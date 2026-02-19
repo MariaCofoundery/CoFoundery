@@ -1,0 +1,2 @@
+-- Intentionally empty.
+-- Seed data is managed through timestamped migrations.

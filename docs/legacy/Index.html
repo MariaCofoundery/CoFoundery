@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CoFoundery Align | Co-Founder Matching mit Werte-Fokus</title>
+    <meta
+      name="description"
+      content="CoFoundery Align verbindet Mitgründer nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung."
+    />
+    <meta name="author" content="CoFoundery Align" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Spectral:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1d2a3a;
+        --muted: #5b6775;
+        --surface: #f9f7fb;
+        --accent: #27b1b7;
+        --accent-deep: #1a7b9e;
+        --violet: #6d3acb;
+        --violet-soft: #b38cf1;
+        --mist: #e6f2f8;
+        --glass: rgba(255, 255, 255, 0.72);
+        --shadow: 0 24px 60px rgba(28, 45, 70, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Spectral", serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% 20%, #fefbff 0%, #f4f8fd 40%, #eef5fb 100%);
+        min-height: 100vh;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .page {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 10%, rgba(109, 58, 203, 0.12), transparent 45%),
+          radial-gradient(circle at 10% 90%, rgba(39, 177, 183, 0.18), transparent 50%);
+        z-index: 0;
+      }
+
+      .grain {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+        pointer-events: none;
+        mix-blend-mode: multiply;
+        z-index: 1;
+      }
+
+      header {
+        position: relative;
+        z-index: 2;
+        padding: 28px clamp(24px, 5vw, 80px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand img {
+        width: 54px;
+        height: 54px;
+      }
+
+      .brand-name {
+        font-family: "Unbounded", sans-serif;
+        font-size: 20px;
+        letter-spacing: 0.04em;
+      }
+
+      nav {
+        display: flex;
+        gap: 22px;
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .cta-pill {
+        padding: 12px 22px;
+        border-radius: 999px;
+        background: linear-gradient(120deg, var(--violet), var(--accent));
+        color: white;
+        font-family: "Unbounded", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 30px rgba(109, 58, 203, 0.25);
+      }
+
+      .hero {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: clamp(28px, 4vw, 64px);
+        padding: 60px clamp(24px, 6vw, 120px) 40px;
+        align-items: center;
+      }
+
+      .hero-copy h1 {
+        font-family: "Unbounded", sans-serif;
+        font-size: clamp(36px, 4vw, 60px);
+        line-height: 1.05;
+        margin-bottom: 20px;
+      }
+
+      .hero-copy p {
+        font-size: 18px;
+        line-height: 1.7;
+        color: var(--muted);
+        margin-bottom: 28px;
+        max-width: 520px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .primary-btn {
+        padding: 14px 28px;
+        border-radius: 16px;
+        background: var(--ink);
+        color: white;
+        font-family: "Unbounded", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .ghost-btn {
+        padding: 14px 28px;
+        border-radius: 16px;
+        border: 1px solid rgba(27, 42, 58, 0.2);
+        color: var(--ink);
+        font-family: "Unbounded", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: transparent;
+      }
+
+      .hero-card {
+        position: relative;
+        background: var(--glass);
+        border-radius: 28px;
+        padding: 26px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(109, 58, 203, 0.1);
+        backdrop-filter: blur(14px);
+      }
+
+      .hero-card::after {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: 20px;
+        border: 1px dashed rgba(39, 177, 183, 0.35);
+        pointer-events: none;
+      }
+
+      .match-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .match-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 24px rgba(31, 50, 76, 0.08);
+        font-size: 14px;
+      }
+
+      .tag {
+        font-family: "Unbounded", sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+      }
+
+      .score {
+        font-family: "Unbounded", sans-serif;
+        font-size: 18px;
+        color: var(--violet);
+      }
+
+      .section {
+        position: relative;
+        z-index: 2;
+        padding: 40px clamp(24px, 6vw, 120px);
+      }
+
+      .section-title {
+        font-family: "Unbounded", sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+        margin-bottom: 14px;
+      }
+
+      .section h2 {
+        font-size: clamp(28px, 3.4vw, 44px);
+        margin: 0 0 20px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 22px;
+        padding: 22px;
+        border: 1px solid rgba(27, 42, 58, 0.08);
+        box-shadow: 0 18px 30px rgba(31, 50, 76, 0.08);
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-family: "Unbounded", sans-serif;
+        font-size: 16px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+      }
+
+      .step {
+        padding: 20px;
+        border-radius: 20px;
+        background: linear-gradient(160deg, rgba(109, 58, 203, 0.08), rgba(39, 177, 183, 0.12));
+        border: 1px solid rgba(109, 58, 203, 0.14);
+      }
+
+      .step span {
+        font-family: "Unbounded", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--violet);
+      }
+
+      .step h4 {
+        margin: 12px 0 8px;
+        font-size: 20px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .testimonial {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
+      }
+
+      .quote {
+        padding: 24px;
+        border-radius: 22px;
+        background: white;
+        border-left: 6px solid var(--accent);
+        box-shadow: 0 18px 30px rgba(31, 50, 76, 0.08);
+      }
+
+      .quote strong {
+        font-family: "Unbounded", sans-serif;
+        display: block;
+        margin-top: 14px;
+      }
+
+      .cta {
+        margin-top: 20px;
+        padding: 36px;
+        border-radius: 28px;
+        background: linear-gradient(120deg, rgba(109, 58, 203, 0.14), rgba(39, 177, 183, 0.18));
+        display: grid;
+        gap: 18px;
+        align-items: center;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .cta form {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      input[type="email"] {
+        flex: 1 1 200px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(27, 42, 58, 0.2);
+        font-family: "Spectral", serif;
+      }
+
+      footer {
+        padding: 30px clamp(24px, 6vw, 120px) 50px;
+        color: var(--muted);
+        font-size: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      @keyframes rise {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .animate {
+        animation: rise 0.8s ease forwards;
+        opacity: 0;
+      }
+
+      .delay-1 {
+        animation-delay: 0.1s;
+      }
+
+      .delay-2 {
+        animation-delay: 0.2s;
+      }
+
+      .delay-3 {
+        animation-delay: 0.35s;
+      }
+
+      .delay-4 {
+        animation-delay: 0.5s;
+      }
+
+      @media (max-width: 800px) {
+        nav {
+          display: none;
+        }
+
+        header {
+          flex-direction: column;
+          gap: 16px;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="grain"></div>
+      <header>
+        <div class="brand">
+          <img src="../assets/Logo.PNG" alt="CoFoundery Align" />
+          <div class="brand-name">CoFoundery Align</div>
+        </div>
+        <nav>
+          <a href="#produkt">Produkt</a>
+          <a href="#prozess">Prozess</a>
+          <a href="#stimmen">Stimmen</a>
+        </nav>
+        <a class="cta-pill" href="#start">Warteliste</a>
+      </header>
+
+      <section class="hero" id="start">
+        <div class="hero-copy">
+          <div class="section-title animate">Co-Founder Matching</div>
+          <h1 class="animate delay-1">Werte zuerst. Danach Talent.</h1>
+          <p class="animate delay-2">
+            CoFoundery Align verbindet Gründer:innen nach Vision, Haltung und Arbeitsstil. Unser Matching zeigt
+            früh, ob es wirklich passt – damit eure Partnerschaft nicht nur effizient, sondern resilient wird.
+          </p>
+          <div class="hero-actions animate delay-3">
+            <a class="primary-btn" href="#start">Jetzt Matching starten</a>
+            <a class="ghost-btn" href="#produkt">Demo ansehen</a>
+          </div>
+        </div>
+        <div class="hero-card animate delay-2">
+          <div class="match-grid">
+            <div class="match-item">
+              <div>
+                <div class="tag">Alignment</div>
+                Vision + Werte + Rhythmus
+              </div>
+              <div class="score">92%</div>
+            </div>
+            <div class="match-item">
+              <div>
+                <div class="tag">Komplement</div>
+                Growth + Product + Ops
+              </div>
+              <div class="score">89%</div>
+            </div>
+            <div class="match-item">
+              <div>
+                <div class="tag">Culture</div>
+                Feedback + Verantwortung
+              </div>
+              <div class="score">95%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="produkt">
+        <div class="section-title">Warum CoFoundery</div>
+        <h2>Co-Founder Beziehungen, die nicht nur schnell starten, sondern lange halten.</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Werte-basierte Profile</h3>
+            <p>Persönliche Prinzipien, Entscheidungsstil und Risikobereitschaft stehen vor Skills.</p>
+          </div>
+          <div class="card">
+            <h3>Signal statt Smalltalk</h3>
+            <p>Alignment-Scores visualisieren sofort, wo echte Synergien entstehen.</p>
+          </div>
+          <div class="card">
+            <h3>Onboarding in 15 Minuten</h3>
+            <p>Strukturierte Fragen führen zu klaren Profilen, die schnell matchen.</p>
+          </div>
+          <div class="card">
+            <h3>Match-Labs</h3>
+            <p>Kurze Experimente testen Zusammenarbeit, bevor ihr langfristig bindet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="prozess">
+        <div class="section-title">Prozess</div>
+        <h2>Von der Idee zur Co-Founder Verbindung in drei klaren Schritten.</h2>
+        <div class="timeline">
+          <div class="step">
+            <span>Schritt 1</span>
+            <h4>Profil & Werte-Canvas</h4>
+            <p>Definiere Mission, ethische Leitplanken und den gewünschten Arbeitsrhythmus.</p>
+          </div>
+          <div class="step">
+            <span>Schritt 2</span>
+            <h4>Align-Matching</h4>
+            <p>Unsere Engine priorisiert Werte, Vision und mentale Modelle – Skills sind ergänzend.</p>
+          </div>
+          <div class="step">
+            <span>Schritt 3</span>
+            <h4>Co-Foundry Session</h4>
+            <p>Gemeinsame Sprint-Workshops validieren eure Dynamik in echten Aufgaben.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="stimmen">
+        <div class="section-title">Stimmen</div>
+        <h2>Teams, die sich für CoFoundery Align entschieden haben.</h2>
+        <div class="testimonial">
+          <div class="quote">
+            „Wir haben nicht nur Skills gematcht, sondern echte gemeinsame Werte gefunden. Das spart Monate.“
+            <strong>Leonie &amp; Farid — Climate SaaS</strong>
+          </div>
+          <div class="quote">
+            „Die Alignment-Scores waren der Moment, in dem wir wussten: Das passt.“
+            <strong>David — HealthTech Founder</strong>
+          </div>
+          <div class="quote">
+            „CoFoundery hat uns geholfen, früh Konflikte sichtbar zu machen – und sie zu lösen.“
+            <strong>Mina — FinOps Studio</strong>
+          </div>
+        </div>
+        <div class="cta">
+          <div>
+            <div class="section-title">Startklar?</div>
+            <h2>Sei Teil der ersten Matching-Welle.</h2>
+          </div>
+          <form>
+            <input type="email" placeholder="Deine E-Mail" required />
+            <button class="primary-btn" type="submit">Platz sichern</button>
+          </form>
+        </div>
+      </section>
+
+      <footer>
+        <div>CoFoundery Align — Connecting Co-Founders</div>
+        <div>hello@cofoundery.io · Berlin · 2026</div>
+      </footer>
+    </div>
+  </body>
+</html>
