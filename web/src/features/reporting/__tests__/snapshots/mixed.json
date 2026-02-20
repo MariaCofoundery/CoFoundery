@@ -1,0 +1,14 @@
+{
+  "summaryType": "Die balancierten Strategen",
+  "topMatches": ["Verbindlichkeit", "Konflikt", "Vision"],
+  "topTensions": ["Risiko", "Autonomie", "Entscheidung"],
+  "labels": [
+    { "dimension": "Vision", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Entscheidung", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Risiko", "label": "KOMPLEMENTAER", "diffClass": "MEDIUM" },
+    { "dimension": "Autonomie", "label": "KOMPLEMENTAER", "diffClass": "MEDIUM" },
+    { "dimension": "Verbindlichkeit", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Konflikt", "label": "MATCH", "diffClass": "SMALL" }
+  ],
+  "conversationGuideCount": 6
+}

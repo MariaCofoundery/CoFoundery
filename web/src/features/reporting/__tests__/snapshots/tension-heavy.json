@@ -1,0 +1,14 @@
+{
+  "summaryType": "Das High-Friction Power-Duo",
+  "topMatches": ["Verbindlichkeit", "Autonomie", "Konflikt"],
+  "topTensions": ["Vision", "Risiko", "Entscheidung"],
+  "labels": [
+    { "dimension": "Vision", "label": "FOKUS_THEMA", "diffClass": "LARGE" },
+    { "dimension": "Entscheidung", "label": "FOKUS_THEMA", "diffClass": "LARGE" },
+    { "dimension": "Risiko", "label": "FOKUS_THEMA", "diffClass": "LARGE" },
+    { "dimension": "Autonomie", "label": "FOKUS_THEMA", "diffClass": "LARGE" },
+    { "dimension": "Verbindlichkeit", "label": "FOKUS_THEMA", "diffClass": "LARGE" },
+    { "dimension": "Konflikt", "label": "FOKUS_THEMA", "diffClass": "LARGE" }
+  ],
+  "conversationGuideCount": 6
+}

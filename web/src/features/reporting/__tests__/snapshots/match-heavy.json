@@ -1,0 +1,14 @@
+{
+  "summaryType": "Die Harmonischen Stabilisatoren",
+  "topMatches": ["Vision", "Autonomie", "Verbindlichkeit"],
+  "topTensions": ["Entscheidung", "Risiko", "Vision"],
+  "labels": [
+    { "dimension": "Vision", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Entscheidung", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Risiko", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Autonomie", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Verbindlichkeit", "label": "MATCH", "diffClass": "SMALL" },
+    { "dimension": "Konflikt", "label": "MATCH", "diffClass": "SMALL" }
+  ],
+  "conversationGuideCount": 6
+}
