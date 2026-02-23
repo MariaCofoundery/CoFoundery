@@ -5,6 +5,7 @@ type Props = {
   answeredB: number;
   total: number;
   personBReady: boolean;
+  mode?: "match" | "self";
 };
 
 export function ValuesModulePlaceholder({
@@ -14,7 +15,9 @@ export function ValuesModulePlaceholder({
   answeredB,
   total,
   personBReady,
+  mode = "match",
 }: Props) {
+  const isSelfMode = mode === "self";
   const statusLabel =
     status === "completed"
       ? "Werte-Profil vollständig"
@@ -23,8 +26,12 @@ export function ValuesModulePlaceholder({
         : "offen";
   const intro =
     status === "not_started"
-      ? "Das dedizierte Werte-Modul wurde noch nicht ausgefüllt. Vorläufige Herleitung auf Basis der 36 Kernfragen zu Ethik und Transparenz:"
-      : "Extra-Kapitel auf Basis der bisherigen Werte-Vertiefung (Ethik & Transparenz):";
+      ? isSelfMode
+        ? "Dein dediziertes Werte-Modul wurde noch nicht ausgefüllt. Vorläufige Herleitung auf Basis der 36 Kernfragen zu Ethik und Transparenz:"
+        : "Das dedizierte Werte-Modul wurde noch nicht ausgefüllt. Vorläufige Herleitung auf Basis der 36 Kernfragen zu Ethik und Transparenz:"
+      : isSelfMode
+        ? "Extra-Kapitel auf Basis deiner bisherigen Werte-Vertiefung (Ethik & Transparenz):"
+        : "Extra-Kapitel auf Basis der bisherigen Werte-Vertiefung (Ethik & Transparenz):";
   return (
     <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -37,7 +44,7 @@ export function ValuesModulePlaceholder({
       </div>
       <p className="mt-4 text-sm leading-7 text-slate-600">{intro}</p>
       <p className="mt-3 text-xs tracking-[0.08em] text-slate-500">
-        Fortschritt: Profil A {answeredA}/{total}
+        Fortschritt: {isSelfMode ? "Dein Profil" : "Profil A"} {answeredA}/{total}
         {personBReady ? `, Profil B ${answeredB}/${total}` : ""}
       </p>
       <p className="mt-4 rounded-xl border border-slate-200/80 bg-slate-50/70 px-5 py-4 text-sm leading-7 text-slate-700">

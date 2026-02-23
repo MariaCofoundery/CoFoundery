@@ -347,7 +347,7 @@ export const VALUES_PLAYBOOK = {
   },
   verantwortungs_stratege: {
     title: "Verantwortungs-Stratege",
-    subtitle: "Dein Match, Maria!",
+    subtitle: "Dein Match, {name}!",
     identity:
       "Du glaubst an „Profit with Purpose“. Du suchst die Schnittmenge aus wirtschaftlichem Erfolg und gesellschaftlicher Verantwortung.",
     warning:

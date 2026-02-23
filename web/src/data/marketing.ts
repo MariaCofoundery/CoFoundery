@@ -1,8 +1,8 @@
 export const nav = [
   { label: "Haltung", href: "/informierte-entscheidungen" },
-  { label: "Produkt", href: "#produkt" },
-  { label: "Ablauf", href: "#ablauf" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Produkt", href: "/#produkt" },
+  { label: "Ablauf", href: "/#ablauf" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export const features = [

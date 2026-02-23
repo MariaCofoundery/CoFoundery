@@ -1,4 +1,4 @@
-export type ParticipantSelectionRow = {
+export type ParticipantLike = {
   id: string;
   role: string;
   user_id: string | null;
@@ -7,64 +7,52 @@ export type ParticipantSelectionRow = {
   created_at: string | null;
 };
 
-export function buildResponseCountByParticipant(
-  rows: Array<{ participant_id: string }>
-) {
-  const responseCountByParticipant = new Map<string, number>();
+// Backward-compatible alias for existing imports/call sites.
+export type ParticipantSelectionRow = ParticipantLike;
+
+// TEMP compatibility helper for older call sites.
+export function buildResponseCountByParticipant(rows: Array<{ participant_id: string }>) {
+  const countByParticipant = new Map<string, number>();
   for (const row of rows) {
-    responseCountByParticipant.set(
+    countByParticipant.set(
       row.participant_id,
-      (responseCountByParticipant.get(row.participant_id) ?? 0) + 1
+      (countByParticipant.get(row.participant_id) ?? 0) + 1
     );
   }
-  return responseCountByParticipant;
+  return countByParticipant;
 }
 
-export function selectParticipantB(
-  participants: ParticipantSelectionRow[],
+export function selectParticipantB<T extends ParticipantLike>(
+  participants: T[],
   options?: {
-    primary?: ParticipantSelectionRow | undefined;
+    primary?: T | undefined;
     responseCountByParticipant?: Map<string, number>;
   }
 ) {
-  const primary =
-    options?.primary ??
-    selectParticipantA(participants, { responseCountByParticipant: options?.responseCountByParticipant });
+  const primary = options?.primary ?? selectParticipantA(participants, options);
+  const primaryUserId = primary?.user_id ?? null;
+
   const candidates = participants.filter((row) => row.role === "B" || row.role === "partner");
   if (candidates.length === 0) return undefined;
 
-  const responseCountByParticipant = options?.responseCountByParticipant ?? new Map<string, number>();
-  const primaryUserId = primary?.user_id ?? null;
-
-  return [...candidates].sort((a, b) => {
-    return scoreParticipant(b, primaryUserId, responseCountByParticipant)
-      - scoreParticipant(a, primaryUserId, responseCountByParticipant);
-  })[0];
+  return [...candidates].sort((a, b) => scoreSecondary(b, primaryUserId) - scoreSecondary(a, primaryUserId))[0];
 }
 
-export function selectParticipantA(
-  participants: ParticipantSelectionRow[],
+export function selectParticipantA<T extends ParticipantLike>(
+  participants: T[],
   options?: {
     responseCountByParticipant?: Map<string, number>;
   }
 ) {
+  void options;
   const candidates = participants.filter((row) => row.role === "A");
   if (candidates.length === 0) return undefined;
-  const responseCountByParticipant = options?.responseCountByParticipant ?? new Map<string, number>();
 
-  return [...candidates].sort((a, b) => {
-    return scorePrimaryParticipant(b, responseCountByParticipant)
-      - scorePrimaryParticipant(a, responseCountByParticipant);
-  })[0];
+  return [...candidates].sort((a, b) => scorePrimary(b) - scorePrimary(a))[0];
 }
 
-function scoreParticipant(
-  participant: ParticipantSelectionRow,
-  primaryUserId: string | null,
-  responseCountByParticipant: Map<string, number>
-) {
+function scoreSecondary(participant: ParticipantLike, primaryUserId: string | null) {
   const completed = participant.completed_at ? 1 : 0;
-  const responses = responseCountByParticipant.get(participant.id) ?? 0;
   const linked = participant.user_id ? 1 : 0;
   const linkedDifferentUser =
     primaryUserId && participant.user_id && participant.user_id !== primaryUserId ? 1 : 0;
@@ -73,27 +61,15 @@ function scoreParticipant(
     primaryUserId && participant.user_id && participant.user_id === primaryUserId ? -1000 : 0;
   const recency = timestampValue(participant.created_at) / 1_000_000_000_000;
 
-  return (
-    completed * 1000 +
-    responses * 100 +
-    linkedDifferentUser * 80 +
-    linked * 20 +
-    invite * 5 +
-    recency +
-    sameUserPenalty
-  );
+  return completed * 1000 + linkedDifferentUser * 80 + linked * 20 + invite * 5 + recency + sameUserPenalty;
 }
 
-function scorePrimaryParticipant(
-  participant: ParticipantSelectionRow,
-  responseCountByParticipant: Map<string, number>
-) {
+function scorePrimary(participant: ParticipantLike) {
   const completed = participant.completed_at ? 1 : 0;
-  const responses = responseCountByParticipant.get(participant.id) ?? 0;
   const linked = participant.user_id ? 1 : 0;
   const recency = timestampValue(participant.created_at) / 1_000_000_000_000;
 
-  return completed * 1000 + responses * 100 + linked * 20 + recency;
+  return completed * 1000 + linked * 20 + recency;
 }
 
 function timestampValue(value: string | null | undefined) {

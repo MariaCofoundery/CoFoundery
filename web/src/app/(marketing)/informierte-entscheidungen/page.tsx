@@ -9,7 +9,7 @@ export default function InformierteEntscheidungenPage() {
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            "radial-gradient(circle at 88% 0%, rgba(38, 118, 255, 0.18), transparent 35%), radial-gradient(circle at 12% 20%, rgba(255, 107, 43, 0.14), transparent 36%), radial-gradient(circle at 36% 94%, rgba(21, 80, 128, 0.1), transparent 44%)",
+            "radial-gradient(circle at 88% 0%, rgba(38, 118, 255, 0.18), transparent 35%), radial-gradient(circle at 12% 20%, rgba(124, 58, 237, 0.14), transparent 36%), radial-gradient(circle at 36% 94%, rgba(21, 80, 128, 0.1), transparent 44%)",
         }}
       />
       <div aria-hidden className="pointer-events-none absolute -left-32 top-28 h-96 w-96 rounded-full bg-[color:var(--blob-a)] blur-3xl" />
@@ -31,14 +31,14 @@ export default function InformierteEntscheidungenPage() {
           </Link>
           <nav className="hidden items-center gap-7 text-sm text-[color:var(--muted)] md:flex">
             {nav.map((item) => (
-              <a key={item.href} href={item.href} className="transition hover:text-[color:var(--ink)]">
+              <Link key={item.href} href={item.href} className="transition hover:text-[color:var(--ink)]">
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
           <Link
             href="/dashboard"
-            className="rounded-xl bg-[color:var(--ink)] px-4 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-white transition hover:bg-[color:var(--ink-soft)] md:text-xs"
+            className="rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-slate-950 transition hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] md:text-xs"
           >
             Session starten
           </Link>
@@ -53,13 +53,10 @@ export default function InformierteEntscheidungenPage() {
           <div className="mt-6 overflow-hidden rounded-3xl border border-[color:var(--line)] bg-white/85 p-6 shadow-[var(--shadow)] md:p-10">
             <div className="h-2 w-24 rounded-full bg-gradient-to-r from-[color:var(--accent)] to-[#2b4b6f]" />
             <blockquote className="mt-6 font-[var(--font-display)] text-3xl leading-tight tracking-tight md:text-6xl">
-              „Wir glauben nicht an perfekte Matches
+              „Wir glauben nicht an perfekte Matches,
               <br />
-              <span className="text-[color:var(--accent-dark)]">sondern an informierte Entscheidungen.“</span>
+              <span className="text-[color:var(--accent-dark)]"> sondern an informierte Entscheidungen.“</span>
             </blockquote>
-            <p className="mt-6 max-w-3xl text-base leading-8 text-[color:var(--muted)] md:text-lg">
-              Wissenschaftlich fundiert - nicht aus dem Bauch heraus.
-            </p>
           </div>
         </section>
 
@@ -162,7 +159,7 @@ export default function InformierteEntscheidungenPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/dashboard"
-              className="rounded-2xl bg-[color:var(--accent)] px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--accent-dark)]"
+              className="rounded-2xl bg-[color:var(--brand-primary)] px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 transition hover:translate-y-[-1px] hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
             >
               Alignment prüfen
             </Link>

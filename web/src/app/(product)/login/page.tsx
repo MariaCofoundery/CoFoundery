@@ -2,19 +2,26 @@ import { redirect } from "next/navigation";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { createClient } from "@/lib/supabase/server";
 
+function normalizeNextPath(value: string | undefined) {
+  const trimmed = (value ?? "").trim();
+  if (!trimmed.startsWith("/")) return "/dashboard";
+  return trimmed;
+}
+
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; next?: string }>;
 }) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const params = await searchParams;
+  const nextPath = normalizeNextPath(params.next);
 
   if (user) {
-    redirect("/dashboard");
+    redirect(nextPath);
   }
 
   return (
@@ -34,7 +41,7 @@ export default async function LoginPage({
           </p>
         ) : null}
         <div className="mt-6">
-          <MagicLinkForm nextPath={params.next ?? "/dashboard"} />
+          <MagicLinkForm nextPath={nextPath} />
         </div>
       </section>
     </main>

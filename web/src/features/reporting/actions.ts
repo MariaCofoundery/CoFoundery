@@ -1,333 +1,2032 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import {
-  REPORT_DIMENSIONS,
-  type DimensionDebugEntry,
-  type KeyInsight,
-  type ParticipantDebugReport,
-  type PersonBStatus,
-  type RadarSeries,
-  type ReportDimension,
-  type CompareReportJson,
-  type SessionAlignmentReport,
-} from "@/features/reporting/types";
-import {
-  ACTIONABLE_PLAYBOOK,
-  DIMENSION_INTERPRETATIONS,
-  DIMENSION_INSIGHTS,
-  REPORT_CONTENT,
-  VALUES_PLAYBOOK,
-} from "@/features/reporting/constants";
+import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   buildProfileResultFromSession,
   generateCompareReport,
 } from "@/features/reporting/generateCompareReport";
+import { createClient } from "@/lib/supabase/server";
+import { DIMENSION_DEFINITIONS_DE } from "@/features/reporting/report_texts.de";
 import {
-  buildResponseCountByParticipant,
-  selectParticipantA,
-  selectParticipantB,
-} from "@/features/participants/selection";
-
-type ParticipantRow = {
-  id: string;
-  role: "A" | "B" | "partner";
-  user_id: string | null;
-  invited_email: string | null;
-  display_name: string | null;
-  created_at: string | null;
-  completed_at: string | null;
-  requested_scope?: string | null;
-  invite_consent_at?: string | null;
-  invite_consent_by_user_id?: string | null;
-};
-
-type ResponseRow = {
-  participant_id: string;
-  question_id: string;
-  choice_value: string;
-};
-
-type QuestionMeta = {
-  dimension: ReportDimension;
-  max: number;
-};
-
-type BasisProgress = {
-  total: number;
-  answeredA: number;
-  answeredB: number;
-  completeA: boolean;
-  completeB: boolean;
-};
-
-type AggregationResult = {
-  averages: Map<string, Map<ReportDimension, number>>;
-  debugByParticipant: Map<string, Map<ReportDimension, DimensionDebugEntry>>;
-};
-
-type ReportModuleKey = "base" | "values" | "stress" | "roles" | "decision_architecture";
-
-type ReportRunInputRefs = {
-  source: "session";
-  sessionId: string;
-  participantAId: string | null;
-  participantBId: string | null;
-  participantACompletedAt: string | null;
-  participantBCompletedAt: string | null;
-  requestedScope: SessionAlignmentReport["requestedScope"];
-  valuesModuleStatus: SessionAlignmentReport["valuesModuleStatus"];
-};
-
-type PersistedComparePayload = {
-  schemaVersion: 1;
-  generatedAt: string;
-  inputRefs: ReportRunInputRefs;
-  sessionReport: SessionAlignmentReport;
-  compareJson: CompareReportJson;
-};
+  aggregateBaseScoresFromAnswers,
+  assertValuesTotalCategoryContract,
+  type AssessmentAnswerRow,
+  type QuestionMetaRow,
+} from "@/features/reporting/base_scoring";
+import {
+  computeValuesContinuumScore,
+  scoreSelfValuesProfile,
+  type ValuesAnswerForScoring,
+} from "@/features/reporting/values_scoring";
+import {
+  REPORT_DIMENSIONS,
+  type CompareReportJson,
+  type KeyInsight,
+  type RadarSeries,
+  type ReportDimension,
+  type SessionAlignmentReport,
+} from "@/features/reporting/types";
 
 export type ReportRunSnapshot = {
-  runId: string;
-  version: number;
+  id: string;
+  invitationId: string;
   relationshipId: string;
-  sourceSessionId: string | null;
   createdAt: string;
-  modules: ReportModuleKey[];
-  inputRefs: ReportRunInputRefs;
-  report: SessionAlignmentReport;
-  compareJson: CompareReportJson;
+  modules: string[];
+  inputAssessmentIds: string[];
+  report: SessionAlignmentReport | null;
+  compareJson: CompareReportJson | null;
+  payload: Record<string, unknown> | null;
 };
 
-const REPORT_RUN_SCHEMA_VERSION = 1 as const;
+type ReportRunRow = {
+  id: string;
+  invitation_id: string;
+  relationship_id: string;
+  modules: string[] | null;
+  input_assessment_ids: string[] | null;
+  payload: unknown;
+  created_at: string;
+};
 
-export async function getSessionAlignmentReport(sessionId: string): Promise<SessionAlignmentReport | null> {
+type SubmittedAssessmentRow = {
+  id: string;
+  module?: string;
+  user_id?: string;
+  submitted_at: string | null;
+  created_at: string;
+};
+
+const VALUES_QUESTION_CATEGORY = "values" as const;
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
+type SupabaseDbClient = SupabaseLikeClient & SupabaseClient;
+export type AssessmentModule = "base" | "values";
+
+type EnsureReportRunResult =
+  | {
+      ok: true;
+      reportRunId: string;
+    }
+  | {
+      ok: false;
+      reason:
+        | "not_authenticated"
+        | "invitation_not_found"
+        | "not_accepted"
+        | "missing_invitee"
+        | "missing_relationship"
+        | "waiting_for_answers"
+        | "expired"
+        | "revoked"
+        | "missing_service_role"
+        | "insert_failed";
+      detail?: string;
+    };
+
+type EnsureReportRunFailureReason = Exclude<EnsureReportRunResult, { ok: true }>["reason"];
+
+type InvitationEnsureRow = {
+  id: string;
+  inviter_user_id: string;
+  invitee_user_id: string | null;
+  invitee_email: string;
+  status: string;
+  created_at: string;
+  accepted_at: string | null;
+  expires_at: string;
+  revoked_at: string | null;
+};
+
+type InvitationModuleRow = {
+  module: string;
+};
+
+type ProfileDisplayRow = {
+  user_id: string;
+  display_name: string | null;
+};
+
+type InvitationDashboardSourceRow = {
+  id: string;
+  inviter_user_id: string;
+  invitee_user_id: string | null;
+  invitee_email: string;
+  status: string;
+  label: string | null;
+  inviter_display_name: string | null;
+  inviter_email: string | null;
+  created_at: string;
+  expires_at: string;
+};
+
+type InvitationModuleByInvitationRow = {
+  invitation_id: string;
+  module: string;
+};
+
+type SubmittedAssessmentLiteRow = {
+  id: string;
+  user_id: string;
+  module: string;
+  submitted_at: string | null;
+  created_at: string;
+};
+
+type ReportRunInvitationRow = {
+  invitation_id: string;
+};
+
+type FinalizeInvitationRpcRow = {
+  ready: boolean | null;
+  report_run_id: string | null;
+  relationship_id: string | null;
+  modules: string[] | null;
+  assessment_ids: string[] | null;
+  reason: string | null;
+};
+
+export type InvitationDashboardRow = {
+  id: string;
+  direction: "sent" | "incoming";
+  inviteeEmail: string;
+  status: string;
+  label: string | null;
+  inviterDisplayName: string | null;
+  inviterEmail: string | null;
+  requiredModules: AssessmentModule[];
+  isReportReady: boolean;
+  isReadyForMatching: boolean;
+  inviterBaseSubmitted: boolean;
+  inviterValuesSubmitted: boolean;
+  inviteeBaseSubmitted: boolean;
+  inviteeValuesSubmitted: boolean;
+  createdAt: string;
+  expiresAt: string;
+};
+
+type PerUserReadinessSnapshot = {
+  has_base_submitted: boolean;
+  has_values_submitted: boolean;
+  submitted_assessment_ids: {
+    base: string | null;
+    values: string | null;
+  };
+  answers_count: {
+    base: number;
+    values: number;
+  };
+};
+
+export type InvitationReadinessDebug = {
+  invitation: {
+    id: string;
+    status: string;
+    inviter_user_id: string;
+    invitee_user_id: string | null;
+    invitee_email: string;
+    expires_at: string;
+    revoked_at: string | null;
+    accepted_at: string | null;
+  };
+  modules_required: AssessmentModule[];
+  per_user_status: {
+    inviter: PerUserReadinessSnapshot;
+    invitee: PerUserReadinessSnapshot | null;
+  };
+  report_run_exists: boolean;
+  report_run_id: string | null;
+  relationship_exists: boolean;
+  relationship_id: string | null;
+  computed_ready: boolean;
+  reason_not_ready: string[];
+  last_error: string | null;
+};
+
+export type InvitationJoinDecision =
+  | {
+      ok: true;
+      invitation_id: string;
+      mode: "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
+      required_modules: AssessmentModule[];
+      missing_modules: AssessmentModule[];
+      invitee_status: {
+        has_base_submitted: boolean;
+        has_values_submitted: boolean;
+      };
+      report_run_id: string | null;
+    }
+  | {
+      ok: false;
+      reason:
+        | "not_authenticated"
+        | "invitation_not_found"
+        | "not_invitee"
+        | "not_accepted"
+        | "expired"
+        | "revoked"
+        | "missing_invitee";
+      detail?: string;
+    };
+
+export type UseExistingInvitationProfileResult =
+  | {
+      ok: true;
+      reportRunId: string | null;
+      waiting: boolean;
+      reason?: string;
+    }
+  | {
+      ok: false;
+      reason: "not_ready_for_existing" | EnsureReportRunFailureReason;
+      detail?: string;
+    };
+
+function createPrivilegedClient(): SupabaseDbClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
+  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
+
+function toRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+  return value as Record<string, unknown>;
+}
+
+function emptySeries(): RadarSeries {
+  return REPORT_DIMENSIONS.reduce((acc, key) => {
+    acc[key] = null;
+    return acc;
+  }, {} as RadarSeries);
+}
+
+function normalizeDimensionLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^\w\s&]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
+  const normalized = normalizeDimensionLabel(dim);
+  if (!normalized) return null;
+
+  if (normalized.includes("vision") && normalized.includes("richtung")) {
+    return "Vision";
+  }
+
+  if (normalized.includes("entscheidungsstil") || normalized.includes("entscheidung")) {
+    return "Entscheidung";
+  }
+
+  if (
+    (normalized.includes("unsicherheit") && normalized.includes("risiko")) ||
+    normalized.includes("umgang mit unsicherheit")
+  ) {
+    return "Risiko";
+  }
+
+  if (normalized.includes("zusammenarbeit") && normalized.includes("nahe")) {
+    return "Autonomie";
+  }
+
+  if (normalized.includes("verantwortung") && normalized.includes("verbindlichkeit")) {
+    return "Verbindlichkeit";
+  }
+
+  if (normalized.includes("konfliktverhalten") || normalized.includes("konflikt")) {
+    return "Konflikt";
+  }
+
+  return null;
+}
+
+function normalizeCategory(value: string | null | undefined) {
+  return value?.trim().toLowerCase() ?? "";
+}
+
+function isValuesCategory(value: string | null | undefined) {
+  return normalizeCategory(value) === VALUES_QUESTION_CATEGORY;
+}
+
+function assertValuesCategoryContract(rows: QuestionMetaRow[], context: string) {
+  const invalid = rows.filter((row) => !isValuesCategory(row.category));
+  if (invalid.length === 0) {
+    return;
+  }
+
+  const sample = invalid
+    .slice(0, 8)
+    .map((row) => `${row.id}:${normalizeCategory(row.category) || "null"}`)
+    .join(", ");
+  const message = `values_category_contract_violation (${context}): expected category='values', got ${sample}`;
+  if (process.env.NODE_ENV !== "production") {
+    throw new Error(message);
+  }
+  console.error(message);
+}
+
+async function countQuestionsByCategories(
+  supabase: SupabaseLikeClient,
+  categories: string[],
+  onlyActive: boolean
+): Promise<number> {
+  const normalized = [...new Set(categories.map((category) => normalizeCategory(category)).filter(Boolean))];
+  if (normalized.length === 0) return 0;
+
+  let query = supabase.from("questions").select("id", { count: "exact", head: true }).in("category", normalized);
+  if (onlyActive) {
+    query = query.eq("is_active", true);
+  }
+
+  const { count, error } = await query;
+  if (error || typeof count !== "number") {
+    return 0;
+  }
+
+  return count;
+}
+
+async function countValuesQuestionsTotal(supabase: SupabaseLikeClient, onlyActive: boolean): Promise<number> {
+  let query = supabase
+    .from("questions")
+    .select("id", { count: "exact", head: true })
+    .eq("category", VALUES_QUESTION_CATEGORY);
+  if (onlyActive) {
+    query = query.eq("is_active", true);
+  }
+
+  const { count, error } = await query;
+  if (error || typeof count !== "number") {
+    return 0;
+  }
+  return count;
+}
+
+function scoreToZone(score: number, dimension: ReportDimension) {
+  const thresholds = DIMENSION_DEFINITIONS_DE[dimension].thresholds;
+  if (score <= thresholds.lowMax) return "low" as const;
+  if (score >= thresholds.highMin) return "high" as const;
+  return "mid" as const;
+}
+
+function insightDimensionLabel(dimension: ReportDimension) {
+  return dimension === "Risiko" ? "Risikoprofil" : dimension;
+}
+
+function round(value: number, precision = 2) {
+  const factor = 10 ** precision;
+  return Math.round(value * factor) / factor;
+}
+
+function normalizeBaseAnswerToReportScale(rawValue: string): number | null {
+  const parsedValue = Number.parseFloat(rawValue);
+  if (!Number.isFinite(parsedValue)) return null;
+
+  if (parsedValue >= 1 && parsedValue <= 4) {
+    // Canonical basis normalization: DB likert (1..4) -> report scale (1..6)
+    return round(1 + ((parsedValue - 1) / 3) * 5, 3);
+  }
+
+  return Math.max(1, Math.min(6, parsedValue));
+}
+
+type RankedSelfDimension = {
+  dimension: ReportDimension;
+  score: number;
+  zone: "low" | "mid" | "high";
+  priority: number;
+  archetype: (typeof DIMENSION_DEFINITIONS_DE)[ReportDimension]["archetypesByZone"]["low"];
+};
+
+function ensureSentence(value: string) {
+  const text = value.trim();
+  if (!text) return "";
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+function decapitalizeFirst(value: string) {
+  if (!value) return value;
+  return `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
+}
+
+function strengthInsightText(row: RankedSelfDimension) {
+  const sentence1 = ensureSentence(
+    `In ${insightDimensionLabel(row.dimension)} agierst du aktuell als ${row.archetype.name}: ${row.archetype.descriptionShort}`
+  );
+  const sentence2 = ensureSentence(
+    `Nutze diese Stärke bewusst im Gründeralltag und achte darauf, dass ${decapitalizeFirst(row.archetype.caution)}`
+  );
+  return `${sentence1} ${sentence2}`;
+}
+
+function watchoutInsightText(row: RankedSelfDimension) {
+  const sentence1 = ensureSentence(
+    `In ${insightDimensionLabel(row.dimension)} zeigt dein Profil aktuell eine besonders prägende Tendenz: ${row.archetype.descriptionShort}`
+  );
+  const sentence2 = ensureSentence(
+    `Setze dafür klare Leitplanken, damit ${decapitalizeFirst(row.archetype.caution)}`
+  );
+  return `${sentence1} ${sentence2}`;
+}
+
+function buildSelfKeyInsights(scores: RadarSeries): KeyInsight[] {
+  const ranked = REPORT_DIMENSIONS.map((dimension) => {
+    const score = scores[dimension];
+    if (score == null) return null;
+    const zone = scoreToZone(score, dimension);
+    const archetype = DIMENSION_DEFINITIONS_DE[dimension].archetypesByZone[zone];
+    return {
+      dimension,
+      score,
+      zone,
+      archetype,
+      priority: Math.abs(score - 3.5),
+    };
+  })
+    .filter((row): row is NonNullable<typeof row> => row != null)
+    .sort((a, b) => b.priority - a.priority) as RankedSelfDimension[];
+
+  const strengths = ranked.slice(0, 2);
+  const usedStrengths = new Set(strengths.map((row) => row.dimension));
+  let watchout = [...ranked].sort((a, b) => a.score - b.score).find((row) => !usedStrengths.has(row.dimension));
+  if (!watchout) {
+    watchout = ranked.find((row) => !usedStrengths.has(row.dimension)) ?? ranked[0];
+  }
+
+  const completed: KeyInsight[] = [];
+  for (const row of strengths) {
+    completed.push({
+      dimension: row.dimension,
+      title: `${insightDimensionLabel(row.dimension)} - ${row.archetype.name}`,
+      text: strengthInsightText(row),
+      priority: completed.length + 1,
+    });
+  }
+
+  if (watchout) {
+    completed.push({
+      dimension: watchout.dimension,
+      title: `${insightDimensionLabel(watchout.dimension)} - Fokus-Thema`,
+      text: watchoutInsightText(watchout),
+      priority: completed.length + 1,
+    });
+  }
+
+  if (completed.length >= 3) return completed.slice(0, 3);
+
+  const used = new Set(completed.map((entry) => entry.dimension));
+  const padded: KeyInsight[] = [...completed];
+  for (const dimension of REPORT_DIMENSIONS) {
+    if (padded.length >= 3) break;
+    if (used.has(dimension)) continue;
+    padded.push({
+      dimension,
+      title: `${insightDimensionLabel(dimension)} - Noch offen`,
+      text: "Für diese Dimension liegen aktuell noch zu wenige Antworten vor. Ergänze weitere Antworten, um eine belastbare Einordnung zu erhalten.",
+      priority: padded.length + 1,
+    });
+  }
+
+  return padded.slice(0, 3);
+}
+
+function coerceAssessmentModule(value: string | null | undefined): AssessmentModule | null {
+  if (value === "base" || value === "values") return value;
+  return null;
+}
+
+function ensureBaseModule(modules: AssessmentModule[]): AssessmentModule[] {
+  if (modules.includes("base")) return modules;
+  return ["base", ...modules];
+}
+
+async function getRequiredModulesForInvitation(
+  supabase: SupabaseLikeClient,
+  invitationId: string
+): Promise<AssessmentModule[]> {
+  const { data, error } = await supabase
+    .from("invitation_modules")
+    .select("module")
+    .eq("invitation_id", invitationId);
+
+  if (error || !data) {
+    return ["base"];
+  }
+
+  const modules = [...new Set((data as InvitationModuleRow[]).map((row) => coerceAssessmentModule(row.module)).filter(Boolean))] as AssessmentModule[];
+  return ensureBaseModule(modules);
+}
+
+async function getLatestSubmittedAssessmentForUserModule(
+  supabase: SupabaseLikeClient,
+  userId: string,
+  module: AssessmentModule
+): Promise<SubmittedAssessmentRow | null> {
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("id, user_id, module, submitted_at, created_at")
+    .eq("user_id", userId)
+    .eq("module", module)
+    .not("submitted_at", "is", null)
+    .order("submitted_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as SubmittedAssessmentRow;
+}
+
+async function getAssessmentAnswers(
+  supabase: SupabaseLikeClient,
+  assessmentId: string
+): Promise<AssessmentAnswerRow[]> {
+  const { data, error } = await supabase
+    .from("assessment_answers")
+    .select("question_id, choice_value")
+    .eq("assessment_id", assessmentId);
+
+  if (error || !data) return [];
+  return data as AssessmentAnswerRow[];
+}
+
+async function getQuestionMetaMap(
+  supabase: SupabaseLikeClient,
+  questionIds: string[]
+): Promise<Map<string, QuestionMetaRow>> {
+  const uniqueQuestionIds = [...new Set(questionIds.filter(Boolean))];
+  if (uniqueQuestionIds.length === 0) {
+    return new Map<string, QuestionMetaRow>();
+  }
+
+  const { data, error } = await supabase
+    .from("questions")
+    .select("id, dimension, category, prompt")
+    .in("id", uniqueQuestionIds);
+
+  if (error || !data) {
+    return new Map<string, QuestionMetaRow>();
+  }
+
+  return new Map((data as QuestionMetaRow[]).map((row) => [row.id, row]));
+}
+
+function emptyDimensionCountRecord() {
+  return REPORT_DIMENSIONS.reduce((acc, dimension) => {
+    acc[dimension] = 0;
+    return acc;
+  }, {} as Record<ReportDimension, number>);
+}
+
+async function getExpectedBaseQuestionCountByDimension(
+  supabase: SupabaseLikeClient
+): Promise<Record<ReportDimension, number>> {
+  const fallback = emptyDimensionCountRecord();
+  const { data, error } = await supabase
+    .from("questions")
+    .select("id, dimension, category, is_active")
+    .eq("category", "basis")
+    .eq("is_active", true);
+
+  if (error || !data || data.length === 0) {
+    const fallbackQuery = await supabase
+      .from("questions")
+      .select("id, dimension, category")
+      .eq("category", "basis");
+    if (fallbackQuery.error || !fallbackQuery.data) {
+      return fallback;
+    }
+    for (const row of fallbackQuery.data as QuestionMetaRow[]) {
+      const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
+      if (!mapped) continue;
+      fallback[mapped] += 1;
+    }
+    return fallback;
+  }
+
+  for (const row of data as Array<QuestionMetaRow & { is_active?: boolean }>) {
+    const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
+    if (!mapped) continue;
+    fallback[mapped] += 1;
+  }
+  return fallback;
+}
+
+function parseAcceptableReportRunId(row: { id?: string } | null | undefined): string | null {
+  if (!row?.id || typeof row.id !== "string") return null;
+  return row.id;
+}
+
+function parseFinalizeRpcRow(value: unknown): FinalizeInvitationRpcRow | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object") return null;
+  return row as FinalizeInvitationRpcRow;
+}
+
+function mapFinalizeReasonToEnsureReason(reason: string | null | undefined): EnsureReportRunFailureReason {
+  if (reason === "invitation_not_found") return "invitation_not_found";
+  if (reason === "not_accepted") return "not_accepted";
+  if (reason === "missing_invitee") return "missing_invitee";
+  if (reason === "waiting_for_answers") return "waiting_for_answers";
+  if (reason === "expired") return "expired";
+  if (reason === "revoked") return "revoked";
+  return "insert_failed";
+}
+
+function isInvitationExpired(expiresAt: string | null | undefined) {
+  if (!expiresAt) return false;
+  const timestamp = new Date(expiresAt).getTime();
+  if (Number.isNaN(timestamp)) return false;
+  return timestamp < Date.now();
+}
+
+async function getLatestSubmittedAssessmentsByUserAndModule(
+  supabase: SupabaseLikeClient,
+  userIds: string[]
+): Promise<Map<string, Map<AssessmentModule, SubmittedAssessmentRow>>> {
+  const normalizedUserIds = [...new Set(userIds.filter(Boolean))];
+  if (normalizedUserIds.length === 0) {
+    return new Map<string, Map<AssessmentModule, SubmittedAssessmentRow>>();
+  }
+
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("id, user_id, module, submitted_at, created_at")
+    .in("user_id", normalizedUserIds)
+    .in("module", ["base", "values"])
+    .not("submitted_at", "is", null)
+    .order("submitted_at", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    return new Map<string, Map<AssessmentModule, SubmittedAssessmentRow>>();
+  }
+
+  const byUser = new Map<string, Map<AssessmentModule, SubmittedAssessmentRow>>();
+  for (const row of data as SubmittedAssessmentLiteRow[]) {
+    const userId = row.user_id?.trim();
+    const moduleKey = coerceAssessmentModule(row.module);
+    if (!userId || !moduleKey) continue;
+
+    const byModule = byUser.get(userId) ?? new Map<AssessmentModule, SubmittedAssessmentRow>();
+    if (!byModule.has(moduleKey)) {
+      byModule.set(moduleKey, {
+        id: row.id,
+        module: moduleKey,
+        user_id: userId,
+        submitted_at: row.submitted_at,
+        created_at: row.created_at,
+      });
+      byUser.set(userId, byModule);
+    }
+  }
+
+  return byUser;
+}
+
+async function getAnswerCountByAssessmentId(
+  supabase: SupabaseLikeClient,
+  assessmentIds: string[]
+): Promise<Map<string, number>> {
+  const normalizedAssessmentIds = [...new Set(assessmentIds.filter(Boolean))];
+  if (normalizedAssessmentIds.length === 0) {
+    return new Map<string, number>();
+  }
+
+  const { data, error } = await supabase
+    .from("assessment_answers")
+    .select("assessment_id")
+    .in("assessment_id", normalizedAssessmentIds);
+  if (error || !data) {
+    return new Map<string, number>();
+  }
+
+  const counts = new Map<string, number>();
+  for (const row of data as Array<{ assessment_id: string }>) {
+    counts.set(row.assessment_id, (counts.get(row.assessment_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function isUserReadyForModules(
+  requiredModules: AssessmentModule[],
+  submittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined
+) {
+  return requiredModules.every((moduleKey) => submittedByModule?.has(moduleKey));
+}
+
+function buildPerUserReadinessSnapshot(
+  submittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined,
+  answersByAssessmentId: Map<string, number>
+): PerUserReadinessSnapshot {
+  const baseAssessmentId = submittedByModule?.get("base")?.id ?? null;
+  const valuesAssessmentId = submittedByModule?.get("values")?.id ?? null;
+  return {
+    has_base_submitted: Boolean(baseAssessmentId),
+    has_values_submitted: Boolean(valuesAssessmentId),
+    submitted_assessment_ids: {
+      base: baseAssessmentId,
+      values: valuesAssessmentId,
+    },
+    answers_count: {
+      base: baseAssessmentId ? answersByAssessmentId.get(baseAssessmentId) ?? 0 : 0,
+      values: valuesAssessmentId ? answersByAssessmentId.get(valuesAssessmentId) ?? 0 : 0,
+    },
+  };
+}
+
+function buildReadinessReasons(params: {
+  invitation: InvitationEnsureRow;
+  requiredModules: AssessmentModule[];
+  inviterAssessments: Map<AssessmentModule, SubmittedAssessmentRow> | undefined;
+  inviteeAssessments: Map<AssessmentModule, SubmittedAssessmentRow> | undefined;
+  reportRunExists: boolean;
+}): string[] {
+  const reasons: string[] = [];
+  const { invitation, requiredModules, inviterAssessments, inviteeAssessments, reportRunExists } = params;
+
+  if (invitation.status !== "accepted") {
+    reasons.push(
+      invitation.status === "revoked" || invitation.revoked_at ? "revoked" : "invite_not_accepted"
+    );
+  }
+  if (!invitation.invitee_user_id) {
+    reasons.push("invitee_missing");
+  }
+  if (invitation.revoked_at) {
+    reasons.push("revoked");
+  }
+  if (isInvitationExpired(invitation.expires_at)) {
+    reasons.push("expired");
+  }
+
+  for (const moduleKey of requiredModules) {
+    if (!inviterAssessments?.has(moduleKey)) {
+      reasons.push(`${moduleKey}_missing_for_inviter`);
+    }
+    if (!inviteeAssessments?.has(moduleKey)) {
+      reasons.push(`${moduleKey}_missing_for_invitee`);
+    }
+  }
+
+  const uniqReasons = [...new Set(reasons)];
+  if (uniqReasons.length === 0 && !reportRunExists) {
+    uniqReasons.push("finalize_not_called");
+  }
+
+  return uniqReasons;
+}
+
+export async function getInvitationDashboardRows(): Promise<InvitationDashboardRow[]> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
+  if (!user?.id) {
+    return [];
   }
 
-  const normalizedSessionId = sessionId.trim();
-  if (!normalizedSessionId) {
-    return null;
+  const normalizedEmail = (user.email ?? "").trim().toLowerCase();
+  const invitationFilter = normalizedEmail
+    ? `inviter_user_id.eq.${user.id},invitee_user_id.eq.${user.id},invitee_email.eq.${normalizedEmail}`
+    : `inviter_user_id.eq.${user.id},invitee_user_id.eq.${user.id}`;
+  const { data: invitationsData, error: invitationsError } = await supabase
+    .from("invitations")
+    .select(
+      "id, inviter_user_id, invitee_user_id, invitee_email, status, label, inviter_display_name, inviter_email, created_at, expires_at"
+    )
+    .or(invitationFilter)
+    .order("created_at", { ascending: false });
+
+  if (invitationsError || !invitationsData) {
+    return [];
   }
 
-  const { data: membership } = await supabase
-    .from("participants")
-    .select("id")
-    .eq("session_id", normalizedSessionId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!membership) {
-    return null;
+  const invitations = invitationsData as InvitationDashboardSourceRow[];
+  if (invitations.length === 0) {
+    return [];
   }
 
-  const [{ data: sessionRow }, { data: participantsRaw }, { data: responsesRaw }, { data: questionsRaw }] = await Promise.all([
-    supabase
-      .from("sessions")
-      .select("id, created_at")
-      .eq("id", normalizedSessionId)
-      .maybeSingle(),
-    supabase
-      .from("participants")
-      .select("*")
-      .eq("session_id", normalizedSessionId),
-    supabase
-      .from("responses")
-      .select("participant_id, question_id, choice_value")
-      .eq("session_id", normalizedSessionId),
-    supabase.from("questions").select("id, dimension, sort_order, category, choices(id)"),
+  const invitationIds = invitations.map((invitation) => invitation.id);
+  const allRelevantUserIds = [
+    ...new Set(
+      invitations
+        .flatMap((invitation) => [invitation.inviter_user_id, invitation.invitee_user_id])
+        .filter((value): value is string => typeof value === "string" && value.length > 0)
+    ),
+  ];
+
+  const privileged = createPrivilegedClient();
+  const dataClient = privileged ?? supabase;
+
+  const [modulesResult, reportRunsResult, latestSubmittedByUser] = await Promise.all([
+    dataClient
+      .from("invitation_modules")
+      .select("invitation_id, module")
+      .in("invitation_id", invitationIds),
+    dataClient.from("report_runs").select("invitation_id").in("invitation_id", invitationIds),
+    getLatestSubmittedAssessmentsByUserAndModule(dataClient, allRelevantUserIds),
   ]);
 
-  if (!sessionRow) {
-    return null;
+  const requiredModulesByInvitationId = new Map<string, AssessmentModule[]>();
+  for (const invitationId of invitationIds) {
+    requiredModulesByInvitationId.set(invitationId, ["base"]);
   }
 
-  const participants = (participantsRaw ?? []) as ParticipantRow[];
-  const responses = (responsesRaw ?? []) as ResponseRow[];
-  const questionMeta = buildQuestionMeta(questionsRaw ?? []);
+  for (const row of (modulesResult.data ?? []) as InvitationModuleByInvitationRow[]) {
+    const moduleKey = coerceAssessmentModule(row.module);
+    if (!moduleKey) continue;
+    const existing = requiredModulesByInvitationId.get(row.invitation_id) ?? ["base"];
+    requiredModulesByInvitationId.set(
+      row.invitation_id,
+      ensureBaseModule([...new Set([...existing, moduleKey])])
+    );
+  }
 
-  const responseCountByParticipant = buildResponseCountByParticipant(responses);
-  const participantASelection = selectParticipantA(participants, { responseCountByParticipant });
-  const participantA = participantASelection
-    ? participants.find((row) => row.id === participantASelection.id)
-    : undefined;
-  const participantBSelection = selectParticipantB(participants, {
-    primary: participantASelection,
-    responseCountByParticipant,
+  const reportRunByInvitationId = new Set(
+    ((reportRunsResult.data ?? []) as ReportRunInvitationRow[]).map((row) => row.invitation_id)
+  );
+
+  return invitations.map((invitation) => {
+    const direction = invitation.inviter_user_id === user.id ? "sent" : "incoming";
+    const requiredModules = requiredModulesByInvitationId.get(invitation.id) ?? ["base"];
+    const inviterSubmittedByModule = latestSubmittedByUser.get(invitation.inviter_user_id);
+    const inviteeSubmittedByModule = invitation.invitee_user_id
+      ? latestSubmittedByUser.get(invitation.invitee_user_id)
+      : undefined;
+    const inviteeHasBase = Boolean(inviteeSubmittedByModule?.has("base"));
+    const inviteeHasValues = Boolean(inviteeSubmittedByModule?.has("values"));
+    const inviterHasBase = Boolean(inviterSubmittedByModule?.has("base"));
+    const inviterHasValues = Boolean(inviterSubmittedByModule?.has("values"));
+    const reportRunExists = reportRunByInvitationId.has(invitation.id);
+    const isReadyForMatching =
+      invitation.status === "accepted" &&
+      !isInvitationExpired(invitation.expires_at) &&
+      isUserReadyForModules(requiredModules, inviterSubmittedByModule) &&
+      isUserReadyForModules(requiredModules, inviteeSubmittedByModule);
+
+    return {
+      id: invitation.id,
+      direction,
+      inviteeEmail: invitation.invitee_email,
+      status: invitation.status,
+      label: direction === "sent" ? invitation.label ?? null : null,
+      inviterDisplayName: invitation.inviter_display_name ?? null,
+      inviterEmail: invitation.inviter_email ?? null,
+      requiredModules,
+      isReportReady: reportRunExists,
+      isReadyForMatching,
+      inviterBaseSubmitted: inviterHasBase,
+      inviterValuesSubmitted: inviterHasValues,
+      inviteeBaseSubmitted: inviteeHasBase,
+      inviteeValuesSubmitted: inviteeHasValues,
+      createdAt: invitation.created_at,
+      expiresAt: invitation.expires_at,
+    };
   });
-  const participantB = participantBSelection
-    ? participants.find((row) => row.id === participantBSelection.id)
-    : undefined;
-  const basisProgress = deriveBasisProgress(
-    responses,
-    questionsRaw ?? [],
-    participantA?.id ?? null,
-    participantB?.id ?? null
-  );
-  const participantAName = deriveFirstName(participantA, "Teilnehmer");
-  const participantBName = participantB ? deriveFirstName(participantB, "Teilnehmer B") : null;
-  const requestedScope =
-    participantB?.requested_scope === "basis_plus_values" ? "basis_plus_values" : "basis";
-  const inviteConsentCaptured = Boolean(participantB?.invite_consent_at || participantB?.invite_consent_by_user_id);
+}
 
-  const personACompleted = Boolean(participantA?.completed_at) || basisProgress.completeA;
-  const personBCompleted = Boolean(participantB?.completed_at) || basisProgress.completeB;
-  const inferredMatchReady = personACompleted && personBCompleted;
-  const personBStatus = inferredMatchReady
-    ? "match_ready"
-    : derivePersonBStatus(participantA, participantB);
-
-  const aggregation = aggregateScores(responses, questionMeta);
-  const scoresA = fillSeries(aggregation.averages.get(participantA?.id ?? "") ?? new Map());
-  const scoresB = fillSeries(aggregation.averages.get(participantB?.id ?? "") ?? new Map());
-  const hasPersonBData = REPORT_DIMENSIONS.some((dimension) => scoresB[dimension] != null);
-  const comparisonEnabled = personBStatus === "match_ready" || hasPersonBData;
-
-  const keyInsights = buildKeyInsights(scoresA, scoresB, comparisonEnabled);
-  const { commonTendencies, frictionPoints } = buildMatchNarratives(
-    scoresA,
-    scoresB,
-    participantAName,
-    participantBName ?? "Teilnehmer B",
-    comparisonEnabled
-  );
-  const conversationGuideQuestions = buildConversationGuide(scoresA, scoresB, comparisonEnabled);
-  const debugA = buildParticipantDebug(
-    participantAName,
-    aggregation.debugByParticipant.get(participantA?.id ?? "") ?? new Map()
-  );
-  const debugB = participantB
-    ? buildParticipantDebug(
-        participantBName ?? "Teilnehmer B",
-        aggregation.debugByParticipant.get(participantB.id) ?? new Map()
-      )
-    : null;
-  const {
-    valuesModulePreview,
-    valuesModuleStatus,
-    valuesAnsweredA,
-    valuesAnsweredB,
-    valuesTotal,
-    valuesAlignmentPercent,
-    valuesIdentityCategoryA,
-    valuesIdentityCategoryB,
-  } = await deriveValuesModuleSummary(
-    normalizedSessionId,
-    participantA?.id ?? null,
-    participantB?.id ?? null,
-    participantAName,
-    participantBName ?? "Teilnehmer B",
-    comparisonEnabled,
-    supabase
-  );
-
+function emptyReadinessSnapshot(): PerUserReadinessSnapshot {
   return {
-    sessionId: normalizedSessionId,
-    createdAt: sessionRow.created_at,
-    personBInvitedAt: participantB?.created_at ?? null,
-    personACompletedAt: participantA?.completed_at ?? null,
-    personBCompletedAt: participantB?.completed_at ?? null,
-    participantAId: participantA?.id ?? null,
-    participantBId: participantB?.id ?? null,
-    participantAName,
-    participantBName,
-    personBStatus,
-    personACompleted,
-    personBCompleted,
-    comparisonEnabled,
-    scoresA,
-    scoresB,
-    keyInsights,
-    commonTendencies,
-    frictionPoints,
-    conversationGuideQuestions,
-    valuesModulePreview,
-    valuesModuleStatus,
-    valuesAnsweredA,
-    valuesAnsweredB,
-    valuesTotal,
-    basisAnsweredA: basisProgress.answeredA,
-    basisAnsweredB: basisProgress.answeredB,
-    basisTotal: basisProgress.total,
-    valuesAlignmentPercent,
-    valuesIdentityCategoryA,
-    valuesIdentityCategoryB,
-    requestedScope,
-    inviteConsentCaptured,
-    debugA,
-    debugB,
+    has_base_submitted: false,
+    has_values_submitted: false,
+    submitted_assessment_ids: {
+      base: null,
+      values: null,
+    },
+    answers_count: {
+      base: 0,
+      values: 0,
+    },
   };
 }
 
-function deriveBasisProgress(
-  responses: ResponseRow[],
-  questionsRaw: {
+function moduleOrder(modules: AssessmentModule[]) {
+  const uniq = [...new Set(modules)];
+  return uniq.sort((left, right) => {
+    if (left === right) return 0;
+    if (left === "base") return -1;
+    if (right === "base") return 1;
+    return left.localeCompare(right);
+  });
+}
+
+async function getInvitationJoinDecisionInternal(
+  invitationId: string
+): Promise<InvitationJoinDecision> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const normalizedEmail = (user.email ?? "").trim().toLowerCase();
+  const { data: invitationAccess, error: invitationAccessError } = await supabase
+    .from("invitations")
+    .select("id, inviter_user_id, invitee_user_id, invitee_email, status, expires_at, revoked_at")
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationAccessError || !invitationAccess) {
+    return {
+      ok: false,
+      reason: "invitation_not_found",
+      detail: invitationAccessError?.message ?? undefined,
+    };
+  }
+
+  const invitation = invitationAccess as {
     id: string;
-    category?: string | null;
-  }[],
-  participantAId: string | null,
-  participantBId: string | null
-): BasisProgress {
-  const basisQuestionIds = new Set<string>();
-  for (const question of questionsRaw) {
-    const category = (question.category ?? "basis").trim().toLowerCase();
-    if (category === "basis") {
-      basisQuestionIds.add(question.id);
-    }
+    inviter_user_id: string;
+    invitee_user_id: string | null;
+    invitee_email: string;
+    status: string;
+    expires_at: string;
+    revoked_at: string | null;
+  };
+  const isInvitee =
+    invitation.invitee_user_id === user.id ||
+    (normalizedEmail.length > 0 && invitation.invitee_email === normalizedEmail);
+  if (!isInvitee) {
+    return { ok: false, reason: "not_invitee" };
+  }
+  if (invitation.revoked_at || invitation.status === "revoked") {
+    return { ok: false, reason: "revoked" };
+  }
+  if (isInvitationExpired(invitation.expires_at)) {
+    return { ok: false, reason: "expired" };
+  }
+  if (invitation.status !== "accepted") {
+    return { ok: false, reason: "not_accepted" };
+  }
+  if (!invitation.invitee_user_id) {
+    return { ok: false, reason: "missing_invitee" };
   }
 
-  const answeredByA = new Set<string>();
-  const answeredByB = new Set<string>();
+  const privileged = createPrivilegedClient();
+  const dataClient = privileged ?? supabase;
+  const requiredModules = moduleOrder(await getRequiredModulesForInvitation(dataClient, normalizedInvitationId));
+  const latestSubmittedByUser = await getLatestSubmittedAssessmentsByUserAndModule(dataClient, [user.id]);
+  const inviteeSubmittedByModule = latestSubmittedByUser.get(user.id);
+  const missingModules = requiredModules.filter((moduleKey) => !inviteeSubmittedByModule?.has(moduleKey));
 
-  for (const row of responses) {
-    if (!basisQuestionIds.has(row.question_id)) continue;
-    if (participantAId && row.participant_id === participantAId) {
-      answeredByA.add(row.question_id);
-    }
-    if (participantBId && row.participant_id === participantBId) {
-      answeredByB.add(row.question_id);
-    }
-  }
+  const { data: reportRunData } = await dataClient
+    .from("report_runs")
+    .select("id")
+    .eq("invitation_id", normalizedInvitationId)
+    .maybeSingle();
+  const reportRunId = parseAcceptableReportRunId(reportRunData as { id?: string } | null);
 
-  const total = basisQuestionIds.size;
-  const answeredA = answeredByA.size;
-  const answeredB = answeredByB.size;
+  const mode: "needs_questionnaires" | "choice_existing_or_update" | "report_ready" = reportRunId
+    ? "report_ready"
+    : missingModules.length > 0
+      ? "needs_questionnaires"
+      : "choice_existing_or_update";
 
   return {
-    total,
-    answeredA,
-    answeredB,
-    completeA: total > 0 && answeredA >= total,
-    completeB: total > 0 && answeredB >= total,
+    ok: true,
+    invitation_id: normalizedInvitationId,
+    mode,
+    required_modules: requiredModules,
+    missing_modules: missingModules,
+    invitee_status: {
+      has_base_submitted: Boolean(inviteeSubmittedByModule?.has("base")),
+      has_values_submitted: Boolean(inviteeSubmittedByModule?.has("values")),
+    },
+    report_run_id: reportRunId,
   };
+}
+
+export async function getInvitationJoinDecision(
+  invitationId: string
+): Promise<InvitationJoinDecision> {
+  return getInvitationJoinDecisionInternal(invitationId);
+}
+
+export async function applyExistingInvitationProfileChoice(
+  invitationId: string
+): Promise<UseExistingInvitationProfileResult> {
+  const decision = await getInvitationJoinDecisionInternal(invitationId);
+  if (!decision.ok) {
+    const mappedReason: EnsureReportRunFailureReason =
+      decision.reason === "not_authenticated"
+        ? "not_authenticated"
+        : decision.reason === "invitation_not_found"
+          ? "invitation_not_found"
+          : decision.reason === "not_accepted"
+            ? "not_accepted"
+            : decision.reason === "missing_invitee"
+              ? "missing_invitee"
+              : decision.reason === "expired"
+                ? "expired"
+                : decision.reason === "revoked"
+                  ? "revoked"
+                  : "invitation_not_found";
+    return {
+      ok: false,
+      reason: mappedReason,
+      detail: decision.detail,
+    };
+  }
+
+  if (decision.mode === "needs_questionnaires") {
+    return { ok: false, reason: "not_ready_for_existing" };
+  }
+
+  if (decision.mode === "report_ready") {
+    return { ok: true, reportRunId: decision.report_run_id, waiting: false };
+  }
+
+  const finalizeResult = await finalizeInvitationIfReady(invitationId);
+  if (finalizeResult.ok) {
+    return { ok: true, reportRunId: finalizeResult.reportRunId, waiting: false };
+  }
+
+  if (finalizeResult.reason === "waiting_for_answers") {
+    return {
+      ok: true,
+      reportRunId: null,
+      waiting: true,
+      reason: finalizeResult.reason,
+    };
+  }
+
+    console.error("applyExistingInvitationProfileChoice finalize failed", {
+      invitationId,
+      reason: finalizeResult.reason,
+      detail: finalizeResult.detail ?? null,
+  });
+  return {
+    ok: false,
+    reason: finalizeResult.reason,
+    detail: finalizeResult.detail,
+  };
+}
+
+export async function debug_invitation_readiness(
+  invitationId: string,
+  options?: { attemptFinalize?: boolean }
+): Promise<InvitationReadinessDebug> {
+  const normalizedInvitationId = invitationId.trim();
+  const fallback: InvitationReadinessDebug = {
+    invitation: {
+      id: normalizedInvitationId,
+      status: "unknown",
+      inviter_user_id: "",
+      invitee_user_id: null,
+      invitee_email: "",
+      expires_at: "",
+      revoked_at: null,
+      accepted_at: null,
+    },
+    modules_required: ["base"],
+    per_user_status: {
+      inviter: emptyReadinessSnapshot(),
+      invitee: null,
+    },
+    report_run_exists: false,
+    report_run_id: null,
+    relationship_exists: false,
+    relationship_id: null,
+    computed_ready: false,
+    reason_not_ready: [],
+    last_error: null,
+  };
+
+  if (!normalizedInvitationId) {
+    return {
+      ...fallback,
+      reason_not_ready: ["invitation_not_found"],
+      last_error: "invalid_invitation_id",
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return {
+      ...fallback,
+      reason_not_ready: ["not_authenticated"],
+      last_error: "not_authenticated",
+    };
+  }
+
+  const { data: invitationAccess, error: invitationAccessError } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationAccessError || !invitationAccess?.id) {
+    return {
+      ...fallback,
+      reason_not_ready: ["invitation_not_found"],
+      last_error: invitationAccessError?.message ?? "invitation_not_found",
+    };
+  }
+
+  const privileged = createPrivilegedClient();
+  const dataClient = privileged ?? supabase;
+  const { data: invitationData, error: invitationError } = await dataClient
+    .from("invitations")
+    .select(
+      "id, inviter_user_id, invitee_user_id, invitee_email, status, created_at, accepted_at, expires_at, revoked_at"
+    )
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationError || !invitationData) {
+    return {
+      ...fallback,
+      reason_not_ready: ["invitation_not_found"],
+      last_error: invitationError?.message ?? "invitation_not_found",
+    };
+  }
+
+  const invitation = invitationData as InvitationEnsureRow;
+  const requiredModules = await getRequiredModulesForInvitation(dataClient, normalizedInvitationId);
+
+  const relevantUsers = [invitation.inviter_user_id, invitation.invitee_user_id].filter(
+    (value): value is string => typeof value === "string" && value.length > 0
+  );
+  const latestSubmittedByUser = await getLatestSubmittedAssessmentsByUserAndModule(dataClient, relevantUsers);
+  const inviterAssessments = latestSubmittedByUser.get(invitation.inviter_user_id);
+  const inviteeAssessments =
+    invitation.invitee_user_id != null
+      ? latestSubmittedByUser.get(invitation.invitee_user_id)
+      : undefined;
+  const assessmentIds = [inviterAssessments, inviteeAssessments]
+    .flatMap((byModule) => [byModule?.get("base")?.id, byModule?.get("values")?.id])
+    .filter((value): value is string => Boolean(value));
+  const answersByAssessmentId = await getAnswerCountByAssessmentId(dataClient, assessmentIds);
+
+  const inviterStatus = buildPerUserReadinessSnapshot(inviterAssessments, answersByAssessmentId);
+  const inviteeStatus =
+    invitation.invitee_user_id != null
+      ? buildPerUserReadinessSnapshot(inviteeAssessments, answersByAssessmentId)
+      : null;
+
+  const { data: reportRunData } = await dataClient
+    .from("report_runs")
+    .select("id, relationship_id")
+    .eq("invitation_id", normalizedInvitationId)
+    .maybeSingle();
+  const reportRunId = parseAcceptableReportRunId(reportRunData as { id?: string } | null);
+  const reportRunRow = reportRunData as { id?: string; relationship_id?: string } | null;
+  let relationshipId = reportRunRow?.relationship_id ?? null;
+  if (!relationshipId && invitation.invitee_user_id) {
+    const { data: relationshipData } = await dataClient
+      .from("relationships")
+      .select("id")
+      .or(
+        `and(user_a_id.eq.${invitation.inviter_user_id},user_b_id.eq.${invitation.invitee_user_id}),and(user_a_id.eq.${invitation.invitee_user_id},user_b_id.eq.${invitation.inviter_user_id})`
+      )
+      .maybeSingle();
+    relationshipId = (relationshipData as { id?: string } | null)?.id ?? null;
+  }
+
+  const reportRunExists = Boolean(reportRunId);
+  const computedReady =
+    invitation.status === "accepted" &&
+    !invitation.revoked_at &&
+    !isInvitationExpired(invitation.expires_at) &&
+    invitation.invitee_user_id != null &&
+    isUserReadyForModules(requiredModules, inviterAssessments) &&
+    isUserReadyForModules(requiredModules, inviteeAssessments);
+
+  const reasonNotReady = computedReady && reportRunExists
+    ? []
+    : buildReadinessReasons({
+        invitation,
+        requiredModules,
+        inviterAssessments,
+        inviteeAssessments,
+        reportRunExists,
+      });
+  if (!privileged) {
+    reasonNotReady.push("missing_service_role");
+  }
+
+  let lastError: string | null = null;
+  let resolvedReportRunId = reportRunId;
+  if (options?.attemptFinalize && computedReady && !reportRunExists) {
+    const finalizeResult = await finalizeInvitationIfReady(normalizedInvitationId);
+    if (finalizeResult.ok) {
+      resolvedReportRunId = finalizeResult.reportRunId;
+      const finalizeNotCalledIndex = reasonNotReady.indexOf("finalize_not_called");
+      if (finalizeNotCalledIndex >= 0) {
+        reasonNotReady.splice(finalizeNotCalledIndex, 1);
+      }
+    } else {
+      lastError = finalizeResult.detail ?? finalizeResult.reason;
+      const normalizedError = (lastError ?? "").toLowerCase();
+      if (normalizedError.includes("row-level security")) {
+        reasonNotReady.push("rls_blocked_insert");
+      } else {
+        reasonNotReady.push(`finalize_failed_${finalizeResult.reason}`);
+      }
+    }
+  }
+
+  return {
+    invitation: {
+      id: invitation.id,
+      status: invitation.status,
+      inviter_user_id: invitation.inviter_user_id,
+      invitee_user_id: invitation.invitee_user_id,
+      invitee_email: invitation.invitee_email,
+      expires_at: invitation.expires_at,
+      revoked_at: invitation.revoked_at,
+      accepted_at: invitation.accepted_at,
+    },
+    modules_required: requiredModules,
+    per_user_status: {
+      inviter: inviterStatus,
+      invitee: inviteeStatus,
+    },
+    report_run_exists: Boolean(resolvedReportRunId),
+    report_run_id: resolvedReportRunId,
+    relationship_exists: Boolean(relationshipId),
+    relationship_id: relationshipId,
+    computed_ready: computedReady,
+    reason_not_ready: [...new Set(reasonNotReady)],
+    last_error: lastError,
+  };
+}
+
+export async function getLatestSelfAlignmentReport(): Promise<SessionAlignmentReport | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return null;
+  }
+
+  const [baseAssessmentResult, valuesAssessmentResult, profileResult] = await Promise.all([
+    supabase
+      .from("assessments")
+      .select("id, module, submitted_at, created_at")
+      .eq("user_id", user.id)
+      .eq("module", "base")
+      .not("submitted_at", "is", null)
+      .order("submitted_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("assessments")
+      .select("id, module, submitted_at, created_at")
+      .eq("user_id", user.id)
+      .eq("module", "values")
+      .not("submitted_at", "is", null)
+      .order("submitted_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.from("profiles").select("display_name").eq("user_id", user.id).maybeSingle(),
+  ]);
+
+  if (baseAssessmentResult.error || !baseAssessmentResult.data) {
+    return null;
+  }
+
+  const baseAssessment = baseAssessmentResult.data as SubmittedAssessmentRow;
+  const valuesAssessment = valuesAssessmentResult.error
+    ? null
+    : (valuesAssessmentResult.data as SubmittedAssessmentRow | null);
+  const valuesAssessmentId = valuesAssessment?.id ?? null;
+
+  const { data: answerRows, error: answerError } = await supabase
+    .from("assessment_answers")
+    .select("question_id, choice_value")
+    .eq("assessment_id", baseAssessment.id);
+
+  if (answerError || !answerRows || answerRows.length === 0) {
+    return null;
+  }
+
+  const answers = answerRows as AssessmentAnswerRow[];
+  const questionIds = [...new Set(answers.map((row) => row.question_id))];
+  const { data: questionRows, error: questionError } = await supabase
+    .from("questions")
+    .select("id, dimension, category, prompt")
+    .in("id", questionIds);
+
+  if (questionError || !questionRows) {
+    return null;
+  }
+
+  let valuesAnswerRows: AssessmentAnswerRow[] = [];
+  if (valuesAssessmentId) {
+    const { data: valuesRows, error: valuesRowsError } = await supabase
+      .from("assessment_answers")
+      .select("question_id, choice_value")
+      .eq("assessment_id", valuesAssessmentId);
+    if (!valuesRowsError && valuesRows) {
+      valuesAnswerRows = valuesRows as AssessmentAnswerRow[];
+    }
+  }
+
+  let valuesTotal = 0;
+  const valuesQuestionIds = [...new Set(valuesAnswerRows.map((row) => row.question_id))];
+  let valuesQuestionMetaRows: QuestionMetaRow[] = [];
+  if (valuesQuestionIds.length > 0) {
+    const { data: valueQuestionMetaRows, error: valueQuestionMetaError } = await supabase
+      .from("questions")
+      .select("id, category, prompt, dimension")
+      .in("id", valuesQuestionIds);
+    if (!valueQuestionMetaError && valueQuestionMetaRows) {
+      valuesQuestionMetaRows = valueQuestionMetaRows as QuestionMetaRow[];
+      assertValuesCategoryContract(valuesQuestionMetaRows, "self_report_values");
+    }
+  }
+  const valuesTotalActive = await countValuesQuestionsTotal(supabase, true);
+  valuesTotal = valuesTotalActive;
+  if (process.env.NODE_ENV !== "production") {
+    const contractCheck = await countQuestionsByCategories(supabase, [VALUES_QUESTION_CATEGORY], true);
+    assertValuesTotalCategoryContract(valuesTotalActive, contractCheck, "self_report_values");
+  }
+
+  const valuesQuestionById = new Map(
+    valuesQuestionMetaRows.filter((row) => isValuesCategory(row.category)).map((row) => [row.id, row])
+  );
+  const valuesAnswersForScoring = valuesAnswerRows.filter((row) => valuesQuestionById.has(row.question_id));
+  const valuesAnsweredCount = valuesAnswersForScoring.length;
+  const valuesModuleStatus: SessionAlignmentReport["valuesModuleStatus"] = !valuesAssessmentId
+    ? "not_started"
+    : valuesAssessment?.submitted_at && valuesAnsweredCount === valuesTotal
+      ? "completed"
+      : "in_progress";
+
+  const valuesScoringInput: ValuesAnswerForScoring[] = valuesAnswersForScoring.map((row) => {
+    const questionMeta = valuesQuestionById.get(row.question_id);
+    return {
+      questionId: row.question_id,
+      choiceValue: row.choice_value,
+      prompt: questionMeta?.prompt ?? null,
+      dimension: questionMeta?.dimension ?? null,
+    };
+  });
+  const selfValuesProfile = scoreSelfValuesProfile(valuesScoringInput, valuesTotal);
+  const selfValuesScore = computeValuesContinuumScore(selfValuesProfile);
+  const valuesModulePreview =
+    selfValuesProfile?.summary ??
+    (valuesModuleStatus === "completed"
+      ? "Dein Werteprofil ist abgeschlossen. Die Interpretation wird aus deinen letzten Antworten abgeleitet."
+      : valuesModuleStatus === "in_progress"
+        ? "Dein Werteprofil ist in Bearbeitung. Reiche das Add-on ein, um eine vollständige Interpretation zu sehen."
+        : "Das Werte-Add-on ist optional. Sobald du es abschließt, erhältst du eine vertiefte Werte-Interpretation.");
+
+  const profileName =
+    (profileResult.data as { display_name?: string | null } | null)?.display_name?.trim() || "Du";
+  const questionById = new Map((questionRows as QuestionMetaRow[]).map((row) => [row.id, row]));
+  const scoreBuckets = new Map<
+    ReportDimension,
+    { sum: number; count: number; questions: Array<{ questionId: string; value: number }> }
+  >(
+    REPORT_DIMENSIONS.map((dimension) => [
+      dimension,
+      { sum: 0, count: 0, questions: [] as Array<{ questionId: string; value: number }> },
+    ])
+  );
+
+  const answeredBaseQuestionIds = new Set<string>();
+  let totalNumericSum = 0;
+  let totalNumericCount = 0;
+  for (const answer of answers) {
+    const questionMeta = questionById.get(answer.question_id);
+    const mappedDimension = questionMeta?.dimension
+      ? mapGermanDimensionToReportKey(questionMeta.dimension)
+      : null;
+    if (!questionMeta || questionMeta.category !== "basis" || !mappedDimension) {
+      continue;
+    }
+
+    answeredBaseQuestionIds.add(answer.question_id);
+    const normalizedValue = normalizeBaseAnswerToReportScale(answer.choice_value);
+    if (normalizedValue == null) {
+      continue;
+    }
+
+    const bucket = scoreBuckets.get(mappedDimension);
+    if (!bucket) continue;
+    bucket.sum += normalizedValue;
+    bucket.count += 1;
+    totalNumericSum += normalizedValue;
+    totalNumericCount += 1;
+    bucket.questions.push({ questionId: answer.question_id, value: normalizedValue });
+  }
+
+  const scoresA = emptySeries();
+  const globalAverage = totalNumericCount > 0 ? round(totalNumericSum / totalNumericCount) : null;
+  for (const dimension of REPORT_DIMENSIONS) {
+    const bucket = scoreBuckets.get(dimension);
+    if (!bucket || bucket.count === 0) {
+      scoresA[dimension] = globalAverage;
+      continue;
+    }
+    scoresA[dimension] = round(bucket.sum / bucket.count);
+  }
+
+  const keyInsights = buildSelfKeyInsights(scoresA);
+  const completedAt = baseAssessment.submitted_at ?? baseAssessment.created_at;
+
+  return {
+    sessionId: baseAssessment.id,
+    createdAt: baseAssessment.created_at,
+    personBInvitedAt: null,
+    personACompletedAt: completedAt,
+    personBCompletedAt: null,
+    participantAId: user.id,
+    participantBId: null,
+    participantAName: profileName,
+    participantBName: "—",
+    personBStatus: "match_ready",
+    personACompleted: true,
+    personBCompleted: false,
+    comparisonEnabled: false,
+    scoresA,
+    scoresB: emptySeries(),
+    keyInsights,
+    commonTendencies: keyInsights.map((insight) => insight.title),
+    frictionPoints: [],
+    conversationGuideQuestions: [],
+    valuesModulePreview,
+    valuesModuleStatus,
+    valuesAnsweredA: valuesAnsweredCount,
+    valuesAnsweredB: 0,
+    valuesTotal,
+    basisAnsweredA: answeredBaseQuestionIds.size,
+    basisAnsweredB: 0,
+    basisTotal: 36,
+    valuesAlignmentPercent: null,
+    valuesIdentityCategoryA: selfValuesProfile?.primaryLabel ?? null,
+    valuesIdentityCategoryB: null,
+    valuesScoreA: selfValuesScore,
+    valuesScoreB: null,
+    requestedScope: valuesModuleStatus === "completed" ? "basis_plus_values" : "basis",
+    inviteConsentCaptured: false,
+    selfAssessmentMeta: {
+      baseAssessmentId: baseAssessment.id,
+      valuesAssessmentId,
+    },
+    selfValuesProfile,
+    debugA: {
+      participantName: profileName,
+      dimensions: REPORT_DIMENSIONS.map((dimension) => {
+        const bucket = scoreBuckets.get(dimension);
+        const rawScore = bucket && bucket.count > 0 ? round(bucket.sum / bucket.count) : null;
+        return {
+          dimension,
+          rawScore,
+          normalizedScore: rawScore == null ? null : round(rawScore / 6, 3),
+          category: "basis",
+          questions: (bucket?.questions ?? []).map((entry) => ({
+            questionId: entry.questionId,
+            value: entry.value,
+            max: 6,
+            normalized: round(entry.value / 6, 3),
+          })),
+        };
+      }),
+    },
+    debugB: null,
+  };
+}
+
+export async function ensureReportRunForInvitation(invitationId: string): Promise<EnsureReportRunResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    console.error("ensureReportRunForInvitation missing service role configuration", {
+      invitationId: normalizedInvitationId,
+    });
+    return { ok: false, reason: "missing_service_role" };
+  }
+
+  const { data: invitationAccess, error: invitationAccessError } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationAccessError || !invitationAccess?.id) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+
+  const { data: invitationData, error: invitationError } = await privileged
+    .from("invitations")
+    .select(
+      "id, inviter_user_id, invitee_user_id, invitee_email, status, created_at, accepted_at, expires_at, revoked_at"
+    )
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationError || !invitationData) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+
+  const invitation = invitationData as InvitationEnsureRow;
+  if (![invitation.inviter_user_id, invitation.invitee_user_id].includes(user.id)) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+  if (invitation.revoked_at || invitation.status === "revoked") {
+    return { ok: false, reason: "revoked" };
+  }
+  if (isInvitationExpired(invitation.expires_at)) {
+    return { ok: false, reason: "expired" };
+  }
+  if (invitation.status !== "accepted") {
+    return { ok: false, reason: "not_accepted" };
+  }
+  if (!invitation.invitee_user_id) {
+    return { ok: false, reason: "missing_invitee" };
+  }
+
+  const { data: existingReportRun } = await privileged
+    .from("report_runs")
+    .select("id")
+    .eq("invitation_id", normalizedInvitationId)
+    .maybeSingle();
+  const existingReportRunId = parseAcceptableReportRunId(existingReportRun as { id?: string } | null);
+  if (existingReportRunId) {
+    return { ok: true, reportRunId: existingReportRunId };
+  }
+
+  const requiredModules = await getRequiredModulesForInvitation(privileged, normalizedInvitationId);
+  const requestedScope: SessionAlignmentReport["requestedScope"] = requiredModules.includes("values")
+    ? "basis_plus_values"
+    : "basis";
+
+  const inviterBase = await getLatestSubmittedAssessmentForUserModule(
+    privileged,
+    invitation.inviter_user_id,
+    "base"
+  );
+  const inviteeBase = await getLatestSubmittedAssessmentForUserModule(
+    privileged,
+    invitation.invitee_user_id,
+    "base"
+  );
+  if (!inviterBase || !inviteeBase) {
+    return { ok: false, reason: "waiting_for_answers" };
+  }
+
+  const inviterValues = requiredModules.includes("values")
+    ? await getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "values")
+    : null;
+  const inviteeValues = requiredModules.includes("values")
+    ? await getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "values")
+    : null;
+  if (requiredModules.includes("values") && (!inviterValues || !inviteeValues)) {
+    return { ok: false, reason: "waiting_for_answers" };
+  }
+
+  const [inviterBaseAnswers, inviteeBaseAnswers] = await Promise.all([
+    getAssessmentAnswers(privileged, inviterBase.id),
+    getAssessmentAnswers(privileged, inviteeBase.id),
+  ]);
+  const baseTotalFromDb = await countQuestionsByCategories(privileged, ["basis"], true);
+  const basisTotal = baseTotalFromDb > 0 ? baseTotalFromDb : 36;
+  const expectedByDimension = await getExpectedBaseQuestionCountByDimension(privileged);
+
+  const baseQuestionMetaById = await getQuestionMetaMap(privileged, [
+    ...inviterBaseAnswers.map((row) => row.question_id),
+    ...inviteeBaseAnswers.map((row) => row.question_id),
+  ]);
+  const inviterBaseScores = aggregateBaseScoresFromAnswers(
+    inviterBaseAnswers,
+    baseQuestionMetaById,
+    expectedByDimension
+  );
+  const inviteeBaseScores = aggregateBaseScoresFromAnswers(
+    inviteeBaseAnswers,
+    baseQuestionMetaById,
+    expectedByDimension
+  );
+
+  let valuesAssessmentIdA: string | null = null;
+  let valuesAssessmentIdB: string | null = null;
+  let valuesAnsweredA = 0;
+  let valuesAnsweredB = 0;
+  let valuesTotal = 0;
+  let valuesIdentityCategoryA: string | null = null;
+  let valuesIdentityCategoryB: string | null = null;
+  let valuesScoreA: number | null = null;
+  let valuesScoreB: number | null = null;
+
+  if (requiredModules.includes("values") && inviterValues && inviteeValues) {
+    valuesAssessmentIdA = inviterValues.id;
+    valuesAssessmentIdB = inviteeValues.id;
+
+    const [rawValuesAnswersA, rawValuesAnswersB] = await Promise.all([
+      getAssessmentAnswers(privileged, inviterValues.id),
+      getAssessmentAnswers(privileged, inviteeValues.id),
+    ]);
+
+    const valuesTotalActive = await countValuesQuestionsTotal(privileged, true);
+    valuesTotal = valuesTotalActive;
+    if (process.env.NODE_ENV !== "production") {
+      const contractCheck = await countQuestionsByCategories(privileged, [VALUES_QUESTION_CATEGORY], true);
+      assertValuesTotalCategoryContract(valuesTotalActive, contractCheck, "ensure_report_run");
+    }
+
+    const valuesQuestionMetaById = await getQuestionMetaMap(privileged, [
+      ...rawValuesAnswersA.map((row) => row.question_id),
+      ...rawValuesAnswersB.map((row) => row.question_id),
+    ]);
+    const valuesQuestionMetaRows = [...valuesQuestionMetaById.values()];
+    assertValuesCategoryContract(valuesQuestionMetaRows, "ensure_report_run_values");
+    const valuesAnswersA = rawValuesAnswersA.filter((row) => isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category));
+    const valuesAnswersB = rawValuesAnswersB.filter((row) => isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category));
+    valuesAnsweredA = valuesAnswersA.length;
+    valuesAnsweredB = valuesAnswersB.length;
+
+    const valuesInputA: ValuesAnswerForScoring[] = valuesAnswersA.map((row) => {
+      const meta = valuesQuestionMetaById.get(row.question_id);
+      return {
+        questionId: row.question_id,
+        choiceValue: row.choice_value,
+        prompt: meta?.prompt ?? null,
+        dimension: meta?.dimension ?? null,
+      };
+    });
+    const valuesInputB: ValuesAnswerForScoring[] = valuesAnswersB.map((row) => {
+      const meta = valuesQuestionMetaById.get(row.question_id);
+      return {
+        questionId: row.question_id,
+        choiceValue: row.choice_value,
+        prompt: meta?.prompt ?? null,
+        dimension: meta?.dimension ?? null,
+      };
+    });
+    const valuesProfileA = scoreSelfValuesProfile(valuesInputA, valuesTotal);
+    const valuesProfileB = scoreSelfValuesProfile(valuesInputB, valuesTotal);
+    valuesIdentityCategoryA = valuesProfileA?.primaryArchetypeId ?? null;
+    valuesIdentityCategoryB = valuesProfileB?.primaryArchetypeId ?? null;
+    valuesScoreA = computeValuesContinuumScore(valuesProfileA);
+    valuesScoreB = computeValuesContinuumScore(valuesProfileB);
+  }
+
+  const { data: profileRows } = await privileged
+    .from("profiles")
+    .select("user_id, display_name")
+    .in("user_id", [invitation.inviter_user_id, invitation.invitee_user_id]);
+  const profileByUserId = new Map(
+    ((profileRows ?? []) as ProfileDisplayRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+  );
+  const participantAName = profileByUserId.get(invitation.inviter_user_id) || "Person A";
+  const participantBName = profileByUserId.get(invitation.invitee_user_id) || "Person B";
+
+  const baseReport: SessionAlignmentReport = {
+    sessionId: normalizedInvitationId,
+    createdAt: new Date().toISOString(),
+    personBInvitedAt: invitation.created_at,
+    personACompletedAt: inviterBase.submitted_at ?? inviterBase.created_at,
+    personBCompletedAt: inviteeBase.submitted_at ?? inviteeBase.created_at,
+    participantAId: invitation.inviter_user_id,
+    participantBId: invitation.invitee_user_id,
+    participantAName,
+    participantBName,
+    personBStatus: "match_ready",
+    personACompleted: true,
+    personBCompleted: true,
+    comparisonEnabled: true,
+    scoresA: inviterBaseScores.scores,
+    scoresB: inviteeBaseScores.scores,
+    keyInsights: [],
+    commonTendencies: [],
+    frictionPoints: [],
+    conversationGuideQuestions: [],
+    valuesModulePreview: "",
+    valuesModuleStatus: requiredModules.includes("values") ? "completed" : "not_started",
+    valuesAnsweredA,
+    valuesAnsweredB,
+    valuesTotal,
+    basisAnsweredA: inviterBaseAnswers.length,
+    basisAnsweredB: inviteeBaseAnswers.length,
+    basisTotal,
+    valuesAlignmentPercent: null,
+    valuesIdentityCategoryA,
+    valuesIdentityCategoryB,
+    valuesScoreA,
+    valuesScoreB,
+    requestedScope,
+    inviteConsentCaptured: Boolean(invitation.accepted_at),
+    baseCoverageA: {
+      answeredNumericByDimension: inviterBaseScores.answeredNumericByDimension,
+      expectedByDimension: inviterBaseScores.expectedByDimension,
+      numericAnsweredTotal: inviterBaseScores.numericAnsweredTotal,
+      expectedTotal: inviterBaseScores.expectedTotal,
+      baseCoveragePercent: inviterBaseScores.baseCoveragePercent,
+    },
+    baseCoverageB: {
+      answeredNumericByDimension: inviteeBaseScores.answeredNumericByDimension,
+      expectedByDimension: inviteeBaseScores.expectedByDimension,
+      numericAnsweredTotal: inviteeBaseScores.numericAnsweredTotal,
+      expectedTotal: inviteeBaseScores.expectedTotal,
+      baseCoveragePercent: inviteeBaseScores.baseCoveragePercent,
+    },
+    debugA: {
+      participantName: participantAName,
+      dimensions: inviterBaseScores.debugDimensions,
+    },
+    debugB: {
+      participantName: participantBName,
+      dimensions: inviteeBaseScores.debugDimensions,
+    },
+  };
+
+  const profileA = buildProfileResultFromSession(baseReport, "A");
+  const profileB = buildProfileResultFromSession(baseReport, "B");
+  const compareJson = generateCompareReport(profileA, profileB);
+  const keyInsights: KeyInsight[] = compareJson.keyInsights.slice(0, 3).map((insight, index) => ({
+    dimension: insight.dimension,
+    title: insight.title,
+    text: insight.text,
+    priority: index + 1,
+  }));
+
+  const finalReport: SessionAlignmentReport = {
+    ...baseReport,
+    keyInsights,
+    commonTendencies: compareJson.executiveSummary.topMatches,
+    frictionPoints: compareJson.executiveSummary.topTensions,
+    conversationGuideQuestions: compareJson.conversationGuide,
+    valuesModulePreview: compareJson.valuesModule.text,
+    valuesAlignmentPercent: compareJson.valuesModule.alignmentPercent,
+  };
+
+  const inputAssessmentIds = [
+    inviterBase.id,
+    inviteeBase.id,
+    valuesAssessmentIdA,
+    valuesAssessmentIdB,
+  ].filter((value): value is string => Boolean(value));
+
+  const payload = {
+    report: finalReport,
+    compareJson,
+    modules: ensureBaseModule(requiredModules),
+    inputAssessmentIds: [...new Set(inputAssessmentIds)],
+    generatedAt: new Date().toISOString(),
+    source: "ensureReportRunForInvitation",
+  };
+
+  const { data: finalizeData, error: finalizeError } = await privileged.rpc(
+    "finalize_invitation_if_ready",
+    {
+      p_invitation_id: normalizedInvitationId,
+      p_payload: payload,
+    }
+  );
+
+  if (finalizeError) {
+    console.error("ensureReportRunForInvitation finalize rpc failed", {
+      invitationId: normalizedInvitationId,
+      error: finalizeError.message,
+    });
+    const { data: existingAfterError } = await privileged
+      .from("report_runs")
+      .select("id")
+      .eq("invitation_id", normalizedInvitationId)
+      .maybeSingle();
+    const fallbackId = parseAcceptableReportRunId(existingAfterError as { id?: string } | null);
+    if (fallbackId) {
+      return { ok: true, reportRunId: fallbackId };
+    }
+    return { ok: false, reason: "insert_failed", detail: finalizeError.message };
+  }
+
+  const finalized = parseFinalizeRpcRow(finalizeData);
+  if (!finalized) {
+    console.error("ensureReportRunForInvitation finalize rpc returned empty payload", {
+      invitationId: normalizedInvitationId,
+    });
+    return { ok: false, reason: "insert_failed", detail: "finalize_rpc_empty" };
+  }
+  if (!finalized.ready) {
+    return {
+      ok: false,
+      reason: mapFinalizeReasonToEnsureReason(finalized.reason),
+      detail: finalized.reason ?? undefined,
+    };
+  }
+
+  const finalizedId = parseAcceptableReportRunId({
+    id: finalized.report_run_id ?? undefined,
+  });
+  if (finalizedId) {
+    return { ok: true, reportRunId: finalizedId };
+  }
+
+  const { data: existingAfterFinalize } = await privileged
+    .from("report_runs")
+    .select("id")
+    .eq("invitation_id", normalizedInvitationId)
+    .maybeSingle();
+  const reportRunId = parseAcceptableReportRunId(existingAfterFinalize as { id?: string } | null);
+  if (reportRunId) {
+    return { ok: true, reportRunId };
+  }
+
+  console.error("ensureReportRunForInvitation report run missing after finalize", {
+    invitationId: normalizedInvitationId,
+  });
+  return { ok: false, reason: "insert_failed", detail: "report_run_not_found_after_finalize" };
+}
+
+export async function finalizeInvitationIfReady(invitationId: string): Promise<EnsureReportRunResult> {
+  return ensureReportRunForInvitation(invitationId);
+}
+
+function asSessionAlignmentReport(value: unknown): SessionAlignmentReport | null {
+  const record = toRecord(value);
+  if (!record) return null;
+  const scoresA = toRecord(record.scoresA);
+  if (!scoresA) return null;
+  return value as SessionAlignmentReport;
+}
+
+function asCompareReportJson(value: unknown): CompareReportJson | null {
+  const record = toRecord(value);
+  if (!record) return null;
+  if (!Array.isArray(record.sections)) return null;
+  return value as CompareReportJson;
+}
+
+function fallbackReport(invitationId: string, createdAt: string, payload: Record<string, unknown> | null) {
+  const participantAName =
+    typeof payload?.participantAName === "string" && payload.participantAName.trim().length > 0
+      ? payload.participantAName
+      : "Person A";
+  const participantBName =
+    typeof payload?.participantBName === "string" && payload.participantBName.trim().length > 0
+      ? payload.participantBName
+      : "Person B";
+
+  const report: SessionAlignmentReport = {
+    sessionId: invitationId,
+    createdAt,
+    personBInvitedAt: null,
+    personACompletedAt: null,
+    personBCompletedAt: null,
+    participantAId: null,
+    participantBId: null,
+    participantAName,
+    participantBName,
+    personBStatus: "match_ready",
+    personACompleted: false,
+    personBCompleted: false,
+    comparisonEnabled: true,
+    scoresA: emptySeries(),
+    scoresB: emptySeries(),
+    keyInsights: [],
+    commonTendencies: [],
+    frictionPoints: [],
+    conversationGuideQuestions: [],
+    valuesModulePreview: "",
+    valuesModuleStatus: "not_started",
+    valuesAnsweredA: 0,
+    valuesAnsweredB: 0,
+    valuesTotal: 0,
+    basisAnsweredA: 0,
+    basisAnsweredB: 0,
+    basisTotal: 0,
+    valuesAlignmentPercent: null,
+    valuesIdentityCategoryA: null,
+    valuesIdentityCategoryB: null,
+    valuesScoreA: null,
+    valuesScoreB: null,
+    requestedScope: "basis",
+    inviteConsentCaptured: false,
+    debugA: { participantName: participantAName, dimensions: [] },
+    debugB: { participantName: participantBName, dimensions: [] },
+  };
+
+  return report;
+}
+
+function mapReportRunRow(row: ReportRunRow): ReportRunSnapshot {
+  const payload = toRecord(row.payload);
+  const nestedReport = asSessionAlignmentReport(payload?.report);
+  const directReport = asSessionAlignmentReport(payload);
+  const report = nestedReport ?? directReport ?? fallbackReport(row.invitation_id, row.created_at, payload);
+
+  const nestedCompare = asCompareReportJson(payload?.compareJson);
+  const directCompare = asCompareReportJson(payload?.compare_report);
+
+  return {
+    id: row.id,
+    invitationId: row.invitation_id,
+    relationshipId: row.relationship_id,
+    createdAt: row.created_at,
+    modules: Array.isArray(row.modules) ? row.modules : [],
+    inputAssessmentIds: Array.isArray(row.input_assessment_ids) ? row.input_assessment_ids : [],
+    report,
+    compareJson: nestedCompare ?? directCompare ?? null,
+    payload,
+  };
+}
+
+async function loadReportRunByInvitationId(invitationId: string): Promise<ReportRunSnapshot | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("report_runs")
+    .select("id, invitation_id, relationship_id, modules, input_assessment_ids, payload, created_at")
+    .eq("invitation_id", invitationId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return mapReportRunRow(data as ReportRunRow);
+}
+
+async function loadReportRunById(runId: string): Promise<ReportRunSnapshot | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("report_runs")
+    .select("id, invitation_id, relationship_id, modules, input_assessment_ids, payload, created_at")
+    .eq("id", runId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return mapReportRunRow(data as ReportRunRow);
+}
+
+export async function getReportRunSnapshotForSession(sessionId: string): Promise<ReportRunSnapshot | null> {
+  const normalized = sessionId.trim();
+  if (!normalized) {
+    return null;
+  }
+
+  const byInvitation = await loadReportRunByInvitationId(normalized);
+  if (byInvitation) {
+    return byInvitation;
+  }
+
+  return loadReportRunById(normalized);
+}
+
+export async function getSessionAlignmentReport(sessionId: string): Promise<SessionAlignmentReport | null> {
+  const snapshot = await getReportRunSnapshotForSession(sessionId);
+  return snapshot?.report ?? null;
 }
 
 export async function getExecutiveSummaryTextByAlignment(
   scoresA: RadarSeries,
   scoresB: RadarSeries
-) {
+): Promise<string> {
   const deltas = REPORT_DIMENSIONS.map((dimension) => {
-    const a = scoresA[dimension];
-    const b = scoresB[dimension];
-    if (a == null || b == null) return null;
-    return Math.abs(a - b);
-  }).filter((value): value is number => value != null);
+    const left = scoresA[dimension] ?? 0;
+    const right = scoresB[dimension] ?? 0;
+    return { dimension, delta: Math.abs(left - right) };
+  }).sort((a, b) => b.delta - a.delta);
 
-  if (deltas.length === 0) {
-    return REPORT_CONTENT.executive_summary.low_alignment;
+  const strongest = deltas[0];
+  if (!strongest || strongest.delta < 1.0) {
+    return "Das Profil zeigt aktuell eine stabile Grundpassung mit moderaten Unterschieden.";
   }
 
-  const averageDelta = deltas.reduce((sum, value) => sum + value, 0) / deltas.length;
-  return averageDelta < 1.0
-    ? REPORT_CONTENT.executive_summary.high_alignment
-    : REPORT_CONTENT.executive_summary.low_alignment;
+  return `Die stärkste Differenz liegt aktuell bei ${strongest.dimension}.`; 
 }
 
 export async function generateCompareReportForSession(sessionId: string): Promise<CompareReportJson | null> {
@@ -335,1067 +2034,10 @@ export async function generateCompareReportForSession(sessionId: string): Promis
   return snapshot?.compareJson ?? null;
 }
 
-export async function getReportRunSnapshotForSession(sessionId: string): Promise<ReportRunSnapshot | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const normalizedSessionId = sessionId.trim();
-  if (!normalizedSessionId) {
-    return null;
-  }
-
-  const isMember = await hasSessionMembership(supabase, normalizedSessionId, user.id);
-  if (!isMember) {
-    return null;
-  }
-
-  return getLatestReportRunSnapshotForSessionWithClient(supabase, normalizedSessionId);
-}
-
 export async function createReportRunOnCompletion(sessionId: string): Promise<ReportRunSnapshot | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
+  const result = await ensureReportRunForInvitation(sessionId);
+  if (!result.ok) {
+    return getReportRunSnapshotForSession(sessionId);
   }
-
-  const normalizedSessionId = sessionId.trim();
-  if (!normalizedSessionId) {
-    return null;
-  }
-
-  const isMember = await hasSessionMembership(supabase, normalizedSessionId, user.id);
-  if (!isMember) {
-    return null;
-  }
-
-  const existing = await getLatestReportRunSnapshotForSessionWithClient(supabase, normalizedSessionId);
-  if (existing) {
-    return existing;
-  }
-
-  return createReportRunForSessionWithClient(supabase, normalizedSessionId, user.id);
-}
-
-async function createReportRunForSessionWithClient(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  normalizedSessionId: string,
-  currentUserId: string
-): Promise<ReportRunSnapshot | null> {
-  const report = await getSessionAlignmentReport(normalizedSessionId);
-  if (!report) {
-    return null;
-  }
-
-  const modules = await resolveRequiredModulesForSession(supabase, normalizedSessionId, report.requestedScope);
-  if (!isReadyForReportRun(report, modules)) {
-    return null;
-  }
-
-  const profileA = buildProfileResultFromSession(report, "A");
-  const profileB = buildProfileResultFromSession(report, "B");
-  const compareJson = generateCompareReport(profileA, profileB);
-  const inputRefs = buildReportInputRefs(normalizedSessionId, report);
-
-  const relationshipId = await resolveRelationshipIdForSession(
-    supabase,
-    normalizedSessionId,
-    report.participantAId,
-    report.participantBId
-  );
-  if (!relationshipId) {
-    return null;
-  }
-
-  const { data: latestVersionRow } = await supabase
-    .from("report_runs")
-    .select("version")
-    .eq("relationship_id", relationshipId)
-    .order("version", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const nextVersion = ((latestVersionRow as { version?: number } | null)?.version ?? 0) + 1;
-  const now = new Date().toISOString();
-  const payload: PersistedComparePayload = {
-    schemaVersion: REPORT_RUN_SCHEMA_VERSION,
-    generatedAt: now,
-    inputRefs,
-    sessionReport: report,
-    compareJson,
-  };
-
-  const { data: insertedRow, error: insertError } = await supabase
-    .from("report_runs")
-    .insert({
-      relationship_id: relationshipId,
-      created_by_user_id: currentUserId,
-      status: "completed",
-      version: nextVersion,
-      source_session_id: normalizedSessionId,
-      input_refs: inputRefs,
-      payload,
-      created_at: now,
-      updated_at: now,
-    })
-    .select("id, relationship_id, version, source_session_id, input_refs, payload, created_at")
-    .single();
-
-  if (insertError) {
-    const existing = await getLatestReportRunSnapshotForSessionWithClient(supabase, normalizedSessionId);
-    if (existing) {
-      return existing;
-    }
-    console.error("Report run insert failed:", insertError.message);
-    return null;
-  }
-
-  if (modules.length > 0) {
-    const { error: moduleError } = await supabase.from("report_run_modules").insert(
-      modules.map((moduleKey) => ({
-        report_run_id: insertedRow.id,
-        module_key: moduleKey,
-      }))
-    );
-    if (moduleError) {
-      console.error("Report run modules insert failed:", moduleError.message);
-    }
-  }
-
-  return mapReportRunRowToSnapshot({
-    ...insertedRow,
-    report_run_modules: modules.map((moduleKey) => ({ module_key: moduleKey })),
-  });
-}
-
-async function getLatestReportRunSnapshotForSessionWithClient(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  normalizedSessionId: string
-): Promise<ReportRunSnapshot | null> {
-  const { data: runRow, error } = await supabase
-    .from("report_runs")
-    .select(
-      "id, relationship_id, version, source_session_id, input_refs, payload, created_at, report_run_modules(module_key)"
-    )
-    .eq("source_session_id", normalizedSessionId)
-    .order("version", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (error) {
-    return null;
-  }
-
-  return mapReportRunRowToSnapshot(runRow);
-}
-
-function mapReportRunRowToSnapshot(row: {
-  id: string;
-  relationship_id: string;
-  version: number;
-  source_session_id: string | null;
-  input_refs: unknown;
-  payload: unknown;
-  created_at: string;
-  report_run_modules?: Array<{ module_key: string }> | null;
-} | null): ReportRunSnapshot | null {
-  if (!row) {
-    return null;
-  }
-
-  const payload = parsePersistedComparePayload(row.payload);
-  if (!payload) {
-    return null;
-  }
-
-  const modules = (row.report_run_modules ?? [])
-    .map((item) => item.module_key)
-    .filter(isReportModuleKey);
-
-  return {
-    runId: row.id,
-    version: row.version,
-    relationshipId: row.relationship_id,
-    sourceSessionId: row.source_session_id,
-    createdAt: row.created_at,
-    modules,
-    inputRefs: parseReportRunInputRefs(row.input_refs) ?? payload.inputRefs,
-    report: payload.sessionReport,
-    compareJson: payload.compareJson,
-  };
-}
-
-function parsePersistedComparePayload(raw: unknown): PersistedComparePayload | null {
-  if (!raw || typeof raw !== "object") return null;
-  const payload = raw as Partial<PersistedComparePayload>;
-  if (payload.schemaVersion !== REPORT_RUN_SCHEMA_VERSION) return null;
-  if (!payload.sessionReport || !payload.compareJson || !payload.inputRefs) return null;
-  return payload as PersistedComparePayload;
-}
-
-function parseReportRunInputRefs(raw: unknown): ReportRunInputRefs | null {
-  if (!raw || typeof raw !== "object") return null;
-  const input = raw as Partial<ReportRunInputRefs>;
-  if (input.source !== "session") return null;
-  if (typeof input.sessionId !== "string") return null;
-  return input as ReportRunInputRefs;
-}
-
-function deriveReportModules(requestedScope: SessionAlignmentReport["requestedScope"]): ReportModuleKey[] {
-  return requestedScope === "basis_plus_values" ? ["base", "values"] : ["base"];
-}
-
-function buildReportInputRefs(sessionId: string, report: SessionAlignmentReport): ReportRunInputRefs {
-  return {
-    source: "session",
-    sessionId,
-    participantAId: report.participantAId,
-    participantBId: report.participantBId,
-    participantACompletedAt: report.personACompletedAt,
-    participantBCompletedAt: report.personBCompletedAt,
-    requestedScope: report.requestedScope,
-    valuesModuleStatus: report.valuesModuleStatus,
-  };
-}
-
-function isReportModuleKey(value: string): value is ReportModuleKey {
-  return (
-    value === "base" ||
-    value === "values" ||
-    value === "stress" ||
-    value === "roles" ||
-    value === "decision_architecture"
-  );
-}
-
-async function resolveRelationshipIdForSession(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  normalizedSessionId: string,
-  participantAId: string | null,
-  participantBId: string | null
-) {
-  const { data: invitationRow } = await supabase
-    .from("invitations")
-    .select("relationship_id")
-    .eq("session_id", normalizedSessionId)
-    .eq("status", "accepted")
-    .not("relationship_id", "is", null)
-    .order("accepted_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const existingRelationshipId = (invitationRow as { relationship_id?: string | null } | null)?.relationship_id;
-  if (existingRelationshipId) {
-    return existingRelationshipId;
-  }
-
-  if (!participantAId || !participantBId) {
-    return null;
-  }
-
-  const { data: pairRows } = await supabase
-    .from("participants")
-    .select("id, user_id")
-    .in("id", [participantAId, participantBId]);
-
-  const userByParticipantId = new Map<string, string>();
-  for (const row of (pairRows ?? []) as Array<{ id: string; user_id: string | null }>) {
-    if (row.user_id) {
-      userByParticipantId.set(row.id, row.user_id);
-    }
-  }
-
-  const userAId = userByParticipantId.get(participantAId);
-  const userBId = userByParticipantId.get(participantBId);
-  if (!userAId || !userBId) {
-    return null;
-  }
-
-  const { data: ensuredRelationshipId, error } = await supabase.rpc("ensure_relationship_for_users", {
-    p_user_a_id: userAId,
-    p_user_b_id: userBId,
-    p_source_session_id: normalizedSessionId,
-  });
-
-  if (error) {
-    console.error("ensure_relationship_for_users failed:", error.message);
-    return null;
-  }
-
-  if (typeof ensuredRelationshipId === "string") {
-    return ensuredRelationshipId;
-  }
-  if (Array.isArray(ensuredRelationshipId) && typeof ensuredRelationshipId[0] === "string") {
-    return ensuredRelationshipId[0];
-  }
-  return null;
-}
-
-function isReadyForReportRun(report: SessionAlignmentReport, requiredModules: ReportModuleKey[]) {
-  if (!report.participantAId || !report.participantBId) {
-    return false;
-  }
-  if (!report.personACompleted || !report.personBCompleted) {
-    return false;
-  }
-
-  const hasCompleteBase =
-    report.basisTotal > 0 &&
-    report.basisAnsweredA >= report.basisTotal &&
-    report.basisAnsweredB >= report.basisTotal;
-  if (!hasCompleteBase) {
-    return false;
-  }
-
-  if (requiredModules.includes("values")) {
-    const hasCompleteValues =
-      report.valuesTotal > 0 &&
-      report.valuesAnsweredA >= report.valuesTotal &&
-      report.valuesAnsweredB >= report.valuesTotal;
-    if (!hasCompleteValues) {
-      return false;
-    }
-  }
-
-  if (
-    requiredModules.includes("stress") ||
-    requiredModules.includes("roles") ||
-    requiredModules.includes("decision_architecture")
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-async function resolveRequiredModulesForSession(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  sessionId: string,
-  requestedScopeFallback: SessionAlignmentReport["requestedScope"]
-) {
-  const { data: invitation } = await supabase
-    .from("invitations")
-    .select("id, created_at")
-    .eq("session_id", sessionId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const invitationId = (invitation as { id?: string } | null)?.id;
-  if (invitationId) {
-    const { data: moduleRows } = await supabase
-      .from("invitation_modules")
-      .select("module_key")
-      .eq("invitation_id", invitationId);
-    const invitationModules = (moduleRows ?? [])
-      .map((row) => String((row as { module_key?: string }).module_key ?? ""))
-      .filter(isReportModuleKey);
-
-    if (invitationModules.length > 0) {
-      return invitationModules.includes("base")
-        ? invitationModules
-        : (["base", ...invitationModules] as ReportModuleKey[]);
-    }
-  }
-
-  return deriveReportModules(requestedScopeFallback);
-}
-
-async function hasSessionMembership(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  sessionId: string,
-  userId: string
-) {
-  const { data: membership } = await supabase
-    .from("participants")
-    .select("id")
-    .eq("session_id", sessionId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  return Boolean(membership);
-}
-
-function derivePersonBStatus(
-  participantA: ParticipantRow | undefined,
-  participantB: ParticipantRow | undefined
-): PersonBStatus {
-  if (!participantB || (!participantB.user_id && !participantB.invited_email)) {
-    return "invitation_open";
-  }
-  if (participantA?.completed_at && participantB.completed_at) {
-    return "match_ready";
-  }
-  if (participantB.user_id || participantB.completed_at) {
-    return "in_progress";
-  }
-  return "invitation_open";
-}
-
-function aggregateScores(
-  responses: ResponseRow[],
-  questionMeta: Map<string, QuestionMeta>
-): AggregationResult {
-  const sums = new Map<string, Map<ReportDimension, { sum: number; count: number }>>();
-  const rawSums = new Map<string, Map<ReportDimension, { sum: number; count: number }>>();
-  const questionsByParticipant = new Map<string, Map<ReportDimension, DimensionDebugEntry["questions"]>>();
-
-  for (const row of responses) {
-    const participantId = row.participant_id;
-    const actualValue = Number(row.choice_value);
-    if (!Number.isFinite(actualValue) || actualValue < 1) {
-      continue;
-    }
-
-    const meta = questionMeta.get(row.question_id);
-    if (!meta) {
-      continue;
-    }
-    const dimension = meta.dimension;
-    const max = Math.max(2, meta.max);
-    const boundedValue = Math.max(1, Math.min(max, actualValue));
-    const normalizedValue = normalizeToSixPointScale(boundedValue, max);
-
-    const participantMap = sums.get(participantId) ?? new Map<ReportDimension, { sum: number; count: number }>();
-    const current = participantMap.get(dimension) ?? { sum: 0, count: 0 };
-    current.sum += normalizedValue;
-    current.count += 1;
-    participantMap.set(dimension, current);
-    sums.set(participantId, participantMap);
-
-    const rawParticipantMap =
-      rawSums.get(participantId) ?? new Map<ReportDimension, { sum: number; count: number }>();
-    const rawCurrent = rawParticipantMap.get(dimension) ?? { sum: 0, count: 0 };
-    rawCurrent.sum += boundedValue;
-    rawCurrent.count += 1;
-    rawParticipantMap.set(dimension, rawCurrent);
-    rawSums.set(participantId, rawParticipantMap);
-
-    const participantQuestions =
-      questionsByParticipant.get(participantId) ?? new Map<ReportDimension, DimensionDebugEntry["questions"]>();
-    const questionList = participantQuestions.get(dimension) ?? [];
-    questionList.push({
-      questionId: row.question_id,
-      value: boundedValue,
-      max,
-      normalized: Number(normalizedValue.toFixed(2)),
-    });
-    participantQuestions.set(dimension, questionList);
-    questionsByParticipant.set(participantId, participantQuestions);
-  }
-
-  const averages = new Map<string, Map<ReportDimension, number>>();
-  const debugByParticipant = new Map<string, Map<ReportDimension, DimensionDebugEntry>>();
-  for (const [participantId, dimensions] of sums) {
-    const avgMap = new Map<ReportDimension, number>();
-    for (const [dimension, value] of dimensions) {
-      avgMap.set(dimension, Number((value.sum / value.count).toFixed(2)));
-    }
-    averages.set(participantId, avgMap);
-
-    const debugMap = new Map<ReportDimension, DimensionDebugEntry>();
-    for (const dimension of REPORT_DIMENSIONS) {
-      const normalizedScore = avgMap.get(dimension) ?? null;
-      const raw = rawSums.get(participantId)?.get(dimension);
-      const rawScore = raw && raw.count > 0 ? Number((raw.sum / raw.count).toFixed(2)) : null;
-      const category = normalizedScore == null ? null : profileTitle(dimension, normalizedScore);
-      const questions = (
-        questionsByParticipant.get(participantId)?.get(dimension) ?? []
-      ).sort((a, b) => a.questionId.localeCompare(b.questionId, "de"));
-      debugMap.set(dimension, {
-        dimension,
-        rawScore,
-        normalizedScore,
-        category,
-        questions,
-      });
-    }
-    debugByParticipant.set(participantId, debugMap);
-  }
-  return { averages, debugByParticipant };
-}
-
-function buildQuestionMeta(
-  questionsRaw: {
-    id: string;
-    dimension: string;
-    sort_order?: number | null;
-    category?: string | null;
-    choices?: { id: string }[] | null;
-  }[]
-) {
-  const map = new Map<string, QuestionMeta>();
-  for (const row of questionsRaw) {
-    const dimension =
-      normalizeDimension(row.dimension ?? "") ??
-      dimensionFromSortOrder(row.sort_order ?? null, row.category ?? null);
-    if (!dimension) continue;
-    const choices = Array.isArray(row.choices) ? row.choices : [];
-    const max = choices.length > 0 ? choices.length : 6;
-    map.set(row.id, { dimension, max });
-  }
-  return map;
-}
-
-function dimensionFromSortOrder(
-  sortOrder: number | null,
-  category: string | null
-): ReportDimension | null {
-  const normalizedCategory = (category ?? "basis").trim().toLowerCase();
-  if (normalizedCategory !== "basis") return null;
-  if (!Number.isFinite(sortOrder ?? NaN)) return null;
-  const order = Number(sortOrder);
-  if (order >= 1 && order <= 6) return "Vision";
-  if (order >= 7 && order <= 12) return "Entscheidung";
-  if (order >= 13 && order <= 18) return "Risiko";
-  if (order >= 19 && order <= 24) return "Autonomie";
-  if (order >= 25 && order <= 30) return "Verbindlichkeit";
-  if (order >= 31 && order <= 36) return "Konflikt";
-  return null;
-}
-
-function normalizeToSixPointScale(value: number, max: number) {
-  if (max <= 1) return 3.5;
-  const ratio = (value - 1) / (max - 1);
-  return 1 + ratio * 5;
-}
-
-function fillSeries(values: Map<ReportDimension, number>): RadarSeries {
-  return REPORT_DIMENSIONS.reduce((acc, dimension) => {
-    acc[dimension] = values.get(dimension) ?? null;
-    return acc;
-  }, {} as RadarSeries);
-}
-
-function normalizeDimension(raw: string): ReportDimension | null {
-  const value = raw.toLowerCase().trim();
-  if (value.includes("vision")) return "Vision";
-  if (value.includes("entscheid")) return "Entscheidung";
-  if (value.includes("risiko")) return "Risiko";
-  if (value.includes("autonomie")) return "Autonomie";
-  if (value.includes("naehe") || value.includes("nähe") || value.includes("nahe")) return "Autonomie";
-  if (value.includes("verbind")) return "Verbindlichkeit";
-  if (value.includes("konflikt")) return "Konflikt";
-  return null;
-}
-
-function buildKeyInsights(
-  scoresA: RadarSeries,
-  scoresB: RadarSeries,
-  includeMatchInsights: boolean
-): KeyInsight[] {
-  const candidates: (KeyInsight & { score: number })[] = [];
-
-  for (const dimension of REPORT_DIMENSIONS) {
-    const base = scoresA[dimension];
-    if (base == null) {
-      continue;
-    }
-    const key = dimensionKey(dimension);
-    const template = DIMENSION_INSIGHTS[key];
-    const deviation = Math.abs(base - 3.5);
-    const partnerScore = scoresB[dimension];
-    const delta =
-      includeMatchInsights && partnerScore != null ? Number(Math.abs(base - partnerScore).toFixed(2)) : 0;
-    const rankingScore = includeMatchInsights ? delta : deviation;
-
-    if (base <= 2.5) {
-      const profile = template.low.title;
-      const pack = actionablePack(dimension, "low");
-      candidates.push({
-        dimension,
-        title: `${dimensionLabel(dimension)} - ${profile}`,
-        priority: 0,
-        score: rankingScore,
-        text: formatActionableInsight(profile, pack.superpower, pack.warning),
-      });
-      continue;
-    }
-
-    if (base >= 4.5) {
-      const profile = template.high.title;
-      const pack = actionablePack(dimension, "high");
-      candidates.push({
-        dimension,
-        title: `${dimensionLabel(dimension)} - ${profile}`,
-        priority: 0,
-        score: rankingScore,
-        text: formatActionableInsight(profile, pack.superpower, pack.warning),
-      });
-      continue;
-    }
-
-    const profile = profileTitle(dimension, base);
-    const pack = actionablePack(dimension, "mid");
-    candidates.push({
-      dimension,
-      title: `${dimensionLabel(dimension)} - ${profile}`,
-      priority: 1,
-      score: rankingScore,
-      text: formatActionableInsight(profile, pack.superpower, pack.warning),
-    });
-  }
-
-  return candidates
-    .sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return a.priority - b.priority;
-    })
-    .slice(0, 3)
-    .map(({ dimension, title, text, priority }) => ({ dimension, title, text, priority }));
-}
-
-function formatActionableInsight(profile: string, superpower: string, warning: string) {
-  return `Deine Superpower ist ${superpower} Risikohinweis: ${warning}`;
-}
-
-function deriveFirstName(participant: ParticipantRow | undefined, fallback: string) {
-  if (!participant) {
-    return fallback;
-  }
-  const fromDisplayName = normalizeName(participant.display_name);
-  if (fromDisplayName) {
-    return fromDisplayName.split(/\s+/)[0] ?? fallback;
-  }
-  const fromInvite = participant.invited_email?.split("@")[0]?.trim();
-  if (fromInvite) {
-    return capitalize(fromInvite);
-  }
-  return fallback;
-}
-
-function actionablePack(dimension: ReportDimension, band: "low" | "mid" | "high") {
-  return ACTIONABLE_PLAYBOOK[dimension][band];
-}
-
-function profileTitle(dimension: ReportDimension, score: number) {
-  const pack = DIMENSION_INTERPRETATIONS[dimension];
-  if (score <= 2.5) return pack.low.title;
-  if (score >= 4.5) return pack.high.title;
-  return pack.mid.title;
-}
-
-function buildParticipantDebug(
-  participantName: string,
-  dimensionMap: Map<ReportDimension, DimensionDebugEntry>
-): ParticipantDebugReport {
-  return {
-    participantName,
-    dimensions: REPORT_DIMENSIONS.map(
-      (dimension) =>
-        dimensionMap.get(dimension) ?? {
-          dimension,
-          rawScore: null,
-          normalizedScore: null,
-          category: null,
-          questions: [],
-        }
-    ),
-  };
-}
-
-function normalizeName(value: string | null | undefined) {
-  const normalized = value?.trim() ?? "";
-  if (!normalized) {
-    return null;
-  }
-  const lowered = normalized.toLowerCase();
-  if (
-    lowered === "person a" ||
-    lowered === "person b" ||
-    lowered === "neuer" ||
-    lowered === "neu" ||
-    lowered === "teilnehmer" ||
-    lowered === "teilnehmerin"
-  ) {
-    return null;
-  }
-  return normalized;
-}
-
-function capitalize(value: string) {
-  if (!value) return value;
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function buildMatchNarratives(
-  scoresA: RadarSeries,
-  scoresB: RadarSeries,
-  nameA: string,
-  nameB: string,
-  enabled: boolean
-) {
-  if (!enabled) {
-    return { commonTendencies: [], frictionPoints: [] };
-  }
-
-  const commonTendencies: string[] = [];
-  const frictionPoints: string[] = [];
-
-  for (const dimension of REPORT_DIMENSIONS) {
-    const a = scoresA[dimension];
-    const b = scoresB[dimension];
-    if (a == null || b == null) {
-      continue;
-    }
-    const delta = Math.abs(a - b);
-    const poles = dimensionPoles(dimension);
-
-    if (delta < 1.0) {
-      const dimensionName = dimensionLabel(dimension);
-      commonTendencies.push(
-        `Starkes Fundament: ${nameA} und ${nameB} ticken beim Thema ${dimensionName} sehr ähnlich.`
-      );
-      continue;
-    }
-
-    if (delta >= 1.0) {
-      const aPole = a >= 3.5 ? poles.high : poles.low;
-      const bPole = b >= 3.5 ? poles.high : poles.low;
-      frictionPoints.push(
-        `Während ${nameA} eher ${aPole} priorisiert, setzt ${nameB} stärker auf ${bPole}.`
-      );
-    }
-  }
-
-  return {
-    commonTendencies: commonTendencies.slice(0, 3),
-    frictionPoints: frictionPoints.slice(0, 3),
-  };
-}
-
-function buildConversationGuide(
-  scoresA: RadarSeries,
-  scoresB: RadarSeries,
-  enabled: boolean
-) {
-  const icebreakers = [
-    "Was war der Moment in deiner bisherigen Laufbahn, in dem du am meisten über dich selbst gelernt hast?",
-    "Stell dir vor, wir scheitern in zwei Jahren. Was wäre aus deiner heutigen Sicht der wahrscheinlichste Grund dafür?",
-  ];
-
-  const questionsByDimension: Record<ReportDimension, string> = {
-    Vision: REPORT_CONTENT.dimensions.vision.q,
-    Entscheidung: REPORT_CONTENT.dimensions.entscheidung.q,
-    Risiko: REPORT_CONTENT.dimensions.risiko.q,
-    Autonomie: REPORT_CONTENT.dimensions.autonomie.q,
-    Verbindlichkeit: REPORT_CONTENT.dimensions.verbindlichkeit.q,
-    Konflikt: REPORT_CONTENT.dimensions.konflikt.q,
-  };
-
-  const deltas = REPORT_DIMENSIONS.map((dimension) => {
-    const a = scoresA[dimension];
-    const b = scoresB[dimension];
-    if (a == null || b == null) {
-      return { dimension, delta: -1 };
-    }
-    return { dimension, delta: Math.abs(a - b) };
-  })
-    .filter((item) => item.delta >= 0)
-    .sort((a, b) => b.delta - a.delta);
-
-  const guide: string[] = [...icebreakers];
-  const used = new Set<string>(guide);
-
-  if (!enabled) {
-    const defaults = [
-      questionsByDimension.Vision,
-      questionsByDimension.Entscheidung,
-      questionsByDimension.Risiko,
-    ];
-    return [...guide, ...defaults].slice(0, 5);
-  }
-
-  for (const item of deltas) {
-    const question = questionsByDimension[item.dimension];
-    if (used.has(question)) continue;
-    guide.push(question);
-    used.add(question);
-    if (guide.length === 5) break;
-  }
-
-  if (guide.length < 5) {
-    for (const dimension of REPORT_DIMENSIONS) {
-      const question = questionsByDimension[dimension];
-      if (used.has(question)) continue;
-      guide.push(question);
-      used.add(question);
-      if (guide.length === 5) break;
-    }
-  }
-
-  return guide.slice(0, 5);
-}
-
-function deriveValuesPreview(scoresA: RadarSeries, participantName: string) {
-  const risiko = scoresA.Risiko ?? 3.5;
-  const verbindlichkeit = scoresA.Verbindlichkeit ?? 3.5;
-  const konflikt = scoresA.Konflikt ?? 3.5;
-
-  if (verbindlichkeit >= 4.5 && konflikt >= 4.5) {
-    return `${participantName} signalisiert ein Wertefundament mit hoher Transparenz, klarer Verantwortungsübernahme und direkter Ethik-Kommunikation.`;
-  }
-  if (risiko <= 2.5 && konflikt <= 2.5) {
-    return `${participantName} zeigt eine eher vorsichtige Ethik-Haltung mit Fokus auf Risikoprävention, Fairness und stabile Entscheidungswege.`;
-  }
-  return `${participantName} zeigt im Werteprofil eine ausgewogene Tendenz zwischen Verlässlichkeit, Transparenz und pragmatischer Entscheidungsfähigkeit.`;
-}
-
-async function deriveValuesModuleSummary(
-  sessionId: string,
-  participantAId: string | null,
-  participantBId: string | null,
-  participantAName: string,
-  participantBName: string,
-  includeB: boolean,
-  supabase: Awaited<ReturnType<typeof createClient>>
-) {
-  const { data: valueQuestions } = await supabase
-    .from("questions")
-    .select("id")
-    .eq("category", "values")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
-    .limit(10);
-
-  const ids = (valueQuestions ?? []).map((q) => q.id);
-  const total = ids.length;
-  if (total === 0) {
-    return {
-      valuesModulePreview: deriveValuesPreview(fillSeries(new Map()), participantAName),
-      valuesModuleStatus: "not_started" as const,
-      valuesAnsweredA: 0,
-      valuesAnsweredB: 0,
-      valuesTotal: 0,
-      valuesAlignmentPercent: null,
-      valuesIdentityCategoryA: null,
-      valuesIdentityCategoryB: null,
-    };
-  }
-
-  const { data: responses } = await supabase
-    .from("responses")
-    .select("participant_id, choice_value, question_id")
-    .eq("session_id", sessionId)
-    .in("question_id", ids);
-  const { data: valueChoices } = await supabase
-    .from("choices")
-    .select("question_id, value")
-    .in("question_id", ids);
-
-  const rows = responses ?? [];
-  const aRows = participantAId ? rows.filter((r) => r.participant_id === participantAId) : [];
-  const bRows = participantBId ? rows.filter((r) => r.participant_id === participantBId) : [];
-  const maxByQuestion = buildMaxByQuestion(ids, valueChoices ?? []);
-
-  const answeredA = uniqueCount(aRows.map((r) => r.question_id));
-  const answeredB = uniqueCount(bRows.map((r) => r.question_id));
-
-  const identityScoreA = computeValuesIdentityScore(aRows, maxByQuestion);
-  const identityScoreB = computeValuesIdentityScore(bRows, maxByQuestion);
-  const valuesAlignmentPercent = calculateValuesAlignment(aRows, bRows);
-
-  const status =
-    answeredA === 0 && answeredB === 0
-      ? ("not_started" as const)
-      : answeredA >= total && (!includeB || answeredB >= total)
-        ? ("completed" as const)
-        : ("in_progress" as const);
-
-  if (status === "not_started") {
-    return {
-      valuesModulePreview:
-        "Das Werte-Modul wurde noch nicht beantwortet. Starte die Werte-Vertiefung, um Ethik- und Transparenzmuster fundiert in den Report einzubinden.",
-      valuesModuleStatus: status,
-      valuesAnsweredA: answeredA,
-      valuesAnsweredB: answeredB,
-      valuesTotal: total,
-      valuesAlignmentPercent,
-      valuesIdentityCategoryA: null,
-      valuesIdentityCategoryB: null,
-    };
-  }
-
-  if (includeB && identityScoreA != null && identityScoreB != null) {
-    const profileA = resolveValuesProfile(identityScoreA);
-    const profileB = resolveValuesProfile(identityScoreB);
-    const sentence = `${participantAName} – ${valuesProfileLabel(profileA, participantAName)}: Identität: ${
-      profileA.identity
-    } Achtung: ${profileA.warning} (Score ${
-      identityScoreA?.toFixed(2) ?? "n/a"
-    }/6). ${participantBName} – ${valuesProfileLabel(profileB, participantBName)}: Identität: ${
-      profileB.identity
-    } Achtung: ${profileB.warning} (Score ${
-      identityScoreB?.toFixed(2) ?? "n/a"
-    }/6).`;
-    return {
-      valuesModulePreview: sentence,
-      valuesModuleStatus: status,
-      valuesAnsweredA: answeredA,
-      valuesAnsweredB: answeredB,
-      valuesTotal: total,
-      valuesAlignmentPercent,
-      valuesIdentityCategoryA: profileA.title,
-      valuesIdentityCategoryB: profileB.title,
-    };
-  }
-
-  const profileA = resolveValuesProfile(identityScoreA);
-  return {
-    valuesModulePreview: `${participantAName} – ${valuesProfileLabel(profileA, participantAName)}: Identität: ${
-      profileA.identity
-    } Achtung: ${profileA.warning} (Score ${
-      identityScoreA?.toFixed(2) ?? "n/a"
-    }/6, Werte-Fragen beantwortet: ${answeredA}/${total}).`,
-    valuesModuleStatus: status,
-    valuesAnsweredA: answeredA,
-    valuesAnsweredB: answeredB,
-    valuesTotal: total,
-    valuesAlignmentPercent,
-    valuesIdentityCategoryA: profileA.title,
-    valuesIdentityCategoryB: null,
-  };
-}
-
-function buildMaxByQuestion(
-  ids: string[],
-  choiceRows: { question_id: string; value: string }[]
-) {
-  const map = new Map<string, number>();
-  for (const id of ids) map.set(id, 4);
-  for (const row of choiceRows) {
-    const numeric = Number(row.value);
-    if (!Number.isFinite(numeric)) continue;
-    const current = map.get(row.question_id) ?? 4;
-    if (numeric > current) map.set(row.question_id, numeric);
-  }
-  return map;
-}
-
-function computeValuesIdentityScore(
-  rows: { question_id: string; choice_value: string }[],
-  maxByQuestion: Map<string, number>
-) {
-  if (rows.length === 0) return null;
-  const normalized: number[] = [];
-  for (const row of rows) {
-    const value = Number(row.choice_value);
-    if (!Number.isFinite(value)) continue;
-    const max = Math.max(2, maxByQuestion.get(row.question_id) ?? 4);
-    const bounded = Math.max(1, Math.min(max, value));
-    const score6 = 1 + ((bounded - 1) / (max - 1)) * 5;
-    normalized.push(score6);
-  }
-  if (normalized.length === 0) return null;
-  return normalized.reduce((sum, item) => sum + item, 0) / normalized.length;
-}
-
-function resolveValuesProfile(score: number | null) {
-  if (score == null) return VALUES_PLAYBOOK.verantwortungs_stratege;
-  if (score <= 2.2) return VALUES_PLAYBOOK.impact_idealist;
-  if (score >= 3.5) return VALUES_PLAYBOOK.business_pragmatiker;
-  return VALUES_PLAYBOOK.verantwortungs_stratege;
-}
-
-function valuesProfileLabel(
-  profile: (typeof VALUES_PLAYBOOK)[keyof typeof VALUES_PLAYBOOK],
-  participantName: string
-) {
-  const isMaria = participantName.trim().toLowerCase() === "maria";
-  const subtitle = "subtitle" in profile ? profile.subtitle : undefined;
-  if (isMaria && subtitle) {
-    return `${profile.title} (${subtitle})`;
-  }
-  return profile.title;
-}
-
-function calculateValuesAlignment(
-  aRows: { question_id: string; choice_value: string }[],
-  bRows: { question_id: string; choice_value: string }[]
-) {
-  const byQuestionB = new Map<string, number>();
-  for (const row of bRows) {
-    const value = Number(row.choice_value);
-    if (!Number.isFinite(value)) continue;
-    byQuestionB.set(row.question_id, value);
-  }
-
-  const closeness: number[] = [];
-  for (const row of aRows) {
-    const a = Number(row.choice_value);
-    const b = byQuestionB.get(row.question_id);
-    if (!Number.isFinite(a) || b == null) continue;
-    const delta = Math.abs(a - b);
-    const normalized = Math.max(0, 1 - delta / 5); // 1..6 scale
-    closeness.push(normalized);
-  }
-
-  if (closeness.length === 0) return null;
-  const avg = closeness.reduce((sum, value) => sum + value, 0) / closeness.length;
-  return Math.round(avg * 100);
-}
-
-function uniqueCount(values: string[]) {
-  return new Set(values).size;
-}
-
-function dimensionLabel(dimension: ReportDimension) {
-  switch (dimension) {
-    case "Vision":
-      return "Vision";
-    case "Entscheidung":
-      return "Entscheidung";
-    case "Risiko":
-      return "Risikoprofil";
-    case "Autonomie":
-      return "Autonomie";
-    case "Verbindlichkeit":
-      return "Verbindlichkeit";
-    case "Konflikt":
-      return "Konflikt";
-  }
-}
-
-function dimensionKey(dimension: ReportDimension): keyof typeof DIMENSION_INSIGHTS {
-  switch (dimension) {
-    case "Vision":
-      return "vision";
-    case "Entscheidung":
-      return "entscheidung";
-    case "Risiko":
-      return "risiko";
-    case "Autonomie":
-      return "autonomie";
-    case "Verbindlichkeit":
-      return "verbindlichkeit";
-    case "Konflikt":
-      return "konflikt";
-  }
-}
-
-function dimensionPoles(dimension: ReportDimension) {
-  switch (dimension) {
-    case "Vision":
-      return { low: "strategische Stabilität", high: "skalierendes Wachstum" };
-    case "Entscheidung":
-      return { low: "analytische Sorgfalt", high: "intuitives Tempo" };
-    case "Risiko":
-      return { low: "Absicherung", high: "kalkulierte Chancenoffenheit" };
-    case "Autonomie":
-      return { low: "autonome Arbeit", high: "enge Abstimmung" };
-    case "Verbindlichkeit":
-      return { low: "nachhaltige Belastbarkeit", high: "radikale Lieferorientierung" };
-    case "Konflikt":
-      return { low: "harmonische Diplomatie", high: "radikale Klarheit" };
-  }
+  return getReportRunSnapshotForSession(result.reportRunId);
 }

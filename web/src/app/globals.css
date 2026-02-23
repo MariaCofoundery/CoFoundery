@@ -8,25 +8,29 @@
   --line: rgba(16, 26, 42, 0.14);
   --bg: #eef3f9;
   --surface-soft: #f6fbff;
-  --accent: #ff6b2b;
-  --accent-dark: #d34f17;
-  --ok: #0f766e;
-  --warn: #d97706;
+  --brand-primary: var(--color-cyan-300);
+  --brand-primary-hover: var(--color-cyan-400);
+  --brand-accent: #7c3aed;
+  --accent: var(--brand-primary);
+  --accent-dark: var(--brand-accent);
+  --ok: var(--brand-primary);
+  --warn: var(--brand-accent);
   --blob-a: #c9ddff;
-  --blob-b: #ffd8c3;
+  --blob-b: #ddd6fe;
   --shadow: 0 24px 60px rgba(16, 26, 42, 0.14);
 }
 
 html,
 body {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   font-family: var(--font-body), ui-serif, Georgia, serif;
   color: var(--ink);
-  background: linear-gradient(160deg, #edf3fb 0%, #e6f0ff 45%, #f5ece8 100%);
+  background: linear-gradient(160deg, #edf3fb 0%, #e6f0ff 45%, #f1edff 100%);
 }
 
 a {

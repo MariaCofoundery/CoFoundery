@@ -1,63 +1,75 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { signOutAction } from "@/app/(product)/dashboard/actions";
+import { CopyLinkButton } from "@/features/dashboard/CopyLinkButton";
+import { DailyQuote } from "@/features/dashboard/DailyQuote";
+import { DAILY_QUOTES } from "@/features/dashboard/dailyQuotes";
+import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
+import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
+import { AlignmentRadarChart } from "@/features/reporting/AlignmentRadarChart";
+import { KeyInsights } from "@/features/reporting/KeyInsights";
 import {
-  saveProfileOnboardingAction,
-  signOutAction,
-  updateDisplayNameAction,
-} from "@/app/(product)/dashboard/actions";
-import { createClient } from "@/lib/supabase/server";
-import { DashboardComparisonWorkspace } from "@/features/dashboard/DashboardComparisonWorkspace";
-import {
-  getReportRunSnapshotForSession,
-  getSessionAlignmentReport,
+  debug_invitation_readiness,
+  finalizeInvitationIfReady,
+  getInvitationDashboardRows,
+  getLatestSelfAlignmentReport,
+  type InvitationDashboardRow,
+  type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
-import { OnboardingCard } from "@/features/onboarding/OnboardingCard";
-import { selectParticipantA, selectParticipantB } from "@/features/participants/selection";
-import { type SessionAlignmentReport } from "@/features/reporting/types";
+import { createClient } from "@/lib/supabase/server";
 
-type SessionRow = {
-  id: string;
-  status: "not_started" | "in_progress" | "waiting" | "ready" | "match_ready" | "completed";
-  created_at: string;
-  source_session_id?: string | null;
-};
-
-type ParticipantRow = {
-  id: string;
-  session_id: string;
-  role: "A" | "B" | "partner";
-  user_id: string | null;
-  invited_email: string | null;
-  invite_consent_by_user_id?: string | null;
-  created_at: string;
-  display_name?: string | null;
-  completed_at: string | null;
+type DashboardSearchParams = {
+  error?: string;
+  valuesStatus?: string;
+  invite?: string;
+  invitationId?: string;
 };
 
 type ProfileRow = {
+  display_name: string | null;
   focus_skill: string | null;
   intention: string | null;
 };
 
-type ResponseSessionRow = {
-  session_id: string;
-  question_id: string;
+type ReportRunRow = {
+  id: string;
+  invitation_id: string;
+  modules: string[];
   created_at: string;
-  question: { category: string | null } | { category: string | null }[] | null;
+  payload: unknown;
+  invitations:
+    | {
+        id: string;
+        label: string | null;
+        invitee_email: string;
+        status: string;
+        created_at: string;
+      }
+    | Array<{
+        id: string;
+        label: string | null;
+        invitee_email: string;
+        status: string;
+        created_at: string;
+      }>
+    | null;
 };
 
-type OutboundInviteStatus = "offen" | "in_bearbeitung" | "abgeschlossen";
+const INVITE_CTA_CLASS =
+  "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)]";
+const REPORT_CTA_CLASS =
+  "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
 
-type OutboundInvite = {
-  sessionId: string;
-  invitedEmail: string;
-  invitedAt: string | null;
-  status: OutboundInviteStatus;
-};
+function getDayOfYear(date: Date) {
+  const startOfYearUtc = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const currentUtc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  return Math.floor((currentUtc - startOfYearUtc) / 86_400_000);
+}
 
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; valuesStatus?: string }>;
+  searchParams: Promise<DashboardSearchParams>;
 }) {
   const supabase = await createClient();
   const {
@@ -68,319 +80,60 @@ export default async function DashboardPage({
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("focus_skill, intention")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  const profileData = profile as ProfileRow | null;
-  const needsOnboarding = !profileData?.focus_skill || !profileData?.intention;
-
-  const { data: myParticipants, error: myParticipantsError } = await supabase
-    .from("participants")
-    .select("id, session_id, role, user_id, invited_email, display_name, completed_at")
-    .eq("user_id", user.id);
-
-  if (myParticipantsError) {
-    return <main className="p-8">Fehler beim Laden der Sessions: {myParticipantsError.message}</main>;
-  }
-
-  const sessionIds = [...new Set((myParticipants ?? []).map((row) => row.session_id))];
-
-  let sessions: SessionRow[] = [];
-  let participantsInMySessions: ParticipantRow[] = [];
-  const responseCountBySession = new Map<string, number>();
-  const basisProgressBySession = new Map<string, number>();
-  const lastResponseAtBySession = new Map<string, string>();
-  const outboundInvitesBySourceSession = new Map<string, OutboundInvite[]>();
-
-  if (sessionIds.length > 0) {
-    const [
-      { data: sessionsData, error: sessionsError },
-      { data: participantsData, error: participantsError },
-      { data: responsesData, error: responsesError },
-    ] =
-      await Promise.all([
-        supabase
-          .from("sessions")
-          .select("id, status, created_at, source_session_id")
-          .in("id", sessionIds)
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("participants")
-          .select("id, session_id, role, user_id, invited_email, invite_consent_by_user_id, created_at, completed_at")
-          .in("session_id", sessionIds),
-        supabase
-          .from("responses")
-          .select("session_id, question_id, created_at, question:questions(category)")
-          .in("session_id", sessionIds),
-      ]);
-
-    if (participantsError) {
-      return <main className="p-8">Fehler beim Laden der Teilnehmer: {participantsError.message}</main>;
-    }
-
-    if (sessionsError) {
-      return <main className="p-8">Fehler beim Laden der Session-Details: {sessionsError.message}</main>;
-    }
-
-    if (responsesError) {
-      return <main className="p-8">Fehler beim Laden der Antworten: {responsesError.message}</main>;
-    }
-
-    const seenBasisQuestionBySession = new Map<string, Set<string>>();
-    for (const row of (responsesData ?? []) as ResponseSessionRow[]) {
-      const current = responseCountBySession.get(row.session_id) ?? 0;
-      responseCountBySession.set(row.session_id, current + 1);
-      const prevLatest = lastResponseAtBySession.get(row.session_id);
-      if (!prevLatest || new Date(row.created_at).getTime() > new Date(prevLatest).getTime()) {
-        lastResponseAtBySession.set(row.session_id, row.created_at);
-      }
-
-      const question = Array.isArray(row.question) ? row.question[0] : row.question;
-      const category = question?.category?.trim().toLowerCase() ?? "basis";
-      if (category !== "basis") continue;
-      const bucket = seenBasisQuestionBySession.get(row.session_id) ?? new Set<string>();
-      bucket.add(row.question_id);
-      seenBasisQuestionBySession.set(row.session_id, bucket);
-    }
-
-    for (const [sid, ids] of seenBasisQuestionBySession) {
-      basisProgressBySession.set(sid, ids.size);
-    }
-
-    participantsInMySessions = (participantsData ?? []) as ParticipantRow[];
-    sessions = ((sessionsData ?? []) as SessionRow[]).filter((session) => {
-      const responseCount = responseCountBySession.get(session.id) ?? 0;
-      if (responseCount > 0) {
-        return true;
-      }
-      return isWithinHours(session.created_at, 24);
-    });
-
-    const sourceSessionIds = [...new Set(sessions.map((row) => row.id))];
-    if (sourceSessionIds.length > 0) {
-      const { data: comparisonSessions } = await supabase
-        .from("sessions")
-        .select("id, status, source_session_id")
-        .in("source_session_id", sourceSessionIds);
-
-      const comparisonSessionRows = (comparisonSessions ?? []) as Array<{
-        id: string;
-        status: SessionRow["status"];
-        source_session_id: string | null;
-      }>;
-      const comparisonSessionIds = comparisonSessionRows.map((row) => row.id);
-
-      if (comparisonSessionIds.length > 0) {
-        const { data: comparisonParticipants } = await supabase
-          .from("participants")
-          .select("session_id, role, invited_email, invite_consent_by_user_id, created_at, completed_at")
-          .in("session_id", comparisonSessionIds);
-
-        const comparisonParticipantRows = (comparisonParticipants ?? []) as Array<{
-          session_id: string;
-          role: "A" | "B" | "partner";
-          invited_email: string | null;
-          invite_consent_by_user_id?: string | null;
-          created_at: string | null;
-          completed_at: string | null;
-        }>;
-
-        const comparisonParticipantsBySession = new Map<string, typeof comparisonParticipantRows>();
-        for (const row of comparisonParticipantRows) {
-          const list = comparisonParticipantsBySession.get(row.session_id) ?? [];
-          list.push(row);
-          comparisonParticipantsBySession.set(row.session_id, list);
-        }
-
-        for (const comparison of comparisonSessionRows) {
-          const sourceId = comparison.source_session_id;
-          if (!sourceId) continue;
-          const participants = comparisonParticipantsBySession.get(comparison.id) ?? [];
-          const participantB = participants.find(
-            (row) =>
-              (row.role === "B" || row.role === "partner") &&
-              row.invite_consent_by_user_id === user.id
-          );
-          if (!participantB?.invited_email) continue;
-          const status: OutboundInviteStatus =
-            comparison.status === "match_ready" || Boolean(participantB.completed_at)
-              ? "abgeschlossen"
-              : comparison.status === "in_progress"
-              ? "in_bearbeitung"
-              : "offen";
-          const list = outboundInvitesBySourceSession.get(sourceId) ?? [];
-          list.push({
-            sessionId: comparison.id,
-            invitedEmail: participantB.invited_email,
-            invitedAt: participantB.created_at ?? null,
-            status,
-          });
-          outboundInvitesBySourceSession.set(sourceId, list);
-        }
-      }
-    }
-  }
-
-  const bySession = new Map<string, ParticipantRow[]>();
-  participantsInMySessions.forEach((participant) => {
-    const list = bySession.get(participant.session_id) ?? [];
-    list.push(participant);
-    bySession.set(participant.session_id, list);
-  });
-
-  const currentDisplayName =
-    (myParticipants ?? [])
-      .map((row) => row.display_name?.trim() ?? "")
-      .find((value) => value.length > 0) ?? "";
-
-  const participantABySession = new Map<string, ParticipantRow | undefined>();
-  const sessionCreatedAtById = new Map<string, string>();
-  for (const session of sessions) {
-    const participants = bySession.get(session.id) ?? [];
-    participantABySession.set(session.id, selectParticipantA(participants));
-    sessionCreatedAtById.set(session.id, session.created_at);
-  }
-
-  const ownAnalysisTimestamp = (sessionId: string) => {
-    const participantA = participantABySession.get(sessionId);
-    return (
-      participantA?.completed_at ??
-      lastResponseAtBySession.get(sessionId) ??
-      sessionCreatedAtById.get(sessionId) ??
-      new Date(0).toISOString()
-    );
-  };
-
-  const analysisTimestamp = (session: SessionRow) => {
-    if (session.source_session_id) {
-      return ownAnalysisTimestamp(session.source_session_id);
-    }
-    return ownAnalysisTimestamp(session.id);
-  };
-
-  const orderedSessions = [...sessions].sort(
-    (a, b) => new Date(analysisTimestamp(b)).getTime() - new Date(analysisTimestamp(a)).getTime()
-  );
-  const sessionsByRecency = [...sessions].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-
-  const hasBothBasisProfilesCompleted = (session: SessionRow) => {
-    const participants = bySession.get(session.id) ?? [];
-    const participantA = selectParticipantA(participants);
-    const participantB = selectParticipantB(participants, { primary: participantA });
-    return Boolean(participantA?.completed_at && participantB?.completed_at);
-  };
-
-  const completedLike = (session: SessionRow) => {
-    const progress = basisProgressBySession.get(session.id) ?? 0;
-    return hasBothBasisProfilesCompleted(session) || session.status === "completed" || progress >= 36;
-  };
-
-  const latestCompletedMatchSession = sessionsByRecency.find((session) =>
-    hasBothBasisProfilesCompleted(session)
-  );
-  const latestCompletedAnySession =
-    latestCompletedMatchSession ??
-    sessionsByRecency.find((session) => completedLike(session));
-  const latestCompletedSession = latestCompletedAnySession ?? null;
-
-  const activeAnySession = sessionsByRecency.find((session) => {
-    const progress = basisProgressBySession.get(session.id) ?? 0;
-    return progress < 36;
-  });
-  const activeSession = !latestCompletedSession
-    ? activeAnySession ?? null
-    : null;
-
-  const latestComparisonSession = sessionsByRecency.find((session) => Boolean(session.source_session_id));
-  const primarySession =
-    latestComparisonSession ??
-    latestCompletedAnySession ??
-    sessionsByRecency[0] ??
-    null;
-  const archivedSessions = sessionsByRecency.filter(
-    (session) => session.id !== activeSession?.id && session.id !== primarySession?.id
-  );
-
-  const primarySnapshot = primarySession
-    ? await getReportRunSnapshotForSession(primarySession.id)
-    : null;
-  const primaryReport = primarySnapshot?.report ??
-    (primarySession ? await getSessionAlignmentReport(primarySession.id) : null);
-
-  const reportItems = orderedSessions.map((session) => {
-    const participants = bySession.get(session.id) ?? [];
-    const myMembership = participants.find((row) => row.user_id === user.id);
-    const participantA = selectParticipantA(participants);
-    const participantB = selectParticipantB(participants, { primary: participantA });
-    const ownInviteParticipant = participants.find(
-      (row) =>
-        (row.role === "B" || row.role === "partner") &&
-        Boolean(row.invited_email) &&
-        row.invite_consent_by_user_id === user.id
-    );
-    const ownInviteStatus: OutboundInviteStatus =
-      session.status === "match_ready" || Boolean(ownInviteParticipant?.completed_at)
-        ? "abgeschlossen"
-        : session.status === "in_progress"
-        ? "in_bearbeitung"
-        : "offen";
-    const outboundInvites = [...(outboundInvitesBySourceSession.get(session.id) ?? [])];
-    if (ownInviteParticipant?.invited_email) {
-      const alreadyPresent = outboundInvites.some((invite) => invite.sessionId === session.id);
-      if (!alreadyPresent) {
-        outboundInvites.unshift({
-          sessionId: session.id,
-          invitedEmail: ownInviteParticipant.invited_email,
-          invitedAt: ownInviteParticipant.created_at ?? null,
-          status: ownInviteStatus,
-        });
-      }
-    }
-
-    return {
-      sessionId: session.id,
-      status: session.status,
-      createdAt: session.created_at,
-      analysisAt: analysisTimestamp(session),
-      myRole: myMembership?.role ?? null,
-      canInvite: Boolean(myMembership?.completed_at),
-      participantAUser: Boolean(participantA?.user_id),
-      participantBUser: Boolean(participantB?.user_id),
-      outboundInvites: outboundInvites.sort(
-        (a, b) => new Date(b.invitedAt ?? "").getTime() - new Date(a.invitedAt ?? "").getTime()
-      ),
-      report:
-        session.id === primarySession?.id
-          ? (primaryReport as SessionAlignmentReport | null)
-          : null,
-    };
-  });
-  const currentItem = primarySession ? reportItems.find((item) => item.sessionId === primarySession.id) ?? null : null;
-  const pastItems = archivedSessions
-    .map((session) => reportItems.find((item) => item.sessionId === session.id))
-    .filter((item): item is NonNullable<typeof item> => item != null);
-  const activeItem = activeSession
-    ? reportItems.find((item) => item.sessionId === activeSession.id) ?? null
-    : null;
-  const staleInvite = currentItem
-    && primarySession?.source_session_id
-    ? findStaleInvite({
-        sessions: archivedSessions,
-        bySession,
-        currentSessionId: currentItem.sessionId,
-        currentSourceSessionId: primarySession.source_session_id,
-      })
-    : null;
-
   const params = await searchParams;
+  if (params.invitationId) {
+    await finalizeInvitationIfReady(params.invitationId);
+  }
+
+  const [selfReport, { data: profile }, invitationRows, runsResult] =
+    await Promise.all([
+      getLatestSelfAlignmentReport(),
+      supabase
+        .from("profiles")
+        .select("display_name, focus_skill, intention")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      getInvitationDashboardRows(),
+      supabase
+        .from("report_runs")
+        .select(
+          "id, invitation_id, modules, created_at, payload, invitations:invitation_id(id, label, invitee_email, status, created_at)"
+        )
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+
+  if (runsResult.error) {
+    return <main className="p-8">Fehler beim Laden der Report-Runs: {runsResult.error.message}</main>;
+  }
+  const profileData = (profile as ProfileRow | null) ?? null;
+  const needsOnboarding =
+    !profileData?.display_name?.trim() || !profileData?.focus_skill || !profileData?.intention;
+  const sentInvites = invitationRows.filter((row) => row.direction === "sent");
+  const receivedInvites = invitationRows.filter((row) => row.direction === "incoming");
+  const groupedSentInvites = groupSentInvitationsByInviteeEmail(sentInvites);
+  const isDev = process.env.NODE_ENV !== "production";
+  const debugByInvitationId = isDev
+    ? new Map<string, InvitationReadinessDebug>(
+        await Promise.all(
+          invitationRows.map(async (invitation) => [
+            invitation.id,
+            await debug_invitation_readiness(invitation.id, { attemptFinalize: true }),
+          ] as const)
+        )
+      )
+    : new Map<string, InvitationReadinessDebug>();
+  const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
+  const hasSubmittedBase = Boolean(selfReport);
+  const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
+  const dayOfYear = getDayOfYear(new Date());
+  const quoteIndex = DAILY_QUOTES.length > 0 ? (dayOfYear - 1) % DAILY_QUOTES.length : 0;
+  const quoteOfDay = DAILY_QUOTES[quoteIndex] ?? "Klarheit schlägt Zufall.";
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-7xl px-8 py-16 md:px-12">
-      <header className="mb-16 flex flex-wrap items-center justify-between gap-6">
+    <main className="mx-auto min-h-screen w-full max-w-5xl px-8 py-16 md:px-12">
+      <DailyQuote displayName={profileData?.display_name ?? null} quote={quoteOfDay} />
+      <header className="mb-10 flex flex-wrap items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-semibold tracking-[0.11em] text-slate-900 md:text-4xl">DASHBOARD</h1>
           <p className="mt-2 text-sm tracking-[0.04em] text-slate-500">{user.email}</p>
@@ -389,92 +142,511 @@ export default async function DashboardPage({
               Fokus: {profileData.focus_skill} · Intention: {profileData.intention}
             </p>
           ) : null}
-          <form action={updateDisplayNameAction} className="mt-3 inline-flex items-center gap-2">
-            <label htmlFor="display-name" className="text-xs tracking-[0.08em] text-slate-500">
-              Anzeigename
-            </label>
-            <input
-              id="display-name"
-              name="displayName"
-              defaultValue={currentDisplayName}
-              placeholder="Dein Name"
-              className="h-9 rounded-lg border border-slate-200 px-3 text-sm text-slate-700"
-            />
+        </div>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/invite/new"
+            className={INVITE_CTA_CLASS}
+          >
+            Co-Founder einladen
+          </Link>
+          <form action={signOutAction}>
             <button
               type="submit"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700"
-              aria-label="Anzeigename speichern"
-              title="Anzeigename speichern"
+              className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
             >
-              ✎
+              Abmelden
             </button>
           </form>
         </div>
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-          >
-            Abmelden
-          </button>
-        </form>
       </header>
 
-      {needsOnboarding ? <OnboardingCard action={saveProfileOnboardingAction} /> : null}
+      <section className="mb-6">
+        {needsOnboarding ? (
+          <ProfileBasicsForm
+            mode="onboarding"
+            initialValues={{
+              display_name: profileData?.display_name ?? null,
+              focus_skill: profileData?.focus_skill ?? null,
+              intention: profileData?.intention ?? null,
+            }}
+            submitLabel="Profil speichern"
+            onSuccessRedirectTo="/dashboard"
+            variant="accent"
+          />
+        ) : (
+          <details className="rounded-2xl border border-slate-200/80 bg-white/95 p-4">
+            <summary className="cursor-pointer text-sm font-medium text-slate-700">
+              Profil-Basics bearbeiten
+            </summary>
+            <div className="mt-4">
+              <ProfileBasicsForm
+                mode="edit"
+                initialValues={{
+                  display_name: profileData?.display_name ?? null,
+                  focus_skill: profileData?.focus_skill ?? null,
+                  intention: profileData?.intention ?? null,
+                }}
+                submitLabel="Profil aktualisieren"
+                onSuccessRedirectTo="/dashboard"
+              />
+            </div>
+          </details>
+        )}
+      </section>
 
-      <DashboardComparisonWorkspace
-        activeItem={
-          activeItem
-            ? {
-                ...activeItem,
-                progressBasis: Math.min(36, basisProgressBySession.get(activeItem.sessionId) ?? 0),
-              }
-            : null
-        }
-        currentItem={currentItem ?? null}
-        pastItems={pastItems}
-        staleInvite={staleInvite}
-        error={params.error}
-      />
+      {params.error ? (
+        <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Hinweis: {params.error}
+        </p>
+      ) : null}
+
+      <section className="mb-6">
+        {selfReport ? (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <article className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+              <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Profil-Snapshot (Basis)</h2>
+              <p className="mt-2 text-xs text-slate-500">
+                Fragen beantwortet: {selfReport.basisAnsweredA}/{selfReport.basisTotal}
+              </p>
+              <div className="mt-4">
+                <AlignmentRadarChart
+                  participants={[
+                    {
+                      id: "self",
+                      label: selfReport.participantAName || "Du",
+                      color: "#00BFA5",
+                      scores: selfReport.scoresA,
+                    },
+                  ]}
+                />
+              </div>
+              {process.env.NODE_ENV !== "production" ? (
+                <details className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <summary className="cursor-pointer text-xs font-medium text-slate-700">
+                    Dev Debug: self report
+                  </summary>
+                  <pre className="mt-2 overflow-auto text-xs text-slate-700">
+                    {JSON.stringify(
+                      {
+                        baseAssessmentId: selfReport.selfAssessmentMeta?.baseAssessmentId ?? selfReport.sessionId,
+                        valuesAssessmentId: selfReport.selfAssessmentMeta?.valuesAssessmentId ?? null,
+                        valuesAnsweredA: selfReport.valuesAnsweredA,
+                        valuesTotal: selfReport.valuesTotal,
+                        scoresA: selfReport.scoresA,
+                      },
+                      null,
+                      2
+                    )}
+                  </pre>
+                </details>
+              ) : null}
+            </article>
+            <KeyInsights insights={selfReport.keyInsights} />
+          </div>
+        ) : (
+          <article className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+            <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Profil-Snapshot (Basis)</h2>
+            <p className="mt-3 text-sm text-slate-700">Fülle zuerst den Basis-Fragebogen aus.</p>
+          </article>
+        )}
+      </section>
+
+      <section className="mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+        <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Profilstatus</h2>
+
+        <div className="mt-4 grid gap-6 lg:grid-cols-2">
+          <article className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Aktive Module</h3>
+            <ul className="mt-3 space-y-3 text-sm text-slate-700">
+              <li className="flex items-center justify-between gap-4">
+                <span>Basis</span>
+                <span className="text-xs uppercase tracking-[0.08em] text-slate-500">
+                  {hasSubmittedBase ? "abgeschlossen" : "offen"}
+                </span>
+              </li>
+              <li className="flex items-center justify-between gap-4">
+                <span>Werte</span>
+                <span className="text-xs uppercase tracking-[0.08em] text-slate-500">
+                  {hasSubmittedValues ? "abgeschlossen" : "offen"}
+                </span>
+              </li>
+            </ul>
+            {!hasSubmittedValues ? (
+              <a
+                href="/me/values"
+                className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              >
+                Werte-Add-on starten
+              </a>
+            ) : null}
+          </article>
+
+          <article className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
+              Weitere Module (coming soon)
+            </h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700">
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.34 3.94L1.82 18a2.25 2.25 0 001.924 3.375h16.512A2.25 2.25 0 0022.18 18L13.66 3.94a2.25 2.25 0 00-3.32 0z"
+                  />
+                </svg>
+                <span>Stress & Belastung</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75m-16.5 0h3.75m3 0a2.25 2.25 0 104.5 0m-4.5 0a2.25 2.25 0 014.5 0M10.5 12h9.75m-16.5 0h3.75m3 0a2.25 2.25 0 104.5 0m-4.5 0a2.25 2.25 0 014.5 0M10.5 18h9.75m-16.5 0h3.75m3 0a2.25 2.25 0 104.5 0m-4.5 0a2.25 2.25 0 014.5 0" />
+                </svg>
+                <span>Arbeitsstil & Entscheidungslogik</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7.5 10.5h9m-9 3h6m-2.25 7.125l-2.436-2.436a2.25 2.25 0 00-1.59-.659H6A2.25 2.25 0 013.75 15.28V7.875A2.25 2.25 0 016 5.625h12a2.25 2.25 0 012.25 2.25v7.406A2.25 2.25 0 0118 17.53h-1.223a2.25 2.25 0 00-1.59.659l-2.437 2.436z"
+                  />
+                </svg>
+                <span>Konflikt- & Feedback-Dynamiken</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19.125a8.967 8.967 0 01-6 0m6 0a9 9 0 10-6 0m6 0v-1.125a3 3 0 00-3-3h0a3 3 0 00-3 3V19.125m6 0h-6M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>Rollenverständnis im Team</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M18 18.72a8.97 8.97 0 003.742-.478 3 3 0 00-4.682-2.72m.94 3.198a8.965 8.965 0 01-3.758.78m-7.5 0a8.965 8.965 0 01-3.758-.78m0 0a3 3 0 014.682-2.72m-4.682 2.72A8.97 8.97 0 012.25 18.72m15.5-7.22a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-9 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm9-5.25a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>Team-Report (3–4 Personen)</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="h-[17px] w-[17px] shrink-0 text-slate-500"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 8.25h19.5m-18 0v8.625A2.625 2.625 0 006.375 19.5h11.25a2.625 2.625 0 002.625-2.625V8.25m-18 0A2.625 2.625 0 016.375 5.625h11.25A2.625 2.625 0 0120.25 8.25m-8.25 3v4.5m-2.25-2.25h4.5"
+                  />
+                </svg>
+                <span>Investor / Business-Angel Match</span>
+              </li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+        <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Dein nächster Schritt</h2>
+        <div className="mt-4 flex flex-wrap gap-3">
+          {!hasSubmittedBase ? (
+            <a
+              href="/me/base"
+              className="inline-flex rounded-lg border border-slate-900 bg-slate-900 px-4 py-2 text-sm text-white"
+            >
+              Basis-Fragebogen starten
+            </a>
+          ) : null}
+          {hasSubmittedBase && !hasSubmittedValues ? (
+            <a
+              href="/me/values"
+              className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+            >
+              Werte Add-on starten
+            </a>
+          ) : null}
+          {hasSubmittedBase ? (
+            <a
+              href="/me/report"
+              className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+            >
+              Individuellen Report öffnen
+            </a>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="grid gap-6 md:grid-cols-2">
+        <article className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+          <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Gesendete Einladungen</h2>
+          <ul className="mt-4 space-y-3">
+            {groupedSentInvites.map(({ primary, additional }) => (
+              <li key={primary.id} className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700">
+                {renderInvitationCard({
+                  invite: primary,
+                  isDev,
+                  debug: debugByInvitationId.get(primary.id) ?? null,
+                })}
+                {additional.length > 0 ? (
+                  <details className="mt-3 rounded-md border border-slate-200 bg-slate-50/70 p-2">
+                    <summary className="cursor-pointer text-xs font-medium text-slate-700">
+                      Weitere anzeigen ({additional.length})
+                    </summary>
+                    <ul className="mt-2 space-y-2">
+                      {additional.map((olderInvite) => (
+                        <li key={olderInvite.id} className="rounded-md border border-slate-200 bg-white p-2">
+                          {renderInvitationCard({
+                            invite: olderInvite,
+                            isDev,
+                            debug: debugByInvitationId.get(olderInvite.id) ?? null,
+                          })}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+              </li>
+            ))}
+            {groupedSentInvites.length === 0 ? (
+              <li className="text-sm text-slate-500">Noch keine gesendeten Einladungen.</li>
+            ) : null}
+          </ul>
+        </article>
+
+        <article className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+          <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Eingehende Einladungen</h2>
+          <ul className="mt-4 space-y-3">
+            {receivedInvites.map((invite) => (
+              <li key={invite.id} className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700">
+                {(() => {
+                  const requiresValues = invite.requiredModules.includes("values");
+                  const inviteeHasAllRequired =
+                    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
+                  const continueMatchHref = `/join?invitationId=${encodeURIComponent(invite.id)}`;
+                  const reportHref = `/report/${invite.id}`;
+                  const actionHref = invite.isReportReady
+                    ? reportHref
+                    : continueMatchHref;
+                  return (
+                    <>
+                      <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite)}</p>
+                      <p className="mt-1">Status: {getIncomingInviteStatusLabel(invite)}</p>
+                      <p className="text-xs text-slate-500">
+                        Module: {formatInvitationModules(invite.requiredModules)}
+                      </p>
+                      <p className="text-xs text-slate-500">Erstellt: {formatDate(invite.createdAt)}</p>
+
+                      <div className="mt-2 flex flex-wrap items-start gap-2">
+                        <a
+                          href={actionHref}
+                          className={
+                            invite.isReportReady
+                              ? REPORT_CTA_CLASS
+                              : "inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
+                          }
+                        >
+                          {invite.isReportReady
+                            ? "Report öffnen"
+                            : inviteeHasAllRequired
+                              ? "Match starten"
+                              : "Jetzt ausfüllen"}
+                        </a>
+                        <CopyLinkButton url={actionHref} />
+                      </div>
+                      {isDev ? (
+                        <details className="mt-2 rounded-md border border-slate-200 bg-slate-50/70 p-2">
+                          <summary className="cursor-pointer text-xs text-slate-600">Debug anzeigen</summary>
+                          <pre className="mt-2 overflow-auto text-[11px] leading-5 text-slate-700">
+                            {JSON.stringify(debugByInvitationId.get(invite.id) ?? null, null, 2)}
+                          </pre>
+                        </details>
+                      ) : null}
+                    </>
+                  );
+                })()}
+              </li>
+            ))}
+            {receivedInvites.length === 0 ? (
+              <li className="text-sm text-slate-500">Keine Einladungen an dich.</li>
+            ) : null}
+          </ul>
+        </article>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+        <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Report-Runs</h2>
+        <ul className="mt-4 space-y-3">
+          {reportRuns.map((run) => (
+            <li key={run.id} className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700">
+              {(() => {
+                const invitation = Array.isArray(run.invitations)
+                  ? run.invitations[0] ?? null
+                  : run.invitations;
+                return (
+                  <>
+              <p className="font-medium text-slate-900">
+                {invitation?.label ?? invitation?.invitee_email ?? run.invitation_id}
+              </p>
+              <p className="mt-1">Module: {(run.modules ?? []).join(", ") || "base"}</p>
+              <p className="text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>
+              <a
+                href={`/report/${run.invitation_id}`}
+                className={`mt-2 ${REPORT_CTA_CLASS}`}
+              >
+                Report öffnen
+              </a>
+                  </>
+                );
+              })()}
+            </li>
+          ))}
+          {reportRuns.length === 0 ? (
+            <li className="text-sm text-slate-500">Noch keine Report-Runs verfügbar.</li>
+          ) : null}
+        </ul>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-600">Bereit für den nächsten Matching-Schritt?</p>
+          <Link href="/invite/new" className={INVITE_CTA_CLASS}>
+            Co-Founder einladen
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
 
-function isWithinHours(timestamp: string | null | undefined, hours: number) {
-  if (!timestamp) return false;
-  const parsed = new Date(timestamp).getTime();
-  if (!Number.isFinite(parsed)) return false;
-  const cutoff = Date.now() - hours * 60 * 60 * 1000;
-  return parsed >= cutoff;
+function formatDate(value: string | null | undefined) {
+  if (!value) return "unbekannt";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "unbekannt";
+  return date.toLocaleDateString("de-DE");
 }
 
-function findStaleInvite({
-  sessions,
-  bySession,
-  currentSessionId,
-  currentSourceSessionId,
-}: {
-  sessions: SessionRow[];
-  bySession: Map<string, ParticipantRow[]>;
-  currentSessionId: string;
-  currentSourceSessionId: string;
-}) {
-  const sorted = [...sessions].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+function resolveIncomingInviterName(invite: InvitationDashboardRow) {
+  const inviterDisplayName = invite.inviterDisplayName?.trim();
+  if (inviterDisplayName) return inviterDisplayName;
+  const inviterEmail = invite.inviterEmail?.trim();
+  if (inviterEmail) return inviterEmail;
+  return "Co-Founder";
+}
 
-  for (const session of sorted) {
-    if (session.id === currentSessionId) continue;
-    if (session.source_session_id !== currentSourceSessionId) continue;
-    const participants = bySession.get(session.id) ?? [];
-    const participantB = selectParticipantB(participants);
-    if (!participantB?.invited_email) continue;
-    return {
-      fromSessionId: session.id,
-      invitedEmail: participantB.invited_email,
-      invitedAt: participantB.created_at ?? session.created_at,
-    };
+function formatIncomingInviteTitle(invite: InvitationDashboardRow) {
+  return `${resolveIncomingInviterName(invite)} hat dich eingeladen`;
+}
+
+function getIncomingInviteStatusLabel(invite: InvitationDashboardRow) {
+  return invite.isReportReady ? "Report bereit" : "gesendet";
+}
+
+function getSentInviteStatusLabel(invite: InvitationDashboardRow) {
+  return invite.isReportReady ? "Report bereit" : "gesendet";
+}
+
+function formatInvitationModules(modules: string[]) {
+  const moduleKeys = (modules ?? []).filter((value): value is string => Boolean(value));
+  if (moduleKeys.length === 0) return "Basis";
+
+  const labels = moduleKeys.map((key) => {
+    if (key === "base") return "Basis";
+    if (key === "values") return "Werte";
+    return key;
+  });
+  return [...new Set(labels)].join(", ");
+}
+
+function groupSentInvitationsByInviteeEmail(invites: InvitationDashboardRow[]) {
+  const groups = new Map<string, InvitationDashboardRow[]>();
+  for (const invite of invites) {
+    const key = invite.inviteeEmail.trim().toLowerCase();
+    const existing = groups.get(key) ?? [];
+    existing.push(invite);
+    groups.set(key, existing);
   }
 
-  return null;
+  return [...groups.values()].map((rows) => ({
+    primary: rows[0],
+    additional: rows.slice(1),
+  }));
+}
+
+function renderInvitationCard(params: {
+  invite: InvitationDashboardRow;
+  isDev: boolean;
+  debug: InvitationReadinessDebug | null;
+}) {
+  const { invite, isDev, debug } = params;
+  const title = invite.label ?? invite.inviteeEmail;
+  return (
+    <>
+      <p className="font-medium text-slate-900">{title}</p>
+      <p className="mt-1">Status: {getSentInviteStatusLabel(invite)}</p>
+      <p className="text-xs text-slate-500">Module: {formatInvitationModules(invite.requiredModules)}</p>
+      <p className="text-xs text-slate-500">Ablauf: {formatDate(invite.expiresAt)}</p>
+      <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
+      {invite.isReportReady ? (
+        <a
+          href={`/report/${invite.id}`}
+          className={`mt-2 ${REPORT_CTA_CLASS}`}
+        >
+          Report öffnen
+        </a>
+      ) : null}
+      {isDev ? (
+        <details className="mt-2 rounded-md border border-slate-200 bg-slate-50/70 p-2">
+          <summary className="cursor-pointer text-xs text-slate-600">Debug anzeigen</summary>
+          <pre className="mt-2 overflow-auto text-[11px] leading-5 text-slate-700">
+            {JSON.stringify(debug, null, 2)}
+          </pre>
+        </details>
+      ) : null}
+    </>
+  );
 }

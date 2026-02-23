@@ -1,155 +1,251 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
 
-type JoinPageProps = {
-  searchParams: Promise<{ sessionId?: string; inviteToken?: string; token?: string }>;
-};
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
-export default async function JoinPage({ searchParams }: JoinPageProps) {
-  const params = await searchParams;
-  const sessionId = params.sessionId?.trim() ?? "";
-  const inviteToken = params.inviteToken?.trim() ?? params.token?.trim() ?? "";
+const PENDING_INVITE_TOKEN_KEY = "pending_invite_token";
 
-  if (!sessionId && !inviteToken) {
-    return (
-      <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h1 className="text-xl font-semibold text-slate-900">Ungültiger Join-Link</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Es fehlt eine `sessionId` oder ein `inviteToken` in der URL.
-          </p>
-        </div>
-      </main>
-    );
+type JoinUiState =
+  | { type: "loading"; title: string; description: string }
+  | { type: "redirecting"; title: string; description: string }
+  | {
+      type: "error";
+      title: string;
+      description: string;
+      technicalError: string;
+    };
+
+function resolveInviteError(message: string) {
+  const normalized = message.trim().toLowerCase();
+
+  if (normalized.includes("invalid_token")) {
+    return {
+      title: "Link ungültig",
+      description: "Der Einladungslink ist nicht mehr gültig.",
+    };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    const nextParams = new URLSearchParams();
-    if (sessionId) nextParams.set("sessionId", sessionId);
-    if (inviteToken) nextParams.set("inviteToken", inviteToken);
-    redirect(`/login?next=${encodeURIComponent(`/join?${nextParams.toString()}`)}`);
+  if (normalized.includes("expired")) {
+    return {
+      title: "Link abgelaufen",
+      description: "Diese Einladung ist abgelaufen.",
+    };
   }
 
-  let resolvedSessionId = sessionId;
-  const useRelationshipAccept =
-    (process.env.ENABLE_RELATIONSHIP_ACCEPT_FALLBACK ?? "true").toLowerCase() !== "false";
+  if (normalized.includes("revoked")) {
+    return {
+      title: "Einladung widerrufen",
+      description: "Diese Einladung wurde widerrufen.",
+    };
+  }
 
-  if (inviteToken && useRelationshipAccept) {
-    const { data: acceptRows, error: acceptError } = await supabase.rpc("accept_invitation", {
-      p_token: inviteToken,
-    });
-    const accepted = Array.isArray(acceptRows) ? acceptRows[0] : acceptRows;
+  return {
+    title: "Einladung konnte nicht angenommen werden",
+    description: "Die Einladung konnte nicht verarbeitet werden.",
+  };
+}
 
-    if (!acceptError && accepted?.relationship_id) {
-      if (accepted.session_id) {
-        resolvedSessionId = String(accepted.session_id);
+function readInviteTokenFromParams(searchParams: URLSearchParams) {
+  return (searchParams.get("inviteToken") ?? searchParams.get("token") ?? "").trim();
+}
+
+function readInvitationIdFromParams(searchParams: URLSearchParams) {
+  return (searchParams.get("invitationId") ?? "").trim();
+}
+
+function readPendingInviteToken() {
+  try {
+    return sessionStorage.getItem(PENDING_INVITE_TOKEN_KEY)?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function writePendingInviteToken(token: string) {
+  try {
+    sessionStorage.setItem(PENDING_INVITE_TOKEN_KEY, token);
+  } catch {
+    // Ignore storage issues in restrictive browser contexts.
+  }
+}
+
+function clearPendingInviteToken() {
+  try {
+    sessionStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
+  } catch {
+    // Ignore storage issues in restrictive browser contexts.
+  }
+}
+
+function extractInvitationIdFromAcceptPayload(payload: unknown): string | null {
+  if (Array.isArray(payload)) {
+    const first = payload[0];
+    if (
+      first &&
+      typeof first === "object" &&
+      typeof (first as { invitation_id?: unknown }).invitation_id === "string"
+    ) {
+      return (first as { invitation_id: string }).invitation_id;
+    }
+    return null;
+  }
+
+  if (
+    payload &&
+    typeof payload === "object" &&
+    typeof (payload as { invitation_id?: unknown }).invitation_id === "string"
+  ) {
+    return (payload as { invitation_id: string }).invitation_id;
+  }
+
+  return null;
+}
+
+export default function JoinPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = useMemo(() => createClient(), []);
+  const hasRunRef = useRef(false);
+  const [uiState, setUiState] = useState<JoinUiState>({
+    type: "loading",
+    title: "Einladung wird geprüft",
+    description: "Wir verarbeiten deinen Einladungslink.",
+  });
+
+  useEffect(() => {
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
+
+    const run = async () => {
+      const tokenFromUrl = readInviteTokenFromParams(searchParams);
+      const invitationIdFromUrl = readInvitationIdFromParams(searchParams);
+
+      if (tokenFromUrl) {
+        writePendingInviteToken(tokenFromUrl);
       }
-      if (!resolvedSessionId) {
-        redirect("/dashboard");
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        setUiState({
+          type: "error",
+          title: "Anmeldung konnte nicht geprüft werden",
+          description: "Bitte versuche es erneut.",
+          technicalError: sessionError.message,
+        });
+        return;
       }
-    } else if (!resolvedSessionId) {
-      return (
-        <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h1 className="text-xl font-semibold text-slate-900">Einladung ungültig</h1>
-            <p className="mt-2 text-sm text-slate-600">
-              Diese Einladung konnte nicht angenommen werden. Bitte fordere eine neue Einladung an.
+
+      if (!session?.user?.id) {
+        const pendingToken = tokenFromUrl || readPendingInviteToken();
+        if (pendingToken) {
+          writePendingInviteToken(pendingToken);
+        }
+
+        const nextPath = pendingToken
+          ? `/join?token=${encodeURIComponent(pendingToken)}`
+          : invitationIdFromUrl
+            ? `/join?invitationId=${encodeURIComponent(invitationIdFromUrl)}`
+            : "/join";
+        setUiState({
+          type: "redirecting",
+          title: "Weiter zum Login",
+          description: "Bitte melde dich per Magic Link an, danach wird die Einladung automatisch fortgesetzt.",
+        });
+        router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+        return;
+      }
+
+      let resolvedInvitationId = invitationIdFromUrl;
+      const token = tokenFromUrl || readPendingInviteToken();
+
+      if (token) {
+        const { data, error } = await supabase.rpc("accept_invitation", {
+          p_token: token,
+        });
+
+        if (error) {
+          const normalizedError = error.message.trim().toLowerCase();
+          if (
+            normalizedError.includes("auth session missing") ||
+            normalizedError.includes("not_authenticated")
+          ) {
+            writePendingInviteToken(token);
+            const nextPath = `/join?token=${encodeURIComponent(token)}`;
+            router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+            return;
+          }
+
+          const mapped = resolveInviteError(error.message);
+          if (
+            normalizedError.includes("invalid_token") ||
+            normalizedError.includes("expired") ||
+            normalizedError.includes("revoked")
+          ) {
+            clearPendingInviteToken();
+          }
+          setUiState({
+            type: "error",
+            title: mapped.title,
+            description: mapped.description,
+            technicalError: error.message,
+          });
+          return;
+        }
+
+        clearPendingInviteToken();
+        resolvedInvitationId = extractInvitationIdFromAcceptPayload(data) ?? resolvedInvitationId;
+      }
+
+      if (!resolvedInvitationId) {
+        setUiState({
+          type: "error",
+          title: "Link ungültig",
+          description: "Es wurde keine Einladung gefunden.",
+          technicalError: "missing_invitation_context",
+        });
+        return;
+      }
+
+      router.replace(`/join/welcome?invitationId=${encodeURIComponent(resolvedInvitationId)}`);
+    };
+
+    void run();
+  }, [router, searchParams, supabase]);
+
+  /*
+   * Testplan:
+   * 1) Inkognito-Fenster öffnen.
+   * 2) Einladung über /join?token=... öffnen.
+   * 3) Magic Link Login auslösen und zurückkehren.
+   * 4) Weiterleitung auf /join/welcome?invitationId=... prüfen.
+   */
+
+  return (
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h1 className="text-xl font-semibold text-slate-900">{uiState.title}</h1>
+        <p className="mt-2 text-sm text-slate-600">{uiState.description}</p>
+
+        {uiState.type === "error" ? (
+          <>
+            <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              Falls der Link wirklich abgelaufen ist, bitte die einladende Person um eine neue Einladung.
             </p>
-            {acceptError?.message ? (
-              <p className="mt-2 text-xs text-slate-500">Hinweis: {acceptError.message}</p>
-            ) : null}
-          </div>
-        </main>
-      );
-    }
-  }
-
-  if (!resolvedSessionId) {
-    return (
-      <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h1 className="text-xl font-semibold text-slate-900">Session nicht verfügbar</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Für diese Einladung konnte keine Session ermittelt werden.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  const { data: session } = await supabase
-    .from("sessions")
-    .select("id")
-    .eq("id", resolvedSessionId)
-    .maybeSingle();
-
-  if (!session) {
-    return (
-      <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h1 className="text-xl font-semibold text-slate-900">Session nicht gefunden</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Bitte prüfe den Link oder fordere eine neue Einladung an.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  const { data: existingMembership } = await supabase
-    .from("participants")
-    .select("id, role")
-    .eq("session_id", resolvedSessionId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!existingMembership) {
-    const { data: invitedSlots } = await supabase
-      .from("participants")
-      .select("id, created_at")
-      .eq("session_id", resolvedSessionId)
-      .in("role", ["B", "partner"])
-      .is("user_id", null)
-      .eq("invited_email", user.email?.toLowerCase() ?? "")
-      .order("created_at", { ascending: false });
-
-    const invitedSlot = (invitedSlots ?? [])[0] ?? null;
-
-    if (!invitedSlot) {
-      return (
-        <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h1 className="text-xl font-semibold text-slate-900">Einladung erforderlich</h1>
-            <p className="mt-2 text-sm text-slate-600">
-              Dieser Link ist nicht (mehr) einer offenen Einladung für deine E-Mail-Adresse zugeordnet.
-              Bitte fordere eine neue Einladung an.
-            </p>
-          </div>
-        </main>
-      );
-    }
-
-    const { error } = await supabase
-      .from("participants")
-      .update({ user_id: user.id })
-      .eq("id", invitedSlot.id);
-
-    if (error) {
-      return (
-        <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h1 className="text-xl font-semibold text-slate-900">Join fehlgeschlagen</h1>
-            <p className="mt-2 text-sm text-slate-600">{error.message}</p>
-          </div>
-        </main>
-      );
-    }
-  }
-
-  redirect(`/session/${resolvedSessionId}/b`);
+            <p className="mt-3 text-xs text-slate-500">Technischer Hinweis: {uiState.technicalError}</p>
+            <a
+              href="/dashboard"
+              className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+            >
+              Zum Dashboard
+            </a>
+          </>
+        ) : null}
+      </div>
+    </main>
+  );
 }

@@ -40,6 +40,24 @@ export type ParticipantDebugReport = {
   dimensions: DimensionDebugEntry[];
 };
 
+export type ValuesArchetypeId =
+  | "impact_idealist"
+  | "verantwortungs_stratege"
+  | "business_pragmatiker";
+
+export type SelfValuesProfile = {
+  primaryArchetypeId: ValuesArchetypeId;
+  secondaryArchetypeId: ValuesArchetypeId | null;
+  primaryLabel: string;
+  secondaryLabel: string | null;
+  summary: string;
+  insights: string[];
+  watchouts: string[];
+  answered: number;
+  total: number;
+  clusterScores: Record<ValuesArchetypeId, number>;
+};
+
 export type SessionAlignmentReport = {
   sessionId: string;
   createdAt: string | null;
@@ -71,8 +89,29 @@ export type SessionAlignmentReport = {
   valuesAlignmentPercent: number | null;
   valuesIdentityCategoryA: string | null;
   valuesIdentityCategoryB: string | null;
+  valuesScoreA?: number | null;
+  valuesScoreB?: number | null;
   requestedScope: "basis" | "basis_plus_values";
   inviteConsentCaptured: boolean;
+  selfAssessmentMeta?: {
+    baseAssessmentId: string | null;
+    valuesAssessmentId: string | null;
+  };
+  selfValuesProfile?: SelfValuesProfile | null;
+  baseCoverageA?: {
+    answeredNumericByDimension: Record<ReportDimension, number>;
+    expectedByDimension: Record<ReportDimension, number>;
+    numericAnsweredTotal: number;
+    expectedTotal: number;
+    baseCoveragePercent: number | null;
+  };
+  baseCoverageB?: {
+    answeredNumericByDimension: Record<ReportDimension, number>;
+    expectedByDimension: Record<ReportDimension, number>;
+    numericAnsweredTotal: number;
+    expectedTotal: number;
+    baseCoveragePercent: number | null;
+  } | null;
   debugA: ParticipantDebugReport;
   debugB: ParticipantDebugReport | null;
 };
@@ -81,7 +120,7 @@ export type ZoneBand = "low" | "mid" | "high";
 
 export type DiffClass = "SMALL" | "MEDIUM" | "LARGE";
 
-export type CompareLabel = "MATCH" | "KOMPLEMENTAER" | "FOKUS_THEMA";
+export type CompareLabel = "MATCH" | "KOMPLEMENTAER" | "FOKUS_THEMA" | "DATEN_UNVOLLSTAENDIG";
 
 export type ArchetypeCopy = {
   id: string;
@@ -146,10 +185,15 @@ export type CompareResult = {
   perDimension: CompareDimensionBlock[];
   topMatches: ReportDimension[];
   topTensions: ReportDimension[];
+  comparableDimensionCount: number;
+  totalDimensionCount: number;
+  dataCoverageText: string;
+  isDataSufficient: boolean;
   summaryType:
     | "Die Harmonischen Stabilisatoren"
     | "Das High-Friction Power-Duo"
-    | "Die balancierten Strategen";
+    | "Die balancierten Strategen"
+    | "Datenlage unvollständig";
 };
 
 export type ReportJsonSection = {
@@ -182,6 +226,13 @@ export type CompareReportJson = {
     identityA: string | null;
     identityB: string | null;
     text: string;
+  };
+  coverage: {
+    comparableDimensions: number;
+    totalDimensions: number;
+    isDataSufficient: boolean;
+    minimumComparableDimensions: number;
+    note: string;
   };
   conversationGuide: string[];
 };

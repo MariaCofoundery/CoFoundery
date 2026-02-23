@@ -21,7 +21,7 @@ function SubmitButton() {
       disabled={pending}
       className="rounded-lg bg-[color:var(--ink)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
     >
-      {pending ? "Erstelle..." : "Meinen Fragebogen starten"}
+      {pending ? "Weiter..." : "Einladung-Flow öffnen"}
     </button>
   );
 }
