@@ -2,6 +2,10 @@
 
 :root {
   color-scheme: light;
+  --font-spectral: ui-serif;
+  --font-unbounded: ui-sans-serif;
+  --font-body: var(--font-spectral);
+  --font-display: var(--font-unbounded);
   --ink: #101a2a;
   --ink-soft: #2b4b6f;
   --muted: #41576d;
