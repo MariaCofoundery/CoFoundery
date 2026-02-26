@@ -66,35 +66,35 @@ export default function InformierteEntscheidungenPage() {
           </h1>
           <div className="mt-5 space-y-5 text-base leading-8 text-[color:var(--muted)]">
             <p>
-              Co-Founder-Entscheidungen gehoeren zu den folgenreichsten Entscheidungen im Aufbau
-              eines Startups. Trotzdem werden sie haeufig auf Basis von Sympathie, Intuition oder
+              Co-Founder-Entscheidungen gehören zu den folgenreichsten Entscheidungen im Aufbau
+              eines Startups. Trotzdem werden sie häufig auf Basis von Sympathie, Intuition oder
               Zeitdruck getroffen. Die Forschung zeigt jedoch klar: Teamdynamik, Konfliktmuster
               und implizite Erwartungen haben messbare Auswirkungen auf den Erfolg junger
               Unternehmen.
             </p>
             <p>
               Zahlreiche Studien aus der Wirtschafts- und Organisationspsychologie sowie der
-              Entrepreneurship-Forschung belegen, dass Konflikte innerhalb von Gruenderteams -
-              insbesondere Beziehungskonflikte - eng mit Leistungsfaehigkeit, Wachstum und
-              Zufriedenheit zusammenhaengen. Meta-Analysen zeigen konsistent, dass affektive
-              Konflikte (z. B. Spannungen auf persoenlicher Ebene) die Team-Performance deutlich
-              beeintraechtigen, waehrend Klarheit, Kohaesion und funktionale Entscheidungsprozesse
+              Entrepreneurship-Forschung belegen, dass Konflikte innerhalb von Gründerteams -
+              insbesondere Beziehungskonflikte - eng mit Leistungsfähigkeit, Wachstum und
+              Zufriedenheit zusammenhängen. Meta-Analysen zeigen konsistent, dass affektive
+              Konflikte (z. B. Spannungen auf persönlicher Ebene) die Team-Performance deutlich
+              beeinträchtigen, während Klarheit, Kohäsion und funktionale Entscheidungsprozesse
               positiv wirken.
             </p>
             <p>
-              Auch speziell fuer Gruenderteams gilt: Unterschiede in Entscheidungsstil,
-              Risikohaltung, Verantwortungsverstaendnis oder Konfliktverhalten sind keine
-              Randthemen, sondern zentrale Einflussfaktoren fuer den weiteren
+              Auch speziell für Gründerteams gilt: Unterschiede in Entscheidungsstil,
+              Risikohaltung, Verantwortungsverständnis oder Konfliktverhalten sind keine
+              Randthemen, sondern zentrale Einflussfaktoren für den weiteren
               Unternehmensverlauf. Studien zu Entrepreneurial Teams zeigen, dass solche
-              Unterschiede haeufig erst im Zeitverlauf sichtbar werden - dann allerdings unter
+              Unterschiede häufig erst im Zeitverlauf sichtbar werden - dann allerdings unter
               hohem Druck und mit potenziell gravierenden Folgen.
             </p>
             <p>
-              Darueber hinaus weisen empirische Arbeiten darauf hin, dass persoenliche Merkmale
-              und Verhaltensmuster von Foundern nicht direkt, sondern ueber Teamkonflikte und
+              Darüber hinaus weisen empirische Arbeiten darauf hin, dass persönliche Merkmale
+              und Verhaltensmuster von Foundern nicht direkt, sondern über Teamkonflikte und
               Entscheidungsprozesse auf den Unternehmenserfolg wirken. Genau hier setzt eine
               wirtschaftspsychologisch fundierte Betrachtung an: Nicht Menschen werden bewertet,
-              sondern Spannungsfelder sichtbar gemacht, die fuer gemeinsame Entscheidungen relevant
+              sondern Spannungsfelder sichtbar gemacht, die für gemeinsame Entscheidungen relevant
               sind.
             </p>
           </div>
@@ -111,19 +111,19 @@ export default function InformierteEntscheidungenPage() {
               implizite Erwartungen explizit zu machen
             </li>
             <li className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-soft)] px-4 py-3">
-              konfliktanfaellige Konstellationen fruehzeitig sichtbar zu machen
+              konfliktanfällige Konstellationen frühzeitig sichtbar zu machen
             </li>
             <li className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-soft)] px-4 py-3">
               Entscheidungs- und Zusammenarbeitsmuster strukturiert zu reflektieren
             </li>
             <li className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-soft)] px-4 py-3">
-              fundierte Gespraechsleitfaeden bereitzustellen, bevor es kritisch wird
+              fundierte Gesprächsleitfäden bereitzustellen, bevor es kritisch wird
             </li>
           </ul>
           <p className="mt-5 text-base leading-8 text-[color:var(--muted)]">
-            Dabei stellen wir keine Diagnosen und vergeben keine Persoenlichkeitslabels. Unser
-            Ziel ist es, eine gemeinsame Sprache fuer relevante Themen zu schaffen - damit
-            Co-Founder informierte Entscheidungen treffen koennen, statt Risiken erst im Ernstfall
+            Dabei stellen wir keine Diagnosen und vergeben keine Persönlichkeitslabels. Unser
+            Ziel ist es, eine gemeinsame Sprache für relevante Themen zu schaffen - damit
+            Co-Founder informierte Entscheidungen treffen können, statt Risiken erst im Ernstfall
             zu entdecken.
           </p>
         </section>

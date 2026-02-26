@@ -32,11 +32,11 @@ export function InviteParticipantForm({
     }
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
-      setError("Bitte eine gueltige E-Mail eingeben.");
+      setError("Bitte eine gültige E-Mail eingeben.");
       return;
     }
     if (!inviteConsent) {
-      setError("Bitte bestaetige die Einwilligung zur Nutzung der E-Mail-Adresse.");
+      setError("Bitte bestätige die Einwilligung zur Nutzung der E-Mail-Adresse.");
       return;
     }
 
@@ -122,8 +122,8 @@ export function InviteParticipantForm({
               className="mt-0.5"
             />
             <span>
-              Ich bestaetige, dass ich die E-Mail-Adresse fuer die Einladung zur Analyse verwenden darf
-              (zweckgebunden fuer dieses Matching).
+              Ich bestätige, dass ich die E-Mail-Adresse für die Einladung zur Analyse verwenden darf
+              (zweckgebunden für dieses Matching).
             </span>
           </label>
           <button
@@ -136,7 +136,7 @@ export function InviteParticipantForm({
         </form>
       ) : (
         <p className="text-xs text-[color:var(--muted)]">
-          Einladung erst nach Abschluss deiner eigenen Analyse moeglich.
+          Einladung erst nach Abschluss deiner eigenen Analyse möglich.
         </p>
       )}
       {error ? <p className="mt-2 text-xs text-red-700">{error}</p> : null}

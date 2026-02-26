@@ -7,7 +7,7 @@ export const nav = [
 
 export const features = [
   {
-    title: "Kompatibilitaet statt Bauchgefuehl",
+    title: "Kompatibilität statt Bauchgefühl",
     text: "Vergleicht Entscheidungslogik, Verantwortung und Tempo entlang klarer Dimensionen.",
   },
   {
@@ -16,7 +16,7 @@ export const features = [
   },
   {
     title: "Direkt nutzbarer Report",
-    text: "Ihr bekommt konkrete Gespraechspunkte statt vager Insights.",
+    text: "Ihr bekommt konkrete Gesprächspunkte statt vager Insights.",
   },
 ];
 
@@ -24,16 +24,16 @@ export const steps = [
   {
     step: "01",
     title: "Session erstellen",
-    text: "Person A startet die Session und erhaelt zwei sichere Links.",
+    text: "Person A startet die Session und erhält zwei sichere Links.",
   },
   {
     step: "02",
-    title: "Fragebogen ausfuellen",
+    title: "Fragebogen ausfüllen",
     text: "36 Fragen in 6 Dimensionen. Antworten werden fortlaufend gespeichert.",
   },
   {
     step: "03",
     title: "Vergleich lesen",
-    text: "Wenn beide abgeschlossen haben, ist der Report sofort verfuegbar.",
+    text: "Wenn beide abgeschlossen haben, ist der Report sofort verfügbar.",
   },
 ];

@@ -54,7 +54,7 @@ export function CoFounderInviteForm() {
     event.preventDefault();
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
-      setError("Bitte eine gueltige E-Mail-Adresse eingeben.");
+      setError("Bitte eine gültige E-Mail-Adresse eingeben.");
       return;
     }
 
@@ -92,7 +92,7 @@ export function CoFounderInviteForm() {
       await navigator.clipboard.writeText(inviteUrl);
       setCopyNotice("Link kopiert.");
     } catch {
-      setCopyNotice("Kopieren nicht moeglich. Bitte Link manuell kopieren.");
+      setCopyNotice("Kopieren nicht möglich. Bitte Link manuell kopieren.");
     }
   };
 
@@ -100,7 +100,7 @@ export function CoFounderInviteForm() {
     <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
       <h1 className="text-xl font-semibold text-slate-900">Co-Founder einladen</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt spaeter.
+        Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt später.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">

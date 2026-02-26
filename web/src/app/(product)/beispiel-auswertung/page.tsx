@@ -8,17 +8,17 @@ export default function BeispielAuswertungPage() {
           Demo Auswertung
         </p>
         <h1 className="mt-3 text-3xl leading-tight text-[color:var(--ink)] md:text-5xl">
-          Beispiel fuer einen spaeteren Vergleichsreport
+          Beispiel für einen späteren Vergleichsreport
         </h1>
         <p className="mt-5 leading-8 text-[color:var(--muted)]">
           Diese Seite ist als Platzhalter aktiv, damit der Link aus der Landingpage funktioniert.
-          Im naechsten Schritt kann hier der echte Report aus Supabase-Daten gerendert werden.
+          Im nächsten Schritt kann hier der echte Report aus Supabase-Daten gerendert werden.
         </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <ReportBox
-            title="Starke Uebereinstimmung"
-            text="Vision, Ownership und Kommunikationsstil zeigen hohe Kompatibilitaet."
+            title="Starke Übereinstimmung"
+            text="Vision, Ownership und Kommunikationsstil zeigen hohe Kompatibilität."
           />
           <ReportBox
             title="Kritischer Punkt"
