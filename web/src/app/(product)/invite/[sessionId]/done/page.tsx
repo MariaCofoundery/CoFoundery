@@ -125,13 +125,18 @@ export default async function InvitationDonePage({ params }: PageProps) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
-          <DelayedRedirect href={dashboardHref} />
           <h1 className="text-2xl font-semibold text-slate-900">Stark, alles ausgefüllt</h1>
           <p className="mt-3 text-sm text-slate-700">
-            Deine Antworten sind gespeichert. Sobald die andere Person fertig ist, wird der Report automatisch
-            erstellt.
+            Deine Antworten sind gespeichert. Sobald die andere Person fertig ist, wird euer Matching-Report
+            automatisch erstellt.
           </p>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href={reportHref}
+              className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
+            >
+              Report öffnen
+            </Link>
             <Link
               href={dashboardHref}
               className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
