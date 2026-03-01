@@ -87,6 +87,41 @@ type EnsureReportRunResult =
 
 type EnsureReportRunFailureReason = Exclude<EnsureReportRunResult, { ok: true }>["reason"];
 
+type EnsureReportRunPrivilegedOptions = {
+  requesterUserId?: string | null;
+  skipMembershipCheck?: boolean;
+  sourceTag?: string;
+};
+
+export type BackfillReportRunItem = {
+  invitationId: string;
+  status: "created" | "waiting_for_answers" | "skipped" | "failed";
+  reportRunId: string | null;
+  reason?: EnsureReportRunFailureReason;
+  detail?: string;
+};
+
+export type BackfillReportRunsResult =
+  | {
+      ok: true;
+      timedOut: boolean;
+      maxDurationMs: number;
+      scannedAccepted: number;
+      candidatesWithoutReportRun: number;
+      processed: number;
+      remainingCandidates: number;
+      created: number;
+      waitingForAnswers: number;
+      skipped: number;
+      failed: number;
+      items: BackfillReportRunItem[];
+    }
+  | {
+      ok: false;
+      reason: "missing_service_role" | "query_failed";
+      detail?: string;
+    };
+
 type InvitationEnsureRow = {
   id: string;
   inviter_user_id: string;
@@ -136,6 +171,10 @@ type SubmittedAssessmentLiteRow = {
 
 type ReportRunInvitationRow = {
   invitation_id: string;
+};
+
+type BackfillInvitationIdRow = {
+  id: string;
 };
 
 type FinalizeInvitationRpcRow = {
@@ -1515,36 +1554,14 @@ export async function getLatestSelfAlignmentReport(): Promise<SessionAlignmentRe
   };
 }
 
-export async function ensureReportRunForInvitation(invitationId: string): Promise<EnsureReportRunResult> {
-  const normalizedInvitationId = invitationId.trim();
-  if (!normalizedInvitationId) {
-    return { ok: false, reason: "invitation_not_found" };
-  }
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user?.id) {
-    return { ok: false, reason: "not_authenticated" };
-  }
-
-  const privileged = createPrivilegedClient();
-  if (!privileged) {
-    console.error("ensureReportRunForInvitation missing service role configuration", {
-      invitationId: normalizedInvitationId,
-    });
-    return { ok: false, reason: "missing_service_role" };
-  }
-
-  const { data: invitationAccess, error: invitationAccessError } = await supabase
-    .from("invitations")
-    .select("id")
-    .eq("id", normalizedInvitationId)
-    .maybeSingle();
-  if (invitationAccessError || !invitationAccess?.id) {
-    return { ok: false, reason: "invitation_not_found" };
-  }
+async function ensureReportRunForInvitationWithPrivilegedClient(
+  privileged: SupabaseDbClient,
+  normalizedInvitationId: string,
+  options?: EnsureReportRunPrivilegedOptions
+): Promise<EnsureReportRunResult> {
+  const requesterUserId = options?.requesterUserId ?? null;
+  const skipMembershipCheck = options?.skipMembershipCheck === true;
+  const sourceTag = options?.sourceTag?.trim() || "ensureReportRunForInvitation";
 
   const { data: invitationData, error: invitationError } = await privileged
     .from("invitations")
@@ -1558,7 +1575,11 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
   }
 
   const invitation = invitationData as InvitationEnsureRow;
-  if (![invitation.inviter_user_id, invitation.invitee_user_id].includes(user.id)) {
+  if (
+    !skipMembershipCheck &&
+    requesterUserId &&
+    ![invitation.inviter_user_id, invitation.invitee_user_id].includes(requesterUserId)
+  ) {
     return { ok: false, reason: "invitation_not_found" };
   }
   if (invitation.revoked_at || invitation.status === "revoked") {
@@ -1668,8 +1689,12 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     ]);
     const valuesQuestionMetaRows = [...valuesQuestionMetaById.values()];
     assertValuesCategoryContract(valuesQuestionMetaRows, "ensure_report_run_values");
-    const valuesAnswersA = rawValuesAnswersA.filter((row) => isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category));
-    const valuesAnswersB = rawValuesAnswersB.filter((row) => isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category));
+    const valuesAnswersA = rawValuesAnswersA.filter((row) =>
+      isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category)
+    );
+    const valuesAnswersB = rawValuesAnswersB.filter((row) =>
+      isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category)
+    );
     valuesAnsweredA = valuesAnswersA.length;
     valuesAnsweredB = valuesAnswersB.length;
 
@@ -1788,12 +1813,9 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     valuesAlignmentPercent: compareJson.valuesModule.alignmentPercent,
   };
 
-  const inputAssessmentIds = [
-    inviterBase.id,
-    inviteeBase.id,
-    valuesAssessmentIdA,
-    valuesAssessmentIdB,
-  ].filter((value): value is string => Boolean(value));
+  const inputAssessmentIds = [inviterBase.id, inviteeBase.id, valuesAssessmentIdA, valuesAssessmentIdB].filter(
+    (value): value is string => Boolean(value)
+  );
 
   const payload = {
     report: finalReport,
@@ -1801,7 +1823,7 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     modules: ensureBaseModule(requiredModules),
     inputAssessmentIds: [...new Set(inputAssessmentIds)],
     generatedAt: new Date().toISOString(),
-    source: "ensureReportRunForInvitation",
+    source: sourceTag,
   };
 
   const { data: finalizeData, error: finalizeError } = await privileged.rpc(
@@ -1865,6 +1887,190 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     invitationId: normalizedInvitationId,
   });
   return { ok: false, reason: "insert_failed", detail: "report_run_not_found_after_finalize" };
+}
+
+export async function ensureReportRunForInvitation(invitationId: string): Promise<EnsureReportRunResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "invitation_not_found" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    console.error("ensureReportRunForInvitation missing service role configuration", {
+      invitationId: normalizedInvitationId,
+    });
+    return { ok: false, reason: "missing_service_role" };
+  }
+
+  return ensureReportRunForInvitationWithPrivilegedClient(privileged, normalizedInvitationId, {
+    requesterUserId: user.id,
+    skipMembershipCheck: false,
+    sourceTag: "ensureReportRunForInvitation",
+  });
+}
+
+export async function backfillReportRunsForAcceptedInvitations(options?: {
+  limit?: number;
+  maxDurationMs?: number;
+}): Promise<BackfillReportRunsResult> {
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    return { ok: false, reason: "missing_service_role" };
+  }
+
+  const target = Math.max(1, Math.min(Number(options?.limit ?? 50) || 50, 500));
+  const maxDurationMs = Math.max(5_000, Math.min(Number(options?.maxDurationMs ?? 20_000) || 20_000, 120_000));
+  const startedAt = Date.now();
+  let timedOut = false;
+  const scanBatchSize = 200;
+  let scannedAccepted = 0;
+  let offset = 0;
+  const candidateIds: string[] = [];
+
+  while (candidateIds.length < target) {
+    if (Date.now() - startedAt >= maxDurationMs) {
+      timedOut = true;
+      break;
+    }
+
+    const { data: invitationRows, error: invitationError } = await privileged
+      .from("invitations")
+      .select("id")
+      .eq("status", "accepted")
+      .order("accepted_at", { ascending: false })
+      .range(offset, offset + scanBatchSize - 1);
+
+    if (invitationError) {
+      return { ok: false, reason: "query_failed", detail: invitationError.message };
+    }
+
+    const rows = (invitationRows ?? []) as BackfillInvitationIdRow[];
+    if (rows.length === 0) {
+      break;
+    }
+
+    scannedAccepted += rows.length;
+    offset += rows.length;
+
+    const invitationIds = rows.map((row) => row.id).filter(Boolean);
+    if (invitationIds.length === 0) {
+      if (rows.length < scanBatchSize) break;
+      continue;
+    }
+
+    const { data: reportRows, error: reportError } = await privileged
+      .from("report_runs")
+      .select("invitation_id")
+      .in("invitation_id", invitationIds);
+    if (reportError) {
+      return { ok: false, reason: "query_failed", detail: reportError.message };
+    }
+
+    const reportRunByInvitationId = new Set(
+      ((reportRows ?? []) as ReportRunInvitationRow[]).map((row) => row.invitation_id)
+    );
+
+    for (const invitationId of invitationIds) {
+      if (!reportRunByInvitationId.has(invitationId)) {
+        candidateIds.push(invitationId);
+        if (candidateIds.length >= target) break;
+      }
+    }
+
+    if (rows.length < scanBatchSize) {
+      break;
+    }
+  }
+
+  const items: BackfillReportRunItem[] = [];
+  let created = 0;
+  let waitingForAnswers = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  for (const invitationId of candidateIds) {
+    if (Date.now() - startedAt >= maxDurationMs) {
+      timedOut = true;
+      break;
+    }
+
+    const result = await ensureReportRunForInvitationWithPrivilegedClient(privileged, invitationId, {
+      skipMembershipCheck: true,
+      sourceTag: "maintenance_backfill",
+    });
+
+    if (result.ok) {
+      created += 1;
+      items.push({
+        invitationId,
+        status: "created",
+        reportRunId: result.reportRunId,
+      });
+      continue;
+    }
+
+    if (result.reason === "waiting_for_answers") {
+      waitingForAnswers += 1;
+      items.push({
+        invitationId,
+        status: "waiting_for_answers",
+        reportRunId: null,
+        reason: result.reason,
+      });
+      continue;
+    }
+
+    if (
+      result.reason === "not_accepted" ||
+      result.reason === "expired" ||
+      result.reason === "revoked" ||
+      result.reason === "missing_invitee" ||
+      result.reason === "invitation_not_found"
+    ) {
+      skipped += 1;
+      items.push({
+        invitationId,
+        status: "skipped",
+        reportRunId: null,
+        reason: result.reason,
+        detail: result.detail,
+      });
+      continue;
+    }
+
+    failed += 1;
+    items.push({
+      invitationId,
+      status: "failed",
+      reportRunId: null,
+      reason: result.reason,
+      detail: result.detail,
+    });
+  }
+
+  return {
+    ok: true,
+    timedOut,
+    maxDurationMs,
+    scannedAccepted,
+    candidatesWithoutReportRun: candidateIds.length,
+    processed: items.length,
+    remainingCandidates: Math.max(0, candidateIds.length - items.length),
+    created,
+    waitingForAnswers,
+    skipped,
+    failed,
+    items,
+  };
 }
 
 export async function finalizeInvitationIfReady(invitationId: string): Promise<EnsureReportRunResult> {

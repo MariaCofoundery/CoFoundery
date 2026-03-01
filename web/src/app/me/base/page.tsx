@@ -64,11 +64,14 @@ export default async function MeBasePage({
       decision.required_modules.includes("values") &&
       (isRefreshFlow || !decision.invitee_status.has_values_submitted);
     if (needsValuesAfterBase) {
-      const valuesSearch = new URLSearchParams({ invitationId });
-      if (isRefreshFlow) valuesSearch.set("flow", "refresh");
-      completeRedirect = `/me/values?${valuesSearch.toString()}`;
+      const transitionSearch = new URLSearchParams();
+      if (isRefreshFlow) transitionSearch.set("flow", "refresh");
+      const transitionQuery = transitionSearch.toString();
+      completeRedirect = transitionQuery
+        ? `/invite/${encodeURIComponent(invitationId)}/basis-complete?${transitionQuery}`
+        : `/invite/${encodeURIComponent(invitationId)}/basis-complete`;
     } else {
-      completeRedirect = `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
+      completeRedirect = `/invite/${encodeURIComponent(invitationId)}/done`;
     }
   }
 

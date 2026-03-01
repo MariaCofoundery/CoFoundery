@@ -62,7 +62,7 @@ export default async function MeValuesPage({
       redirect(`/me/base?${baseSearch.toString()}`);
     }
 
-    completeRedirect = `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
+    completeRedirect = `/invite/${encodeURIComponent(invitationId)}/done`;
   }
 
   const submittedBase = await getLatestSubmittedAssessment("base");

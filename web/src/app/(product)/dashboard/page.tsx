@@ -85,7 +85,7 @@ export default async function DashboardPage({
     await finalizeInvitationIfReady(params.invitationId);
   }
 
-  const [selfReport, { data: profile }, invitationRows, runsResult] =
+  const [selfReport, { data: profile }, initialInvitationRows, initialRunsResult] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
       supabase
@@ -102,6 +102,38 @@ export default async function DashboardPage({
         .order("created_at", { ascending: false })
         .limit(20),
     ]);
+
+  let invitationRows = initialInvitationRows;
+  let runsResult = initialRunsResult;
+
+  const pendingFinalizeIds = invitationRows
+    .filter((invitation) => invitation.isReadyForMatching && !invitation.isReportReady)
+    .map((invitation) => invitation.id);
+  if (pendingFinalizeIds.length > 0) {
+    const finalizeResults = await Promise.all(
+      pendingFinalizeIds.map((invitationId) => finalizeInvitationIfReady(invitationId))
+    );
+    finalizeResults.forEach((result, index) => {
+      if (!result.ok && result.reason !== "waiting_for_answers") {
+        console.error("dashboard finalizeInvitationIfReady failed", {
+          invitationId: pendingFinalizeIds[index],
+          reason: result.reason,
+          detail: result.detail ?? null,
+        });
+      }
+    });
+
+    [invitationRows, runsResult] = await Promise.all([
+      getInvitationDashboardRows(),
+      supabase
+        .from("report_runs")
+        .select(
+          "id, invitation_id, modules, created_at, payload, invitations:invitation_id(id, label, invitee_email, status, created_at)"
+        )
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+  }
 
   if (runsResult.error) {
     return <main className="p-8">Fehler beim Laden der Report-Runs: {runsResult.error.message}</main>;
@@ -467,11 +499,14 @@ export default async function DashboardPage({
                   const requiresValues = invite.requiredModules.includes("values");
                   const inviteeHasAllRequired =
                     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-                  const continueMatchHref = `/join?invitationId=${encodeURIComponent(invite.id)}`;
+                  const completeQuestionnaireHref = `/join?invitationId=${encodeURIComponent(invite.id)}`;
+                  const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
                   const reportHref = `/report/${invite.id}`;
                   const actionHref = invite.isReportReady
                     ? reportHref
-                    : continueMatchHref;
+                    : inviteeHasAllRequired
+                      ? completionStatusHref
+                      : completeQuestionnaireHref;
                   return (
                     <>
                       <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite)}</p>
@@ -493,11 +528,16 @@ export default async function DashboardPage({
                           {invite.isReportReady
                             ? "Report öffnen"
                             : inviteeHasAllRequired
-                              ? "Match starten"
+                              ? "Status ansehen"
                               : "Jetzt ausfüllen"}
                         </a>
                         <CopyLinkButton url={actionHref} />
                       </div>
+                      {inviteeHasAllRequired && !invite.isReportReady ? (
+                        <p className="mt-2 text-xs text-slate-500">
+                          Alles ausgefüllt. Der Report wird automatisch erstellt, sobald beide fertig sind.
+                        </p>
+                      ) : null}
                       {isDev ? (
                         <details className="mt-2 rounded-md border border-slate-200 bg-slate-50/70 p-2">
                           <summary className="cursor-pointer text-xs text-slate-600">Debug anzeigen</summary>
@@ -583,11 +623,24 @@ function formatIncomingInviteTitle(invite: InvitationDashboardRow) {
 }
 
 function getIncomingInviteStatusLabel(invite: InvitationDashboardRow) {
-  return invite.isReportReady ? "Report bereit" : "gesendet";
+  if (invite.isReportReady) return "Report bereit";
+  if (invite.isReadyForMatching) return "Report wird erstellt";
+  const requiresValues = invite.requiredModules.includes("values");
+  const inviteeHasAllRequired =
+    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
+  return inviteeHasAllRequired ? "Warte auf Co-Founder" : "Fragebogen offen";
 }
 
 function getSentInviteStatusLabel(invite: InvitationDashboardRow) {
-  return invite.isReportReady ? "Report bereit" : "gesendet";
+  if (invite.isReportReady) return "Report bereit";
+  if (invite.isReadyForMatching) return "Report wird erstellt";
+  const requiresValues = invite.requiredModules.includes("values");
+  const inviterHasAllRequired =
+    invite.inviterBaseSubmitted && (!requiresValues || invite.inviterValuesSubmitted);
+  const inviteeHasAllRequired =
+    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
+  if (!inviterHasAllRequired) return "Deine Antworten fehlen";
+  return inviteeHasAllRequired ? "Report wird erstellt" : "Warte auf Antworten";
 }
 
 function formatInvitationModules(modules: string[]) {

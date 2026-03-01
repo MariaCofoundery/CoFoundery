@@ -6,7 +6,9 @@ import { ConversationGuide } from "@/features/reporting/ConversationGuide";
 import { KeyInsights } from "@/features/reporting/KeyInsights";
 import { MatchNarratives } from "@/features/reporting/MatchNarratives";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
+import { ReportAutoRefresh } from "@/features/reporting/ReportAutoRefresh";
 import {
+  createReportRunOnCompletion,
   getReportRunSnapshotForSession,
   type ReportRunSnapshot,
 } from "@/features/reporting/actions";
@@ -57,15 +59,22 @@ export default async function ReportPage({ params }: PageProps) {
     redirect(`/login?next=/report/${sessionId}`);
   }
 
-  const snapshot = await getReportRunSnapshotForSession(sessionId);
+  let snapshot = await getReportRunSnapshotForSession(sessionId);
+  if (!snapshot) {
+    snapshot = await createReportRunOnCompletion(sessionId);
+  }
 
   if (!snapshot) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
+          <ReportAutoRefresh />
           <h1 className="text-2xl font-semibold text-slate-900">Report noch nicht verfügbar</h1>
           <p className="mt-3 text-sm text-slate-700">
             Für diese Einladung gibt es noch keinen immutable `report_run`.
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Wir prüfen den Status automatisch im Hintergrund.
           </p>
           <Link
             href="/dashboard"
@@ -82,6 +91,7 @@ export default async function ReportPage({ params }: PageProps) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
+          <ReportAutoRefresh />
           <h1 className="text-2xl font-semibold text-slate-900">Report wird gerade erstellt</h1>
           <p className="mt-3 text-sm text-slate-700">
             Der Matching-Report ist noch nicht vollständig verfügbar. Bitte prüft den Report in wenigen

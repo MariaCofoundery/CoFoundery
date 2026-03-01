@@ -119,7 +119,7 @@ async function resolveNextInviteStepUrl(params: {
     return `/me/values?invitationId=${encodeURIComponent(invitationId)}`;
   }
 
-  return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
+  return `/invite/${encodeURIComponent(invitationId)}/done`;
 }
 
 function renderErrorState(title: string, detail: string) {

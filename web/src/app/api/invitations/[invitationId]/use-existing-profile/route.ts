@@ -28,7 +28,7 @@ export async function POST(_request: NextRequest, context: RouteContext) {
   return NextResponse.json(
     {
       ...result,
-      redirect_to: `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`,
+      redirect_to: `/invite/${encodeURIComponent(invitationId)}/done`,
     },
     { status: 200 }
   );
