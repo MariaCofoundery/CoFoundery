@@ -14,6 +14,7 @@ type InvitationRow = {
   status: string;
   invitee_user_id: string | null;
   invitee_email: string;
+  team_context: string | null;
   inviter_display_name: string | null;
   inviter_email: string | null;
   expires_at: string;
@@ -74,6 +75,22 @@ function isInvitationExpired(expiresAt: string | null | undefined) {
   const parsed = Date.parse(expiresAt);
   if (Number.isNaN(parsed)) return false;
   return parsed < Date.now();
+}
+
+function invitationContextMeta(teamContext: string | null | undefined) {
+  if (teamContext === "existing_team") {
+    return {
+      badge: "Bestehendes Gruenderteam",
+      title: "Diese Einladung laeuft im Modus fuer ein bestehendes Team.",
+      text: "Der folgende Flow ist staerker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet.",
+    };
+  }
+
+  return {
+    badge: "Moegliche Gruendungspartnerschaft",
+    title: "Diese Einladung laeuft im Modus fuer fruehes Matching.",
+    text: "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen.",
+  };
 }
 
 async function resolveNextInviteStepUrl(params: {
@@ -179,7 +196,7 @@ export default async function JoinWelcomePage({
   const { data: invitationData, error: invitationError } = await supabase
     .from("invitations")
     .select(
-      "id, status, invitee_user_id, invitee_email, inviter_display_name, inviter_email, expires_at, revoked_at"
+      "id, status, invitee_user_id, invitee_email, team_context, inviter_display_name, inviter_email, expires_at, revoked_at"
     )
     .eq("id", invitationId)
     .maybeSingle();
@@ -219,6 +236,7 @@ export default async function JoinWelcomePage({
 
   const inviterName =
     invitation.inviter_display_name?.trim() || invitation.inviter_email?.trim() || "Co-Founder";
+  const contextMeta = invitationContextMeta(invitation.team_context);
 
   const nextStepUrl = await resolveNextInviteStepUrl({
     supabase,
@@ -233,6 +251,11 @@ export default async function JoinWelcomePage({
         <div className="border-b border-cyan-200 pb-3">
           <h1 className="text-3xl font-semibold text-slate-900">Willkommen</h1>
           <p className="mt-2 text-base text-slate-700">{inviterName} hat dich eingeladen</p>
+          <div className="mt-4 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
+            {contextMeta.badge}
+          </div>
+          <p className="mt-3 text-sm font-medium text-slate-900">{contextMeta.title}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{contextMeta.text}</p>
         </div>
 
         <p className="mt-4 text-sm leading-6 text-slate-700">

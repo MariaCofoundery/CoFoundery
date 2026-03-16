@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 
 const ALLOWED_FOCUS_SKILLS = ["Tech", "Sales", "Marketing", "Product", "Operations", "Finance"] as const;
 const ALLOWED_INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
@@ -38,6 +39,10 @@ function parseIntention(value: FormDataEntryValue | null) {
     : "";
 }
 
+function parseRoles(formData: FormData) {
+  return normalizeProfileRoles(formData.getAll("roles"));
+}
+
 export async function upsertProfileBasicsAction(formData: FormData) {
   const successRedirectTo = normalizeRedirectTarget(formData.get("onSuccessRedirectTo"), "/dashboard");
   const errorRedirectTo = normalizeRedirectTarget(formData.get("onErrorRedirectTo"), successRedirectTo);
@@ -54,6 +59,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   const displayName = parseDisplayName(formData.get("displayName"));
   const focusSkill = parseFocusSkill(formData.get("focusSkill"));
   const intention = parseIntention(formData.get("intention"));
+  const roles = parseRoles(formData);
 
   if (!displayName || !focusSkill || !intention) {
     redirect(withError(errorRedirectTo, "profile_basics_incomplete"));
@@ -65,6 +71,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
       display_name: displayName,
       focus_skill: focusSkill,
       intention,
+      roles,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" }

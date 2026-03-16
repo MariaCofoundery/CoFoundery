@@ -3,10 +3,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AlignmentRadarChart } from "@/features/reporting/AlignmentRadarChart";
 import { ConversationGuide } from "@/features/reporting/ConversationGuide";
+import { FounderAlignmentReportView } from "@/features/reporting/FounderAlignmentReportView";
 import { KeyInsights } from "@/features/reporting/KeyInsights";
 import { MatchNarratives } from "@/features/reporting/MatchNarratives";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ReportAutoRefresh } from "@/features/reporting/ReportAutoRefresh";
+import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import {
   createReportRunOnCompletion,
   getReportRunSnapshotForSession,
@@ -17,6 +19,20 @@ import { type KeyInsight, type RadarSeries } from "@/features/reporting/types";
 type PageProps = {
   params: Promise<{ sessionId: string }>;
 };
+
+function reportContextMeta(teamContext: string | null | undefined) {
+  if (teamContext === "existing_team") {
+    return {
+      badge: "Bestehendes Gruenderteam",
+      text: "Dieser Report ist im Kontext eines bestehenden Teams zu lesen und fokussiert deshalb staerker auf Zusammenarbeit, Abstimmung und operative Spannungen.",
+    };
+  }
+
+  return {
+    badge: "Moegliche Gruendungspartnerschaft",
+    text: "Dieser Report ist im Kontext einer moeglichen Zusammenarbeit zu lesen und fokussiert deshalb staerker auf Passung, Erwartungen und fruehe Alignment-Fragen.",
+  };
+}
 
 function hasAnyScore(series: RadarSeries) {
   return Object.values(series).some((value) => typeof value === "number" && Number.isFinite(value));
@@ -63,11 +79,20 @@ export default async function ReportPage({ params }: PageProps) {
   if (!snapshot) {
     snapshot = await createReportRunOnCompletion(sessionId);
   }
+  const { data: invitationContextRow } = await supabase
+    .from("invitations")
+    .select("team_context")
+    .eq("id", sessionId)
+    .maybeSingle();
+  const contextMeta = reportContextMeta(
+    (invitationContextRow as { team_context?: string | null } | null)?.team_context ?? null
+  );
 
   if (!snapshot) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
+          <ResearchPageTracker eventName="report_page_viewed" invitationId={sessionId} />
           <ReportAutoRefresh />
           <h1 className="text-2xl font-semibold text-slate-900">Report noch nicht verfügbar</h1>
           <p className="mt-3 text-sm text-slate-700">
@@ -91,6 +116,11 @@ export default async function ReportPage({ params }: PageProps) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
+          <ResearchPageTracker
+            eventName="report_page_viewed"
+            invitationId={snapshot.invitationId}
+            properties={{ state: "rendering_in_progress" }}
+          />
           <ReportAutoRefresh />
           <h1 className="text-2xl font-semibold text-slate-900">Report wird gerade erstellt</h1>
           <p className="mt-3 text-sm text-slate-700">
@@ -106,6 +136,34 @@ export default async function ReportPage({ params }: PageProps) {
           </Link>
         </section>
       </main>
+    );
+  }
+
+  if (
+    snapshot.reportType === "founder_alignment_v1" &&
+    snapshot.founderReport &&
+    snapshot.founderScoring
+  ) {
+    const founderAName = snapshot.report.participantAName || "Founder A";
+    const founderBName = snapshot.report.participantBName || "Founder B";
+
+    return (
+      <>
+        <ResearchPageTracker
+          eventName="report_page_viewed"
+          invitationId={snapshot.invitationId}
+          properties={{ state: "ready", modules: snapshot.modules, reportType: snapshot.reportType }}
+        />
+        <FounderAlignmentReportView
+          report={snapshot.founderReport}
+          scoringResult={snapshot.founderScoring}
+          founderAName={founderAName}
+          founderBName={founderBName}
+          conversationGuideHref={`/founder-alignment/prepare-conversation?invitationId=${snapshot.invitationId}&teamContext=${snapshot.founderReport.teamContext}`}
+          workbookHref={`/founder-alignment/workbook?invitationId=${snapshot.invitationId}&teamContext=${snapshot.founderReport.teamContext}`}
+          backHref="/dashboard"
+        />
+      </>
     );
   }
 
@@ -169,6 +227,11 @@ export default async function ReportPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12">
+      <ResearchPageTracker
+        eventName="report_page_viewed"
+        invitationId={snapshot.invitationId}
+        properties={{ state: "ready", modules: snapshot.modules }}
+      />
       <div className="mb-8 flex items-center justify-between print:hidden">
         <Link
           href="/dashboard"
@@ -184,6 +247,10 @@ export default async function ReportPage({ params }: PageProps) {
         <h1 className="mt-2 text-2xl font-semibold text-slate-900 md:text-3xl">
           {report.participantAName || "Person A"} &amp; {report.participantBName || "Person B"}
         </h1>
+        <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
+          {contextMeta.badge}
+        </div>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{contextMeta.text}</p>
         <p className="mt-2 text-sm text-slate-600">Erstellt: {formatDate(snapshot.createdAt)}</p>
         <p className="mt-1 text-xs tracking-[0.08em] text-slate-500">
           Module: {snapshot.modules.join(", ") || "base"}
@@ -269,7 +336,7 @@ export default async function ReportPage({ params }: PageProps) {
               <article className="rounded-xl border border-[color:var(--brand-primary)]/20 bg-[color:var(--brand-primary)]/6 p-5">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
                   <ValuesIcon type="shared" />
-                  Gemeinsame Werte
+                  Gemeinsame Wertebasis
                 </p>
                 <ul className="mt-3 space-y-3">
                   {parsedValues.shared.slice(0, 3).map((entry, index) => (
@@ -284,50 +351,61 @@ export default async function ReportPage({ params }: PageProps) {
               <article className="rounded-xl border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/6 p-5">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
                   <ValuesIcon type="gap" />
-                  Stolpersteine
+                  Unterschiedliche Prioritäten
                 </p>
                 <ul className="mt-3 space-y-3">
-                  {parsedValues.gaps.slice(0, 2).map((entry, index) => (
+                  {parsedValues.priorities.slice(0, 2).map((entry, index) => (
                     <li key={`values-gap-${index}`} className="rounded-lg border border-[color:var(--brand-accent)]/20 bg-white p-4">
                       <p className="text-sm font-semibold text-slate-900">{entry.headline}</p>
-                      <p className="mt-1 text-sm leading-7 text-slate-700">{entry.riskText}</p>
-                      <p className="mt-1 text-sm leading-7 text-slate-700">
-                        <span className="font-semibold text-slate-900">Vorbeugung:</span> {entry.mitigationText}
-                      </p>
+                      <p className="mt-1 text-sm leading-7 text-slate-700">{entry.text}</p>
                     </li>
                   ))}
                 </ul>
               </article>
 
-              <div className="grid gap-4 lg:grid-cols-2">
-                <article className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5">
-                  <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    <ValuesIcon type="rules" />
-                    Arbeitsabsprachen
-                  </p>
-                  <ul className="mt-3 list-disc space-y-2 pl-5">
-                    {parsedValues.rules.slice(0, 3).map((rule, index) => (
-                      <li key={`values-rule-${index}`} className="text-sm leading-7 text-slate-700">
-                        {rule}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
+              <article className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
+                  <ValuesIcon type="gap" />
+                  Typische Druckpunkte im Alltag
+                </p>
+                <ul className="mt-3 space-y-3">
+                  {parsedValues.pressures.slice(0, 2).map((entry, index) => (
+                    <li key={`values-pressure-${index}`} className="rounded-lg border border-slate-200/80 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-900">{entry.headline}</p>
+                      <p className="mt-1 text-sm leading-7 text-slate-700">{entry.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </article>
 
-                <article className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5">
-                  <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    <ValuesIcon type="questions" />
-                    Gesprächsfragen
-                  </p>
-                  <ul className="mt-3 space-y-2">
-                    {parsedValues.questions.slice(0, 2).map((question, index) => (
-                      <li key={`values-question-${index}`} className="text-sm leading-7 text-slate-700">
-                        {`[ ] ${question}`}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </div>
+              <article className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
+                  <ValuesIcon type="rules" />
+                  Leitplanken für eure Zusammenarbeit
+                </p>
+                <ul className="mt-3 list-disc space-y-2 pl-5">
+                  {parsedValues.rules.slice(0, 3).map((rule, index) => (
+                    <li key={`values-rule-${index}`} className="text-sm leading-7 text-slate-700">
+                      {rule}
+                    </li>
+                  ))}
+                </ul>
+                {parsedValues.questions.length > 0 ? (
+                  <>
+                    <p className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
+                      <ValuesIcon type="questions" />
+                      Fragen für eure nächste Abstimmung
+                    </p>
+                    <ul className="mt-3 space-y-2">
+                      {parsedValues.questions.slice(0, 2).map((question, index) => (
+                        <li key={`values-question-${index}`} className="text-sm leading-7 text-slate-700">
+                          {`[ ] ${question}`}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </article>
             </div>
           ) : null}
         </section>
@@ -382,7 +460,8 @@ type PremiumSection = {
 
 type ParsedValuesSection = {
   shared: Array<{ headline: string; text: string }>;
-  gaps: Array<{ headline: string; riskText: string; mitigationText: string }>;
+  priorities: Array<{ headline: string; text: string }>;
+  pressures: Array<{ headline: string; text: string }>;
   rules: string[];
   questions: string[];
 };
@@ -410,21 +489,26 @@ function parsePremiumSections(sections: unknown[] | null | undefined) {
 function parseValuesSection(section: PremiumSection | undefined): ParsedValuesSection {
   const parsed: ParsedValuesSection = {
     shared: [],
-    gaps: [],
+    priorities: [],
+    pressures: [],
     rules: [],
     questions: [],
   };
   const bullets = section?.bullets ?? [];
   for (const bullet of bullets) {
-    const [tagRaw, partA, partB, partC] = bullet.split("|").map((value) => value.trim());
+    const [tagRaw, partA, partB] = bullet.split("|").map((value) => value.trim());
     const tag = tagRaw?.toUpperCase();
     if (!tag) continue;
     if (tag === "SHARED" && partA && partB) {
       parsed.shared.push({ headline: partA, text: partB });
       continue;
     }
-    if (tag === "GAP" && partA && partB && partC) {
-      parsed.gaps.push({ headline: partA, riskText: partB, mitigationText: partC });
+    if (tag === "PRIORITY" && partA && partB) {
+      parsed.priorities.push({ headline: partA, text: partB });
+      continue;
+    }
+    if (tag === "PRESSURE" && partA && partB) {
+      parsed.pressures.push({ headline: partA, text: partB });
       continue;
     }
     if (tag === "RULE" && partA) {

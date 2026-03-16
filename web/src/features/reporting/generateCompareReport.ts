@@ -36,9 +36,9 @@ type ValueFocusTemplate = {
   id: string;
   overlapHeadline: string;
   overlapText: string;
-  gapHeadline: string;
-  gapRiskText: string;
-  gapMitigationText: string;
+  priorityHeadline: string;
+  priorityText: string;
+  pressureText: string;
   agreementRule: string;
   conversationQuestion: string;
   weight: Record<ValuesArchetypeId, number>;
@@ -49,16 +49,16 @@ const VALUE_FOCUS_TEMPLATES: ValueFocusTemplate[] = [
     id: "integrity_speed",
     overlapHeadline: "Integrität im Entscheidungstempo",
     overlapText:
-      "Ihr habt ein ähnliches Gefühl dafür, wann werteklare Entscheidungen schnell getroffen werden dürfen und wann vertiefte Abwägung nötig ist. Das reduziert Reibung in kritischen Go/No-Go-Situationen.",
-    gapHeadline: "Spannung zwischen Prinzipientreue und Geschwindigkeit",
-    gapRiskText:
-      "Unter Druck kann eine Seite schnelle Marktreaktionen priorisieren, während die andere auf normative Absicherung pocht.",
-    gapMitigationText:
-      "Legt vorab fest, welche Entscheidungen zwingend einen Werte-Check brauchen und welche innerhalb klarer Leitplanken beschleunigt werden dürfen.",
+      "Ihr habt ein ähnliches Gespür dafür, wann Tempo sinnvoll ist und wann eine Entscheidung erst nach einem klaren Werte-Check fallen sollte. Das hilft besonders bei heiklen Go/No-Go-Entscheidungen.",
+    priorityHeadline: "Geschwindigkeit vs. Werte-Check",
+    priorityText:
+      "Hier kann eine Person eher auf schnelle Marktreaktionen schauen, während die andere stärker darauf achtet, ob die Entscheidung auch unter Druck noch zu euren Grundsätzen passt.",
+    pressureText:
+      "Spürbar wird das oft bei Preisentscheidungen, grenzwertigen Vertriebsmaßnahmen oder kurzfristigen Wachstumswetten, bei denen Tempo und Werteklarheit gegeneinanderlaufen.",
     agreementRule:
-      "Wenn eine Entscheidung externe Wirkung auf Kund:innen oder Teamkultur hat, dann macht ihr vor Freigabe einen 10-Minuten-Werte-Check.",
+      "Wenn eine Entscheidung direkte Wirkung auf Kund:innen, Team oder Marke hat, macht ihr vor dem Commit einen kurzen Werte-Check mit klarer Go/No-Go-Frage.",
     conversationQuestion:
-      "Bei welchen Entscheidungstypen wollt ihr Tempo priorisieren und wo ist Integrität ausdrücklich Vorrangkriterium?",
+      "Bei welchen Entscheidungen darf Tempo führen und bei welchen wollt ihr bewusst erst einen Werte-Check machen?",
     weight: {
       impact_idealist: 1,
       verantwortungs_stratege: 0.9,
@@ -69,16 +69,16 @@ const VALUE_FOCUS_TEMPLATES: ValueFocusTemplate[] = [
     id: "stakeholder_balance",
     overlapHeadline: "Balance von Stakeholder-Interessen",
     overlapText:
-      "Ihr teilt eine ähnliche Logik darin, wie Kunden, Team und Kapitalinteressen gegeneinander gewichtet werden. Dadurch werden Priorisierungsentscheidungen nachvollziehbarer und konsistenter.",
-    gapHeadline: "Unterschiedliche Stakeholder-Prioritäten",
-    gapRiskText:
-      "Wenn Interessenkonflikte auftreten, kann eine Seite stärker auf wirtschaftliche Härte setzen, während die andere mehr Ausgleich fordert.",
-    gapMitigationText:
-      "Definiert eine feste Prioritätsreihenfolge für wiederkehrende Zielkonflikte, damit Diskussionen nicht jedes Mal bei null starten.",
+      "Ihr bringt eine anschlussfähige Logik dafür mit, wie Kunden, Team und Kapitalinteressen gegeneinander abgewogen werden. Das schafft mehr Klarheit in schwierigen Priorisierungsentscheidungen.",
+    priorityHeadline: "Unterschiedliche Stakeholder-Prioritäten",
+    priorityText:
+      "In Zielkonflikten kann eine Person eher auf wirtschaftliche Härte gehen, während die andere stärker darauf schaut, was für Team, Kund:innen oder Partner langfristig tragbar bleibt.",
+    pressureText:
+      "Das wird besonders sichtbar, wenn Umsatzdruck, Teambelastung und Kundenerwartungen gleichzeitig steigen oder Investor:innen schnelle Signale erwarten.",
     agreementRule:
-      "Wenn Zielkonflikte zwischen Teambelastung und Umsatzdruck entstehen, dann entscheidet ihr entlang einer vorab dokumentierten Prioritätsmatrix.",
+      "Wenn Umsatzdruck und Teambelastung gegeneinanderstehen, entscheidet ihr entlang einer vorher festgelegten Reihenfolge statt aus dem Moment heraus.",
     conversationQuestion:
-      "Welche Stakeholder-Interessen dürfen in Stressphasen kurzfristig zurückstehen und welche nicht?",
+      "Welche Interessen dürfen in Stressphasen kurz zurücktreten und welche sind für euch nicht verhandelbar?",
     weight: {
       impact_idealist: 0.75,
       verantwortungs_stratege: 1,
@@ -89,16 +89,16 @@ const VALUE_FOCUS_TEMPLATES: ValueFocusTemplate[] = [
     id: "resource_fairness",
     overlapHeadline: "Fairness in Ressourcenentscheidungen",
     overlapText:
-      "Ihr habt eine vergleichbare Haltung dazu, wie Budget, Aufmerksamkeit und Verantwortung im Team verteilt werden sollen. Das stärkt Vertrauen in operative Entscheidungen.",
-    gapHeadline: "Divergenz bei Fairnessmaßstäben",
-    gapRiskText:
-      "Ohne gemeinsame Leitplanken können Ressourcenzuteilungen als sachlich notwendig oder als unausgewogen interpretiert werden.",
-    gapMitigationText:
-      "Vereinbart transparente Kriterien für Ressourcenentscheidungen und überprüft sie regelmäßig mit Blick auf Wirkung und Zumutbarkeit.",
+      "Ihr habt eine ähnliche Haltung dazu, wie Budget, Aufmerksamkeit und Verantwortung fair verteilt werden sollten. Das stärkt Vertrauen in operative Entscheidungen.",
+    priorityHeadline: "Unterschiedliche Maßstäbe für Fairness",
+    priorityText:
+      "Eine Person kann eine Entscheidung eher danach bewerten, ob sie effizient ist, die andere eher danach, ob sie im Team als fair und tragfähig erlebt wird.",
+    pressureText:
+      "Typisch wird das bei Hiring, Gehaltsfragen, Bonuslogik oder der Frage, wer unter Last zusätzliche Verantwortung übernimmt.",
     agreementRule:
-      "Wenn zusätzliche Ressourcen gebunden werden, dann dokumentiert ihr Entscheidungskriterien und den erwarteten Team-Impact in einem gemeinsamen Log.",
+      "Wenn ihr Budget, Rollen oder Zusatzlast verteilt, haltet ihr die Entscheidungskriterien kurz fest und prüft sichtbar mit, wie tragbar sie fürs Team sind.",
     conversationQuestion:
-      "Welche Fairnesskriterien sind für euch bei Budget- und Rollenentscheidungen unverhandelbar?",
+      "Welche Fairnesskriterien sollen bei Hiring-, Budget- oder Rollenentscheidungen immer mit auf den Tisch?",
     weight: {
       impact_idealist: 0.85,
       verantwortungs_stratege: 0.95,
@@ -109,16 +109,16 @@ const VALUE_FOCUS_TEMPLATES: ValueFocusTemplate[] = [
     id: "commercial_focus",
     overlapHeadline: "Kommerzielle Prioritätensetzung",
     overlapText:
-      "Ihr seid ähnlich darin ausgerichtet, wirtschaftliche Zielerreichung als Leitplanke im Tagesgeschäft zu nutzen. Das erhöht Klarheit bei Fokus- und Verzichtsentscheidungen.",
-    gapHeadline: "Unterschied in wirtschaftlicher Härte",
-    gapRiskText:
-      "Bei knappen Ressourcen kann eine Seite konsequente Ergebnisorientierung fordern, während die andere stärker langfristige Nebenwirkungen berücksichtigt.",
-    gapMitigationText:
-      "Legt Schwellenwerte fest, ab denen wirtschaftliche Kennzahlen automatisch priorisiert werden und wo qualitative Korrektive greifen.",
+      "Ihr bringt ein ähnliches Verständnis dafür mit, wie stark Umsatz, Runway und Ergebnisorientierung den Alltag steuern sollen. Das hilft bei Fokus- und Verzichtsentscheidungen.",
+    priorityHeadline: "Wirtschaftliche Härte im Alltag",
+    priorityText:
+      "Hier kann eine Person klarer auf Umsatz, Runway und Ergebnis fokussieren, während die andere stärker mitdenkt, welche Nebenwirkungen das für Team, Produkt oder Reputation hat.",
+    pressureText:
+      "Das wird oft relevant, wenn Zahlen kippen, Pricing angepasst werden muss, Headcount eingefroren wird oder Investorendruck steigt.",
     agreementRule:
-      "Wenn Kernkennzahlen zwei Perioden in Folge unter Ziel liegen, dann schaltet ihr in einen klar definierten Commercial-Mode mit befristeten Prioritätsregeln.",
+      "Wenn Kernkennzahlen kippen, schaltet ihr nicht automatisch in Dauer-Alarm, sondern in einen klar definierten Modus mit zeitlich begrenzten Prioritätsregeln.",
     conversationQuestion:
-      "Welche Kennzahlen lösen bei euch verbindlich einen Fokuswechsel zugunsten von Umsatz und Runway aus?",
+      "Welche Kennzahlen lösen bei euch wirklich einen anderen Fokus aus und was soll dann konkret anders entschieden werden?",
     weight: {
       impact_idealist: 0.35,
       verantwortungs_stratege: 0.65,
@@ -129,16 +129,16 @@ const VALUE_FOCUS_TEMPLATES: ValueFocusTemplate[] = [
     id: "long_term_vs_short_term",
     overlapHeadline: "Zeithorizont in Zielkonflikten",
     overlapText:
-      "Ihr interpretiert kurzfristige Chancen und langfristige Verantwortung ähnlich und könnt deshalb strategische Trade-offs konsistent erklären. Das reduziert Richtungswechsel im Führungsteam.",
-    gapHeadline: "Spannung zwischen kurzfristigem Druck und Langfrist-Logik",
-    gapRiskText:
-      "In kritischen Phasen kann es zu verdeckten Konflikten kommen, ob kurzfristige Stabilisierung oder langfristige Positionierung Vorrang hat.",
-    gapMitigationText:
-      "Arbeitet mit zwei Zeithorizonten in jeder größeren Entscheidung und dokumentiert bewusst, welchen Zielkonflikt ihr in Kauf nehmt.",
+      "Ihr habt ein ähnliches Gefühl dafür, wie kurzfristige Chancen und langfristige Verantwortung zusammengebracht werden sollen. Das reduziert spätere Richtungswechsel im Führungsteam.",
+    priorityHeadline: "Kurzfristiger Druck vs. langfristige Linie",
+    priorityText:
+      "In angespannten Phasen kann eine Person eher auf schnelle Stabilisierung schauen, während die andere stärker darauf achtet, was die Entscheidung langfristig über euer Unternehmen aussagt.",
+    pressureText:
+      "Das zeigt sich besonders bei Partnerschaften, Investorenerwartungen, strategischen Abkürzungen oder schwierigen Kompromissen im Wachstum unter Druck.",
     agreementRule:
-      "Wenn strategische Entscheidungen getroffen werden, dann bewertet ihr systematisch den 90-Tage- und den 12-Monats-Effekt vor dem Commit.",
+      "Wenn größere Entscheidungen anstehen, schaut ihr bewusst auf den 90-Tage-Effekt und auf die langfristige Richtung, bevor ihr euch festlegt.",
     conversationQuestion:
-      "Wo seid ihr bereit, kurzfristige Effizienz zugunsten langfristiger Positionierung zu opfern und wo nicht?",
+      "Wo wollt ihr kurzfristig konsequent handeln und wo soll eure langfristige Linie bewusst Vorrang behalten?",
     weight: {
       impact_idealist: 0.8,
       verantwortungs_stratege: 0.9,
@@ -658,7 +658,10 @@ export function buildProfileResultFromSession(
 ): ProfileResult {
   const name = target === "A" ? report.participantAName : report.participantBName ?? "Person B";
   const scores = target === "A" ? report.scoresA : report.scoresB;
-  const valuesArchetype = target === "A" ? report.valuesIdentityCategoryA : report.valuesIdentityCategoryB;
+  const valuesArchetype =
+    target === "A"
+      ? report.valuesPrimaryArchetypeIdA ?? report.valuesIdentityCategoryA
+      : report.valuesPrimaryArchetypeIdB ?? report.valuesIdentityCategoryB;
   const valuesScore =
     target === "A"
       ? report.valuesScoreA ?? null
@@ -1010,7 +1013,7 @@ function buildPremiumValuesModuleContent(
 
   if (alignment == null || !archetypeA || !archetypeB) {
     return {
-      kurzfazit: `${nameA} (${identityA}) trifft auf ${nameB} (${identityB}). Das Werte-Alignment bildet das Fundament eurer Zusammenarbeit, ist aktuell aber noch nicht belastbar auswertbar. Sobald beide Werteprofile vollständig vorliegen, erhaltet ihr eine strukturierte Einordnung zu Stabilitätsfaktoren, Druckpunkten und konkreten Handlungshinweisen.`,
+      kurzfazit: `${nameA} und ${nameB} haben das Werte-Add-on noch nicht vollstaendig abgeschlossen. Sobald beide Profile vorliegen, koennt ihr sehen, was euch in Grundsatzfragen verbindet und wo ihr fuer Hiring, Wachstum oder schwierige Kompromisse frueh Klarheit braucht.`,
       bullets: [
         "STATE|Werteprofil noch nicht vollständig verfügbar.",
       ],
@@ -1060,20 +1063,20 @@ function buildPremiumValuesModuleContent(
 
   const isSameIdentity = identityA === identityB;
   const identitySentence = isSameIdentity
-    ? `Ihr beide arbeitet aus derselben Werte-Identität (${identityA}); eure gemeinsame Haltung ist damit ein stabiler Orientierungsrahmen.`
-    : `${nameA} (${identityA}) trifft auf ${nameB} (${identityB}).`;
+    ? `Ihr bringt beide eine aehnliche Wertehaltung mit (${identityA}).`
+    : `${nameA} und ${nameB} bringen unterschiedliche, aber anschlussfaehige Werteperspektiven mit (${identityA} und ${identityB}).`;
 
   const strongestShared = overlaps[0] ?? null;
   const strongestGap = gaps[0] ?? null;
   const sharedAnchor = strongestShared
-    ? `Gemeinsame Werte (Stabilitätsfaktor): Besonders tragfähig wirkt aktuell „${strongestShared.template.overlapHeadline}“.`
-    : "Gemeinsame Werte (Stabilitätsfaktor): Eure Werteprofile zeigen mindestens ein klar anschlussfähiges Fundament.";
+    ? `Besonders klar zeigt sich das bei „${strongestShared.template.overlapHeadline}“.`
+    : "Ihr habt erkennbar eine gemeinsame Wertebasis, auf der ihr Entscheidungen aufbauen könnt.";
   const gapAnchor = strongestGap
-    ? `Divergenzen (Druckpunkte): Der höchste Abstimmungsbedarf zeigt sich bei „${strongestGap.template.gapHeadline}“.`
-    : "Divergenzen (Druckpunkte): Aktuell sind keine dominanten Spannungsfelder mit klarer Priorität erkennbar.";
+    ? `Am ehesten braucht ihr Klarheit bei „${strongestGap.template.priorityHeadline}“.`
+    : "Groessere Unterschiede in euren Prioritaeten treten aktuell nicht dominant hervor.";
   const everydayMeaning =
-    "Bedeutung für den Alltag (Handlungshinweis): Nutzt eure gemeinsamen Werte als Entscheidungsanker und besprecht potenzielle Druckpunkte vor kritischen Commitments ausdrücklich.";
-  const kurzfazit = `${identitySentence} Das Werte-Alignment ist das Fundament eurer Zusammenarbeit. ${tierContent.intro} ${pairingText} ${sharedAnchor} ${gapAnchor} ${everydayMeaning}`;
+    "Relevant wird das vor allem in Situationen wie Hiring, Pricing, Finanzierung, Teamlast oder schwierigen Partnerschaften unter Druck.";
+  const kurzfazit = `${identitySentence} ${tierContent.intro} ${pairingText} ${sharedAnchor} ${gapAnchor} ${everydayMeaning}`;
 
   const enrichedShared = overlaps.map((entry, index) => {
     const example = index === 0
@@ -1082,7 +1085,7 @@ function buildPremiumValuesModuleContent(
     const text = example ? `${entry.template.overlapText} ${example}` : entry.template.overlapText;
     return `SHARED|${entry.template.overlapHeadline}|${text}`;
   });
-  const enrichedGaps = gaps.map((entry, index) => {
+  const enrichedPriorities = gaps.map((entry, index) => {
     const example = index === 0
       ? buildGapValuesExample(entry, {
           isSameIdentity,
@@ -1090,13 +1093,15 @@ function buildPremiumValuesModuleContent(
           nameB,
         })
       : "";
-    const riskText = example ? `${entry.template.gapRiskText} ${example}` : entry.template.gapRiskText;
-    return `GAP|${entry.template.gapHeadline}|${riskText}|${entry.template.gapMitigationText}`;
+    const priorityText = example ? `${entry.template.priorityText} ${example}` : entry.template.priorityText;
+    return `PRIORITY|${entry.template.priorityHeadline}|${priorityText}`;
   });
+  const enrichedPressure = gaps.map((entry) => `PRESSURE|${entry.template.priorityHeadline}|${entry.template.pressureText}`);
 
   const bullets = [
     ...enrichedShared,
-    ...enrichedGaps,
+    ...enrichedPriorities,
+    ...enrichedPressure,
     ...agreementRules.map((rule) => `RULE|${rule}`),
     ...questions.map((question) => `QUESTION|${question}`),
   ];
@@ -1205,7 +1210,7 @@ function buildGapValuesExample(
 ) {
   const delta = Math.abs(entry.scoreA - entry.scoreB);
   if (context.isSameIdentity || delta < 0.08) {
-    return `Beispiel aus euren Werteantworten: In „${entry.template.gapHeadline}“ zeigen sich eher Nuancen innerhalb einer ähnlichen Grundhaltung.`;
+    return `Beispiel aus euren Werteantworten: Bei „${entry.template.priorityHeadline}“ zeigen sich eher Nuancen innerhalb einer ähnlichen Grundhaltung.`;
   }
   if (entry.scoreA > entry.scoreB) {
     return `Beispiel aus euren Werteantworten: ${context.nameA} gewichtet dieses Feld aktuell stärker als ${context.nameB}.`;

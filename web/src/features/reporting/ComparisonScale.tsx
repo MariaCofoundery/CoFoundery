@@ -7,6 +7,7 @@ type Props = {
   participantBName: string;
   lowLabel: string;
   highLabel: string;
+  valueScale?: "legacy_1_6" | "founder_percent";
 };
 
 export function ComparisonScale({
@@ -18,11 +19,12 @@ export function ComparisonScale({
   participantBName,
   lowLabel,
   highLabel,
+  valueScale = "legacy_1_6",
 }: Props) {
-  const a = normalizeScore(scoreA);
-  const b = normalizeScore(scoreB);
-  const left = a != null ? toPercent(a) : null;
-  const right = b != null ? toPercent(b) : null;
+  const a = normalizeScore(scoreA, valueScale);
+  const b = normalizeScore(scoreB, valueScale);
+  const left = a != null ? toPercent(a, valueScale) : null;
+  const right = b != null ? toPercent(b, valueScale) : null;
 
   const tensionLeft =
     left != null && right != null ? Math.min(left, right) : null;
@@ -98,11 +100,13 @@ function Marker({
   );
 }
 
-function normalizeScore(value: number | null) {
+function normalizeScore(value: number | null, valueScale: "legacy_1_6" | "founder_percent") {
   if (value == null || !Number.isFinite(value)) return null;
-  return Math.max(1, Math.min(6, value));
+  return valueScale === "founder_percent"
+    ? Math.max(0, Math.min(100, value))
+    : Math.max(1, Math.min(6, value));
 }
 
-function toPercent(value: number) {
-  return ((value - 1) / 5) * 100;
+function toPercent(value: number, valueScale: "legacy_1_6" | "founder_percent") {
+  return valueScale === "founder_percent" ? value : ((value - 1) / 5) * 100;
 }

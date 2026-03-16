@@ -1,9 +1,15 @@
 import { upsertProfileBasicsAction } from "@/features/profile/actions";
+import {
+  PROFILE_ROLE_OPTIONS,
+  normalizeProfileRoles,
+  profileRoleLabel,
+} from "@/features/profile/profileRoles";
 
 type ProfileBasicsValues = {
   display_name: string | null;
   focus_skill: string | null;
   intention: string | null;
+  roles?: string[] | null;
 };
 
 type Props = {
@@ -38,6 +44,7 @@ export function ProfileBasicsForm({
     variant === "accent"
       ? "rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50/80 via-white to-violet-50/70 p-6"
       : "rounded-2xl border border-slate-200/80 bg-white/95 p-6";
+  const selectedRoles = normalizeProfileRoles(initialValues.roles ?? ["founder"]);
 
   return (
     <section className={cardClass}>
@@ -100,6 +107,41 @@ export function ProfileBasicsForm({
             ))}
           </select>
         </label>
+
+        <fieldset className="grid gap-3 text-sm text-slate-700 md:col-span-2">
+          <legend className="text-sm font-medium text-slate-900">Deine Rollen</legend>
+          <p className="text-xs leading-6 text-slate-500">
+            Waehle aus, in welchen Ansichten du CoFoundery aktuell nutzen moechtest. Rollen steuern
+            die sichtbaren Dashboard-Modi, nicht automatisch konkrete Team-Zugriffe.
+          </p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {PROFILE_ROLE_OPTIONS.map((role) => {
+              const checked = selectedRoles.includes(role);
+              return (
+                <label
+                  key={role}
+                  className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3"
+                >
+                  <input
+                    type="checkbox"
+                    name="roles"
+                    value={role}
+                    defaultChecked={checked}
+                    className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-500 focus:ring-violet-200"
+                  />
+                  <span>
+                    <span className="block font-medium text-slate-900">{profileRoleLabel(role)}</span>
+                    <span className="mt-1 block text-xs leading-6 text-slate-500">
+                      {role === "advisor"
+                        ? "Nutze CoFoundery auch, um Founder-Teams als Advisor zu begleiten."
+                        : "Nutze CoFoundery für dein eigenes Founder-Profil, Matching und Alignment."}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <div className="md:col-span-2">
           <button

@@ -5,6 +5,23 @@ import { useRouter } from "next/navigation";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
 
 const SENT_INVITE_TOKEN_STORE_KEY = "sent_invite_tokens_v1";
+type TeamContext = "pre_founder" | "existing_team";
+
+function teamContextMeta(teamContext: TeamContext | null) {
+  if (teamContext === "existing_team") {
+    return {
+      badge: "Bestehendes Team",
+      title: "Ihr startet einen Alignment-Flow fuer ein bestehendes Gruenderteam.",
+      text: "Report, Gespraechsleitfaden und Workbook fokussieren dann staerker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
+    };
+  }
+
+  return {
+    badge: "Moegliche Gruendungspartnerschaft",
+    title: "Ihr startet einen Matching- und Kennenlern-Flow.",
+    text: "Report, Gespraechsleitfaden und Workbook fokussieren dann staerker auf Passung, Erwartungen und fruehe Vereinbarungen vor einer engeren Zusammenarbeit.",
+  };
+}
 
 function toAbsoluteUrl(path: string) {
   if (typeof window === "undefined") return path;
@@ -41,6 +58,7 @@ export function CoFounderInviteForm() {
   const [label, setLabel] = useState("");
   const [email, setEmail] = useState("");
   const [includeValues, setIncludeValues] = useState(false);
+  const [teamContext, setTeamContext] = useState<TeamContext | null>(null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
@@ -49,12 +67,17 @@ export function CoFounderInviteForm() {
   const selectedModulesLabel = useMemo(() => {
     return includeValues ? "Basis, Werte" : "Basis";
   }, [includeValues]);
+  const selectedContextMeta = teamContextMeta(teamContext);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
       setError("Bitte eine gültige E-Mail-Adresse eingeben.");
+      return;
+    }
+    if (!teamContext) {
+      setError("Bitte wähle aus, ob ihr euch erst kennenlernt oder bereits zusammenarbeitet.");
       return;
     }
 
@@ -66,6 +89,7 @@ export function CoFounderInviteForm() {
       formData.set("label", label.trim());
       formData.set("invitedEmail", invitedEmail);
       formData.set("includeValues", includeValues ? "true" : "false");
+      formData.set("teamContext", teamContext);
 
       const result = await createCoFounderInvitationAction(formData);
       if (!result.ok) {
@@ -102,6 +126,9 @@ export function CoFounderInviteForm() {
       <p className="mt-2 text-sm text-slate-600">
         Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt später.
       </p>
+      <p className="mt-1 text-sm text-slate-500">
+        Du legst hier nicht nur den Link an, sondern auch den Kontext fuer den weiteren Founder-Flow.
+      </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <div>
@@ -131,6 +158,64 @@ export function CoFounderInviteForm() {
             placeholder="cofounder@example.com"
             className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           />
+        </div>
+
+        <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
+          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
+            Team-Kontext
+          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Waehle bewusst, ob ihr gerade eine moegliche Zusammenarbeit prueft oder bereits gemeinsam arbeitet.
+            Dieser Kontext steuert spaeter, wie Report, Gespraechsleitfaden und Workbook sprachlich gerahmt werden.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => {
+                setTeamContext("pre_founder");
+                setError(null);
+              }}
+              className={`rounded-2xl border px-4 py-4 text-left transition ${
+                teamContext === "pre_founder"
+                  ? "border-cyan-400 bg-white shadow-[0_10px_25px_rgba(34,211,238,0.12)]"
+                  : "border-slate-200 bg-white/90 hover:border-cyan-200"
+              }`}
+              aria-pressed={teamContext === "pre_founder"}
+            >
+              <p className="text-sm font-semibold text-slate-900">Wir überlegen, zusammenzuarbeiten</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Fuer Matching-Gespraeche vor einer moeglichen Gruendungspartnerschaft.
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTeamContext("existing_team");
+                setError(null);
+              }}
+              className={`rounded-2xl border px-4 py-4 text-left transition ${
+                teamContext === "existing_team"
+                  ? "border-cyan-400 bg-white shadow-[0_10px_25px_rgba(34,211,238,0.12)]"
+                  : "border-slate-200 bg-white/90 hover:border-cyan-200"
+              }`}
+              aria-pressed={teamContext === "existing_team"}
+            >
+              <p className="text-sm font-semibold text-slate-900">Wir arbeiten bereits zusammen</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Fuer Teams, die Rollen, Spannungen und Zusammenarbeit weiter klaeren wollen.
+              </p>
+            </button>
+          </div>
+          <div className="mt-4 rounded-2xl border border-white/80 bg-white/80 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              Was dieser Modus spaeter aendert
+            </p>
+            <div className="mt-3 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-slate-700">
+              {selectedContextMeta.badge}
+            </div>
+            <p className="mt-3 text-sm font-medium text-slate-900">{selectedContextMeta.title}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{selectedContextMeta.text}</p>
+          </div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
@@ -179,7 +264,7 @@ export function CoFounderInviteForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex rounded-lg border border-slate-900 bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+          className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm text-slate-900 shadow-[0_10px_30px_rgba(103,232,249,0.22)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
         >
           {isPending ? "Einladung wird erstellt..." : "Einladungslink erstellen"}
         </button>
@@ -193,6 +278,14 @@ export function CoFounderInviteForm() {
             Einladung erstellt
           </p>
           <p className="mt-2 text-sm text-emerald-900">Aktive Module: {selectedModulesLabel}</p>
+          {teamContext ? (
+            <p className="mt-1 text-sm text-emerald-900">
+              Kontext: {teamContext === "existing_team" ? "Wir arbeiten bereits zusammen" : "Wir ueberlegen, zusammenzuarbeiten"}
+            </p>
+          ) : null}
+          <p className="mt-2 text-xs leading-6 text-emerald-800">
+            Teile jetzt den Link direkt mit der zweiten Person. Derselbe Link kann spaeter auch per E-Mail versendet werden.
+          </p>
           <p className="mt-2 break-all rounded-md border border-emerald-200 bg-white px-3 py-2 text-xs text-emerald-900">
             {inviteUrl}
           </p>

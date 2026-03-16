@@ -36,8 +36,8 @@ export default async function MeReportPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
+    <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
+      <div className="no-print mb-8 flex items-center justify-between">
         <a
           href="/dashboard"
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
@@ -47,12 +47,9 @@ export default async function MeReportPage() {
         <PrintReportButton />
       </div>
 
-      <section className="mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Individual Report</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[0.06em] text-slate-900">{report.participantAName}</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Basis beantwortet: {report.basisAnsweredA}/{report.basisTotal}
-        </p>
+      <section className="page-section mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mb-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-0">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Individueller Report</p>
+        <h1 className="mt-3 text-3xl font-semibold text-slate-900">{report.participantAName}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-700">
           Dieser Report beschreibt dein aktuelles Gründerprofil entlang der sechs Kern-Dimensionen und
           gibt dir konkrete Reflexionsimpulse für deine Co-Founder-Suche.

@@ -22,6 +22,10 @@ type Question = {
   type: string | null;
   prompt: string;
   sort_order: number;
+  optionA?: string | null;
+  optionB?: string | null;
+  option_a?: string | null;
+  option_b?: string | null;
 };
 
 type Choice = {
@@ -61,7 +65,7 @@ async function resolveModuleForQuestion(questionId: string): Promise<ModuleKey> 
   return data?.category === "values" ? "values" : "base";
 }
 
-export async function getParticipantA(_sessionId: string) {
+export async function getParticipantA() {
   const { supabase, user } = await getUserOrRedirect();
   const { data: profile } = await supabase
     .from("profiles")
@@ -105,7 +109,7 @@ export async function listQuestions() {
   const { supabase } = await getUserOrRedirect();
   const { data: questions, error: questionsError } = await supabase
     .from("questions")
-    .select("id, dimension, type, prompt, sort_order")
+    .select("*")
     .eq("is_active", true)
     .eq("category", "basis")
     .order("sort_order", { ascending: true });
@@ -148,11 +152,7 @@ export async function listQuestions() {
   };
 }
 
-export async function upsertResponse(
-  _sessionId: string,
-  questionId: string,
-  choiceValue: string
-) {
+export async function upsertResponse(questionId: string, choiceValue: string) {
   const moduleKey = await resolveModuleForQuestion(questionId);
   const latest = await getLatestAssessmentAnswers(moduleKey);
   latest[questionId] = choiceValue;
@@ -160,12 +160,12 @@ export async function upsertResponse(
   return { ok: true } as const;
 }
 
-export async function saveFreeText(_sessionId: string, _text: string) {
+export async function saveFreeText() {
   // TEMP: free text storage was removed with the legacy schema.
   return { ok: true } as const;
 }
 
-export async function completeParticipantA(_sessionId: string) {
+export async function completeParticipantA() {
   return {
     ok: true,
     status: "waiting" as const,
@@ -173,6 +173,6 @@ export async function completeParticipantA(_sessionId: string) {
   };
 }
 
-export async function markSessionCompleted(_sessionId: string) {
+export async function markSessionCompleted() {
   return { ok: true } as const;
 }

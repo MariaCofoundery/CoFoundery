@@ -1,0 +1,242 @@
+import { createClient } from "@/lib/supabase/server";
+import { hasProfileRole, normalizeProfileRoles } from "@/features/profile/profileRoles";
+import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
+
+export type DashboardRoleKey = "founder" | "advisor";
+
+export type DashboardRoleViews = {
+  hasFounder: boolean;
+  hasAdvisor: boolean;
+  roles: DashboardRoleKey[];
+};
+
+type AdvisorAccessRow = {
+  invitation_id: string;
+  advisor_name: string | null;
+};
+
+type InvitationRow = {
+  id: string;
+  inviter_user_id: string;
+  invitee_user_id: string | null;
+  invitee_email: string | null;
+  team_context: string | null;
+  status: string;
+  created_at: string;
+};
+
+type ProfileRow = {
+  user_id: string;
+  display_name: string | null;
+};
+
+type WorkbookRow = {
+  invitation_id: string;
+  updated_at: string;
+  payload: unknown;
+};
+
+type ReportRunRow = {
+  invitation_id: string;
+  created_at: string;
+};
+
+export type AdvisorDashboardTeam = {
+  invitationId: string;
+  founderAName: string;
+  founderBName: string;
+  teamContext: "pre_founder" | "existing_team";
+  statusLabel: string;
+  lastActivityLabel: string;
+  followUpLabel: string;
+  workbookHref: string;
+  reportHref: string;
+  reportReady: boolean;
+  snapshotHref: string;
+  advisorActionHref: string;
+};
+
+function normalizeTeamContext(value: string | null): "pre_founder" | "existing_team" {
+  return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
+  return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+}
+
+function formatTimestamp(value: string | null) {
+  if (!value) return "Noch keine Aktivitaet";
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function deriveAdvisorStatusLabel(params: {
+  hasReport: boolean;
+  hasWorkbook: boolean;
+  hasAdvisorClosing: boolean;
+  hasFounderReaction: boolean;
+  teamContext: "pre_founder" | "existing_team";
+}) {
+  if (params.hasFounderReaction) {
+    return "Founder haben reagiert";
+  }
+
+  if (params.hasAdvisorClosing) {
+    return "Warten auf Founder-Reaktion";
+  }
+
+  if (params.hasWorkbook) {
+    return "Advisor-Impulse offen";
+  }
+
+  if (params.hasReport) {
+    return params.teamContext === "existing_team" ? "Alignment bereit" : "Matching bereit";
+  }
+
+  return "Noch kein Workbook";
+}
+
+function advisorFollowUpLabel(value: unknown) {
+  if (value === "four_weeks") return "Follow-up in 4 Wochen";
+  if (value === "three_months") return "Follow-up in 3 Monaten";
+  return "Kein Follow-up gesetzt";
+}
+
+export async function getDashboardRoleViews(userId: string): Promise<DashboardRoleViews> {
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("roles")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const roles = normalizeProfileRoles((profile as { roles?: unknown } | null)?.roles);
+  const hasFounder = hasProfileRole(roles, "founder");
+  const hasAdvisor = hasProfileRole(roles, "advisor");
+
+  return {
+    hasFounder,
+    hasAdvisor,
+    roles,
+  };
+}
+
+export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorDashboardTeam[]> {
+  const supabase = await createClient();
+  const { data: advisorAccessRows, error: advisorAccessError } = await supabase
+    .from("founder_alignment_workbook_advisors")
+    .select("invitation_id, advisor_name")
+    .eq("advisor_user_id", userId);
+
+  if (advisorAccessError || !advisorAccessRows || advisorAccessRows.length === 0) {
+    return [];
+  }
+
+  const advisorAccess = advisorAccessRows as AdvisorAccessRow[];
+  const invitationIds = advisorAccess.map((row) => row.invitation_id);
+
+  const [invitationResult, workbookResult, reportRunResult] = await Promise.all([
+    supabase
+      .from("invitations")
+      .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, created_at")
+      .in("id", invitationIds),
+    supabase
+      .from("founder_alignment_workbooks")
+      .select("invitation_id, updated_at, payload")
+      .in("invitation_id", invitationIds),
+    supabase
+      .from("report_runs")
+      .select("invitation_id, created_at")
+      .in("invitation_id", invitationIds)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  if (invitationResult.error || !invitationResult.data) {
+    return [];
+  }
+
+  const invitations = invitationResult.data as InvitationRow[];
+  const workbooks = (workbookResult.data ?? []) as WorkbookRow[];
+  const reportRuns = (reportRunResult.data ?? []) as ReportRunRow[];
+
+  const relevantUserIds = [
+    ...new Set(
+      invitations
+        .flatMap((invitation) => [invitation.inviter_user_id, invitation.invitee_user_id])
+        .filter((value): value is string => Boolean(value))
+    ),
+  ];
+
+  const { data: profileRows } = await supabase
+    .from("profiles")
+    .select("user_id, display_name")
+    .in("user_id", relevantUserIds);
+
+  const profileByUserId = new Map(
+    ((profileRows ?? []) as ProfileRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+  );
+  const workbookByInvitationId = new Map(workbooks.map((row) => [row.invitation_id, row]));
+  const reportRunByInvitationId = new Map<string, ReportRunRow>();
+  for (const row of reportRuns) {
+    if (!reportRunByInvitationId.has(row.invitation_id)) {
+      reportRunByInvitationId.set(row.invitation_id, row);
+    }
+  }
+
+  return invitations
+    .map((invitation) => {
+      const teamContext = normalizeTeamContext(invitation.team_context);
+      const workbook = workbookByInvitationId.get(invitation.id) ?? null;
+      const reportRun = reportRunByInvitationId.get(invitation.id) ?? null;
+      const workbookPayload = workbook
+        ? sanitizeFounderAlignmentWorkbookPayload(workbook.payload)
+        : null;
+      const hasAdvisorClosing = Boolean(
+        workbookPayload?.advisorClosing.observations.trim() ||
+          workbookPayload?.advisorClosing.questions.trim() ||
+          workbookPayload?.advisorClosing.nextSteps.trim()
+      );
+      const hasFounderReaction = Boolean(
+        workbookPayload?.founderReaction.status || workbookPayload?.founderReaction.comment.trim()
+      );
+      const founderAName =
+        profileByUserId.get(invitation.inviter_user_id)?.trim() || "Founder A";
+      const founderBName =
+        (invitation.invitee_user_id
+          ? profileByUserId.get(invitation.invitee_user_id)?.trim()
+          : invitation.invitee_email?.split("@")[0]?.trim()) || "Founder B";
+      const lastActivitySource = [workbook?.updated_at ?? null, reportRun?.created_at ?? null, invitation.created_at]
+        .filter((value): value is string => Boolean(value))
+        .sort()
+        .at(-1) ?? null;
+
+      return {
+        invitationId: invitation.id,
+        founderAName,
+        founderBName,
+        teamContext,
+        statusLabel: deriveAdvisorStatusLabel({
+          hasReport: Boolean(reportRun),
+          hasWorkbook: Boolean(workbook),
+          hasAdvisorClosing,
+          hasFounderReaction,
+          teamContext,
+        }),
+        lastActivityLabel: `${teamContextLabel(teamContext)} · ${formatTimestamp(lastActivitySource)}`,
+        followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
+        workbookHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        reportHref: `/report/${invitation.id}`,
+        reportReady: Boolean(reportRun),
+        snapshotHref: `/advisor/snapshot?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        advisorActionHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        _lastActivityAt: lastActivitySource ?? "",
+      };
+    })
+    .sort((left, right) => right._lastActivityAt.localeCompare(left._lastActivityAt, "de"))
+    .map(({ _lastActivityAt, ...team }) => {
+      void _lastActivityAt;
+      return team satisfies AdvisorDashboardTeam;
+    });
+}

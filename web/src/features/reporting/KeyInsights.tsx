@@ -1,7 +1,12 @@
-import { type KeyInsight } from "@/features/reporting/types";
+type InsightItem = {
+  dimension: string;
+  title: string;
+  text: string;
+  priority: number;
+};
 
 type Props = {
-  insights: KeyInsight[];
+  insights: InsightItem[];
   mode?: "match" | "self";
 };
 
@@ -76,9 +81,9 @@ export function KeyInsights({ insights, mode = "self" }: Props) {
   );
 }
 
-function uniqueByDimension(insights: KeyInsight[]) {
+function uniqueByDimension(insights: InsightItem[]) {
   const seen = new Set<string>();
-  const result: KeyInsight[] = [];
+  const result: InsightItem[] = [];
   for (const insight of insights) {
     if (seen.has(insight.dimension)) continue;
     seen.add(insight.dimension);

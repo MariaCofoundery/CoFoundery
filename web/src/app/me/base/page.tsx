@@ -10,9 +10,9 @@ import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import {
   QuestionnaireClient,
   type QuestionnaireChoice,
-  type QuestionnaireQuestion,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
+import { normalizeQuestionnaireQuestions } from "@/features/questionnaire/questionnaireShared";
 
 type MeBaseSearchParams = {
   invitationId?: string;
@@ -38,7 +38,7 @@ export default async function MeBasePage({
   const invitationId = params.invitationId?.trim() || null;
   const isRefreshFlow = params.flow === "refresh";
 
-  let completeRedirect = "/dashboard";
+  let completeRedirect = "/me/base/complete";
   if (invitationId) {
     const decision = await getInvitationJoinDecision(invitationId);
     if (!decision.ok) {
@@ -99,7 +99,7 @@ export default async function MeBasePage({
 
   const { data: questionsData, error: questionsError } = await supabase
     .from("questions")
-    .select("id, dimension, type, prompt, sort_order")
+    .select("*")
     .eq("is_active", true)
     .eq("category", "basis")
     .order("sort_order", { ascending: true });
@@ -108,7 +108,7 @@ export default async function MeBasePage({
     return <main className="p-8">Fehler beim Laden des Basis-Fragebogens: {questionsError.message}</main>;
   }
 
-  const questions = (questionsData ?? []) as QuestionnaireQuestion[];
+  const questions = normalizeQuestionnaireQuestions((questionsData ?? []) as unknown[]);
   const questionIds = questions.map((question) => question.id);
 
   const [{ data: choicesData, error: choicesError }, answerMap] = await Promise.all([
@@ -136,22 +136,6 @@ export default async function MeBasePage({
   }
 
   const choices = (choicesData ?? []) as QuestionnaireChoice[];
-  const hasChoicesForEveryQuestion =
-    questionIds.length === 0 ||
-    questionIds.every((questionId) => choices.some((choice) => choice.question_id === questionId));
-  if (!hasChoicesForEveryQuestion) {
-    return (
-      <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
-        <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
-          <h1 className="text-base font-semibold text-red-900">Basis-Fragebogen</h1>
-          <p className="mt-2 text-sm text-red-700">
-            Antwortoptionen konnten nicht geladen werden. Bitte neu laden.
-          </p>
-        </section>
-      </main>
-    );
-  }
-
   const responses: QuestionnaireResponse[] = Object.entries(answerMap).map(([questionId, choiceValue]) => ({
     question_id: questionId,
     choice_value: choiceValue,
@@ -178,6 +162,10 @@ export default async function MeBasePage({
         completeRedirect={completeRedirect}
         allowDefaultScaleFallback={false}
         missingChoicesMessage="Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
+        trackingContext={{
+          module: "base",
+          invitationId,
+        }}
       />
     </main>
   );

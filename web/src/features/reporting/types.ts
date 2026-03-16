@@ -89,6 +89,8 @@ export type SessionAlignmentReport = {
   valuesAlignmentPercent: number | null;
   valuesIdentityCategoryA: string | null;
   valuesIdentityCategoryB: string | null;
+  valuesPrimaryArchetypeIdA?: ValuesArchetypeId | null;
+  valuesPrimaryArchetypeIdB?: ValuesArchetypeId | null;
   valuesScoreA?: number | null;
   valuesScoreB?: number | null;
   requestedScope: "basis" | "basis_plus_values";

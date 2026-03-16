@@ -59,6 +59,9 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       >
         {status === "loading" ? "Sende..." : "Magic Link senden"}
       </button>
+      <p className="text-xs text-[color:var(--muted)]">
+        Hinweis: Der Login-Magic-Link ist 60 Minuten gueltig.
+      </p>
       {message ? (
         <p
           className={`text-sm ${status === "error" ? "text-red-700" : "text-[color:var(--muted)]"}`}

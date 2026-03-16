@@ -141,7 +141,7 @@ export function TeamMatchingPanel({
           </a>
           {addOnRequested ? (
             <p className="text-xs tracking-[0.08em] text-slate-600">
-              Werte-Add-on Status: A {valuesAnsweredA}/{valuesTotal}, B {valuesAnsweredB}/{valuesTotal}. Vollreport wird aktiviert, sobald beide 10/10 erreicht haben.
+              Werte-Add-on Status: A {valuesAnsweredA}/{valuesTotal}, B {valuesAnsweredB}/{valuesTotal}. Vollreport wird aktiviert, sobald beide Profile vollstaendig abgeschlossen sind.
             </p>
           ) : null}
           {addOnRequested && !valuesCompletedA ? (

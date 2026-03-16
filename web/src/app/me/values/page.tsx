@@ -10,10 +10,11 @@ import {
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import {
   type QuestionnaireChoice,
-  type QuestionnaireQuestion,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
+import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { ValuesQuestionnaire } from "@/features/questionnaire/ValuesQuestionnaire";
+import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
 
 type MeValuesSearchParams = {
   invitationId?: string;
@@ -39,7 +40,7 @@ export default async function MeValuesPage({
   const invitationId = params.invitationId?.trim() || null;
   const isRefreshFlow = params.flow === "refresh";
 
-  let completeRedirect = "/dashboard?valuesStatus=completed";
+  let completeRedirect = "/me/values/complete";
   if (invitationId) {
     const decision = await getInvitationJoinDecision(invitationId);
     if (!decision.ok) {
@@ -109,7 +110,7 @@ export default async function MeValuesPage({
 
   const { data: questionsData, error: questionsError } = await supabase
     .from("questions")
-    .select("id, dimension, type, prompt, sort_order")
+    .select("id, dimension, type, prompt, sort_order, is_active, category")
     .eq("is_active", true)
     .eq("category", "values")
     .order("sort_order", { ascending: true });
@@ -119,18 +120,48 @@ export default async function MeValuesPage({
   }
 
   const questions = (questionsData ?? []) as QuestionnaireQuestion[];
+  const valuesQuestionMismatch = getValuesQuestionVersionMismatch(questions.map((question) => question.id));
+  if (process.env.NODE_ENV !== "production" && !valuesQuestionMismatch.isAligned) {
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
+        <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
+          <h1 className="text-base font-semibold text-red-900">Werte-Fragebogen</h1>
+          <p className="mt-2 text-sm text-red-700">
+            Die aktive Werte-Fragenbasis stimmt nicht mit der versionierten Werte-Definition im Repo überein.
+          </p>
+          <p className="mt-2 text-xs text-red-800">
+            Unknown: {valuesQuestionMismatch.unknownIds.join(", ") || "keine"} · Missing:{" "}
+            {valuesQuestionMismatch.missingIds.join(", ") || "keine"}
+          </p>
+        </section>
+      </main>
+    );
+  }
   const questionIds = questions.map((question) => question.id);
 
-  const [{ data: choicesData }, answerMap] = await Promise.all([
+  const [{ data: choicesData, error: choicesError }, answerMap] = await Promise.all([
     questionIds.length > 0
       ? supabase
           .from("choices")
           .select("id, question_id, label, value, sort_order")
           .in("question_id", questionIds)
           .order("sort_order", { ascending: true })
-      : Promise.resolve({ data: [] as QuestionnaireChoice[] }),
+      : Promise.resolve({ data: [] as QuestionnaireChoice[], error: null }),
     getAssessmentAnswerMap(draft.id),
   ]);
+
+  if (choicesError) {
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
+        <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
+          <h1 className="text-base font-semibold text-red-900">Werte-Fragebogen</h1>
+          <p className="mt-2 text-sm text-red-700">
+            Antwortoptionen konnten nicht geladen werden. Bitte neu laden.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   const choices = (choicesData ?? []) as QuestionnaireChoice[];
   const responses: QuestionnaireResponse[] = Object.entries(answerMap).map(([questionId, choiceValue]) => ({
@@ -155,6 +186,10 @@ export default async function MeValuesPage({
         choices={choices}
         responses={responses}
         completeRedirect={completeRedirect}
+        trackingContext={{
+          module: "values",
+          invitationId,
+        }}
       />
     </main>
   );

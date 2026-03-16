@@ -5,19 +5,41 @@ import {
   buildProfileResultFromSession,
   generateCompareReport,
 } from "@/features/reporting/generateCompareReport";
+import {
+  buildFounderAlignmentReport,
+  type FounderAlignmentReport,
+} from "@/features/reporting/buildFounderAlignmentReport";
+import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { createClient } from "@/lib/supabase/server";
-import { DIMENSION_DEFINITIONS_DE } from "@/features/reporting/report_texts.de";
+import {
+  assertFounderBaseQuestionVersionContract,
+  scoreStoredBaseAnswerToFounderPercent,
+} from "@/features/scoring/founderBaseQuestionMeta";
 import {
   aggregateBaseScoresFromAnswers,
   assertValuesTotalCategoryContract,
   type AssessmentAnswerRow,
   type QuestionMetaRow,
 } from "@/features/reporting/base_scoring";
+import { FOUNDER_DIMENSION_ORDER, getFounderDimensionMeta, type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
+import {
+  scoreFounderAlignment,
+  type Answer as FounderAnswer,
+  type TeamScoringResult,
+} from "@/features/scoring/founderScoring";
+import {
+  aggregateFounderBaseScoresFromAnswers,
+  buildSelfFounderKeyInsights,
+  toSelfBaseCoverage,
+  toSelfParticipantDebugReport,
+} from "@/features/reporting/selfReportScoring";
+import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import {
   computeValuesContinuumScore,
   scoreSelfValuesProfile,
   type ValuesAnswerForScoring,
 } from "@/features/reporting/values_scoring";
+import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
 import {
   REPORT_DIMENSIONS,
   type CompareReportJson,
@@ -34,8 +56,11 @@ export type ReportRunSnapshot = {
   createdAt: string;
   modules: string[];
   inputAssessmentIds: string[];
+  reportType: "classic_compare_v1" | "founder_alignment_v1";
   report: SessionAlignmentReport | null;
   compareJson: CompareReportJson | null;
+  founderReport: FounderAlignmentReport | null;
+  founderScoring: TeamScoringResult | null;
   payload: Record<string, unknown> | null;
 };
 
@@ -127,6 +152,7 @@ type InvitationEnsureRow = {
   inviter_user_id: string;
   invitee_user_id: string | null;
   invitee_email: string;
+  team_context: string | null;
   status: string;
   created_at: string;
   accepted_at: string | null;
@@ -148,6 +174,7 @@ type InvitationDashboardSourceRow = {
   inviter_user_id: string;
   invitee_user_id: string | null;
   invitee_email: string;
+  team_context: string | null;
   status: string;
   label: string | null;
   inviter_display_name: string | null;
@@ -190,6 +217,7 @@ export type InvitationDashboardRow = {
   id: string;
   direction: "sent" | "incoming";
   inviteeEmail: string;
+  teamContext: TeamContext;
   status: string;
   label: string | null;
   inviterDisplayName: string | null;
@@ -248,6 +276,7 @@ export type InvitationJoinDecision =
       ok: true;
       invitation_id: string;
       mode: "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
+      team_context: TeamContext;
       required_modules: AssessmentModule[];
       missing_modules: AssessmentModule[];
       invitee_status: {
@@ -358,6 +387,35 @@ function normalizeCategory(value: string | null | undefined) {
   return value?.trim().toLowerCase() ?? "";
 }
 
+function normalizeTeamContext(value: string | null | undefined): TeamContext {
+  return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+function transformFounderScoringAnswers(
+  rows: AssessmentAnswerRow[],
+  questionMetaById: Map<string, QuestionMetaRow>
+): FounderAnswer[] {
+  return rows.flatMap((row) => {
+    const meta = questionMetaById.get(row.question_id);
+    if (!meta?.dimension) {
+      return [];
+    }
+
+    const numericValue = scoreStoredBaseAnswerToFounderPercent(row.question_id, row.choice_value);
+    if (numericValue == null || !Number.isFinite(numericValue)) {
+      return [];
+    }
+
+    return [
+      {
+        question_id: row.question_id,
+        dimension: meta.dimension,
+        value: numericValue,
+      },
+    ];
+  });
+}
+
 function isValuesCategory(value: string | null | undefined) {
   return normalizeCategory(value) === VALUES_QUESTION_CATEGORY;
 }
@@ -373,6 +431,32 @@ function assertValuesCategoryContract(rows: QuestionMetaRow[], context: string) 
     .map((row) => `${row.id}:${normalizeCategory(row.category) || "null"}`)
     .join(", ");
   const message = `values_category_contract_violation (${context}): expected category='values', got ${sample}`;
+  if (process.env.NODE_ENV !== "production") {
+    throw new Error(message);
+  }
+  console.error(message);
+}
+
+function assertValuesQuestionVersionContract(
+  rows: QuestionMetaRow[],
+  context: string,
+  options?: { allowMissing?: boolean }
+) {
+  const { unknownIds, missingIds, isAligned } = getValuesQuestionVersionMismatch(rows.map((row) => row.id));
+  const allowMissing = options?.allowMissing === true;
+  if (isAligned || (allowMissing && unknownIds.length === 0)) {
+    return;
+  }
+
+  const parts: string[] = [];
+  if (unknownIds.length > 0) {
+    parts.push(`unknown=${unknownIds.join(",")}`);
+  }
+  if (!allowMissing && missingIds.length > 0) {
+    parts.push(`missing=${missingIds.join(",")}`);
+  }
+
+  const message = `values_question_version_contract_mismatch (${context}): ${parts.join(" | ")}`;
   if (process.env.NODE_ENV !== "production") {
     throw new Error(message);
   }
@@ -414,134 +498,6 @@ async function countValuesQuestionsTotal(supabase: SupabaseLikeClient, onlyActiv
     return 0;
   }
   return count;
-}
-
-function scoreToZone(score: number, dimension: ReportDimension) {
-  const thresholds = DIMENSION_DEFINITIONS_DE[dimension].thresholds;
-  if (score <= thresholds.lowMax) return "low" as const;
-  if (score >= thresholds.highMin) return "high" as const;
-  return "mid" as const;
-}
-
-function insightDimensionLabel(dimension: ReportDimension) {
-  return dimension === "Risiko" ? "Risikoprofil" : dimension;
-}
-
-function round(value: number, precision = 2) {
-  const factor = 10 ** precision;
-  return Math.round(value * factor) / factor;
-}
-
-function normalizeBaseAnswerToReportScale(rawValue: string): number | null {
-  const parsedValue = Number.parseFloat(rawValue);
-  if (!Number.isFinite(parsedValue)) return null;
-
-  if (parsedValue >= 1 && parsedValue <= 4) {
-    // Canonical basis normalization: DB likert (1..4) -> report scale (1..6)
-    return round(1 + ((parsedValue - 1) / 3) * 5, 3);
-  }
-
-  return Math.max(1, Math.min(6, parsedValue));
-}
-
-type RankedSelfDimension = {
-  dimension: ReportDimension;
-  score: number;
-  zone: "low" | "mid" | "high";
-  priority: number;
-  archetype: (typeof DIMENSION_DEFINITIONS_DE)[ReportDimension]["archetypesByZone"]["low"];
-};
-
-function ensureSentence(value: string) {
-  const text = value.trim();
-  if (!text) return "";
-  return /[.!?]$/.test(text) ? text : `${text}.`;
-}
-
-function decapitalizeFirst(value: string) {
-  if (!value) return value;
-  return `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
-}
-
-function strengthInsightText(row: RankedSelfDimension) {
-  const sentence1 = ensureSentence(
-    `In ${insightDimensionLabel(row.dimension)} agierst du aktuell als ${row.archetype.name}: ${row.archetype.descriptionShort}`
-  );
-  const sentence2 = ensureSentence(
-    `Nutze diese Stärke bewusst im Gründeralltag und achte darauf, dass ${decapitalizeFirst(row.archetype.caution)}`
-  );
-  return `${sentence1} ${sentence2}`;
-}
-
-function watchoutInsightText(row: RankedSelfDimension) {
-  const sentence1 = ensureSentence(
-    `In ${insightDimensionLabel(row.dimension)} zeigt dein Profil aktuell eine besonders prägende Tendenz: ${row.archetype.descriptionShort}`
-  );
-  const sentence2 = ensureSentence(
-    `Setze dafür klare Leitplanken, damit ${decapitalizeFirst(row.archetype.caution)}`
-  );
-  return `${sentence1} ${sentence2}`;
-}
-
-function buildSelfKeyInsights(scores: RadarSeries): KeyInsight[] {
-  const ranked = REPORT_DIMENSIONS.map((dimension) => {
-    const score = scores[dimension];
-    if (score == null) return null;
-    const zone = scoreToZone(score, dimension);
-    const archetype = DIMENSION_DEFINITIONS_DE[dimension].archetypesByZone[zone];
-    return {
-      dimension,
-      score,
-      zone,
-      archetype,
-      priority: Math.abs(score - 3.5),
-    };
-  })
-    .filter((row): row is NonNullable<typeof row> => row != null)
-    .sort((a, b) => b.priority - a.priority) as RankedSelfDimension[];
-
-  const strengths = ranked.slice(0, 2);
-  const usedStrengths = new Set(strengths.map((row) => row.dimension));
-  let watchout = [...ranked].sort((a, b) => a.score - b.score).find((row) => !usedStrengths.has(row.dimension));
-  if (!watchout) {
-    watchout = ranked.find((row) => !usedStrengths.has(row.dimension)) ?? ranked[0];
-  }
-
-  const completed: KeyInsight[] = [];
-  for (const row of strengths) {
-    completed.push({
-      dimension: row.dimension,
-      title: `${insightDimensionLabel(row.dimension)} - ${row.archetype.name}`,
-      text: strengthInsightText(row),
-      priority: completed.length + 1,
-    });
-  }
-
-  if (watchout) {
-    completed.push({
-      dimension: watchout.dimension,
-      title: `${insightDimensionLabel(watchout.dimension)} - Fokus-Thema`,
-      text: watchoutInsightText(watchout),
-      priority: completed.length + 1,
-    });
-  }
-
-  if (completed.length >= 3) return completed.slice(0, 3);
-
-  const used = new Set(completed.map((entry) => entry.dimension));
-  const padded: KeyInsight[] = [...completed];
-  for (const dimension of REPORT_DIMENSIONS) {
-    if (padded.length >= 3) break;
-    if (used.has(dimension)) continue;
-    padded.push({
-      dimension,
-      title: `${insightDimensionLabel(dimension)} - Noch offen`,
-      text: "Für diese Dimension liegen aktuell noch zu wenige Antworten vor. Ergänze weitere Antworten, um eine belastbare Einordnung zu erhalten.",
-      priority: padded.length + 1,
-    });
-  }
-
-  return padded.slice(0, 3);
 }
 
 function coerceAssessmentModule(value: string | null | undefined): AssessmentModule | null {
@@ -631,6 +587,13 @@ function emptyDimensionCountRecord() {
   }, {} as Record<ReportDimension, number>);
 }
 
+function emptyFounderDimensionCountRecord() {
+  return FOUNDER_DIMENSION_ORDER.reduce((acc, dimension) => {
+    acc[dimension] = 0;
+    return acc;
+  }, {} as Record<FounderDimensionKey, number>);
+}
+
 async function getExpectedBaseQuestionCountByDimension(
   supabase: SupabaseLikeClient
 ): Promise<Record<ReportDimension, number>> {
@@ -649,6 +612,10 @@ async function getExpectedBaseQuestionCountByDimension(
     if (fallbackQuery.error || !fallbackQuery.data) {
       return fallback;
     }
+    assertFounderBaseQuestionVersionContract(
+      (fallbackQuery.data as QuestionMetaRow[]).map((row) => row.id),
+      "expected_base_question_count_by_dimension_fallback"
+    );
     for (const row of fallbackQuery.data as QuestionMetaRow[]) {
       const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
       if (!mapped) continue;
@@ -657,11 +624,49 @@ async function getExpectedBaseQuestionCountByDimension(
     return fallback;
   }
 
+  assertFounderBaseQuestionVersionContract(
+    (data as Array<QuestionMetaRow & { is_active?: boolean }>).map((row) => row.id),
+    "expected_base_question_count_by_dimension"
+  );
   for (const row of data as Array<QuestionMetaRow & { is_active?: boolean }>) {
     const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
     if (!mapped) continue;
     fallback[mapped] += 1;
   }
+  return fallback;
+}
+
+async function getExpectedFounderBaseQuestionCountByDimension(
+  supabase: SupabaseLikeClient
+): Promise<Record<FounderDimensionKey, number>> {
+  const fallback = emptyFounderDimensionCountRecord();
+  const { data, error } = await supabase
+    .from("questions")
+    .select("id, dimension, category, is_active")
+    .eq("category", "basis")
+    .eq("is_active", true);
+
+  const rows =
+    error || !data || data.length === 0
+      ? (
+          await supabase
+            .from("questions")
+            .select("id, dimension, category")
+            .eq("category", "basis")
+        ).data ?? []
+      : data;
+
+  assertFounderBaseQuestionVersionContract(
+    (rows as Array<QuestionMetaRow & { is_active?: boolean }>).map((row) => row.id),
+    "expected_founder_base_question_count_by_dimension"
+  );
+
+  for (const row of rows as Array<QuestionMetaRow & { is_active?: boolean }>) {
+    const mapped = row.dimension ? getFounderDimensionMeta(row.dimension)?.canonicalName : null;
+    if (!mapped) continue;
+    fallback[mapped] += 1;
+  }
+
   return fallback;
 }
 
@@ -847,7 +852,7 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
   const { data: invitationsData, error: invitationsError } = await supabase
     .from("invitations")
     .select(
-      "id, inviter_user_id, invitee_user_id, invitee_email, status, label, inviter_display_name, inviter_email, created_at, expires_at"
+      "id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, label, inviter_display_name, inviter_email, created_at, expires_at"
     )
     .or(invitationFilter)
     .order("created_at", { ascending: false });
@@ -923,6 +928,7 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
       id: invitation.id,
       direction,
       inviteeEmail: invitation.invitee_email,
+      teamContext: normalizeTeamContext(invitation.team_context),
       status: invitation.status,
       label: direction === "sent" ? invitation.label ?? null : null,
       inviterDisplayName: invitation.inviter_display_name ?? null,
@@ -984,7 +990,7 @@ async function getInvitationJoinDecisionInternal(
   const normalizedEmail = (user.email ?? "").trim().toLowerCase();
   const { data: invitationAccess, error: invitationAccessError } = await supabase
     .from("invitations")
-    .select("id, inviter_user_id, invitee_user_id, invitee_email, status, expires_at, revoked_at")
+    .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, expires_at, revoked_at")
     .eq("id", normalizedInvitationId)
     .maybeSingle();
   if (invitationAccessError || !invitationAccess) {
@@ -1000,6 +1006,7 @@ async function getInvitationJoinDecisionInternal(
     inviter_user_id: string;
     invitee_user_id: string | null;
     invitee_email: string;
+    team_context: string | null;
     status: string;
     expires_at: string;
     revoked_at: string | null;
@@ -1047,6 +1054,7 @@ async function getInvitationJoinDecisionInternal(
     ok: true,
     invitation_id: normalizedInvitationId,
     mode,
+    team_context: normalizeTeamContext(invitation.team_context),
     required_modules: requiredModules,
     missing_modules: missingModules,
     invitee_status: {
@@ -1314,7 +1322,7 @@ export async function debug_invitation_readiness(
   };
 }
 
-export async function getLatestSelfAlignmentReport(): Promise<SessionAlignmentReport | null> {
+export async function getLatestSelfAlignmentReport(): Promise<SelfAlignmentReport | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -1398,6 +1406,7 @@ export async function getLatestSelfAlignmentReport(): Promise<SessionAlignmentRe
     if (!valueQuestionMetaError && valueQuestionMetaRows) {
       valuesQuestionMetaRows = valueQuestionMetaRows as QuestionMetaRow[];
       assertValuesCategoryContract(valuesQuestionMetaRows, "self_report_values");
+      assertValuesQuestionVersionContract(valuesQuestionMetaRows, "self_report_values", { allowMissing: true });
     }
   }
   const valuesTotalActive = await countValuesQuestionsTotal(supabase, true);
@@ -1440,117 +1449,48 @@ export async function getLatestSelfAlignmentReport(): Promise<SessionAlignmentRe
   const profileName =
     (profileResult.data as { display_name?: string | null } | null)?.display_name?.trim() || "Du";
   const questionById = new Map((questionRows as QuestionMetaRow[]).map((row) => [row.id, row]));
-  const scoreBuckets = new Map<
-    ReportDimension,
-    { sum: number; count: number; questions: Array<{ questionId: string; value: number }> }
-  >(
-    REPORT_DIMENSIONS.map((dimension) => [
-      dimension,
-      { sum: 0, count: 0, questions: [] as Array<{ questionId: string; value: number }> },
-    ])
+  assertFounderBaseQuestionVersionContract(
+    [...questionById.keys()],
+    "self_report_answered_basis_questions",
+    { allowMissing: true }
   );
-
-  const answeredBaseQuestionIds = new Set<string>();
-  let totalNumericSum = 0;
-  let totalNumericCount = 0;
-  for (const answer of answers) {
-    const questionMeta = questionById.get(answer.question_id);
-    const mappedDimension = questionMeta?.dimension
-      ? mapGermanDimensionToReportKey(questionMeta.dimension)
-      : null;
-    if (!questionMeta || questionMeta.category !== "basis" || !mappedDimension) {
-      continue;
-    }
-
-    answeredBaseQuestionIds.add(answer.question_id);
-    const normalizedValue = normalizeBaseAnswerToReportScale(answer.choice_value);
-    if (normalizedValue == null) {
-      continue;
-    }
-
-    const bucket = scoreBuckets.get(mappedDimension);
-    if (!bucket) continue;
-    bucket.sum += normalizedValue;
-    bucket.count += 1;
-    totalNumericSum += normalizedValue;
-    totalNumericCount += 1;
-    bucket.questions.push({ questionId: answer.question_id, value: normalizedValue });
-  }
-
-  const scoresA = emptySeries();
-  const globalAverage = totalNumericCount > 0 ? round(totalNumericSum / totalNumericCount) : null;
-  for (const dimension of REPORT_DIMENSIONS) {
-    const bucket = scoreBuckets.get(dimension);
-    if (!bucket || bucket.count === 0) {
-      scoresA[dimension] = globalAverage;
-      continue;
-    }
-    scoresA[dimension] = round(bucket.sum / bucket.count);
-  }
-
-  const keyInsights = buildSelfKeyInsights(scoresA);
-  const completedAt = baseAssessment.submitted_at ?? baseAssessment.created_at;
+  const [expectedByDimension, baseTotalActive] = await Promise.all([
+    getExpectedFounderBaseQuestionCountByDimension(supabase),
+    countQuestionsByCategories(supabase, ["basis"], true),
+  ]);
+  const founderAggregate = aggregateFounderBaseScoresFromAnswers(answers, questionById, expectedByDimension);
+  const scoresA = founderAggregate.scores;
+  const keyInsights = buildSelfFounderKeyInsights(scoresA);
+  const basisTotal =
+    baseTotalActive > 0
+      ? baseTotalActive
+      : Object.values(founderAggregate.expectedByDimension).reduce((sum, value) => sum + value, 0);
 
   return {
     sessionId: baseAssessment.id,
     createdAt: baseAssessment.created_at,
-    personBInvitedAt: null,
-    personACompletedAt: completedAt,
-    personBCompletedAt: null,
     participantAId: user.id,
-    participantBId: null,
     participantAName: profileName,
-    participantBName: "—",
-    personBStatus: "match_ready",
-    personACompleted: true,
-    personBCompleted: false,
-    comparisonEnabled: false,
     scoresA,
-    scoresB: emptySeries(),
     keyInsights,
-    commonTendencies: keyInsights.map((insight) => insight.title),
-    frictionPoints: [],
     conversationGuideQuestions: [],
     valuesModulePreview,
     valuesModuleStatus,
     valuesAnsweredA: valuesAnsweredCount,
-    valuesAnsweredB: 0,
     valuesTotal,
-    basisAnsweredA: answeredBaseQuestionIds.size,
-    basisAnsweredB: 0,
-    basisTotal: 36,
-    valuesAlignmentPercent: null,
+    basisAnsweredA: founderAggregate.answeredQuestionCount,
+    basisTotal,
     valuesIdentityCategoryA: selfValuesProfile?.primaryLabel ?? null,
-    valuesIdentityCategoryB: null,
+    valuesPrimaryArchetypeIdA: selfValuesProfile?.primaryArchetypeId ?? null,
     valuesScoreA: selfValuesScore,
-    valuesScoreB: null,
     requestedScope: valuesModuleStatus === "completed" ? "basis_plus_values" : "basis",
-    inviteConsentCaptured: false,
     selfAssessmentMeta: {
       baseAssessmentId: baseAssessment.id,
       valuesAssessmentId,
     },
     selfValuesProfile,
-    debugA: {
-      participantName: profileName,
-      dimensions: REPORT_DIMENSIONS.map((dimension) => {
-        const bucket = scoreBuckets.get(dimension);
-        const rawScore = bucket && bucket.count > 0 ? round(bucket.sum / bucket.count) : null;
-        return {
-          dimension,
-          rawScore,
-          normalizedScore: rawScore == null ? null : round(rawScore / 6, 3),
-          category: "basis",
-          questions: (bucket?.questions ?? []).map((entry) => ({
-            questionId: entry.questionId,
-            value: entry.value,
-            max: 6,
-            normalized: round(entry.value / 6, 3),
-          })),
-        };
-      }),
-    },
-    debugB: null,
+    baseCoverageA: toSelfBaseCoverage(founderAggregate),
+    debugA: toSelfParticipantDebugReport(profileName, founderAggregate.debugDimensions),
   };
 }
 
@@ -1646,6 +1586,11 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     ...inviterBaseAnswers.map((row) => row.question_id),
     ...inviteeBaseAnswers.map((row) => row.question_id),
   ]);
+  assertFounderBaseQuestionVersionContract(
+    [...baseQuestionMetaById.keys()],
+    "ensure_report_run_answered_basis_questions",
+    { allowMissing: true }
+  );
   const inviterBaseScores = aggregateBaseScoresFromAnswers(
     inviterBaseAnswers,
     baseQuestionMetaById,
@@ -1656,6 +1601,15 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     baseQuestionMetaById,
     expectedByDimension
   );
+  const founderScoringInput = {
+    personA: transformFounderScoringAnswers(inviterBaseAnswers, baseQuestionMetaById),
+    personB: transformFounderScoringAnswers(inviteeBaseAnswers, baseQuestionMetaById),
+  };
+  const founderScoring = scoreFounderAlignment(founderScoringInput);
+  const founderReport = buildFounderAlignmentReport({
+    scoringResult: founderScoring,
+    teamContext: normalizeTeamContext(invitation.team_context),
+  });
 
   let valuesAssessmentIdA: string | null = null;
   let valuesAssessmentIdB: string | null = null;
@@ -1664,6 +1618,8 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   let valuesTotal = 0;
   let valuesIdentityCategoryA: string | null = null;
   let valuesIdentityCategoryB: string | null = null;
+  let valuesPrimaryArchetypeIdA: SessionAlignmentReport["valuesPrimaryArchetypeIdA"] = null;
+  let valuesPrimaryArchetypeIdB: SessionAlignmentReport["valuesPrimaryArchetypeIdB"] = null;
   let valuesScoreA: number | null = null;
   let valuesScoreB: number | null = null;
 
@@ -1689,6 +1645,7 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     ]);
     const valuesQuestionMetaRows = [...valuesQuestionMetaById.values()];
     assertValuesCategoryContract(valuesQuestionMetaRows, "ensure_report_run_values");
+    assertValuesQuestionVersionContract(valuesQuestionMetaRows, "ensure_report_run_values", { allowMissing: true });
     const valuesAnswersA = rawValuesAnswersA.filter((row) =>
       isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category)
     );
@@ -1718,8 +1675,10 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     });
     const valuesProfileA = scoreSelfValuesProfile(valuesInputA, valuesTotal);
     const valuesProfileB = scoreSelfValuesProfile(valuesInputB, valuesTotal);
-    valuesIdentityCategoryA = valuesProfileA?.primaryArchetypeId ?? null;
-    valuesIdentityCategoryB = valuesProfileB?.primaryArchetypeId ?? null;
+    valuesIdentityCategoryA = valuesProfileA?.primaryLabel ?? null;
+    valuesIdentityCategoryB = valuesProfileB?.primaryLabel ?? null;
+    valuesPrimaryArchetypeIdA = valuesProfileA?.primaryArchetypeId ?? null;
+    valuesPrimaryArchetypeIdB = valuesProfileB?.primaryArchetypeId ?? null;
     valuesScoreA = computeValuesContinuumScore(valuesProfileA);
     valuesScoreB = computeValuesContinuumScore(valuesProfileB);
   }
@@ -1765,6 +1724,8 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     valuesAlignmentPercent: null,
     valuesIdentityCategoryA,
     valuesIdentityCategoryB,
+    valuesPrimaryArchetypeIdA,
+    valuesPrimaryArchetypeIdB,
     valuesScoreA,
     valuesScoreB,
     requestedScope,
@@ -1818,8 +1779,12 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   );
 
   const payload = {
+    reportType: "founder_alignment_v1" as const,
     report: finalReport,
     compareJson,
+    founderReport,
+    founderScoring,
+    teamContext: normalizeTeamContext(invitation.team_context),
     modules: ensureBaseModule(requiredModules),
     inputAssessmentIds: [...new Set(inputAssessmentIds)],
     generatedAt: new Date().toISOString(),
@@ -2092,6 +2057,20 @@ function asCompareReportJson(value: unknown): CompareReportJson | null {
   return value as CompareReportJson;
 }
 
+function asFounderAlignmentReport(value: unknown): FounderAlignmentReport | null {
+  const record = toRecord(value);
+  if (!record) return null;
+  if (!record.executiveSummary || !record.sections) return null;
+  return value as FounderAlignmentReport;
+}
+
+function asFounderScoringResult(value: unknown): TeamScoringResult | null {
+  const record = toRecord(value);
+  if (!record) return null;
+  if (!Array.isArray(record.dimensions)) return null;
+  return value as TeamScoringResult;
+}
+
 function fallbackReport(invitationId: string, createdAt: string, payload: Record<string, unknown> | null) {
   const participantAName =
     typeof payload?.participantAName === "string" && payload.participantAName.trim().length > 0
@@ -2133,6 +2112,8 @@ function fallbackReport(invitationId: string, createdAt: string, payload: Record
     valuesAlignmentPercent: null,
     valuesIdentityCategoryA: null,
     valuesIdentityCategoryB: null,
+    valuesPrimaryArchetypeIdA: null,
+    valuesPrimaryArchetypeIdB: null,
     valuesScoreA: null,
     valuesScoreB: null,
     requestedScope: "basis",
@@ -2152,6 +2133,10 @@ function mapReportRunRow(row: ReportRunRow): ReportRunSnapshot {
 
   const nestedCompare = asCompareReportJson(payload?.compareJson);
   const directCompare = asCompareReportJson(payload?.compare_report);
+  const founderReport = asFounderAlignmentReport(payload?.founderReport);
+  const founderScoring = asFounderScoringResult(payload?.founderScoring);
+  const reportType =
+    payload?.reportType === "founder_alignment_v1" ? "founder_alignment_v1" : "classic_compare_v1";
 
   return {
     id: row.id,
@@ -2160,8 +2145,11 @@ function mapReportRunRow(row: ReportRunRow): ReportRunSnapshot {
     createdAt: row.created_at,
     modules: Array.isArray(row.modules) ? row.modules : [],
     inputAssessmentIds: Array.isArray(row.input_assessment_ids) ? row.input_assessment_ids : [],
+    reportType,
     report,
     compareJson: nestedCompare ?? directCompare ?? null,
+    founderReport,
+    founderScoring,
     payload,
   };
 }

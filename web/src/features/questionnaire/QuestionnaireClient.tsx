@@ -1,16 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitAssessment, upsertAssessmentAnswer } from "@/features/assessments/actions";
-
-export type QuestionnaireQuestion = {
-  id: string;
-  dimension: string;
-  type: string | null;
-  prompt: string;
-  sort_order: number;
-};
+import { ForcedChoiceQuestion } from "@/features/questionnaire/ForcedChoiceQuestion";
+import {
+  type QuestionnaireQuestion,
+  type QuestionnaireQuestionType,
+} from "@/features/questionnaire/questionnaireShared";
+import {
+  buildResearchClientProperties,
+  getOrCreateResearchFlowId,
+  trackResearchEvent,
+} from "@/features/research/client";
 
 export type QuestionnaireChoice = {
   id: string;
@@ -25,6 +27,12 @@ export type QuestionnaireResponse = {
   choice_value: string;
 };
 
+export type QuestionnaireAnswerState = {
+  question_id: string;
+  choice_id: string;
+  value: string;
+};
+
 type Props = {
   assessmentId: string;
   title: string;
@@ -37,27 +45,164 @@ type Props = {
   missingChoicesMessage?: string;
   onSaveAnswer?: (
     assessmentId: string,
-    questionId: string,
-    choiceValue: string
+    answer: QuestionnaireAnswerState
   ) => Promise<{ ok: boolean; error?: string }>;
   onSubmitAssessment?: (
     assessmentId: string
   ) => Promise<{ ok: boolean; submittedAt?: string; error?: string }>;
+  trackingContext?: {
+    module: "base" | "values";
+    invitationId?: string | null;
+  };
+  disableTracking?: boolean;
 };
 
-type Option = {
-  value: string;
-  label: string;
-};
+function normalizeQuestionType(type: string | null | undefined): QuestionnaireQuestionType | "unknown" {
+  if (type === "likert" || type === "scenario" || type === "forced_choice") {
+    return type;
+  }
+  return "unknown";
+}
 
-const defaultScaleOptions: Option[] = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
-  { value: "4", label: "4" },
-  { value: "5", label: "5" },
-  { value: "6", label: "6" },
-];
+function buildFallbackChoices(
+  type: QuestionnaireQuestionType | "unknown",
+  enabled: boolean
+): QuestionnaireChoice[] {
+  if (!enabled || (type !== "likert" && type !== "forced_choice")) {
+    return [];
+  }
+
+  return ["1", "2", "3", "4", "5"].map((value, index) => ({
+    id: `fallback-${type}-${value}`,
+    question_id: "",
+    label: value,
+    value,
+    sort_order: index,
+  }));
+}
+
+function nowMs() {
+  if (typeof performance !== "undefined" && typeof performance.now === "function") {
+    return performance.now();
+  }
+  return 0;
+}
+
+function normalizeForcedChoiceStatement(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function parseForcedChoiceStatements(question: QuestionnaireQuestion | null | undefined) {
+  const explicitA =
+    typeof question?.optionA === "string" && question.optionA.trim().length > 0
+      ? normalizeForcedChoiceStatement(question.optionA)
+      : typeof question?.option_a === "string" && question.option_a.trim().length > 0
+        ? normalizeForcedChoiceStatement(question.option_a)
+        : null;
+  const explicitB =
+    typeof question?.optionB === "string" && question.optionB.trim().length > 0
+      ? normalizeForcedChoiceStatement(question.optionB)
+      : typeof question?.option_b === "string" && question.option_b.trim().length > 0
+        ? normalizeForcedChoiceStatement(question.option_b)
+        : null;
+
+  if (explicitA && explicitB) {
+    return { statementA: explicitA, statementB: explicitB };
+  }
+
+  const source = String(question?.prompt ?? "").trim();
+  if (!source) {
+    return { statementA: null, statementB: null };
+  }
+
+  const separatedVariants = ["||", " | ", " <> ", " <-> ", " ↔ "];
+  for (const separator of separatedVariants) {
+    if (!source.includes(separator)) continue;
+    const parts = source
+      .split(separator)
+      .map((part) => normalizeForcedChoiceStatement(part))
+      .filter(Boolean);
+    if (parts.length >= 2) {
+      return {
+        statementA: parts[0],
+        statementB: parts[1],
+      };
+    }
+  }
+
+  const lineParts = source
+    .split(/\r?\n+/)
+    .map((part) => normalizeForcedChoiceStatement(part))
+    .filter(Boolean);
+  const filteredLineParts = lineParts.filter(
+    (part) => !/^welche aussage passt eher zu dir\??$/i.test(part)
+  );
+  if (filteredLineParts.length >= 2) {
+    return {
+      statementA: filteredLineParts[0],
+      statementB: filteredLineParts[1],
+    };
+  }
+  if (lineParts.length >= 2) {
+    return {
+      statementA: lineParts[0],
+      statementB: lineParts[1],
+    };
+  }
+
+  const labelledMatch = source.match(
+    /(?:aussage\s*a|a)\s*[:)\-]\s*(.+?)\s+(?:aussage\s*b|b)\s*[:)\-]\s*(.+)/i
+  );
+  if (labelledMatch) {
+    return {
+      statementA: normalizeForcedChoiceStatement(labelledMatch[1] ?? ""),
+      statementB: normalizeForcedChoiceStatement(labelledMatch[2] ?? ""),
+    };
+  }
+
+  return {
+    statementA: null,
+    statementB: null,
+  };
+}
+
+function getQuestionnaireEncouragement(params: {
+  module: "base" | "values" | null;
+  currentPosition: number;
+  total: number;
+}) {
+  const { module, currentPosition, total } = params;
+  if (total <= 0) return null;
+
+  const checkpoints = [...new Set([1, Math.ceil(total / 3), Math.ceil((2 * total) / 3), total])];
+  if (!checkpoints.includes(currentPosition)) {
+    return null;
+  }
+
+  if (module === "values") {
+    if (currentPosition === 1) {
+      return "Kurzer Zusatz mit viel Wirkung: Schon die ersten Antworten machen sichtbar, welche Leitplanken dir als Founder wichtig sind.";
+    }
+    if (currentPosition === total) {
+      return "Fast geschafft. Mit der letzten Antwort ist dein Werteprofil komplett.";
+    }
+    if (currentPosition >= Math.ceil((2 * total) / 3)) {
+      return "Starker Fortschritt. Gleich hast du auch den Werte-Layer fuer dein Profil sauber abgeschlossen.";
+    }
+    return "Gerade in den Zwischentoenen steckt hier viel Erkenntnis. Der erste ehrliche Impuls ist oft der hilfreichste.";
+  }
+
+  if (currentPosition === 1) {
+    return "Du musst hier nichts perfekt beantworten. Wichtig ist vor allem, was sich fuer dich im ersten Moment stimmig anfuehlt.";
+  }
+  if (currentPosition === total) {
+    return "Fast geschafft. Mit der letzten Antwort steht dein Basisprofil.";
+  }
+  if (currentPosition >= Math.ceil((2 * total) / 3)) {
+    return "Starker Fortschritt. Noch ein paar Antworten, dann ist dein Founder-Profil als Basis gesetzt.";
+  }
+  return "Du baust hier gerade Schritt fuer Schritt dein Founder-Profil auf. Kleine Unterschiede werden spaeter oft erstaunlich aufschlussreich.";
+}
 
 export function QuestionnaireClient({
   assessmentId,
@@ -67,18 +212,51 @@ export function QuestionnaireClient({
   choices,
   responses,
   completeRedirect,
-  allowDefaultScaleFallback = true,
+  allowDefaultScaleFallback = false,
   missingChoicesMessage = "Antwortoptionen konnten nicht geladen werden. Bitte neu laden.",
   onSaveAnswer,
   onSubmitAssessment,
+  trackingContext,
+  disableTracking = false,
 }: Props) {
   const router = useRouter();
 
-  const initialAnswers = useMemo(() => {
-    const map = new Map<string, string>();
-    responses.forEach((row) => map.set(row.question_id, row.choice_value));
+  const questionIds = useMemo(() => new Set(questions.map((question) => question.id)), [questions]);
+
+  const choicesByQuestionId = useMemo(() => {
+    const map = new Map<string, QuestionnaireChoice[]>();
+    [...choices]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .forEach((choice) => {
+        const existing = map.get(choice.question_id);
+        if (existing) {
+          existing.push(choice);
+          return;
+        }
+        map.set(choice.question_id, [choice]);
+      });
     return map;
-  }, [responses]);
+  }, [choices]);
+
+  const initialAnswers = useMemo(() => {
+    const map = new Map<string, QuestionnaireAnswerState>();
+    responses.forEach((row) => {
+      if (!questionIds.has(row.question_id)) {
+        return;
+      }
+
+      const matchedChoice = (choicesByQuestionId.get(row.question_id) ?? []).find(
+        (choice) => choice.value === row.choice_value
+      );
+
+      map.set(row.question_id, {
+        question_id: row.question_id,
+        choice_id: matchedChoice?.id ?? "",
+        value: matchedChoice?.value ?? row.choice_value,
+      });
+    });
+    return map;
+  }, [choicesByQuestionId, questionIds, responses]);
 
   const initialIndex = useMemo(() => {
     const firstOpen = questions.findIndex((question) => !initialAnswers.has(question.id));
@@ -86,33 +264,144 @@ export function QuestionnaireClient({
     return Math.max(0, questions.length - 1);
   }, [initialAnswers, questions]);
 
-  const [answers, setAnswers] = useState<Map<string, string>>(initialAnswers);
+  const [answers, setAnswers] = useState<Map<string, QuestionnaireAnswerState>>(initialAnswers);
   const [index, setIndex] = useState(initialIndex);
   const [saving, setSaving] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const flowIdRef = useRef<string | null>(null);
+  const startedAtRef = useRef<number>(0);
+  const questionShownAtRef = useRef<number>(0);
+  const hiddenAtRef = useRef<number | null>(null);
+  const accumulatedPauseMsRef = useRef<number>(0);
+  const answersCountRef = useRef<number>(initialAnswers.size);
 
   const total = questions.length;
   const current = questions[index];
   const currentPosition = total > 0 ? index + 1 : 0;
   const isLastQuestion = index === total - 1;
+  const initialCompletionRatio = total > 0 ? Math.min(1, initialAnswers.size / total) : null;
+  const currentType = normalizeQuestionType(current?.type);
+  const encouragement = getQuestionnaireEncouragement({
+    module: trackingContext?.module ?? null,
+    currentPosition,
+    total,
+  });
+
+  const flowScope = useMemo(() => {
+    const invitationPart = trackingContext?.invitationId?.trim() || "self";
+    return `invite_journey:${invitationPart}`;
+  }, [trackingContext?.invitationId]);
+
+  useEffect(() => {
+    answersCountRef.current = answers.size;
+  }, [answers]);
+
+  useEffect(() => {
+    if (disableTracking) {
+      flowIdRef.current = null;
+      startedAtRef.current = nowMs();
+      questionShownAtRef.current = startedAtRef.current;
+      hiddenAtRef.current = null;
+      accumulatedPauseMsRef.current = 0;
+      return;
+    }
+
+    const startedAt = nowMs();
+    flowIdRef.current = getOrCreateResearchFlowId(flowScope);
+    startedAtRef.current = startedAt;
+    questionShownAtRef.current = startedAt;
+    hiddenAtRef.current = null;
+    accumulatedPauseMsRef.current = 0;
+
+    trackResearchEvent({
+      eventName: "questionnaire_started",
+      invitationId: trackingContext?.invitationId ?? null,
+      module: trackingContext?.module ?? null,
+      flowId: flowIdRef.current,
+      completionRatio: initialCompletionRatio,
+      properties: buildResearchClientProperties({
+        assessmentId,
+        totalQuestions: total,
+      }),
+    });
+  }, [
+    assessmentId,
+    disableTracking,
+    flowScope,
+    initialCompletionRatio,
+    total,
+    trackingContext?.invitationId,
+    trackingContext?.module,
+  ]);
+
+  useEffect(() => {
+    if (disableTracking) {
+      return;
+    }
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        hiddenAtRef.current = nowMs();
+        return;
+      }
+
+      if (hiddenAtRef.current) {
+        accumulatedPauseMsRef.current += Math.max(0, nowMs() - hiddenAtRef.current);
+        hiddenAtRef.current = null;
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [disableTracking]);
+
+  useEffect(() => {
+    if (disableTracking || !current) return;
+    const viewedAt = nowMs();
+    questionShownAtRef.current = viewedAt;
+    trackResearchEvent({
+      eventName: "question_viewed",
+      invitationId: trackingContext?.invitationId ?? null,
+      module: trackingContext?.module ?? null,
+      flowId: flowIdRef.current,
+      questionId: current.id,
+      questionIndex: currentPosition,
+      elapsedMs: Math.max(0, viewedAt - startedAtRef.current),
+      pauseMs: accumulatedPauseMsRef.current,
+      completionRatio: total > 0 ? Math.min(1, answersCountRef.current / total) : null,
+      properties: buildResearchClientProperties({
+        assessmentId,
+      }),
+    });
+  }, [
+    assessmentId,
+    current,
+    currentPosition,
+    total,
+    trackingContext?.invitationId,
+    trackingContext?.module,
+    disableTracking,
+  ]);
 
   const currentOptions = useMemo(() => {
     if (!current) {
-      return [] as Option[];
+      return [] as QuestionnaireChoice[];
     }
 
-    const filtered = choices
-      .filter((choice) => choice.question_id === current.id)
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((choice) => ({ value: choice.value, label: choice.label }));
+    const filtered = choicesByQuestionId.get(current.id) ?? [];
 
     if (filtered.length > 0) {
       return filtered;
     }
 
-    return allowDefaultScaleFallback ? defaultScaleOptions : [];
-  }, [allowDefaultScaleFallback, choices, current]);
+    return buildFallbackChoices(normalizeQuestionType(current.type), allowDefaultScaleFallback);
+  }, [allowDefaultScaleFallback, choicesByQuestionId, current]);
+
+  const forcedChoiceStatements = useMemo(
+    () => parseForcedChoiceStatements(current),
+    [current]
+  );
 
   const handleBack = () => {
     if (saving || finishing) {
@@ -122,7 +411,7 @@ export function QuestionnaireClient({
     setIndex((prev) => Math.max(0, prev - 1));
   };
 
-  const handleSelect = async (value: string) => {
+  const handleSelect = async (choice: QuestionnaireChoice) => {
     if (!current || saving || finishing) {
       return;
     }
@@ -130,16 +419,22 @@ export function QuestionnaireClient({
     setSaving(true);
     setError(null);
     const previous = answers.get(current.id);
+    const selectedAt = nowMs();
+    const nextAnswer: QuestionnaireAnswerState = {
+      question_id: current.id,
+      choice_id: choice.id,
+      value: choice.value,
+    };
 
     setAnswers((prev) => {
       const next = new Map(prev);
-      next.set(current.id, value);
+      next.set(current.id, nextAnswer);
       return next;
     });
 
     const saveResult = onSaveAnswer
-      ? await onSaveAnswer(assessmentId, current.id, value)
-      : await upsertAssessmentAnswer(assessmentId, current.id, value);
+      ? await onSaveAnswer(assessmentId, nextAnswer)
+      : await upsertAssessmentAnswer(assessmentId, current.id, nextAnswer.value);
 
     if (!saveResult.ok) {
       setAnswers((prev) => {
@@ -154,6 +449,28 @@ export function QuestionnaireClient({
       setSaving(false);
       setError("Antwort konnte nicht gespeichert werden.");
       return;
+    }
+
+    const answeredCountAfter = previous ? answers.size : answers.size + 1;
+    if (!disableTracking) {
+      trackResearchEvent({
+        eventName: "answer_saved",
+        invitationId: trackingContext?.invitationId ?? null,
+        module: trackingContext?.module ?? null,
+        flowId: flowIdRef.current,
+        questionId: current.id,
+        questionIndex: currentPosition,
+        durationMs: Math.max(0, selectedAt - questionShownAtRef.current),
+        elapsedMs: Math.max(0, selectedAt - startedAtRef.current),
+        pauseMs: accumulatedPauseMsRef.current,
+        answerChanged: previous
+          ? previous.choice_id !== nextAnswer.choice_id || previous.value !== nextAnswer.value
+          : false,
+        completionRatio: total > 0 ? Math.min(1, answeredCountAfter / total) : null,
+        properties: buildResearchClientProperties({
+          assessmentId,
+        }),
+      });
     }
 
     if (!isLastQuestion) {
@@ -175,6 +492,23 @@ export function QuestionnaireClient({
       return;
     }
 
+    const submittedAt = nowMs();
+    if (!disableTracking) {
+      trackResearchEvent({
+        eventName: "questionnaire_submitted",
+        invitationId: trackingContext?.invitationId ?? null,
+        module: trackingContext?.module ?? null,
+        flowId: flowIdRef.current,
+        elapsedMs: Math.max(0, submittedAt - startedAtRef.current),
+        pauseMs: accumulatedPauseMsRef.current,
+        completionRatio: 1,
+        properties: buildResearchClientProperties({
+          assessmentId,
+          totalQuestions: total,
+        }),
+      });
+    }
+
     router.push(completeRedirect);
   };
 
@@ -187,7 +521,98 @@ export function QuestionnaireClient({
     );
   }
 
-  const selectedValue = answers.get(current.id);
+  const selectedAnswer = answers.get(current.id);
+  const unknownType = currentType === "unknown" ? current.type?.trim() || "unbekannt" : null;
+
+  const renderChoiceButton = (choice: QuestionnaireChoice, variant: "likert" | "scenario" | "default") => {
+    const active = selectedAnswer?.choice_id
+      ? selectedAnswer.choice_id === choice.id
+      : selectedAnswer?.value === choice.value;
+
+    const inactiveState =
+      "border-slate-200 bg-white text-slate-700 hover:border-violet-200 hover:bg-violet-50/70 hover:shadow-[0_8px_22px_rgba(124,58,237,0.08)]";
+    const activeState = "border-slate-900 bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.12)]";
+
+    const className =
+      variant === "likert"
+        ? `rounded-lg border px-4 py-3 text-center text-sm transition-all duration-200 ${
+            active ? activeState : inactiveState
+          } disabled:opacity-60`
+        : variant === "scenario"
+          ? `rounded-xl border px-4 py-4 text-left text-sm leading-6 transition-all duration-200 ${
+              active ? activeState : inactiveState
+            } disabled:opacity-60`
+          : `rounded-lg border px-4 py-3 text-left text-sm transition-all duration-200 ${
+              active ? activeState : inactiveState
+            } disabled:opacity-60`;
+
+    return (
+      <button
+        key={choice.id}
+        type="button"
+        onClick={() => {
+          void handleSelect(choice);
+        }}
+        disabled={saving || finishing}
+        className={className}
+      >
+        {variant === "scenario" ? (
+          <span className="flex items-start gap-3">
+            <span
+              className={`mt-1 h-3.5 w-3.5 rounded-full border ${
+                active ? "border-white bg-white" : "border-slate-300"
+              }`}
+              aria-hidden="true"
+            />
+            <span>{choice.label}</span>
+          </span>
+        ) : (
+          choice.label
+        )}
+      </button>
+    );
+  };
+
+  const renderChoices = () => {
+    if (currentOptions.length === 0) {
+      return (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {missingChoicesMessage}
+        </p>
+      );
+    }
+
+    if (currentType === "likert") {
+      return (
+        <div className="grid gap-3 sm:grid-cols-5">
+          {currentOptions.map((choice) => renderChoiceButton(choice, "likert"))}
+        </div>
+      );
+    }
+
+    if (currentType === "scenario") {
+      return <div className="grid gap-3">{currentOptions.map((choice) => renderChoiceButton(choice, "scenario"))}</div>;
+    }
+
+    if (currentType === "forced_choice") {
+      return (
+        <ForcedChoiceQuestion
+          options={currentOptions}
+          statementA={forcedChoiceStatements.statementA}
+          statementB={forcedChoiceStatements.statementB}
+          selectedChoiceId={selectedAnswer?.choice_id}
+          selectedValue={selectedAnswer?.value}
+          disabled={saving || finishing}
+          missingChoicesMessage={missingChoicesMessage}
+          onSelect={(choice) => {
+            void handleSelect(choice);
+          }}
+        />
+      );
+    }
+
+    return <div className="grid gap-3">{currentOptions.map((choice) => renderChoiceButton(choice, "default"))}</div>;
+  };
 
   return (
     <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
@@ -203,40 +628,27 @@ export function QuestionnaireClient({
         />
       </div>
 
-      <div className="mt-6 rounded-xl border border-slate-200/80 p-5">
-        <p className="text-xs uppercase tracking-[0.16em] text-slate-500">
-          Frage {currentPosition} von {total}
-        </p>
-        <p className="mt-2 text-base leading-8 text-slate-900">{current.prompt}</p>
-
-        <div className="mt-5 grid gap-3">
-          {currentOptions.length === 0 ? (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {missingChoicesMessage}
-            </p>
-          ) : (
-            currentOptions.map((option) => {
-              const active = selectedValue === option.value;
-              return (
-                <button
-                  key={`${current.id}-${option.value}`}
-                  type="button"
-                  onClick={() => {
-                    void handleSelect(option.value);
-                  }}
-                  disabled={saving || finishing}
-                  className={`rounded-lg border px-4 py-3 text-left text-sm transition ${
-                    active
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                  } disabled:opacity-60`}
-                >
-                  {option.label}
-                </button>
-              );
-            })
-          )}
+      {encouragement ? (
+        <div className="mt-4 rounded-2xl border border-violet-200/70 bg-violet-50/70 px-4 py-3 text-sm leading-7 text-slate-700">
+          {encouragement}
         </div>
+      ) : null}
+
+      <div className="mt-6 rounded-xl border border-slate-200/80 p-5">
+        {currentType === "forced_choice" ? (
+          <p className="text-base font-medium text-slate-900">Welche Aussage passt eher zu dir?</p>
+        ) : (
+          <p className="text-base leading-8 text-slate-900">{current.prompt}</p>
+        )}
+
+        {unknownType ? (
+          <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Unbekannter Fragetyp &quot;{unknownType}&quot;. Die Antwortoptionen werden als Standardliste
+            angezeigt.
+          </p>
+        ) : null}
+
+        <div className="mt-5">{renderChoices()}</div>
       </div>
 
       <div className="mt-5 flex items-center justify-between">

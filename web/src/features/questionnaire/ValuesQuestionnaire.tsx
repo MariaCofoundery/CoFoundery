@@ -3,9 +3,9 @@
 import {
   QuestionnaireClient,
   type QuestionnaireChoice,
-  type QuestionnaireQuestion,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
+import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 
 type Props = {
   assessmentId: string;
@@ -13,6 +13,10 @@ type Props = {
   choices: QuestionnaireChoice[];
   responses: QuestionnaireResponse[];
   completeRedirect?: string;
+  trackingContext?: {
+    module: "base" | "values";
+    invitationId?: string | null;
+  };
 };
 
 export function ValuesQuestionnaire({
@@ -21,6 +25,7 @@ export function ValuesQuestionnaire({
   choices,
   responses,
   completeRedirect = "/dashboard?valuesStatus=completed",
+  trackingContext,
 }: Props) {
   return (
     <QuestionnaireClient
@@ -31,6 +36,7 @@ export function ValuesQuestionnaire({
       choices={choices}
       responses={responses}
       completeRedirect={completeRedirect}
+      trackingContext={trackingContext}
     />
   );
 }

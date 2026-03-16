@@ -3,6 +3,21 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { inviteParticipantBAction } from "@/app/(product)/dashboard/actions";
+type TeamContext = "pre_founder" | "existing_team";
+
+function teamContextMeta(teamContext: TeamContext | null) {
+  if (teamContext === "existing_team") {
+    return {
+      badge: "Bestehendes Team",
+      text: "Dieser Invite fuehrt in einen Alignment-Flow fuer ein Team, das bereits zusammenarbeitet.",
+    };
+  }
+
+  return {
+    badge: "Moegliche Gruendungspartnerschaft",
+    text: "Dieser Invite fuehrt in einen Matching- und Kennenlern-Flow vor einer engeren Zusammenarbeit.",
+  };
+}
 
 type Props = {
   sessionId: string;
@@ -20,10 +35,12 @@ export function InviteParticipantForm({
   const router = useRouter();
   const [email, setEmail] = useState(defaultEmail);
   const [reportScope, setReportScope] = useState<"basis" | "basis_plus_values">("basis");
+  const [teamContext, setTeamContext] = useState<TeamContext | null>(null);
   const [inviteConsent, setInviteConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ text: string; tone: "success" | "warning" } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const selectedContextMeta = teamContextMeta(teamContext);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,6 +50,10 @@ export function InviteParticipantForm({
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
       setError("Bitte eine gültige E-Mail eingeben.");
+      return;
+    }
+    if (!teamContext) {
+      setError("Bitte wähle den Team-Kontext für diese Einladung.");
       return;
     }
     if (!inviteConsent) {
@@ -47,6 +68,7 @@ export function InviteParticipantForm({
       formData.set("sessionId", sessionId);
       formData.set("invitedEmail", invitedEmail);
       formData.set("reportScope", reportScope);
+      formData.set("teamContext", teamContext);
       formData.set("inviteConsent", inviteConsent ? "true" : "false");
       const result = await inviteParticipantBAction(formData);
       if (!result.ok) {
@@ -111,6 +133,50 @@ export function InviteParticipantForm({
             <option value="basis">Report-Umfang: Nur Basis</option>
             <option value="basis_plus_values">Report-Umfang: Basis + Werte-Add-on</option>
           </select>
+          <div className="rounded-xl border border-cyan-100 bg-cyan-50/70 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+              Team-Kontext
+            </p>
+            <p className="mt-2 text-xs leading-6 text-slate-600">
+              So ist frueh klar, ob ihr einen Matching-Flow oder ein Alignment fuer ein bestehendes Team startet.
+            </p>
+            <div className="mt-3 grid gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setTeamContext("pre_founder");
+                  setNotice(null);
+                }}
+                className={`rounded-lg border px-3 py-2 text-left text-xs transition ${
+                  teamContext === "pre_founder"
+                    ? "border-cyan-400 bg-white text-slate-900 shadow-[0_8px_18px_rgba(34,211,238,0.10)]"
+                    : "border-slate-200 bg-white/90 text-slate-700 hover:border-cyan-200"
+                }`}
+              >
+                Wir überlegen, zusammenzuarbeiten
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTeamContext("existing_team");
+                  setNotice(null);
+                }}
+                className={`rounded-lg border px-3 py-2 text-left text-xs transition ${
+                  teamContext === "existing_team"
+                    ? "border-cyan-400 bg-white text-slate-900 shadow-[0_8px_18px_rgba(34,211,238,0.10)]"
+                    : "border-slate-200 bg-white/90 text-slate-700 hover:border-cyan-200"
+                }`}
+              >
+                Wir arbeiten bereits zusammen
+              </button>
+            </div>
+            <div className="mt-3 rounded-xl border border-white/80 bg-white/85 px-3 py-3">
+              <p className="inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-700">
+                {selectedContextMeta.badge}
+              </p>
+              <p className="mt-2 text-xs leading-6 text-slate-600">{selectedContextMeta.text}</p>
+            </div>
+          </div>
           <label className="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
             <input
               type="checkbox"
@@ -129,7 +195,7 @@ export function InviteParticipantForm({
           <button
             type="submit"
             disabled={isPending}
-            className="rounded-lg bg-[color:var(--ink)] px-3 py-2 text-xs text-white disabled:opacity-60"
+            className="rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_10px_24px_rgba(103,232,249,0.16)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
           >
             {isPending ? "Sende..." : "Potenziellen Co-Founder einladen"}
           </button>
@@ -151,6 +217,9 @@ export function InviteParticipantForm({
           {notice.text}
         </p>
       ) : null}
+      <p className="mt-2 text-[11px] leading-5 text-slate-500">
+        Aktuell wird der Einladungslink manuell geteilt. Ein spaeterer E-Mail-Versand kann denselben Link verwenden.
+      </p>
     </div>
   );
 }

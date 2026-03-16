@@ -4,15 +4,18 @@ type ChartParticipant = {
   id: string;
   label: string;
   color: string;
-  scores: RadarSeries;
+  scores: Record<string, number | null> | RadarSeries;
 };
 
 type Props = {
   participants: ChartParticipant[];
   compact?: boolean;
+  dimensions?: readonly string[];
+  labels?: Record<string, string>;
+  valueScale?: "legacy_1_6" | "founder_percent";
 };
 
-const LABELS: Record<(typeof REPORT_DIMENSIONS)[number], string> = {
+const DEFAULT_LABELS: Record<(typeof REPORT_DIMENSIONS)[number], string> = {
   Vision: "Vision",
   Entscheidung: "Entscheidung",
   Risiko: "Risiko",
@@ -21,14 +24,21 @@ const LABELS: Record<(typeof REPORT_DIMENSIONS)[number], string> = {
   Konflikt: "Konflikt",
 };
 
-export function AlignmentRadarChart({ participants, compact = false }: Props) {
+export function AlignmentRadarChart({
+  participants,
+  compact = false,
+  dimensions,
+  labels,
+  valueScale = "legacy_1_6",
+}: Props) {
   const size = 560;
   const center = size / 2;
   const radius = 180;
   const levels = 6;
+  const activeDimensions = [...(dimensions ?? REPORT_DIMENSIONS)];
 
-  const axes = REPORT_DIMENSIONS.map((dimension, index) => {
-    const angle = (Math.PI * 2 * index) / REPORT_DIMENSIONS.length - Math.PI / 2;
+  const axes = activeDimensions.map((dimension, index) => {
+    const angle = (Math.PI * 2 * index) / activeDimensions.length - Math.PI / 2;
     const x = center + Math.cos(angle) * radius;
     const y = center + Math.sin(angle) * radius;
     const lx = center + Math.cos(angle) * (radius + 74);
@@ -73,7 +83,7 @@ export function AlignmentRadarChart({ participants, compact = false }: Props) {
         ))}
 
         {participants.map((participant) => {
-          const polygon = pointsFromSeries(participant.scores, axes, center);
+          const polygon = pointsFromSeries(participant.scores, axes, center, valueScale);
           if (!polygon) return null;
           return (
             <g key={participant.id}>
@@ -99,7 +109,9 @@ export function AlignmentRadarChart({ participants, compact = false }: Props) {
             fontSize="14"
             fill="rgb(30 41 59)"
           >
-            {LABELS[axis.dimension]}
+            {labels?.[axis.dimension] ??
+              DEFAULT_LABELS[axis.dimension as keyof typeof DEFAULT_LABELS] ??
+              axis.dimension}
           </text>
         ))}
       </svg>
@@ -114,14 +126,20 @@ export function AlignmentRadarChart({ participants, compact = false }: Props) {
 }
 
 function pointsFromSeries(
-  series: RadarSeries,
-  axes: { dimension: (typeof REPORT_DIMENSIONS)[number]; x: number; y: number }[],
-  center: number
+  series: Record<string, number | null> | RadarSeries,
+  axes: { dimension: string; x: number; y: number }[],
+  center: number,
+  valueScale: "legacy_1_6" | "founder_percent"
 ) {
+  const scoreMap = series as Record<string, number | null>;
   const points = axes.map((axis) => {
-    const value = series[axis.dimension];
-    const normalized = value == null ? 0 : Math.max(1, Math.min(6, value));
-    const ratio = value == null ? 0 : normalized / 6;
+    const value = scoreMap[axis.dimension];
+    const ratio =
+      value == null
+        ? 0
+        : valueScale === "founder_percent"
+          ? Math.max(0, Math.min(100, value)) / 100
+          : Math.max(1, Math.min(6, value)) / 6;
     const x = center + (axis.x - center) * ratio;
     const y = center + (axis.y - center) * ratio;
     return `${x},${y}`;

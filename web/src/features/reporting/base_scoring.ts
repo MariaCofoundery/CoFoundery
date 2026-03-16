@@ -4,6 +4,9 @@ import {
   type ReportDimension,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
+import { getFounderDimensionMeta, type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
+import { founderPercentToDisplayScore } from "@/features/scoring/founderBaseNormalization";
+import { scoreStoredBaseAnswerToFounderPercent } from "@/features/scoring/founderBaseQuestionMeta";
 
 export type AssessmentAnswerRow = {
   question_id: string;
@@ -46,6 +49,11 @@ function normalizeDimensionLabel(value: string) {
 }
 
 function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
+  const founderMeta = getFounderDimensionMeta(dim);
+  if (founderMeta) {
+    return mapFounderDimensionToReportKey(founderMeta.canonicalName);
+  }
+
   const normalized = normalizeDimensionLabel(dim);
   if (!normalized) return null;
 
@@ -79,6 +87,15 @@ function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
   return null;
 }
 
+function mapFounderDimensionToReportKey(dimension: FounderDimensionKey): ReportDimension {
+  if (dimension === "Vision & Unternehmenshorizont") return "Vision";
+  if (dimension === "Entscheidungslogik") return "Entscheidung";
+  if (dimension === "Risikoorientierung") return "Risiko";
+  if (dimension === "Arbeitsstruktur & Zusammenarbeit") return "Autonomie";
+  if (dimension === "Commitment") return "Verbindlichkeit";
+  return "Konflikt";
+}
+
 function emptyDimensionCountRecord() {
   return REPORT_DIMENSIONS.reduce((acc, dimension) => {
     acc[dimension] = 0;
@@ -89,18 +106,6 @@ function emptyDimensionCountRecord() {
 function round(value: number, precision = 2) {
   const factor = 10 ** precision;
   return Math.round(value * factor) / factor;
-}
-
-function normalizeBaseAnswerToReportScale(rawValue: string): number | null {
-  const parsedValue = Number.parseFloat(rawValue);
-  if (!Number.isFinite(parsedValue)) return null;
-
-  if (parsedValue >= 1 && parsedValue <= 4) {
-    // Canonical basis normalization: DB likert (1..4) -> report scale (1..6)
-    return round(1 + ((parsedValue - 1) / 3) * 5, 3);
-  }
-
-  return Math.max(1, Math.min(6, parsedValue));
 }
 
 export function assertValuesTotalCategoryContract(
@@ -144,10 +149,15 @@ export function aggregateBaseScoresFromAnswers(
     }
 
     answeredBaseQuestionIds.add(answer.question_id);
-    const normalizedValue = normalizeBaseAnswerToReportScale(answer.choice_value);
-    if (normalizedValue == null) {
+    const normalizedPercent = scoreStoredBaseAnswerToFounderPercent(
+      answer.question_id,
+      answer.choice_value
+    );
+    if (normalizedPercent == null) {
       continue;
     }
+    const normalizedValue = founderPercentToDisplayScore(normalizedPercent);
+    if (normalizedValue == null) continue;
 
     const bucket = scoreBuckets.get(mappedDimension);
     if (!bucket) continue;

@@ -367,7 +367,7 @@ export const VALUES_REPORT_CONTENT = {
     symbiose: {
       label: "Werte-Symbiose",
       intro:
-        "Eure Wertearchitektur ist in den Kernprinzipien hoch kohärent. Das schafft eine belastbare Grundlage für Vertrauen, Entscheidbarkeit und externe Glaubwürdigkeit.",
+        "Ihr liegt in euren Grundsaetzen nah beieinander. Das schafft Vertrauen und macht Grundsatzentscheidungen im Alltag leichter.",
       shared: [
         "Ihr bewertet Fairness und Verantwortung nach ähnlichen Maßstäben.",
         "In kritischen Situationen ist die Wahrscheinlichkeit verdeckter Wertekonflikte gering.",
@@ -382,7 +382,7 @@ export const VALUES_REPORT_CONTENT = {
     schnittmenge: {
       label: "Werte-Schnittmenge",
       intro:
-        "Ihr teilt zentrale Werteprinzipien, setzt aber unterschiedliche Schwerpunkte in der praktischen Umsetzung. Das ist gut handhabbar, wenn Entscheidungsregeln explizit sind.",
+        "Ihr teilt eine klare gemeinsame Basis, setzt aber im Alltag teils andere Schwerpunkte. Mit klaren Regeln kann das sehr gut funktionieren.",
       shared: [
         "Es besteht eine tragfähige gemeinsame Basis für verantwortliche Zusammenarbeit.",
         "Ihr habt genug normative Überschneidung, um Konflikte konstruktiv zu verarbeiten.",
@@ -397,7 +397,7 @@ export const VALUES_REPORT_CONTENT = {
     spannungsfeld: {
       label: "Werte-Spannungsfeld",
       intro:
-        "Eure Werteprofile sind komplementär, aber deutlich unterschiedlich priorisiert. Das kann strategisch wertvoll sein, erfordert jedoch eine bewusst moderierte Zusammenarbeit.",
+        "Ihr bringt unterschiedliche Prioritaeten mit. Genau darin kann Staerke liegen, solange ihr fuer Situationen unter Druck klare Leitplanken vereinbart.",
       shared: [
         "Trotz Unterschiede besteht die Chance auf ein starkes Korrektiv gegen einseitige Entscheidungen.",
       ],
@@ -412,16 +412,16 @@ export const VALUES_REPORT_CONTENT = {
   },
   pairing: {
     "Business-Pragmatiker|Business-Pragmatiker":
-      "Euer Profil ist stark auf wirtschaftliche Entscheidbarkeit ausgerichtet. Achtet darauf, Reputation und Kultur bewusst mitzusteuern.",
+      "Ihr kommt beide stark aus Ergebnis- und Umsetzungslogik. Gut ist, frueh mitzudenken, wie Teamkultur und Reputation mitgetragen werden sollen.",
     "Impact-Idealist|Impact-Idealist":
-      "Euer Profil ist stark wertezentriert. Definiert klare wirtschaftliche Leitplanken, damit ethischer Anspruch operativ tragfähig bleibt.",
+      "Ihr seid beide stark werteorientiert. Hilfreich sind klare Leitplanken, damit Anspruch und wirtschaftliche Realitaet im Alltag zusammenpassen.",
     "Verantwortungs-Stratege|Verantwortungs-Stratege":
-      "Euer Profil verbindet Verantwortung und Wirtschaftlichkeit. Das ist eine robuste Basis für konsistente Führung.",
+      "Ihr verbindet beide Verantwortung mit wirtschaftlicher Realitaet. Das ist eine starke Basis fuer konsistente Fuehrung.",
     "Business-Pragmatiker|Impact-Idealist":
-      "Hier trifft Ergebnisorientierung auf Werteklarheit. Mit klaren Entscheidungskriterien entsteht ein starkes Balance-Modell.",
+      "Hier trifft klare Ergebnisorientierung auf starke Werteklarheit. Mit guten Entscheidungsregeln kann daraus eine produktive Balance entstehen.",
     "Business-Pragmatiker|Verantwortungs-Stratege":
-      "Hier trifft Umsetzungsdruck auf verantwortungsorientierte Steuerung. Klare Priorisierungsregeln erhöhen die Zusammenarbeitssicherheit.",
+      "Hier trifft Umsetzungsdruck auf verantwortungsorientierte Steuerung. Klare Prioritaeten helfen, dass Tempo und Tragfaehigkeit zusammenpassen.",
     "Impact-Idealist|Verantwortungs-Stratege":
-      "Hier trifft hoher Werteanspruch auf integrative Steuerung. Das kann kulturell stark wirken, braucht aber operative Präzision.",
+      "Hier trifft klarer Werteanspruch auf integrative Steuerung. Das kann sehr stark sein, wenn operative Entscheidungen trotzdem eindeutig bleiben.",
   },
 } as const;

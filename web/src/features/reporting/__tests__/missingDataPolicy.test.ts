@@ -12,6 +12,7 @@ import {
 } from "@/features/reporting/generateCompareReport";
 import { REPORT_DIMENSIONS, type RadarSeries, type ReportDimension } from "@/features/reporting/types";
 import { getDiffClass } from "@/features/reporting/report_texts.de";
+import { VALUES_QUESTION_DEFINITIONS } from "@/features/reporting/valuesQuestionMeta";
 
 type BaseAnswerRow = {
   question_id: string;
@@ -206,11 +207,12 @@ test("delta label boundaries map deterministically via DiffClass thresholds", ()
 });
 
 test("values flow contract check enforces valuesTotal == count(category='values')", () => {
+  const expectedValuesTotal = VALUES_QUESTION_DEFINITIONS.length;
   assert.doesNotThrow(() => {
-    assertValuesTotalCategoryContract(10, 10, "values_flow_test");
+    assertValuesTotalCategoryContract(expectedValuesTotal, expectedValuesTotal, "values_flow_test");
   });
   assert.throws(
-    () => assertValuesTotalCategoryContract(10, 9, "values_flow_test"),
+    () => assertValuesTotalCategoryContract(expectedValuesTotal, expectedValuesTotal - 1, "values_flow_test"),
     /values_total_contract_mismatch/
   );
 });

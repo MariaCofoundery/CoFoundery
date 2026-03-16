@@ -2,6 +2,7 @@
 
 import { createHash, randomBytes } from "crypto";
 import { redirect } from "next/navigation";
+import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { createClient } from "@/lib/supabase/server";
 
 type EmailStatus = "sent" | "not_sent";
@@ -62,6 +63,13 @@ function parseBooleanEntry(value: FormDataEntryValue | null) {
   return normalized === "1" || normalized === "true" || normalized === "on" || normalized === "yes";
 }
 
+function parseTeamContextEntry(value: FormDataEntryValue | null): TeamContext | null {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (normalized === "pre_founder") return "pre_founder";
+  if (normalized === "existing_team") return "existing_team";
+  return null;
+}
+
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
@@ -86,6 +94,7 @@ async function createInvitation(params: {
   invitedEmail: string;
   label?: string | null;
   reportScope: "basis" | "basis_plus_values";
+  teamContext: TeamContext;
 }): Promise<InviteActionResult> {
   const supabase = await createClient();
   const {
@@ -124,6 +133,7 @@ async function createInvitation(params: {
       label: params.label ?? invitedEmail,
       inviter_display_name: inviterDisplayName,
       inviter_email: inviterEmail,
+      team_context: params.teamContext,
       token_hash: tokenHash,
       expires_at: expiresAt,
       status: "sent",
@@ -287,18 +297,22 @@ export async function saveProfileOnboardingAction(formData: FormData) {
 export async function inviteParticipantBAction(formData: FormData): Promise<InviteActionResult> {
   const invitedEmail = String(formData.get("invitedEmail") ?? "");
   const reportScope = parseReportScope(formData.get("reportScope"));
-  return createInvitation({ invitedEmail, reportScope });
+  const teamContext = parseTeamContextEntry(formData.get("teamContext"));
+  if (!teamContext) {
+    return { ok: false, error: "ungueltiger_teamkontext" };
+  }
+  return createInvitation({ invitedEmail, reportScope, teamContext });
 }
 
-export async function deleteArchivedSessionAction(_formData: FormData) {
+export async function deleteArchivedSessionAction() {
   redirect("/dashboard?error=legacy_sessions_disabled");
 }
 
-export async function deleteSessionAction(_sessionId: string): Promise<{ ok: boolean; error?: string }> {
+export async function deleteSessionAction(): Promise<{ ok: boolean; error?: string }> {
   return { ok: false, error: "legacy_sessions_disabled" };
 }
 
-export async function getMySessionResponsesAction(_sessionId: string): Promise<
+export async function getMySessionResponsesAction(): Promise<
   { ok: true; rows: MySessionResponseRow[]; role: string | null } | { ok: false; error: string }
 > {
   return {
@@ -307,27 +321,34 @@ export async function getMySessionResponsesAction(_sessionId: string): Promise<
   };
 }
 
-export async function restoreResponsesToSessionAction(
-  _sourceSessionId: string,
-  _targetSessionId: string
-): Promise<{ ok: boolean; error?: string }> {
+export async function restoreResponsesToSessionAction(): Promise<{ ok: boolean; error?: string }> {
   return { ok: false, error: "legacy_responses_disabled" };
 }
 
 export async function createComparisonFromExistingAction(formData: FormData): Promise<InviteActionResult> {
   const invitedEmail = String(formData.get("invitedEmail") ?? "");
   const reportScope = parseReportScope(formData.get("reportScope"));
-  return createInvitation({ invitedEmail, reportScope });
+  const teamContext = parseTeamContextEntry(formData.get("teamContext"));
+  if (!teamContext) {
+    return { ok: false, error: "ungueltiger_teamkontext" };
+  }
+  return createInvitation({ invitedEmail, reportScope, teamContext });
 }
 
 export async function createCoFounderInvitationAction(formData: FormData): Promise<InviteActionResult> {
   const invitedEmail = String(formData.get("invitedEmail") ?? "");
   const labelRaw = String(formData.get("label") ?? "").trim();
   const includeValues = parseBooleanEntry(formData.get("includeValues"));
+  const teamContext = parseTeamContextEntry(formData.get("teamContext"));
+
+  if (!teamContext) {
+    return { ok: false, error: "ungueltiger_teamkontext" };
+  }
 
   return createInvitation({
     invitedEmail,
     label: labelRaw.length > 0 ? labelRaw : null,
     reportScope: includeValues ? "basis_plus_values" : "basis",
+    teamContext,
   });
 }
