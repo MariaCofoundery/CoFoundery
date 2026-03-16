@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
 type MagicLinkFormProps = {
   nextPath?: string;
@@ -19,7 +19,16 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
     setStatus("loading");
     setMessage("");
 
-    const origin = getPublicAppOrigin(window.location.origin);
+    const origin =
+      getPublicAppOrigin(window.location.origin) ||
+      (isLocalDevelopmentOrigin(window.location.origin) ? window.location.origin : "");
+
+    if (!origin) {
+      setStatus("error");
+      setMessage("Login-Konfiguration unvollständig. Bitte prüfe die öffentliche App-URL.");
+      return;
+    }
+
     const redirectTo = new URL("/auth/callback", `${origin}/`);
     redirectTo.searchParams.set("next", nextPath);
 
