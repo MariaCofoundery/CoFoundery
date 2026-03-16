@@ -70,7 +70,7 @@ export default async function AdvisorDashboardPage() {
               {teams.length} aktive Team{teams.length === 1 ? "" : "s"}
             </h2>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Fokus fuer V1: klare Teamliste, direkter Sprung ins Workbook und sichtbare offene
+              Fokus für V1: klare Teamliste, direkter Sprung ins Workbook und sichtbare offene
               Advisor-Impulse.
             </p>
           </div>
@@ -98,7 +98,7 @@ export default async function AdvisorDashboardPage() {
               </div>
 
               <div className="max-w-2xl">
-                <p className="text-lg font-semibold text-slate-900">Noch keine Teams verknuepft</p>
+                <p className="text-lg font-semibold text-slate-900">Noch keine Teams verknüpft</p>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
                   Sobald du zu einem Founder-Team als Advisor eingeladen wirst, erscheinen deine begleiteten Teams hier.
                 </p>
@@ -137,7 +137,7 @@ export default async function AdvisorDashboardPage() {
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Link href={team.workbookHref} className={PRIMARY_CTA_CLASS}>
-                    Workbook oeffnen
+                    Workbook öffnen
                   </Link>
                   {team.reportReady ? (
                     <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
@@ -149,7 +149,7 @@ export default async function AdvisorDashboardPage() {
                     </span>
                   )}
                   <Link href={team.advisorActionHref} className={SECONDARY_CTA_CLASS}>
-                    Advisor-Impulse ergaenzen
+                    Advisor-Impulse ergänzen
                   </Link>
                   <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
                     Snapshot exportieren

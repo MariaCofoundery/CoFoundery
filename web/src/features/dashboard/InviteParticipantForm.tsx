@@ -9,13 +9,13 @@ function teamContextMeta(teamContext: TeamContext | null) {
   if (teamContext === "existing_team") {
     return {
       badge: "Bestehendes Team",
-      text: "Dieser Invite fuehrt in einen Alignment-Flow fuer ein Team, das bereits zusammenarbeitet.",
+      text: "Dieser Invite führt in einen Alignment-Flow für ein Team, das bereits zusammenarbeitet.",
     };
   }
 
   return {
-    badge: "Moegliche Gruendungspartnerschaft",
-    text: "Dieser Invite fuehrt in einen Matching- und Kennenlern-Flow vor einer engeren Zusammenarbeit.",
+    badge: "Mögliche Gründungspartnerschaft",
+    text: "Dieser Invite führt in einen Matching- und Kennenlern-Flow vor einer engeren Zusammenarbeit.",
   };
 }
 
@@ -138,7 +138,7 @@ export function InviteParticipantForm({
               Team-Kontext
             </p>
             <p className="mt-2 text-xs leading-6 text-slate-600">
-              So ist frueh klar, ob ihr einen Matching-Flow oder ein Alignment fuer ein bestehendes Team startet.
+              So ist früh klar, ob ihr einen Matching-Flow oder ein Alignment für ein bestehendes Team startet.
             </p>
             <div className="mt-3 grid gap-2">
               <button
@@ -218,7 +218,7 @@ export function InviteParticipantForm({
         </p>
       ) : null}
       <p className="mt-2 text-[11px] leading-5 text-slate-500">
-        Aktuell wird der Einladungslink manuell geteilt. Ein spaeterer E-Mail-Versand kann denselben Link verwenden.
+        Aktuell wird der Einladungslink manuell geteilt. Ein späterer E-Mail-Versand kann denselben Link verwenden.
       </p>
     </div>
   );

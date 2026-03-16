@@ -28,15 +28,15 @@ export default async function MeBaseCompletePage() {
     <QuestionnaireCompletionShell
       eyebrow="Basisprofil"
       title="Stark. Dein Basisprofil steht."
-      description="Deine Antworten sind gespeichert und bilden jetzt die Grundlage fuer dein Founder-Profil. Du kannst direkt weitermachen oder dir zuerst schon deinen individuellen Report ansehen."
+      description="Deine Antworten sind gespeichert und bilden jetzt die Grundlage für dein Founder-Profil. Du kannst direkt weitermachen oder dir zuerst schon deinen individuellen Report ansehen."
       supportingText={
         valuesCompleted
-          ? "Dein Werteprofil ist bereits vorhanden. Damit ist dein Profil gerade besonders aussagekraeftig."
-          : "Das Werteprofil ist der naechste optionale Layer. Es macht sichtbar, welche inneren Prioritaeten deine Entscheidungen als Founder praegen."
+          ? "Dein Werteprofil ist bereits vorhanden. Damit ist dein Profil gerade besonders aussagekräftig."
+          : "Das Werteprofil ist der nächste optionale Layer. Es macht sichtbar, welche inneren Prioritäten deine Entscheidungen als Founder prägen."
       }
       highlight={
         valuesCompleted
-          ? "Alles Wichtige ist da: Basisprofil und Werteprofil sind beide verfuegbar."
+          ? "Alles Wichtige ist da: Basisprofil und Werteprofil sind beide verfügbar."
           : "Wenn du direkt weitermachst, ist das Werteprofil in wenigen Minuten abgeschlossen."
       }
       actions={
@@ -48,7 +48,7 @@ export default async function MeBaseCompletePage() {
           : [
               { href: "/me/values", label: "Werteprofil starten" },
               { href: "/me/report", label: "Report jetzt ansehen", variant: "secondary" },
-              { href: "/dashboard", label: "Spaeter weitermachen", variant: "ghost" },
+              { href: "/dashboard", label: "Später weitermachen", variant: "ghost" },
             ]
       }
     />

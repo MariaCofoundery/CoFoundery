@@ -245,7 +245,7 @@ export default async function DashboardPage({
     { id: "dashboard-journey-profile", label: "Profil", completed: hasSubmittedBase },
     { id: "dashboard-journey-values", label: "Werteprofil", completed: hasSubmittedValues },
     { id: "dashboard-journey-matching", label: "Matching", completed: hasMatchingActivity },
-    { id: "dashboard-journey-conversation", label: "Gespraech", completed: readyReports.length > 0 },
+    { id: "dashboard-journey-conversation", label: "Gespräch", completed: readyReports.length > 0 },
     { id: "dashboard-journey-workbook", label: "Workbook", completed: false },
   ];
   const selfReportDebug = selfReport

@@ -23,14 +23,14 @@ type PageProps = {
 function reportContextMeta(teamContext: string | null | undefined) {
   if (teamContext === "existing_team") {
     return {
-      badge: "Bestehendes Gruenderteam",
-      text: "Dieser Report ist im Kontext eines bestehenden Teams zu lesen und fokussiert deshalb staerker auf Zusammenarbeit, Abstimmung und operative Spannungen.",
+      badge: "Bestehendes Gründerteam",
+      text: "Dieser Report ist im Kontext eines bestehenden Teams zu lesen und fokussiert deshalb stärker auf Zusammenarbeit, Abstimmung und operative Spannungen.",
     };
   }
 
   return {
-    badge: "Moegliche Gruendungspartnerschaft",
-    text: "Dieser Report ist im Kontext einer moeglichen Zusammenarbeit zu lesen und fokussiert deshalb staerker auf Passung, Erwartungen und fruehe Alignment-Fragen.",
+    badge: "Mögliche Gründungspartnerschaft",
+    text: "Dieser Report ist im Kontext einer möglichen Zusammenarbeit zu lesen und fokussiert deshalb stärker auf Passung, Erwartungen und frühe Alignment-Fragen.",
   };
 }
 

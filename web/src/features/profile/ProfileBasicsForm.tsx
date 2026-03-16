@@ -111,7 +111,7 @@ export function ProfileBasicsForm({
         <fieldset className="grid gap-3 text-sm text-slate-700 md:col-span-2">
           <legend className="text-sm font-medium text-slate-900">Deine Rollen</legend>
           <p className="text-xs leading-6 text-slate-500">
-            Waehle aus, in welchen Ansichten du CoFoundery aktuell nutzen moechtest. Rollen steuern
+            Wähle aus, in welchen Ansichten du CoFoundery aktuell nutzen möchtest. Rollen steuern
             die sichtbaren Dashboard-Modi, nicht automatisch konkrete Team-Zugriffe.
           </p>
           <div className="grid gap-3 md:grid-cols-2">

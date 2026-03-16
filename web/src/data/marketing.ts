@@ -1,5 +1,6 @@
 export const nav = [
   { label: "Haltung", href: "/informierte-entscheidungen" },
+  { label: "Für wen", href: "/#fuer-wen" },
   { label: "Produkt", href: "/#produkt" },
   { label: "Ablauf", href: "/#ablauf" },
   { label: "FAQ", href: "/#faq" },
@@ -7,16 +8,16 @@ export const nav = [
 
 export const features = [
   {
-    title: "Kompatibilität statt Bauchgefühl",
-    text: "Vergleicht Entscheidungslogik, Verantwortung und Tempo entlang klarer Dimensionen.",
+    title: "Strukturierter Vergleich",
+    text: "Ihr vergleicht Entscheidungslogik, Verantwortung, Tempo und Zusammenarbeit entlang klarer Founder-Dimensionen.",
   },
   {
-    title: "Asynchron und anonym",
-    text: "Beide Personen beantworten getrennt. Erst danach wird der Vergleich freigegeben.",
+    title: "Report, Leitfaden, Workbook",
+    text: "Aus den Antworten entsteht nicht nur ein Report, sondern direkt ein Gesprächsleitfaden und ein gemeinsames Workbook.",
   },
   {
-    title: "Direkt nutzbarer Report",
-    text: "Ihr bekommt konkrete Gesprächspunkte statt vager Insights.",
+    title: "Optional mit Advisor-Kontext",
+    text: "Advisors, Accelerators oder Investoren können strukturiert begleiten, ohne die Founder-Perspektive zu überlagern.",
   },
 ];
 
@@ -24,16 +25,16 @@ export const steps = [
   {
     step: "01",
     title: "Session erstellen",
-    text: "Person A startet die Session und erhält zwei sichere Links.",
+    text: "Eine Person startet die Session, wählt den Team-Kontext und teilt den sicheren Link mit der zweiten Person.",
   },
   {
     step: "02",
-    title: "Fragebogen ausfüllen",
-    text: "36 Fragen in 6 Dimensionen. Antworten werden fortlaufend gespeichert.",
+    title: "Basisprofil ausfüllen",
+    text: "Beide bearbeiten den Basisfragebogen mit 48 Fragen. Optional kommt das Werte-Add-on dazu.",
   },
   {
     step: "03",
-    title: "Vergleich lesen",
-    text: "Wenn beide abgeschlossen haben, ist der Report sofort verfügbar.",
+    title: "Gemeinsam weiterarbeiten",
+    text: "Danach stehen Report, Gesprächsleitfaden und Workbook bereit, um Entscheidungen sauber weiterzuführen.",
   },
 ];

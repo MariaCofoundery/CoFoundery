@@ -80,15 +80,15 @@ function isInvitationExpired(expiresAt: string | null | undefined) {
 function invitationContextMeta(teamContext: string | null | undefined) {
   if (teamContext === "existing_team") {
     return {
-      badge: "Bestehendes Gruenderteam",
-      title: "Diese Einladung laeuft im Modus fuer ein bestehendes Team.",
-      text: "Der folgende Flow ist staerker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet.",
+      badge: "Bestehendes Gründerteam",
+      title: "Diese Einladung läuft im Modus für ein bestehendes Team.",
+      text: "Der folgende Flow ist stärker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet.",
     };
   }
 
   return {
-    badge: "Moegliche Gruendungspartnerschaft",
-    title: "Diese Einladung laeuft im Modus fuer fruehes Matching.",
+    badge: "Mögliche Gründungspartnerschaft",
+    title: "Diese Einladung läuft im Modus für frühes Matching.",
     text: "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen.",
   };
 }

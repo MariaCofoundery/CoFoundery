@@ -52,7 +52,7 @@ export function ForcedChoiceQuestion({
     return (
       <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4">
         <p className="text-sm text-amber-900">
-          Fuer Forced-Choice wurden weniger als 5 Antwortstufen geladen. Die Frage wird als einfache Auswahlliste
+          Für Forced-Choice wurden weniger als 5 Antwortstufen geladen. Die Frage wird als einfache Auswahlliste
           angezeigt.
         </p>
         <div className="mt-4 grid gap-3">

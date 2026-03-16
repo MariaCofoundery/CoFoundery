@@ -187,13 +187,13 @@ function getQuestionnaireEncouragement(params: {
       return "Fast geschafft. Mit der letzten Antwort ist dein Werteprofil komplett.";
     }
     if (currentPosition >= Math.ceil((2 * total) / 3)) {
-      return "Starker Fortschritt. Gleich hast du auch den Werte-Layer fuer dein Profil sauber abgeschlossen.";
+      return "Starker Fortschritt. Gleich hast du auch den Werte-Layer für dein Profil sauber abgeschlossen.";
     }
-    return "Gerade in den Zwischentoenen steckt hier viel Erkenntnis. Der erste ehrliche Impuls ist oft der hilfreichste.";
+    return "Gerade in den Zwischentönen steckt hier viel Erkenntnis. Der erste ehrliche Impuls ist oft der hilfreichste.";
   }
 
   if (currentPosition === 1) {
-    return "Du musst hier nichts perfekt beantworten. Wichtig ist vor allem, was sich fuer dich im ersten Moment stimmig anfuehlt.";
+    return "Du musst hier nichts perfekt beantworten. Wichtig ist vor allem, was sich für dich im ersten Moment stimmig anfühlt.";
   }
   if (currentPosition === total) {
     return "Fast geschafft. Mit der letzten Antwort steht dein Basisprofil.";
@@ -201,7 +201,7 @@ function getQuestionnaireEncouragement(params: {
   if (currentPosition >= Math.ceil((2 * total) / 3)) {
     return "Starker Fortschritt. Noch ein paar Antworten, dann ist dein Founder-Profil als Basis gesetzt.";
   }
-  return "Du baust hier gerade Schritt fuer Schritt dein Founder-Profil auf. Kleine Unterschiede werden spaeter oft erstaunlich aufschlussreich.";
+  return "Du baust hier gerade Schritt für Schritt dein Founder-Profil auf. Kleine Unterschiede werden später oft erstaunlich aufschlussreich.";
 }
 
 export function QuestionnaireClient({

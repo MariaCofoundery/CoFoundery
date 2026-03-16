@@ -36,7 +36,7 @@ export function QuestionnaireDebugPreview({
         <h1 className="mt-3 text-3xl font-semibold text-slate-950">{title}</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
           Der Preview-Durchlauf wurde lokal abgeschlossen. Es wurden keine Live-Antworten gespeichert und kein
-          produktiver Fragebogenstatus veraendert.
+          produktiver Fragebogenstatus verändert.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
@@ -58,9 +58,9 @@ export function QuestionnaireDebugPreview({
             <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Debug Preview</p>
             <h1 className="mt-3 text-3xl font-semibold text-slate-950">{title}</h1>
             <p className="mt-4 text-sm leading-7 text-slate-700">
-              Diese Vorschau laedt die aktuell aktiven Basisfragen, speichert Antworten aber nur lokal im
-              Browserzustand. So laesst sich der komplette Flow erneut testen, ohne bestehende Live-Antworten zu
-              ueberschreiben.
+              Diese Vorschau lädt die aktuell aktiven Basisfragen, speichert Antworten aber nur lokal im
+              Browserzustand. So lässt sich der komplette Flow erneut testen, ohne bestehende Live-Antworten zu
+              überschreiben.
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export function QuestionnaireDebugPreview({
             href={restartHref}
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
-            Preview zuruecksetzen
+            Preview zurücksetzen
           </Link>
         </div>
       </section>

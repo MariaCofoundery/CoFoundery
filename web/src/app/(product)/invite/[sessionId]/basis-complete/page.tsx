@@ -96,7 +96,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
           Stark. Der Basis-Fragebogen ist geschafft.
         </h1>
         <p className="mt-4 text-sm leading-7 text-slate-700">
-          Das war der groessere Teil. Dein Fortschritt ist sicher gespeichert und der naechste Schritt ist jetzt klar.
+          Das war der größere Teil. Dein Fortschritt ist sicher gespeichert und der nächste Schritt ist jetzt klar.
         </p>
         <p className="mt-2 text-sm leading-7 text-slate-700">
           Jetzt hast du die Wahl: kurz Pause machen oder direkt mit den 10 Fragen im Werte-Modul weitermachen.
@@ -111,7 +111,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
             Wenn du jetzt weitermachst, ist dein kompletter Teil in einem Zug abgeschlossen.
           </div>
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
-            Wenn du spaeter weitermachst, bleibt dein bisheriger Stand erhalten und du steigst genau hier wieder ein.
+            Wenn du später weitermachst, bleibt dein bisheriger Stand erhalten und du steigst genau hier wieder ein.
           </div>
         </div>
 

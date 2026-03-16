@@ -25,12 +25,12 @@ type Props = {
 function reportContextMeta(teamContext: FounderAlignmentReport["teamContext"]) {
   if (teamContext === "existing_team") {
     return {
-      badge: "Bestehendes Gruenderteam",
+      badge: "Bestehendes Gründerteam",
     };
   }
 
   return {
-    badge: "Moegliche Gruendungspartnerschaft",
+    badge: "Mögliche Gründungspartnerschaft",
   };
 }
 
@@ -76,7 +76,7 @@ function buildRadarSummaryGroups(
       dimensions: highPassung,
     },
     {
-      title: "Produktive Ergaenzung",
+      title: "Produktive Ergänzung",
       dimensions: productiveErgaenzung,
     },
     {
@@ -158,7 +158,7 @@ export function FounderAlignmentReportView({
               href={backHref}
               className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
             >
-              Zurueck
+              Zurück
             </Link>
             <PrintReportButton />
           </div>
@@ -193,7 +193,7 @@ export function FounderAlignmentReportView({
                 {founderPairLabel || "Founder A × Founder B"}
               </p>
               <p className="mt-3 text-base leading-7 text-slate-700">
-                Einblick in eure moegliche Zusammenarbeit als Gruenderteam
+                Einblick in eure mögliche Zusammenarbeit als Gründerteam
               </p>
             </div>
 
@@ -224,14 +224,14 @@ export function FounderAlignmentReportView({
               Besprecht die sechs Dimensionssektionen nacheinander und macht Erwartungen konkret.
             </div>
             <div className="rounded-2xl border border-white/70 bg-white/70 p-4 text-sm leading-6 text-slate-700">
-              Die naechsten Schritte sind: Gespraech vorbereiten, Arbeitsdokument starten, Report sichern.
+              Die nächsten Schritte sind: Gespräch vorbereiten, Arbeitsdokument starten, Report sichern.
             </div>
           </div>
           <div className="mt-5 rounded-2xl border border-white/70 bg-white/72 p-4 text-sm leading-7 text-slate-700">
             Dieser Report beschreibt aktuelle Muster eurer Zusammenarbeit. Er ist keine feste
-            Typisierung und keine Prognose ueber den langfristigen Erfolg eures Teams, sondern vor
-            allem ein Arbeitsinstrument, das Unterschiede, gemeinsame Staerken und sinnvolle
-            Gespraechsthemen sichtbar macht.
+            Typisierung und keine Prognose über den langfristigen Erfolg eures Teams, sondern vor
+            allem ein Arbeitsinstrument, das Unterschiede, gemeinsame Stärken und sinnvolle
+            Gesprächsthemen sichtbar macht.
           </div>
         </section>
 
@@ -248,13 +248,13 @@ export function FounderAlignmentReportView({
             </p>
 
             <div className="mt-8 grid gap-4">
-              <SummaryMessage title="Staerke" text={report.executiveSummary.topMessages.strength} />
+              <SummaryMessage title="Stärke" text={report.executiveSummary.topMessages.strength} />
               <SummaryMessage
-                title="Ergaenzende Dynamik"
+                title="Ergänzende Dynamik"
                 text={report.executiveSummary.topMessages.complementaryDynamic}
               />
               <SummaryMessage
-                title="Moegliches Spannungsfeld"
+                title="Mögliches Spannungsfeld"
                 text={report.executiveSummary.topMessages.tension}
               />
             </div>
@@ -282,11 +282,11 @@ export function FounderAlignmentReportView({
                 Teamdynamik eurer Zusammenarbeit
               </p>
               <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-[0.01em] text-slate-950 md:text-[2.15rem]">
-                Welche Grunddynamik eure Zusammenarbeit aktuell praegt
+                Welche Grunddynamik eure Zusammenarbeit aktuell prägt
               </h2>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
-                Der Archetyp verdichtet eure gemeinsame Arbeitslogik zu einem uebersichtlichen Gesamtbild.
-                Er zeigt, was eure Zusammenarbeit traegt und an welchen Stellen bewusste Abstimmung
+                Der Archetyp verdichtet eure gemeinsame Arbeitslogik zu einem übersichtlichen Gesamtbild.
+                Er zeigt, was eure Zusammenarbeit trägt und an welchen Stellen bewusste Abstimmung
                 besonders wirksam wird.
               </p>
 
@@ -310,10 +310,10 @@ export function FounderAlignmentReportView({
                         Profilstaerken
                       </p>
                       <h4 className="mt-3 text-lg font-semibold text-slate-950">
-                        Typische Staerken dieser Dynamik
+                        Typische Stärken dieser Dynamik
                       </h4>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
-                        Diese Aspekte koennen eurer Zusammenarbeit besonders Stabilitaet und Qualitaet geben.
+                        Diese Aspekte können eurer Zusammenarbeit besonders Stabilität und Qualität geben.
                       </p>
                       <ul className="mt-5 space-y-3">
                         {report.teamArchetype.strengths.map((strength, index) => (
@@ -334,7 +334,7 @@ export function FounderAlignmentReportView({
                         Abstimmung
                       </p>
                       <h4 className="mt-3 text-lg font-semibold text-slate-950">
-                        Bereiche fuer bewusste Abstimmung
+                        Bereiche für bewusste Abstimmung
                       </h4>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
                         Hier lohnt sich ein klarer gemeinsamer Rahmen, damit Unterschiede konstruktiv wirken.
@@ -362,7 +362,7 @@ export function FounderAlignmentReportView({
             <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Radar</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">Vergleich eurer Profile</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">
-              Die Grafik zeigt, in welchen Bereichen eure Profile aehnlich sind und wo sich Unterschiede zeigen.
+              Die Grafik zeigt, in welchen Bereichen eure Profile ähnlich sind und wo sich Unterschiede zeigen.
             </p>
             <div className="mt-10">
               <FounderReportRadar
@@ -372,7 +372,7 @@ export function FounderAlignmentReportView({
               />
             </div>
             <p className="mt-8 text-sm leading-7 text-slate-600">
-              Diese Uebersicht zeigt auf einen Blick, in welchen Bereichen eure Profile naeher
+              Diese Übersicht zeigt auf einen Blick, in welchen Bereichen eure Profile näher
               beieinander liegen und wo sich Unterschiede zeigen. Die genauere Einordnung pro
               Dimension folgt darunter in den jeweiligen Spektren und Reportabschnitten.
             </p>
@@ -401,7 +401,7 @@ export function FounderAlignmentReportView({
           <article className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
             <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Teamdynamik</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">
-              Verdichtete Uebersicht eurer Zusammenarbeit
+              Verdichtete Übersicht eurer Zusammenarbeit
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
               Diese Map zeigt vereinfacht, wie sich eure Zusammenarbeit zwischen Tempo, Umgang mit Unsicherheit, Struktur und Abstimmung einordnet.
@@ -516,7 +516,7 @@ export function FounderAlignmentReportView({
           <div className="mt-8 flex flex-wrap gap-3">
             <PrintReportButton />
             <ReportActionButton variant="secondary" href={conversationGuideHref}>
-              Gespraech vorbereiten
+              Gespräch vorbereiten
             </ReportActionButton>
             <ReportActionButton variant="secondary" href={workbookHref}>
               Arbeitsdokument starten
@@ -533,7 +533,7 @@ function SummaryMessage({ title, text }: { title: string; text: string | null })
     <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
       <p className="mt-2 text-sm leading-7 text-slate-700">
-        {text ?? "Fuer diesen Bereich liegt aktuell noch keine hervorgehobene Aussage vor."}
+        {text ?? "Für diesen Bereich liegt aktuell noch keine hervorgehobene Aussage vor."}
       </p>
     </div>
   );

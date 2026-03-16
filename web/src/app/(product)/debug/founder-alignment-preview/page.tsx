@@ -50,12 +50,12 @@ export default async function FounderAlignmentPreviewPage({
                 Founder Alignment Debug
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">
-                Zentrale Preview fuer Report, Gespraechsleitfaden und Workbook
+                Zentrale Preview für Report, Gesprächsleitfaden und Workbook
               </h1>
               <p className="mt-4 max-w-3xl text-[15px] leading-8 text-slate-700">
-                Diese Debug-Oberflaeche simuliert realistische Founder-Alignment-Szenarien mit reinem
-                Mock-State. Es werden keine Einladungen benoetigt, keine Supabase-Daten geladen und keine
-                Schreibvorgaenge ausgeloest.
+                Diese Debug-Oberfläche simuliert realistische Founder-Alignment-Szenarien mit reinem
+                Mock-State. Es werden keine Einladungen benötigt, keine Supabase-Daten geladen und keine
+                Schreibvorgänge ausgelöst.
               </p>
             </div>
 
@@ -87,7 +87,7 @@ export default async function FounderAlignmentPreviewPage({
 
           <nav className="mt-6 flex flex-wrap gap-3 print:hidden">
             <AnchorLink href="#matching-preview" label="Matching Report Preview" />
-            <AnchorLink href="#conversation-preview" label="Gespraechsleitfaden Preview" />
+            <AnchorLink href="#conversation-preview" label="Gesprächsleitfaden Preview" />
             <AnchorLink href="#workbook-preview" label="Workbook Preview" />
           </nav>
         </section>
@@ -96,7 +96,7 @@ export default async function FounderAlignmentPreviewPage({
           <SectionHeader
             eyebrow="Preview 1"
             title="Matching Report Preview"
-            description="Dieser Bereich rendert bewusst denselben Founder-Alignment-Report wie der neue Debug-Report-Einstieg, damit Preview, Gespraechsleitfaden und Workbook auf derselben Report-Familie basieren."
+            description="Dieser Bereich rendert bewusst denselben Founder-Alignment-Report wie der neue Debug-Report-Einstieg, damit Preview, Gesprächsleitfaden und Workbook auf derselben Report-Familie basieren."
           />
           <div className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
             <iframe
@@ -110,8 +110,8 @@ export default async function FounderAlignmentPreviewPage({
         <section id="conversation-preview" className="mt-10 scroll-mt-8">
           <SectionHeader
             eyebrow="Preview 2"
-            title="Gespraechsleitfaden Preview"
-            description="Der Leitfaden uebernimmt denselben Mock-Kontext und zeigt dadurch direkt, wie sich Teamkontext und Werte auf die Fragen auswirken."
+            title="Gesprächsleitfaden Preview"
+            description="Der Leitfaden übernimmt denselben Mock-Kontext und zeigt dadurch direkt, wie sich Teamkontext und Werte auf die Fragen auswirken."
           />
           <DebugConversationGuidePreview
             embedded

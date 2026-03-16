@@ -11,15 +11,15 @@ function teamContextMeta(teamContext: TeamContext | null) {
   if (teamContext === "existing_team") {
     return {
       badge: "Bestehendes Team",
-      title: "Ihr startet einen Alignment-Flow fuer ein bestehendes Gruenderteam.",
-      text: "Report, Gespraechsleitfaden und Workbook fokussieren dann staerker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
+      title: "Ihr startet einen Alignment-Flow für ein bestehendes Gründerteam.",
+      text: "Report, Gesprächsleitfaden und Workbook fokussieren dann stärker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
     };
   }
 
   return {
-    badge: "Moegliche Gruendungspartnerschaft",
+    badge: "Mögliche Gründungspartnerschaft",
     title: "Ihr startet einen Matching- und Kennenlern-Flow.",
-    text: "Report, Gespraechsleitfaden und Workbook fokussieren dann staerker auf Passung, Erwartungen und fruehe Vereinbarungen vor einer engeren Zusammenarbeit.",
+    text: "Report, Gesprächsleitfaden und Workbook fokussieren dann stärker auf Passung, Erwartungen und frühe Vereinbarungen vor einer engeren Zusammenarbeit.",
   };
 }
 
@@ -127,7 +127,7 @@ export function CoFounderInviteForm() {
         Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt später.
       </p>
       <p className="mt-1 text-sm text-slate-500">
-        Du legst hier nicht nur den Link an, sondern auch den Kontext fuer den weiteren Founder-Flow.
+        Du legst hier nicht nur den Link an, sondern auch den Kontext für den weiteren Founder-Flow.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
@@ -165,8 +165,8 @@ export function CoFounderInviteForm() {
             Team-Kontext
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Waehle bewusst, ob ihr gerade eine moegliche Zusammenarbeit prueft oder bereits gemeinsam arbeitet.
-            Dieser Kontext steuert spaeter, wie Report, Gespraechsleitfaden und Workbook sprachlich gerahmt werden.
+            Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.
+            Dieser Kontext steuert später, wie Report, Gesprächsleitfaden und Workbook sprachlich gerahmt werden.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
@@ -184,7 +184,7 @@ export function CoFounderInviteForm() {
             >
               <p className="text-sm font-semibold text-slate-900">Wir überlegen, zusammenzuarbeiten</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Fuer Matching-Gespraeche vor einer moeglichen Gruendungspartnerschaft.
+                Für Matching-Gespräche vor einer möglichen Gründungspartnerschaft.
               </p>
             </button>
             <button
@@ -202,13 +202,13 @@ export function CoFounderInviteForm() {
             >
               <p className="text-sm font-semibold text-slate-900">Wir arbeiten bereits zusammen</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Fuer Teams, die Rollen, Spannungen und Zusammenarbeit weiter klaeren wollen.
+                Für Teams, die Rollen, Spannungen und Zusammenarbeit weiter klären wollen.
               </p>
             </button>
           </div>
           <div className="mt-4 rounded-2xl border border-white/80 bg-white/80 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Was dieser Modus spaeter aendert
+              Was dieser Modus später ändert
             </p>
             <div className="mt-3 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-slate-700">
               {selectedContextMeta.badge}
@@ -280,11 +280,11 @@ export function CoFounderInviteForm() {
           <p className="mt-2 text-sm text-emerald-900">Aktive Module: {selectedModulesLabel}</p>
           {teamContext ? (
             <p className="mt-1 text-sm text-emerald-900">
-              Kontext: {teamContext === "existing_team" ? "Wir arbeiten bereits zusammen" : "Wir ueberlegen, zusammenzuarbeiten"}
+              Kontext: {teamContext === "existing_team" ? "Wir arbeiten bereits zusammen" : "Wir überlegen, zusammenzuarbeiten"}
             </p>
           ) : null}
           <p className="mt-2 text-xs leading-6 text-emerald-800">
-            Teile jetzt den Link direkt mit der zweiten Person. Derselbe Link kann spaeter auch per E-Mail versendet werden.
+            Teile jetzt den Link direkt mit der zweiten Person. Derselbe Link kann später auch per E-Mail versendet werden.
           </p>
           <p className="mt-2 break-all rounded-md border border-emerald-200 bg-white px-3 py-2 text-xs text-emerald-900">
             {inviteUrl}

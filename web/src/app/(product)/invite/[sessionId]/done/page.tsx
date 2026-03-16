@@ -72,7 +72,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
   if (!decision.ok) {
     return (
       <CompletionShell
-        title="Einladung nicht verfuegbar"
+        title="Einladung nicht verfügbar"
         description={`Die Einladung konnte nicht geladen werden (${decision.reason}).`}
       >
           <ResearchTrackedLink
@@ -105,7 +105,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
           />
           <DelayedRedirect href={reportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
-            Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengefuehrt.
+            Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <ResearchTrackedLink
@@ -143,7 +143,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
           />
           <DelayedRedirect href={reportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
-            Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Staerken und erste Gespraechsfelder direkt sichtbar.
+            Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <ResearchTrackedLink
@@ -179,7 +179,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
             properties={{ state: "waiting_for_answers" }}
           />
           <div className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-700">
-            Du musst jetzt nichts weiter tun. Im Dashboard siehst du spaeter direkt, sobald euer gemeinsamer Report bereitsteht.
+            Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <ResearchTrackedLink
@@ -206,7 +206,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
   return (
     <CompletionShell
       title="Fragebogen abgeschlossen"
-      description={`Der Report konnte gerade noch nicht erstellt werden (${finalizeResult.reason}). Bitte pruefe den Status im Dashboard.`}
+      description={`Der Report konnte gerade noch nicht erstellt werden (${finalizeResult.reason}). Bitte prüfe den Status im Dashboard.`}
     >
         <ResearchPageTracker
           eventName="invite_done_viewed"

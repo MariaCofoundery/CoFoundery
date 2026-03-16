@@ -46,8 +46,8 @@ export function DashboardDevSection({
     <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
       <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Dev-Bereich</h2>
       <p className="mt-2 text-sm leading-7 text-slate-600">
-        Interne Debug- und Systeminformationen bleiben verfuegbar, sind aber bewusst aus der
-        produktischen Hauptoberflaeche herausgezogen.
+        Interne Debug- und Systeminformationen bleiben verfügbar, sind aber bewusst aus der
+        produktischen Hauptoberfläche herausgezogen.
       </p>
 
       {selfReportDebug ? (
@@ -91,7 +91,7 @@ export function DashboardDevSection({
             </li>
           ))}
           {reportRuns.length === 0 ? (
-            <li className="text-sm text-slate-500">Noch keine Report-Runs verfuegbar.</li>
+            <li className="text-sm text-slate-500">Noch keine Report-Runs verfügbar.</li>
           ) : null}
         </ul>
       </details>

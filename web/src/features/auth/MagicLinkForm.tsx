@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
 type MagicLinkFormProps = {
   nextPath?: string;
@@ -18,13 +19,14 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
     setStatus("loading");
     setMessage("");
 
-    const origin = window.location.origin;
-    const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+    const origin = getPublicAppOrigin(window.location.origin);
+    const redirectTo = new URL("/auth/callback", `${origin}/`);
+    redirectTo.searchParams.set("next", nextPath);
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: redirectTo,
+        emailRedirectTo: redirectTo.toString(),
       },
     });
 
@@ -60,7 +62,7 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
         {status === "loading" ? "Sende..." : "Magic Link senden"}
       </button>
       <p className="text-xs text-[color:var(--muted)]">
-        Hinweis: Der Login-Magic-Link ist 60 Minuten gueltig.
+        Hinweis: Der Login-Magic-Link ist 60 Minuten gültig.
       </p>
       {message ? (
         <p

@@ -3,6 +3,7 @@
 import { createHash, randomBytes } from "crypto";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 type EmailStatus = "sent" | "not_sent";
@@ -79,9 +80,7 @@ function buildInviteUrl(token: string) {
 }
 
 function getSiteUrlOrigin() {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "";
-  if (!configured) return "";
-  return configured.replace(/\/+$/, "");
+  return getPublicAppOrigin();
 }
 
 function buildAbsoluteInviteUrl(token: string) {

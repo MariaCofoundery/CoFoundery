@@ -30,7 +30,7 @@ function followUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp) {
 function founderReactionLabel(value: "understood" | "open" | "in_clarification" | null) {
   if (value === "understood") return "verstanden";
   if (value === "open") return "offen";
-  if (value === "in_clarification") return "wird geklaert";
+  if (value === "in_clarification") return "wird geklärt";
   return "Noch keine Founder-Reaktion";
 }
 
@@ -64,17 +64,17 @@ export default async function AdvisorSnapshotPage({
         <div className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            Snapshot aktuell noch nicht verfuegbar
+            Snapshot aktuell noch nicht verfügbar
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            Fuer diesen Team-Kontext ist noch kein belastbarer Snapshot verfuegbar.
+            Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.
           </p>
           <div className="mt-6">
             <Link
               href="/advisor/dashboard"
               className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Zurueck zum Advisor Dashboard
+              Zurück zum Advisor Dashboard
             </Link>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default async function AdvisorSnapshotPage({
           href="/advisor/dashboard"
           className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
-          Zurueck zum Advisor Dashboard
+          Zurück zum Advisor Dashboard
         </Link>
         <PrintReportButton label="Snapshot exportieren" />
       </div>
@@ -120,7 +120,7 @@ export default async function AdvisorSnapshotPage({
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
             Kompakter Coaching-Snapshot mit Fokusfeldern, Advisor-Impulsen, Founder-Reaktion und
-            den naechsten sinnvollen Schritten.
+            den nächsten sinnvollen Schritten.
           </p>
         </header>
 
@@ -129,14 +129,14 @@ export default async function AdvisorSnapshotPage({
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Wichtigste Fokusfelder</p>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               <FocusCard
-                title="Staerkste gemeinsame Grundlage"
-                text={data.highlights.topStrength || "Noch keine hervorgehobene Staerke."}
+                title="Stärkste gemeinsame Grundlage"
+                text={data.highlights.topStrength || "Noch keine hervorgehobene Stärke."}
               />
               <FocusCard
-                title="Ergaenzende Dynamik"
+                title="Ergänzende Dynamik"
                 text={
                   data.highlights.topComplementaryDynamic ||
-                  "Noch keine hervorgehobene ergaenzende Dynamik."
+                  "Noch keine hervorgehobene ergänzende Dynamik."
                 }
               />
               <FocusCard
@@ -164,11 +164,11 @@ export default async function AdvisorSnapshotPage({
                 text={data.workbook.advisorClosing.observations || "Noch keine Beobachtungen festgehalten."}
               />
               <FocusCard
-                title="Rueckfragen"
-                text={data.workbook.advisorClosing.questions || "Noch keine Rueckfragen festgehalten."}
+                title="Rückfragen"
+                text={data.workbook.advisorClosing.questions || "Noch keine Rückfragen festgehalten."}
               />
               <FocusCard
-                title="Empfohlene naechste Schritte"
+                title="Empfohlene nächste Schritte"
                 text={data.workbook.advisorClosing.nextSteps || "Noch keine Empfehlungen festgehalten."}
               />
             </div>

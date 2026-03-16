@@ -30,10 +30,10 @@ export default async function LoginPage({
         <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">Login</p>
         <h1 className="mt-2 text-3xl font-semibold text-[color:var(--ink)]">CoFoundery Align</h1>
         <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-          Melde dich per Magic Link an. Es gibt keine Passwoerter und keine anonymen Flows.
+          Melde dich per Magic Link an. Es gibt keine Passwörter und keine anonymen Flows.
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-          Wenn keine Mail ankommt, pruefe bitte auch deinen Spam-Ordner.
+          Wenn keine Mail ankommt, prüfe bitte auch deinen Spam-Ordner.
         </p>
         {params.error ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
