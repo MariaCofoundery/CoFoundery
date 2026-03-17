@@ -274,7 +274,13 @@ export async function getFounderAlignmentWorkbookPageData(
     loadWorkbookAdvisorRow(normalizedInvitationId),
   ]);
 
-  if (debugResult.status !== "ready" || !debugResult.scoring) {
+  const snapshotHasFounderAlignmentData = Boolean(
+    reportSnapshot?.reportType === "founder_alignment_v1" &&
+      reportSnapshot.founderReport &&
+      reportSnapshot.founderScoring
+  );
+
+  if (!snapshotHasFounderAlignmentData && (debugResult.status !== "ready" || !debugResult.scoring)) {
     const fallbackStatus: FounderAlignmentWorkbookPageData["status"] =
       debugResult.status === "ready" ? "in_progress" : debugResult.status;
 
@@ -287,11 +293,17 @@ export async function getFounderAlignmentWorkbookPageData(
   }
 
   const effectiveTeamContext = founderContext.teamContext ?? teamContext;
-
-  const report = buildFounderAlignmentReport({
-    scoringResult: debugResult.scoring,
-    teamContext: effectiveTeamContext,
-  });
+  const scoringResult =
+    snapshotHasFounderAlignmentData && reportSnapshot?.founderScoring
+      ? reportSnapshot.founderScoring
+      : debugResult.scoring!;
+  const report =
+    snapshotHasFounderAlignmentData && reportSnapshot?.founderReport
+      ? reportSnapshot.founderReport
+      : buildFounderAlignmentReport({
+          scoringResult,
+          teamContext: effectiveTeamContext,
+        });
 
   const workbook = workbookRow
     ? sanitizeFounderAlignmentWorkbookPayload(workbookRow.payload)
@@ -325,13 +337,13 @@ export async function getFounderAlignmentWorkbookPageData(
     status: "ready",
     invitationId: normalizedInvitationId,
     teamContext: effectiveTeamContext,
-    founderAName: founderContext.founderAName,
-    founderBName: founderContext.founderBName,
+    founderAName: founderContext.founderAName ?? reportSnapshot?.report?.participantAName ?? null,
+    founderBName: founderContext.founderBName ?? reportSnapshot?.report?.participantBName ?? null,
     currentUserRole,
     report,
-    scoringResult: debugResult.scoring,
+    scoringResult,
     workbook,
-    highlights: deriveFounderAlignmentWorkbookHighlights(report, debugResult.scoring),
+    highlights: deriveFounderAlignmentWorkbookHighlights(report, scoringResult),
     canSave: true,
     persisted: Boolean(workbookRow),
     updatedAt: workbookRow?.updated_at ?? null,

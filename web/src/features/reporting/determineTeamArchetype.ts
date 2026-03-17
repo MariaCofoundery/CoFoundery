@@ -34,6 +34,9 @@ type ArchetypeTemplate = Omit<TeamArchetypeResult, "strengths" | "alignmentTopic
 type DimensionSnapshot = {
   dimension: string;
   distance: number | null;
+  meanDistance: number | null;
+  itemDistance: number | null;
+  hasHiddenDifferences: boolean;
   scoreA: number | null;
   scoreB: number | null;
   teamFit: number | null;
@@ -177,6 +180,9 @@ function toSnapshot(result: DimensionResult | undefined, dimension: string): Dim
   return {
     dimension,
     distance: result?.distance ?? null,
+    meanDistance: result?.meanDistance ?? null,
+    itemDistance: result?.itemDistance ?? null,
+    hasHiddenDifferences: result?.hasHiddenDifferences ?? false,
     scoreA: result?.scoreA ?? null,
     scoreB: result?.scoreB ?? null,
     teamFit: result?.teamFit ?? null,
@@ -201,7 +207,7 @@ function hasPoleTendency(
 }
 
 function isVerySimilar(snapshot: DimensionSnapshot) {
-  return snapshot.distance != null && snapshot.distance <= 15;
+  return snapshot.distance != null && snapshot.distance <= 15 && !snapshot.hasHiddenDifferences;
 }
 
 function isModeratelyDifferent(snapshot: DimensionSnapshot) {
@@ -217,7 +223,7 @@ function isStronglyDifferent(snapshot: DimensionSnapshot) {
 }
 
 function isSimilarOrModerate(snapshot: DimensionSnapshot) {
-  return snapshot.distance != null && snapshot.distance <= 30;
+  return snapshot.distance != null && snapshot.distance <= 30 && !snapshot.hasHiddenDifferences;
 }
 
 function isHighFit(snapshot: DimensionSnapshot) {
@@ -230,6 +236,10 @@ function isModerateOrElevatedTension(snapshot: DimensionSnapshot) {
 
 function isElevatedTension(snapshot: DimensionSnapshot) {
   return snapshot.tensionCategory === "elevated";
+}
+
+function hasHiddenDifference(snapshot: DimensionSnapshot) {
+  return snapshot.hasHiddenDifferences;
 }
 
 function mergeUnique(items: Array<string | null | undefined>, limit = 4) {
@@ -302,6 +312,9 @@ export function determineTeamArchetype(
   const broadTensionCount = [vision, decision, risk, work, commitment, conflict].filter(
     isModerateOrElevatedTension
   ).length;
+  const hiddenDifferenceCount = [vision, decision, risk, work, commitment, conflict].filter(
+    hasHiddenDifference
+  ).length;
 
   if (
     scoringResult.overallFit == null ||
@@ -309,7 +322,8 @@ export function determineTeamArchetype(
     isClearlyDifferent(vision) ||
     isStronglyDifferent(vision) ||
     elevatedTensionCount >= 2 ||
-    broadTensionCount >= 4
+    broadTensionCount >= 4 ||
+    hiddenDifferenceCount >= 2
   ) {
     return buildArchetypeResult("clarification_oriented_partnership", scoringResult);
   }
@@ -319,7 +333,8 @@ export function determineTeamArchetype(
     isVerySimilar(risk) &&
     isVerySimilar(decision) &&
     scoringResult.overallFit >= 80 &&
-    scoringResult.conflictRiskIndex <= 35
+    scoringResult.conflictRiskIndex <= 35 &&
+    hiddenDifferenceCount === 0
   ) {
     return buildArchetypeResult("strategic_alliance", scoringResult);
   }

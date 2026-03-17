@@ -19,6 +19,8 @@ type FounderReportSectionCardProps = {
   fitCategory?: "very_high" | "high" | "mixed" | "low" | "insufficient_data";
   tensionCategory?: "low" | "moderate" | "elevated" | "insufficient_data";
   isComplementaryDynamic?: boolean;
+  hasHiddenDifferences?: boolean;
+  itemDistance?: number | null;
 };
 
 export function FounderReportSectionCard({
@@ -34,6 +36,8 @@ export function FounderReportSectionCard({
   fitCategory = "insufficient_data",
   tensionCategory = "insufficient_data",
   isComplementaryDynamic = false,
+  hasHiddenDifferences = false,
+  itemDistance = null,
 }: FounderReportSectionCardProps) {
   const showComparisonAxis =
     scoreA != null &&
@@ -57,6 +61,8 @@ export function FounderReportSectionCard({
           fitCategory={fitCategory}
           tensionCategory={tensionCategory}
           isComplementaryDynamic={isComplementaryDynamic}
+          hasHiddenDifferences={hasHiddenDifferences}
+          itemDistance={itemDistance}
         />
       ) : null}
       <p className="mt-5 text-sm leading-7 text-slate-700">{t(interpretation)}</p>
@@ -108,6 +114,8 @@ function DimensionComparisonAxis({
   fitCategory,
   tensionCategory,
   isComplementaryDynamic,
+  hasHiddenDifferences,
+  itemDistance,
 }: {
   dimension: string;
   scoreA: number;
@@ -117,12 +125,19 @@ function DimensionComparisonAxis({
   fitCategory: "very_high" | "high" | "mixed" | "low" | "insufficient_data";
   tensionCategory: "low" | "moderate" | "elevated" | "insufficient_data";
   isComplementaryDynamic: boolean;
+  hasHiddenDifferences: boolean;
+  itemDistance: number | null;
 }) {
   const positionA = markerPosition(scoreA);
   const positionB = markerPosition(scoreB);
   const overlap = Math.abs(positionA - positionB) < 10;
   const poles = spectrumPoles(dimension);
-  const tone = qualitativeTone({ fitCategory, tensionCategory, isComplementaryDynamic });
+  const tone = qualitativeTone({
+    fitCategory,
+    tensionCategory,
+    isComplementaryDynamic,
+    hasHiddenDifferences,
+  });
 
   return (
     <div className={`mt-6 rounded-[24px] border p-5 ${tone.bandClass}`}>
@@ -173,6 +188,15 @@ function DimensionComparisonAxis({
           <span className="self-start text-center">{t(poles.mid)}</span>
           <span className="self-start text-right">{t(poles.right)}</span>
         </div>
+        {hasHiddenDifferences ? (
+          <div className="mt-5 rounded-2xl border border-amber-200/70 bg-amber-50/70 px-4 py-3 text-sm leading-6 text-slate-700">
+            {t(
+              itemDistance != null
+                ? `Die Gesamtposition wirkt zwar nah, auf Itemebene liegen eure Antworten hier aber deutlich weiter auseinander (durchschnittlich ${Math.round(itemDistance)} Punkte Unterschied).`
+                : "Die Gesamtposition wirkt zwar nah, auf Itemebene liegen eure Antworten hier aber deutlich weiter auseinander."
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -273,11 +297,22 @@ function qualitativeTone({
   fitCategory,
   tensionCategory,
   isComplementaryDynamic,
+  hasHiddenDifferences,
 }: {
   fitCategory: "very_high" | "high" | "mixed" | "low" | "insufficient_data";
   tensionCategory: "low" | "moderate" | "elevated" | "insufficient_data";
   isComplementaryDynamic: boolean;
+  hasHiddenDifferences: boolean;
 }) {
+  if (hasHiddenDifferences) {
+    return {
+      label: "VERDECKTE UNTERSCHIEDE",
+      bandClass: "border-amber-200/80 bg-amber-50/70",
+      railClass: "bg-amber-200/90",
+      badgeClass: "border border-amber-200 bg-amber-100 text-amber-800",
+    };
+  }
+
   if (isComplementaryDynamic) {
     return {
       label: "PRODUKTIVE ERGAENZUNG",

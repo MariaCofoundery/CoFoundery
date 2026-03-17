@@ -14,6 +14,12 @@ export type TeamScoringInput = {
 export type ConflictRiskLevel = "low" | "medium" | "high" | "insufficient_data";
 export type FitCategory = "very_high" | "high" | "mixed" | "low" | "insufficient_data";
 export type TensionCategory = "low" | "moderate" | "elevated" | "insufficient_data";
+export type PatternCategory =
+  | "aligned"
+  | "hidden_difference"
+  | "moderate_difference"
+  | "clear_difference"
+  | "insufficient_data";
 export type ReportInsight = {
   kind: "strength" | "complementary_dynamic" | "tension";
   dimension: string | null;
@@ -32,7 +38,13 @@ export type DimensionResult = {
   dimension: string;
   scoreA: number | null;
   scoreB: number | null;
+  meanDistance: number | null;
   distance: number | null;
+  itemDistance: number | null;
+  oppositionCount: number;
+  hiddenDifferenceScore: number | null;
+  hasHiddenDifferences: boolean;
+  patternCategory: PatternCategory;
   alignment: number | null;
   alignmentCategory: FitCategory;
   complementarity: number | null;
@@ -79,7 +91,17 @@ type ScoringContext = {
   scoreA: number;
   scoreB: number;
   distance: number;
+  meanDistance: number;
+  itemDistance: number;
+  oppositionCount: number;
+  hiddenDifferenceScore: number;
+  hasHiddenDifferences: boolean;
   alignment: number;
+};
+
+type GroupedAnswer = {
+  question_id: string;
+  value: number;
 };
 
 type DistanceInterpretation = {
@@ -101,7 +123,19 @@ type KnownDimension = (typeof DIMENSION_ORDER)[number];
 
 type DimensionDetails = Omit<
   DimensionResult,
-  "dimension" | "scoreA" | "scoreB" | "distance" | "alignment" | "alignmentCategory" | "fitCategory"
+  | "dimension"
+  | "scoreA"
+  | "scoreB"
+  | "meanDistance"
+  | "distance"
+  | "itemDistance"
+  | "oppositionCount"
+  | "hiddenDifferenceScore"
+  | "hasHiddenDifferences"
+  | "patternCategory"
+  | "alignment"
+  | "alignmentCategory"
+  | "fitCategory"
 >;
 
 const MIN_ANSWERS_PER_PERSON_PER_DIMENSION = 2;
@@ -188,9 +222,8 @@ function parseNumericValue(value: number) {
   return Number.isFinite(value) ? clamp(value, 0, 100) : null;
 }
 
-// Groups answers by normalized dimension and keeps only numeric values on the expected 0..100 scale.
-export function groupAnswersByDimension(answers: PersonAnswers): Map<string, number[]> {
-  const grouped = new Map<string, number[]>();
+function groupScorableAnswersByDimension(answers: PersonAnswers): Map<string, GroupedAnswer[]> {
+  const grouped = new Map<string, GroupedAnswer[]>();
 
   for (const answer of answers) {
     const numeric = parseNumericValue(answer.value);
@@ -198,11 +231,32 @@ export function groupAnswersByDimension(answers: PersonAnswers): Map<string, num
 
     const dimension = normalizeDimensionName(answer.dimension);
     const existing = grouped.get(dimension);
+    const entry = {
+      question_id: answer.question_id,
+      value: numeric,
+    };
+
     if (existing) {
-      existing.push(numeric);
+      existing.push(entry);
       continue;
     }
-    grouped.set(dimension, [numeric]);
+
+    grouped.set(dimension, [entry]);
+  }
+
+  return grouped;
+}
+
+// Groups answers by normalized dimension and keeps only numeric values on the expected 0..100 scale.
+export function groupAnswersByDimension(answers: PersonAnswers): Map<string, number[]> {
+  const grouped = new Map<string, number[]>();
+  const detailed = groupScorableAnswersByDimension(answers);
+
+  for (const [dimension, entries] of detailed.entries()) {
+    grouped.set(
+      dimension,
+      entries.map((entry) => entry.value)
+    );
   }
 
   return grouped;
@@ -247,6 +301,22 @@ function deriveTensionCategory(value: number | null): TensionCategory {
   if (value <= 25) return "low";
   if (value <= 55) return "moderate";
   return "elevated";
+}
+
+function derivePatternCategory({
+  meanDistance,
+  itemDistance,
+  hasHiddenDifferences,
+}: {
+  meanDistance: number | null;
+  itemDistance: number | null;
+  hasHiddenDifferences: boolean;
+}): PatternCategory {
+  if (meanDistance == null || itemDistance == null) return "insufficient_data";
+  if (hasHiddenDifferences) return "hidden_difference";
+  if (meanDistance > 35 || itemDistance >= 45) return "clear_difference";
+  if (meanDistance > 15 || itemDistance >= 25) return "moderate_difference";
+  return "aligned";
 }
 
 function getDistanceInterpretation(dimension: KnownDimension, distance: number): DistanceInterpretation {
@@ -326,7 +396,13 @@ function toInsufficientDimensionResult(dimension: string): DimensionResult {
     dimension,
     scoreA: null,
     scoreB: null,
+    meanDistance: null,
     distance: null,
+    itemDistance: null,
+    oppositionCount: 0,
+    hiddenDifferenceScore: null,
+    hasHiddenDifferences: false,
+    patternCategory: "insufficient_data",
     alignment: null,
     alignmentCategory: "insufficient_data",
     complementarity: null,
@@ -345,6 +421,62 @@ function toInsufficientDimensionResult(dimension: string): DimensionResult {
   };
 }
 
+function sharedQuestionDiffs(valuesA: GroupedAnswer[], valuesB: GroupedAnswer[]) {
+  const byQuestionA = new Map(valuesA.map((entry) => [entry.question_id, entry.value]));
+  const byQuestionB = new Map(valuesB.map((entry) => [entry.question_id, entry.value]));
+  const sharedQuestionIds = [...byQuestionA.keys()].filter((questionId) => byQuestionB.has(questionId));
+
+  return sharedQuestionIds.map((questionId) => Math.abs((byQuestionA.get(questionId) ?? 0) - (byQuestionB.get(questionId) ?? 0)));
+}
+
+function computeItemPatternMetrics(valuesA: GroupedAnswer[], valuesB: GroupedAnswer[]) {
+  const diffs = sharedQuestionDiffs(valuesA, valuesB);
+  const itemDistance = mean(diffs);
+  const oppositionCount = diffs.filter((diff) => diff >= 50).length;
+  const meanDistance = Math.abs((mean(valuesA.map((entry) => entry.value)) ?? 0) - (mean(valuesB.map((entry) => entry.value)) ?? 0));
+  const hiddenDifferenceScore =
+    itemDistance == null ? 0 : round(Math.max(0, itemDistance - meanDistance));
+  const hasHiddenDifferences =
+    itemDistance != null &&
+    meanDistance <= 15 &&
+    (itemDistance >= 30 || oppositionCount >= 2);
+
+  return {
+    itemDistance,
+    oppositionCount,
+    hiddenDifferenceScore,
+    hasHiddenDifferences,
+  };
+}
+
+function blendTeamFit(baseTeamFit: number, itemDistance: number) {
+  const itemAlignment = 100 - itemDistance;
+  return round(baseTeamFit * 0.65 + itemAlignment * 0.35);
+}
+
+function blendTensionScore(baseTensionScore: number, itemDistance: number) {
+  return round(Math.max(baseTensionScore, baseTensionScore * 0.55 + itemDistance * 0.45));
+}
+
+function describeHiddenDifference(dimension: KnownDimension) {
+  if (dimension === "Vision & Unternehmenshorizont") {
+    return "Aehnliche Gesamtposition, aber unterschiedliche Antwortmuster deuten auf verschiedene innere Logiken bei Richtung und Zeithorizont hin.";
+  }
+  if (dimension === "Entscheidungslogik") {
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Entscheidungen im Detail nicht ueber dieselbe innere Logik verarbeitet.";
+  }
+  if (dimension === "Risikoorientierung") {
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Risiken je nach Situation ueber verschiedene innere Logiken bewertet.";
+  }
+  if (dimension === "Arbeitsstruktur & Zusammenarbeit") {
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Zusammenarbeit im Alltag ueber unterschiedliche Arbeitslogiken organisiert.";
+  }
+  if (dimension === "Commitment") {
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Einsatz, Verfuegbarkeit und Prioritaeten nicht in denselben Situationen gleich auslegt.";
+  }
+  return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Spannungen und Konflikte ueber unterschiedliche innere Logiken verarbeitet.";
+}
+
 function classifyRisk(distance: number, lowMaxInclusive: number, mediumMaxInclusive: number): ConflictRiskLevel {
   if (distance <= lowMaxInclusive) return "low";
   if (distance <= mediumMaxInclusive) return "medium";
@@ -353,28 +485,44 @@ function classifyRisk(distance: number, lowMaxInclusive: number, mediumMaxInclus
 
 function buildVisionResult(context: ScoringContext): DimensionDetails {
   const interpretation = getDistanceInterpretation("Vision & Unternehmenshorizont", context.distance);
+  const teamFit = context.hasHiddenDifferences
+    ? blendTeamFit(context.alignment, context.itemDistance)
+    : context.alignment;
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(context.distance, context.itemDistance)
+    : context.distance;
 
   return {
     complementarity: null,
-    teamFit: context.alignment,
-    conflictRisk: classifyRisk(context.distance, 15, 30),
-    tensionScore: context.distance,
-    tensionCategory: deriveTensionCategory(context.distance),
-    dynamicLabel: interpretation.label,
+    teamFit,
+    conflictRisk: classifyRisk(tensionScore, 15, 30),
+    tensionScore,
+    tensionCategory: deriveTensionCategory(tensionScore),
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
     isComplementaryDynamic: false,
-    redFlags: context.distance > 35 ? ["Visionen und Unternehmenshorizonte liegen weit auseinander."] : [],
+    redFlags: [
+      ...(context.distance > 35 ? ["Visionen und Unternehmenshorizonte liegen weit auseinander."] : []),
+      ...(context.hasHiddenDifferences ? [describeHiddenDifference("Vision & Unternehmenshorizont")] : []),
+    ],
     greenFlags: [],
     collaborationStrengths:
-      context.distance <= 15 ? ["Vision und Unternehmenshorizont bilden eine sehr stabile gemeinsame Basis."] : [],
+      context.distance <= 15 && !context.hasHiddenDifferences
+        ? ["Vision und Unternehmenshorizont bilden eine sehr stabile gemeinsame Basis."]
+        : [],
     complementaryDynamics: [],
     potentialTensionAreas:
-      context.distance > 15
-        ? [
-            context.distance <= 30
-              ? "Vision und Unternehmenshorizont sind derzeit klaerungsbeduerftig."
-              : "Vision und Unternehmenshorizont koennen ein Spannungsfeld erzeugen.",
-          ]
-        : [],
+      [
+        ...(context.distance > 15
+          ? [
+              context.distance <= 30
+                ? "Vision und Unternehmenshorizont sind derzeit klaerungsbeduerftig."
+                : "Vision und Unternehmenshorizont koennen ein Spannungsfeld erzeugen.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Vision & Unternehmenshorizont")] : []),
+      ],
   };
 }
 
@@ -382,33 +530,47 @@ function buildDecisionResult(context: ScoringContext): DimensionDetails {
   const interpretation = getDistanceInterpretation("Entscheidungslogik", context.distance);
   const hasProductiveTension = context.distance >= 10 && context.distance <= 20;
   const bonus = hasProductiveTension ? 8 : 0;
+  const baseTeamFit = round(Math.min(100, context.alignment + bonus));
+  const teamFit = context.hasHiddenDifferences
+    ? blendTeamFit(baseTeamFit, context.itemDistance)
+    : baseTeamFit;
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(context.distance, context.itemDistance)
+    : context.distance;
 
   return {
     complementarity: null,
-    teamFit: round(Math.min(100, context.alignment + bonus)),
-    conflictRisk: classifyRisk(context.distance, 20, 35),
-    tensionScore: context.distance,
-    tensionCategory: deriveTensionCategory(context.distance),
-    dynamicLabel: interpretation.label,
-    isComplementaryDynamic: hasProductiveTension,
+    teamFit,
+    conflictRisk: classifyRisk(tensionScore, 20, 35),
+    tensionScore,
+    tensionCategory: deriveTensionCategory(tensionScore),
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
+    isComplementaryDynamic: hasProductiveTension && !context.hasHiddenDifferences,
     redFlags: [],
-    greenFlags: hasProductiveTension
+    greenFlags: hasProductiveTension && !context.hasHiddenDifferences
       ? ["Moderate Unterschiede in der Entscheidungslogik koennen produktiv sein."]
       : [],
     collaborationStrengths:
-      context.distance <= 10 ? ["Die Entscheidungslogik ist sehr aehnlich und wirkt leicht anschlussfaehig."] : [],
+      context.distance <= 10 && !context.hasHiddenDifferences
+        ? ["Die Entscheidungslogik ist sehr aehnlich und wirkt leicht anschlussfaehig."]
+        : [],
     complementaryDynamics:
-      hasProductiveTension
+      hasProductiveTension && !context.hasHiddenDifferences
         ? ["Die Entscheidungslogik zeigt eine produktive ergaenzende Dynamik."]
         : [],
     potentialTensionAreas:
-      context.distance > 20
-        ? [
-            context.distance <= 35
-              ? "Unterschiedliche Entscheidungsstile brauchen bewusste Abstimmung."
-              : "Die Entscheidungslogik kann zu spuerbarem Reibungspotenzial fuehren.",
-          ]
-        : [],
+      [
+        ...(context.distance > 20
+          ? [
+              context.distance <= 35
+                ? "Unterschiedliche Entscheidungsstile brauchen bewusste Abstimmung."
+                : "Die Entscheidungslogik kann zu spuerbarem Reibungspotenzial fuehren.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Entscheidungslogik")] : []),
+      ],
   };
 }
 
@@ -437,34 +599,47 @@ function buildRiskResult(context: ScoringContext): DimensionDetails {
   } else {
     teamFit = round(0.85 * context.alignment + 0.15 * complementarity);
   }
+  const blendedTeamFit = context.hasHiddenDifferences
+    ? blendTeamFit(teamFit, context.itemDistance)
+    : round(teamFit);
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(context.distance, context.itemDistance)
+    : context.distance;
 
   return {
     complementarity,
-    teamFit: round(teamFit),
-    conflictRisk: classifyRisk(context.distance, 25, 40),
-    tensionScore: context.distance,
-    tensionCategory: deriveTensionCategory(context.distance),
-    dynamicLabel: interpretation.label,
-    isComplementaryDynamic: context.distance >= 10 && context.distance <= 25,
+    teamFit: blendedTeamFit,
+    conflictRisk: classifyRisk(tensionScore, 25, 40),
+    tensionScore,
+    tensionCategory: deriveTensionCategory(tensionScore),
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
+    isComplementaryDynamic: context.distance >= 10 && context.distance <= 25 && !context.hasHiddenDifferences,
     redFlags: context.distance > 45 ? ["Sehr grosse Unterschiede in der Risikoorientierung koennen das Team belasten."] : [],
     greenFlags:
-      context.distance >= 10 && context.distance <= 25
+      context.distance >= 10 && context.distance <= 25 && !context.hasHiddenDifferences
         ? ["Unterschiede in der Risikoorientierung koennen sich sinnvoll ergaenzen."]
         : [],
     collaborationStrengths:
-      context.distance <= 10 ? ["Die Risikoorientierung ist sehr aehnlich und schafft strategische Klarheit."] : [],
+      context.distance <= 10 && !context.hasHiddenDifferences
+        ? ["Die Risikoorientierung ist sehr aehnlich und schafft strategische Klarheit."]
+        : [],
     complementaryDynamics:
-      context.distance >= 10 && context.distance <= 25
+      context.distance >= 10 && context.distance <= 25 && !context.hasHiddenDifferences
         ? ["Die Risikoorientierung wirkt als starke ergaenzende Dynamik."]
         : [],
     potentialTensionAreas:
-      context.distance > 25
-        ? [
-            context.distance <= 40
-              ? "Die Risikoorientierung zeigt unterschiedliche Komfortzonen."
-              : "In der Risikoorientierung sind strategische Spannungen moeglich.",
-          ]
-        : [],
+      [
+        ...(context.distance > 25
+          ? [
+              context.distance <= 40
+                ? "Die Risikoorientierung zeigt unterschiedliche Komfortzonen."
+                : "In der Risikoorientierung sind strategische Spannungen moeglich.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Risikoorientierung")] : []),
+      ],
   };
 }
 
@@ -472,64 +647,97 @@ function buildCollaborationResult(context: ScoringContext): DimensionDetails {
   const interpretation = getDistanceInterpretation("Arbeitsstruktur & Zusammenarbeit", context.distance);
   const hasProductiveDifference = context.distance >= 10 && context.distance <= 20;
   const hasComplementaryDynamic = context.distance >= 8 && context.distance <= 18;
+  const baseTeamFit = round(Math.min(100, context.alignment + (hasProductiveDifference ? 5 : 0)));
+  const teamFit = context.hasHiddenDifferences
+    ? blendTeamFit(baseTeamFit, context.itemDistance)
+    : baseTeamFit;
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(context.distance, context.itemDistance)
+    : context.distance;
 
   return {
     complementarity: null,
-    teamFit: round(Math.min(100, context.alignment + (hasProductiveDifference ? 5 : 0))),
-    conflictRisk: classifyRisk(context.distance, 20, 35),
-    tensionScore: context.distance,
-    tensionCategory: deriveTensionCategory(context.distance),
-    dynamicLabel: interpretation.label,
-    isComplementaryDynamic: hasComplementaryDynamic,
+    teamFit,
+    conflictRisk: classifyRisk(tensionScore, 20, 35),
+    tensionScore,
+    tensionCategory: deriveTensionCategory(tensionScore),
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
+    isComplementaryDynamic: hasComplementaryDynamic && !context.hasHiddenDifferences,
     redFlags:
-      context.distance > 40
-        ? ["Arbeitsstruktur und Zusammenarbeit unterscheiden sich sehr stark."]
-        : [],
+      [
+        ...(context.distance > 40
+          ? ["Arbeitsstruktur und Zusammenarbeit unterscheiden sich sehr stark."]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Arbeitsstruktur & Zusammenarbeit")] : []),
+      ],
     greenFlags:
-      hasComplementaryDynamic
+      hasComplementaryDynamic && !context.hasHiddenDifferences
         ? ["Die Unterschiede in der Zusammenarbeit wirken ausgewogen und anschlussfaehig."]
         : [],
     collaborationStrengths:
-      context.distance <= 15 ? ["Die Arbeitsweise wirkt harmonisch und im Alltag leicht koordinierbar."] : [],
+      context.distance <= 15 && !context.hasHiddenDifferences
+        ? ["Die Arbeitsweise wirkt harmonisch und im Alltag leicht koordinierbar."]
+        : [],
     complementaryDynamics:
-      hasComplementaryDynamic
+      hasComplementaryDynamic && !context.hasHiddenDifferences
         ? ["Unterschiede in der Arbeitsstruktur koennen eine ergaenzende Zusammenarbeit foerdern."]
         : [],
     potentialTensionAreas:
-      context.distance > 15
-        ? [
-            context.distance <= 30
-              ? "In der Zusammenarbeit bestehen unterschiedliche Praeferenzen, die bewusste Abstimmung brauchen."
-              : "Im Arbeitsalltag sind Reibungen in Struktur und Zusammenarbeit moeglich.",
-          ]
-        : [],
+      [
+        ...(context.distance > 15
+          ? [
+              context.distance <= 30
+                ? "In der Zusammenarbeit bestehen unterschiedliche Praeferenzen, die bewusste Abstimmung brauchen."
+                : "Im Arbeitsalltag sind Reibungen in Struktur und Zusammenarbeit moeglich.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Arbeitsstruktur & Zusammenarbeit")] : []),
+      ],
   };
 }
 
 function buildCommitmentResult(context: ScoringContext): DimensionDetails {
   const interpretation = getDistanceInterpretation("Commitment", context.distance);
+  const teamFit = context.hasHiddenDifferences
+    ? blendTeamFit(context.alignment, context.itemDistance)
+    : context.alignment;
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(context.distance, context.itemDistance)
+    : context.distance;
 
   return {
     complementarity: null,
-    teamFit: context.alignment,
-    conflictRisk: classifyRisk(context.distance, 15, 25),
-    tensionScore: context.distance,
-    tensionCategory: deriveTensionCategory(context.distance),
-    dynamicLabel: interpretation.label,
+    teamFit,
+    conflictRisk: classifyRisk(tensionScore, 15, 25),
+    tensionScore,
+    tensionCategory: deriveTensionCategory(tensionScore),
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
     isComplementaryDynamic: false,
-    redFlags: context.distance > 30 ? ["Das Commitment-Niveau wirkt deutlich unterschiedlich."] : [],
+    redFlags: [
+      ...(context.distance > 30 ? ["Das Commitment-Niveau wirkt deutlich unterschiedlich."] : []),
+      ...(context.hasHiddenDifferences ? [describeHiddenDifference("Commitment")] : []),
+    ],
     greenFlags: [],
     collaborationStrengths:
-      context.distance <= 15 ? ["Das Commitment wirkt auf einem aehnlichen Einsatzniveau verankert."] : [],
+      context.distance <= 15 && !context.hasHiddenDifferences
+        ? ["Das Commitment wirkt auf einem aehnlichen Einsatzniveau verankert."]
+        : [],
     complementaryDynamics: [],
     potentialTensionAreas:
-      context.distance > 15
-        ? [
-            context.distance <= 25
-              ? "Im Commitment zeigen sich unterschiedliche Belastungsmodelle."
-              : "Commitment ist ein potenziell kritisches Thema fuer die Zusammenarbeit.",
-          ]
-        : [],
+      [
+        ...(context.distance > 15
+          ? [
+              context.distance <= 25
+                ? "Im Commitment zeigen sich unterschiedliche Belastungsmodelle."
+                : "Commitment ist ein potenziell kritisches Thema fuer die Zusammenarbeit.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Commitment")] : []),
+      ],
   };
 }
 
@@ -537,10 +745,14 @@ function buildConflictStyleResult(context: ScoringContext): DimensionDetails {
   const interpretation = getDistanceInterpretation("Konfliktstil", context.distance);
   const extremeOpposition =
     (context.scoreA > 75 && context.scoreB < 25) || (context.scoreB > 75 && context.scoreA < 25);
-  const baseRisk = classifyRisk(context.distance, 20, 35);
+  const tensionScore = context.hasHiddenDifferences
+    ? blendTensionScore(extremeOpposition ? Math.max(context.distance, 56) : context.distance, context.itemDistance)
+    : extremeOpposition
+      ? Math.max(context.distance, 56)
+      : context.distance;
+  const baseRisk = classifyRisk(tensionScore, 20, 35);
   const conflictRisk = extremeOpposition || baseRisk === "high" ? "high" : baseRisk;
   const redFlags = [];
-  const tensionScore = extremeOpposition ? Math.max(context.distance, 56) : context.distance;
 
   if (context.distance > 40) {
     redFlags.push("Die Konfliktstile liegen weit auseinander.");
@@ -548,28 +760,40 @@ function buildConflictStyleResult(context: ScoringContext): DimensionDetails {
   if (extremeOpposition) {
     redFlags.push("Extreme Gegenpole im Konfliktstil deuten auf hohes Eskalationsrisiko hin.");
   }
+  if (context.hasHiddenDifferences) {
+    redFlags.push(describeHiddenDifference("Konfliktstil"));
+  }
 
   return {
     complementarity: null,
-    teamFit: context.alignment,
+    teamFit: context.hasHiddenDifferences
+      ? blendTeamFit(context.alignment, context.itemDistance)
+      : context.alignment,
     conflictRisk,
     tensionScore,
     tensionCategory: deriveTensionCategory(tensionScore),
-    dynamicLabel: interpretation.label,
+    dynamicLabel: context.hasHiddenDifferences
+      ? "aehnliche Position, unterschiedliche innere Logik"
+      : interpretation.label,
     isComplementaryDynamic: false,
     redFlags,
     greenFlags: [],
     collaborationStrengths:
-      context.distance <= 15 ? ["Die Konfliktkultur ist aehnlich und dadurch leichter anschlussfaehig."] : [],
+      context.distance <= 15 && !context.hasHiddenDifferences
+        ? ["Die Konfliktkultur ist aehnlich und dadurch leichter anschlussfaehig."]
+        : [],
     complementaryDynamics: [],
     potentialTensionAreas:
-      context.distance > 15 || extremeOpposition
-        ? [
-            context.distance <= 35 && !extremeOpposition
-              ? "Die Konfliktstile unterscheiden sich und brauchen bewusste Uebersetzung."
-              : "Im Konfliktstil besteht hohes Missverstaendnis- oder Eskalationspotenzial.",
-          ]
-        : [],
+      [
+        ...(context.distance > 15 || extremeOpposition
+          ? [
+              context.distance <= 35 && !extremeOpposition
+                ? "Die Konfliktstile unterscheiden sich und brauchen bewusste Uebersetzung."
+                : "Im Konfliktstil besteht hohes Missverstaendnis- oder Eskalationspotenzial.",
+            ]
+          : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Konfliktstil")] : []),
+      ],
   };
 }
 
@@ -602,8 +826,8 @@ const DIMENSION_RULES: Record<KnownDimension, KnownDimensionRule> = {
 
 function scoreDimension(
   dimension: KnownDimension,
-  personAByDimension: Map<string, number[]>,
-  personBByDimension: Map<string, number[]>
+  personAByDimension: Map<string, GroupedAnswer[]>,
+  personBByDimension: Map<string, GroupedAnswer[]>
 ): DimensionResult {
   const valuesA = personAByDimension.get(dimension) ?? [];
   const valuesB = personBByDimension.get(dimension) ?? [];
@@ -615,19 +839,29 @@ function scoreDimension(
     return toInsufficientDimensionResult(dimension);
   }
 
-  const scoreA = mean(valuesA);
-  const scoreB = mean(valuesB);
+  const scoreA = mean(valuesA.map((entry) => entry.value));
+  const scoreB = mean(valuesB.map((entry) => entry.value));
   if (scoreA == null || scoreB == null) {
     return toInsufficientDimensionResult(dimension);
   }
 
-  const distance = round(Math.abs(scoreA - scoreB));
-  const alignment = round(100 - distance);
+  const meanDistance = round(Math.abs(scoreA - scoreB));
+  const alignment = round(100 - meanDistance);
+  const { itemDistance, oppositionCount, hiddenDifferenceScore, hasHiddenDifferences } =
+    computeItemPatternMetrics(valuesA, valuesB);
+  if (itemDistance == null) {
+    return toInsufficientDimensionResult(dimension);
+  }
   const details = DIMENSION_RULES[dimension].compute({
     dimension,
     scoreA,
     scoreB,
-    distance,
+    distance: meanDistance,
+    meanDistance,
+    itemDistance,
+    oppositionCount,
+    hiddenDifferenceScore,
+    hasHiddenDifferences,
     alignment,
   });
 
@@ -635,7 +869,17 @@ function scoreDimension(
     dimension,
     scoreA,
     scoreB,
-    distance,
+    meanDistance,
+    distance: meanDistance,
+    itemDistance,
+    oppositionCount,
+    hiddenDifferenceScore,
+    hasHiddenDifferences,
+    patternCategory: derivePatternCategory({
+      meanDistance,
+      itemDistance,
+      hasHiddenDifferences,
+    }),
     alignment,
     alignmentCategory: deriveFitCategory(alignment),
     complementarity: details.complementarity == null ? null : round(details.complementarity),
@@ -677,7 +921,8 @@ function buildStrengthCandidate(result: DimensionResult): ReportInsight | null {
       fitCategoryPriority(result.fitCategory) +
       dimensionPriorityBonus(result.dimension, "strength") +
       dimensionWeight(result.dimension) * 0.2 +
-      (result.collaborationStrengths.length > 0 ? 6 : 0),
+      (result.collaborationStrengths.length > 0 ? 6 : 0) -
+      (result.hasHiddenDifferences ? 16 : 0),
     2
   );
 
@@ -734,7 +979,8 @@ function buildTensionCandidate(result: DimensionResult): ReportInsight | null {
       tensionCategoryPriority(result.tensionCategory) +
       dimensionPriorityBonus(result.dimension, "tension") +
       dimensionWeight(result.dimension) * 0.2 +
-      (result.potentialTensionAreas.length > 0 ? 6 : 0),
+      (result.potentialTensionAreas.length > 0 ? 6 : 0) +
+      (result.hasHiddenDifferences ? 14 : 0),
     2
   );
 
@@ -770,8 +1016,8 @@ function selectExecutiveInsights(dimensions: DimensionResult[]): ExecutiveInsigh
 }
 
 export function scoreFounderAlignment(input: TeamScoringInput): TeamScoringResult {
-  const personAByDimension = groupAnswersByDimension(input.personA);
-  const personBByDimension = groupAnswersByDimension(input.personB);
+  const personAByDimension = groupScorableAnswersByDimension(input.personA);
+  const personBByDimension = groupScorableAnswersByDimension(input.personB);
 
   const dimensions = DIMENSION_ORDER.map((dimension) =>
     scoreDimension(dimension, personAByDimension, personBByDimension)

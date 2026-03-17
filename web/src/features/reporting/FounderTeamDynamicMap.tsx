@@ -6,6 +6,8 @@ type DynamicMapDimension = {
   scoreA: number | null;
   scoreB: number | null;
   distance: number | null;
+  itemDistance: number | null;
+  hasHiddenDifferences: boolean;
 };
 
 type FounderTeamDynamicMapProps = {
@@ -70,6 +72,25 @@ function deriveFounderPoint(
 }
 
 function deriveDifferenceSentence(dimensions: DynamicMapDimension[]) {
+  const hiddenDifferences = [...dimensions]
+    .filter((dimension) => dimension.hasHiddenDifferences)
+    .sort((a, b) => (b.itemDistance ?? 0) - (a.itemDistance ?? 0));
+
+  if (hiddenDifferences.length > 0) {
+    const first = hiddenDifferences[0];
+    const second = hiddenDifferences[1];
+
+    if (second) {
+      return t(
+        `In der Gesamtposition wirkt ihr in mehreren Bereichen nah beieinander. Auf Frageebene zeigen sich aber verdeckte Unterschiede vor allem in ${first.dimension.toLowerCase()} und ${second.dimension.toLowerCase()}.`
+      );
+    }
+
+    return t(
+      `In der Gesamtposition wirkt ihr in mehreren Bereichen nah beieinander. Auf Frageebene zeigen sich aber verdeckte Unterschiede vor allem in ${first.dimension.toLowerCase()}.`
+    );
+  }
+
   const sorted = [...dimensions]
     .filter((dimension) => dimension.distance != null)
     .sort((a, b) => (b.distance ?? 0) - (a.distance ?? 0));
@@ -138,6 +159,9 @@ export function FounderTeamDynamicMap({
   };
 
   const differenceSentence = deriveDifferenceSentence(dimensions);
+  const hiddenDifferences = dimensions
+    .filter((dimension) => dimension.hasHiddenDifferences)
+    .sort((a, b) => (b.itemDistance ?? 0) - (a.itemDistance ?? 0));
   const founderALabel = founderLabel(founderAName, "Founder A");
   const founderBLabel = founderLabel(founderBName, "Founder B");
 
@@ -339,6 +363,18 @@ export function FounderTeamDynamicMap({
           )}
         </p>
         <p className="text-sm leading-7 text-slate-600">{t(differenceSentence)}</p>
+        {hiddenDifferences.length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {hiddenDifferences.map((dimension) => (
+              <span
+                key={`${dimension.dimension}-hidden-diff`}
+                className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800"
+              >
+                {t(`${dimension.dimension}: verdeckte Unterschiede`)}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

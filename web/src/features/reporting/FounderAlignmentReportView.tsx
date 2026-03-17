@@ -44,11 +44,17 @@ function buildRadarSummaryGroups(
     fitCategory: "very_high" | "high" | "mixed" | "low" | "insufficient_data";
     tensionCategory: "low" | "moderate" | "elevated" | "insufficient_data";
     isComplementaryDynamic: boolean;
+    hasHiddenDifferences: boolean;
   }>
 ) {
+  const hiddenDifferences = dimensions
+    .filter((dimension) => dimension.hasHiddenDifferences)
+    .map((dimension) => dimension.dimension);
+
   const highPassung = dimensions
     .filter(
       (dimension) =>
+        !dimension.hasHiddenDifferences &&
         !dimension.isComplementaryDynamic &&
         (dimension.fitCategory === "very_high" || dimension.fitCategory === "high") &&
         (dimension.tensionCategory === "low" || dimension.tensionCategory === "insufficient_data")
@@ -63,6 +69,7 @@ function buildRadarSummaryGroups(
     .filter(
       (dimension) =>
         !dimension.isComplementaryDynamic &&
+        !dimension.hasHiddenDifferences &&
         (dimension.tensionCategory === "moderate" ||
           dimension.tensionCategory === "elevated" ||
           dimension.fitCategory === "mixed" ||
@@ -71,6 +78,10 @@ function buildRadarSummaryGroups(
     .map((dimension) => dimension.dimension);
 
   return [
+    {
+      title: "Verdeckte Unterschiede",
+      dimensions: hiddenDifferences,
+    },
     {
       title: "Hohe Passung",
       dimensions: highPassung,
@@ -430,6 +441,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.vision.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.vision.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.vision.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.vision.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.vision.dimension))?.itemDistance}
           />
           <FounderReportSectionCard
             title={report.sections.decisionLogic.dimension}
@@ -444,6 +457,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.decisionLogic.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.decisionLogic.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.decisionLogic.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.decisionLogic.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.decisionLogic.dimension))?.itemDistance}
           />
           <FounderReportSectionCard
             title={report.sections.riskOrientation.dimension}
@@ -458,6 +473,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.riskOrientation.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.riskOrientation.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.riskOrientation.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.riskOrientation.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.riskOrientation.dimension))?.itemDistance}
           />
           <FounderReportSectionCard
             title={report.sections.workStructure.dimension}
@@ -472,6 +489,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.workStructure.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.workStructure.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.workStructure.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.workStructure.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.workStructure.dimension))?.itemDistance}
           />
           <FounderReportSectionCard
             title={report.sections.commitment.dimension}
@@ -486,6 +505,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.commitment.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.commitment.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.commitment.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.commitment.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.commitment.dimension))?.itemDistance}
           />
           <FounderReportSectionCard
             title={report.sections.conflictStyle.dimension}
@@ -500,6 +521,8 @@ export function FounderAlignmentReportView({
             fitCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.conflictStyle.dimension))?.fitCategory}
             tensionCategory={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.conflictStyle.dimension))?.tensionCategory}
             isComplementaryDynamic={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.conflictStyle.dimension))?.isComplementaryDynamic}
+            hasHiddenDifferences={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.conflictStyle.dimension))?.hasHiddenDifferences}
+            itemDistance={scoringResult.dimensions.find((dimension) => normalizeDimensionName(dimension.dimension) === normalizeDimensionName(report.sections.conflictStyle.dimension))?.itemDistance}
           />
         </section>
 
