@@ -1,3 +1,4 @@
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { hasProfileRole, normalizeProfileRoles } from "@/features/profile/profileRoles";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
@@ -41,6 +42,24 @@ type ReportRunRow = {
   invitation_id: string;
   created_at: string;
 };
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
+
+function createPrivilegedClient(): SupabaseLikeClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
+
+  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
 
 export type AdvisorDashboardTeam = {
   invitationId: string;
@@ -141,17 +160,19 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
 
   const advisorAccess = advisorAccessRows as AdvisorAccessRow[];
   const invitationIds = advisorAccess.map((row) => row.invitation_id);
+  const privileged = createPrivilegedClient();
+  const dataClient = privileged ?? supabase;
 
   const [invitationResult, workbookResult, reportRunResult] = await Promise.all([
-    supabase
+    dataClient
       .from("invitations")
       .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, created_at")
       .in("id", invitationIds),
-    supabase
+    dataClient
       .from("founder_alignment_workbooks")
       .select("invitation_id, updated_at, payload")
       .in("invitation_id", invitationIds),
-    supabase
+    dataClient
       .from("report_runs")
       .select("invitation_id, created_at")
       .in("invitation_id", invitationIds)
@@ -174,7 +195,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
     ),
   ];
 
-  const { data: profileRows } = await supabase
+  const { data: profileRows } = await dataClient
     .from("profiles")
     .select("user_id, display_name")
     .in("user_id", relevantUserIds);

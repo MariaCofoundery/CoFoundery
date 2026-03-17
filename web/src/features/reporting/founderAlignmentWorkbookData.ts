@@ -1,3 +1,4 @@
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getFounderScoringDebug } from "@/features/scoring/founderScoringDebug";
 import {
@@ -18,7 +19,10 @@ import {
   type FounderAlignmentWorkbookHighlights,
   type FounderAlignmentWorkbookPayload,
 } from "@/features/reporting/founderAlignmentWorkbook";
-import { getReportRunSnapshotForSession } from "@/features/reporting/actions";
+import {
+  getPrivilegedReportRunSnapshotForInvitation,
+  getReportRunSnapshotForSession,
+} from "@/features/reporting/actions";
 import {
   claimFounderAlignmentAdvisorAccess,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
@@ -56,6 +60,24 @@ type ProfileRow = {
   user_id: string;
   display_name: string | null;
 };
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
+
+function createPrivilegedClient(): SupabaseLikeClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
+
+  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
 
 export type FounderAlignmentWorkbookViewerRole = "founderA" | "founderB" | "advisor" | "unknown";
 
@@ -137,14 +159,16 @@ function buildMockAnswers() {
   return { personA, personB };
 }
 
-async function loadFounderContext(invitationId: string): Promise<{
+async function loadFounderContextWithClient(
+  invitationId: string,
+  supabase: SupabaseLikeClient
+): Promise<{
   founderAName: string | null;
   founderBName: string | null;
   founderAUserId: string | null;
   founderBUserId: string | null;
   teamContext: TeamContext | null;
 }> {
-  const supabase = await createClient();
   const { data: invitation } = await supabase
     .from("invitations")
     .select("inviter_user_id, invitee_user_id, team_context")
@@ -180,8 +204,10 @@ async function loadFounderContext(invitationId: string): Promise<{
   };
 }
 
-async function loadWorkbookRow(invitationId: string): Promise<WorkbookRow | null> {
-  const supabase = await createClient();
+async function loadWorkbookRowWithClient(
+  invitationId: string,
+  supabase: SupabaseLikeClient
+): Promise<WorkbookRow | null> {
   const { data, error } = await supabase
     .from("founder_alignment_workbooks")
     .select("invitation_id, team_context, payload, updated_at, updated_by")
@@ -191,9 +217,10 @@ async function loadWorkbookRow(invitationId: string): Promise<WorkbookRow | null
   if (error || !data) return null;
   return data as WorkbookRow;
 }
-
-async function loadWorkbookAdvisorRow(invitationId: string): Promise<WorkbookAdvisorRow | null> {
-  const supabase = await createClient();
+async function loadWorkbookAdvisorRowWithClient(
+  invitationId: string,
+  supabase: SupabaseLikeClient
+): Promise<WorkbookAdvisorRow | null> {
   const { data, error } = await supabase
     .from("founder_alignment_workbook_advisors")
     .select(
@@ -266,12 +293,18 @@ export async function getFounderAlignmentWorkbookPageData(
     });
   }
 
-  const [debugResult, founderContext, workbookRow, reportSnapshot, advisorRow] = await Promise.all([
-    getFounderScoringDebug(normalizedInvitationId),
-    loadFounderContext(normalizedInvitationId),
-    loadWorkbookRow(normalizedInvitationId),
-    getReportRunSnapshotForSession(normalizedInvitationId),
-    loadWorkbookAdvisorRow(normalizedInvitationId),
+  const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
+  const isLinkedAdvisor = Boolean(user?.id && advisorRow?.advisor_user_id === user.id);
+  const privileged = isLinkedAdvisor ? createPrivilegedClient() : null;
+  const dataClient = privileged ?? supabase;
+
+  const [debugResult, founderContext, workbookRow, reportSnapshot] = await Promise.all([
+    isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
+    loadFounderContextWithClient(normalizedInvitationId, dataClient),
+    loadWorkbookRowWithClient(normalizedInvitationId, dataClient),
+    isLinkedAdvisor
+      ? getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId)
+      : getReportRunSnapshotForSession(normalizedInvitationId),
   ]);
 
   const snapshotHasFounderAlignmentData = Boolean(
@@ -280,15 +313,22 @@ export async function getFounderAlignmentWorkbookPageData(
       reportSnapshot.founderScoring
   );
 
-  if (!snapshotHasFounderAlignmentData && (debugResult.status !== "ready" || !debugResult.scoring)) {
+  if (
+    !snapshotHasFounderAlignmentData &&
+    (isLinkedAdvisor || !debugResult || debugResult.status !== "ready" || !debugResult.scoring)
+  ) {
     const fallbackStatus: FounderAlignmentWorkbookPageData["status"] =
-      debugResult.status === "ready" ? "in_progress" : debugResult.status;
+      isLinkedAdvisor || !debugResult
+        ? "in_progress"
+        : debugResult.status === "ready"
+          ? "in_progress"
+          : debugResult.status;
 
     return {
       status: fallbackStatus,
       invitationId: normalizedInvitationId,
       teamContext: founderContext.teamContext ?? teamContext,
-      reason: debugResult.reason,
+      reason: isLinkedAdvisor ? "report_snapshot_pending" : (debugResult?.reason ?? null),
     };
   }
 
@@ -296,7 +336,7 @@ export async function getFounderAlignmentWorkbookPageData(
   const scoringResult =
     snapshotHasFounderAlignmentData && reportSnapshot?.founderScoring
       ? reportSnapshot.founderScoring
-      : debugResult.scoring!;
+      : debugResult!.scoring!;
   const report =
     snapshotHasFounderAlignmentData && reportSnapshot?.founderReport
       ? reportSnapshot.founderReport

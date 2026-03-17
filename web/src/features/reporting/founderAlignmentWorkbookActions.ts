@@ -224,11 +224,16 @@ async function loadWorkbookPayload(
 async function resolveWorkbookViewerRole(
   invitationId: string,
   userId: string,
-  supabase: SupabaseLikeClient
+  supabase: SupabaseLikeClient,
+  privileged?: SupabaseLikeClient | null
 ): Promise<WorkbookViewerRole> {
   const [invitation, advisorRow] = await Promise.all([
-    loadInvitationAccessRow(invitationId, supabase),
-    loadAdvisorAccessRow(invitationId, supabase),
+    loadInvitationAccessRow(invitationId, supabase).then((row) =>
+      row ?? (privileged ? loadInvitationAccessRow(invitationId, privileged) : null)
+    ),
+    loadAdvisorAccessRow(invitationId, supabase).then((row) =>
+      row ?? (privileged ? loadAdvisorAccessRow(invitationId, privileged) : null)
+    ),
   ]);
 
   if (!invitation) return "unknown";
@@ -349,14 +354,19 @@ export async function saveFounderAlignmentWorkbook({
     return { ok: false, reason: "not_authenticated" };
   }
 
-  const role = await resolveWorkbookViewerRole(normalizedInvitationId, user.id, supabase);
+  const privileged = createPrivilegedClient();
+  const role = await resolveWorkbookViewerRole(normalizedInvitationId, user.id, supabase, privileged);
   if (role === "unknown") {
     return { ok: false, reason: "forbidden" };
   }
+  if (role === "advisor" && !privileged) {
+    return { ok: false, reason: "save_failed" };
+  }
 
+  const dataClient = role === "advisor" && privileged ? privileged : supabase;
   const [existingPayload, advisorRow] = await Promise.all([
-    loadWorkbookPayload(normalizedInvitationId, supabase),
-    loadAdvisorAccessRow(normalizedInvitationId, supabase),
+    loadWorkbookPayload(normalizedInvitationId, dataClient),
+    loadAdvisorAccessRow(normalizedInvitationId, dataClient),
   ]);
 
   const sanitizedPayload = sanitizeFounderAlignmentWorkbookPayload(payload);
@@ -370,7 +380,8 @@ export async function saveFounderAlignmentWorkbook({
         )
       : mergeFounderPayload(existingPayload, sanitizedPayload, role, editingMode);
 
-  const { data, error } = await supabase
+  const writeClient = role === "advisor" && privileged ? privileged : supabase;
+  const { data, error } = await writeClient
     .from("founder_alignment_workbooks")
     .upsert(
       {

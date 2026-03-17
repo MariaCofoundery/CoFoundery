@@ -2171,6 +2171,34 @@ async function loadReportRunByInvitationId(invitationId: string): Promise<Report
   return mapReportRunRow(data as ReportRunRow);
 }
 
+export async function getPrivilegedReportRunSnapshotForInvitation(
+  invitationId: string
+): Promise<ReportRunSnapshot | null> {
+  const normalized = invitationId.trim();
+  if (!normalized) {
+    return null;
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    return null;
+  }
+
+  const { data, error } = await privileged
+    .from("report_runs")
+    .select("id, invitation_id, relationship_id, modules, input_assessment_ids, payload, created_at")
+    .eq("invitation_id", normalized)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return mapReportRunRow(data as ReportRunRow);
+}
+
 async function loadReportRunById(runId: string): Promise<ReportRunSnapshot | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
