@@ -1,5 +1,4 @@
 import { createHash } from "crypto";
-import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 
 export type FounderAlignmentWorkbookAdvisorInviteState = {
   founderAApproved: boolean;
@@ -13,19 +12,9 @@ export function hashFounderAlignmentAdvisorToken(token: string) {
 }
 
 export function buildFounderAlignmentAdvisorInvitePath({
-  invitationId,
-  teamContext,
   token,
 }: {
-  invitationId: string;
-  teamContext: TeamContext;
   token: string;
 }) {
-  const search = new URLSearchParams({
-    invitationId,
-    teamContext,
-    advisorToken: token,
-  });
-
-  return `/founder-alignment/workbook?${search.toString()}`;
+  return `/advisor/invite/${encodeURIComponent(token)}`;
 }

@@ -27,20 +27,22 @@ export default async function FounderAlignmentWorkbookPage({
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const advisorToken = params.advisorToken?.trim() || null;
 
+  if (advisorToken) {
+    redirect(`/advisor/invite/${encodeURIComponent(advisorToken)}`);
+  }
+
   if (!invitationId) {
     redirect("/dashboard");
   }
 
-  if (advisorToken) {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (!user) {
-      const nextPath = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId ?? "")}&teamContext=${encodeURIComponent(requestedTeamContext)}&advisorToken=${encodeURIComponent(advisorToken)}`;
-      redirect(`/login?next=${encodeURIComponent(nextPath)}`);
-    }
+  if (!user) {
+    const nextPath = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}&teamContext=${encodeURIComponent(requestedTeamContext)}`;
+    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, advisorToken);

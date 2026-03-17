@@ -40,6 +40,28 @@ type AdvisorAccessRow = {
   claimed_at: string | null;
 };
 
+type AdvisorInviteInvitationRow = {
+  id: string;
+  inviter_user_id: string;
+  invitee_user_id: string | null;
+  invitee_email: string | null;
+  team_context: string | null;
+  status: string;
+};
+
+type AdvisorInviteProfileRow = {
+  user_id: string;
+  display_name: string | null;
+};
+
+type AdvisorInviteReportRunRow = {
+  invitation_id: string;
+  created_at: string;
+  payload: {
+    reportType?: string | null;
+  } | null;
+};
+
 type WorkbookRow = {
   payload: unknown;
 };
@@ -90,6 +112,40 @@ export type PrepareFounderAlignmentAdvisorInviteResult =
         | "invite_failed";
     };
 
+export type FounderAlignmentAdvisorInviteLookupResult =
+  | {
+      status: "ready";
+      invitationId: string;
+      teamContext: TeamContext;
+      founderAName: string;
+      founderBName: string;
+      founderAApproved: boolean;
+      founderBApproved: boolean;
+      advisorName: string | null;
+      advisorLinked: boolean;
+      advisorUserId: string | null;
+      reportReady: boolean;
+      workbookReady: boolean;
+      reportType: string | null;
+    }
+  | {
+      status: "not_found";
+    };
+
+export type ClaimFounderAlignmentAdvisorAccessResult =
+  | {
+      ok: true;
+      row: AdvisorAccessRow;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_service_role"
+        | "invalid_token"
+        | "already_claimed"
+        | "update_failed";
+    };
+
 function createPrivilegedClient(): SupabaseDbClient | null {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -129,6 +185,23 @@ async function loadAdvisorAccessRow(
       "invitation_id, advisor_user_id, advisor_name, token_hash, founder_a_approved, founder_b_approved, requested_by, approved_at, claimed_at"
     )
     .eq("invitation_id", invitationId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as AdvisorAccessRow;
+}
+
+async function loadAdvisorAccessRowByToken(
+  token: string,
+  supabase: SupabaseLikeClient
+): Promise<AdvisorAccessRow | null> {
+  const tokenHash = hashFounderAlignmentAdvisorToken(token);
+  const { data, error } = await supabase
+    .from("founder_alignment_workbook_advisors")
+    .select(
+      "invitation_id, advisor_user_id, advisor_name, token_hash, founder_a_approved, founder_b_approved, requested_by, approved_at, claimed_at"
+    )
+    .eq("token_hash", tokenHash)
     .maybeSingle();
 
   if (error || !data) return null;
@@ -326,7 +399,6 @@ export async function saveFounderAlignmentWorkbook({
 
 export async function prepareFounderAlignmentAdvisorInvite({
   invitationId,
-  teamContext,
 }: {
   invitationId: string;
   teamContext: TeamContext;
@@ -456,8 +528,6 @@ export async function prepareFounderAlignmentAdvisorInvite({
     ok: true,
     status: "invite_ready",
     inviteUrl: buildFounderAlignmentAdvisorInvitePath({
-      invitationId: normalizedInvitationId,
-      teamContext,
       token,
     }),
     founderAApproved: true,
@@ -477,9 +547,11 @@ export async function claimFounderAlignmentAdvisorAccess({
   advisorToken: string;
   userId: string;
   fallbackName: string | null;
-}) {
+}): Promise<ClaimFounderAlignmentAdvisorAccessResult> {
   const privileged = createPrivilegedClient();
-  if (!privileged) return null;
+  if (!privileged) {
+    return { ok: false, reason: "missing_service_role" };
+  }
 
   const tokenHash = hashFounderAlignmentAdvisorToken(advisorToken);
   const { data: advisorRow, error } = await privileged
@@ -492,14 +564,14 @@ export async function claimFounderAlignmentAdvisorAccess({
     .maybeSingle();
 
   if (error || !advisorRow) {
-    return null;
+    return { ok: false, reason: "invalid_token" };
   }
 
   const typedAdvisorRow = advisorRow as AdvisorAccessRow;
   const nextAdvisorName = typedAdvisorRow.advisor_name ?? fallbackName;
 
   if (typedAdvisorRow.advisor_user_id && typedAdvisorRow.advisor_user_id !== userId) {
-    return null;
+    return { ok: false, reason: "already_claimed" };
   }
 
   const { data: updatedAdvisorRow, error: updateError } = await privileged
@@ -517,7 +589,7 @@ export async function claimFounderAlignmentAdvisorAccess({
     .maybeSingle();
 
   if (updateError || !updatedAdvisorRow) {
-    return null;
+    return { ok: false, reason: "update_failed" };
   }
 
   const currentPayload = await loadWorkbookPayload(invitationId, privileged);
@@ -535,5 +607,91 @@ export async function claimFounderAlignmentAdvisorAccess({
     })
     .eq("invitation_id", invitationId);
 
-  return updatedAdvisorRow as AdvisorAccessRow;
+  return {
+    ok: true,
+    row: updatedAdvisorRow as AdvisorAccessRow,
+  };
+}
+
+function normalizeAdvisorInviteTeamContext(value: string | null | undefined): TeamContext {
+  return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+export async function getFounderAlignmentAdvisorInviteByToken(
+  advisorToken: string
+): Promise<FounderAlignmentAdvisorInviteLookupResult> {
+  const normalizedToken = advisorToken.trim();
+  if (!normalizedToken) {
+    return { status: "not_found" };
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    return { status: "not_found" };
+  }
+
+  const advisorRow = await loadAdvisorAccessRowByToken(normalizedToken, privileged);
+  if (!advisorRow) {
+    return { status: "not_found" };
+  }
+
+  const [invitationResult, reportRunResult, workbookResult] = await Promise.all([
+    privileged
+      .from("invitations")
+      .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status")
+      .eq("id", advisorRow.invitation_id)
+      .maybeSingle(),
+    privileged
+      .from("report_runs")
+      .select("invitation_id, created_at, payload")
+      .eq("invitation_id", advisorRow.invitation_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    privileged
+      .from("founder_alignment_workbooks")
+      .select("invitation_id")
+      .eq("invitation_id", advisorRow.invitation_id)
+      .maybeSingle(),
+  ]);
+
+  const invitation = invitationResult.data as AdvisorInviteInvitationRow | null;
+  if (!invitation) {
+    return { status: "not_found" };
+  }
+
+  const profileIds = [invitation.inviter_user_id, invitation.invitee_user_id].filter(
+    (value): value is string => Boolean(value)
+  );
+  const { data: profileRows } = await privileged
+    .from("profiles")
+    .select("user_id, display_name")
+    .in("user_id", profileIds);
+
+  const profileByUserId = new Map(
+    ((profileRows ?? []) as AdvisorInviteProfileRow[]).map((row) => [
+      row.user_id,
+      row.display_name?.trim() ?? "",
+    ])
+  );
+  const latestReportRun = reportRunResult.data as AdvisorInviteReportRunRow | null;
+
+  return {
+    status: "ready",
+    invitationId: invitation.id,
+    teamContext: normalizeAdvisorInviteTeamContext(invitation.team_context),
+    founderAName: profileByUserId.get(invitation.inviter_user_id)?.trim() || "Founder A",
+    founderBName:
+      (invitation.invitee_user_id
+        ? profileByUserId.get(invitation.invitee_user_id)?.trim()
+        : invitation.invitee_email?.split("@")[0]?.trim()) || "Founder B",
+    founderAApproved: advisorRow.founder_a_approved,
+    founderBApproved: advisorRow.founder_b_approved,
+    advisorName: advisorRow.advisor_name ?? null,
+    advisorLinked: Boolean(advisorRow.advisor_user_id),
+    advisorUserId: advisorRow.advisor_user_id ?? null,
+    reportReady: Boolean(latestReportRun),
+    workbookReady: Boolean(workbookResult.data || latestReportRun),
+    reportType: latestReportRun?.payload?.reportType ?? null,
+  };
 }

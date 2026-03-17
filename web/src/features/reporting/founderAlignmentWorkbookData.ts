@@ -333,6 +333,15 @@ export async function getFounderAlignmentWorkbookPageData(
           ? "advisor"
           : "unknown";
 
+  if (currentUserRole === "unknown") {
+    return {
+      status: "forbidden",
+      invitationId: normalizedInvitationId,
+      teamContext: effectiveTeamContext,
+      reason: "viewer_not_linked",
+    };
+  }
+
   return {
     status: "ready",
     invitationId: normalizedInvitationId,
