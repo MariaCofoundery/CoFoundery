@@ -3,8 +3,6 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
-
-const SENT_INVITE_TOKEN_STORE_KEY = "sent_invite_tokens_v1";
 type TeamContext = "pre_founder" | "existing_team";
 
 function teamContextMeta(teamContext: TeamContext | null) {
@@ -26,31 +24,6 @@ function teamContextMeta(teamContext: TeamContext | null) {
 function toAbsoluteUrl(path: string) {
   if (typeof window === "undefined") return path;
   return path.startsWith("/") ? `${window.location.origin}${path}` : path;
-}
-
-function extractTokenFromInviteUrl(inviteUrl: string) {
-  if (typeof window === "undefined") return null;
-  try {
-    const parsed = inviteUrl.startsWith("http")
-      ? new URL(inviteUrl)
-      : new URL(inviteUrl, window.location.origin);
-    const token = parsed.searchParams.get("token");
-    return token?.trim() ? token : null;
-  } catch {
-    return null;
-  }
-}
-
-function storeInviteToken(invitationId: string, token: string) {
-  if (typeof window === "undefined") return;
-  try {
-    const raw = window.localStorage.getItem(SENT_INVITE_TOKEN_STORE_KEY);
-    const parsed = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-    parsed[invitationId] = token;
-    window.localStorage.setItem(SENT_INVITE_TOKEN_STORE_KEY, JSON.stringify(parsed));
-  } catch {
-    // ignore local cache errors
-  }
 }
 
 export function CoFounderInviteForm() {
@@ -99,11 +72,6 @@ export function CoFounderInviteForm() {
       }
 
       const absoluteInviteUrl = toAbsoluteUrl(result.inviteUrl);
-      const token = extractTokenFromInviteUrl(absoluteInviteUrl);
-      if (token) {
-        storeInviteToken(result.sessionId, token);
-      }
-
       setInviteUrl(absoluteInviteUrl);
       setCopyNotice(null);
       router.refresh();

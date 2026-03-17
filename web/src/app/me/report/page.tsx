@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
+import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 
 export default async function MeReportPage() {
@@ -37,6 +38,7 @@ export default async function MeReportPage() {
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
+      <ResearchPageTracker eventName="self_report_viewed" module="base" />
       <div className="no-print mb-8 flex items-center justify-between">
         <a
           href="/dashboard"
@@ -44,7 +46,7 @@ export default async function MeReportPage() {
         >
           Zurück zum Dashboard
         </a>
-        <PrintReportButton />
+        <PrintReportButton eventName="self_report_print_clicked" module="base" />
       </div>
 
       <section className="page-section mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mb-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-0">

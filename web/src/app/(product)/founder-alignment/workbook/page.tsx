@@ -4,12 +4,14 @@ import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlig
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
+import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
+  // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
 };
 
@@ -25,10 +27,10 @@ export default async function FounderAlignmentWorkbookPage({
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
-  const advisorToken = params.advisorToken?.trim() || null;
+  const legacyAdvisorToken = params.advisorToken?.trim() || null;
 
-  if (advisorToken) {
-    redirect(`/advisor/invite/${encodeURIComponent(advisorToken)}`);
+  if (legacyAdvisorToken) {
+    redirect(`/advisor/invite/${encodeURIComponent(legacyAdvisorToken)}`);
   }
 
   if (!invitationId) {
@@ -45,7 +47,7 @@ export default async function FounderAlignmentWorkbookPage({
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, advisorToken);
+  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
 
   if (data.status !== "ready") {
     return (
@@ -78,6 +80,12 @@ export default async function FounderAlignmentWorkbookPage({
 
   return (
     <main>
+      <ResearchPageTracker
+        eventName="workbook_page_viewed"
+        invitationId={data.invitationId}
+        teamContext={data.teamContext}
+        properties={{ role: data.currentUserRole, source: data.source }}
+      />
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-7xl justify-end">
           {data.currentUserRole !== "advisor" ? (
@@ -100,7 +108,6 @@ export default async function FounderAlignmentWorkbookPage({
         initialWorkbook={data.workbook}
         highlights={data.highlights}
         advisorInvite={data.advisorInvite}
-        advisorToken={advisorToken}
         canSave={data.canSave}
         persisted={data.persisted}
         updatedAt={data.updatedAt}

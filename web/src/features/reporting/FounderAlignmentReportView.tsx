@@ -13,6 +13,7 @@ import {
 } from "@/features/scoring/founderScoring";
 
 type Props = {
+  invitationId?: string | null;
   report: FounderAlignmentReport;
   scoringResult: TeamScoringResult;
   founderAName: string | null;
@@ -113,6 +114,7 @@ function getDimensionScores(
 }
 
 export function FounderAlignmentReportView({
+  invitationId = null,
   report,
   scoringResult,
   founderAName,
@@ -171,7 +173,12 @@ export function FounderAlignmentReportView({
             >
               Zurück
             </Link>
-            <PrintReportButton />
+            <PrintReportButton
+              eventName="report_print_clicked"
+              invitationId={invitationId}
+              teamContext={report.teamContext}
+              properties={{ reportType: "founder_alignment_v1" }}
+            />
           </div>
         ) : null}
 
@@ -179,7 +186,12 @@ export function FounderAlignmentReportView({
           <div className="relative flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
             {!backHref ? (
               <div className="self-end md:absolute md:right-0 md:top-0">
-                <PrintReportButton />
+                <PrintReportButton
+                  eventName="report_print_clicked"
+                  invitationId={invitationId}
+                  teamContext={report.teamContext}
+                  properties={{ reportType: "founder_alignment_v1" }}
+                />
               </div>
             ) : null}
 
@@ -537,7 +549,12 @@ export function FounderAlignmentReportView({
             Report als Grundlage, um Erwartungen, Unterschiede und gemeinsame Regeln konkret zu machen.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <PrintReportButton />
+            <PrintReportButton
+              eventName="report_print_clicked"
+              invitationId={invitationId}
+              teamContext={report.teamContext}
+              properties={{ reportType: "founder_alignment_v1" }}
+            />
             <ReportActionButton variant="secondary" href={conversationGuideHref}>
               Gespräch vorbereiten
             </ReportActionButton>

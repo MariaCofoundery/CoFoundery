@@ -9,6 +9,7 @@ type Props = LinkProps & {
   className?: string;
   eventName: string;
   invitationId?: string | null;
+  teamContext?: "pre_founder" | "existing_team" | null;
   module?: "base" | "values" | null;
   properties?: Record<string, unknown>;
 };
@@ -18,6 +19,7 @@ export function ResearchTrackedLink({
   className,
   eventName,
   invitationId = null,
+  teamContext = null,
   module = null,
   properties,
   ...linkProps
@@ -32,6 +34,7 @@ export function ResearchTrackedLink({
         trackResearchEvent({
           eventName,
           invitationId,
+          teamContext,
           module,
           flowId,
           properties,

@@ -7,6 +7,7 @@ import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { type FounderAlignmentWorkbookStepId } from "@/features/reporting/founderAlignmentWorkbook";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
 import { getReportRunSnapshotForSession } from "@/features/reporting/actions";
+import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import {
   FOUNDER_CONVERSATION_GUIDE_CHAPTERS,
   FOUNDER_VALUES_CONVERSATION_BLOCK,
@@ -122,6 +123,12 @@ export default async function FounderAlignmentConversationGuidePage({
         } as CSSProperties
       }
     >
+      <ResearchPageTracker
+        eventName="conversation_guide_viewed"
+        invitationId={data.invitationId}
+        teamContext={data.teamContext}
+        properties={{ valuesBlock: shouldShowValuesConversationBlock }}
+      />
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-6xl justify-between gap-3">
           <Link
@@ -134,6 +141,10 @@ export default async function FounderAlignmentConversationGuidePage({
             <PrintReportButton
               label={t("Gespraechsleitfaden als PDF exportieren")}
               className=""
+              eventName="conversation_guide_print_clicked"
+              invitationId={data.invitationId}
+              teamContext={data.teamContext}
+              properties={{ valuesBlock: shouldShowValuesConversationBlock }}
             />
           </div>
         </div>
@@ -330,6 +341,10 @@ export default async function FounderAlignmentConversationGuidePage({
               <PrintReportButton
                 label={t("Gespraechsleitfaden als PDF exportieren")}
                 className=""
+                eventName="conversation_guide_print_clicked"
+                invitationId={data.invitationId}
+                teamContext={data.teamContext}
+                properties={{ valuesBlock: shouldShowValuesConversationBlock }}
               />
             </div>
           </section>

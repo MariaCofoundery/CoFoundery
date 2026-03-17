@@ -37,6 +37,7 @@ export default async function MeBasePage({
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const isRefreshFlow = params.flow === "refresh";
+  let trackingTeamContext: "pre_founder" | "existing_team" | null = null;
 
   let completeRedirect = "/me/base/complete";
   if (invitationId) {
@@ -44,6 +45,7 @@ export default async function MeBasePage({
     if (!decision.ok) {
       redirect(`/dashboard?error=${encodeURIComponent(decision.reason)}`);
     }
+    trackingTeamContext = decision.team_context;
 
     const needsBase = isRefreshFlow
       ? decision.required_modules.includes("base")
@@ -165,6 +167,7 @@ export default async function MeBasePage({
         trackingContext={{
           module: "base",
           invitationId,
+          teamContext: trackingTeamContext,
         }}
       />
     </main>

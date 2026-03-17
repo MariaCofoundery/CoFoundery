@@ -14,6 +14,7 @@ import {
   hashFounderAlignmentAdvisorToken,
   type FounderAlignmentWorkbookAdvisorInviteState,
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
+import { trackServerResearchEvent } from "@/features/research/server";
 
 type SaveFounderAlignmentWorkbookInput = {
   invitationId: string;
@@ -410,6 +411,7 @@ export async function saveFounderAlignmentWorkbook({
 
 export async function prepareFounderAlignmentAdvisorInvite({
   invitationId,
+  teamContext,
 }: {
   invitationId: string;
   teamContext: TeamContext;
@@ -535,6 +537,18 @@ export async function prepareFounderAlignmentAdvisorInvite({
     return { ok: false, reason: "invite_failed" };
   }
 
+  await trackServerResearchEvent({
+    eventName: "advisor_invite_prepared",
+    userId: user.id,
+    invitationId: normalizedInvitationId,
+    teamContext,
+    properties: {
+      founderRole,
+      founderAApproved: true,
+      founderBApproved: true,
+    },
+  });
+
   return {
     ok: true,
     status: "invite_ready",
@@ -553,11 +567,13 @@ export async function claimFounderAlignmentAdvisorAccess({
   advisorToken,
   userId,
   fallbackName,
+  teamContext = null,
 }: {
   invitationId: string;
   advisorToken: string;
   userId: string;
   fallbackName: string | null;
+  teamContext?: TeamContext | null;
 }): Promise<ClaimFounderAlignmentAdvisorAccessResult> {
   const privileged = createPrivilegedClient();
   if (!privileged) {
@@ -617,6 +633,16 @@ export async function claimFounderAlignmentAdvisorAccess({
       updated_by: userId,
     })
     .eq("invitation_id", invitationId);
+
+  await trackServerResearchEvent({
+    eventName: "advisor_invite_claimed",
+    userId,
+    invitationId,
+    teamContext,
+    properties: {
+      hasFallbackName: Boolean(fallbackName),
+    },
+  });
 
   return {
     ok: true,

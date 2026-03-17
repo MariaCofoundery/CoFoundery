@@ -14,6 +14,7 @@ import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
+  // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
 };
 
@@ -29,13 +30,17 @@ export default async function FounderAlignmentWorkbookPrintPage({
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
-  const advisorToken = params.advisorToken?.trim() || null;
+  const legacyAdvisorToken = params.advisorToken?.trim() || null;
 
   if (!invitationId) {
     redirect("/dashboard");
   }
 
-  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, advisorToken);
+  if (legacyAdvisorToken) {
+    redirect(`/advisor/invite/${encodeURIComponent(legacyAdvisorToken)}`);
+  }
+
+  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
 
   if (data.status !== "ready") {
     return (
@@ -72,7 +77,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
     dateStyle: "medium",
   }).format(data.updatedAt ? new Date(data.updatedAt) : new Date());
   const workbookHref = data.invitationId
-    ? `/founder-alignment/workbook?invitationId=${data.invitationId}&teamContext=${data.teamContext}${advisorToken ? `&advisorToken=${encodeURIComponent(advisorToken)}` : ""}`
+    ? `/founder-alignment/workbook?invitationId=${data.invitationId}&teamContext=${data.teamContext}`
     : `/founder-alignment/workbook?teamContext=${data.teamContext}`;
 
   return (
@@ -90,7 +95,13 @@ export default async function FounderAlignmentWorkbookPrintPage({
           <Link href={workbookHref} className="text-sm text-slate-500 transition hover:text-slate-900">
             {t("Zurueck zum Arbeitsdokument")}
           </Link>
-          <PrintReportButton label="Als PDF speichern" />
+          <PrintReportButton
+            label="Als PDF speichern"
+            eventName="workbook_print_clicked"
+            invitationId={data.invitationId}
+            teamContext={data.teamContext}
+            properties={{ role: data.currentUserRole, source: "print_page" }}
+          />
         </div>
       </div>
 

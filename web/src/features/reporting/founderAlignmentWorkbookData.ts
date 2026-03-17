@@ -23,9 +23,6 @@ import {
   getPrivilegedReportRunSnapshotForInvitation,
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
-import {
-  claimFounderAlignmentAdvisorAccess,
-} from "@/features/reporting/founderAlignmentWorkbookActions";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 
 type WorkbookRow = {
@@ -246,8 +243,7 @@ function advisorInviteStateFromRow(
 
 export async function getFounderAlignmentWorkbookPageData(
   invitationId: string | null,
-  teamContext: TeamContext,
-  advisorToken?: string | null
+  teamContext: TeamContext
 ): Promise<FounderAlignmentWorkbookPageData> {
   const supabase = await createClient();
   const {
@@ -282,15 +278,6 @@ export async function getFounderAlignmentWorkbookPageData(
       showValuesStep: false,
       advisorInvite: advisorInviteStateFromRow(null),
     };
-  }
-
-  if (advisorToken?.trim() && user?.id) {
-    await claimFounderAlignmentAdvisorAccess({
-      invitationId: normalizedInvitationId,
-      advisorToken: advisorToken.trim(),
-      userId: user.id,
-      fallbackName: user.email?.split("@")[0] ?? null,
-    });
   }
 
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);

@@ -50,7 +50,6 @@ export default async function WorkbookExistingTeamPreviewPage({
         initialWorkbook={preview.initialWorkbook}
         highlights={preview.highlights}
         advisorInvite={preview.advisorInvite}
-        advisorToken={null}
         showValuesStep={preview.showValuesStep}
         canSave={false}
         persisted={false}

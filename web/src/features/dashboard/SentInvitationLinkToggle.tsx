@@ -14,7 +14,6 @@ type LoadState = {
 };
 
 const LINKABLE_STATUSES = new Set(["sent", "opened"]);
-const SENT_INVITE_TOKEN_STORE_KEY = "sent_invite_tokens_v1";
 
 function mapStatusHint(status: string) {
   const normalized = status.trim().toLowerCase();
@@ -31,44 +30,6 @@ function mapActionError(reason: string) {
   return "Link konnte nicht geladen werden.";
 }
 
-function readStoredToken(invitationId: string) {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(SENT_INVITE_TOKEN_STORE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Record<string, string>;
-    const token = parsed[invitationId];
-    return token?.trim() ? token : null;
-  } catch {
-    return null;
-  }
-}
-
-function storeToken(invitationId: string, token: string) {
-  if (typeof window === "undefined") return;
-  try {
-    const raw = window.localStorage.getItem(SENT_INVITE_TOKEN_STORE_KEY);
-    const parsed = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-    parsed[invitationId] = token;
-    window.localStorage.setItem(SENT_INVITE_TOKEN_STORE_KEY, JSON.stringify(parsed));
-  } catch {
-    // ignore local cache errors
-  }
-}
-
-function extractTokenFromInviteUrl(inviteUrl: string) {
-  if (typeof window === "undefined") return null;
-  try {
-    const parsed = inviteUrl.startsWith("http")
-      ? new URL(inviteUrl)
-      : new URL(inviteUrl, window.location.origin);
-    const token = parsed.searchParams.get("token");
-    return token?.trim() ? token : null;
-  } catch {
-    return null;
-  }
-}
-
 export function SentInvitationLinkToggle({ invitationId, status }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
@@ -81,11 +42,6 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
   const toAbsoluteUrl = (value: string) => {
     if (typeof window === "undefined") return value;
     return value.startsWith("/") ? `${window.location.origin}${value}` : value;
-  };
-
-  const buildJoinUrlFromToken = (token: string) => {
-    if (typeof window === "undefined") return `/join?token=${encodeURIComponent(token)}`;
-    return `${window.location.origin}/join?token=${encodeURIComponent(token)}`;
   };
 
   const onToggle = () => {
@@ -101,12 +57,6 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
       return;
     }
 
-    const cachedToken = readStoredToken(invitationId);
-    if (cachedToken) {
-      setState({ inviteUrl: buildJoinUrlFromToken(cachedToken), error: null });
-      return;
-    }
-
     startTransition(async () => {
       const result = await getSentInvitationLinkAction(invitationId);
       if (!result.ok) {
@@ -114,10 +64,6 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
         return;
       }
       const absoluteUrl = toAbsoluteUrl(result.inviteUrl);
-      const token = extractTokenFromInviteUrl(absoluteUrl);
-      if (token) {
-        storeToken(invitationId, token);
-      }
       setState({ inviteUrl: absoluteUrl, error: null });
     });
   };

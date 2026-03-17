@@ -4,8 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const PENDING_INVITE_TOKEN_KEY = "pending_invite_token";
-
 type JoinUiState =
   | { type: "loading"; title: string; description: string }
   | { type: "redirecting"; title: string; description: string }
@@ -54,30 +52,6 @@ function readInvitationIdFromParams(searchParams: URLSearchParams) {
   return (searchParams.get("invitationId") ?? "").trim();
 }
 
-function readPendingInviteToken() {
-  try {
-    return sessionStorage.getItem(PENDING_INVITE_TOKEN_KEY)?.trim() ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function writePendingInviteToken(token: string) {
-  try {
-    sessionStorage.setItem(PENDING_INVITE_TOKEN_KEY, token);
-  } catch {
-    // Ignore storage issues in restrictive browser contexts.
-  }
-}
-
-function clearPendingInviteToken() {
-  try {
-    sessionStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
-  } catch {
-    // Ignore storage issues in restrictive browser contexts.
-  }
-}
-
 function extractInvitationIdFromAcceptPayload(payload: unknown): string | null {
   if (Array.isArray(payload)) {
     const first = payload[0];
@@ -121,10 +95,6 @@ export default function JoinClient() {
       const tokenFromUrl = readInviteTokenFromParams(searchParams);
       const invitationIdFromUrl = readInvitationIdFromParams(searchParams);
 
-      if (tokenFromUrl) {
-        writePendingInviteToken(tokenFromUrl);
-      }
-
       const {
         data: { session },
         error: sessionError,
@@ -141,27 +111,24 @@ export default function JoinClient() {
       }
 
       if (!session?.user?.id) {
-        const pendingToken = tokenFromUrl || readPendingInviteToken();
-        if (pendingToken) {
-          writePendingInviteToken(pendingToken);
-        }
-
-        const nextPath = pendingToken
-          ? `/join?token=${encodeURIComponent(pendingToken)}`
-          : invitationIdFromUrl
-            ? `/join?invitationId=${encodeURIComponent(invitationIdFromUrl)}`
-            : "/join";
+        const nextPath = invitationIdFromUrl
+          ? `/join?invitationId=${encodeURIComponent(invitationIdFromUrl)}`
+          : "/join";
         setUiState({
           type: "redirecting",
           title: "Weiter zum Login",
           description: "Bitte melde dich per Magic Link an, danach wird die Einladung automatisch fortgesetzt.",
         });
+        if (tokenFromUrl && typeof window !== "undefined") {
+          window.location.replace(`/join/prepare?token=${encodeURIComponent(tokenFromUrl)}`);
+          return;
+        }
         router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
         return;
       }
 
       let resolvedInvitationId = invitationIdFromUrl;
-      const token = tokenFromUrl || readPendingInviteToken();
+      const token = tokenFromUrl;
 
       if (token) {
         const { data, error } = await supabase.rpc("accept_invitation", {
@@ -174,20 +141,14 @@ export default function JoinClient() {
             normalizedError.includes("auth session missing") ||
             normalizedError.includes("not_authenticated")
           ) {
-            writePendingInviteToken(token);
-            const nextPath = `/join?token=${encodeURIComponent(token)}`;
-            router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+            if (typeof window !== "undefined") {
+              window.location.replace(`/join/prepare?token=${encodeURIComponent(token)}`);
+              return;
+            }
             return;
           }
 
           const mapped = resolveInviteError(error.message);
-          if (
-            normalizedError.includes("invalid_token") ||
-            normalizedError.includes("expired") ||
-            normalizedError.includes("revoked")
-          ) {
-            clearPendingInviteToken();
-          }
           setUiState({
             type: "error",
             title: mapped.title,
@@ -197,7 +158,6 @@ export default function JoinClient() {
           return;
         }
 
-        clearPendingInviteToken();
         resolvedInvitationId = extractInvitationIdFromAcceptPayload(data) ?? resolvedInvitationId;
       }
 
@@ -221,7 +181,7 @@ export default function JoinClient() {
    * Testplan:
    * 1) Inkognito-Fenster öffnen.
    * 2) Einladung über /join?token=... öffnen.
-   * 3) Magic Link Login auslösen und zurückkehren.
+   * 3) Magic Link Login auslösen und über /join/continue zurückkehren.
    * 4) Weiterleitung auf /join/welcome?invitationId=... prüfen.
    */
 

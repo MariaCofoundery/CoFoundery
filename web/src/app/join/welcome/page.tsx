@@ -172,11 +172,12 @@ export default async function JoinWelcomePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const next = token
-      ? `/join/welcome?token=${encodeURIComponent(token)}`
-      : invitationId
-        ? `/join/welcome?invitationId=${encodeURIComponent(invitationId)}`
-        : "/join/welcome";
+    if (token) {
+      redirect(`/join/prepare?token=${encodeURIComponent(token)}`);
+    }
+    const next = invitationId
+      ? `/join/welcome?invitationId=${encodeURIComponent(invitationId)}`
+      : "/join/welcome";
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 

@@ -16,6 +16,7 @@ type Props = {
   trackingContext?: {
     module: "base" | "values";
     invitationId?: string | null;
+    teamContext?: "pre_founder" | "existing_team" | null;
   };
 };
 

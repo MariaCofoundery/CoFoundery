@@ -101,7 +101,13 @@ export default async function AdvisorSnapshotPage({
         >
           Zurück zum Advisor Dashboard
         </Link>
-        <PrintReportButton label="Snapshot exportieren" />
+        <PrintReportButton
+          label="Snapshot exportieren"
+          eventName="advisor_snapshot_print_clicked"
+          invitationId={data.invitationId}
+          teamContext={data.teamContext}
+          properties={{ followUp: data.workbook.advisorFollowUp }}
+        />
       </div>
 
       <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:p-0 print:shadow-none">

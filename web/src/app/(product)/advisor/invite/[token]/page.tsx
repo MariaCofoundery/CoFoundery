@@ -4,6 +4,7 @@ import {
   claimFounderAlignmentAdvisorAccess,
   getFounderAlignmentAdvisorInviteByToken,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
+import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
@@ -67,7 +68,7 @@ export default async function AdvisorInvitePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const loginHref = `/login?next=${encodeURIComponent(`/advisor/invite/${token}`)}`;
+  const loginHref = `/advisor/invite/prepare?token=${encodeURIComponent(token)}`;
   const isLinkedToOtherUser = Boolean(
     user?.id && inviteData.advisorUserId && inviteData.advisorUserId !== user.id
   );
@@ -90,6 +91,7 @@ export default async function AdvisorInvitePage({
       advisorToken: token,
       userId: user.id,
       fallbackName: user.email?.split("@")[0] ?? null,
+      teamContext: inviteData.teamContext,
     });
 
     if (!result.ok) {
@@ -101,6 +103,16 @@ export default async function AdvisorInvitePage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
+      <ResearchPageTracker
+        eventName="advisor_invite_viewed"
+        invitationId={inviteData.invitationId}
+        teamContext={inviteData.teamContext}
+        properties={{
+          advisorLinked: inviteData.advisorLinked,
+          reportReady: inviteData.reportReady,
+          workbookReady: inviteData.workbookReady,
+        }}
+      />
       <section className="rounded-[36px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] md:p-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">

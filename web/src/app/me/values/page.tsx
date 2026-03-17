@@ -39,6 +39,7 @@ export default async function MeValuesPage({
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const isRefreshFlow = params.flow === "refresh";
+  let trackingTeamContext: "pre_founder" | "existing_team" | null = null;
 
   let completeRedirect = "/me/values/complete";
   if (invitationId) {
@@ -46,6 +47,7 @@ export default async function MeValuesPage({
     if (!decision.ok) {
       redirect(`/dashboard?error=${encodeURIComponent(decision.reason)}`);
     }
+    trackingTeamContext = decision.team_context;
 
     const needsValues = isRefreshFlow
       ? decision.required_modules.includes("values")
@@ -189,6 +191,7 @@ export default async function MeValuesPage({
         trackingContext={{
           module: "values",
           invitationId,
+          teamContext: trackingTeamContext,
         }}
       />
     </main>

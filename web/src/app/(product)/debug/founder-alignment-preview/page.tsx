@@ -142,7 +142,6 @@ export default async function FounderAlignmentPreviewPage({
             initialWorkbook={workbookPreview.initialWorkbook}
             highlights={workbookPreview.highlights}
             advisorInvite={workbookPreview.advisorInvite}
-            advisorToken={null}
             showValuesStep={workbookPreview.showValuesStep}
             canSave={false}
             persisted={false}

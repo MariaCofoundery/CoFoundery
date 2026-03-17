@@ -152,9 +152,11 @@ export default async function ReportPage({ params }: PageProps) {
         <ResearchPageTracker
           eventName="report_page_viewed"
           invitationId={snapshot.invitationId}
+          teamContext={snapshot.founderReport?.teamContext ?? null}
           properties={{ state: "ready", modules: snapshot.modules, reportType: snapshot.reportType }}
         />
         <FounderAlignmentReportView
+          invitationId={snapshot.invitationId}
           report={snapshot.founderReport}
           scoringResult={snapshot.founderScoring}
           founderAName={founderAName}
@@ -230,6 +232,10 @@ export default async function ReportPage({ params }: PageProps) {
       <ResearchPageTracker
         eventName="report_page_viewed"
         invitationId={snapshot.invitationId}
+        teamContext={
+          (invitationContextRow as { team_context?: "pre_founder" | "existing_team" | null } | null)
+            ?.team_context ?? null
+        }
         properties={{ state: "ready", modules: snapshot.modules }}
       />
       <div className="mb-8 flex items-center justify-between print:hidden">
@@ -239,7 +245,12 @@ export default async function ReportPage({ params }: PageProps) {
         >
           Zurück zum Dashboard
         </Link>
-        <PrintReportButton />
+        <PrintReportButton
+          eventName="report_print_clicked"
+          invitationId={snapshot.invitationId}
+          teamContext={snapshot.founderReport?.teamContext ?? null}
+          properties={{ reportType: snapshot.reportType }}
+        />
       </div>
 
       <section className="mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8">

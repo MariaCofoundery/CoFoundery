@@ -53,6 +53,7 @@ type Props = {
   trackingContext?: {
     module: "base" | "values";
     invitationId?: string | null;
+    teamContext?: "pre_founder" | "existing_team" | null;
   };
   disableTracking?: boolean;
 };
@@ -273,7 +274,9 @@ export function QuestionnaireClient({
 
     trackResearchEvent({
       eventName: "questionnaire_started",
+      assessmentId,
       invitationId: trackingContext?.invitationId ?? null,
+      teamContext: trackingContext?.teamContext ?? null,
       module: trackingContext?.module ?? null,
       flowId: flowIdRef.current,
       completionRatio: initialCompletionRatio,
@@ -290,6 +293,7 @@ export function QuestionnaireClient({
     total,
     trackingContext?.invitationId,
     trackingContext?.module,
+    trackingContext?.teamContext,
   ]);
 
   useEffect(() => {
@@ -319,11 +323,15 @@ export function QuestionnaireClient({
     questionShownAtRef.current = viewedAt;
     trackResearchEvent({
       eventName: "question_viewed",
+      assessmentId,
       invitationId: trackingContext?.invitationId ?? null,
+      teamContext: trackingContext?.teamContext ?? null,
       module: trackingContext?.module ?? null,
       flowId: flowIdRef.current,
       questionId: current.id,
       questionIndex: currentPosition,
+      questionType: currentType,
+      dimension: current.dimension,
       elapsedMs: Math.max(0, viewedAt - startedAtRef.current),
       pauseMs: accumulatedPauseMsRef.current,
       completionRatio: total > 0 ? Math.min(1, answersCountRef.current / total) : null,
@@ -334,10 +342,12 @@ export function QuestionnaireClient({
   }, [
     assessmentId,
     current,
+    currentType,
     currentPosition,
     total,
     trackingContext?.invitationId,
     trackingContext?.module,
+    trackingContext?.teamContext,
     disableTracking,
   ]);
 
@@ -412,11 +422,15 @@ export function QuestionnaireClient({
     if (!disableTracking) {
       trackResearchEvent({
         eventName: "answer_saved",
+        assessmentId,
         invitationId: trackingContext?.invitationId ?? null,
+        teamContext: trackingContext?.teamContext ?? null,
         module: trackingContext?.module ?? null,
         flowId: flowIdRef.current,
         questionId: current.id,
         questionIndex: currentPosition,
+        questionType: currentType,
+        dimension: current.dimension,
         durationMs: Math.max(0, selectedAt - questionShownAtRef.current),
         elapsedMs: Math.max(0, selectedAt - startedAtRef.current),
         pauseMs: accumulatedPauseMsRef.current,
@@ -424,6 +438,7 @@ export function QuestionnaireClient({
           ? previous.choice_id !== nextAnswer.choice_id || previous.value !== nextAnswer.value
           : false,
         completionRatio: total > 0 ? Math.min(1, answeredCountAfter / total) : null,
+        choiceValue: nextAnswer.value,
         properties: buildResearchClientProperties({
           assessmentId,
         }),
@@ -453,7 +468,9 @@ export function QuestionnaireClient({
     if (!disableTracking) {
       trackResearchEvent({
         eventName: "questionnaire_submitted",
+        assessmentId,
         invitationId: trackingContext?.invitationId ?? null,
+        teamContext: trackingContext?.teamContext ?? null,
         module: trackingContext?.module ?? null,
         flowId: flowIdRef.current,
         elapsedMs: Math.max(0, submittedAt - startedAtRef.current),

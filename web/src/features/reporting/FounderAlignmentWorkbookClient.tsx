@@ -34,6 +34,7 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import { trackResearchEvent } from "@/features/research/client";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type FounderAlignmentWorkbookClientProps = {
@@ -45,7 +46,6 @@ type FounderAlignmentWorkbookClientProps = {
   initialWorkbook: FounderAlignmentWorkbookPayload;
   highlights: FounderAlignmentWorkbookHighlights;
   advisorInvite: FounderAlignmentWorkbookAdvisorInviteState;
-  advisorToken: string | null;
   showValuesStep: boolean;
   canSave: boolean;
   persisted: boolean;
@@ -266,7 +266,6 @@ export function FounderAlignmentWorkbookClient({
   initialWorkbook,
   highlights,
   advisorInvite,
-  advisorToken,
   showValuesStep,
   canSave,
   persisted,
@@ -345,7 +344,7 @@ export function FounderAlignmentWorkbookClient({
     advisorInviteState.founderBApproved ||
     advisorInviteState.advisorLinked;
   const printWorksheetHref = invitationId
-    ? `/founder-alignment/workbook/print?invitationId=${invitationId}&teamContext=${teamContext}${advisorToken ? `&advisorToken=${encodeURIComponent(advisorToken)}` : ""}`
+    ? `/founder-alignment/workbook/print?invitationId=${invitationId}&teamContext=${teamContext}`
     : `/founder-alignment/workbook/print?teamContext=${teamContext}`;
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
@@ -822,6 +821,12 @@ export function FounderAlignmentWorkbookClient({
 
   function exportSummaryOnly() {
     if (typeof window === "undefined") return;
+    trackResearchEvent({
+      eventName: "workbook_summary_print_clicked",
+      invitationId,
+      teamContext,
+      properties: { role: currentUserRole },
+    });
     window.print();
   }
 
@@ -893,6 +898,12 @@ export function FounderAlignmentWorkbookClient({
 
   function exportFullSession() {
     if (typeof window === "undefined") return;
+    trackResearchEvent({
+      eventName: "workbook_full_export_print_clicked",
+      invitationId,
+      teamContext,
+      properties: { role: currentUserRole },
+    });
     window.print();
   }
 
