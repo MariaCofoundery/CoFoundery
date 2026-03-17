@@ -166,44 +166,6 @@ function parseForcedChoiceStatements(question: QuestionnaireQuestion | null | un
   };
 }
 
-function getQuestionnaireEncouragement(params: {
-  module: "base" | "values" | null;
-  currentPosition: number;
-  total: number;
-}) {
-  const { module, currentPosition, total } = params;
-  if (total <= 0) return null;
-
-  const checkpoints = [...new Set([1, Math.ceil(total / 3), Math.ceil((2 * total) / 3), total])];
-  if (!checkpoints.includes(currentPosition)) {
-    return null;
-  }
-
-  if (module === "values") {
-    if (currentPosition === 1) {
-      return "Kurzer Zusatz mit viel Wirkung: Schon die ersten Antworten machen sichtbar, welche Leitplanken dir als Founder wichtig sind.";
-    }
-    if (currentPosition === total) {
-      return "Fast geschafft. Mit der letzten Antwort ist dein Werteprofil komplett.";
-    }
-    if (currentPosition >= Math.ceil((2 * total) / 3)) {
-      return "Starker Fortschritt. Gleich hast du auch den Werte-Layer für dein Profil sauber abgeschlossen.";
-    }
-    return "Gerade in den Zwischentönen steckt hier viel Erkenntnis. Der erste ehrliche Impuls ist oft der hilfreichste.";
-  }
-
-  if (currentPosition === 1) {
-    return "Du musst hier nichts perfekt beantworten. Wichtig ist vor allem, was sich für dich im ersten Moment stimmig anfühlt.";
-  }
-  if (currentPosition === total) {
-    return "Fast geschafft. Mit der letzten Antwort steht dein Basisprofil.";
-  }
-  if (currentPosition >= Math.ceil((2 * total) / 3)) {
-    return "Starker Fortschritt. Noch ein paar Antworten, dann ist dein Founder-Profil als Basis gesetzt.";
-  }
-  return "Du baust hier gerade Schritt für Schritt dein Founder-Profil auf. Kleine Unterschiede werden später oft erstaunlich aufschlussreich.";
-}
-
 export function QuestionnaireClient({
   assessmentId,
   title,
@@ -282,11 +244,6 @@ export function QuestionnaireClient({
   const isLastQuestion = index === total - 1;
   const initialCompletionRatio = total > 0 ? Math.min(1, initialAnswers.size / total) : null;
   const currentType = normalizeQuestionType(current?.type);
-  const encouragement = getQuestionnaireEncouragement({
-    module: trackingContext?.module ?? null,
-    currentPosition,
-    total,
-  });
 
   const flowScope = useMemo(() => {
     const invitationPart = trackingContext?.invitationId?.trim() || "self";
@@ -627,12 +584,6 @@ export function QuestionnaireClient({
           style={{ width: `${total > 0 ? (currentPosition / total) * 100 : 0}%` }}
         />
       </div>
-
-      {encouragement ? (
-        <div className="mt-4 rounded-2xl border border-violet-200/70 bg-violet-50/70 px-4 py-3 text-sm leading-7 text-slate-700">
-          {encouragement}
-        </div>
-      ) : null}
 
       <div className="mt-6 rounded-xl border border-slate-200/80 p-5">
         {currentType === "forced_choice" ? (

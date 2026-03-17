@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { upsertProfileBasicsRow } from "@/features/profile/profileData";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 
@@ -65,20 +66,17 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     redirect(withError(errorRedirectTo, "profile_basics_incomplete"));
   }
 
-  const { error } = await supabase.from("profiles").upsert(
-    {
-      user_id: user.id,
-      display_name: displayName,
-      focus_skill: focusSkill,
-      intention,
-      roles,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
-  );
+  const { error } = await upsertProfileBasicsRow(supabase, {
+    user_id: user.id,
+    display_name: displayName,
+    focus_skill: focusSkill,
+    intention,
+    roles,
+    updated_at: new Date().toISOString(),
+  });
 
   if (error) {
-    redirect(withError(errorRedirectTo, error.message));
+    redirect(withError(errorRedirectTo, error.message ?? "profile_save_failed"));
   }
 
   redirect(successRedirectTo);

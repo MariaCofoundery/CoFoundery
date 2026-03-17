@@ -10,6 +10,7 @@ import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { DAILY_QUOTES } from "@/features/dashboard/dailyQuotes";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { AlignmentRadarChart } from "@/features/reporting/AlignmentRadarChart";
 import { FOUNDER_DIMENSION_META, FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
@@ -29,13 +30,6 @@ type DashboardSearchParams = {
   valuesStatus?: string;
   invite?: string;
   invitationId?: string;
-};
-
-type ProfileRow = {
-  display_name: string | null;
-  focus_skill: string | null;
-  intention: string | null;
-  roles: string[] | null;
 };
 
 type ReportRunRow = {
@@ -90,6 +84,10 @@ function staggerStyle(delayMs: number) {
   };
 }
 
+function normalizeMetadataName(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -109,14 +107,10 @@ export default async function DashboardPage({
     await finalizeInvitationIfReady(params.invitationId);
   }
 
-  const [selfReport, { data: profile }, initialInvitationRows, initialRunsResult, roleViews] =
+  const [selfReport, profileData, initialInvitationRows, initialRunsResult, roleViews] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
-      supabase
-        .from("profiles")
-        .select("display_name, focus_skill, intention, roles")
-        .eq("user_id", user.id)
-        .maybeSingle(),
+      getProfileBasicsRow(supabase, user.id).catch(() => null),
       getInvitationDashboardRows(),
       supabase
         .from("report_runs")
@@ -167,7 +161,6 @@ export default async function DashboardPage({
   if (runsResult.error) {
     return <main className="p-8">Fehler beim Laden der Report-Runs: {runsResult.error.message}</main>;
   }
-  const profileData = (profile as ProfileRow | null) ?? null;
   const needsOnboarding =
     !profileData?.display_name?.trim() || !profileData?.focus_skill || !profileData?.intention;
   const sentInvites = invitationRows.filter((row) => row.direction === "sent");
@@ -197,7 +190,8 @@ export default async function DashboardPage({
   const quoteOfDay = DAILY_QUOTES[quoteIndex] ?? "Klarheit schlägt Zufall.";
   const displayName =
     profileData?.display_name?.trim() ||
-    selfReport?.participantAName?.trim() ||
+    normalizeMetadataName(user.user_metadata?.display_name) ||
+    normalizeMetadataName(user.user_metadata?.full_name) ||
     user.email?.split("@")[0] ||
     "Founder";
   const valuesStatus = selfReport?.valuesModuleStatus ?? "not_started";

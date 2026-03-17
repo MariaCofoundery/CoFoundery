@@ -1,11 +1,17 @@
 import { redirect } from "next/navigation";
+import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { createClient } from "@/lib/supabase/server";
 
-function normalizeNextPath(value: string | undefined) {
-  const trimmed = (value ?? "").trim();
-  if (!trimmed.startsWith("/")) return "/dashboard";
-  return trimmed;
+function authErrorMessage(error: string | undefined) {
+  const normalized = (error ?? "").trim() as AuthErrorCode | "";
+  if (normalized === "magic_link_failed") {
+    return "Der Magic Link konnte nicht bestätigt werden. Bitte fordere einen neuen Link an.";
+  }
+  if (normalized === "auth_callback_failed") {
+    return "Die Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut.";
+  }
+  return error ? `Anmeldefehler: ${error}` : null;
 }
 
 export default async function LoginPage({
@@ -19,6 +25,7 @@ export default async function LoginPage({
     data: { user },
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
+  const errorMessage = authErrorMessage(params.error);
 
   if (user) {
     redirect(nextPath);
@@ -35,9 +42,9 @@ export default async function LoginPage({
         <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
           Wenn keine Mail ankommt, prüfe bitte auch deinen Spam-Ordner.
         </p>
-        {params.error ? (
+        {errorMessage ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            Callback-Fehler: {params.error}
+            {errorMessage}
           </p>
         ) : null}
         <div className="mt-6">

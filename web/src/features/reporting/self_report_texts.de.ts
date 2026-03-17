@@ -22,16 +22,15 @@ export const SELF_DIMENSION_COPY: Record<
       "Welche strategische Entscheidung in den nächsten 90 Tagen zeigt am klarsten, worauf du dein Unternehmen ausrichten willst?",
     tendency: {
       left:
-        "Aktuell wirkt dein Profil hier eher auf klare wirtschaftliche Tragfaehigkeit, optionalere Wege und begrenztere Wetten ausgerichtet.",
+        "Du denkst das Unternehmen zuerst von Tragfähigkeit und Substanz her. Im Alltag prüfst du Chancen eher auf Machbarkeit als auf große Vision. Das hält Entscheidungen bodenständig, kann Teams aber länger vor mutigen Sprüngen bremsen.",
       center:
-        "Aktuell haeltst du hier mehrere Optionen in Balance und wirkst weder klar exit- noch klar auf langfristigen Aufbau festgelegt.",
+        "Du hältst bei Richtung und Horizont bewusst mehrere Optionen offen. Im Alltag wechselst du zwischen Aufbau, Gelegenheit und wirtschaftlicher Vernunft, statt dich früh festzulegen. Das macht dich flexibel, kann Teams aber in der Schwebe halten, wenn Richtung nicht aktiv entschieden wird.",
       right:
-        "Aktuell wirkt dein Profil hier eher auf langfristigen Aufbau, unternehmerische Entwicklung und eine groessere Vision ausgerichtet.",
+        "Du denkst das Unternehmen klar vom langfristigen Aufbau und einer größeren Richtung her. Im Alltag ordnest du Chancen danach ein, ob sie zur Vision passen und das Unternehmen wirklich weitertragen. Das gibt Teams Zug und Orientierung, erhöht aber den Druck auf gemeinsame strategische Klarheit.",
     },
     everydaySignals: [
-      "Du priorisierst Chancen unterschiedlich danach, ob sie langfristig Richtung geben oder nur kurzfristig Bewegung erzeugen.",
-      "Bei Wachstumsschritten, Hiring oder Kapitalfragen spielt fuer dich der Zeithorizont des Unternehmens eine wichtige Rolle.",
-      "In strategischen Diskussionen wirst du oft dort klar, wo es um Richtung statt nur um einzelne Massnahmen geht.",
+      "Bei Wachstum, Hiring oder Kapitalfragen spielt für dich die langfristige Richtung mit hinein.",
+      "In strategischen Diskussionen wirst du besonders klar, wenn es um den Kurs des Unternehmens geht.",
     ],
   },
   Entscheidungslogik: {
@@ -41,92 +40,87 @@ export const SELF_DIMENSION_COPY: Record<
       "Woran merkst du konkret, dass eine Entscheidung ausreichend geklaert ist und nicht noch mehr Absicherung braucht?",
     tendency: {
       left:
-        "Aktuell suchst du hier eher Struktur, Analyse und eine nachvollziehbare Entscheidungsgrundlage, bevor du festlegst.",
+        "Du willst Entscheidungen sauber begründen, bevor du sie triffst. Im Alltag sammelst du lieber erst Struktur, Daten und Gegenargumente, statt vorschnell auf Momentum zu setzen. Das erhöht die Qualität, kostet in schnellen Phasen aber spürbar Tempo.",
       center:
-        "Aktuell wirkst du hier balanciert zwischen analytischer Absicherung und pragmatischem Vorangehen.",
+        "Du verbindest Analyse und pragmatisches Vorangehen, statt nur einer Logik zu folgen. Im Alltag schaltest du je nach Situation zwischen Absicherung und Tempo um. Das macht dich anschlussfähig, verlangt im Team aber klare Kriterien dafür, wann für dich wirklich genug Grundlage da ist.",
       right:
-        "Aktuell setzt du hier eher auf Gespuer, Tempo und zuegige Einordnung, statt lange Analysephasen auszudehnen.",
+        "Du entscheidest zügig und vertraust stark auf Einordnung, Gespür und Bewegung nach vorn. Im Alltag gehst du lieber mit einer tragfähigen ersten Richtung los, statt Analysefenster lange offenzuhalten. Das bringt Tempo, braucht im Team aber Gegenchecks bei folgenreichen Entscheidungen.",
     },
     everydaySignals: [
-      "Du merkst diese Praeferenz vor allem daran, wie schnell du bei offenen Fragen zu einer ersten Richtung kommst.",
-      "In dynamischen Phasen zeigt sich das oft darin, wie viel Absicherung du vor einem Go oder No-Go wirklich brauchst.",
-      "Auch in Teams wird hier schnell sichtbar, ob du eher ueber Klarheit im Prozess oder ueber Momentum fuehrst.",
+      "Bei offenen Fragen zeigt sich schnell, wie viel Grundlage du vor einem Go oder No-Go brauchst.",
+      "In Teams wird hier sichtbar, ob du eher über Prozessklarheit oder über Momentum führst.",
     ],
   },
   Risikoorientierung: {
     intro:
-      "Diese Dimension macht sichtbar, wie du mit Unsicherheit, Wagnis und neuen Chancen umgehst. Sie praegt, wie mutig du Schritte setzt und wie viel Absicherung du dabei brauchst.",
+      "Diese Dimension macht sichtbar, wie du mit Unsicherheit, Wagnis und neuen Chancen umgehst. Sie prägt, wie mutig du Schritte setzt und wie viel Absicherung du dabei brauchst.",
     reflectionQuestion:
-      "Bei welcher Art von Risiko willst du kuenftig bewusster festlegen, was fuer dich noch tragbar ist und was nicht mehr?",
+      "Bei welcher Art von Risiko willst du künftig bewusster festlegen, was für dich noch tragbar ist und was nicht mehr?",
     tendency: {
       left:
-        "Aktuell wirkt dein Profil hier eher vorsichtig und auf Absicherung, Stabilitaet und klare Leitplanken ausgerichtet.",
+        "Du gehst Risiken kontrolliert an und willst zuerst wissen, was ein Schritt kosten kann. Im Alltag suchst du eher Leitplanken, Sicherheiten und klare Stop-Kriterien. Das schützt vor teuren Schnellschüssen, lässt Chancen aber oft später anlaufen.",
       center:
-        "Aktuell gehst du hier weder besonders vorsichtig noch besonders offensiv vor, sondern eher mit balancierter Risikoabwaegung.",
+        "Du wägt Risiken bewusst ab und gehst weder reflexhaft auf Sicherheit noch auf maximale Chance. Im Alltag prüfst du, wann Mut sinnvoll ist und wann Stabilität wichtiger wird. Das ist für Teams tragfähig, solange unter Druck trotzdem klar bleibt, wo deine Grenze liegt.",
       right:
-        "Aktuell wirkt dein Profil hier eher chancenorientiert und offen fuer mutigere Schritte trotz Unsicherheit.",
+        "Du bist offen für mutige Schritte, wenn darin echte unternehmerische Chance liegt. Im Alltag hält dich Unsicherheit selten lange auf, wenn Richtung oder Lerngewinn greifbar wirken. Das kann Teams stark nach vorne ziehen, braucht aber gemeinsame Guardrails für Tragfähigkeit.",
     },
     everydaySignals: [
-      "Das zeigt sich haeufig bei Experimenten, Launch-Entscheidungen oder der Frage, wie frueh etwas live gehen darf.",
-      "Auch Finanzierung, Runway und Wachstumswetten werden von dieser Grundhaltung oft direkt mitgepraegt.",
-      "Unter Unsicherheit wird hier schnell sichtbar, ob du eher zuerst absicherst oder eher zuerst ausprobierst.",
+      "Diese Haltung wird bei Experimenten, Launches und Wachstumswetten schnell sichtbar.",
+      "Unter Unsicherheit zeigt sich, ob du zuerst absicherst oder zuerst ausprobierst.",
     ],
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     intro:
-      "Diese Dimension zeigt, wie du Zusammenarbeit zwischen Eigenstaendigkeit und enger Abstimmung organisierst. Sie beeinflusst, wie viel Einblick, Mitsprache und Struktur du im Alltag brauchst.",
+      "Diese Dimension zeigt, wie du Zusammenarbeit zwischen Eigenständigkeit und enger Abstimmung organisierst. Sie beeinflusst, wie viel Einblick, Mitsprache und Struktur du im Alltag brauchst.",
     reflectionQuestion:
-      "Welche Form von Abstimmung brauchst du im Alltag wirklich, und wo willst du bewusst mehr Eigenstaendigkeit behalten?",
+      "Welche Form von Abstimmung brauchst du im Alltag wirklich, und wo willst du bewusst mehr Eigenständigkeit behalten?",
     tendency: {
       left:
-        "Aktuell bevorzugst du hier eher Eigenstaendigkeit, klare Verantwortungsraeume und viel operative Freiheit.",
+        "Du arbeitest am stärksten mit klaren Verantwortungsräumen und viel operativer Freiheit. Im Alltag willst du nicht jede Bewegung abstimmen, sondern in deinem Bereich eigenständig liefern. Das schafft Tempo und Ownership, erzeugt ohne klare Transparenz aber schnell stille Missverständnisse.",
       center:
-        "Aktuell wirkst du hier balanciert zwischen Austausch, Transparenz und eigenverantwortlicher Umsetzung.",
+        "Du verbindest Eigenständigkeit mit Austausch, statt nur auf einen Arbeitsmodus zu setzen. Im Alltag willst du genug Transparenz für gute Abstimmung, ohne Verantwortung zu verwässern. Das macht Zusammenarbeit flexibel, braucht im Team aber klare Regeln für Einblick und Mitsprache.",
       right:
-        "Aktuell bevorzugst du hier eher enge Abstimmung, hoehere Transparenz und ein gemeinsames laufendes Bild der Arbeit.",
+        "Du bevorzugst enge Abstimmung und ein gemeinsames laufendes Bild der Arbeit. Im Alltag suchst du Transparenz, Mitsprache und kurze Schleifen, damit nichts auseinanderläuft. Das kann Teams eng und wirksam machen, kostet aber schnell Energie, wenn Verantwortungsräume nicht klar bleiben.",
     },
     everydaySignals: [
-      "Im Alltag zeigt sich das daran, wie viel Einblick du in die Arbeit anderer brauchst und wie viel Mitsprache fuer dich sinnvoll ist.",
-      "Auch Rollen, Verantwortungsgrenzen und Meeting-Rhythmen werden von dieser Praeferenz stark beeinflusst.",
-      "Gerade in Gruendungsteams wird hier frueh spuerbar, ob Zusammenarbeit entlastet oder eher Zusatzkoordination erzeugt.",
+      "Sichtbar wird das daran, wie viel Einblick du in andere Bereiche brauchst und wie viel Mitsprache für dich sinnvoll ist.",
+      "Auch Rollen, Verantwortungsgrenzen und Meeting-Rhythmen hängen stark an dieser Präferenz.",
     ],
   },
   Commitment: {
     intro:
-      "Diese Dimension beschreibt, welchen Stellenwert Verfuegbarkeit, Fokus und Einsatz in deinem Gruenderalltag haben. Sie ist zentral fuer Erwartungen an Tempo, Belastung und Prioritaeten.",
+      "Diese Dimension beschreibt, welchen Stellenwert Verfügbarkeit, Fokus und Einsatz in deinem Gründeralltag haben. Sie ist zentral für Erwartungen an Tempo, Belastung und Prioritäten.",
     reflectionQuestion:
-      "Welche Erwartung an Fokus, Verfuegbarkeit oder Einsatz solltest du kuenftig frueher explizit machen?",
+      "Welche Erwartung an Fokus, Verfügbarkeit oder Einsatz solltest du künftig früher explizit machen?",
     tendency: {
       left:
-        "Aktuell wirkt dein Profil hier eher flexibel und offen fuer wechselnde Belastung, Prioritaeten und Verfuegbarkeit.",
+        "Du definierst Commitment nicht nur über maximale Verfügbarkeit, sondern über einen tragfähigen Rahmen. Im Alltag achtest du darauf, dass Einsatz, Belastung und andere Verpflichtungen realistisch zusammenpassen. Das schützt vor Überforderung, kann im Team aber schnell als geringerer Anspruch gelesen werden, wenn Erwartungen unausgesprochen bleiben.",
       center:
-        "Aktuell wirkst du hier balanciert zwischen Verbindlichkeit und einem realistischen, tragfaehigen Arbeitsmodus.",
+        "Du verbindest Verbindlichkeit mit einem realistischen Blick auf Belastung und Nachhaltigkeit. Im Alltag willst du liefern, ohne daraus automatisch einen Dauer-Hochmodus zu machen. Das ist für Zusammenarbeit gesund, braucht aber klare Absprachen darüber, was für dich verbindlich zugesagt ist.",
       right:
-        "Aktuell wirkt dein Profil hier eher stark fokussiert, verbindlich und auf hohe Prioritaet des Startups ausgerichtet.",
+        "Du gibst dem Startup hohe Priorität und setzt Commitment stark über Fokus, Verfügbarkeit und Verbindlichkeit. Im Alltag zeigt sich das in klarem Einsatz, hoher Präsenz und wenig Toleranz für lose Zusagen. Das erzeugt Zugkraft, setzt im Team aber voraus, dass andere diesen Anspruch kennen und mittragen.",
     },
     everydaySignals: [
-      "Spuerbar wird das haeufig bei der Frage, wie verfuegbar du im Alltag sein willst und welchen Stellenwert das Startup gegenueber anderen Verpflichtungen hat.",
-      "Auch Tempo, Erwartung an Einsatz und der Umgang mit Belastung werden von dieser Haltung mitbestimmt.",
-      "In Co-Founder-Konstellationen wird hier oft sichtbar, was fuer dich als fairer und realistischer Einsatz gilt.",
+      "Spürbar wird das bei der Frage, wie verfügbar du im Alltag sein willst und welchen Stellenwert das Startup hat.",
+      "Hier zeigt sich auch, was für dich als fairer und realistischer Einsatz gilt.",
     ],
   },
   Konfliktstil: {
     intro:
-      "Diese Dimension zeigt, wie du Spannungen, Feedback und Meinungsverschiedenheiten bearbeitest. Sie beeinflusst direkt, wie schnell Konflikte geklaert werden und wie sich Zusammenarbeit unter Druck anfuehlt.",
+      "Diese Dimension zeigt, wie du Spannungen, Feedback und Meinungsverschiedenheiten bearbeitest. Sie beeinflusst direkt, wie schnell Konflikte geklärt werden und wie sich Zusammenarbeit unter Druck anfühlt.",
     reflectionQuestion:
       "Wie willst du kuenftig mit einem schwierigen Punkt umgehen, damit Klarheit entsteht, ohne die Zusammenarbeit unnötig zu belasten?",
     tendency: {
       left:
-        "Aktuell gehst du hier eher reflektierend, mit mehr Abstand und vorsichtigerem Timing in schwierige Gespraeche.",
+        "Du gehst Spannungen eher über Reflexion, Timing und Abstand an, bevor du sie öffnest. Im Alltag sortierst du Kritik und Irritationen zuerst, statt jedes Thema sofort direkt zu adressieren. Das kann Konflikte klüger rahmen, lässt wichtige Punkte aber leicht zu lange liegen.",
       center:
-        "Aktuell wirkst du hier balanciert zwischen Klarheit, Timing und Ruecksicht auf den Rahmen des Gespraechs.",
+        "Du verbindest Klarheit mit Timing und entscheidest situativ, wie direkt ein schwieriger Punkt sein muss. Im Alltag spürst du meist gut, wann Offenheit hilft und wann ein besserer Rahmen zuerst wichtiger ist. Das macht dich im Konflikt anschlussfähig, verlangt aber, dass Unschärfe nicht zu lange stehen bleibt.",
       right:
-        "Aktuell gehst du hier eher direkt, schnell und ohne viel Umweg in Spannungen oder kritische Rueckmeldungen.",
+        "Du sprichst Spannungen schnell an und gehst ohne große Umwege in kritische Gespräche. Im Alltag gibst du direktes Feedback und willst Reibung lieber klären als mitschleppen. Das schafft Tempo in der Klärung, braucht im Team aber Vertrauen und ein Gefühl dafür, wie viel Direktheit der Moment trägt.",
     },
     everydaySignals: [
-      "Das zeigt sich oft daran, wie schnell du Irritationen ansprichst und wie direkt dein Feedback ausfaellt.",
-      "Auch Timing, Ton und die Frage, ob Spannung zuerst intern verarbeitet oder sofort benannt wird, spielen hier hinein.",
-      "Gerade unter Druck praegt dieser Stil stark, ob Klaerung schnell gelingt oder Missverstaendnisse laenger stehen bleiben.",
+      "Das zeigt sich daran, wie schnell du Irritationen ansprichst und wie direkt dein Feedback ausfällt.",
+      "Unter Druck entscheidet dieser Stil oft darüber, ob Klärung gelingt oder Missverständnisse stehen bleiben.",
     ],
   },
 };
@@ -137,56 +131,56 @@ export const SELF_DEVELOPMENT_COPY: Record<
 > = {
   "Vision & Unternehmenshorizont": {
     whyItMatters:
-      "Eine klare Richtung hilft dir spaeter, Wachstum, Prioritaeten und Kapitalfragen konsistent einzuordnen. Gerade in der Co-Founder-Suche schafft sie frueh Orientierung.",
+      "Eine klare Richtung hilft dir später, Wachstum, Prioritäten und Kapitalfragen konsistent einzuordnen. Gerade in der Co-Founder-Suche schafft sie früh Orientierung.",
     nextSteps: [
-      "Halte schriftlich fest, welche Art von Unternehmen du in den naechsten drei bis fuenf Jahren wirklich bauen willst.",
-      "Pruefe bei strategischen Chancen bewusst, ob sie zu deinem bevorzugten Zeithorizont passen.",
-      "Benutze Vision nicht nur als Leitbild, sondern als Filter fuer Prioritaeten und Nein-Entscheidungen.",
+      "Halte schriftlich fest, welche Art von Unternehmen du in den nächsten drei bis fünf Jahren wirklich bauen willst.",
+      "Prüfe bei strategischen Chancen bewusst, ob sie zu deinem bevorzugten Zeithorizont passen.",
+      "Benutze Vision nicht nur als Leitbild, sondern als Filter für Prioritäten und Nein-Entscheidungen.",
     ],
   },
   Entscheidungslogik: {
     whyItMatters:
-      "Wenn du deine eigene Entscheidungslogik klar kennst, faellt spaetere Abstimmung mit Mitgruendern deutlich leichter. So werden Tempo und Absicherung bewusster statt zufaellig.",
+      "Wenn du deine eigene Entscheidungslogik klar kennst, fällt spätere Abstimmung mit Mitgründern deutlich leichter. So werden Tempo und Absicherung bewusster statt zufällig.",
     nextSteps: [
-      "Definiere fuer dich, welche Entscheidungen du mit 70 Prozent Klarheit treffen kannst und welche mehr Absicherung brauchen.",
-      "Halte bei groesseren Entscheidungen kurz fest, worauf du dich konkret gestuetzt hast.",
-      "Beobachte bei den naechsten Entscheidungen, wann du zu lange analysierst oder zu schnell springst.",
+      "Definiere für dich, welche Entscheidungen du mit 70 Prozent Klarheit treffen kannst und welche mehr Absicherung brauchen.",
+      "Halte bei größeren Entscheidungen kurz fest, worauf du dich konkret gestützt hast.",
+      "Beobachte bei den nächsten Entscheidungen, wann du zu lange analysierst oder zu schnell springst.",
     ],
   },
   Risikoorientierung: {
     whyItMatters:
-      "Dein Umgang mit Risiko praegt Wachstum, Experimente und finanzielle Sicherheit. Ein klares eigenes Profil hilft dir, spaeter bessere gemeinsame Guardrails zu setzen.",
+      "Dein Umgang mit Risiko prägt Wachstum, Experimente und finanzielle Sicherheit. Ein klares eigenes Profil hilft dir, später bessere gemeinsame Guardrails zu setzen.",
     nextSteps: [
-      "Lege fuer riskantere Schritte ein einfaches Abbruch- oder Stop-Kriterium fest.",
+      "Lege für riskantere Schritte ein einfaches Abbruch- oder Stop-Kriterium fest.",
       "Trenne bewusster zwischen Risiken, die du aktiv eingehen willst, und Risiken, die du nur aus Druck heraus eingehst.",
-      "Verknuepfe groessere Experimente kuenftig mit einer klaren Lernfrage statt nur mit Hoffnung.",
+      "Verknüpfe größere Experimente künftig mit einer klaren Lernfrage statt nur mit Hoffnung.",
     ],
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     whyItMatters:
-      "Wie du Zusammenarbeit organisieren willst, entscheidet spaeter ueber Tempo, Transparenz und Reibung im Alltag. Gerade hier lohnen fruehe Klarheit und konkrete Erwartungen.",
+      "Wie du Zusammenarbeit organisieren willst, entscheidet später über Tempo, Transparenz und Reibung im Alltag. Gerade hier lohnen frühe Klarheit und konkrete Erwartungen.",
     nextSteps: [
-      "Halte fest, wo du klare Verantwortungsraeume brauchst und wo dir enge Abstimmung wichtig ist.",
-      "Definiere ein realistisches Mindestmass an Transparenz, das du in gemeinsamer Arbeit erwartest.",
-      "Notiere fuer dich, welche Rollen- und Abstimmungsform dich im Alltag wirklich entlastet.",
+      "Halte fest, wo du klare Verantwortungsräume brauchst und wo dir enge Abstimmung wichtig ist.",
+      "Definiere ein realistisches Mindestmaß an Transparenz, das du in gemeinsamer Arbeit erwartest.",
+      "Notiere für dich, welche Rollen- und Abstimmungsform dich im Alltag wirklich entlastet.",
     ],
   },
   Commitment: {
     whyItMatters:
-      "Commitment ist im Gruenderalltag nicht nur Einsatz, sondern auch Erwartungsmanagement. Je klarer du deinen eigenen Rahmen kennst, desto eher lassen sich spaetere Missverstaendnisse vermeiden.",
+      "Commitment ist im Gründeralltag nicht nur Einsatz, sondern auch Erwartungsmanagement. Je klarer du deinen eigenen Rahmen kennst, desto eher lassen sich spätere Missverständnisse vermeiden.",
     nextSteps: [
-      "Lege fest, welche Form von Verfuegbarkeit du realistisch zusagen kannst.",
-      "Sprich innere Annahmen ueber Prioritaet und Belastung bewusst aus, bevor andere sie erraten muessen.",
-      "Pruefe regelmaessig, wo hoher Einsatz sinnvoll ist und wo er nur unsichtbaren Druck erzeugt.",
+      "Lege fest, welche Form von Verfügbarkeit du realistisch zusagen kannst.",
+      "Sprich innere Annahmen über Priorität und Belastung bewusst aus, bevor andere sie erraten müssen.",
+      "Prüfe regelmäßig, wo hoher Einsatz sinnvoll ist und wo er nur unsichtbaren Druck erzeugt.",
     ],
   },
   Konfliktstil: {
     whyItMatters:
-      "Ein geklaerter Konfliktstil macht Zusammenarbeit robuster. Gerade in Gruenderteams entscheidet oft nicht das Thema selbst, sondern die Art des Umgangs miteinander.",
+      "Ein geklärter Konfliktstil macht Zusammenarbeit robuster. Gerade in Gründerteams entscheidet oft nicht das Thema selbst, sondern die Art des Umgangs miteinander.",
     nextSteps: [
-      "Formuliere fuer dich, wann du Spannung direkt ansprechen willst und wann du erst Abstand brauchst.",
-      "Achte darauf, Kritik kuenftig so konkret zu machen, dass daraus ein naechster Schritt entstehen kann.",
-      "Notiere eine einfache Regel, wie du nach einem schwierigen Gespraech wieder in Zusammenarbeit findest.",
+      "Formuliere für dich, wann du Spannung direkt ansprechen willst und wann du erst Abstand brauchst.",
+      "Achte darauf, Kritik künftig so konkret zu machen, dass daraus ein nächster Schritt entstehen kann.",
+      "Notiere eine einfache Regel, wie du nach einem schwierigen Gespräch wieder in Zusammenarbeit findest.",
     ],
   },
 };

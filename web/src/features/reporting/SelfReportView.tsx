@@ -68,7 +68,7 @@ export function SelfReportView({ report }: Props) {
             <h2 className="mt-3 text-2xl font-semibold text-slate-900">Dein aktuelles Founder-Profil</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
               {t(
-                "Dieser Report zeigt, wie du aktuell in zentralen Gruender-Dimensionen tendierst. Er beschreibt keine festen Eigenschaften, sondern typische Praeferenzen in Strategie, Entscheidungen und Zusammenarbeit."
+                "Dieser Report zeigt, welche Muster in deinen Gründerentscheidungen aktuell sichtbar werden. Er beschreibt keine festen Eigenschaften, sondern beobachtbare Präferenzen in Strategie, Entscheidungen und Zusammenarbeit."
               )}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -95,7 +95,7 @@ export function SelfReportView({ report }: Props) {
             <h3 className="text-lg font-semibold text-slate-900">Radar der sechs Founder-Dimensionen</h3>
             <p className="mt-3 text-sm leading-7 text-slate-700">
               {t(
-                "Das Profil zeigt deine aktuelle Tendenz in sechs Founder-Dimensionen. Unterschiede zwischen Foundern entstehen hier nicht aus Staerke oder Schwaeche, sondern aus unterschiedlichen Praeferenzen."
+                "Das Profil zeigt deine aktuelle Tendenz in sechs Founder-Dimensionen. Unterschiede zwischen Foundern sind hier keine Stärke oder Schwäche, sondern unterschiedliche Arbeits- und Entscheidungslogiken."
               )}
             </p>
             <div className="mt-5">
@@ -124,8 +124,8 @@ export function SelfReportView({ report }: Props) {
                 <li className="text-sm leading-7 text-slate-600">
                   {t(
                     isBalancedProfile
-                      ? "Dein Profil wirkt aktuell ueber mehrere Founder-Dimensionen hinweg vergleichsweise ausgewogen. Es zeigt damit eher Balance als einen einzelnen dominanten Schwerpunkt."
-                      : "Noch nicht genuegend Antworten fuer eine belastbare Einordnung."
+                      ? "Dein Profil bleibt über mehrere Founder-Dimensionen hinweg vergleichsweise ausgewogen. Es zeigt eher Balance als einen einzelnen dominanten Schwerpunkt."
+                      : "Noch nicht genügend Antworten für eine belastbare Einordnung."
                   )}
                 </li>
               ) : (
@@ -149,7 +149,7 @@ export function SelfReportView({ report }: Props) {
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. Zentrale Profil-Insights</p>
-        <h3 className="mt-3 text-lg font-semibold text-slate-900">Drei Bereiche, die dein Profil aktuell stark praegen</h3>
+        <h3 className="mt-3 text-lg font-semibold text-slate-900">Drei Bereiche, die dein Profil aktuell besonders prägen</h3>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {displayedInsights.map((insight) => {
             const shortLabel =
@@ -204,11 +204,12 @@ export function SelfReportView({ report }: Props) {
                     <SectionBlock
                       title="Deine aktuelle Tendenz"
                       content={<p className="text-sm leading-7 text-slate-700">{t(tendencyText)}</p>}
+                      variant="emphasis"
                       className="mt-5"
                     />
 
                     <SectionBlock
-                      title={t("Im Gruenderalltag zeigt sich das haeufig so")}
+                      title="Im Gründeralltag zeigt sich das vor allem hier"
                       content={
                         <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700">
                           {SELF_DIMENSION_COPY[dimension].everydaySignals.map((signal) => (
@@ -258,10 +259,10 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("6. Bereiche fuer bewusste Klaerung")}</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("6. Bereiche für bewusste Klärung")}</p>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
           {t(
-            "In diesen Bereichen lohnt es sich besonders, frueh klare Erwartungen zu formulieren. Es geht nicht um Schwaechen, sondern um Themen, bei denen spaetere Zusammenarbeit schnell von expliziter Abstimmung profitiert."
+            "In diesen Bereichen lohnt es sich besonders, früh klare Erwartungen zu formulieren. Es geht nicht um Schwächen, sondern um Themen, bei denen spätere Zusammenarbeit schnell von expliziter Abstimmung profitiert."
           )}
         </p>
 
@@ -269,13 +270,13 @@ export function SelfReportView({ report }: Props) {
           {bottomDimensions.length === 0 ? (
             <article className="card-block rounded-xl border border-slate-200/80 bg-white p-5">
               <p className="text-sm leading-7 text-slate-600">
-                {t(
-                  isBalancedProfile
-                    ? "Dein Profil wirkt aktuell eher ausgewogen. Statt einzelner klarer Klaerungsfelder lohnt sich vor allem, in realen Entscheidungssituationen frueh zu benennen, welche Prioritaet dir dann am wichtigsten ist."
-                    : "Noch nicht genuegend Daten fuer eine belastbare Auswahl von Klaerungsfeldern."
-                )}
-              </p>
-            </article>
+                  {t(
+                    isBalancedProfile
+                      ? "Dein Profil wirkt aktuell eher ausgewogen. Statt einzelner klarer Klärungsfelder lohnt sich vor allem, in realen Entscheidungssituationen früh zu benennen, welche Priorität dir dann am wichtigsten ist."
+                      : "Noch nicht genügend Daten für eine belastbare Auswahl von Klärungsfeldern."
+                  )}
+                </p>
+              </article>
           ) : null}
 
           {bottomDimensions.map(({ dimension }) => {
@@ -299,7 +300,7 @@ export function SelfReportView({ report }: Props) {
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("7. Werteprofil")}</p>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
           {t(
-            "Waehrend dein Basisprofil zeigt, wie du strategisch arbeitest, beschreibt dein Werteprofil, welche inneren Prioritaeten deine Entscheidungen zusaetzlich praegen."
+            "Während dein Basisprofil zeigt, wie du strategisch arbeitest, beschreibt dein Werteprofil, welche inneren Prioritäten deine Entscheidungen zusätzlich prägen."
           )}
         </p>
         <div className="mt-6">
@@ -308,11 +309,11 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("8. Reflexionsfragen fuer dein Founder-Profil")}</p>
-        <h3 className="mt-3 text-lg font-semibold text-slate-900">{t("Strategische Reflexionsfragen fuer dich als Founder")}</h3>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("8. Reflexionsfragen für dein Founder-Profil")}</p>
+        <h3 className="mt-3 text-lg font-semibold text-slate-900">{t("Strategische Reflexionsfragen für dich als Founder")}</h3>
         <div className="mt-6 space-y-6">
           <div className="card-block rounded-xl border border-slate-200 bg-white p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{t("Reflexionsfragen fuer dich selbst")}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{t("Reflexionsfragen für dich selbst")}</p>
             <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-7 text-slate-700">
               {selfReflectionQuestions.map((question) => (
                 <li key={question}>{t(question)}</li>
@@ -322,11 +323,11 @@ export function SelfReportView({ report }: Props) {
 
           <div className="card-block rounded-xl border border-slate-200 bg-slate-50/70 p-5 print:bg-white">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
-              {t("Reflexionsfragen fuer Gespraeche mit potenziellen Co-Foundern")}
+              {t("Reflexionsfragen für Gespräche mit potenziellen Co-Foundern")}
             </p>
             <p className="mt-3 text-sm leading-7 text-slate-700">
               {t(
-                "Diese Fragen helfen dir, dein Profil nicht nur fuer dich selbst zu schaerfen, sondern in fruehen Founder-Gespraechen schneller auf reale Unterschiede in Entscheidungen, Zusammenarbeit und Erwartungen zu kommen."
+                "Diese Fragen helfen dir, dein Profil nicht nur für dich selbst zu schärfen, sondern in frühen Founder-Gesprächen schneller auf reale Unterschiede in Entscheidungen, Zusammenarbeit und Erwartungen zu kommen."
               )}
             </p>
             <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-7 text-slate-700">
@@ -387,7 +388,7 @@ function buildDisplayedInsights(
     if (insight.title.toLowerCase().includes("bewusst")) {
       return {
         ...insight,
-        text: `In ${meta.shortLabel.toLowerCase()} lohnt sich fuer dich fruehe Klaerung besonders. Gerade in spaeteren Teamkonstellationen hilft es, Erwartungen hier nicht still vorauszusetzen, sondern bewusst zu benennen.`,
+        text: `In ${meta.shortLabel.toLowerCase()} lohnt sich für dich frühe Klärung besonders. Gerade in späteren Teamkonstellationen hilft es, Erwartungen hier nicht still vorauszusetzen, sondern bewusst zu benennen.`,
       };
     }
 
@@ -397,7 +398,7 @@ function buildDisplayedInsights(
         text:
           tendency?.tendency === "center"
             ? `In ${meta.shortLabel.toLowerCase()} wirkst du derzeit vergleichsweise balanciert. Das kann in Teams stabilisierend wirken, weil du unterschiedliche Perspektiven oft gut einordnen kannst.`
-            : `In ${meta.shortLabel.toLowerCase()} gibst du Teams haeufig eine klare Linie. Diese Praeferenz kann besonders dann wertvoll sein, wenn in dynamischen Phasen Richtung und Tempo gebraucht werden.`,
+            : `In ${meta.shortLabel.toLowerCase()} gibst du Teams häufig eine klare Linie. Diese Präferenz kann besonders dann wertvoll sein, wenn in dynamischen Phasen Richtung und Tempo gebraucht werden.`,
       };
     }
 
@@ -406,8 +407,8 @@ function buildDisplayedInsights(
         ...insight,
         text:
           tendency?.tendency === "center"
-            ? `Gerade in der Zusammenarbeit kann diese ausgewogene Haltung hilfreich sein, weil du nicht sofort auf einen Extrempol festgelegt wirkst. Entscheidend ist dann, in wichtigen Situationen trotzdem frueh Position zu beziehen.`
-            : `In Teamdynamiken wird diese Tendenz oft schnell sichtbar. Sie kann produktiv sein, wenn andere Founder eine komplementaere Perspektive einbringen und ihr frueh klaert, wann mehr Gegenperspektive sinnvoll ist.`,
+            ? `Gerade in der Zusammenarbeit kann diese ausgewogene Haltung hilfreich sein, weil du nicht sofort auf einen Extrempol festgelegt wirkst. Entscheidend ist dann, in wichtigen Situationen trotzdem früh Position zu beziehen.`
+            : `In Teamdynamiken wird diese Tendenz oft schnell sichtbar. Sie kann produktiv sein, wenn andere Founder eine komplementäre Perspektive einbringen und ihr früh klärt, wann mehr Gegenperspektive sinnvoll ist.`,
       };
     }
 
@@ -415,8 +416,8 @@ function buildDisplayedInsights(
       ...insight,
       text:
         tendency?.tendency === "center"
-          ? `In ${meta.shortLabel.toLowerCase()} wirkst du derzeit vergleichsweise ausgewogen. Das schafft Anschlussfaehigkeit, braucht aber in wichtigen Momenten bewusste Priorisierung.`
-          : `In ${meta.shortLabel.toLowerCase()} tendierst du aktuell eher zu ${tendency?.label ?? meta.centerLabel}. Im Gruenderalltag kann das Teams eine klare Orientierung geben. Wichtig ist jedoch, frueh zu klaeren, wann es in diesem Feld mehr Gegenperspektive oder bewusstere Abstimmung braucht.`,
+          ? `In ${meta.shortLabel.toLowerCase()} wirkst du derzeit vergleichsweise ausgewogen. Das schafft Anschlussfähigkeit, braucht aber in wichtigen Momenten bewusste Priorisierung.`
+          : `In ${meta.shortLabel.toLowerCase()} tendierst du aktuell eher zu ${tendency?.label ?? meta.centerLabel}. Im Gründeralltag kann das Teams klare Orientierung geben. Wichtig ist jedoch, früh zu klären, wann es in diesem Feld mehr Gegenperspektive oder bewusstere Abstimmung braucht.`,
     };
   });
 }
@@ -442,7 +443,7 @@ function buildComplementParagraph(
         : "komplementaere Gegenperspektiven";
 
   if (!secondaryMeta) {
-    return `Founder mit deinem Profil ergaenzen oft besonders gut Personen, die in ${primaryMeta.shortLabel.toLowerCase()} staerker ${counterpart} arbeiten. In solchen Konstellationen entsteht haeufig eine produktive Balance zwischen deiner klaren Praeferenz und einer zweiten Perspektive, die Entscheidungen im Alltag stabiler macht.`;
+    return `Founder mit deinem Profil ergänzen oft besonders gut Personen, die in ${primaryMeta.shortLabel.toLowerCase()} stärker ${counterpart} arbeiten. In solchen Konstellationen entsteht häufig eine produktive Balance zwischen deiner klaren Präferenz und einer zweiten Perspektive, die Entscheidungen im Alltag stabiler macht.`;
   }
 
   return `Founder mit deinem Profil ergaenzen oft besonders gut Personen, die in ${primaryMeta.shortLabel.toLowerCase()} staerker ${counterpart} arbeiten und in ${secondaryMeta.shortLabel.toLowerCase()} eine andere Arbeitslogik einbringen. Gerade dort kann aus Unterschiedlichkeit produktive Spannung entstehen, wenn Rollen, Entscheidungsregeln und Erwartungen frueh geklaert sind.`;
@@ -528,16 +529,28 @@ function firstSentence(value: string) {
 function SectionBlock({
   title,
   content,
+  variant = "default",
   className = "",
 }: {
   title: string;
   content: ReactNode;
+  variant?: "default" | "emphasis";
   className?: string;
 }) {
+  const shellClass =
+    variant === "emphasis"
+      ? "rounded-2xl border border-[color:var(--brand-primary)]/22 bg-[linear-gradient(135deg,rgba(34,211,238,0.1),rgba(255,255,255,0.98))] px-5 py-5 shadow-[0_10px_28px_rgba(34,211,238,0.08)]"
+      : "";
+  const titleClass =
+    variant === "emphasis"
+      ? "text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-900"
+      : "text-xs font-semibold uppercase tracking-[0.12em] text-slate-600";
+  const contentClass = variant === "emphasis" ? "mt-3 text-[15px] leading-7 text-slate-800" : "mt-3";
+
   return (
-    <div className={className}>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">{t(title)}</p>
-      <div className="mt-3">{content}</div>
+    <div className={`${shellClass} ${className}`.trim()}>
+      <p className={titleClass}>{t(title)}</p>
+      <div className={contentClass}>{content}</div>
     </div>
   );
 }

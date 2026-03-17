@@ -1,11 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { redirectToLoginError, redirectToNextPath, normalizeNextPath } from "@/features/auth/authRedirects";
 import { createClient } from "@/lib/supabase/server";
-
-function normalizeNextPath(value: string | null) {
-  const trimmed = (value ?? "").trim();
-  return trimmed.startsWith("/") ? trimmed : "/dashboard";
-}
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -14,7 +10,7 @@ export async function GET(request: NextRequest) {
   const nextPath = normalizeNextPath(requestUrl.searchParams.get("next"));
 
   if (!tokenHash || !type) {
-    return NextResponse.redirect(new URL("/login?error=magic_link_failed", requestUrl.origin));
+    return redirectToLoginError(request, "magic_link_failed");
   }
 
   const supabase = await createClient();
@@ -24,8 +20,8 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.redirect(new URL("/login?error=magic_link_failed", requestUrl.origin));
+    return redirectToLoginError(request, "magic_link_failed");
   }
 
-  return NextResponse.redirect(new URL(nextPath, requestUrl.origin));
+  return redirectToNextPath(request, nextPath);
 }

@@ -1,32 +1,19 @@
-import { createServerClient } from "@supabase/ssr";
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import {
+  redirectToLoginError,
+  redirectToNextPath,
+  normalizeNextPath,
+} from "@/features/auth/authRedirects";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type") as EmailOtpType | null;
-  const next = requestUrl.searchParams.get("next") ?? "/dashboard";
-  const redirectUrl = new URL(next, requestUrl.origin);
-
-  let response = NextResponse.redirect(redirectUrl);
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
+  const nextPath = normalizeNextPath(requestUrl.searchParams.get("next"));
+  const supabase = await createClient();
 
   let error: string | null = null;
   if (code) {
@@ -39,14 +26,12 @@ export async function GET(request: NextRequest) {
     });
     error = result.error?.message ?? null;
   } else {
-    error = "missing_callback_params";
+    error = "auth_callback_failed";
   }
 
   if (error) {
-    response = NextResponse.redirect(
-      new URL(`/login?error=${encodeURIComponent(error)}`, requestUrl.origin)
-    );
+    return redirectToLoginError(request, "auth_callback_failed");
   }
 
-  return response;
+  return redirectToNextPath(request, nextPath);
 }

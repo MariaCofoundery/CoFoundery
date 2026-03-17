@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { hasProfileRole, normalizeProfileRoles } from "@/features/profile/profileRoles";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 
 export type DashboardRoleKey = "founder" | "advisor";
@@ -106,15 +107,19 @@ function advisorFollowUpLabel(value: unknown) {
 
 export async function getDashboardRoleViews(userId: string): Promise<DashboardRoleViews> {
   const supabase = await createClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("roles")
-    .eq("user_id", userId)
-    .maybeSingle();
+  const [profile, advisorAccess] = await Promise.all([
+    getProfileBasicsRow(supabase, userId).catch(() => null),
+    supabase
+      .from("founder_alignment_workbook_advisors")
+      .select("invitation_id")
+      .eq("advisor_user_id", userId)
+      .limit(1),
+  ]);
 
-  const roles = normalizeProfileRoles((profile as { roles?: unknown } | null)?.roles);
+  const roles = normalizeProfileRoles(profile?.roles ?? null);
   const hasFounder = hasProfileRole(roles, "founder");
-  const hasAdvisor = hasProfileRole(roles, "advisor");
+  const hasAdvisor =
+    hasProfileRole(roles, "advisor") || Boolean((advisorAccess.data ?? []).length > 0);
 
   return {
     hasFounder,
