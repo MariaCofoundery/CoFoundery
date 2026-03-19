@@ -53,8 +53,9 @@ export default async function MeReportPage() {
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Individueller Report</p>
         <h1 className="mt-3 text-3xl font-semibold text-slate-900">{report.participantAName}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-700">
-          Dieser Report beschreibt dein aktuelles Gründerprofil entlang der sechs Kern-Dimensionen und
-          gibt dir konkrete Reflexionsimpulse für deine Co-Founder-Suche.
+          Dieser Report fasst dein aktuelles Founder-Profil kompakt zusammen: mit deinen stärksten
+          Mustern, typischen Spannungsfeldern und einer klaren visuellen Einordnung der sechs
+          Dimensionen am Ende.
         </p>
       </section>
 
