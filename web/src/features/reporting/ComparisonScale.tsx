@@ -35,8 +35,8 @@ export function ComparisonScale({
     <div className="w-full">
       <div>
         <div className="relative h-9 w-full">
-          <div className="absolute left-0 right-0 top-4 z-0 h-[2px] bg-[#E5E7EB]" />
-          <div className="absolute left-0 right-0 top-4 z-[1] h-[2px] bg-gradient-to-r from-[#00B8D9]/60 to-[#7C3AED]/60" />
+          <div className="absolute left-0 right-0 top-4 z-0 h-[3px] rounded-full bg-slate-200 print:bg-slate-300" />
+          <div className="absolute left-0 right-0 top-4 z-[1] h-[3px] rounded-full bg-gradient-to-r from-[#00B8D9]/70 to-[#7C3AED]/70 print:from-[#00B8D9] print:to-[#7C3AED]" />
 
           {tensionLeft != null && tensionWidth != null ? (
             <div
@@ -91,7 +91,7 @@ function Marker({
       title={title}
     >
       <span
-        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold text-white"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold text-white shadow-[0_4px_10px_rgba(15,23,42,0.16)] print:shadow-none"
         style={{ backgroundColor: color }}
       >
         {text}

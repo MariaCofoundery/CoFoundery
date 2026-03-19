@@ -89,7 +89,9 @@ export function SelfReportView({ report }: Props) {
               <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
                 {FOUNDER_DIMENSION_META[entry.dimension].canonicalName}
               </p>
-              <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.tendencyLabel)}</h4>
+              <h4 className="mt-3 text-base font-semibold text-slate-900">
+                {t(patternHeadline(entry.dimension, entry.tendencyKey))}
+              </h4>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {t(compactPatternText(entry.dimension, entry.tendencyKey))}
               </p>
@@ -263,21 +265,24 @@ function buildFounderProfileSummary(
 
   if (!primary || primary.orientationStrength < 10) {
     return [
-      "Dein Profil wirkt aktuell breit anschlussfähig und nicht vorschnell auf einen einzigen Founder-Pol festgelegt.",
-      "Du hältst in mehreren Feldern bewusst Optionen offen und entscheidest eher situativ als schematisch.",
-      "Das kann Teams stabilisieren, verlangt aber von dir, in wichtigen Momenten aktiv Position zu beziehen und Prioritäten klar auszusprechen.",
+      "Du wirkst als Founder derzeit breit anschlussfähig und legst dich nicht vorschnell auf nur eine Arbeitslogik fest.",
+      "Du hältst Optionen offen, wägt Situationen sauber ab und reagierst eher bewusst als reflexhaft.",
+      "Das macht dich im Team oft ausgleichend, kann aber verschwimmen, wenn du in wichtigen Momenten nicht klar sagst, was für dich jetzt wirklich Priorität hat.",
       ...(valuesLine ? [valuesLine] : []),
     ];
   }
 
+  const primarySentence = stripTrailingPunctuation(firstSentence(compactPatternText(primary.dimension, primary.tendencyKey)));
+  const secondarySentence = secondary
+    ? stripTrailingPunctuation(firstSentence(compactPatternText(secondary.dimension, secondary.tendencyKey)))
+    : null;
+
   return [
-    `Aktuell prägt vor allem ${FOUNDER_DIMENSION_META[primary.dimension].canonicalName} dein Founder-Profil: ${lowercaseFirst(
-      stripTrailingPunctuation(compactPatternText(primary.dimension, primary.tendencyKey))
-    )}.`,
-    secondary
-      ? `Dazu kommt ein klares Signal in ${FOUNDER_DIMENSION_META[secondary.dimension].canonicalName}, das deinen Stil im Team zusätzlich erkennbar macht.`
-      : "Dein Profil zeigt bereits eine erkennbare Handschrift dafür, wie du Entscheidungen und Zusammenarbeit einordnest.",
-    `Im Alltag wirkt das selten abstrakt, sondern vor allem in Tempo, Erwartungsklarheit, Verantwortung und der Art, wie du mit anderen Founder-Perspektiven arbeitest.`,
+    primarySentence,
+    secondarySentence
+      ? `${uppercaseFirst(secondarySentence)}.`
+      : "Du bringst damit bereits eine klare Handschrift in Entscheidungen und Zusammenarbeit mit.",
+    "Im Team zeigt sich das vor allem darin, wie du Richtung gibst, Verantwortung einordnest und auf andere Founder-Perspektiven reagierst.",
     ...(valuesLine ? [valuesLine] : []),
   ];
 }
@@ -306,7 +311,13 @@ function buildComplementSummary(strongestDimensions: ScoredDimension[]) {
 }
 
 function buildComplementBullets(strongestDimensions: ScoredDimension[]) {
-  const bullets = strongestDimensions.slice(0, 3).map((entry) => {
+  const starters = [
+    "Besonders produktiv wird es mit jemandem, der",
+    "Gut ergänzt dich eine Person, die",
+    "Stark wird die Kombination oft, wenn dein Gegenüber",
+  ] as const;
+
+  const bullets = strongestDimensions.slice(0, 3).map((entry, index) => {
     const meta = FOUNDER_DIMENSION_META[entry.dimension];
     const counterpart =
       entry.tendencyKey === "left"
@@ -315,14 +326,14 @@ function buildComplementBullets(strongestDimensions: ScoredDimension[]) {
           ? meta.leftPole
           : "eine klarere Gegenperspektive";
 
-    return `Hilfreich ist oft jemand, der in ${meta.shortLabel.toLowerCase()} stärker ${counterpart} einbringt, ohne deine Logik abzuwerten.`;
+    return `${starters[index] ?? "Hilfreich ist oft jemand, der"} in ${meta.shortLabel.toLowerCase()} stärker ${counterpart} einbringt und damit einen echten Gegenpol aufmacht.`;
   });
 
   return bullets.length > 0
     ? bullets
     : [
-        "Hilfreich ist oft eine Person, die deine Offenheit ergänzt und in kritischen Momenten etwas früher Richtung vorgibt.",
-        "Gut wirkt eine Gegenperspektive, die Unterschiede früh benennt, statt sie nur mitzuschwingen.",
+        "Besonders produktiv wird es mit einer Person, die in kritischen Momenten etwas früher Richtung vorgibt.",
+        "Gut ergänzt dich jemand, der Unterschiede nicht nur wahrnimmt, sondern sauber auf den Tisch bringt.",
       ];
 }
 
@@ -363,14 +374,7 @@ function compactPatternText(dimension: FounderDimensionKey, tendency: TendencyKe
 }
 
 function compactChallengeText(dimension: FounderDimensionKey, tendency: TendencyKey) {
-  const sentences = splitSentences(SELF_DIMENSION_COPY[dimension].tendency[tendency]);
-  const challenge = sentences[sentences.length - 1] ?? "";
-
-  if (challenge) {
-    return challenge;
-  }
-
-  return firstSentence(SELF_DEVELOPMENT_COPY[dimension].whyItMatters);
+  return CHALLENGE_COPY[dimension][tendency];
 }
 
 function splitSentences(value: string) {
@@ -394,9 +398,13 @@ function stripTrailingPunctuation(value: string) {
   return value.replace(/[.!?…]+$/u, "").trim();
 }
 
-function lowercaseFirst(value: string) {
+function uppercaseFirst(value: string) {
   if (!value) return value;
-  return value.charAt(0).toLowerCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function patternHeadline(dimension: FounderDimensionKey, tendency: TendencyKey) {
+  return PATTERN_HEADLINES[dimension][tendency];
 }
 
 function buildMarkerLabel(name: string | null | undefined) {
@@ -424,3 +432,69 @@ function StatusBadge({ label, tone }: { label: string; tone: "neutral" | "accent
     </span>
   );
 }
+
+const PATTERN_HEADLINES: Record<FounderDimensionKey, Record<TendencyKey, string>> = {
+  "Vision & Unternehmenshorizont": {
+    left: "Substanz vor Vision",
+    center: "Mehrere Wege offenhalten",
+    right: "Klarer Blick nach vorn",
+  },
+  Entscheidungslogik: {
+    left: "Erst prüfen, dann entscheiden",
+    center: "Zwischen Analyse und Tempo",
+    right: "Schnell zur Richtung",
+  },
+  Risikoorientierung: {
+    left: "Kontrolliert ins Risiko",
+    center: "Mut mit Augenmaß",
+    right: "Chancen aktiv nutzen",
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: "Freiheit mit Verantwortung",
+    center: "Eigenständig und anschlussfähig",
+    right: "Nähe in der Zusammenarbeit",
+  },
+  Commitment: {
+    left: "Verbindlich, aber realistisch",
+    center: "Hoher Einsatz mit Maß",
+    right: "Starker Fokus auf das Startup",
+  },
+  Konfliktstil: {
+    left: "Ruhe vor Reibung",
+    center: "Klarheit mit Timing",
+    right: "Direkt in die Klärung",
+  },
+};
+
+const CHALLENGE_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> = {
+  "Vision & Unternehmenshorizont": {
+    left: "Schwierig wird es, wenn andere sehr groß denken wollen und du zuerst auf Tragfähigkeit und Machbarkeit schaust.",
+    center: "Kann dich ausbremsen, wenn im Team lange offenbleibt, welche Richtung jetzt wirklich Vorrang hat.",
+    right: "Wird schnell zäh, wenn andere deutlich vorsichtiger sind und du das Gefühl hast, dass der gemeinsame Kurs zu klein gedacht wird.",
+  },
+  Entscheidungslogik: {
+    left: "Wird schwierig, wenn im Team ständig Tempo gefordert wird, bevor für dich die Entscheidung sauber genug begründet ist.",
+    center: "Kann dich zermürben, wenn unklar bleibt, wann ihr noch prüft und wann ihr euch endlich festlegt.",
+    right: "Kann dich ausbremsen, wenn Diskussionen zu lange offenbleiben und du das Gefühl hast, dass niemand den Punkt setzt.",
+  },
+  Risikoorientierung: {
+    left: "Wird heikel, wenn andere mutig nach vorn wollen und dir dabei die Leitplanken oder Stop-Kriterien fehlen.",
+    center: "Kann anstrengend werden, wenn ihr über Chancen sprecht, aber nie sauber klärt, welches Risiko ihr gemeinsam wirklich tragen wollt.",
+    right: "Wird schwierig, wenn das Team Sicherheit über alles stellt und du in jeder Chance zuerst die Bremse spürst.",
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: "Wird schwierig, wenn andere sehr viel Einblick und Mitsprache brauchen und du eigentlich klare Verantwortungsräume erwartest.",
+    center: "Kann zäh werden, wenn unklar bleibt, wo Abstimmung aufhört und wo Eigenverantwortung beginnt.",
+    right: "Kann dich ausbremsen, wenn andere sehr autonom arbeiten wollen und du zu wenig Transparenz darüber bekommst, was wirklich läuft.",
+  },
+  Commitment: {
+    left: "Wird schnell angespannt, wenn im Team still vorausgesetzt wird, dass alle jederzeit denselben Einsatz bringen müssen.",
+    center: "Kann kippen, wenn Verbindlichkeit groß klingt, aber niemand ausspricht, was im Alltag tatsächlich erwartet wird.",
+    right: "Wird schwierig, wenn du sehr viel Fokus gibst und andere lockerer mit Verfügbarkeit oder Priorität umgehen.",
+  },
+  Konfliktstil: {
+    left: "Kann dich ausbremsen, wenn Spannungen im Raum stehen und andere sofort Härte oder direkte Konfrontation erwarten.",
+    center: "Wird schwierig, wenn Themen lange mitschwingen und niemand klar macht, wann ihr sie wirklich besprecht.",
+    right: "Kann schnell knirschen, wenn dein direktes Ansprechen auf ein Team trifft, das Konflikte lieber erst einmal liegen lässt.",
+  },
+};
