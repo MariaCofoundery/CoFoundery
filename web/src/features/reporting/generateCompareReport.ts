@@ -540,8 +540,8 @@ function buildDecisionArchitecture(
     ? `${nameA} (${decision.archetypeA.name}) und ${nameB} (${decision.archetypeB.name}) profitieren von einer zweistufigen Entscheidungslogik: kurzfristige operative Entscheidungen und strategische Entscheidungen mit strukturierter Voranalyse.`
     : `${nameA} und ${nameB} sollten operative und strategische Entscheidungen sauber trennen, um Geschwindigkeit ohne Qualitätsverlust zu sichern.`;
   const ownershipRule = autonomy
-    ? `Ownership-Architektur: In Autonomie zeigt ihr unterschiedliche Präferenzen für Nähe und Freiheit. Definiert deshalb pro Verantwortungsbereich ein finales Entscheidungsmandat und einen festen Abstimmungstakt.`
-    : "Ownership-Architektur: Definiert je Bereich ein finales Entscheidungsmandat plus wöchentlichen Alignment-Slot.";
+    ? `Arbeitsmodus: In Autonomie zeigt ihr unterschiedliche Präferenzen für enge Abstimmung und Eigenraum. Definiert deshalb pro Verantwortungsbereich einen klaren Abstimmungstakt und sichtbare Checkpoints.`
+    : "Arbeitsmodus: Definiert je Bereich einen klaren Abstimmungstakt plus verlässliche Checkpoints für Sichtbarkeit.";
   const conflictRule = conflict
     ? `Konflikt-Architektur: ${conflict.dailyPressure} Verankert eine klare Eskalationsregel mit zeitnahen Feedbackschleifen, damit Spannungen nicht in operative Verzögerungen übersetzen.`
     : "Konflikt-Architektur: Führt eine explizite Eskalationsregel ein, damit Reibung früh bearbeitet wird.";

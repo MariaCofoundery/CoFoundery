@@ -59,7 +59,7 @@ type BuildFounderAlignmentReportInput = {
 };
 
 const DIMENSION_KEYS = {
-  vision: "Vision & Unternehmenshorizont",
+  vision: "Unternehmenslogik",
   decisionLogic: "Entscheidungslogik",
   riskOrientation: "Risikoorientierung",
   workStructure: "Arbeitsstruktur & Zusammenarbeit",

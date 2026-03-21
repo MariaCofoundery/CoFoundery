@@ -6,19 +6,19 @@ export const WORKBOOK_STEP_CONTENT: Record<
 > = {
   vision_direction: {
     context: [
-      "Dieses Thema legt fest, worauf ihr gemeinsam hinarbeitet und welche Richtung euch langfristig traegt.",
-      "Gerade frueh in der Zusammenarbeit entstehen hier oft unausgesprochene Erwartungen zu Wachstum, Exit und Prioritaeten.",
+      "Dieses Thema klaert, woran ihr unternehmerische Entscheidungen gemeinsam ausrichten wollt.",
+      "Gerade frueh in der Zusammenarbeit entstehen hier oft unausgesprochene Erwartungen zu Marktchance, Aufbau und strategischen Prioritaeten.",
     ],
     everyday:
-      "Im Alltag zeigt sich das oft dort, wo ihr strategische Chancen unterschiedlich bewertet oder nicht sofort gleich entscheidet, was fuer den Unternehmensaufbau jetzt Vorrang hat.",
+      "Im Alltag zeigt sich das oft dort, wo ihr strategische Chancen unterschiedlich bewertet oder nicht sofort gleich entscheidet, ob Wirkung oder Tragfaehigkeit jetzt Vorrang hat.",
   },
   roles_responsibility: {
     context: [
-      "Klare Rollen schaffen Tempo, Verlaesslichkeit und weniger Reibung in der taeglichen Zusammenarbeit.",
-      "Wird Verantwortung nicht bewusst geklaert, entsteht schnell Unsicherheit bei Ownership, Mitsprache und Erwartung an Sichtbarkeit.",
+      "Im Arbeitsalltag entsteht Reibung oft nicht aus fehlendem Willen, sondern aus unterschiedlichen Erwartungen daran, wie eng man verbunden arbeitet.",
+      "Wenn Abstimmungsnaehe, Sichtbarkeit und Eigenraum nicht bewusst geklaert werden, laufen Teams schnell nebeneinander statt miteinander.",
     ],
     everyday:
-      "Spuerbar wird das haeufig bei Themen wie Verantwortungsbereichen, Einblick in Entscheidungen oder der Frage, wer etwas wirklich final owns.",
+      "Spuerbar wird das haeufig daran, wie oft ihr Rueckkopplung braucht, wie sichtbar laufende Arbeit sein soll und wann gezielte Abstimmung fuer euch reicht.",
   },
   decision_rules: {
     context: [
@@ -30,11 +30,11 @@ export const WORKBOOK_STEP_CONTENT: Record<
   },
   commitment_load: {
     context: [
-      "Commitment und Belastung bestimmen, wie tragfaehig eure Zusammenarbeit im Alltag wirklich ist.",
-      "Hier geht es nicht nur um Einsatz, sondern auch um realistische Verfuegbarkeit, Prioritaeten und den Umgang mit intensiven Phasen.",
+      "Commitment bestimmt, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau ihr gegenseitig erwartet.",
+      "Hier geht es nicht um moralische Bewertung, sondern um Arbeitsrealitaet, Verfuegbarkeit und den Umgang mit intensiven Phasen.",
     ],
     everyday:
-      "Das zeigt sich haeufig daran, wie kurzfristig ihr verfuegbar seid, wie viel Fokus das Startup im Alltag bekommt und wie offen ihr ueber Belastungsgrenzen sprecht.",
+      "Das zeigt sich haeufig daran, wie kurzfristig ihr verfuegbar seid, wie viel Fokus das Startup im Alltag bekommt und wie offen ihr ueber Intensitaet und Belastungsgrenzen sprecht.",
   },
   collaboration_conflict: {
     context: [

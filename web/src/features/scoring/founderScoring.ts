@@ -111,7 +111,7 @@ type DistanceInterpretation = {
 };
 
 const DIMENSION_ORDER = [
-  "Vision & Unternehmenshorizont",
+  "Unternehmenslogik",
   "Entscheidungslogik",
   "Risikoorientierung",
   "Arbeitsstruktur & Zusammenarbeit",
@@ -141,8 +141,8 @@ type DimensionDetails = Omit<
 const MIN_ANSWERS_PER_PERSON_PER_DIMENSION = 2;
 
 const DISTANCE_INTERPRETATIONS: Record<KnownDimension, DistanceInterpretation[]> = {
-  "Vision & Unternehmenshorizont": [
-    { maxDistance: 15, label: "sehr stabile Basis" },
+  Unternehmenslogik: [
+    { maxDistance: 15, label: "sehr ähnliche Unternehmenslogik" },
     { maxDistance: 30, label: "klaerungsbeduerftig" },
     { maxDistance: Number.POSITIVE_INFINITY, label: "moegliches Spannungsfeld" },
   ],
@@ -159,14 +159,14 @@ const DISTANCE_INTERPRETATIONS: Record<KnownDimension, DistanceInterpretation[]>
     { maxDistance: Number.POSITIVE_INFINITY, label: "strategische Spannungen moeglich" },
   ],
   "Arbeitsstruktur & Zusammenarbeit": [
-    { maxDistance: 15, label: "harmonische Arbeitsweise" },
-    { maxDistance: 30, label: "unterschiedliche Praeferenzen", complementary: true },
-    { maxDistance: Number.POSITIVE_INFINITY, label: "moegliche Reibungen im Alltag" },
+    { maxDistance: 15, label: "aehnliche Abstimmungsnaehe" },
+    { maxDistance: 30, label: "unterschiedliche Arbeitskopplung", complementary: true },
+    { maxDistance: Number.POSITIVE_INFINITY, label: "Reibung in Abstimmung und Sichtbarkeit moeglich" },
   ],
   Commitment: [
-    { maxDistance: 15, label: "gleiche Einsatzhaltung" },
-    { maxDistance: 25, label: "unterschiedliche Belastungsmodelle" },
-    { maxDistance: Number.POSITIVE_INFINITY, label: "kritisches Thema" },
+    { maxDistance: 15, label: "aehnliche Priorisierung" },
+    { maxDistance: 25, label: "unterschiedliche Einsatzrahmen" },
+    { maxDistance: Number.POSITIVE_INFINITY, label: "deutlich unterschiedliche Arbeitsrealitaeten" },
   ],
   Konfliktstil: [
     { maxDistance: 15, label: "aehnliche Konfliktkultur" },
@@ -195,10 +195,12 @@ function normalizeDimensionKey(value: string) {
 }
 
 const DIMENSION_ALIASES: Record<string, KnownDimension> = {
-  "vision & unternehmenshorizont": "Vision & Unternehmenshorizont",
-  "vision unternehmenshorizont": "Vision & Unternehmenshorizont",
-  "vision": "Vision & Unternehmenshorizont",
-  "unternehmenshorizont": "Vision & Unternehmenshorizont",
+  "unternehmenslogik": "Unternehmenslogik",
+  "unternehmens logik": "Unternehmenslogik",
+  "vision & unternehmenshorizont": "Unternehmenslogik",
+  "vision unternehmenshorizont": "Unternehmenslogik",
+  "vision": "Unternehmenslogik",
+  "unternehmenshorizont": "Unternehmenslogik",
   "entscheidungslogik": "Entscheidungslogik",
   "entscheidung": "Entscheidungslogik",
   "entscheidungen": "Entscheidungslogik",
@@ -353,7 +355,7 @@ function dimensionPriorityBonus(
   if (!dimension) return 0;
 
   if (emphasis === "strength") {
-    if (dimension === "Vision & Unternehmenshorizont") return 12;
+    if (dimension === "Unternehmenslogik") return 12;
     if (dimension === "Commitment") return 11;
     if (dimension === "Arbeitsstruktur & Zusammenarbeit") return 10;
     return 0;
@@ -367,7 +369,7 @@ function dimensionPriorityBonus(
   }
 
   if (dimension === "Commitment") return 12;
-  if (dimension === "Vision & Unternehmenshorizont") return 10;
+  if (dimension === "Unternehmenslogik") return 10;
   if (dimension === "Konfliktstil") return 10;
   return 0;
 }
@@ -459,8 +461,8 @@ function blendTensionScore(baseTensionScore: number, itemDistance: number) {
 }
 
 function describeHiddenDifference(dimension: KnownDimension) {
-  if (dimension === "Vision & Unternehmenshorizont") {
-    return "Aehnliche Gesamtposition, aber unterschiedliche Antwortmuster deuten auf verschiedene innere Logiken bei Richtung und Zeithorizont hin.";
+  if (dimension === "Unternehmenslogik") {
+    return "Aehnliche Gesamtposition, aber unterschiedliche Antwortmuster zeigen, dass ihr unternehmerische Entscheidungen nicht an denselben Maßstäben ausrichtet.";
   }
   if (dimension === "Entscheidungslogik") {
     return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Entscheidungen im Detail nicht ueber dieselbe innere Logik verarbeitet.";
@@ -469,10 +471,10 @@ function describeHiddenDifference(dimension: KnownDimension) {
     return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Risiken je nach Situation ueber verschiedene innere Logiken bewertet.";
   }
   if (dimension === "Arbeitsstruktur & Zusammenarbeit") {
-    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Zusammenarbeit im Alltag ueber unterschiedliche Arbeitslogiken organisiert.";
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr im Alltag unterschiedlich eng abgestimmt und sichtbar verbunden arbeiten wollt.";
   }
   if (dimension === "Commitment") {
-    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Einsatz, Verfuegbarkeit und Prioritaeten nicht in denselben Situationen gleich auslegt.";
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Priorisierung, Verfuegbarkeit und Einsatzniveau nicht in denselben Situationen gleich auslegt.";
   }
   return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Spannungen und Konflikte ueber unterschiedliche innere Logiken verarbeitet.";
 }
@@ -484,7 +486,7 @@ function classifyRisk(distance: number, lowMaxInclusive: number, mediumMaxInclus
 }
 
 function buildVisionResult(context: ScoringContext): DimensionDetails {
-  const interpretation = getDistanceInterpretation("Vision & Unternehmenshorizont", context.distance);
+  const interpretation = getDistanceInterpretation("Unternehmenslogik", context.distance);
   const teamFit = context.hasHiddenDifferences
     ? blendTeamFit(context.alignment, context.itemDistance)
     : context.alignment;
@@ -503,13 +505,13 @@ function buildVisionResult(context: ScoringContext): DimensionDetails {
       : interpretation.label,
     isComplementaryDynamic: false,
     redFlags: [
-      ...(context.distance > 35 ? ["Visionen und Unternehmenshorizonte liegen weit auseinander."] : []),
-      ...(context.hasHiddenDifferences ? [describeHiddenDifference("Vision & Unternehmenshorizont")] : []),
+      ...(context.distance > 35 ? ["Die Unternehmenslogik liegt deutlich auseinander."] : []),
+      ...(context.hasHiddenDifferences ? [describeHiddenDifference("Unternehmenslogik")] : []),
     ],
     greenFlags: [],
     collaborationStrengths:
       context.distance <= 15 && !context.hasHiddenDifferences
-        ? ["Vision und Unternehmenshorizont bilden eine sehr stabile gemeinsame Basis."]
+        ? ["Die Unternehmenslogik bildet derzeit eine sehr stabile gemeinsame Basis."]
         : [],
     complementaryDynamics: [],
     potentialTensionAreas:
@@ -517,11 +519,11 @@ function buildVisionResult(context: ScoringContext): DimensionDetails {
         ...(context.distance > 15
           ? [
               context.distance <= 30
-                ? "Vision und Unternehmenshorizont sind derzeit klaerungsbeduerftig."
-                : "Vision und Unternehmenshorizont koennen ein Spannungsfeld erzeugen.",
+                ? "Die Unternehmenslogik ist derzeit klaerungsbeduerftig."
+                : "Die Unternehmenslogik kann ein Spannungsfeld erzeugen.",
             ]
           : []),
-        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Vision & Unternehmenshorizont")] : []),
+        ...(context.hasHiddenDifferences ? [describeHiddenDifference("Unternehmenslogik")] : []),
       ],
   };
 }
@@ -668,29 +670,29 @@ function buildCollaborationResult(context: ScoringContext): DimensionDetails {
     redFlags:
       [
         ...(context.distance > 40
-          ? ["Arbeitsstruktur und Zusammenarbeit unterscheiden sich sehr stark."]
+          ? ["Wie eng ihr im Alltag verbunden arbeiten wollt, unterscheidet sich sehr stark."]
           : []),
         ...(context.hasHiddenDifferences ? [describeHiddenDifference("Arbeitsstruktur & Zusammenarbeit")] : []),
       ],
     greenFlags:
       hasComplementaryDynamic && !context.hasHiddenDifferences
-        ? ["Die Unterschiede in der Zusammenarbeit wirken ausgewogen und anschlussfaehig."]
+        ? ["Die Unterschiede in Abstimmungsnaehe und Sichtbarkeit wirken gut ausbalanciert."]
         : [],
     collaborationStrengths:
       context.distance <= 15 && !context.hasHiddenDifferences
-        ? ["Die Arbeitsweise wirkt harmonisch und im Alltag leicht koordinierbar."]
+        ? ["Eure gewuenschte Abstimmungsnaehe wirkt im Alltag aehnlich und leicht koordinierbar."]
         : [],
     complementaryDynamics:
       hasComplementaryDynamic && !context.hasHiddenDifferences
-        ? ["Unterschiede in der Arbeitsstruktur koennen eine ergaenzende Zusammenarbeit foerdern."]
+        ? ["Unterschiede in Arbeitskopplung und Sichtbarkeit koennen sich im Alltag ergaenzen."]
         : [],
     potentialTensionAreas:
       [
         ...(context.distance > 15
           ? [
               context.distance <= 30
-                ? "In der Zusammenarbeit bestehen unterschiedliche Praeferenzen, die bewusste Abstimmung brauchen."
-                : "Im Arbeitsalltag sind Reibungen in Struktur und Zusammenarbeit moeglich.",
+                ? "Ihr braucht unterschiedlich viel Abstimmung und Sichtbarkeit im Alltag."
+                : "Im Arbeitsalltag sind deutliche Reibungen bei Abstimmung und Arbeitskopplung moeglich.",
             ]
           : []),
         ...(context.hasHiddenDifferences ? [describeHiddenDifference("Arbeitsstruktur & Zusammenarbeit")] : []),
@@ -718,13 +720,13 @@ function buildCommitmentResult(context: ScoringContext): DimensionDetails {
       : interpretation.label,
     isComplementaryDynamic: false,
     redFlags: [
-      ...(context.distance > 30 ? ["Das Commitment-Niveau wirkt deutlich unterschiedlich."] : []),
+      ...(context.distance > 30 ? ["Priorisierung und erwartetes Einsatzniveau liegen deutlich auseinander."] : []),
       ...(context.hasHiddenDifferences ? [describeHiddenDifference("Commitment")] : []),
     ],
     greenFlags: [],
     collaborationStrengths:
       context.distance <= 15 && !context.hasHiddenDifferences
-        ? ["Das Commitment wirkt auf einem aehnlichen Einsatzniveau verankert."]
+        ? ["Priorisierung und erwartetes Einsatzniveau wirken aehnlich ausgerichtet."]
         : [],
     complementaryDynamics: [],
     potentialTensionAreas:
@@ -732,8 +734,8 @@ function buildCommitmentResult(context: ScoringContext): DimensionDetails {
         ...(context.distance > 15
           ? [
               context.distance <= 25
-                ? "Im Commitment zeigen sich unterschiedliche Belastungsmodelle."
-                : "Commitment ist ein potenziell kritisches Thema fuer die Zusammenarbeit.",
+                ? "Im Commitment zeigen sich unterschiedliche Einsatzrahmen."
+                : "Commitment kann im Alltag zu deutlichen Erwartungsunterschieden fuehren.",
             ]
           : []),
         ...(context.hasHiddenDifferences ? [describeHiddenDifference("Commitment")] : []),
@@ -798,7 +800,7 @@ function buildConflictStyleResult(context: ScoringContext): DimensionDetails {
 }
 
 const DIMENSION_RULES: Record<KnownDimension, KnownDimensionRule> = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     weight: 22,
     compute: buildVisionResult,
   },
@@ -1072,13 +1074,13 @@ Example usage:
 
 const result = scoreFounderAlignment({
   personA: [
-    { question_id: "q1", dimension: "Vision & Unternehmenshorizont", value: 100 },
-    { question_id: "q2", dimension: "Vision & Unternehmenshorizont", value: 75 },
+    { question_id: "q1", dimension: "Unternehmenslogik", value: 100 },
+    { question_id: "q2", dimension: "Unternehmenslogik", value: 75 },
     { question_id: "q3", dimension: "Commitment", value: 100 },
   ],
   personB: [
-    { question_id: "q1", dimension: "Vision & Unternehmenshorizont", value: 75 },
-    { question_id: "q2", dimension: "Vision & Unternehmenshorizont", value: 75 },
+    { question_id: "q1", dimension: "Unternehmenslogik", value: 75 },
+    { question_id: "q2", dimension: "Unternehmenslogik", value: 75 },
     { question_id: "q3", dimension: "Commitment", value: 50 },
   ],
 });

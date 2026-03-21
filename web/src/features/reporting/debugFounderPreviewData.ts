@@ -468,8 +468,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
   if (mode === "existing_team") {
     return {
       personA: [
-        answer("vision-a-1", "Vision & Unternehmenshorizont", 50),
-        answer("vision-a-2", "Vision & Unternehmenshorizont", 75),
+        answer("vision-a-1", "Unternehmenslogik", 50),
+        answer("vision-a-2", "Unternehmenslogik", 75),
         answer("decision-a-1", "Entscheidungslogik", 100),
         answer("decision-a-2", "Entscheidungslogik", 75),
         answer("risk-a-1", "Risikoorientierung", 50),
@@ -482,8 +482,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
         answer("conflict-a-2", "Konfliktstil", 50),
       ],
       personB: [
-        answer("vision-b-1", "Vision & Unternehmenshorizont", 50),
-        answer("vision-b-2", "Vision & Unternehmenshorizont", 75),
+        answer("vision-b-1", "Unternehmenslogik", 50),
+        answer("vision-b-2", "Unternehmenslogik", 75),
         answer("decision-b-1", "Entscheidungslogik", 25),
         answer("decision-b-2", "Entscheidungslogik", 50),
         answer("risk-b-1", "Risikoorientierung", 50),
@@ -501,8 +501,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
   if (mode === "advisor") {
     return {
       personA: [
-        answer("vision-a-1", "Vision & Unternehmenshorizont", 75),
-        answer("vision-a-2", "Vision & Unternehmenshorizont", 75),
+        answer("vision-a-1", "Unternehmenslogik", 75),
+        answer("vision-a-2", "Unternehmenslogik", 75),
         answer("decision-a-1", "Entscheidungslogik", 75),
         answer("decision-a-2", "Entscheidungslogik", 50),
         answer("risk-a-1", "Risikoorientierung", 50),
@@ -515,8 +515,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
         answer("conflict-a-2", "Konfliktstil", 50),
       ],
       personB: [
-        answer("vision-b-1", "Vision & Unternehmenshorizont", 75),
-        answer("vision-b-2", "Vision & Unternehmenshorizont", 50),
+        answer("vision-b-1", "Unternehmenslogik", 75),
+        answer("vision-b-2", "Unternehmenslogik", 50),
         answer("decision-b-1", "Entscheidungslogik", 50),
         answer("decision-b-2", "Entscheidungslogik", 50),
         answer("risk-b-1", "Risikoorientierung", 25),
@@ -533,8 +533,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
 
   return {
     personA: [
-      answer("vision-a-1", "Vision & Unternehmenshorizont", 100),
-      answer("vision-a-2", "Vision & Unternehmenshorizont", 75),
+      answer("vision-a-1", "Unternehmenslogik", 100),
+      answer("vision-a-2", "Unternehmenslogik", 75),
       answer("decision-a-1", "Entscheidungslogik", 75),
       answer("decision-a-2", "Entscheidungslogik", 50),
       answer("risk-a-1", "Risikoorientierung", 100),
@@ -547,8 +547,8 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
       answer("conflict-a-2", "Konfliktstil", 25),
     ],
     personB: [
-      answer("vision-b-1", "Vision & Unternehmenshorizont", 75),
-      answer("vision-b-2", "Vision & Unternehmenshorizont", 75),
+      answer("vision-b-1", "Unternehmenslogik", 75),
+      answer("vision-b-2", "Unternehmenslogik", 75),
       answer("decision-b-1", "Entscheidungslogik", 25),
       answer("decision-b-2", "Entscheidungslogik", 50),
       answer("risk-b-1", "Risikoorientierung", 25),

@@ -84,14 +84,14 @@ const AGREEMENT_DRAFT_META: Record<
     ],
   },
   roles_responsibility: {
-    fallbackSharedThemes: ["klare Verantwortung", "sichtbare Ownership"],
-    differenceFocus: "Rollen, Mitsprache und Verantwortungsbereiche",
+    fallbackSharedThemes: ["klare Zuständigkeiten", "ein passender Arbeitsrhythmus"],
+    differenceFocus: "Abstimmungsnähe, Sichtbarkeit und Zuständigkeiten im Alltag",
     ruleFocus:
-      "Ownership, Mitsprache und operative Verantwortung ordnen wir entlang dieser Vereinbarung und klaeren Abweichungen frueh.",
+      "Abstimmung, Sichtbarkeit und Zuständigkeiten ordnen wir entlang dieser Vereinbarung und klären Abweichungen früh.",
     themeSignals: [
       { label: "klare Rollen", keywords: ["rolle", "rollen", "zustaendig", "verantwort"] },
-      { label: "Ownership", keywords: ["ownership", "own", "fuehren", "federfuehr"] },
-      { label: "Mitsprache", keywords: ["mitsprache", "einblick", "abstimmung", "informiert"] },
+      { label: "Eigenraum", keywords: ["ownership", "own", "autonom", "eigenstaendig", "federfuehr"] },
+      { label: "Sichtbarkeit", keywords: ["mitsprache", "einblick", "abstimmung", "informiert", "sichtbar"] },
       { label: "Equity und Verantwortung", keywords: ["equity", "anteil", "anteile", "beteilig"] },
     ],
   },
@@ -2740,9 +2740,9 @@ function buildStepSpecificAgreementDraft({
 
     case "roles_responsibility":
       return [
-        "Fuer euren Arbeitsalltag haltet ihr fest, wie Rollen, Mitsprache und Verantwortung organisiert sein sollen.",
+        "Fuer euren Arbeitsalltag haltet ihr fest, wie eng ihr abgestimmt arbeiten, was sichtbar bleiben und wo mehr Eigenraum gelten soll.",
         `Tragend sind fuer euch ${sharedOrientation}.`,
-        `Wenn sich Unterschiede bei ${differingOrientation} zeigen, klaert ihr offen, wer fuehrt, wer eingebunden wird und wo Einblick noetig ist.`,
+        `Wenn sich Unterschiede bei ${differingOrientation} zeigen, klaert ihr offen, wo mehr Rueckkopplung noetig ist und wo gezielte statt dauernder Abstimmung reicht.`,
         ruleFocus,
       ].join(" ");
 

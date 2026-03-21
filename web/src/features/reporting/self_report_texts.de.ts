@@ -15,22 +15,22 @@ export const SELF_DIMENSION_COPY: Record<
     everydaySignals: string[];
   }
 > = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     intro:
-      "Diese Dimension zeigt, wie du über Richtung, Wachstum und Zeithorizont nachdenkst. Sie prägt, wie du Chancen einordnest und welche Art von Unternehmen du langfristig bauen willst.",
+      "Diese Dimension zeigt, woran du unternehmerische Entscheidungen ausrichtest. Sie macht sichtbar, ob du stärker auf Marktlogik, Skalierbarkeit und strategische Wirkung schaust oder eher auf Substanz, Aufbau und langfristige Tragfähigkeit.",
     reflectionQuestion:
-      "Welche strategische Entscheidung in den nächsten 90 Tagen zeigt am klarsten, worauf du dein Unternehmen ausrichten willst?",
+      "Welche anstehende Entscheidung zeigt am klarsten, ob du stärker in strategischer Wirkung oder stärker in Substanz und Aufbau denkst?",
     tendency: {
       left:
-        "Du denkst das Unternehmen zuerst von Tragfähigkeit und Substanz her. Im Alltag prüfst du Chancen eher auf Machbarkeit als auf große Vision. Das hält Entscheidungen bodenständig, kann Teams aber länger vor mutigen Sprüngen bremsen.",
+        "Du liest unternehmerische Entscheidungen zuerst über Marktlogik, Hebel und strategische Wirkung. Im Alltag fragst du schneller, was Reichweite erzeugt, was verwertbar ist und was das Unternehmen voranbringt. Das schafft Fokus und Zug, kann aber Substanzfragen zu spät auf den Tisch bringen.",
       center:
-        "Du hältst bei Richtung und Horizont bewusst mehrere Optionen offen. Im Alltag wechselst du zwischen Aufbau, Gelegenheit und wirtschaftlicher Vernunft, statt dich früh festzulegen. Das macht dich flexibel, kann Teams aber in der Schwebe halten, wenn Richtung nicht aktiv entschieden wird.",
+        "Du denkst weder rein über strategische Wirkung noch rein über Substanz. Im Alltag wägst du ab, wann Marktchance trägt und wann Aufbau wichtiger ist. Das macht dich beweglich, verlangt aber klare Priorisierung, sobald mehrere gute Optionen gleichzeitig auf dem Tisch liegen.",
       right:
-        "Du denkst das Unternehmen klar vom langfristigen Aufbau und einer größeren Richtung her. Im Alltag ordnest du Chancen danach ein, ob sie zur Vision passen und das Unternehmen wirklich weitertragen. Das gibt Teams Zug und Orientierung, erhöht aber den Druck auf gemeinsame strategische Klarheit.",
+        "Du richtest unternehmerische Entscheidungen stark an Substanz, Aufbau und Tragfähigkeit aus. Im Alltag prüfst du Chancen danach, ob sie das Unternehmen wirklich stabiler und belastbarer machen. Das schafft Tiefe und Konsistenz, kann Teams aber bei starken Marktfenstern spürbar bremsen.",
     },
     everydaySignals: [
-      "Bei Wachstum, Hiring oder Kapitalfragen spielt für dich die langfristige Richtung mit hinein.",
-      "In strategischen Diskussionen wirst du besonders klar, wenn es um den Kurs des Unternehmens geht.",
+      "Bei Wachstum, Hiring oder Kapitalfragen zeigt sich schnell, ob du zuerst auf Hebel oder zuerst auf Tragfähigkeit schaust.",
+      "In strategischen Diskussionen wirst du besonders klar, wenn entschieden werden muss, was mehr Gewicht bekommt: Marktwirkung oder Aufbau.",
     ],
   },
   Entscheidungslogik: {
@@ -71,38 +71,38 @@ export const SELF_DIMENSION_COPY: Record<
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     intro:
-      "Diese Dimension zeigt, wie du Zusammenarbeit zwischen Eigenständigkeit und enger Abstimmung organisierst. Sie beeinflusst, wie viel Einblick, Mitsprache und Struktur du im Alltag brauchst.",
+      "Diese Dimension zeigt, wie eng du im Alltag mit anderen arbeiten, abstimmen und sichtbar verbunden bleiben willst. Sie macht sichtbar, ob du lieber über klare Zuständigkeiten mit gezielter Abstimmung arbeitest oder über laufenden Austausch und ein gemeinsames Bild der Arbeit.",
     reflectionQuestion:
-      "Welche Form von Abstimmung brauchst du im Alltag wirklich, und wo willst du bewusst mehr Eigenständigkeit behalten?",
+      "Wie eng willst du im Alltag mit anderen verbunden arbeiten, und an welchen Stellen reicht dir gezielte statt dauernder Abstimmung?",
     tendency: {
       left:
-        "Du arbeitest am stärksten mit klaren Verantwortungsräumen und viel operativer Freiheit. Im Alltag willst du nicht jede Bewegung abstimmen, sondern in deinem Bereich eigenständig liefern. Das schafft Tempo und Ownership, erzeugt ohne klare Transparenz aber schnell stille Missverständnisse.",
+        "Du arbeitest am besten mit klaren Zuständigkeiten und eigenem Raum. Im Alltag willst du nicht bei jedem Schritt im Loop sein, sondern gezielt abstimmen, wenn etwas wirklich relevant wird. Das schafft Fokus und Tempo, kann aber schnell zu Reibung führen, wenn andere viel engere Rückkopplung brauchen.",
       center:
-        "Du verbindest Eigenständigkeit mit Austausch, statt nur auf einen Arbeitsmodus zu setzen. Im Alltag willst du genug Transparenz für gute Abstimmung, ohne Verantwortung zu verwässern. Das macht Zusammenarbeit flexibel, braucht im Team aber klare Regeln für Einblick und Mitsprache.",
+        "Du brauchst weder völlige Entkopplung noch ständige Nähe. Im Alltag ist für dich entscheidend, dass Abstimmung dort stattfindet, wo sie Orientierung gibt, und nicht als Dauergeräusch über allem liegt. Das macht Zusammenarbeit flexibel, verlangt im Team aber klare Absprachen darüber, wann Sichtbarkeit und Rückkopplung nötig sind.",
       right:
-        "Du bevorzugst enge Abstimmung und ein gemeinsames laufendes Bild der Arbeit. Im Alltag suchst du Transparenz, Mitsprache und kurze Schleifen, damit nichts auseinanderläuft. Das kann Teams eng und wirksam machen, kostet aber schnell Energie, wenn Verantwortungsräume nicht klar bleiben.",
+        "Du arbeitest lieber mit engem Austausch und einem laufenden Bild davon, was gerade passiert. Im Alltag willst du Fortschritt, offene Punkte und Entscheidungen nicht erst spät mitbekommen, sondern früh gemeinsam kalibrieren. Das hält Teams eng verbunden, wird aber anstrengend, wenn andere viel selbstständiger und mit weniger Sichtbarkeit arbeiten wollen.",
     },
     everydaySignals: [
-      "Sichtbar wird das daran, wie viel Einblick du in andere Bereiche brauchst und wie viel Mitsprache für dich sinnvoll ist.",
-      "Auch Rollen, Verantwortungsgrenzen und Meeting-Rhythmen hängen stark an dieser Präferenz.",
+      "Sichtbar wird das daran, wie oft du Rückkopplung brauchst und wie früh Fortschritt oder offene Punkte für dich geteilt werden sollen.",
+      "Auch Check-ins, Übergaben und die Frage, wie viel man voneinander mitbekommen will, hängen stark an dieser Präferenz.",
     ],
   },
   Commitment: {
     intro:
-      "Diese Dimension beschreibt, welchen Stellenwert Verfügbarkeit, Fokus und Einsatz in deinem Gründeralltag haben. Sie ist zentral für Erwartungen an Tempo, Belastung und Prioritäten.",
+      "Diese Dimension beschreibt, wie stark das Startup im Alltag für dich im Zentrum steht und welches Einsatzniveau du für realistisch hältst. Sie macht sichtbar, wie du Priorität, Verfügbarkeit und Intensität in einer Zusammenarbeit einordnest.",
     reflectionQuestion:
-      "Welche Erwartung an Fokus, Verfügbarkeit oder Einsatz solltest du künftig früher explizit machen?",
+      "Welche Erwartung an Priorität, Verfügbarkeit oder Einsatzniveau willst du künftig früher explizit machen?",
     tendency: {
       left:
-        "Du definierst Commitment nicht nur über maximale Verfügbarkeit, sondern über einen tragfähigen Rahmen. Im Alltag achtest du darauf, dass Einsatz, Belastung und andere Verpflichtungen realistisch zusammenpassen. Das schützt vor Überforderung, kann im Team aber schnell als geringerer Anspruch gelesen werden, wenn Erwartungen unausgesprochen bleiben.",
+        "Das Startup ist für dich wichtig, aber Teil eines größeren Lebens- und Arbeitskontexts. Im Alltag achtest du darauf, dass Verfügbarkeit und Intensität bewusst begrenzt bleiben und auch neben anderen Verpflichtungen tragen. Das schafft einen nachhaltigen Rahmen, führt im Team aber schnell zu Reibung, wenn mehr Präsenz oder höhere Priorität still erwartet werden.",
       center:
-        "Du verbindest Verbindlichkeit mit einem realistischen Blick auf Belastung und Nachhaltigkeit. Im Alltag willst du liefern, ohne daraus automatisch einen Dauer-Hochmodus zu machen. Das ist für Zusammenarbeit gesund, braucht aber klare Absprachen darüber, was für dich verbindlich zugesagt ist.",
+        "Du gibst dem Startup spürbar Gewicht, ohne es in jeder Phase absolut in den Mittelpunkt zu stellen. Im Alltag kann die Priorität je nach Situation hoch sein, braucht aber klare Absprachen darüber, wann mehr Fokus erwartet wird und wann ein begrenzterer Modus reicht. Das macht Zusammenarbeit gut steuerbar, solange Intensität nicht bloß vorausgesetzt wird.",
       right:
-        "Du gibst dem Startup hohe Priorität und setzt Commitment stark über Fokus, Verfügbarkeit und Verbindlichkeit. Im Alltag zeigt sich das in klarem Einsatz, hoher Präsenz und wenig Toleranz für lose Zusagen. Das erzeugt Zugkraft, setzt im Team aber voraus, dass andere diesen Anspruch kennen und mittragen.",
+        "Das Startup steht für dich klar im Zentrum. Im Alltag zeigt sich das in hoher Verfügbarkeit, starkem Fokus und der Erwartung, dass Energie und Aufmerksamkeit spürbar auf das Unternehmen ausgerichtet sind. Das schafft Zug und Klarheit, erzeugt aber schnell Spannung, wenn andere mit einem breiteren Lebens- oder Arbeitsrahmen planen.",
     },
     everydaySignals: [
-      "Spürbar wird das bei der Frage, wie verfügbar du im Alltag sein willst und welchen Stellenwert das Startup hat.",
-      "Hier zeigt sich auch, was für dich als fairer und realistischer Einsatz gilt.",
+      "Spürbar wird das bei der Frage, wie viel Verfügbarkeit im Alltag selbstverständlich ist und welchen Stellenwert das Startup gegenüber anderen Themen bekommt.",
+      "Hier zeigt sich auch, welches Einsatzniveau du für dich und andere im Team realistisch erwartest.",
     ],
   },
   Konfliktstil: {
@@ -129,13 +129,13 @@ export const SELF_DEVELOPMENT_COPY: Record<
   FounderDimensionKey,
   { whyItMatters: string; nextSteps: string[] }
 > = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     whyItMatters:
-      "Eine klare Richtung hilft dir später, Wachstum, Prioritäten und Kapitalfragen konsistent einzuordnen. Gerade in der Co-Founder-Suche schafft sie früh Orientierung.",
+      "Wenn du deine Unternehmenslogik klar kennst, werden Prioritäten, Wachstum und strategische Entscheidungen im Team deutlich greifbarer. Gerade in der Co-Founder-Suche verhindert das stille Grundsatzkonflikte.",
     nextSteps: [
-      "Halte schriftlich fest, welche Art von Unternehmen du in den nächsten drei bis fünf Jahren wirklich bauen willst.",
-      "Prüfe bei strategischen Chancen bewusst, ob sie zu deinem bevorzugten Zeithorizont passen.",
-      "Benutze Vision nicht nur als Leitbild, sondern als Filter für Prioritäten und Nein-Entscheidungen.",
+      "Halte schriftlich fest, woran du wichtige unternehmerische Entscheidungen ausrichtest: eher an strategischer Wirkung oder eher an tragfähigem Aufbau.",
+      "Prüfe bei strategischen Chancen bewusst, ob du gerade Hebel suchst oder Substanz stärken willst.",
+      "Nutze diese Achse als Filter für Prioritäten und Nein-Entscheidungen, statt sie nur implizit mitzudenken.",
     ],
   },
   Entscheidungslogik: {
@@ -158,20 +158,20 @@ export const SELF_DEVELOPMENT_COPY: Record<
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     whyItMatters:
-      "Wie du Zusammenarbeit organisieren willst, entscheidet später über Tempo, Transparenz und Reibung im Alltag. Gerade hier lohnen frühe Klarheit und konkrete Erwartungen.",
+      "Wie eng du im Alltag mit anderen verbunden arbeiten willst, entscheidet später über Reibung, Tempo und Orientierung. Gerade hier lohnt sich frühe Klarheit darüber, wie viel Abstimmung und Sichtbarkeit für dich wirklich nötig sind.",
     nextSteps: [
-      "Halte fest, wo du klare Verantwortungsräume brauchst und wo dir enge Abstimmung wichtig ist.",
-      "Definiere ein realistisches Mindestmaß an Transparenz, das du in gemeinsamer Arbeit erwartest.",
-      "Notiere für dich, welche Rollen- und Abstimmungsform dich im Alltag wirklich entlastet.",
+      "Halte fest, in welchen Situationen dir gezielte Abstimmung reicht und wo du engere Rückkopplung brauchst.",
+      "Definiere ein realistisches Maß an Sichtbarkeit, das du über Fortschritt, offene Punkte und Entscheidungen erwartest.",
+      "Notiere für dich, welcher Arbeitsrhythmus dich entlastet: mehr Eigenraum, mehr Check-ins oder ein bewusster Wechsel zwischen beidem.",
     ],
   },
   Commitment: {
     whyItMatters:
-      "Commitment ist im Gründeralltag nicht nur Einsatz, sondern auch Erwartungsmanagement. Je klarer du deinen eigenen Rahmen kennst, desto eher lassen sich spätere Missverständnisse vermeiden.",
+      "Gerade beim Commitment entstehen viele Spannungen nicht aus bösem Willen, sondern aus unterschiedlichen Arbeitsrealitäten. Je klarer du Priorität und Einsatzniveau für dich benennen kannst, desto eher lassen sich stille Fehlannahmen vermeiden.",
     nextSteps: [
-      "Lege fest, welche Form von Verfügbarkeit du realistisch zusagen kannst.",
-      "Sprich innere Annahmen über Priorität und Belastung bewusst aus, bevor andere sie erraten müssen.",
-      "Prüfe regelmäßig, wo hoher Einsatz sinnvoll ist und wo er nur unsichtbaren Druck erzeugt.",
+      "Lege fest, welche Form von Verfügbarkeit du im Alltag realistisch zusagen willst.",
+      "Sprich deine Annahmen über Priorität und Intensität bewusst aus, bevor andere sie erraten müssen.",
+      "Prüfe regelmäßig, in welchen Phasen du ein höheres Einsatzniveau erwartest und wann ein begrenzterer Rahmen für dich stimmig ist.",
     ],
   },
   Konfliktstil: {

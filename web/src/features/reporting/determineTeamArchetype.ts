@@ -46,7 +46,7 @@ type DimensionSnapshot = {
 };
 
 const DIMENSIONS = {
-  vision: "Vision & Unternehmenshorizont",
+  vision: "Unternehmenslogik",
   decision: "Entscheidungslogik",
   risk: "Risikoorientierung",
   work: "Arbeitsstruktur & Zusammenarbeit",

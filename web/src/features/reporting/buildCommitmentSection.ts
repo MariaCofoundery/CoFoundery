@@ -25,8 +25,8 @@ type BuildCommitmentSectionInput = {
 
 function fallbackInterpretation(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Fuer die Frage, wie viel Verbindlichkeit, Verfuegbarkeit und Prioritaet eine gemeinsame Gruendung tragen soll, liegt derzeit noch keine belastbare Grundlage vor."
-    : "Fuer die Frage, wie ihr Verbindlichkeit, Verfuegbarkeit und Prioritaeten in eurer Zusammenarbeit lebt, liegt derzeit noch keine belastbare Grundlage vor.";
+    ? "Fuer die Frage, welchen Stellenwert das Startup im Alltag haben soll und welches Einsatzniveau ihr erwartet, liegt derzeit noch keine belastbare Grundlage vor."
+    : "Fuer die Frage, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau eure Zusammenarbeit tragen soll, liegt derzeit noch keine belastbare Grundlage vor.";
 }
 
 function interpretationFromFitCategory(
@@ -35,26 +35,26 @@ function interpretationFromFitCategory(
 ) {
   if (fitCategory === "very_high") {
     return teamContext === "pre_founder"
-      ? "In eurer Haltung zu Einsatz, Prioritaet und Verbindlichkeit seid ihr derzeit sehr nah beieinander. Das ist eine stabile Grundlage fuer eine moegliche Zusammenarbeit, weil Erwartungen an Fokus und Verlaesslichkeit aehnlich wirken."
-      : "In eurer Haltung zu Einsatz, Prioritaet und Verbindlichkeit seid ihr derzeit sehr nah beieinander. Fuer die bestehende Zusammenarbeit ist das eine stabile Basis, weil Verlaesslichkeit und Einsatz im Alltag aehnlich verstanden werden.";
+      ? "In der Frage, welchen Stellenwert das Startup im Alltag haben soll, seid ihr derzeit sehr nah beieinander. Das ist eine stabile Grundlage fuer eine moegliche Zusammenarbeit, weil Priorisierung und erwartetes Einsatzniveau aehnlich ausfallen."
+      : "In der Frage, wie stark das Startup im Alltag priorisiert wird, seid ihr derzeit sehr nah beieinander. Fuer die bestehende Zusammenarbeit ist das eine stabile Basis, weil Verfuegbarkeit und Intensitaet aehnlich verstanden werden.";
   }
 
   if (fitCategory === "high") {
     return teamContext === "pre_founder"
-      ? "Ihr bringt beim Commitment viel gemeinsame Basis mit, auch wenn sich in Intensitaet, Prioritaet oder Verfuegbarkeit einzelne Unterschiede abzeichnen. Fuer eine moegliche Zusammenarbeit ist das gut anschlussfaehig, solange diese Unterschiede frueh angesprochen werden."
-      : "Ihr bringt beim Commitment viel gemeinsame Basis mit, auch wenn sich bei Intensitaet, Prioritaet oder Verfuegbarkeit Unterschiede zeigen. Fuer die Zusammenarbeit ist das gut tragfaehig, wenn Erwartungen im Alltag klar benannt bleiben.";
+      ? "Ihr bringt beim Commitment viel gemeinsame Basis mit, auch wenn sich in Prioritaet, Verfuegbarkeit oder Intensitaet Unterschiede abzeichnen. Fuer eine moegliche Zusammenarbeit ist das gut anschlussfaehig, solange diese Unterschiede frueh angesprochen werden."
+      : "Ihr bringt beim Commitment viel gemeinsame Basis mit, auch wenn sich bei Prioritaet, Verfuegbarkeit oder Intensitaet Unterschiede zeigen. Fuer die Zusammenarbeit ist das gut tragfaehig, wenn Erwartungen im Alltag klar benannt bleiben.";
   }
 
   if (fitCategory === "mixed") {
     return teamContext === "pre_founder"
-      ? "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Einsatz, Fokus oder den Erwartungen an den Alltag. Vor einer gemeinsamen Zusammenarbeit lohnt es sich, darueber offen zu sprechen, bevor daraus stille Erwartungen entstehen."
-      : "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Einsatz, Fokus oder den Erwartungen an den Alltag. Fuer ein bestehendes Team ist das ein Bereich, in dem unausgesprochene Annahmen schnell Reibung erzeugen koennen, wenn sie nicht besprochen werden.";
+      ? "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Priorisierung, Verfuegbarkeit oder dem erwarteten Einsatzniveau im Alltag. Vor einer gemeinsamen Zusammenarbeit lohnt es sich, darueber offen zu sprechen, bevor daraus stille Erwartungen entstehen."
+      : "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Priorisierung, Verfuegbarkeit oder dem erwarteten Einsatzniveau im Alltag. Fuer ein bestehendes Team ist das ein Bereich, in dem unausgesprochene Annahmen schnell Reibung erzeugen koennen, wenn sie nicht besprochen werden.";
   }
 
   if (fitCategory === "low") {
     return teamContext === "pre_founder"
-      ? "Beim Commitment liegen deutliche Unterschiede vor. Das kann sich spaeter stark darauf auswirken, wie ihr Tempo, Belastung, Verfuegbarkeit und Zusammenarbeit erlebt. Vor einer gemeinsamen Gruendung solltet ihr diesen Punkt sehr offen klaeren."
-      : "Beim Commitment liegen deutliche Unterschiede vor. Im Alltag kann das Tempo, Belastung und Zusammenarbeit spuerbar beeinflussen. Fuer ein bestehendes Team ist das ein Thema, das klare Sprache und gemeinsame Erwartungen braucht.";
+      ? "Beim Commitment liegen deutliche Unterschiede vor. Das kann sich spaeter stark darauf auswirken, wie ihr Verfuegbarkeit, Intensitaet und Priorisierung im Alltag erlebt. Vor einer gemeinsamen Gruendung lohnt sich hier eine sehr offene Klaerung."
+      : "Beim Commitment liegen deutliche Unterschiede vor. Im Alltag kann das Verfuegbarkeit, Intensitaet und Zusammenarbeit spuerbar beeinflussen. Fuer ein bestehendes Team ist das ein Thema, das klare Sprache und gemeinsame Erwartungen braucht.";
   }
 
   return fallbackInterpretation(teamContext);
@@ -72,7 +72,7 @@ function potentialTensionsFromState(
     {
       topic: "Prioritaet des Startups",
       explanation:
-        "Unterschiedliche Vorstellungen darueber, welchen Stellenwert das Startup im Verhaeltnis zu Privatleben, Familie oder anderen Projekten haben soll.",
+        "Unterschiedliche Vorstellungen darueber, welchen Stellenwert das Startup im Verhaeltnis zu anderen Lebens- oder Arbeitsthemen haben soll.",
     },
   ];
 
@@ -81,12 +81,12 @@ function potentialTensionsFromState(
       {
         topic: "Einsatzniveau im Alltag",
         explanation:
-          "Abweichende Erwartungen daran, wie viel Zeit, Energie und Praesenz eine Zusammenarbeit dauerhaft braucht.",
+          "Abweichende Erwartungen daran, wie viel Zeit, Energie und Praesenz eine Zusammenarbeit im Alltag tragen soll.",
       },
       {
         topic: "Umgang mit Belastung",
         explanation:
-          "Unterschiedliche Haltungen dazu, wie mit intensiven Phasen, Erschoepfung oder persoenlichen Grenzen umgegangen werden soll.",
+          "Unterschiedliche Haltungen dazu, wie intensive Phasen begrenzt, abgestimmt und wieder heruntergefahren werden.",
       }
     );
   }
@@ -95,7 +95,7 @@ function potentialTensionsFromState(
     topics.push({
       topic: "Fokus und Nebenprojekte",
       explanation:
-        "Spannungen koennen entstehen, wenn eine Person klare Exklusivitaet erwartet, waehrend die andere Raum fuer weitere Themen oder Projekte behalten moechte.",
+        "Spannungen koennen entstehen, wenn eine Person klare Priorisierung des Startups erwartet, waehrend die andere bewusst Raum fuer weitere Themen oder Projekte behaelt.",
     });
   }
 
@@ -108,14 +108,14 @@ function promptsForPreFounder() {
   return [
     "Welche Rolle soll das Startup aktuell in eurem Alltag und in eurem Leben spielen?",
     "Woran wuerdet ihr merken, dass eure Erwartungen an Einsatz und Verfuegbarkeit auseinanderlaufen?",
-    "Wie viel Fokus auf das Unternehmen erwartet ihr voneinander und was ist dabei realistisch?",
+    "Wie viel Fokus auf das Unternehmen erwartet ihr voneinander und was ist dabei fuer euch beide realistisch?",
     "Wie wollt ihr mit Phasen umgehen, in denen Belastung, Energie oder Kapazitaet spuerbar auseinandergehen?",
   ];
 }
 
 function promptsForExistingTeam() {
   return [
-    "An welchen Stellen merkt ihr im Alltag bereits Unterschiede in Einsatz, Tempo oder Verfuegbarkeit?",
+    "An welchen Stellen merkt ihr im Alltag bereits Unterschiede in Einsatzniveau, Priorisierung oder Verfuegbarkeit?",
     "Welche unausgesprochenen Erwartungen an Verbindlichkeit gibt es vielleicht schon zwischen euch?",
     "Wie sprecht ihr darueber, wenn Belastung oder Prioritaeten sich veraendern?",
     "Was braucht ihr, damit Commitment nicht zur stillen Reibungsquelle wird?",
@@ -124,8 +124,8 @@ function promptsForExistingTeam() {
 
 function everydaySignals(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr unterschiedlich viel Verfuegbarkeit erwartet, dem Startup einen anderen Stellenwert im Alltag gebt oder Fokus und Belastung nicht gleich realistisch einschaetzt."
-    : "Im Alltag merkt man das oft daran, dass Verfuegbarkeit, Einsatz und Prioritaeten nicht gleich verstanden werden oder still vorausgesetzt wird, wie viel Fokus gerade selbstverstaendlich sein sollte.";
+    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr unterschiedlich viel Verfuegbarkeit erwartet, dem Startup einen anderen Stellenwert im Alltag gebt oder Intensitaet in verschiedenen Phasen nicht gleich einordnet."
+    : "Im Alltag merkt man das oft daran, dass Verfuegbarkeit, Einsatzniveau und Prioritaeten nicht gleich verstanden werden oder still vorausgesetzt wird, wie viel Fokus gerade selbstverstaendlich sein sollte.";
 }
 
 export function buildCommitmentSection({

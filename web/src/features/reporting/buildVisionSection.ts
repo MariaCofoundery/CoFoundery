@@ -6,7 +6,7 @@ import {
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 
 export type VisionSection = {
-  dimension: "Vision & Unternehmenshorizont";
+  dimension: "Unternehmenslogik";
   interpretation: string;
   everydaySignals: string;
   potentialTensions: VisionTension[];
@@ -25,8 +25,8 @@ type BuildVisionSectionInput = {
 
 function fallbackInterpretation(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Fuer die Frage, wohin sich ein gemeinsames Unternehmen entwickeln soll, liegt derzeit noch keine tragfaehige Grundlage fuer eine gemeinsame Einschaetzung vor."
-    : "Fuer die Frage, wohin sich euer Unternehmen langfristig entwickeln soll, liegt derzeit noch keine belastbare Grundlage fuer eine gemeinsame Einordnung vor.";
+    ? "Fuer die Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, liegt derzeit noch keine tragfaehige Grundlage fuer eine gemeinsame Einschaetzung vor."
+    : "Fuer die Frage, woran ihr euer Unternehmen im Kern ausrichten wollt, liegt derzeit noch keine belastbare Grundlage fuer eine gemeinsame Einordnung vor.";
 }
 
 function interpretationFromFitCategory(
@@ -35,26 +35,26 @@ function interpretationFromFitCategory(
 ) {
   if (fitCategory === "very_high") {
     return teamContext === "pre_founder"
-      ? "In der Frage, wohin sich das Unternehmen entwickeln soll, seid ihr derzeit sehr nah beieinander. Das spricht dafuer, dass ihr ein moegliches Gruenderteam auf einem aehnlichen Verstaendnis von Richtung, Zeithorizont und unternehmerischem Anspruch aufbauen koennt."
-      : "In der Frage, wohin sich euer Unternehmen entwickeln soll, seid ihr derzeit sehr nah beieinander. Fuer eure bestehende Zusammenarbeit ist das ein starker Anker, weil Richtung, Zeithorizont und Anspruch gut zusammenpassen.";
+      ? "In der Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, seid ihr derzeit sehr nah beieinander. Das spricht dafuer, dass ihr ein moegliches Gruenderteam auf einem aehnlichen Verstaendnis von Marktchance, Skalierbarkeit und Tragfaehigkeit aufbauen koennt."
+      : "In der Frage, woran ihr euer Unternehmen ausrichtet, seid ihr derzeit sehr nah beieinander. Fuer eure bestehende Zusammenarbeit ist das ein starker Anker, weil strategische Wirkung und Substanz bei euch gut zusammenpassen.";
   }
 
   if (fitCategory === "high") {
     return teamContext === "pre_founder"
-      ? "Ihr schaut in eine aehnliche Richtung, auch wenn in einzelnen Punkten Unterschiede sichtbar werden. Fuer eine moegliche Zusammenarbeit ist das eine gute Voraussetzung, solange ihr offene Fragen zu Wachstum, Zeithorizont und Prioritaeten frueh besprecht."
-      : "Ihr arbeitet aus einer aehnlichen Richtung heraus, auch wenn sich in einzelnen Punkten Unterschiede zeigen. Fuer eure Zusammenarbeit ist das eine gute Basis, solange ihr diese Unterschiede nicht nebenbei laufen lasst, sondern gemeinsam einordnet.";
+      ? "Ihr richtet unternehmerische Entscheidungen in eine aehnliche Richtung aus, auch wenn in einzelnen Punkten Unterschiede sichtbar werden. Fuer eine moegliche Zusammenarbeit ist das eine gute Voraussetzung, solange ihr offene Fragen zu Marktlogik, Substanz und Prioritaeten frueh besprecht."
+      : "Ihr arbeitet aus einer aehnlichen Unternehmenslogik heraus, auch wenn sich in einzelnen Punkten Unterschiede zeigen. Fuer eure Zusammenarbeit ist das eine gute Basis, solange ihr diese Unterschiede nicht nebenbei laufen lasst, sondern gemeinsam einordnet.";
   }
 
   if (fitCategory === "mixed") {
     return teamContext === "pre_founder"
-      ? "In der Frage, wohin sich das Unternehmen entwickeln soll, gibt es erkennbare Unterschiede, zum Beispiel beim Wachstumstempo, beim Blick auf einen moeglichen Exit oder beim Verhaeltnis von Vision und Marktchance. Vor einer gemeinsamen Gruendung lohnt es sich, diese Punkte klar anzusprechen, bevor daraus unausgesprochene Erwartungen werden."
-      : "In der Frage, wohin sich euer Unternehmen entwickeln soll, gibt es erkennbare Unterschiede, zum Beispiel bei Wachstum, Exit oder der Frage, wie stark ihr euch an Marktveraenderungen orientieren wollt. Fuer ein bestehendes Team ist das kein Ausnahmefall, aber ein Bereich, der klare gemeinsame Orientierung braucht.";
+      ? "In der Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, gibt es erkennbare Unterschiede, zum Beispiel bei Marktchance, Skalierbarkeit oder der Bedeutung von Substanz und Aufbau. Vor einer gemeinsamen Gruendung lohnt es sich, diese Punkte klar anzusprechen, bevor daraus unausgesprochene Erwartungen werden."
+      : "In der Frage, woran ihr euer Unternehmen ausrichtet, gibt es erkennbare Unterschiede, zum Beispiel bei Marktwirkung, Skalierbarkeit oder der Frage, wie viel Substanz vor Beschleunigung stehen soll. Fuer ein bestehendes Team ist das kein Ausnahmefall, aber ein Bereich, der klare gemeinsame Orientierung braucht.";
   }
 
   if (fitCategory === "low") {
     return teamContext === "pre_founder"
-      ? "In der Frage, wohin sich das Unternehmen entwickeln soll, liegen deutliche Unterschiede vor. Wenn ihr gemeinsam gruenden wollt, solltet ihr diesen Punkt vor einer verbindlichen Zusammenarbeit sehr offen besprechen, weil hier spaeter Grundsatzkonflikte entstehen koennen."
-      : "In der Frage, wohin sich euer Unternehmen entwickeln soll, liegen deutliche Unterschiede vor. Fuer ein bestehendes Team ist das ein zentraler Bereich, in dem gemeinsame Richtung, Prioritaeten und Entscheidungsgrundlagen nachgeschaerft werden sollten.";
+      ? "In der Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, liegen deutliche Unterschiede vor. Wenn ihr gemeinsam gruenden wollt, solltet ihr diesen Punkt vor einer verbindlichen Zusammenarbeit sehr offen besprechen, weil hier spaeter Grundsatzkonflikte entstehen koennen."
+      : "In der Frage, woran ihr euer Unternehmen ausrichtet, liegen deutliche Unterschiede vor. Fuer ein bestehendes Team ist das ein zentraler Bereich, in dem gemeinsame Prioritaeten und Entscheidungsgrundlagen nachgeschaerft werden sollten.";
   }
 
   return fallbackInterpretation(teamContext);
@@ -70,23 +70,23 @@ function potentialTensionsFromState(
 
   const topics = [
     {
-      topic: "Wachstumstempo",
-      explanation:
-        "Unterschiedliche Vorstellungen darueber, wie schnell das Unternehmen wachsen soll, koennen sich spaeter in Entscheidungen ueber Finanzierung, Teamaufbau oder Marktexpansion zeigen.",
+        topic: "Wachstumstempo",
+        explanation:
+          "Unterschiedliche Vorstellungen darueber, wie stark Marktwirkung vor strukturellen Aufbau treten darf, koennen sich spaeter in Entscheidungen ueber Finanzierung, Teamaufbau oder Marktexpansion zeigen.",
     },
   ];
 
   if (tensionScore != null && tensionScore >= 26) {
     topics.push(
       {
-        topic: "Exit oder langfristiger Aufbau",
+        topic: "Verwertbarkeit oder Aufbau",
         explanation:
-          "Waehrend eine Person das Unternehmen moeglicherweise als langfristiges Aufbauprojekt sieht, denkt die andere staerker in Richtung Exit oder strategischem Verkauf.",
+          "Waehrend eine Person Entscheidungen staerker an strategischer Verwertbarkeit ausrichtet, denkt die andere deutlicher in Substanz, Aufbau und langfristiger Tragfaehigkeit.",
       },
       {
-        topic: "Visionstreue vs Marktanpassung",
+        topic: "Marktchance vs Substanz",
         explanation:
-          "Eine Person moechte moeglicherweise staerker an der urspruenglichen Idee festhalten, waehrend die andere eher bereit ist, das Produkt oder die Strategie an Marktchancen anzupassen.",
+          "Eine Person will Chancen staerker nach Hebel und Wirkung sortieren, waehrend die andere eher darauf schaut, ob sie den Aufbau des Unternehmens wirklich staerken.",
       }
     );
   }
@@ -95,7 +95,7 @@ function potentialTensionsFromState(
     topics.push({
       topic: "Werte vs Marktchance",
       explanation:
-        "Unterschiedliche Vorstellungen darueber, welche Marktchancen man verfolgen moechte und wo persoenliche oder unternehmerische Grenzen liegen.",
+        "Unterschiedliche Vorstellungen darueber, welche Chancen man aus strategischer Sicht verfolgen sollte und wo aus Sicht von Substanz und Unternehmensaufbau Grenzen liegen.",
     });
   }
 
@@ -107,32 +107,32 @@ function potentialTensionsFromState(
 function promptsForPreFounder() {
   return [
     "Welche Rolle soll dieses Unternehmen in fuenf Jahren in eurem Leben spielen und was waere euch dafuer wichtig?",
-    "Woran wuerdet ihr frueh merken, dass ihr trotz gleicher Idee in unterschiedliche Richtungen denkt?",
-    "Was ist euch wichtiger: langfristiger Aufbau, schnelle Skalierung oder die Option auf einen spaeteren Exit?",
-    "An welchem Punkt sollte aus eurer Sicht die urspruengliche Vision Vorrang haben und wann ist Anpassung an den Markt sinnvoller?",
+    "Woran wuerdet ihr frueh merken, dass ihr trotz gleicher Idee unternehmerische Entscheidungen an unterschiedlichen Maßstäben ausrichtet?",
+    "Was soll bei euch in Zweifelsfällen mehr Gewicht haben: strategische Wirkung, Skalierbarkeit oder tragfaehiger Aufbau?",
+    "Wann darf Marktchance Vorrang haben und wann soll Substanz oder Tragfaehigkeit die Entscheidung fuehren?",
   ];
 }
 
 function promptsForExistingTeam() {
   return [
-    "Welche Teile eurer urspruenglichen Vision tragen euch heute noch und was muesst ihr inzwischen gemeinsam neu bestimmen?",
-    "Wie entscheidet ihr, wann eine strategische Anpassung noetig ist, ohne dass ihr eure Richtung verliert?",
-    "Wo gehen eure Erwartungen an Wachstumstempo, Zeithorizont oder Exit-Perspektive derzeit am deutlichsten auseinander?",
-    "Welche Entscheidungen solltet ihr kuenftig staerker daran messen, wo das Unternehmen langfristig hin soll?",
+    "Welche Maßstäbe fuehren eure wichtigsten unternehmerischen Entscheidungen heute tatsaechlich: Wirkung, Skalierbarkeit oder Aufbau?",
+    "Wie entscheidet ihr, wann Marktanpassung sinnvoll ist, ohne dass Substanz oder Tragfaehigkeit zu kurz kommen?",
+    "Wo gehen eure Erwartungen an Marktwirkung, Aufbau oder strategische Priorisierung derzeit am deutlichsten auseinander?",
+    "Welche Entscheidungen solltet ihr kuenftig staerker daran messen, woran ihr euer Unternehmen im Kern ausrichtet?",
   ];
 }
 
 function everydaySignals(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr bei Wachstumschancen unterschiedlich schnell andocken wuerdet oder frueh anders gewichtet, ob langfristiger Aufbau oder eine spaetere Exit-Option wichtiger ist."
-    : "Im Alltag merkt man das oft daran, dass ihr strategische Chancen unterschiedlich einordnet oder bei Wachstum, Zeithorizont und der weiteren Richtung nicht automatisch dieselben Prioritaeten setzt.";
+    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr Marktchancen unterschiedlich bewertet oder frueh anders gewichtet, ob Wirkung und Skalierbarkeit oder Substanz und Aufbau Vorrang haben."
+    : "Im Alltag merkt man das oft daran, dass ihr strategische Chancen unterschiedlich einordnet oder bei Wachstum, Prioritaeten und unternehmerischer Tragfaehigkeit nicht automatisch dieselben Maßstäbe anlegt.";
 }
 
 export function buildVisionSection({
   dimensionResult,
   teamContext,
 }: BuildVisionSectionInput): VisionSection {
-  const safeDimension = "Vision & Unternehmenshorizont" as const;
+  const safeDimension = "Unternehmenslogik" as const;
 
   if (
     !dimensionResult ||

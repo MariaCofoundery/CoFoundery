@@ -58,14 +58,14 @@ export const FOUNDER_CONVERSATION_GUIDE_CHAPTERS: FounderConversationChapter[] =
     id: "daily_collaboration",
     title: "Zusammenarbeit im Alltag",
     context:
-      "Gute Zusammenarbeit entsteht selten zufaellig. Dieses Kapitel hilft euch, Rollen, Abstimmung und Verantwortung so zu besprechen, dass im Alltag weniger Unklarheit und mehr Verlaesslichkeit entsteht.",
+      "Gute Zusammenarbeit entsteht selten zufaellig. Dieses Kapitel hilft euch, Abstimmungsnaehe, Sichtbarkeit und Eigenraum so zu besprechen, dass ihr im Alltag verbunden bleibt, ohne euch gegenseitig auszubremsen.",
     reflectionQuestions: [
-      "Wo braucht ihr im Alltag klare Ownership und wo gemeinsame Mitsprache?",
-      "Wie viel Abstimmung ist fuer euch hilfreich und ab wann bremst sie euch eher aus?",
-      "Woran merkt ihr frueh, dass Rollen oder Verantwortungsbereiche nachgeschaerft werden muessen?",
+      "Wie eng wollt ihr im Alltag abgestimmt arbeiten, ohne euch gegenseitig zu verlangsamen?",
+      "Wie sichtbar sollen Fortschritt, offene Punkte und Entscheidungen füreinander sein?",
+      "Woran merkt ihr früh, dass eure Zusammenarbeit zu eng oder zu lose gekoppelt ist?",
     ],
     decisionQuestion:
-      "Welche Arbeitsregel soll fuer Rollen, Abstimmung und Transparenz in eurem Alltag gelten?",
+      "Welche Arbeitsregel soll fuer Abstimmung, Sichtbarkeit und Eigenraum in eurem Alltag gelten?",
     relatedStepIds: ["roles_responsibility", "collaboration_conflict"],
     accent: "primary",
   },

@@ -1,5 +1,5 @@
 export const FOUNDER_DIMENSION_ORDER = [
-  "Vision & Unternehmenshorizont",
+  "Unternehmenslogik",
   "Entscheidungslogik",
   "Risikoorientierung",
   "Arbeitsstruktur & Zusammenarbeit",
@@ -27,14 +27,14 @@ export type FounderDimensionPoleTendency = {
 // Archetypen-/Mapping-Logiken. Die Pole beschreiben gleichwertige Praeferenzrichtungen
 // und enthalten bewusst keine implizite besser/schlechter-Wertung.
 export const FOUNDER_DIMENSION_META: Record<FounderDimensionKey, FounderDimensionMeta> = {
-  "Vision & Unternehmenshorizont": {
-    canonicalName: "Vision & Unternehmenshorizont",
-    shortLabel: "Vision",
-    leftPole: "Exit-orientiert",
+  Unternehmenslogik: {
+    canonicalName: "Unternehmenslogik",
+    shortLabel: "Unternehmenslogik",
+    leftPole: "strategisch / verwertungsorientiert",
     centerLabel: "balanciert",
-    rightPole: "langfristiger Aufbau",
+    rightPole: "substanzorientiert / aufbauend",
     description:
-      "Beschreibt, wie stark Richtung, Zeithorizont und unternehmerischer Anspruch eher auf Exit-Optionen oder auf langfristigen Aufbau ausgerichtet sind.",
+      "Beschreibt, woran unternehmerische Entscheidungen ausgerichtet werden: eher an Marktlogik, Skalierbarkeit und strategischer Wirkung oder eher an Substanz, Aufbau und langfristiger Tragfähigkeit.",
   },
   Entscheidungslogik: {
     canonicalName: "Entscheidungslogik",
@@ -56,21 +56,21 @@ export const FOUNDER_DIMENSION_META: Record<FounderDimensionKey, FounderDimensio
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     canonicalName: "Arbeitsstruktur & Zusammenarbeit",
-    shortLabel: "Zusammenarbeit",
-    leftPole: "autonom",
+    shortLabel: "Abstimmung",
+    leftPole: "autonom / eigenständig",
     centerLabel: "balanciert",
-    rightPole: "stark abgestimmt",
+    rightPole: "eng abgestimmt / sichtbar verbunden",
     description:
-      "Beschreibt, ob Zusammenarbeit eher ueber Eigenstaendigkeit und Freiraum oder ueber enge Abstimmung, Transparenz und Mitsprache organisiert wird.",
+      "Beschreibt, wie eng jemand im Alltag mit anderen arbeiten, abstimmen und sichtbar verbunden bleiben will: eher ueber klare Zustaendigkeiten und gezielte Abstimmung oder eher ueber laufenden Austausch und ein gemeinsames Bild der Arbeit.",
   },
   Commitment: {
     canonicalName: "Commitment",
     shortLabel: "Commitment",
-    leftPole: "flexibel",
+    leftPole: "integriert / begrenzt",
     centerLabel: "balanciert",
-    rightPole: "stark fokussiert",
+    rightPole: "priorisiert / hochfokussiert",
     description:
-      "Beschreibt, welchen Stellenwert Verfuegbarkeit, Prioritaet und Fokus im Alltag der Zusammenarbeit einnehmen.",
+      "Beschreibt, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau eine Person fuer sich und das Team erwartet.",
   },
   Konfliktstil: {
     canonicalName: "Konfliktstil",
@@ -84,10 +84,12 @@ export const FOUNDER_DIMENSION_META: Record<FounderDimensionKey, FounderDimensio
 };
 
 const DIMENSION_ALIASES: Record<string, FounderDimensionKey> = {
-  "vision & unternehmenshorizont": "Vision & Unternehmenshorizont",
-  "vision unternehmenshorizont": "Vision & Unternehmenshorizont",
-  vision: "Vision & Unternehmenshorizont",
-  unternehmenshorizont: "Vision & Unternehmenshorizont",
+  "unternehmenslogik": "Unternehmenslogik",
+  "unternehmens logik": "Unternehmenslogik",
+  "vision & unternehmenshorizont": "Unternehmenslogik",
+  "vision unternehmenshorizont": "Unternehmenslogik",
+  vision: "Unternehmenslogik",
+  unternehmenshorizont: "Unternehmenslogik",
   entscheidungslogik: "Entscheidungslogik",
   entscheidung: "Entscheidungslogik",
   entscheidungen: "Entscheidungslogik",

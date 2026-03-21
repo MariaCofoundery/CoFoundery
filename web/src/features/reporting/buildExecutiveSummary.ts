@@ -29,9 +29,9 @@ const FALLBACK_FOCUS = [
 ];
 
 const FOCUS_PROMPTS_BY_DIMENSION: Record<string, string[]> = {
-  "Vision & Unternehmenshorizont": [
-    "Welche Erwartungen habt ihr an Zielbild, Zeithorizont und unternehmerische Richtung?",
-    "Woran wuerdet ihr frueh merken, dass ihr strategisch nicht mehr auf derselben Linie seid?",
+  Unternehmenslogik: [
+    "Woran richtet ihr unternehmerische Entscheidungen aus: eher an strategischer Wirkung oder eher an Tragfähigkeit und Aufbau?",
+    "Woran wuerdet ihr frueh merken, dass ihr Marktchance und Substanz nicht mehr gleich gewichtet?",
   ],
   Entscheidungslogik: [
     "Wie wollt ihr Entscheidungen treffen, wenn Tempo und Sorgfalt in Spannung geraten?",
@@ -42,12 +42,12 @@ const FOCUS_PROMPTS_BY_DIMENSION: Record<string, string[]> = {
     "Wie nutzt ihr unterschiedliche Risikoperspektiven fuer bessere strategische Entscheidungen?",
   ],
   "Arbeitsstruktur & Zusammenarbeit": [
-    "Wo braucht ihr klare Regeln und wo eher Flexibilitaet in der Zusammenarbeit?",
-    "Wie sollen Planung, Kommunikation und Verbindlichkeit im Alltag zusammenspielen?",
+    "Wie eng wollt ihr im Alltag abgestimmt arbeiten und wo braucht ihr bewusst mehr Eigenraum?",
+    "Wie sichtbar sollen Fortschritt, Entscheidungen und offene Punkte fuereinander sein?",
   ],
   Commitment: [
-    "Welche Erwartungen habt ihr an Verfuegbarkeit, Belastung und Prioritaeten?",
-    "Woran erkennt ihr frueh, wenn Einsatzniveau oder Verantwortung auseinanderlaufen?",
+    "Welche Erwartungen habt ihr an Priorisierung, Verfuegbarkeit und Einsatzniveau im Alltag?",
+    "Woran erkennt ihr frueh, wenn eure Arbeitsrealitaeten in Intensitaet oder Prioritaet auseinanderlaufen?",
   ],
   Konfliktstil: [
     "Wie wollt ihr Meinungsverschiedenheiten ansprechen, bevor sie sich verfestigen?",

@@ -317,14 +317,14 @@ const DIMENSION_SCALE_ANCHORS: Record<ReportDimension, { left: string; mid: stri
     right: "Experimentierfreude",
   },
   Autonomie: {
-    left: "Nähe & Abstimmung",
+    left: "eng abgestimmt",
     mid: "balanciert",
-    right: "Freiheit & Eigenraum",
+    right: "autonom / eigenständig",
   },
   Verbindlichkeit: {
-    left: "flexibel",
+    left: "integriert / begrenzt",
     mid: "balanciert",
-    right: "hoch verbindlich",
+    right: "priorisiert / hochfokussiert",
   },
   Konflikt: {
     left: "harmonieorientiert",

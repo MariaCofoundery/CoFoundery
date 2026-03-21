@@ -353,7 +353,10 @@ function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
   const normalized = normalizeDimensionLabel(dim);
   if (!normalized) return null;
 
-  if (normalized.includes("vision") && normalized.includes("richtung")) {
+  if (
+    normalized.includes("unternehmenslogik") ||
+    (normalized.includes("vision") && normalized.includes("richtung"))
+  ) {
     return "Vision";
   }
 

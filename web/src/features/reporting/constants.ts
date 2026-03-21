@@ -1,14 +1,14 @@
 export const DIMENSION_INSIGHTS = {
   vision: {
     high: {
-      title: "Unicorn-Architekt",
-      text: "Du denkst in Blitzscaling. Maximale Marktanteile und hohe Bewertungen sind dein Fokus.",
+      title: "Aufbau-Architekt",
+      text: "Du ordnest Entscheidungen stark an Substanz, Aufbau und langfristiger Belastbarkeit aus.",
     },
     low: {
-      title: "Substanz-Hüter",
-      text: "Du legst Wert auf ein gesundes, wertegetriebenes Fundament und organisches Wachstum.",
+      title: "Strategischer Hebel-Denker",
+      text: "Du liest unternehmerische Entscheidungen stark über Marktlogik, Wirkung und Skalierbarkeit.",
     },
-    neutral: "Du agierst als Real-Strategist und balancierst Ambition mit Machbarkeit.",
+    neutral: "Du balancierst strategische Wirkung und Substanz, statt nur einer Seite zu folgen.",
   },
   entscheidung: {
     high: {
@@ -34,25 +34,25 @@ export const DIMENSION_INSIGHTS = {
   },
   autonomie: {
     high: {
-      title: "Autarkie-Spezialist",
-      text: "Du arbeitest am besten in hoher Eigenverantwortung und mit klar abgegrenzten Verantwortungsbereichen.",
+      title: "Eigenständiger Modus",
+      text: "Du arbeitest am besten mit viel Eigenraum und gezielter statt dauernder Abstimmung.",
     },
     low: {
-      title: "Team-Synchronisator",
-      text: "Du schätzt engen Austausch, Nähe und gemeinsame Präsenz als Basis für Teamenergie.",
+      title: "Verbundener Modus",
+      text: "Du schätzt engen Austausch und ein gemeinsames Bild der Arbeit als Basis für gute Zusammenarbeit.",
     },
-    neutral: "Du agierst als Kollaborations-Profi und balancierst Team-Time mit fokussierter Umsetzung.",
+    neutral: "Du wechselst bewusst zwischen enger Abstimmung und eigenständiger Umsetzung, statt nur einen Modus zu bevorzugen.",
   },
   verbindlichkeit: {
     high: {
-      title: "Radical Performer",
-      text: "Verbindlichkeit bedeutet für dich klare Ergebnisse mit maximalem Einsatz.",
+      title: "Startup-Fokus",
+      text: "Das Startup steht bei dir klar im Zentrum, und du erwartest ein entsprechend hohes Maß an Fokus und Verfügbarkeit.",
     },
     low: {
-      title: "Agilitäts-Fan",
-      text: "Du hältst Prioritäten flexibel und passt Strukturen schnell an neue Marktlagen an.",
+      title: "Integrierter Modus",
+      text: "Das Startup ist für dich wichtig, bleibt aber in einen breiteren Lebens- und Arbeitsrahmen eingebettet.",
     },
-    neutral: "Du agierst als Verlässlicher Partner und verbindest Leistungsanspruch mit nachhaltiger Umsetzung.",
+    neutral: "Du steuerst Priorisierung und Einsatzniveau situativ, statt dauerhaft nur einem Modus zu folgen.",
   },
   konflikt: {
     high: {
@@ -78,10 +78,10 @@ export const REPORT_CONTENT = {
   },
   dimensions: {
     vision: {
-      title: "Vision & Skalierung",
+      title: "Unternehmenslogik",
       description:
-        "Diese Dimension zeigt, wie ihr Wachstum priorisiert: belastbare Substanz oder aggressivere Skalierung. Eure Position prägt Kapitaleinsatz, Prioritäten und das operative Tempo.",
-      q: "Wie definieren wir Erfolg in 5 Jahren? Größe des Teams oder Profitabilität?",
+        "Diese Dimension zeigt, woran ihr unternehmerische Entscheidungen ausrichtet: eher an Marktlogik, Skalierbarkeit und strategischer Wirkung oder eher an Substanz, Aufbau und langfristiger Tragfähigkeit.",
+      q: "Was soll in Zweifelsfaellen mehr Gewicht haben: Hebel und Wirkung oder Aufbau und Tragfaehigkeit?",
     },
     entscheidung: {
       title: "Entscheidungsdynamik",
@@ -98,14 +98,14 @@ export const REPORT_CONTENT = {
     autonomie: {
       title: "Zusammenarbeit & Autonomie",
       description:
-        "Diese Dimension beschreibt euer Kollaborationsmuster zwischen enger Abstimmung und hoher Eigenverantwortung. Sie bestimmt, wie Ownership gelebt wird und ob Zusammenarbeit im Alltag entlastet oder zusätzlichen Druck erzeugt.",
-      q: "Wie viel operative Freiheit braucht jeder von uns im Alltag?",
+        "Diese Dimension beschreibt, wie eng ihr im Alltag abgestimmt arbeiten und wie sichtbar ihr füreinander bleiben wollt. Sie beeinflusst, wie viel Eigenraum, Rückkopplung und gemeinsames Kalibrieren eure Zusammenarbeit braucht.",
+      q: "Wie eng wollt ihr im Alltag verbunden arbeiten und wo braucht jeder von euch mehr Eigenraum?",
     },
     verbindlichkeit: {
       title: "Verbindlichkeit & Fokus",
       description:
-        "Diese Dimension zeigt, wie verbindlich Zusagen, Deadlines und Qualitätsstandards verstanden werden. Sie ist ein zentraler Vertrauensfaktor und prägt, wie zuverlässig ihr liefert und Risiken frühzeitig kommuniziert.",
-      q: "Was passiert, wenn private Prioritäten mit der Firma kollidieren?",
+        "Diese Dimension zeigt, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau ihr für euch und das Team erwartet. Sie prägt Verfügbarkeit, Intensität und die Arbeitsrealität im Alltag.",
+      q: "Welchen Stellenwert soll das Startup im Alltag wirklich haben und welches Einsatzniveau ist für euch realistisch?",
     },
     konflikt: {
       title: "Konfliktkultur",
@@ -117,11 +117,11 @@ export const REPORT_CONTENT = {
 } as const;
 
 export const DIMENSION_EXTREMES = {
-  Vision: { low: "Substanz", high: "Skalierung" },
+  Vision: { low: "strategisch", high: "aufbauend" },
   Entscheidung: { low: "Analyse", high: "Tempo" },
   Risiko: { low: "Sicherheit", high: "Wagnis" },
-  Autonomie: { low: "Synchronität", high: "Autarkie" },
-  Verbindlichkeit: { low: "Nachhaltigkeit", high: "Maximaler Einsatz" },
+  Autonomie: { low: "eng abgestimmt", high: "eigenständig" },
+  Verbindlichkeit: { low: "integriert", high: "priorisiert" },
   Konflikt: { low: "Diplomatie", high: "Direktheit" },
 } as const;
 
@@ -130,16 +130,16 @@ export const REVERSE_QUESTIONS = [] as const;
 export const DIMENSION_INTERPRETATIONS = {
   Vision: {
     low: {
-      title: "Substanz-Hüter",
-      text: "Du legst Wert auf ein gesundes, wertegetriebenes Fundament. Ein profitables Business, das organisch wächst, ist dir wichtiger als schnelles Wachstum um jeden Preis. Du sicherst die Unabhängigkeit der Firma.",
+      title: "Strategischer Hebel-Denker",
+      text: "Du richtest Entscheidungen stark an Marktlogik, Hebel und strategischer Wirkung aus. Reichweite, Verwertbarkeit und klare Bewegung nach vorn haben für dich viel Gewicht.",
     },
     mid: {
-      title: "Real-Strategist",
-      text: "Du balancierst Ambition mit Machbarkeit. Du willst ein relevantes Unternehmen bauen, behältst aber die Kontrolle über die Richtung und die wirtschaftliche Vernunft.",
+      title: "Balancierter Unternehmensdenker",
+      text: "Du hältst Marktchance und Substanz zusammen. Du willst Wirkung erzeugen, ohne Aufbau und Tragfähigkeit aus dem Blick zu verlieren.",
     },
     high: {
-      title: "Unicorn-Architekt",
-      text: "Du denkst in Blitzscaling. Maximale Marktanteile und hohe Bewertungen sind dein Fokus. Du bist bereit, für Geschwindigkeit und Größe die Kontrolle teilweise abzugeben.",
+      title: "Aufbau-Architekt",
+      text: "Du richtest Entscheidungen stark an Substanz, Aufbau und langfristiger Tragfähigkeit aus. Bevor etwas groß wird, soll es für dich wirklich tragen.",
     },
   },
   Entscheidung: {
@@ -172,30 +172,30 @@ export const DIMENSION_INTERPRETATIONS = {
   },
   Autonomie: {
     low: {
-      title: "Team-Synchronisator",
-      text: "Du schätzt maximale Nähe, gemeinsame Präsenz und kurze Wege. Synergie entsteht für dich durch ständigen Austausch und emotionale Verbundenheit im Alltag.",
+      title: "Verbundener Modus",
+      text: "Du schätzt enge Abstimmung, hohe Sichtbarkeit und kurze Rückkopplung. Gute Zusammenarbeit entsteht für dich dort, wo laufende Arbeit früh geteilt und gemeinsam kalibriert wird.",
     },
     mid: {
-      title: "Kollaborations-Profi",
-      text: "Du brauchst den Austausch für die Strategie, aber die Freiheit für die Umsetzung. Du balancierst Team-Time und Deep-Work effektiv.",
+      title: "Gekoppelter Modus",
+      text: "Du brauchst weder Dauerabstimmung noch völlige Entkopplung. Für dich funktioniert Zusammenarbeit dann gut, wenn Austausch Orientierung gibt und Eigenraum trotzdem erhalten bleibt.",
     },
     high: {
-      title: "Autarkie-Spezialist",
-      text: "Du arbeitest am besten in hoher Eigenverantwortung. Du schätzt asynchrone Kommunikation und brauchst viel operative Freiheit für deine Bereiche.",
+      title: "Eigenständiger Modus",
+      text: "Du arbeitest am besten mit viel Eigenraum, klaren Zuständigkeiten und gezielter Rückkopplung. Zu enge Taktung oder ständige Schleifen bremsen dich schneller aus als zu wenig Nähe.",
     },
   },
   Verbindlichkeit: {
     low: {
-      title: "Agilitäts-Fan",
-      text: "Du bleibst flexibel und passt Prioritäten schnell an. Starre Strukturen empfindest du als einengend. Du sorgst für Agilität, wenn der Markt sich dreht.",
+      title: "Integrierter Modus",
+      text: "Du hältst das Startup in einen breiteren Alltagsrahmen eingebettet. Verfügbarkeit und Intensität bleiben für dich bewusst begrenzt und situativ steuerbar.",
     },
     mid: {
-      title: "Verlässlicher Partner",
-      text: "Ein Wort ist ein Wort. Du versuchst Deadlines einzuhalten und kommunizierst proaktiv, wenn Prioritäten sich verschieben müssen.",
+      title: "Abgestimmter Modus",
+      text: "Du kannst dem Startup deutlich Gewicht geben, ohne jede Phase gleich zu leben. Für dich zählt, dass Priorisierung und Einsatzniveau offen abgestimmt werden.",
     },
     high: {
-      title: "Radical Performer",
-      text: "Du lebst für Ergebnisse. Einsatz bedeutet für dich absolute Priorität für das Startup, private Belange werden im Zweifel hintenangestellt.",
+      title: "Startup-Fokus",
+      text: "Das Startup steht für dich klar im Zentrum. Zeit, Energie und Aufmerksamkeit werden stark darauf ausgerichtet, und Zusammenarbeit wird auch über dieses hohe Fokusniveau gelesen.",
     },
   },
   Konflikt: {
@@ -298,21 +298,21 @@ export const ACTIONABLE_PLAYBOOK = {
   Verbindlichkeit: {
     low: {
       superpower:
-        "Du verhinderst Starrheit. Deine Stärke ist die Anpassungsfähigkeit – du verstehst, dass ein Startup ein Marathon ist und schützt die langfristige Energie des Teams.",
+        "Du hältst einen Arbeitsrahmen möglich, in dem das Startup wichtig bleibt, ohne jeden anderen Bereich zu verdrängen.",
       warning:
-        "Dein Fokus auf Flexibilität kann als mangelnde Zuverlässigkeit missverstanden werden. Klare Deadlines sind für dein Umfeld oft wichtiger als für dich selbst.",
+        "Wenn höhere Priorisierung still erwartet wird, entstehen schnell Missverständnisse über Verfügbarkeit und Einsatzniveau.",
     },
     mid: {
       superpower:
-        "Ein Wort ist ein Wort. Du bist das Rückgrat der Verlässlichkeit. Du hältst Zusagen ein und kommunizierst proaktiv, wenn sich Prioritäten verschieben müssen.",
+        "Du kannst Intensität gut an Phasen anpassen und daraus einen tragfähigen Arbeitsmodus machen.",
       warning:
-        "Du neigst dazu, dich aufzureiben, wenn dein Gegenüber lockerer mit Terminen umgeht. Das führt zu stiller Frustration, wenn Erwartungen nicht explizit geklärt sind.",
+        "Wenn Erwartungen an Priorisierung nicht explizit werden, bleibt leicht offen, wann mehr Fokus tatsächlich gemeint ist.",
     },
     high: {
       superpower:
-        "Dein Einsatzwille ist grenzenlos. Du lebst für Ergebnisse und bist bereit, private Belange bedingungslos dem Unternehmenserfolg unterzuordnen. Du ziehst das Team mit.",
+        "Du schaffst hohe Konzentration auf das Startup und gibst Zusammenarbeit dadurch einen klaren Schwerpunkt.",
       warning:
-        'Dein "Startup-First"-Tunnelblick kann zu schnellem Burnout führen und Mitarbeiter abschrecken, die eine gesündere Work-Life-Integration benötigen.',
+        "Wenn andere mit einem anderen Alltagsrahmen planen, entstehen schnell Spannungen über Priorität und Verfügbarkeit.",
     },
   },
   Konflikt: {

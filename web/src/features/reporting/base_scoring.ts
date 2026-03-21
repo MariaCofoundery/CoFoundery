@@ -57,7 +57,10 @@ function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
   const normalized = normalizeDimensionLabel(dim);
   if (!normalized) return null;
 
-  if (normalized.includes("vision") && normalized.includes("richtung")) {
+  if (
+    normalized.includes("unternehmenslogik") ||
+    (normalized.includes("vision") && normalized.includes("richtung"))
+  ) {
     return "Vision";
   }
 
@@ -88,7 +91,7 @@ function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
 }
 
 function mapFounderDimensionToReportKey(dimension: FounderDimensionKey): ReportDimension {
-  if (dimension === "Vision & Unternehmenshorizont") return "Vision";
+  if (dimension === "Unternehmenslogik") return "Vision";
   if (dimension === "Entscheidungslogik") return "Entscheidung";
   if (dimension === "Risikoorientierung") return "Risiko";
   if (dimension === "Arbeitsstruktur & Zusammenarbeit") return "Autonomie";

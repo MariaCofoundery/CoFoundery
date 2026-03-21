@@ -108,8 +108,8 @@ export type FounderAlignmentWorkbookPageData =
 
 function buildMockAnswers() {
   const personA: Answer[] = [
-    { question_id: "vision-1", dimension: "Vision & Unternehmenshorizont", value: 100 },
-    { question_id: "vision-2", dimension: "Vision & Unternehmenshorizont", value: 75 },
+    { question_id: "vision-1", dimension: "Unternehmenslogik", value: 100 },
+    { question_id: "vision-2", dimension: "Unternehmenslogik", value: 75 },
     { question_id: "decision-1", dimension: "Entscheidungslogik", value: 75 },
     { question_id: "decision-2", dimension: "Entscheidungslogik", value: 50 },
     { question_id: "risk-1", dimension: "Risikoorientierung", value: 100 },
@@ -131,8 +131,8 @@ function buildMockAnswers() {
   ];
 
   const personB: Answer[] = [
-    { question_id: "vision-1-b", dimension: "Vision & Unternehmenshorizont", value: 75 },
-    { question_id: "vision-2-b", dimension: "Vision & Unternehmenshorizont", value: 75 },
+    { question_id: "vision-1-b", dimension: "Unternehmenslogik", value: 75 },
+    { question_id: "vision-2-b", dimension: "Unternehmenslogik", value: 75 },
     { question_id: "decision-1-b", dimension: "Entscheidungslogik", value: 25 },
     { question_id: "decision-2-b", dimension: "Entscheidungslogik", value: 50 },
     { question_id: "risk-1-b", dimension: "Risikoorientierung", value: 25 },

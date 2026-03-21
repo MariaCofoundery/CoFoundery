@@ -359,7 +359,7 @@ export function FounderTeamDynamicMap({
       <div className="mt-6 space-y-3">
         <p className="text-sm leading-7 text-slate-700">
           {t(
-            "Im Mittel bewegt sich euer Team derzeit zwischen Tempo und Absicherung sowie zwischen Eigenstaendigkeit und klarer Abstimmung."
+            "Im Mittel bewegt sich euer Team derzeit zwischen Tempo und Absicherung sowie zwischen eigenstaendigem Arbeiten und enger Abstimmung."
           )}
         </p>
         <p className="text-sm leading-7 text-slate-600">{t(differenceSentence)}</p>

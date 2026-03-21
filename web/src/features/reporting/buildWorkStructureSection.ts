@@ -25,8 +25,8 @@ type BuildWorkStructureSectionInput = {
 
 function fallbackInterpretation(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Fuer die Frage, wie ihr Zusammenarbeit, Abstimmung und Verantwortungsverteilung im Alltag gestalten wuerdet, liegt derzeit noch keine belastbare Grundlage vor."
-    : "Fuer die Frage, wie ihr Zusammenarbeit, Abstimmung und Verantwortungsverteilung im Alltag gestaltet, liegt derzeit noch keine belastbare Grundlage vor.";
+    ? "Fuer die Frage, wie eng ihr im Alltag verbunden arbeiten und wie viel Abstimmung ihr laufend braucht, liegt derzeit noch keine belastbare Grundlage vor."
+    : "Fuer die Frage, wie eng ihr im Alltag verbunden arbeitet und wie viel Abstimmung ihr laufend braucht, liegt derzeit noch keine belastbare Grundlage vor.";
 }
 
 function interpretationFromFitCategory(
@@ -35,26 +35,26 @@ function interpretationFromFitCategory(
 ) {
   if (fitCategory === "very_high") {
     return teamContext === "pre_founder"
-      ? "In euren Vorstellungen von Abstimmung, Transparenz und Verantwortungsverteilung seid ihr derzeit sehr nah beieinander. Das ist fuer eine moegliche Zusammenarbeit eine starke Basis, weil vieles im Alltag nicht staendig neu ausgehandelt werden muss."
-      : "In euren Vorstellungen von Abstimmung, Transparenz und Verantwortungsverteilung seid ihr derzeit sehr nah beieinander. Fuer eure Zusammenarbeit ist das eine starke Basis, weil vieles im Alltag nicht staendig neu ausgehandelt werden muss.";
+      ? "In euren Vorstellungen davon, wie eng ihr im Alltag abgestimmt und sichtbar verbunden arbeiten wollt, seid ihr derzeit sehr nah beieinander. Das ist fuer eine moegliche Zusammenarbeit eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss."
+      : "In euren Vorstellungen davon, wie eng ihr im Alltag abgestimmt und sichtbar verbunden arbeiten wollt, seid ihr derzeit sehr nah beieinander. Fuer eure Zusammenarbeit ist das eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss.";
   }
 
   if (fitCategory === "high") {
     return teamContext === "pre_founder"
-      ? "Ihr bringt in der Arbeitsstruktur viel gemeinsame Basis mit, auch wenn sich bei Abstimmungsbedarf oder Eigenstaendigkeit Unterschiede zeigen. Fuer eine moegliche Zusammenarbeit ist das gut tragfaehig, wenn ihr diese Unterschiede bewusst einordnet."
-      : "Ihr bringt in der Arbeitsstruktur viel gemeinsame Basis mit, auch wenn sich bei Abstimmungsbedarf oder Eigenstaendigkeit Unterschiede zeigen. Fuer die Zusammenarbeit ist das gut tragfaehig, wenn ihr diese Unterschiede bewusst einordnet.";
+      ? "Ihr bringt beim gewuenschten Arbeitsmodus viel gemeinsame Basis mit, auch wenn sich bei Abstimmungsnaehe oder Eigenraum Unterschiede zeigen. Fuer eine moegliche Zusammenarbeit ist das gut tragfaehig, wenn ihr diese Unterschiede bewusst einordnet."
+      : "Ihr bringt beim gewuenschten Arbeitsmodus viel gemeinsame Basis mit, auch wenn sich bei Abstimmungsnaehe oder Eigenraum Unterschiede zeigen. Fuer die Zusammenarbeit ist das gut tragfaehig, wenn ihr diese Unterschiede bewusst einordnet.";
   }
 
   if (fitCategory === "mixed") {
     return teamContext === "pre_founder"
-      ? "In euren Vorstellungen von Zusammenarbeit, Rollen und Transparenz zeigen sich spuerbare Unterschiede. Das kann hilfreich sein, wenn ihr diese Unterschiede bewusst nutzt. Ohne klare Erwartungen entstehen daraus jedoch schnell kleine Reibungen."
-      : "In euren Vorstellungen von Zusammenarbeit, Rollen und Transparenz zeigen sich spuerbare Unterschiede. Im Alltag kann das hilfreich sein, wenn ihr diese Unterschiede bewusst nutzt. Ohne klare Erwartungen entstehen daraus jedoch schnell kleine Reibungen.";
+      ? "In euren Vorstellungen davon, wie eng ihr im Alltag zusammenarbeiten wollt, zeigen sich spuerbare Unterschiede. Das kann produktiv sein, wenn ihr diese Unterschiede bewusst nutzt. Ohne klare Erwartungen entstehen daraus jedoch schnell kleine Reibungen."
+      : "In euren Vorstellungen davon, wie eng ihr im Alltag zusammenarbeiten wollt, zeigen sich spuerbare Unterschiede. Im Alltag kann das produktiv sein, wenn ihr diese Unterschiede bewusst nutzt. Ohne klare Erwartungen entstehen daraus jedoch schnell kleine Reibungen.";
   }
 
   if (fitCategory === "low") {
     return teamContext === "pre_founder"
-      ? "In eurer Vorstellung von Zusammenarbeit im Alltag liegen deutliche Unterschiede vor. Das betrifft nicht nur Arbeitsstil, sondern auch Einblick, Mitsprache und Abstimmung. Wenn ihr gemeinsam gruenden wollt, braucht dieser Bereich frueh konkrete Regeln."
-      : "In eurer Vorstellung von Zusammenarbeit im Alltag liegen deutliche Unterschiede vor. Das betrifft nicht nur Arbeitsstil, sondern auch Einblick, Mitsprache und Abstimmung. Fuer ein bestehendes Team ist das ein Bereich, der frueh wieder konkrete Regeln braucht.";
+      ? "In eurer Vorstellung davon, wie eng ihr im Alltag gekoppelt arbeiten wollt, liegen deutliche Unterschiede vor. Das betrifft Abstimmungsnaehe, Sichtbarkeit und den gewuenschten Austausch ueber laufende Arbeit. Wenn ihr gemeinsam gruenden wollt, braucht dieser Bereich frueh konkrete Regeln."
+      : "In eurer Vorstellung davon, wie eng ihr im Alltag gekoppelt arbeiten wollt, liegen deutliche Unterschiede vor. Das betrifft Abstimmungsnaehe, Sichtbarkeit und den gewuenschten Austausch ueber laufende Arbeit. Fuer ein bestehendes Team ist das ein Bereich, der frueh wieder konkrete Regeln braucht.";
   }
 
   return fallbackInterpretation(teamContext);
@@ -72,30 +72,30 @@ function potentialTensionsFromState(
     {
       topic: "Abstimmungsbedarf",
       explanation:
-        "Unterschiedliche Erwartungen daran, wie eng ihr euch im Alltag abstimmt und wie viel Austausch fuer gute Zusammenarbeit noetig ist.",
+        "Unterschiedliche Erwartungen daran, wie eng ihr euch im Alltag abstimmt und wie viel laufende Rueckkopplung fuer euch noetig ist.",
     },
   ];
 
   if (tensionScore != null && tensionScore >= 26) {
     topics.push(
       {
-        topic: "Autonomie in Verantwortungsbereichen",
+        topic: "Sichtbarkeit von Fortschritt und offenen Punkten",
         explanation:
-          "Spannungen koennen entstehen, wenn eine Person viel Eigenstaendigkeit erwartet, waehrend die andere staerker eingebunden oder informiert sein moechte.",
+          "Spannungen koennen entstehen, wenn eine Person wichtige Zwischenstaende frueh teilen will, waehrend die andere lieber laenger eigenstaendig arbeitet, bevor etwas sichtbar wird.",
       },
       {
-        topic: "Transparenz ueber Arbeit und Entscheidungen",
+        topic: "Uebergaben und Rueckkopplung",
         explanation:
-          "Unterschiedliche Vorstellungen darueber, wie sichtbar Fortschritte, Entscheidungen und Zwischenschritte fuer den jeweils anderen sein sollten.",
+          "Unterschiedliche Vorstellungen darueber, wie haeufig ihr euch rueckkoppelt und wann laufende Arbeit gemeinsam nachkalibriert werden sollte.",
       }
     );
   }
 
   if (tensionCategory === "elevated" || (tensionScore != null && tensionScore >= 40)) {
     topics.push({
-      topic: "Rollen- und Zustaendigkeitsklarheit",
+      topic: "Arbeitskopplung im Alltag",
       explanation:
-        "Abweichende Erwartungen daran, wie klar Rollen definiert sein muessen und wie flexibel Zustaendigkeiten im Alltag gehandhabt werden.",
+        "Abweichende Erwartungen daran, wie eng ihr ueber Fortschritt, Entscheidungen und offene Punkte dauerhaft verbunden bleiben wollt.",
     });
   }
 
@@ -108,25 +108,25 @@ function potentialTensionsFromState(
 function promptsForPreFounder() {
   return [
     "Wie eng moechtet ihr euch im Alltag abstimmen, ohne euch gegenseitig auszubremsen?",
-    "Welche Bereiche sollten klar in einer Hand liegen, und wo ist gemeinsame Mitsprache wichtig?",
-    "Wie viel Einblick braucht ihr jeweils in die Arbeit des anderen, um Vertrauen und Orientierung zu behalten?",
-    "Woran wuerdet ihr merken, dass eure Zusammenarbeit zu eng oder zu lose organisiert ist?",
+    "Wie sichtbar sollen Fortschritt, offene Punkte und Zwischenstaende fuer den jeweils anderen sein?",
+    "An welchen Stellen reicht gezielte Abstimmung, und wo braucht ihr laufende Rueckkopplung?",
+    "Woran wuerdet ihr merken, dass eure Zusammenarbeit zu eng oder zu lose gekoppelt ist?",
   ];
 }
 
 function promptsForExistingTeam() {
   return [
-    "An welchen Stellen merkt ihr im Alltag bereits Unterschiede in Abstimmung, Transparenz oder Eigenstaendigkeit?",
-    "Wo braucht ihr mehr Klarheit in Rollen und Zustaendigkeiten und wo eher mehr Flexibilitaet?",
-    "Welche Form von Einblick oder Mitsprache ist fuer euch hilfreich, und wo wird sie eher als Eingriff erlebt?",
-    "Was wuerde eure Zusammenarbeit operativ spuerbar leichter machen?",
+    "An welchen Stellen merkt ihr im Alltag bereits Unterschiede in Abstimmungsnaehe, Sichtbarkeit oder Eigenraum?",
+    "Wo braucht ihr mehr laufende Rueckkopplung, und wo wuerde weniger Kopplung euch eher entlasten?",
+    "Welche Form von Sichtbarkeit ueber Fortschritt oder offene Punkte hilft euch wirklich, und wo fuehlt sie sich eher zu eng an?",
+    "Was wuerde euren gemeinsamen Arbeitsmodus operativ spuerbar leichter machen?",
   ];
 }
 
 function everydaySignals(teamContext: TeamContext) {
   return teamContext === "pre_founder"
-    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr unterschiedlich viel Abstimmung braucht, Rollen frueher oder spaeter festziehen wuerdet oder nicht gleich viel Einblick in die Arbeit des anderen erwartet."
-    : "Im Alltag wird das oft dort sichtbar, wo Aufgaben verteilt werden, Mitsprache erwartet wird oder unterschiedlich erlebt wird, wie viel Abstimmung hilfreich und wie viel eher bremsend ist.";
+    ? "Das kann sich im Alltag z. B. daran zeigen, dass ihr unterschiedlich oft Rueckkopplung braucht, Zwischenstaende frueher oder spaeter teilen wollt oder Zusammenarbeit verschieden eng organisiert."
+    : "Im Alltag wird das oft dort sichtbar, wo unterschiedliche Erwartungen an Check-ins, Sichtbarkeit und laufenden Austausch aufeinandertreffen.";
 }
 
 export function buildWorkStructureSection({

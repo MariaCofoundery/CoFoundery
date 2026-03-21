@@ -1,13 +1,15 @@
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import {
-  FOUNDER_DIMENSION_ORDER,
   FOUNDER_DIMENSION_META,
-  type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
+import type { FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import {
-  getSelfDimensionTendency,
-  getSelfOrientationStrength,
-} from "@/features/reporting/selfReportScoring";
+  buildSelfReportSelection,
+  buildSelfReportSignals,
+  type SelfReportSelection,
+  type SelfReportSignal,
+  type SelfReportTendencyKey,
+} from "@/features/reporting/selfReportSelection";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { SelfValuesProfileSection } from "@/features/reporting/SelfValuesProfileSection";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -16,27 +18,16 @@ type Props = {
   report: SelfAlignmentReport;
 };
 
-type TendencyKey = "left" | "center" | "right";
-
-type ScoredDimension = {
-  dimension: FounderDimensionKey;
-  score: number;
-  orientationStrength: number;
-  tendencyKey: TendencyKey;
-  tendencyLabel: string;
-};
+type TendencyKey = SelfReportTendencyKey;
 
 export function SelfReportView({ report }: Props) {
   const markerLabel = buildMarkerLabel(report.participantAName);
-  const scoredDimensions = buildScoredDimensions(report.scoresA);
-  const strongestDimensions = [...scoredDimensions]
-    .sort((left, right) => right.orientationStrength - left.orientationStrength)
-    .slice(0, 3);
-  const challengeDimensions = buildChallengeDimensions(scoredDimensions);
-  const profileSummary = buildFounderProfileSummary(report, scoredDimensions);
-  const complementSummary = buildComplementSummary(strongestDimensions);
-  const complementBullets = buildComplementBullets(strongestDimensions);
-  const conversationHints = buildConversationHints(scoredDimensions);
+  const scoredDimensions = buildSelfReportSignals(report.scoresA);
+  const selection = buildSelfReportSelection(report.scoresA);
+  const profileSummary = buildFounderProfileSummary(report, selection);
+  const complementSummary = buildComplementSummary(selection);
+  const complementBullets = buildComplementBullets(selection);
+  const conversationHints = buildConversationHints(selection.conversationHintDimensions);
   const showValuesSection =
     report.valuesModuleStatus !== "not_started" ||
     Boolean(report.selfValuesProfile) ||
@@ -77,10 +68,7 @@ export function SelfReportView({ report }: Props) {
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Deine stärksten Muster</p>
         <h3 className="mt-3 text-lg font-semibold text-slate-900">Was dein Profil aktuell am stärksten prägt</h3>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {(strongestDimensions.length > 0
-            ? strongestDimensions
-            : buildFallbackPatternDimensions(scoredDimensions)
-          ).map((entry) => (
+          {selection.patternDimensions.map((entry) => (
             <article
               key={`pattern-${entry.dimension}`}
               className="rounded-2xl border border-slate-200/80 bg-white p-5"
@@ -104,7 +92,7 @@ export function SelfReportView({ report }: Props) {
           3. Was dich im Team schnell herausfordert
         </p>
         <div className="mt-6 grid gap-4">
-          {challengeDimensions.map((entry) => (
+          {selection.challengeDimensions.map((entry) => (
             <article
               key={`challenge-${entry.dimension}`}
               className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5"
@@ -200,108 +188,79 @@ export function SelfReportView({ report }: Props) {
   );
 }
 
-function buildScoredDimensions(scores: SelfAlignmentReport["scoresA"]) {
-  return FOUNDER_DIMENSION_ORDER.map((dimension) => {
-    const score = scores[dimension];
-    const tendency = getSelfDimensionTendency(dimension, score);
-    if (score == null || tendency == null) return null;
-
-    return {
-      dimension,
-      score,
-      orientationStrength: getSelfOrientationStrength(score) ?? 0,
-      tendencyKey: tendency.tendency,
-      tendencyLabel: tendency.label,
-    } satisfies ScoredDimension;
-  }).filter((entry): entry is ScoredDimension => entry != null);
-}
-
-function buildFallbackPatternDimensions(scoredDimensions: ScoredDimension[]) {
-  return [...scoredDimensions]
-    .sort((left, right) => right.orientationStrength - left.orientationStrength)
-    .slice(0, 3);
-}
-
-function buildChallengeDimensions(scoredDimensions: ScoredDimension[]) {
-  if (scoredDimensions.length === 0) return [];
-
-  const leastFixed = [...scoredDimensions]
-    .sort((left, right) => left.orientationStrength - right.orientationStrength)
-    .slice(0, 2);
-  const strongest = [...scoredDimensions]
-    .sort((left, right) => right.orientationStrength - left.orientationStrength)
-    .slice(0, 2);
-
-  const ordered = [...leastFixed, ...strongest];
-  const seen = new Set<FounderDimensionKey>();
-
-  return ordered.filter((entry) => {
-    if (seen.has(entry.dimension)) return false;
-    seen.add(entry.dimension);
-    return true;
-  }).slice(0, 3);
-}
-
 function buildFounderProfileSummary(
   report: SelfAlignmentReport,
-  scoredDimensions: ScoredDimension[]
+  selection: SelfReportSelection
 ) {
-  if (scoredDimensions.length === 0) {
+  if (!selection.hero.primarySignal) {
     return [
       "Für ein belastbares Bild fehlen im Moment noch Antworten aus dem Basisfragebogen.",
       "Sobald dein Profil vollständig ist, zeigt dir dieser Report klarer, wie du entscheidest, mit anderen arbeitest und worauf du als Founder besonderen Wert legst.",
     ];
   }
 
-  const strongest = [...scoredDimensions]
-    .sort((left, right) => right.orientationStrength - left.orientationStrength)
-    .slice(0, 2);
-  const [primary, secondary] = strongest;
   const valuesLine =
     report.valuesModuleStatus === "completed"
       ? "Dein Werteprofil zeigt zusätzlich, was hinter diesen Entscheidungen innerlich den Ausschlag gibt."
       : null;
 
-  if (!primary || primary.orientationStrength < 10) {
+  if (selection.balancedProfile) {
     return [
       "Du gehst als Founder nicht mit einer starren Handschrift in jede Situation. Du schaust erst hin, hältst Möglichkeiten offen und legst dich nicht nur deshalb fest, weil gerade Druck entsteht.",
-      "Im Alltag macht dich das beweglich und oft angenehm im Umgang, weil du nicht jede Frage sofort in richtig oder falsch aufteilst.",
-      "Genau deshalb braucht es aber klare Ansagen von dir, sobald es ernst wird. Wenn du deine Priorität nicht aussprichst, bleibt für andere schnell zu viel Interpretationsspielraum.",
+      "Im Alltag macht dich das beweglich, weil du zwischen unterschiedlichen Arbeitsmodi umschalten kannst, statt alles immer nach nur einer Linie zu behandeln.",
+      "Gerade darin steckt aber auch Reibung: Wenn du nicht früh klar machst, was jetzt Priorität hat, bleibt für andere schnell zu viel Interpretationsspielraum.",
+      selection.hero.tensionCarrier
+        ? HERO_COPY[selection.hero.tensionCarrier.dimension][selection.hero.tensionCarrier.tendencyKey].effect
+        : "Besonders wichtig ist deshalb, offene Erwartungen früh sichtbar zu machen, bevor daraus stille Missverständnisse werden.",
       ...(valuesLine ? [valuesLine] : []),
     ];
   }
 
-  const primaryHero = HERO_COPY[primary.dimension][primary.tendencyKey];
-  const secondaryHero = secondary ? HERO_COPY[secondary.dimension][secondary.tendencyKey] : null;
+  const primaryHero = HERO_COPY[selection.hero.primarySignal.dimension][selection.hero.primarySignal.tendencyKey];
+  const workModeHero = selection.hero.workModeSignal
+    ? HERO_COPY[selection.hero.workModeSignal.dimension][selection.hero.workModeSignal.tendencyKey]
+    : null;
+  const tensionHero = selection.hero.tensionCarrier
+    ? HERO_COPY[selection.hero.tensionCarrier.dimension][selection.hero.tensionCarrier.tendencyKey]
+    : null;
 
   return [
     primaryHero.lead,
-    secondaryHero?.lead ??
+    workModeHero?.lead ??
       "Du bringst damit eine erkennbare Handschrift in Entscheidungen, Zusammenarbeit und Verantwortung mit.",
-    primaryHero.effect,
-    secondaryHero?.effect ??
+    workModeHero?.effect ??
       "Andere merken das nicht in Modellen, sondern daran, wie du Tempo hältst, Zuständigkeit verstehst und mit offenen Punkten umgehst.",
+    tensionHero?.effect ?? primaryHero.effect,
     ...(valuesLine ? [valuesLine] : []),
   ];
 }
 
-function buildComplementSummary(strongestDimensions: ScoredDimension[]) {
-  const [primary, secondary] = strongestDimensions;
+function buildComplementSummary(selection: SelfReportSelection) {
+  const [primary, regulator, rhythm] = selection.complementRoles;
 
   if (!primary) {
     return "Sobald mehr Antworten vorliegen, lässt sich klarer sagen, mit welcher Art von Co-Founder deine Zusammenarbeit besonders stark wird.";
   }
 
-  const first = COMPLEMENT_COPY[primary.dimension][primary.tendencyKey];
-  if (!secondary) return first.summary;
+  const first = COMPLEMENT_COPY[primary.signal.dimension][primary.signal.tendencyKey];
+  if (!regulator && !rhythm) return first.summary;
 
-  return `${first.summary} Besonders gut trägt das, wenn dein Gegenüber auch in ${FOUNDER_DIMENSION_META[secondary.dimension].shortLabel.toLowerCase()} etwas mitbringt, was dir nicht ohnehin schon leichtfällt.`;
+  if (selection.balancedProfile && regulator) {
+    return `${first.summary} Wichtig ist dabei vor allem ein Gegenüber, das in offenen Situationen schneller sichtbar macht, was jetzt geklärt, entschieden oder nachgeschärft werden muss.`;
+  }
+
+  if (regulator && rhythm) {
+    return `${first.summary} Besonders gut trägt das, wenn dein Gegenüber Spannungen in ${FOUNDER_DIMENSION_META[regulator.signal.dimension].shortLabel.toLowerCase()} gut regulieren kann und im Alltag einen Arbeitsrhythmus mitbringt, der zu deinem Modus passt.`;
+  }
+
+  const secondary = regulator ?? rhythm;
+  return `${first.summary} Besonders gut trägt das, wenn dein Gegenüber auch in ${FOUNDER_DIMENSION_META[secondary.signal.dimension].shortLabel.toLowerCase()} etwas mitbringt, was dir nicht ohnehin schon leichtfällt.`;
 }
 
-function buildComplementBullets(strongestDimensions: ScoredDimension[]) {
-  const bullets = strongestDimensions
-    .slice(0, 3)
-    .map((entry) => COMPLEMENT_COPY[entry.dimension][entry.tendencyKey].bullet);
+function buildComplementBullets(selection: SelfReportSelection) {
+  const bullets = selection.complementRoles.map(
+    (entry) => COMPLEMENT_COPY[entry.signal.dimension][entry.signal.tendencyKey].bullet
+  );
 
   return bullets.length > 0
     ? bullets
@@ -311,15 +270,7 @@ function buildComplementBullets(strongestDimensions: ScoredDimension[]) {
       ];
 }
 
-function buildConversationHints(scoredDimensions: ScoredDimension[]) {
-  const strongest = [...scoredDimensions]
-    .sort((left, right) => right.orientationStrength - left.orientationStrength)
-    .slice(0, 2);
-  const leastFixed = [...scoredDimensions]
-    .sort((left, right) => left.orientationStrength - right.orientationStrength)
-    .slice(0, 2);
-
-  const dimensions = [...strongest, ...leastFixed];
+function buildConversationHints(dimensions: SelfReportSignal[]) {
   const seen = new Set<FounderDimensionKey>();
 
   const hints = dimensions
@@ -382,24 +333,24 @@ function StatusBadge({ label, tone }: { label: string; tone: "neutral" | "accent
 }
 
 const HERO_COPY: Record<FounderDimensionKey, Record<TendencyKey, { lead: string; effect: string }>> = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     left: {
       lead:
-        "Du denkst ein Unternehmen zuerst von seiner Tragfähigkeit her. Bevor du groß wirst, willst du verstehen, worauf das Ganze wirklich stehen soll.",
+        "Du richtest unternehmerische Entscheidungen zuerst an Wirkung, Marktlogik und Skalierbarkeit aus. Bevor du lange aufbaust, willst du wissen, was wirklich Hebel erzeugt.",
       effect:
-        "Im Gründeralltag merkt man das daran, dass du bei Wachstum, Hiring oder Geldfragen nicht nur auf die Chance schaust, sondern auf die Substanz darunter.",
+        "Im Gründeralltag merkt man das daran, dass du bei Wachstum, Hiring oder Geldfragen schnell auf strategische Reichweite und Verwertbarkeit schaust.",
     },
     center: {
       lead:
-        "Du willst nicht aus Prinzip klein oder groß denken. Für dich zählt, was zum Moment passt und was sich wirtschaftlich tragen lässt.",
+        "Du legst dich nicht früh auf nur eine Seite fest. Für dich zählt, wann Marktchance mehr Gewicht braucht und wann Aufbau und Tragfähigkeit führen müssen.",
       effect:
-        "Dadurch bleibst du beweglich, aber du musst aufpassen, Richtung nicht zu lange offen zu halten, wenn das Team eigentlich eine klare Ansage braucht.",
+        "Dadurch bleibst du beweglich, musst aber klar markieren, woran ihr euch in wichtigen Entscheidungen jetzt tatsächlich orientiert.",
     },
     right: {
       lead:
-        "Du arbeitest mit einem klaren Bild davon, wohin das Unternehmen einmal wachsen soll. Größe und Richtung sind für dich keine Deko, sondern Teil der Entscheidung.",
+        "Du denkst ein Unternehmen stark von Substanz, Aufbau und langfristiger Tragfähigkeit her. Bevor etwas groß wird, soll es auch tragen.",
       effect:
-        "Das bringt Zug in ein Team, macht aber auch spürbar, wenn andere viel vorsichtiger oder kleinteiliger denken als du.",
+        "Das gibt Entscheidungen Tiefe und Stabilität. Es macht aber auch schnell sichtbar, wenn andere stärker auf Hebel und Marktwirkung drängen als du.",
     },
   },
   Entscheidungslogik: {
@@ -445,41 +396,41 @@ const HERO_COPY: Record<FounderDimensionKey, Record<TendencyKey, { lead: string;
   "Arbeitsstruktur & Zusammenarbeit": {
     left: {
       lead:
-        "Du arbeitest am liebsten mit klaren Zuständigkeiten. Wenn etwas dein Bereich ist, willst du darin auch spürbar frei handeln können.",
+        "Du arbeitest am liebsten mit klaren Zuständigkeiten und eigenem Raum. Wenn etwas bei dir liegt, willst du darin nicht dauernd rückgekoppelt arbeiten müssen.",
       effect:
-        "Das bringt Ownership und Tempo. Es kippt aber schnell, wenn andere viel engere Abstimmung erwarten und du dieses Mitschwingen eher als Störung erlebst.",
+        "Das bringt Fokus und Tempo. Es wird aber schnell anstrengend, wenn andere deutlich mehr Nähe, Sichtbarkeit und laufende Abstimmung brauchen als du.",
     },
     center: {
       lead:
-        "Du brauchst weder völlige Freiheit noch ständige Nähe. Für dich ist Zusammenarbeit dann gut, wenn Rollen klar sind und Austausch dort stattfindet, wo er wirklich hilft.",
+        "Du brauchst weder Funkstille noch Dauerabstimmung. Für dich ist Zusammenarbeit dann gut, wenn Austausch Orientierung gibt und nicht jeden Arbeitsschritt begleitet.",
       effect:
-        "Im Alltag macht dich das flexibel. Es wird schwierig, wenn unklar bleibt, wer entscheidet, wer mitreden will und wo Verantwortung tatsächlich liegt.",
+        "Im Alltag macht dich das flexibel. Schwieriger wird es, wenn im Team unklar bleibt, wann etwas eng gemeinsam läuft und wann jeder eigenständig weiterarbeitet.",
     },
     right: {
       lead:
-        "Du arbeitest lieber mit engem Austausch als im stillen Nebeneinander. Transparenz, kurze Schleifen und ein gemeinsames Bild geben dir Sicherheit.",
+        "Du arbeitest lieber mit engem Austausch als im stillen Nebeneinander. Ein gemeinsames Bild von Fortschritt, Entscheidungen und offenen Punkten gibt dir Orientierung.",
       effect:
-        "Das kann Teams eng und wirksam machen. Es kostet dich aber schnell Energie, wenn andere viel autonomer arbeiten und du zu wenig Einblick bekommst.",
+        "Das kann Teams eng und wirksam machen. Es kostet dich aber schnell Energie, wenn andere viel autonomer arbeiten und du wichtige Dinge erst spät mitbekommst.",
     },
   },
   Commitment: {
     left: {
       lead:
-        "Du setzt Verbindlichkeit nicht mit Dauer-Hochmodus gleich. Einsatz soll für dich realistisch sein und auch dann tragen, wenn der Alltag nicht ideal läuft.",
+        "Das Startup hat für dich Gewicht, aber nicht auf Kosten jedes anderen Lebensbereichs. Du willst einen Arbeitsmodus, der auch dann trägt, wenn Alltag und Verpflichtungen nicht ideal sortiert sind.",
       effect:
-        "Das schützt vor Überforderung und leerem Heldentum. Gleichzeitig wird es schnell heikel, wenn andere stillschweigend erwarten, dass wahres Commitment immer maximal sichtbar sein muss.",
+        "Dadurch entsteht Klarheit darüber, dass Verfügbarkeit und Intensität bewusst begrenzt sein können. Spannungen entstehen dort, wo im Team deutlich mehr Präsenz oder ein anderer Stellenwert des Startups vorausgesetzt wird.",
     },
     center: {
       lead:
-        "Du willst liefern, aber nicht um den Preis eines permanenten Übermodus. Für dich zählt, dass Zusagen halten und Energie nicht planlos verbrannt wird.",
+        "Du gibst dem Startup spürbar Priorität, aber nicht in jeder Phase auf dieselbe Weise. Für dich zählt, dass Intensität zur Lage passt und nicht bloß aus diffusem Druck entsteht.",
       effect:
-        "Das wirkt im Team oft gesund und erwachsen. Schwierig wird es, wenn über Einsatz viel gesprochen, aber wenig konkret vereinbart wird.",
+        "Das funktioniert gut, wenn im Team offen geklärt ist, wann mehr Fokus gefragt ist und wann ein begrenzterer Modus völlig stimmig ist. Unklarheit darüber kostet hier am meisten Energie.",
     },
     right: {
       lead:
-        "Du gibst dem Startup viel Raum und erwartest sichtbaren Einsatz. Lose Zusagen oder halbherzige Priorität nerven dich schnell.",
+        "Das Startup steht für dich klar im Zentrum. Du planst Zeit, Energie und Aufmerksamkeit stark darum herum und liest Zusammenarbeit auch über dieses hohe Einsatzniveau.",
       effect:
-        "Damit erzeugst du Zug und Ernsthaftigkeit. Du gerätst aber leicht unter Spannung, wenn andere Commitment deutlich flexibler verstehen als du.",
+        "Das bringt Tempo und Konzentration in ein Team. Es wird aber schnell reibungsvoll, wenn andere Priorität, Verfügbarkeit und Intensität deutlich anders einordnen als du.",
     },
   },
   Konfliktstil: {
@@ -505,18 +456,18 @@ const HERO_COPY: Record<FounderDimensionKey, Record<TendencyKey, { lead: string;
 };
 
 const PATTERN_COPY: Record<FounderDimensionKey, Record<TendencyKey, { headline: string; body: string }>> = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     left: {
-      headline: "Substanz zuerst",
-      body: "Du willst nicht bloß eine große Idee, sondern ein Unternehmen, das wirklich tragen kann. Im Alltag heißt das: erst Fundament, dann Beschleunigung.",
+      headline: "Du denkst zuerst in Hebeln",
+      body: "Du sortierst Chancen stark danach, ob sie strategische Wirkung haben und das Unternehmen voranbringen. Das schafft Klarheit, kann Aufbaufragen aber zu leicht nach hinten schieben.",
     },
     center: {
-      headline: "Richtung mit Augenmaß",
-      body: "Du hältst Vision und wirtschaftliche Realität zusammen. Dadurch bleibst du beweglich, musst aber an entscheidenden Stellen klar sagen, worauf ihr jetzt setzt.",
+      headline: "Du hältst Wirkung und Substanz zusammen",
+      body: "Du kannst Marktchance und Aufbau zugleich sehen. Entscheidend ist für dich, an kritischen Stellen klar zu sagen, was jetzt Vorrang hat.",
     },
     right: {
-      headline: "Groß denken fällt dir leicht",
-      body: "Du arbeitest mit einem klaren Bild von Wachstum und Richtung. Das zieht nach vorn, macht fehlenden Mut oder zu viel Kleinteiligkeit im Team aber schnell sichtbar.",
+      headline: "Du baust lieber tragfähig als schnell",
+      body: "Du prüfst Chancen stark darauf, ob sie das Unternehmen wirklich stabiler machen. Das bringt Substanz, macht aber vorschnelle Beschleunigung für dich schnell fragwürdig.",
     },
   },
   Entscheidungslogik: {
@@ -549,30 +500,30 @@ const PATTERN_COPY: Record<FounderDimensionKey, Record<TendencyKey, { headline: 
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     left: {
-      headline: "Klare Zuständigkeit ist dir wichtig",
-      body: "Du arbeitest am besten, wenn Verantwortung spürbar zugeordnet ist. Zu viel Mitsprache in deinem Bereich kann dich eher bremsen als tragen.",
+      headline: "Du brauchst echten Eigenraum",
+      body: "Du arbeitest am besten, wenn Zuständigkeiten klar sind und du nicht bei jedem Schritt in Schleifen hängen bleibst. Zu viel laufende Abstimmung kostet dich schneller Energie als zu wenig.",
     },
     center: {
-      headline: "Du brauchst weder Klammer noch Funkstille",
-      body: "Für dich funktioniert Zusammenarbeit dann gut, wenn Austausch etwas bringt und Verantwortung trotzdem klar bleibt. Unschärfe kostet dich hier am meisten Energie.",
+      headline: "Du steuerst Nähe bewusst",
+      body: "Für dich funktioniert Zusammenarbeit dann gut, wenn Austausch dort passiert, wo er wirklich etwas klärt. Unschärfe darüber, wann ihr eng arbeitet und wann nicht, kostet dich hier am meisten Energie.",
     },
     right: {
-      headline: "Du willst ein gemeinsames Bild",
-      body: "Du arbeitest lieber mit engem Austausch als mit großem Abstand. Wenn andere zu autark unterwegs sind, fehlt dir schnell die Transparenz, die du für gute Zusammenarbeit brauchst.",
+      headline: "Du willst laufend verbunden bleiben",
+      body: "Du arbeitest lieber mit engem Austausch als mit großem Abstand. Wenn andere zu viel allein vor sich hin arbeiten, fehlt dir schnell das gemeinsame Bild, das du für gute Zusammenarbeit brauchst.",
     },
   },
   Commitment: {
     left: {
-      headline: "Einsatz ja, aber nicht um jeden Preis",
-      body: "Für dich ist Verbindlichkeit etwas anderes als Selbstausbeutung. Du willst, dass Zusagen halten und Belastung trotzdem tragbar bleibt.",
+      headline: "Du hältst das Startup in einen größeren Rahmen eingebettet",
+      body: "Das Unternehmen ist für dich wichtig, aber nicht der einzige Bezugspunkt. Du brauchst einen Modus, in dem Einsatz und übriger Alltag zusammenpassen.",
     },
     center: {
-      headline: "Du suchst einen tragfähigen Modus",
-      body: "Du willst ernsthaft arbeiten, aber nicht im Dauer-Alarm leben. Gut wird es für dich dort, wo Einsatz klar ist und trotzdem niemand nur über Härte definiert wird.",
+      headline: "Du steuerst Intensität situativ",
+      body: "Du kannst Phasen mit viel Fokus gut tragen, solange klar ist, warum sie gerade nötig sind. Entscheidend ist für dich, dass Intensität bewusst abgestimmt wird.",
     },
     right: {
-      headline: "Halber Einsatz frustriert dich schnell",
-      body: "Wenn es um das Startup geht, erwartest du Fokus und sichtbare Verbindlichkeit. Lose Prioritäten oder unklare Zusagen kosten dich schnell Vertrauen.",
+      headline: "Du priorisierst das Startup klar",
+      body: "Für dich ist hohe Verfügbarkeit kein Ausnahmezustand, sondern oft Teil der Zusammenarbeit. Reibung entsteht, wenn dieses Einsatzniveau im Team sehr unterschiedlich gelesen wird.",
     },
   },
   Konfliktstil: {
@@ -592,10 +543,10 @@ const PATTERN_COPY: Record<FounderDimensionKey, Record<TendencyKey, { headline: 
 };
 
 const CHALLENGE_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> = {
-  "Vision & Unternehmenshorizont": {
-    left: "Schwierig wird es, wenn andere sehr groß denken wollen und du zuerst auf Tragfähigkeit und Machbarkeit schaust.",
-    center: "Kann dich ausbremsen, wenn im Team lange offenbleibt, welche Richtung jetzt wirklich Vorrang hat.",
-    right: "Wird schnell zäh, wenn andere deutlich vorsichtiger sind und du das Gefühl hast, dass der gemeinsame Kurs zu klein gedacht wird.",
+  Unternehmenslogik: {
+    left: "Schwierig wird es, wenn andere viel stärker auf Aufbau und Tragfähigkeit schauen und du mehr Zug auf strategische Wirkung geben willst.",
+    center: "Kann dich ausbremsen, wenn im Team lange offenbleibt, ob Marktchance oder Substanz gerade Vorrang haben soll.",
+    right: "Wird schnell zäh, wenn andere Hebel und Marktwirkung stark nach vorne stellen und du erst wissen willst, was davon wirklich trägt.",
   },
   Entscheidungslogik: {
     left: "Wird schwierig, wenn im Team ständig Tempo gefordert wird, bevor für dich die Entscheidung sauber genug begründet ist.",
@@ -608,14 +559,14 @@ const CHALLENGE_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> =
     right: "Wird schwierig, wenn das Team Sicherheit über alles stellt und du in jeder Chance zuerst die Bremse spürst.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Wird schwierig, wenn andere sehr viel Einblick und Mitsprache brauchen und du eigentlich klare Verantwortungsräume erwartest.",
-    center: "Kann zäh werden, wenn unklar bleibt, wo Abstimmung aufhört und wo Eigenverantwortung beginnt.",
-    right: "Kann dich ausbremsen, wenn andere sehr autonom arbeiten wollen und du zu wenig Transparenz darüber bekommst, was wirklich läuft.",
+    left: "Wird schwierig, wenn andere dich sehr eng im Loop halten wollen und du eigentlich mit mehr Eigenraum arbeiten möchtest.",
+    center: "Kann zäh werden, wenn unklar bleibt, wann ihr eng abstimmt und wann jeder eigenständig weiterarbeitet.",
+    right: "Kann dich ausbremsen, wenn andere mit wenig Rückkopplung arbeiten und du zu wenig Sichtbarkeit über Fortschritt oder offene Punkte bekommst.",
   },
   Commitment: {
-    left: "Wird schnell angespannt, wenn im Team still vorausgesetzt wird, dass alle jederzeit denselben Einsatz bringen müssen.",
-    center: "Kann kippen, wenn Verbindlichkeit groß klingt, aber niemand ausspricht, was im Alltag tatsächlich erwartet wird.",
-    right: "Wird schwierig, wenn du sehr viel Fokus gibst und andere lockerer mit Verfügbarkeit oder Priorität umgehen.",
+    left: "Wird schnell angespannt, wenn im Team deutlich mehr Verfügbarkeit oder ein anderer Stellenwert des Startups vorausgesetzt wird als für dich stimmig ist.",
+    center: "Kann kippen, wenn niemand ausspricht, wann ein höheres Einsatzniveau erwartet wird und wann ein begrenzterer Rahmen völlig reicht.",
+    right: "Wird schwierig, wenn du das Startup klar priorisierst und andere mit einem deutlich breiteren Lebens- oder Arbeitsrahmen planen.",
   },
   Konfliktstil: {
     left: "Kann dich ausbremsen, wenn Spannungen im Raum stehen und andere sofort Härte oder direkte Konfrontation erwarten.",
@@ -625,24 +576,24 @@ const CHALLENGE_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> =
 };
 
 const COMPLEMENT_COPY: Record<FounderDimensionKey, Record<TendencyKey, { summary: string; bullet: string }>> = {
-  "Vision & Unternehmenshorizont": {
+  Unternehmenslogik: {
     left: {
       summary:
-        "Besonders gut funktioniert es oft mit Menschen, die aus einer Idee schneller einen größeren Horizont machen, ohne dabei die Bodenhaftung zu verlieren.",
+        "Besonders gut funktioniert es oft mit Menschen, die Aufbau und Tragfähigkeit stark mitdenken, ohne dir den Blick auf strategische Wirkung auszureden.",
       bullet:
-        "Besonders gut funktioniert es oft mit Menschen, die schneller zuspitzen, wohin das Unternehmen wachsen soll, während du auf Tragfähigkeit achtest.",
+        "Besonders gut funktioniert es oft mit Menschen, die frueh fragen, was auch morgen noch trägt, während du auf Hebel und Wirkung schaust.",
     },
     center: {
       summary:
-        "Ergänzend wirkt hier vor allem ein Profil, das an den richtigen Stellen mutiger oder klarer wird, wenn du mehrere Wege noch offenhältst.",
+        "Ergänzend wirkt hier vor allem ein Profil, das an den richtigen Stellen sauber zuspitzt, ob jetzt strategische Wirkung oder Aufbau führen soll.",
       bullet:
-        "Ergänzend wirkt vor allem ein Profil, das bei Richtungsfragen früher festlegt, worauf ihr euch jetzt konzentriert.",
+        "Ergänzend wirkt vor allem ein Profil, das bei Grundsatzentscheidungen früher festlegt, woran ihr euch jetzt konzentriert.",
     },
     right: {
       summary:
-        "Stark wird die Zusammenarbeit dort, wo dein Gegenüber das große Bild mitträgt, aber früh fragt, was davon heute schon wirklich tragfähig ist.",
+        "Stark wird die Zusammenarbeit dort, wo dein Gegenüber Marktchancen klar erkennt, ohne deinen Blick auf Substanz und Aufbau kleinzumachen.",
       bullet:
-        "Stark wird die Zusammenarbeit dort, wo dein Gegenüber Vision nicht kleinmacht, aber sie in belastbare Schritte übersetzt.",
+        "Stark wird die Zusammenarbeit dort, wo dein Gegenüber Hebel und Marktwirkung sieht, sie aber in belastbare Schritte uebersetzt.",
     },
   },
   Entscheidungslogik: {
@@ -688,41 +639,41 @@ const COMPLEMENT_COPY: Record<FounderDimensionKey, Record<TendencyKey, { summary
   "Arbeitsstruktur & Zusammenarbeit": {
     left: {
       summary:
-        "Gut funktioniert es oft mit Menschen, die nicht in jeden Bereich hineinregieren, aber verlässlich Transparenz und Rückkopplung halten.",
+        "Gut funktioniert es oft mit Menschen, die dir Eigenraum lassen und trotzdem früh sichtbar machen, wenn etwas kippt, hängt oder neu abgestimmt werden muss.",
       bullet:
-        "Gut funktioniert es oft mit Menschen, die dir Freiheit lassen und trotzdem nicht erst spät sichtbar machen, wo etwas schiefläuft.",
+        "Gut funktioniert es oft mit Menschen, die nicht alles gemeinsam machen wollen, aber relevante Zwischenstände nicht erst sehr spät teilen.",
     },
     center: {
       summary:
-        "Ergänzend wirkt hier vor allem ein Gegenüber, das sauber zwischen Mitsprache und Zuständigkeit unterscheiden kann.",
+        "Ergänzend wirkt hier vor allem ein Gegenüber, das ein gutes Gefühl dafür hat, wann enge Abstimmung hilft und wann sie nur Reibung erzeugt.",
       bullet:
-        "Ergänzend wirkt hier vor allem ein Gegenüber, das Rollen klar hält und dadurch unnötige Reibung aus der Zusammenarbeit nimmt.",
+        "Ergänzend wirkt hier vor allem ein Gegenüber, das Arbeitsrhythmen klar macht und nicht voraussetzt, dass beide denselben Abstimmungsbedarf haben.",
     },
     right: {
       summary:
-        "Stark wird diese Konstellation oft mit Menschen, die eigenständig liefern, dir aber trotzdem genug Einblick geben, damit du nicht im Dunkeln arbeitest.",
+        "Stark wird diese Konstellation oft mit Menschen, die eigenständig arbeiten können und trotzdem früh teilen, was gerade wichtig, offen oder kritisch wird.",
       bullet:
-        "Stark wird diese Konstellation oft mit Menschen, die Verantwortung selbst tragen und dir trotzdem früh sagen, was gerade wichtig wird.",
+        "Stark wird diese Konstellation oft mit Menschen, die nicht dauernd Rücksprache brauchen, dir aber verlässlich genug Sichtbarkeit geben, damit ihr verbunden bleibt.",
     },
   },
   Commitment: {
     left: {
       summary:
-        "Besonders gut passt jemand, der Verbindlichkeit klar lebt, ohne daraus einen ständigen Überforderungsmodus zu machen.",
+        "Besonders gut passt jemand, der mit begrenzterem Einsatzrahmen umgehen kann und Erwartungen an Verfügbarkeit nicht still nach oben zieht.",
       bullet:
-        "Besonders gut passt jemand, der ernsthaft liefert und dabei versteht, dass Einsatz nur dann stark ist, wenn er langfristig tragbar bleibt.",
+        "Besonders gut passt jemand, der Priorität und Einsatzniveau offen abstimmt, statt sie implizit zu setzen.",
     },
     center: {
       summary:
-        "Gut ergänzt dich hier ein Mensch, der Erwartungen an Fokus und Einsatz nicht erraten lässt, sondern sauber ausspricht.",
+        "Gut ergänzt dich hier ein Mensch, der Intensität und Verfügbarkeit früh konkret macht, statt sie aus dem Moment heraus zu verhandeln.",
       bullet:
-        "Gut ergänzt dich hier ein Mensch, der Verbindlichkeit konkret macht, damit aus guter Absicht keine stille Enttäuschung wird.",
+        "Gut ergänzt dich hier ein Mensch, der klare Arbeitsrealitäten benennt, damit aus guter Absicht keine stille Enttäuschung wird.",
     },
     right: {
       summary:
-        "Ergänzend wirkt ein Profil, das deinen hohen Anspruch mitträgt, dabei aber spürbar auf Nachhaltigkeit, Belastung und Grenzen achtet.",
+        "Ergänzend wirkt ein Profil, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltagsrahmen früh sichtbar macht.",
       bullet:
-        "Ergänzend wirkt ein Profil, das deinen Einsatz ernst nimmt, aber früh merkt, wann der Modus kippt und nachjustiert werden muss.",
+        "Ergänzend wirkt ein Profil, das dein hohes Einsatzniveau nicht kleinredet, aber Erwartungen an Intensität sauber übersetzt.",
     },
   },
   Konfliktstil: {
@@ -748,10 +699,10 @@ const COMPLEMENT_COPY: Record<FounderDimensionKey, Record<TendencyKey, { summary
 };
 
 const CONVERSATION_HINT_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> = {
-  "Vision & Unternehmenshorizont": {
-    left: "Kläre früh, wie groß ihr das Unternehmen wirklich bauen wollt und woran ihr merkt, dass Wachstum für euch noch sinnvoll ist.",
-    center: "Lass in Gesprächen nicht offen, welche Richtung für dich im Zweifel Vorrang hat: Aufbau, Tempo oder wirtschaftliche Ruhe.",
-    right: "Sprich offen darüber, wie viel Größe du willst und wie viel Unsicherheit du dafür in Kauf zu nehmen bereit bist.",
+  Unternehmenslogik: {
+    left: "Kläre früh, woran du unternehmerische Entscheidungen ausrichtest und wie viel Gewicht Marktchance gegenüber Tragfähigkeit für dich haben darf.",
+    center: "Lass in Gesprächen nicht offen, was für dich in Zweifelsfällen Vorrang hat: Wirkung, Skalierbarkeit oder tragfähiger Aufbau.",
+    right: "Sprich offen darueber, wie stark du Entscheidungen an Substanz, Aufbau und langfristiger Tragfaehigkeit festmachst.",
   },
   Entscheidungslogik: {
     left: "Sag klar, wie viel Grundlage du vor einer Entscheidung brauchst und bei welchen Themen du ohne diese Basis nicht mitgehst.",
@@ -764,14 +715,14 @@ const CONVERSATION_HINT_COPY: Record<FounderDimensionKey, Record<TendencyKey, st
     right: "Mach früh sichtbar, wie mutig du bei Wetten, Tempo und Unsicherheit tatsächlich sein willst.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Kläre, wo du echte Zuständigkeit brauchst und ab wann Mitsprache für dich eher stört als hilft.",
-    center: "Sprecht sauber darüber, wie viel Abstimmung ihr wirklich braucht und wo jeder eigenständig entscheidet.",
-    right: "Frag offen, wie viel Transparenz und Austausch dein Gegenüber im Alltag geben will, bevor ihr euch auf Zusammenarbeit einlasst.",
+    left: "Kläre früh, an welchen Stellen du mit mehr Eigenraum arbeitest und wo du trotzdem verlässliche Rückkopplung erwartest.",
+    center: "Sprecht sauber darüber, wann ihr eng verbunden arbeiten wollt und wann gezielte statt dauernder Abstimmung reicht.",
+    right: "Frag offen, wie sichtbar Fortschritt, Entscheidungen und offene Punkte im Alltag für euch gegenseitig sein sollen.",
   },
   Commitment: {
-    left: "Sprich früh aus, was für dich verlässlich ist und was du ausdrücklich nicht als Dauerzustand zusagen willst.",
-    center: "Kläre in Gesprächen konkret, was Fokus, Priorität und Verbindlichkeit im Alltag tatsächlich bedeuten sollen.",
-    right: "Frag nicht nur nach Motivation, sondern nach sichtbarem Einsatz: Zeit, Priorität, Energie und Verlässlichkeit.",
+    left: "Sprich früh aus, welchen Stellenwert das Startup in deinem Alltag haben soll und welche Verfügbarkeit du realistisch einplanst.",
+    center: "Kläre in Gesprächen konkret, wann mehr Fokus erwartet wird und wann ein begrenzterer Modus für euch beide stimmig ist.",
+    right: "Frag nicht nur nach Motivation, sondern danach, welches Einsatzniveau und welche Priorisierung dein Gegenüber im Alltag tatsächlich tragen will.",
   },
   Konfliktstil: {
     left: "Sprich an, wie schnell schwierige Themen auf den Tisch kommen sollen und wie viel Zeit du brauchst, bevor du in ein Gespräch gehst.",

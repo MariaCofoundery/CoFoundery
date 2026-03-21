@@ -75,23 +75,23 @@ export type FounderAlignmentWorkbookHighlights = {
 export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefinition[] = [
   {
     id: "vision_direction",
-    title: "Vision & Richtung",
-    subtitle: "Wohin soll sich das Unternehmen entwickeln und welche Richtung traegt euch wirklich?",
+    title: "Unternehmenslogik",
+    subtitle: "Woran richtet ihr unternehmerische Entscheidungen aus und was soll dabei mehr Gewicht bekommen?",
     prompts: [
-      "Welche Rolle soll das Unternehmen in den naechsten drei bis fuenf Jahren in eurem Leben spielen?",
-      "Wo seid ihr euch bei Wachstum, Exit-Perspektive und langfristigem Aufbau einig und wo nicht?",
-      "Welche strategischen Prioritaeten sollen in Zweifelsfaellen Vorrang haben?",
+      "Woran wollt ihr zentrale unternehmerische Entscheidungen ausrichten: eher an Marktchance und Wirkung oder eher an Substanz und Aufbau?",
+      "Wo seid ihr euch bei Skalierbarkeit, strategischer Verwertbarkeit und langfristiger Tragfaehigkeit einig und wo nicht?",
+      "Welche Prioritaeten sollen in Zweifelsfaellen Vorrang haben?",
     ],
-    reportDimensions: ["Vision & Unternehmenshorizont"],
+    reportDimensions: ["Unternehmenslogik"],
   },
   {
     id: "roles_responsibility",
     title: "Rollen & Verantwortung",
-    subtitle: "Wer verantwortet was und wo braucht ihr Einblick, Mitsprache oder klare Ownership?",
+    subtitle: "Wie organisiert ihr Zuständigkeiten, Sichtbarkeit und Abstimmung im Alltag, ohne euch gegenseitig zu blockieren?",
     prompts: [
-      "Welche Bereiche sollen klar in einer Hand liegen und wo braucht ihr gemeinsame Mitsprache?",
-      "Wie soll Verantwortung mit Equity, Sichtbarkeit und Erwartung an Ownership zusammenpassen?",
-      "Woran merkt ihr frueh, dass Rollen zu unscharf oder zu eng zugeschnitten sind?",
+      "Welche Bereiche sollen klar eigenständig laufen und wo braucht ihr engere gemeinsame Abstimmung?",
+      "Wie sichtbar sollen laufende Arbeit, offene Punkte und wichtige Entscheidungen füreinander sein?",
+      "Woran merkt ihr früh, dass euer Arbeitsmodus zu eng oder zu lose organisiert ist?",
     ],
     reportDimensions: ["Arbeitsstruktur & Zusammenarbeit", "Commitment"],
   },
@@ -109,11 +109,11 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   {
     id: "commitment_load",
     title: "Commitment & Belastung",
-    subtitle: "Wie viel Fokus, Verfuegbarkeit und Belastung ist realistisch und was erwartet ihr voneinander?",
+    subtitle: "Wie stark soll das Startup im Alltag priorisiert werden und welches Einsatzniveau erwartet ihr voneinander?",
     prompts: [
       "Welchen Stellenwert soll das Startup aktuell im Alltag gegenueber anderen Verpflichtungen haben?",
-      "Wie sprecht ihr darueber, wenn Verfuegbarkeit, Energie oder Belastung nicht mehr gleich verteilt sind?",
-      "Welche Erwartungen an Einsatz, Tempo und Verbindlichkeit sollen explizit vereinbart werden?",
+      "Wie sprecht ihr darueber, wenn Verfuegbarkeit, Energie oder Intensitaet nicht mehr gleich verteilt sind?",
+      "Welche Erwartungen an Einsatzniveau, Prioritaet und Verlaesslichkeit sollen explizit vereinbart werden?",
     ],
     reportDimensions: ["Commitment"],
   },
@@ -137,7 +137,7 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
       "Wie soll Equity mit Verantwortung, Commitment und unternehmerischem Risiko zusammengedacht werden?",
       "Welche Grenzen gelten fuer Finanzierung, Verwasserung, Exit-Optionen oder persoenliche Garantien?",
     ],
-    reportDimensions: ["Risikoorientierung", "Vision & Unternehmenshorizont"],
+    reportDimensions: ["Risikoorientierung", "Unternehmenslogik"],
   },
   {
     id: "values_guardrails",
@@ -149,7 +149,7 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
       "Welche Kompromisse waeren fuer euch noch tragbar und ab welchem Punkt wuerde sich etwas nicht mehr richtig anfuehlen?",
       "Welche roten Linien sollen bei Hiring, Investor:innen oder Partnerschaften fuer euch gelten?",
     ],
-    reportDimensions: ["Vision & Unternehmenshorizont", "Risikoorientierung", "Commitment"],
+    reportDimensions: ["Unternehmenslogik", "Risikoorientierung", "Commitment"],
   },
   {
     id: "alignment_90_days",
@@ -161,7 +161,7 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
       "Woran erkennt ihr in 90 Tagen, dass eure Abstimmung tragfaehiger geworden ist?",
     ],
     reportDimensions: [
-      "Vision & Unternehmenshorizont",
+      "Unternehmenslogik",
       "Entscheidungslogik",
       "Risikoorientierung",
       "Arbeitsstruktur & Zusammenarbeit",
