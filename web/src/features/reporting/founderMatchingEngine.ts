@@ -41,6 +41,14 @@ export type CompareFoundersResult = {
   tensionMap: TensionMapEntry[];
 };
 
+type DimensionAssessment = {
+  difference: number | null;
+  relationType: RelationType | null;
+  interactionType: InteractionType | null;
+  explanationKey: string | null;
+  tension: { tensionType: TensionType; explanationKey: string } | null;
+};
+
 const MATCH_WEIGHT: Record<FounderDimensionKey, number> = {
   Unternehmenslogik: 1,
   Entscheidungslogik: 1,
@@ -90,7 +98,7 @@ function buildDimensionAssessment(
   dimension: FounderDimensionKey,
   scoreA: number | null,
   scoreB: number | null
-) {
+): DimensionAssessment {
   const difference =
     scoreA == null || scoreB == null ? null : round(Math.abs(scoreA - scoreB));
   const relationType = getRelationType(difference);
