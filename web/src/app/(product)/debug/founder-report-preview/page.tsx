@@ -157,11 +157,6 @@ export default async function FounderReportPreviewPage({
     : invitationId
       ? `/founder-alignment/workbook?invitationId=${invitationId}&teamContext=${teamContext}`
       : `/founder-alignment/workbook?teamContext=${teamContext}`;
-  const conversationGuideHref = previewMode
-    ? `/debug/conversation-guide-preview?mode=${previewMode}`
-    : invitationId
-      ? `/founder-alignment/prepare-conversation?invitationId=${invitationId}&teamContext=${teamContext}`
-      : `/founder-alignment/prepare-conversation?teamContext=${teamContext}`;
 
   return (
     <FounderAlignmentReportView
@@ -169,7 +164,6 @@ export default async function FounderReportPreviewPage({
       scoringResult={scoringResult}
       founderAName={founderNames.founderAName}
       founderBName={founderNames.founderBName}
-      conversationGuideHref={conversationGuideHref}
       workbookHref={workbookHref}
     />
   );

@@ -284,8 +284,8 @@ export function generateCompareReport(profileA: ProfileResult, profileB: Profile
         .map((entry) => `${entry.title}: ${entry.text}`),
     }),
     createPremiumSection({
-      id: "conversation_guide",
-      title: "Gesprächsleitfaden",
+      id: "workbook_preparation",
+      title: "Workbook-Vorbereitung",
       type: "checklist",
       checklist: conversationGuide.filter((entry) => entry.startsWith("[ ] ")),
     }),

@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { signOutAction } from "@/app/(product)/dashboard/actions";
-import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import {
   getAdvisorDashboardTeams,
   getDashboardRoleViews,
@@ -46,19 +44,6 @@ export default async function AdvisorDashboardPage() {
             {displayName}, hier siehst du die Founder-Teams, zu denen du aktuell Zugriff hast,
             und kannst direkt in Workbook oder Report springen.
           </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <DashboardViewSwitch
-            activeView="advisor"
-            hasFounder={roleViews.hasFounder}
-            hasAdvisor={roleViews.hasAdvisor}
-          />
-          <form action={signOutAction}>
-            <button type="submit" className={SECONDARY_CTA_CLASS}>
-              Abmelden
-            </button>
-          </form>
         </div>
       </header>
 

@@ -133,17 +133,17 @@ a {
   position: sticky;
   top: 0.75rem;
   z-index: 0;
-  height: 220px;
+  height: 182px;
   pointer-events: none;
-  margin-bottom: -118px;
+  margin-bottom: -74px;
 }
 
 .dashboard-constellation {
   position: relative;
-  height: 210px;
+  height: 170px;
   overflow: hidden;
   border-radius: 32px;
-  opacity: 0.96;
+  opacity: 0.9;
   transform: translate3d(0, var(--constellation-shift, 0px), 0) translateZ(0);
   will-change: transform, opacity;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 72%, transparent 100%);

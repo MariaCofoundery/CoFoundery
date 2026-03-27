@@ -18,7 +18,6 @@ type Props = {
   scoringResult: TeamScoringResult;
   founderAName: string | null;
   founderBName: string | null;
-  conversationGuideHref: string;
   workbookHref: string;
   backHref?: string | null;
 };
@@ -119,7 +118,6 @@ export function FounderAlignmentReportView({
   scoringResult,
   founderAName,
   founderBName,
-  conversationGuideHref,
   workbookHref,
   backHref = null,
 }: Props) {
@@ -247,7 +245,7 @@ export function FounderAlignmentReportView({
               Besprecht die sechs Dimensionssektionen nacheinander und macht Erwartungen konkret.
             </div>
             <div className="rounded-2xl border border-white/70 bg-white/70 p-4 text-sm leading-6 text-slate-700">
-              Die nächsten Schritte sind: Gespräch vorbereiten, Arbeitsdokument starten, Report sichern.
+              Die nächsten Schritte sind: Workbook starten, Vereinbarungen festhalten, Report sichern.
             </div>
           </div>
           <div className="mt-5 rounded-2xl border border-white/70 bg-white/72 p-4 text-sm leading-7 text-slate-700">
@@ -546,7 +544,8 @@ export function FounderAlignmentReportView({
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">
             Die eigentliche Qualitaet eurer Zusammenarbeit entsteht nicht durch eine einzelne Auswertung,
             sondern dadurch, wie klar ihr die zentralen Themen jetzt miteinander besprecht. Nutzt den
-            Report als Grundlage, um Erwartungen, Unterschiede und gemeinsame Regeln konkret zu machen.
+            Report als Grundlage, um Erwartungen, Unterschiede und gemeinsame Regeln konkret im
+            Workbook festzuhalten.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <PrintReportButton
@@ -555,11 +554,8 @@ export function FounderAlignmentReportView({
               teamContext={report.teamContext}
               properties={{ reportType: "founder_alignment_v1" }}
             />
-            <ReportActionButton variant="secondary" href={conversationGuideHref}>
-              Gespräch vorbereiten
-            </ReportActionButton>
             <ReportActionButton variant="secondary" href={workbookHref}>
-              Arbeitsdokument starten
+              Workbook starten
             </ReportActionButton>
           </div>
         </section>

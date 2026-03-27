@@ -102,6 +102,7 @@ export default async function FounderMatchingPreviewPage({
         selection={selection}
         valuesProfileA={valuesProfiles?.a ?? null}
         valuesProfileB={valuesProfiles?.b ?? null}
+        workbookHref="#"
       />
     </main>
   );

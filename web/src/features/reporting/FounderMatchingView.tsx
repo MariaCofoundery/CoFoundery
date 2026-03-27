@@ -1,5 +1,6 @@
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import { FOUNDER_DIMENSION_META } from "@/features/reporting/founderDimensionMeta";
+import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
@@ -21,6 +22,7 @@ type Props = {
   selection: FounderMatchingSelection;
   valuesProfileA?: SelfValuesProfile | null;
   valuesProfileB?: SelfValuesProfile | null;
+  workbookHref: string;
 };
 
 export function FounderMatchingView({
@@ -30,6 +32,7 @@ export function FounderMatchingView({
   selection,
   valuesProfileA,
   valuesProfileB,
+  workbookHref,
 }: Props) {
   const hero = buildFounderMatchingHero(selection);
   const stableBase = buildStableBaseBlock(selection.stableBase);
@@ -191,6 +194,19 @@ export function FounderMatchingView({
           </div>
         </section>
       ) : null}
+
+      <section className="page-section mt-6 rounded-2xl border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.06)_0%,rgba(255,255,255,0.98)_100%)] p-8 print:hidden">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Nächster Schritt</p>
+        <h3 className="mt-3 text-xl font-semibold text-slate-900">Jetzt Alignment konkret festhalten</h3>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
+          Ihr habt gesehen, wo ihr steht. Im Workbook legt ihr jetzt fest, wie ihr konkret
+          zusammenarbeitet, was fuer euch gelten soll und wie ihr die naechsten 90 Tage sauber
+          fuehrt.
+        </p>
+        <div className="mt-6">
+          <ReportActionButton href={workbookHref}>Workbook starten</ReportActionButton>
+        </div>
+      </section>
     </>
   );
 }

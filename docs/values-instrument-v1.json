@@ -1,0 +1,388 @@
+{
+  "generated_at": "2026-03-27T16:43:23.588Z",
+  "source": {
+    "table_questions": "public.questions",
+    "table_choices": "public.choices",
+    "filter": {
+      "or": [
+        "category = values",
+        "id like qv_%"
+      ]
+    }
+  },
+  "counts": {
+    "values_questions_found": 10,
+    "choices_found": 40,
+    "expected_question_count": 10,
+    "has_expected_question_count": true
+  },
+  "warnings": {
+    "missing_prompts": [],
+    "missing_choice_values": [],
+    "duplicate_question_ids": [],
+    "duplicate_choice_ids": [],
+    "unexpected_question_types": []
+  },
+  "values_questions_snapshot": [
+    {
+      "question_id": "w1",
+      "prompt": "Finanzengpass & Ethik: Ein legaler, aber moralisch fragwürdiger Weg verspricht schnellen Cashflow. Dein Fokus?",
+      "description": null,
+      "type": "scenario",
+      "order": 37,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "3650f2d0-52dd-4a3b-aa7a-d2038bc0d5fe",
+          "text": "Ethische Integrität ist unverhandelbar. Wir lassen lieber Profit liegen, als unsere Werte zu biegen.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "38c79929-05b6-4339-a3d1-77e332d0edc6",
+          "text": "Wir versuchen, Profit und Moral bestmöglich zu vereinen, ohne radikal zu sein.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "3912c480-375f-4fa0-9446-ff944af19358",
+          "text": "Im harten Business-Alltag sind Grauzonen manchmal notwendig, um zu überleben.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "0ab419a6-6984-4920-9130-0139697fc58d",
+          "text": "Erfolg gibt recht. Solange es legal ist, priorisieren wir das wirtschaftliche Ergebnis.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w2",
+      "prompt": "Transparenz-Kultur: Wie viel wissen Mitarbeiter und Partner über die tatsächliche (vielleicht kritische) Finanzlage?",
+      "description": null,
+      "type": "scenario",
+      "order": 38,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "cdbbbe59-09f9-44ac-b546-6065f47ca4c1",
+          "text": "Radikale Transparenz: Mitarbeiter und Partner wissen immer genau, wie es finanziell steht.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "ca11e26d-00de-42c5-9fa3-dcb91fe55bf3",
+          "text": "Offene Kommunikation über die wichtigsten Kennzahlen und Ziele.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "57267bef-a768-4bdc-9d36-2337e37f90c2",
+          "text": "Informationen werden gezielt gefiltert, um Unruhe im Team zu vermeiden.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "1cedfd78-e7a9-4dcb-b67b-bb4f03eecaf3",
+          "text": "Information ist Macht. Nur die Gründer kennen die volle Wahrheit über die Zahlen.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w3",
+      "prompt": "Loyalität vs. Performance: Ein loyaler Mitarbeiter der ersten Stunde hält mit dem Tempo nicht mehr mit. Was zählt mehr?",
+      "description": null,
+      "type": "scenario",
+      "order": 39,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "06edea70-d56d-4607-8554-8afcf2701006",
+          "text": "Loyalität zählt. Wer von Anfang an dabei war, wird auch durch Schwächephasen getragen.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "5143dac9-616f-464e-ac44-59e7bbc37ce5",
+          "text": "Wir versuchen, leistungsschwache Mitarbeiter wieder auf Kurs zu bringen.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "2ff3cbcb-d5a4-4fc6-8049-001a8cb4289a",
+          "text": "Professionalität geht vor. Wer die Ziele dauerhaft reißt, muss das Team verlassen.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "6f78ecd7-d001-496e-b271-a3098b1402c4",
+          "text": "Radikale Leistungskultur: Nur die Besten bleiben, ohne Rücksicht auf die Historie.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w4",
+      "prompt": "Impact vs. Shareholder-Value: Ein Investor fordert für sein Kapital den Verzicht auf unsere sozialen/ökologischen Standards. Was tun?",
+      "description": null,
+      "type": "scenario",
+      "order": 40,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "21a99e51-dbdb-4b33-9ce5-a18d219910ea",
+          "text": "Unser Ziel ist es, ein gesellschaftliches oder ökologisches Problem zu lösen – das steht über dem Profit.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "383a8027-34f8-4f38-8ed1-6ba7de80779f",
+          "text": "Impact ist ein integraler Bestandteil unseres Geschäftsmodells.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "74334b9c-8382-4ae4-bd36-d39db5728d89",
+          "text": "Wir engagieren uns für gute Zwecke, solange es die Bilanz nicht nennenswert belastet.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "2e7e8055-659a-4d30-8db6-a72b6479d7da",
+          "text": "Der einzige Zweck eines Unternehmens ist die Maximierung des Shareholder-Value.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w5",
+      "prompt": "Umgang mit Ressourcen: Wie aggressiv gehen wir mit dem vorhandenen Kapital um (Sparsamkeit vs. Burn-Rate)?",
+      "description": null,
+      "type": "scenario",
+      "order": 41,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "ab3dc90c-81bd-4435-9e11-bdb9eee50541",
+          "text": "Extreme Genügsamkeit (Bootstrapping-Mentalität). Jeder Cent wird zweimal umgedreht.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "2acb6918-0a94-4d3a-a715-7cdf4f1f4967",
+          "text": "Bewusster Umgang mit Ressourcen, um eine lange Lebensdauer (Runway) zu sichern.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "01f2ed50-c769-4293-80ee-962e8a90528e",
+          "text": "Großzügiges Investment in die besten Talente und eine moderne Arbeitskultur.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "a0c1f4ac-3bb7-4761-8746-4891179a5657",
+          "text": "Aggressives Spending: Wir verbrennen Kapital gezielt, um den Markt zu kaufen.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w6",
+      "prompt": "Führungsstil & Macht: Wie werden bei uns Richtungsentscheidungen im Team getroffen (Basisdemokratie vs. Ansage)?",
+      "description": null,
+      "type": "scenario",
+      "order": 42,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "6782db15-38bc-43dc-9de7-053bd7d02dea",
+          "text": "Absolut flache Hierarchien. Jede Stimme im Team wiegt gleich viel.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "94b987b3-d277-41fa-8629-83a4fdf3974a",
+          "text": "Partizipative Führung: Wir hören alle an, aber die Gründer entscheiden.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "0b432463-9c13-463b-8755-a2d7062e8220",
+          "text": "Klare Ansagen und feste Strukturen geben dem Team die nötige Orientierung.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "8d55b839-ea76-4d5b-b8c8-4e023d4528c2",
+          "text": "Autokratisch: Schnelle Entscheidungen von oben nach unten ohne lange Diskussion.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w7",
+      "prompt": "Integrität vs. Überleben: Ein Kunde verlangt eine \"Gefälligkeit\" in der Grauzone für einen lebenswichtigen Vertrag. Wie reagieren wir?",
+      "description": null,
+      "type": "scenario",
+      "order": 43,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "660948bf-4ab0-4f2b-b844-3fc3bb985549",
+          "text": "Unsere Prinzipien sind unantastbar. Wir verzichten lieber auf den Umsatz, als unsere Integrität zu opfern.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "4043363b-2141-451e-9a76-fe8c372939bf",
+          "text": "Wir halten uns an unseren Code of Conduct, suchen aber nach einem sauberen Kompromiss für den Kunden.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "59e5b1dc-d424-4721-bddb-611b6f528dd7",
+          "text": "Im Einzelfall müssen wir abwägen, wie weit wir gehen können, um das Unternehmen zu retten.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "41209d15-7d32-4f93-b371-63c7ae3acb37",
+          "text": "Pragmatismus geht vor. Wenn der Vertrag überlebenswichtig ist, passen wir unsere Regeln der Realität an.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w8",
+      "prompt": "Ehrlichkeit bei Fehlern: Ein massiver Produktfehler wird entdeckt, den der Kunde noch nicht sieht. Wie kommunizieren wir extern?",
+      "description": null,
+      "type": "scenario",
+      "order": 44,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "af34d329-45d9-470d-99e3-e9b63552150f",
+          "text": "Wir geben Fehler gegenüber Kunden und Partnern sofort und demütig zu.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "e5e87ca6-3b72-4f49-9861-e10937310cf9",
+          "text": "Wir kommunizieren Fehler sachlich und präsentieren direkt die Lösung.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "9f808d85-1d92-4d9a-be9d-018dab0d5360",
+          "text": "Fehler werden nur dann kommuniziert, wenn es sich nicht vermeiden lässt.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "a700da23-b33b-4b8d-b5e9-00bb06ce16f9",
+          "text": "Wir verkaufen Fehler als Features oder \"notwendige Lernschritte\".",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w9",
+      "prompt": "Unternehmenskultur & Recruiting: Wie viel Zeit/Geld investieren wir in Diversität und Kultur, wenn es das Wachstum bremst?",
+      "description": null,
+      "type": "scenario",
+      "order": 45,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "9804fefb-75d6-4f90-92a1-e874939c2d08",
+          "text": "Wir investieren aktiv Zeit und Ressourcen, um ein diverses und werteorientiertes Team aufzubauen.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "a66d11e7-7b3b-4216-bd66-81a80c667921",
+          "text": "Wir achten auf Fairness im Recruiting, priorisieren aber die Geschwindigkeit.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "bf497661-e78b-4186-8c77-f5c8be6450ca",
+          "text": "Einstellung erfolgt rein nach fachlicher Qualifikation, egal welcher Hintergrund.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "ff2f3030-ff7e-4df3-b75a-d1828f447f1e",
+          "text": "Wir brauchen jetzt die Leute, die am schnellsten performen – keine Zeit für \"Culture-Build\".",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    },
+    {
+      "question_id": "w10",
+      "prompt": "Deine ultimative Motivation: Warum gründest du dieses Unternehmen wirklich (Purpose vs. Profit)?",
+      "description": null,
+      "type": "scenario",
+      "order": 46,
+      "is_active": true,
+      "category": "values",
+      "dimension": "Werte & Ethik",
+      "choices": [
+        {
+          "choice_id": "97b76ef3-427b-46d3-8906-65f07de1264c",
+          "text": "Ich will etwas hinterlassen, das die Welt ein Stück besser macht.",
+          "value": "1",
+          "order": 1
+        },
+        {
+          "choice_id": "eadb6a15-a21d-4bb7-a994-cf99bc475466",
+          "text": "Ich möchte eine innovative Lösung für ein echtes Problem am Markt etablieren.",
+          "value": "2",
+          "order": 2
+        },
+        {
+          "choice_id": "80e056b5-ef2b-4ee7-9bfb-d294929ab300",
+          "text": "Ich strebe nach persönlicher Freiheit und finanzieller Unabhängigkeit.",
+          "value": "3",
+          "order": 3
+        },
+        {
+          "choice_id": "b382dc84-47aa-4cbc-ac5e-50820421f034",
+          "text": "Ich will den größtmöglichen finanziellen Erfolg (Exit) in kürzester Zeit.",
+          "value": "4",
+          "order": 4
+        }
+      ]
+    }
+  ]
+}

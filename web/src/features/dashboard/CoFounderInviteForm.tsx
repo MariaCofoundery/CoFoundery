@@ -10,14 +10,14 @@ function teamContextMeta(teamContext: TeamContext | null) {
     return {
       badge: "Bestehendes Team",
       title: "Ihr startet einen Alignment-Flow für ein bestehendes Gründerteam.",
-      text: "Report, Gesprächsleitfaden und Workbook fokussieren dann stärker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
+      text: "Report und Workbook fokussieren dann stärker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
     };
   }
 
   return {
     badge: "Mögliche Gründungspartnerschaft",
     title: "Ihr startet einen Matching- und Kennenlern-Flow.",
-    text: "Report, Gesprächsleitfaden und Workbook fokussieren dann stärker auf Passung, Erwartungen und frühe Vereinbarungen vor einer engeren Zusammenarbeit.",
+    text: "Report und Workbook fokussieren dann stärker auf Passung, Erwartungen und frühe Vereinbarungen vor einer engeren Zusammenarbeit.",
   };
 }
 
@@ -134,7 +134,7 @@ export function CoFounderInviteForm() {
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.
-            Dieser Kontext steuert später, wie Report, Gesprächsleitfaden und Workbook sprachlich gerahmt werden.
+            Dieser Kontext steuert später, wie Report und Workbook sprachlich gerahmt werden.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
@@ -188,6 +188,9 @@ export function CoFounderInviteForm() {
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">Module</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Für den produktiven Founder-Flow startet ihr mit Basis und optional Werte. Report und Workbook bauen anschließend auf diesen beiden Modulen auf.
+          </p>
           <div className="mt-3 space-y-2 text-sm text-slate-700">
             <label className="flex items-center gap-2">
               <input type="checkbox" checked disabled className="h-4 w-4" />
@@ -201,30 +204,6 @@ export function CoFounderInviteForm() {
                 className="h-4 w-4"
               />
               <span>Werte (optional)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Stress & Belastung (coming soon)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Arbeitsstil & Entscheidungslogik (coming soon)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Konflikt- & Feedback-Dynamiken (coming soon)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Rollenverständnis im Team (coming soon)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Team-Report (3–4 Personen) (coming soon)</span>
-            </label>
-            <label className="flex items-center gap-2 text-slate-500">
-              <input type="checkbox" checked={false} disabled className="h-4 w-4" />
-              <span>Investor / Business-Angel Match (coming soon)</span>
             </label>
           </div>
         </div>

@@ -11,6 +11,8 @@ import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founde
 import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
+const DECISION_RULES_STEP_ID = "decision_rules";
+
 type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
@@ -148,6 +150,11 @@ export default async function FounderAlignmentWorkbookPrintPage({
           <div className="mt-8 space-y-8 print:mt-6">
             {visibleSteps.map((step, index) => {
               const content = WORKBOOK_STEP_CONTENT[step.id];
+              const isDecisionRulesStep = step.id === DECISION_RULES_STEP_ID;
+              const structuredOutputFields = content.outputFields ?? null;
+              const isStructuredOutputStep = Boolean(
+                structuredOutputFields && structuredOutputFields.length > 0
+              );
               const sectionAccent =
                 index % 2 === 0
                   ? "border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.08)_0%,rgba(255,255,255,0.96)_100%)]"
@@ -174,8 +181,19 @@ export default async function FounderAlignmentWorkbookPrintPage({
                     </div>
                   </div>
 
+                  {isStructuredOutputStep && content.scenario ? (
+                    <div className="mt-5 rounded-3xl border border-[color:var(--brand-accent)]/16 bg-white/90 p-6">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {t("Realitaetsszenario")}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">{t(content.scenario)}</p>
+                    </div>
+                  ) : null}
+
                   <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
-                    <p className="text-sm font-semibold text-slate-900">{t("Fragen fuer eure Diskussion")}</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {t(isStructuredOutputStep ? "Konkrete Entscheidungsfragen" : "Fragen fuer eure Diskussion")}
+                    </p>
                     <ol className="mt-4 space-y-3">
                       {step.prompts.map((prompt, promptIndex) => (
                         <li
@@ -229,9 +247,41 @@ export default async function FounderAlignmentWorkbookPrintPage({
                         <WorksheetField title={`Perspektive ${founderBLabel}`} />
                       </div>
 
-                      <div className="mt-5">
-                        <WorksheetField title="Gemeinsame Vereinbarung" highlight minHeightClass="min-h-[260px]" lineCount={8} />
-                      </div>
+                      {isStructuredOutputStep && structuredOutputFields ? (
+                        <>
+                          <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
+                            <p className="text-sm font-semibold text-slate-900">
+                              {t(isDecisionRulesStep ? "Entscheidungs-Output" : "Verbindlicher Output")}
+                            </p>
+                            <div className="mt-5 grid gap-5">
+                              {structuredOutputFields.map((field) => (
+                                <WorksheetField
+                                  key={field.key}
+                                  title={t(field.title)}
+                                  highlight={field.highlight === true}
+                                  minHeightClass={field.highlight ? "min-h-[180px]" : "min-h-[160px]"}
+                                  lineCount={field.highlight ? 5 : 4}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {content.riskHint ? (
+                            <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50/70 p-6">
+                              <p className="text-sm font-semibold text-slate-900">
+                                {t("Risiko-Hinweis")}
+                              </p>
+                              <p className="mt-3 text-sm leading-7 text-slate-700">
+                                {t(content.riskHint)}
+                              </p>
+                            </div>
+                          ) : null}
+                        </>
+                      ) : (
+                        <div className="mt-5">
+                          <WorksheetField title="Gemeinsame Vereinbarung" highlight minHeightClass="min-h-[260px]" lineCount={8} />
+                        </div>
+                      )}
 
                       <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
                         <p className="text-sm font-semibold text-slate-900">Status</p>

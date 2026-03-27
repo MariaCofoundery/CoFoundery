@@ -146,6 +146,9 @@ export default async function ReportPage({ params }: PageProps) {
     toFounderScores(founderScoring, "B")
   );
   const selection = buildFounderMatchingSelection(compareResult);
+  const workbookHref = teamContext
+    ? `/founder-alignment/workbook?invitationId=${encodeURIComponent(snapshot.invitationId)}&teamContext=${encodeURIComponent(teamContext)}`
+    : `/founder-alignment/workbook?invitationId=${encodeURIComponent(snapshot.invitationId)}`;
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
@@ -182,6 +185,7 @@ export default async function ReportPage({ params }: PageProps) {
         selection={selection}
         valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
         valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
+        workbookHref={workbookHref}
       />
     </main>
   );

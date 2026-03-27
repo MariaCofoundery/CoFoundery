@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { CopyLinkButton } from "@/features/dashboard/CopyLinkButton";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
-import { DailyQuote } from "@/features/dashboard/DailyQuote";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
-import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
+import { DailyQuote } from "@/features/dashboard/DailyQuote";
 import { DAILY_QUOTES } from "@/features/dashboard/dailyQuotes";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
@@ -14,6 +12,7 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { AlignmentRadarChart } from "@/features/reporting/AlignmentRadarChart";
 import { FOUNDER_DIMENSION_META, FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
+import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import { KeyInsights } from "@/features/reporting/KeyInsights";
 import {
   debug_invitation_readiness,
@@ -56,12 +55,16 @@ type ReportRunRow = {
     | null;
 };
 
+type WorkbookDashboardRow = {
+  invitation_id: string;
+  updated_at: string;
+  payload: unknown;
+};
+
 const INVITE_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)]";
 const REPORT_CTA_CLASS =
   "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
-const SECONDARY_CTA_CLASS =
-  "inline-flex items-center rounded-lg border border-[color:var(--brand-accent)]/25 bg-[color:var(--brand-accent)]/8 px-4 py-2 text-sm font-medium text-slate-800 transition-colors hover:bg-[color:var(--brand-accent)]/14";
 const UTILITY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50";
 const PRIMARY_SURFACE_CLASS =
@@ -82,10 +85,6 @@ function staggerStyle(delayMs: number) {
   return {
     animationDelay: `${delayMs}ms`,
   };
-}
-
-function normalizeMetadataName(value: unknown) {
-  return typeof value === "string" ? value.trim() : "";
 }
 
 export default async function DashboardPage({
@@ -161,6 +160,24 @@ export default async function DashboardPage({
   if (runsResult.error) {
     return <main className="p-8">Fehler beim Laden der Report-Runs: {runsResult.error.message}</main>;
   }
+
+  const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
+  const relevantInvitationIds = [
+    ...new Set([...invitationRows.map((invitation) => invitation.id), ...reportRuns.map((run) => run.invitation_id)]),
+  ];
+  const workbookResult =
+    relevantInvitationIds.length > 0
+      ? await supabase
+          .from("founder_alignment_workbooks")
+          .select("invitation_id, updated_at, payload")
+          .in("invitation_id", relevantInvitationIds)
+          .order("updated_at", { ascending: false })
+      : { data: [] as WorkbookDashboardRow[], error: null };
+
+  if (workbookResult.error) {
+    return <main className="p-8">Fehler beim Laden der Workbooks: {workbookResult.error.message}</main>;
+  }
+
   const needsOnboarding =
     !profileData?.display_name?.trim() || !profileData?.focus_skill || !profileData?.intention;
   const sentInvites = invitationRows.filter((row) => row.direction === "sent");
@@ -182,23 +199,13 @@ export default async function DashboardPage({
         )
       )
     : new Map<string, InvitationReadinessDebug>();
-  const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
+
   const hasSubmittedBase = Boolean(selfReport);
   const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
   const dayOfYear = getDayOfYear(new Date());
   const quoteIndex = DAILY_QUOTES.length > 0 ? (dayOfYear - 1) % DAILY_QUOTES.length : 0;
   const quoteOfDay = DAILY_QUOTES[quoteIndex] ?? "Klarheit schlägt Zufall.";
-  const displayName =
-    profileData?.display_name?.trim() ||
-    normalizeMetadataName(user.user_metadata?.display_name) ||
-    normalizeMetadataName(user.user_metadata?.full_name) ||
-    user.email?.split("@")[0] ||
-    "Founder";
   const valuesStatus = selfReport?.valuesModuleStatus ?? "not_started";
-  const valuesSummary =
-    selfReport?.selfValuesProfile?.summary?.trim() ||
-    selfReport?.valuesModulePreview?.trim() ||
-    "Das Werteprofil ergänzt dein Basisprofil um die Frage, welche inneren Leitplanken deine Entscheidungen prägen.";
   const profileCompletionLabel = hasSubmittedBase
     ? `Basisprofil abgeschlossen (${selfReport?.basisAnsweredA ?? 0}/${selfReport?.basisTotal ?? 0})`
     : "Basisprofil noch offen";
@@ -206,42 +213,166 @@ export default async function DashboardPage({
     selfReport?.valuesTotal && selfReport.valuesTotal > 0
       ? `${selfReport.valuesAnsweredA}/${selfReport.valuesTotal} Wertefragen beantwortet`
       : "Werteprofil optional";
-  const primaryAction = !hasSubmittedBase
-    ? { href: "/me/base", label: "Basisprofil starten" }
-    : !hasSubmittedValues
-      ? { href: "/me/values", label: "Werteprofil abschließen" }
-      : { href: "/me/report", label: "Individuellen Report öffnen" };
-  const valuesAction = hasSubmittedValues
-    ? { href: "/me/report#werteprofil", label: "Werteprofil öffnen" }
-    : {
-        href: "/me/values",
-        label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
-      };
-  const matchingAction = hasSubmittedBase
-    ? { href: "/invite/new", label: "Co-Founder einladen" }
-    : null;
-  const nextStepHeadline = !hasSubmittedBase
-    ? "Starte mit deinem Basisprofil."
-    : !hasSubmittedValues
-      ? "Ergänze als Nächstes dein Werteprofil."
-      : sentInvitesSorted.length > 0 || receivedInvitesSorted.length > 0
-        ? "Dein Profil ist bereit für Matching und Gespräche."
-        : "Dein Profil ist bereit für den nächsten Matching-Schritt.";
-  const nextStepText = !hasSubmittedBase
-    ? "Der Basisfragebogen legt dein Founder-Profil an und macht Radar, Insights und Report erst sinnvoll nutzbar."
-    : !hasSubmittedValues
-      ? "Mit dem Werteprofil ergänzt du dein Basisprofil um innere Prioritäten und Leitplanken für spätere Entscheidungen."
-      : "Lies deinen Report, schärfe dein Profil weiter und nutze es als Grundlage für Co-Founder-Gespräche und Matching.";
+
   const readyReports = reportRuns.slice(0, 3);
+  const readyReportInvitationIds = new Set(readyReports.map((report) => report.invitation_id));
   const hasMatchingActivity =
     sentInvitesSorted.length > 0 || receivedInvitesSorted.length > 0 || readyReports.length > 0;
-  const dashboardJourneyItems = [
-    { id: "dashboard-journey-profile", label: "Profil", completed: hasSubmittedBase },
-    { id: "dashboard-journey-values", label: "Werteprofil", completed: hasSubmittedValues },
-    { id: "dashboard-journey-matching", label: "Matching", completed: hasMatchingActivity },
-    { id: "dashboard-journey-conversation", label: "Gespräch", completed: readyReports.length > 0 },
-    { id: "dashboard-journey-workbook", label: "Workbook", completed: false },
-  ];
+  const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
+  const workbookRows = ((workbookResult.data ?? []) as WorkbookDashboardRow[])
+    .map((row) => {
+      const invitation = invitationById.get(row.invitation_id) ?? null;
+      const payload = sanitizeFounderAlignmentWorkbookPayload(row.payload);
+      const contentSignals = countWorkbookContentSignals(payload);
+      const hasStarted = contentSignals > 0;
+      const isCompleted = payload.founderReaction.status !== null || contentSignals >= 8;
+      return {
+        invitationId: row.invitation_id,
+        title: formatDashboardInvitationTitle(invitation),
+        updatedAt: row.updated_at,
+        href: buildWorkbookHref(row.invitation_id, invitation?.teamContext ?? null),
+        hasStarted,
+        isCompleted,
+      };
+    })
+    .filter((row) => row.hasStarted || readyReportInvitationIds.has(row.invitationId));
+  const activeWorkbooks = workbookRows.filter((row) => row.hasStarted);
+  const activeWorkbookByInvitationId = new Map(
+    activeWorkbooks.map((workbook) => [workbook.invitationId, workbook])
+  );
+  const latestReadyReport = readyReports[0] ?? null;
+  const latestActiveWorkbook = activeWorkbooks[0] ?? null;
+  const workbookEntryPointHref = latestActiveWorkbook
+    ? latestActiveWorkbook.href
+    : latestReadyReport
+      ? buildWorkbookHref(
+          latestReadyReport.invitation_id,
+          invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
+        )
+      : null;
+  const reportsWithoutWorkbook = readyReports.filter(
+    (report) => !activeWorkbookByInvitationId.has(report.invitation_id)
+  );
+
+  const basisStatus = hasSubmittedBase ? "abgeschlossen" : "offen";
+  const valuesStatusLabel = hasSubmittedValues
+    ? "abgeschlossen"
+    : valuesStatus === "in_progress"
+      ? "gestartet"
+      : "offen";
+  const matchingStatus = readyReports.length > 0 ? "abgeschlossen" : hasMatchingActivity ? "gestartet" : "offen";
+  const workbookStatus = activeWorkbooks.some((workbook) => workbook.isCompleted)
+    ? "abgeschlossen"
+    : activeWorkbooks.length > 0
+      ? "gestartet"
+      : readyReports.length > 0
+        ? "offen"
+        : "offen";
+
+  const heroPrimaryAction = !hasSubmittedBase
+    ? {
+        href: "/me/base",
+        label: "Basisprofil starten",
+        eyebrow: "Startpunkt",
+        title: "Lege zuerst dein Founder-Profil an.",
+        text: "Ohne Basisprofil bleiben Werteprofil, Matching und Report nur angedeutet. Dieser Schritt schafft die Grundlage für alles Weitere.",
+      }
+    : !hasSubmittedValues
+      ? {
+          href: "/me/values",
+          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil abschließen",
+          eyebrow: "Nächster Schritt",
+          title: "Schärfe jetzt dein Werteprofil.",
+          text: "Damit wird dein Profil belastbarer und spätere Matching- und Workbook-Entscheidungen werden deutlich präziser.",
+        }
+      : latestActiveWorkbook
+        ? {
+            href: latestActiveWorkbook.href,
+            label: "Workbook öffnen",
+            eyebrow: "Aktiver Fokus",
+            title: "Ein Workbook ist bereits in Arbeit.",
+            text: "Öffne den aktuellen Stand und führe die Vereinbarungen weiter, statt den Flow erneut von vorn zu beginnen.",
+          }
+        : latestReadyReport
+          ? {
+              href:
+                workbookEntryPointHref ??
+                buildWorkbookHref(
+                  latestReadyReport.invitation_id,
+                  invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
+                ),
+              label: "Workbook starten",
+              eyebrow: "Nächster Schritt",
+              title: "Macht aus dem Report konkrete Regeln.",
+              text: "Der Matching-Report zeigt eure Dynamik. Im Workbook haltet ihr jetzt fest, wie ihr konkret zusammenarbeitet und was in den nächsten 90 Tagen gelten soll.",
+            }
+          : !hasMatchingActivity
+            ? {
+                href: "/invite/new",
+                label: "Co-Founder einladen",
+                eyebrow: "Nächster Schritt",
+                title: "Bring jetzt eine zweite Person in den Flow.",
+                text: "Dein Profil steht. Der sinnvollste nächste Schritt ist jetzt ein echter Matching-Kontext mit Einladung, Report und anschließendem Workbook.",
+              }
+            : {
+                href: "/dashboard#dashboard-block-active",
+                label: "Aktive Themen öffnen",
+                eyebrow: "Nächster Schritt",
+                title: "Behalte laufende Einladungen und Reports im Blick.",
+                text: "Sobald Einladungen, Reports oder Workbooks aktiv sind, findest du hier den operativen Einstieg ohne doppelte Umwege.",
+              };
+
+  const progressCards = [
+    {
+      id: "dashboard-status-profile",
+      label: "Basisprofil",
+      status: basisStatus,
+      text: hasSubmittedBase
+        ? "Dein Founder-Profil ist angelegt und bildet die Grundlage für Report, Matching und Workbook."
+        : "Hier beginnt dein Produktpfad. Ohne Basisprofil bleibt alles Weitere offen.",
+      href: hasSubmittedBase ? "/me/report" : "/me/base",
+      actionLabel: hasSubmittedBase ? "Profil öffnen" : "Starten",
+    },
+    {
+      id: "dashboard-status-values",
+      label: "Werteprofil",
+      status: valuesStatusLabel,
+      text: hasSubmittedValues
+        ? "Dein Werte-Layer ist aktiv und erweitert dein Profil um Entscheidungsprioritäten unter Druck."
+        : valuesStatus === "in_progress"
+          ? "Dein Werteprofil ist begonnen, aber noch nicht vollständig abgeschlossen."
+          : "Das Werteprofil ergänzt dein Founder-Profil um einen zweiten, entscheidungsnahen Layer.",
+      href: hasSubmittedValues ? "/me/report#werteprofil" : "/me/values",
+      actionLabel: hasSubmittedValues ? "Öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
+    },
+    {
+      id: "dashboard-block-status-matching",
+      label: "Matching",
+      status: matchingStatus,
+      text:
+        readyReports.length > 0
+          ? "Es liegen auswertbare Matches oder fertige Reports vor."
+          : hasMatchingActivity
+            ? "Einladungen oder laufende Matching-Kontexte sind bereits aktiv."
+            : "Sobald du jemanden einlädst, entsteht hier der operative Matching-Bereich.",
+      href: readyReports[0] ? `/report/${readyReports[0].invitation_id}` : "/dashboard#dashboard-block-active",
+      actionLabel: readyReports[0] ? "Report öffnen" : "Zum Bereich",
+    },
+    {
+      id: "dashboard-status-workbook",
+      label: "Workbook",
+      status: workbookStatus,
+      text:
+        activeWorkbooks.length > 0
+          ? "Mindestens ein Workbook läuft bereits und übersetzt Report-Erkenntnisse in Regeln und Vereinbarungen."
+          : readyReports.length > 0
+            ? "Ein Report ist bereit. Das Workbook ist der nächste Schritt, um konkrete Zusammenarbeit festzuhalten."
+            : "Das Workbook wird relevant, sobald ein gemeinsamer Matching-Report vorliegt.",
+      href: workbookEntryPointHref ?? "/dashboard#dashboard-block-active",
+      actionLabel: workbookEntryPointHref ? "Öffnen" : "Zum Bereich",
+    },
+  ] as const;
+
   const selfReportDebug = selfReport
     ? {
         baseAssessmentId: selfReport.selfAssessmentMeta?.baseAssessmentId ?? selfReport.sessionId,
@@ -263,232 +394,234 @@ export default async function DashboardPage({
   }));
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-16 md:px-10 xl:px-12">
-      <DashboardJourneyLine items={dashboardJourneyItems} />
+    <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 md:px-10 xl:px-12">
+      <DashboardJourneyLine />
+
       <section data-dashboard-hero className="relative isolate mb-8">
         <div className="relative rounded-[32px]">
-        <DashboardHeroConstellation />
-        <div className="relative z-10">
-          <div className="dashboard-fade-up" style={staggerStyle(10)}>
-            <DailyQuote displayName={profileData?.display_name ?? null} quote={quoteOfDay} />
-          </div>
-          <header className="dashboard-fade-up mb-10 flex flex-wrap items-center justify-between gap-6">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Plattform</p>
-          <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">Dein Founder Dashboard</h1>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            Hier laufen dein Profil, dein Werte-Layer und deine Matching-Schritte zusammen.
-          </p>
-          {profileData?.focus_skill && profileData?.intention ? (
-            <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">
-              Fokus: {profileData.focus_skill} · Intention: {profileData.intention}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-3">
-          <DashboardViewSwitch
-            activeView="founder"
-            hasFounder={roleViews.hasFounder}
-            hasAdvisor={roleViews.hasAdvisor}
-          />
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className={UTILITY_CTA_CLASS}
-            >
-              Abmelden
-            </button>
-          </form>
-        </div>
-          </header>
-
-          <section className="mb-6">
-        {needsOnboarding ? (
-          <ProfileBasicsForm
-            mode="onboarding"
-            initialValues={{
-              display_name: profileData?.display_name ?? null,
-              focus_skill: profileData?.focus_skill ?? null,
-              intention: profileData?.intention ?? null,
-              roles: profileData?.roles ?? null,
-            }}
-            submitLabel="Profil speichern"
-            onSuccessRedirectTo="/dashboard"
-            variant="accent"
-          />
-        ) : (
-          <details className="rounded-2xl border border-slate-200/80 bg-white/95 p-4">
-            <summary className="cursor-pointer text-sm font-medium text-slate-700">
-              Profil-Basics bearbeiten
-            </summary>
-            <div className="mt-4">
-              <ProfileBasicsForm
-                mode="edit"
-                initialValues={{
-                  display_name: profileData?.display_name ?? null,
-                  focus_skill: profileData?.focus_skill ?? null,
-                  intention: profileData?.intention ?? null,
-                  roles: profileData?.roles ?? null,
-                }}
-                submitLabel="Profil aktualisieren"
-                onSuccessRedirectTo="/dashboard"
-              />
-            </div>
-          </details>
-        )}
-          </section>
-
-          {params.error ? (
-            <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Hinweis: {params.error}
-            </p>
-          ) : null}
-
-          <section className="dashboard-panel dashboard-fade-up mb-8 rounded-[28px] border border-slate-200/80 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.05)] lg:p-8" style={staggerStyle(40)}>
-        <div className="grid gap-8 xl:grid-cols-[1.05fr_1.15fr]">
-          <div className="space-y-5">
-            <div>
-              <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                <span className="dashboard-icon-chip h-8 w-8 border-none bg-[color:var(--brand-primary)]/10 text-[color:var(--brand-primary)] shadow-none">
-                  <ProfileIcon className="h-4 w-4" />
-                </span>
-                Profilzentrale
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold text-slate-950">Hallo {displayName}</h2>
-              <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600">
-                Das ist dein persönlicher Startpunkt im Founder-System. Hier siehst du dein Basisprofil,
-                dein Werteprofil und die nächsten sinnvollen Schritte für Report und Matching.
-              </p>
+          <DashboardHeroConstellation />
+          <div className="relative z-10">
+            <div className="dashboard-fade-up" style={staggerStyle(10)}>
+              <DailyQuote displayName={profileData?.display_name ?? null} quote={quoteOfDay} />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex rounded-full border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-slate-700">
-                {profileCompletionLabel}
-              </span>
-              <span className="inline-flex rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-slate-700">
-                {hasSubmittedValues ? "Werteprofil abgeschlossen" : valuesCompletionLabel}
-              </span>
-            </div>
-
-            <article
-              id="dashboard-journey-profile"
-              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-5`}
-              style={staggerStyle(90)}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                    <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                      <CompassIcon className="h-4 w-4" />
-                    </span>
-                    Basisprofil
+            <header className="dashboard-fade-up mb-5 flex flex-wrap items-end justify-between gap-6">
+              <div className="max-w-3xl">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Plattform</p>
+                <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
+                  Dein Founder Dashboard
+                </h1>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  Hier laufen Profil, Matching und Workbook in einer klaren Produktoberfläche zusammen.
+                </p>
+                {profileData?.focus_skill && profileData?.intention ? (
+                  <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">
+                    Fokus: {profileData.focus_skill} · Intention: {profileData.intention}
                   </p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">
-                    {hasSubmittedBase ? "Dein Founder-Profil ist angelegt." : "Dein Founder-Profil wartet auf den Start."}
-                  </p>
-                </div>
-                <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                  hasSubmittedBase
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-slate-100 text-slate-600"
-                }`}>
-                  {hasSubmittedBase ? "abgeschlossen" : "offen"}
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                {hasSubmittedBase
-                  ? "Dein Basisprofil zeigt, wie du in Strategie, Entscheidungen und Zusammenarbeit aktuell tendierst."
-                  : "Mit dem Basisprofil legst du den Ausgangspunkt für Radar, Insights und deinen individuellen Founder Report."}
-              </p>
-            </article>
-
-            <article
-              id="dashboard-journey-values"
-              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/5 p-5`}
-              style={staggerStyle(140)}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                    <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                      <ValuesIcon className="h-4 w-4" />
-                    </span>
-                    Werteprofil
-                  </p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">
-                    {hasSubmittedValues ? "Dein zweiter Profil-Layer ist bereit." : "Das Werteprofil ergänzt dein Founder-Profil."}
-                  </p>
-                </div>
-                <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                  hasSubmittedValues
-                    ? "bg-[color:var(--brand-accent)]/10 text-slate-700"
-                    : valuesStatus === "in_progress"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-slate-100 text-slate-600"
-                }`}>
-                  {hasSubmittedValues ? "bereit" : valuesStatus === "in_progress" ? "in Bearbeitung" : "optional"}
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{valuesSummary}</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a href={valuesAction.href} className={SECONDARY_CTA_CLASS}>
-                  {valuesAction.label}
-                </a>
-                {hasSubmittedValues ? (
-                  <a href="/me/report#werteprofil" className={UTILITY_CTA_CLASS}>
-                    Im Report ansehen
-                  </a>
                 ) : null}
               </div>
-            </article>
 
-            <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(190)}>
-              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                  <NextStepIcon className="h-4 w-4" />
-                </span>
-                Nächster sinnvoller Schritt
-              </p>
-              <p className="mt-2 text-lg font-semibold text-slate-900">{nextStepHeadline}</p>
-              <p className="mt-2 text-sm leading-7 text-slate-600">{nextStepText}</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a href={primaryAction.href} className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.18)]`}>
-                  {primaryAction.label}
-                </a>
-                {matchingAction ? (
-                  <a href={matchingAction.href} className={UTILITY_CTA_CLASS}>
-                    {matchingAction.label}
-                  </a>
-                ) : null}
+              <div className="rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 text-sm text-slate-600 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+                {hasMatchingActivity
+                  ? `${sentInvitesSorted.length + receivedInvitesSorted.length} aktive Matching-Kontexte`
+                  : "Noch kein aktiver Matching-Kontext"}
               </div>
-            </article>
+            </header>
 
-            {!needsOnboarding ? (
-              <details className="rounded-2xl border border-slate-200/80 bg-white/85 p-4">
-                <summary className="cursor-pointer text-sm font-medium text-slate-700">
-                  Profil-Basics bearbeiten
-                </summary>
-                <div className="mt-4">
-                  <ProfileBasicsForm
-                    mode="edit"
-                    initialValues={{
-                      display_name: profileData?.display_name ?? null,
-                      focus_skill: profileData?.focus_skill ?? null,
-                      intention: profileData?.intention ?? null,
-                      roles: profileData?.roles ?? null,
-                    }}
-                    submitLabel="Profil aktualisieren"
-                    onSuccessRedirectTo="/dashboard"
-                  />
-                </div>
-              </details>
+            {params.error ? (
+              <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Hinweis: {params.error}
+              </p>
             ) : null}
+
+            <section
+              className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.045)] lg:p-8"
+              style={staggerStyle(40)}
+            >
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.85fr)]">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                    {heroPrimaryAction.eyebrow}
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-slate-950 md:text-[2rem]">
+                    {heroPrimaryAction.title}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+                    {heroPrimaryAction.text}
+                  </p>
+                  <div className="mt-5">
+                    <Link
+                      href={heroPrimaryAction.href}
+                      className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
+                    >
+                      {heroPrimaryAction.label}
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="rounded-[24px] border border-slate-200/80 bg-white/88 p-5">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Orientierung</p>
+                  <div className="mt-4 space-y-3 text-sm text-slate-700">
+                    <div className="flex items-start justify-between gap-3">
+                      <span>Basisprofil</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {basisStatus}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span>Werteprofil</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {valuesStatusLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span>Matching</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {matchingStatus}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span>Workbook</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {workbookStatus}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-xs leading-6 text-slate-500">
+                    Ein Haupt-CTA führt dich weiter. Alle anderen Module bleiben darunter als klarer Status sichtbar.
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
+        </div>
+      </section>
+
+      <section
+        id="dashboard-block-progress"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.04)] lg:p-8"
+        style={staggerStyle(80)}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+                <ProfileIcon className="h-4 w-4" />
+              </span>
+              Fortschritt
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+              Klarer Status statt verteilter Einstiege
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              Hier siehst du pro Modul, was offen, gestartet oder abgeschlossen ist. So bleibt der Produktpfad auch dann lesbar, wenn mehrere Dinge parallel laufen.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {progressCards.map((card, index) => (
+            <article
+              key={card.id}
+              id={card.id}
+              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-5`}
+              style={staggerStyle(100 + index * 30)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                    {card.label}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">{card.status}</p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                  {card.status}
+                </span>
+              </div>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{card.text}</p>
+              <div className="mt-4">
+                <Link href={card.href} className={UTILITY_CTA_CLASS}>
+                  {card.actionLabel}
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <section className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-6`} style={staggerStyle(220)}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                  <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+                    <CompassIcon className="h-4 w-4" />
+                  </span>
+                  Mein Profil
+                </p>
+                <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                  {needsOnboarding ? "Lege zuerst deine Basisdaten an" : "Pflege deine Profildaten an einer Stelle"}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-[0.08em] text-slate-600">
+                <span className="rounded-full border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-3 py-1">
+                  {profileCompletionLabel}
+                </span>
+                <span className="rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1">
+                  {hasSubmittedValues ? "Werteprofil abgeschlossen" : valuesCompletionLabel}
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              {needsOnboarding
+                ? "Hier hinterlegst du die Basisdaten, ohne die Radar, Report und Matching nicht sauber starten."
+                : "Profiländerungen, Fokus und Rollen pflegst du künftig an einer Stelle statt über mehrere Karten verteilt."}
+            </p>
+
+            <div className="mt-5">
+              {needsOnboarding ? (
+                <ProfileBasicsForm
+                  mode="onboarding"
+                  initialValues={{
+                    display_name: profileData?.display_name ?? null,
+                    focus_skill: profileData?.focus_skill ?? null,
+                    intention: profileData?.intention ?? null,
+                    roles: profileData?.roles ?? null,
+                  }}
+                  submitLabel="Profil speichern"
+                  onSuccessRedirectTo="/dashboard"
+                  variant="accent"
+                />
+              ) : (
+                <details className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
+                  <summary className="cursor-pointer text-sm font-medium text-slate-700">
+                    Profildaten bearbeiten
+                  </summary>
+                  <div className="mt-4">
+                    <ProfileBasicsForm
+                      mode="edit"
+                      initialValues={{
+                        display_name: profileData?.display_name ?? null,
+                        focus_skill: profileData?.focus_skill ?? null,
+                        intention: profileData?.intention ?? null,
+                        roles: profileData?.roles ?? null,
+                      }}
+                      submitLabel="Profil aktualisieren"
+                      onSuccessRedirectTo="/dashboard"
+                    />
+                  </div>
+                </details>
+              )}
+            </div>
+          </section>
 
           <div className="space-y-6">
             {selfReport ? (
               <>
-                <article className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up overflow-hidden bg-white/95 p-6`} style={staggerStyle(120)}>
+                <article
+                  className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up overflow-hidden bg-white/95 p-6`}
+                  style={staggerStyle(240)}
+                >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
@@ -497,14 +630,16 @@ export default async function DashboardPage({
                         </span>
                         Profil-Snapshot
                       </p>
-                      <h3 className="mt-2 text-xl font-semibold text-slate-950">Dein aktuelles Founder-Profil</h3>
+                      <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                        Dein aktuelles Founder-Profil
+                      </h3>
                     </div>
-                    <a href="/me/report" className={UTILITY_CTA_CLASS}>
+                    <Link href="/me/report" className={UTILITY_CTA_CLASS}>
                       Report lesen
-                    </a>
+                    </Link>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Das Radar zeigt deine aktuelle Tendenz in sechs Founder-Dimensionen. Unterschiede zu anderen Founder-Profilen sind hier keine Stärke oder Schwäche, sondern unterschiedliche Präferenzen.
+                    Das Radar zeigt deine aktuelle Tendenz in sechs Founder-Dimensionen und bündelt die Basis für alle weiteren Produktmodule.
                   </p>
                   <div className="dashboard-radar-shell mt-5 rounded-[24px] border border-slate-100/80 p-2">
                     <AlignmentRadarChart
@@ -522,35 +657,37 @@ export default async function DashboardPage({
                     />
                   </div>
                 </article>
-                <div className="dashboard-fade-up" style={staggerStyle(170)}>
+                <div className="dashboard-fade-up" style={staggerStyle(270)}>
                   <KeyInsights insights={selfReport.keyInsights} />
                 </div>
               </>
             ) : (
-              <article className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up bg-white/95 p-6`} style={staggerStyle(120)}>
+              <article
+                className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up bg-white/95 p-6`}
+                style={staggerStyle(240)}
+              >
                 <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
                   <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                     <ReportIcon className="h-4 w-4" />
                   </span>
                   Profil-Snapshot
                 </p>
-                <h3 className="mt-2 text-xl font-semibold text-slate-950">Dein Founder-Profil entsteht mit dem Basisfragebogen</h3>
+                <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                  Dein Founder-Profil entsteht mit dem Basisfragebogen
+                </h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Sobald du das Basisprofil ausfüllst, erscheinen hier dein Radar, zentrale Insights und der Einstieg in deinen individuellen Report.
+                  Sobald du das Basisprofil ausfüllst, erscheinen hier Radar, Insights und der Einstieg in deinen individuellen Report.
                 </p>
               </article>
             )}
           </div>
         </div>
-          </section>
-        </div>
-        </div>
       </section>
 
       <section
-        id="dashboard-journey-matching"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.04)] lg:p-8"
-        style={staggerStyle(80)}
+        id="dashboard-block-active"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
+        style={staggerStyle(120)}
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -558,22 +695,19 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
                 <MatchingIcon className="h-4 w-4" />
               </span>
-              Matching
+              Aktive Themen
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Einladungen, laufende Matches und Reports</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Hier behältst du den Überblick darüber, welche Gespräche laufen, welche Einladungen offen sind und welche Matching-Reports bereits bereitstehen.
+              Hier landen nur die laufenden Dinge: Einladungen, Reports und Workbooks. Reports ohne Workbook bleiben sichtbar, laufende Workbooks bekommen ihren eigenen Platz.
             </p>
           </div>
-          <Link href="/invite/new" className={hasSubmittedBase ? INVITE_CTA_CLASS : UTILITY_CTA_CLASS}>
-            Co-Founder einladen
-          </Link>
         </div>
 
-        <div className="mt-6 grid gap-5 xl:grid-cols-3">
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(120)}>
+        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(150)}>
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Aktive Einladungen</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Gesendete Einladungen</h3>
               <span className="text-xs tracking-[0.08em] text-slate-500">{sentInvitesSorted.length}</span>
             </div>
             <div className="mt-4">
@@ -589,9 +723,7 @@ export default async function DashboardPage({
                 </ul>
               ) : (
                 <p className="text-sm leading-7 text-slate-500">
-                  {hasSubmittedBase
-                    ? "Noch keine aktiven Einladungen. Sobald du jemanden einlädst, siehst du den Status hier."
-                    : "Sobald dein Basisprofil steht, kannst du von hier aus Co-Founder einladen."}
+                  Noch keine gesendeten Einladungen. Sobald Matching startet, erscheint der operative Status hier.
                 </p>
               )}
 
@@ -616,7 +748,7 @@ export default async function DashboardPage({
             </div>
           </article>
 
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(160)}>
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(180)}>
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
               <span className="text-xs tracking-[0.08em] text-slate-500">{receivedInvitesSorted.length}</span>
@@ -634,7 +766,7 @@ export default async function DashboardPage({
                 </ul>
               ) : (
                 <p className="text-sm leading-7 text-slate-500">
-                  Noch keine Einladungen an dich. Neue Matching-Anfragen tauchen hier auf.
+                  Noch keine Einladungen an dich. Neue Matching-Anfragen tauchen hier auf, sobald sie aktiv sind.
                 </p>
               )}
 
@@ -659,19 +791,15 @@ export default async function DashboardPage({
             </div>
           </article>
 
-          <article
-            id="dashboard-journey-conversation"
-            className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-5`}
-            style={staggerStyle(200)}
-          >
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-slate-900">Bereite Matching-Reports</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{readyReports.length}</span>
+              <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
             </div>
             <div className="mt-4">
-              {readyReports.length > 0 ? (
+              {reportsWithoutWorkbook.length > 0 ? (
                 <ul className="space-y-3">
-                  {readyReports.map((run) => {
+                  {reportsWithoutWorkbook.map((run) => {
                     const invitation = Array.isArray(run.invitations)
                       ? run.invitations[0] ?? null
                       : run.invitations;
@@ -684,18 +812,67 @@ export default async function DashboardPage({
                           Module: {formatInvitationModules(run.modules ?? [])}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>
-                        <a href={`/report/${run.invitation_id}`} className={`mt-3 ${REPORT_CTA_CLASS}`}>
-                          Report öffnen
-                        </a>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
+                            Report öffnen
+                          </Link>
+                          <Link
+                            href={buildWorkbookHref(
+                              run.invitation_id,
+                              invitationById.get(run.invitation_id)?.teamContext ?? null
+                            )}
+                            className={UTILITY_CTA_CLASS}
+                          >
+                            Workbook starten
+                          </Link>
+                        </div>
                       </li>
                     );
                   })}
                 </ul>
               ) : (
                 <p className="text-sm leading-7 text-slate-500">
-                  {hasMatchingActivity
-                    ? "Sobald aus euren Einladungen fertige Matches werden, erscheinen die Reports hier."
-                    : "Noch keine Matching-Reports vorhanden. Sie erscheinen, sobald beide Seiten ihre Profile abgeschlossen haben."}
+                  {readyReports.length > 0
+                    ? "Alle bereiten Reports sind bereits in laufende Workbooks überführt."
+                    : "Sobald aus euren Matching-Kontexten fertige Reports werden, erscheinen sie hier."}
+                </p>
+              )}
+            </div>
+          </article>
+
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(240)}>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Laufende Workbooks</h3>
+              <span className="text-xs tracking-[0.08em] text-slate-500">{activeWorkbooks.length}</span>
+            </div>
+            <div className="mt-4">
+              {activeWorkbooks.length > 0 ? (
+                <ul className="space-y-3">
+                  {activeWorkbooks.map((workbook) => (
+                    <li key={workbook.invitationId} className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
+                      <p className="font-medium text-slate-900">{workbook.title}</p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {workbook.isCompleted
+                          ? "Das Workbook enthält bereits belastbare Vereinbarungen."
+                          : "Das Workbook ist gestartet und sammelt konkrete Arbeitsregeln."}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Letzte Aktualisierung: {formatDate(workbook.updatedAt)}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Link href={workbook.href} className={REPORT_CTA_CLASS}>
+                          Workbook öffnen
+                        </Link>
+                        <Link href={`/report/${workbook.invitationId}`} className={UTILITY_CTA_CLASS}>
+                          Report ansehen
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm leading-7 text-slate-500">
+                  Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, erscheint das Workbook hier als laufendes Thema.
                 </p>
               )}
             </div>
@@ -704,19 +881,45 @@ export default async function DashboardPage({
       </section>
 
       <section
-        id="dashboard-journey-workbook"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
-        style={staggerStyle(120)}
+        id="dashboard-block-modules"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/92 p-6"
+        style={staggerStyle(140)}
       >
-        <h2 className="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.08em] text-slate-900">
-          <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-            <LayersIcon className="h-4 w-4" />
-          </span>
-          Ausblick
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          Weitere Module wie Stress & Belastung, Rollenverständnis oder Team-Reports bauen auf demselben Founder-Profil auf und werden hier später als zusätzliche Layer ergänzt.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+                <LayersIcon className="h-4 w-4" />
+              </span>
+              Weitere Module
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Strukturell offen für den nächsten Ausbau</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              Dieses Dashboard bleibt nicht beim Erst-Matching stehen. Die Oberfläche ist jetzt so sortiert, dass spätere Re-Alignment-, Entwicklungs- oder Partner-Module sauber anschließen können.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+            <p className="text-sm font-semibold text-slate-900">Re-Alignment</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Für spätere Check-ins, neue Spannungen und veränderte Rollen nach den ersten Arbeitsphasen.
+            </p>
+          </article>
+          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+            <p className="text-sm font-semibold text-slate-900">Entwicklung</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Raum für vertiefende Module, Lernpfade und thematische Follow-ups auf Basis von Report und Workbook.
+            </p>
+          </article>
+          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+            <p className="text-sm font-semibold text-slate-900">Programme & Partner</p>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Anschlussfähig für Accelerator-, Advisor- oder Investorenlogiken, ohne den Founder-Kernfluss zu zerreißen.
+            </p>
+          </article>
+        </div>
       </section>
 
       <DashboardDevSection
@@ -792,6 +995,40 @@ function sortInvitationsByCreatedAtDesc(invites: InvitationDashboardRow[]) {
   });
 }
 
+function buildWorkbookHref(
+  invitationId: string,
+  teamContext: InvitationDashboardRow["teamContext"] | null
+) {
+  const base = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}`;
+  return teamContext ? `${base}&teamContext=${encodeURIComponent(teamContext)}` : base;
+}
+
+function formatDashboardInvitationTitle(invitation: InvitationDashboardRow | null) {
+  if (!invitation) return "Workbook";
+  return invitation.label?.trim() || invitation.inviteeEmail || invitation.id;
+}
+
+function countWorkbookContentSignals(
+  payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>
+) {
+  let count = 0;
+
+  for (const step of Object.values(payload.steps)) {
+    if (step.founderA.trim()) count += 1;
+    if (step.founderB.trim()) count += 1;
+    if (step.agreement.trim()) count += 1;
+    if (step.advisorNotes.trim()) count += 1;
+  }
+
+  if (payload.advisorClosing.observations.trim()) count += 1;
+  if (payload.advisorClosing.questions.trim()) count += 1;
+  if (payload.advisorClosing.nextSteps.trim()) count += 1;
+  if (payload.founderReaction.status) count += 1;
+  if (payload.founderReaction.comment.trim()) count += 1;
+
+  return count;
+}
+
 function renderInvitationCard(params: {
   invite: InvitationDashboardRow;
   isDev: boolean;
@@ -807,10 +1044,7 @@ function renderInvitationCard(params: {
       <p className="text-xs text-slate-500">Ablauf: {formatDate(invite.expiresAt)}</p>
       <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
       {invite.isReportReady ? (
-        <a
-          href={`/report/${invite.id}`}
-          className={`mt-2 ${REPORT_CTA_CLASS}`}
-        >
+        <a href={`/report/${invite.id}`} className={`mt-2 ${REPORT_CTA_CLASS}`}>
           Report öffnen
         </a>
       ) : null}
@@ -898,14 +1132,6 @@ function CompassIcon({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-function ValuesIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25s-6.75-4.24-6.75-10.09A3.66 3.66 0 0112 7.78a3.66 3.66 0 016.75 2.38C18.75 16.01 12 20.25 12 20.25z" />
-    </svg>
-  );
-}
-
 function ReportIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
@@ -922,15 +1148,6 @@ function MatchingIcon({ className = "h-4 w-4" }: { className?: string }) {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 16.5L4.5 12.75 8.25 9" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 11.25H8.25m7.5 1.5H4.5" />
-    </svg>
-  );
-}
-
-function NextStepIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 12h13.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 7.5L18.75 12l-4.5 4.5" />
     </svg>
   );
 }

@@ -16,7 +16,10 @@ import {
   saveFounderAlignmentWorkbook,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
-import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
+import {
+  WORKBOOK_STEP_CONTENT,
+  type WorkbookStructuredOutputField,
+} from "@/features/reporting/founderAlignmentWorkbookStepContent";
 import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   resolveFounderAlignmentWorkbookSteps,
@@ -61,6 +64,7 @@ type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
 type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
 type WorkbookEditingMode = "personal" | "joint";
+type StructuredAgreementValues = Record<string, string>;
 
 const AGREEMENT_DRAFT_META: Record<
   FounderAlignmentWorkbookStepId,
@@ -256,6 +260,7 @@ const DEFAULT_SPEECH_LANGUAGE = AVAILABLE_SPEECH_LANGUAGES[0];
 const DICTATION_INACTIVITY_MS = 9000;
 const DICTATION_RESTART_MS = 250;
 const WORKBOOK_AUTOSAVE_DELAY_MS = 1800;
+const DECISION_RULES_STEP_ID: FounderAlignmentWorkbookStepId = "decision_rules";
 
 export function FounderAlignmentWorkbookClient({
   invitationId,
@@ -348,12 +353,23 @@ export function FounderAlignmentWorkbookClient({
     : `/founder-alignment/workbook/print?teamContext=${teamContext}`;
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
+  const currentStructuredOutputFields = currentStepContent.outputFields ?? null;
+  const currentStepUsesStructuredOutput = Boolean(
+    currentStructuredOutputFields && currentStructuredOutputFields.length > 0
+  );
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
+  const currentStepIsDecisionRules = currentStep.id === DECISION_RULES_STEP_ID;
   const isFocusedStep = highlights.prioritizedStepIds.includes(currentStep.id);
   const currentAgreementDraft = agreementDrafts[currentStep.id];
   const hasBothPerspectives =
     workbook.steps[currentStep.id].founderA.trim().length > 0 &&
     workbook.steps[currentStep.id].founderB.trim().length > 0;
+  const structuredAgreement = currentStepUsesStructuredOutput && currentStructuredOutputFields
+    ? parseStructuredAgreement(
+        workbook.steps[currentStep.id].agreement,
+        currentStructuredOutputFields
+      )
+    : null;
   const showStatusSection =
     !currentStepIsAdvisorClosing &&
     (revealedStatusSteps[currentStep.id] || stepClarity[currentStep.id] !== null);
@@ -587,6 +603,27 @@ export function FounderAlignmentWorkbookClient({
         },
       },
     }));
+  }
+
+  function updateStructuredAgreementField(
+    field: string,
+    value: string
+  ) {
+    if (!currentStepUsesStructuredOutput || !currentStructuredOutputFields) {
+      return;
+    }
+
+    const currentAgreement = parseStructuredAgreement(
+      workbook.steps[currentStep.id].agreement,
+      currentStructuredOutputFields
+    );
+    updateEntry(
+      "agreement",
+      serializeStructuredAgreement(currentStructuredOutputFields, {
+        ...currentAgreement,
+        [field]: value,
+      })
+    );
   }
 
   function updateAdvisorClosing(field: AdvisorClosingField, value: string) {
@@ -1529,12 +1566,27 @@ export function FounderAlignmentWorkbookClient({
                 <StepSection title="Eure Perspektiven" className="mt-8 border-slate-200 bg-slate-50/70">
                   <p className="text-sm leading-7 text-slate-700">
                     {t(
-                      "Haltet hier zunaechst eure individuelle Sicht fest. Diese Felder beschreiben noch keine Einigung, sondern machen sichtbar, welche Prioritaeten, Erwartungen oder Bedenken jede Person in dieses Thema einbringt."
+                      currentStepUsesStructuredOutput
+                        ? "Haltet hier knapp fest, welche Regel, Grenze oder Ausnahme ihr fuer dieses Szenario setzen wuerdet. Es geht nicht um Grundsaetze, sondern um euren tatsaechlichen Arbeitsmodus."
+                        : "Haltet hier zunaechst eure individuelle Sicht fest. Diese Felder beschreiben noch keine Einigung, sondern machen sichtbar, welche Prioritaeten, Erwartungen oder Bedenken jede Person in dieses Thema einbringt."
                     )}
                   </p>
 
+                  {currentStepUsesStructuredOutput && currentStepContent.scenario ? (
+                    <div className="mt-6 rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
+                        Realitaetsszenario
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">
+                        {t(currentStepContent.scenario)}
+                      </p>
+                    </div>
+                  ) : null}
+
                   <div className="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6">
-                    <p className="text-sm font-semibold text-slate-900">{t("Fragen fuer eure Reflexion")}</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {t(currentStepUsesStructuredOutput ? "Konkrete Entscheidungsfragen" : "Fragen fuer eure Reflexion")}
+                    </p>
                     <ul className="mt-4 grid gap-3">
                       {currentStep.prompts.map((prompt) => (
                         <li
@@ -1556,7 +1608,11 @@ export function FounderAlignmentWorkbookClient({
                       }
                       value={workbook.steps[currentStep.id].founderA}
                       onChange={(value) => updateEntry("founderA", value)}
-                      placeholder={t("Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?")}
+                      placeholder={t(
+                        currentStepUsesStructuredOutput
+                          ? "Welche Regel, Schwelle oder Ausnahme wuerdest du fuer dieses Szenario festlegen?"
+                          : "Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?"
+                      )}
                       readOnly={!canEditField("founderA")}
                       helperText={getFieldReadOnlyHint("founderA")}
                     />
@@ -1568,7 +1624,11 @@ export function FounderAlignmentWorkbookClient({
                       }
                       value={workbook.steps[currentStep.id].founderB}
                       onChange={(value) => updateEntry("founderB", value)}
-                      placeholder={t("Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?")}
+                      placeholder={t(
+                        currentStepUsesStructuredOutput
+                          ? "Welche Regel, Schwelle oder Ausnahme wuerdest du fuer dieses Szenario festlegen?"
+                          : "Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?"
+                      )}
                       readOnly={!canEditField("founderB")}
                       helperText={getFieldReadOnlyHint("founderB")}
                     />
@@ -1576,94 +1636,140 @@ export function FounderAlignmentWorkbookClient({
                 </StepSection>
 
                 <StepSection
-                  title="Gemeinsame Vereinbarung"
+                  title={
+                    currentStepUsesStructuredOutput
+                      ? currentStepIsDecisionRules
+                        ? "Entscheidungs-Output"
+                        : "Verbindlicher Output"
+                      : "Gemeinsame Vereinbarung"
+                  }
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[color:var(--brand-primary)]/5"
                 >
                   <p className="text-sm leading-7 text-slate-700">
                     {t(
-                      "Haltet hier fest, welche konkrete Entscheidung, Regel oder feste Arbeitsweise fuer euch kuenftig gelten soll. Der Fokus liegt nicht auf einer Zusammenfassung, sondern auf einer klaren Orientierung fuer euren Alltag als Gruenderteam."
+                      currentStepUsesStructuredOutput
+                        ? "Haltet hier drei Regeln fest, die im Alltag direkt greifen. Jede Regel sollte sagen, wer entscheidet, wann sie gilt und woran ihr die Grenze erkennt."
+                        : "Haltet hier fest, welche konkrete Entscheidung, Regel oder feste Arbeitsweise fuer euch kuenftig gelten soll. Der Fokus liegt nicht auf einer Zusammenfassung, sondern auf einer klaren Orientierung fuer euren Alltag als Gruenderteam."
                     )}
                   </p>
 
-                  <div className="mt-5 flex flex-col gap-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <ReportActionButton
-                        type="button"
-                        variant="utility"
-                        onClick={createAgreementDraft}
-                        className={!hasBothPerspectives ? "pointer-events-none opacity-50" : ""}
-                      >
-                        {currentAgreementDraft
-                          ? t("Vorschlag aus euren Antworten aktualisieren")
-                          : t("Vorschlag aus euren Antworten erstellen")}
-                      </ReportActionButton>
-                      {!hasBothPerspectives ? (
-                        <p className="text-xs leading-6 text-slate-500">
-                          {t("Der Vorschlag ist verfuegbar, sobald beide Perspektiven ausgefuellt sind.")}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    {currentAgreementDraft ? (
-                      <div className="rounded-3xl border border-slate-200 bg-white/90 p-5">
-                        <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 md:grid-cols-2">
-                          <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                              {t("Gemeinsame Grundlage")}
-                            </p>
-                            <ul className="mt-3 space-y-2">
-                              {currentAgreementDraft.commonGround.map((item) => (
-                                <li key={item} className="text-sm leading-6 text-slate-700">
-                                  • {t(item)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                              {t("Unterschiedliche Perspektiven")}
-                            </p>
-                            <ul className="mt-3 space-y-2">
-                              {currentAgreementDraft.differingPerspectives.map((item) => (
-                                <li key={item} className="text-sm leading-6 text-slate-700">
-                                  • {t(item)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          {t("Vorschlag fuer eure gemeinsame Vereinbarung")}
-                        </p>
-                        <p className="mt-2 text-xs leading-6 text-slate-500">
-                          {t(
-                            "Dieser Vorschlag basiert auf euren beiden Perspektiven und ist als gemeinsamer Arbeitsentwurf gedacht. Ihr koennt ihn uebernehmen, anpassen oder vollstaendig neu formulieren."
-                          )}
-                        </p>
-                        <p className="mt-3 text-sm leading-7 text-slate-700">
-                          {t(currentAgreementDraft.draft)}
-                        </p>
-                        <div className="mt-4 flex flex-wrap gap-3">
-                          <ReportActionButton type="button" onClick={applyAgreementDraft}>
-                            {t("Vorschlag uebernehmen")}
-                          </ReportActionButton>
-                        </div>
+                  {currentStepUsesStructuredOutput && structuredAgreement && currentStructuredOutputFields ? (
+                    <>
+                      <div className="mt-6 grid gap-5">
+                        {currentStructuredOutputFields.map((field) => (
+                          <WorkbookField
+                            key={field.key}
+                            title={t(field.title)}
+                            value={structuredAgreement[field.key]}
+                            onChange={(value) =>
+                              updateStructuredAgreementField(field.key, value)
+                            }
+                            placeholder={t(field.placeholder)}
+                            highlight={field.highlight === true}
+                            readOnly={!canEditField("agreement")}
+                            helperText={t(
+                              canEditField("agreement")
+                                ? field.helperText
+                                : getFieldReadOnlyHint("agreement") ?? ""
+                            )}
+                          />
+                        ))}
                       </div>
-                    ) : null}
-                  </div>
 
-                  <div className="mt-6">
-                    <WorkbookField
-                      title=""
-                      value={workbook.steps[currentStep.id].agreement}
-                      onChange={(value) => updateEntry("agreement", value)}
-                      placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
-                      highlight
-                      readOnly={!canEditField("agreement")}
-                      helperText={getFieldReadOnlyHint("agreement")}
-                    />
-                  </div>
+                      {currentStepContent.riskHint ? (
+                        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
+                            Risiko-Hinweis
+                          </p>
+                          <p className="mt-2 text-sm leading-7 text-slate-700">
+                            {t(currentStepContent.riskHint)}
+                          </p>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <div className="mt-5 flex flex-col gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <ReportActionButton
+                            type="button"
+                            variant="utility"
+                            onClick={createAgreementDraft}
+                            className={!hasBothPerspectives ? "pointer-events-none opacity-50" : ""}
+                          >
+                            {currentAgreementDraft
+                              ? t("Vorschlag aus euren Antworten aktualisieren")
+                              : t("Vorschlag aus euren Antworten erstellen")}
+                          </ReportActionButton>
+                          {!hasBothPerspectives ? (
+                            <p className="text-xs leading-6 text-slate-500">
+                              {t("Der Vorschlag ist verfuegbar, sobald beide Perspektiven ausgefuellt sind.")}
+                            </p>
+                          ) : null}
+                        </div>
+
+                        {currentAgreementDraft ? (
+                          <div className="rounded-3xl border border-slate-200 bg-white/90 p-5">
+                            <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 md:grid-cols-2">
+                              <div>
+                                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                  {t("Gemeinsame Grundlage")}
+                                </p>
+                                <ul className="mt-3 space-y-2">
+                                  {currentAgreementDraft.commonGround.map((item) => (
+                                    <li key={item} className="text-sm leading-6 text-slate-700">
+                                      • {t(item)}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              <div>
+                                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                  {t("Unterschiedliche Perspektiven")}
+                                </p>
+                                <ul className="mt-3 space-y-2">
+                                  {currentAgreementDraft.differingPerspectives.map((item) => (
+                                    <li key={item} className="text-sm leading-6 text-slate-700">
+                                      • {t(item)}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                              {t("Vorschlag fuer eure gemeinsame Vereinbarung")}
+                            </p>
+                            <p className="mt-2 text-xs leading-6 text-slate-500">
+                              {t(
+                                "Dieser Vorschlag basiert auf euren beiden Perspektiven und ist als gemeinsamer Arbeitsentwurf gedacht. Ihr koennt ihn uebernehmen, anpassen oder vollstaendig neu formulieren."
+                              )}
+                            </p>
+                            <p className="mt-3 text-sm leading-7 text-slate-700">
+                              {t(currentAgreementDraft.draft)}
+                            </p>
+                            <div className="mt-4 flex flex-wrap gap-3">
+                              <ReportActionButton type="button" onClick={applyAgreementDraft}>
+                                {t("Vorschlag uebernehmen")}
+                              </ReportActionButton>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-6">
+                        <WorkbookField
+                          title=""
+                          value={workbook.steps[currentStep.id].agreement}
+                          onChange={(value) => updateEntry("agreement", value)}
+                          placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
+                          highlight
+                          readOnly={!canEditField("agreement")}
+                          helperText={getFieldReadOnlyHint("agreement")}
+                        />
+                      </div>
+                    </>
+                  )}
                 </StepSection>
 
                 {showAdvisorNotesSection ? (
@@ -2563,6 +2669,58 @@ function buildNextStepRecommendations(
   });
 
   return Array.from(new Set(recommendations));
+}
+
+function escapeRegexPattern(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function parseStructuredAgreement(
+  input: string,
+  fields: WorkbookStructuredOutputField[]
+): StructuredAgreementValues {
+  const trimmedInput = input.trim();
+  const fallback = Object.fromEntries(fields.map((field) => [field.key, ""]));
+
+  if (!trimmedInput) {
+    return fallback;
+  }
+
+  const matches = fields.map((field, index) => {
+    const nextTitles = fields
+      .slice(index + 1)
+      .map((nextField) => escapeRegexPattern(nextField.title))
+      .join("|");
+    const boundary = nextTitles ? `(?:\\n\\s*\\n(?:${nextTitles}):|$)` : "$";
+    const pattern = new RegExp(
+      `${escapeRegexPattern(field.title)}:\\s*([\\s\\S]*?)${boundary}`
+    );
+
+    return {
+      key: field.key,
+      value: trimmedInput.match(pattern)?.[1]?.trim() ?? "",
+    };
+  });
+
+  const hasAnyMatch = matches.some((match) => match.value.length > 0);
+
+  if (!hasAnyMatch) {
+    return {
+      ...fallback,
+      [fields[0]?.key ?? "value"]: trimmedInput,
+    };
+  }
+
+  return Object.fromEntries(matches.map((match) => [match.key, match.value]));
+}
+
+function serializeStructuredAgreement(
+  fields: WorkbookStructuredOutputField[],
+  values: StructuredAgreementValues
+) {
+  return fields
+    .map((field) => `${field.title}: ${(values[field.key] ?? "").trim()}`)
+    .join("\n\n");
 }
 
 function serializeWorkbookPayload(payload: FounderAlignmentWorkbookPayload) {
