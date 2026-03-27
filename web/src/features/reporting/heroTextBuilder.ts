@@ -75,9 +75,9 @@ const WORK_MODE_SENTENCES: DimensionSentenceMap = {
     left: "Sichtbar wird das im Alltag daran, dass du Themen schnell danach sortierst, was Reichweite schafft und den größten Hebel hat.",
     center: (band) =>
       band === "balanced"
-        ? "Im Alltag wechselst du spürbar zwischen Marktfenster und Aufbaufrage, je nachdem, was gerade Vorrang braucht."
-        : "Im Alltag prüfst du oft parallel, was kurz wirkt und was das Unternehmen langfristig trägt.",
-    right: "Im Alltag gibst du vor allem den Themen Raum, die das Fundament stärken und später noch belastbar sind.",
+        ? "Je nach Lage wechselst du spürbar zwischen Marktfenster und Aufbaufrage."
+        : "Oft prüfst du parallel, was kurz wirkt und was das Unternehmen langfristig trägt.",
+    right: "Im Tagesgeschäft gibst du vor allem den Themen Raum, die das Fundament stärken und später noch belastbar sind.",
   },
   Entscheidungslogik: {
     left: "Im Arbeiten merkt man das daran, dass du offene Annahmen sichtbar machen willst, bevor ihr euch festlegt.",
@@ -88,35 +88,35 @@ const WORK_MODE_SENTENCES: DimensionSentenceMap = {
     right: "Im Arbeiten setzt du lieber den nächsten Schritt, sobald für dich genug Kontur da ist.",
   },
   Risikoorientierung: {
-    left: "Im Alltag gibst du Themen eher dann frei, wenn Grenzen, Kosten und Puffer sichtbar genug sind.",
+    left: "Im Tagesgeschäft gibst du Themen eher dann frei, wenn Grenzen, Kosten und Puffer sichtbar genug sind.",
     center: (band) =>
       band === "balanced"
-        ? "Im Alltag liest du Risiko situativ und gehst mal vorsichtiger, mal offensiver vor."
-        : "Im Alltag entscheidest du oft danach, wann Absicherung reicht und wann Mut den größeren Effekt hat.",
-    right: "Im Alltag gehst du schneller in Tests, Wetten und Bewegung, wenn du echten Spielraum erkennst.",
+        ? "Je nach Lage liest du Risiko situativ und gehst mal vorsichtiger, mal offensiver vor."
+        : "Oft entscheidest du danach, wann Absicherung reicht und wann Mut den größeren Effekt hat.",
+    right: "Sobald du echten Spielraum erkennst, gehst du schneller in Tests, Wetten und Bewegung.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Im Alltag arbeitest du lieber eigenständig vor und willst nicht jeden Zwischenschritt gemeinsam kalibrieren.",
+    left: "Am liebsten arbeitest du eigenständig vor und willst nicht jeden Zwischenschritt gemeinsam kalibrieren.",
     center: (band) =>
       band === "balanced"
-        ? "Im Alltag wechselst du zwischen eigenem Raum und enger Rückkopplung, je nachdem, worum es gerade geht."
-        : "Im Alltag dosierst du Abstimmung so, dass sie Orientierung gibt, aber nicht jeden Schritt begleitet.",
+        ? "Je nach Aufgabe wechselst du zwischen eigenem Raum und enger Rückkopplung."
+        : "Oft dosierst du Austausch so, dass er Orientierung gibt, aber nicht jeden Schritt begleitet.",
     right: "Im täglichen Arbeiten willst du laufend wissen, wo Dinge stehen, was entschieden ist und wo noch etwas offen bleibt.",
   },
   Commitment: {
-    left: "Im Alltag planst du Verfügbarkeit und Einsatz so, dass das Startup Platz hat, aber nicht alles andere verdrängt.",
+    left: "Du planst Verfügbarkeit und Einsatz so, dass das Startup Platz hat, aber nicht alles andere verdrängt.",
     center: (band) =>
       band === "balanced"
-        ? "Im Alltag schaltest du dein Einsatzniveau je nach Phase hoch oder runter, statt immer denselben Modus zu fahren."
-        : "Im Alltag ziehst du Intensität oft dann hoch, wenn sie begründet ist, und nimmst sie wieder raus, wenn der Druck sinkt.",
-    right: "Im Alltag behandelst du das Startup als klaren Schwerpunkt und liest Zusammenarbeit auch über dieses Fokusniveau.",
+        ? "Je nach Phase schaltest du dein Einsatzniveau hoch oder runter, statt immer denselben Modus zu fahren."
+        : "Oft ziehst du Intensität dann hoch, wenn sie begründet ist, und nimmst sie wieder raus, wenn der Druck sinkt.",
+    right: "Im Alltag behandelst du das Startup als klaren Schwerpunkt und liest das Miteinander auch über dieses Fokusniveau.",
   },
   Konfliktstil: {
-    left: "Im Alltag suchst du eher erst etwas Abstand, bevor du heikle Punkte klar ansprichst.",
+    left: "Bei heiklen Punkten suchst du eher erst etwas Abstand, bevor du sie klar ansprichst.",
     center: (band) =>
       band === "balanced"
-        ? "Im Alltag entscheidest du je nach Situation, ob etwas sofort auf den Tisch muss oder erst kurz reifen soll."
-        : "Im Alltag steuerst du bewusst, wann Direktheit hilft und wann mehr Timing klüger ist.",
+        ? "Je nach Situation entscheidest du, ob etwas sofort auf den Tisch muss oder erst kurz reifen soll."
+        : "Oft steuerst du, wann Direktheit hilft und wann mehr Timing klüger ist.",
     right: "Im Alltag merkt man das daran, dass du Spannungen eher früh sichtbar machst, statt sie länger im Hintergrund laufen zu lassen.",
   },
 };
@@ -182,7 +182,7 @@ function resolveSentence(
 
 function resolveImpactSentence(input: HeroTextInput) {
   if (input.balancedProfile) {
-    return "Im Miteinander macht dich das beweglich; fehlen klare Absprachen, bleibt schnell offen, wer woran zieht und welches Tempo gerade gilt.";
+    return "Im Miteinander macht dich das beweglich; ohne klare Absprachen bleibt aber schnell offen, wer woran zieht und welches Tempo gerade gilt.";
   }
 
   if (!input.tensionCarrier) {
@@ -191,11 +191,11 @@ function resolveImpactSentence(input: HeroTextInput) {
 
   switch (input.tensionCarrier.family) {
     case "direction":
-      return "Im Team wird dadurch schnell klar, worauf es hinauslaufen soll; fehlen gemeinsame Prioritäten, zieht ihr an entscheidenden Stellen leicht in unterschiedliche Richtungen.";
+      return "Im Team wird dadurch schnell klar, worauf es hinauslaufen soll; fehlen gemeinsame Prioritäten, zieht ihr an wichtigen Stellen leicht in unterschiedliche Richtungen.";
     case "decision_under_uncertainty":
-      return "Für die Zusammenarbeit bringt das Richtung, doch ohne gemeinsames Verständnis von Risiko und Entscheidung bleibt Tempo liegen oder kippt dauernd.";
+      return "Im Alltag gibt das zwar Richtung, doch ohne gemeinsames Verständnis von Risiko und Entscheidung bleibt Tempo liegen oder kippt dauernd.";
     case "collaboration_under_pressure":
-      return "Im Miteinander zeigt sich das sofort an Abstimmung, Verfügbarkeit und Ton; wird das unterschiedlich gelesen, arbeitet ihr schnell aneinander vorbei.";
+      return "Im Miteinander zeigt sich das sofort an Austausch, Verfügbarkeit und Ton; wird das unterschiedlich gelesen, arbeitet ihr schnell aneinander vorbei.";
     default:
       return "Für die Zusammenarbeit bringt das schnell Struktur, doch ohne offene Absprachen geraten Tempo, Erwartungen und Zuständigkeiten leicht durcheinander.";
   }
@@ -235,7 +235,7 @@ export function buildHeroText(input: HeroTextInput): string {
 
   const workModeSentence =
     buildWorkModeSentence(input.workModeSignal) ??
-    "Im Alltag zeigt sich das in einer Arbeitsweise, die anderen früh spürbar macht, wie du Tempo, Abstimmung und Entscheidungen behandelst.";
+    "Im Alltag wird daran früh spürbar, wie du Tempo, Austausch und Entscheidungen behandelst.";
 
   const tensionSentence =
     buildTensionSentence(input.tensionCarrier) ??

@@ -15,7 +15,7 @@ test("complement text builder returns deterministic cards for the tracked audit 
           role: "counterweight",
           title: "Mehr Luft im Einsatz",
           description:
-            "Stark wird es oft mit einem Gegenüber, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltag früh sichtbar macht. Die Ergänzung liegt darin, Tempo ernst zu nehmen, ohne jeden Rahmen gleich hochzuziehen. So wird aus Intensität seltener stiller Druck auf andere.",
+            "Hilfreich ist oft ein Gegenüber, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltag früh sichtbar macht. Die Ergänzung liegt darin, Tempo ernst zu nehmen, ohne jeden Rahmen gleich hochzuziehen. So wird aus Intensität seltener stiller Druck auf andere.",
         },
         {
           role: "regulator",
@@ -61,7 +61,7 @@ test("complement text builder returns deterministic cards for the tracked audit 
           role: "counterweight",
           title: "Mehr Zug nach vorn",
           description:
-            "Stark wird es oft mit einem Gegenüber, das Marktfenster und Hebel schnell erkennt, ohne deinen Blick auf Substanz kleinzumachen. Die Ergänzung liegt darin, Bewegung zu erzeugen, während du Tragfähigkeit absicherst. So bleibt Aufbau nicht hängen, wenn eigentlich ein klarer nächster Schritt auf dem Tisch liegt.",
+            "Hilfreich ist oft ein Gegenüber, das Marktfenster und Hebel schnell erkennt, ohne deinen Blick auf Substanz kleinzumachen. Die Ergänzung liegt darin, Bewegung auszulösen, während du Tragfähigkeit absicherst. So bleibt Aufbau nicht hängen, wenn eigentlich ein klarer nächster Schritt auf dem Tisch liegt.",
         },
         {
           role: "regulator",
@@ -73,7 +73,7 @@ test("complement text builder returns deterministic cards for the tracked audit 
           role: "rhythm_partner",
           title: "Direkt und trotzdem ruhig",
           description:
-            "Leichter wird Zusammenarbeit mit Menschen, die Spannungen ernst nehmen und dabei einen guten Gesprächsrahmen halten. Die Passung liegt darin, dass deine Direktheit aufgenommen wird, ohne in Rückzug oder Verteidigung zu kippen. So bleiben heikle Gespräche schneller arbeitsfähig.",
+            "Leichter wird Zusammenarbeit mit Menschen, die Spannungen ernst nehmen und dabei einen guten Gesprächsrahmen halten. Die Passung liegt darin, dass deine Direktheit aufgenommen wird, ohne in Rückzug oder Verteidigung zu kippen. So bleiben heikle Gespräche eher arbeitsfähig.",
         },
       ],
     },

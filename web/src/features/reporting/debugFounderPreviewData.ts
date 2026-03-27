@@ -87,7 +87,7 @@ export type FounderAlignmentReportPreviewState = {
   scoringResult: TeamScoringResult;
 };
 
-const PREVIEW_VALUES_TOTAL = 10;
+const PREVIEW_VALUES_TOTAL = 12;
 
 const PREVIEW_TEAMS: Record<FounderPreviewMode, PreviewTeam> = {
   pre_founder: {

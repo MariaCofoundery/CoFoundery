@@ -44,7 +44,7 @@ test("pattern text builder returns deterministic cards for the tracked audit cas
         {
           title: "Nähe bewusst dosieren",
           description:
-            "Du wechselst im Arbeiten zwischen Eigenraum und enger Rückkopplung, je nachdem, worum es gerade geht. Im Alltag suchst du nicht automatisch Distanz oder Nähe, sondern steuerst beides bewusst. Wenn das im Team nicht ausgesprochen wird, arbeitet ihr leicht mit unterschiedlichen Erwartungen an denselben Prozess.",
+            "Du wechselst im Arbeiten zwischen Eigenraum und enger Rückkopplung, je nachdem, worum es gerade geht. Dabei suchst du nicht automatisch Distanz oder Nähe, sondern steuerst beides bewusst. Wenn das im Team nicht ausgesprochen wird, arbeitet ihr leicht mit unterschiedlichen Erwartungen an denselben Prozess.",
         },
       ],
     },
@@ -64,7 +64,7 @@ test("pattern text builder returns deterministic cards for the tracked audit cas
         {
           title: "Mut mit Augenmaß",
           description:
-            "Du liest Risiko situativ und gehst mal vorsichtiger, mal offensiver vor. Im Alltag wechselst du zwischen Absicherung und Vorwärtsgang, statt immer dieselbe Schwelle anzulegen. Das funktioniert gut, solange für andere sichtbar bleibt, wo deine Grenze gerade liegt.",
+            "Du liest Risiko situativ und gehst mal vorsichtiger, mal offensiver vor. Im Alltag wechselst du zwischen Absicherung und Vorwärtsgang, statt immer dieselbe Schwelle anzulegen. Das bleibt gut lesbar, solange für andere sichtbar ist, wo deine Grenze gerade liegt.",
         },
       ],
     },

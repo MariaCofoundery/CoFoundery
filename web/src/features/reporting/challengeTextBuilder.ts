@@ -176,7 +176,7 @@ const FRICTION_TAILS = {
     decision_under_uncertainty:
       "Vorangehen wird dann schnell selbst zum Verhandlungsthema.",
     collaboration_under_pressure:
-      "Dann kostet schon der Arbeitsmodus mehr Energie als die Sache selbst.",
+      "So kostet schon die Art zu arbeiten mehr Energie als die Sache selbst.",
   },
   moderate_coordination_risk: {
     direction:
@@ -192,7 +192,7 @@ const FRICTION_TAILS = {
     decision_under_uncertainty:
       "Ohne diesen Punkt dreht sich Diskussion schnell im Kreis.",
     collaboration_under_pressure:
-      "Fehlt das, arbeitet ihr eher nebeneinander als miteinander.",
+      "Fehlt das, arbeitet ihr leicht nebeneinander statt wirklich zusammen.",
   },
 } as const;
 

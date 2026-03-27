@@ -25,6 +25,7 @@ export function ComparisonScale({
   const b = normalizeScore(scoreB, valueScale);
   const left = a != null ? toPercent(a, valueScale) : null;
   const right = b != null ? toPercent(b, valueScale) : null;
+  const markersAreClose = left != null && right != null ? Math.abs(left - right) < 7 : false;
 
   const tensionLeft =
     left != null && right != null ? Math.min(left, right) : null;
@@ -34,7 +35,7 @@ export function ComparisonScale({
   return (
     <div className="w-full">
       <div>
-        <div className="relative h-9 w-full">
+        <div className="relative h-11 w-full">
           <div className="absolute left-0 right-0 top-4 z-0 h-[3px] rounded-full bg-slate-200 print:bg-slate-300" />
           <div className="absolute left-0 right-0 top-4 z-[1] h-[3px] rounded-full bg-gradient-to-r from-[#00B8D9]/70 to-[#7C3AED]/70 print:from-[#00B8D9] print:to-[#7C3AED]" />
 
@@ -51,6 +52,8 @@ export function ComparisonScale({
               color="#00B8D9"
               text={markerA}
               title={participantAName}
+              offsetY={markersAreClose ? 0 : 4}
+              zIndex={markersAreClose ? 30 : 20}
             />
           ) : null}
 
@@ -60,13 +63,15 @@ export function ComparisonScale({
               color="#7C3AED"
               text={markerB}
               title={participantBName}
+              offsetY={markersAreClose ? 10 : 4}
+              zIndex={markersAreClose ? 20 : 20}
             />
           ) : null}
         </div>
 
-        <div className="mt-3 flex items-center justify-between text-[11px]">
-          <span className="text-[#00B8D9]">{lowLabel}</span>
-          <span className="text-[#7C3AED]">{highLabel}</span>
+        <div className="mt-2.5 flex items-start justify-between gap-6 text-[11px] leading-5">
+          <span className="max-w-[42%] text-left text-[#00B8D9]">{lowLabel}</span>
+          <span className="max-w-[42%] text-right text-[#7C3AED]">{highLabel}</span>
         </div>
       </div>
     </div>
@@ -78,20 +83,24 @@ function Marker({
   color,
   text,
   title,
+  offsetY,
+  zIndex,
 }: {
   left: number;
   color: string;
   text: string;
   title: string;
+  offsetY: number;
+  zIndex: number;
 }) {
   return (
     <div
-      className="absolute top-0 z-20 -translate-x-1/2"
-      style={{ left: `${left}%` }}
+      className="absolute -translate-x-1/2"
+      style={{ left: `${left}%`, top: `${offsetY}px`, zIndex }}
       title={title}
     >
       <span
-        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold text-white shadow-[0_4px_10px_rgba(15,23,42,0.16)] print:shadow-none"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white shadow-[0_4px_10px_rgba(15,23,42,0.16)] print:border-white print:shadow-none"
         style={{ backgroundColor: color }}
       >
         {text}

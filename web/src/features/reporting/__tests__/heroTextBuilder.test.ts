@@ -16,7 +16,7 @@ test("hero text builder returns deterministic examples for the main audit cases"
     {
       name: "komplett_balanciertes_profil",
       heroText:
-        "Je nach Aufgabe suchst du mehr Eigenraum oder mehr Rückkopplung, statt dich auf einen festen Arbeitsmodus festzulegen. Im Alltag wechselst du spürbar zwischen Marktfenster und Aufbaufrage, je nachdem, was gerade Vorrang braucht. Dann wird es schnell zäh, wenn offenbleibt, wann ihr prüft und wann ihr euch wirklich festlegen wollt. Im Miteinander macht dich das beweglich; fehlen klare Absprachen, bleibt schnell offen, wer woran zieht und welches Tempo gerade gilt.",
+        "Je nach Aufgabe suchst du mehr Eigenraum oder mehr Rückkopplung, statt dich auf einen festen Arbeitsmodus festzulegen. Je nach Lage wechselst du spürbar zwischen Marktfenster und Aufbaufrage. Dann wird es schnell zäh, wenn offenbleibt, wann ihr prüft und wann ihr euch wirklich festlegen wollt. Im Miteinander macht dich das beweglich; ohne klare Absprachen bleibt aber schnell offen, wer woran zieht und welches Tempo gerade gilt.",
     },
     {
       name: "gemischtes_profil",

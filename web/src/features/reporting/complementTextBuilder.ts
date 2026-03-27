@@ -43,7 +43,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Zug nach vorn",
         description:
-          "Stark wird es oft mit einem Gegenüber, das Marktfenster und Hebel schnell erkennt, ohne deinen Blick auf Substanz kleinzumachen. Die Ergänzung liegt darin, Bewegung zu erzeugen, während du Tragfähigkeit absicherst. So bleibt Aufbau nicht hängen, wenn eigentlich ein klarer nächster Schritt auf dem Tisch liegt.",
+          "Hilfreich ist oft ein Gegenüber, das Marktfenster und Hebel schnell erkennt, ohne deinen Blick auf Substanz kleinzumachen. Die Ergänzung liegt darin, Bewegung auszulösen, während du Tragfähigkeit absicherst. So bleibt Aufbau nicht hängen, wenn eigentlich ein klarer nächster Schritt auf dem Tisch liegt.",
       },
     },
     Entscheidungslogik: {
@@ -62,7 +62,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Gegenprüfung dabei",
         description:
-          "Stark wird es oft dort, wo dein Gegenüber Tempo nicht ausbremst, aber bei größeren Weichenstellungen sauber gegenprüft. Darin liegt der Ausgleich: Entscheidungen bleiben beweglich und bekommen trotzdem mehr Unterbau. Gerade bei folgenreichen Schritten nimmt das Druck aus zu schnellen Zuspitzungen.",
+          "Hilfreich ist oft ein Gegenüber, das Tempo nicht ausbremst, aber bei größeren Weichenstellungen sauber gegenprüft. Darin liegt der Ausgleich: Entscheidungen bleiben beweglich und bekommen trotzdem mehr Unterbau. Gerade bei folgenreichen Schritten nimmt das Druck aus schnellen Zuspitzungen.",
       },
     },
     Risikoorientierung: {
@@ -81,7 +81,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Maß im Risiko",
         description:
-          "Stark wird es oft mit Menschen, die Chancen nicht kleinreden, aber Geld, Timing und Tragbarkeit früh begrenzen. Die Ergänzung liegt darin, dass dein Vorwärtsdrang nicht gebremst, sondern sauber gerahmt wird. So muss das Team Grenzen nicht erst dann nachziehen, wenn schon viel Einsatz auf dem Tisch liegt.",
+          "Hilfreich ist oft ein Gegenüber, das Chancen nicht kleinredet, aber Geld, Timing und Tragbarkeit früh begrenzt. Die Ergänzung liegt darin, dass dein Vorwärtsdrang nicht gebremst, sondern sauber gerahmt wird. So muss das Team Grenzen nicht erst nachziehen, wenn schon viel Einsatz auf dem Tisch liegt.",
       },
     },
     "Arbeitsstruktur & Zusammenarbeit": {
@@ -119,7 +119,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Luft im Einsatz",
         description:
-          "Stark wird es oft mit einem Gegenüber, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltag früh sichtbar macht. Die Ergänzung liegt darin, Tempo ernst zu nehmen, ohne jeden Rahmen gleich hochzuziehen. So wird aus Intensität seltener stiller Druck auf andere.",
+          "Hilfreich ist oft ein Gegenüber, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltag früh sichtbar macht. Die Ergänzung liegt darin, Tempo ernst zu nehmen, ohne jeden Rahmen gleich hochzuziehen. So wird aus Intensität seltener stiller Druck auf andere.",
       },
     },
     Konfliktstil: {
@@ -138,7 +138,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Ruhe in Reibung",
         description:
-          "Stark wird es oft dort, wo dein Gegenüber Direktheit aushält, ohne selbst in Verteidigung oder Rückzug zu kippen. Die Ergänzung liegt darin, Klarheit zu halten und gleichzeitig den sozialen Druck zu senken. So kommen Themen auf den Tisch, ohne dass Gespräche sofort enger werden.",
+          "Hilfreich ist oft ein Gegenüber, das Direktheit aushält, ohne selbst in Verteidigung oder Rückzug zu kippen. Die Ergänzung liegt darin, Klarheit zu halten und gleichzeitig den sozialen Druck zu senken. So kommen Themen auf den Tisch, ohne dass Gespräche sofort enger werden.",
       },
     },
   },
@@ -270,12 +270,12 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         description: (band) =>
           band === "balanced"
             ? "Im Alltag trägt ein Gegenüber, das an Weggabelungen klar sagt, worauf ihr euch jetzt stützt. Die Passung liegt hier in Verlässlichkeit, wenn mehrere Richtungen gleichzeitig sinnvoll wirken. So bleibt Grundsatzklärung nicht dauernd nebenher offen."
-            : "Im Alltag trägt ein Gegenüber, das an Weggabelungen zügig klar macht, was jetzt führt. Die Passung liegt darin, offene Richtungsfragen nicht zu lange mitzuschleppen. So geht weniger Energie in wiederholte Grundsatzklärung.",
+            : "Im Alltag trägt ein Gegenüber, das an Weggabelungen zügig klärt, was jetzt führt. Die Passung liegt darin, offene Richtungsfragen nicht zu lange mitzuschleppen. So geht weniger Energie in wiederholte Grundsatzklärung.",
       },
       right: {
         title: "Marktfenster gut übersetzen",
         description:
-          "Im Alltag trägt ein Gegenüber, das Chancen früh erkennt und sie in Schritte übersetzt, die zu deinem Aufbauanspruch passen. Die Passung liegt darin, Bewegung und Substanz gleichzeitig arbeitsfähig zu halten. So ziehen Wachstum und Belastbarkeit seltener auseinander.",
+          "Im Alltag trägt ein Gegenüber, das Chancen früh erkennt und sie in Schritte übersetzt, die zu deinem Aufbauanspruch passen. Die Passung liegt darin, Bewegung und Substanz gleichzeitig zusammenzuhalten. So ziehen Wachstum und Belastbarkeit seltener auseinander.",
       },
     },
     Entscheidungslogik: {
@@ -289,7 +289,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         description: (band) =>
           band === "balanced"
             ? "Im Alltag trägt ein Gegenüber, das sauber markiert, wann Prüfen reicht und wann jetzt entschieden wird. Die Passung liegt hier in sichtbaren Umschaltpunkten. So müsst ihr den Entscheidungsmodus nicht jedes Mal neu aushandeln."
-            : "Im Alltag trägt ein Gegenüber, das den Wechsel zwischen Prüfen und Entscheiden gut lesen kann. Die Passung liegt darin, dass Abwägung nicht in Endlosschleifen kippt. So bleibt euer Entscheidungsrhythmus besser synchron.",
+            : "Im Alltag trägt ein Gegenüber, das den Wechsel zwischen Prüfen und Entscheiden gut lesen kann. Die Passung liegt darin, dass Abwägung nicht in Endlosschleifen kippt. So bleibt euer Entscheidungsrhythmus näher beieinander.",
       },
       right: {
         title: "Struktur im Vorangehen",
@@ -313,7 +313,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Sicherer im Vorwärtsgang",
         description:
-          "Im Alltag trägt ein Gegenüber, das Chancen ernst nimmt und gleichzeitig Leitplanken verlässlich sichtbar macht. Die Passung liegt darin, dass Tempo nicht dauernd gegen Absicherung ausgespielt wird. So bleibt Vorangehen eher gemeinsamer Schritt als Streitpunkt.",
+          "Im Alltag trägt ein Gegenüber, das Chancen ernst nimmt und gleichzeitig Leitplanken verlässlich sichtbar macht. Die Passung liegt darin, dass Tempo nicht dauernd gegen Absicherung ausgespielt wird. So bleibt Vorangehen eher gemeinsamer Schritt statt Streitpunkt.",
       },
     },
     "Arbeitsstruktur & Zusammenarbeit": {
@@ -327,7 +327,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         description: (band) =>
           band === "balanced"
             ? "Im Alltag trägt ein Gegenüber, das Nähe und Eigenraum früh sichtbar macht, statt beides still vorauszusetzen. Die Passung liegt hier in klaren Erwartungen an denselben Prozess. So arbeitet ihr seltener mit unterschiedlichen inneren Plänen."
-            : "Im Alltag trägt ein Gegenüber, das Abstimmungsbedarf früh markiert und nicht auf stilles Einvernehmen setzt. Die Passung liegt in einem lesbaren Arbeitsmodus. So wird Zusammenarbeit weniger nebenbei verhandelt.",
+            : "Im Alltag trägt ein Gegenüber, das Abstimmungsbedarf früh markiert und nicht auf stilles Einvernehmen setzt. Die Passung liegt in einem lesbaren Arbeitsmodus. So wird weniger nebenbei verhandelt, wie ihr eigentlich arbeitet.",
       },
       right: {
         title: "Verbunden, ohne festzuhalten",
@@ -339,7 +339,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       left: {
         title: "Klarer Fokus im Alltag",
         description:
-          "Im Alltag trägt ein Gegenüber, das wichtige Phasen früher auf Priorität stellt, ohne daraus eine Grundsatzfrage zu machen. Die Passung liegt darin, dass mehr Zug reinkommt, ohne deinen Rahmen dauernd in Frage zu stellen. So wird Einsatzniveau seltener zum stillen Vergleich.",
+          "Im Alltag trägt ein Gegenüber, das wichtige Phasen früher auf Priorität stellt, ohne daraus eine Grundsatzfrage zu machen. Die Passung liegt darin, dass mehr Zug reinkommt, ohne deinen Rahmen dauernd in Frage zu stellen. So wird Einsatzniveau seltener zum stillen Vergleichsmaßstab.",
       },
       center: {
         title: "Verlässlicher bei Intensität",
@@ -351,7 +351,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Tragfähig bei hohem Zug",
         description:
-          "Im Alltag trägt ein Gegenüber, das Priorität ernst nimmt und gleichzeitig Grenzen, Kapazitäten und Alltag sauber mitführt. Die Passung liegt darin, dass hohes Tempo nicht automatisch zum Maßstab für alle wird. So bleibt Fokus eher verbindend als druckvoll.",
+          "Im Alltag trägt ein Gegenüber, das Priorität ernst nimmt und gleichzeitig Grenzen, Kapazitäten und Alltag sauber mitführt. Die Passung liegt darin, dass hohes Tempo nicht automatisch zum Maßstab für alle wird. So wirkt Fokus eher verbindend als druckvoll.",
       },
     },
     Konfliktstil: {
@@ -365,7 +365,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         description: (band) =>
           band === "balanced"
             ? "Im Alltag trägt ein Gegenüber, das ein gutes Gefühl dafür hat, wann etwas sofort auf den Tisch muss und wann noch ein kurzer Abstand hilft. Die Passung liegt hier in verlässlichem Timing. So bleiben Spannungen weder liegen noch werden sie vorschnell groß."
-            : "Im Alltag trägt ein Gegenüber, das Timing und Offenheit gut austariert. Die Passung liegt darin, dass Konflikte weder dauernd verschoben noch unnötig forciert werden. So bleibt das Miteinander unter Druck stabiler.",
+            : "Im Alltag trägt ein Gegenüber, das Timing und Offenheit gut austariert. Die Passung liegt darin, dass Konflikte weder dauernd verschoben noch unnötig forciert werden. So bleibt ihr unter Druck eher gesprächsfähig.",
       },
       right: {
         title: "Direkt und trotzdem ruhig",

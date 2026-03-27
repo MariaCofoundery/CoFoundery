@@ -3,7 +3,12 @@ import test from "node:test";
 import {
   compareFounders,
   FOUNDER_MATCHING_ENGINE_EXAMPLES,
+  FOUNDER_MATCHING_TEST_CASES,
 } from "@/features/reporting/founderMatchingEngine";
+import {
+  buildHumanReadableCompareAudit,
+  runFounderMatchingAuditExamples,
+} from "@/features/reporting/founderMatchingAudit";
 
 test("compareFounders classifies a complementary but workable founder pair", () => {
   const result = FOUNDER_MATCHING_ENGINE_EXAMPLES.complementary_builders;
@@ -60,4 +65,57 @@ test("compareFounders is deterministic for direct calls", () => {
   } as const;
 
   assert.deepEqual(compareFounders(a, b), compareFounders(a, b));
+});
+
+test("compareFounders classifies a balanced but manageable pair", () => {
+  const result = FOUNDER_MATCHING_ENGINE_EXAMPLES.balanced_but_manageable_pair;
+
+  assert.equal(result.overallMatchScore, 75.53);
+  assert.equal(result.alignmentScore, 87.14);
+  assert.equal(result.workingCompatibilityScore, 68.72);
+  assert.deepEqual(
+    result.tensionMap.map((entry) => [entry.dimension, entry.tensionType]),
+    [
+      ["Risikoorientierung", "productive"],
+      ["Arbeitsstruktur & Zusammenarbeit", "coordination"],
+      ["Konfliktstil", "coordination"],
+    ]
+  );
+});
+
+test("compareFounders exposes similarity without tension for a highly similar pair", () => {
+  const result = FOUNDER_MATCHING_ENGINE_EXAMPLES.highly_similar_but_blind_spot_pair;
+
+  assert.equal(result.overallMatchScore, 92);
+  assert.equal(result.alignmentScore, 92);
+  assert.equal(result.workingCompatibilityScore, 92);
+  assert.equal(result.tensionMap.length, 0);
+  assert.ok(result.dimensions.every((entry) => entry.relationType === "similar"));
+});
+
+test("buildHumanReadableCompareAudit returns readable structure for complementary builders", () => {
+  const audit = buildHumanReadableCompareAudit(
+    FOUNDER_MATCHING_TEST_CASES.complementary_builders.a,
+    FOUNDER_MATCHING_TEST_CASES.complementary_builders.b
+  );
+
+  assert.equal(audit.dimensionOverview.length, 6);
+  assert.equal(audit.matchStructure.overallMatchScore, 74.2);
+  assert.match(audit.summary.strongestComplement, /Ergänzung|ergänzt|korrigieren/);
+  assert.equal(audit.tensionMap[0]?.dimension, "Entscheidungslogik");
+});
+
+test("runFounderMatchingAuditExamples exposes all compare demo cases", () => {
+  const demos = runFounderMatchingAuditExamples();
+
+  assert.deepEqual(Object.keys(demos), [
+    "complementary_builders",
+    "misaligned_pressure_pair",
+    "balanced_but_manageable_pair",
+    "highly_similar_but_blind_spot_pair",
+  ]);
+  assert.equal(
+    demos.highly_similar_but_blind_spot_pair.matchStructure.overallMatchScore,
+    92
+  );
 });

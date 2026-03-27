@@ -99,7 +99,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
           Das war der größere Teil. Dein Fortschritt ist sicher gespeichert und der nächste Schritt ist jetzt klar.
         </p>
         <p className="mt-2 text-sm leading-7 text-slate-700">
-          Jetzt hast du die Wahl: kurz Pause machen oder direkt mit den 10 Fragen im Werte-Modul weitermachen.
+          Jetzt hast du die Wahl: kurz Pause machen oder direkt mit den 12 Fragen im Werte-Modul weitermachen.
           Danach ist dein Teil komplett.
         </p>
         <p className="mt-2 rounded-xl border border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
@@ -124,7 +124,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
             properties={{ isRefreshFlow }}
             className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
           >
-            Jetzt durchziehen: Werte-Modul (10 Fragen)
+            Jetzt durchziehen: Werte-Modul (12 Fragen)
           </ResearchTrackedLink>
           <ResearchTrackedLink
             href={dashboardHref}

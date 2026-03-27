@@ -39,13 +39,17 @@ import {
   scoreSelfValuesProfile,
   type ValuesAnswerForScoring,
 } from "@/features/reporting/values_scoring";
-import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
+import {
+  getCanonicalValuesQuestionId,
+  getValuesQuestionVersionMismatch,
+} from "@/features/reporting/valuesQuestionMeta";
 import {
   REPORT_DIMENSIONS,
   type CompareReportJson,
   type KeyInsight,
   type RadarSeries,
   type ReportDimension,
+  type SelfValuesProfile,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
 
@@ -464,6 +468,13 @@ function assertValuesQuestionVersionContract(
     throw new Error(message);
   }
   console.error(message);
+}
+
+function isRecognizedValuesQuestion(
+  questionId: string | null | undefined,
+  category: string | null | undefined
+) {
+  return Boolean(getCanonicalValuesQuestionId(questionId)) || isValuesCategory(category);
 }
 
 async function countQuestionsByCategories(
@@ -1419,10 +1430,10 @@ export async function getLatestSelfAlignmentReport(): Promise<SelfAlignmentRepor
     assertValuesTotalCategoryContract(valuesTotalActive, contractCheck, "self_report_values");
   }
 
-  const valuesQuestionById = new Map(
-    valuesQuestionMetaRows.filter((row) => isValuesCategory(row.category)).map((row) => [row.id, row])
+  const valuesQuestionById = new Map(valuesQuestionMetaRows.map((row) => [row.id, row]));
+  const valuesAnswersForScoring = valuesAnswerRows.filter((row) =>
+    isRecognizedValuesQuestion(row.question_id, valuesQuestionById.get(row.question_id)?.category)
   );
-  const valuesAnswersForScoring = valuesAnswerRows.filter((row) => valuesQuestionById.has(row.question_id));
   const valuesAnsweredCount = valuesAnswersForScoring.length;
   const valuesModuleStatus: SessionAlignmentReport["valuesModuleStatus"] = !valuesAssessmentId
     ? "not_started"
@@ -1650,10 +1661,10 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     assertValuesCategoryContract(valuesQuestionMetaRows, "ensure_report_run_values");
     assertValuesQuestionVersionContract(valuesQuestionMetaRows, "ensure_report_run_values", { allowMissing: true });
     const valuesAnswersA = rawValuesAnswersA.filter((row) =>
-      isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category)
+      isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
     );
     const valuesAnswersB = rawValuesAnswersB.filter((row) =>
-      isValuesCategory(valuesQuestionMetaById.get(row.question_id)?.category)
+      isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
     );
     valuesAnsweredA = valuesAnswersA.length;
     valuesAnsweredB = valuesAnswersB.length;
@@ -2234,6 +2245,153 @@ export async function getReportRunSnapshotForSession(sessionId: string): Promise
 export async function getSessionAlignmentReport(sessionId: string): Promise<SessionAlignmentReport | null> {
   const snapshot = await getReportRunSnapshotForSession(sessionId);
   return snapshot?.report ?? null;
+}
+
+export async function getFounderMatchingLiveData(
+  invitationId: string
+): Promise<{
+  participantAName: string;
+  participantBName: string;
+  founderScoring: TeamScoringResult;
+  valuesProfileA: SelfValuesProfile | null;
+  valuesProfileB: SelfValuesProfile | null;
+} | null> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return null;
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    return null;
+  }
+
+  const { data: invitationData, error: invitationError } = await privileged
+    .from("invitations")
+    .select(
+      "id, inviter_user_id, invitee_user_id, invitee_email, status, created_at, accepted_at, expires_at, revoked_at"
+    )
+    .eq("id", normalizedInvitationId)
+    .maybeSingle();
+  if (invitationError || !invitationData) {
+    return null;
+  }
+
+  const invitation = invitationData as InvitationEnsureRow;
+  if (![invitation.inviter_user_id, invitation.invitee_user_id].includes(user.id)) {
+    return null;
+  }
+  if (invitation.revoked_at || invitation.status !== "accepted" || isInvitationExpired(invitation.expires_at)) {
+    return null;
+  }
+  if (!invitation.invitee_user_id) {
+    return null;
+  }
+
+  const [inviterBase, inviteeBase, inviterValues, inviteeValues] = await Promise.all([
+    getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "base"),
+    getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "base"),
+    getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "values"),
+    getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "values"),
+  ]);
+
+  if (!inviterBase || !inviteeBase) {
+    return null;
+  }
+
+  const [inviterBaseAnswers, inviteeBaseAnswers] = await Promise.all([
+    getAssessmentAnswers(privileged, inviterBase.id),
+    getAssessmentAnswers(privileged, inviteeBase.id),
+  ]);
+  const baseQuestionMetaById = await getQuestionMetaMap(privileged, [
+    ...inviterBaseAnswers.map((row) => row.question_id),
+    ...inviteeBaseAnswers.map((row) => row.question_id),
+  ]);
+  assertFounderBaseQuestionVersionContract(
+    [...baseQuestionMetaById.keys()],
+    "founder_matching_live_render_basis",
+    { allowMissing: true }
+  );
+
+  const founderScoring = scoreFounderAlignment({
+    personA: transformFounderScoringAnswers(inviterBaseAnswers, baseQuestionMetaById),
+    personB: transformFounderScoringAnswers(inviteeBaseAnswers, baseQuestionMetaById),
+  });
+
+  const { data: profileRows } = await privileged
+    .from("profiles")
+    .select("user_id, display_name")
+    .in("user_id", [invitation.inviter_user_id, invitation.invitee_user_id]);
+  const profileByUserId = new Map(
+    ((profileRows ?? []) as ProfileDisplayRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+  );
+
+  let valuesProfileA: SelfValuesProfile | null = null;
+  let valuesProfileB: SelfValuesProfile | null = null;
+
+  if (inviterValues && inviteeValues) {
+    const [rawValuesAnswersA, rawValuesAnswersB] = await Promise.all([
+      getAssessmentAnswers(privileged, inviterValues.id),
+      getAssessmentAnswers(privileged, inviteeValues.id),
+    ]);
+    const valuesTotal = await countValuesQuestionsTotal(privileged, true);
+    const valuesQuestionMetaById = await getQuestionMetaMap(privileged, [
+      ...rawValuesAnswersA.map((row) => row.question_id),
+      ...rawValuesAnswersB.map((row) => row.question_id),
+    ]);
+    const valuesQuestionMetaRows = [...valuesQuestionMetaById.values()].filter((row) =>
+      isRecognizedValuesQuestion(row.id, row.category)
+    );
+    assertValuesCategoryContract(valuesQuestionMetaRows, "founder_matching_live_render_values");
+    assertValuesQuestionVersionContract(valuesQuestionMetaRows, "founder_matching_live_render_values", {
+      allowMissing: true,
+    });
+
+    const valuesAnswersA = rawValuesAnswersA.filter((row) =>
+      isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
+    );
+    const valuesAnswersB = rawValuesAnswersB.filter((row) =>
+      isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
+    );
+
+    const valuesInputA: ValuesAnswerForScoring[] = valuesAnswersA.map((row) => {
+      const meta = valuesQuestionMetaById.get(row.question_id);
+      return {
+        questionId: row.question_id,
+        choiceValue: row.choice_value,
+        prompt: meta?.prompt ?? null,
+        dimension: meta?.dimension ?? null,
+      };
+    });
+    const valuesInputB: ValuesAnswerForScoring[] = valuesAnswersB.map((row) => {
+      const meta = valuesQuestionMetaById.get(row.question_id);
+      return {
+        questionId: row.question_id,
+        choiceValue: row.choice_value,
+        prompt: meta?.prompt ?? null,
+        dimension: meta?.dimension ?? null,
+      };
+    });
+
+    valuesProfileA = scoreSelfValuesProfile(valuesInputA, valuesTotal);
+    valuesProfileB = scoreSelfValuesProfile(valuesInputB, valuesTotal);
+  }
+
+  return {
+    participantAName: profileByUserId.get(invitation.inviter_user_id) || "Person A",
+    participantBName: profileByUserId.get(invitation.invitee_user_id) || "Person B",
+    founderScoring,
+    valuesProfileA,
+    valuesProfileB,
+  };
 }
 
 export async function getExecutiveSummaryTextByAlignment(

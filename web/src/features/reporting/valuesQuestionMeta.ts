@@ -5,7 +5,6 @@ export type ValuesQuestionDefinition = {
   promptLabel: string;
   shortDescription: string;
   archetypeId: ValuesArchetypeId;
-  legacyAliases?: string[];
 };
 
 // Fachliche Quelle fuer die aktive Werte-Logik.
@@ -13,74 +12,88 @@ export type ValuesQuestionDefinition = {
 // versioniert die erwarteten aktiven Fragen und ihre eindeutige Zuordnung.
 export const VALUES_QUESTION_DEFINITIONS: ValuesQuestionDefinition[] = [
   {
-    questionId: "qv_1",
-    promptLabel: "Wirkung vor kurzfristigem Gewinn",
-    shortDescription: "Misst, wie stark gesellschaftliche Wirkung und Sinn den wirtschaftlichen Takt vorgeben.",
+    questionId: "wv2_1",
+    promptLabel: "Partner mit Grenzkosten",
+    shortDescription:
+      "Misst, wie stark Marken- und Vertrauensschutz gegen kurzfristige Entlastung gehalten werden.",
     archetypeId: "impact_idealist",
-    legacyAliases: ["d1_q1", "w1"],
   },
   {
-    questionId: "qv_2",
-    promptLabel: "Ethische Standards unter Druck",
-    shortDescription: "Misst, wie konsequent ethische Leitplanken auch in schwierigen Phasen gehalten werden.",
+    questionId: "wv2_2",
+    promptLabel: "Vorabzahlungen unter Risiko",
+    shortDescription:
+      "Misst, wie stark Kundenzumutbarkeit und Unternehmenssicherung gegeneinander abgewogen werden.",
+    archetypeId: "verantwortungs_stratege",
+  },
+  {
+    questionId: "wv2_3",
+    promptLabel: "Launch-Risiko kommunizieren",
+    shortDescription:
+      "Misst, ob Planungssicherheit für Betroffene oder gesteuerte Marktkommunikation Vorrang bekommt.",
     archetypeId: "impact_idealist",
-    legacyAliases: ["w2"],
   },
   {
-    questionId: "qv_3",
-    promptLabel: "Verantwortung gegenüber Stakeholdern",
-    shortDescription: "Misst, wie stark Entscheidungen auch mit Blick auf Team, Kunden und Umfeld getroffen werden.",
+    questionId: "wv2_4",
+    promptLabel: "Finanzlage im Team",
+    shortDescription:
+      "Misst, wie Teamzumutbarkeit und Informationskontrolle in unsicheren Finanzphasen balanciert werden.",
     archetypeId: "verantwortungs_stratege",
-    legacyAliases: ["w3"],
   },
   {
-    questionId: "qv_4",
-    promptLabel: "Tragfähige Kompromisse",
-    shortDescription: "Misst die Präferenz für balancierte Lösungen zwischen Werten, Zumutbarkeit und Businessrealität.",
+    questionId: "wv2_5",
+    promptLabel: "Frühes Team unter Leistungsdruck",
+    shortDescription:
+      "Misst, wie Fürsorge, Loyalität und Systemleistung bei schwierigen Personalentscheidungen gewichtet werden.",
     archetypeId: "verantwortungs_stratege",
-    legacyAliases: ["d1_q4", "w4"],
   },
   {
-    questionId: "qv_5",
-    promptLabel: "Wirtschaftliche Schlagkraft",
-    shortDescription: "Misst, wie stark Entscheidbarkeit, Profitabilität und operative Wirksamkeit priorisiert werden.",
+    questionId: "wv2_6",
+    promptLabel: "Produktlinie schließen",
+    shortDescription:
+      "Misst, wie klar Fokus und Entlastung gegen Folgen für Bestandskund:innen priorisiert werden.",
     archetypeId: "business_pragmatiker",
-    legacyAliases: ["d1_q2", "w5"],
   },
   {
-    questionId: "qv_6",
-    promptLabel: "Ergebnisorientierung im Alltag",
-    shortDescription: "Misst die klare Orientierung an Umsetzung, Leistung und messbarem Fortschritt.",
-    archetypeId: "business_pragmatiker",
-    legacyAliases: ["w6"],
-  },
-  {
-    questionId: "qv_7",
-    promptLabel: "Fairness und Transparenz",
-    shortDescription: "Misst, wie stark Vertrauen, Fairness und Offenheit als nicht verhandelbare Werte erlebt werden.",
+    questionId: "wv2_7",
+    promptLabel: "Wachstumspartner mit Preis",
+    shortDescription:
+      "Misst, wie stark inhaltliche Linie und Reichweitenhebel unter Wachstumsdruck gegeneinander stehen.",
     archetypeId: "impact_idealist",
-    legacyAliases: ["d1_q3", "d1_q6", "w7"],
   },
   {
-    questionId: "qv_8",
-    promptLabel: "Nachhaltige Teamverantwortung",
-    shortDescription: "Misst, wie stark Kultur, Zumutbarkeit und nachhaltige Verantwortung in Entscheidungen mitlaufen.",
-    archetypeId: "verantwortungs_stratege",
-    legacyAliases: ["d1_q5", "w8"],
-  },
-  {
-    questionId: "qv_9",
-    promptLabel: "Wachstum und Skalierung",
-    shortDescription: "Misst, wie deutlich Wachstum, Effizienz und Marktchancen im Vordergrund stehen.",
+    questionId: "wv2_8",
+    promptLabel: "Vertriebshebel unter Last",
+    shortDescription:
+      "Misst, wie klar Marktfenster gegen operative Belastbarkeit priorisiert werden.",
     archetypeId: "business_pragmatiker",
-    legacyAliases: ["w9"],
   },
   {
-    questionId: "qv_10",
-    promptLabel: "Verantwortung in Grenzfällen",
-    shortDescription: "Misst, wie stark Verantwortung auch bei Zielkonflikten handlungsleitend bleibt.",
+    questionId: "wv2_9",
+    promptLabel: "Kosten senken unter Druck",
+    shortDescription:
+      "Misst, wie Lastverteilung, Abfederung und schnelle finanzielle Wirkung gegeneinander abgewogen werden.",
     archetypeId: "verantwortungs_stratege",
-    legacyAliases: ["w10"],
+  },
+  {
+    questionId: "wv2_10",
+    promptLabel: "Margenbruch drehen",
+    shortDescription:
+      "Misst, wie entschlossen wirtschaftliche Wirkung auch bei spürbarer Härte priorisiert wird.",
+    archetypeId: "business_pragmatiker",
+  },
+  {
+    questionId: "wv2_11",
+    promptLabel: "KI-Launch mit offenen Risiken",
+    shortDescription:
+      "Misst, wie stark Schutzleitplanken eine sichtbare Marktchance begrenzen dürfen.",
+    archetypeId: "impact_idealist",
+  },
+  {
+    questionId: "wv2_12",
+    promptLabel: "Enterprise-Deal unter Stretch",
+    shortDescription:
+      "Misst, wie klar strategische Chance gegen operative Absicherung priorisiert wird.",
+    archetypeId: "business_pragmatiker",
   },
 ];
 
@@ -103,9 +116,6 @@ function normalizeId(value: string) {
 const VALUE_QUESTION_BY_ID = new Map<string, ValuesQuestionDefinition>();
 for (const definition of VALUES_QUESTION_DEFINITIONS) {
   VALUE_QUESTION_BY_ID.set(normalizeId(definition.questionId), definition);
-  for (const alias of definition.legacyAliases ?? []) {
-    VALUE_QUESTION_BY_ID.set(normalizeId(alias), definition);
-  }
 }
 
 export function getValuesQuestionDefinition(questionId: string | null | undefined) {

@@ -41,6 +41,11 @@ export type CompareFoundersResult = {
   tensionMap: TensionMapEntry[];
 };
 
+export type FounderMatchingCase = {
+  a: FounderScores;
+  b: FounderScores;
+};
+
 type DimensionAssessment = {
   difference: number | null;
   relationType: RelationType | null;
@@ -382,9 +387,15 @@ export function compareFounders(a: FounderScores, b: FounderScores): CompareFoun
   };
 }
 
-export const FOUNDER_MATCHING_ENGINE_EXAMPLES = {
-  complementary_builders: compareFounders(
-    {
+export const FOUNDER_MATCHING_TEST_CASES: Record<
+  | "complementary_builders"
+  | "misaligned_pressure_pair"
+  | "balanced_but_manageable_pair"
+  | "highly_similar_but_blind_spot_pair",
+  FounderMatchingCase
+> = {
+  complementary_builders: {
+    a: {
       Unternehmenslogik: 68,
       Entscheidungslogik: 34,
       Risikoorientierung: 64,
@@ -392,17 +403,17 @@ export const FOUNDER_MATCHING_ENGINE_EXAMPLES = {
       Commitment: 81,
       Konfliktstil: 38,
     },
-    {
+    b: {
       Unternehmenslogik: 62,
       Entscheidungslogik: 67,
       Risikoorientierung: 43,
       "Arbeitsstruktur & Zusammenarbeit": 58,
       Commitment: 76,
       Konfliktstil: 61,
-    }
-  ),
-  misaligned_pressure_pair: compareFounders(
-    {
+    },
+  },
+  misaligned_pressure_pair: {
+    a: {
       Unternehmenslogik: 82,
       Entscheidungslogik: 36,
       Risikoorientierung: 71,
@@ -410,13 +421,68 @@ export const FOUNDER_MATCHING_ENGINE_EXAMPLES = {
       Commitment: 88,
       Konfliktstil: 29,
     },
-    {
+    b: {
       Unternehmenslogik: 24,
       Entscheidungslogik: 69,
       Risikoorientierung: 41,
       "Arbeitsstruktur & Zusammenarbeit": 22,
       Commitment: 39,
       Konfliktstil: 77,
-    }
+    },
+  },
+  balanced_but_manageable_pair: {
+    a: {
+      Unternehmenslogik: 54,
+      Entscheidungslogik: 48,
+      Risikoorientierung: 56,
+      "Arbeitsstruktur & Zusammenarbeit": 45,
+      Commitment: 58,
+      Konfliktstil: 41,
+    },
+    b: {
+      Unternehmenslogik: 63,
+      Entscheidungslogik: 60,
+      Risikoorientierung: 43,
+      "Arbeitsstruktur & Zusammenarbeit": 63,
+      Commitment: 65,
+      Konfliktstil: 60,
+    },
+  },
+  highly_similar_but_blind_spot_pair: {
+    a: {
+      Unternehmenslogik: 76,
+      Entscheidungslogik: 68,
+      Risikoorientierung: 74,
+      "Arbeitsstruktur & Zusammenarbeit": 71,
+      Commitment: 84,
+      Konfliktstil: 72,
+    },
+    b: {
+      Unternehmenslogik: 81,
+      Entscheidungslogik: 63,
+      Risikoorientierung: 69,
+      "Arbeitsstruktur & Zusammenarbeit": 76,
+      Commitment: 79,
+      Konfliktstil: 67,
+    },
+  },
+};
+
+export const FOUNDER_MATCHING_ENGINE_EXAMPLES = {
+  complementary_builders: compareFounders(
+    FOUNDER_MATCHING_TEST_CASES.complementary_builders.a,
+    FOUNDER_MATCHING_TEST_CASES.complementary_builders.b
+  ),
+  misaligned_pressure_pair: compareFounders(
+    FOUNDER_MATCHING_TEST_CASES.misaligned_pressure_pair.a,
+    FOUNDER_MATCHING_TEST_CASES.misaligned_pressure_pair.b
+  ),
+  balanced_but_manageable_pair: compareFounders(
+    FOUNDER_MATCHING_TEST_CASES.balanced_but_manageable_pair.a,
+    FOUNDER_MATCHING_TEST_CASES.balanced_but_manageable_pair.b
+  ),
+  highly_similar_but_blind_spot_pair: compareFounders(
+    FOUNDER_MATCHING_TEST_CASES.highly_similar_but_blind_spot_pair.a,
+    FOUNDER_MATCHING_TEST_CASES.highly_similar_but_blind_spot_pair.b
   ),
 };

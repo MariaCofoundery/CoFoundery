@@ -34,7 +34,7 @@ test("challenge text builder returns deterministic cards for the tracked audit c
         {
           title: "Wenn Abstimmung ungeklärt bleibt",
           description:
-            "Schwierig wird es für dich, wenn unklar bleibt, wann ihr eng zusammenarbeitet und wann jeder eigenständig weitergeht. Du kommst mit Nähe und Eigenraum zurecht, solange der Modus erkennbar ist und nicht ständig neu erraten werden muss. Fehlt das, arbeitet ihr eher nebeneinander als miteinander.",
+            "Schwierig wird es für dich, wenn unklar bleibt, wann ihr eng zusammenarbeitet und wann jeder eigenständig weitergeht. Du kommst mit Nähe und Eigenraum zurecht, solange der Modus erkennbar ist und nicht ständig neu erraten werden muss. Fehlt das, arbeitet ihr leicht nebeneinander statt wirklich zusammen.",
         },
         {
           title: "Wenn Richtung offen bleibt",

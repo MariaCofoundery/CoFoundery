@@ -51,7 +51,7 @@ const PATTERN_TEXT: PatternMap = {
       description: (band) =>
         band === "balanced"
           ? "Du schaltest zwischen genauer Prüfung und entschlossenem Setzen eines Punkts, je nachdem, was die Lage braucht. Im Alltag bleibst du damit weder in Analyse hängen noch gehst du blind nach vorn. Kritisch wird es erst dann, wenn im Team niemand klar markiert, wann wirklich entschieden wird."
-          : "Oft prüfst du kurz, ziehst dann aber auch einen klaren Schluss. Im Alltag bringt dir das Beweglichkeit zwischen Sorgfalt und Tempo. Wenn andere deutlich extremer ticken, wirkt genau dieser Wechsel schnell schwer lesbar.",
+          : "Oft prüfst du kurz und ziehst dann einen klaren Schluss. Das hält dich beweglich zwischen Sorgfalt und Tempo. Wenn andere deutlich extremer ticken, wirkt genau dieser Wechsel schnell schwer lesbar.",
     },
     right: {
       title: "Lieber entscheiden als kreisen",
@@ -69,7 +69,7 @@ const PATTERN_TEXT: PatternMap = {
       title: "Mut mit Augenmaß",
       description: (band) =>
         band === "balanced"
-          ? "Du liest Risiko situativ und gehst mal vorsichtiger, mal offensiver vor. Im Alltag wechselst du zwischen Absicherung und Vorwärtsgang, statt immer dieselbe Schwelle anzulegen. Das funktioniert gut, solange für andere sichtbar bleibt, wo deine Grenze gerade liegt."
+          ? "Du liest Risiko situativ und gehst mal vorsichtiger, mal offensiver vor. Im Alltag wechselst du zwischen Absicherung und Vorwärtsgang, statt immer dieselbe Schwelle anzulegen. Das bleibt gut lesbar, solange für andere sichtbar ist, wo deine Grenze gerade liegt."
           : "Oft entscheidest du danach, wann Absicherung reicht und wann Mut mehr bringt. Dadurch bleibst du weder im Vorsichtsmuster hängen noch springst du blind. Ohne klare Worte dazu wird im Team aber schnell unterschiedlich gelesen, welches Risiko gerade noch okay ist.",
     },
     right: {
@@ -88,8 +88,8 @@ const PATTERN_TEXT: PatternMap = {
       title: "Nähe bewusst dosieren",
       description: (band) =>
         band === "balanced"
-          ? "Du wechselst im Arbeiten zwischen Eigenraum und enger Rückkopplung, je nachdem, worum es gerade geht. Im Alltag suchst du nicht automatisch Distanz oder Nähe, sondern steuerst beides bewusst. Wenn das im Team nicht ausgesprochen wird, arbeitet ihr leicht mit unterschiedlichen Erwartungen an denselben Prozess."
-          : "Oft dosierst du Abstimmung so, dass sie Orientierung gibt, aber nicht jeden Schritt begleitet. Im Alltag hält dich das beweglich zwischen eigenständigem Arbeiten und engerem Zusammenspiel. Unklarheit darüber kostet hier schneller Energie als echte Meinungsverschiedenheit.",
+          ? "Du wechselst im Arbeiten zwischen Eigenraum und enger Rückkopplung, je nachdem, worum es gerade geht. Dabei suchst du nicht automatisch Distanz oder Nähe, sondern steuerst beides bewusst. Wenn das im Team nicht ausgesprochen wird, arbeitet ihr leicht mit unterschiedlichen Erwartungen an denselben Prozess."
+          : "Oft dosierst du Austausch so, dass er Orientierung gibt, aber nicht jeden Schritt begleitet. Das hält dich beweglich zwischen eigenständigem Arbeiten und engerem Zusammenspiel. Unklarheit darüber kostet hier schneller Energie als echte Meinungsverschiedenheit.",
     },
     right: {
       title: "Im Loop bleiben",
@@ -107,8 +107,8 @@ const PATTERN_TEXT: PatternMap = {
       title: "Intensität bewusst steuern",
       description: (band) =>
         band === "balanced"
-          ? "Du schaltest dein Einsatzniveau je nach Phase hoch oder runter, statt immer im selben Modus zu bleiben. Im Alltag bedeutet das: volle Präsenz, wenn sie wirklich nötig ist, und bewusst weniger Zug, wenn sie keinen Mehrwert bringt. Genau das muss im Team sichtbar sein, sonst versteht jeder unter Priorität etwas anderes."
-          : "Oft passt du deinen Einsatz an die Lage an, statt ihn dauerhaft gleich hoch zu fahren. Im Alltag gibt dir das Spielraum zwischen Fokus und Begrenzung. Ohne explizite Abstimmung wird daraus aber schnell eine stille Differenz bei Erwartungen.",
+          ? "Du schaltest dein Einsatzniveau je nach Phase hoch oder runter, statt immer im selben Modus zu bleiben. Das heißt im Alltag: volle Präsenz, wenn sie wirklich nötig ist, und bewusst weniger Zug, wenn sie keinen Mehrwert bringt. Genau das muss im Team sichtbar sein, sonst versteht jeder unter Priorität etwas anderes."
+          : "Oft passt du deinen Einsatz an die Lage an, statt ihn dauerhaft gleich hoch zu fahren. Das gibt dir Spielraum zwischen Fokus und Begrenzung. Ohne explizite Absprachen wird daraus aber schnell eine stille Differenz bei Erwartungen.",
     },
     right: {
       title: "Alles auf Fokus",
@@ -126,8 +126,8 @@ const PATTERN_TEXT: PatternMap = {
       title: "Den Moment setzen",
       description: (band) =>
         band === "balanced"
-          ? "Du entscheidest situativ, ob etwas sofort auf den Tisch muss oder erst kurz reifen soll. Im Alltag steuerst du damit Timing und Direktheit bewusster als viele andere. Wenn Spannungen länger mitschwingen, braucht es allerdings irgendwann einen klaren Punkt."
-          : "Oft wählst du bewusst zwischen direkter Ansprache und mehr Timing. Im Alltag hilft dir das, heikle Themen nicht unnötig zu verschärfen und sie trotzdem nicht ganz liegen zu lassen. Für andere bleibt dabei aber nicht immer sofort erkennbar, wann jetzt wirklich Klartext kommt.",
+          ? "Du entscheidest situativ, ob etwas sofort auf den Tisch muss oder erst kurz reifen soll. Damit steuerst du Timing und Direktheit bewusster als viele andere. Wenn Spannungen länger mitschwingen, braucht es allerdings irgendwann einen klaren Punkt."
+          : "Oft wählst du zwischen direkter Ansprache und mehr Timing. Das hilft dir, heikle Themen nicht unnötig zu verschärfen und sie trotzdem nicht ganz liegen zu lassen. Für andere bleibt dabei aber nicht immer sofort erkennbar, wann jetzt wirklich Klartext kommt.",
     },
     right: {
       title: "Spannungen früh aufmachen",
