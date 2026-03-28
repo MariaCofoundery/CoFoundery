@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
@@ -36,7 +37,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     isActive: (pathname) => pathname.startsWith("/report/") || pathname === "/invite/new",
   },
   {
-    href: "/dashboard#dashboard-status-workbook",
+    href: "/dashboard#dashboard-workbook-focus",
     label: "Workbook",
     isActive: (pathname) => pathname.startsWith("/founder-alignment/"),
   },
@@ -88,10 +89,15 @@ export function ProductShell({
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10 xl:px-12">
           <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
-            <Link href="/dashboard" className="min-w-0">
-              <span className="block truncate text-sm font-semibold uppercase tracking-[0.18em] text-slate-900">
-                CoFoundery Align
-              </span>
+            <Link href="/dashboard" className="flex min-w-0 items-center">
+              <Image
+                src="/cofoundery-align-logo.svg"
+                alt="CoFoundery Align"
+                width={220}
+                height={44}
+                className="h-8 w-auto object-contain md:h-9"
+                priority
+              />
             </Link>
 
             <nav

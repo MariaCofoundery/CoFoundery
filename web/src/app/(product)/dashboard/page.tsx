@@ -12,10 +12,8 @@ import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import {
   FOUNDER_DIMENSION_META,
   FOUNDER_DIMENSION_ORDER,
-  getFounderDimensionPoleTendency,
 } from "@/features/reporting/founderDimensionMeta";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
-import { KeyInsights } from "@/features/reporting/KeyInsights";
 import {
   debug_invitation_readiness,
   finalizeInvitationIfReady,
@@ -314,6 +312,8 @@ export default async function DashboardPage({
       id: "dashboard-status-profile",
       label: "Basisprofil",
       status: basisStatus,
+      isCurrent: !hasSubmittedBase,
+      isCompleted: hasSubmittedBase,
       text: hasSubmittedBase
         ? "Profil steht als Grundlage für Report, Matching und Workbook."
         : "Noch offen.",
@@ -324,6 +324,8 @@ export default async function DashboardPage({
       id: "dashboard-status-values",
       label: "Werteprofil",
       status: valuesStatusLabel,
+      isCurrent: hasSubmittedBase && !hasSubmittedValues,
+      isCompleted: hasSubmittedValues,
       text: hasSubmittedValues
         ? "Der Werte-Layer ergänzt dein Profil um Entscheidungsprioritäten."
         : valuesStatus === "in_progress"
@@ -337,6 +339,8 @@ export default async function DashboardPage({
       id: "dashboard-block-status-matching",
       label: "Matching",
       status: matchingStatus,
+      isCurrent: hasSubmittedBase && hasSubmittedValues && !latestReadyReport && !latestActiveWorkbook,
+      isCompleted: readyReports.length > 0,
       text:
         readyReports.length > 0
           ? "Ein fertiger Matching-Report ist verfügbar."
@@ -354,6 +358,8 @@ export default async function DashboardPage({
       id: "dashboard-status-workbook",
       label: "Workbook",
       status: workbookStatus,
+      isCurrent: Boolean(latestReadyReport || latestActiveWorkbook),
+      isCompleted: workbookStatus === "abgeschlossen",
       text:
         activeWorkbooks.length > 0
           ? "Ein Workbook ist bereits in aktiver Bearbeitung."
@@ -417,7 +423,7 @@ export default async function DashboardPage({
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 md:px-10 xl:px-12">
       <DashboardJourneyLine />
 
-      <section data-dashboard-hero className="relative isolate mb-8">
+      <section data-dashboard-hero className="relative isolate mb-10 lg:mb-12">
         <div className="relative rounded-[32px]">
           <DashboardHeroConstellation />
           <div className="relative z-10">
@@ -470,7 +476,7 @@ export default async function DashboardPage({
 
       <section
         id="dashboard-block-progress"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.04)] lg:p-8"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/70 bg-slate-50/72 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.03)] lg:p-6"
         style={staggerStyle(80)}
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -481,7 +487,7 @@ export default async function DashboardPage({
               </span>
               Dein aktueller Stand
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Was ist fertig, was läuft gerade?</h2>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">Was ist fertig, was läuft gerade?</h2>
           </div>
         </div>
 
@@ -490,13 +496,19 @@ export default async function DashboardPage({
             <article
               key={card.id}
               id={card.id}
-              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-4`}
+              className={`dashboard-fade-up scroll-mt-28 rounded-2xl border p-4 transition ${
+                card.isCurrent
+                  ? "border-[color:var(--brand-primary)]/30 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.05)]"
+                  : card.isCompleted
+                    ? "border-slate-200/80 bg-white/65 shadow-[0_8px_20px_rgba(15,23,42,0.025)]"
+                    : "border-slate-200/80 bg-white/82 shadow-[0_8px_20px_rgba(15,23,42,0.03)]"
+              }`}
               style={staggerStyle(100 + index * 30)}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
                 {card.label}
               </p>
-              <p className="mt-2 text-sm font-medium text-slate-900">Status: {card.status}</p>
+              <p className="mt-2 text-sm font-medium text-slate-900">{card.status}</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
               <div className="mt-3">
                 <Link href={card.href} className={UTILITY_CTA_CLASS}>
@@ -506,8 +518,188 @@ export default async function DashboardPage({
             </article>
           ))}
         </div>
+      </section>
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      <section
+        id="dashboard-block-active"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-8"
+        style={staggerStyle(120)}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+                <MatchingIcon className="h-4 w-4" />
+              </span>
+              Aktive Themen
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              Einladungen, Reports und Workbook werden hier als ruhige Arbeitsübersicht gebündelt.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 space-y-5">
+          <article
+            id="dashboard-workbook-focus"
+            className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-6 lg:p-7`}
+            style={staggerStyle(180)}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Nächster Schritt</p>
+                <h3 className="mt-2 text-xl font-semibold text-slate-950">Aktuelles Workbook</h3>
+              </div>
+              <span className="text-xs tracking-[0.08em] text-slate-500">
+                {primaryWorkbook ? "aktiv" : "noch offen"}
+              </span>
+            </div>
+            {primaryWorkbook ? (
+              <div className="mt-4">
+                <p className="font-medium text-slate-900">{primaryWorkbook.title}</p>
+                <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+                  {primaryWorkbook.hasStarted
+                    ? "Hier arbeitet ihr bereits an konkreten Regeln und Vereinbarungen. Das ist aktuell der wichtigste Arbeitsstand."
+                    : "Zu diesem Match liegt ein Report vor. Das Workbook ist jetzt der sinnvollste nächste Schritt."}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
+                </p>
+                <div className="mt-4">
+                  <Link href={primaryWorkbook.href} className={INVITE_CTA_CLASS}>
+                    {primaryWorkbook.hasStarted ? "Weiterarbeiten" : "Workbook starten"}
+                  </Link>
+                </div>
+                {secondaryWorkbooks.length > 0 ? (
+                  <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                    <summary className="cursor-pointer text-sm font-medium text-slate-700">
+                      Weitere Workbooks ({secondaryWorkbooks.length})
+                    </summary>
+                    <ul className="mt-3 space-y-2">
+                      {secondaryWorkbooks.map((workbook) => (
+                        <li
+                          key={workbook.invitationId}
+                          className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-slate-900">{workbook.title}</p>
+                            <p className="text-xs text-slate-500">
+                              Aktualisiert: {formatDate(workbook.updatedAt)}
+                            </p>
+                          </div>
+                          <Link href={workbook.href} className={REPORT_CTA_CLASS}>
+                            Öffnen
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+              </div>
+            ) : (
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
+                Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, landet das Workbook hier als klarer nächster Schritt.
+              </p>
+            )}
+          </article>
+
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Bereite Reports</h3>
+              <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {reportsWithoutWorkbook.length > 0 ? (
+                reportsWithoutWorkbook.map((run) => (
+                  <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                    {renderCompactReportRow(run)}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm leading-7 text-slate-500">
+                  {readyReports.length > 0
+                    ? "Alle bereiten Reports sind bereits in Workbooks überführt."
+                    : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
+                </p>
+              )}
+            </div>
+          </article>
+
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(240)}>
+            <div className="space-y-6">
+              {actionableIncomingInvites.length > 0 ? (
+                <section>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
+                    <span className="text-xs tracking-[0.08em] text-slate-500">{actionableIncomingInvites.length}</span>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {actionableIncomingInvites.map((invite) => (
+                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        {renderCompactIncomingInvitationRow(invite)}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <section>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
+                    <span className="text-xs tracking-[0.08em] text-slate-500">ruhig</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-500">
+                    Aktuell gibt es keine neuen eingehenden Einladungen, die direkt deine Aufmerksamkeit brauchen.
+                  </p>
+                </section>
+              )}
+
+              <section className="border-t border-slate-200/80 pt-5">
+                <details>
+                  <summary className="cursor-pointer text-sm font-semibold text-slate-900">
+                    Gesendete Einladungen ({sentInvitesSorted.length})
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    {sentInvitesSorted.length > 0 ? (
+                      sentInvitesSorted.map((invite) => (
+                        <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                          {renderCompactSentInvitationRow(invite)}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm leading-7 text-slate-500">
+                        Noch keine gesendeten Einladungen.
+                      </p>
+                    )}
+                  </div>
+                </details>
+              </section>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="dashboard-block-profile"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-white/88 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.03)]"
+        style={staggerStyle(130)}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+                <CompassIcon className="h-4 w-4" />
+              </span>
+              Profil & Report
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">Profil pflegen, Report bei Bedarf vertiefen</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              Dieser Bereich bleibt bewusst ruhiger. Er zeigt deinen aktuellen Profilstand, ohne mit Hero oder Workbook um Aufmerksamkeit zu konkurrieren.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <section
             id="dashboard-block-profile-data"
             className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-6`}
@@ -537,8 +729,8 @@ export default async function DashboardPage({
 
             <p className="mt-3 text-sm leading-7 text-slate-600">
               {needsOnboarding
-                ? "Hier hinterlegst du die Basisdaten, ohne die Radar, Report und Matching nicht sauber starten."
-                : "Profiländerungen, Fokus und Rollen pflegst du künftig an einer Stelle statt über mehrere Karten verteilt."}
+                ? "Hier hinterlegst du die Basisdaten, ohne die Report, Matching und Workbook nicht sauber starten."
+                : "Profiländerungen, Fokus und Rollen pflegst du an einer Stelle statt über mehrere Zugänge."}
             </p>
 
             <div className="mt-5">
@@ -593,41 +785,39 @@ export default async function DashboardPage({
 
           <div className="space-y-6">
             {selfReport ? (
-              <>
-                <article
-                  className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up overflow-hidden bg-white/95 p-6`}
-                  style={staggerStyle(240)}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                        <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                          <ReportIcon className="h-4 w-4" />
-                        </span>
-                        Profil-Snapshot
-                      </p>
-                      <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                        Dein aktuelles Founder-Profil
-                      </h3>
-                    </div>
-                    <Link href="/me/report" className={UTILITY_CTA_CLASS}>
-                      Profil ansehen
-                    </Link>
+              <article
+                className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up overflow-hidden bg-slate-50/78 p-6`}
+                style={staggerStyle(240)}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                      <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+                        <ReportIcon className="h-4 w-4" />
+                      </span>
+                      Profil-Snapshot
+                    </p>
+                    <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                      Dein aktuelles Founder-Profil
+                    </h3>
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Die Übersicht zeigt dir, in welche Richtung du in den sechs Founder-Dimensionen aktuell eher tendierst und wo dein Report tiefer einordnet.
-                  </p>
-                  <div className="mt-5">
-                    <FounderDimensionsOverview scores={selfReport.scoresA} />
-                  </div>
-                </article>
-                <div className="dashboard-fade-up" style={staggerStyle(270)}>
-                  <KeyInsights insights={selfReport.keyInsights} />
+                  <Link href="/me/report" className={UTILITY_CTA_CLASS}>
+                    Report öffnen
+                  </Link>
                 </div>
-              </>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  Die Übersicht zeigt dir kompakt, wo du in den sechs Founder-Dimensionen aktuell stehst.
+                </p>
+                <div className="mt-5">
+                  <FounderDimensionsOverview scores={selfReport.scoresA} />
+                </div>
+                <div className="mt-5 rounded-xl border border-slate-200/80 bg-white/70 px-4 py-3">
+                  <p className="text-sm text-slate-600">Detaillierte Einordnung findest du im Report.</p>
+                </div>
+              </article>
             ) : (
               <article
-                className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up bg-white/95 p-6`}
+                className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up bg-slate-50/78 p-6`}
                 style={staggerStyle(240)}
               >
                 <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
@@ -636,7 +826,7 @@ export default async function DashboardPage({
                   </span>
                   Profil-Snapshot
                 </p>
-                <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                <h3 className="mt-2 text-lg font-semibold text-slate-900">
                   Dein Founder-Profil entsteht mit dem Basisfragebogen
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -649,162 +839,8 @@ export default async function DashboardPage({
       </section>
 
       <section
-        id="dashboard-block-active"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
-        style={staggerStyle(120)}
-      >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <MatchingIcon className="h-4 w-4" />
-              </span>
-              Aktive Themen
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Einladungen, Reports und Workbook werden hier als ruhige Arbeitsübersicht gebündelt.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <div className="space-y-5">
-            <article className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(180)}>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">Aktuelles Workbook</h3>
-                <span className="text-xs tracking-[0.08em] text-slate-500">
-                  {primaryWorkbook ? "aktiv" : "noch offen"}
-                </span>
-              </div>
-              {primaryWorkbook ? (
-                <div className="mt-4">
-                  <p className="font-medium text-slate-900">{primaryWorkbook.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {primaryWorkbook.hasStarted
-                      ? "Hier arbeitet ihr bereits an konkreten Regeln und Vereinbarungen."
-                      : "Zu diesem Match liegt ein Report vor. Das Workbook ist der nächste Schritt."}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
-                  </p>
-                  <div className="mt-4">
-                    <Link href={primaryWorkbook.href} className={INVITE_CTA_CLASS}>
-                      {primaryWorkbook.hasStarted ? "Weiterarbeiten" : "Workbook starten"}
-                    </Link>
-                  </div>
-                  {secondaryWorkbooks.length > 0 ? (
-                    <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-                      <summary className="cursor-pointer text-sm font-medium text-slate-700">
-                        Weitere Workbooks ({secondaryWorkbooks.length})
-                      </summary>
-                      <ul className="mt-3 space-y-2">
-                        {secondaryWorkbooks.map((workbook) => (
-                          <li
-                            key={workbook.invitationId}
-                            className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2"
-                          >
-                            <div>
-                              <p className="text-sm font-medium text-slate-900">{workbook.title}</p>
-                              <p className="text-xs text-slate-500">
-                                Aktualisiert: {formatDate(workbook.updatedAt)}
-                              </p>
-                            </div>
-                            <Link href={workbook.href} className={REPORT_CTA_CLASS}>
-                              Öffnen
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : null}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm leading-7 text-slate-500">
-                  Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, landet das Workbook hier als klarer nächster Schritt.
-                </p>
-              )}
-            </article>
-
-            <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">Bereite Reports</h3>
-                <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
-              </div>
-              <div className="mt-3 space-y-2">
-                {reportsWithoutWorkbook.length > 0 ? (
-                  reportsWithoutWorkbook.map((run) => (
-                    <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactReportRow(run)}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm leading-7 text-slate-500">
-                    {readyReports.length > 0
-                      ? "Alle bereiten Reports sind bereits in Workbooks überführt."
-                      : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
-                  </p>
-                )}
-              </div>
-            </article>
-          </div>
-
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(150)}>
-            <div className="space-y-6">
-              {actionableIncomingInvites.length > 0 ? (
-                <section>
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
-                    <span className="text-xs tracking-[0.08em] text-slate-500">{actionableIncomingInvites.length}</span>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {actionableIncomingInvites.map((invite) => (
-                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                        {renderCompactIncomingInvitationRow(invite)}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : (
-                <section>
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
-                    <span className="text-xs tracking-[0.08em] text-slate-500">0</span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-slate-500">
-                    Aktuell gibt es keine neuen eingehenden Einladungen, die direkt deine Aufmerksamkeit brauchen.
-                  </p>
-                </section>
-              )}
-
-              <section className="border-t border-slate-200/80 pt-5">
-                <details>
-                  <summary className="cursor-pointer text-sm font-semibold text-slate-900">
-                    Gesendete Einladungen ({sentInvitesSorted.length})
-                  </summary>
-                  <div className="mt-3 space-y-2">
-                    {sentInvitesSorted.length > 0 ? (
-                      sentInvitesSorted.map((invite) => (
-                        <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                          {renderCompactSentInvitationRow(invite)}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm leading-7 text-slate-500">
-                        Noch keine gesendeten Einladungen.
-                      </p>
-                    )}
-                  </div>
-                </details>
-              </section>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section
         id="dashboard-block-modules"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/92 p-6"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-slate-50/62 p-5"
         style={staggerStyle(140)}
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -815,27 +851,27 @@ export default async function DashboardPage({
               </span>
               Weitere Module
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Strukturell offen für den nächsten Ausbau</h2>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">Strukturell offen für den nächsten Ausbau</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
               Dieses Dashboard bleibt nicht beim Erst-Matching stehen. Die Oberfläche ist jetzt so sortiert, dass spätere Re-Alignment-, Entwicklungs- oder Partner-Module sauber anschließen können.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
             <p className="text-sm font-semibold text-slate-900">Re-Alignment</p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
               Für spätere Check-ins, neue Spannungen und veränderte Rollen nach den ersten Arbeitsphasen.
             </p>
           </article>
-          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
             <p className="text-sm font-semibold text-slate-900">Entwicklung</p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
               Raum für vertiefende Module, Lernpfade und thematische Follow-ups auf Basis von Report und Workbook.
             </p>
           </article>
-          <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
             <p className="text-sm font-semibold text-slate-900">Programme & Partner</p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
               Anschlussfähig für Accelerator-, Advisor- oder Investorenlogiken, ohne den Founder-Kernfluss zu zerreißen.
@@ -961,20 +997,15 @@ function FounderDimensionsOverview({
       {FOUNDER_DIMENSION_ORDER.map((dimension) => {
         const value = formatScoreValue(scores[dimension]);
         const meta = FOUNDER_DIMENSION_META[dimension];
-        const tendency = getFounderDimensionPoleTendency(dimension, value) ?? {
-          tendency: "center",
-          label: meta.centerLabel,
-        };
         return (
           <div key={dimension}>
-            <div className="mb-1.5 flex items-center justify-between gap-3">
+            <div className="mb-1.5">
               <span className="text-sm font-medium text-slate-700">{SELF_RADAR_LABELS[dimension]}</span>
-              <span className="text-xs font-medium text-slate-500">{tendency.label}</span>
             </div>
             <div className="relative h-2 rounded-full bg-slate-100">
               <div
-                className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border border-white bg-[linear-gradient(180deg,rgba(34,211,238,0.95),rgba(124,58,237,0.75))] shadow-[0_6px_18px_rgba(34,211,238,0.16)]"
-                style={{ left: `clamp(0px, calc(${value}% - 7px), calc(100% - 14px))` }}
+                className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-white bg-[linear-gradient(180deg,rgba(34,211,238,0.95),rgba(124,58,237,0.75))] shadow-[0_8px_20px_rgba(34,211,238,0.18)]"
+                style={{ left: `clamp(0px, calc(${value}% - 8px), calc(100% - 16px))` }}
               />
             </div>
             <div className="mt-1 flex items-center justify-between gap-3 text-[11px] text-slate-400">
