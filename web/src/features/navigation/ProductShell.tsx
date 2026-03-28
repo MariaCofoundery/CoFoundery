@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
@@ -26,7 +27,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     href: "/me/report",
-    label: "Profil",
+    label: "Mein Report",
     isActive: (pathname) => pathname.startsWith("/me/"),
   },
   {
@@ -63,6 +64,11 @@ function navLinkClassName(active: boolean) {
       ? "bg-[color:var(--brand-primary)]/18 text-slate-950"
       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
+}
+
+function normalizeDisplayName(value: string | null) {
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : "Profil";
 }
 
 export function ProductShell({
@@ -122,12 +128,48 @@ export function ProductShell({
 }
 
 function ProfileMenu({ displayName }: { displayName: string | null }) {
-  const normalizedName = displayName?.trim() || "Profil";
+  const normalizedName = normalizeDisplayName(displayName);
   const avatarLabel = normalizedName.charAt(0).toUpperCase();
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!rootRef.current) return;
+      if (!rootRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const onScroll = () => setIsOpen(false);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen]);
 
   return (
-    <details className="relative">
-      <summary className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-slate-200 bg-white px-2.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-2.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+      >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700">
           {avatarLabel}
         </span>
@@ -142,30 +184,40 @@ function ProfileMenu({ displayName }: { displayName: string | null }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M5.5 8l4.5 4 4.5-4" />
         </svg>
-      </summary>
+      </button>
 
-      <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 bg-white/96 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)] backdrop-blur-xl">
-        <Link
-          href="/me/base"
-          className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+      {isOpen ? (
+        <div
+          className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 bg-white/96 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)] backdrop-blur-xl"
+          role="menu"
         >
-          Profil bearbeiten
-        </Link>
-        <Link
-          href="/me/base"
-          className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
-        >
-          Account
-        </Link>
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="block w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+          <Link
+            href="/dashboard#dashboard-block-profile-data"
+            onClick={() => setIsOpen(false)}
+            className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+            role="menuitem"
           >
-            Logout
-          </button>
-        </form>
-      </div>
-    </details>
+            Profil bearbeiten
+          </Link>
+          <Link
+            href="/dashboard#dashboard-block-account"
+            onClick={() => setIsOpen(false)}
+            className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+            role="menuitem"
+          >
+            Account
+          </Link>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="block w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+              role="menuitem"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      ) : null}
+    </div>
   );
 }

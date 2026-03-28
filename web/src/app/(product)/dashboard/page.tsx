@@ -9,7 +9,11 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
-import { FOUNDER_DIMENSION_META, FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
+import {
+  FOUNDER_DIMENSION_META,
+  FOUNDER_DIMENSION_ORDER,
+  getFounderDimensionPoleTendency,
+} from "@/features/reporting/founderDimensionMeta";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import { KeyInsights } from "@/features/reporting/KeyInsights";
 import {
@@ -203,11 +207,6 @@ export default async function DashboardPage({
   const profileCompletionLabel = hasSubmittedBase
     ? `Basisprofil abgeschlossen (${selfReport?.basisAnsweredA ?? 0}/${selfReport?.basisTotal ?? 0})`
     : "Basisprofil noch offen";
-  const valuesCompletionLabel =
-    selfReport?.valuesTotal && selfReport.valuesTotal > 0
-      ? `${selfReport.valuesAnsweredA}/${selfReport.valuesTotal} Wertefragen beantwortet`
-      : "Werteprofil optional";
-
   const readyReports = reportRuns.slice(0, 3);
   const readyReportInvitationIds = new Set(readyReports.map((report) => report.invitation_id));
   const hasMatchingActivity =
@@ -392,6 +391,7 @@ export default async function DashboardPage({
   const secondaryWorkbooks = activeWorkbooks.filter(
     (workbook) => workbook.invitationId !== primaryWorkbook?.invitationId
   );
+  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
 
   const selfReportDebug = selfReport
     ? {
@@ -493,17 +493,10 @@ export default async function DashboardPage({
               className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-4`}
               style={staggerStyle(100 + index * 30)}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                    {card.label}
-                  </p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">{card.status}</p>
-                </div>
-                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                  {card.status}
-                </span>
-              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                {card.label}
+              </p>
+              <p className="mt-2 text-sm font-medium text-slate-900">Status: {card.status}</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
               <div className="mt-3">
                 <Link href={card.href} className={UTILITY_CTA_CLASS}>
@@ -515,7 +508,11 @@ export default async function DashboardPage({
         </div>
 
         <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <section className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-6`} style={staggerStyle(220)}>
+          <section
+            id="dashboard-block-profile-data"
+            className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-6`}
+            style={staggerStyle(220)}
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
@@ -533,7 +530,7 @@ export default async function DashboardPage({
                   {profileCompletionLabel}
                 </span>
                 <span className="rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1">
-                  {hasSubmittedValues ? "Werteprofil abgeschlossen" : valuesCompletionLabel}
+                  {hasSubmittedValues ? "Werteprofil abgeschlossen" : "Werteprofil optional"}
                 </span>
               </div>
             </div>
@@ -579,6 +576,19 @@ export default async function DashboardPage({
                 </details>
               )}
             </div>
+
+            <div
+              id="dashboard-block-account"
+              className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Account & Zugang
+              </p>
+              <p className="mt-2 text-sm text-slate-700">{user.email ?? "E-Mail nicht verfügbar"}</p>
+              <p className="mt-1 text-xs leading-6 text-slate-500">
+                Weitere Account-Einstellungen docken hier später an. Für jetzt findest du hier deinen aktuellen Zugangspunkt.
+              </p>
+            </div>
           </section>
 
           <div className="space-y-6">
@@ -605,7 +615,7 @@ export default async function DashboardPage({
                     </Link>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Die sechs Founder-Dimensionen sind hier bewusst ruhig und direkt lesbar dargestellt.
+                    Die Übersicht zeigt dir, in welche Richtung du in den sechs Founder-Dimensionen aktuell eher tendierst und wo dein Report tiefer einordnet.
                   </p>
                   <div className="mt-5">
                     <FounderDimensionsOverview scores={selfReport.scoresA} />
@@ -659,50 +669,6 @@ export default async function DashboardPage({
         </div>
 
         <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(150)}>
-            <div className="space-y-6">
-              <section>
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-slate-900">Gesendete Einladungen</h3>
-                  <span className="text-xs tracking-[0.08em] text-slate-500">{sentInvitesSorted.length}</span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {sentInvitesSorted.length > 0 ? (
-                    sentInvitesSorted.map((invite) => (
-                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                        {renderCompactSentInvitationRow(invite)}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm leading-7 text-slate-500">
-                      Noch keine gesendeten Einladungen.
-                    </p>
-                  )}
-                </div>
-              </section>
-
-              <section className="border-t border-slate-200/80 pt-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
-                  <span className="text-xs tracking-[0.08em] text-slate-500">{receivedInvitesSorted.length}</span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {receivedInvitesSorted.length > 0 ? (
-                    receivedInvitesSorted.map((invite) => (
-                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                        {renderCompactIncomingInvitationRow(invite)}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm leading-7 text-slate-500">
-                      Noch keine Einladungen an dich.
-                    </p>
-                  )}
-                </div>
-              </section>
-            </div>
-          </article>
-
           <div className="space-y-5">
             <article className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(180)}>
               <div className="flex items-center justify-between gap-3">
@@ -782,6 +748,57 @@ export default async function DashboardPage({
               </div>
             </article>
           </div>
+
+          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(150)}>
+            <div className="space-y-6">
+              {actionableIncomingInvites.length > 0 ? (
+                <section>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
+                    <span className="text-xs tracking-[0.08em] text-slate-500">{actionableIncomingInvites.length}</span>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {actionableIncomingInvites.map((invite) => (
+                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        {renderCompactIncomingInvitationRow(invite)}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <section>
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
+                    <span className="text-xs tracking-[0.08em] text-slate-500">0</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-500">
+                    Aktuell gibt es keine neuen eingehenden Einladungen, die direkt deine Aufmerksamkeit brauchen.
+                  </p>
+                </section>
+              )}
+
+              <section className="border-t border-slate-200/80 pt-5">
+                <details>
+                  <summary className="cursor-pointer text-sm font-semibold text-slate-900">
+                    Gesendete Einladungen ({sentInvitesSorted.length})
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    {sentInvitesSorted.length > 0 ? (
+                      sentInvitesSorted.map((invite) => (
+                        <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                          {renderCompactSentInvitationRow(invite)}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm leading-7 text-slate-500">
+                        Noch keine gesendeten Einladungen.
+                      </p>
+                    )}
+                  </div>
+                </details>
+              </section>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -943,17 +960,26 @@ function FounderDimensionsOverview({
     <div className="space-y-3">
       {FOUNDER_DIMENSION_ORDER.map((dimension) => {
         const value = formatScoreValue(scores[dimension]);
+        const meta = FOUNDER_DIMENSION_META[dimension];
+        const tendency = getFounderDimensionPoleTendency(dimension, value) ?? {
+          tendency: "center",
+          label: meta.centerLabel,
+        };
         return (
           <div key={dimension}>
             <div className="mb-1.5 flex items-center justify-between gap-3">
               <span className="text-sm font-medium text-slate-700">{SELF_RADAR_LABELS[dimension]}</span>
-              <span className="text-xs font-medium text-slate-500">{value}%</span>
+              <span className="text-xs font-medium text-slate-500">{tendency.label}</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className="relative h-2 rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,rgba(34,211,238,0.92),rgba(124,58,237,0.62))]"
-                style={{ width: `${value}%` }}
+                className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border border-white bg-[linear-gradient(180deg,rgba(34,211,238,0.95),rgba(124,58,237,0.75))] shadow-[0_6px_18px_rgba(34,211,238,0.16)]"
+                style={{ left: `clamp(0px, calc(${value}% - 7px), calc(100% - 14px))` }}
               />
+            </div>
+            <div className="mt-1 flex items-center justify-between gap-3 text-[11px] text-slate-400">
+              <span>{meta.leftPole}</span>
+              <span>{meta.rightPole}</span>
             </div>
           </div>
         );

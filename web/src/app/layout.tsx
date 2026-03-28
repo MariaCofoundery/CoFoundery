@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,18 +38,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const roleViews = user
-    ? await getDashboardRoleViews(user.id).catch(() => ({
-        hasFounder: false,
-        hasAdvisor: false,
-        roles: [],
-      }))
-    : {
-        hasFounder: false,
-        hasAdvisor: false,
-        roles: [],
-      };
+  const [roleViews, profileData] = user
+    ? await Promise.all([
+        getDashboardRoleViews(user.id).catch(() => ({
+          hasFounder: false,
+          hasAdvisor: false,
+          roles: [],
+        })),
+        getProfileBasicsRow(supabase, user.id).catch(() => null),
+      ])
+    : [
+        {
+          hasFounder: false,
+          hasAdvisor: false,
+          roles: [],
+        },
+        null,
+      ];
   const displayName =
+    profileData?.display_name?.trim() ||
     user?.user_metadata?.display_name?.trim() ||
     user?.user_metadata?.full_name?.trim() ||
     user?.email?.split("@")[0] ||
