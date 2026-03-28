@@ -26,7 +26,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     href: "/me/report",
-    label: "Mein Profil",
+    label: "Profil",
     isActive: (pathname) => pathname.startsWith("/me/"),
   },
   {
@@ -111,32 +111,61 @@ export function ProductShell({
               hasAdvisor={hasAdvisor}
             />
 
-            <Link
-              href="/me/base"
-              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              Profil / Account
-            </Link>
-
-            {displayName ? (
-              <span className="hidden rounded-full border border-slate-200/80 bg-slate-50 px-3 py-2 text-sm text-slate-600 lg:inline-flex">
-                {displayName}
-              </span>
-            ) : null}
-
-            <form action={signOutAction}>
-              <button
-                type="submit"
-                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-              >
-                Logout
-              </button>
-            </form>
+            <ProfileMenu displayName={displayName} />
           </div>
         </div>
       </header>
 
       {children}
     </div>
+  );
+}
+
+function ProfileMenu({ displayName }: { displayName: string | null }) {
+  const normalizedName = displayName?.trim() || "Profil";
+  const avatarLabel = normalizedName.charAt(0).toUpperCase();
+
+  return (
+    <details className="relative">
+      <summary className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-slate-200 bg-white px-2.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700">
+          {avatarLabel}
+        </span>
+        <span className="hidden max-w-28 truncate md:inline">{normalizedName}</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className="h-4 w-4 text-slate-500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5.5 8l4.5 4 4.5-4" />
+        </svg>
+      </summary>
+
+      <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 bg-white/96 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)] backdrop-blur-xl">
+        <Link
+          href="/me/base"
+          className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+        >
+          Profil bearbeiten
+        </Link>
+        <Link
+          href="/me/base"
+          className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+        >
+          Account
+        </Link>
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="block w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+          >
+            Logout
+          </button>
+        </form>
+      </div>
+    </details>
   );
 }

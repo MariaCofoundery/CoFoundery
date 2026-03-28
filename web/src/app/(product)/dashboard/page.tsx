@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CopyLinkButton } from "@/features/dashboard/CopyLinkButton";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
@@ -10,7 +9,6 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
-import { AlignmentRadarChart } from "@/features/reporting/AlignmentRadarChart";
 import { FOUNDER_DIMENSION_META, FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import { KeyInsights } from "@/features/reporting/KeyInsights";
@@ -183,11 +181,7 @@ export default async function DashboardPage({
   const sentInvites = invitationRows.filter((row) => row.direction === "sent");
   const receivedInvites = invitationRows.filter((row) => row.direction === "incoming");
   const sentInvitesSorted = sortInvitationsByCreatedAtDesc(sentInvites);
-  const latestSentInvite = sentInvitesSorted[0] ?? null;
-  const olderSentInvites = sentInvitesSorted.slice(1);
   const receivedInvitesSorted = sortInvitationsByCreatedAtDesc(receivedInvites);
-  const latestReceivedInvite = receivedInvitesSorted[0] ?? null;
-  const olderReceivedInvites = receivedInvitesSorted.slice(1);
   const isDev = process.env.NODE_ENV !== "production";
   const debugByInvitationId = isDev
     ? new Map<string, InvitationReadinessDebug>(
@@ -272,8 +266,7 @@ export default async function DashboardPage({
   const heroPrimaryAction = !hasSubmittedBase
     ? {
         href: "/me/base",
-        label: "Basisprofil starten",
-        eyebrow: "Startpunkt",
+        label: "Profil vervollständigen",
         title: "Lege zuerst dein Founder-Profil an.",
         text: "Ohne Basisprofil bleiben Werteprofil, Matching und Report nur angedeutet. Dieser Schritt schafft die Grundlage für alles Weitere.",
       }
@@ -281,15 +274,13 @@ export default async function DashboardPage({
       ? {
           href: "/me/values",
           label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil abschließen",
-          eyebrow: "Nächster Schritt",
           title: "Schärfe jetzt dein Werteprofil.",
           text: "Damit wird dein Profil belastbarer und spätere Matching- und Workbook-Entscheidungen werden deutlich präziser.",
         }
       : latestActiveWorkbook
         ? {
             href: latestActiveWorkbook.href,
-            label: "Workbook öffnen",
-            eyebrow: "Aktiver Fokus",
+            label: "Weiterarbeiten",
             title: "Ein Workbook ist bereits in Arbeit.",
             text: "Öffne den aktuellen Stand und führe die Vereinbarungen weiter, statt den Flow erneut von vorn zu beginnen.",
           }
@@ -301,23 +292,20 @@ export default async function DashboardPage({
                   latestReadyReport.invitation_id,
                   invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
                 ),
-              label: "Workbook starten",
-              eyebrow: "Nächster Schritt",
-              title: "Macht aus dem Report konkrete Regeln.",
-              text: "Der Matching-Report zeigt eure Dynamik. Im Workbook haltet ihr jetzt fest, wie ihr konkret zusammenarbeitet und was in den nächsten 90 Tagen gelten soll.",
-            }
-          : !hasMatchingActivity
+            label: "Workbook starten",
+            title: "Macht aus dem Report konkrete Regeln.",
+            text: "Der Matching-Report zeigt eure Dynamik. Im Workbook haltet ihr jetzt fest, wie ihr konkret zusammenarbeitet und was in den nächsten 90 Tagen gelten soll.",
+          }
+        : !hasMatchingActivity
             ? {
                 href: "/invite/new",
                 label: "Co-Founder einladen",
-                eyebrow: "Nächster Schritt",
                 title: "Bring jetzt eine zweite Person in den Flow.",
                 text: "Dein Profil steht. Der sinnvollste nächste Schritt ist jetzt ein echter Matching-Kontext mit Einladung, Report und anschließendem Workbook.",
               }
             : {
                 href: "/dashboard#dashboard-block-active",
-                label: "Aktive Themen öffnen",
-                eyebrow: "Nächster Schritt",
+                label: "Übersicht ansehen",
                 title: "Behalte laufende Einladungen und Reports im Blick.",
                 text: "Sobald Einladungen, Reports oder Workbooks aktiv sind, findest du hier den operativen Einstieg ohne doppelte Umwege.",
               };
@@ -328,22 +316,23 @@ export default async function DashboardPage({
       label: "Basisprofil",
       status: basisStatus,
       text: hasSubmittedBase
-        ? "Dein Founder-Profil ist angelegt und bildet die Grundlage für Report, Matching und Workbook."
-        : "Hier beginnt dein Produktpfad. Ohne Basisprofil bleibt alles Weitere offen.",
+        ? "Profil steht als Grundlage für Report, Matching und Workbook."
+        : "Noch offen.",
       href: hasSubmittedBase ? "/me/report" : "/me/base",
-      actionLabel: hasSubmittedBase ? "Profil öffnen" : "Starten",
+      actionLabel: hasSubmittedBase ? "Profil ansehen" : "Vervollständigen",
     },
     {
       id: "dashboard-status-values",
       label: "Werteprofil",
       status: valuesStatusLabel,
       text: hasSubmittedValues
-        ? "Dein Werte-Layer ist aktiv und erweitert dein Profil um Entscheidungsprioritäten unter Druck."
+        ? "Der Werte-Layer ergänzt dein Profil um Entscheidungsprioritäten."
         : valuesStatus === "in_progress"
-          ? "Dein Werteprofil ist begonnen, aber noch nicht vollständig abgeschlossen."
-          : "Das Werteprofil ergänzt dein Founder-Profil um einen zweiten, entscheidungsnahen Layer.",
+          ? "Bereits begonnen."
+          : "Optionaler Vertiefungsschritt.",
       href: hasSubmittedValues ? "/me/report#werteprofil" : "/me/values",
-      actionLabel: hasSubmittedValues ? "Öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
+      actionLabel:
+        hasSubmittedValues ? "Werteprofil öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
     },
     {
       id: "dashboard-block-status-matching",
@@ -351,12 +340,16 @@ export default async function DashboardPage({
       status: matchingStatus,
       text:
         readyReports.length > 0
-          ? "Es liegen auswertbare Matches oder fertige Reports vor."
+          ? "Ein fertiger Matching-Report ist verfügbar."
           : hasMatchingActivity
-            ? "Einladungen oder laufende Matching-Kontexte sind bereits aktiv."
-            : "Sobald du jemanden einlädst, entsteht hier der operative Matching-Bereich.",
-      href: readyReports[0] ? `/report/${readyReports[0].invitation_id}` : "/dashboard#dashboard-block-active",
-      actionLabel: readyReports[0] ? "Report öffnen" : "Zum Bereich",
+            ? "Einladungen oder laufende Matching-Kontexte sind aktiv."
+            : "Noch kein Matching gestartet.",
+      href: readyReports[0]
+        ? `/report/${readyReports[0].invitation_id}`
+        : hasSubmittedBase
+          ? "/invite/new"
+          : "/me/base",
+      actionLabel: readyReports[0] ? "Report ansehen" : hasSubmittedBase ? "Einladen" : "Starten",
     },
     {
       id: "dashboard-status-workbook",
@@ -364,14 +357,41 @@ export default async function DashboardPage({
       status: workbookStatus,
       text:
         activeWorkbooks.length > 0
-          ? "Mindestens ein Workbook läuft bereits und übersetzt Report-Erkenntnisse in Regeln und Vereinbarungen."
+          ? "Ein Workbook ist bereits in aktiver Bearbeitung."
           : readyReports.length > 0
-            ? "Ein Report ist bereit. Das Workbook ist der nächste Schritt, um konkrete Zusammenarbeit festzuhalten."
-            : "Das Workbook wird relevant, sobald ein gemeinsamer Matching-Report vorliegt.",
+            ? "Der nächste Schritt nach dem Report."
+            : "Sobald ein Report vorliegt, wird das Workbook relevant.",
       href: workbookEntryPointHref ?? "/dashboard#dashboard-block-active",
-      actionLabel: workbookEntryPointHref ? "Öffnen" : "Zum Bereich",
+      actionLabel:
+        activeWorkbooks.length > 0
+          ? "Weiterarbeiten"
+          : readyReports.length > 0
+            ? "Workbook starten"
+            : "Matching prüfen",
     },
   ] as const;
+  const primaryWorkbook =
+    latestActiveWorkbook ??
+    (latestReadyReport
+      ? {
+          invitationId: latestReadyReport.invitation_id,
+          title:
+            (Array.isArray(latestReadyReport.invitations)
+              ? latestReadyReport.invitations[0]?.label ?? latestReadyReport.invitations[0]?.invitee_email
+              : latestReadyReport.invitations?.label ?? latestReadyReport.invitations?.invitee_email) ??
+            latestReadyReport.invitation_id,
+          updatedAt: latestReadyReport.created_at,
+          href: buildWorkbookHref(
+            latestReadyReport.invitation_id,
+            invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
+          ),
+          hasStarted: false,
+          isCompleted: false,
+        }
+      : null);
+  const secondaryWorkbooks = activeWorkbooks.filter(
+    (workbook) => workbook.invitationId !== primaryWorkbook?.invitationId
+  );
 
   const selfReportDebug = selfReport
     ? {
@@ -405,26 +425,15 @@ export default async function DashboardPage({
               <DailyQuote displayName={profileData?.display_name ?? null} quote={quoteOfDay} />
             </div>
 
-            <header className="dashboard-fade-up mb-5 flex flex-wrap items-end justify-between gap-6">
-              <div className="max-w-3xl">
+            <header className="dashboard-fade-up mb-4 max-w-3xl">
+              <div>
                 <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Plattform</p>
                 <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
                   Dein Founder Dashboard
                 </h1>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Hier laufen Profil, Matching und Workbook in einer klaren Produktoberfläche zusammen.
+                  Profil, Matching und Workbook greifen hier als ein gemeinsamer Produktfluss ineinander.
                 </p>
-                {profileData?.focus_skill && profileData?.intention ? (
-                  <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">
-                    Fokus: {profileData.focus_skill} · Intention: {profileData.intention}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 text-sm text-slate-600 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-                {hasMatchingActivity
-                  ? `${sentInvitesSorted.length + receivedInvitesSorted.length} aktive Matching-Kontexte`
-                  : "Noch kein aktiver Matching-Kontext"}
               </div>
             </header>
 
@@ -435,61 +444,23 @@ export default async function DashboardPage({
             ) : null}
 
             <section
-              className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.045)] lg:p-8"
+              className="dashboard-panel dashboard-fade-up max-w-3xl rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:p-6"
               style={staggerStyle(40)}
             >
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.85fr)]">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                    {heroPrimaryAction.eyebrow}
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-slate-950 md:text-[2rem]">
-                    {heroPrimaryAction.title}
-                  </h2>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-                    {heroPrimaryAction.text}
-                  </p>
-                  <div className="mt-5">
-                    <Link
-                      href={heroPrimaryAction.href}
-                      className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
-                    >
-                      {heroPrimaryAction.label}
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="rounded-[24px] border border-slate-200/80 bg-white/88 p-5">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Orientierung</p>
-                  <div className="mt-4 space-y-3 text-sm text-slate-700">
-                    <div className="flex items-start justify-between gap-3">
-                      <span>Basisprofil</span>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                        {basisStatus}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-3">
-                      <span>Werteprofil</span>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                        {valuesStatusLabel}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-3">
-                      <span>Matching</span>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                        {matchingStatus}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-3">
-                      <span>Workbook</span>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                        {workbookStatus}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-xs leading-6 text-slate-500">
-                    Ein Haupt-CTA führt dich weiter. Alle anderen Module bleiben darunter als klarer Status sichtbar.
-                  </p>
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-950 md:text-[2rem]">
+                  {heroPrimaryAction.title}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+                  {heroPrimaryAction.text}
+                </p>
+                <div className="mt-5">
+                  <Link
+                    href={heroPrimaryAction.href}
+                    className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
+                  >
+                    {heroPrimaryAction.label}
+                  </Link>
                 </div>
               </div>
             </section>
@@ -508,23 +479,18 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                 <ProfileIcon className="h-4 w-4" />
               </span>
-              Fortschritt
+              Dein aktueller Stand
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              Klarer Status statt verteilter Einstiege
-            </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Hier siehst du pro Modul, was offen, gestartet oder abgeschlossen ist. So bleibt der Produktpfad auch dann lesbar, wenn mehrere Dinge parallel laufen.
-            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Was ist fertig, was läuft gerade?</h2>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {progressCards.map((card, index) => (
             <article
               key={card.id}
               id={card.id}
-              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-5`}
+              className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-4`}
               style={staggerStyle(100 + index * 30)}
             >
               <div className="flex items-start justify-between gap-3">
@@ -532,14 +498,14 @@ export default async function DashboardPage({
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
                     {card.label}
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{card.status}</p>
+                  <p className="mt-2 text-base font-semibold text-slate-900">{card.status}</p>
                 </div>
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
                   {card.status}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{card.text}</p>
-              <div className="mt-4">
+              <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
+              <div className="mt-3">
                 <Link href={card.href} className={UTILITY_CTA_CLASS}>
                   {card.actionLabel}
                 </Link>
@@ -635,26 +601,14 @@ export default async function DashboardPage({
                       </h3>
                     </div>
                     <Link href="/me/report" className={UTILITY_CTA_CLASS}>
-                      Report lesen
+                      Profil ansehen
                     </Link>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Das Radar zeigt deine aktuelle Tendenz in sechs Founder-Dimensionen und bündelt die Basis für alle weiteren Produktmodule.
+                    Die sechs Founder-Dimensionen sind hier bewusst ruhig und direkt lesbar dargestellt.
                   </p>
-                  <div className="dashboard-radar-shell mt-5 rounded-[24px] border border-slate-100/80 p-2">
-                    <AlignmentRadarChart
-                      participants={[
-                        {
-                          id: "self",
-                          label: selfReport.participantAName || "Du",
-                          color: "#22d3ee",
-                          scores: selfReport.scoresA,
-                        },
-                      ]}
-                      dimensions={FOUNDER_DIMENSION_ORDER}
-                      labels={SELF_RADAR_LABELS}
-                      valueScale="founder_percent"
-                    />
+                  <div className="mt-5">
+                    <FounderDimensionsOverview scores={selfReport.scoresA} />
                   </div>
                 </article>
                 <div className="dashboard-fade-up" style={staggerStyle(270)}>
@@ -676,7 +630,7 @@ export default async function DashboardPage({
                   Dein Founder-Profil entsteht mit dem Basisfragebogen
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Sobald du das Basisprofil ausfüllst, erscheinen hier Radar, Insights und der Einstieg in deinen individuellen Report.
+                  Sobald du das Basisprofil ausfüllst, erscheinen hier deine Ergebnisdarstellung und der Einstieg in deinen individuellen Report.
                 </p>
               </article>
             )}
@@ -699,184 +653,135 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Hier landen nur die laufenden Dinge: Einladungen, Reports und Workbooks. Reports ohne Workbook bleiben sichtbar, laufende Workbooks bekommen ihren eigenen Platz.
+              Einladungen, Reports und Workbook werden hier als ruhige Arbeitsübersicht gebündelt.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-5 xl:grid-cols-2">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
           <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(150)}>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Gesendete Einladungen</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{sentInvitesSorted.length}</span>
-            </div>
-            <div className="mt-4">
-              {latestSentInvite ? (
-                <ul className="space-y-3">
-                  <li className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
-                    {renderInvitationCard({
-                      invite: latestSentInvite,
-                      isDev: false,
-                      debug: null,
-                    })}
-                  </li>
-                </ul>
-              ) : (
-                <p className="text-sm leading-7 text-slate-500">
-                  Noch keine gesendeten Einladungen. Sobald Matching startet, erscheint der operative Status hier.
-                </p>
-              )}
-
-              {olderSentInvites.length > 0 ? (
-                <details className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
-                  <summary className="cursor-pointer text-xs font-medium text-slate-700">
-                    Weitere Einladungen ({olderSentInvites.length})
-                  </summary>
-                  <ul className="mt-3 space-y-2">
-                    {olderSentInvites.map((invite) => (
-                      <li key={invite.id} className="rounded-lg border border-slate-200 bg-slate-50/70 p-2.5">
-                        {renderInvitationCard({
-                          invite,
-                          isDev: false,
-                          debug: null,
-                        })}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              ) : null}
-            </div>
-          </article>
-
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(180)}>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{receivedInvitesSorted.length}</span>
-            </div>
-            <div className="mt-4">
-              {latestReceivedInvite ? (
-                <ul className="space-y-3">
-                  <li className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
-                    {renderIncomingInvitationCard({
-                      invite: latestReceivedInvite,
-                      isDev: false,
-                      debug: null,
-                    })}
-                  </li>
-                </ul>
-              ) : (
-                <p className="text-sm leading-7 text-slate-500">
-                  Noch keine Einladungen an dich. Neue Matching-Anfragen tauchen hier auf, sobald sie aktiv sind.
-                </p>
-              )}
-
-              {olderReceivedInvites.length > 0 ? (
-                <details className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
-                  <summary className="cursor-pointer text-xs font-medium text-slate-700">
-                    Weitere Einladungen ({olderReceivedInvites.length})
-                  </summary>
-                  <ul className="mt-3 space-y-2">
-                    {olderReceivedInvites.map((invite) => (
-                      <li key={invite.id} className="rounded-lg border border-slate-200 bg-slate-50/70 p-2.5">
-                        {renderIncomingInvitationCard({
-                          invite,
-                          isDev: false,
-                          debug: null,
-                        })}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              ) : null}
-            </div>
-          </article>
-
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Bereite Matching-Reports</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
-            </div>
-            <div className="mt-4">
-              {reportsWithoutWorkbook.length > 0 ? (
-                <ul className="space-y-3">
-                  {reportsWithoutWorkbook.map((run) => {
-                    const invitation = Array.isArray(run.invitations)
-                      ? run.invitations[0] ?? null
-                      : run.invitations;
-                    return (
-                      <li key={run.id} className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
-                        <p className="font-medium text-slate-900">
-                          {invitation?.label ?? invitation?.invitee_email ?? run.invitation_id}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          Module: {formatInvitationModules(run.modules ?? [])}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
-                            Report öffnen
-                          </Link>
-                          <Link
-                            href={buildWorkbookHref(
-                              run.invitation_id,
-                              invitationById.get(run.invitation_id)?.teamContext ?? null
-                            )}
-                            className={UTILITY_CTA_CLASS}
-                          >
-                            Workbook starten
-                          </Link>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-sm leading-7 text-slate-500">
-                  {readyReports.length > 0
-                    ? "Alle bereiten Reports sind bereits in laufende Workbooks überführt."
-                    : "Sobald aus euren Matching-Kontexten fertige Reports werden, erscheinen sie hier."}
-                </p>
-              )}
-            </div>
-          </article>
-
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(240)}>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Laufende Workbooks</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{activeWorkbooks.length}</span>
-            </div>
-            <div className="mt-4">
-              {activeWorkbooks.length > 0 ? (
-                <ul className="space-y-3">
-                  {activeWorkbooks.map((workbook) => (
-                    <li key={workbook.invitationId} className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
-                      <p className="font-medium text-slate-900">{workbook.title}</p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        {workbook.isCompleted
-                          ? "Das Workbook enthält bereits belastbare Vereinbarungen."
-                          : "Das Workbook ist gestartet und sammelt konkrete Arbeitsregeln."}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Letzte Aktualisierung: {formatDate(workbook.updatedAt)}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <Link href={workbook.href} className={REPORT_CTA_CLASS}>
-                          Workbook öffnen
-                        </Link>
-                        <Link href={`/report/${workbook.invitationId}`} className={UTILITY_CTA_CLASS}>
-                          Report ansehen
-                        </Link>
+            <div className="space-y-6">
+              <section>
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-slate-900">Gesendete Einladungen</h3>
+                  <span className="text-xs tracking-[0.08em] text-slate-500">{sentInvitesSorted.length}</span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {sentInvitesSorted.length > 0 ? (
+                    sentInvitesSorted.map((invite) => (
+                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        {renderCompactSentInvitationRow(invite)}
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm leading-7 text-slate-500">
-                  Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, erscheint das Workbook hier als laufendes Thema.
-                </p>
-              )}
+                    ))
+                  ) : (
+                    <p className="text-sm leading-7 text-slate-500">
+                      Noch keine gesendeten Einladungen.
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              <section className="border-t border-slate-200/80 pt-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
+                  <span className="text-xs tracking-[0.08em] text-slate-500">{receivedInvitesSorted.length}</span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {receivedInvitesSorted.length > 0 ? (
+                    receivedInvitesSorted.map((invite) => (
+                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        {renderCompactIncomingInvitationRow(invite)}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm leading-7 text-slate-500">
+                      Noch keine Einladungen an dich.
+                    </p>
+                  )}
+                </div>
+              </section>
             </div>
           </article>
+
+          <div className="space-y-5">
+            <article className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(180)}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-slate-900">Aktuelles Workbook</h3>
+                <span className="text-xs tracking-[0.08em] text-slate-500">
+                  {primaryWorkbook ? "aktiv" : "noch offen"}
+                </span>
+              </div>
+              {primaryWorkbook ? (
+                <div className="mt-4">
+                  <p className="font-medium text-slate-900">{primaryWorkbook.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {primaryWorkbook.hasStarted
+                      ? "Hier arbeitet ihr bereits an konkreten Regeln und Vereinbarungen."
+                      : "Zu diesem Match liegt ein Report vor. Das Workbook ist der nächste Schritt."}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
+                  </p>
+                  <div className="mt-4">
+                    <Link href={primaryWorkbook.href} className={INVITE_CTA_CLASS}>
+                      {primaryWorkbook.hasStarted ? "Weiterarbeiten" : "Workbook starten"}
+                    </Link>
+                  </div>
+                  {secondaryWorkbooks.length > 0 ? (
+                    <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                      <summary className="cursor-pointer text-sm font-medium text-slate-700">
+                        Weitere Workbooks ({secondaryWorkbooks.length})
+                      </summary>
+                      <ul className="mt-3 space-y-2">
+                        {secondaryWorkbooks.map((workbook) => (
+                          <li
+                            key={workbook.invitationId}
+                            className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2"
+                          >
+                            <div>
+                              <p className="text-sm font-medium text-slate-900">{workbook.title}</p>
+                              <p className="text-xs text-slate-500">
+                                Aktualisiert: {formatDate(workbook.updatedAt)}
+                              </p>
+                            </div>
+                            <Link href={workbook.href} className={REPORT_CTA_CLASS}>
+                              Öffnen
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm leading-7 text-slate-500">
+                  Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, landet das Workbook hier als klarer nächster Schritt.
+                </p>
+              )}
+            </article>
+
+            <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-slate-900">Bereite Reports</h3>
+                <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {reportsWithoutWorkbook.length > 0 ? (
+                  reportsWithoutWorkbook.map((run) => (
+                    <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      {renderCompactReportRow(run)}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm leading-7 text-slate-500">
+                    {readyReports.length > 0
+                      ? "Alle bereiten Reports sind bereits in Workbooks überführt."
+                      : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
+                  </p>
+                )}
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -1029,43 +934,61 @@ function countWorkbookContentSignals(
   return count;
 }
 
-function renderInvitationCard(params: {
-  invite: InvitationDashboardRow;
-  isDev: boolean;
-  debug: InvitationReadinessDebug | null;
+function FounderDimensionsOverview({
+  scores,
+}: {
+  scores: Record<string, number | null | undefined>;
 }) {
-  const { invite, isDev, debug } = params;
-  const title = invite.label ?? invite.inviteeEmail;
   return (
-    <>
-      <p className="font-medium text-slate-900">{title}</p>
-      <p className="mt-1">Status: {getSentInviteStatusLabel(invite)}</p>
-      <p className="text-xs text-slate-500">Module: {formatInvitationModules(invite.requiredModules)}</p>
-      <p className="text-xs text-slate-500">Ablauf: {formatDate(invite.expiresAt)}</p>
-      <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
-      {invite.isReportReady ? (
-        <a href={`/report/${invite.id}`} className={`mt-2 ${REPORT_CTA_CLASS}`}>
-          Report öffnen
-        </a>
-      ) : null}
-      {isDev ? (
-        <details className="mt-2 rounded-md border border-slate-200 bg-slate-50/70 p-2">
-          <summary className="cursor-pointer text-xs text-slate-600">Debug anzeigen</summary>
-          <pre className="mt-2 overflow-auto text-[11px] leading-5 text-slate-700">
-            {JSON.stringify(debug, null, 2)}
-          </pre>
-        </details>
-      ) : null}
-    </>
+    <div className="space-y-3">
+      {FOUNDER_DIMENSION_ORDER.map((dimension) => {
+        const value = formatScoreValue(scores[dimension]);
+        return (
+          <div key={dimension}>
+            <div className="mb-1.5 flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-slate-700">{SELF_RADAR_LABELS[dimension]}</span>
+              <span className="text-xs font-medium text-slate-500">{value}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-[linear-gradient(90deg,rgba(34,211,238,0.92),rgba(124,58,237,0.62))]"
+                style={{ width: `${value}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
-function renderIncomingInvitationCard(params: {
-  invite: InvitationDashboardRow;
-  isDev: boolean;
-  debug: InvitationReadinessDebug | null;
-}) {
-  const { invite, isDev, debug } = params;
+function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
+  const title = invite.label ?? invite.inviteeEmail;
+
+  return (
+    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div className="min-w-0">
+        <p className="font-medium text-slate-900">{title}</p>
+        <p className="mt-1 text-sm text-slate-600">Status: {getSentInviteStatusLabel(invite)}</p>
+        <p className="text-xs text-slate-500">
+          Module: {formatInvitationModules(invite.requiredModules)} · Ablauf: {formatDate(invite.expiresAt)}
+        </p>
+      </div>
+
+      <div className="shrink-0">
+        {invite.isReportReady ? (
+          <Link href={`/report/${invite.id}`} className={REPORT_CTA_CLASS}>
+            Report ansehen
+          </Link>
+        ) : (
+          <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
@@ -1079,39 +1002,52 @@ function renderIncomingInvitationCard(params: {
       : completeQuestionnaireHref;
 
   return (
-    <>
-      <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite)}</p>
-      <p className="mt-1">Status: {getIncomingInviteStatusLabel(invite)}</p>
-      <p className="text-xs text-slate-500">Module: {formatInvitationModules(invite.requiredModules)}</p>
-      <p className="text-xs text-slate-500">Erstellt: {formatDate(invite.createdAt)}</p>
-
-      <div className="mt-2 flex flex-wrap items-start gap-2">
-        <a
-          href={actionHref}
-          className={
-            invite.isReportReady
-              ? REPORT_CTA_CLASS
-              : "inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
-          }
-        >
-          {invite.isReportReady ? "Report öffnen" : inviteeHasAllRequired ? "Status ansehen" : "Jetzt ausfüllen"}
-        </a>
-        <CopyLinkButton url={actionHref} />
+    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div className="min-w-0">
+        <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite)}</p>
+        <p className="mt-1 text-sm text-slate-600">Status: {getIncomingInviteStatusLabel(invite)}</p>
+        <p className="text-xs text-slate-500">
+          Module: {formatInvitationModules(invite.requiredModules)} · Erstellt: {formatDate(invite.createdAt)}
+        </p>
       </div>
 
-      {inviteeHasAllRequired && !invite.isReportReady ? (
-        <p className="mt-2 text-xs text-slate-500">
-          Alles ausgefüllt. Der Report wird automatisch erstellt, sobald beide fertig sind.
-        </p>
-      ) : null}
-      {isDev ? (
-        <details className="mt-2 rounded-md border border-slate-200 bg-slate-50/70 p-2">
-          <summary className="cursor-pointer text-xs text-slate-600">Debug anzeigen</summary>
-          <pre className="mt-2 overflow-auto text-[11px] leading-5 text-slate-700">{JSON.stringify(debug, null, 2)}</pre>
-        </details>
-      ) : null}
-    </>
+      <a
+        href={actionHref}
+        className={
+          invite.isReportReady
+            ? REPORT_CTA_CLASS
+            : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
+        }
+      >
+        {invite.isReportReady ? "Report ansehen" : inviteeHasAllRequired ? "Status ansehen" : "Jetzt ausfüllen"}
+      </a>
+    </div>
   );
+}
+
+function renderCompactReportRow(run: ReportRunRow) {
+  const invitation = Array.isArray(run.invitations) ? run.invitations[0] ?? null : run.invitations;
+
+  return (
+    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div className="min-w-0">
+        <p className="font-medium text-slate-900">
+          {invitation?.label ?? invitation?.invitee_email ?? run.invitation_id}
+        </p>
+        <p className="mt-1 text-sm text-slate-600">Module: {formatInvitationModules(run.modules ?? [])}</p>
+        <p className="text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>
+      </div>
+
+      <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
+        Report ansehen
+      </Link>
+    </div>
+  );
+}
+
+function formatScoreValue(value: number | null | undefined) {
+  if (typeof value !== "number" || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, Math.round(value)));
 }
 
 function ProfileIcon({ className = "h-4 w-4" }: { className?: string }) {
