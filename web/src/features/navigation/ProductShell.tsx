@@ -12,6 +12,7 @@ type Props = {
   hasFounder: boolean;
   hasAdvisor: boolean;
   displayName: string | null;
+  workbookHref: string;
 };
 
 type NavigationItem = {
@@ -19,29 +20,6 @@ type NavigationItem = {
   label: string;
   isActive: (pathname: string) => boolean;
 };
-
-const NAVIGATION_ITEMS: NavigationItem[] = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    isActive: (pathname) => pathname === "/dashboard",
-  },
-  {
-    href: "/me/report",
-    label: "Mein Report",
-    isActive: (pathname) => pathname.startsWith("/me/"),
-  },
-  {
-    href: "/dashboard#dashboard-block-active",
-    label: "Matching",
-    isActive: (pathname) => pathname.startsWith("/report/") || pathname === "/invite/new",
-  },
-  {
-    href: "/dashboard#dashboard-workbook-focus",
-    label: "Workbook",
-    isActive: (pathname) => pathname.startsWith("/founder-alignment/"),
-  },
-];
 
 function isProductChromePath(pathname: string) {
   if (!pathname) return false;
@@ -77,8 +55,32 @@ export function ProductShell({
   hasFounder,
   hasAdvisor,
   displayName,
+  workbookHref,
 }: Props) {
   const pathname = usePathname();
+  const navigationItems: NavigationItem[] = [
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      isActive: (currentPathname) => currentPathname === "/dashboard",
+    },
+    {
+      href: "/me/report",
+      label: "Mein Report",
+      isActive: (currentPathname) => currentPathname.startsWith("/me/"),
+    },
+    {
+      href: "/dashboard#dashboard-block-active",
+      label: "Matching",
+      isActive: (currentPathname) =>
+        currentPathname.startsWith("/report/") || currentPathname === "/invite/new",
+    },
+    {
+      href: workbookHref,
+      label: "Workbook",
+      isActive: (currentPathname) => currentPathname.startsWith("/founder-alignment/"),
+    },
+  ];
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;
@@ -104,7 +106,7 @@ export function ProductShell({
               aria-label="Produktnavigation"
               className="flex flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
             >
-              {NAVIGATION_ITEMS.map((item) => (
+              {navigationItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}

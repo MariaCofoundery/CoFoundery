@@ -263,48 +263,51 @@ export default async function DashboardPage({
   const heroPrimaryAction = !hasSubmittedBase
     ? {
         href: "/me/base",
-        label: "Profil vervollständigen",
-        title: "Lege zuerst dein Founder-Profil an.",
-        text: "Ohne Basisprofil bleiben Werteprofil, Matching und Report nur angedeutet. Dieser Schritt schafft die Grundlage für alles Weitere.",
+        label: "Profil starten",
+        title: "Starte dein Profil.",
+        text: "Das ist der erste Schritt.",
       }
     : !hasSubmittedValues
       ? {
           href: "/me/values",
-          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil abschließen",
-          title: "Schärfe jetzt dein Werteprofil.",
-          text: "Damit wird dein Profil belastbarer und spätere Matching- und Workbook-Entscheidungen werden deutlich präziser.",
+          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
+          title:
+            valuesStatus === "in_progress"
+              ? "Führe dein Werteprofil zu Ende."
+              : "Starte jetzt dein Werteprofil.",
+          text: "Damit wird dein Profil für Matching und Workbook belastbarer.",
         }
       : latestActiveWorkbook
         ? {
             href: latestActiveWorkbook.href,
             label: "Weiterarbeiten",
-            title: "Ein Workbook ist bereits in Arbeit.",
-            text: "Öffne den aktuellen Stand und führe die Vereinbarungen weiter, statt den Flow erneut von vorn zu beginnen.",
+            title: "Arbeite im Workbook weiter.",
+            text: "Hier liegt euer aktueller Arbeitsstand.",
           }
         : latestReadyReport
           ? {
               href:
                 workbookEntryPointHref ??
                 buildWorkbookHref(
-                  latestReadyReport.invitation_id,
-                  invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
+                    latestReadyReport.invitation_id,
+                    invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
                 ),
             label: "Workbook starten",
-            title: "Macht aus dem Report konkrete Regeln.",
-            text: "Der Matching-Report zeigt eure Dynamik. Im Workbook haltet ihr jetzt fest, wie ihr konkret zusammenarbeitet und was in den nächsten 90 Tagen gelten soll.",
+            title: "Starte jetzt das Workbook.",
+            text: "Übersetze den Report in konkrete Regeln und nächste Schritte.",
           }
         : !hasMatchingActivity
             ? {
                 href: "/invite/new",
                 label: "Co-Founder einladen",
-                title: "Bring jetzt eine zweite Person in den Flow.",
-                text: "Dein Profil steht. Der sinnvollste nächste Schritt ist jetzt ein echter Matching-Kontext mit Einladung, Report und anschließendem Workbook.",
+                title: "Starte jetzt das Matching.",
+                text: "Der nächste Schritt ist eine Einladung.",
               }
             : {
                 href: "/dashboard#dashboard-block-active",
-                label: "Übersicht ansehen",
-                title: "Behalte laufende Einladungen und Reports im Blick.",
-                text: "Sobald Einladungen, Reports oder Workbooks aktiv sind, findest du hier den operativen Einstieg ohne doppelte Umwege.",
+                label: "Matching verfolgen",
+                title: "Behalte das laufende Matching im Blick.",
+                text: "Sobald Antworten eingehen oder ein Report bereit ist, geht es hier weiter.",
               };
 
   const progressCards = [
@@ -315,10 +318,10 @@ export default async function DashboardPage({
       isCurrent: !hasSubmittedBase,
       isCompleted: hasSubmittedBase,
       text: hasSubmittedBase
-        ? "Profil steht als Grundlage für Report, Matching und Workbook."
+        ? "Profil ist bereit."
         : "Noch offen.",
       href: hasSubmittedBase ? "/me/report" : "/me/base",
-      actionLabel: hasSubmittedBase ? "Profil ansehen" : "Vervollständigen",
+      actionLabel: hasSubmittedBase ? "Ansehen" : "Starten",
     },
     {
       id: "dashboard-status-values",
@@ -327,13 +330,13 @@ export default async function DashboardPage({
       isCurrent: hasSubmittedBase && !hasSubmittedValues,
       isCompleted: hasSubmittedValues,
       text: hasSubmittedValues
-        ? "Der Werte-Layer ergänzt dein Profil um Entscheidungsprioritäten."
+        ? "Werteprofil ist bereit."
         : valuesStatus === "in_progress"
           ? "Bereits begonnen."
-          : "Optionaler Vertiefungsschritt.",
+          : "Noch offen.",
       href: hasSubmittedValues ? "/me/report#werteprofil" : "/me/values",
       actionLabel:
-        hasSubmittedValues ? "Werteprofil öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
+        hasSubmittedValues ? "Ansehen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
     },
     {
       id: "dashboard-block-status-matching",
@@ -343,10 +346,10 @@ export default async function DashboardPage({
       isCompleted: readyReports.length > 0,
       text:
         readyReports.length > 0
-          ? "Ein fertiger Matching-Report ist verfügbar."
+          ? "Report ist bereit."
           : hasMatchingActivity
-            ? "Einladungen oder laufende Matching-Kontexte sind aktiv."
-            : "Noch kein Matching gestartet.",
+            ? "Matching läuft."
+            : "Noch offen.",
       href: readyReports[0]
         ? `/report/${readyReports[0].invitation_id}`
         : hasSubmittedBase
@@ -362,11 +365,11 @@ export default async function DashboardPage({
       isCompleted: workbookStatus === "abgeschlossen",
       text:
         activeWorkbooks.length > 0
-          ? "Ein Workbook ist bereits in aktiver Bearbeitung."
+          ? "Workbook ist aktiv."
           : readyReports.length > 0
-            ? "Der nächste Schritt nach dem Report."
-            : "Sobald ein Report vorliegt, wird das Workbook relevant.",
-      href: workbookEntryPointHref ?? "/dashboard#dashboard-block-active",
+            ? "Bereit zum Start."
+            : "Noch offen.",
+      href: workbookEntryPointHref ?? "/dashboard",
       actionLabel:
         activeWorkbooks.length > 0
           ? "Weiterarbeiten"
@@ -438,7 +441,7 @@ export default async function DashboardPage({
                   Dein Founder Dashboard
                 </h1>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Profil, Matching und Workbook greifen hier als ein gemeinsamer Produktfluss ineinander.
+                  Von Profil zu Matching bis ins Workbook.
                 </p>
               </div>
             </header>
@@ -485,9 +488,9 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                 <ProfileIcon className="h-4 w-4" />
               </span>
-              Dein aktueller Stand
+              Fortschritt
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">Was ist fertig, was läuft gerade?</h2>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">Dein Stand</h2>
           </div>
         </div>
 
@@ -518,6 +521,20 @@ export default async function DashboardPage({
             </article>
           ))}
         </div>
+
+        {hasSubmittedValues && !hasMatchingActivity ? (
+          <article className="mt-5 rounded-2xl border border-slate-200/80 bg-white/82 p-4 shadow-[0_8px_20px_rgba(15,23,42,0.03)]">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Matching starten</p>
+                <p className="mt-1 text-sm text-slate-600">Lade jetzt einen Co-Founder ein.</p>
+              </div>
+              <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+                Co-Founder einladen
+              </Link>
+            </div>
+          </article>
+        ) : null}
       </section>
 
       <section
@@ -535,7 +552,7 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Einladungen, Reports und Workbook werden hier als ruhige Arbeitsübersicht gebündelt.
+              Hier geht es weiter.
             </p>
           </div>
         </div>
@@ -560,8 +577,8 @@ export default async function DashboardPage({
                 <p className="font-medium text-slate-900">{primaryWorkbook.title}</p>
                 <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
                   {primaryWorkbook.hasStarted
-                    ? "Hier arbeitet ihr bereits an konkreten Regeln und Vereinbarungen. Das ist aktuell der wichtigste Arbeitsstand."
-                    : "Zu diesem Match liegt ein Report vor. Das Workbook ist jetzt der sinnvollste nächste Schritt."}
+                    ? "Hier liegt euer aktueller Arbeitsstand."
+                    : "Der Report ist bereit. Jetzt geht es ins Workbook."}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
                   Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
@@ -599,7 +616,7 @@ export default async function DashboardPage({
               </div>
             ) : (
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
-                Sobald ein Matching-Report in konkrete Vereinbarungen übersetzt wird, landet das Workbook hier als klarer nächster Schritt.
+                Sobald ein Report bereit ist, startet hier das Workbook.
               </p>
             )}
           </article>
@@ -620,7 +637,7 @@ export default async function DashboardPage({
                 <p className="text-sm leading-7 text-slate-500">
                   {readyReports.length > 0
                     ? "Alle bereiten Reports sind bereits in Workbooks überführt."
-                    : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
+                    : "Sobald Reports bereit sind, erscheinen sie hier."}
                 </p>
               )}
             </div>
@@ -649,7 +666,7 @@ export default async function DashboardPage({
                     <span className="text-xs tracking-[0.08em] text-slate-500">ruhig</span>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-slate-500">
-                    Aktuell gibt es keine neuen eingehenden Einladungen, die direkt deine Aufmerksamkeit brauchen.
+                    Aktuell braucht hier nichts deine Aufmerksamkeit.
                   </p>
                 </section>
               )}
@@ -694,7 +711,7 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-xl font-semibold text-slate-900">Profil pflegen, Report bei Bedarf vertiefen</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Dieser Bereich bleibt bewusst ruhiger. Er zeigt deinen aktuellen Profilstand, ohne mit Hero oder Workbook um Aufmerksamkeit zu konkurrieren.
+              Profil und Report bleiben hier bewusst nachgelagert.
             </p>
           </div>
         </div>
@@ -729,8 +746,8 @@ export default async function DashboardPage({
 
             <p className="mt-3 text-sm leading-7 text-slate-600">
               {needsOnboarding
-                ? "Hier hinterlegst du die Basisdaten, ohne die Report, Matching und Workbook nicht sauber starten."
-                : "Profiländerungen, Fokus und Rollen pflegst du an einer Stelle statt über mehrere Zugänge."}
+                ? "Hier hinterlegst du deine Basisdaten."
+                : "Hier pflegst du Fokus, Rollen und Stammdaten."}
             </p>
 
             <div className="mt-5">
@@ -806,7 +823,7 @@ export default async function DashboardPage({
                   </Link>
                 </div>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Die Übersicht zeigt dir kompakt, wo du in den sechs Founder-Dimensionen aktuell stehst.
+                  Eine kompakte Einordnung deiner sechs Founder-Dimensionen.
                 </p>
                 <div className="mt-5">
                   <FounderDimensionsOverview scores={selfReport.scoresA} />
@@ -853,7 +870,7 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-xl font-semibold text-slate-900">Strukturell offen für den nächsten Ausbau</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Dieses Dashboard bleibt nicht beim Erst-Matching stehen. Die Oberfläche ist jetzt so sortiert, dass spätere Re-Alignment-, Entwicklungs- oder Partner-Module sauber anschließen können.
+              Weitere Module docken später hier an.
             </p>
           </div>
         </div>
