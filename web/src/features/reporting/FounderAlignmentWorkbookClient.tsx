@@ -192,8 +192,12 @@ type StepClarity = "open" | "partial" | "clear";
 
 type AgreementDraftResult = {
   draft: string;
-  commonGround: string[];
-  differingPerspectives: string[];
+  sourceMode: "solo" | "joint";
+  state: "aligned" | "different" | "unclear" | "solo";
+  comparisonLabel: string | null;
+  comparisonHint: string | null;
+  suggestionTitle: string;
+  suggestionIntro: string;
 };
 
 type SpeechSupportState = "unknown" | "supported" | "unsupported";
@@ -237,6 +241,29 @@ const STEP_CLARITY_OPTIONS: Array<{ value: StepClarity; label: string }> = [
   { value: "clear", label: "Klar vereinbart" },
 ];
 
+function getStructuredPerspectivePrompt(stepId: FounderAlignmentWorkbookStepId) {
+  switch (stepId) {
+    case "vision_direction":
+      return "Wie wuerdest du hier konkret priorisieren?";
+    case "decision_rules":
+      return "Was wuerdest du hier als klare Regel festlegen?";
+    case "commitment_load":
+      return "Was wuerdest du hier realistisch zusagen?";
+    case "collaboration_conflict":
+      return "Wie wuerdest du das hier konkret ansprechen und klaeren?";
+    case "ownership_risk":
+      return "Wie wuerdest du dieses Risiko fuehren und ab wann eingreifen?";
+    case "values_guardrails":
+      return "Wie wuerdest du hier konkret entscheiden?";
+    case "alignment_90_days":
+      return "Was wuerdest du in den naechsten 90 Tagen klar priorisieren?";
+    case "roles_responsibility":
+      return "Wie wuerdest du hier Verantwortung und Freigabe regeln?";
+    default:
+      return "Was wuerdest du konkret tun?";
+  }
+}
+
 const FOUNDER_REACTION_OPTIONS: Array<{
   value: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>;
   label: string;
@@ -260,7 +287,6 @@ const DEFAULT_SPEECH_LANGUAGE = AVAILABLE_SPEECH_LANGUAGES[0];
 const DICTATION_INACTIVITY_MS = 9000;
 const DICTATION_RESTART_MS = 250;
 const WORKBOOK_AUTOSAVE_DELAY_MS = 1800;
-const DECISION_RULES_STEP_ID: FounderAlignmentWorkbookStepId = "decision_rules";
 
 export function FounderAlignmentWorkbookClient({
   invitationId,
@@ -290,16 +316,9 @@ export function FounderAlignmentWorkbookClient({
     message: null,
     updatedAt,
   });
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [editingMode, setEditingMode] = useState<WorkbookEditingMode>(
     currentUserRole === "founderA" || currentUserRole === "founderB" ? "personal" : "joint"
-  );
-  const [agreementDrafts, setAgreementDrafts] = useState<
-    Record<FounderAlignmentWorkbookStepId, AgreementDraftResult | null>
-  >(() =>
-    Object.fromEntries(
-      FOUNDER_ALIGNMENT_WORKBOOK_STEPS.map((step) => [step.id, null])
-    ) as Record<FounderAlignmentWorkbookStepId, AgreementDraftResult | null>
   );
   const [stepClarity, setStepClarity] = useState<
     Record<FounderAlignmentWorkbookStepId, StepClarity | null>
@@ -317,6 +336,7 @@ export function FounderAlignmentWorkbookClient({
   );
   const [showSummaryView, setShowSummaryView] = useState(false);
   const [showFullExportView, setShowFullExportView] = useState(false);
+  const [agreementFieldFocusSignal, setAgreementFieldFocusSignal] = useState(0);
   const [advisorInviteState, setAdvisorInviteState] =
     useState<FounderAlignmentWorkbookAdvisorInviteState>(advisorInvite);
   const [advisorInviteMessage, setAdvisorInviteMessage] = useState<string | null>(null);
@@ -357,13 +377,121 @@ export function FounderAlignmentWorkbookClient({
   const currentStepUsesStructuredOutput = Boolean(
     currentStructuredOutputFields && currentStructuredOutputFields.length > 0
   );
+  const currentStepHasSingleStructuredOutput =
+    Boolean(currentStructuredOutputFields) && currentStructuredOutputFields?.length === 1;
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
-  const currentStepIsDecisionRules = currentStep.id === DECISION_RULES_STEP_ID;
   const isFocusedStep = highlights.prioritizedStepIds.includes(currentStep.id);
-  const currentAgreementDraft = agreementDrafts[currentStep.id];
   const hasBothPerspectives =
     workbook.steps[currentStep.id].founderA.trim().length > 0 &&
     workbook.steps[currentStep.id].founderB.trim().length > 0;
+  const personalDraftSource =
+    currentUserRole === "founderB"
+      ? workbook.steps[currentStep.id].founderB
+      : workbook.steps[currentStep.id].founderA;
+  const currentAgreementDraft = useMemo(() => {
+    if (currentStepUsesStructuredOutput || currentStepIsAdvisorClosing) {
+      return null;
+    }
+
+    if (editingMode === "joint") {
+      if (!hasBothPerspectives) return null;
+      return buildAgreementDraft({
+        stepId: currentStep.id,
+        founderAResponse: workbook.steps[currentStep.id].founderA,
+        founderBResponse: workbook.steps[currentStep.id].founderB,
+        sourceMode: "joint",
+      });
+    }
+
+    if (!personalDraftSource.trim()) {
+      return null;
+    }
+
+    return buildAgreementDraft({
+      stepId: currentStep.id,
+      founderAResponse: personalDraftSource,
+      founderBResponse: "",
+      sourceMode: "solo",
+    });
+  }, [
+    currentStep.id,
+    currentStepIsAdvisorClosing,
+    currentStepUsesStructuredOutput,
+    editingMode,
+    hasBothPerspectives,
+    personalDraftSource,
+    workbook.steps,
+  ]);
+  const orderedPerspectiveFields = useMemo<["founderA" | "founderB", "founderA" | "founderB"]>(
+    () =>
+      editingMode === "joint"
+        ? ["founderA", "founderB"]
+        : currentUserRole === "founderB"
+          ? ["founderB", "founderA"]
+          : ["founderA", "founderB"],
+    [currentUserRole, editingMode]
+  );
+  const [primaryPerspectiveField, secondaryPerspectiveField] = orderedPerspectiveFields;
+  const primaryPerspectiveHasValue =
+    workbook.steps[currentStep.id][primaryPerspectiveField].trim().length > 0;
+  const currentAgreementValue = workbook.steps[currentStep.id].agreement.trim();
+  const currentStepHasAgreement = currentAgreementValue.length > 0;
+  const stepProgressMeta = useMemo(
+    () =>
+      Object.fromEntries(
+        visibleSteps.map((step) => {
+          const stepEntry = workbook.steps[step.id];
+          const hasPerspectiveInput =
+            stepEntry.founderA.trim().length > 0 || stepEntry.founderB.trim().length > 0;
+          const hasAgreement = stepEntry.agreement.trim().length > 0;
+          const hasAdvisorNotes = stepEntry.advisorNotes.trim().length > 0;
+          const hasAdvisorClosingContent =
+            step.id === "advisor_closing"
+              ? [
+                  workbook.advisorClosing.observations,
+                  workbook.advisorClosing.questions,
+                  workbook.advisorClosing.nextSteps,
+                  workbook.founderReaction.comment,
+                ].some((value) => value.trim().length > 0) ||
+                workbook.founderReaction.status !== null
+              : false;
+          const clarityState = stepClarity[step.id];
+          const completed =
+            clarityState === "clear" ||
+            (step.id === "advisor_closing" ? hasAdvisorClosingContent : hasAgreement);
+          const started =
+            completed ||
+            clarityState === "partial" ||
+            clarityState === "open" ||
+            hasPerspectiveInput ||
+            hasAdvisorNotes ||
+            hasAdvisorClosingContent;
+
+          return [
+            step.id,
+            {
+              completed,
+              started,
+            },
+          ];
+        })
+      ) as Record<FounderAlignmentWorkbookStepId, { completed: boolean; started: boolean }>,
+    [
+      stepClarity,
+      visibleSteps,
+      workbook.advisorClosing.nextSteps,
+      workbook.advisorClosing.observations,
+      workbook.advisorClosing.questions,
+      workbook.founderReaction.comment,
+      workbook.founderReaction.status,
+      workbook.steps,
+    ]
+  );
+  const completedStepsCount = visibleSteps.filter(
+    (step) => stepProgressMeta[step.id]?.completed
+  ).length;
+  const comparisonSectionVisible = !currentStepUsesStructuredOutput;
+  const outputSectionNumber = comparisonSectionVisible ? 5 : 4;
   const structuredAgreement = currentStepUsesStructuredOutput && currentStructuredOutputFields
     ? parseStructuredAgreement(
         workbook.steps[currentStep.id].agreement,
@@ -480,22 +608,44 @@ export function FounderAlignmentWorkbookClient({
 
     switch (saveState.kind) {
       case "dirty":
-        return { label: t("Ungespeicherte Aenderungen"), tone: "warning" as const };
+        return { label: t("Nicht gesichert"), tone: "warning" as const };
       case "saving":
-        return { label: "Speichert...", tone: "info" as const };
+        return { label: t("Speichert gerade"), tone: "info" as const };
       case "autosaved":
-        return { label: t("Automatisch gespeichert"), tone: "success" as const };
       case "saved":
-        return { label: t("Gespeichert"), tone: "success" as const };
+        return { label: t("Alles gesichert"), tone: "success" as const };
       case "error":
-        return { label: t("Speichern fehlgeschlagen"), tone: "error" as const };
+        return { label: t("Speichern klappt gerade nicht"), tone: "error" as const };
       default:
         return {
-          label: persisted ? t("Bestehende Session geladen") : t("Bereit zum Speichern"),
+          label: persisted ? t("Bereit") : t("Startklar"),
           tone: "neutral" as const,
         };
     }
   }, [canSave, persisted, saveState.kind, source]);
+  const saveStatusDetail = useMemo(() => {
+    if (!canSave || source === "mock") {
+      return t("Diese Vorschau speichert keine Eingaben.");
+    }
+
+    switch (saveState.kind) {
+      case "dirty":
+        return t("Aenderungen werden gleich automatisch gesichert.");
+      case "saving":
+        return t("Der aktuelle Stand wird gerade gesichert.");
+      case "autosaved":
+      case "saved":
+        return formattedUpdatedAt
+          ? `${t("Alles gesichert")} · ${formattedUpdatedAt}`
+          : t("Alles gesichert.");
+      case "error":
+        return t("Bitte kurz warten oder den Schritt erneut oeffnen.");
+      default:
+        return persisted
+          ? t("Dein bisheriger Stand ist geladen und bleibt laufend gesichert.")
+          : t("Sobald ihr startet, wird euer Stand laufend gesichert.");
+    }
+  }, [canSave, formattedUpdatedAt, persisted, saveState.kind, source]);
 
   useEffect(() => {
     if (!shouldScrollToStepRef.current) return;
@@ -779,13 +929,6 @@ export function FounderAlignmentWorkbookClient({
 
   const nextStepId = workbookNextStepId(activeStepId, visibleSteps);
   const previousStepId = workbookPreviousStepId(activeStepId, visibleSteps);
-  const topActionLabel =
-    !canSave
-      ? null
-      : persisted || saveState.kind === "saved" || saveState.kind === "autosaved"
-        ? "Arbeitsdokument sichern"
-        : t("Arbeitsdokument starten");
-
   function fieldHeading(field: WorkbookEditableField) {
     if (field === "advisorNotes") {
       return t("Hinweis des Advisors");
@@ -810,24 +953,49 @@ export function FounderAlignmentWorkbookClient({
     return t(`Perspektive von ${otherFounderLabel}`);
   }
 
-  function createAgreementDraft() {
-    if (!hasBothPerspectives) return;
+  function perspectiveDisplayName(field: "founderA" | "founderB") {
+    return field === "founderA" ? founderALabel : founderBLabel;
+  }
 
-    const draft = buildAgreementDraft({
-      stepId: currentStep.id,
-      founderAResponse: workbook.steps[currentStep.id].founderA,
-      founderBResponse: workbook.steps[currentStep.id].founderB,
-    });
+  function perspectiveSectionTitle(field: "founderA" | "founderB", order: 2 | 3) {
+    if (editingMode === "joint") {
+      return `${order}. Perspektive ${perspectiveDisplayName(field)}`;
+    }
 
-    setAgreementDrafts((current) => ({
-      ...current,
-      [currentStep.id]: draft,
-    }));
+    if (
+      (field === "founderA" && currentUserRole === "founderA") ||
+      (field === "founderB" && currentUserRole === "founderB")
+    ) {
+      return `${order}. Deine Sicht`;
+    }
+
+    return `${order}. Sicht von ${perspectiveDisplayName(field)}`;
+  }
+
+  function perspectiveSectionHint(field: "founderA" | "founderB", isPrimary: boolean) {
+    if (editingMode === "joint") {
+      return isPrimary
+        ? t("Startet mit einer ersten klaren Antwort auf das Szenario.")
+        : t("Legt danach die zweite Sicht daneben. So wird der Vergleich greifbar.");
+    }
+
+    if (
+      (field === "founderA" && currentUserRole === "founderA") ||
+      (field === "founderB" && currentUserRole === "founderB")
+    ) {
+      return t("Halte hier zuerst deine eigene Sicht fest.");
+    }
+
+    return t("Die andere Perspektive bleibt sichtbar, damit eure Regel nicht im luftleeren Raum entsteht.");
   }
 
   function applyAgreementDraft() {
     if (!currentAgreementDraft) return;
     updateEntry("agreement", currentAgreementDraft.draft);
+  }
+
+  function focusAgreementField() {
+    setAgreementFieldFocusSignal((current) => current + 1);
   }
 
   function openSummaryView() {
@@ -984,17 +1152,17 @@ export function FounderAlignmentWorkbookClient({
             </div>
           </section>
         ) : (
-          <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
+          <section className="rounded-[32px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                Founder Alignment Session
+                Founder Alignment
               </p>
               <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
                 {teamContextLabel(teamContext)}
               </div>
               <h1 className="mt-3 text-3xl font-semibold text-slate-950">
-                {t("Workbook fuer eure gemeinsame Session")}
+                {t("Workbook fuer euer Gespraech")}
               </h1>
               <p className="mt-3 text-base leading-7 text-slate-700">
                 {founderALabel} x {founderBLabel}
@@ -1004,51 +1172,65 @@ export function FounderAlignmentWorkbookClient({
               </p>
             </div>
 
-            <div className="flex min-w-[240px] flex-col items-start gap-3 rounded-3xl border border-slate-200 bg-slate-50/80 p-5 lg:items-end">
+            <div className="flex min-w-[260px] flex-col items-start gap-3 rounded-[28px] border border-slate-200/70 bg-slate-50/70 p-5 lg:items-end">
               <div className="text-sm text-slate-600">Dauer: 60-90 Minuten</div>
-              {topActionLabel ? (
-                <ReportActionButton
-                  onClick={() => persist()}
-                  className="w-full lg:w-auto"
-                >
-                  {isPending ? t("Sichert...") : t(topActionLabel)}
-                </ReportActionButton>
-              ) : (
-                <div className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-                  {t("Vorschau ohne Speichern")}
+              <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                      saveStatusMeta.tone === "success"
+                        ? "bg-emerald-500"
+                        : saveStatusMeta.tone === "warning"
+                          ? "bg-amber-500"
+                          : saveStatusMeta.tone === "error"
+                            ? "bg-rose-500"
+                            : saveStatusMeta.tone === "info"
+                              ? "bg-sky-500"
+                              : "bg-slate-400"
+                    }`}
+                  />
+                  <p
+                    className={`text-xs font-medium uppercase tracking-[0.16em] ${
+                      saveStatusMeta.tone === "success"
+                        ? "text-emerald-700"
+                        : saveStatusMeta.tone === "warning"
+                          ? "text-amber-700"
+                          : saveStatusMeta.tone === "error"
+                            ? "text-rose-700"
+                            : saveStatusMeta.tone === "info"
+                              ? "text-sky-700"
+                              : "text-slate-500"
+                    }`}
+                  >
+                    {saveStatusMeta.label}
+                  </p>
                 </div>
-              )}
-              <div className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 lg:max-w-xs">
-                <p
-                  className={`text-xs font-medium uppercase tracking-[0.16em] ${
-                    saveStatusMeta.tone === "success"
-                      ? "text-emerald-700"
-                      : saveStatusMeta.tone === "warning"
-                        ? "text-amber-700"
-                        : saveStatusMeta.tone === "error"
-                          ? "text-rose-700"
-                          : saveStatusMeta.tone === "info"
-                            ? "text-sky-700"
-                            : "text-slate-500"
-                  }`}
-                >
-                  {saveStatusMeta.label}
+                <p className="mt-3 text-sm leading-6 text-slate-600">{saveStatusDetail}</p>
+              </div>
+              <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                  {t("Fortschritt")}
                 </p>
-                <p className="mt-2 text-xs leading-6 text-slate-500">
-                  {saveState.message ??
-                    (persisted
-                      ? t("Bestehende Session geladen")
-                      : source === "mock"
-                        ? t("Vorschau ohne Speichern")
-                        : t("Noch keine gespeicherte Session"))}
-                  {formattedUpdatedAt ? ` · zuletzt ${formattedUpdatedAt}` : ""}
+                <p className="mt-2 text-sm font-medium text-slate-900">
+                  {t(`Schritt ${currentIndex + 1} von ${visibleSteps.length}`)}
+                </p>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-[linear-gradient(90deg,var(--brand-primary),var(--brand-accent))]"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="mt-3 text-xs leading-6 text-slate-500">
+                  {completedStepsCount > 0
+                    ? t(`${completedStepsCount} Schritte sind bereits klar festgehalten.`)
+                    : t("Der erste klare Schritt entsteht gleich im Workbook.")}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(260px,0.9fr)]">
-            <div className="rounded-3xl border border-[color:var(--brand-primary)]/20 bg-[linear-gradient(135deg,rgba(103,232,249,0.12),rgba(255,255,255,0.92))] p-6">
+            <div className="rounded-3xl border border-slate-200/70 bg-slate-50/70 p-6">
               <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Arbeitsdokument")}</p>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {t(
@@ -1065,12 +1247,12 @@ export function FounderAlignmentWorkbookClient({
                   href={printWorksheetHref}
                   className="w-full sm:w-auto"
                 >
-                  {t("Arbeitsdokument als PDF herunterladen")}
+                  {t("PDF herunterladen")}
                 </ReportActionButton>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white/92 p-6">
+            <div className="rounded-3xl border border-slate-200/70 bg-white/92 p-6">
               {currentUserRole === "advisor" ? (
                 <>
                   <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
@@ -1092,23 +1274,23 @@ export function FounderAlignmentWorkbookClient({
                 </>
               ) : (
                 <>
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Bearbeitungsmodus")}</p>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Wie ihr gerade arbeitet")}</p>
                   <p className="mt-3 text-sm leading-7 text-slate-700">
                     {t(
-                      "Waehlt bei Bedarf, ob jede Person zuerst die eigene Sicht festhaelt oder ob ihr das Arbeitsdokument direkt gemeinsam ausfuellt."
+                      "Ihr koennt erst einzeln antworten oder den Schritt direkt gemeinsam ausfuellen."
                     )}
                   </p>
                   <div className="mt-5 grid gap-3">
                     <ModeCard
-                      title={t("Ich fuelle meinen Teil aus")}
-                      text={t("Jede Person bearbeitet standardmaessig den eigenen Bereich. Die andere Perspektive bleibt sichtbar.")}
+                      title={t("Eigene Sicht zuerst")}
+                      text={t("Jede Person schreibt zuerst die eigene Antwort. Die andere Sicht bleibt dabei sichtbar.")}
                       active={editingMode === "personal"}
                       onClick={() => setEditingMode("personal")}
                       disabled={currentUserRole === "unknown"}
                     />
                     <ModeCard
-                      title={t("Wir bearbeiten das gemeinsam")}
-                      text={t("Beide Perspektiven und die gemeinsame Vereinbarung sind direkt editierbar.")}
+                      title={t("Gemeinsam bearbeiten")}
+                      text={t("Beide Perspektiven und die gemeinsame Regel sind direkt offen.")}
                       active={editingMode === "joint"}
                       onClick={() => setEditingMode("joint")}
                     />
@@ -1121,17 +1303,17 @@ export function FounderAlignmentWorkbookClient({
                     }`}
                   >
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Aktiver Modus")}
+                      {t("Gerade aktiv")}
                     </p>
                     <p className="mt-2 text-sm font-medium text-slate-900">
                       {editingMode === "joint"
-                        ? t("Gemeinsame Bearbeitung ist aktiv.")
-                        : t("Persoenliche Bearbeitung ist aktiv.")}
+                        ? t("Ihr arbeitet gerade gemeinsam.")
+                        : t("Ihr startet gerade mit den einzelnen Sichten.")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-slate-600">
                       {editingMode === "joint"
-                        ? t("Beide Perspektiven und die Vereinbarung koennen jetzt direkt im Schritt bearbeitet werden.")
-                        : t("Aktiv ist vor allem dein eigener Bereich. Die andere Perspektive bleibt sichtbar, aber bewusst zurueckgenommen.")}
+                        ? t("Beide Antworten und die gemeinsame Regel koennen direkt im Schritt bearbeitet werden.")
+                        : t("Zuerst steht deine eigene Antwort im Fokus. Die andere Sicht bleibt ruhig im Blick.")}
                     </p>
                   </div>
                 </>
@@ -1218,7 +1400,7 @@ export function FounderAlignmentWorkbookClient({
             </div>
           ) : null}
 
-          <div className="mt-8 rounded-3xl border border-[color:var(--brand-accent)]/16 bg-[linear-gradient(135deg,rgba(124,58,237,0.08),rgba(255,255,255,0.95))] p-6">
+          <div className="mt-8 rounded-3xl border border-slate-200/70 bg-slate-50/70 p-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Fokus-Themen aus eurem Report")}</p>
@@ -1231,8 +1413,8 @@ export function FounderAlignmentWorkbookClient({
               </div>
               <div className="text-sm leading-6 text-slate-600">
                 {highlights.prioritizedStepIds.length > 0
-                  ? t("Einzelne Schritte sind bereits aus dem Report besonders hervorgehoben.")
-                  : t("Arbeitet die Session in Ruhe nacheinander durch und macht Unterschiede konkret.")}
+                  ? t("Einzelne Schritte sind aus dem Report besonders wichtig.")
+                  : t("Geht die Schritte in Ruhe nacheinander durch.")}
               </div>
             </div>
 
@@ -1306,14 +1488,17 @@ export function FounderAlignmentWorkbookClient({
         <div className="mt-8 grid gap-8 xl:grid-cols-[280px_minmax(0,1fr)]">
           <aside
             id="sessionverlauf"
-            className="rounded-[28px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)]"
+            className="order-2 self-start rounded-[28px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] xl:order-1 xl:sticky xl:top-24"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Sessionverlauf</p>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Schritte</p>
               <span className="text-sm text-slate-600">
-                {currentIndex + 1}/{visibleSteps.length}
+                {completedStepsCount}/{visibleSteps.length}
               </span>
             </div>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              {t(`Schritt ${currentIndex + 1} von ${visibleSteps.length}`)}
+            </p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,var(--brand-primary),var(--brand-accent))]"
@@ -1325,34 +1510,65 @@ export function FounderAlignmentWorkbookClient({
               {visibleSteps.map((step, index) => {
                 const isActive = step.id === workbook.currentStepId;
                 const isPrioritized = highlights.prioritizedStepIds.includes(step.id);
+                const progressMeta = stepProgressMeta[step.id];
                 return (
                   <li
                     key={step.id}
-                    className={`rounded-2xl border px-4 py-3 ${
-                      isActive
-                        ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-slate-900"
-                        : "border-slate-200 bg-slate-50/80 text-slate-700"
-                    }`}
+                    className="list-none"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">
-                          Schritt {index + 1}
-                        </p>
-                        <p className="mt-1 text-sm font-medium">{step.title}</p>
+                    <button
+                      type="button"
+                      onClick={() => persist(step.id)}
+                      className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                        isActive
+                          ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_12px_24px_rgba(103,232,249,0.12)]"
+                          : progressMeta?.completed
+                              ? "border-emerald-200/80 bg-emerald-50/40 text-slate-800 hover:border-emerald-300"
+                            : progressMeta?.started
+                              ? "border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50"
+                              : "border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">
+                            Schritt {index + 1}
+                          </p>
+                          <p className="mt-1 text-sm font-medium">{step.title}</p>
+                          <p className="mt-2 text-xs leading-5 opacity-75">
+                            {progressMeta?.completed
+                              ? t("Regel steht")
+                              : progressMeta?.started
+                                ? t("In Arbeit")
+                                : t("Noch offen")}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          {isPrioritized ? (
+                            <span
+                              className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                                isActive
+                                  ? "bg-white/70 text-slate-900"
+                                  : "bg-[color:var(--brand-accent)]/10 text-[color:var(--brand-accent)]"
+                              }`}
+                            >
+                              Fokus
+                            </span>
+                          ) : null}
+                          <span
+                            className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                              progressMeta?.completed
+                              ? "bg-emerald-600 text-white"
+                              : progressMeta?.started
+                                  ? "bg-slate-900 text-white"
+                                  : "bg-slate-200 text-slate-500"
+                            }`}
+                          >
+                            {progressMeta?.completed ? "✓" : index + 1}
+                          </span>
+                        </div>
                       </div>
-                      {isPrioritized ? (
-                        <span
-                          className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
-                            isActive
-                              ? "bg-white/15 text-white"
-                              : "bg-[color:var(--brand-accent)]/10 text-[color:var(--brand-accent)]"
-                          }`}
-                        >
-                          Fokus
-                        </span>
-                      ) : null}
-                    </div>
+                    </button>
                   </li>
                 );
               })}
@@ -1361,18 +1577,41 @@ export function FounderAlignmentWorkbookClient({
 
           <section
             ref={currentStepRef}
-            className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)]"
+            className="order-1 rounded-[32px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-8 xl:order-2"
           >
-            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              Schritt {currentIndex + 1} von {visibleSteps.length} -{" "}
-              {currentStep.title}
-            </p>
+            <div className="rounded-3xl border border-slate-200/70 bg-slate-50/70 p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                    Schritt {currentIndex + 1} von {visibleSteps.length}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t("Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.")}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                    stepProgressMeta[currentStep.id]?.completed
+                      ? "bg-emerald-100 text-emerald-700"
+                      : stepProgressMeta[currentStep.id]?.started
+                        ? "bg-slate-900 text-white"
+                        : "bg-slate-200 text-slate-600"
+                  }`}
+                >
+                  {stepProgressMeta[currentStep.id]?.completed
+                    ? t("Regel festgehalten")
+                    : stepProgressMeta[currentStep.id]?.started
+                      ? t("Ihr seid dran")
+                      : t("Startklar")}
+                </span>
+              </div>
+            </div>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
             <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
               {currentStep.subtitle}
             </p>
             {isFocusedStep ? (
-              <div className="mt-6 rounded-2xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-5">
+              <div className="mt-6 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--brand-accent)]">
                   Fokus aus eurem Report
                 </p>
@@ -1383,11 +1622,15 @@ export function FounderAlignmentWorkbookClient({
             ) : null}
 
             <StepSection
-              title="Kontext"
+              title={currentStepUsesStructuredOutput ? "1. Intro und Szenario" : "1. Einstieg"}
               className="mt-8 border-slate-200 bg-slate-50/80"
             >
               <p className="text-sm leading-7 text-slate-700">
-                {t("Warum dieses Thema fuer Gruenderteams wichtig ist.")}
+                {t(
+                  currentStepUsesStructuredOutput
+                    ? "Klaert hier die Regel, die im Alltag wirklich gelten soll."
+                    : "Warum dieses Thema fuer Gruenderteams wichtig ist."
+                )}
               </p>
               <div className="mt-4 space-y-3">
                 {currentStepContent.context.map((paragraph) => (
@@ -1395,12 +1638,60 @@ export function FounderAlignmentWorkbookClient({
                     {t(paragraph)}
                   </p>
                 ))}
-              </div>
-              <div className="mt-5 rounded-2xl border border-[color:var(--brand-accent)]/12 bg-[color:var(--brand-accent)]/5 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                  So zeigt sich das im Alltag
-                </p>
-                <p className="mt-2 text-sm leading-7 text-slate-700">{t(currentStepContent.everyday)}</p>
+                {currentStepUsesStructuredOutput ? (
+                  <>
+                    <p className="text-sm leading-7 text-slate-700">{t(currentStepContent.everyday)}</p>
+                    {currentStepContent.scenario ? (
+                      <div className="mt-5 rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
+                          Realitaetsszenario
+                        </p>
+                        <p className="mt-3 text-sm leading-7 text-slate-700">
+                          {t(currentStepContent.scenario)}
+                        </p>
+                      </div>
+                    ) : null}
+                    <div className="mt-5 rounded-3xl border border-slate-200 bg-white/92 p-6">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {t("Klare Leitfragen")}
+                      </p>
+                      <ul className="mt-4 grid gap-3">
+                        {currentStep.prompts.map((prompt) => (
+                          <li
+                            key={prompt}
+                            className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
+                          >
+                            {t(prompt)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-5 rounded-2xl border border-[color:var(--brand-accent)]/12 bg-[color:var(--brand-accent)]/5 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
+                        So zeigt sich das im Alltag
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-slate-700">{t(currentStepContent.everyday)}</p>
+                    </div>
+                    <div className="mt-5 rounded-3xl border border-slate-200 bg-white/92 p-6">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {t("Worueber ihr hier sprecht")}
+                      </p>
+                      <ul className="mt-4 grid gap-3">
+                        {currentStep.prompts.map((prompt) => (
+                          <li
+                            key={prompt}
+                            className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
+                          >
+                            {t(prompt)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
             </StepSection>
 
@@ -1563,92 +1854,175 @@ export function FounderAlignmentWorkbookClient({
               </StepSection>
             ) : (
               <>
-                <StepSection title="Eure Perspektiven" className="mt-8 border-slate-200 bg-slate-50/70">
+                <StepSection
+                  title={perspectiveSectionTitle(primaryPerspectiveField, 2)}
+                  className="mt-8 border-slate-200/70 bg-white"
+                >
                   <p className="text-sm leading-7 text-slate-700">
-                    {t(
-                      currentStepUsesStructuredOutput
-                        ? "Haltet hier knapp fest, welche Regel, Grenze oder Ausnahme ihr fuer dieses Szenario setzen wuerdet. Es geht nicht um Grundsaetze, sondern um euren tatsaechlichen Arbeitsmodus."
-                        : "Haltet hier zunaechst eure individuelle Sicht fest. Diese Felder beschreiben noch keine Einigung, sondern machen sichtbar, welche Prioritaeten, Erwartungen oder Bedenken jede Person in dieses Thema einbringt."
-                    )}
+                    {perspectiveSectionHint(primaryPerspectiveField, true)}
                   </p>
-
-                  {currentStepUsesStructuredOutput && currentStepContent.scenario ? (
-                    <div className="mt-6 rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                        Realitaetsszenario
-                      </p>
-                      <p className="mt-3 text-sm leading-7 text-slate-700">
-                        {t(currentStepContent.scenario)}
-                      </p>
-                    </div>
-                  ) : null}
-
-                  <div className="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6">
-                    <p className="text-sm font-semibold text-slate-900">
-                      {t(currentStepUsesStructuredOutput ? "Konkrete Entscheidungsfragen" : "Fragen fuer eure Reflexion")}
-                    </p>
-                    <ul className="mt-4 grid gap-3">
-                      {currentStep.prompts.map((prompt) => (
-                        <li
-                          key={prompt}
-                          className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
-                        >
-                          {t(prompt)}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="mt-6 grid gap-6 xl:grid-cols-2">
+                  <div className="mt-5">
                     <WorkbookField
-                      title={
-                        editingMode === "joint"
-                          ? `Perspektive ${founderALabel}`
-                          : fieldHeading("founderA")
-                      }
-                      value={workbook.steps[currentStep.id].founderA}
-                      onChange={(value) => updateEntry("founderA", value)}
+                      title={fieldHeading(primaryPerspectiveField)}
+                      value={workbook.steps[currentStep.id][primaryPerspectiveField]}
+                      onChange={(value) => updateEntry(primaryPerspectiveField, value)}
                       placeholder={t(
                         currentStepUsesStructuredOutput
-                          ? "Welche Regel, Schwelle oder Ausnahme wuerdest du fuer dieses Szenario festlegen?"
+                          ? getStructuredPerspectivePrompt(currentStep.id)
                           : "Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?"
                       )}
-                      readOnly={!canEditField("founderA")}
-                      helperText={getFieldReadOnlyHint("founderA")}
-                    />
-                    <WorkbookField
-                      title={
-                        editingMode === "joint"
-                          ? `Perspektive ${founderBLabel}`
-                          : fieldHeading("founderB")
-                      }
-                      value={workbook.steps[currentStep.id].founderB}
-                      onChange={(value) => updateEntry("founderB", value)}
-                      placeholder={t(
-                        currentStepUsesStructuredOutput
-                          ? "Welche Regel, Schwelle oder Ausnahme wuerdest du fuer dieses Szenario festlegen?"
-                          : "Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?"
-                      )}
-                      readOnly={!canEditField("founderB")}
-                      helperText={getFieldReadOnlyHint("founderB")}
+                      readOnly={!canEditField(primaryPerspectiveField)}
+                      helperText={getFieldReadOnlyHint(primaryPerspectiveField)}
                     />
                   </div>
                 </StepSection>
 
                 <StepSection
+                  title={perspectiveSectionTitle(secondaryPerspectiveField, 3)}
+                  className={`mt-8 border-slate-200/70 ${
+                    primaryPerspectiveHasValue ? "bg-white" : "bg-slate-50/60"
+                  }`}
+                >
+                  <p className="text-sm leading-7 text-slate-700">
+                    {perspectiveSectionHint(secondaryPerspectiveField, false)}
+                  </p>
+                  {!primaryPerspectiveHasValue ? (
+                    <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white/70 px-4 py-3 text-xs leading-6 text-slate-500">
+                      {t("Die erste Antwort darf ruhig zuerst stehen. Danach wird die zweite Sicht leichter vergleichbar.")}
+                    </div>
+                  ) : null}
+                  <div className="mt-5">
+                    <WorkbookField
+                      title={fieldHeading(secondaryPerspectiveField)}
+                      value={workbook.steps[currentStep.id][secondaryPerspectiveField]}
+                      onChange={(value) => updateEntry(secondaryPerspectiveField, value)}
+                      placeholder={t(
+                        currentStepUsesStructuredOutput
+                          ? getStructuredPerspectivePrompt(currentStep.id)
+                          : "Welche Sicht, Sorge oder Prioritaet bringst du in diesen Schritt ein?"
+                      )}
+                      readOnly={!canEditField(secondaryPerspectiveField)}
+                      helperText={getFieldReadOnlyHint(secondaryPerspectiveField)}
+                    />
+                  </div>
+                </StepSection>
+
+                {!currentStepUsesStructuredOutput ? (
+                  <StepSection
+                    title="4. Vergleich und Vorschlag"
+                    className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
+                  >
+                    <p className="text-sm leading-7 text-slate-700">
+                      {t(
+                        "Hier wird aus euren beiden Antworten ein erster gemeinsamer Vorschlag. Ihr koennt ihn direkt uebernehmen oder noch schaerfen."
+                      )}
+                    </p>
+
+                    <div className="mt-5 flex flex-col gap-3">
+                      {editingMode === "joint" && !currentAgreementDraft ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300/90 bg-white/85 px-4 py-4 text-sm leading-7 text-slate-600">
+                          {t("Sobald beide Antworten da sind, seht ihr hier den Vergleich und direkt darunter euren Regelvorschlag.")}
+                        </div>
+                      ) : null}
+
+                      {editingMode === "personal" && !currentAgreementDraft ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300/90 bg-white/85 px-4 py-4 text-sm leading-7 text-slate-600">
+                          {t("Sobald deine Antwort steht, erscheint hier ein erster Regelvorschlag fuer den gemeinsamen Text.")}
+                        </div>
+                      ) : null}
+
+                      {currentAgreementDraft ? (
+                        <div
+                          className={`rounded-3xl border p-5 shadow-[0_12px_30px_rgba(15,23,42,0.06)] ${
+                            currentAgreementDraft.sourceMode === "joint"
+                              ? "border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.04),rgba(255,255,255,0.98))]"
+                              : "border-slate-200/70 bg-slate-50/80"
+                          }`}
+                        >
+                          {currentAgreementDraft.sourceMode === "joint" &&
+                          currentAgreementDraft.comparisonLabel ? (
+                            <div className="rounded-2xl border border-[color:var(--brand-accent)]/14 bg-white/80 p-4">
+                              <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
+                                {t(currentAgreementDraft.comparisonLabel)}
+                              </p>
+                              {currentAgreementDraft.comparisonHint ? (
+                                <p className="mt-2 text-sm leading-6 text-slate-700">
+                                  {t(currentAgreementDraft.comparisonHint)}
+                                </p>
+                              ) : null}
+                            </div>
+                          ) : null}
+
+                          <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                                {t(currentAgreementDraft.suggestionTitle)}
+                              </p>
+                              <p className="mt-2 text-sm leading-6 text-slate-600">
+                                {t(currentAgreementDraft.suggestionIntro)}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-3 sm:justify-end">
+                              <ReportActionButton type="button" onClick={applyAgreementDraft}>
+                                {t("Regel uebernehmen")}
+                              </ReportActionButton>
+                              <ReportActionButton type="button" variant="utility" onClick={focusAgreementField}>
+                                {t("Im Feld anpassen")}
+                              </ReportActionButton>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 rounded-2xl border border-slate-200/70 bg-white p-5">
+                            <p className="text-sm leading-7 text-slate-700">
+                              {t(currentAgreementDraft.draft)}
+                            </p>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </StepSection>
+                ) : null}
+
+                <StepSection
                   title={
                     currentStepUsesStructuredOutput
-                      ? currentStepIsDecisionRules
-                        ? "Entscheidungs-Output"
-                        : "Verbindlicher Output"
-                      : "Gemeinsame Vereinbarung"
+                      ? `${outputSectionNumber}. Regel festhalten`
+                      : `${outputSectionNumber}. Eure Regel fuer diesen Schritt`
                   }
-                  className="mt-8 border-[color:var(--brand-primary)]/16 bg-[color:var(--brand-primary)]/5"
+                  className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="max-w-3xl">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("Ziel dieses Schritts")}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-slate-700">
+                        {t(
+                          currentStepUsesStructuredOutput
+                            ? currentStepHasSingleStructuredOutput
+                              ? "Am Ende dieses Schritts steht eine klare Regel, die ihr im Alltag direkt anwenden koennt."
+                              : "Am Ende dieses Schritts stehen klare Regeln, die im Alltag direkt greifen."
+                            : "Hier landet eure gemeinsame Regel. Sie soll so klar sein, dass ihr sie spaeter wieder lesen und direkt anwenden koennt."
+                        )}
+                      </p>
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                        currentStepHasAgreement
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {currentStepHasAgreement ? t("Regel steht") : t("Noch offen")}
+                    </span>
+                  </div>
+
                   <p className="text-sm leading-7 text-slate-700">
                     {t(
                       currentStepUsesStructuredOutput
-                        ? "Haltet hier drei Regeln fest, die im Alltag direkt greifen. Jede Regel sollte sagen, wer entscheidet, wann sie gilt und woran ihr die Grenze erkennt."
+                        ? currentStepHasSingleStructuredOutput
+                          ? "Haltet hier die eine verbindliche Regel fest, die fuer diesen Schritt im Alltag gelten soll."
+                          : "Haltet hier klare Regeln fest, die im Alltag direkt greifen. Jede Regel sollte sagen, wer entscheidet, wann sie gilt und woran ihr die Grenze erkennt."
                         : "Haltet hier fest, welche konkrete Entscheidung, Regel oder feste Arbeitsweise fuer euch kuenftig gelten soll. Der Fokus liegt nicht auf einer Zusammenfassung, sondern auf einer klaren Orientierung fuer euren Alltag als Gruenderteam."
                     )}
                   </p>
@@ -1667,11 +2041,7 @@ export function FounderAlignmentWorkbookClient({
                             placeholder={t(field.placeholder)}
                             highlight={field.highlight === true}
                             readOnly={!canEditField("agreement")}
-                            helperText={t(
-                              canEditField("agreement")
-                                ? field.helperText
-                                : getFieldReadOnlyHint("agreement") ?? ""
-                            )}
+                            helperText={t(canEditField("agreement") ? field.helperText : getFieldReadOnlyHint("agreement") ?? "")}
                           />
                         ))}
                       </div>
@@ -1689,83 +2059,20 @@ export function FounderAlignmentWorkbookClient({
                     </>
                   ) : (
                     <>
-                      <div className="mt-5 flex flex-col gap-3">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <ReportActionButton
-                            type="button"
-                            variant="utility"
-                            onClick={createAgreementDraft}
-                            className={!hasBothPerspectives ? "pointer-events-none opacity-50" : ""}
-                          >
-                            {currentAgreementDraft
-                              ? t("Vorschlag aus euren Antworten aktualisieren")
-                              : t("Vorschlag aus euren Antworten erstellen")}
-                          </ReportActionButton>
-                          {!hasBothPerspectives ? (
-                            <p className="text-xs leading-6 text-slate-500">
-                              {t("Der Vorschlag ist verfuegbar, sobald beide Perspektiven ausgefuellt sind.")}
-                            </p>
-                          ) : null}
-                        </div>
-
-                        {currentAgreementDraft ? (
-                          <div className="rounded-3xl border border-slate-200 bg-white/90 p-5">
-                            <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 md:grid-cols-2">
-                              <div>
-                                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                                  {t("Gemeinsame Grundlage")}
-                                </p>
-                                <ul className="mt-3 space-y-2">
-                                  {currentAgreementDraft.commonGround.map((item) => (
-                                    <li key={item} className="text-sm leading-6 text-slate-700">
-                                      • {t(item)}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-
-                              <div>
-                                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                                  {t("Unterschiedliche Perspektiven")}
-                                </p>
-                                <ul className="mt-3 space-y-2">
-                                  {currentAgreementDraft.differingPerspectives.map((item) => (
-                                    <li key={item} className="text-sm leading-6 text-slate-700">
-                                      • {t(item)}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-                            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                              {t("Vorschlag fuer eure gemeinsame Vereinbarung")}
-                            </p>
-                            <p className="mt-2 text-xs leading-6 text-slate-500">
-                              {t(
-                                "Dieser Vorschlag basiert auf euren beiden Perspektiven und ist als gemeinsamer Arbeitsentwurf gedacht. Ihr koennt ihn uebernehmen, anpassen oder vollstaendig neu formulieren."
-                              )}
-                            </p>
-                            <p className="mt-3 text-sm leading-7 text-slate-700">
-                              {t(currentAgreementDraft.draft)}
-                            </p>
-                            <div className="mt-4 flex flex-wrap gap-3">
-                              <ReportActionButton type="button" onClick={applyAgreementDraft}>
-                                {t("Vorschlag uebernehmen")}
-                              </ReportActionButton>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-
                       <div className="mt-6">
                         <WorkbookField
-                          title=""
+                          title={t("Eure gemeinsame Regel")}
                           value={workbook.steps[currentStep.id].agreement}
                           onChange={(value) => updateEntry("agreement", value)}
                           placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
                           highlight
+                          focusSignal={agreementFieldFocusSignal}
                           readOnly={!canEditField("agreement")}
-                          helperText={getFieldReadOnlyHint("agreement")}
+                          helperText={
+                            canEditField("agreement")
+                              ? t("Hier landet eure endgueltige Regel fuer diesen Schritt.")
+                              : getFieldReadOnlyHint("agreement")
+                          }
                         />
                       </div>
                     </>
@@ -1774,12 +2081,12 @@ export function FounderAlignmentWorkbookClient({
 
                 {showAdvisorNotesSection ? (
                   <StepSection
-                    title="Kommentar eines Advisors / Moderators"
-                    className="mt-8 border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/6"
+                    title="Hinweis von aussen"
+                    className="mt-8 border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5"
                   >
                     <p className="text-sm leading-7 text-slate-700">
                       {t(
-                        "Dieser Bereich ist fuer Hinweise, Nachfragen oder Beobachtungen einer dritten Person gedacht. Die Notiz unterstuetzt eure Reflexion, ist aber bewusst getrennt von eurer gemeinsamen Vereinbarung."
+                        "Hier ist Platz fuer eine neutrale Beobachtung oder Rueckfrage. Eure gemeinsame Regel bleibt davon getrennt."
                       )}
                     </p>
                     <div className="mt-6">
@@ -1796,9 +2103,9 @@ export function FounderAlignmentWorkbookClient({
                 ) : null}
 
                 {showStatusSection ? (
-                  <StepSection title="Gemeinsamer Status" className="mt-8 border-slate-200 bg-white">
+                  <StepSection title="Gemeinsamer Status" className="mt-8 border-slate-200/70 bg-white">
                     <p className="text-sm leading-7 text-slate-700">
-                      Markiert hier gemeinsam, wie weit ihr bei diesem Thema aktuell seid.
+                      Markiert hier kurz, wie klar dieser Schritt fuer euch schon ist.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {STEP_CLARITY_OPTIONS.map((option) => {
@@ -1831,7 +2138,7 @@ export function FounderAlignmentWorkbookClient({
                       })}
                     </div>
                     <p className="mt-3 text-xs leading-6 text-slate-500">
-                      {t("Diese Einordnung ist optional und bezieht sich auf euren gemeinsamen Stand nach Gespraech und Vereinbarung.")}
+                      {t("Das ist optional und hilft euch spaeter beim schnellen Ueberblick.")}
                     </p>
                   </StepSection>
                 ) : (
@@ -1846,44 +2153,71 @@ export function FounderAlignmentWorkbookClient({
                       }
                       className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                     >
-                      {t("Optionalen Status festhalten")}
+                      {t("Status optional festhalten")}
                     </button>
                   </div>
                 )}
               </>
             )}
 
-            <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
-              <ReportActionButton
-                variant="utility"
-                onClick={() => persist(previousStepId)}
-                className={currentIndex === 0 ? "pointer-events-none opacity-50" : ""}
-              >
-                {t("Zurueck")}
-              </ReportActionButton>
-
-              <div className="flex flex-wrap gap-3">
-                <ReportActionButton variant="utility" onClick={() => persist()}>
-                  {isPending ? t("Sichert...") : t("Zwischenspeichern")}
-                </ReportActionButton>
-                <ReportActionButton
-                  onClick={() =>
-                    currentIndex === visibleSteps.length - 1
-                      ? openSummaryView()
-                      : persist(nextStepId)
-                  }
+            <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {t("Naechster Schritt")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {currentStepHasAgreement
+                      ? t("Guter Fortschritt. Die Regel fuer diesen Schritt steht.")
+                      : t("Haltet die Regel fest und geht dann in den naechsten Schritt.")}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                    saveStatusMeta.tone === "success"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : saveStatusMeta.tone === "warning"
+                        ? "bg-amber-100 text-amber-700"
+                        : saveStatusMeta.tone === "error"
+                          ? "bg-rose-100 text-rose-700"
+                          : saveStatusMeta.tone === "info"
+                            ? "bg-sky-100 text-sky-700"
+                            : "bg-slate-200 text-slate-600"
+                  }`}
                 >
-                  {currentIndex === visibleSteps.length - 1
-                    ? t("Session abschliessen und Zusammenfassung anzeigen")
-                    : t("Weiter")}
-                </ReportActionButton>
+                  {saveStatusMeta.label}
+                </span>
               </div>
-            </div>
+
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                <ReportActionButton
+                  variant="utility"
+                  onClick={() => persist(previousStepId)}
+                  className={currentIndex === 0 ? "pointer-events-none opacity-50" : ""}
+                >
+                  {t("Zurueck")}
+                </ReportActionButton>
+
+                <div className="flex flex-wrap gap-3">
+                  <ReportActionButton
+                    onClick={() =>
+                      currentIndex === visibleSteps.length - 1
+                        ? openSummaryView()
+                        : persist(nextStepId)
+                    }
+                  >
+                    {currentIndex === visibleSteps.length - 1
+                      ? t("Zur Zusammenfassung")
+                      : t("Naechster Schritt")}
+                  </ReportActionButton>
+                </div>
+              </div>
             <p className="mt-4 text-xs leading-6 text-slate-500">
               {currentIndex === visibleSteps.length - 1
-                ? t("Session abschliessen und Zusammenfassung anzeigen sichert euren aktuellen Stand und oeffnet danach die Abschluss-Zusammenfassung.")
-                : t("Weiter speichert euren aktuellen Stand und springt direkt zum naechsten Schritt. Zwischenspeichern sichert nur den aktuellen Stand.")}
+                ? t("Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.")
+                : t("Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt.")}
             </p>
+            </div>
           </section>
         </div>
         )}
@@ -1894,7 +2228,7 @@ export function FounderAlignmentWorkbookClient({
 
 function HighlightCard({ title, text }: { title: string; text: string | null }) {
   return (
-    <div className="rounded-2xl border border-white/75 bg-white/80 p-4">
+    <div className="rounded-2xl border border-slate-200/70 bg-white/88 p-4">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(title)}</p>
       <p className="mt-2 text-sm leading-7 text-slate-700">
         {t(text ?? "Aktuell liegt fuer diesen Punkt noch keine hervorgehobene Aussage vor.")}
@@ -1938,6 +2272,7 @@ function WorkbookField({
   highlight = false,
   readOnly = false,
   helperText = null,
+  focusSignal = 0,
 }: {
   title: string;
   value: string;
@@ -1946,11 +2281,13 @@ function WorkbookField({
   highlight?: boolean;
   readOnly?: boolean;
   helperText?: string | null;
+  focusSignal?: number;
 }) {
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const shouldKeepListeningRef = useRef(false);
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const baseValueRef = useRef(value);
   const finalTranscriptRef = useRef("");
   const speechSupportState = useSyncExternalStore(
@@ -1975,6 +2312,12 @@ function WorkbookField({
     };
   }, []);
 
+  useEffect(() => {
+    if (focusSignal === 0 || readOnly) return;
+    textareaRef.current?.focus();
+    textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focusSignal, readOnly]);
+
   function scheduleInactivityTimeout() {
     clearTimeoutIfSet(inactivityTimeoutRef);
     inactivityTimeoutRef.current = setTimeout(() => {
@@ -1982,7 +2325,7 @@ function WorkbookField({
       clearTimeoutIfSet(restartTimeoutRef);
       setSpeechActive(false);
       setDictationStatus("ended");
-      setSpeechMessage(t("Aufnahme beendet - du kannst jederzeit weiter diktieren."));
+      setSpeechMessage(t("Text uebernommen. Du kannst direkt weiter sprechen."));
       recognitionRef.current?.stop();
     }, DICTATION_INACTIVITY_MS);
   }
@@ -2019,7 +2362,7 @@ function WorkbookField({
   }
 
   function stopDictation() {
-    finishDictationSession("ended", t("Aufnahme beendet - du kannst jederzeit weiter diktieren."));
+    finishDictationSession("ended", t("Text uebernommen. Du kannst direkt weiter sprechen."));
     recognitionRef.current?.stop();
   }
 
@@ -2104,33 +2447,27 @@ function WorkbookField({
     ? dictationStatus === "paused"
       ? t("Kurze Pause")
       : t("Aufnahme laeuft")
-    : t("Diktieren");
+    : t("Mikro");
 
   return (
     <section
-      className={`rounded-3xl border p-5 transition-all duration-300 ease-out ${
+      className={`rounded-[28px] border p-5 transition-all duration-300 ease-out ${
         highlight
           ? readOnly
-            ? "border-[color:var(--brand-primary)]/12 bg-[color:var(--brand-primary)]/4"
+            ? "border-[color:var(--brand-primary)]/10 bg-[color:var(--brand-primary)]/3"
             : "border-[color:var(--brand-primary)]/26 bg-[color:var(--brand-primary)]/8 shadow-[0_12px_32px_rgba(103,232,249,0.10)]"
           : readOnly
-            ? "border-slate-200 bg-slate-50/70"
-            : "border-slate-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.04)]"
+            ? "border-slate-200/70 bg-slate-50/60"
+            : "border-slate-200/70 bg-white"
       } ${readOnly ? "cursor-not-allowed" : "hover:-translate-y-0.5"}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-900">{t(title)}</p>
-          <div className="mt-2">
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] transition ${
-                readOnly
-                  ? "bg-slate-200/80 text-slate-500"
-                  : "bg-emerald-50 text-emerald-700"
-              }`}
-            >
-              {readOnly ? t("Nur lesbar") : t("Editierbar")}
-            </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm font-semibold text-slate-900">{t(title)}</p>
+            {readOnly ? (
+              <span className="text-xs text-slate-400">{t("Nur lesbar")}</span>
+            ) : null}
           </div>
         </div>
 
@@ -2143,15 +2480,15 @@ function WorkbookField({
               ? t(`Diktat fuer ${title} stoppen`)
               : t(`Diktat fuer ${title} starten`)
           }
-          title={t("Sprich einfach frei - der Text wird automatisch eingefuegt.")}
+          title={t("Sprich frei. Der Text landet direkt im Feld.")}
           className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all duration-300 ${
             speechActive && dictationStatus === "paused"
-              ? "border-amber-200 bg-amber-50 text-amber-700 shadow-[0_10px_24px_rgba(245,158,11,0.10)]"
+              ? "border-amber-200 bg-amber-50 text-amber-700"
               : speechActive
-              ? "border-red-200 bg-red-50 text-red-700 shadow-[0_10px_24px_rgba(239,68,68,0.12)]"
+              ? "border-red-200 bg-red-50 text-red-700"
               : dictationDisabled
                 ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                : "border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
+                : "border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-slate-300"
           }`}
         >
           <span
@@ -2169,19 +2506,19 @@ function WorkbookField({
 
       {!readOnly && speechSupportState === "unsupported" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Diktieren ist in diesem Browser nicht verfuegbar. Die normale Texteingabe bleibt erhalten.")}
+          {t("Diktieren geht in diesem Browser gerade nicht. Schreiben funktioniert trotzdem.")}
         </p>
       ) : null}
 
       {dictationStatus === "listening" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Aufnahme laeuft - sprich einfach frei, der Text wird automatisch eingefuegt.")}
+          {t("Spricht gerade. Der Text wird direkt uebernommen.")}
         </p>
       ) : null}
 
       {dictationStatus === "paused" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Kurze Pause erkannt - sprich einfach weiter.")}
+          {t("Kurze Pause erkannt. Sprich einfach weiter.")}
         </p>
       ) : null}
 
@@ -2195,6 +2532,7 @@ function WorkbookField({
         </p>
       ) : null}
       <textarea
+        ref={textareaRef}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={t(placeholder)}
@@ -2202,10 +2540,10 @@ function WorkbookField({
         readOnly={readOnly}
         className={`mt-4 min-h-[220px] w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition-all duration-300 ease-out ${
           readOnly
-            ? "cursor-not-allowed border-slate-200 bg-slate-100/95 text-slate-600"
+            ? "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-600"
             : highlight
-              ? "border-[color:var(--brand-primary)]/22 bg-white text-slate-700 shadow-[0_10px_24px_rgba(103,232,249,0.06)] focus:border-[color:var(--brand-primary)]/40 focus:ring-2 focus:ring-[color:var(--brand-primary)]/20"
-              : "border-slate-200 bg-white text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/20"
+              ? "border-[color:var(--brand-primary)]/22 bg-white text-slate-700 shadow-[0_8px_20px_rgba(103,232,249,0.05)] focus:border-[color:var(--brand-primary)]/40 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+              : "border-slate-200/80 bg-white text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
         }`}
       />
       {helperText ? (
@@ -2225,7 +2563,7 @@ function StepSection({
   className?: string;
 }) {
   return (
-    <section className={`rounded-3xl border p-6 ${className}`}>
+    <section className={`rounded-[28px] border p-5 sm:p-6 ${className}`}>
       <h3 className="text-base font-semibold text-slate-950">{t(title)}</h3>
       <div className="mt-4">{children}</div>
     </section>
@@ -2743,10 +3081,12 @@ function buildAgreementDraft({
   stepId,
   founderAResponse,
   founderBResponse,
+  sourceMode,
 }: {
   stepId: FounderAlignmentWorkbookStepId;
   founderAResponse: string;
   founderBResponse: string;
+  sourceMode: "solo" | "joint";
 }): AgreementDraftResult {
   const meta = AGREEMENT_DRAFT_META[stepId];
   const founderAText = normalizeAgreementSource(founderAResponse);
@@ -2758,44 +3098,61 @@ function buildAgreementDraft({
     ...founderAThemes.filter((theme) => !sharedThemes.includes(theme)),
     ...founderBThemes.filter((theme) => !sharedThemes.includes(theme)),
   ]);
-
-  const commonFoundation =
-    sharedThemes.length > 0 ? sharedThemes : meta.fallbackSharedThemes.slice(0, 2);
-
-  const foundationSentence = `Als gemeinsame Grundlage zaehlen fuer euch ${joinWithUnd(
-    commonFoundation
-  )}.`;
-
-  const differenceSentence =
-    differingThemes.length > 0
-      ? `Unterschiede liegen vor allem bei ${joinWithUnd(
-          differingThemes.slice(0, 2)
-        )}; diese Punkte klaert ihr frueh, bevor sie im Alltag mitlaufen.`
-      : `Wenn sich Nuancen in euren Sichtweisen zeigen, sprecht ihr sie frueh an, bevor daraus unterschiedliche Erwartungen werden.`;
-
-  const integratedPerspectiveSentence = buildIntegratedPerspectiveSentence(
-    commonFoundation,
-    differingThemes,
-    commonFoundation[0] ?? meta.fallbackSharedThemes[0]
-  );
+  const tokenOverlap = getTokenOverlapScore(founderAText, founderBText);
+  const isJointUnclear =
+    sourceMode === "joint" &&
+    founderAText.length + founderBText.length < 90 &&
+    sharedThemes.length === 0 &&
+    differingThemes.length === 0 &&
+    tokenOverlap < 0.18;
+  const state =
+    sourceMode === "solo"
+      ? "solo"
+      : isJointUnclear
+        ? "unclear"
+        : differingThemes.length > 0 || tokenOverlap < 0.12
+          ? "different"
+          : "aligned";
 
   return {
     draft: buildStepSpecificAgreementDraft({
       stepId,
-      commonFoundation,
-      differingThemes,
-      fallbackSharedThemes: meta.fallbackSharedThemes,
-      differenceFocus: meta.differenceFocus,
-      integratedPerspectiveSentence,
-      ruleFocus: meta.ruleFocus,
-      foundationSentence,
-      differenceSentence,
+      state,
     }),
-    commonGround: buildCommonGroundPoints(commonFoundation, meta.fallbackSharedThemes),
-    differingPerspectives: buildDifferingPerspectivePoints(
-      differingThemes,
-      meta.differenceFocus
-    ),
+    sourceMode,
+    state,
+    comparisonLabel:
+      sourceMode === "joint"
+        ? state === "aligned"
+          ? "Ihr seid euch hier einig"
+          : state === "different"
+            ? "Ihr wuerdet unterschiedlich entscheiden"
+            : "Eure Antworten sind noch zu offen"
+        : null,
+    comparisonHint:
+      sourceMode === "joint"
+        ? state === "aligned"
+          ? sharedThemes.length > 0
+            ? `Beide Antworten ziehen in dieselbe Richtung, vor allem bei ${joinWithUnd(
+                sharedThemes.slice(0, 2)
+              )}.`
+            : "Beide Antworten klingen aehnlich und lassen sich gut in eine gemeinsame Regel uebersetzen."
+          : state === "different"
+            ? differingThemes.length > 0
+              ? `Der Unterschied liegt vor allem bei ${joinWithUnd(
+                  differingThemes.slice(0, 2)
+                )}. Genau dafuer braucht ihr jetzt eine klare Regel.`
+              : "Ihr setzt bei derselben Situation unterschiedliche Schwerpunkte. Genau dafuer braucht ihr jetzt eine klare Regel."
+            : "Aus euren Antworten ist noch nicht klar genug, wer was entscheidet oder was im Zweifel gilt."
+        : null,
+    suggestionTitle:
+      sourceMode === "joint"
+        ? "Vorschlag fuer eure gemeinsame Regel"
+        : "Moegliche Regel auf Basis deiner Antwort",
+    suggestionIntro:
+      sourceMode === "joint"
+        ? "Basierend auf euren Antworten koennte eure Regel so aussehen:"
+        : "Auf Basis deiner Antwort koennte eure Regel so aussehen:",
   };
 }
 
@@ -2813,21 +3170,6 @@ function detectThemes(
     .map((signal) => signal.label);
 }
 
-function buildIntegratedPerspectiveSentence(
-  commonFoundation: string[],
-  differingThemes: string[],
-  fallbackTheme: string
-) {
-  const commonFocus = commonFoundation[0] ?? fallbackTheme;
-  const differingFocus = differingThemes[0] ?? null;
-
-  if (differingFocus) {
-    return `Fuer den Alltag heisst das, ${commonFocus} als gemeinsame Leitlinie zu halten und Unterschiede bei ${differingFocus} bewusst zu moderieren.`;
-  }
-
-  return `Fuer den Alltag heisst das, ${commonFocus} in eine klare und alltagstaugliche Orientierung zu uebersetzen.`;
-}
-
 function joinWithUnd(values: string[]) {
   if (values.length === 0) return "";
   if (values.length === 1) return values[0];
@@ -2841,127 +3183,141 @@ function uniqueValues(values: string[]) {
 
 function buildStepSpecificAgreementDraft({
   stepId,
-  commonFoundation,
-  differingThemes,
-  fallbackSharedThemes,
-  differenceFocus,
-  integratedPerspectiveSentence,
-  ruleFocus,
-  foundationSentence,
-  differenceSentence,
+  state,
 }: {
   stepId: FounderAlignmentWorkbookStepId;
-  commonFoundation: string[];
-  differingThemes: string[];
-  fallbackSharedThemes: string[];
-  differenceFocus: string;
-  integratedPerspectiveSentence: string;
-  ruleFocus: string;
-  foundationSentence: string;
-  differenceSentence: string;
+  state: "aligned" | "different" | "unclear" | "solo";
 }) {
-  const sharedOrientation = describeThemeSet(commonFoundation, fallbackSharedThemes);
-  const differingOrientation = describeDifferenceSet(differingThemes, differenceFocus);
-
   switch (stepId) {
     case "vision_direction":
-      return [
-        `Fuer eure gemeinsame Richtung heisst das konkret: ${sharedOrientation} sollen die Entwicklung des Unternehmens tragen.`,
-        `Bei ${differingOrientation} nehmt ihr Unterschiede nicht nebenbei mit, sondern besprecht sie bewusst, bevor daraus verschiedene strategische Erwartungen werden.`,
-        "So entsteht eine Leitlinie, die Orientierung gibt und dennoch unterschiedliche Gewichtungen sauber einbindet.",
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? "Wenn ihr eine neue Chance unterschiedlich seht, dann prueft ihr zuerst, ob sie wirklich zu eurem Ziel passt. Wenn das nicht klar ist, sagt ihr noch nichts zu."
+        : state === "unclear"
+          ? "Wenn eine neue Chance auftaucht, dann haltet ihr zuerst fest, was gerade Vorrang hat. Solange das offen ist, sagt ihr nichts zu."
+          : state === "solo"
+            ? "Wenn eine neue Chance auftaucht, dann pruefe ich zuerst, ob sie zu meiner Richtung passt. Erst dann entscheide ich ueber den naechsten Schritt."
+            : "Wenn eine neue Chance auftaucht, dann prueft ihr zuerst, ob sie zu eurer gemeinsamen Richtung passt. Erst dann entscheidet ihr ueber den naechsten Schritt.";
 
     case "decision_rules":
-      return [
-        "Fuer Entscheidungen haltet ihr fest, wie ihr Tempo, Sorgfalt und Verantwortung zusammenbringt.",
-        `Massgeblich sind fuer euch ${sharedOrientation}.`,
-        `Wenn sich Unterschiede bei ${differingOrientation} zeigen, klaert ihr zuerst, was gemeinsam entschieden werden muss und was klar in einer Hand liegt.`,
-        `${integratedPerspectiveSentence} ${ruleFocus}`,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn ihr eine Entscheidung unterschiedlich seht, dann entscheidet zuerst die Person, die das Thema fuehrt. Wenn Risiko, Budget oder Aussenwirkung groesser sind, dann entscheidet ihr gemeinsam bis zu einer festen Frist.`
+        : state === "unclear"
+          ? "Wenn nicht klar ist, wer entscheidet, dann legt ihr zuerst die verantwortliche Person fest. Wenn ihr danach noch nicht weiterkommt, setzt ihr sofort eine Frist."
+          : state === "solo"
+            ? "Wenn eine Entscheidung in meinen Bereich faellt, dann entscheide ich sie selbst. Wenn Risiko, Budget oder Aussenwirkung groesser werden, hole ich die andere Person dazu."
+            : "Wenn eine Entscheidung im Verantwortungsbereich bleibt, dann entscheidet die fuehrende Person. Wenn Risiko, Budget oder Aussenwirkung groesser werden, entscheidet ihr gemeinsam.";
 
     case "ownership_risk":
-      return [
-        `Im Umgang mit Risiko und Ownership orientiert ihr euch daran, ${sharedOrientation} zusammenzudenken.`,
-        `Wo sich eure Sicht bei ${differingOrientation} unterscheidet, sprecht ihr das frueh an, bevor daraus unterschiedliche Risikoschwellen entstehen.`,
-        "Experimente und weitreichende Schritte sollen deshalb weder aus purem Vorsprung noch aus reiner Vorsicht heraus entstehen, sondern aus einer bewusst getragenen Abwaegung.",
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn ein Risiko unterschiedlich bewertet wird, dann macht die fuehrende Person es sofort sichtbar. Wenn die Folgen groesser werden, dann entscheidet ihr gemeinsam ueber Stop, Weitergehen oder Begrenzen.`
+        : state === "unclear"
+          ? "Wenn ein Risiko auftaucht, dann legt ihr sofort fest, wer es klaert. Auch wenn die Folgen noch unklar sind, macht ihr es direkt sichtbar."
+          : state === "solo"
+            ? "Wenn ich ein Risiko sehe, dann mache ich es sofort sichtbar. Wenn die Folgen groesser werden, hole ich die andere Person in die Entscheidung."
+            : "Wenn ein Risiko auftaucht, dann macht die verantwortliche Person es sofort sichtbar. Wenn eine Grenze erreicht ist, entscheidet ihr gemeinsam ueber den naechsten Schritt.";
 
     case "values_guardrails":
-      return [
-        `Fuer eure unternehmerischen Leitplanken heisst das, ${sharedOrientation} bewusst festzuhalten.`,
-        `Wenn sich Unterschiede bei ${differingOrientation} zeigen, besprecht ihr sie frueh, bevor wirtschaftlicher Druck oder externe Erwartungen euren Rahmen verschieben.`,
-        "So entsteht eine gemeinsame Orientierung dafuer, welche Kompromisse fuer euch tragbar sind und wo eure roten Linien liegen.",
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn ein Schritt fuer eine Person noch okay ist und fuer die andere nicht, dann stoppt ihr ihn zuerst. Wenn ihr ihn weiter prueft, dann nur gegen eine gemeinsam benannte Grenze.`
+        : state === "unclear"
+          ? "Wenn eine Grauzone auftaucht, dann benennt ihr zuerst eure Grenze. Wenn die Grenze nicht klar ist, trefft ihr die Entscheidung noch nicht."
+          : state === "solo"
+            ? "Wenn eine Entscheidung fuer mich in eine Grauzone geht, dann stoppe ich sie zuerst. Ich gehe nur weiter, wenn meine Grenze klar benannt ist."
+            : "Wenn eine kritische Entscheidung ansteht, dann prueft ihr zuerst, ob sie fuer euch beide noch in Ordnung ist. Wenn sie ueber eure Grenze geht, macht ihr den Schritt nicht.";
 
     case "roles_responsibility":
-      return [
-        "Fuer euren Arbeitsalltag haltet ihr fest, wie eng ihr abgestimmt arbeiten, was sichtbar bleiben und wo mehr Eigenraum gelten soll.",
-        `Tragend sind fuer euch ${sharedOrientation}.`,
-        `Wenn sich Unterschiede bei ${differingOrientation} zeigen, klaert ihr offen, wo mehr Rueckkopplung noetig ist und wo gezielte statt dauernder Abstimmung reicht.`,
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn ein Thema in einen Bereich faellt, dann fuehrt die verantwortliche Person. Wenn die andere Person betroffen ist oder etwas blockiert, dann wird sie frueh eingebunden und nicht erst ganz am Ende.`
+        : state === "unclear"
+          ? "Wenn nicht klar ist, wem ein Thema gehoert, dann legt ihr zuerst die Federfuehrung fest. Wenn die Entscheidung groesser wird, benennt ihr sofort, wer mit reinmuss."
+          : state === "solo"
+            ? "Wenn ein Thema in meinen Bereich faellt, dann fuehre ich es. Wenn andere betroffen sind oder etwas blockiert, hole ich sie frueh dazu."
+            : "Wenn ein Thema in einen Bereich faellt, dann fuehrt die verantwortliche Person. Wenn andere betroffen sind, teilt sie den Stand frueh und holt sie rechtzeitig dazu.";
 
     case "commitment_load":
-      return [
-        `Fuer euer Commitment heisst das, einen Arbeitsrahmen zu setzen, der ${sharedOrientation} realistisch abbildet.`,
-        `Wo sich Erwartungen bei ${differingOrientation} unterscheiden, sprecht ihr das offen an, statt es still vorauszusetzen.`,
-        "So entsteht ein Rahmen fuer Fokus, Verfuegbarkeit und Belastung, der fuer beide tragfaehig bleibt.",
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn eine Person merkt, dass Verfuegbarkeit oder Belastung nicht mehr passen, dann sagt sie das sofort. Wenn Zusagen dadurch wackeln, dann priorisiert ihr zuerst neu, statt still auf mehr Einsatz zu hoffen.`
+        : state === "unclear"
+          ? "Wenn nicht klar ist, was realistisch leistbar ist, dann benennt ihr zuerst euren Normalmodus. Wenn jemand davon abweicht, sprecht ihr es sofort an und priorisiert neu."
+          : state === "solo"
+            ? "Wenn ich merke, dass Verfuegbarkeit oder Belastung nicht mehr passen, sage ich das sofort. Wenn Zusagen dadurch wackeln, priorisieren wir neu."
+            : "Wenn alles normal laeuft, dann haltet ihr euch an eure vereinbarte Verfuegbarkeit. Wenn eine Person an ihre Grenze kommt, sprecht ihr das sofort an und setzt Prioritaeten neu.";
 
     case "collaboration_conflict":
-      return [
-        "Wenn Spannungen entstehen, gilt fuer euch eine klare Regel fuer Abstimmung und Klaerung.",
-        `Wichtig sind dabei ${sharedOrientation}.`,
-        `Wo ihr bei ${differingOrientation} unterschiedlich tickt, sprecht ihr Irritationen frueh an, bevor sie persoenlich aufgeladen werden.`,
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? "Wenn etwas stoert, sprecht ihr es frueh an. Wenn ihr dabei sehr unterschiedlich vorgeht, legt ihr direkt ein ruhiges Klaerungsgespraech fest."
+        : state === "unclear"
+          ? "Wenn etwas stoert, dann sprecht ihr es klar an. Wenn das gerade nicht gut geht, legt ihr direkt einen festen Termin dafuer fest."
+          : state === "solo"
+            ? "Wenn mich etwas stoert, spreche ich es frueh an. Wenn das im Moment nicht gut geht, setze ich direkt einen festen Klaerungspunkt."
+            : "Wenn etwas stoert, dann sprecht ihr es frueh an. Wenn das Gespraech festfaehrt, klaert ihr erst den Konflikt und geht dann zur Sache zurueck.";
 
     case "alignment_90_days":
-      return [
-        `Fuer die naechsten 90 Tage nehmt ihr euch vor, ${sharedOrientation} konkret sichtbar zu machen.`,
-        `Bei ${differingOrientation} reicht euch keine lose Abstimmung; daraus sollen in den naechsten Gespraechen klare Entscheidungen werden.`,
-        "Die kommenden Wochen nutzt ihr, um Vereinbarungen in Routinen, Verantwortlichkeiten und naechste Schritte zu uebersetzen.",
-        ruleFocus,
-      ].join(" ");
+      return state === "different"
+        ? `Wenn Prioritaeten auseinanderlaufen, dann klaert ihr zuerst, was in den naechsten 90 Tagen wirklich Vorrang hat. Wenn ein neues Thema dazukommt, entscheidet ihr direkt, was dafuer liegen bleibt.`
+        : state === "unclear"
+          ? "Wenn fuer die naechsten 90 Tage noch nichts klar priorisiert ist, dann legt ihr zuerst drei Themen fest. Wenn etwas Neues dazukommt, entscheidet ihr direkt, was dafuer verschoben wird."
+          : state === "solo"
+            ? "Wenn ich die naechsten 90 Tage plane, halte ich zuerst meine drei wichtigsten Themen fest. Wenn etwas Neues dazukommt, entscheide ich direkt, was dafuer warten muss."
+            : "Wenn ihr eure naechsten 90 Tage plant, haltet ihr zuerst eure drei wichtigsten Themen fest. Wenn etwas Neues auftaucht, entscheidet ihr direkt, was dafuer warten muss.";
 
     default:
-      return [foundationSentence, differenceSentence, integratedPerspectiveSentence, ruleFocus].join(
-        " "
-      );
+      return state === "different"
+        ? `Wenn ihr etwas unterschiedlich bewertet, dann sprecht ihr den Unterschied zuerst offen aus. Wenn er den Alltag blockiert, dann legt ihr direkt eine gemeinsame Regel fest.`
+        : state === "unclear"
+          ? "Wenn noch nicht klar ist, was gelten soll, dann beschreibt ihr zuerst den Normalfall. Wenn etwas davon abweicht, legt ihr sofort fest, wer entscheidet."
+          : state === "solo"
+            ? "Wenn im Alltag alles normal laeuft, halte ich mich an meine Regel. Wenn etwas davon abweicht, entscheide ich bewusst, was dann gilt."
+            : "Wenn im Alltag alles normal laeuft, haltet ihr euch an eure Regel. Wenn etwas davon abweicht, besprecht ihr es frueh und legt es klar fest.";
   }
 }
 
-function buildCommonGroundPoints(detectedThemes: string[], fallbackThemes: string[]) {
-  const themes = (detectedThemes.length > 0 ? detectedThemes : fallbackThemes).slice(0, 3);
+function getTokenOverlapScore(firstText: string, secondText: string) {
+  if (!firstText || !secondText) return 0;
 
-  return themes.map((theme) => `${theme} taucht in beiden Perspektiven als gemeinsamer Bezugspunkt auf.`);
+  const firstTokens = extractComparisonTokens(firstText);
+  const secondTokens = extractComparisonTokens(secondText);
+
+  if (firstTokens.length === 0 || secondTokens.length === 0) return 0;
+
+  const secondSet = new Set(secondTokens);
+  const sharedCount = firstTokens.filter((token) => secondSet.has(token)).length;
+  return sharedCount / Math.max(firstTokens.length, secondTokens.length);
 }
 
-function buildDifferingPerspectivePoints(differingThemes: string[], fallbackDifferenceFocus: string) {
-  if (differingThemes.length === 0) {
-    return [
-      `Unterschiede zeigen sich derzeit eher als Nuancen innerhalb von ${fallbackDifferenceFocus.toLowerCase()}.`,
-    ];
-  }
-
-  return differingThemes
-    .slice(0, 3)
-    .map((theme) => `${theme} wird in euren Antworten unterschiedlich gewichtet.`);
-}
-
-function describeThemeSet(detectedThemes: string[], fallbackThemes: string[]) {
-  const themes = detectedThemes.length > 0 ? detectedThemes : fallbackThemes;
-  return joinWithUnd(themes.slice(0, 2));
-}
-
-function describeDifferenceSet(differingThemes: string[], fallbackDifferenceFocus: string) {
-  return differingThemes.length > 0
-    ? joinWithUnd(differingThemes.slice(0, 2))
-    : fallbackDifferenceFocus.toLowerCase();
+function extractComparisonTokens(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9äöüß\s]/gi, " ")
+    .split(/\s+/)
+    .filter(
+      (token) =>
+        token.length > 3 &&
+        ![
+          "dann",
+          "wenn",
+          "eine",
+          "einer",
+          "einem",
+          "eines",
+          "einen",
+          "dieser",
+          "diesem",
+          "dieses",
+          "damit",
+          "soll",
+          "sollte",
+          "wuerde",
+          "wuerdet",
+          "konkret",
+          "regel",
+          "fuer",
+          "euch",
+          "eure",
+          "einerseits",
+          "andererseits",
+        ].includes(token)
+    );
 }
 
 function getSpeechRecognitionConstructor(windowObject: Window) {
@@ -3050,9 +3406,9 @@ function ModeCard({
       aria-pressed={active}
       className={`rounded-2xl border p-4 text-left transition-all duration-300 ease-out ${
         active
-          ? "border-[color:var(--brand-accent)]/30 bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(255,255,255,0.96))] text-slate-900 shadow-[0_16px_36px_rgba(124,58,237,0.12)] ring-1 ring-[color:var(--brand-accent)]/14"
-          : "border-slate-200 bg-slate-50/80 text-slate-700"
-      } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]"}`}
+          ? "border-[color:var(--brand-accent)]/24 bg-[color:var(--brand-accent)]/7 text-slate-900 ring-1 ring-[color:var(--brand-accent)]/10"
+          : "border-slate-200/70 bg-slate-50/70 text-slate-700"
+      } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:-translate-y-0.5 hover:border-slate-300"}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -3064,7 +3420,7 @@ function ModeCard({
         <span
           className={`mt-0.5 inline-flex h-7 min-w-7 items-center justify-center rounded-full border text-[11px] font-semibold transition ${
             active
-              ? "border-[color:var(--brand-accent)] bg-[color:var(--brand-accent)] text-white shadow-[0_8px_18px_rgba(124,58,237,0.22)]"
+              ? "border-[color:var(--brand-accent)] bg-[color:var(--brand-accent)] text-white"
               : "border-slate-200 bg-white text-slate-400"
           }`}
           aria-hidden="true"

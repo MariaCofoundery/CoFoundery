@@ -555,6 +555,9 @@ export default async function DashboardPage({
               Hier geht es weiter.
             </p>
           </div>
+          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+            Co-Founder einladen
+          </Link>
         </div>
 
         <div className="mt-6 space-y-5">
@@ -661,10 +664,7 @@ export default async function DashboardPage({
                 </section>
               ) : (
                 <section>
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
-                    <span className="text-xs tracking-[0.08em] text-slate-500">ruhig</span>
-                  </div>
+                  <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
                   <p className="mt-3 text-sm leading-7 text-slate-500">
                     Aktuell braucht hier nichts deine Aufmerksamkeit.
                   </p>
