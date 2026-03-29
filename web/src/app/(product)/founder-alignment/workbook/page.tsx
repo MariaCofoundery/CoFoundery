@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
-import { FounderAlignmentPaywallGate } from "@/features/reporting/FounderAlignmentPaywallGate";
 import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlignmentWorkbookClient";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
@@ -133,26 +132,24 @@ export default async function FounderAlignmentWorkbookPage({
           reportHeadline={data.report.executiveSummary.headline}
         />
       ) : (
-        <FounderAlignmentPaywallGate invitationId={data.invitationId ?? invitationId}>
-          <FounderAlignmentWorkbookClient
-            invitationId={data.invitationId}
-            teamContext={data.teamContext}
-            founderAName={data.founderAName}
-            founderBName={data.founderBName}
-            currentUserRole={data.currentUserRole}
-            initialWorkbook={data.workbook}
-            highlights={data.highlights}
-            advisorInvite={data.advisorInvite}
-            canSave={data.canSave}
-            persisted={data.persisted}
-            updatedAt={data.updatedAt}
-            source={data.source}
-            storedTeamContext={data.storedTeamContext}
-            hasTeamContextMismatch={data.hasTeamContextMismatch}
-            showValuesStep={data.showValuesStep}
-            reportHeadline={data.report.executiveSummary.headline}
-          />
-        </FounderAlignmentPaywallGate>
+        <FounderAlignmentWorkbookClient
+          invitationId={data.invitationId}
+          teamContext={data.teamContext}
+          founderAName={data.founderAName}
+          founderBName={data.founderBName}
+          currentUserRole={data.currentUserRole}
+          initialWorkbook={data.workbook}
+          highlights={data.highlights}
+          advisorInvite={data.advisorInvite}
+          canSave={data.canSave}
+          persisted={data.persisted}
+          updatedAt={data.updatedAt}
+          source={data.source}
+          storedTeamContext={data.storedTeamContext}
+          hasTeamContextMismatch={data.hasTeamContextMismatch}
+          showValuesStep={data.showValuesStep}
+          reportHeadline={data.report.executiveSummary.headline}
+        />
       )}
     </main>
   );

@@ -59,44 +59,6 @@ function normalizeDisplayName(value: string | null) {
   return trimmed && trimmed.length > 0 ? trimmed : "Profil";
 }
 
-function ProductShellWordmark() {
-  return (
-    <span className="inline-flex items-center gap-3">
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 32 32"
-        className="h-8 w-8 shrink-0 md:h-9 md:w-9"
-      >
-        <defs>
-          <linearGradient id="product-shell-logo-gradient" x1="6" y1="5" x2="26" y2="27" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#67e8f9" />
-            <stop offset="1" stopColor="#7c3aed" />
-          </linearGradient>
-        </defs>
-        <rect x="3" y="3" width="26" height="26" rx="10" fill="url(#product-shell-logo-gradient)" />
-        <circle cx="12" cy="12" r="3.25" fill="#ffffff" fillOpacity="0.96" />
-        <circle cx="20" cy="20" r="3.25" fill="#ffffff" fillOpacity="0.96" />
-        <path
-          d="M11.4 21.1 20.7 11.8"
-          stroke="#ffffff"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeOpacity="0.94"
-        />
-      </svg>
-
-      <span className="flex min-w-0 flex-col leading-none">
-        <span className="truncate font-[var(--font-display)] text-sm text-slate-950 md:text-[15px]">
-          CoFoundery
-        </span>
-        <span className="truncate text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500 md:text-[10px]">
-          Align
-        </span>
-      </span>
-    </span>
-  );
-}
-
 export function ProductShell({
   children,
   hasFounder,
@@ -148,7 +110,15 @@ export function ProductShell({
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
                 aria-label="Zum Dashboard"
               >
-                <ProductShellWordmark />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/cofoundery-align-logo.svg"
+                  alt="CoFoundery Align"
+                  width={200}
+                  height={70}
+                  className="block h-8 w-auto shrink-0 md:h-9"
+                  draggable={false}
+                />
               </Link>
 
               <nav

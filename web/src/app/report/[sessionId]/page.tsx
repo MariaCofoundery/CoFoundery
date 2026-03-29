@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
-import { FounderAlignmentPaywallGate } from "@/features/reporting/FounderAlignmentPaywallGate";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
 import {
   createReportRunOnCompletion,
@@ -186,17 +185,15 @@ export default async function ReportPage({ params }: PageProps) {
         />
       </div>
 
-      <FounderAlignmentPaywallGate invitationId={snapshot.invitationId}>
-        <FounderMatchingView
-          participantAName={participantAName}
-          participantBName={participantBName}
-          compareResult={compareResult}
-          selection={selection}
-          valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
-          valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
-          workbookHref={workbookHref}
-        />
-      </FounderAlignmentPaywallGate>
+      <FounderMatchingView
+        participantAName={participantAName}
+        participantBName={participantBName}
+        compareResult={compareResult}
+        selection={selection}
+        valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
+        valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
+        workbookHref={workbookHref}
+      />
     </main>
   );
 }

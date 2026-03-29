@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
+import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function NewInvitePage() {
@@ -22,7 +23,10 @@ export default async function NewInvitePage() {
           Zurück zum Dashboard
         </a>
       </div>
-      <CoFounderInviteForm />
+      <div className="space-y-6">
+        <MatchingStartBlock />
+        <CoFounderInviteForm />
+      </div>
     </main>
   );
 }

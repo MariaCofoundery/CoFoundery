@@ -89,14 +89,13 @@ export function CoFounderInviteForm() {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-6">
+    <section
+      id="cofounder-invite-form"
+      className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
+    >
       <h1 className="text-xl font-semibold text-slate-900">Co-Founder einladen</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt später.
-      </p>
-      <p className="mt-1 text-sm text-slate-500">
-        Dein Co-Founder bekommt eine Einladung und kann direkt teilnehmen. Ihr arbeitet danach
-        gemeinsam weiter.
+        Wähle jetzt euren Kontext und erstelle den Einladungslink.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
