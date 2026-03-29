@@ -182,6 +182,17 @@ export default async function MeValuesPage({
         </a>
       </div>
 
+      <section className="mb-5 rounded-2xl border border-slate-200/70 bg-slate-50/72 px-5 py-4">
+        <p className="text-sm leading-7 text-slate-700">Das Werteprofil ist optional.</p>
+        <p className="mt-1 text-sm leading-7 text-slate-600">
+          Es hilft euch zu klären, was für euch unter Druck wirklich zählt und wo ihr klare
+          Grenzen zieht.
+        </p>
+        <p className="mt-1 text-sm leading-7 text-slate-600">
+          Ihr könnt es direkt machen oder auch später ergänzen.
+        </p>
+      </section>
+
       <ValuesQuestionnaire
         assessmentId={draft.id}
         questions={questions}

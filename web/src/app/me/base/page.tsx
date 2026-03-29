@@ -154,6 +154,12 @@ export default async function MeBasePage({
         </a>
       </div>
 
+      <section className="mb-5 rounded-2xl border border-slate-200/70 bg-slate-50/72 px-5 py-4">
+        <p className="text-sm leading-7 text-slate-700">
+          Hier legt ihr die Grundlage für euren Matching-Report.
+        </p>
+      </section>
+
       <QuestionnaireClient
         assessmentId={draft.id}
         title="Basis-Fragebogen"

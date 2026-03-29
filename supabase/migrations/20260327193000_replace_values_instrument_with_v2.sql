@@ -8,9 +8,6 @@ where category = 'values';
 delete from public.choices
 where question_id like 'wv2_%';
 
-delete from public.questions
-where id like 'wv2_%';
-
 insert into public.questions (
   id,
   dimension,
@@ -127,7 +124,15 @@ insert into public.questions (
     true,
     'values',
     'scenario'
-  );
+  )
+on conflict (id) do update
+set
+  dimension = excluded.dimension,
+  prompt = excluded.prompt,
+  sort_order = excluded.sort_order,
+  is_active = excluded.is_active,
+  category = excluded.category,
+  type = excluded.type;
 
 insert into public.choices (question_id, label, value, sort_order) values
   (

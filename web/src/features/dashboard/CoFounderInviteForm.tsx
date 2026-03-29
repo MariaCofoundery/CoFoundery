@@ -95,7 +95,8 @@ export function CoFounderInviteForm() {
         Einladungen laufen aktuell link-basiert. E-Mail-Versand folgt später.
       </p>
       <p className="mt-1 text-sm text-slate-500">
-        Du legst hier nicht nur den Link an, sondern auch den Kontext für den weiteren Founder-Flow.
+        Dein Co-Founder bekommt eine Einladung und kann direkt teilnehmen. Ihr arbeitet danach
+        gemeinsam weiter.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
@@ -231,7 +232,8 @@ export function CoFounderInviteForm() {
             </p>
           ) : null}
           <p className="mt-2 text-xs leading-6 text-emerald-800">
-            Teile jetzt den Link direkt mit der zweiten Person. Derselbe Link kann später auch per E-Mail versendet werden.
+            Teile jetzt den Link direkt mit der zweiten Person. Sobald dein Co-Founder teilnimmt,
+            entsteht euer Matching-Report.
           </p>
           <p className="mt-2 break-all rounded-md border border-emerald-200 bg-white px-3 py-2 text-xs text-emerald-900">
             {inviteUrl}

@@ -236,9 +236,9 @@ type SpeechRecognitionErrorEventLike = {
 type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
 
 const STEP_CLARITY_OPTIONS: Array<{ value: StepClarity; label: string }> = [
-  { value: "open", label: "Noch offen" },
-  { value: "partial", label: t("Teilweise geklaert") },
-  { value: "clear", label: "Klar vereinbart" },
+  { value: "open", label: "Offen" },
+  { value: "partial", label: t("In Arbeit") },
+  { value: "clear", label: "Regel steht" },
 ];
 
 function getStructuredPerspectivePrompt(stepId: FounderAlignmentWorkbookStepId) {
@@ -277,9 +277,9 @@ const ADVISOR_FOLLOW_UP_OPTIONS: Array<{
   value: AdvisorFollowUpOption;
   label: string;
 }> = [
-  { value: "none", label: t("kein Follow-up gesetzt") },
-  { value: "four_weeks", label: t("Follow-up in 4 Wochen") },
-  { value: "three_months", label: t("Follow-up in 3 Monaten") },
+  { value: "none", label: t("Kein Check-in gesetzt") },
+  { value: "four_weeks", label: t("Check-in in 4 Wochen") },
+  { value: "three_months", label: t("Check-in in 3 Monaten") },
 ];
 
 const AVAILABLE_SPEECH_LANGUAGES = ["de-DE", "en-US"] as const;
@@ -360,7 +360,7 @@ export function FounderAlignmentWorkbookClient({
   const currentStep = visibleSteps[Math.max(currentIndex, 0)];
   const founderALabel = founderAName?.trim() || "Founder A";
   const founderBLabel = founderBName?.trim() || "Founder B";
-  const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Advisor";
+  const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Moderation";
   const otherFounderLabel = currentUserRole === "founderA" ? founderBLabel : founderALabel;
   const showAdvisorInviteCard =
     currentUserRole === "founderA" ||
@@ -608,9 +608,9 @@ export function FounderAlignmentWorkbookClient({
 
     switch (saveState.kind) {
       case "dirty":
-        return { label: t("Nicht gesichert"), tone: "warning" as const };
+        return { label: t("Wird gleich gesichert"), tone: "warning" as const };
       case "saving":
-        return { label: t("Speichert gerade"), tone: "info" as const };
+        return { label: t("Speichert"), tone: "info" as const };
       case "autosaved":
       case "saved":
         return { label: t("Alles gesichert"), tone: "success" as const };
@@ -630,20 +630,20 @@ export function FounderAlignmentWorkbookClient({
 
     switch (saveState.kind) {
       case "dirty":
-        return t("Aenderungen werden gleich automatisch gesichert.");
+        return t("Aenderungen werden automatisch gesichert.");
       case "saving":
-        return t("Der aktuelle Stand wird gerade gesichert.");
+        return t("Euer aktueller Stand wird gerade gesichert.");
       case "autosaved":
       case "saved":
         return formattedUpdatedAt
           ? `${t("Alles gesichert")} · ${formattedUpdatedAt}`
           : t("Alles gesichert.");
       case "error":
-        return t("Bitte kurz warten oder den Schritt erneut oeffnen.");
+        return t("Bitte kurz warten. Euer letzter gesicherter Stand bleibt erhalten.");
       default:
         return persisted
-          ? t("Dein bisheriger Stand ist geladen und bleibt laufend gesichert.")
-          : t("Sobald ihr startet, wird euer Stand laufend gesichert.");
+          ? t("Euer Stand ist geladen und bleibt automatisch gesichert.")
+          : t("Sobald ihr losschreibt, wird euer Stand automatisch gesichert.");
     }
   }, [canSave, formattedUpdatedAt, persisted, saveState.kind, source]);
 
@@ -705,7 +705,7 @@ export function FounderAlignmentWorkbookClient({
     setSaveState((current) => ({
       ...current,
       kind: canSave ? "dirty" : current.kind,
-      message: canSave ? t("Ungespeicherte Aenderungen") : current.message,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
     setWorkbook((current) => ({
       ...current,
@@ -741,7 +741,7 @@ export function FounderAlignmentWorkbookClient({
     setSaveState((current) => ({
       ...current,
       kind: canSave ? "dirty" : current.kind,
-      message: canSave ? t("Ungespeicherte Aenderungen") : current.message,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
     setWorkbook((current) => ({
       ...current,
@@ -784,7 +784,7 @@ export function FounderAlignmentWorkbookClient({
     setSaveState((current) => ({
       ...current,
       kind: canSave ? "dirty" : current.kind,
-      message: canSave ? t("Ungespeicherte Aenderungen") : current.message,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
     setWorkbook((current) => ({
       ...current,
@@ -806,7 +806,7 @@ export function FounderAlignmentWorkbookClient({
     setSaveState((current) => ({
       ...current,
       kind: canSave ? "dirty" : current.kind,
-      message: canSave ? t("Ungespeicherte Aenderungen") : current.message,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
     setWorkbook((current) => ({
       ...current,
@@ -834,7 +834,7 @@ export function FounderAlignmentWorkbookClient({
     setSaveState((current) => ({
       ...current,
       kind: "saving",
-      message: mode === "autosave" ? t("Speichert automatisch...") : "Speichert...",
+      message: mode === "autosave" ? t("Sichert automatisch...") : "Sichert...",
     }));
 
     const result = await saveFounderAlignmentWorkbook({
@@ -862,8 +862,8 @@ export function FounderAlignmentWorkbookClient({
       kind: mode === "autosave" ? "autosaved" : "saved",
       message:
         mode === "autosave"
-          ? t("Automatisch gespeichert")
-          : t("Session gespeichert"),
+          ? t("Automatisch gesichert")
+          : t("Alles gesichert"),
       updatedAt: result.updatedAt,
     });
     return true;
@@ -931,12 +931,12 @@ export function FounderAlignmentWorkbookClient({
   const previousStepId = workbookPreviousStepId(activeStepId, visibleSteps);
   function fieldHeading(field: WorkbookEditableField) {
     if (field === "advisorNotes") {
-      return t("Hinweis des Advisors");
+      return t("Hinweis aus der Moderation");
     }
     if (field === "agreement") {
       return editingMode === "joint"
-        ? "Gemeinsame Vereinbarung"
-        : "Gemeinsame Vereinbarung";
+        ? "Gemeinsame Regel"
+        : "Gemeinsame Regel";
     }
 
     if (editingMode === "joint") {
@@ -976,7 +976,7 @@ export function FounderAlignmentWorkbookClient({
     if (editingMode === "joint") {
       return isPrimary
         ? t("Startet mit einer ersten klaren Antwort auf das Szenario.")
-        : t("Legt danach die zweite Sicht daneben. So wird der Vergleich greifbar.");
+        : t("Legt dann die zweite Sicht daneben. So wird der Unterschied oder die Einigkeit schnell sichtbar.");
     }
 
     if (
@@ -986,7 +986,7 @@ export function FounderAlignmentWorkbookClient({
       return t("Halte hier zuerst deine eigene Sicht fest.");
     }
 
-    return t("Die andere Perspektive bleibt sichtbar, damit eure Regel nicht im luftleeren Raum entsteht.");
+    return t("Die andere Perspektive bleibt sichtbar, damit die Regel nicht im luftleeren Raum entsteht.");
   }
 
   function applyAgreementDraft() {
@@ -1048,8 +1048,8 @@ export function FounderAlignmentWorkbookClient({
     if (!result.ok) {
       setAdvisorInviteMessage(
         result.reason === "forbidden"
-          ? t("Die Advisor-Einladung ist fuer diese Person nicht verfuegbar.")
-          : t("Die Advisor-Einladung konnte gerade nicht vorbereitet werden.")
+          ? t("Die Einladung zur Moderation ist fuer diese Person nicht verfuegbar.")
+          : t("Die Einladung zur Moderation konnte gerade nicht vorbereitet werden.")
       );
       setAdvisorInviteLink(null);
       return;
@@ -1066,8 +1066,8 @@ export function FounderAlignmentWorkbookClient({
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
         currentUserRole === "founderA"
-          ? t("Deine Zustimmung ist erfasst. Sobald Founder B ebenfalls zustimmt, kann der Advisor-Link erzeugt werden.")
-          : t("Deine Zustimmung ist erfasst. Sobald Founder A ebenfalls zustimmt, kann der Advisor-Link erzeugt werden.")
+          ? t("Deine Zustimmung ist erfasst. Sobald Founder B ebenfalls zustimmt, kann der Einladungslink erzeugt werden.")
+          : t("Deine Zustimmung ist erfasst. Sobald Founder A ebenfalls zustimmt, kann der Einladungslink erzeugt werden.")
       );
       return;
     }
@@ -1075,7 +1075,7 @@ export function FounderAlignmentWorkbookClient({
     if (result.status === "advisor_linked") {
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
-        t(`Advisor verbunden: ${result.advisorName ?? "Advisor"}. Kommentare koennen jetzt direkt im Workbook hinterlegt werden.`)
+        t(`Moderation verbunden: ${result.advisorName ?? "Moderation"}. Hinweise koennen jetzt direkt im Workbook hinterlegt werden.`)
       );
       return;
     }
@@ -1088,11 +1088,11 @@ export function FounderAlignmentWorkbookClient({
       try {
         await navigator.clipboard.writeText(absoluteInviteUrl);
         setAdvisorInviteMessage(
-          t("Der Advisor-Link wurde erstellt und direkt in die Zwischenablage kopiert.")
+          t("Der Einladungslink wurde erstellt und direkt in die Zwischenablage kopiert.")
         );
       } catch {
         setAdvisorInviteMessage(
-          t("Der Advisor-Link wurde erstellt. Du kannst ihn jetzt kopieren und weitergeben.")
+          t("Der Einladungslink wurde erstellt. Du kannst ihn jetzt kopieren und weitergeben.")
         );
       }
       return;
@@ -1127,21 +1127,21 @@ export function FounderAlignmentWorkbookClient({
               <div>
                 <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
                   {showFullExportView
-                    ? "Founder Alignment Workbook"
-                    : "Founder Alignment Summary"}
+                    ? "Workbook"
+                    : "Zusammenfassung"}
                 </p>
                 <h1 className="mt-3 text-3xl font-semibold text-slate-950">
                   {showFullExportView
-                    ? "Founder Alignment Workbook"
-                    : "Founder Alignment Summary"}
+                    ? "Workbook"
+                    : "Zusammenfassung"}
                 </h1>
                 <p className="mt-3 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
                 </p>
                 <p className="mt-4 max-w-3xl text-[15px] leading-8 text-slate-700">
                   {showFullExportView
-                    ? t("Dieses Dokument enthaelt die vollstaendigen Antworten und Vereinbarungen aus eurer Founder Alignment Session.")
-                    : t("Zusammenfassung eurer wichtigsten Vereinbarungen aus der Alignment Session.")}
+                    ? t("Dieses Dokument enthaelt die vollstaendigen Antworten und Vereinbarungen aus eurem Workbook.")
+                    : t("Zusammenfassung eurer wichtigsten Vereinbarungen aus dem Workbook.")}
                 </p>
                 {formattedUpdatedAt ? (
                   <p className="mt-4 text-sm leading-6 text-slate-500">
@@ -1156,7 +1156,7 @@ export function FounderAlignmentWorkbookClient({
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                Founder Alignment
+                Workbook
               </p>
               <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
                 {teamContextLabel(teamContext)}
@@ -1222,8 +1222,10 @@ export function FounderAlignmentWorkbookClient({
                 </div>
                 <p className="mt-3 text-xs leading-6 text-slate-500">
                   {completedStepsCount > 0
-                    ? t(`${completedStepsCount} Schritte sind bereits klar festgehalten.`)
-                    : t("Der erste klare Schritt entsteht gleich im Workbook.")}
+                    ? t(`${completedStepsCount} Schritte sind schon festgehalten.`)
+                    : editingMode === "joint"
+                      ? t("Die erste klare Regel entsteht gleich im Workbook.")
+                      : t("Deine erste klare Regel entsteht gleich im Workbook.")}
                 </p>
               </div>
             </div>
@@ -1234,12 +1236,12 @@ export function FounderAlignmentWorkbookClient({
               <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Arbeitsdokument")}</p>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {t(
-                  "Hier haltet ihr fest, wie ihr als Gruenderteam konkret zusammenarbeiten wollt: welche Regeln gelten, wie ihr Entscheidungen trefft und woran ihr euren Alltag kuenftig ausrichtet."
+                  "Ihr geht Schritt fuer Schritt durch eure wichtigsten Themen und haltet klare Regeln fest."
                 )}
               </p>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {t(
-                  "Dieses Arbeitsdokument koennt ihr auch als ausdruckbare Version herunterladen und gemeinsam offline bearbeiten – zum Beispiel in einem persoenlichen Treffen, Workshop oder Mentoring-Gespraech."
+                  "Jeder Schritt fuehrt zu einer konkreten Vereinbarung."
                 )}
               </p>
               <div className="mt-5">
@@ -1247,7 +1249,7 @@ export function FounderAlignmentWorkbookClient({
                   href={printWorksheetHref}
                   className="w-full sm:w-auto"
                 >
-                  {t("PDF herunterladen")}
+                  {t("Workbook als PDF")}
                 </ReportActionButton>
               </div>
             </div>
@@ -1256,7 +1258,7 @@ export function FounderAlignmentWorkbookClient({
               {currentUserRole === "advisor" ? (
                 <>
                   <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                    {t("Advisor-Modus")}
+                    {t("Moderationsmodus")}
                   </p>
                   <p className="mt-3 text-sm leading-7 text-slate-700">
                     {t(
@@ -1308,12 +1310,12 @@ export function FounderAlignmentWorkbookClient({
                     <p className="mt-2 text-sm font-medium text-slate-900">
                       {editingMode === "joint"
                         ? t("Ihr arbeitet gerade gemeinsam.")
-                        : t("Ihr startet gerade mit den einzelnen Sichten.")}
+                        : t("Ihr startet gerade mit den einzelnen Antworten.")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-slate-600">
                       {editingMode === "joint"
-                        ? t("Beide Antworten und die gemeinsame Regel koennen direkt im Schritt bearbeitet werden.")
-                        : t("Zuerst steht deine eigene Antwort im Fokus. Die andere Sicht bleibt ruhig im Blick.")}
+                        ? t("Beide Antworten und die gemeinsame Regel bleiben direkt im Blick.")
+                        : t("Zuerst steht deine eigene Antwort im Fokus. Danach wird die zweite Sicht leichter vergleichbar.")}
                     </p>
                   </div>
                 </>
@@ -1326,20 +1328,20 @@ export function FounderAlignmentWorkbookClient({
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-3xl">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                    {t("Advisor / Moderator")}
+                    {t("Moderatorin oder Moderator")}
                   </p>
                   <h2 className="mt-2 text-xl font-semibold text-slate-950">
                     {advisorInviteState.advisorLinked
-                      ? t("Advisor-Zugang ist aktiv")
+                      ? t("Moderation ist aktiv")
                       : t("Optional eine dritte Perspektive einbinden")}
                   </h2>
                   <p className="mt-3 text-sm leading-7 text-slate-700">
                     {advisorInviteState.advisorLinked
                       ? t(
-                          "Der Advisor sieht alle Inhalte im Workbook und kann pro Schritt Hinweise oder Fragen hinterlassen. Founder-Perspektiven und Vereinbarungen bleiben dabei unveraendert in eurer Verantwortung."
+                          "Die Moderation sieht alle Inhalte im Workbook und kann pro Schritt Hinweise oder Fragen hinterlassen. Founder-Perspektiven und Vereinbarungen bleiben dabei unveraendert in eurer Verantwortung."
                         )
                       : t(
-                          "Wenn ihr euch bei schwierigen Punkten eine neutrale Begleitung wuenscht, koennt ihr eine dritte Person als Advisor oder Moderator einladen. Der Zugang wird erst aktiv, wenn beide Founder zustimmen."
+                          "Wenn ihr euch bei schwierigen Punkten eine neutrale Begleitung wuenscht, koennt ihr eine dritte Person zur Moderation einladen. Der Zugang wird erst aktiv, wenn beide Founder zustimmen."
                         )}
                   </p>
                 </div>
@@ -1371,8 +1373,8 @@ export function FounderAlignmentWorkbookClient({
                         className="w-full"
                       >
                         {advisorInviteState.advisorLinked
-                          ? t("Advisor erneut verlinken")
-                          : t("Advisor einladen")}
+                          ? t("Moderation erneut einladen")
+                          : t("Moderation einladen")}
                       </ReportActionButton>
                       {advisorInviteMessage ? (
                         <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
@@ -1391,7 +1393,7 @@ export function FounderAlignmentWorkbookClient({
                   ) : currentUserRole === "advisor" ? (
                     <p className="mt-4 text-xs leading-6 text-slate-600">
                       {t(
-                        "Du bist in diesem Workbook als Advisor verknuepft und kannst unter jedem Schritt eigene Hinweise hinterlegen."
+                        "Du bist in diesem Workbook fuer die Moderation verknuepft und kannst unter jedem Schritt eigene Hinweise hinterlegen."
                       )}
                     </p>
                   ) : null}
@@ -1403,17 +1405,17 @@ export function FounderAlignmentWorkbookClient({
           <div className="mt-8 rounded-3xl border border-slate-200/70 bg-slate-50/70 p-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Fokus-Themen aus eurem Report")}</p>
+                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("Fokus-Themen aus eurem Matching-Report")}</p>
                 <h2 className="mt-2 text-xl font-semibold text-slate-950">{t(reportHeadline)}</h2>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
                   {t(
-                    "Diese Themen verdienen in eurem Arbeitsdokument besondere Aufmerksamkeit, weil sie im Report als tragende Grundlage, ergaenzende Dynamik oder als wichtiges Klaerungsthema sichtbar wurden."
+                    "Diese Themen verdienen in eurem Arbeitsdokument besondere Aufmerksamkeit, weil sie im Matching-Report als tragende Grundlage, ergaenzende Dynamik oder als wichtiges Klaerungsthema sichtbar wurden."
                   )}
                 </p>
               </div>
               <div className="text-sm leading-6 text-slate-600">
                 {highlights.prioritizedStepIds.length > 0
-                  ? t("Einzelne Schritte sind aus dem Report besonders wichtig.")
+                  ? t("Einzelne Schritte sind aus dem Matching-Report besonders wichtig.")
                   : t("Geht die Schritte in Ruhe nacheinander durch.")}
               </div>
             </div>
@@ -1523,7 +1525,7 @@ export function FounderAlignmentWorkbookClient({
                         isActive
                           ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_12px_24px_rgba(103,232,249,0.12)]"
                           : progressMeta?.completed
-                              ? "border-emerald-200/80 bg-emerald-50/40 text-slate-800 hover:border-emerald-300"
+                              ? "border-emerald-200/70 bg-emerald-50/25 text-slate-800 hover:border-emerald-300"
                             : progressMeta?.started
                               ? "border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50"
                               : "border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100"
@@ -1598,10 +1600,10 @@ export function FounderAlignmentWorkbookClient({
                         : "bg-slate-200 text-slate-600"
                   }`}
                 >
-                  {stepProgressMeta[currentStep.id]?.completed
+                    {stepProgressMeta[currentStep.id]?.completed
                     ? t("Regel festgehalten")
                     : stepProgressMeta[currentStep.id]?.started
-                      ? t("Ihr seid dran")
+                      ? t("In Arbeit")
                       : t("Startklar")}
                 </span>
               </div>
@@ -1613,10 +1615,10 @@ export function FounderAlignmentWorkbookClient({
             {isFocusedStep ? (
               <div className="mt-6 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--brand-accent)]">
-                  Fokus aus eurem Report
+                  Fokus aus eurem Matching-Report
                 </p>
                 <p className="mt-2 text-sm leading-7 text-slate-700">
-                  {t("Dieser Bereich wurde im Report als besonders relevant fuer eure Zusammenarbeit identifiziert.")}
+                  {t("Dieser Bereich wurde im Matching-Report als besonders relevant fuer eure Zusammenarbeit identifiziert.")}
                 </p>
               </div>
             ) : null}
@@ -1697,7 +1699,7 @@ export function FounderAlignmentWorkbookClient({
 
             {currentStepIsAdvisorClosing ? (
               <StepSection
-                title="Abschlussimpulse des Advisors"
+                title="Abschlussimpulse der Moderation"
                 className="mt-8 border-[color:var(--brand-accent)]/16 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.96))]"
               >
                 <p className="text-sm leading-7 text-slate-700">
@@ -1761,11 +1763,11 @@ export function FounderAlignmentWorkbookClient({
 
                 <div className="mt-6 rounded-2xl border border-slate-200 bg-white/88 p-4">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {t("Leichter Follow-up Reminder")}
+                    {t("Naechster Check-in")}
                   </p>
                   <p className="mt-2 text-sm leading-7 text-slate-700">
                     {t(
-                      "Markiere hier, ob fuer dieses Team ein leichter Follow-up in 4 Wochen, in 3 Monaten oder aktuell gar nicht sinnvoll ist."
+                      "Markiere hier, ob fuer dieses Team ein Check-in in 4 Wochen, in 3 Monaten oder aktuell gar nicht sinnvoll ist."
                     )}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3">
@@ -1794,11 +1796,11 @@ export function FounderAlignmentWorkbookClient({
 
                 <div className="mt-6 rounded-2xl border border-slate-200 bg-white/85 p-4">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {t("Founder-Reaktion")}
+                    {t("Reaktion des Teams")}
                   </p>
                   <p className="mt-2 text-sm leading-7 text-slate-700">
                     {t(
-                      "Hier koennen die Founder knapp markieren, ob die Advisor-Impulse bereits aufgenommen sind, noch offen bleiben oder aktiv weitergeklaert werden."
+                      "Hier koennt ihr knapp markieren, ob die Hinweise aus der Moderation bereits aufgenommen sind, noch offen bleiben oder weiter geklaert werden."
                     )}
                   </p>
 
@@ -1841,7 +1843,7 @@ export function FounderAlignmentWorkbookClient({
                       title={t("Kurzer gemeinsamer Kommentar")}
                       value={workbook.founderReaction.comment}
                       onChange={(value) => updateFounderReaction("comment", value)}
-                      placeholder={t("Was habt ihr aus den Advisor-Impulsen bereits aufgenommen oder was wollt ihr noch klaeren?")}
+                      placeholder={t("Was habt ihr aus den Hinweisen der Moderation bereits aufgenommen oder was wollt ihr noch klaeren?")}
                       readOnly={!canEditFounderReaction()}
                       helperText={
                         canEditFounderReaction()
@@ -1909,25 +1911,27 @@ export function FounderAlignmentWorkbookClient({
 
                 {!currentStepUsesStructuredOutput ? (
                   <StepSection
-                    title="4. Vergleich und Vorschlag"
+                    title="4. Vergleich und Regelvorschlag"
                     className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
                   >
                     <p className="text-sm leading-7 text-slate-700">
                       {t(
-                        "Hier wird aus euren beiden Antworten ein erster gemeinsamer Vorschlag. Ihr koennt ihn direkt uebernehmen oder noch schaerfen."
+                        editingMode === "joint"
+                          ? "Aus euren Antworten entsteht hier ein erster Regelvorschlag. Ihr koennt ihn direkt uebernehmen oder im Feld weiter schaerfen."
+                          : "Aus deiner Antwort entsteht hier ein erster Regelvorschlag. Du kannst ihn direkt uebernehmen oder im Feld weiter schaerfen."
                       )}
                     </p>
 
                     <div className="mt-5 flex flex-col gap-3">
                       {editingMode === "joint" && !currentAgreementDraft ? (
                         <div className="rounded-2xl border border-dashed border-slate-300/90 bg-white/85 px-4 py-4 text-sm leading-7 text-slate-600">
-                          {t("Sobald beide Antworten da sind, seht ihr hier den Vergleich und direkt darunter euren Regelvorschlag.")}
+                          {t("Sobald beide Antworten da sind, seht ihr hier erst den Vergleich und dann euren Regelvorschlag.")}
                         </div>
                       ) : null}
 
                       {editingMode === "personal" && !currentAgreementDraft ? (
                         <div className="rounded-2xl border border-dashed border-slate-300/90 bg-white/85 px-4 py-4 text-sm leading-7 text-slate-600">
-                          {t("Sobald deine Antwort steht, erscheint hier ein erster Regelvorschlag fuer den gemeinsamen Text.")}
+                          {t("Sobald deine Antwort steht, siehst du hier einen ersten Regelvorschlag.")}
                         </div>
                       ) : null}
 
@@ -1967,7 +1971,7 @@ export function FounderAlignmentWorkbookClient({
                                 {t("Regel uebernehmen")}
                               </ReportActionButton>
                               <ReportActionButton type="button" variant="utility" onClick={focusAgreementField}>
-                                {t("Im Feld anpassen")}
+                                {t("Direkt anpassen")}
                               </ReportActionButton>
                             </div>
                           </div>
@@ -1987,7 +1991,9 @@ export function FounderAlignmentWorkbookClient({
                   title={
                     currentStepUsesStructuredOutput
                       ? `${outputSectionNumber}. Regel festhalten`
-                      : `${outputSectionNumber}. Eure Regel fuer diesen Schritt`
+                      : editingMode === "joint"
+                        ? `${outputSectionNumber}. Eure Regel fuer diesen Schritt`
+                        : `${outputSectionNumber}. Deine Regel fuer diesen Schritt`
                   }
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
@@ -2000,9 +2006,15 @@ export function FounderAlignmentWorkbookClient({
                         {t(
                           currentStepUsesStructuredOutput
                             ? currentStepHasSingleStructuredOutput
-                              ? "Am Ende dieses Schritts steht eine klare Regel, die ihr im Alltag direkt anwenden koennt."
-                              : "Am Ende dieses Schritts stehen klare Regeln, die im Alltag direkt greifen."
-                            : "Hier landet eure gemeinsame Regel. Sie soll so klar sein, dass ihr sie spaeter wieder lesen und direkt anwenden koennt."
+                              ? editingMode === "joint"
+                                ? "Am Ende steht hier eine Regel, die ihr im Alltag direkt nutzen koennt."
+                                : "Am Ende steht hier eine Regel, die du im Alltag direkt nutzen kannst."
+                              : editingMode === "joint"
+                                ? "Am Ende stehen hier Regeln, die euch im Alltag direkt leiten."
+                                : "Am Ende stehen hier Regeln, die dich im Alltag direkt leiten."
+                            : editingMode === "joint"
+                              ? "Hier steht am Ende eure gemeinsame Regel fuer diesen Schritt."
+                              : "Hier steht am Ende deine Regel fuer diesen Schritt."
                         )}
                       </p>
                     </div>
@@ -2013,7 +2025,7 @@ export function FounderAlignmentWorkbookClient({
                           : "bg-slate-200 text-slate-600"
                       }`}
                     >
-                      {currentStepHasAgreement ? t("Regel steht") : t("Noch offen")}
+                      {currentStepHasAgreement ? t("Regel steht") : t("Offen")}
                     </span>
                   </div>
 
@@ -2021,9 +2033,15 @@ export function FounderAlignmentWorkbookClient({
                     {t(
                       currentStepUsesStructuredOutput
                         ? currentStepHasSingleStructuredOutput
-                          ? "Haltet hier die eine verbindliche Regel fest, die fuer diesen Schritt im Alltag gelten soll."
-                          : "Haltet hier klare Regeln fest, die im Alltag direkt greifen. Jede Regel sollte sagen, wer entscheidet, wann sie gilt und woran ihr die Grenze erkennt."
-                        : "Haltet hier fest, welche konkrete Entscheidung, Regel oder feste Arbeitsweise fuer euch kuenftig gelten soll. Der Fokus liegt nicht auf einer Zusammenfassung, sondern auf einer klaren Orientierung fuer euren Alltag als Gruenderteam."
+                          ? editingMode === "joint"
+                            ? "Formuliert die Regel so klar, dass ihr danach ohne weitere Rueckfrage handeln koennt."
+                            : "Formuliere die Regel so klar, dass du danach ohne weitere Rueckfrage handeln kannst."
+                          : editingMode === "joint"
+                            ? "Formuliert jede Regel so klar, dass sofort sichtbar ist, wann sie gilt und wer entscheidet."
+                            : "Formuliere jede Regel so klar, dass sofort sichtbar ist, wann sie gilt und wer entscheidet."
+                        : editingMode === "joint"
+                          ? "Formuliert die Regel so klar, dass ihr spaeter nicht noch einmal neu darueber sprechen muesst."
+                          : "Formuliere die Regel so klar, dass du spaeter nicht noch einmal neu darueber sprechen musst."
                     )}
                   </p>
 
@@ -2061,7 +2079,7 @@ export function FounderAlignmentWorkbookClient({
                     <>
                       <div className="mt-6">
                         <WorkbookField
-                          title={t("Eure gemeinsame Regel")}
+                          title={t(editingMode === "joint" ? "Eure gemeinsame Regel" : "Deine Regel")}
                           value={workbook.steps[currentStep.id].agreement}
                           onChange={(value) => updateEntry("agreement", value)}
                           placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
@@ -2070,7 +2088,11 @@ export function FounderAlignmentWorkbookClient({
                           readOnly={!canEditField("agreement")}
                           helperText={
                             canEditField("agreement")
-                              ? t("Hier landet eure endgueltige Regel fuer diesen Schritt.")
+                              ? t(
+                                  editingMode === "joint"
+                                    ? "Hier steht eure gemeinsame Regel fuer diesen Schritt."
+                                    : "Hier steht deine Regel fuer diesen Schritt."
+                                )
                               : getFieldReadOnlyHint("agreement")
                           }
                         />
@@ -2103,9 +2125,13 @@ export function FounderAlignmentWorkbookClient({
                 ) : null}
 
                 {showStatusSection ? (
-                  <StepSection title="Gemeinsamer Status" className="mt-8 border-slate-200/70 bg-white">
+                  <StepSection title="Stand dieses Schritts" className="mt-8 border-slate-200/70 bg-white">
                     <p className="text-sm leading-7 text-slate-700">
-                      Markiert hier kurz, wie klar dieser Schritt fuer euch schon ist.
+                      {t(
+                        editingMode === "joint"
+                          ? "Markiert hier kurz, wie klar dieser Schritt fuer euch schon ist."
+                          : "Markiere hier kurz, wie klar dieser Schritt fuer dich schon ist."
+                      )}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {STEP_CLARITY_OPTIONS.map((option) => {
@@ -2153,7 +2179,7 @@ export function FounderAlignmentWorkbookClient({
                       }
                       className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                     >
-                      {t("Status optional festhalten")}
+                      {t("Status festhalten")}
                     </button>
                   </div>
                 )}
@@ -2169,7 +2195,11 @@ export function FounderAlignmentWorkbookClient({
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {currentStepHasAgreement
                       ? t("Guter Fortschritt. Die Regel fuer diesen Schritt steht.")
-                      : t("Haltet die Regel fest und geht dann in den naechsten Schritt.")}
+                      : t(
+                          editingMode === "joint"
+                            ? "Haltet jetzt noch eure Regel fest. Dann geht ihr in den naechsten Schritt."
+                            : "Halte jetzt noch deine Regel fest. Dann gehst du in den naechsten Schritt."
+                        )}
                   </p>
                 </div>
                 <span
@@ -2215,7 +2245,11 @@ export function FounderAlignmentWorkbookClient({
             <p className="mt-4 text-xs leading-6 text-slate-500">
               {currentIndex === visibleSteps.length - 1
                 ? t("Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.")
-                : t("Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt.")}
+                : t(
+                    editingMode === "joint"
+                      ? "Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt."
+                      : "Beim Weitergehen bleibt dein aktueller Stand erhalten und du landest direkt im naechsten Schritt."
+                  )}
             </p>
             </div>
           </section>
@@ -2447,7 +2481,7 @@ function WorkbookField({
     ? dictationStatus === "paused"
       ? t("Kurze Pause")
       : t("Aufnahme laeuft")
-    : t("Mikro");
+    : t("Diktieren");
 
   return (
     <section
@@ -2512,7 +2546,7 @@ function WorkbookField({
 
       {dictationStatus === "listening" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Spricht gerade. Der Text wird direkt uebernommen.")}
+          {t("Aufnahme laeuft. Der Text erscheint direkt im Feld.")}
         </p>
       ) : null}
 
@@ -2606,7 +2640,7 @@ function WorkbookSummaryView({
   return (
     <>
       <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/75 p-6 print:mt-6">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Abschluss</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Zusammenfassung</p>
         <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
           {t(
             "Diese Zusammenfassung buendelt eure wichtigsten Vereinbarungen aus dem Arbeitsdokument. Sie zeigt, was ihr bereits klar fuer eure Zusammenarbeit festgehalten habt und an welchen Punkten noch weitere Entscheidungen noetig sind."
@@ -2636,7 +2670,7 @@ function WorkbookSummaryView({
                     />
                     <div className="rounded-2xl border border-[color:var(--brand-primary)]/16 bg-[color:var(--brand-primary)]/6 p-4">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Founder-Reaktion")}
+                        {t("Reaktion des Teams")}
                       </p>
                       <p className="mt-2 text-sm leading-7 text-slate-700">
                         {item.founderReaction?.status
@@ -2650,19 +2684,19 @@ function WorkbookSummaryView({
                       ) : null}
                     </div>
                     <SummaryInsightBlock
-                      title={t("Follow-up")}
+                      title={t("Naechster Check-in")}
                       text={advisorFollowUpLabel(item.advisorFollowUp)}
                     />
                   </div>
                 ) : (
                   <p className="mt-3 text-sm leading-7 text-slate-700">
-                    {t(item.agreement || "Zu diesem Schritt liegt aktuell noch keine gemeinsame Vereinbarung vor.")}
+                    {t(item.agreement || "Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
                   </p>
                 )}
                 {item.advisorNotes ? (
                   <div className="mt-4 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/6 p-4">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                      {t("Hinweis eines Advisors")}
+                      {t("Hinweis aus der Moderation")}
                     </p>
                     <p className="mt-2 text-sm leading-7 text-slate-700">{t(item.advisorNotes)}</p>
                   </div>
@@ -2686,7 +2720,7 @@ function WorkbookSummaryView({
                 <p className="mt-2 text-sm leading-6 text-slate-700">
                   {item.status === "open"
                     ? t("Dieses Thema ist noch offen und sollte gezielt weiter besprochen werden.")
-                    : t("Zu diesem Thema gibt es bereits eine Richtung, aber noch keine abschliessend klare Vereinbarung.")}
+                    : t("Zu diesem Thema gibt es bereits eine Richtung, aber noch keine klare Regel.")}
                 </p>
               </li>
             ))}
@@ -2714,10 +2748,10 @@ function WorkbookSummaryView({
 
         <div className="flex flex-wrap gap-3">
           <ReportActionButton onClick={onExportSummary}>
-            Zusammenfassung exportieren
+            Zusammenfassung als PDF
           </ReportActionButton>
           <ReportActionButton variant="secondary" onClick={onShowFullExport}>
-            {t("Vollstaendige Session exportieren")}
+            {t("Workbook als PDF")}
           </ReportActionButton>
         </div>
       </div>
@@ -2748,26 +2782,26 @@ function founderReactionStatusLabel(status: Exclude<FounderAlignmentWorkbookFoun
 function advisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | null) {
   switch (value) {
     case "four_weeks":
-      return t("Follow-up in 4 Wochen");
+      return t("Check-in in 4 Wochen");
     case "three_months":
-      return t("Follow-up in 3 Monaten");
+      return t("Check-in in 3 Monaten");
     default:
-      return t("Kein Follow-up gesetzt.");
+      return t("Kein Check-in gesetzt.");
   }
 }
 
 function SummaryStatusBadge({ status }: { status: StepClarity }) {
   const statusMeta: Record<StepClarity, { label: string; className: string }> = {
     open: {
-      label: "Noch offen",
+      label: "Offen",
       className: "border-slate-200 bg-slate-100 text-slate-700",
     },
     partial: {
-      label: t("Teilweise geklaert"),
+      label: t("In Arbeit"),
       className: "border-amber-200 bg-amber-50 text-amber-700",
     },
     clear: {
-      label: t("Klar vereinbart"),
+      label: t("Regel steht"),
       className: "border-emerald-200 bg-emerald-50 text-emerald-700",
     },
   };
@@ -2878,7 +2912,7 @@ function WorkbookFullExportView({
                   highlight
                 />
                 <ExportResponseCard
-                  title="Founder-Reaktion"
+                  title="Reaktion des Teams"
                   text={
                     item.founderReaction?.status
                       ? `${founderReactionStatusLabel(item.founderReaction.status)}${
@@ -2890,7 +2924,7 @@ function WorkbookFullExportView({
                   }
                 />
                 <ExportResponseCard
-                  title="Follow-up"
+                  title="Naechster Check-in"
                   text={advisorFollowUpLabel(item.advisorFollowUp)}
                 />
               </div>
@@ -2909,7 +2943,7 @@ function WorkbookFullExportView({
 
                 <div className="mt-5">
                   <ExportResponseCard
-                    title="Gemeinsame Vereinbarung"
+                    title="Gemeinsame Regel"
                     text={item.agreement}
                     highlight
                   />
@@ -2918,7 +2952,7 @@ function WorkbookFullExportView({
                 {item.advisorNotes ? (
                   <div className="mt-5">
                     <ExportResponseCard
-                      title="Hinweis eines Advisors"
+                      title="Hinweis aus der Moderation"
                       text={item.advisorNotes}
                     />
                   </div>
@@ -2931,10 +2965,10 @@ function WorkbookFullExportView({
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <ReportActionButton variant="utility" onClick={onBack}>
-          {t("Zurueck zur Summary")}
+          {t("Zurueck zur Zusammenfassung")}
         </ReportActionButton>
 
-        <ReportActionButton onClick={onExport}>{t("Vollstaendige Session exportieren")}</ReportActionButton>
+        <ReportActionButton onClick={onExport}>{t("Workbook als PDF")}</ReportActionButton>
       </div>
     </>
   );
@@ -3151,8 +3185,8 @@ function buildAgreementDraft({
         : "Moegliche Regel auf Basis deiner Antwort",
     suggestionIntro:
       sourceMode === "joint"
-        ? "Basierend auf euren Antworten koennte eure Regel so aussehen:"
-        : "Auf Basis deiner Antwort koennte eure Regel so aussehen:",
+        ? "So koennte eure Regel lauten:"
+        : "So koennte eure erste Regel lauten:",
   };
 }
 

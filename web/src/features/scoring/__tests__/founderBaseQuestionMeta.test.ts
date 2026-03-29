@@ -20,7 +20,7 @@ test("all basis questions have explicit polarity metadata", () => {
 
 test("critical example items are explicitly corrected via polarity metadata", () => {
   assert.equal(getFounderBaseQuestionScoreMeta("q11_commitment_fc1")?.polarity, "high_is_left_pole");
-  assert.equal(getFounderBaseQuestionScoreMeta("q12_conflict_fc1")?.polarity, "high_is_left_pole");
+  assert.equal(getFounderBaseQuestionScoreMeta("q12_conflict_fc1")?.polarity, "high_is_right_pole");
   assert.equal(getFounderBaseQuestionScoreMeta("q30_conflict_fc2")?.polarity, "high_is_left_pole");
   assert.equal(getFounderBaseQuestionScoreMeta("q03_decision_l1")?.polarity, "high_is_right_pole");
   assert.equal(getFounderBaseQuestionScoreMeta("q21_decision_l2")?.polarity, "high_is_left_pole");
@@ -30,7 +30,7 @@ test("critical example items are explicitly corrected via polarity metadata", ()
 
 test("polarity scoring flips raw values only when the item points to the left pole", () => {
   assert.equal(scoreStoredBaseAnswerToFounderPercent("q11_commitment_fc1", "100"), 0);
-  assert.equal(scoreStoredBaseAnswerToFounderPercent("q12_conflict_fc1", "75"), 25);
+  assert.equal(scoreStoredBaseAnswerToFounderPercent("q12_conflict_fc1", "75"), 75);
   assert.equal(scoreStoredBaseAnswerToFounderPercent("q30_conflict_fc2", "50"), 50);
   assert.equal(scoreStoredBaseAnswerToFounderPercent("q03_decision_l1", "75"), 75);
   assert.equal(scoreStoredBaseAnswerToFounderPercent("q21_decision_l2", "75"), 25);

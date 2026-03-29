@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
+import { FounderAlignmentPaywallGate } from "@/features/reporting/FounderAlignmentPaywallGate";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
 import {
   createReportRunOnCompletion,
@@ -81,6 +83,7 @@ export default async function ReportPage({ params }: PageProps) {
   if (!snapshot) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
+        <ProductNavigationOverride matchingHref={`/report/${encodeURIComponent(sessionId)}`} />
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
           <ResearchPageTracker eventName="report_page_viewed" invitationId={sessionId} />
           <ReportAutoRefresh />
@@ -108,6 +111,7 @@ export default async function ReportPage({ params }: PageProps) {
   if (!founderScoring) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
+        <ProductNavigationOverride matchingHref={`/report/${encodeURIComponent(snapshot.invitationId)}`} />
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
           <ResearchPageTracker
             eventName="report_page_viewed"
@@ -152,6 +156,10 @@ export default async function ReportPage({ params }: PageProps) {
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
+      <ProductNavigationOverride
+        matchingHref={`/report/${encodeURIComponent(snapshot.invitationId)}`}
+        workbookHref={workbookHref}
+      />
       <ResearchPageTracker
         eventName="report_page_viewed"
         invitationId={snapshot.invitationId}
@@ -178,15 +186,17 @@ export default async function ReportPage({ params }: PageProps) {
         />
       </div>
 
-      <FounderMatchingView
-        participantAName={participantAName}
-        participantBName={participantBName}
-        compareResult={compareResult}
-        selection={selection}
-        valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
-        valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
-        workbookHref={workbookHref}
-      />
+      <FounderAlignmentPaywallGate invitationId={snapshot.invitationId}>
+        <FounderMatchingView
+          participantAName={participantAName}
+          participantBName={participantBName}
+          compareResult={compareResult}
+          selection={selection}
+          valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
+          valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
+          workbookHref={workbookHref}
+        />
+      </FounderAlignmentPaywallGate>
     </main>
   );
 }

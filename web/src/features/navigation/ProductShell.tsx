@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
@@ -12,6 +11,7 @@ type Props = {
   hasFounder: boolean;
   hasAdvisor: boolean;
   displayName: string | null;
+  matchingHref: string;
   workbookHref: string;
 };
 
@@ -20,6 +20,15 @@ type NavigationItem = {
   label: string;
   isActive: (pathname: string) => boolean;
 };
+
+type NavigationOverride = {
+  matchingHref?: string;
+  workbookHref?: string;
+} | null;
+
+const ProductNavigationOverrideContext = createContext<
+  ((override: NavigationOverride) => void) | null
+>(null);
 
 function isProductChromePath(pathname: string) {
   if (!pathname) return false;
@@ -50,14 +59,56 @@ function normalizeDisplayName(value: string | null) {
   return trimmed && trimmed.length > 0 ? trimmed : "Profil";
 }
 
+function ProductShellWordmark() {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 32 32"
+        className="h-8 w-8 shrink-0 md:h-9 md:w-9"
+      >
+        <defs>
+          <linearGradient id="product-shell-logo-gradient" x1="6" y1="5" x2="26" y2="27" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#67e8f9" />
+            <stop offset="1" stopColor="#7c3aed" />
+          </linearGradient>
+        </defs>
+        <rect x="3" y="3" width="26" height="26" rx="10" fill="url(#product-shell-logo-gradient)" />
+        <circle cx="12" cy="12" r="3.25" fill="#ffffff" fillOpacity="0.96" />
+        <circle cx="20" cy="20" r="3.25" fill="#ffffff" fillOpacity="0.96" />
+        <path
+          d="M11.4 21.1 20.7 11.8"
+          stroke="#ffffff"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeOpacity="0.94"
+        />
+      </svg>
+
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="truncate font-[var(--font-display)] text-sm text-slate-950 md:text-[15px]">
+          CoFoundery
+        </span>
+        <span className="truncate text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-500 md:text-[10px]">
+          Align
+        </span>
+      </span>
+    </span>
+  );
+}
+
 export function ProductShell({
   children,
   hasFounder,
   hasAdvisor,
   displayName,
+  matchingHref,
   workbookHref,
 }: Props) {
   const pathname = usePathname();
+  const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
+  const resolvedMatchingHref = navigationOverride?.matchingHref ?? matchingHref;
+  const resolvedWorkbookHref = navigationOverride?.workbookHref ?? workbookHref;
   const navigationItems: NavigationItem[] = [
     {
       href: "/dashboard",
@@ -70,13 +121,13 @@ export function ProductShell({
       isActive: (currentPathname) => currentPathname.startsWith("/me/"),
     },
     {
-      href: "/dashboard#dashboard-block-active",
-      label: "Matching",
+      href: resolvedMatchingHref,
+      label: "Matching-Report",
       isActive: (currentPathname) =>
         currentPathname.startsWith("/report/") || currentPathname === "/invite/new",
     },
     {
-      href: workbookHref,
+      href: resolvedWorkbookHref,
       label: "Workbook",
       isActive: (currentPathname) => currentPathname.startsWith("/founder-alignment/"),
     },
@@ -87,52 +138,76 @@ export function ProductShell({
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10 xl:px-12">
-          <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
-            <Link href="/dashboard" className="flex min-w-0 items-center">
-              <Image
-                src="/cofoundery-align-logo.svg"
-                alt="CoFoundery Align"
-                width={220}
-                height={44}
-                className="h-8 w-auto object-contain md:h-9"
-                priority
+    <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
+      <div className="min-h-screen">
+        <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10 xl:px-12">
+            <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
+              <Link
+                href="/dashboard"
+                className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
+                aria-label="Zum Dashboard"
+              >
+                <ProductShellWordmark />
+              </Link>
+
+              <nav
+                aria-label="Produktnavigation"
+                className="flex flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
+              >
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={navLinkClassName(item.isActive(pathname))}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <DashboardViewSwitch
+                activeView={pathname.startsWith("/advisor/") ? "advisor" : "founder"}
+                hasFounder={hasFounder}
+                hasAdvisor={hasAdvisor}
               />
-            </Link>
 
-            <nav
-              aria-label="Produktnavigation"
-              className="flex flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
-            >
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={navLinkClassName(item.isActive(pathname))}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+              <ProfileMenu displayName={displayName} />
+            </div>
           </div>
+        </header>
 
-          <div className="flex flex-wrap items-center justify-end gap-3">
-            <DashboardViewSwitch
-              activeView={pathname.startsWith("/advisor/") ? "advisor" : "founder"}
-              hasFounder={hasFounder}
-              hasAdvisor={hasAdvisor}
-            />
-
-            <ProfileMenu displayName={displayName} />
-          </div>
-        </div>
-      </header>
-
-      {children}
-    </div>
+        {children}
+      </div>
+    </ProductNavigationOverrideContext.Provider>
   );
+}
+
+export function ProductNavigationOverride({
+  matchingHref,
+  workbookHref,
+}: {
+  matchingHref?: string | null;
+  workbookHref?: string | null;
+}) {
+  const setOverride = useContext(ProductNavigationOverrideContext);
+
+  useEffect(() => {
+    if (!setOverride) return;
+
+    setOverride({
+      matchingHref: matchingHref ?? undefined,
+      workbookHref: workbookHref ?? undefined,
+    });
+
+    return () => {
+      setOverride(null);
+    };
+  }, [matchingHref, setOverride, workbookHref]);
+
+  return null;
 }
 
 function ProfileMenu({ displayName }: { displayName: string | null }) {

@@ -22,6 +22,11 @@ type WorkbookDashboardRow = {
   payload: unknown;
 };
 
+type ProductNavigationTargets = {
+  matchingHref: string;
+  workbookHref: string;
+};
+
 const spectral = localFont({
   src: [
     { path: "./fonts/spectral-v15-latin-regular.woff2", weight: "400", style: "normal" },
@@ -83,7 +88,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, workbookHref] = user
+  const [roleViews, profileData, navigationTargets] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -100,12 +105,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             .limit(20);
 
           if (reportRunsResult.error) {
-            return "/dashboard";
+            return {
+              matchingHref: "/dashboard#dashboard-block-active",
+              workbookHref: "/dashboard",
+            } satisfies ProductNavigationTargets;
           }
 
           const reportRuns = (reportRunsResult.data ?? []) as ReportRunRow[];
+          const latestReport = reportRuns[0] ?? null;
+          const matchingHref = latestReport
+            ? `/report/${encodeURIComponent(latestReport.invitation_id)}`
+            : "/dashboard#dashboard-block-active";
           const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
-          const readyReportInvitationIds = new Set(reportRuns.map((run) => run.invitation_id));
           const relevantInvitationIds = [
             ...new Set([
               ...invitationRows.map((invitation) => invitation.id),
@@ -114,7 +125,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           ];
 
           if (relevantInvitationIds.length === 0) {
-            return "/dashboard";
+            return {
+              matchingHref,
+              workbookHref: "/dashboard",
+            } satisfies ProductNavigationTargets;
           }
 
           const workbookResult = await supabase
@@ -124,7 +138,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             .order("updated_at", { ascending: false });
 
           if (workbookResult.error) {
-            return "/dashboard";
+            return {
+              matchingHref,
+              workbookHref: "/dashboard",
+            } satisfies ProductNavigationTargets;
           }
 
           const workbookRows = ((workbookResult.data ?? []) as WorkbookDashboardRow[]).map((row) => {
@@ -140,16 +157,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           const latestActiveWorkbook = workbookRows.find((row) => row.hasStarted) ?? null;
           if (latestActiveWorkbook) {
-            return latestActiveWorkbook.href;
+            return {
+              matchingHref,
+              workbookHref: latestActiveWorkbook.href,
+            } satisfies ProductNavigationTargets;
           }
 
-          const latestReadyReport = reportRuns.find((run) => readyReportInvitationIds.has(run.invitation_id)) ?? null;
-          if (latestReadyReport) {
-            const invitation = invitationById.get(latestReadyReport.invitation_id) ?? null;
-            return buildWorkbookHref(latestReadyReport.invitation_id, invitation?.teamContext ?? null);
+          if (latestReport) {
+            const invitation = invitationById.get(latestReport.invitation_id) ?? null;
+            return {
+              matchingHref,
+              workbookHref: buildWorkbookHref(latestReport.invitation_id, invitation?.teamContext ?? null),
+            } satisfies ProductNavigationTargets;
           }
 
-          return "/dashboard";
+          return {
+            matchingHref,
+            workbookHref: "/dashboard",
+          } satisfies ProductNavigationTargets;
         })(),
       ])
     : [
@@ -159,7 +184,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         },
         null,
-        "/dashboard",
+        {
+          matchingHref: "/dashboard#dashboard-block-active",
+          workbookHref: "/dashboard",
+        } satisfies ProductNavigationTargets,
       ];
   const displayName =
     profileData?.display_name?.trim() ||
@@ -175,7 +203,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           hasFounder={roleViews.hasFounder}
           hasAdvisor={roleViews.hasAdvisor}
           displayName={displayName}
-          workbookHref={workbookHref}
+          matchingHref={navigationTargets.matchingHref}
+          workbookHref={navigationTargets.workbookHref}
         >
           {children}
         </ProductShell>

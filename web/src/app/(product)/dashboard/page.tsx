@@ -245,20 +245,25 @@ export default async function DashboardPage({
     (report) => !activeWorkbookByInvitationId.has(report.invitation_id)
   );
 
-  const basisStatus = hasSubmittedBase ? "abgeschlossen" : "offen";
+  const basisStatus = hasSubmittedBase ? "Bereit" : "Offen";
   const valuesStatusLabel = hasSubmittedValues
-    ? "abgeschlossen"
+    ? "Bereit"
     : valuesStatus === "in_progress"
-      ? "gestartet"
-      : "offen";
-  const matchingStatus = readyReports.length > 0 ? "abgeschlossen" : hasMatchingActivity ? "gestartet" : "offen";
+      ? "In Arbeit"
+      : "Offen";
+  const matchingStatus = readyReports.length > 0 ? "Bereit" : hasMatchingActivity ? "In Arbeit" : "Offen";
   const workbookStatus = activeWorkbooks.some((workbook) => workbook.isCompleted)
-    ? "abgeschlossen"
+    ? "Bereit"
     : activeWorkbooks.length > 0
-      ? "gestartet"
+      ? "In Arbeit"
       : readyReports.length > 0
-        ? "offen"
-        : "offen";
+        ? "Bereit"
+        : "Offen";
+  const shouldPrioritizeInviteCta =
+    hasSubmittedBase && hasSubmittedValues && !hasMatchingActivity && !latestReadyReport && !latestActiveWorkbook;
+  const heroExpectationText = shouldPrioritizeInviteCta
+    ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
+    : null;
 
   const heroPrimaryAction = !hasSubmittedBase
     ? {
@@ -275,7 +280,7 @@ export default async function DashboardPage({
             valuesStatus === "in_progress"
               ? "Führe dein Werteprofil zu Ende."
               : "Starte jetzt dein Werteprofil.",
-          text: "Damit wird dein Profil für Matching und Workbook belastbarer.",
+          text: "Damit wird dein Profil fuer Matching-Report und Workbook belastbarer.",
         }
       : latestActiveWorkbook
         ? {
@@ -294,20 +299,20 @@ export default async function DashboardPage({
                 ),
             label: "Workbook starten",
             title: "Starte jetzt das Workbook.",
-            text: "Übersetze den Report in konkrete Regeln und nächste Schritte.",
+            text: "Uebersetze den Matching-Report in konkrete Regeln und naechste Schritte.",
           }
         : !hasMatchingActivity
             ? {
                 href: "/invite/new",
                 label: "Co-Founder einladen",
                 title: "Starte jetzt das Matching.",
-                text: "Der nächste Schritt ist eine Einladung.",
+                text: "Der nächste Schritt: Lade deinen Co-Founder ein und startet gemeinsam euer Matching.",
               }
             : {
                 href: "/dashboard#dashboard-block-active",
                 label: "Matching verfolgen",
                 title: "Behalte das laufende Matching im Blick.",
-                text: "Sobald Antworten eingehen oder ein Report bereit ist, geht es hier weiter.",
+                text: "Sobald Antworten eingehen oder ein Matching-Report bereit ist, geht es hier weiter.",
               };
 
   const progressCards = [
@@ -319,9 +324,9 @@ export default async function DashboardPage({
       isCompleted: hasSubmittedBase,
       text: hasSubmittedBase
         ? "Profil ist bereit."
-        : "Noch offen.",
+        : "Offen.",
       href: hasSubmittedBase ? "/me/report" : "/me/base",
-      actionLabel: hasSubmittedBase ? "Ansehen" : "Starten",
+      actionLabel: hasSubmittedBase ? "Öffnen" : "Starten",
     },
     {
       id: "dashboard-status-values",
@@ -333,10 +338,10 @@ export default async function DashboardPage({
         ? "Werteprofil ist bereit."
         : valuesStatus === "in_progress"
           ? "Bereits begonnen."
-          : "Noch offen.",
+          : "Offen.",
       href: hasSubmittedValues ? "/me/report#werteprofil" : "/me/values",
       actionLabel:
-        hasSubmittedValues ? "Ansehen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
+        hasSubmittedValues ? "Öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
     },
     {
       id: "dashboard-block-status-matching",
@@ -346,29 +351,37 @@ export default async function DashboardPage({
       isCompleted: readyReports.length > 0,
       text:
         readyReports.length > 0
-          ? "Report ist bereit."
+          ? "Matching-Report ist bereit."
           : hasMatchingActivity
-            ? "Matching läuft."
-            : "Noch offen.",
+            ? "Sobald dein Co-Founder teilnimmt, entsteht euer Matching-Report."
+            : shouldPrioritizeInviteCta
+              ? "Als Nächstes steht die Einladung an."
+              : "Offen.",
       href: readyReports[0]
         ? `/report/${readyReports[0].invitation_id}`
         : hasSubmittedBase
           ? "/invite/new"
           : "/me/base",
-      actionLabel: readyReports[0] ? "Report ansehen" : hasSubmittedBase ? "Einladen" : "Starten",
+      actionLabel: readyReports[0]
+        ? "Öffnen"
+        : shouldPrioritizeInviteCta
+          ? null
+          : hasSubmittedBase
+            ? "Einladen"
+            : "Starten",
     },
     {
       id: "dashboard-status-workbook",
       label: "Workbook",
       status: workbookStatus,
       isCurrent: Boolean(latestReadyReport || latestActiveWorkbook),
-      isCompleted: workbookStatus === "abgeschlossen",
+      isCompleted: workbookStatus === "Bereit",
       text:
         activeWorkbooks.length > 0
-          ? "Workbook ist aktiv."
+          ? "Workbook ist in Arbeit."
           : readyReports.length > 0
-            ? "Bereit zum Start."
-            : "Noch offen.",
+            ? "Workbook ist bereit."
+            : "Offen.",
       href: workbookEntryPointHref ?? "/dashboard",
       actionLabel:
         activeWorkbooks.length > 0
@@ -441,7 +454,7 @@ export default async function DashboardPage({
                   Dein Founder Dashboard
                 </h1>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Von Profil zu Matching bis ins Workbook.
+                  Von deinem Profil zum Matching-Report bis ins Workbook.
                 </p>
               </div>
             </header>
@@ -463,6 +476,11 @@ export default async function DashboardPage({
                 <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                   {heroPrimaryAction.text}
                 </p>
+                {heroExpectationText ? (
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
+                    {heroExpectationText}
+                  </p>
+                ) : null}
                 <div className="mt-5">
                   <Link
                     href={heroPrimaryAction.href}
@@ -471,6 +489,19 @@ export default async function DashboardPage({
                     {heroPrimaryAction.label}
                   </Link>
                 </div>
+              </div>
+            </section>
+
+            <section
+              className="dashboard-fade-up mt-4 max-w-3xl rounded-[24px] border border-slate-200/70 bg-slate-50/72 px-5 py-4"
+              style={staggerStyle(55)}
+            >
+              <p className="text-sm font-medium text-slate-900">So nutzt ihr das Tool am besten:</p>
+              <div className="mt-3 space-y-1.5 text-sm leading-6 text-slate-600">
+                <p>1. Startet mit dem Basisprofil</p>
+                <p>2. Optional: ergänzt euer Werteprofil</p>
+                <p>3. Danach bekommt ihr euren Matching-Report</p>
+                <p>4. Im Workbook klärt ihr eure wichtigsten Regeln</p>
               </div>
             </section>
           </div>
@@ -513,28 +544,16 @@ export default async function DashboardPage({
               </p>
               <p className="mt-2 text-sm font-medium text-slate-900">{card.status}</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
-              <div className="mt-3">
-                <Link href={card.href} className={UTILITY_CTA_CLASS}>
-                  {card.actionLabel}
-                </Link>
-              </div>
+              {card.actionLabel ? (
+                <div className="mt-3">
+                  <Link href={card.href} className={UTILITY_CTA_CLASS}>
+                    {card.actionLabel}
+                  </Link>
+                </div>
+              ) : null}
             </article>
           ))}
         </div>
-
-        {hasSubmittedValues && !hasMatchingActivity ? (
-          <article className="mt-5 rounded-2xl border border-slate-200/80 bg-white/82 p-4 shadow-[0_8px_20px_rgba(15,23,42,0.03)]">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Matching starten</p>
-                <p className="mt-1 text-sm text-slate-600">Lade jetzt einen Co-Founder ein.</p>
-              </div>
-              <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-                Co-Founder einladen
-              </Link>
-            </div>
-          </article>
-        ) : null}
       </section>
 
       <section
@@ -552,12 +571,16 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Hier geht es weiter.
+              {shouldPrioritizeInviteCta
+                ? "Sobald die Einladung raus ist, gehen Matching-Report und Workbook hier weiter."
+                : "Hier geht es weiter."}
             </p>
           </div>
-          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-            Co-Founder einladen
-          </Link>
+          {!shouldPrioritizeInviteCta ? (
+            <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+              Co-Founder einladen
+            </Link>
+          ) : null}
         </div>
 
         <div className="mt-6 space-y-5">
@@ -581,7 +604,7 @@ export default async function DashboardPage({
                 <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
                   {primaryWorkbook.hasStarted
                     ? "Hier liegt euer aktueller Arbeitsstand."
-                    : "Der Report ist bereit. Jetzt geht es ins Workbook."}
+                    : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook."}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
                   Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
@@ -619,14 +642,14 @@ export default async function DashboardPage({
               </div>
             ) : (
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
-                Sobald ein Report bereit ist, startet hier das Workbook.
+                Sobald ein Matching-Report bereit ist, startet hier das Workbook.
               </p>
             )}
           </article>
 
           <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Bereite Reports</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Bereite Matching-Reports</h3>
               <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
             </div>
             <div className="mt-3 space-y-2">
@@ -639,8 +662,8 @@ export default async function DashboardPage({
               ) : (
                 <p className="text-sm leading-7 text-slate-500">
                   {readyReports.length > 0
-                    ? "Alle bereiten Reports sind bereits in Workbooks überführt."
-                    : "Sobald Reports bereit sind, erscheinen sie hier."}
+                    ? "Alle bereiten Matching-Reports sind bereits im Workbook angekommen."
+                    : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
                 </p>
               )}
             </div>
@@ -829,7 +852,7 @@ export default async function DashboardPage({
                   <FounderDimensionsOverview scores={selfReport.scoresA} />
                 </div>
                 <div className="mt-5 rounded-xl border border-slate-200/80 bg-white/70 px-4 py-3">
-                  <p className="text-sm text-slate-600">Detaillierte Einordnung findest du im Report.</p>
+                  <p className="text-sm text-slate-600">Detaillierte Einordnung findest du in deinem Report.</p>
                 </div>
               </article>
             ) : (
@@ -885,7 +908,7 @@ export default async function DashboardPage({
           <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
             <p className="text-sm font-semibold text-slate-900">Entwicklung</p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Raum für vertiefende Module, Lernpfade und thematische Follow-ups auf Basis von Report und Workbook.
+              Raum fuer vertiefende Module, Lernpfade und weitere naechste Schritte auf Basis von Report und Workbook.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
@@ -1052,7 +1075,7 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
       <div className="shrink-0">
         {invite.isReportReady ? (
           <Link href={`/report/${invite.id}`} className={REPORT_CTA_CLASS}>
-            Report ansehen
+            Öffnen
           </Link>
         ) : (
           <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
@@ -1093,7 +1116,7 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
             : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
         }
       >
-        {invite.isReportReady ? "Report ansehen" : inviteeHasAllRequired ? "Status ansehen" : "Jetzt ausfüllen"}
+        {invite.isReportReady ? "Öffnen" : inviteeHasAllRequired ? "Status öffnen" : "Jetzt ausfüllen"}
       </a>
     </div>
   );
@@ -1113,7 +1136,7 @@ function renderCompactReportRow(run: ReportRunRow) {
       </div>
 
       <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
-        Report ansehen
+        Öffnen
       </Link>
     </div>
   );

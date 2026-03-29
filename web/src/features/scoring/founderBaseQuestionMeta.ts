@@ -23,7 +23,7 @@ export const FOUNDER_BASE_QUESTION_SCORE_META: FounderBaseQuestionScoreMeta[] = 
   { id: "q09_decision_fc1", dimension: "Entscheidungslogik", type: "forced_choice", polarity: "high_is_left_pole" },
   { id: "q10_risk_fc1", dimension: "Risikoorientierung", type: "forced_choice", polarity: "high_is_left_pole" },
   { id: "q11_commitment_fc1", dimension: "Commitment", type: "forced_choice", polarity: "high_is_left_pole" },
-  { id: "q12_conflict_fc1", dimension: "Konfliktstil", type: "forced_choice", polarity: "high_is_left_pole" },
+  { id: "q12_conflict_fc1", dimension: "Konfliktstil", type: "forced_choice", polarity: "high_is_right_pole" },
   { id: "q13_vision_s1", dimension: "Unternehmenslogik", type: "scenario", polarity: "high_is_left_pole" },
   { id: "q14_collaboration_s1", dimension: "Arbeitsstruktur & Zusammenarbeit", type: "scenario", polarity: "high_is_left_pole" },
   { id: "q15_decision_s1", dimension: "Entscheidungslogik", type: "scenario", polarity: "high_is_right_pole" },
