@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const panels = [
@@ -13,8 +13,8 @@ const panels = [
   {
     step: "2",
     title: "Seht, wo ihr zusammenpasst",
-    text: "Der Matching-Report zeigt, wo ihr ähnlich tickt, wo ihr unterschiedlich entscheidet und wo daraus Spannungen entstehen können.",
-    label: "Gemeinsamkeiten, Unterschiede, Konfliktpotenzial",
+    text: "Der Matching-Report zeigt, wo ihr gleich tickt, wo ihr unterschiedlich entscheidet und wo daraus Spannungen entstehen können.",
+    label: "Gemeinsamkeiten, Unterschiede, Spannungen",
   },
   {
     step: "3",
@@ -82,55 +82,32 @@ function MatchingSnapshot() {
         </span>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
-        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/75 p-4">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Founder A</p>
-          <div className="mt-3 space-y-3">
-            {[
-              { label: "Entscheidung", width: "72%", tone: "bg-emerald-300/80" },
-              { label: "Konflikt", width: "54%", tone: "bg-amber-300/80" },
-              { label: "Ownership", width: "82%", tone: "bg-slate-300/90" },
-            ].map((item) => (
-              <div key={item.label}>
-                <p className="text-xs text-slate-500">{item.label}</p>
-                <div className="mt-2 h-2.5 rounded-full bg-slate-200/85 p-[2px]">
-                  <div className={`h-full rounded-full ${item.tone}`} style={{ width: item.width }} />
-                </div>
+      <div className="mt-5 space-y-4">
+        {[
+          { label: "Gemeinsamkeiten", left: "76%", right: "76%", tone: "bg-emerald-300/85" },
+          { label: "Unterschiede", left: "42%", right: "72%", tone: "bg-slate-300/90" },
+          { label: "Spannungen", left: "58%", right: "68%", tone: "bg-amber-300/85" },
+        ].map((row) => (
+          <div key={row.label} className="rounded-2xl border border-slate-200/75 bg-slate-50/80 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{row.label}</p>
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-slate-400">
+                <span>A</span>
+                <span>B</span>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <div className="flex items-center justify-center">
-          <div className="relative h-24 w-16">
-            <motion.div
-              animate={{ opacity: [0.35, 0.7, 0.35] }}
-              transition={{ duration: 3.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--brand-primary)]/12 blur-xl"
-            />
-            <div className="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-[color:var(--brand-primary)] shadow-[0_0_0_9px_rgba(38,118,255,0.12)]" />
-            <div className="absolute left-1/2 top-5 h-14 w-px -translate-x-1/2 bg-[color:var(--line)]" />
-            <div className="absolute bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-slate-400/80 shadow-[0_0_0_9px_rgba(148,163,184,0.14)]" />
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/75 p-4">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Founder B</p>
-          <div className="mt-3 space-y-3">
-            {[
-              { label: "Entscheidung", width: "56%", tone: "bg-emerald-300/80" },
-              { label: "Konflikt", width: "78%", tone: "bg-amber-300/80" },
-              { label: "Ownership", width: "64%", tone: "bg-slate-300/90" },
-            ].map((item) => (
-              <div key={item.label}>
-                <p className="text-xs text-slate-500">{item.label}</p>
-                <div className="mt-2 h-2.5 rounded-full bg-slate-200/85 p-[2px]">
-                  <div className={`h-full rounded-full ${item.tone}`} style={{ width: item.width }} />
-                </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-center">
+              <div className="h-2.5 rounded-full bg-slate-200/85 p-[2px]">
+                <div className={`h-full rounded-full ${row.tone}`} style={{ width: row.left }} />
               </div>
-            ))}
+              <div className="h-px bg-slate-300/80 md:w-10" />
+              <div className="h-2.5 rounded-full bg-slate-200/85 p-[2px]">
+                <div className={`h-full rounded-full ${row.tone}`} style={{ width: row.right }} />
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -195,19 +172,47 @@ function WorkbookVisual() {
   );
 }
 
-function FlowPanel({
+function StepVisual({ index }: { index: number }) {
+  if (index === 0) return <QuestionScale />;
+  if (index === 1) return <MatchingSnapshot />;
+  return <WorkbookVisual />;
+}
+
+function StepCard({
   panel,
   index,
+  isActive,
+  setRef,
 }: {
   panel: (typeof panels)[number];
   index: number;
+  isActive: boolean;
+  setRef?: (node: HTMLDivElement | null) => void;
 }) {
   return (
-    <article className="grid h-full gap-8 rounded-[36px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-6 shadow-[0_28px_80px_rgba(15,23,42,0.10)] md:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
+    <motion.article
+      ref={setRef}
+      data-step-index={index}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={`grid gap-8 rounded-[34px] border p-6 shadow-[0_28px_80px_rgba(15,23,42,0.08)] transition-all duration-300 md:p-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10 ${
+        isActive
+          ? "border-[color:var(--brand-primary)]/18 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.12)]"
+          : "border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))]"
+      }`}
+    >
       <div className="flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--line)] bg-white text-sm font-semibold text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.06)]">
+            <span
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-full border text-sm font-semibold shadow-[0_10px_20px_rgba(15,23,42,0.06)] transition-all duration-300 ${
+                isActive
+                  ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white"
+                  : "border-[color:var(--line)] bg-white text-slate-700"
+              }`}
+            >
               {panel.step}
             </span>
             <span className="rounded-full border border-slate-200/80 bg-slate-50/85 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-500">
@@ -215,7 +220,7 @@ function FlowPanel({
             </span>
           </div>
 
-          <h3 className="mt-6 max-w-md font-[var(--font-display)] text-3xl tracking-[-0.04em] text-slate-950 md:text-[2.15rem]">
+          <h3 className="mt-6 max-w-md font-[var(--font-display)] text-3xl tracking-[-0.04em] text-slate-950 md:text-[2.1rem]">
             {panel.title}
           </h3>
           <p className="mt-4 max-w-md text-base leading-8 text-[color:var(--muted)]">
@@ -223,7 +228,7 @@ function FlowPanel({
           </p>
         </div>
 
-        <div className="mt-8 hidden lg:flex lg:items-center lg:gap-3">
+        <div className="mt-8 flex items-center gap-3">
           <div className="h-px flex-1 bg-[color:var(--line)]" />
           <span className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
             Schritt {index + 1} von {panels.length}
@@ -241,137 +246,92 @@ function FlowPanel({
           className="absolute -right-4 bottom-4 h-24 w-24 rounded-full bg-[color:var(--brand-accent)]/8 blur-3xl"
         />
         <div className="relative">
-          {index === 0 ? <QuestionScale /> : null}
-          {index === 1 ? <MatchingSnapshot /> : null}
-          {index === 2 ? <WorkbookVisual /> : null}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function StepVisual({ index }: { index: number }) {
-  if (index === 0) return <QuestionScale />;
-  if (index === 1) return <MatchingSnapshot />;
-  return <WorkbookVisual />;
-}
-
-function DesktopSlide({
-  panel,
-  index,
-}: {
-  panel: (typeof panels)[number];
-  index: number;
-}) {
-  return (
-    <div className="grid min-h-[78vh] items-center gap-8 lg:grid-cols-[minmax(0,1.06fr)_minmax(320px,0.94fr)] lg:gap-10">
-      <div className="relative overflow-hidden rounded-[36px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.90))] p-6 shadow-[0_28px_80px_rgba(15,23,42,0.10)]">
-        <div
-          aria-hidden
-          className="absolute inset-x-12 top-8 h-24 rounded-full bg-[color:var(--brand-primary)]/10 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="absolute -right-4 bottom-4 h-24 w-24 rounded-full bg-[color:var(--brand-accent)]/8 blur-3xl"
-        />
-        <div className="relative">
           <StepVisual index={index} />
         </div>
       </div>
+    </motion.article>
+  );
+}
 
-      <div className="rounded-[32px] border border-[color:var(--line)] bg-white/92 p-7 shadow-[0_20px_55px_rgba(15,23,42,0.08)]">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-sm font-semibold text-white shadow-[0_10px_20px_rgba(38,118,255,0.16)]">
-            {panel.step}
-          </span>
-          <span className="rounded-full border border-slate-200/80 bg-slate-50/85 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-500">
-            {panel.label}
-          </span>
-        </div>
+function TimelineRail({
+  index,
+  isActive,
+  isComplete,
+  isLast,
+}: {
+  index: number;
+  isActive: boolean;
+  isComplete: boolean;
+  isLast: boolean;
+}) {
+  return (
+    <div className="relative hidden lg:flex lg:justify-center">
+      {!isLast ? (
+        <div className="absolute left-1/2 top-14 h-[calc(100%+2rem)] w-px -translate-x-1/2 bg-slate-200/85" />
+      ) : null}
+      {!isLast && (isComplete || isActive) ? (
+        <motion.div
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          style={{ transformOrigin: "top center" }}
+          className="absolute left-1/2 top-14 h-[calc(100%+2rem)] w-px -translate-x-1/2 bg-[color:var(--brand-primary)]/45"
+        />
+      ) : null}
 
-        <h3 className="mt-7 font-[var(--font-display)] text-4xl tracking-[-0.04em] text-slate-950">
-          {panel.title}
-        </h3>
-        <p className="mt-5 max-w-md text-lg leading-8 text-[color:var(--muted)]">
-          {panel.text}
-        </p>
+      <div
+        className={`relative z-10 mt-5 flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold transition-all duration-300 ${
+          isActive
+            ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white shadow-[0_14px_28px_rgba(38,118,255,0.18)]"
+            : isComplete
+              ? "border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 text-[color:var(--brand-primary)]"
+              : "border-slate-200/90 bg-white text-slate-500"
+        }`}
+      >
+        {index + 1}
       </div>
     </div>
   );
 }
 
 export function HowItWorksSection() {
-  const slideWrapperRef = useRef<HTMLDivElement | null>(null);
   const [activeStep, setActiveStep] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    let frame = 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
-    const updateFromScroll = () => {
-      if (!mediaQuery.matches || !slideWrapperRef.current) {
-        setActiveStep(0);
-        setScrollProgress(0);
-        return;
-      }
+        if (visible[0]) {
+          const index = Number(visible[0].target.getAttribute("data-step-index"));
+          if (Number.isFinite(index)) {
+            setActiveStep(index);
+          }
+        }
+      },
+      {
+        threshold: [0.25, 0.45, 0.65],
+        rootMargin: "-18% 0px -28% 0px",
+      },
+    );
 
-      const rect = slideWrapperRef.current.getBoundingClientRect();
-      const totalScrollable = Math.max(rect.height - window.innerHeight, 1);
-      const rawProgress = -rect.top / totalScrollable;
-      const nextProgress = Math.min(1, Math.max(0, rawProgress));
-
-      setScrollProgress(nextProgress);
-
-      if (nextProgress < 1 / 3) {
-        setActiveStep(0);
-      } else if (nextProgress < 2 / 3) {
-        setActiveStep(1);
-      } else {
-        setActiveStep(2);
-      }
-    };
-
-    const scheduleUpdate = () => {
-      cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(updateFromScroll);
-    };
-
-    const jumpToStep = () => scheduleUpdate();
-
-    updateFromScroll();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    mediaQuery.addEventListener("change", jumpToStep);
+    const nodes = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+    nodes.forEach((node) => observer.observe(node));
 
     return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      mediaQuery.removeEventListener("change", jumpToStep);
+      observer.disconnect();
     };
   }, []);
 
-  const jumpToStep = (stepIndex: number) => {
-    if (typeof window === "undefined" || !slideWrapperRef.current) {
-      return;
-    }
-
-    const sectionTop = slideWrapperRef.current.getBoundingClientRect().top + window.scrollY;
-    const totalScrollable = Math.max(
-      slideWrapperRef.current.offsetHeight - window.innerHeight,
-      1,
-    );
-    const target = sectionTop + totalScrollable * (stepIndex / panels.length);
-
-    window.scrollTo({
-      top: target,
-      behavior: "smooth",
-    });
+  const setCardRef = (index: number) => (node: HTMLDivElement | null) => {
+    cardRefs.current[index] = node;
   };
 
   return (
@@ -388,97 +348,30 @@ export function HowItWorksSection() {
         </p>
       </div>
 
-      <div className="mt-8">
-        <div className="mb-5 hidden flex-wrap items-center gap-3 lg:flex">
-          {panels.map((panel, index) => (
-            <button
-              key={panel.step}
-              type="button"
-              onClick={() => jumpToStep(index)}
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.04)] transition-all duration-300 ${
-                activeStep === index
-                  ? "border-[color:var(--brand-primary)]/15 bg-white/94"
-                  : "border-slate-200/80 bg-white/78"
-              }`}
-            >
-              <span
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-300 ${
-                  activeStep === index
-                    ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white"
-                    : "border-slate-200/80 bg-white text-slate-600"
-                }`}
-              >
-                {panel.step}
-              </span>
-              <span
-                className={`text-xs tracking-[0.08em] transition-colors duration-300 ${
-                  activeStep === index ? "text-slate-800" : "text-slate-500"
-                }`}
-              >
-                {panel.label}
-              </span>
-            </button>
-          ))}
-        </div>
-
+      <div className="mt-10">
         <div className="space-y-6 lg:hidden">
           {panels.map((panel, index) => (
-            <FlowPanel key={panel.step} panel={panel} index={index} />
+            <StepCard key={panel.step} panel={panel} index={index} isActive={index === 0} />
           ))}
         </div>
 
-        <div ref={slideWrapperRef} className="relative hidden h-[300vh] lg:block">
-          <div className="sticky top-0 h-screen overflow-hidden">
-            <div className="flex h-full items-center py-10">
-              <div className="w-full">
-                <div className="mb-6 flex items-center justify-between gap-6">
-                  <div className="flex items-center gap-3">
-                    {panels.map((panel, index) => (
-                      <div
-                        key={panel.step}
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.04)] transition-all duration-300 ${
-                          activeStep === index
-                            ? "border-[color:var(--brand-primary)]/15 bg-white/94"
-                            : "border-slate-200/80 bg-white/78"
-                        }`}
-                      >
-                        <span
-                          className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-300 ${
-                            activeStep === index
-                              ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white"
-                              : "border-slate-200/80 bg-white text-slate-600"
-                          }`}
-                        >
-                          {panel.step}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="w-40">
-                    <div className="h-1 rounded-full bg-slate-200/85">
-                      <div
-                        style={{ width: `${Math.max(8, scrollProgress * 100)}%` }}
-                        className="h-full rounded-full bg-[color:var(--brand-primary)] transition-[width] duration-300 ease-out"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={panels[activeStep]?.step}
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -18 }}
-                    transition={{ duration: 0.45, ease: "easeOut" }}
-                  >
-                    <DesktopSlide panel={panels[activeStep]} index={activeStep} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+        <div className="hidden lg:grid lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-8">
+          {panels.map((panel, index) => (
+            <div key={panel.step} className="contents">
+              <TimelineRail
+                index={index}
+                isActive={activeStep === index}
+                isComplete={activeStep > index}
+                isLast={index === panels.length - 1}
+              />
+              <StepCard
+                panel={panel}
+                index={index}
+                isActive={activeStep === index}
+                setRef={setCardRef(index)}
+              />
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
