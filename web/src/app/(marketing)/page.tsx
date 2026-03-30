@@ -45,7 +45,7 @@ const faqs = [
 
 export default function Page() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[color:var(--bg)] text-[color:var(--ink)]">
+    <div className="relative min-h-screen overflow-x-hidden bg-[color:var(--bg)] text-[color:var(--ink)]">
       {/* Background Decor */}
       <div
         aria-hidden

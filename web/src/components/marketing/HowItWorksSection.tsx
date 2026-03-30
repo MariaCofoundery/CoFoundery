@@ -408,15 +408,6 @@ export function HowItWorksSection() {
                 ))}
               </div>
             </div>
-
-            <div className="pointer-events-none absolute right-6 top-5 rounded-2xl border border-slate-200/80 bg-white/82 px-3 py-2 text-[10px] leading-5 tracking-[0.08em] text-slate-500 shadow-[0_10px_20px_rgba(15,23,42,0.05)]">
-              <div>viewport: {Math.round(debugState.viewportWidth)}px</div>
-              <div>track: {Math.round(debugState.trackWidth)}px</div>
-              <div>distance: {Math.round(debugState.horizontalDistance)}px</div>
-              <div>height: {Math.round(debugState.sectionHeight)}px</div>
-              <div>progress: {Math.round(debugState.scrollProgress * 100)}%</div>
-              <div>translateX: {Math.round(debugState.translateX)}px</div>
-            </div>
           </div>
         </div>
       </div>
