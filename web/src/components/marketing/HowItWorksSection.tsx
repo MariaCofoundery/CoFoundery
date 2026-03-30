@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const panels = [
@@ -256,11 +256,18 @@ export function HowItWorksSection() {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const reduceMotion = useReducedMotion();
-  const [scrollDistance, setScrollDistance] = useState(0);
-  const [stickyHeight, setStickyHeight] = useState(0);
-  const { scrollYProgress } = useScroll({
-    target: scrollSectionRef,
-    offset: ["start start", "end end"],
+  const metricsRef = useRef({
+    stickyTop: 0,
+    horizontalDistance: 0,
+  });
+  const [debugState, setDebugState] = useState({
+    viewportWidth: 0,
+    trackWidth: 0,
+    horizontalDistance: 0,
+    stickyHeight: 0,
+    sectionHeight: 0,
+    scrollProgress: 0,
+    translateX: 0,
   });
 
   useEffect(() => {
@@ -268,31 +275,61 @@ export function HowItWorksSection() {
       const viewportWidth = viewportRef.current?.clientWidth ?? 0;
       const trackWidth = trackRef.current?.scrollWidth ?? 0;
       const nextStickyHeight = stickyRef.current?.clientHeight ?? 0;
+      const stickyTop = stickyRef.current
+        ? Number.parseFloat(window.getComputedStyle(stickyRef.current).top || "0") || 0
+        : 0;
+      const horizontalDistance = Math.max(trackWidth - viewportWidth, 0);
 
-      setStickyHeight(nextStickyHeight);
-      setScrollDistance(Math.max(trackWidth - viewportWidth, 0));
+      metricsRef.current = {
+        stickyTop,
+        horizontalDistance,
+      };
+
+      setDebugState((current) => ({
+        ...current,
+        viewportWidth,
+        trackWidth,
+        horizontalDistance,
+        stickyHeight: nextStickyHeight,
+        sectionHeight: nextStickyHeight + horizontalDistance,
+      }));
+    };
+
+    const updateProgress = () => {
+      const sectionTop = scrollSectionRef.current?.getBoundingClientRect().top ?? 0;
+      const { stickyTop, horizontalDistance } = metricsRef.current;
+      const rawProgress =
+        horizontalDistance > 0 ? (stickyTop - sectionTop) / horizontalDistance : 0;
+      const scrollProgress = Math.min(1, Math.max(0, rawProgress));
+      const translateX = reduceMotion ? 0 : -horizontalDistance * scrollProgress;
+
+      setDebugState((current) => ({
+        ...current,
+        scrollProgress,
+        translateX,
+      }));
     };
 
     updateMeasurements();
+    updateProgress();
 
-    const observer = new ResizeObserver(() => updateMeasurements());
+    const observer = new ResizeObserver(() => {
+      updateMeasurements();
+      updateProgress();
+    });
+    if (scrollSectionRef.current) observer.observe(scrollSectionRef.current);
     if (stickyRef.current) observer.observe(stickyRef.current);
     if (viewportRef.current) observer.observe(viewportRef.current);
     if (trackRef.current) observer.observe(trackRef.current);
 
     window.addEventListener("resize", updateMeasurements);
+    window.addEventListener("scroll", updateProgress, { passive: true });
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", updateMeasurements);
+      window.removeEventListener("scroll", updateProgress);
     };
-  }, []);
-
-  const x = useTransform(scrollYProgress, (value) => {
-    if (reduceMotion) return 0;
-    return -scrollDistance * value;
-  });
-  const progressWidth = useTransform(scrollYProgress, [0, 1], ["6%", "100%"]);
-  const desktopHeight = stickyHeight > 0 ? stickyHeight + scrollDistance : 0;
+  }, [reduceMotion]);
 
   return (
     <section id="ablauf" className="mt-20 reveal">
@@ -319,7 +356,9 @@ export function HowItWorksSection() {
       <div
         ref={scrollSectionRef}
         className="relative mt-8 hidden lg:block"
-        style={{ height: desktopHeight > 0 ? `${desktopHeight}px` : undefined }}
+        style={{
+          height: debugState.sectionHeight > 0 ? `${debugState.sectionHeight}px` : undefined,
+        }}
       >
         <div
           ref={stickyRef}
@@ -339,8 +378,10 @@ export function HowItWorksSection() {
               </div>
               <div className="w-40">
                 <div className="h-1 rounded-full bg-slate-200/85">
-                  <motion.div
-                    style={{ width: reduceMotion ? "100%" : progressWidth }}
+                  <div
+                    style={{
+                      width: `${reduceMotion ? 100 : Math.max(6, debugState.scrollProgress * 100)}%`,
+                    }}
                     className="h-full rounded-full bg-[color:var(--brand-primary)]"
                   />
                 </div>
@@ -348,9 +389,11 @@ export function HowItWorksSection() {
             </div>
 
             <div ref={viewportRef} className="min-h-0 flex-1 overflow-hidden">
-              <motion.div
+              <div
                 ref={trackRef}
-                style={{ x }}
+                style={{
+                  transform: `translate3d(${debugState.translateX}px, 0, 0)`,
+                }}
                 className="flex h-full gap-6"
               >
                 {panels.map((panel, index) => (
@@ -361,7 +404,16 @@ export function HowItWorksSection() {
                     <FlowPanel panel={panel} index={index} />
                   </div>
                 ))}
-              </motion.div>
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute right-6 top-5 rounded-2xl border border-slate-200/80 bg-white/82 px-3 py-2 text-[10px] leading-5 tracking-[0.08em] text-slate-500 shadow-[0_10px_20px_rgba(15,23,42,0.05)]">
+              <div>viewport: {Math.round(debugState.viewportWidth)}px</div>
+              <div>track: {Math.round(debugState.trackWidth)}px</div>
+              <div>distance: {Math.round(debugState.horizontalDistance)}px</div>
+              <div>height: {Math.round(debugState.sectionHeight)}px</div>
+              <div>progress: {Math.round(debugState.scrollProgress * 100)}%</div>
+              <div>translateX: {Math.round(debugState.translateX)}px</div>
             </div>
           </div>
         </div>
