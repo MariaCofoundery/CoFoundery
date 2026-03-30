@@ -251,27 +251,33 @@ function FlowPanel({
 }
 
 export function HowItWorksSection() {
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const scrollSectionRef = useRef<HTMLDivElement | null>(null);
   const stickyRef = useRef<HTMLDivElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const reduceMotion = useReducedMotion();
   const [scrollDistance, setScrollDistance] = useState(0);
+  const [stickyHeight, setStickyHeight] = useState(0);
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: scrollSectionRef,
     offset: ["start start", "end end"],
   });
 
   useEffect(() => {
     const updateMeasurements = () => {
-      const stickyWidth = stickyRef.current?.clientWidth ?? 0;
+      const viewportWidth = viewportRef.current?.clientWidth ?? 0;
       const trackWidth = trackRef.current?.scrollWidth ?? 0;
-      setScrollDistance(Math.max(trackWidth - stickyWidth, 0));
+      const nextStickyHeight = stickyRef.current?.clientHeight ?? 0;
+
+      setStickyHeight(nextStickyHeight);
+      setScrollDistance(Math.max(trackWidth - viewportWidth, 0));
     };
 
     updateMeasurements();
 
     const observer = new ResizeObserver(() => updateMeasurements());
     if (stickyRef.current) observer.observe(stickyRef.current);
+    if (viewportRef.current) observer.observe(viewportRef.current);
     if (trackRef.current) observer.observe(trackRef.current);
 
     window.addEventListener("resize", updateMeasurements);
@@ -286,13 +292,10 @@ export function HowItWorksSection() {
     return -scrollDistance * value;
   });
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["6%", "100%"]);
-  const debugProgress = useTransform(scrollYProgress, (value) => `${Math.round(value * 100)}%`);
-  const desktopHeight = reduceMotion
-    ? "100vh"
-    : `calc(100vh + ${Math.max(scrollDistance, 1)}px)`;
+  const desktopHeight = stickyHeight > 0 ? stickyHeight + scrollDistance : 0;
 
   return (
-    <section id="ablauf" ref={sectionRef} className="mt-20 reveal">
+    <section id="ablauf" className="mt-20 reveal">
       <div className="max-w-3xl">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
           So funktioniert CoFoundery Align
@@ -313,13 +316,17 @@ export function HowItWorksSection() {
         </div>
       </div>
 
-      <div className="relative mt-10 hidden lg:block" style={{ height: desktopHeight }}>
+      <div
+        ref={scrollSectionRef}
+        className="relative mt-8 hidden lg:block"
+        style={{ height: desktopHeight > 0 ? `${desktopHeight}px` : undefined }}
+      >
         <div
           ref={stickyRef}
-          className="sticky top-0 h-screen overflow-hidden rounded-[42px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,250,252,0.56))] px-6 py-6 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur md:px-8 md:py-8"
+          className="sticky top-24 h-[min(760px,calc(100vh-8rem))] overflow-hidden rounded-[42px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,250,252,0.56))] px-6 py-5 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur md:px-8 md:py-6"
         >
-          <div className="flex h-full flex-col justify-center">
-            <div className="mb-6 flex items-center justify-between gap-6">
+          <div className="flex h-full flex-col">
+            <div className="mb-5 flex items-center justify-between gap-6">
               <div className="flex items-center gap-3">
                 {panels.map((panel) => (
                   <div key={panel.step} className="inline-flex items-center gap-2">
@@ -337,23 +344,25 @@ export function HowItWorksSection() {
                     className="h-full rounded-full bg-[color:var(--brand-primary)]"
                   />
                 </div>
-                <motion.p className="mt-2 text-right text-[10px] tracking-[0.12em] text-slate-400">
-                  {debugProgress}
-                </motion.p>
               </div>
             </div>
 
-            <motion.div
-              ref={trackRef}
-              style={{ x }}
-              className="grid w-max min-w-full grid-cols-3 gap-6"
-            >
-              {panels.map((panel, index) => (
-                <div key={panel.step} className="w-[min(1180px,calc(100vw-9rem))] shrink-0">
-                  <FlowPanel panel={panel} index={index} />
-                </div>
-              ))}
-            </motion.div>
+            <div ref={viewportRef} className="min-h-0 flex-1 overflow-hidden">
+              <motion.div
+                ref={trackRef}
+                style={{ x }}
+                className="flex h-full gap-6"
+              >
+                {panels.map((panel, index) => (
+                  <div
+                    key={panel.step}
+                    className="h-full w-[min(1180px,calc(100vw-9rem))] shrink-0"
+                  >
+                    <FlowPanel panel={panel} index={index} />
+                  </div>
+                ))}
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
