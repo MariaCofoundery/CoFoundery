@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const panels = [
   {
@@ -252,14 +252,44 @@ function FlowPanel({
 
 export function HowItWorksSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const stickyRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
   const reduceMotion = useReducedMotion();
+  const [scrollDistance, setScrollDistance] = useState(0);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-66.4%"]);
+  useEffect(() => {
+    const updateMeasurements = () => {
+      const stickyWidth = stickyRef.current?.clientWidth ?? 0;
+      const trackWidth = trackRef.current?.scrollWidth ?? 0;
+      setScrollDistance(Math.max(trackWidth - stickyWidth, 0));
+    };
+
+    updateMeasurements();
+
+    const observer = new ResizeObserver(() => updateMeasurements());
+    if (stickyRef.current) observer.observe(stickyRef.current);
+    if (trackRef.current) observer.observe(trackRef.current);
+
+    window.addEventListener("resize", updateMeasurements);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateMeasurements);
+    };
+  }, []);
+
+  const x = useTransform(scrollYProgress, (value) => {
+    if (reduceMotion) return 0;
+    return -scrollDistance * value;
+  });
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["6%", "100%"]);
+  const debugProgress = useTransform(scrollYProgress, (value) => `${Math.round(value * 100)}%`);
+  const desktopHeight = reduceMotion
+    ? "100vh"
+    : `calc(100vh + ${Math.max(scrollDistance, 1)}px)`;
 
   return (
     <section id="ablauf" ref={sectionRef} className="mt-20 reveal">
@@ -283,37 +313,48 @@ export function HowItWorksSection() {
         </div>
       </div>
 
-      <div className="relative mt-10 hidden lg:block lg:h-[330vh]">
-        <div className="sticky top-20 overflow-hidden rounded-[42px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,250,252,0.56))] px-6 py-6 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur md:px-8 md:py-8">
-          <div className="mb-6 flex items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              {panels.map((panel) => (
-                <div key={panel.step} className="inline-flex items-center gap-2">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/80 bg-white text-xs font-medium text-slate-600">
-                    {panel.step}
-                  </span>
-                  <span className="text-xs tracking-[0.08em] text-slate-500">{panel.label}</span>
+      <div className="relative mt-10 hidden lg:block" style={{ height: desktopHeight }}>
+        <div
+          ref={stickyRef}
+          className="sticky top-0 h-screen overflow-hidden rounded-[42px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,250,252,0.56))] px-6 py-6 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur md:px-8 md:py-8"
+        >
+          <div className="flex h-full flex-col justify-center">
+            <div className="mb-6 flex items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                {panels.map((panel) => (
+                  <div key={panel.step} className="inline-flex items-center gap-2">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/80 bg-white text-xs font-medium text-slate-600">
+                      {panel.step}
+                    </span>
+                    <span className="text-xs tracking-[0.08em] text-slate-500">{panel.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="w-40">
+                <div className="h-1 rounded-full bg-slate-200/85">
+                  <motion.div
+                    style={{ width: reduceMotion ? "100%" : progressWidth }}
+                    className="h-full rounded-full bg-[color:var(--brand-primary)]"
+                  />
                 </div>
-              ))}
-            </div>
-            <div className="w-40">
-              <div className="h-1 rounded-full bg-slate-200/85">
-                <motion.div
-                  style={{ width: reduceMotion ? "100%" : progressWidth }}
-                  className="h-full rounded-full bg-[color:var(--brand-primary)]"
-                />
+                <motion.p className="mt-2 text-right text-[10px] tracking-[0.12em] text-slate-400">
+                  {debugProgress}
+                </motion.p>
               </div>
             </div>
-          </div>
 
-          <motion.div
-            style={{ x: reduceMotion ? "0%" : x }}
-            className="grid w-[300%] grid-cols-3 gap-6"
-          >
-            {panels.map((panel, index) => (
-              <FlowPanel key={panel.step} panel={panel} index={index} />
-            ))}
-          </motion.div>
+            <motion.div
+              ref={trackRef}
+              style={{ x }}
+              className="grid w-max min-w-full grid-cols-3 gap-6"
+            >
+              {panels.map((panel, index) => (
+                <div key={panel.step} className="w-[min(1180px,calc(100vw-9rem))] shrink-0">
+                  <FlowPanel panel={panel} index={index} />
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>
