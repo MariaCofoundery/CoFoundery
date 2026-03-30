@@ -9,15 +9,15 @@ export const nav = [
 export const features = [
   {
     title: "Strukturierter Vergleich",
-    text: "Ihr vergleicht Entscheidungslogik, Verantwortung, Tempo und Zusammenarbeit entlang klarer Founder-Dimensionen.",
+    text: "Ihr beantwortet gezielte Fragen zu Zusammenarbeit, Entscheidungen und Verantwortung.",
   },
   {
-    title: "Report, Leitfaden, Workbook",
-    text: "Aus den Antworten entsteht nicht nur ein Report, sondern direkt ein Gesprächsleitfaden und ein gemeinsames Workbook.",
+    title: "Matching-Report",
+    text: "Ihr seht, wo ihr gleich tickt – und wo Unterschiede relevant werden.",
   },
   {
-    title: "Optional mit Advisor-Kontext",
-    text: "Advisors, Accelerators oder Investoren können strukturiert begleiten, ohne die Founder-Perspektive zu überlagern.",
+    title: "Gemeinsames Workbook",
+    text: "Ihr übersetzt Erkenntnisse in konkrete Vereinbarungen für euren Alltag.",
   },
 ];
 
@@ -35,6 +35,6 @@ export const steps = [
   {
     step: "03",
     title: "Gemeinsam weiterarbeiten",
-    text: "Danach stehen Report, Gesprächsleitfaden und Workbook bereit, um Entscheidungen sauber weiterzuführen.",
+    text: "Danach stehen Matching-Report und gemeinsames Workbook bereit, um Entscheidungen sauber weiterzuführen.",
   },
 ];

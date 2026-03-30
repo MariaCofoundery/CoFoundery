@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 const navItems = [
   { label: "Produkt", href: "/#produkt" },
-  { label: "Für wen", href: "/#fuer-wen" },
-  { label: "Ablauf", href: "/#ablauf" },
+  { label: "So funktioniert’s", href: "/#ablauf" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 function NavLink({
@@ -52,7 +52,7 @@ export function LandingTopNav() {
   }, []);
 
   return (
-    <header className="sticky top-4 z-30 mx-auto w-full max-w-6xl px-5 md:px-8">
+    <header className="sticky top-0 z-30 mx-auto w-full max-w-6xl px-5 pt-4 md:px-8">
       <div
         className={`rounded-[24px] border px-4 py-3 transition-all duration-300 md:px-6 ${
           hasScrolled
@@ -90,7 +90,7 @@ export function LandingTopNav() {
               href="/dashboard"
               className="inline-flex items-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_25px_rgba(38,118,255,0.16)] transition duration-200 hover:-translate-y-[1px] hover:shadow-[0_14px_30px_rgba(38,118,255,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
             >
-              Founder-Kompatibilität prüfen
+              Jetzt starten
             </Link>
           </div>
 
@@ -99,7 +99,7 @@ export function LandingTopNav() {
               href="/dashboard"
               className="inline-flex items-center rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-slate-950 shadow-[0_8px_22px_rgba(38,118,255,0.14)] transition hover:-translate-y-[1px]"
             >
-              Prüfen
+              Starten
             </Link>
             <button
               type="button"
@@ -159,7 +159,7 @@ export function LandingTopNav() {
                 onClick={() => setIsMenuOpen(false)}
                 className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_24px_rgba(38,118,255,0.16)] transition hover:-translate-y-[1px]"
               >
-                Founder-Kompatibilität prüfen
+                Jetzt starten
               </Link>
             </div>
           </div>

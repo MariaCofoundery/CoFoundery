@@ -20,10 +20,43 @@ const audiences = [
   },
 ];
 
+const dimensions = [
+  {
+    title: "Entscheidungslogik",
+    text: "Wie ihr wichtige Entscheidungen trefft – und worauf ihr euch stützt",
+    icon: <SectionGlyph type="decision" />,
+  },
+  {
+    title: "Commitment & Verantwortung",
+    text: "Wie verbindlich ihr arbeitet und wer wirklich Ownership übernimmt",
+    icon: <SectionGlyph type="commitment" />,
+  },
+  {
+    title: "Risikoorientierung & Tempo",
+    text: "Wie unterschiedlich ihr mit Unsicherheit und Wachstum umgeht",
+    icon: <SectionGlyph type="risk" />,
+  },
+  {
+    title: "Konfliktstil",
+    text: "Wann ihr Spannungen ansprecht – und wie direkt ihr damit umgeht",
+    icon: <SectionGlyph type="collaboration" />,
+  },
+  {
+    title: "Zusammenarbeit & Arbeitsweise",
+    text: "Wie gut eure täglichen Arbeitsweisen wirklich zusammenpassen",
+    icon: <SectionGlyph type="collaboration" />,
+  },
+  {
+    title: "Vision & Werte",
+    text: "Wofür ihr steht – und wie ähnlich eure langfristige Ausrichtung ist",
+    icon: <SectionGlyph type="reflection" />,
+  },
+];
+
 const faqs = [
   {
     q: "Ist CoFoundery Align ein Persönlichkeitstest?",
-    a: "Nein. CoFoundery Align ist ein strukturierter Entscheidungs- und Gesprächsraum für Gründungsteams: mit Vergleich, Report, Leitfaden und Workbook.",
+    a: "Nein. CoFoundery Align ist ein strukturierter Entscheidungs- und Arbeitsraum für Gründungsteams: mit Vergleich, Matching-Report und gemeinsamem Workbook.",
   },
   {
     q: "Wann wird der Report freigeschaltet?",
@@ -31,7 +64,7 @@ const faqs = [
   },
   {
     q: "Ist das nur für neue Founder-Teams gedacht?",
-    a: "Nein. Der Flow unterscheidet bewusst zwischen Pre-Founder Matching und bestehenden Founder-Teams, damit Sprache, Leitfaden und Workbook zum Kontext passen.",
+    a: "Nein. Der Flow unterscheidet bewusst zwischen Pre-Founder Matching und bestehenden Founder-Teams, damit Sprache, Matching-Report und Workbook zum Kontext passen.",
   },
   {
     q: "Brauchen wir dafür einen Advisor?",
@@ -60,7 +93,7 @@ export default function Page() {
 
       <LandingTopNav />
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-10 md:px-8 md:pt-16">
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-8 md:px-8 md:pt-12">
         <LandingHero />
 
         <section id="fuer-wen" className="mt-16 reveal">
@@ -104,8 +137,8 @@ export default function Page() {
                 </p>
                 <p className="mt-4 max-w-2xl text-base leading-8 text-[color:var(--muted)]">
                   Genau dort setzt CoFoundery Align an. Die Plattform macht diese Unterschiede
-                  früh sichtbar und übersetzt sie in einen Report, einen Gesprächsleitfaden
-                  und ein Workbook, damit aus vagem Bauchgefühl echte Klärung wird.
+                  früh sichtbar und übersetzt sie in einen Matching-Report und ein gemeinsames
+                  Workbook, damit aus vagem Bauchgefühl echte Klärung wird.
                 </p>
               </div>
 
@@ -150,8 +183,8 @@ export default function Page() {
             </h2>
             <p className="mt-3 max-w-3xl text-base leading-8 text-[color:var(--muted)]">
               CoFoundery Align bleibt nicht bei einem Test stehen. Der Vergleich wird in einen
-              Report, konkrete Gespräche und ein gemeinsames Workbook übersetzt, damit aus
-              Erkenntnis auch Entscheidung wird.
+              Matching-Report und in ein gemeinsames Workbook übersetzt, damit aus Erkenntnis
+              konkrete Zusammenarbeit wird.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -165,9 +198,7 @@ export default function Page() {
           <div className="overflow-hidden rounded-[32px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,249,252,0.96))] shadow-[var(--shadow)]">
             <div className="grid gap-10 px-6 py-8 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-10">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-                  Was CoFoundery Align anders macht
-                </p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">Ansatz</p>
                 <h2 className="mt-3 max-w-2xl font-[var(--font-display)] text-3xl tracking-tight md:text-4xl">
                   Was CoFoundery Align anders macht
                 </h2>
@@ -196,16 +227,16 @@ export default function Page() {
               <div className="flex flex-col justify-center gap-4">
                 {[
                   {
-                    title: "Founder Report",
+                    title: "Matching-Report",
                     text: "Macht Unterschiede, tragende Gemeinsamkeiten und relevante Spannungsfelder klar lesbar.",
                   },
                   {
-                    title: "Conversation Guide",
-                    text: "Übersetzt die Ergebnisse in konkrete Fragen für ein gutes, strukturiertes Founder-Gespräch.",
+                    title: "Gemeinsames Workbook",
+                    text: "Hilft dabei, aus Erkenntnissen klare Vereinbarungen und nächste Schritte für den Alltag zu machen.",
                   },
                   {
-                    title: "Alignment Workbook",
-                    text: "Hilft dabei, aus Erkenntnissen klare Vereinbarungen und nächste Schritte für den Alltag zu machen.",
+                    title: "Begleitender Advisor-Kontext",
+                    text: "Advisors, Accelerators oder Investoren können strukturiert begleiten, ohne die Founder-Perspektive zu überlagern.",
                   },
                 ].map((item, index) => (
                   <div key={item.title} className="flex gap-4">
@@ -233,54 +264,31 @@ export default function Page() {
         <section className="mt-16 reveal">
           <div className="grid gap-8 rounded-[32px] border border-[color:var(--line)] bg-white/84 px-6 py-8 shadow-[var(--shadow)] md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-10">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-                Founder Reality Check
-              </p>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">Dimensionen</p>
               <h2 className="mt-3 font-[var(--font-display)] text-3xl tracking-tight md:text-4xl">
-                Founder Reality Check
+                Ihr seht nicht nur ein Gefühl – sondern ein klares System eurer Zusammenarbeit.
               </h2>
               <div className="mt-5 space-y-4 text-base leading-8 text-[color:var(--muted)]">
                 <p>
-                  Viele Gründerteams starten mit einer starken Idee, aber ohne klare
-                  Antworten auf die Fragen, die später wirklich Druck erzeugen.
+                  CoFoundery Align macht sichtbar, wie ihr in den entscheidenden Bereichen
+                  wirklich funktioniert – von Entscheidungen über Verantwortung bis hin zu
+                  Konflikt und Risiko.
                 </p>
                 <p>
-                  Wer trifft Entscheidungen, wenn ihr uneinig seid? Wie viel Risiko wollt
-                  ihr wirklich eingehen? Wie verbindlich ist Commitment, wenn das Startup
-                  wächst? Was passiert, wenn Tempo und Arbeitsstil auseinandergehen?
-                </p>
-                <p>
-                  Viele Teams klären diese Fragen erst unter Druck. CoFoundery Align hilft,
-                  sie früh strukturiert zu besprechen.
+                  Statt einzelner Eindrücke entsteht ein vollständiges Bild eurer
+                  Zusammenarbeit.
                 </p>
               </div>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-[color:var(--muted)]">
+                CoFoundery Align bildet die zentralen Dimensionen eurer Zusammenarbeit
+                strukturiert ab – und wird kontinuierlich weiterentwickelt.
+              </p>
             </div>
 
             <div className="grid gap-3 self-center sm:grid-cols-2">
-              {[
-                {
-                  label: "Decision",
-                  text: "Wie ihr Entscheidungen trefft und mit Uneinigkeit umgeht.",
-                  icon: <SectionGlyph type="decision" />,
-                },
-                {
-                  label: "Risk",
-                  text: "Welche Unsicherheit ihr tragen wollt und wo eure Grenzen liegen.",
-                  icon: <SectionGlyph type="risk" />,
-                },
-                {
-                  label: "Commitment",
-                  text: "Wie verbindlich Fokus, Einsatz und Erwartungen wirklich sind.",
-                  icon: <SectionGlyph type="commitment" />,
-                },
-                {
-                  label: "Collaboration",
-                  text: "Wie Rollen, Tempo und Zusammenarbeit im Alltag zusammenpassen.",
-                  icon: <SectionGlyph type="collaboration" />,
-                },
-              ].map((item) => (
+              {dimensions.map((item) => (
                 <div
-                  key={item.label}
+                  key={item.title}
                   className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-soft)]/80 px-4 py-4"
                 >
                   <div className="flex items-center gap-3">
@@ -288,7 +296,7 @@ export default function Page() {
                       {item.icon}
                     </div>
                     <p className="font-[var(--font-display)] text-base tracking-[0.01em] text-[color:var(--ink)]">
-                      {item.label}
+                      {item.title}
                     </p>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-[color:var(--muted)]">{item.text}</p>
@@ -302,7 +310,7 @@ export default function Page() {
           <div className="rounded-[32px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(250,252,255,0.95),rgba(255,255,255,0.92))] px-6 py-8 shadow-[var(--shadow)] md:px-8 md:py-10">
             <div className="max-w-2xl">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-                Trust Section
+                Warum das funktioniert
               </p>
               <h2 className="mt-3 font-[var(--font-display)] text-3xl tracking-tight md:text-4xl">
                 Worauf der Ansatz basiert

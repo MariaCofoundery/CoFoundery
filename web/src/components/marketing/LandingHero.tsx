@@ -213,15 +213,6 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
 export function LandingHero() {
   const reduceMotion = useReducedMotion() ?? false;
 
-  const floatTransition = reduceMotion
-    ? { duration: 0 }
-    : {
-        duration: 4.6,
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: "mirror" as const,
-        ease: "easeInOut" as const,
-      };
-
   return (
     <section className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(360px,0.98fr)] lg:gap-14">
       <motion.div
@@ -230,17 +221,14 @@ export function LandingHero() {
         transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
         className="reveal"
       >
-        <p className="inline-flex rounded-full border border-[color:var(--line)] bg-white/82 px-4 py-2 font-[var(--font-display)] text-[11px] tracking-[0.14em] text-[color:var(--ink-soft)] shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
-          Die meisten Founder merken zu spät, wo sie nicht zusammenpassen.
-        </p>
-
-        <h1 className="mt-7 max-w-4xl font-[var(--font-display)] text-4xl leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.35rem]">
-          Erfolgreiche Startups entstehen aus stabilen Founder-Teams.
+        <h1 className="max-w-4xl font-[var(--font-display)] text-4xl leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.35rem]">
+          Die meisten Founder merken zu spät, dass sie nicht zusammenpassen.
         </h1>
 
         <p className="mt-6 max-w-2xl text-lg leading-8 text-[color:var(--muted)] lg:text-[1.15rem]">
-          Ihr seht, wo ihr gleich tickt, wo ihr unterschiedlich entscheidet und wo daraus echte
-          Spannungen entstehen können – bevor sie eure Zusammenarbeit belasten.
+          CoFoundery Align zeigt euch, wie ihr wirklich zusammenarbeitet: wo ihr gleich tickt,
+          wo Unterschiede Konfliktpotenzial erzeugen – und wie ihr daraus eine stabile
+          Zusammenarbeit entwickelt.
         </p>
 
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -285,12 +273,7 @@ export function LandingHero() {
             transition={{ duration: 0.72, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative"
           >
-            <motion.div
-              animate={reduceMotion ? undefined : { y: [-2, 6, -2] }}
-              transition={floatTransition}
-            >
-              <HeroProductVisual reduceMotion={reduceMotion} />
-            </motion.div>
+            <HeroProductVisual reduceMotion={reduceMotion} />
           </motion.div>
         </div>
       </div>

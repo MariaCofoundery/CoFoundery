@@ -1,9 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-
-const DESKTOP_TRACK_GAP = 18;
 
 const panels = [
   {
@@ -253,120 +251,66 @@ function FlowPanel({
 }
 
 export function HowItWorksSection() {
-  const scrollSectionRef = useRef<HTMLDivElement | null>(null);
-  const stickyRef = useRef<HTMLDivElement | null>(null);
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const reduceMotion = useReducedMotion();
-  const metricsRef = useRef({
-    stickyTop: 0,
-    horizontalDistance: 0,
-    stickyHeight: 0,
-  });
-  const [debugState, setDebugState] = useState({
-    viewportWidth: 0,
-    trackWidth: 0,
-    horizontalDistance: 0,
-    stickyHeight: 0,
-    sectionHeight: 0,
-    scrollProgress: 0,
-    translateX: 0,
-  });
+  const [activeStep, setActiveStep] = useState(0);
+  const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
-  const panelStride = debugState.viewportWidth + DESKTOP_TRACK_GAP;
-  const activePanelIndex =
-    panelStride > 0
-      ? Math.min(
-          panels.length - 1,
-          Math.max(0, Math.round(Math.abs(debugState.translateX) / panelStride)),
-        )
-      : 0;
-
-  const jumpToPanel = (panelIndex: number) => {
-    if (
-      typeof window === "undefined" ||
-      !scrollSectionRef.current ||
-      debugState.viewportWidth <= 0 ||
-      metricsRef.current.horizontalDistance <= 0
-    ) {
+  useEffect(() => {
+    if (typeof window === "undefined") {
       return;
     }
 
-    const sectionAbsoluteTop =
-      scrollSectionRef.current.getBoundingClientRect().top + window.scrollY;
-    const startScrollY = sectionAbsoluteTop - metricsRef.current.stickyTop;
-    const desiredTranslate = Math.min(
-      panelIndex * (debugState.viewportWidth + DESKTOP_TRACK_GAP),
-      metricsRef.current.horizontalDistance,
-    );
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    let observer: IntersectionObserver | null = null;
 
-    window.scrollTo({
-      top: startScrollY + desiredTranslate,
-      behavior: "smooth",
-    });
-  };
+    const setupObserver = () => {
+      observer?.disconnect();
+      observer = null;
 
-  useEffect(() => {
-    const updateMeasurements = () => {
-      const viewportWidth = viewportRef.current?.clientWidth ?? 0;
-      const trackWidth = trackRef.current?.scrollWidth ?? 0;
-      const nextStickyHeight = stickyRef.current?.clientHeight ?? 0;
-      const stickyTop = stickyRef.current
-        ? Number.parseFloat(window.getComputedStyle(stickyRef.current).top || "0") || 0
-        : 0;
-      const horizontalDistance = Math.max(trackWidth - viewportWidth, 0);
+      if (!mediaQuery.matches) {
+        setActiveStep(0);
+        return;
+      }
 
-      metricsRef.current = {
-        stickyTop,
-        horizontalDistance,
-        stickyHeight: nextStickyHeight,
-      };
+      observer = new IntersectionObserver(
+        (entries) => {
+          const visibleEntries = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
 
-      setDebugState((current) => ({
-        ...current,
-        viewportWidth,
-        trackWidth,
-        horizontalDistance,
-        stickyHeight: nextStickyHeight,
-        sectionHeight: nextStickyHeight + stickyTop + horizontalDistance,
-      }));
+          if (visibleEntries.length === 0) {
+            return;
+          }
+
+          const nextIndex = Number(
+            visibleEntries[0].target.getAttribute("data-step-index") ?? "0",
+          );
+
+          setActiveStep(nextIndex);
+        },
+        {
+          root: null,
+          rootMargin: "-18% 0px -42% 0px",
+          threshold: [0.2, 0.35, 0.5, 0.7],
+        },
+      );
+
+      for (const stepRef of stepRefs.current) {
+        if (stepRef) {
+          observer.observe(stepRef);
+        }
+      }
     };
 
-    const updateProgress = () => {
-      const sectionTop = scrollSectionRef.current?.getBoundingClientRect().top ?? 0;
-      const { stickyTop, horizontalDistance } = metricsRef.current;
-      const rawProgress =
-        horizontalDistance > 0 ? (stickyTop - sectionTop) / horizontalDistance : 0;
-      const scrollProgress = Math.min(1, Math.max(0, rawProgress));
-      const translateX = reduceMotion ? 0 : -horizontalDistance * scrollProgress;
+    setupObserver();
 
-      setDebugState((current) => ({
-        ...current,
-        scrollProgress,
-        translateX,
-      }));
-    };
+    const handleMediaChange = () => setupObserver();
+    mediaQuery.addEventListener("change", handleMediaChange);
 
-    updateMeasurements();
-    updateProgress();
-
-    const observer = new ResizeObserver(() => {
-      updateMeasurements();
-      updateProgress();
-    });
-    if (scrollSectionRef.current) observer.observe(scrollSectionRef.current);
-    if (stickyRef.current) observer.observe(stickyRef.current);
-    if (viewportRef.current) observer.observe(viewportRef.current);
-    if (trackRef.current) observer.observe(trackRef.current);
-
-    window.addEventListener("resize", updateMeasurements);
-    window.addEventListener("scroll", updateProgress, { passive: true });
     return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", updateMeasurements);
-      window.removeEventListener("scroll", updateProgress);
+      mediaQuery.removeEventListener("change", handleMediaChange);
+      observer?.disconnect();
     };
-  }, [reduceMotion]);
+  }, []);
 
   return (
     <section id="ablauf" className="mt-20">
@@ -382,94 +326,129 @@ export function HowItWorksSection() {
         </p>
       </div>
 
-      <div className="mt-10 lg:hidden">
-        <div className="space-y-5">
+      <div className="mt-8">
+        <div className="mb-5 hidden flex-wrap items-center gap-3 lg:flex">
+          {panels.map((panel, index) => (
+            <div
+              key={panel.step}
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.04)] transition-all duration-300 ${
+                activeStep === index
+                  ? "border-[color:var(--brand-primary)]/15 bg-white/94"
+                  : "border-slate-200/80 bg-white/78"
+              }`}
+            >
+              <span
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-300 ${
+                  activeStep === index
+                    ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white"
+                    : "border-slate-200/80 bg-white text-slate-600"
+                }`}
+              >
+                {panel.step}
+              </span>
+              <span
+                className={`text-xs tracking-[0.08em] transition-colors duration-300 ${
+                  activeStep === index ? "text-slate-800" : "text-slate-500"
+                }`}
+              >
+                {panel.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-6 lg:hidden">
           {panels.map((panel, index) => (
             <FlowPanel key={panel.step} panel={panel} index={index} />
           ))}
         </div>
-      </div>
 
-      <div
-        ref={scrollSectionRef}
-        className="relative mt-8 hidden lg:block"
-        style={{
-          height: debugState.sectionHeight > 0 ? `${debugState.sectionHeight}px` : undefined,
-        }}
-      >
-        <div
-          ref={stickyRef}
-          className="sticky top-24 h-[min(760px,calc(100vh-8rem))] overflow-hidden rounded-[42px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,250,252,0.56))] px-6 py-5 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur md:px-8 md:py-6"
-        >
-          <div className="flex h-full flex-col">
-            <div className="mb-5 flex items-center justify-between gap-6">
-              <div className="flex items-center gap-3">
-                {panels.map((panel, index) => (
-                  <button
-                    key={panel.step}
-                    type="button"
-                    onClick={() => jumpToPanel(index)}
-                    className={`inline-flex items-center gap-2 rounded-full px-1.5 py-1.5 text-left transition-all duration-200 ${
-                      activePanelIndex === index
-                        ? "bg-white/85 shadow-[0_10px_22px_rgba(15,23,42,0.06)]"
-                        : "hover:bg-white/55"
-                    }`}
-                    aria-pressed={activePanelIndex === index}
-                  >
+        <div className="hidden lg:grid lg:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] lg:gap-8">
+            <div className="relative">
+              <div className="sticky top-24">
+              <div className="relative overflow-hidden rounded-[36px] border border-[color:var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.90))] p-6 shadow-[0_28px_80px_rgba(15,23,42,0.10)]">
+                <div
+                  aria-hidden
+                  className="absolute inset-x-12 top-8 h-24 rounded-full bg-[color:var(--brand-primary)]/10 blur-3xl"
+                />
+                <div
+                  aria-hidden
+                  className="absolute -right-4 bottom-4 h-24 w-24 rounded-full bg-[color:var(--brand-accent)]/8 blur-3xl"
+                />
+                <div className="relative">
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
+                        Schritt {activeStep + 1}
+                      </p>
+                      <p className="mt-2 font-[var(--font-display)] text-2xl tracking-[-0.03em] text-slate-950">
+                        {panels[activeStep]?.title}
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-slate-200/80 bg-white/82 px-3 py-1 text-[10px] tracking-[0.12em] text-slate-500">
+                      {activeStep + 1} / {panels.length}
+                    </span>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={panels[activeStep]?.step}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -14 }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                    >
+                      {activeStep === 0 ? <QuestionScale /> : null}
+                      {activeStep === 1 ? <MatchingSnapshot /> : null}
+                      {activeStep === 2 ? <WorkbookVisual /> : null}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {panels.map((panel, index) => (
+              <section
+                key={panel.step}
+                ref={(node) => {
+                  stepRefs.current[index] = node;
+                }}
+                data-step-index={index}
+                className="flex min-h-[58vh] items-center"
+              >
+                <article
+                  className={`w-full rounded-[32px] border p-6 transition-all duration-300 ${
+                    activeStep === index
+                      ? "border-[color:var(--brand-primary)]/15 bg-white shadow-[0_22px_55px_rgba(15,23,42,0.08)]"
+                      : "border-[color:var(--line)] bg-white/72 shadow-[0_12px_28px_rgba(15,23,42,0.04)] opacity-70"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
                     <span
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-200 ${
-                        activePanelIndex === index
-                          ? "border-[color:var(--brand-primary)]/20 bg-[color:var(--brand-primary)] text-white"
-                          : "border-slate-200/80 bg-white text-slate-600"
+                      className={`inline-flex h-11 w-11 items-center justify-center rounded-full border text-sm font-semibold transition-colors duration-300 ${
+                        activeStep === index
+                          ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-white"
+                          : "border-[color:var(--line)] bg-white text-slate-700"
                       }`}
                     >
                       {panel.step}
                     </span>
-                    <span
-                      className={`text-xs tracking-[0.08em] transition-colors duration-200 ${
-                        activePanelIndex === index ? "text-slate-800" : "text-slate-500"
-                      }`}
-                    >
+                    <span className="rounded-full border border-slate-200/80 bg-slate-50/85 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-500">
                       {panel.label}
                     </span>
-                  </button>
-                ))}
-              </div>
-              <div className="w-40">
-                <div className="h-1 rounded-full bg-slate-200/85">
-                  <div
-                    style={{
-                      width: `${reduceMotion ? 100 : Math.max(6, debugState.scrollProgress * 100)}%`,
-                    }}
-                    className="h-full rounded-full bg-[color:var(--brand-primary)]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div ref={viewportRef} className="min-h-0 flex-1 overflow-hidden">
-              <div
-                ref={trackRef}
-                style={{
-                  transform: `translate3d(${debugState.translateX}px, 0, 0)`,
-                  gap: `${DESKTOP_TRACK_GAP}px`,
-                  willChange: "transform",
-                }}
-                className="flex h-full"
-              >
-                {panels.map((panel, index) => (
-                  <div
-                    key={panel.step}
-                    style={{
-                      width: debugState.viewportWidth > 0 ? `${debugState.viewportWidth}px` : undefined,
-                    }}
-                    className="h-full shrink-0"
-                  >
-                    <FlowPanel panel={panel} index={index} />
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  <h3 className="mt-6 max-w-md font-[var(--font-display)] text-3xl tracking-[-0.04em] text-slate-950">
+                    {panel.title}
+                  </h3>
+                  <p className="mt-4 max-w-md text-base leading-8 text-[color:var(--muted)]">
+                    {panel.text}
+                  </p>
+                </article>
+              </section>
+            ))}
           </div>
         </div>
       </div>
