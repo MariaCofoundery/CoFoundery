@@ -259,6 +259,7 @@ export function HowItWorksSection() {
   const metricsRef = useRef({
     stickyTop: 0,
     horizontalDistance: 0,
+    stickyHeight: 0,
   });
   const [debugState, setDebugState] = useState({
     viewportWidth: 0,
@@ -283,6 +284,7 @@ export function HowItWorksSection() {
       metricsRef.current = {
         stickyTop,
         horizontalDistance,
+        stickyHeight: nextStickyHeight,
       };
 
       setDebugState((current) => ({
@@ -291,7 +293,7 @@ export function HowItWorksSection() {
         trackWidth,
         horizontalDistance,
         stickyHeight: nextStickyHeight,
-        sectionHeight: nextStickyHeight + horizontalDistance,
+        sectionHeight: nextStickyHeight + stickyTop + horizontalDistance,
       }));
     };
 
