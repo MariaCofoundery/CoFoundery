@@ -39,10 +39,8 @@ export default function DatenschutzPage() {
               Datenschutzerklärung
             </h1>
             <p className="mt-4 text-sm leading-7 text-slate-700">
-              Diese Datenschutzerklärung beschreibt, welche personenbezogenen Daten bei der Nutzung
-              von CoFoundery Align verarbeitet werden, wie diese Daten im Produktkontext verwendet
-              werden und welche Rechte Nutzer:innen dabei haben. Sie basiert auf dem aktuellen
-              technischen Stand des Produkts und wird bei Weiterentwicklungen angepasst.
+              Diese Datenschutzerklärung informiert dich darüber, welche personenbezogenen Daten wir
+              verarbeiten, wofür wir sie nutzen und welche Rechte dir dabei zustehen.
             </p>
           </div>
 
@@ -64,245 +62,283 @@ export default function DatenschutzPage() {
 
         <div className="grid gap-6">
           <BulletSection number="1" title="Verantwortlicher">
-            <p>
-              Verantwortlich für die Datenverarbeitung im Zusammenhang mit CoFoundery Align ist:
-            </p>
+            <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
-              <p>[Name / Firma]</p>
-              <p>[Anschrift]</p>
-              <p>[PLZ Ort, Land]</p>
-              <p>[E-Mail für Datenschutzanfragen]</p>
+              <p>Maria Schulz</p>
+              <p>Am Juliusturm 89</p>
+              <p>13597 Berlin</p>
+              <p>E-Mail: business.mariaschulz@gmail.com</p>
             </div>
-            <p>
-              Falls du Fragen zum Datenschutz hast oder deine Rechte ausüben möchtest, kannst du
-              dich an die oben genannte Stelle wenden.
-            </p>
           </BulletSection>
 
-          <BulletSection number="2" title="Allgemeine Hinweise">
+          <BulletSection number="2" title="Überblick über die Datenverarbeitung">
             <p>
-              Wir verarbeiten personenbezogene Daten nur insoweit, wie dies für den Betrieb von
-              CoFoundery Align, die Erstellung von Reports und Arbeitsdokumenten, die sichere
-              Anmeldung sowie die Weiterentwicklung des Produkts erforderlich ist.
+              Wir verarbeiten personenbezogene Daten, um dir die Nutzung unseres Tools zur Analyse
+              und Abstimmung von Founder-Teams zu ermöglichen.
             </p>
             <List
               items={[
-                "Wir arbeiten nach dem Prinzip der Datensparsamkeit und erheben keine unnötigen Marketing- oder Werbetrackingdaten.",
-                "Wir verwenden derzeit keine externen Werbe- oder Reichweiten-Tracker wie Google Analytics, Meta Pixel oder vergleichbare Marketing-Tools.",
-                "Datenzugriffe werden im Produkt technisch begrenzt, insbesondere zwischen Founder-, Team- und Advisor-Kontexten.",
-                "Sicherheitsmaßnahmen wie rollenbasierte Zugriffe, serverseitige Autorisierungsprüfungen und gehärtete Token-Flows sollen unberechtigte Zugriffe verhindern.",
-              ]}
-            />
-            <p>
-              Soweit eine Verarbeitung zur Bereitstellung des Produkts erforderlich ist, erfolgt sie
-              in der Regel auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO. Für Sicherheit, Stabilität
-              und Weiterentwicklung stützen wir uns ergänzend auf Art. 6 Abs. 1 lit. f DSGVO. Soweit
-              du freiwillig zusätzliche Angaben machst, kann die Verarbeitung außerdem auf deiner
-              Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO beruhen.
-            </p>
-          </BulletSection>
-
-          <BulletSection number="3" title="Erhebung personenbezogener Daten">
-            <p>Bei der Nutzung von CoFoundery Align können insbesondere folgende Daten verarbeitet werden:</p>
-            <List
-              items={[
-                "Account-Daten wie E-Mail-Adresse, interne User-ID und Anmeldestatus",
-                "Profilinformationen wie Anzeigename, Rollen, Fokus-Skill oder Intention",
-                "Einladungs- und Teamdaten wie eingeladene E-Mail-Adresse, Team-Kontext, Einladungsstatus und Zuordnung zwischen Founder:innen",
-                "Advisor-bezogene Daten wie verknüpftes Advisor-Profil, Freigabestatus und Zeitpunkte der Verknüpfung",
-              ]}
-            />
-            <p>
-              Diese Daten werden verarbeitet, damit Nutzer:innen sich anmelden, Teams aufbauen,
-              Einladungen annehmen, Reports gemeinsam nutzen und Advisors strukturiert einbinden
-              können.
-            </p>
-          </BulletSection>
-
-          <BulletSection number="4" title="Nutzung des Produkts">
-            <p>
-              CoFoundery Align verarbeitet Daten, um den Kern des Produkts bereitzustellen: einen
-              strukturierten Co-Founder Matching- und Alignment-Prozess für Gründer:innen, Teams und
-              optional eingebundene Advisors.
-            </p>
-            <List
-              items={[
-                "Fragebögen: Antworten aus dem Basisfragebogen und optional dem Werte-Add-on",
-                "Reports und Matching: individuelle Auswertungen, Vergleichsprofile, Snapshot-Daten und abgeleitete Report-Inhalte",
-                "Workbooks und Zusammenarbeit: Inhalte aus dem Founder Alignment Workbook, Vereinbarungen, Status, Notizen und strukturierte Arbeitsstände",
-                "Advisor-Einbindung: Advisor-Impulse, Abschlussnotizen, Follow-up-Hinweise und Founder-Reaktionen auf Advisor-Impulse",
-              ]}
-            />
-            <p>
-              Diese Verarbeitungen sind notwendig, damit die Plattform die gewünschten Report-,
-              Gesprächs- und Workbook-Funktionen überhaupt bereitstellen kann.
-            </p>
-          </BulletSection>
-
-          <BulletSection number="5" title="Verarbeitung sensibler Inhalte">
-            <p>
-              Im Produkt werden keine medizinischen Diagnosen oder Gesundheitsdaten im engeren
-              Sinne verarbeitet. Gleichwohl können die Inhalte des Produkts für Nutzer:innen sensibel
-              sein, weil sie arbeitsbezogene, psychologisch relevante oder persönlich reflektierte
-              Angaben enthalten.
-            </p>
-            <List
-              items={[
-                "Antworten zu Entscheidungslogik, Risiko, Commitment, Konfliktstil und Zusammenarbeit",
-                "Vergleichsauswertungen zwischen Gründer:innen",
-                "freie Texte in Workbooks, Vereinbarungen, Advisor-Impulsen und Reaktionen",
-              ]}
-            />
-            <p>
-              Diese Inhalte dienen ausschließlich der Erstellung von Reports, der strukturierten
-              Reflexion und der Zusammenarbeit im jeweiligen Teamkontext. Sie sind nicht als
-              therapeutische, diagnostische oder medizinische Bewertung gedacht.
-            </p>
-          </BulletSection>
-
-          <BulletSection number="6" title="Nutzungs- und Forschungsdaten">
-            <p>
-              Wir erfassen produktbezogene Nutzungsereignisse in einer internen
-              `research_events`-Struktur, um das Produkt fachlich und technisch weiterzuentwickeln
-              sowie spätere Auswertungen zu Nutzungsmustern, Flow-Qualität und Forschungskontexten
-              zu ermöglichen.
-            </p>
-            <List
-              items={[
-                "Beispiele sind Start, Verlauf und Abschluss von Fragebögen, Report-Aufrufe, Workbook-Aufrufe, Print-/PDF-Auslösungen sowie Advisor-Claim- oder Einladungsereignisse.",
-                "Die Verarbeitung erfolgt grundsätzlich pseudonymisiert, z. B. über Hashes für Nutzer-, Flow-, Assessment- oder Teambezüge.",
-                "Pseudonymisiert bedeutet nicht anonymisiert: Die Daten sind intern weiterhin einem Produktkontext zuordenbar, auch wenn nicht überall direkt Klarnamen gespeichert werden.",
-                "Wir verwenden diese Daten nicht für Werbung, Profiling zu Marketingzwecken oder den Verkauf an Dritte.",
-              ]}
-            />
-            <p>
-              Die Verarbeitung erfolgt für Produktverbesserung, Qualitätskontrolle, Analyse und
-              Forschung im Zusammenhang mit dem Produkt.
-            </p>
-          </BulletSection>
-
-          <BulletSection number="7" title="Authentifizierung">
-            <p>
-              Die Anmeldung erfolgt derzeit per Magic Link über Supabase Auth. Dabei wird deine
-              E-Mail-Adresse verarbeitet, um dir einen sicheren Anmeldelink zu senden und deine
-              Session zu verwalten.
-            </p>
-            <List
-              items={[
-                "Magic Links und Invite-Links dienen als Einstiegspunkte für Login oder Team-Zuordnung.",
-                "Invite- und Advisor-Tokens werden technisch gehärtet verarbeitet und nicht dauerhaft im Browser gespeichert.",
-                "Nach erfolgreicher Anmeldung oder Verknüpfung wird der Zugriff im Regelfall über dein eingeloggtes Profil und serverseitige Zuordnungen gesteuert, nicht über dauerhaft weitergereichte Tokens.",
+                "Account- und Login-Daten (E-Mail-Adresse)",
+                "Profildaten (z. B. Name, Rollen, Fokus)",
+                "Antworten auf strukturierte Fragebögen",
+                "daraus abgeleitete Auswertungen (z. B. Matching-Reports)",
+                "Inhalte aus der Zusammenarbeit (z. B. Workbook)",
+                "Einladungsdaten (z. B. E-Mail eines Co-Founders)",
+                "Daten im Zusammenhang mit Advisor-/Moderationszugängen",
+                "technische Nutzungsdaten",
               ]}
             />
           </BulletSection>
 
-          <BulletSection number="8" title="Hosting und Infrastruktur">
-            <p>Für den Betrieb von CoFoundery Align nutzen wir derzeit insbesondere folgende technische Dienstleister:</p>
+          <BulletSection number="3" title="Zweck der Verarbeitung">
+            <p>Die Verarbeitung erfolgt zu folgenden Zwecken:</p>
             <List
               items={[
-                "Supabase für Authentifizierung, Datenbank und sichere serverseitige Datenzugriffe",
-                "Vercel für Hosting, Serverausführung und Auslieferung der Webanwendung",
+                "Bereitstellung und Betrieb des Tools",
+                "Erstellung individueller und gemeinsamer Auswertungen",
+                "Matching zwischen Founder-Teams",
+                "Unterstützung der Zusammenarbeit (Workbook)",
+                "Einbindung von Advisoren oder Moderatoren",
+                "Verbesserung des Produkts und der Nutzererfahrung",
+                "Gewährleistung der technischen Sicherheit",
+              ]}
+            />
+          </BulletSection>
+
+          <BulletSection number="4" title="Rechtsgrundlagen">
+            <p>Die Verarbeitung erfolgt auf Basis folgender Rechtsgrundlagen:</p>
+            <List
+              items={[
+                "Art. 6 Abs. 1 lit. b DSGVO (Vertrag / Nutzung des Tools)",
+                "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Produktverbesserung und Sicherheit)",
+                "Art. 6 Abs. 1 lit. c DSGVO (gesetzliche Verpflichtungen, z. B. Rechnungsstellung)",
               ]}
             />
             <p>
-              Diese Anbieter verarbeiten Daten im Rahmen ihrer technischen Funktion für uns. Eine
-              Verarbeitung kann dabei auch außerhalb der EU bzw. des EWR stattfinden, insbesondere
-              wenn Anbieter Infrastruktur in Drittländern nutzen. In solchen Fällen sollen
-              geeignete datenschutzrechtliche Garantien, etwa Standardvertragsklauseln, zugrunde
-              gelegt werden.
+              Unser berechtigtes Interesse liegt in der sicheren Bereitstellung des Produkts, der
+              technischen Fehleranalyse, der Missbrauchsverhinderung sowie der Weiterentwicklung
+              und Verbesserung des Tools.
             </p>
           </BulletSection>
 
-          <BulletSection number="9" title="Speicherung und Aufbewahrung">
+          <BulletSection number="5" title="Account und Login">
             <p>
-              Produktdaten wie Profile, Einladungen, Fragebogenantworten, Reports und Workbooks
-              werden grundsätzlich so lange gespeichert, wie dies für die Bereitstellung des
-              Produkts und die Nutzung durch aktive Accounts erforderlich ist.
+              Für den Login verwenden wir ein sogenanntes Magic-Link-Verfahren. Dabei wird deine
+              E-Mail-Adresse genutzt, um dir einen sicheren Login-Link zu senden.
+            </p>
+            <p>Die Authentifizierung erfolgt über:</p>
+            <List items={["Supabase (Supabase Inc.)"]} />
+          </BulletSection>
+
+          <BulletSection number="6" title="Verarbeitung von Profildaten und Fragebögen">
+            <p>
+              Im Rahmen der Nutzung des Tools verarbeitest du selbst eingegebene Daten,
+              insbesondere:
             </p>
             <List
               items={[
-                "Reports und Workbooks sind Teil des Produktverlaufs und werden aktuell nicht aggressiv automatisch gelöscht.",
-                "Pseudonymisierte Nutzungs- und Forschungsdaten können für Produktanalyse und Qualitätssicherung zeitlich begrenzt gespeichert werden.",
-                "Anonymisierte oder nicht mehr personenbezogene Auswertungen können länger aufbewahrt und statistisch genutzt werden.",
+                "Profildaten",
+                "Antworten auf strukturierte Fragebögen",
+              ]}
+            />
+            <p>Diese Daten werden verwendet, um:</p>
+            <List
+              items={[
+                "individuelle Profile zu erstellen",
+                "Matching-Analysen zu berechnen",
+                "Unterschiede und Gemeinsamkeiten sichtbar zu machen",
+              ]}
+            />
+          </BulletSection>
+
+          <BulletSection number="7" title="Matching, Reports und gemeinsame Inhalte">
+            <p>
+              Wenn du einen Co-Founder einlädst:
+            </p>
+            <List
+              items={[
+                "werden eure Daten miteinander verknüpft",
+                "gemeinsame Auswertungen erstellt",
+                "Inhalte im Workbook gemeinsam bearbeitet",
               ]}
             />
             <p>
-              Eine weiter ausdifferenzierte Retention-, Lösch- und Anonymisierungsstrategie ist
-              geplant. Bis dahin prüfen wir Löschanfragen einzelfallbezogen und mit Blick auf
-              gemeinsame Teamdaten sorgfältig.
+              Wichtig: Diese Inhalte betreffen immer beide Founder gemeinsam und können nicht
+              vollständig isoliert einer einzelnen Person zugeordnet werden.
+            </p>
+            <p>
+              In der aktuellen Produktphase werden gemeinsame Reports und Workbooks der
+              betroffenen Founder-Konstellation bei Löschung eines Accounts ebenfalls gelöscht.
             </p>
           </BulletSection>
 
-          <BulletSection number="10" title="Weitergabe von Daten">
-            <p>
-              Wir geben personenbezogene Daten nicht an Dritte zu Werbe- oder Marketingzwecken
-              weiter und verkaufen keine Nutzerdaten.
-            </p>
-            <p>Daten werden nur insoweit an Dritte übermittelt, wie dies für den technischen Betrieb erforderlich ist, insbesondere an:</p>
+          <BulletSection number="8" title="Eingeladene Personen (Co-Founder)">
+            <p>Wenn du eine andere Person einlädst:</p>
             <List
               items={[
-                "Hosting- und Infrastruktur-Dienstleister",
-                "Authentifizierungs- und Datenbank-Dienstleister",
-                "in seltenen Fällen Behörden oder Gerichte, soweit wir gesetzlich dazu verpflichtet sind",
+                "wird deren E-Mail-Adresse verarbeitet",
+                "die Daten stammen von der einladenden Person",
+                "die Verarbeitung dient ausschließlich dazu, die Einladung und den Matching-Prozess zu ermöglichen",
+              ]}
+            />
+          </BulletSection>
+
+          <BulletSection number="9" title="Advisor / Moderation">
+            <p>Im Rahmen der Nutzung kann ein Advisor oder Moderator eingebunden werden.</p>
+            <p>Dabei werden verarbeitet:</p>
+            <List
+              items={[
+                "Zugriffsdaten",
+                "Zuordnungen zu einem Founder-Team",
+                "Inhalte im Workbook (z. B. Notizen oder Kommentare)",
+              ]}
+            />
+            <p>Der Zugriff erfolgt ausschließlich im freigegebenen Kontext.</p>
+          </BulletSection>
+
+          <BulletSection number="10" title="Verarbeitung abgeleiteter Daten (Profiling)">
+            <p>Auf Basis deiner Eingaben erstellen wir:</p>
+            <List
+              items={[
+                "strukturierte Auswertungen",
+                "Matching-Analysen",
+                "inhaltliche Interpretationen",
               ]}
             />
             <p>
-              Innerhalb des Produkts selbst werden Daten nur dort sichtbar gemacht, wo dies der
-              jeweilige Team-, Founder- oder Advisor-Kontext vorsieht.
+              Dabei handelt es sich um automatisierte Auswertungen, jedoch keine automatisierten
+              Entscheidungen mit rechtlicher Wirkung.
             </p>
           </BulletSection>
 
-          <BulletSection number="11" title="Rechte der Nutzer:innen">
-            <p>Du hast im Rahmen der gesetzlichen Voraussetzungen insbesondere folgende Rechte:</p>
+          <BulletSection number="11" title="Produktanalyse und Forschung">
+            <p>Wir verwenden Daten zur Verbesserung unseres Produkts, insbesondere:</p>
             <List
               items={[
-                "Auskunft über die zu deiner Person gespeicherten Daten",
-                "Berichtigung unrichtiger oder unvollständiger Daten",
-                "Löschung deiner Daten, soweit keine gesetzlichen oder zwingenden produktbezogenen Gründe entgegenstehen",
+                "Nutzungsabläufe",
+                "Interaktionen",
+                "aggregierte Auswertungen",
+              ]}
+            />
+            <p>
+              Soweit möglich, erfolgt dies in pseudonymisierter Form. Pseudonymisierte Daten
+              bleiben personenbezogene Daten. Eine Weiterverwendung außerhalb personenbezogener
+              Kontexte erfolgt nur nach Anonymisierung oder Aggregation, wenn danach kein
+              Rückschluss auf einzelne Personen mehr möglich ist.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="12" title="Anonymisierung und Weiterverwendung">
+            <p>Daten können nach Abschluss der Nutzung:</p>
+            <List
+              items={[
+                "anonymisiert oder aggregiert werden",
+                "für Analyse- und Forschungszwecke weiterverarbeitet werden",
+              ]}
+            />
+            <p>
+              Eine Weiterverarbeitung erfolgt nur, wenn kein Rückschluss auf einzelne Personen mehr
+              möglich ist.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="13" title="Zahlungen (PayPal)">
+            <p>Wenn du eine freiwillige Zahlung tätigst:</p>
+            <List items={["erfolgt die Abwicklung über PayPal (PayPal Europe S.à r.l.)"]} />
+            <p>PayPal verarbeitet die Daten eigenständig. Es gelten die Datenschutzbestimmungen von PayPal.</p>
+            <p>In unserem System speichern wir keine Zahlungsdaten.</p>
+          </BulletSection>
+
+          <BulletSection number="14" title="E-Mail-Kommunikation">
+            <p>
+              Wenn du uns per E-Mail kontaktierst oder uns Daten, z. B. Rechnungsdaten,
+              übermittelst, werden diese zur Bearbeitung deiner Anfrage verarbeitet.
+            </p>
+            <p>Wir nutzen hierfür:</p>
+            <List items={["Gmail (Google Ireland Limited, Dublin, Irland)"]} />
+            <p>
+              Es kann dabei zu einer Übermittlung in Drittländer kommen. Google verwendet
+              Standardvertragsklauseln gemäß DSGVO.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="15" title="Hosting und Infrastruktur">
+            <p>Wir nutzen folgende Dienstleister:</p>
+            <List
+              items={[
+                "Vercel (Hosting)",
+                "Supabase (Datenbank und Authentifizierung)",
+              ]}
+            />
+            <p>Diese verarbeiten Daten in unserem Auftrag.</p>
+            <p>
+              Soweit personenbezogene Daten in Staaten außerhalb der Europäischen Union oder des
+              Europäischen Wirtschaftsraums übermittelt werden, erfolgt dies nur unter Beachtung
+              der gesetzlichen Voraussetzungen, insbesondere auf Grundlage von
+              Angemessenheitsbeschlüssen oder geeigneten Garantien wie
+              Standardvertragsklauseln.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="16" title="Cookies und technische Speicherung">
+            <p>Wir verwenden notwendige Cookies und ähnliche Technologien, um:</p>
+            <List
+              items={[
+                "Login-Sessions zu verwalten",
+                "Einladungsprozesse technisch umzusetzen",
+              ]}
+            />
+            <p>Diese sind für den Betrieb erforderlich.</p>
+          </BulletSection>
+
+          <BulletSection number="17" title="Speicherdauer">
+            <p>Wir speichern personenbezogene Daten:</p>
+            <List
+              items={[
+                "solange sie für die Nutzung erforderlich sind",
+                "oder gesetzliche Aufbewahrungspflichten bestehen",
+              ]}
+            />
+            <p>
+              Anschließend werden personenbezogene Daten gelöscht, soweit keine gesetzlichen
+              Aufbewahrungspflichten entgegenstehen. Daten können darüber hinaus anonymisiert oder
+              aggregiert weiterverarbeitet werden, sofern danach kein Personenbezug mehr besteht.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="18" title="Deine Rechte">
+            <p>Du hast das Recht auf:</p>
+            <List
+              items={[
+                "Auskunft",
+                "Berichtigung",
+                "Löschung",
                 "Einschränkung der Verarbeitung",
                 "Datenübertragbarkeit",
-                "Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen",
-                "Beschwerde bei einer Datenschutzaufsichtsbehörde",
+                "Widerspruch",
               ]}
             />
             <p>
-              Bitte beachte, dass bei Team- und Workbook-Daten auch gemeinsame Kontexte betroffen
-              sein können. Wir prüfen daher Lösch- und Auskunftsanfragen immer mit Blick auf den
-              konkreten Produktzusammenhang.
+              Du hast außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu
+              beschweren.
             </p>
           </BulletSection>
 
-          <BulletSection number="12" title="Datensicherheit">
+          <BulletSection number="19" title="Löschung und gemeinsame Daten">
+            <p>Bei Löschung deines Accounts:</p>
             <p>
-              Wir treffen technische und organisatorische Maßnahmen, um personenbezogene Daten vor
-              unberechtigtem Zugriff, Verlust oder Missbrauch zu schützen.
-            </p>
-            <List
-              items={[
-                "rollen- und kontextbezogene Zugriffsbeschränkungen",
-                "serverseitige Autorisierungsprüfungen für Founder-, Team- und Advisor-Zugriffe",
-                "sichere Authentifizierung über Magic Links",
-                "pseudonymisierte Produkt- und Forschungsanalyse, soweit dies möglich und sinnvoll ist",
-              ]}
-            />
-            <p>
-              Trotz aller Maßnahmen kann eine vollständige Sicherheit bei internetbasierten
-              Diensten nie garantiert werden. Wir entwickeln die Sicherheitsarchitektur deshalb
-              laufend weiter.
+              Soweit keine gesetzlichen Aufbewahrungspflichten oder sonstigen rechtlichen Gründe
+              entgegenstehen, werden personenbezogene Daten bei Löschung des Accounts gelöscht.
+              Gemeinsame Reports und Workbooks der betroffenen Founder-Konstellation werden in der
+              aktuellen Produktphase ebenfalls gelöscht.
             </p>
           </BulletSection>
 
-          <BulletSection number="13" title="Schluss">
-            <p>
-              Wenn du Fragen zum Datenschutz, zu deinen Daten oder zur Nutzung von CoFoundery Align
-              hast, kannst du uns jederzeit über die oben genannte Kontaktmöglichkeit schreiben.
-            </p>
-            <p>
-              CoFoundery Align entwickelt sich weiter. Deshalb kann es notwendig sein, diese
-              Datenschutzerklärung anzupassen, wenn sich Funktionen, Datenflüsse oder technische
-              Dienstleister ändern. Maßgeblich ist jeweils die auf dieser Seite veröffentlichte
-              aktuelle Fassung.
-            </p>
+          <BulletSection number="20" title="Kontakt">
+            <p>Bei Fragen zum Datenschutz:</p>
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
+              <p>business.mariaschulz@gmail.com</p>
+            </div>
           </BulletSection>
         </div>
       </div>

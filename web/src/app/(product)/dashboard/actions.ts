@@ -1,6 +1,7 @@
 "use server";
 
 import { createHash, randomBytes } from "crypto";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
@@ -30,6 +31,17 @@ export type SentInvitationLinkActionResult =
       ok: false;
       reason: "not_authenticated" | "invalid_invitation_id" | "not_found" | "status_not_linkable" | "rotate_failed";
       error?: string;
+    };
+
+export type DeleteAccountActionResult =
+  | { ok: true }
+  | {
+      ok: false;
+      error:
+        | "not_authenticated"
+        | "missing_service_role"
+        | "cleanup_failed"
+        | "auth_delete_failed";
     };
 
 type MySessionResponseRow = {
@@ -87,6 +99,21 @@ function buildAbsoluteInviteUrl(token: string) {
   const relative = buildInviteUrl(token);
   const origin = getSiteUrlOrigin();
   return origin ? `${origin}${relative}` : relative;
+}
+
+function createPrivilegedClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return null;
+  }
+
+  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
 }
 
 async function createInvitation(params: {
@@ -230,6 +257,53 @@ export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return { ok: false, error: "not_authenticated" };
+  }
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) {
+    return { ok: false, error: "missing_service_role" };
+  }
+
+  const { error: cleanupError } = await privileged.rpc("delete_user_operational_data", {
+    p_user_id: user.id,
+    p_user_email: normalizeEmail(user.email ?? null) || null,
+    p_research_hash_salt: process.env.RESEARCH_HASH_SALT?.trim() || null,
+  });
+
+  if (cleanupError) {
+    console.error("deleteCurrentUserAccountAction cleanup failed", {
+      userId: user.id,
+      error: cleanupError.message,
+    });
+    return { ok: false, error: "cleanup_failed" };
+  }
+
+  const { error: authDeleteError } = await privileged.auth.admin.deleteUser(user.id);
+  if (authDeleteError) {
+    console.error("deleteCurrentUserAccountAction auth delete failed", {
+      userId: user.id,
+      error: authDeleteError.message,
+    });
+    return { ok: false, error: "auth_delete_failed" };
+  }
+
+  try {
+    await supabase.auth.signOut();
+  } catch {
+    // Best effort: once the auth user is gone, stale sessions should no longer be usable.
+  }
+
+  redirect("/login?status=account_deleted");
 }
 
 export async function updateDisplayNameAction(formData: FormData) {

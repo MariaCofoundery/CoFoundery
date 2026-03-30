@@ -4,6 +4,7 @@ import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
 import { DailyQuote } from "@/features/dashboard/DailyQuote";
+import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
 import { DAILY_QUOTES } from "@/features/dashboard/dailyQuotes";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
@@ -820,6 +821,7 @@ export default async function DashboardPage({
               <p className="mt-1 text-xs leading-6 text-slate-500">
                 Weitere Account-Einstellungen docken hier später an. Für jetzt findest du hier deinen aktuellen Zugangspunkt.
               </p>
+              <DeleteAccountSection />
             </div>
           </section>
 
