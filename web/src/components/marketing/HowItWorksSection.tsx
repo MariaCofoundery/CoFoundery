@@ -3,6 +3,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+const DESKTOP_TRACK_GAP = 18;
+
 const panels = [
   {
     step: "1",
@@ -271,6 +273,39 @@ export function HowItWorksSection() {
     translateX: 0,
   });
 
+  const panelStride = debugState.viewportWidth + DESKTOP_TRACK_GAP;
+  const activePanelIndex =
+    panelStride > 0
+      ? Math.min(
+          panels.length - 1,
+          Math.max(0, Math.round(Math.abs(debugState.translateX) / panelStride)),
+        )
+      : 0;
+
+  const jumpToPanel = (panelIndex: number) => {
+    if (
+      typeof window === "undefined" ||
+      !scrollSectionRef.current ||
+      debugState.viewportWidth <= 0 ||
+      metricsRef.current.horizontalDistance <= 0
+    ) {
+      return;
+    }
+
+    const sectionAbsoluteTop =
+      scrollSectionRef.current.getBoundingClientRect().top + window.scrollY;
+    const startScrollY = sectionAbsoluteTop - metricsRef.current.stickyTop;
+    const desiredTranslate = Math.min(
+      panelIndex * (debugState.viewportWidth + DESKTOP_TRACK_GAP),
+      metricsRef.current.horizontalDistance,
+    );
+
+    window.scrollTo({
+      top: startScrollY + desiredTranslate,
+      behavior: "smooth",
+    });
+  };
+
   useEffect(() => {
     const updateMeasurements = () => {
       const viewportWidth = viewportRef.current?.clientWidth ?? 0;
@@ -334,7 +369,7 @@ export function HowItWorksSection() {
   }, [reduceMotion]);
 
   return (
-    <section id="ablauf" className="mt-20 reveal">
+    <section id="ablauf" className="mt-20">
       <div className="max-w-3xl">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
           So funktioniert CoFoundery Align
@@ -369,13 +404,35 @@ export function HowItWorksSection() {
           <div className="flex h-full flex-col">
             <div className="mb-5 flex items-center justify-between gap-6">
               <div className="flex items-center gap-3">
-                {panels.map((panel) => (
-                  <div key={panel.step} className="inline-flex items-center gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/80 bg-white text-xs font-medium text-slate-600">
+                {panels.map((panel, index) => (
+                  <button
+                    key={panel.step}
+                    type="button"
+                    onClick={() => jumpToPanel(index)}
+                    className={`inline-flex items-center gap-2 rounded-full px-1.5 py-1.5 text-left transition-all duration-200 ${
+                      activePanelIndex === index
+                        ? "bg-white/85 shadow-[0_10px_22px_rgba(15,23,42,0.06)]"
+                        : "hover:bg-white/55"
+                    }`}
+                    aria-pressed={activePanelIndex === index}
+                  >
+                    <span
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium transition-colors duration-200 ${
+                        activePanelIndex === index
+                          ? "border-[color:var(--brand-primary)]/20 bg-[color:var(--brand-primary)] text-white"
+                          : "border-slate-200/80 bg-white text-slate-600"
+                      }`}
+                    >
                       {panel.step}
                     </span>
-                    <span className="text-xs tracking-[0.08em] text-slate-500">{panel.label}</span>
-                  </div>
+                    <span
+                      className={`text-xs tracking-[0.08em] transition-colors duration-200 ${
+                        activePanelIndex === index ? "text-slate-800" : "text-slate-500"
+                      }`}
+                    >
+                      {panel.label}
+                    </span>
+                  </button>
                 ))}
               </div>
               <div className="w-40">
@@ -395,13 +452,18 @@ export function HowItWorksSection() {
                 ref={trackRef}
                 style={{
                   transform: `translate3d(${debugState.translateX}px, 0, 0)`,
+                  gap: `${DESKTOP_TRACK_GAP}px`,
+                  willChange: "transform",
                 }}
-                className="flex h-full gap-6"
+                className="flex h-full"
               >
                 {panels.map((panel, index) => (
                   <div
                     key={panel.step}
-                    className="h-full w-[min(1180px,calc(100vw-9rem))] shrink-0"
+                    style={{
+                      width: debugState.viewportWidth > 0 ? `${debugState.viewportWidth}px` : undefined,
+                    }}
+                    className="h-full shrink-0"
                   >
                     <FlowPanel panel={panel} index={index} />
                   </div>
