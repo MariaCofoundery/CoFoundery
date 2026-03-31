@@ -221,7 +221,7 @@ export function LandingHero() {
         transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
         className="reveal"
       >
-        <h1 className="max-w-4xl font-[var(--font-display)] text-4xl leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.35rem]">
+        <h1 className="max-w-4xl font-[var(--font-display)] text-4xl leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[3.75rem] lg:leading-[0.9] xl:text-[3.95rem]">
           Die meisten Founder merken zu spät, dass sie nicht zusammenpassen.
         </h1>
 

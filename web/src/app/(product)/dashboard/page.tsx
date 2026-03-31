@@ -3,13 +3,12 @@ import { redirect } from "next/navigation";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
-import { DailyQuote } from "@/features/dashboard/DailyQuote";
 import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
-import { DAILY_QUOTES } from "@/features/dashboard/dailyQuotes";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
+import { normalizeProfileRoles, profileRoleLabel } from "@/features/profile/profileRoles";
 import {
   FOUNDER_DIMENSION_META,
   FOUNDER_DIMENSION_ORDER,
@@ -75,12 +74,6 @@ const SECONDARY_SURFACE_CLASS =
 const SELF_RADAR_LABELS = Object.fromEntries(
   FOUNDER_DIMENSION_ORDER.map((dimension) => [dimension, FOUNDER_DIMENSION_META[dimension].shortLabel])
 ) as Record<string, string>;
-
-function getDayOfYear(date: Date) {
-  const startOfYearUtc = Date.UTC(date.getUTCFullYear(), 0, 0);
-  const currentUtc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-  return Math.floor((currentUtc - startOfYearUtc) / 86_400_000);
-}
 
 function staggerStyle(delayMs: number) {
   return {
@@ -199,9 +192,6 @@ export default async function DashboardPage({
 
   const hasSubmittedBase = Boolean(selfReport);
   const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
-  const dayOfYear = getDayOfYear(new Date());
-  const quoteIndex = DAILY_QUOTES.length > 0 ? (dayOfYear - 1) % DAILY_QUOTES.length : 0;
-  const quoteOfDay = DAILY_QUOTES[quoteIndex] ?? "Klarheit schlägt Zufall.";
   const valuesStatus = selfReport?.valuesModuleStatus ?? "not_started";
   const profileCompletionLabel = hasSubmittedBase
     ? `Basisprofil abgeschlossen (${selfReport?.basisAnsweredA ?? 0}/${selfReport?.basisTotal ?? 0})`
@@ -229,11 +219,10 @@ export default async function DashboardPage({
     })
     .filter((row) => row.hasStarted || readyReportInvitationIds.has(row.invitationId));
   const activeWorkbooks = workbookRows.filter((row) => row.hasStarted);
-  const activeWorkbookByInvitationId = new Map(
-    activeWorkbooks.map((workbook) => [workbook.invitationId, workbook])
-  );
   const latestReadyReport = readyReports[0] ?? null;
   const latestActiveWorkbook = activeWorkbooks[0] ?? null;
+  const displayName =
+    profileData?.display_name?.trim() || user.email?.split("@")[0]?.trim() || "Founder";
   const workbookEntryPointHref = latestActiveWorkbook
     ? latestActiveWorkbook.href
     : latestReadyReport
@@ -242,17 +231,6 @@ export default async function DashboardPage({
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
       : null;
-  const reportsWithoutWorkbook = readyReports.filter(
-    (report) => !activeWorkbookByInvitationId.has(report.invitation_id)
-  );
-
-  const basisStatus = hasSubmittedBase ? "Bereit" : "Offen";
-  const valuesStatusLabel = hasSubmittedValues
-    ? "Bereit"
-    : valuesStatus === "in_progress"
-      ? "In Arbeit"
-      : "Offen";
-  const matchingStatus = readyReports.length > 0 ? "Bereit" : hasMatchingActivity ? "In Arbeit" : "Offen";
   const workbookStatus = activeWorkbooks.some((workbook) => workbook.isCompleted)
     ? "Bereit"
     : activeWorkbooks.length > 0
@@ -265,6 +243,14 @@ export default async function DashboardPage({
   const heroExpectationText = shouldPrioritizeInviteCta
     ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
     : null;
+  const workbookFocusHref =
+    workbookEntryPointHref ??
+    (latestReadyReport
+      ? buildWorkbookHref(
+          latestReadyReport.invitation_id,
+          invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
+        )
+      : null);
 
   const heroPrimaryAction = !hasSubmittedBase
     ? {
@@ -315,106 +301,65 @@ export default async function DashboardPage({
                 title: "Behalte das laufende Matching im Blick.",
                 text: "Sobald Antworten eingehen oder ein Matching-Report bereit ist, geht es hier weiter.",
               };
+  const heroCta = workbookFocusHref
+    ? {
+        href: workbookFocusHref,
+        label: "Arbeite im Workbook weiter",
+        text: latestActiveWorkbook
+          ? "Hier liegt euer aktueller Arbeitsstand."
+          : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook.",
+      }
+    : heroPrimaryAction;
 
-  const progressCards = [
+  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
+  const compactProgressItems = [
     {
-      id: "dashboard-status-profile",
+      id: "basis",
       label: "Basisprofil",
-      status: basisStatus,
-      isCurrent: !hasSubmittedBase,
-      isCompleted: hasSubmittedBase,
-      text: hasSubmittedBase
-        ? "Profil ist bereit."
-        : "Offen.",
-      href: hasSubmittedBase ? "/me/report" : "/me/base",
-      actionLabel: hasSubmittedBase ? "Öffnen" : "Starten",
+      state: hasSubmittedBase ? "done" : "active",
+      detail: hasSubmittedBase ? "fertig" : "offen",
     },
     {
-      id: "dashboard-status-values",
+      id: "values",
       label: "Werteprofil",
-      status: valuesStatusLabel,
-      isCurrent: hasSubmittedBase && !hasSubmittedValues,
-      isCompleted: hasSubmittedValues,
-      text: hasSubmittedValues
-        ? "Werteprofil ist bereit."
-        : valuesStatus === "in_progress"
-          ? "Bereits begonnen."
-          : "Offen.",
-      href: hasSubmittedValues ? "/me/report#werteprofil" : "/me/values",
-      actionLabel:
-        hasSubmittedValues ? "Öffnen" : valuesStatus === "in_progress" ? "Fortsetzen" : "Starten",
+      state: hasSubmittedValues ? "done" : hasSubmittedBase ? "active" : "upcoming",
+      detail: hasSubmittedValues ? "fertig" : valuesStatus === "in_progress" ? "in Arbeit" : "offen",
     },
     {
-      id: "dashboard-block-status-matching",
+      id: "matching",
       label: "Matching",
-      status: matchingStatus,
-      isCurrent: hasSubmittedBase && hasSubmittedValues && !latestReadyReport && !latestActiveWorkbook,
-      isCompleted: readyReports.length > 0,
-      text:
-        readyReports.length > 0
-          ? "Matching-Report ist bereit."
-          : hasMatchingActivity
-            ? "Sobald dein Co-Founder teilnimmt, entsteht euer Matching-Report."
-            : shouldPrioritizeInviteCta
-              ? "Als Nächstes steht die Einladung an."
-              : "Offen.",
-      href: readyReports[0]
-        ? `/report/${readyReports[0].invitation_id}`
-        : hasSubmittedBase
-          ? "/invite/new"
-          : "/me/base",
-      actionLabel: readyReports[0]
-        ? "Öffnen"
-        : shouldPrioritizeInviteCta
-          ? null
-          : hasSubmittedBase
-            ? "Einladen"
-            : "Starten",
+      state: readyReports.length > 0 ? "done" : hasMatchingActivity ? "active" : "upcoming",
+      detail: readyReports.length > 0 ? "fertig" : hasMatchingActivity ? "läuft" : "offen",
     },
     {
-      id: "dashboard-status-workbook",
+      id: "workbook",
       label: "Workbook",
-      status: workbookStatus,
-      isCurrent: Boolean(latestReadyReport || latestActiveWorkbook),
-      isCompleted: workbookStatus === "Bereit",
-      text:
+      state:
         activeWorkbooks.length > 0
-          ? "Workbook ist in Arbeit."
-          : readyReports.length > 0
-            ? "Workbook ist bereit."
-            : "Offen.",
-      href: workbookEntryPointHref ?? "/dashboard",
-      actionLabel:
+          ? "active"
+          : workbookStatus === "Bereit"
+            ? "done"
+            : "upcoming",
+      detail:
         activeWorkbooks.length > 0
-          ? "Weiterarbeiten"
-          : readyReports.length > 0
-            ? "Workbook starten"
-            : "Matching prüfen",
+          ? "aktiv"
+          : workbookStatus === "Bereit"
+            ? "bereit"
+            : "offen",
     },
   ] as const;
-  const primaryWorkbook =
-    latestActiveWorkbook ??
-    (latestReadyReport
-      ? {
-          invitationId: latestReadyReport.invitation_id,
-          title:
-            (Array.isArray(latestReadyReport.invitations)
-              ? latestReadyReport.invitations[0]?.label ?? latestReadyReport.invitations[0]?.invitee_email
-              : latestReadyReport.invitations?.label ?? latestReadyReport.invitations?.invitee_email) ??
-            latestReadyReport.invitation_id,
-          updatedAt: latestReadyReport.created_at,
-          href: buildWorkbookHref(
-            latestReadyReport.invitation_id,
-            invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
-          ),
-          hasStarted: false,
-          isCompleted: false,
-        }
-      : null);
-  const secondaryWorkbooks = activeWorkbooks.filter(
-    (workbook) => workbook.invitationId !== primaryWorkbook?.invitationId
-  );
-  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
+  const profileInfoRows = [
+    { label: "Name", value: profileData?.display_name?.trim() || "Noch nicht gesetzt" },
+    { label: "Fokus", value: profileData?.focus_skill?.trim() || "Noch nicht gesetzt" },
+    { label: "Intention", value: profileData?.intention?.trim() || "Noch nicht gesetzt" },
+    {
+      label: "Rollen",
+      value: normalizeProfileRoles(profileData?.roles ?? ["founder"])
+        .map((role) => profileRoleLabel(role))
+        .join(", "),
+    },
+  ] as const;
+  const supportEmail = "business.mariaschulz@gmail.com";
 
   const selfReportDebug = selfReport
     ? {
@@ -444,22 +389,6 @@ export default async function DashboardPage({
         <div className="relative rounded-[32px]">
           <DashboardHeroConstellation />
           <div className="relative z-10">
-            <div className="dashboard-fade-up" style={staggerStyle(10)}>
-              <DailyQuote displayName={profileData?.display_name ?? null} quote={quoteOfDay} />
-            </div>
-
-            <header className="dashboard-fade-up mb-4 max-w-3xl">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Plattform</p>
-                <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
-                  Dein Founder Dashboard
-                </h1>
-                <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Von deinem Profil zum Matching-Report bis ins Workbook.
-                </p>
-              </div>
-            </header>
-
             {params.error ? (
               <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 Hinweis: {params.error}
@@ -467,43 +396,79 @@ export default async function DashboardPage({
             ) : null}
 
             <section
-              className="dashboard-panel dashboard-fade-up max-w-3xl rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:p-6"
+              className="dashboard-panel dashboard-fade-up grid gap-5 rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,0.94fr)_minmax(320px,0.86fr)] lg:p-6"
               style={staggerStyle(40)}
             >
               <div>
-                <h2 className="text-2xl font-semibold text-slate-950 md:text-[2rem]">
-                  {heroPrimaryAction.title}
-                </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-                  {heroPrimaryAction.text}
-                </p>
-                {heroExpectationText ? (
+                <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Dashboard</p>
+                <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
+                  Hallo, {displayName}.
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{heroCta.text}</p>
+                {heroExpectationText && heroCta.href === heroPrimaryAction.href ? (
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
                     {heroExpectationText}
                   </p>
                 ) : null}
                 <div className="mt-5">
                   <Link
-                    href={heroPrimaryAction.href}
+                    href={heroCta.href}
                     className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
                   >
-                    {heroPrimaryAction.label}
+                    {heroCta.label}
                   </Link>
                 </div>
               </div>
+
+              <article className={`${SECONDARY_SURFACE_CLASS} overflow-hidden p-5`}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                      <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+                        <ReportIcon className="h-4 w-4" />
+                      </span>
+                      Profil-Snapshot
+                    </p>
+                    <h2 className="mt-2 text-lg font-semibold text-slate-900">
+                      Dein aktueller Stand in 6 Dimensionen
+                    </h2>
+                  </div>
+                  {selfReport ? (
+                    <Link href="/me/report" className={UTILITY_CTA_CLASS}>
+                      Report öffnen
+                    </Link>
+                  ) : null}
+                </div>
+                {selfReport ? (
+                  <>
+                    <p className="mt-3 text-sm leading-7 text-slate-600">
+                      Eine kompakte Einordnung deines aktuellen Founder-Profils.
+                    </p>
+                    <div className="mt-5">
+                      <FounderDimensionsOverview scores={selfReport.scoresA} />
+                    </div>
+                  </>
+                ) : (
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    Sobald du dein Basisprofil abgeschlossen hast, erscheint hier dein Profil-Snapshot.
+                  </p>
+                )}
+              </article>
             </section>
 
             <section
-              className="dashboard-fade-up mt-4 max-w-3xl rounded-[24px] border border-slate-200/70 bg-slate-50/72 px-5 py-4"
+              className="dashboard-fade-up mt-4 rounded-[20px] border border-slate-200/70 bg-slate-50/72 px-4 py-3"
               style={staggerStyle(55)}
             >
-              <p className="text-sm font-medium text-slate-900">So nutzt ihr das Tool am besten:</p>
-              <div className="mt-3 space-y-1.5 text-sm leading-6 text-slate-600">
-                <p>1. Startet mit dem Basisprofil</p>
-                <p>2. Optional: ergänzt euer Werteprofil</p>
-                <p>3. Danach bekommt ihr euren Matching-Report</p>
-                <p>4. Im Workbook klärt ihr eure wichtigsten Regeln</p>
-              </div>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+                So nutzt ihr das Tool
+              </p>
+              <ol className="mt-2 grid gap-1 text-sm leading-6 text-slate-600 md:grid-cols-2 xl:grid-cols-4">
+                <li>1. Basisprofil</li>
+                <li>2. Optional Werteprofil</li>
+                <li>3. Matching-Report</li>
+                <li>4. Gemeinsames Workbook</li>
+              </ol>
             </section>
           </div>
         </div>
@@ -514,210 +479,130 @@ export default async function DashboardPage({
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/70 bg-slate-50/72 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.03)] lg:p-6"
         style={staggerStyle(80)}
       >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                <ProfileIcon className="h-4 w-4" />
-              </span>
-              Fortschritt
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">Dein Stand</h2>
-          </div>
+        <div>
+          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
+              <ProfileIcon className="h-4 w-4" />
+            </span>
+            Fortschritt
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-900">Dein Stand im Flow</h2>
         </div>
 
-        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {progressCards.map((card, index) => (
-            <article
-              key={card.id}
-              id={card.id}
-              className={`dashboard-fade-up scroll-mt-28 rounded-2xl border p-4 transition ${
-                card.isCurrent
-                  ? "border-[color:var(--brand-primary)]/30 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.05)]"
-                  : card.isCompleted
-                    ? "border-slate-200/80 bg-white/65 shadow-[0_8px_20px_rgba(15,23,42,0.025)]"
-                    : "border-slate-200/80 bg-white/82 shadow-[0_8px_20px_rgba(15,23,42,0.03)]"
+        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+          {compactProgressItems.map((item, index) => (
+            <div
+              key={item.id}
+              className={`dashboard-fade-up rounded-2xl border px-4 py-3 transition ${
+                item.state === "active"
+                  ? "border-[color:var(--brand-primary)]/30 bg-white shadow-[0_12px_24px_rgba(15,23,42,0.05)]"
+                  : item.state === "done"
+                    ? "border-slate-200/80 bg-white/72"
+                    : "border-slate-200/80 bg-white/48"
               }`}
-              style={staggerStyle(100 + index * 30)}
+              style={staggerStyle(100 + index * 20)}
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                {card.label}
-              </p>
-              <p className="mt-2 text-sm font-medium text-slate-900">{card.status}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
-              {card.actionLabel ? (
-                <div className="mt-3">
-                  <Link href={card.href} className={UTILITY_CTA_CLASS}>
-                    {card.actionLabel}
-                  </Link>
-                </div>
-              ) : null}
-            </article>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-slate-900">{item.label}</p>
+                <span
+                  className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                    item.state === "active"
+                      ? "bg-[color:var(--brand-primary)]"
+                      : item.state === "done"
+                        ? "bg-emerald-400"
+                        : "bg-slate-300"
+                  }`}
+                />
+              </div>
+              <p className="mt-2 text-xs uppercase tracking-[0.12em] text-slate-500">{item.detail}</p>
+            </div>
           ))}
         </div>
       </section>
 
       <section
         id="dashboard-block-active"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-8"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-6"
         style={staggerStyle(120)}
       >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <MatchingIcon className="h-4 w-4" />
-              </span>
-              Aktive Themen
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Operativer Überblick</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              {shouldPrioritizeInviteCta
-                ? "Sobald die Einladung raus ist, gehen Matching-Report und Workbook hier weiter."
-                : "Hier geht es weiter."}
-            </p>
-          </div>
-          {!shouldPrioritizeInviteCta ? (
-            <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-              Co-Founder einladen
-            </Link>
-          ) : null}
-        </div>
-
-        <div className="mt-6 space-y-5">
-          <article
-            id="dashboard-workbook-focus"
-            className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up scroll-mt-28 p-6 lg:p-7`}
-            style={staggerStyle(180)}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Nächster Schritt</p>
-                <h3 className="mt-2 text-xl font-semibold text-slate-950">Aktuelles Workbook</h3>
-              </div>
-              <span className="text-xs tracking-[0.08em] text-slate-500">
-                {primaryWorkbook ? "aktiv" : "noch offen"}
-              </span>
-            </div>
-            {primaryWorkbook ? (
-              <div className="mt-4">
-                <p className="font-medium text-slate-900">{primaryWorkbook.title}</p>
-                <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-                  {primaryWorkbook.hasStarted
-                    ? "Hier liegt euer aktueller Arbeitsstand."
-                    : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook."}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Letzte Aktivität: {formatDate(primaryWorkbook.updatedAt)}
-                </p>
-                <div className="mt-4">
-                  <Link href={primaryWorkbook.href} className={INVITE_CTA_CLASS}>
-                    {primaryWorkbook.hasStarted ? "Weiterarbeiten" : "Workbook starten"}
-                  </Link>
-                </div>
-                {secondaryWorkbooks.length > 0 ? (
-                  <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-                    <summary className="cursor-pointer text-sm font-medium text-slate-700">
-                      Weitere Workbooks ({secondaryWorkbooks.length})
-                    </summary>
-                    <ul className="mt-3 space-y-2">
-                      {secondaryWorkbooks.map((workbook) => (
-                        <li
-                          key={workbook.invitationId}
-                          className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2"
-                        >
-                          <div>
-                            <p className="text-sm font-medium text-slate-900">{workbook.title}</p>
-                            <p className="text-xs text-slate-500">
-                              Aktualisiert: {formatDate(workbook.updatedAt)}
-                            </p>
-                          </div>
-                          <Link href={workbook.href} className={REPORT_CTA_CLASS}>
-                            Öffnen
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : null}
-              </div>
-            ) : (
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
-                Sobald ein Matching-Report bereit ist, startet hier das Workbook.
+        <details>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+            <div>
+              <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+                  <MatchingIcon className="h-4 w-4" />
+                </span>
+                Team & Zusammenarbeit
               </p>
-            )}
-          </article>
-
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(210)}>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Bereite Matching-Reports</h3>
-              <span className="text-xs tracking-[0.08em] text-slate-500">{reportsWithoutWorkbook.length}</span>
+              <h2 className="mt-2 text-xl font-semibold text-slate-950">
+                Einladungen, Matching und Zusammenarbeit
+              </h2>
             </div>
-            <div className="mt-3 space-y-2">
-              {reportsWithoutWorkbook.length > 0 ? (
-                reportsWithoutWorkbook.map((run) => (
-                  <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                    {renderCompactReportRow(run)}
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm leading-7 text-slate-500">
-                  {readyReports.length > 0
-                    ? "Alle bereiten Matching-Reports sind bereits im Workbook angekommen."
-                    : "Sobald Matching-Reports bereit sind, erscheinen sie hier."}
-                </p>
-              )}
-            </div>
-          </article>
+            <span className="text-sm text-slate-500">Ausklappen</span>
+          </summary>
 
-          <article className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up p-5`} style={staggerStyle(240)}>
-            <div className="space-y-6">
-              {actionableIncomingInvites.length > 0 ? (
-                <section>
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-slate-900">Eingehende Einladungen</h3>
-                    <span className="text-xs tracking-[0.08em] text-slate-500">{actionableIncomingInvites.length}</span>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {actionableIncomingInvites.map((invite) => (
-                      <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                        {renderCompactIncomingInvitationRow(invite)}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : (
-                <section>
-                  <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-500">
-                    Aktuell braucht hier nichts deine Aufmerksamkeit.
+          <div className="mt-5 grid gap-4">
+            <article className={`${PRIMARY_SURFACE_CLASS} p-5`}>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900">Co-Founder einladen</h3>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    Starte oder begleite hier euren Matching-Prozess.
                   </p>
-                </section>
-              )}
+                </div>
+                <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+                  Co-Founder einladen
+                </Link>
+              </div>
+            </article>
 
-              <section className="border-t border-slate-200/80 pt-5">
-                <details>
-                  <summary className="cursor-pointer text-sm font-semibold text-slate-900">
-                    Gesendete Einladungen ({sentInvitesSorted.length})
-                  </summary>
-                  <div className="mt-3 space-y-2">
-                    {sentInvitesSorted.length > 0 ? (
-                      sentInvitesSorted.map((invite) => (
-                        <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                          {renderCompactSentInvitationRow(invite)}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm leading-7 text-slate-500">
-                        Noch keine gesendeten Einladungen.
-                      </p>
-                    )}
-                  </div>
-                </details>
-              </section>
-            </div>
-          </article>
-        </div>
+            <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
+                <span className="text-xs tracking-[0.08em] text-slate-500">
+                  {actionableIncomingInvites.length + sentInvitesSorted.length}
+                </span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {actionableIncomingInvites.length > 0 ? (
+                  actionableIncomingInvites.map((invite) => (
+                    <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      {renderCompactIncomingInvitationRow(invite)}
+                    </div>
+                  ))
+                ) : sentInvitesSorted.length > 0 ? (
+                  sentInvitesSorted.map((invite) => (
+                    <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      {renderCompactSentInvitationRow(invite)}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm leading-7 text-slate-500">Noch keine offenen Einladungen.</p>
+                )}
+              </div>
+            </article>
+
+            <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold text-slate-900">Matching Reports</h3>
+                <span className="text-xs tracking-[0.08em] text-slate-500">{readyReports.length}</span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {readyReports.length > 0 ? (
+                  readyReports.map((run) => (
+                    <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      {renderCompactReportRow(run)}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm leading-7 text-slate-500">
+                    Sobald Matching-Reports bereit sind, erscheinen sie hier.
+                  </p>
+                )}
+              </div>
+            </article>
+          </div>
+        </details>
       </section>
 
       <section
@@ -731,31 +616,29 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                 <CompassIcon className="h-4 w-4" />
               </span>
-              Profil & Report
+              Profil & Einstellungen
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">Profil pflegen, Report bei Bedarf vertiefen</h2>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">
+              Profil und Einstellungen an einer Stelle
+            </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Profil und Report bleiben hier bewusst nachgelagert.
+              Hier pflegst du deine Basisdaten und verwaltest deine Account-Einstellungen.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <section
-            id="dashboard-block-profile-data"
-            className={`${PRIMARY_SURFACE_CLASS} dashboard-fade-up p-6`}
-            style={staggerStyle(220)}
-          >
+        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+          <section id="dashboard-block-profile-data" className={`${PRIMARY_SURFACE_CLASS} p-6`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
                   <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                     <CompassIcon className="h-4 w-4" />
                   </span>
-                  Mein Profil
+                  Profil
                 </p>
                 <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                  {needsOnboarding ? "Lege zuerst deine Basisdaten an" : "Pflege deine Profildaten an einer Stelle"}
+                  {needsOnboarding ? "Lege zuerst deine Basisdaten an" : "Deine aktuellen Profildaten"}
                 </h3>
               </div>
               <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-[0.08em] text-slate-600">
@@ -768,11 +651,14 @@ export default async function DashboardPage({
               </div>
             </div>
 
-            <p className="mt-3 text-sm leading-7 text-slate-600">
-              {needsOnboarding
-                ? "Hier hinterlegst du deine Basisdaten."
-                : "Hier pflegst du Fokus, Rollen und Stammdaten."}
-            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {profileInfoRows.map((row) => (
+                <div key={row.label} className="rounded-xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{row.label}</p>
+                  <p className="mt-2 text-sm font-medium text-slate-900">{row.value}</p>
+                </div>
+              ))}
+            </div>
 
             <div className="mt-5">
               {needsOnboarding ? (
@@ -809,116 +695,43 @@ export default async function DashboardPage({
                 </details>
               )}
             </div>
-
-            <div
-              id="dashboard-block-account"
-              className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                Account & Zugang
-              </p>
-              <p className="mt-2 text-sm text-slate-700">{user.email ?? "E-Mail nicht verfügbar"}</p>
-              <p className="mt-1 text-xs leading-6 text-slate-500">
-                Weitere Account-Einstellungen docken hier später an. Für jetzt findest du hier deinen aktuellen Zugangspunkt.
-              </p>
-              <DeleteAccountSection />
-            </div>
           </section>
 
-          <div className="space-y-6">
-            {selfReport ? (
-              <article
-                className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up overflow-hidden bg-slate-50/78 p-6`}
-                style={staggerStyle(240)}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                        <ReportIcon className="h-4 w-4" />
-                      </span>
-                      Profil-Snapshot
-                    </p>
-                    <h3 className="mt-2 text-lg font-semibold text-slate-900">
-                      Dein aktuelles Founder-Profil
-                    </h3>
-                  </div>
-                  <Link href="/me/report" className={UTILITY_CTA_CLASS}>
-                    Report öffnen
-                  </Link>
-                </div>
-                <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Eine kompakte Einordnung deiner sechs Founder-Dimensionen.
-                </p>
-                <div className="mt-5">
-                  <FounderDimensionsOverview scores={selfReport.scoresA} />
-                </div>
-                <div className="mt-5 rounded-xl border border-slate-200/80 bg-white/70 px-4 py-3">
-                  <p className="text-sm text-slate-600">Detaillierte Einordnung findest du in deinem Report.</p>
-                </div>
-              </article>
-            ) : (
-              <article
-                className={`${SECONDARY_SURFACE_CLASS} dashboard-fade-up bg-slate-50/78 p-6`}
-                style={staggerStyle(240)}
-              >
-                <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                  <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                    <ReportIcon className="h-4 w-4" />
-                  </span>
-                  Profil-Snapshot
-                </p>
-                <h3 className="mt-2 text-lg font-semibold text-slate-900">
-                  Dein Founder-Profil entsteht mit dem Basisfragebogen
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Sobald du das Basisprofil ausfüllst, erscheinen hier deine Ergebnisdarstellung und der Einstieg in deinen individuellen Report.
-                </p>
-              </article>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="dashboard-block-modules"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-slate-50/62 p-5"
-        style={staggerStyle(140)}
-      >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+          <section id="dashboard-block-account" className={`${SECONDARY_SURFACE_CLASS} p-6`}>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
               <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <LayersIcon className="h-4 w-4" />
+                <ProfileIcon className="h-4 w-4" />
               </span>
-              Weitere Module
+              Einstellungen
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">Strukturell offen für den nächsten Ausbau</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Weitere Module docken später hier an.
-            </p>
-          </div>
-        </div>
+            <h3 className="mt-2 text-xl font-semibold text-slate-950">Account</h3>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
-            <p className="text-sm font-semibold text-slate-900">Re-Alignment</p>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              Für spätere Check-ins, neue Spannungen und veränderte Rollen nach den ersten Arbeitsphasen.
+            <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Aktuelle E-Mail</p>
+              <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? "E-Mail nicht verfügbar"}</p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail ändern")}`}
+                className={UTILITY_CTA_CLASS}
+              >
+                E-Mail ändern
+              </a>
+              <a
+                href={`mailto:${supportEmail}?subject=${encodeURIComponent("Passwort ändern")}`}
+                className={UTILITY_CTA_CLASS}
+              >
+                Passwort ändern
+              </a>
+            </div>
+
+            <p className="mt-3 text-xs leading-6 text-slate-500">
+              Für die aktuelle Produktphase laufen diese Änderungen noch direkt über den Support.
             </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
-            <p className="text-sm font-semibold text-slate-900">Entwicklung</p>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              Raum fuer vertiefende Module, Lernpfade und weitere naechste Schritte auf Basis von Report und Workbook.
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/70 bg-white/68 p-4">
-            <p className="text-sm font-semibold text-slate-900">Programme & Partner</p>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              Anschlussfähig für Accelerator-, Advisor- oder Investorenlogiken, ohne den Founder-Kernfluss zu zerreißen.
-            </p>
-          </article>
+
+            <DeleteAccountSection />
+          </section>
         </div>
       </section>
 
@@ -1183,16 +996,6 @@ function MatchingIcon({ className = "h-4 w-4" }: { className?: string }) {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 16.5L4.5 12.75 8.25 9" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 11.25H8.25m7.5 1.5H4.5" />
-    </svg>
-  );
-}
-
-function LayersIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5l8.25 4.5L12 13.5 3.75 9 12 4.5z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 12.75L12 16.5l6.75-3.75" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 16.5L12 20.25l6.75-3.75" />
     </svg>
   );
 }

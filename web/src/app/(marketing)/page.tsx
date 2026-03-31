@@ -9,14 +9,17 @@ const audiences = [
   {
     title: "Pre-Founder Matching",
     text: "Für Founder, die ernsthaft prüfen wollen, ob sie gemeinsam gründen sollten, bevor aus Sympathie schon ein Commitment wird.",
+    visual: "pre-founder" as const,
   },
   {
     title: "Bestehende Founder-Teams",
     text: "Für Teams, die bereits zusammenarbeiten und Rollen, Entscheidungsregeln oder Spannungen strukturierter klären wollen.",
+    visual: "existing-team" as const,
   },
   {
     title: "Begleitender Advisor-Kontext",
     text: "Für Advisors, Accelerators oder Investoren, die Gespräche sauber begleiten wollen, ohne das Founder-Team zu überfahren.",
+    visual: "advisor" as const,
   },
 ];
 
@@ -113,6 +116,7 @@ export default function Page() {
                 key={audience.title}
                 className="rounded-3xl border border-[color:var(--line)] bg-white/85 p-6 shadow-[var(--shadow)]"
               >
+                <AudienceAvatarVisual type={audience.visual} />
                 <h3 className="font-[var(--font-display)] text-lg tracking-[0.01em] text-[color:var(--ink)]">
                   {audience.title}
                 </h3>
@@ -388,6 +392,89 @@ export default function Page() {
           </p>
         </footer>
       </main>
+    </div>
+  );
+}
+
+function AudienceAvatarVisual({
+  type,
+}: {
+  type: "pre-founder" | "existing-team" | "advisor";
+}) {
+  if (type === "pre-founder") {
+    return (
+      <div className="mb-5 rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(255,255,255,0.9))] p-4">
+        <div className="relative flex h-24 items-center justify-center">
+          <div className="absolute inset-x-10 top-1/2 h-px -translate-y-1/2 bg-[color:var(--line)]" />
+          <div className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-200/90 bg-emerald-100/70 shadow-[0_0_0_8px_rgba(16,185,129,0.08)]" />
+          <div className="relative flex items-center justify-center">
+            <div className="translate-x-3">
+              <AudienceAvatar className="h-16 w-16" />
+            </div>
+            <div className="-ml-3">
+              <AudienceAvatar className="h-16 w-16" innerClassName="bg-slate-400/70" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "existing-team") {
+    return (
+      <div className="mb-5 rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(255,255,255,0.9))] p-4">
+        <div className="relative h-24 rounded-[20px] border border-slate-200/80 bg-white/80">
+          <div className="absolute inset-x-5 top-1/2 h-px -translate-y-1/2 bg-[color:var(--line)]" />
+          <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-200/85 bg-slate-50/95" />
+          <div className="absolute left-5 top-1/2 -translate-y-1/2">
+            <AudienceAvatar className="h-14 w-14" />
+          </div>
+          <div className="absolute right-5 top-1/2 -translate-y-1/2">
+            <AudienceAvatar className="h-14 w-14" innerClassName="bg-slate-400/70" />
+          </div>
+          <div className="absolute left-[30%] top-[35%] h-2 w-12 rounded-full bg-emerald-200/85" />
+          <div className="absolute right-[27%] top-[58%] h-2 w-10 rounded-full bg-amber-200/90" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-5 rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(255,255,255,0.9))] p-4">
+      <div className="relative h-24 rounded-[20px] bg-white/70">
+        <div className="absolute left-5 top-1/2 -translate-y-1/2">
+          <AudienceAvatar className="h-14 w-14" />
+        </div>
+        <div className="absolute left-[4.8rem] top-1/2 -translate-y-1/2">
+          <AudienceAvatar className="h-14 w-14" innerClassName="bg-slate-400/70" />
+        </div>
+        <div className="absolute right-5 top-4">
+          <AudienceAvatar className="h-11 w-11 border-[color:var(--brand-primary)]/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(235,244,255,0.94))]" innerClassName="bg-[color:var(--brand-primary)]/22" />
+        </div>
+        <div className="absolute left-[4.6rem] top-[44%] h-px w-14 bg-[color:var(--line)]" />
+        <div className="absolute right-[3.8rem] top-[39%] h-px w-10 bg-[color:var(--brand-primary)]/35" />
+      </div>
+    </div>
+  );
+}
+
+function AudienceAvatar({
+  className,
+  innerClassName,
+}: {
+  className: string;
+  innerClassName?: string;
+}) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-full border border-slate-200/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(241,245,249,0.92))] ${className}`}
+    >
+      <div className="absolute left-1/2 top-[24%] h-[28%] w-[28%] -translate-x-1/2 rounded-full bg-slate-400/55" />
+      <div
+        className={`absolute left-1/2 top-[52%] h-[36%] w-[54%] -translate-x-1/2 rounded-t-full bg-slate-300/85 ${
+          innerClassName ?? ""
+        }`}
+      />
     </div>
   );
 }
