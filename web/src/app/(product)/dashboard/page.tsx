@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
@@ -318,18 +319,21 @@ export default async function DashboardPage({
       label: "Basisprofil",
       state: hasSubmittedBase ? "done" : "active",
       detail: hasSubmittedBase ? "fertig" : "offen",
+      description: "Hier entsteht die Grundlage fuer dein Founder-Profil.",
     },
     {
       id: "values",
       label: "Werteprofil",
       state: hasSubmittedValues ? "done" : hasSubmittedBase ? "active" : "upcoming",
       detail: hasSubmittedValues ? "fertig" : valuesStatus === "in_progress" ? "in Arbeit" : "offen",
+      description: "Optionaler Deep-Dive zu Werten, Leitplanken und roten Linien.",
     },
     {
       id: "matching",
       label: "Matching",
       state: readyReports.length > 0 ? "done" : hasMatchingActivity ? "active" : "upcoming",
       detail: readyReports.length > 0 ? "fertig" : hasMatchingActivity ? "läuft" : "offen",
+      description: "Hier wird sichtbar, wo ihr zusammenpasst und wo Spannungen entstehen koennen.",
     },
     {
       id: "workbook",
@@ -346,6 +350,7 @@ export default async function DashboardPage({
           : workbookStatus === "Bereit"
             ? "bereit"
             : "offen",
+      description: "Hier haltet ihr eure gemeinsamen Absprachen fuer den Alltag fest.",
     },
   ] as const;
   const profileInfoRows = [
@@ -360,6 +365,11 @@ export default async function DashboardPage({
     },
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
+  const profileImageUrl =
+    (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
+    (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
+    null;
+  const quoteOfTheDay = getQuoteOfTheDay();
 
   const selfReportDebug = selfReport
     ? {
@@ -400,24 +410,56 @@ export default async function DashboardPage({
               style={staggerStyle(40)}
             >
               <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder-Dashboard</p>
-                <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
-                  Hallo, {displayName}.
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{heroCta.text}</p>
-                {heroExpectationText && heroCta.href === heroPrimaryAction.href ? (
-                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
-                    {heroExpectationText}
-                  </p>
-                ) : null}
-                <div className="mt-5">
-                  <Link
-                    href={heroCta.href}
-                    className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
-                  >
-                    {heroCta.label}
-                  </Link>
+                <div className="flex items-center gap-4">
+                  <DashboardProfileAvatar
+                    displayName={displayName}
+                    imageUrl={profileImageUrl}
+                  />
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder Dashboard</p>
+                    <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
+                      Schön, dass du da bist, {displayName}
+                    </h1>
+                  </div>
                 </div>
+
+                <article className="mt-5 overflow-hidden rounded-[24px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.08),rgba(255,255,255,0.95)_45%,rgba(124,58,237,0.05))] p-5 shadow-[0_12px_30px_rgba(15,23,42,0.035)]">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-white/80 text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">
+                      <QuoteIcon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Zitat des Tages</p>
+                      <p className="mt-3 max-w-2xl text-[15px] leading-7 text-slate-700">
+                        „{quoteOfTheDay.text}“
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/88 p-5 shadow-[0_12px_28px_rgba(15,23,42,0.035)]">
+                  <h2 className="text-xl font-semibold text-slate-950">Arbeite im Workbook weiter</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
+                    Hier liegt euer aktueller Arbeitsstand.
+                  </p>
+                  {heroExpectationText && heroCta.href === heroPrimaryAction.href ? (
+                    <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
+                      {heroExpectationText}
+                    </p>
+                  ) : null}
+                  <div className="mt-5">
+                    <Link
+                      href={heroCta.href}
+                      className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
+                    >
+                      Weiterarbeiten
+                    </Link>
+                  </div>
+
+                  <div className="mt-6">
+                    <DashboardProgressRoadmap items={compactProgressItems} />
+                  </div>
+                </article>
               </div>
 
               <article className={`${SECONDARY_SURFACE_CLASS} overflow-hidden p-5`}>
@@ -455,68 +497,7 @@ export default async function DashboardPage({
                 )}
               </article>
             </section>
-
-            <section
-              className="dashboard-fade-up mt-4 rounded-[20px] border border-slate-200/70 bg-slate-50/72 px-4 py-3"
-              style={staggerStyle(55)}
-            >
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
-                So nutzt ihr das Tool
-              </p>
-              <ol className="mt-2 grid gap-1 text-sm leading-6 text-slate-600 md:grid-cols-2 xl:grid-cols-4">
-                <li>1. Basisprofil</li>
-                <li>2. Optional Werteprofil</li>
-                <li>3. Matching-Report</li>
-                <li>4. Gemeinsames Workbook</li>
-              </ol>
-            </section>
           </div>
-        </div>
-      </section>
-
-      <section
-        id="dashboard-block-progress"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/70 bg-slate-50/72 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.03)] lg:p-6"
-        style={staggerStyle(80)}
-      >
-        <div>
-          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-            <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-              <ProfileIcon className="h-4 w-4" />
-            </span>
-            Fortschritt
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-slate-900">Dein Stand im Flow</h2>
-        </div>
-
-        <div className="mt-5 grid gap-3 lg:grid-cols-4">
-          {compactProgressItems.map((item, index) => (
-            <div
-              key={item.id}
-              className={`dashboard-fade-up rounded-2xl border px-4 py-3 transition ${
-                item.state === "active"
-                  ? "border-[color:var(--brand-primary)]/30 bg-white shadow-[0_12px_24px_rgba(15,23,42,0.05)]"
-                  : item.state === "done"
-                    ? "border-slate-200/80 bg-white/72"
-                    : "border-slate-200/80 bg-white/48"
-              }`}
-              style={staggerStyle(100 + index * 20)}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-slate-900">{item.label}</p>
-                <span
-                  className={`inline-flex h-2.5 w-2.5 rounded-full ${
-                    item.state === "active"
-                      ? "bg-[color:var(--brand-primary)]"
-                      : item.state === "done"
-                        ? "bg-emerald-400"
-                        : "bg-slate-300"
-                  }`}
-                />
-              </div>
-              <p className="mt-2 text-xs uppercase tracking-[0.12em] text-slate-500">{item.detail}</p>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -962,6 +943,121 @@ function formatScoreValue(value: number | null | undefined) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+const DASHBOARD_QUOTES = [
+  "Klarheit spart Gruenderteams spaeter deutlich mehr Kraft als Tempo am falschen Punkt.",
+  "Nicht jede Spannung ist ein Problem. Aber jede ungeklärte Spannung kostet Fokus.",
+  "Gute Founder-Teams wirken nicht reibungslos. Sie klaeren Reibung frueh.",
+  "Ein stabiles Team entsteht selten aus Gleichheit, sondern aus gut geklaerten Unterschieden.",
+  "Wenn zwei Founder dieselbe Richtung sehen, werden Entscheidungen leichter und Konflikte kleiner.",
+  "Manchmal ist der produktivste Fortschritt nicht mehr Tempo, sondern eine bessere Absprache.",
+] as const;
+
+function getQuoteOfTheDay() {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - startOfYear.getTime();
+  const dayOfYear = Math.floor(diff / 86_400_000);
+  return {
+    text: DASHBOARD_QUOTES[dayOfYear % DASHBOARD_QUOTES.length],
+  };
+}
+
+function DashboardProfileAvatar({
+  displayName,
+  imageUrl,
+}: {
+  displayName: string;
+  imageUrl: string | null;
+}) {
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("")
+    .slice(0, 2);
+
+  return imageUrl ? (
+    <Image
+      src={imageUrl}
+      alt={displayName}
+      width={64}
+      height={64}
+      className="h-16 w-16 rounded-[24px] border border-white/80 object-cover shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
+    />
+  ) : (
+    <div className="flex h-16 w-16 items-center justify-center rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
+      {initials || "F"}
+    </div>
+  );
+}
+
+function DashboardProgressRoadmap({
+  items,
+}: {
+  items: ReadonlyArray<{
+    id: string;
+    label: string;
+    state: "done" | "active" | "upcoming";
+    detail: string;
+    description: string;
+  }>;
+}) {
+  const activeIndex = Math.max(
+    items.findIndex((item) => item.state === "active"),
+    items.findLastIndex((item) => item.state === "done")
+  );
+  const fillPercent =
+    items.length > 1 && activeIndex >= 0 ? (activeIndex / (items.length - 1)) * 100 : 0;
+
+  return (
+    <div className="overflow-x-auto pb-1">
+      <div className="min-w-[720px] rounded-[24px] border border-slate-200/80 bg-slate-50/78 px-6 py-5">
+        <div className="relative">
+          <div className="absolute left-[48px] right-[48px] top-5 h-px bg-slate-200/90" />
+          <div
+            className="absolute left-[48px] top-5 h-px bg-[linear-gradient(90deg,rgba(148,163,184,0.18),rgba(34,211,238,0.8),rgba(34,211,238,0.32))] transition-all duration-500"
+            style={{ width: `calc((100% - 96px) * ${fillPercent / 100})` }}
+          />
+
+          <div className="relative grid grid-cols-4 gap-4">
+            {items.map((item, index) => {
+              const isDone = item.state === "done";
+              const isActive = item.state === "active";
+
+              return (
+                <div key={item.id} className="group text-center" title={item.description}>
+                  <div className="flex justify-center">
+                    <span
+                      className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
+                        isActive
+                          ? "h-12 w-12 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_12px_24px_rgba(34,211,238,0.14)]"
+                          : isDone
+                            ? "h-10 w-10 border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "h-10 w-10 border-slate-200 bg-white text-slate-400"
+                      }`}
+                    >
+                      {isDone ? <RoadmapCheckIcon className="h-4 w-4" /> : <span className="text-xs font-semibold">{index + 1}</span>}
+                    </span>
+                  </div>
+                  <div className="mt-4">
+                    <p className={`text-sm font-medium ${isActive ? "text-slate-950" : "text-slate-800"}`}>
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                      {item.detail}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProfileIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
@@ -996,6 +1092,23 @@ function MatchingIcon({ className = "h-4 w-4" }: { className?: string }) {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 16.5L4.5 12.75 8.25 9" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 11.25H8.25m7.5 1.5H4.5" />
+    </svg>
+  );
+}
+
+function QuoteIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.5 8.25H6.75A2.25 2.25 0 004.5 10.5v2.75A2.25 2.25 0 006.75 15.5H9a2 2 0 002-2v-3.25a2 2 0 00-2-2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 8.25h-2.75A2.25 2.25 0 0014 10.5v2.75a2.25 2.25 0 002.25 2.25h2.25a2 2 0 002-2v-3.25a2 2 0 00-2-2z" />
+    </svg>
+  );
+}
+
+function RoadmapCheckIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12.75l3.5 3.5 7-8" />
     </svg>
   );
 }

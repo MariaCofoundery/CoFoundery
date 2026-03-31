@@ -345,7 +345,7 @@ export function FounderAlignmentWorkbookClient({
   ]);
   const currentAgreementValue = workbook.steps[currentStep.id].agreement.trim();
   const currentStepHasAgreement = currentAgreementValue.length > 0;
-  const helperQuestion = currentStep.prompts[0] ?? "Welche gemeinsame Regel soll hier fuer euch gelten?";
+  const helperQuestion = currentStep.prompts[0] ?? "Welche gemeinsame Absprache soll hier fuer euch gelten?";
   const shortContext = currentStepContent.context.slice(0, 1);
   const helperDetails = currentStep.prompts.slice(1);
   const stepProgressMeta = useMemo(
@@ -1228,6 +1228,57 @@ export function FounderAlignmentWorkbookClient({
               </div>
             </StepSection>
 
+            {!currentStepIsAdvisorClosing ? (
+              <details
+                className="mt-8 rounded-[28px] border border-slate-200/70 bg-white p-5 sm:p-6"
+                open={helperOpenByStep[currentStep.id]}
+                onToggle={(event) =>
+                  setHelperOpenByStep((current) => ({
+                    ...current,
+                    [currentStep.id]: (event.currentTarget as HTMLDetailsElement).open,
+                  }))
+                }
+              >
+                <summary className="cursor-pointer text-base font-semibold text-slate-950">
+                  {t("Hilfestellung anzeigen")}
+                </summary>
+                <div className="mt-4 space-y-4">
+                  {currentStepContent.scenario ? (
+                    <div className="rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
+                        {t("Beispiel")}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-slate-700">
+                        {t(currentStepContent.scenario)}
+                      </p>
+                    </div>
+                  ) : null}
+                  {helperDetails.length > 0 ? (
+                    <ul className="grid gap-3">
+                      {helperDetails.map((prompt) => (
+                        <li
+                          key={prompt}
+                          className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
+                        >
+                          {t(prompt)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {currentStepContent.riskHint ? (
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
+                        {t("Worauf ihr achten solltet")}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-slate-700">
+                        {t(currentStepContent.riskHint)}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              </details>
+            ) : null}
+
             {currentStepIsAdvisorClosing ? (
               <StepSection
                 title="Abschlussimpulse der Moderation"
@@ -1451,15 +1502,15 @@ export function FounderAlignmentWorkbookClient({
                 </StepSection>
 
                 <StepSection
-                  title="4. Finale Regel"
+                  title="4. Finale Absprache"
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
                   <p className="text-sm leading-7 text-slate-700">
-                    {t("Hier haltet ihr eine gemeinsame Regel fest, auf die ihr spaeter direkt zurueckgreifen koennt.")}
+                    {t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")}
                   </p>
                   <div className="mt-6">
                     <WorkbookField
-                      title={t("Eure gemeinsame Regel")}
+                      title={t("Eure finale Absprache")}
                       value={workbook.steps[currentStep.id].agreement}
                       onChange={(value) => updateEntry("agreement", value)}
                       placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
@@ -1468,61 +1519,12 @@ export function FounderAlignmentWorkbookClient({
                       readOnly={!canEditField("agreement")}
                       helperText={
                         canEditField("agreement")
-                          ? t("Das ist das Ergebnis dieses Schritts.")
+                          ? t("Das ist das gemeinsame Ergebnis dieses Schritts.")
                           : getFieldReadOnlyHint("agreement")
                       }
                     />
                   </div>
                 </StepSection>
-
-                <details
-                  className="mt-8 rounded-[28px] border border-slate-200/70 bg-white p-5 sm:p-6"
-                  open={helperOpenByStep[currentStep.id]}
-                  onToggle={(event) =>
-                    setHelperOpenByStep((current) => ({
-                      ...current,
-                      [currentStep.id]: (event.currentTarget as HTMLDetailsElement).open,
-                    }))
-                  }
-                >
-                  <summary className="cursor-pointer text-base font-semibold text-slate-950">
-                    {t("Hilfestellung anzeigen")}
-                  </summary>
-                  <div className="mt-4 space-y-4">
-                    {currentStepContent.scenario ? (
-                      <div className="rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-4">
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                          {t("Beispiel")}
-                        </p>
-                        <p className="mt-2 text-sm leading-7 text-slate-700">
-                          {t(currentStepContent.scenario)}
-                        </p>
-                      </div>
-                    ) : null}
-                    {helperDetails.length > 0 ? (
-                      <ul className="grid gap-3">
-                        {helperDetails.map((prompt) => (
-                          <li
-                            key={prompt}
-                            className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
-                          >
-                            {t(prompt)}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    {currentStepContent.riskHint ? (
-                      <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
-                          {t("Worauf ihr achten solltet")}
-                        </p>
-                        <p className="mt-2 text-sm leading-7 text-slate-700">
-                          {t(currentStepContent.riskHint)}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                </details>
 
                 {showAdvisorNotesSection ? (
                   <details className="mt-8 rounded-[28px] border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5 sm:p-6">
@@ -1532,7 +1534,7 @@ export function FounderAlignmentWorkbookClient({
                     <div className="mt-4">
                       <p className="text-sm leading-7 text-slate-700">
                         {t(
-                          "Hier ist Platz fuer eine neutrale Beobachtung oder Rueckfrage. Eure gemeinsame Regel bleibt davon getrennt."
+                          "Hier ist Platz fuer eine neutrale Beobachtung oder Rueckfrage. Eure gemeinsame Absprache bleibt davon getrennt."
                         )}
                       </p>
                       <div className="mt-6">
@@ -1559,8 +1561,8 @@ export function FounderAlignmentWorkbookClient({
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {currentStepHasAgreement
-                      ? t("Guter Fortschritt. Die Regel fuer diesen Schritt steht.")
-                      : t("Haltet jetzt noch eure Regel fest. Dann geht ihr in den naechsten Schritt.")}
+                      ? t("Guter Fortschritt. Die Absprache fuer diesen Schritt steht.")
+                      : t("Haltet jetzt noch eure finale Absprache fest. Dann geht ihr in den naechsten Schritt.")}
                   </p>
                 </div>
                 <span
@@ -2161,23 +2163,23 @@ function buildAgreementDraft({
             ? `Beide Antworten ziehen in dieselbe Richtung, vor allem bei ${joinWithUnd(
                 sharedThemes.slice(0, 2)
               )}.`
-            : "Beide Antworten klingen aehnlich und lassen sich gut in eine gemeinsame Regel uebersetzen."
+            : "Beide Antworten klingen aehnlich und lassen sich gut in eine gemeinsame Absprache uebersetzen."
           : state === "different"
             ? differingThemes.length > 0
               ? `Der Unterschied liegt vor allem bei ${joinWithUnd(
                   differingThemes.slice(0, 2)
-                )}. Genau dafuer braucht ihr jetzt eine klare Regel.`
-              : "Ihr setzt bei derselben Situation unterschiedliche Schwerpunkte. Genau dafuer braucht ihr jetzt eine klare Regel."
+                )}. Genau dafuer braucht ihr jetzt eine klare Absprache.`
+              : "Ihr setzt bei derselben Situation unterschiedliche Schwerpunkte. Genau dafuer braucht ihr jetzt eine klare Absprache."
             : "Aus euren Antworten ist noch nicht klar genug, wer was entscheidet oder was im Zweifel gilt."
         : null,
     suggestionTitle:
       sourceMode === "joint"
-        ? "Vorschlag fuer eure gemeinsame Regel"
-        : "Moegliche Regel auf Basis deiner Antwort",
+        ? "Vorschlag fuer eure gemeinsame Absprache"
+        : "Moegliche Absprache auf Basis deiner Antwort",
     suggestionIntro:
       sourceMode === "joint"
-        ? "So koennte eure Regel lauten:"
-        : "So koennte eure erste Regel lauten:",
+        ? "So koennte eure Absprache lauten:"
+        : "So koennte eure erste Absprache lauten:",
   };
 }
 
