@@ -400,7 +400,9 @@ export default async function DashboardPage({
     },
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
-  const profileAvatarId = profileData?.avatar_id?.trim() || null;
+  const sessionAvatarId =
+    (typeof user.user_metadata?.avatar_id === "string" && user.user_metadata.avatar_id.trim()) || null;
+  const profileAvatarId = profileData?.avatar_id?.trim() || sessionAvatarId || null;
   const profileImageUrl = profileAvatarId
     ? null
     : (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||

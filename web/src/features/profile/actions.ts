@@ -87,6 +87,16 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     redirect(withError(errorRedirectTo, error.message ?? "profile_save_failed"));
   }
 
+  const { error: authMetadataError } = await supabase.auth.updateUser({
+    data: {
+      avatar_id: avatarId,
+    },
+  });
+
+  if (authMetadataError) {
+    redirect(withError(errorRedirectTo, authMetadataError.message ?? "profile_avatar_sync_failed"));
+  }
+
   revalidatePath("/dashboard");
   revalidatePath("/founder-alignment/workbook");
   revalidatePath(successRedirectTo);
