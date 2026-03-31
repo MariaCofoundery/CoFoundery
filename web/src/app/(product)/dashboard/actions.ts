@@ -259,6 +259,12 @@ export async function signOutAction() {
   redirect("/login");
 }
 
+export async function signOutAllSessionsAction() {
+  const supabase = await createClient();
+  await supabase.auth.signOut({ scope: "global" });
+  redirect("/login");
+}
+
 export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountActionResult> {
   const supabase = await createClient();
   const {

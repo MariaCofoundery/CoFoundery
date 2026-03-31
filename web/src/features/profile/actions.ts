@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { upsertProfileBasicsRow } from "@/features/profile/profileData";
+import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 
@@ -44,6 +45,10 @@ function parseRoles(formData: FormData) {
   return normalizeProfileRoles(formData.getAll("roles"));
 }
 
+function parseAvatarId(value: FormDataEntryValue | null) {
+  return normalizeAvatarId(typeof value === "string" ? value : null);
+}
+
 export async function upsertProfileBasicsAction(formData: FormData) {
   const successRedirectTo = normalizeRedirectTarget(formData.get("onSuccessRedirectTo"), "/dashboard");
   const errorRedirectTo = normalizeRedirectTarget(formData.get("onErrorRedirectTo"), successRedirectTo);
@@ -61,6 +66,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   const focusSkill = parseFocusSkill(formData.get("focusSkill"));
   const intention = parseIntention(formData.get("intention"));
   const roles = parseRoles(formData);
+  const avatarId = parseAvatarId(formData.get("avatarId"));
 
   if (!displayName || !focusSkill || !intention) {
     redirect(withError(errorRedirectTo, "profile_basics_incomplete"));
@@ -72,6 +78,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     focus_skill: focusSkill,
     intention,
     roles,
+    avatar_id: avatarId,
     updated_at: new Date().toISOString(),
   });
 

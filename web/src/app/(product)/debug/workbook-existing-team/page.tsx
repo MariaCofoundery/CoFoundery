@@ -46,6 +46,8 @@ export default async function WorkbookExistingTeamPreviewPage({
         teamContext={preview.teamContext}
         founderAName={preview.founderAName}
         founderBName={preview.founderBName}
+        founderAAvatarId="avatar-04"
+        founderBAvatarId="avatar-17"
         currentUserRole={preview.currentUserRole}
         initialWorkbook={preview.initialWorkbook}
         highlights={preview.highlights}

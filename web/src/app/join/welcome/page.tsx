@@ -25,6 +25,7 @@ type ProfileRow = {
   display_name: string | null;
   focus_skill: string | null;
   intention: string | null;
+  avatar_id: string | null;
 };
 
 type SubmittedAssessmentRow = {
@@ -226,7 +227,7 @@ export default async function JoinWelcomePage({
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("display_name, focus_skill, intention")
+    .select("display_name, focus_skill, intention, avatar_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -290,6 +291,7 @@ export default async function JoinWelcomePage({
                 display_name: profile?.display_name ?? null,
                 focus_skill: profile?.focus_skill ?? null,
                 intention: profile?.intention ?? null,
+                avatar_id: profile?.avatar_id ?? null,
               }}
               submitLabel="Weiter zum Fragebogen"
               onSuccessRedirectTo={nextStepUrl}

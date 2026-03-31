@@ -11,6 +11,7 @@ import {
   useTransition,
 } from "react";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import {
   prepareFounderAlignmentAdvisorInvite,
   saveFounderAlignmentWorkbook,
@@ -41,6 +42,8 @@ type FounderAlignmentWorkbookClientProps = {
   teamContext: TeamContext;
   founderAName: string | null;
   founderBName: string | null;
+  founderAAvatarId: string | null;
+  founderBAvatarId: string | null;
   currentUserRole: FounderAlignmentWorkbookViewerRole;
   initialWorkbook: FounderAlignmentWorkbookPayload;
   highlights: FounderAlignmentWorkbookHighlights;
@@ -256,6 +259,8 @@ export function FounderAlignmentWorkbookClient({
   teamContext,
   founderAName,
   founderBName,
+  founderAAvatarId,
+  founderBAvatarId,
   currentUserRole,
   initialWorkbook,
   highlights,
@@ -1443,6 +1448,8 @@ export function FounderAlignmentWorkbookClient({
                   <div className="mt-6 grid gap-6 xl:grid-cols-2">
                     <WorkbookField
                       title={founderALabel}
+                      showAvatar
+                      avatarId={founderAAvatarId}
                       value={workbook.steps[currentStep.id].founderA}
                       onChange={(value) => updateEntry("founderA", value)}
                       placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
@@ -1451,6 +1458,8 @@ export function FounderAlignmentWorkbookClient({
                     />
                     <WorkbookField
                       title={founderBLabel}
+                      showAvatar
+                      avatarId={founderBAvatarId}
                       value={workbook.steps[currentStep.id].founderB}
                       onChange={(value) => updateEntry("founderB", value)}
                       placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
@@ -1659,6 +1668,8 @@ function AdvisorApprovalRow({
 
 function WorkbookField({
   title,
+  avatarId = null,
+  showAvatar = false,
   value,
   onChange,
   placeholder,
@@ -1668,6 +1679,8 @@ function WorkbookField({
   focusSignal = 0,
 }: {
   title: string;
+  avatarId?: string | null;
+  showAvatar?: boolean;
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
@@ -1855,13 +1868,24 @@ function WorkbookField({
       } ${readOnly ? "cursor-not-allowed" : "hover:-translate-y-0.5"}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="flex min-w-0 items-center gap-3">
+          {showAvatar ? (
+            <ProfileAvatar
+              displayName={title}
+              avatarId={avatarId}
+              className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200/80 object-cover shadow-[0_8px_16px_rgba(15,23,42,0.06)]"
+              fallbackClassName="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.12),rgba(255,255,255,0.94)_48%,rgba(124,58,237,0.06))] text-sm font-semibold text-slate-700 shadow-[0_8px_16px_rgba(15,23,42,0.05)]"
+            />
+          ) : null}
+
+          <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm font-semibold text-slate-900">{t(title)}</p>
             {readOnly ? (
               <span className="text-xs text-slate-400">{t("Nur lesbar")}</span>
             ) : null}
           </div>
+        </div>
         </div>
 
         <button

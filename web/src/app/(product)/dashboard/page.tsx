@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
@@ -6,6 +5,8 @@ import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroCo
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
 import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { signOutAllSessionsAction } from "@/app/(product)/dashboard/actions";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
@@ -365,6 +366,7 @@ export default async function DashboardPage({
     },
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
+  const profileAvatarId = profileData?.avatar_id ?? null;
   const profileImageUrl =
     (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
     (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
@@ -413,6 +415,7 @@ export default async function DashboardPage({
                 <div className="flex items-center gap-4">
                   <DashboardProfileAvatar
                     displayName={displayName}
+                    avatarId={profileAvatarId}
                     imageUrl={profileImageUrl}
                   />
                   <div>
@@ -650,10 +653,12 @@ export default async function DashboardPage({
                     focus_skill: profileData?.focus_skill ?? null,
                     intention: profileData?.intention ?? null,
                     roles: profileData?.roles ?? null,
+                    avatar_id: profileData?.avatar_id ?? null,
                   }}
                   submitLabel="Profil speichern"
                   onSuccessRedirectTo="/dashboard"
                   variant="accent"
+                  fallbackAvatarUrl={profileImageUrl}
                 />
               ) : (
                 <details className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
@@ -668,9 +673,11 @@ export default async function DashboardPage({
                         focus_skill: profileData?.focus_skill ?? null,
                         intention: profileData?.intention ?? null,
                         roles: profileData?.roles ?? null,
+                        avatar_id: profileData?.avatar_id ?? null,
                       }}
                       submitLabel="Profil aktualisieren"
                       onSuccessRedirectTo="/dashboard"
+                      fallbackAvatarUrl={profileImageUrl}
                     />
                   </div>
                 </details>
@@ -685,31 +692,40 @@ export default async function DashboardPage({
               </span>
               Einstellungen
             </p>
-            <h3 className="mt-2 text-xl font-semibold text-slate-950">Account</h3>
+            <h3 className="mt-2 text-xl font-semibold text-slate-950">Zugang &amp; Sicherheit</h3>
 
-            <div className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Aktuelle E-Mail</p>
-              <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? "E-Mail nicht verfügbar"}</p>
+            <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/92 p-5">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">E-Mail-Adresse</p>
+              <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">
+                    {user.email ?? "E-Mail nicht verfügbar"}
+                  </p>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.
+                  </p>
+                  <p className="mt-2 text-xs leading-6 text-slate-500">
+                    Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit
+                    Zwei-Faktor-Authentifizierung.
+                  </p>
+                </div>
+
+                <a
+                  href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail-Adresse ändern")}`}
+                  className={`${UTILITY_CTA_CLASS} shrink-0`}
+                >
+                  E-Mail-Adresse ändern
+                </a>
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
-              <a
-                href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail ändern")}`}
-                className={UTILITY_CTA_CLASS}
-              >
-                E-Mail ändern
-              </a>
-              <a
-                href={`mailto:${supportEmail}?subject=${encodeURIComponent("Passwort ändern")}`}
-                className={UTILITY_CTA_CLASS}
-              >
-                Passwort ändern
-              </a>
+              <form action={signOutAllSessionsAction}>
+                <button type="submit" className={UTILITY_CTA_CLASS}>
+                  Alle Sitzungen beenden
+                </button>
+              </form>
             </div>
-
-            <p className="mt-3 text-xs leading-6 text-slate-500">
-              Für die aktuelle Produktphase laufen diese Änderungen noch direkt über den Support.
-            </p>
 
             <DeleteAccountSection />
           </section>
@@ -964,31 +980,21 @@ function getQuoteOfTheDay() {
 
 function DashboardProfileAvatar({
   displayName,
+  avatarId,
   imageUrl,
 }: {
   displayName: string;
+  avatarId: string | null;
   imageUrl: string | null;
 }) {
-  const initials = displayName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("")
-    .slice(0, 2);
-
-  return imageUrl ? (
-    <Image
-      src={imageUrl}
-      alt={displayName}
-      width={64}
-      height={64}
+  return (
+    <ProfileAvatar
+      displayName={displayName}
+      avatarId={avatarId}
+      imageUrl={imageUrl}
       className="h-16 w-16 rounded-[24px] border border-white/80 object-cover shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
+      fallbackClassName="flex h-16 w-16 items-center justify-center rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]"
     />
-  ) : (
-    <div className="flex h-16 w-16 items-center justify-center rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
-      {initials || "F"}
-    </div>
   );
 }
 
@@ -1011,48 +1017,101 @@ function DashboardProgressRoadmap({
     items.length > 1 && activeIndex >= 0 ? (activeIndex / (items.length - 1)) * 100 : 0;
 
   return (
-    <div className="overflow-x-auto pb-1">
-      <div className="min-w-[720px] rounded-[24px] border border-slate-200/80 bg-slate-50/78 px-6 py-5">
-        <div className="relative">
-          <div className="absolute left-[48px] right-[48px] top-5 h-px bg-slate-200/90" />
-          <div
-            className="absolute left-[48px] top-5 h-px bg-[linear-gradient(90deg,rgba(148,163,184,0.18),rgba(34,211,238,0.8),rgba(34,211,238,0.32))] transition-all duration-500"
-            style={{ width: `calc((100% - 96px) * ${fillPercent / 100})` }}
-          />
+    <div className="rounded-[24px] border border-slate-200/80 bg-slate-50/78 px-3.5 py-4 sm:px-4 sm:py-[1.125rem] lg:px-5">
+      <div className="relative hidden md:block">
+        <div className="absolute left-[34px] right-[34px] top-4 h-px bg-slate-200/90" />
+        <div
+          className="absolute left-[34px] top-4 h-px bg-[linear-gradient(90deg,rgba(148,163,184,0.16),rgba(34,211,238,0.72),rgba(34,211,238,0.28))] transition-all duration-500"
+          style={{ width: `calc((100% - 68px) * ${fillPercent / 100})` }}
+        />
 
-          <div className="relative grid grid-cols-4 gap-4">
-            {items.map((item, index) => {
-              const isDone = item.state === "done";
-              const isActive = item.state === "active";
+        <div className="relative grid grid-cols-4 gap-2.5 lg:gap-3">
+          {items.map((item, index) => {
+            const isDone = item.state === "done";
+            const isActive = item.state === "active";
 
-              return (
-                <div key={item.id} className="group text-center" title={item.description}>
-                  <div className="flex justify-center">
-                    <span
-                      className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
-                        isActive
-                          ? "h-12 w-12 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_12px_24px_rgba(34,211,238,0.14)]"
-                          : isDone
-                            ? "h-10 w-10 border-emerald-200 bg-emerald-50 text-emerald-700"
-                            : "h-10 w-10 border-slate-200 bg-white text-slate-400"
-                      }`}
-                    >
-                      {isDone ? <RoadmapCheckIcon className="h-4 w-4" /> : <span className="text-xs font-semibold">{index + 1}</span>}
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <p className={`text-sm font-medium ${isActive ? "text-slate-950" : "text-slate-800"}`}>
-                      {item.label}
-                    </p>
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                      {item.detail}
-                    </p>
-                  </div>
+            return (
+              <div key={item.id} className="group text-center" title={item.description}>
+                <div className="flex justify-center">
+                  <span
+                    className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
+                      isActive
+                        ? "h-9 w-9 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_10px_20px_rgba(34,211,238,0.12)]"
+                        : isDone
+                          ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "h-8 w-8 border-slate-200 bg-white text-slate-400"
+                    }`}
+                  >
+                    {isDone ? (
+                      <RoadmapCheckIcon className="h-3.5 w-3.5" />
+                    ) : (
+                      <span className="text-[10px] font-semibold">{index + 1}</span>
+                    )}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
+                <div className="mt-3 px-1">
+                  <p
+                    className={`text-[12px] font-medium leading-5 lg:text-[13px] ${
+                      isActive ? "text-slate-950" : "text-slate-800"
+                    }`}
+                  >
+                    {item.label}
+                  </p>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">
+                    {item.detail}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5 md:hidden">
+        {items.map((item, index) => {
+          const isDone = item.state === "done";
+          const isActive = item.state === "active";
+
+          return (
+            <div
+              key={item.id}
+              title={item.description}
+              className={`rounded-2xl border px-3 py-3 ${
+                isActive
+                  ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10"
+                  : isDone
+                    ? "border-slate-200/80 bg-white/88"
+                    : "border-slate-200/80 bg-white/72"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <span
+                  className={`flex shrink-0 items-center justify-center rounded-full border ${
+                    isActive
+                      ? "h-[2.125rem] w-[2.125rem] border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900"
+                      : isDone
+                        ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "h-8 w-8 border-slate-200 bg-white text-slate-400"
+                  }`}
+                >
+                  {isDone ? (
+                    <RoadmapCheckIcon className="h-3.5 w-3.5" />
+                  ) : (
+                    <span className="text-[10px] font-semibold">{index + 1}</span>
+                  )}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[12px] font-medium leading-5 text-slate-900 sm:text-[13px]">
+                    {item.label}
+                  </p>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">
+                    {item.detail}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

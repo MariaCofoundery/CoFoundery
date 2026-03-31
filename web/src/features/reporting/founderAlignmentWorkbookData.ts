@@ -56,6 +56,7 @@ function parseStoredTeamContext(value: string | null | undefined): TeamContext |
 type ProfileRow = {
   user_id: string;
   display_name: string | null;
+  avatar_id: string | null;
 };
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -85,6 +86,8 @@ export type FounderAlignmentWorkbookPageData =
       teamContext: TeamContext;
       founderAName: string | null;
       founderBName: string | null;
+      founderAAvatarId: string | null;
+      founderBAvatarId: string | null;
       currentUserRole: FounderAlignmentWorkbookViewerRole;
       report: FounderAlignmentReport;
       scoringResult: TeamScoringResult;
@@ -162,6 +165,8 @@ async function loadFounderContextWithClient(
 ): Promise<{
   founderAName: string | null;
   founderBName: string | null;
+  founderAAvatarId: string | null;
+  founderBAvatarId: string | null;
   founderAUserId: string | null;
   founderBUserId: string | null;
   teamContext: TeamContext | null;
@@ -177,6 +182,8 @@ async function loadFounderContextWithClient(
     return {
       founderAName: null,
       founderBName: null,
+      founderAAvatarId: null,
+      founderBAvatarId: null,
       founderAUserId: typedInvitation?.inviter_user_id ?? null,
       founderBUserId: typedInvitation?.invitee_user_id ?? null,
       teamContext: parseStoredTeamContext(typedInvitation?.team_context),
@@ -185,16 +192,24 @@ async function loadFounderContextWithClient(
 
   const { data: profileRows } = await supabase
     .from("profiles")
-    .select("user_id, display_name")
+    .select("user_id, display_name, avatar_id")
     .in("user_id", [typedInvitation.inviter_user_id, typedInvitation.invitee_user_id]);
 
   const profileByUserId = new Map(
-    ((profileRows ?? []) as ProfileRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+    ((profileRows ?? []) as ProfileRow[]).map((row) => [
+      row.user_id,
+      {
+        displayName: row.display_name?.trim() ?? "",
+        avatarId: row.avatar_id?.trim() ?? "",
+      },
+    ])
   );
 
   return {
-    founderAName: profileByUserId.get(typedInvitation.inviter_user_id)?.trim() || null,
-    founderBName: profileByUserId.get(typedInvitation.invitee_user_id)?.trim() || null,
+    founderAName: profileByUserId.get(typedInvitation.inviter_user_id)?.displayName || null,
+    founderBName: profileByUserId.get(typedInvitation.invitee_user_id)?.displayName || null,
+    founderAAvatarId: profileByUserId.get(typedInvitation.inviter_user_id)?.avatarId || null,
+    founderBAvatarId: profileByUserId.get(typedInvitation.invitee_user_id)?.avatarId || null,
     founderAUserId: typedInvitation.inviter_user_id,
     founderBUserId: typedInvitation.invitee_user_id,
     teamContext: parseStoredTeamContext(typedInvitation.team_context),
@@ -264,6 +279,8 @@ export async function getFounderAlignmentWorkbookPageData(
       teamContext,
       founderAName: "Maria Keller",
       founderBName: "Lukas Brandt",
+      founderAAvatarId: "avatar-04",
+      founderBAvatarId: "avatar-17",
       currentUserRole: "founderA",
       report,
       scoringResult,
@@ -375,6 +392,8 @@ export async function getFounderAlignmentWorkbookPageData(
     teamContext: effectiveTeamContext,
     founderAName: founderContext.founderAName ?? reportSnapshot?.report?.participantAName ?? null,
     founderBName: founderContext.founderBName ?? reportSnapshot?.report?.participantBName ?? null,
+    founderAAvatarId: founderContext.founderAAvatarId,
+    founderBAvatarId: founderContext.founderBAvatarId,
     currentUserRole,
     report,
     scoringResult,

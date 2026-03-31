@@ -118,6 +118,8 @@ export default async function FounderAlignmentWorkbookPage({
           teamContext={data.teamContext}
           founderAName={data.founderAName}
           founderBName={data.founderBName}
+          founderAAvatarId={data.founderAAvatarId}
+          founderBAvatarId={data.founderBAvatarId}
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}
@@ -137,6 +139,8 @@ export default async function FounderAlignmentWorkbookPage({
           teamContext={data.teamContext}
           founderAName={data.founderAName}
           founderBName={data.founderBName}
+          founderAAvatarId={data.founderAAvatarId}
+          founderBAvatarId={data.founderBAvatarId}
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}

@@ -134,11 +134,13 @@ export default async function FounderAlignmentPreviewPage({
             />
           </div>
           <FounderAlignmentWorkbookClient
-            invitationId={null}
-            teamContext={workbookPreview.teamContext}
-            founderAName={workbookPreview.founderAName}
-            founderBName={workbookPreview.founderBName}
-            currentUserRole={workbookPreview.currentUserRole}
+          invitationId={null}
+          teamContext={workbookPreview.teamContext}
+          founderAName={workbookPreview.founderAName}
+          founderBName={workbookPreview.founderBName}
+          founderAAvatarId="avatar-04"
+          founderBAvatarId="avatar-17"
+          currentUserRole={workbookPreview.currentUserRole}
             initialWorkbook={workbookPreview.initialWorkbook}
             highlights={workbookPreview.highlights}
             advisorInvite={workbookPreview.advisorInvite}
