@@ -234,61 +234,85 @@ export function getWorkbookPreviewState(
     workbook.advisorName = "Theresa Vogt";
     workbook.advisorId = "debug-advisor";
     workbook.steps.vision_direction = {
+      mode: "collaborative",
       founderA: "We want to prioritize product validation before aggressive fundraising.",
       founderB: "I agree with product validation first, but I believe we should still keep investor conversations open early.",
       agreement:
         "For the next six months we prioritize product-market fit. Investor conversations are exploratory only.",
+      founderAApproved: true,
+      founderBApproved: true,
       advisorNotes: "Clarify who decides when fundraising becomes active.",
     };
     workbook.steps.roles_responsibility = {
+      mode: "collaborative",
       founderA: "I want product and user discovery to stay clearly with me until we have a stable rhythm.",
       founderB: "I can own operations and early commercial structure, but I want visibility into major product bets.",
       agreement:
         "Product discovery stays with Founder A, operations and commercial setup with Founder B. Strategic role changes are discussed explicitly once per month.",
+      founderAApproved: true,
+      founderBApproved: false,
       advisorNotes: "Make the monthly role-check concrete and time-boxed.",
     };
     workbook.steps.values_guardrails = {
+      mode: "collaborative",
       founderA: "I do not want investor pressure to push us into promises we cannot deliver to early customers.",
       founderB: "I can handle exploratory investor conversations early, but I do not want growth pressure to reshape our product roadmap too soon.",
       agreement:
         "We keep investor outreach exploratory until product-market fit signals are stable. External pressure does not override customer trust or roadmap discipline.",
+      founderAApproved: false,
+      founderBApproved: false,
       advisorNotes: "Define the signal that turns exploratory fundraising into an active process.",
     };
   } else if (mode === "existing_team") {
     workbook.steps.decision_rules = {
+      mode: "collaborative",
       founderA: "I tend to make quick product decisions during development cycles.",
       founderB: "I prefer we validate with the team before final product decisions.",
       agreement:
         "Product direction decisions are discussed in the weekly founder meeting. Urgent tactical decisions can be made by the product lead.",
+      founderAApproved: true,
+      founderBApproved: true,
       advisorNotes: "",
     };
     workbook.steps.roles_responsibility = {
+      mode: "collaborative",
       founderA: "I already own product and engineering, but major roadmap shifts still create ambiguity.",
       founderB: "I lead sales and financing topics, but I need clearer visibility when product choices affect commitments to customers.",
       agreement:
         "Product and engineering stay with Founder A, sales and financing with Founder B. Decisions that affect delivery promises or revenue targets are synced before they go live.",
+      founderAApproved: false,
+      founderBApproved: false,
       advisorNotes: "",
     };
     workbook.steps.collaboration_conflict = {
+      mode: "solo",
       founderA: "In operational sprints I need less ad-hoc escalation and more structured check-ins.",
       founderB: "I need issues raised quickly because operational delays usually surface first in customer conversations.",
       agreement:
         "Operational tensions are raised in the daily founder sync. If something blocks customer commitments, it is escalated immediately with a proposed next step.",
+      founderAApproved: false,
+      founderBApproved: false,
       advisorNotes: "",
     };
   } else {
     workbook.steps.roles_responsibility = {
+      mode: "solo",
       founderA: "I would like us to keep product and customer discovery close to one person at the start.",
       founderB: "I want shared visibility on the big bets, even if execution ownership is distributed.",
       agreement:
         "Execution ownership can sit with one person, but strategic shifts are discussed together before commitments are made.",
+      founderAApproved: false,
+      founderBApproved: false,
       advisorNotes: "",
     };
     workbook.steps.decision_rules = {
+      mode: "solo",
       founderA: "I prefer fast tests and would rather correct quickly than wait for perfect certainty.",
       founderB: "I am comfortable moving fast if we define which decisions need a stronger data check first.",
       agreement:
         "Fast experiments are encouraged. Decisions with financial, hiring or brand impact require one extra checkpoint before they are finalized.",
+      founderAApproved: false,
+      founderBApproved: false,
       advisorNotes: "",
     };
   }

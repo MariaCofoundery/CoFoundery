@@ -18,10 +18,54 @@ export const WORKBOOK_STEP_IDS = [
 
 export type FounderAlignmentWorkbookStepId = (typeof WORKBOOK_STEP_IDS)[number];
 
+export type FounderAlignmentWorkbookStepMode = "solo" | "collaborative";
+export type FounderAlignmentWorkbookStepStatus =
+  | "collecting_inputs"
+  | "draft_ready"
+  | "awaiting_approval"
+  | "finalized";
+
+export type FounderAlignmentWorkbookStepField =
+  | "mode"
+  | "founderA"
+  | "founderB"
+  | "agreement"
+  | "founderAApproved"
+  | "founderBApproved"
+  | "advisorNotes";
+
+export type FounderAlignmentWorkbookRootField = "currentStepId" | "advisorFollowUp";
+
+export type FounderAlignmentWorkbookPatch =
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: FounderAlignmentWorkbookStepField;
+      value: string | boolean;
+    }
+  | {
+      scope: "root";
+      field: FounderAlignmentWorkbookRootField;
+      value: string;
+    }
+  | {
+      scope: "advisorClosing";
+      field: keyof FounderAlignmentWorkbookAdvisorClosing;
+      value: string;
+    }
+  | {
+      scope: "founderReaction";
+      field: "status" | "comment";
+      value: FounderAlignmentWorkbookFounderReactionStatus | string;
+    };
+
 export type FounderAlignmentWorkbookEntry = {
+  mode: FounderAlignmentWorkbookStepMode;
   founderA: string;
   founderB: string;
   agreement: string;
+  founderAApproved: boolean;
+  founderBApproved: boolean;
   advisorNotes: string;
 };
 
@@ -218,7 +262,15 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
     steps: Object.fromEntries(
       FOUNDER_ALIGNMENT_WORKBOOK_STEPS.map((step) => [
         step.id,
-        { founderA: "", founderB: "", agreement: "", advisorNotes: "" },
+        {
+          mode: "solo",
+          founderA: "",
+          founderB: "",
+          agreement: "",
+          founderAApproved: false,
+          founderBApproved: false,
+          advisorNotes: "",
+        },
       ])
     ) as Record<FounderAlignmentWorkbookStepId, FounderAlignmentWorkbookEntry>,
   };
@@ -248,7 +300,15 @@ export function sanitizeFounderAlignmentWorkbookPayload(
     };
     steps?: Record<
       string,
-      { founderA?: unknown; founderB?: unknown; agreement?: unknown; advisorNotes?: unknown }
+      {
+        mode?: unknown;
+        founderA?: unknown;
+        founderB?: unknown;
+        agreement?: unknown;
+        founderAApproved?: unknown;
+        founderBApproved?: unknown;
+        advisorNotes?: unknown;
+      }
     >;
   };
 
@@ -262,9 +322,12 @@ export function sanitizeFounderAlignmentWorkbookPayload(
   for (const step of FOUNDER_ALIGNMENT_WORKBOOK_STEPS) {
     const source = raw.steps?.[step.id];
     steps[step.id] = {
+      mode: source?.mode === "collaborative" ? "collaborative" : "solo",
       founderA: typeof source?.founderA === "string" ? source.founderA : "",
       founderB: typeof source?.founderB === "string" ? source.founderB : "",
       agreement: typeof source?.agreement === "string" ? source.agreement : "",
+      founderAApproved: source?.founderAApproved === true,
+      founderBApproved: source?.founderBApproved === true,
       advisorNotes: typeof source?.advisorNotes === "string" ? source.advisorNotes : "",
     };
   }

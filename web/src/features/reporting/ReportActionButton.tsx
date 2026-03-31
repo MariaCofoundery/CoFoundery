@@ -8,6 +8,7 @@ type ReportActionButtonProps = {
   variant?: "primary" | "secondary" | "utility";
   className?: string;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 };
 
 const BASE_CLASS =
@@ -29,19 +30,23 @@ export function ReportActionButton({
   variant = "primary",
   className = "",
   type = "button",
+  disabled = false,
 }: ReportActionButtonProps) {
-  const classes = `${BASE_CLASS} ${VARIANT_CLASS[variant]} ${className}`.trim();
+  const disabledClass = disabled
+    ? "pointer-events-none cursor-not-allowed opacity-50 hover:translate-y-0 hover:shadow-none"
+    : "";
+  const classes = `${BASE_CLASS} ${VARIANT_CLASS[variant]} ${disabledClass} ${className}`.trim();
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={onClick} className={classes} disabled={disabled}>
       {children}
     </button>
   );

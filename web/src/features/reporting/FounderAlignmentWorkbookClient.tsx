@@ -30,7 +30,10 @@ import {
   type FounderAlignmentWorkbookAdvisorClosing,
   type FounderAlignmentWorkbookAdvisorFollowUp,
   type FounderAlignmentWorkbookFounderReactionStatus,
+  type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
+  type FounderAlignmentWorkbookStepMode,
+  type FounderAlignmentWorkbookStepStatus,
   type FounderAlignmentWorkbookStepId,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
@@ -62,6 +65,7 @@ type WorkbookEditableField = "founderA" | "founderB" | "agreement" | "advisorNot
 type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
 type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
+type WorkbookModeOption = Exclude<FounderAlignmentWorkbookStepMode, never>;
 
 const AGREEMENT_DRAFT_META: Record<
   FounderAlignmentWorkbookStepId,
@@ -230,6 +234,23 @@ type SpeechRecognitionErrorEventLike = {
 
 type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
 
+const WORKBOOK_MODE_OPTIONS: ReadonlyArray<{
+  value: WorkbookModeOption;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "solo",
+    label: "Ich arbeite gerade allein",
+    description: "Du siehst nur deine eigene Perspektive und kannst einen vorläufigen Vorschlag vorbereiten.",
+  },
+  {
+    value: "collaborative",
+    label: "Wir bearbeiten diesen Schritt gemeinsam",
+    description: "Beide Perspektiven, gemeinsamer Vorschlag und finale Absprache bleiben gleichzeitig sichtbar.",
+  },
+] as const;
+
 const FOUNDER_REACTION_OPTIONS: Array<{
   value: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>;
   label: string;
@@ -301,7 +322,9 @@ export function FounderAlignmentWorkbookClient({
   const currentStepRef = useRef<HTMLElement | null>(null);
   const shouldScrollToStepRef = useRef(false);
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastPersistedSnapshotRef = useRef(serializeWorkbookPayload(initialWorkbook));
+  const lastPersistedWorkbookRef = useRef(sanitizeFounderAlignmentWorkbookPayload(initialWorkbook));
+  const lastTrackedSnapshotRef = useRef(serializeWorkbookPayload(initialWorkbook));
+  const lastUpdatedAtRef = useRef(updatedAt);
   const saveSequenceRef = useRef(0);
   const hasActiveAdvisor = Boolean(
     workbook.advisorId || advisorInviteState.advisorLinked || currentUserRole === "advisor"
@@ -328,27 +351,70 @@ export function FounderAlignmentWorkbookClient({
   const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
   const isFocusedStep = highlights.prioritizedStepIds.includes(currentStep.id);
+  const currentStepEntry = workbook.steps[currentStep.id];
+  const currentStepMode = currentStepEntry.mode;
+  const isCollaborativeMode = currentStepMode === "collaborative";
+  const viewerFounderField =
+    currentUserRole === "founderA"
+      ? "founderA"
+      : currentUserRole === "founderB"
+        ? "founderB"
+        : null;
+  const otherFounderField =
+    viewerFounderField === "founderA"
+      ? "founderB"
+      : viewerFounderField === "founderB"
+        ? "founderA"
+        : null;
   const hasBothPerspectives =
-    workbook.steps[currentStep.id].founderA.trim().length > 0 &&
-    workbook.steps[currentStep.id].founderB.trim().length > 0;
+    currentStepEntry.founderA.trim().length > 0 &&
+    currentStepEntry.founderB.trim().length > 0;
+  const hasAnyPerspectiveInput =
+    currentStepEntry.founderA.trim().length > 0 || currentStepEntry.founderB.trim().length > 0;
+  const currentUserInputValue = viewerFounderField ? currentStepEntry[viewerFounderField] : "";
+  const otherFounderHasInput = otherFounderField
+    ? currentStepEntry[otherFounderField].trim().length > 0
+    : false;
+  const otherFounderApproved =
+    otherFounderField === "founderA"
+      ? currentStepEntry.founderAApproved
+      : otherFounderField === "founderB"
+        ? currentStepEntry.founderBApproved
+        : false;
+  const currentUserApproved =
+    viewerFounderField === "founderA"
+      ? currentStepEntry.founderAApproved
+      : viewerFounderField === "founderB"
+        ? currentStepEntry.founderBApproved
+        : false;
+  const otherFounderLabel =
+    otherFounderField === "founderA"
+      ? founderALabel
+      : otherFounderField === "founderB"
+        ? founderBLabel
+        : null;
+  const currentStepIsApprovedByBoth =
+    currentStepEntry.founderAApproved && currentStepEntry.founderBApproved;
+  const currentStepStatus = deriveWorkbookStepStatus(currentStepEntry);
   const currentAgreementDraft = useMemo(() => {
-    if (currentStepIsAdvisorClosing || !hasBothPerspectives) {
+    if (currentStepIsAdvisorClosing || !hasAnyPerspectiveInput) {
       return null;
     }
 
     return buildAgreementDraft({
       stepId: currentStep.id,
-      founderAResponse: workbook.steps[currentStep.id].founderA,
-      founderBResponse: workbook.steps[currentStep.id].founderB,
-      sourceMode: "joint",
+      founderAResponse: currentStepEntry.founderA,
+      founderBResponse: currentStepEntry.founderB,
+      sourceMode: hasBothPerspectives ? "joint" : "solo",
     });
   }, [
     currentStep.id,
     currentStepIsAdvisorClosing,
+    hasAnyPerspectiveInput,
     hasBothPerspectives,
-    workbook.steps,
+    currentStepEntry,
   ]);
-  const currentAgreementValue = workbook.steps[currentStep.id].agreement.trim();
+  const currentAgreementValue = currentStepEntry.agreement.trim();
   const currentStepHasAgreement = currentAgreementValue.length > 0;
   const helperQuestion = currentStep.prompts[0] ?? "Welche gemeinsame Absprache soll hier fuer euch gelten?";
   const shortContext = currentStepContent.context.slice(0, 1);
@@ -358,9 +424,7 @@ export function FounderAlignmentWorkbookClient({
       Object.fromEntries(
         visibleSteps.map((step) => {
           const stepEntry = workbook.steps[step.id];
-          const hasPerspectiveInput =
-            stepEntry.founderA.trim().length > 0 || stepEntry.founderB.trim().length > 0;
-          const hasAgreement = stepEntry.agreement.trim().length > 0;
+          const status = deriveWorkbookStepStatus(stepEntry);
           const hasAdvisorNotes = stepEntry.advisorNotes.trim().length > 0;
           const hasAdvisorClosingContent =
             step.id === "advisor_closing"
@@ -372,18 +436,26 @@ export function FounderAlignmentWorkbookClient({
                 ].some((value) => value.trim().length > 0) ||
                 workbook.founderReaction.status !== null
               : false;
-          const completed = step.id === "advisor_closing" ? hasAdvisorClosingContent : hasAgreement;
-          const started = completed || hasPerspectiveInput || hasAdvisorNotes || hasAdvisorClosingContent;
+          const completed = step.id === "advisor_closing" ? hasAdvisorClosingContent : status === "finalized";
+          const started =
+            completed ||
+            status !== "collecting_inputs" ||
+            hasAdvisorNotes ||
+            hasAdvisorClosingContent;
 
           return [
             step.id,
             {
               completed,
               started,
+              status,
             },
           ];
         })
-      ) as Record<FounderAlignmentWorkbookStepId, { completed: boolean; started: boolean }>,
+      ) as Record<
+        FounderAlignmentWorkbookStepId,
+        { completed: boolean; started: boolean; status: FounderAlignmentWorkbookStepStatus }
+      >,
     [
       visibleSteps,
       workbook.advisorClosing.nextSteps,
@@ -521,6 +593,14 @@ export function FounderAlignmentWorkbookClient({
       return false;
     }
 
+    if (field === "founderA") {
+      return currentUserRole === "founderA";
+    }
+
+    if (field === "founderB") {
+      return currentUserRole === "founderB";
+    }
+
     if (field === "agreement") {
       return true;
     }
@@ -530,6 +610,28 @@ export function FounderAlignmentWorkbookClient({
     }
 
     return true;
+  }
+
+  function updateStepMode(mode: WorkbookModeOption) {
+    if (currentStepIsAdvisorClosing || currentUserRole === "advisor" || currentUserRole === "unknown") {
+      return;
+    }
+
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setWorkbook((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activeStepId]: {
+          ...current.steps[activeStepId],
+          mode,
+        },
+      },
+    }));
   }
 
   function canEditAdvisorClosing() {
@@ -593,6 +695,41 @@ export function FounderAlignmentWorkbookClient({
         [activeStepId]: {
           ...current.steps[activeStepId],
           [field]: value,
+          ...(field === "advisorNotes"
+            ? {}
+            : {
+                founderAApproved: false,
+                founderBApproved: false,
+              }),
+        },
+      },
+    }));
+  }
+
+  function updateApproval(approved: boolean) {
+    if (currentUserRole !== "founderA" && currentUserRole !== "founderB") {
+      return;
+    }
+
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setWorkbook((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activeStepId]: {
+          ...current.steps[activeStepId],
+          founderAApproved:
+            currentUserRole === "founderA"
+              ? approved
+              : current.steps[activeStepId].founderAApproved,
+          founderBApproved:
+            currentUserRole === "founderB"
+              ? approved
+              : current.steps[activeStepId].founderBApproved,
         },
       },
     }));
@@ -647,11 +784,22 @@ export function FounderAlignmentWorkbookClient({
       return false;
     }
 
-    const previousSnapshot = lastPersistedSnapshotRef.current;
+    const patches = buildWorkbookPatches(lastPersistedWorkbookRef.current, nextWorkbook);
+    if (patches.length === 0) {
+      setSaveState((current) => ({
+        ...current,
+        kind: mode === "autosave" ? "autosaved" : "saved",
+        message: mode === "autosave" ? t("Automatisch gesichert") : t("Alles gesichert"),
+        updatedAt: lastUpdatedAtRef.current,
+      }));
+      return true;
+    }
+
+    const previousSnapshot = lastTrackedSnapshotRef.current;
     const nextSnapshot = serializeWorkbookPayload(nextWorkbook);
     const requestId = saveSequenceRef.current + 1;
     saveSequenceRef.current = requestId;
-    lastPersistedSnapshotRef.current = nextSnapshot;
+    lastTrackedSnapshotRef.current = nextSnapshot;
 
     setSaveState((current) => ({
       ...current,
@@ -662,8 +810,8 @@ export function FounderAlignmentWorkbookClient({
     const result = await saveFounderAlignmentWorkbook({
       invitationId,
       teamContext,
-      payload: nextWorkbook,
-      editingMode: "joint",
+      expectedUpdatedAt: lastUpdatedAtRef.current,
+      patches,
     });
 
     if (requestId !== saveSequenceRef.current) {
@@ -671,14 +819,23 @@ export function FounderAlignmentWorkbookClient({
     }
 
     if (!result.ok) {
-      lastPersistedSnapshotRef.current = previousSnapshot;
+      if (result.reason !== "stale_version") {
+        lastTrackedSnapshotRef.current = previousSnapshot;
+      }
       setSaveState((current) => ({
         ...current,
         kind: "error",
-        message: t("Die Session konnte gerade nicht gespeichert werden."),
+        message:
+          result.reason === "stale_version"
+            ? t("Dieses Workbook wurde zwischenzeitlich an anderer Stelle aktualisiert. Bitte lade die Seite neu, bevor du weiterarbeitest.")
+            : t("Die Session konnte gerade nicht gespeichert werden."),
       }));
       return false;
     }
+
+    lastPersistedWorkbookRef.current = sanitizeFounderAlignmentWorkbookPayload(nextWorkbook);
+    lastTrackedSnapshotRef.current = nextSnapshot;
+    lastUpdatedAtRef.current = result.updatedAt;
 
     setSaveState({
       kind: mode === "autosave" ? "autosaved" : "saved",
@@ -727,7 +884,7 @@ export function FounderAlignmentWorkbookClient({
         ? workbook
         : { ...workbook, currentStepId: activeStepId };
     const currentSnapshot = serializeWorkbookPayload(autosaveWorkbook);
-    if (currentSnapshot === lastPersistedSnapshotRef.current) {
+    if (currentSnapshot === lastTrackedSnapshotRef.current) {
       return;
     }
 
@@ -756,7 +913,7 @@ export function FounderAlignmentWorkbookClient({
       return t("Hinweis aus der Moderation");
     }
     if (field === "agreement") {
-      return "Gemeinsame Regel";
+      return "Finale Absprache";
     }
 
     return field === "founderA" ? founderALabel : founderBLabel;
@@ -1191,19 +1348,11 @@ export function FounderAlignmentWorkbookClient({
                   </p>
                 </div>
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                    stepProgressMeta[currentStep.id]?.completed
-                      ? "bg-emerald-100 text-emerald-700"
-                      : stepProgressMeta[currentStep.id]?.started
-                        ? "bg-slate-900 text-white"
-                        : "bg-slate-200 text-slate-600"
-                  }`}
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
+                    currentStepStatus
+                  )}`}
                 >
-                    {stepProgressMeta[currentStep.id]?.completed
-                    ? t("Regel festgehalten")
-                    : stepProgressMeta[currentStep.id]?.started
-                      ? t("In Arbeit")
-                      : t("Startklar")}
+                  {t(workbookStepStatusLabel(currentStepStatus))}
                 </span>
               </div>
             </div>
@@ -1220,6 +1369,39 @@ export function FounderAlignmentWorkbookClient({
                   {t("Dieser Bereich wurde im Matching-Report als besonders relevant fuer eure Zusammenarbeit identifiziert.")}
                 </p>
               </div>
+            ) : null}
+
+            {!currentStepIsAdvisorClosing ? (
+              <StepSection title="Arbeitsmodus" className="mt-8 border-slate-200/80 bg-white">
+                <p className="text-sm leading-7 text-slate-700">
+                  {t("Wie moechtet ihr diesen Schritt bearbeiten?")}
+                </p>
+                <div className="mt-5 grid gap-3 lg:grid-cols-2">
+                  {WORKBOOK_MODE_OPTIONS.map((option) => {
+                    const isActive = currentStepMode === option.value;
+                    const disabled =
+                      currentUserRole === "advisor" || currentUserRole === "unknown";
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => updateStepMode(option.value)}
+                        disabled={disabled}
+                        className={`rounded-2xl border px-4 py-4 text-left transition ${
+                          isActive
+                            ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.08)]"
+                            : disabled
+                              ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
+                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        <p className="text-sm font-semibold text-slate-900">{t(option.label)}</p>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">{t(option.description)}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </StepSection>
             ) : null}
 
             <StepSection title="1. Kontext" className="mt-8 border-slate-200 bg-slate-50/80">
@@ -1445,38 +1627,85 @@ export function FounderAlignmentWorkbookClient({
               <>
                 <StepSection title="2. Individuelle Antworten" className="mt-8 border-slate-200/70 bg-white">
                   <p className="text-sm leading-7 text-slate-700">{t(helperQuestion)}</p>
-                  <div className="mt-6 grid gap-6 xl:grid-cols-2">
-                    <WorkbookField
-                      title={founderALabel}
-                      showAvatar
-                      avatarId={founderAAvatarId}
-                      value={workbook.steps[currentStep.id].founderA}
-                      onChange={(value) => updateEntry("founderA", value)}
-                      placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
-                      readOnly={!canEditField("founderA")}
-                      helperText={getFieldReadOnlyHint("founderA")}
-                    />
-                    <WorkbookField
-                      title={founderBLabel}
-                      showAvatar
-                      avatarId={founderBAvatarId}
-                      value={workbook.steps[currentStep.id].founderB}
-                      onChange={(value) => updateEntry("founderB", value)}
-                      placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
-                      readOnly={!canEditField("founderB")}
-                      helperText={getFieldReadOnlyHint("founderB")}
-                    />
-                  </div>
+                  {isCollaborativeMode ? (
+                    <div className="mt-6 grid gap-6 xl:grid-cols-2">
+                      <WorkbookField
+                        title={founderALabel}
+                        showAvatar
+                        avatarId={founderAAvatarId}
+                        value={currentStepEntry.founderA}
+                        onChange={(value) => updateEntry("founderA", value)}
+                        placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
+                        readOnly={!canEditField("founderA")}
+                        helperText={getFieldReadOnlyHint("founderA")}
+                      />
+                      <WorkbookField
+                        title={founderBLabel}
+                        showAvatar
+                        avatarId={founderBAvatarId}
+                        value={currentStepEntry.founderB}
+                        onChange={(value) => updateEntry("founderB", value)}
+                        placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
+                        readOnly={!canEditField("founderB")}
+                        helperText={getFieldReadOnlyHint("founderB")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-6 space-y-5">
+                      {viewerFounderField ? (
+                        <WorkbookField
+                          title={viewerFounderField === "founderA" ? founderALabel : founderBLabel}
+                          showAvatar
+                          avatarId={viewerFounderField === "founderA" ? founderAAvatarId : founderBAvatarId}
+                          value={currentUserInputValue}
+                          onChange={(value) => updateEntry(viewerFounderField, value)}
+                          placeholder={t("Was ist dir in diesem Punkt wichtig und was sollte hier konkret gelten?")}
+                          readOnly={!canEditField(viewerFounderField)}
+                          helperText={t("Hier haeltst du zuerst deine eigene Sicht fest.")}
+                        />
+                      ) : null}
+
+                      {otherFounderLabel ? (
+                        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/75 px-4 py-4">
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                            {t("Status der anderen Person")}
+                          </p>
+                          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-sm font-medium text-slate-900">{otherFounderLabel}</p>
+                            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600">
+                              {otherFounderApproved
+                                ? t("Zugestimmt")
+                                : otherFounderHasInput
+                                  ? t("Ausgefuellt")
+                                  : t("Noch offen")}
+                            </span>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={() => persist()}
+                          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                        >
+                          {t("Eigene Sicht speichern")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </StepSection>
 
                 <StepSection
-                  title="3. Gemeinsamer Vorschlag"
+                  title={isCollaborativeMode ? "3. Gemeinsamer Vorschlag" : "3. Vorlaeufiger Vorschlag"}
                   className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="max-w-3xl">
                       <p className="text-sm leading-7 text-slate-700">
-                        {t("Aus beiden Antworten entsteht hier ein erster Regelvorschlag, den ihr direkt weiter bearbeiten koennt.")}
+                        {isCollaborativeMode
+                          ? t("Aus beiden Antworten entsteht hier ein erster gemeinsamer Vorschlag, den ihr direkt weiter bearbeiten koennt.")
+                          : t("Auch mit nur einer Perspektive koennt ihr hier schon einen vorlaeufigen Vorschlag vorbereiten. Er bleibt spaeter gemeinsam anpassbar.")}
                       </p>
                       {currentAgreementDraft?.comparisonHint ? (
                         <p className="mt-3 text-sm leading-7 text-slate-700">
@@ -1491,8 +1720,9 @@ export function FounderAlignmentWorkbookClient({
                         focusAgreementField();
                       }}
                       className="shrink-0"
+                      disabled={!currentAgreementDraft}
                     >
-                      {t("Vorschlag erstellen")}
+                      {t(isCollaborativeMode ? "Vorschlag erstellen" : "Vorlaeufigen Vorschlag erstellen")}
                     </ReportActionButton>
                   </div>
 
@@ -1505,7 +1735,11 @@ export function FounderAlignmentWorkbookClient({
                     <p className="mt-3 text-sm leading-7 text-slate-700">
                       {currentAgreementDraft
                         ? t(currentAgreementDraft.draft)
-                        : t("Sobald beide Antworten da sind, koennt ihr hier einen Vorschlag erstellen.")}
+                        : t(
+                            isCollaborativeMode
+                              ? "Sobald beide Antworten da sind, koennt ihr hier einen gemeinsamen Vorschlag erstellen."
+                              : "Sobald deine Sicht vorliegt, kannst du hier einen vorlaeufigen Vorschlag erstellen."
+                          )}
                     </p>
                   </div>
                 </StepSection>
@@ -1515,12 +1749,14 @@ export function FounderAlignmentWorkbookClient({
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
                   <p className="text-sm leading-7 text-slate-700">
-                    {t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")}
+                    {isCollaborativeMode
+                      ? t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")
+                      : t("Hier entsteht eure vorlaeufige oder gemeinsame Absprache. Final ist sie erst, wenn beide Founder zustimmen.")}
                   </p>
                   <div className="mt-6">
                     <WorkbookField
                       title={t("Eure finale Absprache")}
-                      value={workbook.steps[currentStep.id].agreement}
+                      value={currentStepEntry.agreement}
                       onChange={(value) => updateEntry("agreement", value)}
                       placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
                       highlight
@@ -1532,6 +1768,58 @@ export function FounderAlignmentWorkbookClient({
                           : getFieldReadOnlyHint("agreement")
                       }
                     />
+                  </div>
+
+                  <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("Status dieser Absprache")}
+                      </p>
+                      <span
+                        className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${workbookStepStatusClassName(
+                          currentStepStatus
+                        )}`}
+                      >
+                        {t(workbookStepStatusLabel(currentStepStatus))}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <ApprovalStatusCard
+                        label={founderALabel}
+                        approved={currentStepEntry.founderAApproved}
+                      />
+                      <ApprovalStatusCard
+                        label={founderBLabel}
+                        approved={currentStepEntry.founderBApproved}
+                      />
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      {viewerFounderField ? (
+                        <button
+                          type="button"
+                          onClick={() => updateApproval(!currentUserApproved)}
+                          disabled={!currentStepHasAgreement || !hasBothPerspectives}
+                          className={`rounded-full border px-4 py-2 text-sm transition ${
+                            !currentStepHasAgreement || !hasBothPerspectives
+                              ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                              : currentUserApproved
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                        >
+                          {currentUserApproved ? t("Zustimmung zuruecknehmen") : t("Finale Absprache bestaetigen")}
+                        </button>
+                      ) : null}
+                      <p className="text-xs leading-6 text-slate-500">
+                        {!hasBothPerspectives
+                          ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
+                          : currentStepIsApprovedByBoth
+                            ? t("Beide Founder haben zugestimmt. Dieser Schritt ist finalisiert.")
+                            : t("Sobald beide Founder bestaetigen, wird dieser Schritt finalisiert.")}
+                      </p>
+                    </div>
                   </div>
                 </StepSection>
 
@@ -1569,9 +1857,13 @@ export function FounderAlignmentWorkbookClient({
                     {t("Naechster Schritt")}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {currentStepHasAgreement
-                      ? t("Guter Fortschritt. Die Absprache fuer diesen Schritt steht.")
-                      : t("Haltet jetzt noch eure finale Absprache fest. Dann geht ihr in den naechsten Schritt.")}
+                    {currentStepStatus === "finalized"
+                      ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
+                      : currentStepStatus === "awaiting_approval"
+                        ? t("Die Absprache steht. Es fehlt nur noch die Zustimmung beider Founder.")
+                        : currentStepStatus === "draft_ready"
+                          ? t("Es gibt bereits einen Entwurf. Macht daraus jetzt eine klare gemeinsame Absprache.")
+                          : t("Sammelt zuerst eure Perspektiven und formuliert dann eine erste Absprache.")}
                   </p>
                 </div>
                 <span
@@ -1970,6 +2262,23 @@ function WorkbookField({
   );
 }
 
+function ApprovalStatusCard({
+  label,
+  approved,
+}: {
+  label: string;
+  approved: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+      <p className="text-sm font-medium text-slate-900">{label}</p>
+      <p className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+        {approved ? t("Zugestimmt") : t("Noch offen")}
+      </p>
+    </div>
+  );
+}
+
 function StepSection({
   title,
   children,
@@ -2112,6 +2421,101 @@ function advisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | n
   }
 }
 
+function buildWorkbookPatches(
+  previousPayload: FounderAlignmentWorkbookPayload,
+  nextPayload: FounderAlignmentWorkbookPayload
+): FounderAlignmentWorkbookPatch[] {
+  const previous = sanitizeFounderAlignmentWorkbookPayload(previousPayload);
+  const next = sanitizeFounderAlignmentWorkbookPayload(nextPayload);
+  const patches: FounderAlignmentWorkbookPatch[] = [];
+
+  if (previous.currentStepId !== next.currentStepId) {
+    patches.push({
+      scope: "root",
+      field: "currentStepId",
+      value: next.currentStepId,
+    });
+  }
+
+  if (previous.advisorFollowUp !== next.advisorFollowUp) {
+    patches.push({
+      scope: "root",
+      field: "advisorFollowUp",
+      value: next.advisorFollowUp,
+    });
+  }
+
+  for (const field of ["observations", "questions", "nextSteps"] as const) {
+    if (previous.advisorClosing[field] !== next.advisorClosing[field]) {
+      patches.push({
+        scope: "advisorClosing",
+        field,
+        value: next.advisorClosing[field],
+      });
+    }
+  }
+
+  if (previous.founderReaction.status !== next.founderReaction.status) {
+    patches.push({
+      scope: "founderReaction",
+      field: "status",
+      value: next.founderReaction.status,
+    });
+  }
+
+  if (previous.founderReaction.comment !== next.founderReaction.comment) {
+    patches.push({
+      scope: "founderReaction",
+      field: "comment",
+      value: next.founderReaction.comment,
+    });
+  }
+
+  for (const stepId of Object.keys(next.steps) as FounderAlignmentWorkbookStepId[]) {
+    const previousStep = previous.steps[stepId];
+    const nextStep = next.steps[stepId];
+
+    if (previousStep.mode !== nextStep.mode) {
+      patches.push({ scope: "step", stepId, field: "mode", value: nextStep.mode });
+    }
+    if (previousStep.founderA !== nextStep.founderA) {
+      patches.push({ scope: "step", stepId, field: "founderA", value: nextStep.founderA });
+    }
+    if (previousStep.founderB !== nextStep.founderB) {
+      patches.push({ scope: "step", stepId, field: "founderB", value: nextStep.founderB });
+    }
+    if (previousStep.agreement !== nextStep.agreement) {
+      patches.push({ scope: "step", stepId, field: "agreement", value: nextStep.agreement });
+    }
+    if (previousStep.founderAApproved !== nextStep.founderAApproved) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "founderAApproved",
+        value: nextStep.founderAApproved,
+      });
+    }
+    if (previousStep.founderBApproved !== nextStep.founderBApproved) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "founderBApproved",
+        value: nextStep.founderBApproved,
+      });
+    }
+    if (previousStep.advisorNotes !== nextStep.advisorNotes) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "advisorNotes",
+        value: nextStep.advisorNotes,
+      });
+    }
+  }
+
+  return patches;
+}
+
 function serializeWorkbookPayload(payload: FounderAlignmentWorkbookPayload) {
   return JSON.stringify(sanitizeFounderAlignmentWorkbookPayload(payload));
 }
@@ -2209,6 +2613,54 @@ function buildAgreementDraft({
 
 function normalizeAgreementSource(input: string) {
   return input.replace(/\s+/g, " ").trim();
+}
+
+function deriveWorkbookStepStatus(
+  entry: FounderAlignmentWorkbookPayload["steps"][FounderAlignmentWorkbookStepId]
+): FounderAlignmentWorkbookStepStatus {
+  const hasBothInputs = entry.founderA.trim().length > 0 && entry.founderB.trim().length > 0;
+  const hasAgreement = entry.agreement.trim().length > 0;
+  const bothApproved = entry.founderAApproved && entry.founderBApproved;
+
+  if (hasAgreement && bothApproved) {
+    return "finalized";
+  }
+
+  if (hasAgreement && hasBothInputs) {
+    return "awaiting_approval";
+  }
+
+  if (hasAgreement) {
+    return "draft_ready";
+  }
+
+  return "collecting_inputs";
+}
+
+function workbookStepStatusLabel(status: FounderAlignmentWorkbookStepStatus) {
+  switch (status) {
+    case "draft_ready":
+      return "Entwurf bereit";
+    case "awaiting_approval":
+      return "Wartet auf Zustimmung";
+    case "finalized":
+      return "Finalisiert";
+    default:
+      return "Sammelt Eingaben";
+  }
+}
+
+function workbookStepStatusClassName(status: FounderAlignmentWorkbookStepStatus) {
+  switch (status) {
+    case "draft_ready":
+      return "bg-amber-100 text-amber-700";
+    case "awaiting_approval":
+      return "bg-violet-100 text-violet-700";
+    case "finalized":
+      return "bg-emerald-100 text-emerald-700";
+    default:
+      return "bg-slate-200 text-slate-600";
+  }
 }
 
 function detectThemes(

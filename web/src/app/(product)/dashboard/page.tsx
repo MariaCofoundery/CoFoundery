@@ -233,15 +233,21 @@ export default async function DashboardPage({
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
       : null;
-  const workbookStatus = activeWorkbooks.some((workbook) => workbook.isCompleted)
-    ? "Bereit"
-    : activeWorkbooks.length > 0
-      ? "In Arbeit"
-      : readyReports.length > 0
-        ? "Bereit"
-        : "Offen";
+  const workbookPhase: "upcoming" | "ready_to_start" | "in_progress" | "done" =
+    activeWorkbooks.some((workbook) => !workbook.isCompleted)
+      ? "in_progress"
+      : activeWorkbooks.some((workbook) => workbook.isCompleted)
+        ? "done"
+        : readyReports.length > 0
+          ? "ready_to_start"
+          : "upcoming";
   const shouldPrioritizeInviteCta =
-    hasSubmittedBase && hasSubmittedValues && !hasMatchingActivity && !latestReadyReport && !latestActiveWorkbook;
+    hasSubmittedBase &&
+    hasSubmittedValues &&
+    !hasMatchingActivity &&
+    workbookPhase === "upcoming" &&
+    !latestReadyReport &&
+    !latestActiveWorkbook;
   const heroExpectationText = shouldPrioritizeInviteCta
     ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
     : null;
@@ -253,6 +259,14 @@ export default async function DashboardPage({
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
       : null);
+  const currentStep: "basis" | "values" | "matching" | "workbook" = !hasSubmittedBase
+    ? "basis"
+    : !hasSubmittedValues && !hasMatchingActivity && workbookPhase === "upcoming"
+      ? "values"
+      : workbookPhase === "ready_to_start" || workbookPhase === "in_progress"
+        ? "workbook"
+        : "matching";
+  const valuesSkipped = !hasSubmittedValues && currentStep !== "values";
 
   const heroPrimaryAction = !hasSubmittedBase
     ? {
@@ -261,7 +275,7 @@ export default async function DashboardPage({
         title: "Starte dein Profil.",
         text: "Das ist der erste Schritt.",
       }
-    : !hasSubmittedValues
+    : !hasSubmittedValues && !hasMatchingActivity
       ? {
           href: "/me/values",
           label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
@@ -306,10 +320,18 @@ export default async function DashboardPage({
   const heroCta = workbookFocusHref
     ? {
         href: workbookFocusHref,
-        label: "Arbeite im Workbook weiter",
+        label: latestActiveWorkbook ? "Arbeite im Workbook weiter" : "Workbook starten",
         text: latestActiveWorkbook
           ? "Hier liegt euer aktueller Arbeitsstand."
           : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook.",
+      }
+    : heroPrimaryAction;
+  const heroPanel = workbookFocusHref
+    ? {
+        href: heroCta.href,
+        label: heroCta.label,
+        title: latestActiveWorkbook ? "Arbeite im Workbook weiter." : "Starte jetzt das Workbook.",
+        text: heroCta.text,
       }
     : heroPrimaryAction;
 
@@ -325,30 +347,42 @@ export default async function DashboardPage({
     {
       id: "values",
       label: "Werteprofil",
-      state: hasSubmittedValues ? "done" : hasSubmittedBase ? "active" : "upcoming",
-      detail: hasSubmittedValues ? "fertig" : valuesStatus === "in_progress" ? "in Arbeit" : "offen",
+      state: hasSubmittedValues || valuesSkipped ? "done" : currentStep === "values" ? "active" : "upcoming",
+      detail: hasSubmittedValues ? "fertig" : valuesSkipped ? "optional" : valuesStatus === "in_progress" ? "in Arbeit" : "offen",
       description: "Optionaler Deep-Dive zu Werten, Leitplanken und roten Linien.",
     },
     {
       id: "matching",
       label: "Matching",
-      state: readyReports.length > 0 ? "done" : hasMatchingActivity ? "active" : "upcoming",
-      detail: readyReports.length > 0 ? "fertig" : hasMatchingActivity ? "läuft" : "offen",
+      state:
+        workbookPhase !== "upcoming" || readyReports.length > 0
+          ? "done"
+          : currentStep === "matching"
+            ? "active"
+            : "upcoming",
+      detail:
+        workbookPhase !== "upcoming" || readyReports.length > 0
+          ? "fertig"
+          : hasMatchingActivity
+            ? "läuft"
+            : "offen",
       description: "Hier wird sichtbar, wo ihr zusammenpasst und wo Spannungen entstehen koennen.",
     },
     {
       id: "workbook",
       label: "Workbook",
       state:
-        activeWorkbooks.length > 0
+        workbookPhase === "done"
+          ? "done"
+          : workbookPhase === "ready_to_start" || workbookPhase === "in_progress"
           ? "active"
-          : workbookStatus === "Bereit"
-            ? "done"
-            : "upcoming",
+          : "upcoming",
       detail:
-        activeWorkbooks.length > 0
+        workbookPhase === "done"
+          ? "abgeschlossen"
+          : workbookPhase === "in_progress"
           ? "aktiv"
-          : workbookStatus === "Bereit"
+          : workbookPhase === "ready_to_start"
             ? "bereit"
             : "offen",
       description: "Hier haltet ihr eure gemeinsamen Absprachen fuer den Alltag fest.",
@@ -412,15 +446,15 @@ export default async function DashboardPage({
               style={staggerStyle(40)}
             >
               <div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3.5">
                   <DashboardProfileAvatar
                     displayName={displayName}
                     avatarId={profileAvatarId}
                     imageUrl={profileImageUrl}
                   />
-                  <div>
+                  <div className="min-w-0 max-w-xl">
                     <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder Dashboard</p>
-                    <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
+                    <h1 className="mt-1.5 text-[1.9rem] font-semibold leading-[1.04] text-slate-950 md:text-[2.55rem] md:leading-[1.02]">
                       Schön, dass du da bist, {displayName}
                     </h1>
                   </div>
@@ -441,9 +475,9 @@ export default async function DashboardPage({
                 </article>
 
                 <article className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/88 p-5 shadow-[0_12px_28px_rgba(15,23,42,0.035)]">
-                  <h2 className="text-xl font-semibold text-slate-950">Arbeite im Workbook weiter</h2>
+                  <h2 className="text-xl font-semibold text-slate-950">{heroPanel.title}</h2>
                   <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-                    Hier liegt euer aktueller Arbeitsstand.
+                    {heroPanel.text}
                   </p>
                   {heroExpectationText && heroCta.href === heroPrimaryAction.href ? (
                     <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
@@ -452,10 +486,10 @@ export default async function DashboardPage({
                   ) : null}
                   <div className="mt-5">
                     <Link
-                      href={heroCta.href}
+                      href={heroPanel.href}
                       className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
                     >
-                      Weiterarbeiten
+                      {heroPanel.label}
                     </Link>
                   </div>
 
@@ -714,9 +748,12 @@ export default async function DashboardPage({
                   href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail-Adresse ändern")}`}
                   className={`${UTILITY_CTA_CLASS} shrink-0`}
                 >
-                  E-Mail-Adresse ändern
+                  E-Mail-Adresse ändern? Kontaktiere uns
                 </a>
               </div>
+              <p className="mt-3 text-xs leading-6 text-slate-500">
+                Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.
+              </p>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -1033,20 +1070,22 @@ function DashboardProgressRoadmap({
             return (
               <div key={item.id} className="group text-center" title={item.description}>
                 <div className="flex justify-center">
-                  <span
-                    className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
-                      isActive
-                        ? "h-9 w-9 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_10px_20px_rgba(34,211,238,0.12)]"
-                        : isDone
-                          ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
-                          : "h-8 w-8 border-slate-200 bg-white text-slate-400"
-                    }`}
-                  >
-                    {isDone ? (
-                      <RoadmapCheckIcon className="h-3.5 w-3.5" />
-                    ) : (
-                      <span className="text-[10px] font-semibold">{index + 1}</span>
-                    )}
+                  <span className="relative z-10 inline-flex rounded-full bg-slate-50/95 p-1">
+                    <span
+                      className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
+                        isActive
+                          ? "h-9 w-9 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/16 text-slate-900 shadow-[0_10px_20px_rgba(34,211,238,0.12)]"
+                          : isDone
+                            ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "h-8 w-8 border-slate-200 bg-white text-slate-400"
+                      }`}
+                    >
+                      {isDone ? (
+                        <RoadmapCheckIcon className="h-3.5 w-3.5" />
+                      ) : (
+                        <span className="text-[10px] font-semibold">{index + 1}</span>
+                      )}
+                    </span>
                   </span>
                 </div>
                 <div className="mt-3 px-1">

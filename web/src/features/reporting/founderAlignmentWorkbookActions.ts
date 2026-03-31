@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   sanitizeFounderAlignmentWorkbookPayload,
+  type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookStepId,
 } from "@/features/reporting/founderAlignmentWorkbook";
@@ -19,8 +20,8 @@ import { trackServerResearchEvent } from "@/features/research/server";
 type SaveFounderAlignmentWorkbookInput = {
   invitationId: string;
   teamContext: TeamContext;
-  payload: FounderAlignmentWorkbookPayload;
-  editingMode: "personal" | "joint";
+  expectedUpdatedAt: string | null;
+  patches: FounderAlignmentWorkbookPatch[];
 };
 
 type InvitationAccessRow = {
@@ -65,11 +66,11 @@ type AdvisorInviteReportRunRow = {
 
 type WorkbookRow = {
   payload: unknown;
+  updated_at?: string | null;
 };
 
 type WorkbookViewerRole = "founderA" | "founderB" | "advisor" | "unknown";
 type WorkbookFounderRole = Extract<WorkbookViewerRole, "founderA" | "founderB">;
-type WorkbookEditingMode = "personal" | "joint";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
@@ -82,11 +83,8 @@ export type SaveFounderAlignmentWorkbookResult =
     }
   | {
       ok: false;
-      reason:
-        | "missing_invitation"
-        | "not_authenticated"
-        | "forbidden"
-        | "save_failed";
+      reason: "missing_invitation" | "not_authenticated" | "forbidden" | "save_failed" | "stale_version";
+      updatedAt?: string | null;
     };
 
 export type PrepareFounderAlignmentAdvisorInviteResult =
@@ -209,17 +207,21 @@ async function loadAdvisorAccessRowByToken(
   return data as AdvisorAccessRow;
 }
 
-async function loadWorkbookPayload(
+async function loadWorkbookRow(
   invitationId: string,
   supabase: SupabaseLikeClient
-): Promise<FounderAlignmentWorkbookPayload> {
+): Promise<{ payload: FounderAlignmentWorkbookPayload; updatedAt: string | null }> {
   const { data } = await supabase
     .from("founder_alignment_workbooks")
-    .select("payload")
+    .select("payload, updated_at")
     .eq("invitation_id", invitationId)
     .maybeSingle();
 
-  return sanitizeFounderAlignmentWorkbookPayload((data as WorkbookRow | null)?.payload);
+  const row = data as WorkbookRow | null;
+  return {
+    payload: sanitizeFounderAlignmentWorkbookPayload(row?.payload),
+    updatedAt: row?.updated_at ?? null,
+  };
 }
 
 async function resolveWorkbookViewerRole(
@@ -255,91 +257,136 @@ function advisorInviteStateFromRow(row: AdvisorAccessRow | null): FounderAlignme
 
 function mergeFounderPayload(
   existingPayload: FounderAlignmentWorkbookPayload,
-  incomingPayload: FounderAlignmentWorkbookPayload,
-  role: WorkbookFounderRole,
-  editingMode: WorkbookEditingMode
+  patches: FounderAlignmentWorkbookPatch[],
+  role: WorkbookFounderRole
 ) {
-  const nextPayload = sanitizeFounderAlignmentWorkbookPayload(incomingPayload);
+  const nextPayload = sanitizeFounderAlignmentWorkbookPayload(existingPayload);
 
-  return {
-    ...existingPayload,
-    currentStepId: nextPayload.currentStepId,
-    advisorId: existingPayload.advisorId,
-    advisorName: existingPayload.advisorName,
-    advisorClosing: existingPayload.advisorClosing,
-    advisorFollowUp: existingPayload.advisorFollowUp,
-    founderReaction: {
-      status: nextPayload.founderReaction.status,
-      comment: nextPayload.founderReaction.comment,
-    },
-    steps: Object.fromEntries(
-      Object.keys(existingPayload.steps).map((stepId) => {
-        const typedStepId = stepId as FounderAlignmentWorkbookStepId;
-        const existingEntry = existingPayload.steps[typedStepId];
-        const incomingEntry = nextPayload.steps[typedStepId];
+  for (const patch of patches) {
+    if (patch.scope === "root") {
+      if (patch.field === "currentStepId") {
+        const value = String(patch.value ?? "");
+        if (value in nextPayload.steps) {
+          nextPayload.currentStepId = value as FounderAlignmentWorkbookStepId;
+        }
+      } else if (patch.field === "advisorFollowUp") {
+        nextPayload.advisorFollowUp =
+          patch.value === "four_weeks" || patch.value === "three_months" ? patch.value : "none";
+      }
+      continue;
+    }
 
-        const founderA =
-          editingMode === "joint" || role === "founderA"
-            ? incomingEntry.founderA
-            : existingEntry.founderA;
-        const founderB =
-          editingMode === "joint" || role === "founderB"
-            ? incomingEntry.founderB
-            : existingEntry.founderB;
+    if (patch.scope === "advisorClosing") {
+      nextPayload.advisorClosing = {
+        ...nextPayload.advisorClosing,
+        [patch.field]: typeof patch.value === "string" ? patch.value : "",
+      };
+      continue;
+    }
 
-        return [
-          stepId,
-          {
-            ...existingEntry,
-            founderA,
-            founderB,
-            agreement: incomingEntry.agreement,
-            advisorNotes: existingEntry.advisorNotes,
-          },
-        ];
-      })
-    ) as FounderAlignmentWorkbookPayload["steps"],
-  } satisfies FounderAlignmentWorkbookPayload;
+    if (patch.scope === "founderReaction") {
+      if (patch.field === "status") {
+        nextPayload.founderReaction.status =
+          patch.value === "understood" || patch.value === "open" || patch.value === "in_clarification"
+            ? patch.value
+            : null;
+      } else {
+        nextPayload.founderReaction.comment = typeof patch.value === "string" ? patch.value : "";
+      }
+      continue;
+    }
+
+    const stepEntry = nextPayload.steps[patch.stepId];
+    if (!stepEntry) {
+      continue;
+    }
+
+    switch (patch.field) {
+      case "mode":
+        stepEntry.mode = patch.value === "collaborative" ? "collaborative" : "solo";
+        break;
+      case "founderA":
+        if (role === "founderA" && typeof patch.value === "string") {
+          stepEntry.founderA = patch.value;
+        }
+        break;
+      case "founderB":
+        if (role === "founderB" && typeof patch.value === "string") {
+          stepEntry.founderB = patch.value;
+        }
+        break;
+      case "agreement":
+        if (typeof patch.value === "string") {
+          stepEntry.agreement = patch.value;
+        }
+        break;
+      case "founderAApproved":
+        if (role === "founderA") {
+          stepEntry.founderAApproved = patch.value === true;
+        }
+        break;
+      case "founderBApproved":
+        if (role === "founderB") {
+          stepEntry.founderBApproved = patch.value === true;
+        }
+        break;
+      case "advisorNotes":
+        break;
+    }
+  }
+
+  return sanitizeFounderAlignmentWorkbookPayload(nextPayload);
 }
 
 function mergeAdvisorPayload(
   existingPayload: FounderAlignmentWorkbookPayload,
-  incomingPayload: FounderAlignmentWorkbookPayload,
+  patches: FounderAlignmentWorkbookPatch[],
   advisorId: string,
   advisorName: string | null
 ) {
-  const nextPayload = sanitizeFounderAlignmentWorkbookPayload(incomingPayload);
+  const nextPayload = sanitizeFounderAlignmentWorkbookPayload(existingPayload);
 
-  return {
-    ...existingPayload,
-    currentStepId: nextPayload.currentStepId,
-    advisorId,
-    advisorName,
-    advisorClosing: {
-      observations: nextPayload.advisorClosing.observations,
-      questions: nextPayload.advisorClosing.questions,
-      nextSteps: nextPayload.advisorClosing.nextSteps,
-    },
-    advisorFollowUp: nextPayload.advisorFollowUp,
-    founderReaction: existingPayload.founderReaction,
-    steps: Object.fromEntries(
-      Object.keys(existingPayload.steps).map((stepId) => [
-        stepId,
-        {
-          ...existingPayload.steps[stepId as FounderAlignmentWorkbookStepId],
-          advisorNotes:
-            nextPayload.steps[stepId as FounderAlignmentWorkbookStepId]?.advisorNotes ?? "",
-        },
-      ])
-    ) as FounderAlignmentWorkbookPayload["steps"],
-  } satisfies FounderAlignmentWorkbookPayload;
+  nextPayload.advisorId = advisorId;
+  nextPayload.advisorName = advisorName;
+
+  for (const patch of patches) {
+    if (patch.scope === "root") {
+      if (patch.field === "currentStepId") {
+        const value = String(patch.value ?? "");
+        if (value in nextPayload.steps) {
+          nextPayload.currentStepId = value as FounderAlignmentWorkbookStepId;
+        }
+      } else if (patch.field === "advisorFollowUp") {
+        nextPayload.advisorFollowUp =
+          patch.value === "four_weeks" || patch.value === "three_months" ? patch.value : "none";
+      }
+      continue;
+    }
+
+    if (patch.scope === "advisorClosing") {
+      nextPayload.advisorClosing = {
+        ...nextPayload.advisorClosing,
+        [patch.field]: typeof patch.value === "string" ? patch.value : "",
+      };
+      continue;
+    }
+
+    if (patch.scope === "step" && patch.field === "advisorNotes") {
+      const stepEntry = nextPayload.steps[patch.stepId];
+      if (stepEntry) {
+        stepEntry.advisorNotes = typeof patch.value === "string" ? patch.value : "";
+      }
+    }
+  }
+
+  return sanitizeFounderAlignmentWorkbookPayload(nextPayload);
 }
 
 export async function saveFounderAlignmentWorkbook({
   invitationId,
   teamContext,
-  payload,
-  editingMode,
+  expectedUpdatedAt,
+  patches,
 }: SaveFounderAlignmentWorkbookInput): Promise<SaveFounderAlignmentWorkbookResult> {
   const normalizedInvitationId = invitationId.trim();
   if (!normalizedInvitationId) {
@@ -365,21 +412,31 @@ export async function saveFounderAlignmentWorkbook({
   }
 
   const dataClient = role === "advisor" && privileged ? privileged : supabase;
-  const [existingPayload, advisorRow] = await Promise.all([
-    loadWorkbookPayload(normalizedInvitationId, dataClient),
+  const [{ payload: existingPayload, updatedAt: currentUpdatedAt }, advisorRow] = await Promise.all([
+    loadWorkbookRow(normalizedInvitationId, dataClient),
     loadAdvisorAccessRow(normalizedInvitationId, dataClient),
   ]);
 
-  const sanitizedPayload = sanitizeFounderAlignmentWorkbookPayload(payload);
+  if (patches.length === 0) {
+    return {
+      ok: true,
+      updatedAt: currentUpdatedAt ?? expectedUpdatedAt ?? new Date().toISOString(),
+    };
+  }
+
+  if ((expectedUpdatedAt ?? null) !== (currentUpdatedAt ?? null)) {
+    return { ok: false, reason: "stale_version", updatedAt: currentUpdatedAt ?? null };
+  }
+
   const payloadToPersist =
     role === "advisor"
       ? mergeAdvisorPayload(
           existingPayload,
-          sanitizedPayload,
+          patches,
           user.id,
           advisorRow?.advisor_name ?? existingPayload.advisorName ?? null
         )
-      : mergeFounderPayload(existingPayload, sanitizedPayload, role, editingMode);
+      : mergeFounderPayload(existingPayload, patches, role);
 
   const writeClient = role === "advisor" && privileged ? privileged : supabase;
   const { data, error } = await writeClient
@@ -619,7 +676,7 @@ export async function claimFounderAlignmentAdvisorAccess({
     return { ok: false, reason: "update_failed" };
   }
 
-  const currentPayload = await loadWorkbookPayload(invitationId, privileged);
+  const { payload: currentPayload } = await loadWorkbookRow(invitationId, privileged);
   const nextPayload = {
     ...currentPayload,
     advisorId: userId,
