@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { upsertProfileBasicsRow } from "@/features/profile/profileData";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
@@ -85,6 +86,10 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   if (error) {
     redirect(withError(errorRedirectTo, error.message ?? "profile_save_failed"));
   }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/founder-alignment/workbook");
+  revalidatePath(successRedirectTo);
 
   redirect(successRedirectTo);
 }

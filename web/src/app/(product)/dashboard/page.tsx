@@ -789,32 +789,71 @@ export default async function DashboardPage({
             </p>
             <h2 className="mt-2 text-xl font-semibold text-slate-900">Was als Nächstes kommt</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              CoFoundery Align wächst Schritt für Schritt weiter. Hier seht ihr, welche Formen von
-              Orientierung und Zusammenarbeit als Nächstes dazukommen sollen.
+              CoFoundery Align wächst Schritt für Schritt weiter. Hier seht ihr, welche nächsten
+              Bausteine eure Zusammenarbeit später noch tiefer, klarer und belastbarer begleiten sollen.
             </p>
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        <div className="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Tiefere Reflexion</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Fortschritts-Check</h3>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
+                Kommt bald
+              </span>
+            </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Weitere Module und gezieltere Reflexionsfragen sollen kritische Teamthemen noch
-              früher sichtbar machen.
+              Ein späterer Check-in soll sichtbar machen, was sich nach einigen Monaten bewährt hat
+              und wo ihr eure Absprachen nachschärfen wollt.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Mehr Orientierung im Alltag</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Vertiefung eurer Zusammenarbeit</h3>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
+                In Planung
+              </span>
+            </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Das Workbook wird weiter darauf ausgerichtet, klare Absprachen leichter festzuhalten
-              und im Alltag wiederzufinden.
+              Weitere Reflexionsmodule sollen euch helfen, Alignment nicht nur einmal festzuhalten,
+              sondern über Zeit bewusster weiterzuentwickeln.
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Präzisere Vergleiche</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Investor Readiness</h3>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
+                Perspektive
+              </span>
+            </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Künftige Auswertungen sollen Unterschiede, Ergänzungen und Spannungen noch klarer und
-              anschlussfähiger zeigen.
+              Künftige Auswertungen sollen zeigen, wie euer Founder-Setup von außen wirkt und wo
+              daraus besondere Stärken oder Rückfragen entstehen.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Team- und Rollenentwicklung</h3>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
+                Später
+              </span>
+            </div>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Wenn euer Team wächst, sollen zusätzliche Rollen, Verantwortungen und Schnittstellen
+              klarer in die Zusammenarbeit eingebunden werden.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-900">Wissensbibliothek</h3>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
+                Ausbau
+              </span>
+            </div>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Eine kuratierte Bibliothek soll euch später passende Impulse, Modelle und konkrete
+              Hilfen für Founder-Zusammenarbeit direkt anschlussfähig machen.
             </p>
           </article>
         </div>
@@ -1080,8 +1119,8 @@ function DashboardProfileAvatar({
       displayName={displayName}
       avatarId={avatarId}
       imageUrl={imageUrl}
-      className="h-16 w-16 rounded-[24px] border border-white/80 object-cover shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
-      fallbackClassName="flex h-16 w-16 items-center justify-center rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]"
+      className="h-16 w-16 rounded-full border border-white/80 object-cover shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
+      fallbackClassName="flex h-16 w-16 items-center justify-center rounded-full border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]"
     />
   );
 }

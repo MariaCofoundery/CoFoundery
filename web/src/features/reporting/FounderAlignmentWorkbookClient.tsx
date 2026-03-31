@@ -1110,6 +1110,142 @@ export function FounderAlignmentWorkbookClient({
               </div>
             </div>
 
+            {(!currentStepIsAdvisorClosing || showAdvisorInviteCard) && (
+              <div
+                className={`mt-6 grid gap-4 ${
+                  showAdvisorInviteCard
+                    ? "xl:grid-cols-[minmax(0,1.18fr)_minmax(300px,0.82fr)]"
+                    : ""
+                }`}
+              >
+                {!currentStepIsAdvisorClosing ? (
+                  <section className="rounded-[28px] border border-[color:var(--brand-primary)]/18 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.035)] sm:p-6">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="max-w-2xl">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                          {t("Arbeitsmodus")}
+                        </p>
+                        <h2 className="mt-2 text-lg font-semibold text-slate-950">
+                          {t("Wie möchtet ihr diesen Schritt bearbeiten?")}
+                        </h2>
+                        <p className="mt-2 text-sm leading-7 text-slate-600">
+                          {t("Legt zuerst fest, ob ihr diesen Schritt allein vorbereitet oder direkt gemeinsam bearbeitet.")}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/8 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-600">
+                        {t(`Schritt ${currentIndex + 1}`)}
+                      </span>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 lg:grid-cols-2">
+                      {WORKBOOK_MODE_OPTIONS.map((option) => {
+                        const isActive = currentStepMode === option.value;
+                        const disabled =
+                          currentUserRole === "advisor" || currentUserRole === "unknown";
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => updateStepMode(option.value)}
+                            disabled={disabled}
+                            className={`rounded-2xl border px-4 py-4 text-left transition ${
+                              isActive
+                                ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.08)]"
+                                : disabled
+                                  ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
+                                  : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                            }`}
+                          >
+                            <p className="text-sm font-semibold text-slate-900">{t(option.label)}</p>
+                            <p className="mt-2 text-sm leading-6 text-slate-600">
+                              {t(option.description)}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ) : null}
+
+                {showAdvisorInviteCard ? (
+                  <aside className="rounded-[24px] border border-slate-200/80 bg-slate-50/78 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
+                    <div className="max-w-md">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("Dritte Perspektive")}
+                      </p>
+                      <h3 className="mt-1.5 text-base font-semibold text-slate-950">
+                        {advisorInviteState.advisorLinked
+                          ? t("Moderation ist verbunden")
+                          : t("Optional eine dritte Perspektive einbinden")}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        {advisorInviteState.advisorLinked
+                          ? t(
+                              "Eine neutrale Person kann dieses Workbook begleiten und pro Schritt Hinweise hinterlassen."
+                            )
+                          : t(
+                              "Wenn ihr bei schwierigen Punkten eine neutrale Begleitung möchtet, könnt ihr hier eine dritte Person einladen."
+                            )}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border border-white/80 bg-white/92 p-3">
+                      <div className="grid gap-2 text-sm text-slate-700">
+                        <AdvisorApprovalRow
+                          label={founderALabel}
+                          approved={advisorInviteState.founderAApproved}
+                        />
+                        <AdvisorApprovalRow
+                          label={founderBLabel}
+                          approved={advisorInviteState.founderBApproved}
+                        />
+                        {advisorInviteState.advisorLinked ? (
+                          <AdvisorApprovalRow
+                            label={advisorInviteState.advisorName ?? advisorLabel}
+                            approved
+                            tone="linked"
+                          />
+                        ) : null}
+                      </div>
+
+                      {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
+                        <div className="mt-3 space-y-3">
+                          <ReportActionButton
+                            type="button"
+                            onClick={handleAdvisorInvite}
+                            className="w-full justify-center"
+                          >
+                            {advisorInviteState.advisorLinked
+                              ? t("Moderation erneut einladen")
+                              : t("Moderation einladen")}
+                          </ReportActionButton>
+                          {advisorInviteMessage ? (
+                            <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
+                          ) : null}
+                          {advisorInviteLink ? (
+                            <details className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2.5">
+                              <summary className="cursor-pointer text-xs font-medium text-slate-700">
+                                {t("Einladungslink anzeigen")}
+                              </summary>
+                              <p className="mt-2 break-all text-xs leading-6 text-slate-700">
+                                {advisorInviteLink}
+                              </p>
+                            </details>
+                          ) : null}
+                        </div>
+                      ) : currentUserRole === "advisor" ? (
+                        <p className="mt-3 text-xs leading-6 text-slate-600">
+                          {t(
+                            "Du bist in diesem Workbook für die Moderation verknüpft und kannst unter jedem Schritt eigene Hinweise hinterlegen."
+                          )}
+                        </p>
+                      ) : null}
+                    </div>
+                  </aside>
+                ) : null}
+              </div>
+            )}
+
             <details className="mt-6 rounded-3xl border border-slate-200/70 bg-slate-50/70 p-6">
               <summary className="cursor-pointer list-none text-sm font-semibold text-slate-900">
                 {t("Fokusthemen aus eurem Matching-Report anzeigen")}
@@ -1292,39 +1428,6 @@ export function FounderAlignmentWorkbookClient({
               </div>
             ) : null}
 
-            {!currentStepIsAdvisorClosing ? (
-              <StepSection title="Arbeitsmodus" className="mt-8 border-slate-200/80 bg-white">
-                <p className="text-sm leading-7 text-slate-700">
-                  {t("Wie moechtet ihr diesen Schritt bearbeiten?")}
-                </p>
-                <div className="mt-5 grid gap-3 lg:grid-cols-2">
-                  {WORKBOOK_MODE_OPTIONS.map((option) => {
-                    const isActive = currentStepMode === option.value;
-                    const disabled =
-                      currentUserRole === "advisor" || currentUserRole === "unknown";
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => updateStepMode(option.value)}
-                        disabled={disabled}
-                        className={`rounded-2xl border px-4 py-4 text-left transition ${
-                          isActive
-                            ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.08)]"
-                            : disabled
-                              ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        <p className="text-sm font-semibold text-slate-900">{t(option.label)}</p>
-                        <p className="mt-2 text-sm leading-6 text-slate-600">{t(option.description)}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </StepSection>
-            ) : null}
-
             <StepSection title="1. Kontext" className="mt-8 border-slate-200 bg-slate-50/80">
               <div className="space-y-3">
                 {shortContext.map((paragraph) => (
@@ -1335,85 +1438,6 @@ export function FounderAlignmentWorkbookClient({
                 <p className="text-sm leading-7 text-slate-700">{t(currentStepContent.everyday)}</p>
               </div>
             </StepSection>
-
-            {showAdvisorInviteCard ? (
-              <aside className="mt-6 ml-auto max-w-lg rounded-[24px] border border-slate-200/80 bg-slate-50/78 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="max-w-md">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Dritte Perspektive")}
-                    </p>
-                    <h3 className="mt-1.5 text-base font-semibold text-slate-950">
-                      {advisorInviteState.advisorLinked
-                        ? t("Moderation ist verbunden")
-                        : t("Optional eine dritte Perspektive einbinden")}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
-                      {advisorInviteState.advisorLinked
-                        ? t(
-                            "Eine neutrale Person kann dieses Workbook begleiten und pro Schritt Hinweise hinterlassen."
-                          )
-                        : t(
-                            "Wenn ihr bei schwierigen Punkten eine neutrale Begleitung möchtet, könnt ihr hier eine dritte Person einladen."
-                          )}
-                    </p>
-                  </div>
-
-                  <div className="min-w-[220px] rounded-2xl border border-white/80 bg-white/92 p-3">
-                    <div className="grid gap-2 text-sm text-slate-700">
-                      <AdvisorApprovalRow
-                        label={founderALabel}
-                        approved={advisorInviteState.founderAApproved}
-                      />
-                      <AdvisorApprovalRow
-                        label={founderBLabel}
-                        approved={advisorInviteState.founderBApproved}
-                      />
-                      {advisorInviteState.advisorLinked ? (
-                        <AdvisorApprovalRow
-                          label={advisorInviteState.advisorName ?? advisorLabel}
-                          approved
-                          tone="linked"
-                        />
-                      ) : null}
-                    </div>
-
-                    {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
-                      <div className="mt-3 space-y-3">
-                        <ReportActionButton
-                          type="button"
-                          onClick={handleAdvisorInvite}
-                          className="w-full justify-center"
-                        >
-                          {advisorInviteState.advisorLinked
-                            ? t("Moderation erneut einladen")
-                            : t("Moderation einladen")}
-                        </ReportActionButton>
-                        {advisorInviteMessage ? (
-                          <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
-                        ) : null}
-                        {advisorInviteLink ? (
-                          <details className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2.5">
-                            <summary className="cursor-pointer text-xs font-medium text-slate-700">
-                              {t("Einladungslink anzeigen")}
-                            </summary>
-                            <p className="mt-2 break-all text-xs leading-6 text-slate-700">
-                              {advisorInviteLink}
-                            </p>
-                          </details>
-                        ) : null}
-                      </div>
-                    ) : currentUserRole === "advisor" ? (
-                      <p className="mt-3 text-xs leading-6 text-slate-600">
-                        {t(
-                          "Du bist in diesem Workbook für die Moderation verknüpft und kannst unter jedem Schritt eigene Hinweise hinterlegen."
-                        )}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-              </aside>
-            ) : null}
 
             {!currentStepIsAdvisorClosing ? (
               <details
