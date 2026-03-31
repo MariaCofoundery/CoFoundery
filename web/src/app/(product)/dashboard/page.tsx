@@ -400,11 +400,12 @@ export default async function DashboardPage({
     },
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
-  const profileAvatarId = profileData?.avatar_id ?? null;
-  const profileImageUrl =
-    (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
-    (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
-    null;
+  const profileAvatarId = profileData?.avatar_id?.trim() || null;
+  const profileImageUrl = profileAvatarId
+    ? null
+    : (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
+      (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
+      null;
   const quoteOfTheDay = getQuoteOfTheDay();
 
   const selfReportDebug = selfReport
@@ -543,37 +544,44 @@ export default async function DashboardPage({
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-6"
         style={staggerStyle(120)}
       >
-        <details>
+        <div>
+          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+              <MatchingIcon className="h-4 w-4" />
+            </span>
+            Team & Zusammenarbeit
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">
+            Einladungen, Matching und Zusammenarbeit
+          </h2>
+        </div>
+
+        <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-semibold text-slate-900">Co-Founder einladen</h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Starte oder begleite hier euren Matching-Prozess.
+              </p>
+            </div>
+            <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+              Co-Founder einladen
+            </Link>
+          </div>
+        </article>
+
+        <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
             <div>
-              <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                  <MatchingIcon className="h-4 w-4" />
-                </span>
-                Team & Zusammenarbeit
+              <p className="text-sm font-semibold text-slate-900">Einladungen und Reports</p>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Offene Einladungen, Matching-Reports und weitere Teamdetails.
               </p>
-              <h2 className="mt-2 text-xl font-semibold text-slate-950">
-                Einladungen, Matching und Zusammenarbeit
-              </h2>
             </div>
             <span className="text-sm text-slate-500">Ausklappen</span>
           </summary>
 
           <div className="mt-5 grid gap-4">
-            <article className={`${PRIMARY_SURFACE_CLASS} p-5`}>
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-base font-semibold text-slate-900">Co-Founder einladen</h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">
-                    Starte oder begleite hier euren Matching-Prozess.
-                  </p>
-                </div>
-                <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-                  Co-Founder einladen
-                </Link>
-              </div>
-            </article>
-
             <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
@@ -730,30 +738,27 @@ export default async function DashboardPage({
 
             <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/92 p-5">
               <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">E-Mail-Adresse</p>
-              <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-900">
-                    {user.email ?? "E-Mail nicht verfügbar"}
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-slate-600">
-                    Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.
-                  </p>
-                  <p className="mt-2 text-xs leading-6 text-slate-500">
-                    Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit
-                    Zwei-Faktor-Authentifizierung.
-                  </p>
-                </div>
-
+              <div className="mt-3">
+                <p className="text-sm font-medium text-slate-900">
+                  {user.email ?? "E-Mail nicht verfügbar"}
+                </p>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.
+                </p>
+                <p className="mt-2 text-xs leading-6 text-slate-500">
+                  Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit
+                  Zwei-Faktor-Authentifizierung.
+                </p>
+                <p className="mt-3 text-xs leading-6 text-slate-500">
+                  Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.
+                </p>
                 <a
                   href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail-Adresse ändern")}`}
-                  className={`${UTILITY_CTA_CLASS} shrink-0`}
+                  className={`${UTILITY_CTA_CLASS} mt-4`}
                 >
-                  E-Mail-Adresse ändern? Kontaktiere uns
+                  Support kontaktieren
                 </a>
               </div>
-              <p className="mt-3 text-xs leading-6 text-slate-500">
-                Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.
-              </p>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -766,6 +771,52 @@ export default async function DashboardPage({
 
             <DeleteAccountSection />
           </section>
+        </div>
+      </section>
+
+      <section
+        id="dashboard-block-outlook"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-slate-50/76 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.03)]"
+        style={staggerStyle(140)}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+                <ReportIcon className="h-4 w-4" />
+              </span>
+              Ausblick
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">Was als Nächstes kommt</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              CoFoundery Align wächst Schritt für Schritt weiter. Hier seht ihr, welche Formen von
+              Orientierung und Zusammenarbeit als Nächstes dazukommen sollen.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Tiefere Reflexion</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Weitere Module und gezieltere Reflexionsfragen sollen kritische Teamthemen noch
+              früher sichtbar machen.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Mehr Orientierung im Alltag</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Das Workbook wird weiter darauf ausgerichtet, klare Absprachen leichter festzuhalten
+              und im Alltag wiederzufinden.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Präzisere Vergleiche</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Künftige Auswertungen sollen Unterschiede, Ergänzungen und Spannungen noch klarer und
+              anschlussfähiger zeigen.
+            </p>
+          </article>
         </div>
       </section>
 
@@ -1196,9 +1247,17 @@ function MatchingIcon({ className = "h-4 w-4" }: { className?: string }) {
 
 function QuoteIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.5 8.25H6.75A2.25 2.25 0 004.5 10.5v2.75A2.25 2.25 0 006.75 15.5H9a2 2 0 002-2v-3.25a2 2 0 00-2-2z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 8.25h-2.75A2.25 2.25 0 0014 10.5v2.75a2.25 2.25 0 002.25 2.25h2.25a2 2 0 002-2v-3.25a2 2 0 00-2-2z" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" className={className} aria-hidden="true">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9.25 8.75c-1.56.72-2.34 1.95-2.34 3.7v1.08c0 .97.79 1.76 1.76 1.76h.83c.97 0 1.75-.78 1.75-1.75v-.9c0-.96-.78-1.75-1.75-1.75H7.66c.05-.93.57-1.71 1.59-2.34"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M17.25 8.75c-1.56.72-2.34 1.95-2.34 3.7v1.08c0 .97.79 1.76 1.76 1.76h.83c.97 0 1.75-.78 1.75-1.75v-.9c0-.96-.78-1.75-1.75-1.75h-1.84c.05-.93.57-1.71 1.59-2.34"
+      />
     </svg>
   );
 }

@@ -300,18 +300,20 @@ function mergeFounderPayload(
     if (!stepEntry) {
       continue;
     }
+    const founderCanCollaborate =
+      stepEntry.mode === "collaborative" && (role === "founderA" || role === "founderB");
 
     switch (patch.field) {
       case "mode":
         stepEntry.mode = patch.value === "collaborative" ? "collaborative" : "solo";
         break;
       case "founderA":
-        if (role === "founderA" && typeof patch.value === "string") {
+        if (typeof patch.value === "string" && (role === "founderA" || founderCanCollaborate)) {
           stepEntry.founderA = patch.value;
         }
         break;
       case "founderB":
-        if (role === "founderB" && typeof patch.value === "string") {
+        if (typeof patch.value === "string" && (role === "founderB" || founderCanCollaborate)) {
           stepEntry.founderB = patch.value;
         }
         break;
