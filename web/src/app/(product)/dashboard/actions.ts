@@ -2,8 +2,10 @@
 
 import { createHash, randomBytes } from "crypto";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import { deleteFounderAccount } from "@/features/account/deleteFounderAccount";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -40,8 +42,7 @@ export type DeleteAccountActionResult =
       error:
         | "not_authenticated"
         | "missing_service_role"
-        | "cleanup_failed"
-        | "auth_delete_failed";
+        | "cleanup_failed";
     };
 
 type MySessionResponseRow = {
@@ -275,32 +276,9 @@ export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountAct
     return { ok: false, error: "not_authenticated" };
   }
 
-  const privileged = createPrivilegedClient();
-  if (!privileged) {
-    return { ok: false, error: "missing_service_role" };
-  }
-
-  const { error: cleanupError } = await privileged.rpc("delete_user_operational_data", {
-    p_user_id: user.id,
-    p_user_email: normalizeEmail(user.email ?? null) || null,
-    p_research_hash_salt: process.env.RESEARCH_HASH_SALT?.trim() || null,
-  });
-
-  if (cleanupError) {
-    console.error("deleteCurrentUserAccountAction cleanup failed", {
-      userId: user.id,
-      error: cleanupError.message,
-    });
-    return { ok: false, error: "cleanup_failed" };
-  }
-
-  const { error: authDeleteError } = await privileged.auth.admin.deleteUser(user.id);
-  if (authDeleteError) {
-    console.error("deleteCurrentUserAccountAction auth delete failed", {
-      userId: user.id,
-      error: authDeleteError.message,
-    });
-    return { ok: false, error: "auth_delete_failed" };
+  const deleteResult = await deleteFounderAccount(user.id);
+  if (!deleteResult.ok) {
+    return { ok: false, error: deleteResult.error };
   }
 
   try {
@@ -309,7 +287,10 @@ export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountAct
     // Best effort: once the auth user is gone, stale sessions should no longer be usable.
   }
 
-  redirect("/login?status=account_deleted");
+  revalidatePath("/", "layout");
+  revalidatePath("/dashboard");
+
+  redirect("/?status=account_deleted");
 }
 
 export async function updateDisplayNameAction(formData: FormData) {

@@ -17,7 +17,7 @@ function errorMessage(error: string | null) {
     return "Die Löschung ist gerade technisch nicht verfügbar. Bitte versuche es später erneut.";
   }
 
-  if (error === "cleanup_failed" || error === "auth_delete_failed") {
+  if (error === "cleanup_failed") {
     return "Dein Account konnte gerade nicht vollständig gelöscht werden. Bitte versuche es erneut.";
   }
 
