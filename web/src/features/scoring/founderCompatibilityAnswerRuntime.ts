@@ -127,6 +127,16 @@ function buildLegacyQuestionBridgeMeta() {
 }
 
 const LEGACY_QUESTION_TO_V2_ITEM = buildLegacyQuestionBridgeMeta();
+const CANONICAL_LEGACY_QUESTION_ID_BY_ITEM = (() => {
+  const cache = new Map<ItemId, string>();
+  for (const [questionId, meta] of LEGACY_QUESTION_TO_V2_ITEM.entries()) {
+    if (!cache.has(meta.itemId)) {
+      cache.set(meta.itemId, questionId);
+    }
+  }
+  return cache;
+})();
+const CANONICAL_LEGACY_QUESTION_ID_SET = new Set(CANONICAL_LEGACY_QUESTION_ID_BY_ITEM.values());
 
 function emptyCountRecord() {
   return ORDERED_DIMENSION_IDS.reduce((acc, dimensionId) => {
@@ -148,6 +158,14 @@ export function getLegacyFounderQuestionBridgeMeta(questionId: string) {
 
 export function isActiveFounderCompatibilityItemId(questionId: string): questionId is ItemId {
   return ACTIVE_ITEM_BY_ID.has(questionId as ItemId);
+}
+
+export function getCanonicalLegacyFounderQuestionIdForItem(itemId: ItemId) {
+  return CANONICAL_LEGACY_QUESTION_ID_BY_ITEM.get(itemId) ?? null;
+}
+
+export function isCanonicalLegacyFounderQuestionId(questionId: string) {
+  return CANONICAL_LEGACY_QUESTION_ID_SET.has(questionId);
 }
 
 export function mapLegacyFounderAnswerToV2Answer(

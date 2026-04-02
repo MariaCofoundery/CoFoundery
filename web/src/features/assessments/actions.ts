@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { finalizeInvitationIfReady } from "@/features/reporting/actions";
 import {
+  getFounderCompatibilityBasePersistenceQuestionId,
   isActiveFounderCompatibilityBaseItemId,
   isValidFounderCompatibilityBaseChoiceValue,
 } from "@/features/questionnaire/founderCompatibilityBaseQuestionnaire";
@@ -186,10 +187,15 @@ export async function upsertAssessmentAnswer(
         return { ok: false, error: "invalid_choice" };
       }
 
+      const persistedQuestionId = getFounderCompatibilityBasePersistenceQuestionId(questionId);
+      if (!persistedQuestionId) {
+        return { ok: false, error: "invalid_question" };
+      }
+
       const { error: upsertError } = await supabase.from("assessment_answers").upsert(
         {
           assessment_id: assessmentId,
-          question_id: questionId,
+          question_id: persistedQuestionId,
           choice_value: choiceValue,
         },
         { onConflict: "assessment_id,question_id" }

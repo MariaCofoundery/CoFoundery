@@ -8,7 +8,8 @@ import {
 } from "@/features/assessments/actions";
 import {
   buildFounderCompatibilityBaseQuestionnaire,
-  hasLegacyFounderBaseAnswers,
+  hasIncompatibleLegacyFounderBaseAnswers,
+  normalizeFounderCompatibilityBaseDraftAnswerMap,
 } from "@/features/questionnaire/founderCompatibilityBaseQuestionnaire";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import {
@@ -101,8 +102,8 @@ export default async function MeBasePage({
   }
 
   const { questions, choices } = buildFounderCompatibilityBaseQuestionnaire();
-  const answerMap = await getAssessmentAnswerMap(draft.id);
-  if (hasLegacyFounderBaseAnswers(answerMap)) {
+  const rawAnswerMap = await getAssessmentAnswerMap(draft.id);
+  if (hasIncompatibleLegacyFounderBaseAnswers(rawAnswerMap)) {
     const freshDraft = await createDraftAssessment("base");
     const nextSearch = new URLSearchParams();
     if (invitationId) {
@@ -114,6 +115,7 @@ export default async function MeBasePage({
     nextSearch.set("assessmentId", freshDraft.id);
     redirect(`/me/base?${nextSearch.toString()}`);
   }
+  const answerMap = normalizeFounderCompatibilityBaseDraftAnswerMap(rawAnswerMap);
 
   const responses: QuestionnaireResponse[] = Object.entries(answerMap).map(([questionId, choiceValue]) => ({
     question_id: questionId,

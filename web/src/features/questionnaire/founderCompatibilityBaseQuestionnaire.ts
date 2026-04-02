@@ -5,6 +5,12 @@ import {
   type RegistryItem,
 } from "@/features/scoring/founderCompatibilityRegistry";
 import type { AnswerMap } from "@/features/assessments/actions";
+import {
+  getCanonicalLegacyFounderQuestionIdForItem,
+  getLegacyFounderQuestionBridgeMeta,
+  isActiveFounderCompatibilityItemId,
+  isCanonicalLegacyFounderQuestionId,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { getFounderBaseQuestionScoreMeta } from "@/features/scoring/founderBaseQuestionMeta";
 
@@ -94,6 +100,48 @@ export function isValidFounderCompatibilityBaseChoiceValue(itemId: string, choic
   return item.choices.some((choice) => String(choice.value) === choiceValue);
 }
 
-export function hasLegacyFounderBaseAnswers(answerMap: AnswerMap) {
-  return Object.keys(answerMap).some((questionId) => Boolean(getFounderBaseQuestionScoreMeta(questionId)));
+export function getFounderCompatibilityBasePersistenceQuestionId(itemId: string) {
+  if (!isActiveFounderCompatibilityBaseItemId(itemId)) {
+    return null;
+  }
+
+  return getCanonicalLegacyFounderQuestionIdForItem(itemId) ?? null;
+}
+
+export function normalizeFounderCompatibilityBaseDraftAnswerMap(answerMap: AnswerMap): AnswerMap {
+  const normalized: AnswerMap = {};
+
+  for (const [questionId, choiceValue] of Object.entries(answerMap)) {
+    if (isActiveFounderCompatibilityItemId(questionId) && isValidFounderCompatibilityBaseChoiceValue(questionId, choiceValue)) {
+      normalized[questionId] = choiceValue;
+      continue;
+    }
+
+    const bridgeMeta = getLegacyFounderQuestionBridgeMeta(questionId);
+    if (!bridgeMeta) {
+      continue;
+    }
+
+    if (!isValidFounderCompatibilityBaseChoiceValue(bridgeMeta.itemId, choiceValue)) {
+      continue;
+    }
+
+    normalized[bridgeMeta.itemId] = choiceValue;
+  }
+
+  return normalized;
+}
+
+export function hasIncompatibleLegacyFounderBaseAnswers(answerMap: AnswerMap) {
+  return Object.keys(answerMap).some((questionId) => {
+    if (isActiveFounderCompatibilityItemId(questionId)) {
+      return false;
+    }
+
+    if (!getFounderBaseQuestionScoreMeta(questionId)) {
+      return false;
+    }
+
+    return !isCanonicalLegacyFounderQuestionId(questionId);
+  });
 }
