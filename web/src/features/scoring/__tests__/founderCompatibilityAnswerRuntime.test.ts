@@ -54,6 +54,24 @@ test("legacy rows are filtered through the basis boundary before V2 conversion",
   );
 });
 
+test("registry-native base rows map directly without legacy question metadata", () => {
+  const rows = [
+    { question_id: "cl_core_1", choice_value: "75" },
+    { question_id: "cl_support_1", choice_value: "67" },
+    { question_id: "q49_values_1", choice_value: "100" },
+  ];
+
+  const mapped = mapLegacyFounderAnswersToV2Answers(rows);
+
+  assert.deepEqual(
+    mapped.map((entry) => ({ itemId: entry.itemId, value: entry.value, source: entry.source })),
+    [
+      { itemId: "cl_core_1", value: 75, source: "registry" },
+      { itemId: "cl_support_1", value: 67, source: "registry" },
+    ]
+  );
+});
+
 test("V2 answer maps average duplicate legacy mappings onto one canonical item id", () => {
   const answerMap = buildFounderCompatibilityAnswerMapV2([
     { itemId: "cl_core_1", value: 0, source: "legacy_bridge", legacyQuestionId: "q01_vision_l1" },
@@ -63,6 +81,15 @@ test("V2 answer maps average duplicate legacy mappings onto one canonical item i
 
   assert.equal(answerMap.cl_core_1, 50);
   assert.equal(answerMap.cl_core_2, 25);
+});
+
+test("registry-native answers override legacy bridge answers for the same canonical item", () => {
+  const answerMap = buildFounderCompatibilityAnswerMapV2([
+    { itemId: "cl_core_1", value: 0, source: "legacy_bridge", legacyQuestionId: "q01_vision_l1" },
+    { itemId: "cl_core_1", value: 75, source: "registry" },
+  ]);
+
+  assert.equal(answerMap.cl_core_1, 75);
 });
 
 test("dimension aggregates operate on V2 item ids instead of legacy question ids", () => {

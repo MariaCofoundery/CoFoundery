@@ -29,7 +29,7 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       return;
     }
 
-    const redirectTo = new URL("/auth/confirm", `${origin}/`);
+    const redirectTo = new URL("/auth/callback", `${origin}/`);
     redirectTo.searchParams.set("next", nextPath);
 
     const { error } = await supabase.auth.signInWithOtp({

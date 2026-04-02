@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { finalizeInvitationIfReady } from "@/features/reporting/actions";
+import {
+  isActiveFounderCompatibilityBaseItemId,
+  isValidFounderCompatibilityBaseChoiceValue,
+} from "@/features/questionnaire/founderCompatibilityBaseQuestionnaire";
 
 export type ModuleKey = "base" | "values";
 export type QuestionCategory = "basis" | "values";
@@ -175,6 +179,27 @@ export async function upsertAssessmentAnswer(
     const { supabase, assessment } = await getOwnedAssessmentOrThrow(assessmentId);
     if (assessment.submitted_at) {
       return { ok: false, error: "already_submitted" };
+    }
+
+    if (assessment.module === "base" && isActiveFounderCompatibilityBaseItemId(questionId)) {
+      if (!isValidFounderCompatibilityBaseChoiceValue(questionId, choiceValue)) {
+        return { ok: false, error: "invalid_choice" };
+      }
+
+      const { error: upsertError } = await supabase.from("assessment_answers").upsert(
+        {
+          assessment_id: assessmentId,
+          question_id: questionId,
+          choice_value: choiceValue,
+        },
+        { onConflict: "assessment_id,question_id" }
+      );
+
+      if (upsertError) {
+        return { ok: false, error: "save_failed" };
+      }
+
+      return { ok: true };
     }
 
     const expectedCategory = MODULE_TO_CATEGORY[assessment.module];

@@ -6,13 +6,15 @@ import {
   getOwnedDraftAssessment,
   getOrCreateDraftAssessment,
 } from "@/features/assessments/actions";
+import {
+  buildFounderCompatibilityBaseQuestionnaire,
+  hasLegacyFounderBaseAnswers,
+} from "@/features/questionnaire/founderCompatibilityBaseQuestionnaire";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import {
   QuestionnaireClient,
-  type QuestionnaireChoice,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
-import { normalizeQuestionnaireQuestions } from "@/features/questionnaire/questionnaireShared";
 
 type MeBaseSearchParams = {
   invitationId?: string;
@@ -77,67 +79,42 @@ export default async function MeBasePage({
     }
   }
 
+  const explicitDraftId = params.assessmentId?.trim() ?? "";
   let draft = null as Awaited<ReturnType<typeof getOrCreateDraftAssessment>> | null;
-  if (invitationId && isRefreshFlow) {
-    const refreshDraftId = params.assessmentId?.trim() ?? "";
-    if (refreshDraftId) {
-      draft = await getOwnedDraftAssessment("base", refreshDraftId);
-    }
-    if (!draft) {
-      const freshDraft = await createDraftAssessment("base");
-      const refreshSearch = new URLSearchParams({
-        invitationId,
-        flow: "refresh",
-        assessmentId: freshDraft.id,
-      });
-      redirect(`/me/base?${refreshSearch.toString()}`);
-    }
-  } else {
+  if (explicitDraftId) {
+    draft = await getOwnedDraftAssessment("base", explicitDraftId);
+  }
+  if (!draft && invitationId && isRefreshFlow) {
+    const freshDraft = await createDraftAssessment("base");
+    const refreshSearch = new URLSearchParams({
+      invitationId,
+      flow: "refresh",
+      assessmentId: freshDraft.id,
+    });
+    redirect(`/me/base?${refreshSearch.toString()}`);
+  }
+  if (!draft) {
     draft = await getOrCreateDraftAssessment("base");
   }
   if (!draft) {
     return <main className="p-8">Fehler beim Erstellen des Fragebogens.</main>;
   }
 
-  const { data: questionsData, error: questionsError } = await supabase
-    .from("questions")
-    .select("*")
-    .eq("is_active", true)
-    .eq("category", "basis")
-    .order("sort_order", { ascending: true });
-
-  if (questionsError) {
-    return <main className="p-8">Fehler beim Laden des Basis-Fragebogens: {questionsError.message}</main>;
+  const { questions, choices } = buildFounderCompatibilityBaseQuestionnaire();
+  const answerMap = await getAssessmentAnswerMap(draft.id);
+  if (hasLegacyFounderBaseAnswers(answerMap)) {
+    const freshDraft = await createDraftAssessment("base");
+    const nextSearch = new URLSearchParams();
+    if (invitationId) {
+      nextSearch.set("invitationId", invitationId);
+    }
+    if (isRefreshFlow) {
+      nextSearch.set("flow", "refresh");
+    }
+    nextSearch.set("assessmentId", freshDraft.id);
+    redirect(`/me/base?${nextSearch.toString()}`);
   }
 
-  const questions = normalizeQuestionnaireQuestions((questionsData ?? []) as unknown[]);
-  const questionIds = questions.map((question) => question.id);
-
-  const [{ data: choicesData, error: choicesError }, answerMap] = await Promise.all([
-    questionIds.length > 0
-      ? supabase
-          .from("choices")
-          .select("id, question_id, label, value, sort_order")
-          .in("question_id", questionIds)
-          .order("sort_order", { ascending: true })
-      : Promise.resolve({ data: [] as QuestionnaireChoice[], error: null }),
-    getAssessmentAnswerMap(draft.id),
-  ]);
-
-  if (choicesError) {
-    return (
-      <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
-        <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
-          <h1 className="text-base font-semibold text-red-900">Basis-Fragebogen</h1>
-          <p className="mt-2 text-sm text-red-700">
-            Antwortoptionen konnten nicht geladen werden. Bitte neu laden.
-          </p>
-        </section>
-      </main>
-    );
-  }
-
-  const choices = (choicesData ?? []) as QuestionnaireChoice[];
   const responses: QuestionnaireResponse[] = Object.entries(answerMap).map(([questionId, choiceValue]) => ({
     question_id: questionId,
     choice_value: choiceValue,

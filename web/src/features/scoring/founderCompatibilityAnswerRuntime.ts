@@ -1,4 +1,5 @@
 import {
+  getRegistryItem,
   getOrderedActiveRegistryItems,
   getOrderedRegistryDimensions,
   getRegistryItemsByDimension,
@@ -145,6 +146,10 @@ export function getLegacyFounderQuestionBridgeMeta(questionId: string) {
   return LEGACY_QUESTION_TO_V2_ITEM.get(questionId) ?? null;
 }
 
+export function isActiveFounderCompatibilityItemId(questionId: string): questionId is ItemId {
+  return ACTIVE_ITEM_BY_ID.has(questionId as ItemId);
+}
+
 export function mapLegacyFounderAnswerToV2Answer(
   questionId: string,
   rawValue: string
@@ -172,6 +177,36 @@ export function mapLegacyFounderAnswersToV2Answers(
   questionById?: Map<string, LegacyFounderQuestionMetaLike>
 ) {
   return rows.flatMap((row) => {
+    if (isActiveFounderCompatibilityItemId(row.question_id)) {
+      const item = getRegistryItem(row.question_id);
+      if (!item?.isActive) {
+        return [];
+      }
+
+      if (questionById) {
+        const meta = questionById.get(row.question_id);
+        if (meta && !isBasisCategory(meta.category)) {
+          return [];
+        }
+      }
+
+      const numericValue = Number.parseFloat(row.choice_value);
+      if (!Number.isFinite(numericValue)) {
+        return [];
+      }
+      if (!item.choices.some((choice) => choice.value === numericValue)) {
+        return [];
+      }
+
+      return [
+        {
+          itemId: row.question_id,
+          value: round(numericValue),
+          source: "registry",
+        } satisfies FounderCompatibilityAnswerV2,
+      ];
+    }
+
     const meta = questionById?.get(row.question_id);
     if (questionById && !meta) {
       return [];
@@ -188,13 +223,15 @@ export function mapLegacyFounderAnswersToV2Answers(
 export function buildFounderCompatibilityAnswerMapV2(
   answers: FounderCompatibilityAnswerV2[]
 ): FounderCompatibilityAnswerMapV2 {
-  const buckets = new Map<ItemId, number[]>();
+  const registryBuckets = new Map<ItemId, number[]>();
+  const legacyBuckets = new Map<ItemId, number[]>();
 
   for (const answer of answers) {
     if (!ACTIVE_ITEM_BY_ID.has(answer.itemId)) {
       continue;
     }
 
+    const buckets = answer.source === "registry" ? registryBuckets : legacyBuckets;
     const existing = buckets.get(answer.itemId);
     if (existing) {
       existing.push(answer.value);
@@ -205,7 +242,9 @@ export function buildFounderCompatibilityAnswerMapV2(
   }
 
   const map: FounderCompatibilityAnswerMapV2 = {};
-  for (const [itemId, values] of buckets.entries()) {
+  const itemIds = new Set<ItemId>([...legacyBuckets.keys(), ...registryBuckets.keys()]);
+  for (const itemId of itemIds) {
+    const values = registryBuckets.get(itemId) ?? legacyBuckets.get(itemId) ?? [];
     if (values.length === 0) continue;
     map[itemId] = round(values.reduce((sum, value) => sum + value, 0) / values.length);
   }

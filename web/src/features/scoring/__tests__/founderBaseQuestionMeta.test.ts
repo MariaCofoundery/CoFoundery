@@ -18,6 +18,51 @@ test("all basis questions have explicit polarity metadata", () => {
   });
 });
 
+test("question contract also accepts the active 36-item registry questionnaire ids", () => {
+  const registryIds = [
+    "cl_core_1",
+    "cl_core_2",
+    "cl_core_3",
+    "cl_core_4",
+    "cl_support_1",
+    "cl_support_2",
+    "dl_core_1",
+    "dl_core_2",
+    "dl_core_3",
+    "dl_core_4",
+    "dl_support_1",
+    "dl_support_2",
+    "ws_core_1",
+    "ws_core_2",
+    "ws_core_3",
+    "ws_core_4",
+    "ws_support_1",
+    "ws_support_2",
+    "cm_core_1",
+    "cm_core_2",
+    "cm_core_3",
+    "cm_core_4",
+    "cm_support_1",
+    "cm_support_2",
+    "ro_core_1",
+    "ro_core_2",
+    "ro_core_3",
+    "ro_core_4",
+    "ro_support_1",
+    "ro_support_2",
+    "cs_core_1",
+    "cs_core_2",
+    "cs_core_3",
+    "cs_core_4",
+    "cs_support_1",
+    "cs_support_2",
+  ];
+
+  assert.doesNotThrow(() => {
+    assertFounderBaseQuestionVersionContract(registryIds, "test_registry_basis_question_contract");
+  });
+});
+
 test("critical example items are explicitly corrected via polarity metadata", () => {
   assert.equal(getFounderBaseQuestionScoreMeta("q11_commitment_fc1")?.polarity, "high_is_left_pole");
   assert.equal(getFounderBaseQuestionScoreMeta("q12_conflict_fc1")?.polarity, "high_is_right_pole");

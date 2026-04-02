@@ -1,5 +1,6 @@
 import type { QuestionnaireQuestionType } from "@/features/questionnaire/questionnaireShared";
 import { type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
+import { getOrderedActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import { normalizeStoredBaseAnswerToFounderPercent } from "@/features/scoring/founderBaseNormalization";
 
 // Legacy compatibility bridge:
@@ -71,6 +72,8 @@ export const FOUNDER_BASE_QUESTION_SCORE_META: FounderBaseQuestionScoreMeta[] = 
 export const FOUNDER_BASE_QUESTION_SCORE_META_BY_ID = new Map(
   FOUNDER_BASE_QUESTION_SCORE_META.map((entry) => [entry.id, entry])
 );
+const ACTIVE_REGISTRY_BASE_ITEM_IDS = getOrderedActiveRegistryItems().map((item) => item.itemId as string);
+const ACTIVE_REGISTRY_BASE_ITEM_ID_SET = new Set<string>(ACTIVE_REGISTRY_BASE_ITEM_IDS);
 
 export function getFounderBaseQuestionScoreMeta(questionId: string) {
   return FOUNDER_BASE_QUESTION_SCORE_META_BY_ID.get(questionId) ?? null;
@@ -96,10 +99,15 @@ export function scoreStoredBaseAnswerToFounderPercent(questionId: string, rawVal
 export function getFounderBaseQuestionVersionMismatch(questionIds: string[]) {
   const normalizedIds = [...new Set(questionIds.filter(Boolean))];
   const knownIds = new Set(FOUNDER_BASE_QUESTION_SCORE_META.map((entry) => entry.id));
+  const registryIds = new Set(ACTIVE_REGISTRY_BASE_ITEM_IDS);
   const incoming = new Set(normalizedIds);
+  const containsRegistryIds = normalizedIds.some((id) => ACTIVE_REGISTRY_BASE_ITEM_ID_SET.has(id));
+  const expectedIds = containsRegistryIds ? registryIds : knownIds;
 
-  const unknownIds = normalizedIds.filter((id) => !knownIds.has(id)).sort();
-  const missingIds = [...knownIds].filter((id) => !incoming.has(id)).sort();
+  const unknownIds = normalizedIds
+    .filter((id) => !knownIds.has(id) && !registryIds.has(id))
+    .sort();
+  const missingIds = [...expectedIds].filter((id) => !incoming.has(id)).sort();
 
   return {
     unknownIds,
