@@ -59,16 +59,16 @@ function dimensionPrefix(dimension: string | null) {
   return dimension ? `im Bereich ${dimension}` : "in eurer Zusammenarbeit";
 }
 
-function headlineFromScores(overallFit: number | null, conflictRiskIndex: number | null) {
-  if (overallFit == null || conflictRiskIndex == null) {
+function headlineFromScores(overallFit: number | null, overallTension: number | null) {
+  if (overallFit == null || overallTension == null) {
     return "Noch keine belastbare Gesamteinschaetzung";
   }
 
-  if (overallFit >= 85 && conflictRiskIndex <= 25) {
+  if (overallFit >= 85 && overallTension <= 25) {
     return "Hohe Passung mit stabiler gemeinsamer Basis";
   }
 
-  if (overallFit >= 70 && conflictRiskIndex <= 55) {
+  if (overallFit >= 70 && overallTension <= 55) {
     return "Gute Grundlage mit einzelnen Klaerungsthemen";
   }
 
@@ -82,7 +82,7 @@ function headlineFromScores(overallFit: number | null, conflictRiskIndex: number
 function introForContext(
   teamContext: TeamContext,
   overallFit: number | null,
-  conflictRiskIndex: number | null,
+  overallTension: number | null,
   executiveInsights: ExecutiveInsights
 ) {
   const strengthDimension = executiveInsights.topStrength?.dimension;
@@ -111,7 +111,7 @@ function introForContext(
 
   const tensionSentence = tensionDimension
     ? `Besonders aufmerksam solltet ihr auf die Abstimmung ${dimensionPrefix(tensionDimension)} schauen.`
-    : conflictRiskIndex != null && conflictRiskIndex > 55
+    : overallTension != null && overallTension > 55
       ? "Einzelne Themen verdienen fruehzeitig eine bewusstere Abstimmung."
       : "Die wichtigsten Abstimmungsthemen wirken derzeit gut besprechbar.";
 
@@ -201,13 +201,15 @@ export function buildExecutiveSummary({
   scoringResult,
   teamContext,
 }: BuildExecutiveSummaryInput): ExecutiveSummaryResult {
+  const overallTension = scoringResult.overallTension;
+
   return {
     teamContext,
-    headline: headlineFromScores(scoringResult.overallFit, scoringResult.conflictRiskIndex),
+    headline: headlineFromScores(scoringResult.overallFit, overallTension),
     summaryIntro: introForContext(
       teamContext,
       scoringResult.overallFit,
-      scoringResult.conflictRiskIndex,
+      overallTension,
       scoringResult.executiveInsights
     ),
     topMessages: {

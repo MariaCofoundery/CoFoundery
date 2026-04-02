@@ -41,7 +41,7 @@ export const DIMENSION_INSIGHTS = {
       title: "Verbundener Modus",
       text: "Du schätzt engen Austausch und ein gemeinsames Bild der Arbeit als Basis für gute Zusammenarbeit.",
     },
-    neutral: "Du wechselst bewusst zwischen enger Abstimmung und eigenständiger Umsetzung, statt nur einen Modus zu bevorzugen.",
+    neutral: "Du wechselst bewusst zwischen enger Abstimmung und autonomer Umsetzung, statt nur einen Modus zu bevorzugen.",
   },
   verbindlichkeit: {
     high: {
@@ -117,12 +117,12 @@ export const REPORT_CONTENT = {
 } as const;
 
 export const DIMENSION_EXTREMES = {
-  Vision: { low: "strategisch", high: "aufbauend" },
-  Entscheidung: { low: "Analyse", high: "Tempo" },
-  Risiko: { low: "Sicherheit", high: "Wagnis" },
-  Autonomie: { low: "eng abgestimmt", high: "eigenständig" },
-  Verbindlichkeit: { low: "integriert", high: "priorisiert" },
-  Konflikt: { low: "Diplomatie", high: "Direktheit" },
+  Vision: { low: "opportunitätsorientiert", high: "aufbauorientiert" },
+  Entscheidung: { low: "analytisch", high: "intuitiv" },
+  Risiko: { low: "sicherheitsorientiert", high: "chancenorientiert" },
+  Autonomie: { low: "abgestimmt", high: "autonom" },
+  Verbindlichkeit: { low: "klar begrenzt", high: "hoch priorisiert" },
+  Konflikt: { low: "reflektierend", high: "direkt" },
 } as const;
 
 export const REVERSE_QUESTIONS = [] as const;

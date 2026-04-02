@@ -23,24 +23,24 @@ test("founder matching hero is deterministic for complementary builders", () => 
   const selection = runFounderMatchingSelectionExamples().complementary_builders;
   const hero = buildFounderMatchingHero(selection);
 
-  assert.match(hero, /Unterschied als aus Gleichlauf/);
-  assert.match(hero, /wenn unter Zeitdruck entschieden werden muss/);
+  assert.match(hero, /Chance in einem Unterschied|Von selbst traegt er nicht/i);
+  assert.match(hero, /zwischen zwei Wegen entscheiden muesst|zwischen zwei Wegen entscheiden müsst/i);
   assert.match(hero, /Commitment nicht jedes Mal neu aufgerollt werden muss/);
-  assert.match(hero, /arbeitet ihr schnell aneinander vorbei|Dauerabstimmung/);
-  assert.match(hero, /ergänzung ist real|zieht nicht nur anders|trägt sich aber nicht von selbst/i);
+  assert.match(hero, /wann etwas angesprochen wird|eng ihr dazu im Austausch bleiben wollt/i);
+  assert.match(hero, /traegt er nicht von selbst|nicht von selbst/i);
 });
 
 test("founder matching intro blocks are direct and tension-led for misaligned pairs", () => {
   const selection = runFounderMatchingSelectionExamples().misaligned_pressure_pair;
   const blocks = buildFounderMatchingIntroBlocks(selection);
 
-  assert.match(blocks.hero, /Spannung ist kein Späteffekt/);
-  assert.match(blocks.hero, /Präsenz, Verfügbarkeit und Zug/);
+  assert.match(blocks.hero, /beginnt Reibung nicht spaet|beginnt Reibung nicht spät/i);
+  assert.match(blocks.hero, /verschiedene Ziele|Richtungsfrage|Prioritaeten setzt/i);
   assert.match(blocks.hero, /Unterschied in Entscheidungslogik nicht sofort wie Widerspruch/);
-  assert.match(blocks.hero, /auseinanderzieht/);
+  assert.match(blocks.hero, /Einsatz und Arbeitsweise|getrennt besprechen/i);
   assert.equal(blocks.stableBase.title, "Keine klare Basislinie");
   assert.equal(blocks.strongestComplement.title, "Prüfung trifft Zuspitzung");
-  assert.equal(blocks.biggestTension.title, "Wenn Einsatz auseinanderläuft");
+  assert.equal(blocks.biggestTension.title, "Wenn Richtung strittig wird");
 });
 
 test("founder matching builder handles high-similarity blind spot pairs", () => {
@@ -72,9 +72,9 @@ test("daily dynamics simulates interaction instead of restating dimensions", () 
   assert.match(text, /Wenn Arbeit nicht nur weiterlaufen, sondern für beide sichtbar bleiben soll/);
   assert.match(
     text,
-    /arbeitet ihr oft am selben Thema, aber nicht am selben Stand|will dann früher sehen|mehr Mitsicht/
+    /frueher sehen|früher sehen|mehr Mitsicht|nicht denselben Takt/
   );
-  assert.match(text, /Das trägt nur|Das funktioniert nur/);
+  assert.match(text, /Dann muss klar sein|muesst ihr trennen/i);
 });
 
 test("agreement builder returns direct rule sentences", () => {

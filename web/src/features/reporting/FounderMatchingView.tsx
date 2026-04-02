@@ -1,5 +1,14 @@
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
-import { FOUNDER_DIMENSION_META } from "@/features/reporting/founderDimensionMeta";
+import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import {
+  FOUNDER_DIMENSION_META,
+  getFounderDimensionPoleLabels,
+  type FounderDimensionKey,
+} from "@/features/reporting/founderDimensionMeta";
+import {
+  buildFounderMatchingMarkers,
+  type FounderMatchingMarker,
+} from "@/features/reporting/founderMatchingMarkers";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
@@ -23,6 +32,7 @@ type Props = {
   valuesProfileA?: SelfValuesProfile | null;
   valuesProfileB?: SelfValuesProfile | null;
   workbookHref: string;
+  teamContext?: TeamContext | null;
 };
 
 export function FounderMatchingView({
@@ -33,19 +43,25 @@ export function FounderMatchingView({
   valuesProfileA,
   valuesProfileB,
   workbookHref,
+  teamContext,
 }: Props) {
+  const effectiveTeamContext = teamContext ?? "pre_founder";
   const hero = buildFounderMatchingHero(selection);
   const stableBase = buildStableBaseBlock(selection.stableBase);
   const strongestComplement = buildStrongestComplementBlock(selection.strongestComplement, selection);
   const biggestTension = buildBiggestTensionBlock(selection.biggestTension, selection);
   const dailyDynamics = buildFounderMatchingDailyDynamics(selection);
   const agreements = buildFounderMatchingAgreements(selection);
+  const markers = buildFounderMatchingMarkers(compareResult, selection, effectiveTeamContext);
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const heroHeadline = buildMatchHeadline(selection);
   const heroParagraphs = splitIntoParagraphs(hero);
   const dailyDynamicsSections = splitNarrativeSections(dailyDynamics);
+  const topAlignmentSignals = buildSignalEntries(compareResult.topAlignments, selection, "alignment");
+  const topTensionSignals = buildSignalEntries(compareResult.topTensions, selection, "tension");
+  const overallMatchReading = buildOverallMatchReading(compareResult.overallMatchScore);
   const keyFieldCards = [
     { label: "Größtes Spannungsfeld", entry: biggestTension, featured: true },
     { label: "Stabile Basis", entry: stableBase, featured: false },
@@ -74,6 +90,10 @@ export function FounderMatchingView({
             <div className="mt-7 flex flex-wrap gap-2.5">
               <StatusBadge label={participantAName} tone="accentA" />
               <StatusBadge label={participantBName} tone="accentB" />
+              <StatusBadge label={teamContextLabel(effectiveTeamContext)} tone="neutral" />
+              {compareResult.overallMatchScore != null ? (
+                <StatusBadge label={`Match-Score ${compareResult.overallMatchScore}/100`} tone="neutral" />
+              ) : null}
               <StatusBadge
                 label={
                   selection.meta.highSimilarityBlindSpotRisk
@@ -100,6 +120,104 @@ export function FounderMatchingView({
             </p>
           ))}
         </div>
+
+        <div className="mt-8">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+            Im Modell fällt besonders auf
+          </p>
+          <div className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1fr_1fr]">
+            <article className="rounded-[22px] border border-slate-200/80 bg-white/90 p-5">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Gesamtbild</p>
+              <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950">
+                {compareResult.overallMatchScore != null ? `${compareResult.overallMatchScore}/100` : "—"}
+              </p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t(overallMatchReading)}</p>
+            </article>
+
+            <article className="rounded-[22px] border border-slate-200/80 bg-white/90 p-5">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                Stärkste gemeinsame Basis
+              </p>
+              <ul className="mt-3 space-y-3">
+                {topAlignmentSignals.length > 0 ? (
+                  topAlignmentSignals.map((entry) => (
+                    <li key={`alignment-${entry.dimension}`} className="text-sm leading-7 text-slate-700">
+                      <span className="font-semibold text-slate-900">{entry.label}:</span> {t(entry.text)}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm leading-7 text-slate-700">
+                    Keine klare gemeinsame Basis mit hoher Signalstärke sichtbar.
+                  </li>
+                )}
+              </ul>
+            </article>
+
+            <article className="rounded-[22px] border border-rose-200/70 bg-[linear-gradient(180deg,rgba(255,241,242,0.9),rgba(255,255,255,0.98))] p-5">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-rose-700">
+                Größte Spannungsfelder
+              </p>
+              <ul className="mt-3 space-y-3">
+                {topTensionSignals.length > 0 ? (
+                  topTensionSignals.map((entry) => (
+                    <li key={`tension-${entry.dimension}`} className="text-sm leading-7 text-slate-700">
+                      <span className="font-semibold text-slate-900">{entry.label}:</span> {t(entry.text)}
+                    </li>
+                  ))
+                ) : selection.meta.highSimilarityBlindSpotRisk ? (
+                  <li className="text-sm leading-7 text-slate-700">
+                    <span className="font-semibold text-slate-900">Kein offenes Spannungsfeld:</span>{" "}
+                    Die Reibung liegt hier eher in stiller Drift als in offenem Konflikt.
+                  </li>
+                ) : (
+                  <li className="text-sm leading-7 text-slate-700">
+                    Kein dominantes Spannungsfeld mit hoher Signalstärke sichtbar.
+                  </li>
+                )}
+              </ul>
+            </article>
+          </div>
+        </div>
+
+        {markers.primary ? (
+          <div className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/92 p-5">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+              So solltet ihr dieses Match lesen
+            </p>
+            <div className="mt-4 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+              <article className="rounded-[20px] border border-slate-200/80 bg-slate-50/70 p-5">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                  Primärer Marker
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                  {t(markers.primary.label)}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-700">
+                  {t(markers.primary.explanation)}
+                </p>
+                <p className="mt-4 text-sm font-medium text-slate-900">
+                  {t(buildMarkerWorkbookLead(markers.primary, effectiveTeamContext))}
+                </p>
+              </article>
+
+              <div className="grid gap-3">
+                {markers.secondary.map((marker) => (
+                  <article
+                    key={`${marker.markerClass}-${marker.dimension ?? "none"}`}
+                    className="rounded-[20px] border border-slate-200/80 bg-white p-4"
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      {t(marker.label)}
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-slate-700">
+                      {t(marker.explanation)}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
@@ -158,6 +276,7 @@ export function FounderMatchingView({
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
             const meta = FOUNDER_DIMENSION_META[dimension.dimension];
+            const reportPoles = getFounderDimensionPoleLabels(dimension.dimension, "report");
             const status = selection.dimensionStatuses.find(
               (entry) => entry.dimension === dimension.dimension
             );
@@ -182,8 +301,8 @@ export function FounderMatchingView({
                     markerB={markerB}
                     participantAName={participantAName}
                     participantBName={participantBName}
-                    lowLabel={t(meta.leftPole)}
-                    highLabel={t(meta.rightPole)}
+                    lowLabel={t(reportPoles?.left ?? meta.reportLeftPole)}
+                    highLabel={t(reportPoles?.right ?? meta.reportRightPole)}
                     valueScale="founder_percent"
                     compact
                   />
@@ -219,6 +338,17 @@ export function FounderMatchingView({
 
       <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{`${nextStepSectionNumber}. Euer wichtigster nächster Schritt`}</p>
+        {markers.primary ? (
+          <div className="mt-5 rounded-[20px] border border-[color:var(--brand-accent)]/18 bg-white/88 px-5 py-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+              Workbook-Haltung
+            </p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">{t(markers.primary.workbookLabel)}</p>
+            <p className="mt-2 text-sm leading-7 text-slate-700">
+              {t(buildMarkerWorkbookPrompt(markers.primary, effectiveTeamContext))}
+            </p>
+          </div>
+        ) : null}
         {primaryAgreement ? (
           <div className="mt-5 rounded-[24px] border border-[color:var(--brand-accent)]/18 bg-white/92 p-6">
             <p className="text-lg font-semibold leading-8 text-slate-900">{t(primaryAgreement)}</p>
@@ -241,9 +371,7 @@ export function FounderMatchingView({
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Nächster Schritt</p>
           <h3 className="mt-3 text-xl font-semibold text-slate-900">Jetzt Alignment konkret festhalten</h3>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            Ihr habt gesehen, wo ihr steht. Im Workbook legt ihr jetzt fest, wie ihr konkret
-            zusammenarbeitet, was fuer euch gelten soll und wie ihr die naechsten 90 Tage sauber
-            fuehrt.
+            {t(buildWorkbookOutro(markers.primary, effectiveTeamContext))}
           </p>
           <div className="mt-6">
             <ReportActionButton href={workbookHref}>Workbook starten</ReportActionButton>
@@ -283,16 +411,109 @@ function splitNarrativeSections(text: string) {
 function buildMatchHeadline(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Unter Druck braucht ihr frueh klare Absprachen";
+      return "Euer größtes Problem startet nicht im Detail, sondern im Alltag";
     case "complement_led":
-      return "Eure Unterschiede tragen, wenn Regeln frueh klar sind";
+      return "Euer Unterschied hilft nur, wenn Reibung frueh geregelt ist";
     case "coordination_led":
-      return "Viel passt, Abstimmung entscheidet ueber euer Tempo";
+      return "Ihr verliert Tempo nicht im Streit, sondern in stiller Abstimmung";
     case "blind_spot_watch":
-      return "Aehnlich im Start, spaeter drohen stille Luecken";
+      return "Euer Risiko liegt nicht im Streit, sondern in spaeter Drift";
     case "alignment_led":
     default:
-      return "Viel gemeinsame Linie, klare Reibung an wenigen Punkten";
+      return "Viel gemeinsame Linie, aber ein Randfeld darf nicht still mitlaufen";
+  }
+}
+
+function teamContextLabel(teamContext: TeamContext) {
+  return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+}
+
+function buildOverallMatchReading(overallMatchScore: number | null) {
+  if (overallMatchScore == null) {
+    return "Für dieses Match fehlen belastbare Vergleichsdaten.";
+  }
+
+  if (overallMatchScore >= 80) {
+    return "Hohe Anschlussfähigkeit. Das Duo wirkt nah, darf Ähnlichkeit aber nicht mit voller Klarheit verwechseln.";
+  }
+
+  if (overallMatchScore >= 65) {
+    return "Tragfähige Basis mit klaren Reibungspunkten. Nicht offener Streit, sondern wiederkehrende Abstimmung kostet hier am ehesten Zeit.";
+  }
+
+  if (overallMatchScore >= 45) {
+    return "Gemischtes Bild mit spürbarer Belastung. Dieses Match lebt nicht von Selbstverständlichkeit, sondern von sichtbaren Regeln und sauberer Priorisierung.";
+  }
+
+  return "Niedrige Anschlussfähigkeit. Ohne frühe Klärung drohen hier nicht nur Reibung, sondern unterschiedliche Erwartungen daran, wie dieses Duo überhaupt arbeiten soll.";
+}
+
+function buildSignalEntries(
+  dimensions: FounderDimensionKey[],
+  selection: FounderMatchingSelection,
+  kind: "alignment" | "tension"
+) {
+  return dimensions
+    .slice(0, 3)
+    .map((dimension) => {
+      const status = selection.dimensionStatuses.find((entry) => entry.dimension === dimension)?.status ?? null;
+      return {
+        dimension,
+        label: dimension,
+        text: kind === "alignment" ? describeAlignmentSignal(dimension, status) : describeTensionSignal(dimension, status),
+      };
+    });
+}
+
+function describeAlignmentSignal(
+  dimension: FounderDimensionKey,
+  status: FounderMatchingSelection["dimensionStatuses"][number]["status"] | null
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return status === "ergänzend"
+        ? "unterschiedliche Logiken koennen hilfreich sein, solange Richtung nicht jedes Mal neu verhandelt werden muss."
+        : "hier liegt am ehesten eine gemeinsame Linie dafuer, worauf Entscheidungen einzahlen sollen.";
+    case "Entscheidungslogik":
+      return status === "ergänzend"
+        ? "hier koennen Prüfung und Zuspitzung sinnvoll zusammenkommen, wenn klar ist, wann entschieden wird."
+        : "hier ist eher klar, wann genug geprüft wurde und wie Entscheidungen zustande kommen.";
+    case "Risikoorientierung":
+      return status === "ergänzend"
+        ? "hier kann Unterschied nuetzen, wenn Chance und Absicherung nicht jedes Mal neu durcheinandergeraten."
+        : "hier liegt eine aehnliche Schwelle dafuer, wann ein Schritt noch vertretbar ist.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "hier ist der Takt eurer Zusammenarbeit am ehesten anschlussfähig und nicht dauernd erklaerungsbeduerftig.";
+    case "Commitment":
+      return "hier ist am ehesten klar, wie viel Einsatz, Verfügbarkeit und Priorität im Alltag gelten.";
+    case "Konfliktstil":
+      return "hier ist am ehesten klar, wann etwas angesprochen wird und wie schnell ihr wieder in die Sache kommt.";
+  }
+}
+
+function describeTensionSignal(
+  dimension: FounderDimensionKey,
+  status: FounderMatchingSelection["dimensionStatuses"][number]["status"] | null
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return status === "kritisch"
+        ? "dieselbe Entscheidung zahlt fuer euch nicht auf dasselbe Ziel ein. Dann wird aus Strategie schnell Grundsatzstreit."
+        : "hier muesset ihr bewusst klären, worauf eine Priorität gerade einzahlen soll.";
+    case "Entscheidungslogik":
+      return "hier wird dieselbe Frage leicht mehrfach diskutiert, weil fuer euch nicht im selben Moment klar ist, wann sie entschieden ist.";
+    case "Risikoorientierung":
+      return "hier kann dieselbe Chance schnell zum Streit ueber vertretbares Wagnis werden.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return status === "kritisch"
+        ? "hier kollidieren Einblick, Eigenraum und Abstimmungsdichte direkt. Das kostet im Alltag sofort Tempo."
+        : "hier geht Geschwindigkeit oft still verloren, weil dieselbe Aufgabe mehr Mitsicht und Rueckversicherung braucht als gedacht.";
+    case "Commitment":
+      return status === "kritisch"
+        ? "hier gelten nicht dieselben Erwartungen an Einsatz und Verfügbarkeit. Daraus wird schnell Druck statt Zusammenarbeit."
+        : "hier muesset ihr klären, welches Einsatzniveau im Alltag wirklich gelten soll.";
+    case "Konfliktstil":
+      return "hier entsteht Reibung nicht nur am Thema, sondern daran, wann etwas angesprochen wird und wie direkt das passiert.";
   }
 }
 
@@ -305,6 +526,75 @@ function buildMarkerLabel(name: string | null | undefined) {
     .map((part) => part.charAt(0).toUpperCase())
     .join("")
     .slice(0, 2);
+}
+
+function buildMarkerWorkbookLead(marker: FounderMatchingMarker, teamContext: TeamContext) {
+  switch (marker.markerClass) {
+    case "stable_base":
+      return teamContext === "pre_founder"
+        ? "Diese Basis solltet ihr vor dem Start bewusst schützen."
+        : "Diese Basis solltet ihr im Alltag aktiv stabil halten.";
+    case "conditional_complement":
+      return teamContext === "pre_founder"
+        ? "Die Chance liegt hier nicht im Unterschied selbst, sondern in eurer Vorabklärung."
+        : "Die Chance liegt hier nicht im Unterschied selbst, sondern in klarer Führung im Alltag.";
+    case "high_rule_need":
+      return teamContext === "pre_founder"
+        ? "Dieses Feld sollte nicht implizit bleiben, bevor ihr eng zusammenarbeitet."
+        : "Dieses Feld sollte nicht weiter nebenher laufen, wenn ihr schon gemeinsam arbeitet.";
+    case "critical_clarification_point":
+      return teamContext === "pre_founder"
+        ? "Das ist kein Randthema vor dem Start, sondern ein Punkt für ausdrückliche Klärung."
+        : "Das ist kein Randthema im Betrieb, sondern ein Punkt für gezielte Bearbeitung.";
+  }
+}
+
+function buildMarkerWorkbookPrompt(marker: FounderMatchingMarker, teamContext: TeamContext) {
+  switch (marker.workbookPosture) {
+    case "protect":
+      return teamContext === "pre_founder"
+        ? "Haltet fest, was diese Basis tragfähig macht und woran ihr merkt, dass sie zu kippen beginnt."
+        : "Haltet fest, was diese Basis im Alltag stützt und woran ihr früh merkt, dass sie leise erodiert.";
+    case "define":
+      return "Legt im Workbook ausdrücklich fest, was gelten soll, statt auf stilles gemeinsames Verständnis zu hoffen.";
+    case "regulate":
+      return "Übersetzt das Feld im Workbook in klare Regeln für Timing, Sichtbarkeit und Nachsteuerung.";
+    case "repair":
+      return "Behandelt das Feld im Workbook nicht als Feinschliff, sondern als aktive Belastung, die gezielt bearbeitet werden muss.";
+    case "escalate_for_discussion":
+      return "Nutzt das Workbook hier nicht für Kosmetik, sondern für eine ausdrückliche Klärung vor gemeinsamer Abhängigkeit.";
+  }
+}
+
+function buildWorkbookOutro(
+  marker: FounderMatchingMarker | null,
+  teamContext: TeamContext
+) {
+  if (!marker) {
+    return "Ihr habt gesehen, wo ihr steht. Im Workbook legt ihr jetzt fest, wie ihr konkret zusammenarbeitet, was fuer euch gelten soll und wie ihr die naechsten 90 Tage sauber fuehrt.";
+  }
+
+  if (marker.markerClass === "critical_clarification_point") {
+    return teamContext === "pre_founder"
+      ? "Ihr habt gesehen, welches Feld vor dem Start nicht offen bleiben sollte. Im Workbook macht ihr daraus jetzt eine ausdrückliche Klärung statt eine stille Hoffnung auf später."
+      : "Ihr habt gesehen, welches Feld im Alltag nicht weiterlaufen sollte. Im Workbook macht ihr daraus jetzt eine gezielte Bearbeitung statt eine weitere Schleife im laufenden Betrieb.";
+  }
+
+  if (marker.markerClass === "high_rule_need") {
+    return teamContext === "pre_founder"
+      ? "Ihr habt gesehen, wo gute Absicht vor dem Start nicht reicht. Im Workbook übersetzt ihr das jetzt in klare Regeln, bevor daraus spätere Reibung wird."
+      : "Ihr habt gesehen, wo Unklarheit im Alltag zu viel Zug kostet. Im Workbook übersetzt ihr das jetzt in klare Regeln, damit Reibung nicht weiter nebenher läuft.";
+  }
+
+  if (marker.markerClass === "conditional_complement") {
+    return teamContext === "pre_founder"
+      ? "Ihr habt gesehen, wo euer Unterschied nützlich sein kann. Im Workbook legt ihr jetzt fest, wann er euch breiter macht und wann er Führung braucht."
+      : "Ihr habt gesehen, wo euer Unterschied nützlich bleiben kann. Im Workbook legt ihr jetzt fest, wie ihr ihn im Alltag führt, bevor er in Reibung kippt.";
+  }
+
+  return teamContext === "pre_founder"
+    ? "Ihr habt gesehen, was euch vor dem Start bereits trägt. Im Workbook haltet ihr jetzt fest, wie ihr diese Basis schützt, wenn Druck und Abhängigkeit steigen."
+    : "Ihr habt gesehen, was euch im Alltag bereits trägt. Im Workbook haltet ihr jetzt fest, wie ihr diese Basis stabil haltet, wenn Tempo und Druck steigen.";
 }
 
 function statusLabel(status: FounderMatchingSelection["dimensionStatuses"][number]["status"]) {

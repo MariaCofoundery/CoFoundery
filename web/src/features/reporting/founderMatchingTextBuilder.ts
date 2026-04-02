@@ -58,14 +58,14 @@ export function buildFounderMatchingHero(selection: FounderMatchingSelection): s
 
   const firstSentence =
     selection.heroSelection.mode === "blind_spot_watch"
-      ? "Bei euch läuft anfangs vieles erstaunlich glatt."
+      ? "Bei euch wirkt anfangs vieles klarer, als es später ist."
       : selection.heroSelection.mode === "tension_led"
-        ? "Bei euch sieht man meist früh, wo es im Alltag hakt."
+        ? "Bei euch beginnt Reibung nicht spät. Sie sitzt früh im Arbeitsalltag."
       : selection.heroSelection.mode === "complement_led"
-          ? "Bei euch helfen oft gerade die Unterschiede weiter, nicht nur das, was ihr ähnlich seht."
+          ? "Bei euch liegt die Chance in einem Unterschied, der nützlich sein kann. Von selbst trägt er nicht."
           : selection.heroSelection.mode === "coordination_led"
-            ? "Bei euch sind Unterschiede nicht das Hauptproblem. Im Alltag müsst ihr sie trotzdem gut organisieren."
-            : "Bei euch gibt es eine gemeinsame Linie. Das bringt im Alltag erst einmal Ruhe.";
+            ? "Bei euch kippt wenig offen. Ihr verliert eher Zeit, weil Abstimmung still mehr zieht, als ihr denkt."
+            : "Bei euch gibt es eine gemeinsame Linie. Das senkt offene Reibung, macht Randthemen aber nicht automatisch klar.";
 
   const secondSentence = getMatchingGroundArenaSentence(groundDynamic);
   const thirdSentence = getMatchingStrongestQualitySentence(strongestQuality);

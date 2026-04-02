@@ -1,15 +1,15 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
+import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import {
-  assertFounderBaseQuestionVersionContract,
-  scoreStoredBaseAnswerToFounderPercent,
-} from "@/features/scoring/founderBaseQuestionMeta";
-import {
-  scoreFounderAlignment,
-  type Answer,
-  type TeamScoringResult,
-} from "@/features/scoring/founderScoring";
+  buildFounderCompatibilityAnswerMapV2,
+  mapLegacyFounderAnswersToV2Answers,
+  type FounderCompatibilityAnswerV2,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
+import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
+import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 
 type InvitationRow = {
   id: string;
@@ -36,7 +36,6 @@ type AssessmentAnswerRow = {
 
 type QuestionRow = {
   id: string;
-  dimension: string;
 };
 
 type DebugStatus = "missing_invitation" | "forbidden" | "in_progress" | "ready";
@@ -62,8 +61,8 @@ export type FounderScoringDebugResult = {
     };
   };
   transformedAnswers: {
-    personA: Answer[];
-    personB: Answer[];
+    personA: FounderCompatibilityAnswerV2[];
+    personB: FounderCompatibilityAnswerV2[];
   };
   scoring: TeamScoringResult | null;
 };
@@ -89,7 +88,7 @@ async function getLatestSubmittedBaseAssessment(
 async function getActiveBaseQuestionMap(supabase: SupabaseServerClient): Promise<Map<string, QuestionRow>> {
   const { data, error } = await supabase
     .from("questions")
-    .select("id, dimension")
+    .select("id")
     .eq("category", "basis")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
@@ -122,22 +121,15 @@ async function getAssessmentAnswers(
 function transformAnswers(
   rows: AssessmentAnswerRow[],
   activeBaseQuestionMap: Map<string, QuestionRow>
-): Answer[] {
-  return rows.flatMap((row) => {
-    const question = activeBaseQuestionMap.get(row.question_id);
-    if (!question) return [];
+): FounderCompatibilityAnswerV2[] {
+  const questionById = new Map(
+    [...activeBaseQuestionMap.values()].map((question) => [
+      question.id,
+      { id: question.id, category: "basis" },
+    ])
+  );
 
-    const numericValue = scoreStoredBaseAnswerToFounderPercent(row.question_id, row.choice_value);
-    if (numericValue == null || !Number.isFinite(numericValue)) return [];
-
-    return [
-      {
-        question_id: row.question_id,
-        dimension: question.dimension,
-        value: numericValue,
-      },
-    ];
-  });
+  return mapLegacyFounderAnswersToV2Answers(rows, questionById);
 }
 
 export async function getFounderScoringDebug(
@@ -273,7 +265,7 @@ export async function getFounderScoringDebug(
     getLatestSubmittedBaseAssessment(supabase, typedInvitation.invitee_user_id),
   ]);
 
-  const baseQuestionCount = activeBaseQuestionMap.size;
+  const baseQuestionCount = getActiveRegistryItems().length;
   const baseResult: FounderScoringDebugResult = {
     ...emptyResult,
     status: "in_progress",
@@ -315,6 +307,8 @@ export async function getFounderScoringDebug(
 
   const personAAnswers = transformAnswers(personARows, activeBaseQuestionMap);
   const personBAnswers = transformAnswers(personBRows, activeBaseQuestionMap);
+  const personAAnswerMap = buildFounderCompatibilityAnswerMapV2(personAAnswers);
+  const personBAnswerMap = buildFounderCompatibilityAnswerMapV2(personBAnswers);
 
   const resultWithAnswers: FounderScoringDebugResult = {
     ...baseResult,
@@ -325,19 +319,19 @@ export async function getFounderScoringDebug(
     participants: {
       personA: {
         ...baseResult.participants.personA,
-        answeredActiveBaseQuestions: personAAnswers.length,
+        answeredActiveBaseQuestions: Object.keys(personAAnswerMap).length,
       },
       personB: {
         ...baseResult.participants.personB,
-        answeredActiveBaseQuestions: personBAnswers.length,
+        answeredActiveBaseQuestions: Object.keys(personBAnswerMap).length,
       },
     },
   };
 
   const assessmentsAreComplete =
     baseQuestionCount > 0 &&
-    personAAnswers.length >= baseQuestionCount &&
-    personBAnswers.length >= baseQuestionCount;
+    Object.keys(personAAnswerMap).length >= baseQuestionCount &&
+    Object.keys(personBAnswerMap).length >= baseQuestionCount;
 
   if (!assessmentsAreComplete) {
     return {
@@ -347,7 +341,7 @@ export async function getFounderScoringDebug(
     };
   }
 
-  const scoring = scoreFounderAlignment({
+  const scoring = scoreFounderAlignmentV2FromAnswersV2({
     personA: personAAnswers,
     personB: personBAnswers,
   });
@@ -355,10 +349,10 @@ export async function getFounderScoringDebug(
   console.log("founder-scoring-debug", {
     invitationId: normalizedInvitationId,
     baseQuestionCount,
-    personAAnswered: personAAnswers.length,
-    personBAnswered: personBAnswers.length,
+    personAAnswered: Object.keys(personAAnswerMap).length,
+    personBAnswered: Object.keys(personBAnswerMap).length,
     overallFit: scoring.overallFit,
-    conflictRiskIndex: scoring.conflictRiskIndex,
+    overallTension: scoring.overallTension,
     overallRedFlags: scoring.overallRedFlags,
     overallGreenFlags: scoring.overallGreenFlags,
   });

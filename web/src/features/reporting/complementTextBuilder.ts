@@ -29,9 +29,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
   counterweight: {
     Unternehmenslogik: {
       left: {
-        title: "Mehr Substanz im Blick",
+        title: "Mehr Zug nach vorn",
         description:
-          "Gut ergänzt wirst du durch Menschen, die Wachstum und Wirkung nicht kleinreden, aber früh fragen, was davon auch morgen noch trägt. Genau darin liegt der Ausgleich: strategische Zugkraft bleibt da, ohne dass Aufbau und Belastbarkeit unter die Räder kommen. So werden große Hebel eher in Schritte übersetzt, die im Alltag standhalten.",
+          "Hilfreich ist oft ein Gegenüber, das bei einer neuen Chance schneller sagt: Das ist ein Marktfenster, das wir jetzt prüfen sollten. Während du Fundament und Tragfähigkeit absicherst, bringt die andere Person Bewegung in den nächsten Schritt. So bleibt ihr bei guten Gelegenheiten seltener zu lange nur in Aufbaufragen.",
       },
       center: {
         title: "Klarer an Weggabelungen",
@@ -41,9 +41,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
             : "Gut ergänzt wirst du durch Menschen, die bei Grundsatzfragen früher zuspitzen, woran ihr euch gerade orientiert. Die Ergänzung liegt hier vor allem in Klarheit, nicht in Härte. So kippen offene Richtungsfragen seltener in lange Schleifen.",
       },
       right: {
-        title: "Mehr Zug nach vorn",
+        title: "Mehr Substanz im Blick",
         description:
-          "Hilfreich ist oft ein Gegenüber, das Marktfenster und Hebel schnell erkennt, ohne deinen Blick auf Substanz kleinzumachen. Die Ergänzung liegt darin, Bewegung auszulösen, während du Tragfähigkeit absicherst. So bleibt Aufbau nicht hängen, wenn eigentlich ein klarer nächster Schritt auf dem Tisch liegt.",
+          "Gut ergänzt wirst du durch Menschen, die Wachstum und Wirkung nicht kleinreden, aber früh fragen, was davon auch morgen noch trägt. Genau darin liegt der Ausgleich: strategische Zugkraft bleibt da, ohne dass Aufbau und Belastbarkeit unter die Räder kommen. So werden große Hebel eher in Schritte übersetzt, die im Alltag standhalten.",
       },
     },
     Entscheidungslogik: {
@@ -94,13 +94,13 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         title: "Stabiler im Modus",
         description: (band) =>
           band === "balanced"
-            ? "Hilfreich ist eher ein Gegenüber, das Arbeitsmodi sichtbar macht und nicht voraussetzt, dass beide denselben Abstimmungsbedarf haben. Die Ergänzung liegt hier in Verlässlichkeit darüber, wann Nähe hilft und wann Eigenraum trägt. So müsst ihr den Arbeitsmodus nicht ständig nebenbei klären."
+            ? "Hilfreich ist eher ein Gegenüber, das früh sagt, wann etwas gemeinsam abgestimmt werden muss und wann jeder für sich weiterarbeiten kann. So wird im Alltag schneller klar, ob ihr gerade im engen Austausch oder im Eigenraum arbeitet. Der Arbeitsmodus muss dann nicht erst aus kleinen Irritationen heraus gelesen werden."
             : "Hilfreich ist eher ein Gegenüber, das gut markiert, wann enge Abstimmung hilft und wann sie nur Reibung erzeugt. Das gleicht deinen wechselnden Modus aus, ohne ihn festzuzurren. So bleibt Zusammenarbeit lesbar, auch wenn die Lage sich ändert.",
       },
       right: {
         title: "Mehr Eigenraum im Alltag",
         description:
-          "Leichter wird Zusammenarbeit mit Menschen, die eigenständig arbeiten können und trotzdem früh teilen, was wichtig, offen oder kritisch wird. Darin liegt der Ausgleich: du bleibst verbunden, ohne jeden Schritt eng begleiten zu müssen. So wird Abstimmung seltener zur Daueraufgabe.",
+          "Leichter wird Zusammenarbeit mit Menschen, die autonom arbeiten können und trotzdem früh teilen, was wichtig, offen oder kritisch wird. Darin liegt der Ausgleich: du bleibst verbunden, ohne jeden Schritt eng begleiten zu müssen. So wird Abstimmung seltener zur Daueraufgabe.",
       },
     },
     Commitment: {
@@ -119,7 +119,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Luft im Einsatz",
         description:
-          "Hilfreich ist oft ein Gegenüber, das hohe Priorisierung versteht, aber Unterschiede in Kapazität und Alltag früh sichtbar macht. Die Ergänzung liegt darin, Tempo ernst zu nehmen, ohne jeden Rahmen gleich hochzuziehen. So wird aus Intensität seltener stiller Druck auf andere.",
+          "Hilfreich ist oft ein Gegenüber, das deinen hohen Fokus teilt und gleichzeitig früh sagt, wann eigene Grenzen, Kalender oder andere Verpflichtungen hineinspielen. So wird in intensiven Phasen schneller klar, wer gerade wirklich zusätzliche Zeit geben kann und wer nicht. Unterschiedliche Kapazitäten werden dann seltener als fehlender Einsatz gelesen.",
       },
     },
     Konfliktstil: {
@@ -145,9 +145,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
   regulator: {
     Unternehmenslogik: {
       left: {
-        title: "Fundament mit im Blick",
+        title: "Hebel nüchtern einordnen",
         description:
-          "Entlastend ist oft ein Gegenüber, das bei viel Zug nach vorn früh die Frage nach Aufbau und Tragfähigkeit mit hineinnimmt. Die Ergänzung wirkt hier als Puffer gegen vorschnelle Verengung auf reine Wirkung. So kippen Richtungsfragen seltener in Grundsatzstreit.",
+          "Entlastend ist oft ein Gegenüber, das Chancen klar sieht und sie in realistische Schritte übersetzt. Die Regulierung liegt darin, Spannung aus der Frage zu nehmen, ob Bewegung und Substanz überhaupt zusammengehen. So wird aus Hebel gegen Fundament seltener ein Grundsatzkonflikt.",
       },
       center: {
         title: "Zielkonflikte früher sortieren",
@@ -157,9 +157,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
             : "Entlastend ist oft ein Gegenüber, das Zielkonflikte früh sortiert, bevor sie breit werden. Die Regulierung liegt hier weniger im Gegenpol als in klarer Ordnung. So geraten Entscheidungen seltener in diffuse Grundsatzdebatten.",
       },
       right: {
-        title: "Hebel nüchtern einordnen",
+        title: "Fundament mit im Blick",
         description:
-          "Entlastend ist oft ein Gegenüber, das Chancen klar sieht und sie in realistische Schritte übersetzt. Die Regulierung liegt darin, Spannung aus der Frage zu nehmen, ob Bewegung und Substanz überhaupt zusammengehen. So wird aus Hebel gegen Fundament seltener ein Grundsatzkonflikt.",
+          "Entlastend ist oft ein Gegenüber, das bei viel Zug nach vorn früh die Frage nach Aufbau und Tragfähigkeit mit hineinnimmt. Die Ergänzung wirkt hier als Puffer gegen vorschnelle Verengung auf reine Wirkung. So kippen Richtungsfragen seltener in Grundsatzstreit.",
       },
     },
     Entscheidungslogik: {
@@ -192,19 +192,19 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         description: (band) =>
           band === "balanced"
             ? "Hilfreich ist eher ein Gegenüber, das offen sagt, welches Risiko ihr tragen wollt und welches nicht. Die Regulierung liegt hier in klaren Schwellen statt stiller Interpretation. So wird Unsicherheit seltener jedes Mal neu gelesen."
-            : "Hilfreich ist eher ein Gegenüber, das bei Chancen und Risiken früh eine nachvollziehbare Schwelle benennt. Die Regulierung liegt darin, situative Unterschiede übersetzbar zu machen. So wird Vorangehen seltener selbst zum Streitpunkt.",
+            : "Hilfreich ist eher ein Gegenüber, das bei einer Chance früh benennt, bis wohin ihr beim Geld, Tempo oder bei persönlicher Belastung wirklich gehen wollt. So muss die Risikoschwelle nicht erst in der Diskussion erraten werden. Vorangehen wird dann seltener selbst zum Streitpunkt.",
       },
       right: {
         title: "Mehr Leitplanken im Vorangehen",
         description:
-          "Entlastend ist oft ein Gegenüber, das Chancen sieht und gleichzeitig Geld, Timing und Tragbarkeit begrenzt. Die Regulierung liegt darin, Mut nicht zurückzunehmen, sondern ihm einen Rahmen zu geben. So entsteht aus Tempo seltener sozialer Druck im Team.",
+          "Entlastend ist oft ein Gegenüber, das bei einer Chance nicht grundsätzlich bremst, aber früh fragt, wie viel Geld, Zeit oder Unsicherheit ihr dafür wirklich einsetzen wollt. So bekommt ein mutiger Schritt klare Grenzen, bevor schon viel Einsatz gebunden ist. Aus Vorwärtsgang wird dann seltener Druck auf das ganze Team.",
       },
     },
     "Arbeitsstruktur & Zusammenarbeit": {
       left: {
         title: "Mehr Verbindung im Prozess",
         description:
-          "Entlastend ist oft ein Gegenüber, das relevante Zwischenstände früh teilt, ohne deinen Eigenraum zu zerlegen. Die Regulierung liegt hier in Mitsicht an den richtigen Stellen. So fühlen sich andere seltener abgehängt, wenn du schnell eigenständig vorangehst.",
+          "Entlastend ist oft ein Gegenüber, das relevante Zwischenstände früh teilt, ohne deinen Eigenraum zu zerlegen. Die Regulierung liegt hier in Mitsicht an den richtigen Stellen. So fühlen sich andere seltener abgehängt, wenn du schnell autonom vorangehst.",
       },
       center: {
         title: "Abstimmung sichtbar halten",
@@ -216,7 +216,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Mehr Ruhe im Ablauf",
         description:
-          "Hilfreich ist eher ein Gegenüber, das eigenständig arbeiten kann und dabei verlässlich sichtbar bleibt. Die Regulierung liegt darin, Verbindung zu halten, ohne dauernd neue Schleifen aufzumachen. So wird enge Abstimmung seltener zur Dauerbelastung.",
+          "Hilfreich ist eher ein Gegenüber, das autonom arbeiten kann und dabei verlässlich sichtbar bleibt. Die Regulierung liegt darin, Verbindung zu halten, ohne dauernd neue Schleifen aufzumachen. So wird enge Abstimmung seltener zur Dauerbelastung.",
       },
     },
     Commitment: {
@@ -229,7 +229,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         title: "Einsatz klar rahmen",
         description: (band) =>
           band === "balanced"
-            ? "Entlastend ist oft ein Gegenüber, das sichtbar macht, wann hoher Fokus gefragt ist und wann ein begrenzterer Rahmen reicht. Die Regulierung liegt in klaren Arbeitsrealitäten statt stiller Deutung. So wird Intensität seltener zum Missverständnis."
+            ? "Entlastend ist oft ein Gegenüber, das früh anspricht, wann in den nächsten Wochen hoher Fokus nötig ist und wann ein begrenzterer Rahmen reicht. So wird aus Priorität eine konkrete Erwartung an Zeit und Verfügbarkeit. Missverständnisse entstehen dann seltener erst dann, wenn schon jemand mehr Einsatz erwartet hat."
             : "Entlastend ist oft ein Gegenüber, das Verfügbarkeit und Einsatz konkret benennt, bevor Enttäuschung entsteht. Die Regulierung liegt darin, Intensität lesbar zu machen. So kippt Einsatzniveau seltener in verdeckte Spannung.",
       },
       right: {
@@ -261,9 +261,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
   rhythm_partner: {
     Unternehmenslogik: {
       left: {
-        title: "Schnell klar bei Hebeln",
+        title: "Marktfenster gut übersetzen",
         description:
-          "Leichter wird Zusammenarbeit mit Menschen, die Wirkung früh sehen und trotzdem tragfähig übersetzen können. Die Passung liegt hier im gemeinsamen Vorwärtsgang ohne strategische Unschärfe. So müsst ihr Richtungsfragen im Alltag seltener mehrfach öffnen.",
+          "Im Alltag trägt ein Gegenüber, das Chancen früh erkennt und sie in Schritte übersetzt, die zu deinem Aufbauanspruch passen. Die Passung liegt darin, Bewegung und Substanz gleichzeitig zusammenzuhalten. So ziehen Wachstum und Belastbarkeit seltener auseinander.",
       },
       center: {
         title: "Verlässlich an Weggabelungen",
@@ -273,9 +273,9 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
             : "Im Alltag trägt ein Gegenüber, das an Weggabelungen zügig klärt, was jetzt führt. Die Passung liegt darin, offene Richtungsfragen nicht zu lange mitzuschleppen. So geht weniger Energie in wiederholte Grundsatzklärung.",
       },
       right: {
-        title: "Marktfenster gut übersetzen",
+        title: "Schnell klar bei Hebeln",
         description:
-          "Im Alltag trägt ein Gegenüber, das Chancen früh erkennt und sie in Schritte übersetzt, die zu deinem Aufbauanspruch passen. Die Passung liegt darin, Bewegung und Substanz gleichzeitig zusammenzuhalten. So ziehen Wachstum und Belastbarkeit seltener auseinander.",
+          "Leichter wird Zusammenarbeit mit Menschen, die Wirkung früh sehen und trotzdem tragfähig übersetzen können. Die Passung liegt hier im gemeinsamen Vorwärtsgang ohne strategische Unschärfe. So müsst ihr Richtungsfragen im Alltag seltener mehrfach öffnen.",
       },
     },
     Entscheidungslogik: {
@@ -332,7 +332,7 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
       right: {
         title: "Verbunden, ohne festzuhalten",
         description:
-          "Leichter wird Zusammenarbeit mit Menschen, die sichtbar bleiben, ohne jede Schleife gemeinsam zu machen. Die Passung liegt darin, dass du Rückkopplung bekommst und trotzdem nicht alles eng begleiten musst. So bleibt Nähe im Alltag tragfähig.",
+          "Leichter wird Zusammenarbeit mit Menschen, die im Austausch bleiben, ohne jeden Zwischenschritt gemeinsam zu drehen. So bekommst du früh genug Rückkopplung, ohne dass Abstimmung den ganzen Arbeitstag belegt. Verbindung bleibt dann im Alltag stabiler als der Wunsch, alles gemeinsam zu sehen.",
       },
     },
     Commitment: {
@@ -364,13 +364,13 @@ const COMPLEMENT_TEXT: ComplementRoleMap = {
         title: "Klar im richtigen Moment",
         description: (band) =>
           band === "balanced"
-            ? "Im Alltag trägt ein Gegenüber, das ein gutes Gefühl dafür hat, wann etwas sofort auf den Tisch muss und wann noch ein kurzer Abstand hilft. Die Passung liegt hier in verlässlichem Timing. So bleiben Spannungen weder liegen noch werden sie vorschnell groß."
+            ? "Im Alltag trägt ein Gegenüber, das früh merkt, ob ein Unterschied sofort besprochen werden muss oder ob ein kurzer Abstand hilft. So wird Timing zwischen euch besprechbar, statt vom Moment abzuhängen. Themen bleiben dann weder tagelang liegen noch werden sie vorschnell groß."
             : "Im Alltag trägt ein Gegenüber, das Timing und Offenheit gut austariert. Die Passung liegt darin, dass Konflikte weder dauernd verschoben noch unnötig forciert werden. So bleibt ihr unter Druck eher gesprächsfähig.",
       },
       right: {
         title: "Direkt und trotzdem ruhig",
         description:
-          "Leichter wird Zusammenarbeit mit Menschen, die Spannungen ernst nehmen und dabei einen guten Gesprächsrahmen halten. Die Passung liegt darin, dass deine Direktheit aufgenommen wird, ohne in Rückzug oder Verteidigung zu kippen. So bleiben heikle Gespräche schneller arbeitsfähig.",
+          "Leichter wird Zusammenarbeit mit Menschen, die einen Unterschied nicht übergehen, aber im Gespräch Tempo und Rahmen mitsteuern. So kann deine direkte Ansprache aufgenommen werden, ohne dass das Gegenüber sofort in Rückzug oder Rechtfertigung geht. Heikle Themen werden dann eher geklärt, bevor sie auf die Beziehungsebene rutschen.",
       },
     },
   },

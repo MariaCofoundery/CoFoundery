@@ -101,6 +101,41 @@ const ASCII_GERMAN_REPLACEMENTS: Array<[RegExp, string]> = [
   [/zuverlaess/g, "zuverläss"],
 ];
 
+// The generic digraph repair intentionally catches legacy transliterations like
+// "Gespraech" or "fuer". A small number of valid German words, however, really
+// contain "...ue..." without needing an umlaut, e.g. "aktuell" or
+// "individuell". We repair those false positives here after the generic pass.
+const FALSE_UMLAUT_REPAIRS: Array<[RegExp, string]> = [
+  [/Aktüll/g, "Aktuell"],
+  [/aktüll/g, "aktuell"],
+  [/Individüll/g, "Individuell"],
+  [/individüll/g, "individuell"],
+  [/Visüll/g, "Visuell"],
+  [/visüll/g, "visuell"],
+  [/Manüll/g, "Manuell"],
+  [/manüll/g, "manuell"],
+  [/Eventüll/g, "Eventuell"],
+  [/eventüll/g, "eventuell"],
+  [/Virtüll/g, "Virtuell"],
+  [/virtüll/g, "virtuell"],
+  [/Sexüll/g, "Sexuell"],
+  [/sexüll/g, "sexuell"],
+  [/Spiritüll/g, "Spirituell"],
+  [/spiritüll/g, "spirituell"],
+  [/Ritüll/g, "Rituell"],
+  [/ritüll/g, "rituell"],
+  [/Gradüll/g, "Graduell"],
+  [/gradüll/g, "graduell"],
+  [/Konzeptüll/g, "Konzeptuell"],
+  [/konzeptüll/g, "konzeptuell"],
+  [/Intellektüll/g, "Intellektuell"],
+  [/intellektüll/g, "intellektuell"],
+  [/Prozentüll/g, "Prozentuell"],
+  [/prozentüll/g, "prozentuell"],
+  [/Düell/g, "Duell"],
+  [/düell/g, "duell"],
+];
+
 function restoreInWordGermanDigraphs(value: string) {
   return value
     .replace(/([B-DF-HJ-NP-TV-Zb-df-hj-np-tv-z])ae/g, "$1ä")
@@ -127,6 +162,10 @@ export function normalizeGermanText(value: string | null | undefined) {
   }
 
   normalized = restoreInWordGermanDigraphs(normalized);
+
+  for (const [pattern, target] of FALSE_UMLAUT_REPAIRS) {
+    normalized = normalized.replace(pattern, target);
+  }
 
   return normalized;
 }

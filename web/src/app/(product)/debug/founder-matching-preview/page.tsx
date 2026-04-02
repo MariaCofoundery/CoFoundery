@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { FOUNDER_MATCHING_TEST_CASES, compareFounders } from "@/features/reporting/founderMatchingEngine";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
 import { buildFounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
@@ -7,6 +8,7 @@ import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 
 type SearchParams = {
   case?: string;
+  mode?: string;
 };
 
 const DEMO_NAMES: Record<string, { participantAName: string; participantBName: string }> = {
@@ -44,6 +46,10 @@ function resolveCase(
   return "complementary_builders";
 }
 
+function resolveTeamContext(value: string | undefined): TeamContext {
+  return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
 export default async function FounderMatchingPreviewPage({
   searchParams,
 }: {
@@ -55,6 +61,7 @@ export default async function FounderMatchingPreviewPage({
 
   const params = await searchParams;
   const selectedCase = resolveCase(params.case);
+  const teamContext = resolveTeamContext(params.mode);
   const scores = FOUNDER_MATCHING_TEST_CASES[selectedCase];
   const names = DEMO_NAMES[selectedCase];
   const valuesProfiles = DEMO_VALUES_PROFILES[selectedCase];
@@ -64,20 +71,40 @@ export default async function FounderMatchingPreviewPage({
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
       <div className="no-print mb-8 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          {Object.keys(FOUNDER_MATCHING_TEST_CASES).map((demoCase) => (
-            <a
-              key={demoCase}
-              href={`/debug/founder-matching-preview?case=${demoCase}`}
-              className={`inline-flex rounded-lg border px-4 py-2 text-sm ${
-                demoCase === selectedCase
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-white text-slate-700"
-              }`}
-            >
-              {demoCase}
-            </a>
-          ))}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2">
+            {Object.keys(FOUNDER_MATCHING_TEST_CASES).map((demoCase) => (
+              <a
+                key={demoCase}
+                href={`/debug/founder-matching-preview?case=${demoCase}&mode=${teamContext}`}
+                className={`inline-flex rounded-lg border px-4 py-2 text-sm ${
+                  demoCase === selectedCase
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                {demoCase}
+              </a>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: "pre_founder", label: "Pre-Founder" },
+              { id: "existing_team", label: "Bestehendes Team" },
+            ].map((mode) => (
+              <a
+                key={mode.id}
+                href={`/debug/founder-matching-preview?case=${selectedCase}&mode=${mode.id}`}
+                className={`inline-flex rounded-lg border px-4 py-2 text-sm ${
+                  mode.id === teamContext
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                {mode.label}
+              </a>
+            ))}
+          </div>
         </div>
         <PrintReportButton label="Als PDF speichern" />
       </div>
@@ -90,8 +117,12 @@ export default async function FounderMatchingPreviewPage({
           {names.participantAName} + {names.participantBName}
         </h1>
         <p className="mt-3 text-sm leading-7 text-slate-700">
-          Demo-Report auf Basis der bestehenden Matching-Engine, Selection und Text-Builder. Der
-          aktuelle Fall ist <span className="font-medium text-slate-900">{selectedCase}</span>.
+          Demo-Report auf Basis der neuen V1-Matching-Engine, der bestehenden Selection und der
+          aktuellen Text-Builder. Der aktuelle Fall ist{" "}
+          <span className="font-medium text-slate-900">{selectedCase}</span> im Modus{" "}
+          <span className="font-medium text-slate-900">
+            {teamContext === "existing_team" ? "existing_team" : "pre_founder"}
+          </span>.
         </p>
       </section>
 
@@ -103,6 +134,7 @@ export default async function FounderMatchingPreviewPage({
         valuesProfileA={valuesProfiles?.a ?? null}
         valuesProfileB={valuesProfiles?.b ?? null}
         workbookHref="#"
+        teamContext={teamContext}
       />
     </main>
   );

@@ -11,22 +11,21 @@ import {
 } from "@/features/reporting/buildFounderAlignmentReport";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { createClient } from "@/lib/supabase/server";
-import {
-  assertFounderBaseQuestionVersionContract,
-  scoreStoredBaseAnswerToFounderPercent,
-} from "@/features/scoring/founderBaseQuestionMeta";
+import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import {
   aggregateBaseScoresFromAnswers,
   assertValuesTotalCategoryContract,
   type AssessmentAnswerRow,
   type QuestionMetaRow,
 } from "@/features/reporting/base_scoring";
-import { FOUNDER_DIMENSION_ORDER, getFounderDimensionMeta, type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import {
-  scoreFounderAlignment,
-  type Answer as FounderAnswer,
   type TeamScoringResult,
 } from "@/features/scoring/founderScoring";
+import {
+  mapLegacyFounderAnswersToV2Answers,
+  type FounderCompatibilityAnswerV2,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
+import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
 import {
   aggregateFounderBaseScoresFromAnswers,
   buildSelfFounderKeyInsights,
@@ -48,7 +47,6 @@ import {
   type CompareReportJson,
   type KeyInsight,
   type RadarSeries,
-  type ReportDimension,
   type SelfValuesProfile,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
@@ -343,53 +341,6 @@ function emptySeries(): RadarSeries {
   }, {} as RadarSeries);
 }
 
-function normalizeDimensionLabel(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^\w\s&]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
-  const normalized = normalizeDimensionLabel(dim);
-  if (!normalized) return null;
-
-  if (
-    normalized.includes("unternehmenslogik") ||
-    (normalized.includes("vision") && normalized.includes("richtung"))
-  ) {
-    return "Vision";
-  }
-
-  if (normalized.includes("entscheidungsstil") || normalized.includes("entscheidung")) {
-    return "Entscheidung";
-  }
-
-  if (
-    (normalized.includes("unsicherheit") && normalized.includes("risiko")) ||
-    normalized.includes("umgang mit unsicherheit")
-  ) {
-    return "Risiko";
-  }
-
-  if (normalized.includes("zusammenarbeit") && normalized.includes("nahe")) {
-    return "Autonomie";
-  }
-
-  if (normalized.includes("verantwortung") && normalized.includes("verbindlichkeit")) {
-    return "Verbindlichkeit";
-  }
-
-  if (normalized.includes("konfliktverhalten") || normalized.includes("konflikt")) {
-    return "Konflikt";
-  }
-
-  return null;
-}
-
 function normalizeCategory(value: string | null | undefined) {
   return value?.trim().toLowerCase() ?? "";
 }
@@ -401,26 +352,8 @@ function normalizeTeamContext(value: string | null | undefined): TeamContext {
 function transformFounderScoringAnswers(
   rows: AssessmentAnswerRow[],
   questionMetaById: Map<string, QuestionMetaRow>
-): FounderAnswer[] {
-  return rows.flatMap((row) => {
-    const meta = questionMetaById.get(row.question_id);
-    if (!meta?.dimension) {
-      return [];
-    }
-
-    const numericValue = scoreStoredBaseAnswerToFounderPercent(row.question_id, row.choice_value);
-    if (numericValue == null || !Number.isFinite(numericValue)) {
-      return [];
-    }
-
-    return [
-      {
-        question_id: row.question_id,
-        dimension: meta.dimension,
-        value: numericValue,
-      },
-    ];
-  });
+): FounderCompatibilityAnswerV2[] {
+  return mapLegacyFounderAnswersToV2Answers(rows, questionMetaById);
 }
 
 function isValuesCategory(value: string | null | undefined) {
@@ -592,96 +525,6 @@ async function getQuestionMetaMap(
   }
 
   return new Map((data as QuestionMetaRow[]).map((row) => [row.id, row]));
-}
-
-function emptyDimensionCountRecord() {
-  return REPORT_DIMENSIONS.reduce((acc, dimension) => {
-    acc[dimension] = 0;
-    return acc;
-  }, {} as Record<ReportDimension, number>);
-}
-
-function emptyFounderDimensionCountRecord() {
-  return FOUNDER_DIMENSION_ORDER.reduce((acc, dimension) => {
-    acc[dimension] = 0;
-    return acc;
-  }, {} as Record<FounderDimensionKey, number>);
-}
-
-async function getExpectedBaseQuestionCountByDimension(
-  supabase: SupabaseLikeClient
-): Promise<Record<ReportDimension, number>> {
-  const fallback = emptyDimensionCountRecord();
-  const { data, error } = await supabase
-    .from("questions")
-    .select("id, dimension, category, is_active")
-    .eq("category", "basis")
-    .eq("is_active", true);
-
-  if (error || !data || data.length === 0) {
-    const fallbackQuery = await supabase
-      .from("questions")
-      .select("id, dimension, category")
-      .eq("category", "basis");
-    if (fallbackQuery.error || !fallbackQuery.data) {
-      return fallback;
-    }
-    assertFounderBaseQuestionVersionContract(
-      (fallbackQuery.data as QuestionMetaRow[]).map((row) => row.id),
-      "expected_base_question_count_by_dimension_fallback"
-    );
-    for (const row of fallbackQuery.data as QuestionMetaRow[]) {
-      const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
-      if (!mapped) continue;
-      fallback[mapped] += 1;
-    }
-    return fallback;
-  }
-
-  assertFounderBaseQuestionVersionContract(
-    (data as Array<QuestionMetaRow & { is_active?: boolean }>).map((row) => row.id),
-    "expected_base_question_count_by_dimension"
-  );
-  for (const row of data as Array<QuestionMetaRow & { is_active?: boolean }>) {
-    const mapped = row.dimension ? mapGermanDimensionToReportKey(row.dimension) : null;
-    if (!mapped) continue;
-    fallback[mapped] += 1;
-  }
-  return fallback;
-}
-
-async function getExpectedFounderBaseQuestionCountByDimension(
-  supabase: SupabaseLikeClient
-): Promise<Record<FounderDimensionKey, number>> {
-  const fallback = emptyFounderDimensionCountRecord();
-  const { data, error } = await supabase
-    .from("questions")
-    .select("id, dimension, category, is_active")
-    .eq("category", "basis")
-    .eq("is_active", true);
-
-  const rows =
-    error || !data || data.length === 0
-      ? (
-          await supabase
-            .from("questions")
-            .select("id, dimension, category")
-            .eq("category", "basis")
-        ).data ?? []
-      : data;
-
-  assertFounderBaseQuestionVersionContract(
-    (rows as Array<QuestionMetaRow & { is_active?: boolean }>).map((row) => row.id),
-    "expected_founder_base_question_count_by_dimension"
-  );
-
-  for (const row of rows as Array<QuestionMetaRow & { is_active?: boolean }>) {
-    const mapped = row.dimension ? getFounderDimensionMeta(row.dimension)?.canonicalName : null;
-    if (!mapped) continue;
-    fallback[mapped] += 1;
-  }
-
-  return fallback;
 }
 
 function parseAcceptableReportRunId(row: { id?: string } | null | undefined): string | null {
@@ -1468,17 +1311,10 @@ export async function getLatestSelfAlignmentReport(): Promise<SelfAlignmentRepor
     "self_report_answered_basis_questions",
     { allowMissing: true }
   );
-  const [expectedByDimension, baseTotalActive] = await Promise.all([
-    getExpectedFounderBaseQuestionCountByDimension(supabase),
-    countQuestionsByCategories(supabase, ["basis"], true),
-  ]);
-  const founderAggregate = aggregateFounderBaseScoresFromAnswers(answers, questionById, expectedByDimension);
+  const founderAggregate = aggregateFounderBaseScoresFromAnswers(answers, questionById);
   const scoresA = founderAggregate.scores;
   const keyInsights = buildSelfFounderKeyInsights(scoresA);
-  const basisTotal =
-    baseTotalActive > 0
-      ? baseTotalActive
-      : Object.values(founderAggregate.expectedByDimension).reduce((sum, value) => sum + value, 0);
+  const basisTotal = founderAggregate.expectedTotal;
 
   return {
     sessionId: baseAssessment.id,
@@ -1592,9 +1428,6 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     getAssessmentAnswers(privileged, inviterBase.id),
     getAssessmentAnswers(privileged, inviteeBase.id),
   ]);
-  const baseTotalFromDb = await countQuestionsByCategories(privileged, ["basis"], true);
-  const basisTotal = baseTotalFromDb > 0 ? baseTotalFromDb : 36;
-  const expectedByDimension = await getExpectedBaseQuestionCountByDimension(privileged);
 
   const baseQuestionMetaById = await getQuestionMetaMap(privileged, [
     ...inviterBaseAnswers.map((row) => row.question_id),
@@ -1607,19 +1440,18 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   );
   const inviterBaseScores = aggregateBaseScoresFromAnswers(
     inviterBaseAnswers,
-    baseQuestionMetaById,
-    expectedByDimension
+    baseQuestionMetaById
   );
   const inviteeBaseScores = aggregateBaseScoresFromAnswers(
     inviteeBaseAnswers,
-    baseQuestionMetaById,
-    expectedByDimension
+    baseQuestionMetaById
   );
+  const basisTotal = inviterBaseScores.expectedTotal;
   const founderScoringInput = {
     personA: transformFounderScoringAnswers(inviterBaseAnswers, baseQuestionMetaById),
     personB: transformFounderScoringAnswers(inviteeBaseAnswers, baseQuestionMetaById),
   };
-  const founderScoring = scoreFounderAlignment(founderScoringInput);
+  const founderScoring = scoreFounderAlignmentV2FromAnswersV2(founderScoringInput);
   const founderReport = buildFounderAlignmentReport({
     scoringResult: founderScoring,
     teamContext: normalizeTeamContext(invitation.team_context),
@@ -1732,8 +1564,8 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     valuesAnsweredA,
     valuesAnsweredB,
     valuesTotal,
-    basisAnsweredA: inviterBaseAnswers.length,
-    basisAnsweredB: inviteeBaseAnswers.length,
+    basisAnsweredA: inviterBaseScores.answeredQuestionCount,
+    basisAnsweredB: inviteeBaseScores.answeredQuestionCount,
     basisTotal,
     valuesAlignmentPercent: null,
     valuesIdentityCategoryA,
@@ -2321,7 +2153,7 @@ export async function getFounderMatchingLiveData(
     { allowMissing: true }
   );
 
-  const founderScoring = scoreFounderAlignment({
+  const founderScoring = scoreFounderAlignmentV2FromAnswersV2({
     personA: transformFounderScoringAnswers(inviterBaseAnswers, baseQuestionMetaById),
     personB: transformFounderScoringAnswers(inviteeBaseAnswers, baseQuestionMetaById),
   });

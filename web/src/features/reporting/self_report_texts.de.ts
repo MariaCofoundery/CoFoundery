@@ -71,7 +71,7 @@ export const SELF_DIMENSION_COPY: Record<
   },
   "Arbeitsstruktur & Zusammenarbeit": {
     intro:
-      "Diese Dimension zeigt, wie eng du im Alltag mit anderen arbeiten, abstimmen und sichtbar verbunden bleiben willst. Sie macht sichtbar, ob du lieber über klare Zuständigkeiten mit gezielter Abstimmung arbeitest oder über laufenden Austausch und ein gemeinsames Bild der Arbeit.",
+      "Diese Dimension zeigt, wie autonom oder eng abgestimmt du im Alltag mit anderen arbeiten willst. Sie macht sichtbar, ob du lieber über klare Zuständigkeiten mit gezielter Abstimmung arbeitest oder über laufenden Austausch und ein gemeinsames Bild der Arbeit.",
     reflectionQuestion:
       "Wie eng willst du im Alltag mit anderen verbunden arbeiten, und an welchen Stellen reicht dir gezielte statt dauernder Abstimmung?",
     tendency: {

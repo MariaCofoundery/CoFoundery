@@ -5,6 +5,7 @@ import { createClient as createSupabaseClient, type SupabaseClient } from "@supa
 import { createClient } from "@/lib/supabase/server";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
+  sanitizeWorkbookStructuredOutputsByStep,
   sanitizeFounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
@@ -321,6 +322,12 @@ function mergeFounderPayload(
         if (typeof patch.value === "string") {
           stepEntry.agreement = patch.value;
         }
+        break;
+      case "structuredOutputs":
+        stepEntry.structuredOutputs = sanitizeWorkbookStructuredOutputsByStep(
+          patch.stepId,
+          patch.value
+        );
         break;
       case "founderAApproved":
         if (role === "founderA") {

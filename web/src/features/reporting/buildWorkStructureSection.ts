@@ -35,8 +35,8 @@ function interpretationFromFitCategory(
 ) {
   if (fitCategory === "very_high") {
     return teamContext === "pre_founder"
-      ? "In euren Vorstellungen davon, wie eng ihr im Alltag abgestimmt und sichtbar verbunden arbeiten wollt, seid ihr derzeit sehr nah beieinander. Das ist fuer eine moegliche Zusammenarbeit eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss."
-      : "In euren Vorstellungen davon, wie eng ihr im Alltag abgestimmt und sichtbar verbunden arbeiten wollt, seid ihr derzeit sehr nah beieinander. Fuer eure Zusammenarbeit ist das eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss.";
+      ? "In euren Vorstellungen davon, wie autonom oder eng abgestimmt ihr im Alltag arbeiten wollt, seid ihr derzeit sehr nah beieinander. Das ist fuer eine moegliche Zusammenarbeit eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss."
+      : "In euren Vorstellungen davon, wie autonom oder eng abgestimmt ihr im Alltag arbeiten wollt, seid ihr derzeit sehr nah beieinander. Fuer eure Zusammenarbeit ist das eine starke Basis, weil euer Arbeitsmodus nicht staendig neu ausgehandelt werden muss.";
   }
 
   if (fitCategory === "high") {
@@ -81,7 +81,7 @@ function potentialTensionsFromState(
       {
         topic: "Sichtbarkeit von Fortschritt und offenen Punkten",
         explanation:
-          "Spannungen koennen entstehen, wenn eine Person wichtige Zwischenstaende frueh teilen will, waehrend die andere lieber laenger eigenstaendig arbeitet, bevor etwas sichtbar wird.",
+          "Spannungen koennen entstehen, wenn eine Person wichtige Zwischenstaende frueh teilen will, waehrend die andere lieber laenger autonom arbeitet, bevor etwas sichtbar wird.",
       },
       {
         topic: "Uebergaben und Rueckkopplung",

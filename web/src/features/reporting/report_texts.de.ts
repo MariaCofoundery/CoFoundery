@@ -18,8 +18,8 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
   Vision: {
     id: "Vision",
     name: "Unternehmenslogik",
-    axisLeft: "strategisch",
-    axisRight: "aufbauend",
+    axisLeft: "opportunitäts- und wachstumsorientiert",
+    axisRight: "langfristig aufbau- und substanzorientiert",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {
@@ -64,8 +64,8 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
   Entscheidung: {
     id: "Entscheidung",
     name: "Entscheidung",
-    axisLeft: "Analyse",
-    axisRight: "Tempo",
+    axisLeft: "analytisch-abwägend",
+    axisRight: "intuitiv-handlungsorientiert",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {
@@ -107,8 +107,8 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
   Risiko: {
     id: "Risiko",
     name: "Risikoprofil",
-    axisLeft: "Sicherheit",
-    axisRight: "Wagnis",
+    axisLeft: "sicherheitsorientiert",
+    axisRight: "chancenorientiert",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {
@@ -151,7 +151,7 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
     id: "Autonomie",
     name: "Zusammenarbeit im Alltag",
     axisLeft: "eng abgestimmt",
-    axisRight: "eigenständig",
+    axisRight: "autonom organisiert",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {
@@ -167,11 +167,11 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
         name: "Gekoppelter Modus",
         superpower: "Du kannst zwischen enger Abstimmung und Eigenraum bewusst wechseln.",
         caution: "In Stressphasen droht Unklarheit darueber, wann mehr Sichtbarkeit noetig ist.",
-        descriptionShort: "Bewusster Wechsel zwischen Rueckkopplung und eigenstaendiger Umsetzung.",
+        descriptionShort: "Bewusster Wechsel zwischen Rueckkopplung und autonomer Umsetzung.",
       },
       high: {
         id: "autarkie-spezialist",
-        name: "Eigenstaendiger Modus",
+        name: "Autonomer Modus",
         superpower: "Du arbeitest fokussiert mit klarem Eigenraum und wenig Dauerabstimmung.",
         caution: "Ohne verlaessliche Rueckkopplung kann das gemeinsame Bild schnell auseinanderlaufen.",
         descriptionShort: "Viel Eigenraum und gezielte statt dauernde Abstimmung.",
@@ -184,7 +184,7 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
     },
     dailyPressureByZoneOrPair: {
       low: "Im Alltag zeigt sich das in enger Taktung, frueher Sichtbarkeit und kurzer Rueckkopplung.",
-      mid: "Im Alltag wechselt ihr bewusst zwischen enger Abstimmung und eigenstaendigen Fokusphasen.",
+      mid: "Im Alltag wechselt ihr bewusst zwischen enger Abstimmung und autonomen Fokusphasen.",
       high: "Im Alltag dominieren Eigenraum, gezielte Check-ins und laenger selbststaendige Umsetzungsphasen.",
       low_high_pair:
         "Unter Druck prallen enge Abstimmung und grosser Eigenraum aufeinander. Ein klarer Kommunikationsrhythmus entschaerft das zuverlaessig.",
@@ -193,8 +193,8 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
   Verbindlichkeit: {
     id: "Verbindlichkeit",
     name: "Verbindlichkeit",
-    axisLeft: "integriert",
-    axisRight: "priorisiert",
+    axisLeft: "klar begrenzt / integriert",
+    axisRight: "stark priorisiert / hochfokussiert",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {
@@ -236,8 +236,8 @@ export const DIMENSION_DEFINITIONS_DE: Record<ReportDimension, DimensionDefiniti
   Konflikt: {
     id: "Konflikt",
     name: "Konflikt",
-    axisLeft: "Diplomatie",
-    axisRight: "Direktheit",
+    axisLeft: "reflektierend",
+    axisRight: "direkt",
     thresholds: BASE_THRESHOLDS,
     diffThresholds: BASE_DIFF_THRESHOLDS,
     archetypesByZone: {

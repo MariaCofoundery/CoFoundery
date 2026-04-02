@@ -1,4 +1,7 @@
-import { getFounderDimensionMeta } from "@/features/reporting/founderDimensionMeta";
+import {
+  getFounderDimensionMeta,
+  getFounderDimensionPoleLabels,
+} from "@/features/reporting/founderDimensionMeta";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type StructuredTension = {
@@ -282,14 +285,15 @@ function initials(name: string) {
 
 function spectrumPoles(dimension: string) {
   const meta = getFounderDimensionMeta(dimension);
+  const reportPoles = getFounderDimensionPoleLabels(dimension, "report");
   if (!meta) {
     return { left: "", mid: "balanciert", right: "" };
   }
 
   return {
-    left: meta.leftPole,
+    left: reportPoles?.left ?? meta.reportLeftPole,
     mid: meta.centerLabel,
-    right: meta.rightPole,
+    right: reportPoles?.right ?? meta.reportRightPole,
   };
 }
 

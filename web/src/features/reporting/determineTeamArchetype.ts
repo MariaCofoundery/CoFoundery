@@ -282,6 +282,7 @@ export function determineTeamArchetype(
 ): TeamArchetypeResult {
   // Archetypes should not infer "high/low = good/bad". Where direction matters, the
   // explicit left/right poles from founderDimensionMeta define what the score leans toward.
+  const overallTension = scoringResult.overallTension;
   const riskMeta = requireFounderDimensionMeta(DIMENSIONS.risk);
   const decisionMeta = requireFounderDimensionMeta(DIMENSIONS.decision);
 
@@ -318,7 +319,7 @@ export function determineTeamArchetype(
 
   if (
     scoringResult.overallFit == null ||
-    scoringResult.conflictRiskIndex == null ||
+    overallTension == null ||
     isClearlyDifferent(vision) ||
     isStronglyDifferent(vision) ||
     elevatedTensionCount >= 2 ||
@@ -333,7 +334,7 @@ export function determineTeamArchetype(
     isVerySimilar(risk) &&
     isVerySimilar(decision) &&
     scoringResult.overallFit >= 80 &&
-    scoringResult.conflictRiskIndex <= 35 &&
+    overallTension <= 35 &&
     hiddenDifferenceCount === 0
   ) {
     return buildArchetypeResult("strategic_alliance", scoringResult);
@@ -372,7 +373,7 @@ export function determineTeamArchetype(
     decisionMean != null &&
     hasPoleTendency(riskMeta.canonicalName, riskMean, "right") &&
     hasPoleTendency(decisionMeta.canonicalName, decisionMean, "right") &&
-    scoringResult.conflictRiskIndex <= 55
+    overallTension <= 55
   ) {
     return buildArchetypeResult("explorer_dynamic", scoringResult);
   }
@@ -390,7 +391,7 @@ export function determineTeamArchetype(
 
   if (
     scoringResult.overallFit >= 55 &&
-    scoringResult.conflictRiskIndex <= 60 &&
+    overallTension <= 60 &&
     elevatedTensionCount === 0
   ) {
     return buildArchetypeResult("adaptive_alliance", scoringResult);

@@ -1,3 +1,5 @@
+import { scoreFounderAlignmentV2 } from "@/features/scoring/founderCompatibilityScoringV2";
+
 export type Answer = {
   question_id: string;
   dimension: string;
@@ -67,6 +69,8 @@ export type DimensionResult = {
 export type TeamScoringResult = {
   dimensions: DimensionResult[];
   overallFit: number | null;
+  overallTension: number | null;
+  // Deprecated compatibility alias. Active V2 report logic should read overallTension.
   conflictRiskIndex: number | null;
   overallRedFlags: string[];
   overallGreenFlags: string[];
@@ -471,7 +475,7 @@ function describeHiddenDifference(dimension: KnownDimension) {
     return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Risiken je nach Situation ueber verschiedene innere Logiken bewertet.";
   }
   if (dimension === "Arbeitsstruktur & Zusammenarbeit") {
-    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr im Alltag unterschiedlich eng abgestimmt und sichtbar verbunden arbeiten wollt.";
+    return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr im Alltag unterschiedlich autonom oder eng abgestimmt arbeiten wollt.";
   }
   if (dimension === "Commitment") {
     return "Aehnliche Position, aber unterschiedliche Antwortmuster zeigen, dass ihr Priorisierung, Verfuegbarkeit und Einsatzniveau nicht in denselben Situationen gleich auslegt.";
@@ -1018,47 +1022,7 @@ function selectExecutiveInsights(dimensions: DimensionResult[]): ExecutiveInsigh
 }
 
 export function scoreFounderAlignment(input: TeamScoringInput): TeamScoringResult {
-  const personAByDimension = groupScorableAnswersByDimension(input.personA);
-  const personBByDimension = groupScorableAnswersByDimension(input.personB);
-
-  const dimensions = DIMENSION_ORDER.map((dimension) =>
-    scoreDimension(dimension, personAByDimension, personBByDimension)
-  );
-  const executiveInsights = selectExecutiveInsights(dimensions);
-
-  const overallFit = weightedMean(
-    dimensions.map((dimensionResult) => ({
-      value: dimensionResult.teamFit,
-      weight: DIMENSION_RULES[dimensionResult.dimension as KnownDimension].weight,
-    }))
-  );
-
-  const conflictRiskIndex = weightedMean(
-    dimensions.map((dimensionResult) => ({
-      // Use the underlying tension score directly so the overall index changes
-      // continuously with small differences instead of jumping between 0/50/100 buckets.
-      value: dimensionResult.tensionScore,
-      weight: DIMENSION_RULES[dimensionResult.dimension as KnownDimension].weight,
-    }))
-  );
-
-  return {
-    dimensions,
-    overallFit,
-    conflictRiskIndex,
-    overallRedFlags: uniqueStrings(dimensions.flatMap((dimension) => dimension.redFlags)),
-    overallGreenFlags: uniqueStrings(dimensions.flatMap((dimension) => dimension.greenFlags)),
-    overallCollaborationStrengths: uniqueStrings(
-      dimensions.flatMap((dimension) => dimension.collaborationStrengths)
-    ),
-    overallComplementaryDynamics: uniqueStrings(
-      dimensions.flatMap((dimension) => dimension.complementaryDynamics)
-    ),
-    overallPotentialTensionAreas: uniqueStrings(
-      dimensions.flatMap((dimension) => dimension.potentialTensionAreas)
-    ),
-    executiveInsights,
-  };
+  return scoreFounderAlignmentV2(input);
 }
 
 export const founderScoring = {

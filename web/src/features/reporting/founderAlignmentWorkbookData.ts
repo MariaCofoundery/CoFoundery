@@ -18,6 +18,7 @@ import {
   sanitizeFounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookHighlights,
   type FounderAlignmentWorkbookPayload,
+  type WorkbookStepMarkersByStep,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import {
   getPrivilegedReportRunSnapshotForInvitation,
@@ -93,6 +94,7 @@ export type FounderAlignmentWorkbookPageData =
       scoringResult: TeamScoringResult;
       workbook: FounderAlignmentWorkbookPayload;
       highlights: FounderAlignmentWorkbookHighlights;
+      stepMarkersByStep: WorkbookStepMarkersByStep;
       canSave: boolean;
       persisted: boolean;
       updatedAt: string | null;
@@ -272,6 +274,7 @@ export async function getFounderAlignmentWorkbookPageData(
       scoringResult,
       teamContext,
     });
+    const highlights = deriveFounderAlignmentWorkbookHighlights(report, scoringResult);
 
     return {
       status: "ready",
@@ -285,7 +288,8 @@ export async function getFounderAlignmentWorkbookPageData(
       report,
       scoringResult,
       workbook: buildEmptyFounderAlignmentWorkbookPayload(),
-      highlights: deriveFounderAlignmentWorkbookHighlights(report, scoringResult),
+      highlights,
+      stepMarkersByStep: highlights.stepMarkersByStep,
       canSave: false,
       persisted: false,
       updatedAt: null,
@@ -386,6 +390,8 @@ export async function getFounderAlignmentWorkbookPageData(
     };
   }
 
+  const highlights = deriveFounderAlignmentWorkbookHighlights(report, scoringResult);
+
   return {
     status: "ready",
     invitationId: normalizedInvitationId,
@@ -398,7 +404,8 @@ export async function getFounderAlignmentWorkbookPageData(
     report,
     scoringResult,
     workbook,
-    highlights: deriveFounderAlignmentWorkbookHighlights(report, scoringResult),
+    highlights,
+    stepMarkersByStep: highlights.stepMarkersByStep,
     canSave: true,
     persisted: Boolean(workbookRow),
     updatedAt: workbookRow?.updated_at ?? null,

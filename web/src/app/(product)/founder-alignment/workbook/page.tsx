@@ -123,6 +123,7 @@ export default async function FounderAlignmentWorkbookPage({
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}
+          stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
           canSave={data.canSave}
           persisted={data.persisted}
@@ -144,6 +145,7 @@ export default async function FounderAlignmentWorkbookPage({
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}
+          stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
           canSave={data.canSave}
           persisted={data.persisted}

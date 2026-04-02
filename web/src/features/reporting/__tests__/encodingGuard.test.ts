@@ -10,11 +10,12 @@ import { buildPatternExamples } from "@/features/reporting/patternTextBuilder";
 import { normalizeGermanText } from "@/lib/normalizeGermanText";
 
 const SUSPICIOUS_ENCODING_PATTERNS = [/Ã./u, /Â./u, /â€./u, /�/u, /\uFFFD/u];
-const KNOWN_BAD_MUTATIONS = ["zürst", "Daür", "aufbaünd"];
+const KNOWN_BAD_MUTATIONS = ["zürst", "Daür", "aufbaünd", "aktüll", "individülle", "visülle"];
 
 test("normalizeGermanText repairs mojibake and does not corrupt valid German words", () => {
   assert.equal(normalizeGermanText("zuerst Dauer aufbauend"), "zuerst Dauer aufbauend");
   assert.equal(normalizeGermanText("staerker abgestimmt"), "stärker abgestimmt");
+  assert.equal(normalizeGermanText("aktuell individuelle visuelle manuelle Hilfe"), "aktuell individuelle visuelle manuelle Hilfe");
   assert.equal(
     normalizeGermanText("darueber Rueckkopplung und Verfuegbarkeit klaert ihr frueh."),
     "darüber Rückkopplung und Verfügbarkeit klärt ihr früh."

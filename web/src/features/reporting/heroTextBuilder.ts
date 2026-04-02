@@ -21,154 +21,154 @@ type DimensionSentenceMap = Record<
 
 const PRIMARY_SENTENCES: DimensionSentenceMap = {
   Unternehmenslogik: {
-    left: "Für dich zählen in unternehmerischen Entscheidungen vor allem Markt, Hebel und strategische Wirkung.",
+    left: "Dein Kernmuster: Du pruefst neue Chancen zuerst darauf, ob sie das Unternehmen belastbarer und tragfaehiger machen - genau dort kippt es im Team, wenn andere aus derselben Chance schon den naechsten Hebel ableiten.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Situation wechselst du zwischen Hebel und Aufbau, statt dich früh auf nur eine Linie festzulegen."
-        : "Oft hältst du Wirkung und Substanz gleichzeitig im Blick, ohne dich vorschnell auf nur eine Seite zu schlagen.",
-    right: "Substanz, Aufbau und langfristige Tragfähigkeit sind für dich kein Nebenthema, sondern der Maßstab für unternehmerische Entscheidungen.",
+        ? "Dein Kernmuster: Bei neuen Chancen schaust du mal zuerst auf Aufbau und Tragfaehigkeit und mal zuerst auf Hebel und Reichweite - genau dort kippt es im Team, weil dein Wechsel oft erst spaet lesbar wird."
+        : "Dein Kernmuster: Du hältst Aufbau und Wirkung gleichzeitig im Blick, statt dich früh auf nur eine Seite festzulegen.",
+    right: "Dein Kernmuster: Du sortierst neue Chancen zuerst nach Reichweite, Zug und strategischer Wirkung - genau dort kippt es im Team, wenn andere zuerst Stabilitaet und Tragfaehigkeit sichern wollen.",
   },
   Entscheidungslogik: {
-    left: "Bevor du dich festlegst, willst du eine nachvollziehbare Grundlage für die Entscheidung sehen.",
+    left: "Dein Kernmuster: Du legst Entscheidungen ungern fest, solange wichtige Annahmen oder Gegenargumente noch offen sind - genau dort kippt es im Team, wenn andere den naechsten Schritt schon festhalten wollen.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Lage gehst du gründlich hinein oder setzt schnell einen Punkt, ohne an einem festen Stil zu hängen."
-        : "Oft prüfst du erst kurz und entscheidest dann, statt lange auf einer Seite stecken zu bleiben.",
-    right: "Wenn ein Bild für dich stimmig ist, entscheidest du lieber, als noch lange an offenen Punkten zu kreisen.",
+        ? "Dein Kernmuster: Bei manchen Entscheidungen willst du erst offene Annahmen sehen, bei anderen setzt du frueh einen naechsten Schritt - genau dort kippt es im Team, weil dein Wechsel nicht stabil vorhersagbar ist."
+        : "Dein Kernmuster: Du prüfst oft kurz und gehst dann in eine Entscheidung, statt lange in einer Schleife zu bleiben.",
+    right: "Dein Kernmuster: Wenn fuer dich ein gangbarer naechster Schritt sichtbar ist, entscheidest du lieber, als die Frage weiter offen zu halten - genau dort kippt es im Team, wenn andere dieselbe Frage noch weiter pruefen wollen.",
   },
   Risikoorientierung: {
-    left: "Risiko gehst du lieber mit klaren Leitplanken ein und nicht nur aus Momentum heraus.",
+    left: "Dein Kernmuster: Du gehst Risiko lieber mit klaren Leitplanken, Puffern und Stop-Kriterien ein - genau dort kippt es im Team, wenn andere frueher ins Handeln wollen.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Lage sicherst du stärker ab oder gehst bewusst nach vorn, ohne Risiko immer gleich zu lesen."
-        : "Oft wägest du Mut und Absicherung gegeneinander ab, statt automatisch nur einer Seite zu folgen.",
-    right: "Auch in unsicheren Lagen gehst du nach vorn, wenn du darin eine echte Chance siehst.",
+        ? "Dein Kernmuster: Bei manchen Chancen gehst du frueh los, bei anderen willst du erst klare Leitplanken sehen - genau dort kippt es im Team, weil deine Risikoschwelle schwer lesbar bleibt."
+        : "Dein Kernmuster: Du wägest Mut und Absicherung gegeneinander ab, statt automatisch nur einer Seite zu folgen.",
+    right: "Dein Kernmuster: Wenn du in einer unsicheren Lage eine echte Chance siehst, gehst du eher in Bewegung als in laengere Absicherung - genau dort kippt es im Team, wenn andere zuerst Sicherheit herstellen wollen.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Am besten arbeitest du mit klaren Zuständigkeiten, eigenem Raum und gezielter statt dauernder Abstimmung.",
+    left: "Dein Kernmuster: Du arbeitest am liebsten mit klarem Eigenraum und gezielter statt dauernder Abstimmung - genau dort kippt es im Team, wenn andere fruehe Mitsicht erwarten.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Aufgabe suchst du mehr Eigenraum oder mehr Rückkopplung, statt dich auf einen festen Arbeitsmodus festzulegen."
-        : "Oft steuerst du Nähe und Eigenraum situativ, statt nur auf Autonomie oder Dauerschleifen zu setzen.",
-    right: "Am besten arbeitest du, wenn Fortschritt, offene Punkte und Entscheidungen eng miteinander geteilt werden.",
+        ? "Dein Kernmuster: In manchen Aufgaben willst du Eigenraum, in anderen fruehe Rueckkopplung - genau dort kippt es im Team, wenn andere zu spaet merken, welchen Modus du gerade erwartest."
+        : "Dein Kernmuster: Du steuerst Nähe und Eigenraum situativ, statt nur in Autonomie oder Dauerschleifen zu arbeiten.",
+    right: "Dein Kernmuster: Du arbeitest am besten, wenn Fortschritt, offene Punkte und Entscheidungen frueh gemeinsam sichtbar sind - genau dort kippt es im Team, wenn andere autonomer weiterarbeiten wollen.",
   },
   Commitment: {
-    left: "Das Startup hat Gewicht für dich, bleibt aber Teil eines größeren Lebens- und Arbeitskontexts.",
+    left: "Dein Kernmuster: Das Startup hat fuer dich Gewicht, bleibt im Alltag aber Teil eines groesseren Arbeits- und Lebensrahmens - genau dort kippt es im Team, wenn andere mehr Verfuegbarkeit still voraussetzen.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Lage gibst du dem Startup mehr oder weniger Raum, ohne ein starres Einsatzniveau festzulegen."
-        : "Oft passt du dein Einsatzniveau an die aktuelle Phase an, statt es dauerhaft gleich hoch oder gleich begrenzt zu halten.",
-    right: "Für dich steht das Startup klar im Zentrum; Zeit, Energie und Aufmerksamkeit ordnen sich stark darum herum.",
+        ? "Dein Kernmuster: In intensiven Phasen ziehst du Fokus sichtbar hoch und nimmst ihn wieder raus, wenn der Druck sinkt - genau dort kippt es im Team, weil dein Einsatzniveau nicht dauerhaft gleich lesbar bleibt."
+        : "Dein Kernmuster: Du passt dein Einsatzniveau an die aktuelle Phase an, statt es dauerhaft gleich hoch oder gleich begrenzt zu halten.",
+    right: "Dein Kernmuster: Du richtest Zeit, Energie und Aufmerksamkeit deutlich auf das Startup aus - genau dort kippt es im Team, wenn andere Prioritaet und Verfuegbarkeit anders einordnen.",
   },
   Konfliktstil: {
-    left: "Spannungen sprichst du eher nach kurzer Sortierung an, statt sofort frontal hineinzugehen.",
+    left: "Dein Kernmuster: Wenn ein Unterschied spuerbar wird, sortierst du ihn meist erst fuer dich, bevor du ihn ansprichst - genau dort kippt es im Team, wenn andere direkte Klaerung sofort erwarten.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Situation gehst du direkt hinein oder hältst erst kurz Abstand, ohne nur einem Konfliktrhythmus zu folgen."
-        : "Oft wählst du bewusst zwischen direkter Ansprache und mehr Timing, je nachdem, was die Lage trägt.",
-    right: "Spannungen sprichst du lieber früh und direkt an, bevor sie lange im Raum stehen.",
+        ? "Dein Kernmuster: Manche Unterschiede sprichst du sofort an, andere laesst du erst kurz liegen, bevor du sie aufmachst - genau dort kippt es im Team, weil dein Timing schwer vorhersagbar ist."
+        : "Dein Kernmuster: Du waehlst bewusst zwischen direkter Ansprache und mehr Timing, je nachdem, was die Lage traegt.",
+    right: "Dein Kernmuster: Du sprichst Unterschiede lieber frueh und direkt an, bevor sie laenger mitlaufen - genau dort kippt es im Team, wenn andere dafuer mehr Schonraum brauchen.",
   },
 };
 
 const WORK_MODE_SENTENCES: DimensionSentenceMap = {
   Unternehmenslogik: {
-    left: "Sichtbar wird das im Alltag daran, dass du Themen schnell danach sortierst, was Reichweite schafft und den größten Hebel hat.",
+    left: "Im Tagesgeschaeft gibst du vor allem den Themen Raum, die das Fundament staerken und auch in sechs oder zwoelf Monaten noch tragen.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Lage wechselst du spürbar zwischen Marktfenster und Aufbaufrage."
-        : "Oft prüfst du parallel, was kurz wirkt und was das Unternehmen langfristig trägt.",
-    right: "Im Tagesgeschäft gibst du vor allem den Themen Raum, die das Fundament stärken und später noch belastbar sind.",
+        ? "Im Alltag wirkt das so: Bei einer Chance sprichst du zuerst ueber Tragfaehigkeit und Aufbau, bei der naechsten zuerst ueber das Marktfenster."
+        : "Im Alltag pruefst du oft parallel, was das Unternehmen langfristig traegt und wo trotzdem ein echter Hebel liegt.",
+    right: "Im Alltag ziehst du Themen nach vorn, wenn schnell sichtbar wird, wo Reichweite, Zugang oder Momentum entstehen koennen.",
   },
   Entscheidungslogik: {
-    left: "Im Arbeiten merkt man das daran, dass du offene Annahmen sichtbar machen willst, bevor ihr euch festlegt.",
+    left: "Im Arbeiten merkt man das daran, dass du Annahmen, Luecken und Gegenargumente eher noch einmal sichtbar machst, bevor ihr festlegt.",
     center: (band) =>
       band === "balanced"
-        ? "Im Arbeiten passt du daran an, wie viel Prüfung oder Entschluss ein Moment gerade wirklich braucht."
-        : "Im Arbeiten pendelst du oft zwischen kurzer Prüfung und pragmatischer Entscheidung, ohne lange auf einer Seite zu bleiben.",
-    right: "Im Arbeiten setzt du lieber den nächsten Schritt, sobald für dich genug Kontur da ist.",
+        ? "Im Arbeiten wirkt das so: Manche Entscheidungen willst du erst sauber pruefen, andere schiebst du frueh in einen klaren naechsten Schritt."
+        : "Im Arbeiten wechselst du oft zwischen kurzer Pruefung und pragmatischer Entscheidung, ohne lange auf einer Seite zu bleiben.",
+    right: "Im Arbeiten setzt du lieber einen naechsten Schritt, sobald fuer dich genug Kontur da ist.",
   },
   Risikoorientierung: {
-    left: "Im Tagesgeschäft gibst du Themen eher dann frei, wenn Grenzen, Kosten und Puffer sichtbar genug sind.",
+    left: "Im Tagesgeschaeft gibst du Themen eher dann frei, wenn Grenzen, Kosten und Puffer sichtbar genug sind.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Lage liest du Risiko situativ und gehst mal vorsichtiger, mal offensiver vor."
-        : "Oft entscheidest du danach, wann Absicherung reicht und wann Mut den größeren Effekt hat.",
+        ? "Im Alltag wirkt das so: Bei einem Schritt willst du erst Leitplanken, beim naechsten reicht dir schon ein plausibler Hebel fuer Bewegung."
+        : "Oft entscheidest du danach, wann Absicherung reicht und wann ein mutigerer Schritt den groesseren Effekt hat.",
     right: "Sobald du echten Spielraum erkennst, gehst du schneller in Tests, Wetten und Bewegung.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Am liebsten arbeitest du eigenständig vor und willst nicht jeden Zwischenschritt gemeinsam kalibrieren.",
+    left: "Am liebsten arbeitest du autonom vor und willst nicht jeden Zwischenschritt gemeinsam kalibrieren.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Aufgabe wechselst du zwischen eigenem Raum und enger Rückkopplung."
+        ? "Im Alltag wirkt das so: Bei manchen Themen willst du erst allein vorarbeiten, bei anderen brauchst du fruehe Rueckkopplung."
         : "Oft dosierst du Austausch so, dass er Orientierung gibt, aber nicht jeden Schritt begleitet.",
-    right: "Im täglichen Arbeiten willst du laufend wissen, wo Dinge stehen, was entschieden ist und wo noch etwas offen bleibt.",
+    right: "Im taeglichen Arbeiten willst du frueh sehen, wo Dinge stehen, was entschieden ist und wo noch etwas offen bleibt.",
   },
   Commitment: {
-    left: "Du planst Verfügbarkeit und Einsatz so, dass das Startup Platz hat, aber nicht alles andere verdrängt.",
+    left: "Du planst Verfuegbarkeit und Einsatz so, dass das Startup Platz hat, aber nicht alles andere verdraengt.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Phase schaltest du dein Einsatzniveau hoch oder runter, statt immer denselben Modus zu fahren."
-        : "Oft ziehst du Intensität dann hoch, wenn sie begründet ist, und nimmst sie wieder raus, wenn der Druck sinkt.",
-    right: "Im Alltag behandelst du das Startup als klaren Schwerpunkt und liest das Miteinander auch über dieses Fokusniveau.",
+        ? "Im Alltag wirkt das so: In einer Phase bist du sehr praesenz, in der naechsten faehrst du bewusst wieder auf ein integriertes Niveau zurueck."
+        : "Oft ziehst du Intensitaet dann hoch, wenn sie begruendet ist, und nimmst sie wieder raus, wenn der Druck sinkt.",
+    right: "Im Alltag behandelst du das Startup als klaren Schwerpunkt und liest Zusammenarbeit auch ueber dieses Fokusniveau.",
   },
   Konfliktstil: {
-    left: "Bei heiklen Punkten suchst du eher erst etwas Abstand, bevor du sie klar ansprichst.",
+    left: "Bei heiklen Punkten nimmst du dir eher kurz Zeit, bevor du sie offen ansprichst.",
     center: (band) =>
       band === "balanced"
-        ? "Je nach Situation entscheidest du, ob etwas sofort auf den Tisch muss oder erst kurz reifen soll."
-        : "Oft steuerst du, wann Direktheit hilft und wann mehr Timing klüger ist.",
-    right: "Im Alltag merkt man das daran, dass du Spannungen eher früh sichtbar machst, statt sie länger im Hintergrund laufen zu lassen.",
+        ? "Im Alltag wirkt das so: Einen Unterschied sprichst du sofort an, einen anderen erst am naechsten passenden Moment."
+        : "Oft steuerst du, wann Direktheit hilft und wann mehr Timing klueger ist.",
+    right: "Im Alltag merkt man das daran, dass du Unterschiede eher frueh sichtbar machst, statt sie laenger im Hintergrund laufen zu lassen.",
   },
 };
 
 const TENSION_SENTENCES: DimensionSentenceMap = {
   Unternehmenslogik: {
-    left: "Schwierig wird es dort, wo andere stärker bauen wollen und du zuerst sehen willst, wo wirklich Wirkung entsteht.",
+    left: "Die groesste Reibung entsteht dort, wo andere aus einer Chance schon den naechsten Schritt ableiten und du zuerst wissen willst, ob das Modell dafuer schon tragfaehig genug ist.",
     center: (band) =>
       band === "balanced"
-        ? "Dann zieht es schnell auseinander, wenn im Team offenbleibt, wann Wirkung und wann Aufbau führen sollen."
-        : "Schwierig wird es, wenn niemand klar sagt, ob ihr gerade Hebel sucht oder bewusst Fundament baut.",
-    right: "Schwierig wird es dort, wo andere schnell auf Marktchance ziehen und du zuerst wissen willst, was davon später noch trägt.",
+        ? "Die groesste Reibung entsteht dort, wo du zwischen Aufbau und Hebel wechselst, ohne dass fuer andere sofort klar ist, welche Logik gerade fuehrt."
+        : "Reibung entsteht dort, wo niemand klar sagt, ob ihr gerade bewusst Fundament baut oder den naechsten Hebel sucht.",
+    right: "Die groesste Reibung entsteht dort, wo du in einer neuen Chance schon den naechsten Hebel siehst, waehrend andere erst klaeren wollen, ob Aufbau und Tragfaehigkeit dafuer schon reichen.",
   },
   Entscheidungslogik: {
-    left: "Schwierig wird es, wenn vom Team schon Tempo erwartet wird, während für dich noch eine tragfähige Grundlage fehlt.",
+    left: "Die groesste Reibung entsteht, wenn im Meeting schon ein naechster Schritt festgehalten werden soll, waehrend fuer dich noch zentrale Annahmen offen sind.",
     center: (band) =>
       band === "balanced"
-        ? "Dann wird es schnell zäh, wenn offenbleibt, wann ihr prüft und wann ihr euch wirklich festlegen wollt."
-        : "Schwierig wird es, wenn das Team zwischen Prüfen und Entscheiden hängen bleibt.",
-    right: "Schwierig wird es, wenn Diskussionen weiterlaufen, obwohl du längst einen nächsten Schritt setzen willst.",
+        ? "Die groesste Reibung entsteht, wenn du zwischen Pruefen und Festlegen wechselst und fuer andere nicht klar ist, ab wann du etwas wirklich fuer entscheidbar haeltst."
+        : "Reibung entsteht, wenn das Team zwischen Pruefen und Entscheiden haengen bleibt.",
+    right: "Die groesste Reibung entsteht, wenn fuer dich der naechste Schritt schon klar ist, waehrend andere dieselbe Frage noch weiter pruefen wollen.",
   },
   Risikoorientierung: {
-    left: "Schwierig wird es, wenn andere schneller nach vorn gehen wollen und dir dafür die Leitplanken fehlen.",
+    left: "Die groesste Reibung entsteht, wenn andere schon testen oder zusagen wollen und dir dafuer Leitplanken, Puffer oder Stop-Kriterien fehlen.",
     center: (band) =>
       band === "balanced"
-        ? "Dann zieht es schnell auseinander, wenn Risiko unterschiedlich gelesen wird und niemand die gemeinsame Grenze sauber benennt."
-        : "Schwierig wird es, wenn Chancen im Raum stehen, aber offenbleibt, welches Risiko ihr gemeinsam wirklich tragen wollt.",
-    right: "Schwierig wird es, wenn im Team zuerst Sicherheit gesucht wird und du längst eine echte Chance siehst.",
+        ? "Die groesste Reibung entsteht, wenn du Risiko mal eng und mal offensiv liest und fuer andere nicht klar ist, wo deine Grenze in diesem Fall liegt."
+        : "Reibung entsteht, wenn Chancen im Raum stehen, aber offenbleibt, welches Risiko ihr gemeinsam wirklich tragen wollt.",
+    right: "Die groesste Reibung entsteht, wenn im Team zuerst Sicherheit hergestellt werden soll und du in derselben Lage schon eine echte Chance siehst.",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Schwierig wird es, wenn andere deutlich mehr Nähe, Mitsicht und laufende Abstimmung brauchen als du.",
+    left: "Die groesste Reibung entsteht, wenn andere laufende Mitsicht erwarten und du einen Arbeitsstand erst zeigen willst, wenn fuer dich schon etwas Belastbares da ist.",
     center: (band) =>
       band === "balanced"
-        ? "Dann arbeitet ihr schnell nebeneinander statt miteinander, wenn niemand klar macht, wann ihr eng zusammenarbeitet und wann jeder eigenständig weitergeht."
-        : "Schwierig wird es, wenn Abstimmung weder klar begrenzt noch klar eng geführt wird.",
-    right: "Schwierig wird es, wenn andere viel autonomer arbeiten und du wichtige Dinge erst spät mitbekommst.",
+        ? "Die groesste Reibung entsteht, wenn du zwischen Eigenraum und Rueckkopplung wechselst und fuer andere nicht frueh sichtbar wird, welcher Modus gerade gilt."
+        : "Reibung entsteht, wenn Abstimmung weder klar begrenzt noch klar eng gefuehrt wird.",
+    right: "Die groesste Reibung entsteht, wenn andere autonom weiterarbeiten und du wichtige Entscheidungen oder Zwischenstaende erst spaet mitbekommst.",
   },
   Commitment: {
-    left: "Schwierig wird es, wenn im Team deutlich mehr Präsenz oder ein anderer Stellenwert des Startups still vorausgesetzt wird.",
+    left: "Die groesste Reibung entsteht, wenn im Team mehr Praesenz, Tempo oder Verfuegbarkeit erwartet wird, als du fuer deinen Alltag realistisch zugesagt hast.",
     center: (band) =>
       band === "balanced"
-        ? "Dann zieht es schnell auseinander, wenn Intensität nicht offen abgestimmt wird und alle etwas anderes unter Priorität verstehen."
-        : "Schwierig wird es, wenn offenbleibt, wann hoher Fokus gefragt ist und wann ein begrenzterer Modus reicht.",
-    right: "Schwierig wird es, wenn andere Priorität, Verfügbarkeit und Intensität deutlich anders einordnen als du.",
+        ? "Die groesste Reibung entsteht, wenn du dein Einsatzniveau sichtbar hoch- oder herunterfaehrst und andere erst spaet merken, welches Prioritaetsniveau du gerade erwartest."
+        : "Reibung entsteht, wenn offenbleibt, wann hoher Fokus gefragt ist und wann ein begrenzterer Modus reicht.",
+    right: "Die groesste Reibung entsteht, wenn du hohe Prioritaet und Verfuegbarkeit fuer selbstverstaendlich haeltst, waehrend andere das Startup in ihrem Alltag anders einordnen.",
   },
   Konfliktstil: {
-    left: "Schwierig wird es, wenn andere sofortige Direktheit erwarten und du Themen erst sauber sortieren willst.",
+    left: "Die groesste Reibung entsteht, wenn andere einen Unterschied sofort besprechen wollen und du ihn erst fuer dich sortieren willst.",
     center: (band) =>
       band === "balanced"
-        ? "Dann wird es schnell zäh, wenn Spannungen mitschwingen und niemand markiert, wann jetzt wirklich geklärt wird."
-        : "Schwierig wird es, wenn Timing und Direktheit im Team unterschiedlich gelesen werden.",
-    right: "Schwierig wird es, wenn dein Gegenüber deutlich mehr Schonraum oder indirektere Annäherung braucht als du.",
+        ? "Die groesste Reibung entsteht, wenn du manche Themen sofort und andere spaeter aufmachst und fuer andere nicht klar ist, wann bei dir wirklich Klaerung dran ist."
+        : "Reibung entsteht, wenn Timing und Direktheit im Team unterschiedlich gelesen werden.",
+    right: "Die groesste Reibung entsteht, wenn du einen Unterschied direkt ansprechen willst und dein Gegenueber dafuer deutlich mehr Schonraum oder indirektere Annaeherung braucht.",
   },
 };
 
@@ -182,22 +182,22 @@ function resolveSentence(
 
 function resolveImpactSentence(input: HeroTextInput) {
   if (input.balancedProfile) {
-    return "Im Miteinander macht dich das beweglich; ohne klare Absprachen bleibt aber schnell offen, wer woran zieht und welches Tempo gerade gilt.";
+    return "Im Alltag wird oft erst spaet sichtbar, welchen Modus du gerade erwartest. Dadurch wirkst du schnell sprunghaft, obwohl du fuer dich nur zwischen passenden Modi wechselst.";
   }
 
   if (!input.tensionCarrier) {
-    return "Für die Zusammenarbeit bringt das schnell Struktur, doch ohne offene Absprachen geraten Tempo, Erwartungen und Zuständigkeiten leicht durcheinander.";
+    return "Im Alltag werden Tempo, Klarheit oder Rueckkopplung verschieden gelesen. Dann zaehlt oft staerker die Wirkung deines Arbeitsmodus als deine eigentliche Absicht.";
   }
 
   switch (input.tensionCarrier.family) {
     case "direction":
-      return "Im Team wird dadurch schnell klar, worauf es hinauslaufen soll; fehlen gemeinsame Prioritäten, zieht ihr an wichtigen Stellen leicht in unterschiedliche Richtungen.";
+      return "Im Alltag wird dieselbe Chance schnell noch einmal aufgemacht: Du siehst schon den naechsten Schritt, dein Gegenueber erst den offenen Aufbau-, Fokus- oder Risikopunkt. Im Gespraech wirkt das schnell so, als wuerdest du zu frueh ziehen oder zu spaet bremsen.";
     case "decision_under_uncertainty":
-      return "Im Alltag gibt das zwar Richtung, doch ohne gemeinsames Verständnis von Risiko und Entscheidung bleibt Tempo liegen oder kippt dauernd.";
+      return "Im Alltag landet dieselbe Entscheidung schnell noch einmal auf dem Tisch, obwohl fuer dich innerlich schon klar ist, ob noch geprueft oder schon entschieden werden sollte. Im Meeting wirkt das schnell so, als waerst du schon einen Schritt weiter oder noch nicht so weit wie der Rest.";
     case "collaboration_under_pressure":
-      return "Im Miteinander zeigt sich das sofort an Austausch, Verfügbarkeit und Ton; wird das unterschiedlich gelesen, arbeitet ihr schnell aneinander vorbei.";
+      return "Im Alltag reibt ihr euch dann weniger an Zielen als an Sichtbarkeit, Timing und Ansprache. Das wirkt schnell so, als waerst du zu spaet sichtbar, zu eng dran oder zu direkt.";
     default:
-      return "Für die Zusammenarbeit bringt das schnell Struktur, doch ohne offene Absprachen geraten Tempo, Erwartungen und Zuständigkeiten leicht durcheinander.";
+      return "Dann merkt ihr die Differenz weniger in Grundsaetzen als in kleinen Alltagssituationen, die ploetzlich viel Abstimmung brauchen.";
   }
 }
 

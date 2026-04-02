@@ -2,6 +2,12 @@ import type { QuestionnaireQuestionType } from "@/features/questionnaire/questio
 import { type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import { normalizeStoredBaseAnswerToFounderPercent } from "@/features/scoring/founderBaseNormalization";
 
+// Legacy compatibility bridge:
+// This module no longer defines the active founder compatibility semantics.
+// Its remaining role is limited to translating the current Supabase questionnaire
+// contract (`q01...q48`) into V2-native runtime answers via the compatibility
+// adapter in `founderCompatibilityAnswerRuntime.ts`.
+
 export type FounderBaseItemPolarity = "high_is_left_pole" | "high_is_right_pole";
 
 export type FounderBaseQuestionScoreMeta = {

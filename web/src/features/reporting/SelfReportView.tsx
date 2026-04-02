@@ -3,6 +3,7 @@ import { buildChallengesFromScores } from "@/features/reporting/challengeTextBui
 import { buildComplementsFromScores } from "@/features/reporting/complementTextBuilder";
 import {
   FOUNDER_DIMENSION_META,
+  getFounderDimensionPoleLabels,
   type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
 import { buildHeroTextFromScores } from "@/features/reporting/heroTextBuilder";
@@ -11,6 +12,7 @@ import {
   buildSelfReportSelection,
   buildSelfReportSignals,
   type SelfReportSignal,
+  type SelfReportSelection,
   type SelfReportTendencyKey,
 } from "@/features/reporting/selfReportSelection";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
@@ -32,6 +34,7 @@ export function SelfReportView({ report }: Props) {
   const challenges = buildChallengesFromScores(report.scoresA);
   const complements = buildComplementsFromScores(report.scoresA);
   const conversationHints = buildConversationHints(selection.conversationHintDimensions);
+  const overviewParagraphs = buildOverviewInterpretation(selection);
   const showValuesSection =
     report.valuesModuleStatus !== "not_started" ||
     Boolean(report.selfValuesProfile) ||
@@ -45,8 +48,11 @@ export function SelfReportView({ report }: Props) {
             <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Dein Founder-Profil</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-900">Dein Founder-Profil</h2>
             <div className="mt-4 space-y-3">
-              {heroParagraphs.map((paragraph) => (
-                <p key={paragraph} className="text-sm leading-7 text-slate-700">
+              {heroParagraphs.map((paragraph, index) => (
+                <p
+                  key={paragraph}
+                  className={index === 0 ? "text-sm font-medium leading-7 text-slate-900" : "text-sm leading-7 text-slate-700"}
+                >
                   {t(paragraph)}
                 </p>
               ))}
@@ -83,7 +89,13 @@ export function SelfReportView({ report }: Props) {
                   {signal ? FOUNDER_DIMENSION_META[signal.dimension].canonicalName : "Muster"}
                 </p>
                 <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.title)}</h4>
-                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.description)}</p>
+                <div className="mt-3 space-y-3">
+                  {splitIntoParagraphs(entry.description).map((paragraph) => (
+                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                      {t(paragraph)}
+                    </p>
+                  ))}
+                </div>
               </article>
             );
           })}
@@ -103,7 +115,13 @@ export function SelfReportView({ report }: Props) {
                 className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5"
               >
                 <h4 className="text-sm font-semibold text-slate-900">{t(entry.title)}</h4>
-                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.description)}</p>
+                <div className="mt-3 space-y-3">
+                  {splitIntoParagraphs(entry.description).map((paragraph) => (
+                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                      {t(paragraph)}
+                    </p>
+                  ))}
+                </div>
               </article>
             );
           })}
@@ -114,7 +132,7 @@ export function SelfReportView({ report }: Props) {
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. Was dich gut ergänzt</p>
         <h3 className="mt-3 text-lg font-semibold text-slate-900">Mit wem du oft besonders gut arbeiten kannst</h3>
         <div className="mt-6 grid gap-4">
-          {complements.map((entry) => (
+          {complements.map((entry, index) => (
             <article
               key={`${entry.role}-${entry.title}`}
               className="rounded-2xl border border-slate-200/80 bg-white p-5"
@@ -127,7 +145,16 @@ export function SelfReportView({ report }: Props) {
                     : "Arbeitsrhythmus"}
               </p>
               <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.title)}</h4>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.description)}</p>
+              <div className="mt-3 space-y-3">
+                {splitIntoParagraphs(entry.description).map((paragraph) => (
+                  <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                    {t(paragraph)}
+                  </p>
+                ))}
+                <p className="text-sm leading-7 text-slate-700">
+                  {t(buildComplementPracticalNote(selection.complementRoles[index]?.signal))}
+                </p>
+              </div>
             </article>
           ))}
         </div>
@@ -160,14 +187,18 @@ export function SelfReportView({ report }: Props) {
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">7. Dein Profil auf einen Blick</p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-          Die sechs Dimensionen bleiben im Modell erhalten, werden hier aber bewusst nur noch als
-          schnelle visuelle Orientierung gezeigt.
-        </p>
+        <div className="mt-3 max-w-3xl space-y-3">
+          {overviewParagraphs.map((paragraph) => (
+            <p key={paragraph} className="text-sm leading-7 text-slate-700">
+              {t(paragraph)}
+            </p>
+          ))}
+        </div>
 
         <div className="mt-6 space-y-4">
           {scoredDimensions.map(({ dimension, score }) => {
             const meta = FOUNDER_DIMENSION_META[dimension];
+            const reportPoles = getFounderDimensionPoleLabels(dimension, "report");
 
             return (
               <article
@@ -183,8 +214,8 @@ export function SelfReportView({ report }: Props) {
                     markerB=""
                     participantAName={report.participantAName || "Du"}
                     participantBName=""
-                    lowLabel={t(meta.leftPole)}
-                    highLabel={t(meta.rightPole)}
+                    lowLabel={t(reportPoles?.left ?? meta.reportLeftPole)}
+                    highLabel={t(reportPoles?.right ?? meta.reportRightPole)}
                     valueScale="founder_percent"
                   />
                 </div>
@@ -202,6 +233,109 @@ function splitIntoParagraphs(text: string) {
     .split(/(?<=[.!?])\s+/)
     .map((part) => part.trim())
     .filter(Boolean);
+}
+
+function buildOverviewInterpretation(selection: SelfReportSelection) {
+  const keySignals = selection.patternDimensions.slice(0, 3);
+  const combination = buildOverviewCombination(keySignals);
+  const implication = buildOverviewImplication(selection.hero.tensionCarrier);
+
+  return [combination, implication];
+}
+
+function buildOverviewCombination(signals: SelfReportSignal[]) {
+  const phrases = signals.map((signal) => describeOverviewSignal(signal));
+  return `Du ${joinClauses(phrases)}.`;
+}
+
+function describeOverviewSignal(signal: SelfReportSignal) {
+  switch (signal.dimension) {
+    case "Unternehmenslogik":
+      return signal.tendencyKey === "left"
+        ? "pruefst Chancen zuerst auf Tragfaehigkeit und Fundament"
+        : signal.tendencyKey === "center"
+          ? "sprichst bei neuen Chancen mal zuerst ueber Aufbau und mal zuerst ueber Hebel"
+          : "sortierst Chancen frueh nach Hebel und Reichweite";
+    case "Entscheidungslogik":
+      return signal.tendencyKey === "left"
+        ? "pruefst vor Entscheidungen eher noch einmal Grundlage und Gegenargumente"
+        : signal.tendencyKey === "center"
+          ? "pruefst manche Fragen erst gruendlich und legst andere frueh fest"
+          : "setzt einen naechsten Schritt, sobald fuer dich genug Kontur da ist";
+    case "Risikoorientierung":
+      return signal.tendencyKey === "left"
+        ? "gehst Risiken lieber mit Leitplanken ein"
+        : signal.tendencyKey === "center"
+          ? "gehst bei manchen Schritten frueh los und willst bei anderen erst klare Sicherungen"
+          : "gehst bei echten Chancen frueher in Bewegung";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return signal.tendencyKey === "left"
+        ? "arbeitest lieber mit Eigenraum und gezielter Abstimmung"
+        : signal.tendencyKey === "center"
+          ? "willst mal Eigenraum und forderst mal fruehe Rueckkopplung ein"
+          : "willst Fortschritt und offene Punkte frueh im gemeinsamen Blick haben";
+    case "Commitment":
+      return signal.tendencyKey === "left"
+        ? "gibst dem Startup Gewicht, ohne alles andere darum herum zu ordnen"
+        : signal.tendencyKey === "center"
+          ? "faehrst dein Einsatzniveau sichtbar hoch und wieder herunter"
+          : "richtest Zeit, Energie und Aufmerksamkeit deutlich auf das Startup aus";
+    case "Konfliktstil":
+      return signal.tendencyKey === "left"
+        ? "sortierst Unterschiede erst, bevor du sie ansprichst"
+        : signal.tendencyKey === "center"
+          ? "sprichst manche Unterschiede sofort und andere erst mit Abstand an"
+          : "sprichst Unterschiede frueh und direkt an";
+    default:
+      return "arbeitest im Alltag mit klarer Linie";
+  }
+}
+
+function buildOverviewImplication(signal: SelfReportSignal | null) {
+  if (!signal) {
+    return "Dann brechen Unterschiede erst im Alltag auf, wenn mehrere Erwartungen gleichzeitig im Raum stehen und niemand frueh klaert, welcher Modus gerade gelten soll.";
+  }
+
+  switch (signal.family) {
+    case "direction":
+      return "Dann will eine Person bei einer Option schon weitergehen, waehrend die andere noch klaeren will, ob sie zum Aufbau, zum Fokus oder zum Risiko passt.";
+    case "decision_under_uncertainty":
+      return "Dann landet dieselbe Entscheidung schnell in einer zweiten oder dritten Runde: eine Person will den naechsten Schritt festhalten, die andere dieselbe Frage noch weiter pruefen.";
+    case "collaboration_under_pressure":
+      return "Dann reibt ihr euch nicht zuerst an Zielen, sondern daran, wann Arbeit sichtbar wird, wann Rueckkopplung faellig ist und wann ein Widerspruch offen auf den Tisch kommt.";
+    default:
+      return "Dann werden Unterschiede erst unter Druck spuerbar, weil sie vorher nicht klar genug lesbar waren.";
+  }
+}
+
+function buildComplementPracticalNote(signal: SelfReportSignal | undefined) {
+  if (!signal) {
+    return "Praktisch wird diese Ergaenzung dort, wo im Alltag frueh sichtbar wird, wer Tempo, Struktur oder Einordnung gerade staerker traegt.";
+  }
+
+  switch (signal.dimension) {
+    case "Unternehmenslogik":
+      return "Praktisch wird diese Ergaenzung dort, wo ihr bei einer Chance frueh klaert, wer Hebel sieht und wer Tragfaehigkeit absichert.";
+    case "Entscheidungslogik":
+      return "Praktisch wird diese Ergaenzung dort, wo eine Person den Punkt zum Entscheiden setzt und die andere die Grundlage sauber macht.";
+    case "Risikoorientierung":
+      return "Praktisch wird diese Ergaenzung dort, wo eine Person Vorwaertsgang bringt und die andere Schwellen, Puffer oder Stop-Kriterien sichtbar macht.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Praktisch wird diese Ergaenzung dort, wo ihr klar festlegt, wann Eigenraum traegt und wann fruehe Rueckkopplung noetig ist.";
+    case "Commitment":
+      return "Praktisch wird diese Ergaenzung dort, wo ihr vor intensiven Phasen sichtbar macht, welches Einsatzniveau wirklich erwartet und getragen wird.";
+    case "Konfliktstil":
+      return "Praktisch wird diese Ergaenzung dort, wo eine Person Themen frueher aufmacht und die andere dafuer sorgt, dass das Gespraech dabei arbeitsfaehig bleibt.";
+    default:
+      return "Praktisch wird diese Ergaenzung dort, wo eure unterschiedlichen Muster nicht gegeneinanderlaufen, sondern bewusst verteilt werden.";
+  }
+}
+
+function joinClauses(clauses: string[]) {
+  if (clauses.length === 0) return "dein Profil in mehreren Bereichen zugleich klar lesbar wird";
+  if (clauses.length === 1) return clauses[0];
+  if (clauses.length === 2) return `${clauses[0]} und ${clauses[1]}`;
+  return `${clauses[0]}, ${clauses[1]} und ${clauses[2]}`;
 }
 
 function buildConversationHints(dimensions: SelfReportSignal[]) {
@@ -222,9 +356,9 @@ function buildConversationHints(dimensions: SelfReportSignal[]) {
 
   return [
     ...hints,
-    "Sprich früh aus, welche Art von Tempo, Abstimmung und Verbindlichkeit du wirklich erwartest.",
-    "Achte in Founder-Gesprächen weniger auf Sympathie allein und stärker auf konkrete Entscheidungslogiken.",
-    "Mach Unterschiede lieber früh sichtbar, statt sie erst in echten Stressphasen zu entdecken.",
+    "Woran soll fuer euch frueh sichtbar werden, welches Tempo und welche Verbindlichkeit gerade erwartet werden?",
+    "Bei welcher Art von Entscheidung wollt ihr festhalten, wann noch geprueft und wann schon entschieden wird?",
+    "Welche Unterschiede sollten zwischen euch frueh angesprochen werden, bevor sie erst in einer Stressphase sichtbar werden?",
   ].slice(0, 4);
 }
 
@@ -256,33 +390,33 @@ function StatusBadge({ label, tone }: { label: string; tone: "neutral" | "accent
 
 const CONVERSATION_HINT_COPY: Record<FounderDimensionKey, Record<TendencyKey, string>> = {
   Unternehmenslogik: {
-    left: "Kläre früh, woran du unternehmerische Entscheidungen ausrichtest und wie viel Gewicht Marktchance gegenüber Tragfähigkeit für dich haben darf.",
-    center: "Lass in Gesprächen nicht offen, was für dich in Zweifelsfällen Vorrang hat: Wirkung, Skalierbarkeit oder tragfähiger Aufbau.",
-    right: "Sprich offen darüber, wie stark du Entscheidungen an Substanz, Aufbau und langfristiger Tragfähigkeit festmachst.",
+    left: "Woran sollt ihr erkennen, dass eine Chance fuer euch tragfaehig genug ist, um Prioritaet zu bekommen?",
+    center: "Woran wollt ihr in Zweifelsfaellen festmachen, ob gerade Aufbau oder Hebel Vorrang bekommt?",
+    right: "Woran sollt ihr erkennen, dass eine Chance fuer euch genug Hebel hat und nicht nur kurzfristig gut aussieht?",
   },
   Entscheidungslogik: {
-    left: "Sag klar, wie viel Grundlage du vor einer Entscheidung brauchst und bei welchen Themen du ohne diese Basis nicht mitgehst.",
-    center: "Kläre mit deinem Gegenüber, wann ihr noch prüft und wann ihr euch festlegt. Sonst bleibt zu viel in der Luft.",
-    right: "Prüf in Gesprächen, ob dein Gegenüber mit deinem Tempo umgehen kann oder wichtige Entscheidungen deutlich langsamer angehen will.",
+    left: "Bei welcher Art von Entscheidung willst du erst weitergehen, wenn Annahmen und Gegenargumente sichtbar auf dem Tisch liegen?",
+    center: "Woran wollt ihr gemeinsam erkennen, dass ihr von Pruefung in Entscheidung wechselt?",
+    right: "Woran soll dein Gegenueber merken, dass fuer dich ein naechster Schritt schon klar genug ist, auch wenn noch nicht alles geklaert ist?",
   },
   Risikoorientierung: {
-    left: "Frag konkret nach, welches Risiko finanziell, emotional und operativ für euch beide noch tragbar ist.",
-    center: "Sprecht nicht nur über Chancen, sondern auch darüber, welche rote Linie bei Risiko-Fragen für euch gilt.",
-    right: "Mach früh sichtbar, wie mutig du bei Wetten, Tempo und Unsicherheit tatsächlich sein willst.",
+    left: "Welche finanziellen, operativen oder persoenlichen Risiken muessen fuer dich begrenzt sein, bevor du mitgehst?",
+    center: "Welche Schwelle bei Risiko wollt ihr explizit benennen, statt sie erst im Streitfall zu merken?",
+    right: "Woran soll fuer euch frueh sichtbar werden, wann du in einer Chance schon einen gangbaren Schritt siehst?",
   },
   "Arbeitsstruktur & Zusammenarbeit": {
-    left: "Kläre früh, an welchen Stellen du mit mehr Eigenraum arbeitest und wo du trotzdem verlässliche Rückkopplung erwartest.",
-    center: "Sprecht sauber darüber, wann ihr eng verbunden arbeiten wollt und wann gezielte statt dauernder Abstimmung reicht.",
-    right: "Frag offen, wie sichtbar Fortschritt, Entscheidungen und offene Punkte im Alltag für euch gegenseitig sein sollen.",
+    left: "An welchen Stellen willst du autonom arbeiten, und an welchen Punkten braucht es trotzdem fruehe Rueckkopplung?",
+    center: "Woran wollt ihr im Alltag erkennen, wann enger Austausch hilft und wann gezielte Abstimmung reicht?",
+    right: "Wie frueh sollen Fortschritt, Entscheidungen und offene Punkte fuer euch gegenseitig sichtbar werden?",
   },
   Commitment: {
-    left: "Sprich früh aus, welchen Stellenwert das Startup in deinem Alltag haben soll und welche Verfügbarkeit du realistisch einplanst.",
-    center: "Kläre in Gesprächen konkret, wann mehr Fokus erwartet wird und wann ein begrenzterer Rahmen für euch beide stimmig ist.",
-    right: "Frag nicht nur nach Motivation, sondern danach, welches Einsatzniveau und welche Priorisierung dein Gegenüber im Alltag tatsächlich tragen will.",
+    left: "Welchen Platz soll das Startup in deinem Alltag realistisch haben, und welche Verfuegbarkeit willst du wirklich zusagen?",
+    center: "Wann erwartet ihr mehr Fokus, und wann ist ein begrenzterer Modus fuer euch beide voellig in Ordnung?",
+    right: "Welches Einsatzniveau soll fuer euch im Alltag konkret sichtbar sein, statt nur allgemein gewollt zu wirken?",
   },
   Konfliktstil: {
-    left: "Sprich an, wie schnell schwierige Themen auf den Tisch kommen sollen und wie viel Zeit du brauchst, bevor du in ein Gespräch gehst.",
-    center: "Kläre früh, wie ihr Konflikte ansprecht, bevor sie mitschwingen und aus kleinen Reibungen große Missverständnisse werden.",
-    right: "Prüf in Gesprächen, ob dein Gegenüber mit direkter Ansprache umgehen kann oder unter deiner Klarheit schnell dichtmacht.",
+    left: "Wie viel Zeit brauchst du meist, bevor du einen spuerbaren Unterschied offen ansprechen willst?",
+    center: "Woran wollt ihr merken, dass ein Thema jetzt auf den Tisch muss und nicht noch laenger mitlaufen sollte?",
+    right: "Woran soll dein Gegenueber frueh merken, dass du einen Unterschied direkt ansprechen wirst und nicht erst spaeter?",
   },
 };

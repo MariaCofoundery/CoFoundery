@@ -4,9 +4,19 @@ import {
   type ReportDimension,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
-import { getFounderDimensionMeta, type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import { founderPercentToDisplayScore } from "@/features/scoring/founderBaseNormalization";
-import { scoreStoredBaseAnswerToFounderPercent } from "@/features/scoring/founderBaseQuestionMeta";
+import {
+  aggregateFounderCompatibilityAnswerMapForEnrichment,
+  aggregateFounderCompatibilityAnswerMapForScoring,
+  buildFounderCompatibilityAnswerMapV2,
+  mapLegacyFounderAnswersToV2Answers,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
+import { type DimensionId } from "@/features/scoring/founderCompatibilityRegistry";
+
+// Legacy boundary: this aggregate still depends on the current Supabase question rows
+// and old base-question IDs. Numeric dimension scoring is now CORE-only; SUPPORT
+// items are retained only for enrichment/debug visibility until the questionnaire
+// intake itself is registry-native.
 
 export type AssessmentAnswerRow = {
   question_id: string;
@@ -38,64 +48,12 @@ function emptySeries(): RadarSeries {
   }, {} as RadarSeries);
 }
 
-function normalizeDimensionLabel(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^\w\s&]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function mapGermanDimensionToReportKey(dim: string): ReportDimension | null {
-  const founderMeta = getFounderDimensionMeta(dim);
-  if (founderMeta) {
-    return mapFounderDimensionToReportKey(founderMeta.canonicalName);
-  }
-
-  const normalized = normalizeDimensionLabel(dim);
-  if (!normalized) return null;
-
-  if (
-    normalized.includes("unternehmenslogik") ||
-    (normalized.includes("vision") && normalized.includes("richtung"))
-  ) {
-    return "Vision";
-  }
-
-  if (normalized.includes("entscheidungsstil") || normalized.includes("entscheidung")) {
-    return "Entscheidung";
-  }
-
-  if (
-    (normalized.includes("unsicherheit") && normalized.includes("risiko")) ||
-    normalized.includes("umgang mit unsicherheit")
-  ) {
-    return "Risiko";
-  }
-
-  if (normalized.includes("zusammenarbeit") && normalized.includes("nahe")) {
-    return "Autonomie";
-  }
-
-  if (normalized.includes("verantwortung") && normalized.includes("verbindlichkeit")) {
-    return "Verbindlichkeit";
-  }
-
-  if (normalized.includes("konfliktverhalten") || normalized.includes("konflikt")) {
-    return "Konflikt";
-  }
-
-  return null;
-}
-
-function mapFounderDimensionToReportKey(dimension: FounderDimensionKey): ReportDimension {
-  if (dimension === "Unternehmenslogik") return "Vision";
-  if (dimension === "Entscheidungslogik") return "Entscheidung";
-  if (dimension === "Risikoorientierung") return "Risiko";
-  if (dimension === "Arbeitsstruktur & Zusammenarbeit") return "Autonomie";
-  if (dimension === "Commitment") return "Verbindlichkeit";
+function mapRegistryDimensionToReportKey(dimensionId: DimensionId): ReportDimension {
+  if (dimensionId === "company_logic") return "Vision";
+  if (dimensionId === "decision_logic") return "Entscheidung";
+  if (dimensionId === "risk_orientation") return "Risiko";
+  if (dimensionId === "work_structure") return "Autonomie";
+  if (dimensionId === "commitment") return "Verbindlichkeit";
   return "Konflikt";
 }
 
@@ -129,57 +87,19 @@ export function aggregateBaseScoresFromAnswers(
   questionById: Map<string, QuestionMetaRow>,
   expectedByDimensionInput?: Record<ReportDimension, number>
 ): BaseScoreAggregate {
-  const scoreBuckets = new Map<
-    ReportDimension,
-    { sum: number; count: number; questions: Array<{ questionId: string; value: number }> }
-  >(
-    REPORT_DIMENSIONS.map((dimension) => [
-      dimension,
-      { sum: 0, count: 0, questions: [] as Array<{ questionId: string; value: number }> },
-    ])
-  );
-
-  const answeredBaseQuestionIds = new Set<string>();
-  const answeredNumericByDimension = emptyDimensionCountRecord();
-
-  for (const answer of answers) {
-    const questionMeta = questionById.get(answer.question_id);
-    const mappedDimension = questionMeta?.dimension
-      ? mapGermanDimensionToReportKey(questionMeta.dimension)
-      : null;
-    if (!questionMeta || questionMeta.category !== "basis" || !mappedDimension) {
-      continue;
-    }
-
-    answeredBaseQuestionIds.add(answer.question_id);
-    const normalizedPercent = scoreStoredBaseAnswerToFounderPercent(
-      answer.question_id,
-      answer.choice_value
-    );
-    if (normalizedPercent == null) {
-      continue;
-    }
-    const normalizedValue = founderPercentToDisplayScore(normalizedPercent);
-    if (normalizedValue == null) continue;
-
-    const bucket = scoreBuckets.get(mappedDimension);
-    if (!bucket) continue;
-    bucket.sum += normalizedValue;
-    bucket.count += 1;
-    answeredNumericByDimension[mappedDimension] += 1;
-    bucket.questions.push({ questionId: answer.question_id, value: normalizedValue });
-  }
+  const v2Answers = mapLegacyFounderAnswersToV2Answers(answers, questionById);
+  const answerMap = buildFounderCompatibilityAnswerMapV2(v2Answers);
+  const scoringAggregate = aggregateFounderCompatibilityAnswerMapForScoring(answerMap);
+  const enrichmentAggregate = aggregateFounderCompatibilityAnswerMapForEnrichment(answerMap);
 
   const scores = emptySeries();
+  const answeredNumericByDimension = emptyDimensionCountRecord();
   const expectedByDimension =
     expectedByDimensionInput ??
     (() => {
       const derived = emptyDimensionCountRecord();
-      for (const meta of questionById.values()) {
-        if (meta.category !== "basis") continue;
-        const mapped = meta.dimension ? mapGermanDimensionToReportKey(meta.dimension) : null;
-        if (!mapped) continue;
-        derived[mapped] += 1;
+      for (const [dimensionId, count] of Object.entries(scoringAggregate.expectedCountByDimension)) {
+        derived[mapRegistryDimensionToReportKey(dimensionId as DimensionId)] += count;
       }
       return derived;
     })();
@@ -187,42 +107,62 @@ export function aggregateBaseScoresFromAnswers(
     (sum, dimension) => sum + (expectedByDimension[dimension] ?? 0),
     0
   );
+
+  for (const dimension of REPORT_DIMENSIONS) {
+    const matchingEntry = Object.entries(scoringAggregate.scoresByDimension).find(
+      ([dimensionId]) => mapRegistryDimensionToReportKey(dimensionId as DimensionId) === dimension
+    );
+    const founderPercent =
+      matchingEntry && typeof matchingEntry[1] === "number" ? matchingEntry[1] : null;
+
+    if (founderPercent == null) {
+      scores[dimension] = null;
+      continue;
+    }
+    scores[dimension] = founderPercentToDisplayScore(founderPercent);
+  }
+
+  for (const [dimensionId, answeredCount] of Object.entries(scoringAggregate.answeredCountByDimension)) {
+    const reportDimension = mapRegistryDimensionToReportKey(dimensionId as DimensionId);
+    answeredNumericByDimension[reportDimension] += answeredCount;
+  }
+
   const numericAnsweredTotal = REPORT_DIMENSIONS.reduce(
     (sum, dimension) => sum + (answeredNumericByDimension[dimension] ?? 0),
     0
   );
-  const baseCoveragePercent = expectedTotal > 0 ? round((numericAnsweredTotal / expectedTotal) * 100, 2) : null;
-
-  for (const dimension of REPORT_DIMENSIONS) {
-    const bucket = scoreBuckets.get(dimension);
-    if (!bucket || bucket.count === 0) {
-      scores[dimension] = null;
-      continue;
-    }
-    scores[dimension] = round(bucket.sum / bucket.count);
-  }
+  const baseCoveragePercent =
+    expectedTotal > 0 ? round((numericAnsweredTotal / expectedTotal) * 100, 2) : null;
 
   return {
     scores,
-    answeredQuestionCount: answeredBaseQuestionIds.size,
+    answeredQuestionCount: scoringAggregate.answeredTotal,
     answeredNumericByDimension,
     expectedByDimension,
     numericAnsweredTotal,
     expectedTotal,
     baseCoveragePercent,
     debugDimensions: REPORT_DIMENSIONS.map((dimension) => {
-      const bucket = scoreBuckets.get(dimension);
-      const rawScore = bucket && bucket.count > 0 ? round(bucket.sum / bucket.count) : null;
+      const matchingEntry = Object.entries(scoringAggregate.scoresByDimension).find(
+        ([dimensionId]) => mapRegistryDimensionToReportKey(dimensionId as DimensionId) === dimension
+      );
+      const founderPercent =
+        matchingEntry && typeof matchingEntry[1] === "number" ? matchingEntry[1] : null;
+      const rawScore =
+        founderPercent == null ? null : founderPercentToDisplayScore(founderPercent);
+      const dimensionItems = Object.entries(enrichmentAggregate.itemsByDimension)
+        .filter(([dimensionId]) => mapRegistryDimensionToReportKey(dimensionId as DimensionId) === dimension)
+        .flatMap(([, items]) => items);
       return {
         dimension,
         rawScore,
         normalizedScore: rawScore == null ? null : round(rawScore / 6, 3),
         category: "basis",
-        questions: (bucket?.questions ?? []).map((entry) => ({
-          questionId: entry.questionId,
-          value: entry.value,
+        questions: dimensionItems.map((entry) => ({
+          questionId: entry.itemId,
+          value: founderPercentToDisplayScore(entry.value) ?? 0,
           max: 6,
-          normalized: round(entry.value / 6, 3),
+          normalized: round((founderPercentToDisplayScore(entry.value) ?? 0) / 6, 3),
         })),
       };
     }),

@@ -94,19 +94,19 @@ export const MATCHING_BASE_SENTENCES: Record<FounderDimensionKey, string[]> = {
 export const MATCHING_FALLBACK_BLOCKS = {
   stableBase: {
     title: "Keine klare Basislinie",
-    body: "Es gibt kein einzelnes Feld, das eure Zusammenarbeit von selbst stabil macht. Das ist kein Warnsignal. Es heißt nur, dass ihr euch im Alltag bewusster abstimmen müsst.",
+    body: "Es gibt kein einzelnes Feld, das eure Zusammenarbeit von selbst stabil hält. Das muss kein schlechtes Match heißen. Es heißt aber, dass Reibung schneller in Tempoverlust und Zusatzabstimmung kippt.",
   },
   strongestComplement: {
     title: "Keine klare Ergänzungsachse",
-    body: "Dieses Duo lebt nicht vor allem von einem klaren Unterschied, der euch automatisch ergänzt. Wenn es gut läuft, dann eher über ähnliche Sichtweisen oder über klare Absprachen im Alltag.",
+    body: "Dieses Duo gewinnt nicht über einen klaren produktiven Gegenpol. Wenn es gut läuft, dann eher, weil ihr Reibung klein haltet und unnötige Schleifen verhindert.",
   },
   biggestTension: {
     title: "Kein klares Konfliktfeld",
-    body: "Es gibt kein einzelnes Feld, das im Alltag sofort alles bestimmt. Das senkt das Risiko für dauernde Konflikte. Trotzdem lohnt es sich, typische Reibungspunkte früh klar zu benennen.",
+    body: "Es gibt kein einzelnes Feld, das alles sofort dominiert. Der Preis liegt eher im Schleichenden: kleine Unklarheiten bleiben länger liegen und kosten mit der Zeit Tempo und Energie.",
   },
   blindSpot: {
     title: "Was ihr leicht überseht",
-    body: "Hier gibt es keinen offenen Konflikt. Gerade deshalb kann ein blinder Fleck entstehen. Zwei ähnliche Erwartungen bleiben dann leicht lange unausgesprochen und laufen erst spät auseinander.",
+    body: "Hier gibt es keinen offenen Konflikt. Genau deshalb kann sich ein blinder Fleck festsetzen. Zwei ähnliche Erwartungen verschieben sich dann leise und werden erst sichtbar, wenn schon unterschiedliche Standards gelten.",
   },
 } satisfies Record<string, MatchingFallbackBlock>;
 
@@ -306,9 +306,9 @@ export function getMatchingHeroInteractionSentence(
     case "risk_commitment_push":
       return "Sobald ein Schritt mehr Einsatz verlangt, wird aus der Risiko-Frage schnell auch die Frage, wer gerade wie viel übernimmt.";
     case "complement_under_pressure":
-      return "Eure Ergänzung ist real. Sie hilft euch aber nur, wenn ein anderes kritisches Feld nicht gleichzeitig alle Aufmerksamkeit bindet.";
+      return "Eure Ergänzung ist real. Sie hilft euch aber nur, wenn ein anderes kritisches Feld nicht gleichzeitig alles überlagert.";
     case "coordination_hidden_cost":
-      return "Von außen wirkt das oft stabiler, als es sich im Alltag anfühlt. Wie viel zusätzliche Abstimmung nötig ist, fällt oft erst spät auf.";
+      return "Von außen wirkt das oft stabiler, als es sich im Alltag anfühlt. Geschwindigkeit geht dann nicht im Streit verloren, sondern in zusätzlicher Abstimmung, die zu spät sichtbar wird.";
     case "alignment_edge_guard":
       return "Die gemeinsame Basis ist stark. Trotzdem kann euch ein offenes Randthema spät treffen, wenn ihr es zu lange laufen lasst.";
   }
@@ -464,7 +464,7 @@ export function getMatchingBiggestRiskSentence(
     case "Unternehmenslogik":
       return "Sonst führt dieselbe Priorisierungsfrage euch schnell in verschiedene Richtungen.";
     case "Entscheidungslogik":
-      return "Sonst bleibt Tempo liegen oder eine Person erlebt die andere als Bremse, während diese sich schon übergangen fühlt.";
+      return "Sonst wird dieselbe Entscheidung mehrfach wieder aufgerollt oder eine Person fühlt sich schon übergangen, während die andere noch nicht so weit ist.";
     case "Risikoorientierung":
       return "Sonst wird dieselbe Chance schnell zum Streitpunkt darüber, wie weit ihr wirklich gehen wollt.";
   }
@@ -511,7 +511,7 @@ export function getMatchingConditionSentence(
     case "tension_led":
       return "Ohne klare Regel wird genau dieses Feld im Alltag schnell zum Problem.";
     case "coordination_led":
-      return "Dann müssen Regeln für Übergaben, Entscheidungen und Einblick klar sein und auch im Alltag eingehalten werden.";
+      return "Dann müsst ihr sichtbar regeln, wo Abstimmung wirklich nötig ist und wo sie euch nur still Zeit kostet.";
     case "blind_spot_watch":
       return "Das bleibt nur stabil, wenn ihr Nähe nicht mit Klarheit verwechselt und kleine Unstimmigkeiten früh ansprecht.";
     default:
@@ -575,11 +575,11 @@ export function buildMatchingComplementSentences(
       }
 
       if (mode === "complement_led" && selection?.stableBase) {
-        return [
-          "Ihr habt nicht dieselbe Schwelle dafür, wann sich ein Schritt für euch richtig anfühlt.",
-          "Auf einer stabilen Basis kann das hilfreich sein: Eine Person sieht früher die Chance, die andere früher die Kosten.",
-          "Dann müsst ihr klar benennen, welches Risiko ihr gerade wirklich eingeht und welche Grenze für euch gilt.",
-        ];
+      return [
+        "Ihr habt nicht dieselbe Schwelle dafür, wann sich ein Schritt für euch richtig anfühlt.",
+        "Auf einer stabilen Basis kann das hilfreich sein: Eine Person sieht früher die Chance, die andere früher die Kosten.",
+        "Dann müsst ihr klar benennen, welches Risiko ihr gerade wirklich eingeht und welche Grenze im Alltag gelten soll.",
+      ];
       }
 
       if (
@@ -616,7 +616,7 @@ export function getMatchingDynamicsSituationSentence(selection: FounderMatchingS
   }
 
   if (primaryPattern?.id === "blind_spot_similarity_drift") {
-    return "Lange wirkt vieles klar. Erst später merkt ihr, dass ihr plötzlich von unterschiedlichen Dingen ausgeht.";
+    return "Lange wirkt vieles sauber. Erst später merkt ihr, dass ihr längst von unterschiedlichen Standards ausgeht.";
   }
 
   switch (lead.dimension) {
@@ -670,9 +670,9 @@ export function getMatchingDynamicsInteractionSentence(
     case "risk_commitment_push":
       return "Sobald ein Schritt mehr Einsatz verlangt, wird aus Risiko schnell auch die Frage, wer gerade wie viel übernimmt.";
     case "blind_spot_similarity_drift":
-      return "Weil wenig offen auffällt, merkt ihr Unterschiede oft erst dann, wenn eine Person längst von einem anderen Standard ausgeht.";
+      return "Weil wenig offen auffällt, merkt ihr Unterschiede oft erst dann, wenn eine Person längst nach einem anderen Standard arbeitet.";
     case "coordination_hidden_cost":
-      return "Nach außen sieht das oft sauber aus. Intern braucht dieselbe Aufgabe aber mehr Abstimmung und Rückversicherung, als man zuerst denkt.";
+      return "Nach außen sieht das oft sauber aus. Intern zieht dieselbe Aufgabe aber mehr Abstimmung und Rückversicherung, als ihr zuerst merkt.";
     case "alignment_edge_guard":
       return "Vieles läuft stabil. Genau deshalb fällt ein offenes Randthema leicht erst spät auf.";
   }
@@ -721,7 +721,7 @@ export function getMatchingDynamicsConsequenceSentence(
     case "risk_commitment_push":
       return "Dann wird aus einer Chance schnell Streit darüber, wie viel Einsatz dafür gerade überhaupt vertretbar ist.";
     case "blind_spot_similarity_drift":
-      return "So merkt ihr Veränderungen oft erst spät, obwohl vorher lange alles ruhig wirkte.";
+      return "So verschieben sich Erwartungen leise, obwohl vorher lange alles ruhig wirkte.";
   }
 
   if (selection.meta.highSimilarityBlindSpotRisk) {
@@ -737,7 +737,7 @@ export function getMatchingDynamicsConsequenceSentence(
   }
 
   if (selection.heroSelection.mode === "coordination_led") {
-    return "Es hakt nicht ständig. Dieselbe Aufgabe braucht bei euch aber oft mehr Rückversicherung, als man von außen sieht.";
+    return "Es hakt nicht ständig. Ihr verliert Geschwindigkeit eher daran, dass dieselbe Aufgabe mehr Rückversicherung braucht, als von außen sichtbar ist.";
   }
 
   return "So läuft vieles ruhig, bis eine Person merkt, dass die andere längst von etwas anderem ausgeht.";
@@ -785,7 +785,7 @@ export function getMatchingDynamicsConditionSentence(
     case "complement_under_pressure":
       return "Dann müsst ihr die Ergänzung bewusst nutzen und verhindern, dass das kritische Feld still alles andere bestimmt.";
     case "coordination_hidden_cost":
-      return "Dann muss zusätzliche Abstimmung sichtbar bleiben und darf nicht erst auffallen, wenn schon Verzug oder Frust da ist.";
+      return "Dann muss zusätzliche Abstimmung sichtbar bleiben und darf nicht erst auffallen, wenn schon Zeit, Zug oder Klarheit verloren gegangen sind.";
     case "alignment_edge_guard":
       return "Dann solltet ihr das offene Feld nicht wegen der sonst guten Basis zu lange kleinreden.";
   }

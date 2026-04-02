@@ -302,34 +302,34 @@ function parsePremiumSections(sections: unknown[] | undefined) {
 
 const DIMENSION_SCALE_ANCHORS: Record<ReportDimension, { left: string; mid: string; right: string }> = {
   Vision: {
-    left: "konkret & operativ",
+    left: "opportunitäts- und wachstumsorientiert",
     mid: "balanciert",
-    right: "ambitioniert & langfristig",
+    right: "langfristig aufbau- und substanzorientiert",
   },
   Entscheidung: {
-    left: "schnell & pragmatisch",
+    left: "analytisch-abwägend",
     mid: "balanciert",
-    right: "gründlich & analytisch",
+    right: "intuitiv-handlungsorientiert",
   },
   Risiko: {
-    left: "Sicherheitsfokus",
+    left: "sicherheitsorientiert",
     mid: "balanciert",
-    right: "Experimentierfreude",
+    right: "chancenorientiert",
   },
   Autonomie: {
     left: "eng abgestimmt",
     mid: "balanciert",
-    right: "autonom / eigenständig",
+    right: "autonom organisiert",
   },
   Verbindlichkeit: {
-    left: "integriert / begrenzt",
+    left: "klar begrenzt / integriert",
     mid: "balanciert",
-    right: "priorisiert / hochfokussiert",
+    right: "stark priorisiert / hochfokussiert",
   },
   Konflikt: {
-    left: "harmonieorientiert",
+    left: "reflektierend",
     mid: "balanciert",
-    right: "direkt & konfrontationsklar",
+    right: "direkt",
   },
 };
 

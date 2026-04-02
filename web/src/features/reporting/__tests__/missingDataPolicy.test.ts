@@ -11,7 +11,6 @@ import {
   generateCompareReport,
 } from "@/features/reporting/generateCompareReport";
 import { REPORT_DIMENSIONS, type RadarSeries, type ReportDimension } from "@/features/reporting/types";
-import { getDiffClass } from "@/features/reporting/report_texts.de";
 import { VALUES_QUESTION_DEFINITIONS } from "@/features/reporting/valuesQuestionMeta";
 
 type BaseAnswerRow = {
@@ -193,17 +192,11 @@ test("missing dimensions are flagged as DATEN_UNVOLLSTAENDIG and not suggested a
   assert.ok(report.deepDive.every((block) => block.label === "DATEN_UNVOLLSTAENDIG"));
 });
 
-test("delta label boundaries map deterministically via DiffClass thresholds", () => {
-  const classify = (diff: number) =>
-    classifyDelta({
-      diff,
-      diffClass: getDiffClass(diff, "Vision"),
-    });
-
-  assert.equal(classify(0.99), "Hohe Passung");
-  assert.equal(classify(1.0), "Produktive Ergänzung");
-  assert.equal(classify(2.0), "Produktive Ergänzung");
-  assert.equal(classify(2.01), "Braucht bewusste Abstimmung");
+test("classifyDelta remains deterministic for engine-backed label classes", () => {
+  assert.equal(classifyDelta({ diff: 8, diffClass: "SMALL" }), "Hohe Passung");
+  assert.equal(classifyDelta({ diff: 24, diffClass: "MEDIUM" }), "Produktive Ergänzung");
+  assert.equal(classifyDelta({ diff: 44, diffClass: "LARGE" }), "Braucht bewusste Abstimmung");
+  assert.equal(classifyDelta({ diff: null, diffClass: "MEDIUM" }), "Datenlage unvollständig");
 });
 
 test("values flow contract check enforces valuesTotal == count(category='values')", () => {

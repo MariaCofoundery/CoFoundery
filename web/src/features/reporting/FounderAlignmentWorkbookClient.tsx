@@ -18,10 +18,17 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbookActions";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
 import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
+import { buildPilotAgreementDraftFromStructuredOutputs } from "@/features/reporting/founderAlignmentWorkbookPilotDraft";
 import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
+  WORKBOOK_STRUCTURED_STEP_IDS,
+  getMissingWorkbookStructuredOutputKeys,
+  getWorkbookRequiredStructuredOutputKeys,
+  getWorkbookStepStructuredOutputs,
+  isWorkbookStructuredStepId,
   resolveFounderAlignmentWorkbookSteps,
   sanitizeFounderAlignmentWorkbookPayload,
+  sanitizeWorkbookStructuredOutputsByStep,
   workbookContextIntro,
   workbookNextStepId,
   workbookPreviousStepId,
@@ -35,7 +42,12 @@ import {
   type FounderAlignmentWorkbookStepMode,
   type FounderAlignmentWorkbookStepStatus,
   type FounderAlignmentWorkbookStepId,
+  type WorkbookStepMarkersByStep,
+  type WorkbookStructuredOutputsByStep,
+  type WorkbookStructuredStepOutputs,
+  type WorkbookStructuredOutputType,
 } from "@/features/reporting/founderAlignmentWorkbook";
+import type { FounderMatchingMarkerClass } from "@/features/reporting/founderMatchingMarkers";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -50,6 +62,7 @@ type FounderAlignmentWorkbookClientProps = {
   currentUserRole: FounderAlignmentWorkbookViewerRole;
   initialWorkbook: FounderAlignmentWorkbookPayload;
   highlights: FounderAlignmentWorkbookHighlights;
+  stepMarkersByStep?: WorkbookStepMarkersByStep;
   advisorInvite: FounderAlignmentWorkbookAdvisorInviteState;
   showValuesStep: boolean;
   canSave: boolean;
@@ -62,6 +75,7 @@ type FounderAlignmentWorkbookClientProps = {
 };
 
 type WorkbookEditableField = "founderA" | "founderB" | "agreement" | "advisorNotes";
+type WorkbookStructuredOutputValue = WorkbookStructuredStepOutputs;
 type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
 type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
@@ -285,6 +299,7 @@ export function FounderAlignmentWorkbookClient({
   currentUserRole,
   initialWorkbook,
   highlights,
+  stepMarkersByStep,
   advisorInvite,
   showValuesStep,
   canSave,
@@ -317,6 +332,23 @@ export function FounderAlignmentWorkbookClient({
   );
   const [advisorInviteState, setAdvisorInviteState] =
     useState<FounderAlignmentWorkbookAdvisorInviteState>(advisorInvite);
+  const effectiveStepMarkersByStep = useMemo<WorkbookStepMarkersByStep>(
+    () =>
+      stepMarkersByStep ??
+      Object.fromEntries(
+        WORKBOOK_STRUCTURED_STEP_IDS.map((stepId) => [
+          stepId,
+          {
+            stepId,
+            dimension:
+              FOUNDER_ALIGNMENT_WORKBOOK_STEPS.find((step) => step.id === stepId)?.reportDimensions[0] ??
+              stepId,
+            markerClass: "stable_base",
+          },
+        ])
+      ),
+    [stepMarkersByStep]
+  );
   const [advisorInviteMessage, setAdvisorInviteMessage] = useState<string | null>(null);
   const [advisorInviteLink, setAdvisorInviteLink] = useState<string | null>(null);
   const currentStepRef = useRef<HTMLElement | null>(null);
@@ -350,8 +382,29 @@ export function FounderAlignmentWorkbookClient({
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
+  const currentStepHasStructuredOutputs = isWorkbookStructuredStepId(currentStep.id);
+  const currentStructuredStepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing"> | null =
+    currentStepHasStructuredOutputs
+      ? (currentStep.id as Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">)
+      : null;
+  const currentStepMarker =
+    currentStructuredStepId != null ? effectiveStepMarkersByStep[currentStructuredStepId] ?? null : null;
   const isFocusedStep = highlights.prioritizedStepIds.includes(currentStep.id);
   const currentStepEntry = workbook.steps[currentStep.id];
+  const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
+  const currentStepMissingStructuredKeys =
+    currentStructuredStepId != null && currentStepMarker
+      ? getMissingWorkbookStructuredOutputKeys(
+          currentStructuredStepId,
+          currentStepStructuredOutputs,
+          currentStepMarker.markerClass
+        )
+      : [];
+  const currentStepStructuredRequiredKeys =
+    currentStructuredStepId != null && currentStepMarker
+      ? getWorkbookRequiredStructuredOutputKeys(currentStructuredStepId, currentStepMarker.markerClass)
+      : [];
+  const currentStepStructuredReady = currentStepMissingStructuredKeys.length === 0;
   const currentStepMode = currentStepEntry.mode;
   const isCollaborativeMode = currentStepMode === "collaborative";
   const viewerFounderField =
@@ -395,7 +448,11 @@ export function FounderAlignmentWorkbookClient({
         : null;
   const currentStepIsApprovedByBoth =
     currentStepEntry.founderAApproved && currentStepEntry.founderBApproved;
-  const currentStepStatus = deriveWorkbookStepStatus(currentStepEntry);
+  const currentStepStatus = deriveWorkbookStepStatus(
+    currentStep.id,
+    currentStepEntry,
+    currentStepMarker?.markerClass ?? null
+  );
   const currentAgreementDraft = useMemo(() => {
     if (currentStepIsAdvisorClosing || !hasAnyPerspectiveInput) {
       return null;
@@ -406,6 +463,9 @@ export function FounderAlignmentWorkbookClient({
       founderAResponse: currentStepEntry.founderA,
       founderBResponse: currentStepEntry.founderB,
       sourceMode: hasBothPerspectives ? "joint" : "solo",
+      structuredOutputs: currentStepStructuredOutputs,
+      teamContext,
+      markerClass: currentStepMarker?.markerClass ?? null,
     });
   }, [
     currentStep.id,
@@ -413,6 +473,9 @@ export function FounderAlignmentWorkbookClient({
     hasAnyPerspectiveInput,
     hasBothPerspectives,
     currentStepEntry,
+    currentStepMarker?.markerClass,
+    currentStepStructuredOutputs,
+    teamContext,
   ]);
   const currentAgreementValue = currentStepEntry.agreement.trim();
   const currentStepHasAgreement = currentAgreementValue.length > 0;
@@ -424,7 +487,12 @@ export function FounderAlignmentWorkbookClient({
       Object.fromEntries(
         visibleSteps.map((step) => {
           const stepEntry = workbook.steps[step.id];
-          const status = deriveWorkbookStepStatus(stepEntry);
+          const structuredStepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing"> | null =
+            isWorkbookStructuredStepId(step.id)
+              ? (step.id as Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">)
+              : null;
+          const stepMarker = structuredStepId != null ? effectiveStepMarkersByStep[structuredStepId] : null;
+          const status = deriveWorkbookStepStatus(step.id, stepEntry, stepMarker?.markerClass ?? null);
           const hasAdvisorNotes = stepEntry.advisorNotes.trim().length > 0;
           const hasAdvisorClosingContent =
             step.id === "advisor_closing"
@@ -457,6 +525,7 @@ export function FounderAlignmentWorkbookClient({
         { completed: boolean; started: boolean; status: FounderAlignmentWorkbookStepStatus }
       >,
     [
+      effectiveStepMarkersByStep,
       visibleSteps,
       workbook.advisorClosing.nextSteps,
       workbook.advisorClosing.observations,
@@ -701,6 +770,42 @@ export function FounderAlignmentWorkbookClient({
                 founderAApproved: false,
                 founderBApproved: false,
               }),
+        },
+      },
+    }));
+  }
+
+  function canEditStructuredOutputs() {
+    return currentUserRole === "founderA" || currentUserRole === "founderB";
+  }
+
+  function updateStructuredOutput(field: string, value: string) {
+    if (!currentStepHasStructuredOutputs || !canEditStructuredOutputs()) {
+      return;
+    }
+
+    const nextStructuredOutputs = sanitizeWorkbookStructuredOutputsByStep(activeStepId, {
+      ...(currentStepEntry.structuredOutputs ?? {}),
+      [activeStepId]: {
+        ...(getWorkbookStepStructuredOutputs(currentStepEntry, activeStepId) ?? {}),
+        [field]: value,
+      },
+    });
+
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setWorkbook((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activeStepId]: {
+          ...current.steps[activeStepId],
+          structuredOutputs: nextStructuredOutputs,
+          founderAApproved: false,
+          founderBApproved: false,
         },
       },
     }));
@@ -1720,8 +1825,96 @@ export function FounderAlignmentWorkbookClient({
                   )}
                 </StepSection>
 
+                {currentStepHasStructuredOutputs && currentStepContent.outputFields?.length ? (
+                  <StepSection
+                    title="3. Arbeitsregel festhalten"
+                    className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.98))]"
+                  >
+                    <div className="max-w-3xl">
+                      <p className="text-sm leading-7 text-slate-700">
+                        {t(
+                          currentStructuredStepId
+                            ? buildStructuredSectionIntro(
+                                currentStructuredStepId,
+                                teamContext,
+                                currentStepMarker?.markerClass ?? null
+                              )
+                            : ""
+                        )}
+                      </p>
+                      {currentStepMarker ? (
+                        <p className="mt-3 text-xs leading-6 text-slate-500">
+                          {t(`Report-Marker fuer diesen Schritt: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                      {currentStepContent.outputFields.map((field) => {
+                        const required =
+                          currentStepHasStructuredOutputs &&
+                          currentStepMarker != null &&
+                          currentStepStructuredRequiredKeys.includes(field.key);
+                        const fieldValue = readStructuredOutputValue(currentStepStructuredOutputs, field.key);
+
+                        return (
+                          <WorkbookField
+                            key={field.key}
+                            title={
+                              required
+                                ? `${structuredOutputLabel(field.outputType, teamContext)} *`
+                                : structuredOutputLabel(field.outputType, teamContext)
+                            }
+                            value={fieldValue}
+                            onChange={(value) => updateStructuredOutput(field.key, value)}
+                            placeholder={field.placeholder}
+                            highlight={field.highlight || required}
+                            readOnly={!canEditStructuredOutputs()}
+                            helperText={buildStructuredFieldHelperText(
+                              field.helperText,
+                              required,
+                              teamContext,
+                              field.outputType,
+                              field.block ?? null
+                            )}
+                            rows={4}
+                            minHeightClassName="min-h-[132px]"
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {currentStepMissingStructuredKeys.length > 0 ? (
+                      <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/75 p-4">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
+                          {t("Vor der Finalisierung noch offen")}
+                        </p>
+                        <p className="mt-2 text-sm leading-7 text-slate-700">
+                          {t(
+                            currentStructuredStepId
+                              ? buildMissingStructuredOutputsText(
+                                  currentStructuredStepId,
+                                  currentStepMissingStructuredKeys,
+                                  teamContext
+                                )
+                              : ""
+                          )}
+                        </p>
+                      </div>
+                    ) : null}
+                  </StepSection>
+                ) : null}
+
                 <StepSection
-                  title={isCollaborativeMode ? "3. Gemeinsamer Vorschlag" : "3. Vorlaeufiger Vorschlag"}
+                  title={
+                    isCollaborativeMode
+                      ? currentStepHasStructuredOutputs
+                        ? "4. Gemeinsamer Vorschlag"
+                        : "3. Gemeinsamer Vorschlag"
+                      : currentStepHasStructuredOutputs
+                        ? "4. Vorlaeufiger Vorschlag"
+                        : "3. Vorlaeufiger Vorschlag"
+                  }
                   className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1769,7 +1962,7 @@ export function FounderAlignmentWorkbookClient({
                 </StepSection>
 
                 <StepSection
-                  title="4. Finale Absprache"
+                  title={currentStepHasStructuredOutputs ? "5. Finale Absprache" : "4. Finale Absprache"}
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
                   <p className="text-sm leading-7 text-slate-700">
@@ -1824,9 +2017,15 @@ export function FounderAlignmentWorkbookClient({
                         <button
                           type="button"
                           onClick={() => updateApproval(!currentUserApproved)}
-                          disabled={!currentStepHasAgreement || !hasBothPerspectives}
+                          disabled={
+                            !currentStepHasAgreement ||
+                            !hasBothPerspectives ||
+                            (currentStepHasStructuredOutputs && !currentStepStructuredReady)
+                          }
                           className={`rounded-full border px-4 py-2 text-sm transition ${
-                            !currentStepHasAgreement || !hasBothPerspectives
+                            !currentStepHasAgreement ||
+                            !hasBothPerspectives ||
+                            (currentStepHasStructuredOutputs && !currentStepStructuredReady)
                               ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
                               : currentUserApproved
                                 ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -1839,6 +2038,8 @@ export function FounderAlignmentWorkbookClient({
                       <p className="text-xs leading-6 text-slate-500">
                         {!hasBothPerspectives
                           ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
+                          : currentStepHasStructuredOutputs && !currentStepStructuredReady
+                            ? t("Vor der Finalisierung muessen die Pflichtfelder fuer diese Arbeitsregel ausgefuellt sein.")
                           : currentStepIsApprovedByBoth
                             ? t("Beide Founder haben zugestimmt. Dieser Schritt ist finalisiert.")
                             : t("Sobald beide Founder bestaetigen, wird dieser Schritt finalisiert.")}
@@ -1955,6 +2156,137 @@ function HighlightCard({ title, text }: { title: string; text: string | null }) 
   );
 }
 
+function readStructuredOutputValue(
+  outputs: WorkbookStructuredOutputValue | null,
+  key: WorkbookStructuredOutputType
+) {
+  if (!outputs || !(key in outputs)) {
+    return "";
+  }
+
+  const value = outputs[key as keyof WorkbookStructuredOutputValue];
+  return typeof value === "string" ? value : "";
+}
+
+function pilotMarkerLabel(markerClass: FounderMatchingMarkerClass, teamContext: TeamContext) {
+  switch (markerClass) {
+    case "stable_base":
+      return teamContext === "existing_team" ? "Stabile Arbeitsbasis" : "Tragende Basis vor dem Start";
+    case "conditional_complement":
+      return teamContext === "existing_team"
+        ? "Produktiv, wenn ihr es aktiv führt"
+        : "Produktiv, wenn ihr es vorher klärt";
+    case "high_rule_need":
+      return teamContext === "existing_team" ? "Hoher Regelbedarf im Alltag" : "Vor dem Start klar regeln";
+    case "critical_clarification_point":
+      return teamContext === "existing_team" ? "Kritischer Eskalationspunkt" : "Kritischer Klärungspunkt";
+  }
+}
+
+function buildStructuredSectionIntro(
+  stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
+  teamContext: TeamContext,
+  markerClass: FounderMatchingMarkerClass | null
+) {
+  const modeSentence =
+    teamContext === "existing_team"
+      ? "Haltet hier fest, was im Alltag ab jetzt anders geregelt werden soll."
+      : "Haltet hier fest, was ihr vor dem Start nicht implizit lassen wollt.";
+
+  const severitySentence =
+    markerClass === "critical_clarification_point"
+      ? "Dieser Schritt braucht nicht nur eine Position, sondern eine belastbare Regel mit Eskalationspfad."
+      : markerClass === "high_rule_need"
+        ? "Gerade hier reicht gute Absicht nicht. Ihr braucht eine klare Arbeitsregel, die unter Druck trägt."
+        : markerClass === "conditional_complement"
+          ? "Gerade hier hilft Unterschied nur, wenn klar ist, unter welchen Bedingungen er produktiv bleibt."
+          : "Auch wenn dieses Feld eher stabil wirkt, solltet ihr mindestens eine explizite Arbeitsregel festhalten.";
+
+  const stepSentence =
+    stepId === "vision_direction"
+      ? "Schreibt auf, woran ihr Chancen, Fokus und Richtungswechsel im Zweifel wirklich messt."
+      : stepId === "commitment_load"
+        ? "Schreibt auf, was bei Verfügbarkeit, Belastung und Entlastung konkret gilt."
+        : stepId === "decision_rules"
+          ? "Schreibt auf, wer entscheidet, wann beide reinmuessen und was bei Deadlock gilt."
+          : "Schreibt fuer diesen Bereich auf, was grundsaetzlich gilt, was im Alltag laeuft und was unter Druck nicht offen bleiben darf.";
+
+  return `${modeSentence} ${severitySentence} ${stepSentence}`;
+}
+
+function buildStructuredFieldHelperText(
+  baseHelperText: string,
+  required: boolean,
+  teamContext: TeamContext,
+  outputType: WorkbookStructuredOutputType,
+  block: "core_rule" | "escalation_rule" | "trigger" | null
+) {
+  const contextSuffix =
+    teamContext === "existing_team"
+      ? outputType === "boundaryRule"
+        ? "Beschreibt die Grenze, die im laufenden Alltag nicht weiter verschoben wird."
+        : block === "trigger"
+        ? "Formuliert ein Signal, das euch im laufenden Alltag rechtzeitig stoppt."
+        : block === "escalation_rule"
+          ? "Beschreibt, was ab jetzt konkret passiert, wenn es hakt."
+          : "Schreibt auf, was im Alltag ab jetzt konkret gelten soll."
+      : outputType === "boundaryRule"
+        ? "Beschreibt die Grenze, die ihr vor engerer Zusammenarbeit nicht implizit lassen wollt."
+        : block === "trigger"
+        ? "Formuliert ein Signal, das euch vor dem Start oder frueh danach zum Nachschärfen zwingt."
+        : block === "escalation_rule"
+          ? "Beschreibt, was gilt, bevor ihr enger voneinander abhängt."
+          : "Schreibt auf, was ihr vor dem Start ausdrücklich festlegen wollt.";
+
+  return required ? `${baseHelperText} ${contextSuffix}` : `${baseHelperText} ${contextSuffix}`;
+}
+
+function buildMissingStructuredOutputsText(
+  stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
+  missingKeys: WorkbookStructuredOutputType[],
+  teamContext: TeamContext
+) {
+  const fieldLabels = missingKeys.map((key) => structuredOutputLabel(key, teamContext));
+  const intro =
+    teamContext === "existing_team"
+      ? "Bevor ihr diesen Schritt finalisiert, fehlt noch:"
+      : "Bevor ihr diesen Schritt als tragfähige Vorabklärung finalisiert, fehlt noch:";
+
+  return `${intro} ${joinWithComma(fieldLabels)}.`;
+}
+
+function structuredOutputLabel(
+  outputType: WorkbookStructuredOutputType,
+  teamContext: TeamContext
+) {
+  const preFounderLabels: Record<WorkbookStructuredOutputType, string> = {
+    principle: "Was gilt grundsätzlich?",
+    operatingRule: "Was macht ihr im Normalfall?",
+    escalationRule: "Was passiert bei Uneinigkeit oder Druck?",
+    boundaryRule: "Wo ist eure Grenze?",
+    reviewTrigger: "Woran merkt ihr, dass es nicht mehr passt?",
+  };
+
+  const existingTeamLabels: Record<WorkbookStructuredOutputType, string> = {
+    principle: "Was gilt ab jetzt grundsätzlich?",
+    operatingRule: "Was macht ihr im Alltag konkret?",
+    escalationRule: "Was passiert bei Reibung oder Druck?",
+    boundaryRule: "Wo zieht ihr ab jetzt die Grenze?",
+    reviewTrigger: "Woran merkt ihr, dass die Regel nicht mehr trägt?",
+  };
+
+  return teamContext === "existing_team"
+    ? existingTeamLabels[outputType]
+    : preFounderLabels[outputType];
+}
+
+function joinWithComma(values: string[]) {
+  if (values.length === 0) return "";
+  if (values.length === 1) return values[0];
+  if (values.length === 2) return `${values[0]} und ${values[1]}`;
+  return `${values.slice(0, -1).join(", ")} und ${values[values.length - 1]}`;
+}
+
 function AdvisorApprovalRow({
   label,
   approved,
@@ -1993,6 +2325,8 @@ function WorkbookField({
   readOnly = false,
   helperText = null,
   focusSignal = 0,
+  rows = 10,
+  minHeightClassName = "min-h-[220px]",
 }: {
   title: string;
   avatarId?: string | null;
@@ -2004,6 +2338,8 @@ function WorkbookField({
   readOnly?: boolean;
   helperText?: string | null;
   focusSignal?: number;
+  rows?: number;
+  minHeightClassName?: string;
 }) {
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const shouldKeepListeningRef = useRef(false);
@@ -2269,9 +2605,9 @@ function WorkbookField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={t(placeholder)}
-        rows={10}
+        rows={rows}
         readOnly={readOnly}
-        className={`mt-4 min-h-[220px] w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition-all duration-300 ease-out ${
+        className={`mt-4 ${minHeightClassName} w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition-all duration-300 ease-out ${
           readOnly
             ? "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-600"
             : highlight
@@ -2511,6 +2847,17 @@ function buildWorkbookPatches(
     if (previousStep.agreement !== nextStep.agreement) {
       patches.push({ scope: "step", stepId, field: "agreement", value: nextStep.agreement });
     }
+    if (
+      JSON.stringify(previousStep.structuredOutputs ?? null) !==
+      JSON.stringify(nextStep.structuredOutputs ?? null)
+    ) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "structuredOutputs",
+        value: nextStep.structuredOutputs ?? null,
+      });
+    }
     if (previousStep.founderAApproved !== nextStep.founderAApproved) {
       patches.push({
         scope: "step",
@@ -2561,11 +2908,17 @@ function buildAgreementDraft({
   founderAResponse,
   founderBResponse,
   sourceMode,
+  structuredOutputs,
+  teamContext,
+  markerClass,
 }: {
   stepId: FounderAlignmentWorkbookStepId;
   founderAResponse: string;
   founderBResponse: string;
   sourceMode: "solo" | "joint";
+  structuredOutputs?: WorkbookStructuredOutputValue | null;
+  teamContext: TeamContext;
+  markerClass: FounderMatchingMarkerClass | null;
 }): AgreementDraftResult {
   const meta = AGREEMENT_DRAFT_META[stepId];
   const founderAText = normalizeAgreementSource(founderAResponse);
@@ -2593,11 +2946,24 @@ function buildAgreementDraft({
           ? "different"
           : "aligned";
 
+  const structuredDraft =
+    isWorkbookStructuredStepId(stepId)
+      ? buildPilotAgreementDraftFromStructuredOutputs({
+          stepId,
+          structuredOutputs: structuredOutputs ?? null,
+          teamContext,
+          markerClass,
+        })
+      : null;
+
   return {
-    draft: buildStepSpecificAgreementDraft({
-      stepId,
-      state,
-    }),
+    draft:
+      structuredDraft && structuredDraft.trim().length > 0
+        ? structuredDraft
+        : buildStepSpecificAgreementDraft({
+            stepId,
+            state,
+          }),
     sourceMode,
     state,
     comparisonLabel:
@@ -2640,17 +3006,27 @@ function normalizeAgreementSource(input: string) {
 }
 
 function deriveWorkbookStepStatus(
-  entry: FounderAlignmentWorkbookPayload["steps"][FounderAlignmentWorkbookStepId]
+  stepId: FounderAlignmentWorkbookStepId,
+  entry: FounderAlignmentWorkbookPayload["steps"][FounderAlignmentWorkbookStepId],
+  markerClass: FounderMatchingMarkerClass | null
 ): FounderAlignmentWorkbookStepStatus {
+  const structuredReady =
+    isWorkbookStructuredStepId(stepId)
+      ? getMissingWorkbookStructuredOutputKeys(
+          stepId,
+          getWorkbookStepStructuredOutputs(entry, stepId),
+          markerClass ?? "stable_base"
+        ).length === 0
+      : true;
   const hasBothInputs = entry.founderA.trim().length > 0 && entry.founderB.trim().length > 0;
   const hasAgreement = entry.agreement.trim().length > 0;
   const bothApproved = entry.founderAApproved && entry.founderBApproved;
 
-  if (hasAgreement && bothApproved) {
+  if (hasAgreement && structuredReady && bothApproved) {
     return "finalized";
   }
 
-  if (hasAgreement && hasBothInputs) {
+  if (hasAgreement && hasBothInputs && structuredReady) {
     return "awaiting_approval";
   }
 

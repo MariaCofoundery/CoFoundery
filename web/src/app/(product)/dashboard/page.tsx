@@ -14,6 +14,7 @@ import { normalizeProfileRoles, profileRoleLabel } from "@/features/profile/prof
 import {
   FOUNDER_DIMENSION_META,
   FOUNDER_DIMENSION_ORDER,
+  getFounderDimensionPoleLabels,
 } from "@/features/reporting/founderDimensionMeta";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import {
@@ -978,6 +979,8 @@ function FounderDimensionsOverview({
       {FOUNDER_DIMENSION_ORDER.map((dimension) => {
         const value = formatScoreValue(scores[dimension]);
         const meta = FOUNDER_DIMENSION_META[dimension];
+        const uiPoles = getFounderDimensionPoleLabels(dimension, "ui");
+        const reportPoles = getFounderDimensionPoleLabels(dimension, "report");
         return (
           <div key={dimension}>
             <div className="mb-1.5">
@@ -990,8 +993,8 @@ function FounderDimensionsOverview({
               />
             </div>
             <div className="mt-1 flex items-center justify-between gap-3 text-[11px] text-slate-400">
-              <span>{meta.leftPole}</span>
-              <span>{meta.rightPole}</span>
+              <span title={reportPoles?.left}>{uiPoles?.left ?? meta.uiLeftPole}</span>
+              <span title={reportPoles?.right}>{uiPoles?.right ?? meta.uiRightPole}</span>
             </div>
           </div>
         );

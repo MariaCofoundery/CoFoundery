@@ -23,6 +23,7 @@ import {
   type ValuesArchetypeId,
   type ZoneBand,
 } from "@/features/reporting/types";
+import { getCoreRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import { scoreFounderAlignment, type Answer, type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { type FounderConversationChapter } from "@/features/reporting/founderConversationGuide";
 
@@ -78,6 +79,8 @@ export type MatchingReportPreviewState = {
   report: SessionAlignmentReport;
   compareJson: CompareReportJson;
 };
+
+const PREVIEW_BASIS_TOTAL = getCoreRegistryItems().length;
 
 export type FounderAlignmentReportPreviewState = {
   founderAName: string;
@@ -423,9 +426,9 @@ export function getMatchingReportPreviewState(mode: FounderPreviewMode): Matchin
     valuesAnsweredA: PREVIEW_VALUES_TOTAL,
     valuesAnsweredB: PREVIEW_VALUES_TOTAL,
     valuesTotal: PREVIEW_VALUES_TOTAL,
-    basisAnsweredA: 48,
-    basisAnsweredB: 48,
-    basisTotal: 48,
+    basisAnsweredA: PREVIEW_BASIS_TOTAL,
+    basisAnsweredB: PREVIEW_BASIS_TOTAL,
+    basisTotal: PREVIEW_BASIS_TOTAL,
     valuesAlignmentPercent: compareJson.valuesModule.alignmentPercent,
     valuesIdentityCategoryA: valuesProfiles.a.primaryLabel,
     valuesIdentityCategoryB: valuesProfiles.b.primaryLabel,

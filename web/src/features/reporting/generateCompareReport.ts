@@ -1,9 +1,13 @@
 import {
   DIMENSION_DEFINITIONS_DE,
   VALUES_ARCHETYPES_DE,
-  getDiffClass,
 } from "@/features/reporting/report_texts.de";
 import { VALUES_PLAYBOOK, VALUES_REPORT_CONTENT } from "@/features/reporting/constants";
+import {
+  compareProfileResults,
+  type CompareFoundersResult,
+  type DimensionMatchResult,
+} from "@/features/reporting/founderMatchingEngine";
 import {
   REPORT_DIMENSIONS,
   type CompareDimensionBlock,
@@ -18,6 +22,7 @@ import {
   type ValuesArchetypeId,
   type ZoneBand,
 } from "@/features/reporting/types";
+import { type FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 
 const ICEBREAKER_QUESTIONS = [
   "Was war der Moment in deiner bisherigen Laufbahn, in dem du am meisten über dich selbst gelernt hast?",
@@ -25,6 +30,24 @@ const ICEBREAKER_QUESTIONS = [
 ] as const;
 
 export const MIN_COMPARABLE_DIMENSIONS = 4;
+
+const REPORT_TO_FOUNDER_DIMENSION: Record<ReportDimension, FounderDimensionKey> = {
+  Vision: "Unternehmenslogik",
+  Entscheidung: "Entscheidungslogik",
+  Risiko: "Risikoorientierung",
+  Autonomie: "Arbeitsstruktur & Zusammenarbeit",
+  Verbindlichkeit: "Commitment",
+  Konflikt: "Konfliktstil",
+};
+
+const FOUNDER_TO_REPORT_DIMENSION: Record<FounderDimensionKey, ReportDimension> = {
+  Unternehmenslogik: "Vision",
+  Entscheidungslogik: "Entscheidung",
+  Risikoorientierung: "Risiko",
+  "Arbeitsstruktur & Zusammenarbeit": "Autonomie",
+  Commitment: "Verbindlichkeit",
+  Konfliktstil: "Konflikt",
+};
 
 const VALUES_ARCHETYPE_ANCHOR: Record<ValuesArchetypeId, number> = {
   impact_idealist: 1,
@@ -162,8 +185,9 @@ function createPremiumSection(section: PremiumSectionPayload) {
 
 export function generateCompareReport(profileA: ProfileResult, profileB: ProfileResult): CompareReportJson {
   const isMatch = profileA.profileId !== profileB.profileId;
+  const matchingResult = compareProfileResults(profileA, profileB);
   const perDimension = REPORT_DIMENSIONS.map((dimension) =>
-    buildDimensionBlock(profileA, profileB, dimension)
+    buildDimensionBlock(profileA, profileB, dimension, matchingResult)
   );
   const comparableBlocks = perDimension.filter(hasComparableDelta);
   const comparableDimensionCount = comparableBlocks.length;
@@ -174,7 +198,7 @@ export function generateCompareReport(profileA: ProfileResult, profileB: Profile
     ? `Datenabdeckung: ${dataCoverageText}.`
     : `Datenlage unvollständig: ${dataCoverageText}. Für belastbares Team-Typing sind mindestens ${MIN_COMPARABLE_DIMENSIONS}/${totalDimensionCount} vergleichbare Dimensionen erforderlich.`;
 
-  const compareResult = buildCompareResult(profileA, profileB, perDimension);
+  const compareResult = buildCompareResult(profileA, profileB, perDimension, matchingResult);
   const applicationIntro = buildApplicationIntroToken(profileA.displayName, profileB.displayName);
   const executiveSummaryTokens = buildExecutiveDecisionTokens(compareResult, perDimension, profileA.displayName, profileB.displayName);
   const decisionArchitecture = buildDecisionArchitecture(perDimension, profileA.displayName, profileB.displayName);
@@ -333,8 +357,8 @@ export function generateCompareReport(profileA: ProfileResult, profileB: Profile
     },
     executiveSummary: {
       summaryType: compareResult.summaryType,
-      topMatches: [applicationIntro, ...executiveSummaryTokens, ...decisionArchitecture, ...dimensionDossiers],
-      topTensions: [...riskContract, ...criticalTensions, closingReflection, ...closingQuestions],
+      topMatches: compareResult.topMatches,
+      topTensions: compareResult.topTensions,
       bullets: executiveBullets,
       valuesMatchSentence: valuesContent?.kurzfazit ?? "",
     },
@@ -429,6 +453,33 @@ function parseTaggedToken(token: string) {
 
 function normalizePlanTokenForChecklist(value: string) {
   return value.replace(/^PLAN(30|60|90)\|/, "$1|").trim();
+}
+
+function toReportDimension(dimension: FounderDimensionKey): ReportDimension {
+  return FOUNDER_TO_REPORT_DIMENSION[dimension];
+}
+
+function getMatchingDimension(
+  result: CompareFoundersResult,
+  dimension: ReportDimension
+) {
+  return result.dimensions.find(
+    (entry) => entry.dimension === REPORT_TO_FOUNDER_DIMENSION[dimension]
+  ) ?? null;
+}
+
+function matchResultToDiffClass(match: DimensionMatchResult | null): DiffClass {
+  if (!match || !match.category) return "MEDIUM";
+  if (match.category === "aligned") return "SMALL";
+  if (match.category === "complementary") return "MEDIUM";
+  return "LARGE";
+}
+
+function matchResultToLabel(match: DimensionMatchResult | null): CompareLabel {
+  if (!match || !match.category) return "DATEN_UNVOLLSTAENDIG";
+  if (match.category === "aligned") return "MATCH";
+  if (match.category === "complementary") return "KOMPLEMENTAER";
+  return "FOKUS_THEMA";
 }
 
 export function classifyDelta(
@@ -692,20 +743,25 @@ export function buildProfileResultFromSession(
 function buildDimensionBlock(
   profileA: ProfileResult,
   profileB: ProfileResult,
-  dimension: ReportDimension
+  dimension: ReportDimension,
+  matchingResult: CompareFoundersResult
 ): CompareDimensionBlock {
   const definition = DIMENSION_DEFINITIONS_DE[dimension];
   const scoreA = profileA.dimensionScores[dimension];
   const scoreB = profileB.dimensionScores[dimension];
+  const matchingDimension = getMatchingDimension(matchingResult, dimension);
 
   const zoneA = scoreToZone(scoreA ?? 3.5, dimension);
   const zoneB = scoreToZone(scoreB ?? 3.5, dimension);
   const archetypeA = definition.archetypesByZone[zoneA];
   const archetypeB = definition.archetypesByZone[zoneB];
 
-  const diff = scoreA != null && scoreB != null ? Number(Math.abs(scoreA - scoreB).toFixed(2)) : null;
-  const diffClass = diff == null ? "MEDIUM" : getDiffClass(diff, dimension);
-  const label = diff == null ? "DATEN_UNVOLLSTAENDIG" : diffClassToLabel(diffClass);
+  const diff =
+    scoreA != null && scoreB != null && matchingDimension?.difference != null
+      ? Number(matchingDimension.difference.toFixed(2))
+      : null;
+  const diffClass = diff == null ? "MEDIUM" : matchResultToDiffClass(matchingDimension);
+  const label = diff == null ? "DATEN_UNVOLLSTAENDIG" : matchResultToLabel(matchingDimension);
 
   const hasStrongPairing =
     (zoneA === "low" && zoneB === "high") || (zoneA === "high" && zoneB === "low");
@@ -779,30 +835,30 @@ function startupBehaviorSentence(dimension: ReportDimension, zone: ZoneBand) {
 function buildCompareResult(
   profileA: ProfileResult,
   profileB: ProfileResult,
-  perDimension: CompareDimensionBlock[]
+  perDimension: CompareDimensionBlock[],
+  matchingResult: CompareFoundersResult
 ): CompareResult {
   const comparable = perDimension.filter(hasComparableDelta);
-  const orderedByMatch = [...comparable].sort((a, b) => (a.diff ?? 99) - (b.diff ?? 99));
-  const orderedByTension = [...comparable].sort((a, b) => (b.diff ?? -1) - (a.diff ?? -1));
-  const deltaSum = comparable.reduce((sum, block) => sum + (block.diff ?? 0), 0);
   const comparableDimensionCount = comparable.length;
   const totalDimensionCount = REPORT_DIMENSIONS.length;
   const isDataSufficient = comparableDimensionCount >= MIN_COMPARABLE_DIMENSIONS;
   const dataCoverageText = `${comparableDimensionCount}/${totalDimensionCount} Dimensionen belastbar`;
+  const highRiskCount = matchingResult.dimensions.filter((entry) => entry.riskLevel === "high").length;
+  const overallMatchScore = matchingResult.overallMatchScore ?? 0;
   const summaryType =
     !isDataSufficient
       ? "Datenlage unvollständig"
-      : deltaSum <= 6
+      : overallMatchScore >= 85 && matchingResult.topTensions.length === 0
         ? "Die Harmonischen Stabilisatoren"
-        : deltaSum <= 12
-          ? "Die balancierten Strategen"
-          : "Das High-Friction Power-Duo";
+        : highRiskCount >= 2 || overallMatchScore < 60
+          ? "Das High-Friction Power-Duo"
+          : "Die balancierten Strategen";
 
   return {
     pairId: `${profileA.profileId}_${profileB.profileId}`,
     perDimension,
-    topMatches: orderedByMatch.slice(0, 3).map((block) => block.dimension),
-    topTensions: orderedByTension.slice(0, 3).map((block) => block.dimension),
+    topMatches: matchingResult.topAlignments.map(toReportDimension),
+    topTensions: matchingResult.topTensions.map(toReportDimension),
     comparableDimensionCount,
     totalDimensionCount,
     dataCoverageText,
@@ -986,12 +1042,6 @@ function scoreToZone(score: number, dimension: ReportDimension): ZoneBand {
   if (score <= thresholds.lowMax) return "low";
   if (score >= thresholds.highMin) return "high";
   return "mid";
-}
-
-function diffClassToLabel(diffClass: DiffClass): CompareLabel {
-  if (diffClass === "SMALL") return "MATCH";
-  if (diffClass === "LARGE") return "FOKUS_THEMA";
-  return "KOMPLEMENTAER";
 }
 
 type PremiumValuesModuleContent = {

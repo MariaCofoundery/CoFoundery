@@ -193,6 +193,7 @@ export default async function ReportPage({ params }: PageProps) {
         valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
         valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
         workbookHref={workbookHref}
+        teamContext={teamContext}
       />
     </main>
   );

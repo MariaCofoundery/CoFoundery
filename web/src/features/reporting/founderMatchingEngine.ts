@@ -1,8 +1,17 @@
 import {
+  compareFounderProfiles,
+  type DimensionId as MatchDimensionId,
+  type DimensionMatch,
+  type MatchCategory,
+  type MatchResult,
+  type RiskLevel,
+} from "@/features/scoring/founderMatching";
+import { founderDisplayScoreToPercent } from "@/features/scoring/founderBaseNormalization";
+import {
   FOUNDER_DIMENSION_ORDER,
-  getFounderDimensionPoleTendency,
   type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
+import { type ProfileResult, type RadarSeries } from "@/features/reporting/types";
 
 export type FounderScores = {
   Unternehmenslogik: number | null;
@@ -25,6 +34,12 @@ export type DimensionMatchResult = {
   relationType: RelationType | null;
   interactionType: InteractionType | null;
   explanationKey: string | null;
+  category: MatchCategory | null;
+  riskLevel: RiskLevel | null;
+  baseCompatibility: number | null;
+  weight: number | null;
+  weightedCompatibility: number | null;
+  appliedRules?: string[];
 };
 
 export type TensionMapEntry = {
@@ -39,6 +54,9 @@ export type CompareFoundersResult = {
   alignmentScore: number | null;
   workingCompatibilityScore: number | null;
   tensionMap: TensionMapEntry[];
+  topAlignments: FounderDimensionKey[];
+  topTensions: FounderDimensionKey[];
+  rawMatchResult: MatchResult;
 };
 
 export type FounderMatchingCase = {
@@ -46,345 +64,185 @@ export type FounderMatchingCase = {
   b: FounderScores;
 };
 
-type DimensionAssessment = {
-  difference: number | null;
-  relationType: RelationType | null;
-  interactionType: InteractionType | null;
-  explanationKey: string | null;
-  tension: { tensionType: TensionType; explanationKey: string } | null;
+const GERMAN_TO_MATCH_ID: Record<FounderDimensionKey, MatchDimensionId> = {
+  Unternehmenslogik: "company_logic",
+  Entscheidungslogik: "decision_logic",
+  Risikoorientierung: "risk_orientation",
+  "Arbeitsstruktur & Zusammenarbeit": "work_structure",
+  Commitment: "commitment",
+  Konfliktstil: "conflict_style",
 };
 
-const MATCH_WEIGHT: Record<FounderDimensionKey, number> = {
-  Unternehmenslogik: 1,
-  Entscheidungslogik: 1,
-  Risikoorientierung: 0.7,
-  "Arbeitsstruktur & Zusammenarbeit": 1.4,
-  Commitment: 1.5,
-  Konfliktstil: 1.3,
+const MATCH_ID_TO_GERMAN: Record<MatchDimensionId, FounderDimensionKey> = {
+  company_logic: "Unternehmenslogik",
+  decision_logic: "Entscheidungslogik",
+  risk_orientation: "Risikoorientierung",
+  work_structure: "Arbeitsstruktur & Zusammenarbeit",
+  commitment: "Commitment",
+  conflict_style: "Konfliktstil",
 };
-
-const ALIGNMENT_WEIGHT: Partial<Record<FounderDimensionKey, number>> = {
-  Unternehmenslogik: 1.3,
-  Commitment: 1.4,
-  Entscheidungslogik: 1,
-  Risikoorientierung: 0.7,
-};
-
-const WORKING_WEIGHT: Partial<Record<FounderDimensionKey, number>> = {
-  "Arbeitsstruktur & Zusammenarbeit": 1.5,
-  Commitment: 1.3,
-  Konfliktstil: 1.3,
-  Entscheidungslogik: 0.9,
-};
-
-type Orientation = "left" | "right" | "center";
 
 function round(value: number, precision = 2) {
   const factor = 10 ** precision;
   return Math.round(value * factor) / factor;
 }
 
-function getOrientation(dimension: FounderDimensionKey, value: number | null): Orientation | null {
-  return getFounderDimensionPoleTendency(dimension, value)?.tendency ?? null;
-}
-
-function getRelationType(difference: number | null): RelationType | null {
-  if (difference == null) return null;
-  if (difference <= 12) return "similar";
-  if (difference <= 25) return "moderate_difference";
-  return "strong_difference";
-}
-
-function areOpposingPoles(a: Orientation | null, b: Orientation | null) {
-  return (a === "left" && b === "right") || (a === "right" && b === "left");
-}
-
-function buildDimensionAssessment(
-  dimension: FounderDimensionKey,
-  scoreA: number | null,
-  scoreB: number | null
-): DimensionAssessment {
-  const difference =
-    scoreA == null || scoreB == null ? null : round(Math.abs(scoreA - scoreB));
-  const relationType = getRelationType(difference);
-  const orientationA = getOrientation(dimension, scoreA);
-  const orientationB = getOrientation(dimension, scoreB);
-  const opposingPoles = areOpposingPoles(orientationA, orientationB);
-
-  if (relationType == null) {
-    return {
-      difference,
-      relationType,
-      interactionType: null,
-      explanationKey: null,
-      tension: null,
-    };
-  }
-
-  switch (dimension) {
-    case "Commitment":
-      if (relationType === "strong_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "critical_tension" as const,
-          explanationKey: "commitment_gap_critical",
-          tension: { tensionType: "critical" as const, explanationKey: "commitment_gap_critical" },
-        };
-      }
-      if (relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "coordination" as const,
-          explanationKey: "commitment_expectation_gap",
-          tension: { tensionType: "coordination" as const, explanationKey: "commitment_expectation_gap" },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "commitment_aligned",
-        tension: null,
-      };
-
-    case "Arbeitsstruktur & Zusammenarbeit":
-      if (relationType === "strong_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: opposingPoles ? "critical_tension" : "coordination",
-          explanationKey: opposingPoles ? "work_mode_clash_critical" : "work_mode_gap_coordination",
-          tension: {
-            tensionType: opposingPoles ? "critical" : "coordination",
-            explanationKey: opposingPoles ? "work_mode_clash_critical" : "work_mode_gap_coordination",
-          },
-        };
-      }
-      if (relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "coordination" as const,
-          explanationKey: "work_mode_needs_explicit_rules",
-          tension: {
-            tensionType: "coordination" as const,
-            explanationKey: "work_mode_needs_explicit_rules",
-          },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "work_mode_aligned",
-        tension: null,
-      };
-
-    case "Unternehmenslogik":
-      if (relationType === "strong_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "critical_tension" as const,
-          explanationKey: "directional_alignment_conflict",
-          tension: {
-            tensionType: "critical" as const,
-            explanationKey: "directional_alignment_conflict",
-          },
-        };
-      }
-      if (relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "coordination" as const,
-          explanationKey: "directional_tradeoff_coordination",
-          tension: {
-            tensionType: "coordination" as const,
-            explanationKey: "directional_tradeoff_coordination",
-          },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "directional_alignment",
-        tension: null,
-      };
-
-    case "Entscheidungslogik":
-      if (relationType === "strong_difference" || relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "complement" as const,
-          explanationKey: relationType === "strong_difference"
-            ? "decision_style_strong_complement"
-            : "decision_style_moderate_complement",
-          tension: {
-            tensionType: "productive" as const,
-            explanationKey: relationType === "strong_difference"
-              ? "decision_style_strong_complement"
-              : "decision_style_moderate_complement",
-          },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "decision_style_alignment",
-        tension: null,
-      };
-
-    case "Risikoorientierung":
-      if (relationType === "strong_difference" || relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "complement" as const,
-          explanationKey: relationType === "strong_difference"
-            ? "risk_productive_tension_strong"
-            : "risk_productive_tension_moderate",
-          tension: {
-            tensionType: "productive" as const,
-            explanationKey: relationType === "strong_difference"
-              ? "risk_productive_tension_strong"
-              : "risk_productive_tension_moderate",
-          },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "risk_alignment",
-        tension: null,
-      };
-
-    case "Konfliktstil":
-      if (relationType === "strong_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: opposingPoles ? "critical_tension" : "coordination",
-          explanationKey: opposingPoles ? "conflict_style_escalation_risk" : "conflict_style_coordination_gap",
-          tension: {
-            tensionType: opposingPoles ? "critical" : "coordination",
-            explanationKey: opposingPoles ? "conflict_style_escalation_risk" : "conflict_style_coordination_gap",
-          },
-        };
-      }
-      if (relationType === "moderate_difference") {
-        return {
-          difference,
-          relationType,
-          interactionType: "coordination" as const,
-          explanationKey: "conflict_style_coordination_gap",
-          tension: {
-            tensionType: "coordination" as const,
-            explanationKey: "conflict_style_coordination_gap",
-          },
-        };
-      }
-      return {
-        difference,
-        relationType,
-        interactionType: "alignment" as const,
-        explanationKey: "conflict_style_alignment",
-        tension: null,
-      };
-  }
-}
-
-function toDimensionScore(result: DimensionMatchResult) {
-  if (!result.relationType || !result.interactionType) return null;
-
-  // We do not score only by distance. The same gap can be healthy, neutral or risky
-  // depending on the underlying founder dynamic of that dimension.
-  const table: Record<InteractionType, Record<RelationType, number>> = {
-    alignment: {
-      similar: 92,
-      moderate_difference: 72,
-      strong_difference: 48,
-    },
-    complement: {
-      similar: 76,
-      moderate_difference: 84,
-      strong_difference: 72,
-    },
-    coordination: {
-      similar: 72,
-      moderate_difference: 56,
-      strong_difference: 34,
-    },
-    critical_tension: {
-      similar: 62,
-      moderate_difference: 38,
-      strong_difference: 16,
-    },
+function toMatchProfile(scores: FounderScores) {
+  return {
+    company_logic: scores.Unternehmenslogik,
+    decision_logic: scores.Entscheidungslogik,
+    work_structure: scores["Arbeitsstruktur & Zusammenarbeit"],
+    commitment: scores.Commitment,
+    risk_orientation: scores.Risikoorientierung,
+    conflict_style: scores.Konfliktstil,
   };
-
-  return table[result.interactionType][result.relationType];
 }
 
-function weightedAverage(
-  dimensions: DimensionMatchResult[],
-  weights: Partial<Record<FounderDimensionKey, number>>
-) {
-  let weightedSum = 0;
-  let weightTotal = 0;
+export function radarSeriesToFounderScores(scores: RadarSeries): FounderScores {
+  return {
+    Unternehmenslogik: founderDisplayScoreToPercent(scores.Vision),
+    Entscheidungslogik: founderDisplayScoreToPercent(scores.Entscheidung),
+    Risikoorientierung: founderDisplayScoreToPercent(scores.Risiko),
+    "Arbeitsstruktur & Zusammenarbeit": founderDisplayScoreToPercent(scores.Autonomie),
+    Commitment: founderDisplayScoreToPercent(scores.Verbindlichkeit),
+    Konfliktstil: founderDisplayScoreToPercent(scores.Konflikt),
+  };
+}
 
-  for (const dimension of dimensions) {
-    const weight = weights[dimension.dimension];
-    const score = toDimensionScore(dimension);
-    if (!weight || score == null) continue;
-    weightedSum += score * weight;
-    weightTotal += weight;
+function toGermanDimensionId(dimensionId: MatchDimensionId): FounderDimensionKey {
+  return MATCH_ID_TO_GERMAN[dimensionId];
+}
+
+function toRelationType(match: DimensionMatch): RelationType {
+  if (match.category === "aligned") return "similar";
+  if (match.category === "complementary") return "moderate_difference";
+  if (match.riskLevel === "high" || match.distance > 30) return "strong_difference";
+  return "moderate_difference";
+}
+
+function toInteractionType(match: DimensionMatch): InteractionType {
+  if (match.category === "aligned") return "alignment";
+  if (match.category === "complementary") return "complement";
+  if (match.riskLevel === "high") return "critical_tension";
+  return "coordination";
+}
+
+function toTensionType(match: DimensionMatch): TensionType | null {
+  if (match.category === "complementary") return "productive";
+  if (match.category === "tension" && match.riskLevel === "high") return "critical";
+  if (match.category === "tension" && match.riskLevel === "medium") return "coordination";
+  return null;
+}
+
+function resolveExplanationKey(match: DimensionMatch): string {
+  switch (match.dimensionId) {
+    case "commitment":
+      if (match.category === "aligned") return "commitment_aligned";
+      if (match.riskLevel === "high") return "commitment_gap_critical";
+      return "commitment_expectation_gap";
+
+    case "work_structure":
+      if (match.category === "aligned") return "work_mode_aligned";
+      if (match.riskLevel === "high") return "work_mode_clash_critical";
+      return "work_mode_needs_explicit_rules";
+
+    case "company_logic":
+      if (match.category === "aligned") return "directional_alignment";
+      if (match.riskLevel === "high") return "directional_alignment_conflict";
+      return "directional_tradeoff_coordination";
+
+    case "decision_logic":
+      if (match.category === "aligned") return "decision_style_alignment";
+      if (match.category === "complementary") {
+        return match.distance > 30
+          ? "decision_style_strong_complement"
+          : "decision_style_moderate_complement";
+      }
+      return "decision_style_process_tension";
+
+    case "risk_orientation":
+      if (match.category === "aligned") return "risk_alignment";
+      if (match.category === "complementary") {
+        return match.distance > 28
+          ? "risk_productive_tension_strong"
+          : "risk_productive_tension_moderate";
+      }
+      return "risk_threshold_tension";
+
+    case "conflict_style":
+      if (match.category === "aligned") return "conflict_style_alignment";
+      if (match.riskLevel === "high") return "conflict_style_escalation_risk";
+      return "conflict_style_coordination_gap";
   }
+}
 
-  if (weightTotal === 0) return null;
-  return round(weightedSum / weightTotal);
+function adaptDimensionMatch(match: DimensionMatch): DimensionMatchResult {
+  return {
+    dimension: toGermanDimensionId(match.dimensionId),
+    scoreA: match.scoreA,
+    scoreB: match.scoreB,
+    difference: match.distance,
+    relationType: toRelationType(match),
+    interactionType: toInteractionType(match),
+    explanationKey: resolveExplanationKey(match),
+    category: match.category,
+    riskLevel: match.riskLevel,
+    baseCompatibility: match.baseCompatibility,
+    weight: match.weight,
+    weightedCompatibility: match.weightedCompatibility,
+    appliedRules: match.appliedRules,
+  };
+}
+
+function buildTensionMap(dimensions: DimensionMatchResult[]): TensionMapEntry[] {
+  return dimensions.flatMap((dimension) => {
+    if (dimension.category !== "tension" || !dimension.riskLevel || !dimension.explanationKey) {
+      return [];
+    }
+
+    return [
+      {
+        dimension: dimension.dimension,
+        tensionType: dimension.riskLevel === "high" ? "critical" : "coordination",
+        explanationKey: dimension.explanationKey,
+      },
+    ];
+  });
+}
+
+function orderDimensions(dimensions: DimensionMatchResult[]) {
+  return [...dimensions].sort(
+    (a, b) => FOUNDER_DIMENSION_ORDER.indexOf(a.dimension) - FOUNDER_DIMENSION_ORDER.indexOf(b.dimension)
+  );
 }
 
 export function compareFounders(a: FounderScores, b: FounderScores): CompareFoundersResult {
-  const dimensions = FOUNDER_DIMENSION_ORDER.map((dimension) => {
-    const assessment = buildDimensionAssessment(dimension, a[dimension], b[dimension]);
-
-    return {
-      dimension,
-      scoreA: a[dimension],
-      scoreB: b[dimension],
-      difference: assessment.difference,
-      relationType: assessment.relationType,
-      interactionType: assessment.interactionType,
-      explanationKey: assessment.explanationKey,
-    } satisfies DimensionMatchResult;
-  });
-
-  const tensionMap = FOUNDER_DIMENSION_ORDER.flatMap((dimension) => {
-    const assessment = buildDimensionAssessment(dimension, a[dimension], b[dimension]);
-    return assessment.tension
-      ? [
-          {
-            dimension,
-            tensionType: assessment.tension.tensionType,
-            explanationKey: assessment.tension.explanationKey,
-          },
-        ]
-      : [];
-  });
+  const rawMatchResult = compareFounderProfiles(toMatchProfile(a), toMatchProfile(b));
+  const dimensions = orderDimensions(rawMatchResult.dimensions.map(adaptDimensionMatch));
+  const topAlignments = rawMatchResult.topAlignments.map(toGermanDimensionId);
+  const topTensions = rawMatchResult.topTensions.map(toGermanDimensionId);
+  const overallScore = round(rawMatchResult.overallScore);
 
   return {
     dimensions,
-    overallMatchScore: weightedAverage(dimensions, MATCH_WEIGHT),
-    alignmentScore: weightedAverage(dimensions, ALIGNMENT_WEIGHT),
-    workingCompatibilityScore: weightedAverage(dimensions, WORKING_WEIGHT),
-    tensionMap,
+    overallMatchScore: overallScore,
+    alignmentScore: overallScore,
+    workingCompatibilityScore: overallScore,
+    tensionMap: buildTensionMap(dimensions),
+    topAlignments,
+    topTensions,
+    rawMatchResult,
   };
+}
+
+export function compareProfileResults(
+  profileA: Pick<ProfileResult, "dimensionScores">,
+  profileB: Pick<ProfileResult, "dimensionScores">
+): CompareFoundersResult {
+  return compareFounders(
+    radarSeriesToFounderScores(profileA.dimensionScores),
+    radarSeriesToFounderScores(profileB.dimensionScores)
+  );
 }
 
 export const FOUNDER_MATCHING_TEST_CASES: Record<

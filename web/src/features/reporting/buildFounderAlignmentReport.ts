@@ -40,6 +40,8 @@ import {
 export type FounderAlignmentReport = {
   teamContext: TeamContext;
   overallFit: number | null;
+  overallTension: number | null;
+  // Deprecated compatibility alias. Active report rendering should prefer overallTension.
   conflictRiskIndex: number | null;
   executiveSummary: ExecutiveSummaryResult;
   teamArchetype: TeamArchetypeResult;
@@ -86,6 +88,7 @@ export function buildFounderAlignmentReport({
   return {
     teamContext,
     overallFit: scoringResult.overallFit,
+    overallTension: scoringResult.overallTension,
     conflictRiskIndex: scoringResult.conflictRiskIndex,
     executiveSummary: buildExecutiveSummary({
       scoringResult,

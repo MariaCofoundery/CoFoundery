@@ -4,7 +4,12 @@ import {
   getFounderDimensionPoleTendency,
   type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
-import { scoreStoredBaseAnswerToFounderPercent } from "@/features/scoring/founderBaseQuestionMeta";
+import {
+  aggregateFounderCompatibilityAnswerMapForEnrichment,
+  aggregateFounderCompatibilityAnswerMapForScoring,
+  buildFounderCompatibilityAnswerMapV2,
+  mapLegacyFounderAnswersToV2Answers,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
 import type { AssessmentAnswerRow, QuestionMetaRow } from "@/features/reporting/base_scoring";
 import type {
   SelfAlignmentReport,
@@ -14,6 +19,12 @@ import type {
   SelfParticipantDebugReport,
   SelfRadarSeries,
 } from "@/features/reporting/selfReportTypes";
+import { type DimensionId } from "@/features/scoring/founderCompatibilityRegistry";
+
+// Legacy boundary: this path still reads the active Supabase questionnaire contract
+// (`q..` IDs via question rows). Numeric scoring is now CORE-only; SUPPORT items
+// remain available only for enrichment/debug visibility until the intake contract
+// becomes registry-native end-to-end.
 
 type FounderBaseScoreAggregate = {
   scores: SelfRadarSeries;
@@ -27,6 +38,15 @@ type FounderBaseScoreAggregate = {
 };
 
 export const SELF_MEANINGFUL_ORIENTATION_DISTANCE = 10;
+
+const FOUNDER_DIMENSION_TO_REGISTRY_ID: Record<FounderDimensionKey, DimensionId> = {
+  Unternehmenslogik: "company_logic",
+  Entscheidungslogik: "decision_logic",
+  "Arbeitsstruktur & Zusammenarbeit": "work_structure",
+  Commitment: "commitment",
+  Risikoorientierung: "risk_orientation",
+  Konfliktstil: "conflict_style",
+};
 
 function round(value: number, precision = 2) {
   const factor = 10 ** precision;
@@ -76,55 +96,20 @@ export function aggregateFounderBaseScoresFromAnswers(
   questionById: Map<string, QuestionMetaRow>,
   expectedByDimensionInput?: Record<FounderDimensionKey, number>
 ): FounderBaseScoreAggregate {
-  const scoreBuckets = new Map<
-    FounderDimensionKey,
-    { sum: number; count: number; questions: Array<{ questionId: string; value: number }> }
-  >(
-    FOUNDER_DIMENSION_ORDER.map((dimension) => [
-      dimension,
-      { sum: 0, count: 0, questions: [] as Array<{ questionId: string; value: number }> },
-    ])
-  );
-
-  const answeredQuestionIds = new Set<string>();
-  const answeredNumericByDimension = emptyFounderDimensionCountRecord();
-
-  for (const answer of answers) {
-    const questionMeta = questionById.get(answer.question_id);
-    const canonicalDimension = questionMeta?.dimension
-      ? getFounderDimensionMeta(questionMeta.dimension)?.canonicalName ?? null
-      : null;
-    if (!questionMeta || questionMeta.category !== "basis" || !canonicalDimension) {
-      continue;
-    }
-
-    answeredQuestionIds.add(answer.question_id);
-    const normalizedPercent = scoreStoredBaseAnswerToFounderPercent(
-      answer.question_id,
-      answer.choice_value
-    );
-    if (normalizedPercent == null) {
-      continue;
-    }
-
-    const bucket = scoreBuckets.get(canonicalDimension);
-    if (!bucket) continue;
-    bucket.sum += normalizedPercent;
-    bucket.count += 1;
-    answeredNumericByDimension[canonicalDimension] += 1;
-    bucket.questions.push({ questionId: answer.question_id, value: normalizedPercent });
-  }
+  const v2Answers = mapLegacyFounderAnswersToV2Answers(answers, questionById);
+  const answerMap = buildFounderCompatibilityAnswerMapV2(v2Answers);
+  const scoringAggregate = aggregateFounderCompatibilityAnswerMapForScoring(answerMap);
+  const enrichmentAggregate = aggregateFounderCompatibilityAnswerMapForEnrichment(answerMap);
 
   const scores = emptySelfRadarSeries();
+  const answeredNumericByDimension = emptyFounderDimensionCountRecord();
   const expectedByDimension =
     expectedByDimensionInput ??
     (() => {
       const derived = emptyFounderDimensionCountRecord();
-      for (const meta of questionById.values()) {
-        if (meta.category !== "basis") continue;
-        const dimension = meta.dimension ? getFounderDimensionMeta(meta.dimension)?.canonicalName : null;
-        if (!dimension) continue;
-        derived[dimension] += 1;
+      for (const dimension of FOUNDER_DIMENSION_ORDER) {
+        derived[dimension] =
+          scoringAggregate.expectedCountByDimension[FOUNDER_DIMENSION_TO_REGISTRY_ID[dimension]] ?? 0;
       }
       return derived;
     })();
@@ -133,39 +118,47 @@ export function aggregateFounderBaseScoresFromAnswers(
     (sum, dimension) => sum + (expectedByDimension[dimension] ?? 0),
     0
   );
+
+  for (const dimension of FOUNDER_DIMENSION_ORDER) {
+    const dimensionId = FOUNDER_DIMENSION_TO_REGISTRY_ID[dimension];
+    const founderPercent = scoringAggregate.scoresByDimension[dimensionId];
+    if (typeof founderPercent !== "number") {
+      scores[dimension] = null;
+      continue;
+    }
+    scores[dimension] = founderPercent;
+    answeredNumericByDimension[dimension] = scoringAggregate.answeredCountByDimension[dimensionId] ?? 0;
+  }
+
   const numericAnsweredTotal = FOUNDER_DIMENSION_ORDER.reduce(
     (sum, dimension) => sum + (answeredNumericByDimension[dimension] ?? 0),
     0
   );
-  const baseCoveragePercent = expectedTotal > 0 ? round((numericAnsweredTotal / expectedTotal) * 100, 2) : null;
-
-  for (const dimension of FOUNDER_DIMENSION_ORDER) {
-    const bucket = scoreBuckets.get(dimension);
-    if (!bucket || bucket.count === 0) {
-      scores[dimension] = null;
-      continue;
-    }
-    scores[dimension] = round(bucket.sum / bucket.count);
-  }
+  const baseCoveragePercent =
+    expectedTotal > 0 ? round((numericAnsweredTotal / expectedTotal) * 100, 2) : null;
 
   return {
     scores,
-    answeredQuestionCount: answeredQuestionIds.size,
+    answeredQuestionCount: scoringAggregate.answeredTotal,
     answeredNumericByDimension,
     expectedByDimension,
     numericAnsweredTotal,
     expectedTotal,
     baseCoveragePercent,
     debugDimensions: FOUNDER_DIMENSION_ORDER.map((dimension) => {
-      const bucket = scoreBuckets.get(dimension);
-      const rawScore = bucket && bucket.count > 0 ? round(bucket.sum / bucket.count) : null;
+      const dimensionId = FOUNDER_DIMENSION_TO_REGISTRY_ID[dimension];
+      const rawScore =
+        typeof scoringAggregate.scoresByDimension[dimensionId] === "number"
+          ? scoringAggregate.scoresByDimension[dimensionId]
+          : null;
+      const dimensionItems = enrichmentAggregate.itemsByDimension[dimensionId as DimensionId] ?? [];
       return {
         dimension,
         rawScore,
         normalizedScore: rawScore == null ? null : round(rawScore / 100, 3),
         category: "basis",
-        questions: (bucket?.questions ?? []).map((entry) => ({
-          questionId: entry.questionId,
+        questions: dimensionItems.map((entry) => ({
+          questionId: entry.itemId,
           value: entry.value,
           max: 100,
           normalized: round(entry.value / 100, 3),

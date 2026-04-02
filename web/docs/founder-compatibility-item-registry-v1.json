@@ -1,0 +1,1500 @@
+{
+  "registryVersion": "1.0.0",
+  "modelVersion": "founder-compatibility-v1-core24-support12",
+  "createdAt": "2026-04-01",
+  "dimensions": [
+    {
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "order": 1,
+      "leftPoleLabel": "substanz & aufbauorientiert",
+      "rightPoleLabel": "chancen & hebelorientiert",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2
+    },
+    {
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "order": 2,
+      "leftPoleLabel": "analytisch abwägend",
+      "rightPoleLabel": "intuitiv handlungsorientiert",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2,
+      "implementationNote": "Diese Dimension bleibt methodisch sensibel, weil Entscheidungsmodus leicht in Risiko- und Tempologik verschwimmt. Deshalb muss der CORE alle Score-Berechnungen dominieren; SUPPORT bleibt strikt nicht scorewirksam."
+    },
+    {
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "order": 3,
+      "leftPoleLabel": "autonom",
+      "rightPoleLabel": "abgestimmt",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2,
+      "implementationNote": "Diese Dimension fokussiert strikt auf Koordinationspräferenzen zwischen Co-Foundern. Sie muss unabhängig von Vertrauen, Konfliktstil oder Commitment interpretiert werden; deshalb müssen die CORE-Items das Scoring klar dominieren."
+    },
+    {
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "order": 4,
+      "leftPoleLabel": "klar begrenzt",
+      "rightPoleLabel": "hoch priorisiert",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2,
+      "implementationNote": "Diese Dimension erfasst, wie viel Zeit, Energie und Aufmerksamkeit das Startup im Verhältnis zu anderen Lebensbereichen tatsächlich bekommt. Sie muss unabhängig von Motivation, Persönlichkeit oder moralischer Bewertung interpretiert werden; deshalb müssen die CORE-Items das Scoring klar dominieren."
+    },
+    {
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "order": 5,
+      "leftPoleLabel": "sicherheitsorientiert",
+      "rightPoleLabel": "unsicherheitsbereit",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2,
+      "implementationNote": "Diese Dimension bleibt methodisch sensibel, weil Unsicherheitstoleranz leicht in Strategie-, Wachstums- und Entscheidungsstil verschwimmt. Deshalb muss der CORE alle Score-Berechnungen dominieren; SUPPORT bleibt strikt nicht scorewirksam."
+    },
+    {
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "order": 6,
+      "leftPoleLabel": "sortierend",
+      "rightPoleLabel": "direkt",
+      "expectedCoreItems": 4,
+      "expectedSupportItems": 2,
+      "implementationNote": "Diese Dimension erfasst, wie Meinungsverschiedenheiten typischerweise angesprochen, zeitlich verarbeitet und in der Interaktion weitergeführt werden. Sie muss unabhängig von Persönlichkeitsurteilen, Höflichkeit oder moralischer Bewertung interpretiert werden; deshalb müssen die CORE-Items das Scoring klar dominieren."
+    }
+  ],
+  "namingConventions": {
+    "aggregateFitMetric": "overallFit",
+    "aggregateTensionMetric": "overallTension",
+    "deprecatedAggregateTerms": [
+      "conflictRiskIndex"
+    ],
+    "coreLayerMeaning": "Scoring-relevant und direkt für Dimensionsscore, overallFit und overallTension genutzt.",
+    "supportLayerMeaning": "Nicht scoring-relevant; dient nur der narrativen Anreicherung, Report-Nuancierung und Workbook-Kontextualisierung.",
+    "choiceValueScale": {
+      "likert": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ],
+      "forced_choice": [
+        0,
+        25,
+        50,
+        75,
+        100
+      ],
+      "scenario": [
+        0,
+        33,
+        67,
+        100
+      ]
+    },
+    "polarityConvention": "Alle Items sind so beschrieben, dass 0 auf den linken Pol und 100 auf den rechten Pol der Dimension normiert werden können."
+  },
+  "items": [
+    {
+      "itemId": "cl_core_1",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Wenn ich unternehmerische Optionen bewerte, ist für mich vor allem wichtig, ob sie das Unternehmen langfristig tragfähig und in sich stimmig machen.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "left_pole_keyed",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 1,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Woran erkennen wir beide, dass eine neue Chance wirklich relevant ist?",
+          "Wann schützen wir Aufbau und Stabilität, und wann gehen wir bewusst in Hebel und Wachstum?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst die strategische Bewertungslogik direkt über Tragfähigkeit und innere Stimmigkeit statt über Team-Alignment oder Tempo.",
+        "whyLayer": "CORE, weil das Item vergleichsweise trennscharf für das Konstrukt ist und den Dimensionsscore tragen soll. Diese Dimension bleibt methodisch sensibler als etwa work_structure oder commitment; deshalb muss der CORE die Auswertung klar dominieren."
+      }
+    },
+    {
+      "itemId": "cl_core_2",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich bewerte unternehmerische Optionen vor allem danach, ob sie das Unternehmen langfristig robuster und tragfähiger machen.\nB: Ich bewerte unternehmerische Optionen vor allem danach, ob sie einen klaren strategischen Hebel oder Zugang zu relevanten Chancen eröffnen.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 2,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Woran erkennen wir beide, dass eine neue Chance wirklich relevant ist?",
+          "Wann schützen wir Aufbau und Stabilität, und wann gehen wir bewusst in Hebel und Wachstum?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Stellt Substanz- und Aufbaukriterien direkt strategischen Hebel- und Chancenargumenten gegenüber.",
+        "whyLayer": "CORE, weil es Risiko- und Commitment-Lesarten stärker begrenzt als die Legacy-Fassung. Gerade in dieser Dimension sollte die Auswertung auf die CORE-Items gestützt bleiben."
+      }
+    },
+    {
+      "itemId": "cl_core_3",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Wenn eine Richtung einmal stimmig und tragfähig wirkt, sollte sie nicht wegen neuer Gelegenheiten vorschnell neu gewichtet werden.\nB: Wenn eine neue Richtung strategisch deutlich mehr Hebel bietet, sollte sie auch dann neu geprüft werden, wenn die bisherige Richtung bereits stimmig ist.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 3,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Woran erkennen wir beide, dass eine neue Chance wirklich relevant ist?",
+          "Wann schützen wir Aufbau und Stabilität, und wann gehen wir bewusst in Hebel und Wachstum?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Erfasst strategische Neugewichtung als Frage der Bewertungskriterien statt als allgemeine Flexibilität oder Risikofreude.",
+        "whyLayer": "CORE, weil das Item direkt an das Konstrukt der strategischen Bewertungslogik anschließt und nicht auf Ausführungstempo zielt."
+      }
+    },
+    {
+      "itemId": "cl_core_4",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Eine neue strategische Option würde euch Zugang zu einem deutlich größeren Markt verschaffen. Gleichzeitig würde das Unternehmen dadurch breiter, komplexer und weniger klar positioniert. Woran würdest du zuerst beurteilen, ob diese Option grundsätzlich gut für euch ist?",
+      "choices": [
+        { "value": 0, "label": "Daran, ob die Option die innere Logik des Unternehmens stärkt und langfristig tragfähig bleibt." },
+        { "value": 33, "label": "Daran, ob sich die Option mit Positionierung und Aufbau des Unternehmens sauber verbinden lässt." },
+        { "value": 67, "label": "Daran, ob die Option einen klaren strategischen Hebel eröffnet, auch wenn mehr Komplexität entsteht." },
+        { "value": 100, "label": "Daran, ob die Option die strategische Reichweite deutlich erhöht, selbst wenn das Unternehmen dadurch breiter wird." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 4,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Woran erkennen wir beide, dass eine neue Chance wirklich relevant ist?",
+          "Wann schützen wir Aufbau und Stabilität, und wann gehen wir bewusst in Hebel und Wachstum?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht strategische Bewertungslogik an einer Optionenabwägung sichtbar, ohne Kapitalallokation, Reinvestitionsstil oder Ausführungstempo zum Hauptsignal zu machen.",
+        "whyLayer": "CORE, weil das Item die Frage auf das grundlegende Urteil über eine Option fokussiert. Diese Dimension bleibt methodisch sensibler als etwa work_structure oder commitment; daher müssen Support-Items klar nachgeordnet bleiben."
+      }
+    },
+    {
+      "itemId": "cl_support_1",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Ein Investor bietet euch Kapital an. Dafür müsst ihr das Unternehmen stärker auf einen größeren Markt mit hohem strategischem Hebel ausrichten, auch wenn euer bisheriges Modell dadurch weniger fokussiert würde. Was entspricht am ehesten deiner ersten Tendenz?",
+      "choices": [
+        { "value": 0, "label": "Ich würde das eher nicht verfolgen. Für mich ist wichtiger, dass die Unternehmenslogik stimmig und belastbar bleibt." },
+        { "value": 33, "label": "Ich würde sehr genau prüfen, ob sich Wachstum und tragfähiger Aufbau sauber verbinden lassen." },
+        { "value": 67, "label": "Ich wäre offen dafür, wenn die strategische Chance groß genug ist und wir klare Leitplanken definieren." },
+        { "value": 100, "label": "Ich würde das eher verfolgen. Wenn ein starker Hebel sichtbar wird, sollte man das Unternehmen darauf ausrichten." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 5,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Wie gehen wir mit starkem externem Hebel um?",
+          "Welche Leitplanken brauchen wir, wenn Wachstum die Unternehmenslogik verschiebt?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Veranschaulicht, wie Unternehmenslogik unter externem Hebeldruck gelesen wird.",
+        "whyLayer": "SUPPORT, weil das Szenario weiterhin partiell auf Risiko- und Hebelinterpretationen mitlädt und deshalb nur kontextualisieren soll."
+      }
+    },
+    {
+      "itemId": "cl_support_2",
+      "version": "v1",
+      "dimensionId": "company_logic",
+      "dimensionLabel": "Unternehmenslogik",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Ihr habt ein stabiles Geschäftsmodell gefunden. Dann zeigt sich ein anderer Markt mit deutlich größerem Hebel, aber nur mit klarem Richtungswechsel. Wie gehst du damit um?",
+      "choices": [
+        { "value": 0, "label": "Ich würde eher bei der bisherigen Richtung bleiben, solange sie tragfähig ist." },
+        { "value": 33, "label": "Ich würde den neuen Markt sorgfältig prüfen, bevor wir die Richtung neu gewichten." },
+        { "value": 67, "label": "Ich würde offen prüfen, ob der neue Markt strategisch mehr Hebel bietet." },
+        { "value": 100, "label": "Ich würde die neue Richtung aktiv verfolgen, wenn das Potenzial deutlich größer ist." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 6,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Strategische Prioritäten und Richtungsentscheidungen",
+        "conversationFoci": [
+          "Wann rechtfertigt ein neuer Markt eine Neugewichtung unserer Richtung?",
+          "Wie unterscheiden wir strategischen Hebel von bloßer Ablenkung?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht strategische Neuausrichtung in einer realistischen Entscheidungslage sichtbar.",
+        "whyLayer": "SUPPORT, weil das Item situativer ist und partiell auf risikoähnliche Interpretation laden kann; für das Scoring müssen deshalb die CORE-Items dominieren."
+      }
+    },
+
+    {
+      "itemId": "dl_core_1",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Bei wichtigen Entscheidungen ist mir wichtig, dass sie auf nachvollziehbaren Argumenten, Daten und überprüfbaren Annahmen beruhen.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "left_pole_keyed",
+      "status": "retained",
+      "isActive": true,
+      "order": 7,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wann ist eine Entscheidung für uns beide ausreichend geklärt?",
+          "Welche Entscheidungen brauchen mehr Klärung, und bei welchen reicht eine tragfähige Richtung mit späterer Nachschärfung?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Klarer Marker für evidenz- und begründungsorientierte Entscheidungsreife.",
+        "whyLayer": "CORE, weil das Item einer der saubersten Indikatoren der Dimension ist. Diese Dimension bleibt methodisch sensibel; deshalb muss der CORE die Auswertung klar dominieren."
+      }
+    },
+    {
+      "itemId": "dl_core_2",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich treffe wichtige Entscheidungen lieber erst, wenn die wichtigsten Argumente, Annahmen und Einwände geklärt sind.\nB: Ich treffe wichtige Entscheidungen lieber, sobald sich aus den vorhandenen Informationen und Signalen eine stimmige Richtung abzeichnet, auch wenn noch nicht alle Punkte vollständig geklärt sind.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 8,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wann ist eine Entscheidung für uns beide ausreichend geklärt?",
+          "Welche Entscheidungen brauchen mehr Klärung, und bei welchen reicht eine tragfähige Richtung mit späterer Nachschärfung?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst die subjektive Schwelle, ab wann eine Entscheidung als ausreichend geklärt oder bereits stimmig wahrgenommen wird.",
+        "whyLayer": "CORE, weil das Item die Verarbeitungslogik trägt, ohne in Governance oder Autoritätsfragen zu kippen."
+      }
+    },
+    {
+      "itemId": "dl_core_3",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Die sachlichen Hinweise sprechen eher für eine Entscheidung, aber innerlich fühlt sie sich für dich noch nicht stimmig an. Wie gehst du damit um?",
+      "choices": [
+        { "value": 0, "label": "Wenn die Argumente insgesamt dafür sprechen, ist die Entscheidung für mich grundsätzlich tragfähig." },
+        { "value": 33, "label": "Ich würde noch einen gezielten Gegencheck machen, um die Spannung zwischen Analyse und innerem Signal zu prüfen." },
+        { "value": 67, "label": "Für mich wäre die Entscheidung erst tragfähig, wenn sich auch innerlich mehr Stimmigkeit ergibt." },
+        { "value": 100, "label": "Solange sich die Entscheidung innerlich nicht stimmig anfühlt, wäre sie für mich noch nicht entscheidungsreif." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 9,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wann ist eine Entscheidung für uns beide ausreichend geklärt?",
+          "Welche Entscheidungen brauchen mehr Klärung, und bei welchen reicht eine tragfähige Richtung mit späterer Nachschärfung?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Trifft die Kernspannung zwischen sachlicher Evidenz, innerem Stimmigkeitssignal und subjektiver Entscheidungsreife, ohne die Frage primär als Risikoaversion zu rahmen.",
+        "whyLayer": "CORE, weil das Item unmittelbar auf das Zielkonstrukt einzahlt. Gerade hier muss die Interpretation eng an evidentieller Gewichtung und nicht an allgemeiner Vorsicht bleiben."
+      }
+    },
+    {
+      "itemId": "dl_core_4",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Für mich ist eine wichtige Entscheidung erst dann wirklich tragfähig, wenn die wichtigsten Gegenargumente ausdrücklich geprüft wurden.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "left_pole_keyed",
+      "status": "new",
+      "isActive": true,
+      "order": 10,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wann ist eine Entscheidung für uns beide ausreichend geklärt?",
+          "Welche Entscheidungen brauchen mehr Klärung, und bei welchen reicht eine tragfähige Richtung mit späterer Nachschärfung?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Stabilisiert den analytisch-abwägenden Pol über Gegenargument- und Prüfbedürfnis.",
+        "whyLayer": "CORE, weil die Itemformulierung explizit Risiko-, Governance- und Konfliktloading vermeidet; SUPPORT muss hier strikt nachgeordnet bleiben."
+      }
+    },
+    {
+      "itemId": "dl_support_1",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Eine strategische Entscheidung steht an, aber der Rahmen erlaubt nur begrenzte Vertiefung. Wie gehst du in so einer Situation am liebsten vor?",
+      "choices": [
+        { "value": 0, "label": "Ich würde die Entscheidung lieber kurz verschieben, damit die wichtigsten offenen Punkte noch geklärt werden können." },
+        { "value": 33, "label": "Ich würde die vorhandenen Informationen bündeln und dann bewusst abwägen." },
+        { "value": 67, "label": "Ich würde auf Basis der tragfähigsten Hinweise entscheiden und offene Punkte später nachschärfen." },
+        { "value": 100, "label": "Ich würde mich auf die stimmigste Richtung festlegen und sie im weiteren Verlauf überprüfen." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 11,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wie entscheiden wir unter Zeitdruck?",
+          "Wann darf Unvollständigkeit akzeptiert werden, und wann nicht?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht Unterschiede im Entscheidungsmodus sichtbar, wenn nicht beliebig viel Vertiefung möglich ist.",
+        "whyLayer": "SUPPORT, weil begrenzter Entscheidungsrahmen weiterhin Tempo- und Risikoassoziationen aktivieren kann und deshalb nicht scoreleitend werden sollte."
+      }
+    },
+    {
+      "itemId": "dl_support_2",
+      "version": "v1",
+      "dimensionId": "decision_logic",
+      "dimensionLabel": "Entscheidungslogik",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Nach einer Woche verdichten sich Hinweise, dass eine eingeschlagene Richtung wahrscheinlich nicht trägt. Wie reagierst du am ehesten?",
+      "choices": [
+        { "value": 0, "label": "Ich würde zuerst genauer verstehen wollen, welche Hinweise gegen die bisherige Richtung sprechen." },
+        { "value": 33, "label": "Ich würde die Richtung kontrolliert anpassen und die wichtigsten Annahmen noch einmal sauber prüfen." },
+        { "value": 67, "label": "Ich würde mich auf die plausiblere Alternative zubewegen, auch wenn noch nicht alles abschließend geklärt ist." },
+        { "value": 100, "label": "Ich würde die bisherige Richtung innerlich eher loslassen und mich an der stimmigeren Alternative orientieren." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 12,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Wie wir Entscheidungen treffen",
+        "conversationFoci": [
+          "Wie reagieren wir, wenn eine Richtung nicht trägt?",
+          "Wann analysieren wir länger, und wann justieren wir schneller nach?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Erlaubt alltagsnahe Differenzierung darin, wann eine bisherige Richtung subjektiv nicht mehr entscheidungstragfähig wirkt.",
+        "whyLayer": "SUPPORT, weil Kurskorrekturen weiterhin leicht mit Risiko-, Lern- und Veränderungslogik verschwimmen und deshalb nicht scoreleitend werden sollten."
+      }
+    },
+
+    {
+      "itemId": "ws_core_1",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu deiner bevorzugten Zusammenarbeit?\nA: Ich arbeite am liebsten eigenständig und verantworte meinen Bereich weitgehend selbst.\nB: Ich arbeite am liebsten eng abgestimmt mit meinem Co-Founder.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 13,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wann brauchen wir Mitsicht, und wann bewusst Eigenraum?",
+          "Welche Updates sind Pflicht, und was darf eigenständig laufen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Direkter Marker für unabhängige Ownership versus enge Abstimmung.",
+        "whyLayer": "CORE, weil die Koordinationspräferenz hier sehr klar und ohne Vertrauens- oder Konfliktlesart erfasst wird."
+      }
+    },
+    {
+      "itemId": "ws_core_2",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Du arbeitest intensiv an einem neuen Feature und triffst dabei mehrere operative Weichenstellungen. Wann würdest du deinen Co-Founder typischerweise einbeziehen?",
+      "choices": [
+        { "value": 0, "label": "Ich würde wichtige Schritte in meinem Bereich weitgehend eigenständig setzen." },
+        { "value": 33, "label": "Ich würde den Co-Founder einbeziehen, sobald erste belastbare Zwischenstände vorliegen." },
+        { "value": 67, "label": "Ich würde regelmäßig kurze Zwischenstände teilen und punktuell abstimmen." },
+        { "value": 100, "label": "Ich würde wichtige Schritte früh gemeinsam abstimmen." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 14,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wann brauchen wir Mitsicht, und wann bewusst Eigenraum?",
+          "Welche Updates sind Pflicht, und was darf eigenständig laufen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst Timing von Mitsicht und Abstimmung im operativen Alltag.",
+        "whyLayer": "CORE, weil das Item direkt auf Koordinationspräferenz und Sichtbarkeit zielt."
+      }
+    },
+    {
+      "itemId": "ws_core_3",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Ihr merkt, dass ihr beide immer wieder an denselben Themen arbeitet und sich Zuständigkeiten überschneiden. Wie gehst du damit typischerweise um?",
+      "choices": [
+        { "value": 0, "label": "Ich würde die Zuständigkeiten klarer trennen, damit jeder seinen Bereich eigenständig führen kann." },
+        { "value": 33, "label": "Ich würde Rollen schärfen und nur an wichtigen Schnittstellen abstimmen." },
+        { "value": 67, "label": "Ich würde regelmäßige kurze Abstimmungen einführen, damit Überschneidungen sichtbar bleiben." },
+        { "value": 100, "label": "Ich würde die Zusammenarbeit enger synchronisieren, damit Überschneidungen früh gemeinsam eingeordnet werden." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 15,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wann brauchen wir Mitsicht, und wann bewusst Eigenraum?",
+          "Welche Updates sind Pflicht, und was darf eigenständig laufen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht Koordinationslogik bei überlappender Ownership sichtbar.",
+        "whyLayer": "CORE, weil es alltagsnah bleibt und klar auf Zuständigkeiten und Abstimmungsdichte zielt."
+      }
+    },
+    {
+      "itemId": "ws_core_4",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Für mich funktioniert Zusammenarbeit am besten, wenn wichtige Zwischenstände früh sichtbar werden und nicht erst am Ende geteilt werden.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "right_pole_keyed",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 16,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wann brauchen wir Mitsicht, und wann bewusst Eigenraum?",
+          "Welche Updates sind Pflicht, und was darf eigenständig laufen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Erfasst Bedarf an früher Sichtbarkeit von Work-in-Progress.",
+        "whyLayer": "CORE, weil das Item Mitsichtbedarf direkt und ohne Vertrauens- oder Kontrollsprache misst."
+      }
+    },
+    {
+      "itemId": "ws_support_1",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Euer Arbeitsalltag läuft zu sehr unterschiedlichen Zeiten ab. Wie würdest du die Zusammenarbeit in so einer Phase organisieren?",
+      "choices": [
+        { "value": 0, "label": "Für mich reicht eine klare Aufgabenaufteilung; gemeinsame Zeiten sind nicht entscheidend." },
+        { "value": 33, "label": "Ich würde nur an wenigen festen Punkten synchronisieren." },
+        { "value": 67, "label": "Ich würde tägliche kurze Abstimmungsfenster einbauen." },
+        { "value": 100, "label": "Ich würde möglichst viele relevante Arbeitsphasen enger synchronisieren." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 17,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wie viel Synchronisation brauchen wir in asynchronen Phasen?",
+          "Welche Abstimmungspunkte sind unverzichtbar?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht Synchronisationsbedarf unter asynchronen Arbeitszeiten greifbar.",
+        "whyLayer": "SUPPORT, weil das Item stärker situativ als dispositionell ist und nur der Anreicherung dienen soll."
+      }
+    },
+    {
+      "itemId": "ws_support_2",
+      "version": "v1",
+      "dimensionId": "work_structure",
+      "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Ein Co-Founder arbeitet sehr autonom und teilt wichtige Zwischenstände erst spät. Welche Form der Abstimmung wäre für dich dabei am passendsten?",
+      "choices": [
+        { "value": 0, "label": "Für mich reicht es, wenn der Zuständigkeitsbereich klar ist und erst Ergebnisse geteilt werden." },
+        { "value": 33, "label": "Für mich ist das meist passend, solange an wenigen Punkten sichtbar wird, wie der Stand ist." },
+        { "value": 67, "label": "Ich würde mir regelmäßige Zwischenstände wünschen, damit wichtige Entwicklungen früh sichtbar werden." },
+        { "value": 100, "label": "Für mich wäre wichtig, bei relevanten Themen früh in Zwischenstände und Abstimmung eingebunden zu sein." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 18,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Zusammenarbeit, Sichtbarkeit und Zuständigkeiten",
+        "conversationFoci": [
+          "Wie früh müssen wichtige Zwischenstände geteilt werden?",
+          "Wann ist späte Information für uns noch okay und wann nicht mehr?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Zeigt, wie viel laufende Sichtbarkeit und Abstimmung bei autonomer Arbeitsweise bevorzugt wird.",
+        "whyLayer": "SUPPORT, weil die Situation realitätsnah ist, aber nur narrativ anreichern und nicht scoreleitend werden soll."
+      }
+    },
+
+    {
+      "itemId": "cm_core_1",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Der Aufbau eines Startups nimmt in meiner aktuellen Zeit- und Energieverteilung einen spürbaren Anteil ein.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "right_pole_keyed",
+      "status": "retained",
+      "isActive": true,
+      "order": 19,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Was erwarten wir realistisch voneinander in intensiven Phasen?",
+          "Wo liegen legitime Grenzen, und wann braucht das Startup bewusst mehr Priorität?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Direkter Marker dafür, wie stark das Startup im Alltag gegenüber anderen Verpflichtungen priorisiert wird.",
+        "whyLayer": "CORE, weil das Item sehr klar auf Priorisierung und Ressourcenallokation zielt."
+      }
+    },
+    {
+      "itemId": "cm_core_2",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich halte für das Startup eher einen klar begrenzten und verlässlichen Rahmen an Zeit und Energie frei.\nB: Ich richte meine Zeit und Energie aktuell eher so aus, dass das Startup einen größeren Anteil bekommt.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 20,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Was erwarten wir realistisch voneinander in intensiven Phasen?",
+          "Wo liegen legitime Grenzen, und wann braucht das Startup bewusst mehr Priorität?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Stellt begrenzte versus stark ausgeweitete Zeit- und Energieallokation direkt gegenüber.",
+        "whyLayer": "CORE, weil das Item die Priorisierungslogik trägt, ohne moralische Wertung einzuführen."
+      }
+    },
+    {
+      "itemId": "cm_core_3",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "In intensiven Phasen plane ich bei Bedarf zusätzliche Zeit und Energie für das Unternehmen ein.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "right_pole_keyed",
+      "status": "retained",
+      "isActive": true,
+      "order": 21,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Was erwarten wir realistisch voneinander in intensiven Phasen?",
+          "Wo liegen legitime Grenzen, und wann braucht das Startup bewusst mehr Priorität?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst direkt, wie stark Zeit und Energie in intensiven Phasen ausgeweitet werden können.",
+        "whyLayer": "CORE, weil das Item klar im Priorisierungs- und Ressourcenallokationskonstrukt bleibt."
+      }
+    },
+    {
+      "itemId": "cm_core_4",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Das Unternehmen entwickelt sich langsamer als erwartet, und ihr überlegt, wie viel Zeit und Energie ihr in den kommenden Monaten dafür einplanen wollt. Welche Haltung passt am ehesten zu dir?",
+      "choices": [
+        { "value": 0, "label": "Ich würde den zeitlichen Rahmen eher stabil halten und darauf achten, dass andere Bereiche weiter verlässlich Raum haben." },
+        { "value": 33, "label": "Ich würde einen begrenzten zusätzlichen Einsatz einplanen, ohne andere Bereiche stark zu verschieben." },
+        { "value": 67, "label": "Ich würde das Startup für eine Zeit etwas höher priorisieren und andere Bereiche entsprechend anpassen." },
+        { "value": 100, "label": "Ich würde für die kommenden Monate einen größeren Teil meiner Zeit und Energie auf das Startup ausrichten." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 22,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Was erwarten wir realistisch voneinander in intensiven Phasen?",
+          "Wo liegen legitime Grenzen, und wann braucht das Startup bewusst mehr Priorität?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst Persistenz der Zeit- und Energieallokation bei langsamer Entwicklung.",
+        "whyLayer": "CORE, weil das Item Priorisierung unter anhaltender Belastung statt Fairness oder moralische Haltung erfasst."
+      }
+    },
+    {
+      "itemId": "cm_support_1",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Du merkst nach einigen Monaten, dass parallel zum Startup weitere Projekte oder Verpflichtungen Zeit und Aufmerksamkeit binden. Was entspricht am ehesten deiner Haltung?",
+      "choices": [
+        { "value": 0, "label": "Das ist für mich grundsätzlich gut vereinbar, solange die verfügbare Zeit realistisch verteilt bleibt." },
+        { "value": 33, "label": "Das ist für mich meist okay, wenn sichtbar bleibt, wie Zeit und Prioritäten verteilt sind." },
+        { "value": 67, "label": "Ich würde genauer klären wollen, in welchen Phasen das Startup mehr Raum bekommen soll." },
+        { "value": 100, "label": "Für mich wäre wichtig, dass das Startup in zentralen Phasen entsprechend mehr Zeit und Aufmerksamkeit bekommt." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 23,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Wie gehen wir mit parallelen Verpflichtungen um?",
+          "Wann erwarten wir, dass das Startup klar Vorrang hat?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht geteilte Prioritäten und tatsächliche Verteilung von Zeit und Aufmerksamkeit sichtbar.",
+        "whyLayer": "SUPPORT, weil das Item situative Spannungen konkretisiert, aber nicht scoreleitend werden soll."
+      }
+    },
+    {
+      "itemId": "cm_support_2",
+      "version": "v1",
+      "dimensionId": "commitment",
+      "dimensionLabel": "Commitment",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Der Aufbau des Startups fordert deutlich mehr Zeit als ursprünglich geplant. Wie gehst du damit um?",
+      "choices": [
+        { "value": 0, "label": "Ich würde meine ursprünglichen zeitlichen Grenzen eher beibehalten." },
+        { "value": 33, "label": "Ich würde nur begrenzt zusätzliche Zeit einplanen und klare Grenzen setzen." },
+        { "value": 67, "label": "Ich würde meine Prioritäten vorübergehend neu ordnen, um mehr Raum zu schaffen." },
+        { "value": 100, "label": "Ich würde das Startup in dieser Phase entsprechend höher priorisieren als bisher." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 24,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Verfügbarkeit, Prioritäten und Belastungsphasen",
+        "conversationFoci": [
+          "Wie reagieren wir, wenn der Aufwand stärker steigt als geplant?",
+          "Welche Grenzen bleiben auch in intensiven Phasen bestehen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Veranschaulicht, wie flexibel Zeit und Energie bei steigender Belastung neu priorisiert werden.",
+        "whyLayer": "SUPPORT, weil das Szenario situativer ist und nur der narrativen Konkretisierung dient."
+      }
+    },
+
+    {
+      "itemId": "ro_core_1",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Der finanzielle Puffer des Unternehmens reicht nur noch für wenige Monate. Welche Haltung passt in so einer Lage am ehesten zu dir?",
+      "choices": [
+        { "value": 0, "label": "Für mich wäre zuerst wichtig, zusätzliche Belastung und mögliche negative Folgen möglichst klar zu begrenzen." },
+        { "value": 33, "label": "Ich könnte nur Schritte mittragen, bei denen Unsicherheit und Belastung eng abgesichert bleiben." },
+        { "value": 67, "label": "Ich könnte auch spürbare zusätzliche Unsicherheit mittragen, wenn dadurch eine realistische Entlastung möglich bleibt." },
+        { "value": 100, "label": "Ich könnte auch eine deutlich belastendere und unsicherere Phase akzeptieren, solange eine relevante Wende noch möglich ist." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 25,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Welche Risiken tragen wir bewusst, und wo setzen wir klare Stop-Kriterien?",
+          "Wann ist Vorsicht sinnvoll, und wann würden wir eine Chance unnötig kleinhalten?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst Downside-, Belastungs- und Expositionsregulation unter realem Unsicherheitsdruck, ohne strategische Richtung zum Hauptsignal zu machen.",
+        "whyLayer": "CORE, weil das Item trotz Krisenkontext eines der saubersten Signale für Risikoorientierung bleibt. Diese Dimension ist methodisch sensibel; deshalb muss der CORE die Auswertung klar dominieren."
+      }
+    },
+    {
+      "itemId": "ro_core_2",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Beim Aufbau des Unternehmens stellt sich die Frage nach persönlicher Unsicherheit und möglicher eigener Belastung. Welche Haltung passt am ehesten zu dir?",
+      "choices": [
+        { "value": 0, "label": "Ich möchte persönliches Risiko möglichst klar begrenzen." },
+        { "value": 33, "label": "Ich bin zu kalkulierter zusätzlicher Unsicherheit bereit, aber nur mit deutlichen Sicherungen." },
+        { "value": 67, "label": "Ich bin bereit, spürbares persönliches Risiko zu tragen, wenn die mögliche positive Wirkung plausibel ist." },
+        { "value": 100, "label": "Ich kann auch deutlich höhere persönliche Unsicherheit akzeptieren, wenn der mögliche Nutzen entsprechend hoch ist." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 26,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Welche Risiken tragen wir bewusst, und wo setzen wir klare Stop-Kriterien?",
+          "Wann ist Vorsicht sinnvoll, und wann würden wir eine Chance unnötig kleinhalten?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Erfasst persönliche Risikoexposition und Belastungstoleranz direkt.",
+        "whyLayer": "CORE, weil das Item relativ wenig strategische oder prozessuale Nebenbedeutung erzeugt."
+      }
+    },
+    {
+      "itemId": "ro_core_3",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Ich kann Unsicherheit über längere Zeit gut mittragen, auch wenn nicht alle Belastungen und Risiken klar absehbar sind.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "right_pole_keyed",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 27,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Welche Risiken tragen wir bewusst, und wo setzen wir klare Stop-Kriterien?",
+          "Wann ist Vorsicht sinnvoll, und wann würden wir eine Chance unnötig kleinhalten?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst Unsicherheitstoleranz direkt statt über Strategie, Tempo oder Entscheidungsstil.",
+        "whyLayer": "CORE, weil die Formulierung den Verarbeitungsmodus weitgehend aus dem Item heraushält."
+      }
+    },
+    {
+      "itemId": "ro_core_4",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich gehe lieber Schritte, bei denen mögliche Belastung und negative Folgen klar begrenzt bleiben.\nB: Ich gehe lieber Schritte, wenn ich auch spürbare Unsicherheit und zusätzliche Belastung mittragen kann, solange der mögliche Nutzen entsprechend hoch ist.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 28,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Welche Risiken tragen wir bewusst, und wo setzen wir klare Stop-Kriterien?",
+          "Wann ist Vorsicht sinnvoll, und wann würden wir eine Chance unnötig kleinhalten?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst Downside-Begrenzung versus Bereitschaft, Unsicherheit und Exposure mitzutragen, ohne Wachstums- oder Strategiefokus.",
+        "whyLayer": "CORE, weil das Item die Risikologik direkt trifft und SUPPORT hier strikt nachgeordnet bleiben muss."
+      }
+    },
+    {
+      "itemId": "ro_support_1",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Ein neues Produkt könnte in den Markt gehen, obwohl noch relevante Unsicherheiten offen sind. Welche Haltung entspricht am ehesten deiner?",
+      "choices": [
+        { "value": 0, "label": "Ich würde offene Unsicherheiten zuerst möglichst weit reduzieren, bevor zusätzliche Belastung und neue Risiken entstehen." },
+        { "value": 33, "label": "Ich wäre nur offen dafür, wenn verbleibende Risiken und mögliche Belastungen klar begrenzt sind." },
+        { "value": 67, "label": "Ich könnte einen Start trotz offener Unsicherheiten mittragen, wenn die zusätzliche Belastung eng begrenzt bleibt." },
+        { "value": 100, "label": "Ich könnte auch mit deutlich offener Unsicherheit in den Markt gehen, solange die zusätzliche Belastung für mich noch tragbar bleibt." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 29,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Wann ist ein früher Launch für uns vertretbar?",
+          "Welche Mindestkriterien müssen erfüllt sein, bevor wir in den Markt gehen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht Risikologik an offener Unsicherheit und zusätzlicher Exposition konkret sichtbar.",
+        "whyLayer": "SUPPORT, weil Marktstart-Szenarien weiterhin auf Entscheidungs- und Qualitätslogik mitladen können und deshalb nicht scoreleitend sein dürfen."
+      }
+    },
+    {
+      "itemId": "ro_support_2",
+      "version": "v1",
+      "dimensionId": "risk_orientation",
+      "dimensionLabel": "Risikoorientierung",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Eine Option könnte spürbar positive Wirkung entfalten, würde über mehrere Monate aber auch Unsicherheit, Belastung und mögliche negative Folgen deutlich erhöhen. Welche Haltung entspricht am ehesten deiner?",
+      "choices": [
+        { "value": 0, "label": "Ich wäre nur offen dafür, wenn zusätzliche Belastung und mögliche negative Folgen klar begrenzt bleiben." },
+        { "value": 33, "label": "Ich könnte das nur mittragen, wenn es deutliche Leitplanken gegen Überlastung und zu hohe Belastung gibt." },
+        { "value": 67, "label": "Ich könnte die zusätzliche Unsicherheit mittragen, wenn die mögliche positive Wirkung spürbar genug erscheint." },
+        { "value": 100, "label": "Ich könnte auch deutlich mehr Unsicherheit und Belastung akzeptieren, wenn der mögliche Nutzen entsprechend groß ist." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 30,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Umgang mit Unsicherheit und Leitplanken",
+        "conversationFoci": [
+          "Wann rechtfertigt eine Chance zusätzliche Unsicherheit?",
+          "Welche Stop-Kriterien brauchen wir, wenn Belastung und Risiko steigen?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Konkretisiert die Risikologik bei Optionen mit erhöhter Unsicherheit, Belastung und Exposure.",
+        "whyLayer": "SUPPORT, weil solche Szenarien situativ leicht in Strategie- oder Nutzenabwägung kippen und deshalb nicht scoreleitend werden dürfen."
+      }
+    },
+
+    {
+      "itemId": "cs_core_1",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "core",
+      "type": "likert",
+      "prompt": "Wenn zwischen mir und einem Co-Founder ein Unterschied spürbar wird, sortiere ich meine Sicht meist erst für mich, statt ihn sofort anzusprechen.",
+      "choices": [
+        { "value": 0, "label": "trifft überhaupt nicht zu" },
+        { "value": 25, "label": "trifft eher nicht zu" },
+        { "value": 50, "label": "teils / teils" },
+        { "value": 75, "label": "trifft eher zu" },
+        { "value": 100, "label": "trifft voll zu" }
+      ],
+      "polarity": "left_pole_keyed",
+      "status": "retained",
+      "isActive": true,
+      "order": 31,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wann sprechen wir Irritationen an, und wann sortieren wir erst?",
+          "Wann benennen wir Differenzen eher vorsichtig, und wann eher direkt?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst direkt die Tendenz, Spannung zunächst intern zu verarbeiten, bevor sie angesprochen wird.",
+        "whyLayer": "CORE, weil das Item die linke Seite der Achse als legitimes Verarbeitungsmuster und nicht als Defizit abbildet."
+      }
+    },
+    {
+      "itemId": "cs_core_2",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Ein Co-Founder trifft eine Entscheidung, die du anders gesehen hättest. Wie reagierst du typischerweise?",
+      "choices": [
+        { "value": 0, "label": "Ich würde meine Reaktion zunächst für mich sortieren und erst einmal beobachten, ob der Unterschied stehen bleibt." },
+        { "value": 33, "label": "Ich würde den Unterschied später ansprechen, wenn ich meine Sicht klarer eingeordnet habe." },
+        { "value": 67, "label": "Ich würde den Unterschied relativ zeitnah ansprechen." },
+        { "value": 100, "label": "Ich würde den Unterschied direkt ansprechen, solange die Situation noch frisch ist." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "retained",
+      "isActive": true,
+      "order": 32,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wann sprechen wir Irritationen an, und wann sortieren wir erst?",
+          "Wann benennen wir Differenzen eher vorsichtig, und wann eher direkt?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Erfasst an einer typischen Meinungsverschiedenheit, ob Differenz zunächst beobachtet, später aufgegriffen oder sofort benannt wird.",
+        "whyLayer": "CORE, weil das Item konkrete Reaktionsmuster unter Spannung sichtbar macht statt gewünschte Konfliktideale."
+      }
+    },
+    {
+      "itemId": "cs_core_3",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "core",
+      "type": "forced_choice",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Wenn ich Widerspruch habe, taste ich mich lieber vorsichtig in das Thema hinein.\nB: Wenn ich Widerspruch habe, benenne ich die Differenz lieber direkt.",
+      "choices": [
+        { "value": 0, "label": "A trifft deutlich eher zu" },
+        { "value": 25, "label": "A trifft eher zu" },
+        { "value": 50, "label": "beide etwa gleich" },
+        { "value": 75, "label": "B trifft eher zu" },
+        { "value": 100, "label": "B trifft deutlich eher zu" }
+      ],
+      "polarity": "forced_choice_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 33,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wann sprechen wir Irritationen an, und wann sortieren wir erst?",
+          "Wann benennen wir Differenzen eher vorsichtig, und wann eher direkt?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Misst, ob Widerspruch eher vorsichtig eingeführt oder explizit benannt wird.",
+        "whyLayer": "CORE, weil das Item die Ausdrucksform von Dissens direkt trifft, ohne Höflichkeit oder Reife zu bewerten."
+      }
+    },
+    {
+      "itemId": "cs_core_4",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "core",
+      "type": "scenario",
+      "prompt": "Ein Unterschied zwischen euch bleibt nach einem Gespräch offen und ist weiter spürbar. Wie gehst du typischerweise damit um?",
+      "choices": [
+        { "value": 0, "label": "Ich würde das Thema meist erst etwas stehen lassen und meine Sicht weiter für mich sortieren." },
+        { "value": 33, "label": "Ich würde es in einem späteren, passenderen Moment noch einmal aufgreifen." },
+        { "value": 67, "label": "Ich würde den offenen Punkt relativ bald wieder ansprechen." },
+        { "value": 100, "label": "Ich würde den offenen Punkt direkt noch einmal ansprechen, bevor er stehen bleibt." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 34,
+      "reportUsage": {
+        "role": "core_interpretation",
+        "drivesDimensionScore": true,
+        "drivesExecutiveSummary": true,
+        "canAnchorDimensionCard": true
+      },
+      "workbookUsage": {
+        "role": "priority_driver",
+        "canTriggerPriority": true,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wann sprechen wir Irritationen an, und wann sortieren wir erst?",
+          "Wann benennen wir Differenzen eher vorsichtig, und wann eher direkt?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht sichtbar, ob offene Differenzen eher liegen bleiben, später wieder aufgenommen oder unmittelbar weiterbearbeitet werden.",
+        "whyLayer": "CORE, weil das Item Timing und Weiterführung von Dissens im Alltag ohne Wertung abbildet."
+      }
+    },
+    {
+      "itemId": "cs_support_1",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "Ein Fehler im Unternehmen hat spürbare Folgen, und zwischen euch ist unklar, wie ihr ihn einordnet. Wie würdest du das typischerweise ansprechen?",
+      "choices": [
+        { "value": 0, "label": "Ich würde das eher mit etwas Abstand ansprechen, wenn ich meine Sicht sortiert habe." },
+        { "value": 33, "label": "Ich würde einen passenden Rahmen suchen und das Thema dann vorsichtig aufmachen." },
+        { "value": 67, "label": "Ich würde die Differenz dazu relativ zeitnah und klar ansprechen." },
+        { "value": 100, "label": "Ich würde die Differenz und ihre Folgen direkt ansprechen." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 35,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wie sprechen wir heikle Themen mit realen Folgen an?",
+          "Wann suchen wir eher einen Rahmen, und wann gehen wir direkt hinein?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Zeigt, wie Timing und Direktheit bei heiklen Themen mit realen Folgen variieren können.",
+        "whyLayer": "SUPPORT, weil der Fehlerkontext zusätzliche Accountability-Aspekte mitlädt und deshalb nur narrativ anreichern soll."
+      }
+    },
+    {
+      "itemId": "cs_support_2",
+      "version": "v1",
+      "dimensionId": "conflict_style",
+      "dimensionLabel": "Konfliktstil",
+      "layer": "support",
+      "type": "scenario",
+      "prompt": "In einer Diskussion über eine strategische Frage, in der spürbare Spannung im Raum ist: Wie gehst du typischerweise damit um?",
+      "choices": [
+        { "value": 0, "label": "Ich nehme eher Dynamik heraus und sortiere erst, bevor ich weiter in die Klärung gehe." },
+        { "value": 33, "label": "Ich lasse den Widerspruch zunächst etwas abkühlen und greife das Thema dann wieder auf." },
+        { "value": 67, "label": "Ich spreche den Kern der Differenz eher direkt an, auch wenn spürbare Spannung im Raum ist." },
+        { "value": 100, "label": "Ich gehe auch bei hoher Spannung eher unmittelbar weiter in den Widerspruch." }
+      ],
+      "polarity": "scenario_left_to_right",
+      "status": "rewritten",
+      "isActive": true,
+      "order": 36,
+      "reportUsage": {
+        "role": "support_enrichment",
+        "drivesDimensionScore": false,
+        "canEnrichDimensionCard": true,
+        "canConcretizeExecutiveSummary": true,
+        "canAddTensionHint": true
+      },
+      "workbookUsage": {
+        "role": "handoff_enrichment",
+        "canTriggerPriority": false,
+        "topicTitle": "Wie wir Spannungen ansprechen und klären",
+        "conversationFoci": [
+          "Wann lassen wir Spannung erst abkühlen, und wann sprechen wir sie sofort aus?",
+          "Wie direkt oder vorsichtig benennen wir Differenzen, wenn es emotional wird?"
+        ]
+      },
+      "rationale": {
+        "whyHere": "Macht sichtbar, ob emotionale Spannung eher gedämpft, später wieder aufgegriffen oder direkt bearbeitet wird.",
+        "whyLayer": "SUPPORT, weil Affektdynamik und Konfliktstil sich hier nicht vollständig trennen lassen und das Item deshalb nur narrativ anreichern soll."
+      }
+    }
+  ]
+}

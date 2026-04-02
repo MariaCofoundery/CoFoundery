@@ -2,6 +2,7 @@ import {
   compareFounders,
   FOUNDER_MATCHING_TEST_CASES,
   type CompareFoundersResult,
+  type DimensionMatchResult,
   type FounderScores,
   type InteractionType,
   type RelationType,
@@ -90,15 +91,46 @@ const AGREEMENT_THEME: Record<
   Risikoorientierung: "gemeinsame_risikoschwelle",
 };
 
+function getPriorityBoost(
+  dimension: Pick<DimensionMatchResult, "dimension" | "riskLevel" | "appliedRules">,
+  status: MatchingDimensionStatus
+) {
+  let boost = 0;
+
+  if (dimension.appliedRules?.includes("RULE_E_COMPANY_LOGIC_STRATEGIC_TENSION")) {
+    boost += 1.7;
+  }
+
+  if (dimension.appliedRules?.includes("RULE_A_COMMITMENT_HARD_PENALTY")) {
+    boost += 1.1;
+  }
+
+  if (dimension.appliedRules?.includes("RULE_B_WORK_STRUCTURE_CLASH")) {
+    boost += 0.7;
+  }
+
+  if (dimension.dimension === "Unternehmenslogik" && status === "kritisch") {
+    boost += 0.6;
+  }
+
+  if (dimension.dimension === "Commitment" && status === "kritisch") {
+    boost += 0.35;
+  }
+
+  return boost;
+}
+
 function getStatus(
-  interactionType: InteractionType | null,
+  dimension: Pick<DimensionMatchResult, "category" | "riskLevel" | "interactionType">,
   tensionType: TensionType | null
 ): MatchingDimensionStatus {
-  if (interactionType === "critical_tension" || tensionType === "critical") return "kritisch";
-  if (interactionType === "coordination" || tensionType === "coordination") {
+  if (dimension.category === "tension" && dimension.riskLevel === "high") return "kritisch";
+  if (dimension.category === "tension" && dimension.riskLevel === "medium") {
     return "abstimmung_nötig";
   }
-  if (interactionType === "complement") return "ergänzend";
+  if (dimension.category === "complementary" || dimension.interactionType === "complement") {
+    return "ergänzend";
+  }
   return "nah";
 }
 
@@ -113,7 +145,7 @@ function getCategoryPriority(status: MatchingDimensionStatus, tensionType: Tensi
 function enrichDimensions(compareResult: CompareFoundersResult): EnrichedDimension[] {
   return compareResult.dimensions.map((dimension) => {
     const tension = compareResult.tensionMap.find((entry) => entry.dimension === dimension.dimension);
-    const status = getStatus(dimension.interactionType, tension?.tensionType ?? null);
+    const status = getStatus(dimension, tension?.tensionType ?? null);
 
     return {
       dimension: dimension.dimension,
@@ -126,7 +158,7 @@ function enrichDimensions(compareResult: CompareFoundersResult): EnrichedDimensi
       scoreB: dimension.scoreB,
       explanationKey: dimension.explanationKey,
       reason: "",
-      priorityWeight: DIMENSION_PRIORITY[dimension.dimension],
+      priorityWeight: DIMENSION_PRIORITY[dimension.dimension] + getPriorityBoost(dimension, status),
       categoryPriority: getCategoryPriority(status, tension?.tensionType ?? null),
     };
   });
@@ -199,11 +231,22 @@ function pickBiggestTension(dimensions: EnrichedDimension[]) {
   );
 }
 
+function pickTopCandidate(
+  candidates: Array<EnrichedDimension | undefined>,
+  sorter: (a: EnrichedDimension, b: EnrichedDimension) => number,
+  predicate: (dimension: EnrichedDimension) => boolean
+) {
+  return [...candidates]
+    .filter((entry): entry is EnrichedDimension => entry != null)
+    .filter(predicate)
+    .sort(sorter)[0] ?? null;
+}
+
 function isHighSimilarityBlindSpotRisk(compareResult: CompareFoundersResult, dimensions: EnrichedDimension[]) {
-  const similarCount = dimensions.filter((dimension) => dimension.relationType === "similar").length;
+  const similarCount = dimensions.filter((dimension) => dimension.status === "nah").length;
   return (
     (compareResult.overallMatchScore ?? 0) >= 85 &&
-    compareResult.tensionMap.length === 0 &&
+    compareResult.topTensions.length === 0 &&
     similarCount >= 5
   );
 }
@@ -237,10 +280,18 @@ function buildHeroSelection(
 
   let mode: HeroSelection["mode"] = "alignment_led";
   let groundDynamic: EnrichedDimension | null = stableBase;
+  const existentialCriticalTension =
+    biggestTension &&
+    biggestTension.status === "kritisch" &&
+    (biggestTension.dimension === "Unternehmenslogik" ||
+      biggestTension.dimension === "Commitment");
 
   if (blindSpotRisk) {
     mode = "blind_spot_watch";
     groundDynamic = stableBase ?? pickBlindSpotWatch(dimensions);
+  } else if (existentialCriticalTension) {
+    mode = "tension_led";
+    groundDynamic = biggestTension;
   } else if (
     biggestTension &&
     biggestTension.status === "kritisch" &&
@@ -248,12 +299,12 @@ function buildHeroSelection(
   ) {
     mode = "tension_led";
     groundDynamic = biggestTension;
-  } else if (strongestComplement && (compareResult.alignmentScore ?? 0) >= 70) {
+  } else if (strongestComplement && (compareResult.overallMatchScore ?? 0) >= 70) {
     mode = "complement_led";
     groundDynamic = strongestComplement;
   } else if (biggestTension && biggestTension.status === "abstimmung_nötig") {
     mode = "coordination_led";
-    groundDynamic = stableBase ?? biggestTension;
+    groundDynamic = biggestTension ?? stableBase;
   }
 
   const strongestQuality =
@@ -276,6 +327,8 @@ function buildHeroSelection(
       groundDynamic,
       blindSpotRisk
         ? "Grunddynamik über hohe Ähnlichkeit; Fokus liegt eher auf möglichem Blind-Spot-Risiko als auf offenem Spannungsfeld."
+        : existentialCriticalTension
+          ? "Grunddynamik wird von einem kritischen Richtungs- oder Commitment-Feld geprägt, das das Duo früher bestimmt als bloße Prozessfragen."
         : mode === "tension_led"
           ? "Grunddynamik wird von einem kritischen Spannungsfeld geprägt, das das Duo früh strukturiert."
           : mode === "complement_led"
@@ -427,9 +480,24 @@ export function buildFounderMatchingSelection(
   compareResult: CompareFoundersResult
 ): FounderMatchingSelection {
   const dimensions = enrichDimensions(compareResult);
-  const stableBase = pickStableBase(dimensions);
-  const strongestComplement = pickStrongestComplement(dimensions);
+  const topAlignmentCandidates = compareResult.topAlignments.map((dimension) =>
+    dimensions.find((entry) => entry.dimension === dimension)
+  );
+  const topTensionCandidates = compareResult.topTensions.map((dimension) =>
+    dimensions.find((entry) => entry.dimension === dimension)
+  );
+  const stableBase =
+    pickTopCandidate(topAlignmentCandidates, sortByStableBase, (entry) => entry.status === "nah") ??
+    pickStableBase(dimensions);
+  const strongestComplement =
+    pickTopCandidate(topAlignmentCandidates, sortByComplement, (entry) => entry.status === "ergänzend") ??
+    pickStrongestComplement(dimensions);
   const biggestTension =
+    pickTopCandidate(
+      topTensionCandidates,
+      sortByTension,
+      (entry) => entry.status === "kritisch" || entry.status === "abstimmung_nötig"
+    ) ??
     pickBiggestTension(dimensions) ??
     (isHighSimilarityBlindSpotRisk(compareResult, dimensions) ? pickBlindSpotWatch(dimensions) : null);
 

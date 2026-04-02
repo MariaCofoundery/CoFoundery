@@ -11,22 +11,22 @@ test("hero text builder returns deterministic examples for the main audit cases"
     {
       name: "stark_ausgepraegtes_profil",
       heroText:
-        "Für dich steht das Startup klar im Zentrum; Zeit, Energie und Aufmerksamkeit ordnen sich stark darum herum. Im täglichen Arbeiten willst du laufend wissen, wo Dinge stehen, was entschieden ist und wo noch etwas offen bleibt. Schwierig wird es, wenn im Team zuerst Sicherheit gesucht wird und du längst eine echte Chance siehst. Für die Zusammenarbeit bringt das Richtung, doch ohne gemeinsames Verständnis von Risiko und Entscheidung bleibt Tempo liegen oder kippt dauernd.",
+        "Dein Kernmuster: Du richtest Zeit, Energie und Aufmerksamkeit deutlich auf das Startup aus - genau dort kippt es im Team, wenn andere Prioritaet und Verfuegbarkeit anders einordnen. Im taeglichen Arbeiten willst du frueh sehen, wo Dinge stehen, was entschieden ist und wo noch etwas offen bleibt. Die groesste Reibung entsteht, wenn im Team zuerst Sicherheit hergestellt werden soll und du in derselben Lage schon eine echte Chance siehst. Im Alltag landet dieselbe Entscheidung schnell noch einmal auf dem Tisch, obwohl fuer dich innerlich schon klar ist, ob noch geprueft oder schon entschieden werden sollte. Im Meeting wirkt das schnell so, als waerst du schon einen Schritt weiter oder noch nicht so weit wie der Rest.",
     },
     {
       name: "komplett_balanciertes_profil",
       heroText:
-        "Je nach Aufgabe suchst du mehr Eigenraum oder mehr Rückkopplung, statt dich auf einen festen Arbeitsmodus festzulegen. Je nach Lage wechselst du spürbar zwischen Marktfenster und Aufbaufrage. Dann wird es schnell zäh, wenn offenbleibt, wann ihr prüft und wann ihr euch wirklich festlegen wollt. Im Miteinander macht dich das beweglich; ohne klare Absprachen bleibt aber schnell offen, wer woran zieht und welches Tempo gerade gilt.",
+        "Dein Kernmuster: Manche Unterschiede sprichst du sofort an, andere laesst du erst kurz liegen, bevor du sie aufmachst - genau dort kippt es im Team, weil dein Timing schwer vorhersagbar ist. Im Alltag wirkt das so: In einer Phase bist du sehr praesenz, in der naechsten faehrst du bewusst wieder auf ein integriertes Niveau zurueck. Die groesste Reibung entsteht, wenn du zwischen Pruefen und Festlegen wechselst und fuer andere nicht klar ist, ab wann du etwas wirklich fuer entscheidbar haeltst. Im Alltag wird oft erst spaet sichtbar, welchen Modus du gerade erwartest. Dadurch wirkst du schnell sprunghaft, obwohl du fuer dich nur zwischen passenden Modi wechselst.",
     },
     {
       name: "gemischtes_profil",
       heroText:
-        "Substanz, Aufbau und langfristige Tragfähigkeit sind für dich kein Nebenthema, sondern der Maßstab für unternehmerische Entscheidungen. Im Alltag merkt man das daran, dass du Spannungen eher früh sichtbar machst, statt sie länger im Hintergrund laufen zu lassen. Schwierig wird es, wenn Chancen im Raum stehen, aber offenbleibt, welches Risiko ihr gemeinsam wirklich tragen wollt. Für die Zusammenarbeit bringt das Richtung, doch ohne gemeinsames Verständnis von Risiko und Entscheidung bleibt Tempo liegen oder kippt dauernd.",
+        "Dein Kernmuster: Du sortierst neue Chancen zuerst nach Reichweite, Zug und strategischer Wirkung - genau dort kippt es im Team, wenn andere zuerst Stabilitaet und Tragfaehigkeit sichern wollen. Im Alltag merkt man das daran, dass du Unterschiede eher frueh sichtbar machst, statt sie laenger im Hintergrund laufen zu lassen. Reibung entsteht, wenn Chancen im Raum stehen, aber offenbleibt, welches Risiko ihr gemeinsam wirklich tragen wollt. Im Alltag landet dieselbe Entscheidung schnell noch einmal auf dem Tisch, obwohl fuer dich innerlich schon klar ist, ob noch geprueft oder schon entschieden werden sollte. Im Meeting wirkt das schnell so, als waerst du schon einen Schritt weiter oder noch nicht so weit wie der Rest.",
     },
   ]);
 });
 
-test("hero text always contains exactly four sentences for the tracked example cases", () => {
+test("hero text always contains exactly five sentences for the tracked example cases", () => {
   const trackedCases = SELF_REPORT_SELECTION_DEBUG_CASES.filter((entry) =>
     ["stark_ausgepraegtes_profil", "komplett_balanciertes_profil", "gemischtes_profil"].includes(
       entry.name
@@ -40,6 +40,6 @@ test("hero text always contains exactly four sentences for the tracked example c
       .filter(Boolean)
       .length;
 
-    assert.equal(sentenceCount, 4, testCase.name);
+    assert.equal(sentenceCount, 5, testCase.name);
   }
 });
