@@ -92,6 +92,7 @@ export default async function FounderAlignmentWorkbookPage({
       <ProductNavigationOverride
         matchingHref={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
         workbookHref={buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext)}
+        feedbackInvitationId={data.invitationId ?? invitationId}
       />
       <ResearchPageTracker
         eventName="workbook_page_viewed"

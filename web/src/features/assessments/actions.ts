@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { finalizeInvitationIfReady } from "@/features/reporting/actions";
 import {
+  getFounderCompatibilityBasePersistedChoiceValue,
   getFounderCompatibilityBasePersistenceQuestionId,
   isActiveFounderCompatibilityBaseItemId,
   isValidFounderCompatibilityBaseChoiceValue,
@@ -188,7 +189,11 @@ export async function upsertAssessmentAnswer(
       }
 
       const persistedQuestionId = getFounderCompatibilityBasePersistenceQuestionId(questionId);
-      if (!persistedQuestionId) {
+      const persistedChoiceValue = getFounderCompatibilityBasePersistedChoiceValue(
+        questionId,
+        choiceValue
+      );
+      if (!persistedQuestionId || !persistedChoiceValue) {
         return { ok: false, error: "invalid_question" };
       }
 
@@ -196,7 +201,7 @@ export async function upsertAssessmentAnswer(
         {
           assessment_id: assessmentId,
           question_id: persistedQuestionId,
-          choice_value: choiceValue,
+          choice_value: persistedChoiceValue,
         },
         { onConflict: "assessment_id,question_id" }
       );

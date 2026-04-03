@@ -103,7 +103,7 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "likert",
-      "prompt": "Wenn ich unternehmerische Optionen bewerte, ist für mich vor allem wichtig, ob sie das Unternehmen langfristig tragfähig und in sich stimmig machen.",
+      "prompt": "Wenn ich unternehmerische Optionen bewerte, ist für mich entscheidend, ob sie das Unternehmen langfristig tragfähig und in sich stimmig machen.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -142,7 +142,7 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich bewerte unternehmerische Optionen vor allem danach, ob sie das Unternehmen langfristig robuster und tragfähiger machen.\nB: Ich bewerte unternehmerische Optionen vor allem danach, ob sie einen klaren strategischen Hebel oder Zugang zu relevanten Chancen eröffnen.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich bewerte unternehmerische Optionen vor allem danach, ob sie das Unternehmen robuster und konsistenter machen.\nB: Ich bewerte unternehmerische Optionen vor allem danach, ob sie neue strategische Hebel und Wachstumsmöglichkeiten eröffnen.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -180,16 +180,15 @@
       "dimensionId": "company_logic",
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
-      "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Wenn eine Richtung einmal stimmig und tragfähig wirkt, sollte sie nicht wegen neuer Gelegenheiten vorschnell neu gewichtet werden.\nB: Wenn eine neue Richtung strategisch deutlich mehr Hebel bietet, sollte sie auch dann neu geprüft werden, wenn die bisherige Richtung bereits stimmig ist.",
+      "type": "scenario",
+      "prompt": "Wenn ein Geschäftsmodell intern sehr sauber aufgebaut ist, aber nur begrenztes Wachstumspotenzial hat – wie bewertest du das grundsätzlich?",
       "choices": [
-        { "value": 0, "label": "A trifft deutlich eher zu" },
-        { "value": 25, "label": "A trifft eher zu" },
-        { "value": 50, "label": "beide etwa gleich" },
-        { "value": 75, "label": "B trifft eher zu" },
-        { "value": 100, "label": "B trifft deutlich eher zu" }
+        { "value": 0, "label": "Innere Qualität und Stabilität sind entscheidend." },
+        { "value": 33, "label": "Eine gute Balance zwischen Stabilität und Wachstum ist wichtig." },
+        { "value": 67, "label": "Wachstumspotenzial ist wichtiger als innere Klarheit." },
+        { "value": 100, "label": "Wachstum geht klar vor, auch wenn das Modell weniger stimmig wirkt." }
       ],
-      "polarity": "forced_choice_left_to_right",
+      "polarity": "scenario_left_to_right",
       "status": "rewritten",
       "isActive": true,
       "order": 3,
@@ -220,7 +219,7 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Eine neue strategische Option würde euch Zugang zu einem deutlich größeren Markt verschaffen. Gleichzeitig würde das Unternehmen dadurch breiter, komplexer und weniger klar positioniert. Woran würdest du zuerst beurteilen, ob diese Option grundsätzlich gut für euch ist?",
+      "prompt": "Eine neue strategische Option würde euch Zugang zu einem deutlich größeren Markt verschaffen. Gleichzeitig würde das Unternehmen dadurch komplexer und weniger klar positioniert. Woran würdest du zuerst beurteilen, ob diese Option sinnvoll ist?",
       "choices": [
         { "value": 0, "label": "Daran, ob die Option die innere Logik des Unternehmens stärkt und langfristig tragfähig bleibt." },
         { "value": 33, "label": "Daran, ob sich die Option mit Positionierung und Aufbau des Unternehmens sauber verbinden lässt." },
@@ -337,7 +336,7 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "likert",
-      "prompt": "Bei wichtigen Entscheidungen ist mir wichtig, dass sie auf nachvollziehbaren Argumenten, Daten und überprüfbaren Annahmen beruhen.",
+      "prompt": "Bei wichtigen Entscheidungen ist mir wichtig, dass sie auf nachvollziehbaren Argumenten und überprüfbaren Annahmen beruhen.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -376,7 +375,7 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich treffe wichtige Entscheidungen lieber erst, wenn die wichtigsten Argumente, Annahmen und Einwände geklärt sind.\nB: Ich treffe wichtige Entscheidungen lieber, sobald sich aus den vorhandenen Informationen und Signalen eine stimmige Richtung abzeichnet, auch wenn noch nicht alle Punkte vollständig geklärt sind.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich treffe Entscheidungen lieber erst, wenn die wichtigsten Argumente und Einwände geklärt sind.\nB: Ich treffe Entscheidungen, sobald sich eine stimmige Richtung abzeichnet – auch wenn noch nicht alles geklärt ist.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -415,7 +414,7 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Die sachlichen Hinweise sprechen eher für eine Entscheidung, aber innerlich fühlt sie sich für dich noch nicht stimmig an. Wie gehst du damit um?",
+      "prompt": "Die sachlichen Hinweise sprechen eher für eine Entscheidung, aber innerlich fühlt sie sich noch nicht stimmig an. Wie gehst du damit um?",
       "choices": [
         { "value": 0, "label": "Wenn die Argumente insgesamt dafür sprechen, ist die Entscheidung für mich grundsätzlich tragfähig." },
         { "value": 33, "label": "Ich würde noch einen gezielten Gegencheck machen, um die Spannung zwischen Analyse und innerem Signal zu prüfen." },
@@ -452,16 +451,15 @@
       "dimensionId": "decision_logic",
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
-      "type": "likert",
-      "prompt": "Für mich ist eine wichtige Entscheidung erst dann wirklich tragfähig, wenn die wichtigsten Gegenargumente ausdrücklich geprüft wurden.",
+      "type": "scenario",
+      "prompt": "Wie gehst du typischerweise mit Entscheidungen um, bei denen Zeitdruck besteht, aber noch Unsicherheit im Raum ist?",
       "choices": [
-        { "value": 0, "label": "trifft überhaupt nicht zu" },
-        { "value": 25, "label": "trifft eher nicht zu" },
-        { "value": 50, "label": "teils / teils" },
-        { "value": 75, "label": "trifft eher zu" },
-        { "value": 100, "label": "trifft voll zu" }
+        { "value": 0, "label": "Ich warte lieber und kläre weiter." },
+        { "value": 33, "label": "Ich sichere so viel wie möglich ab, bevor ich entscheide." },
+        { "value": 67, "label": "Ich entscheide, sobald eine tragfähige Richtung erkennbar ist." },
+        { "value": 100, "label": "Ich entscheide bewusst schnell und korrigiere später bei Bedarf." }
       ],
-      "polarity": "left_pole_keyed",
+      "polarity": "scenario_left_to_right",
       "status": "new",
       "isActive": true,
       "order": 10,
@@ -881,16 +879,15 @@
       "dimensionId": "commitment",
       "dimensionLabel": "Commitment",
       "layer": "core",
-      "type": "likert",
-      "prompt": "In intensiven Phasen plane ich bei Bedarf zusätzliche Zeit und Energie für das Unternehmen ein.",
+      "type": "scenario",
+      "prompt": "Wenn andere wichtige Lebensbereiche unter Druck geraten, wie stabil bleibt deine Priorität für das Startup?",
       "choices": [
-        { "value": 0, "label": "trifft überhaupt nicht zu" },
-        { "value": 25, "label": "trifft eher nicht zu" },
-        { "value": 50, "label": "teils / teils" },
-        { "value": 75, "label": "trifft eher zu" },
-        { "value": 100, "label": "trifft voll zu" }
+        { "value": 0, "label": "Klare Grenzen bleiben auch dann bestehen." },
+        { "value": 33, "label": "Ich passe meine Priorisierung nur leicht an." },
+        { "value": 67, "label": "Ich priorisiere das Startup zeitweise höher." },
+        { "value": 100, "label": "Das Startup hat dann klar Vorrang." }
       ],
-      "polarity": "right_pole_keyed",
+      "polarity": "scenario_left_to_right",
       "status": "retained",
       "isActive": true,
       "order": 21,
@@ -1076,7 +1073,7 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Beim Aufbau des Unternehmens stellt sich die Frage nach persönlicher Unsicherheit und möglicher eigener Belastung. Welche Haltung passt am ehesten zu dir?",
+      "prompt": "Wie stark bist du bereit, persönliche Stabilität – zum Beispiel Einkommen oder Sicherheit – zugunsten unternehmerischer Chancen zu riskieren?",
       "choices": [
         { "value": 0, "label": "Ich möchte persönliches Risiko möglichst klar begrenzen." },
         { "value": 33, "label": "Ich bin zu kalkulierter zusätzlicher Unsicherheit bereit, aber nur mit deutlichen Sicherungen." },
@@ -1387,12 +1384,12 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Ein Unterschied zwischen euch bleibt nach einem Gespräch offen und ist weiter spürbar. Wie gehst du typischerweise damit um?",
+      "prompt": "Wenn ein Unterschied zwischen euch länger bestehen bleibt, wie gehst du typischerweise damit um?",
       "choices": [
-        { "value": 0, "label": "Ich würde das Thema meist erst etwas stehen lassen und meine Sicht weiter für mich sortieren." },
-        { "value": 33, "label": "Ich würde es in einem späteren, passenderen Moment noch einmal aufgreifen." },
-        { "value": 67, "label": "Ich würde den offenen Punkt relativ bald wieder ansprechen." },
-        { "value": 100, "label": "Ich würde den offenen Punkt direkt noch einmal ansprechen, bevor er stehen bleibt." }
+        { "value": 0, "label": "Ich lasse ihn erst stehen und sortiere weiter." },
+        { "value": 33, "label": "Ich greife ihn später in einem passenderen Moment auf." },
+        { "value": 67, "label": "Ich spreche ihn aktiv wieder an." },
+        { "value": 100, "label": "Ich will ihn möglichst direkt weiter klären." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",

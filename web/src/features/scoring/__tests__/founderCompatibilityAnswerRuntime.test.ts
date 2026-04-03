@@ -7,14 +7,17 @@ import {
   buildFounderCompatibilityAnswerMapV2,
   founderCompatibilityAnswerMapToAnswers,
   getLegacyFounderQuestionBridgeMeta,
+  mapFounderPercentToRegistryChoiceValue,
   mapLegacyFounderAnswerToV2Answer,
   mapLegacyFounderAnswersToV2Answers,
+  mapRegistryFounderChoiceToFounderPercent,
+  mapRegistryFounderChoiceToPersistedLegacyChoice,
 } from "@/features/scoring/founderCompatibilityAnswerRuntime";
 
 test("legacy question ids map into V2 registry item ids", () => {
   assert.equal(getLegacyFounderQuestionBridgeMeta("q01_vision_l1")?.itemId, "cl_core_1");
-  assert.equal(getLegacyFounderQuestionBridgeMeta("q25_vision_fc2")?.itemId, "cl_core_3");
-  assert.equal(getLegacyFounderQuestionBridgeMeta("q31_vision_s2")?.itemId, "cl_support_1");
+  assert.equal(getLegacyFounderQuestionBridgeMeta("q13_vision_s1")?.itemId, "cl_core_3");
+  assert.equal(getLegacyFounderQuestionBridgeMeta("q37_vision_s3")?.itemId, "cl_support_1");
   assert.equal(getLegacyFounderQuestionBridgeMeta("q48_conflict_s4")?.itemId, "cs_support_2");
 });
 
@@ -66,10 +69,23 @@ test("registry-native base rows map directly without legacy question metadata", 
   assert.deepEqual(
     mapped.map((entry) => ({ itemId: entry.itemId, value: entry.value, source: entry.source })),
     [
-      { itemId: "cl_core_1", value: 75, source: "registry" },
+      { itemId: "cl_core_1", value: 25, source: "registry" },
       { itemId: "cl_support_1", value: 67, source: "registry" },
     ]
   );
+});
+
+test("registry-native choice values can be translated into founder-oriented values and back", () => {
+  assert.equal(mapRegistryFounderChoiceToFounderPercent("cl_core_1", "75"), 25);
+  assert.equal(mapRegistryFounderChoiceToFounderPercent("cl_core_2", "75"), 75);
+  assert.equal(mapFounderPercentToRegistryChoiceValue("cl_core_1", 25), "75");
+  assert.equal(mapFounderPercentToRegistryChoiceValue("cl_core_3", 67), "67");
+});
+
+test("registry-native choices can be persisted through legacy ids without semantic drift", () => {
+  assert.equal(mapRegistryFounderChoiceToPersistedLegacyChoice("cl_core_2", "0"), "100");
+  assert.equal(mapRegistryFounderChoiceToPersistedLegacyChoice("cl_core_3", "67"), "33");
+  assert.equal(mapRegistryFounderChoiceToPersistedLegacyChoice("dl_core_4", "67"), "67");
 });
 
 test("V2 answer maps average duplicate legacy mappings onto one canonical item id", () => {

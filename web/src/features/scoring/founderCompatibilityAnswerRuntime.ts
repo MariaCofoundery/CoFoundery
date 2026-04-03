@@ -10,6 +10,7 @@ import {
 } from "@/features/scoring/founderCompatibilityRegistry";
 import {
   FOUNDER_BASE_QUESTION_SCORE_META,
+  applyFounderBaseItemPolarity,
   getFounderBaseQuestionScoreMeta,
   scoreStoredBaseAnswerToFounderPercent,
 } from "@/features/scoring/founderBaseQuestionMeta";
@@ -138,6 +139,31 @@ const CANONICAL_LEGACY_QUESTION_ID_BY_ITEM = (() => {
 })();
 const CANONICAL_LEGACY_QUESTION_ID_SET = new Set(CANONICAL_LEGACY_QUESTION_ID_BY_ITEM.values());
 
+function founderPercentFromRegistryChoice(itemId: ItemId, rawValue: number) {
+  const item = getRegistryItem(itemId);
+  if (!item?.isActive) {
+    return null;
+  }
+  if (!item.choices.some((choice) => choice.value === rawValue)) {
+    return null;
+  }
+
+  return round(item.polarity === "left_pole_keyed" ? 100 - rawValue : rawValue);
+}
+
+function registryChoiceFromFounderPercent(itemId: ItemId, founderPercent: number) {
+  const item = getRegistryItem(itemId);
+  if (!item?.isActive) {
+    return null;
+  }
+
+  const displayValue = round(
+    item.polarity === "left_pole_keyed" ? 100 - founderPercent : founderPercent
+  );
+
+  return item.choices.some((choice) => choice.value === displayValue) ? displayValue : null;
+}
+
 function emptyCountRecord() {
   return ORDERED_DIMENSION_IDS.reduce((acc, dimensionId) => {
     acc[dimensionId] = 0;
@@ -166,6 +192,53 @@ export function getCanonicalLegacyFounderQuestionIdForItem(itemId: ItemId) {
 
 export function isCanonicalLegacyFounderQuestionId(questionId: string) {
   return CANONICAL_LEGACY_QUESTION_ID_SET.has(questionId);
+}
+
+export function mapRegistryFounderChoiceToFounderPercent(itemId: ItemId, rawValue: string | number) {
+  const numericValue =
+    typeof rawValue === "number" ? rawValue : Number.parseFloat(String(rawValue).trim());
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  return founderPercentFromRegistryChoice(itemId, numericValue);
+}
+
+export function mapFounderPercentToRegistryChoiceValue(
+  itemId: ItemId,
+  founderPercent: string | number
+) {
+  const numericValue =
+    typeof founderPercent === "number"
+      ? founderPercent
+      : Number.parseFloat(String(founderPercent).trim());
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  const displayValue = registryChoiceFromFounderPercent(itemId, numericValue);
+  return displayValue == null ? null : String(displayValue);
+}
+
+export function mapRegistryFounderChoiceToPersistedLegacyChoice(
+  itemId: ItemId,
+  rawValue: string
+) {
+  const legacyQuestionId = getCanonicalLegacyFounderQuestionIdForItem(itemId);
+  const legacyMeta = legacyQuestionId ? getFounderBaseQuestionScoreMeta(legacyQuestionId) : null;
+  const founderPercent = mapRegistryFounderChoiceToFounderPercent(itemId, rawValue);
+
+  if (!legacyQuestionId || !legacyMeta || founderPercent == null) {
+    return null;
+  }
+
+  const persistedValue = round(
+    legacyMeta.polarity === "high_is_right_pole"
+      ? founderPercent
+      : applyFounderBaseItemPolarity(founderPercent, legacyMeta.polarity)
+  );
+
+  return String(persistedValue);
 }
 
 export function mapLegacyFounderAnswerToV2Answer(
@@ -208,18 +281,15 @@ export function mapLegacyFounderAnswersToV2Answers(
         }
       }
 
-      const numericValue = Number.parseFloat(row.choice_value);
-      if (!Number.isFinite(numericValue)) {
-        return [];
-      }
-      if (!item.choices.some((choice) => choice.value === numericValue)) {
+      const founderPercent = mapRegistryFounderChoiceToFounderPercent(item.itemId, row.choice_value);
+      if (founderPercent == null) {
         return [];
       }
 
       return [
         {
           itemId: row.question_id,
-          value: round(numericValue),
+          value: founderPercent,
           source: "registry",
         } satisfies FounderCompatibilityAnswerV2,
       ];

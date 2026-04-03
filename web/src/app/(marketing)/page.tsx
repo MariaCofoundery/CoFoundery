@@ -451,7 +451,6 @@ function AudienceAvatarVisual({
         <div className="absolute right-5 top-4">
           <AudienceAvatar className="h-11 w-11 border-[color:var(--brand-primary)]/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(235,244,255,0.94))]" innerClassName="bg-[color:var(--brand-primary)]/22" />
         </div>
-        <div className="absolute left-[4.6rem] top-[44%] h-px w-14 bg-[color:var(--line)]" />
         <div className="absolute right-[3.8rem] top-[39%] h-px w-10 bg-[color:var(--brand-primary)]/35" />
       </div>
     </div>

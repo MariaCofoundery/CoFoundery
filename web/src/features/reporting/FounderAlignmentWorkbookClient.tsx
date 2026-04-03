@@ -12,6 +12,7 @@ import {
 } from "react";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import {
   prepareFounderAlignmentAdvisorInvite,
   saveFounderAlignmentWorkbook,
@@ -1401,6 +1402,7 @@ export function FounderAlignmentWorkbookClient({
               <WorkbookSummaryView
                 items={workbookSummaryItems}
                 onBack={returnToWorkbook}
+                invitationId={invitationId}
               />
             </section>
           </div>
@@ -2659,6 +2661,7 @@ function StepSection({
 function WorkbookSummaryView({
   items,
   onBack,
+  invitationId,
 }: {
   items: Array<{
     id: FounderAlignmentWorkbookStepId;
@@ -2670,6 +2673,7 @@ function WorkbookSummaryView({
     founderReaction: { status: FounderAlignmentWorkbookFounderReactionStatus; comment: string } | null;
   }>;
   onBack: () => void;
+  invitationId: string | null;
 }) {
   return (
     <>
@@ -2740,6 +2744,12 @@ function WorkbookSummaryView({
           </div>
         ))}
       </div>
+
+      <ProductFeedbackEntry
+        source="workbook"
+        invitationId={invitationId}
+        variant="workbook"
+      />
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <ReportActionButton variant="utility" onClick={onBack}>

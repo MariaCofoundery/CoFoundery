@@ -10,6 +10,9 @@ import {
   getLegacyFounderQuestionBridgeMeta,
   isActiveFounderCompatibilityItemId,
   isCanonicalLegacyFounderQuestionId,
+  mapFounderPercentToRegistryChoiceValue,
+  mapLegacyFounderAnswerToV2Answer,
+  mapRegistryFounderChoiceToPersistedLegacyChoice,
 } from "@/features/scoring/founderCompatibilityAnswerRuntime";
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { getFounderBaseQuestionScoreMeta } from "@/features/scoring/founderBaseQuestionMeta";
@@ -108,6 +111,14 @@ export function getFounderCompatibilityBasePersistenceQuestionId(itemId: string)
   return getCanonicalLegacyFounderQuestionIdForItem(itemId) ?? null;
 }
 
+export function getFounderCompatibilityBasePersistedChoiceValue(itemId: string, choiceValue: string) {
+  if (!isActiveFounderCompatibilityBaseItemId(itemId)) {
+    return null;
+  }
+
+  return mapRegistryFounderChoiceToPersistedLegacyChoice(itemId, choiceValue);
+}
+
 export function normalizeFounderCompatibilityBaseDraftAnswerMap(answerMap: AnswerMap): AnswerMap {
   const normalized: AnswerMap = {};
 
@@ -122,11 +133,17 @@ export function normalizeFounderCompatibilityBaseDraftAnswerMap(answerMap: Answe
       continue;
     }
 
-    if (!isValidFounderCompatibilityBaseChoiceValue(bridgeMeta.itemId, choiceValue)) {
+    const mapped = mapLegacyFounderAnswerToV2Answer(questionId, choiceValue);
+    if (!mapped) {
       continue;
     }
 
-    normalized[bridgeMeta.itemId] = choiceValue;
+    const displayChoiceValue = mapFounderPercentToRegistryChoiceValue(mapped.itemId, mapped.value);
+    if (!displayChoiceValue) {
+      continue;
+    }
+
+    normalized[bridgeMeta.itemId] = displayChoiceValue;
   }
 
   return normalized;

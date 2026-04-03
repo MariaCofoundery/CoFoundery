@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildFounderCompatibilityBaseQuestionnaire,
+  getFounderCompatibilityBasePersistedChoiceValue,
   getFounderCompatibilityBasePersistenceQuestionId,
   hasIncompatibleLegacyFounderBaseAnswers,
   isActiveFounderCompatibilityBaseItemId,
@@ -44,21 +45,28 @@ test("base questionnaire runtime validates active registry item ids and choice v
 
 test("registry-native questionnaire items map onto canonical persisted legacy question ids", () => {
   assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cl_core_1"), "q01_vision_l1");
-  assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cl_core_3"), "q25_vision_fc2");
-  assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cl_support_1"), "q31_vision_s2");
+  assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cl_core_3"), "q13_vision_s1");
+  assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cl_support_1"), "q37_vision_s3");
   assert.equal(getFounderCompatibilityBasePersistenceQuestionId("cs_support_2"), "q48_conflict_s4");
+});
+
+test("registry-native questionnaire choices are transformed into compatible legacy stored values", () => {
+  assert.equal(getFounderCompatibilityBasePersistedChoiceValue("cl_core_1", "75"), "25");
+  assert.equal(getFounderCompatibilityBasePersistedChoiceValue("cl_core_2", "0"), "100");
+  assert.equal(getFounderCompatibilityBasePersistedChoiceValue("cl_core_3", "67"), "33");
+  assert.equal(getFounderCompatibilityBasePersistedChoiceValue("dl_core_4", "67"), "67");
 });
 
 test("saved legacy base answers hydrate back into the 36-item questionnaire answer map", () => {
   const normalized = normalizeFounderCompatibilityBaseDraftAnswerMap({
-    q01_vision_l1: "75",
-    q25_vision_fc2: "50",
-    q31_vision_s2: "67",
+    q01_vision_l1: "25",
+    q13_vision_s1: "33",
+    q37_vision_s3: "33",
   });
 
   assert.deepEqual(normalized, {
     cl_core_1: "75",
-    cl_core_3: "50",
+    cl_core_3: "67",
     cl_support_1: "67",
   });
 });
@@ -66,16 +74,16 @@ test("saved legacy base answers hydrate back into the 36-item questionnaire answ
 test("only non-canonical old 48-question drafts are treated as incompatible", () => {
   assert.equal(
     hasIncompatibleLegacyFounderBaseAnswers({
-      q01_vision_l1: "75",
-      q25_vision_fc2: "50",
-      q31_vision_s2: "67",
+      q01_vision_l1: "25",
+      q13_vision_s1: "33",
+      q37_vision_s3: "33",
     }),
     false
   );
 
   assert.equal(
     hasIncompatibleLegacyFounderBaseAnswers({
-      q43_vision_s4: "67",
+      q25_vision_fc2: "50",
     }),
     true
   );

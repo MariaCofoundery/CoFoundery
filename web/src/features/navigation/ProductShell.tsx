@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
+import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 
 type Props = {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ type NavigationItem = {
 type NavigationOverride = {
   matchingHref?: string;
   workbookHref?: string;
+  feedbackInvitationId?: string | null;
 } | null;
 
 const ProductNavigationOverrideContext = createContext<
@@ -71,6 +73,7 @@ export function ProductShell({
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const resolvedMatchingHref = navigationOverride?.matchingHref ?? matchingHref;
   const resolvedWorkbookHref = navigationOverride?.workbookHref ?? workbookHref;
+  const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const navigationItems: NavigationItem[] = [
     {
       href: "/dashboard",
@@ -134,6 +137,12 @@ export function ProductShell({
                     {item.label}
                   </Link>
                 ))}
+                <ProductFeedbackEntry
+                  source="nav"
+                  invitationId={resolvedFeedbackInvitationId}
+                  variant="nav"
+                  triggerClassName={navLinkClassName(false)}
+                />
               </nav>
             </div>
 
@@ -158,9 +167,11 @@ export function ProductShell({
 export function ProductNavigationOverride({
   matchingHref,
   workbookHref,
+  feedbackInvitationId,
 }: {
   matchingHref?: string | null;
   workbookHref?: string | null;
+  feedbackInvitationId?: string | null;
 }) {
   const setOverride = useContext(ProductNavigationOverrideContext);
 
@@ -170,12 +181,13 @@ export function ProductNavigationOverride({
     setOverride({
       matchingHref: matchingHref ?? undefined,
       workbookHref: workbookHref ?? undefined,
+      feedbackInvitationId: feedbackInvitationId ?? undefined,
     });
 
     return () => {
       setOverride(null);
     };
-  }, [matchingHref, setOverride, workbookHref]);
+  }, [feedbackInvitationId, matchingHref, setOverride, workbookHref]);
 
   return null;
 }
