@@ -140,144 +140,157 @@ function ProductFeedbackDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/35 px-4 py-6 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[120] bg-slate-950/35 backdrop-blur-[2px]"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      onClick={onClose}
     >
+      <button
+        type="button"
+        aria-label={t("Feedback schliessen")}
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
       <div
-        className="max-h-[calc(100vh-3rem)] w-full max-w-3xl overflow-y-auto rounded-[32px] border border-slate-200/90 bg-white/98 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.22)] sm:p-8"
-        onClick={(event) => event.stopPropagation()}
+        className="relative flex min-h-full w-full items-start justify-center overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-6"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Feedback")}</p>
-            <h2 id={titleId} className="mt-3 text-2xl font-semibold text-slate-950">
-              {t("Kurzer Produkt-Check")}
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">
-              {t(
-                "Ich freue mich wirklich ueber dein Feedback — vor allem, was dir geholfen hat, was unklar war und was noch fehlt."
-              )}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
-            aria-label={t("Feedback schliessen")}
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-
-        {submitted ? (
-          <div className="mt-8 rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6">
-            <p className="text-lg font-semibold text-emerald-900">
-              {t("Danke — das hilft mir wirklich weiter.")}
-            </p>
-            <div className="mt-5">
-              <ReportActionButton onClick={onClose} variant="utility">
-                {t("Schliessen")}
-              </ReportActionButton>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="mt-8 grid gap-5">
-              <FeedbackTextarea
-                id="q1"
-                label={t("1. Was war fuer dich der wertvollste Moment im Tool?")}
-                value={q1Value}
-                onChange={setQ1Value}
-                required
-              />
-              <FeedbackTextarea
-                id="q2"
-                label={t("2. Wo hat es sich nicht klar oder unnoetig kompliziert angefuehlt?")}
-                value={q2Value}
-                onChange={setQ2Value}
-                required
-              />
-              <FeedbackTextarea
-                id="q3"
-                label={t(
-                  "3. Was muesste sich aendern, damit du sagen wuerdest: Das hat mir wirklich geholfen?"
-                )}
-                value={q3Value}
-                onChange={setQ3Value}
-                required
-              />
-            </div>
-
-            <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/75 p-5">
-              <p className="text-sm font-semibold text-slate-950">
-                {t("4. Wobei wuerdest du dir noch mehr Unterstuetzung wuenschen?")}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS.map((option) => {
-                  const isActive = q4Choice === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setQ4Choice(option.value)}
-                      className={`rounded-full border px-3 py-2 text-sm transition ${
-                        isActive
-                          ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/12 text-slate-950"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      {t(option.label)}
-                    </button>
-                  );
-                })}
+        <div
+          className="flex w-full max-w-3xl flex-col overflow-hidden rounded-[32px] border border-slate-200/90 bg-white/98 shadow-[0_24px_80px_rgba(15,23,42,0.22)] max-h-[90dvh] sm:max-h-[88dvh]"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="shrink-0 border-b border-slate-200/80 px-6 py-6 sm:px-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Feedback")}</p>
+                <h2 id={titleId} className="mt-3 text-2xl font-semibold text-slate-950">
+                  {t("Kurzer Produkt-Check")}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">
+                  {t(
+                    "Ich freue mich wirklich ueber dein Feedback — vor allem, was dir geholfen hat, was unklar war und was noch fehlt."
+                  )}
+                </p>
               </div>
-              {q4Choice === "anderes" ? (
-                <div className="mt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                aria-label={t("Feedback schliessen")}
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 overscroll-contain sm:px-8 sm:py-8">
+            {submitted ? (
+              <div className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6">
+                <p className="text-lg font-semibold text-emerald-900">
+                  {t("Danke — das hilft mir wirklich weiter.")}
+                </p>
+                <div className="mt-5">
+                  <ReportActionButton onClick={onClose} variant="utility">
+                    {t("Schliessen")}
+                  </ReportActionButton>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="grid gap-5">
                   <FeedbackTextarea
-                    id="q4-other"
-                    label={t("Was genau fehlt dir noch?")}
-                    value={q4OtherText}
-                    onChange={setQ4OtherText}
-                    rows={4}
+                    id="q1"
+                    label={t("1. Was war fuer dich der wertvollste Moment im Tool?")}
+                    value={q1Value}
+                    onChange={setQ1Value}
+                    required
+                  />
+                  <FeedbackTextarea
+                    id="q2"
+                    label={t("2. Wo hat es sich nicht klar oder unnoetig kompliziert angefuehlt?")}
+                    value={q2Value}
+                    onChange={setQ2Value}
+                    required
+                  />
+                  <FeedbackTextarea
+                    id="q3"
+                    label={t(
+                      "3. Was muesste sich aendern, damit du sagen wuerdest: Das hat mir wirklich geholfen?"
+                    )}
+                    value={q3Value}
+                    onChange={setQ3Value}
+                    required
                   />
                 </div>
-              ) : null}
-            </div>
 
-            <div className="mt-8">
-              <FeedbackTextarea
-                id="q5"
-                label={t("5. Gibt es noch etwas, das du mir sagen moechtest?")}
-                value={q5Text}
-                onChange={setQ5Text}
-                rows={5}
-              />
-            </div>
+                <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/75 p-5">
+                  <p className="text-sm font-semibold text-slate-950">
+                    {t("4. Wobei wuerdest du dir noch mehr Unterstuetzung wuenschen?")}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS.map((option) => {
+                      const isActive = q4Choice === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setQ4Choice(option.value)}
+                          className={`rounded-full border px-3 py-2 text-sm transition ${
+                            isActive
+                              ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/12 text-slate-950"
+                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                        >
+                          {t(option.label)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {q4Choice === "anderes" ? (
+                    <div className="mt-4">
+                      <FeedbackTextarea
+                        id="q4-other"
+                        label={t("Was genau fehlt dir noch?")}
+                        value={q4OtherText}
+                        onChange={setQ4OtherText}
+                        rows={4}
+                      />
+                    </div>
+                  ) : null}
+                </div>
 
-            {error ? (
-              <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700">
-                {error}
-              </div>
-            ) : null}
+                <div className="mt-8">
+                  <FeedbackTextarea
+                    id="q5"
+                    label={t("5. Gibt es noch etwas, das du mir sagen moechtest?")}
+                    value={q5Text}
+                    onChange={setQ5Text}
+                    rows={5}
+                  />
+                </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs leading-6 text-slate-500">
-                {t("Die ersten drei Fragen sind Pflicht. Alles andere ist optional.")}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <ReportActionButton onClick={onClose} variant="utility">
-                  {t("Abbrechen")}
-                </ReportActionButton>
-                <ReportActionButton onClick={handleSubmit} disabled={isPending}>
-                  {isPending ? t("Speichere...") : t("Feedback senden")}
-                </ReportActionButton>
-              </div>
-            </div>
-          </>
-        )}
+                {error ? (
+                  <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700">
+                    {error}
+                  </div>
+                ) : null}
+
+                <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs leading-6 text-slate-500">
+                    {t("Die ersten drei Fragen sind Pflicht. Alles andere ist optional.")}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <ReportActionButton onClick={onClose} variant="utility">
+                      {t("Abbrechen")}
+                    </ReportActionButton>
+                    <ReportActionButton onClick={handleSubmit} disabled={isPending}>
+                      {isPending ? t("Speichere...") : t("Feedback senden")}
+                    </ReportActionButton>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

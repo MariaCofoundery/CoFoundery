@@ -5,22 +5,6 @@ import { useRouter } from "next/navigation";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
 type TeamContext = "pre_founder" | "existing_team";
 
-function teamContextMeta(teamContext: TeamContext | null) {
-  if (teamContext === "existing_team") {
-    return {
-      badge: "Bestehendes Team",
-      title: "Ihr startet einen Alignment-Flow für ein bestehendes Gründerteam.",
-      text: "Report und Workbook fokussieren dann stärker auf Rollen, operative Spannungen und konkrete Entscheidungsregeln im gemeinsamen Alltag.",
-    };
-  }
-
-  return {
-    badge: "Mögliche Gründungspartnerschaft",
-    title: "Ihr startet einen Matching- und Kennenlern-Flow.",
-    text: "Report und Workbook fokussieren dann stärker auf Passung, Erwartungen und frühe Vereinbarungen vor einer engeren Zusammenarbeit.",
-  };
-}
-
 function toAbsoluteUrl(path: string) {
   if (typeof window === "undefined") return path;
   return path.startsWith("/") ? `${window.location.origin}${path}` : path;
@@ -40,7 +24,6 @@ export function CoFounderInviteForm() {
   const selectedModulesLabel = useMemo(() => {
     return includeValues ? "Basis, Werte" : "Basis";
   }, [includeValues]);
-  const selectedContextMeta = teamContextMeta(teamContext);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -134,7 +117,6 @@ export function CoFounderInviteForm() {
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.
-            Dieser Kontext steuert später, wie Report und Workbook sprachlich gerahmt werden.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
@@ -150,10 +132,7 @@ export function CoFounderInviteForm() {
               }`}
               aria-pressed={teamContext === "pre_founder"}
             >
-              <p className="text-sm font-semibold text-slate-900">Wir überlegen, zusammenzuarbeiten</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Für Matching-Gespräche vor einer möglichen Gründungspartnerschaft.
-              </p>
+              <p className="text-sm font-semibold text-slate-900">Wir überlegen zusammenzuarbeiten</p>
             </button>
             <button
               type="button"
@@ -169,21 +148,11 @@ export function CoFounderInviteForm() {
               aria-pressed={teamContext === "existing_team"}
             >
               <p className="text-sm font-semibold text-slate-900">Wir arbeiten bereits zusammen</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Für Teams, die Rollen, Spannungen und Zusammenarbeit weiter klären wollen.
-              </p>
             </button>
           </div>
-          <div className="mt-4 rounded-2xl border border-white/80 bg-white/80 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              Was dieser Modus später ändert
-            </p>
-            <div className="mt-3 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-slate-700">
-              {selectedContextMeta.badge}
-            </div>
-            <p className="mt-3 text-sm font-medium text-slate-900">{selectedContextMeta.title}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{selectedContextMeta.text}</p>
-          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            Dieser Kontext beeinflusst später eure Auswertung.
+          </p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">

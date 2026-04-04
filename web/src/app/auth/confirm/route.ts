@@ -5,6 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   return completeAuthRedirectSession(request, supabase, {
-    errorCode: "magic_link_failed",
+    errorCode: "auth_callback_failed",
   });
 }
