@@ -1052,9 +1052,10 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   const completeQuestionnaireHref = `/join?invitationId=${encodeURIComponent(invite.id)}`;
   const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
   const reportHref = `/report/${invite.id}`;
+  const canOpenCompletionStatus = invite.isReadyForMatching || inviteeHasAllRequired;
   const actionHref = invite.isReportReady
     ? reportHref
-    : inviteeHasAllRequired
+    : canOpenCompletionStatus
       ? completionStatusHref
       : completeQuestionnaireHref;
 
@@ -1076,7 +1077,7 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
             : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
         }
       >
-        {invite.isReportReady ? "Öffnen" : inviteeHasAllRequired ? "Status öffnen" : "Jetzt ausfüllen"}
+        {invite.isReportReady ? "Öffnen" : canOpenCompletionStatus ? "Status öffnen" : "Jetzt ausfüllen"}
       </a>
     </div>
   );

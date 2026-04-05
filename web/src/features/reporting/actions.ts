@@ -1715,14 +1715,14 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
   }
 
   const privileged = createPrivilegedClient();
+  const dataClient = (privileged ?? supabase) as SupabaseDbClient;
   if (!privileged) {
-    console.error("ensureReportRunForInvitation missing service role configuration", {
+    console.warn("ensureReportRunForInvitation falling back to authenticated client", {
       invitationId: normalizedInvitationId,
     });
-    return { ok: false, reason: "missing_service_role" };
   }
 
-  return ensureReportRunForInvitationWithPrivilegedClient(privileged, normalizedInvitationId, {
+  return ensureReportRunForInvitationWithPrivilegedClient(dataClient, normalizedInvitationId, {
     requesterUserId: user.id,
     skipMembershipCheck: false,
     sourceTag: "ensureReportRunForInvitation",
