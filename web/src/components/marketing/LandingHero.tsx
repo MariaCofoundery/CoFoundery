@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { BASE_QUESTION_COUNT_STRUCTURED_LABEL_DE } from "@/data/marketing";
 
 const supportPoints = [
-  "48 strukturierte Fragen",
+  BASE_QUESTION_COUNT_STRUCTURED_LABEL_DE,
   "Klarer Matching-Report",
   "Gemeinsames Workbook",
 ];

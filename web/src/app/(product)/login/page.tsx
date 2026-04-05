@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
+import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,7 +29,7 @@ export default async function LoginPage({
   const errorMessage = authErrorMessage(params.error);
 
   if (user) {
-    redirect(nextPath);
+    redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
   }
 
   return (

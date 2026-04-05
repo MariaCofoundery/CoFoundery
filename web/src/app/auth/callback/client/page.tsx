@@ -15,6 +15,14 @@ function buildLoginErrorHref(nextPath: string) {
   return `/login?${params.toString()}`;
 }
 
+function buildAuthLandingHref(nextPath: string) {
+  const params = new URLSearchParams({
+    next: normalizeNextPath(nextPath),
+  });
+
+  return `/auth/landing?${params.toString()}`;
+}
+
 export default function AuthCallbackClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,8 +71,11 @@ export default function AuthCallbackClientPage() {
             return;
           }
         } else {
-          fail();
-          return;
+          const existing = await supabase.auth.getUser();
+          if (existing.error || !existing.data.user) {
+            fail();
+            return;
+          }
         }
 
         const {
@@ -78,7 +89,7 @@ export default function AuthCallbackClientPage() {
         }
 
         if (!cancelled) {
-          router.replace(nextPath);
+          router.replace(buildAuthLandingHref(nextPath));
           router.refresh();
         }
       } catch {

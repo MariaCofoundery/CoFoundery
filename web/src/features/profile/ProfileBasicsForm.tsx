@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { upsertProfileBasicsAction } from "@/features/profile/actions";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
@@ -26,11 +26,12 @@ type Props = {
   onSuccessRedirectTo?: string;
   variant?: "default" | "accent";
   fallbackAvatarUrl?: string | null;
+  welcomeVisual?: ReactNode;
 };
 
 const SKILLS = ["Tech", "Sales", "Marketing", "Product", "Operations", "Finance"] as const;
 const INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
-const ONBOARDING_STEP_ORDER = ["name", "role", "focus", "intention"] as const;
+const ONBOARDING_STEP_ORDER = ["welcome", "name", "role", "focus", "intention", "avatar", "next"] as const;
 
 type OnboardingStepId = (typeof ONBOARDING_STEP_ORDER)[number];
 
@@ -43,6 +44,10 @@ function normalizePath(path: string | undefined, fallback: string) {
 }
 
 function getNextStepDisabled(step: OnboardingStepId, values: Record<OnboardingStepId, string>) {
+  if (step === "welcome" || step === "avatar" || step === "next") {
+    return false;
+  }
+
   if (step === "role") {
     return values.role.length === 0;
   }
@@ -57,6 +62,7 @@ export function ProfileBasicsForm({
   onSuccessRedirectTo,
   variant = "default",
   fallbackAvatarUrl = null,
+  welcomeVisual,
 }: Props) {
   const successRedirect = normalizePath(onSuccessRedirectTo, "/dashboard");
   const errorRedirect = successRedirect;
@@ -76,10 +82,13 @@ export function ProfileBasicsForm({
   const previewName = displayName.trim() || "Founder";
 
   const onboardingValues = {
+    welcome: "ready",
     name: displayName,
     role: primaryRole,
     focus: focusSkill,
     intention,
+    avatar: selectedAvatarId,
+    next: "ready",
   } satisfies Record<OnboardingStepId, string>;
 
   const activeStep = ONBOARDING_STEP_ORDER[activeStepIndex];
@@ -91,25 +100,40 @@ export function ProfileBasicsForm({
 
   const onboardingStepMeta = useMemo(
     () => ({
+      welcome: {
+        eyebrow: "Schritt 1 von 7",
+        title: "Willkommen bei CoFoundery Align",
+        hint: "Hier geht es nicht nur darum, wen du findest. Sondern wie gut ihr wirklich zusammenarbeitet.",
+      },
       name: {
-        eyebrow: "Schritt 1 von 4",
+        eyebrow: "Schritt 2 von 7",
         title: "Wie sollen wir dich nennen?",
-        hint: "Dieser Name erscheint in Reports, Einladungen und im Workbook.",
+        hint: "So erscheinst du spaeter in deinem Profil und im Matching.",
       },
       role: {
-        eyebrow: "Schritt 2 von 4",
-        title: "In welcher Rolle nutzt du CoFoundery gerade?",
-        hint: "Du legst hier deine Kernrolle fest. Weitere Profilfelder kommen spaeter dazu.",
+        eyebrow: "Schritt 3 von 7",
+        title: "Was bringst du aktuell vor allem mit?",
+        hint: "Waehle die Rolle, mit der du gerade am ehesten unterwegs bist.",
       },
       focus: {
-        eyebrow: "Schritt 3 von 4",
-        title: "Was ist dein staerkster Fokus?",
-        hint: "Waehle den Bereich, in dem du im Team am meisten Verantwortung traegst.",
+        eyebrow: "Schritt 4 von 7",
+        title: "Worauf liegt dein Schwerpunkt?",
+        hint: "Das hilft uns, dein Profil spaeter besser einzuordnen.",
       },
       intention: {
-        eyebrow: "Schritt 4 von 4",
-        title: "Mit welcher Intention startest du hier?",
-        hint: "Danach geht es direkt ins Produkt. Den Avatar kannst du hier optional schon setzen.",
+        eyebrow: "Schritt 5 von 7",
+        title: "Woran arbeitest du gerade?",
+        hint: "Deine Intention hilft uns, den richtigen Kontext fuer Matching und Zusammenarbeit zu setzen.",
+      },
+      avatar: {
+        eyebrow: "Schritt 6 von 7",
+        title: "Willst du noch ein Bild hinzufuegen?",
+        hint: "Optional. Du kannst das auch spaeter machen.",
+      },
+      next: {
+        eyebrow: "Schritt 7 von 7",
+        title: "So geht es jetzt weiter",
+        hint: "Du startest gleich nicht in ein Formular, sondern in ein Produkt, das Zusammenarbeit frueh klarer macht.",
       },
     }),
     []
@@ -180,29 +204,74 @@ export function ProfileBasicsForm({
     );
   }
 
+  function renderChoiceCard(params: {
+    id: string;
+    title: string;
+    description: string;
+    selected: boolean;
+    onSelect: () => void;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={params.onSelect}
+        className={`rounded-2xl border px-4 py-4 text-left transition ${
+          params.selected
+            ? "border-cyan-300 bg-cyan-50/90 shadow-[0_14px_32px_rgba(14,165,233,0.12)]"
+            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+        }`}
+      >
+        <p className="text-sm font-semibold text-slate-950">{params.title}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{params.description}</p>
+      </button>
+    );
+  }
+
   function renderOnboardingStep() {
     const meta = onboardingStepMeta[activeStep];
+    const isWelcomeStep = activeStep === "welcome";
+    const isFinalStep = activeStep === "next";
+    const showProgress = true;
+    const nextButtonLabel =
+      activeStep === "welcome"
+        ? "Profil starten"
+        : activeStep === "avatar"
+          ? "Weiter"
+          : "Weiter";
 
     return (
       <>
-        <div className="mb-4 border-b border-cyan-200 pb-4">
+        {isWelcomeStep && welcomeVisual ? <div className="pb-5">{welcomeVisual}</div> : null}
+
+        <div className={`pb-4 ${showProgress ? "border-b border-cyan-200" : ""}`}>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{meta.eyebrow}</p>
-          <h2 className="mt-2 text-xl font-semibold text-slate-950">{meta.title}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{meta.hint}</p>
-          <div className="mt-4 flex gap-2">
-            {ONBOARDING_STEP_ORDER.map((stepId, index) => (
-              <span
-                key={stepId}
-                className={`h-2 flex-1 rounded-full ${
-                  index <= activeStepIndex ? "bg-cyan-300" : "bg-slate-200"
-                }`}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
+          <h2 className={`mt-2 font-semibold text-slate-950 ${isWelcomeStep ? "text-3xl" : "text-2xl"}`}>
+            {meta.title}
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+            {meta.hint}
+          </p>
+          {isWelcomeStep ? (
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
+              Du legst jetzt nur dein Kernprofil an. Das dauert kurz und bringt dich danach direkt in das Produkt.
+            </p>
+          ) : null}
+          {showProgress ? (
+            <div className="mt-5 flex gap-2">
+              {ONBOARDING_STEP_ORDER.map((stepId, index) => (
+                <span
+                  key={stepId}
+                  className={`h-2 flex-1 rounded-full ${
+                    index <= activeStepIndex ? "bg-cyan-300" : "bg-slate-200"
+                  }`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
 
-        <div className="grid gap-5">
+        <div className="grid gap-5 pt-4">
           {activeStep === "name" ? (
             <label className="grid gap-2 text-sm text-slate-700">
               Name
@@ -223,75 +292,96 @@ export function ProfileBasicsForm({
           ) : null}
 
           {activeStep === "role" ? (
-            <label className="grid gap-2 text-sm text-slate-700">
-              Rolle
-              <select
-                value={primaryRole}
-                onChange={(event) => setPrimaryRole(event.target.value as ProfileRole)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    handleOnboardingEnter();
-                  }
-                }}
-                className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
-              >
-                {PROFILE_ROLE_OPTIONS.map((role) => (
-                  <option key={role} value={role}>
-                    {profileRoleLabel(role)}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="grid gap-3">
+              {PROFILE_ROLE_OPTIONS.map((role) =>
+                renderChoiceCard({
+                  id: role,
+                  title: profileRoleLabel(role),
+                  description:
+                    role === "advisor"
+                      ? "Du begleitest Founder-Teams mit einer beratenden Perspektive."
+                      : "Du nutzt CoFoundery fuer dein eigenes Matching, Profil und Alignment.",
+                  selected: primaryRole === role,
+                  onSelect: () => setPrimaryRole(role),
+                })
+              )}
+            </div>
           ) : null}
 
           {activeStep === "focus" ? (
-            <label className="grid gap-2 text-sm text-slate-700">
-              Fokus
-              <select
-                value={focusSkill}
-                onChange={(event) => setFocusSkill(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    handleOnboardingEnter();
-                  }
-                }}
-                className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
-              >
-                <option value="" disabled>
-                  Bitte auswaehlen
-                </option>
-                {SKILLS.map((skill) => (
-                  <option key={skill} value={skill}>
-                    {skill}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {SKILLS.map((skill) =>
+                renderChoiceCard({
+                  id: skill,
+                  title: skill,
+                  description: "Das ist der Bereich, in dem dein Profil spaeter zuerst gelesen wird.",
+                  selected: focusSkill === skill,
+                  onSelect: () => setFocusSkill(skill),
+                })
+              )}
+            </div>
           ) : null}
 
           {activeStep === "intention" ? (
+            <div className="grid gap-3">
+              {INTENTIONS.map((entry) =>
+                renderChoiceCard({
+                  id: entry,
+                  title: entry,
+                  description:
+                    entry === "Suche"
+                      ? "Du willst frueh sehen, mit wem Zusammenarbeit wirklich tragen koennte."
+                      : entry === "Partner-Match"
+                        ? "Du willst Passung und Unterschiede in einer konkreten Co-Founder-Konstellation klaeren."
+                        : "Du willst dein eigenes Profil und deine Arbeitsweise erst einmal sauber einordnen.",
+                  selected: intention === entry,
+                  onSelect: () => setIntention(entry),
+                })
+              )}
+            </div>
+          ) : null}
+
+          {activeStep === "avatar" ? (
             <>
-              <label className="grid gap-2 text-sm text-slate-700">
-                Intention
-                <select
-                  value={intention}
-                  onChange={(event) => setIntention(event.target.value)}
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
-                >
-                  <option value="" disabled>
-                    Bitte auswaehlen
-                  </option>
-                  {INTENTIONS.map((entry) => (
-                    <option key={entry} value={entry}>
-                      {entry}
-                    </option>
-                  ))}
-                </select>
-              </label>
               {renderAvatarCard()}
+              <p className="text-xs leading-6 text-slate-500">
+                Wenn du gerade ueberspringen willst, ist das voellig okay.
+              </p>
             </>
+          ) : null}
+
+          {activeStep === "next" ? (
+            <div className="grid gap-5">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">1</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">Profil aufbauen</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Dein Kernprofil gibt deinem Einstieg sofort Richtung.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">2</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">Insights bekommen</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Deine Antworten machen Unterschiede und Muster greifbar.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">3</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">Matching und Zusammenarbeit klaeren</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Daraus werden klare Gespraeche, Reports und spaeter konkrete Arbeitsregeln.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-cyan-200 bg-cyan-50/70 px-5 py-4">
+                <p className="text-sm leading-7 text-slate-800">
+                  CoFoundery Align ist kein Persoenlichkeitstest. Es hilft dir, Zusammenarbeit frueh klarer und belastbarer zu machen.
+                </p>
+              </div>
+            </div>
           ) : null}
         </div>
 
@@ -299,26 +389,34 @@ export function ProfileBasicsForm({
           <button
             type="button"
             onClick={() => setActiveStepIndex((current) => Math.max(0, current - 1))}
-            disabled={!canGoBack}
+            disabled={!canGoBack || isWelcomeStep}
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
           >
             Zurueck
           </button>
-          {activeStepIndex < ONBOARDING_STEP_ORDER.length - 1 ? (
-            <button
-              type="button"
-              onClick={() => setActiveStepIndex((current) => Math.min(ONBOARDING_STEP_ORDER.length - 1, current + 1))}
-              disabled={!canGoNext}
-              className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              Weiter
-            </button>
-          ) : (
+          {isFinalStep ? (
             <button
               type="submit"
               className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400"
             >
               {submitLabel}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() =>
+                setActiveStepIndex((current) => Math.min(ONBOARDING_STEP_ORDER.length - 1, current + 1))
+              }
+              disabled={!canGoNext}
+              className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {activeStep === "welcome"
+                ? "Profil starten"
+                : activeStep === "avatar"
+                  ? selectedAvatarId
+                    ? "Weiter"
+                    : "Ohne Bild weiter"
+                  : nextButtonLabel}
             </button>
           )}
         </div>

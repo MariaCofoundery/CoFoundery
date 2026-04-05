@@ -1,3 +1,7 @@
+export const BASE_QUESTION_COUNT = 36;
+export const BASE_QUESTION_COUNT_LABEL_DE = `${BASE_QUESTION_COUNT} Fragen`;
+export const BASE_QUESTION_COUNT_STRUCTURED_LABEL_DE = `${BASE_QUESTION_COUNT} strukturierte Fragen`;
+
 export const nav = [
   { label: "Haltung", href: "/informierte-entscheidungen" },
   { label: "Für wen", href: "/#fuer-wen" },
@@ -30,7 +34,7 @@ export const steps = [
   {
     step: "02",
     title: "Basisprofil ausfüllen",
-    text: "Beide bearbeiten den Basisfragebogen mit 48 Fragen. Optional kommt das Werte-Add-on dazu.",
+    text: `Beide bearbeiten den Basisfragebogen mit ${BASE_QUESTION_COUNT_LABEL_DE}. Optional kommt das Werte-Add-on dazu.`,
   },
   {
     step: "03",

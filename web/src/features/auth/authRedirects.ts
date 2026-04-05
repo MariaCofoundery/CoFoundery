@@ -9,6 +9,10 @@ type AuthSessionLikeClient = {
       token_hash: string;
       type: EmailOtpType;
     }) => Promise<{ error: { message?: string | null } | null }>;
+    getUser: () => Promise<{
+      data: { user: { id: string } | null };
+      error: { message?: string | null } | null;
+    }>;
   };
 };
 
@@ -127,6 +131,7 @@ export async function completeAuthRedirectSession(
   supabase: AuthSessionLikeClient,
   options?: {
     errorCode?: AuthErrorCode;
+    onSuccessRedirect?: (nextPath: string) => Promise<NextResponse> | NextResponse;
   }
 ) {
   const requestUrl = new URL(request.url);
@@ -156,11 +161,18 @@ export async function completeAuthRedirectSession(
       requestUrl.searchParams.get("error") ??
       requestUrl.searchParams.get("error_code");
   } else {
-    return buildAuthCallbackClientBridgeResponse(request, nextPath, errorCode);
+    const existingSession = await supabase.auth.getUser();
+    if (existingSession.error || !existingSession.data.user) {
+      return buildAuthCallbackClientBridgeResponse(request, nextPath, errorCode);
+    }
   }
 
   if (error) {
     return redirectToLoginError(request, errorCode, nextPath);
+  }
+
+  if (options?.onSuccessRedirect) {
+    return options.onSuccessRedirect(nextPath);
   }
 
   return redirectToNextPath(request, nextPath);

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { BASE_QUESTION_COUNT_LABEL_DE } from "@/data/marketing";
 
 const panels = [
   {
@@ -32,7 +33,7 @@ function QuestionScale() {
           Profil
         </p>
         <span className="rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1 text-[10px] tracking-[0.12em] text-slate-500">
-          48 Fragen
+          {BASE_QUESTION_COUNT_LABEL_DE}
         </span>
       </div>
 

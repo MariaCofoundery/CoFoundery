@@ -73,19 +73,20 @@ export default function DatenschutzPage() {
 
           <BulletSection number="2" title="Überblick über die Datenverarbeitung">
             <p>
-              Wir verarbeiten personenbezogene Daten, um dir die Nutzung unseres Tools zur Analyse
-              und Abstimmung von Founder-Teams zu ermöglichen.
+              Wir verarbeiten personenbezogene Daten, damit du CoFoundery Align nutzen kannst:
+              für Login, Profil, Fragebögen, Auswertungen, Matching, gemeinsames Workbook und
+              technische Produktanalyse.
             </p>
             <List
               items={[
-                "Account- und Login-Daten (E-Mail-Adresse)",
-                "Profildaten (z. B. Name, Rollen, Fokus)",
+                "Account- und Login-Daten, vor allem deine E-Mail-Adresse",
+                "Profildaten, z. B. Name, Rolle, Fokus, Intention und optional Avatar",
                 "Antworten auf strukturierte Fragebögen",
-                "daraus abgeleitete Auswertungen (z. B. Matching-Reports)",
-                "Inhalte aus der Zusammenarbeit (z. B. Workbook)",
-                "Einladungsdaten (z. B. E-Mail eines Co-Founders)",
-                "Daten im Zusammenhang mit Advisor-/Moderationszugängen",
-                "technische Nutzungsdaten",
+                "daraus abgeleitete Scores, Dimensionen und Reports",
+                "gemeinsame Daten mit einem Co-Founder, z. B. Matching-Report und Workbook",
+                "Einladungsdaten, z. B. die E-Mail-Adresse einer eingeladenen Person",
+                "Daten zu freigegebenen Advisor- oder Moderationszugängen",
+                "technische Nutzungs- und Analyseereignisse",
               ]}
             />
           </BulletSection>
@@ -94,13 +95,13 @@ export default function DatenschutzPage() {
             <p>Die Verarbeitung erfolgt zu folgenden Zwecken:</p>
             <List
               items={[
-                "Bereitstellung und Betrieb des Tools",
-                "Erstellung individueller und gemeinsamer Auswertungen",
-                "Matching zwischen Founder-Teams",
-                "Unterstützung der Zusammenarbeit (Workbook)",
-                "Einbindung von Advisoren oder Moderatoren",
-                "Verbesserung des Produkts und der Nutzererfahrung",
-                "Gewährleistung der technischen Sicherheit",
+                "Bereitstellung und sicherer Betrieb des Produkts",
+                "Erstellung von Profilen, Scores, individuellen Reports und Matching-Reports",
+                "Vergleich zweier Founder-Profile im Matching",
+                "Unterstützung der Zusammenarbeit im Workbook",
+                "Einbindung von Advisors oder Moderatoren nach Freigabe",
+                "technische Analyse, Fehlerbehebung und Produktverbesserung",
+                "Missbrauchsverhinderung und Systemsicherheit",
               ]}
             />
           </BulletSection>
@@ -123,8 +124,12 @@ export default function DatenschutzPage() {
 
           <BulletSection number="5" title="Account und Login">
             <p>
-              Für den Login verwenden wir ein sogenanntes Magic-Link-Verfahren. Dabei wird deine
-              E-Mail-Adresse genutzt, um dir einen sicheren Login-Link zu senden.
+              Für den Login verwenden wir ein Magic-Link-Verfahren. Dabei nutzen wir deine
+              E-Mail-Adresse, um dir einen sicheren Anmeldelink zu senden.
+            </p>
+            <p>
+              Nach erfolgreicher Anmeldung verarbeiten wir außerdem technisch notwendige Session-
+              Daten, damit du eingeloggt bleibst und geschützte Produktbereiche nutzen kannst.
             </p>
             <p>Die Authentifizierung erfolgt über:</p>
             <List items={["Supabase (Supabase Inc.)"]} />
@@ -132,43 +137,48 @@ export default function DatenschutzPage() {
 
           <BulletSection number="6" title="Verarbeitung von Profildaten und Fragebögen">
             <p>
-              Im Rahmen der Nutzung des Tools verarbeitest du selbst eingegebene Daten,
-              insbesondere:
+              Im Rahmen der Nutzung verarbeiten wir die Daten, die du im Produkt selbst angibst.
+              Dazu gehören insbesondere:
             </p>
             <List
               items={[
-                "Profildaten",
-                "Antworten auf strukturierte Fragebögen",
+                "dein Kernprofil mit Name, Rolle, Fokus und Intention",
+                "optional ein Avatar",
+                "optional weitere Profilangaben wie Kurzbeschreibung, Erfahrungen, Fähigkeiten oder ein LinkedIn-Profil, soweit solche Funktionen von dir genutzt werden",
+                "deine Antworten auf strukturierte Fragebögen",
               ]}
             />
-            <p>Diese Daten werden verwendet, um:</p>
+            <p>Diese Daten nutzen wir, um:</p>
             <List
               items={[
-                "individuelle Profile zu erstellen",
-                "Matching-Analysen zu berechnen",
-                "Unterschiede und Gemeinsamkeiten sichtbar zu machen",
+                "dein Profil im Produkt darzustellen",
+                "Fragebogenantworten auszuwerten",
+                "Dimensionen und Scores zu berechnen",
+                "individuelle und gemeinsame Auswertungen zu erstellen",
               ]}
             />
           </BulletSection>
 
           <BulletSection number="7" title="Matching, Reports und gemeinsame Inhalte">
             <p>
-              Wenn du einen Co-Founder einlädst:
+              Wenn du mit einer weiteren Person eine Founder-Konstellation bildest, werden Daten
+              beider Personen zusammengeführt. Daraus entstehen gemeinsame Ergebnisse.
             </p>
             <List
               items={[
-                "werden eure Daten miteinander verknüpft",
-                "gemeinsame Auswertungen erstellt",
-                "Inhalte im Workbook gemeinsam bearbeitet",
+                "eure Fragebogen- und Profildaten werden für das Matching gemeinsam ausgewertet",
+                "es entstehen gemeinsame Ergebnisse wie Matching-Report, Vergleichssignale und Workbook-Inhalte",
+                "beide beteiligten Founder haben Zugriff auf diese gemeinsamen Ergebnisse",
               ]}
             />
             <p>
-              Wichtig: Diese Inhalte betreffen immer beide Founder gemeinsam und können nicht
-              vollständig isoliert einer einzelnen Person zugeordnet werden.
+              Diese Inhalte betreffen beide Founder gemeinsam. Sie lassen sich deshalb nicht wie
+              reine Einzeldaten behandeln.
             </p>
             <p>
-              In der aktuellen Produktphase werden gemeinsame Reports und Workbooks der
-              betroffenen Founder-Konstellation bei Löschung eines Accounts ebenfalls gelöscht.
+              In der aktuellen Produktphase werden gemeinsame Reports, Workbooks und weitere
+              gemeinsame Founder-Ergebnisse bei Löschung eines Accounts ebenfalls entfernt, soweit
+              sie dieser Founder-Konstellation zugeordnet sind.
             </p>
           </BulletSection>
 
@@ -176,69 +186,93 @@ export default function DatenschutzPage() {
             <p>Wenn du eine andere Person einlädst:</p>
             <List
               items={[
-                "wird deren E-Mail-Adresse verarbeitet",
-                "die Daten stammen von der einladenden Person",
-                "die Verarbeitung dient ausschließlich dazu, die Einladung und den Matching-Prozess zu ermöglichen",
+                "verarbeiten wir deren E-Mail-Adresse, um die Einladung zuzustellen und zuzuordnen",
+                "die Daten stammen zunächst von der einladenden Person",
+                "die Verarbeitung dient dazu, die Einladung, den Login-Kontext und den späteren Matching-Prozess technisch umzusetzen",
               ]}
             />
           </BulletSection>
 
           <BulletSection number="9" title="Advisor / Moderation">
-            <p>Im Rahmen der Nutzung kann ein Advisor oder Moderator eingebunden werden.</p>
+            <p>Founder können optional einen Advisor oder Moderator in den Arbeitskontext einbinden.</p>
             <p>Dabei werden verarbeitet:</p>
             <List
               items={[
-                "Zugriffsdaten",
-                "Zuordnungen zu einem Founder-Team",
-                "Inhalte im Workbook (z. B. Notizen oder Kommentare)",
-              ]}
-            />
-            <p>Der Zugriff erfolgt ausschließlich im freigegebenen Kontext.</p>
-          </BulletSection>
-
-          <BulletSection number="10" title="Verarbeitung abgeleiteter Daten (Profiling)">
-            <p>Auf Basis deiner Eingaben erstellen wir:</p>
-            <List
-              items={[
-                "strukturierte Auswertungen",
-                "Matching-Analysen",
-                "inhaltliche Interpretationen",
+                "Zugriffs- und Freigabedaten",
+                "die Zuordnung zu einem konkreten Founder-Team",
+                "Inhalte im Workbook, z. B. Hinweise, Notizen, Rückfragen oder Abschlussimpulse",
               ]}
             />
             <p>
-              Dabei handelt es sich um automatisierte Auswertungen, jedoch keine automatisierten
+              Ein Advisor erhält Zugriff nur im freigegebenen Teamkontext. Dort kann er
+              freigegebene Inhalte einsehen und eigene Beiträge hinzufügen. Diese Beiträge sind für
+              die beteiligten Founder sichtbar.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="10" title="Verarbeitung abgeleiteter Daten (Profiling)">
+            <p>
+              Auf Basis deiner Profilangaben und Fragebogenantworten berechnen wir strukturierte
+              Auswertungen.
+            </p>
+            <List
+              items={[
+                "Dimensionswerte und Scores",
+                "individuelle Einordnungen und individuelle Reports",
+                "gemeinsame Matching-Analysen und gemeinsame Reports",
+                "inhaltliche Zusammenfassungen für Matching und Workbook",
+              ]}
+            />
+            <p>
+              Vereinfacht gesagt: Antworten werden in Dimensionen und Signale übersetzt. Daraus
+              entstehen individuelle und gemeinsame Auswertungen.
+            </p>
+            <p>
+              Dabei handelt es sich um automatisierte Auswertungen, aber nicht um automatisierte
               Entscheidungen mit rechtlicher Wirkung.
             </p>
           </BulletSection>
 
           <BulletSection number="11" title="Produktanalyse und Forschung">
-            <p>Wir verwenden Daten zur Verbesserung unseres Produkts, insbesondere:</p>
+            <p>
+              Wir erfassen bestimmte Nutzungsereignisse, um das Produkt technisch zu verstehen und
+              weiterzuentwickeln.
+            </p>
             <List
               items={[
-                "Nutzungsabläufe",
-                "Interaktionen",
-                "aggregierte Auswertungen",
+                "Start und Abschluss von Fragebögen",
+                "Anzeigen einzelner Fragen",
+                "Speichern von Antworten",
+                "Bearbeitungsdauer, Fortschritt und technische Nutzungskontexte",
               ]}
             />
             <p>
-              Soweit möglich, erfolgt dies in pseudonymisierter Form. Pseudonymisierte Daten
-              bleiben personenbezogene Daten. Eine Weiterverwendung außerhalb personenbezogener
-              Kontexte erfolgt nur nach Anonymisierung oder Aggregation, wenn danach kein
-              Rückschluss auf einzelne Personen mehr möglich ist.
+              Dabei können insbesondere Angaben wie Modul, Frage-ID, Dimension, Frageposition,
+              Antwortspeicherung, Bearbeitungsdauer, Fortschritt und Seitenpfad verarbeitet werden.
+            </p>
+            <p>
+              Soweit möglich, speichern wir diese Ereignisse nicht mit Klartext-Identifikatoren wie
+              E-Mail-Adresse oder offener Nutzer-ID, sondern in pseudonymisierter Form, z. B. über
+              Hash-Werte. Pseudonymisierte Daten bleiben personenbezogene Daten.
+            </p>
+            <p>
+              Aus diesen Daten können anonyme oder ausreichend aggregierte Statistiken entstehen,
+              die wir für Produktanalyse und Forschung weiter nutzen.
             </p>
           </BulletSection>
 
           <BulletSection number="12" title="Anonymisierung und Weiterverwendung">
-            <p>Daten können nach Abschluss der Nutzung:</p>
+            <p>Wir unterscheiden zwischen pseudonymisierten Rohdaten und anonymen Aggregaten.</p>
             <List
               items={[
-                "anonymisiert oder aggregiert werden",
-                "für Analyse- und Forschungszwecke weiterverarbeitet werden",
+                "Pseudonymisierte Analyse-Rohdaten dienen nur der kurzfristigen Produktanalyse.",
+                "Anschließend können daraus aggregierte statistische Auswertungen entstehen.",
+                "Aggregierte Auswertungen sollen keinen Rückschluss mehr auf einzelne Personen oder konkrete Founder-Paare erlauben.",
               ]}
             />
             <p>
-              Eine Weiterverarbeitung erfolgt nur, wenn kein Rückschluss auf einzelne Personen mehr
-              möglich ist.
+              Eine Weiterverwendung außerhalb personenbezogener Kontexte erfolgt nur, wenn danach
+              kein Rückschluss auf einzelne Personen mehr möglich sein soll.
             </p>
           </BulletSection>
 
@@ -281,28 +315,38 @@ export default function DatenschutzPage() {
           </BulletSection>
 
           <BulletSection number="16" title="Cookies und technische Speicherung">
-            <p>Wir verwenden notwendige Cookies und ähnliche Technologien, um:</p>
+            <p>
+              Wir verwenden technisch notwendige Cookies und vergleichbare browserseitige
+              Speichermechanismen, um zentrale Produktfunktionen umzusetzen.
+            </p>
             <List
               items={[
-                "Login-Sessions zu verwalten",
-                "Einladungsprozesse technisch umzusetzen",
+                "Session-Cookies für Login und geschützte Produktbereiche",
+                "kurzlebige Cookies für Founder- und Advisor-Einladungsprozesse",
+                "browserseitigen Speicher, z. B. sessionStorage, für technische Flow- und Analysekontexte",
               ]}
             />
-            <p>Diese sind für den Betrieb erforderlich.</p>
+            <p>
+              Diese Speicherungen dienen dem Betrieb, der sicheren Anmeldung und der technischen
+              Durchführung von Einladungs- und Produktabläufen.
+            </p>
           </BulletSection>
 
           <BulletSection number="17" title="Speicherdauer">
-            <p>Wir speichern personenbezogene Daten:</p>
+            <p>Wir speichern personenbezogene Daten nicht länger als nötig.</p>
             <List
               items={[
-                "solange sie für die Nutzung erforderlich sind",
-                "oder gesetzliche Aufbewahrungspflichten bestehen",
+                "Account-, Profil-, Fragebogen-, Report- und Workbook-Daten speichern wir grundsätzlich so lange, wie sie für die Nutzung des Produkts erforderlich sind oder bis eine Löschung erfolgt.",
+                "Pseudonymisierte Analyse-Rohdaten speichern wir nur für einen begrenzten Zeitraum und löschen sie anschließend in der Regel wieder. Aktuell liegt dieser Zeitraum typischerweise bei bis zu 30 Tagen.",
+                "Anonyme oder ausreichend aggregierte Statistikdaten können länger aufbewahrt werden.",
+                "Gesetzliche Aufbewahrungspflichten, z. B. bei rechnungsbezogenen Daten, bleiben unberührt.",
               ]}
             />
             <p>
               Anschließend werden personenbezogene Daten gelöscht, soweit keine gesetzlichen
-              Aufbewahrungspflichten entgegenstehen. Daten können darüber hinaus anonymisiert oder
-              aggregiert weiterverarbeitet werden, sofern danach kein Personenbezug mehr besteht.
+              Aufbewahrungspflichten entgegenstehen. Daten können darüber hinaus nur dann
+              anonymisiert oder aggregiert weiterverarbeitet werden, wenn danach kein
+              Personenbezug mehr besteht.
             </p>
           </BulletSection>
 
@@ -328,9 +372,16 @@ export default function DatenschutzPage() {
             <p>Bei Löschung deines Accounts:</p>
             <p>
               Soweit keine gesetzlichen Aufbewahrungspflichten oder sonstigen rechtlichen Gründe
-              entgegenstehen, werden personenbezogene Daten bei Löschung des Accounts gelöscht.
-              Gemeinsame Reports und Workbooks der betroffenen Founder-Konstellation werden in der
-              aktuellen Produktphase ebenfalls gelöscht.
+              entgegenstehen, werden deine personenbezogenen Daten gelöscht.
+            </p>
+            <p>
+              In der aktuellen Produktphase gilt das auch für gemeinsame Founder-Daten, soweit sie
+              der betroffenen Founder-Konstellation zugeordnet sind. Dazu gehören insbesondere
+              gemeinsame Reports, Matching-Ergebnisse und Workbook-Inhalte.
+            </p>
+            <p>
+              Anonyme oder ausreichend aggregierte Statistikdaten können bestehen bleiben, wenn
+              daraus kein Rückschluss mehr auf einzelne Personen möglich ist.
             </p>
           </BulletSection>
 
