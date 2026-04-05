@@ -1,4 +1,4 @@
-import { DimensionScale } from "@/features/reporting/DimensionScale";
+import { PairDimensionScale } from "@/features/reporting/PairDimensionScale";
 import { type CompareLabel, REPORT_DIMENSIONS, type ReportDimension } from "@/features/reporting/types";
 
 type Props = {
@@ -384,7 +384,7 @@ function DimensionDetailCard({
           </ul>
         </div>
         {anchors ? (
-          <DimensionScale
+          <PairDimensionScale
             scoreA={comparison?.scoreA ?? null}
             scoreB={comparison?.scoreB ?? null}
             participantAName={participantAName}

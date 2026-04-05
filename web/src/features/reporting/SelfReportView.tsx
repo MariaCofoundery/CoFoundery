@@ -1,3 +1,5 @@
+import { DimensionOverview } from "@/features/reporting/DimensionOverview";
+import { DimensionScale } from "@/features/reporting/DimensionScale";
 import {
   FOUNDER_DIMENSION_META,
   type FounderDimensionKey,
@@ -65,6 +67,7 @@ export function SelfReportView({ report }: Props) {
           <div className="max-w-4xl">
             <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Kernmuster</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-900">So funktioniert dein Profil gerade</h2>
+            <DimensionOverview scores={report.scoresA} />
             <div className="mt-5 space-y-4">
               {coreParagraphs.map((paragraph) => (
                 <article key={paragraph.text} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
@@ -102,6 +105,13 @@ export function SelfReportView({ report }: Props) {
                 {block.highSignal ? <SignalBadge label="High-Signal" tone="soft" /> : null}
               </div>
               <h3 className="mt-3 text-base font-semibold text-slate-900">{block.title}</h3>
+              <DimensionScale
+                score={report.scoresA[block.dimension]}
+                leftLabel={FOUNDER_DIMENSION_META[block.dimension].reportLeftPole}
+                rightLabel={FOUNDER_DIMENSION_META[block.dimension].reportRightPole}
+                compact
+                className="mt-3"
+              />
               <p className="mt-3 text-sm leading-7 text-slate-800">{block.statement}</p>
               <p className="mt-3 text-sm leading-7 text-slate-600">
                 <span className="font-medium text-slate-900">Typische Situation:</span> {block.situation}
@@ -123,6 +133,13 @@ export function SelfReportView({ report }: Props) {
                 {block.highSignal ? <SignalBadge label="High-Signal" tone="warning" /> : null}
               </div>
               <h3 className="mt-3 text-base font-semibold text-slate-900">{block.title}</h3>
+              <DimensionScale
+                score={report.scoresA[block.dimension]}
+                leftLabel={FOUNDER_DIMENSION_META[block.dimension].reportLeftPole}
+                rightLabel={FOUNDER_DIMENSION_META[block.dimension].reportRightPole}
+                compact
+                className="mt-3"
+              />
               <p className="mt-3 text-sm leading-7 text-slate-800">{block.text}</p>
             </article>
           ))}
