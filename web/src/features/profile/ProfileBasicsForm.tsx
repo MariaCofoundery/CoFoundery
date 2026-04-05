@@ -257,6 +257,105 @@ export function ProfileBasicsForm({
     );
   }
 
+  function renderAvatarActionButton(params: {
+    label: string;
+    onClick: () => void;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={params.onClick}
+        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+      >
+        {params.label}
+      </button>
+    );
+  }
+
+  function renderEditProfileHeader() {
+    return (
+      <div className="grid gap-5 rounded-2xl border border-slate-200/80 bg-slate-50/85 p-4 md:grid-cols-[auto_minmax(0,1fr)] md:items-start">
+        <div className="flex min-w-0 flex-col items-start gap-3">
+          <ProfileAvatar
+            displayName={previewName}
+            avatarId={selectedAvatarId || null}
+            imageUrl={resolvedAvatarImageUrl}
+            className="h-20 w-20 shrink-0 rounded-[22px] border border-white/80 object-cover shadow-[0_10px_20px_rgba(15,23,42,0.08)]"
+            fallbackClassName="flex h-20 w-20 shrink-0 items-center justify-center rounded-[22px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.92)_48%,rgba(124,58,237,0.08))] text-lg font-semibold text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.06)]"
+          />
+
+          <div className="flex w-full flex-wrap gap-2">
+            {renderAvatarActionButton({
+              label: "Bild hochladen",
+              onClick: () => avatarUploadRef.current?.click(),
+            })}
+            {renderAvatarActionButton({
+              label: avatarPickerOpen ? "Auswahl schließen" : "Avatar auswählen",
+              onClick: () => setAvatarPickerOpen((current) => !current),
+            })}
+          </div>
+
+          {uploadedAvatarLabel && !selectedAvatarId ? (
+            <p className="text-xs text-slate-500">{uploadedAvatarLabel}</p>
+          ) : null}
+        </div>
+
+        <div className="min-w-0">
+          <label className="grid gap-2 text-sm text-slate-700">
+            Anzeigename
+            <input
+              name="displayName"
+              required
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Dein Name"
+              className="h-11 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
+            />
+          </label>
+        </div>
+
+        <input
+          ref={avatarUploadRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleAvatarUpload}
+        />
+
+        {avatarPickerOpen ? (
+          <div className="md:col-span-2 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+            {AVATAR_LIBRARY.map((avatar) => {
+              const selected = selectedAvatarId === avatar.id;
+              return (
+                <button
+                  key={avatar.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedAvatarId(avatar.id);
+                    setUploadedAvatarLabel(null);
+                  }}
+                  className={`rounded-2xl border p-2 transition ${
+                    selected
+                      ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.14)]"
+                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                  aria-pressed={selected}
+                  aria-label={avatar.label}
+                >
+                  <ProfileAvatar
+                    displayName={avatar.label}
+                    avatarId={avatar.id}
+                    className="h-auto w-full rounded-[18px] border border-slate-100 object-cover"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   function renderChoiceCard(params: {
     id: string;
     title: string;
@@ -511,21 +610,10 @@ export function ProfileBasicsForm({
   function renderEditForm() {
     return (
       <>
-        <div className="grid gap-4 md:grid-cols-2">
-          {renderAvatarCard()}
+        <div className="grid gap-4">
+          {renderEditProfileHeader()}
 
-          <label className="grid gap-2 text-sm text-slate-700">
-            Anzeigename
-            <input
-              name="displayName"
-              required
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
-              placeholder="Dein Name"
-              className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
-            />
-          </label>
-
+          <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-sm text-slate-700">
             Fokus
             <div className="grid gap-3">
@@ -574,6 +662,7 @@ export function ProfileBasicsForm({
               ))}
             </select>
           </label>
+        </div>
         </div>
 
         <fieldset className="mt-4 grid gap-3 text-sm text-slate-700">
