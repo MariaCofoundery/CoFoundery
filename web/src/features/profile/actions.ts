@@ -230,15 +230,19 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     await deleteStoredAvatarIfOwned(supabase, user.id, avatarToDeleteAfterSave);
   }
 
-  const { error: authMetadataError } = await supabase.auth.updateUser({
-    data: {
-      avatar_id: avatarId,
-      avatar_url: null,
-    },
-  });
+  const currentMetadataAvatarUrl =
+    typeof user.user_metadata?.avatar_url === "string" ? user.user_metadata.avatar_url : null;
 
-  if (authMetadataError) {
-    redirect(withError(errorRedirectTo, authMetadataError.message ?? "profile_avatar_sync_failed"));
+  if (currentMetadataAvatarUrl?.startsWith("data:image/")) {
+    const { error: authMetadataError } = await supabase.auth.updateUser({
+      data: {
+        avatar_url: null,
+      },
+    });
+
+    if (authMetadataError) {
+      redirect(withError(errorRedirectTo, authMetadataError.message ?? "profile_avatar_sync_failed"));
+    }
   }
 
   revalidatePath("/dashboard");
