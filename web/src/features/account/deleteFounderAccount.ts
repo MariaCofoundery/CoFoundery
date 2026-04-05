@@ -5,8 +5,11 @@ type DeleteFounderAccountRpcSummary = {
   remainingReportRuns?: number | null;
   remainingAdvisorLinks?: number | null;
   remainingWorkbooks?: number | null;
+  remainingAdvisorPayloadResidues?: number | null;
   remainingAssessments?: number | null;
   remainingProfiles?: number | null;
+  remainingResearchEvents?: number | null;
+  remainingProductFeedback?: number | null;
   deletedAuthUsers?: number | null;
 };
 
@@ -66,8 +69,11 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
     !isZero(summary.remainingReportRuns) ||
     !isZero(summary.remainingAdvisorLinks) ||
     !isZero(summary.remainingWorkbooks) ||
+    !isZero(summary.remainingAdvisorPayloadResidues) ||
     !isZero(summary.remainingAssessments) ||
     !isZero(summary.remainingProfiles)
+    || !isZero(summary.remainingResearchEvents)
+    || !isZero(summary.remainingProductFeedback)
   ) {
     console.error("deleteFounderAccount verification failed", {
       userId,

@@ -153,6 +153,10 @@ export function CoFounderInviteForm() {
           <p className="mt-3 text-xs leading-5 text-slate-500">
             Dieser Kontext beeinflusst später eure Auswertung.
           </p>
+          <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
+            Die Ergebnisse gehören euch beiden. Wenn eine Person ihre Daten löscht, werden auch
+            die gemeinsamen Ergebnisse entfernt.
+          </p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">

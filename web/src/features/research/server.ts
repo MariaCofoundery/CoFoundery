@@ -8,6 +8,7 @@ type ResearchQuestionType = "likert" | "scenario" | "forced_choice" | "unknown";
 type ServerResearchTrackPayload = {
   eventName: string;
   userId: string;
+  instrumentVersion?: string | null;
   invitationId?: string | null;
   assessmentId?: string | null;
   flowId?: string | null;
@@ -75,6 +76,7 @@ function normalizeProperties(value: unknown) {
   delete next.teamContext;
   delete next.questionType;
   delete next.dimension;
+  delete next.instrumentVersion;
   return next;
 }
 
@@ -115,6 +117,9 @@ export async function trackServerResearchEvent(payload: ServerResearchTrackPaylo
   const invitationId = asTrimmedString(payload.invitationId, 128);
   const assessmentId = asTrimmedString(payload.assessmentId, 128);
   const flowId = asTrimmedString(payload.flowId, 128);
+  const instrumentVersion =
+    asTrimmedString(payload.instrumentVersion, 64) ??
+    asTrimmedString((payload.properties as Record<string, unknown> | undefined)?.instrumentVersion, 64);
   const questionId = asTrimmedString(payload.questionId, 128);
   const pagePath = asTrimmedString(payload.pagePath, 500);
   const dimension = asTrimmedString(payload.dimension, 160);
@@ -139,6 +144,7 @@ export async function trackServerResearchEvent(payload: ServerResearchTrackPaylo
     assessment_hash: assessmentId ? hashForResearch(assessmentId) : null,
     flow_hash: flowId ? hashForResearch(flowId) : null,
     module: payload.module === "base" || payload.module === "values" ? payload.module : null,
+    instrument_version: instrumentVersion,
     question_id: questionId,
     question_index: asInteger(payload.questionIndex, 1, 5000),
     duration_ms: asInteger(payload.durationMs, 0, 3_600_000),

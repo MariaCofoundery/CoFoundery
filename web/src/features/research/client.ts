@@ -3,6 +3,7 @@
 export type ResearchTrackPayload = {
   eventName: string;
   eventVersion?: number;
+  instrumentVersion?: string | null;
   invitationId?: string | null;
   assessmentId?: string | null;
   flowId?: string | null;

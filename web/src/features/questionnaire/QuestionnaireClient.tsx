@@ -52,6 +52,7 @@ type Props = {
   ) => Promise<{ ok: boolean; submittedAt?: string; error?: string }>;
   trackingContext?: {
     module: "base" | "values";
+    instrumentVersion?: string | null;
     invitationId?: string | null;
     teamContext?: "pre_founder" | "existing_team" | null;
   };
@@ -275,6 +276,7 @@ export function QuestionnaireClient({
     trackResearchEvent({
       eventName: "questionnaire_started",
       assessmentId,
+      instrumentVersion: trackingContext?.instrumentVersion ?? null,
       invitationId: trackingContext?.invitationId ?? null,
       teamContext: trackingContext?.teamContext ?? null,
       module: trackingContext?.module ?? null,
@@ -292,6 +294,7 @@ export function QuestionnaireClient({
     initialCompletionRatio,
     total,
     trackingContext?.invitationId,
+    trackingContext?.instrumentVersion,
     trackingContext?.module,
     trackingContext?.teamContext,
   ]);
@@ -324,6 +327,7 @@ export function QuestionnaireClient({
     trackResearchEvent({
       eventName: "question_viewed",
       assessmentId,
+      instrumentVersion: trackingContext?.instrumentVersion ?? null,
       invitationId: trackingContext?.invitationId ?? null,
       teamContext: trackingContext?.teamContext ?? null,
       module: trackingContext?.module ?? null,
@@ -346,6 +350,7 @@ export function QuestionnaireClient({
     currentPosition,
     total,
     trackingContext?.invitationId,
+    trackingContext?.instrumentVersion,
     trackingContext?.module,
     trackingContext?.teamContext,
     disableTracking,
@@ -423,6 +428,7 @@ export function QuestionnaireClient({
       trackResearchEvent({
         eventName: "answer_saved",
         assessmentId,
+        instrumentVersion: trackingContext?.instrumentVersion ?? null,
         invitationId: trackingContext?.invitationId ?? null,
         teamContext: trackingContext?.teamContext ?? null,
         module: trackingContext?.module ?? null,
@@ -469,6 +475,7 @@ export function QuestionnaireClient({
       trackResearchEvent({
         eventName: "questionnaire_submitted",
         assessmentId,
+        instrumentVersion: trackingContext?.instrumentVersion ?? null,
         invitationId: trackingContext?.invitationId ?? null,
         teamContext: trackingContext?.teamContext ?? null,
         module: trackingContext?.module ?? null,

@@ -13,7 +13,7 @@ type Props = {
 };
 
 const DEFAULT_DESCRIPTION =
-  "Dieser Report fasst dein aktuelles Founder-Profil kompakt zusammen: mit deinen stärksten Mustern, typischen Spannungsfeldern und einer klaren visuellen Einordnung der sechs Dimensionen am Ende.";
+  "Dieser Report zeigt dir dein aktuelles Founder-Profil zuerst über die sechs Dimensionen und ergänzt die Skalen nur dort, wo Einordnung im Alltag wirklich hilft.";
 
 export function IndividualReportPageContent({
   report,

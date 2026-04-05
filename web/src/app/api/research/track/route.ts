@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 type TrackRequestBody = {
   eventName?: unknown;
   eventVersion?: unknown;
+  instrumentVersion?: unknown;
   invitationId?: unknown;
   assessmentId?: unknown;
   flowId?: unknown;
@@ -72,6 +73,7 @@ function normalizeProperties(value: unknown) {
   delete next.teamContext;
   delete next.questionType;
   delete next.dimension;
+  delete next.instrumentVersion;
   return next;
 }
 
@@ -109,6 +111,9 @@ export async function POST(request: NextRequest) {
   const invitationId = asTrimmedString(body.invitationId, 128);
   const assessmentId = asTrimmedString(body.assessmentId, 128);
   const flowId = asTrimmedString(body.flowId, 128);
+  const instrumentVersion =
+    asTrimmedString(body.instrumentVersion, 64) ??
+    asTrimmedString((body.properties as Record<string, unknown> | undefined)?.instrumentVersion, 64);
   const questionId = asTrimmedString(body.questionId, 128);
   const pagePath = asTrimmedString(body.pagePath, 500);
   const dimension = asTrimmedString(body.dimension, 160);
@@ -142,6 +147,7 @@ export async function POST(request: NextRequest) {
     assessment_hash: assessmentId ? hashForResearch(assessmentId) : null,
     flow_hash: flowId ? hashForResearch(flowId) : null,
     module: moduleValue,
+    instrument_version: instrumentVersion,
     question_id: questionId,
     question_index: asInteger(body.questionIndex, 1, 5000),
     question_type: questionType,

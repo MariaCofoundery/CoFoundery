@@ -201,6 +201,7 @@ export default async function MeValuesPage({
         completeRedirect={completeRedirect}
         trackingContext={{
           module: "values",
+          instrumentVersion: "values_v2",
           invitationId,
           teamContext: trackingTeamContext,
         }}

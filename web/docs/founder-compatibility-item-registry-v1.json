@@ -103,7 +103,7 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "likert",
-      "prompt": "Wenn ich unternehmerische Optionen bewerte, ist für mich entscheidend, ob sie das Unternehmen langfristig tragfähig und in sich stimmig machen.",
+      "prompt": "Wenn ich neue Möglichkeiten für das Unternehmen bewerte, ist für mich vor allem wichtig, ob sie das Unternehmen langfristig solide aufbauen.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -142,7 +142,7 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich bewerte unternehmerische Optionen vor allem danach, ob sie das Unternehmen robuster und konsistenter machen.\nB: Ich bewerte unternehmerische Optionen vor allem danach, ob sie neue strategische Hebel und Wachstumsmöglichkeiten eröffnen.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich bewerte neue Möglichkeiten vor allem danach, ob sie das Unternehmen stabiler und klarer machen.\nB: Ich bewerte neue Möglichkeiten vor allem danach, ob sie neue Chancen für Wachstum eröffnen.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -181,12 +181,12 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Wenn ein Geschäftsmodell intern sehr sauber aufgebaut ist, aber nur begrenztes Wachstumspotenzial hat – wie bewertest du das grundsätzlich?",
+      "prompt": "Ein Geschäftsmodell ist sauber aufgebaut, hat aber nur begrenztes Wachstumspotenzial. Wie bewertest du das eher?",
       "choices": [
-        { "value": 0, "label": "Innere Qualität und Stabilität sind entscheidend." },
-        { "value": 33, "label": "Eine gute Balance zwischen Stabilität und Wachstum ist wichtig." },
-        { "value": 67, "label": "Wachstumspotenzial ist wichtiger als innere Klarheit." },
-        { "value": 100, "label": "Wachstum geht klar vor, auch wenn das Modell weniger stimmig wirkt." }
+        { "value": 0, "label": "Für mich ist wichtiger, dass das Modell solide und stimmig ist." },
+        { "value": 33, "label": "Für mich ist wichtig, dass beides möglichst zusammenkommt: Stabilität und Wachstum." },
+        { "value": 67, "label": "Für mich ist wichtiger, dass das Modell mehr Wachstum ermöglicht." },
+        { "value": 100, "label": "Für mich geht Wachstum klar vor, auch wenn das Modell noch nicht ganz stimmig ist." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -219,12 +219,12 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Eine neue strategische Option würde euch Zugang zu einem deutlich größeren Markt verschaffen. Gleichzeitig würde das Unternehmen dadurch komplexer und weniger klar positioniert. Woran würdest du zuerst beurteilen, ob diese Option sinnvoll ist?",
+      "prompt": "Eine neue Möglichkeit würde euch Zugang zu einem deutlich größeren Markt geben. Gleichzeitig würde euer Unternehmen dadurch komplexer und weniger klar. Woran würdest du zuerst prüfen, ob dieser Schritt sinnvoll ist?",
       "choices": [
-        { "value": 0, "label": "Daran, ob die Option die innere Logik des Unternehmens stärkt und langfristig tragfähig bleibt." },
-        { "value": 33, "label": "Daran, ob sich die Option mit Positionierung und Aufbau des Unternehmens sauber verbinden lässt." },
-        { "value": 67, "label": "Daran, ob die Option einen klaren strategischen Hebel eröffnet, auch wenn mehr Komplexität entsteht." },
-        { "value": 100, "label": "Daran, ob die Option die strategische Reichweite deutlich erhöht, selbst wenn das Unternehmen dadurch breiter wird." }
+        { "value": 0, "label": "Daran, ob das Unternehmen dadurch langfristig stabil und stimmig bleibt." },
+        { "value": 33, "label": "Daran, ob sich der Schritt gut in den bisherigen Aufbau des Unternehmens einfügt." },
+        { "value": 67, "label": "Daran, ob der Schritt eine klare Wachstumschance eröffnet, auch wenn es komplexer wird." },
+        { "value": 100, "label": "Daran, ob der Schritt die Möglichkeiten des Unternehmens deutlich vergrößert, auch wenn es breiter und weniger klar wird." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -257,12 +257,12 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Ein Investor bietet euch Kapital an. Dafür müsst ihr das Unternehmen stärker auf einen größeren Markt mit hohem strategischem Hebel ausrichten, auch wenn euer bisheriges Modell dadurch weniger fokussiert würde. Was entspricht am ehesten deiner ersten Tendenz?",
+      "prompt": "Ein Investor bietet euch Kapital an. Dafür müsstet ihr euch stärker auf einen größeren Markt ausrichten, und euer bisheriges Modell würde weniger fokussiert. Was entspricht am ehesten deiner ersten Tendenz?",
       "choices": [
-        { "value": 0, "label": "Ich würde das eher nicht verfolgen. Für mich ist wichtiger, dass die Unternehmenslogik stimmig und belastbar bleibt." },
-        { "value": 33, "label": "Ich würde sehr genau prüfen, ob sich Wachstum und tragfähiger Aufbau sauber verbinden lassen." },
-        { "value": 67, "label": "Ich wäre offen dafür, wenn die strategische Chance groß genug ist und wir klare Leitplanken definieren." },
-        { "value": 100, "label": "Ich würde das eher verfolgen. Wenn ein starker Hebel sichtbar wird, sollte man das Unternehmen darauf ausrichten." }
+        { "value": 0, "label": "Ich würde das eher nicht verfolgen. Wichtiger ist mir, dass das Unternehmen klar und belastbar bleibt." },
+        { "value": 33, "label": "Ich würde genau prüfen, ob sich Wachstum und ein sauberer Aufbau gut verbinden lassen." },
+        { "value": 67, "label": "Ich wäre offen dafür, wenn die Chance groß genug ist und wir klare Leitplanken setzen." },
+        { "value": 100, "label": "Ich würde das eher verfolgen. Wenn die Chance groß ist, sollte sich das Unternehmen daran ausrichten." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -296,11 +296,11 @@
       "dimensionLabel": "Unternehmenslogik",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Ihr habt ein stabiles Geschäftsmodell gefunden. Dann zeigt sich ein anderer Markt mit deutlich größerem Hebel, aber nur mit klarem Richtungswechsel. Wie gehst du damit um?",
+      "prompt": "Ihr habt ein stabiles Geschäftsmodell gefunden. Dann zeigt sich ein anderer Markt mit deutlich mehr Wachstum, aber nur mit einem klaren Richtungswechsel. Wie gehst du damit eher um?",
       "choices": [
-        { "value": 0, "label": "Ich würde eher bei der bisherigen Richtung bleiben, solange sie tragfähig ist." },
-        { "value": 33, "label": "Ich würde den neuen Markt sorgfältig prüfen, bevor wir die Richtung neu gewichten." },
-        { "value": 67, "label": "Ich würde offen prüfen, ob der neue Markt strategisch mehr Hebel bietet." },
+        { "value": 0, "label": "Ich würde eher bei der bisherigen Richtung bleiben, solange sie funktioniert." },
+        { "value": 33, "label": "Ich würde den neuen Markt sorgfältig prüfen, bevor wir die Richtung ändern." },
+        { "value": 67, "label": "Ich würde offen prüfen, ob der neue Markt langfristig die bessere Chance ist." },
         { "value": 100, "label": "Ich würde die neue Richtung aktiv verfolgen, wenn das Potenzial deutlich größer ist." }
       ],
       "polarity": "scenario_left_to_right",
@@ -336,7 +336,7 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "likert",
-      "prompt": "Bei wichtigen Entscheidungen ist mir wichtig, dass sie auf nachvollziehbaren Argumenten und überprüfbaren Annahmen beruhen.",
+      "prompt": "Bei wichtigen Entscheidungen ist mir wichtig, dass sie gut begründet sind und sich nachvollziehen lassen.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -375,7 +375,7 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich treffe Entscheidungen lieber erst, wenn die wichtigsten Argumente und Einwände geklärt sind.\nB: Ich treffe Entscheidungen, sobald sich eine stimmige Richtung abzeichnet – auch wenn noch nicht alles geklärt ist.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich entscheide lieber erst, wenn die wichtigsten Punkte geklärt sind.\nB: Ich entscheide, sobald sich eine klare Richtung abzeichnet – auch wenn noch nicht alles geklärt ist.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -414,12 +414,12 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Die sachlichen Hinweise sprechen eher für eine Entscheidung, aber innerlich fühlt sie sich noch nicht stimmig an. Wie gehst du damit um?",
+      "prompt": "Die Fakten sprechen eher für eine Entscheidung, aber sie fühlt sich für dich noch nicht richtig an. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Wenn die Argumente insgesamt dafür sprechen, ist die Entscheidung für mich grundsätzlich tragfähig." },
-        { "value": 33, "label": "Ich würde noch einen gezielten Gegencheck machen, um die Spannung zwischen Analyse und innerem Signal zu prüfen." },
-        { "value": 67, "label": "Für mich wäre die Entscheidung erst tragfähig, wenn sich auch innerlich mehr Stimmigkeit ergibt." },
-        { "value": 100, "label": "Solange sich die Entscheidung innerlich nicht stimmig anfühlt, wäre sie für mich noch nicht entscheidungsreif." }
+        { "value": 0, "label": "Wenn die Fakten dafür sprechen, ist die Entscheidung für mich grundsätzlich tragfähig." },
+        { "value": 33, "label": "Ich würde noch einmal gezielt prüfen, warum sich beides nicht deckt." },
+        { "value": 67, "label": "Für mich passt die Entscheidung erst, wenn sie sich auch richtig anfühlt." },
+        { "value": 100, "label": "Solange es sich nicht richtig anfühlt, treffe ich die Entscheidung nicht." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -452,12 +452,12 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Wie gehst du typischerweise mit Entscheidungen um, bei denen Zeitdruck besteht, aber noch Unsicherheit im Raum ist?",
+      "prompt": "Wie gehst du mit Entscheidungen um, bei denen Zeitdruck besteht und noch Unsicherheit da ist?",
       "choices": [
         { "value": 0, "label": "Ich warte lieber und kläre weiter." },
-        { "value": 33, "label": "Ich sichere so viel wie möglich ab, bevor ich entscheide." },
+        { "value": 33, "label": "Ich kläre so viel wie möglich, bevor ich entscheide." },
         { "value": 67, "label": "Ich entscheide, sobald eine tragfähige Richtung erkennbar ist." },
-        { "value": 100, "label": "Ich entscheide bewusst schnell und korrigiere später bei Bedarf." }
+        { "value": 100, "label": "Ich entscheide bewusst schnell und passe später an." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "new",
@@ -490,12 +490,12 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Eine strategische Entscheidung steht an, aber der Rahmen erlaubt nur begrenzte Vertiefung. Wie gehst du in so einer Situation am liebsten vor?",
+      "prompt": "Eine wichtige Entscheidung steht an, aber du hast nur begrenzt Zeit, dich einzuarbeiten. Wie gehst du am ehesten vor?",
       "choices": [
-        { "value": 0, "label": "Ich würde die Entscheidung lieber kurz verschieben, damit die wichtigsten offenen Punkte noch geklärt werden können." },
-        { "value": 33, "label": "Ich würde die vorhandenen Informationen bündeln und dann bewusst abwägen." },
+        { "value": 0, "label": "Ich würde die Entscheidung lieber verschieben, um mehr Klarheit zu bekommen." },
+        { "value": 33, "label": "Ich würde die vorhandenen Infos bündeln und dann abwägen." },
         { "value": 67, "label": "Ich würde auf Basis der tragfähigsten Hinweise entscheiden und offene Punkte später nachschärfen." },
-        { "value": 100, "label": "Ich würde mich auf die stimmigste Richtung festlegen und sie im weiteren Verlauf überprüfen." }
+        { "value": 100, "label": "Ich würde mich für die Richtung entscheiden, die sich am stimmigsten anfühlt, und dann weiter prüfen." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -529,12 +529,12 @@
       "dimensionLabel": "Entscheidungslogik",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Nach einer Woche verdichten sich Hinweise, dass eine eingeschlagene Richtung wahrscheinlich nicht trägt. Wie reagierst du am ehesten?",
+      "prompt": "Nach kurzer Zeit merkst du, dass eine Entscheidung wahrscheinlich nicht trägt. Wie reagierst du?",
       "choices": [
-        { "value": 0, "label": "Ich würde zuerst genauer verstehen wollen, welche Hinweise gegen die bisherige Richtung sprechen." },
-        { "value": 33, "label": "Ich würde die Richtung kontrolliert anpassen und die wichtigsten Annahmen noch einmal sauber prüfen." },
-        { "value": 67, "label": "Ich würde mich auf die plausiblere Alternative zubewegen, auch wenn noch nicht alles abschließend geklärt ist." },
-        { "value": 100, "label": "Ich würde die bisherige Richtung innerlich eher loslassen und mich an der stimmigeren Alternative orientieren." }
+        { "value": 0, "label": "Ich würde erst genau verstehen wollen, was nicht passt." },
+        { "value": 33, "label": "Ich würde die Richtung vorsichtig anpassen und nochmal prüfen." },
+        { "value": 67, "label": "Ich würde mich in Richtung der besseren Alternative bewegen." },
+        { "value": 100, "label": "Ich würde die bisherige Richtung loslassen und mich neu ausrichten." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -569,7 +569,7 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu deiner bevorzugten Zusammenarbeit?\nA: Ich arbeite am liebsten eigenständig und verantworte meinen Bereich weitgehend selbst.\nB: Ich arbeite am liebsten eng abgestimmt mit meinem Co-Founder.",
+      "prompt": "Welche Aussage passt eher zu deiner Art zu arbeiten?\nA: Ich arbeite am liebsten eigenständig und verantworte meinen Bereich selbst.\nB: Ich arbeite am liebsten eng abgestimmt mit meinem Co-Founder.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -608,12 +608,12 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Du arbeitest intensiv an einem neuen Feature und triffst dabei mehrere operative Weichenstellungen. Wann würdest du deinen Co-Founder typischerweise einbeziehen?",
+      "prompt": "Du arbeitest an einem neuen Feature und triffst dabei mehrere wichtige Entscheidungen. Wann beziehst du deinen Co-Founder typischerweise ein?",
       "choices": [
-        { "value": 0, "label": "Ich würde wichtige Schritte in meinem Bereich weitgehend eigenständig setzen." },
-        { "value": 33, "label": "Ich würde den Co-Founder einbeziehen, sobald erste belastbare Zwischenstände vorliegen." },
-        { "value": 67, "label": "Ich würde regelmäßig kurze Zwischenstände teilen und punktuell abstimmen." },
-        { "value": 100, "label": "Ich würde wichtige Schritte früh gemeinsam abstimmen." }
+        { "value": 0, "label": "Ich entscheide in meinem Bereich meist selbstständig." },
+        { "value": 33, "label": "Ich beziehe ihn ein, sobald ich erste klare Ergebnisse habe." },
+        { "value": 67, "label": "Ich teile regelmäßig Zwischenstände und stimme mich punktuell ab." },
+        { "value": 100, "label": "Ich stimme wichtige Schritte früh gemeinsam ab." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -646,12 +646,12 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Ihr merkt, dass ihr beide immer wieder an denselben Themen arbeitet und sich Zuständigkeiten überschneiden. Wie gehst du damit typischerweise um?",
+      "prompt": "Ihr merkt, dass ihr beide immer wieder an denselben Themen arbeitet und sich Zuständigkeiten überschneiden. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Ich würde die Zuständigkeiten klarer trennen, damit jeder seinen Bereich eigenständig führen kann." },
-        { "value": 33, "label": "Ich würde Rollen schärfen und nur an wichtigen Schnittstellen abstimmen." },
-        { "value": 67, "label": "Ich würde regelmäßige kurze Abstimmungen einführen, damit Überschneidungen sichtbar bleiben." },
-        { "value": 100, "label": "Ich würde die Zusammenarbeit enger synchronisieren, damit Überschneidungen früh gemeinsam eingeordnet werden." }
+        { "value": 0, "label": "Ich würde die Zuständigkeiten klarer trennen." },
+        { "value": 33, "label": "Ich würde Rollen schärfen und nur an wichtigen Punkten abstimmen." },
+        { "value": 67, "label": "Ich würde regelmäßige kurze Abstimmungen einführen." },
+        { "value": 100, "label": "Ich würde die Zusammenarbeit enger abstimmen." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -684,7 +684,7 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "core",
       "type": "likert",
-      "prompt": "Für mich funktioniert Zusammenarbeit am besten, wenn wichtige Zwischenstände früh sichtbar werden und nicht erst am Ende geteilt werden.",
+      "prompt": "Zusammenarbeit funktioniert für mich am besten, wenn wir uns früh über Zwischenstände austauschen und nicht erst am Ende.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -723,12 +723,12 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Euer Arbeitsalltag läuft zu sehr unterschiedlichen Zeiten ab. Wie würdest du die Zusammenarbeit in so einer Phase organisieren?",
+      "prompt": "Ihr arbeitet zu unterschiedlichen Zeiten. Wie würdest du eure Zusammenarbeit organisieren?",
       "choices": [
-        { "value": 0, "label": "Für mich reicht eine klare Aufgabenaufteilung; gemeinsame Zeiten sind nicht entscheidend." },
+        { "value": 0, "label": "Eine klare Aufgabenverteilung reicht mir." },
         { "value": 33, "label": "Ich würde nur an wenigen festen Punkten synchronisieren." },
         { "value": 67, "label": "Ich würde tägliche kurze Abstimmungsfenster einbauen." },
-        { "value": 100, "label": "Ich würde möglichst viele relevante Arbeitsphasen enger synchronisieren." }
+        { "value": 100, "label": "Ich würde möglichst viele Arbeitsphasen enger abstimmen." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -762,12 +762,12 @@
       "dimensionLabel": "Arbeitsstruktur & Zusammenarbeit",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Ein Co-Founder arbeitet sehr autonom und teilt wichtige Zwischenstände erst spät. Welche Form der Abstimmung wäre für dich dabei am passendsten?",
+      "prompt": "Ein Co-Founder arbeitet sehr eigenständig und teilt wichtige Zwischenstände erst spät. Was wäre für dich dabei passend?",
       "choices": [
-        { "value": 0, "label": "Für mich reicht es, wenn der Zuständigkeitsbereich klar ist und erst Ergebnisse geteilt werden." },
-        { "value": 33, "label": "Für mich ist das meist passend, solange an wenigen Punkten sichtbar wird, wie der Stand ist." },
-        { "value": 67, "label": "Ich würde mir regelmäßige Zwischenstände wünschen, damit wichtige Entwicklungen früh sichtbar werden." },
-        { "value": 100, "label": "Für mich wäre wichtig, bei relevanten Themen früh in Zwischenstände und Abstimmung eingebunden zu sein." }
+        { "value": 0, "label": "Für mich reicht es, wenn am Ende Ergebnisse geteilt werden." },
+        { "value": 33, "label": "Für mich reicht es, wenn an ein paar Stellen sichtbar ist, wo ihr steht." },
+        { "value": 67, "label": "Ich hätte gern regelmäßige Zwischenstände." },
+        { "value": 100, "label": "Mir ist wichtig, früh in wichtige Entwicklungen eingebunden zu sein." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -802,7 +802,7 @@
       "dimensionLabel": "Commitment",
       "layer": "core",
       "type": "likert",
-      "prompt": "Der Aufbau eines Startups nimmt in meiner aktuellen Zeit- und Energieverteilung einen spürbaren Anteil ein.",
+      "prompt": "Das Startup nimmt aktuell einen klaren Teil meiner Zeit und Energie ein.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -841,7 +841,7 @@
       "dimensionLabel": "Commitment",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich halte für das Startup eher einen klar begrenzten und verlässlichen Rahmen an Zeit und Energie frei.\nB: Ich richte meine Zeit und Energie aktuell eher so aus, dass das Startup einen größeren Anteil bekommt.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich halte für das Startup einen festen, begrenzten Rahmen an Zeit und Energie ein.\nB: Ich richte meine Zeit und Energie eher so aus, dass das Startup mehr Raum bekommt.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -880,11 +880,11 @@
       "dimensionLabel": "Commitment",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Wenn andere wichtige Lebensbereiche unter Druck geraten, wie stabil bleibt deine Priorität für das Startup?",
+      "prompt": "Wenn andere wichtige Dinge in deinem Leben mehr Aufmerksamkeit brauchen: Wie verändert sich dann deine Priorität für das Startup?",
       "choices": [
-        { "value": 0, "label": "Klare Grenzen bleiben auch dann bestehen." },
-        { "value": 33, "label": "Ich passe meine Priorisierung nur leicht an." },
-        { "value": 67, "label": "Ich priorisiere das Startup zeitweise höher." },
+        { "value": 0, "label": "Ich halte meine Grenzen auch dann klar ein." },
+        { "value": 33, "label": "Ich passe meine Priorität nur leicht an." },
+        { "value": 67, "label": "Ich gebe dem Startup in solchen Phasen mehr Raum." },
         { "value": 100, "label": "Das Startup hat dann klar Vorrang." }
       ],
       "polarity": "scenario_left_to_right",
@@ -918,12 +918,12 @@
       "dimensionLabel": "Commitment",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Das Unternehmen entwickelt sich langsamer als erwartet, und ihr überlegt, wie viel Zeit und Energie ihr in den kommenden Monaten dafür einplanen wollt. Welche Haltung passt am ehesten zu dir?",
+      "prompt": "Das Startup entwickelt sich langsamer als erwartet. Ihr überlegt, wie viel Zeit und Energie ihr in den nächsten Monaten investieren wollt. Welche Haltung passt eher zu dir?",
       "choices": [
-        { "value": 0, "label": "Ich würde den zeitlichen Rahmen eher stabil halten und darauf achten, dass andere Bereiche weiter verlässlich Raum haben." },
-        { "value": 33, "label": "Ich würde einen begrenzten zusätzlichen Einsatz einplanen, ohne andere Bereiche stark zu verschieben." },
-        { "value": 67, "label": "Ich würde das Startup für eine Zeit etwas höher priorisieren und andere Bereiche entsprechend anpassen." },
-        { "value": 100, "label": "Ich würde für die kommenden Monate einen größeren Teil meiner Zeit und Energie auf das Startup ausrichten." }
+        { "value": 0, "label": "Ich würde meinen bisherigen Zeitrahmen beibehalten." },
+        { "value": 33, "label": "Ich würde etwas mehr Zeit investieren, aber mit klaren Grenzen." },
+        { "value": 67, "label": "Ich würde das Startup vorübergehend höher priorisieren." },
+        { "value": 100, "label": "Ich würde in dieser Phase einen großen Teil meiner Zeit darauf ausrichten." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -956,12 +956,12 @@
       "dimensionLabel": "Commitment",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Du merkst nach einigen Monaten, dass parallel zum Startup weitere Projekte oder Verpflichtungen Zeit und Aufmerksamkeit binden. Was entspricht am ehesten deiner Haltung?",
+      "prompt": "Neben dem Startup kommen weitere Projekte oder Verpflichtungen dazu. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Das ist für mich grundsätzlich gut vereinbar, solange die verfügbare Zeit realistisch verteilt bleibt." },
-        { "value": 33, "label": "Das ist für mich meist okay, wenn sichtbar bleibt, wie Zeit und Prioritäten verteilt sind." },
-        { "value": 67, "label": "Ich würde genauer klären wollen, in welchen Phasen das Startup mehr Raum bekommen soll." },
-        { "value": 100, "label": "Für mich wäre wichtig, dass das Startup in zentralen Phasen entsprechend mehr Zeit und Aufmerksamkeit bekommt." }
+        { "value": 0, "label": "Das ist für mich gut vereinbar, solange alles seinen festen Platz hat." },
+        { "value": 33, "label": "Das passt für mich, solange klar ist, wie ich meine Zeit aufteile." },
+        { "value": 67, "label": "Ich würde bewusst klären, wann das Startup mehr Raum bekommt." },
+        { "value": 100, "label": "Mir ist wichtig, dass das Startup in wichtigen Phasen klar Vorrang hat." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -995,12 +995,12 @@
       "dimensionLabel": "Commitment",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Der Aufbau des Startups fordert deutlich mehr Zeit als ursprünglich geplant. Wie gehst du damit um?",
+      "prompt": "Der Aufbau des Startups braucht deutlich mehr Zeit als geplant. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Ich würde meine ursprünglichen zeitlichen Grenzen eher beibehalten." },
-        { "value": 33, "label": "Ich würde nur begrenzt zusätzliche Zeit einplanen und klare Grenzen setzen." },
-        { "value": 67, "label": "Ich würde meine Prioritäten vorübergehend neu ordnen, um mehr Raum zu schaffen." },
-        { "value": 100, "label": "Ich würde das Startup in dieser Phase entsprechend höher priorisieren als bisher." }
+        { "value": 0, "label": "Ich bleibe bei meinen bisherigen zeitlichen Grenzen." },
+        { "value": 33, "label": "Ich erhöhe meinen Einsatz nur begrenzt." },
+        { "value": 67, "label": "Ich ordne meine Prioritäten vorübergehend neu." },
+        { "value": 100, "label": "Ich gebe dem Startup in dieser Phase deutlich mehr Raum." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -1035,12 +1035,12 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Der finanzielle Puffer des Unternehmens reicht nur noch für wenige Monate. Welche Haltung passt in so einer Lage am ehesten zu dir?",
+      "prompt": "Der finanzielle Puffer reicht nur noch für wenige Monate. Wie gehst du mit der Situation um?",
       "choices": [
-        { "value": 0, "label": "Für mich wäre zuerst wichtig, zusätzliche Belastung und mögliche negative Folgen möglichst klar zu begrenzen." },
-        { "value": 33, "label": "Ich könnte nur Schritte mittragen, bei denen Unsicherheit und Belastung eng abgesichert bleiben." },
-        { "value": 67, "label": "Ich könnte auch spürbare zusätzliche Unsicherheit mittragen, wenn dadurch eine realistische Entlastung möglich bleibt." },
-        { "value": 100, "label": "Ich könnte auch eine deutlich belastendere und unsicherere Phase akzeptieren, solange eine relevante Wende noch möglich ist." }
+        { "value": 0, "label": "Ich würde zuerst versuchen, das Risiko möglichst zu begrenzen." },
+        { "value": 33, "label": "Ich würde nur Schritte gehen, bei denen die Unsicherheit überschaubar bleibt." },
+        { "value": 67, "label": "Ich könnte auch mehr Unsicherheit akzeptieren, wenn sich eine Chance ergibt." },
+        { "value": 100, "label": "Ich wäre bereit, deutlich mehr Unsicherheit einzugehen, um eine Wende zu schaffen." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -1073,12 +1073,12 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Wie stark bist du bereit, persönliche Stabilität – zum Beispiel Einkommen oder Sicherheit – zugunsten unternehmerischer Chancen zu riskieren?",
+      "prompt": "Wie viel persönliche Sicherheit bist du bereit für unternehmerische Chancen zu riskieren?",
       "choices": [
-        { "value": 0, "label": "Ich möchte persönliches Risiko möglichst klar begrenzen." },
-        { "value": 33, "label": "Ich bin zu kalkulierter zusätzlicher Unsicherheit bereit, aber nur mit deutlichen Sicherungen." },
-        { "value": 67, "label": "Ich bin bereit, spürbares persönliches Risiko zu tragen, wenn die mögliche positive Wirkung plausibel ist." },
-        { "value": 100, "label": "Ich kann auch deutlich höhere persönliche Unsicherheit akzeptieren, wenn der mögliche Nutzen entsprechend hoch ist." }
+        { "value": 0, "label": "Ich möchte mein persönliches Risiko möglichst gering halten." },
+        { "value": 33, "label": "Ich bin zu etwas mehr Risiko bereit, aber nur mit klaren Grenzen." },
+        { "value": 67, "label": "Ich bin bereit, spürbares persönliches Risiko zu tragen." },
+        { "value": 100, "label": "Ich bin auch zu deutlich höherem Risiko bereit, wenn die Chance groß ist." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -1111,7 +1111,7 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "core",
       "type": "likert",
-      "prompt": "Ich kann Unsicherheit über längere Zeit gut mittragen, auch wenn nicht alle Belastungen und Risiken klar absehbar sind.",
+      "prompt": "Ich kann Unsicherheit über längere Zeit gut aushalten, auch wenn nicht alles absehbar ist.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -1150,7 +1150,7 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich gehe lieber Schritte, bei denen mögliche Belastung und negative Folgen klar begrenzt bleiben.\nB: Ich gehe lieber Schritte, wenn ich auch spürbare Unsicherheit und zusätzliche Belastung mittragen kann, solange der mögliche Nutzen entsprechend hoch ist.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Ich gehe lieber Schritte, bei denen Risiken klar begrenzt sind.\nB: Ich gehe auch Schritte mit höherem Risiko, wenn die Chance groß ist.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -1189,12 +1189,12 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Ein neues Produkt könnte in den Markt gehen, obwohl noch relevante Unsicherheiten offen sind. Welche Haltung entspricht am ehesten deiner?",
+      "prompt": "Ein neues Produkt könnte starten, obwohl noch Unsicherheiten bestehen. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Ich würde offene Unsicherheiten zuerst möglichst weit reduzieren, bevor zusätzliche Belastung und neue Risiken entstehen." },
-        { "value": 33, "label": "Ich wäre nur offen dafür, wenn verbleibende Risiken und mögliche Belastungen klar begrenzt sind." },
-        { "value": 67, "label": "Ich könnte einen Start trotz offener Unsicherheiten mittragen, wenn die zusätzliche Belastung eng begrenzt bleibt." },
-        { "value": 100, "label": "Ich könnte auch mit deutlich offener Unsicherheit in den Markt gehen, solange die zusätzliche Belastung für mich noch tragbar bleibt." }
+        { "value": 0, "label": "Ich würde erst möglichst viele Unsicherheiten klären." },
+        { "value": 33, "label": "Ich wäre nur dabei, wenn die Risiken gut überschaubar sind." },
+        { "value": 67, "label": "Ich könnte auch mit offenen Unsicherheiten starten." },
+        { "value": 100, "label": "Ich würde auch mit hoher Unsicherheit starten, wenn die Chance passt." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -1228,12 +1228,12 @@
       "dimensionLabel": "Risikoorientierung",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Eine Option könnte spürbar positive Wirkung entfalten, würde über mehrere Monate aber auch Unsicherheit, Belastung und mögliche negative Folgen deutlich erhöhen. Welche Haltung entspricht am ehesten deiner?",
+      "prompt": "Eine Option bietet große Chancen, bringt aber über mehrere Monate mehr Unsicherheit mit sich. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Ich wäre nur offen dafür, wenn zusätzliche Belastung und mögliche negative Folgen klar begrenzt bleiben." },
-        { "value": 33, "label": "Ich könnte das nur mittragen, wenn es deutliche Leitplanken gegen Überlastung und zu hohe Belastung gibt." },
-        { "value": 67, "label": "Ich könnte die zusätzliche Unsicherheit mittragen, wenn die mögliche positive Wirkung spürbar genug erscheint." },
-        { "value": 100, "label": "Ich könnte auch deutlich mehr Unsicherheit und Belastung akzeptieren, wenn der mögliche Nutzen entsprechend groß ist." }
+        { "value": 0, "label": "Ich würde sie nur verfolgen, wenn die Risiken klar begrenzt sind." },
+        { "value": 33, "label": "Ich würde sie nur mit klaren Sicherungen angehen." },
+        { "value": 67, "label": "Ich könnte die zusätzliche Unsicherheit akzeptieren." },
+        { "value": 100, "label": "Ich würde sie trotz hoher Unsicherheit verfolgen, wenn die Chance groß ist." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -1268,7 +1268,7 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "core",
       "type": "likert",
-      "prompt": "Wenn zwischen mir und einem Co-Founder ein Unterschied spürbar wird, sortiere ich meine Sicht meist erst für mich, statt ihn sofort anzusprechen.",
+      "prompt": "Wenn ich merke, dass ich mit einem Co-Founder unterschiedlich denke, kläre ich meine Sicht meist erst für mich, bevor ich es anspreche.",
       "choices": [
         { "value": 0, "label": "trifft überhaupt nicht zu" },
         { "value": 25, "label": "trifft eher nicht zu" },
@@ -1307,12 +1307,12 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Ein Co-Founder trifft eine Entscheidung, die du anders gesehen hättest. Wie reagierst du typischerweise?",
+      "prompt": "Ein Co-Founder trifft eine Entscheidung, die du anders gesehen hättest. Wie reagierst du?",
       "choices": [
-        { "value": 0, "label": "Ich würde meine Reaktion zunächst für mich sortieren und erst einmal beobachten, ob der Unterschied stehen bleibt." },
-        { "value": 33, "label": "Ich würde den Unterschied später ansprechen, wenn ich meine Sicht klarer eingeordnet habe." },
-        { "value": 67, "label": "Ich würde den Unterschied relativ zeitnah ansprechen." },
-        { "value": 100, "label": "Ich würde den Unterschied direkt ansprechen, solange die Situation noch frisch ist." }
+        { "value": 0, "label": "Ich würde das erst für mich einordnen und beobachten." },
+        { "value": 33, "label": "Ich würde es später ansprechen, wenn ich meine Sicht klar habe." },
+        { "value": 67, "label": "Ich würde es relativ zeitnah ansprechen." },
+        { "value": 100, "label": "Ich würde es direkt ansprechen." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "retained",
@@ -1345,7 +1345,7 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "core",
       "type": "forced_choice",
-      "prompt": "Welche Aussage passt eher zu dir?\nA: Wenn ich Widerspruch habe, taste ich mich lieber vorsichtig in das Thema hinein.\nB: Wenn ich Widerspruch habe, benenne ich die Differenz lieber direkt.",
+      "prompt": "Welche Aussage passt eher zu dir?\nA: Wenn ich widerspreche, spreche ich es eher vorsichtig an.\nB: Wenn ich widerspreche, spreche ich es direkt an.",
       "choices": [
         { "value": 0, "label": "A trifft deutlich eher zu" },
         { "value": 25, "label": "A trifft eher zu" },
@@ -1384,12 +1384,12 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "core",
       "type": "scenario",
-      "prompt": "Wenn ein Unterschied zwischen euch länger bestehen bleibt, wie gehst du typischerweise damit um?",
+      "prompt": "Wenn ein Unterschied länger bestehen bleibt: Wie gehst du damit um?",
       "choices": [
         { "value": 0, "label": "Ich lasse ihn erst stehen und sortiere weiter." },
-        { "value": 33, "label": "Ich greife ihn später in einem passenderen Moment auf." },
+        { "value": 33, "label": "Ich spreche ihn später in einem passenden Moment an." },
         { "value": 67, "label": "Ich spreche ihn aktiv wieder an." },
-        { "value": 100, "label": "Ich will ihn möglichst direkt weiter klären." }
+        { "value": 100, "label": "Ich kläre ihn möglichst direkt weiter." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -1422,12 +1422,12 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "support",
       "type": "scenario",
-      "prompt": "Ein Fehler im Unternehmen hat spürbare Folgen, und zwischen euch ist unklar, wie ihr ihn einordnet. Wie würdest du das typischerweise ansprechen?",
+      "prompt": "Ein Fehler im Unternehmen hat Folgen, und ihr seht ihn unterschiedlich. Wie sprichst du das an?",
       "choices": [
-        { "value": 0, "label": "Ich würde das eher mit etwas Abstand ansprechen, wenn ich meine Sicht sortiert habe." },
-        { "value": 33, "label": "Ich würde einen passenden Rahmen suchen und das Thema dann vorsichtig aufmachen." },
-        { "value": 67, "label": "Ich würde die Differenz dazu relativ zeitnah und klar ansprechen." },
-        { "value": 100, "label": "Ich würde die Differenz und ihre Folgen direkt ansprechen." }
+        { "value": 0, "label": "Ich spreche es eher mit etwas Abstand an." },
+        { "value": 33, "label": "Ich suche einen passenden Moment und spreche es vorsichtig an." },
+        { "value": 67, "label": "Ich spreche den Unterschied relativ zeitnah an." },
+        { "value": 100, "label": "Ich spreche ihn direkt an." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",
@@ -1461,12 +1461,12 @@
       "dimensionLabel": "Konfliktstil",
       "layer": "support",
       "type": "scenario",
-      "prompt": "In einer Diskussion über eine strategische Frage, in der spürbare Spannung im Raum ist: Wie gehst du typischerweise damit um?",
+      "prompt": "In einer Diskussion entsteht spürbare Spannung. Wie gehst du damit um?",
       "choices": [
-        { "value": 0, "label": "Ich nehme eher Dynamik heraus und sortiere erst, bevor ich weiter in die Klärung gehe." },
-        { "value": 33, "label": "Ich lasse den Widerspruch zunächst etwas abkühlen und greife das Thema dann wieder auf." },
-        { "value": 67, "label": "Ich spreche den Kern der Differenz eher direkt an, auch wenn spürbare Spannung im Raum ist." },
-        { "value": 100, "label": "Ich gehe auch bei hoher Spannung eher unmittelbar weiter in den Widerspruch." }
+        { "value": 0, "label": "Ich nehme eher Tempo raus und sortiere erst." },
+        { "value": 33, "label": "Ich lasse es kurz abkühlen und komme später darauf zurück." },
+        { "value": 67, "label": "Ich spreche den Unterschied trotzdem an." },
+        { "value": 100, "label": "Ich gehe direkt weiter in die Klärung, auch bei Spannung." }
       ],
       "polarity": "scenario_left_to_right",
       "status": "rewritten",

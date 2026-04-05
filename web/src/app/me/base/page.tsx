@@ -151,6 +151,7 @@ export default async function MeBasePage({
         missingChoicesMessage="Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
         trackingContext={{
           module: "base",
+          instrumentVersion: "founder_base_v2",
           invitationId,
           teamContext: trackingTeamContext,
         }}

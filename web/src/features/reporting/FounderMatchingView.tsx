@@ -3,7 +3,6 @@ import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   FOUNDER_DIMENSION_META,
   getFounderDimensionPoleLabels,
-  type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
 import {
   buildFounderMatchingMarkers,
@@ -17,9 +16,6 @@ import {
   buildFounderMatchingAgreements,
   buildFounderMatchingDailyDynamics,
   buildFounderMatchingHero,
-  buildBiggestTensionBlock,
-  buildStableBaseBlock,
-  buildStrongestComplementBlock,
 } from "@/features/reporting/founderMatchingTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -47,9 +43,6 @@ export function FounderMatchingView({
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
   const hero = buildFounderMatchingHero(selection);
-  const stableBase = buildStableBaseBlock(selection.stableBase);
-  const strongestComplement = buildStrongestComplementBlock(selection.strongestComplement, selection);
-  const biggestTension = buildBiggestTensionBlock(selection.biggestTension, selection);
   const dailyDynamics = buildFounderMatchingDailyDynamics(selection);
   const agreements = buildFounderMatchingAgreements(selection);
   const markers = buildFounderMatchingMarkers(compareResult, selection, effectiveTeamContext);
@@ -57,18 +50,10 @@ export function FounderMatchingView({
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const heroHeadline = buildMatchHeadline(selection);
-  const heroParagraphs = splitIntoParagraphs(hero);
-  const dailyDynamicsSections = splitNarrativeSections(dailyDynamics);
-  const topAlignmentSignals = buildSignalEntries(compareResult.topAlignments, selection, "alignment");
-  const topTensionSignals = buildSignalEntries(compareResult.topTensions, selection, "tension");
-  const overallMatchReading = buildOverallMatchReading(compareResult.overallMatchScore);
-  const keyFieldCards = [
-    { label: "Größtes Spannungsfeld", entry: biggestTension, featured: true },
-    { label: "Stabile Basis", entry: stableBase, featured: false },
-    { label: "Stärkste Ergänzung", entry: strongestComplement, featured: false },
-  ].filter((entry) => entry.entry !== null);
+  const heroParagraphs = splitIntoParagraphs(hero).slice(0, 3);
+  const dailyDynamicsSections = splitNarrativeSections(dailyDynamics).slice(0, 2);
+  const compactInterpretation = buildCompactMatchInterpretation(compareResult, selection);
   const [primaryAgreement, ...secondaryAgreements] = agreements;
-  const nextStepSectionNumber = valuesBlock ? 6 : 5;
 
   return (
     <>
@@ -81,11 +66,11 @@ export function FounderMatchingView({
             </h1>
             <h2 className="mt-5 text-lg font-medium text-slate-900">Euer Matching-Report</h2>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-              Hier seht ihr, was euch traegt, wo ihr euch produktiv ergaenzt und wo klare Regeln
-              wichtig sind.
+              Hier seht ihr, wo ihr anschlussfähig seid, wo Unterschiede produktiv werden können
+              und wo ihr klare Regeln braucht.
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-500">
-              Im naechsten Schritt klaert ihr eure wichtigsten Punkte im Workbook.
+              Im nächsten Schritt übersetzt ihr das im Workbook in konkrete Arbeitsregeln.
             </p>
             <div className="mt-7 flex flex-wrap gap-2.5">
               <StatusBadge label={participantAName} tone="accentA" />
@@ -110,9 +95,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          1. Euer Zusammenspiel auf einen Blick
-        </p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Euer Kernmuster</p>
         <div className="mt-6 max-w-4xl space-y-3.5">
           {heroParagraphs.map((paragraph) => (
             <p key={paragraph} className="text-[15px] leading-7 text-slate-700">
@@ -120,159 +103,10 @@ export function FounderMatchingView({
             </p>
           ))}
         </div>
-
-        <div className="mt-8">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-            Im Modell fällt besonders auf
-          </p>
-          <div className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1fr_1fr]">
-            <article className="rounded-[22px] border border-slate-200/80 bg-white/90 p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Gesamtbild</p>
-              <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950">
-                {compareResult.overallMatchScore != null ? `${compareResult.overallMatchScore}/100` : "—"}
-              </p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(overallMatchReading)}</p>
-            </article>
-
-            <article className="rounded-[22px] border border-slate-200/80 bg-white/90 p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                Stärkste gemeinsame Basis
-              </p>
-              <ul className="mt-3 space-y-3">
-                {topAlignmentSignals.length > 0 ? (
-                  topAlignmentSignals.map((entry) => (
-                    <li key={`alignment-${entry.dimension}`} className="text-sm leading-7 text-slate-700">
-                      <span className="font-semibold text-slate-900">{entry.label}:</span> {t(entry.text)}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-sm leading-7 text-slate-700">
-                    Keine klare gemeinsame Basis mit hoher Signalstärke sichtbar.
-                  </li>
-                )}
-              </ul>
-            </article>
-
-            <article className="rounded-[22px] border border-rose-200/70 bg-[linear-gradient(180deg,rgba(255,241,242,0.9),rgba(255,255,255,0.98))] p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-rose-700">
-                Größte Spannungsfelder
-              </p>
-              <ul className="mt-3 space-y-3">
-                {topTensionSignals.length > 0 ? (
-                  topTensionSignals.map((entry) => (
-                    <li key={`tension-${entry.dimension}`} className="text-sm leading-7 text-slate-700">
-                      <span className="font-semibold text-slate-900">{entry.label}:</span> {t(entry.text)}
-                    </li>
-                  ))
-                ) : selection.meta.highSimilarityBlindSpotRisk ? (
-                  <li className="text-sm leading-7 text-slate-700">
-                    <span className="font-semibold text-slate-900">Kein offenes Spannungsfeld:</span>{" "}
-                    Die Reibung liegt hier eher in stiller Drift als in offenem Konflikt.
-                  </li>
-                ) : (
-                  <li className="text-sm leading-7 text-slate-700">
-                    Kein dominantes Spannungsfeld mit hoher Signalstärke sichtbar.
-                  </li>
-                )}
-              </ul>
-            </article>
-          </div>
-        </div>
-
-        {markers.primary ? (
-          <div className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/92 p-5">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-              So solltet ihr dieses Match lesen
-            </p>
-            <div className="mt-4 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
-              <article className="rounded-[20px] border border-slate-200/80 bg-slate-50/70 p-5">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                  Primärer Marker
-                </p>
-                <h3 className="mt-2 text-lg font-semibold text-slate-900">
-                  {t(markers.primary.label)}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-700">
-                  {t(markers.primary.explanation)}
-                </p>
-                <p className="mt-4 text-sm font-medium text-slate-900">
-                  {t(buildMarkerWorkbookLead(markers.primary, effectiveTeamContext))}
-                </p>
-              </article>
-
-              <div className="grid gap-3">
-                {markers.secondary.map((marker) => (
-                  <article
-                    key={`${marker.markerClass}-${marker.dimension ?? "none"}`}
-                    className="rounded-[20px] border border-slate-200/80 bg-white p-4"
-                  >
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                      {t(marker.label)}
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-700">
-                      {t(marker.explanation)}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : null}
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          2. Die drei wichtigsten Felder
-        </p>
-        <div className="mt-7 grid gap-5 lg:grid-cols-[1.15fr_1fr_1fr]">
-          {keyFieldCards.map(({ label, entry, featured }) => (
-            <article
-              key={`${label}-${entry?.title}`}
-              className={`rounded-[24px] border sm:p-6 ${
-                featured
-                  ? "border-rose-200/80 bg-[linear-gradient(180deg,rgba(255,241,242,0.92),rgba(255,255,255,0.98))] p-6 shadow-[0_18px_40px_rgba(244,63,94,0.08)] lg:py-7"
-                  : "border-slate-200/80 bg-slate-50/60 p-5"
-              }`}
-            >
-              <p
-                className={`text-[11px] uppercase tracking-[0.16em] ${
-                  featured ? "text-rose-700" : "text-slate-500"
-                }`}
-              >
-                {label}
-              </p>
-              <h3 className={`mt-3 font-semibold text-slate-900 ${featured ? "text-lg" : "text-base"}`}>
-                {t(entry?.title ?? "")}
-              </h3>
-              <p className={`mt-3 leading-7 text-slate-700 ${featured ? "text-[15px]" : "text-sm"}`}>
-                {t(entry?.body ?? "")}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          3. Typische Dynamik im Alltag
-        </p>
-        <div className="mt-6 grid gap-5 lg:grid-cols-3">
-          {dailyDynamicsSections.map((section) => (
-            <article
-              key={`${section.title}-${section.body}`}
-              className="rounded-[22px] border border-slate-200/80 bg-slate-50/70 p-5"
-            >
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{section.title}</p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          4. Eure Dynamik über alle Dimensionen
-        </p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Eure Dynamik auf einen Blick</p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
             const meta = FOUNDER_DIMENSION_META[dimension.dimension];
@@ -284,7 +118,7 @@ export function FounderMatchingView({
             return (
               <article
                 key={`matching-overview-${dimension.dimension}`}
-                className="rounded-[22px] border border-slate-200/70 bg-white/85 px-5 py-4 sm:px-6 sm:py-5"
+                className="rounded-[22px] border border-slate-200/70 bg-slate-50/60 px-5 py-4 sm:px-6 sm:py-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
                   <div className="min-w-0 flex-1">
@@ -311,49 +145,70 @@ export function FounderMatchingView({
             );
           })}
         </div>
+
+        <div className="mt-6 max-w-3xl space-y-3">
+          {compactInterpretation.map((paragraph, index) => (
+            <p
+              key={paragraph}
+              className={index === 0 ? "text-sm font-medium leading-7 text-slate-900" : "text-sm leading-7 text-slate-700"}
+            >
+              {t(paragraph)}
+            </p>
+          ))}
+        </div>
       </section>
 
-      {valuesBlock ? (
-        <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">5. Wertefokus im Duo</p>
-          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
-          <div className="mt-5 grid gap-4 lg:grid-cols-3">
-            {[
-              { label: "Gemeinsame Basis", entry: valuesBlock.gemeinsameBasis },
-              { label: "Unterschied unter Druck", entry: valuesBlock.unterschiedUnterDruck },
-              { label: "Leitplanke", entry: valuesBlock.leitplanke },
-            ].map(({ label, entry }) => (
-              <article
-                key={`${label}-${entry.title}`}
-                className="rounded-[22px] border border-slate-200/80 bg-slate-50/60 px-5 py-5"
-              >
-                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{label}</p>
-                <h3 className="mt-2 text-sm font-semibold text-slate-900">{t(entry.title)}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-700">{t(entry.body)}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. So zeigt sich das im Alltag</p>
+        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          {dailyDynamicsSections.map((section) => (
+            <article
+              key={`${section.title}-${section.body}`}
+              className="rounded-[22px] border border-slate-200/80 bg-slate-50/70 p-5"
+            >
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{section.title}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{`${nextStepSectionNumber}. Euer wichtigster nächster Schritt`}</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. Was ihr klären müsst</p>
+
         {markers.primary ? (
           <div className="mt-5 rounded-[20px] border border-[color:var(--brand-accent)]/18 bg-white/88 px-5 py-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-              Workbook-Haltung
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Primärer Marker</p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-900">{t(markers.primary.label)}</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-700">{t(markers.primary.explanation)}</p>
+            <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-500">Workbook-Haltung</p>
             <p className="mt-2 text-sm font-semibold text-slate-900">{t(markers.primary.workbookLabel)}</p>
             <p className="mt-2 text-sm leading-7 text-slate-700">
               {t(buildMarkerWorkbookPrompt(markers.primary, effectiveTeamContext))}
             </p>
           </div>
         ) : null}
+
+        {markers.secondary.length > 0 ? (
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            {markers.secondary.map((marker) => (
+              <article
+                key={`${marker.markerClass}-${marker.dimension ?? "none"}`}
+                className="rounded-[20px] border border-slate-200/80 bg-white/84 px-5 py-4"
+              >
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{t(marker.label)}</p>
+                <p className="mt-2 text-sm leading-7 text-slate-700">{t(marker.explanation)}</p>
+              </article>
+            ))}
+          </div>
+        ) : null}
+
         {primaryAgreement ? (
           <div className="mt-5 rounded-[24px] border border-[color:var(--brand-accent)]/18 bg-white/92 p-6">
             <p className="text-lg font-semibold leading-8 text-slate-900">{t(primaryAgreement)}</p>
           </div>
         ) : null}
+
         {secondaryAgreements.length > 0 ? (
           <div className="mt-4 grid gap-3">
             {secondaryAgreements.map((agreement) => (
@@ -378,6 +233,29 @@ export function FounderMatchingView({
           </div>
         </div>
       </section>
+
+      {valuesBlock ? (
+        <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Zusätzlich: Wertefokus im Duo</p>
+          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            {[
+              { label: "Gemeinsame Basis", entry: valuesBlock.gemeinsameBasis },
+              { label: "Unterschied unter Druck", entry: valuesBlock.unterschiedUnterDruck },
+              { label: "Leitplanke", entry: valuesBlock.leitplanke },
+            ].map(({ label, entry }) => (
+              <article
+                key={`${label}-${entry.title}`}
+                className="rounded-[22px] border border-slate-200/80 bg-slate-50/60 px-5 py-5"
+              >
+                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{label}</p>
+                <h3 className="mt-2 text-sm font-semibold text-slate-900">{t(entry.title)}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{t(entry.body)}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }
@@ -448,73 +326,38 @@ function buildOverallMatchReading(overallMatchScore: number | null) {
   return "Niedrige Anschlussfähigkeit. Ohne frühe Klärung drohen hier nicht nur Reibung, sondern unterschiedliche Erwartungen daran, wie dieses Duo überhaupt arbeiten soll.";
 }
 
-function buildSignalEntries(
-  dimensions: FounderDimensionKey[],
-  selection: FounderMatchingSelection,
-  kind: "alignment" | "tension"
+function buildCompactMatchInterpretation(
+  compareResult: CompareFoundersResult,
+  selection: FounderMatchingSelection
 ) {
-  return dimensions
-    .slice(0, 3)
-    .map((dimension) => {
-      const status = selection.dimensionStatuses.find((entry) => entry.dimension === dimension)?.status ?? null;
-      return {
-        dimension,
-        label: dimension,
-        text: kind === "alignment" ? describeAlignmentSignal(dimension, status) : describeTensionSignal(dimension, status),
-      };
-    });
-}
+  const strongestBase = compareResult.topAlignments[0] ?? selection.stableBase?.dimension ?? null;
+  const mainNeed = compareResult.topTensions[0] ?? selection.biggestTension?.dimension ?? null;
+  const paragraphs = [buildOverallMatchReading(compareResult.overallMatchScore)];
 
-function describeAlignmentSignal(
-  dimension: FounderDimensionKey,
-  status: FounderMatchingSelection["dimensionStatuses"][number]["status"] | null
-) {
-  switch (dimension) {
-    case "Unternehmenslogik":
-      return status === "ergänzend"
-        ? "unterschiedliche Logiken koennen hilfreich sein, solange Richtung nicht jedes Mal neu verhandelt werden muss."
-        : "hier liegt am ehesten eine gemeinsame Linie dafuer, worauf Entscheidungen einzahlen sollen.";
-    case "Entscheidungslogik":
-      return status === "ergänzend"
-        ? "hier koennen Prüfung und Zuspitzung sinnvoll zusammenkommen, wenn klar ist, wann entschieden wird."
-        : "hier ist eher klar, wann genug geprüft wurde und wie Entscheidungen zustande kommen.";
-    case "Risikoorientierung":
-      return status === "ergänzend"
-        ? "hier kann Unterschied nuetzen, wenn Chance und Absicherung nicht jedes Mal neu durcheinandergeraten."
-        : "hier liegt eine aehnliche Schwelle dafuer, wann ein Schritt noch vertretbar ist.";
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return "hier ist der Takt eurer Zusammenarbeit am ehesten anschlussfähig und nicht dauernd erklaerungsbeduerftig.";
-    case "Commitment":
-      return "hier ist am ehesten klar, wie viel Einsatz, Verfügbarkeit und Priorität im Alltag gelten.";
-    case "Konfliktstil":
-      return "hier ist am ehesten klar, wann etwas angesprochen wird und wie schnell ihr wieder in die Sache kommt.";
+  if (selection.meta.highSimilarityBlindSpotRisk) {
+    paragraphs.push(
+      strongestBase
+        ? `Am stabilsten wirkt aktuell ${strongestBase}. Aufmerksamkeit braucht hier aber vor allem stille Drift statt offener Konflikt.`
+        : "Auffällig ist hier weniger offener Streit als die Gefahr, dass Annahmen still auseinanderlaufen."
+    );
+    return paragraphs;
   }
-}
 
-function describeTensionSignal(
-  dimension: FounderDimensionKey,
-  status: FounderMatchingSelection["dimensionStatuses"][number]["status"] | null
-) {
-  switch (dimension) {
-    case "Unternehmenslogik":
-      return status === "kritisch"
-        ? "dieselbe Entscheidung zahlt fuer euch nicht auf dasselbe Ziel ein. Dann wird aus Strategie schnell Grundsatzstreit."
-        : "hier muesset ihr bewusst klären, worauf eine Priorität gerade einzahlen soll.";
-    case "Entscheidungslogik":
-      return "hier wird dieselbe Frage leicht mehrfach diskutiert, weil fuer euch nicht im selben Moment klar ist, wann sie entschieden ist.";
-    case "Risikoorientierung":
-      return "hier kann dieselbe Chance schnell zum Streit ueber vertretbares Wagnis werden.";
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return status === "kritisch"
-        ? "hier kollidieren Einblick, Eigenraum und Abstimmungsdichte direkt. Das kostet im Alltag sofort Tempo."
-        : "hier geht Geschwindigkeit oft still verloren, weil dieselbe Aufgabe mehr Mitsicht und Rueckversicherung braucht als gedacht.";
-    case "Commitment":
-      return status === "kritisch"
-        ? "hier gelten nicht dieselben Erwartungen an Einsatz und Verfügbarkeit. Daraus wird schnell Druck statt Zusammenarbeit."
-        : "hier muesset ihr klären, welches Einsatzniveau im Alltag wirklich gelten soll.";
-    case "Konfliktstil":
-      return "hier entsteht Reibung nicht nur am Thema, sondern daran, wann etwas angesprochen wird und wie direkt das passiert.";
+  if (strongestBase && mainNeed) {
+    paragraphs.push(`Am stabilsten wirkt aktuell ${strongestBase}. Den meisten Klärungsbedarf zeigt ${mainNeed}.`);
+    return paragraphs;
   }
+
+  if (strongestBase) {
+    paragraphs.push(`Am stabilsten wirkt aktuell ${strongestBase}.`);
+    return paragraphs;
+  }
+
+  if (mainNeed) {
+    paragraphs.push(`Den meisten Klärungsbedarf zeigt aktuell ${mainNeed}.`);
+  }
+
+  return paragraphs;
 }
 
 function buildMarkerLabel(name: string | null | undefined) {

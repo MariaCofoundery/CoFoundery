@@ -15,6 +15,7 @@ type Props = {
   completeRedirect?: string;
   trackingContext?: {
     module: "base" | "values";
+    instrumentVersion?: string | null;
     invitationId?: string | null;
     teamContext?: "pre_founder" | "existing_team" | null;
   };

@@ -1,6 +1,5 @@
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import { buildChallengesFromScores } from "@/features/reporting/challengeTextBuilder";
-import { buildComplementsFromScores } from "@/features/reporting/complementTextBuilder";
 import {
   FOUNDER_DIMENSION_META,
   getFounderDimensionPoleLabels,
@@ -29,12 +28,11 @@ export function SelfReportView({ report }: Props) {
   const markerLabel = buildMarkerLabel(report.participantAName);
   const scoredDimensions = buildSelfReportSignals(report.scoresA);
   const selection = buildSelfReportSelection(report.scoresA);
-  const heroParagraphs = splitIntoParagraphs(buildHeroTextFromScores(report.scoresA));
+  const heroParagraphs = splitIntoParagraphs(buildHeroTextFromScores(report.scoresA)).slice(0, 3);
   const patterns = buildPatternsFromScores(report.scoresA);
   const challenges = buildChallengesFromScores(report.scoresA);
-  const complements = buildComplementsFromScores(report.scoresA);
   const conversationHints = buildConversationHints(selection.conversationHintDimensions);
-  const overviewParagraphs = buildOverviewInterpretation(selection);
+  const overviewParagraphs = buildOverviewInterpretation(selection).slice(0, 2);
   const showValuesSection =
     report.valuesModuleStatus !== "not_started" ||
     Boolean(report.selfValuesProfile) ||
@@ -45,8 +43,8 @@ export function SelfReportView({ report }: Props) {
       <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-4xl">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Dein Founder-Profil</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-900">Dein Founder-Profil</h2>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Dein Kernmuster</p>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-900">Dein Kernmuster</h2>
             <div className="mt-4 space-y-3">
               {heroParagraphs.map((paragraph, index) => (
                 <p
@@ -74,127 +72,8 @@ export function SelfReportView({ report }: Props) {
         </div>
       </section>
 
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Deine stärksten Muster</p>
-        <h3 className="mt-3 text-lg font-semibold text-slate-900">Was dein Profil aktuell am stärksten prägt</h3>
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {patterns.map((entry, index) => {
-            const signal = selection.patternDimensions[index];
-            return (
-              <article
-                key={`pattern-${signal?.dimension ?? index}`}
-                className="rounded-2xl border border-slate-200/80 bg-white p-5"
-              >
-                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                  {signal ? FOUNDER_DIMENSION_META[signal.dimension].canonicalName : "Muster"}
-                </p>
-                <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.title)}</h4>
-                <div className="mt-3 space-y-3">
-                  {splitIntoParagraphs(entry.description).map((paragraph) => (
-                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
-                      {t(paragraph)}
-                    </p>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          3. Was dich im Team schnell herausfordert
-        </p>
-        <div className="mt-6 grid gap-4">
-          {challenges.map((entry, index) => {
-            const signal = selection.challengeDimensions[index];
-            return (
-              <article
-                key={`challenge-${signal?.dimension ?? index}`}
-                className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5"
-              >
-                <h4 className="text-sm font-semibold text-slate-900">{t(entry.title)}</h4>
-                <div className="mt-3 space-y-3">
-                  {splitIntoParagraphs(entry.description).map((paragraph) => (
-                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
-                      {t(paragraph)}
-                    </p>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. Was dich gut ergänzt</p>
-        <h3 className="mt-3 text-lg font-semibold text-slate-900">Mit wem du oft besonders gut arbeiten kannst</h3>
-        <div className="mt-6 grid gap-4">
-          {complements.map((entry, index) => (
-            <article
-              key={`${entry.role}-${entry.title}`}
-              className="rounded-2xl border border-slate-200/80 bg-white p-5"
-            >
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                {entry.role === "counterweight"
-                  ? "Ausgleich"
-                  : entry.role === "regulator"
-                    ? "Entlastung"
-                    : "Arbeitsrhythmus"}
-              </p>
-              <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.title)}</h4>
-              <div className="mt-3 space-y-3">
-                {splitIntoParagraphs(entry.description).map((paragraph) => (
-                  <p key={paragraph} className="text-sm leading-7 text-slate-700">
-                    {t(paragraph)}
-                  </p>
-                ))}
-                <p className="text-sm leading-7 text-slate-700">
-                  {t(buildComplementPracticalNote(selection.complementRoles[index]?.signal))}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          5. Worauf du in Co-Founder-Gesprächen achten solltest
-        </p>
-        <div className="mt-6 grid gap-4">
-          {conversationHints.map((hint) => (
-            <article
-              key={hint}
-              className="rounded-2xl border border-slate-200/80 bg-white px-4 py-4 text-sm leading-7 text-slate-700"
-            >
-              {t(hint)}
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {showValuesSection ? (
-        <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">6. Werteprofil kompakt</p>
-          <div className="mt-5">
-            <SelfValuesProfileSection report={report} />
-          </div>
-        </section>
-      ) : null}
-
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">7. Dein Profil auf einen Blick</p>
-        <div className="mt-3 max-w-3xl space-y-3">
-          {overviewParagraphs.map((paragraph) => (
-            <p key={paragraph} className="text-sm leading-7 text-slate-700">
-              {t(paragraph)}
-            </p>
-          ))}
-        </div>
-
+      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Dein Profil auf einen Blick</p>
         <div className="mt-6 space-y-4">
           {scoredDimensions.map(({ dimension, score }) => {
             const meta = FOUNDER_DIMENSION_META[dimension];
@@ -223,7 +102,96 @@ export function SelfReportView({ report }: Props) {
             );
           })}
         </div>
+
+        <div className="mt-6 max-w-3xl space-y-3">
+          {overviewParagraphs.map((paragraph, index) => (
+            <p
+              key={paragraph}
+              className={index === 0 ? "text-sm font-medium leading-7 text-slate-900" : "text-sm leading-7 text-slate-700"}
+            >
+              {t(paragraph)}
+            </p>
+          ))}
+        </div>
       </section>
+
+      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. Was dich im Alltag prägt</p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {patterns.map((entry, index) => {
+            const signal = selection.patternDimensions[index];
+            return (
+              <article
+                key={`pattern-${signal?.dimension ?? index}`}
+                className="rounded-2xl border border-slate-200/80 bg-white p-5"
+              >
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                  {signal ? FOUNDER_DIMENSION_META[signal.dimension].canonicalName : "Muster"}
+                </p>
+                <h4 className="mt-3 text-base font-semibold text-slate-900">{t(entry.title)}</h4>
+                <div className="mt-3 space-y-3">
+                  {splitIntoParagraphs(entry.description).map((paragraph) => (
+                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                      {t(paragraph)}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          4. Wo es im Team schwierig wird
+        </p>
+        <div className="mt-6 grid gap-4">
+          {challenges.map((entry, index) => {
+            const signal = selection.challengeDimensions[index];
+            return (
+              <article
+                key={`challenge-${signal?.dimension ?? index}`}
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5"
+              >
+                <h4 className="text-sm font-semibold text-slate-900">{t(entry.title)}</h4>
+                <div className="mt-3 space-y-3">
+                  {splitIntoParagraphs(entry.description).map((paragraph) => (
+                    <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                      {t(paragraph)}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          5. Worauf du achten solltest
+        </p>
+        <div className="mt-6 grid gap-4">
+          {conversationHints.map((hint) => (
+            <article
+              key={hint}
+              className="rounded-2xl border border-slate-200/80 bg-white px-4 py-4 text-sm leading-7 text-slate-700"
+            >
+              {t(hint)}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {showValuesSection ? (
+        <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Zusätzlich: Werteprofil kompakt</p>
+          <div className="mt-5">
+            <SelfValuesProfileSection report={report} />
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }
@@ -305,29 +273,6 @@ function buildOverviewImplication(signal: SelfReportSignal | null) {
       return "Dann reibt ihr euch nicht zuerst an Zielen, sondern daran, wann Arbeit sichtbar wird, wann Rueckkopplung faellig ist und wann ein Widerspruch offen auf den Tisch kommt.";
     default:
       return "Dann werden Unterschiede erst unter Druck spuerbar, weil sie vorher nicht klar genug lesbar waren.";
-  }
-}
-
-function buildComplementPracticalNote(signal: SelfReportSignal | undefined) {
-  if (!signal) {
-    return "Praktisch wird diese Ergaenzung dort, wo im Alltag frueh sichtbar wird, wer Tempo, Struktur oder Einordnung gerade staerker traegt.";
-  }
-
-  switch (signal.dimension) {
-    case "Unternehmenslogik":
-      return "Praktisch wird diese Ergaenzung dort, wo ihr bei einer Chance frueh klaert, wer Hebel sieht und wer Tragfaehigkeit absichert.";
-    case "Entscheidungslogik":
-      return "Praktisch wird diese Ergaenzung dort, wo eine Person den Punkt zum Entscheiden setzt und die andere die Grundlage sauber macht.";
-    case "Risikoorientierung":
-      return "Praktisch wird diese Ergaenzung dort, wo eine Person Vorwaertsgang bringt und die andere Schwellen, Puffer oder Stop-Kriterien sichtbar macht.";
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return "Praktisch wird diese Ergaenzung dort, wo ihr klar festlegt, wann Eigenraum traegt und wann fruehe Rueckkopplung noetig ist.";
-    case "Commitment":
-      return "Praktisch wird diese Ergaenzung dort, wo ihr vor intensiven Phasen sichtbar macht, welches Einsatzniveau wirklich erwartet und getragen wird.";
-    case "Konfliktstil":
-      return "Praktisch wird diese Ergaenzung dort, wo eine Person Themen frueher aufmacht und die andere dafuer sorgt, dass das Gespraech dabei arbeitsfaehig bleibt.";
-    default:
-      return "Praktisch wird diese Ergaenzung dort, wo eure unterschiedlichen Muster nicht gegeneinanderlaufen, sondern bewusst verteilt werden.";
   }
 }
 
