@@ -31,10 +31,7 @@ export default async function WelcomePage({
     redirect(nextPath);
   }
 
-  const fallbackAvatarUrl =
-    (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
-    (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
-    null;
+  const fallbackAvatarUrl = profile?.avatar_url?.trim() || null;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
@@ -48,6 +45,7 @@ export default async function WelcomePage({
               intention: profile?.intention ?? null,
               roles: profile?.roles ?? null,
               avatar_id: profile?.avatar_id ?? null,
+              avatar_url: profile?.avatar_url ?? null,
             }}
             submitLabel="Los geht's"
             onSuccessRedirectTo={nextPath}

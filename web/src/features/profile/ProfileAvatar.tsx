@@ -29,10 +29,20 @@ export function ProfileAvatar({
   alt,
 }: ProfileAvatarProps) {
   const initials = buildInitials(displayName);
-  const resolvedSrc = getAvatarSrc(avatarId) ?? imageUrl;
+  const resolvedSrc = getAvatarSrc(avatarId) ?? resolveProfileAvatarUrl(imageUrl);
   const resolvedAlt = alt ?? `Avatar von ${displayName}`;
 
   if (resolvedSrc) {
+    if (!resolvedSrc.startsWith("/")) {
+      return (
+        <img
+          src={resolvedSrc}
+          alt={resolvedAlt}
+          className={className}
+        />
+      );
+    }
+
     return (
       <Image
         src={resolvedSrc}
@@ -55,4 +65,27 @@ export function ProfileAvatar({
       <span className="font-semibold">{initials || "F"}</span>
     </div>
   );
+}
+
+function resolveProfileAvatarUrl(value: string | null | undefined) {
+  const normalized = (value ?? "").trim();
+  if (!normalized) return null;
+  if (
+    normalized.startsWith("http://") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("data:image/")
+  ) {
+    return normalized;
+  }
+
+  if (!normalized.startsWith("avatars/")) {
+    return normalized;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (!supabaseUrl) {
+    return null;
+  }
+
+  return `${supabaseUrl.replace(/\/+$/, "")}/storage/v1/object/public/${normalized}`;
 }

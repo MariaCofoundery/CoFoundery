@@ -18,7 +18,16 @@ type AuthSessionLikeClient = {
 
 export function normalizeNextPath(value: string | null | undefined, fallback = "/dashboard") {
   const trimmed = (value ?? "").trim();
-  return trimmed.startsWith("/") ? trimmed : fallback;
+  if (!trimmed.startsWith("/")) {
+    return fallback;
+  }
+
+  if (trimmed.startsWith("//")) {
+    const normalized = `/${trimmed.replace(/^\/+/, "")}`;
+    return normalized.length > 1 ? normalized : fallback;
+  }
+
+  return trimmed;
 }
 
 function readNestedNextPath(rawUrl: string | null | undefined) {

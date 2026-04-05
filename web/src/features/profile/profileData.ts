@@ -6,6 +6,7 @@ export type ProfileBasicsRow = {
   intention: string | null;
   roles: string[] | null;
   avatar_id: string | null;
+  avatar_url: string | null;
   headline: string | null;
   experience: string[] | null;
   skills: string[] | null;
@@ -32,6 +33,7 @@ type ProfilesTableAccess = {
 const OPTIONAL_PROFILE_COLUMNS = [
   "roles",
   "avatar_id",
+  "avatar_url",
   "headline",
   "experience",
   "skills",
@@ -102,6 +104,7 @@ function normalizeProfileRow(
     intention: typeof row.intention === "string" ? row.intention : null,
     roles: optionalColumns.has("roles") ? normalizeProfileRoles(row.roles ?? null) : null,
     avatar_id: optionalColumns.has("avatar_id") && typeof row.avatar_id === "string" ? row.avatar_id : null,
+    avatar_url: optionalColumns.has("avatar_url") && typeof row.avatar_url === "string" ? row.avatar_url : null,
     headline: optionalColumns.has("headline") && typeof row.headline === "string" ? row.headline : null,
     experience: optionalColumns.has("experience") ? normalizeStringArray(row.experience ?? null) : null,
     skills: optionalColumns.has("skills") ? normalizeStringArray(row.skills ?? null) : null,
@@ -147,10 +150,11 @@ export async function upsertProfileBasicsRow(
   const omittedColumns = new Set<OptionalProfileColumn>();
 
   while (true) {
-    const { roles: _roles, avatar_id: _avatarId, headline: _headline, experience: _experience, skills: _skills, linkedin_url: _linkedinUrl, imported_at: _importedAt, ...baseValues } =
+    const { roles: _roles, avatar_id: _avatarId, avatar_url: _avatarUrl, headline: _headline, experience: _experience, skills: _skills, linkedin_url: _linkedinUrl, imported_at: _importedAt, ...baseValues } =
       values;
     void _roles;
     void _avatarId;
+    void _avatarUrl;
     void _headline;
     void _experience;
     void _skills;
@@ -162,6 +166,7 @@ export async function upsertProfileBasicsRow(
         ...baseValues,
         ...(omittedColumns.has("roles") ? {} : { roles: values.roles }),
         ...(omittedColumns.has("avatar_id") ? {} : { avatar_id: values.avatar_id }),
+        ...(omittedColumns.has("avatar_url") ? {} : { avatar_url: values.avatar_url }),
         ...(omittedColumns.has("headline") ? {} : { headline: values.headline }),
         ...(omittedColumns.has("experience") ? {} : { experience: values.experience }),
         ...(omittedColumns.has("skills") ? {} : { skills: values.skills }),

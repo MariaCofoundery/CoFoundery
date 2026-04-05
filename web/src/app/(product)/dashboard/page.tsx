@@ -411,14 +411,10 @@ export default async function DashboardPage({
       : []),
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
-  const sessionAvatarId =
-    (typeof user.user_metadata?.avatar_id === "string" && user.user_metadata.avatar_id.trim()) || null;
-  const profileAvatarId = profileData?.avatar_id?.trim() || sessionAvatarId || null;
+  const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
     ? null
-    : (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
-      (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
-      null;
+    : profileData?.avatar_url?.trim() || null;
   const quoteOfTheDay = getQuoteOfTheDay();
 
   const selfReportDebug = selfReport
@@ -717,6 +713,7 @@ export default async function DashboardPage({
                     intention: profileData?.intention ?? null,
                     roles: profileData?.roles ?? null,
                     avatar_id: profileData?.avatar_id ?? null,
+                    avatar_url: profileData?.avatar_url ?? null,
                   }}
                   submitLabel="Profil speichern"
                   onSuccessRedirectTo="/dashboard"
@@ -737,6 +734,7 @@ export default async function DashboardPage({
                         intention: profileData?.intention ?? null,
                         roles: profileData?.roles ?? null,
                         avatar_id: profileData?.avatar_id ?? null,
+                        avatar_url: profileData?.avatar_url ?? null,
                       }}
                       submitLabel="Profil aktualisieren"
                       onSuccessRedirectTo="/dashboard"

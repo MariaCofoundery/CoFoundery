@@ -17,6 +17,7 @@ type ProfileBasicsValues = {
   intention: string | null;
   roles?: string[] | null;
   avatar_id?: string | null;
+  avatar_url?: string | null;
 };
 
 type Props = {
@@ -40,6 +41,10 @@ function normalizePath(path: string | undefined, fallback: string) {
   const normalized = (path ?? "").trim();
   if (!normalized.startsWith("/")) {
     return fallback;
+  }
+  if (normalized.startsWith("//")) {
+    const sanitized = `/${normalized.replace(/^\/+/, "")}`;
+    return sanitized.length > 1 ? sanitized : fallback;
   }
   return normalized;
 }
@@ -82,11 +87,12 @@ export function ProfileBasicsForm({
       ? initialValues.focus_skill
       : null;
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const initialAvatarUrl = initialValues.avatar_url?.trim() || fallbackAvatarUrl || "";
   const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState(
-    initialValues.avatar_id?.trim() ? "" : (fallbackAvatarUrl ?? "")
+    initialValues.avatar_id?.trim() ? "" : initialAvatarUrl
   );
   const [uploadedAvatarLabel, setUploadedAvatarLabel] = useState<string | null>(
-    initialValues.avatar_id?.trim() ? null : fallbackAvatarUrl ? "Eigenes Profilbild" : null
+    initialValues.avatar_id?.trim() ? null : initialAvatarUrl ? "Eigenes Profilbild" : null
   );
   const [selectedAvatarId, setSelectedAvatarId] = useState(initialValues.avatar_id?.trim() ?? "");
   const [displayName, setDisplayName] = useState(initialValues.display_name?.trim() ?? "");
@@ -104,7 +110,7 @@ export function ProfileBasicsForm({
   const resolvedFocusSkill =
     focusChoice === "Sonstiges" ? focusOtherText.trim() || "Sonstiges" : focusChoice;
   const resolvedRoles = primaryRole === "both" ? ["founder", "advisor"] : [primaryRole];
-  const resolvedAvatarImageUrl = selectedAvatarId ? null : uploadedAvatarUrl || fallbackAvatarUrl || null;
+  const resolvedAvatarImageUrl = selectedAvatarId ? null : uploadedAvatarUrl || initialAvatarUrl || null;
 
   const onboardingValues = {
     welcome: "ready",
@@ -227,6 +233,7 @@ export function ProfileBasicsForm({
                   type="button"
                   onClick={() => {
                     setSelectedAvatarId(avatar.id);
+                    setUploadedAvatarLabel(null);
                   }}
                   className={`rounded-2xl border p-2 transition ${
                     selected
@@ -650,7 +657,7 @@ async function toAvatarDataUrl(file: File) {
 
   try {
     const image = await loadImage(imageBitmapUrl);
-    const maxSize = 512;
+    const maxSize = 320;
     const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
     const width = Math.max(1, Math.round(image.width * scale));
     const height = Math.max(1, Math.round(image.height * scale));
@@ -664,7 +671,7 @@ async function toAvatarDataUrl(file: File) {
     }
 
     context.drawImage(image, 0, 0, width, height);
-    return canvas.toDataURL("image/jpeg", 0.86);
+    return canvas.toDataURL("image/jpeg", 0.82);
   } finally {
     URL.revokeObjectURL(imageBitmapUrl);
   }
