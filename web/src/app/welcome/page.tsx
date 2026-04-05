@@ -31,6 +31,11 @@ export default async function WelcomePage({
     redirect(nextPath);
   }
 
+  const fallbackAvatarUrl =
+    (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
+    (typeof user.user_metadata?.picture === "string" && user.user_metadata.picture.trim()) ||
+    null;
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
       <section className="rounded-3xl border border-slate-200 bg-white/96 p-4 shadow-sm md:p-6">
@@ -47,6 +52,7 @@ export default async function WelcomePage({
             submitLabel="Los geht's"
             onSuccessRedirectTo={nextPath}
             variant="accent"
+            fallbackAvatarUrl={fallbackAvatarUrl}
             welcomeVisual={<WelcomeAlignmentVisual className="mx-auto w-full max-w-2xl" />}
           />
         </div>

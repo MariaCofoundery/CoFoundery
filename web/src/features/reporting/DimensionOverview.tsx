@@ -13,14 +13,9 @@ type Props = {
 export function DimensionOverview({ scores }: Props) {
   return (
     <section className="mt-6 rounded-2xl border border-slate-200/80 bg-white/80 p-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Übersicht</p>
-          <h3 className="mt-2 text-base font-semibold text-slate-900">Dein aktueller Stand in 6 Dimensionen</h3>
-        </div>
-        <p className="max-w-xl text-xs leading-6 text-slate-600">
-          Eine kompakte Orientierung über die sechs Felder, die deinen Arbeitsstil im Report tragen.
-        </p>
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Übersicht</p>
+        <h3 className="mt-2 text-base font-semibold text-slate-900">Dein aktueller Stand in 6 Dimensionen</h3>
       </div>
 
       <div className="mt-5 grid gap-x-6 gap-y-4 md:grid-cols-2">
@@ -43,18 +38,13 @@ function DimensionOverviewRow({
 
   return (
     <article className="rounded-xl border border-slate-200/70 bg-slate-50/55 px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-slate-800">{meta.shortLabel}</p>
-        <span className="text-[11px] uppercase tracking-[0.12em] text-slate-400">
-          {score == null ? "offen" : `${Math.round(score)}`}
-        </span>
-      </div>
+      <p className="text-sm font-medium text-slate-800">{meta.shortLabel}</p>
       <DimensionScale
         score={score}
         leftLabel={meta.reportLeftPole}
         rightLabel={meta.reportRightPole}
         compact
-        showPoleLabels={false}
+        showPoleLabels
         className="mt-2"
       />
     </article>

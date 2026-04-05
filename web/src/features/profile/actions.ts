@@ -7,7 +7,6 @@ import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 
-const ALLOWED_FOCUS_SKILLS = ["Tech", "Sales", "Marketing", "Product", "Operations", "Finance"] as const;
 const ALLOWED_INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
 
 function normalizeRedirectTarget(value: FormDataEntryValue | null, fallback: string) {
@@ -29,10 +28,7 @@ function parseDisplayName(value: FormDataEntryValue | null) {
 }
 
 function parseFocusSkill(value: FormDataEntryValue | null) {
-  const normalized = String(value ?? "").trim();
-  return ALLOWED_FOCUS_SKILLS.includes(normalized as (typeof ALLOWED_FOCUS_SKILLS)[number])
-    ? normalized
-    : "";
+  return String(value ?? "").trim().slice(0, 80);
 }
 
 function parseIntention(value: FormDataEntryValue | null) {
@@ -44,6 +40,10 @@ function parseIntention(value: FormDataEntryValue | null) {
 
 function parseRoles(formData: FormData) {
   const primaryRole = String(formData.get("primaryRole") ?? "").trim().toLowerCase();
+  if (primaryRole === "both") {
+    return normalizeProfileRoles(["founder", "advisor"]);
+  }
+
   if (primaryRole.length > 0) {
     return normalizeProfileRoles(primaryRole);
   }
@@ -53,6 +53,19 @@ function parseRoles(formData: FormData) {
 
 function parseAvatarId(value: FormDataEntryValue | null) {
   return normalizeAvatarId(typeof value === "string" ? value : null);
+}
+
+function parseAvatarImageUrl(value: FormDataEntryValue | null) {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  if (!normalized) return null;
+  if (
+    normalized.startsWith("data:image/") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("http://")
+  ) {
+    return normalized;
+  }
+  return null;
 }
 
 export async function upsertProfileBasicsAction(formData: FormData) {
@@ -73,6 +86,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   const intention = parseIntention(formData.get("intention"));
   const roles = parseRoles(formData);
   const avatarId = parseAvatarId(formData.get("avatarId"));
+  const avatarImageUrl = parseAvatarImageUrl(formData.get("avatarImageUrl"));
 
   if (!displayName || !focusSkill || !intention) {
     redirect(withError(errorRedirectTo, "profile_basics_incomplete"));
@@ -102,6 +116,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   const { error: authMetadataError } = await supabase.auth.updateUser({
     data: {
       avatar_id: avatarId,
+      avatar_url: avatarId ? null : avatarImageUrl,
     },
   });
 

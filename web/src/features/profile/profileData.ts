@@ -50,7 +50,9 @@ function isMissingProfileColumnError(
     message.includes(`could not find the '${column}' column of 'profiles'`) ||
     message.includes(`could not find the "${column}" column of "profiles"`) ||
     message.includes(`column profiles.${column} does not exist`) ||
-    message.includes("schema cache")
+    (message.includes("schema cache") &&
+      message.includes(column.toLowerCase()) &&
+      message.includes("profiles"))
   );
 }
 
