@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
+import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type WelcomeSearchParams = {
@@ -19,21 +22,6 @@ type InvitationRow = {
   inviter_email: string | null;
   expires_at: string;
   revoked_at: string | null;
-};
-
-type ProfileRow = {
-  display_name: string | null;
-  focus_skill: string | null;
-  intention: string | null;
-  avatar_id: string | null;
-};
-
-type SubmittedAssessmentRow = {
-  module: string;
-};
-
-type InvitationModuleRow = {
-  module: string;
 };
 
 function normalizeEmail(value: string | null | undefined) {
@@ -66,11 +54,6 @@ function resolveInviteError(message: string) {
   return "Einladung konnte nicht verarbeitet werden";
 }
 
-function ensureBaseModule(modules: string[]) {
-  const unique = [...new Set(modules)];
-  return unique.includes("base") ? unique : ["base", ...unique];
-}
-
 function isInvitationExpired(expiresAt: string | null | undefined) {
   if (!expiresAt) return false;
   const parsed = Date.parse(expiresAt);
@@ -94,50 +77,37 @@ function invitationContextMeta(teamContext: string | null | undefined) {
   };
 }
 
-async function resolveNextInviteStepUrl(params: {
-  supabase: Awaited<ReturnType<typeof createClient>>;
-  userId: string;
+function buildQuestionnaireHref(invitationId: string, module: "base" | "values") {
+  const search = new URLSearchParams({ invitationId });
+  const path = module === "base" ? "/me/base" : "/me/values";
+  return `${path}?${search.toString()}`;
+}
+
+async function resolveNextInviteStep(params: {
   invitationId: string;
-  invitationStatus: string;
 }) {
-  const { supabase, userId, invitationId, invitationStatus } = params;
+  const { invitationId } = params;
+  const decision = await getInvitationJoinDecision(invitationId);
 
-  if (invitationStatus !== "accepted") {
-    return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
+  if (!decision.ok) {
+    return {
+      href: `/dashboard?error=${encodeURIComponent(decision.reason)}`,
+      label: "Zum Dashboard",
+    };
   }
 
-  const { data: moduleRows } = await supabase
-    .from("invitation_modules")
-    .select("module")
-    .eq("invitation_id", invitationId);
-  const requiredModules = ensureBaseModule(
-    ((moduleRows ?? []) as InvitationModuleRow[])
-      .map((row) => row.module)
-      .filter((module): module is string => typeof module === "string" && module.length > 0)
-  );
-
-  const { data: submittedRows } = await supabase
-    .from("assessments")
-    .select("module")
-    .eq("user_id", userId)
-    .not("submitted_at", "is", null)
-    .in("module", requiredModules);
-
-  const submittedModules = new Set(
-    ((submittedRows ?? []) as SubmittedAssessmentRow[])
-      .map((row) => row.module)
-      .filter((module): module is string => typeof module === "string" && module.length > 0)
-  );
-
-  if (!submittedModules.has("base")) {
-    return `/me/base?invitationId=${encodeURIComponent(invitationId)}`;
+  if (decision.mode === "report_ready" || decision.mode === "choice_existing_or_update") {
+    return {
+      href: `/invite/${encodeURIComponent(invitationId)}/done`,
+      label: decision.mode === "report_ready" ? "Zum Report" : "Zum Abschluss",
+    };
   }
 
-  if (requiredModules.includes("values") && !submittedModules.has("values")) {
-    return `/me/values?invitationId=${encodeURIComponent(invitationId)}`;
-  }
-
-  return `/invite/${encodeURIComponent(invitationId)}/done`;
+  const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
+  return {
+    href: buildQuestionnaireHref(invitationId, nextModule),
+    label: nextModule === "base" ? "Zum Basis-Fragebogen" : "Zum Werte-Modul",
+  };
 }
 
 function renderErrorState(title: string, detail: string) {
@@ -225,26 +195,15 @@ export default async function JoinWelcomePage({
     return renderErrorState("Einladung abgelaufen", "expired");
   }
 
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("display_name, focus_skill, intention, avatar_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  const profile = (profileData as ProfileRow | null) ?? null;
-  const hasProfileBasics = Boolean(
-    profile?.display_name?.trim() && profile?.focus_skill?.trim() && profile?.intention?.trim()
-  );
+  const profile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
+  const hasProfileBasics = isCoreProfileComplete(profile);
 
   const inviterName =
     invitation.inviter_display_name?.trim() || invitation.inviter_email?.trim() || "Co-Founder";
   const contextMeta = invitationContextMeta(invitation.team_context);
 
-  const nextStepUrl = await resolveNextInviteStepUrl({
-    supabase,
-    userId: user.id,
+  const nextStep = await resolveNextInviteStep({
     invitationId,
-    invitationStatus: invitation.status,
   });
 
   return (
@@ -261,9 +220,12 @@ export default async function JoinWelcomePage({
         </div>
 
         <p className="mt-4 text-sm leading-6 text-slate-700">
-          Bitte gib deinen Namen an. Dieser Name erscheint im Report für deinen Co-Founder.
+          Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention braucht CoFoundery,
+          damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten koennen.
         </p>
-        <p className="mt-1 text-xs text-slate-500">Du kannst das später im Dashboard ändern.</p>
+        <p className="mt-1 text-xs text-slate-500">
+          Weitere Profildaten kannst du spaeter optional ergaenzen.
+        </p>
 
         <div className="mt-6">
           {hasProfileBasics ? (
@@ -273,6 +235,10 @@ export default async function JoinWelcomePage({
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-500">Name</dt>
                   <dd className="font-medium text-slate-900">{profile?.display_name}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-500">Rolle</dt>
+                  <dd className="font-medium text-slate-900">{getPrimaryProfileRoleLabel(profile)}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-500">Fokus</dt>
@@ -291,10 +257,11 @@ export default async function JoinWelcomePage({
                 display_name: profile?.display_name ?? null,
                 focus_skill: profile?.focus_skill ?? null,
                 intention: profile?.intention ?? null,
+                roles: profile?.roles ?? null,
                 avatar_id: profile?.avatar_id ?? null,
               }}
-              submitLabel="Weiter zum Fragebogen"
-              onSuccessRedirectTo={nextStepUrl}
+              submitLabel={nextStep.label}
+              onSuccessRedirectTo={nextStep.href}
               variant="accent"
             />
           )}
@@ -303,10 +270,10 @@ export default async function JoinWelcomePage({
         <div className="mt-6 flex flex-wrap items-center gap-2">
           {hasProfileBasics ? (
             <Link
-              href={nextStepUrl}
+              href={nextStep.href}
               className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >
-              Weiter zum Fragebogen
+              {nextStep.label}
             </Link>
           ) : null}
           <Link

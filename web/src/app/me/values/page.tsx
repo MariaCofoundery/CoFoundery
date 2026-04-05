@@ -53,7 +53,7 @@ export default async function MeValuesPage({
       ? decision.required_modules.includes("values")
       : decision.missing_modules.includes("values");
     if (!needsValues) {
-      redirect(`/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`);
+      redirect(`/invite/${encodeURIComponent(invitationId)}/done`);
     }
 
     const needsBaseFirst = isRefreshFlow

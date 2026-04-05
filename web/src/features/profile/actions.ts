@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { upsertProfileBasicsRow } from "@/features/profile/profileData";
+import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
@@ -43,6 +43,11 @@ function parseIntention(value: FormDataEntryValue | null) {
 }
 
 function parseRoles(formData: FormData) {
+  const primaryRole = String(formData.get("primaryRole") ?? "").trim().toLowerCase();
+  if (primaryRole.length > 0) {
+    return normalizeProfileRoles(primaryRole);
+  }
+
   return normalizeProfileRoles(formData.getAll("roles"));
 }
 
@@ -73,6 +78,8 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     redirect(withError(errorRedirectTo, "profile_basics_incomplete"));
   }
 
+  const existingProfile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
+
   const { error } = await upsertProfileBasicsRow(supabase, {
     user_id: user.id,
     display_name: displayName,
@@ -80,6 +87,11 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     intention,
     roles,
     avatar_id: avatarId,
+    headline: existingProfile?.headline ?? null,
+    experience: existingProfile?.experience ?? null,
+    skills: existingProfile?.skills ?? null,
+    linkedin_url: existingProfile?.linkedin_url ?? null,
+    imported_at: existingProfile?.imported_at ?? null,
     updated_at: new Date().toISOString(),
   });
 

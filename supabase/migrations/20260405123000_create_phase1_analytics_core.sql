@@ -26,18 +26,6 @@ select
   re.flow_hash,
 
   re.module,
-  nullif(
-    coalesce(
-      re.instrument_version,
-      nullif(re.properties ->> 'instrumentVersion', ''),
-      case
-        when re.module = 'base' then 'founder_base_v2'
-        when re.module = 'values' then 'values_v2'
-        else 'unknown'
-      end
-    ),
-    ''
-  ) as instrument_version,
   coalesce(re.team_context, nullif(re.properties ->> 'teamContext', '')) as team_context,
 
   re.question_id,
@@ -61,7 +49,19 @@ select
   end as values_block,
 
   coalesce(re.device_class, nullif(re.properties ->> 'deviceClass', '')) as device_class,
-  coalesce(re.app_version, nullif(re.properties ->> 'appVersion', '')) as app_version
+  coalesce(re.app_version, nullif(re.properties ->> 'appVersion', '')) as app_version,
+  nullif(
+    coalesce(
+      re.instrument_version,
+      nullif(re.properties ->> 'instrumentVersion', ''),
+      case
+        when re.module = 'base' then 'founder_base_v2'
+        when re.module = 'values' then 'values_v2'
+        else 'unknown'
+      end
+    ),
+    ''
+  ) as instrument_version
 from public.research_events re;
 
 comment on view public.research_events_analytics_v1 is

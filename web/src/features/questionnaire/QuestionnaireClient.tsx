@@ -94,6 +94,25 @@ function normalizeForcedChoiceStatement(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function getForcedChoicePrompt(question: QuestionnaireQuestion | null | undefined) {
+  const source = String(question?.prompt ?? "").trim();
+  if (!source) {
+    return "Welche Aussage passt eher zu dir?";
+  }
+
+  const lineParts = source
+    .split(/\r?\n+/)
+    .map((part) => normalizeForcedChoiceStatement(part))
+    .filter(Boolean);
+
+  const firstLine = lineParts[0];
+  if (!firstLine || /^(?:aussage\s*a|a)\s*[:)\-]/i.test(firstLine)) {
+    return "Welche Aussage passt eher zu dir?";
+  }
+
+  return firstLine;
+}
+
 function parseForcedChoiceStatements(question: QuestionnaireQuestion | null | undefined) {
   const explicitA =
     typeof question?.optionA === "string" && question.optionA.trim().length > 0
@@ -115,6 +134,16 @@ function parseForcedChoiceStatements(question: QuestionnaireQuestion | null | un
   const source = String(question?.prompt ?? "").trim();
   if (!source) {
     return { statementA: null, statementB: null };
+  }
+
+  const labelledMatch = source.match(
+    /(?:^|\s)(?:aussage\s*a|a)\s*[:)\-]\s*(.+?)\s+(?:aussage\s*b|b)\s*[:)\-]\s*(.+)$/i
+  );
+  if (labelledMatch) {
+    return {
+      statementA: normalizeForcedChoiceStatement(labelledMatch[1] ?? ""),
+      statementB: normalizeForcedChoiceStatement(labelledMatch[2] ?? ""),
+    };
   }
 
   const separatedVariants = ["||", " | ", " <> ", " <-> ", " ↔ "];
@@ -149,16 +178,6 @@ function parseForcedChoiceStatements(question: QuestionnaireQuestion | null | un
     return {
       statementA: lineParts[0],
       statementB: lineParts[1],
-    };
-  }
-
-  const labelledMatch = source.match(
-    /(?:aussage\s*a|a)\s*[:)\-]\s*(.+?)\s+(?:aussage\s*b|b)\s*[:)\-]\s*(.+)/i
-  );
-  if (labelledMatch) {
-    return {
-      statementA: normalizeForcedChoiceStatement(labelledMatch[1] ?? ""),
-      statementB: normalizeForcedChoiceStatement(labelledMatch[2] ?? ""),
     };
   }
 
@@ -374,6 +393,7 @@ export function QuestionnaireClient({
     () => parseForcedChoiceStatements(current),
     [current]
   );
+  const forcedChoicePrompt = useMemo(() => getForcedChoicePrompt(current), [current]);
 
   const handleBack = () => {
     if (saving || finishing) {
@@ -611,7 +631,7 @@ export function QuestionnaireClient({
 
       <div className="mt-6 rounded-xl border border-slate-200/80 p-5">
         {currentType === "forced_choice" ? (
-          <p className="text-base font-medium text-slate-900">Welche Aussage passt eher zu dir?</p>
+          <p className="text-base font-medium text-slate-900">{forcedChoicePrompt}</p>
         ) : (
           <p className="text-base leading-8 text-slate-900">{current.prompt}</p>
         )}

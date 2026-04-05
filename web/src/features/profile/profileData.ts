@@ -6,6 +6,11 @@ export type ProfileBasicsRow = {
   intention: string | null;
   roles: string[] | null;
   avatar_id: string | null;
+  headline: string | null;
+  experience: string[] | null;
+  skills: string[] | null;
+  linkedin_url: string | null;
+  imported_at: string | null;
 };
 
 type SupabaseLikeClient = {
@@ -24,6 +29,18 @@ type ProfilesTableAccess = {
   ) => Promise<{ error: { message?: string | null } | null }>;
 };
 
+const OPTIONAL_PROFILE_COLUMNS = [
+  "roles",
+  "avatar_id",
+  "headline",
+  "experience",
+  "skills",
+  "linkedin_url",
+  "imported_at",
+] as const;
+
+type OptionalProfileColumn = (typeof OPTIONAL_PROFILE_COLUMNS)[number];
+
 function isMissingProfileColumnError(
   error: { message?: string | null } | null | undefined,
   column: string
@@ -37,81 +54,87 @@ function isMissingProfileColumnError(
   );
 }
 
-export function isMissingRolesColumnError(error: { message?: string | null } | null | undefined) {
-  return isMissingProfileColumnError(error, "roles");
+function getMissingOptionalProfileColumn(
+  error: { message?: string | null } | null | undefined
+): OptionalProfileColumn | null {
+  for (const column of OPTIONAL_PROFILE_COLUMNS) {
+    if (isMissingProfileColumnError(error, column)) {
+      return column;
+    }
+  }
+
+  return null;
 }
 
-function isMissingAvatarColumnError(error: { message?: string | null } | null | undefined) {
-  return isMissingProfileColumnError(error, "avatar_id");
+export function isMissingRolesColumnError(error: { message?: string | null } | null | undefined) {
+  return getMissingOptionalProfileColumn(error) === "roles";
+}
+
+function normalizeStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const normalized = value
+    .map((entry) => String(entry ?? "").trim())
+    .filter((entry) => entry.length > 0);
+  return normalized.length > 0 ? normalized : [];
+}
+
+function buildProfileSelectColumns(optionalColumns: ReadonlySet<OptionalProfileColumn>) {
+  return [
+    "display_name",
+    "focus_skill",
+    "intention",
+    ...OPTIONAL_PROFILE_COLUMNS.filter((column) => optionalColumns.has(column)),
+  ].join(", ");
+}
+
+function normalizeProfileRow(
+  row: Partial<Record<keyof ProfileBasicsRow, unknown>>,
+  optionalColumns: ReadonlySet<OptionalProfileColumn>
+): ProfileBasicsRow {
+  return {
+    display_name: typeof row.display_name === "string" ? row.display_name : null,
+    focus_skill: typeof row.focus_skill === "string" ? row.focus_skill : null,
+    intention: typeof row.intention === "string" ? row.intention : null,
+    roles: optionalColumns.has("roles") ? normalizeProfileRoles(row.roles ?? null) : null,
+    avatar_id: optionalColumns.has("avatar_id") && typeof row.avatar_id === "string" ? row.avatar_id : null,
+    headline: optionalColumns.has("headline") && typeof row.headline === "string" ? row.headline : null,
+    experience: optionalColumns.has("experience") ? normalizeStringArray(row.experience ?? null) : null,
+    skills: optionalColumns.has("skills") ? normalizeStringArray(row.skills ?? null) : null,
+    linkedin_url:
+      optionalColumns.has("linkedin_url") && typeof row.linkedin_url === "string" ? row.linkedin_url : null,
+    imported_at:
+      optionalColumns.has("imported_at") && typeof row.imported_at === "string" ? row.imported_at : null,
+  };
 }
 
 export async function getProfileBasicsRow(
   supabase: SupabaseLikeClient,
   userId: string
 ): Promise<ProfileBasicsRow | null> {
-  // The helper stays intentionally tolerant because older remote schemas may still miss `roles`.
   const profilesTable = supabase.from("profiles") as ProfilesTableAccess;
-  const withRolesResult = await profilesTable
-    .select("display_name, focus_skill, intention, roles, avatar_id")
-    .eq("user_id", userId)
-    .maybeSingle();
+  const optionalColumns = new Set<OptionalProfileColumn>(OPTIONAL_PROFILE_COLUMNS);
 
-  if (!withRolesResult.error) {
-    const row =
-      (withRolesResult.data as Omit<ProfileBasicsRow, "roles"> & { roles?: unknown } | null) ?? null;
-    return row
-      ? {
-          display_name: row.display_name ?? null,
-          focus_skill: row.focus_skill ?? null,
-          intention: row.intention ?? null,
-          roles: normalizeProfileRoles(row.roles ?? null),
-          avatar_id: row.avatar_id ?? null,
-        }
-      : null;
+  while (true) {
+    const result = await profilesTable
+      .select(buildProfileSelectColumns(optionalColumns))
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!result.error) {
+      const row = (result.data as Partial<Record<keyof ProfileBasicsRow, unknown>> | null) ?? null;
+      return row ? normalizeProfileRow(row, optionalColumns) : null;
+    }
+
+    const missingColumn = getMissingOptionalProfileColumn(result.error);
+    if (!missingColumn || !optionalColumns.has(missingColumn)) {
+      throw new Error(result.error.message ?? "profile_load_failed");
+    }
+
+    optionalColumns.delete(missingColumn);
   }
-
-  const missingRolesColumn = isMissingRolesColumnError(withRolesResult.error);
-  const missingAvatarColumn = isMissingAvatarColumnError(withRolesResult.error);
-
-  if (!missingRolesColumn && !missingAvatarColumn) {
-    throw new Error(withRolesResult.error.message ?? "profile_load_failed");
-  }
-
-  const fallbackColumns = [
-    "display_name",
-    "focus_skill",
-    "intention",
-    missingRolesColumn ? null : "roles",
-    missingAvatarColumn ? null : "avatar_id",
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const fallbackResult = await profilesTable
-    .select(fallbackColumns)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (fallbackResult.error) {
-    throw new Error(fallbackResult.error.message ?? "profile_load_failed");
-  }
-
-  const row =
-    (fallbackResult.data as
-      | (Omit<ProfileBasicsRow, "roles" | "avatar_id"> & {
-          roles?: unknown;
-          avatar_id?: string | null;
-        })
-      | null) ?? null;
-  return row
-    ? {
-        display_name: row.display_name ?? null,
-        focus_skill: row.focus_skill ?? null,
-        intention: row.intention ?? null,
-        roles: missingRolesColumn ? null : normalizeProfileRoles(row.roles ?? null),
-        avatar_id: missingAvatarColumn ? null : row.avatar_id ?? null,
-      }
-    : null;
 }
 
 export async function upsertProfileBasicsRow(
@@ -119,26 +142,42 @@ export async function upsertProfileBasicsRow(
   values: ProfileBasicsRow & { user_id: string; updated_at: string }
 ) {
   const profilesTable = supabase.from("profiles") as ProfilesTableAccess;
-  const withRoles = await profilesTable.upsert(values, { onConflict: "user_id" });
-  if (!withRoles.error) {
-    return withRoles;
-  }
+  const omittedColumns = new Set<OptionalProfileColumn>();
 
-  const missingRolesColumn = isMissingRolesColumnError(withRoles.error);
-  const missingAvatarColumn = isMissingAvatarColumnError(withRoles.error);
-  if (!missingRolesColumn && !missingAvatarColumn) {
-    return withRoles;
-  }
+  while (true) {
+    const { roles: _roles, avatar_id: _avatarId, headline: _headline, experience: _experience, skills: _skills, linkedin_url: _linkedinUrl, imported_at: _importedAt, ...baseValues } =
+      values;
+    void _roles;
+    void _avatarId;
+    void _headline;
+    void _experience;
+    void _skills;
+    void _linkedinUrl;
+    void _importedAt;
 
-  const { roles: _roles, avatar_id: _avatarId, ...baseValues } = values;
-  void _roles;
-  void _avatarId;
-  return profilesTable.upsert(
-    {
-      ...baseValues,
-      ...(missingRolesColumn ? {} : { roles: values.roles }),
-      ...(missingAvatarColumn ? {} : { avatar_id: values.avatar_id }),
-    },
-    { onConflict: "user_id" }
-  );
+    const result = await profilesTable.upsert(
+      {
+        ...baseValues,
+        ...(omittedColumns.has("roles") ? {} : { roles: values.roles }),
+        ...(omittedColumns.has("avatar_id") ? {} : { avatar_id: values.avatar_id }),
+        ...(omittedColumns.has("headline") ? {} : { headline: values.headline }),
+        ...(omittedColumns.has("experience") ? {} : { experience: values.experience }),
+        ...(omittedColumns.has("skills") ? {} : { skills: values.skills }),
+        ...(omittedColumns.has("linkedin_url") ? {} : { linkedin_url: values.linkedin_url }),
+        ...(omittedColumns.has("imported_at") ? {} : { imported_at: values.imported_at }),
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (!result.error) {
+      return result;
+    }
+
+    const missingColumn = getMissingOptionalProfileColumn(result.error);
+    if (!missingColumn || omittedColumns.has(missingColumn)) {
+      return result;
+    }
+
+    omittedColumns.add(missingColumn);
+  }
 }

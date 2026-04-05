@@ -62,7 +62,7 @@ export default async function MeBasePage({
         if (isRefreshFlow) valuesSearch.set("flow", "refresh");
         redirect(`/me/values?${valuesSearch.toString()}`);
       }
-      redirect(`/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`);
+      redirect(`/invite/${encodeURIComponent(invitationId)}/done`);
     }
 
     const needsValuesAfterBase =

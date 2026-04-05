@@ -12,6 +12,11 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { normalizeProfileRoles, profileRoleLabel } from "@/features/profile/profileRoles";
 import {
+  computeProfileCompletion,
+  getPrimaryProfileRoleLabel,
+  isCoreProfileComplete,
+} from "@/features/profile/profileCompletion";
+import {
   FOUNDER_DIMENSION_META,
   FOUNDER_DIMENSION_ORDER,
   getFounderDimensionPoleLabels,
@@ -175,8 +180,8 @@ export default async function DashboardPage({
     return <main className="p-8">Fehler beim Laden der Workbooks: {workbookResult.error.message}</main>;
   }
 
-  const needsOnboarding =
-    !profileData?.display_name?.trim() || !profileData?.focus_skill || !profileData?.intention;
+  const profileCompletion = computeProfileCompletion(profileData);
+  const needsOnboarding = !isCoreProfileComplete(profileData);
   const sentInvites = invitationRows.filter((row) => row.direction === "sent");
   const receivedInvites = invitationRows.filter((row) => row.direction === "incoming");
   const sentInvitesSorted = sortInvitationsByCreatedAtDesc(sentInvites);
@@ -199,6 +204,7 @@ export default async function DashboardPage({
   const profileCompletionLabel = hasSubmittedBase
     ? `Basisprofil abgeschlossen (${selfReport?.basisAnsweredA ?? 0}/${selfReport?.basisTotal ?? 0})`
     : "Basisprofil noch offen";
+  const profileCompletionBadge = `Profil ${profileCompletion.percent}%`;
   const readyReports = reportRuns.slice(0, 3);
   const readyReportInvitationIds = new Set(readyReports.map((report) => report.invitation_id));
   const hasMatchingActivity =
@@ -389,16 +395,20 @@ export default async function DashboardPage({
       description: "Hier haltet ihr eure gemeinsamen Absprachen fuer den Alltag fest.",
     },
   ] as const;
+  const additionalRoles = normalizeProfileRoles(profileData?.roles ?? ["founder"]).slice(1);
   const profileInfoRows = [
     { label: "Name", value: profileData?.display_name?.trim() || "Noch nicht gesetzt" },
+    { label: "Rolle", value: getPrimaryProfileRoleLabel(profileData) },
     { label: "Fokus", value: profileData?.focus_skill?.trim() || "Noch nicht gesetzt" },
     { label: "Intention", value: profileData?.intention?.trim() || "Noch nicht gesetzt" },
-    {
-      label: "Rollen",
-      value: normalizeProfileRoles(profileData?.roles ?? ["founder"])
-        .map((role) => profileRoleLabel(role))
-        .join(", "),
-    },
+    ...(additionalRoles.length > 0
+      ? [
+          {
+            label: "Weitere Modi",
+            value: additionalRoles.map((role) => profileRoleLabel(role)).join(", "),
+          },
+        ]
+      : []),
   ] as const;
   const supportEmail = "business.mariaschulz@gmail.com";
   const sessionAvatarId =
@@ -667,16 +677,24 @@ export default async function DashboardPage({
                   Profil
                 </p>
                 <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                  {needsOnboarding ? "Lege zuerst deine Basisdaten an" : "Deine aktuellen Profildaten"}
+                  {needsOnboarding ? "Lege zuerst dein Kernprofil an" : "Deine aktuellen Profildaten"}
                 </h3>
               </div>
               <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-[0.08em] text-slate-600">
                 <span className="rounded-full border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-3 py-1">
                   {profileCompletionLabel}
                 </span>
+                <span className="rounded-full border border-slate-200 bg-white/75 px-3 py-1">
+                  {profileCompletionBadge}
+                </span>
                 <span className="rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1">
                   {hasSubmittedValues ? "Werteprofil abgeschlossen" : "Werteprofil optional"}
                 </span>
+                {profileCompletion.ctaLabel ? (
+                  <span className="rounded-full border border-slate-200 bg-white/75 px-3 py-1">
+                    {profileCompletion.ctaLabel}
+                  </span>
+                ) : null}
               </div>
             </div>
 
