@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
-  createDraftAssessment,
   getAssessmentAnswerMap,
   getLatestSubmittedAssessment,
   getOwnedDraftAssessment,
   getOrCreateDraftAssessment,
 } from "@/features/assessments/actions";
+import { ensureInvitationMatchingBinding } from "@/features/assessments/matchingBindings";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import {
   type QuestionnaireChoice,
@@ -89,19 +89,28 @@ export default async function MeValuesPage({
   }
 
   let draft = null as Awaited<ReturnType<typeof getOrCreateDraftAssessment>> | null;
-  if (invitationId && isRefreshFlow) {
-    const refreshDraftId = params.assessmentId?.trim() ?? "";
-    if (refreshDraftId) {
-      draft = await getOwnedDraftAssessment("values", refreshDraftId);
-    }
-    if (!draft) {
-      const freshDraft = await createDraftAssessment("values");
-      const refreshSearch = new URLSearchParams({
-        invitationId,
-        flow: "refresh",
-        assessmentId: freshDraft.id,
+  if (invitationId) {
+    const explicitDraftId = params.assessmentId?.trim() ?? "";
+    let binding;
+    try {
+      binding = await ensureInvitationMatchingBinding(invitationId, user.id, "values", {
+        assessmentId: explicitDraftId || null,
+        createDraftIfMissing: true,
+        replaceExisting: isRefreshFlow || Boolean(explicitDraftId),
       });
-      redirect(`/me/values?${refreshSearch.toString()}`);
+    } catch {
+      binding = await ensureInvitationMatchingBinding(invitationId, user.id, "values", {
+        createDraftIfMissing: true,
+        replaceExisting: isRefreshFlow,
+      });
+    }
+    draft = await getOwnedDraftAssessment("values", binding.assessmentId);
+    if (!draft) {
+      const rebound = await ensureInvitationMatchingBinding(invitationId, user.id, "values", {
+        createDraftIfMissing: true,
+        replaceExisting: true,
+      });
+      draft = await getOwnedDraftAssessment("values", rebound.assessmentId);
     }
   } else {
     draft = await getOrCreateDraftAssessment("values");

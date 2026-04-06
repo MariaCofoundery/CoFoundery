@@ -50,63 +50,52 @@ export function FounderMatchingView({
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const heroHeadline = buildMatchHeadline(selection);
-  const heroParagraphs = splitIntoParagraphs(hero).slice(0, 3);
-  const dailyDynamicsSections = splitNarrativeSections(dailyDynamics).slice(0, 2);
-  const compactInterpretation = buildCompactMatchInterpretation(compareResult, selection);
-  const [primaryAgreement, ...secondaryAgreements] = agreements;
+  const heroSentences = splitIntoParagraphs(hero);
+  const heroLead = heroSentences[0] ?? "";
+  const heroSupport = heroSentences.slice(1, 4);
+  const dailyDynamicsSections = splitNarrativeSections(dailyDynamics).slice(0, 3);
+  const steeringPoints = buildSteeringPoints(markers, agreements);
+  const supportingPoints = buildSupportingPoints(selection);
+  const clarificationQuestions = buildClarificationQuestions(selection);
+  const introSummary = buildIntroSummary(selection);
+  const introContext = buildIntroContext(selection);
 
   return (
     <>
       <section className="page-section rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-4xl">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Matching-Report</p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-              {t(heroHeadline)}
-            </h1>
-            <h2 className="mt-5 text-lg font-medium text-slate-900">Euer Matching-Report</h2>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-              Hier seht ihr, wo ihr anschlussfähig seid, wo Unterschiede produktiv werden können
-              und wo ihr klare Regeln braucht.
-            </p>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-500">
-              Im nächsten Schritt übersetzt ihr das im Workbook in konkrete Arbeitsregeln.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-2.5">
-              <StatusBadge label={participantAName} tone="accentA" />
-              <StatusBadge label={participantBName} tone="accentB" />
-              <StatusBadge label={teamContextLabel(effectiveTeamContext)} tone="neutral" />
-              {compareResult.overallMatchScore != null ? (
-                <StatusBadge label={`Match-Score ${compareResult.overallMatchScore}/100`} tone="neutral" />
-              ) : null}
-              <StatusBadge
-                label={
-                  selection.meta.highSimilarityBlindSpotRisk
-                    ? "Hohe Nähe mit Blind-Spot-Risiko"
-                    : selection.meta.balancedButManageable
-                      ? "Ausgeglichen, aber abstimmungsbedürftig"
-                      : "Klar lesbare Teamdynamik"
-                }
-                tone="neutral"
-              />
-            </div>
-          </div>
+        <div className="max-w-4xl">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Einstieg</p>
+          <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
+            {t(heroHeadline)}
+          </h1>
+          <p className="mt-4 text-sm font-medium text-slate-900">
+            {t(introSummary)}
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
+            {t(introContext)}
+          </p>
+          <p className="mt-5 text-[12px] uppercase tracking-[0.16em] text-slate-500">
+            {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
+          </p>
         </div>
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Euer Kernmuster</p>
-        <div className="mt-6 max-w-4xl space-y-3.5">
-          {heroParagraphs.map((paragraph) => (
-            <p key={paragraph} className="text-[15px] leading-7 text-slate-700">
-              {t(paragraph)}
-            </p>
-          ))}
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Euer zentrales Muster</p>
+        <div className="mt-6 max-w-4xl">
+          <p className="text-lg font-semibold leading-8 text-slate-950">{t(heroLead)}</p>
+          <div className="mt-4 space-y-3.5">
+            {heroSupport.map((sentence) => (
+              <p key={sentence} className="text-[15px] leading-7 text-slate-700">
+                {t(sentence)}
+              </p>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Eure Dynamik auf einen Blick</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. Eure Dynamik im Überblick</p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
             const meta = FOUNDER_DIMENSION_META[dimension.dimension];
@@ -120,12 +109,10 @@ export function FounderMatchingView({
                 key={`matching-overview-${dimension.dimension}`}
                 className="rounded-[22px] border border-slate-200/70 bg-slate-50/60 px-5 py-4 sm:px-6 sm:py-5"
               >
-                <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-[15px] font-semibold text-slate-900">{meta.canonicalName}</h4>
-                  </div>
-                  {status ? <MiniStatusBadge status={status.status} /> : null}
-                </div>
+                <h4 className="text-[15px] font-semibold text-slate-900">{meta.canonicalName}</h4>
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  {t(buildDimensionReading(meta.canonicalName, status?.status ?? "nah"))}
+                </p>
 
                 <div className="mt-4 max-w-3xl">
                   <ComparisonScale
@@ -145,88 +132,71 @@ export function FounderMatchingView({
             );
           })}
         </div>
-
-        <div className="mt-6 max-w-3xl space-y-3">
-          {compactInterpretation.map((paragraph, index) => (
-            <p
-              key={paragraph}
-              className={index === 0 ? "text-sm font-medium leading-7 text-slate-900" : "text-sm leading-7 text-slate-700"}
-            >
-              {t(paragraph)}
-            </p>
-          ))}
-        </div>
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. So zeigt sich das im Alltag</p>
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. So zeigt sich das im Alltag</p>
+        <div className="mt-6 grid gap-5 lg:grid-cols-3">
           {dailyDynamicsSections.map((section) => (
             <article
               key={`${section.title}-${section.body}`}
               className="rounded-[22px] border border-slate-200/80 bg-slate-50/70 p-5"
             >
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{section.title}</p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                {t(limitSentences(section.body, 2))}
+              </p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. Was ihr klären müsst</p>
+      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">5. Wo ihr steuern müsst</p>
+        <ul className="mt-6 space-y-3">
+          {steeringPoints.map((point) => (
+            <li
+              key={point}
+              className="rounded-[18px] border border-slate-200/80 bg-slate-50/60 px-5 py-4 text-sm leading-7 text-slate-700"
+            >
+              {t(point)}
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {markers.primary ? (
-          <div className="mt-5 rounded-[20px] border border-[color:var(--brand-accent)]/18 bg-white/88 px-5 py-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Primärer Marker</p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-900">{t(markers.primary.label)}</h3>
-            <p className="mt-2 text-sm leading-7 text-slate-700">{t(markers.primary.explanation)}</p>
-            <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-500">Workbook-Haltung</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{t(markers.primary.workbookLabel)}</p>
-            <p className="mt-2 text-sm leading-7 text-slate-700">
-              {t(buildMarkerWorkbookPrompt(markers.primary, effectiveTeamContext))}
+      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">6. Was euch trägt</p>
+        <div className="mt-6 space-y-3">
+          {supportingPoints.map((point) => (
+            <p
+              key={point}
+              className="rounded-[18px] border border-slate-200/80 bg-white/92 px-5 py-4 text-sm leading-7 text-slate-700"
+            >
+              {t(point)}
             </p>
-          </div>
-        ) : null}
+          ))}
+        </div>
+      </section>
 
-        {markers.secondary.length > 0 ? (
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            {markers.secondary.map((marker) => (
-              <article
-                key={`${marker.markerClass}-${marker.dimension ?? "none"}`}
-                className="rounded-[20px] border border-slate-200/80 bg-white/84 px-5 py-4"
-              >
-                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{t(marker.label)}</p>
-                <p className="mt-2 text-sm leading-7 text-slate-700">{t(marker.explanation)}</p>
-              </article>
-            ))}
-          </div>
-        ) : null}
-
-        {primaryAgreement ? (
-          <div className="mt-5 rounded-[24px] border border-[color:var(--brand-accent)]/18 bg-white/92 p-6">
-            <p className="text-lg font-semibold leading-8 text-slate-900">{t(primaryAgreement)}</p>
-          </div>
-        ) : null}
-
-        {secondaryAgreements.length > 0 ? (
-          <div className="mt-4 grid gap-3">
-            {secondaryAgreements.map((agreement) => (
-              <article
-                key={agreement}
-                className="rounded-[20px] border border-slate-200/80 bg-white/80 px-5 py-4 text-sm leading-7 text-slate-700"
-              >
-                {t(agreement)}
-              </article>
-            ))}
-          </div>
-        ) : null}
+      <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">7. Das müsst ihr klären</p>
+        <ul className="mt-6 space-y-3">
+          {clarificationQuestions.map((question) => (
+            <li
+              key={question}
+              className="rounded-[20px] border border-slate-200/80 bg-white/88 px-5 py-4 text-sm leading-7 text-slate-800"
+            >
+              {t(question)}
+            </li>
+          ))}
+        </ul>
 
         <div className="mt-8 border-t border-slate-200/80 pt-8 print:hidden">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Nächster Schritt</p>
-          <h3 className="mt-3 text-xl font-semibold text-slate-900">Jetzt Alignment konkret festhalten</h3>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">8. Übergang zum Workbook</p>
+          <h3 className="mt-3 text-xl font-semibold text-slate-900">Diese Punkte klärt ihr nicht nebenbei.</h3>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            {t(buildWorkbookOutro(markers.primary, effectiveTeamContext))}
+            Im Workbook legt ihr fest, wie ihr damit arbeitet.
           </p>
           <div className="mt-6">
             <ReportActionButton href={workbookHref}>Workbook starten</ReportActionButton>
@@ -286,6 +256,10 @@ function splitNarrativeSections(text: string) {
   }).filter((section) => section.body.length > 0);
 }
 
+function limitSentences(text: string, maxSentences: number) {
+  return splitIntoParagraphs(text).slice(0, maxSentences).join(" ");
+}
+
 function buildMatchHeadline(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
@@ -302,62 +276,50 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
   }
 }
 
+function buildIntroSummary(selection: FounderMatchingSelection) {
+  switch (selection.heroSelection.mode) {
+    case "tension_led":
+      return selection.biggestTension
+        ? `Bei euch entsteht Reibung frueh. Vor allem in ${selection.biggestTension.dimension}.`
+        : "Bei euch entsteht Reibung frueh.";
+    case "complement_led":
+      return selection.strongestComplement
+        ? `Bei euch liegt die Chance in einem Unterschied. Vor allem in ${selection.strongestComplement.dimension}.`
+        : "Bei euch liegt die Chance in einem echten Unterschied.";
+    case "coordination_led":
+      return selection.biggestTension
+        ? `Bei euch wird Reibung eher still als laut. Vor allem in ${selection.biggestTension.dimension}.`
+        : "Bei euch wird Reibung eher still als laut.";
+    case "blind_spot_watch":
+      return selection.heroSelection.biggestRisk
+        ? `Bei euch wirkt vieles erst einmal nah. Das Risiko liegt in stiller Drift, vor allem in ${selection.heroSelection.biggestRisk.dimension}.`
+        : "Bei euch wirkt vieles erst einmal nah. Das Risiko liegt in stiller Drift.";
+    case "alignment_led":
+    default:
+      return selection.stableBase
+        ? `Bei euch gibt es eine tragende Linie. Klarheit braucht trotzdem ein Feld am Rand.`
+        : "Bei euch gibt es eine tragende Linie.";
+  }
+}
+
+function buildIntroContext(selection: FounderMatchingSelection) {
+  switch (selection.heroSelection.mode) {
+    case "tension_led":
+      return "Das wird im Alltag sichtbar, wenn Prioritaeten, Tempo oder Erwartungen nicht ueber denselben Weg laufen.";
+    case "complement_led":
+      return "Das kann euch breiter machen. Von selbst traegt es aber nicht.";
+    case "coordination_led":
+      return "Das kostet selten offen Energie. Es kostet eher Tempo und Klarheit.";
+    case "blind_spot_watch":
+      return "Der Punkt ist nicht offener Streit. Der Punkt ist, dass ihr Unterschiede zu spaet merkt.";
+    case "alignment_led":
+    default:
+      return "Das gibt euch Ruhe. Es ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
+  }
+}
+
 function teamContextLabel(teamContext: TeamContext) {
   return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
-}
-
-function buildOverallMatchReading(overallMatchScore: number | null) {
-  if (overallMatchScore == null) {
-    return "Für dieses Match fehlen belastbare Vergleichsdaten.";
-  }
-
-  if (overallMatchScore >= 80) {
-    return "Hohe Anschlussfähigkeit. Das Duo wirkt nah, darf Ähnlichkeit aber nicht mit voller Klarheit verwechseln.";
-  }
-
-  if (overallMatchScore >= 65) {
-    return "Tragfähige Basis mit klaren Reibungspunkten. Nicht offener Streit, sondern wiederkehrende Abstimmung kostet hier am ehesten Zeit.";
-  }
-
-  if (overallMatchScore >= 45) {
-    return "Gemischtes Bild mit spürbarer Belastung. Dieses Match lebt nicht von Selbstverständlichkeit, sondern von sichtbaren Regeln und sauberer Priorisierung.";
-  }
-
-  return "Niedrige Anschlussfähigkeit. Ohne frühe Klärung drohen hier nicht nur Reibung, sondern unterschiedliche Erwartungen daran, wie dieses Duo überhaupt arbeiten soll.";
-}
-
-function buildCompactMatchInterpretation(
-  compareResult: CompareFoundersResult,
-  selection: FounderMatchingSelection
-) {
-  const strongestBase = compareResult.topAlignments[0] ?? selection.stableBase?.dimension ?? null;
-  const mainNeed = compareResult.topTensions[0] ?? selection.biggestTension?.dimension ?? null;
-  const paragraphs = [buildOverallMatchReading(compareResult.overallMatchScore)];
-
-  if (selection.meta.highSimilarityBlindSpotRisk) {
-    paragraphs.push(
-      strongestBase
-        ? `Am stabilsten wirkt aktuell ${strongestBase}. Aufmerksamkeit braucht hier aber vor allem stille Drift statt offener Konflikt.`
-        : "Auffällig ist hier weniger offener Streit als die Gefahr, dass Annahmen still auseinanderlaufen."
-    );
-    return paragraphs;
-  }
-
-  if (strongestBase && mainNeed) {
-    paragraphs.push(`Am stabilsten wirkt aktuell ${strongestBase}. Den meisten Klärungsbedarf zeigt ${mainNeed}.`);
-    return paragraphs;
-  }
-
-  if (strongestBase) {
-    paragraphs.push(`Am stabilsten wirkt aktuell ${strongestBase}.`);
-    return paragraphs;
-  }
-
-  if (mainNeed) {
-    paragraphs.push(`Den meisten Klärungsbedarf zeigt aktuell ${mainNeed}.`);
-  }
-
-  return paragraphs;
 }
 
 function buildMarkerLabel(name: string | null | undefined) {
@@ -371,41 +333,89 @@ function buildMarkerLabel(name: string | null | undefined) {
     .slice(0, 2);
 }
 
-function buildMarkerWorkbookLead(marker: FounderMatchingMarker, teamContext: TeamContext) {
-  switch (marker.markerClass) {
-    case "stable_base":
-      return teamContext === "pre_founder"
-        ? "Diese Basis solltet ihr vor dem Start bewusst schützen."
-        : "Diese Basis solltet ihr im Alltag aktiv stabil halten.";
-    case "conditional_complement":
-      return teamContext === "pre_founder"
-        ? "Die Chance liegt hier nicht im Unterschied selbst, sondern in eurer Vorabklärung."
-        : "Die Chance liegt hier nicht im Unterschied selbst, sondern in klarer Führung im Alltag.";
-    case "high_rule_need":
-      return teamContext === "pre_founder"
-        ? "Dieses Feld sollte nicht implizit bleiben, bevor ihr eng zusammenarbeitet."
-        : "Dieses Feld sollte nicht weiter nebenher laufen, wenn ihr schon gemeinsam arbeitet.";
-    case "critical_clarification_point":
-      return teamContext === "pre_founder"
-        ? "Das ist kein Randthema vor dem Start, sondern ein Punkt für ausdrückliche Klärung."
-        : "Das ist kein Randthema im Betrieb, sondern ein Punkt für gezielte Bearbeitung.";
+function buildDimensionReading(
+  _dimension: string,
+  status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
+) {
+  switch (status) {
+    case "nah":
+      return "Hier zieht ihr eher in dieselbe Richtung.";
+    case "ergänzend":
+      return "Hier arbeitet ihr ueber unterschiedliche Staerken.";
+    case "abstimmung_nötig":
+      return "Hier braucht ihr klare Abstimmung.";
+    case "kritisch":
+      return "Hier duerft ihr Unklarheit nicht mitnehmen.";
   }
+}
+
+function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMarkers>, agreements: string[]) {
+  const points = [
+    markers.primary?.explanation,
+    ...markers.secondary.map((marker) => marker.explanation),
+    ...agreements,
+  ]
+    .filter((entry): entry is string => Boolean(entry))
+    .map((entry) => limitSentences(entry, 1));
+
+  return Array.from(new Set(points)).slice(0, 4);
+}
+
+function buildSupportingPoints(selection: FounderMatchingSelection) {
+  const points: string[] = [];
+
+  if (selection.stableBase) {
+    points.push(`In ${selection.stableBase.dimension} habt ihr eine tragende Basis.`);
+  }
+
+  if (selection.strongestComplement) {
+    points.push(
+      `Euer Unterschied in ${selection.strongestComplement.dimension} kann euch breiter machen, wenn ihr ihn klar fuehrt.`
+    );
+  }
+
+  if (points.length === 0) {
+    points.push("Es gibt bei euch eine gemeinsame Linie, auf die ihr aufbauen koennt.");
+  }
+
+  return points.slice(0, 2);
+}
+
+function buildClarificationQuestions(selection: FounderMatchingSelection) {
+  const questions = selection.agreementFocusDimensions.map((entry) => {
+    switch (entry.dimension) {
+      case "Commitment":
+        return "Welches Einsatzniveau erwartet ihr im Alltag voneinander?";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Welche Zwischenstaende muessen sichtbar sein, und wo beginnt Eigenraum?";
+      case "Konfliktstil":
+        return "Was muss sofort auf den Tisch, und was klaert ihr in Ruhe?";
+      case "Entscheidungslogik":
+        return "Wer bereitet Entscheidungen vor, wann ist genug geklaert, und wer entscheidet am Ende?";
+      case "Unternehmenslogik":
+        return "Wonach priorisiert ihr, wenn Wachstum, Wirkung und Aufbau nicht dieselbe Richtung zeigen?";
+      case "Risikoorientierung":
+        return "Wie viel Risiko ist fuer euch okay, und wann geht Absicherung vor?";
+    }
+  });
+
+  return Array.from(new Set(questions)).slice(0, 5);
 }
 
 function buildMarkerWorkbookPrompt(marker: FounderMatchingMarker, teamContext: TeamContext) {
   switch (marker.workbookPosture) {
     case "protect":
       return teamContext === "pre_founder"
-        ? "Haltet fest, was diese Basis tragfähig macht und woran ihr merkt, dass sie zu kippen beginnt."
-        : "Haltet fest, was diese Basis im Alltag stützt und woran ihr früh merkt, dass sie leise erodiert.";
+        ? "Haltet fest, was diese Basis tragfaehig macht und woran ihr merkt, dass sie zu kippen beginnt."
+        : "Haltet fest, was diese Basis im Alltag stuetzt und woran ihr frueh merkt, dass sie leise erodiert.";
     case "define":
-      return "Legt im Workbook ausdrücklich fest, was gelten soll, statt auf stilles gemeinsames Verständnis zu hoffen.";
+      return "Legt im Workbook ausdruecklich fest, was gelten soll, statt auf stilles gemeinsames Verstaendnis zu hoffen.";
     case "regulate":
-      return "Übersetzt das Feld im Workbook in klare Regeln für Timing, Sichtbarkeit und Nachsteuerung.";
+      return "Uebersetzt das Feld im Workbook in klare Regeln fuer Timing, Sichtbarkeit und Nachsteuerung.";
     case "repair":
       return "Behandelt das Feld im Workbook nicht als Feinschliff, sondern als aktive Belastung, die gezielt bearbeitet werden muss.";
     case "escalate_for_discussion":
-      return "Nutzt das Workbook hier nicht für Kosmetik, sondern für eine ausdrückliche Klärung vor gemeinsamer Abhängigkeit.";
+      return "Nutzt das Workbook hier nicht fuer Kosmetik, sondern fuer eine ausdrueckliche Klaerung vor gemeinsamer Abhaengigkeit.";
   }
 }
 
@@ -438,63 +448,4 @@ function buildWorkbookOutro(
   return teamContext === "pre_founder"
     ? "Ihr habt gesehen, was euch vor dem Start bereits trägt. Im Workbook haltet ihr jetzt fest, wie ihr diese Basis schützt, wenn Druck und Abhängigkeit steigen."
     : "Ihr habt gesehen, was euch im Alltag bereits trägt. Im Workbook haltet ihr jetzt fest, wie ihr diese Basis stabil haltet, wenn Tempo und Druck steigen.";
-}
-
-function statusLabel(status: FounderMatchingSelection["dimensionStatuses"][number]["status"]) {
-  switch (status) {
-    case "nah":
-      return "Nah";
-    case "ergänzend":
-      return "Ergänzend";
-    case "abstimmung_nötig":
-      return "Abstimmung nötig";
-    case "kritisch":
-      return "Kritisch";
-  }
-}
-
-function StatusBadge({
-  label,
-  tone,
-}: {
-  label: string;
-  tone: "neutral" | "accentA" | "accentB";
-}) {
-  const className =
-    tone === "accentA"
-      ? "border-[#00B8D9]/25 bg-[#00B8D9]/10 text-slate-700"
-      : tone === "accentB"
-        ? "border-[#7C3AED]/25 bg-[#7C3AED]/10 text-slate-700"
-        : "border-slate-200 bg-slate-50 text-slate-600";
-
-  return (
-    <span
-      className={`inline-flex min-h-7 items-center rounded-full border px-3 py-1 text-[11px] tracking-[0.08em] ${className}`}
-    >
-      {t(label)}
-    </span>
-  );
-}
-
-function MiniStatusBadge({
-  status,
-}: {
-  status: FounderMatchingSelection["dimensionStatuses"][number]["status"];
-}) {
-  const className =
-    status === "kritisch"
-      ? "border-rose-200 bg-rose-50 text-rose-700"
-      : status === "abstimmung_nötig"
-        ? "border-amber-200 bg-amber-50 text-amber-700"
-        : status === "ergänzend"
-          ? "border-sky-200 bg-sky-50 text-sky-700"
-          : "border-emerald-200 bg-emerald-50 text-emerald-700";
-
-  return (
-    <span
-      className={`inline-flex min-h-7 items-center whitespace-nowrap rounded-full border px-3 py-1 text-[11px] tracking-[0.08em] ${className}`}
-    >
-      {t(statusLabel(status))}
-    </span>
-  );
 }

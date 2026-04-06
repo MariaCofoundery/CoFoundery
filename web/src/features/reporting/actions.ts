@@ -39,6 +39,12 @@ import {
   type ValuesAnswerForScoring,
 } from "@/features/reporting/values_scoring";
 import {
+  bindLatestSubmittedInvitationMatchingInputs,
+  ensureInvitationMatchingBinding,
+  getInvitationMatchingState,
+  type InvitationMatchingBinding,
+} from "@/features/assessments/matchingBindings";
+import {
   getCanonicalValuesQuestionId,
   getValuesQuestionVersionMismatch,
 } from "@/features/reporting/valuesQuestionMeta";
@@ -238,7 +244,11 @@ export type InvitationDashboardRow = {
 type PerUserReadinessSnapshot = {
   has_base_submitted: boolean;
   has_values_submitted: boolean;
-  submitted_assessment_ids: {
+  bound_assessment_ids: {
+    base: string | null;
+    values: string | null;
+  };
+  latest_submitted_assessment_ids: {
     base: string | null;
     values: string | null;
   };
@@ -264,6 +274,27 @@ export type InvitationReadinessDebug = {
     inviter: PerUserReadinessSnapshot;
     invitee: PerUserReadinessSnapshot | null;
   };
+  matching_inputs: {
+    inviter: {
+      base: string | null;
+      values: string | null;
+    };
+    invitee: {
+      base: string | null;
+      values: string | null;
+    } | null;
+  };
+  latest_global_submitted: {
+    inviter: {
+      base: string | null;
+      values: string | null;
+    };
+    invitee: {
+      base: string | null;
+      values: string | null;
+    } | null;
+  };
+  divergence: string[];
   report_run_exists: boolean;
   report_run_id: string | null;
   relationship_exists: boolean;
@@ -271,6 +302,8 @@ export type InvitationReadinessDebug = {
   computed_ready: boolean;
   reason_not_ready: string[];
   last_error: string | null;
+  finalize_attempted: boolean;
+  finalize_source: string | null;
 };
 
 export type InvitationJoinDecision =
@@ -281,6 +314,8 @@ export type InvitationJoinDecision =
       team_context: TeamContext;
       required_modules: AssessmentModule[];
       missing_modules: AssessmentModule[];
+      requires_existing_profile_choice: boolean;
+      existing_profile_available_modules: AssessmentModule[];
       invitee_status: {
         has_base_submitted: boolean;
         has_values_submitted: boolean;
@@ -630,35 +665,90 @@ function isUserReadyForModules(
   return requiredModules.every((moduleKey) => submittedByModule?.has(moduleKey));
 }
 
+function isBindingSubmitted(binding: InvitationMatchingBinding | null | undefined) {
+  return Boolean(binding?.assessmentSubmittedAt);
+}
+
+function isUserReadyForModulesFromBindings(
+  requiredModules: AssessmentModule[],
+  boundByModule: Map<AssessmentModule, InvitationMatchingBinding> | undefined
+) {
+  return requiredModules.every((moduleKey) => isBindingSubmitted(boundByModule?.get(moduleKey)));
+}
+
 function buildPerUserReadinessSnapshot(
-  submittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined,
+  boundByModule: Map<AssessmentModule, InvitationMatchingBinding> | undefined,
+  latestSubmittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined,
   answersByAssessmentId: Map<string, number>
 ): PerUserReadinessSnapshot {
-  const baseAssessmentId = submittedByModule?.get("base")?.id ?? null;
-  const valuesAssessmentId = submittedByModule?.get("values")?.id ?? null;
+  const baseBindingAssessmentId = boundByModule?.get("base")?.assessmentId ?? null;
+  const valuesBindingAssessmentId = boundByModule?.get("values")?.assessmentId ?? null;
+  const baseLatestAssessmentId = latestSubmittedByModule?.get("base")?.id ?? null;
+  const valuesLatestAssessmentId = latestSubmittedByModule?.get("values")?.id ?? null;
   return {
-    has_base_submitted: Boolean(baseAssessmentId),
-    has_values_submitted: Boolean(valuesAssessmentId),
-    submitted_assessment_ids: {
-      base: baseAssessmentId,
-      values: valuesAssessmentId,
+    has_base_submitted: Boolean(boundByModule?.get("base")?.assessmentSubmittedAt),
+    has_values_submitted: Boolean(boundByModule?.get("values")?.assessmentSubmittedAt),
+    bound_assessment_ids: {
+      base: baseBindingAssessmentId,
+      values: valuesBindingAssessmentId,
+    },
+    latest_submitted_assessment_ids: {
+      base: baseLatestAssessmentId,
+      values: valuesLatestAssessmentId,
     },
     answers_count: {
-      base: baseAssessmentId ? answersByAssessmentId.get(baseAssessmentId) ?? 0 : 0,
-      values: valuesAssessmentId ? answersByAssessmentId.get(valuesAssessmentId) ?? 0 : 0,
+      base: baseBindingAssessmentId ? answersByAssessmentId.get(baseBindingAssessmentId) ?? 0 : 0,
+      values: valuesBindingAssessmentId ? answersByAssessmentId.get(valuesBindingAssessmentId) ?? 0 : 0,
     },
   };
+}
+
+function buildMatchingInputSnapshot(
+  boundByModule: Map<AssessmentModule, InvitationMatchingBinding> | undefined
+) {
+  return {
+    base: boundByModule?.get("base")?.assessmentId ?? null,
+    values: boundByModule?.get("values")?.assessmentId ?? null,
+  };
+}
+
+function buildLatestSubmittedSnapshot(
+  latestSubmittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined
+) {
+  return {
+    base: latestSubmittedByModule?.get("base")?.id ?? null,
+    values: latestSubmittedByModule?.get("values")?.id ?? null,
+  };
+}
+
+function buildBindingDivergence(
+  userLabel: "inviter" | "invitee",
+  boundByModule: Map<AssessmentModule, InvitationMatchingBinding> | undefined,
+  latestSubmittedByModule: Map<AssessmentModule, SubmittedAssessmentRow> | undefined
+) {
+  const divergences: string[] = [];
+  for (const moduleKey of ["base", "values"] as AssessmentModule[]) {
+    const boundAssessmentId = boundByModule?.get(moduleKey)?.assessmentId ?? null;
+    const latestAssessmentId = latestSubmittedByModule?.get(moduleKey)?.id ?? null;
+    if (boundAssessmentId && latestAssessmentId && boundAssessmentId !== latestAssessmentId) {
+      divergences.push(`${userLabel}_${moduleKey}_binding_differs_from_latest`);
+    }
+    if (!boundAssessmentId && latestAssessmentId) {
+      divergences.push(`${userLabel}_${moduleKey}_latest_exists_without_binding`);
+    }
+  }
+  return divergences;
 }
 
 function buildReadinessReasons(params: {
   invitation: InvitationEnsureRow;
   requiredModules: AssessmentModule[];
-  inviterAssessments: Map<AssessmentModule, SubmittedAssessmentRow> | undefined;
-  inviteeAssessments: Map<AssessmentModule, SubmittedAssessmentRow> | undefined;
+  inviterBindings: Map<AssessmentModule, InvitationMatchingBinding> | undefined;
+  inviteeBindings: Map<AssessmentModule, InvitationMatchingBinding> | undefined;
   reportRunExists: boolean;
 }): string[] {
   const reasons: string[] = [];
-  const { invitation, requiredModules, inviterAssessments, inviteeAssessments, reportRunExists } = params;
+  const { invitation, requiredModules, inviterBindings, inviteeBindings, reportRunExists } = params;
 
   if (invitation.status !== "accepted") {
     reasons.push(
@@ -676,10 +766,10 @@ function buildReadinessReasons(params: {
   }
 
   for (const moduleKey of requiredModules) {
-    if (!inviterAssessments?.has(moduleKey)) {
+    if (!isBindingSubmitted(inviterBindings?.get(moduleKey))) {
       reasons.push(`${moduleKey}_missing_for_inviter`);
     }
-    if (!inviteeAssessments?.has(moduleKey)) {
+    if (!isBindingSubmitted(inviteeBindings?.get(moduleKey))) {
       reasons.push(`${moduleKey}_missing_for_invitee`);
     }
   }
@@ -724,24 +814,15 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
   }
 
   const invitationIds = invitations.map((invitation) => invitation.id);
-  const allRelevantUserIds = [
-    ...new Set(
-      invitations
-        .flatMap((invitation) => [invitation.inviter_user_id, invitation.invitee_user_id])
-        .filter((value): value is string => typeof value === "string" && value.length > 0)
-    ),
-  ];
-
   const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
 
-  const [modulesResult, reportRunsResult, latestSubmittedByUser] = await Promise.all([
+  const [modulesResult, reportRunsResult] = await Promise.all([
     dataClient
       .from("invitation_modules")
       .select("invitation_id, module")
       .in("invitation_id", invitationIds),
     dataClient.from("report_runs").select("invitation_id").in("invitation_id", invitationIds),
-    getLatestSubmittedAssessmentsByUserAndModule(dataClient, allRelevantUserIds),
   ]);
 
   const requiredModulesByInvitationId = new Map<string, AssessmentModule[]>();
@@ -763,23 +844,48 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
     ((reportRunsResult.data ?? []) as ReportRunInvitationRow[]).map((row) => row.invitation_id)
   );
 
+  const matchingStates = new Map(
+    await Promise.all(
+      invitations.map(async (invitation) => {
+        if (invitation.inviter_user_id === user.id) {
+          await bindLatestSubmittedInvitationMatchingInputs(invitation.id, user.id, requiredModulesByInvitationId.get(invitation.id) ?? ["base"], {
+            client: dataClient,
+            replaceExisting: false,
+          }).catch((error) => {
+            console.error("dashboard inviter binding bootstrap failed", {
+              invitationId: invitation.id,
+              userId: user.id,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          });
+        }
+
+        return [
+          invitation.id,
+          await getInvitationMatchingState(invitation.id, { client: dataClient }),
+        ] as const;
+      })
+    )
+  );
+
   return invitations.map((invitation) => {
     const direction = invitation.inviter_user_id === user.id ? "sent" : "incoming";
     const requiredModules = requiredModulesByInvitationId.get(invitation.id) ?? ["base"];
-    const inviterSubmittedByModule = latestSubmittedByUser.get(invitation.inviter_user_id);
-    const inviteeSubmittedByModule = invitation.invitee_user_id
-      ? latestSubmittedByUser.get(invitation.invitee_user_id)
+    const matchingState = matchingStates.get(invitation.id);
+    const inviterBoundByModule = matchingState?.bindingsByUser.get(invitation.inviter_user_id);
+    const inviteeBoundByModule = invitation.invitee_user_id
+      ? matchingState?.bindingsByUser.get(invitation.invitee_user_id)
       : undefined;
-    const inviteeHasBase = Boolean(inviteeSubmittedByModule?.has("base"));
-    const inviteeHasValues = Boolean(inviteeSubmittedByModule?.has("values"));
-    const inviterHasBase = Boolean(inviterSubmittedByModule?.has("base"));
-    const inviterHasValues = Boolean(inviterSubmittedByModule?.has("values"));
+    const inviteeHasBase = isBindingSubmitted(inviteeBoundByModule?.get("base"));
+    const inviteeHasValues = isBindingSubmitted(inviteeBoundByModule?.get("values"));
+    const inviterHasBase = isBindingSubmitted(inviterBoundByModule?.get("base"));
+    const inviterHasValues = isBindingSubmitted(inviterBoundByModule?.get("values"));
     const reportRunExists = reportRunByInvitationId.has(invitation.id);
     const isReadyForMatching =
       invitation.status === "accepted" &&
       !isInvitationExpired(invitation.expires_at) &&
-      isUserReadyForModules(requiredModules, inviterSubmittedByModule) &&
-      isUserReadyForModules(requiredModules, inviteeSubmittedByModule);
+      isUserReadyForModulesFromBindings(requiredModules, inviterBoundByModule) &&
+      isUserReadyForModulesFromBindings(requiredModules, inviteeBoundByModule);
 
     return {
       id: invitation.id,
@@ -807,7 +913,11 @@ function emptyReadinessSnapshot(): PerUserReadinessSnapshot {
   return {
     has_base_submitted: false,
     has_values_submitted: false,
-    submitted_assessment_ids: {
+    bound_assessment_ids: {
+      base: null,
+      values: null,
+    },
+    latest_submitted_assessment_ids: {
       base: null,
       values: null,
     },
@@ -890,9 +1000,35 @@ async function getInvitationJoinDecisionInternal(
   const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
   const requiredModules = moduleOrder(await getRequiredModulesForInvitation(dataClient, normalizedInvitationId));
-  const latestSubmittedByUser = await getLatestSubmittedAssessmentsByUserAndModule(dataClient, [user.id]);
-  const inviteeSubmittedByModule = latestSubmittedByUser.get(user.id);
-  const missingModules = requiredModules.filter((moduleKey) => !inviteeSubmittedByModule?.has(moduleKey));
+  if (privileged) {
+    await bindLatestSubmittedInvitationMatchingInputs(
+      normalizedInvitationId,
+      invitation.inviter_user_id,
+      requiredModules,
+      {
+        client: dataClient,
+        replaceExisting: false,
+      }
+    ).catch((error) => {
+      console.error("join decision inviter binding bootstrap failed", {
+        invitationId: normalizedInvitationId,
+        userId: invitation.inviter_user_id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }
+
+  const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: dataClient });
+  const inviteeBoundByModule = matchingState.bindingsByUser.get(user.id);
+  const inviteeLatestSubmittedByModule = matchingState.latestSubmittedByUser.get(user.id);
+  const missingModules = requiredModules.filter(
+    (moduleKey) => !isBindingSubmitted(inviteeBoundByModule?.get(moduleKey))
+  );
+  const existingProfileAvailableModules = missingModules.filter((moduleKey) =>
+    Boolean(inviteeLatestSubmittedByModule?.get(moduleKey))
+  );
+  const requiresExistingProfileChoice =
+    missingModules.length > 0 && existingProfileAvailableModules.length === missingModules.length;
 
   const { data: reportRunData } = await dataClient
     .from("report_runs")
@@ -903,7 +1039,7 @@ async function getInvitationJoinDecisionInternal(
 
   const mode: "needs_questionnaires" | "choice_existing_or_update" | "report_ready" = reportRunId
     ? "report_ready"
-    : missingModules.length > 0
+    : missingModules.length > 0 && !requiresExistingProfileChoice
       ? "needs_questionnaires"
       : "choice_existing_or_update";
 
@@ -914,9 +1050,11 @@ async function getInvitationJoinDecisionInternal(
     team_context: normalizeTeamContext(invitation.team_context),
     required_modules: requiredModules,
     missing_modules: missingModules,
+    requires_existing_profile_choice: requiresExistingProfileChoice,
+    existing_profile_available_modules: existingProfileAvailableModules,
     invitee_status: {
-      has_base_submitted: Boolean(inviteeSubmittedByModule?.has("base")),
-      has_values_submitted: Boolean(inviteeSubmittedByModule?.has("values")),
+      has_base_submitted: isBindingSubmitted(inviteeBoundByModule?.get("base")),
+      has_values_submitted: isBindingSubmitted(inviteeBoundByModule?.get("values")),
     },
     report_run_id: reportRunId,
   };
@@ -931,6 +1069,14 @@ export async function getInvitationJoinDecision(
 export async function applyExistingInvitationProfileChoice(
   invitationId: string
 ): Promise<UseExistingInvitationProfileResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
   const decision = await getInvitationJoinDecisionInternal(invitationId);
   if (!decision.ok) {
     const mappedReason: EnsureReportRunFailureReason =
@@ -960,6 +1106,23 @@ export async function applyExistingInvitationProfileChoice(
 
   if (decision.mode === "report_ready") {
     return { ok: true, reportRunId: decision.report_run_id, waiting: false };
+  }
+
+  for (const moduleKey of decision.existing_profile_available_modules) {
+    try {
+      await ensureInvitationMatchingBinding(invitationId, user.id, moduleKey, {
+        client: supabase,
+        allowLatestSubmitted: true,
+        createDraftIfMissing: false,
+        replaceExisting: true,
+      });
+    } catch (error) {
+      return {
+        ok: false,
+        reason: "not_ready_for_existing",
+        detail: error instanceof Error ? error.message : "existing_profile_binding_failed",
+      };
+    }
   }
 
   const finalizeResult = await finalizeInvitationIfReady(invitationId);
@@ -1009,6 +1172,21 @@ export async function debug_invitation_readiness(
       inviter: emptyReadinessSnapshot(),
       invitee: null,
     },
+    matching_inputs: {
+      inviter: {
+        base: null,
+        values: null,
+      },
+      invitee: null,
+    },
+    latest_global_submitted: {
+      inviter: {
+        base: null,
+        values: null,
+      },
+      invitee: null,
+    },
+    divergence: [],
     report_run_exists: false,
     report_run_id: null,
     relationship_exists: false,
@@ -1016,6 +1194,8 @@ export async function debug_invitation_readiness(
     computed_ready: false,
     reason_not_ready: [],
     last_error: null,
+    finalize_attempted: false,
+    finalize_source: null,
   };
 
   if (!normalizedInvitationId) {
@@ -1070,25 +1250,49 @@ export async function debug_invitation_readiness(
 
   const invitation = invitationData as InvitationEnsureRow;
   const requiredModules = await getRequiredModulesForInvitation(dataClient, normalizedInvitationId);
+  if (privileged || user.id === invitation.inviter_user_id) {
+    await bindLatestSubmittedInvitationMatchingInputs(
+      normalizedInvitationId,
+      invitation.inviter_user_id,
+      requiredModules,
+      {
+        client: dataClient,
+        replaceExisting: false,
+      }
+    ).catch((error) => {
+      console.error("debug invitation inviter binding bootstrap failed", {
+        invitationId: normalizedInvitationId,
+        userId: invitation.inviter_user_id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }
 
-  const relevantUsers = [invitation.inviter_user_id, invitation.invitee_user_id].filter(
-    (value): value is string => typeof value === "string" && value.length > 0
-  );
-  const latestSubmittedByUser = await getLatestSubmittedAssessmentsByUserAndModule(dataClient, relevantUsers);
+  const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: dataClient });
+  const inviterBindings = matchingState.bindingsByUser.get(invitation.inviter_user_id);
+  const inviteeBindings =
+    invitation.invitee_user_id != null
+      ? matchingState.bindingsByUser.get(invitation.invitee_user_id)
+      : undefined;
+  const latestSubmittedByUser = matchingState.latestSubmittedByUser;
   const inviterAssessments = latestSubmittedByUser.get(invitation.inviter_user_id);
   const inviteeAssessments =
     invitation.invitee_user_id != null
       ? latestSubmittedByUser.get(invitation.invitee_user_id)
       : undefined;
-  const assessmentIds = [inviterAssessments, inviteeAssessments]
-    .flatMap((byModule) => [byModule?.get("base")?.id, byModule?.get("values")?.id])
+  const assessmentIds = [inviterBindings, inviteeBindings]
+    .flatMap((byModule) => [byModule?.get("base")?.assessmentId, byModule?.get("values")?.assessmentId])
     .filter((value): value is string => Boolean(value));
   const answersByAssessmentId = await getAnswerCountByAssessmentId(dataClient, assessmentIds);
 
-  const inviterStatus = buildPerUserReadinessSnapshot(inviterAssessments, answersByAssessmentId);
+  const inviterStatus = buildPerUserReadinessSnapshot(
+    inviterBindings,
+    inviterAssessments,
+    answersByAssessmentId
+  );
   const inviteeStatus =
     invitation.invitee_user_id != null
-      ? buildPerUserReadinessSnapshot(inviteeAssessments, answersByAssessmentId)
+      ? buildPerUserReadinessSnapshot(inviteeBindings, inviteeAssessments, answersByAssessmentId)
       : null;
 
   const { data: reportRunData } = await dataClient
@@ -1116,21 +1320,25 @@ export async function debug_invitation_readiness(
     !invitation.revoked_at &&
     !isInvitationExpired(invitation.expires_at) &&
     invitation.invitee_user_id != null &&
-    isUserReadyForModules(requiredModules, inviterAssessments) &&
-    isUserReadyForModules(requiredModules, inviteeAssessments);
+    isUserReadyForModulesFromBindings(requiredModules, inviterBindings) &&
+    isUserReadyForModulesFromBindings(requiredModules, inviteeBindings);
 
   const reasonNotReady = computedReady && reportRunExists
     ? []
     : buildReadinessReasons({
         invitation,
         requiredModules,
-        inviterAssessments,
-        inviteeAssessments,
+        inviterBindings,
+        inviteeBindings,
         reportRunExists,
       });
   if (!privileged) {
     reasonNotReady.push("missing_service_role");
   }
+  const divergence = [
+    ...buildBindingDivergence("inviter", inviterBindings, inviterAssessments),
+    ...buildBindingDivergence("invitee", inviteeBindings, inviteeAssessments),
+  ];
 
   let lastError: string | null = null;
   let resolvedReportRunId = reportRunId;
@@ -1169,6 +1377,21 @@ export async function debug_invitation_readiness(
       inviter: inviterStatus,
       invitee: inviteeStatus,
     },
+    matching_inputs: {
+      inviter: buildMatchingInputSnapshot(inviterBindings),
+      invitee:
+        invitation.invitee_user_id != null
+          ? buildMatchingInputSnapshot(inviteeBindings)
+          : null,
+    },
+    latest_global_submitted: {
+      inviter: buildLatestSubmittedSnapshot(inviterAssessments),
+      invitee:
+        invitation.invitee_user_id != null
+          ? buildLatestSubmittedSnapshot(inviteeAssessments)
+          : null,
+    },
+    divergence: [...new Set(divergence)],
     report_run_exists: Boolean(resolvedReportRunId),
     report_run_id: resolvedReportRunId,
     relationship_exists: Boolean(relationshipId),
@@ -1176,6 +1399,8 @@ export async function debug_invitation_readiness(
     computed_ready: computedReady,
     reason_not_ready: [...new Set(reasonNotReady)],
     last_error: lastError,
+    finalize_attempted: options?.attemptFinalize === true,
+    finalize_source: options?.attemptFinalize ? "debug_invitation_readiness" : null,
   };
 }
 
@@ -1400,29 +1625,67 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     ? "basis_plus_values"
     : "basis";
 
-  const inviterBase = await getLatestSubmittedAssessmentForUserModule(
-    privileged,
+  await bindLatestSubmittedInvitationMatchingInputs(
+    normalizedInvitationId,
     invitation.inviter_user_id,
-    "base"
-  );
-  const inviteeBase = await getLatestSubmittedAssessmentForUserModule(
-    privileged,
-    invitation.invitee_user_id,
-    "base"
-  );
-  if (!inviterBase || !inviteeBase) {
-    return { ok: false, reason: "waiting_for_answers" };
-  }
+    requiredModules,
+    {
+      client: privileged,
+      replaceExisting: false,
+    }
+  ).catch((error) => {
+    console.error("ensure report inviter binding bootstrap failed", {
+      invitationId: normalizedInvitationId,
+      userId: invitation.inviter_user_id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 
-  const inviterValues = requiredModules.includes("values")
-    ? await getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "values")
-    : null;
-  const inviteeValues = requiredModules.includes("values")
-    ? await getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "values")
-    : null;
-  if (requiredModules.includes("values") && (!inviterValues || !inviteeValues)) {
+  const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: privileged });
+  const inviterBindings = matchingState.bindingsByUser.get(invitation.inviter_user_id);
+  const inviteeBindings = matchingState.bindingsByUser.get(invitation.invitee_user_id);
+  const inviterBaseBinding = inviterBindings?.get("base");
+  const inviteeBaseBinding = inviteeBindings?.get("base");
+  if (!isBindingSubmitted(inviterBaseBinding) || !isBindingSubmitted(inviteeBaseBinding)) {
     return { ok: false, reason: "waiting_for_answers" };
   }
+  const resolvedInviterBaseBinding = inviterBaseBinding as InvitationMatchingBinding;
+  const resolvedInviteeBaseBinding = inviteeBaseBinding as InvitationMatchingBinding;
+  const inviterBase = {
+    id: resolvedInviterBaseBinding.assessmentId,
+    submitted_at: resolvedInviterBaseBinding.assessmentSubmittedAt,
+    created_at: resolvedInviterBaseBinding.assessmentCreatedAt,
+  };
+  const inviteeBase = {
+    id: resolvedInviteeBaseBinding.assessmentId,
+    submitted_at: resolvedInviteeBaseBinding.assessmentSubmittedAt,
+    created_at: resolvedInviteeBaseBinding.assessmentCreatedAt,
+  };
+
+  const inviterValuesBinding = requiredModules.includes("values") ? inviterBindings?.get("values") ?? null : null;
+  const inviteeValuesBinding = requiredModules.includes("values") ? inviteeBindings?.get("values") ?? null : null;
+  if (
+    requiredModules.includes("values") &&
+    (!isBindingSubmitted(inviterValuesBinding) || !isBindingSubmitted(inviteeValuesBinding))
+  ) {
+    return { ok: false, reason: "waiting_for_answers" };
+  }
+  const resolvedInviterValuesBinding = inviterValuesBinding as InvitationMatchingBinding | null;
+  const resolvedInviteeValuesBinding = inviteeValuesBinding as InvitationMatchingBinding | null;
+  const inviterValues = resolvedInviterValuesBinding
+    ? {
+        id: resolvedInviterValuesBinding.assessmentId,
+        submitted_at: resolvedInviterValuesBinding.assessmentSubmittedAt,
+        created_at: resolvedInviterValuesBinding.assessmentCreatedAt,
+      }
+    : null;
+  const inviteeValues = resolvedInviteeValuesBinding
+    ? {
+        id: resolvedInviteeValuesBinding.assessmentId,
+        submitted_at: resolvedInviteeValuesBinding.assessmentSubmittedAt,
+        created_at: resolvedInviteeValuesBinding.assessmentCreatedAt,
+      }
+    : null;
 
   const [inviterBaseAnswers, inviteeBaseAnswers] = await Promise.all([
     getAssessmentAnswers(privileged, inviterBase.id),
@@ -2128,16 +2391,37 @@ export async function getFounderMatchingLiveData(
     return null;
   }
 
-  const [inviterBase, inviteeBase, inviterValues, inviteeValues] = await Promise.all([
-    getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "base"),
-    getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "base"),
-    getLatestSubmittedAssessmentForUserModule(privileged, invitation.inviter_user_id, "values"),
-    getLatestSubmittedAssessmentForUserModule(privileged, invitation.invitee_user_id, "values"),
-  ]);
+  const requiredModules = await getRequiredModulesForInvitation(privileged, normalizedInvitationId);
+  await bindLatestSubmittedInvitationMatchingInputs(
+    normalizedInvitationId,
+    invitation.inviter_user_id,
+    requiredModules,
+    {
+      client: privileged,
+      replaceExisting: false,
+    }
+  ).catch(() => undefined);
 
-  if (!inviterBase || !inviteeBase) {
+  const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: privileged });
+  const inviterBindings = matchingState.bindingsByUser.get(invitation.inviter_user_id);
+  const inviteeBindings = matchingState.bindingsByUser.get(invitation.invitee_user_id);
+  const inviterBaseBinding = inviterBindings?.get("base");
+  const inviteeBaseBinding = inviteeBindings?.get("base");
+  if (!isBindingSubmitted(inviterBaseBinding) || !isBindingSubmitted(inviteeBaseBinding)) {
     return null;
   }
+  const resolvedInviterBaseBinding = inviterBaseBinding as InvitationMatchingBinding;
+  const resolvedInviteeBaseBinding = inviteeBaseBinding as InvitationMatchingBinding;
+  const inviterBase = { id: resolvedInviterBaseBinding.assessmentId };
+  const inviteeBase = { id: resolvedInviteeBaseBinding.assessmentId };
+  const inviterValuesBinding = inviterBindings?.get("values") ?? null;
+  const inviteeValuesBinding = inviteeBindings?.get("values") ?? null;
+  const inviterValues = isBindingSubmitted(inviterValuesBinding)
+    ? { id: (inviterValuesBinding as InvitationMatchingBinding).assessmentId }
+    : null;
+  const inviteeValues = isBindingSubmitted(inviteeValuesBinding)
+    ? { id: (inviteeValuesBinding as InvitationMatchingBinding).assessmentId }
+    : null;
 
   const [inviterBaseAnswers, inviteeBaseAnswers] = await Promise.all([
     getAssessmentAnswers(privileged, inviterBase.id),

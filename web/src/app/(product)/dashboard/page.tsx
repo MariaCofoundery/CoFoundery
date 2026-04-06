@@ -909,23 +909,23 @@ function formatIncomingInviteTitle(invite: InvitationDashboardRow) {
 
 function getIncomingInviteStatusLabel(invite: InvitationDashboardRow) {
   if (invite.isReportReady) return "Report bereit";
-  if (invite.isReadyForMatching) return "Report wird erstellt";
+  if (invite.isReadyForMatching) return "Matching bereit";
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  return inviteeHasAllRequired ? "Warte auf Co-Founder" : "Fragebogen offen";
+  return inviteeHasAllRequired ? "Warten auf Partner" : "Fragebogen offen";
 }
 
 function getSentInviteStatusLabel(invite: InvitationDashboardRow) {
   if (invite.isReportReady) return "Report bereit";
-  if (invite.isReadyForMatching) return "Report wird erstellt";
+  if (invite.isReadyForMatching) return "Matching bereit";
   const requiresValues = invite.requiredModules.includes("values");
   const inviterHasAllRequired =
     invite.inviterBaseSubmitted && (!requiresValues || invite.inviterValuesSubmitted);
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
   if (!inviterHasAllRequired) return "Deine Antworten fehlen";
-  return inviteeHasAllRequired ? "Report wird erstellt" : "Warte auf Antworten";
+  return inviteeHasAllRequired ? "Matching bereit" : "Warten auf Partner";
 }
 
 function formatInvitationModules(modules: string[]) {

@@ -10,6 +10,7 @@ type DeleteFounderAccountRpcSummary = {
   remainingProfiles?: number | null;
   remainingResearchEvents?: number | null;
   remainingProductFeedback?: number | null;
+  remainingMatchingInputs?: number | null;
   deletedAuthUsers?: number | null;
 };
 
@@ -74,6 +75,7 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
     !isZero(summary.remainingProfiles)
     || !isZero(summary.remainingResearchEvents)
     || !isZero(summary.remainingProductFeedback)
+    || !isZero(summary.remainingMatchingInputs)
   ) {
     console.error("deleteFounderAccount verification failed", {
       userId,

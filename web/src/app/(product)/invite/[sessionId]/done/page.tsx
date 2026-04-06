@@ -4,6 +4,7 @@ import { DelayedRedirect } from "@/features/navigation/DelayedRedirect";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { ResearchTrackedLink } from "@/features/research/ResearchTrackedLink";
 import {
+  applyExistingInvitationProfileChoice,
   finalizeInvitationIfReady,
   getInvitationJoinDecision,
 } from "@/features/reporting/actions";
@@ -11,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
+  searchParams: Promise<{ useExisting?: string }>;
 };
 
 function buildDashboardHref(invitationId: string) {
@@ -50,8 +52,8 @@ function CompletionShell({
   );
 }
 
-export default async function InvitationDonePage({ params }: PageProps) {
-  const { sessionId } = await params;
+export default async function InvitationDonePage({ params, searchParams }: PageProps) {
+  const [{ sessionId }, query] = await Promise.all([params, searchParams]);
   const invitationId = sessionId.trim();
   if (!invitationId) {
     redirect("/dashboard");
@@ -68,6 +70,7 @@ export default async function InvitationDonePage({ params }: PageProps) {
   const dashboardHref = buildDashboardHref(invitationId);
   const reportHref = `/report/${encodeURIComponent(invitationId)}`;
   const decision = await getInvitationJoinDecision(invitationId);
+  const useExistingChoice = query.useExisting === "1";
 
   if (!decision.ok) {
     return (
@@ -125,6 +128,94 @@ export default async function InvitationDonePage({ params }: PageProps) {
               Zurück zum Dashboard
             </ResearchTrackedLink>
           </div>
+      </CompletionShell>
+    );
+  }
+
+  if (decision.requires_existing_profile_choice) {
+    if (useExistingChoice) {
+      const existingProfileResult = await applyExistingInvitationProfileChoice(invitationId);
+      if (existingProfileResult.ok && existingProfileResult.reportRunId) {
+        redirect(reportHref);
+      }
+      if (existingProfileResult.ok && existingProfileResult.waiting) {
+        return (
+          <CompletionShell
+            title="Dein bestehendes Profil ist eingebunden."
+            description="Deine bereits eingereichten Antworten gelten jetzt für diese Einladung. Sobald die andere Person fertig ist, wird euer Matching-Report erstellt."
+          >
+            <ResearchPageTracker
+              eventName="invite_done_viewed"
+              invitationId={invitationId}
+              properties={{ state: "waiting_for_answers_after_existing_choice" }}
+            />
+            <div className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-700">
+              Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht.
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ResearchTrackedLink
+                href={dashboardHref}
+                eventName="invite_done_dashboard_clicked"
+                invitationId={invitationId}
+                className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
+              >
+                Zum Dashboard
+              </ResearchTrackedLink>
+            </div>
+          </CompletionShell>
+        );
+      }
+    }
+
+    const refreshStartModule = decision.required_modules.includes("base") ? "base" : "values";
+    const refreshSearch = new URLSearchParams({ invitationId, flow: "refresh" });
+    const refreshHref = `${
+      refreshStartModule === "base" ? "/me/base" : "/me/values"
+    }?${refreshSearch.toString()}`;
+    const useExistingHref = `/invite/${encodeURIComponent(invitationId)}/done?useExisting=1`;
+
+    return (
+      <CompletionShell
+        title="Wie möchtest du für dieses Matching starten?"
+        description="Du hast bereits ein eingereichtes Profil. Für dieses Matching kannst du es bewusst übernehmen oder für diesen Kontext neu beantworten."
+      >
+        <ResearchPageTracker
+          eventName="invite_done_viewed"
+          invitationId={invitationId}
+          properties={{ state: "existing_profile_choice" }}
+        />
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
+            <p className="font-medium text-slate-900">Bestehendes Profil verwenden</p>
+            <p className="mt-2">
+              Nutze deine zuletzt eingereichten Antworten als Matching-Grundlage für diese Einladung.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
+            <p className="font-medium text-slate-900">Für dieses Matching neu beantworten</p>
+            <p className="mt-2">
+              Starte mit einem frischen Lauf, wenn du deinen aktuellen Stand bewusst neu einbringen willst.
+            </p>
+          </div>
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <ResearchTrackedLink
+            href={useExistingHref}
+            eventName="invite_done_use_existing_clicked"
+            invitationId={invitationId}
+            className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
+          >
+            Bestehendes Profil verwenden
+          </ResearchTrackedLink>
+          <ResearchTrackedLink
+            href={refreshHref}
+            eventName="invite_done_refresh_clicked"
+            invitationId={invitationId}
+            className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+          >
+            Neu beantworten
+          </ResearchTrackedLink>
+        </div>
       </CompletionShell>
     );
   }

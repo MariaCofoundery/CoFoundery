@@ -6,6 +6,7 @@ import {
   getOwnedDraftAssessment,
   getOrCreateDraftAssessment,
 } from "@/features/assessments/actions";
+import { ensureInvitationMatchingBinding } from "@/features/assessments/matchingBindings";
 import {
   buildFounderCompatibilityBaseQuestionnaire,
   hasIncompatibleLegacyFounderBaseAnswers,
@@ -82,17 +83,31 @@ export default async function MeBasePage({
 
   const explicitDraftId = params.assessmentId?.trim() ?? "";
   let draft = null as Awaited<ReturnType<typeof getOrCreateDraftAssessment>> | null;
-  if (explicitDraftId) {
+  if (explicitDraftId && !invitationId) {
     draft = await getOwnedDraftAssessment("base", explicitDraftId);
   }
-  if (!draft && invitationId && isRefreshFlow) {
-    const freshDraft = await createDraftAssessment("base");
-    const refreshSearch = new URLSearchParams({
-      invitationId,
-      flow: "refresh",
-      assessmentId: freshDraft.id,
-    });
-    redirect(`/me/base?${refreshSearch.toString()}`);
+  if (!draft && invitationId) {
+    let binding;
+    try {
+      binding = await ensureInvitationMatchingBinding(invitationId, user.id, "base", {
+        assessmentId: explicitDraftId || null,
+        createDraftIfMissing: true,
+        replaceExisting: isRefreshFlow || Boolean(explicitDraftId),
+      });
+    } catch {
+      binding = await ensureInvitationMatchingBinding(invitationId, user.id, "base", {
+        createDraftIfMissing: true,
+        replaceExisting: isRefreshFlow,
+      });
+    }
+    draft = await getOwnedDraftAssessment("base", binding.assessmentId);
+    if (!draft) {
+      const rebound = await ensureInvitationMatchingBinding(invitationId, user.id, "base", {
+        createDraftIfMissing: true,
+        replaceExisting: true,
+      });
+      draft = await getOwnedDraftAssessment("base", rebound.assessmentId);
+    }
   }
   if (!draft) {
     draft = await getOrCreateDraftAssessment("base");

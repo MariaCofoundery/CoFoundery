@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { deleteFounderAccount } from "@/features/account/deleteFounderAccount";
+import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -184,6 +185,22 @@ async function createInvitation(params: {
   if (moduleError) {
     return { ok: false, error: moduleError.message };
   }
+
+  await bindLatestSubmittedInvitationMatchingInputs(
+    invitation.id,
+    user.id,
+    modules.map((row) => row.module),
+    {
+      client: supabase,
+      replaceExisting: false,
+    }
+  ).catch((error) => {
+    console.error("createInvitation matching binding bootstrap failed", {
+      invitationId: invitation.id,
+      userId: user.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 
   return {
     ok: true,
