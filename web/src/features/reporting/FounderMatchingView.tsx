@@ -77,7 +77,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Euer zentrales Muster</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Eure zentralen Muster</p>
         <div className="mt-6 max-w-4xl">
           <p className="text-lg font-semibold leading-8 text-slate-950">{t(centralPattern.lead)}</p>
           <div className="mt-4 space-y-3.5">
@@ -204,6 +204,18 @@ export function FounderMatchingView({
         </div>
       </section>
 
+      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Hinweis zur Einordnung des Reports</p>
+        <div className="mt-6 space-y-3.5 max-w-4xl">
+          <p className="text-[15px] leading-7 text-slate-700">
+            Dieser Report zeigt euren aktuellen Stand. Er ist ein Abbild eurer Dynamik, kein festes Urteil.
+          </p>
+          <p className="text-[15px] leading-7 text-slate-700">
+            Zusammenarbeit ist gestaltbar. Wenn ihr die richtigen Punkte klärt, kann sich eure Dynamik deutlich in die bessere Richtung entwickeln.
+          </p>
+        </div>
+      </section>
+
       {valuesBlock ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Zusätzlich: Wertefokus im Duo</p>
@@ -259,13 +271,13 @@ function splitNarrativeSections(text: string) {
 function buildMatchHeadline(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Ihr werdet euch nicht erst spaeter reiben. Sondern direkt im Alltag.";
+      return "Ihr werdet euch nicht erst spaeter reiben, sondern direkt im Alltag.";
     case "complement_led":
-      return "Euer Unterschied kann euch tragen. Oder frueh gegeneinander arbeiten.";
+      return "Euer Unterschied kann euch tragen oder frueh gegeneinander arbeiten.";
     case "coordination_led":
-      return "Euer Problem ist nicht Streit. Euer Problem ist stiller Zugverlust.";
+      return "Euer Problem ist nicht Streit, sondern stiller Zugverlust.";
     case "blind_spot_watch":
-      return "Bei euch kommt der Konflikt nicht zuerst. Sondern die stille Drift.";
+      return "Bei euch kommt der Konflikt nicht zuerst, sondern die stille Drift.";
     case "alignment_led":
     default:
       return "Ihr habt viel gemeinsame Linie. Gerade deshalb merkt ihr Unterschiede spaet.";
@@ -275,16 +287,16 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
 function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Bei euch wird Reibung schnell operativ.";
+      return "Euer Konflikt sitzt nicht im Ton, sondern in eurer Arbeitslogik.";
     case "complement_led":
-      return "Bei euch ist der Unterschied Chance und Risiko zugleich.";
+      return "Euer Unterschied ist zugleich Chance und Belastung.";
     case "coordination_led":
-      return "Bei euch geht eher Tempo verloren als Harmonie.";
+      return "Bei euch geht eher Tempo verloren als Vertrauen.";
     case "blind_spot_watch":
-      return "Bei euch beginnt das Problem frueher, als ihr es merkt.";
+      return "Bei euch entsteht das Problem frueher, als ihr es bemerkt.";
     case "alignment_led":
     default:
-      return "Bei euch wirkt vieles tragfaehig, bis ein offener Punkt Wirkung bekommt.";
+      return "Vieles wirkt bei euch tragfaehig, bis ein offener Punkt Wirkung bekommt.";
   }
 }
 
@@ -292,23 +304,25 @@ function buildIntroContext(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
       return selection.biggestTension
-        ? `${buildDimensionConsequence(selection.biggestTension.dimension, selection.biggestTension.status)}`
-        : "Das wird im Alltag schnell sichtbar.";
+        ? `Der staerkste Unterschied liegt in ${selection.biggestTension.dimension}. Wenn ihr das nicht klaert, arbeitet ihr an zentralen Punkten nicht nach denselben Massstaeben.`
+        : "Der Unterschied wird im Alltag schnell sichtbar.";
     case "complement_led":
       return selection.strongestComplement
-        ? `${buildDimensionComplementConsequence(selection.strongestComplement.dimension)}`
-        : "Das kann euch breiter machen. Von selbst traegt es aber nicht.";
+        ? `Die staerkste Chance liegt in ${selection.strongestComplement.dimension}. Sie traegt nur dann, wenn ihr den Unterschied bewusst fuehrt.`
+        : "Der Unterschied kann euch breiter machen, traegt aber nicht von selbst.";
     case "coordination_led":
       return selection.biggestTension
-        ? `${buildDimensionConsequence(selection.biggestTension.dimension, selection.biggestTension.status)}`
-        : "Das kostet selten offen Energie. Es kostet eher Tempo und Klarheit.";
+        ? `Der staerkste Verlustpunkt liegt in ${selection.biggestTension.dimension}. Das bremst euch nicht laut, sondern ueber Schleifen, Nachziehen und Unklarheit.`
+        : "Das kostet selten offen Energie, aber oft Tempo und Klarheit.";
     case "blind_spot_watch":
-      return "Der Punkt ist nicht offener Streit. Der Punkt ist, dass ihr Unterschiede zu spaet merkt.";
+      return selection.heroSelection.biggestRisk
+        ? `Die heikelste Stelle liegt in ${selection.heroSelection.biggestRisk.dimension}. Gerade weil ihr euch in vielem aehnlich seid, merkt ihr Unterschiede dort oft zu spaet.`
+        : "Gerade weil ihr euch in vielem aehnlich seid, merkt ihr Unterschiede oft zu spaet.";
     case "alignment_led":
     default:
       return selection.stableBase
-        ? `${buildStableBaseContext(selection.stableBase.dimension)}`
-        : "Das gibt euch Ruhe. Es ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
+        ? `${buildStableBaseContext(selection.stableBase.dimension)} Gleichzeitig reicht diese Basis nicht aus, wenn ihr offene Punkte nicht ausdruecklich klaert.`
+        : "Die gemeinsame Linie gibt euch Ruhe, ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
   }
 }
 
@@ -327,7 +341,7 @@ function buildCentralPattern(
             ? buildTensionCauseSentence(selection.biggestTension.dimension)
             : "Ihr kommt in einem zentralen Feld nicht mit derselben Grundannahme zusammen.",
           selection.stableBase
-            ? `Gleichzeitig habt ihr in ${selection.stableBase.dimension} genug gemeinsame Linie, um das Thema anfangs zu unterschaetzen.`
+            ? `Gleichzeitig habt ihr in ${selection.stableBase.dimension} genug gemeinsame Linie, um das Problem anfangs zu unterschaetzen.`
             : "Das Problem sitzt nicht an der Oberflaeche. Es steckt in einer stillen Grundannahme.",
           "Deshalb braucht ihr hier keine bessere Stimmung, sondern eine klare Arbeitsregel.",
         ],
@@ -411,68 +425,68 @@ function buildDimensionReading(
     case "Unternehmenslogik":
       switch (status) {
         case "nah":
-          return "Hier wollt ihr unternehmerisch in eine aehnliche Richtung.";
+          return "Ihr richtet das Unternehmen in eine aehnliche Richtung aus.";
         case "ergänzend":
-          return "Hier schaut ihr auf unterschiedliche Hebel.";
+          return "Ihr schaut auf unterschiedliche Hebel, nicht auf dasselbe Ziel.";
         case "abstimmung_nötig":
-          return "Hier priorisiert ihr nicht automatisch dasselbe.";
+          return "Ihr priorisiert nicht automatisch dasselbe.";
         case "kritisch":
-          return "Hier geht es nicht um Stil. Hier geht es um Richtung.";
+          return "Ihr arbeitet hier nicht auf dieselbe Richtung hin.";
       }
     case "Entscheidungslogik":
       switch (status) {
         case "nah":
-          return "Hier kommt ihr ueber einen aehnlichen Weg zu Entscheidungen.";
+          return "Ihr kommt ueber einen aehnlichen Weg zu Entscheidungen.";
         case "ergänzend":
-          return "Hier bringt eine Person mehr Analyse, die andere mehr Urteil.";
+          return "Eine Person bringt mehr Analyse, die andere mehr Urteil.";
         case "abstimmung_nötig":
-          return "Hier entscheidet ihr nicht nach denselben Kriterien.";
+          return "Ihr entscheidet nicht nach denselben Kriterien.";
         case "kritisch":
-          return "Hier blockiert euch nicht das Thema, sondern der Weg dorthin.";
+          return "Nicht das Thema blockiert euch, sondern der Weg zur Entscheidung.";
       }
     case "Arbeitsstruktur & Zusammenarbeit":
       switch (status) {
         case "nah":
-          return "Hier habt ihr ein aehnliches Bild von Zusammenarbeit.";
+          return "Ihr habt ein aehnliches Bild davon, wie Zusammenarbeit laufen soll.";
         case "ergänzend":
-          return "Hier bringt eine Person mehr Eigenraum, die andere mehr Sichtbarkeit.";
+          return "Eine Person bringt mehr Eigenraum, die andere mehr Sichtbarkeit.";
         case "abstimmung_nötig":
-          return "Hier meint ihr nicht dasselbe mit Zusammenarbeit.";
+          return "Ihr meint nicht dasselbe mit guter Zusammenarbeit.";
         case "kritisch":
-          return "Hier kollidiert euer Arbeitsmodus direkt.";
+          return "Eure Arbeitsweisen kollidieren im Alltag direkt.";
       }
     case "Commitment":
       switch (status) {
         case "nah":
-          return "Hier liegt euer Einsatzniveau nah beieinander.";
+          return "Euer Einsatzniveau liegt nah beieinander.";
         case "ergänzend":
-          return "Hier bringt eine Person mehr Zug, die andere mehr Begrenzung.";
+          return "Eine Person bringt mehr Zug, die andere mehr Begrenzung.";
         case "abstimmung_nötig":
-          return "Hier meint ihr nicht dasselbe mit Einsatz.";
+          return "Ihr meint nicht dasselbe mit Einsatz.";
         case "kritisch":
-          return "Hier geht es nicht um Motivation, sondern um Grundannahmen.";
+          return "Ihr bringt unterschiedliche Grundannahmen zu Einsatz und Verbindlichkeit mit.";
       }
     case "Risikoorientierung":
       switch (status) {
         case "nah":
-          return "Hier ist eure Risikoschwelle aehnlich.";
+          return "Eure Risikoschwelle ist aehnlich.";
         case "ergänzend":
-          return "Hier oeffnet eine Person eher Chancen, die andere eher Grenzen.";
+          return "Eine Person oeffnet eher Chancen, die andere setzt eher Grenzen.";
         case "abstimmung_nötig":
-          return "Hier ist fuer euch nicht dasselbe mutig oder vertretbar.";
+          return "Fuer euch ist nicht dasselbe mutig oder vertretbar.";
         case "kritisch":
-          return "Hier bewertet ihr Risiko grundlegend anders.";
+          return "Ihr bewertet Risiko grundlegend anders.";
       }
     case "Konfliktstil":
       switch (status) {
         case "nah":
-          return "Hier habt ihr ein aehnliches Tempo im Umgang mit Spannung.";
+          return "Ihr habt ein aehnliches Tempo im Umgang mit Spannung.";
         case "ergänzend":
-          return "Hier sortiert eine Person eher, waehrend die andere direkt wird.";
+          return "Eine Person sortiert eher, waehrend die andere direkt wird.";
         case "abstimmung_nötig":
-          return "Hier klaert ihr Spannungen nicht gleich.";
+          return "Ihr klaert Spannungen nicht auf dieselbe Weise.";
         case "kritisch":
-          return "Hier trefft ihr im Konflikt nicht dieselbe Sprache.";
+          return "Im Konflikt sprecht ihr nicht dieselbe Sprache.";
       }
   }
 }
@@ -519,7 +533,7 @@ function buildDimensionBusinessMeaning(
         : "Das beeinflusst, wie fair Verantwortung, Verfuegbarkeit und Druck erlebt werden.";
     case "Risikoorientierung":
       return status === "nah"
-        ? "Das erleichtert Wetten, Investitionen und Stop-Entscheidungen."
+        ? "Das erleichtert Investitionen, Richtungswechsel und Stop-Entscheidungen."
         : "Das praegt, welche Schritte ihr wagt und wo fuer euch die Bremse greifen muss.";
     case "Konfliktstil":
       return status === "nah"
@@ -583,7 +597,7 @@ function buildClarificationQuestions(selection: FounderMatchingSelection) {
       case "Unternehmenslogik":
         return "Wonach priorisiert ihr, wenn Wachstum, Wirkung und Aufbau gegeneinander laufen?";
       case "Risikoorientierung":
-        return "Welche Wetten sind fuer euch vertretbar, und wo zieht ihr die Grenze?";
+        return "Welche Schritte sind fuer euch vertretbar, und wo zieht ihr die Grenze?";
     }
   });
 
@@ -646,32 +660,32 @@ function buildEverydaySituationForDimension(
     case "Unternehmenslogik":
       return {
         title: "Wenn Prioritaeten kollidieren",
-        body: "Dann wird sichtbar, ob ihr auf dieselben Ziele hinarbeitet. Wenn ihr das nicht geklaert habt, zieht ihr am selben Thema in verschiedene Richtungen.",
+        body: "Ihr muesst Prioritaeten, Ziele und Richtung klaeren, sonst zieht ihr am selben Thema in verschiedene Richtungen.",
       };
     case "Entscheidungslogik":
       return {
         title: "Wenn schnell entschieden werden muss",
-        body: "Dann zeigt sich, ob fuer euch dieselben Kriterien zaehlen. Sonst wird aus Tempo schnell eine Schleife.",
+        body: "Ihr braucht klare Entscheidungskriterien, sonst wird aus Tempo schnell eine Schleife.",
       };
     case "Arbeitsstruktur & Zusammenarbeit":
       return {
         title: "Wenn Arbeit parallel laeuft",
-        body: "Dann wird sichtbar, was fuer euch Abstimmung heisst. Sonst fuehlt sich die eine Person kontrolliert und die andere allein gelassen.",
+        body: "Ihr muesst festlegen, was sichtbar sein muss und was eigenstaendig laufen darf, sonst fuehlt sich die eine Person kontrolliert und die andere allein gelassen.",
       };
     case "Commitment":
       return {
         title: "Wenn Wochen voll werden",
-        body: "Dann merkt ihr, ob ihr mit Einsatz dasselbe meint. Sonst wird aus Tempo schnell ein Streit ueber Erwartung und Verantwortung.",
+        body: "Ihr muesst Zeit, Verantwortung und Erwartung an Einsatz klaeren, sonst wird aus Belastung schnell ein Streit ueber Fairness.",
       };
     case "Risikoorientierung":
       return {
-        title: "Wenn eine Wette ansteht",
-        body: "Dann zeigt sich, was fuer euch vertretbar ist. Sonst zieht die eine Person an, waehrend die andere bremst.",
+        title: "Wenn eine groessere Entscheidung ansteht",
+        body: "Ihr muesst klären, welches Risiko fuer euch tragbar ist, sonst zieht die eine Person an, waehrend die andere bremst.",
       };
     case "Konfliktstil":
       return {
         title: "Wenn etwas schieflaeuft",
-        body: "Dann merkt ihr, ob ihr Spannungen gleich klaeren wollt. Sonst fuehlt sich die eine Person ueberfahren und die andere ausgebremst.",
+        body: "Ihr braucht eine klare Form fuer Klaerung, sonst fuehlt sich die eine Person ueberfahren und die andere ausgebremst.",
       };
   }
 }
@@ -689,7 +703,7 @@ function buildTensionCauseSentence(
     case "Commitment":
       return "Ihr verbindet mit Einsatz und Verbindlichkeit nicht automatisch dasselbe.";
     case "Risikoorientierung":
-      return "Ihr bewertet Wetten, Unsicherheit und Absicherung nicht auf dieselbe Weise.";
+      return "Ihr bewertet Risiko, Unsicherheit und Absicherung nicht auf dieselbe Weise.";
     case "Konfliktstil":
       return "Ihr klaert Spannung nicht im selben Tempo und nicht auf dieselbe Art.";
   }
@@ -738,7 +752,7 @@ function buildDimensionConsequence(
     case "Risikoorientierung":
       return status === "kritisch"
         ? "Ohne klare Leitplanke zieht die eine Person an und die andere bremst."
-        : "Wenn ihr das offen lasst, kippen Wetten oder werden zu frueh abgebrochen.";
+        : "Wenn ihr das offen lasst, werden Chancen zu frueh gestoppt oder zu weit getrieben.";
     case "Konfliktstil":
       return status === "kritisch"
         ? "Ohne Regel dazu eskalieren Kleinigkeiten oder bleiben zu lange liegen."
@@ -778,7 +792,7 @@ function buildStableBaseContext(
     case "Commitment":
       return "Das schafft Ruhe bei Erwartungen an Einsatz und Verfuegbarkeit.";
     case "Risikoorientierung":
-      return "Das macht Wetten und Absicherung deutlich leichter.";
+      return "Das macht Risikoabwaegung und Absicherung deutlich leichter.";
     case "Konfliktstil":
       return "Das macht Klaerung leichter, weil ihr Spannung aehnlich angeht.";
   }
@@ -789,17 +803,17 @@ function buildSteeringPointForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Legt fest, wonach ihr priorisiert, wenn Richtung und Wachstum nicht dasselbe nahelegen.";
+      return "Legt fest, wonach ihr priorisiert, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen.";
     case "Entscheidungslogik":
-      return "Legt fest, wer Entscheidungen vorbereitet und wann genug geprueft ist.";
+      return "Legt fest, wer Entscheidungen vorbereitet, wann genug geprueft ist und wann eine Entscheidung faellt.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Legt fest, was sichtbar sein muss und wo Eigenraum beginnt.";
+      return "Legt fest, was sichtbar sein muss, wo Eigenraum beginnt und wann Abstimmung Pflicht ist.";
     case "Commitment":
-      return "Legt fest, welches Einsatzniveau ihr wirklich voneinander erwartet.";
+      return "Legt fest, wie viel Zeit, Verantwortung und Equity jeweils mit welchem Einsatz verbunden sind.";
     case "Risikoorientierung":
-      return "Legt fest, welche Wetten fuer euch vertretbar sind und wo Absicherung vorgeht.";
+      return "Legt fest, welches Risiko fuer euch tragbar ist und wann Absicherung Vorrang hat.";
     case "Konfliktstil":
-      return "Legt fest, was sofort angesprochen wird und was ihr mit Abstand klaert.";
+      return "Legt fest, was sofort angesprochen wird, in welchem Ton ihr das tut und was ihr mit Abstand klaert.";
   }
 }
 
@@ -816,7 +830,7 @@ function buildSupportSentenceForDimension(
     case "Commitment":
       return "Beim Commitment liegt eine tragende gemeinsame Linie. Das schafft Ruhe bei Erwartungen.";
     case "Risikoorientierung":
-      return "Bei Risiko liegt eine tragende gemeinsame Linie. Das macht Wetten berechenbarer.";
+      return "Bei Risiko liegt eine tragende gemeinsame Linie. Das macht groessere Schritte berechenbarer.";
     case "Konfliktstil":
       return "Im Umgang mit Spannung liegt eine tragende gemeinsame Linie. Das macht Klaerung leichter.";
   }
@@ -835,7 +849,7 @@ function buildComplementSupportSentence(
     case "Commitment":
       return "Euer Unterschied beim Commitment kann tragen, wenn Einsatz nicht still vorausgesetzt wird.";
     case "Risikoorientierung":
-      return "Euer Unterschied beim Risiko kann euch vor blinden Wetten und vor zu viel Vorsicht schuetzen.";
+      return "Euer Unterschied beim Risiko kann euch vor Ueberzug und vor zu viel Vorsicht schuetzen.";
     case "Konfliktstil":
       return "Euer Unterschied im Konfliktstil kann Klaerung verbessern, wenn ihr Timing und Form bewusst fuehrt.";
   }
