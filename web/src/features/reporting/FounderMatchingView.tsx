@@ -48,12 +48,10 @@ export function FounderMatchingView({
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const heroHeadline = buildMatchHeadline(selection);
-  const heroSentences = splitIntoParagraphs(hero);
-  const heroLead = heroSentences[0] ?? "";
-  const heroSupport = buildCentralPatternParagraphs(selection, heroSentences);
+  const centralPattern = buildCentralPattern(selection, splitIntoParagraphs(hero));
   const everydaySituations = buildEverydaySituations(selection);
   const steeringPoints = buildSteeringPoints(markers, agreements);
-  const supportingPoints = buildSupportingPoints(selection);
+  const opportunityPoints = buildOpportunityPoints(selection);
   const clarificationQuestions = buildClarificationQuestions(selection);
   const introSummary = buildIntroSummary(selection);
   const introContext = buildIntroContext(selection);
@@ -62,7 +60,7 @@ export function FounderMatchingView({
     <>
       <section className="page-section rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <div className="max-w-4xl">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Einstieg</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Matching-Report</p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
             {t(heroHeadline)}
           </h1>
@@ -79,11 +77,11 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. Euer zentrales Muster</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Euer zentrales Muster</p>
         <div className="mt-6 max-w-4xl">
-          <p className="text-lg font-semibold leading-8 text-slate-950">{t(heroLead)}</p>
+          <p className="text-lg font-semibold leading-8 text-slate-950">{t(centralPattern.lead)}</p>
           <div className="mt-4 space-y-3.5">
-            {heroSupport.map((sentence) => (
+            {centralPattern.paragraphs.map((sentence) => (
               <p key={sentence} className="text-[15px] leading-7 text-slate-700">
                 {t(sentence)}
               </p>
@@ -93,7 +91,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. Eure Dynamik im Überblick</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Eure Dynamik im Überblick</p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
             const meta = FOUNDER_DIMENSION_META[dimension.dimension];
@@ -108,8 +106,14 @@ export function FounderMatchingView({
                 className="rounded-[22px] border border-slate-200/70 bg-slate-50/60 px-5 py-4 sm:px-6 sm:py-5"
               >
                 <h4 className="text-[15px] font-semibold text-slate-900">{meta.canonicalName}</h4>
+                <p className="mt-2 text-xs leading-6 text-slate-500">
+                  {t(buildDimensionExplanation(meta.canonicalName))}
+                </p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
                   {t(buildDimensionReading(meta.canonicalName, status?.status ?? "nah"))}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {t(buildDimensionBusinessMeaning(meta.canonicalName, status?.status ?? "nah"))}
                 </p>
 
                 <div className="mt-4 max-w-3xl">
@@ -133,7 +137,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. So zeigt sich das im Alltag</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">So zeigt sich das im Alltag</p>
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           {everydaySituations.map((section) => (
             <article
@@ -148,7 +152,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">5. Wo ihr steuern müsst</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Wo ihr steuern müsst</p>
         <ul className="mt-6 space-y-3">
           {steeringPoints.map((point) => (
             <li
@@ -162,9 +166,9 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">6. Was euch trägt</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Wo eure Chance liegt</p>
         <div className="mt-6 space-y-3">
-          {supportingPoints.map((point) => (
+          {opportunityPoints.map((point) => (
             <p
               key={point}
               className="rounded-[18px] border border-slate-200/80 bg-white/92 px-5 py-4 text-sm leading-7 text-slate-700"
@@ -176,7 +180,7 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">7. Das müsst ihr klären</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Das müsst ihr klären</p>
         <ul className="mt-6 space-y-3">
           {clarificationQuestions.map((question) => (
             <li
@@ -189,7 +193,7 @@ export function FounderMatchingView({
         </ul>
 
         <div className="mt-8 border-t border-slate-200/80 pt-8 print:hidden">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">8. Übergang zum Workbook</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Nächster Schritt</p>
           <h3 className="mt-3 text-xl font-semibold text-slate-900">Diese Punkte klärt ihr nicht nebenbei.</h3>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
             Im Workbook legt ihr fest, wie ihr damit arbeitet.
@@ -271,26 +275,16 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
 function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return selection.biggestTension
-        ? `Der Hauptpunkt liegt in ${selection.biggestTension.dimension}.`
-        : "Bei euch entsteht Reibung frueh.";
+      return "Bei euch wird Reibung schnell operativ.";
     case "complement_led":
-      return selection.strongestComplement
-        ? `Die staerkste Chance liegt in ${selection.strongestComplement.dimension}.`
-        : "Bei euch liegt die Chance in einem echten Unterschied.";
+      return "Bei euch ist der Unterschied Chance und Risiko zugleich.";
     case "coordination_led":
-      return selection.biggestTension
-        ? `Der Hauptpunkt liegt in ${selection.biggestTension.dimension}.`
-        : "Bei euch wird Reibung eher still als laut.";
+      return "Bei euch geht eher Tempo verloren als Harmonie.";
     case "blind_spot_watch":
-      return selection.heroSelection.biggestRisk
-        ? `Das Risiko liegt in ${selection.heroSelection.biggestRisk.dimension}.`
-        : "Bei euch wirkt vieles erst einmal nah. Das Risiko liegt in stiller Drift.";
+      return "Bei euch beginnt das Problem frueher, als ihr es merkt.";
     case "alignment_led":
     default:
-      return selection.stableBase
-        ? `Eure tragende Basis liegt in ${selection.stableBase.dimension}.`
-        : "Bei euch gibt es eine tragende Linie.";
+      return "Bei euch wirkt vieles tragfaehig, bis ein offener Punkt Wirkung bekommt.";
   }
 }
 
@@ -315,6 +309,82 @@ function buildIntroContext(selection: FounderMatchingSelection) {
       return selection.stableBase
         ? `${buildStableBaseContext(selection.stableBase.dimension)}`
         : "Das gibt euch Ruhe. Es ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
+  }
+}
+
+function buildCentralPattern(
+  selection: FounderMatchingSelection,
+  heroSentences: string[]
+) {
+  switch (selection.heroSelection.mode) {
+    case "tension_led":
+      return {
+        lead: selection.biggestTension
+          ? `Der Kern liegt in ${selection.biggestTension.dimension}.`
+          : "Der Kern liegt in eurer Grundlogik der Zusammenarbeit.",
+        paragraphs: [
+          selection.biggestTension
+            ? buildTensionCauseSentence(selection.biggestTension.dimension)
+            : "Ihr kommt in einem zentralen Feld nicht mit derselben Grundannahme zusammen.",
+          selection.stableBase
+            ? `Gleichzeitig habt ihr in ${selection.stableBase.dimension} genug gemeinsame Linie, um das Thema anfangs zu unterschaetzen.`
+            : "Das Problem sitzt nicht an der Oberflaeche. Es steckt in einer stillen Grundannahme.",
+          "Deshalb braucht ihr hier keine bessere Stimmung, sondern eine klare Arbeitsregel.",
+        ],
+      };
+    case "complement_led":
+      return {
+        lead: selection.strongestComplement
+          ? `Eure Chance liegt in ${selection.strongestComplement.dimension}.`
+          : "Eure Chance liegt in einem echten Unterschied.",
+        paragraphs: [
+          selection.strongestComplement
+            ? buildComplementCauseSentence(selection.strongestComplement.dimension)
+            : "Ihr bringt nicht dasselbe mit. Genau das kann wertvoll sein.",
+          selection.biggestTension
+            ? `Der Preis dafuer liegt in ${selection.biggestTension.dimension}. Dort kippt Ergaenzung schnell in Reibung.`
+            : "Diese Ergaenzung traegt nur, wenn ihr sie bewusst fuehrt.",
+          "Euer Thema ist also nicht Gleichheit. Euer Thema ist gute Fuehrung des Unterschieds.",
+        ],
+      };
+    case "coordination_led":
+      return {
+        lead: "Der Kern liegt nicht im offenen Konflikt.",
+        paragraphs: [
+          "Ihr habt genug gemeinsame Basis, um zusammen loszugehen.",
+          selection.biggestTension
+            ? `Das Problem zeigt sich erst, wenn ${selection.biggestTension.dimension} im Alltag nicht sauber geregelt ist.`
+            : "Das Problem zeigt sich erst, wenn Regeln im Alltag fehlen.",
+          "Dann verliert ihr nicht ueber Lautstaerke. Ihr verliert ueber Verzoegerung, Unklarheit und stilles Nachziehen.",
+        ],
+      };
+    case "blind_spot_watch":
+      return {
+        lead: "Der Kern liegt in eurer Naehe.",
+        paragraphs: [
+          "Ihr seid euch in vielem aehnlich genug, um schnell Vertrauen aufzubauen.",
+          selection.heroSelection.biggestRisk
+            ? `Gerade deshalb merkt ihr Unterschiede in ${selection.heroSelection.biggestRisk.dimension} erst, wenn sie schon Wirkung haben.`
+            : "Gerade deshalb merkt ihr Unterschiede erst, wenn sie schon Wirkung haben.",
+          "Das Risiko ist hier nicht Streit. Das Risiko ist zu spaete Klaerung.",
+        ],
+      };
+    case "alignment_led":
+    default:
+      return {
+        lead: selection.stableBase
+          ? `Eure Basis liegt in ${selection.stableBase.dimension}.`
+          : "Ihr habt eine tragende gemeinsame Linie.",
+        paragraphs: [
+          selection.stableBase
+            ? buildStableBaseContext(selection.stableBase.dimension)
+            : "Das gibt euch Ruhe im Alltag.",
+          selection.biggestTension
+            ? `Der offene Punkt liegt in ${selection.biggestTension.dimension}. Dort reicht eure Naehe nicht mehr aus.`
+            : heroSentences[1] ?? "Trotzdem ersetzt Naehe keine Regel dort, wo ihr unterschiedlich tickt.",
+          "Euer Thema ist also nicht Grundkompatibilitaet. Euer Thema ist saubere Klaerung an der richtigen Stelle.",
+        ],
+      };
   }
 }
 
@@ -407,6 +477,59 @@ function buildDimensionReading(
   }
 }
 
+function buildDimensionExplanation(dimension: string) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Hier geht es um die Richtung des Unternehmens und darum, woran ihr Wachstum, Stabilitaet und Wirkung messt.";
+    case "Entscheidungslogik":
+      return "Hier geht es darum, wie Entscheidungen zustande kommen und wann fuer euch etwas als ausreichend geklaert gilt.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Hier geht es um Sichtbarkeit, Eigenraum und darum, wie eng ihr im Alltag zusammenarbeitet.";
+    case "Commitment":
+      return "Hier geht es um Einsatz, Verfuegbarkeit und darum, was fuer euch verbindlich mitgetragen wird.";
+    case "Risikoorientierung":
+      return "Hier geht es darum, was fuer euch vertretbar ist und wann Vorsicht oder Wagnis Vorrang haben.";
+    case "Konfliktstil":
+      return "Hier geht es darum, wie schnell ihr Spannung ansprecht und in welcher Form ihr sie klaert.";
+    default:
+      return "";
+  }
+}
+
+function buildDimensionBusinessMeaning(
+  dimension: string,
+  status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return status === "nah"
+        ? "Das macht Kursentscheidungen leichter."
+        : "Das beeinflusst, wie ihr Chancen bewertet und wann ihr den Kurs aendert.";
+    case "Entscheidungslogik":
+      return status === "nah"
+        ? "Das spart Zeit bei Entscheidungen unter Druck."
+        : "Das entscheidet darueber, ob ihr schnell vorankommt oder euch in Schleifen festfahrt.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return status === "nah"
+        ? "Das entlastet eure Zusammenarbeit im Alltag."
+        : "Das praegt, wie viel Abstimmung euch traegt und ab wann sie euch bremst.";
+    case "Commitment":
+      return status === "nah"
+        ? "Das schafft Ruhe bei Erwartungen an Einsatz und Tempo."
+        : "Das beeinflusst, wie fair Verantwortung, Verfuegbarkeit und Druck erlebt werden.";
+    case "Risikoorientierung":
+      return status === "nah"
+        ? "Das erleichtert Wetten, Investitionen und Stop-Entscheidungen."
+        : "Das praegt, welche Schritte ihr wagt und wo fuer euch die Bremse greifen muss.";
+    case "Konfliktstil":
+      return status === "nah"
+        ? "Das erleichtert Klaerung, wenn es schwierig wird."
+        : "Das bestimmt, ob Spannungen frueh bearbeitet oder gegenseitig falsch gelesen werden.";
+    default:
+      return "";
+  }
+}
+
 function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMarkers>, agreements: string[]) {
   const markerPoints = [
     markers.primary?.dimension
@@ -422,7 +545,7 @@ function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMark
   return Array.from(new Set([...markerPoints, ...agreementPoints])).slice(0, 4);
 }
 
-function buildSupportingPoints(selection: FounderMatchingSelection) {
+function buildOpportunityPoints(selection: FounderMatchingSelection) {
   const points: string[] = [];
 
   if (selection.stableBase) {
@@ -433,11 +556,17 @@ function buildSupportingPoints(selection: FounderMatchingSelection) {
     points.push(buildComplementSupportSentence(selection.strongestComplement.dimension));
   }
 
-  if (points.length === 0) {
-    points.push("Es gibt bei euch eine gemeinsame Linie, auf die ihr aufbauen koennt.");
+  if (selection.stableBase && selection.strongestComplement) {
+    points.push(
+      `Gerade weil ihr in ${selection.stableBase.dimension} nah seid, koennt ihr euren Unterschied in ${selection.strongestComplement.dimension} produktiv nutzen.`
+    );
   }
 
-  return points.slice(0, 2);
+  if (points.length === 0) {
+    points.push("Ihr habt genug gemeinsame Linie, um Unterschiede produktiv zu fuehren.");
+  }
+
+  return Array.from(new Set(points)).slice(0, 3);
 }
 
 function buildClarificationQuestions(selection: FounderMatchingSelection) {
@@ -544,6 +673,44 @@ function buildEverydaySituationForDimension(
         title: "Wenn etwas schieflaeuft",
         body: "Dann merkt ihr, ob ihr Spannungen gleich klaeren wollt. Sonst fuehlt sich die eine Person ueberfahren und die andere ausgebremst.",
       };
+  }
+}
+
+function buildTensionCauseSentence(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Ihr schaut nicht mit derselben Unternehmenslogik auf Richtung und Prioritaeten.";
+    case "Entscheidungslogik":
+      return "Ihr haltet nicht nach denselben Kriterien etwas fuer entscheidungsreif.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Ihr habt kein deckungsgleiches Bild davon, wie Zusammenarbeit im Alltag aussehen soll.";
+    case "Commitment":
+      return "Ihr verbindet mit Einsatz und Verbindlichkeit nicht automatisch dasselbe.";
+    case "Risikoorientierung":
+      return "Ihr bewertet Wetten, Unsicherheit und Absicherung nicht auf dieselbe Weise.";
+    case "Konfliktstil":
+      return "Ihr klaert Spannung nicht im selben Tempo und nicht auf dieselbe Art.";
+  }
+}
+
+function buildComplementCauseSentence(
+  dimension: NonNullable<FounderMatchingSelection["strongestComplement"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Eine Person bringt mehr Blick fuer Substanz, die andere mehr Blick fuer Hebel.";
+    case "Entscheidungslogik":
+      return "Eine Person bringt mehr Analyse, die andere mehr Urteil und Tempo.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Eine Person bringt mehr Eigenraum, die andere mehr gemeinsame Orientierung.";
+    case "Commitment":
+      return "Eine Person bringt mehr Zug, die andere mehr Grenze und Realismus.";
+    case "Risikoorientierung":
+      return "Eine Person oeffnet eher Chancen, die andere schuetzt eher vor Ueberzug.";
+    case "Konfliktstil":
+      return "Eine Person bringt mehr Direktheit, die andere mehr Sortierung.";
   }
 }
 
