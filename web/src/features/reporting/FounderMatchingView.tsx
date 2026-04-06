@@ -14,7 +14,6 @@ import type { FounderMatchingSelection } from "@/features/reporting/founderMatch
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
 import {
   buildFounderMatchingAgreements,
-  buildFounderMatchingDailyDynamics,
   buildFounderMatchingHero,
 } from "@/features/reporting/founderMatchingTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
@@ -43,7 +42,6 @@ export function FounderMatchingView({
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
   const hero = buildFounderMatchingHero(selection);
-  const dailyDynamics = buildFounderMatchingDailyDynamics(selection);
   const agreements = buildFounderMatchingAgreements(selection);
   const markers = buildFounderMatchingMarkers(compareResult, selection, effectiveTeamContext);
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
@@ -52,8 +50,8 @@ export function FounderMatchingView({
   const heroHeadline = buildMatchHeadline(selection);
   const heroSentences = splitIntoParagraphs(hero);
   const heroLead = heroSentences[0] ?? "";
-  const heroSupport = heroSentences.slice(1, 4);
-  const dailyDynamicsSections = splitNarrativeSections(dailyDynamics).slice(0, 3);
+  const heroSupport = buildCentralPatternParagraphs(selection, heroSentences);
+  const everydaySituations = buildEverydaySituations(selection);
   const steeringPoints = buildSteeringPoints(markers, agreements);
   const supportingPoints = buildSupportingPoints(selection);
   const clarificationQuestions = buildClarificationQuestions(selection);
@@ -137,15 +135,13 @@ export function FounderMatchingView({
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. So zeigt sich das im Alltag</p>
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
-          {dailyDynamicsSections.map((section) => (
+          {everydaySituations.map((section) => (
             <article
               key={`${section.title}-${section.body}`}
               className="rounded-[22px] border border-slate-200/80 bg-slate-50/70 p-5"
             >
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{section.title}</p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                {t(limitSentences(section.body, 2))}
-              </p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
             </article>
           ))}
         </div>
@@ -256,23 +252,19 @@ function splitNarrativeSections(text: string) {
   }).filter((section) => section.body.length > 0);
 }
 
-function limitSentences(text: string, maxSentences: number) {
-  return splitIntoParagraphs(text).slice(0, maxSentences).join(" ");
-}
-
 function buildMatchHeadline(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Euer größtes Problem startet nicht im Detail, sondern im Alltag";
+      return "Ihr werdet euch nicht erst spaeter reiben. Sondern direkt im Alltag.";
     case "complement_led":
-      return "Euer Unterschied hilft nur, wenn Reibung frueh geregelt ist";
+      return "Euer Unterschied kann euch tragen. Oder frueh gegeneinander arbeiten.";
     case "coordination_led":
-      return "Ihr verliert Tempo nicht im Streit, sondern in stiller Abstimmung";
+      return "Euer Problem ist nicht Streit. Euer Problem ist stiller Zugverlust.";
     case "blind_spot_watch":
-      return "Euer Risiko liegt nicht im Streit, sondern in spaeter Drift";
+      return "Bei euch kommt der Konflikt nicht zuerst. Sondern die stille Drift.";
     case "alignment_led":
     default:
-      return "Viel gemeinsame Linie, aber ein Randfeld darf nicht still mitlaufen";
+      return "Ihr habt viel gemeinsame Linie. Gerade deshalb merkt ihr Unterschiede spaet.";
   }
 }
 
@@ -280,24 +272,24 @@ function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
       return selection.biggestTension
-        ? `Bei euch entsteht Reibung frueh. Vor allem in ${selection.biggestTension.dimension}.`
+        ? `Der Hauptpunkt liegt in ${selection.biggestTension.dimension}.`
         : "Bei euch entsteht Reibung frueh.";
     case "complement_led":
       return selection.strongestComplement
-        ? `Bei euch liegt die Chance in einem Unterschied. Vor allem in ${selection.strongestComplement.dimension}.`
+        ? `Die staerkste Chance liegt in ${selection.strongestComplement.dimension}.`
         : "Bei euch liegt die Chance in einem echten Unterschied.";
     case "coordination_led":
       return selection.biggestTension
-        ? `Bei euch wird Reibung eher still als laut. Vor allem in ${selection.biggestTension.dimension}.`
+        ? `Der Hauptpunkt liegt in ${selection.biggestTension.dimension}.`
         : "Bei euch wird Reibung eher still als laut.";
     case "blind_spot_watch":
       return selection.heroSelection.biggestRisk
-        ? `Bei euch wirkt vieles erst einmal nah. Das Risiko liegt in stiller Drift, vor allem in ${selection.heroSelection.biggestRisk.dimension}.`
+        ? `Das Risiko liegt in ${selection.heroSelection.biggestRisk.dimension}.`
         : "Bei euch wirkt vieles erst einmal nah. Das Risiko liegt in stiller Drift.";
     case "alignment_led":
     default:
       return selection.stableBase
-        ? `Bei euch gibt es eine tragende Linie. Klarheit braucht trotzdem ein Feld am Rand.`
+        ? `Eure tragende Basis liegt in ${selection.stableBase.dimension}.`
         : "Bei euch gibt es eine tragende Linie.";
   }
 }
@@ -305,16 +297,24 @@ function buildIntroSummary(selection: FounderMatchingSelection) {
 function buildIntroContext(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Das wird im Alltag sichtbar, wenn Prioritaeten, Tempo oder Erwartungen nicht ueber denselben Weg laufen.";
+      return selection.biggestTension
+        ? `${buildDimensionConsequence(selection.biggestTension.dimension, selection.biggestTension.status)}`
+        : "Das wird im Alltag schnell sichtbar.";
     case "complement_led":
-      return "Das kann euch breiter machen. Von selbst traegt es aber nicht.";
+      return selection.strongestComplement
+        ? `${buildDimensionComplementConsequence(selection.strongestComplement.dimension)}`
+        : "Das kann euch breiter machen. Von selbst traegt es aber nicht.";
     case "coordination_led":
-      return "Das kostet selten offen Energie. Es kostet eher Tempo und Klarheit.";
+      return selection.biggestTension
+        ? `${buildDimensionConsequence(selection.biggestTension.dimension, selection.biggestTension.status)}`
+        : "Das kostet selten offen Energie. Es kostet eher Tempo und Klarheit.";
     case "blind_spot_watch":
       return "Der Punkt ist nicht offener Streit. Der Punkt ist, dass ihr Unterschiede zu spaet merkt.";
     case "alignment_led":
     default:
-      return "Das gibt euch Ruhe. Es ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
+      return selection.stableBase
+        ? `${buildStableBaseContext(selection.stableBase.dimension)}`
+        : "Das gibt euch Ruhe. Es ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
   }
 }
 
@@ -334,44 +334,103 @@ function buildMarkerLabel(name: string | null | undefined) {
 }
 
 function buildDimensionReading(
-  _dimension: string,
+  dimension: string,
   status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
 ) {
-  switch (status) {
-    case "nah":
-      return "Hier zieht ihr eher in dieselbe Richtung.";
-    case "ergänzend":
-      return "Hier arbeitet ihr ueber unterschiedliche Staerken.";
-    case "abstimmung_nötig":
-      return "Hier braucht ihr klare Abstimmung.";
-    case "kritisch":
-      return "Hier duerft ihr Unklarheit nicht mitnehmen.";
+  switch (dimension) {
+    case "Unternehmenslogik":
+      switch (status) {
+        case "nah":
+          return "Hier wollt ihr unternehmerisch in eine aehnliche Richtung.";
+        case "ergänzend":
+          return "Hier schaut ihr auf unterschiedliche Hebel.";
+        case "abstimmung_nötig":
+          return "Hier priorisiert ihr nicht automatisch dasselbe.";
+        case "kritisch":
+          return "Hier geht es nicht um Stil. Hier geht es um Richtung.";
+      }
+    case "Entscheidungslogik":
+      switch (status) {
+        case "nah":
+          return "Hier kommt ihr ueber einen aehnlichen Weg zu Entscheidungen.";
+        case "ergänzend":
+          return "Hier bringt eine Person mehr Analyse, die andere mehr Urteil.";
+        case "abstimmung_nötig":
+          return "Hier entscheidet ihr nicht nach denselben Kriterien.";
+        case "kritisch":
+          return "Hier blockiert euch nicht das Thema, sondern der Weg dorthin.";
+      }
+    case "Arbeitsstruktur & Zusammenarbeit":
+      switch (status) {
+        case "nah":
+          return "Hier habt ihr ein aehnliches Bild von Zusammenarbeit.";
+        case "ergänzend":
+          return "Hier bringt eine Person mehr Eigenraum, die andere mehr Sichtbarkeit.";
+        case "abstimmung_nötig":
+          return "Hier meint ihr nicht dasselbe mit Zusammenarbeit.";
+        case "kritisch":
+          return "Hier kollidiert euer Arbeitsmodus direkt.";
+      }
+    case "Commitment":
+      switch (status) {
+        case "nah":
+          return "Hier liegt euer Einsatzniveau nah beieinander.";
+        case "ergänzend":
+          return "Hier bringt eine Person mehr Zug, die andere mehr Begrenzung.";
+        case "abstimmung_nötig":
+          return "Hier meint ihr nicht dasselbe mit Einsatz.";
+        case "kritisch":
+          return "Hier geht es nicht um Motivation, sondern um Grundannahmen.";
+      }
+    case "Risikoorientierung":
+      switch (status) {
+        case "nah":
+          return "Hier ist eure Risikoschwelle aehnlich.";
+        case "ergänzend":
+          return "Hier oeffnet eine Person eher Chancen, die andere eher Grenzen.";
+        case "abstimmung_nötig":
+          return "Hier ist fuer euch nicht dasselbe mutig oder vertretbar.";
+        case "kritisch":
+          return "Hier bewertet ihr Risiko grundlegend anders.";
+      }
+    case "Konfliktstil":
+      switch (status) {
+        case "nah":
+          return "Hier habt ihr ein aehnliches Tempo im Umgang mit Spannung.";
+        case "ergänzend":
+          return "Hier sortiert eine Person eher, waehrend die andere direkt wird.";
+        case "abstimmung_nötig":
+          return "Hier klaert ihr Spannungen nicht gleich.";
+        case "kritisch":
+          return "Hier trefft ihr im Konflikt nicht dieselbe Sprache.";
+      }
   }
 }
 
 function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMarkers>, agreements: string[]) {
-  const points = [
-    markers.primary?.explanation,
-    ...markers.secondary.map((marker) => marker.explanation),
-    ...agreements,
-  ]
-    .filter((entry): entry is string => Boolean(entry))
-    .map((entry) => limitSentences(entry, 1));
+  const markerPoints = [
+    markers.primary?.dimension
+      ? buildSteeringPointForDimension(markers.primary.dimension)
+      : null,
+    ...markers.secondary.map((marker) =>
+      marker.dimension ? buildSteeringPointForDimension(marker.dimension) : null
+    ),
+  ].filter((entry): entry is string => Boolean(entry));
 
-  return Array.from(new Set(points)).slice(0, 4);
+  const agreementPoints = agreements.map((entry) => sharpenAgreementSentence(entry));
+
+  return Array.from(new Set([...markerPoints, ...agreementPoints])).slice(0, 4);
 }
 
 function buildSupportingPoints(selection: FounderMatchingSelection) {
   const points: string[] = [];
 
   if (selection.stableBase) {
-    points.push(`In ${selection.stableBase.dimension} habt ihr eine tragende Basis.`);
+    points.push(buildSupportSentenceForDimension(selection.stableBase.dimension));
   }
 
   if (selection.strongestComplement) {
-    points.push(
-      `Euer Unterschied in ${selection.strongestComplement.dimension} kann euch breiter machen, wenn ihr ihn klar fuehrt.`
-    );
+    points.push(buildComplementSupportSentence(selection.strongestComplement.dimension));
   }
 
   if (points.length === 0) {
@@ -385,21 +444,263 @@ function buildClarificationQuestions(selection: FounderMatchingSelection) {
   const questions = selection.agreementFocusDimensions.map((entry) => {
     switch (entry.dimension) {
       case "Commitment":
-        return "Welches Einsatzniveau erwartet ihr im Alltag voneinander?";
+        return "Was heisst fuer euch verbindlicher Einsatz im Alltag konkret?";
       case "Arbeitsstruktur & Zusammenarbeit":
-        return "Welche Zwischenstaende muessen sichtbar sein, und wo beginnt Eigenraum?";
+        return "Was muss sichtbar sein, und was darf jede Person eigenstaendig loesen?";
       case "Konfliktstil":
-        return "Was muss sofort auf den Tisch, und was klaert ihr in Ruhe?";
+        return "Was sprecht ihr sofort an, und was klaert ihr erst mit Abstand?";
       case "Entscheidungslogik":
-        return "Wer bereitet Entscheidungen vor, wann ist genug geklaert, und wer entscheidet am Ende?";
+        return "Wer bereitet Entscheidungen vor, und wer hat am Ende das letzte Wort?";
       case "Unternehmenslogik":
-        return "Wonach priorisiert ihr, wenn Wachstum, Wirkung und Aufbau nicht dieselbe Richtung zeigen?";
+        return "Wonach priorisiert ihr, wenn Wachstum, Wirkung und Aufbau gegeneinander laufen?";
       case "Risikoorientierung":
-        return "Wie viel Risiko ist fuer euch okay, und wann geht Absicherung vor?";
+        return "Welche Wetten sind fuer euch vertretbar, und wo zieht ihr die Grenze?";
     }
   });
 
   return Array.from(new Set(questions)).slice(0, 5);
+}
+
+function buildCentralPatternParagraphs(selection: FounderMatchingSelection, heroSentences: string[]) {
+  const paragraphs: string[] = [];
+
+  if (selection.stableBase) {
+    paragraphs.push(buildSupportSentenceForDimension(selection.stableBase.dimension));
+  }
+
+  if (selection.biggestTension) {
+    paragraphs.push(buildRiskSentenceForDimension(selection.biggestTension.dimension));
+  }
+
+  if (selection.strongestComplement) {
+    paragraphs.push(buildComplementSupportSentence(selection.strongestComplement.dimension));
+  }
+
+  if (paragraphs.length < 3) {
+    paragraphs.push(...heroSentences.slice(1, 4));
+  }
+
+  return Array.from(new Set(paragraphs)).slice(0, 3);
+}
+
+function buildEverydaySituations(selection: FounderMatchingSelection) {
+  const dimensions = Array.from(
+    new Set(
+      [
+        selection.biggestTension?.dimension,
+        selection.strongestComplement?.dimension,
+        ...selection.dailyDynamicsDimensions.map((entry) => entry.dimension),
+      ].filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+    )
+  ).slice(0, 3);
+
+  const fallback = [
+    {
+      title: "Wenn Tempo steigt",
+      body: "Dann zeigt sich schnell, ob ihr wirklich nach denselben Kriterien arbeitet.",
+    },
+    {
+      title: "Wenn Druck steigt",
+      body: "Dann reichen gute Absichten nicht. Dann werden Regeln sichtbar oder ihr merkt, dass sie fehlen.",
+    },
+  ];
+
+  if (dimensions.length === 0) return fallback;
+
+  return dimensions.map((dimension) => buildEverydaySituationForDimension(dimension));
+}
+
+function buildEverydaySituationForDimension(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return {
+        title: "Wenn Prioritaeten kollidieren",
+        body: "Dann wird sichtbar, ob ihr auf dieselben Ziele hinarbeitet. Wenn ihr das nicht geklaert habt, zieht ihr am selben Thema in verschiedene Richtungen.",
+      };
+    case "Entscheidungslogik":
+      return {
+        title: "Wenn schnell entschieden werden muss",
+        body: "Dann zeigt sich, ob fuer euch dieselben Kriterien zaehlen. Sonst wird aus Tempo schnell eine Schleife.",
+      };
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return {
+        title: "Wenn Arbeit parallel laeuft",
+        body: "Dann wird sichtbar, was fuer euch Abstimmung heisst. Sonst fuehlt sich die eine Person kontrolliert und die andere allein gelassen.",
+      };
+    case "Commitment":
+      return {
+        title: "Wenn Wochen voll werden",
+        body: "Dann merkt ihr, ob ihr mit Einsatz dasselbe meint. Sonst wird aus Tempo schnell ein Streit ueber Erwartung und Verantwortung.",
+      };
+    case "Risikoorientierung":
+      return {
+        title: "Wenn eine Wette ansteht",
+        body: "Dann zeigt sich, was fuer euch vertretbar ist. Sonst zieht die eine Person an, waehrend die andere bremst.",
+      };
+    case "Konfliktstil":
+      return {
+        title: "Wenn etwas schieflaeuft",
+        body: "Dann merkt ihr, ob ihr Spannungen gleich klaeren wollt. Sonst fuehlt sich die eine Person ueberfahren und die andere ausgebremst.",
+      };
+  }
+}
+
+function buildDimensionConsequence(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"],
+  status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return status === "kritisch"
+        ? "Wenn ihr das nicht klaert, baut ihr am selben Unternehmen mit verschiedenen Logiken."
+        : "Wenn ihr das offen lasst, arbeitet ihr an verschiedenen Zielen.";
+    case "Entscheidungslogik":
+      return status === "kritisch"
+        ? "Ohne klare Regel entscheidet ihr aneinander vorbei."
+        : "Wenn ihr das offen lasst, dreht ihr Schleifen statt zu entscheiden.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return status === "kritisch"
+        ? "Ohne klare Regeln wird aus Alltag direkt Reibung."
+        : "Wenn ihr das nicht klaert, fuehlt sich die eine Person allein gelassen und die andere kontrolliert.";
+    case "Commitment":
+      return status === "kritisch"
+        ? "Ohne klare Abmachung wird Commitment zum Dauerthema."
+        : "Wenn ihr das nicht klaert, entsteht Frust ueber Tempo, Verfuegbarkeit und Verantwortung.";
+    case "Risikoorientierung":
+      return status === "kritisch"
+        ? "Ohne klare Leitplanke zieht die eine Person an und die andere bremst."
+        : "Wenn ihr das offen lasst, kippen Wetten oder werden zu frueh abgebrochen.";
+    case "Konfliktstil":
+      return status === "kritisch"
+        ? "Ohne Regel dazu eskalieren Kleinigkeiten oder bleiben zu lange liegen."
+        : "Wenn ihr das offen lasst, fuehlt sich die eine Person ueberfahren und die andere ausgebremst.";
+  }
+}
+
+function buildDimensionComplementConsequence(
+  dimension: NonNullable<FounderMatchingSelection["strongestComplement"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Das macht euch breiter, wenn ihr gemeinsam festlegt, worauf ihr am Ende priorisiert.";
+    case "Entscheidungslogik":
+      return "Das hilft euch nur, wenn klar ist, wer wann den letzten Schritt macht.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Das traegt nur, wenn Zuständigkeit und Sichtbarkeit sauber geregelt sind.";
+    case "Commitment":
+      return "Das traegt nur, wenn beide wissen, was wirklich erwartet ist und was nicht.";
+    case "Risikoorientierung":
+      return "Das hilft nur, wenn ihr die Grenze gemeinsam setzt und nicht situativ verschiebt.";
+    case "Konfliktstil":
+      return "Das hilft nur, wenn ihr den richtigen Moment fuer Klaerung gemeinsam findet.";
+  }
+}
+
+function buildStableBaseContext(
+  dimension: NonNullable<FounderMatchingSelection["stableBase"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Das gibt euch Ruhe bei Richtung und Prioritaeten.";
+    case "Entscheidungslogik":
+      return "Das spart Reibung, vor allem wenn es schnell gehen muss.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Das entlastet den Alltag, weil ihr aehnlich auf Abstimmung schaut.";
+    case "Commitment":
+      return "Das schafft Ruhe bei Erwartungen an Einsatz und Verfuegbarkeit.";
+    case "Risikoorientierung":
+      return "Das macht Wetten und Absicherung deutlich leichter.";
+    case "Konfliktstil":
+      return "Das macht Klaerung leichter, weil ihr Spannung aehnlich angeht.";
+  }
+}
+
+function buildSteeringPointForDimension(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Legt fest, wonach ihr priorisiert, wenn Richtung und Wachstum nicht dasselbe nahelegen.";
+    case "Entscheidungslogik":
+      return "Legt fest, wer Entscheidungen vorbereitet und wann genug geprueft ist.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Legt fest, was sichtbar sein muss und wo Eigenraum beginnt.";
+    case "Commitment":
+      return "Legt fest, welches Einsatzniveau ihr wirklich voneinander erwartet.";
+    case "Risikoorientierung":
+      return "Legt fest, welche Wetten fuer euch vertretbar sind und wo Absicherung vorgeht.";
+    case "Konfliktstil":
+      return "Legt fest, was sofort angesprochen wird und was ihr mit Abstand klaert.";
+  }
+}
+
+function buildSupportSentenceForDimension(
+  dimension: NonNullable<FounderMatchingSelection["stableBase"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "In eurer Unternehmenslogik liegt eine tragende gemeinsame Linie. Das gibt euch Halt bei Prioritaeten.";
+    case "Entscheidungslogik":
+      return "In eurer Entscheidungslogik liegt eine tragende gemeinsame Linie. Das spart Reibung unter Zeitdruck.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "In eurer Zusammenarbeit liegt eine tragende gemeinsame Linie. Das entlastet den Alltag.";
+    case "Commitment":
+      return "Beim Commitment liegt eine tragende gemeinsame Linie. Das schafft Ruhe bei Erwartungen.";
+    case "Risikoorientierung":
+      return "Bei Risiko liegt eine tragende gemeinsame Linie. Das macht Wetten berechenbarer.";
+    case "Konfliktstil":
+      return "Im Umgang mit Spannung liegt eine tragende gemeinsame Linie. Das macht Klaerung leichter.";
+  }
+}
+
+function buildComplementSupportSentence(
+  dimension: NonNullable<FounderMatchingSelection["strongestComplement"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Euer Unterschied in der Unternehmenslogik kann euch breiter machen, wenn ihr die Richtung trotzdem gemeinsam haltet.";
+    case "Entscheidungslogik":
+      return "Euer Unterschied in der Entscheidungslogik kann euch schneller und gruendlicher machen, wenn die Rollen klar sind.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Euer Unterschied in der Zusammenarbeit kann gut sein, wenn Eigenraum und Sichtbarkeit zusammenpassen.";
+    case "Commitment":
+      return "Euer Unterschied beim Commitment kann tragen, wenn Einsatz nicht still vorausgesetzt wird.";
+    case "Risikoorientierung":
+      return "Euer Unterschied beim Risiko kann euch vor blinden Wetten und vor zu viel Vorsicht schuetzen.";
+    case "Konfliktstil":
+      return "Euer Unterschied im Konfliktstil kann Klaerung verbessern, wenn ihr Timing und Form bewusst fuehrt.";
+  }
+}
+
+function buildRiskSentenceForDimension(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Euer groesster Reibungspunkt ist die Unternehmenslogik. Wenn ihr das nicht klaert, arbeitet ihr an verschiedenen Zielen.";
+    case "Entscheidungslogik":
+      return "Euer groesster Reibungspunkt ist die Entscheidungslogik. Wenn ihr das nicht klaert, entscheidet ihr aneinander vorbei.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Euer groesster Reibungspunkt ist die Zusammenarbeit im Alltag. Wenn ihr das nicht klaert, kippt Alltag schnell in Reibung.";
+    case "Commitment":
+      return "Euer groesster Reibungspunkt ist Commitment. Wenn ihr das nicht klaert, wird Einsatz zum Dauerthema.";
+    case "Risikoorientierung":
+      return "Euer groesster Reibungspunkt ist Risiko. Wenn ihr das nicht klaert, zieht eine Person an und die andere bremst.";
+    case "Konfliktstil":
+      return "Euer groesster Reibungspunkt ist der Umgang mit Spannung. Wenn ihr das nicht klaert, eskalieren Kleinigkeiten oder bleiben liegen.";
+  }
+}
+
+function sharpenAgreementSentence(sentence: string) {
+  if (sentence.startsWith("Ihr braucht eine klare Regel dafür, ")) {
+    return sentence.replace("Ihr braucht eine klare Regel dafür, ", "");
+  }
+  if (sentence.startsWith("Es sollte eindeutig sein, ")) {
+    return sentence.replace("Es sollte eindeutig sein, ", "");
+  }
+  return sentence;
 }
 
 function buildMarkerWorkbookPrompt(marker: FounderMatchingMarker, teamContext: TeamContext) {
