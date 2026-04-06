@@ -34,6 +34,7 @@ export type FounderAlignmentWorkbookStepField =
   | "founderB"
   | "agreement"
   | "structuredOutputs"
+  | "workspaceV2"
   | "founderAApproved"
   | "founderBApproved"
   | "advisorNotes";
@@ -62,6 +63,33 @@ export type WorkbookStructuredOutputsByStep = Partial<
   Record<FounderAlignmentWorkbookStepId, WorkbookStructuredStepOutputs>
 >;
 
+export const WORKBOOK_DISCUSSION_SIGNAL_VALUES = ["important", "agree", "critical"] as const;
+
+export type FounderAlignmentWorkbookDiscussionAuthor = "founderA" | "founderB";
+export type FounderAlignmentWorkbookDiscussionSignal =
+  (typeof WORKBOOK_DISCUSSION_SIGNAL_VALUES)[number];
+
+export type FounderAlignmentWorkbookDiscussionEntry = {
+  id: string;
+  content: string;
+  createdBy: FounderAlignmentWorkbookDiscussionAuthor;
+  createdAt: string;
+  updatedAt: string | null;
+  updatedBy: FounderAlignmentWorkbookDiscussionAuthor | null;
+};
+
+export type FounderAlignmentWorkbookDiscussionReaction = {
+  entryId: string;
+  userId: FounderAlignmentWorkbookDiscussionAuthor;
+  signal: FounderAlignmentWorkbookDiscussionSignal;
+  updatedAt: string | null;
+};
+
+export type FounderAlignmentWorkbookStepWorkspaceV2 = {
+  entries: FounderAlignmentWorkbookDiscussionEntry[];
+  reactions: FounderAlignmentWorkbookDiscussionReaction[];
+};
+
 export type WorkbookStepMarker = {
   stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">;
   dimension: string;
@@ -79,7 +107,12 @@ export type FounderAlignmentWorkbookPatch =
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
       field: FounderAlignmentWorkbookStepField;
-      value: string | boolean | WorkbookStructuredOutputsByStep | null;
+      value:
+        | string
+        | boolean
+        | WorkbookStructuredOutputsByStep
+        | FounderAlignmentWorkbookStepWorkspaceV2
+        | null;
     }
   | {
       scope: "root";
@@ -103,6 +136,7 @@ export type FounderAlignmentWorkbookEntry = {
   founderB: string;
   agreement: string;
   structuredOutputs?: WorkbookStructuredOutputsByStep;
+  workspaceV2?: FounderAlignmentWorkbookStepWorkspaceV2;
   founderAApproved: boolean;
   founderBApproved: boolean;
   advisorNotes: string;
@@ -308,6 +342,7 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
           founderB: "",
           agreement: "",
           structuredOutputs: undefined,
+          workspaceV2: undefined,
           founderAApproved: false,
           founderBApproved: false,
           advisorNotes: "",
@@ -413,6 +448,103 @@ export function sanitizeWorkbookStructuredOutputsByStep(
   };
 }
 
+function isDiscussionAuthor(value: unknown): value is FounderAlignmentWorkbookDiscussionAuthor {
+  return value === "founderA" || value === "founderB";
+}
+
+function isDiscussionSignal(value: unknown): value is FounderAlignmentWorkbookDiscussionSignal {
+  return WORKBOOK_DISCUSSION_SIGNAL_VALUES.includes(value as FounderAlignmentWorkbookDiscussionSignal);
+}
+
+export function sanitizeWorkbookStepWorkspaceV2(
+  input: unknown
+): FounderAlignmentWorkbookStepWorkspaceV2 | undefined {
+  if (!input || typeof input !== "object") {
+    return undefined;
+  }
+
+  const raw = input as {
+    entries?: Array<{
+      id?: unknown;
+      content?: unknown;
+      createdBy?: unknown;
+      createdAt?: unknown;
+      updatedAt?: unknown;
+      updatedBy?: unknown;
+    }>;
+    reactions?: Array<{
+      entryId?: unknown;
+      userId?: unknown;
+      signal?: unknown;
+      updatedAt?: unknown;
+    }>;
+  };
+
+  const entries = Array.isArray(raw.entries)
+    ? raw.entries
+        .map((entry) => {
+          if (
+            typeof entry?.id !== "string" ||
+            typeof entry?.content !== "string" ||
+            !isDiscussionAuthor(entry?.createdBy) ||
+            typeof entry?.createdAt !== "string"
+          ) {
+            return null;
+          }
+
+          const content = entry.content.trim();
+          if (!content) {
+            return null;
+          }
+
+          return {
+            id: entry.id,
+            content,
+            createdBy: entry.createdBy,
+            createdAt: entry.createdAt,
+            updatedAt: typeof entry.updatedAt === "string" ? entry.updatedAt : null,
+            updatedBy: isDiscussionAuthor(entry.updatedBy) ? entry.updatedBy : null,
+          } satisfies FounderAlignmentWorkbookDiscussionEntry;
+        })
+        .filter((entry): entry is FounderAlignmentWorkbookDiscussionEntry => Boolean(entry))
+    : [];
+
+  const entryIds = new Set(entries.map((entry) => entry.id));
+
+  const reactions = Array.isArray(raw.reactions)
+    ? raw.reactions
+        .map((reaction) => {
+          if (
+            typeof reaction?.entryId !== "string" ||
+            !entryIds.has(reaction.entryId) ||
+            !isDiscussionAuthor(reaction?.userId) ||
+            !isDiscussionSignal(reaction?.signal)
+          ) {
+            return null;
+          }
+
+          return {
+            entryId: reaction.entryId,
+            userId: reaction.userId,
+            signal: reaction.signal,
+            updatedAt: typeof reaction.updatedAt === "string" ? reaction.updatedAt : null,
+          } satisfies FounderAlignmentWorkbookDiscussionReaction;
+        })
+        .filter(
+          (reaction): reaction is FounderAlignmentWorkbookDiscussionReaction => Boolean(reaction)
+        )
+    : [];
+
+  if (entries.length === 0 && reactions.length === 0) {
+    return undefined;
+  }
+
+  return {
+    entries,
+    reactions,
+  };
+}
+
 export function getWorkbookStepStructuredOutputs(
   entry: FounderAlignmentWorkbookEntry,
   stepId: FounderAlignmentWorkbookStepId
@@ -428,6 +560,10 @@ export function getWorkbookRequiredStructuredOutputKeys(
   stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
   markerClass: FounderMatchingMarkerClass
 ) {
+  if (stepId === "decision_rules") {
+    return ["operatingRule", "escalationRule"] as WorkbookStructuredOutputType[];
+  }
+
   switch (markerClass) {
     case "stable_base":
       return ["principle", "reviewTrigger"] as WorkbookStructuredOutputType[];
@@ -438,9 +574,7 @@ export function getWorkbookRequiredStructuredOutputKeys(
     case "critical_clarification_point":
       return ["escalationRule", "boundaryRule"] as WorkbookStructuredOutputType[];
     default:
-      return stepId === "decision_rules"
-        ? (["operatingRule", "escalationRule"] as WorkbookStructuredOutputType[])
-        : (["principle", "operatingRule"] as WorkbookStructuredOutputType[]);
+      return ["principle", "operatingRule"] as WorkbookStructuredOutputType[];
   }
 }
 
@@ -601,6 +735,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         founderB?: unknown;
         agreement?: unknown;
         structuredOutputs?: unknown;
+        workspaceV2?: unknown;
         founderAApproved?: unknown;
         founderBApproved?: unknown;
         advisorNotes?: unknown;
@@ -623,6 +758,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
       founderB: typeof source?.founderB === "string" ? source.founderB : "",
       agreement: typeof source?.agreement === "string" ? source.agreement : "",
       structuredOutputs: sanitizeWorkbookStructuredOutputsByStep(step.id, source?.structuredOutputs),
+      workspaceV2: sanitizeWorkbookStepWorkspaceV2(source?.workspaceV2),
       founderAApproved: source?.founderAApproved === true,
       founderBApproved: source?.founderBApproved === true,
       advisorNotes: typeof source?.advisorNotes === "string" ? source.advisorNotes : "",

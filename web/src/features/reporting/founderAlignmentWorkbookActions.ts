@@ -7,6 +7,7 @@ import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   sanitizeWorkbookStructuredOutputsByStep,
   sanitizeFounderAlignmentWorkbookPayload,
+  sanitizeWorkbookStepWorkspaceV2,
   type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookStepId,
@@ -328,6 +329,9 @@ function mergeFounderPayload(
           patch.stepId,
           patch.value
         );
+        break;
+      case "workspaceV2":
+        stepEntry.workspaceV2 = sanitizeWorkbookStepWorkspaceV2(patch.value);
         break;
       case "founderAApproved":
         if (role === "founderA") {
