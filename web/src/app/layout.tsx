@@ -7,8 +7,12 @@ import { ProductShell } from "@/features/navigation/ProductShell";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import {
   getInvitationDashboardRows,
-  type InvitationDashboardRow,
 } from "@/features/reporting/actions";
+import {
+  buildWorkbookHref,
+  buildWorkbookIntroHref,
+  countWorkbookContentSignals,
+} from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 
 type ReportRunRow = {
@@ -52,35 +56,6 @@ export const metadata: Metadata = {
   description:
     "CoFoundery Align verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung.",
 };
-
-function buildWorkbookHref(
-  invitationId: string,
-  teamContext: InvitationDashboardRow["teamContext"] | null
-) {
-  const base = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}`;
-  return teamContext ? `${base}&teamContext=${encodeURIComponent(teamContext)}` : base;
-}
-
-function countWorkbookContentSignals(
-  payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>
-) {
-  let count = 0;
-
-  for (const step of Object.values(payload.steps)) {
-    if (step.founderA.trim()) count += 1;
-    if (step.founderB.trim()) count += 1;
-    if (step.agreement.trim()) count += 1;
-    if (step.advisorNotes.trim()) count += 1;
-  }
-
-  if (payload.advisorClosing.observations.trim()) count += 1;
-  if (payload.advisorClosing.questions.trim()) count += 1;
-  if (payload.advisorClosing.nextSteps.trim()) count += 1;
-  if (payload.founderReaction.status) count += 1;
-  if (payload.founderReaction.comment.trim()) count += 1;
-
-  return count;
-}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -167,7 +142,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             const invitation = invitationById.get(latestReport.invitation_id) ?? null;
             return {
               matchingHref,
-              workbookHref: buildWorkbookHref(latestReport.invitation_id, invitation?.teamContext ?? null),
+              workbookHref: buildWorkbookIntroHref(
+                latestReport.invitation_id,
+                invitation?.teamContext ?? null
+              ),
             } satisfies ProductNavigationTargets;
           }
 

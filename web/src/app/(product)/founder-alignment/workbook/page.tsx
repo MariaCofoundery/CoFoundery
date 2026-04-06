@@ -5,6 +5,7 @@ import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlig
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
+import { buildWorkbookHref } from "@/features/reporting/workbookNavigation";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -18,10 +19,6 @@ type PageSearchParams = {
 
 function resolveTeamContext(value: string | undefined): TeamContext {
   return value === "existing_team" ? "existing_team" : "pre_founder";
-}
-
-function buildWorkbookHref(invitationId: string, teamContext: TeamContext) {
-  return `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}&teamContext=${encodeURIComponent(teamContext)}`;
 }
 
 export default async function FounderAlignmentWorkbookPage({

@@ -20,6 +20,7 @@ import {
 } from "@/features/reporting/founderMatchingEngine";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ReportAutoRefresh } from "@/features/reporting/ReportAutoRefresh";
+import { buildWorkbookIntroHref } from "@/features/reporting/workbookNavigation";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
@@ -149,9 +150,7 @@ export default async function ReportPage({ params }: PageProps) {
     toFounderScores(founderScoring, "B")
   );
   const selection = buildFounderMatchingSelection(compareResult);
-  const workbookHref = teamContext
-    ? `/founder-alignment/workbook?invitationId=${encodeURIComponent(snapshot.invitationId)}&teamContext=${encodeURIComponent(teamContext)}`
-    : `/founder-alignment/workbook?invitationId=${encodeURIComponent(snapshot.invitationId)}`;
+  const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">

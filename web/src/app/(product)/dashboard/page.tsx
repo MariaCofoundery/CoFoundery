@@ -30,6 +30,11 @@ import {
   type InvitationDashboardRow,
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
+import {
+  buildWorkbookHref,
+  buildWorkbookIntroHref,
+  countWorkbookContentSignals,
+} from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 
 type DashboardSearchParams = {
@@ -235,7 +240,7 @@ export default async function DashboardPage({
   const workbookEntryPointHref = latestActiveWorkbook
     ? latestActiveWorkbook.href
     : latestReadyReport
-      ? buildWorkbookHref(
+      ? buildWorkbookIntroHref(
           latestReadyReport.invitation_id,
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
@@ -261,7 +266,7 @@ export default async function DashboardPage({
   const workbookFocusHref =
     workbookEntryPointHref ??
     (latestReadyReport
-      ? buildWorkbookHref(
+      ? buildWorkbookIntroHref(
           latestReadyReport.invitation_id,
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
@@ -303,7 +308,7 @@ export default async function DashboardPage({
           ? {
               href:
                 workbookEntryPointHref ??
-                buildWorkbookHref(
+                buildWorkbookIntroHref(
                     latestReadyReport.invitation_id,
                     invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
                 ),
@@ -951,38 +956,9 @@ function sortInvitationsByCreatedAtDesc(invites: InvitationDashboardRow[]) {
   });
 }
 
-function buildWorkbookHref(
-  invitationId: string,
-  teamContext: InvitationDashboardRow["teamContext"] | null
-) {
-  const base = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}`;
-  return teamContext ? `${base}&teamContext=${encodeURIComponent(teamContext)}` : base;
-}
-
 function formatDashboardInvitationTitle(invitation: InvitationDashboardRow | null) {
   if (!invitation) return "Workbook";
   return invitation.label?.trim() || invitation.inviteeEmail || invitation.id;
-}
-
-function countWorkbookContentSignals(
-  payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>
-) {
-  let count = 0;
-
-  for (const step of Object.values(payload.steps)) {
-    if (step.founderA.trim()) count += 1;
-    if (step.founderB.trim()) count += 1;
-    if (step.agreement.trim()) count += 1;
-    if (step.advisorNotes.trim()) count += 1;
-  }
-
-  if (payload.advisorClosing.observations.trim()) count += 1;
-  if (payload.advisorClosing.questions.trim()) count += 1;
-  if (payload.advisorClosing.nextSteps.trim()) count += 1;
-  if (payload.founderReaction.status) count += 1;
-  if (payload.founderReaction.comment.trim()) count += 1;
-
-  return count;
 }
 
 function FounderDimensionsOverview({

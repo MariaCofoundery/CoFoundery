@@ -64,6 +64,11 @@ export function FounderMatchingView({
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
             {t(heroHeadline)}
           </h1>
+          <div className="mt-4 max-w-3xl space-y-1.5 text-sm leading-6 text-slate-600">
+            <p>{t("Dieser Report zeigt euren aktuellen Stand.")}</p>
+            <p>{t("Er ist ein Abbild eurer Dynamik, kein festes Urteil.")}</p>
+            <p>{t("Zusammenarbeit ist gestaltbar, und genau darin liegt eure Möglichkeit.")}</p>
+          </div>
           <p className="mt-4 text-sm font-medium text-slate-900">
             {t(introSummary)}
           </p>
@@ -167,7 +172,7 @@ export function FounderMatchingView({
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Wo eure Chance liegt</p>
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 space-y-3.5">
           {opportunityPoints.map((point) => (
             <p
               key={point}
@@ -201,18 +206,6 @@ export function FounderMatchingView({
           <div className="mt-6">
             <ReportActionButton href={workbookHref}>Workbook starten</ReportActionButton>
           </div>
-        </div>
-      </section>
-
-      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Hinweis zur Einordnung des Reports</p>
-        <div className="mt-6 space-y-3.5 max-w-4xl">
-          <p className="text-[15px] leading-7 text-slate-700">
-            Dieser Report zeigt euren aktuellen Stand. Er ist ein Abbild eurer Dynamik, kein festes Urteil.
-          </p>
-          <p className="text-[15px] leading-7 text-slate-700">
-            Zusammenarbeit ist gestaltbar. Wenn ihr die richtigen Punkte klärt, kann sich eure Dynamik deutlich in die bessere Richtung entwickeln.
-          </p>
         </div>
       </section>
 
@@ -562,32 +555,37 @@ function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMark
 function buildOpportunityPoints(selection: FounderMatchingSelection) {
   const points: string[] = [];
 
-  if (selection.stableBase) {
+  if (selection.stableBase && selection.strongestComplement) {
+    points.push(
+      `Eure staerkste Chance liegt darin, dass euch ${selection.stableBase.dimension} Halt gibt, waehrend euch ${selection.strongestComplement.dimension} breiter machen kann. Wenn ihr beides sauber fuehrt, entsteht nicht nur Ausgleich, sondern echte Staerke.`
+    );
+  } else if (selection.stableBase) {
     points.push(buildSupportSentenceForDimension(selection.stableBase.dimension));
-  }
-
-  if (selection.strongestComplement) {
+  } else if (selection.strongestComplement) {
     points.push(buildComplementSupportSentence(selection.strongestComplement.dimension));
   }
 
-  if (selection.stableBase && selection.strongestComplement) {
-    points.push(
-      `Gerade weil ihr in ${selection.stableBase.dimension} nah seid, koennt ihr euren Unterschied in ${selection.strongestComplement.dimension} produktiv nutzen.`
-    );
+  if (selection.strongestComplement) {
+    points.push(buildComplementOperationSentence(selection.strongestComplement.dimension));
+  }
+
+  if (selection.stableBase) {
+    points.push(buildSharedStrengthSentence(selection.stableBase.dimension));
   }
 
   if (points.length === 0) {
-    points.push("Ihr habt genug gemeinsame Linie, um Unterschiede produktiv zu fuehren.");
+    points.push("Ihr habt genug gemeinsame Linie, um Unterschiede produktiv zu fuehren, wenn ihr sie nicht dem Zufall ueberlasst.");
+    points.push("Eine gute Zusammenarbeit entsteht hier nicht durch Gleichheit, sondern durch Klarheit ueber Rollen, Erwartungen und Entscheidungen.");
   }
 
   return Array.from(new Set(points)).slice(0, 3);
 }
 
 function buildClarificationQuestions(selection: FounderMatchingSelection) {
-  const questions = selection.agreementFocusDimensions.map((entry) => {
+  const selectedQuestions = selection.agreementFocusDimensions.map((entry) => {
     switch (entry.dimension) {
       case "Commitment":
-        return "Was heisst fuer euch verbindlicher Einsatz im Alltag konkret?";
+        return "Was heisst fuer euch verbindlicher Einsatz bei Zeit, Verantwortung und Equity?";
       case "Arbeitsstruktur & Zusammenarbeit":
         return "Was muss sichtbar sein, und was darf jede Person eigenstaendig loesen?";
       case "Konfliktstil":
@@ -601,7 +599,16 @@ function buildClarificationQuestions(selection: FounderMatchingSelection) {
     }
   });
 
-  return Array.from(new Set(questions)).slice(0, 5);
+  const fallbackQuestions = [
+    "Wonach priorisiert ihr, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen?",
+    "Was heisst fuer euch verbindlicher Einsatz bei Zeit, Verantwortung und Equity?",
+    "Was muss sichtbar sein, und was darf jede Person eigenstaendig loesen?",
+    "Wer bereitet Entscheidungen vor, und wer hat am Ende das letzte Wort?",
+    "Was sprecht ihr sofort an, und was klaert ihr erst mit Abstand?",
+    "Welche Schritte sind fuer euch vertretbar, und wo zieht ihr die Grenze?",
+  ];
+
+  return Array.from(new Set([...selectedQuestions, ...fallbackQuestions])).slice(0, 5);
 }
 
 function buildCentralPatternParagraphs(selection: FounderMatchingSelection, heroSentences: string[]) {
@@ -644,7 +651,7 @@ function buildEverydaySituations(selection: FounderMatchingSelection) {
     },
     {
       title: "Wenn Druck steigt",
-      body: "Dann reichen gute Absichten nicht. Dann werden Regeln sichtbar oder ihr merkt, dass sie fehlen.",
+      body: "Dann tragen gute Absichten nicht mehr. Dann zeigt sich, ob eure Regeln im Alltag wirklich halten.",
     },
   ];
 
@@ -822,7 +829,7 @@ function buildSupportSentenceForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "In eurer Unternehmenslogik liegt eine tragende gemeinsame Linie. Das gibt euch Halt bei Prioritaeten.";
+      return "In eurer Unternehmenslogik liegt eine tragende gemeinsame Linie. Das gibt euch Halt bei Prioritaeten und Richtung.";
     case "Entscheidungslogik":
       return "In eurer Entscheidungslogik liegt eine tragende gemeinsame Linie. Das spart Reibung unter Zeitdruck.";
     case "Arbeitsstruktur & Zusammenarbeit":
@@ -852,6 +859,44 @@ function buildComplementSupportSentence(
       return "Euer Unterschied beim Risiko kann euch vor Ueberzug und vor zu viel Vorsicht schuetzen.";
     case "Konfliktstil":
       return "Euer Unterschied im Konfliktstil kann Klaerung verbessern, wenn ihr Timing und Form bewusst fuehrt.";
+  }
+}
+
+function buildComplementOperationSentence(
+  dimension: NonNullable<FounderMatchingSelection["strongestComplement"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Das kann euch in der Praxis staerker machen: Eine Person schuetzt die Substanz, waehrend die andere Reichweite und Hebel oeffnet. So entstehen weniger blinde Flecken in strategischen Entscheidungen.";
+    case "Entscheidungslogik":
+      return "Das kann Entscheidungen verbessern: Eine Person prueft gruendlicher, die andere bringt Tempo. Wenn klar ist, wer vorbereitet und wer entscheidet, wird daraus kein Konflikt, sondern Qualitaet.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Das kann eure Zusammenarbeit stabiler machen: Eine Person haelt Eigenverantwortung hoch, die andere sorgt fuer Sichtbarkeit. Wenn ihr das klar regelt, entsteht weder Mikromanagement noch Blindflug.";
+    case "Commitment":
+      return "Das kann euch im Alltag gut tun: Eine Person haelt den Zug hoch, die andere schuetzt vor Ueberdehnung. So bleibt Einsatz verbindlich, ohne still unfair zu werden.";
+    case "Risikoorientierung":
+      return "Das kann Entscheidungen robuster machen: Eine Person oeffnet Chancen, die andere prueft Folgen und Grenzen. So koennt ihr mutig bleiben, ohne leichtfertig zu werden.";
+    case "Konfliktstil":
+      return "Das kann eure Klaerung besser machen: Eine Person bringt Direktheit, die andere Ordnung in die Spannung. So koennt ihr Themen klarer ansprechen, ohne jedes Gespraech zu ueberhitzen.";
+  }
+}
+
+function buildSharedStrengthSentence(
+  dimension: NonNullable<FounderMatchingSelection["stableBase"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr bei Richtung und Prioritaeten schneller auf einen gemeinsamen Kurs kommt.";
+    case "Entscheidungslogik":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr unter Druck nicht erst den Entscheidungsweg aushandeln muesst.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr im Alltag weniger Energie an Abstimmung verliert.";
+    case "Commitment":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil Einsatz und Verbindlichkeit fuer euch aehnlich lesbar sind.";
+    case "Risikoorientierung":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr grosse Schritte und Grenzen aehnlich bewertet.";
+    case "Konfliktstil":
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr Spannungen aehnlich ansprecht und dadurch schneller klaert.";
   }
 }
 
