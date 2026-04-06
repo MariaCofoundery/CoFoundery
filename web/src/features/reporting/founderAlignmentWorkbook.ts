@@ -560,7 +560,12 @@ export function getWorkbookRequiredStructuredOutputKeys(
   stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
   markerClass: FounderMatchingMarkerClass
 ) {
-  if (stepId === "decision_rules") {
+  if (
+    stepId === "vision_direction" ||
+    stepId === "decision_rules" ||
+    stepId === "collaboration_conflict" ||
+    stepId === "ownership_risk"
+  ) {
     return ["operatingRule", "escalationRule"] as WorkbookStructuredOutputType[];
   }
 

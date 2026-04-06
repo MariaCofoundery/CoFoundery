@@ -88,8 +88,169 @@ type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
 type WorkbookModeOption = Exclude<FounderAlignmentWorkbookStepMode, never>;
 
-const PREMIUM_WORKBOOK_PILOT_STEP_ID: FounderAlignmentWorkbookStepId = "decision_rules";
+const PREMIUM_WORKBOOK_V2_STEP_IDS = [
+  "vision_direction",
+  "decision_rules",
+  "collaboration_conflict",
+  "ownership_risk",
+] as const;
+type PremiumWorkbookV2StepId = (typeof PREMIUM_WORKBOOK_V2_STEP_IDS)[number];
 const LEGACY_WORKSPACE_TIMESTAMP = "1970-01-01T00:00:00.000Z";
+
+type PremiumWorkbookV2Config = {
+  collectIntro: string;
+  collectPlaceholder: string;
+  collectHelper: string;
+  collectReadyText: string;
+  missingPerspectiveText: (missingLabel: string) => string;
+  weightingIntro: string;
+  ruleIntro: string;
+  agreementTitle: string;
+  agreementPlaceholder: string;
+  escalationTitle: string;
+  escalationPlaceholder: string;
+  escalationHelper: string;
+  reviewTitle: string;
+  reviewPlaceholder: string;
+  reviewHelper: string;
+  reviewSummary: string;
+  rulePreviewSummary: string;
+  rulePreviewDetail: string;
+};
+
+const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkbookV2Config> = {
+  vision_direction: {
+    collectIntro:
+      "Haltet zuerst die Punkte fest, die eure Richtung im Alltag wirklich steuern: was bei euch Vorrang bekommt, welche Chancen attraktiv wirken und wann ihr bewusst beim Fokus bleibt. Ein klarer Punkt pro Beobachtung reicht.",
+    collectPlaceholder:
+      "Zum Beispiel: Umsatzchancen kippen bei uns schnell in Vorrang. Oder: Wir wechseln den Fokus erst, wenn ein Thema klar zum Kern passt und nicht nur laut wirkt.",
+    collectHelper: "Startet mit zwei oder drei klaren Prioritaets- oder Fokusbeobachtungen.",
+    collectReadyText:
+      "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, welche Richtung euch gemeinsam traegt und wo ihr Chancen unterschiedlich lest.",
+    missingPerspectiveText: (missingLabel) =>
+      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird sichtbar, wie ihr Fokus, Chancen und Richtungswechsel wirklich abwaegt.`,
+    weightingIntro:
+      "Ordnet jetzt jeden Punkt ein. So wird sichtbar, was fuer euch beide Prioritaet hat, wo eine Chance unterschiedlich attraktiv wirkt und welche Linie euch gemeinsam traegt.",
+    ruleIntro:
+      "Verdichtet eure Punkte jetzt zu einer klaren Richtungsregel fuer Fokus, Chancen und bewusste Nicht-Prioritaeten. Hier legt ihr fest, was im Zweifel Vorrang hat und wann ihr euch nicht vom Kern wegziehen lasst.",
+    agreementTitle: "Richtungsregel",
+    agreementPlaceholder:
+      "Wenn neue Chancen, Produktfokus und Aufbau gleichzeitig ziehen, hat ... Vorrang. Eine neue Richtung prueft ihr erst dann weiter, wenn ...",
+    escalationTitle: "Wann ihr bewusst nein sagt",
+    escalationPlaceholder:
+      "Auch wenn eine Chance attraktiv wirkt, verfolgt ihr sie nicht weiter, wenn ...",
+    escalationHelper:
+      "Diese Regel schuetzt euren Fokus vor laut wirkenden, aber unpassenden Chancen.",
+    reviewTitle: "Wann ihr eure Richtung bewusst neu prueft",
+    reviewPlaceholder:
+      "Zum Beispiel: wenn sich Markt, Team oder Prioritaeten sichtbar veraendern und eure bisherige Linie nicht mehr sauber traegt.",
+    reviewHelper: "Hilfreich, damit Richtungswechsel bewusst und nicht nebenbei passieren.",
+    reviewSummary: "Review-Punkt optional ergänzen",
+    rulePreviewSummary:
+      "Die gemeinsame Linie wird erst stark, wenn eure Prioritaeten und Fokusmuster sichtbar eingeordnet sind.",
+    rulePreviewDetail:
+      "So wirkt die Richtungsregel wie eine klare Linie und nicht wie ein weiterer Textblock.",
+  },
+  decision_rules: {
+    collectIntro:
+      "Haltet zuerst nur die Punkte fest, die eure Entscheidungen im Alltag tragen oder blockieren. Ein klarer Satz pro Punkt reicht.",
+    collectPlaceholder:
+      "Zum Beispiel: Ab Budget X entscheidet niemand mehr allein. Oder: Marktfenster duerfen nicht zweimal in dieselbe Schleife fallen.",
+    collectHelper: "Startet mit zwei oder drei Punkten, nicht mit einem perfekten Text.",
+    collectReadyText:
+      "Beide Perspektiven sind jetzt auf dem Tisch. Als Naechstes ordnet ihr jeden Punkt gemeinsam ein.",
+    missingPerspectiveText: (missingLabel) =>
+      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird die Gewichtung wirklich belastbar.`,
+    weightingIntro:
+      "Ordnet jetzt jeden vorhandenen Punkt ein. Erst wenn beide Seiten alle Punkte gelesen und markiert haben, wird die Regel wirklich belastbar.",
+    ruleIntro:
+      "Verdichtet jetzt eure Punkte zu einer Regel, die im Alltag wirklich traegt. Hier entscheidet sich, was kuenftig gilt.",
+    agreementTitle: "Entscheidungsregel",
+    agreementPlaceholder:
+      "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet ... Sobald Risiko, Budget oder Aussenwirkung groesser werden, ...",
+    escalationTitle: "Wenn ihr nicht einig seid",
+    escalationPlaceholder:
+      "Wenn ihr bis zu einer festen Frist nicht einig seid, dann entscheidet ... oder ihr zieht ... dazu.",
+    escalationHelper: "Diese Regel macht den Schritt erst belastbar.",
+    reviewTitle: "Wann ihr die Regel wieder prueft",
+    reviewPlaceholder:
+      "Zum Beispiel: wenn Entscheidungen wieder haengen bleiben oder Verantwortung unklar wird.",
+    reviewHelper: "Hilfreich, wenn ihr spaeter bewusst nachschaerfen wollt.",
+    reviewSummary: "Review-Trigger optional ergänzen",
+    rulePreviewSummary:
+      "Die Regel wird erst wichtig, wenn eure Punkte und Gewichtungen sauber sichtbar sind.",
+    rulePreviewDetail:
+      "Sie kommt erst dann nach vorn, wenn beide Perspektiven und alle Einordnungen wirklich da sind.",
+  },
+  collaboration_conflict: {
+    collectIntro:
+      "Haltet zuerst die Situationen fest, in denen Reibung entsteht, Kritik haengen bleibt oder ein Thema einen eigenen Klaerungsrahmen braucht. Ein klarer Punkt pro Beobachtung reicht.",
+    collectPlaceholder:
+      "Zum Beispiel: Kritik kommt oft erst, wenn der Frust schon da ist. Oder: In angespannten Meetings wird zu schnell in der Sache weitergemacht.",
+    collectHelper: "Startet mit konkreten Situationen, nicht mit langen Erklaerungen.",
+    collectReadyText:
+      "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, was ihr gemeinsam tragen koennt und wo klare Spielregeln fehlen.",
+    missingPerspectiveText: (missingLabel) =>
+      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird sichtbar, wie ihr mit Spannung und Feedback wirklich umgeht.`,
+    weightingIntro:
+      "Ordnet jetzt jeden Punkt ein. So wird sichtbar, welche Reibungen ihr gemeinsam klaeren koennt und wo ihr bewusst andere Spielregeln braucht.",
+    ruleIntro:
+      "Verdichtet eure Punkte jetzt zu einer klaren Regel fuer Feedback, Klaerung und Konflikt. Hier legt ihr fest, was im Alltag gilt und wann ihr aus dem Tagesgeschaeft in einen eigenen Klaerungsrahmen wechselt.",
+    agreementTitle: "Klaerungsregel",
+    agreementPlaceholder:
+      "Wenn mich etwas stoert, spreche ich es ... an. Wenn ein Thema im laufenden Austausch nicht sauber geklaert wird, ...",
+    escalationTitle: "Wenn ein Thema nicht im Alltag geloest wird",
+    escalationPlaceholder:
+      "Wenn ein Punkt wiederkommt, im Ton kippt oder im Meeting nicht sauber geloest wird, dann ...",
+    escalationHelper:
+      "Diese Regel trennt Alltagsreibung von einem bewussten Klaerungsgespraech.",
+    reviewTitle: "Woran ihr merkt, dass ihr frueher klaeren muesst",
+    reviewPlaceholder:
+      "Zum Beispiel: wenn Feedback liegen bleibt, Gespraeche schaerfer werden oder dieselbe Reibung mehrfach auftaucht.",
+    reviewHelper: "Hilfreich, damit Konflikte nicht erst spaet einen eigenen Raum bekommen.",
+    reviewSummary: "Fruehwarnsignal optional ergänzen",
+    rulePreviewSummary:
+      "Die Regel fuer Feedback und Klaerung wird erst tragfaehig, wenn eure Spannungen und Muster sichtbar eingeordnet sind.",
+    rulePreviewDetail:
+      "So wird aus Reibung eine klare Arbeitsregel und nicht nur ein guter Vorsatz.",
+  },
+  ownership_risk: {
+    collectIntro:
+      "Haltet zuerst die Situationen fest, in denen ein Risiko frueher sichtbar werden muss, unterschiedlich gelesen wird oder nicht mehr nur bei einer Person liegen sollte. Ein klarer Punkt pro Risiko-Muster reicht.",
+    collectPlaceholder:
+      "Zum Beispiel: Runway-Risiken werden zu spaet geteilt. Oder: Produktwetten laufen weiter, obwohl eine Person das Risiko schon frueh kritisch sieht.",
+    collectHelper: "Startet mit konkreten Risikosituationen statt mit allgemeinen Grundsaetzen.",
+    collectReadyText:
+      "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, welche Risiken frueh sichtbar werden muessen und ab wann ihr gemeinsam eingreift.",
+    missingPerspectiveText: (missingLabel) =>
+      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird sichtbar, wo ihr Risiko unterschiedlich frueh seht oder unterschiedlich lange weitergehen wuerdet.`,
+    weightingIntro:
+      "Ordnet jetzt jeden Punkt ein. So wird sichtbar, welche Risiken ihr gleich lest, welche eine Person frueher sieht und ab wann ihr nicht mehr allein weitergehen wollt.",
+    ruleIntro:
+      "Verdichtet eure Punkte jetzt zu einer klaren Regel fuer Risiko-Fuehrung, Sichtbarkeit und Eingriffsschwellen. Hier legt ihr fest, wann ein Risiko bei einer Person bleibt und ab wann ihr gemeinsam entscheidet.",
+    agreementTitle: "Risikoregel",
+    agreementPlaceholder:
+      "Wenn ein Risiko in diesem Bereich auftaucht, fuehrt ... es zuerst. Sichtbar wird es fuer beide spaetestens dann, wenn ...",
+    escalationTitle: "Ab wann ihr gemeinsam eingreift",
+    escalationPlaceholder:
+      "Wenn ein Risiko diese Schwelle erreicht oder eine Person es klar kritisch sieht, dann ...",
+    escalationHelper:
+      "Diese Regel trennt laufende Beobachtung von einem gemeinsamen Eingriff.",
+    reviewTitle: "Woran ihr merkt, dass die Risikoregel nicht mehr reicht",
+    reviewPlaceholder:
+      "Zum Beispiel: wenn Risiken zu spaet sichtbar werden, unterschiedlich bewertet bleiben oder erst im Notfall gemeinsam entschieden wird.",
+    reviewHelper: "Hilfreich, damit Risiken nicht erst unter Druck in den gemeinsamen Raum kommen.",
+    reviewSummary: "Fruehwarnsignal optional ergänzen",
+    rulePreviewSummary:
+      "Die Risikoregel wird erst tragfaehig, wenn eure Sicht auf Fuehrung, Sichtbarkeit und Schwellen sauber sichtbar ist.",
+    rulePreviewDetail:
+      "So wird aus Risiko kein Bauchthema, sondern eine klare gemeinsame Eingriffslogik.",
+  },
+};
+
+function isPremiumWorkbookV2StepId(stepId: FounderAlignmentWorkbookStepId): stepId is PremiumWorkbookV2StepId {
+  return (PREMIUM_WORKBOOK_V2_STEP_IDS as readonly FounderAlignmentWorkbookStepId[]).includes(stepId);
+}
 
 const AGREEMENT_DRAFT_META: Record<
   FounderAlignmentWorkbookStepId,
@@ -304,7 +465,7 @@ const DISCUSSION_SIGNAL_OPTIONS: Array<{
   shortLabel: string;
 }> = [
   { value: "important", label: "Wichtig fuer mich", shortLabel: "Wichtig" },
-  { value: "agree", label: "Sehe ich genauso", shortLabel: "Passt" },
+  { value: "agree", label: "Trage ich mit", shortLabel: "Trage ich mit" },
   { value: "critical", label: "Sehe ich kritisch", shortLabel: "Kritisch" },
 ];
 
@@ -353,22 +514,7 @@ function resolveDecisionRulesWorkspace(
   entry: FounderAlignmentWorkbookPayload["steps"][FounderAlignmentWorkbookStepId]
 ): FounderAlignmentWorkbookStepWorkspaceV2 {
   const workspace = sanitizeWorkbookStepWorkspaceV2(entry.workspaceV2);
-  const legacyWorkspace = buildLegacyDecisionRulesWorkspace(entry);
-
-  if (!workspace) {
-    return legacyWorkspace;
-  }
-
-  const existingEntryIds = new Set(workspace.entries.map((item) => item.id));
-  const mergedEntries = [
-    ...legacyWorkspace.entries.filter((item) => !existingEntryIds.has(item.id)),
-    ...workspace.entries,
-  ];
-
-  return {
-    entries: mergedEntries,
-    reactions: workspace.reactions,
-  };
+  return workspace ?? buildLegacyDecisionRulesWorkspace(entry);
 }
 
 function getDecisionRulesReaction(
@@ -385,13 +531,64 @@ function hasDecisionRulesPerspective(
   workspace: FounderAlignmentWorkbookStepWorkspaceV2,
   userId: FounderAlignmentWorkbookDiscussionAuthor
 ) {
-  return (
-    workspace.entries.some((entry) => entry.createdBy === userId) ||
-    workspace.reactions.some((reaction) => reaction.userId === userId)
+  return workspace.entries.some(
+    (entry) => entry.createdBy === userId && entry.content.trim().length > 0
   );
 }
 
-function buildDecisionRulesMatchingHint(markerClass: FounderMatchingMarkerClass | null) {
+function hasDecisionRulesWeightingForAllEntries(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  userId: FounderAlignmentWorkbookDiscussionAuthor
+) {
+  return (
+    workspace.entries.length > 0 &&
+    workspace.entries.every((entry) => getDecisionRulesReaction(workspace, entry.id, userId) !== null)
+  );
+}
+
+function buildWorkbookV2MatchingHint(
+  stepId: PremiumWorkbookV2StepId,
+  markerClass: FounderMatchingMarkerClass | null
+) {
+  if (stepId === "vision_direction") {
+    switch (markerClass) {
+      case "critical_clarification_point":
+        return "Hier zieht ihr strategisch nicht automatisch in dieselbe Richtung. Ohne klare Prioritaetslinie entscheidet ihr Chancen jedes Mal neu.";
+      case "high_rule_need":
+        return "Gutes Verstaendnis reicht hier nicht. Ihr braucht eine klare Linie dafuer, was wirklich Vorrang hat und was bewusst liegen bleibt.";
+      case "conditional_complement":
+        return "Ihr bringt unterschiedliche Blickwinkel auf Fokus und Chancen mit. Das hilft euch, wenn klar ist, wann Wachstum zieht und wann ihr den Kern schuetzt.";
+      default:
+        return "Euer Matching zeigt hier Unterschiede darin, wie ihr Fokus haltet, Chancen bewertet und wann fuer euch ein Richtungswechsel wirklich Sinn ergibt.";
+    }
+  }
+
+  if (stepId === "ownership_risk") {
+    switch (markerClass) {
+      case "critical_clarification_point":
+        return "Wenn ihr hier zu spaet sichtbar macht oder zu unterschiedlich eingreift, landet ihr erst im kritischen Moment in einer gemeinsamen Entscheidung.";
+      case "high_rule_need":
+        return "Gutes Gefuehl reicht hier nicht. Ihr braucht klare Schwellen dafuer, wann ein Risiko sichtbar wird und ab wann ihr gemeinsam fuehrt.";
+      case "conditional_complement":
+        return "Ihr schaut unterschiedlich frueh auf Risiken. Das kann stark sein, wenn klar ist, wer fuehrt und wann die zweite Person verbindlich dazukommt.";
+      default:
+        return "Euer Matching zeigt hier Unterschiede darin, wie frueh ihr Risiken seht, wie viel Unsicherheit ihr tragt und wann fuer euch ein gemeinsamer Eingriff noetig wird.";
+    }
+  }
+
+  if (stepId === "collaboration_conflict") {
+    switch (markerClass) {
+      case "critical_clarification_point":
+        return "Wenn Reibung hier liegen bleibt, zieht sie sich schnell durch andere Themen. Ihr braucht eine klare Form fuer Feedback und Klaerung.";
+      case "high_rule_need":
+        return "Gute Absicht reicht hier nicht. Ihr braucht klare Spielregeln dafuer, wann ihr Dinge ansprecht und wann ihr sie aus dem Tagesgeschaeft herausnehmt.";
+      case "conditional_complement":
+        return "Ihr bringt unterschiedliche Konflikt- und Abstimmungsstile mit. Das hilft euch nur dann, wenn Timing und Form der Klaerung klar sind.";
+      default:
+        return "Euer Matching zeigt hier Unterschiede darin, wie direkt ihr Feedback gebt, wie viel Abstimmung ihr braucht und wann Reibung wirklich geklaert werden muss.";
+    }
+  }
+
   switch (markerClass) {
     case "critical_clarification_point":
       return "Hier braucht ihr eine klare Entscheidungsgrenze. Sonst kippt Druck schnell in Blockade oder Rueckzug.";
@@ -415,7 +612,8 @@ function formatDiscussionTimestamp(value: string) {
   }).format(new Date(value));
 }
 
-function buildDecisionRulesSuggestion(params: {
+function buildWorkbookV2Suggestion(params: {
+  stepId: PremiumWorkbookV2StepId;
   workspace: FounderAlignmentWorkbookStepWorkspaceV2;
   founderALabel: string;
   founderBLabel: string;
@@ -437,6 +635,75 @@ function buildDecisionRulesSuggestion(params: {
       Boolean(reactionB)
     );
   });
+
+  if (params.stepId === "vision_direction") {
+    const agreement =
+      criticalEntries.length > 0
+        ? "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Sobald eine Person eine Chance klar kritisch sieht oder sie euch sichtbar vom Kern wegzieht, verfolgt ihr sie nicht weiter, bevor ihr die Richtung gemeinsam neu prueft."
+        : "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Neue Chancen verfolgt ihr nur weiter, wenn sie klar zu eurer Richtung passen und nicht nur kurzfristig attraktiv wirken.";
+
+    const escalationRule =
+      hasFounderA && hasFounderB
+        ? `Wenn eine Chance oder Richtungsveraenderung unterschiedlich gelesen wird, stoppt ihr zuerst den Zug zum lauteren Thema und legt fest, wann ${params.founderALabel} und ${params.founderBLabel} die Prioritaet gemeinsam neu pruefen.`
+        : "Wenn eine Chance attraktiv wirkt, eure Richtung aber unscharf wird, stoppt ihr sie zuerst und legt direkt fest, wann ihr die Prioritaet gemeinsam neu prueft.";
+
+    const reviewTrigger =
+      sharedEntries.length > 0
+        ? "Ihr prueft diese Linie neu, wenn wieder zu viele Themen gleichzeitig ziehen, gute Chancen unterschiedlich gelesen werden oder euer Kernfokus unscharf wird."
+        : "Ihr prueft diese Linie neu, wenn neue Chancen haeufig zu Richtungswechseln fuehren oder Prioritaeten immer wieder neu verhandelt werden.";
+
+    return {
+      agreement,
+      escalationRule,
+      reviewTrigger,
+    };
+  }
+
+  if (params.stepId === "ownership_risk") {
+    const agreement =
+      criticalEntries.length > 0
+        ? "Wenn ein Risiko im laufenden Bereich bleibt, fuehrt es die verantwortliche Person zuerst. Sobald eine Person das Risiko klar kritisch sieht oder eine feste Schwelle erreicht ist, macht ihr es sofort fuer beide sichtbar und entscheidet gemeinsam ueber Stop, Begrenzung oder den naechsten Schritt."
+        : "Wenn ein Risiko im laufenden Bereich bleibt, fuehrt es die verantwortliche Person zuerst. Sobald eine feste Schwelle erreicht ist oder die Auswirkungen groesser werden, macht ihr es frueh fuer beide sichtbar und entscheidet gemeinsam ueber den naechsten Schritt.";
+
+    const escalationRule =
+      hasFounderA && hasFounderB
+        ? `Wenn ein Risiko unterschiedlich gelesen wird oder eine Schwelle erreicht, benennt ihr noch im selben Termin, was jetzt kritisch ist, und legt fest, ob ${params.founderALabel}, ${params.founderBLabel} oder ihr beide gemeinsam bis wann entscheidet.`
+        : "Wenn ein Risiko kritisch wird oder unterschiedlich gelesen bleibt, nehmt ihr es sofort aus der stillen Beobachtung heraus und legt direkt fest, wer bis wann gemeinsam entscheidet.";
+
+    const reviewTrigger =
+      sharedEntries.length > 0
+        ? "Ihr prueft diese Regel neu, wenn Risiken zu spaet sichtbar werden, unterschiedlich lange weiterlaufen oder erst im kritischen Moment gemeinsam entschieden wird."
+        : "Ihr prueft diese Regel neu, wenn ein Risiko zu lange bei einer Person bleibt oder erst unter Druck auf den gemeinsamen Tisch kommt.";
+
+    return {
+      agreement,
+      escalationRule,
+      reviewTrigger,
+    };
+  }
+
+  if (params.stepId === "collaboration_conflict") {
+    const agreement =
+      criticalEntries.length > 0
+        ? "Wenn etwas stoert oder kippt, sprecht ihr es frueh und direkt an. Sobald eine Person einen Punkt klar kritisch sieht oder dieselbe Reibung wiederkommt, nehmt ihr ihn aus dem Tagesgeschaeft und klaert ihn in einem eigenen ruhigen Gespraech."
+        : "Wenn etwas stoert, sprecht ihr es frueh und direkt an. Wenn im laufenden Austausch keine saubere Klaerung entsteht, legt ihr zeitnah ein eigenes Gespraech dafuer fest.";
+
+    const escalationRule =
+      hasFounderA && hasFounderB
+        ? `Wenn ein Thema im Alltag nicht geloest wird, benennt ihr noch im selben Termin, was offen ist, und legt fest, wann ${params.founderALabel} und ${params.founderBLabel} es in einem eigenen Klaerungsrahmen besprechen.`
+        : "Wenn ein Thema im Alltag nicht sauber geloest wird, nehmt ihr es aus dem laufenden Geschaeft heraus und legt direkt einen festen Klaerungstermin fest.";
+
+    const reviewTrigger =
+      sharedEntries.length > 0
+        ? "Ihr prueft diese Regel neu, wenn Feedback wieder liegen bleibt, Gespraeche schaerfer werden oder dieselbe Reibung mehrfach auftaucht."
+        : "Ihr prueft diese Regel neu, wenn Kritik zu spaet kommt, zwischen den Zeilen landet oder ein Thema mehrfach offen bleibt.";
+
+    return {
+      agreement,
+      escalationRule,
+      reviewTrigger,
+    };
+  }
 
   const agreement =
     criticalEntries.length > 0
@@ -551,7 +818,12 @@ export function FounderAlignmentWorkbookClient({
   const founderALabel = founderAName?.trim() || "Founder A";
   const founderBLabel = founderBName?.trim() || "Founder B";
   const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Moderation";
-  const currentStepIsPremiumPilot = currentStep.id === PREMIUM_WORKBOOK_PILOT_STEP_ID;
+  const currentStepIsPremiumPilot = isPremiumWorkbookV2StepId(currentStep.id);
+  const currentPremiumV2StepId: PremiumWorkbookV2StepId | null = currentStepIsPremiumPilot
+    ? (currentStep.id as PremiumWorkbookV2StepId)
+    : null;
+  const currentPremiumV2Config =
+    currentPremiumV2StepId != null ? PREMIUM_WORKBOOK_V2_CONFIG[currentPremiumV2StepId] : null;
   const showAdvisorInviteCard =
     !currentStepIsPremiumPilot &&
     (currentUserRole === "founderA" ||
@@ -630,11 +902,15 @@ export function FounderAlignmentWorkbookClient({
     currentStepEntry.founderAApproved && currentStepEntry.founderBApproved;
   const decisionRulesWorkspace = useMemo(
     () =>
-      currentStep.id === PREMIUM_WORKBOOK_PILOT_STEP_ID
+      currentStepIsPremiumPilot
         ? resolveDecisionRulesWorkspace(currentStepEntry)
         : null,
-    [currentStep.id, currentStepEntry]
+    [currentStepEntry, currentStepIsPremiumPilot]
   );
+  const shouldHydrateLegacyDecisionRulesWorkspace =
+    currentStepIsPremiumPilot &&
+    !currentStepEntry.workspaceV2 &&
+    (currentStepEntry.founderA.trim().length > 0 || currentStepEntry.founderB.trim().length > 0);
   const currentDiscussionDraft = discussionDraftByStep[currentStep.id] ?? "";
   const hasDecisionRulesFounderAPerspective = decisionRulesWorkspace
     ? hasDecisionRulesPerspective(decisionRulesWorkspace, "founderA")
@@ -646,20 +922,51 @@ export function FounderAlignmentWorkbookClient({
     hasDecisionRulesFounderAPerspective && hasDecisionRulesFounderBPerspective;
   const decisionRulesSuggestion = useMemo(
     () =>
-      decisionRulesWorkspace
-        ? buildDecisionRulesSuggestion({
+      decisionRulesWorkspace && currentPremiumV2StepId
+        ? buildWorkbookV2Suggestion({
+            stepId: currentPremiumV2StepId,
             workspace: decisionRulesWorkspace,
             founderALabel,
             founderBLabel,
           })
         : null,
-    [decisionRulesWorkspace, founderALabel, founderBLabel]
+    [decisionRulesWorkspace, currentPremiumV2StepId, founderALabel, founderBLabel]
   );
-  const decisionRulesMatchingHint = buildDecisionRulesMatchingHint(currentStepMarker?.markerClass ?? null);
+  const decisionRulesMatchingHint =
+    currentPremiumV2StepId != null
+      ? buildWorkbookV2MatchingHint(currentPremiumV2StepId, currentStepMarker?.markerClass ?? null)
+      : "";
   const decisionRulesEscalationValue =
     currentStepStructuredOutputs?.escalationRule?.trim() ?? "";
   const decisionRulesReviewTriggerValue =
     currentStepStructuredOutputs?.reviewTrigger?.trim() ?? "";
+  const decisionRulesHasEntries = decisionRulesWorkspace
+    ? decisionRulesWorkspace.entries.length > 0
+    : false;
+  const decisionRulesFounderAWeightingComplete = decisionRulesWorkspace
+    ? hasDecisionRulesWeightingForAllEntries(decisionRulesWorkspace, "founderA")
+    : false;
+  const decisionRulesFounderBWeightingComplete = decisionRulesWorkspace
+    ? hasDecisionRulesWeightingForAllEntries(decisionRulesWorkspace, "founderB")
+    : false;
+  const decisionRulesWeightingReady =
+    decisionRulesHasEntries &&
+    hasDecisionRulesBothPerspectives &&
+    decisionRulesFounderAWeightingComplete &&
+    decisionRulesFounderBWeightingComplete;
+  const decisionRulesRuleReady =
+    decisionRulesWeightingReady &&
+    currentStepEntry.agreement.trim().length > 0 &&
+    decisionRulesEscalationValue.trim().length > 0 &&
+    hasDecisionRulesBothPerspectives;
+  const currentDecisionRulesPhase: "collect" | "weight" | "rule" | "approval" =
+    !hasDecisionRulesBothPerspectives
+      ? "collect"
+      : !decisionRulesWeightingReady
+        ? "weight"
+        : !decisionRulesRuleReady
+          ? "rule"
+          : "approval";
   const decisionRulesSharedCount = decisionRulesWorkspace
     ? decisionRulesWorkspace.entries.filter((entry) => {
         const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
@@ -688,6 +995,16 @@ export function FounderAlignmentWorkbookClient({
           (reactionB === "important" || reactionB === "agree" || reactionB === "critical")
         );
       }).length
+    : 0;
+  const decisionRulesFounderAOpenWeightingCount = decisionRulesWorkspace
+    ? decisionRulesWorkspace.entries.filter(
+        (entry) => getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA") === null
+      ).length
+    : 0;
+  const decisionRulesFounderBOpenWeightingCount = decisionRulesWorkspace
+    ? decisionRulesWorkspace.entries.filter(
+        (entry) => getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB") === null
+      ).length
     : 0;
   const currentStepStatus = deriveWorkbookStepStatus(
     currentStep.id,
@@ -877,6 +1194,40 @@ export function FounderAlignmentWorkbookClient({
   }, [canSave, formattedUpdatedAt, persisted, saveState.kind, source]);
 
   useEffect(() => {
+    if (!shouldHydrateLegacyDecisionRulesWorkspace || !decisionRulesWorkspace) {
+      return;
+    }
+
+    setWorkbook((current) => {
+      if (!currentPremiumV2StepId) {
+        return current;
+      }
+
+      const stepEntry = current.steps[currentPremiumV2StepId];
+      if (stepEntry.workspaceV2) {
+        return current;
+      }
+
+      return {
+        ...current,
+        steps: {
+          ...current.steps,
+          [currentPremiumV2StepId]: {
+            ...stepEntry,
+            workspaceV2: decisionRulesWorkspace,
+          },
+        },
+      };
+    });
+
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+  }, [canSave, currentPremiumV2StepId, decisionRulesWorkspace, shouldHydrateLegacyDecisionRulesWorkspace]);
+
+  useEffect(() => {
     if (!shouldScrollToStepRef.current) return;
 
     shouldScrollToStepRef.current = false;
@@ -1047,7 +1398,7 @@ export function FounderAlignmentWorkbookClient({
 
   function addDecisionRulesDiscussionEntry() {
     if (
-      activeStepId !== PREMIUM_WORKBOOK_PILOT_STEP_ID ||
+      !isPremiumWorkbookV2StepId(activeStepId) ||
       !decisionRulesWorkspace ||
       (currentUserRole !== "founderA" && currentUserRole !== "founderB")
     ) {
@@ -1078,7 +1429,7 @@ export function FounderAlignmentWorkbookClient({
 
   function updateDecisionRulesDiscussionEntry(entryId: string, content: string) {
     if (
-      activeStepId !== PREMIUM_WORKBOOK_PILOT_STEP_ID ||
+      !isPremiumWorkbookV2StepId(activeStepId) ||
       !decisionRulesWorkspace ||
       (currentUserRole !== "founderA" && currentUserRole !== "founderB")
     ) {
@@ -1105,7 +1456,7 @@ export function FounderAlignmentWorkbookClient({
     signal: FounderAlignmentWorkbookDiscussionSignal
   ) {
     if (
-      activeStepId !== PREMIUM_WORKBOOK_PILOT_STEP_ID ||
+      !isPremiumWorkbookV2StepId(activeStepId) ||
       !decisionRulesWorkspace ||
       (currentUserRole !== "founderA" && currentUserRole !== "founderB")
     ) {
@@ -1857,6 +2208,11 @@ export function FounderAlignmentWorkbookClient({
                 const isActive = step.id === workbook.currentStepId;
                 const isPrioritized = highlights.prioritizedStepIds.includes(step.id);
                 const progressMeta = stepProgressMeta[step.id];
+                const statusLabel = progressMeta?.completed
+                  ? t("Bereit")
+                  : progressMeta?.started
+                    ? t("In Arbeit")
+                    : t("Offen");
                 return (
                   <li
                     key={step.id}
@@ -1876,41 +2232,32 @@ export function FounderAlignmentWorkbookClient({
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">
                             Schritt {index + 1}
                           </p>
-                          <p className="mt-1 text-sm font-medium">{step.title}</p>
-                          <p className="mt-2 text-xs leading-5 opacity-75">
-                            {progressMeta?.completed
-                              ? t("Regel steht")
-                              : progressMeta?.started
-                                ? t("In Arbeit")
-                                : t("Noch offen")}
-                          </p>
+                          <p className="mt-1 truncate text-sm font-medium">{step.title}</p>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
+                        <div className="flex shrink-0 items-center gap-2">
                           {isPrioritized ? (
                             <span
-                              className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                              className={`inline-flex h-2.5 w-2.5 rounded-full ${
                                 isActive
-                                  ? "bg-white/70 text-slate-900"
-                                  : "bg-[color:var(--brand-accent)]/10 text-[color:var(--brand-accent)]"
+                                  ? "bg-slate-900"
+                                  : "bg-[color:var(--brand-accent)]/70"
                               }`}
-                            >
-                              Fokus
-                            </span>
+                            />
                           ) : null}
                           <span
-                            className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
                               progressMeta?.completed
-                              ? "bg-emerald-600 text-white"
-                              : progressMeta?.started
+                                ? "bg-emerald-100 text-emerald-700"
+                                : progressMeta?.started
                                   ? "bg-slate-900 text-white"
                                   : "bg-slate-200 text-slate-500"
                             }`}
                           >
-                            {progressMeta?.completed ? "✓" : index + 1}
+                            {statusLabel}
                           </span>
                         </div>
                       </div>
@@ -1925,39 +2272,69 @@ export function FounderAlignmentWorkbookClient({
             ref={currentStepRef}
             className="order-1 rounded-[32px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-8 xl:order-2"
           >
-            <div className="rounded-3xl border border-slate-200/70 bg-slate-50/70 p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                    Schritt {currentIndex + 1} von {visibleSteps.length}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {t("Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.")}
-                  </p>
+            {currentStepIsPremiumPilot ? (
+              <div className="border-b border-slate-200/80 pb-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                      Schritt {currentIndex + 1} von {visibleSteps.length}
+                    </p>
+                    <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+                      {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was kuenftig klar gelten soll.")}
+                    </p>
+                    {isFocusedStep ? (
+                      <p className="mt-3 text-xs leading-6 text-[color:var(--brand-accent)]">
+                        {t("Im Matching-Report war dieses Thema fuer euch besonders auffaellig.")}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
+                      currentStepStatus
+                    )}`}
+                  >
+                    {t(workbookStepStatusLabel(currentStepStatus))}
+                  </span>
                 </div>
-                <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
-                    currentStepStatus
-                  )}`}
-                >
-                  {t(workbookStepStatusLabel(currentStepStatus))}
-                </span>
               </div>
-            </div>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
-            <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
-              {currentStep.subtitle}
-            </p>
-            {isFocusedStep ? (
-              <div className="mt-6 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--brand-accent)]">
-                  Fokus aus eurem Matching-Report
+            ) : (
+              <>
+                <div className="rounded-3xl border border-slate-200/70 bg-slate-50/70 p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                        Schritt {currentIndex + 1} von {visibleSteps.length}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        {t("Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.")}
+                      </p>
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
+                        currentStepStatus
+                      )}`}
+                    >
+                      {t(workbookStepStatusLabel(currentStepStatus))}
+                    </span>
+                  </div>
+                </div>
+                <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
+                <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
+                  {currentStep.subtitle}
                 </p>
-                <p className="mt-2 text-sm leading-7 text-slate-700">
-                  {t("Dieser Bereich wurde im Matching-Report als besonders relevant fuer eure Zusammenarbeit identifiziert.")}
-                </p>
-              </div>
-            ) : null}
+                {isFocusedStep ? (
+                  <div className="mt-6 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--brand-accent)]">
+                      Fokus aus eurem Matching-Report
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-slate-700">
+                      {t("Dieser Bereich wurde im Matching-Report als besonders relevant fuer eure Zusammenarbeit identifiziert.")}
+                    </p>
+                  </div>
+                ) : null}
+              </>
+            )}
 
             {!currentStepIsPremiumPilot ? (
               <>
@@ -2182,50 +2559,78 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </div>
               </StepSection>
-            ) : currentStepIsPremiumPilot && decisionRulesWorkspace ? (
+            ) : currentStepIsPremiumPilot && decisionRulesWorkspace && currentPremiumV2Config ? (
               <>
-                <StepSection
-                  title="1. Leitfrage"
-                  className="mt-8 border-[color:var(--brand-primary)]/18 bg-[linear-gradient(180deg,rgba(103,232,249,0.08),rgba(255,255,255,0.98))]"
-                >
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-                    <div>
-                      <p className="text-lg font-semibold leading-8 text-slate-950">
+                <section className="mt-8 rounded-[26px] bg-slate-50/80 px-5 py-5 sm:px-6">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                    <div className="max-w-3xl">
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                        {t("Leitfrage")}
+                      </p>
+                      <p className="mt-2 text-lg font-semibold leading-8 text-slate-950 sm:text-xl">
                         {t(currentStep.prompts[0] ?? "Wie regelt ihr Entscheidungen so, dass sie auch unter Druck klar bleiben?")}
                       </p>
-                      <p className="mt-3 text-sm leading-7 text-slate-700">
-                        {t("Hier legt ihr fest, wer im Alltag entscheidet, wann ihr zusammen reinmuesst und was gilt, wenn Zeitdruck steigt.")}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/80 bg-white/88 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Matching-Hinweis")}
-                      </p>
-                      <p className="mt-2 text-sm leading-7 text-slate-700">
+                      <p className="mt-3 text-sm leading-6 text-slate-600">
                         {t(decisionRulesMatchingHint)}
                       </p>
                     </div>
-                  </div>
-                </StepSection>
-
-                <StepSection title="2. Denkraum" className="mt-8 border-slate-200/80 bg-white">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="max-w-3xl">
-                      <p className="text-sm leading-7 text-slate-700">
-                        {t("Legt zuerst die Punkte auf den Tisch, die eure Entscheidungslogik im Alltag wirklich tragen oder blockieren. Haltet lieber kurze, klare Gedanken fest als lange Erklaerungen.")}
-                      </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <DecisionRulesPhasePill
+                        label={t("Sammeln")}
+                        state={
+                          currentDecisionRulesPhase === "collect"
+                            ? "active"
+                            : hasDecisionRulesBothPerspectives
+                              ? "done"
+                              : "upcoming"
+                        }
+                      />
+                      <DecisionRulesPhasePill
+                        label={t("Schaerfen")}
+                        state={
+                          currentDecisionRulesPhase === "weight"
+                            ? "active"
+                            : decisionRulesWeightingReady
+                              ? "done"
+                              : "upcoming"
+                        }
+                      />
+                      <DecisionRulesPhasePill
+                        label={t("Regel")}
+                        state={
+                          currentDecisionRulesPhase === "rule"
+                            ? "active"
+                            : decisionRulesRuleReady
+                              ? "done"
+                              : "upcoming"
+                        }
+                      />
+                      <DecisionRulesPhasePill
+                        label={t("Bestaetigen")}
+                        state={
+                          currentDecisionRulesPhase === "approval"
+                            ? "active"
+                            : currentStepIsApprovedByBoth
+                              ? "done"
+                              : "upcoming"
+                        }
+                      />
                     </div>
-                    {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
-                        {t("Autoren sichtbar")}
-                      </span>
-                    ) : null}
                   </div>
+                </section>
 
-                  <div className="mt-6 rounded-[24px] border border-slate-200/80 bg-slate-50/70 p-4 sm:p-5">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-slate-900">{t("Neuen Punkt festhalten")}</p>
-                      <span className="text-xs uppercase tracking-[0.14em] text-slate-500">
+                {currentDecisionRulesPhase === "collect" ? (
+                  <section className="mt-8 rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-7">
+                    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
+                      <div className="max-w-3xl">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                          {t("1. Denkraum")}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-slate-700">
+                          {t(currentPremiumV2Config.collectIntro)}
+                        </p>
+                      </div>
+                      <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
                         {t(
                           currentUserRole === "founderA"
                             ? `Du schreibst als ${founderALabel}`
@@ -2235,271 +2640,322 @@ export function FounderAlignmentWorkbookClient({
                         )}
                       </span>
                     </div>
-                    <textarea
-                      value={currentDiscussionDraft}
-                      onChange={(event) => setDiscussionDraft(event.target.value)}
-                      placeholder={t("Zum Beispiel: Entscheidungen mit Marktfenster duerfen nicht zweimal in dieselbe Schleife fallen. Oder: Ab Budget X entscheiden wir nicht mehr allein.")}
-                      readOnly={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
-                      rows={3}
-                      className={`mt-4 min-h-[112px] w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition ${
-                        currentUserRole === "founderA" || currentUserRole === "founderB"
-                          ? "border-slate-200/80 bg-white text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                          : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
-                      }`}
-                    />
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-xs leading-6 text-slate-500">
-                        {t("Ein Punkt reicht. Ihr koennt spaeter weitere Gedanken ergaenzen und gewichten.")}
-                      </p>
-                      <ReportActionButton
-                        type="button"
-                        onClick={addDecisionRulesDiscussionEntry}
-                        disabled={
-                          currentUserRole !== "founderA" &&
-                          currentUserRole !== "founderB"
-                        }
-                      >
-                        {t("Punkt hinzufuegen")}
-                      </ReportActionButton>
-                    </div>
-                  </div>
 
-                  <div className="mt-6 grid gap-4">
-                    {decisionRulesWorkspace.entries.length === 0 ? (
-                      <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-6 text-sm leading-7 text-slate-600">
-                        {t("Noch keine Punkte festgehalten. Startet mit den zwei oder drei Dingen, die bei Entscheidungen bei euch am schnellsten Reibung oder Tempo erzeugen.")}
+                    <div className="mt-5">
+                      <textarea
+                        value={currentDiscussionDraft}
+                        onChange={(event) => setDiscussionDraft(event.target.value)}
+                        placeholder={t(currentPremiumV2Config.collectPlaceholder)}
+                        readOnly={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
+                        rows={3}
+                        className={`w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition ${
+                          currentUserRole === "founderA" || currentUserRole === "founderB"
+                            ? "border-slate-200/80 bg-slate-50/50 text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                            : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
+                        }`}
+                      />
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t(currentPremiumV2Config.collectHelper)}
+                        </p>
+                        <ReportActionButton
+                          type="button"
+                          onClick={addDecisionRulesDiscussionEntry}
+                          disabled={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
+                        >
+                          {t("Punkt hinzufuegen")}
+                        </ReportActionButton>
                       </div>
-                    ) : (
-                      decisionRulesWorkspace.entries.map((entry) => {
+                    </div>
+
+                    <div className="mt-5 space-y-3">
+                      {decisionRulesWorkspace.entries.length === 0 ? (
+                        <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-5 text-sm leading-7 text-slate-600">
+                          {t("Noch keine Punkte festgehalten. Der Einstieg wird leicht, sobald der erste konkrete Satz da ist.")}
+                        </div>
+                      ) : (
+                        decisionRulesWorkspace.entries.map((entry) => {
+                          const isOwnEntry =
+                            (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                            entry.createdBy === currentUserRole;
+                          const authorLabel = entry.createdBy === "founderA" ? founderALabel : founderBLabel;
+
+                          return (
+                            <article
+                              key={entry.id}
+                              className="rounded-[20px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)]"
+                            >
+                              <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex items-center gap-3">
+                                  <ProfileAvatar
+                                    displayName={authorLabel}
+                                    avatarId={entry.createdBy === "founderA" ? founderAAvatarId : founderBAvatarId}
+                                    className="h-9 w-9 shrink-0 rounded-2xl border border-slate-200/80 object-cover"
+                                    fallbackClassName="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-slate-200/80 bg-slate-50 text-xs font-semibold text-slate-700"
+                                  />
+                                  <span className="text-sm font-medium text-slate-900">{authorLabel}</span>
+                                </div>
+                                <span className="text-xs text-slate-500">
+                                  {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
+                                </span>
+                              </div>
+                              {isOwnEntry ? (
+                                <textarea
+                                  value={entry.content}
+                                  onChange={(event) =>
+                                    updateDecisionRulesDiscussionEntry(entry.id, event.target.value)
+                                  }
+                                  rows={2}
+                                  className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-slate-50/40 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                                />
+                              ) : (
+                                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
+                              )}
+                            </article>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div className="mt-5 text-sm leading-7 text-slate-600">
+                      {hasDecisionRulesBothPerspectives
+                        ? t(currentPremiumV2Config.collectReadyText)
+                        : t(
+                            currentPremiumV2Config.missingPerspectiveText(
+                              hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel
+                            )
+                          )}
+                    </div>
+                  </section>
+                ) : (
+                  <DecisionRulesPhasePreview
+                    title={t("1. Denkraum")}
+                    summary={t(`${decisionRulesWorkspace.entries.length} Punkte liegen auf dem Tisch.`)}
+                    detail={
+                      hasDecisionRulesBothPerspectives
+                        ? t("Beide Perspektiven sind sichtbar.")
+                        : t("Es fehlt noch mindestens ein eigener Punkt der zweiten Person.")
+                    }
+                    className="mt-8"
+                  />
+                )}
+
+                {currentDecisionRulesPhase === "weight" ? (
+                  <section className="mt-6 rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-7">
+                    <div className="max-w-3xl">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("2. Gewichtung")}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {t(currentPremiumV2Config.weightingIntro)}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 md:grid-cols-3">
+                      <DecisionRulesInsightCard
+                        title={t("Gemeinsam getragen")}
+                        count={decisionRulesSharedCount}
+                        text={t("Punkte, die fuer euch beide klar passen.")}
+                        tone="shared"
+                      />
+                      <DecisionRulesInsightCard
+                        title={t("Einseitig wichtig")}
+                        count={decisionRulesImportantSinglesCount}
+                        text={t("Punkte, die vor allem einer Person wichtig sind.")}
+                        tone="focus"
+                      />
+                      <DecisionRulesInsightCard
+                        title={t("Offen oder kritisch")}
+                        count={decisionRulesCriticalCount}
+                        text={t("Punkte, bei denen ihr bewusst klaeren muesst.")}
+                        tone="critical"
+                      />
+                    </div>
+
+                    <div className="mt-5 grid gap-3">
+                      {decisionRulesWorkspace.entries.map((entry) => {
                         const signalA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
                         const signalB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-                        const isOwnEntry =
-                          (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                          entry.createdBy === currentUserRole;
                         const authorLabel = entry.createdBy === "founderA" ? founderALabel : founderBLabel;
 
                         return (
                           <article
                             key={entry.id}
-                            className="rounded-[24px] border border-slate-200/80 bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]"
+                            className="rounded-[20px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)]"
                           >
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
-                                  {authorLabel}
-                                </span>
-                                <span className="text-xs text-slate-500">
-                                  {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
-                                </span>
-                              </div>
-                              {entry.updatedBy && entry.updatedAt ? (
-                                <span className="text-xs text-slate-400">
-                                  {t(`Zuletzt bearbeitet von ${entry.updatedBy === "founderA" ? founderALabel : founderBLabel}`)}
-                                </span>
-                              ) : null}
+                            <div className="flex flex-wrap items-center gap-3">
+                              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
+                                {authorLabel}
+                              </span>
                             </div>
+                            <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
 
-                            {isOwnEntry ? (
-                              <textarea
-                                value={entry.content}
-                                onChange={(event) =>
-                                  updateDecisionRulesDiscussionEntry(entry.id, event.target.value)
-                                }
-                                rows={3}
-                                className="mt-4 w-full rounded-2xl border border-slate-200/80 bg-slate-50/50 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                              />
-                            ) : (
-                              <p className="mt-4 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
-                            )}
+                            <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                              <div className="flex flex-wrap gap-2">
+                                {DISCUSSION_SIGNAL_OPTIONS.map((option) => {
+                                  const isActive =
+                                    currentUserRole === "founderA" || currentUserRole === "founderB"
+                                      ? getDecisionRulesReaction(
+                                          decisionRulesWorkspace,
+                                          entry.id,
+                                          currentUserRole
+                                        ) === option.value
+                                      : false;
 
-                            <div className="mt-5 rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
-                              <div className="flex flex-wrap items-center justify-between gap-3">
-                                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                                  {t("Gewichtung")}
-                                </p>
-                                {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
-                                  <span className="text-xs text-slate-500">
-                                    {t("Markiere, wie du diesen Punkt liest.")}
-                                  </span>
-                                ) : null}
+                                  return (
+                                    <button
+                                      key={`${entry.id}-${option.value}`}
+                                      type="button"
+                                      disabled={
+                                        currentUserRole !== "founderA" &&
+                                        currentUserRole !== "founderB"
+                                      }
+                                      onClick={() => updateDecisionRulesReaction(entry.id, option.value)}
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                                        isActive
+                                          ? option.value === "critical"
+                                            ? "border-rose-200 bg-rose-50 text-rose-700"
+                                            : option.value === "important"
+                                              ? "border-amber-200 bg-amber-50 text-amber-700"
+                                              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                          : currentUserRole === "founderA" || currentUserRole === "founderB"
+                                            ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                                            : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                                      }`}
+                                    >
+                                      {t(option.shortLabel)}
+                                    </button>
+                                  );
+                                })}
                               </div>
 
-                              <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-                                <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-                                  {DISCUSSION_SIGNAL_OPTIONS.map((option) => {
-                                    const isActive =
-                                      currentUserRole === "founderA" || currentUserRole === "founderB"
-                                        ? getDecisionRulesReaction(
-                                            decisionRulesWorkspace,
-                                            entry.id,
-                                            currentUserRole
-                                          ) === option.value
-                                        : false;
-
-                                    return (
-                                      <button
-                                        key={`${entry.id}-${option.value}`}
-                                        type="button"
-                                        disabled={
-                                          currentUserRole !== "founderA" &&
-                                          currentUserRole !== "founderB"
-                                        }
-                                        onClick={() => updateDecisionRulesReaction(entry.id, option.value)}
-                                        className={`rounded-2xl border px-3 py-3 text-left text-sm transition ${
-                                          isActive
-                                            ? option.value === "critical"
-                                              ? "border-rose-200 bg-rose-50 text-rose-700"
-                                              : option.value === "important"
-                                                ? "border-amber-200 bg-amber-50 text-amber-700"
-                                                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                            : currentUserRole === "founderA" || currentUserRole === "founderB"
-                                              ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                                              : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                                        }`}
-                                      >
-                                        <div className="font-medium">{t(option.shortLabel)}</div>
-                                        <div className="mt-1 text-xs leading-5 opacity-80">
-                                          {t(option.label)}
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-
-                                <div className="grid gap-3 sm:grid-cols-2">
-                                  <DecisionRulesReactionCard
-                                    label={founderALabel}
-                                    signal={signalA}
-                                    avatarId={founderAAvatarId}
-                                  />
-                                  <DecisionRulesReactionCard
-                                    label={founderBLabel}
-                                    signal={signalB}
-                                    avatarId={founderBAvatarId}
-                                  />
-                                </div>
+                              <div className="flex flex-wrap gap-2 lg:justify-end">
+                                <DecisionRulesSignalBadge
+                                  label={founderALabel}
+                                  signal={signalA}
+                                />
+                                <DecisionRulesSignalBadge
+                                  label={founderBLabel}
+                                  signal={signalB}
+                                />
                               </div>
                             </div>
                           </article>
                         );
-                      })
-                    )}
-                  </div>
-                </StepSection>
+                      })}
+                    </div>
+                  </section>
+                ) : (
+                  <DecisionRulesPhasePreview
+                        title={t("2. Gewichtung")}
+                    summary={
+                      decisionRulesWeightingReady
+                        ? t(`${decisionRulesSharedCount} gemeinsame Punkte, ${decisionRulesCriticalCount} offene Unterschiede.`)
+                        : t("Die Gewichtung ist erst fertig, wenn beide alle vorhandenen Punkte eingeordnet haben.")
+                    }
+                    detail={
+                      decisionRulesWeightingReady
+                        ? t("Die wichtigen Unterschiede sind sichtbar.")
+                        : t(
+                            decisionRulesFounderAOpenWeightingCount > 0 || decisionRulesFounderBOpenWeightingCount > 0
+                              ? `${founderALabel}: ${decisionRulesFounderAOpenWeightingCount} offen · ${founderBLabel}: ${decisionRulesFounderBOpenWeightingCount} offen.`
+                              : "Danach geht ihr direkt in die gemeinsame Regel."
+                          )
+                    }
+                    className="mt-6"
+                  />
+                )}
 
-                <StepSection title="3. Gewichtung" className="mt-8 border-slate-200 bg-slate-50/80">
-                  <p className="text-sm leading-7 text-slate-700">
-                    {t("Hier seht ihr, wo schon gemeinsame Basis da ist, welche Punkte nur fuer eine Person besonders wichtig sind und wo ihr bewusst nachschaerfen muesst.")}
-                  </p>
-                  <div className="mt-5 grid gap-4 md:grid-cols-3">
-                    <DecisionRulesInsightCard
-                      title={t("Gemeinsame Basis")}
-                      count={decisionRulesSharedCount}
-                      text={t("Punkte, die beide tragen und die sich direkt in eine Regel uebersetzen lassen.")}
-                      tone="shared"
-                    />
-                    <DecisionRulesInsightCard
-                      title={t("Wichtige Einzelpunkte")}
-                      count={decisionRulesImportantSinglesCount}
-                      text={t("Punkte, die fuer eine Person besonders tragen und noch sauber einsortiert werden muessen.")}
-                      tone="focus"
-                    />
-                    <DecisionRulesInsightCard
-                      title={t("Offene Unterschiede")}
-                      count={decisionRulesCriticalCount}
-                      text={t("Punkte, bei denen ihr nicht dasselbe meint oder dieselbe Risikoschwelle habt.")}
-                      tone="critical"
-                    />
-                  </div>
-                </StepSection>
+                {currentDecisionRulesPhase === "rule" || currentDecisionRulesPhase === "approval" ? (
+                  <section className="mt-6 rounded-[32px] border border-[color:var(--brand-primary)]/18 bg-[linear-gradient(180deg,rgba(103,232,249,0.08),rgba(255,255,255,0.99))] p-6 sm:p-7">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="max-w-3xl">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                          {t("3. Gemeinsame Regel")}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-slate-700">
+                          {t(currentPremiumV2Config.ruleIntro)}
+                        </p>
+                      </div>
+                      <ReportActionButton
+                        type="button"
+                        onClick={applyDecisionRulesSuggestion}
+                        disabled={!decisionRulesSuggestion || decisionRulesWorkspace.entries.length === 0}
+                        className="shrink-0"
+                      >
+                        {t("Vorschlag einsetzen")}
+                      </ReportActionButton>
+                    </div>
 
-                <StepSection
-                  title="4. Gemeinsame Regel"
-                  className="mt-8 border-[color:var(--brand-primary)]/20 bg-[linear-gradient(180deg,rgba(103,232,249,0.08),rgba(255,255,255,0.99))]"
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="max-w-3xl">
-                      <p className="text-sm leading-7 text-slate-700">
-                        {t("Formuliert hier die Regel, auf die ihr spaeter wirklich zurueckgreifen koennt. Sie muss im Alltag tragen, nicht nur im Moment gut klingen.")}
+                    <div className="mt-6 rounded-[28px] border border-white/85 bg-white p-5 shadow-[0_14px_36px_rgba(15,23,42,0.05)] sm:p-6">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t(currentPremiumV2Config.agreementTitle)}
                       </p>
-                    </div>
-                    <ReportActionButton
-                      type="button"
-                      onClick={applyDecisionRulesSuggestion}
-                      disabled={!decisionRulesSuggestion || decisionRulesWorkspace.entries.length === 0}
-                      className="shrink-0"
-                    >
-                      {t("Regelvorschlag einsetzen")}
-                    </ReportActionButton>
-                  </div>
-
-                  <div className="mt-6 rounded-[28px] border border-[color:var(--brand-primary)]/18 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-6">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Entscheidungsregel")}
-                    </p>
-                    <textarea
-                      value={currentStepEntry.agreement}
-                      onChange={(event) => updateDecisionRulesAgreement(event.target.value)}
-                      placeholder={t("Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet ... Sobald Risiko, Budget oder Aussenwirkung groesser werden, ...")}
-                      rows={4}
-                      readOnly={!canEditField("agreement")}
-                      className={`mt-4 min-h-[152px] w-full rounded-2xl border px-4 py-4 text-sm leading-7 outline-none transition ${
-                        canEditField("agreement")
-                          ? "border-[color:var(--brand-primary)]/24 bg-white text-slate-700 focus:border-[color:var(--brand-primary)]/40 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                          : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
-                      }`}
-                    />
-                    <p className="mt-3 text-xs leading-6 text-slate-500">
-                      {t("Das ist die Fassung, der am Ende beide zustimmen.")}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                    <WorkbookField
-                      title={t("Wenn ihr nicht einig seid")}
-                      value={decisionRulesEscalationValue}
-                      onChange={(value) => updateStructuredOutput("escalationRule", value)}
-                      placeholder={t("Wenn ihr bis zu einer festen Frist nicht einig seid, dann entscheidet ... oder ihr zieht ... dazu.")}
-                      highlight
-                      readOnly={!canEditStructuredOutputs()}
-                      helperText={t("Hier haltet ihr fest, was bei Deadlocks oder Zeitdruck konkret gilt.")}
-                      rows={4}
-                      minHeightClassName="min-h-[144px]"
-                    />
-                    <WorkbookField
-                      title={t("Wann ihr die Regel wieder prueft")}
-                      value={decisionRulesReviewTriggerValue}
-                      onChange={(value) => updateStructuredOutput("reviewTrigger", value)}
-                      placeholder={t("Zum Beispiel: wenn Entscheidungen wieder haengen bleiben, zurueckgeholt werden oder Verantwortung unklar wird.")}
-                      readOnly={!canEditStructuredOutputs()}
-                      helperText={t("Optional, aber hilfreich, wenn ihr die Regel spaeter bewusst nachschaerfen wollt.")}
-                      rows={4}
-                      minHeightClassName="min-h-[144px]"
-                    />
-                  </div>
-                </StepSection>
-
-                {currentStepEntry.agreement.trim().length > 0 &&
-                decisionRulesEscalationValue.trim().length > 0 &&
-                hasDecisionRulesBothPerspectives ? (
-                  <StepSection
-                    title="5. Zustimmung"
-                    className="mt-8 border-slate-200/80 bg-white"
-                  >
-                    <p className="text-sm leading-7 text-slate-700">
-                      {t("Bestaetigt diese Fassung erst dann, wenn sie fuer euch beide im Alltag wirklich belastbar ist. Bei jeder relevanten Aenderung setzt sich die Zustimmung wieder zurueck.")}
-                    </p>
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      <ApprovalStatusCard
-                        label={founderALabel}
-                        approved={currentStepEntry.founderAApproved}
-                      />
-                      <ApprovalStatusCard
-                        label={founderBLabel}
-                        approved={currentStepEntry.founderBApproved}
+                      <textarea
+                        value={currentStepEntry.agreement}
+                        onChange={(event) => updateDecisionRulesAgreement(event.target.value)}
+                        placeholder={t(currentPremiumV2Config.agreementPlaceholder)}
+                        rows={4}
+                        readOnly={!canEditField("agreement")}
+                        className={`mt-4 min-h-[152px] w-full rounded-2xl border px-4 py-4 text-sm leading-7 outline-none transition ${
+                          canEditField("agreement")
+                            ? "border-[color:var(--brand-primary)]/24 bg-white text-slate-700 focus:border-[color:var(--brand-primary)]/40 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                            : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
+                        }`}
                       />
                     </div>
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
+
+                    <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)]">
+                      <WorkbookField
+                        title={t(currentPremiumV2Config.escalationTitle)}
+                        value={decisionRulesEscalationValue}
+                        onChange={(value) => updateStructuredOutput("escalationRule", value)}
+                        placeholder={t(currentPremiumV2Config.escalationPlaceholder)}
+                        highlight
+                        readOnly={!canEditStructuredOutputs()}
+                        helperText={t(currentPremiumV2Config.escalationHelper)}
+                        rows={4}
+                        minHeightClassName="min-h-[132px]"
+                      />
+                      <details className="rounded-[24px] border border-slate-200/80 bg-white/80 p-4">
+                        <summary className="cursor-pointer text-sm font-medium text-slate-900">
+                          {t(currentPremiumV2Config.reviewSummary)}
+                        </summary>
+                        <div className="mt-4">
+                          <WorkbookField
+                            title={t(currentPremiumV2Config.reviewTitle)}
+                            value={decisionRulesReviewTriggerValue}
+                            onChange={(value) => updateStructuredOutput("reviewTrigger", value)}
+                            placeholder={t(currentPremiumV2Config.reviewPlaceholder)}
+                            readOnly={!canEditStructuredOutputs()}
+                            helperText={t(currentPremiumV2Config.reviewHelper)}
+                            rows={4}
+                            minHeightClassName="min-h-[132px]"
+                          />
+                        </div>
+                      </details>
+                    </div>
+                  </section>
+                ) : (
+                  <DecisionRulesPhasePreview
+                    title={t("3. Gemeinsame Regel")}
+                    summary={t(currentPremiumV2Config.rulePreviewSummary)}
+                    detail={t(currentPremiumV2Config.rulePreviewDetail)}
+                    className="mt-6"
+                  />
+                )}
+
+                {currentDecisionRulesPhase === "approval" ? (
+                  <section className="mt-6 rounded-[24px] border border-slate-200/80 bg-slate-50/60 p-5 sm:p-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="max-w-3xl">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                          {t("4. Zustimmung")}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-slate-700">
+                          {t("Bestaetigt diese Fassung erst dann, wenn sie fuer euch beide im Alltag wirklich traegt. Relevante Aenderungen setzen die Zustimmung automatisch zurueck.")}
+                        </p>
+                      </div>
                       {viewerFounderField ? (
                         <button
                           type="button"
@@ -2513,22 +2969,26 @@ export function FounderAlignmentWorkbookClient({
                           {currentUserApproved ? t("Zustimmung zuruecknehmen") : t("Regel bestaetigen")}
                         </button>
                       ) : null}
-                      <p className="text-xs leading-6 text-slate-500">
-                        {currentStepIsApprovedByBoth
-                          ? t("Beide Founder haben der aktuellen Fassung zugestimmt.")
-                          : t("Sobald beide Founder bestaetigen, ist dieser Schritt finalisiert.")}
-                      </p>
                     </div>
-                  </StepSection>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <ApprovalStatusCard
+                        label={founderALabel}
+                        approved={currentStepEntry.founderAApproved}
+                      />
+                      <ApprovalStatusCard
+                        label={founderBLabel}
+                        approved={currentStepEntry.founderBApproved}
+                      />
+                    </div>
+                  </section>
                 ) : (
-                  <div className="mt-8 rounded-[24px] border border-slate-200/70 bg-slate-50/70 p-5">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Naechster Schritt")}
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-700">
-                      {t("Sobald beide Perspektiven sichtbar sind und eine klare Entscheidungs- plus Eskalationsregel steht, koennt ihr diese Fassung gemeinsam bestaetigen.")}
-                    </p>
-                  </div>
+                  <DecisionRulesPhasePreview
+                    title={t("4. Zustimmung")}
+                    summary={t("Die Zustimmung kommt erst ganz zum Schluss.")}
+                    detail={t("So bleibt der Fokus zuerst auf Klarheit und nicht auf Status.")}
+                    className="mt-6"
+                  />
                 )}
               </>
             ) : (
@@ -3418,14 +3878,55 @@ function ApprovalStatusCard({
   );
 }
 
-function DecisionRulesReactionCard({
+function DecisionRulesPhasePill({
+  label,
+  state,
+}: {
+  label: string;
+  state: "active" | "done" | "upcoming";
+}) {
+  const className =
+    state === "active"
+      ? "border-slate-900 bg-slate-900 text-white"
+      : state === "done"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+        : "border-slate-200 bg-white text-slate-500";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] ${className}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+function DecisionRulesPhasePreview({
+  title,
+  summary,
+  detail,
+  className = "",
+}: {
+  title: string;
+  summary: string;
+  detail: string;
+  className?: string;
+}) {
+  return (
+    <section className={`${className} rounded-[22px] border border-slate-200/75 bg-slate-50/60 px-5 py-4`}>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
+      <p className="mt-2 text-sm font-medium leading-6 text-slate-900">{summary}</p>
+      <p className="mt-1 text-xs leading-6 text-slate-500">{detail}</p>
+    </section>
+  );
+}
+
+function DecisionRulesSignalBadge({
   label,
   signal,
-  avatarId,
 }: {
   label: string;
   signal: FounderAlignmentWorkbookDiscussionSignal | null;
-  avatarId: string | null;
 }) {
   const toneClass =
     signal === "critical"
@@ -3438,27 +3939,18 @@ function DecisionRulesReactionCard({
 
   const text =
     signal === "critical"
-      ? "Sieht diesen Punkt kritisch"
+      ? "kritisch"
       : signal === "important"
-        ? "Markiert diesen Punkt als wichtig"
+        ? "wichtig"
         : signal === "agree"
-          ? "Traegt diesen Punkt mit"
-          : "Noch nicht gewichtet";
+          ? "traegt mit"
+          : "offen";
 
   return (
-    <div className={`rounded-2xl border px-4 py-3 ${toneClass}`}>
-      <div className="flex items-center gap-3">
-        <ProfileAvatar
-          displayName={label}
-          avatarId={avatarId}
-          className="h-9 w-9 shrink-0 rounded-2xl border border-white/80 object-cover"
-          fallbackClassName="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-white/80 bg-white/80 text-xs font-semibold text-slate-700"
-        />
-        <div>
-          <p className="text-sm font-medium">{label}</p>
-          <p className="mt-1 text-xs leading-5 opacity-90">{t(text)}</p>
-        </div>
-      </div>
+    <div className={`rounded-full border px-3 py-1.5 text-xs ${toneClass}`}>
+      <span className="font-medium">{label}</span>
+      <span className="mx-1 opacity-50">·</span>
+      <span>{t(text)}</span>
     </div>
   );
 }
@@ -3482,10 +3974,10 @@ function DecisionRulesInsightCard({
         : "border-emerald-200 bg-emerald-50/70";
 
   return (
-    <div className={`rounded-[22px] border p-5 ${toneClass}`}>
+    <div className={`rounded-[20px] border p-4 ${toneClass}`}>
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950">{count}</p>
-      <p className="mt-2 text-sm leading-7 text-slate-700">{text}</p>
+      <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{count}</p>
+      <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
     </div>
   );
 }
@@ -3885,23 +4377,28 @@ function deriveWorkbookStepStatus(
           markerClass ?? "stable_base"
         ).length === 0
       : true;
-  const workspace = stepId === PREMIUM_WORKBOOK_PILOT_STEP_ID ? resolveDecisionRulesWorkspace(entry) : null;
+  const workspace = isPremiumWorkbookV2StepId(stepId) ? resolveDecisionRulesWorkspace(entry) : null;
   const hasBothInputs = workspace
     ? hasDecisionRulesPerspective(workspace, "founderA") &&
       hasDecisionRulesPerspective(workspace, "founderB")
     : entry.founderA.trim().length > 0 && entry.founderB.trim().length > 0;
+  const weightingReady = workspace
+    ? hasBothInputs &&
+      hasDecisionRulesWeightingForAllEntries(workspace, "founderA") &&
+      hasDecisionRulesWeightingForAllEntries(workspace, "founderB")
+    : true;
   const hasAgreement = entry.agreement.trim().length > 0;
   const bothApproved = entry.founderAApproved && entry.founderBApproved;
 
-  if (hasAgreement && structuredReady && bothApproved) {
+  if (hasAgreement && weightingReady && structuredReady && bothApproved) {
     return "finalized";
   }
 
-  if (hasAgreement && hasBothInputs && structuredReady) {
+  if (hasAgreement && hasBothInputs && weightingReady && structuredReady) {
     return "awaiting_approval";
   }
 
-  if (hasAgreement) {
+  if (hasAgreement && hasBothInputs && weightingReady) {
     return "draft_ready";
   }
 
@@ -3917,7 +4414,7 @@ function workbookStepStatusLabel(status: FounderAlignmentWorkbookStepStatus) {
     case "finalized":
       return "Finalisiert";
     default:
-      return "Sammelt Eingaben";
+      return "In Arbeit";
   }
 }
 
