@@ -683,13 +683,13 @@ const WORKBOOK_MODE_OPTIONS: ReadonlyArray<{
     value: "solo",
     label: "Erst allein starten",
     description:
-      "Du bereitest deine eigenen Punkte vor. Die zweite Perspektive bleibt sichtbar, sobald sie da ist.",
+      "Du legst einen ersten Stand im gemeinsamen Raum an. Die zweite Perspektive kommt spaeter mit eigener Autorenschaft dazu.",
   },
   {
     value: "collaborative",
     label: "Direkt gemeinsam starten",
     description:
-      "Ihr sammelt und ordnet im selben Schritt. Eigene Punkte bleiben trotzdem klar zugeordnet.",
+      "Ihr sammelt direkt im selben Raum. Jeder Punkt bleibt klar einer Person zugeordnet.",
   },
 ] as const;
 
@@ -700,9 +700,9 @@ const WORKBOOK_MODE_SHORT_LABELS: Record<WorkbookModeOption, string> = {
 
 const WORKBOOK_MODE_V2_HINTS: Record<WorkbookModeOption, string> = {
   solo:
-    "Arbeitsweise: Du startest mit deinen Punkten. Rechte, Autorenschaft und Zustimmung bleiben gleich.",
+    "Gemeinsamer Raum: Du startest mit deinen Punkten. Die andere Person sieht sie hier und ergaenzt spaeter ihre eigene Sicht.",
   collaborative:
-    "Arbeitsweise: Ihr startet zusammen. Persoenliche Punkte bleiben zugeordnet, die Vereinbarung entsteht gemeinsam.",
+    "Gemeinsamer Raum: Ihr sammelt direkt zusammen. Jeder Punkt bleibt einer Person zugeordnet, die Vereinbarung entsteht gemeinsam.",
 };
 
 const FOUNDER_REACTION_OPTIONS: Array<{
@@ -753,6 +753,7 @@ function buildLegacyDecisionRulesWorkspace(
       content: entry.founderA.trim(),
       createdBy: "founderA",
       createdAt: LEGACY_WORKSPACE_TIMESTAMP,
+      sourceEntryId: null,
       updatedAt: null,
       updatedBy: null,
     });
@@ -764,6 +765,7 @@ function buildLegacyDecisionRulesWorkspace(
       content: entry.founderB.trim(),
       createdBy: "founderB",
       createdAt: LEGACY_WORKSPACE_TIMESTAMP,
+      sourceEntryId: null,
       updatedAt: null,
       updatedBy: null,
     });
@@ -1192,6 +1194,9 @@ export function FounderAlignmentWorkbookClient({
       FOUNDER_ALIGNMENT_WORKBOOK_STEPS.map((step) => [step.id, ""])
     ) as Record<FounderAlignmentWorkbookStepId, string>
   );
+  const [discussionDraftSourceEntryIdByStep, setDiscussionDraftSourceEntryIdByStep] = useState<
+    Partial<Record<FounderAlignmentWorkbookStepId, string | null>>
+  >({});
   const [workbookV2OpenPhaseByStep, setWorkbookV2OpenPhaseByStep] = useState<
     Partial<Record<FounderAlignmentWorkbookStepId, WorkbookV2Phase>>
   >({});
@@ -1366,6 +1371,12 @@ export function FounderAlignmentWorkbookClient({
     !currentStepEntry.workspaceV2 &&
     (currentStepEntry.founderA.trim().length > 0 || currentStepEntry.founderB.trim().length > 0);
   const currentDiscussionDraft = discussionDraftByStep[currentStep.id] ?? "";
+  const currentDiscussionDraftSourceEntryId =
+    discussionDraftSourceEntryIdByStep[currentStep.id] ?? null;
+  const currentDiscussionDraftSourceEntry =
+    currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
+      ? decisionRulesWorkspace.entries.find((entry) => entry.id === currentDiscussionDraftSourceEntryId) ?? null
+      : null;
   const hasDecisionRulesFounderAPerspective = decisionRulesWorkspace
     ? hasDecisionRulesPerspective(decisionRulesWorkspace, "founderA")
     : false;
@@ -1433,6 +1444,16 @@ export function FounderAlignmentWorkbookClient({
     requestedWorkbookV2Phase && canShowRequestedWorkbookV2Phase
       ? requestedWorkbookV2Phase
       : currentDecisionRulesPhase;
+  const workbookV2SharedSpaceHint =
+    currentUserRole === "founderA" || currentUserRole === "founderB"
+      ? isCollaborativeMode
+        ? "Ihr arbeitet im selben Raum. Eigene Punkte bleiben editierbar, fremde Punkte koennt ihr einordnen, ergaenzen oder als Basis fuer einen eigenen Punkt nutzen."
+        : "Du startest mit deinem ersten Stand im gemeinsamen Raum. Die andere Person sieht ihn hier, ordnet ihn spaeter ein und ergaenzt eigene Punkte mit eigener Autorenschaft."
+      : "Beide Founder arbeiten hier im selben Raum. Punkte bleiben pro Person sichtbar und werden gemeinsam zur Vereinbarung verdichtet.";
+  const workbookV2WeightingHint =
+    currentUserRole === "founderA" || currentUserRole === "founderB"
+      ? "Ordnet jeden Punkt klar ein. Fremde Punkte bleiben unveraendert; wenn ihr darauf aufbauen wollt, macht daraus einen eigenen Punkt."
+      : "Hier wird sichtbar, welche Punkte beide tragen, was nur eine Person stark sieht und wo noch Klaerung noetig ist.";
   const decisionRulesSharedCount = decisionRulesWorkspace
     ? decisionRulesWorkspace.entries.filter((entry) => {
         const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
@@ -1921,6 +1942,12 @@ export function FounderAlignmentWorkbookClient({
       ...current,
       [activeStepId]: value,
     }));
+    if (value.trim().length === 0) {
+      setDiscussionDraftSourceEntryIdByStep((current) => ({
+        ...current,
+        [activeStepId]: null,
+      }));
+    }
   }
 
   function openWorkbookV2Phase(phase: WorkbookV2Phase) {
@@ -1928,6 +1955,28 @@ export function FounderAlignmentWorkbookClient({
       ...current,
       [activeStepId]: phase,
     }));
+  }
+
+  function useDecisionRulesDiscussionEntryAsDraft(entry: FounderAlignmentWorkbookDiscussionEntry) {
+    if (
+      !isPremiumWorkbookV2StepId(activeStepId) ||
+      (currentUserRole !== "founderA" && currentUserRole !== "founderB") ||
+      entry.createdBy === currentUserRole
+    ) {
+      return;
+    }
+
+    const baseContent = entry.content.trim();
+    if (!baseContent) {
+      return;
+    }
+
+    setDiscussionDraft(baseContent);
+    setDiscussionDraftSourceEntryIdByStep((current) => ({
+      ...current,
+      [activeStepId]: entry.id,
+    }));
+    openWorkbookV2Phase("collect");
   }
 
   function addDecisionRulesDiscussionEntry() {
@@ -1953,12 +2002,21 @@ export function FounderAlignmentWorkbookClient({
           content,
           createdBy: currentUserRole,
           createdAt: new Date().toISOString(),
+          sourceEntryId:
+            currentDiscussionDraftSourceEntryId &&
+            decisionRulesWorkspace.entries.some((entry) => entry.id === currentDiscussionDraftSourceEntryId)
+              ? currentDiscussionDraftSourceEntryId
+              : null,
           updatedAt: null,
           updatedBy: null,
         },
       ],
     });
     setDiscussionDraft("");
+    setDiscussionDraftSourceEntryIdByStep((current) => ({
+      ...current,
+      [activeStepId]: null,
+    }));
   }
 
   function updateDecisionRulesDiscussionEntry(entryId: string, content: string) {
@@ -3265,19 +3323,43 @@ export function FounderAlignmentWorkbookClient({
                         <p className="mt-2 text-sm leading-6 text-slate-700">
                           {t(currentPremiumV2Config.collectIntro)}
                         </p>
+                        <p className="mt-2 text-xs leading-6 text-slate-500">
+                          {t(workbookV2SharedSpaceHint)}
+                        </p>
                       </div>
-                      <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {t(
-                          currentUserRole === "founderA"
-                            ? `Du schreibst als ${founderALabel}`
-                            : currentUserRole === "founderB"
-                              ? `Du schreibst als ${founderBLabel}`
-                              : "Nur lesbar"
-                        )}
-                      </span>
+                      <div className="flex flex-col items-start gap-1 sm:items-end">
+                        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                          {t("Gemeinsamer Raum")}
+                        </span>
+                        <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                          {t(
+                            currentUserRole === "founderA"
+                              ? `Du schreibst als ${founderALabel}`
+                              : currentUserRole === "founderB"
+                                ? `Du schreibst als ${founderBLabel}`
+                                : "Nur lesbar"
+                          )}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="mt-5">
+                      {currentDiscussionDraftSourceEntry ? (
+                        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 text-xs text-slate-600">
+                          <span className="font-medium text-slate-700">
+                            {t("Basis fuer deinen Punkt")}
+                          </span>
+                          <span>
+                            {t(
+                              `Beitrag von ${
+                                currentDiscussionDraftSourceEntry.createdBy === "founderA"
+                                  ? founderALabel
+                                  : founderBLabel
+                              }`
+                            )}
+                          </span>
+                        </div>
+                      ) : null}
                       <textarea
                         value={currentDiscussionDraft}
                         onChange={(event) => setDiscussionDraft(event.target.value)}
@@ -3299,7 +3381,7 @@ export function FounderAlignmentWorkbookClient({
                           onClick={addDecisionRulesDiscussionEntry}
                           disabled={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
                         >
-                          {t("Punkt hinzufuegen")}
+                          {t("Eigenen Punkt hinzufuegen")}
                         </ReportActionButton>
                       </div>
                     </div>
@@ -3307,7 +3389,7 @@ export function FounderAlignmentWorkbookClient({
                     <div className="mt-5 space-y-3">
                       {decisionRulesWorkspace.entries.length === 0 ? (
                         <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-5 text-sm leading-7 text-slate-600">
-                          {t("Noch keine Punkte festgehalten. Der Einstieg wird leicht, sobald der erste konkrete Satz da ist.")}
+                          {t("Noch keine Punkte im gemeinsamen Raum. Der Einstieg wird leicht, sobald der erste konkrete Satz da ist.")}
                         </div>
                       ) : (
                         decisionRulesWorkspace.entries.map((entry) => {
@@ -3315,6 +3397,14 @@ export function FounderAlignmentWorkbookClient({
                             (currentUserRole === "founderA" || currentUserRole === "founderB") &&
                             entry.createdBy === currentUserRole;
                           const authorLabel = entry.createdBy === "founderA" ? founderALabel : founderBLabel;
+                          const sourceEntry = entry.sourceEntryId
+                            ? decisionRulesWorkspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
+                            : null;
+                          const sourceAuthorLabel = sourceEntry
+                            ? sourceEntry.createdBy === "founderA"
+                              ? founderALabel
+                              : founderBLabel
+                            : null;
 
                           return (
                             <article
@@ -3335,6 +3425,13 @@ export function FounderAlignmentWorkbookClient({
                                   {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
                                 </span>
                               </div>
+                              {sourceEntry || entry.sourceEntryId ? (
+                                <p className="mt-2 text-xs leading-5 text-slate-500">
+                                  {sourceAuthorLabel
+                                    ? t(`Auf Basis von ${sourceAuthorLabel}`)
+                                    : t("Auf Basis eines frueheren Punkts")}
+                                </p>
+                              ) : null}
                               {isOwnEntry ? (
                                 <>
                                   <textarea
@@ -3354,7 +3451,23 @@ export function FounderAlignmentWorkbookClient({
                                   </button>
                                 </>
                               ) : (
-                                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
+                                <>
+                                  <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
+                                  {viewerFounderField ? (
+                                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                                      <button
+                                        type="button"
+                                        onClick={() => useDecisionRulesDiscussionEntryAsDraft(entry)}
+                                        className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+                                      >
+                                        {t("Als eigenen Punkt aufgreifen")}
+                                      </button>
+                                      <span className="text-xs leading-5 text-slate-500">
+                                        {t("Der Originalpunkt bleibt unveraendert.")}
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </>
                               )}
                             </article>
                           );
@@ -3396,6 +3509,9 @@ export function FounderAlignmentWorkbookClient({
                       <p className="mt-2 text-sm leading-6 text-slate-700">
                         {t(currentPremiumV2Config.weightingIntro)}
                       </p>
+                      <p className="mt-2 text-xs leading-6 text-slate-500">
+                        {t(workbookV2WeightingHint)}
+                      </p>
                     </div>
 
                     <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -3427,6 +3543,14 @@ export function FounderAlignmentWorkbookClient({
                         const isOwnEntry =
                           (currentUserRole === "founderA" || currentUserRole === "founderB") &&
                           entry.createdBy === currentUserRole;
+                        const sourceEntry = entry.sourceEntryId
+                          ? decisionRulesWorkspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
+                          : null;
+                        const sourceAuthorLabel = sourceEntry
+                          ? sourceEntry.createdBy === "founderA"
+                            ? founderALabel
+                            : founderBLabel
+                          : null;
 
                         return (
                           <article
@@ -3437,7 +3561,17 @@ export function FounderAlignmentWorkbookClient({
                               <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
                                 {authorLabel}
                               </span>
+                              <span className="text-xs text-slate-500">
+                                {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
+                              </span>
                             </div>
+                            {sourceEntry || entry.sourceEntryId ? (
+                              <p className="mt-2 text-xs leading-5 text-slate-500">
+                                {sourceAuthorLabel
+                                  ? t(`Auf Basis von ${sourceAuthorLabel}`)
+                                  : t("Auf Basis eines frueheren Punkts")}
+                              </p>
+                            ) : null}
                             <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
                             {isOwnEntry ? (
                               <details className="mt-3 rounded-2xl border border-slate-200/70 bg-slate-50/70 px-3 py-2">
@@ -3465,6 +3599,19 @@ export function FounderAlignmentWorkbookClient({
                                   </button>
                                 </div>
                               </details>
+                            ) : viewerFounderField ? (
+                              <div className="mt-3 flex flex-wrap items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => useDecisionRulesDiscussionEntryAsDraft(entry)}
+                                  className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+                                >
+                                  {t("Als eigenen Punkt aufgreifen")}
+                                </button>
+                                <span className="text-xs leading-5 text-slate-500">
+                                  {t("Erstellt einen eigenen Punkt auf Basis dieses Beitrags.")}
+                                </span>
+                              </div>
                             ) : null}
 
                             <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -4941,6 +5088,108 @@ function advisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | n
   }
 }
 
+function discussionEntryVersion(entry: FounderAlignmentWorkbookDiscussionEntry) {
+  return entry.updatedAt ?? entry.createdAt;
+}
+
+function buildWorkspaceV2Patches(
+  stepId: FounderAlignmentWorkbookStepId,
+  previousWorkspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined,
+  nextWorkspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined
+): FounderAlignmentWorkbookPatch[] {
+  const previous = previousWorkspace ?? { entries: [], reactions: [] };
+  const next = nextWorkspace ?? { entries: [], reactions: [] };
+  const patches: FounderAlignmentWorkbookPatch[] = [];
+  const previousEntries = new Map(previous.entries.map((entry) => [entry.id, entry]));
+  const nextEntries = new Map(next.entries.map((entry) => [entry.id, entry]));
+  const previousReactions = new Map(
+    previous.reactions.map((reaction) => [`${reaction.entryId}:${reaction.userId}`, reaction])
+  );
+  const nextReactions = new Map(
+    next.reactions.map((reaction) => [`${reaction.entryId}:${reaction.userId}`, reaction])
+  );
+
+  for (const entry of next.entries) {
+    const previousEntry = previousEntries.get(entry.id);
+    if (!previousEntry) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "workspaceEntryCreate",
+        value: entry,
+      });
+      continue;
+    }
+
+    if (
+      previousEntry.content !== entry.content ||
+      previousEntry.updatedAt !== entry.updatedAt ||
+      previousEntry.updatedBy !== entry.updatedBy
+    ) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "workspaceEntryUpdate",
+        value: {
+          id: entry.id,
+          content: entry.content,
+          expectedUpdatedAt: discussionEntryVersion(previousEntry),
+          updatedAt: entry.updatedAt,
+          updatedBy: entry.updatedBy,
+        },
+      });
+    }
+  }
+
+  for (const entry of previous.entries) {
+    if (!nextEntries.has(entry.id)) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "workspaceEntryDelete",
+        value: {
+          id: entry.id,
+          expectedUpdatedAt: discussionEntryVersion(entry),
+        },
+      });
+    }
+  }
+
+  for (const reaction of next.reactions) {
+    const key = `${reaction.entryId}:${reaction.userId}`;
+    const previousReaction = previousReactions.get(key);
+    if (
+      !previousReaction ||
+      previousReaction.signal !== reaction.signal ||
+      previousReaction.updatedAt !== reaction.updatedAt
+    ) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "workspaceReactionUpsert",
+        value: reaction,
+      });
+    }
+  }
+
+  for (const reaction of previous.reactions) {
+    const key = `${reaction.entryId}:${reaction.userId}`;
+    if (!nextReactions.has(key)) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "workspaceReactionDelete",
+        value: {
+          entryId: reaction.entryId,
+          userId: reaction.userId,
+        },
+      });
+    }
+  }
+
+  return patches;
+}
+
 function buildWorkbookPatches(
   previousPayload: FounderAlignmentWorkbookPayload,
   nextPayload: FounderAlignmentWorkbookPayload
@@ -5018,14 +5267,7 @@ function buildWorkbookPatches(
         value: nextStep.structuredOutputs ?? null,
       });
     }
-    if (JSON.stringify(previousStep.workspaceV2 ?? null) !== JSON.stringify(nextStep.workspaceV2 ?? null)) {
-      patches.push({
-        scope: "step",
-        stepId,
-        field: "workspaceV2",
-        value: nextStep.workspaceV2 ?? null,
-      });
-    }
+    patches.push(...buildWorkspaceV2Patches(stepId, previousStep.workspaceV2, nextStep.workspaceV2));
     if (previousStep.founderAApproved !== nextStep.founderAApproved) {
       patches.push({
         scope: "step",

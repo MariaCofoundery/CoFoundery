@@ -65,6 +65,45 @@ test("legacy pilot-shaped structured outputs are mapped into the generic V2 shap
   );
 });
 
+test("workspace entries keep source provenance when shared-space payloads are sanitized", () => {
+  const payload = sanitizeFounderAlignmentWorkbookPayload({
+    currentStepId: "decision_rules",
+    steps: {
+      decision_rules: {
+        mode: "collaborative",
+        founderA: "",
+        founderB: "",
+        agreement: "",
+        workspaceV2: {
+          entries: [
+            {
+              id: "entry-a",
+              content: "Wir ziehen die andere Person frueh rein.",
+              createdBy: "founderA",
+              createdAt: "2026-04-09T08:00:00.000Z",
+              sourceEntryId: null,
+              updatedAt: null,
+              updatedBy: null,
+            },
+            {
+              id: "entry-b",
+              content: "Ich will denselben Punkt fuer meinen Bereich schaerfen.",
+              createdBy: "founderB",
+              createdAt: "2026-04-09T08:05:00.000Z",
+              sourceEntryId: "entry-a",
+              updatedAt: null,
+              updatedBy: null,
+            },
+          ],
+          reactions: [],
+        },
+      },
+    },
+  });
+
+  assert.equal(payload.steps.decision_rules.workspaceV2?.entries[1]?.sourceEntryId, "entry-a");
+});
+
 test("all non-advisor workbook steps expose the five structured output types", () => {
   for (const [stepId, content] of Object.entries(WORKBOOK_STEP_CONTENT)) {
     if (stepId === "advisor_closing") {

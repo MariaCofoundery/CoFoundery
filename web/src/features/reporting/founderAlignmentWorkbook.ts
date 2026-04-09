@@ -34,7 +34,6 @@ export type FounderAlignmentWorkbookStepField =
   | "founderB"
   | "agreement"
   | "structuredOutputs"
-  | "workspaceV2"
   | "founderAApproved"
   | "founderBApproved"
   | "advisorNotes";
@@ -74,6 +73,7 @@ export type FounderAlignmentWorkbookDiscussionEntry = {
   content: string;
   createdBy: FounderAlignmentWorkbookDiscussionAuthor;
   createdAt: string;
+  sourceEntryId: string | null;
   updatedAt: string | null;
   updatedBy: FounderAlignmentWorkbookDiscussionAuthor | null;
 };
@@ -111,8 +111,49 @@ export type FounderAlignmentWorkbookPatch =
         | string
         | boolean
         | WorkbookStructuredOutputsByStep
-        | FounderAlignmentWorkbookStepWorkspaceV2
         | null;
+    }
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: "workspaceEntryCreate";
+      value: FounderAlignmentWorkbookDiscussionEntry;
+    }
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: "workspaceEntryUpdate";
+      value: {
+        id: string;
+        content: string;
+        expectedUpdatedAt: string | null;
+        updatedAt: string | null;
+        updatedBy: FounderAlignmentWorkbookDiscussionAuthor | null;
+      };
+    }
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: "workspaceEntryDelete";
+      value: {
+        id: string;
+        expectedUpdatedAt: string | null;
+      };
+    }
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: "workspaceReactionUpsert";
+      value: FounderAlignmentWorkbookDiscussionReaction;
+    }
+  | {
+      scope: "step";
+      stepId: FounderAlignmentWorkbookStepId;
+      field: "workspaceReactionDelete";
+      value: {
+        entryId: string;
+        userId: FounderAlignmentWorkbookDiscussionAuthor;
+      };
     }
   | {
       scope: "root";
@@ -471,6 +512,7 @@ export function sanitizeWorkbookStepWorkspaceV2(
       content?: unknown;
       createdBy?: unknown;
       createdAt?: unknown;
+      sourceEntryId?: unknown;
       updatedAt?: unknown;
       updatedBy?: unknown;
     }>;
@@ -504,6 +546,7 @@ export function sanitizeWorkbookStepWorkspaceV2(
             content,
             createdBy: entry.createdBy,
             createdAt: entry.createdAt,
+            sourceEntryId: typeof entry.sourceEntryId === "string" ? entry.sourceEntryId : null,
             updatedAt: typeof entry.updatedAt === "string" ? entry.updatedAt : null,
             updatedBy: isDiscussionAuthor(entry.updatedBy) ? entry.updatedBy : null,
           } satisfies FounderAlignmentWorkbookDiscussionEntry;
