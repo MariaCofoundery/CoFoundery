@@ -61,6 +61,12 @@ type ProfileRow = {
   avatar_url: string | null;
 };
 
+type ProfileIdentity = {
+  displayName: string | null;
+  avatarId: string | null;
+  avatarUrl: string | null;
+};
+
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
 
@@ -257,15 +263,50 @@ async function loadWorkbookAdvisorRowWithClient(
   return data as WorkbookAdvisorRow;
 }
 
+async function loadProfileIdentityWithClient(
+  userId: string | null | undefined,
+  supabase: SupabaseLikeClient
+): Promise<ProfileIdentity | null> {
+  if (!userId) return null;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("user_id, display_name, avatar_id, avatar_url")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const profile = data as ProfileRow | null;
+  if (!profile) return null;
+
+  return {
+    displayName: profile.display_name?.trim() || null,
+    avatarId: profile.avatar_id?.trim() || null,
+    avatarUrl: profile.avatar_url?.trim() || null,
+  };
+}
+
 function advisorInviteStateFromRow(
-  advisorRow: WorkbookAdvisorRow | null
+  advisorRow: WorkbookAdvisorRow | null,
+  advisorProfile: ProfileIdentity | null = null
 ): FounderAlignmentWorkbookAdvisorInviteState {
   return {
     founderAApproved: advisorRow?.founder_a_approved ?? false,
     founderBApproved: advisorRow?.founder_b_approved ?? false,
     advisorLinked: Boolean(advisorRow?.advisor_user_id),
-    advisorName: advisorRow?.advisor_name ?? null,
+    advisorName: advisorProfile?.displayName ?? advisorRow?.advisor_name ?? null,
   };
+}
+
+function hasActiveAdvisorAccess(
+  advisorRow: WorkbookAdvisorRow | null,
+  userId: string | null | undefined
+) {
+  return Boolean(
+    userId &&
+      advisorRow?.advisor_user_id === userId &&
+      advisorRow.founder_a_approved === true &&
+      advisorRow.founder_b_approved === true
+  );
 }
 
 export async function getFounderAlignmentWorkbookPageData(
@@ -314,19 +355,20 @@ export async function getFounderAlignmentWorkbookPageData(
   }
 
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
-  const isLinkedAdvisor = Boolean(user?.id && advisorRow?.advisor_user_id === user.id);
+  const isLinkedAdvisor = hasActiveAdvisorAccess(advisorRow, user?.id);
   const privileged = isLinkedAdvisor ? createPrivilegedClient() : null;
   const dataClient = privileged ?? supabase;
 
   const founderContextClient = createPrivilegedClient() ?? dataClient;
 
-  const [debugResult, founderContext, workbookRow, reportSnapshot] = await Promise.all([
+  const [debugResult, founderContext, workbookRow, reportSnapshot, advisorProfile] = await Promise.all([
     isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
     loadFounderContextWithClient(normalizedInvitationId, founderContextClient),
     loadWorkbookRowWithClient(normalizedInvitationId, dataClient),
     isLinkedAdvisor
       ? getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId)
       : getReportRunSnapshotForSession(normalizedInvitationId),
+    loadProfileIdentityWithClient(advisorRow?.advisor_user_id, founderContextClient),
   ]);
 
   const snapshotHasFounderAlignmentData = Boolean(
@@ -373,8 +415,9 @@ export async function getFounderAlignmentWorkbookPageData(
   if (advisorRow?.advisor_user_id) {
     workbook.advisorId = advisorRow.advisor_user_id;
   }
-  if (advisorRow?.advisor_name) {
-    workbook.advisorName = advisorRow.advisor_name;
+  const advisorDisplayName = advisorProfile?.displayName ?? advisorRow?.advisor_name ?? null;
+  if (advisorDisplayName) {
+    workbook.advisorName = advisorDisplayName;
   }
   const storedTeamContext = workbookRow?.team_context ?? null;
   const hasTeamContextMismatch =
@@ -390,8 +433,8 @@ export async function getFounderAlignmentWorkbookPageData(
     user?.id && founderContext.founderAUserId === user.id
       ? "founderA"
       : user?.id && founderContext.founderBUserId === user.id
-        ? "founderB"
-        : user?.id && advisorRow?.advisor_user_id === user.id
+      ? "founderB"
+        : hasActiveAdvisorAccess(advisorRow, user?.id)
           ? "advisor"
           : "unknown";
 
@@ -429,7 +472,7 @@ export async function getFounderAlignmentWorkbookPageData(
     storedTeamContext,
     hasTeamContextMismatch,
     showValuesStep,
-    advisorInvite: advisorInviteStateFromRow(advisorRow),
+    advisorInvite: advisorInviteStateFromRow(advisorRow, advisorProfile),
   };
 }
 

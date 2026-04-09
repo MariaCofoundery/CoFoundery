@@ -4,6 +4,7 @@ import {
   claimFounderAlignmentAdvisorAccess,
   getFounderAlignmentAdvisorInviteByToken,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
 
@@ -86,11 +87,14 @@ export default async function AdvisorInvitePage({
       redirect(loginHref);
     }
 
+    const advisorProfile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
+    const profileName = advisorProfile?.display_name?.trim() ?? "";
+
     const result = await claimFounderAlignmentAdvisorAccess({
       invitationId: inviteData.invitationId,
       advisorToken: token,
       userId: user.id,
-      fallbackName: user.email?.split("@")[0] ?? null,
+      fallbackName: profileName || (user.email?.split("@")[0] ?? null),
       teamContext: inviteData.teamContext,
     });
 

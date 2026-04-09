@@ -15,6 +15,10 @@ export type DashboardRoleViews = {
 type AdvisorAccessRow = {
   invitation_id: string;
   advisor_name: string | null;
+  founder_a_approved: boolean;
+  founder_b_approved: boolean;
+  approved_at: string | null;
+  claimed_at: string | null;
 };
 
 type InvitationRow = {
@@ -30,6 +34,8 @@ type InvitationRow = {
 type ProfileRow = {
   user_id: string;
   display_name: string | null;
+  avatar_id: string | null;
+  avatar_url: string | null;
 };
 
 type WorkbookRow = {
@@ -65,15 +71,30 @@ export type AdvisorDashboardTeam = {
   invitationId: string;
   founderAName: string;
   founderBName: string;
+  founderAAvatarId: string | null;
+  founderBAvatarId: string | null;
+  founderAAvatarUrl: string | null;
+  founderBAvatarUrl: string | null;
   teamContext: "pre_founder" | "existing_team";
+  accessStatus: "ready" | "waiting_for_approval" | "paused";
+  accessStatusLabel: string;
+  accessStatusDescription: string;
+  approvalSummary: string;
   statusLabel: string;
   lastActivityLabel: string;
   followUpLabel: string;
+  canOpenWorkbook: boolean;
   workbookHref: string;
   reportHref: string;
   reportReady: boolean;
   snapshotHref: string;
   advisorActionHref: string;
+};
+
+export type AdvisorDashboardProfile = {
+  displayName: string | null;
+  avatarId: string | null;
+  avatarUrl: string | null;
 };
 
 function normalizeTeamContext(value: string | null): "pre_founder" | "existing_team" {
@@ -118,6 +139,44 @@ function deriveAdvisorStatusLabel(params: {
   return "Noch kein Workbook";
 }
 
+function deriveAdvisorAccessState(row: AdvisorAccessRow): Pick<
+  AdvisorDashboardTeam,
+  "accessStatus" | "accessStatusLabel" | "accessStatusDescription" | "approvalSummary" | "canOpenWorkbook"
+> {
+  const founderAApproved = row.founder_a_approved === true;
+  const founderBApproved = row.founder_b_approved === true;
+
+  if (founderAApproved && founderBApproved) {
+    return {
+      accessStatus: "ready",
+      accessStatusLabel: "Freigegeben",
+      accessStatusDescription: "Beide Founder haben die Begleitung freigegeben.",
+      approvalSummary: "2 von 2 Freigaben",
+      canOpenWorkbook: true,
+    };
+  }
+
+  const approvalSummary = `${Number(founderAApproved) + Number(founderBApproved)} von 2 Freigaben`;
+
+  if (row.approved_at) {
+    return {
+      accessStatus: "paused",
+      accessStatusLabel: "Zugriff pausiert",
+      accessStatusDescription: "Die Freigabe ist nicht mehr vollstaendig aktiv.",
+      approvalSummary,
+      canOpenWorkbook: false,
+    };
+  }
+
+  return {
+    accessStatus: "waiting_for_approval",
+    accessStatusLabel: "Wartet auf Freigabe",
+    accessStatusDescription: "Du kannst arbeiten, sobald beide Founder zugestimmt haben.",
+    approvalSummary,
+    canOpenWorkbook: false,
+  };
+}
+
 function advisorFollowUpLabel(value: unknown) {
   if (value === "four_weeks") return "Follow-up in 4 Wochen";
   if (value === "three_months") return "Follow-up in 3 Monaten";
@@ -147,11 +206,22 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
   };
 }
 
+export async function getAdvisorDashboardProfile(userId: string): Promise<AdvisorDashboardProfile> {
+  const supabase = await createClient();
+  const profile = await getProfileBasicsRow(supabase, userId).catch(() => null);
+
+  return {
+    displayName: profile?.display_name?.trim() || null,
+    avatarId: profile?.avatar_id?.trim() || null,
+    avatarUrl: profile?.avatar_url?.trim() || null,
+  };
+}
+
 export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorDashboardTeam[]> {
   const supabase = await createClient();
   const { data: advisorAccessRows, error: advisorAccessError } = await supabase
     .from("founder_alignment_workbook_advisors")
-    .select("invitation_id, advisor_name")
+    .select("invitation_id, advisor_name, founder_a_approved, founder_b_approved, approved_at, claimed_at")
     .eq("advisor_user_id", userId);
 
   if (advisorAccessError || !advisorAccessRows || advisorAccessRows.length === 0) {
@@ -159,6 +229,9 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
   }
 
   const advisorAccess = advisorAccessRows as AdvisorAccessRow[];
+  const advisorAccessByInvitationId = new Map(
+    advisorAccess.map((row) => [row.invitation_id, row])
+  );
   const invitationIds = advisorAccess.map((row) => row.invitation_id);
   const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
@@ -197,11 +270,18 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
 
   const { data: profileRows } = await dataClient
     .from("profiles")
-    .select("user_id, display_name")
+    .select("user_id, display_name, avatar_id, avatar_url")
     .in("user_id", relevantUserIds);
 
   const profileByUserId = new Map(
-    ((profileRows ?? []) as ProfileRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+    ((profileRows ?? []) as ProfileRow[]).map((row) => [
+      row.user_id,
+      {
+        displayName: row.display_name?.trim() ?? "",
+        avatarId: row.avatar_id?.trim() ?? "",
+        avatarUrl: row.avatar_url?.trim() ?? "",
+      },
+    ])
   );
   const workbookByInvitationId = new Map(workbooks.map((row) => [row.invitation_id, row]));
   const reportRunByInvitationId = new Map<string, ReportRunRow>();
@@ -216,6 +296,9 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
       const teamContext = normalizeTeamContext(invitation.team_context);
       const workbook = workbookByInvitationId.get(invitation.id) ?? null;
       const reportRun = reportRunByInvitationId.get(invitation.id) ?? null;
+      const accessRow = advisorAccessByInvitationId.get(invitation.id);
+      if (!accessRow) return null;
+      const accessState = deriveAdvisorAccessState(accessRow);
       const workbookPayload = workbook
         ? sanitizeFounderAlignmentWorkbookPayload(workbook.payload)
         : null;
@@ -228,11 +311,15 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         workbookPayload?.founderReaction.status || workbookPayload?.founderReaction.comment.trim()
       );
       const founderAName =
-        profileByUserId.get(invitation.inviter_user_id)?.trim() || "Founder A";
+        profileByUserId.get(invitation.inviter_user_id)?.displayName || "Founder A";
       const founderBName =
         (invitation.invitee_user_id
-          ? profileByUserId.get(invitation.invitee_user_id)?.trim()
+          ? profileByUserId.get(invitation.invitee_user_id)?.displayName
           : invitation.invitee_email?.split("@")[0]?.trim()) || "Founder B";
+      const founderAProfile = profileByUserId.get(invitation.inviter_user_id);
+      const founderBProfile = invitation.invitee_user_id
+        ? profileByUserId.get(invitation.invitee_user_id)
+        : null;
       const lastActivitySource = [workbook?.updated_at ?? null, reportRun?.created_at ?? null, invitation.created_at]
         .filter((value): value is string => Boolean(value))
         .sort()
@@ -242,7 +329,12 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         invitationId: invitation.id,
         founderAName,
         founderBName,
+        founderAAvatarId: founderAProfile?.avatarId || null,
+        founderBAvatarId: founderBProfile?.avatarId || null,
+        founderAAvatarUrl: founderAProfile?.avatarUrl || null,
+        founderBAvatarUrl: founderBProfile?.avatarUrl || null,
         teamContext,
+        ...accessState,
         statusLabel: deriveAdvisorStatusLabel({
           hasReport: Boolean(reportRun),
           hasWorkbook: Boolean(workbook),
@@ -260,6 +352,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         _lastActivityAt: lastActivitySource ?? "",
       };
     })
+    .filter((team): team is AdvisorDashboardTeam & { _lastActivityAt: string } => Boolean(team))
     .sort((left, right) => right._lastActivityAt.localeCompare(left._lastActivityAt, "de"))
     .map(({ _lastActivityAt, ...team }) => {
       void _lastActivityAt;

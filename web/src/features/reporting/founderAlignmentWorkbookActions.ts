@@ -244,7 +244,13 @@ async function resolveWorkbookViewerRole(
   if (!invitation) return "unknown";
   if (invitation.inviter_user_id === userId) return "founderA";
   if (invitation.invitee_user_id === userId) return "founderB";
-  if (advisorRow?.advisor_user_id === userId) return "advisor";
+  if (
+    advisorRow?.advisor_user_id === userId &&
+    advisorRow.founder_a_approved === true &&
+    advisorRow.founder_b_approved === true
+  ) {
+    return "advisor";
+  }
   return "unknown";
 }
 
@@ -1024,6 +1030,13 @@ export async function claimFounderAlignmentAdvisorAccess({
 
   const typedAdvisorRow = advisorRow as AdvisorAccessRow;
   const nextAdvisorName = typedAdvisorRow.advisor_name ?? fallbackName;
+
+  if (
+    typedAdvisorRow.founder_a_approved !== true ||
+    typedAdvisorRow.founder_b_approved !== true
+  ) {
+    return { ok: false, reason: "invalid_token" };
+  }
 
   if (typedAdvisorRow.advisor_user_id && typedAdvisorRow.advisor_user_id !== userId) {
     return { ok: false, reason: "already_claimed" };
