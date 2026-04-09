@@ -436,10 +436,10 @@ export const WORKBOOK_STEP_CONTENT: Record<
   },
   advisor_closing: {
     context: [
-      "Am Ende einer Alignment-Session kann eine neutrale dritte Perspektive oft noch einmal besonders klar sichtbar machen, wo Muster, offene Spannungen oder gute Ansatzpunkte liegen.",
-      "Dieser Abschlussblock ersetzt keine Founder-Vereinbarungen, sondern ordnet das Gespraech als zusaetzliche Beobachtung, Rueckfrage und Empfehlung ein.",
+      "Am Ende der Session buendelt der Advisor, was aus externer Sicht nicht verloren gehen sollte.",
+      "Dieser Abschluss ersetzt keine Founder-Vereinbarung. Er markiert Beobachtungen, Rueckfragen und den sinnvollsten naechsten Schritt.",
     ],
     everyday:
-      "Im Alltag ist das vor allem dann hilfreich, wenn ein Advisor rote Faeden, ungeklaerte Punkte oder konkrete naechste Schritte benoennen kann, bevor sie zwischen Meeting und Umsetzung wieder verschwimmen.",
+      "Im Alltag hilft das, wenn wichtige Beobachtungen und offene Fragen nicht zwischen Session und Umsetzung verschwinden.",
   },
 };

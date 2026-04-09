@@ -205,11 +205,11 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   {
     id: "roles_responsibility",
     title: "Rollen & Verantwortung",
-    subtitle: "Wie legt ihr fest, wer fuehrt, wer mitentscheidet und was sichtbar bleiben muss?",
+    subtitle: "Wie legt ihr fest, wer fuehrt, was sichtbar bleibt und ab wann die andere Person mit rein muss?",
     prompts: [
-      "Wer fuehrt welchen Bereich verbindlich?",
-      "Was darf diese Person allein entscheiden, ohne vorher zu fragen?",
-      "Was muss sie aktiv teilen, damit nichts liegen bleibt?",
+      "Welche Themen fuehrt eine Person klar eigenstaendig?",
+      "Wo braucht die andere Person frueh Mitsicht?",
+      "Ab wann wird aus Eigenverantwortung ein gemeinsames Thema?",
     ],
     reportDimensions: ["Arbeitsstruktur & Zusammenarbeit", "Commitment"],
   },
@@ -227,11 +227,11 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   {
     id: "commitment_load",
     title: "Commitment & Belastung",
-    subtitle: "Wie klaert ihr Einsatz, Verfuegbarkeit und Ueberlastung, bevor stiller Druck entsteht?",
+    subtitle: "Wie macht ihr Einsatz, Verfuegbarkeit und Belastung frueh sichtbar, bevor stiller Druck entsteht?",
     prompts: [
-      "Was ist im Normalmodus bei Verfuegbarkeit und Reaktionszeit realistisch?",
-      "Woran merkt ihr frueh, dass eine Person an ihre Grenze kommt?",
-      "Was wird dann als Erstes neu priorisiert?",
+      "Was ist im Normalmodus realistisch leistbar?",
+      "Was muss frueh sichtbar werden, wenn Kapazitaet kippt?",
+      "Was sortiert ihr zuerst neu, wenn Zusagen nicht mehr tragbar sind?",
     ],
     reportDimensions: ["Commitment"],
   },
@@ -249,11 +249,12 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   {
     id: "ownership_risk",
     title: "Ownership & Risiko",
-    subtitle: "Wie regelt ihr, wer welches Risiko fuehrt, wann es sichtbar wird und ab welcher Schwelle ihr eingreift?",
+    subtitle:
+      "Wie legt ihr fest, wer Risiken fuehrt, wann sie sichtbar werden und ab welcher Schwelle gemeinsam entschieden wird?",
     prompts: [
-      "Wer fuehrt welchen Risikotyp verbindlich?",
-      "Ab welchem Signal wird ein Risiko sofort sichtbar gemacht?",
-      "Was passiert, wenn ein Risiko eine feste Schwelle erreicht?",
+      "Welche Risiken fuehrt eine Person selbst, und wo braucht es frueh Sichtbarkeit?",
+      "Welche Schwelle beendet stille Beobachtung?",
+      "Wann hat Absicherung Vorrang vor Tempo?",
     ],
     reportDimensions: ["Risikoorientierung", "Unternehmenslogik"],
   },
@@ -261,18 +262,19 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
     id: "values_guardrails",
     title: "Werte & unternehmerische Leitplanken",
     subtitle:
-      "Wie entscheidet ihr, wenn Geld, Wachstum oder Druck gegen eure Prinzipien laufen?",
+      "Wie legt ihr fest, was tragbar ist, was ein Grenzfall bleibt und was nicht euer Weg ist?",
     prompts: [
-      "Wann sagt ihr bewusst nein, obwohl Geld, Wachstum oder Reichweite drin waeren?",
-      "Welche Grenze ueberschreitet ihr nicht, auch wenn sie euch kurzfristig helfen wuerde?",
-      "Was gilt, wenn ein Angebot euren Prinzipien widerspricht, aber operativ attraktiv ist?",
+      "Welche Kompromisse sind fuer euch noch tragbar?",
+      "Welche Faelle brauchen immer eine bewusste gemeinsame Freigabe?",
+      "Was macht ihr nicht, auch wenn es wirtschaftlich attraktiv wirkt?",
     ],
     reportDimensions: ["Unternehmenslogik", "Risikoorientierung", "Commitment"],
   },
   {
     id: "alignment_90_days",
-    title: "90-Tage Alignment",
-    subtitle: "Wie legt ihr fuer die naechsten 90 Tage klar fest, was Vorrang hat, was liegen bleibt und woran ihr Fortschritt messt?",
+    title: "90-Tage-Fokus",
+    subtitle:
+      "Wie legt ihr fuer die naechsten 90 Tage klar fest, was Vorrang hat, was liegen bleibt und woran ihr Fortschritt messt?",
     prompts: [
       "Was hat in den naechsten 90 Tagen absolute Prioritaet?",
       "Was macht ihr bewusst nicht, auch wenn es sinnvoll wirken koennte?",
@@ -289,13 +291,13 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   },
   {
     id: "advisor_closing",
-    title: "Abschlussimpulse des Advisors",
+    title: "Advisor-Abschluss",
     subtitle:
-      "Welche Beobachtungen, offenen Rueckfragen und naechsten Schritte sollte eine neutrale dritte Perspektive am Ende eurer Session noch sichtbar machen?",
+      "Welche Beobachtungen, offenen Rueckfragen und naechsten Schritte sollte der Advisor am Ende sichtbar machen?",
     prompts: [
-      "Welche zwei oder drei Beobachtungen sind aus Advisor-Sicht im Gesamtbild dieses Founder-Teams besonders wichtig?",
-      "Welche offenen Rueckfragen sollten die Founder nach der Session noch bewusst weiterklaeren?",
-      "Welche naechsten Schritte oder To-dos empfiehlt der Advisor fuer die kommenden Wochen?",
+      "Was sollte dieses Team nach der Session nicht uebersehen?",
+      "Welche Rueckfragen bleiben fachlich wichtig?",
+      "Was ist der sinnvollste naechste Schritt?",
     ],
     reportDimensions: [],
   },
@@ -562,11 +564,18 @@ export function getWorkbookRequiredStructuredOutputKeys(
 ) {
   if (
     stepId === "vision_direction" ||
+    stepId === "roles_responsibility" ||
     stepId === "decision_rules" ||
+    stepId === "commitment_load" ||
     stepId === "collaboration_conflict" ||
-    stepId === "ownership_risk"
+    stepId === "ownership_risk" ||
+    stepId === "values_guardrails"
   ) {
     return ["operatingRule", "escalationRule"] as WorkbookStructuredOutputType[];
+  }
+
+  if (stepId === "alignment_90_days") {
+    return ["operatingRule", "escalationRule", "reviewTrigger"] as WorkbookStructuredOutputType[];
   }
 
   switch (markerClass) {
@@ -819,10 +828,13 @@ export function deriveFounderAlignmentWorkbookHighlights(
 ): FounderAlignmentWorkbookHighlights {
   const priorityDimensions = collectPriorityDimensions(scoringResult);
 
-  const prioritizedStepIds = FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter((step) =>
-    step.reportDimensions.some((dimension) =>
-      priorityDimensions.includes(normalizeDimensionName(dimension))
-    )
+  const prioritizedStepIds = FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter(
+    (step) =>
+      step.id !== "advisor_closing" &&
+      step.id !== "alignment_90_days" &&
+      step.reportDimensions.some((dimension) =>
+        priorityDimensions.includes(normalizeDimensionName(dimension))
+      )
   ).map((step) => step.id);
 
   return {

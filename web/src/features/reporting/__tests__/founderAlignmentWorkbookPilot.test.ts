@@ -85,21 +85,20 @@ test("all non-advisor workbook steps expose the five structured output types", (
 
 test("marker-aware requiredness follows the V2 rule system", () => {
   assert.deepEqual(getWorkbookRequiredStructuredOutputKeys("decision_rules", "stable_base"), [
-    "principle",
-    "reviewTrigger",
+    "operatingRule",
+    "escalationRule",
   ]);
   assert.deepEqual(getWorkbookRequiredStructuredOutputKeys("decision_rules", "conditional_complement"), [
-    "principle",
+    "operatingRule",
     "escalationRule",
   ]);
   assert.deepEqual(getWorkbookRequiredStructuredOutputKeys("decision_rules", "high_rule_need"), [
     "operatingRule",
     "escalationRule",
-    "reviewTrigger",
   ]);
   assert.deepEqual(
     getWorkbookRequiredStructuredOutputKeys("decision_rules", "critical_clarification_point"),
-    ["escalationRule", "boundaryRule"]
+    ["operatingRule", "escalationRule"]
   );
 });
 
@@ -116,7 +115,7 @@ test("missing structured outputs detect generic validation gaps", () => {
     "high_rule_need"
   );
 
-  assert.deepEqual(missing, ["escalationRule", "reviewTrigger"]);
+  assert.deepEqual(missing, ["escalationRule"]);
 });
 
 test("step marker derivation maps all structured workbook steps", () => {
