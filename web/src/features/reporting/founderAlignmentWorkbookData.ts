@@ -58,6 +58,7 @@ type ProfileRow = {
   user_id: string;
   display_name: string | null;
   avatar_id: string | null;
+  avatar_url: string | null;
 };
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -89,6 +90,8 @@ export type FounderAlignmentWorkbookPageData =
       founderBName: string | null;
       founderAAvatarId: string | null;
       founderBAvatarId: string | null;
+      founderAAvatarUrl: string | null;
+      founderBAvatarUrl: string | null;
       currentUserRole: FounderAlignmentWorkbookViewerRole;
       report: FounderAlignmentReport;
       scoringResult: TeamScoringResult;
@@ -169,6 +172,8 @@ async function loadFounderContextWithClient(
   founderBName: string | null;
   founderAAvatarId: string | null;
   founderBAvatarId: string | null;
+  founderAAvatarUrl: string | null;
+  founderBAvatarUrl: string | null;
   founderAUserId: string | null;
   founderBUserId: string | null;
   teamContext: TeamContext | null;
@@ -186,6 +191,8 @@ async function loadFounderContextWithClient(
       founderBName: null,
       founderAAvatarId: null,
       founderBAvatarId: null,
+      founderAAvatarUrl: null,
+      founderBAvatarUrl: null,
       founderAUserId: typedInvitation?.inviter_user_id ?? null,
       founderBUserId: typedInvitation?.invitee_user_id ?? null,
       teamContext: parseStoredTeamContext(typedInvitation?.team_context),
@@ -194,7 +201,7 @@ async function loadFounderContextWithClient(
 
   const { data: profileRows } = await supabase
     .from("profiles")
-    .select("user_id, display_name, avatar_id")
+    .select("user_id, display_name, avatar_id, avatar_url")
     .in("user_id", [typedInvitation.inviter_user_id, typedInvitation.invitee_user_id]);
 
   const profileByUserId = new Map(
@@ -203,6 +210,7 @@ async function loadFounderContextWithClient(
       {
         displayName: row.display_name?.trim() ?? "",
         avatarId: row.avatar_id?.trim() ?? "",
+        avatarUrl: row.avatar_url?.trim() ?? "",
       },
     ])
   );
@@ -212,6 +220,8 @@ async function loadFounderContextWithClient(
     founderBName: profileByUserId.get(typedInvitation.invitee_user_id)?.displayName || null,
     founderAAvatarId: profileByUserId.get(typedInvitation.inviter_user_id)?.avatarId || null,
     founderBAvatarId: profileByUserId.get(typedInvitation.invitee_user_id)?.avatarId || null,
+    founderAAvatarUrl: profileByUserId.get(typedInvitation.inviter_user_id)?.avatarUrl || null,
+    founderBAvatarUrl: profileByUserId.get(typedInvitation.invitee_user_id)?.avatarUrl || null,
     founderAUserId: typedInvitation.inviter_user_id,
     founderBUserId: typedInvitation.invitee_user_id,
     teamContext: parseStoredTeamContext(typedInvitation.team_context),
@@ -284,6 +294,8 @@ export async function getFounderAlignmentWorkbookPageData(
       founderBName: "Lukas Brandt",
       founderAAvatarId: "avatar-04",
       founderBAvatarId: "avatar-17",
+      founderAAvatarUrl: null,
+      founderBAvatarUrl: null,
       currentUserRole: "founderA",
       report,
       scoringResult,
@@ -306,9 +318,11 @@ export async function getFounderAlignmentWorkbookPageData(
   const privileged = isLinkedAdvisor ? createPrivilegedClient() : null;
   const dataClient = privileged ?? supabase;
 
+  const founderContextClient = createPrivilegedClient() ?? dataClient;
+
   const [debugResult, founderContext, workbookRow, reportSnapshot] = await Promise.all([
     isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
-    loadFounderContextWithClient(normalizedInvitationId, dataClient),
+    loadFounderContextWithClient(normalizedInvitationId, founderContextClient),
     loadWorkbookRowWithClient(normalizedInvitationId, dataClient),
     isLinkedAdvisor
       ? getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId)
@@ -400,6 +414,8 @@ export async function getFounderAlignmentWorkbookPageData(
     founderBName: founderContext.founderBName ?? reportSnapshot?.report?.participantBName ?? null,
     founderAAvatarId: founderContext.founderAAvatarId,
     founderBAvatarId: founderContext.founderBAvatarId,
+    founderAAvatarUrl: founderContext.founderAAvatarUrl,
+    founderBAvatarUrl: founderContext.founderBAvatarUrl,
     currentUserRole,
     report,
     scoringResult,

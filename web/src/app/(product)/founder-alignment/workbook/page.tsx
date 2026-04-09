@@ -118,6 +118,8 @@ export default async function FounderAlignmentWorkbookPage({
           founderBName={data.founderBName}
           founderAAvatarId={data.founderAAvatarId}
           founderBAvatarId={data.founderBAvatarId}
+          founderAAvatarUrl={data.founderAAvatarUrl}
+          founderBAvatarUrl={data.founderBAvatarUrl}
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}
@@ -140,6 +142,8 @@ export default async function FounderAlignmentWorkbookPage({
           founderBName={data.founderBName}
           founderAAvatarId={data.founderAAvatarId}
           founderBAvatarId={data.founderBAvatarId}
+          founderAAvatarUrl={data.founderAAvatarUrl}
+          founderBAvatarUrl={data.founderBAvatarUrl}
           currentUserRole={data.currentUserRole}
           initialWorkbook={data.workbook}
           highlights={data.highlights}

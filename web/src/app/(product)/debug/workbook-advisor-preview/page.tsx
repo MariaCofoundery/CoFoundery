@@ -48,6 +48,8 @@ export default async function WorkbookAdvisorPreviewPage({
         founderBName={preview.founderBName}
         founderAAvatarId="avatar-04"
         founderBAvatarId="avatar-17"
+        founderAAvatarUrl={null}
+        founderBAvatarUrl={null}
         currentUserRole={preview.currentUserRole}
         initialWorkbook={preview.initialWorkbook}
         highlights={preview.highlights}

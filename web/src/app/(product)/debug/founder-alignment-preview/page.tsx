@@ -140,6 +140,8 @@ export default async function FounderAlignmentPreviewPage({
           founderBName={workbookPreview.founderBName}
           founderAAvatarId="avatar-04"
           founderBAvatarId="avatar-17"
+          founderAAvatarUrl={null}
+          founderBAvatarUrl={null}
           currentUserRole={workbookPreview.currentUserRole}
             initialWorkbook={workbookPreview.initialWorkbook}
             highlights={workbookPreview.highlights}
