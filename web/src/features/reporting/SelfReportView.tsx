@@ -1,6 +1,7 @@
 import { DimensionOverview } from "@/features/reporting/DimensionOverview";
 import { DimensionScale } from "@/features/reporting/DimensionScale";
 import {
+  FOUNDER_DIMENSION_ORDER,
   FOUNDER_DIMENSION_META,
   type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
@@ -221,18 +222,32 @@ function buildEverydayBlocks(
   selection: SelfReportSelection,
   signals: SelfReportSignal[]
 ): EverydayBlock[] {
-  return collectUniqueSignals(
+  const prioritizedSignals = collectUniqueSignals(
     selection.patternDimensions,
     selection.hero.workModeSignal,
     selection.hero.primarySignal,
     selection.hero.tensionCarrier,
     signals
-  )
-    .slice(0, 5)
-    .map((signal, index) => ({
+  );
+
+  const prioritizedSignalMap = new Map(
+    prioritizedSignals.map((signal, index) => [signal.dimension, { signal, index }] as const)
+  );
+  const signalMap = new Map(signals.map((signal) => [signal.dimension, signal] as const));
+
+  return FOUNDER_DIMENSION_ORDER.map((dimension) => {
+    const prioritizedEntry = prioritizedSignalMap.get(dimension);
+    const signal = prioritizedEntry?.signal ?? signalMap.get(dimension) ?? null;
+
+    if (!signal) {
+      return buildEverydayFallbackBlock(dimension);
+    }
+
+    return {
       ...buildEverydayCopy(signal),
-      highSignal: index === 0 && signal.isClear,
-    }));
+      highSignal: prioritizedEntry?.index === 0 && signal.isClear,
+    };
+  });
 }
 
 function buildTeamBreakBlocks(selection: SelfReportSelection): TeamBreakBlock[] {
@@ -566,6 +581,74 @@ function buildEverydayCopy(signal: SelfReportSignal): EverydayBlock {
         title: "Dein Alltag ist klar lesbar",
         statement: "Deine Präferenzen zeigen sich nicht nur im Test, sondern in echten Arbeitssituationen.",
         situation: "Vor allem unter Druck werden sie für andere klar sichtbar.",
+      };
+  }
+}
+
+function buildEverydayFallbackBlock(dimension: FounderDimensionKey): EverydayBlock {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return {
+        dimension,
+        title: "Deine Linie ist hier noch nicht klar lesbar",
+        statement:
+          "Ob du eher den Aufbau schützt oder eine größere Chance früh ziehst, ist in diesem Profil gerade nicht sauber belastbar.",
+        situation:
+          "Im Alltag zeigt sich das oft erst dann klar, wenn eine neue Option gleichzeitig Fokus verspricht und Fokus kostet.",
+      };
+    case "Entscheidungslogik":
+      return {
+        dimension,
+        title: "Dein Entscheidungsmodus ist hier noch offen",
+        statement:
+          "Ob du eher über Klärung oder über eine tragfähige Richtung entscheidest, ist in diesem Profil gerade nicht klar genug belegt.",
+        situation:
+          "Sichtbar wird das meist erst dann deutlich, wenn eine größere Entscheidung unter Zeitdruck reif werden muss.",
+      };
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return {
+        dimension,
+        title: "Dein Arbeitsrhythmus ist hier noch nicht klar genug",
+        statement:
+          "Wie viel Eigenraum oder Mitsicht du im Alltag wirklich brauchst, ist in diesem Profil gerade nicht sauber ablesbar.",
+        situation:
+          "Das zeigt sich meist erst dann klar, wenn Verantwortung läuft und gleichzeitig Sichtbarkeit erwartet wird.",
+      };
+    case "Commitment":
+      return {
+        dimension,
+        title: "Dein Einsatzrahmen bleibt hier noch offen",
+        statement:
+          "Wie stark du das Startup im Alltag priorisierst, ist in diesem Profil gerade nicht belastbar genug zu lesen.",
+        situation:
+          "Im Alltag wird das oft erst deutlich, wenn Intensität, Verfügbarkeit und Erwartung nicht mehr nur theoretisch sind.",
+      };
+    case "Risikoorientierung":
+      return {
+        dimension,
+        title: "Deine Risikoschwelle ist hier noch nicht klar genug",
+        statement:
+          "Ob du Unsicherheit eher früh begrenzen oder eher länger tragen würdest, ist in diesem Profil gerade nicht sauber belegt.",
+        situation:
+          "Sichtbar wird das meist dann, wenn eine Chance offen ist, aber Folgen und Sicherungen noch nicht ganz feststehen.",
+      };
+    case "Konfliktstil":
+      return {
+        dimension,
+        title: "Dein Klärungsstil bleibt hier noch offen",
+        statement:
+          "Ob du Unterschiede eher früh ansprichst oder erst sortierst, ist in diesem Profil gerade nicht eindeutig lesbar.",
+        situation:
+          "Im Alltag zeigt sich das meist erst dann klar, wenn ein Thema gleichzeitig heikel und nicht mehr gut aufschiebbar ist.",
+      };
+    default:
+      return {
+        dimension,
+        title: "Dein Alltag ist hier noch nicht klar lesbar",
+        statement:
+          "Diese Dimension ist im aktuellen Profil noch nicht stabil genug ausgeprägt, um eine klare Alltagswirkung zu zeigen.",
+        situation:
+          "Im Alltag wird das meist erst unter echter Belastung oder in wiederkehrenden Situationen deutlicher sichtbar.",
       };
   }
 }

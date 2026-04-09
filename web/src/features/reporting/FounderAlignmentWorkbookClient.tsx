@@ -88,6 +88,7 @@ type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
 type WorkbookModeOption = Exclude<FounderAlignmentWorkbookStepMode, never>;
 type WorkbookV2Phase = "collect" | "weight" | "rule" | "approval";
+type WorkbookVisualTone = "default" | "core" | "light" | "closing" | "guardrails" | "advisor";
 type DiscussionSignalOption = {
   value: FounderAlignmentWorkbookDiscussionSignal;
   label: string;
@@ -1243,6 +1244,9 @@ export function FounderAlignmentWorkbookClient({
   const founderALabel = founderAName?.trim() || "Founder A";
   const founderBLabel = founderBName?.trim() || "Founder B";
   const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Moderation";
+  const currentVisualTone = workbookStepVisualTone(currentStep.id);
+  const currentToneMeta = workbookToneMeta(currentVisualTone);
+  const currentStepIsPrioritized = highlights.prioritizedStepIds.includes(currentStep.id);
   const currentStepIsPremiumPilot = isPremiumWorkbookV2StepId(currentStep.id);
   const currentPremiumV2StepId: PremiumWorkbookV2StepId | null = currentStepIsPremiumPilot
     ? (currentStep.id as PremiumWorkbookV2StepId)
@@ -2501,7 +2505,7 @@ export function FounderAlignmentWorkbookClient({
   }
 
   return (
-    <div className="print-document-root min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_26%,#f8fafc_100%)] px-4 py-10 sm:px-6 lg:px-8 print:min-h-0 print:bg-white print:px-0 print:py-0">
+    <div className="print-document-root min-h-screen bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.08),transparent_28%),linear-gradient(180deg,#f8fafc_0%,#ffffff_24%,#f8fafc_100%)] px-4 py-10 sm:px-6 lg:px-8 print:min-h-0 print:bg-white print:px-0 print:py-0">
       <div className="mx-auto max-w-7xl print:max-w-none">
         {showSummaryView ? (
           <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:p-0 print:shadow-none">
@@ -2530,7 +2534,7 @@ export function FounderAlignmentWorkbookClient({
             </div>
           </section>
         ) : (
-          <section className="rounded-[32px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-8">
+          <section className="rounded-[36px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.055)] sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Workbook</p>
@@ -2548,7 +2552,7 @@ export function FounderAlignmentWorkbookClient({
                 </p>
               </div>
 
-              <div className="flex min-w-[260px] flex-col items-start gap-3 rounded-[28px] border border-slate-200/70 bg-slate-50/70 p-5 lg:items-end">
+              <div className="flex min-w-[260px] flex-col items-start gap-3 rounded-[30px] border border-slate-200/70 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,0.96))] p-5 lg:items-end">
                 <div className="text-sm text-slate-600">Dauer: 60-90 Minuten</div>
                 <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
                   <div className="flex items-center gap-3">
@@ -2800,7 +2804,7 @@ export function FounderAlignmentWorkbookClient({
         <div className="mt-8 grid gap-8 xl:grid-cols-[280px_minmax(0,1fr)]">
           <aside
             id="sessionverlauf"
-            className="order-2 self-start rounded-[28px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] xl:order-1 xl:sticky xl:top-24"
+            className="order-2 self-start rounded-[30px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.045)] xl:order-1 xl:sticky xl:top-24"
           >
             <div className="flex items-center justify-between gap-3">
               <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Schritte</p>
@@ -2822,6 +2826,7 @@ export function FounderAlignmentWorkbookClient({
               {visibleSteps.map((step, index) => {
                 const isActive = step.id === workbook.currentStepId;
                 const isPrioritized = highlights.prioritizedStepIds.includes(step.id);
+                const stepToneMeta = workbookToneMeta(workbookStepVisualTone(step.id));
                 const progressMeta = stepProgressMeta[step.id];
                 const statusLabel = progressMeta?.completed
                   ? t("Bereit")
@@ -2838,7 +2843,7 @@ export function FounderAlignmentWorkbookClient({
                       onClick={() => persist(step.id)}
                       className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
                         isActive
-                          ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/14 text-slate-900 shadow-[0_12px_24px_rgba(103,232,249,0.12)]"
+                          ? stepToneMeta.sidebarActive
                           : progressMeta?.completed
                               ? "border-emerald-200/70 bg-emerald-50/25 text-slate-800 hover:border-emerald-300"
                             : progressMeta?.started
@@ -2852,16 +2857,21 @@ export function FounderAlignmentWorkbookClient({
                             Schritt {index + 1}
                           </p>
                           <p className="mt-1 truncate text-sm font-medium">{step.title}</p>
+                          {isPrioritized ? (
+                            <p className="mt-2 text-[11px] leading-5 text-slate-500">
+                              {t("Fokus aus dem Matching")}
+                            </p>
+                          ) : null}
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {isPrioritized ? (
                             <span
-                              className={`inline-flex h-2.5 w-2.5 rounded-full ${
-                                isActive
-                                  ? "bg-slate-900"
-                                  : "bg-[color:var(--brand-accent)]/70"
+                              className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                                stepToneMeta.sidebarFocus
                               }`}
-                            />
+                            >
+                              {t("Fokus")}
+                            </span>
                           ) : null}
                           <span
                             className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
@@ -2885,19 +2895,31 @@ export function FounderAlignmentWorkbookClient({
 
           <section
             ref={currentStepRef}
-            className="order-1 rounded-[32px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-8 xl:order-2"
+            className="order-1 rounded-[36px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.05)] sm:p-8 xl:order-2"
           >
             {currentStepIsPremiumPilot ? (
-              <div className="border-b border-slate-200/80 pb-5">
+              <div className={`rounded-[28px] px-5 py-5 ${currentToneMeta.headerSurface}`}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="max-w-3xl">
-                    <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                    <p className={`text-[11px] uppercase tracking-[0.22em] ${currentToneMeta.headerKicker}`}>
                       Schritt {currentIndex + 1} von {visibleSteps.length}
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
                       {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was kuenftig klar gelten soll.")}
                     </p>
+                    {currentStepIsPrioritized ? (
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
+                          {t("Fokus aus Matching")}
+                        </span>
+                        {currentStepMarker ? (
+                          <span className="text-xs leading-6 text-slate-500">
+                            {t(`Warum Fokus: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
                       <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
                         {t("Arbeitsweise")}
@@ -2941,10 +2963,10 @@ export function FounderAlignmentWorkbookClient({
               </div>
             ) : (
               <>
-                <div className="rounded-3xl border border-slate-200/70 bg-slate-50/70 p-5">
+                <div className={`rounded-3xl p-5 ${currentToneMeta.headerSurface}`}>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                      <p className={`text-[11px] uppercase tracking-[0.22em] ${currentToneMeta.headerKicker}`}>
                         Schritt {currentIndex + 1} von {visibleSteps.length}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -2961,6 +2983,18 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
+                {currentStepIsPrioritized ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
+                      {t("Fokus aus Matching")}
+                    </span>
+                    {currentStepMarker ? (
+                      <span className="text-xs leading-6 text-slate-500">
+                        {t(`Warum Fokus: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
                 <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
                   {currentStep.subtitle}
                 </p>
@@ -3251,7 +3285,7 @@ export function FounderAlignmentWorkbookClient({
               </StepSection>
             ) : currentStepIsPremiumPilot && decisionRulesWorkspace && currentPremiumV2Config ? (
               <>
-                <section className="mt-8 rounded-[26px] bg-slate-50/80 px-5 py-5 sm:px-6">
+                <section className={`mt-8 rounded-[28px] px-5 py-5 sm:px-6 ${currentToneMeta.headerSurface}`}>
                   <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
@@ -3271,6 +3305,7 @@ export function FounderAlignmentWorkbookClient({
                     <div className="flex flex-wrap gap-2 pt-1">
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
+                        tone={currentVisualTone}
                         state={
                           visibleWorkbookV2Phase === "collect"
                             ? "active"
@@ -3281,6 +3316,7 @@ export function FounderAlignmentWorkbookClient({
                       />
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen")}
+                        tone={currentVisualTone}
                         state={
                           visibleWorkbookV2Phase === "weight"
                             ? "active"
@@ -3291,6 +3327,7 @@ export function FounderAlignmentWorkbookClient({
                       />
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.rulePhaseLabel ?? "Regel")}
+                        tone={currentVisualTone}
                         state={
                           visibleWorkbookV2Phase === "rule"
                             ? "active"
@@ -3301,6 +3338,7 @@ export function FounderAlignmentWorkbookClient({
                       />
                       <WorkbookV2PhasePill
                         label={t("Bestaetigen")}
+                        tone={currentVisualTone}
                         state={
                           visibleWorkbookV2Phase === "approval"
                             ? "active"
@@ -3314,7 +3352,7 @@ export function FounderAlignmentWorkbookClient({
                 </section>
 
                 {visibleWorkbookV2Phase === "collect" ? (
-                  <section className="mt-8 rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-7">
+                  <section className="mt-8 rounded-[30px] border border-slate-200/80 bg-white p-6 sm:p-7">
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
                       <div className="max-w-3xl">
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -3328,7 +3366,7 @@ export function FounderAlignmentWorkbookClient({
                         </p>
                       </div>
                       <div className="flex flex-col items-start gap-1 sm:items-end">
-                        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        <span className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
                           {t("Gemeinsamer Raum")}
                         </span>
                         <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
@@ -3409,7 +3447,9 @@ export function FounderAlignmentWorkbookClient({
                           return (
                             <article
                               key={entry.id}
-                              className="rounded-[20px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)]"
+                              className={`rounded-[22px] border px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)] ${
+                                isOwnEntry ? currentToneMeta.entryOwn : currentToneMeta.entryShared
+                              }`}
                             >
                               <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex items-center gap-3">
@@ -3426,11 +3466,13 @@ export function FounderAlignmentWorkbookClient({
                                 </span>
                               </div>
                               {sourceEntry || entry.sourceEntryId ? (
-                                <p className="mt-2 text-xs leading-5 text-slate-500">
-                                  {sourceAuthorLabel
-                                    ? t(`Auf Basis von ${sourceAuthorLabel}`)
-                                    : t("Auf Basis eines frueheren Punkts")}
-                                </p>
+                                <div className="mt-2">
+                                  <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.sourceBadge}`}>
+                                    {sourceAuthorLabel
+                                      ? t(`Auf Basis von ${sourceAuthorLabel}`)
+                                      : t("Auf Basis eines frueheren Punkts")}
+                                  </span>
+                                </div>
                               ) : null}
                               {isOwnEntry ? (
                                 <>
@@ -3496,12 +3538,13 @@ export function FounderAlignmentWorkbookClient({
                     }
                     actionLabel={t(currentPremiumV2Config.collectActionLabel ?? "Denkraum bearbeiten")}
                     onAction={() => openWorkbookV2Phase("collect")}
+                    tone={currentVisualTone}
                     className="mt-8"
                   />
                 )}
 
                 {visibleWorkbookV2Phase === "weight" ? (
-                  <section className="mt-6 rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-7">
+                  <section className={`mt-6 rounded-[30px] border p-6 sm:p-7 ${currentToneMeta.weightSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                         {t(currentPremiumV2Config.weightingTitle ?? "2. Gewichtung")}
@@ -3520,18 +3563,21 @@ export function FounderAlignmentWorkbookClient({
                         count={workbookV2SharedInsightCount}
                         text={t(currentPremiumV2InsightCopy.sharedText)}
                         tone="shared"
+                        visualTone={currentVisualTone}
                       />
                       <WorkbookV2InsightCard
                         title={t(currentPremiumV2InsightCopy.pendingTitle)}
                         count={workbookV2PendingInsightCount}
                         text={t(currentPremiumV2InsightCopy.pendingText)}
                         tone="focus"
+                        visualTone={currentVisualTone}
                       />
                       <WorkbookV2InsightCard
                         title={t(currentPremiumV2InsightCopy.criticalTitle)}
                         count={decisionRulesCriticalCount}
                         text={t(currentPremiumV2InsightCopy.criticalText)}
                         tone="critical"
+                        visualTone={currentVisualTone}
                       />
                     </div>
 
@@ -3555,10 +3601,12 @@ export function FounderAlignmentWorkbookClient({
                         return (
                           <article
                             key={entry.id}
-                            className="rounded-[20px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)]"
+                            className={`rounded-[22px] border px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)] ${
+                              isOwnEntry ? currentToneMeta.entryOwn : currentToneMeta.entryShared
+                            }`}
                           >
                             <div className="flex flex-wrap items-center gap-3">
-                              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
+                              <span className="rounded-full border border-slate-200/80 bg-white/88 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
                                 {authorLabel}
                               </span>
                               <span className="text-xs text-slate-500">
@@ -3566,11 +3614,13 @@ export function FounderAlignmentWorkbookClient({
                               </span>
                             </div>
                             {sourceEntry || entry.sourceEntryId ? (
-                              <p className="mt-2 text-xs leading-5 text-slate-500">
-                                {sourceAuthorLabel
-                                  ? t(`Auf Basis von ${sourceAuthorLabel}`)
-                                  : t("Auf Basis eines frueheren Punkts")}
-                              </p>
+                              <div className="mt-2">
+                                <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.sourceBadge}`}>
+                                  {sourceAuthorLabel
+                                    ? t(`Auf Basis von ${sourceAuthorLabel}`)
+                                    : t("Auf Basis eines frueheren Punkts")}
+                                </span>
+                              </div>
                             ) : null}
                             <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
                             {isOwnEntry ? (
@@ -3635,15 +3685,15 @@ export function FounderAlignmentWorkbookClient({
                                         currentUserRole !== "founderB"
                                       }
                                       onClick={() => updateDecisionRulesReaction(entry.id, option.value)}
-                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
                                         isActive
                                           ? option.value === "critical"
-                                            ? "border-rose-200 bg-rose-50 text-rose-700"
+                                            ? "border-rose-200/80 bg-rose-50/80 text-rose-700"
                                             : option.value === "important"
-                                              ? "border-amber-200 bg-amber-50 text-amber-700"
-                                              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                              ? "border-amber-200/80 bg-amber-50/80 text-amber-700"
+                                              : "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
                                           : currentUserRole === "founderA" || currentUserRole === "founderB"
-                                            ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                                            ? "border-slate-200/90 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
                                             : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
                                       }`}
                                     >
@@ -3718,18 +3768,13 @@ export function FounderAlignmentWorkbookClient({
                     onAction={
                       hasDecisionRulesBothPerspectives ? () => openWorkbookV2Phase("weight") : undefined
                     }
+                    tone={currentVisualTone}
                     className="mt-6"
                   />
                 )}
 
                 {visibleWorkbookV2Phase === "rule" || visibleWorkbookV2Phase === "approval" ? (
-                  <section
-                    className={`mt-6 border ${
-                      currentPremiumV2IsLight
-                        ? "rounded-[28px] border-slate-200/80 bg-slate-50/60 p-5 sm:p-6"
-                        : "rounded-[32px] border-[color:var(--brand-primary)]/18 bg-[linear-gradient(180deg,rgba(103,232,249,0.08),rgba(255,255,255,0.99))] p-6 sm:p-7"
-                    }`}
-                  >
+                  <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="max-w-3xl">
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -3752,8 +3797,8 @@ export function FounderAlignmentWorkbookClient({
                     <div
                       className={`mt-6 rounded-[28px] border bg-white p-5 ${
                         currentPremiumV2IsLight
-                          ? "border-slate-200/80"
-                          : "border-white/85 shadow-[0_14px_36px_rgba(15,23,42,0.05)] sm:p-6"
+                          ? currentToneMeta.ruleCard
+                          : currentToneMeta.ruleCard
                       }`}
                     >
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4754,16 +4799,19 @@ function ApprovalStatusCard({
 function WorkbookV2PhasePill({
   label,
   state,
+  tone = "default",
 }: {
   label: string;
   state: "active" | "done" | "upcoming";
+  tone?: WorkbookVisualTone;
 }) {
+  const toneMeta = workbookToneMeta(tone);
   const className =
     state === "active"
-      ? "border-slate-900 bg-slate-900 text-white"
+      ? toneMeta.phaseActive
       : state === "done"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-slate-200 bg-white text-slate-500";
+        ? toneMeta.phaseDone
+        : "border-slate-200 bg-white/88 text-slate-500";
 
   return (
     <span
@@ -4781,6 +4829,7 @@ function WorkbookV2PhasePreview({
   actionLabel,
   onAction,
   className = "",
+  tone = "default",
 }: {
   title: string;
   summary: string;
@@ -4788,9 +4837,11 @@ function WorkbookV2PhasePreview({
   actionLabel?: string;
   onAction?: () => void;
   className?: string;
+  tone?: WorkbookVisualTone;
 }) {
+  const toneMeta = workbookToneMeta(tone);
   return (
-    <section className={`${className} rounded-[22px] border border-slate-200/75 bg-slate-50/60 px-5 py-4`}>
+    <section className={`${className} rounded-[24px] border px-5 py-4 ${toneMeta.preview}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
@@ -4801,7 +4852,7 @@ function WorkbookV2PhasePreview({
           <button
             type="button"
             onClick={onAction}
-            className="w-fit rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+            className="w-fit rounded-full border border-slate-200 bg-white/92 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
           >
             {actionLabel}
           </button>
@@ -4840,7 +4891,7 @@ function WorkbookV2SignalBadge({
           : "offen");
 
   return (
-    <div className={`rounded-full border px-3 py-1.5 text-xs ${toneClass}`}>
+    <div className={`rounded-full border px-3 py-1.5 text-[11px] ${toneClass}`}>
       <span className="font-medium">{label}</span>
       <span className="mx-1 opacity-50">·</span>
       <span>{t(text)}</span>
@@ -4853,23 +4904,26 @@ function WorkbookV2InsightCard({
   count,
   text,
   tone,
+  visualTone = "default",
 }: {
   title: string;
   count: number;
   text: string;
   tone: "shared" | "focus" | "critical";
+  visualTone?: WorkbookVisualTone;
 }) {
+  const toneMeta = workbookToneMeta(visualTone);
   const toneClass =
     tone === "critical"
-      ? "border-rose-200 bg-rose-50/70"
+      ? toneMeta.insightCritical
       : tone === "focus"
-        ? "border-amber-200 bg-amber-50/70"
-        : "border-emerald-200 bg-emerald-50/70";
+        ? toneMeta.insightFocus
+        : toneMeta.insightShared;
 
   return (
-    <div className={`rounded-[20px] border p-4 ${toneClass}`}>
+    <div className={`rounded-[22px] border p-4 ${toneClass}`}>
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{count}</p>
+      <p className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-slate-950">{count}</p>
       <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
     </div>
   );
@@ -5085,6 +5139,185 @@ function advisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | n
       return t("Check-in in 3 Monaten");
     default:
       return t("Kein Check-in gesetzt.");
+  }
+}
+
+function workbookStepVisualTone(stepId: FounderAlignmentWorkbookStepId): WorkbookVisualTone {
+  switch (stepId) {
+    case "decision_rules":
+    case "collaboration_conflict":
+    case "ownership_risk":
+      return "core";
+    case "vision_direction":
+    case "roles_responsibility":
+    case "commitment_load":
+      return "light";
+    case "alignment_90_days":
+      return "closing";
+    case "values_guardrails":
+      return "guardrails";
+    case "advisor_closing":
+      return "advisor";
+    default:
+      return "default";
+  }
+}
+
+function workbookToneMeta(tone: WorkbookVisualTone) {
+  switch (tone) {
+    case "core":
+      return {
+        headerSurface:
+          "border border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.09),rgba(255,255,255,0.98))] shadow-[0_14px_30px_rgba(15,23,42,0.03)]",
+        headerKicker: "text-[color:var(--brand-primary)]",
+        focusPill:
+          "border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/8 text-slate-700",
+        phaseActive: "border-slate-900 bg-slate-900 text-white",
+        phaseDone:
+          "border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 text-slate-800",
+        preview:
+          "border-[color:var(--brand-primary)]/12 bg-[linear-gradient(180deg,rgba(103,232,249,0.04),rgba(248,250,252,0.7))]",
+        insightShared: "border-emerald-200/80 bg-emerald-50/80",
+        insightFocus: "border-amber-200/80 bg-amber-50/80",
+        insightCritical: "border-rose-200/80 bg-rose-50/80",
+        weightSurface:
+          "border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.92),rgba(255,255,255,1))]",
+        ruleSurface:
+          "rounded-[32px] border-[color:var(--brand-primary)]/18 bg-[linear-gradient(180deg,rgba(103,232,249,0.11),rgba(255,255,255,0.99))] p-6 sm:p-7",
+        ruleCard: "border-white/90 shadow-[0_18px_42px_rgba(15,23,42,0.05)] sm:p-6",
+        entryOwn:
+          "border-[color:var(--brand-primary)]/18 bg-[linear-gradient(180deg,rgba(103,232,249,0.05),rgba(255,255,255,1))]",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge:
+          "border-[color:var(--brand-primary)]/14 bg-[color:var(--brand-primary)]/5 text-slate-600",
+        sidebarActive:
+          "border-[color:var(--brand-primary)]/24 bg-[linear-gradient(180deg,rgba(103,232,249,0.14),rgba(255,255,255,0.98))] text-slate-900 shadow-[0_12px_24px_rgba(103,232,249,0.10)]",
+        sidebarFocus:
+          "border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/8 text-slate-700",
+        sidebarDot: "bg-[color:var(--brand-primary)]/70",
+      };
+    case "light":
+      return {
+        headerSurface:
+          "border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(255,255,255,1))] shadow-[0_12px_26px_rgba(15,23,42,0.025)]",
+        headerKicker: "text-slate-500",
+        focusPill: "border-sky-200/80 bg-sky-50/80 text-sky-700",
+        phaseActive: "border-slate-900 bg-white text-slate-900 shadow-[0_8px_18px_rgba(15,23,42,0.04)]",
+        phaseDone: "border-sky-200/80 bg-sky-50/70 text-sky-700",
+        preview: "border-slate-200/75 bg-slate-50/55",
+        insightShared: "border-emerald-200/75 bg-emerald-50/70",
+        insightFocus: "border-sky-200/75 bg-sky-50/70",
+        insightCritical: "border-amber-200/75 bg-amber-50/65",
+        weightSurface: "border-slate-200/80 bg-white",
+        ruleSurface:
+          "rounded-[28px] border-sky-200/70 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,1))] p-5 sm:p-6",
+        ruleCard: "border-slate-200/80 sm:p-5",
+        entryOwn: "border-sky-200/70 bg-sky-50/55",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge: "border-sky-200/70 bg-sky-50/70 text-sky-700",
+        sidebarActive:
+          "border-sky-200/80 bg-sky-50/70 text-slate-900 shadow-[0_10px_22px_rgba(125,211,252,0.08)]",
+        sidebarFocus: "border-sky-200/80 bg-sky-50 text-sky-700",
+        sidebarDot: "bg-sky-400",
+      };
+    case "closing":
+      return {
+        headerSurface:
+          "border border-amber-200/70 bg-[linear-gradient(180deg,rgba(254,243,199,0.35),rgba(255,255,255,0.98))] shadow-[0_12px_26px_rgba(120,53,15,0.03)]",
+        headerKicker: "text-amber-700",
+        focusPill: "border-amber-200/80 bg-amber-50/80 text-amber-700",
+        phaseActive: "border-slate-900 bg-slate-900 text-white",
+        phaseDone: "border-amber-200/80 bg-amber-50/80 text-amber-700",
+        preview: "border-amber-200/65 bg-amber-50/55",
+        insightShared: "border-emerald-200/75 bg-emerald-50/70",
+        insightFocus: "border-amber-200/80 bg-amber-50/80",
+        insightCritical: "border-slate-200/80 bg-slate-50/80",
+        weightSurface:
+          "border-amber-200/65 bg-[linear-gradient(180deg,rgba(255,251,235,0.75),rgba(255,255,255,1))]",
+        ruleSurface:
+          "rounded-[32px] border-amber-200/80 bg-[linear-gradient(180deg,rgba(254,243,199,0.45),rgba(255,255,255,0.99))] p-6 sm:p-7",
+        ruleCard: "border-white/90 shadow-[0_16px_36px_rgba(120,53,15,0.05)] sm:p-6",
+        entryOwn: "border-amber-200/70 bg-amber-50/60",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge: "border-amber-200/70 bg-amber-50/70 text-amber-700",
+        sidebarActive:
+          "border-amber-200/80 bg-amber-50/80 text-slate-900 shadow-[0_10px_24px_rgba(245,158,11,0.08)]",
+        sidebarFocus: "border-amber-200/80 bg-amber-50 text-amber-700",
+        sidebarDot: "bg-amber-400",
+      };
+    case "guardrails":
+      return {
+        headerSurface:
+          "border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.05),rgba(255,255,255,0.99))] shadow-[0_12px_26px_rgba(76,29,149,0.03)]",
+        headerKicker: "text-[color:var(--brand-accent)]",
+        focusPill:
+          "border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/8 text-slate-700",
+        phaseActive: "border-slate-900 bg-slate-900 text-white",
+        phaseDone:
+          "border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/8 text-slate-800",
+        preview:
+          "border-[color:var(--brand-accent)]/12 bg-[linear-gradient(180deg,rgba(124,58,237,0.03),rgba(248,250,252,0.75))]",
+        insightShared: "border-emerald-200/75 bg-emerald-50/70",
+        insightFocus: "border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/7",
+        insightCritical: "border-rose-200/75 bg-rose-50/75",
+        weightSurface:
+          "border-[color:var(--brand-accent)]/12 bg-[linear-gradient(180deg,rgba(248,250,252,0.94),rgba(255,255,255,1))]",
+        ruleSurface:
+          "rounded-[30px] border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.06),rgba(255,255,255,0.99))] p-6 sm:p-7",
+        ruleCard: "border-white/90 shadow-[0_16px_34px_rgba(76,29,149,0.04)] sm:p-6",
+        entryOwn: "border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/5",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge:
+          "border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/6 text-slate-700",
+        sidebarActive:
+          "border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07),rgba(255,255,255,0.98))] text-slate-900 shadow-[0_10px_24px_rgba(124,58,237,0.07)]",
+        sidebarFocus:
+          "border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/8 text-slate-700",
+        sidebarDot: "bg-[color:var(--brand-accent)]/75",
+      };
+    case "advisor":
+      return {
+        headerSurface:
+          "border border-slate-200/80 bg-[linear-gradient(180deg,rgba(15,23,42,0.03),rgba(255,255,255,0.98))]",
+        headerKicker: "text-slate-500",
+        focusPill: "border-slate-200 bg-slate-50 text-slate-600",
+        phaseActive: "border-slate-900 bg-slate-900 text-white",
+        phaseDone: "border-slate-200 bg-slate-50 text-slate-700",
+        preview: "border-slate-200/75 bg-slate-50/60",
+        insightShared: "border-slate-200/75 bg-slate-50/70",
+        insightFocus: "border-slate-200/75 bg-slate-50/70",
+        insightCritical: "border-slate-200/75 bg-slate-50/70",
+        weightSurface: "border-slate-200/80 bg-white",
+        ruleSurface: "rounded-[28px] border-slate-200/80 bg-white p-6 sm:p-7",
+        ruleCard: "border-slate-200/80 sm:p-6",
+        entryOwn: "border-slate-200/80 bg-slate-50/50",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge: "border-slate-200/80 bg-slate-50 text-slate-600",
+        sidebarActive: "border-slate-200/90 bg-slate-50/90 text-slate-900",
+        sidebarFocus: "border-slate-200 bg-slate-50 text-slate-600",
+        sidebarDot: "bg-slate-400",
+      };
+    default:
+      return {
+        headerSurface: "border border-slate-200/80 bg-slate-50/70",
+        headerKicker: "text-slate-500",
+        focusPill: "border-slate-200 bg-slate-50 text-slate-600",
+        phaseActive: "border-slate-900 bg-slate-900 text-white",
+        phaseDone: "border-slate-200 bg-slate-50 text-slate-700",
+        preview: "border-slate-200/75 bg-slate-50/60",
+        insightShared: "border-emerald-200/75 bg-emerald-50/70",
+        insightFocus: "border-amber-200/75 bg-amber-50/70",
+        insightCritical: "border-rose-200/75 bg-rose-50/70",
+        weightSurface: "border-slate-200/80 bg-white",
+        ruleSurface: "rounded-[28px] border-slate-200/80 bg-slate-50/60 p-5 sm:p-6",
+        ruleCard: "border-slate-200/80 sm:p-5",
+        entryOwn: "border-slate-200/80 bg-slate-50/60",
+        entryShared: "border-slate-200/80 bg-white",
+        sourceBadge: "border-slate-200/80 bg-slate-50 text-slate-600",
+        sidebarActive: "border-slate-200/90 bg-white text-slate-900",
+        sidebarFocus: "border-slate-200 bg-slate-50 text-slate-600",
+        sidebarDot: "bg-slate-400",
+      };
   }
 }
 
@@ -5474,7 +5707,7 @@ function workbookStepStatusClassName(status: FounderAlignmentWorkbookStepStatus)
     case "draft_ready":
       return "bg-amber-100 text-amber-700";
     case "awaiting_approval":
-      return "bg-violet-100 text-violet-700";
+      return "bg-sky-100 text-sky-700";
     case "finalized":
       return "bg-emerald-100 text-emerald-700";
     default:
