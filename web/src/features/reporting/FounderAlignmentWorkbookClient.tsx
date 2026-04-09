@@ -2544,13 +2544,13 @@ export function FounderAlignmentWorkbookClient({
                 aria-label="CoFoundery Align Logo"
               />
               <div className="w-full">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Zusammenfassung</p>
-                <h1 className="mt-3 text-3xl font-semibold text-slate-950">Zusammenfassung</h1>
+                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Workbook</p>
+                <h1 className="mt-3 text-3xl font-semibold text-slate-950">Eure gemeinsame Vereinbarung</h1>
                 <p className="mt-3 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
                 </p>
                 <p className="mt-4 max-w-3xl text-[15px] leading-8 text-slate-700">
-                  {t("Zusammenfassung eurer wichtigsten Vereinbarungen aus dem Workbook.")}
+                  {t("Das ist die Arbeitsbasis, auf die ihr euch aktuell einigt.")}
                 </p>
                 {formattedUpdatedAt ? (
                   <p className="mt-4 text-sm leading-6 text-slate-500">
@@ -5037,16 +5037,7 @@ function WorkbookSummaryView({
 }) {
   return (
     <>
-      <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/75 p-6 print:mt-6">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Zusammenfassung</p>
-        <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
-          {t(
-            "Diese Zusammenfassung buendelt eure wichtigsten Vereinbarungen aus dem Workbook. Sie zeigt, was ihr bereits klar fuer eure Zusammenarbeit festgehalten habt."
-          )}
-        </p>
-      </div>
-
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid gap-4 print:mt-6">
         {items.map((item) => {
           const primaryAgreement = item.agreement || item.structuredOutputs?.operatingRule?.trim() || "";
           const structuredSummaryItems = buildWorkbookSummaryStructuredItems(
@@ -5056,10 +5047,10 @@ function WorkbookSummaryView({
           );
 
           return (
-            <div key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6">
+            <div key={item.id} className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.035)] print:shadow-none">
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="w-full">
-                <p className="text-lg font-semibold text-slate-950">{t(item.title)}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(item.title)}</p>
                 {item.id === "advisor_closing" ? (
                   <div className="mt-4 space-y-4">
                     <SummaryInsightBlock
@@ -5096,7 +5087,7 @@ function WorkbookSummaryView({
                   </div>
                 ) : (
                   <>
-                    <p className="mt-3 text-sm leading-7 text-slate-700">
+                    <p className="mt-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4 text-sm leading-7 text-slate-800">
                       {t(primaryAgreement || "Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
                     </p>
                     {structuredSummaryItems.length > 0 ? (
@@ -5125,6 +5116,22 @@ function WorkbookSummaryView({
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-8 rounded-3xl border border-slate-200/80 bg-slate-50/75 p-5 print:mt-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm leading-7 text-slate-700">
+              {t("Ihr könnt das jederzeit anpassen – entscheidend ist, dass ihr bewusst danach arbeitet.")}
+            </p>
+            <p className="mt-1 text-xs leading-6 text-slate-500">
+              {t("Kein rechtlicher Vertrag – aber eure gemeinsame Grundlage.")}
+            </p>
+          </div>
+          <ReportActionButton type="button" onClick={() => window.print()} className="shrink-0 print:hidden">
+            {t("Als PDF exportieren")}
+          </ReportActionButton>
+        </div>
       </div>
 
       <ProductFeedbackEntry

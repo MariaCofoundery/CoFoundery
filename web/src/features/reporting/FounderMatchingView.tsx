@@ -12,10 +12,7 @@ import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
-import {
-  buildFounderMatchingAgreements,
-  buildFounderMatchingHero,
-} from "@/features/reporting/founderMatchingTextBuilder";
+import { buildFounderMatchingAgreements } from "@/features/reporting/founderMatchingTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
@@ -41,57 +38,61 @@ export function FounderMatchingView({
   teamContext,
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
-  const hero = buildFounderMatchingHero(selection);
   const agreements = buildFounderMatchingAgreements(selection);
   const markers = buildFounderMatchingMarkers(compareResult, selection, effectiveTeamContext);
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
-  const heroHeadline = buildMatchHeadline(selection);
-  const centralPattern = buildCentralPattern(selection, splitIntoParagraphs(hero));
   const everydaySituations = buildEverydaySituations(selection);
   const steeringPoints = buildSteeringPoints(markers, agreements);
   const opportunityPoints = buildOpportunityPoints(selection);
   const clarificationQuestions = buildClarificationQuestions(selection);
-  const introSummary = buildIntroSummary(selection);
-  const introContext = buildIntroContext(selection);
 
   return (
     <>
       <section className="page-section rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <div className="max-w-4xl">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Matching-Report</p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-            {t(heroHeadline)}
-          </h1>
-          <div className="mt-4 max-w-3xl space-y-1.5 text-sm leading-6 text-slate-600">
-            <p>{t("Dieser Report zeigt euren aktuellen Stand.")}</p>
-            <p>{t("Er ist ein Abbild eurer Dynamik, kein festes Urteil.")}</p>
-            <p>{t("Zusammenarbeit ist gestaltbar, und genau darin liegt eure Möglichkeit.")}</p>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+          <div className="max-w-4xl">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Matching-Report</p>
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
+              {t("Ihr werdet euch nicht erst später reiben, sondern direkt im Alltag.")}
+            </h1>
+            <div className="mt-5 max-w-3xl space-y-3 text-[15px] leading-8 text-slate-700">
+              <p>
+                {t(
+                  "Eure Unterschiede zeigen sich nicht im Umgang, sondern in der Art, wie ihr Entscheidungen trefft und Arbeit strukturiert."
+                )}
+              </p>
+              <p>
+                {t(
+                  "Wenn ihr das nicht bewusst klärt, entstehen unterschiedliche Maßstäbe an zentralen Punkten."
+                )}
+              </p>
+            </div>
+            <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
+              {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
+            </p>
           </div>
-          <p className="mt-4 text-sm font-medium text-slate-900">
-            {t(introSummary)}
-          </p>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-            {t(introContext)}
-          </p>
-          <p className="mt-5 text-[12px] uppercase tracking-[0.16em] text-slate-500">
-            {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
-          </p>
+          <aside className="rounded-[24px] border border-slate-200/80 bg-slate-50/80 p-5 text-sm leading-7 text-slate-600">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{t("Einordnung")}</p>
+            <div className="mt-3 space-y-2">
+              <p>{t("Dieser Report ist eine Momentaufnahme eurer Zusammenarbeit.")}</p>
+              <p>{t("Er zeigt Muster – keine festen Urteile.")}</p>
+              <p>{t("Entscheidend ist, was ihr daraus macht.")}</p>
+            </div>
+          </aside>
         </div>
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Eure zentralen Muster</p>
         <div className="mt-6 max-w-4xl">
-          <p className="text-lg font-semibold leading-8 text-slate-950">{t(centralPattern.lead)}</p>
-          <div className="mt-4 space-y-3.5">
-            {centralPattern.paragraphs.map((sentence) => (
-              <p key={sentence} className="text-[15px] leading-7 text-slate-700">
-                {t(sentence)}
-              </p>
-            ))}
-          </div>
+          <p className="text-lg font-semibold leading-8 text-slate-950">
+            {t("Der Kern liegt in eurer Unternehmenslogik.")}
+          </p>
+          <p className="mt-4 text-[15px] leading-7 text-slate-700">
+            {t("Ihr bewertet Richtung und Prioritäten nicht nach denselben Maßstäben.")}
+          </p>
         </div>
       </section>
 
