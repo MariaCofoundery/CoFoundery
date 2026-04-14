@@ -1270,7 +1270,7 @@ export function FounderAlignmentWorkbookClient({
       founderBAvatarUrl,
     ]
   );
-  const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Moderation";
+  const advisorLabel = workbook.advisorName?.trim() || advisorInviteState.advisorName?.trim() || "Advisor";
   const currentVisualTone = workbookStepVisualTone(currentStep.id);
   const currentToneMeta = workbookToneMeta(currentVisualTone);
   const currentStepIsPrioritized = highlights.prioritizedStepIds.includes(currentStep.id);
@@ -1293,12 +1293,11 @@ export function FounderAlignmentWorkbookClient({
     criticalText: currentPremiumV2Config?.criticalInsightText ?? "Punkte, bei denen ihr bewusst klaeren muesst.",
   };
   const showAdvisorInviteCard =
-    !currentStepIsPremiumPilot &&
-    (currentUserRole === "founderA" ||
-      currentUserRole === "founderB" ||
-      advisorInviteState.founderAApproved ||
-      advisorInviteState.founderBApproved ||
-      advisorInviteState.advisorLinked);
+    currentUserRole === "founderA" ||
+    currentUserRole === "founderB" ||
+    advisorInviteState.founderAApproved ||
+    advisorInviteState.founderBApproved ||
+    advisorInviteState.advisorLinked;
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
@@ -1325,6 +1324,87 @@ export function FounderAlignmentWorkbookClient({
     workbook.founderReaction.status != null
       ? founderReactionStatusLabel(workbook.founderReaction.status)
       : "Noch keine Team-Reaktion";
+  const founderAAdvisorApproved = advisorInviteState.founderAApproved;
+  const founderBAdvisorApproved = advisorInviteState.founderBApproved;
+  const advisorApprovalCount =
+    Number(founderAAdvisorApproved) + Number(founderBAdvisorApproved);
+  const advisorBothFoundersApproved = founderAAdvisorApproved && founderBAdvisorApproved;
+  const viewerFounderApproved =
+    currentUserRole === "founderA"
+      ? founderAAdvisorApproved
+      : currentUserRole === "founderB"
+        ? founderBAdvisorApproved
+        : false;
+  const otherFounderAdvisorLabel =
+    currentUserRole === "founderA"
+      ? founderBLabel
+      : currentUserRole === "founderB"
+        ? founderALabel
+        : "die andere Person";
+  const advisorAccessState =
+    advisorInviteState.advisorLinked && !advisorBothFoundersApproved
+      ? "paused"
+      : advisorInviteState.advisorLinked
+        ? "active"
+        : advisorBothFoundersApproved
+          ? "ready"
+          : advisorApprovalCount > 0
+            ? "waiting"
+            : "idle";
+  const advisorAccessMeta =
+    advisorAccessState === "active"
+      ? {
+          badge: "Advisor freigegeben",
+          badgeClassName: "border-emerald-200 bg-emerald-50 text-emerald-700",
+          title: `${advisorLabel} kann jetzt mitlesen und eigene Hinweise ergänzen`,
+          description:
+            "Beide Founder haben freigegeben. Der Advisor sieht das Workbook und den zugehörigen Report, bearbeitet aber nur die vorgesehenen Advisor-Bereiche.",
+        }
+      : advisorAccessState === "ready"
+        ? {
+            badge: "Freigabe liegt vor",
+            badgeClassName: "border-sky-200 bg-sky-50 text-sky-700",
+            title: "Beide Founder haben zugestimmt",
+            description:
+              "Der Zugriff wird aktiv, sobald der Advisor den Einladungslink nutzt. Bis dahin bleibt der Arbeitsraum unverändert.",
+          }
+        : advisorAccessState === "waiting"
+          ? {
+              badge: "Wartet auf zweite Zustimmung",
+              badgeClassName: "border-amber-200 bg-amber-50 text-amber-700",
+              title: "Eine Zustimmung allein reicht noch nicht",
+              description: `Der Advisor bleibt blockiert, bis ${otherFounderAdvisorLabel} ebenfalls freigibt.`,
+            }
+          : advisorAccessState === "paused"
+            ? {
+                badge: "Zugriff pausiert",
+                badgeClassName: "border-amber-200 bg-amber-50 text-amber-700",
+                title: "Der Advisor bleibt verknüpft, hat aber aktuell keinen Zugriff",
+                description:
+                  "Mindestens eine Freigabe ist nicht mehr aktiv. Der Advisor kann erst wieder arbeiten, wenn beide Founder erneut freigegeben haben.",
+              }
+            : {
+                badge: "Noch nicht freigegeben",
+                badgeClassName: "border-slate-200 bg-white text-slate-600",
+                title: "Optional eine externe Begleitung freigeben",
+                description:
+                  "Wenn ihr eine dritte Perspektive einbinden wollt, gebt den Zugriff bewusst gemeinsam frei. Vorher bleibt der Advisor vollständig blockiert.",
+              };
+  const advisorActionLabel =
+    advisorAccessState === "ready"
+      ? "Einladungslink erstellen"
+      : advisorAccessState === "paused" && !viewerFounderApproved
+        ? "Freigabe erneut erteilen"
+        : advisorAccessState === "idle"
+          ? "Freigabe starten"
+          : "Freigabe erteilen";
+  const showAdvisorApprovalButton =
+    (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+    (
+      advisorAccessState === "idle" ||
+      advisorAccessState === "ready" ||
+      (!viewerFounderApproved && (advisorAccessState === "waiting" || advisorAccessState === "paused"))
+    );
   const currentStepHasStructuredOutputs = isWorkbookStructuredStepId(currentStep.id);
   const currentStructuredStepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing"> | null =
     currentStepHasStructuredOutputs
@@ -1673,10 +1753,9 @@ export function FounderAlignmentWorkbookClient({
     (step) => stepProgressMeta[step.id]?.completed
   ).length;
   const showAdvisorNotesSection =
-    advisorInviteState.founderAApproved ||
-    advisorInviteState.founderBApproved ||
     advisorInviteState.advisorLinked ||
-    currentUserRole === "advisor";
+    currentUserRole === "advisor" ||
+    workbook.steps[currentStep.id].advisorNotes.trim().length > 0;
   const workbookSummaryItems = useMemo(
     () =>
       visibleSteps.map((step) => {
@@ -2496,8 +2575,8 @@ export function FounderAlignmentWorkbookClient({
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
         currentUserRole === "founderA"
-          ? t("Deine Zustimmung ist erfasst. Sobald Founder B ebenfalls zustimmt, kann der Einladungslink erzeugt werden.")
-          : t("Deine Zustimmung ist erfasst. Sobald Founder A ebenfalls zustimmt, kann der Einladungslink erzeugt werden.")
+          ? t("Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder B ebenfalls zustimmt.")
+          : t("Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder A ebenfalls zustimmt.")
       );
       return;
     }
@@ -2505,7 +2584,7 @@ export function FounderAlignmentWorkbookClient({
     if (result.status === "advisor_linked") {
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
-        t(`Moderation verbunden: ${result.advisorName ?? "Moderation"}. Hinweise koennen jetzt direkt im Workbook hinterlegt werden.`)
+        t(`Advisor aktiv: ${result.advisorName ?? "Advisor"}. Der Zugriff auf die Advisor-Bereiche ist jetzt freigegeben.`)
       );
       return;
     }
@@ -2518,11 +2597,11 @@ export function FounderAlignmentWorkbookClient({
       try {
         await navigator.clipboard.writeText(absoluteInviteUrl);
         setAdvisorInviteMessage(
-          t("Der Einladungslink wurde erstellt und direkt in die Zwischenablage kopiert.")
+          t("Beide Founder haben freigegeben. Der Einladungslink wurde erstellt und in die Zwischenablage kopiert.")
         );
       } catch {
         setAdvisorInviteMessage(
-          t("Der Einladungslink wurde erstellt. Du kannst ihn jetzt kopieren und weitergeben.")
+          t("Beide Founder haben freigegeben. Der Einladungslink wurde erstellt und kann jetzt weitergegeben werden.")
         );
       }
       return;
@@ -2697,21 +2776,23 @@ export function FounderAlignmentWorkbookClient({
                   <aside className="rounded-[24px] border border-slate-200/80 bg-slate-50/78 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
                     <div className="max-w-md">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Dritte Perspektive")}
+                        {t("Advisor-Begleitung")}
                       </p>
-                      <h3 className="mt-1.5 text-base font-semibold text-slate-950">
-                        {advisorInviteState.advisorLinked
-                          ? t("Moderation ist verbunden")
-                          : t("Optional eine dritte Perspektive einbinden")}
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span
+                          className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${advisorAccessMeta.badgeClassName}`}
+                        >
+                          {t(advisorAccessMeta.badge)}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {t(`${advisorApprovalCount} von 2 Founder-Freigaben`)}
+                        </span>
+                      </div>
+                      <h3 className="mt-3 text-base font-semibold text-slate-950">
+                        {t(advisorAccessMeta.title)}
                       </h3>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
-                        {advisorInviteState.advisorLinked
-                          ? t(
-                              "Eine neutrale Person kann dieses Workbook begleiten und pro Schritt Hinweise hinterlassen."
-                            )
-                          : t(
-                              "Wenn ihr bei schwierigen Punkten eine neutrale Begleitung möchtet, könnt ihr hier eine dritte Person einladen."
-                            )}
+                        {t(advisorAccessMeta.description)}
                       </p>
                     </div>
 
@@ -2734,21 +2815,48 @@ export function FounderAlignmentWorkbookClient({
                         ) : null}
                       </div>
 
+                      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                          {t("Was der Advisor darf")}
+                        </p>
+                        <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
+                          <li>{t("Sieht den freigegebenen Report und das Workbook.")}</li>
+                          <li>{t("Ergänzt nur Advisor-Hinweise und den Advisor-Abschluss.")}</li>
+                          <li>{t("Ändert keine Founder-Beiträge, Regeln oder Zustimmungen.")}</li>
+                        </ul>
+                      </div>
+
                       {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
                         <div className="mt-3 space-y-3">
-                          <ReportActionButton
-                            type="button"
-                            onClick={handleAdvisorInvite}
-                            className="w-full justify-center"
-                          >
-                            {advisorInviteState.advisorLinked
-                              ? t("Moderation erneut einladen")
-                              : t("Moderation einladen")}
-                          </ReportActionButton>
+                          {showAdvisorApprovalButton ? (
+                            <ReportActionButton
+                              type="button"
+                              onClick={handleAdvisorInvite}
+                              className="w-full justify-center"
+                            >
+                              {t(advisorActionLabel)}
+                            </ReportActionButton>
+                          ) : null}
+                          {!showAdvisorApprovalButton &&
+                          (advisorAccessState === "waiting" || advisorAccessState === "paused") &&
+                          viewerFounderApproved ? (
+                            <p className="text-xs leading-6 text-slate-600">
+                              {t(
+                                `Deine Freigabe ist bereits erfasst. Jetzt fehlt noch ${otherFounderAdvisorLabel}.`
+                              )}
+                            </p>
+                          ) : null}
+                          {advisorAccessState === "active" ? (
+                            <p className="text-xs leading-6 text-slate-600">
+                              {t(
+                                "Die Begleitung ist aktiv. Advisor-Hinweise bleiben sichtbar, eure Regeln und Entscheidungen bleiben aber bei euch."
+                              )}
+                            </p>
+                          ) : null}
                           {advisorInviteMessage ? (
                             <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
                           ) : null}
-                          {advisorInviteLink ? (
+                          {advisorInviteLink && advisorAccessState === "ready" ? (
                             <details className="rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2.5">
                               <summary className="cursor-pointer text-xs font-medium text-slate-700">
                                 {t("Einladungslink anzeigen")}
@@ -2762,7 +2870,7 @@ export function FounderAlignmentWorkbookClient({
                       ) : currentUserRole === "advisor" ? (
                         <p className="mt-3 text-xs leading-6 text-slate-600">
                           {t(
-                            "Du bist in diesem Workbook für die Moderation verknüpft und kannst unter jedem Schritt eigene Hinweise hinterlegen."
+                            "Du siehst hier den Founder-Freigabestatus. Dein Zugriff bleibt nur aktiv, solange beide Founder freigegeben haben."
                           )}
                         </p>
                       ) : null}
@@ -4250,12 +4358,12 @@ export function FounderAlignmentWorkbookClient({
                 {showAdvisorNotesSection ? (
                   <details className="mt-8 rounded-[28px] border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5 sm:p-6">
                     <summary className="cursor-pointer text-base font-semibold text-slate-950">
-                      {t("Hinweis von aussen anzeigen")}
+                      {t("Advisor-Hinweis anzeigen")}
                     </summary>
                     <div className="mt-4">
                       <p className="text-sm leading-7 text-slate-700">
                         {t(
-                          "Hier ist Platz fuer eine neutrale Beobachtung oder Rueckfrage. Eure gemeinsame Absprache bleibt davon getrennt."
+                          "Hier steht die externe Beobachtung zum Schritt. Eure gemeinsame Absprache bleibt davon getrennt und wird dadurch nicht überschrieben."
                         )}
                       </p>
                       <div className="mt-6">
