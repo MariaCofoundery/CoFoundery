@@ -12,7 +12,6 @@ import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
-import { buildFounderMatchingAgreements } from "@/features/reporting/founderMatchingTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
@@ -38,13 +37,13 @@ export function FounderMatchingView({
   teamContext,
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
-  const agreements = buildFounderMatchingAgreements(selection);
   const markers = buildFounderMatchingMarkers(compareResult, selection, effectiveTeamContext);
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
+  const centralPatternSections = buildCentralPatternSections(selection);
   const everydaySituations = buildEverydaySituations(selection);
-  const steeringPoints = buildSteeringPoints(markers, agreements);
+  const steeringPoints = buildSteeringPoints(selection, markers);
   const opportunityPoints = buildOpportunityPoints(selection);
   const clarificationQuestions = buildClarificationQuestions(selection);
 
@@ -86,13 +85,16 @@ export function FounderMatchingView({
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Eure zentralen Muster</p>
-        <div className="mt-6 max-w-4xl">
-          <p className="text-lg font-semibold leading-8 text-slate-950">
-            {t("Der Kern liegt in eurer Unternehmenslogik.")}
-          </p>
-          <p className="mt-4 text-[15px] leading-7 text-slate-700">
-            {t("Ihr bewertet Richtung und Prioritäten nicht nach denselben Maßstäben.")}
-          </p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {centralPatternSections.map((section) => (
+            <article
+              key={section.label}
+              className="rounded-[22px] border border-slate-200/80 bg-white/80 px-5 py-5"
+            >
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{section.label}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -271,7 +273,7 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
     case "coordination_led":
       return "Euer Problem ist nicht Streit, sondern stiller Zugverlust.";
     case "blind_spot_watch":
-      return "Bei euch kommt der Konflikt nicht zuerst, sondern die stille Drift.";
+      return "Bei euch kommt nicht zuerst die offene Spannung, sondern die stille Drift.";
     case "alignment_led":
     default:
       return "Ihr habt viel gemeinsame Linie. Gerade deshalb merkt ihr Unterschiede spaet.";
@@ -281,7 +283,7 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
 function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Euer Konflikt sitzt nicht im Ton, sondern in eurer Arbeitslogik.";
+      return "Eure Spannung sitzt nicht im Ton, sondern in eurer Arbeitslogik.";
     case "complement_led":
       return "Euer Unterschied ist zugleich Chance und Belastung.";
     case "coordination_led":
@@ -538,19 +540,34 @@ function buildDimensionBusinessMeaning(
   }
 }
 
-function buildSteeringPoints(markers: ReturnType<typeof buildFounderMatchingMarkers>, agreements: string[]) {
-  const markerPoints = [
-    markers.primary?.dimension
-      ? buildSteeringPointForDimension(markers.primary.dimension)
-      : null,
-    ...markers.secondary.map((marker) =>
-      marker.dimension ? buildSteeringPointForDimension(marker.dimension) : null
-    ),
-  ].filter((entry): entry is string => Boolean(entry));
+function buildSteeringPoints(
+  selection: FounderMatchingSelection,
+  markers: ReturnType<typeof buildFounderMatchingMarkers>
+) {
+  const prioritizedDimensions = Array.from(
+    new Set(
+      [
+        markers.primary?.dimension,
+        ...markers.secondary.map((marker) => marker.dimension),
+        ...selection.agreementFocusDimensions.map((entry) => entry.dimension),
+        selection.biggestTension?.dimension,
+        selection.strongestComplement?.dimension,
+      ].filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+    )
+  );
 
-  const agreementPoints = agreements.map((entry) => sharpenAgreementSentence(entry));
+  const fallbackDimensions: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"][] = [
+    "Unternehmenslogik",
+    "Entscheidungslogik",
+    "Arbeitsstruktur & Zusammenarbeit",
+    "Commitment",
+    "Risikoorientierung",
+    "Konfliktstil",
+  ];
 
-  return Array.from(new Set([...markerPoints, ...agreementPoints])).slice(0, 4);
+  return Array.from(
+    new Set([...prioritizedDimensions, ...fallbackDimensions].map(buildSteeringQuestionForDimension))
+  ).slice(0, 5);
 }
 
 function buildOpportunityPoints(selection: FounderMatchingSelection) {
@@ -806,22 +823,22 @@ function buildStableBaseContext(
   }
 }
 
-function buildSteeringPointForDimension(
+function buildSteeringQuestionForDimension(
   dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Legt fest, wonach ihr priorisiert, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen.";
+      return "Was hat fuer euch Vorrang, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen?";
     case "Entscheidungslogik":
-      return "Legt fest, wer Entscheidungen vorbereitet, wann genug geprueft ist und wann eine Entscheidung faellt.";
+      return "Was muss vorliegen, damit fuer euch eine Entscheidung wirklich reif ist?";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Legt fest, was sichtbar sein muss, wo Eigenraum beginnt und wann Abstimmung Pflicht ist.";
+      return "Was muss sichtbar sein, was darf eigenstaendig laufen und ab wann wird Abstimmung Pflicht?";
     case "Commitment":
-      return "Legt fest, wie viel Zeit, Verantwortung und Equity jeweils mit welchem Einsatz verbunden sind.";
+      return "Was ist fuer euch realistisch verbindlich, wenn Zeit, Verantwortung und Einsatz auseinanderlaufen?";
     case "Risikoorientierung":
-      return "Legt fest, welches Risiko fuer euch tragbar ist und wann Absicherung Vorrang hat.";
+      return "Was gilt fuer euch noch als vertretbar, und ab wann geht Absicherung vor Tempo?";
     case "Konfliktstil":
-      return "Legt fest, was sofort angesprochen wird, in welchem Ton ihr das tut und was ihr mit Abstand klaert.";
+      return "Was sprecht ihr sofort an, und was klaert ihr bewusst mit etwas Abstand?";
   }
 }
 
@@ -870,7 +887,7 @@ function buildComplementOperationSentence(
     case "Unternehmenslogik":
       return "Das kann euch in der Praxis staerker machen: Eine Person schuetzt die Substanz, waehrend die andere Reichweite und Hebel oeffnet. So entstehen weniger blinde Flecken in strategischen Entscheidungen.";
     case "Entscheidungslogik":
-      return "Das kann Entscheidungen verbessern: Eine Person prueft gruendlicher, die andere bringt Tempo. Wenn klar ist, wer vorbereitet und wer entscheidet, wird daraus kein Konflikt, sondern Qualitaet.";
+      return "Das kann Entscheidungen verbessern: Eine Person prueft gruendlicher, die andere bringt Tempo. Wenn klar ist, wer vorbereitet und wer entscheidet, wird daraus keine Spannung, sondern Qualitaet.";
     case "Arbeitsstruktur & Zusammenarbeit":
       return "Das kann eure Zusammenarbeit stabiler machen: Eine Person haelt Eigenverantwortung hoch, die andere sorgt fuer Sichtbarkeit. Wenn ihr das klar regelt, entsteht weder Mikromanagement noch Blindflug.";
     case "Commitment":
@@ -920,14 +937,74 @@ function buildRiskSentenceForDimension(
   }
 }
 
-function sharpenAgreementSentence(sentence: string) {
-  if (sentence.startsWith("Ihr braucht eine klare Regel dafür, ")) {
-    return sentence.replace("Ihr braucht eine klare Regel dafür, ", "");
+function buildCentralPatternSections(selection: FounderMatchingSelection) {
+  const biggestTensionStatus =
+    selection.biggestTension &&
+    selection.dimensionStatuses.find((entry) => entry.dimension === selection.biggestTension?.dimension);
+
+  const kernspannung = selection.biggestTension
+    ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Massstaeben schaut.`
+    : selection.strongestComplement
+      ? `Euer staerkster Unterschied liegt in ${selection.strongestComplement.dimension} und braucht bewusste Fuehrung, damit er euch traegt.`
+      : selection.stableBase
+        ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfaehig, ersetzt aber keine klare Regel an offenen Punkten.`
+        : "Ihr habt genug gemeinsame Linie, um gut zusammenzuarbeiten, aber nicht genug Gleichlauf fuer stilles Verstaendnis.";
+
+  const auswirkungImAlltag = selection.biggestTension
+    ? buildEverydayImpactSentenceForDimension(selection.biggestTension.dimension)
+    : selection.strongestComplement
+      ? buildComplementEverydayImpactSentence(selection.strongestComplement.dimension)
+      : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern in Prioritaeten, Timing und unausgesprochenen Erwartungen.";
+
+  const konsequenzOhneKlaerung = selection.biggestTension && biggestTensionStatus
+    ? buildDimensionConsequence(selection.biggestTension.dimension, biggestTensionStatus.status)
+    : selection.strongestComplement
+      ? buildDimensionComplementConsequence(selection.strongestComplement.dimension)
+      : "Ohne bewusste Klaerung entstehen unterschiedliche Massstaebe genau dort, wo ihr gemeinsam tragen und entscheiden muesst.";
+
+  return [
+    { label: "Kernspannung", body: kernspannung },
+    { label: "Auswirkung im Alltag", body: auswirkungImAlltag },
+    { label: "Konsequenz ohne Klaerung", body: konsequenzOhneKlaerung },
+  ];
+}
+
+function buildEverydayImpactSentenceForDimension(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Im Alltag zeigt sich das, sobald ihr dieselbe Chance oder Prioritaet unterschiedlich bewertet.";
+    case "Entscheidungslogik":
+      return "Im Alltag zeigt sich das, sobald Tempo gefragt ist und ihr nicht dieselbe Schwelle fuer Klarheit habt.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Im Alltag zeigt sich das daran, dass Sichtbarkeit, Eigenraum und Abstimmung nicht gleich verstanden werden.";
+    case "Commitment":
+      return "Im Alltag zeigt sich das, wenn Einsatz, Verfuegbarkeit und Verantwortung unterschiedlich gelesen werden.";
+    case "Risikoorientierung":
+      return "Im Alltag zeigt sich das, sobald eine Person frueher handeln will und die andere frueher absichert.";
+    case "Konfliktstil":
+      return "Im Alltag zeigt sich das, sobald Spannung aufkommt und ihr nicht dieselbe Form fuer Klaerung erwartet.";
   }
-  if (sentence.startsWith("Es sollte eindeutig sein, ")) {
-    return sentence.replace("Es sollte eindeutig sein, ", "");
+}
+
+function buildComplementEverydayImpactSentence(
+  dimension: NonNullable<FounderMatchingSelection["strongestComplement"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "Im Alltag koennt ihr dadurch zugleich Substanz schuetzen und Chancen frueher sehen.";
+    case "Entscheidungslogik":
+      return "Im Alltag koennt ihr dadurch gruendlicher und schneller entscheiden als mit nur einer Logik.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Im Alltag koennt ihr dadurch Eigenverantwortung und gemeinsame Orientierung besser verbinden.";
+    case "Commitment":
+      return "Im Alltag koennt ihr dadurch Zug halten, ohne Grenzen und Realismus zu verlieren.";
+    case "Risikoorientierung":
+      return "Im Alltag koennt ihr dadurch Chancen oeffnen, ohne Folgen und Absicherung zu unterschaetzen.";
+    case "Konfliktstil":
+      return "Im Alltag koennt ihr dadurch Themen klarer ansprechen und zugleich besser sortieren.";
   }
-  return sentence;
 }
 
 function buildMarkerWorkbookPrompt(marker: FounderMatchingMarker, teamContext: TeamContext) {
