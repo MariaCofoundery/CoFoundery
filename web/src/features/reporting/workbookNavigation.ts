@@ -1,4 +1,8 @@
-import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
+import {
+  type FounderAlignmentWorkbookEntry,
+  resolveFounderAlignmentWorkbookSteps,
+  sanitizeFounderAlignmentWorkbookPayload,
+} from "@/features/reporting/founderAlignmentWorkbook";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 
 export function buildWorkbookHref(invitationId: string, teamContext: TeamContext | null) {
@@ -11,23 +15,82 @@ export function buildWorkbookIntroHref(invitationId: string, teamContext: TeamCo
   return teamContext ? `${base}&teamContext=${encodeURIComponent(teamContext)}` : base;
 }
 
-export function countWorkbookContentSignals(
+function hasStructuredOutputs(step: FounderAlignmentWorkbookEntry) {
+  return Object.values(step.structuredOutputs ?? {}).some((stepOutputs) =>
+    Object.values(stepOutputs ?? {}).some(
+      (value) => typeof value === "string" && value.trim().length > 0
+    )
+  );
+}
+
+function hasStepV2Progress(step: FounderAlignmentWorkbookEntry) {
+  return (
+    (step.workspaceV2?.entries.length ?? 0) > 0 ||
+    hasStructuredOutputs(step) ||
+    step.agreement.trim().length > 0
+  );
+}
+
+export function hasWorkbookStarted(
   payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>
 ) {
-  let count = 0;
+  const hasStepProgress = Object.values(payload.steps).some(hasStepV2Progress);
+  const hasAdvisorProgress =
+    payload.advisorClosing.observations.trim().length > 0 ||
+    payload.advisorClosing.questions.trim().length > 0 ||
+    payload.advisorClosing.nextSteps.trim().length > 0 ||
+    payload.founderReaction.status !== null ||
+    payload.founderReaction.comment.trim().length > 0 ||
+    payload.advisorFollowUp !== "none";
 
-  for (const step of Object.values(payload.steps)) {
-    if (step.founderA.trim()) count += 1;
-    if (step.founderB.trim()) count += 1;
-    if (step.agreement.trim()) count += 1;
-    if (step.advisorNotes.trim()) count += 1;
+  return hasStepProgress || hasAdvisorProgress;
+}
+
+export function isWorkbookCompleted(
+  payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>,
+  teamContext: TeamContext | null
+) {
+  if (!hasWorkbookStarted(payload)) {
+    return false;
   }
 
-  if (payload.advisorClosing.observations.trim()) count += 1;
-  if (payload.advisorClosing.questions.trim()) count += 1;
-  if (payload.advisorClosing.nextSteps.trim()) count += 1;
-  if (payload.founderReaction.status) count += 1;
-  if (payload.founderReaction.comment.trim()) count += 1;
+  const visibleSteps = resolveFounderAlignmentWorkbookSteps(teamContext === "existing_team", false);
+  const founderSteps = visibleSteps.filter((step) => step.id !== "advisor_closing");
 
-  return count;
+  return founderSteps.every((step) => {
+    const entry = payload.steps[step.id];
+    return entry?.founderAApproved === true && entry?.founderBApproved === true;
+  });
+}
+
+export function deriveWorkbookNavigationState(
+  payload: ReturnType<typeof sanitizeFounderAlignmentWorkbookPayload>,
+  teamContext: TeamContext | null
+) {
+  const started = hasWorkbookStarted(payload);
+  if (!started) {
+    return {
+      hasStarted: false,
+      isCompleted: false,
+      statusKind: "ready" as const,
+      statusLabel: "Workbook bereit",
+    };
+  }
+
+  const completed = isWorkbookCompleted(payload, teamContext);
+  if (completed) {
+    return {
+      hasStarted: true,
+      isCompleted: true,
+      statusKind: "completed" as const,
+      statusLabel: "Abgeschlossen",
+    };
+  }
+
+  return {
+    hasStarted: true,
+    isCompleted: false,
+    statusKind: "in_progress" as const,
+    statusLabel: "In Arbeit",
+  };
 }

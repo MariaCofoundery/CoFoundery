@@ -8,7 +8,7 @@ import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
-  countWorkbookContentSignals,
+  hasWorkbookStarted,
 } from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -73,7 +73,7 @@ export default async function FounderAlignmentWorkbookIntroPage({
     );
   }
 
-  if (countWorkbookContentSignals(data.workbook) > 0) {
+  if (hasWorkbookStarted(data.workbook)) {
     redirect(buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext));
   }
 

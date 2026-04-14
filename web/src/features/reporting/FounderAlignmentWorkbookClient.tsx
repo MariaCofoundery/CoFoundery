@@ -97,6 +97,11 @@ type DiscussionSignalOption = {
   shortLabel: string;
 };
 
+type WorkbookDiscussionThreadGroup = {
+  rootEntry: FounderAlignmentWorkbookDiscussionEntry;
+  childEntries: FounderAlignmentWorkbookDiscussionEntry[];
+};
+
 const PREMIUM_WORKBOOK_V2_STEP_IDS = [
   "vision_direction",
   "roles_responsibility",
@@ -942,6 +947,75 @@ function getDiscussionSignalShortLabel(
   return options.find((option) => option.value === signal)?.shortLabel ?? null;
 }
 
+function truncateDiscussionPreview(content: string, maxLength = 180) {
+  const normalized = content.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength).trimEnd()}…`;
+}
+
+function resolveDiscussionRootEntryId(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  entryId: string
+) {
+  const entryById = new Map(workspace.entries.map((entry) => [entry.id, entry]));
+  let current = entryById.get(entryId) ?? null;
+  const visited = new Set<string>();
+
+  while (current?.sourceEntryId && !visited.has(current.id)) {
+    visited.add(current.id);
+    const parent = entryById.get(current.sourceEntryId) ?? null;
+    if (!parent) {
+      break;
+    }
+    current = parent;
+  }
+
+  return current?.id ?? entryId;
+}
+
+function buildDiscussionThreadGroups(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2
+): WorkbookDiscussionThreadGroup[] {
+  const groupsByRootId = new Map<string, WorkbookDiscussionThreadGroup>();
+
+  for (const entry of workspace.entries) {
+    const rootId = entry.sourceEntryId
+      ? resolveDiscussionRootEntryId(workspace, entry.id)
+      : entry.id;
+
+    if (!groupsByRootId.has(rootId)) {
+      groupsByRootId.set(rootId, {
+        rootEntry: entry,
+        childEntries: [],
+      });
+    }
+
+    const group = groupsByRootId.get(rootId)!;
+    if (rootId === entry.id && !entry.sourceEntryId) {
+      group.rootEntry = entry;
+    } else if (rootId === entry.id && entry.sourceEntryId) {
+      group.rootEntry = entry;
+    } else {
+      group.childEntries.push(entry);
+    }
+  }
+
+  return workspace.entries
+    .filter((entry) => groupsByRootId.has(entry.id))
+    .map((entry) => groupsByRootId.get(entry.id)!)
+    .filter((group, index, all) => all.findIndex((candidate) => candidate.rootEntry.id === group.rootEntry.id) === index);
+}
+
+function countDiscussionEntryReactions(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  entryId: string
+) {
+  return workspace.reactions.filter((reaction) => reaction.entryId === entryId).length;
+}
+
 function buildWorkbookV2Suggestion(params: {
   stepId: PremiumWorkbookV2StepId;
   workspace: FounderAlignmentWorkbookStepWorkspaceV2;
@@ -1200,6 +1274,9 @@ export function FounderAlignmentWorkbookClient({
     ) as Record<FounderAlignmentWorkbookStepId, string>
   );
   const [discussionDraftSourceEntryIdByStep, setDiscussionDraftSourceEntryIdByStep] = useState<
+    Partial<Record<FounderAlignmentWorkbookStepId, string | null>>
+  >({});
+  const [discussionOpenThreadByStep, setDiscussionOpenThreadByStep] = useState<
     Partial<Record<FounderAlignmentWorkbookStepId, string | null>>
   >({});
   const [workbookV2OpenPhaseByStep, setWorkbookV2OpenPhaseByStep] = useState<
@@ -1508,6 +1585,10 @@ export function FounderAlignmentWorkbookClient({
         : null,
     [decisionRulesWorkspace, currentPremiumV2StepId, founderALabel, founderBLabel]
   );
+  const decisionRulesThreadGroups = useMemo(
+    () => (decisionRulesWorkspace ? buildDiscussionThreadGroups(decisionRulesWorkspace) : []),
+    [decisionRulesWorkspace]
+  );
   const decisionRulesMatchingHint =
     currentPremiumV2StepId != null
       ? buildWorkbookV2MatchingHint(currentPremiumV2StepId, currentStepMarker?.markerClass ?? null)
@@ -1555,6 +1636,33 @@ export function FounderAlignmentWorkbookClient({
     requestedWorkbookV2Phase && canShowRequestedWorkbookV2Phase
       ? requestedWorkbookV2Phase
       : currentDecisionRulesPhase;
+  const currentDiscussionDraftSourceRootEntryId =
+    currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
+      ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
+      : null;
+  const defaultDiscussionOpenThreadId = currentDiscussionDraftSourceRootEntryId
+    ?? (
+      visibleWorkbookV2Phase === "weight"
+        ? decisionRulesThreadGroups.find((group) => {
+            const threadEntries = [group.rootEntry, ...group.childEntries];
+            return threadEntries.some((entry) => {
+              const reactionA = getDecisionRulesReaction(decisionRulesWorkspace!, entry.id, "founderA");
+              const reactionB = getDecisionRulesReaction(decisionRulesWorkspace!, entry.id, "founderB");
+              return reactionA === null || reactionB === null;
+            });
+          })?.rootEntry.id ?? null
+        : null
+    )
+    ?? (decisionRulesThreadGroups.length === 1 ? decisionRulesThreadGroups[0]?.rootEntry.id ?? null : null);
+  const requestedDiscussionOpenThreadId = discussionOpenThreadByStep[currentStep.id] ?? null;
+  const visibleDiscussionOpenThreadId =
+    requestedDiscussionOpenThreadId &&
+    decisionRulesThreadGroups.some((group) => group.rootEntry.id === requestedDiscussionOpenThreadId)
+      ? requestedDiscussionOpenThreadId
+      : defaultDiscussionOpenThreadId;
+  const showWorkbookV2WeightPreview =
+    visibleWorkbookV2Phase === "rule" || visibleWorkbookV2Phase === "approval";
+  const showWorkbookV2RulePreview = visibleWorkbookV2Phase === "approval";
   const workbookV2SharedSpaceHint =
     currentUserRole === "founderA" || currentUserRole === "founderB"
       ? isCollaborativeMode
@@ -2067,6 +2175,20 @@ export function FounderAlignmentWorkbookClient({
     }));
   }
 
+  function setDiscussionOpenThread(rootEntryId: string | null) {
+    setDiscussionOpenThreadByStep((current) => ({
+      ...current,
+      [activeStepId]: rootEntryId,
+    }));
+  }
+
+  function toggleDiscussionOpenThread(rootEntryId: string) {
+    setDiscussionOpenThreadByStep((current) => ({
+      ...current,
+      [activeStepId]: current[activeStepId] === rootEntryId ? null : rootEntryId,
+    }));
+  }
+
   function useDecisionRulesDiscussionEntryAsDraft(entry: FounderAlignmentWorkbookDiscussionEntry) {
     if (
       !isPremiumWorkbookV2StepId(activeStepId) ||
@@ -2086,6 +2208,9 @@ export function FounderAlignmentWorkbookClient({
       ...current,
       [activeStepId]: entry.id,
     }));
+    if (decisionRulesWorkspace) {
+      setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entry.id));
+    }
     openWorkbookV2Phase("collect");
   }
 
@@ -2103,25 +2228,32 @@ export function FounderAlignmentWorkbookClient({
       return;
     }
 
+    const nextEntryId = createDiscussionEntryId();
+    const sourceEntryId =
+      currentDiscussionDraftSourceEntryId &&
+      decisionRulesWorkspace.entries.some((entry) => entry.id === currentDiscussionDraftSourceEntryId)
+        ? currentDiscussionDraftSourceEntryId
+        : null;
+    const nextOpenThreadId = sourceEntryId
+      ? resolveDiscussionRootEntryId(decisionRulesWorkspace, sourceEntryId)
+      : nextEntryId;
+
     updateWorkspaceV2({
       ...decisionRulesWorkspace,
       entries: [
         ...decisionRulesWorkspace.entries,
         {
-          id: createDiscussionEntryId(),
+          id: nextEntryId,
           content,
           createdBy: currentUserRole,
           createdAt: new Date().toISOString(),
-          sourceEntryId:
-            currentDiscussionDraftSourceEntryId &&
-            decisionRulesWorkspace.entries.some((entry) => entry.id === currentDiscussionDraftSourceEntryId)
-              ? currentDiscussionDraftSourceEntryId
-              : null,
+          sourceEntryId,
           updatedAt: null,
           updatedBy: null,
         },
       ],
     });
+    setDiscussionOpenThread(nextOpenThreadId);
     setDiscussionDraft("");
     setDiscussionDraftSourceEntryIdByStep((current) => ({
       ...current,
@@ -2137,6 +2269,8 @@ export function FounderAlignmentWorkbookClient({
     ) {
       return;
     }
+
+    setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entryId));
 
     updateWorkspaceV2({
       ...decisionRulesWorkspace,
@@ -2168,11 +2302,21 @@ export function FounderAlignmentWorkbookClient({
       return;
     }
 
+    const removedRootId = resolveDiscussionRootEntryId(decisionRulesWorkspace, entryId);
+
     updateWorkspaceV2({
       ...decisionRulesWorkspace,
       entries: decisionRulesWorkspace.entries.filter((item) => item.id !== entryId),
       reactions: decisionRulesWorkspace.reactions.filter((reaction) => reaction.entryId !== entryId),
     });
+    setDiscussionOpenThreadByStep((current) =>
+      current[activeStepId] === removedRootId
+        ? {
+            ...current,
+            [activeStepId]: null,
+          }
+        : current
+    );
   }
 
   function updateDecisionRulesReaction(
@@ -2193,6 +2337,7 @@ export function FounderAlignmentWorkbookClient({
     const nextReactions = decisionRulesWorkspace.reactions.filter(
       (reaction) => !(reaction.entryId === entryId && reaction.userId === currentUserRole)
     );
+    setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entryId));
 
     updateWorkspaceV2({
       ...decisionRulesWorkspace,
@@ -2614,29 +2759,40 @@ export function FounderAlignmentWorkbookClient({
     <div className="print-document-root min-h-screen bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.08),transparent_28%),linear-gradient(180deg,#f8fafc_0%,#ffffff_24%,#f8fafc_100%)] px-4 py-10 sm:px-6 lg:px-8 print:min-h-0 print:bg-white print:px-0 print:py-0">
       <div className="mx-auto max-w-7xl print:max-w-none">
         {showSummaryView ? (
-          <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:p-0 print:shadow-none">
-            <div className="flex flex-col gap-5 border-b border-slate-200 pb-8 print:pb-6">
-              <object
-                type="image/svg+xml"
-                data="/cofoundery-align-logo.svg"
-                className="h-8 w-auto print:h-7"
-                aria-label="CoFoundery Align Logo"
-              />
-              <div className="w-full">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Workbook</p>
-                <h1 className="mt-3 text-3xl font-semibold text-slate-950">Eure gemeinsame Vereinbarung</h1>
-                <p className="mt-3 text-base leading-7 text-slate-700">
+          <section className="rounded-[32px] border border-slate-200/80 bg-white/98 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:p-0 print:shadow-none">
+            <div className="grid gap-8 border-b border-slate-200/80 pb-10 print:gap-6 print:pb-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+              <div className="min-w-0">
+                <object
+                  type="image/svg+xml"
+                  data="/cofoundery-align-logo.svg"
+                  className="h-9 w-auto max-w-[190px] print:h-7"
+                  aria-label="CoFoundery Align Logo"
+                />
+                <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                  CoFoundery Align
+                </p>
+                <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.035em] text-slate-950">
+                  Eure gemeinsame Vereinbarung
+                </h1>
+                <p className="mt-3 text-[15px] leading-7 text-slate-600">
+                  {t("Basierend auf eurem Alignment-Workbook")}
+                </p>
+                <p className="mt-5 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
                 </p>
-                <p className="mt-4 max-w-3xl text-[15px] leading-8 text-slate-700">
+                <p className="mt-4 max-w-3xl text-[16px] leading-8 text-slate-700">
                   {t("Das ist die Arbeitsbasis, auf die ihr euch aktuell einigt.")}
                 </p>
-                {formattedUpdatedAt ? (
-                  <p className="mt-4 text-sm leading-6 text-slate-500">
-                    Sessionstand: {formattedUpdatedAt}
-                  </p>
-                ) : null}
               </div>
+
+              {formattedUpdatedAt ? (
+                <div className="rounded-[22px] border border-slate-200/80 bg-slate-50/65 px-4 py-3 text-sm text-slate-600 print:min-w-[170px]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {t("Stand")}
+                  </p>
+                  <p className="mt-2 font-medium text-slate-700">{formattedUpdatedAt}</p>
+                </div>
+              ) : null}
             </div>
           </section>
         ) : (
@@ -3559,96 +3715,31 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                     </div>
 
-                    <div className="mt-5 space-y-3">
+                    <div className="mt-5">
                       {decisionRulesWorkspace.entries.length === 0 ? (
                         <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-5 text-sm leading-7 text-slate-600">
                           {t("Noch keine Punkte im gemeinsamen Raum. Der Einstieg wird leicht, sobald der erste konkrete Satz da ist.")}
                         </div>
                       ) : (
-                        decisionRulesWorkspace.entries.map((entry) => {
-                          const isOwnEntry =
-                            (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                            entry.createdBy === currentUserRole;
-                          const authorLabel = entry.createdBy === "founderA" ? founderALabel : founderBLabel;
-                          const sourceEntry = entry.sourceEntryId
-                            ? decisionRulesWorkspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
-                            : null;
-                          const sourceAuthorLabel = sourceEntry
-                            ? sourceEntry.createdBy === "founderA"
-                              ? founderALabel
-                              : founderBLabel
-                            : null;
-
-                          return (
-                            <article
-                              key={entry.id}
-                              className={`rounded-[22px] border px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)] ${
-                                isOwnEntry ? currentToneMeta.entryOwn : currentToneMeta.entryShared
-                              }`}
-                            >
-                              <div className="flex flex-wrap items-center gap-3">
-                                <div className="flex items-center gap-3">
-                                  <WorkbookFounderAvatar
-                                    displayName={authorLabel}
-                                    avatarId={founderAvatarByAuthor[entry.createdBy].avatarId}
-                                    imageUrl={founderAvatarByAuthor[entry.createdBy].imageUrl}
-                                    size="md"
-                                  />
-                                  <span className="text-sm font-medium text-slate-900">{authorLabel}</span>
-                                </div>
-                                <span className="text-xs text-slate-500">
-                                  {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
-                                </span>
-                              </div>
-                              {sourceEntry || entry.sourceEntryId ? (
-                                <div className="mt-2">
-                                  <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.sourceBadge}`}>
-                                    {sourceAuthorLabel
-                                      ? t(`Auf Basis von ${sourceAuthorLabel}`)
-                                      : t("Auf Basis eines frueheren Punkts")}
-                                  </span>
-                                </div>
-                              ) : null}
-                              {isOwnEntry ? (
-                                <>
-                                  <textarea
-                                    value={entry.content}
-                                    onChange={(event) =>
-                                      updateDecisionRulesDiscussionEntry(entry.id, event.target.value)
-                                    }
-                                    rows={2}
-                                    className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-slate-50/40 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => removeDecisionRulesDiscussionEntry(entry.id)}
-                                    className="mt-2 text-xs font-medium text-slate-500 underline-offset-4 hover:text-rose-600 hover:underline"
-                                  >
-                                    {t("Punkt entfernen")}
-                                  </button>
-                                </>
-                              ) : (
-                                <>
-                                  <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
-                                  {viewerFounderField ? (
-                                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                                      <button
-                                        type="button"
-                                        onClick={() => useDecisionRulesDiscussionEntryAsDraft(entry)}
-                                        className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
-                                      >
-                                        {t("Als eigenen Punkt aufgreifen")}
-                                      </button>
-                                      <span className="text-xs leading-5 text-slate-500">
-                                        {t("Der Originalpunkt bleibt unveraendert.")}
-                                      </span>
-                                    </div>
-                                  ) : null}
-                                </>
-                              )}
-                            </article>
-                          );
-                        })
+                        <WorkbookV2DiscussionThreadList
+                          groups={decisionRulesThreadGroups}
+                          workspace={decisionRulesWorkspace}
+                          currentUserRole={currentUserRole}
+                          founderALabel={founderALabel}
+                          founderBLabel={founderBLabel}
+                          founderAvatarByAuthor={founderAvatarByAuthor}
+                          signalOptions={currentPremiumV2SignalOptions}
+                          mode="collect"
+                          openThreadId={visibleDiscussionOpenThreadId}
+                          onToggleThread={toggleDiscussionOpenThread}
+                          onUseAsDraft={useDecisionRulesDiscussionEntryAsDraft}
+                          onUpdateEntry={updateDecisionRulesDiscussionEntry}
+                          onRemoveEntry={removeDecisionRulesDiscussionEntry}
+                          onUpdateReaction={updateDecisionRulesReaction}
+                          entryOwnClassName={currentToneMeta.entryOwn}
+                          entrySharedClassName={currentToneMeta.entryShared}
+                          sourceBadgeClassName={currentToneMeta.sourceBadge}
+                        />
                       )}
                     </div>
 
@@ -3716,161 +3807,29 @@ export function FounderAlignmentWorkbookClient({
                       />
                     </div>
 
-                    <div className="mt-5 grid gap-3">
-                      {decisionRulesWorkspace.entries.map((entry) => {
-                        const signalA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-                        const signalB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-                        const authorLabel = entry.createdBy === "founderA" ? founderALabel : founderBLabel;
-                        const isOwnEntry =
-                          (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                          entry.createdBy === currentUserRole;
-                        const sourceEntry = entry.sourceEntryId
-                          ? decisionRulesWorkspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
-                          : null;
-                        const sourceAuthorLabel = sourceEntry
-                          ? sourceEntry.createdBy === "founderA"
-                            ? founderALabel
-                            : founderBLabel
-                          : null;
-
-                        return (
-                          <article
-                            key={entry.id}
-                            className={`rounded-[22px] border px-4 py-4 shadow-[0_8px_24px_rgba(15,23,42,0.03)] ${
-                              isOwnEntry ? currentToneMeta.entryOwn : currentToneMeta.entryShared
-                            }`}
-                          >
-                            <div className="flex flex-wrap items-center gap-3">
-                              <div className="flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/88 px-2.5 py-1">
-                                <WorkbookFounderAvatar
-                                  displayName={authorLabel}
-                                  avatarId={founderAvatarByAuthor[entry.createdBy].avatarId}
-                                  imageUrl={founderAvatarByAuthor[entry.createdBy].imageUrl}
-                                  size="sm"
-                                />
-                                <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-600">
-                                  {authorLabel}
-                                </span>
-                              </div>
-                              <span className="text-xs text-slate-500">
-                                {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
-                              </span>
-                            </div>
-                            {sourceEntry || entry.sourceEntryId ? (
-                              <div className="mt-2">
-                                <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.sourceBadge}`}>
-                                  {sourceAuthorLabel
-                                    ? t(`Auf Basis von ${sourceAuthorLabel}`)
-                                    : t("Auf Basis eines frueheren Punkts")}
-                                </span>
-                              </div>
-                            ) : null}
-                            <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
-                            {isOwnEntry ? (
-                              <details className="mt-3 rounded-2xl border border-slate-200/70 bg-slate-50/70 px-3 py-2">
-                                <summary className="cursor-pointer text-xs font-medium text-slate-600">
-                                  {t("Eigenen Punkt bearbeiten")}
-                                </summary>
-                                <textarea
-                                  value={entry.content}
-                                  onChange={(event) =>
-                                    updateDecisionRulesDiscussionEntry(entry.id, event.target.value)
-                                  }
-                                  rows={2}
-                                  className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                                />
-                                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                                  <p className="text-xs leading-5 text-slate-500">
-                                    {t("Aenderungen setzen die Zustimmung zurueck und machen die Gewichtung fuer diesen Punkt neu offen.")}
-                                  </p>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeDecisionRulesDiscussionEntry(entry.id)}
-                                    className="text-xs font-medium text-slate-500 underline-offset-4 hover:text-rose-600 hover:underline"
-                                  >
-                                    {t("Entfernen")}
-                                  </button>
-                                </div>
-                              </details>
-                            ) : viewerFounderField ? (
-                              <div className="mt-3 flex flex-wrap items-center gap-3">
-                                <button
-                                  type="button"
-                                  onClick={() => useDecisionRulesDiscussionEntryAsDraft(entry)}
-                                  className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
-                                >
-                                  {t("Als eigenen Punkt aufgreifen")}
-                                </button>
-                                <span className="text-xs leading-5 text-slate-500">
-                                  {t("Erstellt einen eigenen Punkt auf Basis dieses Beitrags.")}
-                                </span>
-                              </div>
-                            ) : null}
-
-                            <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                              <div className="flex flex-wrap gap-2">
-                                {currentPremiumV2SignalOptions.map((option) => {
-                                  const isActive =
-                                    currentUserRole === "founderA" || currentUserRole === "founderB"
-                                      ? getDecisionRulesReaction(
-                                          decisionRulesWorkspace,
-                                          entry.id,
-                                          currentUserRole
-                                        ) === option.value
-                                      : false;
-
-                                  return (
-                                    <button
-                                      key={`${entry.id}-${option.value}`}
-                                      type="button"
-                                      disabled={
-                                        currentUserRole !== "founderA" &&
-                                        currentUserRole !== "founderB"
-                                      }
-                                      onClick={() => updateDecisionRulesReaction(entry.id, option.value)}
-                                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                                        isActive
-                                          ? option.value === "critical"
-                                            ? "border-rose-200/80 bg-rose-50/80 text-rose-700"
-                                            : option.value === "important"
-                                              ? "border-amber-200/80 bg-amber-50/80 text-amber-700"
-                                              : "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
-                                          : currentUserRole === "founderA" || currentUserRole === "founderB"
-                                            ? "border-slate-200/90 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
-                                            : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                                      }`}
-                                    >
-                                      {t(option.shortLabel)}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-
-                              <div className="flex flex-wrap gap-2 lg:justify-end">
-                                <WorkbookV2SignalBadge
-                                  label={founderALabel}
-                                  signal={signalA}
-                                  signalLabel={getDiscussionSignalShortLabel(
-                                    currentPremiumV2SignalOptions,
-                                    signalA
-                                  )}
-                                />
-                                <WorkbookV2SignalBadge
-                                  label={founderBLabel}
-                                  signal={signalB}
-                                  signalLabel={getDiscussionSignalShortLabel(
-                                    currentPremiumV2SignalOptions,
-                                    signalB
-                                  )}
-                                />
-                              </div>
-                            </div>
-                          </article>
-                        );
-                      })}
+                    <div className="mt-5">
+                      <WorkbookV2DiscussionThreadList
+                        groups={decisionRulesThreadGroups}
+                        workspace={decisionRulesWorkspace}
+                        currentUserRole={currentUserRole}
+                        founderALabel={founderALabel}
+                        founderBLabel={founderBLabel}
+                        founderAvatarByAuthor={founderAvatarByAuthor}
+                        signalOptions={currentPremiumV2SignalOptions}
+                        mode="weight"
+                        openThreadId={visibleDiscussionOpenThreadId}
+                        onToggleThread={toggleDiscussionOpenThread}
+                        onUseAsDraft={useDecisionRulesDiscussionEntryAsDraft}
+                        onUpdateEntry={updateDecisionRulesDiscussionEntry}
+                        onRemoveEntry={removeDecisionRulesDiscussionEntry}
+                        onUpdateReaction={updateDecisionRulesReaction}
+                        entryOwnClassName={currentToneMeta.entryOwn}
+                        entrySharedClassName={currentToneMeta.entryShared}
+                        sourceBadgeClassName={currentToneMeta.sourceBadge}
+                      />
                     </div>
                   </section>
-                ) : (
+                ) : showWorkbookV2WeightPreview ? (
                   <WorkbookV2PhasePreview
                     title={t(currentPremiumV2Config.weightingTitle ?? "2. Gewichtung")}
                     summary={
@@ -3914,31 +3873,52 @@ export function FounderAlignmentWorkbookClient({
                     tone={currentVisualTone}
                     className="mt-6"
                   />
-                )}
+                ) : null}
 
                 {visibleWorkbookV2Phase === "rule" || visibleWorkbookV2Phase === "approval" ? (
                   <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="max-w-3xl">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {t(currentPremiumV2Config.ruleIntro)}
+                      </p>
+                    </div>
+
+                    {decisionRulesSuggestion && decisionRulesWorkspace.entries.length > 0 ? (
+                      <div className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/78 p-4">
+                        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div className="max-w-3xl">
+                            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                              {t("Vorschlag aus euren Punkten")}
+                            </p>
+                            <p className="mt-2 text-sm leading-7 text-slate-700">
+                              {t(decisionRulesSuggestion.agreement)}
+                            </p>
+                          </div>
+                          <ReportActionButton
+                            type="button"
+                            onClick={applyDecisionRulesSuggestion}
+                            disabled={decisionRulesWorkspace.entries.length === 0}
+                            className="shrink-0"
+                          >
+                            {t("Als Startpunkt nutzen")}
+                          </ReportActionButton>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="max-w-3xl">
-                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          {t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
-                        </p>
-                        <p className="mt-2 text-sm leading-6 text-slate-700">
-                          {t(currentPremiumV2Config.ruleIntro)}
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t("Jetzt verdichtet ihr die sichtbaren Punkte zu einer Fassung, nach der ihr im Alltag wirklich arbeiten wollt.")}
                         </p>
                       </div>
-                      <ReportActionButton
-                        type="button"
-                        onClick={applyDecisionRulesSuggestion}
-                        disabled={!decisionRulesSuggestion || decisionRulesWorkspace.entries.length === 0}
-                        className="shrink-0"
-                      >
-                        {t("Vorschlag einsetzen")}
-                      </ReportActionButton>
                     </div>
 
                     <div
-                      className={`mt-6 rounded-[28px] border bg-white p-5 ${
+                      className={`mt-5 rounded-[28px] border bg-white p-5 ${
                         currentPremiumV2IsLight
                           ? currentToneMeta.ruleCard
                           : currentToneMeta.ruleCard
@@ -3994,14 +3974,14 @@ export function FounderAlignmentWorkbookClient({
                       </details>
                     </div>
                   </section>
-                ) : (
+                ) : showWorkbookV2RulePreview ? (
                   <WorkbookV2PhasePreview
                     title={t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
                     summary={t(currentPremiumV2Config.rulePreviewSummary)}
                     detail={t(currentPremiumV2Config.rulePreviewDetail)}
                     className="mt-6"
                   />
-                )}
+                ) : null}
 
                 {visibleWorkbookV2Phase === "approval" ? (
                   <section className="mt-6 rounded-[24px] border border-slate-200/80 bg-slate-50/60 p-5 sm:p-6">
@@ -4043,14 +4023,14 @@ export function FounderAlignmentWorkbookClient({
                       />
                     </div>
                   </section>
-                ) : (
+                ) : visibleWorkbookV2Phase === "rule" ? (
                   <WorkbookV2PhasePreview
                     title={t("4. Zustimmung")}
                     summary={t("Die Zustimmung kommt erst ganz zum Schluss.")}
                     detail={t("So bleibt der Fokus zuerst auf Klarheit und nicht auf Status.")}
                     className="mt-6"
                   />
-                )}
+                ) : null}
               </>
             ) : (
               <>
@@ -4646,6 +4626,315 @@ function WorkbookFounderAvatar({
   );
 }
 
+function WorkbookV2DiscussionThreadList({
+  groups,
+  workspace,
+  currentUserRole,
+  founderALabel,
+  founderBLabel,
+  founderAvatarByAuthor,
+  signalOptions,
+  mode,
+  openThreadId,
+  onToggleThread,
+  onUseAsDraft,
+  onUpdateEntry,
+  onRemoveEntry,
+  onUpdateReaction,
+  entryOwnClassName,
+  entrySharedClassName,
+  sourceBadgeClassName,
+}: {
+  groups: WorkbookDiscussionThreadGroup[];
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2;
+  currentUserRole: FounderAlignmentWorkbookViewerRole;
+  founderALabel: string;
+  founderBLabel: string;
+  founderAvatarByAuthor: Record<
+    FounderAlignmentWorkbookDiscussionAuthor,
+    { avatarId: string | null; imageUrl: string | null }
+  >;
+  signalOptions: DiscussionSignalOption[];
+  mode: "collect" | "weight";
+  openThreadId: string | null;
+  onToggleThread: (rootEntryId: string) => void;
+  onUseAsDraft: (entry: FounderAlignmentWorkbookDiscussionEntry) => void;
+  onUpdateEntry: (entryId: string, content: string) => void;
+  onRemoveEntry: (entryId: string) => void;
+  onUpdateReaction: (entryId: string, signal: FounderAlignmentWorkbookDiscussionSignal) => void;
+  entryOwnClassName: string;
+  entrySharedClassName: string;
+  sourceBadgeClassName: string;
+}) {
+  const viewerFounderRole =
+    currentUserRole === "founderA" || currentUserRole === "founderB" ? currentUserRole : null;
+
+  function authorLabelFor(author: FounderAlignmentWorkbookDiscussionAuthor) {
+    return author === "founderA" ? founderALabel : founderBLabel;
+  }
+
+  function renderSignals(entry: FounderAlignmentWorkbookDiscussionEntry, compact: boolean) {
+    const signalA = getDecisionRulesReaction(workspace, entry.id, "founderA");
+    const signalB = getDecisionRulesReaction(workspace, entry.id, "founderB");
+
+    if (compact) {
+      return (
+        <div className="flex flex-wrap gap-2">
+          <WorkbookV2SignalBadge
+            label={founderALabel}
+            signal={signalA}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
+          />
+          <WorkbookV2SignalBadge
+            label={founderBLabel}
+            signal={signalB}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap gap-2">
+          {signalOptions.map((option) => {
+            const isActive =
+              viewerFounderRole != null &&
+              getDecisionRulesReaction(workspace, entry.id, viewerFounderRole) === option.value;
+
+            return (
+              <button
+                key={`${entry.id}-${option.value}`}
+                type="button"
+                disabled={viewerFounderRole == null}
+                onClick={() => onUpdateReaction(entry.id, option.value)}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                  isActive
+                    ? option.value === "critical"
+                      ? "border-rose-200/80 bg-rose-50/80 text-rose-700"
+                      : option.value === "important"
+                        ? "border-amber-200/80 bg-amber-50/80 text-amber-700"
+                        : "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
+                    : viewerFounderRole != null
+                      ? "border-slate-200/90 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
+                      : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                }`}
+              >
+                {t(option.shortLabel)}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-2 lg:justify-end">
+          <WorkbookV2SignalBadge
+            label={founderALabel}
+            signal={signalA}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
+          />
+          <WorkbookV2SignalBadge
+            label={founderBLabel}
+            signal={signalB}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  function renderEntry(
+    entry: FounderAlignmentWorkbookDiscussionEntry,
+    options: {
+      isChild: boolean;
+      open: boolean;
+    }
+  ) {
+    const isOwnEntry = viewerFounderRole != null && entry.createdBy === viewerFounderRole;
+    const authorLabel = authorLabelFor(entry.createdBy);
+    const sourceEntry = entry.sourceEntryId
+      ? workspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
+      : null;
+    const reactionCount = countDiscussionEntryReactions(workspace, entry.id);
+    const compactPreview = truncateDiscussionPreview(entry.content, options.isChild ? 120 : 180);
+    const attachmentLabel = options.isChild
+      ? sourceEntry
+        ? `Greift den Punkt von ${authorLabelFor(sourceEntry.createdBy)} auf`
+        : "Baut auf einem frueheren Punkt auf"
+      : null;
+
+    return (
+      <div
+        className={`rounded-[20px] border px-4 py-4 ${
+          isOwnEntry ? entryOwnClassName : entrySharedClassName
+        } ${options.isChild ? "bg-white/88 shadow-none" : "shadow-[0_8px_24px_rgba(15,23,42,0.03)]"}`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <WorkbookFounderAvatar
+              displayName={authorLabel}
+              avatarId={founderAvatarByAuthor[entry.createdBy].avatarId}
+              imageUrl={founderAvatarByAuthor[entry.createdBy].imageUrl}
+              size={options.isChild ? "sm" : "md"}
+            />
+            <div>
+              <p className="text-sm font-medium text-slate-900">{authorLabel}</p>
+              <p className="text-xs text-slate-500">
+                {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {attachmentLabel ? (
+              <span
+                className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${sourceBadgeClassName}`}
+              >
+                {t(attachmentLabel)}
+              </span>
+            ) : null}
+            <span className="text-xs text-slate-500">
+              {t(
+                reactionCount > 0
+                  ? `${reactionCount} Einordnungen`
+                  : options.isChild
+                    ? "Noch nicht eingeordnet"
+                    : "Noch offen"
+              )}
+            </span>
+          </div>
+        </div>
+
+        {options.open ? (
+          <>
+            {isOwnEntry ? (
+              <>
+                <textarea
+                  value={entry.content}
+                  onChange={(event) => onUpdateEntry(entry.id, event.target.value)}
+                  rows={options.isChild ? 2 : 3}
+                  className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-slate-50/40 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                />
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs leading-5 text-slate-500">
+                    {t("Aenderungen halten den Punkt aktuell und setzen seine Einordnung neu offen.")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onRemoveEntry(entry.id)}
+                    className="text-xs font-medium text-slate-500 underline-offset-4 hover:text-rose-600 hover:underline"
+                  >
+                    {t(options.isChild ? "Anschluss entfernen" : "Punkt entfernen")}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
+                {viewerFounderRole ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onUseAsDraft(entry)}
+                      className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+                    >
+                      {t("Als Basis fuer eigenen Punkt nutzen")}
+                    </button>
+                    <span className="text-xs leading-5 text-slate-500">
+                      {t("Der Ursprungspunkt bleibt unveraendert.")}
+                    </span>
+                  </div>
+                ) : null}
+              </>
+            )}
+
+            {mode === "weight" ? renderSignals(entry, false) : null}
+          </>
+        ) : (
+          <div className="mt-3">
+            <p className="text-sm leading-7 text-slate-700">{t(compactPreview)}</p>
+            {mode === "weight" ? <div className="mt-3">{renderSignals(entry, true)}</div> : null}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {groups.map((group) => {
+        const isOpen = openThreadId === group.rootEntry.id;
+        const threadEntryCount = group.childEntries.length;
+        const unresolvedCount =
+          mode === "weight"
+            ? [group.rootEntry, ...group.childEntries].filter((entry) => {
+                const reactionA = getDecisionRulesReaction(workspace, entry.id, "founderA");
+                const reactionB = getDecisionRulesReaction(workspace, entry.id, "founderB");
+                return reactionA === null || reactionB === null;
+              }).length
+            : 0;
+
+        return (
+          <article
+            key={group.rootEntry.id}
+            className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-[0_10px_26px_rgba(15,23,42,0.035)]"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                  {t(threadEntryCount > 0 ? "Gedanke mit Anschluss" : "Gedanke")}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-slate-500">
+                  {threadEntryCount > 0 ? t(`${threadEntryCount} Anschlussbeitraege`) : t("Kein Anschluss")}
+                </span>
+                {mode === "weight" && unresolvedCount > 0 ? (
+                  <span className="rounded-full border border-amber-200 bg-amber-50/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700">
+                    {t(`${unresolvedCount} offen`)}
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => onToggleThread(group.rootEntry.id)}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                >
+                  {t(isOpen ? "Schliessen" : "Oeffnen")}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-3">
+              {renderEntry(group.rootEntry, {
+                isChild: false,
+                open: isOpen,
+              })}
+            </div>
+
+            {isOpen && group.childEntries.length > 0 ? (
+              <div className="mt-4 border-l border-slate-200/90 pl-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                    {t("Anschluesse")}
+                  </span>
+                  <span className="text-xs text-slate-400">{t("eine leichte zweite Ebene")}</span>
+                </div>
+                <div className="space-y-3">
+                  {group.childEntries.map((entry) =>
+                    renderEntry(entry, {
+                      isChild: true,
+                      open: true,
+                    })
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 function WorkbookField({
   title,
   avatarId = null,
@@ -5145,7 +5434,7 @@ function WorkbookSummaryView({
 }) {
   return (
     <>
-      <div className="mt-8 grid gap-4 print:mt-6">
+      <div className="mt-10 space-y-8 print:mt-6 print:space-y-6">
         {items.map((item) => {
           const primaryAgreement = item.agreement || item.structuredOutputs?.operatingRule?.trim() || "";
           const structuredSummaryItems = buildWorkbookSummaryStructuredItems(
@@ -5155,12 +5444,15 @@ function WorkbookSummaryView({
           );
 
           return (
-            <div key={item.id} className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.035)] print:shadow-none">
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <div className="w-full">
+            <section
+              key={item.id}
+              className="rounded-[30px] border border-slate-200/75 bg-white px-7 py-8 shadow-[0_12px_34px_rgba(15,23,42,0.035)] print:break-inside-avoid print:rounded-none print:border-x-0 print:border-t-0 print:px-0 print:py-7 print:shadow-none"
+            >
+              <div className="w-full">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(item.title)}</p>
+
                 {item.id === "advisor_closing" ? (
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-5 space-y-5">
                     <SummaryInsightBlock
                       title={t("Aussenblick")}
                       text={item.advisorClosing?.observations || "Noch kein Aussenblick festgehalten."}
@@ -5173,21 +5465,20 @@ function WorkbookSummaryView({
                       title={t("Naechster sinnvoller Schritt")}
                       text={item.advisorClosing?.nextSteps || "Noch kein naechster Schritt festgehalten."}
                     />
-                    <div className="rounded-2xl border border-[color:var(--brand-primary)]/16 bg-[color:var(--brand-primary)]/6 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Antwort des Teams")}
-                      </p>
-                      <p className="mt-2 text-sm leading-7 text-slate-700">
-                        {item.founderReaction?.status
-                          ? t(founderReactionStatusLabel(item.founderReaction.status))
-                          : t("Noch kein Reaktionsstatus festgehalten.")}
-                      </p>
-                      {item.founderReaction?.comment ? (
-                        <p className="mt-2 text-sm leading-7 text-slate-700">
-                          {t(item.founderReaction.comment)}
-                        </p>
-                      ) : null}
-                    </div>
+                    <SummaryInsightBlock
+                      title={t("Antwort des Teams")}
+                      text={
+                        item.founderReaction?.comment
+                          ? `${
+                              item.founderReaction?.status
+                                ? founderReactionStatusLabel(item.founderReaction.status)
+                                : "Noch kein Reaktionsstatus festgehalten."
+                            }\n\n${item.founderReaction.comment}`
+                          : item.founderReaction?.status
+                            ? founderReactionStatusLabel(item.founderReaction.status)
+                            : "Noch kein Reaktionsstatus festgehalten."
+                      }
+                    />
                     <SummaryInsightBlock
                       title={t("Naechster Check-in")}
                       text={advisorFollowUpLabel(item.advisorFollowUp)}
@@ -5195,11 +5486,13 @@ function WorkbookSummaryView({
                   </div>
                 ) : (
                   <>
-                    <p className="mt-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4 text-sm leading-7 text-slate-800">
-                      {t(primaryAgreement || "Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
-                    </p>
+                    <div className="mt-5 border-l-2 border-slate-200 pl-5">
+                      <p className="text-[17px] leading-8 text-slate-900">
+                        {t(primaryAgreement || "Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
+                      </p>
+                    </div>
                     {structuredSummaryItems.length > 0 ? (
-                      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                      <div className="mt-7 grid gap-4 lg:grid-cols-2">
                         {structuredSummaryItems.map((summaryItem) => (
                           <SummaryInsightBlock
                             key={`${item.id}-${summaryItem.title}`}
@@ -5211,28 +5504,31 @@ function WorkbookSummaryView({
                     ) : null}
                   </>
                 )}
+
                 {item.advisorNotes ? (
-                  <div className="mt-4 rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/6 p-4">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                      {t("Hinweis aus der Moderation")}
+                  <div className="mt-6 border-t border-slate-200/80 pt-5">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                      {t("Hinweis aus der Begleitung")}
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-700">{t(item.advisorNotes)}</p>
+                    <p className="mt-3 text-[15px] leading-8 text-slate-700">{t(item.advisorNotes)}</p>
                   </div>
                 ) : null}
-                </div>
               </div>
-            </div>
+            </section>
           );
         })}
       </div>
 
-      <div className="mt-8 rounded-3xl border border-slate-200/80 bg-slate-50/75 p-5 print:mt-6">
+      <div className="mt-12 border-t border-slate-200/80 pt-8 print:mt-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm leading-7 text-slate-700">
+          <div className="max-w-3xl">
+            <p className="text-[15px] leading-8 text-slate-700">
+              {t("Diese Vereinbarung ist eure aktuelle Arbeitsgrundlage.")}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-slate-700">
               {t("Ihr könnt das jederzeit anpassen – entscheidend ist, dass ihr bewusst danach arbeitet.")}
             </p>
-            <p className="mt-1 text-xs leading-6 text-slate-500">
+            <p className="mt-3 text-xs leading-6 text-slate-400">
               {t("Kein rechtlicher Vertrag – aber eure gemeinsame Grundlage.")}
             </p>
           </div>
@@ -5297,9 +5593,18 @@ function buildWorkbookSummaryStructuredItems(
 
 function SummaryInsightBlock({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/88 p-4">
+    <div className="rounded-[24px] bg-slate-50/60 px-5 py-5">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(title)}</p>
-      <p className="mt-2 text-sm leading-7 text-slate-700">{t(text)}</p>
+      <div className="mt-3 space-y-3">
+        {t(text)
+          .split("\n\n")
+          .filter((part) => part.trim().length > 0)
+          .map((part) => (
+            <p key={`${title}-${part}`} className="text-[15px] leading-8 text-slate-700">
+              {part}
+            </p>
+          ))}
+      </div>
     </div>
   );
 }

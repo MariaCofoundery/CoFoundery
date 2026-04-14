@@ -224,6 +224,8 @@ type FinalizeInvitationRpcRow = {
 export type InvitationDashboardRow = {
   id: string;
   direction: "sent" | "incoming";
+  inviterUserId: string;
+  inviteeUserId: string | null;
   inviteeEmail: string;
   teamContext: TeamContext;
   status: string;
@@ -890,6 +892,8 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
     return {
       id: invitation.id,
       direction,
+      inviterUserId: invitation.inviter_user_id,
+      inviteeUserId: invitation.invitee_user_id,
       inviteeEmail: invitation.invitee_email,
       teamContext: normalizeTeamContext(invitation.team_context),
       status: invitation.status,

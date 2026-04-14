@@ -4,14 +4,16 @@ import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
-import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
+import {
+  sanitizeFounderAlignmentWorkbookPayload,
+} from "@/features/reporting/founderAlignmentWorkbook";
 import {
   getInvitationDashboardRows,
 } from "@/features/reporting/actions";
 import {
+  deriveWorkbookNavigationState,
   buildWorkbookHref,
   buildWorkbookIntroHref,
-  countWorkbookContentSignals,
 } from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,7 +31,57 @@ type WorkbookDashboardRow = {
 type ProductNavigationTargets = {
   matchingHref: string;
   workbookHref: string;
+  matchingItems: ProductNavigationContextItem[];
+  workbookItems: ProductNavigationContextItem[];
 };
+
+type ProductNavigationContextItem = {
+  id: string;
+  href: string;
+  title: string;
+  subtitle: string;
+  statusLabel: string;
+  avatarLabel: string;
+  avatarUrl: string | null;
+  statusKind: "ready" | "in_progress" | "completed";
+  sortDate: string;
+};
+
+type ProfileListRow = {
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
+function teamContextLabel(value: "pre_founder" | "existing_team") {
+  return value === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+}
+
+function formatNavigationTimestamp(value: string | null) {
+  if (!value) return "ohne Datum";
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+  }).format(new Date(value));
+}
+
+function fallbackNameFromEmail(value: string | null | undefined) {
+  const localPart = value?.split("@")[0]?.trim();
+  return localPart && localPart.length > 0 ? localPart : "Founder";
+}
+
+function buildAvatarLabel(value: string) {
+  const parts = value
+    .split(/\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) return "F";
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+}
 
 const spectral = localFont({
   src: [
@@ -83,6 +135,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             return {
               matchingHref: "/dashboard#dashboard-block-active",
               workbookHref: "/dashboard",
+              matchingItems: [],
+              workbookItems: [],
             } satisfies ProductNavigationTargets;
           }
 
@@ -103,38 +157,168 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             return {
               matchingHref,
               workbookHref: "/dashboard",
+              matchingItems: [],
+              workbookItems: [],
             } satisfies ProductNavigationTargets;
           }
 
-          const workbookResult = await supabase
-            .from("founder_alignment_workbooks")
-            .select("invitation_id, updated_at, payload")
-            .in("invitation_id", relevantInvitationIds)
-            .order("updated_at", { ascending: false });
+          const relevantUserIds = [
+            ...new Set(
+              invitationRows
+                .flatMap((invitation) => [invitation.inviterUserId, invitation.inviteeUserId])
+                .filter((value): value is string => Boolean(value))
+            ),
+          ];
+
+          const [workbookResult, profilesResult] = await Promise.all([
+            supabase
+              .from("founder_alignment_workbooks")
+              .select("invitation_id, updated_at, payload")
+              .in("invitation_id", relevantInvitationIds)
+              .order("updated_at", { ascending: false }),
+            relevantUserIds.length > 0
+              ? supabase
+                  .from("profiles")
+                  .select("user_id, display_name, avatar_url")
+                  .in("user_id", relevantUserIds)
+              : Promise.resolve({ data: [], error: null }),
+          ]);
 
           if (workbookResult.error) {
             return {
               matchingHref,
               workbookHref: "/dashboard",
+              matchingItems: [],
+              workbookItems: [],
             } satisfies ProductNavigationTargets;
           }
 
+          const profileByUserId = new Map(
+            (((profilesResult.data ?? []) as ProfileListRow[]) ?? []).map((row) => [
+              row.user_id,
+              {
+                displayName: row.display_name?.trim() ?? "",
+                avatarUrl: row.avatar_url?.trim() ?? "",
+              },
+            ])
+          );
           const workbookRows = ((workbookResult.data ?? []) as WorkbookDashboardRow[]).map((row) => {
             const payload = sanitizeFounderAlignmentWorkbookPayload(row.payload);
             const invitation = invitationById.get(row.invitation_id) ?? null;
+            const state = deriveWorkbookNavigationState(payload, invitation?.teamContext ?? null);
             return {
               href: buildWorkbookHref(row.invitation_id, invitation?.teamContext ?? null),
-              hasStarted: countWorkbookContentSignals(payload) > 0,
+              hasStarted: state.hasStarted,
               updatedAt: row.updated_at,
               invitationId: row.invitation_id,
+              state,
             };
           });
+          const workbookByInvitationId = new Map(workbookRows.map((row) => [row.invitationId, row]));
+
+          const matchingItems = invitationRows
+            .filter((invitation) => reportRuns.some((run) => run.invitation_id === invitation.id))
+            .map((invitation) => {
+              const reportRun =
+                reportRuns.find((run) => run.invitation_id === invitation.id) ?? null;
+              const counterpartProfile =
+                invitation.direction === "sent"
+                  ? invitation.inviteeUserId
+                    ? profileByUserId.get(invitation.inviteeUserId)
+                    : null
+                  : profileByUserId.get(invitation.inviterUserId) ?? null;
+              const fallbackCounterpartName =
+                invitation.direction === "sent"
+                  ? invitation.label?.trim() || fallbackNameFromEmail(invitation.inviteeEmail)
+                  : invitation.inviterDisplayName?.trim() ||
+                    fallbackNameFromEmail(invitation.inviterEmail);
+              const counterpartName =
+                counterpartProfile?.displayName || fallbackCounterpartName || "Founder";
+
+              return {
+                id: invitation.id,
+                href: `/report/${encodeURIComponent(invitation.id)}`,
+                title: counterpartName,
+                subtitle: `${teamContextLabel(invitation.teamContext)} · ${formatNavigationTimestamp(
+                  reportRun?.created_at ?? invitation.createdAt
+                )}`,
+                statusLabel: "Report bereit",
+                avatarLabel: buildAvatarLabel(counterpartName),
+                avatarUrl: counterpartProfile?.avatarUrl || null,
+                statusKind: "ready" as const,
+                sortDate: reportRun?.created_at ?? invitation.createdAt,
+                _sortDate: reportRun?.created_at ?? invitation.createdAt,
+              } satisfies ProductNavigationContextItem & { _sortDate: string };
+            })
+            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, "de"))
+            .map((item) => {
+              const { _sortDate: _ignoredSortDate, ...navigationItem } = item;
+              void _ignoredSortDate;
+              return navigationItem satisfies ProductNavigationContextItem;
+            });
+
+          const workbookItems = invitationRows
+            .filter((invitation) => {
+              const workbook = workbookByInvitationId.get(invitation.id) ?? null;
+              const reportReady = reportRuns.some((run) => run.invitation_id === invitation.id);
+              return Boolean(workbook || reportReady);
+            })
+            .map((invitation) => {
+              const workbook = workbookByInvitationId.get(invitation.id) ?? null;
+              const reportRun =
+                reportRuns.find((run) => run.invitation_id === invitation.id) ?? null;
+              const counterpartProfile =
+                invitation.direction === "sent"
+                  ? invitation.inviteeUserId
+                    ? profileByUserId.get(invitation.inviteeUserId)
+                    : null
+                  : profileByUserId.get(invitation.inviterUserId) ?? null;
+              const fallbackCounterpartName =
+                invitation.direction === "sent"
+                  ? invitation.label?.trim() || fallbackNameFromEmail(invitation.inviteeEmail)
+                  : invitation.inviterDisplayName?.trim() ||
+                    fallbackNameFromEmail(invitation.inviterEmail);
+              const counterpartName =
+                counterpartProfile?.displayName || fallbackCounterpartName || "Founder";
+              const workbookState =
+                workbook?.state ?? {
+                  statusKind: "ready" as const,
+                  statusLabel: "Workbook bereit",
+                };
+              const hasStarted = workbookState.statusKind !== "ready";
+              const workbookHrefForItem = hasStarted
+                ? buildWorkbookHref(invitation.id, invitation.teamContext)
+                : buildWorkbookIntroHref(invitation.id, invitation.teamContext);
+
+              return {
+                id: invitation.id,
+                href: workbookHrefForItem,
+                title: counterpartName,
+                subtitle: `${teamContextLabel(invitation.teamContext)} · ${formatNavigationTimestamp(
+                  workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt
+                )}`,
+                statusLabel: workbookState.statusLabel,
+                avatarLabel: buildAvatarLabel(counterpartName),
+                avatarUrl: counterpartProfile?.avatarUrl || null,
+                statusKind: workbookState.statusKind,
+                sortDate: workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt,
+                _sortDate: workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt,
+              } satisfies ProductNavigationContextItem & { _sortDate: string };
+            })
+            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, "de"))
+            .map((item) => {
+              const { _sortDate: _ignoredSortDate, ...navigationItem } = item;
+              void _ignoredSortDate;
+              return navigationItem satisfies ProductNavigationContextItem;
+            });
 
           const latestActiveWorkbook = workbookRows.find((row) => row.hasStarted) ?? null;
           if (latestActiveWorkbook) {
             return {
               matchingHref,
               workbookHref: latestActiveWorkbook.href,
+              matchingItems,
+              workbookItems,
             } satisfies ProductNavigationTargets;
           }
 
@@ -146,12 +330,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 latestReport.invitation_id,
                 invitation?.teamContext ?? null
               ),
+              matchingItems,
+              workbookItems,
             } satisfies ProductNavigationTargets;
           }
 
           return {
             matchingHref,
             workbookHref: "/dashboard",
+            matchingItems,
+            workbookItems,
           } satisfies ProductNavigationTargets;
         })(),
       ])
@@ -165,6 +353,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {
           matchingHref: "/dashboard#dashboard-block-active",
           workbookHref: "/dashboard",
+          matchingItems: [],
+          workbookItems: [],
         } satisfies ProductNavigationTargets,
       ];
   const displayName =
@@ -183,6 +373,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           displayName={displayName}
           matchingHref={navigationTargets.matchingHref}
           workbookHref={navigationTargets.workbookHref}
+          matchingItems={navigationTargets.matchingItems}
+          workbookItems={navigationTargets.workbookItems}
         >
           {children}
         </ProductShell>

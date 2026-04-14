@@ -33,7 +33,7 @@ import {
 import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
-  countWorkbookContentSignals,
+  deriveWorkbookNavigationState,
 } from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -219,16 +219,14 @@ export default async function DashboardPage({
     .map((row) => {
       const invitation = invitationById.get(row.invitation_id) ?? null;
       const payload = sanitizeFounderAlignmentWorkbookPayload(row.payload);
-      const contentSignals = countWorkbookContentSignals(payload);
-      const hasStarted = contentSignals > 0;
-      const isCompleted = payload.founderReaction.status !== null || contentSignals >= 8;
+      const navigationState = deriveWorkbookNavigationState(payload, invitation?.teamContext ?? null);
       return {
         invitationId: row.invitation_id,
         title: formatDashboardInvitationTitle(invitation),
         updatedAt: row.updated_at,
         href: buildWorkbookHref(row.invitation_id, invitation?.teamContext ?? null),
-        hasStarted,
-        isCompleted,
+        hasStarted: navigationState.hasStarted,
+        isCompleted: navigationState.isCompleted,
       };
     })
     .filter((row) => row.hasStarted || readyReportInvitationIds.has(row.invitationId));
