@@ -174,7 +174,7 @@ test("step marker derivation maps all structured workbook steps", () => {
   assert.equal(markers.vision_direction?.markerClass, "stable_base");
   assert.equal(markers.decision_rules?.markerClass, "conditional_complement");
   assert.equal(markers.commitment_load?.markerClass, "critical_clarification_point");
-  assert.equal(markers.collaboration_conflict?.markerClass, "critical_clarification_point");
+  assert.equal(markers.collaboration_conflict?.markerClass, "high_rule_need");
   assert.equal(markers.roles_responsibility?.markerClass, "critical_clarification_point");
 });
 

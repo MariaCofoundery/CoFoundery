@@ -32,19 +32,16 @@ import {
   buildConflictStyleSection,
   type ConflictStyleSection,
 } from "@/features/reporting/buildConflictStyleSection";
-import {
-  determineTeamArchetype,
-  type TeamArchetypeResult,
-} from "@/features/reporting/determineTeamArchetype";
 
 export type FounderAlignmentReport = {
   teamContext: TeamContext;
   overallFit: number | null;
   overallTension: number | null;
+  // Legacy compatibility report for workbook/fallback data paths.
+  // The primary founder-facing matching report now renders through FounderMatchingView.
   // Deprecated compatibility alias. Active report rendering should prefer overallTension.
   conflictRiskIndex: number | null;
   executiveSummary: ExecutiveSummaryResult;
-  teamArchetype: TeamArchetypeResult;
   sections: {
     vision: VisionSection;
     decisionLogic: DecisionLogicSection;
@@ -83,8 +80,6 @@ export function buildFounderAlignmentReport({
   scoringResult,
   teamContext,
 }: BuildFounderAlignmentReportInput): FounderAlignmentReport {
-  const teamArchetype = determineTeamArchetype(scoringResult);
-
   return {
     teamContext,
     overallFit: scoringResult.overallFit,
@@ -94,7 +89,6 @@ export function buildFounderAlignmentReport({
       scoringResult,
       teamContext,
     }),
-    teamArchetype,
     sections: {
       vision: buildVisionSection({
         dimensionResult: getDimensionResult(scoringResult.dimensions, DIMENSION_KEYS.vision),

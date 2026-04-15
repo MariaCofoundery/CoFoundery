@@ -390,24 +390,24 @@ function buildCoreSupportParagraph(signal: SelfReportSignal) {
 
 function buildCoreTensionParagraph(signal: SelfReportSignal | null) {
   if (!signal) {
-    return "Die eigentliche Spannung entsteht für dich meist nicht an einem einzelnen Thema, sondern dann, wenn im Alltag mehrere Erwartungen gleichzeitig gelten sollen und niemand früh sagt, welcher Modus gerade zählt.";
+    return "Die eigentliche Spannung entsteht fuer dich meist nicht an einem einzelnen Thema, sondern dann, wenn im Alltag mehrere Erwartungen gleichzeitig gelten und niemand frueh markiert, welcher Modus gerade gelten soll.";
   }
 
   switch (signal.dimension) {
     case "Unternehmenslogik":
-      return "Im Team kippt es für dich vor allem dann, wenn eine Chance für andere schon gut genug aussieht, du aber noch nicht siehst, wie sie zum Aufbau oder Fokus des Unternehmens passt.";
+      return "Im Team wird es fuer dich vor allem dann anspruchsvoll, wenn eine Chance fuer andere schon tragfaehig wirkt, du aber noch nicht siehst, wie sie zu Aufbau oder Fokus des Unternehmens passt.";
     case "Entscheidungslogik":
-      return "Im Team kippt es für dich dann, wenn dieselbe Entscheidung für die eine Person schon tragfähig ist, während du sie noch nicht wirklich freigeben würdest.";
+      return "Im Team wird es fuer dich dann anspruchsvoll, wenn dieselbe Entscheidung fuer die eine Person schon tragfaehig ist, waehrend du sie noch nicht wirklich freigeben wuerdest.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Im Team kippt es für dich dann, wenn Arbeit zu spät sichtbar wird oder unklar bleibt, wann Rückkopplung nötig war und wann Eigenraum gereicht hätte.";
+      return "Im Team wird es fuer dich dann anspruchsvoll, wenn Arbeit zu spaet sichtbar wird oder unklar bleibt, wann Rueckkopplung noetig war und wann Eigenraum gereicht haette.";
     case "Commitment":
-      return "Im Team kippt es für dich dann, wenn Einsatz nicht nur unterschiedlich ist, sondern im Alltag auch unterschiedlich gelesen wird: über Verfügbarkeit, Reaktionszeit und spürbaren Fokus.";
+      return "Im Team wird es fuer dich dann anspruchsvoll, wenn Einsatz nicht nur unterschiedlich ist, sondern im Alltag auch unterschiedlich gelesen wird: ueber Verfuegbarkeit, Reaktionszeit und spuerbaren Fokus.";
     case "Risikoorientierung":
-      return "Im Team kippt es für dich dann, wenn dieselbe Lage für eine Person noch vertretbar und für die andere schon zu offen oder zu eng geführt ist.";
+      return "Im Team wird es fuer dich dann anspruchsvoll, wenn dieselbe Lage fuer eine Person noch vertretbar und fuer die andere schon zu offen oder zu eng gefuehrt ist.";
     case "Konfliktstil":
-      return "Im Team kippt es für dich dann, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will früher auf den Tisch, die andere erst später und sortierter.";
+      return "Im Team wird es fuer dich dann anspruchsvoll, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will frueher auf den Tisch, die andere erst spaeter und sortierter.";
     default:
-      return "Im Team kippt es für dich vor allem dort, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
+      return "Im Team wird es fuer dich vor allem dort anspruchsvoll, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
   }
 }
 
@@ -660,48 +660,48 @@ function buildTeamBreakCopy(signal: SelfReportSignal): TeamBreakBlock {
         dimension: signal.dimension,
         title: "Wenn eine Chance gut aussieht, aber den Fokus verschiebt",
         text:
-          "Hier kippt es, wenn eine Möglichkeit für andere schon attraktiv genug ist, du aber zuerst wissen willst, was sie mit Klarheit, Aufbau oder Richtung des Unternehmens macht.",
+          "Hier wird es haeufig schwierig, wenn eine Moeglichkeit fuer andere schon attraktiv genug ist, du aber zuerst wissen willst, was sie mit Klarheit, Aufbau oder Richtung des Unternehmens macht.",
       };
     case "Entscheidungslogik":
       return {
         dimension: signal.dimension,
         title: "Wenn dieselbe Entscheidung zweimal geführt wird",
         text:
-          "Hier kippt es, wenn eine Person innerlich schon entschieden hat und die andere noch prüfen will. Dann wird nicht nur über die Sache gestritten, sondern darüber, ob die Entscheidung überhaupt schon reif ist.",
+          "Hier wird es haeufig schwierig, wenn eine Person innerlich schon entschieden hat und die andere noch pruefen will. Dann entsteht Spannung nicht nur an der Sache, sondern daran, ob die Entscheidung ueberhaupt schon reif ist.",
       };
     case "Arbeitsstruktur & Zusammenarbeit":
       return {
         dimension: signal.dimension,
         title: "Wenn Sichtbarkeit und Eigenraum unterschiedlich gelesen werden",
         text:
-          "Hier kippt es, wenn die eine Person laufend Einblick erwartet und die andere denkt, ein klarer Zwischenstand reiche völlig aus. Das fühlt sich dann schnell nach Kontrolle oder nach zu spätem Einbinden an.",
+          "Hier wird es haeufig schwierig, wenn die eine Person laufend Einblick erwartet und die andere denkt, ein klarer Zwischenstand reiche voellig aus. Das fuehlt sich dann leicht nach Kontrolle oder nach zu spaetem Einbinden an.",
       };
     case "Commitment":
       return {
         dimension: signal.dimension,
         title: "Wenn Einsatz unterschiedlich ernst genommen wird",
         text:
-          "Hier kippt es, wenn ihr nicht nur unterschiedlich viel gebt, sondern dieses Niveau auch unterschiedlich lest. Dann werden Reaktionszeit, Verfügbarkeit und Fokus still zum Streitpunkt.",
+          "Hier wird es haeufig schwierig, wenn ihr nicht nur unterschiedlich viel gebt, sondern dieses Niveau auch unterschiedlich lest. Dann werden Reaktionszeit, Verfuegbarkeit und Fokus leicht zum stillen Streitpunkt.",
       };
     case "Risikoorientierung":
       return {
         dimension: signal.dimension,
         title: "Wenn dieselbe Lage für euch nicht gleich riskant ist",
         text:
-          "Hier kippt es, wenn eine Person in einer offenen Lage noch eine vertretbare Chance sieht und die andere schon zu viel Unsicherheit spürt. Dann redet ihr scheinbar über denselben Schritt, aber nicht über dieselbe Schwelle.",
+          "Hier wird es haeufig schwierig, wenn eine Person in einer offenen Lage noch eine vertretbare Chance sieht und die andere schon zu viel Unsicherheit spürt. Dann redet ihr scheinbar ueber denselben Schritt, aber nicht ueber dieselbe Schwelle.",
       };
     case "Konfliktstil":
       return {
         dimension: signal.dimension,
         title: "Wenn Unterschiede nicht im gleichen Takt geklärt werden",
         text:
-          "Hier kippt es, wenn eine Person etwas direkt ansprechen will und die andere erst sortieren oder den richtigen Moment abwarten möchte. Dann wird schon der Zeitpunkt der Klärung selbst zum Konflikt.",
+          "Hier wird es haeufig schwierig, wenn eine Person etwas direkt ansprechen will und die andere erst sortieren oder den richtigen Moment abwarten moechte. Dann wird schon der Zeitpunkt der Klaerung selbst zum Konfliktfeld.",
       };
     default:
       return {
         dimension: signal.dimension,
         title: "Wenn Alltagserwartungen auseinanderlaufen",
-        text: "Hier kippt es, wenn im Alltag unterschiedliche Regeln gelten, ohne dass sie ausgesprochen werden.",
+        text: "Hier wird es haeufig schwierig, wenn im Alltag unterschiedliche Regeln gelten, ohne dass sie ausgesprochen werden.",
       };
   }
 }
@@ -795,72 +795,72 @@ function buildLeverCopy(signal: SelfReportSignal): LeverBlock {
         ? {
             title: "Sag früher, woran du eine Chance misst",
             text:
-              "Mach früh konkret, was für dich tragfähig genug ist. Dann wirkt dein Nein nicht pauschal, sondern nachvollziehbar.",
+              "Mach frueh konkret, was fuer dich tragfaehig genug ist. Dann wirkt dein Nein weniger pauschal und deine Logik wird fuer andere besser lesbar.",
           }
         : {
             title: "Sag früher, warum du eine Chance nicht liegen lassen willst",
             text:
-              "Benenne klar, welchen Hebel oder welches Potenzial du siehst. Dann wirkt dein Vorwärtsdrang weniger wie reiner Impuls.",
+              "Benenne klar, welchen Hebel oder welches Potenzial du siehst. Dann wirkt dein Vorwaertsdrang weniger wie reiner Impuls und mehr wie eine begruendete Prioritaet.",
           };
     case "Entscheidungslogik":
       return signal.tendencyKey === "left"
         ? {
             title: "Sag, was dir noch fehlt",
             text:
-              "Formuliere die zwei oder drei Punkte, die für dich vor einer Entscheidung noch geklärt sein müssen. So bleibt Prüfung konkret und wird nicht endlos.",
+              "Formuliere die zwei oder drei Punkte, die fuer dich vor einer Entscheidung noch geklaert sein muessen. So bleibt Pruefung konkret und wird nicht diffus oder endlos.",
           }
         : {
             title: "Sag, was schon entschieden ist und was noch offen bleiben darf",
             text:
-              "Wenn du früh festlegen willst, markiere klar den tragfähigen Kern der Entscheidung. Das nimmt anderen das Gefühl, überrollt zu werden.",
+              "Wenn du frueh festlegen willst, markiere klar den tragfaehigen Kern der Entscheidung. Das nimmt anderen eher das Gefuehl, ueberrollt zu werden.",
           };
     case "Arbeitsstruktur & Zusammenarbeit":
       return signal.tendencyKey === "left"
         ? {
             title: "Definiere deine Rückkopplungspunkte",
             text:
-              "Sag nicht nur, dass du autonom arbeiten willst. Sag auch, wann du bewusst einbindest. Dann wirkt Eigenraum nicht wie Funkstille.",
+              "Sag nicht nur, dass du autonom arbeiten willst. Sag auch, wann du bewusst einbindest. Dann wirkt Eigenraum weniger wie Funkstille.",
           }
         : {
             title: "Sag, welche Sichtbarkeit du brauchst",
             text:
-              "Mach klar, welche Zwischenstände du früh sehen willst und welche nicht. Dann fühlt sich dein Abstimmungsbedarf weniger diffus an.",
+              "Mach klar, welche Zwischenstaende du frueh sehen willst und welche nicht. Dann fuehlt sich dein Abstimmungsbedarf weniger diffus an.",
           };
     case "Commitment":
       return signal.tendencyKey === "left"
         ? {
             title: "Sprich deinen Rahmen aus, bevor andere ihn erraten",
             text:
-              "Sag früh, was du realistisch tragen kannst. So wird aus deinem Rahmen eine klare Abmachung statt ein stiller Unterschied.",
+              "Sag frueh, was du realistisch tragen kannst. So wird aus deinem Rahmen eher eine klare Abmachung als ein stiller Unterschied.",
           }
         : {
             title: "Mach Erwartungen an Einsatz explizit",
             text:
-              "Wenn dir hoher Fokus wichtig ist, sag konkret, woran man ihn im Alltag sehen soll. Dann bleibt er nicht nur als stille Messlatte im Raum.",
+              "Wenn dir hoher Fokus wichtig ist, sag konkret, woran man ihn im Alltag sehen soll. Dann bleibt er weniger als stille Messlatte im Raum.",
           };
     case "Risikoorientierung":
       return signal.tendencyKey === "left"
         ? {
             title: "Nenne deine Grenze vor der Entscheidung",
             text:
-              "Sag früh, welches Risiko für dich noch okay ist und ab wann du absichern willst. Das macht deine Vorsicht berechenbar statt bremsend.",
+              "Sag frueh, welches Risiko fuer dich noch okay ist und ab wann du absichern willst. Das macht deine Vorsicht eher berechenbar als bremsend.",
           }
         : {
             title: "Verbinde Mut mit klaren Stopps",
             text:
-              "Wenn du eine offene Chance spielen willst, nenne auch die Schwelle, an der ihr wieder aussteigt. So wird Risiko führbar.",
+              "Wenn du eine offene Chance spielen willst, nenne auch die Schwelle, an der ihr wieder aussteigt. So wird Risiko fuehrbar statt diffus.",
           };
     case "Konfliktstil":
       return signal.tendencyKey === "left"
         ? {
             title: "Sag, wann du ein Thema ansprichst",
             text:
-              "Wenn du erst sortieren willst, kündige das an. Dann wirkt dein Abwarten nicht wie Ausweichen, sondern wie ein bewusster Schritt.",
+              "Wenn du erst sortieren willst, kuendige das an. Dann wirkt dein Abwarten weniger wie Ausweichen und mehr wie ein bewusster Schritt.",
           }
         : {
             title: "Rahme direkte Ansprache kurz ein",
             text:
-              "Ein kurzer Satz wie 'ich will das früh klären, nicht größer machen' hilft oft schon. So wird Direktheit besser lesbar.",
+              "Ein kurzer Satz wie 'ich will das frueh klaeren, nicht groesser machen' hilft oft schon. So wird Direktheit fuer andere besser lesbar.",
           };
     default:
       return {

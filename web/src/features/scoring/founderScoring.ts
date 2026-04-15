@@ -40,6 +40,15 @@ export type DimensionResult = {
   dimension: string;
   scoreA: number | null;
   scoreB: number | null;
+  jointState?:
+    | "BOTH_LOW"
+    | "BOTH_MID"
+    | "BOTH_HIGH"
+    | "LOW_MID"
+    | "MID_HIGH"
+    | "OPPOSITE"
+    | null;
+  hasSharedBlindSpotRisk?: boolean;
   meanDistance: number | null;
   distance: number | null;
   itemDistance: number | null;
@@ -70,6 +79,10 @@ export type TeamScoringResult = {
   dimensions: DimensionResult[];
   overallFit: number | null;
   overallTension: number | null;
+  alignmentScore?: number | null;
+  workingCompatibilityScore?: number | null;
+  sharedBlindSpotRisk?: boolean;
+  sharedBlindSpotDimensions?: string[];
   // Deprecated compatibility alias. Active V2 report logic should read overallTension.
   conflictRiskIndex: number | null;
   overallRedFlags: string[];

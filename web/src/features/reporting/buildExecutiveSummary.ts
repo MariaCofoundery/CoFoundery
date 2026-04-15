@@ -59,46 +59,94 @@ function dimensionPrefix(dimension: string | null) {
   return dimension ? `im Bereich ${dimension}` : "in eurer Zusammenarbeit";
 }
 
-function headlineFromScores(overallFit: number | null, overallTension: number | null) {
-  if (overallFit == null || overallTension == null) {
+function getDimensionResult(scoringResult: TeamScoringResult, dimension: string | null) {
+  if (!dimension) return null;
+  return scoringResult.dimensions.find((entry) => entry.dimension === dimension) ?? null;
+}
+
+function getStrategicFocusDimension(executiveInsights: ExecutiveInsights) {
+  if (
+    executiveInsights.topTension?.dimension === "Unternehmenslogik" ||
+    executiveInsights.topTension?.dimension === "Entscheidungslogik" ||
+    executiveInsights.topTension?.dimension === "Risikoorientierung"
+  ) {
+    return executiveInsights.topTension.dimension;
+  }
+
+  return executiveInsights.topStrength?.dimension === "Unternehmenslogik"
+    ? "Unternehmenslogik"
+    : "Entscheidungslogik";
+}
+
+function getWorkingFocusDimension(executiveInsights: ExecutiveInsights) {
+  if (
+    executiveInsights.topTension?.dimension === "Arbeitsstruktur & Zusammenarbeit" ||
+    executiveInsights.topTension?.dimension === "Commitment" ||
+    executiveInsights.topTension?.dimension === "Konfliktstil"
+  ) {
+    return executiveInsights.topTension.dimension;
+  }
+
+  return executiveInsights.topStrength?.dimension === "Arbeitsstruktur & Zusammenarbeit"
+    ? "Arbeitsstruktur & Zusammenarbeit"
+    : "Commitment";
+}
+
+function headlineFromState(scoringResult: TeamScoringResult) {
+  const alignmentScore = scoringResult.alignmentScore;
+  const workingCompatibilityScore = scoringResult.workingCompatibilityScore;
+
+  if (alignmentScore == null || workingCompatibilityScore == null) {
     return "Noch keine belastbare Gesamteinschaetzung";
   }
 
-  if (overallFit >= 85 && overallTension <= 25) {
-    return "Hohe Passung mit stabiler gemeinsamer Basis";
+  if (scoringResult.sharedBlindSpotRisk && alignmentScore >= 60 && workingCompatibilityScore >= 60) {
+    return "Viel gemeinsame Basis mit stillen Watchpoints";
   }
 
-  if (overallFit >= 70 && overallTension <= 55) {
-    return "Gute Grundlage mit einzelnen Klaerungsthemen";
+  if (alignmentScore >= 72 && workingCompatibilityScore >= 72) {
+    return "Strategisch und operativ tragfaehige Basis";
   }
 
-  if (overallFit >= 50) {
-    return "Erkennbare Unterschiede mit bewusstem Gespraechsbedarf";
+  if (alignmentScore >= 68 && workingCompatibilityScore < 60) {
+    return "Strategisch nah, operativ mit Klaerungsbedarf";
   }
 
-  return "Unterschiedliche Arbeitslogiken mit hohem Abstimmungsbedarf";
+  if (alignmentScore < 60 && workingCompatibilityScore >= 68) {
+    return "Im Alltag anschlussfaehig, strategisch mit Spannungsfeld";
+  }
+
+  if (alignmentScore < 60 && workingCompatibilityScore < 60) {
+    return "Strategisch und operativ mit hohem Klaerungsbedarf";
+  }
+
+  return "Teilweise tragfaehig, aber nicht in denselben Feldern";
 }
 
 function introForContext(
   teamContext: TeamContext,
-  overallFit: number | null,
-  overallTension: number | null,
-  executiveInsights: ExecutiveInsights
+  scoringResult: TeamScoringResult
 ) {
+  const alignmentScore = scoringResult.alignmentScore;
+  const workingCompatibilityScore = scoringResult.workingCompatibilityScore;
+  const executiveInsights = scoringResult.executiveInsights;
   const strengthDimension = executiveInsights.topStrength?.dimension;
-  const tensionDimension = executiveInsights.topTension?.dimension;
+  const tensionDimension = executiveInsights.topTension?.dimension ?? null;
   const complementaryDimension = executiveInsights.topComplementaryDynamic?.dimension;
+  const tensionResult = getDimensionResult(scoringResult, tensionDimension);
 
   const fitText =
-    overallFit == null
+    alignmentScore == null || workingCompatibilityScore == null
       ? "Die aktuelle Datenlage erlaubt noch keine belastbare Gesamteinschaetzung eurer Zusammenarbeit."
-      : overallFit >= 85
-        ? "Eure Zusammenarbeit wirkt in der Grundanlage sehr tragfaehig und klar ausgerichtet."
-        : overallFit >= 70
-          ? "Eure Zusammenarbeit wirkt insgesamt gut anschlussfaehig und in zentralen Punkten gut vereinbar."
-          : overallFit >= 50
-            ? "Eure Zusammenarbeit bringt eine erkennbare gemeinsame Basis mit, zeigt aber auch Unterschiede, die im Alltag spuerbar werden koennen."
-            : "Eure Zusammenarbeit ist aktuell von deutlicheren Unterschieden gepraegt, die eine bewusste gemeinsame Einordnung brauchen.";
+      : alignmentScore >= 72 && workingCompatibilityScore >= 72
+        ? "Strategisch und im Arbeitsalltag habt ihr eine tragfaehige gemeinsame Basis."
+        : alignmentScore >= 68 && workingCompatibilityScore < 60
+          ? "Strategisch seid ihr naeher beieinander als im Alltag; Reibung entsteht eher aus Zusammenarbeit als aus Richtung."
+          : alignmentScore < 60 && workingCompatibilityScore >= 68
+            ? "Im Alltag koennt ihr gut anschliessen, aber strategisch lest ihr zentrale Fragen noch nicht nach denselben Massstaeben."
+            : alignmentScore < 60 && workingCompatibilityScore < 60
+              ? "Strategische Richtung und operative Zusammenarbeit brauchen beide deutlich mehr bewusste Klaerung."
+              : "Ihr habt belastbare Anknuepfungspunkte, aber nicht in denselben Feldern.";
 
   const strengthSentence = strengthDimension
     ? `Eine klare Staerke liegt derzeit ${dimensionPrefix(strengthDimension)}.`
@@ -109,10 +157,14 @@ function introForContext(
       ? `Gerade Unterschiede ${dimensionPrefix(complementaryDimension)} koennen eine produktive Ergaenzung sein.`
       : null;
 
-  const tensionSentence = tensionDimension
-    ? `Besonders aufmerksam solltet ihr auf die Abstimmung ${dimensionPrefix(tensionDimension)} schauen.`
-    : overallTension != null && overallTension > 55
-      ? "Einzelne Themen verdienen fruehzeitig eine bewusstere Abstimmung."
+  const tensionSentence = scoringResult.sharedBlindSpotRisk
+    ? tensionDimension
+      ? `Besonders aufmerksam solltet ihr auf ${dimensionPrefix(tensionDimension)} schauen, weil gemeinsame Tendenzen dort leicht still mitlaufen koennen.`
+      : "Gerade Felder mit hoher gemeinsamer Naehe verdienen Aufmerksamkeit, damit aus Gleichlauf kein stiller Blind Spot wird."
+    : tensionDimension
+      ? tensionResult?.jointState === "OPPOSITE" || tensionResult?.conflictRisk === "high"
+        ? `Besonders aufmerksam solltet ihr auf die Abstimmung ${dimensionPrefix(tensionDimension)} schauen.`
+        : `Besonders bewusst fuehren solltet ihr ${dimensionPrefix(tensionDimension)}, weil dort wiederkehrende Koordination noetig wird.`
       : "Die wichtigsten Abstimmungsthemen wirken derzeit gut besprechbar.";
 
   if (teamContext === "pre_founder") {
@@ -159,13 +211,32 @@ function promptsForDimension(dimension: string | null) {
 }
 
 function collectRecommendedFocus(
-  executiveInsights: ExecutiveInsights,
+  scoringResult: TeamScoringResult,
   teamContext: TeamContext
 ) {
+  const executiveInsights = scoringResult.executiveInsights;
   const prompts: string[] = [];
+  const sharedBlindSpotDimension = (scoringResult.sharedBlindSpotDimensions ?? [])[0] ?? null;
+  const topTensionDimension = executiveInsights.topTension?.dimension ?? null;
+  const topTensionResult = getDimensionResult(scoringResult, topTensionDimension);
 
-  if (executiveInsights.topTension) {
-    prompts.push(...promptsForDimension(executiveInsights.topTension.dimension).slice(0, 2));
+  if (sharedBlindSpotDimension) {
+    prompts.push(...promptsForDimension(sharedBlindSpotDimension).slice(0, 2));
+  }
+
+  if (
+    topTensionDimension &&
+    (!topTensionResult?.hasSharedBlindSpotRisk || prompts.length === 0)
+  ) {
+    prompts.push(...promptsForDimension(topTensionDimension).slice(0, 2));
+  }
+
+  if ((scoringResult.alignmentScore ?? 0) < 65) {
+    prompts.push(...promptsForDimension(getStrategicFocusDimension(executiveInsights)).slice(0, 1));
+  }
+
+  if ((scoringResult.workingCompatibilityScore ?? 0) < 65) {
+    prompts.push(...promptsForDimension(getWorkingFocusDimension(executiveInsights)).slice(0, 1));
   }
 
   if (executiveInsights.topComplementaryDynamic) {
@@ -201,22 +272,28 @@ export function buildExecutiveSummary({
   scoringResult,
   teamContext,
 }: BuildExecutiveSummaryInput): ExecutiveSummaryResult {
-  const overallTension = scoringResult.overallTension;
+  const topTensionResult = getDimensionResult(
+    scoringResult,
+    scoringResult.executiveInsights.topTension?.dimension ?? null
+  );
+  const topTensionMessage =
+    scoringResult.executiveInsights.topTension == null
+      ? null
+      : topTensionResult?.hasSharedBlindSpotRisk
+        ? `Aufmerksam beobachten solltet ihr vor allem ${dimensionPrefix(
+            scoringResult.executiveInsights.topTension.dimension
+          )}: ${scoringResult.executiveInsights.topTension.title}`
+        : tensionMessage(scoringResult.executiveInsights.topTension);
 
   return {
     teamContext,
-    headline: headlineFromScores(scoringResult.overallFit, overallTension),
-    summaryIntro: introForContext(
-      teamContext,
-      scoringResult.overallFit,
-      overallTension,
-      scoringResult.executiveInsights
-    ),
+    headline: headlineFromState(scoringResult),
+    summaryIntro: introForContext(teamContext, scoringResult),
     topMessages: {
       strength: strengthMessage(scoringResult.executiveInsights.topStrength),
       complementaryDynamic: complementaryMessage(scoringResult.executiveInsights.topComplementaryDynamic),
-      tension: tensionMessage(scoringResult.executiveInsights.topTension),
+      tension: topTensionMessage,
     },
-    recommendedFocus: collectRecommendedFocus(scoringResult.executiveInsights, teamContext),
+    recommendedFocus: collectRecommendedFocus(scoringResult, teamContext),
   };
 }

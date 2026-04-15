@@ -4,6 +4,7 @@ import {
   type DimensionId,
   type DimensionMatch,
   type FounderMatchProfile,
+  type JointState,
   type MatchResult,
   type MatchCategory,
   type RiskLevel,
@@ -61,6 +62,8 @@ type DimensionResult = {
   dimension: string;
   scoreA: number | null;
   scoreB: number | null;
+  jointState: JointState | null;
+  hasSharedBlindSpotRisk: boolean;
   meanDistance: number | null;
   distance: number | null;
   itemDistance: number | null;
@@ -89,6 +92,10 @@ type TeamScoringResultV2 = {
   dimensions: DimensionResult[];
   overallFit: number | null;
   overallTension: number | null;
+  alignmentScore: number | null;
+  workingCompatibilityScore: number | null;
+  sharedBlindSpotRisk: boolean;
+  sharedBlindSpotDimensions: string[];
   conflictRiskIndex: number | null;
   overallRedFlags: string[];
   overallGreenFlags: string[];
@@ -166,6 +173,39 @@ const TENSION_LABELS: Record<DimensionId, { medium: string; high: string }> = {
   },
 };
 
+const SHARED_POSITION_LABELS: Record<
+  DimensionId,
+  {
+    BOTH_HIGH: string;
+    BOTH_LOW: string;
+  }
+> = {
+  company_logic: {
+    BOTH_HIGH: "gemeinsamer Zug in dieselbe starke Richtung",
+    BOTH_LOW: "gemeinsame Absicherung in dieselbe Richtung",
+  },
+  decision_logic: {
+    BOTH_HIGH: "gemeinsamer hoher Entscheidungszug",
+    BOTH_LOW: "gemeinsame hohe Prueftiefe",
+  },
+  work_structure: {
+    BOTH_HIGH: "gemeinsam hoher Eigenraum- und Tempodruck",
+    BOTH_LOW: "gemeinsam hoher Sichtbarkeits- und Abstimmungsbedarf",
+  },
+  commitment: {
+    BOTH_HIGH: "gemeinsam sehr hohes Einsatzniveau",
+    BOTH_LOW: "gemeinsam begrenzterer Einsatzrahmen",
+  },
+  risk_orientation: {
+    BOTH_HIGH: "gemeinsam hohe Risikobereitschaft",
+    BOTH_LOW: "gemeinsam hohe Absicherungslogik",
+  },
+  conflict_style: {
+    BOTH_HIGH: "gemeinsam direkte Klaerung",
+    BOTH_LOW: "gemeinsam spaete oder vorsichtige Klaerung",
+  },
+};
+
 const DIMENSION_STRENGTH_TEXT: Record<DimensionId, string> = {
   company_logic:
     "Eure Unternehmenslogik liegt nah genug beieinander, dass strategische Prioritaeten auf einer aehnlichen Grundannahme aufbauen koennen.",
@@ -226,6 +266,51 @@ const DIMENSION_TENSION_TEXT: Record<DimensionId, { medium: string; high: string
       "Der gleiche Widerspruch wird unterschiedlich frueh und unterschiedlich direkt angesprochen.",
     high:
       "Missverstaendnisse entstehen nicht nur am Thema, sondern an der Art, wie Unterschiede angesprochen oder liegen gelassen werden.",
+  },
+};
+
+const DIMENSION_SHARED_POSITION_TEXT: Record<
+  DimensionId,
+  {
+    BOTH_HIGH: string;
+    BOTH_LOW: string;
+  }
+> = {
+  company_logic: {
+    BOTH_HIGH:
+      "Ihr schaut beide eher nach vorne, Hebel und Bewegung. Das schafft Zug, braucht aber eine bewusste Gegenkraft gegen opportunistische Richtungswechsel.",
+    BOTH_LOW:
+      "Ihr schaut beide eher auf Substanz und Absicherung. Das kann tragen, braucht aber Schutz davor, dass Chancen zu spaet geoeffnet werden.",
+  },
+  decision_logic: {
+    BOTH_HIGH:
+      "Ihr seid beide eher bereit, mit begrenzterer Klarheit zu entscheiden. Das beschleunigt, kann aber dieselbe Luecke fuer euch beide unsichtbar machen.",
+    BOTH_LOW:
+      "Ihr wollt beide eher mehr Reife vor einer Entscheidung. Das schafft Sorgfalt, kann aber dieselbe Entscheidung zu lange offen halten.",
+  },
+  work_structure: {
+    BOTH_HIGH:
+      "Ihr gebt beide eher viel Eigenraum und Tempo. Das kann effizient sein, braucht aber klare Sichtbarkeit, damit Themen nicht still auseinanderlaufen.",
+    BOTH_LOW:
+      "Ihr wollt beide eher viel Mitsicht und Rueckkopplung. Das schafft Sicherheit, kann aber Tempo und Eigenverantwortung unnoetig verengen.",
+  },
+  commitment: {
+    BOTH_HIGH:
+      "Ihr bringt beide sehr viel Einsatz hinein. Das wirkt stark, braucht aber klare Grenzen gegen stille Ueberlast und gegenseitige Selbstverstaendlichkeitslogik.",
+    BOTH_LOW:
+      "Ihr bringt beide einen begrenzteren oder realistisch engeren Einsatzrahmen mit. Das kann tragbar sein, braucht aber explizite Erwartungen an Verbindlichkeit und Priorisierung.",
+  },
+  risk_orientation: {
+    BOTH_HIGH:
+      "Ihr seid beide eher bereit, Wetten zu gehen. Das oeffnet Chancen, braucht aber klare Schwellen dafuer, wann Absicherung Vorrang bekommt.",
+    BOTH_LOW:
+      "Ihr seid beide eher vorsichtig. Das schuetzt vor unnoetiger Exposition, kann aber gemeinsam zu spaetes Handeln erzeugen.",
+  },
+  conflict_style: {
+    BOTH_HIGH:
+      "Ihr sprecht Spannung beide eher direkt an. Das kann klaerend sein, braucht aber Leitplanken gegen Eskalation aus Zug heraus.",
+    BOTH_LOW:
+      "Ihr sprecht Spannung beide eher spaeter oder vorsichtiger an. Das haelt Gespraeche ruhig, kann aber Konflikte zu lange unter der Oberflaeche halten.",
   },
 };
 
@@ -372,6 +457,8 @@ function toInsufficientDimensionResult(dimensionId: DimensionId): DimensionResul
     dimension: DIMENSION_ID_TO_CANONICAL[dimensionId],
     scoreA: null,
     scoreB: null,
+    jointState: null,
+    hasSharedBlindSpotRisk: false,
     meanDistance: null,
     distance: null,
     itemDistance: null,
@@ -398,12 +485,12 @@ function toInsufficientDimensionResult(dimensionId: DimensionId): DimensionResul
 }
 
 function derivePatternCategory(
-  category: MatchCategory,
-  distance: number,
-  riskLevel: RiskLevel
+  match: DimensionMatch
 ): PatternCategory {
-  if (category === "aligned") return "aligned";
-  if (riskLevel === "high" || distance > 50) return "clear_difference";
+  if (match.category === "aligned" && match.riskLevel === "low") return "aligned";
+  if (match.riskLevel === "high" || match.distance > 50 || match.jointState === "OPPOSITE") {
+    return "clear_difference";
+  }
   return "moderate_difference";
 }
 
@@ -414,6 +501,10 @@ function mapConflictRisk(riskLevel: RiskLevel): ConflictRiskLevel {
 }
 
 function deriveDynamicLabel(match: DimensionMatch) {
+  if (match.jointState === "BOTH_HIGH" || match.jointState === "BOTH_LOW") {
+    return SHARED_POSITION_LABELS[match.dimensionId][match.jointState];
+  }
+
   if (match.category === "aligned") {
     return ALIGNED_LABELS[match.dimensionId];
   }
@@ -427,8 +518,12 @@ function deriveDynamicLabel(match: DimensionMatch) {
 }
 
 function deriveTensionScore(match: DimensionMatch) {
-  if (match.category === "aligned") {
+  if (match.category === "aligned" && match.riskLevel === "low") {
     return round(clamp(match.distance, 0, 25));
+  }
+
+  if (match.category === "aligned") {
+    return round(clamp(34 + match.distance * 0.4, 32, 58));
   }
 
   if (match.category === "complementary") {
@@ -447,30 +542,42 @@ function buildDimensionResult(match: DimensionMatch): DimensionResult {
   const fitCategory = deriveFitCategory(match.baseCompatibility);
   const tensionLevel = match.riskLevel === "high" ? "high" : "medium";
   const tensionText = TENSION_LABELS[match.dimensionId][tensionLevel];
+  const sharedPositionText =
+    match.jointState === "BOTH_HIGH" || match.jointState === "BOTH_LOW"
+      ? DIMENSION_SHARED_POSITION_TEXT[match.dimensionId][match.jointState]
+      : null;
 
   const collaborationStrengths =
-    match.category === "aligned" ? [DIMENSION_STRENGTH_TEXT[match.dimensionId]] : [];
+    match.category === "aligned" && match.riskLevel === "low"
+      ? [DIMENSION_STRENGTH_TEXT[match.dimensionId]]
+      : [];
   const complementaryDynamics =
     match.category === "complementary"
       ? [DIMENSION_COMPLEMENTARY_TEXT[match.dimensionId] ?? "Diese Unterschiede koennen produktiv sein, wenn ihr sie bewusst fuehrt."]
       : [];
-  const potentialTensionAreas =
-    match.category === "tension" ? [DIMENSION_TENSION_TEXT[match.dimensionId][tensionLevel]] : [];
+  const potentialTensionAreas = uniqueStrings(
+    [
+      sharedPositionText,
+      match.category === "tension" ? DIMENSION_TENSION_TEXT[match.dimensionId][tensionLevel] : null,
+    ].filter((value): value is string => value != null)
+  );
 
   return {
     dimension: DIMENSION_ID_TO_CANONICAL[match.dimensionId],
     scoreA: match.scoreA,
     scoreB: match.scoreB,
+    jointState: match.jointState,
+    hasSharedBlindSpotRisk: match.hasSharedBlindSpotRisk,
     meanDistance: match.distance,
     distance: match.distance,
     itemDistance: match.distance,
     oppositionCount:
-      (match.scoreA <= 25 && match.scoreB >= 75) || (match.scoreB <= 25 && match.scoreA >= 75)
+      match.jointState === "OPPOSITE"
         ? 1
         : 0,
-    hiddenDifferenceScore: 0,
+    hiddenDifferenceScore: null,
     hasHiddenDifferences: false,
-    patternCategory: derivePatternCategory(match.category, match.distance, match.riskLevel),
+    patternCategory: derivePatternCategory(match),
     alignment: match.baseCompatibility,
     alignmentCategory: fitCategory,
     complementarity: match.category === "complementary" ? match.baseCompatibility : null,
@@ -481,9 +588,13 @@ function buildDimensionResult(match: DimensionMatch): DimensionResult {
     tensionCategory: deriveTensionCategory(tensionScore),
     dynamicLabel: deriveDynamicLabel(match),
     isComplementaryDynamic: match.category === "complementary",
-    redFlags: match.riskLevel === "high" ? [tensionText] : [],
+    redFlags: uniqueStrings(
+      [match.riskLevel === "high" ? tensionText : null, sharedPositionText].filter(
+        (value): value is string => value != null && match.riskLevel !== "low"
+      )
+    ),
     greenFlags:
-      match.category === "aligned"
+      match.category === "aligned" && match.riskLevel === "low"
         ? [DIMENSION_STRENGTH_TEXT[match.dimensionId]]
         : match.category === "complementary"
           ? [DIMENSION_COMPLEMENTARY_TEXT[match.dimensionId] ?? "Diese Unterschiede koennen produktiv sein."]
@@ -542,17 +653,54 @@ function buildExecutiveInsights(
     ])
   );
 
+  const sortDimensionIds = (
+    selector: (match: DimensionMatch, result: DimensionResult | null) => number
+  ) =>
+    [...matchResult.dimensions]
+      .map((match) => ({
+        match,
+        result: byDimensionId.get(match.dimensionId) ?? null,
+        priority: selector(match, byDimensionId.get(match.dimensionId) ?? null),
+      }))
+      .filter((entry) => entry.priority > Number.NEGATIVE_INFINITY)
+      .sort(
+        (a, b) =>
+          b.priority - a.priority ||
+          (MATCH_WEIGHTS[b.match.dimensionId] ?? 0) - (MATCH_WEIGHTS[a.match.dimensionId] ?? 0) ||
+          a.match.distance - b.match.distance ||
+          a.match.dimensionId.localeCompare(b.match.dimensionId)
+      )
+      .map((entry) => entry.match.dimensionId);
+
   const topStrengthDimensionId =
-    matchResult.topAlignments.find((dimensionId) => {
-      const result = byDimensionId.get(dimensionId);
-      return result?.fitCategory === "very_high" || result?.fitCategory === "high";
-    }) ?? matchResult.topAlignments[0] ?? null;
+    sortDimensionIds((match) =>
+      match.category === "aligned" &&
+      match.riskLevel === "low" &&
+      match.jointState === "BOTH_MID" &&
+      !match.hasSharedBlindSpotRisk
+        ? 120
+        : Number.NEGATIVE_INFINITY
+    )[0] ?? null;
+
   const topComplementaryDimensionId =
-    matchResult.topAlignments.find((dimensionId) => {
-      const result = byDimensionId.get(dimensionId);
-      return result?.isComplementaryDynamic === true;
-    }) ?? null;
-  const topTensionDimensionId = matchResult.topTensions[0] ?? null;
+    sortDimensionIds((match) =>
+      match.category === "complementary" &&
+      match.riskLevel !== "high" &&
+      !match.hasSharedBlindSpotRisk &&
+      (match.jointState === "LOW_MID" || match.jointState === "MID_HIGH")
+        ? 110
+        : Number.NEGATIVE_INFINITY
+    )[0] ?? null;
+
+  const topTensionDimensionId =
+    sortDimensionIds((match) => {
+      if (match.jointState === "OPPOSITE") return 160;
+      if (match.riskLevel === "high" && (match.appliedRules?.length ?? 0) > 0) return 150;
+      if (match.riskLevel === "high") return 140;
+      if (match.hasSharedBlindSpotRisk) return 130;
+      if (match.riskLevel === "medium") return 120;
+      return Number.NEGATIVE_INFINITY;
+    })[0] ?? null;
 
   return {
     topStrength: topStrengthDimensionId
@@ -607,11 +755,23 @@ export function scoreFounderAlignmentV2(
   const hasAnyScoredDimension = matchResult.dimensions.length > 0;
   const overallTension = hasAnyScoredDimension ? computeOverallTension(dimensions) : null;
   const executiveInsights = buildExecutiveInsights(dimensions, matchResult);
+  const sharedBlindSpotDimensions = matchResult.dimensions
+    .filter((dimension) => dimension.hasSharedBlindSpotRisk)
+    .sort(
+      (a, b) =>
+        (MATCH_WEIGHTS[b.dimensionId] ?? 0) - (MATCH_WEIGHTS[a.dimensionId] ?? 0) ||
+        a.distance - b.distance
+    )
+    .map((dimension) => DIMENSION_ID_TO_CANONICAL[dimension.dimensionId]);
 
   return {
     dimensions,
     overallFit: hasAnyScoredDimension ? matchResult.overallScore : null,
     overallTension,
+    alignmentScore: hasAnyScoredDimension ? matchResult.alignmentScore : null,
+    workingCompatibilityScore: hasAnyScoredDimension ? matchResult.workingCompatibilityScore : null,
+    sharedBlindSpotRisk: sharedBlindSpotDimensions.length > 0,
+    sharedBlindSpotDimensions,
     // Legacy alias kept as a temporary compatibility field for downstream consumers
     // that still expect the old property name. The V2 source of truth is overallTension.
     conflictRiskIndex: overallTension,
@@ -646,11 +806,23 @@ export function scoreFounderAlignmentV2FromAnswerMap(input: {
   const hasAnyScoredDimension = matchResult.dimensions.length > 0;
   const overallTension = hasAnyScoredDimension ? computeOverallTension(dimensions) : null;
   const executiveInsights = buildExecutiveInsights(dimensions, matchResult);
+  const sharedBlindSpotDimensions = matchResult.dimensions
+    .filter((dimension) => dimension.hasSharedBlindSpotRisk)
+    .sort(
+      (a, b) =>
+        (MATCH_WEIGHTS[b.dimensionId] ?? 0) - (MATCH_WEIGHTS[a.dimensionId] ?? 0) ||
+        a.distance - b.distance
+    )
+    .map((dimension) => DIMENSION_ID_TO_CANONICAL[dimension.dimensionId]);
 
   return {
     dimensions,
     overallFit: hasAnyScoredDimension ? matchResult.overallScore : null,
     overallTension,
+    alignmentScore: hasAnyScoredDimension ? matchResult.alignmentScore : null,
+    workingCompatibilityScore: hasAnyScoredDimension ? matchResult.workingCompatibilityScore : null,
+    sharedBlindSpotRisk: sharedBlindSpotDimensions.length > 0,
+    sharedBlindSpotDimensions,
     conflictRiskIndex: overallTension,
     overallRedFlags: uniqueStrings(dimensions.flatMap((dimension) => dimension.redFlags)),
     overallGreenFlags: uniqueStrings(dimensions.flatMap((dimension) => dimension.greenFlags)),

@@ -66,8 +66,14 @@ export type FounderMatchingSelection = {
 };
 
 type EnrichedDimension = MatchingSelectionEntry & {
+  jointState: DimensionMatchResult["jointState"];
+  category: DimensionMatchResult["category"];
+  riskLevel: DimensionMatchResult["riskLevel"];
+  hasSharedBlindSpotRisk: boolean;
+  hasSharedExtremeHigh: boolean;
+  hasSharedExtremeLow: boolean;
+  appliedRules: string[];
   priorityWeight: number;
-  categoryPriority: number;
 };
 
 const DIMENSION_PRIORITY: Record<FounderDimensionKey, number> = {
@@ -121,10 +127,14 @@ function getPriorityBoost(
 }
 
 function getStatus(
-  dimension: Pick<DimensionMatchResult, "category" | "riskLevel" | "interactionType">,
+  dimension: Pick<
+    DimensionMatchResult,
+    "category" | "riskLevel" | "interactionType"
+  >,
   tensionType: TensionType | null
 ): MatchingDimensionStatus {
   if (dimension.category === "tension" && dimension.riskLevel === "high") return "kritisch";
+  if (dimension.category === "complementary" && dimension.riskLevel === "high") return "kritisch";
   if (dimension.category === "tension" && dimension.riskLevel === "medium") {
     return "abstimmung_nötig";
   }
@@ -132,14 +142,6 @@ function getStatus(
     return "ergänzend";
   }
   return "nah";
-}
-
-function getCategoryPriority(status: MatchingDimensionStatus, tensionType: TensionType | null) {
-  if (status === "kritisch") return 4;
-  if (status === "abstimmung_nötig") return 3;
-  if (status === "ergänzend" && tensionType === "productive") return 2;
-  if (status === "nah") return 1;
-  return 0;
 }
 
 function enrichDimensions(compareResult: CompareFoundersResult): EnrichedDimension[] {
@@ -158,15 +160,67 @@ function enrichDimensions(compareResult: CompareFoundersResult): EnrichedDimensi
       scoreB: dimension.scoreB,
       explanationKey: dimension.explanationKey,
       reason: "",
+      jointState: dimension.jointState,
+      category: dimension.category,
+      riskLevel: dimension.riskLevel,
+      hasSharedBlindSpotRisk: dimension.hasSharedBlindSpotRisk,
+      hasSharedExtremeHigh: dimension.hasSharedExtremeHigh,
+      hasSharedExtremeLow: dimension.hasSharedExtremeLow,
+      appliedRules: dimension.appliedRules ?? [],
       priorityWeight: DIMENSION_PRIORITY[dimension.dimension] + getPriorityBoost(dimension, status),
-      categoryPriority: getCategoryPriority(status, tension?.tensionType ?? null),
     };
   });
 }
 
-function sortByStableBase(a: EnrichedDimension, b: EnrichedDimension) {
+function isStableStrength(dimension: EnrichedDimension) {
   return (
-    b.priorityWeight - a.priorityWeight ||
+    dimension.status === "nah" &&
+    !dimension.hasSharedBlindSpotRisk &&
+    dimension.category === "aligned" &&
+    dimension.riskLevel === "low" &&
+    dimension.jointState === "BOTH_MID"
+  );
+}
+
+function isOpportunity(dimension: EnrichedDimension) {
+  return (
+    dimension.status === "ergänzend" &&
+    !dimension.hasSharedBlindSpotRisk &&
+    dimension.category === "complementary" &&
+    dimension.riskLevel !== "high" &&
+    (dimension.jointState === "LOW_MID" || dimension.jointState === "MID_HIGH")
+  );
+}
+
+function isRuleEscalatedHighRisk(dimension: EnrichedDimension) {
+  return dimension.riskLevel === "high" && dimension.appliedRules.length > 0;
+}
+
+function isBlindSpotWatch(dimension: EnrichedDimension) {
+  return (
+    dimension.hasSharedBlindSpotRisk ||
+    dimension.hasSharedExtremeHigh ||
+    dimension.hasSharedExtremeLow ||
+    dimension.jointState === "BOTH_HIGH" ||
+    dimension.jointState === "BOTH_LOW"
+  );
+}
+
+function isTensionPressure(dimension: EnrichedDimension) {
+  if (dimension.jointState === "OPPOSITE") return true;
+  if (dimension.status === "kritisch") return true;
+  return dimension.status === "abstimmung_nötig" && !isBlindSpotWatch(dimension);
+}
+
+function sortByStableBase(a: EnrichedDimension, b: EnrichedDimension) {
+  const stableScore = (dimension: EnrichedDimension) =>
+    (isStableStrength(dimension) ? 12 : 0) +
+    (dimension.jointState === "BOTH_MID" ? 6 : 0) +
+    (dimension.riskLevel === "low" ? 4 : 0) +
+    dimension.priorityWeight;
+
+  return (
+    stableScore(b) - stableScore(a) ||
     (a.difference ?? 999) - (b.difference ?? 999) ||
     a.dimension.localeCompare(b.dimension)
   );
@@ -174,20 +228,43 @@ function sortByStableBase(a: EnrichedDimension, b: EnrichedDimension) {
 
 function sortByComplement(a: EnrichedDimension, b: EnrichedDimension) {
   const complementFit = (dimension: EnrichedDimension) =>
-    (dimension.relationType === "moderate_difference" ? 0.35 : 0) + dimension.priorityWeight;
+    (isOpportunity(dimension) ? 10 : 0) +
+    (dimension.jointState === "LOW_MID" || dimension.jointState === "MID_HIGH" ? 4 : 0) +
+    dimension.priorityWeight;
 
   return (
     complementFit(b) - complementFit(a) ||
-    (b.difference ?? 0) - (a.difference ?? 0) ||
+    (a.difference ?? 999) - (b.difference ?? 999) ||
     a.dimension.localeCompare(b.dimension)
   );
 }
 
 function sortByTension(a: EnrichedDimension, b: EnrichedDimension) {
+  const tensionRank = (dimension: EnrichedDimension) => {
+    if (dimension.jointState === "OPPOSITE") return 5;
+    if (isRuleEscalatedHighRisk(dimension)) return 4;
+    if (dimension.status === "kritisch") return 3;
+    if (dimension.status === "abstimmung_nötig") return 2;
+    return 1;
+  };
+
   return (
-    b.categoryPriority - a.categoryPriority ||
+    tensionRank(b) - tensionRank(a) ||
     b.priorityWeight - a.priorityWeight ||
     (b.difference ?? 0) - (a.difference ?? 0) ||
+    a.dimension.localeCompare(b.dimension)
+  );
+}
+
+function sortByBlindSpotWatch(a: EnrichedDimension, b: EnrichedDimension) {
+  const blindSpotRank = (dimension: EnrichedDimension) =>
+    (dimension.jointState === "BOTH_HIGH" || dimension.jointState === "BOTH_LOW" ? 8 : 0) +
+    (dimension.hasSharedExtremeHigh || dimension.hasSharedExtremeLow ? 4 : 0) +
+    dimension.priorityWeight;
+
+  return (
+    blindSpotRank(b) - blindSpotRank(a) ||
+    (a.difference ?? 999) - (b.difference ?? 999) ||
     a.dimension.localeCompare(b.dimension)
   );
 }
@@ -212,42 +289,27 @@ function toSelectionEntry(
 }
 
 function pickStableBase(dimensions: EnrichedDimension[]) {
-  return dimensions.filter((dimension) => dimension.status === "nah").sort(sortByStableBase)[0] ?? null;
+  return dimensions.filter(isStableStrength).sort(sortByStableBase)[0] ?? null;
 }
 
 function pickStrongestComplement(dimensions: EnrichedDimension[]) {
-  return (
-    dimensions
-      .filter((dimension) => dimension.status === "ergänzend")
-      .sort(sortByComplement)[0] ?? null
-  );
+  return dimensions.filter(isOpportunity).sort(sortByComplement)[0] ?? null;
 }
 
 function pickBiggestTension(dimensions: EnrichedDimension[]) {
-  return (
-    dimensions
-      .filter((dimension) => dimension.status === "kritisch" || dimension.status === "abstimmung_nötig")
-      .sort(sortByTension)[0] ?? null
-  );
-}
-
-function pickTopCandidate(
-  candidates: Array<EnrichedDimension | undefined>,
-  sorter: (a: EnrichedDimension, b: EnrichedDimension) => number,
-  predicate: (dimension: EnrichedDimension) => boolean
-) {
-  return [...candidates]
-    .filter((entry): entry is EnrichedDimension => entry != null)
-    .filter(predicate)
-    .sort(sorter)[0] ?? null;
+  return dimensions.filter(isTensionPressure).sort(sortByTension)[0] ?? null;
 }
 
 function isHighSimilarityBlindSpotRisk(compareResult: CompareFoundersResult, dimensions: EnrichedDimension[]) {
-  const similarCount = dimensions.filter((dimension) => dimension.status === "nah").length;
+  const blindSpotDimensions = dimensions.filter(isBlindSpotWatch);
+  const stableCount = dimensions.filter(isStableStrength).length;
+  const hasCriticalOpenTension = dimensions.some((dimension) => dimension.status === "kritisch");
   return (
-    (compareResult.overallMatchScore ?? 0) >= 85 &&
-    compareResult.topTensions.length === 0 &&
-    similarCount >= 5
+    !hasCriticalOpenTension &&
+    blindSpotDimensions.length >= 2 &&
+    (compareResult.alignmentScore ?? 0) >= 60 &&
+    (compareResult.workingCompatibilityScore ?? 0) >= 60 &&
+    stableCount + blindSpotDimensions.length >= 4
   );
 }
 
@@ -261,12 +323,13 @@ function isBalancedButManageable(compareResult: CompareFoundersResult, dimension
     !isHighSimilarityBlindSpotRisk(compareResult, dimensions) &&
     criticalCount === 0 &&
     activeCount >= 2 &&
-    (compareResult.overallMatchScore ?? 0) >= 60
+    (compareResult.alignmentScore ?? 0) >= 60 &&
+    (compareResult.workingCompatibilityScore ?? 0) >= 60
   );
 }
 
 function pickBlindSpotWatch(dimensions: EnrichedDimension[]) {
-  return dimensions.filter((dimension) => dimension.status === "nah").sort(sortByStableBase)[0] ?? null;
+  return dimensions.filter(isBlindSpotWatch).sort(sortByBlindSpotWatch)[0] ?? null;
 }
 
 function buildHeroSelection(
@@ -277,6 +340,9 @@ function buildHeroSelection(
   biggestTension: EnrichedDimension | null
 ): HeroSelection {
   const blindSpotRisk = isHighSimilarityBlindSpotRisk(compareResult, dimensions);
+  const alignmentScore = compareResult.alignmentScore ?? 0;
+  const workingCompatibilityScore = compareResult.workingCompatibilityScore ?? 0;
+  const criticalCount = dimensions.filter((dimension) => dimension.status === "kritisch").length;
 
   let mode: HeroSelection["mode"] = "alignment_led";
   let groundDynamic: EnrichedDimension | null = stableBase;
@@ -288,21 +354,35 @@ function buildHeroSelection(
 
   if (blindSpotRisk) {
     mode = "blind_spot_watch";
-    groundDynamic = stableBase ?? pickBlindSpotWatch(dimensions);
+    groundDynamic = pickBlindSpotWatch(dimensions) ?? stableBase;
   } else if (existentialCriticalTension) {
     mode = "tension_led";
     groundDynamic = biggestTension;
   } else if (
     biggestTension &&
     biggestTension.status === "kritisch" &&
-    ((compareResult.overallMatchScore ?? 0) < 60 || dimensions.filter((d) => d.status === "kritisch").length >= 2)
+    (biggestTension.jointState === "OPPOSITE" ||
+      alignmentScore < 58 ||
+      workingCompatibilityScore < 58 ||
+      criticalCount >= 2)
   ) {
     mode = "tension_led";
     groundDynamic = biggestTension;
-  } else if (strongestComplement && (compareResult.overallMatchScore ?? 0) >= 70) {
+  } else if (
+    strongestComplement &&
+    criticalCount === 0 &&
+    alignmentScore >= 66 &&
+    workingCompatibilityScore >= 62
+  ) {
     mode = "complement_led";
     groundDynamic = strongestComplement;
-  } else if (biggestTension && biggestTension.status === "abstimmung_nötig") {
+  } else if (
+    biggestTension &&
+    (biggestTension.status === "abstimmung_nötig" || biggestTension.status === "kritisch") &&
+    (Math.abs(alignmentScore - workingCompatibilityScore) >= 12 ||
+      alignmentScore < 72 ||
+      workingCompatibilityScore < 72)
+  ) {
     mode = "coordination_led";
     groundDynamic = biggestTension ?? stableBase;
   }
@@ -387,7 +467,7 @@ function buildDailyDynamicsDimensions(
   }
 
   if (selected.length < 2 && isHighSimilarityBlindSpotRisk(compareResult, dimensions)) {
-    for (const candidate of dimensions.filter((dimension) => dimension.status === "nah").sort(sortByStableBase)) {
+    for (const candidate of dimensions.filter(isBlindSpotWatch).sort(sortByBlindSpotWatch)) {
       if (selected.some((entry) => entry.dimension === candidate.dimension)) continue;
       selected.push(candidate);
       if (selected.length === 2) break;
@@ -399,6 +479,8 @@ function buildDailyDynamicsDimensions(
       dimension,
       dimension.status === "kritisch"
         ? "für die Alltagsdynamik priorisiert, weil hier das größte Konfliktpotenzial im Duo liegt"
+        : isBlindSpotWatch(dimension)
+          ? "für die Alltagsdynamik priorisiert, weil hier ähnliche Grundtendenzen leicht in einen stillen gemeinsamen Blind Spot kippen können"
         : dimension.status === "abstimmung_nötig"
           ? "für die Alltagsdynamik priorisiert, weil diese Koordinationsfrage regelmäßig in der Zusammenarbeit auftauchen dürfte"
           : dimension.status === "ergänzend"
@@ -451,6 +533,8 @@ function buildAgreementFocusDimensions(
       dimension,
       dimension.status === "kritisch"
         ? "immer priorisiert, weil dieses Feld ohne klare Vereinbarung schnell kippt"
+        : isBlindSpotWatch(dimension)
+          ? "als präventives Vereinbarungsfeld gewählt, damit gemeinsame Extreme oder stille Annahmen nicht unbemerkt mitlaufen"
         : dimension.status === "abstimmung_nötig"
           ? "priorisiert, weil hier wiederkehrende Koordination nötig ist"
           : isHighSimilarityBlindSpotRisk(compareResult, dimensions)
@@ -468,9 +552,11 @@ function buildDimensionStatuses(dimensions: EnrichedDimension[]) {
     reason:
       dimension.status === "kritisch"
         ? "kritisch, weil diese Differenz im Modell ein grundlegendes Spannungsfeld markiert"
+        : isBlindSpotWatch(dimension)
+          ? "beobachten, weil hier gemeinsame Extreme oder still geteilte Annahmen in einen Blind Spot kippen koennen"
         : dimension.status === "abstimmung_nötig"
           ? "Abstimmung nötig, weil diese Differenz ohne explizite Regeln im Alltag Reibung erzeugt"
-          : dimension.status === "ergänzend"
+        : dimension.status === "ergänzend"
             ? "ergänzend, weil die Unterschiede produktiv sein können"
             : "nah, weil das Duo hier auf ähnlicher Grundlage unterwegs ist",
   }));
@@ -480,24 +566,9 @@ export function buildFounderMatchingSelection(
   compareResult: CompareFoundersResult
 ): FounderMatchingSelection {
   const dimensions = enrichDimensions(compareResult);
-  const topAlignmentCandidates = compareResult.topAlignments.map((dimension) =>
-    dimensions.find((entry) => entry.dimension === dimension)
-  );
-  const topTensionCandidates = compareResult.topTensions.map((dimension) =>
-    dimensions.find((entry) => entry.dimension === dimension)
-  );
-  const stableBase =
-    pickTopCandidate(topAlignmentCandidates, sortByStableBase, (entry) => entry.status === "nah") ??
-    pickStableBase(dimensions);
-  const strongestComplement =
-    pickTopCandidate(topAlignmentCandidates, sortByComplement, (entry) => entry.status === "ergänzend") ??
-    pickStrongestComplement(dimensions);
+  const stableBase = pickStableBase(dimensions);
+  const strongestComplement = pickStrongestComplement(dimensions);
   const biggestTension =
-    pickTopCandidate(
-      topTensionCandidates,
-      sortByTension,
-      (entry) => entry.status === "kritisch" || entry.status === "abstimmung_nötig"
-    ) ??
     pickBiggestTension(dimensions) ??
     (isHighSimilarityBlindSpotRisk(compareResult, dimensions) ? pickBlindSpotWatch(dimensions) : null);
 
@@ -515,18 +586,18 @@ export function buildFounderMatchingSelection(
     ),
     stableBase: toSelectionEntry(
       stableBase,
-      "als stabilste Basis ausgewählt, weil diese Achse hohe Relevanz und geringe Differenz verbindet"
+      "als stabilste Basis ausgewählt, weil hier gemeinsame Mitte und geringe Reibung auf hoher Relevanz zusammenkommen"
     ),
     strongestComplement: toSelectionEntry(
       strongestComplement,
-      "als stärkste tragfähige Ergänzung ausgewählt; nicht bloß größter Unterschied, sondern produktiv klassifizierte Differenz"
+      "als stärkste tragfähige Ergänzung ausgewählt; nicht bloß wegen Distanz, sondern weil die angrenzenden Lagen produktiv nutzbar sind"
     ),
     biggestTension: toSelectionEntry(
       biggestTension,
       isHighSimilarityBlindSpotRisk(compareResult, dimensions) &&
         biggestTension?.status === "nah"
         ? "kein offenes Spannungsfeld; ausgewählt als Blind-Spot-Watch bei sehr hoher Ähnlichkeit"
-        : "als größtes Spannungsfeld nach Kritikalität, Relevanz und Differenz ausgewählt"
+        : "als größtes Spannungsfeld nach Joint State, Risikologik und Relevanz ausgewählt; Distanz dient nur noch als Tiebreaker"
     ),
     dailyDynamicsDimensions: buildDailyDynamicsDimensions(
       compareResult,

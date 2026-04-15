@@ -18,9 +18,9 @@ test("buildFounderMatchingSelection prefers complement-led hero for complementar
   );
 
   assert.equal(selection.heroSelection.mode, "complement_led");
-  assert.equal(selection.heroSelection.groundDynamic?.dimension, "Risikoorientierung");
-  assert.equal(selection.stableBase?.dimension, "Commitment");
-  assert.equal(selection.strongestComplement?.dimension, "Risikoorientierung");
+  assert.equal(selection.heroSelection.groundDynamic?.dimension, "Unternehmenslogik");
+  assert.equal(selection.stableBase?.dimension, "Konfliktstil");
+  assert.equal(selection.strongestComplement?.dimension, "Unternehmenslogik");
   assert.equal(selection.biggestTension?.dimension, "Arbeitsstruktur & Zusammenarbeit");
   assert.deepEqual(
     selection.dailyDynamicsDimensions.map((entry) => entry.dimension),
@@ -39,7 +39,7 @@ test("buildFounderMatchingSelection becomes tension-led for critically misaligne
   assert.equal(selection.heroSelection.mode, "tension_led");
   assert.equal(selection.heroSelection.groundDynamic?.dimension, "Unternehmenslogik");
   assert.equal(selection.biggestTension?.dimension, "Unternehmenslogik");
-  assert.equal(selection.strongestComplement?.dimension, "Entscheidungslogik");
+  assert.equal(selection.strongestComplement?.dimension, "Risikoorientierung");
   assert.ok(
     selection.agreementFocusDimensions
       .slice(0, 3)
@@ -47,7 +47,7 @@ test("buildFounderMatchingSelection becomes tension-led for critically misaligne
   );
 });
 
-test("buildFounderMatchingSelection marks balanced but manageable pairs without critical mode", () => {
+test("buildFounderMatchingSelection reads fully mid-range pairs as alignment-led instead of forcing false complexity", () => {
   const selection = buildFounderMatchingSelection(
     compareFounders(
       FOUNDER_MATCHING_TEST_CASES.balanced_but_manageable_pair.a,
@@ -55,10 +55,11 @@ test("buildFounderMatchingSelection marks balanced but manageable pairs without 
     )
   );
 
-  assert.equal(selection.meta.balancedButManageable, true);
+  assert.equal(selection.meta.balancedButManageable, false);
   assert.equal(selection.meta.highSimilarityBlindSpotRisk, false);
   assert.equal(selection.strongestComplement, null);
-  assert.equal(selection.biggestTension?.dimension, "Arbeitsstruktur & Zusammenarbeit");
+  assert.equal(selection.biggestTension, null);
+  assert.equal(selection.stableBase?.dimension, "Commitment");
 });
 
 test("buildFounderMatchingSelection flags high-similarity blind spot pairs", () => {

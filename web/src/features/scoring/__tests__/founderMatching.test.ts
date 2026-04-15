@@ -6,6 +6,9 @@ import {
   compareFounderProfiles,
   computeOverallScore,
   escalateRiskLevel,
+  getExtremeFlags,
+  getJointState,
+  getPositionBand,
   type FounderMatchProfile,
 } from "@/features/scoring/founderMatching";
 
@@ -21,88 +24,44 @@ function createProfile(overrides: Partial<FounderMatchProfile> = {}): FounderMat
   };
 }
 
-test("classifyBaseMatch applies the finalized thresholds per dimension", () => {
-  assert.deepEqual(classifyBaseMatch("company_logic", 15), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("company_logic", 16), {
-    category: "complementary",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("company_logic", 31), {
-    category: "tension",
-    riskLevel: "medium",
-  });
+test("joint position helpers classify bands, states and extremes deterministically", () => {
+  assert.equal(getPositionBand(10), "LOW");
+  assert.equal(getPositionBand(50), "MID");
+  assert.equal(getPositionBand(90), "HIGH");
 
-  assert.deepEqual(classifyBaseMatch("decision_logic", 18), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("decision_logic", 19), {
-    category: "complementary",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("decision_logic", 39), {
-    category: "tension",
-    riskLevel: "medium",
-  });
+  assert.deepEqual(getExtremeFlags(10), ["EXTREME_LOW"]);
+  assert.deepEqual(getExtremeFlags(90), ["EXTREME_HIGH"]);
+  assert.deepEqual(getExtremeFlags(50), []);
 
-  assert.deepEqual(classifyBaseMatch("work_structure", 12), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("work_structure", 13), {
-    category: "tension",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("work_structure", 25), {
-    category: "tension",
-    riskLevel: "high",
-  });
+  assert.equal(getJointState("LOW", "LOW"), "BOTH_LOW");
+  assert.equal(getJointState("MID", "MID"), "BOTH_MID");
+  assert.equal(getJointState("HIGH", "HIGH"), "BOTH_HIGH");
+  assert.equal(getJointState("LOW", "MID"), "LOW_MID");
+  assert.equal(getJointState("HIGH", "MID"), "MID_HIGH");
+  assert.equal(getJointState("LOW", "HIGH"), "OPPOSITE");
+});
 
-  assert.deepEqual(classifyBaseMatch("commitment", 10), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("commitment", 11), {
-    category: "tension",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("commitment", 21), {
-    category: "tension",
-    riskLevel: "high",
-  });
+test("classifyBaseMatch combines distance with shared position meaning", () => {
+  const bothMid = classifyBaseMatch("company_logic", 48, 56);
+  assert.equal(bothMid.jointState, "BOTH_MID");
+  assert.equal(bothMid.category, "aligned");
+  assert.equal(bothMid.riskLevel, "low");
 
-  assert.deepEqual(classifyBaseMatch("risk_orientation", 18), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("risk_orientation", 19), {
-    category: "complementary",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("risk_orientation", 36), {
-    category: "tension",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("risk_orientation", 51), {
-    category: "tension",
-    riskLevel: "high",
-  });
+  const bothHigh = classifyBaseMatch("commitment", 88, 92);
+  assert.equal(bothHigh.jointState, "BOTH_HIGH");
+  assert.equal(bothHigh.category, "aligned");
+  assert.equal(bothHigh.riskLevel, "medium");
+  assert.equal(bothHigh.hasSharedExtremeHigh, true);
 
-  assert.deepEqual(classifyBaseMatch("conflict_style", 15), {
-    category: "aligned",
-    riskLevel: "low",
-  });
-  assert.deepEqual(classifyBaseMatch("conflict_style", 16), {
-    category: "tension",
-    riskLevel: "medium",
-  });
-  assert.deepEqual(classifyBaseMatch("conflict_style", 29), {
-    category: "tension",
-    riskLevel: "high",
-  });
+  const strategicAdjacent = classifyBaseMatch("risk_orientation", 24, 61);
+  assert.equal(strategicAdjacent.jointState, "LOW_MID");
+  assert.equal(strategicAdjacent.category, "complementary");
+  assert.equal(strategicAdjacent.riskLevel, "medium");
+
+  const workingOpposite = classifyBaseMatch("work_structure", 12, 88);
+  assert.equal(workingOpposite.jointState, "OPPOSITE");
+  assert.equal(workingOpposite.category, "tension");
+  assert.equal(workingOpposite.riskLevel, "high");
 });
 
 test("RULE_A_COMMITMENT_HARD_PENALTY forces high tension for an extreme commitment gap", () => {
@@ -235,6 +194,14 @@ test("computeOverallScore uses weighted base compatibility only", () => {
       scoreA: 50,
       scoreB: 40,
       distance: 10,
+      positionA: "MID",
+      positionB: "MID",
+      jointState: "BOTH_MID",
+      extremeFlagsA: [],
+      extremeFlagsB: [],
+      hasSharedExtremeHigh: false,
+      hasSharedExtremeLow: false,
+      hasSharedBlindSpotRisk: false,
       baseCompatibility: 90,
       weight: 1.2,
       weightedCompatibility: 108,
@@ -246,6 +213,14 @@ test("computeOverallScore uses weighted base compatibility only", () => {
       scoreA: 50,
       scoreB: 30,
       distance: 20,
+      positionA: "MID",
+      positionB: "LOW",
+      jointState: "LOW_MID",
+      extremeFlagsA: [],
+      extremeFlagsB: [],
+      hasSharedExtremeHigh: false,
+      hasSharedExtremeLow: false,
+      hasSharedBlindSpotRisk: false,
       baseCompatibility: 80,
       weight: 1.5,
       weightedCompatibility: 120,

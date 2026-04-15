@@ -11,17 +11,10 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
-import { generateCompareReport } from "@/features/reporting/generateCompareReport";
-import { DIMENSION_DEFINITIONS_DE, VALUES_ARCHETYPES_DE } from "@/features/reporting/report_texts.de";
+import { VALUES_ARCHETYPES_DE } from "@/features/reporting/report_texts.de";
 import {
-  type CompareReportJson,
-  type ProfileResult,
-  type RadarSeries,
-  type ReportDimension,
   type SelfValuesProfile,
-  type SessionAlignmentReport,
   type ValuesArchetypeId,
-  type ZoneBand,
 } from "@/features/reporting/types";
 import { getCoreRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import { scoreFounderAlignment, type Answer, type TeamScoringResult } from "@/features/scoring/founderScoring";
@@ -73,22 +66,7 @@ export type ConversationGuidePreviewState = {
   chapterOverrides: Partial<Record<FounderConversationChapter["id"], { reflectionQuestions?: [string, string, string]; decisionQuestion?: string }>>;
 };
 
-export type MatchingReportPreviewState = {
-  createdAt: string;
-  modules: string[];
-  report: SessionAlignmentReport;
-  compareJson: CompareReportJson;
-};
-
 const PREVIEW_BASIS_TOTAL = getCoreRegistryItems().length;
-
-export type FounderAlignmentReportPreviewState = {
-  founderAName: string;
-  founderBName: string;
-  teamContext: TeamContext;
-  report: FounderAlignmentReport;
-  scoringResult: TeamScoringResult;
-};
 
 const PREVIEW_VALUES_TOTAL = 12;
 
@@ -391,85 +369,6 @@ export function getConversationGuidePreviewState(mode: FounderPreviewMode): Conv
   };
 }
 
-export function getMatchingReportPreviewState(mode: FounderPreviewMode): MatchingReportPreviewState {
-  const compareProfiles = buildCompareProfiles(mode);
-  const compareJson = generateCompareReport(compareProfiles.profileA, compareProfiles.profileB);
-  const valuesProfiles = PREVIEW_VALUES_PROFILES[mode];
-  const team = PREVIEW_TEAMS[mode];
-  const report: SessionAlignmentReport = {
-    sessionId: `debug-${mode}`,
-    createdAt: "2026-03-16T10:30:00.000Z",
-    personBInvitedAt: "2026-03-09T10:00:00.000Z",
-    personACompletedAt: "2026-03-10T10:00:00.000Z",
-    personBCompletedAt: "2026-03-11T10:00:00.000Z",
-    participantAId: "debug-a",
-    participantBId: "debug-b",
-    participantAName: team.founderAName,
-    participantBName: team.founderBName,
-    personBStatus: "match_ready",
-    personACompleted: true,
-    personBCompleted: true,
-    comparisonEnabled: true,
-    scoresA: compareProfiles.profileA.dimensionScores,
-    scoresB: compareProfiles.profileB.dimensionScores,
-    keyInsights: compareJson.keyInsights.map((entry, index) => ({
-      dimension: entry.dimension,
-      title: entry.title,
-      text: entry.text,
-      priority: index + 1,
-    })),
-    commonTendencies: compareJson.executiveSummary.topMatches,
-    frictionPoints: compareJson.executiveSummary.topTensions,
-    conversationGuideQuestions: compareJson.conversationGuide,
-    valuesModulePreview: compareJson.valuesModule.text,
-    valuesModuleStatus: "completed",
-    valuesAnsweredA: PREVIEW_VALUES_TOTAL,
-    valuesAnsweredB: PREVIEW_VALUES_TOTAL,
-    valuesTotal: PREVIEW_VALUES_TOTAL,
-    basisAnsweredA: PREVIEW_BASIS_TOTAL,
-    basisAnsweredB: PREVIEW_BASIS_TOTAL,
-    basisTotal: PREVIEW_BASIS_TOTAL,
-    valuesAlignmentPercent: compareJson.valuesModule.alignmentPercent,
-    valuesIdentityCategoryA: valuesProfiles.a.primaryLabel,
-    valuesIdentityCategoryB: valuesProfiles.b.primaryLabel,
-    valuesPrimaryArchetypeIdA: valuesProfiles.a.primaryArchetypeId,
-    valuesPrimaryArchetypeIdB: valuesProfiles.b.primaryArchetypeId,
-    valuesScoreA: compareProfiles.profileA.valuesScore,
-    valuesScoreB: compareProfiles.profileB.valuesScore,
-    requestedScope: "basis_plus_values",
-    inviteConsentCaptured: true,
-    debugA: {
-      participantName: team.founderAName,
-      dimensions: [],
-    },
-    debugB: {
-      participantName: team.founderBName,
-      dimensions: [],
-    },
-  };
-
-  return {
-    createdAt: "2026-03-16T10:30:00.000Z",
-    modules: ["base", "values"],
-    report,
-    compareJson,
-  };
-}
-
-export function getFounderAlignmentReportPreviewState(
-  mode: FounderPreviewMode
-): FounderAlignmentReportPreviewState {
-  const foundation = getFounderAlignmentPreviewFoundation(mode);
-
-  return {
-    founderAName: foundation.team.founderAName,
-    founderBName: foundation.team.founderBName,
-    teamContext: foundation.team.teamContext,
-    report: foundation.report,
-    scoringResult: foundation.scoringResult,
-  };
-}
-
 function getFounderAlignmentPreviewFoundation(mode: FounderPreviewMode): {
   team: PreviewTeam;
   scoringResult: TeamScoringResult;
@@ -588,144 +487,6 @@ function buildFounderAlignmentAnswers(mode: FounderPreviewMode) {
       answer("conflict-b-2", "Konfliktstil", 75),
     ],
   };
-}
-
-function buildCompareProfiles(mode: FounderPreviewMode) {
-  if (mode === "existing_team") {
-    return {
-      profileA: buildCompareProfile({
-        id: "existing-a",
-        displayName: PREVIEW_TEAMS[mode].founderAName,
-        valuesScore: 5.6,
-        valuesArchetypeId: "business_pragmatiker",
-        scores: {
-          Vision: 4.7,
-          Entscheidung: 5.1,
-          Risiko: 4.2,
-          Autonomie: 4.8,
-          Verbindlichkeit: 5.3,
-          Konflikt: 4.1,
-        },
-      }),
-      profileB: buildCompareProfile({
-        id: "existing-b",
-        displayName: PREVIEW_TEAMS[mode].founderBName,
-        valuesScore: 3.6,
-        valuesArchetypeId: "verantwortungs_stratege",
-        scores: {
-          Vision: 4.2,
-          Entscheidung: 2.7,
-          Risiko: 3.8,
-          Autonomie: 2.6,
-          Verbindlichkeit: 4.8,
-          Konflikt: 2.8,
-        },
-      }),
-    };
-  }
-
-  if (mode === "advisor") {
-    return {
-      profileA: buildCompareProfile({
-        id: "advisor-a",
-        displayName: PREVIEW_TEAMS[mode].founderAName,
-        valuesScore: 2.2,
-        valuesArchetypeId: "impact_idealist",
-        scores: {
-          Vision: 4.4,
-          Entscheidung: 4.6,
-          Risiko: 3.9,
-          Autonomie: 3.6,
-          Verbindlichkeit: 5.1,
-          Konflikt: 3.2,
-        },
-      }),
-      profileB: buildCompareProfile({
-        id: "advisor-b",
-        displayName: PREVIEW_TEAMS[mode].founderBName,
-        valuesScore: 4.1,
-        valuesArchetypeId: "verantwortungs_stratege",
-        scores: {
-          Vision: 4.1,
-          Entscheidung: 3.5,
-          Risiko: 2.8,
-          Autonomie: 3.1,
-          Verbindlichkeit: 4.7,
-          Konflikt: 4.2,
-        },
-      }),
-    };
-  }
-
-  return {
-    profileA: buildCompareProfile({
-      id: "pre-a",
-      displayName: PREVIEW_TEAMS[mode].founderAName,
-      valuesScore: 2.6,
-      valuesArchetypeId: "impact_idealist",
-      scores: {
-        Vision: 5,
-        Entscheidung: 4.4,
-        Risiko: 5.1,
-        Autonomie: 4.6,
-        Verbindlichkeit: 4.5,
-        Konflikt: 3.4,
-      },
-    }),
-    profileB: buildCompareProfile({
-      id: "pre-b",
-      displayName: PREVIEW_TEAMS[mode].founderBName,
-      valuesScore: 4.9,
-      valuesArchetypeId: "business_pragmatiker",
-      scores: {
-        Vision: 3.7,
-        Entscheidung: 2.8,
-        Risiko: 2.9,
-        Autonomie: 3.2,
-        Verbindlichkeit: 3.8,
-        Konflikt: 4.8,
-      },
-    }),
-  };
-}
-
-function buildCompareProfile({
-  id,
-  displayName,
-  scores,
-  valuesScore,
-  valuesArchetypeId,
-}: {
-  id: string;
-  displayName: string;
-  scores: RadarSeries;
-  valuesScore: number;
-  valuesArchetypeId: ValuesArchetypeId;
-}): ProfileResult {
-  return {
-    profileId: id,
-    displayName,
-    dimensionScores: scores,
-    dimensionZones: Object.fromEntries(
-      Object.entries(scores).map(([dimension, score]) => [dimension, resolveZone(score)])
-    ) as Record<ReportDimension, ZoneBand>,
-    archetypeIdPerDimension: Object.fromEntries(
-      Object.entries(scores).map(([dimension, score]) => {
-        const zone = resolveZone(score);
-        const definition = DIMENSION_DEFINITIONS_DE[dimension as ReportDimension];
-        return [dimension, definition.archetypesByZone[zone].id];
-      })
-    ) as Record<ReportDimension, string>,
-    valuesScore,
-    valuesArchetypeId,
-  };
-}
-
-function resolveZone(score: number | null): ZoneBand {
-  if (score == null) return "mid";
-  if (score <= 2.5) return "low";
-  if (score >= 4.5) return "high";
-  return "mid";
 }
 
 function answer(questionId: string, dimension: string, value: number): Answer {

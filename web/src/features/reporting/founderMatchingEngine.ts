@@ -2,8 +2,11 @@ import {
   compareFounderProfiles,
   type DimensionId as MatchDimensionId,
   type DimensionMatch,
+  type ExtremeFlag,
+  type JointState,
   type MatchCategory,
   type MatchResult,
+  type PositionBand,
   type RiskLevel,
 } from "@/features/scoring/founderMatching";
 import { founderDisplayScoreToPercent } from "@/features/scoring/founderBaseNormalization";
@@ -31,6 +34,14 @@ export type DimensionMatchResult = {
   scoreA: number | null;
   scoreB: number | null;
   difference: number | null;
+  positionA: PositionBand | null;
+  positionB: PositionBand | null;
+  jointState: JointState | null;
+  extremeFlagsA: ExtremeFlag[];
+  extremeFlagsB: ExtremeFlag[];
+  hasSharedExtremeHigh: boolean;
+  hasSharedExtremeLow: boolean;
+  hasSharedBlindSpotRisk: boolean;
   relationType: RelationType | null;
   interactionType: InteractionType | null;
   explanationKey: string | null;
@@ -121,7 +132,8 @@ function toRelationType(match: DimensionMatch): RelationType {
 }
 
 function toInteractionType(match: DimensionMatch): InteractionType {
-  if (match.category === "aligned") return "alignment";
+  if (match.category === "aligned" && match.riskLevel === "low") return "alignment";
+  if (match.category === "aligned") return "coordination";
   if (match.category === "complementary") return "complement";
   if (match.riskLevel === "high") return "critical_tension";
   return "coordination";
@@ -137,21 +149,29 @@ function toTensionType(match: DimensionMatch): TensionType | null {
 function resolveExplanationKey(match: DimensionMatch): string {
   switch (match.dimensionId) {
     case "commitment":
+      if (match.jointState === "BOTH_HIGH") return "commitment_shared_high";
+      if (match.jointState === "BOTH_LOW") return "commitment_shared_low";
       if (match.category === "aligned") return "commitment_aligned";
       if (match.riskLevel === "high") return "commitment_gap_critical";
       return "commitment_expectation_gap";
 
     case "work_structure":
+      if (match.jointState === "BOTH_HIGH") return "work_mode_shared_high";
+      if (match.jointState === "BOTH_LOW") return "work_mode_shared_low";
       if (match.category === "aligned") return "work_mode_aligned";
       if (match.riskLevel === "high") return "work_mode_clash_critical";
       return "work_mode_needs_explicit_rules";
 
     case "company_logic":
+      if (match.jointState === "BOTH_HIGH") return "directional_alignment_shared_high";
+      if (match.jointState === "BOTH_LOW") return "directional_alignment_shared_low";
       if (match.category === "aligned") return "directional_alignment";
       if (match.riskLevel === "high") return "directional_alignment_conflict";
       return "directional_tradeoff_coordination";
 
     case "decision_logic":
+      if (match.jointState === "BOTH_HIGH") return "decision_style_shared_high";
+      if (match.jointState === "BOTH_LOW") return "decision_style_shared_low";
       if (match.category === "aligned") return "decision_style_alignment";
       if (match.category === "complementary") {
         return match.distance > 30
@@ -161,6 +181,8 @@ function resolveExplanationKey(match: DimensionMatch): string {
       return "decision_style_process_tension";
 
     case "risk_orientation":
+      if (match.jointState === "BOTH_HIGH") return "risk_alignment_shared_high";
+      if (match.jointState === "BOTH_LOW") return "risk_alignment_shared_low";
       if (match.category === "aligned") return "risk_alignment";
       if (match.category === "complementary") {
         return match.distance > 28
@@ -170,6 +192,8 @@ function resolveExplanationKey(match: DimensionMatch): string {
       return "risk_threshold_tension";
 
     case "conflict_style":
+      if (match.jointState === "BOTH_HIGH") return "conflict_style_shared_high";
+      if (match.jointState === "BOTH_LOW") return "conflict_style_shared_low";
       if (match.category === "aligned") return "conflict_style_alignment";
       if (match.riskLevel === "high") return "conflict_style_escalation_risk";
       return "conflict_style_coordination_gap";
@@ -182,6 +206,14 @@ function adaptDimensionMatch(match: DimensionMatch): DimensionMatchResult {
     scoreA: match.scoreA,
     scoreB: match.scoreB,
     difference: match.distance,
+    positionA: match.positionA,
+    positionB: match.positionB,
+    jointState: match.jointState,
+    extremeFlagsA: match.extremeFlagsA,
+    extremeFlagsB: match.extremeFlagsB,
+    hasSharedExtremeHigh: match.hasSharedExtremeHigh,
+    hasSharedExtremeLow: match.hasSharedExtremeLow,
+    hasSharedBlindSpotRisk: match.hasSharedBlindSpotRisk,
     relationType: toRelationType(match),
     interactionType: toInteractionType(match),
     explanationKey: resolveExplanationKey(match),
@@ -226,8 +258,8 @@ export function compareFounders(a: FounderScores, b: FounderScores): CompareFoun
   return {
     dimensions,
     overallMatchScore: overallScore,
-    alignmentScore: overallScore,
-    workingCompatibilityScore: overallScore,
+    alignmentScore: round(rawMatchResult.alignmentScore),
+    workingCompatibilityScore: round(rawMatchResult.workingCompatibilityScore),
     tensionMap: buildTensionMap(dimensions),
     topAlignments,
     topTensions,

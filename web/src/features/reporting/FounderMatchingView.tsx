@@ -41,6 +41,9 @@ export function FounderMatchingView({
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
+  const reportHeadline = buildMatchHeadline(selection);
+  const reportIntroLead = buildIntroSummary(selection);
+  const reportIntroContext = buildIntroContext(selection);
   const centralPatternSections = buildCentralPatternSections(selection);
   const everydaySituations = buildEverydaySituations(selection);
   const steeringPoints = buildSteeringPoints(selection, markers);
@@ -54,19 +57,11 @@ export function FounderMatchingView({
           <div className="max-w-4xl">
             <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Matching-Report</p>
             <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-              {t("Ihr werdet euch nicht erst später reiben, sondern direkt im Alltag.")}
+              {t(reportHeadline)}
             </h1>
             <div className="mt-5 max-w-3xl space-y-3 text-[15px] leading-8 text-slate-700">
-              <p>
-                {t(
-                  "Eure Unterschiede zeigen sich nicht im Umgang, sondern in der Art, wie ihr Entscheidungen trefft und Arbeit strukturiert."
-                )}
-              </p>
-              <p>
-                {t(
-                  "Wenn ihr das nicht bewusst klärt, entstehen unterschiedliche Maßstäbe an zentralen Punkten."
-                )}
-              </p>
+              <p>{t(reportIntroLead)}</p>
+              <p>{t(reportIntroContext)}</p>
             </div>
             <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
               {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
@@ -118,10 +113,16 @@ export function FounderMatchingView({
                   {t(buildDimensionExplanation(meta.canonicalName))}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
-                  {t(buildDimensionReading(meta.canonicalName, status?.status ?? "nah"))}
+                  {t(buildDimensionReading(meta.canonicalName, dimension, status?.status ?? "nah"))}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {t(buildDimensionBusinessMeaning(meta.canonicalName, status?.status ?? "nah"))}
+                  {t(
+                    buildDimensionBusinessMeaning(
+                      meta.canonicalName,
+                      dimension,
+                      status?.status ?? "nah"
+                    )
+                  )}
                 </p>
 
                 <div className="mt-4 max-w-3xl">
@@ -267,32 +268,32 @@ function splitNarrativeSections(text: string) {
 function buildMatchHeadline(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Ihr werdet euch nicht erst spaeter reiben, sondern direkt im Alltag.";
+      return "Ein zentrales Spannungsfeld wird bei euch frueh im Alltag sichtbar.";
     case "complement_led":
-      return "Euer Unterschied kann euch tragen oder frueh gegeneinander arbeiten.";
+      return "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst fuehrt.";
     case "coordination_led":
-      return "Euer Problem ist nicht Streit, sondern stiller Zugverlust.";
+      return "Ihr seid nicht weit auseinander, aber auch nicht automatisch im selben Takt.";
     case "blind_spot_watch":
-      return "Bei euch kommt nicht zuerst die offene Spannung, sondern die stille Drift.";
+      return "Eure Naehe wirkt tragend und braucht gerade deshalb bewusste Watchpoints.";
     case "alignment_led":
     default:
-      return "Ihr habt viel gemeinsame Linie. Gerade deshalb merkt ihr Unterschiede spaet.";
+      return "Ihr habt eine tragfaehige Basis, aber nicht automatisch dieselben Massstaebe.";
   }
 }
 
 function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Eure Spannung sitzt nicht im Ton, sondern in eurer Arbeitslogik.";
+      return "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst.";
     case "complement_led":
-      return "Euer Unterschied ist zugleich Chance und Belastung.";
+      return "Euer Unterschied ist weder automatisch Problem noch automatisch Staerke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Fuehrung braucht.";
     case "coordination_led":
-      return "Bei euch geht eher Tempo verloren als Vertrauen.";
+      return "Bei euch geht eher Energie in Nachziehen, Schleifen und stille Koordination als in offenen Grundsatzstreit.";
     case "blind_spot_watch":
-      return "Bei euch entsteht das Problem frueher, als ihr es bemerkt.";
+      return "Bei euch liegt das Risiko nicht zuerst in offenem Gegensatz, sondern in einer gemeinsamen Tendenz, die zu spaet bewusst wird.";
     case "alignment_led":
     default:
-      return "Vieles wirkt bei euch tragfaehig, bis ein offener Punkt Wirkung bekommt.";
+      return "Vieles ist bei euch anschlussfaehig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Fuehren beginnt.";
   }
 }
 
@@ -300,25 +301,25 @@ function buildIntroContext(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
       return selection.biggestTension
-        ? `Der staerkste Unterschied liegt in ${selection.biggestTension.dimension}. Wenn ihr das nicht klaert, arbeitet ihr an zentralen Punkten nicht nach denselben Massstaeben.`
-        : "Der Unterschied wird im Alltag schnell sichtbar.";
+        ? `Das staerkste Spannungsfeld liegt in ${selection.biggestTension.dimension}. Ohne bewusste Klaerung koennt ihr dort dieselbe Lage unterschiedlich lesen und daraus verschiedene Standards ableiten.`
+        : "Ein Unterschied wird im Alltag frueh spuerbar, wenn ihr ihn nicht ausdruecklich einordnet.";
     case "complement_led":
       return selection.strongestComplement
-        ? `Die staerkste Chance liegt in ${selection.strongestComplement.dimension}. Sie traegt nur dann, wenn ihr den Unterschied bewusst fuehrt.`
-        : "Der Unterschied kann euch breiter machen, traegt aber nicht von selbst.";
+        ? `Die staerkste produktive Ergaenzung liegt in ${selection.strongestComplement.dimension}. Sie traegt nicht von selbst, kann euch aber deutlich breiter machen, wenn ihr Timing, Rollen und Grenzen sichtbar fuehrt.`
+        : "Ein Unterschied kann euch breiter machen, solange ihr ihn nicht sich selbst ueberlasst.";
     case "coordination_led":
       return selection.biggestTension
-        ? `Der staerkste Verlustpunkt liegt in ${selection.biggestTension.dimension}. Das bremst euch nicht laut, sondern ueber Schleifen, Nachziehen und Unklarheit.`
-        : "Das kostet selten offen Energie, aber oft Tempo und Klarheit.";
+        ? `Der staerkste Verlustpunkt liegt in ${selection.biggestTension.dimension}. Das wirkt oft nicht dramatisch, kostet aber ueber Nachziehen, Schleifen und unscharfe Uebergaenge spürbar Zug.`
+        : "Das kostet selten offen Vertrauen, aber oft Tempo, Klarheit und Fuehrungsenergie.";
     case "blind_spot_watch":
       return selection.heroSelection.biggestRisk
-        ? `Die heikelste Stelle liegt in ${selection.heroSelection.biggestRisk.dimension}. Gerade weil ihr euch in vielem aehnlich seid, merkt ihr Unterschiede dort oft zu spaet.`
-        : "Gerade weil ihr euch in vielem aehnlich seid, merkt ihr Unterschiede oft zu spaet.";
+        ? `Die heikelste Stelle liegt in ${selection.heroSelection.biggestRisk.dimension}. Gerade weil ihr euch in vielem aehnlich seid, kann dort lange wie selbstverstaendlich wirken, was eigentlich eine bewusste Grenze oder Regel braucht.`
+        : "Gerade weil ihr euch in vielem aehnlich seid, werden kleine Abweichungen leicht erst spaet sichtbar.";
     case "alignment_led":
     default:
       return selection.stableBase
-        ? `${buildStableBaseContext(selection.stableBase.dimension)} Gleichzeitig reicht diese Basis nicht aus, wenn ihr offene Punkte nicht ausdruecklich klaert.`
-        : "Die gemeinsame Linie gibt euch Ruhe, ersetzt aber keine Klarheit dort, wo ihr unterschiedlich priorisiert oder entscheidet.";
+        ? `${buildStableBaseContext(selection.stableBase.dimension)} Gleichzeitig ist diese Basis kein Freifahrtschein dafuer, andere Felder still laufen zu lassen.`
+        : "Die gemeinsame Linie gibt euch eine gute Ausgangslage, ersetzt aber keine klare Abstimmung dort, wo ihr unterschiedlich priorisiert, entscheidet oder Grenzen zieht.";
   }
 }
 
@@ -415,74 +416,143 @@ function buildMarkerLabel(name: string | null | undefined) {
 
 function buildDimensionReading(
   dimension: string,
+  match: CompareFoundersResult["dimensions"][number],
   status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
 ) {
+  if (match.jointState === "BOTH_MID") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und lest Richtung weder rein ueber Hebel noch rein ueber Absicherung.";
+      case "Entscheidungslogik":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und braucht weder maximale Prueftiefe noch reines Vorwaertsgehen.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und braucht weder Dauerabstimmung noch maximalen Eigenflug.";
+      case "Commitment":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und verbindet Einsatz mit Realismus statt mit einem gemeinsamen Extrem.";
+      case "Risikoorientierung":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und geht weder reflexhaft auf Sicherheit noch auf offene Wette.";
+      case "Konfliktstil":
+        return "Ihr liegt hier in einer aehnlichen mittleren Lage und klaert Unterschiede weder spaet noch ueberhart.";
+    }
+  }
+
+  if (match.jointState === "BOTH_HIGH") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Hier liegt eine klare gemeinsame Tendenz zu Wachstum, Hebel und Bewegung.";
+      case "Entscheidungslogik":
+        return "Hier liegt eine klare gemeinsame Tendenz, frueh in Entscheidungen zu gehen und eher im Laufen nachzuschaerfen.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Hier liegt eine klare gemeinsame Tendenz zu Tempo, Eigenraum und weniger laufender Mitsicht.";
+      case "Commitment":
+        return "Hier liegt eine klare gemeinsame Tendenz zu hohem Einsatz und starker Priorisierung.";
+      case "Risikoorientierung":
+        return "Hier liegt eine klare gemeinsame Tendenz, Unsicherheit offensiver mitzutragen.";
+      case "Konfliktstil":
+        return "Hier liegt eine klare gemeinsame Tendenz zu frueher und direkter Klaerung.";
+    }
+  }
+
+  if (match.jointState === "BOTH_LOW") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Hier liegt eine klare gemeinsame Tendenz zu Aufbau, Substanz und vorsichtigerem Kurs.";
+      case "Entscheidungslogik":
+        return "Hier liegt eine klare gemeinsame Tendenz, Entscheidungen erst mit mehr Reife wirklich freizugeben.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Hier liegt eine klare gemeinsame Tendenz zu Sichtbarkeit, Rueckkopplung und engerer Kopplung.";
+      case "Commitment":
+        return "Hier liegt eine klare gemeinsame Tendenz zu einem begrenzteren oder bewusster gerahmten Einsatzniveau.";
+      case "Risikoorientierung":
+        return "Hier liegt eine klare gemeinsame Tendenz, zuerst auf Absicherung und Begrenzung zu schauen.";
+      case "Konfliktstil":
+        return "Hier liegt eine klare gemeinsame Tendenz, Spannung spaeter oder vorsichtiger zu oeffnen.";
+    }
+  }
+
+  if (match.hasSharedBlindSpotRisk) {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Hier wirkt ihr nah genug beieinander, dass kleine Richtungsverschiebungen leicht zu spaet auffallen koennen.";
+      case "Entscheidungslogik":
+        return "Hier wirkt ihr nah genug beieinander, dass dieselbe Luecke fuer euch beide zunaechst unkritisch aussieht.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Hier wirkt ihr nah genug beieinander, dass fehlende Sichtbarkeit oder zu viel Eigenraum lange nicht als Problem gelesen werden.";
+      case "Commitment":
+        return "Hier wirkt ihr nah genug beieinander, dass unausgesprochene Erwartungen an Einsatz und Verfuegbarkeit leicht mitlaufen.";
+      case "Risikoorientierung":
+        return "Hier wirkt ihr nah genug beieinander, dass dieselbe Chance oder Bremse fuer euch beide selbstverstaendlich werden kann.";
+      case "Konfliktstil":
+        return "Hier wirkt ihr nah genug beieinander, dass Spannungen laenger unmarkiert bleiben, weil beide denselben stillen Modus teilen.";
+    }
+  }
+
   switch (dimension) {
     case "Unternehmenslogik":
       switch (status) {
         case "nah":
-          return "Ihr richtet das Unternehmen in eine aehnliche Richtung aus.";
+          return "Ihr habt hier eine aehnliche Grundtendenz in der Frage, worauf ihr Richtung und Prioritaeten stuetzt.";
         case "ergänzend":
-          return "Ihr schaut auf unterschiedliche Hebel, nicht auf dasselbe Ziel.";
+          return "Ihr schaut hier auf unterschiedliche Hebel und bringt damit eine potenziell produktive Ergaenzung mit.";
         case "abstimmung_nötig":
-          return "Ihr priorisiert nicht automatisch dasselbe.";
+          return "Ihr priorisiert hier nicht automatisch nach denselben Massstaeben.";
         case "kritisch":
-          return "Ihr arbeitet hier nicht auf dieselbe Richtung hin.";
+          return "Hier koennt ihr dieselbe unternehmerische Frage in unterschiedliche Richtungen aufloesen.";
       }
     case "Entscheidungslogik":
       switch (status) {
         case "nah":
-          return "Ihr kommt ueber einen aehnlichen Weg zu Entscheidungen.";
+          return "Ihr habt hier eine aehnliche Grundtendenz darin, wann etwas fuer euch als entscheidungsreif gilt.";
         case "ergänzend":
-          return "Eine Person bringt mehr Analyse, die andere mehr Urteil.";
+          return "Hier bringt eine Person eher mehr Analyse, die andere eher mehr Urteil und Vorwaertsbewegung ein.";
         case "abstimmung_nötig":
-          return "Ihr entscheidet nicht nach denselben Kriterien.";
+          return "Hier entscheidet ihr nicht automatisch nach denselben Kriterien.";
         case "kritisch":
-          return "Nicht das Thema blockiert euch, sondern der Weg zur Entscheidung.";
+          return "Hier liegt die Reibung weniger im Thema selbst als in der Frage, wann entschieden werden darf.";
       }
     case "Arbeitsstruktur & Zusammenarbeit":
       switch (status) {
         case "nah":
-          return "Ihr habt ein aehnliches Bild davon, wie Zusammenarbeit laufen soll.";
+          return "Ihr habt hier eine aehnliche Grundtendenz darin, wie eng Zusammenarbeit gekoppelt sein soll.";
         case "ergänzend":
-          return "Eine Person bringt mehr Eigenraum, die andere mehr Sichtbarkeit.";
+          return "Hier bringt eine Person eher mehr Eigenraum, die andere eher mehr Sichtbarkeit und Rueckkopplung ein.";
         case "abstimmung_nötig":
-          return "Ihr meint nicht dasselbe mit guter Zusammenarbeit.";
+          return "Hier meint ihr nicht automatisch dasselbe mit guter Zusammenarbeit.";
         case "kritisch":
-          return "Eure Arbeitsweisen kollidieren im Alltag direkt.";
+          return "Hier koennen eure Arbeitsweisen im Alltag direkt gegeneinander laufen.";
       }
     case "Commitment":
       switch (status) {
         case "nah":
-          return "Euer Einsatzniveau liegt nah beieinander.";
+          return "Ihr habt hier eine aehnliche Grundtendenz darin, wie viel Einsatz und Verbindlichkeit fuer euch realistisch sind.";
         case "ergänzend":
-          return "Eine Person bringt mehr Zug, die andere mehr Begrenzung.";
+          return "Hier bringt eine Person eher mehr Zug, die andere eher mehr Grenze und Realismus ein.";
         case "abstimmung_nötig":
-          return "Ihr meint nicht dasselbe mit Einsatz.";
+          return "Hier meint ihr nicht automatisch dasselbe mit Einsatz, Verfuegbarkeit oder Prioritaet.";
         case "kritisch":
-          return "Ihr bringt unterschiedliche Grundannahmen zu Einsatz und Verbindlichkeit mit.";
+          return "Hier bringt ihr unterschiedliche Grundannahmen zu Einsatz und Verbindlichkeit mit.";
       }
     case "Risikoorientierung":
       switch (status) {
         case "nah":
-          return "Eure Risikoschwelle ist aehnlich.";
+          return "Ihr habt hier eine aehnliche Grundtendenz darin, was fuer euch noch vertretbar ist.";
         case "ergänzend":
-          return "Eine Person oeffnet eher Chancen, die andere setzt eher Grenzen.";
+          return "Hier oeffnet eine Person eher Chancen, waehrend die andere eher Grenzen und Sicherungen sichtbar macht.";
         case "abstimmung_nötig":
-          return "Fuer euch ist nicht dasselbe mutig oder vertretbar.";
+          return "Hier ist fuer euch nicht automatisch dasselbe mutig, vertretbar oder zu offen.";
         case "kritisch":
-          return "Ihr bewertet Risiko grundlegend anders.";
+          return "Hier koennt ihr dieselbe Unsicherheit grundlegend unterschiedlich lesen.";
       }
     case "Konfliktstil":
       switch (status) {
         case "nah":
-          return "Ihr habt ein aehnliches Tempo im Umgang mit Spannung.";
+          return "Ihr habt hier eine aehnliche Grundtendenz darin, wann und wie ihr Spannung oeffnet.";
         case "ergänzend":
-          return "Eine Person sortiert eher, waehrend die andere direkt wird.";
+          return "Hier sortiert eine Person eher vor, waehrend die andere frueher direkt in die Klaerung geht.";
         case "abstimmung_nötig":
-          return "Ihr klaert Spannungen nicht auf dieselbe Weise.";
+          return "Hier klaert ihr Spannungen nicht automatisch auf dieselbe Weise.";
         case "kritisch":
-          return "Im Konflikt sprecht ihr nicht dieselbe Sprache.";
+          return "Hier koennt ihr schon ueber Form und Timing der Klaerung aneinander vorbeigehen.";
       }
   }
 }
@@ -508,32 +578,101 @@ function buildDimensionExplanation(dimension: string) {
 
 function buildDimensionBusinessMeaning(
   dimension: string,
+  match: CompareFoundersResult["dimensions"][number],
   status: FounderMatchingSelection["dimensionStatuses"][number]["status"]
 ) {
+  if (match.jointState === "BOTH_MID") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Das schafft oft eine belastbare Ausgangslage, weil weder Wachstumszug noch Absicherung reflexhaft dominieren.";
+      case "Entscheidungslogik":
+        return "Das schafft oft eine belastbare Ausgangslage, weil ihr Entscheidungen weder unnoetig offen haltet noch zu frueh schliesst.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Das schafft oft eine belastbare Ausgangslage, weil Abstimmung und Eigenraum bei euch nicht auf einem gemeinsamen Extrem liegen.";
+      case "Commitment":
+        return "Das schafft oft eine belastbare Ausgangslage, weil Einsatz realistisch lesbar bleibt, ohne sofort still ueberzogen oder unterversorgt zu werden.";
+      case "Risikoorientierung":
+        return "Das schafft oft eine belastbare Ausgangslage, weil weder Sicherheitsdrang noch Offensivzug automatisch den Ton setzen.";
+      case "Konfliktstil":
+        return "Das schafft oft eine belastbare Ausgangslage, weil Klaerung bei euch weder zu spaet noch zu hart angelegt ist.";
+    }
+  }
+
+  if (match.jointState === "BOTH_HIGH") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Das gibt Zug, kann aber dazu fuehren, dass ihr beide zu wenig Gegenkraft gegen opportunistische Richtungswechsel einbaut.";
+      case "Entscheidungslogik":
+        return "Das beschleunigt, kann aber gemeinsame Prueftiefe zu frueh abkuerzen.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Das schafft Momentum, braucht aber klare Sichtbarkeit, damit Tempo nicht in Blindflug kippt.";
+      case "Commitment":
+        return "Das wirkt stark, braucht aber Schutz gegen stille Ueberlast und unausgesprochene Opferlogik.";
+      case "Risikoorientierung":
+        return "Das oeffnet Chancen, braucht aber klare Schwellen dafuer, wann Absicherung Vorrang bekommt.";
+      case "Konfliktstil":
+        return "Das kann Dinge schnell klaeren, braucht aber Leitplanken gegen Eskalation aus Zug heraus.";
+    }
+  }
+
+  if (match.jointState === "BOTH_LOW") {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Das schuetzt vor Schnellschuessen, kann aber auch gemeinsame Untersteuerung erzeugen.";
+      case "Entscheidungslogik":
+        return "Das reduziert vorschnelle Entscheidungen, kann aber leicht in zu spaete Commitments kippen.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Das schafft Sicherheit, kann aber Eigenverantwortung und Geschwindigkeit zu stark bremsen.";
+      case "Commitment":
+        return "Das kann realistisch sein, braucht aber klare Erwartungen, damit das Unternehmen nicht still unterversorgt bleibt.";
+      case "Risikoorientierung":
+        return "Das schuetzt vor unnoetigen Wetten, kann aber auch Chancen systematisch zu spaet oeffnen.";
+      case "Konfliktstil":
+        return "Das haelt Gespraeche ruhig, kann aber Spannung zu lange im System lassen.";
+    }
+  }
+
+  if (match.hasSharedBlindSpotRisk) {
+    switch (dimension) {
+      case "Unternehmenslogik":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber kleine Richtungsverschiebungen lange unsichtbar lassen.";
+      case "Entscheidungslogik":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber dazu fuehren, dass dieselbe Entscheidungsluecke fuer euch beide zu normal wirkt.";
+      case "Arbeitsstruktur & Zusammenarbeit":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber stille Drift bei Sichtbarkeit, Eigenraum oder Mitsicht verdecken.";
+      case "Commitment":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber unausgesprochene Erwartungen an Einsatz lange mitschwingen lassen.";
+      case "Risikoorientierung":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber gemeinsame Ueber- oder Untersteuerung zu spaet sichtbar machen.";
+      case "Konfliktstil":
+        return "Das wirkt zunaechst anschlussfaehig, kann aber dazu fuehren, dass beide zu lange im selben stillen Modus bleiben.";
+    }
+  }
+
   switch (dimension) {
     case "Unternehmenslogik":
       return status === "nah"
-        ? "Das macht Kursentscheidungen leichter."
+        ? "Das erleichtert Kursentscheidungen, solange ihr offene Abweichungen trotzdem frueh markiert."
         : "Das beeinflusst, wie ihr Chancen bewertet und wann ihr den Kurs aendert.";
     case "Entscheidungslogik":
       return status === "nah"
-        ? "Das spart Zeit bei Entscheidungen unter Druck."
+        ? "Das erleichtert Entscheidungen unter Druck, solange aus Naehe keine stille Selbstverstaendlichkeit wird."
         : "Das entscheidet darueber, ob ihr schnell vorankommt oder euch in Schleifen festfahrt.";
     case "Arbeitsstruktur & Zusammenarbeit":
       return status === "nah"
-        ? "Das entlastet eure Zusammenarbeit im Alltag."
+        ? "Das entlastet Zusammenarbeit oft, solange Sichtbarkeit und Eigenraum nicht still auseinanderlaufen."
         : "Das praegt, wie viel Abstimmung euch traegt und ab wann sie euch bremst.";
     case "Commitment":
       return status === "nah"
-        ? "Das schafft Ruhe bei Erwartungen an Einsatz und Tempo."
+        ? "Das schafft oft Ruhe bei Erwartungen an Einsatz und Tempo, solange Grenzen und Zusatzlasten nicht still verschoben werden."
         : "Das beeinflusst, wie fair Verantwortung, Verfuegbarkeit und Druck erlebt werden.";
     case "Risikoorientierung":
       return status === "nah"
-        ? "Das erleichtert Investitionen, Richtungswechsel und Stop-Entscheidungen."
+        ? "Das erleichtert grosse Schritte, solange gemeinsame Wetten oder gemeinsame Vorsicht nicht ungeprueft mitlaufen."
         : "Das praegt, welche Schritte ihr wagt und wo fuer euch die Bremse greifen muss.";
     case "Konfliktstil":
       return status === "nah"
-        ? "Das erleichtert Klaerung, wenn es schwierig wird."
+        ? "Das erleichtert Klaerung oft, solange ihr nicht voraussetzt, dass der gemeinsame Stil immer schon reicht."
         : "Das bestimmt, ob Spannungen frueh bearbeitet oder gegenseitig falsch gelesen werden.";
     default:
       return "";
@@ -685,32 +824,32 @@ function buildEverydaySituationForDimension(
     case "Unternehmenslogik":
       return {
         title: "Wenn Prioritaeten kollidieren",
-        body: "Ihr muesst Prioritaeten, Ziele und Richtung klaeren, sonst zieht ihr am selben Thema in verschiedene Richtungen.",
+        body: "Dann wird schnell sichtbar, ob ihr dieselbe Chance gleich gewichtet oder ob daraus unterschiedliche Kurslesarten entstehen.",
       };
     case "Entscheidungslogik":
       return {
         title: "Wenn schnell entschieden werden muss",
-        body: "Ihr braucht klare Entscheidungskriterien, sonst wird aus Tempo schnell eine Schleife.",
+        body: "Dann wird sichtbar, ob fuer euch derselbe Stand schon tragfaehig ist oder ob die Entscheidung noch einmal eine Runde dreht.",
       };
     case "Arbeitsstruktur & Zusammenarbeit":
       return {
         title: "Wenn Arbeit parallel laeuft",
-        body: "Ihr muesst festlegen, was sichtbar sein muss und was eigenstaendig laufen darf, sonst fuehlt sich die eine Person kontrolliert und die andere allein gelassen.",
+        body: "Dann wird sichtbar, was frueh in den gemeinsamen Blick gehoert und was eigenstaendig weiterlaufen kann, ohne zu spaet wieder aufzuploppen.",
       };
     case "Commitment":
       return {
         title: "Wenn Wochen voll werden",
-        body: "Ihr muesst Zeit, Verantwortung und Erwartung an Einsatz klaeren, sonst wird aus Belastung schnell ein Streit ueber Fairness.",
+        body: "Dann wird sichtbar, ob Einsatz fuer euch dieselbe Form hat oder ob aus Mehrbelastung still unterschiedliche Erwartungen werden.",
       };
     case "Risikoorientierung":
       return {
         title: "Wenn eine groessere Entscheidung ansteht",
-        body: "Ihr muesst klären, welches Risiko fuer euch tragbar ist, sonst zieht die eine Person an, waehrend die andere bremst.",
+        body: "Dann wird sichtbar, welche Schwelle fuer euch noch vertretbar ist und ab wann dieselbe Lage fuer eine Person schon zu offen wird.",
       };
     case "Konfliktstil":
       return {
         title: "Wenn etwas schieflaeuft",
-        body: "Ihr braucht eine klare Form fuer Klaerung, sonst fuehlt sich die eine Person ueberfahren und die andere ausgebremst.",
+        body: "Dann wird sichtbar, ob ihr Unterschiede im selben Takt und in derselben Form klaeren wollt oder ob schon der Rahmen der Klaerung zur Reibung wird.",
       };
   }
 }
@@ -760,28 +899,28 @@ function buildDimensionConsequence(
   switch (dimension) {
     case "Unternehmenslogik":
       return status === "kritisch"
-        ? "Wenn ihr das nicht klaert, baut ihr am selben Unternehmen mit verschiedenen Logiken."
-        : "Wenn ihr das offen lasst, arbeitet ihr an verschiedenen Zielen.";
+        ? "Wenn ihr das nicht klaert, koennt ihr am selben Unternehmen mit verschiedenen Grundlogiken arbeiten."
+        : "Wenn ihr das offen lasst, koennen aus derselben Prioritaet unterschiedliche Zielbilder werden.";
     case "Entscheidungslogik":
       return status === "kritisch"
-        ? "Ohne klare Regel entscheidet ihr aneinander vorbei."
-        : "Wenn ihr das offen lasst, dreht ihr Schleifen statt zu entscheiden.";
+        ? "Ohne klare Regel koennt ihr aneinander vorbei entscheiden oder Entscheidungen unterschiedlich frueh als erledigt ansehen."
+        : "Wenn ihr das offen lasst, entstehen leicht Schleifen, obwohl beide schon weiter wollen.";
     case "Arbeitsstruktur & Zusammenarbeit":
       return status === "kritisch"
-        ? "Ohne klare Regeln wird aus Alltag direkt Reibung."
-        : "Wenn ihr das nicht klaert, fuehlt sich die eine Person allein gelassen und die andere kontrolliert.";
+        ? "Ohne klare Regeln wird aus Alltag leicht direkte Reibung ueber Sichtbarkeit, Eigenraum und Mitsicht."
+        : "Wenn ihr das nicht klaert, kann sich dieselbe Zusammenarbeit fuer die eine Person zu eng und fuer die andere zu lose anfuehlen.";
     case "Commitment":
       return status === "kritisch"
-        ? "Ohne klare Abmachung wird Commitment zum Dauerthema."
-        : "Wenn ihr das nicht klaert, entsteht Frust ueber Tempo, Verfuegbarkeit und Verantwortung.";
+        ? "Ohne klare Abmachung wird Commitment leicht zum Dauerthema ueber Tempo, Verfuegbarkeit und Fairness."
+        : "Wenn ihr das nicht klaert, entsteht leicht Frust ueber Tempo, Verfuegbarkeit und Verantwortung.";
     case "Risikoorientierung":
       return status === "kritisch"
-        ? "Ohne klare Leitplanke zieht die eine Person an und die andere bremst."
-        : "Wenn ihr das offen lasst, werden Chancen zu frueh gestoppt oder zu weit getrieben.";
+        ? "Ohne klare Leitplanke zieht leicht die eine Person an, waehrend die andere frueher bremst."
+        : "Wenn ihr das offen lasst, werden Chancen leicht zu frueh gestoppt oder zu weit getrieben.";
     case "Konfliktstil":
       return status === "kritisch"
-        ? "Ohne Regel dazu eskalieren Kleinigkeiten oder bleiben zu lange liegen."
-        : "Wenn ihr das offen lasst, fuehlt sich die eine Person ueberfahren und die andere ausgebremst.";
+        ? "Ohne Regel dazu koennen Kleinigkeiten eskalieren oder zu lange unter der Oberflaeche bleiben."
+        : "Wenn ihr das offen lasst, fuehlt sich die eine Person leicht ueberfahren und die andere ausgebremst.";
   }
 }
 
@@ -790,17 +929,17 @@ function buildDimensionComplementConsequence(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Das macht euch breiter, wenn ihr gemeinsam festlegt, worauf ihr am Ende priorisiert.";
+      return "Das macht euch breiter, wenn ihr gemeinsam festlegt, worauf ihr im Zweifel priorisiert.";
     case "Entscheidungslogik":
-      return "Das hilft euch nur, wenn klar ist, wer wann den letzten Schritt macht.";
+      return "Das hilft euch, wenn klar ist, wer wann den letzten Schritt macht und was davor noch geprueft werden soll.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Das traegt nur, wenn Zuständigkeit und Sichtbarkeit sauber geregelt sind.";
+      return "Das traegt nur, wenn Zustaendigkeit und Sichtbarkeit sauber geregelt sind.";
     case "Commitment":
-      return "Das traegt nur, wenn beide wissen, was wirklich erwartet ist und was nicht.";
+      return "Das traegt nur, wenn beide wissen, was wirklich erwartet ist und was bewusst nicht still mitgemeint ist.";
     case "Risikoorientierung":
       return "Das hilft nur, wenn ihr die Grenze gemeinsam setzt und nicht situativ verschiebt.";
     case "Konfliktstil":
-      return "Das hilft nur, wenn ihr den richtigen Moment fuer Klaerung gemeinsam findet.";
+      return "Das hilft nur, wenn ihr den Moment und die Form fuer Klaerung gemeinsam findet.";
   }
 }
 
@@ -847,17 +986,17 @@ function buildSupportSentenceForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "In eurer Unternehmenslogik liegt eine tragende gemeinsame Linie. Das gibt euch Halt bei Prioritaeten und Richtung.";
+      return "In eurer Unternehmenslogik liegt eine tragende gemeinsame Linie. Das gibt euch oft Halt bei Prioritaeten und Richtung, ohne schon jede spaetere Richtungsfrage vorwegzunehmen.";
     case "Entscheidungslogik":
-      return "In eurer Entscheidungslogik liegt eine tragende gemeinsame Linie. Das spart Reibung unter Zeitdruck.";
+      return "In eurer Entscheidungslogik liegt eine tragende gemeinsame Linie. Das spart oft Reibung unter Zeitdruck, solange ihr offene Sonderfaelle trotzdem markiert.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "In eurer Zusammenarbeit liegt eine tragende gemeinsame Linie. Das entlastet den Alltag.";
+      return "In eurer Zusammenarbeit liegt eine tragende gemeinsame Linie. Das entlastet den Alltag, solange ihr sie nicht mit stiller Selbstverstaendlichkeit verwechselt.";
     case "Commitment":
-      return "Beim Commitment liegt eine tragende gemeinsame Linie. Das schafft Ruhe bei Erwartungen.";
+      return "Beim Commitment liegt eine tragende gemeinsame Linie. Das schafft oft Ruhe bei Erwartungen, solange Zusatzlasten und Grenzverschiebungen sichtbar bleiben.";
     case "Risikoorientierung":
-      return "Bei Risiko liegt eine tragende gemeinsame Linie. Das macht groessere Schritte berechenbarer.";
+      return "Bei Risiko liegt eine tragende gemeinsame Linie. Das macht groessere Schritte berechenbarer, solange gemeinsame Ueber- oder Untersteuerung mitgedacht wird.";
     case "Konfliktstil":
-      return "Im Umgang mit Spannung liegt eine tragende gemeinsame Linie. Das macht Klaerung leichter.";
+      return "Im Umgang mit Spannung liegt eine tragende gemeinsame Linie. Das macht Klaerung oft leichter, ohne jeden schwierigen Moment automatisch einfach zu machen.";
   }
 }
 
@@ -866,17 +1005,17 @@ function buildComplementSupportSentence(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Euer Unterschied in der Unternehmenslogik kann euch breiter machen, wenn ihr die Richtung trotzdem gemeinsam haltet.";
+      return "Euer Unterschied in der Unternehmenslogik kann euch breiter machen, wenn ihr die Richtung trotzdem gemeinsam haltet und den Zielmassstab explizit macht.";
     case "Entscheidungslogik":
-      return "Euer Unterschied in der Entscheidungslogik kann euch schneller und gruendlicher machen, wenn die Rollen klar sind.";
+      return "Euer Unterschied in der Entscheidungslogik kann euch schneller und gruendlicher machen, wenn klar bleibt, wann Tempo hilft und wann mehr Pruefung noetig ist.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Euer Unterschied in der Zusammenarbeit kann gut sein, wenn Eigenraum und Sichtbarkeit zusammenpassen.";
+      return "Euer Unterschied in der Zusammenarbeit kann produktiv sein, wenn Eigenraum und Sichtbarkeit bewusst aufeinander abgestimmt werden.";
     case "Commitment":
-      return "Euer Unterschied beim Commitment kann tragen, wenn Einsatz nicht still vorausgesetzt wird.";
+      return "Euer Unterschied beim Commitment kann tragen, wenn Einsatz nicht still vorausgesetzt, sondern bewusst gerahmt wird.";
     case "Risikoorientierung":
-      return "Euer Unterschied beim Risiko kann euch vor Ueberzug und vor zu viel Vorsicht schuetzen.";
+      return "Euer Unterschied beim Risiko kann euch vor Ueberzug und vor zu viel Vorsicht schuetzen, wenn eure Schwellen sichtbar bleiben.";
     case "Konfliktstil":
-      return "Euer Unterschied im Konfliktstil kann Klaerung verbessern, wenn ihr Timing und Form bewusst fuehrt.";
+      return "Euer Unterschied im Konfliktstil kann Klaerung verbessern, wenn ihr Timing und Form bewusst fuehrt statt gegeneinander zu lesen.";
   }
 }
 
@@ -904,17 +1043,17 @@ function buildSharedStrengthSentence(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr bei Richtung und Prioritaeten schneller auf einen gemeinsamen Kurs kommt.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr bei Richtung und Prioritaeten schneller auf einen gemeinsamen Kurs kommt, ohne jedes Mal bei null zu beginnen.";
     case "Entscheidungslogik":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr unter Druck nicht erst den Entscheidungsweg aushandeln muesst.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr unter Druck nicht erst den Entscheidungsweg neu aushandeln muesst.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr im Alltag weniger Energie an Abstimmung verliert.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr im Alltag weniger Energie an unnötige Abstimmung verliert.";
     case "Commitment":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil Einsatz und Verbindlichkeit fuer euch aehnlich lesbar sind.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil Einsatz und Verbindlichkeit fuer euch aehnlich lesbar bleiben.";
     case "Risikoorientierung":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr grosse Schritte und Grenzen aehnlich bewertet.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr grosse Schritte und Grenzen auf einer aehnlichen Grundlage bewertet.";
     case "Konfliktstil":
-      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr Spannungen aehnlich ansprecht und dadurch schneller klaert.";
+      return "Diese gemeinsame Linie kann zu einer echten Staerke werden, weil ihr Spannungen aehnlich ansprecht und dadurch Klarung leichter anschlussfaehig bleibt.";
   }
 }
 
@@ -923,17 +1062,17 @@ function buildRiskSentenceForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Euer groesster Reibungspunkt ist die Unternehmenslogik. Wenn ihr das nicht klaert, arbeitet ihr an verschiedenen Zielen.";
+      return "Euer groesster Klaerungsbedarf liegt in der Unternehmenslogik. Wenn ihr das offen lasst, koennt ihr dieselbe Prioritaet an verschiedenen Zielen ausrichten.";
     case "Entscheidungslogik":
-      return "Euer groesster Reibungspunkt ist die Entscheidungslogik. Wenn ihr das nicht klaert, entscheidet ihr aneinander vorbei.";
+      return "Euer groesster Klaerungsbedarf liegt in der Entscheidungslogik. Wenn ihr das offen lasst, koennt ihr aneinander vorbei entscheiden oder dieselbe Entscheidung mehrfach fuehren.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Euer groesster Reibungspunkt ist die Zusammenarbeit im Alltag. Wenn ihr das nicht klaert, kippt Alltag schnell in Reibung.";
+      return "Euer groesster Klaerungsbedarf liegt in der Zusammenarbeit im Alltag. Wenn ihr das offen lasst, entsteht Reibung eher ueber Uebergaenge und Sichtbarkeit als ueber offene Konfrontation.";
     case "Commitment":
-      return "Euer groesster Reibungspunkt ist Commitment. Wenn ihr das nicht klaert, wird Einsatz zum Dauerthema.";
+      return "Euer groesster Klaerungsbedarf liegt beim Commitment. Wenn ihr das offen lasst, werden Einsatz, Verfuegbarkeit und Fairness leicht zum Dauerthema.";
     case "Risikoorientierung":
-      return "Euer groesster Reibungspunkt ist Risiko. Wenn ihr das nicht klaert, zieht eine Person an und die andere bremst.";
+      return "Euer groesster Klaerungsbedarf liegt beim Risiko. Wenn ihr das offen lasst, kann dieselbe Chance fuer die eine Person zu eng und fuer die andere zu offen wirken.";
     case "Konfliktstil":
-      return "Euer groesster Reibungspunkt ist der Umgang mit Spannung. Wenn ihr das nicht klaert, eskalieren Kleinigkeiten oder bleiben liegen.";
+      return "Euer groesster Klaerungsbedarf liegt im Umgang mit Spannung. Wenn ihr das offen lasst, werden Themen entweder zu spaet oder in unpassender Form bearbeitet.";
   }
 }
 
@@ -942,25 +1081,37 @@ function buildCentralPatternSections(selection: FounderMatchingSelection) {
     selection.biggestTension &&
     selection.dimensionStatuses.find((entry) => entry.dimension === selection.biggestTension?.dimension);
 
-  const kernspannung = selection.biggestTension
-    ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Massstaeben schaut.`
-    : selection.strongestComplement
-      ? `Euer staerkster Unterschied liegt in ${selection.strongestComplement.dimension} und braucht bewusste Fuehrung, damit er euch traegt.`
-      : selection.stableBase
-        ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfaehig, ersetzt aber keine klare Regel an offenen Punkten.`
-        : "Ihr habt genug gemeinsame Linie, um gut zusammenzuarbeiten, aber nicht genug Gleichlauf fuer stilles Verstaendnis.";
+  const kernspannung = selection.heroSelection.mode === "blind_spot_watch"
+    ? selection.heroSelection.biggestRisk
+      ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich zunaechst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.`
+      : "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und gerade deshalb leicht zu spät geprüft wird."
+    : selection.biggestTension
+      ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Massstaeben schaut.`
+      : selection.strongestComplement
+        ? `Euer staerkster Unterschied liegt in ${selection.strongestComplement.dimension} und kann euch breiter machen, wenn ihr ihn bewusst fuehrt.`
+        : selection.stableBase
+          ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfaehig, aber kein Ersatz fuer klare Regeln an offenen Punkten.`
+          : "Ihr habt genug gemeinsame Linie fuer Zusammenarbeit, aber nicht genug Gleichlauf fuer stilles Verstaendnis.";
 
-  const auswirkungImAlltag = selection.biggestTension
-    ? buildEverydayImpactSentenceForDimension(selection.biggestTension.dimension)
-    : selection.strongestComplement
-      ? buildComplementEverydayImpactSentence(selection.strongestComplement.dimension)
-      : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern in Prioritaeten, Timing und unausgesprochenen Erwartungen.";
+  const auswirkungImAlltag = selection.heroSelection.mode === "blind_spot_watch"
+    ? selection.heroSelection.biggestRisk
+      ? `Im Alltag zeigt sich das oft nicht als offene Reibung, sondern als spaete Irritation rund um ${selection.heroSelection.biggestRisk.dimension}: Beide gehen zunaechst von derselben Selbstverstaendlichkeit aus, bis eine Grenze ploetzlich doch nicht geteilt ist.`
+      : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern darin, dass kleine Abweichungen lange unter gemeinsamer Naehe mitlaufen."
+    : selection.biggestTension
+      ? buildEverydayImpactSentenceForDimension(selection.biggestTension.dimension)
+      : selection.strongestComplement
+        ? buildComplementEverydayImpactSentence(selection.strongestComplement.dimension)
+        : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern in Prioritaeten, Timing und unausgesprochenen Erwartungen.";
 
-  const konsequenzOhneKlaerung = selection.biggestTension && biggestTensionStatus
-    ? buildDimensionConsequence(selection.biggestTension.dimension, biggestTensionStatus.status)
-    : selection.strongestComplement
-      ? buildDimensionComplementConsequence(selection.strongestComplement.dimension)
-      : "Ohne bewusste Klaerung entstehen unterschiedliche Massstaebe genau dort, wo ihr gemeinsam tragen und entscheiden muesst.";
+  const konsequenzOhneKlaerung = selection.heroSelection.mode === "blind_spot_watch"
+    ? selection.heroSelection.biggestRisk
+      ? `Ohne bewusste Klaerung kann aus gemeinsamer Naehe rund um ${selection.heroSelection.biggestRisk.dimension} ein Blind Spot werden: Nicht weil ihr offen gegeneinander arbeitet, sondern weil niemand merkt, wann der gemeinsame Modus nicht mehr traegt.`
+      : "Ohne bewusste Klaerung entsteht kein lauter Konflikt, sondern spaeter eine Ueberraschung ueber Regeln, von denen beide dachten, sie seien geteilt."
+    : selection.biggestTension && biggestTensionStatus
+      ? buildDimensionConsequence(selection.biggestTension.dimension, biggestTensionStatus.status)
+      : selection.strongestComplement
+        ? buildDimensionComplementConsequence(selection.strongestComplement.dimension)
+        : "Ohne bewusste Klaerung entstehen unterschiedliche Massstaebe genau dort, wo ihr gemeinsam tragen und entscheiden muesst.";
 
   return [
     { label: "Kernspannung", body: kernspannung },
@@ -974,17 +1125,17 @@ function buildEverydayImpactSentenceForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Im Alltag zeigt sich das, sobald ihr dieselbe Chance oder Prioritaet unterschiedlich bewertet.";
+      return "Im Alltag zeigt sich das oft dort, wo ihr dieselbe Chance oder Prioritaet unterschiedlich bewertet.";
     case "Entscheidungslogik":
-      return "Im Alltag zeigt sich das, sobald Tempo gefragt ist und ihr nicht dieselbe Schwelle fuer Klarheit habt.";
+      return "Im Alltag zeigt sich das oft dort, wo Tempo gefragt ist und ihr nicht dieselbe Schwelle fuer Klarheit habt.";
     case "Arbeitsstruktur & Zusammenarbeit":
       return "Im Alltag zeigt sich das daran, dass Sichtbarkeit, Eigenraum und Abstimmung nicht gleich verstanden werden.";
     case "Commitment":
-      return "Im Alltag zeigt sich das, wenn Einsatz, Verfuegbarkeit und Verantwortung unterschiedlich gelesen werden.";
+      return "Im Alltag zeigt sich das oft dort, wo Einsatz, Verfuegbarkeit und Verantwortung unterschiedlich gelesen werden.";
     case "Risikoorientierung":
-      return "Im Alltag zeigt sich das, sobald eine Person frueher handeln will und die andere frueher absichert.";
+      return "Im Alltag zeigt sich das oft dort, wo eine Person frueher handeln will und die andere frueher absichert.";
     case "Konfliktstil":
-      return "Im Alltag zeigt sich das, sobald Spannung aufkommt und ihr nicht dieselbe Form fuer Klaerung erwartet.";
+      return "Im Alltag zeigt sich das oft dort, wo Spannung aufkommt und ihr nicht dieselbe Form fuer Klaerung erwartet.";
   }
 }
 
@@ -993,9 +1144,9 @@ function buildComplementEverydayImpactSentence(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Im Alltag koennt ihr dadurch zugleich Substanz schuetzen und Chancen frueher sehen.";
+      return "Im Alltag koennt ihr dadurch zugleich Substanz schuetzen und Chancen frueher sehen, wenn ihr dieselbe Richtung sauber haltet.";
     case "Entscheidungslogik":
-      return "Im Alltag koennt ihr dadurch gruendlicher und schneller entscheiden als mit nur einer Logik.";
+      return "Im Alltag koennt ihr dadurch gruendlicher und zugleich schneller entscheiden als mit nur einer Logik.";
     case "Arbeitsstruktur & Zusammenarbeit":
       return "Im Alltag koennt ihr dadurch Eigenverantwortung und gemeinsame Orientierung besser verbinden.";
     case "Commitment":

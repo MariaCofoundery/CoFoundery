@@ -66,7 +66,9 @@ export type ReportRunSnapshot = {
   inputAssessmentIds: string[];
   reportType: "classic_compare_v1" | "founder_alignment_v1";
   report: SessionAlignmentReport | null;
+  // Legacy compare payload retained for backward-compatible snapshot hydration.
   compareJson: CompareReportJson | null;
+  // Legacy compatibility report retained for workbook/fallback hydration.
   founderReport: FounderAlignmentReport | null;
   founderScoring: TeamScoringResult | null;
   payload: Record<string, unknown> | null;
@@ -2530,11 +2532,6 @@ export async function getExecutiveSummaryTextByAlignment(
   }
 
   return `Die stärkste Differenz liegt aktuell bei ${strongest.dimension}.`; 
-}
-
-export async function generateCompareReportForSession(sessionId: string): Promise<CompareReportJson | null> {
-  const snapshot = await getReportRunSnapshotForSession(sessionId);
-  return snapshot?.compareJson ?? null;
 }
 
 export async function createReportRunOnCompletion(sessionId: string): Promise<ReportRunSnapshot | null> {
