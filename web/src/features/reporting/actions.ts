@@ -208,6 +208,8 @@ type SubmittedAssessmentLiteRow = {
 
 type ReportRunInvitationRow = {
   invitation_id: string;
+  payload?: unknown;
+  created_at?: string;
 };
 
 type BackfillInvitationIdRow = {
@@ -911,7 +913,10 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
       .from("invitation_modules")
       .select("invitation_id, module")
       .in("invitation_id", invitationIds),
-    dataClient.from("report_runs").select("invitation_id").in("invitation_id", invitationIds),
+    dataClient
+      .from("report_runs")
+      .select("invitation_id, payload")
+      .in("invitation_id", invitationIds),
   ]);
 
   const requiredModulesByInvitationId = new Map<string, AssessmentModule[]>();
@@ -929,9 +934,12 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
     );
   }
 
-  const reportRunByInvitationId = new Set(
-    ((reportRunsResult.data ?? []) as ReportRunInvitationRow[]).map((row) => row.invitation_id)
-  );
+  const reportRunRenderableByInvitationId = new Map<string, boolean>();
+  for (const row of (reportRunsResult.data ?? []) as ReportRunInvitationRow[]) {
+    const renderable = hasRenderableReportRunPayload(toRecord(row.payload));
+    const current = reportRunRenderableByInvitationId.get(row.invitation_id) ?? false;
+    reportRunRenderableByInvitationId.set(row.invitation_id, current || renderable);
+  }
 
   const matchingStates = new Map(
     await Promise.all(
@@ -953,6 +961,47 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
       })
     )
   );
+
+  if (privileged) {
+    for (const invitation of invitations) {
+      const requiredModules = requiredModulesByInvitationId.get(invitation.id) ?? ["base"];
+      const matchingState = matchingStates.get(invitation.id);
+      const inviterBoundByModule = matchingState?.bindingsByUser.get(invitation.inviter_user_id);
+      const inviteeBoundByModule = invitation.invitee_user_id
+        ? matchingState?.bindingsByUser.get(invitation.invitee_user_id)
+        : undefined;
+      const inviterLatestSubmittedByModule =
+        matchingState?.latestSubmittedByUser.get(invitation.inviter_user_id);
+      const inviteeLatestSubmittedByModule = invitation.invitee_user_id
+        ? matchingState?.latestSubmittedByUser.get(invitation.invitee_user_id)
+        : undefined;
+      const reportRunExists = reportRunRenderableByInvitationId.get(invitation.id) === true;
+      const isReadyForMatching =
+        invitation.status === "accepted" &&
+        !isInvitationExpired(invitation.expires_at) &&
+        isUserReadyForModulesFromCurrentStand(
+          requiredModules,
+          inviterBoundByModule,
+          inviterLatestSubmittedByModule
+        ) &&
+        isUserReadyForModulesFromCurrentStand(
+          requiredModules,
+          inviteeBoundByModule,
+          inviteeLatestSubmittedByModule
+        );
+
+      if (!reportRunExists && isReadyForMatching) {
+        const repairResult = await ensureReportRunForInvitationWithPrivilegedClient(
+          privileged,
+          invitation.id,
+          { sourceTag: "dashboard_ready_repair" }
+        );
+        if (repairResult.ok) {
+          reportRunRenderableByInvitationId.set(invitation.id, true);
+        }
+      }
+    }
+  }
 
   return invitations.map((invitation) => {
     const direction = invitation.inviter_user_id === user.id ? "sent" : "incoming";
@@ -995,7 +1044,7 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
         "values"
       )
     );
-    const reportRunExists = reportRunByInvitationId.has(invitation.id);
+    const reportRunExists = reportRunRenderableByInvitationId.get(invitation.id) === true;
     const isReadyForMatching =
       invitation.status === "accepted" &&
       !isInvitationExpired(invitation.expires_at) &&
@@ -1136,6 +1185,9 @@ async function getInvitationJoinDecisionInternal(
   });
 
   const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: dataClient });
+  const inviterBoundByModule = matchingState.bindingsByUser.get(invitation.inviter_user_id);
+  const inviterLatestSubmittedByModule =
+    matchingState.latestSubmittedByUser.get(invitation.inviter_user_id);
   const inviteeBoundByModule = matchingState.bindingsByUser.get(user.id);
   const inviteeLatestSubmittedByModule = matchingState.latestSubmittedByUser.get(user.id);
   const missingModules = requiredModules.filter(
@@ -1154,10 +1206,35 @@ async function getInvitationJoinDecisionInternal(
 
   const { data: reportRunData } = await dataClient
     .from("report_runs")
-    .select("id")
+    .select("id, payload")
     .eq("invitation_id", normalizedInvitationId)
     .maybeSingle();
-  const reportRunId = parseAcceptableReportRunId(reportRunData as { id?: string } | null);
+  const reportRunRow = reportRunData as { id?: string; payload?: unknown } | null;
+  let reportRunId = hasRenderableReportRunPayload(toRecord(reportRunRow?.payload))
+    ? parseAcceptableReportRunId(reportRunRow)
+    : null;
+  const isMatchingReady =
+    isUserReadyForModulesFromCurrentStand(
+      requiredModules,
+      inviterBoundByModule,
+      inviterLatestSubmittedByModule
+    ) &&
+    isUserReadyForModulesFromCurrentStand(
+      requiredModules,
+      inviteeBoundByModule,
+      inviteeLatestSubmittedByModule
+    );
+
+  if (!reportRunId && privileged && isMatchingReady) {
+    const repairResult = await ensureReportRunForInvitationWithPrivilegedClient(
+      privileged,
+      normalizedInvitationId,
+      { sourceTag: "join_decision_ready_repair" }
+    );
+    if (repairResult.ok) {
+      reportRunId = repairResult.reportRunId;
+    }
+  }
 
   const mode: "needs_questionnaires" | "choice_existing_or_update" | "report_ready" = reportRunId
     ? "report_ready"
@@ -1423,11 +1500,17 @@ export async function debug_invitation_readiness(
 
   const { data: reportRunData } = await dataClient
     .from("report_runs")
-    .select("id, relationship_id")
+    .select("id, relationship_id, payload")
     .eq("invitation_id", normalizedInvitationId)
     .maybeSingle();
-  const reportRunId = parseAcceptableReportRunId(reportRunData as { id?: string } | null);
-  const reportRunRow = reportRunData as { id?: string; relationship_id?: string } | null;
+  const reportRunRow = reportRunData as {
+    id?: string;
+    relationship_id?: string;
+    payload?: unknown;
+  } | null;
+  const reportRunId = hasRenderableReportRunPayload(toRecord(reportRunRow?.payload))
+    ? parseAcceptableReportRunId(reportRunRow)
+    : null;
   let relationshipId = reportRunRow?.relationship_id ?? null;
   if (!relationshipId && invitation.invitee_user_id) {
     const { data: relationshipData } = await dataClient
@@ -1740,11 +1823,19 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
 
   const { data: existingReportRun } = await privileged
     .from("report_runs")
-    .select("id")
+    .select("id, relationship_id, payload")
     .eq("invitation_id", normalizedInvitationId)
     .maybeSingle();
-  const existingReportRunId = parseAcceptableReportRunId(existingReportRun as { id?: string } | null);
-  if (existingReportRunId) {
+  const existingReportRunRow = existingReportRun as {
+    id?: string;
+    relationship_id?: string | null;
+    payload?: unknown;
+  } | null;
+  const existingReportRunId = parseAcceptableReportRunId(existingReportRunRow);
+  const existingReportRunRenderable = hasRenderableReportRunPayload(
+    toRecord(existingReportRunRow?.payload)
+  );
+  if (existingReportRunId && existingReportRunRenderable) {
     return { ok: true, reportRunId: existingReportRunId };
   }
 
@@ -2016,6 +2107,33 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     source: sourceTag,
   };
 
+  if (existingReportRunId && !existingReportRunRenderable) {
+    const { data: repairedRow, error: repairedError } = await privileged
+      .from("report_runs")
+      .update({
+        payload,
+        modules: ensureBaseModule(requiredModules),
+        input_assessment_ids: [...new Set(inputAssessmentIds)],
+      })
+      .eq("id", existingReportRunId)
+      .select("id")
+      .maybeSingle();
+
+    if (repairedError) {
+      console.error("ensureReportRunForInvitation repair update failed", {
+        invitationId: normalizedInvitationId,
+        reportRunId: existingReportRunId,
+        error: repairedError.message,
+      });
+      return { ok: false, reason: "insert_failed", detail: repairedError.message };
+    }
+
+    const repairedId = parseAcceptableReportRunId(repairedRow as { id?: string } | null);
+    if (repairedId) {
+      return { ok: true, reportRunId: repairedId };
+    }
+  }
+
   const { data: finalizeData, error: finalizeError } = await privileged.rpc(
     "finalize_invitation_if_ready",
     {
@@ -2159,18 +2277,20 @@ export async function backfillReportRunsForAcceptedInvitations(options?: {
 
     const { data: reportRows, error: reportError } = await privileged
       .from("report_runs")
-      .select("invitation_id")
+      .select("invitation_id, payload")
       .in("invitation_id", invitationIds);
     if (reportError) {
       return { ok: false, reason: "query_failed", detail: reportError.message };
     }
 
-    const reportRunByInvitationId = new Set(
-      ((reportRows ?? []) as ReportRunInvitationRow[]).map((row) => row.invitation_id)
+    const renderableReportByInvitationId = new Set(
+      ((reportRows ?? []) as ReportRunInvitationRow[])
+        .filter((row) => hasRenderableReportRunPayload(toRecord(row.payload)))
+        .map((row) => row.invitation_id)
     );
 
     for (const invitationId of invitationIds) {
-      if (!reportRunByInvitationId.has(invitationId)) {
+      if (!renderableReportByInvitationId.has(invitationId)) {
         candidateIds.push(invitationId);
         if (candidateIds.length >= target) break;
       }
@@ -2294,6 +2414,15 @@ function asFounderScoringResult(value: unknown): TeamScoringResult | null {
   if (!record) return null;
   if (!Array.isArray(record.dimensions)) return null;
   return value as TeamScoringResult;
+}
+
+function hasRenderableReportRunPayload(payload: Record<string, unknown> | null) {
+  const nestedReport = asSessionAlignmentReport(payload?.report);
+  const directReport = asSessionAlignmentReport(payload);
+  const founderReport = asFounderAlignmentReport(payload?.founderReport);
+  const founderScoring = asFounderScoringResult(payload?.founderScoring);
+
+  return Boolean((nestedReport ?? directReport) && founderReport && founderScoring);
 }
 
 function fallbackReport(invitationId: string, createdAt: string, payload: Record<string, unknown> | null) {

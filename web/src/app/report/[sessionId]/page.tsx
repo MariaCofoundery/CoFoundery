@@ -69,6 +69,8 @@ export default async function ReportPage({ params }: PageProps) {
   let snapshot = await getReportRunSnapshotForSession(sessionId);
   if (!snapshot) {
     snapshot = await createReportRunOnCompletion(sessionId);
+  } else if (!snapshot.founderScoring) {
+    snapshot = await createReportRunOnCompletion(snapshot.invitationId);
   }
 
   const { data: invitationContextRow } = await supabase
