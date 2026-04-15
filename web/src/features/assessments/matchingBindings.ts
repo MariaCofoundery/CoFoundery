@@ -71,6 +71,28 @@ type BindLatestSubmittedOptions = {
   replaceExisting?: boolean;
 };
 
+function shouldReplaceBindingWithLatestSubmitted(params: {
+  existing: InvitationMatchingBinding | null;
+  latestSubmitted: AssessmentRow | null;
+  forceReplace: boolean;
+}) {
+  const { existing, latestSubmitted, forceReplace } = params;
+  if (!latestSubmitted) {
+    return false;
+  }
+  if (forceReplace) {
+    return true;
+  }
+  if (!existing) {
+    return true;
+  }
+  if (!existing.assessmentSubmittedAt) {
+    return true;
+  }
+
+  return existing.assessmentId !== latestSubmitted.id;
+}
+
 function coerceAssessmentModule(value: string | null | undefined): AssessmentModule | null {
   if (value === "base" || value === "values") return value;
   return null;
@@ -474,12 +496,24 @@ export async function bindLatestSubmittedInvitationMatchingInputs(
   modules: AssessmentModule[],
   options?: BindLatestSubmittedOptions
 ): Promise<InvitationMatchingBinding[]> {
+  const normalizedInvitationId = invitationId.trim();
+  const normalizedUserId = userId.trim();
+  if (!normalizedInvitationId || !normalizedUserId) {
+    return [];
+  }
+
   const uniqueModules = [...new Set(modules)];
   const bindings: InvitationMatchingBinding[] = [];
+  const existingBindings = await getInvitationMatchingBindings(normalizedInvitationId, options?.client);
+  const existingByModule = new Map(
+    existingBindings
+      .filter((binding) => binding.userId === normalizedUserId)
+      .map((binding) => [binding.module, binding] as const)
+  );
 
   for (const module of uniqueModules) {
     const latestSubmitted = await getLatestSubmittedAssessmentForUserModule(
-      userId,
+      normalizedUserId,
       module,
       options?.client
     );
@@ -487,14 +521,27 @@ export async function bindLatestSubmittedInvitationMatchingInputs(
       continue;
     }
 
-    const binding = await ensureInvitationMatchingBinding(invitationId, userId, module, {
+    const existing = existingByModule.get(module) ?? null;
+    const shouldReplace = shouldReplaceBindingWithLatestSubmitted({
+      existing,
+      latestSubmitted,
+      forceReplace: options?.replaceExisting === true,
+    });
+
+    if (existing && !shouldReplace) {
+      bindings.push(existing);
+      continue;
+    }
+
+    const binding = await ensureInvitationMatchingBinding(normalizedInvitationId, normalizedUserId, module, {
       client: options?.client,
       assessmentId: latestSubmitted.id,
       allowLatestSubmitted: false,
       createDraftIfMissing: false,
-      replaceExisting: options?.replaceExisting === true,
+      replaceExisting: shouldReplace,
     });
     bindings.push(binding);
+    existingByModule.set(module, binding);
   }
 
   return bindings;

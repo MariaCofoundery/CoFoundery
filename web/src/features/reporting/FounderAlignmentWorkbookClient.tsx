@@ -18,6 +18,7 @@ import {
   saveFounderAlignmentWorkbook,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
+import { buildWorkbookStepImpulseContent } from "@/features/reporting/founderAlignmentWorkbookImpulses";
 import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
 import { buildPilotAgreementDraftFromStructuredOutputs } from "@/features/reporting/founderAlignmentWorkbookPilotDraft";
 import {
@@ -1302,6 +1303,7 @@ export function FounderAlignmentWorkbookClient({
   const [advisorInviteMessage, setAdvisorInviteMessage] = useState<string | null>(null);
   const [advisorInviteLink, setAdvisorInviteLink] = useState<string | null>(null);
   const currentStepRef = useRef<HTMLElement | null>(null);
+  const discussionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const shouldScrollToStepRef = useRef(false);
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPersistedWorkbookRef = useRef(sanitizeFounderAlignmentWorkbookPayload(initialWorkbook));
@@ -1487,6 +1489,16 @@ export function FounderAlignmentWorkbookClient({
       : null;
   const currentStepMarker =
     currentStructuredStepId != null ? effectiveStepMarkersByStep[currentStructuredStepId] ?? null : null;
+  const currentStepImpulseContent = useMemo(
+    () =>
+      currentPremiumV2StepId
+        ? buildWorkbookStepImpulseContent(
+            currentPremiumV2StepId,
+            currentStepMarker?.markerClass ?? null
+          )
+        : null,
+    [currentPremiumV2StepId, currentStepMarker?.markerClass]
+  );
   const currentStepEntry = workbook.steps[currentStep.id];
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
   const currentStepMissingStructuredKeys =
@@ -2219,6 +2231,54 @@ export function FounderAlignmentWorkbookClient({
       setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entry.id));
     }
     openWorkbookV2Phase("collect");
+  }
+
+  function focusDiscussionDraftField() {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (!discussionTextareaRef.current) return;
+        discussionTextareaRef.current.focus();
+        const valueLength = discussionTextareaRef.current.value.length;
+        discussionTextareaRef.current.setSelectionRange(valueLength, valueLength);
+        discussionTextareaRef.current.scrollIntoView({
+          block: "center",
+          behavior: "smooth",
+        });
+      });
+    });
+  }
+
+  function useWorkbookImpulseAsDraft(prompt: string) {
+    if (
+      !isPremiumWorkbookV2StepId(activeStepId) ||
+      (currentUserRole !== "founderA" && currentUserRole !== "founderB")
+    ) {
+      return;
+    }
+
+    const nextPrompt = prompt.trim();
+    if (!nextPrompt) {
+      return;
+    }
+
+    const nextDraft = currentDiscussionDraft.trim().length
+      ? currentDiscussionDraft.includes(nextPrompt)
+        ? currentDiscussionDraft
+        : `${currentDiscussionDraft.trim()}\n\n${nextPrompt}`
+      : nextPrompt;
+
+    setDiscussionDraft(nextDraft);
+    setDiscussionDraftSourceEntryIdByStep((current) => ({
+      ...current,
+      [activeStepId]: null,
+    }));
+    setDiscussionOpenThread(null);
+    setHelperOpenByStep((current) => ({
+      ...current,
+      [activeStepId]: false,
+    }));
+    openWorkbookV2Phase("collect");
+    focusDiscussionDraftField();
   }
 
   function addDecisionRulesDiscussionEntry() {
@@ -3561,6 +3621,27 @@ export function FounderAlignmentWorkbookClient({
                       <p className="mt-3 text-sm leading-6 text-slate-600">
                         {t(decisionRulesMatchingHint)}
                       </p>
+                      {currentStepImpulseContent ? (
+                        <div className="mt-4">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setHelperOpenByStep((current) => ({
+                                ...current,
+                                [currentStep.id]: !current[currentStep.id],
+                              }))
+                            }
+                            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/88 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
+                            aria-expanded={helperOpenByStep[currentStep.id]}
+                            aria-controls={`workbook-impulses-${currentStep.id}`}
+                          >
+                            <span>{t("Fragen & Impulse")}</span>
+                            <span className="text-slate-400">
+                              {helperOpenByStep[currentStep.id] ? t("ausblenden") : t("oeffnen")}
+                            </span>
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
                       <WorkbookV2PhasePill
@@ -3611,6 +3692,17 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </section>
 
+                {currentStepImpulseContent && helperOpenByStep[currentStep.id] ? (
+                  <WorkbookStepImpulsePanel
+                    id={`workbook-impulses-${currentStep.id}`}
+                    questions={currentStepImpulseContent.questions}
+                    matchingImpulses={currentStepImpulseContent.matchingImpulses}
+                    canUse={currentUserRole === "founderA" || currentUserRole === "founderB"}
+                    onUseItem={useWorkbookImpulseAsDraft}
+                    className="mt-4"
+                  />
+                ) : null}
+
                 {visibleWorkbookV2Phase === "collect" ? (
                   <section className="mt-8 rounded-[30px] border border-slate-200/80 bg-white p-6 sm:p-7">
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
@@ -3659,6 +3751,7 @@ export function FounderAlignmentWorkbookClient({
                         </div>
                       ) : null}
                       <textarea
+                        ref={discussionTextareaRef}
                         value={currentDiscussionDraft}
                         onChange={(event) => setDiscussionDraft(event.target.value)}
                         placeholder={t(currentPremiumV2Config.collectPlaceholder)}
@@ -4556,6 +4649,99 @@ function AdvisorApprovalRow({
         {approved ? (tone === "linked" ? t("verbunden") : t("zugestimmt")) : t("offen")}
       </span>
     </div>
+  );
+}
+
+function WorkbookStepImpulsePanel({
+  id,
+  questions,
+  matchingImpulses,
+  canUse,
+  onUseItem,
+  className = "",
+}: {
+  id: string;
+  questions: string[];
+  matchingImpulses: string[];
+  canUse: boolean;
+  onUseItem: (value: string) => void;
+  className?: string;
+}) {
+  return (
+    <section
+      id={id}
+      className={`rounded-[26px] border border-slate-200/80 bg-white/94 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6 ${className}`}
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-2xl">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Fragen & Impulse")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            {t(
+              "Nutzt die Fragen als klugen Einstieg. Ein Klick setzt den Text direkt als editierbaren Startpunkt in euren Denkraum."
+            )}
+          </p>
+        </div>
+        <span className="text-xs leading-6 text-slate-500">
+          {canUse
+            ? t("Direkt uebernehmbar und frei anpassbar")
+            : t("Nur lesbar in dieser Rolle")}
+        </span>
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Gute Fragen")}</p>
+          <div className="mt-3 grid gap-2.5">
+            {questions.map((question) => (
+              <button
+                key={question}
+                type="button"
+                onClick={() => onUseItem(question)}
+                disabled={!canUse}
+                className={`w-full rounded-[20px] border px-4 py-3 text-left text-sm leading-6 transition ${
+                  canUse
+                    ? "border-slate-200/80 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-white"
+                    : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
+                }`}
+              >
+                {t(question)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              {t("Impuls aus eurem Matching")}
+            </p>
+            <span className="rounded-full border border-slate-200/80 bg-slate-50/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500">
+              {t("Kontextbezogen")}
+            </span>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            {t("Diese Denkstoesse greifen die Dynamik auf, die fuer diesen Schritt bei euch gerade besonders relevant ist.")}
+          </p>
+          <div className="mt-3 grid gap-2.5">
+            {matchingImpulses.map((impulse) => (
+              <button
+                key={impulse}
+                type="button"
+                onClick={() => onUseItem(impulse)}
+                disabled={!canUse}
+                className={`w-full rounded-[20px] border px-4 py-3 text-left text-sm leading-6 transition ${
+                  canUse
+                    ? "border-[color:var(--brand-primary)]/14 bg-[linear-gradient(180deg,rgba(103,232,249,0.08),rgba(248,250,252,0.98))] text-slate-700 hover:border-[color:var(--brand-primary)]/24 hover:bg-white"
+                    : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
+                }`}
+              >
+                {t(impulse)}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
