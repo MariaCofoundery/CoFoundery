@@ -76,6 +76,10 @@ function extractInvitationIdFromAcceptPayload(payload: unknown): string | null {
   return null;
 }
 
+function buildJoinStartHref(invitationId: string) {
+  return `/join/start?invitationId=${encodeURIComponent(invitationId)}`;
+}
+
 export default function JoinClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -111,9 +115,7 @@ export default function JoinClient() {
       }
 
       if (!session?.user?.id) {
-        const nextPath = invitationIdFromUrl
-          ? `/join?invitationId=${encodeURIComponent(invitationIdFromUrl)}`
-          : "/join";
+        const nextPath = invitationIdFromUrl ? buildJoinStartHref(invitationIdFromUrl) : "/join";
         setUiState({
           type: "redirecting",
           title: "Weiter zum Login",
@@ -171,7 +173,7 @@ export default function JoinClient() {
         return;
       }
 
-      router.replace(`/join/welcome?invitationId=${encodeURIComponent(resolvedInvitationId)}`);
+      router.replace(buildJoinStartHref(resolvedInvitationId));
     };
 
     void run();
@@ -182,7 +184,8 @@ export default function JoinClient() {
    * 1) Inkognito-Fenster öffnen.
    * 2) Einladung über /join?token=... öffnen.
    * 3) Magic Link Login auslösen und über /join/continue zurückkehren.
-   * 4) Weiterleitung auf /join/welcome?invitationId=... prüfen.
+   * 4) Weiterleitung auf /join/start?invitationId=... prüfen.
+   * 5) Von dort entweder direkt in den nächsten Einladungsschritt oder bei fehlenden Profil-Basics nach /join/welcome.
    */
 
   return (

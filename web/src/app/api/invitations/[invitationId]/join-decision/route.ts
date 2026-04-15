@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  buildInvitationDashboardHref,
+  buildInvitationQuestionnaireHref,
+} from "@/features/onboarding/invitationFlow";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 
 type RouteContext = {
@@ -6,23 +10,6 @@ type RouteContext = {
     invitationId: string;
   }>;
 };
-
-function buildDashboardUrl(invitationId: string) {
-  return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
-}
-
-function buildQuestionnaireUrl(
-  invitationId: string,
-  moduleKey: "base" | "values",
-  flow: "refresh" | null
-) {
-  const search = new URLSearchParams({ invitationId });
-  if (flow === "refresh") {
-    search.set("flow", "refresh");
-  }
-  const pathname = moduleKey === "base" ? "/me/base" : "/me/values";
-  return `${pathname}?${search.toString()}`;
-}
 
 export async function GET(_request: NextRequest, context: RouteContext) {
   const { invitationId: rawInvitationId } = await context.params;
@@ -55,11 +42,13 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   return NextResponse.json(
     {
       ...decision,
-      dashboard_url: buildDashboardUrl(invitationId),
+      dashboard_url: buildInvitationDashboardHref(invitationId),
       needs_questionnaire_url: firstMissing
-        ? buildQuestionnaireUrl(invitationId, firstMissing, null)
+        ? buildInvitationQuestionnaireHref(invitationId, firstMissing)
         : null,
-      refresh_start_url: buildQuestionnaireUrl(invitationId, firstRefreshModule, "refresh"),
+      refresh_start_url: buildInvitationQuestionnaireHref(invitationId, firstRefreshModule, {
+        flow: "refresh",
+      }),
     },
     { status: 200 }
   );

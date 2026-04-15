@@ -132,7 +132,6 @@ export default async function FounderAlignmentWorkbookPage({
           storedTeamContext={data.storedTeamContext}
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
-          reportHeadline={data.report.executiveSummary.headline}
         />
       ) : (
         <FounderAlignmentWorkbookClient
@@ -156,7 +155,6 @@ export default async function FounderAlignmentWorkbookPage({
           storedTeamContext={data.storedTeamContext}
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
-          reportHeadline={data.report.executiveSummary.headline}
         />
       )}
     </main>

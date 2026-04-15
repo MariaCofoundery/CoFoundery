@@ -439,34 +439,34 @@ function buildDimensionReading(
   if (match.jointState === "BOTH_HIGH") {
     switch (dimension) {
       case "Unternehmenslogik":
-        return "Hier liegt eine klare gemeinsame Tendenz zu Wachstum, Hebel und Bewegung.";
+        return "Bei euch zeigt sich eine klare gemeinsame Tendenz zu Wachstum, Hebel und Bewegung.";
       case "Entscheidungslogik":
-        return "Hier liegt eine klare gemeinsame Tendenz, frueh in Entscheidungen zu gehen und eher im Laufen nachzuschaerfen.";
+        return "Bei Entscheidungen zeigt sich eine klare gemeinsame Tendenz, frueh zu gehen und eher im Laufen nachzuschaerfen.";
       case "Arbeitsstruktur & Zusammenarbeit":
-        return "Hier liegt eine klare gemeinsame Tendenz zu Tempo, Eigenraum und weniger laufender Mitsicht.";
+        return "In eurer Zusammenarbeit zeigt sich eine klare gemeinsame Tendenz zu Tempo, Eigenraum und weniger laufender Mitsicht.";
       case "Commitment":
-        return "Hier liegt eine klare gemeinsame Tendenz zu hohem Einsatz und starker Priorisierung.";
+        return "Beim Commitment zeigt sich eine klare gemeinsame Tendenz zu hohem Einsatz und starker Priorisierung.";
       case "Risikoorientierung":
-        return "Hier liegt eine klare gemeinsame Tendenz, Unsicherheit offensiver mitzutragen.";
+        return "Beim Risiko zeigt sich eine klare gemeinsame Tendenz, Unsicherheit offensiver mitzutragen.";
       case "Konfliktstil":
-        return "Hier liegt eine klare gemeinsame Tendenz zu frueher und direkter Klaerung.";
+        return "Im Umgang mit Spannung zeigt sich eine klare gemeinsame Tendenz zu früher und direkter Klärung.";
     }
   }
 
   if (match.jointState === "BOTH_LOW") {
     switch (dimension) {
       case "Unternehmenslogik":
-        return "Hier liegt eine klare gemeinsame Tendenz zu Aufbau, Substanz und vorsichtigerem Kurs.";
+        return "Bei euch zeigt sich eine klare gemeinsame Tendenz zu Aufbau, Substanz und vorsichtigerem Kurs.";
       case "Entscheidungslogik":
-        return "Hier liegt eine klare gemeinsame Tendenz, Entscheidungen erst mit mehr Reife wirklich freizugeben.";
+        return "Bei Entscheidungen zeigt sich eine klare gemeinsame Tendenz, sie erst mit mehr Reife wirklich freizugeben.";
       case "Arbeitsstruktur & Zusammenarbeit":
-        return "Hier liegt eine klare gemeinsame Tendenz zu Sichtbarkeit, Rueckkopplung und engerer Kopplung.";
+        return "In eurer Zusammenarbeit zeigt sich eine klare gemeinsame Tendenz zu Sichtbarkeit, Rückkopplung und engerer Kopplung.";
       case "Commitment":
-        return "Hier liegt eine klare gemeinsame Tendenz zu einem begrenzteren oder bewusster gerahmten Einsatzniveau.";
+        return "Beim Commitment zeigt sich eine klare gemeinsame Tendenz zu einem begrenzteren oder bewusster gerahmten Einsatzniveau.";
       case "Risikoorientierung":
-        return "Hier liegt eine klare gemeinsame Tendenz, zuerst auf Absicherung und Begrenzung zu schauen.";
+        return "Beim Risiko zeigt sich eine klare gemeinsame Tendenz, zuerst auf Absicherung und Begrenzung zu schauen.";
       case "Konfliktstil":
-        return "Hier liegt eine klare gemeinsame Tendenz, Spannung spaeter oder vorsichtiger zu oeffnen.";
+        return "Im Umgang mit Spannung zeigt sich eine klare gemeinsame Tendenz, sie später oder vorsichtiger zu öffnen.";
     }
   }
 
@@ -560,17 +560,17 @@ function buildDimensionReading(
 function buildDimensionExplanation(dimension: string) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Hier geht es um die Richtung des Unternehmens und darum, woran ihr Wachstum, Stabilitaet und Wirkung messt.";
+      return "Diese Dimension zeigt, woran ihr Richtung, Wachstum und Wirkung im Unternehmen messt.";
     case "Entscheidungslogik":
-      return "Hier geht es darum, wie Entscheidungen zustande kommen und wann fuer euch etwas als ausreichend geklaert gilt.";
+      return "Sie beschreibt, wie Entscheidungen zustande kommen und wann für euch etwas als ausreichend geklärt gilt.";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Hier geht es um Sichtbarkeit, Eigenraum und darum, wie eng ihr im Alltag zusammenarbeitet.";
+      return "Sie macht sichtbar, wie viel Eigenraum, Sichtbarkeit und Abstimmung ihr im Alltag braucht.";
     case "Commitment":
-      return "Hier geht es um Einsatz, Verfuegbarkeit und darum, was fuer euch verbindlich mitgetragen wird.";
+      return "Hier wird deutlich, was ihr unter Einsatz, Verfügbarkeit und verbindlichem Mittragen versteht.";
     case "Risikoorientierung":
-      return "Hier geht es darum, was fuer euch vertretbar ist und wann Vorsicht oder Wagnis Vorrang haben.";
+      return "Sie zeigt, was für euch noch vertretbar ist und wann Vorsicht oder Wagnis Vorrang bekommen.";
     case "Konfliktstil":
-      return "Hier geht es darum, wie schnell ihr Spannung ansprecht und in welcher Form ihr sie klaert.";
+      return "Sie beschreibt, wie schnell ihr Spannung ansprecht und in welcher Form ihr sie klärt.";
     default:
       return "";
   }

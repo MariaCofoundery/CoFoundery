@@ -61,7 +61,6 @@ export default async function WorkbookAdvisorPreviewPage({
         source="mock"
         storedTeamContext={null}
         hasTeamContextMismatch={false}
-        reportHeadline={preview.reportHeadline}
       />
     </main>
   );

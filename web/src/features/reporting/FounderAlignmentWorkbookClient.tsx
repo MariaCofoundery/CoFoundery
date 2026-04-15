@@ -80,7 +80,6 @@ type FounderAlignmentWorkbookClientProps = {
   source: "live" | "mock";
   storedTeamContext: TeamContext | null;
   hasTeamContextMismatch: boolean;
-  reportHeadline: string;
 };
 
 type WorkbookEditableField = "founderA" | "founderB" | "agreement" | "advisorNotes";
@@ -1244,7 +1243,6 @@ export function FounderAlignmentWorkbookClient({
   source,
   storedTeamContext,
   hasTeamContextMismatch,
-  reportHeadline,
 }: FounderAlignmentWorkbookClientProps) {
   const [workbook, setWorkbook] = useState(initialWorkbook);
   const [saveState, setSaveState] = useState<{
@@ -1997,10 +1995,19 @@ export function FounderAlignmentWorkbookClient({
     if (!shouldScrollToStepRef.current) return;
 
     shouldScrollToStepRef.current = false;
-    currentStepRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+    const target = currentStepRef.current;
+    if (!target) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const top = window.scrollY + target.getBoundingClientRect().top - 104;
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "smooth",
+      });
+      target.focus({ preventScroll: true });
     });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, [activeStepId, showSummaryView]);
 
   useEffect(() => {
@@ -3036,30 +3043,6 @@ export function FounderAlignmentWorkbookClient({
               </div>
             )}
 
-            <details className="mt-6 rounded-3xl border border-slate-200/70 bg-slate-50/70 p-6">
-              <summary className="cursor-pointer list-none text-sm font-semibold text-slate-900">
-                {t("Fokusthemen aus eurem Matching-Report anzeigen")}
-              </summary>
-              <div className="mt-5 grid gap-4 xl:grid-cols-3">
-                <HighlightCard
-                  title={t("Staerkste gemeinsame Grundlage")}
-                  text={highlights.topStrength}
-                />
-                <HighlightCard
-                  title={t("Wichtigste ergaenzende Dynamik")}
-                  text={
-                    highlights.topComplementaryDynamic ??
-                    t("Aktuell wird keine einzelne ergaenzende Dynamik besonders hervorgehoben.")
-                  }
-                />
-                <HighlightCard
-                  title={t("Wichtigstes Abstimmungsthema")}
-                  text={highlights.topTension}
-                />
-              </div>
-              <p className="mt-5 text-sm leading-7 text-slate-700">{t(reportHeadline)}</p>
-            </details>
-
           {hasTeamContextMismatch ? (
             <div className="mt-6 rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
               <p className="text-[11px] uppercase tracking-[0.22em] text-[color:var(--brand-accent)]">
@@ -3134,7 +3117,7 @@ export function FounderAlignmentWorkbookClient({
                       onClick={() => persist(step.id)}
                       className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
                         isActive
-                          ? stepToneMeta.sidebarActive
+                          ? `${stepToneMeta.sidebarActive} ring-1 ring-slate-900/8 shadow-[0_14px_34px_rgba(15,23,42,0.08)]`
                           : progressMeta?.completed
                               ? "border-emerald-200/70 bg-emerald-50/25 text-slate-800 hover:border-emerald-300"
                             : progressMeta?.started
@@ -3148,11 +3131,6 @@ export function FounderAlignmentWorkbookClient({
                             Schritt {index + 1}
                           </p>
                           <p className="mt-1 truncate text-sm font-medium">{step.title}</p>
-                          {isPrioritized ? (
-                            <p className="mt-2 text-[11px] leading-5 text-slate-500">
-                              {t("Fokus aus dem Matching")}
-                            </p>
-                          ) : null}
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {isPrioritized ? (
@@ -3164,17 +3142,17 @@ export function FounderAlignmentWorkbookClient({
                               {t("Fokus")}
                             </span>
                           ) : null}
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
-                              progressMeta?.completed
-                                ? "bg-emerald-100 text-emerald-700"
-                                : progressMeta?.started
-                                  ? "bg-slate-900 text-white"
-                                  : "bg-slate-200 text-slate-500"
-                            }`}
-                          >
-                            {statusLabel}
-                          </span>
+                          {progressMeta?.started ? (
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
+                                progressMeta?.completed
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-slate-900 text-white"
+                              }`}
+                            >
+                              {statusLabel}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
                     </button>
@@ -3186,7 +3164,8 @@ export function FounderAlignmentWorkbookClient({
 
           <section
             ref={currentStepRef}
-            className="order-1 rounded-[36px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.05)] sm:p-8 xl:order-2"
+            tabIndex={-1}
+            className="order-1 rounded-[36px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.05)] focus:outline-none sm:p-8 xl:order-2"
           >
             {currentStepIsPremiumPilot ? (
               <div className={`rounded-[28px] px-5 py-5 ${currentToneMeta.headerSurface}`}>
@@ -3197,18 +3176,13 @@ export function FounderAlignmentWorkbookClient({
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-                      {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was kuenftig klar gelten soll.")}
+                      {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll.")}
                     </p>
                     {currentStepIsPrioritized ? (
                       <div className="mt-4 flex flex-wrap items-center gap-2">
                         <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
-                          {t("Fokus aus Matching")}
+                          {t("Fokus")}
                         </span>
-                        {currentStepMarker ? (
-                          <span className="text-xs leading-6 text-slate-500">
-                            {t(`Warum Fokus: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
-                          </span>
-                        ) : null}
                       </div>
                     ) : null}
                     <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -3277,13 +3251,8 @@ export function FounderAlignmentWorkbookClient({
                 {currentStepIsPrioritized ? (
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
-                      {t("Fokus aus Matching")}
+                      {t("Fokus")}
                     </span>
-                    {currentStepMarker ? (
-                      <span className="text-xs leading-6 text-slate-500">
-                        {t(`Warum Fokus: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
-                      </span>
-                    ) : null}
                   </div>
                 ) : null}
                 <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
@@ -4428,17 +4397,6 @@ export function FounderAlignmentWorkbookClient({
         </div>
         )}
       </div>
-    </div>
-  );
-}
-
-function HighlightCard({ title, text }: { title: string; text: string | null }) {
-  return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white/88 p-4">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(title)}</p>
-      <p className="mt-2 text-sm leading-7 text-slate-700">
-        {t(text ?? "Aktuell liegt fuer diesen Punkt noch keine hervorgehobene Aussage vor.")}
-      </p>
     </div>
   );
 }

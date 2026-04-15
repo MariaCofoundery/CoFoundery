@@ -6,5 +6,5 @@ type PageProps = {
 
 export default async function InvitePage({ params }: PageProps) {
   const { sessionId } = await params;
-  redirect(`/join?invitationId=${encodeURIComponent(sessionId)}`);
+  redirect(`/join/start?invitationId=${encodeURIComponent(sessionId)}`);
 }

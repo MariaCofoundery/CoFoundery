@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { buildInvitationDashboardHref, resolveInvitationContinueTarget } from "@/features/onboarding/invitationFlow";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type WelcomeSearchParams = {
@@ -74,39 +74,6 @@ function invitationContextMeta(teamContext: string | null | undefined) {
     badge: "Mögliche Gründungspartnerschaft",
     title: "Diese Einladung läuft im Modus für frühes Matching.",
     text: "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen.",
-  };
-}
-
-function buildQuestionnaireHref(invitationId: string, module: "base" | "values") {
-  const search = new URLSearchParams({ invitationId });
-  const path = module === "base" ? "/me/base" : "/me/values";
-  return `${path}?${search.toString()}`;
-}
-
-async function resolveNextInviteStep(params: {
-  invitationId: string;
-}) {
-  const { invitationId } = params;
-  const decision = await getInvitationJoinDecision(invitationId);
-
-  if (!decision.ok) {
-    return {
-      href: `/dashboard?error=${encodeURIComponent(decision.reason)}`,
-      label: "Zum Dashboard",
-    };
-  }
-
-  if (decision.mode === "report_ready" || decision.mode === "choice_existing_or_update") {
-    return {
-      href: `/invite/${encodeURIComponent(invitationId)}/done`,
-      label: decision.mode === "report_ready" ? "Zum Report" : "Zum Abschluss",
-    };
-  }
-
-  const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
-  return {
-    href: buildQuestionnaireHref(invitationId, nextModule),
-    label: nextModule === "base" ? "Zum Basis-Fragebogen" : "Zum Werte-Modul",
   };
 }
 
@@ -202,9 +169,12 @@ export default async function JoinWelcomePage({
     invitation.inviter_display_name?.trim() || invitation.inviter_email?.trim() || "Co-Founder";
   const contextMeta = invitationContextMeta(invitation.team_context);
 
-  const nextStep = await resolveNextInviteStep({
-    invitationId,
-  });
+  const nextStep = await resolveInvitationContinueTarget(invitationId);
+  if (!nextStep.ok) {
+    return renderErrorState("Einladung nicht verfügbar", nextStep.detail ?? nextStep.reason);
+  }
+  const primaryHref = nextStep.entryHref;
+  const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
@@ -221,10 +191,10 @@ export default async function JoinWelcomePage({
 
         <p className="mt-4 text-sm leading-6 text-slate-700">
           Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention braucht CoFoundery,
-          damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten koennen.
+          damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten können.
         </p>
         <p className="mt-1 text-xs text-slate-500">
-          Weitere Profildaten kannst du spaeter optional ergaenzen.
+          Weitere Profildaten kannst du später optional ergänzen.
         </p>
 
         <div className="mt-6">
@@ -261,7 +231,7 @@ export default async function JoinWelcomePage({
                 avatar_id: profile?.avatar_id ?? null,
               }}
               submitLabel={nextStep.label}
-              onSuccessRedirectTo={nextStep.href}
+              onSuccessRedirectTo={primaryHref}
               variant="accent"
             />
           )}
@@ -270,14 +240,14 @@ export default async function JoinWelcomePage({
         <div className="mt-6 flex flex-wrap items-center gap-2">
           {hasProfileBasics ? (
             <Link
-              href={nextStep.href}
+              href={primaryHref}
               className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >
               {nextStep.label}
             </Link>
           ) : null}
           <Link
-            href="/dashboard"
+            href={dashboardHref}
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
           >
             Später

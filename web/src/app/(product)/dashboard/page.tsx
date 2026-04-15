@@ -1023,7 +1023,7 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  const completeQuestionnaireHref = `/join?invitationId=${encodeURIComponent(invite.id)}`;
+  const completeQuestionnaireHref = `/join/start?invitationId=${encodeURIComponent(invite.id)}`;
   const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
   const reportHref = `/report/${invite.id}`;
   const canOpenCompletionStatus = invite.isReadyForMatching || inviteeHasAllRequired;
