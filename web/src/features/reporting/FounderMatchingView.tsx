@@ -50,9 +50,8 @@ export function FounderMatchingView({
   const reportIntroContext = buildIntroContext(selection);
   const centralPatternSections = buildCentralPatternSections(selection);
   const everydaySituations = buildEverydaySituations(selection);
-  const steeringPoints = buildSteeringPoints(selection, markers);
+  const conversationQuestions = buildConversationQuestions(selection, markers);
   const opportunityPoints = buildOpportunityPoints(selection);
-  const clarificationQuestions = buildClarificationQuestions(selection);
   const timelineNodes = buildFounderDynamicsTimelineNodes(compareResult);
   const timelineDetailPhases = buildFounderDynamicsTimelineDetailPhases(compareResult);
 
@@ -176,20 +175,6 @@ export function FounderMatchingView({
         </div>
       </section>
 
-      <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Wo ihr steuern müsst</p>
-        <ul className="mt-6 space-y-3">
-          {steeringPoints.map((point) => (
-            <li
-              key={point}
-              className="rounded-[18px] border border-slate-200/80 bg-slate-50/60 px-5 py-4 text-sm leading-7 text-slate-700"
-            >
-              {t(point)}
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Wo eure Chance liegt</p>
         <div className="mt-6 space-y-3.5">
@@ -205,9 +190,9 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Das müsst ihr klären</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Worüber ihr konkret sprechen solltet</p>
         <ul className="mt-6 space-y-3">
-          {clarificationQuestions.map((question) => (
+          {conversationQuestions.map((question) => (
             <li
               key={question}
               className="rounded-[20px] border border-slate-200/80 bg-white/88 px-5 py-4 text-sm leading-7 text-slate-800"
@@ -231,7 +216,7 @@ export function FounderMatchingView({
 
       {valuesBlock ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Zusätzlich: Wertefokus im Duo</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Ergänzend: Wertefokus im Duo</p>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
           <div className="mt-5 grid gap-4 lg:grid-cols-3">
             {[
@@ -300,16 +285,16 @@ function buildMatchHeadline(selection: FounderMatchingSelection) {
 function buildIntroSummary(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
-      return "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst.";
+      return "Die Reibung liegt nicht zuerst im Ton, sondern in euren Maßstäben für Richtung, Entscheidungen oder Zusammenarbeit.";
     case "complement_led":
-      return "Euer Unterschied ist weder automatisch Problem noch automatisch Staerke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Fuehrung braucht.";
+      return "Euer Unterschied ist kein Problem und keine Stärke an sich. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Führung braucht.";
     case "coordination_led":
-      return "Bei euch geht eher Energie in Nachziehen, Schleifen und stille Koordination als in offenen Grundsatzstreit.";
+      return "Bei euch geht Energie eher in Nachziehen, Schleifen und stille Koordination als in offenen Streit.";
     case "blind_spot_watch":
-      return "Bei euch liegt das Risiko nicht zuerst in offenem Gegensatz, sondern in einer gemeinsamen Tendenz, die zu spaet bewusst wird.";
+      return "Das Risiko liegt nicht im offenen Gegensatz, sondern in einer gemeinsamen Tendenz, die euch zu spät auffällt.";
     case "alignment_led":
     default:
-      return "Vieles ist bei euch anschlussfaehig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Fuehren beginnt.";
+      return "Vieles greift bei euch gut ineinander. Gerade deshalb lohnt sich ein klarer Blick darauf, wo gemeinsame Linie endet und Führung beginnen muss.";
   }
 }
 
@@ -317,24 +302,24 @@ function buildIntroContext(selection: FounderMatchingSelection) {
   switch (selection.heroSelection.mode) {
     case "tension_led":
       return selection.biggestTension
-        ? `Das staerkste Spannungsfeld liegt in ${selection.biggestTension.dimension}. Ohne bewusste Klaerung koennt ihr dort dieselbe Lage unterschiedlich lesen und daraus verschiedene Standards ableiten.`
-        : "Ein Unterschied wird im Alltag frueh spuerbar, wenn ihr ihn nicht ausdruecklich einordnet.";
+        ? `Das stärkste Spannungsfeld liegt in ${selection.biggestTension.dimension}. Dort könnt ihr dieselbe Lage unterschiedlich lesen und daraus verschiedene Standards ableiten.`
+        : "Ein Unterschied wird im Alltag schnell spürbar, wenn ihr ihn nicht ausdrücklich einordnet.";
     case "complement_led":
       return selection.strongestComplement
-        ? `Die staerkste produktive Ergaenzung liegt in ${selection.strongestComplement.dimension}. Sie traegt nicht von selbst, kann euch aber deutlich breiter machen, wenn ihr Timing, Rollen und Grenzen sichtbar fuehrt.`
-        : "Ein Unterschied kann euch breiter machen, solange ihr ihn nicht sich selbst ueberlasst.";
+        ? `Die stärkste produktive Ergänzung liegt in ${selection.strongestComplement.dimension}. Sie trägt nicht von selbst, kann euch aber klar breiter machen, wenn Timing, Rollen und Grenzen sichtbar sind.`
+        : "Ein Unterschied kann euch breiter machen, solange ihr ihn nicht sich selbst überlasst.";
     case "coordination_led":
       return selection.biggestTension
-        ? `Der staerkste Verlustpunkt liegt in ${selection.biggestTension.dimension}. Das wirkt oft nicht dramatisch, kostet aber ueber Nachziehen, Schleifen und unscharfe Uebergaenge spürbar Zug.`
-        : "Das kostet selten offen Vertrauen, aber oft Tempo, Klarheit und Fuehrungsenergie.";
+        ? `Der stärkste Verlustpunkt liegt in ${selection.biggestTension.dimension}. Das wirkt oft nicht dramatisch, kostet euch aber über Schleifen und unscharfe Übergänge spürbar Zug.`
+        : "Das kostet selten offen Vertrauen, aber oft Tempo, Klarheit und Führungsenergie.";
     case "blind_spot_watch":
       return selection.heroSelection.biggestRisk
-        ? `Die heikelste Stelle liegt in ${selection.heroSelection.biggestRisk.dimension}. Gerade weil ihr euch in vielem aehnlich seid, kann dort lange wie selbstverstaendlich wirken, was eigentlich eine bewusste Grenze oder Regel braucht.`
-        : "Gerade weil ihr euch in vielem aehnlich seid, werden kleine Abweichungen leicht erst spaet sichtbar.";
+        ? `Die heikelste Stelle liegt in ${selection.heroSelection.biggestRisk.dimension}. Gerade weil ihr euch in vielem ähnlich seid, wirkt dort lange selbstverständlich, was eigentlich eine klare Grenze oder Regel braucht.`
+        : "Gerade weil ihr euch in vielem ähnlich seid, werden kleine Abweichungen leicht erst spät sichtbar.";
     case "alignment_led":
     default:
       return selection.stableBase
-        ? `${buildStableBaseContext(selection.stableBase.dimension)} Gleichzeitig ist diese Basis kein Freifahrtschein dafuer, andere Felder still laufen zu lassen.`
+        ? `${buildStableBaseContext(selection.stableBase.dimension)} Sie ersetzt aber keine klare Abstimmung an offenen Punkten.`
         : "Die gemeinsame Linie gibt euch eine gute Ausgangslage, ersetzt aber keine klare Abstimmung dort, wo ihr unterschiedlich priorisiert, entscheidet oder Grenzen zieht.";
   }
 }
@@ -695,7 +680,7 @@ function buildDimensionBusinessMeaning(
   }
 }
 
-function buildSteeringPoints(
+function buildConversationQuestions(
   selection: FounderMatchingSelection,
   markers: ReturnType<typeof buildFounderMatchingMarkers>
 ) {
@@ -720,9 +705,17 @@ function buildSteeringPoints(
     "Konfliktstil",
   ];
 
+  const selectedQuestions = selection.agreementFocusDimensions.map((entry) =>
+    buildClarificationQuestionForDimension(entry.dimension)
+  );
+
   return Array.from(
-    new Set([...prioritizedDimensions, ...fallbackDimensions].map(buildSteeringQuestionForDimension))
-  ).slice(0, 5);
+    new Set([
+      ...prioritizedDimensions.map(buildSteeringQuestionForDimension),
+      ...selectedQuestions,
+      ...fallbackDimensions.map(buildClarificationQuestionForDimension),
+    ])
+  ).slice(0, 6);
 }
 
 function buildOpportunityPoints(selection: FounderMatchingSelection) {
@@ -752,36 +745,6 @@ function buildOpportunityPoints(selection: FounderMatchingSelection) {
   }
 
   return Array.from(new Set(points)).slice(0, 3);
-}
-
-function buildClarificationQuestions(selection: FounderMatchingSelection) {
-  const selectedQuestions = selection.agreementFocusDimensions.map((entry) => {
-    switch (entry.dimension) {
-      case "Commitment":
-        return "Was heisst fuer euch verbindlicher Einsatz bei Zeit, Verantwortung und Equity?";
-      case "Arbeitsstruktur & Zusammenarbeit":
-        return "Was muss sichtbar sein, und was darf jede Person eigenstaendig loesen?";
-      case "Konfliktstil":
-        return "Was sprecht ihr sofort an, und was klaert ihr erst mit Abstand?";
-      case "Entscheidungslogik":
-        return "Wer bereitet Entscheidungen vor, und wer hat am Ende das letzte Wort?";
-      case "Unternehmenslogik":
-        return "Wonach priorisiert ihr, wenn Wachstum, Wirkung und Aufbau gegeneinander laufen?";
-      case "Risikoorientierung":
-        return "Welche Schritte sind fuer euch vertretbar, und wo zieht ihr die Grenze?";
-    }
-  });
-
-  const fallbackQuestions = [
-    "Wonach priorisiert ihr, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen?",
-    "Was heisst fuer euch verbindlicher Einsatz bei Zeit, Verantwortung und Equity?",
-    "Was muss sichtbar sein, und was darf jede Person eigenstaendig loesen?",
-    "Wer bereitet Entscheidungen vor, und wer hat am Ende das letzte Wort?",
-    "Was sprecht ihr sofort an, und was klaert ihr erst mit Abstand?",
-    "Welche Schritte sind fuer euch vertretbar, und wo zieht ihr die Grenze?",
-  ];
-
-  return Array.from(new Set([...selectedQuestions, ...fallbackQuestions])).slice(0, 5);
 }
 
 function buildCentralPatternParagraphs(selection: FounderMatchingSelection, heroSentences: string[]) {
@@ -820,11 +783,11 @@ function buildEverydaySituations(selection: FounderMatchingSelection) {
   const fallback = [
     {
       title: "Wenn Tempo steigt",
-      body: "Dann zeigt sich schnell, ob ihr wirklich nach denselben Kriterien arbeitet.",
+      body: "Dann wird sichtbar, ob ihr wirklich nach denselben Kriterien entscheidet.",
     },
     {
       title: "Wenn Druck steigt",
-      body: "Dann tragen gute Absichten nicht mehr. Dann zeigt sich, ob eure Regeln im Alltag wirklich halten.",
+      body: "Dann tragen gute Absichten nicht mehr. Dann zeigt sich, ob eure Regeln im Alltag halten.",
     },
   ];
 
@@ -840,32 +803,32 @@ function buildEverydaySituationForDimension(
     case "Unternehmenslogik":
       return {
         title: "Wenn Prioritaeten kollidieren",
-        body: "Dann wird schnell sichtbar, ob ihr dieselbe Chance gleich gewichtet oder ob daraus unterschiedliche Kurslesarten entstehen.",
+        body: "Dann wird sichtbar, ob ihr dieselbe Chance gleich bewertet. Sonst zieht ihr aus derselben Lage unterschiedliche Prioritäten.",
       };
     case "Entscheidungslogik":
       return {
         title: "Wenn schnell entschieden werden muss",
-        body: "Dann wird sichtbar, ob fuer euch derselbe Stand schon tragfaehig ist oder ob die Entscheidung noch einmal eine Runde dreht.",
+        body: "Dann wird sichtbar, ob derselbe Stand für euch schon reicht. Sonst dreht die Entscheidung noch eine Runde.",
       };
     case "Arbeitsstruktur & Zusammenarbeit":
       return {
         title: "Wenn Arbeit parallel laeuft",
-        body: "Dann wird sichtbar, was frueh in den gemeinsamen Blick gehoert und was eigenstaendig weiterlaufen kann, ohne zu spaet wieder aufzuploppen.",
+        body: "Dann wird sichtbar, was früh in den gemeinsamen Blick muss. Sonst tauchen Themen zu spät wieder auf.",
       };
     case "Commitment":
       return {
         title: "Wenn Wochen voll werden",
-        body: "Dann wird sichtbar, ob Einsatz fuer euch dieselbe Form hat oder ob aus Mehrbelastung still unterschiedliche Erwartungen werden.",
+        body: "Dann wird sichtbar, ob Einsatz für euch dieselbe Form hat. Sonst werden aus Mehrbelastung schnell stille Erwartungen.",
       };
     case "Risikoorientierung":
       return {
         title: "Wenn eine groessere Entscheidung ansteht",
-        body: "Dann wird sichtbar, welche Schwelle fuer euch noch vertretbar ist und ab wann dieselbe Lage fuer eine Person schon zu offen wird.",
+        body: "Dann wird sichtbar, welche Schwelle für euch noch vertretbar ist. Sonst wirkt dieselbe Lage für eine Person zu offen und für die andere noch tragbar.",
       };
     case "Konfliktstil":
       return {
         title: "Wenn etwas schieflaeuft",
-        body: "Dann wird sichtbar, ob ihr Unterschiede im selben Takt und in derselben Form klaeren wollt oder ob schon der Rahmen der Klaerung zur Reibung wird.",
+        body: "Dann wird sichtbar, ob ihr Unterschiede im selben Takt klären wollt. Sonst wird schon der Rahmen der Klärung zur Reibung.",
       };
   }
 }
@@ -983,17 +946,36 @@ function buildSteeringQuestionForDimension(
 ) {
   switch (dimension) {
     case "Unternehmenslogik":
-      return "Was hat fuer euch Vorrang, wenn Richtung, Wachstum und Stabilitaet nicht dasselbe nahelegen?";
+      return "Wonach priorisiert ihr, wenn Richtung, Wachstum und Stabilität nicht dasselbe nahelegen?";
     case "Entscheidungslogik":
-      return "Was muss vorliegen, damit fuer euch eine Entscheidung wirklich reif ist?";
+      return "Woran ist für euch klar, dass eine Entscheidung reif ist?";
     case "Arbeitsstruktur & Zusammenarbeit":
-      return "Was muss sichtbar sein, was darf eigenstaendig laufen und ab wann wird Abstimmung Pflicht?";
+      return "Was muss sichtbar sein, was läuft eigenständig und ab wann wird Abstimmung Pflicht?";
     case "Commitment":
-      return "Was ist fuer euch realistisch verbindlich, wenn Zeit, Verantwortung und Einsatz auseinanderlaufen?";
+      return "Was ist für euch verbindlich, wenn Zeit, Verantwortung und Einsatz auseinanderlaufen?";
     case "Risikoorientierung":
-      return "Was gilt fuer euch noch als vertretbar, und ab wann geht Absicherung vor Tempo?";
+      return "Was ist für euch noch vertretbar, und ab wann geht Absicherung vor Tempo?";
     case "Konfliktstil":
-      return "Was sprecht ihr sofort an, und was klaert ihr bewusst mit etwas Abstand?";
+      return "Was sprecht ihr sofort an, und was klärt ihr bewusst mit Abstand?";
+  }
+}
+
+function buildClarificationQuestionForDimension(
+  dimension: NonNullable<FounderMatchingSelection["biggestTension"]>["dimension"]
+) {
+  switch (dimension) {
+    case "Commitment":
+      return "Was heißt für euch verbindlicher Einsatz bei Zeit, Verantwortung und Equity?";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "Was muss sichtbar sein, und was darf jede Person eigenständig lösen?";
+    case "Konfliktstil":
+      return "Was sprecht ihr sofort an, und was klärt ihr erst nach eigener Sortierung?";
+    case "Entscheidungslogik":
+      return "Wer bereitet Entscheidungen vor, und wer entscheidet am Ende?";
+    case "Unternehmenslogik":
+      return "Wonach priorisiert ihr, wenn Wirkung, Wachstum und Aufbau gegeneinander laufen?";
+    case "Risikoorientierung":
+      return "Welche Schritte sind für euch vertretbar, und wo zieht ihr die Grenze?";
   }
 }
 
@@ -1099,35 +1081,35 @@ function buildCentralPatternSections(selection: FounderMatchingSelection) {
 
   const kernspannung = selection.heroSelection.mode === "blind_spot_watch"
     ? selection.heroSelection.biggestRisk
-      ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich zunaechst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.`
-      : "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und gerade deshalb leicht zu spät geprüft wird."
+      ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich erst stabil anfühlt, braucht sie bewusste Aufmerksamkeit.`
+      : "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und deshalb leicht zu spät geprüft wird."
     : selection.biggestTension
-      ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Massstaeben schaut.`
+      ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Maßstäben schaut.`
       : selection.strongestComplement
-        ? `Euer staerkster Unterschied liegt in ${selection.strongestComplement.dimension} und kann euch breiter machen, wenn ihr ihn bewusst fuehrt.`
+        ? `Euer stärkster Unterschied liegt in ${selection.strongestComplement.dimension}. Er kann euch breiter machen, wenn ihr ihn bewusst führt.`
         : selection.stableBase
-          ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfaehig, aber kein Ersatz fuer klare Regeln an offenen Punkten.`
-          : "Ihr habt genug gemeinsame Linie fuer Zusammenarbeit, aber nicht genug Gleichlauf fuer stilles Verstaendnis.";
+          ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} trägt, ersetzt aber keine klaren Regeln an offenen Punkten.`
+          : "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis.";
 
   const auswirkungImAlltag = selection.heroSelection.mode === "blind_spot_watch"
     ? selection.heroSelection.biggestRisk
-      ? `Im Alltag zeigt sich das oft nicht als offene Reibung, sondern als spaete Irritation rund um ${selection.heroSelection.biggestRisk.dimension}: Beide gehen zunaechst von derselben Selbstverstaendlichkeit aus, bis eine Grenze ploetzlich doch nicht geteilt ist.`
-      : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern darin, dass kleine Abweichungen lange unter gemeinsamer Naehe mitlaufen."
+      ? `Im Alltag zeigt sich das selten als offene Reibung, sondern als späte Irritation rund um ${selection.heroSelection.biggestRisk.dimension}: Beide gehen von derselben Selbstverständlichkeit aus, bis eine Grenze doch nicht geteilt ist.`
+      : "Im Alltag zeigt sich das nicht in großen Szenen, sondern darin, dass kleine Abweichungen lange unter gemeinsamer Nähe mitlaufen."
     : selection.biggestTension
       ? buildEverydayImpactSentenceForDimension(selection.biggestTension.dimension)
       : selection.strongestComplement
         ? buildComplementEverydayImpactSentence(selection.strongestComplement.dimension)
-        : "Im Alltag zeigt sich das nicht in grossen Szenen, sondern in Prioritaeten, Timing und unausgesprochenen Erwartungen.";
+        : "Im Alltag zeigt sich das nicht in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen.";
 
   const konsequenzOhneKlaerung = selection.heroSelection.mode === "blind_spot_watch"
     ? selection.heroSelection.biggestRisk
-      ? `Ohne bewusste Klaerung kann aus gemeinsamer Naehe rund um ${selection.heroSelection.biggestRisk.dimension} ein Blind Spot werden: Nicht weil ihr offen gegeneinander arbeitet, sondern weil niemand merkt, wann der gemeinsame Modus nicht mehr traegt.`
-      : "Ohne bewusste Klaerung entsteht kein lauter Konflikt, sondern spaeter eine Ueberraschung ueber Regeln, von denen beide dachten, sie seien geteilt."
+      ? `Ohne bewusste Klärung wird aus gemeinsamer Nähe rund um ${selection.heroSelection.biggestRisk.dimension} leicht ein Blind Spot. Nicht weil ihr offen gegeneinander arbeitet, sondern weil niemand merkt, wann euer gemeinsamer Modus nicht mehr trägt.`
+      : "Ohne bewusste Klärung entsteht kein lauter Konflikt, sondern später Überraschung über Regeln, die beide für geteilt hielten."
     : selection.biggestTension && biggestTensionStatus
       ? buildDimensionConsequence(selection.biggestTension.dimension, biggestTensionStatus.status)
       : selection.strongestComplement
         ? buildDimensionComplementConsequence(selection.strongestComplement.dimension)
-        : "Ohne bewusste Klaerung entstehen unterschiedliche Massstaebe genau dort, wo ihr gemeinsam tragen und entscheiden muesst.";
+        : "Ohne bewusste Klärung entstehen unterschiedliche Maßstäbe genau dort, wo ihr gemeinsam tragen und entscheiden müsst.";
 
   return [
     { label: "Kernspannung", body: kernspannung },
