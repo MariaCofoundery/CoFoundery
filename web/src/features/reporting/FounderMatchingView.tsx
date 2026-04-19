@@ -1,4 +1,6 @@
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
+import { DynamicsTimeline } from "@/components/DynamicsTimeline";
+import { DecisionEngineSection } from "@/features/reporting/DecisionEngineSection";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   FOUNDER_DIMENSION_META,
@@ -8,6 +10,8 @@ import {
   buildFounderMatchingMarkers,
   type FounderMatchingMarker,
 } from "@/features/reporting/founderMatchingMarkers";
+import { buildFounderDynamicsTimelineDetailPhases } from "@/features/reporting/founderDynamicsTimelineDetails";
+import { buildFounderDynamicsTimelineNodes, FOUNDER_DYNAMICS_TIMELINE_PHASES } from "@/features/reporting/timelineLogic";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
@@ -49,6 +53,8 @@ export function FounderMatchingView({
   const steeringPoints = buildSteeringPoints(selection, markers);
   const opportunityPoints = buildOpportunityPoints(selection);
   const clarificationQuestions = buildClarificationQuestions(selection);
+  const timelineNodes = buildFounderDynamicsTimelineNodes(compareResult);
+  const timelineDetailPhases = buildFounderDynamicsTimelineDetailPhases(compareResult);
 
   return (
     <>
@@ -144,6 +150,16 @@ export function FounderMatchingView({
           })}
         </div>
       </section>
+
+      <DecisionEngineSection compareResult={compareResult} selection={selection} />
+
+      <div className="page-section mt-8 print:mt-4">
+        <DynamicsTimeline
+          phases={FOUNDER_DYNAMICS_TIMELINE_PHASES}
+          nodes={timelineNodes}
+          detailPhases={timelineDetailPhases}
+        />
+      </div>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">So zeigt sich das im Alltag</p>
