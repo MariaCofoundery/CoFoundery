@@ -173,7 +173,7 @@ export default async function JoinWelcomePage({
   if (!nextStep.ok) {
     return renderErrorState("Einladung nicht verfügbar", nextStep.detail ?? nextStep.reason);
   }
-  const primaryHref = nextStep.entryHref;
+  const primaryHref = nextStep.resolvedHref;
   const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (

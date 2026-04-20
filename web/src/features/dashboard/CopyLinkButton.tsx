@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type Props = {
   url: string;
@@ -9,8 +10,7 @@ type Props = {
 };
 
 function toAbsoluteUrl(url: string) {
-  if (typeof window === "undefined") return url;
-  return url.startsWith("/") ? `${window.location.origin}${url}` : url;
+  return typeof window === "undefined" ? url : toPublicAppUrl(url, window.location.origin);
 }
 
 export function CopyLinkButton({

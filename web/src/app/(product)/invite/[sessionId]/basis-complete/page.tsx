@@ -3,6 +3,7 @@ import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { ResearchTrackedLink } from "@/features/research/ResearchTrackedLink";
 import { createClient } from "@/lib/supabase/server";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
+import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
@@ -23,10 +24,6 @@ function buildValuesHref(invitationId: string, isRefreshFlow: boolean) {
 
 function buildDoneHref(invitationId: string) {
   return `/invite/${encodeURIComponent(invitationId)}/done`;
-}
-
-function buildDashboardHref(invitationId: string) {
-  return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
 }
 
 export default async function InvitationBasisCompletePage({ params, searchParams }: PageProps) {
@@ -74,7 +71,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
   }
 
   const valuesHref = buildValuesHref(invitationId, isRefreshFlow);
-  const dashboardHref = buildDashboardHref(invitationId);
+  const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">

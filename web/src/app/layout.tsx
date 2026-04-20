@@ -15,6 +15,7 @@ import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
 } from "@/features/reporting/workbookNavigation";
+import { DEFAULT_PUBLIC_APP_ORIGIN, getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 type ReportRunRow = {
@@ -104,6 +105,7 @@ const unbounded = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getPublicAppOrigin() || DEFAULT_PUBLIC_APP_ORIGIN),
   title: "CoFoundery Align | Co-Founder Matching mit Werte-Fokus",
   description:
     "CoFoundery Align verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung.",

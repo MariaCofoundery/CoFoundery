@@ -24,6 +24,10 @@ import {
   getPrivilegedReportRunSnapshotForInvitation,
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
+import {
+  hasAdvisorAccessToRelationship,
+  resolveRelationshipIdForInvitation,
+} from "@/features/reporting/relationshipAdvisorAccess";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 
 type WorkbookRow = {
@@ -355,7 +359,15 @@ export async function getFounderAlignmentWorkbookPageData(
   }
 
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
-  const isLinkedAdvisor = hasActiveAdvisorAccess(advisorRow, user?.id);
+  const relationshipId = user?.id
+    ? await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase)
+    : null;
+  const hasRelationshipAdvisorAccess =
+    user?.id && relationshipId
+      ? await hasAdvisorAccessToRelationship(user.id, relationshipId, supabase)
+      : false;
+  const isLinkedAdvisor =
+    hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id);
   const privileged = isLinkedAdvisor ? createPrivilegedClient() : null;
   const dataClient = privileged ?? supabase;
 

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createComparisonFromExistingAction } from "@/app/(product)/dashboard/actions";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type Option = {
   sessionId: string;
@@ -57,9 +58,7 @@ export function MatchFromExistingForm({ options }: Props) {
       if (result.emailStatus === "sent") {
         nextNotice = { text: "Einladung per E-Mail versendet.", tone: "success" };
       } else {
-        const inviteUrl = result.inviteUrl.startsWith("/")
-          ? `${window.location.origin}${result.inviteUrl}`
-          : result.inviteUrl;
+        const inviteUrl = toPublicAppUrl(result.inviteUrl, window.location.origin);
         try {
           await navigator.clipboard.writeText(inviteUrl);
           nextNotice = {

@@ -3,11 +3,11 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
 
 function toAbsoluteUrl(path: string) {
-  if (typeof window === "undefined") return path;
-  return path.startsWith("/") ? `${window.location.origin}${path}` : path;
+  return typeof window === "undefined" ? path : toPublicAppUrl(path, window.location.origin);
 }
 
 export function CoFounderInviteForm() {

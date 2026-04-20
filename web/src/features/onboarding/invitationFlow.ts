@@ -20,7 +20,7 @@ export type InvitationContinueResolution =
     };
 
 export function buildInvitationDashboardHref(invitationId: string) {
-  return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
+  return `/dashboard?invitationId=${encodeURIComponent(invitationId)}`;
 }
 
 export function buildInvitationDoneHref(invitationId: string) {

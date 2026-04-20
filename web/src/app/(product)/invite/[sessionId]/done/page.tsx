@@ -8,16 +8,13 @@ import {
   finalizeInvitationIfReady,
   getInvitationJoinDecision,
 } from "@/features/reporting/actions";
+import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
 import { createClient } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
   searchParams: Promise<{ useExisting?: string }>;
 };
-
-function buildDashboardHref(invitationId: string) {
-  return `/dashboard?invite=accepted&invitationId=${encodeURIComponent(invitationId)}`;
-}
 
 function buildQuestionnaireHref(invitationId: string, module: "base" | "values") {
   const search = new URLSearchParams({ invitationId });
@@ -67,7 +64,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     redirect(`/login?next=${encodeURIComponent(`/invite/${invitationId}/done`)}`);
   }
 
-  const dashboardHref = buildDashboardHref(invitationId);
+  const dashboardHref = buildInvitationDashboardHref(invitationId);
   const reportHref = `/report/${encodeURIComponent(invitationId)}`;
   const decision = await getInvitationJoinDecision(invitationId);
   const useExistingChoice = query.useExisting === "1";

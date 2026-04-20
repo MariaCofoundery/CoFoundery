@@ -59,6 +59,7 @@ import type { FounderMatchingMarkerClass } from "@/features/reporting/founderMat
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type FounderAlignmentWorkbookClientProps = {
   invitationId: string | null;
@@ -2802,9 +2803,7 @@ export function FounderAlignmentWorkbookClient({
     }
 
     if (typeof window !== "undefined") {
-      const absoluteInviteUrl = result.inviteUrl.startsWith("/")
-        ? `${window.location.origin}${result.inviteUrl}`
-        : result.inviteUrl;
+      const absoluteInviteUrl = toPublicAppUrl(result.inviteUrl, window.location.origin);
       setAdvisorInviteLink(absoluteInviteUrl);
       try {
         await navigator.clipboard.writeText(absoluteInviteUrl);

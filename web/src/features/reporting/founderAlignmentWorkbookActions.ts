@@ -17,6 +17,11 @@ import {
   hashFounderAlignmentAdvisorToken,
   type FounderAlignmentWorkbookAdvisorInviteState,
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
+import {
+  hasAdvisorAccessToRelationship,
+  resolveRelationshipIdForInvitation,
+  syncRelationshipAdvisorFromLegacyInvitation,
+} from "@/features/reporting/relationshipAdvisorAccess";
 import { trackServerResearchEvent } from "@/features/research/server";
 
 type SaveFounderAlignmentWorkbookInput = {
@@ -244,6 +249,14 @@ async function resolveWorkbookViewerRole(
   if (!invitation) return "unknown";
   if (invitation.inviter_user_id === userId) return "founderA";
   if (invitation.invitee_user_id === userId) return "founderB";
+  const accessClient = privileged ?? supabase;
+  const relationshipId = await resolveRelationshipIdForInvitation(invitationId, accessClient);
+  if (
+    relationshipId &&
+    (await hasAdvisorAccessToRelationship(userId, relationshipId, accessClient))
+  ) {
+    return "advisor";
+  }
   if (
     advisorRow?.advisor_user_id === userId &&
     advisorRow.founder_a_approved === true &&
@@ -917,6 +930,17 @@ export async function prepareFounderAlignmentAdvisorInvite({
       return { ok: false, reason: "invite_failed" };
     }
 
+    const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
+      normalizedInvitationId,
+      privileged
+    );
+    if (!syncResult.ok && syncResult.reason !== "missing_relationship") {
+      console.error("relationship advisor sync failed after linked advisor refresh", {
+        invitationId: normalizedInvitationId,
+        reason: syncResult.reason,
+      });
+    }
+
     return {
       ok: true,
       status: "advisor_linked",
@@ -944,6 +968,17 @@ export async function prepareFounderAlignmentAdvisorInvite({
       return { ok: false, reason: "invite_failed" };
     }
 
+    const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
+      normalizedInvitationId,
+      privileged
+    );
+    if (!syncResult.ok && syncResult.reason !== "missing_relationship") {
+      console.error("relationship advisor sync failed after founder approval", {
+        invitationId: normalizedInvitationId,
+        reason: syncResult.reason,
+      });
+    }
+
     return {
       ok: true,
       status: "awaiting_other_founder",
@@ -969,6 +1004,17 @@ export async function prepareFounderAlignmentAdvisorInvite({
 
   if (error) {
     return { ok: false, reason: "invite_failed" };
+  }
+
+  const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
+    normalizedInvitationId,
+    privileged
+  );
+  if (!syncResult.ok && syncResult.reason !== "missing_relationship") {
+    console.error("relationship advisor sync failed after invite preparation", {
+      invitationId: normalizedInvitationId,
+      reason: syncResult.reason,
+    });
   }
 
   await trackServerResearchEvent({
@@ -1058,6 +1104,14 @@ export async function claimFounderAlignmentAdvisorAccess({
 
   if (updateError || !updatedAdvisorRow) {
     return { ok: false, reason: "update_failed" };
+  }
+
+  const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(invitationId, privileged);
+  if (!syncResult.ok && syncResult.reason !== "missing_relationship") {
+    console.error("relationship advisor sync failed after advisor claim", {
+      invitationId,
+      reason: syncResult.reason,
+    });
   }
 
   const { payload: currentPayload } = await loadWorkbookRow(invitationId, privileged);

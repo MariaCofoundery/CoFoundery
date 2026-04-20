@@ -1,3 +1,5 @@
+export const DEFAULT_PUBLIC_APP_ORIGIN = "https://cofoundery.de";
+
 function normalizeOrigin(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return "";
@@ -21,7 +23,7 @@ export function isLocalDevelopmentOrigin(value: string) {
   }
 }
 
-export function getPublicAppOrigin(fallbackOrigin = "") {
+export function getConfiguredPublicAppOrigin() {
   const configured =
     typeof window === "undefined"
       ? process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
@@ -31,9 +33,27 @@ export function getPublicAppOrigin(fallbackOrigin = "") {
         ""
       : process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.NEXT_PUBLIC_APP_URL?.trim() || "";
 
+  return configured ? normalizeOrigin(configured) : "";
+}
+
+export function getPublicAppOrigin(fallbackOrigin = "") {
+  const configured = getConfiguredPublicAppOrigin();
   if (configured) {
-    return normalizeOrigin(configured);
+    return configured;
   }
 
-  return isLocalDevelopmentOrigin(fallbackOrigin) ? normalizeOrigin(fallbackOrigin) : "";
+  if (isLocalDevelopmentOrigin(fallbackOrigin)) {
+    return normalizeOrigin(fallbackOrigin);
+  }
+
+  return DEFAULT_PUBLIC_APP_ORIGIN;
+}
+
+export function toPublicAppUrl(value: string, fallbackOrigin = "") {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  if (!trimmed.startsWith("/")) return trimmed;
+
+  const origin = getPublicAppOrigin(fallbackOrigin);
+  return origin ? `${origin}${trimmed}` : trimmed;
 }

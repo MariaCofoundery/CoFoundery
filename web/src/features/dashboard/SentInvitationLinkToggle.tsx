@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { getSentInvitationLinkAction } from "@/app/(product)/dashboard/actions";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type Props = {
   invitationId: string;
@@ -40,8 +41,7 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
   const isLinkable = LINKABLE_STATUSES.has(normalizedStatus);
 
   const toAbsoluteUrl = (value: string) => {
-    if (typeof window === "undefined") return value;
-    return value.startsWith("/") ? `${window.location.origin}${value}` : value;
+    return typeof window === "undefined" ? value : toPublicAppUrl(value, window.location.origin);
   };
 
   const onToggle = () => {

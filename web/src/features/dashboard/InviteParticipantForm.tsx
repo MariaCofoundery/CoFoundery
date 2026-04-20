@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { inviteParticipantBAction } from "@/app/(product)/dashboard/actions";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
 
 function teamContextMeta(teamContext: TeamContext | null) {
@@ -76,9 +77,7 @@ export function InviteParticipantForm({
         return;
       }
 
-      const inviteUrl = result.inviteUrl.startsWith("/")
-        ? `${window.location.origin}${result.inviteUrl}`
-        : result.inviteUrl;
+      const inviteUrl = toPublicAppUrl(result.inviteUrl, window.location.origin);
       onInviteCreated?.({ sessionId: result.sessionId, inviteUrl });
 
       let nextNotice: { text: string; tone: "success" | "warning" };

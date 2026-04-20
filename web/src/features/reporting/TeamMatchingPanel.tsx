@@ -4,6 +4,7 @@ import { InviteParticipantForm } from "@/features/dashboard/InviteParticipantFor
 import { PersonBStatusBadge } from "@/features/reporting/PersonBStatusBadge";
 import { type PersonBStatus } from "@/features/reporting/types";
 import { useState } from "react";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type Props = {
   sessionId: string;
@@ -58,8 +59,11 @@ export function TeamMatchingPanel({
       setCopied(false);
       return;
     }
-    const base = typeof window !== "undefined" ? window.location.origin : "";
-    const link = latestInviteUrl ?? `${base}/join?sessionId=${targetSessionId}`;
+    const link =
+      latestInviteUrl ??
+      (typeof window !== "undefined"
+        ? toPublicAppUrl(`/join/start?invitationId=${targetSessionId}`, window.location.origin)
+        : `/join/start?invitationId=${targetSessionId}`);
     try {
       await navigator.clipboard.writeText(link);
       setCopyError(null);

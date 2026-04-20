@@ -1023,15 +1023,32 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
+  const isAccepted = invite.status === "accepted";
   const completeQuestionnaireHref = `/join/start?invitationId=${encodeURIComponent(invite.id)}`;
   const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
+  const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
   const reportHref = `/report/${invite.id}`;
-  const canOpenCompletionStatus = invite.isReadyForMatching || inviteeHasAllRequired;
+  const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
   const actionHref = invite.isReportReady
     ? reportHref
     : canOpenCompletionStatus
       ? completionStatusHref
-      : completeQuestionnaireHref;
+      : isAccepted
+        ? completeQuestionnaireHref
+        : dashboardHref;
+  const actionLabel = invite.isReportReady
+    ? "Öffnen"
+    : canOpenCompletionStatus
+      ? "Status öffnen"
+      : isAccepted
+        ? "Jetzt ausfüllen"
+        : "Einladung prüfen";
+  const actionClassName = invite.isReportReady
+    ? REPORT_CTA_CLASS
+    : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700";
+  const helperText = isAccepted
+    ? null
+    : "Öffne zuerst den ursprünglichen Einladungslink, damit die Einladung angenommen und korrekt gestartet wird.";
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -1041,17 +1058,14 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
         <p className="text-xs text-slate-500">
           Module: {formatInvitationModules(invite.requiredModules)} · Erstellt: {formatDate(invite.createdAt)}
         </p>
+        {helperText ? <p className="mt-1 text-xs text-amber-700">{helperText}</p> : null}
       </div>
 
       <a
         href={actionHref}
-        className={
-          invite.isReportReady
-            ? REPORT_CTA_CLASS
-            : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
-        }
+        className={actionClassName}
       >
-        {invite.isReportReady ? "Öffnen" : canOpenCompletionStatus ? "Status öffnen" : "Jetzt ausfüllen"}
+        {actionLabel}
       </a>
     </div>
   );
