@@ -7,6 +7,14 @@ import {
   type AdvisorSectionImpulse,
 } from "@/features/reporting/advisorSectionImpulses";
 import { getPrivilegedReportRunSnapshotForInvitation } from "@/features/reporting/actions";
+import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
+import {
+  buildFounderCompatibilityAnswerMapV2,
+  mapLegacyFounderAnswersToV2Answers,
+  type FounderCompatibilityAnswerV2,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
+import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
+import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import type { TeamScoringResult } from "@/features/scoring/founderScoring";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -21,6 +29,7 @@ type InvitationReportContextRow = {
   invitee_user_id: string | null;
   invitee_email: string | null;
   team_context: string | null;
+  status: string;
 };
 
 type ProfileNameRow = {
@@ -37,6 +46,24 @@ type AdvisorSectionImpulseRow = {
   created_at: string;
   updated_at: string;
 };
+
+type AssessmentRow = {
+  id: string;
+  user_id: string;
+  submitted_at: string | null;
+  created_at: string;
+};
+
+type AssessmentAnswerRow = {
+  question_id: string;
+  choice_value: string;
+};
+
+type QuestionRow = {
+  id: string;
+};
+
+type PrivilegedClient = NonNullable<ReturnType<typeof createPrivilegedAccessClient>>;
 
 export type AdvisorReportPageData =
   | {
@@ -93,6 +120,121 @@ function emptyImpulseMap() {
   ) as Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
 }
 
+async function getLatestSubmittedBaseAssessment(
+  privileged: PrivilegedClient,
+  userId: string
+): Promise<AssessmentRow | null> {
+  const { data, error } = await privileged
+    .from("assessments")
+    .select("id, user_id, submitted_at, created_at")
+    .eq("user_id", userId)
+    .eq("module", "base")
+    .not("submitted_at", "is", null)
+    .order("submitted_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as AssessmentRow;
+}
+
+async function getActiveBaseQuestionMap(
+  privileged: PrivilegedClient
+): Promise<Map<string, QuestionRow>> {
+  const { data, error } = await privileged
+    .from("questions")
+    .select("id")
+    .eq("category", "basis")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data) {
+    return new Map<string, QuestionRow>();
+  }
+
+  assertFounderBaseQuestionVersionContract(
+    (data as QuestionRow[]).map((row) => row.id),
+    "advisor_report_active_basis_questions"
+  );
+
+  return new Map((data as QuestionRow[]).map((row) => [row.id, row]));
+}
+
+async function getAssessmentAnswers(
+  privileged: PrivilegedClient,
+  assessmentId: string
+): Promise<AssessmentAnswerRow[]> {
+  const { data, error } = await privileged
+    .from("assessment_answers")
+    .select("question_id, choice_value")
+    .eq("assessment_id", assessmentId);
+
+  if (error || !data) return [];
+  return data as AssessmentAnswerRow[];
+}
+
+function transformAnswers(
+  rows: AssessmentAnswerRow[],
+  activeBaseQuestionMap: Map<string, QuestionRow>
+): FounderCompatibilityAnswerV2[] {
+  const questionById = new Map(
+    [...activeBaseQuestionMap.values()].map((question) => [
+      question.id,
+      { id: question.id, category: "basis" as const },
+    ])
+  );
+
+  return mapLegacyFounderAnswersToV2Answers(rows, questionById);
+}
+
+async function resolveFounderScoringForAdvisorReport(
+  invitation: InvitationReportContextRow,
+  snapshotFounderScoring: TeamScoringResult | null,
+  privileged: PrivilegedClient
+): Promise<TeamScoringResult | null> {
+  if (snapshotFounderScoring) {
+    return snapshotFounderScoring;
+  }
+
+  if (invitation.status !== "accepted" || !invitation.invitee_user_id) {
+    return null;
+  }
+
+  const [activeBaseQuestionMap, personAAssessment, personBAssessment] = await Promise.all([
+    getActiveBaseQuestionMap(privileged),
+    getLatestSubmittedBaseAssessment(privileged, invitation.inviter_user_id),
+    getLatestSubmittedBaseAssessment(privileged, invitation.invitee_user_id),
+  ]);
+
+  if (!personAAssessment || !personBAssessment) {
+    return null;
+  }
+
+  const [personARows, personBRows] = await Promise.all([
+    getAssessmentAnswers(privileged, personAAssessment.id),
+    getAssessmentAnswers(privileged, personBAssessment.id),
+  ]);
+
+  const personAAnswers = transformAnswers(personARows, activeBaseQuestionMap);
+  const personBAnswers = transformAnswers(personBRows, activeBaseQuestionMap);
+  const personAAnswerMap = buildFounderCompatibilityAnswerMapV2(personAAnswers);
+  const personBAnswerMap = buildFounderCompatibilityAnswerMapV2(personBAnswers);
+  const baseQuestionCount = getActiveRegistryItems().length;
+
+  if (
+    baseQuestionCount <= 0 ||
+    Object.keys(personAAnswerMap).length < baseQuestionCount ||
+    Object.keys(personBAnswerMap).length < baseQuestionCount
+  ) {
+    return null;
+  }
+
+  return scoreFounderAlignmentV2FromAnswersV2({
+    personA: personAAnswers,
+    personB: personBAnswers,
+  });
+}
+
 export async function getAdvisorReportPageData(
   invitationId: string
 ): Promise<AdvisorReportPageData> {
@@ -132,7 +274,7 @@ export async function getAdvisorReportPageData(
     getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId),
     privileged
       .from("invitations")
-      .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context")
+      .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status")
       .eq("id", normalizedInvitationId)
       .maybeSingle(),
     privileged
@@ -147,7 +289,13 @@ export async function getAdvisorReportPageData(
     return { status: "not_found", invitationId: normalizedInvitationId };
   }
 
-  if (!snapshot?.founderScoring) {
+  const founderScoring = await resolveFounderScoringForAdvisorReport(
+    invitation,
+    snapshot?.founderScoring ?? null,
+    privileged
+  );
+
+  if (!founderScoring) {
     return { status: "missing_report", invitationId: normalizedInvitationId };
   }
 
@@ -164,19 +312,19 @@ export async function getAdvisorReportPageData(
   );
 
   const participantAName =
-    snapshot.report?.participantAName ||
+    snapshot?.report?.participantAName ||
     profileByUserId.get(invitation.inviter_user_id) ||
     "Founder A";
   const participantBName =
-    snapshot.report?.participantBName ||
+    snapshot?.report?.participantBName ||
     (invitation.invitee_user_id
       ? profileByUserId.get(invitation.invitee_user_id)
       : invitation.invitee_email?.split("@")[0]?.trim()) ||
     "Founder B";
 
   const compareResult = compareFounders(
-    toFounderScores(snapshot.founderScoring, "A"),
-    toFounderScores(snapshot.founderScoring, "B")
+    toFounderScores(founderScoring, "A"),
+    toFounderScores(founderScoring, "B")
   );
   const report = buildAdvisorReportData(compareResult);
   const impulseMap = emptyImpulseMap();

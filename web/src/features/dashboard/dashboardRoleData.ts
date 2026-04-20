@@ -63,6 +63,11 @@ type ReportRunRow = {
   payload?: unknown;
 };
 
+type SubmittedBaseAssessmentRow = {
+  user_id: string;
+  submitted_at: string | null;
+};
+
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
 
@@ -328,10 +333,20 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
     ),
   ];
 
-  const { data: profileRows } = await dataClient
-    .from("profiles")
-    .select("user_id, display_name, avatar_id, avatar_url")
-    .in("user_id", relevantUserIds);
+  const [{ data: profileRows }, submittedBaseAssessmentsResult] = await Promise.all([
+    dataClient
+      .from("profiles")
+      .select("user_id, display_name, avatar_id, avatar_url")
+      .in("user_id", relevantUserIds),
+    relevantUserIds.length > 0
+      ? dataClient
+          .from("assessments")
+          .select("user_id, submitted_at")
+          .eq("module", "base")
+          .not("submitted_at", "is", null)
+          .in("user_id", relevantUserIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
   const profileByUserId = new Map(
     ((profileRows ?? []) as ProfileRow[]).map((row) => [
@@ -348,6 +363,14 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
   for (const row of reportRuns) {
     if (!reportRunByInvitationId.has(row.invitation_id)) {
       reportRunByInvitationId.set(row.invitation_id, row);
+    }
+  }
+  const latestSubmittedBaseByUserId = new Map<string, string>();
+  for (const row of (submittedBaseAssessmentsResult.data ?? []) as SubmittedBaseAssessmentRow[]) {
+    if (!row.submitted_at) continue;
+    const current = latestSubmittedBaseByUserId.get(row.user_id);
+    if (!current || row.submitted_at > current) {
+      latestSubmittedBaseByUserId.set(row.user_id, row.submitted_at);
     }
   }
 
@@ -383,12 +406,20 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
       const founderBProfile = invitation.invitee_user_id
         ? profileByUserId.get(invitation.invitee_user_id)
         : null;
+      const hasBothBaseSubmissions = Boolean(
+        latestSubmittedBaseByUserId.get(invitation.inviter_user_id) &&
+          invitation.invitee_user_id &&
+          latestSubmittedBaseByUserId.get(invitation.invitee_user_id)
+      );
       const lastActivitySource = [workbook?.updated_at ?? null, reportRun?.created_at ?? null, invitation.created_at]
         .filter((value): value is string => Boolean(value))
         .sort()
         .at(-1) ?? null;
 
-      const reportReady = hasRenderableAdvisorReportPayload(reportRun?.payload);
+      const reportReady =
+        hasRenderableAdvisorReportPayload(reportRun?.payload) ||
+        Boolean(reportRun) ||
+        hasBothBaseSubmissions;
 
       return {
         invitationId: invitation.id,

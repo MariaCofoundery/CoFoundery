@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import {
   FOUNDER_DIMENSION_META,
@@ -7,10 +8,19 @@ import type { AdvisorReportPreviewCase } from "@/features/reporting/advisorRepor
 import type {
   AdvisorClassification,
   AdvisorDimensionAssessment,
+  AdvisorReportData,
 } from "@/features/reporting/advisor-report/advisorReportTypes";
 
 type Props = {
-  preview: AdvisorReportPreviewCase;
+  preview?: AdvisorReportPreviewCase;
+  participantAName?: string;
+  participantBName?: string;
+  report?: AdvisorReportData;
+  title?: string;
+  summary?: string | null;
+  eyebrow?: string;
+  topActions?: ReactNode;
+  appendix?: ReactNode;
   debug?: boolean;
 };
 
@@ -238,19 +248,44 @@ function DimensionInsightCard({
   );
 }
 
-export function AdvisorReportPreview({ preview, debug = false }: Props) {
-  const { report } = preview;
+export function AdvisorReportPreview({
+  preview,
+  participantAName: participantANameProp,
+  participantBName: participantBNameProp,
+  report: reportProp,
+  title: titleProp,
+  summary: summaryProp,
+  eyebrow: eyebrowProp,
+  topActions,
+  appendix,
+  debug = false,
+}: Props) {
+  const participantAName = preview?.participantAName ?? participantANameProp ?? null;
+  const participantBName = preview?.participantBName ?? participantBNameProp ?? null;
+  const report = preview?.report ?? reportProp ?? null;
+  const title =
+    titleProp ??
+    (preview ? `${preview.title}: ${preview.participantAName} + ${preview.participantBName}` : null);
+  const summary = summaryProp ?? preview?.summary ?? null;
+  const eyebrow = eyebrowProp ?? (preview ? "Interne Preview · Advisor Report" : "Advisor Report");
+
+  if (!participantAName || !participantBName || !report) {
+    return null;
+  }
 
   return (
     <div className="space-y-8">
+      {topActions ? <div>{topActions}</div> : null}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-          Interne Preview · Advisor Report
+          {eyebrow}
         </p>
-        <h1 className="mt-3 text-2xl font-semibold text-slate-950">
-          {preview.title}: {preview.participantAName} + {preview.participantBName}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">{preview.summary}</p>
+        {title ? (
+          <h1 className="mt-3 text-2xl font-semibold text-slate-950">{title}</h1>
+        ) : null}
+        {summary ? (
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">{summary}</p>
+        ) : null}
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -288,8 +323,8 @@ export function AdvisorReportPreview({ preview, debug = false }: Props) {
             <DimensionScaleCard
               key={dimension.dimensionKey}
               dimension={dimension}
-              participantAName={preview.participantAName}
-              participantBName={preview.participantBName}
+              participantAName={participantAName}
+              participantBName={participantBName}
               debug={debug}
             />
           ))}
@@ -407,6 +442,7 @@ export function AdvisorReportPreview({ preview, debug = false }: Props) {
           ))}
         </div>
       </details>
+      {appendix}
     </div>
   );
 }
