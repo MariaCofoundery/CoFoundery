@@ -3276,10 +3276,10 @@ export function FounderAlignmentWorkbookClient({
                               </span>
                             </div>
                             <h3 className="mt-3 text-base font-semibold text-slate-950">
-                              {t("Founder-Freigabe und Zugriff")}
+                              {t("Advisor-Zugriff")}
                             </h3>
                             <p className="mt-2 text-sm leading-6 text-slate-600">
-                              {t("Nur bei Bedarf öffnen: Hier siehst du Freigabestatus und Grenzen deiner Advisor-Rolle.")}
+                              {t("Nur bei Bedarf öffnen: Hier siehst du Freigabestatus und den Rahmen deiner Rolle.")}
                             </p>
                           </div>
                           <span className="mt-1 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500 transition group-open:bg-slate-100">
@@ -3305,21 +3305,9 @@ export function FounderAlignmentWorkbookClient({
                               />
                             ) : null}
                           </div>
-
-                          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
-                            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                              {t("Was du hier tun kannst")}
-                            </p>
-                            <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
-                              <li>{t("Siehst den freigegebenen Report- und Workbook-Kontext.")}</li>
-                              <li>{t("Ergänzt nur Advisor-Hinweise und den Advisor-Abschluss.")}</li>
-                              <li>{t("Änderst keine Founder-Beiträge, Regeln oder Zustimmungen.")}</li>
-                            </ul>
-                          </div>
-
-                          <p className="mt-3 text-xs leading-6 text-slate-600">
+                          <p className="mt-4 text-sm leading-6 text-slate-600">
                             {t(
-                              "Dein Zugriff bleibt nur aktiv, solange beide Founder freigegeben haben."
+                              "Du arbeitest nur im freigegebenen Workbook- und Report-Kontext. Founder-Beiträge und Zustimmungen bleiben unverändert."
                             )}
                           </p>
                         </div>

@@ -106,18 +106,24 @@ export function ProductShell({
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
     navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
+  const dashboardHref = resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
   const navigationItems: NavigationItem[] = [
     {
-      href: "/dashboard",
+      href: dashboardHref,
       label: "Dashboard",
-      isActive: (currentPathname) => currentPathname === "/dashboard",
+      isActive: (currentPathname) =>
+        resolvedActiveView === "advisor"
+          ? currentPathname === "/advisor/dashboard"
+          : currentPathname === "/dashboard",
     },
-    {
+  ];
+  if (resolvedActiveView !== "advisor") {
+    navigationItems.push({
       href: "/me/report",
       label: "Mein Report",
       isActive: (currentPathname) => currentPathname.startsWith("/me/"),
-    },
-  ];
+    });
+  }
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;
@@ -130,7 +136,7 @@ export function ProductShell({
           <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10 xl:px-12">
             <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
               <Link
-                href="/dashboard"
+                href={dashboardHref}
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
                 aria-label="Zum Dashboard"
               >
@@ -158,24 +164,43 @@ export function ProductShell({
                     {item.label}
                   </Link>
                 ))}
-                <NavigationContextMenu
-                  label="Matching-Report"
-                  directHref={resolvedMatchingHref}
-                  items={matchingItems}
-                  isActive={
-                    pathname.startsWith("/report/") ||
-                    pathname.startsWith("/advisor/report") ||
-                    pathname === "/invite/new"
-                  }
-                  currentHref={resolvedMatchingHref}
-                />
-                <NavigationContextMenu
-                  label="Workbook"
-                  directHref={resolvedWorkbookHref}
-                  items={workbookItems}
-                  isActive={pathname.startsWith("/founder-alignment/")}
-                  currentHref={resolvedWorkbookHref}
-                />
+                {resolvedActiveView === "advisor" ? (
+                  <>
+                    <Link
+                      href={resolvedWorkbookHref}
+                      className={navLinkClassName(pathname.startsWith("/founder-alignment/"))}
+                    >
+                      Workbook
+                    </Link>
+                    <Link
+                      href={resolvedMatchingHref}
+                      className={navLinkClassName(pathname.startsWith("/advisor/report"))}
+                    >
+                      Report
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <NavigationContextMenu
+                      label="Matching-Report"
+                      directHref={resolvedMatchingHref}
+                      items={matchingItems}
+                      isActive={
+                        pathname.startsWith("/report/") ||
+                        pathname.startsWith("/advisor/report") ||
+                        pathname === "/invite/new"
+                      }
+                      currentHref={resolvedMatchingHref}
+                    />
+                    <NavigationContextMenu
+                      label="Workbook"
+                      directHref={resolvedWorkbookHref}
+                      items={workbookItems}
+                      isActive={pathname.startsWith("/founder-alignment/")}
+                      currentHref={resolvedWorkbookHref}
+                    />
+                  </>
+                )}
                 <ProductFeedbackEntry
                   source="nav"
                   invitationId={resolvedFeedbackInvitationId}
