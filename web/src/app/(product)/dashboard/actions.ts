@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { deleteFounderAccount } from "@/features/account/deleteFounderAccount";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
+import { sendCoFounderInviteEmail } from "@/lib/email/sendCoFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -18,6 +19,8 @@ export type InviteActionResult =
       sessionId: string;
       inviteUrl: string;
       emailStatus: EmailStatus;
+      emailError?: string;
+      emailRecipient: string;
     }
   | {
       ok: false;
@@ -123,6 +126,7 @@ async function createInvitation(params: {
   label?: string | null;
   reportScope: "basis" | "basis_plus_values";
   teamContext: TeamContext;
+  sendEmail?: boolean;
 }): Promise<InviteActionResult> {
   const supabase = await createClient();
   const {
@@ -202,11 +206,38 @@ async function createInvitation(params: {
     });
   });
 
+  let emailStatus: EmailStatus = "not_sent";
+  let emailError: string | undefined;
+
+  if (params.sendEmail) {
+    const sendResult = await sendCoFounderInviteEmail({
+      inviteeEmail: invitedEmail,
+      inviteUrl: buildAbsoluteInviteUrl(token),
+      inviterDisplayName,
+      reportScope: params.reportScope,
+      teamContext: params.teamContext,
+    });
+
+    if (sendResult.ok) {
+      emailStatus = "sent";
+    } else {
+      emailError = sendResult.error;
+      console.error("createInvitation email send failed", {
+        invitationId: invitation.id,
+        userId: user.id,
+        invitedEmail,
+        error: sendResult.error,
+      });
+    }
+  }
+
   return {
     ok: true,
     sessionId: invitation.id,
     inviteUrl: buildInviteUrl(token),
-    emailStatus: "not_sent",
+    emailStatus,
+    emailError,
+    emailRecipient: invitedEmail,
   };
 }
 
@@ -427,5 +458,6 @@ export async function createCoFounderInvitationAction(formData: FormData): Promi
     label: labelRaw.length > 0 ? labelRaw : null,
     reportScope: includeValues ? "basis_plus_values" : "basis",
     teamContext,
+    sendEmail: true,
   });
 }

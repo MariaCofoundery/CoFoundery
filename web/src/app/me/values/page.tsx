@@ -15,6 +15,7 @@ import {
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { ValuesQuestionnaire } from "@/features/questionnaire/ValuesQuestionnaire";
 import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
+import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type MeValuesSearchParams = {
   invitationId?: string;
@@ -44,7 +45,18 @@ export default async function MeValuesPage({
   let completeRedirect = "/me/values/complete";
   if (invitationId) {
     const decision = await getInvitationJoinDecision(invitationId);
+    logInviteFlowDebug("me/values:join_decision", {
+      invitationId,
+      userId: user.id,
+      isRefreshFlow,
+      decision,
+    });
     if (!decision.ok) {
+      logInviteFlowDebug("me/values:redirect_dashboard_error", {
+        invitationId,
+        userId: user.id,
+        reason: decision.reason,
+      });
       redirect(`/dashboard?error=${encodeURIComponent(decision.reason)}`);
     }
     trackingTeamContext = decision.team_context;
@@ -62,11 +74,21 @@ export default async function MeValuesPage({
     if (needsBaseFirst) {
       const baseSearch = new URLSearchParams({ invitationId });
       if (isRefreshFlow) baseSearch.set("flow", "refresh");
+      logInviteFlowDebug("me/values:redirect_base", {
+        invitationId,
+        userId: user.id,
+        redirectTo: `/me/base?${baseSearch.toString()}`,
+      });
       redirect(`/me/base?${baseSearch.toString()}`);
     }
 
     completeRedirect = `/invite/${encodeURIComponent(invitationId)}/done`;
   }
+  logInviteFlowDebug("me/values:resolved", {
+    invitationId,
+    userId: user.id,
+    completeRedirect,
+  });
 
   const submittedBase = await getLatestSubmittedAssessment("base");
   if (!submittedBase) {

@@ -1,4 +1,5 @@
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
+import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
 
@@ -52,6 +53,10 @@ export async function resolveInvitationContinueTarget(
 ): Promise<InvitationContinueResolution> {
   const normalizedInvitationId = invitationId.trim();
   const fallbackHref = buildInvitationDashboardHref(normalizedInvitationId);
+  logInviteFlowDebug("invitationFlow:resolve_start", {
+    invitationId: normalizedInvitationId,
+    fallbackHref,
+  });
 
   if (!normalizedInvitationId) {
     return {
@@ -63,6 +68,10 @@ export async function resolveInvitationContinueTarget(
   }
 
   const decision = await getInvitationJoinDecision(normalizedInvitationId);
+  logInviteFlowDebug("invitationFlow:join_decision", {
+    invitationId: normalizedInvitationId,
+    decision,
+  });
   if (!decision.ok) {
     return {
       ok: false,
@@ -74,23 +83,27 @@ export async function resolveInvitationContinueTarget(
   }
 
   if (decision.mode === "report_ready" || decision.mode === "choice_existing_or_update") {
-    return {
+    const result = {
       ok: true,
       invitationId: normalizedInvitationId,
       mode: decision.mode,
       label: decision.mode === "report_ready" ? "Zum Report" : "Zum Abschluss",
       resolvedHref: buildInvitationDoneHref(normalizedInvitationId),
       entryHref: buildInvitationStartHref(normalizedInvitationId),
-    };
+    } satisfies Extract<InvitationContinueResolution, { ok: true }>;
+    logInviteFlowDebug("invitationFlow:resolve_result", result);
+    return result;
   }
 
   const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
-  return {
+  const result = {
     ok: true,
     invitationId: normalizedInvitationId,
     mode: decision.mode,
     label: nextModule === "base" ? "Zum Basis-Fragebogen" : "Zum Werte-Modul",
     resolvedHref: buildInvitationQuestionnaireHref(normalizedInvitationId, nextModule),
     entryHref: buildInvitationStartHref(normalizedInvitationId),
-  };
+  } satisfies Extract<InvitationContinueResolution, { ok: true }>;
+  logInviteFlowDebug("invitationFlow:resolve_result", result);
+  return result;
 }

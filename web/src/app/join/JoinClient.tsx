@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient } from "@/lib/supabase/client";
 
 type JoinUiState =
@@ -98,11 +99,22 @@ export default function JoinClient() {
     const run = async () => {
       const tokenFromUrl = readInviteTokenFromParams(searchParams);
       const invitationIdFromUrl = readInvitationIdFromParams(searchParams);
+      logInviteFlowDebug("JoinClient:start", {
+        href: typeof window !== "undefined" ? window.location.href : null,
+        tokenPresent: Boolean(tokenFromUrl),
+        invitationIdFromUrl,
+      });
 
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
+      logInviteFlowDebug("JoinClient:session", {
+        invitationIdFromUrl,
+        tokenPresent: Boolean(tokenFromUrl),
+        sessionUserId: session?.user?.id ?? null,
+        sessionError: sessionError?.message ?? null,
+      });
 
       if (sessionError) {
         setUiState({
@@ -116,6 +128,12 @@ export default function JoinClient() {
 
       if (!session?.user?.id) {
         const nextPath = invitationIdFromUrl ? buildJoinStartHref(invitationIdFromUrl) : "/join";
+        logInviteFlowDebug("JoinClient:redirect_login", {
+          invitationIdFromUrl,
+          tokenPresent: Boolean(tokenFromUrl),
+          nextPath,
+          route: tokenFromUrl ? "/join/prepare" : "/login",
+        });
         setUiState({
           type: "redirecting",
           title: "Weiter zum Login",
@@ -133,11 +151,21 @@ export default function JoinClient() {
       const token = tokenFromUrl;
 
       if (token) {
+        logInviteFlowDebug("JoinClient:accept_invitation_attempt", {
+          sessionUserId: session.user.id,
+          invitationIdFromUrl,
+          tokenPresent: true,
+        });
         const { data, error } = await supabase.rpc("accept_invitation", {
           p_token: token,
         });
 
         if (error) {
+          logInviteFlowDebug("JoinClient:accept_invitation_error", {
+            sessionUserId: session.user.id,
+            invitationIdFromUrl,
+            error: error.message,
+          });
           const normalizedError = error.message.trim().toLowerCase();
           if (
             normalizedError.includes("auth session missing") ||
@@ -161,9 +189,20 @@ export default function JoinClient() {
         }
 
         resolvedInvitationId = extractInvitationIdFromAcceptPayload(data) ?? resolvedInvitationId;
+        logInviteFlowDebug("JoinClient:accept_invitation_success", {
+          sessionUserId: session.user.id,
+          invitationIdFromUrl,
+          resolvedInvitationId,
+          payload: data,
+        });
       }
 
       if (!resolvedInvitationId) {
+        logInviteFlowDebug("JoinClient:missing_invitation_context", {
+          sessionUserId: session.user.id,
+          invitationIdFromUrl,
+          tokenPresent: Boolean(token),
+        });
         setUiState({
           type: "error",
           title: "Link ungültig",
@@ -173,6 +212,11 @@ export default function JoinClient() {
         return;
       }
 
+      logInviteFlowDebug("JoinClient:redirect_join_start", {
+        sessionUserId: session.user.id,
+        resolvedInvitationId,
+        redirectTo: buildJoinStartHref(resolvedInvitationId),
+      });
       router.replace(buildJoinStartHref(resolvedInvitationId));
     };
 

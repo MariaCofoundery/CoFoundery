@@ -17,6 +17,7 @@ import {
   QuestionnaireClient,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
+import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type MeBaseSearchParams = {
   invitationId?: string;
@@ -46,7 +47,18 @@ export default async function MeBasePage({
   let completeRedirect = "/me/base/complete";
   if (invitationId) {
     const decision = await getInvitationJoinDecision(invitationId);
+    logInviteFlowDebug("me/base:join_decision", {
+      invitationId,
+      userId: user.id,
+      isRefreshFlow,
+      decision,
+    });
     if (!decision.ok) {
+      logInviteFlowDebug("me/base:redirect_dashboard_error", {
+        invitationId,
+        userId: user.id,
+        reason: decision.reason,
+      });
       redirect(`/dashboard?error=${encodeURIComponent(decision.reason)}`);
     }
     trackingTeamContext = decision.team_context;
@@ -61,8 +73,18 @@ export default async function MeBasePage({
       if (needsValues) {
         const valuesSearch = new URLSearchParams({ invitationId });
         if (isRefreshFlow) valuesSearch.set("flow", "refresh");
+        logInviteFlowDebug("me/base:redirect_values", {
+          invitationId,
+          userId: user.id,
+          redirectTo: `/me/values?${valuesSearch.toString()}`,
+        });
         redirect(`/me/values?${valuesSearch.toString()}`);
       }
+      logInviteFlowDebug("me/base:redirect_done", {
+        invitationId,
+        userId: user.id,
+        redirectTo: `/invite/${encodeURIComponent(invitationId)}/done`,
+      });
       redirect(`/invite/${encodeURIComponent(invitationId)}/done`);
     }
 
@@ -80,6 +102,11 @@ export default async function MeBasePage({
       completeRedirect = `/invite/${encodeURIComponent(invitationId)}/done`;
     }
   }
+  logInviteFlowDebug("me/base:resolved", {
+    invitationId,
+    userId: user.id,
+    completeRedirect,
+  });
 
   const explicitDraftId = params.assessmentId?.trim() ?? "";
   let draft = null as Awaited<ReturnType<typeof getOrCreateDraftAssessment>> | null;

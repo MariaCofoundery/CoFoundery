@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { buildInvitationDashboardHref, resolveInvitationContinueTarget } from "@/features/onboarding/invitationFlow";
+import {
+  buildInvitationDashboardHref,
+  resolveInvitationContinueTarget,
+} from "@/features/onboarding/invitationFlow";
+import {
+  inviteFlowDebugQueryEnabled,
+  logInviteFlowDebug,
+} from "@/features/onboarding/inviteFlowDebug";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
@@ -10,6 +17,7 @@ type WelcomeSearchParams = {
   invitationId?: string;
   token?: string;
   inviteToken?: string;
+  debug?: string;
 };
 
 type InvitationRow = {
@@ -22,6 +30,8 @@ type InvitationRow = {
   inviter_email: string | null;
   expires_at: string;
   revoked_at: string | null;
+  accepted_at: string | null;
+  relationship_id: string | null;
 };
 
 function normalizeEmail(value: string | null | undefined) {
@@ -103,29 +113,60 @@ export default async function JoinWelcomePage({
   const params = await searchParams;
   const token = readToken(params);
   let invitationId = readInvitationId(params);
+  const showDebug = inviteFlowDebugQueryEnabled(params.debug);
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  logInviteFlowDebug("join/welcome:request", {
+    invitationId,
+    tokenPresent: Boolean(token),
+    userId: user?.id ?? null,
+    href: invitationId ? `/join/welcome?invitationId=${invitationId}` : "/join/welcome",
+  });
 
   if (!user) {
     if (token) {
+      logInviteFlowDebug("join/welcome:redirect_prepare", {
+        invitationId,
+        tokenPresent: true,
+      });
       redirect(`/join/prepare?token=${encodeURIComponent(token)}`);
     }
     const next = invitationId
       ? `/join/welcome?invitationId=${encodeURIComponent(invitationId)}`
       : "/join/welcome";
+    logInviteFlowDebug("join/welcome:redirect_login", {
+      invitationId,
+      next,
+    });
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 
   if (token) {
+    logInviteFlowDebug("join/welcome:accept_invitation_attempt", {
+      invitationId,
+      tokenPresent: true,
+      userId: user.id,
+    });
     const { data, error } = await supabase.rpc("accept_invitation", { p_token: token });
     if (error) {
+      logInviteFlowDebug("join/welcome:accept_invitation_error", {
+        invitationId,
+        userId: user.id,
+        error: error.message,
+      });
       return renderErrorState(resolveInviteError(error.message), error.message);
     }
     const acceptedInvitationId = extractInvitationIdFromAcceptPayload(data);
     invitationId = acceptedInvitationId ?? invitationId;
+    logInviteFlowDebug("join/welcome:accept_invitation_success", {
+      invitationId,
+      acceptedInvitationId,
+      userId: user.id,
+      payload: data,
+    });
   }
 
   if (!invitationId) {
@@ -135,7 +176,7 @@ export default async function JoinWelcomePage({
   const { data: invitationData, error: invitationError } = await supabase
     .from("invitations")
     .select(
-      "id, status, invitee_user_id, invitee_email, team_context, inviter_display_name, inviter_email, expires_at, revoked_at"
+      "id, status, invitee_user_id, invitee_email, team_context, inviter_display_name, inviter_email, expires_at, revoked_at, accepted_at, relationship_id"
     )
     .eq("id", invitationId)
     .maybeSingle();
@@ -145,6 +186,11 @@ export default async function JoinWelcomePage({
   }
 
   const invitation = invitationData as InvitationRow;
+  logInviteFlowDebug("join/welcome:invitation_snapshot", {
+    invitationId,
+    userId: user.id,
+    invitation,
+  });
   const userEmail = normalizeEmail(user.email);
   const isInvitee =
     invitation.invitee_user_id === user.id ||
@@ -170,6 +216,11 @@ export default async function JoinWelcomePage({
   const contextMeta = invitationContextMeta(invitation.team_context);
 
   const nextStep = await resolveInvitationContinueTarget(invitationId);
+  logInviteFlowDebug("join/welcome:next_step", {
+    invitationId,
+    userId: user.id,
+    nextStep,
+  });
   if (!nextStep.ok) {
     return renderErrorState("Einladung nicht verfügbar", nextStep.detail ?? nextStep.reason);
   }
@@ -198,6 +249,45 @@ export default async function JoinWelcomePage({
         </p>
 
         <div className="mt-6">
+          {showDebug ? (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-950">
+              <p className="font-semibold uppercase tracking-[0.08em]">Invite Flow Debug</p>
+              <dl className="mt-2 grid gap-1">
+                <div className="flex gap-2">
+                  <dt className="font-medium">Invitation</dt>
+                  <dd>{invitationId}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Status</dt>
+                  <dd>{invitation.status}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Invitee</dt>
+                  <dd>{invitation.invitee_user_id ?? "null"}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Accepted</dt>
+                  <dd>{invitation.accepted_at ?? "null"}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Relationship</dt>
+                  <dd>{invitation.relationship_id ?? "null"}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">User</dt>
+                  <dd>{user.id}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Next</dt>
+                  <dd>{primaryHref}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium">Mode</dt>
+                  <dd>{nextStep.mode}</dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
           {hasProfileBasics ? (
             <section className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50/80 via-white to-violet-50/70 p-6">
               <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Deine Profil-Basics</h2>

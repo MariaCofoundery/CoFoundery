@@ -19,6 +19,11 @@ export function CoFounderInviteForm() {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
+  const [resultState, setResultState] = useState<{
+    tone: "success" | "warning";
+    recipient: string;
+    message: string;
+  } | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const selectedModulesLabel = useMemo(() => {
@@ -39,6 +44,7 @@ export function CoFounderInviteForm() {
 
     setError(null);
     setCopyNotice(null);
+    setResultState(null);
 
     startTransition(async () => {
       const formData = new FormData();
@@ -50,6 +56,7 @@ export function CoFounderInviteForm() {
       const result = await createCoFounderInvitationAction(formData);
       if (!result.ok) {
         setInviteUrl(null);
+        setResultState(null);
         setError(result.error);
         return;
       }
@@ -57,6 +64,20 @@ export function CoFounderInviteForm() {
       const absoluteInviteUrl = toAbsoluteUrl(result.inviteUrl);
       setInviteUrl(absoluteInviteUrl);
       setCopyNotice(null);
+      setResultState(
+        result.emailStatus === "sent"
+          ? {
+              tone: "success",
+              recipient: result.emailRecipient,
+              message: `Die Einladung wurde an ${result.emailRecipient} versendet.`,
+            }
+          : {
+              tone: "warning",
+              recipient: result.emailRecipient,
+              message:
+                "Die Einladung wurde erstellt, aber die E-Mail konnte nicht versendet werden. Teile den Link bitte manuell.",
+            }
+      );
       router.refresh();
     });
   };
@@ -78,7 +99,7 @@ export function CoFounderInviteForm() {
     >
       <h1 className="text-xl font-semibold text-slate-900">Co-Founder einladen</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Wähle jetzt euren Kontext und erstelle den Einladungslink.
+        Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
@@ -186,37 +207,82 @@ export function CoFounderInviteForm() {
           disabled={isPending}
           className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm text-slate-900 shadow-[0_10px_30px_rgba(103,232,249,0.22)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
         >
-          {isPending ? "Einladung wird erstellt..." : "Einladungslink erstellen"}
+          {isPending ? "Einladung wird gesendet..." : "Einladung senden"}
         </button>
+        <p className="text-xs text-slate-500">
+          Fallback: Wenn der Versand scheitert, kannst du den Einladungslink danach manuell teilen.
+        </p>
       </form>
 
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
 
-      {inviteUrl ? (
-        <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-800">
-            Einladung erstellt
+      {inviteUrl && resultState ? (
+        <div
+          className={`mt-5 rounded-xl border p-4 ${
+            resultState.tone === "success"
+              ? "border-emerald-200 bg-emerald-50/60"
+              : "border-amber-200 bg-amber-50/60"
+          }`}
+        >
+          <p
+            className={`text-xs font-semibold uppercase tracking-[0.08em] ${
+              resultState.tone === "success" ? "text-emerald-800" : "text-amber-800"
+            }`}
+          >
+            {resultState.tone === "success" ? "Einladung versendet" : "Einladung erstellt"}
           </p>
-          <p className="mt-2 text-sm text-emerald-900">Aktive Module: {selectedModulesLabel}</p>
+          <p
+            className={`mt-2 text-sm ${
+              resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
+            }`}
+          >
+            {resultState.message}
+          </p>
+          <p
+            className={`mt-2 text-sm ${
+              resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
+            }`}
+          >
+            Aktive Module: {selectedModulesLabel}
+          </p>
           {teamContext ? (
-            <p className="mt-1 text-sm text-emerald-900">
+            <p
+              className={`mt-1 text-sm ${
+                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
+              }`}
+            >
               Kontext: {teamContext === "existing_team" ? "Wir arbeiten bereits zusammen" : "Wir überlegen, zusammenzuarbeiten"}
             </p>
           ) : null}
-          <p className="mt-2 text-xs leading-6 text-emerald-800">
-            Teile jetzt den Link direkt mit der zweiten Person. Sobald dein Co-Founder teilnimmt,
-            entsteht euer Matching-Report.
+          <p
+            className={`mt-2 text-xs leading-6 ${
+              resultState.tone === "success" ? "text-emerald-800" : "text-amber-800"
+            }`}
+          >
+            {resultState.tone === "success"
+              ? "Falls du zusätzlich manuell nachfassen willst, kannst du denselben Einladungslink kopieren."
+              : "Die Einladung ist gültig. Nutze den Link jetzt als manuellen Rettungsweg, damit der Flow nicht blockiert."}
           </p>
-          <p className="mt-2 break-all rounded-md border border-emerald-200 bg-white px-3 py-2 text-xs text-emerald-900">
+          <p
+            className={`mt-2 break-all rounded-md border bg-white px-3 py-2 text-xs ${
+              resultState.tone === "success"
+                ? "border-emerald-200 text-emerald-900"
+                : "border-amber-200 text-amber-900"
+            }`}
+          >
             {inviteUrl}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={onCopy}
-              className="inline-flex rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-sm text-emerald-900"
+              className={`inline-flex rounded-lg border bg-white px-3 py-1.5 text-sm ${
+                resultState.tone === "success"
+                  ? "border-emerald-300 text-emerald-900"
+                  : "border-amber-300 text-amber-900"
+              }`}
             >
-              Link kopieren
+              Einladungslink kopieren
             </button>
             <a
               href="/dashboard"
@@ -225,7 +291,15 @@ export function CoFounderInviteForm() {
               Zum Dashboard
             </a>
           </div>
-          {copyNotice ? <p className="mt-2 text-xs text-emerald-900">{copyNotice}</p> : null}
+          {copyNotice ? (
+            <p
+              className={`mt-2 text-xs ${
+                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
+              }`}
+            >
+              {copyNotice}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </section>

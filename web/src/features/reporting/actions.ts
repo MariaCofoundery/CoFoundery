@@ -10,6 +10,7 @@ import {
   type FounderAlignmentReport,
 } from "@/features/reporting/buildFounderAlignmentReport";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient } from "@/lib/supabase/server";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import {
@@ -1131,7 +1132,9 @@ async function getInvitationJoinDecisionInternal(
   const normalizedEmail = (user.email ?? "").trim().toLowerCase();
   const { data: invitationAccess, error: invitationAccessError } = await supabase
     .from("invitations")
-    .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, expires_at, revoked_at")
+    .select(
+      "id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, expires_at, revoked_at, accepted_at, relationship_id"
+    )
     .eq("id", normalizedInvitationId)
     .maybeSingle();
   if (invitationAccessError || !invitationAccess) {
@@ -1151,7 +1154,15 @@ async function getInvitationJoinDecisionInternal(
     status: string;
     expires_at: string;
     revoked_at: string | null;
+    accepted_at: string | null;
+    relationship_id: string | null;
   };
+  logInviteFlowDebug("reporting:getInvitationJoinDecision:invitation", {
+    invitationId: normalizedInvitationId,
+    userId: user.id,
+    userEmail: normalizedEmail,
+    invitation,
+  });
   const isInvitee =
     invitation.invitee_user_id === user.id ||
     (normalizedEmail.length > 0 && invitation.invitee_email === normalizedEmail);
@@ -1165,6 +1176,14 @@ async function getInvitationJoinDecisionInternal(
     return { ok: false, reason: "expired" };
   }
   if (invitation.status !== "accepted") {
+    logInviteFlowDebug("reporting:getInvitationJoinDecision:not_accepted", {
+      invitationId: normalizedInvitationId,
+      userId: user.id,
+      invitationStatus: invitation.status,
+      inviteeUserId: invitation.invitee_user_id,
+      acceptedAt: invitation.accepted_at,
+      relationshipId: invitation.relationship_id,
+    });
     return { ok: false, reason: "not_accepted" };
   }
   if (!invitation.invitee_user_id) {
@@ -1242,7 +1261,7 @@ async function getInvitationJoinDecisionInternal(
       ? "needs_questionnaires"
       : "choice_existing_or_update";
 
-  return {
+  const result = {
     ok: true,
     invitation_id: normalizedInvitationId,
     mode,
@@ -1268,7 +1287,13 @@ async function getInvitationJoinDecisionInternal(
       ),
     },
     report_run_id: reportRunId,
-  };
+  } satisfies Extract<InvitationJoinDecision, { ok: true }>;
+  logInviteFlowDebug("reporting:getInvitationJoinDecision:result", {
+    invitationId: normalizedInvitationId,
+    userId: user.id,
+    result,
+  });
+  return result;
 }
 
 export async function getInvitationJoinDecision(
