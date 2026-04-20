@@ -233,7 +233,10 @@ export default async function AdvisorDashboardPage() {
         </div>
       </header>
 
-      <section className="mt-8 rounded-[32px] border border-slate-200/80 bg-slate-50/75 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.04)] md:p-8">
+      <section
+        id="advisor-teams"
+        className="mt-8 rounded-[32px] border border-slate-200/80 bg-slate-50/75 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.04)] md:p-8"
+      >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Teams & Workbooks</p>

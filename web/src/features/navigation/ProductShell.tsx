@@ -101,11 +101,18 @@ export function ProductShell({
 }: Props) {
   const pathname = usePathname();
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
-  const resolvedMatchingHref = navigationOverride?.matchingHref ?? matchingHref;
-  const resolvedWorkbookHref = navigationOverride?.workbookHref ?? workbookHref;
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
     navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
+  const advisorFallbackHref = "/advisor/dashboard#advisor-teams";
+  const resolvedMatchingHref =
+    resolvedActiveView === "advisor"
+      ? navigationOverride?.matchingHref ?? advisorFallbackHref
+      : navigationOverride?.matchingHref ?? matchingHref;
+  const resolvedWorkbookHref =
+    resolvedActiveView === "advisor"
+      ? navigationOverride?.workbookHref ?? advisorFallbackHref
+      : navigationOverride?.workbookHref ?? workbookHref;
   const dashboardHref = resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
   const navigationItems: NavigationItem[] = [
     {

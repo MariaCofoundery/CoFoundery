@@ -86,11 +86,19 @@ export default async function FounderAlignmentWorkbookPage({
     );
   }
 
+  const resolvedInvitationId = data.invitationId ?? invitationId;
+  const advisorReportHref = `/advisor/report?invitationId=${encodeURIComponent(
+    resolvedInvitationId
+  )}`;
+  const founderReportHref = `/report/${encodeURIComponent(resolvedInvitationId)}`;
+
   return (
     <main>
       <ProductNavigationOverride
-        matchingHref={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
-        workbookHref={buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext)}
+        matchingHref={
+          data.currentUserRole === "advisor" ? advisorReportHref : founderReportHref
+        }
+        workbookHref={buildWorkbookHref(resolvedInvitationId, data.teamContext)}
         feedbackInvitationId={data.invitationId ?? invitationId}
         activeView={data.currentUserRole === "advisor" ? "advisor" : "founder"}
         contextLabel={data.currentUserRole === "advisor" ? "Advisor-Kontext" : "Founder-Kontext"}
