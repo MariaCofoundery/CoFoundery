@@ -29,6 +29,10 @@ function buildModuleLabel(reportScope: "basis" | "basis_plus_values") {
   return reportScope === "basis_plus_values" ? "Basis und Werte" : "Basis";
 }
 
+function buildPrivacyUrl() {
+  return "https://cofoundery.de/datenschutz";
+}
+
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
@@ -43,14 +47,15 @@ function buildReplyToAddress() {
 
 function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
   const inviterName = params.inviterDisplayName ? escapeHtml(params.inviterDisplayName) : null;
-  const greeting = inviterName ? `Hi, ${inviterName} möchte dich einladen.` : "Hi, du wurdest eingeladen.";
+  const greeting = inviterName ? `Hi,` : "Hi,";
   const inviterLine = inviterName
-    ? `${inviterName} möchte mit dir eure Co-Founder Dynamik anschauen.`
-    : "Jemand möchte mit dir eure Co-Founder Dynamik anschauen.";
+    ? `${inviterName} hat dich eingeladen, gemeinsam eure Co-Founder Dynamik mit Cofoundery Align anzuschauen.`
+    : "Du wurdest eingeladen, gemeinsam eure Co-Founder Dynamik mit Cofoundery Align anzuschauen.";
 
   const contextLabel = escapeHtml(buildContextLabel(params.teamContext));
   const moduleLabel = escapeHtml(buildModuleLabel(params.reportScope));
   const inviteUrl = escapeHtml(params.inviteUrl);
+  const privacyUrl = escapeHtml(buildPrivacyUrl());
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -58,26 +63,30 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
             <tr>
-              <td style="padding:32px 32px 20px;">
-                <p style="margin:0 0 12px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
-                  Cofoundery
-                </p>
-                <h1 style="margin:0 0 16px;font-size:28px;line-height:34px;color:#0f172a;">
+              <td style="padding:32px 32px 28px;">
+                <img
+                  src="https://cofoundery.de/cofoundery-align-logo.svg"
+                  alt="Cofoundery Align"
+                  width="168"
+                  height="32"
+                  style="display:block;height:auto;width:168px;max-width:100%;margin:0 0 20px;"
+                />
+                <h1 style="margin:0 0 16px;font-size:28px;line-height:34px;color:#0f172a;font-weight:700;">
                   ${greeting}
                 </h1>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
                   ${inviterLine}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Cofoundery Align hilft zwei Gründer:innen dabei, ihre Zusammenarbeit früh klarer zu sehen und wichtige Unterschiede besser einzuordnen.
+                  Cofoundery Align hilft Gründer:innen dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.
                 </p>
-                <p style="margin:0 0 28px;font-size:16px;line-height:26px;color:#334155;">
-                  Du bekommst daraus einen strukturierten Matching-Report und ein gemeinsames Workbook, mit dem ihr die wichtigsten Themen konkret besprechen könnt.
+                <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
+                  Du bekommst daraus einen strukturierten Matching-Report und ein gemeinsames Workbook, mit dem ihr eure wichtigsten Spannungs- und Entscheidungsfelder konkret anschauen könnt.
                 </p>
-                <p style="margin:0 0 28px;font-size:16px;line-height:26px;color:#334155;">
-                  Der aktuelle Kontext ist <strong>${contextLabel}</strong>, gestartet wird mit <strong>${moduleLabel}</strong>.
+                <p style="margin:0 0 28px;font-size:15px;line-height:25px;color:#475569;">
+                  Kontext: <strong>${contextLabel}</strong>. Ihr startet mit <strong>${moduleLabel}</strong>.
                 </p>
                 <p style="margin:0 0 28px;">
                   <a href="${inviteUrl}" style="display:inline-block;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
@@ -90,6 +99,17 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
                 <p style="margin:0;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
                   <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
                 </p>
+                <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
+                  <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
+                    Du erhältst diese E-Mail, weil dich jemand direkt zu einem gemeinsamen Co-Founder Matching eingeladen hat.
+                  </p>
+                  <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
+                    Wenn die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.
+                  </p>
+                  <p style="margin:0;font-size:13px;line-height:21px;color:#64748b;">
+                    <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">Datenschutzerklärung</a>
+                  </p>
+                </div>
               </td>
             </tr>
           </table>
@@ -102,22 +122,27 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
 
 function buildTextBody(params: SendCoFounderInviteEmailParams) {
   const inviterLine = params.inviterDisplayName
-    ? `${params.inviterDisplayName} möchte mit dir eure Co-Founder Dynamik anschauen.`
-    : "Jemand möchte mit dir eure Co-Founder Dynamik anschauen.";
+    ? `${params.inviterDisplayName} hat dich eingeladen, gemeinsam eure Co-Founder Dynamik mit Cofoundery Align anzuschauen.`
+    : "Du wurdest eingeladen, gemeinsam eure Co-Founder Dynamik mit Cofoundery Align anzuschauen.";
 
   return [
     "Hi,",
     "",
     inviterLine,
     "",
-    "Cofoundery Align hilft zwei Gründer:innen dabei, ihre Zusammenarbeit früh klarer zu sehen und wichtige Unterschiede besser einzuordnen.",
-    "Du bekommst daraus einen strukturierten Matching-Report und ein gemeinsames Workbook, mit dem ihr die wichtigsten Themen konkret besprechen könnt.",
+    "Cofoundery Align hilft Gründer:innen dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.",
+    "Du bekommst daraus einen strukturierten Matching-Report und ein gemeinsames Workbook, mit dem ihr eure wichtigsten Spannungs- und Entscheidungsfelder konkret anschauen könnt.",
     "",
     `Kontext: ${buildContextLabel(params.teamContext)}`,
     `Start mit: ${buildModuleLabel(params.reportScope)}`,
     "",
     "Starte hier direkt mit eurem Matching:",
     params.inviteUrl,
+    "",
+    "Du erhältst diese E-Mail, weil dich jemand direkt zu einem gemeinsamen Co-Founder Matching eingeladen hat.",
+    "Wenn die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.",
+    "",
+    `Datenschutzerklärung: ${buildPrivacyUrl()}`,
   ].join("\n");
 }
 
@@ -146,7 +171,7 @@ export async function sendCoFounderInviteEmail(
       to: [params.inviteeEmail],
       reply_to: buildReplyToAddress(),
       subject: params.inviterDisplayName
-        ? `${params.inviterDisplayName} möchte mit dir eure Co-Founder Dynamik anschauen`
+        ? `${params.inviterDisplayName} möchte mit dir euer Co-Founder Matching starten`
         : "Du wurdest zu einem Co-Founder Matching eingeladen",
       html: buildHtmlBody(params),
       text: buildTextBody(params),

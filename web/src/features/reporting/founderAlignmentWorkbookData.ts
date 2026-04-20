@@ -26,9 +26,14 @@ import {
 } from "@/features/reporting/actions";
 import {
   hasAdvisorAccessToRelationship,
+  listRelationshipAdvisorsForRelationship,
   resolveRelationshipIdForInvitation,
 } from "@/features/reporting/relationshipAdvisorAccess";
-import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
+import { type FounderVisibleAdvisorImpulse } from "@/features/reporting/advisorSectionImpulses";
+import {
+  type FounderAlignmentWorkbookAdvisorEntry,
+  type FounderAlignmentWorkbookAdvisorInviteState,
+} from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 
 type WorkbookRow = {
   invitation_id: string;
@@ -116,6 +121,8 @@ export type FounderAlignmentWorkbookPageData =
       hasTeamContextMismatch: boolean;
       showValuesStep: boolean;
       advisorInvite: FounderAlignmentWorkbookAdvisorInviteState;
+      advisorEntries: FounderAlignmentWorkbookAdvisorEntry[];
+      advisorImpulses: FounderVisibleAdvisorImpulse[];
     }
   | {
       status: "missing_invitation" | "forbidden" | "in_progress";
@@ -355,6 +362,8 @@ export async function getFounderAlignmentWorkbookPageData(
       hasTeamContextMismatch: false,
       showValuesStep: false,
       advisorInvite: advisorInviteStateFromRow(null),
+      advisorEntries: [],
+      advisorImpulses: [],
     };
   }
 
@@ -460,6 +469,100 @@ export async function getFounderAlignmentWorkbookPageData(
   }
 
   const highlights = deriveFounderAlignmentWorkbookHighlights(report, scoringResult);
+  const relationshipAdvisorEntriesRaw =
+    relationshipId && founderContextClient
+      ? await listRelationshipAdvisorsForRelationship(relationshipId, founderContextClient)
+      : [];
+  const advisorImpulseResult =
+    relationshipId && founderContextClient
+      ? await founderContextClient
+          .from("advisor_section_impulses")
+          .select("id, advisor_user_id, section_key, text, updated_at")
+          .eq("relationship_id", relationshipId)
+          .order("updated_at", { ascending: false })
+      : { data: [], error: null };
+  const advisorEntries: FounderAlignmentWorkbookAdvisorEntry[] = relationshipAdvisorEntriesRaw.map((row) => {
+    const suggestedByRole =
+      row.requested_by_user_id && row.requested_by_user_id === founderContext.founderAUserId
+        ? "founderA"
+        : row.requested_by_user_id && row.requested_by_user_id === founderContext.founderBUserId
+          ? "founderB"
+          : "unknown";
+    return {
+      id: row.id,
+      relationshipId: row.relationship_id,
+      invitationId: normalizedInvitationId,
+      advisorName: row.advisor_name ?? null,
+      advisorEmail: row.advisor_email ?? null,
+      status: row.status,
+      founderAApproved: row.founder_a_approved,
+      founderBApproved: row.founder_b_approved,
+      suggestedByRole,
+      suggestedByLabel:
+        suggestedByRole === "founderA"
+          ? founderContext.founderAName ?? "Founder A"
+          : suggestedByRole === "founderB"
+            ? founderContext.founderBName ?? "Founder B"
+            : "Unbekannt",
+      invitedAt: row.invited_at ?? null,
+      linkedAt: row.linked_at ?? null,
+    };
+  });
+  const aggregateAdvisorInviteState: FounderAlignmentWorkbookAdvisorInviteState = {
+    founderAApproved:
+      advisorEntries.some((entry) => entry.founderAApproved) || (advisorRow?.founder_a_approved ?? false),
+    founderBApproved:
+      advisorEntries.some((entry) => entry.founderBApproved) || (advisorRow?.founder_b_approved ?? false),
+    advisorLinked:
+      advisorEntries.some((entry) => entry.status === "linked") || Boolean(advisorRow?.advisor_user_id),
+    advisorName:
+      advisorEntries.find((entry) => entry.status === "linked")?.advisorName ??
+      advisorEntries[0]?.advisorName ??
+      advisorDisplayName,
+  };
+  const advisorImpulseUserIds = [
+    ...new Set(
+      ((advisorImpulseResult.data ?? []) as Array<{ advisor_user_id: string | null }>)
+        .map((row) => row.advisor_user_id)
+        .filter((value): value is string => Boolean(value))
+    ),
+  ];
+  const advisorImpulseProfilesResult =
+    advisorImpulseUserIds.length > 0 && founderContextClient
+      ? await founderContextClient
+          .from("profiles")
+          .select("user_id, display_name")
+          .in("user_id", advisorImpulseUserIds)
+      : { data: [], error: null };
+  const advisorImpulseProfileByUserId = new Map(
+    (((advisorImpulseProfilesResult.data ?? []) as Array<{
+      user_id: string;
+      display_name: string | null;
+    }>)).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
+  );
+  const advisorNameByUserId = new Map(
+    relationshipAdvisorEntriesRaw
+      .filter((row): row is typeof row & { advisor_user_id: string } => Boolean(row.advisor_user_id))
+      .map((row) => [row.advisor_user_id, row.advisor_name?.trim() ?? ""])
+  );
+  const advisorImpulses: FounderVisibleAdvisorImpulse[] = ((advisorImpulseResult.data ?? []) as Array<{
+    id: string;
+    advisor_user_id: string | null;
+    section_key: FounderVisibleAdvisorImpulse["sectionKey"];
+    text: string;
+    updated_at: string;
+  }>)
+    .filter((row) => row.text.trim().length > 0)
+    .map((row) => ({
+      id: row.id,
+      sectionKey: row.section_key,
+      advisorName:
+        (row.advisor_user_id ? advisorImpulseProfileByUserId.get(row.advisor_user_id) : null) ||
+        (row.advisor_user_id ? advisorNameByUserId.get(row.advisor_user_id) : null) ||
+        "Advisor",
+      text: row.text,
+      updatedAt: row.updated_at,
+    }));
 
   return {
     status: "ready",
@@ -484,7 +587,9 @@ export async function getFounderAlignmentWorkbookPageData(
     storedTeamContext,
     hasTeamContextMismatch,
     showValuesStep,
-    advisorInvite: advisorInviteStateFromRow(advisorRow, advisorProfile),
+    advisorInvite: aggregateAdvisorInviteState,
+    advisorEntries,
+    advisorImpulses,
   };
 }
 

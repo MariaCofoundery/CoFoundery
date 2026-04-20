@@ -1,17 +1,19 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
-export type RelationshipAdvisorStatus = "pending" | "approved" | "linked" | "revoked";
+export type RelationshipAdvisorStatus = "pending" | "approved" | "invited" | "linked" | "revoked";
 
 export type RelationshipAdvisorRow = {
   id: string;
   relationship_id: string;
   advisor_user_id: string | null;
   advisor_name: string | null;
+  advisor_email: string | null;
   status: RelationshipAdvisorStatus;
   founder_a_approved: boolean;
   founder_b_approved: boolean;
   approved_at: string | null;
+  invited_at: string | null;
   linked_at: string | null;
   revoked_at: string | null;
   requested_by_user_id: string | null;
@@ -64,6 +66,8 @@ export function deriveRelationshipAdvisorStatus(params: {
   founderAApproved: boolean;
   founderBApproved: boolean;
   advisorUserId: string | null;
+  inviteTokenHash?: string | null;
+  invitedAt?: string | null;
   revokedAt?: string | null;
 }): RelationshipAdvisorStatus {
   if (params.revokedAt) {
@@ -71,6 +75,9 @@ export function deriveRelationshipAdvisorStatus(params: {
   }
   if (params.advisorUserId) {
     return "linked";
+  }
+  if (params.invitedAt || params.inviteTokenHash) {
+    return "invited";
   }
   if (params.founderAApproved && params.founderBApproved) {
     return "approved";
@@ -157,14 +164,18 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
     relationship_id: relationshipId,
     advisor_user_id: legacy.advisor_user_id,
     advisor_name: legacy.advisor_name,
+    advisor_email: null,
     status: deriveRelationshipAdvisorStatus({
       founderAApproved: legacy.founder_a_approved,
       founderBApproved: legacy.founder_b_approved,
       advisorUserId: legacy.advisor_user_id,
+      inviteTokenHash: legacy.token_hash,
+      invitedAt: legacy.advisor_user_id ? null : legacy.approved_at ?? legacy.updated_at,
     }),
     founder_a_approved: legacy.founder_a_approved,
     founder_b_approved: legacy.founder_b_approved,
     approved_at: legacy.approved_at,
+    invited_at: legacy.advisor_user_id ? null : legacy.approved_at ?? legacy.updated_at,
     linked_at: legacy.advisor_user_id ? legacy.claimed_at ?? legacy.updated_at : null,
     revoked_at: null,
     requested_by_user_id: legacy.requested_by,
@@ -177,7 +188,7 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
   const existingQuery = client
     .from("relationship_advisors")
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, status, founder_a_approved, founder_b_approved, approved_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("source_invitation_id", legacy.invitation_id);
 
@@ -198,7 +209,7 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
 
   const { data: persistedRow, error: writeError } = await writeQuery
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, status, founder_a_approved, founder_b_approved, approved_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .maybeSingle();
 
@@ -229,7 +240,7 @@ export async function hasAdvisorAccessToRelationship(
     .select("id")
     .eq("relationship_id", normalizedRelationshipId)
     .eq("advisor_user_id", normalizedUserId)
-    .in("status", ["approved", "linked"])
+    .in("status", ["approved", "invited", "linked"])
     .eq("founder_a_approved", true)
     .eq("founder_b_approved", true)
     .is("revoked_at", null)
@@ -252,9 +263,34 @@ export async function listRelationshipAdvisorsForUser(
   const { data, error } = await resolvedClient
     .from("relationship_advisors")
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, status, founder_a_approved, founder_b_approved, approved_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("advisor_user_id", normalizedUserId)
+    .order("updated_at", { ascending: false });
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data as RelationshipAdvisorRow[];
+}
+
+export async function listRelationshipAdvisorsForRelationship(
+  relationshipId: string,
+  client?: SupabaseLikeClient
+): Promise<RelationshipAdvisorRow[]> {
+  const normalizedRelationshipId = relationshipId.trim();
+  if (!normalizedRelationshipId) {
+    return [];
+  }
+
+  const resolvedClient = client ?? (await createClient());
+  const { data, error } = await resolvedClient
+    .from("relationship_advisors")
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .eq("relationship_id", normalizedRelationshipId)
     .order("updated_at", { ascending: false });
 
   if (error || !data) {

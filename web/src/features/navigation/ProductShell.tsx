@@ -40,6 +40,8 @@ type NavigationOverride = {
   matchingHref?: string;
   workbookHref?: string;
   feedbackInvitationId?: string | null;
+  activeView?: "founder" | "advisor";
+  contextLabel?: string | null;
 } | null;
 
 const ProductNavigationOverrideContext = createContext<
@@ -102,6 +104,11 @@ export function ProductShell({
   const resolvedMatchingHref = navigationOverride?.matchingHref ?? matchingHref;
   const resolvedWorkbookHref = navigationOverride?.workbookHref ?? workbookHref;
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
+  const resolvedActiveView =
+    navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
+  const resolvedContextLabel =
+    navigationOverride?.contextLabel ??
+    (resolvedActiveView === "advisor" ? "Advisor-Kontext" : "Founder-Kontext");
   const navigationItems: NavigationItem[] = [
     {
       href: "/dashboard",
@@ -158,7 +165,11 @@ export function ProductShell({
                   label="Matching-Report"
                   directHref={resolvedMatchingHref}
                   items={matchingItems}
-                  isActive={pathname.startsWith("/report/") || pathname === "/invite/new"}
+                  isActive={
+                    pathname.startsWith("/report/") ||
+                    pathname.startsWith("/advisor/report") ||
+                    pathname === "/invite/new"
+                  }
                   currentHref={resolvedMatchingHref}
                 />
                 <NavigationContextMenu
@@ -178,8 +189,17 @@ export function ProductShell({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
+              <span
+                className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] ${
+                  resolvedActiveView === "advisor"
+                    ? "border-sky-200 bg-sky-50 text-sky-800"
+                    : "border-slate-200 bg-slate-50 text-slate-600"
+                }`}
+              >
+                {resolvedContextLabel}
+              </span>
               <DashboardViewSwitch
-                activeView={pathname.startsWith("/advisor/") ? "advisor" : "founder"}
+                activeView={resolvedActiveView}
                 hasFounder={hasFounder}
                 hasAdvisor={hasAdvisor}
               />
@@ -421,10 +441,14 @@ export function ProductNavigationOverride({
   matchingHref,
   workbookHref,
   feedbackInvitationId,
+  activeView,
+  contextLabel,
 }: {
   matchingHref?: string | null;
   workbookHref?: string | null;
   feedbackInvitationId?: string | null;
+  activeView?: "founder" | "advisor";
+  contextLabel?: string | null;
 }) {
   const setOverride = useContext(ProductNavigationOverrideContext);
 
@@ -435,12 +459,14 @@ export function ProductNavigationOverride({
       matchingHref: matchingHref ?? undefined,
       workbookHref: workbookHref ?? undefined,
       feedbackInvitationId: feedbackInvitationId ?? undefined,
+      activeView: activeView ?? undefined,
+      contextLabel: contextLabel ?? undefined,
     });
 
     return () => {
       setOverride(null);
     };
-  }, [feedbackInvitationId, matchingHref, setOverride, workbookHref]);
+  }, [activeView, contextLabel, feedbackInvitationId, matchingHref, setOverride, workbookHref]);
 
   return null;
 }

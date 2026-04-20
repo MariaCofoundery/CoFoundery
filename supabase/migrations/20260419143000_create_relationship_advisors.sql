@@ -104,103 +104,226 @@ with check (
   )
 );
 
-with legacy_rows as (
-  select
-    fwa.invitation_id,
-    coalesce(i.relationship_id, rel.id) as relationship_id,
-    fwa.advisor_user_id,
-    fwa.advisor_name,
-    case
-      when fwa.advisor_user_id is not null then 'linked'::public.relationship_advisor_status
-      when fwa.founder_a_approved and fwa.founder_b_approved then 'approved'::public.relationship_advisor_status
-      else 'pending'::public.relationship_advisor_status
-    end as status,
-    fwa.founder_a_approved,
-    fwa.founder_b_approved,
-    fwa.approved_at,
-    case when fwa.advisor_user_id is not null then coalesce(fwa.claimed_at, fwa.updated_at, fwa.created_at) else null end as linked_at,
-    null::timestamptz as revoked_at,
-    fwa.requested_by as requested_by_user_id,
-    fwa.invitation_id as source_invitation_id,
-    fwa.token_hash as invite_token_hash,
-    fwa.created_at,
-    fwa.updated_at
-  from public.founder_alignment_workbook_advisors fwa
-  left join public.invitations i on i.id = fwa.invitation_id
-  left join public.relationships rel
-    on i.relationship_id is null
-   and i.inviter_user_id is not null
-   and i.invitee_user_id is not null
-   and (
-     (rel.user_a_id = i.inviter_user_id and rel.user_b_id = i.invitee_user_id)
-     or (rel.user_a_id = i.invitee_user_id and rel.user_b_id = i.inviter_user_id)
-   )
-)
-insert into public.relationship_advisors (
-  relationship_id,
-  advisor_user_id,
-  advisor_name,
-  status,
-  founder_a_approved,
-  founder_b_approved,
-  approved_at,
-  linked_at,
-  revoked_at,
-  requested_by_user_id,
-  source_invitation_id,
-  invite_token_hash,
-  created_at,
-  updated_at
-)
-select
-  relationship_id,
-  advisor_user_id,
-  advisor_name,
-  status,
-  founder_a_approved,
-  founder_b_approved,
-  approved_at,
-  linked_at,
-  revoked_at,
-  requested_by_user_id,
-  source_invitation_id,
-  invite_token_hash,
-  created_at,
-  updated_at
-from legacy_rows
-where relationship_id is not null
-  and not exists (
+do $$
+declare
+  v_has_invitation_relationship boolean;
+begin
+  select exists (
     select 1
-    from public.relationship_advisors existing
-    where existing.source_invitation_id = legacy_rows.source_invitation_id
-      and coalesce(existing.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
-        = coalesce(legacy_rows.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
-  );
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'invitations'
+      and column_name = 'relationship_id'
+  )
+  into v_has_invitation_relationship;
 
-create or replace view public.relationship_advisor_backfill_unresolved as
-select
-  fwa.invitation_id as source_invitation_id,
-  i.relationship_id as invitation_relationship_id,
-  i.inviter_user_id,
-  i.invitee_user_id,
-  fwa.advisor_user_id,
-  fwa.advisor_name,
-  fwa.founder_a_approved,
-  fwa.founder_b_approved,
-  fwa.approved_at,
-  fwa.claimed_at,
-  fwa.created_at,
-  fwa.updated_at,
-  case
-    when i.id is null then 'invitation_not_found'
-    when i.relationship_id is null and i.invitee_user_id is null then 'invitee_not_linked'
-    when i.relationship_id is null then 'relationship_not_resolved'
-    else 'unknown'
-  end as unresolved_reason
-from public.founder_alignment_workbook_advisors fwa
-left join public.invitations i on i.id = fwa.invitation_id
-left join public.relationship_advisors ra
-  on ra.source_invitation_id = fwa.invitation_id
- and coalesce(ra.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
-    = coalesce(fwa.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
-where ra.id is null;
+  if v_has_invitation_relationship then
+    execute $sql$
+      with legacy_rows as (
+        select
+          fwa.invitation_id,
+          coalesce(i.relationship_id, rel.id) as relationship_id,
+          fwa.advisor_user_id,
+          fwa.advisor_name,
+          case
+            when fwa.advisor_user_id is not null then 'linked'::public.relationship_advisor_status
+            when fwa.founder_a_approved and fwa.founder_b_approved then 'approved'::public.relationship_advisor_status
+            else 'pending'::public.relationship_advisor_status
+          end as status,
+          fwa.founder_a_approved,
+          fwa.founder_b_approved,
+          fwa.approved_at,
+          case when fwa.advisor_user_id is not null then coalesce(fwa.claimed_at, fwa.updated_at, fwa.created_at) else null end as linked_at,
+          null::timestamptz as revoked_at,
+          fwa.requested_by as requested_by_user_id,
+          fwa.invitation_id as source_invitation_id,
+          fwa.token_hash as invite_token_hash,
+          fwa.created_at,
+          fwa.updated_at
+        from public.founder_alignment_workbook_advisors fwa
+        left join public.invitations i on i.id = fwa.invitation_id
+        left join public.relationships rel
+          on i.relationship_id is null
+         and i.inviter_user_id is not null
+         and i.invitee_user_id is not null
+         and (
+           (rel.user_a_id = i.inviter_user_id and rel.user_b_id = i.invitee_user_id)
+           or (rel.user_a_id = i.invitee_user_id and rel.user_b_id = i.inviter_user_id)
+         )
+      )
+      insert into public.relationship_advisors (
+        relationship_id,
+        advisor_user_id,
+        advisor_name,
+        status,
+        founder_a_approved,
+        founder_b_approved,
+        approved_at,
+        linked_at,
+        revoked_at,
+        requested_by_user_id,
+        source_invitation_id,
+        invite_token_hash,
+        created_at,
+        updated_at
+      )
+      select
+        relationship_id,
+        advisor_user_id,
+        advisor_name,
+        status,
+        founder_a_approved,
+        founder_b_approved,
+        approved_at,
+        linked_at,
+        revoked_at,
+        requested_by_user_id,
+        source_invitation_id,
+        invite_token_hash,
+        created_at,
+        updated_at
+      from legacy_rows
+      where relationship_id is not null
+        and not exists (
+          select 1
+          from public.relationship_advisors existing
+          where existing.source_invitation_id = legacy_rows.source_invitation_id
+            and coalesce(existing.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+              = coalesce(legacy_rows.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+        );
+    $sql$;
+
+    execute $sql$
+      create or replace view public.relationship_advisor_backfill_unresolved as
+      select
+        fwa.invitation_id as source_invitation_id,
+        i.relationship_id as invitation_relationship_id,
+        i.inviter_user_id,
+        i.invitee_user_id,
+        fwa.advisor_user_id,
+        fwa.advisor_name,
+        fwa.founder_a_approved,
+        fwa.founder_b_approved,
+        fwa.approved_at,
+        fwa.claimed_at,
+        fwa.created_at,
+        fwa.updated_at,
+        case
+          when i.id is null then 'invitation_not_found'
+          when i.relationship_id is null and i.invitee_user_id is null then 'invitee_not_linked'
+          when i.relationship_id is null then 'relationship_not_resolved'
+          else 'unknown'
+        end as unresolved_reason
+      from public.founder_alignment_workbook_advisors fwa
+      left join public.invitations i on i.id = fwa.invitation_id
+      left join public.relationship_advisors ra
+        on ra.source_invitation_id = fwa.invitation_id
+       and coalesce(ra.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+          = coalesce(fwa.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+      where ra.id is null;
+    $sql$;
+  else
+    execute $sql$
+      with legacy_rows as (
+        select
+          fwa.invitation_id,
+          rel.id as relationship_id,
+          fwa.advisor_user_id,
+          fwa.advisor_name,
+          case
+            when fwa.advisor_user_id is not null then 'linked'::public.relationship_advisor_status
+            when fwa.founder_a_approved and fwa.founder_b_approved then 'approved'::public.relationship_advisor_status
+            else 'pending'::public.relationship_advisor_status
+          end as status,
+          fwa.founder_a_approved,
+          fwa.founder_b_approved,
+          fwa.approved_at,
+          case when fwa.advisor_user_id is not null then coalesce(fwa.claimed_at, fwa.updated_at, fwa.created_at) else null end as linked_at,
+          null::timestamptz as revoked_at,
+          fwa.requested_by as requested_by_user_id,
+          fwa.invitation_id as source_invitation_id,
+          fwa.token_hash as invite_token_hash,
+          fwa.created_at,
+          fwa.updated_at
+        from public.founder_alignment_workbook_advisors fwa
+        left join public.invitations i on i.id = fwa.invitation_id
+        left join public.relationships rel
+          on i.inviter_user_id is not null
+         and i.invitee_user_id is not null
+         and (
+           (rel.user_a_id = i.inviter_user_id and rel.user_b_id = i.invitee_user_id)
+           or (rel.user_a_id = i.invitee_user_id and rel.user_b_id = i.inviter_user_id)
+         )
+      )
+      insert into public.relationship_advisors (
+        relationship_id,
+        advisor_user_id,
+        advisor_name,
+        status,
+        founder_a_approved,
+        founder_b_approved,
+        approved_at,
+        linked_at,
+        revoked_at,
+        requested_by_user_id,
+        source_invitation_id,
+        invite_token_hash,
+        created_at,
+        updated_at
+      )
+      select
+        relationship_id,
+        advisor_user_id,
+        advisor_name,
+        status,
+        founder_a_approved,
+        founder_b_approved,
+        approved_at,
+        linked_at,
+        revoked_at,
+        requested_by_user_id,
+        source_invitation_id,
+        invite_token_hash,
+        created_at,
+        updated_at
+      from legacy_rows
+      where relationship_id is not null
+        and not exists (
+          select 1
+          from public.relationship_advisors existing
+          where existing.source_invitation_id = legacy_rows.source_invitation_id
+            and coalesce(existing.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+              = coalesce(legacy_rows.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+        );
+    $sql$;
+
+    execute $sql$
+      create or replace view public.relationship_advisor_backfill_unresolved as
+      select
+        fwa.invitation_id as source_invitation_id,
+        null::uuid as invitation_relationship_id,
+        i.inviter_user_id,
+        i.invitee_user_id,
+        fwa.advisor_user_id,
+        fwa.advisor_name,
+        fwa.founder_a_approved,
+        fwa.founder_b_approved,
+        fwa.approved_at,
+        fwa.claimed_at,
+        fwa.created_at,
+        fwa.updated_at,
+        case
+          when i.id is null then 'invitation_not_found'
+          when i.invitee_user_id is null then 'invitee_not_linked'
+          else 'relationship_not_resolved'
+        end as unresolved_reason
+      from public.founder_alignment_workbook_advisors fwa
+      left join public.invitations i on i.id = fwa.invitation_id
+      left join public.relationship_advisors ra
+        on ra.source_invitation_id = fwa.invitation_id
+       and coalesce(ra.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+          = coalesce(fwa.advisor_user_id, '00000000-0000-0000-0000-000000000000'::uuid)
+      where ra.id is null;
+    $sql$;
+  end if;
+end $$;

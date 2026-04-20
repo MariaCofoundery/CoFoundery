@@ -57,6 +57,8 @@ export default async function FounderAlignmentWorkbookPage({
         <ProductNavigationOverride
           matchingHref={`/report/${encodeURIComponent(invitationId)}`}
           workbookHref={buildWorkbookHref(invitationId, requestedTeamContext)}
+          activeView="founder"
+          contextLabel="Founder-Kontext"
         />
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
@@ -90,6 +92,8 @@ export default async function FounderAlignmentWorkbookPage({
         matchingHref={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
         workbookHref={buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext)}
         feedbackInvitationId={data.invitationId ?? invitationId}
+        activeView={data.currentUserRole === "advisor" ? "advisor" : "founder"}
+        contextLabel={data.currentUserRole === "advisor" ? "Advisor-Kontext" : "Founder-Kontext"}
       />
       <ResearchPageTracker
         eventName="workbook_page_viewed"
@@ -125,6 +129,8 @@ export default async function FounderAlignmentWorkbookPage({
           highlights={data.highlights}
           stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
+          advisorEntries={data.advisorEntries}
+          advisorImpulses={data.advisorImpulses}
           canSave={data.canSave}
           persisted={data.persisted}
           updatedAt={data.updatedAt}
@@ -148,6 +154,8 @@ export default async function FounderAlignmentWorkbookPage({
           highlights={data.highlights}
           stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
+          advisorEntries={data.advisorEntries}
+          advisorImpulses={data.advisorImpulses}
           canSave={data.canSave}
           persisted={data.persisted}
           updatedAt={data.updatedAt}

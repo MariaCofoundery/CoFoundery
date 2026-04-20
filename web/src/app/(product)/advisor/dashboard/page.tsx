@@ -105,25 +105,23 @@ function TeamCard({ team }: { team: AdvisorDashboardTeam }) {
         ) : (
           <span className={DISABLED_CTA_CLASS}>{team.accessStatusLabel}</span>
         )}
-        {team.canOpenWorkbook ? (
+        {team.canOpenWorkbook && team.reportReady ? (
           <Link href={team.advisorActionHref} className={SECONDARY_CTA_CLASS}>
             Advisor-Impulse ergänzen
           </Link>
         ) : null}
-        {team.reportReady && team.canOpenWorkbook ? (
-          <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
-            Report ansehen
-          </Link>
-        ) : team.reportReady ? (
-          <span className={DISABLED_CTA_CLASS}>Report freigegeben nach Zugriff</span>
-        ) : (
-          <span className={DISABLED_CTA_CLASS}>Report noch nicht bereit</span>
-        )}
         {team.canOpenWorkbook ? (
           <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
             Snapshot exportieren
           </Link>
         ) : null}
+        {team.reportReady ? (
+          <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
+            Report ansehen
+          </Link>
+        ) : (
+          <span className={DISABLED_CTA_CLASS}>Report noch nicht bereit</span>
+        )}
       </div>
     </article>
   );

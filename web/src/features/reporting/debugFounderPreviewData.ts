@@ -11,6 +11,7 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
+import { type FounderAlignmentWorkbookAdvisorEntry } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { VALUES_ARCHETYPES_DE } from "@/features/reporting/report_texts.de";
 import {
   type SelfValuesProfile,
@@ -50,6 +51,7 @@ export type WorkbookPreviewState = {
   initialWorkbook: FounderAlignmentWorkbookPayload;
   highlights: FounderAlignmentWorkbookHighlights;
   advisorInvite: FounderAlignmentWorkbookAdvisorInviteState;
+  advisorEntries: FounderAlignmentWorkbookAdvisorEntry[];
   reportHeadline: string;
   showValuesStep: boolean;
 };
@@ -306,6 +308,7 @@ export function getWorkbookPreviewState(
     initialWorkbook: workbook,
     highlights: foundation.highlights,
     advisorInvite: advisorInviteState,
+    advisorEntries: [],
     reportHeadline: foundation.report.executiveSummary.headline,
     showValuesStep: true,
   };

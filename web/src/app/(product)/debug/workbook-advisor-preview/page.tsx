@@ -54,6 +54,8 @@ export default async function WorkbookAdvisorPreviewPage({
         initialWorkbook={preview.initialWorkbook}
         highlights={preview.highlights}
         advisorInvite={preview.advisorInvite}
+        advisorEntries={preview.advisorEntries}
+        advisorImpulses={[]}
         showValuesStep={preview.showValuesStep}
         canSave={false}
         persisted={false}

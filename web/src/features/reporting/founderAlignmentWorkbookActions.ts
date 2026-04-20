@@ -3,6 +3,8 @@
 import { randomBytes } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { sendAdvisorInviteEmail } from "@/lib/email/sendAdvisorInviteEmail";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   sanitizeWorkbookStructuredOutputsByStep,
@@ -14,13 +16,16 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbook";
 import {
   buildFounderAlignmentAdvisorInvitePath,
+  type FounderAlignmentWorkbookAdvisorEntry,
   hashFounderAlignmentAdvisorToken,
   type FounderAlignmentWorkbookAdvisorInviteState,
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import {
   hasAdvisorAccessToRelationship,
+  listRelationshipAdvisorsForRelationship,
   resolveRelationshipIdForInvitation,
   syncRelationshipAdvisorFromLegacyInvitation,
+  type RelationshipAdvisorRow,
 } from "@/features/reporting/relationshipAdvisorAccess";
 import { trackServerResearchEvent } from "@/features/research/server";
 
@@ -45,6 +50,16 @@ type AdvisorAccessRow = {
   founder_a_approved: boolean;
   founder_b_approved: boolean;
   requested_by: string;
+  approved_at: string | null;
+  claimed_at: string | null;
+};
+
+type AdvisorAccessClaimRow = {
+  invitation_id: string;
+  advisor_user_id: string | null;
+  advisor_name: string | null;
+  founder_a_approved: boolean;
+  founder_b_approved: boolean;
   approved_at: string | null;
   claimed_at: string | null;
 };
@@ -118,6 +133,77 @@ export type PrepareFounderAlignmentAdvisorInviteResult =
         | "invite_failed";
     };
 
+export type ProposeFounderAlignmentAdvisorResult =
+  | {
+      ok: true;
+      entry: FounderAlignmentWorkbookAdvisorEntry;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "not_authenticated"
+        | "forbidden"
+        | "missing_relationship"
+        | "invalid_email"
+        | "save_failed";
+    };
+
+export type ApproveFounderAlignmentAdvisorProposalResult =
+  | {
+      ok: true;
+      entry: FounderAlignmentWorkbookAdvisorEntry;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "not_authenticated"
+        | "forbidden"
+        | "missing_relationship"
+        | "not_found"
+        | "save_failed";
+    };
+
+export type SendFounderAlignmentAdvisorInviteResult =
+  | {
+      ok: true;
+      entry: FounderAlignmentWorkbookAdvisorEntry;
+      inviteUrl: string;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "not_authenticated"
+        | "forbidden"
+        | "missing_relationship"
+        | "not_found"
+        | "missing_email"
+        | "not_ready"
+        | "email_failed"
+        | "save_failed";
+      error?: string;
+    };
+
+export type CopyFounderAlignmentAdvisorInviteLinkResult =
+  | {
+      ok: true;
+      entry: FounderAlignmentWorkbookAdvisorEntry;
+      inviteUrl: string;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "not_authenticated"
+        | "forbidden"
+        | "missing_relationship"
+        | "not_found"
+        | "not_ready"
+        | "save_failed";
+    };
+
 export type FounderAlignmentAdvisorInviteLookupResult =
   | {
       status: "ready";
@@ -141,7 +227,7 @@ export type FounderAlignmentAdvisorInviteLookupResult =
 export type ClaimFounderAlignmentAdvisorAccessResult =
   | {
       ok: true;
-      row: AdvisorAccessRow;
+      row: AdvisorAccessClaimRow;
     }
   | {
       ok: false;
@@ -165,6 +251,61 @@ function createPrivilegedClient(): SupabaseDbClient | null {
       autoRefreshToken: false,
     },
   });
+}
+
+function normalizeAdvisorEmail(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase();
+}
+
+function normalizeAdvisorName(value: string | null | undefined) {
+  const normalized = (value ?? "").trim().slice(0, 120);
+  return normalized.length > 0 ? normalized : null;
+}
+
+function advisorSuggestedByRole(
+  requestedByUserId: string | null | undefined,
+  founderAUserId: string | null | undefined,
+  founderBUserId: string | null | undefined
+): "founderA" | "founderB" | "unknown" {
+  if (requestedByUserId && founderAUserId && requestedByUserId === founderAUserId) return "founderA";
+  if (requestedByUserId && founderBUserId && requestedByUserId === founderBUserId) return "founderB";
+  return "unknown";
+}
+
+function mapRelationshipAdvisorToWorkbookEntry(params: {
+  row: RelationshipAdvisorRow;
+  invitationId: string | null;
+  founderAUserId: string | null;
+  founderBUserId: string | null;
+  founderALabel: string;
+  founderBLabel: string;
+}): FounderAlignmentWorkbookAdvisorEntry {
+  const suggestedByRole = advisorSuggestedByRole(
+    params.row.requested_by_user_id,
+    params.founderAUserId,
+    params.founderBUserId
+  );
+  const suggestedByLabel =
+    suggestedByRole === "founderA"
+      ? params.founderALabel
+      : suggestedByRole === "founderB"
+        ? params.founderBLabel
+        : "Unbekannt";
+
+  return {
+    id: params.row.id,
+    relationshipId: params.row.relationship_id,
+    invitationId: params.invitationId ?? params.row.source_invitation_id ?? null,
+    advisorName: params.row.advisor_name ?? null,
+    advisorEmail: params.row.advisor_email ?? null,
+    status: params.row.status,
+    founderAApproved: params.row.founder_a_approved,
+    founderBApproved: params.row.founder_b_approved,
+    suggestedByRole,
+    suggestedByLabel,
+    invitedAt: params.row.invited_at ?? null,
+    linkedAt: params.row.linked_at ?? null,
+  };
 }
 
 async function loadInvitationAccessRow(
@@ -212,6 +353,24 @@ async function loadAdvisorAccessRowByToken(
 
   if (error || !data) return null;
   return data as AdvisorAccessRow;
+}
+
+async function loadRelationshipAdvisorAccessRowByToken(
+  token: string,
+  supabase: SupabaseLikeClient
+): Promise<RelationshipAdvisorRow | null> {
+  const tokenHash = hashFounderAlignmentAdvisorToken(token);
+  const { data, error } = await supabase
+    .from("relationship_advisors")
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .eq("invite_token_hash", tokenHash)
+    .is("revoked_at", null)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as RelationshipAdvisorRow;
 }
 
 async function loadWorkbookRow(
@@ -1042,6 +1201,551 @@ export async function prepareFounderAlignmentAdvisorInvite({
   };
 }
 
+export async function proposeFounderAlignmentAdvisor({
+  invitationId,
+  advisorName,
+  advisorEmail,
+}: {
+  invitationId: string;
+  advisorName: string | null;
+  advisorEmail: string;
+}): Promise<ProposeFounderAlignmentAdvisorResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const normalizedEmail = normalizeAdvisorEmail(advisorEmail);
+  if (!normalizedEmail || !normalizedEmail.includes("@")) {
+    return { ok: false, reason: "invalid_email" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const invitation = await loadInvitationAccessRow(normalizedInvitationId, supabase);
+  if (!invitation) {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const founderRole =
+    invitation.inviter_user_id === user.id
+      ? "founderA"
+      : invitation.invitee_user_id === user.id
+        ? "founderB"
+        : "unknown";
+
+  if (founderRole === "unknown") {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
+  if (!relationshipId) {
+    return { ok: false, reason: "missing_relationship" };
+  }
+
+  const existingRows = await listRelationshipAdvisorsForRelationship(relationshipId, supabase);
+  const existingRow =
+    existingRows.find(
+      (row) =>
+        normalizeAdvisorEmail(row.advisor_email) === normalizedEmail && row.revoked_at == null
+    ) ?? null;
+
+  const nextFounderAApproved =
+    founderRole === "founderA" ? true : (existingRow?.founder_a_approved ?? false);
+  const nextFounderBApproved =
+    founderRole === "founderB" ? true : (existingRow?.founder_b_approved ?? false);
+
+  const { data: persisted, error } = existingRow
+    ? await supabase
+        .from("relationship_advisors")
+        .update({
+          advisor_name: normalizeAdvisorName(advisorName) ?? existingRow.advisor_name ?? null,
+          advisor_email: normalizedEmail,
+          founder_a_approved: nextFounderAApproved,
+          founder_b_approved: nextFounderBApproved,
+          status: nextFounderAApproved && nextFounderBApproved ? "approved" : "pending",
+          approved_at:
+            nextFounderAApproved && nextFounderBApproved
+              ? existingRow.approved_at ?? new Date().toISOString()
+              : existingRow.approved_at,
+          requested_by_user_id: existingRow.requested_by_user_id ?? user.id,
+          source_invitation_id: existingRow.source_invitation_id ?? normalizedInvitationId,
+        })
+        .eq("id", existingRow.id)
+        .select(
+          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+        )
+        .single()
+    : await supabase
+        .from("relationship_advisors")
+        .insert({
+          relationship_id: relationshipId,
+          advisor_name: normalizeAdvisorName(advisorName),
+          advisor_email: normalizedEmail,
+          status: founderRole === "founderA" || founderRole === "founderB" ? "pending" : "pending",
+          founder_a_approved: founderRole === "founderA",
+          founder_b_approved: founderRole === "founderB",
+          requested_by_user_id: user.id,
+          source_invitation_id: normalizedInvitationId,
+        })
+        .select(
+          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+        )
+        .single();
+
+  if (error || !persisted) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  const row = persisted as RelationshipAdvisorRow;
+  const founderALabel = "Founder A";
+  const founderBLabel = "Founder B";
+
+  return {
+    ok: true,
+    entry: mapRelationshipAdvisorToWorkbookEntry({
+      row,
+      invitationId: normalizedInvitationId,
+      founderAUserId: invitation.inviter_user_id,
+      founderBUserId: invitation.invitee_user_id,
+      founderALabel,
+      founderBLabel,
+    }),
+  };
+}
+
+export async function approveFounderAlignmentAdvisorProposal({
+  invitationId,
+  advisorEntryId,
+}: {
+  invitationId: string;
+  advisorEntryId: string;
+}): Promise<ApproveFounderAlignmentAdvisorProposalResult> {
+  const normalizedInvitationId = invitationId.trim();
+  const normalizedEntryId = advisorEntryId.trim();
+  if (!normalizedInvitationId || !normalizedEntryId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const invitation = await loadInvitationAccessRow(normalizedInvitationId, supabase);
+  if (!invitation) {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const founderRole =
+    invitation.inviter_user_id === user.id
+      ? "founderA"
+      : invitation.invitee_user_id === user.id
+        ? "founderB"
+        : "unknown";
+
+  if (founderRole === "unknown") {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
+  if (!relationshipId) {
+    return { ok: false, reason: "missing_relationship" };
+  }
+
+  const { data: existing, error: loadError } = await supabase
+    .from("relationship_advisors")
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .eq("id", normalizedEntryId)
+    .eq("relationship_id", relationshipId)
+    .maybeSingle();
+
+  if (loadError) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  if (!existing) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  const row = existing as RelationshipAdvisorRow;
+  const nextFounderAApproved = founderRole === "founderA" ? true : row.founder_a_approved;
+  const nextFounderBApproved = founderRole === "founderB" ? true : row.founder_b_approved;
+  const nextStatus =
+    row.status === "linked" || row.status === "invited"
+      ? row.status
+      : nextFounderAApproved && nextFounderBApproved
+        ? "approved"
+        : "pending";
+
+  const { data: updated, error: updateError } = await supabase
+    .from("relationship_advisors")
+    .update({
+      founder_a_approved: nextFounderAApproved,
+      founder_b_approved: nextFounderBApproved,
+      status: nextStatus,
+      approved_at:
+        nextFounderAApproved && nextFounderBApproved
+          ? row.approved_at ?? new Date().toISOString()
+          : row.approved_at,
+    })
+    .eq("id", row.id)
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .single();
+
+  if (updateError || !updated) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  return {
+    ok: true,
+    entry: mapRelationshipAdvisorToWorkbookEntry({
+      row: updated as RelationshipAdvisorRow,
+      invitationId: normalizedInvitationId,
+      founderAUserId: invitation.inviter_user_id,
+      founderBUserId: invitation.invitee_user_id,
+      founderALabel: "Founder A",
+      founderBLabel: "Founder B",
+    }),
+  };
+}
+
+async function loadRelationshipAdvisorEntryForFounder(params: {
+  invitationId: string;
+  advisorEntryId: string;
+  supabase: SupabaseServerClient;
+  userId: string;
+}): Promise<
+  | {
+      ok: true;
+      invitation: InvitationAccessRow;
+      founderRole: WorkbookFounderRole;
+      relationshipId: string;
+      row: RelationshipAdvisorRow;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "forbidden"
+        | "missing_relationship"
+        | "not_found"
+        | "save_failed";
+    }
+> {
+  const normalizedInvitationId = params.invitationId.trim();
+  const normalizedEntryId = params.advisorEntryId.trim();
+  if (!normalizedInvitationId || !normalizedEntryId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const invitation = await loadInvitationAccessRow(normalizedInvitationId, params.supabase);
+  if (!invitation) {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const founderRole =
+    invitation.inviter_user_id === params.userId
+      ? "founderA"
+      : invitation.invitee_user_id === params.userId
+        ? "founderB"
+        : "unknown";
+
+  if (founderRole === "unknown") {
+    return { ok: false, reason: "forbidden" };
+  }
+
+  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, params.supabase);
+  if (!relationshipId) {
+    return { ok: false, reason: "missing_relationship" };
+  }
+
+  const { data: row, error } = await params.supabase
+    .from("relationship_advisors")
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .eq("id", normalizedEntryId)
+    .eq("relationship_id", relationshipId)
+    .maybeSingle();
+
+  if (error) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  if (!row) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  return {
+    ok: true,
+    invitation,
+    founderRole,
+    relationshipId,
+    row: row as RelationshipAdvisorRow,
+  };
+}
+
+async function loadFounderLabelsForInvitation(
+  invitation: InvitationAccessRow,
+  supabase: SupabaseLikeClient
+): Promise<{ founderALabel: string; founderBLabel: string }> {
+  const profileIds = [invitation.inviter_user_id, invitation.invitee_user_id].filter(
+    (value): value is string => Boolean(value)
+  );
+
+  if (profileIds.length === 0) {
+    return { founderALabel: "Founder A", founderBLabel: "Founder B" };
+  }
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("user_id, display_name")
+    .in("user_id", profileIds);
+
+  const profileByUserId = new Map(
+    ((data ?? []) as AdvisorInviteProfileRow[]).map((row) => [
+      row.user_id,
+      row.display_name?.trim() ?? "",
+    ])
+  );
+
+  return {
+    founderALabel: profileByUserId.get(invitation.inviter_user_id)?.trim() || "Founder A",
+    founderBLabel: profileByUserId.get(invitation.invitee_user_id ?? "")?.trim() || "Founder B",
+  };
+}
+
+function mapRelationshipAdvisorEntryWithInvitation(params: {
+  row: RelationshipAdvisorRow;
+  invitationId: string;
+  invitation: InvitationAccessRow;
+  founderALabel: string;
+  founderBLabel: string;
+}) {
+  return mapRelationshipAdvisorToWorkbookEntry({
+    row: params.row,
+    invitationId: params.invitationId,
+    founderAUserId: params.invitation.inviter_user_id,
+    founderBUserId: params.invitation.invitee_user_id,
+    founderALabel: params.founderALabel,
+    founderBLabel: params.founderBLabel,
+  });
+}
+
+export async function sendFounderAlignmentAdvisorInvite({
+  invitationId,
+  advisorEntryId,
+  teamContext,
+}: {
+  invitationId: string;
+  advisorEntryId: string;
+  teamContext: TeamContext;
+}): Promise<SendFounderAlignmentAdvisorInviteResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const loaded = await loadRelationshipAdvisorEntryForFounder({
+    invitationId: normalizedInvitationId,
+    advisorEntryId,
+    supabase,
+    userId: user.id,
+  });
+  if (!loaded.ok) {
+    return loaded;
+  }
+
+  if (!loaded.row.advisor_email) {
+    return { ok: false, reason: "missing_email" };
+  }
+
+  if (
+    loaded.row.revoked_at ||
+    !loaded.row.founder_a_approved ||
+    !loaded.row.founder_b_approved ||
+    !["approved", "invited"].includes(loaded.row.status)
+  ) {
+    return { ok: false, reason: "not_ready" };
+  }
+
+  const [labels, invitationContext] = await Promise.all([
+    loadFounderLabelsForInvitation(loaded.invitation, supabase),
+    supabase
+      .from("invitations")
+      .select("team_context")
+      .eq("id", normalizedInvitationId)
+      .maybeSingle(),
+  ]);
+
+  const token = randomBytes(24).toString("hex");
+  const tokenHash = hashFounderAlignmentAdvisorToken(token);
+  const invitePath = buildFounderAlignmentAdvisorInvitePath({ token });
+  const inviteUrl = toPublicAppUrl(invitePath);
+  const effectiveTeamContext =
+    invitationContext.data?.team_context === "existing_team" ? "existing_team" : teamContext;
+
+  const emailResult = await sendAdvisorInviteEmail({
+    advisorEmail: loaded.row.advisor_email,
+    advisorName: loaded.row.advisor_name,
+    inviteUrl,
+    founderAName: labels.founderALabel,
+    founderBName: labels.founderBLabel,
+    teamContext: effectiveTeamContext,
+  });
+
+  if (!emailResult.ok) {
+    return {
+      ok: false,
+      reason: "email_failed",
+      error: emailResult.error,
+    };
+  }
+
+  const sentAt = new Date().toISOString();
+  const { data: updated, error: updateError } = await supabase
+    .from("relationship_advisors")
+    .update({
+      status: "invited",
+      invited_at: sentAt,
+      invite_token_hash: tokenHash,
+      source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
+    })
+    .eq("id", loaded.row.id)
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .single();
+
+  if (updateError || !updated) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  await trackServerResearchEvent({
+    eventName: "advisor_invite_sent",
+    userId: user.id,
+    invitationId: normalizedInvitationId,
+    teamContext: effectiveTeamContext,
+    properties: {
+      advisorEntryId: loaded.row.id,
+      advisorEmail: loaded.row.advisor_email,
+      resent: loaded.row.status === "invited",
+    },
+  });
+
+  return {
+    ok: true,
+    inviteUrl,
+    entry: mapRelationshipAdvisorEntryWithInvitation({
+      row: updated as RelationshipAdvisorRow,
+      invitationId: normalizedInvitationId,
+      invitation: loaded.invitation,
+      founderALabel: labels.founderALabel,
+      founderBLabel: labels.founderBLabel,
+    }),
+  };
+}
+
+export async function copyFounderAlignmentAdvisorInviteLink({
+  invitationId,
+  advisorEntryId,
+}: {
+  invitationId: string;
+  advisorEntryId: string;
+}): Promise<CopyFounderAlignmentAdvisorInviteLinkResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const loaded = await loadRelationshipAdvisorEntryForFounder({
+    invitationId: normalizedInvitationId,
+    advisorEntryId,
+    supabase,
+    userId: user.id,
+  });
+  if (!loaded.ok) {
+    return loaded;
+  }
+
+  if (
+    loaded.row.revoked_at ||
+    !loaded.row.founder_a_approved ||
+    !loaded.row.founder_b_approved ||
+    !["approved", "invited"].includes(loaded.row.status)
+  ) {
+    return { ok: false, reason: "not_ready" };
+  }
+
+  const labels = await loadFounderLabelsForInvitation(loaded.invitation, supabase);
+  const token = randomBytes(24).toString("hex");
+  const tokenHash = hashFounderAlignmentAdvisorToken(token);
+  const invitePath = buildFounderAlignmentAdvisorInvitePath({ token });
+  const inviteUrl = toPublicAppUrl(invitePath);
+
+  const { data: updated, error: updateError } = await supabase
+    .from("relationship_advisors")
+    .update({
+      invite_token_hash: tokenHash,
+      source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
+    })
+    .eq("id", loaded.row.id)
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .single();
+
+  if (updateError || !updated) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  return {
+    ok: true,
+    inviteUrl,
+    entry: mapRelationshipAdvisorEntryWithInvitation({
+      row: updated as RelationshipAdvisorRow,
+      invitationId: normalizedInvitationId,
+      invitation: loaded.invitation,
+      founderALabel: labels.founderALabel,
+      founderBLabel: labels.founderBLabel,
+    }),
+  };
+}
+
 export async function claimFounderAlignmentAdvisorAccess({
   invitationId,
   advisorToken,
@@ -1061,6 +1765,95 @@ export async function claimFounderAlignmentAdvisorAccess({
   }
 
   const tokenHash = hashFounderAlignmentAdvisorToken(advisorToken);
+  const { data: relationshipAdvisorRow, error: relationshipError } = await privileged
+    .from("relationship_advisors")
+    .select(
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+    )
+    .eq("source_invitation_id", invitationId)
+    .eq("invite_token_hash", tokenHash)
+    .is("revoked_at", null)
+    .maybeSingle();
+
+  if (relationshipError) {
+    return { ok: false, reason: "invalid_token" };
+  }
+
+  if (relationshipAdvisorRow) {
+    const typedRelationshipRow = relationshipAdvisorRow as RelationshipAdvisorRow;
+    const nextAdvisorName = typedRelationshipRow.advisor_name ?? fallbackName;
+
+    if (
+      typedRelationshipRow.founder_a_approved !== true ||
+      typedRelationshipRow.founder_b_approved !== true
+    ) {
+      return { ok: false, reason: "invalid_token" };
+    }
+
+    if (typedRelationshipRow.advisor_user_id && typedRelationshipRow.advisor_user_id !== userId) {
+      return { ok: false, reason: "already_claimed" };
+    }
+
+    const claimedAt = typedRelationshipRow.linked_at ?? new Date().toISOString();
+    const { data: updatedRelationshipRow, error: updateRelationshipError } = await privileged
+      .from("relationship_advisors")
+      .update({
+        advisor_user_id: userId,
+        advisor_name: nextAdvisorName,
+        status: "linked",
+        linked_at: claimedAt,
+      })
+      .eq("id", typedRelationshipRow.id)
+      .select(
+        "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      )
+      .maybeSingle();
+
+    if (updateRelationshipError || !updatedRelationshipRow) {
+      return { ok: false, reason: "update_failed" };
+    }
+
+    const { payload: currentPayload } = await loadWorkbookRow(invitationId, privileged);
+    const nextPayload = {
+      ...currentPayload,
+      advisorId: userId,
+      advisorName: nextAdvisorName,
+    } satisfies FounderAlignmentWorkbookPayload;
+
+    await privileged
+      .from("founder_alignment_workbooks")
+      .update({
+        payload: nextPayload,
+        updated_by: userId,
+      })
+      .eq("invitation_id", invitationId);
+
+    await trackServerResearchEvent({
+      eventName: "advisor_invite_claimed",
+      userId,
+      invitationId,
+      teamContext,
+      properties: {
+        hasFallbackName: Boolean(fallbackName),
+        advisorFlow: "relationship_advisors",
+      },
+    });
+
+    return {
+      ok: true,
+      row: {
+        invitation_id: invitationId,
+        advisor_user_id: userId,
+        advisor_name: nextAdvisorName,
+        founder_a_approved: typedRelationshipRow.founder_a_approved,
+        founder_b_approved: typedRelationshipRow.founder_b_approved,
+        approved_at: typedRelationshipRow.approved_at,
+        claimed_at:
+          (updatedRelationshipRow as RelationshipAdvisorRow).linked_at ?? claimedAt,
+      },
+    };
+  }
+
   const { data: advisorRow, error } = await privileged
     .from("founder_alignment_workbook_advisors")
     .select(
@@ -1136,12 +1929,21 @@ export async function claimFounderAlignmentAdvisorAccess({
     teamContext,
     properties: {
       hasFallbackName: Boolean(fallbackName),
+      advisorFlow: "legacy_single_advisor",
     },
   });
 
   return {
     ok: true,
-    row: updatedAdvisorRow as AdvisorAccessRow,
+    row: {
+      invitation_id: updatedAdvisorRow.invitation_id,
+      advisor_user_id: updatedAdvisorRow.advisor_user_id,
+      advisor_name: updatedAdvisorRow.advisor_name,
+      founder_a_approved: updatedAdvisorRow.founder_a_approved,
+      founder_b_approved: updatedAdvisorRow.founder_b_approved,
+      approved_at: updatedAdvisorRow.approved_at,
+      claimed_at: updatedAdvisorRow.claimed_at,
+    },
   };
 }
 
@@ -1162,8 +1964,17 @@ export async function getFounderAlignmentAdvisorInviteByToken(
     return { status: "not_found" };
   }
 
-  const advisorRow = await loadAdvisorAccessRowByToken(normalizedToken, privileged);
-  if (!advisorRow) {
+  const relationshipAdvisorRow = await loadRelationshipAdvisorAccessRowByToken(
+    normalizedToken,
+    privileged
+  );
+  const advisorRow = relationshipAdvisorRow
+    ? null
+    : await loadAdvisorAccessRowByToken(normalizedToken, privileged);
+  const invitationId =
+    relationshipAdvisorRow?.source_invitation_id ?? advisorRow?.invitation_id ?? null;
+
+  if (!invitationId) {
     return { status: "not_found" };
   }
 
@@ -1171,19 +1982,19 @@ export async function getFounderAlignmentAdvisorInviteByToken(
     privileged
       .from("invitations")
       .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status")
-      .eq("id", advisorRow.invitation_id)
+      .eq("id", invitationId)
       .maybeSingle(),
     privileged
       .from("report_runs")
       .select("invitation_id, created_at, payload")
-      .eq("invitation_id", advisorRow.invitation_id)
+      .eq("invitation_id", invitationId)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
     privileged
       .from("founder_alignment_workbooks")
       .select("invitation_id")
-      .eq("invitation_id", advisorRow.invitation_id)
+      .eq("invitation_id", invitationId)
       .maybeSingle(),
   ]);
 
@@ -1207,6 +2018,14 @@ export async function getFounderAlignmentAdvisorInviteByToken(
     ])
   );
   const latestReportRun = reportRunResult.data as AdvisorInviteReportRunRow | null;
+  const founderAApproved =
+    relationshipAdvisorRow?.founder_a_approved ?? advisorRow?.founder_a_approved ?? false;
+  const founderBApproved =
+    relationshipAdvisorRow?.founder_b_approved ?? advisorRow?.founder_b_approved ?? false;
+  const advisorUserId =
+    relationshipAdvisorRow?.advisor_user_id ?? advisorRow?.advisor_user_id ?? null;
+  const advisorName =
+    relationshipAdvisorRow?.advisor_name ?? advisorRow?.advisor_name ?? null;
 
   return {
     status: "ready",
@@ -1217,11 +2036,11 @@ export async function getFounderAlignmentAdvisorInviteByToken(
       (invitation.invitee_user_id
         ? profileByUserId.get(invitation.invitee_user_id)?.trim()
         : invitation.invitee_email?.split("@")[0]?.trim()) || "Founder B",
-    founderAApproved: advisorRow.founder_a_approved,
-    founderBApproved: advisorRow.founder_b_approved,
-    advisorName: advisorRow.advisor_name ?? null,
-    advisorLinked: Boolean(advisorRow.advisor_user_id),
-    advisorUserId: advisorRow.advisor_user_id ?? null,
+    founderAApproved,
+    founderBApproved,
+    advisorName,
+    advisorLinked: Boolean(advisorUserId),
+    advisorUserId,
     reportReady: Boolean(latestReportRun),
     workbookReady: Boolean(workbookResult.data || latestReportRun),
     reportType: latestReportRun?.payload?.reportType ?? null,
