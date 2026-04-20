@@ -156,7 +156,13 @@ function TeamSection({
   );
 }
 
-export default async function AdvisorDashboardPage() {
+export default async function AdvisorDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ debug?: string }>;
+}) {
+  const params = await searchParams;
+  const debug = params.debug === "1";
   const supabase = await createClient();
   const {
     data: { user },
@@ -185,6 +191,19 @@ export default async function AdvisorDashboardPage() {
   const readyTeams = teams.filter((team) => team.accessStatus === "ready");
   const waitingTeams = teams.filter((team) => team.accessStatus === "waiting_for_approval");
   const pausedTeams = teams.filter((team) => team.accessStatus === "paused");
+
+  if (debug) {
+    console.info("[advisor-report-debug] dashboard_links", {
+      userId: user.id,
+      teams: teams.map((team) => ({
+        invitationId: team.invitationId,
+        workbookHref: team.workbookHref,
+        reportHref: team.reportHref,
+        reportReady: team.reportReady,
+        accessStatus: team.accessStatus,
+      })),
+    });
+  }
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-14 md:px-10 xl:px-12">
@@ -249,6 +268,29 @@ export default async function AdvisorDashboardPage() {
             </p>
           </div>
         </div>
+
+        {debug ? (
+          <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white/80 p-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              Debug · Dashboard Links
+            </p>
+            <div className="mt-3 space-y-3 text-xs leading-6 text-slate-700">
+              {teams.map((team) => (
+                <div key={`debug-${team.invitationId}`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                  <p className="font-semibold text-slate-900">
+                    {team.founderAName} & {team.founderBName}
+                  </p>
+                  <p>invitationId: {team.invitationId}</p>
+                  <p>workbookHref: {team.workbookHref}</p>
+                  <p>reportHref: {team.reportHref}</p>
+                  <p>
+                    reportReady: {String(team.reportReady)} · accessStatus: {team.accessStatus}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {teams.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white/82 p-8">

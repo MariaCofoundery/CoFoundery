@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
@@ -100,6 +100,7 @@ export function ProductShell({
   workbookItems,
 }: Props) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
@@ -131,6 +132,19 @@ export function ProductShell({
       isActive: (currentPathname) => currentPathname.startsWith("/me/"),
     });
   }
+
+  useEffect(() => {
+    if (searchParams.get("debug") !== "1" || resolvedActiveView !== "advisor") {
+      return;
+    }
+
+    console.info("[advisor-report-debug] nav_links", {
+      pathname,
+      dashboardHref,
+      workbookHref: resolvedWorkbookHref,
+      reportHref: resolvedMatchingHref,
+    });
+  }, [dashboardHref, pathname, resolvedActiveView, resolvedMatchingHref, resolvedWorkbookHref, searchParams]);
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;
