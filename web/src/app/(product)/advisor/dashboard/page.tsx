@@ -13,6 +13,8 @@ const PRIMARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50";
+const TERTIARY_CTA_CLASS =
+  "inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700";
 const DISABLED_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400";
 
@@ -106,22 +108,18 @@ function TeamCard({ team }: { team: AdvisorDashboardTeam }) {
           <span className={DISABLED_CTA_CLASS}>{team.accessStatusLabel}</span>
         )}
         {team.canOpenWorkbook && team.reportReady ? (
-          <Link href={team.advisorActionHref} className={SECONDARY_CTA_CLASS}>
-            Advisor-Impulse ergänzen
-          </Link>
-        ) : null}
-        {team.canOpenWorkbook ? (
-          <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
-            Snapshot exportieren
-          </Link>
-        ) : null}
-        {team.reportReady ? (
           <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
             Report ansehen
           </Link>
-        ) : (
+        ) : null}
+        {team.canOpenWorkbook ? (
+          <Link href={team.snapshotHref} className={TERTIARY_CTA_CLASS}>
+            Snapshot exportieren
+          </Link>
+        ) : null}
+        {team.canOpenWorkbook && !team.reportReady ? (
           <span className={DISABLED_CTA_CLASS}>Report noch nicht bereit</span>
-        )}
+        ) : null}
       </div>
     </article>
   );

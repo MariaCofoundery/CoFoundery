@@ -106,9 +106,6 @@ export function ProductShell({
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
     navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
-  const resolvedContextLabel =
-    navigationOverride?.contextLabel ??
-    (resolvedActiveView === "advisor" ? "Advisor-Kontext" : "Founder-Kontext");
   const navigationItems: NavigationItem[] = [
     {
       href: "/dashboard",
@@ -188,16 +185,7 @@ export function ProductShell({
               </nav>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-3">
-              <span
-                className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-medium uppercase tracking-[0.12em] ${
-                  resolvedActiveView === "advisor"
-                    ? "border-sky-200 bg-sky-50 text-sky-800"
-                    : "border-slate-200 bg-slate-50 text-slate-600"
-                }`}
-              >
-                {resolvedContextLabel}
-              </span>
+            <div className="flex items-center justify-end gap-3">
               <DashboardViewSwitch
                 activeView={resolvedActiveView}
                 hasFounder={hasFounder}

@@ -60,6 +60,7 @@ type WorkbookRow = {
 type ReportRunRow = {
   invitation_id: string;
   created_at: string;
+  payload?: unknown;
 };
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -101,8 +102,20 @@ export type AdvisorDashboardTeam = {
   reportHref: string;
   reportReady: boolean;
   snapshotHref: string;
-  advisorActionHref: string;
 };
+
+function toRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function hasRenderableAdvisorReportPayload(payload: unknown) {
+  const record = toRecord(payload);
+  const founderScoring = toRecord(record?.founderScoring);
+
+  return Array.isArray(founderScoring?.dimensions);
+}
 
 export type AdvisorDashboardProfile = {
   displayName: string | null;
@@ -294,7 +307,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
       .in("invitation_id", invitationIds),
     dataClient
       .from("report_runs")
-      .select("invitation_id, created_at")
+      .select("invitation_id, created_at, payload")
       .in("invitation_id", invitationIds)
       .order("created_at", { ascending: false }),
   ]);
@@ -375,6 +388,8 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         .sort()
         .at(-1) ?? null;
 
+      const reportReady = hasRenderableAdvisorReportPayload(reportRun?.payload);
+
       return {
         invitationId: invitation.id,
         founderAName,
@@ -396,9 +411,8 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
         workbookHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}`,
         reportHref: `/advisor/report?invitationId=${invitation.id}`,
-        reportReady: Boolean(reportRun),
+        reportReady,
         snapshotHref: `/advisor/snapshot?invitationId=${invitation.id}&teamContext=${teamContext}`,
-        advisorActionHref: `/advisor/report?invitationId=${invitation.id}#advisor-impulses`,
         _lastActivityAt: lastActivitySource ?? "",
       };
     })
