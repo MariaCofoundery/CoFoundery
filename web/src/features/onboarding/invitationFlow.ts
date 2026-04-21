@@ -29,6 +29,10 @@ export function buildInvitationDoneHref(invitationId: string) {
   return `/invite/${encodeURIComponent(invitationId)}/done`;
 }
 
+export function buildInvitationResumeHref(invitationId: string) {
+  return `/invite/${encodeURIComponent(invitationId)}/resume`;
+}
+
 export function buildInvitationQuestionnaireHref(
   invitationId: string,
   module: "base" | "values",

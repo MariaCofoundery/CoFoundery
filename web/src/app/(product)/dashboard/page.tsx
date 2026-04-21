@@ -31,7 +31,7 @@ import {
   type InvitationDashboardRow,
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
-import { buildInvitationQuestionnaireHref } from "@/features/onboarding/invitationFlow";
+import { buildInvitationResumeHref } from "@/features/onboarding/invitationFlow";
 import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
@@ -264,7 +264,10 @@ export default async function DashboardPage({
     ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
     : null;
   const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
-  const prioritizedIncomingInvite = actionableIncomingInvites[0] ?? null;
+  const prioritizedIncomingInvite =
+    actionableIncomingInvites.find((invite) => invite.status === "accepted") ??
+    actionableIncomingInvites[0] ??
+    null;
   const workbookFocusHref =
     workbookEntryPointHref ??
     (latestReadyReport
@@ -1087,28 +1090,15 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
   const isAccepted = invite.status === "accepted";
-  const baseQuestionnaireHref = buildInvitationQuestionnaireHref(invite.id, "base");
-  const valuesQuestionnaireHref = buildInvitationQuestionnaireHref(invite.id, "values");
-  const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
+  const resumeHref = buildInvitationResumeHref(invite.id);
   const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
-  const reportHref = `/report/${invite.id}`;
   const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
   const needsBaseQuestionnaire = !invite.inviteeBaseSubmitted;
   const needsValuesQuestionnaire =
     invite.inviteeBaseSubmitted && requiresValues && !invite.inviteeValuesSubmitted;
 
   return {
-    href: invite.isReportReady
-      ? reportHref
-      : canOpenCompletionStatus
-        ? completionStatusHref
-        : isAccepted
-          ? needsBaseQuestionnaire
-            ? baseQuestionnaireHref
-            : needsValuesQuestionnaire
-              ? valuesQuestionnaireHref
-              : completionStatusHref
-          : dashboardHref,
+    href: isAccepted ? resumeHref : dashboardHref,
     label: invite.isReportReady
       ? "Öffnen"
       : canOpenCompletionStatus
