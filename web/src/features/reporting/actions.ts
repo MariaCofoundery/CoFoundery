@@ -499,6 +499,10 @@ function ensureBaseModule(modules: AssessmentModule[]): AssessmentModule[] {
   return ["base", ...modules];
 }
 
+function getMatchingReadinessModules(_: AssessmentModule[]): AssessmentModule[] {
+  return ["base"];
+}
+
 async function getRequiredModulesForInvitation(
   supabase: SupabaseLikeClient,
   invitationId: string
@@ -1012,6 +1016,7 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
   if (privileged) {
     for (const invitation of invitations) {
       const requiredModules = requiredModulesByInvitationId.get(invitation.id) ?? ["base"];
+      const readinessModules = getMatchingReadinessModules(requiredModules);
       const matchingState = matchingStates.get(invitation.id);
       const inviterBoundByModule = matchingState?.bindingsByUser.get(invitation.inviter_user_id);
       const inviteeBoundByModule = invitation.invitee_user_id
@@ -1027,12 +1032,12 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
         invitation.status === "accepted" &&
         !isInvitationExpired(invitation.expires_at) &&
         isUserReadyForModulesFromCurrentStand(
-          requiredModules,
+          readinessModules,
           inviterBoundByModule,
           inviterLatestSubmittedByModule
         ) &&
         isUserReadyForModulesFromCurrentStand(
-          requiredModules,
+          readinessModules,
           inviteeBoundByModule,
           inviteeLatestSubmittedByModule
         );
@@ -1237,6 +1242,7 @@ async function getInvitationJoinDecisionInternal(
   const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
   const requiredModules = moduleOrder(await getRequiredModulesForInvitation(dataClient, normalizedInvitationId));
+  const readinessModules = getMatchingReadinessModules(requiredModules);
   await bootstrapInvitationLatestSubmittedBindings({
     invitationId: normalizedInvitationId,
     participantUserIds: privileged
@@ -1278,12 +1284,12 @@ async function getInvitationJoinDecisionInternal(
     : null;
   const isMatchingReady =
     isUserReadyForModulesFromCurrentStand(
-      requiredModules,
+      readinessModules,
       inviterBoundByModule,
       inviterLatestSubmittedByModule
     ) &&
     isUserReadyForModulesFromCurrentStand(
-      requiredModules,
+      readinessModules,
       inviteeBoundByModule,
       inviteeLatestSubmittedByModule
     );
@@ -1892,26 +1898,22 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
 
   const { data: existingReportRun } = await privileged
     .from("report_runs")
-    .select("id, relationship_id, payload")
+    .select("id, relationship_id, modules, payload")
     .eq("invitation_id", normalizedInvitationId)
     .maybeSingle();
   const existingReportRunRow = existingReportRun as {
     id?: string;
     relationship_id?: string | null;
+    modules?: string[] | null;
     payload?: unknown;
   } | null;
   const existingReportRunId = parseAcceptableReportRunId(existingReportRunRow);
   const existingReportRunRenderable = hasRenderableReportRunPayload(
     toRecord(existingReportRunRow?.payload)
   );
-  if (existingReportRunId && existingReportRunRenderable) {
-    return { ok: true, reportRunId: existingReportRunId };
-  }
 
   const requiredModules = await getRequiredModulesForInvitation(privileged, normalizedInvitationId);
-  const requestedScope: SessionAlignmentReport["requestedScope"] = requiredModules.includes("values")
-    ? "basis_plus_values"
-    : "basis";
+  const readinessModules = getMatchingReadinessModules(requiredModules);
 
   await bootstrapInvitationLatestSubmittedBindings({
     invitationId: normalizedInvitationId,
@@ -1952,6 +1954,27 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
         "values"
       )
     : null;
+  const includeValuesInReport =
+    requiredModules.includes("values") && Boolean(inviterValues) && Boolean(inviteeValues);
+  const reportModules = includeValuesInReport
+    ? (["base", "values"] as AssessmentModule[])
+    : (["base"] as AssessmentModule[]);
+  const requestedScope: SessionAlignmentReport["requestedScope"] = includeValuesInReport
+    ? "basis_plus_values"
+    : "basis";
+  const existingReportRunModules = ensureBaseModule(
+    ((existingReportRunRow?.modules ?? []).filter(
+      (value): value is AssessmentModule => value === "base" || value === "values"
+    ) as AssessmentModule[])
+  );
+  const shouldUpgradeExistingReport =
+    Boolean(existingReportRunId) &&
+    existingReportRunRenderable &&
+    includeValuesInReport &&
+    !existingReportRunModules.includes("values");
+  if (existingReportRunId && existingReportRunRenderable && !shouldUpgradeExistingReport) {
+    return { ok: true, reportRunId: existingReportRunId };
+  }
   const matchingBindingsSnapshot = {
     inviter: buildMatchingInputSnapshot(inviterBindings),
     invitee: buildMatchingInputSnapshot(inviteeBindings),
@@ -1966,34 +1989,13 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     inviteeBase,
     inviteeValues,
   });
-  if (
-    requiredModules.includes("values") &&
-    (!inviterValues || !inviteeValues)
-  ) {
-    logEnsureReportRunSnapshot({
-      sourceTag,
-      invitationId: normalizedInvitationId,
-      userId: requesterUserId,
-      relationshipId: existingReportRunRow?.relationship_id ?? null,
-      requiredModules,
-      matchingBindings: matchingBindingsSnapshot,
-      latestSubmitted: latestSubmittedSnapshot,
-      completionStatus,
-      reportRunId: existingReportRunId,
-      reportRunRenderable: existingReportRunRenderable,
-      finalizeResult: "waiting_for_answers",
-      finalStatus: "not_ready",
-      detail: "values_missing_for_at_least_one_founder",
-    });
-    return { ok: false, reason: "waiting_for_answers" };
-  }
   if (!inviterBase || !inviteeBase) {
     logEnsureReportRunSnapshot({
       sourceTag,
       invitationId: normalizedInvitationId,
       userId: requesterUserId,
       relationshipId: existingReportRunRow?.relationship_id ?? null,
-      requiredModules,
+      requiredModules: readinessModules,
       matchingBindings: matchingBindingsSnapshot,
       latestSubmitted: latestSubmittedSnapshot,
       completionStatus,
@@ -2051,7 +2053,7 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   let valuesScoreA: number | null = null;
   let valuesScoreB: number | null = null;
 
-  if (requiredModules.includes("values") && inviterValues && inviteeValues) {
+  if (includeValuesInReport && inviterValues && inviteeValues) {
     valuesAssessmentIdA = inviterValues.id;
     valuesAssessmentIdB = inviteeValues.id;
 
@@ -2142,7 +2144,7 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     frictionPoints: [],
     conversationGuideQuestions: [],
     valuesModulePreview: "",
-    valuesModuleStatus: requiredModules.includes("values") ? "completed" : "not_started",
+    valuesModuleStatus: includeValuesInReport ? "completed" : "not_started",
     valuesAnsweredA,
     valuesAnsweredB,
     valuesTotal,
@@ -2213,20 +2215,20 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     founderReport,
     founderScoring,
     teamContext: normalizeTeamContext(invitation.team_context),
-    modules: ensureBaseModule(requiredModules),
+    modules: reportModules,
     inputAssessmentIds: [...new Set(inputAssessmentIds)],
     generatedAt: new Date().toISOString(),
     source: sourceTag,
   };
 
-  if (existingReportRunId && !existingReportRunRenderable) {
+  if (existingReportRunId && (!existingReportRunRenderable || shouldUpgradeExistingReport)) {
     const repairedInputAssessmentIds = [...new Set(inputAssessmentIds)];
     const { data: repairedRow, error: repairedError } = await privileged.rpc(
       "repair_report_run_payload",
       {
         p_report_run_id: existingReportRunId,
         p_payload: payload,
-        p_modules: ensureBaseModule(requiredModules),
+        p_modules: reportModules,
         p_input_assessment_ids: repairedInputAssessmentIds,
       }
     );

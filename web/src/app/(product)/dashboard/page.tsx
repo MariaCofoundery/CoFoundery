@@ -262,6 +262,8 @@ export default async function DashboardPage({
   const heroExpectationText = shouldPrioritizeInviteCta
     ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
     : null;
+  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
+  const prioritizedIncomingInvite = actionableIncomingInvites[0] ?? null;
   const workbookFocusHref =
     workbookEntryPointHref ??
     (latestReadyReport
@@ -270,7 +272,7 @@ export default async function DashboardPage({
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
       : null);
-  const contextualInvitationId = params.invitationId?.trim() || null;
+  const contextualInvitationId = params.invitationId?.trim() || prioritizedIncomingInvite?.id || null;
   const contextualInvitation = contextualInvitationId
     ? invitationById.get(contextualInvitationId) ?? null
     : null;
@@ -292,6 +294,8 @@ export default async function DashboardPage({
   const contextualValuesHref = contextualInvitation
     ? `/me/values?invitationId=${encodeURIComponent(contextualInvitation.id)}`
     : "/me/values";
+  const heroIncomingInvite =
+    contextualInvitation?.direction === "incoming" ? contextualInvitation : prioritizedIncomingInvite;
   const currentStep: "basis" | "values" | "matching" | "workbook" = !hasSubmittedBase
     ? "basis"
     : !hasSubmittedValues && !hasMatchingActivity && workbookPhase === "upcoming"
@@ -301,7 +305,9 @@ export default async function DashboardPage({
         : "matching";
   const valuesSkipped = !hasSubmittedValues && currentStep !== "values";
 
-  const heroPrimaryAction = !hasSubmittedBase
+  const heroPrimaryAction = heroIncomingInvite
+    ? buildHeroIncomingInvitationAction(heroIncomingInvite)
+    : !hasSubmittedBase
     ? {
         href: contextualBaseHref,
         label: "Profil starten",
@@ -368,7 +374,6 @@ export default async function DashboardPage({
       }
     : heroPrimaryAction;
 
-  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
   const compactProgressItems = [
     {
       id: "basis",
@@ -1050,33 +1055,8 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
 }
 
 function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
-  const requiresValues = invite.requiredModules.includes("values");
-  const inviteeHasAllRequired =
-    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  const isAccepted = invite.status === "accepted";
-  const completeQuestionnaireHref = `/join/start?invitationId=${encodeURIComponent(invite.id)}`;
-  const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
-  const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
-  const reportHref = `/report/${invite.id}`;
-  const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
-  const actionHref = invite.isReportReady
-    ? reportHref
-    : canOpenCompletionStatus
-      ? completionStatusHref
-      : isAccepted
-        ? completeQuestionnaireHref
-        : dashboardHref;
-  const actionLabel = invite.isReportReady
-    ? "Öffnen"
-    : canOpenCompletionStatus
-      ? "Status öffnen"
-      : isAccepted
-        ? "Jetzt ausfüllen"
-        : "Einladung prüfen";
-  const actionClassName = invite.isReportReady
-    ? REPORT_CTA_CLASS
-    : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700";
-  const helperText = isAccepted
+  const action = buildIncomingInvitationAction(invite);
+  const helperText = invite.status === "accepted"
     ? null
     : "Öffne zuerst den ursprünglichen Einladungslink, damit die Einladung angenommen und korrekt gestartet wird.";
 
@@ -1092,13 +1072,76 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
       </div>
 
       <a
-        href={actionHref}
-        className={actionClassName}
+        href={action.href}
+        className={action.className}
       >
-        {actionLabel}
+        {action.label}
       </a>
     </div>
   );
+}
+
+function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
+  const requiresValues = invite.requiredModules.includes("values");
+  const inviteeHasAllRequired =
+    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
+  const isAccepted = invite.status === "accepted";
+  const completeQuestionnaireHref = `/join/start?invitationId=${encodeURIComponent(invite.id)}`;
+  const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
+  const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
+  const reportHref = `/report/${invite.id}`;
+  const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
+
+  return {
+    href: invite.isReportReady
+      ? reportHref
+      : canOpenCompletionStatus
+        ? completionStatusHref
+        : isAccepted
+          ? completeQuestionnaireHref
+          : dashboardHref,
+    label: invite.isReportReady
+      ? "Öffnen"
+      : canOpenCompletionStatus
+        ? "Status öffnen"
+        : isAccepted
+          ? "Jetzt ausfüllen"
+          : "Einladung prüfen",
+    className: invite.isReportReady
+      ? REPORT_CTA_CLASS
+      : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",
+    canOpenCompletionStatus,
+  };
+}
+
+function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
+  const action = buildIncomingInvitationAction(invite);
+  const inviterName = resolveIncomingInviterName(invite);
+
+  if (invite.isReportReady) {
+    return {
+      href: action.href,
+      label: "Matching-Report ansehen",
+      title: "Euer Matching ist bereit.",
+      text: `Der gemeinsame Report mit ${inviterName} ist jetzt verfügbar.`,
+    };
+  }
+
+  if (action.canOpenCompletionStatus) {
+    return {
+      href: action.href,
+      label: "Matching fortsetzen",
+      title: "Dein laufendes Matching hat Priorität.",
+      text: `Steige direkt in den aktuellen Status mit ${inviterName} ein und gehe von dort weiter.`,
+    };
+  }
+
+  return {
+    href: action.href,
+    label: "Matching fortsetzen",
+    title: "Dein laufendes Matching hat Priorität.",
+    text: `Führe den eingeladenen Founder-Flow mit ${inviterName} genau dort weiter, wo du aufgehört hast.`,
+  };
 }
 
 function renderCompactReportRow(run: ReportRunRow) {
