@@ -125,6 +125,7 @@ export default async function FounderAlignmentWorkbookPage({
       {data.currentUserRole === "advisor" ? (
         <FounderAlignmentWorkbookClient
           invitationId={data.invitationId}
+          relationshipId={data.relationshipId}
           teamContext={data.teamContext}
           founderAName={data.founderAName}
           founderBName={data.founderBName}
@@ -150,6 +151,7 @@ export default async function FounderAlignmentWorkbookPage({
       ) : (
         <FounderAlignmentWorkbookClient
           invitationId={data.invitationId}
+          relationshipId={data.relationshipId}
           teamContext={data.teamContext}
           founderAName={data.founderAName}
           founderBName={data.founderBName}

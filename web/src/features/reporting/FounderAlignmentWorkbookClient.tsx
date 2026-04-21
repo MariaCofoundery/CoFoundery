@@ -72,6 +72,7 @@ import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type FounderAlignmentWorkbookClientProps = {
   invitationId: string | null;
+  relationshipId: string | null;
   teamContext: TeamContext;
   founderAName: string | null;
   founderBName: string | null;
@@ -1253,6 +1254,7 @@ function buildWorkbookV2Suggestion(params: {
 
 export function FounderAlignmentWorkbookClient({
   invitationId,
+  relationshipId,
   teamContext,
   founderAName,
   founderBName,
@@ -1315,6 +1317,7 @@ export function FounderAlignmentWorkbookClient({
     useState<FounderAlignmentWorkbookAdvisorInviteState>(advisorInvite);
   const [advisorEntriesState, setAdvisorEntriesState] =
     useState<FounderAlignmentWorkbookAdvisorEntry[]>(advisorEntries);
+  const [isAdvisorSectionExpanded, setIsAdvisorSectionExpanded] = useState(false);
   const [advisorProposalName, setAdvisorProposalName] = useState("");
   const [advisorProposalEmail, setAdvisorProposalEmail] = useState("");
   const effectiveStepMarkersByStep = useMemo<WorkbookStepMarkersByStep>(
@@ -2961,6 +2964,15 @@ export function FounderAlignmentWorkbookClient({
       return t("Bitte gib eine gültige Advisor-E-Mail-Adresse ein.");
     }
 
+    if (result.reason === "missing_relationship") {
+      const debugParts = [
+        `invitationId=${result.debug.invitationId || "-"}`,
+        `relationshipId=${result.debug.relationshipId || "-"}`,
+        result.debug.validationError ? `validation=${result.debug.validationError}` : null,
+      ].filter(Boolean);
+      return `${t("Beziehung konnte nicht aufgelöst werden.")} ${debugParts.join(" | ")}`;
+    }
+
     const debugParts = [
       `result=${result.debug.finalResult}`,
       `invitationId=${result.debug.invitationId || "-"}`,
@@ -2985,6 +2997,7 @@ export function FounderAlignmentWorkbookClient({
     startAdvisorActionTransition(async () => {
       const result = await proposeFounderAlignmentAdvisor({
         invitationId,
+        relationshipId,
         advisorName: advisorProposalName,
         advisorEmail: advisorProposalEmail,
       });
@@ -3015,12 +3028,17 @@ export function FounderAlignmentWorkbookClient({
     startAdvisorActionTransition(async () => {
       const result = await approveFounderAlignmentAdvisorProposal({
         invitationId,
+        relationshipId: relationshipId ?? advisorEntriesState.find((entry) => entry.id === entryId)?.relationshipId ?? null,
         advisorEntryId: entryId,
       });
 
       if (!result.ok) {
         setAdvisorInviteLink(null);
-        setAdvisorInviteMessage(t("Die Zustimmung konnte gerade nicht gespeichert werden."));
+        setAdvisorInviteMessage(
+          result.reason === "missing_relationship"
+            ? t("Beziehung konnte nicht aufgelöst werden.")
+            : t("Die Zustimmung konnte gerade nicht gespeichert werden.")
+        );
         return;
       }
 
@@ -3042,6 +3060,7 @@ export function FounderAlignmentWorkbookClient({
     startAdvisorActionTransition(async () => {
       const result = await sendFounderAlignmentAdvisorInvite({
         invitationId,
+        relationshipId: entry.relationshipId || relationshipId,
         advisorEntryId: entry.id,
         teamContext,
       });
@@ -3053,6 +3072,8 @@ export function FounderAlignmentWorkbookClient({
             ? t("Für diesen Advisor fehlt noch eine E-Mail-Adresse.")
             : result.reason === "not_ready"
               ? t("Dieser Advisor-Eintrag ist noch nicht bereit für den Versand.")
+              : result.reason === "missing_relationship"
+                ? t("Beziehung konnte nicht aufgelöst werden.")
               : t(
                   "Die Einladung wurde noch nicht versendet. Der Advisor-Eintrag bleibt erhalten und kann bei Bedarf manuell geteilt werden."
                 )
@@ -3078,13 +3099,16 @@ export function FounderAlignmentWorkbookClient({
     startAdvisorActionTransition(async () => {
       const result = await copyFounderAlignmentAdvisorInviteLink({
         invitationId,
+        relationshipId: entry.relationshipId || relationshipId,
         advisorEntryId: entry.id,
       });
 
       if (!result.ok) {
         setAdvisorInviteLink(null);
         setAdvisorInviteMessage(
-          t("Der Einladungslink konnte gerade nicht vorbereitet werden.")
+          result.reason === "missing_relationship"
+            ? t("Beziehung konnte nicht aufgelöst werden.")
+            : t("Der Einladungslink konnte gerade nicht vorbereitet werden.")
         );
         return;
       }
@@ -3363,248 +3387,263 @@ export function FounderAlignmentWorkbookClient({
                               "Schlagt konkrete Personen vor, haltet die zweite Founder-Zustimmung fest und bereitet so einen sauberen Advisor-Kontext pro Person vor."
                             )}
                           </p>
+                          <div className="mt-4">
+                            <button
+                              type="button"
+                              onClick={() => setIsAdvisorSectionExpanded((current) => !current)}
+                              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+                            >
+                              {t(
+                                isAdvisorSectionExpanded
+                                  ? "Advisor-Begleitung ausblenden"
+                                  : "Advisor-Begleitung anzeigen"
+                              )}
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="mt-4 rounded-2xl border border-white/80 bg-white/92 p-3">
-                          <div className="space-y-3">
-                            {advisorEntriesState.length > 0 ? (
-                              <div className="space-y-3">
-                                {advisorEntriesState.map((entry) => {
-                                  const statusMeta = statusMetaForAdvisorEntry(entry);
-                                  const invitedAtLabel = formatAdvisorInviteTimestamp(entry.invitedAt);
-                                  const canApproveCurrentFounder =
-                                    (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                                    entry.status === "pending" &&
-                                    !currentFounderApprovedEntry(entry);
-                                  const canSendInvite =
-                                    (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                                    entry.status === "approved";
-                                  const canResendInvite =
-                                    (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                                    entry.status === "invited";
-                                  const canCopyInviteLink =
-                                    (currentUserRole === "founderA" || currentUserRole === "founderB") &&
-                                    (entry.status === "approved" || entry.status === "invited");
-                                  const missingLabel = missingOtherFounderLabel(entry);
-                                  return (
-                                    <div
-                                      key={entry.id}
-                                      className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3"
-                                    >
-                                      <div className="flex flex-wrap items-start justify-between gap-3">
-                                        <div className="min-w-0">
-                                          <p className="text-sm font-semibold text-slate-900">
-                                            {t(entry.advisorName?.trim() || entry.advisorEmail || "Advisor")}
-                                          </p>
-                                          {entry.advisorEmail ? (
-                                            <p className="mt-1 text-xs text-slate-600">{entry.advisorEmail}</p>
-                                          ) : null}
-                                          <p className="mt-2 text-xs text-slate-500">
-                                            {t(`Vorgeschlagen von ${advisorSuggestedByDisplayLabel(entry)}`)}
-                                          </p>
-                                        </div>
-                                        <span
-                                          className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${statusMeta.className}`}
-                                        >
-                                          {t(statusMeta.label)}
-                                        </span>
-                                      </div>
-
-                                      <p className="mt-3 text-sm leading-6 text-slate-600">
-                                        {t(statusMeta.description)}
-                                      </p>
-
-                                      {entry.status === "invited" && invitedAtLabel ? (
-                                        <p className="mt-2 text-xs leading-6 text-slate-500">
-                                          {t(`Gesendet am ${invitedAtLabel}${entry.advisorEmail ? ` an ${entry.advisorEmail}` : ""}.`)}
-                                        </p>
-                                      ) : null}
-
-                                      <div className="mt-3 grid gap-2 text-sm text-slate-700">
-                                        <AdvisorApprovalRow
-                                          label={founderALabel}
-                                          approved={entry.founderAApproved}
-                                        />
-                                        <AdvisorApprovalRow
-                                          label={founderBLabel}
-                                          approved={entry.founderBApproved}
-                                        />
-                                      </div>
-
-                                      {canApproveCurrentFounder ? (
-                                        <div className="mt-3 flex flex-wrap items-center gap-3">
-                                          <ReportActionButton
-                                            type="button"
-                                            onClick={() => handleApproveAdvisorEntry(entry.id)}
-                                            className="justify-center"
-                                          >
-                                            {t("Zustimmen")}
-                                          </ReportActionButton>
-                                          <p className="text-xs leading-6 text-slate-600">
-                                            {t(
-                                              missingLabel
-                                                ? `Danach fehlt noch ${missingLabel}, falls die zweite Zustimmung noch offen ist.`
-                                                : "Damit wird dieser Advisor-Eintrag weiter freigegeben."
-                                            )}
-                                          </p>
-                                        </div>
-                                      ) : currentFounderApprovedEntry(entry) && entry.status === "pending" ? (
-                                        <p className="mt-3 text-xs leading-6 text-slate-600">
-                                          {t(
-                                            `Deine Zustimmung liegt vor. Jetzt fehlt noch ${missingLabel ?? "die zweite Founder-Zustimmung"}.`
-                                          )}
-                                        </p>
-                                      ) : null}
-
-                                      {canSendInvite || canResendInvite || canCopyInviteLink ? (
-                                        <div className="mt-3 flex flex-wrap items-center gap-3">
-                                          {canSendInvite ? (
-                                            <ReportActionButton
-                                              type="button"
-                                              onClick={() => handleSendAdvisorInvite(entry)}
-                                              disabled={isAdvisorActionPending}
-                                              className="justify-center"
-                                            >
-                                              {t(
-                                                isAdvisorActionPending
-                                                  ? "Versendet..."
-                                                  : "Einladung senden"
-                                              )}
-                                            </ReportActionButton>
-                                          ) : null}
-                                          {canResendInvite ? (
-                                            <button
-                                              type="button"
-                                              onClick={() => handleSendAdvisorInvite(entry)}
-                                              disabled={isAdvisorActionPending}
-                                              className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
-                                            >
-                                              {t("Erneut senden")}
-                                            </button>
-                                          ) : null}
-                                          {canCopyInviteLink ? (
-                                            <button
-                                              type="button"
-                                              onClick={() => handleCopyAdvisorInviteLink(entry)}
-                                              disabled={isAdvisorActionPending}
-                                              className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
-                                            >
-                                              {t("Einladungslink kopieren")}
-                                            </button>
-                                          ) : null}
-                                        </div>
-                                      ) : null}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 p-4">
-                                <p className="text-sm font-medium text-slate-900">
-                                  {t("Noch kein Advisor vorgeschlagen")}
-                                </p>
-                                <p className="mt-2 text-sm leading-6 text-slate-600">
-                                  {t(
-                                    "Schlagt bei Bedarf eine konkrete Person vor. Der Vorschlag bleibt sichtbar, bis die zweite Founder-Zustimmung vorliegt."
-                                  )}
-                                </p>
-                              </div>
-                            )}
-
-                            {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
-                              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                  {t("Advisor vorschlagen")}
-                                </p>
-                                <div className="mt-3 grid gap-3">
-                                  <input
-                                    type="text"
-                                    value={advisorProposalName}
-                                    onChange={(event) => setAdvisorProposalName(event.target.value)}
-                                    placeholder={t("Advisor-Name (optional)")}
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-                                  />
-                                  <input
-                                    type="email"
-                                    value={advisorProposalEmail}
-                                    onChange={(event) => setAdvisorProposalEmail(event.target.value)}
-                                    placeholder={t("advisor@example.com")}
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-                                  />
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <ReportActionButton
-                                      type="button"
-                                      onClick={handleProposeAdvisor}
-                                      disabled={isAdvisorActionPending}
-                                      className="justify-center"
-                                    >
-                                      {t(
-                                        isAdvisorActionPending
-                                          ? "Speichert..."
-                                          : "Advisor vorschlagen"
-                                      )}
-                                    </ReportActionButton>
-                                    <p className="text-xs leading-6 text-slate-600">
-                                      {t("E-Mail ist Pflicht. Dein Vorschlag bleibt sichtbar, auch wenn die zweite Zustimmung noch fehlt.")}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : null}
-
-                            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
-                              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                {t("Was der Advisor später darf")}
-                              </p>
-                              <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
-                                <li>{t("Sieht den freigegebenen Report und das Workbook.")}</li>
-                                <li>{t("Ergänzt nur Advisor-Hinweise und den Advisor-Abschluss.")}</li>
-                                <li>{t("Ändert keine Founder-Beiträge, Regeln oder Zustimmungen.")}</li>
-                              </ul>
-                            </div>
-
-                            {advisorImpulses.length > 0 ? (
-                              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
-                                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                  {t("Impulse aus der Advisor-Begleitung")}
-                                </p>
-                                <div className="mt-3 space-y-3">
-                                  {advisorImpulses.map((impulse) => {
-                                    const sectionMeta = ADVISOR_IMPULSE_SECTION_META[impulse.sectionKey];
+                        {isAdvisorSectionExpanded ? (
+                          <div className="mt-4 rounded-2xl border border-white/80 bg-white/92 p-3">
+                            <div className="space-y-3">
+                              {advisorEntriesState.length > 0 ? (
+                                <div className="space-y-3">
+                                  {advisorEntriesState.map((entry) => {
+                                    const statusMeta = statusMetaForAdvisorEntry(entry);
+                                    const invitedAtLabel = formatAdvisorInviteTimestamp(entry.invitedAt);
+                                    const canApproveCurrentFounder =
+                                      (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                                      entry.status === "pending" &&
+                                      !currentFounderApprovedEntry(entry);
+                                    const canSendInvite =
+                                      (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                                      entry.status === "approved";
+                                    const canResendInvite =
+                                      (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                                      entry.status === "invited";
+                                    const canCopyInviteLink =
+                                      (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                                      (entry.status === "approved" || entry.status === "invited");
+                                    const missingLabel = missingOtherFounderLabel(entry);
                                     return (
                                       <div
-                                        key={impulse.id}
-                                        className="rounded-2xl border border-slate-200 bg-white px-3 py-3"
+                                        key={entry.id}
+                                        className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3"
                                       >
                                         <div className="flex flex-wrap items-start justify-between gap-3">
-                                          <div>
+                                          <div className="min-w-0">
                                             <p className="text-sm font-semibold text-slate-900">
-                                              {t(sectionMeta.title)}
+                                              {t(entry.advisorName?.trim() || entry.advisorEmail || "Advisor")}
                                             </p>
-                                            <p className="mt-1 text-xs text-slate-500">
+                                            {entry.advisorEmail ? (
+                                              <p className="mt-1 text-xs text-slate-600">{entry.advisorEmail}</p>
+                                            ) : null}
+                                            <p className="mt-2 text-xs text-slate-500">
+                                              {t(`Vorgeschlagen von ${advisorSuggestedByDisplayLabel(entry)}`)}
+                                            </p>
+                                          </div>
+                                          <span
+                                            className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${statusMeta.className}`}
+                                          >
+                                            {t(statusMeta.label)}
+                                          </span>
+                                        </div>
+
+                                        <p className="mt-3 text-sm leading-6 text-slate-600">
+                                          {t(statusMeta.description)}
+                                        </p>
+
+                                        {entry.status === "invited" && invitedAtLabel ? (
+                                          <p className="mt-2 text-xs leading-6 text-slate-500">
+                                            {t(`Gesendet am ${invitedAtLabel}${entry.advisorEmail ? ` an ${entry.advisorEmail}` : ""}.`)}
+                                          </p>
+                                        ) : null}
+
+                                        <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                                          <AdvisorApprovalRow
+                                            label={founderALabel}
+                                            approved={entry.founderAApproved}
+                                          />
+                                          <AdvisorApprovalRow
+                                            label={founderBLabel}
+                                            approved={entry.founderBApproved}
+                                          />
+                                        </div>
+
+                                        {canApproveCurrentFounder ? (
+                                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                                            <ReportActionButton
+                                              type="button"
+                                              onClick={() => handleApproveAdvisorEntry(entry.id)}
+                                              className="justify-center"
+                                            >
+                                              {t("Zustimmen")}
+                                            </ReportActionButton>
+                                            <p className="text-xs leading-6 text-slate-600">
                                               {t(
-                                                `${impulse.advisorName ?? "Advisor"} · ${formatAdvisorImpulseTimestamp(
-                                                  impulse.updatedAt
-                                                )}`
+                                                missingLabel
+                                                  ? `Danach fehlt noch ${missingLabel}, falls die zweite Zustimmung noch offen ist.`
+                                                  : "Damit wird dieser Advisor-Eintrag weiter freigegeben."
                                               )}
                                             </p>
                                           </div>
-                                        </div>
-                                        <p className="mt-3 text-sm leading-6 text-slate-700">
-                                          {t(impulse.text)}
-                                        </p>
+                                        ) : currentFounderApprovedEntry(entry) && entry.status === "pending" ? (
+                                          <p className="mt-3 text-xs leading-6 text-slate-600">
+                                            {t(
+                                              `Deine Zustimmung liegt vor. Jetzt fehlt noch ${missingLabel ?? "die zweite Founder-Zustimmung"}.`
+                                            )}
+                                          </p>
+                                        ) : null}
+
+                                        {canSendInvite || canResendInvite || canCopyInviteLink ? (
+                                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                                            {canSendInvite ? (
+                                              <ReportActionButton
+                                                type="button"
+                                                onClick={() => handleSendAdvisorInvite(entry)}
+                                                disabled={isAdvisorActionPending}
+                                                className="justify-center"
+                                              >
+                                                {t(
+                                                  isAdvisorActionPending
+                                                    ? "Versendet..."
+                                                    : "Einladung senden"
+                                                )}
+                                              </ReportActionButton>
+                                            ) : null}
+                                            {canResendInvite ? (
+                                              <button
+                                                type="button"
+                                                onClick={() => handleSendAdvisorInvite(entry)}
+                                                disabled={isAdvisorActionPending}
+                                                className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
+                                              >
+                                                {t("Erneut senden")}
+                                              </button>
+                                            ) : null}
+                                            {canCopyInviteLink ? (
+                                              <button
+                                                type="button"
+                                                onClick={() => handleCopyAdvisorInviteLink(entry)}
+                                                disabled={isAdvisorActionPending}
+                                                className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
+                                              >
+                                                {t("Einladungslink kopieren")}
+                                              </button>
+                                            ) : null}
+                                          </div>
+                                        ) : null}
                                       </div>
                                     );
                                   })}
                                 </div>
-                              </div>
-                            ) : null}
+                              ) : (
+                                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 p-4">
+                                  <p className="text-sm font-medium text-slate-900">
+                                    {t("Noch kein Advisor vorgeschlagen")}
+                                  </p>
+                                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                                    {t(
+                                      "Schlagt bei Bedarf eine konkrete Person vor. Der Vorschlag bleibt sichtbar, bis die zweite Founder-Zustimmung vorliegt."
+                                    )}
+                                  </p>
+                                </div>
+                              )}
 
-                            {advisorInviteMessage ? (
-                              <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
-                            ) : null}
+                              {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
+                                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                                    {t("Advisor vorschlagen")}
+                                  </p>
+                                  <div className="mt-3 grid gap-3">
+                                    <input
+                                      type="text"
+                                      value={advisorProposalName}
+                                      onChange={(event) => setAdvisorProposalName(event.target.value)}
+                                      placeholder={t("Advisor-Name (optional)")}
+                                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                                    />
+                                    <input
+                                      type="email"
+                                      value={advisorProposalEmail}
+                                      onChange={(event) => setAdvisorProposalEmail(event.target.value)}
+                                      placeholder={t("advisor@example.com")}
+                                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                                    />
+                                    <div className="flex flex-wrap items-center gap-3">
+                                      <ReportActionButton
+                                        type="button"
+                                        onClick={handleProposeAdvisor}
+                                        disabled={isAdvisorActionPending}
+                                        className="justify-center"
+                                      >
+                                        {t(
+                                          isAdvisorActionPending
+                                            ? "Speichert..."
+                                            : "Advisor vorschlagen"
+                                        )}
+                                      </ReportActionButton>
+                                      <p className="text-xs leading-6 text-slate-600">
+                                        {t("E-Mail ist Pflicht. Dein Vorschlag bleibt sichtbar, auch wenn die zweite Zustimmung noch fehlt.")}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+                                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                                  {t("Was der Advisor später darf")}
+                                </p>
+                                <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
+                                  <li>{t("Sieht den freigegebenen Report und das Workbook.")}</li>
+                                  <li>{t("Ergänzt nur Advisor-Hinweise und den Advisor-Abschluss.")}</li>
+                                  <li>{t("Ändert keine Founder-Beiträge, Regeln oder Zustimmungen.")}</li>
+                                </ul>
+                              </div>
+
+                              {advisorImpulses.length > 0 ? (
+                                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+                                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                                    {t("Impulse aus der Advisor-Begleitung")}
+                                  </p>
+                                  <div className="mt-3 space-y-3">
+                                    {advisorImpulses.map((impulse) => {
+                                      const sectionMeta = ADVISOR_IMPULSE_SECTION_META[impulse.sectionKey];
+                                      return (
+                                        <div
+                                          key={impulse.id}
+                                          className="rounded-2xl border border-slate-200 bg-white px-3 py-3"
+                                        >
+                                          <div className="flex flex-wrap items-start justify-between gap-3">
+                                            <div>
+                                              <p className="text-sm font-semibold text-slate-900">
+                                                {t(sectionMeta.title)}
+                                              </p>
+                                              <p className="mt-1 text-xs text-slate-500">
+                                                {t(
+                                                  `${impulse.advisorName ?? "Advisor"} · ${formatAdvisorImpulseTimestamp(
+                                                    impulse.updatedAt
+                                                  )}`
+                                                )}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <p className="mt-3 text-sm leading-6 text-slate-700">
+                                            {t(impulse.text)}
+                                          </p>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              {advisorInviteMessage ? (
+                                <p className="text-xs leading-6 text-slate-600">{advisorInviteMessage}</p>
+                              ) : null}
+                            </div>
                           </div>
-                        </div>
+                        ) : null}
                       </>
                     )}
                   </aside>

@@ -100,6 +100,7 @@ export type FounderAlignmentWorkbookPageData =
   | {
       status: "ready";
       invitationId: string | null;
+      relationshipId: string | null;
       teamContext: TeamContext;
       founderAName: string | null;
       founderBName: string | null;
@@ -341,6 +342,7 @@ export async function getFounderAlignmentWorkbookPageData(
     return {
       status: "ready",
       invitationId: null,
+      relationshipId: null,
       teamContext,
       founderAName: "Maria Keller",
       founderBName: "Lukas Brandt",
@@ -368,12 +370,12 @@ export async function getFounderAlignmentWorkbookPageData(
   }
 
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
-  const relationshipId = user?.id
+  const resolvedRelationshipId = user?.id
     ? await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase)
     : null;
   const hasRelationshipAdvisorAccess =
-    user?.id && relationshipId
-      ? await hasAdvisorAccessToRelationship(user.id, relationshipId, supabase)
+    user?.id && resolvedRelationshipId
+      ? await hasAdvisorAccessToRelationship(user.id, resolvedRelationshipId, supabase)
       : false;
   const isLinkedAdvisor =
     hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id);
@@ -449,6 +451,7 @@ export async function getFounderAlignmentWorkbookPageData(
       reportSnapshot.report.valuesAnsweredA >= reportSnapshot.report.valuesTotal &&
       reportSnapshot.report.valuesAnsweredB >= reportSnapshot.report.valuesTotal
   );
+  const relationshipId = resolvedRelationshipId ?? reportSnapshot?.relationshipId ?? null;
 
   const currentUserRole: FounderAlignmentWorkbookViewerRole =
     user?.id && founderContext.founderAUserId === user.id
@@ -567,6 +570,7 @@ export async function getFounderAlignmentWorkbookPageData(
   return {
     status: "ready",
     invitationId: normalizedInvitationId,
+    relationshipId,
     teamContext: effectiveTeamContext,
     founderAName: founderContext.founderAName ?? reportSnapshot?.report?.participantAName ?? null,
     founderBName: founderContext.founderBName ?? reportSnapshot?.report?.participantBName ?? null,

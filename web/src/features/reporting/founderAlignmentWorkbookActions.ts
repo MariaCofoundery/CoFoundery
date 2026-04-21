@@ -27,7 +27,6 @@ import {
   syncRelationshipAdvisorFromLegacyInvitation,
   type RelationshipAdvisorRow,
 } from "@/features/reporting/relationshipAdvisorAccess";
-import { finalizeInvitationIfReady } from "@/features/reporting/actions";
 import { trackServerResearchEvent } from "@/features/research/server";
 
 type SaveFounderAlignmentWorkbookInput = {
@@ -275,6 +274,11 @@ function normalizeAdvisorEmail(value: string | null | undefined) {
 
 function normalizeAdvisorName(value: string | null | undefined) {
   const normalized = (value ?? "").trim().slice(0, 120);
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeRelationshipId(value: string | null | undefined) {
+  const normalized = (value ?? "").trim();
   return normalized.length > 0 ? normalized : null;
 }
 
@@ -1244,14 +1248,17 @@ export async function prepareFounderAlignmentAdvisorInvite({
 
 export async function proposeFounderAlignmentAdvisor({
   invitationId,
+  relationshipId,
   advisorName,
   advisorEmail,
 }: {
   invitationId: string;
+  relationshipId?: string | null;
   advisorName: string | null;
   advisorEmail: string;
 }): Promise<ProposeFounderAlignmentAdvisorResult> {
   const normalizedInvitationId = invitationId.trim();
+  const normalizedRelationshipId = normalizeRelationshipId(relationshipId);
   const normalizedAdvisorName = normalizeAdvisorName(advisorName);
   if (!normalizedInvitationId) {
     return {
@@ -1326,26 +1333,20 @@ export async function proposeFounderAlignmentAdvisor({
     return { ok: false, reason: "forbidden", debug: debugInfo };
   }
 
-  let relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
-  debugInfo.relationshipId = relationshipId;
-  if (!relationshipId) {
-    debugInfo.repairAttempted = true;
-    const repairResult = await finalizeInvitationIfReady(normalizedInvitationId);
-    debugInfo.repairResult = repairResult.ok
-      ? `report_run_ready:${repairResult.reportRunId}`
-      : `${repairResult.reason}${repairResult.detail ? `:${repairResult.detail}` : ""}`;
-    relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
-    debugInfo.relationshipId = relationshipId;
-  }
+  const resolvedRelationshipId =
+    normalizedRelationshipId ?? (await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase));
+  debugInfo.relationshipId = resolvedRelationshipId;
 
-  if (!relationshipId) {
-    debugInfo.validationError = "relationship_not_resolved_for_invitation";
+  if (!resolvedRelationshipId) {
+    debugInfo.validationError = normalizedRelationshipId
+      ? "relationship_not_accessible_in_workbook_context"
+      : "relationship_not_resolved_for_invitation";
     debugInfo.finalResult = "missing_relationship";
     console.error("advisor proposal failed before save", debugInfo);
     return { ok: false, reason: "missing_relationship", debug: debugInfo };
   }
 
-  const existingRows = await listRelationshipAdvisorsForRelationship(relationshipId, supabase);
+  const existingRows = await listRelationshipAdvisorsForRelationship(resolvedRelationshipId, supabase);
   const existingRow =
     existingRows.find(
       (row) =>
@@ -1381,7 +1382,7 @@ export async function proposeFounderAlignmentAdvisor({
     : await supabase
         .from("relationship_advisors")
         .insert({
-          relationship_id: relationshipId,
+          relationship_id: resolvedRelationshipId,
           advisor_name: normalizedAdvisorName,
           advisor_email: normalizedEmail,
           status: founderRole === "founderA" || founderRole === "founderB" ? "pending" : "pending",
@@ -1424,9 +1425,11 @@ export async function proposeFounderAlignmentAdvisor({
 
 export async function approveFounderAlignmentAdvisorProposal({
   invitationId,
+  relationshipId,
   advisorEntryId,
 }: {
   invitationId: string;
+  relationshipId?: string | null;
   advisorEntryId: string;
 }): Promise<ApproveFounderAlignmentAdvisorProposalResult> {
   const normalizedInvitationId = invitationId.trim();
@@ -1460,8 +1463,10 @@ export async function approveFounderAlignmentAdvisorProposal({
     return { ok: false, reason: "forbidden" };
   }
 
-  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
-  if (!relationshipId) {
+  const resolvedRelationshipId =
+    normalizeRelationshipId(relationshipId) ??
+    (await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase));
+  if (!resolvedRelationshipId) {
     return { ok: false, reason: "missing_relationship" };
   }
 
@@ -1471,7 +1476,7 @@ export async function approveFounderAlignmentAdvisorProposal({
       "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("id", normalizedEntryId)
-    .eq("relationship_id", relationshipId)
+    .eq("relationship_id", resolvedRelationshipId)
     .maybeSingle();
 
   if (loadError) {
@@ -1528,6 +1533,7 @@ export async function approveFounderAlignmentAdvisorProposal({
 
 async function loadRelationshipAdvisorEntryForFounder(params: {
   invitationId: string;
+  relationshipId?: string | null;
   advisorEntryId: string;
   supabase: SupabaseServerClient;
   userId: string;
@@ -1571,7 +1577,9 @@ async function loadRelationshipAdvisorEntryForFounder(params: {
     return { ok: false, reason: "forbidden" };
   }
 
-  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, params.supabase);
+  const relationshipId =
+    normalizeRelationshipId(params.relationshipId) ??
+    (await resolveRelationshipIdForInvitation(normalizedInvitationId, params.supabase));
   if (!relationshipId) {
     return { ok: false, reason: "missing_relationship" };
   }
@@ -1651,10 +1659,12 @@ function mapRelationshipAdvisorEntryWithInvitation(params: {
 
 export async function sendFounderAlignmentAdvisorInvite({
   invitationId,
+  relationshipId,
   advisorEntryId,
   teamContext,
 }: {
   invitationId: string;
+  relationshipId?: string | null;
   advisorEntryId: string;
   teamContext: TeamContext;
 }): Promise<SendFounderAlignmentAdvisorInviteResult> {
@@ -1674,6 +1684,7 @@ export async function sendFounderAlignmentAdvisorInvite({
 
   const loaded = await loadRelationshipAdvisorEntryForFounder({
     invitationId: normalizedInvitationId,
+    relationshipId,
     advisorEntryId,
     supabase,
     userId: user.id,
@@ -1774,9 +1785,11 @@ export async function sendFounderAlignmentAdvisorInvite({
 
 export async function copyFounderAlignmentAdvisorInviteLink({
   invitationId,
+  relationshipId,
   advisorEntryId,
 }: {
   invitationId: string;
+  relationshipId?: string | null;
   advisorEntryId: string;
 }): Promise<CopyFounderAlignmentAdvisorInviteLinkResult> {
   const normalizedInvitationId = invitationId.trim();
@@ -1795,6 +1808,7 @@ export async function copyFounderAlignmentAdvisorInviteLink({
 
   const loaded = await loadRelationshipAdvisorEntryForFounder({
     invitationId: normalizedInvitationId,
+    relationshipId,
     advisorEntryId,
     supabase,
     userId: user.id,

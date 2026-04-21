@@ -43,6 +43,7 @@ export default async function WorkbookExistingTeamPreviewPage({
       </div>
       <FounderAlignmentWorkbookClient
         invitationId={null}
+        relationshipId={null}
         teamContext={preview.teamContext}
         founderAName={preview.founderAName}
         founderBName={preview.founderBName}
