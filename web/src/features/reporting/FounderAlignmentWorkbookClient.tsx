@@ -2950,6 +2950,33 @@ export function FounderAlignmentWorkbookClient({
     return entry.suggestedByLabel;
   }
 
+  function formatAdvisorProposalFailure(
+    result: Awaited<ReturnType<typeof proposeFounderAlignmentAdvisor>>
+  ) {
+    if (result.ok) {
+      return null;
+    }
+
+    if (result.reason === "invalid_email") {
+      return t("Bitte gib eine gültige Advisor-E-Mail-Adresse ein.");
+    }
+
+    const debugParts = [
+      `result=${result.debug.finalResult}`,
+      `invitationId=${result.debug.invitationId || "-"}`,
+      `relationshipId=${result.debug.relationshipId || "-"}`,
+      `userId=${result.debug.userId || "-"}`,
+      `role=${result.debug.founderRole}`,
+      `advisor_name=${result.debug.advisorName || "-"}`,
+      `advisor_email=${result.debug.advisorEmail || "-"}`,
+      result.debug.validationError ? `validation=${result.debug.validationError}` : null,
+      result.debug.dbError ? `db=${result.debug.dbError}` : null,
+      result.debug.repairResult ? `repair=${result.debug.repairResult}` : null,
+    ].filter(Boolean);
+
+    return `${t("Der Advisor-Vorschlag konnte nicht gespeichert werden.")} ${debugParts.join(" | ")}`;
+  }
+
   function handleProposeAdvisor() {
     if (!invitationId || (currentUserRole !== "founderA" && currentUserRole !== "founderB")) {
       return;
@@ -2964,11 +2991,7 @@ export function FounderAlignmentWorkbookClient({
 
       if (!result.ok) {
         setAdvisorInviteLink(null);
-        setAdvisorInviteMessage(
-          result.reason === "invalid_email"
-            ? t("Bitte gib eine gültige Advisor-E-Mail-Adresse ein.")
-            : t("Der Advisor-Vorschlag konnte gerade nicht gespeichert werden.")
-        );
+        setAdvisorInviteMessage(formatAdvisorProposalFailure(result));
         return;
       }
 

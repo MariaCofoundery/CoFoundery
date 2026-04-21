@@ -27,6 +27,7 @@ import {
   syncRelationshipAdvisorFromLegacyInvitation,
   type RelationshipAdvisorRow,
 } from "@/features/reporting/relationshipAdvisorAccess";
+import { finalizeInvitationIfReady } from "@/features/reporting/actions";
 import { trackServerResearchEvent } from "@/features/research/server";
 
 type SaveFounderAlignmentWorkbookInput = {
@@ -98,6 +99,20 @@ type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
 type SupabaseDbClient = SupabaseLikeClient & SupabaseClient;
 
+type AdvisorProposalDebugInfo = {
+  invitationId: string;
+  relationshipId: string | null;
+  userId: string | null;
+  founderRole: WorkbookViewerRole;
+  advisorName: string | null;
+  advisorEmail: string;
+  validationError: string | null;
+  dbError: string | null;
+  repairAttempted: boolean;
+  repairResult: string | null;
+  finalResult: string;
+};
+
 export type SaveFounderAlignmentWorkbookResult =
   | {
       ok: true;
@@ -147,6 +162,7 @@ export type ProposeFounderAlignmentAdvisorResult =
         | "missing_relationship"
         | "invalid_email"
         | "save_failed";
+      debug: AdvisorProposalDebugInfo;
     };
 
 export type ApproveFounderAlignmentAdvisorProposalResult =
@@ -260,6 +276,31 @@ function normalizeAdvisorEmail(value: string | null | undefined) {
 function normalizeAdvisorName(value: string | null | undefined) {
   const normalized = (value ?? "").trim().slice(0, 120);
   return normalized.length > 0 ? normalized : null;
+}
+
+function formatSupabaseError(
+  error:
+    | {
+        code?: string | null;
+        message?: string | null;
+        details?: string | null;
+        hint?: string | null;
+      }
+    | null
+    | undefined
+) {
+  if (!error) {
+    return null;
+  }
+
+  return [
+    error.code?.trim(),
+    error.message?.trim(),
+    error.details?.trim(),
+    error.hint?.trim(),
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" | ");
 }
 
 function advisorSuggestedByRole(
@@ -1211,13 +1252,45 @@ export async function proposeFounderAlignmentAdvisor({
   advisorEmail: string;
 }): Promise<ProposeFounderAlignmentAdvisorResult> {
   const normalizedInvitationId = invitationId.trim();
+  const normalizedAdvisorName = normalizeAdvisorName(advisorName);
   if (!normalizedInvitationId) {
-    return { ok: false, reason: "missing_invitation" };
+    return {
+      ok: false,
+      reason: "missing_invitation",
+      debug: {
+        invitationId: normalizedInvitationId,
+        relationshipId: null,
+        userId: null,
+        founderRole: "unknown",
+        advisorName: normalizedAdvisorName,
+        advisorEmail: normalizeAdvisorEmail(advisorEmail),
+        validationError: "invitationId_missing",
+        dbError: null,
+        repairAttempted: false,
+        repairResult: null,
+        finalResult: "missing_invitation",
+      },
+    };
   }
 
   const normalizedEmail = normalizeAdvisorEmail(advisorEmail);
+  const debugInfo: AdvisorProposalDebugInfo = {
+    invitationId: normalizedInvitationId,
+    relationshipId: null,
+    userId: null,
+    founderRole: "unknown",
+    advisorName: normalizedAdvisorName,
+    advisorEmail: normalizedEmail,
+    validationError: null,
+    dbError: null,
+    repairAttempted: false,
+    repairResult: null,
+    finalResult: "started",
+  };
   if (!normalizedEmail || !normalizedEmail.includes("@")) {
-    return { ok: false, reason: "invalid_email" };
+    debugInfo.validationError = "advisor_email_invalid";
+    debugInfo.finalResult = "invalid_email";
+    return { ok: false, reason: "invalid_email", debug: debugInfo };
   }
 
   const supabase = await createClient();
@@ -1226,12 +1299,17 @@ export async function proposeFounderAlignmentAdvisor({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { ok: false, reason: "not_authenticated" };
+    debugInfo.validationError = "user_not_authenticated";
+    debugInfo.finalResult = "not_authenticated";
+    return { ok: false, reason: "not_authenticated", debug: debugInfo };
   }
+  debugInfo.userId = user.id;
 
   const invitation = await loadInvitationAccessRow(normalizedInvitationId, supabase);
   if (!invitation) {
-    return { ok: false, reason: "forbidden" };
+    debugInfo.validationError = "invitation_not_accessible";
+    debugInfo.finalResult = "forbidden";
+    return { ok: false, reason: "forbidden", debug: debugInfo };
   }
 
   const founderRole =
@@ -1240,14 +1318,31 @@ export async function proposeFounderAlignmentAdvisor({
       : invitation.invitee_user_id === user.id
         ? "founderB"
         : "unknown";
+  debugInfo.founderRole = founderRole;
 
   if (founderRole === "unknown") {
-    return { ok: false, reason: "forbidden" };
+    debugInfo.validationError = "user_not_founder_a_or_b";
+    debugInfo.finalResult = "forbidden";
+    return { ok: false, reason: "forbidden", debug: debugInfo };
   }
 
-  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
+  let relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
+  debugInfo.relationshipId = relationshipId;
   if (!relationshipId) {
-    return { ok: false, reason: "missing_relationship" };
+    debugInfo.repairAttempted = true;
+    const repairResult = await finalizeInvitationIfReady(normalizedInvitationId);
+    debugInfo.repairResult = repairResult.ok
+      ? `report_run_ready:${repairResult.reportRunId}`
+      : `${repairResult.reason}${repairResult.detail ? `:${repairResult.detail}` : ""}`;
+    relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase);
+    debugInfo.relationshipId = relationshipId;
+  }
+
+  if (!relationshipId) {
+    debugInfo.validationError = "relationship_not_resolved_for_invitation";
+    debugInfo.finalResult = "missing_relationship";
+    console.error("advisor proposal failed before save", debugInfo);
+    return { ok: false, reason: "missing_relationship", debug: debugInfo };
   }
 
   const existingRows = await listRelationshipAdvisorsForRelationship(relationshipId, supabase);
@@ -1266,7 +1361,7 @@ export async function proposeFounderAlignmentAdvisor({
     ? await supabase
         .from("relationship_advisors")
         .update({
-          advisor_name: normalizeAdvisorName(advisorName) ?? existingRow.advisor_name ?? null,
+          advisor_name: normalizedAdvisorName ?? existingRow.advisor_name ?? null,
           advisor_email: normalizedEmail,
           founder_a_approved: nextFounderAApproved,
           founder_b_approved: nextFounderBApproved,
@@ -1287,7 +1382,7 @@ export async function proposeFounderAlignmentAdvisor({
         .from("relationship_advisors")
         .insert({
           relationship_id: relationshipId,
-          advisor_name: normalizeAdvisorName(advisorName),
+          advisor_name: normalizedAdvisorName,
           advisor_email: normalizedEmail,
           status: founderRole === "founderA" || founderRole === "founderB" ? "pending" : "pending",
           founder_a_approved: founderRole === "founderA",
@@ -1301,7 +1396,13 @@ export async function proposeFounderAlignmentAdvisor({
         .single();
 
   if (error || !persisted) {
-    return { ok: false, reason: "save_failed" };
+    debugInfo.dbError = formatSupabaseError(error);
+    debugInfo.finalResult = "save_failed";
+    console.error("advisor proposal persistence failed", {
+      ...debugInfo,
+      existingAdvisorEntryId: existingRow?.id ?? null,
+    });
+    return { ok: false, reason: "save_failed", debug: debugInfo };
   }
 
   const row = persisted as RelationshipAdvisorRow;

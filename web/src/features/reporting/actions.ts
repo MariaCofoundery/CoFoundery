@@ -762,6 +762,52 @@ function buildLatestSubmittedSnapshot(
   };
 }
 
+function buildEnsureReportRunCompletionSnapshot(params: {
+  inviterBase: ReturnType<typeof resolveEffectiveSubmittedAssessmentForModule>;
+  inviterValues: ReturnType<typeof resolveEffectiveSubmittedAssessmentForModule>;
+  inviteeBase: ReturnType<typeof resolveEffectiveSubmittedAssessmentForModule>;
+  inviteeValues: ReturnType<typeof resolveEffectiveSubmittedAssessmentForModule>;
+}) {
+  return {
+    inviter: {
+      base: Boolean(params.inviterBase),
+      values: Boolean(params.inviterValues),
+    },
+    invitee: {
+      base: Boolean(params.inviteeBase),
+      values: Boolean(params.inviteeValues),
+    },
+  };
+}
+
+function logEnsureReportRunSnapshot(params: {
+  sourceTag: string;
+  invitationId: string;
+  userId: string | null;
+  relationshipId: string | null;
+  requiredModules: AssessmentModule[];
+  matchingBindings: {
+    inviter: { base: string | null; values: string | null };
+    invitee: { base: string | null; values: string | null };
+  };
+  latestSubmitted: {
+    inviter: { base: string | null; values: string | null };
+    invitee: { base: string | null; values: string | null };
+  };
+  completionStatus: {
+    inviter: { base: boolean; values: boolean };
+    invitee: { base: boolean; values: boolean };
+  };
+  reportRunId: string | null;
+  reportRunRenderable: boolean;
+  finalizeResult: string | null;
+  finalStatus: "ready" | "not_ready" | "missing_report" | "failed_finalization";
+  detail?: string | null;
+}) {
+  const logger = params.finalStatus === "ready" ? console.info : console.error;
+  logger("ensureReportRunForInvitation state", params);
+}
+
 function buildBindingDivergence(
   userLabel: "inviter" | "invitee",
   boundByModule: Map<AssessmentModule, InvitationMatchingBinding> | undefined,
@@ -1894,10 +1940,6 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     inviteeLatestSubmittedByModule,
     "base"
   );
-  if (!inviterBase || !inviteeBase) {
-    return { ok: false, reason: "waiting_for_answers" };
-  }
-
   const inviterValues = requiredModules.includes("values")
     ? resolveEffectiveSubmittedAssessmentForModule(
         inviterBindings,
@@ -1912,10 +1954,57 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
         "values"
       )
     : null;
+  const matchingBindingsSnapshot = {
+    inviter: buildMatchingInputSnapshot(inviterBindings),
+    invitee: buildMatchingInputSnapshot(inviteeBindings),
+  };
+  const latestSubmittedSnapshot = {
+    inviter: buildLatestSubmittedSnapshot(inviterLatestSubmittedByModule),
+    invitee: buildLatestSubmittedSnapshot(inviteeLatestSubmittedByModule),
+  };
+  const completionStatus = buildEnsureReportRunCompletionSnapshot({
+    inviterBase,
+    inviterValues,
+    inviteeBase,
+    inviteeValues,
+  });
   if (
     requiredModules.includes("values") &&
     (!inviterValues || !inviteeValues)
   ) {
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: existingReportRunId,
+      reportRunRenderable: existingReportRunRenderable,
+      finalizeResult: "waiting_for_answers",
+      finalStatus: "not_ready",
+      detail: "values_missing_for_at_least_one_founder",
+    });
+    return { ok: false, reason: "waiting_for_answers" };
+  }
+  if (!inviterBase || !inviteeBase) {
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: existingReportRunId,
+      reportRunRenderable: existingReportRunRenderable,
+      finalizeResult: "waiting_for_answers",
+      finalStatus: "not_ready",
+      detail: "base_missing_for_at_least_one_founder",
+    });
     return { ok: false, reason: "waiting_for_answers" };
   }
 
@@ -2155,6 +2244,21 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
 
     const repairedId = parseAcceptableReportRunId(repairedRow as { id?: string } | null);
     if (repairedId) {
+      logEnsureReportRunSnapshot({
+        sourceTag,
+        invitationId: normalizedInvitationId,
+        userId: requesterUserId,
+        relationshipId: existingReportRunRow?.relationship_id ?? null,
+        requiredModules,
+        matchingBindings: matchingBindingsSnapshot,
+        latestSubmitted: latestSubmittedSnapshot,
+        completionStatus,
+        reportRunId: repairedId,
+        reportRunRenderable: true,
+        finalizeResult: "repaired_existing_report_run",
+        finalStatus: "ready",
+        detail: null,
+      });
       return { ok: true, reportRunId: repairedId };
     }
   }
@@ -2179,8 +2283,38 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
       .maybeSingle();
     const fallbackId = parseAcceptableReportRunId(existingAfterError as { id?: string } | null);
     if (fallbackId) {
+      logEnsureReportRunSnapshot({
+        sourceTag,
+        invitationId: normalizedInvitationId,
+        userId: requesterUserId,
+        relationshipId: existingReportRunRow?.relationship_id ?? null,
+        requiredModules,
+        matchingBindings: matchingBindingsSnapshot,
+        latestSubmitted: latestSubmittedSnapshot,
+        completionStatus,
+        reportRunId: fallbackId,
+        reportRunRenderable: false,
+        finalizeResult: `rpc_error_fallback:${finalizeError.message}`,
+        finalStatus: "ready",
+        detail: finalizeError.message,
+      });
       return { ok: true, reportRunId: fallbackId };
     }
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: null,
+      reportRunRenderable: false,
+      finalizeResult: `rpc_error:${finalizeError.message}`,
+      finalStatus: "failed_finalization",
+      detail: finalizeError.message,
+    });
     return { ok: false, reason: "insert_failed", detail: finalizeError.message };
   }
 
@@ -2189,9 +2323,39 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     console.error("ensureReportRunForInvitation finalize rpc returned empty payload", {
       invitationId: normalizedInvitationId,
     });
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: null,
+      reportRunRenderable: false,
+      finalizeResult: "finalize_rpc_empty",
+      finalStatus: "failed_finalization",
+      detail: "finalize_rpc_empty",
+    });
     return { ok: false, reason: "insert_failed", detail: "finalize_rpc_empty" };
   }
   if (!finalized.ready) {
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: finalized.relationship_id ?? existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: finalized.report_run_id ?? null,
+      reportRunRenderable: false,
+      finalizeResult: finalized.reason,
+      finalStatus: "not_ready",
+      detail: finalized.reason,
+    });
     return {
       ok: false,
       reason: mapFinalizeReasonToEnsureReason(finalized.reason),
@@ -2203,6 +2367,21 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     id: finalized.report_run_id ?? undefined,
   });
   if (finalizedId) {
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: finalized.relationship_id ?? existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId: finalizedId,
+      reportRunRenderable: true,
+      finalizeResult: "rpc_ready",
+      finalStatus: "ready",
+      detail: null,
+    });
     return { ok: true, reportRunId: finalizedId };
   }
 
@@ -2213,11 +2392,41 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     .maybeSingle();
   const reportRunId = parseAcceptableReportRunId(existingAfterFinalize as { id?: string } | null);
   if (reportRunId) {
+    logEnsureReportRunSnapshot({
+      sourceTag,
+      invitationId: normalizedInvitationId,
+      userId: requesterUserId,
+      relationshipId: finalized.relationship_id ?? existingReportRunRow?.relationship_id ?? null,
+      requiredModules,
+      matchingBindings: matchingBindingsSnapshot,
+      latestSubmitted: latestSubmittedSnapshot,
+      completionStatus,
+      reportRunId,
+      reportRunRenderable: false,
+      finalizeResult: "rpc_ready_report_row_loaded_after_finalize",
+      finalStatus: "ready",
+      detail: null,
+    });
     return { ok: true, reportRunId };
   }
 
   console.error("ensureReportRunForInvitation report run missing after finalize", {
     invitationId: normalizedInvitationId,
+  });
+  logEnsureReportRunSnapshot({
+    sourceTag,
+    invitationId: normalizedInvitationId,
+    userId: requesterUserId,
+    relationshipId: finalized.relationship_id ?? existingReportRunRow?.relationship_id ?? null,
+    requiredModules,
+    matchingBindings: matchingBindingsSnapshot,
+    latestSubmitted: latestSubmittedSnapshot,
+    completionStatus,
+    reportRunId: null,
+    reportRunRenderable: false,
+    finalizeResult: "rpc_ready_missing_report_row",
+    finalStatus: "missing_report",
+    detail: "report_run_not_found_after_finalize",
   });
   return { ok: false, reason: "insert_failed", detail: "report_run_not_found_after_finalize" };
 }
