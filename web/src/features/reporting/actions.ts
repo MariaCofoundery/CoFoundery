@@ -2222,16 +2222,16 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   };
 
   if (existingReportRunId && !existingReportRunRenderable) {
-    const { data: repairedRow, error: repairedError } = await privileged
-      .from("report_runs")
-      .update({
-        payload,
-        modules: ensureBaseModule(requiredModules),
-        input_assessment_ids: [...new Set(inputAssessmentIds)],
-      })
-      .eq("id", existingReportRunId)
-      .select("id")
-      .maybeSingle();
+    const repairedInputAssessmentIds = [...new Set(inputAssessmentIds)];
+    const { data: repairedRow, error: repairedError } = await privileged.rpc(
+      "repair_report_run_payload",
+      {
+        p_report_run_id: existingReportRunId,
+        p_payload: payload,
+        p_modules: ensureBaseModule(requiredModules),
+        p_input_assessment_ids: repairedInputAssessmentIds,
+      }
+    );
 
     if (repairedError) {
       console.error("ensureReportRunForInvitation repair update failed", {
@@ -2242,7 +2242,10 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
       return { ok: false, reason: "insert_failed", detail: repairedError.message };
     }
 
-    const repairedId = parseAcceptableReportRunId(repairedRow as { id?: string } | null);
+    const repairedId =
+      typeof repairedRow === "string"
+        ? repairedRow
+        : parseAcceptableReportRunId(repairedRow as { id?: string } | null);
     if (repairedId) {
       logEnsureReportRunSnapshot({
         sourceTag,
