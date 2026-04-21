@@ -270,6 +270,28 @@ export default async function DashboardPage({
           invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
         )
       : null);
+  const contextualInvitationId = params.invitationId?.trim() || null;
+  const contextualInvitation = contextualInvitationId
+    ? invitationById.get(contextualInvitationId) ?? null
+    : null;
+  const contextualWorkbook = contextualInvitation
+    ? workbookRows.find((row) => row.invitationId === contextualInvitation.id) ?? null
+    : null;
+  const contextualMatchingHref = contextualInvitation
+    ? contextualInvitation.isReportReady
+      ? `/report/${encodeURIComponent(contextualInvitation.id)}`
+      : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+    : null;
+  const contextualWorkbookHref = contextualInvitation
+    ? contextualWorkbook?.href ??
+      buildWorkbookIntroHref(contextualInvitation.id, contextualInvitation.teamContext)
+    : null;
+  const contextualBaseHref = contextualInvitation
+    ? `/me/base?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+    : "/me/base";
+  const contextualValuesHref = contextualInvitation
+    ? `/me/values?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+    : "/me/values";
   const currentStep: "basis" | "values" | "matching" | "workbook" = !hasSubmittedBase
     ? "basis"
     : !hasSubmittedValues && !hasMatchingActivity && workbookPhase === "upcoming"
@@ -281,14 +303,14 @@ export default async function DashboardPage({
 
   const heroPrimaryAction = !hasSubmittedBase
     ? {
-        href: "/me/base",
+        href: contextualBaseHref,
         label: "Profil starten",
         title: "Starte dein Profil.",
         text: "Das ist der erste Schritt.",
       }
     : !hasSubmittedValues && !hasMatchingActivity
       ? {
-          href: "/me/values",
+          href: contextualValuesHref,
           label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
           title:
             valuesStatus === "in_progress"
@@ -440,23 +462,6 @@ export default async function DashboardPage({
     modules: run.modules ?? [],
     createdAt: run.created_at,
   }));
-  const contextualInvitationId = params.invitationId?.trim() || null;
-  const contextualInvitation = contextualInvitationId
-    ? invitationById.get(contextualInvitationId) ?? null
-    : null;
-  const contextualWorkbook = contextualInvitation
-    ? workbookRows.find((row) => row.invitationId === contextualInvitation.id) ?? null
-    : null;
-  const contextualMatchingHref = contextualInvitation
-    ? contextualInvitation.isReportReady
-      ? `/report/${encodeURIComponent(contextualInvitation.id)}`
-      : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
-    : null;
-  const contextualWorkbookHref = contextualInvitation
-    ? contextualWorkbook?.href ??
-      buildWorkbookIntroHref(contextualInvitation.id, contextualInvitation.teamContext)
-    : null;
-
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 md:px-10 xl:px-12">
       {contextualInvitation ? (
