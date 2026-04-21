@@ -1060,9 +1060,7 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
 
 function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   const action = buildIncomingInvitationAction(invite);
-  const helperText = invite.status === "accepted"
-    ? null
-    : "Öffne zuerst den ursprünglichen Einladungslink, damit die Einladung angenommen und korrekt gestartet wird.";
+  const helperText = null;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -1098,7 +1096,7 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
     invite.inviteeBaseSubmitted && requiresValues && !invite.inviteeValuesSubmitted;
 
   return {
-    href: isAccepted ? resumeHref : dashboardHref,
+    href: resumeHref,
     label: invite.isReportReady
       ? "Öffnen"
       : canOpenCompletionStatus
@@ -1111,7 +1109,7 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
             : needsValuesQuestionnaire
               ? "Werte-Modul öffnen"
               : "Status öffnen"
-          : "Einladung prüfen",
+          : "Matching starten",
     className: invite.isReportReady
       ? REPORT_CTA_CLASS
       : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",
