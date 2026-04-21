@@ -127,11 +127,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         getProfileBasicsRow(supabase, user.id).catch(() => null),
         (async () => {
           const invitationRows = await getInvitationDashboardRows().catch(() => []);
-          const reportRunsResult = await supabase
-            .from("report_runs")
-            .select("invitation_id, created_at")
-            .order("created_at", { ascending: false })
-            .limit(20);
+          const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
+          const relevantInvitationIds = [...invitationById.keys()];
+
+          const reportRunsResult =
+            relevantInvitationIds.length > 0
+              ? await supabase
+                  .from("report_runs")
+                  .select("invitation_id, created_at")
+                  .in("invitation_id", relevantInvitationIds)
+                  .order("created_at", { ascending: false })
+                  .limit(20)
+              : { data: [] as ReportRunRow[], error: null };
 
           if (reportRunsResult.error) {
             return {
@@ -143,21 +150,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }
 
           const reportRuns = (reportRunsResult.data ?? []) as ReportRunRow[];
-          const latestReport = reportRuns[0] ?? null;
-          const matchingHref = latestReport
-            ? `/report/${encodeURIComponent(latestReport.invitation_id)}`
-            : "/dashboard#dashboard-block-active";
-          const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
-          const relevantInvitationIds = [
-            ...new Set([
-              ...invitationRows.map((invitation) => invitation.id),
-              ...reportRuns.map((run) => run.invitation_id),
-            ]),
-          ];
 
           if (relevantInvitationIds.length === 0) {
             return {
-              matchingHref,
+              matchingHref: "/dashboard#dashboard-block-active",
               workbookHref: "/dashboard",
               matchingItems: [],
               workbookItems: [],
@@ -188,7 +184,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           if (workbookResult.error) {
             return {
-              matchingHref,
+              matchingHref: "/dashboard#dashboard-block-active",
               workbookHref: "/dashboard",
               matchingItems: [],
               workbookItems: [],
@@ -313,6 +309,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               void _ignoredSortDate;
               return navigationItem satisfies ProductNavigationContextItem;
             });
+
+          const latestReport = reportRuns[0] ?? null;
+          const matchingHref =
+            matchingItems[0]?.href ??
+            (latestReport
+              ? `/report/${encodeURIComponent(latestReport.invitation_id)}`
+              : "/dashboard#dashboard-block-active");
 
           const latestActiveWorkbook = workbookRows.find((row) => row.hasStarted) ?? null;
           if (latestActiveWorkbook) {

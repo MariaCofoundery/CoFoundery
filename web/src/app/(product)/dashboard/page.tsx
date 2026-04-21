@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
@@ -439,9 +440,33 @@ export default async function DashboardPage({
     modules: run.modules ?? [],
     createdAt: run.created_at,
   }));
+  const contextualInvitationId = params.invitationId?.trim() || null;
+  const contextualInvitation = contextualInvitationId
+    ? invitationById.get(contextualInvitationId) ?? null
+    : null;
+  const contextualWorkbook = contextualInvitation
+    ? workbookRows.find((row) => row.invitationId === contextualInvitation.id) ?? null
+    : null;
+  const contextualMatchingHref = contextualInvitation
+    ? contextualInvitation.isReportReady
+      ? `/report/${encodeURIComponent(contextualInvitation.id)}`
+      : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+    : null;
+  const contextualWorkbookHref = contextualInvitation
+    ? contextualWorkbook?.href ??
+      buildWorkbookIntroHref(contextualInvitation.id, contextualInvitation.teamContext)
+    : null;
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 md:px-10 xl:px-12">
+      {contextualInvitation ? (
+        <ProductNavigationOverride
+          matchingHref={contextualMatchingHref}
+          workbookHref={contextualWorkbookHref}
+          activeView="founder"
+          contextLabel="Founder-Kontext"
+        />
+      ) : null}
       <DashboardJourneyLine />
 
       <section data-dashboard-hero className="relative isolate mb-10 lg:mb-12">

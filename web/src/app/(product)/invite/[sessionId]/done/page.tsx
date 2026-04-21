@@ -77,6 +77,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   const dashboardHref = buildInvitationDashboardHref(invitationId);
   const matchingReportHref = `/report/${encodeURIComponent(invitationId)}`;
   const individualReportHref = "/me/report";
+  const valuesModuleHref = buildQuestionnaireHref(invitationId, "values");
   const decision = await getInvitationJoinDecision(invitationId);
   const useExistingChoice = query.useExisting === "1";
 
@@ -96,6 +97,10 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
 
     if (target === "individual") {
       redirect(individualReportHref);
+    }
+
+    if (target === "values") {
+      redirect(valuesModuleHref);
     }
 
     if (target === "dashboard") {
@@ -123,6 +128,97 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     );
   }
 
+  const showValuesNextStep =
+    decision.required_modules.includes("values") && !decision.invitee_status.has_values_submitted;
+
+  function renderReadyActions() {
+    if (showValuesNextStep) {
+      return (
+        <div className="mt-6 flex flex-wrap gap-3">
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="matching" />
+            <button type="submit" className={completionButtonClass("primary")}>
+              Matching-Report ansehen
+            </button>
+          </form>
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="values" />
+            <button type="submit" className={completionButtonClass("secondary")}>
+              Weiter zum Werte-Modul
+            </button>
+          </form>
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="dashboard" />
+            <button type="submit" className={completionButtonClass("ghost")}>
+              Zurück zum Dashboard
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-6 flex flex-wrap gap-3">
+        <form action={navigateWithEnsuredMatchingReport}>
+          <input type="hidden" name="target" value="matching" />
+          <button type="submit" className={completionButtonClass("primary")}>
+            Matching-Report ansehen
+          </button>
+        </form>
+        <form action={navigateWithEnsuredMatchingReport}>
+          <input type="hidden" name="target" value="individual" />
+          <button type="submit" className={completionButtonClass("secondary")}>
+            Individuellen Report ansehen
+          </button>
+        </form>
+        <form action={navigateWithEnsuredMatchingReport}>
+          <input type="hidden" name="target" value="dashboard" />
+          <button type="submit" className={completionButtonClass("ghost")}>
+            Zurück zum Dashboard
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  function renderWaitingActions() {
+    if (showValuesNextStep) {
+      return (
+        <div className="mt-6 flex flex-wrap gap-3">
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="values" />
+            <button type="submit" className={completionButtonClass("primary")}>
+              Weiter zum Werte-Modul
+            </button>
+          </form>
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="dashboard" />
+            <button type="submit" className={completionButtonClass("secondary")}>
+              Zurück zum Dashboard
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-6 flex flex-wrap gap-3">
+        <form action={navigateWithEnsuredMatchingReport}>
+          <input type="hidden" name="target" value="individual" />
+          <button type="submit" className={completionButtonClass("primary")}>
+            Individuellen Report ansehen
+          </button>
+        </form>
+        <form action={navigateWithEnsuredMatchingReport}>
+          <input type="hidden" name="target" value="dashboard" />
+          <button type="submit" className={completionButtonClass("secondary")}>
+            Zurück zum Dashboard
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   if (decision.mode === "needs_questionnaires") {
     const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
     redirect(buildQuestionnaireHref(invitationId, nextModule));
@@ -142,28 +238,11 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           />
           <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
-            Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt.
+            {showValuesNextStep
+              ? "Euer Matching-Report auf Basis der Basisprofile ist bereit. Wenn du jetzt weitermachst, ergänzt du ihn noch um das Werte-Modul."
+              : "Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt."}
           </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="matching" />
-              <button type="submit" className={completionButtonClass("primary")}>
-                Matching-Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="individual" />
-              <button type="submit" className={completionButtonClass("secondary")}>
-                Individuellen Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="dashboard" />
-              <button type="submit" className={completionButtonClass("ghost")}>
-                Zurück zum Dashboard
-              </button>
-            </form>
-          </div>
+          {renderReadyActions()}
           {!ensuredReportResult.ok ? (
             <p className="mt-4 text-xs text-slate-500">
               Der Matching-Report wurde beim Laden erneut angestoßen ({ensuredReportResult.reason}).
@@ -275,28 +354,11 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           />
           <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
-            Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar.
+            {showValuesNextStep
+              ? "Euer Matching-Report ist jetzt verfügbar. Wenn du als Nächstes das Werte-Modul ergänzt, wird der nächste Report-Stand noch aussagekräftiger."
+              : "Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar."}
           </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="matching" />
-              <button type="submit" className={completionButtonClass("primary")}>
-                Matching-Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="individual" />
-              <button type="submit" className={completionButtonClass("secondary")}>
-                Individuellen Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="dashboard" />
-              <button type="submit" className={completionButtonClass("ghost")}>
-                Zurück zum Dashboard
-              </button>
-            </form>
-          </div>
+          {renderReadyActions()}
       </CompletionShell>
     );
   }
@@ -313,28 +375,11 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             properties={{ state: "waiting_for_answers" }}
           />
           <div className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-700">
-            Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht.
+            {showValuesNextStep
+              ? "Dein Basisprofil ist gespeichert. Sobald die andere Person ebenfalls mit dem Basisprofil fertig ist, wird euer Matching-Report sichtbar. Du kannst bis dahin direkt mit dem Werte-Modul weitermachen."
+              : "Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht."}
           </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="matching" />
-              <button type="submit" className={completionButtonClass("primary")}>
-                Matching-Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="individual" />
-              <button type="submit" className={completionButtonClass("secondary")}>
-                Individuellen Report ansehen
-              </button>
-            </form>
-            <form action={navigateWithEnsuredMatchingReport}>
-              <input type="hidden" name="target" value="dashboard" />
-              <button type="submit" className={completionButtonClass("ghost")}>
-                Zurück zum Dashboard
-              </button>
-            </form>
-          </div>
+          {renderWaitingActions()}
       </CompletionShell>
     );
   }
@@ -349,26 +394,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           invitationId={invitationId}
           properties={{ state: "error", reason: ensuredReportResult.reason }}
         />
-        <div className="mt-6 flex flex-wrap gap-3">
-          <form action={navigateWithEnsuredMatchingReport}>
-            <input type="hidden" name="target" value="matching" />
-            <button type="submit" className={completionButtonClass("primary")}>
-              Matching-Report ansehen
-            </button>
-          </form>
-          <form action={navigateWithEnsuredMatchingReport}>
-            <input type="hidden" name="target" value="individual" />
-            <button type="submit" className={completionButtonClass("secondary")}>
-              Individuellen Report ansehen
-            </button>
-          </form>
-          <form action={navigateWithEnsuredMatchingReport}>
-            <input type="hidden" name="target" value="dashboard" />
-            <button type="submit" className={completionButtonClass("ghost")}>
-              Zurück zum Dashboard
-            </button>
-          </form>
-        </div>
+        {renderWaitingActions()}
     </CompletionShell>
   );
 }
