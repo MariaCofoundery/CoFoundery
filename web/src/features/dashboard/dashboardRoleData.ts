@@ -417,9 +417,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         .at(-1) ?? null;
 
       const reportReady =
-        hasRenderableAdvisorReportPayload(reportRun?.payload) ||
-        Boolean(reportRun) ||
-        hasBothBaseSubmissions;
+        hasRenderableAdvisorReportPayload(reportRun?.payload) || hasBothBaseSubmissions;
 
       return {
         invitationId: invitation.id,
@@ -432,7 +430,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         teamContext,
         ...accessState,
         statusLabel: deriveAdvisorStatusLabel({
-          hasReport: Boolean(reportRun),
+          hasReport: reportReady,
           hasWorkbook: Boolean(workbook),
           hasAdvisorClosing,
           hasFounderReaction,
