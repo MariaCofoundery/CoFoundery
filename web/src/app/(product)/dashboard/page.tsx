@@ -31,6 +31,7 @@ import {
   type InvitationDashboardRow,
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
+import { buildInvitationQuestionnaireHref } from "@/features/onboarding/invitationFlow";
 import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
@@ -1086,11 +1087,15 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
   const isAccepted = invite.status === "accepted";
-  const completeQuestionnaireHref = `/join/start?invitationId=${encodeURIComponent(invite.id)}`;
+  const baseQuestionnaireHref = buildInvitationQuestionnaireHref(invite.id, "base");
+  const valuesQuestionnaireHref = buildInvitationQuestionnaireHref(invite.id, "values");
   const completionStatusHref = `/invite/${encodeURIComponent(invite.id)}/done`;
   const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
   const reportHref = `/report/${invite.id}`;
   const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
+  const needsBaseQuestionnaire = !invite.inviteeBaseSubmitted;
+  const needsValuesQuestionnaire =
+    invite.inviteeBaseSubmitted && requiresValues && !invite.inviteeValuesSubmitted;
 
   return {
     href: invite.isReportReady
@@ -1098,14 +1103,24 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
       : canOpenCompletionStatus
         ? completionStatusHref
         : isAccepted
-          ? completeQuestionnaireHref
+          ? needsBaseQuestionnaire
+            ? baseQuestionnaireHref
+            : needsValuesQuestionnaire
+              ? valuesQuestionnaireHref
+              : completionStatusHref
           : dashboardHref,
     label: invite.isReportReady
       ? "Öffnen"
       : canOpenCompletionStatus
         ? "Status öffnen"
         : isAccepted
-          ? "Jetzt ausfüllen"
+          ? needsBaseQuestionnaire
+            ? invite.inviteeBaseStarted
+              ? "Jetzt fortsetzen"
+              : "Jetzt starten"
+            : needsValuesQuestionnaire
+              ? "Werte-Modul öffnen"
+              : "Status öffnen"
           : "Einladung prüfen",
     className: invite.isReportReady
       ? REPORT_CTA_CLASS
@@ -1117,6 +1132,8 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
 function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
   const action = buildIncomingInvitationAction(invite);
   const inviterName = resolveIncomingInviterName(invite);
+  const needsBaseStart = !invite.inviteeBaseSubmitted && !invite.inviteeBaseStarted;
+  const needsBaseContinue = !invite.inviteeBaseSubmitted && invite.inviteeBaseStarted;
 
   if (invite.isReportReady) {
     return {
@@ -1124,6 +1141,24 @@ function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
       label: "Matching-Report ansehen",
       title: "Euer Matching ist bereit.",
       text: `Der gemeinsame Report mit ${inviterName} ist jetzt verfügbar.`,
+    };
+  }
+
+  if (needsBaseStart) {
+    return {
+      href: action.href,
+      label: "Matching starten",
+      title: "Starte euer Matching mit dem Basisprofil.",
+      text: `Lege jetzt dein Basisprofil für das Matching mit ${inviterName} an.`,
+    };
+  }
+
+  if (needsBaseContinue) {
+    return {
+      href: action.href,
+      label: "Matching fortsetzen",
+      title: "Setze deinen Basis-Fragebogen fort.",
+      text: `Führe dein Basisprofil für das Matching mit ${inviterName} genau dort weiter, wo du aufgehört hast.`,
     };
   }
 

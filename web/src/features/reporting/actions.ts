@@ -240,8 +240,10 @@ export type InvitationDashboardRow = {
   requiredModules: AssessmentModule[];
   isReportReady: boolean;
   isReadyForMatching: boolean;
+  inviterBaseStarted: boolean;
   inviterBaseSubmitted: boolean;
   inviterValuesSubmitted: boolean;
+  inviteeBaseStarted: boolean;
   inviteeBaseSubmitted: boolean;
   inviteeValuesSubmitted: boolean;
   createdAt: string;
@@ -1089,6 +1091,12 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
         "base"
       )
     );
+    const inviterBaseStarted = Boolean(
+      inviterBoundByModule?.get("base") || inviterLatestSubmittedByModule?.get("base")
+    );
+    const inviteeBaseStarted = Boolean(
+      inviteeBoundByModule?.get("base") || inviteeLatestSubmittedByModule?.get("base")
+    );
     const inviterHasValues = Boolean(
       resolveEffectiveSubmittedAssessmentForModule(
         inviterBoundByModule,
@@ -1125,8 +1133,10 @@ export async function getInvitationDashboardRows(): Promise<InvitationDashboardR
       requiredModules,
       isReportReady: reportRunExists,
       isReadyForMatching,
+      inviterBaseStarted,
       inviterBaseSubmitted: inviterHasBase,
       inviterValuesSubmitted: inviterHasValues,
+      inviteeBaseStarted,
       inviteeBaseSubmitted: inviteeHasBase,
       inviteeValuesSubmitted: inviteeHasValues,
       createdAt: invitation.created_at,
