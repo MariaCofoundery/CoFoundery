@@ -307,8 +307,6 @@ export default async function DashboardPage({
       : workbookPhase === "ready_to_start" || workbookPhase === "in_progress"
         ? "workbook"
         : "matching";
-  const valuesSkipped = !hasSubmittedValues && currentStep !== "values";
-
   const heroPrimaryAction = heroIncomingInvite
     ? buildHeroIncomingInvitationAction(heroIncomingInvite)
     : !hasSubmittedBase
@@ -369,6 +367,17 @@ export default async function DashboardPage({
           : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook.",
       }
     : heroPrimaryAction;
+  const heroValuesCta =
+    hasSubmittedBase && !hasSubmittedValues && heroCta.href !== contextualValuesHref
+      ? {
+          href: contextualValuesHref,
+          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
+          text:
+            valuesStatus === "in_progress"
+              ? "Führe dein Werteprofil zu Ende und schärfe eure Leitplanken weiter."
+              : "Ergänze jetzt das optionale Werteprofil für mehr Tiefe im Matching und Workbook.",
+        }
+      : null;
   const heroPanel = workbookFocusHref
     ? {
         href: heroCta.href,
@@ -389,8 +398,14 @@ export default async function DashboardPage({
     {
       id: "values",
       label: "Werteprofil",
-      state: hasSubmittedValues || valuesSkipped ? "done" : currentStep === "values" ? "active" : "upcoming",
-      detail: hasSubmittedValues ? "fertig" : valuesSkipped ? "optional" : valuesStatus === "in_progress" ? "in Arbeit" : "offen",
+      state: hasSubmittedValues ? "done" : currentStep === "values" ? "active" : "upcoming",
+      detail: hasSubmittedValues
+        ? "fertig"
+        : currentStep === "values"
+          ? valuesStatus === "in_progress"
+            ? "in Arbeit"
+            : "offen"
+          : "optional",
       description: "Optionaler Deep-Dive zu Werten, Leitplanken und roten Linien.",
     },
     {
@@ -536,13 +551,18 @@ export default async function DashboardPage({
                       {heroExpectationText}
                     </p>
                   ) : null}
-                  <div className="mt-5">
+                  <div className="mt-5 flex flex-wrap gap-3">
                     <Link
                       href={heroPanel.href}
                       className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
                     >
                       {heroPanel.label}
                     </Link>
+                    {heroValuesCta ? (
+                      <Link href={heroValuesCta.href} className={UTILITY_CTA_CLASS}>
+                        {heroValuesCta.label}
+                      </Link>
+                    ) : null}
                   </div>
 
                   <div className="mt-6">

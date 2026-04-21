@@ -29,7 +29,9 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       return;
     }
 
-    const redirectTo = new URL("/auth/callback", `${origin}/`);
+    // Complete OTP/PKCE-based magic-link logins in the browser callback so the
+    // Supabase client can use its local verifier/session context reliably.
+    const redirectTo = new URL("/auth/callback/client", `${origin}/`);
     redirectTo.searchParams.set("next", nextPath);
 
     const { error } = await supabase.auth.signInWithOtp({
