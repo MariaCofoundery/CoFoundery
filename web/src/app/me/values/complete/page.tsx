@@ -19,6 +19,22 @@ export default async function MeValuesCompletePage() {
     redirect("/me/values");
   }
 
+  const { data: latestAcceptedInvite } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("invitee_user_id", user.id)
+    .eq("status", "accepted")
+    .is("revoked_at", null)
+    .order("accepted_at", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const inviteCompletionId = (latestAcceptedInvite as { id?: string } | null)?.id?.trim() ?? "";
+  if (inviteCompletionId) {
+    redirect(`/invite/${encodeURIComponent(inviteCompletionId)}/done`);
+  }
+
   return (
     <QuestionnaireCompletionShell
       eyebrow="Werteprofil"
