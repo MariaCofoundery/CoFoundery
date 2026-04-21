@@ -15,6 +15,7 @@ import {
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { ValuesQuestionnaire } from "@/features/questionnaire/ValuesQuestionnaire";
 import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
+import { buildInvitationQuestionnaireHref, resolveActiveInvitationIdForCurrentUser } from "@/features/onboarding/invitationFlow";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type MeValuesSearchParams = {
@@ -38,9 +39,20 @@ export default async function MeValuesPage({
   }
 
   const params = await searchParams;
-  const invitationId = params.invitationId?.trim() || null;
+  const invitationIdFromParams = params.invitationId?.trim() || null;
+  const recoveredInvitationId = invitationIdFromParams
+    ? null
+    : await resolveActiveInvitationIdForCurrentUser();
+  const invitationId = invitationIdFromParams ?? recoveredInvitationId;
   const isRefreshFlow = params.flow === "refresh";
   let trackingTeamContext: "pre_founder" | "existing_team" | null = null;
+
+  if (!invitationIdFromParams && recoveredInvitationId) {
+    logInviteFlowDebug("me/values:recovered_invitation_context", {
+      recoveredInvitationId,
+      userId: user.id,
+    });
+  }
 
   let completeRedirect = "/me/values/complete";
   if (invitationId) {
@@ -92,6 +104,11 @@ export default async function MeValuesPage({
 
   const submittedBase = await getLatestSubmittedAssessment("base");
   if (!submittedBase) {
+    const baseHref = invitationId
+      ? buildInvitationQuestionnaireHref(invitationId, "base", {
+          flow: isRefreshFlow ? "refresh" : null,
+        })
+      : "/me/base";
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
@@ -100,7 +117,7 @@ export default async function MeValuesPage({
             Das Werte Add-on ist verfügbar, sobald dein Basis-Fragebogen eingereicht ist.
           </p>
           <a
-            href="/me/base"
+            href={baseHref}
             className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           >
             Basis-Fragebogen starten

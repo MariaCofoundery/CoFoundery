@@ -1,5 +1,6 @@
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
+import { createClient } from "@/lib/supabase/server";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
 
@@ -46,6 +47,34 @@ export function buildInvitationQuestionnaireHref(
 
 export function buildInvitationStartHref(invitationId: string) {
   return `/join/start?invitationId=${encodeURIComponent(invitationId)}`;
+}
+
+export async function resolveActiveInvitationIdForCurrentUser(): Promise<string | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return null;
+  }
+
+  const normalizedEmail = (user.email ?? "").trim().toLowerCase();
+  const inviteFilter = normalizedEmail
+    ? `invitee_user_id.eq.${user.id},invitee_email.eq.${normalizedEmail}`
+    : `invitee_user_id.eq.${user.id}`;
+  const { data } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("status", "accepted")
+    .is("revoked_at", null)
+    .or(inviteFilter)
+    .order("accepted_at", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return ((data as { id?: string } | null)?.id ?? "").trim() || null;
 }
 
 export async function resolveInvitationContinueTarget(

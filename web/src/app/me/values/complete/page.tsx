@@ -1,40 +1,16 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { getLatestSubmittedAssessment } from "@/features/assessments/actions";
+import { resolveActiveInvitationIdForCurrentUser } from "@/features/onboarding/invitationFlow";
 import { QuestionnaireCompletionShell } from "@/features/questionnaire/QuestionnaireCompletionShell";
 
 export default async function MeValuesCompletePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/me/values/complete");
-  }
-
   const submittedValues = await getLatestSubmittedAssessment("values");
 
   if (!submittedValues) {
     redirect("/me/values");
   }
 
-  const normalizedEmail = (user.email ?? "").trim().toLowerCase();
-  const inviteFilter = normalizedEmail
-    ? `invitee_user_id.eq.${user.id},invitee_email.eq.${normalizedEmail}`
-    : `invitee_user_id.eq.${user.id}`;
-  const { data: latestAcceptedInvite } = await supabase
-    .from("invitations")
-    .select("id")
-    .eq("status", "accepted")
-    .is("revoked_at", null)
-    .or(inviteFilter)
-    .order("accepted_at", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const inviteCompletionId = (latestAcceptedInvite as { id?: string } | null)?.id?.trim() ?? "";
+  const inviteCompletionId = (await resolveActiveInvitationIdForCurrentUser()) ?? "";
   if (inviteCompletionId) {
     redirect(`/invite/${encodeURIComponent(inviteCompletionId)}/done`);
   }

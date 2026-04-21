@@ -17,6 +17,7 @@ import {
   QuestionnaireClient,
   type QuestionnaireResponse,
 } from "@/features/questionnaire/QuestionnaireClient";
+import { resolveActiveInvitationIdForCurrentUser } from "@/features/onboarding/invitationFlow";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type MeBaseSearchParams = {
@@ -40,9 +41,20 @@ export default async function MeBasePage({
   }
 
   const params = await searchParams;
-  const invitationId = params.invitationId?.trim() || null;
+  const invitationIdFromParams = params.invitationId?.trim() || null;
+  const recoveredInvitationId = invitationIdFromParams
+    ? null
+    : await resolveActiveInvitationIdForCurrentUser();
+  const invitationId = invitationIdFromParams ?? recoveredInvitationId;
   const isRefreshFlow = params.flow === "refresh";
   let trackingTeamContext: "pre_founder" | "existing_team" | null = null;
+
+  if (!invitationIdFromParams && recoveredInvitationId) {
+    logInviteFlowDebug("me/base:recovered_invitation_context", {
+      recoveredInvitationId,
+      userId: user.id,
+    });
+  }
 
   let completeRedirect = "/me/base/complete";
   if (invitationId) {
