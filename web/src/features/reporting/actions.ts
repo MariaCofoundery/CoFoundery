@@ -2533,6 +2533,13 @@ function mapReportRunRow(row: ReportRunRow): ReportRunSnapshot {
   };
 }
 
+function pickPreferredReportRunRow(rows: ReportRunRow[]): ReportRunRow | null {
+  if (rows.length === 0) return null;
+
+  const renderableRow = rows.find((row) => hasRenderableReportRunPayload(toRecord(row.payload)));
+  return renderableRow ?? rows[0] ?? null;
+}
+
 async function loadReportRunByInvitationId(invitationId: string): Promise<ReportRunSnapshot | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -2540,14 +2547,14 @@ async function loadReportRunByInvitationId(invitationId: string): Promise<Report
     .select("id, invitation_id, relationship_id, modules, input_assessment_ids, payload, created_at")
     .eq("invitation_id", invitationId)
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(10);
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
     return null;
   }
 
-  return mapReportRunRow(data as ReportRunRow);
+  const row = pickPreferredReportRunRow(data as ReportRunRow[]);
+  return row ? mapReportRunRow(row) : null;
 }
 
 export async function getPrivilegedReportRunSnapshotForInvitation(
@@ -2568,14 +2575,14 @@ export async function getPrivilegedReportRunSnapshotForInvitation(
     .select("id, invitation_id, relationship_id, modules, input_assessment_ids, payload, created_at")
     .eq("invitation_id", normalized)
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(10);
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
     return null;
   }
 
-  return mapReportRunRow(data as ReportRunRow);
+  const row = pickPreferredReportRunRow(data as ReportRunRow[]);
+  return row ? mapReportRunRow(row) : null;
 }
 
 async function loadReportRunById(runId: string): Promise<ReportRunSnapshot | null> {
