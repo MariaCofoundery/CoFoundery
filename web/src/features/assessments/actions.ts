@@ -283,10 +283,19 @@ export async function submitAssessment(
           });
         }
       });
+
+      for (const invitationId of invitationIds) {
+        revalidatePath(`/invite/${invitationId}`);
+        revalidatePath(`/invite/${invitationId}/done`);
+        revalidatePath(`/invite/${invitationId}/basis-complete`);
+        revalidatePath(`/report/${invitationId}`);
+      }
     }
 
     revalidatePath("/dashboard");
     revalidatePath("/me/report");
+    revalidatePath("/me/base/complete");
+    revalidatePath("/me/values/complete");
     return { ok: true, submittedAt };
   } catch {
     return { ok: false, error: "not_allowed" };
