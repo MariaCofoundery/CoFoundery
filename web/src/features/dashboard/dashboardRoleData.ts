@@ -3,7 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { hasProfileRole, normalizeProfileRoles } from "@/features/profile/profileRoles";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
-import { listRelationshipAdvisorsForUser } from "@/features/reporting/relationshipAdvisorAccess";
+import {
+  listRelationshipAdvisorsForUser,
+  syncRelationshipAdvisorFromLegacyInvitation,
+} from "@/features/reporting/relationshipAdvisorAccess";
 
 export type DashboardRoleKey = "founder" | "advisor";
 
@@ -28,7 +31,7 @@ type RelationshipAdvisorAccessRow = {
   advisor_name: string | null;
   founder_a_approved: boolean;
   founder_b_approved: boolean;
-  status: "pending" | "approved" | "linked" | "revoked";
+  status: "pending" | "approved" | "invited" | "linked" | "revoked";
   approved_at: string | null;
   linked_at: string | null;
   revoked_at: string | null;
@@ -88,6 +91,7 @@ function createPrivilegedClient(): SupabaseLikeClient | null {
 
 export type AdvisorDashboardTeam = {
   invitationId: string;
+  relationshipId: string | null;
   founderAName: string;
   founderBName: string;
   founderAAvatarId: string | null;
@@ -107,6 +111,11 @@ export type AdvisorDashboardTeam = {
   reportHref: string;
   reportReady: boolean;
   snapshotHref: string;
+  advisorLinked: boolean;
+  workbookAvailable: boolean;
+  reportAvailable: boolean;
+  snapshotAvailable: boolean;
+  whyUnavailable: string | null;
 };
 
 function toRecord(value: unknown): Record<string, unknown> | null {
@@ -264,7 +273,7 @@ export async function getAdvisorDashboardProfile(userId: string): Promise<Adviso
 
 export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorDashboardTeam[]> {
   const supabase = await createClient();
-  const [relationshipAdvisorRows, legacyAdvisorAccessResult] = await Promise.all([
+  const [initialRelationshipAdvisorRows, legacyAdvisorAccessResult] = await Promise.all([
     listRelationshipAdvisorsForUser(userId, supabase),
     supabase
     .from("founder_alignment_workbook_advisors")
@@ -275,16 +284,40 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
   const advisorAccessRows = legacyAdvisorAccessResult.data ?? [];
   const advisorAccessError = legacyAdvisorAccessResult.error;
   if (
-    relationshipAdvisorRows.length === 0 &&
+    initialRelationshipAdvisorRows.length === 0 &&
     (advisorAccessError || !advisorAccessRows || advisorAccessRows.length === 0)
   ) {
     return [];
   }
 
   const advisorAccess = advisorAccessRows as AdvisorAccessRow[];
-  const legacyAdvisorAccessByInvitationId = new Map(
-    advisorAccess.map((row) => [row.invitation_id, row])
-  );
+  const privileged = createPrivilegedClient();
+  const syncedRelationshipRows = privileged
+    ? (
+        await Promise.all(
+          advisorAccess
+            .filter(
+              (row) =>
+                Boolean(row.claimed_at) &&
+                !initialRelationshipAdvisorRows.some(
+                  (relationshipRow) => relationshipRow.source_invitation_id === row.invitation_id
+                )
+            )
+            .map(async (row) => {
+              const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
+                row.invitation_id,
+                privileged
+              );
+              return syncResult.ok ? syncResult.row : null;
+            })
+        )
+      ).filter(
+        (row): row is NonNullable<(typeof initialRelationshipAdvisorRows)[number]> => Boolean(row)
+      )
+    : [];
+  const relationshipAdvisorRows = [...initialRelationshipAdvisorRows, ...syncedRelationshipRows];
+
+  const legacyAdvisorAccessByInvitationId = new Map(advisorAccess.map((row) => [row.invitation_id, row]));
   const relationshipAdvisorAccessByInvitationId = new Map(
     relationshipAdvisorRows
       .filter((row): row is typeof row & { source_invitation_id: string } => Boolean(row.source_invitation_id))
@@ -298,7 +331,6 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         .filter((value): value is string => Boolean(value)),
     ]),
   ];
-  const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
 
   const [invitationResult, workbookResult, reportRunResult] = await Promise.all([
@@ -384,7 +416,14 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         legacyAdvisorAccessByInvitationId.get(invitation.id) ??
         null;
       if (!accessRow) return null;
+      const legacyAccessRow = legacyAdvisorAccessByInvitationId.get(invitation.id) ?? null;
       const accessState = deriveAdvisorAccessState(accessRow);
+      const relationshipAccessRow =
+        relationshipAdvisorAccessByInvitationId.get(invitation.id) ?? null;
+      const advisorLinked = Boolean(
+        relationshipAccessRow?.status === "linked" || relationshipAccessRow?.linked_at
+      );
+      const workbookAvailable = accessState.canOpenWorkbook && Boolean(relationshipAccessRow);
       const workbookPayload = workbook
         ? sanitizeFounderAlignmentWorkbookPayload(workbook.payload)
         : null;
@@ -418,9 +457,25 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
 
       const reportReady =
         hasRenderableAdvisorReportPayload(reportRun?.payload) || hasBothBaseSubmissions;
+      const reportAvailable = workbookAvailable && reportReady;
+      const snapshotAvailable = workbookAvailable;
+      const whyUnavailable = workbookAvailable
+        ? reportAvailable
+          ? null
+          : "report_not_ready"
+        : relationshipAccessRow
+          ? accessState.accessStatus === "waiting_for_approval"
+            ? "awaiting_founder_approval"
+            : accessState.accessStatus === "paused"
+              ? "access_paused"
+              : "team_not_ready"
+          : legacyAccessRow
+            ? "relationship_access_not_synced"
+            : "team_not_linked";
 
       return {
         invitationId: invitation.id,
+        relationshipId: relationshipAccessRow?.relationship_id ?? null,
         founderAName,
         founderBName,
         founderAAvatarId: founderAProfile?.avatarId || null,
@@ -429,6 +484,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         founderBAvatarUrl: founderBProfile?.avatarUrl || null,
         teamContext,
         ...accessState,
+        canOpenWorkbook: workbookAvailable,
         statusLabel: deriveAdvisorStatusLabel({
           hasReport: reportReady,
           hasWorkbook: Boolean(workbook),
@@ -442,6 +498,11 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         reportHref: `/advisor/report?invitationId=${invitation.id}`,
         reportReady,
         snapshotHref: `/advisor/snapshot?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        advisorLinked,
+        workbookAvailable,
+        reportAvailable,
+        snapshotAvailable,
+        whyUnavailable,
         _lastActivityAt: lastActivitySource ?? "",
       };
     })

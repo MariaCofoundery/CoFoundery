@@ -52,7 +52,7 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   );
 }
 
-function TeamCard({ team }: { team: AdvisorDashboardTeam }) {
+function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?: boolean }) {
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -122,6 +122,22 @@ function TeamCard({ team }: { team: AdvisorDashboardTeam }) {
           <span className={DISABLED_CTA_CLASS}>Report noch nicht bereit</span>
         ) : null}
       </div>
+
+      {debug ? (
+        <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
+          <p className="font-semibold text-slate-900">Debug · Team Gatekeeper</p>
+          <p>invitationId: {team.invitationId}</p>
+          <p>relationshipId: {team.relationshipId ?? "-"}</p>
+          <p>advisorLinked: {String(team.advisorLinked)}</p>
+          <p>workbookHref: {team.workbookHref}</p>
+          <p>reportHref: {team.reportHref}</p>
+          <p>snapshotHref: {team.snapshotHref}</p>
+          <p>workbookAvailable: {String(team.workbookAvailable)}</p>
+          <p>reportAvailable: {String(team.reportAvailable)}</p>
+          <p>snapshotAvailable: {String(team.snapshotAvailable)}</p>
+          <p>whyUnavailable: {team.whyUnavailable ?? "-"}</p>
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -130,10 +146,12 @@ function TeamSection({
   title,
   description,
   teams,
+  debug = false,
 }: {
   title: string;
   description: string;
   teams: AdvisorDashboardTeam[];
+  debug?: boolean;
 }) {
   if (teams.length === 0) return null;
 
@@ -150,7 +168,7 @@ function TeamSection({
       </div>
       <div className="grid gap-5">
         {teams.map((team) => (
-          <TeamCard key={team.invitationId} team={team} />
+          <TeamCard key={team.invitationId} team={team} debug={debug} />
         ))}
       </div>
     </section>
@@ -352,16 +370,19 @@ export default async function AdvisorDashboardPage({
               title="Bereit zur Begleitung"
               description="Diese Teams sind freigegeben. Du kannst Workbook, Report und Snapshot öffnen."
               teams={readyTeams}
+              debug={debug}
             />
             <TeamSection
               title="Wartet auf Freigabe"
               description="Diese Teams sind verknüpft, aber noch nicht vollständig freigegeben."
               teams={waitingTeams}
+              debug={debug}
             />
             <TeamSection
               title="Zugriff pausiert"
               description="Hier fehlt aktuell eine aktive Freigabe. Du siehst den Status, arbeitest aber nicht weiter."
               teams={pausedTeams}
+              debug={debug}
             />
           </>
         )}
