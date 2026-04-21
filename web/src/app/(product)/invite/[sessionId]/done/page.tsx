@@ -5,7 +5,7 @@ import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { ResearchTrackedLink } from "@/features/research/ResearchTrackedLink";
 import {
   applyExistingInvitationProfileChoice,
-  finalizeInvitationIfReady,
+  ensureReportRunForInvitation,
   getInvitationJoinDecision,
 } from "@/features/reporting/actions";
 import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
@@ -20,6 +20,16 @@ function buildQuestionnaireHref(invitationId: string, module: "base" | "values")
   const search = new URLSearchParams({ invitationId });
   const path = module === "base" ? "/me/base" : "/me/values";
   return `${path}?${search.toString()}`;
+}
+
+function completionButtonClass(variant: "primary" | "secondary" | "ghost" = "primary") {
+  if (variant === "primary") {
+    return "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
+  }
+  if (variant === "secondary") {
+    return "inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700";
+  }
+  return "inline-flex rounded-lg border border-slate-200/70 bg-slate-50 px-4 py-2 text-sm text-slate-700";
 }
 
 function CompletionShell({
@@ -65,9 +75,35 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   }
 
   const dashboardHref = buildInvitationDashboardHref(invitationId);
-  const reportHref = `/report/${encodeURIComponent(invitationId)}`;
+  const matchingReportHref = `/report/${encodeURIComponent(invitationId)}`;
+  const individualReportHref = "/me/report";
   const decision = await getInvitationJoinDecision(invitationId);
   const useExistingChoice = query.useExisting === "1";
+
+  async function navigateWithEnsuredMatchingReport(formData: FormData) {
+    "use server";
+
+    const target = String(formData.get("target") ?? "matching");
+    const ensureResult = await ensureReportRunForInvitation(invitationId);
+    if (!ensureResult.ok) {
+      console.error("invite done CTA ensureReportRunForInvitation failed", {
+        invitationId,
+        target,
+        reason: ensureResult.reason,
+        detail: ensureResult.detail ?? null,
+      });
+    }
+
+    if (target === "individual") {
+      redirect(individualReportHref);
+    }
+
+    if (target === "dashboard") {
+      redirect(dashboardHref);
+    }
+
+    redirect(matchingReportHref);
+  }
 
   if (!decision.ok) {
     return (
@@ -93,6 +129,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   }
 
   if (decision.mode === "report_ready") {
+    const ensuredReportResult = await ensureReportRunForInvitation(invitationId);
     return (
       <CompletionShell
         title="Stark, alles ist komplett."
@@ -103,28 +140,35 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             properties={{ state: "report_ready" }}
           />
-          <DelayedRedirect href={reportHref} />
+          <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
             Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <ResearchTrackedLink
-              href={reportHref}
-              eventName="invite_done_report_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
-            >
-              Report öffnen
-            </ResearchTrackedLink>
-            <ResearchTrackedLink
-              href={dashboardHref}
-              eventName="invite_done_dashboard_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-            >
-              Zurück zum Dashboard
-            </ResearchTrackedLink>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="matching" />
+              <button type="submit" className={completionButtonClass("primary")}>
+                Matching-Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="individual" />
+              <button type="submit" className={completionButtonClass("secondary")}>
+                Individuellen Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="dashboard" />
+              <button type="submit" className={completionButtonClass("ghost")}>
+                Zurück zum Dashboard
+              </button>
+            </form>
           </div>
+          {!ensuredReportResult.ok ? (
+            <p className="mt-4 text-xs text-slate-500">
+              Der Matching-Report wurde beim Laden erneut angestoßen ({ensuredReportResult.reason}).
+            </p>
+          ) : null}
       </CompletionShell>
     );
   }
@@ -133,7 +177,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     if (useExistingChoice) {
       const existingProfileResult = await applyExistingInvitationProfileChoice(invitationId);
       if (existingProfileResult.ok && existingProfileResult.reportRunId) {
-        redirect(reportHref);
+        redirect(matchingReportHref);
       }
       if (existingProfileResult.ok && existingProfileResult.waiting) {
         return (
@@ -217,8 +261,8 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     );
   }
 
-  const finalizeResult = await finalizeInvitationIfReady(invitationId);
-  if (finalizeResult.ok) {
+  const ensuredReportResult = await ensureReportRunForInvitation(invitationId);
+  if (ensuredReportResult.ok) {
     return (
       <CompletionShell
         title="Sehr gut, dein Teil ist abgeschlossen."
@@ -229,33 +273,35 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             properties={{ state: "finalized_now" }}
           />
-          <DelayedRedirect href={reportHref} />
+          <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
             Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <ResearchTrackedLink
-              href={reportHref}
-              eventName="invite_done_report_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
-            >
-              Report öffnen
-            </ResearchTrackedLink>
-            <ResearchTrackedLink
-              href={dashboardHref}
-              eventName="invite_done_dashboard_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-            >
-              Zurück zum Dashboard
-            </ResearchTrackedLink>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="matching" />
+              <button type="submit" className={completionButtonClass("primary")}>
+                Matching-Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="individual" />
+              <button type="submit" className={completionButtonClass("secondary")}>
+                Individuellen Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="dashboard" />
+              <button type="submit" className={completionButtonClass("ghost")}>
+                Zurück zum Dashboard
+              </button>
+            </form>
           </div>
       </CompletionShell>
     );
   }
 
-  if (finalizeResult.reason === "waiting_for_answers") {
+  if (ensuredReportResult.reason === "waiting_for_answers") {
     return (
       <CompletionShell
         title="Sehr gut, dein Teil ist abgeschlossen."
@@ -270,22 +316,24 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht.
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <ResearchTrackedLink
-              href={dashboardHref}
-              eventName="invite_done_dashboard_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
-            >
-              Zum Dashboard
-            </ResearchTrackedLink>
-            <ResearchTrackedLink
-              href={reportHref}
-              eventName="invite_done_report_clicked"
-              invitationId={invitationId}
-              className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-            >
-              Report öffnen
-            </ResearchTrackedLink>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="matching" />
+              <button type="submit" className={completionButtonClass("primary")}>
+                Matching-Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="individual" />
+              <button type="submit" className={completionButtonClass("secondary")}>
+                Individuellen Report ansehen
+              </button>
+            </form>
+            <form action={navigateWithEnsuredMatchingReport}>
+              <input type="hidden" name="target" value="dashboard" />
+              <button type="submit" className={completionButtonClass("ghost")}>
+                Zurück zum Dashboard
+              </button>
+            </form>
           </div>
       </CompletionShell>
     );
@@ -294,22 +342,32 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   return (
     <CompletionShell
       title="Fragebogen abgeschlossen"
-      description={`Der Report konnte gerade noch nicht erstellt werden (${finalizeResult.reason}). Bitte prüfe den Status im Dashboard.`}
+      description={`Der Report konnte gerade noch nicht erstellt werden (${ensuredReportResult.reason}). Bitte prüfe den Status im Dashboard.`}
     >
         <ResearchPageTracker
           eventName="invite_done_viewed"
           invitationId={invitationId}
-          properties={{ state: "error", reason: finalizeResult.reason }}
+          properties={{ state: "error", reason: ensuredReportResult.reason }}
         />
-        <div className="mt-6">
-          <ResearchTrackedLink
-            href={dashboardHref}
-            eventName="invite_done_error_dashboard_clicked"
-            invitationId={invitationId}
-            className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-          >
-            Zurück zum Dashboard
-          </ResearchTrackedLink>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="matching" />
+            <button type="submit" className={completionButtonClass("primary")}>
+              Matching-Report ansehen
+            </button>
+          </form>
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="individual" />
+            <button type="submit" className={completionButtonClass("secondary")}>
+              Individuellen Report ansehen
+            </button>
+          </form>
+          <form action={navigateWithEnsuredMatchingReport}>
+            <input type="hidden" name="target" value="dashboard" />
+            <button type="submit" className={completionButtonClass("ghost")}>
+              Zurück zum Dashboard
+            </button>
+          </form>
         </div>
     </CompletionShell>
   );
