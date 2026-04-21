@@ -71,6 +71,53 @@ export default async function AdvisorReportPage({
   }
 
   if (data.status === "forbidden" || data.status === "not_found") {
+    const redirectTarget = "/advisor/dashboard";
+    if (debug) {
+      console.info("[advisor-report-debug] render_state", {
+        ...(data.debugMeta ?? null),
+        redirectTarget,
+      });
+      return (
+        <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
+          <section className="rounded-[32px] border border-amber-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-amber-700">
+              Advisor Report Debug
+            </p>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-950">
+              Advisor-Report konnte nicht geladen werden
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
+              Die Produktseite würde dich in diesem Zustand direkt zurück ins Advisor-Dashboard
+              schicken. Im Debug-Modus bleibt dieser Zustand sichtbar, damit wir den echten
+              Bruchpunkt sehen können.
+            </p>
+            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
+              <p className="font-semibold text-slate-900">Debug · Advisor Report Redirect</p>
+              <p>url: /advisor/report?invitationId={invitationId}</p>
+              <p>redirectTarget: {redirectTarget}</p>
+              <p>finalState: {data.debugMeta?.finalState ?? data.status}</p>
+              <p>invitationId: {data.debugMeta?.requestedInvitationId ?? invitationId}</p>
+              <p>userId: {data.debugMeta?.userId ?? "-"}</p>
+              <p>relationshipId: {data.debugMeta?.relationshipId ?? "-"}</p>
+              <p>
+                accessBeforeLegacySync: {String(data.debugMeta?.accessBeforeLegacySync ?? false)} ·
+                hasAccess: {String(data.debugMeta?.hasAccess ?? false)}
+              </p>
+              <p>
+                legacySyncAttempted: {String(data.debugMeta?.legacySyncAttempted ?? false)} ·
+                legacySyncResult: {data.debugMeta?.legacySyncResult ?? "not_attempted"}
+              </p>
+              <p>reportRunId: {data.debugMeta?.reportRunId ?? "-"}</p>
+              <p>
+                snapshotFounderScoring:{" "}
+                {String(data.debugMeta?.snapshotFounderScoring ?? false)}
+              </p>
+              <p>scoringSource: {data.debugMeta?.scoringSource ?? "missing"}</p>
+            </div>
+          </section>
+        </main>
+      );
+    }
     redirect("/advisor/dashboard");
   }
 

@@ -109,6 +109,23 @@ export async function resolveRelationshipIdForInvitation(
     return invitation.relationship_id;
   }
 
+  const { data: reportRunData, error: reportRunError } = await client
+    .from("report_runs")
+    .select("relationship_id, created_at")
+    .eq("invitation_id", normalizedInvitationId)
+    .not("relationship_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!reportRunError) {
+    const reportRunRelationshipId =
+      (reportRunData as { relationship_id?: string | null } | null)?.relationship_id ?? null;
+    if (reportRunRelationshipId) {
+      return reportRunRelationshipId;
+    }
+  }
+
   if (!invitation.inviter_user_id || !invitation.invitee_user_id) {
     return null;
   }
