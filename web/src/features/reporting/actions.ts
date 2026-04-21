@@ -1179,7 +1179,7 @@ async function getInvitationJoinDecisionInternal(
   const { data: invitationAccess, error: invitationAccessError } = await supabase
     .from("invitations")
     .select(
-      "id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, expires_at, revoked_at, accepted_at, relationship_id"
+      "id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, expires_at, revoked_at, accepted_at"
     )
     .eq("id", normalizedInvitationId)
     .maybeSingle();
@@ -1201,7 +1201,6 @@ async function getInvitationJoinDecisionInternal(
     expires_at: string;
     revoked_at: string | null;
     accepted_at: string | null;
-    relationship_id: string | null;
   };
   logInviteFlowDebug("reporting:getInvitationJoinDecision:invitation", {
     invitationId: normalizedInvitationId,
@@ -1228,7 +1227,6 @@ async function getInvitationJoinDecisionInternal(
       invitationStatus: invitation.status,
       inviteeUserId: invitation.invitee_user_id,
       acceptedAt: invitation.accepted_at,
-      relationshipId: invitation.relationship_id,
     });
     return { ok: false, reason: "not_accepted" };
   }

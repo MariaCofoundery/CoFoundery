@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 
   const { data: invitationSnapshot, error: invitationSnapshotError } = await supabase
     .from("invitations")
-    .select("id, status, invitee_user_id, accepted_at, relationship_id")
+    .select("id, status, invitee_user_id, accepted_at")
     .eq("id", invitationId)
     .maybeSingle();
   logInviteFlowDebug("join/start:invitation_snapshot", {

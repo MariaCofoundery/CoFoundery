@@ -31,7 +31,6 @@ type InvitationRow = {
   expires_at: string;
   revoked_at: string | null;
   accepted_at: string | null;
-  relationship_id: string | null;
 };
 
 function normalizeEmail(value: string | null | undefined) {
@@ -176,7 +175,7 @@ export default async function JoinWelcomePage({
   const { data: invitationData, error: invitationError } = await supabase
     .from("invitations")
     .select(
-      "id, status, invitee_user_id, invitee_email, team_context, inviter_display_name, inviter_email, expires_at, revoked_at, accepted_at, relationship_id"
+      "id, status, invitee_user_id, invitee_email, team_context, inviter_display_name, inviter_email, expires_at, revoked_at, accepted_at"
     )
     .eq("id", invitationId)
     .maybeSingle();
@@ -271,7 +270,7 @@ export default async function JoinWelcomePage({
                 </div>
                 <div className="flex gap-2">
                   <dt className="font-medium">Relationship</dt>
-                  <dd>{invitation.relationship_id ?? "null"}</dd>
+                  <dd>n/a</dd>
                 </div>
                 <div className="flex gap-2">
                   <dt className="font-medium">User</dt>
