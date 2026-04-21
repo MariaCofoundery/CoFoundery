@@ -369,20 +369,22 @@ export async function getFounderAlignmentWorkbookPageData(
     };
   }
 
+  const privilegedAccessClient = createPrivilegedClient();
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
+  const relationshipAccessClient = privilegedAccessClient ?? supabase;
   const resolvedRelationshipId = user?.id
-    ? await resolveRelationshipIdForInvitation(normalizedInvitationId, supabase)
+    ? await resolveRelationshipIdForInvitation(normalizedInvitationId, relationshipAccessClient)
     : null;
   const hasRelationshipAdvisorAccess =
     user?.id && resolvedRelationshipId
-      ? await hasAdvisorAccessToRelationship(user.id, resolvedRelationshipId, supabase)
+      ? await hasAdvisorAccessToRelationship(user.id, resolvedRelationshipId, relationshipAccessClient)
       : false;
   const isLinkedAdvisor =
     hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id);
-  const privileged = isLinkedAdvisor ? createPrivilegedClient() : null;
+  const privileged = isLinkedAdvisor ? privilegedAccessClient : null;
   const dataClient = privileged ?? supabase;
 
-  const founderContextClient = createPrivilegedClient() ?? dataClient;
+  const founderContextClient = privilegedAccessClient ?? dataClient;
 
   const [debugResult, founderContext, workbookRow, reportSnapshot, advisorProfile] = await Promise.all([
     isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
@@ -458,7 +460,7 @@ export async function getFounderAlignmentWorkbookPageData(
       ? "founderA"
       : user?.id && founderContext.founderBUserId === user.id
       ? "founderB"
-        : hasActiveAdvisorAccess(advisorRow, user?.id)
+        : hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id)
           ? "advisor"
           : "unknown";
 
