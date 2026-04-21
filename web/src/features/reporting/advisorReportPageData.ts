@@ -33,6 +33,11 @@ type InvitationReportContextRow = {
   status: string;
 };
 
+type RelationshipParticipantRow = {
+  user_a_id: string;
+  user_b_id: string;
+};
+
 type ProfileNameRow = {
   user_id: string;
   display_name: string | null;
@@ -70,6 +75,7 @@ export type AdvisorReportDebugMeta = {
   requestedInvitationId: string;
   userId: string | null;
   relationshipId: string | null;
+  teamContext: "pre_founder" | "existing_team" | null;
   accessBeforeLegacySync: boolean;
   legacySyncAttempted: boolean;
   legacySyncResult: "not_attempted" | "synced" | "sync_failed" | "legacy_not_found";
@@ -143,6 +149,44 @@ function emptyImpulseMap() {
   ) as Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
 }
 
+async function resolveAdvisorParticipantIds(params: {
+  invitation: InvitationReportContextRow;
+  relationshipId: string;
+  privileged: PrivilegedClient;
+}) {
+  const founderAUserId = params.invitation.inviter_user_id ?? null;
+  let founderBUserId = params.invitation.invitee_user_id ?? null;
+
+  if (!founderAUserId || !founderBUserId) {
+    const { data: relationship } = await params.privileged
+      .from("relationships")
+      .select("user_a_id, user_b_id")
+      .eq("id", params.relationshipId)
+      .maybeSingle();
+
+    const typedRelationship = relationship as RelationshipParticipantRow | null;
+    if (typedRelationship) {
+      const resolvedFounderA = founderAUserId ?? typedRelationship.user_a_id ?? typedRelationship.user_b_id;
+      const resolvedFounderB =
+        founderBUserId ??
+        (resolvedFounderA === typedRelationship.user_a_id
+          ? typedRelationship.user_b_id
+          : typedRelationship.user_a_id) ??
+        null;
+
+      return {
+        founderAUserId: resolvedFounderA,
+        founderBUserId: resolvedFounderB,
+      };
+    }
+  }
+
+  return {
+    founderAUserId,
+    founderBUserId,
+  };
+}
+
 async function getLatestSubmittedBaseAssessment(
   privileged: PrivilegedClient,
   userId: string
@@ -212,6 +256,7 @@ function transformAnswers(
 
 async function resolveFounderScoringForAdvisorReport(
   invitation: InvitationReportContextRow,
+  relationshipId: string,
   snapshotFounderScoring: TeamScoringResult | null,
   privileged: PrivilegedClient
 ): Promise<{
@@ -225,7 +270,13 @@ async function resolveFounderScoringForAdvisorReport(
     };
   }
 
-  if (invitation.status !== "accepted" || !invitation.invitee_user_id) {
+  const participants = await resolveAdvisorParticipantIds({
+    invitation,
+    relationshipId,
+    privileged,
+  });
+
+  if (!participants.founderAUserId || !participants.founderBUserId) {
     return {
       scoring: null,
       source: "missing",
@@ -234,8 +285,8 @@ async function resolveFounderScoringForAdvisorReport(
 
   const [activeBaseQuestionMap, personAAssessment, personBAssessment] = await Promise.all([
     getActiveBaseQuestionMap(privileged),
-    getLatestSubmittedBaseAssessment(privileged, invitation.inviter_user_id),
-    getLatestSubmittedBaseAssessment(privileged, invitation.invitee_user_id),
+    getLatestSubmittedBaseAssessment(privileged, participants.founderAUserId),
+    getLatestSubmittedBaseAssessment(privileged, participants.founderBUserId),
   ]);
 
   if (!personAAssessment || !personBAssessment) {
@@ -288,6 +339,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: "",
         userId: null,
         relationshipId: null,
+        teamContext: null,
         accessBeforeLegacySync: false,
         legacySyncAttempted: false,
         legacySyncResult: "not_attempted",
@@ -313,6 +365,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: null,
         relationshipId: null,
+        teamContext: null,
         accessBeforeLegacySync: false,
         legacySyncAttempted: false,
         legacySyncResult: "not_attempted",
@@ -334,6 +387,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId: null,
+        teamContext: null,
         accessBeforeLegacySync: false,
         legacySyncAttempted: false,
         legacySyncResult: "not_attempted",
@@ -355,6 +409,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId: null,
+        teamContext: null,
         accessBeforeLegacySync: false,
         legacySyncAttempted: false,
         legacySyncResult: "not_attempted",
@@ -403,6 +458,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId,
+        teamContext: null,
         accessBeforeLegacySync,
         legacySyncAttempted,
         legacySyncResult,
@@ -438,6 +494,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId,
+        teamContext: null,
         accessBeforeLegacySync,
         legacySyncAttempted,
         legacySyncResult,
@@ -452,6 +509,7 @@ export async function getAdvisorReportPageData(
 
   const founderScoringResolution = await resolveFounderScoringForAdvisorReport(
     invitation,
+    relationshipId,
     snapshot?.founderScoring ?? null,
     privileged
   );
@@ -478,6 +536,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId,
+        teamContext: normalizeTeamContext(invitation.team_context),
         accessBeforeLegacySync,
         legacySyncAttempted,
         legacySyncResult,
@@ -490,13 +549,18 @@ export async function getAdvisorReportPageData(
     };
   }
 
-  const profileIds = [invitation.inviter_user_id, invitation.invitee_user_id].filter(
+  const participants = await resolveAdvisorParticipantIds({
+    invitation,
+    relationshipId,
+    privileged,
+  });
+  const resolvedProfileIds = [participants.founderAUserId, participants.founderBUserId].filter(
     (value): value is string => Boolean(value)
   );
   const { data: profileRows } = await privileged
     .from("profiles")
     .select("user_id, display_name")
-    .in("user_id", profileIds);
+    .in("user_id", resolvedProfileIds);
 
   const profileByUserId = new Map(
     ((profileRows ?? []) as ProfileNameRow[]).map((row) => [row.user_id, row.display_name?.trim() ?? ""])
@@ -504,12 +568,12 @@ export async function getAdvisorReportPageData(
 
   const participantAName =
     snapshot?.report?.participantAName ||
-    profileByUserId.get(invitation.inviter_user_id) ||
+    (participants.founderAUserId ? profileByUserId.get(participants.founderAUserId) : null) ||
     "Founder A";
   const participantBName =
     snapshot?.report?.participantBName ||
-    (invitation.invitee_user_id
-      ? profileByUserId.get(invitation.invitee_user_id)
+    (participants.founderBUserId
+      ? profileByUserId.get(participants.founderBUserId)
       : invitation.invitee_email?.split("@")[0]?.trim()) ||
     "Founder B";
 
@@ -552,6 +616,7 @@ export async function getAdvisorReportPageData(
       requestedInvitationId: normalizedInvitationId,
       userId: user.id,
       relationshipId,
+      teamContext,
       accessBeforeLegacySync,
       legacySyncAttempted,
       legacySyncResult,

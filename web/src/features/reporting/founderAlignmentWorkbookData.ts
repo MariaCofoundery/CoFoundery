@@ -65,6 +65,11 @@ type InvitationRow = {
   team_context: string | null;
 };
 
+type RelationshipRow = {
+  user_a_id: string;
+  user_b_id: string;
+};
+
 function parseStoredTeamContext(value: string | null | undefined): TeamContext | null {
   if (value === "existing_team") return "existing_team";
   if (value === "pre_founder") return "pre_founder";
@@ -208,7 +213,8 @@ function buildMockAnswers() {
 
 async function loadFounderContextWithClient(
   invitationId: string,
-  supabase: SupabaseLikeClient
+  supabase: SupabaseLikeClient,
+  relationshipId?: string | null
 ): Promise<{
   founderAName: string | null;
   founderBName: string | null;
@@ -227,7 +233,33 @@ async function loadFounderContextWithClient(
     .maybeSingle();
 
   const typedInvitation = invitation as InvitationRow | null;
-  if (!typedInvitation?.inviter_user_id || !typedInvitation?.invitee_user_id) {
+  let founderAUserId = typedInvitation?.inviter_user_id ?? null;
+  let founderBUserId = typedInvitation?.invitee_user_id ?? null;
+
+  if (relationshipId && (!founderAUserId || !founderBUserId)) {
+    const { data: relationship } = await supabase
+      .from("relationships")
+      .select("user_a_id, user_b_id")
+      .eq("id", relationshipId)
+      .maybeSingle();
+
+    const typedRelationship = relationship as RelationshipRow | null;
+    if (typedRelationship) {
+      founderAUserId =
+        founderAUserId ??
+        typedRelationship.user_a_id ??
+        typedRelationship.user_b_id ??
+        null;
+      founderBUserId =
+        founderBUserId ??
+        (founderAUserId === typedRelationship.user_a_id
+          ? typedRelationship.user_b_id
+          : typedRelationship.user_a_id) ??
+        null;
+    }
+  }
+
+  if (!founderAUserId || !founderBUserId) {
     return {
       founderAName: null,
       founderBName: null,
@@ -235,8 +267,8 @@ async function loadFounderContextWithClient(
       founderBAvatarId: null,
       founderAAvatarUrl: null,
       founderBAvatarUrl: null,
-      founderAUserId: typedInvitation?.inviter_user_id ?? null,
-      founderBUserId: typedInvitation?.invitee_user_id ?? null,
+      founderAUserId,
+      founderBUserId,
       teamContext: parseStoredTeamContext(typedInvitation?.team_context),
     };
   }
@@ -244,7 +276,7 @@ async function loadFounderContextWithClient(
   const { data: profileRows } = await supabase
     .from("profiles")
     .select("user_id, display_name, avatar_id, avatar_url")
-    .in("user_id", [typedInvitation.inviter_user_id, typedInvitation.invitee_user_id]);
+    .in("user_id", [founderAUserId, founderBUserId]);
 
   const profileByUserId = new Map(
     ((profileRows ?? []) as ProfileRow[]).map((row) => [
@@ -258,15 +290,15 @@ async function loadFounderContextWithClient(
   );
 
   return {
-    founderAName: profileByUserId.get(typedInvitation.inviter_user_id)?.displayName || null,
-    founderBName: profileByUserId.get(typedInvitation.invitee_user_id)?.displayName || null,
-    founderAAvatarId: profileByUserId.get(typedInvitation.inviter_user_id)?.avatarId || null,
-    founderBAvatarId: profileByUserId.get(typedInvitation.invitee_user_id)?.avatarId || null,
-    founderAAvatarUrl: profileByUserId.get(typedInvitation.inviter_user_id)?.avatarUrl || null,
-    founderBAvatarUrl: profileByUserId.get(typedInvitation.invitee_user_id)?.avatarUrl || null,
-    founderAUserId: typedInvitation.inviter_user_id,
-    founderBUserId: typedInvitation.invitee_user_id,
-    teamContext: parseStoredTeamContext(typedInvitation.team_context),
+    founderAName: profileByUserId.get(founderAUserId)?.displayName || null,
+    founderBName: profileByUserId.get(founderBUserId)?.displayName || null,
+    founderAAvatarId: profileByUserId.get(founderAUserId)?.avatarId || null,
+    founderBAvatarId: profileByUserId.get(founderBUserId)?.avatarId || null,
+    founderAAvatarUrl: profileByUserId.get(founderAUserId)?.avatarUrl || null,
+    founderBAvatarUrl: profileByUserId.get(founderBUserId)?.avatarUrl || null,
+    founderAUserId,
+    founderBUserId,
+    teamContext: parseStoredTeamContext(typedInvitation?.team_context),
   };
 }
 
@@ -523,7 +555,7 @@ export async function getFounderAlignmentWorkbookPageData(
 
   const [debugResult, founderContext, workbookRow, reportSnapshot, advisorProfile] = await Promise.all([
     isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
-    loadFounderContextWithClient(normalizedInvitationId, founderContextClient),
+    loadFounderContextWithClient(normalizedInvitationId, founderContextClient, resolvedRelationshipId),
     loadWorkbookRowWithClient(normalizedInvitationId, dataClient),
     isLinkedAdvisor
       ? getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId)

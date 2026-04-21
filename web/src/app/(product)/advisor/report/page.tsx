@@ -98,7 +98,9 @@ export default async function AdvisorReportPage({
               <p>finalState: {data.debugMeta?.finalState ?? data.status}</p>
               <p>invitationId: {data.debugMeta?.requestedInvitationId ?? invitationId}</p>
               <p>userId: {data.debugMeta?.userId ?? "-"}</p>
+              <p>currentUserRole: advisor</p>
               <p>relationshipId: {data.debugMeta?.relationshipId ?? "-"}</p>
+              <p>teamContext: {data.debugMeta?.teamContext ?? "-"}</p>
               <p>
                 accessBeforeLegacySync: {String(data.debugMeta?.accessBeforeLegacySync ?? false)} ·
                 hasAccess: {String(data.debugMeta?.hasAccess ?? false)}
@@ -141,7 +143,9 @@ export default async function AdvisorReportPage({
               <p className="font-semibold text-slate-900">Debug · Advisor Report Loader</p>
               <p>invitationId: {data.debugMeta.requestedInvitationId}</p>
               <p>userId: {data.debugMeta.userId ?? "-"}</p>
+              <p>currentUserRole: advisor</p>
               <p>relationshipId: {data.debugMeta.relationshipId ?? "-"}</p>
+              <p>teamContext: {data.debugMeta.teamContext ?? "-"}</p>
               <p>
                 accessBeforeLegacySync: {String(data.debugMeta.accessBeforeLegacySync)} · hasAccess:{" "}
                 {String(data.debugMeta.hasAccess)}
@@ -186,7 +190,9 @@ export default async function AdvisorReportPage({
             <p>url: /advisor/report?invitationId={data.invitationId}</p>
             <p>invitationId: {data.debugMeta.requestedInvitationId}</p>
             <p>userId: {data.debugMeta.userId ?? "-"}</p>
+            <p>currentUserRole: advisor</p>
             <p>relationshipId: {data.debugMeta.relationshipId ?? "-"}</p>
+            <p>teamContext: {data.debugMeta.teamContext ?? data.teamContext}</p>
             <p>
               accessBeforeLegacySync: {String(data.debugMeta.accessBeforeLegacySync)} · hasAccess:{" "}
               {String(data.debugMeta.hasAccess)}

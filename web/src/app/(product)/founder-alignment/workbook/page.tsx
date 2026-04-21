@@ -14,6 +14,7 @@ type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
   advisorContext?: string;
+  debug?: string;
   // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
 };
@@ -39,6 +40,7 @@ export default async function FounderAlignmentWorkbookPage({
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const advisorContext = isAdvisorContext(params.advisorContext);
+  const debug = params.debug === "1";
   const legacyAdvisorToken = params.advisorToken?.trim() || null;
 
   if (legacyAdvisorToken) {
@@ -97,6 +99,18 @@ export default async function FounderAlignmentWorkbookPage({
               {advisorContext ? "Zum Advisor-Report" : "Zum Matching-Report"}
             </ReportActionButton>
           </div>
+          {debug ? (
+            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-left text-xs leading-6 text-slate-700">
+              <p className="font-semibold text-slate-900">Debug · Workbook Target</p>
+              <p>currentUserRole: -</p>
+              <p>advisorContext: {String(advisorContext)}</p>
+              <p>invitationId: {invitationId}</p>
+              <p>relationshipId: -</p>
+              <p>teamContext: {requestedTeamContext}</p>
+              <p>resolvedViewMode: {advisorContext ? "advisor" : "founder"}</p>
+              <p>whyNotUsable: {data.reason ?? data.status}</p>
+            </div>
+          ) : null}
         </div>
       </main>
     );
@@ -129,6 +143,20 @@ export default async function FounderAlignmentWorkbookPage({
         teamContext={data.teamContext}
         properties={{ role: data.currentUserRole, source: data.source }}
       />
+      {debug ? (
+        <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8 print:hidden">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
+            <p className="font-semibold text-slate-900">Debug · Workbook Target</p>
+            <p>currentUserRole: {data.currentUserRole}</p>
+            <p>advisorContext: {String(advisorContext)}</p>
+            <p>invitationId: {data.invitationId ?? invitationId}</p>
+            <p>relationshipId: {data.relationshipId ?? "-"}</p>
+            <p>teamContext: {data.teamContext}</p>
+            <p>resolvedViewMode: {data.currentUserRole === "advisor" ? "advisor" : "founder"}</p>
+            <p>whyNotUsable: -</p>
+          </div>
+        </div>
+      ) : null}
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-7xl justify-end">
           {data.currentUserRole !== "advisor" ? (
