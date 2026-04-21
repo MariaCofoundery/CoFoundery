@@ -19,12 +19,16 @@ export default async function MeValuesCompletePage() {
     redirect("/me/values");
   }
 
+  const normalizedEmail = (user.email ?? "").trim().toLowerCase();
+  const inviteFilter = normalizedEmail
+    ? `invitee_user_id.eq.${user.id},invitee_email.eq.${normalizedEmail}`
+    : `invitee_user_id.eq.${user.id}`;
   const { data: latestAcceptedInvite } = await supabase
     .from("invitations")
     .select("id")
-    .eq("invitee_user_id", user.id)
     .eq("status", "accepted")
     .is("revoked_at", null)
+    .or(inviteFilter)
     .order("accepted_at", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(1)
