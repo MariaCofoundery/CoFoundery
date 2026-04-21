@@ -20,6 +20,10 @@ export function isJoinContinuationPath(path: string) {
   return path === "/join" || path.startsWith("/join/");
 }
 
+export function isAdvisorInviteContinuationPath(path: string) {
+  return path === "/advisor/invite/continue" || path.startsWith("/advisor/invite/continue?");
+}
+
 export function buildWelcomeRedirectPath(nextPath: string) {
   const normalizedNext = normalizePath(nextPath);
   if (normalizedNext === "/dashboard") {
@@ -35,7 +39,7 @@ export async function resolvePostAuthRedirectPath(
 ) {
   const normalizedNext = normalizePath(nextPath);
 
-  if (isJoinContinuationPath(normalizedNext)) {
+  if (isJoinContinuationPath(normalizedNext) || isAdvisorInviteContinuationPath(normalizedNext)) {
     return normalizedNext;
   }
 

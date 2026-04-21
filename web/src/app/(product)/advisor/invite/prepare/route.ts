@@ -8,8 +8,10 @@ import {
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const token = normalizeOpaqueToken(requestUrl.searchParams.get("token"));
-
-  const target = new URL("/login?next=%2Fadvisor%2Finvite%2Fcontinue", request.url);
+  const continueTarget = token
+    ? `/advisor/invite/continue?token=${encodeURIComponent(token)}`
+    : "/advisor/invite/continue";
+  const target = new URL(`/login?next=${encodeURIComponent(continueTarget)}`, request.url);
   const response = NextResponse.redirect(target);
 
   if (token) {

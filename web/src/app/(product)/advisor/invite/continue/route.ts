@@ -6,7 +6,10 @@ import {
 } from "@/features/security/pendingTokenCookies";
 
 export async function GET(request: NextRequest) {
-  const token = normalizeOpaqueToken(request.cookies.get(PENDING_ADVISOR_INVITE_COOKIE)?.value);
+  const requestUrl = new URL(request.url);
+  const token =
+    normalizeOpaqueToken(requestUrl.searchParams.get("token")) ||
+    normalizeOpaqueToken(request.cookies.get(PENDING_ADVISOR_INVITE_COOKIE)?.value);
   const target = token ? `/advisor/invite/${encodeURIComponent(token)}` : "/advisor/dashboard";
   const response = NextResponse.redirect(new URL(target, request.url));
   response.cookies.set(PENDING_ADVISOR_INVITE_COOKIE, "", clearPendingTokenCookieOptions());
