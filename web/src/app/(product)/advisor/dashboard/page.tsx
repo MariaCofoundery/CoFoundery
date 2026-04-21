@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import {
   getAdvisorDashboardProfile,
   getAdvisorDashboardTeams,
@@ -191,10 +192,17 @@ export default async function AdvisorDashboardPage({
   const readyTeams = teams.filter((team) => team.accessStatus === "ready");
   const waitingTeams = teams.filter((team) => team.accessStatus === "waiting_for_approval");
   const pausedTeams = teams.filter((team) => team.accessStatus === "paused");
+  const preferredTeam = readyTeams[0] ?? teams.find((team) => team.canOpenWorkbook) ?? null;
+  const dashboardFallbackHref = debug ? "/advisor/dashboard?debug=1#advisor-teams" : "/advisor/dashboard#advisor-teams";
+  const reportHref = preferredTeam?.reportHref ?? dashboardFallbackHref;
+  const workbookHref = preferredTeam?.workbookHref ?? dashboardFallbackHref;
 
   if (debug) {
     console.info("[advisor-report-debug] dashboard_links", {
       userId: user.id,
+      preferredTeamInvitationId: preferredTeam?.invitationId ?? null,
+      navReportHref: reportHref,
+      navWorkbookHref: workbookHref,
       teams: teams.map((team) => ({
         invitationId: team.invitationId,
         workbookHref: team.workbookHref,
@@ -206,7 +214,13 @@ export default async function AdvisorDashboardPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-14 md:px-10 xl:px-12">
+    <>
+      <ProductNavigationOverride
+        activeView="advisor"
+        matchingHref={reportHref}
+        workbookHref={workbookHref}
+      />
+      <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-14 md:px-10 xl:px-12">
       <header className="rounded-[36px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-7 shadow-[0_18px_55px_rgba(15,23,42,0.055)] md:p-9">
         <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-5">
@@ -273,6 +287,13 @@ export default async function AdvisorDashboardPage({
           <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white/80 p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
               Debug · Dashboard Links
+            </p>
+            <p className="mt-2 text-xs leading-6 text-slate-700">
+              navReportHref: {reportHref}
+              <br />
+              navWorkbookHref: {workbookHref}
+              <br />
+              preferredTeamInvitationId: {preferredTeam?.invitationId ?? "-"}
             </p>
             <div className="mt-3 space-y-3 text-xs leading-6 text-slate-700">
               {teams.map((team) => (
@@ -345,6 +366,7 @@ export default async function AdvisorDashboardPage({
           </>
         )}
       </section>
-    </main>
+      </main>
+    </>
   );
 }
