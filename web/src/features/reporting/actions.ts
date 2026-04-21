@@ -2239,7 +2239,6 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
         reportRunId: existingReportRunId,
         error: repairedError.message,
       });
-      return { ok: false, reason: "insert_failed", detail: repairedError.message };
     }
 
     const repairedId =
