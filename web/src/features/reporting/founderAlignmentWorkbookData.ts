@@ -1,6 +1,14 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import { getFounderScoringDebug } from "@/features/scoring/founderScoringDebug";
+import {
+  buildFounderCompatibilityAnswerMapV2,
+  mapLegacyFounderAnswersToV2Answers,
+  type FounderCompatibilityAnswerV2,
+} from "@/features/scoring/founderCompatibilityAnswerRuntime";
+import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
+import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import {
   normalizeDimensionName,
   scoreFounderAlignment,
@@ -74,6 +82,22 @@ type ProfileIdentity = {
   displayName: string | null;
   avatarId: string | null;
   avatarUrl: string | null;
+};
+
+type AssessmentRow = {
+  id: string;
+  user_id: string;
+  submitted_at: string | null;
+  created_at: string;
+};
+
+type AssessmentAnswerRow = {
+  question_id: string;
+  choice_value: string;
+};
+
+type QuestionRow = {
+  id: string;
 };
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -297,6 +321,117 @@ async function loadProfileIdentityWithClient(
   };
 }
 
+async function getLatestSubmittedBaseAssessmentWithClient(
+  userId: string,
+  supabase: SupabaseLikeClient
+): Promise<AssessmentRow | null> {
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("id, user_id, submitted_at, created_at")
+    .eq("user_id", userId)
+    .eq("module", "base")
+    .not("submitted_at", "is", null)
+    .order("submitted_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as AssessmentRow;
+}
+
+async function getActiveBaseQuestionMapWithClient(
+  supabase: SupabaseLikeClient
+): Promise<Map<string, QuestionRow>> {
+  const { data, error } = await supabase
+    .from("questions")
+    .select("id")
+    .eq("category", "basis")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error || !data) {
+    return new Map<string, QuestionRow>();
+  }
+
+  assertFounderBaseQuestionVersionContract(
+    (data as QuestionRow[]).map((row) => row.id),
+    "workbook_advisor_active_basis_questions"
+  );
+
+  return new Map((data as QuestionRow[]).map((row) => [row.id, row]));
+}
+
+async function getAssessmentAnswersWithClient(
+  assessmentId: string,
+  supabase: SupabaseLikeClient
+): Promise<AssessmentAnswerRow[]> {
+  const { data, error } = await supabase
+    .from("assessment_answers")
+    .select("question_id, choice_value")
+    .eq("assessment_id", assessmentId);
+
+  if (error || !data) return [];
+  return data as AssessmentAnswerRow[];
+}
+
+function transformBaseAnswers(
+  rows: AssessmentAnswerRow[],
+  activeBaseQuestionMap: Map<string, QuestionRow>
+): FounderCompatibilityAnswerV2[] {
+  const questionById = new Map(
+    [...activeBaseQuestionMap.values()].map((question) => [
+      question.id,
+      { id: question.id, category: "basis" as const },
+    ])
+  );
+
+  return mapLegacyFounderAnswersToV2Answers(rows, questionById);
+}
+
+async function resolveAdvisorWorkbookScoringWithClient(params: {
+  founderAUserId: string | null;
+  founderBUserId: string | null;
+  supabase: SupabaseLikeClient;
+}): Promise<TeamScoringResult | null> {
+  if (!params.founderAUserId || !params.founderBUserId) {
+    return null;
+  }
+
+  const [activeBaseQuestionMap, personAAssessment, personBAssessment] = await Promise.all([
+    getActiveBaseQuestionMapWithClient(params.supabase),
+    getLatestSubmittedBaseAssessmentWithClient(params.founderAUserId, params.supabase),
+    getLatestSubmittedBaseAssessmentWithClient(params.founderBUserId, params.supabase),
+  ]);
+
+  if (!personAAssessment || !personBAssessment) {
+    return null;
+  }
+
+  const [personARows, personBRows] = await Promise.all([
+    getAssessmentAnswersWithClient(personAAssessment.id, params.supabase),
+    getAssessmentAnswersWithClient(personBAssessment.id, params.supabase),
+  ]);
+
+  const personAAnswers = transformBaseAnswers(personARows, activeBaseQuestionMap);
+  const personBAnswers = transformBaseAnswers(personBRows, activeBaseQuestionMap);
+  const personAAnswerMap = buildFounderCompatibilityAnswerMapV2(personAAnswers);
+  const personBAnswerMap = buildFounderCompatibilityAnswerMapV2(personBAnswers);
+  const baseQuestionCount = getActiveRegistryItems().length;
+
+  if (
+    baseQuestionCount <= 0 ||
+    Object.keys(personAAnswerMap).length < baseQuestionCount ||
+    Object.keys(personBAnswerMap).length < baseQuestionCount
+  ) {
+    return null;
+  }
+
+  return scoreFounderAlignmentV2FromAnswersV2({
+    personA: personAAnswers,
+    personB: personBAnswers,
+  });
+}
+
 function advisorInviteStateFromRow(
   advisorRow: WorkbookAdvisorRow | null,
   advisorProfile: ProfileIdentity | null = null
@@ -401,13 +536,22 @@ export async function getFounderAlignmentWorkbookPageData(
       reportSnapshot.founderReport &&
       reportSnapshot.founderScoring
   );
+  const advisorWorkbookScoring =
+    isLinkedAdvisor && !snapshotHasFounderAlignmentData && privilegedAccessClient
+      ? await resolveAdvisorWorkbookScoringWithClient({
+          founderAUserId: founderContext.founderAUserId,
+          founderBUserId: founderContext.founderBUserId,
+          supabase: privilegedAccessClient,
+        })
+      : null;
 
   if (
     !snapshotHasFounderAlignmentData &&
-    (isLinkedAdvisor || !debugResult || debugResult.status !== "ready" || !debugResult.scoring)
+    (!advisorWorkbookScoring &&
+      (isLinkedAdvisor || !debugResult || debugResult.status !== "ready" || !debugResult.scoring))
   ) {
     const fallbackStatus: FounderAlignmentWorkbookPageData["status"] =
-      isLinkedAdvisor || !debugResult
+      (isLinkedAdvisor && !advisorWorkbookScoring) || !debugResult
         ? "in_progress"
         : debugResult.status === "ready"
           ? "in_progress"
@@ -425,6 +569,8 @@ export async function getFounderAlignmentWorkbookPageData(
   const scoringResult =
     snapshotHasFounderAlignmentData && reportSnapshot?.founderScoring
       ? reportSnapshot.founderScoring
+      : advisorWorkbookScoring
+        ? advisorWorkbookScoring
       : debugResult!.scoring!;
   const report =
     snapshotHasFounderAlignmentData && reportSnapshot?.founderReport
