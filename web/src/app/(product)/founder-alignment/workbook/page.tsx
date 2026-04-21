@@ -13,12 +13,21 @@ import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
+  advisorContext?: string;
   // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
 };
 
 function resolveTeamContext(value: string | undefined): TeamContext {
   return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+function isAdvisorContext(value: string | undefined) {
+  return value === "1" || value === "true";
+}
+
+function buildAdvisorWorkbookHref(invitationId: string, teamContext: TeamContext) {
+  return `${buildWorkbookHref(invitationId, teamContext)}&advisorContext=1`;
 }
 
 export default async function FounderAlignmentWorkbookPage({
@@ -29,6 +38,7 @@ export default async function FounderAlignmentWorkbookPage({
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
+  const advisorContext = isAdvisorContext(params.advisorContext);
   const legacyAdvisorToken = params.advisorToken?.trim() || null;
 
   if (legacyAdvisorToken) {
@@ -52,13 +62,19 @@ export default async function FounderAlignmentWorkbookPage({
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
 
   if (data.status !== "ready") {
+    const fallbackWorkbookHref = advisorContext
+      ? buildAdvisorWorkbookHref(invitationId, requestedTeamContext)
+      : buildWorkbookHref(invitationId, requestedTeamContext);
+    const fallbackReportHref = advisorContext
+      ? `/advisor/report?invitationId=${encodeURIComponent(invitationId)}`
+      : `/report/${encodeURIComponent(invitationId)}`;
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
         <ProductNavigationOverride
-          matchingHref={`/report/${encodeURIComponent(invitationId)}`}
-          workbookHref={buildWorkbookHref(invitationId, requestedTeamContext)}
-          activeView="founder"
-          contextLabel="Founder-Kontext"
+          matchingHref={fallbackReportHref}
+          workbookHref={fallbackWorkbookHref}
+          activeView={advisorContext ? "advisor" : "founder"}
+          contextLabel={advisorContext ? "Advisor-Kontext" : "Founder-Kontext"}
         />
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
@@ -77,8 +93,8 @@ export default async function FounderAlignmentWorkbookPage({
             {data.reason ? ` · ${data.reason}` : ""}
           </p>
           <div className="mt-8 flex justify-center">
-            <ReportActionButton href={`/report/${encodeURIComponent(invitationId)}`} variant="utility">
-              Zum Matching-Report
+            <ReportActionButton href={fallbackReportHref} variant="utility">
+              {advisorContext ? "Zum Advisor-Report" : "Zum Matching-Report"}
             </ReportActionButton>
           </div>
         </div>
@@ -91,6 +107,10 @@ export default async function FounderAlignmentWorkbookPage({
     resolvedInvitationId
   )}`;
   const founderReportHref = `/report/${encodeURIComponent(resolvedInvitationId)}`;
+  const resolvedWorkbookHref =
+    data.currentUserRole === "advisor" || advisorContext
+      ? buildAdvisorWorkbookHref(resolvedInvitationId, data.teamContext)
+      : buildWorkbookHref(resolvedInvitationId, data.teamContext);
 
   return (
     <main>
@@ -98,7 +118,7 @@ export default async function FounderAlignmentWorkbookPage({
         matchingHref={
           data.currentUserRole === "advisor" ? advisorReportHref : founderReportHref
         }
-        workbookHref={buildWorkbookHref(resolvedInvitationId, data.teamContext)}
+        workbookHref={resolvedWorkbookHref}
         feedbackInvitationId={data.invitationId ?? invitationId}
         activeView={data.currentUserRole === "advisor" ? "advisor" : "founder"}
         contextLabel={data.currentUserRole === "advisor" ? "Advisor-Kontext" : "Founder-Kontext"}

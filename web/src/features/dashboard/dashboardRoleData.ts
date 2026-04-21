@@ -438,7 +438,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         }),
         lastActivityLabel: `${teamContextLabel(teamContext)} · ${formatTimestamp(lastActivitySource)}`,
         followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
-        workbookHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        workbookHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}&advisorContext=1`,
         reportHref: `/advisor/report?invitationId=${invitation.id}`,
         reportReady,
         snapshotHref: `/advisor/snapshot?invitationId=${invitation.id}&teamContext=${teamContext}`,

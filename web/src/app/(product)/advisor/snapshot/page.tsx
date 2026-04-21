@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
@@ -57,28 +58,40 @@ export default async function AdvisorSnapshotPage({
   }
 
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
+  const reportHref = `/advisor/report?invitationId=${encodeURIComponent(invitationId)}`;
+  const workbookHref = `/founder-alignment/workbook?invitationId=${encodeURIComponent(
+    invitationId
+  )}&teamContext=${encodeURIComponent(requestedTeamContext)}&advisorContext=1`;
 
   if (data.status !== "ready") {
     return (
-      <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
-        <div className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
-          <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            Snapshot aktuell noch nicht verfügbar
-          </h1>
-          <p className="mt-4 text-sm leading-7 text-slate-700">
-            Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.
-          </p>
-          <div className="mt-6">
-            <Link
-              href="/advisor/dashboard"
-              className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-            >
-              Zurück zum Advisor Dashboard
-            </Link>
+      <>
+        <ProductNavigationOverride
+          activeView="advisor"
+          contextLabel="Advisor-Kontext"
+          matchingHref={reportHref}
+          workbookHref={workbookHref}
+        />
+        <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
+          <div className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
+            <h1 className="mt-4 text-3xl font-semibold text-slate-950">
+              Snapshot aktuell noch nicht verfügbar
+            </h1>
+            <p className="mt-4 text-sm leading-7 text-slate-700">
+              Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/advisor/dashboard"
+                className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                Zurück zum Advisor Dashboard
+              </Link>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </>
     );
   }
 
@@ -93,24 +106,31 @@ export default async function AdvisorSnapshotPage({
   ).slice(0, 3);
 
   return (
-    <main className="print-document-root mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link
-          href="/advisor/dashboard"
-          className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          Zurück zum Advisor Dashboard
-        </Link>
-        <PrintReportButton
-          label="Snapshot exportieren"
-          eventName="advisor_snapshot_print_clicked"
-          invitationId={data.invitationId}
-          teamContext={data.teamContext}
-          properties={{ followUp: data.workbook.advisorFollowUp }}
-        />
-      </div>
+    <>
+      <ProductNavigationOverride
+        activeView="advisor"
+        contextLabel="Advisor-Kontext"
+        matchingHref={reportHref}
+        workbookHref={workbookHref}
+      />
+      <main className="print-document-root mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
+          <Link
+            href="/advisor/dashboard"
+            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            Zurück zum Advisor Dashboard
+          </Link>
+          <PrintReportButton
+            label="Snapshot exportieren"
+            eventName="advisor_snapshot_print_clicked"
+            invitationId={data.invitationId}
+            teamContext={data.teamContext}
+            properties={{ followUp: data.workbook.advisorFollowUp }}
+          />
+        </div>
 
-      <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:p-0 print:shadow-none">
+        <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:p-0 print:shadow-none">
         <header className="border-b border-slate-200 pb-8">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">
@@ -190,8 +210,9 @@ export default async function AdvisorSnapshotPage({
             </p>
           </section>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
 

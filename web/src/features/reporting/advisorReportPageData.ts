@@ -544,7 +544,7 @@ export async function getAdvisorReportPageData(
     impulses: impulseMap,
     workbookHref: `/founder-alignment/workbook?invitationId=${encodeURIComponent(
       normalizedInvitationId
-    )}&teamContext=${encodeURIComponent(teamContext)}`,
+    )}&teamContext=${encodeURIComponent(teamContext)}&advisorContext=1`,
     snapshotHref: `/advisor/snapshot?invitationId=${encodeURIComponent(
       normalizedInvitationId
     )}&teamContext=${encodeURIComponent(teamContext)}`,
