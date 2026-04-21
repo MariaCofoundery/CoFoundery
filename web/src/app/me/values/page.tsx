@@ -15,7 +15,11 @@ import {
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { ValuesQuestionnaire } from "@/features/questionnaire/ValuesQuestionnaire";
 import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
-import { buildInvitationQuestionnaireHref, resolveActiveInvitationIdForCurrentUser } from "@/features/onboarding/invitationFlow";
+import {
+  buildInvitationDashboardHref,
+  buildInvitationQuestionnaireHref,
+  resolveActiveInvitationIdForCurrentUser,
+} from "@/features/onboarding/invitationFlow";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 
 type MeValuesSearchParams = {
@@ -29,22 +33,34 @@ export default async function MeValuesPage({
 }: {
   searchParams: Promise<MeValuesSearchParams>;
 }) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?next=/me/values");
+    const nextSearch = new URLSearchParams();
+    if (params.invitationId?.trim()) {
+      nextSearch.set("invitationId", params.invitationId.trim());
+    }
+    if (params.flow === "refresh") {
+      nextSearch.set("flow", "refresh");
+    }
+    if (params.assessmentId?.trim()) {
+      nextSearch.set("assessmentId", params.assessmentId.trim());
+    }
+    const nextPath = nextSearch.toString() ? `/me/values?${nextSearch.toString()}` : "/me/values";
+    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  const params = await searchParams;
   const invitationIdFromParams = params.invitationId?.trim() || null;
   const recoveredInvitationId = invitationIdFromParams
     ? null
     : await resolveActiveInvitationIdForCurrentUser();
   const invitationId = invitationIdFromParams ?? recoveredInvitationId;
   const isRefreshFlow = params.flow === "refresh";
+  const dashboardHref = invitationId ? buildInvitationDashboardHref(invitationId) : "/dashboard";
   let trackingTeamContext: "pre_founder" | "existing_team" | null = null;
 
   if (!invitationIdFromParams && recoveredInvitationId) {
@@ -223,7 +239,7 @@ export default async function MeValuesPage({
     <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
       <div className="mb-5 flex items-center justify-between">
         <a
-          href="/dashboard"
+          href={dashboardHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-700"
         >
           Zurück zum Dashboard

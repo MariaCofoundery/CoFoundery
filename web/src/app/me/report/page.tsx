@@ -4,6 +4,11 @@ import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { IndividualReportPageContent } from "@/features/reporting/IndividualReportPageContent";
+import {
+  buildInvitationDashboardHref,
+  buildInvitationQuestionnaireHref,
+  resolveActiveInvitationIdForCurrentUser,
+} from "@/features/onboarding/invitationFlow";
 
 export default async function MeReportPage() {
   const supabase = await createClient();
@@ -15,6 +20,9 @@ export default async function MeReportPage() {
     redirect("/login?next=/me/report");
   }
 
+  const invitationId = await resolveActiveInvitationIdForCurrentUser();
+  const dashboardHref = invitationId ? buildInvitationDashboardHref(invitationId) : "/dashboard";
+  const baseHref = invitationId ? buildInvitationQuestionnaireHref(invitationId, "base") : "/me/base";
   const report = await getLatestSelfAlignmentReport();
 
   if (!report) {
@@ -26,7 +34,7 @@ export default async function MeReportPage() {
             Für deinen individuellen Report fehlt noch ein eingereichter Basis-Fragebogen.
           </p>
           <a
-            href="/me/base"
+            href={baseHref}
             className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           >
             Basis-Fragebogen starten
@@ -44,7 +52,7 @@ export default async function MeReportPage() {
         toolbar={
           <div className="flex items-center justify-between">
             <a
-              href="/dashboard"
+              href={dashboardHref}
               className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
             >
               Zurück zum Dashboard
