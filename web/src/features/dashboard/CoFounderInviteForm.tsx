@@ -105,16 +105,20 @@ export function CoFounderInviteForm() {
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <div>
           <label htmlFor="invite-label" className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            Label / Name
+            Name eures Teams oder Projekts
           </label>
           <input
             id="invite-label"
             type="text"
             value={label}
             onChange={(event) => setLabel(event.target.value)}
-            placeholder="z. B. Alex"
+            placeholder="optional, z. B. Cofoundery oder Projekt Atlas"
             className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           />
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            Optional. Wenn ihr euer Matching benennen möchtet, nutzen wir den Namen später dort, wo
+            euer Team sichtbar wird.
+          </p>
         </div>
 
         <div>

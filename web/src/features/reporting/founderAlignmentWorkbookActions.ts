@@ -41,6 +41,8 @@ type InvitationAccessRow = {
   id: string;
   inviter_user_id: string;
   invitee_user_id: string | null;
+  invitee_email: string | null;
+  label: string | null;
 };
 
 type AdvisorAccessRow = {
@@ -283,6 +285,23 @@ function normalizeRelationshipId(value: string | null | undefined) {
   return normalized.length > 0 ? normalized : null;
 }
 
+function resolveInvitationTeamName(label: string | null | undefined, inviteeEmail: string | null | undefined) {
+  const normalizedLabel = label?.trim();
+  if (!normalizedLabel) return null;
+
+  const normalizedInviteeEmail = inviteeEmail?.trim().toLowerCase();
+  if (normalizedInviteeEmail && normalizedLabel.toLowerCase() === normalizedInviteeEmail) {
+    return null;
+  }
+
+  const inviteeLocalPart = normalizedInviteeEmail?.split("@")[0]?.trim();
+  if (inviteeLocalPart && normalizedLabel.toLowerCase() === inviteeLocalPart) {
+    return null;
+  }
+
+  return normalizedLabel;
+}
+
 function formatSupabaseError(
   error:
     | {
@@ -360,7 +379,7 @@ async function loadInvitationAccessRow(
 ): Promise<InvitationAccessRow | null> {
   const { data, error } = await supabase
     .from("invitations")
-    .select("id, inviter_user_id, invitee_user_id")
+    .select("id, inviter_user_id, invitee_user_id, invitee_email, label")
     .eq("id", invitationId)
     .maybeSingle();
 
@@ -1653,7 +1672,10 @@ async function loadFounderLabelsForInvitation(
 
   return {
     founderALabel: profileByUserId.get(invitation.inviter_user_id)?.trim() || "Founder A",
-    founderBLabel: profileByUserId.get(invitation.invitee_user_id ?? "")?.trim() || "Founder B",
+    founderBLabel:
+      profileByUserId.get(invitation.invitee_user_id ?? "")?.trim() ||
+      invitation.invitee_email?.split("@")[0]?.trim() ||
+      "Founder B",
   };
 }
 
@@ -1745,6 +1767,7 @@ export async function sendFounderAlignmentAdvisorInvite({
     inviteUrl,
     founderAName: labels.founderALabel,
     founderBName: labels.founderBLabel,
+    teamName: resolveInvitationTeamName(loaded.invitation.label, loaded.invitation.invitee_email),
     teamContext: effectiveTeamContext,
   });
 

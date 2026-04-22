@@ -1,13 +1,12 @@
-type SendCoFounderInviteEmailParams = {
+type SendAdvisorTeamFounderInviteEmailParams = {
   inviteeEmail: string;
   inviteUrl: string;
-  inviterDisplayName: string | null;
+  advisorName: string | null;
   teamName?: string | null;
-  reportScope: "basis" | "basis_plus_values";
-  teamContext: "pre_founder" | "existing_team";
+  counterpartLabel?: string | null;
 };
 
-type SendCoFounderInviteEmailResult =
+type SendAdvisorTeamFounderInviteEmailResult =
   | { ok: true; id: string | null }
   | { ok: false; error: string };
 
@@ -18,16 +17,6 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function buildContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team"
-    ? "Bestehendes Team"
-    : "Vor einer engeren Zusammenarbeit";
-}
-
-function buildModuleLabel(reportScope: "basis" | "basis_plus_values") {
-  return reportScope === "basis_plus_values" ? "Basis + Werte" : "Basis";
 }
 
 function buildPrivacyUrl() {
@@ -46,16 +35,12 @@ function buildReplyToAddress() {
   return process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined;
 }
 
-function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
-  const inviterName = params.inviterDisplayName ? escapeHtml(params.inviterDisplayName) : null;
-  const greeting = "Hi,";
-  const inviterLine = inviterName
-    ? `${inviterName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Cofoundery Align anschauen.`
-    : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Cofoundery Align anzuschauen.";
-
-  const contextLabel = escapeHtml(buildContextLabel(params.teamContext));
-  const moduleLabel = escapeHtml(buildModuleLabel(params.reportScope));
+function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams) {
+  const advisorName = params.advisorName?.trim() ? escapeHtml(params.advisorName.trim()) : null;
   const teamName = params.teamName?.trim() ? escapeHtml(params.teamName.trim()) : null;
+  const counterpartLabel = params.counterpartLabel?.trim()
+    ? escapeHtml(params.counterpartLabel.trim())
+    : "die zweite Founder-Person";
   const inviteUrl = escapeHtml(params.inviteUrl);
   const privacyUrl = escapeHtml(buildPrivacyUrl());
 
@@ -63,7 +48,7 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
 <html lang="de">
   <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#0f172a;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-      Persönliche Einladung zu Cofoundery Align: gemeinsamer Report und Workbook für eure Co-Founder-Dynamik.
+      Einladung in ein von einem Advisor initiiertes Founder-Matching bei Cofoundery Align.
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr>
@@ -83,52 +68,43 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
             <tr>
               <td style="padding:24px 32px 32px;">
                 <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
-                  Persönliche Einladung
+                  Founder-Einladung
                 </p>
                 <h1 style="margin:0 0 16px;font-size:28px;line-height:34px;color:#0f172a;font-weight:700;">
-                  ${greeting}
+                  Hi,
                 </h1>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  ${inviterLine}
+                  ${advisorName
+                    ? `${advisorName} möchte euch in ein strukturiertes Founder-Matching mit Cofoundery Align einladen.`
+                    : "Du wurdest in ein strukturiertes Founder-Matching mit Cofoundery Align eingeladen."}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Cofoundery Align hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.
+                  Mit diesem Schritt bestätigst du nur deinen Start in den Flow. Sobald auch ${counterpartLabel} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.
                 </p>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc;">
                   <tr>
                     <td style="padding:18px 20px;">
                       <p style="margin:0 0 10px;font-size:13px;line-height:20px;font-weight:700;color:#0f172a;">
-                        Was euch erwartet
+                        Was danach entsteht
                       </p>
                       <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik
+                        • ein gemeinsamer Matching-Kontext für beide Founder
                       </p>
                       <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein gemeinsames Workbook, um zentrale Spannungen und Vereinbarungen konkret festzuhalten
+                        • ein Alignment-Workbook, sobald ihr beide gestartet habt
                       </p>
                       <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        • ein klarer gemeinsamer Gesprächsrahmen statt vager Eindrücke
+                        • ein sauberer Fortschrittsblick für eure begleitende Advisor-Person
                       </p>
                     </td>
                   </tr>
                 </table>
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:18px 0 0;">
-                  <tr>
-                    <td style="padding:0;">
-                      <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}
-                        Kontext: <strong>${contextLabel}</strong><br />
-                        Startmodul: <strong>${moduleLabel}</strong>
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-                <p style="margin:22px 0 0;font-size:15px;line-height:25px;color:#334155;">
-                  Die Einladung ist persönlich und führt dich direkt in den bestehenden gemeinsamen Flow.
+                <p style="margin:18px 0 0;font-size:14px;line-height:22px;color:#475569;">
+                  ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}Kontext: <strong>Founder-Matching</strong>
                 </p>
                 <p style="margin:0 0 28px;">
                   <a href="${inviteUrl}" style="display:inline-block;margin-top:28px;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
-                    Einladung öffnen
+                    Matching starten
                   </a>
                 </p>
                 <div style="margin-top:12px;padding:16px 18px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;">
@@ -141,7 +117,7 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
                 </div>
                 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
-                    Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Cofoundery-Align-Prozess eingeladen wurdest.
+                    Du erhältst diese E-Mail, weil du von einer Advisor-Person gezielt in ein Founder-Matching eingeladen wurdest.
                   </p>
                   <p style="margin:0 0 12px;font-size:13px;line-height:21px;color:#64748b;">
                     Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.
@@ -160,43 +136,44 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
 </html>`;
 }
 
-function buildTextBody(params: SendCoFounderInviteEmailParams) {
-  const inviterLine = params.inviterDisplayName
-    ? `${params.inviterDisplayName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Cofoundery Align anschauen.`
-    : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Cofoundery Align anzuschauen.";
+function buildTextBody(params: SendAdvisorTeamFounderInviteEmailParams) {
   const teamName = params.teamName?.trim();
+  const advisorLine = params.advisorName?.trim()
+    ? `${params.advisorName.trim()} möchte euch in ein strukturiertes Founder-Matching mit Cofoundery Align einladen.`
+    : "Du wurdest in ein strukturiertes Founder-Matching mit Cofoundery Align eingeladen.";
+  const counterpartLine = params.counterpartLabel?.trim()
+    ? `Sobald auch ${params.counterpartLabel.trim()} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.`
+    : "Sobald auch die zweite Founder-Person gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.";
 
   return [
     "Hi,",
     "",
-    inviterLine,
+    advisorLine,
     "",
-    "Cofoundery Align hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.",
+    "Mit diesem Schritt bestätigst du nur deinen Start in den Flow.",
+    counterpartLine,
     "",
-    "Was euch erwartet:",
-    "- ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik",
-    "- ein gemeinsames Workbook, um Spannungen und Vereinbarungen konkret festzuhalten",
-    "- ein klarer gemeinsamer Gesprächsrahmen statt vager Eindrücke",
+    "Was danach entsteht:",
+    "- ein gemeinsamer Matching-Kontext für beide Founder",
+    "- ein Alignment-Workbook, sobald ihr beide gestartet habt",
+    "- ein sauberer Fortschrittsblick für eure begleitende Advisor-Person",
     "",
     ...(teamName ? [`Team/Projekt: ${teamName}`] : []),
-    `Kontext: ${buildContextLabel(params.teamContext)}`,
-    `Startmodul: ${buildModuleLabel(params.reportScope)}`,
+    "Kontext: Founder-Matching",
     "",
-    "Die Einladung ist persönlich und führt dich direkt in den bestehenden gemeinsamen Flow.",
-    "",
-    "Einladung öffnen:",
+    "Matching starten:",
     params.inviteUrl,
     "",
-    "Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Cofoundery-Align-Prozess eingeladen wurdest.",
+    "Du erhältst diese E-Mail, weil du von einer Advisor-Person gezielt in ein Founder-Matching eingeladen wurdest.",
     "Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.",
     "",
     `Datenschutzerklärung: ${buildPrivacyUrl()}`,
   ].join("\n");
 }
 
-export async function sendCoFounderInviteEmail(
-  params: SendCoFounderInviteEmailParams
-): Promise<SendCoFounderInviteEmailResult> {
+export async function sendAdvisorTeamFounderInviteEmail(
+  params: SendAdvisorTeamFounderInviteEmailParams
+): Promise<SendAdvisorTeamFounderInviteEmailResult> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = buildFromAddress();
 
@@ -218,9 +195,9 @@ export async function sendCoFounderInviteEmail(
       from,
       to: [params.inviteeEmail],
       reply_to: buildReplyToAddress(),
-      subject: params.inviterDisplayName
-        ? `${params.inviterDisplayName} lädt dich zu eurem Cofoundery Align ein`
-        : "Einladung zu eurem Cofoundery Align",
+      subject: params.advisorName?.trim()
+        ? `${params.advisorName.trim()} lädt dich in ein Founder-Matching ein`
+        : "Einladung in ein Founder-Matching",
       html: buildHtmlBody(params),
       text: buildTextBody(params),
     }),

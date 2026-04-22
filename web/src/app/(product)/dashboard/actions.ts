@@ -214,6 +214,7 @@ async function createInvitation(params: {
       inviteeEmail: invitedEmail,
       inviteUrl: buildAbsoluteInviteUrl(token),
       inviterDisplayName,
+      teamName: params.label ?? null,
       reportScope: params.reportScope,
       teamContext: params.teamContext,
     });
@@ -404,12 +405,13 @@ export async function saveProfileOnboardingAction(formData: FormData) {
 
 export async function inviteParticipantBAction(formData: FormData): Promise<InviteActionResult> {
   const invitedEmail = String(formData.get("invitedEmail") ?? "");
+  const label = normalizeDisplayName(formData.get("label"));
   const reportScope = parseReportScope(formData.get("reportScope"));
   const teamContext = parseTeamContextEntry(formData.get("teamContext"));
   if (!teamContext) {
     return { ok: false, error: "ungueltiger_teamkontext" };
   }
-  return createInvitation({ invitedEmail, reportScope, teamContext });
+  return createInvitation({ invitedEmail, label, reportScope, teamContext });
 }
 
 export async function deleteArchivedSessionAction() {
@@ -435,12 +437,13 @@ export async function restoreResponsesToSessionAction(): Promise<{ ok: boolean; 
 
 export async function createComparisonFromExistingAction(formData: FormData): Promise<InviteActionResult> {
   const invitedEmail = String(formData.get("invitedEmail") ?? "");
+  const label = normalizeDisplayName(formData.get("label"));
   const reportScope = parseReportScope(formData.get("reportScope"));
   const teamContext = parseTeamContextEntry(formData.get("teamContext"));
   if (!teamContext) {
     return { ok: false, error: "ungueltiger_teamkontext" };
   }
-  return createInvitation({ invitedEmail, reportScope, teamContext });
+  return createInvitation({ invitedEmail, label, reportScope, teamContext });
 }
 
 export async function createCoFounderInvitationAction(formData: FormData): Promise<InviteActionResult> {

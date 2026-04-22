@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AdvisorTeamInviteForm } from "@/features/dashboard/AdvisorTeamInviteForm";
+import {
+  getAdvisorPendingTeamInvites,
+  type AdvisorPendingTeamInvite,
+} from "@/features/dashboard/advisorTeamInviteData";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import {
   getAdvisorDashboardProfile,
@@ -95,6 +100,13 @@ function attentionLabel(team: AdvisorDashboardTeam) {
   return "Report oder Workbook oeffnen";
 }
 
+function formatPendingTimestamp(value: string) {
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   return (
     <div className="flex -space-x-2">
@@ -130,6 +142,9 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
               <h3 className="mt-1 text-xl font-semibold text-slate-950">
                 {team.founderAName} & {team.founderBName}
               </h3>
+              {team.teamName ? (
+                <p className="mt-1 text-sm text-slate-600">Team/Projekt: {team.teamName}</p>
+              ) : null}
             </div>
           </div>
 
@@ -256,6 +271,110 @@ function TeamSection({
   );
 }
 
+function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
+  return (
+    <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 max-w-3xl">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Founder-Matching</p>
+          <h3 className="mt-1 text-xl font-semibold text-slate-950">
+            {invite.teamName || `${invite.founderALabel} & ${invite.founderBLabel}`}
+          </h3>
+          {invite.teamName ? (
+            <p className="mt-1 text-sm text-slate-600">
+              {invite.founderALabel} & {invite.founderBLabel}
+            </p>
+          ) : null}
+
+          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
+            <p>
+              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
+                Fortschritt
+              </span>
+              {invite.progressLabel}
+            </p>
+            <p>
+              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
+                Letztes Update
+              </span>
+              {formatPendingTimestamp(invite.lastActivityAt)}
+            </p>
+            <p>
+              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
+                Naechster Schritt
+              </span>
+              {invite.nextStepLabel}
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
+          <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+            {invite.status === "activating" ? "Wird verknuepft" : "Founder eingeladen"}
+          </span>
+          <div className="mt-4 grid gap-2">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderALabel}</span>
+              <span
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
+                  invite.founderAStarted
+                    ? "border-emerald-200 bg-emerald-50/80 text-emerald-800"
+                    : "border-slate-200 bg-slate-50 text-slate-500"
+                }`}
+              >
+                {invite.founderAStarted ? "gestartet" : "offen"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderBLabel}</span>
+              <span
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
+                  invite.founderBStarted
+                    ? "border-emerald-200 bg-emerald-50/80 text-emerald-800"
+                    : "border-slate-200 bg-slate-50 text-slate-500"
+                }`}
+              >
+                {invite.founderBStarted ? "gestartet" : "offen"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function PendingInviteSection({
+  invites,
+}: {
+  invites: AdvisorPendingTeamInvite[];
+}) {
+  if (invites.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="mt-8">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-950">Neu eingeladen</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Diese Teams hast du bereits angestoßen. Sobald beide Founder gestartet haben, wechseln sie automatisch in deine begleiteten Teams.
+          </p>
+        </div>
+        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
+          {invites.length} offen
+        </span>
+      </div>
+      <div className="grid gap-5">
+        {invites.map((invite) => (
+          <PendingInviteCard key={invite.id} invite={invite} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function AdvisorDashboardPage({
   searchParams,
 }: {
@@ -272,10 +391,11 @@ export default async function AdvisorDashboardPage({
     redirect("/login");
   }
 
-  const [roleViews, teams, advisorProfile] = await Promise.all([
+  const [roleViews, teams, advisorProfile, pendingInvites] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
+    getAdvisorPendingTeamInvites(user.id),
   ]);
 
   if (!roleViews.hasAdvisor) {
@@ -365,6 +485,10 @@ export default async function AdvisorDashboardPage({
         </div>
       </header>
 
+      <section className="mt-8">
+        <AdvisorTeamInviteForm />
+      </section>
+
       <section
         id="advisor-teams"
         className="mt-8 rounded-[32px] border border-slate-200/80 bg-slate-50/75 p-6 shadow-[0_16px_50px_rgba(15,23,42,0.04)] md:p-8"
@@ -399,6 +523,7 @@ export default async function AdvisorDashboardPage({
                   <p className="font-semibold text-slate-900">
                     {team.founderAName} & {team.founderBName}
                   </p>
+                  {team.teamName ? <p className="text-slate-600">Team/Projekt: {team.teamName}</p> : null}
                   <p>invitationId: {team.invitationId}</p>
                   <p>workbookHref: {team.workbookHref}</p>
                   <p>reportHref: {team.reportHref}</p>
@@ -411,7 +536,9 @@ export default async function AdvisorDashboardPage({
           </div>
         ) : null}
 
-        {teams.length === 0 ? (
+        <PendingInviteSection invites={pendingInvites} />
+
+        {teams.length === 0 && pendingInvites.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white/82 p-8">
             <div className="flex flex-col gap-5 md:flex-row md:items-start">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white/90 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
@@ -435,11 +562,11 @@ export default async function AdvisorDashboardPage({
               <div className="max-w-2xl">
                 <p className="text-lg font-semibold text-slate-900">Noch keine Teams verknüpft</p>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Sobald du zu einem Founder-Team als Advisor eingeladen wirst, erscheint es hier
+                  Sobald beide Founder gestartet und mit deinem Invite verknüpft sind, erscheint das Team hier
                   mit seinem Freigabestatus.
                 </p>
                 <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Arbeiten kannst du erst, wenn beide Founder die Begleitung freigegeben haben.
+                  Bis dahin siehst du neue Einladungen oben bereits als offene Teamstarts.
                 </p>
               </div>
             </div>

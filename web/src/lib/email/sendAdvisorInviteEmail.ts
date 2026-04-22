@@ -4,6 +4,7 @@ type SendAdvisorInviteEmailParams = {
   inviteUrl: string;
   founderAName: string;
   founderBName: string;
+  teamName?: string | null;
   teamContext: "pre_founder" | "existing_team";
 };
 
@@ -34,8 +35,8 @@ function buildReplyToAddress() {
 
 function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
   return teamContext === "existing_team"
-    ? "Sie begleiten ein bestehendes Founder-Team."
-    : "Sie begleiten ein Pre-Founder-Team in einer fruehen Abstimmung.";
+    ? "Bestehendes Founder-Team"
+    : "Frühe Abstimmung vor einer engeren Zusammenarbeit";
 }
 
 function buildPrivacyUrl() {
@@ -48,26 +49,40 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
     : "Hi,";
   const founderLine = `${escapeHtml(params.founderAName)} und ${escapeHtml(
     params.founderBName
-  )} moechten Sie als Advisor in ihren Cofoundery-Align-Kontext einbinden.`;
+  )} möchten Sie gezielt als Advisor in ihren Cofoundery-Align-Kontext einbinden.`;
   const inviteUrl = escapeHtml(params.inviteUrl);
   const privacyUrl = escapeHtml(buildPrivacyUrl());
+  const contextLabel = escapeHtml(teamContextLabel(params.teamContext));
+  const teamName = params.teamName?.trim() ? escapeHtml(params.teamName.trim()) : null;
 
   return `<!DOCTYPE html>
 <html lang="de">
   <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#0f172a;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+      Persönliche Advisor-Einladung von ${escapeHtml(params.founderAName)} und ${escapeHtml(
+        params.founderBName
+      )} für Cofoundery Align.
+    </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:32px 12px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:24px;overflow:hidden;">
             <tr>
-              <td style="padding:32px 32px 28px;">
-                <p style="margin:0 0 20px;">
+              <td style="padding:28px 32px 0;background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);">
+                <p style="margin:0;">
                   <img
                     src="https://cofoundery.de/cofoundery-align-logo.svg"
                     alt="Cofoundery Align"
-                    width="168"
-                    style="display:block;border:0;max-width:168px;height:auto;"
+                    width="176"
+                    style="display:block;border:0;max-width:176px;height:auto;"
                   />
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 32px 32px;">
+                <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
+                  Persönliche Advisor-Einladung
                 </p>
                 <p style="margin:0 0 18px;font-size:16px;line-height:26px;color:#0f172a;">
                   ${advisorGreetingName}
@@ -76,35 +91,59 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
                   ${founderLine}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Cofoundery Align hilft Founder-Teams dabei, Unterschiede frueh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespraeche strukturierter zu fuehren.
+                  Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Als Advisor erhalten Sie Zugriff auf das freigegebene Workbook und die wichtigsten Einblicke aus dem Founder-Kontext, um Beobachtungen, Rueckfragen und naechste sinnvolle Schritte zu ergaenzen.
+                  Als Advisor erhalten Sie Zugriff auf den freigegebenen Teamkontext, das gemeinsame Workbook und den Advisor-Report, um Beobachtungen, Rückfragen und nächste sinnvolle Schritte beizutragen.
                 </p>
-                <p style="margin:0 0 18px;font-size:15px;line-height:24px;color:#475569;">
-                  ${escapeHtml(teamContextLabel(params.teamContext))}
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc;">
+                  <tr>
+                    <td style="padding:18px 20px;">
+                      <p style="margin:0 0 10px;font-size:13px;line-height:20px;font-weight:700;color:#0f172a;">
+                        Was Sie sehen können
+                      </p>
+                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
+                        • den freigegebenen Teamkontext und die relevanten Founder-Perspektiven
+                      </p>
+                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
+                        • das Workbook mit den aktuellen Arbeitsständen des Teams
+                      </p>
+                      <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
+                        • den Advisor-Report als strukturierte Grundlage für Ihre Begleitung
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:18px 0 0;font-size:14px;line-height:22px;color:#475569;">
+                  ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}
+                  Kontext: <strong>${contextLabel}</strong>
                 </p>
                 <p style="margin:0 0 28px;">
-                  <a href="${inviteUrl}" style="display:inline-block;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
+                  <a href="${inviteUrl}" style="display:inline-block;margin-top:28px;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
                     Advisor-Zugang oeffnen
                   </a>
                 </p>
-                <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
-                  Falls der Button nicht funktioniert, koennen Sie auch direkt diesen Link oeffnen:
-                </p>
-                <p style="margin:0 0 18px;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
-                  <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
-                </p>
-                <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
-                  Sie erhalten diese E-Mail, weil zwei Founder Sie direkt als Advisor einbinden moechten.
-                </p>
-                <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
-                  Wenn diese Einladung fuer Sie nicht relevant ist, koennen Sie diese E-Mail einfach ignorieren.
-                </p>
-                <p style="margin:0;font-size:13px;line-height:22px;color:#64748b;">
-                  Hinweise zum Datenschutz finden Sie hier:
-                  <a href="${privacyUrl}" style="color:#0f172a;">Datenschutzerklaerung</a>
-                </p>
+                <div style="margin-top:12px;padding:16px 18px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;">
+                  <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
+                    Falls der Button nicht funktioniert, können Sie auch direkt diesen Link öffnen:
+                  </p>
+                  <p style="margin:0;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
+                    <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
+                  </p>
+                </div>
+                <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
+                  <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
+                    Sie erhalten diese E-Mail, weil ${escapeHtml(params.founderAName)} und ${escapeHtml(
+                      params.founderBName
+                    )} Sie gezielt als Advisor einbinden möchten.
+                  </p>
+                  <p style="margin:0 0 12px;font-size:13px;line-height:22px;color:#64748b;">
+                    Wenn Sie diese Einladung nicht annehmen möchten, können Sie die E-Mail einfach ignorieren.
+                  </p>
+                  <p style="margin:0;font-size:13px;line-height:22px;color:#64748b;">
+                    Mehr zum Datenschutz: <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">Datenschutzerklärung</a>
+                  </p>
+                </div>
               </td>
             </tr>
           </table>
@@ -120,26 +159,32 @@ function buildTextBody(params: SendAdvisorInviteEmailParams) {
     ? `Hi ${params.advisorName.trim()},`
     : "Hi,";
   const privacyUrl = buildPrivacyUrl();
+  const teamName = params.teamName?.trim();
 
   return [
     greeting,
     "",
-    `${params.founderAName} und ${params.founderBName} moechten Sie als Advisor in ihren Cofoundery-Align-Kontext einbinden.`,
+    `${params.founderAName} und ${params.founderBName} möchten Sie gezielt als Advisor in ihren Cofoundery-Align-Kontext einbinden.`,
     "",
-    "Cofoundery Align hilft Founder-Teams dabei, Unterschiede frueh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespraeche strukturierter zu fuehren.",
+    "Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.",
     "",
-    "Als Advisor erhalten Sie Zugriff auf das freigegebene Workbook und die wichtigsten Einblicke aus dem Founder-Kontext, um Beobachtungen, Rueckfragen und naechste sinnvolle Schritte zu ergaenzen.",
-    teamContextLabel(params.teamContext),
+    "Als Advisor erhalten Sie Zugriff auf den freigegebenen Teamkontext, das gemeinsame Workbook und den Advisor-Report, um Beobachtungen, Rückfragen und nächste sinnvolle Schritte beizutragen.",
+    "",
+    "Was Sie sehen können:",
+    "- den freigegebenen Teamkontext und relevante Founder-Perspektiven",
+    "- das Workbook mit den aktuellen Arbeitsständen des Teams",
+    "- den Advisor-Report als strukturierte Grundlage für Ihre Begleitung",
+    "",
+    ...(teamName ? [`Team/Projekt: ${teamName}`] : []),
+    `Kontext: ${teamContextLabel(params.teamContext)}`,
     "",
     "Advisor-Zugang oeffnen:",
     params.inviteUrl,
     "",
-    "Falls der Button nicht funktioniert, koennen Sie auch direkt den Link oben verwenden.",
+    "Sie erhalten diese E-Mail, weil die beiden Founder Sie gezielt als Advisor einbinden möchten.",
+    "Wenn Sie diese Einladung nicht annehmen möchten, können Sie die E-Mail einfach ignorieren.",
     "",
-    "Sie erhalten diese E-Mail, weil zwei Founder Sie direkt als Advisor einbinden moechten.",
-    "Wenn diese Einladung fuer Sie nicht relevant ist, koennen Sie diese E-Mail einfach ignorieren.",
-    "",
-    `Datenschutzerklaerung: ${privacyUrl}`,
+    `Datenschutzerklärung: ${privacyUrl}`,
   ].join("\n");
 }
 
@@ -167,7 +212,7 @@ export async function sendAdvisorInviteEmail(
       from,
       to: [params.advisorEmail],
       reply_to: buildReplyToAddress(),
-      subject: `${params.founderAName} und ${params.founderBName} laden Sie als Advisor ein`,
+      subject: `${params.founderAName} und ${params.founderBName} möchten Sie als Advisor einbinden`,
       html: buildHtmlBody(params),
       text: buildTextBody(params),
     }),

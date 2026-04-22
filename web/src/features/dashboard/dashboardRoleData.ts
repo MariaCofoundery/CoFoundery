@@ -47,6 +47,7 @@ type InvitationRow = {
   inviter_user_id: string;
   invitee_user_id: string | null;
   invitee_email: string | null;
+  label: string | null;
   team_context: string | null;
   status: string;
   created_at: string;
@@ -97,6 +98,7 @@ function createPrivilegedClient(): SupabaseLikeClient | null {
 export type AdvisorDashboardTeam = {
   invitationId: string;
   relationshipId: string | null;
+  teamName: string | null;
   founderAName: string;
   founderBName: string;
   founderAAvatarId: string | null;
@@ -144,6 +146,23 @@ export type AdvisorDashboardProfile = {
 
 function normalizeTeamContext(value: string | null): "pre_founder" | "existing_team" {
   return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+function resolveInvitationTeamName(label: string | null | undefined, inviteeEmail: string | null | undefined) {
+  const normalizedLabel = label?.trim();
+  if (!normalizedLabel) return null;
+
+  const normalizedInviteeEmail = inviteeEmail?.trim().toLowerCase();
+  if (normalizedInviteeEmail && normalizedLabel.toLowerCase() === normalizedInviteeEmail) {
+    return null;
+  }
+
+  const inviteeLocalPart = normalizedInviteeEmail?.split("@")[0]?.trim();
+  if (inviteeLocalPart && normalizedLabel.toLowerCase() === inviteeLocalPart) {
+    return null;
+  }
+
+  return normalizedLabel;
 }
 
 function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
@@ -341,7 +360,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
   const [invitationResult, workbookResult, reportRunResult] = await Promise.all([
     dataClient
       .from("invitations")
-      .select("id, inviter_user_id, invitee_user_id, invitee_email, team_context, status, created_at")
+      .select("id, inviter_user_id, invitee_user_id, invitee_email, label, team_context, status, created_at")
       .in("id", invitationIds),
     dataClient
       .from("founder_alignment_workbooks")
@@ -446,6 +465,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         (invitation.invitee_user_id
           ? profileByUserId.get(invitation.invitee_user_id)?.displayName
           : invitation.invitee_email?.split("@")[0]?.trim()) || "Founder B";
+      const teamName = resolveInvitationTeamName(invitation.label, invitation.invitee_email);
       const founderAProfile = profileByUserId.get(invitation.inviter_user_id);
       const founderBProfile = invitation.invitee_user_id
         ? profileByUserId.get(invitation.invitee_user_id)
@@ -481,6 +501,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
       return {
         invitationId: invitation.id,
         relationshipId: relationshipAccessRow?.relationship_id ?? null,
+        teamName,
         founderAName,
         founderBName,
         founderAAvatarId: founderAProfile?.avatarId || null,

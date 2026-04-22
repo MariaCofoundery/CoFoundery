@@ -1013,9 +1013,30 @@ function sortInvitationsByCreatedAtDesc(invites: InvitationDashboardRow[]) {
   });
 }
 
+function resolveInvitationTeamName(label: string | null | undefined, inviteeEmail: string | null | undefined) {
+  const normalizedLabel = label?.trim();
+  if (!normalizedLabel) return null;
+
+  const normalizedInviteeEmail = inviteeEmail?.trim().toLowerCase();
+  if (normalizedInviteeEmail && normalizedLabel.toLowerCase() === normalizedInviteeEmail) {
+    return null;
+  }
+
+  const inviteeLocalPart = normalizedInviteeEmail?.split("@")[0]?.trim();
+  if (inviteeLocalPart && normalizedLabel.toLowerCase() === inviteeLocalPart) {
+    return null;
+  }
+
+  return normalizedLabel;
+}
+
 function formatDashboardInvitationTitle(invitation: InvitationDashboardRow | null) {
   if (!invitation) return "Workbook";
-  return invitation.label?.trim() || invitation.inviteeEmail || invitation.id;
+  return (
+    resolveInvitationTeamName(invitation.label, invitation.inviteeEmail) ||
+    invitation.inviteeEmail ||
+    invitation.id
+  );
 }
 
 function FounderDimensionsOverview({
@@ -1053,12 +1074,14 @@ function FounderDimensionsOverview({
 }
 
 function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
-  const title = invite.label ?? invite.inviteeEmail;
+  const teamName = resolveInvitationTeamName(invite.label, invite.inviteeEmail);
+  const title = teamName || invite.inviteeEmail;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
         <p className="font-medium text-slate-900">{title}</p>
+        {teamName ? <p className="mt-1 text-xs text-slate-500">Partner: {invite.inviteeEmail}</p> : null}
         <p className="mt-1 text-sm text-slate-600">Status: {getSentInviteStatusLabel(invite)}</p>
         <p className="text-xs text-slate-500">
           Module: {formatInvitationModules(invite.requiredModules)} · Ablauf: {formatDate(invite.expiresAt)}
@@ -1189,12 +1212,13 @@ function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
 
 function renderCompactReportRow(run: ReportRunRow) {
   const invitation = Array.isArray(run.invitations) ? run.invitations[0] ?? null : run.invitations;
+  const teamName = resolveInvitationTeamName(invitation?.label, invitation?.invitee_email);
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
         <p className="font-medium text-slate-900">
-          {invitation?.label ?? invitation?.invitee_email ?? run.invitation_id}
+          {teamName ?? invitation?.invitee_email ?? run.invitation_id}
         </p>
         <p className="mt-1 text-sm text-slate-600">Module: {formatInvitationModules(run.modules ?? [])}</p>
         <p className="text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>

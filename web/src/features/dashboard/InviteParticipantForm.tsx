@@ -34,6 +34,7 @@ export function InviteParticipantForm({
   onInviteCreated,
 }: Props) {
   const router = useRouter();
+  const [label, setLabel] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [reportScope, setReportScope] = useState<"basis" | "basis_plus_values">("basis");
   const [teamContext, setTeamContext] = useState<TeamContext | null>(null);
@@ -67,6 +68,7 @@ export function InviteParticipantForm({
     startTransition(async () => {
       const formData = new FormData();
       formData.set("sessionId", sessionId);
+      formData.set("label", label.trim());
       formData.set("invitedEmail", invitedEmail);
       formData.set("reportScope", reportScope);
       formData.set("teamContext", teamContext);
@@ -98,6 +100,7 @@ export function InviteParticipantForm({
         }
       }
 
+      setLabel("");
       setEmail("");
       setInviteConsent(false);
       setNotice(nextNotice);
@@ -109,6 +112,25 @@ export function InviteParticipantForm({
     <div className="mt-3">
       {canInvite ? (
         <form onSubmit={onSubmit} className="space-y-3">
+          <div>
+            <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+              Team- oder Projektname
+            </label>
+            <input
+              type="text"
+              value={label}
+              onChange={(event) => {
+                setLabel(event.target.value);
+                setNotice(null);
+              }}
+              placeholder="optional, z. B. Projekt Atlas"
+              className="mt-1 min-w-[240px] w-full rounded-lg border border-[color:var(--line)] px-3 py-2 text-xs"
+            />
+            <p className="mt-1 text-[11px] leading-5 text-slate-500">
+              Optional. Wenn ihr euer Matching benennen möchtet, erscheint der Name später im Dashboard
+              und in Einladungen.
+            </p>
+          </div>
           <input
             type="email"
             value={email}
