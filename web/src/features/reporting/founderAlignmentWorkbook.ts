@@ -36,7 +36,8 @@ export type FounderAlignmentWorkbookStepField =
   | "structuredOutputs"
   | "founderAApproved"
   | "founderBApproved"
-  | "advisorNotes";
+  | "advisorNotes"
+  | "advisorReplies";
 
 export const WORKBOOK_STRUCTURED_STEP_IDS = WORKBOOK_STEP_IDS.filter(
   (stepId) => stepId !== "advisor_closing"
@@ -90,6 +91,16 @@ export type FounderAlignmentWorkbookStepWorkspaceV2 = {
   reactions: FounderAlignmentWorkbookDiscussionReaction[];
 };
 
+export type FounderAlignmentWorkbookAdvisorReply = {
+  id: string;
+  sourceEntryId: string;
+  content: string;
+  advisorUserId: string | null;
+  advisorName: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
 export type WorkbookStepMarker = {
   stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">;
   dimension: string;
@@ -110,6 +121,7 @@ export type FounderAlignmentWorkbookPatch =
       value:
         | string
         | boolean
+        | FounderAlignmentWorkbookAdvisorReply[]
         | WorkbookStructuredOutputsByStep
         | null;
     }
@@ -181,6 +193,7 @@ export type FounderAlignmentWorkbookEntry = {
   founderAApproved: boolean;
   founderBApproved: boolean;
   advisorNotes: string;
+  advisorReplies?: FounderAlignmentWorkbookAdvisorReply[];
 };
 
 export type FounderAlignmentWorkbookAdvisorClosing = {
@@ -389,9 +402,10 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
           founderAApproved: false,
           founderBApproved: false,
           advisorNotes: "",
+          advisorReplies: [],
         },
       ])
-    ) as Record<FounderAlignmentWorkbookStepId, FounderAlignmentWorkbookEntry>,
+    ) as unknown as Record<FounderAlignmentWorkbookStepId, FounderAlignmentWorkbookEntry>,
   };
 }
 
@@ -497,6 +511,60 @@ function isDiscussionAuthor(value: unknown): value is FounderAlignmentWorkbookDi
 
 function isDiscussionSignal(value: unknown): value is FounderAlignmentWorkbookDiscussionSignal {
   return WORKBOOK_DISCUSSION_SIGNAL_VALUES.includes(value as FounderAlignmentWorkbookDiscussionSignal);
+}
+
+function sanitizeWorkbookAdvisorReplies(
+  input: unknown,
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined
+): FounderAlignmentWorkbookAdvisorReply[] {
+  const sourceEntryIds = new Set((workspace?.entries ?? []).map((entry) => entry.id));
+  if (!Array.isArray(input) || sourceEntryIds.size === 0) {
+    return [];
+  }
+
+  return input
+    .map((reply) => {
+      if (!reply || typeof reply !== "object") {
+        return null;
+      }
+
+      const candidate = reply as {
+        id?: unknown;
+        sourceEntryId?: unknown;
+        content?: unknown;
+        advisorUserId?: unknown;
+        advisorName?: unknown;
+        createdAt?: unknown;
+        updatedAt?: unknown;
+      };
+
+      if (
+        typeof candidate.id !== "string" ||
+        typeof candidate.sourceEntryId !== "string" ||
+        !sourceEntryIds.has(candidate.sourceEntryId) ||
+        typeof candidate.content !== "string" ||
+        typeof candidate.createdAt !== "string"
+      ) {
+        return null;
+      }
+
+      const content = candidate.content.trim();
+      if (!content) {
+        return null;
+      }
+
+      return {
+        id: candidate.id,
+        sourceEntryId: candidate.sourceEntryId,
+        content,
+        advisorUserId:
+          typeof candidate.advisorUserId === "string" ? candidate.advisorUserId : null,
+        advisorName: typeof candidate.advisorName === "string" ? candidate.advisorName : null,
+        createdAt: candidate.createdAt,
+        updatedAt: typeof candidate.updatedAt === "string" ? candidate.updatedAt : null,
+      } satisfies FounderAlignmentWorkbookAdvisorReply;
+    })
+    .filter((reply): reply is FounderAlignmentWorkbookAdvisorReply => Boolean(reply));
 }
 
 export function sanitizeWorkbookStepWorkspaceV2(
@@ -796,6 +864,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         founderAApproved?: unknown;
         founderBApproved?: unknown;
         advisorNotes?: unknown;
+        advisorReplies?: unknown;
       }
     >;
   };
@@ -809,16 +878,18 @@ export function sanitizeFounderAlignmentWorkbookPayload(
   const steps = { ...emptyPayload.steps };
   for (const step of FOUNDER_ALIGNMENT_WORKBOOK_STEPS) {
     const source = raw.steps?.[step.id];
+    const workspaceV2 = sanitizeWorkbookStepWorkspaceV2(source?.workspaceV2);
     steps[step.id] = {
       mode: source?.mode === "collaborative" ? "collaborative" : "solo",
       founderA: typeof source?.founderA === "string" ? source.founderA : "",
       founderB: typeof source?.founderB === "string" ? source.founderB : "",
       agreement: typeof source?.agreement === "string" ? source.agreement : "",
       structuredOutputs: sanitizeWorkbookStructuredOutputsByStep(step.id, source?.structuredOutputs),
-      workspaceV2: sanitizeWorkbookStepWorkspaceV2(source?.workspaceV2),
+      workspaceV2,
       founderAApproved: source?.founderAApproved === true,
       founderBApproved: source?.founderBApproved === true,
       advisorNotes: typeof source?.advisorNotes === "string" ? source.advisorNotes : "",
+      advisorReplies: sanitizeWorkbookAdvisorReplies(source?.advisorReplies, workspaceV2),
     };
   }
 

@@ -104,6 +104,83 @@ test("workspace entries keep source provenance when shared-space payloads are sa
   assert.equal(payload.steps.decision_rules.workspaceV2?.entries[1]?.sourceEntryId, "entry-a");
 });
 
+test("advisor replies stay attached to visible founder entries", () => {
+  const payload = sanitizeFounderAlignmentWorkbookPayload({
+    currentStepId: "decision_rules",
+    steps: {
+      decision_rules: {
+        mode: "collaborative",
+        founderA: "",
+        founderB: "",
+        agreement: "",
+        workspaceV2: {
+          entries: [
+            {
+              id: "entry-a",
+              content: "Wir ziehen heikle Themen frueh auf den Tisch.",
+              createdBy: "founderA",
+              createdAt: "2026-04-09T08:00:00.000Z",
+              sourceEntryId: null,
+              updatedAt: null,
+              updatedBy: null,
+            },
+          ],
+          reactions: [],
+        },
+        advisorReplies: [
+          {
+            id: "reply-a",
+            sourceEntryId: "entry-a",
+            content: "  Woran merkt ihr das im Alltag konkret?  ",
+            advisorUserId: "advisor-1",
+            advisorName: "Advisor",
+            createdAt: "2026-04-09T08:15:00.000Z",
+            updatedAt: null,
+          },
+        ],
+      },
+    },
+  });
+
+  assert.equal(payload.steps.decision_rules.advisorReplies?.length ?? 0, 1);
+  assert.equal(payload.steps.decision_rules.advisorReplies?.[0]?.sourceEntryId, "entry-a");
+  assert.equal(
+    payload.steps.decision_rules.advisorReplies?.[0]?.content,
+    "Woran merkt ihr das im Alltag konkret?"
+  );
+});
+
+test("advisor replies without a valid source entry are dropped during sanitizing", () => {
+  const payload = sanitizeFounderAlignmentWorkbookPayload({
+    currentStepId: "decision_rules",
+    steps: {
+      decision_rules: {
+        mode: "collaborative",
+        founderA: "",
+        founderB: "",
+        agreement: "",
+        workspaceV2: {
+          entries: [],
+          reactions: [],
+        },
+        advisorReplies: [
+          {
+            id: "reply-a",
+            sourceEntryId: "missing-entry",
+            content: "Bitte konkretisieren.",
+            advisorUserId: "advisor-1",
+            advisorName: "Advisor",
+            createdAt: "2026-04-09T08:15:00.000Z",
+            updatedAt: null,
+          },
+        ],
+      },
+    },
+  });
+
+  assert.deepEqual(payload.steps.decision_rules.advisorReplies ?? [], []);
+});
+
 test("all non-advisor workbook steps expose the five structured output types", () => {
   for (const [stepId, content] of Object.entries(WORKBOOK_STEP_CONTENT)) {
     if (stepId === "advisor_closing") {

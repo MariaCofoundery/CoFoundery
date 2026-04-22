@@ -31,6 +31,70 @@ function accessStatusClassName(status: AdvisorDashboardTeam["accessStatus"]) {
   return "border-slate-200 bg-slate-100 text-slate-600";
 }
 
+function progressToneClassName(params: { active: boolean; tone: "default" | "success" | "warning" }) {
+  if (!params.active) {
+    return "border-slate-200 bg-slate-50 text-slate-400";
+  }
+
+  if (params.tone === "success") {
+    return "border-emerald-200 bg-emerald-50/80 text-emerald-800";
+  }
+
+  if (params.tone === "warning") {
+    return "border-amber-200 bg-amber-50/80 text-amber-800";
+  }
+
+  return "border-sky-200 bg-sky-50/80 text-sky-800";
+}
+
+function reportStatusLabel(team: AdvisorDashboardTeam) {
+  if (!team.workbookAvailable) {
+    return "Noch kein Zugriff";
+  }
+
+  if (team.reportReady) {
+    return "Bereit";
+  }
+
+  return "In Vorbereitung";
+}
+
+function workbookStatusLabel(team: AdvisorDashboardTeam) {
+  if (!team.workbookAvailable) {
+    return "Noch gesperrt";
+  }
+
+  if (team.statusLabel === "Workbook noch leer") {
+    return "Noch kein Eintrag";
+  }
+
+  return team.statusLabel;
+}
+
+function attentionLabel(team: AdvisorDashboardTeam) {
+  if (team.accessStatus !== "ready") {
+    return "Freigabe im Blick behalten";
+  }
+
+  if (!team.reportReady) {
+    return "Report-Stand beobachten";
+  }
+
+  if (team.statusLabel === "Founder-Reaktion liegt vor") {
+    return "Founder-Reaktion ansehen";
+  }
+
+  if (team.statusLabel === "Founder-Reaktion offen") {
+    return "Workbook auf neue Reaktion pruefen";
+  }
+
+  if (team.statusLabel === "Workbook in Arbeit") {
+    return "Workbook-Stand pruefen";
+  }
+
+  return "Report oder Workbook oeffnen";
+}
+
 function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   return (
     <div className="flex -space-x-2">
@@ -72,21 +136,21 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
           <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Letzte Aktivitaet
+                Letzter Stand
               </span>
               {team.lastActivityLabel}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Begleitung
+                Workbook
               </span>
-              {team.statusLabel}
+              {workbookStatusLabel(team)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Follow-up
+                Aufmerksamkeit
               </span>
-              {team.followUpLabel}
+              {attentionLabel(team)}
             </p>
           </div>
         </div>
@@ -95,8 +159,25 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
           <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${accessStatusClassName(team.accessStatus)}`}>
             {team.accessStatusLabel}
           </span>
-          <p className="mt-3 font-medium text-slate-900">{team.approvalSummary}</p>
+          <p className="mt-3 font-medium text-slate-900">Freigabe: {team.approvalSummary}</p>
           <p className="mt-1 leading-6 text-slate-600">{team.accessStatusDescription}</p>
+          <div className="mt-4 grid gap-2">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Report</span>
+              <span
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${progressToneClassName({
+                  active: team.reportReady && team.workbookAvailable,
+                  tone: team.reportReady ? "success" : "warning",
+                })}`}
+              >
+                {reportStatusLabel(team)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Follow-up</span>
+              <span className="text-xs font-medium text-slate-700">{team.followUpLabel}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -295,8 +376,7 @@ export default async function AdvisorDashboardPage({
               Deine begleiteten Teams
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-              Öffne nur Teams mit aktiver Freigabe. Alles andere bleibt sichtbar als Status, aber
-              nicht als Arbeitszugriff.
+              Du siehst pro Team Freigabe, aktuellen Stand und worauf sich dein Blick gerade am ehesten lohnt.
             </p>
           </div>
         </div>
@@ -368,19 +448,19 @@ export default async function AdvisorDashboardPage({
           <>
             <TeamSection
               title="Bereit zur Begleitung"
-              description="Diese Teams sind freigegeben. Du kannst Workbook, Report und Snapshot öffnen."
+              description="Freigabe vollstaendig. Hier lohnt sich der Blick ins Workbook, in den Report oder in den aktuellen Snapshot."
               teams={readyTeams}
               debug={debug}
             />
             <TeamSection
               title="Wartet auf Freigabe"
-              description="Diese Teams sind verknüpft, aber noch nicht vollständig freigegeben."
+              description="Diese Teams sind sichtbar, aber noch nicht vollstaendig freigegeben. Behalte den Freigabestand im Blick."
               teams={waitingTeams}
               debug={debug}
             />
             <TeamSection
               title="Zugriff pausiert"
-              description="Hier fehlt aktuell eine aktive Freigabe. Du siehst den Status, arbeitest aber nicht weiter."
+              description="Hier ist die Freigabe aktuell nicht vollstaendig aktiv. Der Stand bleibt sichtbar, der Arbeitszugriff pausiert."
               teams={pausedTeams}
               debug={debug}
             />

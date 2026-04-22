@@ -54,6 +54,7 @@ import {
   type FounderAlignmentWorkbookDiscussionEntry,
   type FounderAlignmentWorkbookDiscussionReaction,
   type FounderAlignmentWorkbookDiscussionSignal,
+  type FounderAlignmentWorkbookAdvisorReply,
   type WorkbookStepMarkersByStep,
   type WorkbookStructuredOutputsByStep,
   type WorkbookStructuredStepOutputs,
@@ -113,6 +114,11 @@ type DiscussionSignalOption = {
 type WorkbookDiscussionThreadGroup = {
   rootEntry: FounderAlignmentWorkbookDiscussionEntry;
   childEntries: FounderAlignmentWorkbookDiscussionEntry[];
+};
+
+type WorkbookAdvisorReplyGroup = {
+  sourceEntryId: string;
+  replies: FounderAlignmentWorkbookAdvisorReply[];
 };
 
 const PREMIUM_WORKBOOK_V2_STEP_IDS = [
@@ -1038,6 +1044,25 @@ function buildDiscussionThreadGroups(
     .filter((group, index, all) => all.findIndex((candidate) => candidate.rootEntry.id === group.rootEntry.id) === index);
 }
 
+function buildAdvisorReplyGroups(
+  replies: FounderAlignmentWorkbookAdvisorReply[]
+): WorkbookAdvisorReplyGroup[] {
+  const grouped = new Map<string, FounderAlignmentWorkbookAdvisorReply[]>();
+
+  for (const reply of replies) {
+    const existing = grouped.get(reply.sourceEntryId) ?? [];
+    existing.push(reply);
+    grouped.set(reply.sourceEntryId, existing);
+  }
+
+  return Array.from(grouped.entries()).map(([sourceEntryId, groupedReplies]) => ({
+    sourceEntryId,
+    replies: [...groupedReplies].sort((left, right) =>
+      (left.updatedAt ?? left.createdAt).localeCompare(right.updatedAt ?? right.createdAt)
+    ),
+  }));
+}
+
 function countDiscussionEntryReactions(
   workspace: FounderAlignmentWorkbookStepWorkspaceV2,
   entryId: string
@@ -1544,6 +1569,7 @@ export function FounderAlignmentWorkbookClient({
     [currentPremiumV2StepId, currentStepMarker?.markerClass]
   );
   const currentStepEntry = workbook.steps[currentStep.id];
+  const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
   const currentStepMissingStructuredKeys =
     currentStructuredStepId != null && currentStepMarker
@@ -1643,6 +1669,10 @@ export function FounderAlignmentWorkbookClient({
     () => (decisionRulesWorkspace ? buildDiscussionThreadGroups(decisionRulesWorkspace) : []),
     [decisionRulesWorkspace]
   );
+  const currentStepAdvisorReplyGroups = useMemo(
+    () => buildAdvisorReplyGroups(currentStepAdvisorReplies),
+    [currentStepAdvisorReplies]
+  );
   const decisionRulesMatchingHint =
     currentPremiumV2StepId != null
       ? buildWorkbookV2MatchingHint(currentPremiumV2StepId, currentStepMarker?.markerClass ?? null)
@@ -1722,7 +1752,7 @@ export function FounderAlignmentWorkbookClient({
       ? isCollaborativeMode
         ? "Ihr arbeitet im selben Raum. Eigene Punkte bleiben editierbar, fremde Punkte koennt ihr einordnen, ergaenzen oder als Basis fuer einen eigenen Punkt nutzen."
         : "Du startest mit deinem ersten Stand im gemeinsamen Raum. Die andere Person sieht ihn hier, ordnet ihn spaeter ein und ergaenzt eigene Punkte mit eigener Autorenschaft."
-      : "Beide Founder arbeiten hier im selben Raum. Punkte bleiben pro Person sichtbar und werden gemeinsam zur Vereinbarung verdichtet.";
+      : "Hier siehst du, welche Punkte die Founder bisher festgehalten haben. Die Beitraege bleiben pro Person sichtbar.";
   const workbookV2WeightingHint =
     currentUserRole === "founderA" || currentUserRole === "founderB"
       ? "Ordnet jeden Punkt klar ein. Fremde Punkte bleiben unveraendert; wenn ihr darauf aufbauen wollt, macht daraus einen eigenen Punkt."
@@ -1865,6 +1895,7 @@ export function FounderAlignmentWorkbookClient({
           const stepMarker = structuredStepId != null ? effectiveStepMarkersByStep[structuredStepId] : null;
           const status = deriveWorkbookStepStatus(step.id, stepEntry, stepMarker?.markerClass ?? null);
           const hasAdvisorNotes = stepEntry.advisorNotes.trim().length > 0;
+          const hasAdvisorReplies = (stepEntry.advisorReplies?.length ?? 0) > 0;
           const hasAdvisorClosingContent =
             step.id === "advisor_closing"
               ? [
@@ -1885,6 +1916,7 @@ export function FounderAlignmentWorkbookClient({
             completed ||
             status !== "collecting_inputs" ||
             hasAdvisorNotes ||
+            hasAdvisorReplies ||
             hasAdvisorClosingContent;
 
           return [
@@ -2154,11 +2186,15 @@ export function FounderAlignmentWorkbookClient({
     }
 
     if (field === "founderA") {
-      return t(`Dieses Feld wird von ${founderALabel} ausgefuellt.`);
+      return isAdvisorViewer
+        ? t(`Hier siehst du den bisher festgehaltenen Beitrag von ${founderALabel}.`)
+        : t(`Dieses Feld wird von ${founderALabel} ausgefuellt.`);
     }
 
     if (field === "founderB") {
-      return t(`Dieses Feld wird von ${founderBLabel} ausgefuellt.`);
+      return isAdvisorViewer
+        ? t(`Hier siehst du den bisher festgehaltenen Beitrag von ${founderBLabel}.`)
+        : t(`Dieses Feld wird von ${founderBLabel} ausgefuellt.`);
     }
 
     if (field === "advisorNotes") {
@@ -2213,6 +2249,32 @@ export function FounderAlignmentWorkbookClient({
           workspaceV2: workspace,
           founderAApproved: false,
           founderBApproved: false,
+        },
+      },
+    }));
+  }
+
+  function updateAdvisorReplies(
+    updater: (
+      replies: FounderAlignmentWorkbookAdvisorReply[]
+    ) => FounderAlignmentWorkbookAdvisorReply[]
+  ) {
+    if (currentUserRole !== "advisor") {
+      return;
+    }
+
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setWorkbook((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activeStepId]: {
+          ...current.steps[activeStepId],
+          advisorReplies: updater(current.steps[activeStepId].advisorReplies ?? []),
         },
       },
     }));
@@ -2370,6 +2432,41 @@ export function FounderAlignmentWorkbookClient({
       ...current,
       [activeStepId]: null,
     }));
+  }
+
+  function addAdvisorReply(sourceEntryId: string, content: string) {
+    if (
+      !isPremiumWorkbookV2StepId(activeStepId) ||
+      !decisionRulesWorkspace ||
+      currentUserRole !== "advisor"
+    ) {
+      return false;
+    }
+
+    const trimmedContent = content.trim();
+    if (!trimmedContent) {
+      return false;
+    }
+
+    const sourceEntry = decisionRulesWorkspace.entries.find((entry) => entry.id === sourceEntryId);
+    if (!sourceEntry) {
+      return false;
+    }
+
+    updateAdvisorReplies((currentReplies) => [
+      ...currentReplies,
+      {
+        id: createDiscussionEntryId(),
+        sourceEntryId,
+        content: trimmedContent,
+        advisorUserId: workbook.advisorId,
+        advisorName: advisorLabel,
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+      },
+    ]);
+    setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, sourceEntryId));
+    return true;
   }
 
   function updateDecisionRulesDiscussionEntry(entryId: string, content: string) {
@@ -2771,7 +2868,7 @@ export function FounderAlignmentWorkbookClient({
   const previousStepId = workbookPreviousStepId(activeStepId, visibleSteps);
   function fieldHeading(field: WorkbookEditableField) {
     if (field === "advisorNotes") {
-      return t("Hinweis aus der Moderation");
+      return t("Impuls aus der Begleitung");
     }
     if (field === "agreement") {
       return "Finale Absprache";
@@ -3592,12 +3689,12 @@ export function FounderAlignmentWorkbookClient({
 
                               <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                  {t("Was der Advisor später darf")}
+                                  {t("Was der Advisor spaeter darf")}
                                 </p>
                                 <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
                                   <li>{t("Sieht den freigegebenen Report und das Workbook.")}</li>
-                                  <li>{t("Ergänzt nur Advisor-Hinweise und den Advisor-Abschluss.")}</li>
-                                  <li>{t("Ändert keine Founder-Beiträge, Regeln oder Zustimmungen.")}</li>
+                                  <li>{t("Antwortet auf sichtbare Founder-Beitraege und ergaenzt pro Abschnitt einen Impuls.")}</li>
+                                  <li>{t("Aendert keine Founder-Beitraege, Regeln oder Zustimmungen.")}</li>
                                 </ul>
                               </div>
 
@@ -3784,7 +3881,11 @@ export function FounderAlignmentWorkbookClient({
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-                      {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll.")}
+                      {t(
+                        isAdvisorViewer
+                          ? "Hier siehst du die Leitfrage, die festgehaltenen Founder-Perspektiven und den aktuellen Stand dieses Abschnitts."
+                          : "Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll."
+                      )}
                     </p>
                     {currentStepIsPrioritized ? (
                       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -3793,37 +3894,39 @@ export function FounderAlignmentWorkbookClient({
                         </span>
                       </div>
                     ) : null}
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                        {t("Arbeitsweise")}
-                      </span>
-                      <div className="inline-flex w-fit rounded-full border border-slate-200 bg-slate-50 p-1">
-                        {WORKBOOK_MODE_OPTIONS.map((option) => {
-                          const isActive = currentStepMode === option.value;
-                          const disabled = currentUserRole === "advisor" || currentUserRole === "unknown";
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => updateStepMode(option.value)}
-                              disabled={disabled}
-                              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                                isActive
-                                  ? "bg-slate-900 text-white"
-                                  : disabled
-                                    ? "cursor-not-allowed text-slate-400"
-                                    : "text-slate-600 hover:bg-white hover:text-slate-900"
-                              }`}
-                            >
-                              {t(WORKBOOK_MODE_SHORT_LABELS[option.value])}
-                            </button>
-                          );
-                        })}
+                    {!isAdvisorViewer ? (
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                          {t("Arbeitsweise")}
+                        </span>
+                        <div className="inline-flex w-fit rounded-full border border-slate-200 bg-slate-50 p-1">
+                          {WORKBOOK_MODE_OPTIONS.map((option) => {
+                            const isActive = currentStepMode === option.value;
+                            const disabled = currentUserRole === "unknown";
+                            return (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => updateStepMode(option.value)}
+                                disabled={disabled}
+                                className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                                  isActive
+                                    ? "bg-slate-900 text-white"
+                                    : disabled
+                                      ? "cursor-not-allowed text-slate-400"
+                                      : "text-slate-600 hover:bg-white hover:text-slate-900"
+                                }`}
+                              >
+                                {t(WORKBOOK_MODE_SHORT_LABELS[option.value])}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t(WORKBOOK_MODE_V2_HINTS[currentStepMode])}
+                        </p>
                       </div>
-                      <p className="text-xs leading-6 text-slate-500">
-                        {t(WORKBOOK_MODE_V2_HINTS[currentStepMode])}
-                      </p>
-                    </div>
+                    ) : null}
                   </div>
                   <span
                     className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
@@ -3843,7 +3946,11 @@ export function FounderAlignmentWorkbookClient({
                         Schritt {currentIndex + 1} von {visibleSteps.length}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
-                        {t("Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.")}
+                        {t(
+                          isAdvisorViewer
+                            ? "Hier siehst du, was die Founder in diesem Abschnitt bisher festgehalten haben."
+                            : "Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest."
+                        )}
                       </p>
                     </div>
                     <span
@@ -3882,7 +3989,7 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </StepSection>
 
-                {!currentStepIsAdvisorClosing ? (
+                {!currentStepIsAdvisorClosing && !isAdvisorViewer ? (
                   <details
                     className="mt-8 rounded-[28px] border border-slate-200/70 bg-white p-5 sm:p-6"
                     open={helperOpenByStep[currentStep.id]}
@@ -4275,14 +4382,14 @@ export function FounderAlignmentWorkbookClient({
                               ? `Du schreibst als ${founderALabel}`
                               : currentUserRole === "founderB"
                                 ? `Du schreibst als ${founderBLabel}`
-                                : "Nur lesbar"
+                                : "Advisor-Kontext"
                           )}
                         </span>
                       </div>
                     </div>
 
                     <div className="mt-5">
-                      {currentDiscussionDraftSourceEntry ? (
+                      {currentDiscussionDraftSourceEntry && !isAdvisorViewer ? (
                         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 text-xs text-slate-600">
                           <span className="font-medium text-slate-700">
                             {t("Basis fuer deinen Punkt")}
@@ -4298,31 +4405,39 @@ export function FounderAlignmentWorkbookClient({
                           </span>
                         </div>
                       ) : null}
-                      <textarea
-                        ref={discussionTextareaRef}
-                        value={currentDiscussionDraft}
-                        onChange={(event) => setDiscussionDraft(event.target.value)}
-                        placeholder={t(currentPremiumV2Config.collectPlaceholder)}
-                        readOnly={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
-                        rows={3}
-                        className={`w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition ${
-                          currentUserRole === "founderA" || currentUserRole === "founderB"
-                            ? "border-slate-200/80 bg-slate-50/50 text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
-                            : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
-                        }`}
-                      />
-                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-xs leading-6 text-slate-500">
-                          {t(currentPremiumV2Config.collectHelper)}
-                        </p>
-                        <ReportActionButton
-                          type="button"
-                          onClick={addDecisionRulesDiscussionEntry}
-                          disabled={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
-                        >
-                          {t("Eigenen Punkt hinzufuegen")}
-                        </ReportActionButton>
-                      </div>
+                      {!isAdvisorViewer ? (
+                        <>
+                          <textarea
+                            ref={discussionTextareaRef}
+                            value={currentDiscussionDraft}
+                            onChange={(event) => setDiscussionDraft(event.target.value)}
+                            placeholder={t(currentPremiumV2Config.collectPlaceholder)}
+                            readOnly={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
+                            rows={3}
+                            className={`w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition ${
+                              currentUserRole === "founderA" || currentUserRole === "founderB"
+                                ? "border-slate-200/80 bg-slate-50/50 text-slate-700 focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                                : "cursor-not-allowed border-slate-200/70 bg-slate-100/90 text-slate-500"
+                            }`}
+                          />
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-xs leading-6 text-slate-500">
+                              {t(currentPremiumV2Config.collectHelper)}
+                            </p>
+                            <ReportActionButton
+                              type="button"
+                              onClick={addDecisionRulesDiscussionEntry}
+                              disabled={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
+                            >
+                              {t("Eigenen Punkt hinzufuegen")}
+                            </ReportActionButton>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-600">
+                          {t("Hier siehst du die bisherigen Founder-Beitraege zu diesem Abschnitt.")}
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-5">
@@ -4334,9 +4449,11 @@ export function FounderAlignmentWorkbookClient({
                         <WorkbookV2DiscussionThreadList
                           groups={decisionRulesThreadGroups}
                           workspace={decisionRulesWorkspace}
+                          advisorReplyGroups={currentStepAdvisorReplyGroups}
                           currentUserRole={currentUserRole}
                           founderALabel={founderALabel}
                           founderBLabel={founderBLabel}
+                          advisorLabel={advisorLabel}
                           founderAvatarByAuthor={founderAvatarByAuthor}
                           signalOptions={currentPremiumV2SignalOptions}
                           mode="collect"
@@ -4346,6 +4463,7 @@ export function FounderAlignmentWorkbookClient({
                           onUpdateEntry={updateDecisionRulesDiscussionEntry}
                           onRemoveEntry={removeDecisionRulesDiscussionEntry}
                           onUpdateReaction={updateDecisionRulesReaction}
+                          onAddAdvisorReply={addAdvisorReply}
                           entryOwnClassName={currentToneMeta.entryOwn}
                           entrySharedClassName={currentToneMeta.entryShared}
                           sourceBadgeClassName={currentToneMeta.sourceBadge}
@@ -4354,13 +4472,17 @@ export function FounderAlignmentWorkbookClient({
                     </div>
 
                     <div className="mt-5 text-sm leading-7 text-slate-600">
-                      {hasDecisionRulesBothPerspectives
-                        ? t(currentPremiumV2Config.collectReadyText)
-                        : t(
-                            currentPremiumV2Config.missingPerspectiveText(
-                              hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel
-                            )
-                          )}
+                      {isAdvisorViewer
+                        ? hasDecisionRulesBothPerspectives
+                          ? t("Hier sind bereits Beitraege von beiden Foundern sichtbar.")
+                          : t("Hier ist bisher noch nicht von beiden Foundern eine Perspektive sichtbar.")
+                        : hasDecisionRulesBothPerspectives
+                          ? t(currentPremiumV2Config.collectReadyText)
+                          : t(
+                              currentPremiumV2Config.missingPerspectiveText(
+                                hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel
+                              )
+                            )}
                     </div>
                   </section>
                 ) : (
@@ -4370,7 +4492,11 @@ export function FounderAlignmentWorkbookClient({
                     detail={
                       hasDecisionRulesBothPerspectives
                         ? t("Beide Perspektiven sind sichtbar.")
-                        : t("Es fehlt noch mindestens ein eigener Punkt der zweiten Person.")
+                        : t(
+                            isAdvisorViewer
+                              ? "Hier fehlt aktuell noch eine sichtbare Perspektive der zweiten Founder-Person."
+                              : "Es fehlt noch mindestens ein eigener Punkt der zweiten Person."
+                          )
                     }
                     actionLabel={t(currentPremiumV2Config.collectActionLabel ?? "Denkraum bearbeiten")}
                     onAction={() => openWorkbookV2Phase("collect")}
@@ -4421,9 +4547,11 @@ export function FounderAlignmentWorkbookClient({
                       <WorkbookV2DiscussionThreadList
                         groups={decisionRulesThreadGroups}
                         workspace={decisionRulesWorkspace}
+                        advisorReplyGroups={currentStepAdvisorReplyGroups}
                         currentUserRole={currentUserRole}
                         founderALabel={founderALabel}
                         founderBLabel={founderBLabel}
+                        advisorLabel={advisorLabel}
                         founderAvatarByAuthor={founderAvatarByAuthor}
                         signalOptions={currentPremiumV2SignalOptions}
                         mode="weight"
@@ -4433,6 +4561,7 @@ export function FounderAlignmentWorkbookClient({
                         onUpdateEntry={updateDecisionRulesDiscussionEntry}
                         onRemoveEntry={removeDecisionRulesDiscussionEntry}
                         onUpdateReaction={updateDecisionRulesReaction}
+                        onAddAdvisorReply={addAdvisorReply}
                         entryOwnClassName={currentToneMeta.entryOwn}
                         entrySharedClassName={currentToneMeta.entryShared}
                         sourceBadgeClassName={currentToneMeta.sourceBadge}
@@ -4644,8 +4773,15 @@ export function FounderAlignmentWorkbookClient({
               </>
             ) : (
               <>
-                <StepSection title="2. Individuelle Antworten" className="mt-8 border-slate-200/70 bg-white">
-                  <p className="text-sm leading-7 text-slate-700">{t(helperQuestion)}</p>
+                <StepSection
+                  title={isAdvisorViewer ? "2. Founder-Perspektiven" : "2. Individuelle Antworten"}
+                  className="mt-8 border-slate-200/70 bg-white"
+                >
+                  <p className="text-sm leading-7 text-slate-700">
+                    {isAdvisorViewer
+                      ? t("Hier siehst du die Leitfrage und die bisher festgehaltenen Perspektiven der Founder.")
+                      : t(helperQuestion)}
+                  </p>
                   {isCollaborativeMode ? (
                     <div className="mt-6 grid gap-6 xl:grid-cols-2">
                       <WorkbookField
@@ -4804,22 +4940,28 @@ export function FounderAlignmentWorkbookClient({
 
                 <StepSection
                   title={
-                    isCollaborativeMode
+                    isAdvisorViewer
                       ? currentStepHasStructuredOutputs
-                        ? "4. Gemeinsamer Vorschlag"
-                        : "3. Gemeinsamer Vorschlag"
-                      : currentStepHasStructuredOutputs
-                        ? "4. Vorlaeufiger Vorschlag"
-                        : "3. Vorlaeufiger Vorschlag"
+                        ? "4. Aktueller Vorschlag"
+                        : "3. Aktueller Vorschlag"
+                      : isCollaborativeMode
+                        ? currentStepHasStructuredOutputs
+                          ? "4. Gemeinsamer Vorschlag"
+                          : "3. Gemeinsamer Vorschlag"
+                        : currentStepHasStructuredOutputs
+                          ? "4. Vorlaeufiger Vorschlag"
+                          : "3. Vorlaeufiger Vorschlag"
                   }
                   className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="max-w-3xl">
                       <p className="text-sm leading-7 text-slate-700">
-                        {isCollaborativeMode
-                          ? t("Aus beiden Antworten entsteht hier ein erster gemeinsamer Vorschlag, den ihr direkt weiter bearbeiten koennt.")
-                          : t("Auch mit nur einer Perspektive koennt ihr hier schon einen vorlaeufigen Vorschlag vorbereiten. Er bleibt spaeter gemeinsam anpassbar.")}
+                        {isAdvisorViewer
+                          ? t("Hier siehst du den aktuellen Vorschlag, der aus den Founder-Beitraegen fuer diesen Schritt entstanden ist.")
+                          : isCollaborativeMode
+                            ? t("Aus beiden Antworten entsteht hier ein erster gemeinsamer Vorschlag, den ihr direkt weiter bearbeiten koennt.")
+                            : t("Auch mit nur einer Perspektive koennt ihr hier schon einen vorlaeufigen Vorschlag vorbereiten. Er bleibt spaeter gemeinsam anpassbar.")}
                       </p>
                       {currentAgreementDraft?.comparisonHint ? (
                         <p className="mt-3 text-sm leading-7 text-slate-700">
@@ -4827,17 +4969,19 @@ export function FounderAlignmentWorkbookClient({
                         </p>
                       ) : null}
                     </div>
-                    <ReportActionButton
-                      type="button"
-                      onClick={() => {
-                        applyAgreementDraft();
-                        focusAgreementField();
-                      }}
-                      className="shrink-0"
-                      disabled={!currentAgreementDraft}
-                    >
-                      {t(isCollaborativeMode ? "Vorschlag erstellen" : "Vorlaeufigen Vorschlag erstellen")}
-                    </ReportActionButton>
+                    {!isAdvisorViewer ? (
+                      <ReportActionButton
+                        type="button"
+                        onClick={() => {
+                          applyAgreementDraft();
+                          focusAgreementField();
+                        }}
+                        className="shrink-0"
+                        disabled={!currentAgreementDraft}
+                      >
+                        {t(isCollaborativeMode ? "Vorschlag erstellen" : "Vorlaeufigen Vorschlag erstellen")}
+                      </ReportActionButton>
+                    ) : null}
                   </div>
 
                   <div className="mt-5 rounded-2xl border border-slate-200/70 bg-white p-5">
@@ -4850,26 +4994,38 @@ export function FounderAlignmentWorkbookClient({
                       {currentAgreementDraft
                         ? t(currentAgreementDraft.draft)
                         : t(
-                            isCollaborativeMode
-                              ? "Sobald beide Antworten da sind, koennt ihr hier einen gemeinsamen Vorschlag erstellen."
-                              : "Sobald deine Sicht vorliegt, kannst du hier einen vorlaeufigen Vorschlag erstellen."
+                            isAdvisorViewer
+                              ? "Sobald hier ein Vorschlag vorliegt, wird er in diesem Bereich sichtbar."
+                              : isCollaborativeMode
+                                ? "Sobald beide Antworten da sind, koennt ihr hier einen gemeinsamen Vorschlag erstellen."
+                                : "Sobald deine Sicht vorliegt, kannst du hier einen vorlaeufigen Vorschlag erstellen."
                           )}
                     </p>
                   </div>
                 </StepSection>
 
                 <StepSection
-                  title={currentStepHasStructuredOutputs ? "5. Finale Absprache" : "4. Finale Absprache"}
+                  title={
+                    isAdvisorViewer
+                      ? currentStepHasStructuredOutputs
+                        ? "5. Aktuelle Absprache"
+                        : "4. Aktuelle Absprache"
+                      : currentStepHasStructuredOutputs
+                        ? "5. Finale Absprache"
+                        : "4. Finale Absprache"
+                  }
                   className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.99))]"
                 >
                   <p className="text-sm leading-7 text-slate-700">
-                    {isCollaborativeMode
-                      ? t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")
-                      : t("Hier entsteht eure vorlaeufige oder gemeinsame Absprache. Final ist sie erst, wenn beide Founder zustimmen.")}
+                    {isAdvisorViewer
+                      ? t("Hier siehst du die aktuelle Absprache der Founder fuer diesen Schritt.")
+                      : isCollaborativeMode
+                        ? t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")
+                        : t("Hier entsteht eure vorlaeufige oder gemeinsame Absprache. Final ist sie erst, wenn beide Founder zustimmen.")}
                   </p>
                   <div className="mt-6">
                     <WorkbookField
-                      title={t("Eure finale Absprache")}
+                      title={t(isAdvisorViewer ? "Aktuelle Absprache" : "Eure finale Absprache")}
                       value={currentStepEntry.agreement}
                       onChange={(value) => updateEntry("agreement", value)}
                       placeholder={t("Welche konkrete Regel, Entscheidung oder Arbeitsweise soll fuer diesen Schritt kuenftig gelten?")}
@@ -4933,37 +5089,54 @@ export function FounderAlignmentWorkbookClient({
                         </button>
                       ) : null}
                       <p className="text-xs leading-6 text-slate-500">
-                        {!hasBothPerspectives
-                          ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
-                          : currentStepHasStructuredOutputs && !currentStepStructuredReady
-                            ? t("Vor der Finalisierung muessen die Pflichtfelder fuer diese Arbeitsregel ausgefuellt sein.")
-                          : currentStepIsApprovedByBoth
-                            ? t("Beide Founder haben zugestimmt. Dieser Schritt ist finalisiert.")
-                            : t("Sobald beide Founder bestaetigen, wird dieser Schritt finalisiert.")}
+                        {isAdvisorViewer
+                          ? !hasBothPerspectives
+                            ? t("Aktuell ist noch nicht von beiden Foundern eine vollstaendige Perspektive sichtbar.")
+                            : currentStepHasStructuredOutputs && !currentStepStructuredReady
+                              ? t("Die zugehoerige Arbeitsregel ist noch nicht vollstaendig ausgefuellt.")
+                            : currentStepIsApprovedByBoth
+                              ? t("Die Founder haben diesen Schritt bereits gemeinsam bestaetigt.")
+                              : t("Die Founder haben diesen Schritt inhaltlich vorbereitet, aber noch nicht gemeinsam bestaetigt.")
+                          : !hasBothPerspectives
+                            ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
+                            : currentStepHasStructuredOutputs && !currentStepStructuredReady
+                              ? t("Vor der Finalisierung muessen die Pflichtfelder fuer diese Arbeitsregel ausgefuellt sein.")
+                            : currentStepIsApprovedByBoth
+                              ? t("Beide Founder haben zugestimmt. Dieser Schritt ist finalisiert.")
+                              : t("Sobald beide Founder bestaetigen, wird dieser Schritt finalisiert.")}
                       </p>
                     </div>
                   </div>
                 </StepSection>
 
                 {showAdvisorNotesSection ? (
-                  <details className="mt-8 rounded-[28px] border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5 sm:p-6">
+                  <details
+                    className="mt-8 rounded-[28px] border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-5 sm:p-6"
+                    open={isAdvisorViewer}
+                  >
                     <summary className="cursor-pointer text-base font-semibold text-slate-950">
-                      {t("Advisor-Hinweis anzeigen")}
+                      {t(isAdvisorViewer ? "Impuls zum Abschnitt" : "Impuls aus der Begleitung anzeigen")}
                     </summary>
-                    <div className="mt-4">
-                      <p className="text-sm leading-7 text-slate-700">
-                        {t(
-                          "Hier steht die externe Beobachtung zum Schritt. Eure gemeinsame Absprache bleibt davon getrennt und wird dadurch nicht überschrieben."
+                  <div className="mt-4">
+                    <p className="text-sm leading-7 text-slate-700">
+                      {t(
+                          isAdvisorViewer
+                            ? "Ergaenze hier einen ruhigen Impuls, der dem Team fuer diesen Abschnitt Orientierung oder eine hilfreiche Rueckfrage gibt."
+                            : "Hier liegt ein kurzer Impuls aus der Begleitung zu diesem Abschnitt. Die Founder-Absprache bleibt davon getrennt."
                         )}
-                      </p>
+                    </p>
                       <div className="mt-6">
                         <WorkbookField
                           title={fieldHeading("advisorNotes")}
                           value={workbook.steps[currentStep.id].advisorNotes}
                           onChange={(value) => updateEntry("advisorNotes", value)}
-                          placeholder={t("Welche Beobachtung, Rueckfrage oder Moderationsnotiz ist fuer diesen Schritt hilfreich?")}
+                          placeholder={t("Welche Beobachtung oder Rueckfrage ist hier fuer das Team hilfreich?")}
                           readOnly={!canEditField("advisorNotes")}
-                          helperText={getFieldReadOnlyHint("advisorNotes")}
+                          helperText={
+                            canEditField("advisorNotes")
+                              ? t("Kurz und auf diesen Abschnitt bezogen halten.")
+                              : getFieldReadOnlyHint("advisorNotes")
+                          }
                         />
                       </div>
                     </div>
@@ -4979,13 +5152,21 @@ export function FounderAlignmentWorkbookClient({
                     {t("Naechster Schritt")}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {currentStepStatus === "finalized"
-                      ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
-                      : currentStepStatus === "awaiting_approval"
-                        ? t("Die Absprache steht. Es fehlt nur noch die Zustimmung beider Founder.")
-                        : currentStepStatus === "draft_ready"
-                          ? t("Es gibt bereits einen Entwurf. Macht daraus jetzt eine klare gemeinsame Absprache.")
-                          : t("Sammelt zuerst eure Perspektiven und formuliert dann eine erste Absprache.")}
+                    {isAdvisorViewer
+                      ? currentStepStatus === "finalized"
+                        ? t("Dieser Abschnitt ist bereits als gemeinsamer Stand der Founder festgehalten.")
+                        : currentStepStatus === "awaiting_approval"
+                          ? t("Es liegt ein inhaltlicher Stand vor, die gemeinsame Founder-Bestaetigung fehlt noch.")
+                          : currentStepStatus === "draft_ready"
+                            ? t("Es liegt bereits ein Entwurf fuer diesen Abschnitt vor.")
+                            : t("Hier entwickelt sich der Abschnitt noch aus den bisherigen Founder-Perspektiven.")
+                      : currentStepStatus === "finalized"
+                        ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
+                        : currentStepStatus === "awaiting_approval"
+                          ? t("Die Absprache steht. Es fehlt nur noch die Zustimmung beider Founder.")
+                          : currentStepStatus === "draft_ready"
+                            ? t("Es gibt bereits einen Entwurf. Macht daraus jetzt eine klare gemeinsame Absprache.")
+                            : t("Sammelt zuerst eure Perspektiven und formuliert dann eine erste Absprache.")}
                   </p>
                 </div>
                 <span
@@ -5321,9 +5502,11 @@ function WorkbookFounderAvatar({
 function WorkbookV2DiscussionThreadList({
   groups,
   workspace,
+  advisorReplyGroups,
   currentUserRole,
   founderALabel,
   founderBLabel,
+  advisorLabel,
   founderAvatarByAuthor,
   signalOptions,
   mode,
@@ -5333,15 +5516,18 @@ function WorkbookV2DiscussionThreadList({
   onUpdateEntry,
   onRemoveEntry,
   onUpdateReaction,
+  onAddAdvisorReply,
   entryOwnClassName,
   entrySharedClassName,
   sourceBadgeClassName,
 }: {
   groups: WorkbookDiscussionThreadGroup[];
   workspace: FounderAlignmentWorkbookStepWorkspaceV2;
+  advisorReplyGroups: WorkbookAdvisorReplyGroup[];
   currentUserRole: FounderAlignmentWorkbookViewerRole;
   founderALabel: string;
   founderBLabel: string;
+  advisorLabel: string;
   founderAvatarByAuthor: Record<
     FounderAlignmentWorkbookDiscussionAuthor,
     { avatarId: string | null; imageUrl: string | null }
@@ -5354,15 +5540,56 @@ function WorkbookV2DiscussionThreadList({
   onUpdateEntry: (entryId: string, content: string) => void;
   onRemoveEntry: (entryId: string) => void;
   onUpdateReaction: (entryId: string, signal: FounderAlignmentWorkbookDiscussionSignal) => void;
+  onAddAdvisorReply: (sourceEntryId: string, content: string) => boolean;
   entryOwnClassName: string;
   entrySharedClassName: string;
   sourceBadgeClassName: string;
 }) {
   const viewerFounderRole =
     currentUserRole === "founderA" || currentUserRole === "founderB" ? currentUserRole : null;
+  const isAdvisorViewer = currentUserRole === "advisor";
+  const [replyDraftByEntryId, setReplyDraftByEntryId] = useState<Record<string, string>>({});
+  const [replyComposerEntryId, setReplyComposerEntryId] = useState<string | null>(null);
 
   function authorLabelFor(author: FounderAlignmentWorkbookDiscussionAuthor) {
     return author === "founderA" ? founderALabel : founderBLabel;
+  }
+
+  function repliesFor(entryId: string) {
+    return advisorReplyGroups.find((group) => group.sourceEntryId === entryId)?.replies ?? [];
+  }
+
+  function openReplyComposer(entryId: string) {
+    setReplyComposerEntryId(entryId);
+    setReplyDraftByEntryId((current) => ({
+      ...current,
+      [entryId]: current[entryId] ?? "",
+    }));
+  }
+
+  function closeReplyComposer(entryId: string) {
+    setReplyComposerEntryId((current) => (current === entryId ? null : current));
+  }
+
+  function updateReplyDraft(entryId: string, value: string) {
+    setReplyDraftByEntryId((current) => ({
+      ...current,
+      [entryId]: value,
+    }));
+  }
+
+  function submitAdvisorReply(entryId: string) {
+    const draft = replyDraftByEntryId[entryId] ?? "";
+    const didAddReply = onAddAdvisorReply(entryId, draft);
+    if (!didAddReply) {
+      return;
+    }
+
+    setReplyDraftByEntryId((current) => ({
+      ...current,
+      [entryId]: "",
+    }));
+    setReplyComposerEntryId((current) => (current === entryId ? null : current));
   }
 
   function renderSignals(entry: FounderAlignmentWorkbookDiscussionEntry, compact: boolean) {
@@ -5372,6 +5599,23 @@ function WorkbookV2DiscussionThreadList({
     if (compact) {
       return (
         <div className="flex flex-wrap gap-2">
+          <WorkbookV2SignalBadge
+            label={founderALabel}
+            signal={signalA}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
+          />
+          <WorkbookV2SignalBadge
+            label={founderBLabel}
+            signal={signalB}
+            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
+          />
+        </div>
+      );
+    }
+
+    if (viewerFounderRole == null) {
+      return (
+        <div className="mt-4 flex flex-wrap gap-2 lg:justify-end">
           <WorkbookV2SignalBadge
             label={founderALabel}
             signal={signalA}
@@ -5447,6 +5691,9 @@ function WorkbookV2DiscussionThreadList({
       ? workspace.entries.find((candidate) => candidate.id === entry.sourceEntryId) ?? null
       : null;
     const reactionCount = countDiscussionEntryReactions(workspace, entry.id);
+    const advisorReplies = repliesFor(entry.id);
+    const hasAdvisorReplies = advisorReplies.length > 0;
+    const showReplyComposer = isAdvisorViewer && replyComposerEntryId === entry.id;
     const compactPreview = truncateDiscussionPreview(entry.content, options.isChild ? 120 : 180);
     const attachmentLabel = options.isChild
       ? sourceEntry
@@ -5540,11 +5787,114 @@ function WorkbookV2DiscussionThreadList({
             )}
 
             {mode === "weight" ? renderSignals(entry, false) : null}
+
+            {isAdvisorViewer ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => openReplyComposer(entry.id)}
+                  className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+                >
+                  {t("Antworten")}
+                </button>
+                <span className="text-xs leading-5 text-slate-500">
+                  {t(
+                    hasAdvisorReplies
+                      ? `${advisorReplies.length} Antwort${advisorReplies.length === 1 ? "" : "en"} aus der Begleitung`
+                      : "Kurze Rueckfrage oder Einordnung direkt am Beitrag."
+                  )}
+                </span>
+              </div>
+            ) : null}
+
+            {showReplyComposer ? (
+              <div className="mt-4 rounded-[20px] border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                  {t("Antwort aus der Begleitung")}
+                </p>
+                <textarea
+                  value={replyDraftByEntryId[entry.id] ?? ""}
+                  onChange={(event) => updateReplyDraft(entry.id, event.target.value)}
+                  rows={3}
+                  placeholder={t("Welche Rueckfrage, Beobachtung oder kurze Einordnung ist hier hilfreich?")}
+                  className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
+                />
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs leading-6 text-slate-500">
+                    {t("Kurz und bezogen auf diesen Beitrag halten.")}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => closeReplyComposer(entry.id)}
+                      className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+                    >
+                      {t("Abbrechen")}
+                    </button>
+                    <ReportActionButton
+                      type="button"
+                      onClick={() => submitAdvisorReply(entry.id)}
+                      disabled={(replyDraftByEntryId[entry.id] ?? "").trim().length === 0}
+                    >
+                      {t("Antwort speichern")}
+                    </ReportActionButton>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {hasAdvisorReplies ? (
+              <div className="mt-4 border-l border-[color:var(--brand-accent)]/18 pl-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                    {t("Antworten aus der Begleitung")}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {t(`${advisorReplies.length} sichtbar`)}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {advisorReplies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className="rounded-[18px] border border-[color:var(--brand-accent)]/14 bg-white/92 px-4 py-4"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/8 text-xs font-semibold text-slate-700">
+                            {t((reply.advisorName ?? advisorLabel).slice(0, 1).toUpperCase())}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-900">
+                              {t(reply.advisorName?.trim() || advisorLabel)}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {formatDiscussionTimestamp(reply.updatedAt ?? reply.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="inline-flex rounded-full border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/8 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-600">
+                          {t("Advisor")}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">{t(reply.content)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </>
         ) : (
           <div className="mt-3">
             <p className="text-sm leading-7 text-slate-700">{t(compactPreview)}</p>
             {mode === "weight" ? <div className="mt-3">{renderSignals(entry, true)}</div> : null}
+            {hasAdvisorReplies ? (
+              <p className="mt-3 text-xs leading-6 text-slate-500">
+                {t(
+                  `${advisorReplies.length} Antwort${advisorReplies.length === 1 ? "" : "en"} aus der Begleitung sichtbar`
+                )}
+              </p>
+            ) : null}
           </div>
         )}
       </div>
@@ -5556,6 +5906,10 @@ function WorkbookV2DiscussionThreadList({
       {groups.map((group) => {
         const isOpen = openThreadId === group.rootEntry.id;
         const threadEntryCount = group.childEntries.length;
+        const threadReplyCount = [group.rootEntry, ...group.childEntries].reduce(
+          (count, entry) => count + repliesFor(entry.id).length,
+          0
+        );
         const unresolvedCount =
           mode === "weight"
             ? [group.rootEntry, ...group.childEntries].filter((entry) => {
@@ -5580,6 +5934,11 @@ function WorkbookV2DiscussionThreadList({
                 <span className="text-xs text-slate-500">
                   {threadEntryCount > 0 ? t(`${threadEntryCount} Anschlussbeitraege`) : t("Kein Anschluss")}
                 </span>
+                {threadReplyCount > 0 ? (
+                  <span className="text-xs text-slate-500">
+                    {t(`${threadReplyCount} Advisor-Antwort${threadReplyCount === 1 ? "" : "en"}`)}
+                  </span>
+                ) : null}
                 {mode === "weight" && unresolvedCount > 0 ? (
                   <span className="rounded-full border border-amber-200 bg-amber-50/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700">
                     {t(`${unresolvedCount} offen`)}
@@ -6200,7 +6559,7 @@ function WorkbookSummaryView({
                 {item.advisorNotes ? (
                   <div className="mt-6 border-t border-slate-200/80 pt-5">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Hinweis aus der Begleitung")}
+                      {t("Impuls aus der Begleitung")}
                     </p>
                     <p className="mt-3 text-[15px] leading-8 text-slate-700">{t(item.advisorNotes)}</p>
                   </div>
@@ -6704,6 +7063,17 @@ function buildWorkbookPatches(
         stepId,
         field: "advisorNotes",
         value: nextStep.advisorNotes,
+      });
+    }
+    if (
+      JSON.stringify(previousStep.advisorReplies ?? []) !==
+      JSON.stringify(nextStep.advisorReplies ?? [])
+    ) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "advisorReplies",
+        value: nextStep.advisorReplies ?? [],
       });
     }
   }

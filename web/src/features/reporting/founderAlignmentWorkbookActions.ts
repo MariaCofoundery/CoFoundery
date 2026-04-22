@@ -756,6 +756,7 @@ function mergeFounderPayload(
         }
         break;
       case "advisorNotes":
+      case "advisorReplies":
         break;
       case "workspaceEntryCreate": {
         const entry = sanitizeDiscussionEntryPatchValue(patch.value);
@@ -947,10 +948,24 @@ function mergeAdvisorPayload(
       continue;
     }
 
-    if (patch.scope === "step" && patch.field === "advisorNotes") {
+    if (
+      patch.scope === "step" &&
+      (patch.field === "advisorNotes" || patch.field === "advisorReplies")
+    ) {
       const stepEntry = nextPayload.steps[patch.stepId];
       if (stepEntry) {
-        stepEntry.advisorNotes = typeof patch.value === "string" ? patch.value : "";
+        if (patch.field === "advisorNotes") {
+          stepEntry.advisorNotes = typeof patch.value === "string" ? patch.value : "";
+        } else {
+          stepEntry.advisorReplies = sanitizeFounderAlignmentWorkbookPayload({
+            steps: {
+              [patch.stepId]: {
+                workspaceV2: stepEntry.workspaceV2,
+                advisorReplies: patch.value,
+              },
+            },
+          }).steps[patch.stepId].advisorReplies;
+        }
       }
     }
   }

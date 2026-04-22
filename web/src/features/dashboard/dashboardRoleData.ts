@@ -166,22 +166,22 @@ function deriveAdvisorStatusLabel(params: {
   teamContext: "pre_founder" | "existing_team";
 }) {
   if (params.hasFounderReaction) {
-    return "Founder haben reagiert";
+    return "Founder-Reaktion liegt vor";
   }
 
   if (params.hasAdvisorClosing) {
-    return "Warten auf Founder-Reaktion";
+    return "Founder-Reaktion offen";
   }
 
   if (params.hasWorkbook) {
-    return "Advisor-Impulse offen";
+    return "Workbook in Arbeit";
   }
 
   if (params.hasReport) {
-    return params.teamContext === "existing_team" ? "Alignment bereit" : "Matching bereit";
+    return params.teamContext === "existing_team" ? "Alignment-Report bereit" : "Matching-Report bereit";
   }
 
-  return "Noch kein Workbook";
+  return "Workbook noch leer";
 }
 
 function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAccessRow): Pick<
@@ -196,7 +196,7 @@ function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAcc
     return {
       accessStatus: "paused",
       accessStatusLabel: "Zugriff widerrufen",
-      accessStatusDescription: "Die Advisor-Freigabe wurde für dieses Team widerrufen.",
+      accessStatusDescription: "Die Freigabe ist fuer dieses Team nicht mehr aktiv. Du siehst den Stand, arbeitest aber nicht weiter.",
       approvalSummary: `${Number(founderAApproved) + Number(founderBApproved)} von 2 Freigaben`,
       canOpenWorkbook: false,
     };
@@ -206,7 +206,7 @@ function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAcc
     return {
       accessStatus: "ready",
       accessStatusLabel: "Freigegeben",
-      accessStatusDescription: "Beide Founder haben die Begleitung freigegeben.",
+      accessStatusDescription: "Freigabe vollstaendig. Workbook, Report und Snapshot koennen genutzt werden, sobald der jeweilige Stand vorliegt.",
       approvalSummary: "2 von 2 Freigaben",
       canOpenWorkbook: true,
     };
@@ -218,7 +218,7 @@ function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAcc
     return {
       accessStatus: "paused",
       accessStatusLabel: "Zugriff pausiert",
-      accessStatusDescription: "Die Freigabe ist nicht mehr vollstaendig aktiv.",
+      accessStatusDescription: "Mindestens eine Freigabe ist aktuell nicht aktiv. Du behaeltst den Status im Blick, arbeitest aber nicht weiter.",
       approvalSummary,
       canOpenWorkbook: false,
     };
@@ -227,7 +227,7 @@ function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAcc
   return {
     accessStatus: "waiting_for_approval",
     accessStatusLabel: "Wartet auf Freigabe",
-    accessStatusDescription: "Du kannst arbeiten, sobald beide Founder zugestimmt haben.",
+    accessStatusDescription: "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team fuer die Begleitung offen.",
     approvalSummary,
     canOpenWorkbook: false,
   };
