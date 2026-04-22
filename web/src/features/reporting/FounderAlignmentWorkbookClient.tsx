@@ -1724,7 +1724,17 @@ export function FounderAlignmentWorkbookClient({
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
       : null;
+  const defaultAdvisorReplyOpenThreadId =
+    decisionRulesWorkspace && currentStepAdvisorReplyGroups.length > 0
+      ? decisionRulesThreadGroups.find((group) => {
+          const threadEntries = [group.rootEntry, ...group.childEntries];
+          return threadEntries.some((entry) =>
+            currentStepAdvisorReplyGroups.some((replyGroup) => replyGroup.sourceEntryId === entry.id)
+          );
+        })?.rootEntry.id ?? null
+      : null;
   const defaultDiscussionOpenThreadId = currentDiscussionDraftSourceRootEntryId
+    ?? defaultAdvisorReplyOpenThreadId
     ?? (
       visibleWorkbookV2Phase === "weight"
         ? decisionRulesThreadGroups.find((group) => {
@@ -3880,13 +3890,11 @@ export function FounderAlignmentWorkbookClient({
                       Schritt {currentIndex + 1} von {visibleSteps.length}
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-                      {t(
-                        isAdvisorViewer
-                          ? "Hier siehst du die Leitfrage, die festgehaltenen Founder-Perspektiven und den aktuellen Stand dieses Abschnitts."
-                          : "Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll."
-                      )}
-                    </p>
+                    {!isAdvisorViewer ? (
+                      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+                        {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll.")}
+                      </p>
+                    ) : null}
                     {currentStepIsPrioritized ? (
                       <div className="mt-4 flex flex-wrap items-center gap-2">
                         <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
@@ -4433,11 +4441,7 @@ export function FounderAlignmentWorkbookClient({
                             </ReportActionButton>
                           </div>
                         </>
-                      ) : (
-                        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-600">
-                          {t("Hier siehst du die bisherigen Founder-Beitraege zu diesem Abschnitt.")}
-                        </div>
-                      )}
+                      ) : null}
                     </div>
 
                     <div className="mt-5">
@@ -4475,7 +4479,7 @@ export function FounderAlignmentWorkbookClient({
                       {isAdvisorViewer
                         ? hasDecisionRulesBothPerspectives
                           ? t("Hier sind bereits Beitraege von beiden Foundern sichtbar.")
-                          : t("Hier ist bisher noch nicht von beiden Foundern eine Perspektive sichtbar.")
+                          : null
                         : hasDecisionRulesBothPerspectives
                           ? t(currentPremiumV2Config.collectReadyText)
                           : t(

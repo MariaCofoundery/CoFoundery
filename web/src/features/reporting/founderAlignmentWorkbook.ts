@@ -63,6 +63,8 @@ export type WorkbookStructuredOutputsByStep = Partial<
   Record<FounderAlignmentWorkbookStepId, WorkbookStructuredStepOutputs>
 >;
 
+const LEGACY_WORKBOOK_REPLY_TIMESTAMP = "1970-01-01T00:00:00.000Z";
+
 export const WORKBOOK_DISCUSSION_SIGNAL_VALUES = ["important", "agree", "critical"] as const;
 
 export type FounderAlignmentWorkbookDiscussionAuthor = "founderA" | "founderB";
@@ -567,6 +569,46 @@ function sanitizeWorkbookAdvisorReplies(
     .filter((reply): reply is FounderAlignmentWorkbookAdvisorReply => Boolean(reply));
 }
 
+function buildLegacyWorkspaceForAdvisorReplies(params: {
+  founderA: string | undefined;
+  founderB: string | undefined;
+}): FounderAlignmentWorkbookStepWorkspaceV2 | undefined {
+  const entries: FounderAlignmentWorkbookDiscussionEntry[] = [];
+
+  if (typeof params.founderA === "string" && params.founderA.trim()) {
+    entries.push({
+      id: "legacy-founderA",
+      content: params.founderA.trim(),
+      createdBy: "founderA",
+      createdAt: LEGACY_WORKBOOK_REPLY_TIMESTAMP,
+      sourceEntryId: null,
+      updatedAt: null,
+      updatedBy: null,
+    });
+  }
+
+  if (typeof params.founderB === "string" && params.founderB.trim()) {
+    entries.push({
+      id: "legacy-founderB",
+      content: params.founderB.trim(),
+      createdBy: "founderB",
+      createdAt: LEGACY_WORKBOOK_REPLY_TIMESTAMP,
+      sourceEntryId: null,
+      updatedAt: null,
+      updatedBy: null,
+    });
+  }
+
+  if (entries.length === 0) {
+    return undefined;
+  }
+
+  return {
+    entries,
+    reactions: [],
+  };
+}
+
 export function sanitizeWorkbookStepWorkspaceV2(
   input: unknown
 ): FounderAlignmentWorkbookStepWorkspaceV2 | undefined {
@@ -879,6 +921,12 @@ export function sanitizeFounderAlignmentWorkbookPayload(
   for (const step of FOUNDER_ALIGNMENT_WORKBOOK_STEPS) {
     const source = raw.steps?.[step.id];
     const workspaceV2 = sanitizeWorkbookStepWorkspaceV2(source?.workspaceV2);
+    const advisorReplyWorkspace =
+      workspaceV2 ??
+      buildLegacyWorkspaceForAdvisorReplies({
+        founderA: typeof source?.founderA === "string" ? source.founderA : undefined,
+        founderB: typeof source?.founderB === "string" ? source.founderB : undefined,
+      });
     steps[step.id] = {
       mode: source?.mode === "collaborative" ? "collaborative" : "solo",
       founderA: typeof source?.founderA === "string" ? source.founderA : "",
@@ -889,7 +937,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
       founderAApproved: source?.founderAApproved === true,
       founderBApproved: source?.founderBApproved === true,
       advisorNotes: typeof source?.advisorNotes === "string" ? source.advisorNotes : "",
-      advisorReplies: sanitizeWorkbookAdvisorReplies(source?.advisorReplies, workspaceV2),
+      advisorReplies: sanitizeWorkbookAdvisorReplies(source?.advisorReplies, advisorReplyWorkspace),
     };
   }
 

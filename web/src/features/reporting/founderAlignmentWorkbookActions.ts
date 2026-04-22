@@ -20,6 +20,7 @@ import {
   hashFounderAlignmentAdvisorToken,
   type FounderAlignmentWorkbookAdvisorInviteState,
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
+import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
   hasAdvisorAccessToRelationship,
   listRelationshipAdvisorsForRelationship,
@@ -454,11 +455,12 @@ async function resolveWorkbookViewerRole(
   if (invitation.inviter_user_id === userId) return "founderA";
   if (invitation.invitee_user_id === userId) return "founderB";
   const accessClient = privileged ?? supabase;
-  const relationshipId = await resolveRelationshipIdForInvitation(invitationId, accessClient);
-  if (
-    relationshipId &&
-    (await hasAdvisorAccessToRelationship(userId, relationshipId, accessClient))
-  ) {
+  const advisorRelationshipContext = await resolveAdvisorRelationshipContext({
+    invitationId,
+    advisorUserId: userId,
+    client: accessClient,
+  });
+  if (advisorRelationshipContext.hasRelationshipAdvisorAccess) {
     return "advisor";
   }
   if (

@@ -181,6 +181,38 @@ test("advisor replies without a valid source entry are dropped during sanitizing
   assert.deepEqual(payload.steps.decision_rules.advisorReplies ?? [], []);
 });
 
+test("advisor replies persist against legacy founder fields when no workspaceV2 exists yet", () => {
+  const payload = sanitizeFounderAlignmentWorkbookPayload({
+    currentStepId: "vision_direction",
+    steps: {
+      vision_direction: {
+        mode: "collaborative",
+        founderA: "Wir priorisieren Produktfokus.",
+        founderB: "Ich will fruehe Gespraeche offenhalten.",
+        agreement: "",
+        advisorReplies: [
+          {
+            id: "reply-a",
+            sourceEntryId: "legacy-founderA",
+            content: "Welche Grenze schuetzt euren Fokus konkret?",
+            advisorUserId: "advisor-1",
+            advisorName: "Advisor",
+            createdAt: "2026-04-09T08:15:00.000Z",
+            updatedAt: null,
+          },
+        ],
+      },
+    },
+  });
+
+  assert.equal(payload.steps.vision_direction.workspaceV2, undefined);
+  assert.equal(payload.steps.vision_direction.advisorReplies?.length ?? 0, 1);
+  assert.equal(
+    payload.steps.vision_direction.advisorReplies?.[0]?.sourceEntryId,
+    "legacy-founderA"
+  );
+});
+
 test("all non-advisor workbook steps expose the five structured output types", () => {
   for (const [stepId, content] of Object.entries(WORKBOOK_STEP_CONTENT)) {
     if (stepId === "advisor_closing") {
