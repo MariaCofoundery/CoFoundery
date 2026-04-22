@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { buildInvitationDashboardHref, buildInvitationResumeHref } from "@/features/onboarding/invitationFlow";
 import {
   claimAdvisorTeamInviteFounderAction,
 } from "@/features/dashboard/advisorTeamInviteActions";
@@ -87,6 +88,9 @@ export default async function AdvisorTeamInvitePage({
     currentUserMatchesInvite &&
     (founderSlot === "founderA" ? !row.founder_a_user_id || slotAlreadyClaimed : !row.founder_b_user_id || slotAlreadyClaimed);
   const invitationReady = Boolean(row.invitation_id);
+  const invitationDashboardHref = row.invitation_id
+    ? buildInvitationDashboardHref(row.invitation_id)
+    : "/dashboard";
 
   async function claimAction() {
     "use server";
@@ -96,11 +100,11 @@ export default async function AdvisorTeamInvitePage({
       redirect(`/team-invite/${encodeURIComponent(token)}?error=${encodeURIComponent(result.reason)}`);
     }
 
-    if (result.state === "activated" && result.invitationId) {
-      redirect(`/join/start?invitationId=${encodeURIComponent(result.invitationId)}`);
-    }
-
-    redirect(`/team-invite/${encodeURIComponent(token)}?claimed=1`);
+    redirect(
+      result.state === "invitee_continue"
+        ? buildInvitationResumeHref(result.invitationId)
+        : buildInvitationDashboardHref(result.invitationId)
+    );
   }
 
   return (
@@ -175,16 +179,16 @@ export default async function AdvisorTeamInvitePage({
             </>
           ) : invitationReady ? (
             <>
-              <h2 className="text-xl font-semibold text-slate-950">Euer Matching ist bereit</h2>
+              <h2 className="text-xl font-semibold text-slate-950">Weiter im Matching</h2>
               <p className="mt-3 text-sm leading-7 text-slate-700">
-                Beide Founder sind gestartet. Du kannst jetzt direkt in euren bestehenden Matching-Flow wechseln.
+                Dein Matching-Kontext ist bereits angelegt. Von hier gehst du in den bestehenden Founder-Flow weiter.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
-                  href={`/join/start?invitationId=${encodeURIComponent(row.invitation_id as string)}`}
+                  href={invitationDashboardHref}
                   className={PRIMARY_CTA_CLASS}
                 >
-                  Zum Matching
+                  Matching öffnen
                 </Link>
               </div>
             </>

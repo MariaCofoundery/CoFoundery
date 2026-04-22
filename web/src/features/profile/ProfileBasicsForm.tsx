@@ -111,6 +111,7 @@ export function ProfileBasicsForm({
     focusChoice === "Sonstiges" ? focusOtherText.trim() || "Sonstiges" : focusChoice;
   const resolvedRoles = primaryRole === "both" ? ["founder", "advisor"] : [primaryRole];
   const resolvedAvatarImageUrl = selectedAvatarId ? null : uploadedAvatarUrl || initialAvatarUrl || null;
+  const hasAvatarImage = Boolean(selectedAvatarId || resolvedAvatarImageUrl);
 
   const onboardingValues = {
     welcome: "ready",
@@ -596,9 +597,9 @@ export function ProfileBasicsForm({
               {activeStep === "welcome"
                 ? "Profil starten"
                 : activeStep === "avatar"
-                  ? selectedAvatarId
+                  ? hasAvatarImage
                     ? "Weiter"
-                    : "Ohne Bild weiter"
+                    : "Ohne Bild weitermachen"
                   : nextButtonLabel}
             </button>
           )}

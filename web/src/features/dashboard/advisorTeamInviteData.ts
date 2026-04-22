@@ -46,6 +46,16 @@ type ExistingRelationshipAdvisorRow = {
   id: string;
 };
 
+type InvitationBootstrapRow = {
+  id: string;
+  inviter_user_id: string;
+  invitee_user_id: string | null;
+  invitee_email: string;
+  status: string;
+  accepted_at: string | null;
+  relationship_id: string | null;
+};
+
 export type AdvisorPendingTeamInvite = {
   id: string;
   teamName: string | null;
@@ -77,8 +87,8 @@ export type AdvisorTeamInviteTokenLookup =
 export type ClaimAdvisorTeamInviteResult =
   | {
       ok: true;
-      state: "waiting_for_other_founder" | "activated";
-      invitationId: string | null;
+      state: "inviter_continue" | "invitee_continue";
+      invitationId: string;
     }
   | {
       ok: false;
@@ -403,6 +413,166 @@ async function createAcceptedInvitationForAdvisorTeam(params: {
   return invitationId;
 }
 
+async function loadInvitationBootstrapRow(
+  invitationId: string,
+  client: SupabaseLikeClient
+): Promise<InvitationBootstrapRow | null> {
+  const { data, error } = await client
+    .from("invitations")
+    .select("id, inviter_user_id, invitee_user_id, invitee_email, status, accepted_at, relationship_id")
+    .eq("id", invitationId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as InvitationBootstrapRow;
+}
+
+async function createBootstrapInvitationForAdvisorTeam(params: {
+  row: AdvisorTeamInviteRow;
+  inviterUserId: string;
+  inviterEmail: string;
+  inviteeEmail: string;
+  client: SupabaseLikeClient;
+}) {
+  const [{ data: inviterProfile }, existingInvitation] = await Promise.all([
+    params.client
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", params.inviterUserId)
+      .maybeSingle(),
+    params.row.invitation_id
+      ? loadInvitationBootstrapRow(params.row.invitation_id, params.client)
+      : Promise.resolve(null),
+  ]);
+
+  if (existingInvitation?.id) {
+    return existingInvitation.id;
+  }
+
+  const token = createOpaqueToken();
+  const tokenHash = hashOpaqueToken(token);
+  const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const inviterDisplayName =
+    (inviterProfile as { display_name?: string | null } | null)?.display_name?.trim() ||
+    fallbackLabelFromEmail(params.inviterEmail);
+
+  const { data: insertedInvitation, error: insertedInvitationError } = await params.client
+    .from("invitations")
+    .insert({
+      inviter_user_id: params.inviterUserId,
+      invitee_email: params.inviteeEmail,
+      label: normalizeTeamName(params.row.team_name) ?? params.inviteeEmail,
+      inviter_display_name: inviterDisplayName,
+      inviter_email: params.inviterEmail,
+      team_context: "pre_founder",
+      token_hash: tokenHash,
+      expires_at: expiresAt,
+      status: "sent",
+    })
+    .select("id")
+    .single();
+
+  if (insertedInvitationError || !insertedInvitation) {
+    throw new Error(insertedInvitationError?.message ?? "bootstrap_invitation_create_failed");
+  }
+
+  const invitationId = (insertedInvitation as InsertedInvitationRow).id;
+  const { error: moduleError } = await params.client.from("invitation_modules").insert({
+    invitation_id: invitationId,
+    module: "base",
+  });
+
+  if (moduleError) {
+    throw new Error(moduleError.message);
+  }
+
+  await bindLatestSubmittedInvitationMatchingInputs(invitationId, params.inviterUserId, ["base"], {
+    client: params.client,
+    replaceExisting: false,
+  }).catch(() => null);
+
+  const { error: pendingUpdateError } = await params.client
+    .from("advisor_team_invites")
+    .update({
+      invitation_id: invitationId,
+    })
+    .eq("id", params.row.id);
+
+  if (pendingUpdateError) {
+    throw new Error(pendingUpdateError.message);
+  }
+
+  return invitationId;
+}
+
+async function activateBootstrapInvitationForAdvisorTeam(params: {
+  row: AdvisorTeamInviteRow;
+  invitationId: string;
+  client: SupabaseLikeClient;
+}) {
+  const founderAUserId = params.row.founder_a_user_id;
+  const founderBUserId = params.row.founder_b_user_id;
+  if (!founderAUserId || !founderBUserId) {
+    throw new Error("missing_founders");
+  }
+
+  const invitation = await loadInvitationBootstrapRow(params.invitationId, params.client);
+  if (!invitation) {
+    throw new Error("bootstrap_invitation_not_found");
+  }
+
+  const relationshipId =
+    invitation.relationship_id ??
+    params.row.relationship_id ??
+    (await resolveRelationshipIdForFounders(founderAUserId, founderBUserId, params.client));
+  const inviteeUserId =
+    normalizeEmail(invitation.invitee_email) === normalizeEmail(params.row.founder_a_email)
+      ? founderAUserId
+      : founderBUserId;
+
+  const { error: invitationUpdateError } = await params.client
+    .from("invitations")
+    .update({
+      invitee_user_id: inviteeUserId,
+      accepted_at: invitation.accepted_at ?? new Date().toISOString(),
+      status: "accepted",
+      relationship_id: relationshipId,
+    })
+    .eq("id", params.invitationId);
+
+  if (invitationUpdateError) {
+    throw new Error(invitationUpdateError.message);
+  }
+
+  await upsertRelationshipAdvisorLink({
+    row: params.row,
+    relationshipId,
+    invitationId: params.invitationId,
+    client: params.client,
+  });
+
+  const { error: finalizeError } = await params.client
+    .from("advisor_team_invites")
+    .update({
+      relationship_id: relationshipId,
+      invitation_id: params.invitationId,
+      status: "activated",
+    })
+    .eq("id", params.row.id);
+
+  if (finalizeError) {
+    throw new Error(finalizeError.message);
+  }
+
+  return {
+    invitationId: params.invitationId,
+    relationshipId,
+  };
+}
+
 async function upsertRelationshipAdvisorLink(params: {
   row: AdvisorTeamInviteRow;
   relationshipId: string;
@@ -567,68 +737,53 @@ export async function claimAdvisorTeamInviteFounder(params: {
   }
 
   const refreshedRow = refreshedLookup.row;
-  const bothFoundersClaimed = Boolean(refreshedRow.founder_a_user_id && refreshedRow.founder_b_user_id);
-  if (!bothFoundersClaimed) {
-    return {
-      ok: true,
-      state: "waiting_for_other_founder",
-      invitationId: refreshedRow.invitation_id,
-    };
-  }
-
-  if (refreshedRow.invitation_id) {
-    return {
-      ok: true,
-      state: "activated",
-      invitationId: refreshedRow.invitation_id,
-    };
-  }
-
-  const { data: activationLockRow, error: activationLockError } = await privileged
-    .from("advisor_team_invites")
-    .update({ status: "activating" })
-    .eq("id", refreshedRow.id)
-    .eq("status", "pending")
-    .is("invitation_id", null)
-    .not("founder_a_user_id", "is", null)
-    .not("founder_b_user_id", "is", null)
-    .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
-    )
-    .maybeSingle();
-
-  if (!activationLockError && activationLockRow) {
+  let invitationId = refreshedRow.invitation_id;
+  if (!invitationId) {
+    const inviteeEmail =
+      founderSlot === "founderA" ? refreshedRow.founder_b_email : refreshedRow.founder_a_email;
     try {
-      const activated = await activateAdvisorTeamInviteRow(
-        activationLockRow as AdvisorTeamInviteRow,
-        privileged
-      );
-      return {
-        ok: true,
-        state: "activated",
-        invitationId: activated.invitationId,
-      };
+      invitationId = await createBootstrapInvitationForAdvisorTeam({
+        row: refreshedRow,
+        inviterUserId: normalizedUserId,
+        inviterEmail: normalizedUserEmail,
+        inviteeEmail,
+        client: privileged,
+      });
     } catch {
-      await privileged
-        .from("advisor_team_invites")
-        .update({ status: "pending" })
-        .eq("id", refreshedRow.id)
-        .eq("status", "activating");
       return { ok: false, reason: "activation_failed" };
     }
   }
 
-  const afterActivationLookup = await loadAdvisorTeamInviteByTokenHash(
-    hashOpaqueToken(normalizedToken),
-    privileged
-  );
-  if (afterActivationLookup.status === "ready" && afterActivationLookup.row.invitation_id) {
-    return {
-      ok: true,
-      state: "activated",
-      invitationId: afterActivationLookup.row.invitation_id,
-    };
+  const bothFoundersClaimed = Boolean(refreshedRow.founder_a_user_id && refreshedRow.founder_b_user_id);
+  const invitationBeforeFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
+  if (!invitationBeforeFinalize) {
+    return { ok: false, reason: "activation_failed" };
   }
 
-  return { ok: false, reason: "activation_failed" };
+  if (bothFoundersClaimed && invitationBeforeFinalize.status !== "accepted") {
+    try {
+      await activateBootstrapInvitationForAdvisorTeam({
+        row: refreshedRow,
+        invitationId,
+        client: privileged,
+      });
+    } catch {
+      return { ok: false, reason: "activation_failed" };
+    }
+  }
+
+  const invitationAfterFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
+  if (!invitationAfterFinalize) {
+    return { ok: false, reason: "activation_failed" };
+  }
+
+  const isInviteeForInvitation =
+    invitationAfterFinalize.invitee_user_id === normalizedUserId ||
+    normalizeEmail(invitationAfterFinalize.invitee_email) === normalizedUserEmail;
+
+  return {
+    ok: true,
+    state: isInviteeForInvitation ? "invitee_continue" : "inviter_continue",
+    invitationId,
+  };
 }
