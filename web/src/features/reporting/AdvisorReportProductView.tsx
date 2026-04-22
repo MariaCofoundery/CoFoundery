@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { AdvisorReportPreview } from "@/features/reporting/AdvisorReportPreview";
 import type { AdvisorReportData } from "@/features/reporting/advisor-report/advisorReportTypes";
 import {
@@ -10,6 +11,7 @@ import {
 
 type Props = {
   invitationId: string;
+  teamContext: TeamContext;
   participantAName: string;
   participantBName: string;
   report: AdvisorReportData;
@@ -30,6 +32,7 @@ function formatSavedLabel(value: string | null) {
 
 export function AdvisorReportProductView({
   invitationId,
+  teamContext,
   participantAName,
   participantBName,
   report,
@@ -87,6 +90,7 @@ export function AdvisorReportProductView({
               className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
             >
               <input type="hidden" name="invitationId" value={invitationId} />
+              <input type="hidden" name="teamContext" value={teamContext} />
               <input type="hidden" name="sectionKey" value={sectionKey} />
               <div className="flex items-start justify-between gap-3">
                 <div>

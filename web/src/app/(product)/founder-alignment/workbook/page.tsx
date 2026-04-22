@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlignmentWorkbookClient";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
+import {
+  buildAdvisorReportHref,
+  buildAdvisorWorkbookHref,
+} from "@/features/reporting/advisorTeamTargets";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
 import { buildWorkbookHref } from "@/features/reporting/workbookNavigation";
@@ -25,10 +29,6 @@ function resolveTeamContext(value: string | undefined): TeamContext {
 
 function isAdvisorContext(value: string | undefined) {
   return value === "1" || value === "true";
-}
-
-function buildAdvisorWorkbookHref(invitationId: string, teamContext: TeamContext) {
-  return `${buildWorkbookHref(invitationId, teamContext)}&advisorContext=1`;
 }
 
 export default async function FounderAlignmentWorkbookPage({
@@ -70,7 +70,7 @@ export default async function FounderAlignmentWorkbookPage({
       ? buildAdvisorWorkbookHref(invitationId, requestedTeamContext)
       : buildWorkbookHref(invitationId, requestedTeamContext);
     const fallbackReportHref = advisorContext
-      ? `/advisor/report?invitationId=${encodeURIComponent(invitationId)}`
+      ? buildAdvisorReportHref(invitationId, requestedTeamContext)
       : `/report/${encodeURIComponent(invitationId)}`;
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
@@ -119,9 +119,7 @@ export default async function FounderAlignmentWorkbookPage({
   }
 
   const resolvedInvitationId = data.invitationId ?? invitationId;
-  const advisorReportHref = `/advisor/report?invitationId=${encodeURIComponent(
-    resolvedInvitationId
-  )}`;
+  const advisorReportHref = buildAdvisorReportHref(resolvedInvitationId, data.teamContext);
   const founderReportHref = `/report/${encodeURIComponent(resolvedInvitationId)}`;
   const resolvedWorkbookHref =
     data.currentUserRole === "advisor" || advisorContext

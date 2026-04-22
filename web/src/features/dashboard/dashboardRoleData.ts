@@ -4,6 +4,11 @@ import { hasProfileRole, normalizeProfileRoles } from "@/features/profile/profil
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import {
+  buildAdvisorReportHref,
+  buildAdvisorSnapshotHref,
+  buildAdvisorWorkbookHref,
+} from "@/features/reporting/advisorTeamTargets";
+import {
   listRelationshipAdvisorsForUser,
   syncRelationshipAdvisorFromLegacyInvitation,
 } from "@/features/reporting/relationshipAdvisorAccess";
@@ -494,10 +499,10 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         }),
         lastActivityLabel: `${teamContextLabel(teamContext)} · ${formatTimestamp(lastActivitySource)}`,
         followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
-        workbookHref: `/founder-alignment/workbook?invitationId=${invitation.id}&teamContext=${teamContext}&advisorContext=1`,
-        reportHref: `/advisor/report?invitationId=${invitation.id}`,
+        workbookHref: buildAdvisorWorkbookHref(invitation.id, teamContext),
+        reportHref: buildAdvisorReportHref(invitation.id, teamContext),
         reportReady,
-        snapshotHref: `/advisor/snapshot?invitationId=${invitation.id}&teamContext=${teamContext}`,
+        snapshotHref: buildAdvisorSnapshotHref(invitation.id, teamContext),
         advisorLinked,
         workbookAvailable,
         reportAvailable,

@@ -7,6 +7,14 @@ import {
   type AdvisorSectionImpulse,
 } from "@/features/reporting/advisorSectionImpulses";
 import { getPrivilegedReportRunSnapshotForInvitation } from "@/features/reporting/actions";
+import {
+  resolveAdvisorRelationshipContext,
+} from "@/features/reporting/advisorTeamContext";
+import {
+  buildAdvisorSnapshotHref,
+  buildAdvisorWorkbookHref,
+  normalizeAdvisorTeamContext,
+} from "@/features/reporting/advisorTeamTargets";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import {
   buildFounderCompatibilityAnswerMapV2,
@@ -19,8 +27,6 @@ import type { TeamScoringResult } from "@/features/scoring/founderScoring";
 import { createClient } from "@/lib/supabase/server";
 import {
   createPrivilegedAccessClient,
-  hasAdvisorAccessToRelationship,
-  resolveRelationshipIdForInvitation,
   syncRelationshipAdvisorFromLegacyInvitation,
 } from "@/features/reporting/relationshipAdvisorAccess";
 
@@ -137,10 +143,6 @@ function toFounderScores(scoring: TeamScoringResult, person: "A" | "B"): Founder
   }
 
   return founderScores;
-}
-
-function normalizeTeamContext(value: string | null | undefined): "pre_founder" | "existing_team" {
-  return value === "existing_team" ? "existing_team" : "pre_founder";
 }
 
 function emptyImpulseMap() {
@@ -400,7 +402,12 @@ export async function getAdvisorReportPageData(
     };
   }
 
-  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, privileged);
+  let relationshipResolution = await resolveAdvisorRelationshipContext({
+    invitationId: normalizedInvitationId,
+    advisorUserId: user.id,
+    client: privileged,
+  });
+  let relationshipId = relationshipResolution.relationshipId;
   if (!relationshipId) {
     return {
       status: "not_found",
@@ -422,7 +429,7 @@ export async function getAdvisorReportPageData(
     };
   }
 
-  const accessBeforeLegacySync = await hasAdvisorAccessToRelationship(user.id, relationshipId, privileged);
+  const accessBeforeLegacySync = relationshipResolution.hasRelationshipAdvisorAccess;
   let hasAccess = accessBeforeLegacySync;
   let legacySyncAttempted = false;
   let legacySyncResult: AdvisorReportDebugMeta["legacySyncResult"] = "not_attempted";
@@ -435,7 +442,13 @@ export async function getAdvisorReportPageData(
     );
     if (syncResult.ok) {
       legacySyncResult = syncResult.row ? "synced" : "legacy_not_found";
-      hasAccess = await hasAdvisorAccessToRelationship(user.id, relationshipId, privileged);
+      relationshipResolution = await resolveAdvisorRelationshipContext({
+        invitationId: normalizedInvitationId,
+        advisorUserId: user.id,
+        client: privileged,
+      });
+      relationshipId = relationshipResolution.relationshipId ?? relationshipId;
+      hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
     } else {
       legacySyncResult =
         syncResult.reason === "legacy_not_found" ? "legacy_not_found" : "sync_failed";
@@ -536,7 +549,7 @@ export async function getAdvisorReportPageData(
         requestedInvitationId: normalizedInvitationId,
         userId: user.id,
         relationshipId,
-        teamContext: normalizeTeamContext(invitation.team_context),
+        teamContext: normalizeAdvisorTeamContext(invitation.team_context),
         accessBeforeLegacySync,
         legacySyncAttempted,
         legacySyncResult,
@@ -595,7 +608,7 @@ export async function getAdvisorReportPageData(
     };
   }
 
-  const teamContext = normalizeTeamContext(invitation.team_context);
+  const teamContext = normalizeAdvisorTeamContext(invitation.team_context);
 
   return {
     status: "ready",
@@ -606,12 +619,8 @@ export async function getAdvisorReportPageData(
     participantBName,
     report,
     impulses: impulseMap,
-    workbookHref: `/founder-alignment/workbook?invitationId=${encodeURIComponent(
-      normalizedInvitationId
-    )}&teamContext=${encodeURIComponent(teamContext)}&advisorContext=1`,
-    snapshotHref: `/advisor/snapshot?invitationId=${encodeURIComponent(
-      normalizedInvitationId
-    )}&teamContext=${encodeURIComponent(teamContext)}`,
+    workbookHref: buildAdvisorWorkbookHref(normalizedInvitationId, teamContext),
+    snapshotHref: buildAdvisorSnapshotHref(normalizedInvitationId, teamContext),
     debugMeta: {
       requestedInvitationId: normalizedInvitationId,
       userId: user.id,
@@ -653,14 +662,35 @@ export async function saveAdvisorSectionImpulse(params: {
     return { ok: false, reason: "save_failed" };
   }
 
-  const relationshipId = await resolveRelationshipIdForInvitation(normalizedInvitationId, privileged);
+  let relationshipResolution = await resolveAdvisorRelationshipContext({
+    invitationId: normalizedInvitationId,
+    advisorUserId: user.id,
+    client: privileged,
+  });
+  let relationshipId = relationshipResolution.relationshipId;
   if (!relationshipId) {
     return { ok: false, reason: "not_found" };
   }
 
-  const hasAccess = await hasAdvisorAccessToRelationship(user.id, relationshipId, privileged);
+  let hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
   if (!hasAccess) {
-    return { ok: false, reason: "forbidden" };
+    const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
+      normalizedInvitationId,
+      privileged
+    );
+    if (!syncResult.ok) {
+      return { ok: false, reason: "forbidden" };
+    }
+    relationshipResolution = await resolveAdvisorRelationshipContext({
+      invitationId: normalizedInvitationId,
+      advisorUserId: user.id,
+      client: privileged,
+    });
+    relationshipId = relationshipResolution.relationshipId ?? relationshipId;
+    hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
+    if (!hasAccess) {
+      return { ok: false, reason: "forbidden" };
+    }
   }
 
   if (!normalizedText) {

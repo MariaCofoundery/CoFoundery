@@ -28,7 +28,7 @@ import {
   type FounderAlignmentWorkbookPayload,
   type WorkbookStepMarkersByStep,
 } from "@/features/reporting/founderAlignmentWorkbook";
-import { resolveWorkbookRelationshipAccess } from "@/features/reporting/workbookRelationshipAccess";
+import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
   getPrivilegedReportRunSnapshotForInvitation,
   getReportRunSnapshotForSession,
@@ -58,10 +58,6 @@ type WorkbookAdvisorRow = {
   advisor_name: string | null;
   founder_a_approved: boolean;
   founder_b_approved: boolean;
-};
-
-type RelationshipAdvisorAccessRow = {
-  relationship_id: string;
 };
 
 type InvitationRow = {
@@ -336,61 +332,6 @@ async function loadWorkbookAdvisorRowWithClient(
   return data as WorkbookAdvisorRow;
 }
 
-async function loadAdvisorRelationshipIdWithClient(
-  invitationId: string,
-  advisorUserId: string | null | undefined,
-  supabase: SupabaseLikeClient
-): Promise<string | null> {
-  const normalizedInvitationId = invitationId.trim();
-  const normalizedAdvisorUserId = advisorUserId?.trim() ?? "";
-  if (!normalizedInvitationId || !normalizedAdvisorUserId) {
-    return null;
-  }
-
-  const { data, error } = await supabase
-    .from("relationship_advisors")
-    .select("relationship_id")
-    .eq("source_invitation_id", normalizedInvitationId)
-    .eq("advisor_user_id", normalizedAdvisorUserId)
-    .in("status", ["approved", "invited", "linked"])
-    .eq("founder_a_approved", true)
-    .eq("founder_b_approved", true)
-    .is("revoked_at", null)
-    .order("updated_at", { ascending: false })
-    .limit(1);
-
-  if (error || !data || data.length === 0) {
-    return null;
-  }
-
-  return ((data as RelationshipAdvisorAccessRow[])[0]?.relationship_id ?? null)?.trim() || null;
-}
-
-async function loadReportRunRelationshipIdWithClient(
-  invitationId: string,
-  supabase: SupabaseLikeClient
-): Promise<string | null> {
-  const normalizedInvitationId = invitationId.trim();
-  if (!normalizedInvitationId) {
-    return null;
-  }
-
-  const { data, error } = await supabase
-    .from("report_runs")
-    .select("relationship_id")
-    .eq("invitation_id", normalizedInvitationId)
-    .not("relationship_id", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (error || !data) {
-    return null;
-  }
-
-  return ((data as { relationship_id?: string | null } | null)?.relationship_id ?? null)?.trim() || null;
-}
-
 async function loadProfileIdentityWithClient(
   userId: string | null | undefined,
   supabase: SupabaseLikeClient
@@ -603,35 +544,21 @@ export async function getFounderAlignmentWorkbookPageData(
   const privilegedAccessClient = createPrivilegedClient();
   const advisorRow = await loadWorkbookAdvisorRowWithClient(normalizedInvitationId, supabase);
   const relationshipAccessClient = privilegedAccessClient ?? supabase;
-  const [
-    advisorRelationshipId,
-    reportRunRelationshipId,
-    invitationRelationshipId,
-  ] = await Promise.all([
-    advisorContext
-      ? loadAdvisorRelationshipIdWithClient(normalizedInvitationId, user?.id, relationshipAccessClient)
-      : Promise.resolve(null),
-    advisorContext
-      ? loadReportRunRelationshipIdWithClient(normalizedInvitationId, relationshipAccessClient)
-      : Promise.resolve(null),
-    resolveRelationshipIdForInvitation(normalizedInvitationId, relationshipAccessClient),
-  ]);
-  const candidateRelationshipId =
-    advisorRelationshipId ?? reportRunRelationshipId ?? invitationRelationshipId;
-  const checkedRelationshipAdvisorAccess =
-    user?.id && candidateRelationshipId
-      ? await hasAdvisorAccessToRelationship(user.id, candidateRelationshipId, relationshipAccessClient)
-      : false;
-  const {
-    relationshipId: resolvedRelationshipId,
-    hasRelationshipAdvisorAccess,
-  } = resolveWorkbookRelationshipAccess({
-    advisorContext,
-    relationshipIdFromAdvisorAccess: advisorRelationshipId,
-    relationshipIdFromReportRun: reportRunRelationshipId,
-    relationshipIdFromInvitation: invitationRelationshipId,
-    hasRelationshipAdvisorAccess: checkedRelationshipAdvisorAccess,
-  });
+  const advisorRelationshipResolution = advisorContext
+    ? await resolveAdvisorRelationshipContext({
+        invitationId: normalizedInvitationId,
+        advisorUserId: user?.id,
+        client: relationshipAccessClient,
+      })
+    : null;
+  const resolvedRelationshipId = advisorRelationshipResolution?.relationshipId ??
+    (user?.id
+      ? await resolveRelationshipIdForInvitation(normalizedInvitationId, relationshipAccessClient)
+      : null);
+  const hasRelationshipAdvisorAccess = advisorRelationshipResolution?.hasRelationshipAdvisorAccess ??
+    (user?.id && resolvedRelationshipId
+      ? await hasAdvisorAccessToRelationship(user.id, resolvedRelationshipId, relationshipAccessClient)
+      : false);
   const isLinkedAdvisor =
     hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id);
   const privileged = isLinkedAdvisor ? privilegedAccessClient : null;

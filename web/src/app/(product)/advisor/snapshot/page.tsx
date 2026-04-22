@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import {
+  buildAdvisorReportHref,
+  buildAdvisorWorkbookHref,
+  normalizeAdvisorTeamContext,
+} from "@/features/reporting/advisorTeamTargets";
+import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   type FounderAlignmentWorkbookAdvisorFollowUp,
 } from "@/features/reporting/founderAlignmentWorkbook";
@@ -16,7 +21,7 @@ type PageSearchParams = {
 };
 
 function resolveTeamContext(value: string | undefined) {
-  return value === "existing_team" ? "existing_team" : "pre_founder";
+  return normalizeAdvisorTeamContext(value);
 }
 
 function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
@@ -62,10 +67,17 @@ export default async function AdvisorSnapshotPage({
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {
     advisorContext: true,
   });
-  const reportHref = `/advisor/report?invitationId=${encodeURIComponent(invitationId)}`;
-  const workbookHref = `/founder-alignment/workbook?invitationId=${encodeURIComponent(
-    invitationId
-  )}&teamContext=${encodeURIComponent(requestedTeamContext)}&advisorContext=1`;
+  const dashboardFallbackHref = debug
+    ? "/advisor/dashboard?debug=1#advisor-teams"
+    : "/advisor/dashboard#advisor-teams";
+  const reportHref =
+    data.status === "ready"
+      ? buildAdvisorReportHref(data.invitationId ?? invitationId, data.teamContext)
+      : dashboardFallbackHref;
+  const workbookHref =
+    data.status === "ready"
+      ? buildAdvisorWorkbookHref(data.invitationId ?? invitationId, data.teamContext)
+      : dashboardFallbackHref;
 
   if (data.status !== "ready") {
     return (

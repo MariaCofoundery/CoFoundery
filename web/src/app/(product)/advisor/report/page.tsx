@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { AdvisorReportProductView } from "@/features/reporting/AdvisorReportProductView";
 import {
+  buildAdvisorReportHref,
+  normalizeAdvisorTeamContext,
+} from "@/features/reporting/advisorTeamTargets";
+import {
   getAdvisorReportPageData,
   saveAdvisorSectionImpulse,
 } from "@/features/reporting/advisorReportPageData";
@@ -20,12 +24,16 @@ export default async function AdvisorReportPage({
 }: {
   searchParams: Promise<{
     invitationId?: string;
+    teamContext?: string;
     saved?: string;
     debug?: string;
   }>;
 }) {
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() ?? "";
+  const requestedTeamContext = params.teamContext
+    ? normalizeAdvisorTeamContext(params.teamContext)
+    : null;
   const debug = params.debug === "1";
   if (!invitationId) {
     redirect("/advisor/dashboard");
@@ -40,11 +48,15 @@ export default async function AdvisorReportPage({
     "use server";
 
     const invitationId = String(formData.get("invitationId") ?? "").trim();
+    const teamContextRaw = String(formData.get("teamContext") ?? "").trim();
     const sectionKeyRaw = String(formData.get("sectionKey") ?? "").trim();
     const text = String(formData.get("text") ?? "");
+    const teamContext = teamContextRaw ? normalizeAdvisorTeamContext(teamContextRaw) : null;
 
     if (!invitationId || !isAdvisorImpulseSectionKey(sectionKeyRaw)) {
-      redirect(`/advisor/report?invitationId=${encodeURIComponent(invitationId || "")}`);
+      redirect(
+        invitationId ? buildAdvisorReportHref(invitationId, teamContext) : "/advisor/dashboard"
+      );
     }
 
     const result = await saveAdvisorSectionImpulse({
@@ -56,18 +68,20 @@ export default async function AdvisorReportPage({
     revalidatePath("/advisor/report");
 
     if (!result.ok) {
-      redirect(`/advisor/report?invitationId=${encodeURIComponent(invitationId)}#advisor-impulses`);
+      redirect(`${buildAdvisorReportHref(invitationId, teamContext)}#advisor-impulses`);
     }
 
     redirect(
-      `/advisor/report?invitationId=${encodeURIComponent(invitationId)}&saved=${encodeURIComponent(
+      `${buildAdvisorReportHref(invitationId, teamContext)}&saved=${encodeURIComponent(
         sectionKeyRaw
       )}#advisor-impulses`
     );
   }
 
   if (data.status === "not_authenticated") {
-    redirect(`/login?next=/advisor/report?invitationId=${encodeURIComponent(invitationId)}`);
+    redirect(
+      `/login?next=${encodeURIComponent(buildAdvisorReportHref(invitationId, requestedTeamContext))}`
+    );
   }
 
   if (data.status === "forbidden" || data.status === "not_found") {
@@ -173,7 +187,7 @@ export default async function AdvisorReportPage({
     console.info("[advisor-report-debug] render_state", data.debugMeta);
   }
 
-  const reportHref = `/advisor/report?invitationId=${encodeURIComponent(data.invitationId)}`;
+  const reportHref = buildAdvisorReportHref(data.invitationId, data.teamContext);
 
   return (
     <>
@@ -212,6 +226,7 @@ export default async function AdvisorReportPage({
       ) : null}
       <AdvisorReportProductView
         invitationId={data.invitationId}
+        teamContext={data.teamContext}
         participantAName={data.participantAName}
         participantBName={data.participantBName}
         report={data.report}
