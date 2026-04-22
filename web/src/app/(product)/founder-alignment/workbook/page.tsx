@@ -61,7 +61,9 @@ export default async function FounderAlignmentWorkbookPage({
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
+  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {
+    advisorContext,
+  });
 
   if (data.status !== "ready") {
     const fallbackWorkbookHref = advisorContext

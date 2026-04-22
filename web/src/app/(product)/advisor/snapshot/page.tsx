@@ -59,7 +59,9 @@ export default async function AdvisorSnapshotPage({
     redirect("/login");
   }
 
-  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
+  const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {
+    advisorContext: true,
+  });
   const reportHref = `/advisor/report?invitationId=${encodeURIComponent(invitationId)}`;
   const workbookHref = `/founder-alignment/workbook?invitationId=${encodeURIComponent(
     invitationId
