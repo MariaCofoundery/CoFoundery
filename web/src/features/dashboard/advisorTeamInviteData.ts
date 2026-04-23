@@ -579,12 +579,25 @@ async function upsertRelationshipAdvisorLink(params: {
   invitationId: string;
   client: SupabaseLikeClient;
 }) {
-  const { data: existingRelationshipAdvisor } = await params.client
+  const { data: existingByInvitation } = await params.client
+    .from("relationship_advisors")
+    .select("id")
+    .eq("source_invitation_id", params.invitationId)
+    .eq("advisor_user_id", params.row.advisor_user_id)
+    .limit(1)
+    .maybeSingle();
+
+  const { data: existingByRelationship } = existingByInvitation
+    ? { data: null }
+    : await params.client
     .from("relationship_advisors")
     .select("id")
     .eq("relationship_id", params.relationshipId)
     .eq("advisor_user_id", params.row.advisor_user_id)
+    .limit(1)
     .maybeSingle();
+
+  const existingRelationshipAdvisor = existingByInvitation ?? existingByRelationship;
 
   const payload = {
     relationship_id: params.relationshipId,
@@ -760,7 +773,7 @@ export async function claimAdvisorTeamInviteFounder(params: {
     return { ok: false, reason: "activation_failed" };
   }
 
-  if (bothFoundersClaimed && invitationBeforeFinalize.status !== "accepted") {
+  if (bothFoundersClaimed && refreshedRow.status !== "activated") {
     try {
       await activateBootstrapInvitationForAdvisorTeam({
         row: refreshedRow,
