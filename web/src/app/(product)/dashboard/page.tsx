@@ -31,7 +31,10 @@ import {
   type InvitationDashboardRow,
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
-import { buildInvitationResumeHref } from "@/features/onboarding/invitationFlow";
+import {
+  buildInvitationDashboardHref,
+  buildInvitationResumeHref,
+} from "@/features/onboarding/invitationFlow";
 import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
@@ -280,6 +283,9 @@ export default async function DashboardPage({
   const contextualInvitation = contextualInvitationId
     ? invitationById.get(contextualInvitationId) ?? null
     : null;
+  const contextualDashboardHref = contextualInvitationId
+    ? buildInvitationDashboardHref(contextualInvitationId)
+    : "/dashboard";
   const contextualWorkbook = contextualInvitation
     ? workbookRows.find((row) => row.invitationId === contextualInvitation.id) ?? null
     : null;
@@ -292,11 +298,11 @@ export default async function DashboardPage({
     ? contextualWorkbook?.href ??
       buildWorkbookIntroHref(contextualInvitation.id, contextualInvitation.teamContext)
     : null;
-  const contextualBaseHref = contextualInvitation
-    ? `/me/base?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+  const contextualBaseHref = contextualInvitationId
+    ? `/me/base?invitationId=${encodeURIComponent(contextualInvitationId)}`
     : "/me/base";
-  const contextualValuesHref = contextualInvitation
-    ? `/me/values?invitationId=${encodeURIComponent(contextualInvitation.id)}`
+  const contextualValuesHref = contextualInvitationId
+    ? `/me/values?invitationId=${encodeURIComponent(contextualInvitationId)}`
     : "/me/values";
   const heroIncomingInvite =
     contextualInvitation?.direction === "incoming" ? contextualInvitation : prioritizedIncomingInvite;
@@ -778,7 +784,7 @@ export default async function DashboardPage({
                     avatar_url: profileData?.avatar_url ?? null,
                   }}
                   submitLabel="Profil speichern"
-                  onSuccessRedirectTo="/dashboard"
+                  onSuccessRedirectTo={contextualDashboardHref}
                   variant="accent"
                   fallbackAvatarUrl={profileImageUrl}
                 />
@@ -799,7 +805,7 @@ export default async function DashboardPage({
                         avatar_url: profileData?.avatar_url ?? null,
                       }}
                       submitLabel="Profil aktualisieren"
-                      onSuccessRedirectTo="/dashboard"
+                      onSuccessRedirectTo={contextualDashboardHref}
                       fallbackAvatarUrl={profileImageUrl}
                     />
                   </div>
