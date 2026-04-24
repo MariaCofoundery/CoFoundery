@@ -83,11 +83,12 @@ export default async function AdvisorTeamInvitePage({
     founderSlot === "founderA"
       ? row.founder_a_user_id === user?.id
       : row.founder_b_user_id === user?.id;
-  const canActivate =
+  const slotNeedsActivation =
     Boolean(user?.id) &&
     currentUserMatchesInvite &&
-    (founderSlot === "founderA" ? !row.founder_a_user_id || slotAlreadyClaimed : !row.founder_b_user_id || slotAlreadyClaimed);
-  const invitationReady = Boolean(row.invitation_id);
+    !slotAlreadyClaimed &&
+    (founderSlot === "founderA" ? !row.founder_a_user_id : !row.founder_b_user_id);
+  const invitationReadyForCurrentSlot = Boolean(row.invitation_id) && slotAlreadyClaimed;
   const invitationDashboardHref = row.invitation_id
     ? buildInvitationDashboardHref(row.invitation_id)
     : "/dashboard";
@@ -177,7 +178,19 @@ export default async function AdvisorTeamInvitePage({
                 Dieser Founder-Platz ist für <strong>{slotEmail}</strong> vorgesehen. Aktuell bist du mit <strong>{user.email}</strong> angemeldet.
               </p>
             </>
-          ) : invitationReady ? (
+          ) : slotNeedsActivation ? (
+            <>
+              <h2 className="text-xl font-semibold text-slate-950">Deinen Founder-Platz aktivieren</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                Dieser Link gehört zu <strong>{slotEmail}</strong>. Mit einem Klick bestätigst du deinen Start in den Matching-Flow.
+              </p>
+              <form action={claimAction} className="mt-6">
+                <button type="submit" className={PRIMARY_CTA_CLASS}>
+                  Start bestätigen
+                </button>
+              </form>
+            </>
+          ) : invitationReadyForCurrentSlot ? (
             <>
               <h2 className="text-xl font-semibold text-slate-950">Weiter im Matching</h2>
               <p className="mt-3 text-sm leading-7 text-slate-700">
@@ -191,18 +204,6 @@ export default async function AdvisorTeamInvitePage({
                   Matching öffnen
                 </Link>
               </div>
-            </>
-          ) : canActivate ? (
-            <>
-              <h2 className="text-xl font-semibold text-slate-950">Deinen Founder-Platz aktivieren</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                Dieser Link gehört zu <strong>{slotEmail}</strong>. Mit einem Klick bestätigst du deinen Start in den Matching-Flow.
-              </p>
-              <form action={claimAction} className="mt-6">
-                <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  Start bestätigen
-                </button>
-              </form>
             </>
           ) : (
             <>

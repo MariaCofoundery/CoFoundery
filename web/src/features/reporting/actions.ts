@@ -1256,8 +1256,8 @@ async function getInvitationJoinDecisionInternal(
     advisorTeamInviteParticipant?.founder_b_user_id === user.id;
   const allowsAdvisorBootstrapAccess =
     isAdvisorTeamFounder &&
-    advisorTeamInviteParticipant?.founder_a_user_id === user.id &&
-    invitation.inviter_user_id === user.id;
+    invitation.inviter_user_id === user.id &&
+    !invitation.invitee_user_id;
   const isInvitee =
     invitation.invitee_user_id === user.id ||
     (normalizedEmail.length > 0 && invitation.invitee_email === normalizedEmail);
