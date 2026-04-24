@@ -389,6 +389,29 @@ function normalizeCategory(value: string | null | undefined) {
   return value?.trim().toLowerCase() ?? "";
 }
 
+type AdvisorTeamInviteParticipantRow = {
+  id: string;
+  founder_a_user_id: string | null;
+  founder_b_user_id: string | null;
+};
+
+async function loadAdvisorTeamInviteParticipantRow(
+  invitationId: string,
+  client: SupabaseLikeClient
+): Promise<AdvisorTeamInviteParticipantRow | null> {
+  const { data, error } = await client
+    .from("advisor_team_invites")
+    .select("id, founder_a_user_id, founder_b_user_id")
+    .eq("invitation_id", invitationId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as AdvisorTeamInviteParticipantRow;
+}
+
 function normalizeTeamContext(value: string | null | undefined): TeamContext {
   return value === "existing_team" ? "existing_team" : "pre_founder";
 }
@@ -1223,10 +1246,22 @@ async function getInvitationJoinDecisionInternal(
     userEmail: normalizedEmail,
     invitation,
   });
+  const privileged = createPrivilegedClient();
+  const advisorTeamInviteParticipant =
+    privileged && (invitation.inviter_user_id === user.id || !invitation.invitee_user_id)
+      ? await loadAdvisorTeamInviteParticipantRow(normalizedInvitationId, privileged)
+      : null;
+  const isAdvisorTeamFounder =
+    advisorTeamInviteParticipant?.founder_a_user_id === user.id ||
+    advisorTeamInviteParticipant?.founder_b_user_id === user.id;
+  const allowsAdvisorBootstrapAccess =
+    isAdvisorTeamFounder &&
+    advisorTeamInviteParticipant?.founder_a_user_id === user.id &&
+    invitation.inviter_user_id === user.id;
   const isInvitee =
     invitation.invitee_user_id === user.id ||
     (normalizedEmail.length > 0 && invitation.invitee_email === normalizedEmail);
-  if (!isInvitee) {
+  if (!isInvitee && !isAdvisorTeamFounder) {
     return { ok: false, reason: "not_invitee" };
   }
   if (invitation.revoked_at || invitation.status === "revoked") {
@@ -1235,28 +1270,37 @@ async function getInvitationJoinDecisionInternal(
   if (isInvitationExpired(invitation.expires_at)) {
     return { ok: false, reason: "expired" };
   }
-  if (invitation.status !== "accepted") {
+  if (invitation.status !== "accepted" && !allowsAdvisorBootstrapAccess) {
     logInviteFlowDebug("reporting:getInvitationJoinDecision:not_accepted", {
       invitationId: normalizedInvitationId,
       userId: user.id,
       invitationStatus: invitation.status,
       inviteeUserId: invitation.invitee_user_id,
       acceptedAt: invitation.accepted_at,
+      allowsAdvisorBootstrapAccess,
     });
     return { ok: false, reason: "not_accepted" };
   }
-  if (!invitation.invitee_user_id) {
+  if (!invitation.invitee_user_id && !allowsAdvisorBootstrapAccess) {
     return { ok: false, reason: "missing_invitee" };
   }
 
-  const privileged = createPrivilegedClient();
   const dataClient = privileged ?? supabase;
   const requiredModules = moduleOrder(await getRequiredModulesForInvitation(dataClient, normalizedInvitationId));
   const readinessModules = getMatchingReadinessModules(requiredModules);
+  const counterpartUserId =
+    advisorTeamInviteParticipant?.founder_a_user_id === user.id
+      ? advisorTeamInviteParticipant?.founder_b_user_id ?? invitation.invitee_user_id
+      : advisorTeamInviteParticipant?.founder_b_user_id === user.id
+        ? advisorTeamInviteParticipant?.founder_a_user_id ?? invitation.inviter_user_id
+        : invitation.invitee_user_id;
   await bootstrapInvitationLatestSubmittedBindings({
     invitationId: normalizedInvitationId,
     participantUserIds: privileged
-      ? [invitation.inviter_user_id, invitation.invitee_user_id]
+      ? [
+          advisorTeamInviteParticipant?.founder_a_user_id ?? invitation.inviter_user_id,
+          advisorTeamInviteParticipant?.founder_b_user_id ?? invitation.invitee_user_id,
+        ]
       : [user.id],
     requiredModules,
     client: dataClient,
@@ -1264,21 +1308,24 @@ async function getInvitationJoinDecisionInternal(
   });
 
   const matchingState = await getInvitationMatchingState(normalizedInvitationId, { client: dataClient });
-  const inviterBoundByModule = matchingState.bindingsByUser.get(invitation.inviter_user_id);
-  const inviterLatestSubmittedByModule =
-    matchingState.latestSubmittedByUser.get(invitation.inviter_user_id);
-  const inviteeBoundByModule = matchingState.bindingsByUser.get(user.id);
-  const inviteeLatestSubmittedByModule = matchingState.latestSubmittedByUser.get(user.id);
+  const currentUserBoundByModule = matchingState.bindingsByUser.get(user.id);
+  const currentUserLatestSubmittedByModule = matchingState.latestSubmittedByUser.get(user.id);
+  const counterpartBoundByModule = counterpartUserId
+    ? matchingState.bindingsByUser.get(counterpartUserId)
+    : undefined;
+  const counterpartLatestSubmittedByModule = counterpartUserId
+    ? matchingState.latestSubmittedByUser.get(counterpartUserId)
+    : undefined;
   const missingModules = requiredModules.filter(
     (moduleKey) =>
       !resolveEffectiveSubmittedAssessmentForModule(
-        inviteeBoundByModule,
-        inviteeLatestSubmittedByModule,
+        currentUserBoundByModule,
+        currentUserLatestSubmittedByModule,
         moduleKey
       )
   );
   const existingProfileAvailableModules = missingModules.filter((moduleKey) =>
-    Boolean(inviteeLatestSubmittedByModule?.get(moduleKey))
+    Boolean(currentUserLatestSubmittedByModule?.get(moduleKey))
   );
   const requiresExistingProfileChoice =
     missingModules.length > 0 && existingProfileAvailableModules.length === missingModules.length;
@@ -1293,15 +1340,16 @@ async function getInvitationJoinDecisionInternal(
     ? parseAcceptableReportRunId(reportRunRow)
     : null;
   const isMatchingReady =
+    counterpartUserId != null &&
     isUserReadyForModulesFromCurrentStand(
       readinessModules,
-      inviterBoundByModule,
-      inviterLatestSubmittedByModule
+      currentUserBoundByModule,
+      currentUserLatestSubmittedByModule
     ) &&
     isUserReadyForModulesFromCurrentStand(
       readinessModules,
-      inviteeBoundByModule,
-      inviteeLatestSubmittedByModule
+      counterpartBoundByModule,
+      counterpartLatestSubmittedByModule
     );
 
   if (!reportRunId && privileged && isMatchingReady) {
@@ -1333,15 +1381,15 @@ async function getInvitationJoinDecisionInternal(
     invitee_status: {
       has_base_submitted: Boolean(
         resolveEffectiveSubmittedAssessmentForModule(
-          inviteeBoundByModule,
-          inviteeLatestSubmittedByModule,
+          currentUserBoundByModule,
+          currentUserLatestSubmittedByModule,
           "base"
         )
       ),
       has_values_submitted: Boolean(
         resolveEffectiveSubmittedAssessmentForModule(
-          inviteeBoundByModule,
-          inviteeLatestSubmittedByModule,
+          currentUserBoundByModule,
+          currentUserLatestSubmittedByModule,
           "values"
         )
       ),
