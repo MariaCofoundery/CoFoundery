@@ -139,6 +139,38 @@ export function fallbackLabelFromEmail(email: string) {
   return localPart && localPart.length > 0 ? localPart : "Founder";
 }
 
+function toErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function logAdvisorTeamInviteActivation(params: {
+  stage: string;
+  level?: "info" | "error";
+  pendingInviteId: string;
+  invitationId?: string | null;
+  founderSlot?: "founderA" | "founderB";
+  currentUserId?: string | null;
+  status?: string | null;
+  founderAUserId?: string | null;
+  founderBUserId?: string | null;
+  relationshipId?: string | null;
+  detail?: string | null;
+}) {
+  const logger = params.level === "error" ? console.error : console.info;
+  logger("[advisor-team-invite] activation", {
+    stage: params.stage,
+    pendingInviteId: params.pendingInviteId,
+    invitationId: params.invitationId ?? null,
+    founderSlot: params.founderSlot ?? null,
+    currentUserId: params.currentUserId ?? null,
+    status: params.status ?? null,
+    founderAUserId: params.founderAUserId ?? null,
+    founderBUserId: params.founderBUserId ?? null,
+    relationshipId: params.relationshipId ?? null,
+    detail: params.detail ?? null,
+  });
+}
+
 function buildPendingProgressLabel(row: AdvisorTeamInviteRow) {
   const startedCount = Number(Boolean(row.founder_a_claimed_at)) + Number(Boolean(row.founder_b_claimed_at));
   if (startedCount === 0) {
@@ -528,6 +560,15 @@ async function activateBootstrapInvitationForAdvisorTeam(params: {
     invitation.relationship_id ??
     params.row.relationship_id ??
     (await resolveRelationshipIdForFounders(founderAUserId, founderBUserId, params.client));
+  logAdvisorTeamInviteActivation({
+    stage: "bootstrap_activation_relationship_resolved",
+    pendingInviteId: params.row.id,
+    invitationId: params.invitationId,
+    status: params.row.status,
+    founderAUserId,
+    founderBUserId,
+    relationshipId,
+  });
   const inviteeUserId =
     normalizeEmail(invitation.invitee_email) === normalizeEmail(params.row.founder_a_email)
       ? founderAUserId
@@ -546,12 +587,31 @@ async function activateBootstrapInvitationForAdvisorTeam(params: {
   if (invitationUpdateError) {
     throw new Error(invitationUpdateError.message);
   }
+  logAdvisorTeamInviteActivation({
+    stage: "bootstrap_activation_invitation_updated",
+    pendingInviteId: params.row.id,
+    invitationId: params.invitationId,
+    status: params.row.status,
+    founderAUserId,
+    founderBUserId,
+    relationshipId,
+    detail: `inviteeUserId=${inviteeUserId}`,
+  });
 
   await upsertRelationshipAdvisorLink({
     row: params.row,
     relationshipId,
     invitationId: params.invitationId,
     client: params.client,
+  });
+  logAdvisorTeamInviteActivation({
+    stage: "bootstrap_activation_advisor_linked",
+    pendingInviteId: params.row.id,
+    invitationId: params.invitationId,
+    status: params.row.status,
+    founderAUserId,
+    founderBUserId,
+    relationshipId,
   });
 
   const { error: finalizeError } = await params.client
@@ -566,6 +626,15 @@ async function activateBootstrapInvitationForAdvisorTeam(params: {
   if (finalizeError) {
     throw new Error(finalizeError.message);
   }
+  logAdvisorTeamInviteActivation({
+    stage: "bootstrap_activation_pending_finalized",
+    pendingInviteId: params.row.id,
+    invitationId: params.invitationId,
+    status: "activated",
+    founderAUserId,
+    founderBUserId,
+    relationshipId,
+  });
 
   return {
     invitationId: params.invitationId,
@@ -599,33 +668,61 @@ async function upsertRelationshipAdvisorLink(params: {
 
   const existingRelationshipAdvisor = existingByInvitation ?? existingByRelationship;
 
-  const payload = {
+  const basePayload = {
     relationship_id: params.relationshipId,
     advisor_user_id: params.row.advisor_user_id,
     advisor_name: params.row.advisor_name,
-    advisor_email: params.row.advisor_email,
     status: "linked",
     founder_a_approved: true,
     founder_b_approved: true,
     approved_at: new Date().toISOString(),
-    invited_at: params.row.created_at,
     linked_at: new Date().toISOString(),
     revoked_at: null,
     requested_by_user_id: null,
     source_invitation_id: params.invitationId,
     invite_token_hash: null,
   };
+  const extendedPayload = {
+    ...basePayload,
+    advisor_email: params.row.advisor_email,
+    invited_at: params.row.created_at,
+  };
 
-  const writeQuery = existingRelationshipAdvisor
-    ? params.client
-        .from("relationship_advisors")
-        .update(payload)
-        .eq("id", (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow).id)
-    : params.client.from("relationship_advisors").insert(payload);
+  async function persist(payload: typeof basePayload | typeof extendedPayload) {
+    const writeQuery = existingRelationshipAdvisor
+      ? params.client
+          .from("relationship_advisors")
+          .update(payload)
+          .eq("id", (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow).id)
+      : params.client.from("relationship_advisors").insert(payload);
 
-  const { error } = await writeQuery.select("id").maybeSingle();
-  if (error) {
-    throw new Error(error.message);
+    return writeQuery.select("id").maybeSingle();
+  }
+
+  const extendedResult = await persist(extendedPayload);
+  if (!extendedResult.error) {
+    return;
+  }
+
+  if (!/advisor_email|invited_at/i.test(extendedResult.error.message)) {
+    throw new Error(extendedResult.error.message);
+  }
+
+  logAdvisorTeamInviteActivation({
+    stage: "relationship_advisor_extended_payload_retry",
+    level: "error",
+    pendingInviteId: params.row.id,
+    invitationId: params.invitationId,
+    status: params.row.status,
+    founderAUserId: params.row.founder_a_user_id,
+    founderBUserId: params.row.founder_b_user_id,
+    relationshipId: params.relationshipId,
+    detail: extendedResult.error.message,
+  });
+
+  const baseResult = await persist(basePayload);
+  if (baseResult.error) {
+    throw new Error(baseResult.error.message);
   }
 }
 
@@ -750,6 +847,17 @@ export async function claimAdvisorTeamInviteFounder(params: {
   }
 
   const refreshedRow = refreshedLookup.row;
+  logAdvisorTeamInviteActivation({
+    stage: "claim_loaded",
+    pendingInviteId: refreshedRow.id,
+    invitationId: refreshedRow.invitation_id,
+    founderSlot,
+    currentUserId: normalizedUserId,
+    status: refreshedRow.status,
+    founderAUserId: refreshedRow.founder_a_user_id,
+    founderBUserId: refreshedRow.founder_b_user_id,
+    relationshipId: refreshedRow.relationship_id,
+  });
   let invitationId = refreshedRow.invitation_id;
   if (!invitationId) {
     const inviteeEmail =
@@ -762,7 +870,31 @@ export async function claimAdvisorTeamInviteFounder(params: {
         inviteeEmail,
         client: privileged,
       });
-    } catch {
+      logAdvisorTeamInviteActivation({
+        stage: "bootstrap_invitation_created",
+        pendingInviteId: refreshedRow.id,
+        invitationId,
+        founderSlot,
+        currentUserId: normalizedUserId,
+        status: refreshedRow.status,
+        founderAUserId: refreshedRow.founder_a_user_id,
+        founderBUserId: refreshedRow.founder_b_user_id,
+        relationshipId: refreshedRow.relationship_id,
+      });
+    } catch (error) {
+      logAdvisorTeamInviteActivation({
+        stage: "bootstrap_invitation_failed",
+        level: "error",
+        pendingInviteId: refreshedRow.id,
+        invitationId: refreshedRow.invitation_id,
+        founderSlot,
+        currentUserId: normalizedUserId,
+        status: refreshedRow.status,
+        founderAUserId: refreshedRow.founder_a_user_id,
+        founderBUserId: refreshedRow.founder_b_user_id,
+        relationshipId: refreshedRow.relationship_id,
+        detail: toErrorMessage(error),
+      });
       return { ok: false, reason: "activation_failed" };
     }
   }
@@ -770,6 +902,18 @@ export async function claimAdvisorTeamInviteFounder(params: {
   const bothFoundersClaimed = Boolean(refreshedRow.founder_a_user_id && refreshedRow.founder_b_user_id);
   const invitationBeforeFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
   if (!invitationBeforeFinalize) {
+    logAdvisorTeamInviteActivation({
+      stage: "bootstrap_invitation_missing_after_create",
+      level: "error",
+      pendingInviteId: refreshedRow.id,
+      invitationId,
+      founderSlot,
+      currentUserId: normalizedUserId,
+      status: refreshedRow.status,
+      founderAUserId: refreshedRow.founder_a_user_id,
+      founderBUserId: refreshedRow.founder_b_user_id,
+      relationshipId: refreshedRow.relationship_id,
+    });
     return { ok: false, reason: "activation_failed" };
   }
 
@@ -780,13 +924,49 @@ export async function claimAdvisorTeamInviteFounder(params: {
         invitationId,
         client: privileged,
       });
-    } catch {
+      logAdvisorTeamInviteActivation({
+        stage: "bootstrap_activation_completed",
+        pendingInviteId: refreshedRow.id,
+        invitationId,
+        founderSlot,
+        currentUserId: normalizedUserId,
+        status: refreshedRow.status,
+        founderAUserId: refreshedRow.founder_a_user_id,
+        founderBUserId: refreshedRow.founder_b_user_id,
+        relationshipId: refreshedRow.relationship_id,
+      });
+    } catch (error) {
+      logAdvisorTeamInviteActivation({
+        stage: "bootstrap_activation_failed",
+        level: "error",
+        pendingInviteId: refreshedRow.id,
+        invitationId,
+        founderSlot,
+        currentUserId: normalizedUserId,
+        status: refreshedRow.status,
+        founderAUserId: refreshedRow.founder_a_user_id,
+        founderBUserId: refreshedRow.founder_b_user_id,
+        relationshipId: refreshedRow.relationship_id,
+        detail: toErrorMessage(error),
+      });
       return { ok: false, reason: "activation_failed" };
     }
   }
 
   const invitationAfterFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
   if (!invitationAfterFinalize) {
+    logAdvisorTeamInviteActivation({
+      stage: "finalized_invitation_missing",
+      level: "error",
+      pendingInviteId: refreshedRow.id,
+      invitationId,
+      founderSlot,
+      currentUserId: normalizedUserId,
+      status: refreshedRow.status,
+      founderAUserId: refreshedRow.founder_a_user_id,
+      founderBUserId: refreshedRow.founder_b_user_id,
+      relationshipId: refreshedRow.relationship_id,
+    });
     return { ok: false, reason: "activation_failed" };
   }
 
