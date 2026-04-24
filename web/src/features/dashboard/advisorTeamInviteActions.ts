@@ -199,3 +199,33 @@ export async function claimAdvisorTeamInviteFounderAction(params: {
 
   return result;
 }
+
+export async function revokeAdvisorPendingTeamInviteAction(
+  formData: FormData
+): Promise<void> {
+  const pendingTeamId = String(formData.get("pendingTeamId") ?? "").trim();
+  if (!pendingTeamId) {
+    return;
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return;
+  }
+
+  await supabase
+    .from("advisor_team_invites")
+    .update({
+      status: "revoked",
+    })
+    .eq("id", pendingTeamId)
+    .eq("advisor_user_id", user.id)
+    .eq("status", "pending")
+    .is("relationship_id", null);
+
+  revalidatePath("/advisor/dashboard");
+}

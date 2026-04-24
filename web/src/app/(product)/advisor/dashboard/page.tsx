@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { revokeAdvisorPendingTeamInviteAction } from "@/features/dashboard/advisorTeamInviteActions";
 import { AdvisorTeamInviteForm } from "@/features/dashboard/AdvisorTeamInviteForm";
 import {
   getAdvisorPendingTeamInvites,
@@ -338,6 +339,17 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
               </span>
             </div>
           </div>
+          {invite.status === "pending" ? (
+            <form action={revokeAdvisorPendingTeamInviteAction} className="mt-4">
+              <input type="hidden" name="pendingTeamId" value={invite.id} />
+              <button
+                type="submit"
+                className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800"
+              >
+                Aus Übersicht entfernen
+              </button>
+            </form>
+          ) : null}
         </div>
       </div>
     </article>
