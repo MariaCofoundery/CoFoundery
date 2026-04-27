@@ -6,6 +6,7 @@ import {
 } from "@/features/dashboard/advisorTeamInviteActions";
 import {
   fallbackLabelFromEmail,
+  finalizeAdvisorTeamInviteIfPossible,
   getAdvisorTeamInviteByToken,
   normalizeEmail,
   normalizeTeamName,
@@ -42,8 +43,16 @@ export default async function AdvisorTeamInvitePage({
 }) {
   const { token } = await params;
   const resolvedSearchParams = await searchParams;
-  const invite = await getAdvisorTeamInviteByToken(token);
-  const errorMessage = statusCopy(resolvedSearchParams.error);
+  let invite = await getAdvisorTeamInviteByToken(token);
+
+  if (
+    invite.status === "ready" &&
+    invite.row.invitation_id &&
+    invite.row.status !== "activated"
+  ) {
+    await finalizeAdvisorTeamInviteIfPossible(invite.row);
+    invite = await getAdvisorTeamInviteByToken(token);
+  }
 
   if (invite.status !== "ready") {
     return (
@@ -92,8 +101,15 @@ export default async function AdvisorTeamInvitePage({
   const questionnaireHref = row.invitation_id
     ? buildInvitationQuestionnaireHref(row.invitation_id, "base")
     : null;
+  const recoveredActivationError =
+    resolvedSearchParams.error === "activation_failed" &&
+    invitationReadyForCurrentSlot &&
+    Boolean(questionnaireHref);
+  const errorMessage = recoveredActivationError
+    ? null
+    : statusCopy(resolvedSearchParams.error);
 
-  if (!resolvedSearchParams.error && invitationReadyForCurrentSlot && questionnaireHref) {
+  if ((!resolvedSearchParams.error || recoveredActivationError) && invitationReadyForCurrentSlot && questionnaireHref) {
     redirect(questionnaireHref);
   }
 

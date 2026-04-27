@@ -157,8 +157,9 @@ function logAdvisorTeamInviteActivation(params: {
   detail?: string | null;
 }) {
   const logger = params.level === "error" ? console.error : console.info;
-  logger("[advisor-team-invite] activation", {
-    stage: params.stage,
+  logger("[advisor-activation]", {
+    step: params.stage,
+    success: params.level === "error" ? false : true,
     pendingInviteId: params.pendingInviteId,
     invitationId: params.invitationId ?? null,
     founderSlot: params.founderSlot ?? null,
@@ -170,6 +171,17 @@ function logAdvisorTeamInviteActivation(params: {
     detail: params.detail ?? null,
   });
 }
+
+type FinalizeAdvisorTeamInviteResult = {
+  pendingInviteId: string;
+  invitationId: string | null;
+  relationshipId: string | null;
+  activated: boolean;
+  invitationReady: boolean;
+  advisorLinkReady: boolean;
+  repaired: boolean;
+  failures: string[];
+};
 
 function buildPendingProgressLabel(row: AdvisorTeamInviteRow) {
   const startedCount = Number(Boolean(row.founder_a_claimed_at)) + Number(Boolean(row.founder_b_claimed_at));
@@ -296,6 +308,30 @@ async function loadAdvisorTeamInviteByTokenHash(
     founderSlot,
     slotEmail,
   };
+}
+
+async function loadAdvisorTeamInviteById(
+  id: string,
+  client: SupabaseLikeClient
+): Promise<AdvisorTeamInviteRow | null> {
+  const normalizedId = id.trim();
+  if (!normalizedId) {
+    return null;
+  }
+
+  const { data, error } = await client
+    .from("advisor_team_invites")
+    .select(
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
+    )
+    .eq("id", normalizedId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as AdvisorTeamInviteRow;
 }
 
 export async function getAdvisorTeamInviteByToken(
@@ -726,6 +762,392 @@ async function upsertRelationshipAdvisorLink(params: {
   }
 }
 
+function resolveBootstrapStarter(row: AdvisorTeamInviteRow) {
+  const founderAClaimedAt = row.founder_a_claimed_at ? new Date(row.founder_a_claimed_at).getTime() : null;
+  const founderBClaimedAt = row.founder_b_claimed_at ? new Date(row.founder_b_claimed_at).getTime() : null;
+
+  const founderAFirst =
+    row.founder_a_user_id &&
+    (!row.founder_b_user_id ||
+      founderBClaimedAt == null ||
+      (founderAClaimedAt != null && founderAClaimedAt <= founderBClaimedAt));
+
+  if (founderAFirst) {
+    return {
+      inviterUserId: row.founder_a_user_id as string,
+      inviterEmail: row.founder_a_email,
+      inviteeEmail: row.founder_b_email,
+    };
+  }
+
+  if (row.founder_b_user_id) {
+    return {
+      inviterUserId: row.founder_b_user_id,
+      inviterEmail: row.founder_b_email,
+      inviteeEmail: row.founder_a_email,
+    };
+  }
+
+  return null;
+}
+
+function resolveExpectedInviteeUserId(
+  invitation: InvitationBootstrapRow,
+  row: AdvisorTeamInviteRow
+) {
+  const invitationInviteeEmail = normalizeEmail(invitation.invitee_email);
+  if (invitationInviteeEmail === normalizeEmail(row.founder_a_email)) {
+    return row.founder_a_user_id;
+  }
+  if (invitationInviteeEmail === normalizeEmail(row.founder_b_email)) {
+    return row.founder_b_user_id;
+  }
+  if (invitation.inviter_user_id === row.founder_a_user_id) {
+    return row.founder_b_user_id;
+  }
+  if (invitation.inviter_user_id === row.founder_b_user_id) {
+    return row.founder_a_user_id;
+  }
+  return null;
+}
+
+export async function finalizeAdvisorTeamInviteIfPossible(
+  pendingInvite: AdvisorTeamInviteRow,
+  client?: SupabaseLikeClient
+): Promise<FinalizeAdvisorTeamInviteResult> {
+  const resolvedClient = client ?? createPrivilegedClient();
+  const failures: string[] = [];
+  let repaired = false;
+  let row = pendingInvite;
+  let invitationId = row.invitation_id;
+  let relationshipId = row.relationship_id;
+  let invitation: InvitationBootstrapRow | null = null;
+  let advisorLinkReady = false;
+
+  const resultBase = (): FinalizeAdvisorTeamInviteResult => ({
+    pendingInviteId: row.id,
+    invitationId,
+    relationshipId,
+    activated: row.status === "activated",
+    invitationReady: Boolean(
+      invitation &&
+        invitation.status === "accepted" &&
+        invitation.invitee_user_id &&
+        invitation.relationship_id
+    ),
+    advisorLinkReady,
+    repaired,
+    failures,
+  });
+
+  if (!resolvedClient) {
+    failures.push("service_unavailable");
+    logAdvisorTeamInviteActivation({
+      stage: "finalize_service_unavailable",
+      level: "error",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+      detail: "missing_service_role",
+    });
+    return resultBase();
+  }
+
+  if (invitationId) {
+    invitation = await loadInvitationBootstrapRow(invitationId, resolvedClient);
+  }
+
+  async function safeStep<T>(step: string, fn: () => Promise<T>): Promise<T | null> {
+    try {
+      const value = await fn();
+      logAdvisorTeamInviteActivation({
+        stage: step,
+        pendingInviteId: row.id,
+        invitationId,
+        status: row.status,
+        founderAUserId: row.founder_a_user_id,
+        founderBUserId: row.founder_b_user_id,
+        relationshipId,
+      });
+      return value;
+    } catch (error) {
+      const detail = toErrorMessage(error);
+      failures.push(`${step}:${detail}`);
+      logAdvisorTeamInviteActivation({
+        stage: step,
+        level: "error",
+        pendingInviteId: row.id,
+        invitationId,
+        status: row.status,
+        founderAUserId: row.founder_a_user_id,
+        founderBUserId: row.founder_b_user_id,
+        relationshipId,
+        detail,
+      });
+      return null;
+    }
+  }
+
+  if (!invitationId) {
+    const starter = resolveBootstrapStarter(row);
+    if (starter) {
+      const createdInvitationId = await safeStep("ensure_invitation", () =>
+        createBootstrapInvitationForAdvisorTeam({
+          row,
+          inviterUserId: starter.inviterUserId,
+          inviterEmail: starter.inviterEmail,
+          inviteeEmail: starter.inviteeEmail,
+          client: resolvedClient,
+        })
+      );
+      if (createdInvitationId) {
+        invitationId = createdInvitationId;
+        repaired = true;
+      }
+    } else {
+      failures.push("ensure_invitation:missing_founder_starter");
+      logAdvisorTeamInviteActivation({
+        stage: "ensure_invitation",
+        level: "error",
+        pendingInviteId: row.id,
+        invitationId,
+        status: row.status,
+        founderAUserId: row.founder_a_user_id,
+        founderBUserId: row.founder_b_user_id,
+        relationshipId,
+        detail: "missing_founder_starter",
+      });
+    }
+  } else {
+    logAdvisorTeamInviteActivation({
+      stage: "ensure_invitation_skip_existing",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+    });
+  }
+
+  if (invitationId) {
+    invitation = await loadInvitationBootstrapRow(invitationId, resolvedClient);
+  }
+
+  const bothFoundersClaimed = Boolean(row.founder_a_user_id && row.founder_b_user_id);
+  if (bothFoundersClaimed && !relationshipId) {
+    const resolvedRelationshipId = await safeStep("ensure_relationship", () =>
+      resolveRelationshipIdForFounders(
+        row.founder_a_user_id as string,
+        row.founder_b_user_id as string,
+        resolvedClient
+      )
+    );
+    if (resolvedRelationshipId) {
+      relationshipId = resolvedRelationshipId;
+      repaired = true;
+    }
+  } else if (!bothFoundersClaimed) {
+    logAdvisorTeamInviteActivation({
+      stage: "ensure_relationship_skip_missing_founders",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+    });
+  } else {
+    logAdvisorTeamInviteActivation({
+      stage: "ensure_relationship_skip_existing",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+    });
+  }
+
+  if (row.invitation_id !== invitationId || row.relationship_id !== relationshipId) {
+    const persistedReferences = await safeStep("persist_partial_references", async () => {
+      const { error } = await resolvedClient
+        .from("advisor_team_invites")
+        .update({
+          invitation_id: invitationId,
+          relationship_id: relationshipId,
+        })
+        .eq("id", row.id);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return true;
+    });
+    if (persistedReferences) {
+      const refreshedRow = await loadAdvisorTeamInviteById(row.id, resolvedClient);
+      if (refreshedRow) {
+        row = refreshedRow;
+        repaired = true;
+      }
+    }
+  }
+
+  if (invitation && bothFoundersClaimed && relationshipId) {
+    const currentInvitation = invitation;
+    const expectedInviteeUserId = resolveExpectedInviteeUserId(invitation, row);
+    const invitationNeedsUpdate =
+      currentInvitation.status !== "accepted" ||
+      currentInvitation.invitee_user_id !== expectedInviteeUserId ||
+      currentInvitation.relationship_id !== relationshipId ||
+      !currentInvitation.accepted_at;
+
+    if (expectedInviteeUserId && invitationNeedsUpdate) {
+      const updatedInvitation = await safeStep("ensure_invitation_accepted", async () => {
+        const nextAcceptedAt = currentInvitation.accepted_at ?? new Date().toISOString();
+        const { error } = await resolvedClient
+          .from("invitations")
+          .update({
+            invitee_user_id: expectedInviteeUserId,
+            accepted_at: nextAcceptedAt,
+            status: "accepted",
+            relationship_id: relationshipId,
+          })
+          .eq("id", currentInvitation.id);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        const refreshedInvitation = await loadInvitationBootstrapRow(currentInvitation.id, resolvedClient);
+        if (!refreshedInvitation) {
+          throw new Error("invitation_reload_failed");
+        }
+        return refreshedInvitation;
+      });
+      if (updatedInvitation) {
+        invitation = updatedInvitation;
+        repaired = true;
+      }
+    } else if (expectedInviteeUserId) {
+      logAdvisorTeamInviteActivation({
+        stage: "ensure_invitation_accepted_skip_existing",
+        pendingInviteId: row.id,
+        invitationId,
+        status: row.status,
+        founderAUserId: row.founder_a_user_id,
+        founderBUserId: row.founder_b_user_id,
+        relationshipId,
+      });
+    } else {
+      failures.push("ensure_invitation_accepted:missing_expected_invitee");
+      logAdvisorTeamInviteActivation({
+        stage: "ensure_invitation_accepted",
+        level: "error",
+        pendingInviteId: row.id,
+        invitationId,
+        status: row.status,
+        founderAUserId: row.founder_a_user_id,
+        founderBUserId: row.founder_b_user_id,
+        relationshipId,
+        detail: "missing_expected_invitee",
+      });
+    }
+  }
+
+  const invitationReady = Boolean(
+    invitation &&
+      invitation.status === "accepted" &&
+      invitation.invitee_user_id &&
+      invitation.relationship_id
+  );
+
+  if (invitationId && relationshipId) {
+    const linkedAdvisor = await safeStep("ensure_relationship_advisor", async () => {
+      await upsertRelationshipAdvisorLink({
+        row,
+        relationshipId,
+        invitationId,
+        client: resolvedClient,
+      });
+      return true;
+    });
+    advisorLinkReady = Boolean(linkedAdvisor);
+    if (advisorLinkReady) {
+      repaired = true;
+    }
+  } else {
+    logAdvisorTeamInviteActivation({
+      stage: "ensure_relationship_advisor_skip_missing_context",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+    });
+  }
+
+  const canActivate = Boolean(invitationId && relationshipId && invitationReady && advisorLinkReady);
+  if (canActivate && row.status !== "activated") {
+    const activated = await safeStep("mark_activated", async () => {
+      const { error } = await resolvedClient
+        .from("advisor_team_invites")
+        .update({
+          invitation_id: invitationId,
+          relationship_id: relationshipId,
+          status: "activated",
+        })
+        .eq("id", row.id);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return true;
+    });
+    if (activated) {
+      const refreshedRow = await loadAdvisorTeamInviteById(row.id, resolvedClient);
+      if (refreshedRow) {
+        row = refreshedRow;
+      }
+      repaired = true;
+    }
+  } else if (row.status === "activated") {
+    logAdvisorTeamInviteActivation({
+      stage: "mark_activated_skip_existing",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+    });
+  } else {
+    logAdvisorTeamInviteActivation({
+      stage: "mark_activated_skip_incomplete",
+      pendingInviteId: row.id,
+      invitationId,
+      status: row.status,
+      founderAUserId: row.founder_a_user_id,
+      founderBUserId: row.founder_b_user_id,
+      relationshipId,
+      detail: `invitationReady=${String(invitationReady)} advisorLinkReady=${String(advisorLinkReady)}`,
+    });
+  }
+
+  return {
+    pendingInviteId: row.id,
+    invitationId,
+    relationshipId,
+    activated: row.status === "activated",
+    invitationReady,
+    advisorLinkReady,
+    repaired,
+    failures,
+  };
+}
+
 async function activateAdvisorTeamInviteRow(
   row: AdvisorTeamInviteRow,
   client: SupabaseLikeClient
@@ -858,105 +1280,32 @@ export async function claimAdvisorTeamInviteFounder(params: {
     founderBUserId: refreshedRow.founder_b_user_id,
     relationshipId: refreshedRow.relationship_id,
   });
-  let invitationId = refreshedRow.invitation_id;
+  const finalizeResult = await finalizeAdvisorTeamInviteIfPossible(refreshedRow, privileged);
+  const invitationId = finalizeResult.invitationId;
   if (!invitationId) {
-    const inviteeEmail =
-      founderSlot === "founderA" ? refreshedRow.founder_b_email : refreshedRow.founder_a_email;
-    try {
-      invitationId = await createBootstrapInvitationForAdvisorTeam({
-        row: refreshedRow,
-        inviterUserId: normalizedUserId,
-        inviterEmail: normalizedUserEmail,
-        inviteeEmail,
-        client: privileged,
-      });
-      logAdvisorTeamInviteActivation({
-        stage: "bootstrap_invitation_created",
-        pendingInviteId: refreshedRow.id,
-        invitationId,
-        founderSlot,
-        currentUserId: normalizedUserId,
-        status: refreshedRow.status,
-        founderAUserId: refreshedRow.founder_a_user_id,
-        founderBUserId: refreshedRow.founder_b_user_id,
-        relationshipId: refreshedRow.relationship_id,
-      });
-    } catch (error) {
-      logAdvisorTeamInviteActivation({
-        stage: "bootstrap_invitation_failed",
-        level: "error",
-        pendingInviteId: refreshedRow.id,
-        invitationId: refreshedRow.invitation_id,
-        founderSlot,
-        currentUserId: normalizedUserId,
-        status: refreshedRow.status,
-        founderAUserId: refreshedRow.founder_a_user_id,
-        founderBUserId: refreshedRow.founder_b_user_id,
-        relationshipId: refreshedRow.relationship_id,
-        detail: toErrorMessage(error),
-      });
-      return { ok: false, reason: "activation_failed" };
-    }
-  }
-
-  const bothFoundersClaimed = Boolean(refreshedRow.founder_a_user_id && refreshedRow.founder_b_user_id);
-  const invitationBeforeFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
-  if (!invitationBeforeFinalize) {
-    logAdvisorTeamInviteActivation({
-      stage: "bootstrap_invitation_missing_after_create",
-      level: "error",
-      pendingInviteId: refreshedRow.id,
-      invitationId,
-      founderSlot,
-      currentUserId: normalizedUserId,
-      status: refreshedRow.status,
-      founderAUserId: refreshedRow.founder_a_user_id,
-      founderBUserId: refreshedRow.founder_b_user_id,
-      relationshipId: refreshedRow.relationship_id,
-    });
     return { ok: false, reason: "activation_failed" };
-  }
-
-  if (bothFoundersClaimed && refreshedRow.status !== "activated") {
-    try {
-      await activateBootstrapInvitationForAdvisorTeam({
-        row: refreshedRow,
-        invitationId,
-        client: privileged,
-      });
-      logAdvisorTeamInviteActivation({
-        stage: "bootstrap_activation_completed",
-        pendingInviteId: refreshedRow.id,
-        invitationId,
-        founderSlot,
-        currentUserId: normalizedUserId,
-        status: refreshedRow.status,
-        founderAUserId: refreshedRow.founder_a_user_id,
-        founderBUserId: refreshedRow.founder_b_user_id,
-        relationshipId: refreshedRow.relationship_id,
-      });
-    } catch (error) {
-      logAdvisorTeamInviteActivation({
-        stage: "bootstrap_activation_failed",
-        level: "error",
-        pendingInviteId: refreshedRow.id,
-        invitationId,
-        founderSlot,
-        currentUserId: normalizedUserId,
-        status: refreshedRow.status,
-        founderAUserId: refreshedRow.founder_a_user_id,
-        founderBUserId: refreshedRow.founder_b_user_id,
-        relationshipId: refreshedRow.relationship_id,
-        detail: toErrorMessage(error),
-      });
-      return { ok: false, reason: "activation_failed" };
-    }
   }
 
   const invitationAfterFinalize = await loadInvitationBootstrapRow(invitationId, privileged);
   if (!invitationAfterFinalize) {
+    return { ok: false, reason: "activation_failed" };
+  }
+
+  const isCurrentFounderParticipant =
+    refreshedRow.founder_a_user_id === normalizedUserId ||
+    refreshedRow.founder_b_user_id === normalizedUserId;
+  const canContinueThroughBootstrap =
+    isCurrentFounderParticipant &&
+    invitationAfterFinalize.inviter_user_id === normalizedUserId &&
+    !invitationAfterFinalize.invitee_user_id;
+
+  const isInviteeForInvitation =
+    invitationAfterFinalize.invitee_user_id === normalizedUserId ||
+    normalizeEmail(invitationAfterFinalize.invitee_email) === normalizedUserEmail;
+
+  if (!isInviteeForInvitation && !canContinueThroughBootstrap && !finalizeResult.activated) {
     logAdvisorTeamInviteActivation({
-      stage: "finalized_invitation_missing",
+      stage: "claim_continue_guard_failed",
       level: "error",
       pendingInviteId: refreshedRow.id,
       invitationId,
@@ -965,14 +1314,11 @@ export async function claimAdvisorTeamInviteFounder(params: {
       status: refreshedRow.status,
       founderAUserId: refreshedRow.founder_a_user_id,
       founderBUserId: refreshedRow.founder_b_user_id,
-      relationshipId: refreshedRow.relationship_id,
+      relationshipId: finalizeResult.relationshipId,
+      detail: finalizeResult.failures.join(" | ") || "continue_guard_failed",
     });
     return { ok: false, reason: "activation_failed" };
   }
-
-  const isInviteeForInvitation =
-    invitationAfterFinalize.invitee_user_id === normalizedUserId ||
-    normalizeEmail(invitationAfterFinalize.invitee_email) === normalizedUserEmail;
 
   return {
     ok: true,
