@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { buildInvitationDashboardHref, buildInvitationResumeHref } from "@/features/onboarding/invitationFlow";
+import { buildInvitationQuestionnaireHref } from "@/features/onboarding/invitationFlow";
 import {
   claimAdvisorTeamInviteFounderAction,
 } from "@/features/dashboard/advisorTeamInviteActions";
@@ -89,9 +89,13 @@ export default async function AdvisorTeamInvitePage({
     !slotAlreadyClaimed &&
     (founderSlot === "founderA" ? !row.founder_a_user_id : !row.founder_b_user_id);
   const invitationReadyForCurrentSlot = Boolean(row.invitation_id) && slotAlreadyClaimed;
-  const invitationDashboardHref = row.invitation_id
-    ? buildInvitationDashboardHref(row.invitation_id)
-    : "/dashboard";
+  const questionnaireHref = row.invitation_id
+    ? buildInvitationQuestionnaireHref(row.invitation_id, "base")
+    : null;
+
+  if (!resolvedSearchParams.error && invitationReadyForCurrentSlot && questionnaireHref) {
+    redirect(questionnaireHref);
+  }
 
   async function claimAction() {
     "use server";
@@ -101,11 +105,7 @@ export default async function AdvisorTeamInvitePage({
       redirect(`/team-invite/${encodeURIComponent(token)}?error=${encodeURIComponent(result.reason)}`);
     }
 
-    redirect(
-      result.state === "invitee_continue"
-        ? buildInvitationResumeHref(result.invitationId)
-        : buildInvitationDashboardHref(result.invitationId)
-    );
+    redirect(buildInvitationQuestionnaireHref(result.invitationId, "base"));
   }
 
   return (
@@ -189,21 +189,6 @@ export default async function AdvisorTeamInvitePage({
                   Start bestätigen
                 </button>
               </form>
-            </>
-          ) : invitationReadyForCurrentSlot ? (
-            <>
-              <h2 className="text-xl font-semibold text-slate-950">Weiter im Matching</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                Dein Matching-Kontext ist bereits angelegt. Von hier gehst du in den bestehenden Founder-Flow weiter.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href={invitationDashboardHref}
-                  className={PRIMARY_CTA_CLASS}
-                >
-                  Matching öffnen
-                </Link>
-              </div>
             </>
           ) : (
             <>
