@@ -311,7 +311,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
 
         <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
           <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-            {invite.status === "activating" ? "Wird verknuepft" : "Founder eingeladen"}
+            Founder eingeladen
           </span>
           <div className="mt-4 grid gap-2">
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">

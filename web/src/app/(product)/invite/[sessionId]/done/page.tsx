@@ -117,7 +117,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
         description={`Die Einladung konnte nicht geladen werden (${decision.reason}).`}
       >
           <ResearchTrackedLink
-            href="/dashboard"
+            href={dashboardHref}
             eventName="invite_done_error_dashboard_clicked"
             invitationId={invitationId}
             className="mt-6 inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
@@ -147,12 +147,14 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
               Weiter zum Werte-Modul
             </button>
           </form>
-          <form action={navigateWithEnsuredMatchingReport}>
-            <input type="hidden" name="target" value="dashboard" />
-            <button type="submit" className={completionButtonClass("ghost")}>
-              Zurück zum Dashboard
-            </button>
-          </form>
+          <ResearchTrackedLink
+            href={dashboardHref}
+            eventName="invite_done_dashboard_clicked"
+            invitationId={invitationId}
+            className={completionButtonClass("ghost")}
+          >
+            Zurück zum Dashboard
+          </ResearchTrackedLink>
         </div>
       );
     }
@@ -171,12 +173,14 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             Individuellen Report ansehen
           </button>
         </form>
-        <form action={navigateWithEnsuredMatchingReport}>
-          <input type="hidden" name="target" value="dashboard" />
-          <button type="submit" className={completionButtonClass("ghost")}>
-            Zurück zum Dashboard
-          </button>
-        </form>
+        <ResearchTrackedLink
+          href={dashboardHref}
+          eventName="invite_done_dashboard_clicked"
+          invitationId={invitationId}
+          className={completionButtonClass("ghost")}
+        >
+          Zurück zum Dashboard
+        </ResearchTrackedLink>
       </div>
     );
   }
@@ -191,12 +195,14 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
               Weiter zum Werte-Modul
             </button>
           </form>
-          <form action={navigateWithEnsuredMatchingReport}>
-            <input type="hidden" name="target" value="dashboard" />
-            <button type="submit" className={completionButtonClass("secondary")}>
-              Zurück zum Dashboard
-            </button>
-          </form>
+          <ResearchTrackedLink
+            href={dashboardHref}
+            eventName="invite_done_dashboard_clicked"
+            invitationId={invitationId}
+            className={completionButtonClass("secondary")}
+          >
+            Zurück zum Dashboard
+          </ResearchTrackedLink>
         </div>
       );
     }
@@ -209,12 +215,14 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             Individuellen Report ansehen
           </button>
         </form>
-        <form action={navigateWithEnsuredMatchingReport}>
-          <input type="hidden" name="target" value="dashboard" />
-          <button type="submit" className={completionButtonClass("secondary")}>
-            Zurück zum Dashboard
-          </button>
-        </form>
+        <ResearchTrackedLink
+          href={dashboardHref}
+          eventName="invite_done_dashboard_clicked"
+          invitationId={invitationId}
+          className={completionButtonClass("secondary")}
+        >
+          Zurück zum Dashboard
+        </ResearchTrackedLink>
       </div>
     );
   }

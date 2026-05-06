@@ -24,7 +24,7 @@ type AdvisorTeamInviteRow = {
   founder_b_token_hash: string;
   invitation_id: string | null;
   relationship_id: string | null;
-  status: "pending" | "activating" | "activated" | "revoked";
+  status: "pending" | "activated" | "revoked";
   created_at: string;
   updated_at: string;
 };
@@ -67,7 +67,7 @@ export type AdvisorPendingTeamInvite = {
   founderBStarted: boolean;
   founderAStartedAt: string | null;
   founderBStartedAt: string | null;
-  status: "pending" | "activating";
+  status: "pending";
   progressLabel: string;
   nextStepLabel: string;
   lastActivityAt: string;
@@ -191,7 +191,7 @@ function buildPendingProgressLabel(row: AdvisorTeamInviteRow) {
   if (startedCount === 1) {
     return "1 von 2 Founder hat gestartet";
   }
-  return row.status === "activating" ? "Team wird verknüpft" : "Beide Founder haben gestartet";
+  return "Beide Founder haben gestartet";
 }
 
 function buildPendingNextStepLabel(row: AdvisorTeamInviteRow) {
@@ -201,9 +201,7 @@ function buildPendingNextStepLabel(row: AdvisorTeamInviteRow) {
   if (!row.founder_a_claimed_at || !row.founder_b_claimed_at) {
     return "Wartet auf den zweiten Founder";
   }
-  return row.status === "activating"
-    ? "Dashboard verknüpft das Team gerade"
-    : "Das Team wechselt gleich in die begleiteten Teams";
+  return "Das Team wechselt gleich in die begleiteten Teams";
 }
 
 export async function getAdvisorPendingTeamInvites(userId: string): Promise<AdvisorPendingTeamInvite[]> {
@@ -219,7 +217,7 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
       "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
     )
     .eq("advisor_user_id", normalizedUserId)
-    .in("status", ["pending", "activating"])
+    .eq("status", "pending")
     .order("updated_at", { ascending: false });
 
   if (error || !data) {
@@ -274,7 +272,7 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
       founderBStarted: Boolean(row.founder_b_claimed_at),
       founderAStartedAt: row.founder_a_claimed_at,
       founderBStartedAt: row.founder_b_claimed_at,
-      status: row.status === "activating" ? "activating" : "pending",
+      status: "pending",
       progressLabel: buildPendingProgressLabel(row),
       nextStepLabel: buildPendingNextStepLabel(row),
       lastActivityAt,
@@ -396,91 +394,6 @@ async function resolveRelationshipIdForFounders(
   return (retriedRelationship as ExistingRelationshipRow).id;
 }
 
-async function createAcceptedInvitationForAdvisorTeam(params: {
-  row: AdvisorTeamInviteRow;
-  relationshipId: string;
-  client: SupabaseLikeClient;
-}) {
-  const founderAUserId = params.row.founder_a_user_id;
-  const founderBUserId = params.row.founder_b_user_id;
-  if (!founderAUserId || !founderBUserId) {
-    throw new Error("missing_founders");
-  }
-
-  const [{ data: founderAProfile }, { data: existingInvitation }] = await Promise.all([
-    params.client
-      .from("profiles")
-      .select("display_name")
-      .eq("user_id", founderAUserId)
-      .maybeSingle(),
-    params.client
-      .from("invitations")
-      .select("id")
-      .eq("relationship_id", params.relationshipId)
-      .eq("inviter_user_id", founderAUserId)
-      .eq("invitee_user_id", founderBUserId)
-      .limit(1)
-      .maybeSingle(),
-  ]);
-
-  if (existingInvitation) {
-    return (existingInvitation as InsertedInvitationRow).id;
-  }
-
-  const token = createOpaqueToken();
-  const tokenHash = hashOpaqueToken(token);
-  const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-  const inviterDisplayName =
-    (founderAProfile as { display_name?: string | null } | null)?.display_name?.trim() ||
-    fallbackLabelFromEmail(params.row.founder_a_email);
-
-  const { data: insertedInvitation, error: insertedInvitationError } = await params.client
-    .from("invitations")
-    .insert({
-      inviter_user_id: founderAUserId,
-      invitee_user_id: founderBUserId,
-      invitee_email: params.row.founder_b_email,
-      label: normalizeTeamName(params.row.team_name) ?? params.row.founder_b_email,
-      inviter_display_name: inviterDisplayName,
-      inviter_email: params.row.founder_a_email,
-      team_context: "pre_founder",
-      token_hash: tokenHash,
-      expires_at: expiresAt,
-      accepted_at: new Date().toISOString(),
-      status: "accepted",
-      relationship_id: params.relationshipId,
-    })
-    .select("id")
-    .single();
-
-  if (insertedInvitationError || !insertedInvitation) {
-    throw new Error(insertedInvitationError?.message ?? "invitation_create_failed");
-  }
-
-  const invitationId = (insertedInvitation as InsertedInvitationRow).id;
-  const { error: moduleError } = await params.client.from("invitation_modules").insert({
-    invitation_id: invitationId,
-    module: "base",
-  });
-
-  if (moduleError) {
-    throw new Error(moduleError.message);
-  }
-
-  await Promise.all([
-    bindLatestSubmittedInvitationMatchingInputs(invitationId, founderAUserId, ["base"], {
-      client: params.client,
-      replaceExisting: false,
-    }).catch(() => null),
-    bindLatestSubmittedInvitationMatchingInputs(invitationId, founderBUserId, ["base"], {
-      client: params.client,
-      replaceExisting: false,
-    }).catch(() => null),
-  ]);
-
-  return invitationId;
-}
-
 async function loadInvitationBootstrapRow(
   invitationId: string,
   client: SupabaseLikeClient
@@ -574,108 +487,6 @@ async function createBootstrapInvitationForAdvisorTeam(params: {
   }
 
   return invitationId;
-}
-
-async function activateBootstrapInvitationForAdvisorTeam(params: {
-  row: AdvisorTeamInviteRow;
-  invitationId: string;
-  client: SupabaseLikeClient;
-}) {
-  const founderAUserId = params.row.founder_a_user_id;
-  const founderBUserId = params.row.founder_b_user_id;
-  if (!founderAUserId || !founderBUserId) {
-    throw new Error("missing_founders");
-  }
-
-  const invitation = await loadInvitationBootstrapRow(params.invitationId, params.client);
-  if (!invitation) {
-    throw new Error("bootstrap_invitation_not_found");
-  }
-
-  const relationshipId =
-    invitation.relationship_id ??
-    params.row.relationship_id ??
-    (await resolveRelationshipIdForFounders(founderAUserId, founderBUserId, params.client));
-  logAdvisorTeamInviteActivation({
-    stage: "bootstrap_activation_relationship_resolved",
-    pendingInviteId: params.row.id,
-    invitationId: params.invitationId,
-    status: params.row.status,
-    founderAUserId,
-    founderBUserId,
-    relationshipId,
-  });
-  const inviteeUserId =
-    normalizeEmail(invitation.invitee_email) === normalizeEmail(params.row.founder_a_email)
-      ? founderAUserId
-      : founderBUserId;
-
-  const { error: invitationUpdateError } = await params.client
-    .from("invitations")
-    .update({
-      invitee_user_id: inviteeUserId,
-      accepted_at: invitation.accepted_at ?? new Date().toISOString(),
-      status: "accepted",
-      relationship_id: relationshipId,
-    })
-    .eq("id", params.invitationId);
-
-  if (invitationUpdateError) {
-    throw new Error(invitationUpdateError.message);
-  }
-  logAdvisorTeamInviteActivation({
-    stage: "bootstrap_activation_invitation_updated",
-    pendingInviteId: params.row.id,
-    invitationId: params.invitationId,
-    status: params.row.status,
-    founderAUserId,
-    founderBUserId,
-    relationshipId,
-    detail: `inviteeUserId=${inviteeUserId}`,
-  });
-
-  await upsertRelationshipAdvisorLink({
-    row: params.row,
-    relationshipId,
-    invitationId: params.invitationId,
-    client: params.client,
-  });
-  logAdvisorTeamInviteActivation({
-    stage: "bootstrap_activation_advisor_linked",
-    pendingInviteId: params.row.id,
-    invitationId: params.invitationId,
-    status: params.row.status,
-    founderAUserId,
-    founderBUserId,
-    relationshipId,
-  });
-
-  const { error: finalizeError } = await params.client
-    .from("advisor_team_invites")
-    .update({
-      relationship_id: relationshipId,
-      invitation_id: params.invitationId,
-      status: "activated",
-    })
-    .eq("id", params.row.id);
-
-  if (finalizeError) {
-    throw new Error(finalizeError.message);
-  }
-  logAdvisorTeamInviteActivation({
-    stage: "bootstrap_activation_pending_finalized",
-    pendingInviteId: params.row.id,
-    invitationId: params.invitationId,
-    status: "activated",
-    founderAUserId,
-    founderBUserId,
-    relationshipId,
-  });
-
-  return {
-    invitationId: params.invitationId,
-    relationshipId,
-  };
 }
 
 async function upsertRelationshipAdvisorLink(params: {
@@ -1145,57 +956,6 @@ export async function finalizeAdvisorTeamInviteIfPossible(
     advisorLinkReady,
     repaired,
     failures,
-  };
-}
-
-async function activateAdvisorTeamInviteRow(
-  row: AdvisorTeamInviteRow,
-  client: SupabaseLikeClient
-) {
-  if (row.invitation_id) {
-    return {
-      invitationId: row.invitation_id,
-      relationshipId: row.relationship_id,
-    };
-  }
-
-  const founderAUserId = row.founder_a_user_id;
-  const founderBUserId = row.founder_b_user_id;
-  if (!founderAUserId || !founderBUserId) {
-    throw new Error("missing_founders");
-  }
-
-  const relationshipId =
-    row.relationship_id ?? (await resolveRelationshipIdForFounders(founderAUserId, founderBUserId, client));
-  const invitationId = await createAcceptedInvitationForAdvisorTeam({
-    row,
-    relationshipId,
-    client,
-  });
-
-  await upsertRelationshipAdvisorLink({
-    row,
-    relationshipId,
-    invitationId,
-    client,
-  });
-
-  const { error: finalizeError } = await client
-    .from("advisor_team_invites")
-    .update({
-      relationship_id: relationshipId,
-      invitation_id: invitationId,
-      status: "activated",
-    })
-    .eq("id", row.id);
-
-  if (finalizeError) {
-    throw new Error(finalizeError.message);
-  }
-
-  return {
-    invitationId,
-    relationshipId,
   };
 }
 

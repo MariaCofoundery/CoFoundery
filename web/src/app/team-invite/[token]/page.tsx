@@ -39,7 +39,7 @@ export default async function AdvisorTeamInvitePage({
   searchParams,
 }: {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ error?: string; claimed?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { token } = await params;
   const resolvedSearchParams = await searchParams;
@@ -101,15 +101,9 @@ export default async function AdvisorTeamInvitePage({
   const questionnaireHref = row.invitation_id
     ? buildInvitationQuestionnaireHref(row.invitation_id, "base")
     : null;
-  const recoveredActivationError =
-    resolvedSearchParams.error === "activation_failed" &&
-    invitationReadyForCurrentSlot &&
-    Boolean(questionnaireHref);
-  const errorMessage = recoveredActivationError
-    ? null
-    : statusCopy(resolvedSearchParams.error);
+  const errorMessage = statusCopy(resolvedSearchParams.error);
 
-  if ((!resolvedSearchParams.error || recoveredActivationError) && invitationReadyForCurrentSlot && questionnaireHref) {
+  if (invitationReadyForCurrentSlot && questionnaireHref) {
     redirect(questionnaireHref);
   }
 
@@ -212,11 +206,6 @@ export default async function AdvisorTeamInvitePage({
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 Dein Platz ist bereits verknüpft. Sobald auch {counterpartLabel} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert.
               </p>
-              {resolvedSearchParams.claimed === "1" ? (
-                <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                  Dein Start wurde gespeichert. Du musst gerade nichts weiter tun.
-                </p>
-              ) : null}
             </>
           )}
         </div>
