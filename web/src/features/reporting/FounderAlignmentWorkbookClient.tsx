@@ -4352,6 +4352,9 @@ export function FounderAlignmentWorkbookClient({
                         }
                       />
                     </div>
+                    <p className="mt-3 text-xs leading-6 text-slate-500">
+                      {t("Innerhalb dieser Dimension bewegt ihr euch nacheinander durch Perspektiven, Einordnung, Entwurf und finale Absprache.")}
+                    </p>
                   </div>
                 </section>
 
@@ -4488,6 +4491,20 @@ export function FounderAlignmentWorkbookClient({
                               )
                             )}
                     </div>
+                    {!isAdvisorViewer && hasDecisionRulesBothPerspectives ? (
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t("Beide Perspektiven liegen jetzt in derselben Dimension vor. Als Naechstes ordnet ihr die Punkte gemeinsam ein.")}
+                        </p>
+                        <ReportActionButton
+                          variant="utility"
+                          type="button"
+                          onClick={() => openWorkbookV2Phase("weight")}
+                        >
+                          {t("Weiter zur Einordnung")}
+                        </ReportActionButton>
+                      </div>
+                    ) : null}
                   </section>
                 ) : (
                   <WorkbookV2PhasePreview
@@ -4571,6 +4588,20 @@ export function FounderAlignmentWorkbookClient({
                         sourceBadgeClassName={currentToneMeta.sourceBadge}
                       />
                     </div>
+                    {!isAdvisorViewer && decisionRulesWeightingReady ? (
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t("Die Einordnung ist abgeschlossen. In derselben Dimension macht ihr daraus jetzt einen ersten Entwurf.")}
+                        </p>
+                        <ReportActionButton
+                          variant="utility"
+                          type="button"
+                          onClick={() => openWorkbookV2Phase("rule")}
+                        >
+                          {t("Weiter zum Entwurf")}
+                        </ReportActionButton>
+                      </div>
+                    ) : null}
                   </section>
                 ) : showWorkbookV2WeightPreview ? (
                   <WorkbookV2PhasePreview
@@ -4719,6 +4750,20 @@ export function FounderAlignmentWorkbookClient({
                         </div>
                       </details>
                     </div>
+                    {!isAdvisorViewer && decisionRulesRuleReady ? (
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
+                        <p className="text-xs leading-6 text-slate-500">
+                          {t("Der Entwurf steht. Im letzten Teil dieser Dimension bestaetigt ihr nur noch eure finale Absprache.")}
+                        </p>
+                        <ReportActionButton
+                          variant="utility"
+                          type="button"
+                          onClick={() => openWorkbookV2Phase("approval")}
+                        >
+                          {t("Weiter zur finalen Absprache")}
+                        </ReportActionButton>
+                      </div>
+                    ) : null}
                   </section>
                 ) : showWorkbookV2RulePreview ? (
                   <WorkbookV2PhasePreview
@@ -5169,7 +5214,7 @@ export function FounderAlignmentWorkbookClient({
                             : t("Hier entwickelt sich der Abschnitt noch aus den bisherigen Founder-Perspektiven.")
                       : currentStepStatus === "finalized"
                         ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
-                        : currentStepStatus === "awaiting_approval"
+                      : currentStepStatus === "awaiting_approval"
                           ? t("Die finale Absprache steht. Es fehlt nur noch die Bestaetigung beider Founder.")
                           : currentStepStatus === "draft_ready"
                             ? t("Es gibt bereits einen Entwurf. Schaerft ihn jetzt zur finalen Absprache.")
@@ -5214,8 +5259,8 @@ export function FounderAlignmentWorkbookClient({
                     {currentIndex === visibleSteps.length - 1
                       ? t("Zur Zusammenfassung")
                       : currentStepStatus === "finalized"
-                        ? t("Naechster Schritt")
-                        : t("Trotzdem weiter")}
+                        ? t("Zur naechsten Dimension")
+                        : t("Diesen Schritt vorerst verlassen")}
                   </ReportActionButton>
                 </div>
               </div>
