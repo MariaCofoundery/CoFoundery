@@ -1720,6 +1720,10 @@ export function FounderAlignmentWorkbookClient({
     requestedWorkbookV2Phase && canShowRequestedWorkbookV2Phase
       ? requestedWorkbookV2Phase
       : currentDecisionRulesPhase;
+  const canOpenCollectPhase = true;
+  const canOpenWeightPhase = hasDecisionRulesBothPerspectives;
+  const canOpenRulePhase = decisionRulesWeightingReady;
+  const canOpenApprovalPhase = decisionRulesRuleReady;
   const currentDiscussionDraftSourceRootEntryId =
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
@@ -1754,9 +1758,6 @@ export function FounderAlignmentWorkbookClient({
     decisionRulesThreadGroups.some((group) => group.rootEntry.id === requestedDiscussionOpenThreadId)
       ? requestedDiscussionOpenThreadId
       : defaultDiscussionOpenThreadId;
-  const showWorkbookV2WeightPreview =
-    visibleWorkbookV2Phase === "rule" || visibleWorkbookV2Phase === "approval";
-  const showWorkbookV2RulePreview = visibleWorkbookV2Phase === "approval";
   const workbookV2SharedSpaceHint =
     currentUserRole === "founderA" || currentUserRole === "founderB"
       ? isCollaborativeMode
@@ -4310,6 +4311,8 @@ export function FounderAlignmentWorkbookClient({
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
                         tone={currentVisualTone}
+                        onClick={() => openWorkbookV2Phase("collect")}
+                        disabled={!canOpenCollectPhase}
                         state={
                           visibleWorkbookV2Phase === "collect"
                             ? "active"
@@ -4321,6 +4324,8 @@ export function FounderAlignmentWorkbookClient({
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen")}
                         tone={currentVisualTone}
+                        onClick={() => openWorkbookV2Phase("weight")}
+                        disabled={!canOpenWeightPhase}
                         state={
                           visibleWorkbookV2Phase === "weight"
                             ? "active"
@@ -4332,6 +4337,8 @@ export function FounderAlignmentWorkbookClient({
                       <WorkbookV2PhasePill
                         label={t(currentPremiumV2Config.rulePhaseLabel ?? "Regel")}
                         tone={currentVisualTone}
+                        onClick={() => openWorkbookV2Phase("rule")}
+                        disabled={!canOpenRulePhase}
                         state={
                           visibleWorkbookV2Phase === "rule"
                             ? "active"
@@ -4343,6 +4350,8 @@ export function FounderAlignmentWorkbookClient({
                       <WorkbookV2PhasePill
                         label={t("Bestaetigen")}
                         tone={currentVisualTone}
+                        onClick={() => openWorkbookV2Phase("approval")}
+                        disabled={!canOpenApprovalPhase}
                         state={
                           visibleWorkbookV2Phase === "approval"
                             ? "active"
@@ -4506,25 +4515,7 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                     ) : null}
                   </section>
-                ) : (
-                  <WorkbookV2PhasePreview
-                    title={t(currentPremiumV2Config.collectTitle ?? "1. Denkraum")}
-                    summary={t(`${decisionRulesWorkspace.entries.length} Punkte liegen auf dem Tisch.`)}
-                    detail={
-                      hasDecisionRulesBothPerspectives
-                        ? t("Beide Perspektiven sind sichtbar.")
-                        : t(
-                            isAdvisorViewer
-                              ? "Hier fehlt aktuell noch eine sichtbare Perspektive der zweiten Founder-Person."
-                              : "Es fehlt noch mindestens ein eigener Punkt der zweiten Person."
-                          )
-                    }
-                    actionLabel={t(currentPremiumV2Config.collectActionLabel ?? "Denkraum bearbeiten")}
-                    onAction={() => openWorkbookV2Phase("collect")}
-                    tone={currentVisualTone}
-                    className="mt-8"
-                  />
-                )}
+                ) : null}
 
                 {visibleWorkbookV2Phase === "weight" ? (
                   <section className={`mt-6 rounded-[30px] border p-6 sm:p-7 ${currentToneMeta.weightSurface}`}>
@@ -4603,53 +4594,9 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                     ) : null}
                   </section>
-                ) : showWorkbookV2WeightPreview ? (
-                  <WorkbookV2PhasePreview
-                    title={t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
-                    summary={
-                      decisionRulesWeightingReady
-                        ? t(
-                            currentPremiumV2StepId === "ownership_risk"
-                              ? `${decisionRulesSharedCount} tragbare Punkte, ${decisionRulesCriticalCount} Punkte fuer gemeinsamen Eingriff.`
-                              : currentPremiumV2StepId === "alignment_90_days"
-                                ? `${workbookV2PriorityCount} Fokus-Punkte, ${workbookV2DeferredCount} bewusst geparkt.`
-                                : currentPremiumV2StepId === "values_guardrails"
-                                  ? `${workbookV2GuardrailTragbarCount} tragbare Faelle, ${workbookV2GuardrailCaseCount} Grenzfaelle, ${decisionRulesCriticalCount} rote Linien.`
-                              : `${decisionRulesSharedCount} gemeinsame Punkte, ${decisionRulesCriticalCount} offene Unterschiede.`
-                          )
-                        : t("Die Einordnung ist erst fertig, wenn beide alle vorhandenen Punkte im Denkraum markiert haben.")
-                    }
-                    detail={
-                      decisionRulesWeightingReady
-                        ? t(
-                            currentPremiumV2StepId === "ownership_risk"
-                              ? "Jetzt ist sichtbar, was allein gefuehrt werden kann und was gemeinsame Absicherung braucht."
-                              : currentPremiumV2StepId === "alignment_90_days"
-                                ? "Jetzt ist sichtbar, was Vorrang hat, was wartet und was nur bewusst freigegeben wird."
-                                : currentPremiumV2StepId === "values_guardrails"
-                                  ? "Jetzt ist sichtbar, was tragbar ist, was bewusste Freigabe braucht und was nicht euer Weg ist."
-                              : "Die wichtigen Unterschiede sind sichtbar."
-                          )
-                        : t(
-                            decisionRulesFounderAOpenWeightingCount > 0 || decisionRulesFounderBOpenWeightingCount > 0
-                              ? `${founderALabel}: ${decisionRulesFounderAOpenWeightingCount} offen · ${founderBLabel}: ${decisionRulesFounderBOpenWeightingCount} offen.`
-                              : "Danach geht ihr direkt in die gemeinsame Regel."
-                          )
-                    }
-                    actionLabel={
-                      hasDecisionRulesBothPerspectives
-                        ? t(currentPremiumV2Config.weightingActionLabel ?? "Einordnung bearbeiten")
-                        : undefined
-                    }
-                    onAction={
-                      hasDecisionRulesBothPerspectives ? () => openWorkbookV2Phase("weight") : undefined
-                    }
-                    tone={currentVisualTone}
-                    className="mt-6"
-                  />
                 ) : null}
 
-                {visibleWorkbookV2Phase === "rule" || visibleWorkbookV2Phase === "approval" ? (
+                {visibleWorkbookV2Phase === "rule" ? (
                   <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4765,13 +4712,6 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                     ) : null}
                   </section>
-                ) : showWorkbookV2RulePreview ? (
-                  <WorkbookV2PhasePreview
-                    title={t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
-                    summary={t(currentPremiumV2Config.rulePreviewSummary)}
-                    detail={t(currentPremiumV2Config.rulePreviewDetail)}
-                    className="mt-6"
-                  />
                 ) : null}
 
                 {visibleWorkbookV2Phase === "approval" ? (
@@ -4813,14 +4753,17 @@ export function FounderAlignmentWorkbookClient({
                         approved={currentStepEntry.founderBApproved}
                       />
                     </div>
+                    <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/88 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("Finale Absprache in dieser Dimension")}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">
+                        {currentStepEntry.agreement.trim().length > 0
+                          ? t(currentStepEntry.agreement)
+                          : t("Noch keine finale Absprache sichtbar.")}
+                      </p>
+                    </div>
                   </section>
-                ) : visibleWorkbookV2Phase === "rule" ? (
-                  <WorkbookV2PhasePreview
-                    title={t("4. Zustimmung")}
-                    summary={t("Die Zustimmung kommt erst ganz zum Schluss.")}
-                    detail={t("So bleibt der Fokus zuerst auf Klarheit und nicht auf Status.")}
-                    className="mt-6"
-                  />
                 ) : null}
               </>
             ) : (
@@ -6374,10 +6317,14 @@ function WorkbookV2PhasePill({
   label,
   state,
   tone = "default",
+  onClick,
+  disabled = false,
 }: {
   label: string;
   state: "active" | "done" | "upcoming";
   tone?: WorkbookVisualTone;
+  onClick?: () => void;
+  disabled?: boolean;
 }) {
   const toneMeta = workbookToneMeta(tone);
   const className =
@@ -6386,53 +6333,30 @@ function WorkbookV2PhasePill({
       : state === "done"
         ? toneMeta.phaseDone
         : "border-slate-200 bg-white/88 text-slate-500";
+  const buttonClassName = `inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition ${
+    disabled
+      ? "cursor-not-allowed opacity-50"
+      : onClick
+        ? "cursor-pointer hover:-translate-y-0.5"
+        : ""
+  } ${className}`;
 
-  return (
+  return onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={state === "active"}
+      className={buttonClassName}
+    >
+      {label}
+    </button>
+  ) : (
     <span
       className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] ${className}`}
     >
       {label}
     </span>
-  );
-}
-
-function WorkbookV2PhasePreview({
-  title,
-  summary,
-  detail,
-  actionLabel,
-  onAction,
-  className = "",
-  tone = "default",
-}: {
-  title: string;
-  summary: string;
-  detail: string;
-  actionLabel?: string;
-  onAction?: () => void;
-  className?: string;
-  tone?: WorkbookVisualTone;
-}) {
-  const toneMeta = workbookToneMeta(tone);
-  return (
-    <section className={`${className} rounded-[24px] border px-5 py-4 ${toneMeta.preview}`}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
-          <p className="mt-2 text-sm font-medium leading-6 text-slate-900">{summary}</p>
-          <p className="mt-1 text-xs leading-6 text-slate-500">{detail}</p>
-        </div>
-        {actionLabel && onAction ? (
-          <button
-            type="button"
-            onClick={onAction}
-            className="w-fit rounded-full border border-slate-200 bg-white/92 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
-          >
-            {actionLabel}
-          </button>
-        ) : null}
-      </div>
-    </section>
   );
 }
 
