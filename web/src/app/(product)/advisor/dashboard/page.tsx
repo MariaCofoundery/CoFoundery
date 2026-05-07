@@ -65,25 +65,54 @@ function reportStatusLabel(team: AdvisorDashboardTeam) {
   return "In Vorbereitung";
 }
 
-function workbookStatusLabel(team: AdvisorDashboardTeam) {
+function teamStandLabel(team: AdvisorDashboardTeam) {
+  if (team.accessStatus === "paused") {
+    return "Advisor-Zugriff pausiert";
+  }
+
+  if (team.accessStatus === "waiting_for_approval") {
+    return "Wartet auf Founder-Freigabe";
+  }
+
   if (!team.workbookAvailable) {
-    return "Noch gesperrt";
+    return "Team noch im Start";
+  }
+
+  if (team.reportReady) {
+    return "Report bereit";
+  }
+
+  if (team.statusLabel === "Founder-Reaktion liegt vor") {
+    return "Founder-Reaktion liegt vor";
+  }
+
+  if (team.statusLabel === "Founder-Reaktion offen") {
+    return "Absprache wartet auf Founder-Reaktion";
+  }
+
+  if (team.statusLabel === "Workbook in Arbeit") {
+    return "Workbook wurde aktualisiert";
   }
 
   if (team.statusLabel === "Workbook noch leer") {
-    return "Noch kein Eintrag";
+    return "Workbook noch im Start";
   }
 
   return team.statusLabel;
 }
 
-function attentionLabel(team: AdvisorDashboardTeam) {
+function teamAttentionLabel(team: AdvisorDashboardTeam) {
   if (team.accessStatus !== "ready") {
-    return "Freigabe im Blick behalten";
+    return team.accessStatus === "paused"
+      ? "Freigabestatus pruefen"
+      : "Wartet auf zweite Founder-Freigabe";
   }
 
   if (!team.reportReady) {
-    return "Report-Stand beobachten";
+    if (team.statusLabel === "Workbook noch leer") {
+      return "Ersten Workbook-Stand abwarten";
+    }
+    return "Workbook oeffnen und Stand pruefen";
   }
 
   if (team.statusLabel === "Founder-Reaktion liegt vor") {
@@ -95,10 +124,50 @@ function attentionLabel(team: AdvisorDashboardTeam) {
   }
 
   if (team.statusLabel === "Workbook in Arbeit") {
-    return "Workbook-Stand pruefen";
+    return "Aktuelle Absprache ansehen";
   }
 
   return "Report oder Workbook oeffnen";
+}
+
+function teamLastActivityLabel(team: AdvisorDashboardTeam) {
+  return team.lastActivityLabel.replace(/^Pre-Founder\s·\s/, "Pre-Founder · Zuletzt aktiv ").replace(
+    /^Bestehendes Team\s·\s/,
+    "Bestehendes Team · Zuletzt aktiv "
+  );
+}
+
+function pendingStandLabel(invite: AdvisorPendingTeamInvite) {
+  if (invite.founderAStarted && invite.founderBStarted) {
+    return "Beide Founder haben gestartet";
+  }
+  if (invite.founderAStarted || invite.founderBStarted) {
+    return "1 von 2 Foundern gestartet";
+  }
+  return "Team noch im Start";
+}
+
+function pendingAttentionLabel(invite: AdvisorPendingTeamInvite) {
+  if (!invite.founderAStarted && !invite.founderBStarted) {
+    return "Wartet auf den ersten Start";
+  }
+
+  const openFounder = !invite.founderAStarted
+    ? invite.founderALabel
+    : !invite.founderBStarted
+      ? invite.founderBLabel
+      : null;
+
+  if (openFounder) {
+    return `${openFounder} noch offen`;
+  }
+
+  return "Wechselt gleich in die begleiteten Teams";
+}
+
+function pendingFounderProgressLabel(invite: AdvisorPendingTeamInvite, founder: "A" | "B") {
+  const isStarted = founder === "A" ? invite.founderAStarted : invite.founderBStarted;
+  return isStarted ? "gestartet" : "offen";
 }
 
 function formatPendingTimestamp(value: string) {
@@ -152,21 +221,21 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
           <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Letzter Stand
+                Stand
               </span>
-              {team.lastActivityLabel}
+              {teamStandLabel(team)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Workbook
+                Zuletzt
               </span>
-              {workbookStatusLabel(team)}
+              {teamLastActivityLabel(team)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Aufmerksamkeit
+                Naechster Blick
               </span>
-              {attentionLabel(team)}
+              {teamAttentionLabel(team)}
             </p>
           </div>
         </div>
@@ -290,21 +359,21 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
           <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Fortschritt
+                Stand
               </span>
-              {invite.progressLabel}
+              {pendingStandLabel(invite)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Letztes Update
+                Zuletzt
               </span>
               {formatPendingTimestamp(invite.lastActivityAt)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Naechster Schritt
+                Naechster Blick
               </span>
-              {invite.nextStepLabel}
+              {pendingAttentionLabel(invite)}
             </p>
           </div>
         </div>
@@ -323,7 +392,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
                     : "border-slate-200 bg-slate-50 text-slate-500"
                 }`}
               >
-                {invite.founderAStarted ? "gestartet" : "offen"}
+                {pendingFounderProgressLabel(invite, "A")}
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
@@ -335,7 +404,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
                     : "border-slate-200 bg-slate-50 text-slate-500"
                 }`}
               >
-                {invite.founderBStarted ? "gestartet" : "offen"}
+                {pendingFounderProgressLabel(invite, "B")}
               </span>
             </div>
           </div>
