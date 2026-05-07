@@ -1719,7 +1719,9 @@ export function FounderAlignmentWorkbookClient({
   const visibleWorkbookV2Phase =
     requestedWorkbookV2Phase && canShowRequestedWorkbookV2Phase
       ? requestedWorkbookV2Phase
-      : currentDecisionRulesPhase;
+      : isAdvisorViewer
+        ? "collect"
+        : currentDecisionRulesPhase;
   const canOpenCollectPhase = true;
   const canOpenWeightPhase = hasDecisionRulesBothPerspectives;
   const canOpenRulePhase = decisionRulesWeightingReady;
@@ -4362,7 +4364,9 @@ export function FounderAlignmentWorkbookClient({
                       />
                     </div>
                     <p className="mt-3 text-xs leading-6 text-slate-500">
-                      {t("Innerhalb dieser Dimension bewegt ihr euch nacheinander durch Perspektiven, Einordnung, Entwurf und finale Absprache.")}
+                      {isAdvisorViewer
+                        ? t("Du kannst die Perspektiven, Einordnungen, Absprache und den aktuellen Status dieses Schritts ansehen.")
+                        : t("Innerhalb dieser Dimension bewegt ihr euch nacheinander durch Perspektiven, Einordnung, Entwurf und finale Absprache.")}
                     </p>
                   </div>
                 </section>
