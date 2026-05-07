@@ -1726,6 +1726,36 @@ export function FounderAlignmentWorkbookClient({
   const canOpenWeightPhase = hasDecisionRulesBothPerspectives;
   const canOpenRulePhase = decisionRulesWeightingReady;
   const canOpenApprovalPhase = decisionRulesRuleReady;
+  const advisorPhaseMeta: Record<
+    WorkbookV2Phase,
+    { label: string; subtitle: string; activeSummary: string; disabled: boolean }
+  > = {
+    collect: {
+      label: currentPremiumV2Config?.collectPhaseLabel ?? "Sammeln",
+      subtitle: "Founder-Beitraege lesen",
+      activeSummary: "Founder-Beitraege und Advisor-Antworten",
+      disabled: !canOpenCollectPhase,
+    },
+    weight: {
+      label: currentPremiumV2Config?.weightingPhaseLabel ?? "Schaerfen",
+      subtitle: "Einordnungen ansehen",
+      activeSummary: "Einordnungen der Founder",
+      disabled: !canOpenWeightPhase,
+    },
+    rule: {
+      label: currentPremiumV2Config?.rulePhaseLabel ?? "Regel",
+      subtitle: "Entwurf pruefen",
+      activeSummary: "aktueller Entwurf",
+      disabled: !canOpenRulePhase,
+    },
+    approval: {
+      label: "Bestaetigen",
+      subtitle: "Absprache & Status",
+      activeSummary: "finale Absprache und Zustimmung",
+      disabled: !canOpenApprovalPhase,
+    },
+  };
+  const advisorCurrentPhaseMeta = advisorPhaseMeta[visibleWorkbookV2Phase];
   const currentDiscussionDraftSourceRootEntryId =
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
@@ -4309,63 +4339,111 @@ export function FounderAlignmentWorkbookClient({
                         </div>
                       ) : null}
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <WorkbookV2PhasePill
-                        label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
-                        tone={currentVisualTone}
-                        onClick={() => openWorkbookV2Phase("collect")}
-                        disabled={!canOpenCollectPhase}
-                        state={
-                          visibleWorkbookV2Phase === "collect"
-                            ? "active"
-                            : hasDecisionRulesBothPerspectives
-                              ? "done"
-                              : "upcoming"
-                        }
-                      />
-                      <WorkbookV2PhasePill
-                        label={t(currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen")}
-                        tone={currentVisualTone}
-                        onClick={() => openWorkbookV2Phase("weight")}
-                        disabled={!canOpenWeightPhase}
-                        state={
-                          visibleWorkbookV2Phase === "weight"
-                            ? "active"
-                            : decisionRulesWeightingReady
-                              ? "done"
-                              : "upcoming"
-                        }
-                      />
-                      <WorkbookV2PhasePill
-                        label={t(currentPremiumV2Config.rulePhaseLabel ?? "Regel")}
-                        tone={currentVisualTone}
-                        onClick={() => openWorkbookV2Phase("rule")}
-                        disabled={!canOpenRulePhase}
-                        state={
-                          visibleWorkbookV2Phase === "rule"
-                            ? "active"
-                            : decisionRulesRuleReady
-                              ? "done"
-                              : "upcoming"
-                        }
-                      />
-                      <WorkbookV2PhasePill
-                        label={t("Bestaetigen")}
-                        tone={currentVisualTone}
-                        onClick={() => openWorkbookV2Phase("approval")}
-                        disabled={!canOpenApprovalPhase}
-                        state={
-                          visibleWorkbookV2Phase === "approval"
-                            ? "active"
-                            : currentStepIsApprovedByBoth
-                              ? "done"
-                              : "upcoming"
-                        }
-                      />
-                    </div>
+                    {isAdvisorViewer ? (
+                      <div className="grid gap-2 pt-1 sm:grid-cols-2 xl:grid-cols-4">
+                        {(Object.entries(advisorPhaseMeta) as Array<[WorkbookV2Phase, typeof advisorPhaseMeta[WorkbookV2Phase]]>).map(
+                          ([phase, meta]) => {
+                            const isActive = visibleWorkbookV2Phase === phase;
+                            const isDone =
+                              phase === "collect"
+                                ? hasDecisionRulesBothPerspectives
+                                : phase === "weight"
+                                  ? decisionRulesWeightingReady
+                                  : phase === "rule"
+                                    ? decisionRulesRuleReady
+                                    : currentStepIsApprovedByBoth;
+
+                            return (
+                              <button
+                                key={phase}
+                                type="button"
+                                onClick={() => openWorkbookV2Phase(phase)}
+                                disabled={meta.disabled}
+                                aria-pressed={isActive}
+                                className={`rounded-2xl border px-4 py-3 text-left transition ${
+                                  meta.disabled
+                                    ? "cursor-not-allowed border-slate-200 bg-white/65 text-slate-400 opacity-60"
+                                    : isActive
+                                      ? "border-slate-900 bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.14)]"
+                                      : isDone
+                                        ? "border-sky-200/80 bg-sky-50/75 text-slate-900 hover:border-sky-300 hover:bg-sky-50"
+                                        : "border-slate-200 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
+                                }`}
+                              >
+                                <p className="text-[11px] font-semibold uppercase tracking-[0.16em]">
+                                  {t(meta.label)}
+                                </p>
+                                <p
+                                  className={`mt-1 text-xs leading-5 ${
+                                    isActive ? "text-white/78" : "text-slate-500"
+                                  }`}
+                                >
+                                  {t(meta.subtitle)}
+                                </p>
+                              </button>
+                            );
+                          }
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <WorkbookV2PhasePill
+                          label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
+                          tone={currentVisualTone}
+                          onClick={() => openWorkbookV2Phase("collect")}
+                          disabled={!canOpenCollectPhase}
+                          state={
+                            visibleWorkbookV2Phase === "collect"
+                              ? "active"
+                              : hasDecisionRulesBothPerspectives
+                                ? "done"
+                                : "upcoming"
+                          }
+                        />
+                        <WorkbookV2PhasePill
+                          label={t(currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen")}
+                          tone={currentVisualTone}
+                          onClick={() => openWorkbookV2Phase("weight")}
+                          disabled={!canOpenWeightPhase}
+                          state={
+                            visibleWorkbookV2Phase === "weight"
+                              ? "active"
+                              : decisionRulesWeightingReady
+                                ? "done"
+                                : "upcoming"
+                          }
+                        />
+                        <WorkbookV2PhasePill
+                          label={t(currentPremiumV2Config.rulePhaseLabel ?? "Regel")}
+                          tone={currentVisualTone}
+                          onClick={() => openWorkbookV2Phase("rule")}
+                          disabled={!canOpenRulePhase}
+                          state={
+                            visibleWorkbookV2Phase === "rule"
+                              ? "active"
+                              : decisionRulesRuleReady
+                                ? "done"
+                                : "upcoming"
+                          }
+                        />
+                        <WorkbookV2PhasePill
+                          label={t("Bestaetigen")}
+                          tone={currentVisualTone}
+                          onClick={() => openWorkbookV2Phase("approval")}
+                          disabled={!canOpenApprovalPhase}
+                          state={
+                            visibleWorkbookV2Phase === "approval"
+                              ? "active"
+                              : currentStepIsApprovedByBoth
+                                ? "done"
+                                : "upcoming"
+                          }
+                        />
+                      </div>
+                    )}
                     <p className="mt-3 text-xs leading-6 text-slate-500">
                       {isAdvisorViewer
-                        ? t("Du kannst die Perspektiven, Einordnungen, Absprache und den aktuellen Status dieses Schritts ansehen.")
+                        ? t("Waehle eine Phase, um Beitraege, Einordnungen, Absprache oder Status dieses Schritts anzusehen.")
                         : t("Innerhalb dieser Dimension bewegt ihr euch nacheinander durch Perspektiven, Einordnung, Entwurf und finale Absprache.")}
                     </p>
                   </div>
@@ -4380,6 +4458,17 @@ export function FounderAlignmentWorkbookClient({
                     onUseItem={useWorkbookImpulseAsDraft}
                     className="mt-4"
                   />
+                ) : null}
+
+                {isAdvisorViewer ? (
+                  <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/88 px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                      {t("Aktuell")}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-slate-900">
+                      {t(`${advisorCurrentPhaseMeta.label} · ${advisorCurrentPhaseMeta.activeSummary}`)}
+                    </p>
+                  </div>
                 ) : null}
 
                 {visibleWorkbookV2Phase === "collect" ? (
