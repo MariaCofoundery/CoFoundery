@@ -1756,6 +1756,14 @@ export function FounderAlignmentWorkbookClient({
     },
   };
   const advisorCurrentPhaseMeta = advisorPhaseMeta[visibleWorkbookV2Phase];
+  const founderCurrentPhaseSummary =
+    visibleWorkbookV2Phase === "collect"
+      ? "Perspektiven sammeln"
+      : visibleWorkbookV2Phase === "weight"
+        ? "Unterschiede und Anschlussstellen schaerfen"
+        : visibleWorkbookV2Phase === "rule"
+          ? "Euren Entwurf konkretisieren"
+          : "Eure Absprache verbindlich festhalten";
   const currentDiscussionDraftSourceRootEntryId =
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
@@ -3396,20 +3404,20 @@ export function FounderAlignmentWorkbookClient({
                 }`}
               >
                 {!currentStepIsAdvisorClosing && !currentStepIsPremiumPilot && !isAdvisorViewer ? (
-                  <section className="rounded-[28px] border border-[color:var(--brand-primary)]/18 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.035)] sm:p-6">
+                  <section className="rounded-[24px] border border-slate-200/80 bg-slate-50/58 p-4 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="max-w-2xl">
-                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
                           {t("Arbeitsweise")}
                         </p>
-                        <h2 className="mt-2 text-lg font-semibold text-slate-950">
-                          {t("Wie wollt ihr starten?")}
+                        <h2 className="mt-2 text-base font-semibold text-slate-900">
+                          {t("Wie moechtet ihr in diesen Schritt gehen?")}
                         </h2>
-                        <p className="mt-2 text-sm leading-7 text-slate-600">
-                          {t("Das steuert nur eure Startform. Bearbeitungsrechte, Autorenschaft und Zustimmung bleiben sauber getrennt.")}
+                        <p className="mt-2 text-xs leading-6 text-slate-500">
+                          {t("Das betrifft nur eure Startform. Rechte, Autorenschaft und Zustimmung bleiben getrennt.")}
                         </p>
                       </div>
-                      <span className="rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/8 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-600">
+                      <span className="rounded-full border border-slate-200 bg-white/88 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
                         {t(`Schritt ${currentIndex + 1}`)}
                       </span>
                     </div>
@@ -3426,10 +3434,10 @@ export function FounderAlignmentWorkbookClient({
                             disabled={disabled}
                             className={`rounded-2xl border px-4 py-4 text-left transition ${
                               isActive
-                                ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.08)]"
+                                ? "border-[color:var(--brand-primary)]/22 bg-[color:var(--brand-primary)]/7"
                                 : disabled
                                   ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-                                  : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                                  : "border-slate-200 bg-white/88 hover:border-slate-300 hover:bg-white"
                             }`}
                           >
                             <p className="text-sm font-semibold text-slate-900">{t(option.label)}</p>
@@ -4301,46 +4309,28 @@ export function FounderAlignmentWorkbookClient({
               </StepSection>
             ) : currentStepIsPremiumPilot && decisionRulesWorkspace && currentPremiumV2Config ? (
               <>
-                <section className={`mt-8 rounded-[28px] px-5 py-5 sm:px-6 ${currentToneMeta.headerSurface}`}>
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                    <div className="max-w-3xl">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                        {t("Leitfrage")}
-                      </p>
-                      <p className="mt-2 text-lg font-semibold leading-8 text-slate-950 sm:text-xl">
-                        {t(
-                          currentPremiumV2Config.question ??
-                            currentStep.prompts[0] ??
-                            "Wie regelt ihr Entscheidungen so, dass sie auch unter Druck klar bleiben?"
-                        )}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-slate-600">
-                        {t(decisionRulesMatchingHint)}
-                      </p>
-                      {currentStepImpulseContent ? (
-                        <div className="mt-4">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setHelperOpenByStep((current) => ({
-                                ...current,
-                                [currentStep.id]: !current[currentStep.id],
-                              }))
-                            }
-                            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/88 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
-                            aria-expanded={helperOpenByStep[currentStep.id]}
-                            aria-controls={`workbook-impulses-${currentStep.id}`}
-                          >
-                            <span>{t("Fragen & Impulse")}</span>
-                            <span className="text-slate-400">
-                              {helperOpenByStep[currentStep.id] ? t("ausblenden") : t("oeffnen")}
-                            </span>
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
+                <section className={`mt-8 rounded-[30px] px-5 py-7 sm:px-7 sm:py-8 ${currentToneMeta.headerSurface}`}>
+                  <div className="max-w-4xl">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                      {t("Leitfrage")}
+                    </p>
+                    <p className="mt-3 text-[1.55rem] font-semibold leading-[1.28] text-slate-950 sm:text-[2rem] sm:leading-[1.22]">
+                      {t(
+                        currentPremiumV2Config.question ??
+                          currentStep.prompts[0] ??
+                          "Wie regelt ihr Entscheidungen so, dass sie auch unter Druck klar bleiben?"
+                      )}
+                    </p>
+                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-700">
+                      {isAdvisorViewer
+                        ? t("Du kannst Beitraege, Einordnungen, Absprache und Status dieses Schritts ansehen.")
+                        : t("Sammelt erst Perspektiven, schaerft dann Unterschiede und haltet unten eure gemeinsame Absprache fest.")}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 space-y-3">
                     {isAdvisorViewer ? (
-                      <div className="grid gap-2 pt-1 sm:grid-cols-2 xl:grid-cols-4">
+                      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                         {(Object.entries(advisorPhaseMeta) as Array<[WorkbookV2Phase, typeof advisorPhaseMeta[WorkbookV2Phase]]>).map(
                           ([phase, meta]) => {
                             const isActive = visibleWorkbookV2Phase === phase;
@@ -4386,7 +4376,7 @@ export function FounderAlignmentWorkbookClient({
                         )}
                       </div>
                     ) : (
-                      <div className="flex flex-wrap gap-2 pt-1">
+                      <div className="flex flex-wrap gap-2">
                         <WorkbookV2PhasePill
                           label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
                           tone={currentVisualTone}
@@ -4441,11 +4431,51 @@ export function FounderAlignmentWorkbookClient({
                         />
                       </div>
                     )}
-                    <p className="mt-3 text-xs leading-6 text-slate-500">
-                      {isAdvisorViewer
-                        ? t("Waehle eine Phase, um Beitraege, Einordnungen, Absprache oder Status dieses Schritts anzusehen.")
-                        : t("Innerhalb dieser Dimension bewegt ihr euch nacheinander durch Perspektiven, Einordnung, Entwurf und finale Absprache.")}
-                    </p>
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 max-w-3xl">
+                        <p className="text-xs leading-6 text-slate-600">
+                          {isAdvisorViewer
+                            ? t(`Aktuell: ${advisorCurrentPhaseMeta.label} · ${advisorCurrentPhaseMeta.activeSummary}`)
+                            : t(
+                                `Aktuell: ${
+                                  visibleWorkbookV2Phase === "collect"
+                                    ? currentPremiumV2Config.collectPhaseLabel ?? "Sammeln"
+                                    : visibleWorkbookV2Phase === "weight"
+                                      ? currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen"
+                                      : visibleWorkbookV2Phase === "rule"
+                                        ? currentPremiumV2Config.rulePhaseLabel ?? "Regel"
+                                        : "Bestaetigen"
+                                } · ${founderCurrentPhaseSummary}`
+                              )}
+                        </p>
+                        {decisionRulesMatchingHint ? (
+                          <p className="mt-1 text-xs leading-5 text-slate-500">
+                            {t(decisionRulesMatchingHint)}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {currentStepImpulseContent ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setHelperOpenByStep((current) => ({
+                              ...current,
+                              [currentStep.id]: !current[currentStep.id],
+                            }))
+                          }
+                          className="inline-flex items-center gap-2 self-start rounded-full border border-slate-200/70 bg-white/72 px-2.5 py-1 text-[11px] font-medium text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-700"
+                          aria-expanded={helperOpenByStep[currentStep.id]}
+                          aria-controls={`workbook-impulses-${currentStep.id}`}
+                        >
+                          <span>{t("Fragen & Impulse")}</span>
+                          <span className="text-slate-400">
+                            {helperOpenByStep[currentStep.id] ? t("ausblenden") : t("oeffnen")}
+                          </span>
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </section>
 
@@ -4458,17 +4488,6 @@ export function FounderAlignmentWorkbookClient({
                     onUseItem={useWorkbookImpulseAsDraft}
                     className="mt-4"
                   />
-                ) : null}
-
-                {isAdvisorViewer ? (
-                  <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/88 px-4 py-3">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                      {t("Aktuell")}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-slate-900">
-                      {t(`${advisorCurrentPhaseMeta.label} · ${advisorCurrentPhaseMeta.activeSummary}`)}
-                    </p>
-                  </div>
                 ) : null}
 
                 {visibleWorkbookV2Phase === "collect" ? (
