@@ -1764,6 +1764,54 @@ export function FounderAlignmentWorkbookClient({
         : visibleWorkbookV2Phase === "rule"
           ? "Euren Entwurf konkretisieren"
           : "Eure Absprache verbindlich festhalten";
+  const currentStepStatusSummaryItems = [
+    {
+      label: "Perspektiven",
+      value: hasDecisionRulesBothPerspectives ? "beide sichtbar" : "noch offen",
+      tone: hasDecisionRulesBothPerspectives ? "success" : "default",
+    },
+    {
+      label: "Einordnung",
+      value: decisionRulesWeightingReady ? "vollstaendig" : "noch offen",
+      tone: decisionRulesWeightingReady ? "success" : "default",
+    },
+    {
+      label: "Arbeitsfassung",
+      value: currentStepEntry.agreement.trim().length > 0 ? "liegt vor" : "fehlt noch",
+      tone: currentStepEntry.agreement.trim().length > 0 ? "success" : "default",
+    },
+    {
+      label: "Finale Absprache",
+      value: currentStepIsApprovedByBoth
+        ? "bestaetigt"
+        : decisionRulesRuleReady && currentStepEntry.agreement.trim().length > 0
+          ? currentStepEntry.founderAApproved || currentStepEntry.founderBApproved
+            ? "wartet auf zweite Bestaetigung"
+            : "wartet auf Zustimmung"
+          : "noch offen",
+      tone: currentStepIsApprovedByBoth
+        ? "success"
+        : decisionRulesRuleReady && currentStepEntry.agreement.trim().length > 0
+          ? "info"
+          : "default",
+    },
+  ] as const;
+  const currentStepGuidanceItems = [
+    currentStepAdvisorReplies.length > 0
+      ? {
+          label: "Begleitung",
+          value: `${currentStepAdvisorReplies.length} Antwort${
+            currentStepAdvisorReplies.length === 1 ? "" : "en"
+          } vorhanden`,
+        }
+      : null,
+    advisorImpulses.length > 0
+      ? {
+          label: "Impuls",
+          value: "Advisor-Impuls vorhanden",
+        }
+      : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
   const currentDiscussionDraftSourceRootEntryId =
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? resolveDiscussionRootEntryId(decisionRulesWorkspace, currentDiscussionDraftSourceEntryId)
@@ -4476,6 +4524,57 @@ export function FounderAlignmentWorkbookClient({
                         </button>
                       ) : null}
                     </div>
+                  </div>
+                </section>
+
+                <section className="mt-4 rounded-[24px] border border-slate-200/80 bg-white/78 px-4 py-4 sm:px-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("Aktueller Stand")}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        {isAdvisorViewer
+                          ? t("So steht das Team in diesem Abschnitt gerade.")
+                          : t("Kurze Orientierung fuer diesen Abschnitt.")}
+                      </p>
+                    </div>
+                    {currentStepGuidanceItems.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {currentStepGuidanceItems.map((item) => (
+                          <span
+                            key={`${item.label}-${item.value}`}
+                            className="inline-flex rounded-full border border-slate-200 bg-slate-50/85 px-3 py-1 text-[11px] font-medium text-slate-600"
+                          >
+                            {t(`${item.label}: ${item.value}`)}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    {currentStepStatusSummaryItems.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-slate-200/80 bg-slate-50/68 px-3.5 py-3"
+                      >
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">
+                          {t(item.label)}
+                        </p>
+                        <span
+                          className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                            item.tone === "success"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : item.tone === "info"
+                                ? "bg-sky-100 text-sky-700"
+                                : "bg-slate-200 text-slate-600"
+                          }`}
+                        >
+                          {t(item.value)}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </section>
 
