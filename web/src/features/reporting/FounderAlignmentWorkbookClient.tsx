@@ -228,11 +228,11 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     weightingIntro:
       "Ordnet jeden Punkt ein. So seht ihr, was eigenstaendig laufen kann, wo fruehe Mitsicht reicht und wo ihr gemeinsam klaeren muesst.",
     signalOptions: [
-      { value: "important", label: "Brauche frueh Mitsicht", shortLabel: "Mitsicht" },
-      { value: "agree", label: "Kann so laufen", shortLabel: "Passt" },
-      { value: "critical", label: "Muss geklaert werden", shortLabel: "Klaeren" },
+      { value: "important", label: "Braucht frueh Mitsicht", shortLabel: "Mitsicht" },
+      { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
+      { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
     ],
-    sharedInsightTitle: "Kann so laufen",
+    sharedInsightTitle: "Anschlussfaehig",
     sharedInsightText: "Punkte, bei denen Fuehrung und Mitsicht fuer beide passen.",
     pendingInsightTitle: "Noch nicht von beiden eingeordnet",
     pendingInsightText: "Punkte, bei denen noch keine gemeinsame Lesart sichtbar ist.",
@@ -305,10 +305,10 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jeden Punkt ein. So seht ihr, was realistisch tragbar ist, was frueh transparent werden muss und wo ihr Erwartungen neu sortieren solltet.",
     signalOptions: [
       { value: "important", label: "Muss frueh sichtbar sein", shortLabel: "Frueh sichtbar" },
-      { value: "agree", label: "Ist realistisch tragbar", shortLabel: "Tragbar" },
-      { value: "critical", label: "Muss neu sortiert werden", shortLabel: "Neu sortieren" },
+      { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
+      { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
     ],
-    sharedInsightTitle: "Realistisch tragbar",
+    sharedInsightTitle: "Anschlussfaehig",
     sharedInsightText: "Punkte, die beide als realistische Arbeitsbasis tragen koennen.",
     pendingInsightTitle: "Noch nicht von beiden eingeordnet",
     pendingInsightText: "Punkte, bei denen noch keine gemeinsame Erwartung sichtbar ist.",
@@ -382,10 +382,10 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jeden Punkt ein. So seht ihr, was fuer beide tragbar ist, was frueh sichtbar werden muss und wo eine Person nicht allein weitergehen sollte.",
     signalOptions: [
       { value: "important", label: "Muss frueh sichtbar sein", shortLabel: "Frueh sichtbar" },
-      { value: "agree", label: "Ist fuer mich tragbar", shortLabel: "Tragbar" },
-      { value: "critical", label: "Nicht allein weiter", shortLabel: "Nicht allein" },
+      { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
+      { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
     ],
-    sharedInsightTitle: "Tragbar fuer beide",
+    sharedInsightTitle: "Anschlussfaehig",
     sharedInsightText: "Punkte, die beide in dieser Form tragen koennen.",
     pendingInsightTitle: "Noch nicht von beiden eingeordnet",
     pendingInsightText: "Punkte, bei denen noch keine gemeinsame Lesart sichtbar ist.",
@@ -428,16 +428,16 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     missingPerspectiveText: (missingLabel) =>
       `Noch fehlt mindestens ein eigener Grenzfall von ${missingLabel}. Erst dann wird sichtbar, welche Kompromisse, roten Linien und Freigaben fuer euch beide gelten.`,
     weightingPhaseLabel: "Einordnen",
-    weightingTitle: "2. Persoenliche Einordnung",
+    weightingTitle: "2. Einordnung im Denkraum",
     weightingActionLabel: "Einordnung bearbeiten",
     weightingIntro:
       "Ordnet jeden Fall ein. Hier geht es nicht um Bewertung, sondern um Klarheit: tragbar, Grenzfall oder nicht euer Weg.",
     signalOptions: [
-      { value: "agree", label: "Ist tragbar", shortLabel: "Tragbar" },
+      { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
       { value: "important", label: "Ist ein Grenzfall", shortLabel: "Grenzfall" },
-      { value: "critical", label: "Nicht unser Weg", shortLabel: "Nicht unser Weg" },
+      { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
     ],
-    sharedInsightTitle: "Tragbar",
+    sharedInsightTitle: "Anschlussfaehig",
     sharedInsightText: "Faelle, die beide in dieser Form vertreten koennen.",
     pendingInsightTitle: "Grenzfaelle",
     pendingInsightText: "Faelle, die bewusst freigegeben und nicht nebenbei entschieden werden sollten.",
@@ -492,8 +492,8 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jeden Punkt ein. Hier geht es nicht um eine lange Liste, sondern um klare Auswahl: Vorrang, warten lassen oder nur bewusst freigeben.",
     signalOptions: [
       { value: "important", label: "Hat Vorrang", shortLabel: "Vorrang" },
-      { value: "agree", label: "Kann warten", shortLabel: "Warten" },
-      { value: "critical", label: "Nur bewusst freigeben", shortLabel: "Nur bewusst" },
+      { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
+      { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
     ],
     sharedInsightTitle: "Gemeinsamer Fokus",
     sharedInsightText: "Punkte, die beide klar in den Fokus nehmen.",
@@ -756,9 +756,9 @@ const DICTATION_INACTIVITY_MS = 9000;
 const DICTATION_RESTART_MS = 250;
 const WORKBOOK_AUTOSAVE_DELAY_MS = 1800;
 const DISCUSSION_SIGNAL_OPTIONS: DiscussionSignalOption[] = [
-  { value: "important", label: "Wichtig fuer mich", shortLabel: "Wichtig" },
-  { value: "agree", label: "Trage ich mit", shortLabel: "Trage ich mit" },
-  { value: "critical", label: "Sehe ich kritisch", shortLabel: "Kritisch" },
+  { value: "important", label: "Ist fuer mich hilfreich", shortLabel: "Hilfreich" },
+  { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
+  { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
 ];
 
 function createDiscussionEntryId() {
@@ -4513,13 +4513,13 @@ export function FounderAlignmentWorkbookClient({
                   <section className={`mt-6 rounded-[30px] border p-6 sm:p-7 ${currentToneMeta.weightSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t(currentPremiumV2Config.weightingTitle ?? "2. Gewichtung")}
+                        {t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-700">
                         {t(currentPremiumV2Config.weightingIntro)}
                       </p>
                       <p className="mt-2 text-xs leading-6 text-slate-500">
-                        {t(workbookV2WeightingHint)}
+                        {t("Hier ordnet ihr eure Punkte nur ein. Die eigentliche Zustimmung kommt erst in der finalen Absprache.")}
                       </p>
                     </div>
 
@@ -4574,7 +4574,7 @@ export function FounderAlignmentWorkbookClient({
                   </section>
                 ) : showWorkbookV2WeightPreview ? (
                   <WorkbookV2PhasePreview
-                    title={t(currentPremiumV2Config.weightingTitle ?? "2. Gewichtung")}
+                    title={t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
                     summary={
                       decisionRulesWeightingReady
                         ? t(
@@ -4586,7 +4586,7 @@ export function FounderAlignmentWorkbookClient({
                                   ? `${workbookV2GuardrailTragbarCount} tragbare Faelle, ${workbookV2GuardrailCaseCount} Grenzfaelle, ${decisionRulesCriticalCount} rote Linien.`
                               : `${decisionRulesSharedCount} gemeinsame Punkte, ${decisionRulesCriticalCount} offene Unterschiede.`
                           )
-                        : t("Die Gewichtung ist erst fertig, wenn beide alle vorhandenen Punkte eingeordnet haben.")
+                        : t("Die Einordnung ist erst fertig, wenn beide alle vorhandenen Punkte im Denkraum markiert haben.")
                     }
                     detail={
                       decisionRulesWeightingReady
@@ -4607,7 +4607,7 @@ export function FounderAlignmentWorkbookClient({
                     }
                     actionLabel={
                       hasDecisionRulesBothPerspectives
-                        ? t(currentPremiumV2Config.weightingActionLabel ?? "Gewichtung bearbeiten")
+                        ? t(currentPremiumV2Config.weightingActionLabel ?? "Einordnung bearbeiten")
                         : undefined
                     }
                     onAction={
@@ -4634,10 +4634,13 @@ export function FounderAlignmentWorkbookClient({
                         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                           <div className="max-w-3xl">
                             <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                              {t("Vorschlag aus euren Punkten")}
+                              {t("Entwurf fuer eure Absprache")}
                             </p>
                             <p className="mt-2 text-sm leading-7 text-slate-700">
                               {t(decisionRulesSuggestion.agreement)}
+                            </p>
+                            <p className="mt-2 text-xs leading-6 text-slate-500">
+                              {t("Nutzt diesen Entwurf als Startpunkt und schaerft eure eigentliche Entscheidung direkt darunter.")}
                             </p>
                           </div>
                           <ReportActionButton
@@ -4646,7 +4649,7 @@ export function FounderAlignmentWorkbookClient({
                             disabled={decisionRulesWorkspace.entries.length === 0}
                             className="shrink-0"
                           >
-                            {t("Als Startpunkt nutzen")}
+                            {t("Als Startpunkt uebernehmen")}
                           </ReportActionButton>
                         </div>
                       </div>
@@ -4945,16 +4948,16 @@ export function FounderAlignmentWorkbookClient({
                 <StepSection
                   title={
                     isAdvisorViewer
-                      ? currentStepHasStructuredOutputs
-                        ? "4. Aktueller Vorschlag"
-                        : "3. Aktueller Vorschlag"
+                        ? currentStepHasStructuredOutputs
+                          ? "4. Aktueller Entwurf"
+                          : "3. Aktueller Entwurf"
                       : isCollaborativeMode
                         ? currentStepHasStructuredOutputs
-                          ? "4. Gemeinsamer Vorschlag"
-                          : "3. Gemeinsamer Vorschlag"
+                          ? "4. Entwurf fuer eure Absprache"
+                          : "3. Entwurf fuer eure Absprache"
                         : currentStepHasStructuredOutputs
-                          ? "4. Vorlaeufiger Vorschlag"
-                          : "3. Vorlaeufiger Vorschlag"
+                          ? "4. Erster Entwurf"
+                          : "3. Erster Entwurf"
                   }
                   className="mt-8 border-[color:var(--brand-accent)]/18 bg-[linear-gradient(135deg,rgba(124,58,237,0.06),rgba(255,255,255,0.98))]"
                 >
@@ -4962,10 +4965,10 @@ export function FounderAlignmentWorkbookClient({
                     <div className="max-w-3xl">
                       <p className="text-sm leading-7 text-slate-700">
                         {isAdvisorViewer
-                          ? t("Hier siehst du den aktuellen Vorschlag, der aus den Founder-Beitraegen fuer diesen Schritt entstanden ist.")
+                          ? t("Hier siehst du den aktuellen Entwurf, der aus den Founder-Beitraegen fuer diesen Schritt entstanden ist.")
                           : isCollaborativeMode
-                            ? t("Aus beiden Antworten entsteht hier ein erster gemeinsamer Vorschlag, den ihr direkt weiter bearbeiten koennt.")
-                            : t("Auch mit nur einer Perspektive koennt ihr hier schon einen vorlaeufigen Vorschlag vorbereiten. Er bleibt spaeter gemeinsam anpassbar.")}
+                            ? t("Aus den Founder-Perspektiven entsteht hier ein Hilfsentwurf. Ihr koennt ihn unten direkt zur finalen Absprache weiterentwickeln.")
+                            : t("Auch mit nur einer Perspektive kann hier schon ein erster Entwurf entstehen. Final wird die Absprache erst im naechsten Block.")}
                       </p>
                       {currentAgreementDraft?.comparisonHint ? (
                         <p className="mt-3 text-sm leading-7 text-slate-700">
@@ -4983,7 +4986,7 @@ export function FounderAlignmentWorkbookClient({
                         className="shrink-0"
                         disabled={!currentAgreementDraft}
                       >
-                        {t(isCollaborativeMode ? "Vorschlag erstellen" : "Vorlaeufigen Vorschlag erstellen")}
+                        {t(isCollaborativeMode ? "Entwurf erstellen" : "Ersten Entwurf erstellen")}
                       </ReportActionButton>
                     ) : null}
                   </div>
@@ -4992,17 +4995,17 @@ export function FounderAlignmentWorkbookClient({
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                       {currentAgreementDraft?.suggestionTitle
                         ? t(currentAgreementDraft.suggestionTitle)
-                        : t("Vorschau")}
+                        : t("Entwurfs-Vorschau")}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-slate-700">
                       {currentAgreementDraft
                         ? t(currentAgreementDraft.draft)
                         : t(
                             isAdvisorViewer
-                              ? "Sobald hier ein Vorschlag vorliegt, wird er in diesem Bereich sichtbar."
+                              ? "Sobald hier ein Entwurf vorliegt, wird er in diesem Bereich sichtbar."
                               : isCollaborativeMode
-                                ? "Sobald beide Antworten da sind, koennt ihr hier einen gemeinsamen Vorschlag erstellen."
-                                : "Sobald deine Sicht vorliegt, kannst du hier einen vorlaeufigen Vorschlag erstellen."
+                                ? "Sobald beide Antworten da sind, koennt ihr hier einen ersten Entwurf fuer eure Absprache erstellen."
+                                : "Sobald deine Sicht vorliegt, kannst du hier einen ersten Entwurf vorbereiten."
                           )}
                     </p>
                   </div>
@@ -5022,10 +5025,10 @@ export function FounderAlignmentWorkbookClient({
                 >
                   <p className="text-sm leading-7 text-slate-700">
                     {isAdvisorViewer
-                      ? t("Hier siehst du die aktuelle Absprache der Founder fuer diesen Schritt.")
+                        ? t("Hier siehst du die aktuelle Absprache der Founder fuer diesen Schritt.")
                       : isCollaborativeMode
-                        ? t("Hier haltet ihr eure gemeinsame Absprache fest, auf die ihr spaeter direkt zurueckgreifen koennt.")
-                        : t("Hier entsteht eure vorlaeufige oder gemeinsame Absprache. Final ist sie erst, wenn beide Founder zustimmen.")}
+                        ? t("Hier haltet ihr fest, worauf ihr euch fuer diesen Schritt wirklich einigen wollt.")
+                        : t("Hier wird aus dem Entwurf eure eigentliche Absprache. Bestaetigt wird nur dieser finale Stand.")}
                   </p>
                   <div className="mt-6">
                     <WorkbookField
@@ -5038,7 +5041,7 @@ export function FounderAlignmentWorkbookClient({
                       readOnly={!canEditField("agreement")}
                       helperText={
                         canEditField("agreement")
-                          ? t("Das ist das gemeinsame Ergebnis dieses Schritts.")
+                          ? t("Das ist die eigentliche Entscheidung fuer diesen Schritt.")
                           : getFieldReadOnlyHint("agreement")
                       }
                     />
@@ -5099,15 +5102,15 @@ export function FounderAlignmentWorkbookClient({
                             : currentStepHasStructuredOutputs && !currentStepStructuredReady
                               ? t("Die zugehoerige Arbeitsregel ist noch nicht vollstaendig ausgefuellt.")
                             : currentStepIsApprovedByBoth
-                              ? t("Die Founder haben diesen Schritt bereits gemeinsam bestaetigt.")
-                              : t("Die Founder haben diesen Schritt inhaltlich vorbereitet, aber noch nicht gemeinsam bestaetigt.")
+                              ? t("Die Founder haben diese Absprache bereits gemeinsam bestaetigt.")
+                              : t("Es liegt ein Entwurf vor, aber die finale Bestaetigung der Founder fehlt noch.")
                           : !hasBothPerspectives
                             ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
                             : currentStepHasStructuredOutputs && !currentStepStructuredReady
                               ? t("Vor der Finalisierung muessen die Pflichtfelder fuer diese Arbeitsregel ausgefuellt sein.")
                             : currentStepIsApprovedByBoth
-                              ? t("Beide Founder haben zugestimmt. Dieser Schritt ist finalisiert.")
-                              : t("Sobald beide Founder bestaetigen, wird dieser Schritt finalisiert.")}
+                              ? t("Beide Founder haben diese finale Absprache bestaetigt. Der Schritt ist damit festgehalten.")
+                              : t("Die Zustimmung gehoert erst hierher: Sobald beide Founder diese finale Absprache bestaetigen, ist der Schritt abgeschlossen.")}
                       </p>
                     </div>
                   </div>
@@ -5167,10 +5170,10 @@ export function FounderAlignmentWorkbookClient({
                       : currentStepStatus === "finalized"
                         ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
                         : currentStepStatus === "awaiting_approval"
-                          ? t("Die Absprache steht. Es fehlt nur noch die Zustimmung beider Founder.")
+                          ? t("Die finale Absprache steht. Es fehlt nur noch die Bestaetigung beider Founder.")
                           : currentStepStatus === "draft_ready"
-                            ? t("Es gibt bereits einen Entwurf. Macht daraus jetzt eine klare gemeinsame Absprache.")
-                            : t("Sammelt zuerst eure Perspektiven und formuliert dann eine erste Absprache.")}
+                            ? t("Es gibt bereits einen Entwurf. Schaerft ihn jetzt zur finalen Absprache.")
+                            : t("Sammelt zuerst eure Perspektiven, verdichtet sie dann gemeinsam und haltet erst danach die finale Absprache fest.")}
                   </p>
                 </div>
                 <span
@@ -5201,6 +5204,7 @@ export function FounderAlignmentWorkbookClient({
 
                 <div className="flex flex-wrap gap-3">
                   <ReportActionButton
+                    variant={currentStepStatus === "finalized" ? "primary" : "utility"}
                     onClick={() =>
                       currentIndex === visibleSteps.length - 1
                         ? openSummaryView()
@@ -5209,15 +5213,19 @@ export function FounderAlignmentWorkbookClient({
                   >
                     {currentIndex === visibleSteps.length - 1
                       ? t("Zur Zusammenfassung")
-                      : t("Naechster Schritt")}
+                      : currentStepStatus === "finalized"
+                        ? t("Naechster Schritt")
+                        : t("Trotzdem weiter")}
                   </ReportActionButton>
                 </div>
               </div>
-            <p className="mt-4 text-xs leading-6 text-slate-500">
-              {currentIndex === visibleSteps.length - 1
-                ? t("Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.")
-                : t("Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt.")}
-            </p>
+              <p className="mt-4 text-xs leading-6 text-slate-500">
+                {currentStepStatus === "finalized"
+                  ? currentIndex === visibleSteps.length - 1
+                    ? t("Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.")
+                    : t("Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt.")
+                  : t("Du kannst weitergehen, aber die eigentliche Entscheidung dieses Schritts liegt in der finalen Absprache oben.")}
+              </p>
             </div>
           </section>
         </div>
