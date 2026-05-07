@@ -26,7 +26,7 @@ export default function ImpressumPage() {
 
         <div>
           <p className="font-semibold text-slate-900">Kontakt</p>
-          <p>E-Mail: Business.mariaschulz@gmail.com</p>
+          <p>E-Mail: hello@cofoundery.de</p>
         </div>
 
         <div>

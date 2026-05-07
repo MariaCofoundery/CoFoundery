@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
 import {
   BETA_ACCESS_COOKIE_NAME,
+  BETA_ACCESS_REQUEST_EMAIL,
   getBetaAccessRequestHref,
   hasBetaAccessCookie,
   isInviteBypassPath,
@@ -120,6 +121,9 @@ export default async function LoginPage({
                 placeholder="Code eingeben"
                 className="rounded-lg border border-[color:var(--line)] bg-white px-4 py-3 text-sm outline-none focus:border-[color:var(--ink-soft)]"
               />
+              <p className="text-xs leading-6 text-[color:var(--muted)]">
+                Noch keinen Code? Schreib uns kurz, fuer welches Team, Programm oder Event du Cofoundery testen moechtest.
+              </p>
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="submit"
@@ -131,9 +135,12 @@ export default async function LoginPage({
                   href={getBetaAccessRequestHref()}
                   className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
                 >
-                  Zugang anfragen
+                  Beta-Zugang anfragen
                 </a>
               </div>
+              <p className="text-xs text-slate-500">
+                {BETA_ACCESS_REQUEST_EMAIL}
+              </p>
             </form>
           </div>
         ) : (

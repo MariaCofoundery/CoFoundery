@@ -5,16 +5,24 @@ type ReadonlyCookieStore = {
 };
 
 const LOCAL_ALLOWED_BETA_CODES = ["cofoundery-beta"];
-const BETA_ACCESS_REQUEST_EMAIL =
-  process.env.RESEND_REPLY_TO_EMAIL?.trim() || "business.mariaschulz@gmail.com";
+export const BETA_ACCESS_REQUEST_EMAIL =
+  process.env.RESEND_REPLY_TO_EMAIL?.trim() || "hello@cofoundery.de";
 
 function normalizeCode(value: string) {
   return value.trim().toLowerCase();
 }
 
 export function getBetaAccessRequestHref() {
-  const subject = encodeURIComponent("Zugang anfragen - Cofoundery Beta");
-  return `mailto:${BETA_ACCESS_REQUEST_EMAIL}?subject=${subject}`;
+  const subject = encodeURIComponent("Beta-Zugang anfragen");
+  const body = encodeURIComponent(`Hallo Cofoundery-Team,
+
+ich würde gerne Zugang zur Cofoundery-Beta anfragen.
+
+Kurz zu mir / uns:
+[bitte ergänzen]
+
+Viele Grüße`);
+  return `mailto:${BETA_ACCESS_REQUEST_EMAIL}?subject=${subject}&body=${body}`;
 }
 
 export function getAllowedBetaCodes() {

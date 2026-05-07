@@ -466,7 +466,7 @@ export default async function DashboardPage({
         ]
       : []),
   ] as const;
-  const supportEmail = "business.mariaschulz@gmail.com";
+  const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
     ? null

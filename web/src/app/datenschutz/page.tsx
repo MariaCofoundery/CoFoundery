@@ -67,7 +67,7 @@ export default function DatenschutzPage() {
               <p>Maria Schulz</p>
               <p>Am Juliusturm 89</p>
               <p>13597 Berlin</p>
-              <p>E-Mail: business.mariaschulz@gmail.com</p>
+              <p>E-Mail: hello@cofoundery.de</p>
             </div>
           </BulletSection>
 
@@ -388,7 +388,7 @@ export default function DatenschutzPage() {
           <BulletSection number="20" title="Kontakt">
             <p>Bei Fragen zum Datenschutz:</p>
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
-              <p>business.mariaschulz@gmail.com</p>
+              <p>hello@cofoundery.de</p>
             </div>
           </BulletSection>
         </div>
