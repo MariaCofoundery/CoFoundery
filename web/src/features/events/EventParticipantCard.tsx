@@ -43,20 +43,20 @@ export function EventParticipantCard({
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Mini-Profil</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Ein schneller Blick auf deine Gruender-Dynamik fuer dieses Event.
+                Dein Kurzprofil fuer gemeinsame Richtung, Tempo und Zusammenarbeit.
               </p>
             </div>
           </div>
 
-          <div className="mt-5 space-y-3.5">
+          <div className="mt-5 space-y-3">
             {profile.scales.map((scale) => (
               <article
                 key={scale.key}
-                className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-4 py-4 shadow-[0_8px_20px_rgba(15,23,42,0.03)]"
+                className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))] px-4 py-3.5 shadow-[0_8px_20px_rgba(15,23,42,0.03)]"
               >
                 <h2 className="text-sm font-semibold text-slate-950">{scale.label}</h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{scale.bandLabel}</p>
-                <div className="mt-3">
+                <p className="mt-1 text-sm leading-5 text-slate-600">{scale.bandLabel}</p>
+                <div className="mt-2.5">
                   <EventScaleTrack score={scale.score} variant="self" />
                 </div>
               </article>

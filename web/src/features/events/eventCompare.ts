@@ -17,44 +17,48 @@ type TensionMeta = {
 const TENSION_META: Record<EventTensionKey, TensionMeta> = {
   exit_horizon: {
     label: "Exit-Horizont",
-    conversationPrompt: "Welche Zeitlogik wuenscht ihr euch wirklich fuer einen gemeinsamen Aufbau?",
+    conversationPrompt: "Wollt ihr eher etwas auf Jahre bauen oder reizt euch frueher Hebel mehr?",
   },
   sync_vs_autonomy: {
     label: "Abstimmung vs Autonomie",
-    conversationPrompt: "Wie eng wollt ihr euch im Alltag abstimmen und wo braucht ihr bewusst Freiraum?",
+    conversationPrompt: "Wie viel Freiheit braucht jeder von euch wirklich im Alltag?",
   },
   speed_vs_assurance: {
     label: "Tempo vs Absicherung",
-    conversationPrompt: "Wann ist schnelles Entscheiden hilfreich und wann braucht ihr mehr Absicherung?",
+    conversationPrompt: "Wann reicht euch 'lass machen' und wann braucht es einen zweiten Blick?",
   },
   risk_vs_stability: {
     label: "Risiko vs Stabilitaet",
-    conversationPrompt: "Wie viel Risiko fuehlt sich fuer euch gemeinsam tragfaehig an?",
+    conversationPrompt: "Wie viel Risiko fuehlt sich fuer euch gemeinsam gut an - und ab wann wird's zu wild?",
   },
   roles_vs_shared: {
     label: "Rollenverteilung",
-    conversationPrompt: "Welche Themen brauchen frueh klare Ownership und was wollt ihr gemeinsam tragen?",
+    conversationPrompt: "Was wuerdet ihr frueh klar aufteilen - und was auf keinen Fall?",
   },
 };
 
 const SCALE_PROMPTS: Record<string, string> = {
-  vision_ambition: "Was bedeutet fuer euch beide eigentlich eine ambitionierte gemeinsame Richtung?",
-  tempo: "Welches Umsetzungstempo fuehlt sich fuer euch motivierend und gleichzeitig tragfaehig an?",
-  risk: "Wie wollt ihr Chancen nutzen, ohne euch im Risikoempfinden zu verlieren?",
-  structure_roles: "Wie frueh braucht ihr Klarheit bei Rollen und Verantwortungen?",
-  sync: "Wie viel Mitsicht und Abstimmung braucht ihr, damit Zusammenarbeit leicht bleibt?",
-  conflict_decision: "Wie direkt wollt ihr Spannungen ansprechen und wie schnell entscheidet ihr danach?",
+  vision_ambition: "Wollt ihr eher langfristig aufbauen oder frueh auf maximalen Hebel gehen?",
+  tempo: "Wie schnell wollt ihr wirklich werden, ohne dass einer von euch aussteigt?",
+  risk: "Wie viel Risiko fuehlt sich fuer euch gemeinsam gut an - und ab wann wird's zu wild?",
+  structure_roles: "Was braucht klare Ownership - und wo wuerdet ihr euch in die Quere kommen?",
+  sync: "Wie viel Freiheit braucht jeder von euch wirklich im Alltag?",
+  conflict_decision: "Wie direkt wollt ihr sein, wenn etwas wirklich haengt?",
 };
 
+const COMMON_GROUND_MAX_DISTANCE = 20;
+const DIFFERENCE_MIN_DISTANCE = 30;
+const MAX_COMMON_GROUND_ITEMS = 3;
+const MAX_DIFFERENCE_ITEMS = 3;
+
 function relationLabelForCommonGround(distance: number) {
-  if (distance <= 10) return "sehr nah beieinander";
-  if (distance <= 25) return "nah beieinander";
-  return "ueberraschend nah";
+  if (distance <= 8) return "sehr nah beieinander";
+  return "nah beieinander";
 }
 
 function relationLabelForDifference(distance: number) {
-  if (distance >= 75) return "sehr deutlich unterschiedlich";
-  if (distance >= 50) return "deutlich unterschiedlich";
+  if (distance >= 60) return "sehr deutlich unterschiedlich";
+  if (distance >= 40) return "deutlich unterschiedlich";
   return "spuerbar unterschiedlich";
 }
 
@@ -143,17 +147,19 @@ export function buildEventCompareResult(params: {
 }): EventCompareResult {
   const comparedScales = buildComparedScales(params.profileA, params.profileB);
 
-  const commonGround = [...comparedScales]
+  const commonGround = comparedScales
+    .filter((entry) => entry.distance <= COMMON_GROUND_MAX_DISTANCE)
     .sort((a, b) => a.distance - b.distance)
-    .slice(0, 3)
+    .slice(0, MAX_COMMON_GROUND_ITEMS)
     .map((entry) => ({
       ...entry,
       relationLabel: relationLabelForCommonGround(entry.distance),
     }));
 
-  const differences = [...comparedScales]
+  const differences = comparedScales
+    .filter((entry) => entry.distance >= DIFFERENCE_MIN_DISTANCE)
     .sort((a, b) => b.distance - a.distance)
-    .slice(0, 3)
+    .slice(0, MAX_DIFFERENCE_ITEMS)
     .map((entry) => ({
       ...entry,
       relationLabel: relationLabelForDifference(entry.distance),
@@ -174,6 +180,7 @@ export function buildEventCompareResult(params: {
   return {
     participantAName: params.participantAName,
     participantBName: params.participantBName,
+    allScales: comparedScales,
     commonGround,
     differences,
     tensionSignals,

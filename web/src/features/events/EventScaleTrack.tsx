@@ -5,7 +5,7 @@ type EventScaleTrackProps = {
 
 function clampScore(score: number) {
   if (!Number.isFinite(score)) {
-    return 0;
+    return 50;
   }
 
   return Math.max(0, Math.min(100, score));
@@ -16,25 +16,34 @@ export function EventScaleTrack({
   variant = "self",
 }: EventScaleTrackProps) {
   const clampedScore = clampScore(score);
-  const markerColor = variant === "other" ? "#7C3AED" : "#00B8D9";
-  const shadowColor = variant === "other" ? "rgba(124,58,237,0.22)" : "rgba(0,184,217,0.24)";
-  const railStart = 9;
-  const railWidth = 98;
-  const markerX = railStart + (clampedScore / 100) * railWidth;
+  const markerTone =
+    variant === "other"
+      ? {
+          marker: "#7C3AED",
+          shadow: "0 6px 14px rgba(124,58,237,0.22)",
+        }
+      : {
+          marker: "#00B8D9",
+          shadow: "0 6px 14px rgba(0,184,217,0.22)",
+        };
 
   return (
-    <div className="min-w-[120px] w-full">
-      <svg
-        viewBox="0 0 116 24"
-        preserveAspectRatio="none"
-        className="block h-6 w-full overflow-visible"
-        aria-hidden="true"
-      >
-        <rect x={railStart} y="8" width={railWidth} height="8" rx="999" fill="#E6DCCB" />
-        <rect x={railStart} y="8" width={railWidth} height="8" rx="999" fill="none" stroke="#D3C7B3" strokeWidth="0.8" />
-        <circle cx={markerX} cy="12" r="8" fill="none" stroke={shadowColor} strokeWidth="4" opacity="0.22" />
-        <circle cx={markerX} cy="12" r="8" fill={markerColor} stroke="#FFFFFF" strokeWidth="2.5" />
-      </svg>
+    <div className="w-full">
+      <div className="relative h-9 w-full overflow-visible">
+        <div className="absolute left-0 right-0 top-4 z-0 h-[3px] rounded-full bg-slate-200" />
+        <div
+          className="absolute left-0 right-0 top-4 z-[1] h-[3px] rounded-full bg-gradient-to-r from-[#00B8D9]/45 to-[#7C3AED]/45"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute left-0 top-1/2 z-30 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white"
+          style={{
+            left: `${clampedScore}%`,
+            backgroundColor: markerTone.marker,
+            boxShadow: markerTone.shadow,
+          }}
+        />
+      </div>
     </div>
   );
 }

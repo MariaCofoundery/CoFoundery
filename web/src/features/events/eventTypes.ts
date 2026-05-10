@@ -109,6 +109,7 @@ export type EventComparedScale = {
 export type EventCompareResult = {
   participantAName: string;
   participantBName: string;
+  allScales: EventComparedScale[];
   commonGround: EventComparedScale[];
   differences: EventComparedScale[];
   tensionSignals: EventTensionSignal[];
