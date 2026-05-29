@@ -23,6 +23,10 @@ function buildEventCardHref(eventSlug: string) {
   return `/event/${encodeURIComponent(eventSlug)}/me`;
 }
 
+function buildEventScanHref(eventSlug: string) {
+  return `/event/${encodeURIComponent(eventSlug)}/scan`;
+}
+
 function EventCompareMessage({
   title,
   text,
@@ -155,6 +159,7 @@ export default async function EventComparePage({
         event={event}
         result={compareResult}
         backToCardHref={buildEventCardHref(event.slug)}
+        scanHref={buildEventScanHref(event.slug)}
       />
     </main>
   );

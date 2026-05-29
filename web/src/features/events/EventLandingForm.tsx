@@ -103,6 +103,8 @@ export function EventLandingForm({ event, errorMessage, action }: EventLandingFo
 
         <p className="text-xs leading-6 text-slate-500">
           Deine E-Mail wird nicht in deinem QR-Profil angezeigt. Dein QR-Code zeigt nur dein Event-Kurzprofil und Vergleichshinweise innerhalb dieses Events.
+          {" "}
+          Event-Daten sind temporaer und werden 24 Stunden nach Eventende entfernt.
         </p>
 
         <div className="pt-2">

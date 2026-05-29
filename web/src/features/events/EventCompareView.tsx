@@ -7,6 +7,7 @@ type EventCompareViewProps = {
   event: EventRecord;
   result: EventCompareResult;
   backToCardHref: string;
+  scanHref: string;
 };
 
 function scaleTagLabel(
@@ -240,7 +241,7 @@ function CompareScaleCard({
   );
 }
 
-export function EventCompareView({ event, result, backToCardHref }: EventCompareViewProps) {
+export function EventCompareView({ event, result, backToCardHref, scanHref }: EventCompareViewProps) {
   const observationLines = buildObservationLines(result);
   const teamDynamicSummary = buildTeamDynamicSummary(result);
   const dynamicTags = buildDynamicTags(result);
@@ -351,17 +352,47 @@ export function EventCompareView({ event, result, backToCardHref }: EventCompare
         </section>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-6 text-slate-500">
           Kurz, direkt und eher als Conversation Starter gedacht als als fertiges Urteil.
         </p>
-        <Link
-          href={backToCardHref}
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-        >
-          Zurueck zu meiner Event-Karte
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link
+            href={scanHref}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Naechsten QR-Code scannen
+          </Link>
+          <Link
+            href={backToCardHref}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            Zurueck zu meiner Event-Karte
+          </Link>
+        </div>
       </div>
+
+      <section className="mt-6 rounded-[24px] border border-slate-200/80 bg-slate-50/70 px-5 py-5">
+        <div className="max-w-2xl">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Naechster Schritt</p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-950">Wollt ihr tiefer einsteigen?</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Der Event-Check zeigt euch erste Dynamiken. Im vollstaendigen Cofoundery-Matching geht ihr genauer rein:
+            Persoenlichkeit, Werte, Zusammenarbeit und gemeinsamer Report.
+          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Ihr koennt den Event-Vergleich weiter nutzen - oder spaeter mit mehr Tiefe weitermachen.
+          </p>
+        </div>
+        <div className="mt-4">
+          <Link
+            href="/invite/new"
+            className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 sm:w-auto"
+          >
+            Vollstaendiges Matching starten
+          </Link>
+        </div>
+      </section>
     </section>
   );
 }

@@ -9,6 +9,10 @@ function buildEventComparePath(eventSlug: string, participantToken: string) {
   return `/event/${encodeURIComponent(eventSlug)}/compare/${encodeURIComponent(participantToken)}`;
 }
 
+function buildEventScanPath(eventSlug: string) {
+  return `/event/${encodeURIComponent(eventSlug)}/scan`;
+}
+
 function getRequestOriginFromHeaders(headerStore: Headers) {
   const forwardedHost = headerStore.get("x-forwarded-host")?.trim() || headerStore.get("host")?.trim() || "";
   if (!forwardedHost) {
@@ -71,6 +75,7 @@ export default async function EventParticipantCardPage({
         participantName={participantProfile.participant.displayName}
         profile={participantProfile.profile}
         compareUrl={compareUrl}
+        scanUrl={buildEventScanPath(event.slug)}
       />
     </main>
   );

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { EventProfile, EventRecord } from "@/features/events/eventTypes";
 import { EventScaleTrack } from "@/features/events/EventScaleTrack";
 
@@ -6,6 +7,7 @@ type EventParticipantCardProps = {
   participantName: string;
   profile: EventProfile;
   compareUrl: string;
+  scanUrl: string;
 };
 
 function buildQrImageUrl(compareUrl: string) {
@@ -23,6 +25,7 @@ export function EventParticipantCard({
   participantName,
   profile,
   compareUrl,
+  scanUrl,
 }: EventParticipantCardProps) {
   return (
     <section className="rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)] sm:p-8">
@@ -80,6 +83,13 @@ export function EventParticipantCard({
             Andere Teilnehmende koennen darueber dein Event-Kurzprofil und den Vergleich mit ihrem eigenen Profil aufrufen.
           </p>
 
+          <Link
+            href={scanUrl}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            QR-Code einer anderen Person scannen
+          </Link>
+
           <div className="mt-4 rounded-2xl border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.92),rgba(255,255,255,1))] p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Vergleichslink</p>
             <p className="mt-2 break-all text-xs leading-6 text-slate-600">{compareUrl}</p>
@@ -87,6 +97,8 @@ export function EventParticipantCard({
 
           <p className="mt-4 text-xs leading-6 text-slate-500">
             Deine E-Mail ist im QR-Code nicht enthalten. Andere sehen nur dein Event-Kurzprofil und den Vergleich mit ihrem eigenen Profil.
+            {" "}
+            Deine Event-Antworten und dein Kurzprofil werden 24 Stunden nach Eventende geloescht.
           </p>
         </aside>
       </div>

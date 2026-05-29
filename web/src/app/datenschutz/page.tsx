@@ -337,6 +337,7 @@ export default function DatenschutzPage() {
             <List
               items={[
                 "Account-, Profil-, Fragebogen-, Report- und Workbook-Daten speichern wir grundsätzlich so lange, wie sie für die Nutzung des Produkts erforderlich sind oder bis eine Löschung erfolgt.",
+                "Bei Event-Checks werden Event-Antworten und das Event-Kurzprofil nur temporär verarbeitet und 24 Stunden nach Ende des jeweiligen Events gelöscht.",
                 "Pseudonymisierte Analyse-Rohdaten speichern wir nur für einen begrenzten Zeitraum und löschen sie anschließend in der Regel wieder. Aktuell liegt dieser Zeitraum typischerweise bei bis zu 30 Tagen.",
                 "Anonyme oder ausreichend aggregierte Statistikdaten können länger aufbewahrt werden.",
                 "Gesetzliche Aufbewahrungspflichten, z. B. bei rechnungsbezogenen Daten, bleiben unberührt.",
