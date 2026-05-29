@@ -85,7 +85,7 @@ export function EventParticipantCard({
 
           <Link
             href={scanUrl}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-3 text-sm font-semibold text-slate-950 shadow-[0_10px_24px_rgba(103,232,249,0.18)] transition hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
           >
             QR-Code einer anderen Person scannen
           </Link>

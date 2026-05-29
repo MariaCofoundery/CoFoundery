@@ -27,22 +27,12 @@ function QuestionCard({
   index: number;
   defaultValue: number | null;
 }) {
-  const helperText =
-    question.kind === "forced"
-      ? question.helperText?.includes("Gespraechsbedarf")
-        ? "Das zeigt oft spaeteren Gespraechsbedarf."
-        : "Grosse Unterschiede solltet ihr bewusst besprechen."
-      : null;
-
   return (
     <article className="rounded-[22px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_8px_20px_rgba(15,23,42,0.03)] sm:px-5">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Frage {index + 1}</p>
       <h2 className="mt-2 text-[15px] font-semibold leading-6 text-slate-950 sm:text-base sm:leading-7">
         {question.prompt}
       </h2>
-      {helperText ? (
-        <p className="mt-1.5 text-sm leading-6 text-slate-600">{helperText}</p>
-      ) : null}
 
       <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4">
         <div className="flex items-start justify-between gap-4 text-xs leading-5 text-slate-500">
