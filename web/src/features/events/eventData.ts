@@ -147,7 +147,7 @@ export async function getLiveEventBySlug(slug: string): Promise<EventRecord | nu
   const { data, error } = await privileged
     .from("events")
     .select("id, slug, name, status, starts_at, ends_at, created_at")
-    .eq("slug", normalizedSlug)
+    .ilike("slug", normalizedSlug)
     .eq("status", "live")
     .maybeSingle();
 
