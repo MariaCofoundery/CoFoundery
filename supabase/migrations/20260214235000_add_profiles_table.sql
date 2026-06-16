@@ -3,6 +3,7 @@
 create table if not exists public.profiles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null unique references auth.users(id) on delete cascade,
+  display_name text,
   focus_skill text,
   intention text,
   created_at timestamptz not null default now(),
