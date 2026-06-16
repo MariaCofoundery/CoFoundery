@@ -57,6 +57,7 @@ function isProductChromePath(pathname: string) {
   return (
     pathname === "/dashboard" ||
     pathname.startsWith("/advisor/") ||
+    pathname.startsWith("/discovery") ||
     pathname.startsWith("/me/") ||
     pathname.startsWith("/report/") ||
     pathname.startsWith("/founder-alignment/") ||
@@ -77,6 +78,14 @@ function navMenuTriggerClassName(active: boolean) {
     active
       ? "bg-[color:var(--brand-primary)]/18 text-slate-950"
       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+  }`;
+}
+
+function discoveryCtaClassName(active: boolean) {
+  return `rounded-full px-3 py-2 text-sm font-semibold transition ${
+    active
+      ? "bg-[color:var(--brand-primary)] text-slate-950"
+      : "bg-[color:var(--brand-primary)]/80 text-slate-950 hover:bg-[color:var(--brand-primary)]"
   }`;
 }
 
@@ -125,13 +134,6 @@ export function ProductShell({
           : currentPathname === "/dashboard",
     },
   ];
-  if (resolvedActiveView !== "advisor") {
-    navigationItems.push({
-      href: "/me/report",
-      label: "Mein Report",
-      isActive: (currentPathname) => currentPathname.startsWith("/me/"),
-    });
-  }
 
   useEffect(() => {
     if (searchParams.get("debug") !== "1" || resolvedActiveView !== "advisor") {
@@ -203,7 +205,7 @@ export function ProductShell({
                 ) : (
                   <>
                     <NavigationContextMenu
-                      label="Matching-Report"
+                      label="Dynamik-Report"
                       directHref={resolvedMatchingHref}
                       items={matchingItems}
                       isActive={
@@ -228,6 +230,14 @@ export function ProductShell({
                   variant="nav"
                   triggerClassName={navLinkClassName(false)}
                 />
+                {resolvedActiveView !== "advisor" ? (
+                  <Link
+                    href="/discovery"
+                    className={discoveryCtaClassName(pathname.startsWith("/discovery"))}
+                  >
+                    Co-Founder suchen
+                  </Link>
+                ) : null}
               </nav>
             </div>
 
