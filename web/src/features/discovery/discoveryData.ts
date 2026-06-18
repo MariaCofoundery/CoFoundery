@@ -12,6 +12,10 @@ import {
   buildDiscoveryCandidateRecommendations,
 } from "@/features/discovery/discoveryRecommendation";
 import {
+  appendDiscoveryAssessmentConversationPromptsToCandidates,
+} from "@/features/discovery/discoveryAssessmentConversationPrompts";
+import {
+  getDiscoveryAssessmentConversationPromptsForCandidates,
   getDiscoveryAssessmentSignalAvailabilityForCandidates,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
@@ -355,23 +359,29 @@ export async function getActiveDiscoveryProfileById(
   return data ? mapProfileRow(data) : null;
 }
 
-async function prepareDiscoveryAssessmentSignalAvailability(
+async function prepareDiscoveryAssessmentConversationPrompts(
   ownerUserId: string,
   candidateProfiles: FounderDiscoveryProfile[]
 ) {
   if (candidateProfiles.length === 0) {
-    return;
+    return new Map<string, string[]>();
   }
 
   try {
-    await getDiscoveryAssessmentSignalAvailabilityForCandidates({
+    const availabilityByUserId = await getDiscoveryAssessmentSignalAvailabilityForCandidates({
       ownerUserId,
       candidateUserIds: candidateProfiles.map((profile) => profile.userId),
     });
+    return getDiscoveryAssessmentConversationPromptsForCandidates({
+      ownerUserId,
+      candidateUserIds: candidateProfiles.map((profile) => profile.userId),
+      availabilityByUserId,
+    });
   } catch (error) {
-    console.warn("discovery assessment availability preparation failed", {
+    console.warn("discovery assessment conversation prompt preparation failed", {
       reason: error instanceof Error ? error.message : "unknown_error",
     });
+    return new Map<string, string[]>();
   }
 }
 
@@ -399,11 +409,28 @@ export async function getDiscoveryCandidatesForCurrentUser(
   }
 
   const candidateProfiles = (data ?? []).map(mapProfileRow);
-  await prepareDiscoveryAssessmentSignalAvailability(normalizedUserId, candidateProfiles);
-
-  return buildDiscoveryCandidateRecommendations({
+  const candidates = buildDiscoveryCandidateRecommendations({
     ownProfile,
     candidateProfiles,
     preferences,
+  });
+
+  const promptsByUserId = await prepareDiscoveryAssessmentConversationPrompts(
+    normalizedUserId,
+    candidateProfiles
+  );
+  const profileIdByUserId = new Map(candidateProfiles.map((profile) => [profile.userId, profile.id]));
+  const promptsByProfileId = new Map(
+    Array.from(promptsByUserId.entries())
+      .map(([userId, prompts]) => {
+        const profileId = profileIdByUserId.get(userId);
+        return profileId ? ([profileId, prompts] as const) : null;
+      })
+      .filter((entry): entry is readonly [string, string[]] => entry != null)
+  );
+
+  return appendDiscoveryAssessmentConversationPromptsToCandidates({
+    candidates,
+    promptsByProfileId,
   });
 }

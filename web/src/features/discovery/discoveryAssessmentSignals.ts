@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { selectDiscoveryAssessmentConversationPrompts } from "@/features/discovery/discoveryAssessmentConversationPrompts";
 import {
   buildDiscoveryAssessmentSignalAvailabilityMap,
   normalizeDiscoveryAssessmentSignalCandidateUserIds,
@@ -8,6 +9,9 @@ import {
   type DiscoveryAssessmentSignalAvailability,
   type OwnDiscoveryAssessmentSignalReadiness,
 } from "@/features/discovery/discoveryAssessmentSignalsCore";
+import type { AssessmentAnswerRow, QuestionMetaRow } from "@/features/reporting/base_scoring";
+import { aggregateFounderBaseScoresFromAnswers } from "@/features/reporting/selfReportScoring";
+import type { SelfRadarSeries } from "@/features/reporting/selfReportTypes";
 import { createClient } from "@/lib/supabase/server";
 
 export type {
@@ -31,6 +35,18 @@ type CandidateAssessmentRow = {
   id: string;
   module: string;
   submitted_at: string | null;
+};
+
+type SubmittedBaseAssessmentRow = {
+  id: string;
+  user_id: string;
+  module: string | null;
+  submitted_at: string | null;
+  created_at: string | null;
+};
+
+type AssessmentAnswerWithAssessmentIdRow = AssessmentAnswerRow & {
+  assessment_id: string;
 };
 
 function createDiscoveryServiceRoleClient(): DiscoveryServiceRoleClient | null {
@@ -187,4 +203,174 @@ export async function getDiscoveryAssessmentSignalAvailabilityForCandidates({
       hasSubmittedBaseAssessment: candidatesWithSubmittedBase.has(userId),
     })),
   });
+}
+
+function pickLatestAssessmentByUserId(rows: SubmittedBaseAssessmentRow[]) {
+  const latestByUserId = new Map<string, SubmittedBaseAssessmentRow>();
+
+  for (const row of rows) {
+    if (row.module !== "base" || row.submitted_at == null || !row.id) {
+      continue;
+    }
+
+    if (!latestByUserId.has(row.user_id)) {
+      latestByUserId.set(row.user_id, row);
+    }
+  }
+
+  return latestByUserId;
+}
+
+function groupAnswersByAssessmentId(rows: AssessmentAnswerWithAssessmentIdRow[]) {
+  const answersByAssessmentId = new Map<string, AssessmentAnswerRow[]>();
+
+  for (const row of rows) {
+    const answers = answersByAssessmentId.get(row.assessment_id) ?? [];
+    answers.push({
+      question_id: row.question_id,
+      choice_value: row.choice_value,
+    });
+    answersByAssessmentId.set(row.assessment_id, answers);
+  }
+
+  return answersByAssessmentId;
+}
+
+function aggregateScoresForAssessment(params: {
+  assessmentId: string;
+  answersByAssessmentId: Map<string, AssessmentAnswerRow[]>;
+  questionById: Map<string, QuestionMetaRow>;
+}): SelfRadarSeries | null {
+  const answers = params.answersByAssessmentId.get(params.assessmentId) ?? [];
+  if (answers.length === 0) {
+    return null;
+  }
+
+  return aggregateFounderBaseScoresFromAnswers(answers, params.questionById).scores;
+}
+
+export async function getDiscoveryAssessmentConversationPromptsForCandidates({
+  ownerUserId,
+  candidateUserIds,
+  availabilityByUserId,
+}: {
+  ownerUserId: string;
+  candidateUserIds: string[];
+  availabilityByUserId: Map<string, DiscoveryAssessmentSignalAvailability>;
+}): Promise<Map<string, string[]>> {
+  const normalizedCandidateUserIds = normalizeDiscoveryAssessmentSignalCandidateUserIds({
+    ownerUserId,
+    candidateUserIds,
+  }).filter((userId) => availabilityByUserId.get(userId)?.bothReady === true);
+
+  if (normalizedCandidateUserIds.length === 0) {
+    return new Map();
+  }
+
+  const serviceClient = createDiscoveryServiceRoleClient();
+  if (!serviceClient) {
+    return new Map();
+  }
+
+  try {
+    const userIdsToLoad = [ownerUserId.trim(), ...normalizedCandidateUserIds];
+    const { data: assessmentRows, error: assessmentError } = await serviceClient
+      .from("assessments")
+      .select("id, user_id, module, submitted_at, created_at")
+      .in("user_id", userIdsToLoad)
+      .eq("module", "base")
+      .not("submitted_at", "is", null)
+      .order("submitted_at", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (assessmentError) {
+      console.warn("discovery assessment prompt assessment load failed", {
+        reason: assessmentError.message,
+      });
+      return new Map();
+    }
+
+    const latestAssessmentByUserId = pickLatestAssessmentByUserId(
+      (assessmentRows ?? []) as SubmittedBaseAssessmentRow[]
+    );
+    const ownerAssessment = latestAssessmentByUserId.get(ownerUserId.trim());
+    if (!ownerAssessment) {
+      return new Map();
+    }
+
+    const candidateAssessments = normalizedCandidateUserIds
+      .map((userId) => latestAssessmentByUserId.get(userId) ?? null)
+      .filter((row): row is SubmittedBaseAssessmentRow => row != null);
+    if (candidateAssessments.length === 0) {
+      return new Map();
+    }
+
+    const assessmentIds = [ownerAssessment.id, ...candidateAssessments.map((row) => row.id)];
+    const { data: answerRows, error: answerError } = await serviceClient
+      .from("assessment_answers")
+      .select("assessment_id, question_id, choice_value")
+      .in("assessment_id", assessmentIds);
+
+    if (answerError) {
+      console.warn("discovery assessment prompt answer load failed", {
+        reason: answerError.message,
+      });
+      return new Map();
+    }
+
+    const answers = (answerRows ?? []) as AssessmentAnswerWithAssessmentIdRow[];
+    const questionIds = Array.from(new Set(answers.map((entry) => entry.question_id)));
+    if (questionIds.length === 0) {
+      return new Map();
+    }
+
+    const { data: questionRows, error: questionError } = await serviceClient
+      .from("questions")
+      .select("id, dimension, category, prompt")
+      .in("id", questionIds);
+
+    if (questionError) {
+      console.warn("discovery assessment prompt question load failed", {
+        reason: questionError.message,
+      });
+      return new Map();
+    }
+
+    const answersByAssessmentId = groupAnswersByAssessmentId(answers);
+    const questionById = new Map(
+      ((questionRows ?? []) as QuestionMetaRow[]).map((row) => [row.id, row])
+    );
+    const ownerScores = aggregateScoresForAssessment({
+      assessmentId: ownerAssessment.id,
+      answersByAssessmentId,
+      questionById,
+    });
+    if (!ownerScores) {
+      return new Map();
+    }
+
+    return new Map(
+      candidateAssessments
+        .map((assessment) => {
+          const candidateScores = aggregateScoresForAssessment({
+            assessmentId: assessment.id,
+            answersByAssessmentId,
+            questionById,
+          });
+          const prompts = selectDiscoveryAssessmentConversationPrompts({
+            availability: availabilityByUserId.get(assessment.user_id) ?? null,
+            ownerScores,
+            candidateScores,
+          });
+
+          return [assessment.user_id, prompts] as const;
+        })
+        .filter(([, prompts]) => prompts.length > 0)
+    );
+  } catch (error) {
+    console.warn("discovery assessment prompt preparation failed", {
+      reason: error instanceof Error ? error.message : "unknown_error",
+    });
+    return new Map();
+  }
 }
