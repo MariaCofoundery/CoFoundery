@@ -8,6 +8,9 @@ import {
   normalizePriorityWeights,
   getDiscoveryProfilePublishIssues,
 } from "@/features/discovery/discoveryValidation";
+import {
+  buildDiscoveryCandidateRecommendations,
+} from "@/features/discovery/discoveryRecommendation";
 import type {
   DiscoveryCandidate,
   DiscoveryCommitmentLevel,
@@ -203,144 +206,6 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
   };
 }
 
-function uniqueIntersection<T extends string>(left: readonly T[], right: readonly T[]) {
-  const rightSet = new Set(right);
-  return Array.from(new Set(left.filter((value) => rightSet.has(value))));
-}
-
-function normalizeComparableText(value: string) {
-  return value.trim().toLowerCase();
-}
-
-function intersectTextValues(left: readonly string[], right: readonly string[]) {
-  const rightValuesByNormalized = new Map(
-    right.map((value) => [normalizeComparableText(value), value] as const)
-  );
-  const matches = left
-    .map((value) => rightValuesByNormalized.get(normalizeComparableText(value)))
-    .filter((value): value is string => Boolean(value));
-  return Array.from(new Set(matches));
-}
-
-function remoteModesAreCompatible(
-  ownMode: DiscoveryRemoteMode,
-  candidateMode: DiscoveryRemoteMode
-) {
-  return (
-    ownMode === candidateMode ||
-    ownMode === "flexible" ||
-    candidateMode === "flexible" ||
-    (ownMode === "hybrid" && candidateMode === "onsite") ||
-    (ownMode === "onsite" && candidateMode === "hybrid")
-  );
-}
-
-function availabilityIsRoughlyAligned(
-  ownAvailability: number | null,
-  candidateAvailability: number | null
-) {
-  if (ownAvailability == null || candidateAvailability == null) {
-    return false;
-  }
-  return Math.abs(ownAvailability - candidateAvailability) <= 10;
-}
-
-function buildCandidateReasons(
-  ownProfile: FounderDiscoveryProfile,
-  candidateProfile: FounderDiscoveryProfile
-) {
-  const reasons: string[] = [];
-  const sharedIndustries = intersectTextValues(ownProfile.industries, candidateProfile.industries);
-  const candidateOffersRolesYouSeek = uniqueIntersection(
-    ownProfile.seekingRoles,
-    candidateProfile.ownRoles
-  );
-  const youOfferRolesCandidateSeeks = uniqueIntersection(
-    ownProfile.ownRoles,
-    candidateProfile.seekingRoles
-  );
-
-  if (sharedIndustries.length > 0) {
-    reasons.push(`Ihr teilt Interesse an ${sharedIndustries.slice(0, 2).join(", ")}.`);
-  }
-  if (candidateOffersRolesYouSeek.length > 0) {
-    reasons.push("Diese Person bringt Rollen mit, die du suchst.");
-  }
-  if (youOfferRolesCandidateSeeks.length > 0) {
-    reasons.push("Du bringst Rollen mit, die diese Person sucht.");
-  }
-  if (remoteModesAreCompatible(ownProfile.remoteMode, candidateProfile.remoteMode)) {
-    reasons.push("Euer Arbeitsort-/Remote-Rahmen wirkt kompatibel.");
-  }
-  if (ownProfile.commitmentLevel === candidateProfile.commitmentLevel) {
-    reasons.push("Ihr beschreibt ein ähnliches Commitment-Level.");
-  }
-  if (ownProfile.ventureGoal === candidateProfile.ventureGoal) {
-    reasons.push("Euer Aufbauziel klingt ähnlich.");
-  }
-  if (ownProfile.ventureStage === candidateProfile.ventureStage) {
-    reasons.push("Ihr seid in einer ähnlichen Venture-Phase.");
-  }
-  if (
-    availabilityIsRoughlyAligned(
-      ownProfile.availabilityHoursPerWeek,
-      candidateProfile.availabilityHoursPerWeek
-    )
-  ) {
-    reasons.push("Eure verfügbare Zeit pro Woche liegt grob nah beieinander.");
-  }
-
-  return reasons.slice(0, 3);
-}
-
-function buildConversationTopics(
-  ownProfile: FounderDiscoveryProfile,
-  candidateProfile: FounderDiscoveryProfile
-) {
-  const topics: string[] = [];
-
-  if (
-    ownProfile.availabilityHoursPerWeek !== candidateProfile.availabilityHoursPerWeek ||
-    ownProfile.commitmentLevel !== candidateProfile.commitmentLevel
-  ) {
-    topics.push("Kläre früh, wie viel Zeit ihr realistisch investieren wollt.");
-  }
-  if (ownProfile.ventureGoal !== candidateProfile.ventureGoal) {
-    topics.push(
-      "Sprecht darüber, ob ihr eher ein skalierbares Venture oder ein profitables Unternehmen aufbauen wollt."
-    );
-  }
-  if (
-    uniqueIntersection(ownProfile.ownRoles, candidateProfile.ownRoles).length > 0 ||
-    uniqueIntersection(ownProfile.seekingRoles, candidateProfile.seekingRoles).length > 0
-  ) {
-    topics.push("Besprecht, wie ihr Rollen und Verantwortlichkeiten verteilen würdet.");
-  }
-  if (!remoteModesAreCompatible(ownProfile.remoteMode, candidateProfile.remoteMode)) {
-    topics.push("Kläre, wie viel Nähe, Remote-Arbeit oder gemeinsame Präsenz ihr braucht.");
-  }
-
-  if (topics.length === 0) {
-    topics.push("Besprecht, wie ihr Rollen und Verantwortlichkeiten verteilen würdet.");
-    topics.push("Kläre früh, wie viel Zeit ihr realistisch investieren wollt.");
-  }
-
-  return topics.slice(0, 2);
-}
-
-function buildDiscoveryCandidate(
-  ownProfile: FounderDiscoveryProfile,
-  candidateProfile: FounderDiscoveryProfile
-): DiscoveryCandidate {
-  const reasons = buildCandidateReasons(ownProfile, candidateProfile);
-  return {
-    profile: toDiscoveryProfilePreview(candidateProfile),
-    reasons,
-    conversationTopics: buildConversationTopics(ownProfile, candidateProfile),
-    score: reasons.length,
-  };
-}
-
 export async function getOwnDiscoveryProfile(
   userId: string,
   client?: SupabaseLikeClient
@@ -482,6 +347,7 @@ export async function getDiscoveryCandidatesForCurrentUser(
   if (!ownProfile || ownProfile.status !== "active") {
     return [];
   }
+  const preferences = await getOwnSearchPreferences(normalizedUserId, supabase);
 
   const { data, error } = await getProfilesTable(supabase)
     .select(DISCOVERY_PROFILE_COLUMNS)
@@ -494,8 +360,9 @@ export async function getDiscoveryCandidatesForCurrentUser(
     throw new Error(error.message ?? "discovery_candidates_load_failed");
   }
 
-  return (data ?? [])
-    .map(mapProfileRow)
-    .map((profile) => buildDiscoveryCandidate(ownProfile, profile))
-    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0));
+  return buildDiscoveryCandidateRecommendations({
+    ownProfile,
+    candidateProfiles: (data ?? []).map(mapProfileRow),
+    preferences,
+  });
 }

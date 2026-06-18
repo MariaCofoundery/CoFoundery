@@ -157,7 +157,7 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
 
       {candidate.reasons.length > 0 ? (
         <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-          <p className="text-sm font-semibold text-slate-950">Warum dieses Profil passt</p>
+          <p className="text-sm font-semibold text-slate-950">Warum spannend</p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-600">
             {candidate.reasons.map((reason) => (
               <li key={reason}>{reason}</li>
@@ -280,6 +280,11 @@ export default async function DiscoveryPage() {
                 <h2 className="mt-2 text-2xl font-semibold text-slate-950">
                   Erste Profile entdecken
                 </h2>
+                {isActive ? (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Sortiert nach deinen privaten Prioritäten, ohne sie öffentlich anzuzeigen.
+                  </p>
+                ) : null}
               </div>
               <span className={SECONDARY_BADGE_CLASS}>Ohne Prozent-Score</span>
             </div>
