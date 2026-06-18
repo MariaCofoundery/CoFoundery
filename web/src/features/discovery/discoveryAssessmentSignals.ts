@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { getOwnSearchPreferences } from "@/features/discovery/discoveryData";
 import {
   buildDiscoveryAssessmentSignalAvailabilityMap,
   normalizeDiscoveryAssessmentSignalCandidateUserIds,
@@ -20,6 +19,10 @@ type DiscoveryServiceRoleClient = ReturnType<typeof createSupabaseClient>;
 
 type CandidatePreferenceRow = {
   user_id: string;
+  include_assessment_signals: boolean;
+};
+
+type OwnerPreferenceRow = {
   include_assessment_signals: boolean;
 };
 
@@ -65,7 +68,16 @@ export async function getOwnDiscoveryAssessmentSignalReadiness(
   }
 
   const supabase = await createClient();
-  const preferences = await getOwnSearchPreferences(normalizedUserId, supabase);
+  const { data: preference, error: preferenceError } = await supabase
+    .from("founder_search_preferences")
+    .select("include_assessment_signals")
+    .eq("user_id", normalizedUserId)
+    .maybeSingle();
+
+  if (preferenceError) {
+    throw new Error(preferenceError.message ?? "discovery_assessment_consent_load_failed");
+  }
+
   const { data, error } = await supabase
     .from("assessments")
     .select("id")
@@ -82,7 +94,8 @@ export async function getOwnDiscoveryAssessmentSignalReadiness(
   }
 
   return resolveOwnDiscoveryAssessmentSignalReadiness({
-    includeAssessmentSignals: preferences?.includeAssessmentSignals === true,
+    includeAssessmentSignals:
+      (preference as OwnerPreferenceRow | null)?.include_assessment_signals === true,
     hasSubmittedBaseAssessment: Boolean(data?.id),
   });
 }

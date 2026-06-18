@@ -11,6 +11,9 @@ import {
 import {
   buildDiscoveryCandidateRecommendations,
 } from "@/features/discovery/discoveryRecommendation";
+import {
+  getDiscoveryAssessmentSignalAvailabilityForCandidates,
+} from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
   DiscoveryCandidate,
@@ -352,6 +355,26 @@ export async function getActiveDiscoveryProfileById(
   return data ? mapProfileRow(data) : null;
 }
 
+async function prepareDiscoveryAssessmentSignalAvailability(
+  ownerUserId: string,
+  candidateProfiles: FounderDiscoveryProfile[]
+) {
+  if (candidateProfiles.length === 0) {
+    return;
+  }
+
+  try {
+    await getDiscoveryAssessmentSignalAvailabilityForCandidates({
+      ownerUserId,
+      candidateUserIds: candidateProfiles.map((profile) => profile.userId),
+    });
+  } catch (error) {
+    console.warn("discovery assessment availability preparation failed", {
+      reason: error instanceof Error ? error.message : "unknown_error",
+    });
+  }
+}
+
 export async function getDiscoveryCandidatesForCurrentUser(
   userId: string,
   client?: SupabaseLikeClient
@@ -375,9 +398,12 @@ export async function getDiscoveryCandidatesForCurrentUser(
     throw new Error(error.message ?? "discovery_candidates_load_failed");
   }
 
+  const candidateProfiles = (data ?? []).map(mapProfileRow);
+  await prepareDiscoveryAssessmentSignalAvailability(normalizedUserId, candidateProfiles);
+
   return buildDiscoveryCandidateRecommendations({
     ownProfile,
-    candidateProfiles: (data ?? []).map(mapProfileRow),
+    candidateProfiles,
     preferences,
   });
 }
