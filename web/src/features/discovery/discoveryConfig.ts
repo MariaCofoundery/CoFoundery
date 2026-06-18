@@ -23,6 +23,13 @@ export const DISCOVERY_TEXT_LIMITS = {
   industry: 80,
 } as const;
 
+export const DISCOVERY_SELECTION_LIMITS = {
+  ownRoles: 3,
+  seekingRoles: 3,
+  industries: 5,
+  priorityWeightsAboveZero: 5,
+} as const;
+
 export const DISCOVERY_STATUS_LABELS: Record<DiscoveryStatus, string> = {
   draft: "Entwurf",
   active: "Aktiv",

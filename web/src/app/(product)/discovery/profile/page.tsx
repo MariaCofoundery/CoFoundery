@@ -6,6 +6,7 @@ import {
   DISCOVERY_REMOTE_MODE_OPTIONS,
   DISCOVERY_ROLE_LABELS,
   DISCOVERY_ROLE_OPTIONS,
+  DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_STATUS_LABELS,
   DISCOVERY_VENTURE_GOAL_OPTIONS,
   DISCOVERY_VENTURE_STAGE_OPTIONS,
@@ -34,15 +35,17 @@ import type {
 } from "@/features/discovery/discoveryTypes";
 import { createClient } from "@/lib/supabase/server";
 
-const CARD_CLASS = "rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)]";
+const CARD_CLASS =
+  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
 const FIELD_CLASS =
   "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 const LABEL_CLASS = "text-sm font-medium text-slate-900";
 const HELP_CLASS = "mt-1 text-xs leading-5 text-slate-500";
 const PRIMARY_BUTTON_CLASS =
-  "inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800";
+  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_BUTTON_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+const INNER_SECTION_CLASS = "rounded-3xl border border-slate-200 bg-slate-50/60 p-5";
 
 type DiscoveryProfileSearchParams = {
   message?: string | string[];
@@ -92,13 +95,21 @@ function formatRoleList(values: DiscoveryFounderRole[] | undefined) {
   return values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ");
 }
 
-function formatText(value: string | null | undefined) {
+function previewText(value: string | null | undefined, fallback: string) {
   const normalized = value?.trim();
-  return normalized && normalized.length > 0 ? normalized : "Noch nicht angegeben";
+  return normalized && normalized.length > 0 ? normalized : fallback;
 }
 
 function formatIndustries(values: string[] | undefined) {
   return values && values.length > 0 ? values.join(", ") : "Noch nicht angegeben";
+}
+
+function limitHint(isAtLimit: boolean, text: string) {
+  return isAtLimit ? (
+    <p className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+      {text}
+    </p>
+  ) : null;
 }
 
 function searchParamValue(value: string | string[] | undefined) {
@@ -232,6 +243,25 @@ function RoleCheckboxGrid({
   );
 }
 
+function PublishIssuesCard({ issues }: { issues: string[] }) {
+  if (issues.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+      <p className="text-sm font-semibold text-amber-900">
+        Bevor dein Profil sichtbar wird, ergänze noch:
+      </p>
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
+        {issues.map((issue) => (
+          <li key={issue}>{issue}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function MultiCheckboxGrid<T extends string>({
   name,
   selected,
@@ -280,7 +310,17 @@ export default async function DiscoveryProfilePage({
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const preferences = loadedPreferences ?? emptyPreferences();
   const publishIssues = getDiscoveryProfilePublishIssues(profile);
-  const canPublish = publishIssues.length === 0;
+  const selectedPriorityCount = Object.values(preferences.priorityWeights).filter(
+    (value) => typeof value === "number" && value > 0
+  ).length;
+  const ownRolesAtLimit =
+    (profile.ownRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.ownRoles;
+  const seekingRolesAtLimit =
+    (profile.seekingRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.seekingRoles;
+  const industriesAtLimit =
+    (profile.industries?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.industries;
+  const prioritiesAtLimit =
+    selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
 
   async function saveProfileDraft(formData: FormData) {
     "use server";
@@ -307,9 +347,9 @@ export default async function DiscoveryProfilePage({
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.16),transparent_34%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-10 text-slate-950 md:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <header className="flex flex-col gap-4 rounded-[2rem] border border-white/70 bg-white/78 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] backdrop-blur md:p-8">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
+        <header className="flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6">
           <Link href="/dashboard" className="text-sm font-medium text-slate-500 hover:text-slate-900">
             ← Zurück zum Dashboard
           </Link>
@@ -317,10 +357,10 @@ export default async function DiscoveryProfilePage({
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               Founder Discovery
             </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-4xl">
               Dein Co-Founder-Suchprofil
             </h1>
-            <p className="mt-4 text-base leading-7 text-slate-600">
+            <p className="mt-3 text-base leading-7 text-slate-600">
               Erstelle ein Profil für Menschen, die potenziell mit dir gründen könnten. Du
               entscheidest bewusst, wann es sichtbar wird.
             </p>
@@ -330,20 +370,23 @@ export default async function DiscoveryProfilePage({
         <StatusCard profile={profile} />
         <PageMessage message={pageMessage} issues={pageIssues} />
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
           <section className={CARD_CLASS}>
-            <div className="border-b border-slate-200 pb-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Öffentlich sichtbares Profil
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">Was andere später sehen</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Diese Angaben können nach Veröffentlichung für eingeloggte Cofoundery-Nutzer
-                sichtbar werden. Dein privates Cofoundery-Profil bleibt davon getrennt.
-              </p>
-            </div>
+            <form action={saveProfileDraft} className="grid gap-5">
+              <div className={INNER_SECTION_CLASS}>
+                <div className="border-b border-slate-200 pb-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Öffentliches Suchprofil
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                    Was andere sehen dürfen
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Diese Angaben werden erst sichtbar, wenn du dein Profil veröffentlichst.
+                  </p>
+                </div>
 
-            <form action={saveProfileDraft} className="mt-6 grid gap-6">
+                <div className="mt-5 grid gap-5">
               <div className="grid gap-4 md:grid-cols-2">
                 <label>
                   <span className={LABEL_CLASS}>Anzeigename</span>
@@ -383,14 +426,25 @@ export default async function DiscoveryProfilePage({
 
               <div>
                 <p className={LABEL_CLASS}>Eigene Rollen</p>
-                <p className={HELP_CLASS}>Was bringst du selbst am stärksten ein?</p>
+                <p className={HELP_CLASS}>
+                  Was bringst du selbst am stärksten ein? Maximal{" "}
+                  {DISCOVERY_SELECTION_LIMITS.ownRoles} Rollen.
+                </p>
                 <RoleCheckboxGrid name="ownRoles" selected={profile.ownRoles} />
+                {limitHint(ownRolesAtLimit, "Du hast die maximale Anzahl eigener Rollen erreicht.")}
               </div>
 
               <div>
                 <p className={LABEL_CLASS}>Gesuchte Rollen</p>
-                <p className={HELP_CLASS}>Welche Ergänzung suchst du bei einem Co-Founder?</p>
+                <p className={HELP_CLASS}>
+                  Welche Ergänzung suchst du bei einem Co-Founder? Maximal{" "}
+                  {DISCOVERY_SELECTION_LIMITS.seekingRoles} Rollen.
+                </p>
                 <RoleCheckboxGrid name="seekingRoles" selected={profile.seekingRoles} />
+                {limitHint(
+                  seekingRolesAtLimit,
+                  "Du hast die maximale Anzahl gesuchter Rollen erreicht."
+                )}
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -403,7 +457,14 @@ export default async function DiscoveryProfilePage({
                     className={FIELD_CLASS}
                     placeholder="z. B. Climate, B2B SaaS, Bildung"
                   />
-                  <p className={HELP_CLASS}>Mehrere Begriffe einfach mit Komma trennen.</p>
+                  <p className={HELP_CLASS}>
+                    Mehrere Begriffe einfach mit Komma trennen. Maximal{" "}
+                    {DISCOVERY_SELECTION_LIMITS.industries} Begriffe.
+                  </p>
+                  {limitHint(
+                    industriesAtLimit,
+                    "Du hast die maximale Anzahl an Branchen/Interessen erreicht."
+                  )}
                 </label>
                 <label>
                   <span className={LABEL_CLASS}>Standort</span>
@@ -446,10 +507,25 @@ export default async function DiscoveryProfilePage({
                   />
                 </label>
               </div>
+                </div>
+              </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className={INNER_SECTION_CLASS}>
+                <div className="border-b border-slate-200 pb-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Deine Gründungsrichtung
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                    Was du gerade suchst
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Hilf anderen einzuschätzen, ob Richtung, Tempo und Ambition gut zusammenpassen.
+                  </p>
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-3">
                 <label>
-                  <span className={LABEL_CLASS}>Commitment-Level</span>
+                  <span className={LABEL_CLASS}>Wie viel Raum hat Gründung gerade?</span>
                   <select
                     name="commitmentLevel"
                     defaultValue={profile.commitmentLevel}
@@ -463,7 +539,7 @@ export default async function DiscoveryProfilePage({
                   </select>
                 </label>
                 <label>
-                  <span className={LABEL_CLASS}>Venture Stage</span>
+                  <span className={LABEL_CLASS}>Wo stehst du gerade?</span>
                   <select
                     name="ventureStage"
                     defaultValue={profile.ventureStage}
@@ -476,18 +552,20 @@ export default async function DiscoveryProfilePage({
                     ))}
                   </select>
                 </label>
-              </div>
-
-              <label>
-                <span className={LABEL_CLASS}>Venture Goal</span>
-                <select name="ventureGoal" defaultValue={profile.ventureGoal} className={FIELD_CLASS}>
+                <label>
+                  <span className={LABEL_CLASS}>Was möchtest du aufbauen?</span>
+                  <select name="ventureGoal" defaultValue={profile.ventureGoal} className={FIELD_CLASS}>
                   {DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
-                </select>
-              </label>
+                  </select>
+                </label>
+                </div>
+              </div>
+
+              <PublishIssuesCard issues={publishIssues} />
 
               <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
                 <button type="submit" className={PRIMARY_BUTTON_CLASS}>
@@ -510,37 +588,29 @@ export default async function DiscoveryProfilePage({
                 </button>
               </form>
             </div>
-
-            {!canPublish ? (
-              <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                <p className="text-sm font-semibold text-amber-900">
-                  Noch nicht bereit zur Veröffentlichung
-                </p>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
-                  {publishIssues.map((issue) => (
-                    <li key={issue}>{issue}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </section>
 
-          <aside className="flex flex-col gap-6">
+          <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
             <section className={CARD_CLASS}>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 Vorschau
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                So wirkt dein Profil später
+                So sehen andere dein Profil
               </h2>
               <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <p className="text-sm font-semibold text-slate-950">
-                  {formatText(profile.displayName)}
+                  {previewText(profile.displayName, "Dein Anzeigename")}
                 </p>
                 <p className="mt-2 text-xl font-semibold leading-7 text-slate-950">
-                  {formatText(profile.headline)}
+                  {previewText(profile.headline, "Eine kurze Headline über dich und deine Suche")}
                 </p>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{formatText(profile.bio)}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {previewText(
+                    profile.bio,
+                    "Beschreibe kurz, was du mitbringst und welche Art Zusammenarbeit du suchst."
+                  )}
+                </p>
                 <dl className="mt-5 grid gap-3 text-sm">
                   <div>
                     <dt className="font-semibold text-slate-900">Bringt mit</dt>
@@ -565,6 +635,30 @@ export default async function DiscoveryProfilePage({
                   </div>
                 </dl>
               </div>
+              <p className="mt-3 text-xs leading-5 text-slate-500">
+                Private Suchprioritäten werden hier nicht angezeigt.
+              </p>
+            </section>
+
+            <section className={CARD_CLASS}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Später
+              </p>
+              <h2 className="mt-2 text-xl font-semibold text-slate-950">
+                Cofoundery Check einbeziehen
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Später kannst du deine Arbeitsdynamik aus dem Cofoundery-Test einbeziehen. Daraus
+                entstehen keine öffentlichen Scores, sondern bessere Gesprächsimpulse und passendere
+                Vorschläge.
+              </p>
+              <button
+                type="button"
+                disabled
+                className="mt-4 inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500"
+              >
+                Kommt als nächster Schritt
+              </button>
             </section>
           </aside>
         </div>
@@ -575,20 +669,25 @@ export default async function DiscoveryProfilePage({
               Private Suchpräferenzen
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              Was ist dir bei einem Co-Founder besonders wichtig?
+              Was dir bei einem Co-Founder wichtig ist
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Diese Präferenzen sind privat. Sie werden nicht auf deinem Profil angezeigt und
-              dienen später nur dazu, Vorschläge sinnvoller zu sortieren.
+              Wähle maximal {DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero} Themen, die dir
+              wirklich wichtig sind. 1 bedeutet „leicht wichtig“, 5 bedeutet „sehr wichtig“.
+              Nicht ausgewählte Themen bleiben privat und zählen intern als 0.
             </p>
+            {limitHint(
+              prioritiesAtLimit,
+              `Du hast ${DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero} Prioritäten mit Gewichtung gesetzt.`
+            )}
           </div>
 
-          <form action={savePreferences} className="mt-6 grid gap-8">
-            <div className="grid gap-4 md:grid-cols-2">
+          <form action={savePreferences} className="mt-6 grid gap-6">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {DISCOVERY_PRIORITY_OPTIONS.map((option) => (
                 <label
                   key={option.value}
-                  className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4"
+                  className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3"
                 >
                   <span className="text-sm font-semibold text-slate-950">{option.label}</span>
                   <span className="mt-1 block text-xs leading-5 text-slate-500">
@@ -601,18 +700,21 @@ export default async function DiscoveryProfilePage({
                     max={5}
                     step={1}
                     defaultValue={preferences.priorityWeights[option.value] ?? 0}
-                    className="mt-4 w-full accent-slate-950"
+                    className="mt-3 w-full accent-[color:var(--brand-primary)]"
                   />
-                  <span className="mt-1 block text-xs text-slate-500">0 = egal, 5 = sehr wichtig</span>
+                  <span className="mt-1 block text-xs text-slate-500">
+                    0 = nicht priorisiert · 5 = sehr wichtig
+                  </span>
                 </label>
               ))}
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-5">
-              <h3 className="text-lg font-semibold text-slate-950">Must-haves</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Halte das ruhig grob. Diese Angaben sind als spätere Filter vorbereitet, nicht als
-                starre Bewertung von Menschen.
+            <details className="rounded-3xl border border-slate-200 bg-white p-5">
+              <summary className="cursor-pointer text-lg font-semibold text-slate-950">
+                Erweiterte Filter
+              </summary>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                Nutze harte Kriterien sparsam. Zu viele Must-haves können gute Gespräche verhindern.
               </p>
 
               <div className="mt-5 grid gap-5">
@@ -673,7 +775,7 @@ export default async function DiscoveryProfilePage({
                   </div>
                 </div>
               </div>
-            </div>
+            </details>
 
             <div>
               <button type="submit" className={PRIMARY_BUTTON_CLASS}>

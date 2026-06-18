@@ -18,7 +18,10 @@ import {
   type DiscoveryVentureGoal,
   type DiscoveryVentureStage,
 } from "@/features/discovery/discoveryTypes";
-import { DISCOVERY_TEXT_LIMITS } from "@/features/discovery/discoveryConfig";
+import {
+  DISCOVERY_SELECTION_LIMITS,
+  DISCOVERY_TEXT_LIMITS,
+} from "@/features/discovery/discoveryConfig";
 
 const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   minimumAvailabilityHoursPerWeek: null,
@@ -104,6 +107,7 @@ export function normalizePriorityWeights(value: unknown): DiscoveryPriorityWeigh
   }
 
   const weights: DiscoveryPriorityWeights = {};
+  let selectedCount = 0;
   for (const key of DISCOVERY_PRIORITY_KEYS) {
     const rawValue = value[key];
     if (rawValue == null || rawValue === "") {
@@ -115,7 +119,16 @@ export function normalizePriorityWeights(value: unknown): DiscoveryPriorityWeigh
       continue;
     }
 
-    weights[key] = Math.min(5, Math.max(0, Math.round(numeric)));
+    const normalizedValue = Math.min(5, Math.max(0, Math.round(numeric)));
+    if (normalizedValue <= 0) {
+      continue;
+    }
+    if (selectedCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero) {
+      continue;
+    }
+
+    weights[key] = normalizedValue;
+    selectedCount += 1;
   }
 
   return weights;
@@ -162,12 +175,15 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
     displayName: normalizeText(input.displayName, DISCOVERY_TEXT_LIMITS.displayName),
     headline: normalizeText(input.headline, DISCOVERY_TEXT_LIMITS.headline),
     bio: normalizeText(input.bio, DISCOVERY_TEXT_LIMITS.bio),
-    ownRoles: normalizeAllowedArray<DiscoveryFounderRole>(input.ownRoles, DISCOVERY_FOUNDER_ROLES),
+    ownRoles: normalizeAllowedArray<DiscoveryFounderRole>(
+      input.ownRoles,
+      DISCOVERY_FOUNDER_ROLES
+    ).slice(0, DISCOVERY_SELECTION_LIMITS.ownRoles),
     seekingRoles: normalizeAllowedArray<DiscoveryFounderRole>(
       input.seekingRoles,
       DISCOVERY_FOUNDER_ROLES
-    ),
-    industries: normalizeStringArray(input.industries),
+    ).slice(0, DISCOVERY_SELECTION_LIMITS.seekingRoles),
+    industries: normalizeStringArray(input.industries).slice(0, DISCOVERY_SELECTION_LIMITS.industries),
     locationLabel: normalizeText(input.locationLabel, DISCOVERY_TEXT_LIMITS.locationLabel) || null,
     remoteMode: normalizeRemoteMode(input.remoteMode),
     availabilityHoursPerWeek: normalizeAvailabilityHours(input.availabilityHoursPerWeek),
