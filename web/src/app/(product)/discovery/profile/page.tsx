@@ -71,7 +71,10 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
   };
 }
 
-function emptyPreferences(): Pick<FounderSearchPreferences, "priorityWeights" | "mustHaves"> {
+function emptyPreferences(): Pick<
+  FounderSearchPreferences,
+  "priorityWeights" | "mustHaves" | "includeAssessmentSignals" | "assessmentSignalsConsentedAt"
+> {
   return {
     priorityWeights: {},
     mustHaves: {
@@ -83,6 +86,8 @@ function emptyPreferences(): Pick<FounderSearchPreferences, "priorityWeights" | 
       acceptedVentureStages: [],
       acceptedVentureGoals: [],
     },
+    includeAssessmentSignals: false,
+    assessmentSignalsConsentedAt: null,
   };
 }
 
@@ -640,26 +645,6 @@ export default async function DiscoveryProfilePage({
               </p>
             </section>
 
-            <section className={CARD_CLASS}>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Später
-              </p>
-              <h2 className="mt-2 text-xl font-semibold text-slate-950">
-                Cofoundery Check einbeziehen
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Später kannst du deine Arbeitsdynamik aus dem Cofoundery-Test einbeziehen. Daraus
-                entstehen keine öffentlichen Scores, sondern bessere Gesprächsimpulse und passendere
-                Vorschläge.
-              </p>
-              <button
-                type="button"
-                disabled
-                className="mt-4 inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500"
-              >
-                Kommt als nächster Schritt
-              </button>
-            </section>
           </aside>
         </div>
 
@@ -708,6 +693,52 @@ export default async function DiscoveryProfilePage({
                 </label>
               ))}
             </div>
+
+            <section className="rounded-3xl border border-slate-200 bg-slate-50/70 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Private Einstellung
+              </p>
+              <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                Cofoundery Check einbeziehen
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Wenn du möchtest, nutzen wir deine Cofoundery-Assessment-Ergebnisse später, um
+                bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten, Scores und
+                private Auswertungen werden nicht auf deinem Profil angezeigt.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Die Auswertung wird in einem nächsten Schritt angebunden.
+              </p>
+              <label className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <input
+                  type="checkbox"
+                  name="includeAssessmentSignals"
+                  value="true"
+                  defaultChecked={preferences.includeAssessmentSignals}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-950"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-slate-950">
+                    Für bessere Vorschläge einbeziehen
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-500">
+                    Diese Einstellung ist privat und erscheint nicht auf deinem öffentlichen
+                    Discovery-Profil.
+                  </span>
+                </span>
+              </label>
+              <p
+                className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${
+                  preferences.includeAssessmentSignals
+                    ? "bg-emerald-50 text-emerald-900"
+                    : "bg-slate-100 text-slate-600"
+                }`}
+              >
+                {preferences.includeAssessmentSignals
+                  ? "Aktiviert: Dein Cofoundery Check kann später privat für bessere Gesprächsimpulse genutzt werden."
+                  : "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt."}
+              </p>
+            </section>
 
             <details className="rounded-3xl border border-slate-200 bg-white p-5">
               <summary className="cursor-pointer text-lg font-semibold text-slate-950">

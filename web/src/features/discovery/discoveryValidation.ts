@@ -198,6 +198,11 @@ export function normalizeDiscoveryPreferencesInput(input: DiscoveryPreferencesIn
   return {
     priorityWeights: normalizePriorityWeights(input.priorityWeights),
     mustHaves: normalizeMustHaves(input.mustHaves),
+    includeAssessmentSignals:
+      input.includeAssessmentSignals === true ||
+      input.includeAssessmentSignals === "true" ||
+      input.includeAssessmentSignals === "on" ||
+      input.includeAssessmentSignals === "1",
   };
 }
 

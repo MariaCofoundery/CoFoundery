@@ -59,6 +59,8 @@ function createPreferences(
       ...DEFAULT_MUST_HAVES,
       ...(overrides.mustHaves ?? {}),
     },
+    includeAssessmentSignals: false,
+    assessmentSignalsConsentedAt: null,
     createdAt: "2026-06-18T09:00:00.000Z",
     updatedAt: "2026-06-18T10:00:00.000Z",
   };

@@ -101,6 +101,8 @@ export type FounderSearchPreferences = {
   userId: string;
   priorityWeights: DiscoveryPriorityWeights;
   mustHaves: DiscoveryMustHaves;
+  includeAssessmentSignals: boolean;
+  assessmentSignalsConsentedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -125,6 +127,7 @@ export type DiscoveryProfileInput = Partial<{
 export type DiscoveryPreferencesInput = Partial<{
   priorityWeights: unknown;
   mustHaves: unknown;
+  includeAssessmentSignals: unknown;
 }>;
 
 export type DiscoveryProfilePreview = Pick<

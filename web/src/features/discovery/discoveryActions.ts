@@ -184,6 +184,10 @@ function parseDiscoveryPreferencesFormData(formData: FormData): DiscoveryPrefere
   return {
     priorityWeights: parsePriorityWeightsFormData(formData),
     mustHaves: parseMustHavesFormData(formData),
+    includeAssessmentSignals: getFirstString(formData, [
+      "includeAssessmentSignals",
+      "include_assessment_signals",
+    ]),
   };
 }
 

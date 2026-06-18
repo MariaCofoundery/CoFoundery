@@ -11,6 +11,7 @@ import {
 import {
   buildDiscoveryCandidateRecommendations,
 } from "@/features/discovery/discoveryRecommendation";
+import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
   DiscoveryCandidate,
   DiscoveryCommitmentLevel,
@@ -88,6 +89,8 @@ type FounderSearchPreferencesRow = {
   user_id: string;
   priority_weights: unknown;
   must_haves: unknown;
+  include_assessment_signals: boolean;
+  assessment_signals_consented_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -118,6 +121,8 @@ const DISCOVERY_PREFERENCES_COLUMNS = [
   "user_id",
   "priority_weights",
   "must_haves",
+  "include_assessment_signals",
+  "assessment_signals_consented_at",
   "created_at",
   "updated_at",
 ].join(", ");
@@ -182,6 +187,8 @@ function mapPreferencesRow(row: FounderSearchPreferencesRow): FounderSearchPrefe
     userId: row.user_id,
     priorityWeights: normalizePriorityWeights(row.priority_weights) as DiscoveryPriorityWeights,
     mustHaves: normalizeMustHaves(row.must_haves) as DiscoveryMustHaves,
+    includeAssessmentSignals: row.include_assessment_signals === true,
+    assessmentSignalsConsentedAt: row.assessment_signals_consented_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -299,12 +306,20 @@ export async function upsertOwnSearchPreferences(
   const normalizedUserId = assertUserId(userId);
   const normalized = normalizeDiscoveryPreferencesInput(input);
   const supabase = await resolveClient(client);
+  const existing = await getOwnSearchPreferences(normalizedUserId, supabase);
+  const consentState = resolveDiscoveryAssessmentConsentState({
+    includeAssessmentSignals: normalized.includeAssessmentSignals === true,
+    existingConsentedAt: existing?.assessmentSignalsConsentedAt ?? null,
+    now: new Date().toISOString(),
+  });
   const { data, error } = await getPreferencesTable(supabase)
     .upsert(
       {
         user_id: normalizedUserId,
         priority_weights: normalized.priorityWeights,
         must_haves: normalized.mustHaves,
+        include_assessment_signals: consentState.includeAssessmentSignals,
+        assessment_signals_consented_at: consentState.assessmentSignalsConsentedAt,
       },
       { onConflict: "user_id" }
     )
