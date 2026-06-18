@@ -1,8 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  resolveDiscoveryAssessmentSignalAvailability,
   resolveOwnDiscoveryAssessmentSignalReadiness,
 } from "@/features/discovery/discoveryAssessmentSignalsCore";
+
+const READY = {
+  includeAssessmentSignals: true,
+  hasSubmittedBaseAssessment: true,
+  isAssessmentSignalReady: true,
+};
+
+const NOT_READY = {
+  includeAssessmentSignals: true,
+  hasSubmittedBaseAssessment: false,
+  isAssessmentSignalReady: false,
+};
 
 test("marks assessment signals as not ready when consent is inactive even with base assessment", () => {
   assert.deepEqual(
@@ -63,5 +76,61 @@ test("treats missing assessment status as not ready", () => {
       hasSubmittedBaseAssessment: false,
     }).isAssessmentSignalReady,
     false
+  );
+});
+
+test("marks bilateral availability as false when owner is not ready and candidate is ready", () => {
+  assert.deepEqual(
+    resolveDiscoveryAssessmentSignalAvailability({
+      ownerReadiness: NOT_READY,
+      candidateReadiness: READY,
+    }),
+    {
+      ownerReady: false,
+      candidateReady: true,
+      bothReady: false,
+    }
+  );
+});
+
+test("marks bilateral availability as false when owner is ready and candidate is not ready", () => {
+  assert.deepEqual(
+    resolveDiscoveryAssessmentSignalAvailability({
+      ownerReadiness: READY,
+      candidateReadiness: NOT_READY,
+    }),
+    {
+      ownerReady: true,
+      candidateReady: false,
+      bothReady: false,
+    }
+  );
+});
+
+test("marks bilateral availability as true only when owner and candidate are ready", () => {
+  assert.deepEqual(
+    resolveDiscoveryAssessmentSignalAvailability({
+      ownerReadiness: READY,
+      candidateReadiness: READY,
+    }),
+    {
+      ownerReady: true,
+      candidateReady: true,
+      bothReady: true,
+    }
+  );
+});
+
+test("marks bilateral availability as false when candidate readiness is missing", () => {
+  assert.deepEqual(
+    resolveDiscoveryAssessmentSignalAvailability({
+      ownerReadiness: READY,
+      candidateReadiness: null,
+    }),
+    {
+      ownerReady: true,
+      candidateReady: false,
+      bothReady: false,
+    }
   );
 });
