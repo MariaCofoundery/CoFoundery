@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildDiscoveryAssessmentSignalAvailabilityMap,
+  normalizeDiscoveryAssessmentSignalCandidateUserIds,
   resolveDiscoveryAssessmentSignalAvailability,
   resolveOwnDiscoveryAssessmentSignalReadiness,
 } from "@/features/discovery/discoveryAssessmentSignalsCore";
@@ -133,4 +135,79 @@ test("marks bilateral availability as false when candidate readiness is missing"
       bothReady: false,
     }
   );
+});
+
+test("normalizes candidate user ids by removing owner, blanks, duplicates and limiting results", () => {
+  assert.deepEqual(
+    normalizeDiscoveryAssessmentSignalCandidateUserIds({
+      ownerUserId: "owner",
+      candidateUserIds: ["", "candidate-a", "owner", "candidate-a", " candidate-b ", "candidate-c"],
+      limit: 2,
+    }),
+    ["candidate-a", "candidate-b"]
+  );
+});
+
+test("builds an empty bilateral availability map for empty candidate ids", () => {
+  const availability = buildDiscoveryAssessmentSignalAvailabilityMap({
+    ownerReadiness: READY,
+    candidateUserIds: [],
+    candidateReadiness: [],
+  });
+
+  assert.equal(availability.size, 0);
+});
+
+test("fails closed when candidate readiness data is unavailable", () => {
+  const availability = buildDiscoveryAssessmentSignalAvailabilityMap({
+    ownerReadiness: READY,
+    candidateUserIds: ["candidate-a"],
+    candidateReadiness: [],
+  });
+
+  assert.deepEqual(availability.get("candidate-a"), {
+    ownerReady: true,
+    candidateReady: false,
+    bothReady: false,
+  });
+});
+
+test("marks candidate as not ready without consent even when submitted base exists", () => {
+  const availability = buildDiscoveryAssessmentSignalAvailabilityMap({
+    ownerReadiness: READY,
+    candidateUserIds: ["candidate-a"],
+    candidateReadiness: [
+      {
+        userId: "candidate-a",
+        includeAssessmentSignals: false,
+        hasSubmittedBaseAssessment: true,
+      },
+    ],
+  });
+
+  assert.deepEqual(availability.get("candidate-a"), {
+    ownerReady: true,
+    candidateReady: false,
+    bothReady: false,
+  });
+});
+
+test("marks candidate as not ready without submitted base assessment even when consent exists", () => {
+  const availability = buildDiscoveryAssessmentSignalAvailabilityMap({
+    ownerReadiness: READY,
+    candidateUserIds: ["candidate-a"],
+    candidateReadiness: [
+      {
+        userId: "candidate-a",
+        includeAssessmentSignals: true,
+        hasSubmittedBaseAssessment: false,
+      },
+    ],
+  });
+
+  assert.deepEqual(availability.get("candidate-a"), {
+    ownerReady: true,
+    candidateReady: false,
+    bothReady: false,
+  });
 });
