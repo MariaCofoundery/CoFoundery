@@ -23,6 +23,10 @@ import {
   getOwnDiscoveryProfile,
   getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
+import {
+  getOwnDiscoveryAssessmentSignalReadiness,
+  type OwnDiscoveryAssessmentSignalReadiness,
+} from "@/features/discovery/discoveryAssessmentSignals";
 import { getDiscoveryProfilePublishIssues } from "@/features/discovery/discoveryValidation";
 import type {
   DiscoveryCommitmentLevel,
@@ -291,6 +295,30 @@ function MultiCheckboxGrid<T extends string>({
   );
 }
 
+function assessmentSignalStatusCopy(readiness: OwnDiscoveryAssessmentSignalReadiness) {
+  if (!readiness.includeAssessmentSignals) {
+    return "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt.";
+  }
+
+  if (!readiness.hasSubmittedBaseAssessment) {
+    return "Aktiviert, aber noch nicht bereit: Fülle zuerst den Cofoundery Check aus, damit wir ihn später für bessere Gesprächsimpulse nutzen können.";
+  }
+
+  return "Bereit: Dein Cofoundery Check kann in einem nächsten Schritt privat für bessere Gesprächsimpulse genutzt werden.";
+}
+
+function assessmentSignalStatusClass(readiness: OwnDiscoveryAssessmentSignalReadiness) {
+  if (readiness.isAssessmentSignalReady) {
+    return "bg-emerald-50 text-emerald-900";
+  }
+
+  if (readiness.includeAssessmentSignals) {
+    return "bg-amber-50 text-amber-900";
+  }
+
+  return "bg-slate-100 text-slate-600";
+}
+
 export default async function DiscoveryProfilePage({
   searchParams,
 }: {
@@ -305,9 +333,10 @@ export default async function DiscoveryProfilePage({
     redirect(`/login?next=${encodeURIComponent("/discovery/profile")}`);
   }
 
-  const [loadedProfile, loadedPreferences] = await Promise.all([
+  const [loadedProfile, loadedPreferences, assessmentSignalReadiness] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
     getOwnSearchPreferences(user.id),
+    getOwnDiscoveryAssessmentSignalReadiness(user.id),
   ]);
   const params = await searchParams;
   const pageMessage = searchParamValue(params.message) ?? null;
@@ -728,15 +757,11 @@ export default async function DiscoveryProfilePage({
                 </span>
               </label>
               <p
-                className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${
-                  preferences.includeAssessmentSignals
-                    ? "bg-emerald-50 text-emerald-900"
-                    : "bg-slate-100 text-slate-600"
-                }`}
+                className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${assessmentSignalStatusClass(
+                  assessmentSignalReadiness
+                )}`}
               >
-                {preferences.includeAssessmentSignals
-                  ? "Aktiviert: Dein Cofoundery Check kann später privat für bessere Gesprächsimpulse genutzt werden."
-                  : "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt."}
+                {assessmentSignalStatusCopy(assessmentSignalReadiness)}
               </p>
             </section>
 
