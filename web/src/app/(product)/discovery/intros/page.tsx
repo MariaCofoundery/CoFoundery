@@ -6,6 +6,7 @@ import {
 } from "@/features/discovery/discoveryConfig";
 import {
   cancelDiscoveryIntroAction,
+  type DiscoveryIntroActionState,
   respondDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import {
@@ -15,7 +16,6 @@ import {
 import {
   canCancelDiscoveryIntro,
   canRespondToDiscoveryIntro,
-  DISCOVERY_INTRO_STATUS_LABELS,
   type DiscoveryIntroRequestWithProfile,
 } from "@/features/discovery/discoveryIntroTypes";
 import type { DiscoveryFounderRole, DiscoveryProfilePreview } from "@/features/discovery/discoveryTypes";
@@ -31,6 +31,47 @@ const DANGER_LIGHT_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50";
 const TEXTAREA_CLASS =
   "mt-2 min-h-24 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
+
+type DiscoveryIntrosSearchParams = {
+  introMessage?: string | string[];
+  introOk?: string | string[];
+};
+
+const INTRO_STATUS_PILL_LABELS = {
+  pending: "Offen",
+  accepted: "Angenommen",
+  declined: "Nicht angenommen",
+  canceled: "Zurückgezogen",
+} as const;
+
+function searchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function introsResultUrl(result: DiscoveryIntroActionState) {
+  const params = new URLSearchParams();
+  params.set("introMessage", result.message ?? "Die Intro-Aktion wurde verarbeitet.");
+  params.set("introOk", result.ok ? "1" : "0");
+  return `/discovery/intros?${params.toString()}`;
+}
+
+function IntroPageMessage({ message, ok }: { message: string | null; ok: boolean }) {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`rounded-3xl border p-4 ${
+        ok ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <p className={`text-sm font-semibold ${ok ? "text-emerald-900" : "text-amber-900"}`}>
+        {message}
+      </p>
+    </section>
+  );
+}
 
 function formatRoleList(values: DiscoveryFounderRole[]) {
   return values.length > 0
@@ -85,7 +126,7 @@ function StatusPill({ request }: { request: DiscoveryIntroRequestWithProfile }) 
 
   return (
     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}>
-      {DISCOVERY_INTRO_STATUS_LABELS[request.status]}
+      {INTRO_STATUS_PILL_LABELS[request.status]}
     </span>
   );
 }
@@ -112,12 +153,14 @@ function RequestMessage({
 function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile }) {
   async function acceptIntro(formData: FormData) {
     "use server";
-    await respondDiscoveryIntroAction(request.id, "accepted", formData);
+    const result = await respondDiscoveryIntroAction(request.id, "accepted", formData);
+    redirect(introsResultUrl(result));
   }
 
   async function declineIntro(formData: FormData) {
     "use server";
-    await respondDiscoveryIntroAction(request.id, "declined", formData);
+    const result = await respondDiscoveryIntroAction(request.id, "declined", formData);
+    redirect(introsResultUrl(result));
   }
 
   return (
@@ -180,7 +223,8 @@ function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProf
 function SentIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile }) {
   async function cancelIntro() {
     "use server";
-    await cancelDiscoveryIntroAction(request.id);
+    const result = await cancelDiscoveryIntroAction(request.id);
+    redirect(introsResultUrl(result));
   }
 
   return (
@@ -219,7 +263,12 @@ function sortIntroRequests(requests: DiscoveryIntroRequestWithProfile[]) {
   });
 }
 
-export default async function DiscoveryIntrosPage() {
+export default async function DiscoveryIntrosPage({
+  searchParams,
+}: {
+  searchParams?: Promise<DiscoveryIntrosSearchParams>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const supabase = await createClient();
   const {
     data: { user },
@@ -236,6 +285,8 @@ export default async function DiscoveryIntrosPage() {
 
   const sortedReceived = sortIntroRequests(received);
   const sortedSent = sortIntroRequests(sent);
+  const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
+  const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -251,10 +302,13 @@ export default async function DiscoveryIntrosPage() {
             Meine Intros
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            Hier siehst du eingegangene und gesendete Intro-Anfragen. Ein angenommenes Intro
-            erzeugt noch keine Relationship, keine Invitation und kein Workbook.
+            Hier siehst du, wer dich kennenlernen möchte und welche Intros du angefragt hast.
+            Ein angenommenes Intro erzeugt noch keine Relationship, keine Invitation und kein
+            Workbook.
           </p>
         </header>
+
+        <IntroPageMessage message={introMessage} ok={introOk} />
 
         <section className={CARD_CLASS}>
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -275,7 +329,8 @@ export default async function DiscoveryIntrosPage() {
             </div>
           ) : (
             <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              Noch keine eingegangenen Intro-Anfragen.
+              Noch keine eingegangenen Intro-Anfragen. Sobald jemand dein Profil spannend findet,
+              erscheint die Anfrage hier.
             </p>
           )}
         </section>
@@ -295,7 +350,8 @@ export default async function DiscoveryIntrosPage() {
             </div>
           ) : (
             <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              Du hast noch keine Intros angefragt.
+              Du hast noch keine Intros angefragt. Wenn ein Profil spannend wirkt, kannst du über
+              die Profilseite ein erstes Interesse signalisieren.
             </p>
           )}
         </section>

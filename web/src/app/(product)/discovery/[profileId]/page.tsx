@@ -10,6 +10,7 @@ import {
 import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
 import {
   cancelDiscoveryIntroAction,
+  type DiscoveryIntroActionState,
   requestDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
@@ -36,6 +37,11 @@ type DiscoveryProfileDetailPageParams = {
   profileId: string;
 };
 
+type DiscoveryProfileDetailSearchParams = {
+  introMessage?: string | string[];
+  introOk?: string | string[];
+};
+
 function formatRoleList(values: DiscoveryFounderRole[]) {
   return values.length > 0
     ? values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ")
@@ -57,6 +63,35 @@ function DetailItem({ label, value }: { label: string; value: string }) {
       <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</dt>
       <dd className="mt-2 text-sm font-medium leading-6 text-slate-900">{value}</dd>
     </div>
+  );
+}
+
+function searchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function introResultUrl(profileId: string, result: DiscoveryIntroActionState) {
+  const params = new URLSearchParams();
+  params.set("introMessage", result.message ?? "Die Intro-Aktion wurde verarbeitet.");
+  params.set("introOk", result.ok ? "1" : "0");
+  return `/discovery/${profileId}?${params.toString()}`;
+}
+
+function IntroPageMessage({ message, ok }: { message: string | null; ok: boolean }) {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`rounded-3xl border p-4 ${
+        ok ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <p className={`text-sm font-semibold ${ok ? "text-emerald-900" : "text-amber-900"}`}>
+        {message}
+      </p>
+    </section>
   );
 }
 
@@ -115,7 +150,8 @@ function IntroRequestCard({
 }) {
   async function requestIntro(formData: FormData) {
     "use server";
-    await requestDiscoveryIntroAction(profile.id, formData);
+    const result = await requestDiscoveryIntroAction(profile.id, formData);
+    redirect(introResultUrl(profile.id, result));
   }
 
   if (!introRequest) {
@@ -161,10 +197,10 @@ function IntroRequestCard({
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
           {DISCOVERY_INTRO_STATUS_LABELS.accepted}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Beidseitiges Interesse</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro angenommen</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Ihr habt beide Interesse signalisiert. Als nächster Schritt könnt ihr ein erstes Gespräch
-          führen oder ein gemeinsames Cofoundery-Matching starten.
+          Ihr habt beide Interesse signalisiert. Als nächstes könnt ihr ein erstes Gespräch
+          führen oder später ein gemeinsames Cofoundery-Matching starten.
         </p>
         {introRequest.responseMessage ? (
           <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
@@ -189,7 +225,9 @@ function IntroRequestCard({
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
           {DISCOVERY_INTRO_STATUS_LABELS.declined}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Aktuell kein Intro</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          Intro aktuell nicht angenommen
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           Diese Person möchte das Intro aktuell nicht weiterverfolgen.
         </p>
@@ -215,8 +253,7 @@ function IntroRequestCard({
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">Anfrage zurückgezogen</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Du hast diese Intro-Anfrage zurückgezogen. Wenn das Profil später wieder spannend wirkt,
-          kannst du eine neue Anfrage stellen.
+          Du hast diese Intro-Anfrage zurückgezogen.
         </p>
         <div className="mt-5">
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
@@ -234,7 +271,7 @@ function IntroRequestCard({
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro angefragt</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Die Anfrage wartet auf Antwort.
+        Deine Anfrage wartet auf Antwort.
       </p>
       {introRequest.message ? (
         <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
@@ -246,7 +283,8 @@ function IntroRequestCard({
           <form
             action={async () => {
               "use server";
-              await cancelDiscoveryIntroAction(introRequest.id);
+              const result = await cancelDiscoveryIntroAction(introRequest.id);
+              redirect(introResultUrl(profile.id, result));
             }}
           >
             <button type="submit" className={SECONDARY_CTA_CLASS}>
@@ -264,10 +302,13 @@ function IntroRequestCard({
 
 export default async function DiscoveryProfileDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<DiscoveryProfileDetailPageParams>;
+  searchParams?: Promise<DiscoveryProfileDetailSearchParams>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const profileId = resolvedParams.profileId;
   const supabase = await createClient();
   const {
@@ -287,6 +328,8 @@ export default async function DiscoveryProfileDetailPage({
   const introRequest = isOwner
     ? null
     : await getDiscoveryIntroRequestForProfile(user.id, profile.id);
+  const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
+  const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -318,6 +361,8 @@ export default async function DiscoveryProfileDetailPage({
             )}
           </div>
         </header>
+
+        <IntroPageMessage message={introMessage} ok={introOk} />
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">

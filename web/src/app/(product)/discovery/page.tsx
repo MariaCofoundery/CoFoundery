@@ -299,7 +299,7 @@ export default async function DiscoveryPage() {
                 {statusView.cta}
               </Link>
               <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                Meine Intros
+                Offene Anfragen ansehen
               </Link>
             </div>
           </div>
@@ -329,7 +329,7 @@ export default async function DiscoveryPage() {
                 {statusView.cta}
               </Link>
               <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                Meine Intros
+                Offene Anfragen ansehen
               </Link>
             </div>
           </div>

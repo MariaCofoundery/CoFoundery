@@ -71,7 +71,7 @@ function responseErrorMessage(error: unknown) {
   }
 
   if (error.message === "discovery_intro_not_pending") {
-    return "Diese Intro-Anfrage wurde bereits beantwortet oder zurückgezogen.";
+    return "Diese Anfrage ist nicht mehr offen.";
   }
   if (error.message === "discovery_intro_response_forbidden") {
     return "Du kannst diese Intro-Anfrage nicht beantworten.";
@@ -86,7 +86,7 @@ function cancelErrorMessage(error: unknown) {
   }
 
   if (error.message === "discovery_intro_not_pending") {
-    return "Diese Intro-Anfrage wurde bereits beantwortet oder zurückgezogen.";
+    return "Diese Anfrage ist nicht mehr offen.";
   }
   if (error.message === "discovery_intro_cancel_forbidden") {
     return "Du kannst diese Intro-Anfrage nicht zurückziehen.";
@@ -114,7 +114,7 @@ export async function requestDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths(profileId);
     return {
       ok: true,
-      message: "Deine Intro-Anfrage wurde gesendet.",
+      message: "Intro-Anfrage gesendet.",
     };
   } catch (error) {
     return {
@@ -151,10 +151,7 @@ export async function respondDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths();
     return {
       ok: true,
-      message:
-        response === "accepted"
-          ? "Du hast das Intro angenommen."
-          : "Du hast das Intro abgelehnt.",
+      message: response === "accepted" ? "Intro angenommen." : "Intro abgelehnt.",
     };
   } catch (error) {
     return {
@@ -181,7 +178,7 @@ export async function cancelDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths();
     return {
       ok: true,
-      message: "Du hast die Intro-Anfrage zurückgezogen.",
+      message: "Anfrage zurückgezogen.",
     };
   } catch (error) {
     return {
