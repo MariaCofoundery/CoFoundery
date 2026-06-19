@@ -18,6 +18,9 @@ import type {
   DiscoveryFounderRole,
   DiscoveryProfilePreview,
 } from "@/features/discovery/discoveryTypes";
+import { createMatchingSessionFromDiscoveryStartAction } from "@/features/matchingCore/matchingCoreActions";
+import { getMatchingSessionForDiscoveryStart } from "@/features/matchingCore/matchingCoreData";
+import type { MatchingSessionSummary } from "@/features/matchingCore/matchingCoreTypes";
 import { createClient } from "@/lib/supabase/server";
 
 const CARD_CLASS =
@@ -109,6 +112,77 @@ function ProfileCard({
   );
 }
 
+function MatchingSessionReadinessCard({
+  summary,
+  currentUserId,
+}: {
+  summary: MatchingSessionSummary;
+  currentUserId: string;
+}) {
+  const currentUserReadiness = summary.participants.find(
+    (participant) => participant.userId === currentUserId
+  );
+  const currentUserBaseMissing = currentUserReadiness?.baseInputStatus === "missing";
+  const isReadyForReport = summary.session.status === "ready_for_report";
+
+  return (
+    <>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+        Matching-Core
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+        Matching-Session vorbereitet
+      </h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+        Cofoundery hat einen gemeinsamen Matching-Kontext angelegt und geprüft, ob eure
+        Basis-Antworten schon vorhanden sind. Es wurde kein Report, keine Relationship und kein
+        Workbook erstellt.
+      </p>
+      <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
+        Status: {isReadyForReport ? "Bereit für Report" : "Wartet auf Antworten"}
+      </div>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {summary.participants.map((participant) => (
+          <article key={participant.userId} className="rounded-3xl border border-slate-200 bg-white p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              {participant.userId === currentUserId ? "Du" : "Gegenüber"}
+            </p>
+            <h3 className="mt-2 text-lg font-semibold text-slate-950">
+              {participant.profile?.displayName ?? "Discovery-Profil nicht sichtbar"}
+            </h3>
+            {participant.profile?.headline ? (
+              <p className="mt-1 text-sm leading-6 text-slate-600">{participant.profile.headline}</p>
+            ) : null}
+            <p
+              className={`mt-4 rounded-full px-3 py-2 text-sm font-semibold ${
+                participant.baseInputStatus === "present"
+                  ? "bg-emerald-50 text-emerald-800"
+                  : "bg-amber-50 text-amber-800"
+              }`}
+            >
+              {participant.baseInputStatus === "present"
+                ? "Basis-Fragen vorhanden"
+                : "Basis-Fragen fehlen"}
+            </p>
+          </article>
+        ))}
+      </div>
+      <div className="mt-6 flex flex-wrap gap-3">
+        {currentUserBaseMissing ? (
+          <Link href="/me/base" className={PRIMARY_CTA_CLASS}>
+            Basis-Fragen ausfüllen
+          </Link>
+        ) : null}
+        {isReadyForReport ? (
+          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
+            Dynamik-Report vorbereiten - kommt als nächster Schritt
+          </button>
+        ) : null}
+      </div>
+    </>
+  );
+}
+
 function UnavailableState() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
@@ -158,10 +232,12 @@ function MatchingStartStatusContent({
   introRequestId,
   matchingStart,
   currentUserId,
+  matchingSession,
 }: {
   introRequestId: string;
   matchingStart: DiscoveryMatchingStart;
   currentUserId: string;
+  matchingSession: MatchingSessionSummary | null;
 }) {
   async function requestFullMatching() {
     "use server";
@@ -172,6 +248,12 @@ function MatchingStartStatusContent({
   async function confirmFullMatching() {
     "use server";
     const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
+    redirect(matchingPreparationResultUrl(introRequestId, result));
+  }
+
+  async function createMatchingSession() {
+    "use server";
+    const result = await createMatchingSessionFromDiscoveryStartAction(introRequestId, matchingStart.id);
     redirect(matchingPreparationResultUrl(introRequestId, result));
   }
 
@@ -192,6 +274,10 @@ function MatchingStartStatusContent({
   }
 
   if (matchingStart.status === "ready_for_matching") {
+    if (matchingSession) {
+      return <MatchingSessionReadinessCard summary={matchingSession} currentUserId={currentUserId} />;
+    }
+
     return (
       <>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
@@ -202,7 +288,8 @@ function MatchingStartStatusContent({
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
           Ihr habt beide bestätigt, dass ihr das vollständige Cofoundery-Matching starten
-          möchtet. Der eigentliche Matching-Prozess wird im nächsten Schritt angebunden.
+          möchtet. Als nächstes kann Cofoundery einen gemeinsamen Matching-Kontext anlegen und
+          prüfen, ob eure Basis-Antworten schon vorhanden sind.
         </p>
         <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
@@ -215,10 +302,17 @@ function MatchingStartStatusContent({
             Beide haben den gemeinsamen Matching-Start bestätigt
           </li>
         </ul>
-        <div className="mt-6">
-          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-            Vollständiges Matching starten - kommt als nächster Schritt
-          </button>
+        <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-600">
+          Cofoundery legt einen gemeinsamen Matching-Kontext an und prüft, ob eure Basis-Antworten
+          schon vorhanden sind. Es wird noch kein Report, keine Relationship und kein Workbook
+          erstellt.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <form action={createMatchingSession}>
+            <button type="submit" className={PRIMARY_CTA_CLASS}>
+              Matching-Session vorbereiten
+            </button>
+          </form>
         </div>
       </>
     );
@@ -343,6 +437,9 @@ export default async function DiscoveryIntroMatchingPreparationPage({
       ? preparation.recipientProfile
       : preparation.requesterProfile;
   const matchingStart = preparation.matchingStart;
+  const matchingSession = matchingStart
+    ? await getMatchingSessionForDiscoveryStart(matchingStart.id, user.id)
+    : null;
   const matchingMessage = searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
   const matchingOk = searchParamValue(resolvedSearchParams.matchingOk) !== "0";
 
@@ -413,6 +510,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               introRequestId={introRequestId}
               matchingStart={matchingStart}
               currentUserId={user.id}
+              matchingSession={matchingSession}
             />
           ) : (
             <>
