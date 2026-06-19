@@ -20,6 +20,9 @@ import type {
 } from "@/features/discovery/discoveryTypes";
 import { createMatchingSessionFromDiscoveryStartAction } from "@/features/matchingCore/matchingCoreActions";
 import { getMatchingSessionForDiscoveryStart } from "@/features/matchingCore/matchingCoreData";
+import { createMatchingReportRunFromSessionAction } from "@/features/matchingCore/matchingCoreReportActions";
+import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
+import type { MatchingReportRunSummary } from "@/features/matchingCore/matchingCoreReportTypes";
 import type { MatchingSessionSummary } from "@/features/matchingCore/matchingCoreTypes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -115,15 +118,18 @@ function ProfileCard({
 function MatchingSessionReadinessCard({
   summary,
   currentUserId,
+  reportRun,
 }: {
   summary: MatchingSessionSummary;
   currentUserId: string;
+  reportRun: MatchingReportRunSummary | null;
 }) {
   const currentUserReadiness = summary.participants.find(
     (participant) => participant.userId === currentUserId
   );
   const currentUserBaseMissing = currentUserReadiness?.baseInputStatus === "missing";
   const isReadyForReport = summary.session.status === "ready_for_report";
+  const isReportReady = summary.session.status === "report_ready" || Boolean(reportRun);
 
   return (
     <>
@@ -139,7 +145,12 @@ function MatchingSessionReadinessCard({
         Workbook erstellt.
       </p>
       <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
-        Status: {isReadyForReport ? "Bereit für Report" : "Wartet auf Antworten"}
+        Status:{" "}
+        {isReportReady
+          ? "Dynamik-Report erstellt"
+          : isReadyForReport
+            ? "Bereit für Report"
+            : "Wartet auf Antworten"}
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2">
         {summary.participants.map((participant) => (
@@ -173,10 +184,16 @@ function MatchingSessionReadinessCard({
             Basis-Fragen ausfüllen
           </Link>
         ) : null}
-        {isReadyForReport ? (
-          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-            Dynamik-Report vorbereiten - kommt als nächster Schritt
-          </button>
+        {isReportReady ? (
+          <Link href={`/matching/${summary.session.id}/report`} className={PRIMARY_CTA_CLASS}>
+            Dynamik-Report ansehen
+          </Link>
+        ) : null}
+        {isReadyForReport && !isReportReady ? (
+          <p className="w-full max-w-3xl text-sm leading-6 text-slate-600">
+            Beide Basis-Antworten sind vorhanden. Ihr könnt jetzt einen gemeinsamen Dynamik-Report
+            als unveränderlichen Snapshot erstellen.
+          </p>
         ) : null}
       </div>
     </>
@@ -233,11 +250,13 @@ function MatchingStartStatusContent({
   matchingStart,
   currentUserId,
   matchingSession,
+  reportRun,
 }: {
   introRequestId: string;
   matchingStart: DiscoveryMatchingStart;
   currentUserId: string;
   matchingSession: MatchingSessionSummary | null;
+  reportRun: MatchingReportRunSummary | null;
 }) {
   async function requestFullMatching() {
     "use server";
@@ -254,6 +273,24 @@ function MatchingStartStatusContent({
   async function createMatchingSession() {
     "use server";
     const result = await createMatchingSessionFromDiscoveryStartAction(introRequestId, matchingStart.id);
+    redirect(matchingPreparationResultUrl(introRequestId, result));
+  }
+
+  async function createMatchingReport() {
+    "use server";
+    if (!matchingSession) {
+      redirect(
+        matchingPreparationResultUrl(introRequestId, {
+          ok: false,
+          message: "Die Matching-Session ist aktuell nicht verfügbar.",
+        })
+      );
+    }
+
+    const result = await createMatchingReportRunFromSessionAction(matchingSession.session.id);
+    if (result.ok && result.reportHref) {
+      redirect(result.reportHref);
+    }
     redirect(matchingPreparationResultUrl(introRequestId, result));
   }
 
@@ -275,7 +312,24 @@ function MatchingStartStatusContent({
 
   if (matchingStart.status === "ready_for_matching") {
     if (matchingSession) {
-      return <MatchingSessionReadinessCard summary={matchingSession} currentUserId={currentUserId} />;
+      return (
+        <>
+          <MatchingSessionReadinessCard
+            summary={matchingSession}
+            currentUserId={currentUserId}
+            reportRun={reportRun}
+          />
+          {matchingSession.session.status === "ready_for_report" && !reportRun ? (
+            <div className="mt-6">
+              <form action={createMatchingReport}>
+                <button type="submit" className={PRIMARY_CTA_CLASS}>
+                  Dynamik-Report erstellen
+                </button>
+              </form>
+            </div>
+          ) : null}
+        </>
+      );
     }
 
     return (
@@ -440,6 +494,9 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   const matchingSession = matchingStart
     ? await getMatchingSessionForDiscoveryStart(matchingStart.id, user.id)
     : null;
+  const reportRun = matchingSession
+    ? await getMatchingReportRunForSession(matchingSession.session.id, user.id)
+    : null;
   const matchingMessage = searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
   const matchingOk = searchParamValue(resolvedSearchParams.matchingOk) !== "0";
 
@@ -511,6 +568,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               matchingStart={matchingStart}
               currentUserId={user.id}
               matchingSession={matchingSession}
+              reportRun={reportRun}
             />
           ) : (
             <>

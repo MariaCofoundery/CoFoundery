@@ -14,6 +14,23 @@ export type MatchingReportRunSummary = {
   reportRun: MatchingReportRun;
 };
 
+export function canCreateMatchingReportRunFromSession(params: {
+  sessionStatus: string;
+  currentUserIsParticipant: boolean;
+  requiredInputStatus: "complete" | "missing";
+  existingReportRunId?: string | null;
+}) {
+  if (params.existingReportRunId) {
+    return true;
+  }
+
+  return (
+    params.sessionStatus === "ready_for_report" &&
+    params.currentUserIsParticipant &&
+    params.requiredInputStatus === "complete"
+  );
+}
+
 export function isMatchingReportRunPayload(value: unknown): value is Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return false;
