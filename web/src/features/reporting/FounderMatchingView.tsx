@@ -14,6 +14,8 @@ type Props = {
   valuesProfileB?: SelfValuesProfile | null;
   workbookHref: string;
   teamContext?: TeamContext | null;
+  reportContext?: "invitation" | "matching_session";
+  showUnlockSection?: boolean;
 };
 
 export function FounderMatchingView({
@@ -25,21 +27,28 @@ export function FounderMatchingView({
   valuesProfileB: _valuesProfileB,
   workbookHref: _workbookHref,
   teamContext,
+  reportContext = "invitation",
+  showUnlockSection = true,
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
+  const isSessionReport = reportContext === "matching_session";
 
   return (
     <>
       <section className="page-section rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <div className="max-w-4xl">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Matching-Report")}
+            {t(isSessionReport ? "Dynamik-Report" : "Matching-Report")}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-            {t("Euer Alignment-Report ist fertig.")}
+            {t(isSessionReport ? "Euer Dynamik-Report ist fertig." : "Euer Alignment-Report ist fertig.")}
           </h1>
           <p className="mt-5 max-w-3xl text-[15px] leading-8 text-slate-700">
-            {t("Hier ist ein erster kurzer Einblick in eure Zusammenarbeit.")}
+            {t(
+              isSessionReport
+                ? "Dieser Snapshot zeigt euch erste gemeinsame Muster fuer ein gutes Gespraech ueber Zusammenarbeit."
+                : "Hier ist ein erster kurzer Einblick in eure Zusammenarbeit."
+            )}
           </p>
           <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
             {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
@@ -69,41 +78,58 @@ export function FounderMatchingView({
         </div>
 
         <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-700">
-          {t("Die entscheidenden Punkte fuer eure Zusammenarbeit seht ihr im vollstaendigen Report.")}
+          {t(
+            isSessionReport
+              ? "Nutzt diese Punkte als Ausgangspunkt fuer ein ruhiges Gespraech ueber Rollen, Erwartungen und Zusammenarbeit."
+              : "Die entscheidenden Punkte fuer eure Zusammenarbeit seht ihr im vollstaendigen Report."
+          )}
         </p>
 
-        <div id="report-paywall-placeholder" className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-            {t("Freischaltung")}
-          </p>
-          <h2 className="mt-3 text-xl font-semibold text-slate-950">
-            {t("Dieser Team-Report ist noch nicht freigeschaltet.")}
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-            {t("In der Testphase kannst du den Report kostenlos oeffnen.")}
-          </p>
-          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-            {t("Wenn ein Advisor oder Accelerator den Report fuer euch freischaltet, ist er fuer das Team verfuegbar.")}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <ReportActionButton href="#report-paywall-placeholder">
-              {t("Report freischalten")}
-            </ReportActionButton>
-            <ReportActionButton href="#report-paywall-placeholder" variant="utility">
-              {t("Kostenlos oeffnen (Testphase)")}
-            </ReportActionButton>
+        {showUnlockSection ? (
+          <div id="report-paywall-placeholder" className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              {t("Freischaltung")}
+            </p>
+            <h2 className="mt-3 text-xl font-semibold text-slate-950">
+              {t("Dieser Team-Report ist noch nicht freigeschaltet.")}
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
+              {t("In der Testphase kannst du den Report kostenlos oeffnen.")}
+            </p>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+              {t("Wenn ein Advisor oder Accelerator den Report fuer euch freischaltet, ist er fuer das Team verfuegbar.")}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ReportActionButton href="#report-paywall-placeholder">
+                {t("Report freischalten")}
+              </ReportActionButton>
+              <ReportActionButton href="#report-paywall-placeholder" variant="utility">
+                {t("Kostenlos oeffnen (Testphase)")}
+              </ReportActionButton>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
+              {t("Session-Snapshot")}
+            </p>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
+              {t("Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.")}
+            </p>
+          </div>
+        )}
       </section>
 
-      <section className="page-section mt-8 rounded-[28px] border border-dashed border-slate-300 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Vollstaendiger Report")}
-        </p>
-        <p className="mt-4 text-sm leading-7 text-slate-700">
-          {t("Der vollstaendige Report wird nach der Freischaltung sichtbar.")}
-        </p>
-      </section>
+      {showUnlockSection ? (
+        <section className="page-section mt-8 rounded-[28px] border border-dashed border-slate-300 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+            {t("Vollstaendiger Report")}
+          </p>
+          <p className="mt-4 text-sm leading-7 text-slate-700">
+            {t("Der vollstaendige Report wird nach der Freischaltung sichtbar.")}
+          </p>
+        </section>
+      ) : null}
     </>
   );
 }

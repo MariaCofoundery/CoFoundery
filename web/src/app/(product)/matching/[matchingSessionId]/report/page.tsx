@@ -137,6 +137,8 @@ export default async function MatchingSessionReportPage({ params }: PageProps) {
         valuesProfileB={null}
         workbookHref="#"
         teamContext={payload.teamContext}
+        reportContext="matching_session"
+        showUnlockSection={false}
       />
     </main>
   );
