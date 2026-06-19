@@ -732,8 +732,8 @@ export default async function DiscoveryProfilePage({
               </h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 Wenn du möchtest, nutzen wir deine Cofoundery-Assessment-Ergebnisse später, um
-                bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten, Scores und
-                private Auswertungen werden nicht auf deinem Profil angezeigt.
+                bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne
+                Auswertungen werden nicht auf deinem Profil angezeigt.
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 Die Auswertung wird in einem nächsten Schritt angebunden.

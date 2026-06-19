@@ -25,6 +25,10 @@ const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_BADGE_CLASS =
   "inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600";
+const CHIP_CLASS =
+  "inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm";
+const SOFT_CHIP_CLASS =
+  "inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700";
 
 type DiscoveryStatusView = {
   label: string;
@@ -106,76 +110,150 @@ function statusBadgeClass(status: DiscoveryStatusView["status"]) {
   return "bg-slate-950 text-white";
 }
 
-function formatRoleList(values: DiscoveryFounderRole[]) {
-  return values.length > 0
-    ? values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ")
-    : "Noch offen";
+function RoleChips({ values, emptyLabel }: { values: DiscoveryFounderRole[]; emptyLabel: string }) {
+  if (values.length === 0) {
+    return <span className={SOFT_CHIP_CLASS}>{emptyLabel}</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {values.map((value) => (
+        <span key={value} className={CHIP_CLASS}>
+          {DISCOVERY_ROLE_LABELS[value]}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function InsightList({
+  title,
+  eyebrow,
+  items,
+  tone,
+}: {
+  title: string;
+  eyebrow: string;
+  items: string[];
+  tone: "slate" | "amber";
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  const isAmber = tone === "amber";
+  return (
+    <section
+      className={`rounded-[1.35rem] border p-4 ${
+        isAmber
+          ? "border-amber-100 bg-amber-50/70"
+          : "border-slate-200 bg-slate-50/80"
+      }`}
+    >
+      <p
+        className={`text-[0.68rem] font-semibold uppercase tracking-[0.16em] ${
+          isAmber ? "text-amber-700" : "text-slate-500"
+        }`}
+      >
+        {eyebrow}
+      </p>
+      <h4 className={`mt-1 text-sm font-semibold ${isAmber ? "text-amber-950" : "text-slate-950"}`}>
+        {title}
+      </h4>
+      <ul className={`mt-3 space-y-2 text-sm leading-6 ${isAmber ? "text-amber-900" : "text-slate-600"}`}>
+        {items.map((item) => (
+          <li key={item} className="flex gap-2">
+            <span
+              aria-hidden="true"
+              className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${
+                isAmber ? "bg-amber-400" : "bg-slate-400"
+              }`}
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
   const { profile } = candidate;
 
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-            Könnte interessant sein
-          </p>
-          <h3 className="mt-2 text-xl font-semibold text-slate-950">{profile.displayName}</h3>
-          <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{profile.headline}</p>
+    <article className="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.055)]">
+      <div className="border-b border-slate-100 bg-[linear-gradient(135deg,#fff,rgba(248,250,252,0.9))] p-5 md:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Guter Gesprächsanlass
+            </p>
+            <h3 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">
+              {profile.displayName}
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-700">
+              {profile.headline}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 lg:items-end">
+            <Link href={`/discovery/${profile.id}`} className={PRIMARY_CTA_CLASS}>
+              Profil ansehen
+            </Link>
+            <p className="max-w-56 text-xs leading-5 text-slate-500 lg:text-right">
+              Schau dir erst das Profil an. Ein Intro-Flow kommt als nächster Schritt.
+            </p>
+          </div>
         </div>
-        <Link href={`/discovery/${profile.id}`} className={PRIMARY_CTA_CLASS}>
-          Profil ansehen
-        </Link>
-      </div>
 
-      <dl className="mt-5 grid gap-3 text-sm md:grid-cols-2">
-        <div>
-          <dt className="font-semibold text-slate-900">Bringt mit</dt>
-          <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles)}</dd>
-        </div>
-        <div>
-          <dt className="font-semibold text-slate-900">Sucht</dt>
-          <dd className="mt-1 text-slate-600">{formatRoleList(profile.seekingRoles)}</dd>
-        </div>
-        <div>
-          <dt className="font-semibold text-slate-900">Ort / Remote</dt>
-          <dd className="mt-1 text-slate-600">
+        <div className="mt-5 flex flex-wrap gap-2">
+          <span className={SOFT_CHIP_CLASS}>
             {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
             {DISCOVERY_REMOTE_MODE_LABELS[profile.remoteMode]}
-          </dd>
+          </span>
+          <span className={SOFT_CHIP_CLASS}>
+            {DISCOVERY_COMMITMENT_LABELS[profile.commitmentLevel]}
+          </span>
+          <span className={SOFT_CHIP_CLASS}>
+            Zielbild: {DISCOVERY_VENTURE_GOAL_LABELS[profile.ventureGoal]}
+          </span>
         </div>
-        <div>
-          <dt className="font-semibold text-slate-900">Commitment / Ziel</dt>
-          <dd className="mt-1 text-slate-600">
-            {DISCOVERY_COMMITMENT_LABELS[profile.commitmentLevel]} ·{" "}
-            {DISCOVERY_VENTURE_GOAL_LABELS[profile.ventureGoal]}
-          </dd>
-        </div>
-      </dl>
+      </div>
 
-      {candidate.reasons.length > 0 ? (
-        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-          <p className="text-sm font-semibold text-slate-950">Warum spannend</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-600">
-            {candidate.reasons.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
+      <div className="grid gap-5 p-5 md:p-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <section className="rounded-[1.35rem] border border-slate-200 bg-white p-4">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Bringt mit
+            </p>
+            <div className="mt-3">
+              <RoleChips values={profile.ownRoles} emptyLabel="Noch offen" />
+            </div>
+          </section>
+          <section className="rounded-[1.35rem] border border-slate-200 bg-white p-4">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Sucht
+            </p>
+            <div className="mt-3">
+              <RoleChips values={profile.seekingRoles} emptyLabel="Noch offen" />
+            </div>
+          </section>
         </div>
-      ) : null}
 
-      {candidate.conversationTopics.length > 0 ? (
-        <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
-          <p className="text-sm font-semibold text-amber-950">Was ihr früh besprechen solltet</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-900">
-            {candidate.conversationTopics.map((topic) => (
-              <li key={topic}>{topic}</li>
-            ))}
-          </ul>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <InsightList
+            eyebrow="Kuratierte Hinweise"
+            title="Warum spannend"
+            items={candidate.reasons}
+            tone="slate"
+          />
+          <InsightList
+            eyebrow="Fürs erste Gespräch"
+            title="Früh besprechen"
+            items={candidate.conversationTopics}
+            tone="amber"
+          />
         </div>
-      ) : null}
+      </div>
     </article>
   );
 }
@@ -286,20 +364,23 @@ export default async function DiscoveryPage() {
                   </p>
                 ) : null}
               </div>
-              <span className={SECONDARY_BADGE_CLASS}>Ohne Prozent-Score</span>
+              <span className={SECONDARY_BADGE_CLASS}>Ohne öffentliche Bewertung</span>
             </div>
 
             {isActive && candidates.length > 0 ? (
-              <div className="mt-5 grid gap-4">
+              <div className="mt-5 grid gap-5">
                 {candidates.map((candidate) => (
                   <CandidateCard key={candidate.profile.id} candidate={candidate} />
                 ))}
               </div>
             ) : (
-              <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                <p className="text-sm leading-6 text-slate-600">
+              <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5">
+                <p className="text-sm font-semibold text-slate-950">
+                  {isActive ? "Noch keine passenden Profile" : "Profil erst sichtbar machen"}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
                   {isActive
-                    ? "Noch keine aktiven Profile gefunden. Sobald weitere Founder ihre Suche aktivieren, erscheinen hier Vorschläge."
+                    ? "Aktuell sehen wir keine passenden Profile. Prüfe, ob deine erweiterten Filter zu eng gesetzt sind, oder schau später nochmal vorbei."
                     : "Veröffentliche dein Suchprofil, damit wir passende Profile besser einordnen können."}
                 </p>
               </div>
