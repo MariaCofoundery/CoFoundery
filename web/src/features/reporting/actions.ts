@@ -1,20 +1,12 @@
 "use server";
 
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
-import {
-  buildProfileResultFromSession,
-  generateCompareReport,
-} from "@/features/reporting/generateCompareReport";
-import {
-  buildFounderAlignmentReport,
-  type FounderAlignmentReport,
-} from "@/features/reporting/buildFounderAlignmentReport";
+import { type FounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient } from "@/lib/supabase/server";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import {
-  aggregateBaseScoresFromAnswers,
   assertValuesTotalCategoryContract,
   type AssessmentAnswerRow,
   type QuestionMetaRow,
@@ -24,7 +16,6 @@ import {
 } from "@/features/scoring/founderScoring";
 import {
   mapLegacyFounderAnswersToV2Answers,
-  type FounderCompatibilityAnswerV2,
 } from "@/features/scoring/founderCompatibilityAnswerRuntime";
 import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
 import {
@@ -52,11 +43,11 @@ import {
 import {
   REPORT_DIMENSIONS,
   type CompareReportJson,
-  type KeyInsight,
   type RadarSeries,
   type SelfValuesProfile,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
+import { buildFounderAlignmentReportPayload } from "@/features/reporting/founderAlignmentReportPayload";
 
 export type ReportRunSnapshot = {
   id: string;
@@ -419,7 +410,7 @@ function normalizeTeamContext(value: string | null | undefined): TeamContext {
 function transformFounderScoringAnswers(
   rows: AssessmentAnswerRow[],
   questionMetaById: Map<string, QuestionMetaRow>
-): FounderCompatibilityAnswerV2[] {
+) {
   return mapLegacyFounderAnswersToV2Answers(rows, questionMetaById);
 }
 
@@ -2017,9 +2008,6 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   const reportModules = includeValuesInReport
     ? (["base", "values"] as AssessmentModule[])
     : (["base"] as AssessmentModule[]);
-  const requestedScope: SessionAlignmentReport["requestedScope"] = includeValuesInReport
-    ? "basis_plus_values"
-    : "basis";
   const existingReportRunModules = ensureBaseModule(
     ((existingReportRunRow?.modules ?? []).filter(
       (value): value is AssessmentModule => value === "base" || value === "values"
@@ -2080,41 +2068,13 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     "ensure_report_run_answered_basis_questions",
     { allowMissing: true }
   );
-  const inviterBaseScores = aggregateBaseScoresFromAnswers(
-    inviterBaseAnswers,
-    baseQuestionMetaById
-  );
-  const inviteeBaseScores = aggregateBaseScoresFromAnswers(
-    inviteeBaseAnswers,
-    baseQuestionMetaById
-  );
-  const basisTotal = inviterBaseScores.expectedTotal;
-  const founderScoringInput = {
-    personA: transformFounderScoringAnswers(inviterBaseAnswers, baseQuestionMetaById),
-    personB: transformFounderScoringAnswers(inviteeBaseAnswers, baseQuestionMetaById),
-  };
-  const founderScoring = scoreFounderAlignmentV2FromAnswersV2(founderScoringInput);
-  const founderReport = buildFounderAlignmentReport({
-    scoringResult: founderScoring,
-    teamContext: normalizeTeamContext(invitation.team_context),
-  });
 
-  let valuesAssessmentIdA: string | null = null;
-  let valuesAssessmentIdB: string | null = null;
-  let valuesAnsweredA = 0;
-  let valuesAnsweredB = 0;
   let valuesTotal = 0;
-  let valuesIdentityCategoryA: string | null = null;
-  let valuesIdentityCategoryB: string | null = null;
-  let valuesPrimaryArchetypeIdA: SessionAlignmentReport["valuesPrimaryArchetypeIdA"] = null;
-  let valuesPrimaryArchetypeIdB: SessionAlignmentReport["valuesPrimaryArchetypeIdB"] = null;
-  let valuesScoreA: number | null = null;
-  let valuesScoreB: number | null = null;
+  let valuesAnswersA: AssessmentAnswerRow[] = [];
+  let valuesAnswersB: AssessmentAnswerRow[] = [];
+  let valuesQuestionMetaById = new Map<string, QuestionMetaRow>();
 
   if (includeValuesInReport && inviterValues && inviteeValues) {
-    valuesAssessmentIdA = inviterValues.id;
-    valuesAssessmentIdB = inviteeValues.id;
-
     const [rawValuesAnswersA, rawValuesAnswersB] = await Promise.all([
       getAssessmentAnswers(privileged, inviterValues.id),
       getAssessmentAnswers(privileged, inviteeValues.id),
@@ -2127,48 +2087,19 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
       assertValuesTotalCategoryContract(valuesTotalActive, contractCheck, "ensure_report_run");
     }
 
-    const valuesQuestionMetaById = await getQuestionMetaMap(privileged, [
+    valuesQuestionMetaById = await getQuestionMetaMap(privileged, [
       ...rawValuesAnswersA.map((row) => row.question_id),
       ...rawValuesAnswersB.map((row) => row.question_id),
     ]);
     const valuesQuestionMetaRows = [...valuesQuestionMetaById.values()];
     assertValuesCategoryContract(valuesQuestionMetaRows, "ensure_report_run_values");
     assertValuesQuestionVersionContract(valuesQuestionMetaRows, "ensure_report_run_values", { allowMissing: true });
-    const valuesAnswersA = rawValuesAnswersA.filter((row) =>
+    valuesAnswersA = rawValuesAnswersA.filter((row) =>
       isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
     );
-    const valuesAnswersB = rawValuesAnswersB.filter((row) =>
+    valuesAnswersB = rawValuesAnswersB.filter((row) =>
       isRecognizedValuesQuestion(row.question_id, valuesQuestionMetaById.get(row.question_id)?.category)
     );
-    valuesAnsweredA = valuesAnswersA.length;
-    valuesAnsweredB = valuesAnswersB.length;
-
-    const valuesInputA: ValuesAnswerForScoring[] = valuesAnswersA.map((row) => {
-      const meta = valuesQuestionMetaById.get(row.question_id);
-      return {
-        questionId: row.question_id,
-        choiceValue: row.choice_value,
-        prompt: meta?.prompt ?? null,
-        dimension: meta?.dimension ?? null,
-      };
-    });
-    const valuesInputB: ValuesAnswerForScoring[] = valuesAnswersB.map((row) => {
-      const meta = valuesQuestionMetaById.get(row.question_id);
-      return {
-        questionId: row.question_id,
-        choiceValue: row.choice_value,
-        prompt: meta?.prompt ?? null,
-        dimension: meta?.dimension ?? null,
-      };
-    });
-    const valuesProfileA = scoreSelfValuesProfile(valuesInputA, valuesTotal);
-    const valuesProfileB = scoreSelfValuesProfile(valuesInputB, valuesTotal);
-    valuesIdentityCategoryA = valuesProfileA?.primaryLabel ?? null;
-    valuesIdentityCategoryB = valuesProfileB?.primaryLabel ?? null;
-    valuesPrimaryArchetypeIdA = valuesProfileA?.primaryArchetypeId ?? null;
-    valuesPrimaryArchetypeIdB = valuesProfileB?.primaryArchetypeId ?? null;
-    valuesScoreA = computeValuesContinuumScore(valuesProfileA);
-    valuesScoreB = computeValuesContinuumScore(valuesProfileB);
   }
 
   const { data: profileRows } = await privileged
@@ -2181,103 +2112,54 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
   const participantAName = profileByUserId.get(invitation.inviter_user_id) || "Person A";
   const participantBName = profileByUserId.get(invitation.invitee_user_id) || "Person B";
 
-  const baseReport: SessionAlignmentReport = {
+  const reportPayload = buildFounderAlignmentReportPayload({
     sessionId: normalizedInvitationId,
-    createdAt: new Date().toISOString(),
     personBInvitedAt: invitation.created_at,
-    personACompletedAt: inviterBase.submitted_at ?? inviterBase.created_at,
-    personBCompletedAt: inviteeBase.submitted_at ?? inviteeBase.created_at,
-    participantAId: invitation.inviter_user_id,
-    participantBId: invitation.invitee_user_id,
-    participantAName,
-    participantBName,
-    personBStatus: "match_ready",
-    personACompleted: true,
-    personBCompleted: true,
-    comparisonEnabled: true,
-    scoresA: inviterBaseScores.scores,
-    scoresB: inviteeBaseScores.scores,
-    keyInsights: [],
-    commonTendencies: [],
-    frictionPoints: [],
-    conversationGuideQuestions: [],
-    valuesModulePreview: "",
-    valuesModuleStatus: includeValuesInReport ? "completed" : "not_started",
-    valuesAnsweredA,
-    valuesAnsweredB,
+    participantA: {
+      userId: invitation.inviter_user_id,
+      displayName: participantAName,
+      baseAssessment: {
+        id: inviterBase.id,
+        submittedAt: inviterBase.submitted_at,
+        createdAt: inviterBase.created_at,
+      },
+      baseAnswers: inviterBaseAnswers,
+      valuesAssessment: inviterValues
+        ? {
+            id: inviterValues.id,
+            submittedAt: inviterValues.submitted_at,
+            createdAt: inviterValues.created_at,
+          }
+        : null,
+      valuesAnswers: valuesAnswersA,
+    },
+    participantB: {
+      userId: invitation.invitee_user_id,
+      displayName: participantBName,
+      baseAssessment: {
+        id: inviteeBase.id,
+        submittedAt: inviteeBase.submitted_at,
+        createdAt: inviteeBase.created_at,
+      },
+      baseAnswers: inviteeBaseAnswers,
+      valuesAssessment: inviteeValues
+        ? {
+            id: inviteeValues.id,
+            submittedAt: inviteeValues.submitted_at,
+            createdAt: inviteeValues.created_at,
+          }
+        : null,
+      valuesAnswers: valuesAnswersB,
+    },
+    baseQuestionMetaById,
+    valuesQuestionMetaById,
     valuesTotal,
-    basisAnsweredA: inviterBaseScores.answeredQuestionCount,
-    basisAnsweredB: inviteeBaseScores.answeredQuestionCount,
-    basisTotal,
-    valuesAlignmentPercent: null,
-    valuesIdentityCategoryA,
-    valuesIdentityCategoryB,
-    valuesPrimaryArchetypeIdA,
-    valuesPrimaryArchetypeIdB,
-    valuesScoreA,
-    valuesScoreB,
-    requestedScope,
-    inviteConsentCaptured: Boolean(invitation.accepted_at),
-    baseCoverageA: {
-      answeredNumericByDimension: inviterBaseScores.answeredNumericByDimension,
-      expectedByDimension: inviterBaseScores.expectedByDimension,
-      numericAnsweredTotal: inviterBaseScores.numericAnsweredTotal,
-      expectedTotal: inviterBaseScores.expectedTotal,
-      baseCoveragePercent: inviterBaseScores.baseCoveragePercent,
-    },
-    baseCoverageB: {
-      answeredNumericByDimension: inviteeBaseScores.answeredNumericByDimension,
-      expectedByDimension: inviteeBaseScores.expectedByDimension,
-      numericAnsweredTotal: inviteeBaseScores.numericAnsweredTotal,
-      expectedTotal: inviteeBaseScores.expectedTotal,
-      baseCoveragePercent: inviteeBaseScores.baseCoveragePercent,
-    },
-    debugA: {
-      participantName: participantAName,
-      dimensions: inviterBaseScores.debugDimensions,
-    },
-    debugB: {
-      participantName: participantBName,
-      dimensions: inviteeBaseScores.debugDimensions,
-    },
-  };
-
-  const profileA = buildProfileResultFromSession(baseReport, "A");
-  const profileB = buildProfileResultFromSession(baseReport, "B");
-  const compareJson = generateCompareReport(profileA, profileB);
-  const keyInsights: KeyInsight[] = compareJson.keyInsights.slice(0, 3).map((insight, index) => ({
-    dimension: insight.dimension,
-    title: insight.title,
-    text: insight.text,
-    priority: index + 1,
-  }));
-
-  const finalReport: SessionAlignmentReport = {
-    ...baseReport,
-    keyInsights,
-    commonTendencies: compareJson.executiveSummary.topMatches,
-    frictionPoints: compareJson.executiveSummary.topTensions,
-    conversationGuideQuestions: compareJson.conversationGuide,
-    valuesModulePreview: compareJson.valuesModule.text,
-    valuesAlignmentPercent: compareJson.valuesModule.alignmentPercent,
-  };
-
-  const inputAssessmentIds = [inviterBase.id, inviteeBase.id, valuesAssessmentIdA, valuesAssessmentIdB].filter(
-    (value): value is string => Boolean(value)
-  );
-
-  const payload = {
-    reportType: "founder_alignment_v1" as const,
-    report: finalReport,
-    compareJson,
-    founderReport,
-    founderScoring,
-    teamContext: normalizeTeamContext(invitation.team_context),
     modules: reportModules,
-    inputAssessmentIds: [...new Set(inputAssessmentIds)],
-    generatedAt: new Date().toISOString(),
+    teamContext: normalizeTeamContext(invitation.team_context),
+    inviteConsentCaptured: Boolean(invitation.accepted_at),
     source: sourceTag,
-  };
+  });
+  const { payload, inputAssessmentIds } = reportPayload;
 
   if (existingReportRunId && (!existingReportRunRenderable || shouldUpgradeExistingReport)) {
     const repairedInputAssessmentIds = [...new Set(inputAssessmentIds)];
