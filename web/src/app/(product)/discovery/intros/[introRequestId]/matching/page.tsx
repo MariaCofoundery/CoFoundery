@@ -7,10 +7,13 @@ import {
   DISCOVERY_VENTURE_GOAL_LABELS,
 } from "@/features/discovery/discoveryConfig";
 import {
+  confirmFullDiscoveryMatchingAction,
+  requestFullDiscoveryMatchingAction,
   startDiscoveryMatchingPreparationAction,
   type DiscoveryMatchingStartActionState,
 } from "@/features/discovery/discoveryMatchingStartActions";
 import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
+import type { DiscoveryMatchingStart } from "@/features/discovery/discoveryMatchingStartTypes";
 import type {
   DiscoveryFounderRole,
   DiscoveryProfilePreview,
@@ -151,6 +154,154 @@ function PageMessage({ message, ok }: { message: string | null; ok: boolean }) {
   );
 }
 
+function MatchingStartStatusContent({
+  introRequestId,
+  matchingStart,
+  currentUserId,
+}: {
+  introRequestId: string;
+  matchingStart: DiscoveryMatchingStart;
+  currentUserId: string;
+}) {
+  async function requestFullMatching() {
+    "use server";
+    const result = await requestFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
+    redirect(matchingPreparationResultUrl(introRequestId, result));
+  }
+
+  async function confirmFullMatching() {
+    "use server";
+    const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
+    redirect(matchingPreparationResultUrl(introRequestId, result));
+  }
+
+  if (matchingStart.status === "canceled") {
+    return (
+      <>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          Vorbereitung beendet
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          Matching-Vorbereitung beendet
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          Diese Matching-Vorbereitung wurde beendet.
+        </p>
+      </>
+    );
+  }
+
+  if (matchingStart.status === "ready_for_matching") {
+    return (
+      <>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          Bereit
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          Bereit für das gemeinsame Matching
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          Ihr habt beide bestätigt, dass ihr das vollständige Cofoundery-Matching starten
+          möchtet. Der eigentliche Matching-Prozess wird im nächsten Schritt angebunden.
+        </p>
+        <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            Intro angenommen
+          </li>
+          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            Matching-Vorbereitung erstellt
+          </li>
+          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            Beide haben den gemeinsamen Matching-Start bestätigt
+          </li>
+        </ul>
+        <div className="mt-6">
+          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
+            Vollständiges Matching starten - kommt als nächster Schritt
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  if (matchingStart.status === "awaiting_other_confirmation") {
+    const isRequester = matchingStart.requestedByUserId === currentUserId;
+
+    return (
+      <>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+          Bestätigung
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          {isRequester ? "Bestätigung angefragt" : "Cofoundery-Matching bestätigen"}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          {isRequester
+            ? "Die andere Person muss den gemeinsamen Matching-Start noch bestätigen."
+            : "Die andere Person möchte das vollständige gemeinsame Matching starten. Wenn du bestätigst, seid ihr bereit für den nächsten Schritt."}
+        </p>
+        <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            Intro angenommen
+          </li>
+          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+            Matching-Vorbereitung erstellt
+          </li>
+          <li className="rounded-2xl bg-amber-50 px-4 py-3 font-medium text-amber-900">
+            Gemeinsamer Matching-Start wartet auf zweite Bestätigung
+          </li>
+        </ul>
+        <div className="mt-6">
+          {isRequester ? (
+            <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
+              Warte auf Bestätigung
+            </button>
+          ) : (
+            <form action={confirmFullMatching}>
+              <button type="submit" className={PRIMARY_CTA_CLASS}>
+                Matching bestätigen
+              </button>
+            </form>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+        Vorbereitung gestartet
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+        Matching-Vorbereitung gestartet
+      </h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+        Wenn du bereit bist, kannst du den gemeinsamen Matching-Start anfragen. Die andere Person
+        muss anschließend bestätigen.
+      </p>
+      <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+        <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+          Intro angenommen
+        </li>
+        <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+          Matching-Vorbereitung erstellt
+        </li>
+        <li className="rounded-2xl bg-slate-50 px-4 py-3">
+          Vollständiger Cofoundery-Matching-Start braucht beide Bestätigungen
+        </li>
+      </ul>
+      <div className="mt-6">
+        <form action={requestFullMatching}>
+          <button type="submit" className={PRIMARY_CTA_CLASS}>
+            Vollständiges Matching anfragen
+          </button>
+        </form>
+      </div>
+    </>
+  );
+}
+
 export default async function DiscoveryIntroMatchingPreparationPage({
   params,
   searchParams,
@@ -257,34 +408,20 @@ export default async function DiscoveryIntroMatchingPreparationPage({
         </section>
 
         <section className={CARD_CLASS}>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {matchingStart?.status === "preparing" ? "Vorbereitung gestartet" : "Nächster Schritt"}
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            {matchingStart?.status === "preparing"
-              ? "Matching-Vorbereitung gestartet"
-              : "Matching-Vorbereitung starten"}
-          </h2>
-          {matchingStart?.status === "preparing" ? (
-            <>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                Ihr habt den nächsten Schritt vorbereitet. Als Nächstes wird Cofoundery daraus
-                einen sicheren gemeinsamen Matching-Prozess starten können.
-              </p>
-              <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
-                <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-                  Intro angenommen
-                </li>
-                <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-                  Matching-Vorbereitung erstellt
-                </li>
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  Vollständiger Cofoundery-Matching-Start kommt als nächster Schritt
-                </li>
-              </ul>
-            </>
+          {matchingStart ? (
+            <MatchingStartStatusContent
+              introRequestId={introRequestId}
+              matchingStart={matchingStart}
+              currentUserId={user.id}
+            />
           ) : (
             <>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Nächster Schritt
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                Matching-Vorbereitung starten
+              </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
                 Damit merkt Cofoundery sich, dass ihr aus diesem angenommenen Intro gemeinsam
                 weitergehen möchtet. Dabei wird noch keine Einladung, keine Relationship, kein
@@ -303,20 +440,16 @@ export default async function DiscoveryIntroMatchingPreparationPage({
                   weiterarbeiten.
                 </li>
               </ol>
+              <div className="mt-6">
+                <form action={startMatchingPreparation}>
+                  <button type="submit" className={PRIMARY_CTA_CLASS}>
+                    Matching-Vorbereitung starten
+                  </button>
+                </form>
+              </div>
             </>
           )}
           <div className="mt-6 flex flex-wrap gap-3">
-            {matchingStart?.status === "preparing" ? (
-              <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-                Vollständiges Matching starten - kommt als nächster Schritt
-              </button>
-            ) : (
-              <form action={startMatchingPreparation}>
-                <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  Matching-Vorbereitung starten
-                </button>
-              </form>
-            )}
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
               Zurück zu meinen Intros
             </Link>
