@@ -6,7 +6,11 @@ import {
   DISCOVERY_ROLE_LABELS,
   DISCOVERY_VENTURE_GOAL_LABELS,
 } from "@/features/discovery/discoveryConfig";
-import { getAcceptedDiscoveryIntroForMatchingPreparation } from "@/features/discovery/discoveryIntroData";
+import {
+  startDiscoveryMatchingPreparationAction,
+  type DiscoveryMatchingStartActionState,
+} from "@/features/discovery/discoveryMatchingStartActions";
+import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
 import type {
   DiscoveryFounderRole,
   DiscoveryProfilePreview,
@@ -17,12 +21,33 @@ const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
 const PRIMARY_DISABLED_CTA_CLASS =
   "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
+const PRIMARY_CTA_CLASS =
+  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 
 type MatchingPreparationPageParams = {
   introRequestId: string;
 };
+
+type MatchingPreparationSearchParams = {
+  matchingMessage?: string | string[];
+  matchingOk?: string | string[];
+};
+
+function searchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function matchingPreparationResultUrl(
+  introRequestId: string,
+  result: DiscoveryMatchingStartActionState
+) {
+  const params = new URLSearchParams();
+  params.set("matchingMessage", result.message ?? "Die Matching-Vorbereitung wurde verarbeitet.");
+  params.set("matchingOk", result.ok ? "1" : "0");
+  return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
+}
 
 function formatRoleList(values: DiscoveryFounderRole[]) {
   return values.length > 0
@@ -108,12 +133,33 @@ function UnavailableState() {
   );
 }
 
+function PageMessage({ message, ok }: { message: string | null; ok: boolean }) {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`rounded-3xl border p-4 ${
+        ok ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <p className={`text-sm font-semibold ${ok ? "text-emerald-900" : "text-amber-900"}`}>
+        {message}
+      </p>
+    </section>
+  );
+}
+
 export default async function DiscoveryIntroMatchingPreparationPage({
   params,
+  searchParams,
 }: {
   params: Promise<MatchingPreparationPageParams>;
+  searchParams?: Promise<MatchingPreparationSearchParams>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const introRequestId = resolvedParams.introRequestId;
   const supabase = await createClient();
   const {
@@ -125,13 +171,16 @@ export default async function DiscoveryIntroMatchingPreparationPage({
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 
-  const preparation = await getAcceptedDiscoveryIntroForMatchingPreparation(
-    introRequestId,
-    user.id
-  );
+  const preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);
 
   if (!preparation) {
     return <UnavailableState />;
+  }
+
+  async function startMatchingPreparation() {
+    "use server";
+    const result = await startDiscoveryMatchingPreparationAction(introRequestId);
+    redirect(matchingPreparationResultUrl(introRequestId, result));
   }
 
   const currentUserProfile =
@@ -142,6 +191,9 @@ export default async function DiscoveryIntroMatchingPreparationPage({
     preparation.currentUserRole === "requester"
       ? preparation.recipientProfile
       : preparation.requesterProfile;
+  const matchingStart = preparation.matchingStart;
+  const matchingMessage = searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
+  const matchingOk = searchParamValue(resolvedSearchParams.matchingOk) !== "0";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -165,6 +217,8 @@ export default async function DiscoveryIntroMatchingPreparationPage({
             Erwartungen gemeinsam reflektieren könnt.
           </p>
         </header>
+
+        <PageMessage message={matchingMessage} ok={matchingOk} />
 
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm font-semibold leading-6 text-amber-950">
@@ -204,28 +258,65 @@ export default async function DiscoveryIntroMatchingPreparationPage({
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Was als Nächstes passiert
+            {matchingStart?.status === "preparing" ? "Vorbereitung gestartet" : "Nächster Schritt"}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            Vom Interesse zum gemeinsamen Reflexionsraum
+            {matchingStart?.status === "preparing"
+              ? "Matching-Vorbereitung gestartet"
+              : "Matching-Vorbereitung starten"}
           </h2>
-          <ol className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
-            <li className="rounded-2xl bg-slate-50 px-4 py-3">
-              1. Ihr startet das vollständige Cofoundery-Matching.
-            </li>
-            <li className="rounded-2xl bg-slate-50 px-4 py-3">
-              2. Beide füllen die relevanten Cofoundery-Fragen aus oder bestätigen vorhandene
-              Antworten.
-            </li>
-            <li className="rounded-2xl bg-slate-50 px-4 py-3">
-              3. Danach entsteht ein gemeinsamer Dynamik-Report und ihr könnt mit dem Workbook
-              weiterarbeiten.
-            </li>
-          </ol>
+          {matchingStart?.status === "preparing" ? (
+            <>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                Ihr habt den nächsten Schritt vorbereitet. Als Nächstes wird Cofoundery daraus
+                einen sicheren gemeinsamen Matching-Prozess starten können.
+              </p>
+              <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+                <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+                  Intro angenommen
+                </li>
+                <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
+                  Matching-Vorbereitung erstellt
+                </li>
+                <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                  Vollständiger Cofoundery-Matching-Start kommt als nächster Schritt
+                </li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                Damit merkt Cofoundery sich, dass ihr aus diesem angenommenen Intro gemeinsam
+                weitergehen möchtet. Dabei wird noch keine Einladung, keine Relationship, kein
+                Report und kein Workbook erstellt.
+              </p>
+              <ol className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+                <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                  1. Ihr startet das vollständige Cofoundery-Matching.
+                </li>
+                <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                  2. Beide füllen die relevanten Cofoundery-Fragen aus oder bestätigen vorhandene
+                  Antworten.
+                </li>
+                <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                  3. Danach entsteht ein gemeinsamer Dynamik-Report und ihr könnt mit dem Workbook
+                  weiterarbeiten.
+                </li>
+              </ol>
+            </>
+          )}
           <div className="mt-6 flex flex-wrap gap-3">
-            <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-              Matching starten - kommt als nächster Schritt
-            </button>
+            {matchingStart?.status === "preparing" ? (
+              <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
+                Vollständiges Matching starten - kommt als nächster Schritt
+              </button>
+            ) : (
+              <form action={startMatchingPreparation}>
+                <button type="submit" className={PRIMARY_CTA_CLASS}>
+                  Matching-Vorbereitung starten
+                </button>
+              </form>
+            )}
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
               Zurück zu meinen Intros
             </Link>
