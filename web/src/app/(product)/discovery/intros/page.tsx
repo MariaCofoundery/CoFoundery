@@ -179,6 +179,14 @@ function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProf
             Profil ansehen
           </Link>
         ) : null}
+        {request.status === "accepted" ? (
+          <Link
+            href={`/discovery/intros/${request.id}/matching`}
+            className={PRIMARY_CTA_CLASS}
+          >
+            Gemeinsames Matching vorbereiten
+          </Link>
+        ) : null}
       </div>
       {canRespondToDiscoveryIntro(request) ? (
         <div className="mt-5 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
@@ -241,6 +249,14 @@ function SentIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile 
         {request.profile ? (
           <Link href={`/discovery/${request.profile.id}`} className={SECONDARY_CTA_CLASS}>
             Profil ansehen
+          </Link>
+        ) : null}
+        {request.status === "accepted" ? (
+          <Link
+            href={`/discovery/intros/${request.id}/matching`}
+            className={PRIMARY_CTA_CLASS}
+          >
+            Gemeinsames Matching vorbereiten
           </Link>
         ) : null}
         {canCancelDiscoveryIntro(request) ? (

@@ -26,6 +26,15 @@ export type DiscoveryIntroRequestWithProfile = DiscoveryIntroRequest & {
   profile: DiscoveryProfilePreview | null;
 };
 
+export type DiscoveryIntroMatchingPreparation = {
+  introRequest: DiscoveryIntroRequest;
+  requesterProfile: DiscoveryProfilePreview;
+  recipientProfile: DiscoveryProfilePreview;
+  currentUserRole: "requester" | "recipient";
+  relationshipExists: boolean;
+  invitationExists: boolean;
+};
+
 export const DISCOVERY_INTRO_STATUS_LABELS: Record<DiscoveryIntroStatus, string> = {
   pending: "Intro angefragt",
   accepted: "Intro angenommen",
@@ -45,4 +54,15 @@ export function canCancelDiscoveryIntro(request: Pick<DiscoveryIntroRequest, "st
 
 export function canRespondToDiscoveryIntro(request: Pick<DiscoveryIntroRequest, "status">) {
   return request.status === "pending";
+}
+
+export function canPrepareDiscoveryIntroMatching(
+  request: Pick<DiscoveryIntroRequest, "status" | "requesterUserId" | "recipientUserId">,
+  userId: string
+) {
+  return (
+    request.status === "accepted" &&
+    request.requesterUserId !== request.recipientUserId &&
+    (request.requesterUserId === userId || request.recipientUserId === userId)
+  );
 }

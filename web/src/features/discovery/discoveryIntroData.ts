@@ -14,10 +14,12 @@ import type {
   DiscoveryVentureStage,
 } from "@/features/discovery/discoveryTypes";
 import type {
+  DiscoveryIntroMatchingPreparation,
   DiscoveryIntroRequest,
   DiscoveryIntroRequestWithProfile,
   DiscoveryIntroStatus,
 } from "@/features/discovery/discoveryIntroTypes";
+import { canPrepareDiscoveryIntroMatching } from "@/features/discovery/discoveryIntroTypes";
 
 const DISCOVERY_INTRO_COLUMNS = [
   "id",
@@ -191,6 +193,65 @@ async function getIntroRequestById(introRequestId: string) {
   }
 
   return data ? mapIntroRow(data as unknown as DiscoveryIntroRequestRow) : null;
+}
+
+async function checkRelationshipExistsBetweenUsers(leftUserId: string, rightUserId: string) {
+  if (leftUserId === rightUserId) {
+    return true;
+  }
+
+  const [userLow, userHigh] = [leftUserId, rightUserId].sort();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("relationships")
+    .select("id")
+    .eq("user_low", userLow)
+    .eq("user_high", userHigh)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    return false;
+  }
+
+  return Boolean(data);
+}
+
+async function checkAcceptedInvitationExistsBetweenUsers(leftUserId: string, rightUserId: string) {
+  if (leftUserId === rightUserId) {
+    return false;
+  }
+
+  const supabase = await createClient();
+  const { data: leftToRight, error: leftError } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("inviter_user_id", leftUserId)
+    .eq("invitee_user_id", rightUserId)
+    .limit(1)
+    .maybeSingle();
+
+  if (leftError) {
+    return false;
+  }
+
+  if (leftToRight) {
+    return true;
+  }
+
+  const { data: rightToLeft, error: rightError } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("inviter_user_id", rightUserId)
+    .eq("invitee_user_id", leftUserId)
+    .limit(1)
+    .maybeSingle();
+
+  if (rightError) {
+    return false;
+  }
+
+  return Boolean(rightToLeft);
 }
 
 export function normalizeDiscoveryIntroMessage(value: unknown) {
@@ -396,4 +457,42 @@ export async function getSentDiscoveryIntroRequests(
     ...request,
     profile: profilesByUserId.get(request.recipientUserId) ?? null,
   }));
+}
+
+export async function getAcceptedDiscoveryIntroForMatchingPreparation(
+  introRequestId: string,
+  userId: string
+): Promise<DiscoveryIntroMatchingPreparation | null> {
+  const normalizedUserId = assertUserId(userId);
+  const introRequest = await getIntroRequestById(introRequestId);
+
+  if (!introRequest || !canPrepareDiscoveryIntroMatching(introRequest, normalizedUserId)) {
+    return null;
+  }
+
+  const profilesByUserId = await loadPublicProfilesByUserId([
+    introRequest.requesterUserId,
+    introRequest.recipientUserId,
+  ]);
+  const requesterProfile = profilesByUserId.get(introRequest.requesterUserId);
+  const recipientProfile = profilesByUserId.get(introRequest.recipientUserId);
+
+  if (!requesterProfile || !recipientProfile) {
+    return null;
+  }
+
+  const [relationshipExists, invitationExists] = await Promise.all([
+    checkRelationshipExistsBetweenUsers(introRequest.requesterUserId, introRequest.recipientUserId),
+    checkAcceptedInvitationExistsBetweenUsers(introRequest.requesterUserId, introRequest.recipientUserId),
+  ]);
+
+  return {
+    introRequest,
+    requesterProfile,
+    recipientProfile,
+    currentUserRole:
+      introRequest.requesterUserId === normalizedUserId ? "requester" : "recipient",
+    relationshipExists,
+    invitationExists,
+  };
 }

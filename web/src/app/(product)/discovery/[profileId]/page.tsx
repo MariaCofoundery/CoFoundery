@@ -26,8 +26,6 @@ const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const DISABLED_CTA_CLASS =
-  "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
 const SECONDARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 const TEXTAREA_CLASS =
@@ -208,9 +206,12 @@ function IntroRequestCard({
           </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" disabled className={DISABLED_CTA_CLASS}>
+          <Link
+            href={`/discovery/intros/${introRequest.id}/matching`}
+            className={PRIMARY_CTA_CLASS}
+          >
             Gemeinsames Matching vorbereiten
-          </button>
+          </Link>
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
             Meine Intros
           </Link>
