@@ -1,12 +1,8 @@
 import "server-only";
 
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
 import type { DiscoveryProfilePreview } from "@/features/discovery/discoveryTypes";
 import {
-  canCreateMatchingSessionFromDiscoveryStart,
-  getMatchingSessionInputReadinessStatus,
   type MatchingSession,
   type MatchingSessionInput,
   type MatchingSessionModule,
@@ -104,14 +100,6 @@ type MatchingSessionInputRow = {
   updated_at: string;
 };
 
-type SubmittedAssessmentRow = {
-  id: string;
-  user_id: string;
-  module: string;
-  submitted_at: string;
-  created_at: string;
-};
-
 type MatchingCoreProfileRow = {
   user_id: string;
   id: string;
@@ -128,6 +116,11 @@ type MatchingCoreProfileRow = {
   venture_stage: string;
   venture_goal: string;
   published_at: string | null;
+};
+
+type MatchingSessionFromDiscoveryRpcRow = {
+  matching_session_id: string;
+  status: string;
 };
 
 function getErrorMessage(error: SupabaseError | null | undefined, fallback: string) {
@@ -148,21 +141,6 @@ function assertDiscoveryMatchingStartId(discoveryMatchingStartId: string) {
     throw new Error("matching_core_missing_discovery_matching_start_id");
   }
   return normalized;
-}
-
-function getPrivilegedClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null;
-  }
-
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
 }
 
 function mapSession(row: MatchingSessionRow): MatchingSession {
@@ -333,35 +311,6 @@ async function loadActiveProfilesByUserId(userIds: string[], client: SupabaseLik
   );
 }
 
-async function loadLatestSubmittedBaseAssessments(userIds: string[], client: SupabaseLikeClient) {
-  const normalizedUserIds = [...new Set(userIds.map((id) => id.trim()).filter(Boolean))];
-  if (normalizedUserIds.length === 0) {
-    return new Map<string, SubmittedAssessmentRow>();
-  }
-
-  const { data, error } = await client
-    .from("assessments")
-    .select("id, user_id, module, submitted_at, created_at")
-    .in("user_id", normalizedUserIds)
-    .eq("module", "base")
-    .not("submitted_at", "is", null)
-    .order("submitted_at", { ascending: false })
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error(getErrorMessage(error, "matching_session_assessments_load_failed"));
-  }
-
-  const byUser = new Map<string, SubmittedAssessmentRow>();
-  for (const row of (data ?? []) as unknown as SubmittedAssessmentRow[]) {
-    if (!byUser.has(row.user_id)) {
-      byUser.set(row.user_id, row);
-    }
-  }
-
-  return byUser;
-}
-
 function buildSessionSummary(params: {
   session: MatchingSession;
   participants: MatchingSessionParticipant[];
@@ -391,26 +340,6 @@ function buildSessionSummary(params: {
     participants,
     requiredModules,
   };
-}
-
-async function getMatchingSessionSummary(session: MatchingSession, client: SupabaseLikeClient) {
-  const [participants, modules, inputs] = await Promise.all([
-    loadSessionParticipants(session.id, client),
-    loadSessionModules(session.id, client),
-    loadSessionInputs(session.id, client),
-  ]);
-  const profilesByUserId = await loadActiveProfilesByUserId(
-    participants.map((participant) => participant.userId),
-    client
-  );
-
-  return buildSessionSummary({
-    session,
-    participants,
-    modules,
-    inputs,
-    profilesByUserId,
-  });
 }
 
 export async function getMatchingSessionForDiscoveryStart(
@@ -462,120 +391,27 @@ export async function createMatchingSessionFromDiscoveryStart(params: {
     return existing;
   }
 
-  const preparation = await getDiscoveryMatchingPreparation(normalizedStartId, normalizedUserId);
-  if (!preparation?.matchingStart) {
-    throw new Error("matching_core_discovery_start_unavailable");
-  }
-
-  if (
-    !canCreateMatchingSessionFromDiscoveryStart({
-      discoveryMatchingStartStatus: preparation.matchingStart.status,
-      requesterUserId: preparation.matchingStart.requesterUserId,
-      recipientUserId: preparation.matchingStart.recipientUserId,
-      userId: normalizedUserId,
-      relationshipExists: preparation.relationshipExists,
-    })
-  ) {
-    if (preparation.relationshipExists) {
-      throw new Error("matching_core_relationship_exists");
-    }
-    throw new Error("matching_core_discovery_start_not_ready");
-  }
-
-  const privileged = getPrivilegedClient();
-  if (!privileged) {
-    throw new Error("matching_core_missing_service_role");
-  }
-
-  const userIds = [
-    preparation.matchingStart.requesterUserId,
-    preparation.matchingStart.recipientUserId,
-  ];
-  const profilesByUserId = await loadActiveProfilesByUserId(userIds, privileged);
-  if (!userIds.every((userId) => profilesByUserId.has(userId))) {
-    throw new Error("matching_core_profiles_inactive");
-  }
-
-  const latestBaseByUser = await loadLatestSubmittedBaseAssessments(userIds, privileged);
-  const submittedInputs = [...latestBaseByUser.values()].map((assessment) => ({
-    userId: assessment.user_id,
-    module: "base" as const,
-  }));
-  const status = getMatchingSessionInputReadinessStatus({
-    activeParticipantUserIds: userIds,
-    requiredModules: ["base"],
-    submittedInputs,
+  const client = await createClient();
+  const { data, error } = await client.rpc("create_matching_session_from_discovery_start", {
+    p_discovery_matching_start_id: normalizedStartId,
   });
-  const reportReadyAt = status === "ready_for_report" ? new Date().toISOString() : null;
 
-  const { data: insertedSession, error: sessionError } = await privileged
-    .from("matching_sessions")
-    .insert({
-      source_type: "discovery_matching_start",
-      source_id: preparation.matchingStart.id,
-      status,
-      created_by_user_id: normalizedUserId,
-      report_ready_at: reportReadyAt,
-    })
-    .select(MATCHING_SESSION_COLUMNS)
-    .single();
-
-  if (sessionError || !insertedSession) {
-    if ((sessionError as SupabaseError | null)?.code === "23505") {
-      const existingAfterRace = await getMatchingSessionForDiscoveryStart(
-        normalizedStartId,
-        normalizedUserId
-      );
-      if (existingAfterRace) {
-        return existingAfterRace;
-      }
-    }
-    throw new Error(getErrorMessage(sessionError as SupabaseError | null, "matching_session_create_failed"));
+  if (error) {
+    throw new Error(getErrorMessage(error, "matching_session_create_failed"));
   }
 
-  const session = mapSession(insertedSession as unknown as MatchingSessionRow);
-  try {
-    const { error: participantsError } = await privileged.from("matching_session_participants").insert(
-      userIds.map((userId) => ({
-        matching_session_id: session.id,
-        user_id: userId,
-        role: "founder",
-        status: "active",
-        confirmed_at: preparation.matchingStart?.confirmedAt ?? new Date().toISOString(),
-      }))
-    );
+  const created = Array.isArray(data)
+    ? (data[0] as MatchingSessionFromDiscoveryRpcRow | undefined)
+    : (data as MatchingSessionFromDiscoveryRpcRow | null);
 
-    if (participantsError) {
-      throw new Error(getErrorMessage(participantsError, "matching_session_participants_create_failed"));
-    }
-
-    const { error: modulesError } = await privileged.from("matching_session_modules").insert({
-      matching_session_id: session.id,
-      module: "base",
-      required: true,
-    });
-
-    if (modulesError) {
-      throw new Error(getErrorMessage(modulesError, "matching_session_modules_create_failed"));
-    }
-
-    const inputRows = [...latestBaseByUser.values()].map((assessment) => ({
-      matching_session_id: session.id,
-      user_id: assessment.user_id,
-      module: "base",
-      assessment_id: assessment.id,
-    }));
-
-    if (inputRows.length > 0) {
-      const { error: inputsError } = await privileged.from("matching_session_inputs").insert(inputRows);
-      if (inputsError) {
-        throw new Error(getErrorMessage(inputsError, "matching_session_inputs_create_failed"));
-      }
-    }
-  } catch (error) {
-    await privileged.from("matching_sessions").delete().eq("id", session.id);
-    throw error;
+  if (!created?.matching_session_id) {
+    throw new Error("matching_session_create_failed");
   }
 
-  return getMatchingSessionSummary(session, privileged);
+  const summary = await getMatchingSessionForDiscoveryStart(normalizedStartId, normalizedUserId);
+  if (!summary || summary.session.id !== created.matching_session_id) {
+    throw new Error("matching_session_create_failed");
+  }
+
+  return summary;
 }
