@@ -23,6 +23,8 @@ const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
+const SECONDARY_CTA_CLASS =
+  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 const SECONDARY_BADGE_CLASS =
   "inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600";
 const CHIP_CLASS =
@@ -292,9 +294,14 @@ export default async function DiscoveryPage() {
                 passende Co-Founder-Kandidat:innen vorgeschlagen zu bekommen.
               </p>
             </div>
-            <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
-              {statusView.cta}
-            </Link>
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
+                {statusView.cta}
+              </Link>
+              <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+                Meine Intros
+              </Link>
+            </div>
           </div>
         </header>
 
@@ -317,9 +324,14 @@ export default async function DiscoveryPage() {
                 </p>
               ) : null}
             </div>
-            <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
-              {statusView.cta}
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
+                {statusView.cta}
+              </Link>
+              <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+                Meine Intros
+              </Link>
+            </div>
           </div>
         </section>
 

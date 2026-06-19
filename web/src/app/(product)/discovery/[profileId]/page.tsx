@@ -8,6 +8,16 @@ import {
   DISCOVERY_VENTURE_STAGE_LABELS,
 } from "@/features/discovery/discoveryConfig";
 import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
+import {
+  cancelDiscoveryIntroAction,
+  requestDiscoveryIntroAction,
+} from "@/features/discovery/discoveryIntroActions";
+import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
+import {
+  canCancelDiscoveryIntro,
+  DISCOVERY_INTRO_STATUS_LABELS,
+  type DiscoveryIntroRequest,
+} from "@/features/discovery/discoveryIntroTypes";
 import type { DiscoveryFounderRole, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,6 +27,10 @@ const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const DISABLED_CTA_CLASS =
   "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
+const SECONDARY_CTA_CLASS =
+  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+const TEXTAREA_CLASS =
+  "mt-2 min-h-28 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
 type DiscoveryProfileDetailPageParams = {
   profileId: string;
@@ -92,6 +106,162 @@ function ProfileDetails({ profile }: { profile: FounderDiscoveryProfile }) {
   );
 }
 
+function IntroRequestCard({
+  profile,
+  introRequest,
+}: {
+  profile: FounderDiscoveryProfile;
+  introRequest: DiscoveryIntroRequest | null;
+}) {
+  async function requestIntro(formData: FormData) {
+    "use server";
+    await requestDiscoveryIntroAction(profile.id, formData);
+  }
+
+  if (!introRequest) {
+    return (
+      <section className={CARD_CLASS}>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          Discovery Intro
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro anfragen</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Wenn das Profil spannend wirkt, kannst du ein erstes Interesse signalisieren. Die
+          andere Person entscheidet, ob sie das Intro annehmen möchte.
+        </p>
+        <form action={requestIntro} className="mt-5 grid gap-4">
+          <label>
+            <span className="text-sm font-semibold text-slate-900">Kurze Nachricht</span>
+            <textarea
+              name="message"
+              maxLength={600}
+              placeholder="Was macht das Profil für dich spannend?"
+              className={TEXTAREA_CLASS}
+            />
+            <span className="mt-2 block text-xs leading-5 text-slate-500">
+              Optional, maximal 600 Zeichen. Teile nur, was du bewusst senden möchtest.
+            </span>
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <button type="submit" className={PRIMARY_CTA_CLASS}>
+              Intro anfragen
+            </button>
+            <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+              Meine Intros
+            </Link>
+          </div>
+        </form>
+      </section>
+    );
+  }
+
+  if (introRequest.status === "accepted") {
+    return (
+      <section className={CARD_CLASS}>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          {DISCOVERY_INTRO_STATUS_LABELS.accepted}
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Beidseitiges Interesse</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Ihr habt beide Interesse signalisiert. Als nächster Schritt könnt ihr ein erstes Gespräch
+          führen oder ein gemeinsames Cofoundery-Matching starten.
+        </p>
+        {introRequest.responseMessage ? (
+          <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+            Antwort: {introRequest.responseMessage}
+          </p>
+        ) : null}
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" disabled className={DISABLED_CTA_CLASS}>
+            Gemeinsames Matching vorbereiten
+          </button>
+          <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+            Meine Intros
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  if (introRequest.status === "declined") {
+    return (
+      <section className={CARD_CLASS}>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {DISCOVERY_INTRO_STATUS_LABELS.declined}
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Aktuell kein Intro</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Diese Person möchte das Intro aktuell nicht weiterverfolgen.
+        </p>
+        {introRequest.responseMessage ? (
+          <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+            Antwort: {introRequest.responseMessage}
+          </p>
+        ) : null}
+        <div className="mt-5">
+          <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+            Meine Intros
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  if (introRequest.status === "canceled") {
+    return (
+      <section className={CARD_CLASS}>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {DISCOVERY_INTRO_STATUS_LABELS.canceled}
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Anfrage zurückgezogen</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Du hast diese Intro-Anfrage zurückgezogen. Wenn das Profil später wieder spannend wirkt,
+          kannst du eine neue Anfrage stellen.
+        </p>
+        <div className="mt-5">
+          <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+            Meine Intros
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={CARD_CLASS}>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+        {DISCOVERY_INTRO_STATUS_LABELS.pending}
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro angefragt</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Die Anfrage wartet auf Antwort.
+      </p>
+      {introRequest.message ? (
+        <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+          Deine Nachricht: {introRequest.message}
+        </p>
+      ) : null}
+      <div className="mt-5 flex flex-wrap gap-3">
+        {canCancelDiscoveryIntro(introRequest) ? (
+          <form
+            action={async () => {
+              "use server";
+              await cancelDiscoveryIntroAction(introRequest.id);
+            }}
+          >
+            <button type="submit" className={SECONDARY_CTA_CLASS}>
+              Anfrage zurückziehen
+            </button>
+          </form>
+        ) : null}
+        <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+          Meine Intros
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 export default async function DiscoveryProfileDetailPage({
   params,
 }: {
@@ -114,6 +284,9 @@ export default async function DiscoveryProfileDetailPage({
   }
 
   const isOwner = profile.userId === user.id;
+  const introRequest = isOwner
+    ? null
+    : await getDiscoveryIntroRequestForProfile(user.id, profile.id);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -139,9 +312,9 @@ export default async function DiscoveryProfileDetailPage({
                 Mein Suchprofil bearbeiten
               </Link>
             ) : (
-              <button type="button" disabled className={DISABLED_CTA_CLASS}>
-                Intro anfragen – kommt später
-              </button>
+              <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+                Meine Intros
+              </Link>
             )}
           </div>
         </header>
@@ -166,6 +339,8 @@ export default async function DiscoveryProfileDetailPage({
             <ProfileDetails profile={profile} />
           </div>
         </section>
+
+        {isOwner ? null : <IntroRequestCard profile={profile} introRequest={introRequest} />}
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">
