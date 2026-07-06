@@ -2,9 +2,10 @@
 
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { useEffect, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { createClient } from "@/lib/supabase/client";
+
+const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
 
 function buildLoginErrorHref(nextPath: string) {
   const params = new URLSearchParams({
@@ -31,29 +32,57 @@ function readHashParams() {
   return new URLSearchParams(window.location.hash.slice(1));
 }
 
+function readStoredCallbackTokens() {
+  let rawValue: string | null = null;
+
+  try {
+    rawValue = window.sessionStorage.getItem(AUTH_CALLBACK_SESSION_STORAGE_KEY);
+    window.sessionStorage.removeItem(AUTH_CALLBACK_SESSION_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as Partial<{
+      accessToken: unknown;
+      refreshToken: unknown;
+    }>;
+    const accessToken = typeof parsed.accessToken === "string" ? parsed.accessToken : "";
+    const refreshToken = typeof parsed.refreshToken === "string" ? parsed.refreshToken : "";
+    return accessToken && refreshToken ? { accessToken, refreshToken } : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function AuthCallbackClientPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     let cancelled = false;
 
     const finish = async () => {
+      const requestUrl = new URL(window.location.href);
       const hashParams = readHashParams();
-      const getParam = (key: string) => searchParams.get(key) ?? hashParams?.get(key) ?? null;
+      const storedTokens = readStoredCallbackTokens();
+      const getParam = (key: string) =>
+        requestUrl.searchParams.get(key) ?? hashParams?.get(key) ?? null;
       const nextPath = normalizeNextPath(getParam("next"));
       const code = getParam("code");
       const tokenHash = getParam("token_hash");
       const type = getParam("type") as EmailOtpType | null;
-      const accessToken = getParam("access_token");
-      const refreshToken = getParam("refresh_token");
+      const accessToken = storedTokens?.accessToken ?? getParam("access_token");
+      const refreshToken = storedTokens?.refreshToken ?? getParam("refresh_token");
       const callbackError =
         getParam("error") ?? getParam("error_code") ?? getParam("error_description");
 
       const fail = () => {
         if (!cancelled) {
-          router.replace(buildLoginErrorHref(nextPath));
+          window.location.replace(buildLoginErrorHref(nextPath));
         }
       };
 
@@ -106,8 +135,7 @@ export default function AuthCallbackClientPage() {
         }
 
         if (!cancelled) {
-          router.replace(buildAuthLandingHref(nextPath));
-          router.refresh();
+          window.location.replace(buildAuthLandingHref(nextPath));
         }
       } catch {
         fail();
@@ -119,7 +147,7 @@ export default function AuthCallbackClientPage() {
     return () => {
       cancelled = true;
     };
-  }, [router, searchParams, supabase]);
+  }, [supabase]);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-5 py-14 md:px-8">

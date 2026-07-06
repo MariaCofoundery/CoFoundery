@@ -2,6 +2,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
 export type AuthErrorCode = "magic_link_failed" | "auth_callback_failed";
+const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
 type AuthSessionLikeClient = {
   auth: {
     exchangeCodeForSession: (code: string) => Promise<{ error: { message?: string | null } | null }>;
@@ -100,30 +101,34 @@ export function buildAuthCallbackClientBridgeResponse(
         </p>
       </section>
     </main>
-    <script>
-      (function () {
-        var hash = window.location.hash ? new URLSearchParams(window.location.hash.slice(1)) : null;
-        if (!hash) {
-          window.location.replace(${JSON.stringify(loginUrl.toString())});
-          return;
-        }
+	    <script>
+	      (function () {
+	        var hash = window.location.hash ? new URLSearchParams(window.location.hash.slice(1)) : null;
+	        var query = window.location.search ? new URLSearchParams(window.location.search.slice(1)) : null;
+	        var getParam = function (key) {
+	          return (hash && hash.get(key)) || (query && query.get(key)) || "";
+	        };
+	        var accessToken = getParam("access_token");
+	        var refreshToken = getParam("refresh_token");
+	        if (!accessToken || !refreshToken) {
+	          window.location.replace(${JSON.stringify(loginUrl.toString())});
+	          return;
+	        }
 
-        var accessToken = hash.get("access_token");
-        var refreshToken = hash.get("refresh_token");
-        if (!accessToken || !refreshToken) {
-          window.location.replace(${JSON.stringify(loginUrl.toString())});
-          return;
-        }
+	        try {
+	          window.sessionStorage.setItem(
+	            ${JSON.stringify(AUTH_CALLBACK_SESSION_STORAGE_KEY)},
+	            JSON.stringify({ accessToken: accessToken, refreshToken: refreshToken })
+	          );
+	        } catch (error) {
+	          window.location.replace(${JSON.stringify(loginUrl.toString())});
+	          return;
+	        }
 
-        var target = new URL(${JSON.stringify(clientUrl.toString())});
-        ["access_token", "refresh_token", "expires_in", "expires_at", "token_type", "type"].forEach(function (key) {
-          var value = hash.get(key);
-          if (value) target.searchParams.set(key, value);
-        });
-
-        window.location.replace(target.toString());
-      })();
-    </script>
+	        var target = new URL(${JSON.stringify(clientUrl.toString())});
+	        window.location.replace(target.toString());
+	      })();
+	    </script>
   </body>
 </html>`;
 
