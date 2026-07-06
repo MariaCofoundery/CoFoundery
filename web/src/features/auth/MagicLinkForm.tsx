@@ -1,7 +1,7 @@
 "use client";
 
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { FormEvent, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
 type MagicLinkFormProps = {
@@ -9,7 +9,22 @@ type MagicLinkFormProps = {
 };
 
 export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(
+    () =>
+      createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+            flowType: "implicit",
+            persistSession: false,
+          },
+        }
+      ),
+    []
+  );
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState<string>("");
@@ -29,9 +44,7 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       return;
     }
 
-    // Complete OTP/PKCE-based magic-link logins in the browser callback so the
-    // Supabase client can use its local verifier/session context reliably.
-    const redirectTo = new URL("/auth/callback/client", `${origin}/`);
+    const redirectTo = new URL("/auth/callback", `${origin}/`);
     redirectTo.searchParams.set("next", nextPath);
 
     const { error } = await supabase.auth.signInWithOtp({
