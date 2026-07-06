@@ -11,11 +11,39 @@ import { compareFounders, type FounderScores } from "@/features/reporting/founde
 import { buildFounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
+import { startWorkspaceFromMatchingSessionAction } from "@/features/matchingCore/matchingWorkspaceActions";
+import { getMatchingWorkspaceForSession } from "@/features/matchingCore/matchingWorkspaceData";
+import type { MatchingWorkspaceSummary } from "@/features/matchingCore/matchingWorkspaceTypes";
 import { createClient } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ matchingSessionId: string }>;
+  searchParams?: Promise<{
+    workspaceMessage?: string | string[];
+    workspaceOk?: string | string[];
+  }>;
 };
+
+const PRIMARY_CTA_CLASS =
+  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
+const PRIMARY_DISABLED_CTA_CLASS =
+  "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
+const SECONDARY_CTA_CLASS =
+  "inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+
+function searchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function workspaceResultUrl(
+  matchingSessionId: string,
+  result: { ok: boolean; message?: string }
+) {
+  const params = new URLSearchParams();
+  params.set("workspaceMessage", result.message ?? "Der Arbeitsraum wurde verarbeitet.");
+  params.set("workspaceOk", result.ok ? "1" : "0");
+  return `/matching/${matchingSessionId}/report?${params.toString()}`;
+}
 
 function isFounderDimensionKey(value: string): value is FounderDimensionKey {
   return (FOUNDER_DIMENSION_ORDER as readonly string[]).includes(value);
@@ -86,8 +114,92 @@ function EmptyReportState({ matchingSessionId }: { matchingSessionId: string }) 
   );
 }
 
-export default async function MatchingSessionReportPage({ params }: PageProps) {
+function PageMessage({ message, ok }: { message: string | null; ok: boolean }) {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`no-print mb-6 rounded-3xl border p-4 ${
+        ok ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <p className={`text-sm font-semibold ${ok ? "text-emerald-900" : "text-amber-900"}`}>
+        {message}
+      </p>
+    </section>
+  );
+}
+
+function WorkspacePanel({
+  matchingSessionId,
+  workspace,
+}: {
+  matchingSessionId: string;
+  workspace: MatchingWorkspaceSummary | null;
+}) {
+  async function startWorkspace() {
+    "use server";
+    const result = await startWorkspaceFromMatchingSessionAction(matchingSessionId);
+    redirect(workspaceResultUrl(matchingSessionId, result));
+  }
+
+  if (workspace) {
+    return (
+      <section className="no-print mb-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.04)] md:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+          Arbeitsraum
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          Arbeitsraum vorbereitet
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-emerald-950">
+          Eure gemeinsame Verbindung wurde angelegt. Das Workbook/Operating Agreement wird als
+          nächster Schritt angebunden.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
+            Workbook kommt als nächster Schritt
+          </button>
+          <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+            Zurück zu meinen Intros
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="no-print mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] md:p-6">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+        Nächster Schritt
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+        Gemeinsamen Arbeitsraum vorbereiten
+      </h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+        Wenn ihr weitermachen möchtet, könnt ihr aus diesem Report einen gemeinsamen Arbeitsraum
+        vorbereiten. Dabei wird eine gemeinsame Verbindung angelegt. Das Workbook wird im nächsten
+        Schritt angebunden.
+      </p>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+        Es wird keine Einladung, kein legacy Report und kein Workbook erstellt.
+      </p>
+      <div className="mt-5">
+        <form action={startWorkspace}>
+          <button type="submit" className={PRIMARY_CTA_CLASS}>
+            Gemeinsamen Arbeitsraum starten
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+export default async function MatchingSessionReportPage({ params, searchParams }: PageProps) {
   const { matchingSessionId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const supabase = await createClient();
   const {
     data: { user },
@@ -101,6 +213,9 @@ export default async function MatchingSessionReportPage({ params }: PageProps) {
   if (!summary || !isFounderAlignmentReportPayload(summary.reportRun.payload)) {
     return <EmptyReportState matchingSessionId={matchingSessionId} />;
   }
+  const workspace = await getMatchingWorkspaceForSession(matchingSessionId, user.id);
+  const workspaceMessage = searchParamValue(resolvedSearchParams.workspaceMessage) ?? null;
+  const workspaceOk = searchParamValue(resolvedSearchParams.workspaceOk) !== "0";
 
   const payload = summary.reportRun.payload;
   const founderScoring = payload.founderScoring;
@@ -124,9 +239,12 @@ export default async function MatchingSessionReportPage({ params }: PageProps) {
           Zurück zu meinen Intros
         </Link>
         <p className="text-xs font-medium text-slate-500">
-          Session-basierter Snapshot · keine Einladung, keine Relationship, kein Workbook
+          Session-basierter Snapshot · keine Einladung, kein legacy Report, kein Workbook
         </p>
       </div>
+
+      <PageMessage message={workspaceMessage} ok={workspaceOk} />
+      <WorkspacePanel matchingSessionId={matchingSessionId} workspace={workspace} />
 
       <FounderMatchingView
         participantAName={participantAName}
