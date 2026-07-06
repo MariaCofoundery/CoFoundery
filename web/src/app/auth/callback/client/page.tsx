@@ -23,6 +23,14 @@ function buildAuthLandingHref(nextPath: string) {
   return `/auth/landing?${params.toString()}`;
 }
 
+function readHashParams() {
+  if (!window.location.hash.startsWith("#")) {
+    return null;
+  }
+
+  return new URLSearchParams(window.location.hash.slice(1));
+}
+
 export default function AuthCallbackClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,12 +40,16 @@ export default function AuthCallbackClientPage() {
     let cancelled = false;
 
     const finish = async () => {
-      const nextPath = normalizeNextPath(searchParams.get("next"));
-      const code = searchParams.get("code");
-      const tokenHash = searchParams.get("token_hash");
-      const type = searchParams.get("type") as EmailOtpType | null;
-      const accessToken = searchParams.get("access_token");
-      const refreshToken = searchParams.get("refresh_token");
+      const hashParams = readHashParams();
+      const getParam = (key: string) => searchParams.get(key) ?? hashParams?.get(key) ?? null;
+      const nextPath = normalizeNextPath(getParam("next"));
+      const code = getParam("code");
+      const tokenHash = getParam("token_hash");
+      const type = getParam("type") as EmailOtpType | null;
+      const accessToken = getParam("access_token");
+      const refreshToken = getParam("refresh_token");
+      const callbackError =
+        getParam("error") ?? getParam("error_code") ?? getParam("error_description");
 
       const fail = () => {
         if (!cancelled) {
@@ -46,6 +58,11 @@ export default function AuthCallbackClientPage() {
       };
 
       try {
+        if (callbackError) {
+          fail();
+          return;
+        }
+
         if (code) {
           const result = await supabase.auth.exchangeCodeForSession(code);
           if (result.error) {
