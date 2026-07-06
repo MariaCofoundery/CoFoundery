@@ -26,8 +26,6 @@ type PageProps = {
 
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const PRIMARY_DISABLED_CTA_CLASS =
-  "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
 const SECONDARY_CTA_CLASS =
   "inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 
@@ -159,9 +157,9 @@ function WorkspacePanel({
           nächster Schritt angebunden.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-            Workbook kommt als nächster Schritt
-          </button>
+          <Link href={`/workspaces/${workspace.workspace.id}`} className={PRIMARY_CTA_CLASS}>
+            Arbeitsraum öffnen
+          </Link>
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
             Zurück zu meinen Intros
           </Link>
