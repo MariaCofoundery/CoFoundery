@@ -1,7 +1,17 @@
+import { ComparisonScale } from "@/features/reporting/ComparisonScale";
+import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import type { FounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
+import {
+  FOUNDER_DIMENSION_META,
+  getFounderDimensionPoleLabels,
+} from "@/features/reporting/founderDimensionMeta";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
-import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
+import type {
+  FounderMatchingSelection,
+  MatchingDimensionStatus,
+} from "@/features/reporting/founderMatchingSelection";
+import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
@@ -20,10 +30,30 @@ type Props = {
   reportAccessNotice?: "locked" | "free_beta" | "session_snapshot" | null;
 };
 
+type FounderReportSection = FounderAlignmentReport["sections"][keyof FounderAlignmentReport["sections"]];
+type DimensionMatch = CompareFoundersResult["dimensions"][number];
+
+const SECTION_ORDER: Array<{
+  key: keyof FounderAlignmentReport["sections"];
+  label: string;
+}> = [
+  { key: "vision", label: "Unternehmenslogik" },
+  { key: "decisionLogic", label: "Entscheidungslogik" },
+  { key: "riskOrientation", label: "Risikoorientierung" },
+  { key: "workStructure", label: "Arbeitsstruktur & Zusammenarbeit" },
+  { key: "commitment", label: "Commitment" },
+  { key: "conflictStyle", label: "Konfliktstil" },
+];
+
 export function FounderMatchingView({
   participantAName,
   participantBName,
+  compareResult,
+  selection,
+  valuesProfileA,
+  valuesProfileB,
   founderReport,
+  workbookHref,
   teamContext,
   reportContext = "invitation",
   showUnlockSection = true,
@@ -33,6 +63,7 @@ export function FounderMatchingView({
   const isSessionReport = reportContext === "matching_session";
   const effectiveAccessNotice =
     reportAccessNotice ?? (showUnlockSection ? "locked" : isSessionReport ? "session_snapshot" : null);
+  const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
 
   return (
     <>
@@ -42,14 +73,10 @@ export function FounderMatchingView({
             {t(isSessionReport ? "Dynamik-Report" : "Matching-Report")}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-            {t(isSessionReport ? "Euer Dynamik-Report ist fertig." : "Euer Alignment-Report ist fertig.")}
+            {t(buildMatchHeadline(selection, isSessionReport))}
           </h1>
           <p className="mt-5 max-w-3xl text-[15px] leading-8 text-slate-700">
-            {t(
-              isSessionReport
-                ? "Dieser Snapshot zeigt euch erste gemeinsame Muster fuer ein gutes Gespraech ueber Zusammenarbeit."
-                : "Hier ist ein erster kurzer Einblick in eure Zusammenarbeit."
-            )}
+            {t(buildIntroSummary(selection, isSessionReport))}
           </p>
           <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
             {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
@@ -58,31 +85,28 @@ export function FounderMatchingView({
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-        <div className="grid gap-4 lg:grid-cols-2">
-          <article className="rounded-[22px] border border-emerald-200/80 bg-emerald-50/70 px-5 py-5">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
-              {t("Erster Eindruck")}
-            </p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              {t("Ihr habt eine starke Uebereinstimmung in eurer Vision.")}
-            </p>
-          </article>
-
-          <article className="rounded-[22px] border border-amber-200/80 bg-amber-50/70 px-5 py-5">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
-              {t("Spannungsfeld")}
-            </p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              {t("Gleichzeitig zeigen sich Unterschiede in eurem Entscheidungsstil.")}
-            </p>
-          </article>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          {t("Eure zentralen Muster")}
+        </p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {buildCentralPatternSections(selection).map((section) => (
+            <article
+              key={section.label}
+              className="rounded-[22px] border border-slate-200/80 bg-white/80 px-5 py-5"
+            >
+              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                {t(section.label)}
+              </p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
+            </article>
+          ))}
         </div>
 
         <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-700">
           {t(
             isSessionReport
-              ? "Nutzt diese Punkte als Ausgangspunkt fuer ein ruhiges Gespraech ueber Rollen, Erwartungen und Zusammenarbeit."
-              : "Die entscheidenden Punkte fuer eure Zusammenarbeit seht ihr im vollstaendigen Report."
+              ? "Nutzt diese Punkte als Ausgangspunkt für ein ruhiges Gespräch über Rollen, Erwartungen und Zusammenarbeit."
+              : "Die entscheidenden Punkte für eure Zusammenarbeit seht ihr im vollständigen Report."
           )}
         </p>
 
@@ -95,25 +119,25 @@ export function FounderMatchingView({
               {t("Dieser Team-Report ist noch nicht freigeschaltet.")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("Die Freischaltung fuer diesen Legacy-Report ist noch nicht aktiv.")}
+              {t("Die Freischaltung für diesen Legacy-Report ist noch nicht aktiv.")}
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-              {t("Wenn ein Advisor oder Accelerator den Report fuer euch freischaltet, ist er fuer das Team verfuegbar.")}
+              {t("Wenn ein Advisor oder Accelerator den Report für euch freischaltet, ist er für das Team verfügbar.")}
             </p>
             <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-              {t("Freischaltung kommt bald. Bis dahin bleibt der PDF-Export fuer diesen Report deaktiviert.")}
+              {t("Freischaltung kommt bald. Bis dahin bleibt der PDF-Export für diesen Report deaktiviert.")}
             </p>
           </div>
         ) : effectiveAccessNotice === "free_beta" ? (
           <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
-              {t("Kostenlos verfuegbar in der Testphase")}
+              {t("Kostenlos verfügbar in der Testphase")}
             </p>
             <h2 className="mt-3 text-xl font-semibold text-slate-950">
-              {t("Dieser Report ist in der aktuellen Testphase vollstaendig geoeffnet.")}
+              {t("Dieser Report ist in der aktuellen Testphase vollständig geöffnet.")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("Spaeter kann die Freischaltung ueber einen Team- oder Report-Zugang laufen.")}
+              {t("Später kann die Freischaltung über einen Team- oder Report-Zugang laufen.")}
             </p>
           </div>
         ) : effectiveAccessNotice === "session_snapshot" ? (
@@ -131,50 +155,59 @@ export function FounderMatchingView({
       {effectiveAccessNotice === "locked" ? (
         <section className="page-section mt-8 rounded-[28px] border border-dashed border-slate-300 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Vollstaendiger Report")}
+            {t("Vollständiger Report")}
           </p>
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            {t("Der vollstaendige Report wird nach der Freischaltung sichtbar.")}
+            {t("Der vollständige Report wird nach der Freischaltung sichtbar.")}
           </p>
         </section>
       ) : (
-        <FounderMatchingReportSections founderReport={founderReport} />
+        <FounderMatchingReportSections
+          founderReport={founderReport}
+          compareResult={compareResult}
+          selection={selection}
+          participantAName={participantAName}
+          participantBName={participantBName}
+          valuesBlock={valuesBlock}
+          workbookHref={workbookHref}
+          isSessionReport={isSessionReport}
+        />
       )}
     </>
   );
 }
 
-function teamContextLabel(teamContext: TeamContext) {
-  return teamContext === "existing_team" ? "Bestehendes Team" : "Founder-Matching";
-}
-
-type FounderReportSection = FounderAlignmentReport["sections"][keyof FounderAlignmentReport["sections"]];
-
-const SECTION_ORDER: Array<{
-  key: keyof FounderAlignmentReport["sections"];
-  label: string;
-}> = [
-  { key: "vision", label: "Unternehmenslogik" },
-  { key: "decisionLogic", label: "Entscheidungslogik" },
-  { key: "riskOrientation", label: "Risikoorientierung" },
-  { key: "workStructure", label: "Arbeitsstruktur & Zusammenarbeit" },
-  { key: "commitment", label: "Commitment" },
-  { key: "conflictStyle", label: "Konfliktstil" },
-];
-
 function FounderMatchingReportSections({
   founderReport,
+  compareResult,
+  selection,
+  participantAName,
+  participantBName,
+  valuesBlock,
+  workbookHref,
+  isSessionReport,
 }: {
   founderReport?: FounderAlignmentReport | null;
+  compareResult: CompareFoundersResult;
+  selection: FounderMatchingSelection;
+  participantAName: string;
+  participantBName: string;
+  valuesBlock: ReturnType<typeof buildFounderValuesBlockFromProfiles>;
+  workbookHref: string;
+  isSessionReport: boolean;
 }) {
-  if (!founderReport) {
+  const markerA = buildMarkerLabel(participantAName);
+  const markerB = buildMarkerLabel(participantBName);
+  const conversationPrompts = collectConversationPrompts(founderReport);
+
+  if (!founderReport && compareResult.dimensions.length === 0) {
     return (
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Vollstaendiger Report")}
+          {t("Vollständiger Report")}
         </p>
         <p className="mt-4 text-sm leading-7 text-slate-700">
-          {t("Der Report ist freigeschaltet, aber die Detailauswertung ist fuer diesen alten Datensatz noch nicht renderbar.")}
+          {t("Der Report ist freigeschaltet, aber die Detailauswertung ist für diesen alten Datensatz noch nicht renderbar.")}
         </p>
       </section>
     );
@@ -182,68 +215,170 @@ function FounderMatchingReportSections({
 
   return (
     <>
+      {founderReport ? <ExecutiveSummarySection founderReport={founderReport} /> : null}
+
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Executive Summary")}
+          {t("Eure Dynamik im Überblick")}
         </p>
-        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-slate-950">
-          {t(founderReport.executiveSummary.headline)}
-        </h2>
-        <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-700">
-          {t(founderReport.executiveSummary.summaryIntro)}
-        </p>
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {summaryMessages(founderReport).map((message) => (
-            <article
-              key={message.label}
-              className="rounded-[22px] border border-slate-200/80 bg-slate-50/75 px-5 py-5"
-            >
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                {t(message.label)}
-              </p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(message.text)}</p>
-            </article>
-          ))}
+        <div className="mt-6 space-y-4">
+          {compareResult.dimensions.map((dimension) => {
+            const meta = FOUNDER_DIMENSION_META[dimension.dimension];
+            const reportPoles = getFounderDimensionPoleLabels(dimension.dimension, "report");
+            const status = selection.dimensionStatuses.find(
+              (entry) => entry.dimension === dimension.dimension
+            );
+
+            return (
+              <article
+                key={`matching-overview-${dimension.dimension}`}
+                className="rounded-[22px] border border-slate-200/70 bg-slate-50/60 px-5 py-4 sm:px-6 sm:py-5"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h4 className="text-[15px] font-semibold text-slate-900">
+                      {t(meta.canonicalName)}
+                    </h4>
+                    <p className="mt-2 text-xs leading-6 text-slate-500">
+                      {t(meta.description)}
+                    </p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${statusTone(status?.status)}`}>
+                    {t(statusLabel(status?.status))}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-slate-700">
+                  {t(buildDimensionReading(dimension, status?.status ?? "nah"))}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {t(buildDimensionBusinessMeaning(dimension.dimension, status?.status ?? "nah"))}
+                </p>
+
+                <div className="mt-4 max-w-3xl">
+                  <ComparisonScale
+                    scoreA={dimension.scoreA}
+                    scoreB={dimension.scoreB}
+                    markerA={markerA}
+                    markerB={markerB}
+                    participantAName={participantAName}
+                    participantBName={participantBName}
+                    lowLabel={t(reportPoles?.left ?? meta.reportLeftPole)}
+                    highLabel={t(reportPoles?.right ?? meta.reportRightPole)}
+                    valueScale="founder_percent"
+                    compact
+                  />
+                </div>
+              </article>
+            );
+          })}
         </div>
-        {founderReport.executiveSummary.recommendedFocus.length > 0 ? (
-          <div className="mt-8 rounded-[24px] border border-slate-200/80 bg-white p-6">
-            <h3 className="text-base font-semibold text-slate-950">
-              {t("Empfohlener Gespraechsfokus")}
-            </h3>
-            <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-              {founderReport.executiveSummary.recommendedFocus.map((prompt) => (
-                <li key={prompt} className="flex gap-3">
-                  <span className="mt-3 h-1.5 w-1.5 flex-none rounded-full bg-slate-400" />
-                  <span>{t(prompt)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
       </section>
 
-      <section className="page-section mt-8 grid gap-6 print:mt-4">
-        {SECTION_ORDER.map(({ key, label }) => (
-          <FounderMatchingDimensionSection
-            key={key}
-            label={label}
-            section={founderReport.sections[key]}
-          />
-        ))}
-      </section>
+      {founderReport ? (
+        <section className="page-section mt-8 grid gap-6 print:mt-4">
+          {SECTION_ORDER.map(({ key, label }) => (
+            <FounderMatchingDimensionSection
+              key={key}
+              label={label}
+              section={founderReport.sections[key]}
+            />
+          ))}
+        </section>
+      ) : null}
+
+      {valuesBlock ? (
+        <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+            {t("Zusatzmodul Wertefokus")}
+          </p>
+          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            {[
+              { label: "Gemeinsame Basis", entry: valuesBlock.gemeinsameBasis },
+              { label: "Unterschied unter Druck", entry: valuesBlock.unterschiedUnterDruck },
+              { label: "Leitplanke", entry: valuesBlock.leitplanke },
+            ].map(({ label, entry }) => (
+              <article
+                key={`${label}-${entry.title}`}
+                className="rounded-[22px] border border-slate-200/80 bg-slate-50/60 px-5 py-5"
+              >
+                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{t(label)}</p>
+                <h3 className="mt-2 text-sm font-semibold text-slate-900">{t(entry.title)}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{t(entry.body)}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {conversationPrompts.length > 0 ? (
+        <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+            {t("Gesprächsimpulse für euer nächstes Gespräch")}
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
+            {t("Diese Fragen sind als nächster Schritt gedacht, nachdem ihr die Muster und Skalen eingeordnet habt.")}
+          </p>
+          <ul className="mt-6 grid gap-3 lg:grid-cols-2">
+            {conversationPrompts.map((prompt) => (
+              <li
+                key={prompt}
+                className="rounded-[20px] border border-slate-200/80 bg-white/88 px-5 py-4 text-sm leading-7 text-slate-800"
+              >
+                {t(prompt)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {!isSessionReport ? (
+        <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:hidden">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+            {t("Nächster Schritt")}
+          </p>
+          <h3 className="mt-3 text-xl font-semibold text-slate-900">
+            {t("Diese Punkte klärt ihr nicht nebenbei.")}
+          </h3>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
+            {t("Im Workbook legt ihr fest, wie ihr damit arbeitet.")}
+          </p>
+          <div className="mt-6">
+            <ReportActionButton href={workbookHref}>{t("Workbook starten")}</ReportActionButton>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }
 
-function summaryMessages(founderReport: FounderAlignmentReport) {
-  return [
-    { label: "Staerke", text: founderReport.executiveSummary.topMessages.strength },
-    {
-      label: "Ergaenzung",
-      text: founderReport.executiveSummary.topMessages.complementaryDynamic,
-    },
-    { label: "Klaerungsfeld", text: founderReport.executiveSummary.topMessages.tension },
-  ].filter((entry): entry is { label: string; text: string } => Boolean(entry.text));
+function ExecutiveSummarySection({ founderReport }: { founderReport: FounderAlignmentReport }) {
+  return (
+    <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
+      <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+        {t("Executive Summary")}
+      </p>
+      <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-slate-950">
+        {t(founderReport.executiveSummary.headline)}
+      </h2>
+      <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-700">
+        {t(founderReport.executiveSummary.summaryIntro)}
+      </p>
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {summaryMessages(founderReport).map((message) => (
+          <article
+            key={message.label}
+            className="rounded-[22px] border border-slate-200/80 bg-slate-50/75 px-5 py-5"
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              {t(message.label)}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-700">{t(message.text)}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function FounderMatchingDimensionSection({
@@ -265,7 +400,7 @@ function FounderMatchingDimensionSection({
       {section.potentialTensions.length > 0 ? (
         <div className="mt-7 rounded-[24px] border border-amber-200/80 bg-amber-50/70 p-6">
           <h3 className="text-base font-semibold text-slate-950">
-            {t("Moegliche Spannungsfelder")}
+            {t("Mögliche Spannungsfelder")}
           </h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {section.potentialTensions.map((tension) => (
@@ -279,22 +414,184 @@ function FounderMatchingDimensionSection({
           </div>
         </div>
       ) : null}
-
-      {section.conversationPrompts.length > 0 ? (
-        <div className="mt-7 rounded-[24px] border border-slate-200/80 bg-slate-50/75 p-6">
-          <h3 className="text-base font-semibold text-slate-950">
-            {t("Fragen fuer euer Gespraech")}
-          </h3>
-          <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-            {section.conversationPrompts.map((prompt) => (
-              <li key={prompt} className="flex gap-3">
-                <span className="mt-3 h-1.5 w-1.5 flex-none rounded-full bg-slate-400" />
-                <span>{t(prompt)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
     </article>
   );
+}
+
+function summaryMessages(founderReport: FounderAlignmentReport) {
+  return [
+    { label: "Stärke", text: founderReport.executiveSummary.topMessages.strength },
+    {
+      label: "Ergänzung",
+      text: founderReport.executiveSummary.topMessages.complementaryDynamic,
+    },
+    { label: "Klärungsfeld", text: founderReport.executiveSummary.topMessages.tension },
+  ].filter((entry): entry is { label: string; text: string } => Boolean(entry.text));
+}
+
+function teamContextLabel(teamContext: TeamContext) {
+  return teamContext === "existing_team" ? "Bestehendes Team" : "Founder-Matching";
+}
+
+function buildMarkerLabel(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0].slice(0, 1)}${parts[1].slice(0, 1)}`.toUpperCase();
+}
+
+function buildMatchHeadline(selection: FounderMatchingSelection, isSessionReport: boolean) {
+  if (isSessionReport) {
+    return "Euer Dynamik-Report ist fertig.";
+  }
+
+  switch (selection.heroSelection.mode) {
+    case "tension_led":
+      return "Ein zentrales Spannungsfeld wird bei euch früh im Alltag sichtbar.";
+    case "complement_led":
+      return "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst führt.";
+    case "coordination_led":
+      return "Ihr seid nicht weit auseinander, aber auch nicht automatisch im selben Takt.";
+    case "blind_spot_watch":
+      return "Eure Nähe wirkt tragend und braucht gerade deshalb bewusste Watchpoints.";
+    case "alignment_led":
+    default:
+      return "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe.";
+  }
+}
+
+function buildIntroSummary(selection: FounderMatchingSelection, isSessionReport: boolean) {
+  if (isSessionReport) {
+    return "Dieser Snapshot zeigt euch eure gemeinsamen Muster, Unterschiede und Abstimmungspunkte als visuelle Momentaufnahme.";
+  }
+
+  switch (selection.heroSelection.mode) {
+    case "tension_led":
+      return "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst.";
+    case "complement_led":
+      return "Euer Unterschied ist weder automatisch Problem noch automatisch Stärke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Führung braucht.";
+    case "coordination_led":
+      return "Bei euch geht eher Energie in Nachziehen, Schleifen und stille Koordination als in offenen Grundsatzstreit.";
+    case "blind_spot_watch":
+      return "Bei euch liegt das Risiko nicht zuerst in offenem Gegensatz, sondern in einer gemeinsamen Tendenz, die zu spät bewusst wird.";
+    case "alignment_led":
+    default:
+      return "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt.";
+  }
+}
+
+function buildCentralPatternSections(selection: FounderMatchingSelection) {
+  const corePattern = selection.heroSelection.mode === "blind_spot_watch"
+    ? selection.heroSelection.biggestRisk
+      ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich zunächst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.`
+      : "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und gerade deshalb leicht zu spät geprüft wird."
+    : selection.biggestTension
+      ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Maßstäben schaut.`
+      : selection.strongestComplement
+        ? `Euer stärkster Unterschied liegt in ${selection.strongestComplement.dimension} und kann euch breiter machen, wenn ihr ihn bewusst führt.`
+        : selection.stableBase
+          ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfähig, aber kein Ersatz für klare Regeln an offenen Punkten.`
+          : "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis.";
+
+  const everydayImpact = selection.biggestTension
+    ? buildDimensionBusinessMeaning(selection.biggestTension.dimension, selection.biggestTension.status)
+    : selection.strongestComplement
+      ? buildDimensionBusinessMeaning(selection.strongestComplement.dimension, selection.strongestComplement.status)
+      : "Im Alltag zeigt sich das weniger in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen.";
+
+  const consequence = selection.agreementFocusDimensions[0]
+    ? `Der wichtigste Arbeitsauftrag liegt aktuell bei ${selection.agreementFocusDimensions[0].dimension}. Dort braucht ihr eine explizite Vereinbarung.`
+    : "Ohne bewusste Klärung entstehen unterschiedliche Maßstäbe genau dort, wo ihr gemeinsam tragen und entscheiden müsst.";
+
+  return [
+    { label: "Kernmuster", body: corePattern },
+    { label: "Auswirkung im Alltag", body: everydayImpact },
+    { label: "Konsequenz", body: consequence },
+  ];
+}
+
+function buildDimensionReading(
+  dimension: DimensionMatch,
+  status: MatchingDimensionStatus
+) {
+  if (dimension.scoreA == null || dimension.scoreB == null) {
+    return "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor.";
+  }
+
+  if (dimension.hasSharedBlindSpotRisk) {
+    return "Eure Positionen liegen nah beieinander. Gerade diese Nähe kann aber dazu führen, dass gemeinsame Annahmen zu lange ungeprüft bleiben.";
+  }
+
+  if (status === "kritisch") {
+    return "Hier liegt ein deutliches Spannungsfeld. Ihr lest diese Dimension nicht automatisch aus derselben Logik heraus.";
+  }
+
+  if (status === "abstimmung_nötig") {
+    return "Hier seid ihr nicht fundamental gegensätzlich, aber der Alltag braucht bewusste Abstimmung.";
+  }
+
+  if (status === "ergänzend") {
+    return "Hier entsteht eine produktive Ergänzung, wenn Rollen, Timing und Entscheidungsrechte sauber geführt werden.";
+  }
+
+  return "Hier zeigt sich eine tragfähige gemeinsame Linie, die euch im Alltag entlasten kann.";
+}
+
+function buildDimensionBusinessMeaning(
+  dimension: DimensionMatch["dimension"],
+  status: MatchingDimensionStatus
+) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return status === "kritisch"
+        ? "Wenn ihr das nicht klärt, könnt ihr am selben Unternehmen mit verschiedenen Grundlogiken arbeiten."
+        : "Wenn ihr das offen lasst, können aus derselben Priorität unterschiedliche Zielbilder werden.";
+    case "Entscheidungslogik":
+      return status === "kritisch"
+        ? "Ohne klare Regel könnt ihr aneinander vorbei entscheiden oder Entscheidungen unterschiedlich früh als erledigt ansehen."
+        : "Wenn ihr das offen lasst, entstehen leicht Schleifen, obwohl beide schon weiter wollen.";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return status === "kritisch"
+        ? "Ohne klare Regeln wird aus Alltag leicht direkte Reibung über Sichtbarkeit, Eigenraum und Mitsicht."
+        : "Wenn ihr das nicht klärt, kann sich dieselbe Zusammenarbeit für eine Person zu eng und für die andere zu lose anfühlen.";
+    case "Commitment":
+      return status === "kritisch"
+        ? "Ohne klare Abmachung wird Commitment leicht zum Dauerthema über Tempo, Verfügbarkeit und Fairness."
+        : "Wenn ihr das nicht klärt, entsteht leicht Frust über Tempo, Verfügbarkeit und Verantwortung.";
+    case "Risikoorientierung":
+      return status === "kritisch"
+        ? "Ohne klare Leitplanke zieht leicht eine Person an, während die andere früher bremst."
+        : "Wenn ihr das offen lasst, werden Chancen leicht zu früh gestoppt oder zu weit getrieben.";
+    case "Konfliktstil":
+      return status === "kritisch"
+        ? "Ohne Regel dazu können Kleinigkeiten eskalieren oder zu lange unter der Oberfläche bleiben."
+        : "Wenn ihr das offen lasst, fühlt sich eine Person leicht überfahren und die andere ausgebremst.";
+  }
+}
+
+function statusLabel(status: MatchingDimensionStatus | undefined) {
+  if (status === "kritisch") return "Kritisch";
+  if (status === "abstimmung_nötig") return "Braucht Abstimmung";
+  if (status === "ergänzend") return "Ergänzend";
+  return "Nahe Basis";
+}
+
+function statusTone(status: MatchingDimensionStatus | undefined) {
+  if (status === "kritisch") return "border border-rose-200 bg-rose-50 text-rose-700";
+  if (status === "abstimmung_nötig") return "border border-amber-200 bg-amber-50 text-amber-700";
+  if (status === "ergänzend") {
+    return "border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/10 text-[color:var(--brand-accent)]";
+  }
+  return "border border-emerald-200 bg-emerald-50 text-emerald-700";
+}
+
+function collectConversationPrompts(founderReport?: FounderAlignmentReport | null) {
+  if (!founderReport) return [];
+
+  const prompts = [
+    ...founderReport.executiveSummary.recommendedFocus,
+    ...SECTION_ORDER.flatMap(({ key }) => founderReport.sections[key].conversationPrompts),
+  ];
+
+  return [...new Set(prompts.filter(Boolean))].slice(0, 8);
 }
