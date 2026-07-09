@@ -1,14 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
-import {
-  BETA_ACCESS_COOKIE_NAME,
-  BETA_ACCESS_REQUEST_EMAIL,
-  getBetaAccessRequestHref,
-  hasBetaAccessCookie,
-  isInviteBypassPath,
-  isValidBetaAccessCode,
-} from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { createClient } from "@/lib/supabase/server";
@@ -27,7 +19,7 @@ function authErrorMessage(error: string | undefined) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ beta?: string; error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -36,39 +28,9 @@ export default async function LoginPage({
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
   const errorMessage = authErrorMessage(params.error);
-  const cookieStore = await cookies();
-  const betaAccessGranted = hasBetaAccessCookie(cookieStore);
-  const inviteBypass = isInviteBypassPath(nextPath);
-  const betaGateRequired = !betaAccessGranted && !inviteBypass;
-  const betaError =
-    params.beta === "invalid"
-      ? "Dieser Zugangscode ist aktuell nicht freigeschaltet."
-      : null;
 
   if (user) {
     redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
-  }
-
-  async function unlockBetaAccessAction(formData: FormData) {
-    "use server";
-
-    const code = String(formData.get("betaCode") ?? "");
-    const redirectNextPath = normalizeNextPath(String(formData.get("nextPath") ?? "/dashboard"));
-
-    if (!isValidBetaAccessCode(code)) {
-      redirect(`/login?beta=invalid&next=${encodeURIComponent(redirectNextPath)}`);
-    }
-
-    const actionCookieStore = await cookies();
-    actionCookieStore.set(BETA_ACCESS_COOKIE_NAME, "granted", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-
-    redirect(`/login?next=${encodeURIComponent(redirectNextPath)}`);
   }
 
   return (
@@ -76,78 +38,28 @@ export default async function LoginPage({
       <section className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-[0_20px_40px_rgba(16,26,42,0.1)] md:p-8">
         <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">Login</p>
         <h1 className="mt-2 text-3xl font-semibold text-[color:var(--ink)]">CoFoundery Align</h1>
-        {betaGateRequired ? (
-          <>
-            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-              Cofoundery befindet sich aktuell in einer kontrollierten Testphase.
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-              Du benötigst aktuell einen Zugangscode.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-              Melde dich per Magic Link an. Es gibt keine Passwörter und keine anonymen Flows.
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-              Wenn keine Mail ankommt, prüfe bitte auch deinen Spam-Ordner.
-            </p>
-          </>
-        )}
+        <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
+          Melde dich per Magic Link an, wenn du bereits Zugang hast.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
+          Wenn du neu bist, starte bitte mit deinem Zugangscode.
+        </p>
         {errorMessage ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
             {errorMessage}
           </p>
         ) : null}
-        {betaGateRequired ? (
-          <div className="mt-6 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-5">
-            {betaError ? (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{betaError}</p>
-            ) : null}
-            <form action={unlockBetaAccessAction} className="grid gap-3">
-              <input type="hidden" name="nextPath" value={nextPath} />
-              <label
-                htmlFor="beta-code"
-                className="text-sm font-medium text-[color:var(--ink)]"
-              >
-                Zugangscode
-              </label>
-              <input
-                id="beta-code"
-                name="betaCode"
-                type="text"
-                required
-                placeholder="Code eingeben"
-                className="rounded-lg border border-[color:var(--line)] bg-white px-4 py-3 text-sm outline-none focus:border-[color:var(--ink-soft)]"
-              />
-              <p className="text-xs leading-6 text-[color:var(--muted)]">
-                Noch keinen Code? Schreib uns kurz, fuer welches Team, Programm oder Event du Cofoundery testen moechtest.
-              </p>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center rounded-lg bg-[color:var(--ink)] px-4 py-3 text-sm font-semibold text-white"
-                >
-                  Zugang öffnen
-                </button>
-                <a
-                  href={getBetaAccessRequestHref()}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-                >
-                  Beta-Zugang anfragen
-                </a>
-              </div>
-              <p className="text-xs text-slate-500">
-                {BETA_ACCESS_REQUEST_EMAIL}
-              </p>
-            </form>
-          </div>
-        ) : (
-          <div className="mt-6">
-            <MagicLinkForm nextPath={nextPath} />
-          </div>
-        )}
+        <div className="mt-6">
+          <MagicLinkForm nextPath={nextPath} />
+        </div>
+        <div className="mt-5 border-t border-slate-200 pt-5">
+          <Link
+            href={`/start?next=${encodeURIComponent(nextPath)}`}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            Neu starten mit Zugangscode
+          </Link>
+        </div>
       </section>
     </main>
   );

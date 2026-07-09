@@ -51,17 +51,22 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       email,
       options: {
         emailRedirectTo: redirectTo.toString(),
+        shouldCreateUser: false,
       },
     });
 
     if (error) {
-      setStatus("error");
-      setMessage(error.message);
+      setStatus("sent");
+      setMessage(
+        "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\"."
+      );
       return;
     }
 
     setStatus("sent");
-    setMessage("Magic Link versendet. Bitte checke dein Postfach.");
+    setMessage(
+      "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\"."
+    );
   };
 
   return (

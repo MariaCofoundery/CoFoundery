@@ -87,7 +87,7 @@ export function LandingTopNav() {
               Login
             </Link>
             <Link
-              href="/dashboard"
+              href="/start"
               className="inline-flex items-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_25px_rgba(38,118,255,0.16)] transition duration-200 hover:-translate-y-[1px] hover:shadow-[0_14px_30px_rgba(38,118,255,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
             >
               Jetzt starten
@@ -96,7 +96,7 @@ export function LandingTopNav() {
 
           <div className="flex items-center gap-2 md:hidden">
             <Link
-              href="/dashboard"
+              href="/start"
               className="inline-flex items-center rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-slate-950 shadow-[0_8px_22px_rgba(38,118,255,0.14)] transition hover:-translate-y-[1px]"
             >
               Starten
@@ -155,7 +155,7 @@ export function LandingTopNav() {
                 Login
               </Link>
               <Link
-                href="/dashboard"
+                href="/start"
                 onClick={() => setIsMenuOpen(false)}
                 className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_24px_rgba(38,118,255,0.16)] transition hover:-translate-y-[1px]"
               >

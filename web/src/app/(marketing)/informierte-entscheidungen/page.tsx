@@ -37,7 +37,7 @@ export default function InformierteEntscheidungenPage() {
             ))}
           </nav>
           <Link
-            href="/dashboard"
+            href="/start"
             className="rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-slate-950 transition hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] md:text-xs"
           >
             Session starten
@@ -158,7 +158,7 @@ export default function InformierteEntscheidungenPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/dashboard"
+              href="/start"
               className="rounded-2xl bg-[color:var(--brand-primary)] px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 transition hover:translate-y-[-1px] hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
             >
               Alignment prüfen

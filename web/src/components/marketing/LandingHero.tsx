@@ -234,7 +234,7 @@ export function LandingHero() {
 
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link
-            href="/dashboard"
+            href="/start"
             className="inline-flex items-center justify-center rounded-2xl bg-[color:var(--brand-primary)] px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 transition hover:translate-y-[-1px] hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
           >
             Founder-Kompatibilität prüfen
