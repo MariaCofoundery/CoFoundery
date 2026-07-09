@@ -294,14 +294,6 @@ export default async function DiscoveryPage() {
                 passende Co-Founder-Kandidat:innen vorgeschlagen zu bekommen.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3 lg:justify-end">
-              <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
-                {statusView.cta}
-              </Link>
-              <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                Offene Anfragen ansehen
-              </Link>
-            </div>
           </div>
         </header>
 

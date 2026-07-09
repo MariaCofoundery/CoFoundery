@@ -296,15 +296,15 @@ function MultiCheckboxGrid<T extends string>({
 }
 
 function assessmentSignalStatusCopy(readiness: OwnDiscoveryAssessmentSignalReadiness) {
+  if (!readiness.hasSubmittedBaseAssessment) {
+    return "Fülle zuerst die Basis-Fragen aus, damit Cofoundery den Check in Discovery nutzen kann.";
+  }
+
   if (!readiness.includeAssessmentSignals) {
     return "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt.";
   }
 
-  if (!readiness.hasSubmittedBaseAssessment) {
-    return "Aktiviert, aber noch nicht bereit: Fülle zuerst den Cofoundery Check aus, damit wir ihn später für bessere Gesprächsimpulse nutzen können.";
-  }
-
-  return "Bereit: Dein Cofoundery Check kann in einem nächsten Schritt privat für bessere Gesprächsimpulse genutzt werden.";
+  return "Aktiv: Cofoundery nutzt deine Check-Signale privat für bessere Discovery-Vorschläge und Gesprächsimpulse.";
 }
 
 function assessmentSignalStatusClass(readiness: OwnDiscoveryAssessmentSignalReadiness) {
@@ -312,7 +312,7 @@ function assessmentSignalStatusClass(readiness: OwnDiscoveryAssessmentSignalRead
     return "bg-emerald-50 text-emerald-900";
   }
 
-  if (readiness.includeAssessmentSignals) {
+  if (!readiness.hasSubmittedBaseAssessment) {
     return "bg-amber-50 text-amber-900";
   }
 
@@ -735,15 +735,13 @@ export default async function DiscoveryProfilePage({
                 bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne
                 Auswertungen werden nicht auf deinem Profil angezeigt.
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Die Auswertung wird in einem nächsten Schritt angebunden.
-              </p>
               <label className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
                 <input
                   type="checkbox"
                   name="includeAssessmentSignals"
                   value="true"
                   defaultChecked={preferences.includeAssessmentSignals}
+                  disabled={!assessmentSignalReadiness.hasSubmittedBaseAssessment}
                   className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-950"
                 />
                 <span>
@@ -756,6 +754,11 @@ export default async function DiscoveryProfilePage({
                   </span>
                 </span>
               </label>
+              {!assessmentSignalReadiness.hasSubmittedBaseAssessment ? (
+                <Link href="/me/base?next=/discovery/profile" className={`${PRIMARY_BUTTON_CLASS} mt-4`}>
+                  Basis-Fragen ausfüllen
+                </Link>
+              ) : null}
               <p
                 className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${assessmentSignalStatusClass(
                   assessmentSignalReadiness

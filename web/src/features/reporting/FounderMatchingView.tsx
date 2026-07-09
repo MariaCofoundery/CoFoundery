@@ -1,4 +1,3 @@
-import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type { FounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
@@ -21,11 +20,6 @@ type Props = {
 export function FounderMatchingView({
   participantAName,
   participantBName,
-  compareResult: _compareResult,
-  selection: _selection,
-  valuesProfileA: _valuesProfileA,
-  valuesProfileB: _valuesProfileB,
-  workbookHref: _workbookHref,
   teamContext,
   reportContext = "invitation",
   showUnlockSection = true,
@@ -94,19 +88,14 @@ export function FounderMatchingView({
               {t("Dieser Team-Report ist noch nicht freigeschaltet.")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("In der Testphase kannst du den Report kostenlos oeffnen.")}
+              {t("Die Freischaltung fuer diesen Legacy-Report ist noch nicht aktiv.")}
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
               {t("Wenn ein Advisor oder Accelerator den Report fuer euch freischaltet, ist er fuer das Team verfuegbar.")}
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <ReportActionButton href="#report-paywall-placeholder">
-                {t("Report freischalten")}
-              </ReportActionButton>
-              <ReportActionButton href="#report-paywall-placeholder" variant="utility">
-                {t("Kostenlos oeffnen (Testphase)")}
-              </ReportActionButton>
-            </div>
+            <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+              {t("Freischaltung kommt bald. Bis dahin bleibt der PDF-Export fuer diesen Report deaktiviert.")}
+            </p>
           </div>
         ) : (
           <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">

@@ -153,6 +153,7 @@ export default async function ReportPage({ params }: PageProps) {
   );
   const selection = buildFounderMatchingSelection(compareResult);
   const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
+  const isLegacyReportLocked = true;
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
@@ -179,11 +180,17 @@ export default async function ReportPage({ params }: PageProps) {
         >
           Zurück zum Dashboard
         </Link>
-        <PrintReportButton
-          invitationId={snapshot.invitationId}
-          teamContext={teamContext}
-          properties={{ reportType: snapshot.reportType, renderMode: "founder_matching_live" }}
-        />
+        {isLegacyReportLocked ? (
+          <span className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500">
+            PDF nach Freischaltung verfügbar
+          </span>
+        ) : (
+          <PrintReportButton
+            invitationId={snapshot.invitationId}
+            teamContext={teamContext}
+            properties={{ reportType: snapshot.reportType, renderMode: "founder_matching_live" }}
+          />
+        )}
       </div>
 
       <FounderMatchingView
@@ -195,6 +202,7 @@ export default async function ReportPage({ params }: PageProps) {
         valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
         workbookHref={workbookHref}
         teamContext={teamContext}
+        showUnlockSection={isLegacyReportLocked}
       />
     </main>
   );
