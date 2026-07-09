@@ -1,0 +1,17 @@
+{
+  "account": "Account",
+  "current": "Current",
+  "dashboard": "Dashboard",
+  "discovery": "Find a Co-Founder",
+  "editProfile": "Edit profile",
+  "lastOpened": "Last opened",
+  "logoLabel": "Go to dashboard",
+  "logout": "Sign out",
+  "matchingReport": "Dynamics report",
+  "navLabel": "Product navigation",
+  "profileFallback": "Profile",
+  "report": "Report",
+  "reportContextHelp": "Choose the founder context whose report you want to open.",
+  "workbook": "Workbook",
+  "workbookContextHelp": "Choose the founder context you want to keep working in."
+}

@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
+import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 
 type Props = {
   children: React.ReactNode;
@@ -91,11 +93,20 @@ function discoveryCtaClassName(active: boolean) {
 
 function normalizeDisplayName(value: string | null) {
   const trimmed = value?.trim();
-  return trimmed && trimmed.length > 0 ? trimmed : "Profil";
+  return trimmed && trimmed.length > 0 ? trimmed : null;
 }
 
-function navigationContextStorageKey(label: string) {
-  return `product-nav:last-context:${label}`;
+function navigationContextStorageKey(kind: "matching" | "workbook") {
+  return `product-nav:last-context:${kind}`;
+}
+
+function writeLocaleCookie(locale: AppLocale) {
+  document.cookie = [
+    `${LOCALE_COOKIE_NAME}=${encodeURIComponent(locale)}`,
+    "path=/",
+    "max-age=31536000",
+    "samesite=lax",
+  ].join("; ");
 }
 
 export function ProductShell({
@@ -110,6 +121,7 @@ export function ProductShell({
 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations("navigation");
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
@@ -127,7 +139,7 @@ export function ProductShell({
   const navigationItems: NavigationItem[] = [
     {
       href: dashboardHref,
-      label: "Dashboard",
+      label: t("dashboard"),
       isActive: (currentPathname) =>
         resolvedActiveView === "advisor"
           ? currentPathname === "/advisor/dashboard"
@@ -161,7 +173,7 @@ export function ProductShell({
               <Link
                 href={dashboardHref}
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
-                aria-label="Zum Dashboard"
+                aria-label={t("logoLabel")}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -175,7 +187,7 @@ export function ProductShell({
               </Link>
 
               <nav
-                aria-label="Produktnavigation"
+                aria-label={t("navLabel")}
                 className="flex flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
               >
                 {navigationItems.map((item) => (
@@ -193,19 +205,20 @@ export function ProductShell({
                       href={resolvedWorkbookHref}
                       className={navLinkClassName(pathname.startsWith("/founder-alignment/"))}
                     >
-                      Workbook
+                      {t("workbook")}
                     </Link>
                     <Link
                       href={resolvedMatchingHref}
                       className={navLinkClassName(pathname.startsWith("/advisor/report"))}
                     >
-                      Report
+                      {t("report")}
                     </Link>
                   </>
                 ) : (
                   <>
                     <NavigationContextMenu
-                      label="Dynamik-Report"
+                      kind="matching"
+                      label={t("matchingReport")}
                       directHref={resolvedMatchingHref}
                       items={matchingItems}
                       isActive={
@@ -216,7 +229,8 @@ export function ProductShell({
                       currentHref={resolvedMatchingHref}
                     />
                     <NavigationContextMenu
-                      label="Workbook"
+                      kind="workbook"
+                      label={t("workbook")}
                       directHref={resolvedWorkbookHref}
                       items={workbookItems}
                       isActive={pathname.startsWith("/founder-alignment/")}
@@ -235,7 +249,7 @@ export function ProductShell({
                     href="/discovery"
                     className={discoveryCtaClassName(pathname.startsWith("/discovery"))}
                   >
-                    Co-Founder suchen
+                    {t("discovery")}
                   </Link>
                 ) : null}
               </nav>
@@ -248,6 +262,7 @@ export function ProductShell({
                 hasAdvisor={hasAdvisor}
               />
 
+              <LanguageSwitcher />
               <ProfileMenu displayName={displayName} />
             </div>
           </div>
@@ -260,24 +275,27 @@ export function ProductShell({
 }
 
 function NavigationContextMenu({
+  kind,
   label,
   directHref,
   items,
   isActive,
   currentHref,
 }: {
+  kind: "matching" | "workbook";
   label: string;
   directHref: string;
   items: ProductNavigationContextItem[];
   isActive: boolean;
   currentHref: string;
 }) {
+  const t = useTranslations("navigation");
   const [isOpen, setIsOpen] = useState(false);
   const [lastOpenedHref, setLastOpenedHref] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
 
     try {
-      return window.localStorage.getItem(navigationContextStorageKey(label));
+      return window.localStorage.getItem(navigationContextStorageKey(kind));
     } catch {
       return null;
     }
@@ -290,11 +308,11 @@ function NavigationContextMenu({
     if (!isActive || !currentHref || typeof window === "undefined") return;
 
     try {
-      window.localStorage.setItem(navigationContextStorageKey(label), currentHref);
+      window.localStorage.setItem(navigationContextStorageKey(kind), currentHref);
     } catch {
       // ignore localStorage issues
     }
-  }, [currentHref, isActive, label]);
+  }, [currentHref, isActive, kind]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -367,9 +385,7 @@ function NavigationContextMenu({
           <div className="border-b border-slate-200/80 px-3 py-3">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{label}</p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              {label === "Workbook"
-                ? "Waehle den Founder-Kontext, in dem du weiterarbeiten willst."
-                : "Waehle den Founder-Kontext, dessen Report du oeffnen willst."}
+              {kind === "workbook" ? t("workbookContextHelp") : t("reportContextHelp")}
             </p>
           </div>
 
@@ -389,7 +405,7 @@ function NavigationContextMenu({
                   return leftIsLastOpened ? -1 : 1;
                 }
 
-                if (label === "Workbook") {
+                if (kind === "workbook") {
                   const workbookPriority: Record<ProductNavigationContextItem["statusKind"], number> = {
                     in_progress: 0,
                     ready: 1,
@@ -423,7 +439,7 @@ function NavigationContextMenu({
                     if (typeof window !== "undefined") {
                       try {
                         window.localStorage.setItem(
-                          navigationContextStorageKey(label),
+                          navigationContextStorageKey(kind),
                           item.href
                         );
                       } catch {
@@ -459,11 +475,11 @@ function NavigationContextMenu({
                       </span>
                       {isCurrent ? (
                         <span className="rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-700">
-                          Aktuell
+                          {t("current")}
                         </span>
                       ) : isLastOpened ? (
                         <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                          Zuletzt geoeffnet
+                          {t("lastOpened")}
                         </span>
                       ) : null}
                     </span>
@@ -516,7 +532,8 @@ export function ProductNavigationOverride({
 }
 
 function ProfileMenu({ displayName }: { displayName: string | null }) {
-  const normalizedName = normalizeDisplayName(displayName);
+  const t = useTranslations("navigation");
+  const normalizedName = normalizeDisplayName(displayName) || t("profileFallback");
   const avatarLabel = normalizedName.charAt(0).toUpperCase();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -585,7 +602,7 @@ function ProfileMenu({ displayName }: { displayName: string | null }) {
             className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
             role="menuitem"
           >
-            Profil bearbeiten
+            {t("editProfile")}
           </Link>
           <Link
             href="/dashboard#dashboard-block-account"
@@ -593,7 +610,7 @@ function ProfileMenu({ displayName }: { displayName: string | null }) {
             className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
             role="menuitem"
           >
-            Account
+            {t("account")}
           </Link>
           <form action={signOutAction}>
             <button
@@ -601,11 +618,45 @@ function ProfileMenu({ displayName }: { displayName: string | null }) {
               className="block w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
               role="menuitem"
             >
-              Logout
+              {t("logout")}
             </button>
           </form>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function LanguageSwitcher() {
+  const locale = useLocale() as AppLocale;
+  const router = useRouter();
+  const t = useTranslations("common");
+
+  function selectLocale(nextLocale: AppLocale) {
+    if (nextLocale === locale) return;
+
+    writeLocaleCookie(nextLocale);
+    router.refresh();
+  }
+
+  return (
+    <div
+      className="flex items-center rounded-full border border-slate-200 bg-white p-1 text-xs font-medium text-slate-600"
+      aria-label={t("language.switchLabel")}
+    >
+      {SUPPORTED_LOCALES.map((item) => (
+        <button
+          key={item}
+          type="button"
+          onClick={() => selectLocale(item)}
+          className={`rounded-full px-2.5 py-1.5 transition ${
+            locale === item ? "bg-slate-900 text-white" : "hover:bg-slate-50 hover:text-slate-900"
+          }`}
+          aria-pressed={locale === item}
+        >
+          {t(`language.${item}`)}
+        </button>
+      ))}
     </div>
   );
 }

@@ -15,6 +15,9 @@ import {
   buildWorkbookHref,
   buildWorkbookIntroHref,
 } from "@/features/reporting/workbookNavigation";
+import { getRequestLocale } from "@/i18n/getLocale";
+import { I18nProvider } from "@/i18n/I18nProvider";
+import { getMessages } from "@/i18n/messages";
 import { DEFAULT_PUBLIC_APP_ORIGIN, getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -112,6 +115,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = getRequestLocale();
+  const messages = getMessages(locale);
   const supabase = await createClient();
   const {
     data: { user },
@@ -370,19 +375,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     null;
 
   return (
-    <html lang="de" className={`${spectral.variable} ${unbounded.variable}`}>
+    <html lang={locale} className={`${spectral.variable} ${unbounded.variable}`}>
       <body>
-        <ProductShell
-          hasFounder={roleViews.hasFounder}
-          hasAdvisor={roleViews.hasAdvisor}
-          displayName={displayName}
-          matchingHref={navigationTargets.matchingHref}
-          workbookHref={navigationTargets.workbookHref}
-          matchingItems={navigationTargets.matchingItems}
-          workbookItems={navigationTargets.workbookItems}
-        >
-          {children}
-        </ProductShell>
+        <I18nProvider locale={locale} messages={messages}>
+          <ProductShell
+            hasFounder={roleViews.hasFounder}
+            hasAdvisor={roleViews.hasAdvisor}
+            displayName={displayName}
+            matchingHref={navigationTargets.matchingHref}
+            workbookHref={navigationTargets.workbookHref}
+            matchingItems={navigationTargets.matchingItems}
+            workbookItems={navigationTargets.workbookItems}
+          >
+            {children}
+          </ProductShell>
+        </I18nProvider>
       </body>
     </html>
   );
