@@ -78,7 +78,7 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
 function emptyPreferences(): Pick<
   FounderSearchPreferences,
   "priorityWeights" | "mustHaves" | "includeAssessmentSignals" | "assessmentSignalsConsentedAt"
-> {
+> & { isDefaultedForSubmittedBase: boolean } {
   return {
     priorityWeights: {},
     mustHaves: {
@@ -92,6 +92,7 @@ function emptyPreferences(): Pick<
     },
     includeAssessmentSignals: false,
     assessmentSignalsConsentedAt: null,
+    isDefaultedForSubmittedBase: false,
   };
 }
 
@@ -297,7 +298,7 @@ function MultiCheckboxGrid<T extends string>({
 
 function assessmentSignalStatusCopy(readiness: OwnDiscoveryAssessmentSignalReadiness) {
   if (!readiness.hasSubmittedBaseAssessment) {
-    return "Fülle zuerst die Basis-Fragen aus, damit Cofoundery den Check in Discovery nutzen kann.";
+    return "Fülle zuerst die Basis-Fragen aus, um den Cofoundery Check einzubeziehen.";
   }
 
   if (!readiness.includeAssessmentSignals) {
@@ -342,7 +343,21 @@ export default async function DiscoveryProfilePage({
   const pageMessage = searchParamValue(params.message) ?? null;
   const pageIssues = searchParamValues(params.issue);
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
-  const preferences = loadedPreferences ?? emptyPreferences();
+  const defaultAssessmentSignalsForSubmittedBase =
+    !loadedPreferences && assessmentSignalReadiness.hasSubmittedBaseAssessment;
+  const preferences = loadedPreferences
+    ? { ...loadedPreferences, isDefaultedForSubmittedBase: false }
+    : {
+        ...emptyPreferences(),
+        includeAssessmentSignals: defaultAssessmentSignalsForSubmittedBase,
+        isDefaultedForSubmittedBase: defaultAssessmentSignalsForSubmittedBase,
+      };
+  const effectiveAssessmentSignalReadiness: OwnDiscoveryAssessmentSignalReadiness = {
+    ...assessmentSignalReadiness,
+    includeAssessmentSignals: preferences.includeAssessmentSignals,
+    isAssessmentSignalReady:
+      preferences.includeAssessmentSignals && assessmentSignalReadiness.hasSubmittedBaseAssessment,
+  };
   const publishIssues = getDiscoveryProfilePublishIssues(profile);
   const selectedPriorityCount = Object.values(preferences.priorityWeights).filter(
     (value) => typeof value === "number" && value > 0
@@ -741,7 +756,7 @@ export default async function DiscoveryProfilePage({
                   name="includeAssessmentSignals"
                   value="true"
                   defaultChecked={preferences.includeAssessmentSignals}
-                  disabled={!assessmentSignalReadiness.hasSubmittedBaseAssessment}
+                  disabled={!effectiveAssessmentSignalReadiness.hasSubmittedBaseAssessment}
                   className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-950"
                 />
                 <span>
@@ -754,17 +769,23 @@ export default async function DiscoveryProfilePage({
                   </span>
                 </span>
               </label>
-              {!assessmentSignalReadiness.hasSubmittedBaseAssessment ? (
+              {!effectiveAssessmentSignalReadiness.hasSubmittedBaseAssessment ? (
                 <Link href="/me/base?next=/discovery/profile" className={`${PRIMARY_BUTTON_CLASS} mt-4`}>
                   Basis-Fragen ausfüllen
                 </Link>
               ) : null}
+              {preferences.isDefaultedForSubmittedBase ? (
+                <p className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-900">
+                  Für die Testphase ist diese private Einstellung vorausgewählt. Speichere deine
+                  Suchprioritäten, um sie zu übernehmen, oder entferne den Haken.
+                </p>
+              ) : null}
               <p
                 className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${assessmentSignalStatusClass(
-                  assessmentSignalReadiness
+                  effectiveAssessmentSignalReadiness
                 )}`}
               >
-                {assessmentSignalStatusCopy(assessmentSignalReadiness)}
+                {assessmentSignalStatusCopy(effectiveAssessmentSignalReadiness)}
               </p>
             </section>
 
