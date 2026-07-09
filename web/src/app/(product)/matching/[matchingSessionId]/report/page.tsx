@@ -251,6 +251,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         selection={selection}
         valuesProfileA={null}
         valuesProfileB={null}
+        founderReport={payload.founderReport}
         workbookHref="#"
         teamContext={payload.teamContext}
         reportContext="matching_session"

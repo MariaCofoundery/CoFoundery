@@ -7,6 +7,7 @@ import {
   getFounderMatchingLiveData,
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
+import { buildFounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
 import {
   FOUNDER_DIMENSION_ORDER,
   type FounderDimensionKey,
@@ -156,6 +157,10 @@ export default async function ReportPage({ params }: PageProps) {
   const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
   const legacyReportAccess = getLegacyReportAccessState({ isLocked: true });
   const isLegacyReportLocked = !legacyReportAccess.isUnlocked;
+  const founderReport = buildFounderAlignmentReport({
+    scoringResult: founderScoring,
+    teamContext: teamContext ?? "pre_founder",
+  });
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
@@ -202,6 +207,7 @@ export default async function ReportPage({ params }: PageProps) {
         selection={selection}
         valuesProfileA={liveMatchingData?.valuesProfileA ?? null}
         valuesProfileB={liveMatchingData?.valuesProfileB ?? null}
+        founderReport={founderReport}
         workbookHref={workbookHref}
         teamContext={teamContext}
         showUnlockSection={isLegacyReportLocked}
