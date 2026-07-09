@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
-import { createOrGetMatchingWorkspaceAgreementAction } from "@/features/matchingCore/matchingWorkspaceAgreementActions";
-import { getMatchingWorkspaceAgreementForWorkspace } from "@/features/matchingCore/matchingWorkspaceAgreementData";
+import { saveMatchingWorkspaceAgreementSectionAction } from "@/features/matchingCore/matchingWorkspaceAgreementActions";
+import { createOrGetMatchingWorkspaceAgreement } from "@/features/matchingCore/matchingWorkspaceAgreementData";
 import {
   type MatchingWorkspaceAgreementSectionKey,
   type MatchingWorkspaceAgreementSummary,
@@ -19,8 +19,8 @@ type PageProps = {
 
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const PRIMARY_DISABLED_CTA_CLASS =
-  "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
+const FIELD_CLASS =
+  "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
 const AGREEMENT_MODULES: Array<{
   key: MatchingWorkspaceAgreementSectionKey;
@@ -29,38 +29,38 @@ const AGREEMENT_MODULES: Array<{
 }> = [
   {
     key: "roles",
-    title: "Rollen klären",
-    description: "Wer führt welche Themen, und wo braucht es frühe Mitsicht?",
+    title: "Rollen & Verantwortlichkeiten",
+    description: "Haltet fest, wer welche Themen führt und wo frühe Mitsicht wichtig ist.",
   },
   {
     key: "commitment",
-    title: "Commitment klären",
-    description: "Wie viel Zeit, Energie und Verbindlichkeit ist realistisch tragbar?",
+    title: "Zeit & Commitment",
+    description: "Beschreibt, was realistisch verfügbar ist und woran ihr Überlastung früh merkt.",
   },
   {
     key: "decisions",
-    title: "Entscheidungen klären",
-    description: "Was darf eine Person allein entscheiden, und wann braucht es beide?",
-  },
-  {
-    key: "communication",
-    title: "Kommunikation klären",
-    description: "Wie bleibt Wichtiges sichtbar, bevor es im Alltag untergeht?",
+    title: "Entscheidungen",
+    description: "Klärt, was eine Person allein entscheiden darf und wann beide gebraucht werden.",
   },
   {
     key: "conflict",
-    title: "Konflikte klären",
-    description: "Wie sprecht ihr Spannungen früh, fair und handhabbar an?",
+    title: "Konflikt & Klärung",
+    description: "Legt fest, wie ihr Spannungen früh, fair und handhabbar ansprecht.",
+  },
+  {
+    key: "communication",
+    title: "Kommunikation",
+    description: "Definiert, wie Wichtiges sichtbar bleibt, bevor es im Alltag untergeht.",
   },
   {
     key: "equity_conversation",
-    title: "Equity-/Fairness-Gespräch vorbereiten",
-    description: "Welche Beiträge, Risiken und Erwartungen sollten bewusst besprochen werden?",
+    title: "Equity-Gespräch",
+    description: "Sammelt Fragen zu Beiträgen, Risiken und Erwartungen, ohne sie vorschnell zu finalisieren.",
   },
   {
     key: "next_90_days",
-    title: "Nächste 90 Tage festlegen",
-    description: "Was hat Vorrang, was bleibt liegen, und woran erkennt ihr Fortschritt?",
+    title: "Nächste 90 Tage",
+    description: "Haltet fest, was Vorrang hat, was liegen bleibt und woran ihr Fortschritt erkennt.",
   },
 ];
 
@@ -115,33 +115,52 @@ function UnavailableState() {
   );
 }
 
-function AgreementModules({ summary }: { summary: MatchingWorkspaceAgreementSummary }) {
+function formatUpdatedAt(value: string | null) {
+  if (!value) return "Noch nicht gespeichert";
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function AgreementEditor({
+  summary,
+  saveSection,
+}: {
+  summary: MatchingWorkspaceAgreementSummary;
+  saveSection: (formData: FormData) => Promise<void>;
+}) {
   const agreement = summary.agreement;
 
   return (
     <section className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-        Module
+        Arbeitsdokument
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        Operating Agreement vorbereiten
+        Euer Operating Agreement
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        Diese Bereiche helfen euch später, aus dem Dynamik-Report klare Gesprächspunkte und
-        einfache Arbeitsregeln abzuleiten.
+        Haltet fest, wie ihr zusammenarbeiten, entscheiden und mit Spannungen umgehen wollt.
       </p>
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="mt-5 grid gap-5">
         {AGREEMENT_MODULES.map((module) => {
-          const section = agreement?.sections[module.key];
+          const section = agreement?.sections[module.key] ?? {
+            notes: "",
+            agreement: "",
+            updatedAt: null,
+          };
           const hasContent =
             Boolean(section?.notes.trim()) || Boolean(section?.agreement.trim());
 
           return (
-            <article
+            <form
               key={module.key}
+              action={saveSection}
               className="rounded-3xl border border-slate-200 bg-white p-5"
             >
-              <div className="flex items-start justify-between gap-3">
+              <input type="hidden" name="sectionKey" value={module.key} />
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-950">{module.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -156,12 +175,39 @@ function AgreementModules({ summary }: { summary: MatchingWorkspaceAgreementSumm
                   {hasContent ? "Angelegt" : "Bereit"}
                 </span>
               </div>
-              <div className="mt-5">
-                <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-                  Editor kommt als nächster Schritt
+              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <label>
+                  <span className="text-sm font-semibold text-slate-950">Notizen</span>
+                  <textarea
+                    name="notes"
+                    defaultValue={section.notes}
+                    rows={5}
+                    maxLength={4000}
+                    className={FIELD_CLASS}
+                    placeholder="Gedanken, offene Punkte oder Beispiele aus eurem Gespräch."
+                  />
+                </label>
+                <label>
+                  <span className="text-sm font-semibold text-slate-950">Vereinbarung</span>
+                  <textarea
+                    name="agreement"
+                    defaultValue={section.agreement}
+                    rows={5}
+                    maxLength={4000}
+                    className={FIELD_CLASS}
+                    placeholder="Was soll ab jetzt zwischen euch gelten?"
+                  />
+                </label>
+              </div>
+              <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs leading-5 text-slate-500">
+                  Zuletzt aktualisiert: {formatUpdatedAt(section.updatedAt)}
+                </p>
+                <button type="submit" className={PRIMARY_CTA_CLASS}>
+                  Section speichern
                 </button>
               </div>
-            </article>
+            </form>
           );
         })}
       </div>
@@ -181,14 +227,23 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
     redirect(`/login?next=${encodeURIComponent(`/workspaces/${workspaceId}`)}`);
   }
 
-  const summary = await getMatchingWorkspaceAgreementForWorkspace(workspaceId, user.id);
-  if (!summary) {
+  let summary: MatchingWorkspaceAgreementSummary | null = null;
+  try {
+    summary = await createOrGetMatchingWorkspaceAgreement({
+      workspaceId,
+      userId: user.id,
+    });
+  } catch {
+    summary = null;
+  }
+
+  if (!summary?.agreement) {
     return <UnavailableState />;
   }
 
-  async function prepareAgreement() {
+  async function saveAgreementSection(formData: FormData) {
     "use server";
-    const result = await createOrGetMatchingWorkspaceAgreementAction(workspaceId);
+    const result = await saveMatchingWorkspaceAgreementSectionAction(workspaceId, formData);
     redirect(agreementResultUrl(workspaceId, result));
   }
 
@@ -208,11 +263,11 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
             Matching Workspace
           </p>
           <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-            Gemeinsamer Arbeitsraum
+            Euer Operating Agreement
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
-            Das Operating Agreement ist ein Gesprächs- und Klarheitsraum für eure Zusammenarbeit.
-            Es ist kein Legal-Dokument.
+            Haltet fest, wie ihr zusammenarbeiten, entscheiden und mit Spannungen umgehen wollt.
+            Es ist ein Arbeitsdokument, kein Vertrag.
           </p>
         </header>
 
@@ -226,17 +281,8 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
             Arbeitsraum vorbereitet
           </h2>
           <p className="mt-3 text-sm leading-6 text-emerald-950">
-            Agreement-Status: {summary.agreement ? "Entwurf" : "Noch nicht vorbereitet"}
+            Agreement-Status: Entwurf
           </p>
-          {!summary.agreement ? (
-            <div className="mt-5">
-              <form action={prepareAgreement}>
-                <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  Operating Agreement vorbereiten
-                </button>
-              </form>
-            </div>
-          ) : null}
         </section>
 
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
@@ -246,7 +292,7 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
           </p>
         </section>
 
-        <AgreementModules summary={summary} />
+        <AgreementEditor summary={summary} saveSection={saveAgreementSection} />
       </div>
     </main>
   );

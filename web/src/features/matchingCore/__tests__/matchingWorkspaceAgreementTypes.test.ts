@@ -5,7 +5,10 @@ import {
   canCreateMatchingWorkspaceAgreement,
   createInitialMatchingWorkspaceAgreementSections,
   isMatchingWorkspaceAgreementStatus,
+  isMatchingWorkspaceAgreementSectionKey,
+  mergeMatchingWorkspaceAgreementSection,
   normalizeMatchingWorkspaceAgreementSections,
+  normalizeMatchingWorkspaceAgreementSectionInput,
 } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
 
 test("accepts only draft matching workspace agreement status for V1", () => {
@@ -27,6 +30,12 @@ test("creates initial agreement sections for every V1 section key", () => {
   }
 });
 
+test("accepts only known agreement section keys", () => {
+  assert.equal(isMatchingWorkspaceAgreementSectionKey("roles"), true);
+  assert.equal(isMatchingWorkspaceAgreementSectionKey("next_90_days"), true);
+  assert.equal(isMatchingWorkspaceAgreementSectionKey("unknown"), false);
+});
+
 test("normalizes incomplete agreement sections without dropping V1 keys", () => {
   const sections = normalizeMatchingWorkspaceAgreementSections({
     roles: {
@@ -45,6 +54,48 @@ test("normalizes incomplete agreement sections without dropping V1 keys", () => 
   assert.equal(sections.commitment.notes, "");
   assert.equal(sections.next_90_days.agreement, "");
   assert.equal(Object.keys(sections).includes("unknown"), false);
+});
+
+test("normalizes section input while allowing empty contents", () => {
+  assert.deepEqual(
+    normalizeMatchingWorkspaceAgreementSectionInput({
+      notes: "",
+      agreement: "",
+    }),
+    {
+      notes: "",
+      agreement: "",
+    }
+  );
+});
+
+test("limits large section inputs before persistence", () => {
+  const longText = "x".repeat(5000);
+  const normalized = normalizeMatchingWorkspaceAgreementSectionInput({
+    notes: longText,
+    agreement: longText,
+  });
+
+  assert.equal(normalized.notes.length, 4000);
+  assert.equal(normalized.agreement.length, 4000);
+});
+
+test("merges only the selected agreement section", () => {
+  const sections = createInitialMatchingWorkspaceAgreementSections();
+  const merged = mergeMatchingWorkspaceAgreementSection({
+    sections,
+    sectionKey: "roles",
+    notes: "Rollennotiz",
+    agreement: "Rollenregel",
+    updatedAt: "2026-07-10T10:00:00.000Z",
+  });
+
+  assert.equal(merged.roles.notes, "Rollennotiz");
+  assert.equal(merged.roles.agreement, "Rollenregel");
+  assert.equal(merged.roles.updatedAt, "2026-07-10T10:00:00.000Z");
+  assert.equal(merged.commitment.notes, "");
+  assert.equal(merged.commitment.agreement, "");
+  assert.equal(merged.commitment.updatedAt, null);
 });
 
 test("allows agreement creation only for prepared participant workspaces", () => {

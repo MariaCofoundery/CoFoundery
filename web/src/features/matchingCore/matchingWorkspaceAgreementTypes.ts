@@ -54,6 +54,14 @@ export function isMatchingWorkspaceAgreementStatus(
   );
 }
 
+export function isMatchingWorkspaceAgreementSectionKey(
+  value: string
+): value is MatchingWorkspaceAgreementSectionKey {
+  return MATCHING_WORKSPACE_AGREEMENT_SECTION_KEYS.includes(
+    value as MatchingWorkspaceAgreementSectionKey
+  );
+}
+
 export function createInitialMatchingWorkspaceAgreementSections(): MatchingWorkspaceAgreementSections {
   return Object.fromEntries(
     MATCHING_WORKSPACE_AGREEMENT_SECTION_KEYS.map((key) => [
@@ -65,6 +73,29 @@ export function createInitialMatchingWorkspaceAgreementSections(): MatchingWorks
       },
     ])
   ) as MatchingWorkspaceAgreementSections;
+}
+
+export const MATCHING_WORKSPACE_AGREEMENT_FIELD_LIMITS = {
+  notes: 4000,
+  agreement: 4000,
+} as const;
+
+function normalizeAgreementText(value: unknown, maxLength: number) {
+  if (typeof value !== "string") return "";
+  return value.slice(0, maxLength);
+}
+
+export function normalizeMatchingWorkspaceAgreementSectionInput(input: {
+  notes?: unknown;
+  agreement?: unknown;
+}) {
+  return {
+    notes: normalizeAgreementText(input.notes, MATCHING_WORKSPACE_AGREEMENT_FIELD_LIMITS.notes),
+    agreement: normalizeAgreementText(
+      input.agreement,
+      MATCHING_WORKSPACE_AGREEMENT_FIELD_LIMITS.agreement
+    ),
+  };
 }
 
 export function normalizeMatchingWorkspaceAgreementSections(
@@ -94,6 +125,24 @@ export function normalizeMatchingWorkspaceAgreementSections(
       ];
     })
   ) as MatchingWorkspaceAgreementSections;
+}
+
+export function mergeMatchingWorkspaceAgreementSection(params: {
+  sections: unknown;
+  sectionKey: MatchingWorkspaceAgreementSectionKey;
+  notes: string;
+  agreement: string;
+  updatedAt: string;
+}): MatchingWorkspaceAgreementSections {
+  const sections = normalizeMatchingWorkspaceAgreementSections(params.sections);
+  return {
+    ...sections,
+    [params.sectionKey]: {
+      notes: params.notes,
+      agreement: params.agreement,
+      updatedAt: params.updatedAt,
+    },
+  };
 }
 
 export function canCreateMatchingWorkspaceAgreement(params: {

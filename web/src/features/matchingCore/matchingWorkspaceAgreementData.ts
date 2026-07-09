@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createClient as createSupabaseServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import {
   isMatchingWorkspaceStatus,
@@ -7,7 +8,10 @@ import {
 } from "@/features/matchingCore/matchingWorkspaceTypes";
 import {
   isMatchingWorkspaceAgreementStatus,
+  mergeMatchingWorkspaceAgreementSection,
   normalizeMatchingWorkspaceAgreementSections,
+  normalizeMatchingWorkspaceAgreementSectionInput,
+  type MatchingWorkspaceAgreementSectionKey,
   type MatchingWorkspaceAgreement,
   type MatchingWorkspaceAgreementSummary,
 } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
@@ -67,6 +71,33 @@ type CreateAgreementRpcRow = {
   matching_workspace_id: string;
   status: string;
 };
+
+type MatchingWorkspaceAgreementServiceClient = ReturnType<typeof createSupabaseServiceClient>;
+type MatchingWorkspaceAgreementUpdateTable = {
+  update: (values: {
+    sections: MatchingWorkspaceAgreement["sections"];
+    updated_by_user_id: string;
+  }) => {
+    eq: (column: string, value: string) => {
+      eq: (column: string, value: string) => Promise<{ error: SupabaseError | null }>;
+    };
+  };
+};
+
+function createServiceRoleClient(): MatchingWorkspaceAgreementServiceClient {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("matching_workspace_agreement_service_role_unavailable");
+  }
+
+  return createSupabaseServiceClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
 
 function getErrorMessage(error: SupabaseError | null | undefined, fallback: string) {
   return error?.message ?? fallback;
@@ -241,4 +272,61 @@ export async function createOrGetMatchingWorkspaceAgreement(params: {
   }
 
   return summary;
+}
+
+export async function updateMatchingWorkspaceAgreementSection(params: {
+  workspaceId: string;
+  userId: string;
+  sectionKey: MatchingWorkspaceAgreementSectionKey;
+  notes: string;
+  agreement: string;
+}): Promise<MatchingWorkspaceAgreementSummary> {
+  const normalizedWorkspaceId = assertWorkspaceId(params.workspaceId);
+  const normalizedUserId = assertUserId(params.userId);
+  const normalizedSectionInput = normalizeMatchingWorkspaceAgreementSectionInput({
+    notes: params.notes,
+    agreement: params.agreement,
+  });
+  const summary = await createOrGetMatchingWorkspaceAgreement({
+    workspaceId: normalizedWorkspaceId,
+    userId: normalizedUserId,
+  });
+  if (!summary.agreement) {
+    throw new Error("matching_workspace_agreement_missing");
+  }
+
+  const updatedAt = new Date().toISOString();
+  const nextSections = mergeMatchingWorkspaceAgreementSection({
+    sections: summary.agreement.sections,
+    sectionKey: params.sectionKey,
+    notes: normalizedSectionInput.notes,
+    agreement: normalizedSectionInput.agreement,
+    updatedAt,
+  });
+
+  const serviceClient = createServiceRoleClient();
+  const agreementsTable = serviceClient.from(
+    "matching_workspace_agreements"
+  ) as unknown as MatchingWorkspaceAgreementUpdateTable;
+  const { error } = await agreementsTable
+    .update({
+      sections: nextSections,
+      updated_by_user_id: normalizedUserId,
+    })
+    .eq("id", summary.agreement.id)
+    .eq("matching_workspace_id", normalizedWorkspaceId);
+
+  if (error) {
+    throw new Error(getErrorMessage(error, "matching_workspace_agreement_section_save_failed"));
+  }
+
+  const nextSummary = await getMatchingWorkspaceAgreementForWorkspace(
+    normalizedWorkspaceId,
+    normalizedUserId
+  );
+  if (!nextSummary?.agreement) {
+    throw new Error("matching_workspace_agreement_section_save_failed");
+  }
+
+  return nextSummary;
 }
