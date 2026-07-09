@@ -16,6 +16,16 @@ function authErrorMessage(error: string | undefined) {
   return error ? `Anmeldefehler: ${error}` : null;
 }
 
+function canCreateUserFromLogin(nextPath: string) {
+  return (
+    nextPath === "/join/continue" ||
+    nextPath.startsWith("/join/continue?") ||
+    nextPath.startsWith("/team-invite/") ||
+    nextPath === "/advisor/invite/continue" ||
+    nextPath.startsWith("/advisor/invite/continue?")
+  );
+}
+
 export default async function LoginPage({
   searchParams,
 }: {
@@ -28,6 +38,7 @@ export default async function LoginPage({
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
   const errorMessage = authErrorMessage(params.error);
+  const shouldCreateUser = canCreateUserFromLogin(nextPath);
 
   if (user) {
     redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
@@ -42,7 +53,9 @@ export default async function LoginPage({
           Melde dich per Magic Link an, wenn du bereits Zugang hast.
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-          Wenn du neu bist, starte bitte mit deinem Zugangscode.
+          {shouldCreateUser
+            ? "Diese Einladung darf ein neues Profil per Magic Link anlegen."
+            : "Wenn du neu bist, starte bitte mit deinem Zugangscode."}
         </p>
         {errorMessage ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -50,7 +63,7 @@ export default async function LoginPage({
           </p>
         ) : null}
         <div className="mt-6">
-          <MagicLinkForm nextPath={nextPath} />
+          <MagicLinkForm nextPath={nextPath} shouldCreateUser={shouldCreateUser} />
         </div>
         <div className="mt-5 border-t border-slate-200 pt-5">
           <Link

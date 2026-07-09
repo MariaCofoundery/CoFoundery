@@ -6,9 +6,10 @@ import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOri
 
 type MagicLinkFormProps = {
   nextPath?: string;
+  shouldCreateUser?: boolean;
 };
 
-export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
+export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = false }: MagicLinkFormProps) {
   const supabase = useMemo(
     () =>
       createSupabaseClient(
@@ -28,6 +29,9 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState<string>("");
+  const sentMessage = shouldCreateUser
+    ? "Wenn die E-Mail zur Einladung passt, senden wir dir einen Link."
+    : "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\".";
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,22 +55,18 @@ export function MagicLinkForm({ nextPath = "/dashboard" }: MagicLinkFormProps) {
       email,
       options: {
         emailRedirectTo: redirectTo.toString(),
-        shouldCreateUser: false,
+        shouldCreateUser,
       },
     });
 
     if (error) {
       setStatus("sent");
-      setMessage(
-        "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\"."
-      );
+      setMessage(sentMessage);
       return;
     }
 
     setStatus("sent");
-    setMessage(
-      "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\"."
-    );
+    setMessage(sentMessage);
   };
 
   return (

@@ -15,6 +15,7 @@ type Props = {
   teamContext?: TeamContext | null;
   reportContext?: "invitation" | "matching_session";
   showUnlockSection?: boolean;
+  reportAccessNotice?: "locked" | "free_beta" | "session_snapshot" | null;
 };
 
 export function FounderMatchingView({
@@ -23,9 +24,12 @@ export function FounderMatchingView({
   teamContext,
   reportContext = "invitation",
   showUnlockSection = true,
+  reportAccessNotice,
 }: Props) {
   const effectiveTeamContext = teamContext ?? "pre_founder";
   const isSessionReport = reportContext === "matching_session";
+  const effectiveAccessNotice =
+    reportAccessNotice ?? (showUnlockSection ? "locked" : isSessionReport ? "session_snapshot" : null);
 
   return (
     <>
@@ -79,7 +83,7 @@ export function FounderMatchingView({
           )}
         </p>
 
-        {showUnlockSection ? (
+        {effectiveAccessNotice === "locked" ? (
           <div id="report-paywall-placeholder" className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
               {t("Freischaltung")}
@@ -97,7 +101,19 @@ export function FounderMatchingView({
               {t("Freischaltung kommt bald. Bis dahin bleibt der PDF-Export fuer diesen Report deaktiviert.")}
             </p>
           </div>
-        ) : (
+        ) : effectiveAccessNotice === "free_beta" ? (
+          <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
+              {t("Kostenlos verfuegbar in der Testphase")}
+            </p>
+            <h2 className="mt-3 text-xl font-semibold text-slate-950">
+              {t("Dieser Report ist in der aktuellen Testphase vollstaendig geoeffnet.")}
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
+              {t("Spaeter kann die Freischaltung ueber einen Team- oder Report-Zugang laufen.")}
+            </p>
+          </div>
+        ) : effectiveAccessNotice === "session_snapshot" ? (
           <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
               {t("Session-Snapshot")}
@@ -106,10 +122,10 @@ export function FounderMatchingView({
               {t("Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.")}
             </p>
           </div>
-        )}
+        ) : null}
       </section>
 
-      {showUnlockSection ? (
+      {effectiveAccessNotice === "locked" ? (
         <section className="page-section mt-8 rounded-[28px] border border-dashed border-slate-300 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
             {t("Vollstaendiger Report")}

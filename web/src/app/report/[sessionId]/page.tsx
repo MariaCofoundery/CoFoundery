@@ -20,6 +20,7 @@ import {
 } from "@/features/reporting/founderMatchingEngine";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ReportAutoRefresh } from "@/features/reporting/ReportAutoRefresh";
+import { getLegacyReportAccessState } from "@/features/reporting/reportAccess";
 import { buildWorkbookIntroHref } from "@/features/reporting/workbookNavigation";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
@@ -153,7 +154,8 @@ export default async function ReportPage({ params }: PageProps) {
   );
   const selection = buildFounderMatchingSelection(compareResult);
   const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
-  const isLegacyReportLocked = true;
+  const legacyReportAccess = getLegacyReportAccessState({ isLocked: true });
+  const isLegacyReportLocked = !legacyReportAccess.isUnlocked;
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
@@ -203,6 +205,7 @@ export default async function ReportPage({ params }: PageProps) {
         workbookHref={workbookHref}
         teamContext={teamContext}
         showUnlockSection={isLegacyReportLocked}
+        reportAccessNotice={legacyReportAccess.reason === "free_beta" ? "free_beta" : undefined}
       />
     </main>
   );
