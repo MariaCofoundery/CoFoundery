@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  DISCOVERY_COMMITMENT_LABELS,
-  DISCOVERY_REMOTE_MODE_LABELS,
-  DISCOVERY_ROLE_LABELS,
-  DISCOVERY_VENTURE_GOAL_LABELS,
-} from "@/features/discovery/discoveryConfig";
+import { getTranslations } from "next-intl/server";
 import {
   confirmFullDiscoveryMatchingAction,
   requestFullDiscoveryMatchingAction,
@@ -44,24 +39,27 @@ type MatchingPreparationSearchParams = {
   matchingOk?: string | string[];
 };
 
+type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
+
 function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
 function matchingPreparationResultUrl(
   introRequestId: string,
-  result: DiscoveryMatchingStartActionState
+  result: DiscoveryMatchingStartActionState,
+  fallbackMessage: string
 ) {
   const params = new URLSearchParams();
-  params.set("matchingMessage", result.message ?? "Die Matching-Vorbereitung wurde verarbeitet.");
+  params.set("matchingMessage", result.message ?? fallbackMessage);
   params.set("matchingOk", result.ok ? "1" : "0");
   return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
 }
 
-function formatRoleList(values: DiscoveryFounderRole[]) {
+function formatRoleList(values: DiscoveryFounderRole[], t: DiscoveryT) {
   return values.length > 0
-    ? values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ")
-    : "Noch nicht angegeben";
+    ? values.map((value) => t(`roles.${value}`)).join(", ")
+    : t("common.notProvided");
 }
 
 function profileDetailUrl(profile: DiscoveryProfilePreview) {
@@ -71,9 +69,11 @@ function profileDetailUrl(profile: DiscoveryProfilePreview) {
 function ProfileCard({
   eyebrow,
   profile,
+  t,
 }: {
   eyebrow: string;
   profile: DiscoveryProfilePreview;
+  t: DiscoveryT;
 }) {
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5">
@@ -84,31 +84,31 @@ function ProfileCard({
       <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{profile.headline}</p>
       <dl className="mt-5 grid gap-3 text-sm text-slate-600">
         <div>
-          <dt className="font-semibold text-slate-900">Bringt mit</dt>
-          <dd className="mt-1">{formatRoleList(profile.ownRoles)}</dd>
+          <dt className="font-semibold text-slate-900">{t("matchingPreparation.profile.brings")}</dt>
+          <dd className="mt-1">{formatRoleList(profile.ownRoles, t)}</dd>
         </div>
         <div>
-          <dt className="font-semibold text-slate-900">Sucht</dt>
-          <dd className="mt-1">{formatRoleList(profile.seekingRoles)}</dd>
+          <dt className="font-semibold text-slate-900">{t("matchingPreparation.profile.seeks")}</dt>
+          <dd className="mt-1">{formatRoleList(profile.seekingRoles, t)}</dd>
         </div>
         <div>
-          <dt className="font-semibold text-slate-900">Arbeitsrahmen</dt>
+          <dt className="font-semibold text-slate-900">{t("matchingPreparation.profile.workFrame")}</dt>
           <dd className="mt-1">
             {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
-            {DISCOVERY_REMOTE_MODE_LABELS[profile.remoteMode]}
+            {t(`remoteModes.${profile.remoteMode}`)}
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-slate-900">Commitment / Zielbild</dt>
+          <dt className="font-semibold text-slate-900">{t("matchingPreparation.profile.commitmentGoal")}</dt>
           <dd className="mt-1">
-            {DISCOVERY_COMMITMENT_LABELS[profile.commitmentLevel]} ·{" "}
-            {DISCOVERY_VENTURE_GOAL_LABELS[profile.ventureGoal]}
+            {t(`commitmentLevels.${profile.commitmentLevel}`)} ·{" "}
+            {t(`ventureGoals.${profile.ventureGoal}`)}
           </dd>
         </div>
       </dl>
       <div className="mt-5">
         <Link href={profileDetailUrl(profile)} className={SECONDARY_CTA_CLASS}>
-          Profil ansehen
+          {t("common.viewProfile")}
         </Link>
       </div>
     </article>
@@ -119,10 +119,12 @@ function MatchingSessionReadinessCard({
   summary,
   currentUserId,
   reportRun,
+  t,
 }: {
   summary: MatchingSessionSummary;
   currentUserId: string;
   reportRun: MatchingReportRunSummary | null;
+  t: DiscoveryT;
 }) {
   const currentUserReadiness = summary.participants.find(
     (participant) => participant.userId === currentUserId
@@ -134,32 +136,32 @@ function MatchingSessionReadinessCard({
   return (
     <>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-        Matching-Core
+        {t("matchingPreparation.readiness.eyebrow")}
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        Matching-Session vorbereitet
+        {t("matchingPreparation.readiness.title")}
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        Cofoundery hat einen gemeinsamen Matching-Kontext angelegt und geprüft, ob eure
-        Basis-Antworten schon vorhanden sind. Es wurde kein Report, keine Relationship und kein
-        Workbook erstellt.
+        {t("matchingPreparation.readiness.text")}
       </p>
       <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
-        Status:{" "}
+        {t("matchingPreparation.readiness.statusPrefix")}{" "}
         {isReportReady
-          ? "Dynamik-Report erstellt"
+          ? t("matchingPreparation.readiness.reportReady")
           : isReadyForReport
-            ? "Bereit für Report"
-            : "Wartet auf Antworten"}
+            ? t("matchingPreparation.readiness.readyForReport")
+            : t("matchingPreparation.readiness.waitingForAnswers")}
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2">
         {summary.participants.map((participant) => (
           <article key={participant.userId} className="rounded-3xl border border-slate-200 bg-white p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              {participant.userId === currentUserId ? "Du" : "Gegenüber"}
+              {participant.userId === currentUserId
+                ? t("matchingPreparation.you")
+                : t("matchingPreparation.counterpart")}
             </p>
             <h3 className="mt-2 text-lg font-semibold text-slate-950">
-              {participant.profile?.displayName ?? "Discovery-Profil nicht sichtbar"}
+              {participant.profile?.displayName ?? t("matchingPreparation.readiness.profileHidden")}
             </h3>
             {participant.profile?.headline ? (
               <p className="mt-1 text-sm leading-6 text-slate-600">{participant.profile.headline}</p>
@@ -172,8 +174,8 @@ function MatchingSessionReadinessCard({
               }`}
             >
               {participant.baseInputStatus === "present"
-                ? "Basis-Fragen vorhanden"
-                : "Basis-Fragen fehlen"}
+                ? t("matchingPreparation.readiness.basePresent")
+                : t("matchingPreparation.readiness.baseMissing")}
             </p>
           </article>
         ))}
@@ -181,18 +183,17 @@ function MatchingSessionReadinessCard({
       <div className="mt-6 flex flex-wrap gap-3">
         {currentUserBaseMissing ? (
           <Link href="/me/base" className={PRIMARY_CTA_CLASS}>
-            Basis-Fragen ausfüllen
+            {t("common.fillBaseQuestions")}
           </Link>
         ) : null}
         {isReportReady ? (
           <Link href={`/matching/${summary.session.id}/report`} className={PRIMARY_CTA_CLASS}>
-            Dynamik-Report ansehen
+            {t("matchingPreparation.readiness.viewReport")}
           </Link>
         ) : null}
         {isReadyForReport && !isReportReady ? (
           <p className="w-full max-w-3xl text-sm leading-6 text-slate-600">
-            Beide Basis-Antworten sind vorhanden. Ihr könnt jetzt einen gemeinsamen Dynamik-Report
-            als unveränderlichen Snapshot erstellen.
+            {t("matchingPreparation.readiness.createReportHint")}
           </p>
         ) : null}
       </div>
@@ -200,7 +201,7 @@ function MatchingSessionReadinessCard({
   );
 }
 
-function UnavailableState() {
+function UnavailableState({ t }: { t: DiscoveryT }) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
       <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-8">
@@ -208,18 +209,17 @@ function UnavailableState() {
           href="/discovery/intros"
           className="text-sm font-medium text-slate-500 hover:text-slate-900"
         >
-          Zurück zu meinen Intros
+          {t("matchingPreparation.backToIntros")}
         </Link>
         <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-slate-950">
-          Dieser Matching-Schritt ist aktuell nicht verfügbar.
+          {t("matchingPreparation.unavailable.title")}
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Das Intro ist nicht verfügbar, nicht mehr angenommen oder gehört nicht zu deinem
-          Account. Private Details werden hier bewusst nicht angezeigt.
+          {t("matchingPreparation.unavailable.text")}
         </p>
         <div className="mt-6">
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            Zurück zu meinen Intros
+            {t("matchingPreparation.backToIntros")}
           </Link>
         </div>
       </section>
@@ -251,39 +251,49 @@ function MatchingStartStatusContent({
   currentUserId,
   matchingSession,
   reportRun,
+  t,
+  fallbackMessage,
+  matchingSessionUnavailableMessage,
 }: {
   introRequestId: string;
   matchingStart: DiscoveryMatchingStart;
   currentUserId: string;
   matchingSession: MatchingSessionSummary | null;
   reportRun: MatchingReportRunSummary | null;
+  t: DiscoveryT;
+  fallbackMessage: string;
+  matchingSessionUnavailableMessage: string;
 }) {
   async function requestFullMatching() {
     "use server";
     const result = await requestFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result));
+    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
   }
 
   async function confirmFullMatching() {
     "use server";
     const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result));
+    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
   }
 
   async function createMatchingSession() {
     "use server";
     const result = await createMatchingSessionFromDiscoveryStartAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result));
+    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
   }
 
   async function createMatchingReport() {
     "use server";
     if (!matchingSession) {
       redirect(
-        matchingPreparationResultUrl(introRequestId, {
-          ok: false,
-          message: "Die Matching-Session ist aktuell nicht verfügbar.",
-        })
+        matchingPreparationResultUrl(
+          introRequestId,
+          {
+            ok: false,
+            message: matchingSessionUnavailableMessage,
+          },
+          fallbackMessage
+        )
       );
     }
 
@@ -291,20 +301,20 @@ function MatchingStartStatusContent({
     if (result.ok && result.reportHref) {
       redirect(result.reportHref);
     }
-    redirect(matchingPreparationResultUrl(introRequestId, result));
+    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
   }
 
   if (matchingStart.status === "canceled") {
     return (
       <>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          Vorbereitung beendet
+          {t("matchingPreparation.states.canceledEyebrow")}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          Matching-Vorbereitung beendet
+          {t("matchingPreparation.states.canceledTitle")}
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-          Diese Matching-Vorbereitung wurde beendet.
+          {t("matchingPreparation.states.canceledText")}
         </p>
       </>
     );
@@ -318,12 +328,13 @@ function MatchingStartStatusContent({
             summary={matchingSession}
             currentUserId={currentUserId}
             reportRun={reportRun}
+            t={t}
           />
           {matchingSession.session.status === "ready_for_report" && !reportRun ? (
             <div className="mt-6">
               <form action={createMatchingReport}>
                 <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  Dynamik-Report erstellen
+                  {t("matchingPreparation.readiness.createReport")}
                 </button>
               </form>
             </div>
@@ -335,36 +346,32 @@ function MatchingStartStatusContent({
     return (
       <>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-          Bereit
+          {t("matchingPreparation.states.readyEyebrow")}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          Bereit für das gemeinsame Matching
+          {t("matchingPreparation.states.readyTitle")}
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-          Ihr habt beide bestätigt, dass ihr das vollständige Cofoundery-Matching starten
-          möchtet. Als nächstes kann Cofoundery einen gemeinsamen Matching-Kontext anlegen und
-          prüfen, ob eure Basis-Antworten schon vorhanden sind.
+          {t("matchingPreparation.states.readyText")}
         </p>
         <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            Intro angenommen
+            {t("matchingPreparation.steps.introAccepted")}
           </li>
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            Matching-Vorbereitung erstellt
+            {t("matchingPreparation.steps.preparationCreated")}
           </li>
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            Beide haben den gemeinsamen Matching-Start bestätigt
+            {t("matchingPreparation.steps.bothConfirmed")}
           </li>
         </ul>
         <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-600">
-          Cofoundery legt einen gemeinsamen Matching-Kontext an und prüft, ob eure Basis-Antworten
-          schon vorhanden sind. Es wird noch kein Report, keine Relationship und kein Workbook
-          erstellt.
+          {t("matchingPreparation.states.readyFollowup")}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <form action={createMatchingSession}>
             <button type="submit" className={PRIMARY_CTA_CLASS}>
-              Matching-Session vorbereiten
+              {t("matchingPreparation.actions.prepareSession")}
             </button>
           </form>
         </div>
@@ -378,36 +385,38 @@ function MatchingStartStatusContent({
     return (
       <>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-          Bestätigung
+          {t("matchingPreparation.states.confirmationEyebrow")}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          {isRequester ? "Bestätigung angefragt" : "Cofoundery-Matching bestätigen"}
+          {isRequester
+            ? t("matchingPreparation.states.confirmationRequestedTitle")
+            : t("matchingPreparation.states.confirmTitle")}
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
           {isRequester
-            ? "Die andere Person muss den gemeinsamen Matching-Start noch bestätigen."
-            : "Die andere Person möchte das vollständige gemeinsame Matching starten. Wenn du bestätigst, seid ihr bereit für den nächsten Schritt."}
+            ? t("matchingPreparation.states.confirmationRequestedText")
+            : t("matchingPreparation.states.confirmText")}
         </p>
         <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            Intro angenommen
+            {t("matchingPreparation.steps.introAccepted")}
           </li>
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            Matching-Vorbereitung erstellt
+            {t("matchingPreparation.steps.preparationCreated")}
           </li>
           <li className="rounded-2xl bg-amber-50 px-4 py-3 font-medium text-amber-900">
-            Gemeinsamer Matching-Start wartet auf zweite Bestätigung
+            {t("matchingPreparation.steps.awaitingSecondConfirmation")}
           </li>
         </ul>
         <div className="mt-6">
           {isRequester ? (
             <button type="button" disabled className={PRIMARY_DISABLED_CTA_CLASS}>
-              Warte auf Bestätigung
+              {t("matchingPreparation.actions.waitingForConfirmation")}
             </button>
           ) : (
             <form action={confirmFullMatching}>
               <button type="submit" className={PRIMARY_CTA_CLASS}>
-                Matching bestätigen
+                {t("matchingPreparation.actions.confirmMatching")}
               </button>
             </form>
           )}
@@ -419,30 +428,29 @@ function MatchingStartStatusContent({
   return (
     <>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-        Vorbereitung gestartet
+        {t("matchingPreparation.states.startedEyebrow")}
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        Matching-Vorbereitung gestartet
+        {t("matchingPreparation.states.startedTitle")}
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        Wenn du bereit bist, kannst du den gemeinsamen Matching-Start anfragen. Die andere Person
-        muss anschließend bestätigen.
+        {t("matchingPreparation.states.startedText")}
       </p>
       <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
         <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-          Intro angenommen
+          {t("matchingPreparation.steps.introAccepted")}
         </li>
         <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-          Matching-Vorbereitung erstellt
+          {t("matchingPreparation.steps.preparationCreated")}
         </li>
         <li className="rounded-2xl bg-slate-50 px-4 py-3">
-          Vollständiger Cofoundery-Matching-Start braucht beide Bestätigungen
+          {t("matchingPreparation.steps.needsBothConfirmations")}
         </li>
       </ul>
       <div className="mt-6">
         <form action={requestFullMatching}>
           <button type="submit" className={PRIMARY_CTA_CLASS}>
-            Vollständiges Matching anfragen
+            {t("matchingPreparation.actions.requestFullMatching")}
           </button>
         </form>
       </div>
@@ -457,6 +465,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   params: Promise<MatchingPreparationPageParams>;
   searchParams?: Promise<MatchingPreparationSearchParams>;
 }) {
+  const t = await getTranslations("discovery");
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const introRequestId = resolvedParams.introRequestId;
@@ -473,13 +482,15 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   const preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);
 
   if (!preparation) {
-    return <UnavailableState />;
+    return <UnavailableState t={t} />;
   }
+  const fallbackMatchingMessage = t("matchingPreparation.defaultActionMessage");
+  const matchingSessionUnavailableMessage = t("matchingPreparation.matchingSessionUnavailable");
 
   async function startMatchingPreparation() {
     "use server";
     const result = await startDiscoveryMatchingPreparationAction(introRequestId);
-    redirect(matchingPreparationResultUrl(introRequestId, result));
+    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMatchingMessage));
   }
 
   const currentUserProfile =
@@ -508,18 +519,16 @@ export default async function DiscoveryIntroMatchingPreparationPage({
             href="/discovery/intros"
             className="text-sm font-medium text-slate-500 hover:text-slate-900"
           >
-            Zurück zu meinen Intros
+            {t("matchingPreparation.backToIntros")}
           </Link>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Discovery Intro
+            {t("matchingPreparation.eyebrow")}
           </p>
           <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-            Gemeinsames Cofoundery-Matching vorbereiten
+            {t("matchingPreparation.title")}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
-            Ihr habt beide Interesse signalisiert. Der nächste sinnvolle Schritt ist ein
-            vollständiges Cofoundery-Matching, damit ihr Rollen, Commitment, Arbeitsweise und
-            Erwartungen gemeinsam reflektieren könnt.
+            {t("matchingPreparation.subtitle")}
           </p>
         </header>
 
@@ -527,37 +536,34 @@ export default async function DiscoveryIntroMatchingPreparationPage({
 
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm font-semibold leading-6 text-amber-950">
-            Hier wird noch nichts automatisch erstellt: keine Einladung, keine Relationship,
-            kein Report und kein Workbook.
+            {t("matchingPreparation.safetyNote")}
           </p>
         </section>
 
         {preparation.relationshipExists || preparation.invitationExists ? (
           <section className="rounded-3xl border border-slate-200 bg-white/90 p-5">
             <h2 className="text-xl font-semibold text-slate-950">
-              Es gibt bereits einen bestehenden Cofoundery-Kontext
+              {t("matchingPreparation.existingContextTitle")}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Für euch scheint bereits ein Matching- oder Verbindungsstand zu existieren. Damit
-              nichts doppelt angelegt wird, startet diese Vorbereitungsseite keinen neuen Prozess.
+              {t("matchingPreparation.existingContextText")}
             </p>
           </section>
         ) : null}
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Beteiligte Profile
+            {t("matchingPreparation.profilesEyebrow")}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            Öffentliche Discovery-Projektion
+            {t("matchingPreparation.profilesTitle")}
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Angezeigt werden nur Angaben, die ihr bewusst über Discovery veröffentlicht habt.
-            E-Mail-Adressen, private Suchprioritäten und Assessment-Daten bleiben verborgen.
+            {t("matchingPreparation.profilesText")}
           </p>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            <ProfileCard eyebrow="Du" profile={currentUserProfile} />
-            <ProfileCard eyebrow="Gegenüber" profile={otherProfile} />
+            <ProfileCard eyebrow={t("matchingPreparation.you")} profile={currentUserProfile} t={t} />
+            <ProfileCard eyebrow={t("matchingPreparation.counterpart")} profile={otherProfile} t={t} />
           </div>
         </section>
 
@@ -569,37 +575,36 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               currentUserId={user.id}
               matchingSession={matchingSession}
               reportRun={reportRun}
+              t={t}
+              fallbackMessage={fallbackMatchingMessage}
+              matchingSessionUnavailableMessage={matchingSessionUnavailableMessage}
             />
           ) : (
             <>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Nächster Schritt
+                {t("matchingPreparation.states.nextStepEyebrow")}
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                Matching-Vorbereitung starten
+                {t("matchingPreparation.states.startTitle")}
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                Damit merkt Cofoundery sich, dass ihr aus diesem angenommenen Intro gemeinsam
-                weitergehen möchtet. Dabei wird noch keine Einladung, keine Relationship, kein
-                Report und kein Workbook erstellt.
+                {t("matchingPreparation.states.startText")}
               </p>
               <ol className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
                 <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  1. Ihr startet das vollständige Cofoundery-Matching.
+                  {t("matchingPreparation.steps.startFullMatching")}
                 </li>
                 <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  2. Beide füllen die relevanten Cofoundery-Fragen aus oder bestätigen vorhandene
-                  Antworten.
+                  {t("matchingPreparation.steps.answerQuestions")}
                 </li>
                 <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  3. Danach entsteht ein gemeinsamer Dynamik-Report und ihr könnt mit dem Workbook
-                  weiterarbeiten.
+                  {t("matchingPreparation.steps.reportAndWorkbook")}
                 </li>
               </ol>
               <div className="mt-6">
                 <form action={startMatchingPreparation}>
                   <button type="submit" className={PRIMARY_CTA_CLASS}>
-                    Matching-Vorbereitung starten
+                    {t("matchingPreparation.actions.startPreparation")}
                   </button>
                 </form>
               </div>
@@ -607,10 +612,10 @@ export default async function DiscoveryIntroMatchingPreparationPage({
           )}
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-              Zurück zu meinen Intros
+              {t("matchingPreparation.backToIntros")}
             </Link>
             <Link href={profileDetailUrl(otherProfile)} className={SECONDARY_CTA_CLASS}>
-              Profil ansehen
+              {t("common.viewProfile")}
             </Link>
           </div>
         </section>

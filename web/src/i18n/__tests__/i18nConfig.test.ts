@@ -29,3 +29,13 @@ test("loads English navigation messages", () => {
   assert.equal(navigation.dashboard, "Dashboard");
   assert.equal(navigation.logout, "Sign out");
 });
+
+test("loads English discovery messages", () => {
+  const messages = getMessages("en");
+  const discovery = messages.discovery as {
+    index?: { title?: string };
+    profile?: { assessment?: { title?: string } };
+  };
+  assert.equal(discovery.index?.title, "Find a co-founder");
+  assert.equal(discovery.profile?.assessment?.title, "Include Cofoundery Check");
+});

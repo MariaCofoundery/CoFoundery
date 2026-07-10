@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  DISCOVERY_REMOTE_MODE_LABELS,
-  DISCOVERY_ROLE_LABELS,
-} from "@/features/discovery/discoveryConfig";
+import { getTranslations } from "next-intl/server";
 import {
   cancelDiscoveryIntroAction,
   type DiscoveryIntroActionState,
@@ -32,25 +29,20 @@ const DANGER_LIGHT_CTA_CLASS =
 const TEXTAREA_CLASS =
   "mt-2 min-h-24 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
+type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
+
 type DiscoveryIntrosSearchParams = {
   introMessage?: string | string[];
   introOk?: string | string[];
 };
 
-const INTRO_STATUS_PILL_LABELS = {
-  pending: "Offen",
-  accepted: "Angenommen",
-  declined: "Nicht angenommen",
-  canceled: "Zurückgezogen",
-} as const;
-
 function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function introsResultUrl(result: DiscoveryIntroActionState) {
+function introsResultUrl(result: DiscoveryIntroActionState, fallbackMessage: string) {
   const params = new URLSearchParams();
-  params.set("introMessage", result.message ?? "Die Intro-Aktion wurde verarbeitet.");
+  params.set("introMessage", result.message ?? fallbackMessage);
   params.set("introOk", result.ok ? "1" : "0");
   return `/discovery/intros?${params.toString()}`;
 }
@@ -73,19 +65,19 @@ function IntroPageMessage({ message, ok }: { message: string | null; ok: boolean
   );
 }
 
-function formatRoleList(values: DiscoveryFounderRole[]) {
+function formatRoleList(values: DiscoveryFounderRole[], t: DiscoveryT) {
   return values.length > 0
-    ? values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ")
-    : "Noch nicht angegeben";
+    ? values.map((value) => t(`roles.${value}`)).join(", ")
+    : t("common.notProvided");
 }
 
-function ProfileSummary({ profile }: { profile: DiscoveryProfilePreview | null }) {
+function ProfileSummary({ profile, t }: { profile: DiscoveryProfilePreview | null; t: DiscoveryT }) {
   if (!profile) {
     return (
       <div>
-        <h3 className="text-xl font-semibold text-slate-950">Discovery-Profil nicht sichtbar</h3>
+        <h3 className="text-xl font-semibold text-slate-950">{t("intros.profileHiddenTitle")}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Das zugehörige Profil ist aktuell nicht öffentlich sichtbar.
+          {t("intros.profileHiddenText")}
         </p>
       </div>
     );
@@ -97,24 +89,24 @@ function ProfileSummary({ profile }: { profile: DiscoveryProfilePreview | null }
       <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{profile.headline}</p>
       <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
         <p>
-          <span className="font-semibold text-slate-900">Bringt mit:</span>{" "}
-          {formatRoleList(profile.ownRoles)}
+          <span className="font-semibold text-slate-900">{t("intros.brings")}</span>{" "}
+          {formatRoleList(profile.ownRoles, t)}
         </p>
         <p>
-          <span className="font-semibold text-slate-900">Sucht:</span>{" "}
-          {formatRoleList(profile.seekingRoles)}
+          <span className="font-semibold text-slate-900">{t("intros.seeks")}</span>{" "}
+          {formatRoleList(profile.seekingRoles, t)}
         </p>
         <p>
-          <span className="font-semibold text-slate-900">Arbeitsrahmen:</span>{" "}
+          <span className="font-semibold text-slate-900">{t("intros.workFrame")}</span>{" "}
           {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
-          {DISCOVERY_REMOTE_MODE_LABELS[profile.remoteMode]}
+          {t(`remoteModes.${profile.remoteMode}`)}
         </p>
       </div>
     </div>
   );
 }
 
-function StatusPill({ request }: { request: DiscoveryIntroRequestWithProfile }) {
+function StatusPill({ request, t }: { request: DiscoveryIntroRequestWithProfile; t: DiscoveryT }) {
   const statusClass =
     request.status === "accepted"
       ? "bg-emerald-100 text-emerald-800"
@@ -126,7 +118,7 @@ function StatusPill({ request }: { request: DiscoveryIntroRequestWithProfile }) 
 
   return (
     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}>
-      {INTRO_STATUS_PILL_LABELS[request.status]}
+      {t(`introStatus.pill.${request.status}`)}
     </span>
   );
 }
@@ -150,33 +142,41 @@ function RequestMessage({
   );
 }
 
-function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile }) {
+function ReceivedIntroCard({
+  request,
+  t,
+  fallbackMessage,
+}: {
+  request: DiscoveryIntroRequestWithProfile;
+  t: DiscoveryT;
+  fallbackMessage: string;
+}) {
   async function acceptIntro(formData: FormData) {
     "use server";
     const result = await respondDiscoveryIntroAction(request.id, "accepted", formData);
-    redirect(introsResultUrl(result));
+    redirect(introsResultUrl(result, fallbackMessage));
   }
 
   async function declineIntro(formData: FormData) {
     "use server";
     const result = await respondDiscoveryIntroAction(request.id, "declined", formData);
-    redirect(introsResultUrl(result));
+    redirect(introsResultUrl(result, fallbackMessage));
   }
 
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <ProfileSummary profile={request.profile} />
-        <StatusPill request={request} />
+        <ProfileSummary profile={request.profile} t={t} />
+        <StatusPill request={request} t={t} />
       </div>
       <div className="mt-4 grid gap-3">
-        <RequestMessage label="Nachricht" value={request.message} />
-        <RequestMessage label="Deine Antwort" value={request.responseMessage} />
+        <RequestMessage label={t("intros.message")} value={request.message} />
+        <RequestMessage label={t("intros.yourResponse")} value={request.responseMessage} />
       </div>
       <div className="mt-5 flex flex-wrap gap-3">
         {request.profile ? (
           <Link href={`/discovery/${request.profile.id}`} className={SECONDARY_CTA_CLASS}>
-            Profil ansehen
+            {t("common.viewProfile")}
           </Link>
         ) : null}
         {request.status === "accepted" ? (
@@ -184,7 +184,7 @@ function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProf
             href={`/discovery/intros/${request.id}/matching`}
             className={PRIMARY_CTA_CLASS}
           >
-            Gemeinsames Matching vorbereiten
+            {t("common.prepareSharedMatching")}
           </Link>
         ) : null}
       </div>
@@ -193,33 +193,33 @@ function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProf
           <form action={acceptIntro}>
             <label>
               <span className="text-sm font-semibold text-slate-900">
-                Antwortnachricht optional
+                {t("intros.optionalResponse")}
               </span>
               <textarea
                 name="responseMessage"
                 maxLength={600}
-                placeholder="Was möchtest du kurz zurückgeben?"
+                placeholder={t("intros.acceptPlaceholder")}
                 className={TEXTAREA_CLASS}
               />
             </label>
             <button type="submit" className={`${PRIMARY_CTA_CLASS} mt-3`}>
-              Annehmen
+              {t("intros.accept")}
             </button>
           </form>
           <form action={declineIntro}>
             <label>
               <span className="text-sm font-semibold text-slate-900">
-                Antwortnachricht optional
+                {t("intros.optionalResponse")}
               </span>
               <textarea
                 name="responseMessage"
                 maxLength={600}
-                placeholder="Du kannst kurz antworten, musst aber nicht."
+                placeholder={t("intros.declinePlaceholder")}
                 className={TEXTAREA_CLASS}
               />
             </label>
             <button type="submit" className={`${DANGER_LIGHT_CTA_CLASS} mt-3`}>
-              Ablehnen
+              {t("intros.decline")}
             </button>
           </form>
         </div>
@@ -228,27 +228,35 @@ function ReceivedIntroCard({ request }: { request: DiscoveryIntroRequestWithProf
   );
 }
 
-function SentIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile }) {
+function SentIntroCard({
+  request,
+  t,
+  fallbackMessage,
+}: {
+  request: DiscoveryIntroRequestWithProfile;
+  t: DiscoveryT;
+  fallbackMessage: string;
+}) {
   async function cancelIntro() {
     "use server";
     const result = await cancelDiscoveryIntroAction(request.id);
-    redirect(introsResultUrl(result));
+    redirect(introsResultUrl(result, fallbackMessage));
   }
 
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <ProfileSummary profile={request.profile} />
-        <StatusPill request={request} />
+        <ProfileSummary profile={request.profile} t={t} />
+        <StatusPill request={request} t={t} />
       </div>
       <div className="mt-4 grid gap-3">
-        <RequestMessage label="Deine Nachricht" value={request.message} />
-        <RequestMessage label="Antwort" value={request.responseMessage} />
+        <RequestMessage label={t("intros.yourMessage")} value={request.message} />
+        <RequestMessage label={t("intros.response")} value={request.responseMessage} />
       </div>
       <div className="mt-5 flex flex-wrap gap-3">
         {request.profile ? (
           <Link href={`/discovery/${request.profile.id}`} className={SECONDARY_CTA_CLASS}>
-            Profil ansehen
+            {t("common.viewProfile")}
           </Link>
         ) : null}
         {request.status === "accepted" ? (
@@ -256,13 +264,13 @@ function SentIntroCard({ request }: { request: DiscoveryIntroRequestWithProfile 
             href={`/discovery/intros/${request.id}/matching`}
             className={PRIMARY_CTA_CLASS}
           >
-            Gemeinsames Matching vorbereiten
+            {t("common.prepareSharedMatching")}
           </Link>
         ) : null}
         {canCancelDiscoveryIntro(request) ? (
           <form action={cancelIntro}>
             <button type="submit" className={DANGER_LIGHT_CTA_CLASS}>
-              Zurückziehen
+              {t("intros.cancel")}
             </button>
           </form>
         ) : null}
@@ -284,6 +292,7 @@ export default async function DiscoveryIntrosPage({
 }: {
   searchParams?: Promise<DiscoveryIntrosSearchParams>;
 }) {
+  const t = await getTranslations("discovery");
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const supabase = await createClient();
   const {
@@ -303,24 +312,23 @@ export default async function DiscoveryIntrosPage({
   const sortedSent = sortIntroRequests(sent);
   const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
+  const fallbackIntroMessage = t("intros.defaultActionMessage");
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
           <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
-            Zurück zu Discovery
+            {t("common.backToDiscovery")}
           </Link>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
             Discovery Intros
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-            Meine Intros
+            {t("intros.title")}
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            Hier siehst du, wer dich kennenlernen möchte und welche Intros du angefragt hast.
-            Ein angenommenes Intro erzeugt noch keine Relationship, keine Invitation und kein
-            Workbook.
+            {t("intros.subtitle")}
           </p>
         </header>
 
@@ -330,44 +338,52 @@ export default async function DiscoveryIntrosPage({
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Eingegangen
+                {t("intros.receivedEyebrow")}
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                Intro-Anfragen an dich
+                {t("intros.receivedTitle")}
               </h2>
             </div>
           </div>
           {sortedReceived.length > 0 ? (
             <div className="mt-5 grid gap-4">
               {sortedReceived.map((request) => (
-                <ReceivedIntroCard key={request.id} request={request} />
+                <ReceivedIntroCard
+                  key={request.id}
+                  request={request}
+                  t={t}
+                  fallbackMessage={fallbackIntroMessage}
+                />
               ))}
             </div>
           ) : (
             <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              Noch keine eingegangenen Intro-Anfragen. Sobald jemand dein Profil spannend findet,
-              erscheint die Anfrage hier.
+              {t("intros.receivedEmpty")}
             </p>
           )}
         </section>
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Gesendet
+            {t("intros.sentEyebrow")}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            Deine angefragten Intros
+            {t("intros.sentTitle")}
           </h2>
           {sortedSent.length > 0 ? (
             <div className="mt-5 grid gap-4">
               {sortedSent.map((request) => (
-                <SentIntroCard key={request.id} request={request} />
+                <SentIntroCard
+                  key={request.id}
+                  request={request}
+                  t={t}
+                  fallbackMessage={fallbackIntroMessage}
+                />
               ))}
             </div>
           ) : (
             <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              Du hast noch keine Intros angefragt. Wenn ein Profil spannend wirkt, kannst du über
-              die Profilseite ein erstes Interesse signalisieren.
+              {t("intros.sentEmpty")}
             </p>
           )}
         </section>

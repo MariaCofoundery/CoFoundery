@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  DISCOVERY_COMMITMENT_LABELS,
-  DISCOVERY_REMOTE_MODE_LABELS,
-  DISCOVERY_ROLE_LABELS,
-  DISCOVERY_STATUS_LABELS,
-  DISCOVERY_VENTURE_GOAL_LABELS,
-} from "@/features/discovery/discoveryConfig";
+import { getTranslations } from "next-intl/server";
 import {
   getDiscoveryCandidatesForCurrentUser,
   getOwnDiscoveryProfile,
@@ -32,6 +26,8 @@ const CHIP_CLASS =
 const SOFT_CHIP_CLASS =
   "inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700";
 
+type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
+
 type DiscoveryStatusView = {
   label: string;
   hint: string;
@@ -40,61 +36,52 @@ type DiscoveryStatusView = {
 };
 
 const JOURNEY_STEPS = [
-  {
-    title: "Profil anlegen",
-    description: "Zeig, wer du bist, was du mitbringst und wonach du suchst.",
-  },
-  {
-    title: "Prioritäten setzen",
-    description: "Lege fest, was dir bei einem Co-Founder besonders wichtig ist.",
-  },
-  {
-    title: "Vorschläge erhalten",
-    description: "Später schlagen wir dir Profile vor, die zu deinen Prioritäten passen.",
-  },
-  {
-    title: "Intro anfragen",
-    description: "Wenn beide Interesse haben, könnt ihr ein erstes Gespräch starten.",
-  },
-  {
-    title: "Gemeinsames Cofoundery-Matching starten",
-    description:
-      "Danach könnt ihr eure Zusammenarbeit mit dem bestehenden Matching und Workbook vertiefen.",
-  },
+  "profile",
+  "priorities",
+  "suggestions",
+  "intro",
+  "matching",
 ] as const;
 
-function getStatusView(profile: FounderDiscoveryProfile | null): DiscoveryStatusView {
+function discoveryRoleLabel(t: DiscoveryT, value: DiscoveryFounderRole) {
+  return t(`roles.${value}`);
+}
+
+function getStatusView(
+  profile: FounderDiscoveryProfile | null,
+  t: DiscoveryT
+): DiscoveryStatusView {
   if (!profile) {
     return {
-      label: "Noch kein Suchprofil",
-      hint: "Lege zuerst ein Suchprofil an. Du entscheidest später bewusst, wann es sichtbar wird.",
-      cta: "Suchprofil erstellen",
+      label: t("index.missingProfile.label"),
+      hint: t("index.missingProfile.hint"),
+      cta: t("index.missingProfile.cta"),
       status: "missing",
     };
   }
 
   if (profile.status === "active") {
     return {
-      label: DISCOVERY_STATUS_LABELS.active,
-      hint: "Dein Profil ist für eingeloggte Cofoundery-Nutzer:innen sichtbar.",
-      cta: "Profil bearbeiten",
+      label: t("status.active"),
+      hint: t("index.activeProfile.hint"),
+      cta: t("index.activeProfile.cta"),
       status: "active",
     };
   }
 
   if (profile.status === "paused") {
     return {
-      label: DISCOVERY_STATUS_LABELS.paused,
-      hint: "Dein Profil ist aktuell nicht sichtbar.",
-      cta: "Profil reaktivieren",
+      label: t("status.paused"),
+      hint: t("index.pausedProfile.hint"),
+      cta: t("index.pausedProfile.cta"),
       status: "paused",
     };
   }
 
   return {
-    label: DISCOVERY_STATUS_LABELS.draft,
-    hint: "Nur du siehst dieses Profil.",
-    cta: "Profil weiter bearbeiten",
+    label: t("status.draft"),
+    hint: t("index.draftProfile.hint"),
+    cta: t("index.draftProfile.cta"),
     status: "draft",
   };
 }
@@ -112,7 +99,15 @@ function statusBadgeClass(status: DiscoveryStatusView["status"]) {
   return "bg-slate-950 text-white";
 }
 
-function RoleChips({ values, emptyLabel }: { values: DiscoveryFounderRole[]; emptyLabel: string }) {
+function RoleChips({
+  values,
+  emptyLabel,
+  t,
+}: {
+  values: DiscoveryFounderRole[];
+  emptyLabel: string;
+  t: DiscoveryT;
+}) {
   if (values.length === 0) {
     return <span className={SOFT_CHIP_CLASS}>{emptyLabel}</span>;
   }
@@ -121,7 +116,7 @@ function RoleChips({ values, emptyLabel }: { values: DiscoveryFounderRole[]; emp
     <div className="flex flex-wrap gap-2">
       {values.map((value) => (
         <span key={value} className={CHIP_CLASS}>
-          {DISCOVERY_ROLE_LABELS[value]}
+          {discoveryRoleLabel(t, value)}
         </span>
       ))}
     </div>
@@ -179,7 +174,7 @@ function InsightList({
   );
 }
 
-function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
+function CandidateCard({ candidate, t }: { candidate: DiscoveryCandidate; t: DiscoveryT }) {
   const { profile } = candidate;
 
   return (
@@ -188,7 +183,7 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Guter Gesprächsanlass
+              {t("index.candidateCard.eyebrow")}
             </p>
             <h3 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">
               {profile.displayName}
@@ -199,10 +194,10 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
           </div>
           <div className="flex flex-col gap-2 lg:items-end">
             <Link href={`/discovery/${profile.id}`} className={PRIMARY_CTA_CLASS}>
-              Profil ansehen
+              {t("index.candidateCard.view")}
             </Link>
             <p className="max-w-56 text-xs leading-5 text-slate-500 lg:text-right">
-              Schau dir erst das Profil an. Ein Intro-Flow kommt als nächster Schritt.
+              {t("index.candidateCard.hint")}
             </p>
           </div>
         </div>
@@ -210,13 +205,13 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
         <div className="mt-5 flex flex-wrap gap-2">
           <span className={SOFT_CHIP_CLASS}>
             {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
-            {DISCOVERY_REMOTE_MODE_LABELS[profile.remoteMode]}
+            {t(`remoteModes.${profile.remoteMode}`)}
           </span>
           <span className={SOFT_CHIP_CLASS}>
-            {DISCOVERY_COMMITMENT_LABELS[profile.commitmentLevel]}
+            {t(`commitmentLevels.${profile.commitmentLevel}`)}
           </span>
           <span className={SOFT_CHIP_CLASS}>
-            Zielbild: {DISCOVERY_VENTURE_GOAL_LABELS[profile.ventureGoal]}
+            {t("index.candidateCard.goalPrefix")} {t(`ventureGoals.${profile.ventureGoal}`)}
           </span>
         </div>
       </div>
@@ -225,32 +220,32 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
         <div className="grid gap-4 md:grid-cols-2">
           <section className="rounded-[1.35rem] border border-slate-200 bg-white p-4">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Bringt mit
+              {t("index.candidateCard.brings")}
             </p>
             <div className="mt-3">
-              <RoleChips values={profile.ownRoles} emptyLabel="Noch offen" />
+              <RoleChips values={profile.ownRoles} emptyLabel={t("index.candidateCard.emptyRole")} t={t} />
             </div>
           </section>
           <section className="rounded-[1.35rem] border border-slate-200 bg-white p-4">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Sucht
+              {t("index.candidateCard.seeks")}
             </p>
             <div className="mt-3">
-              <RoleChips values={profile.seekingRoles} emptyLabel="Noch offen" />
+              <RoleChips values={profile.seekingRoles} emptyLabel={t("index.candidateCard.emptyRole")} t={t} />
             </div>
           </section>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-2">
           <InsightList
-            eyebrow="Kuratierte Hinweise"
-            title="Warum spannend"
+            eyebrow={t("index.candidateCard.reasonsEyebrow")}
+            title={t("index.candidateCard.reasonsTitle")}
             items={candidate.reasons}
             tone="slate"
           />
           <InsightList
-            eyebrow="Fürs erste Gespräch"
-            title="Früh besprechen"
+            eyebrow={t("index.candidateCard.topicsEyebrow")}
+            title={t("index.candidateCard.topicsTitle")}
             items={candidate.conversationTopics}
             tone="amber"
           />
@@ -261,6 +256,7 @@ function CandidateCard({ candidate }: { candidate: DiscoveryCandidate }) {
 }
 
 export default async function DiscoveryPage() {
+  const t = await getTranslations("discovery");
   const supabase = await createClient();
   const {
     data: { user },
@@ -274,7 +270,7 @@ export default async function DiscoveryPage() {
     getOwnDiscoveryProfile(user.id),
     getDiscoveryCandidatesForCurrentUser(user.id),
   ]);
-  const statusView = getStatusView(profile);
+  const statusView = getStatusView(profile, t);
   const isActive = profile?.status === "active";
 
   return (
@@ -282,16 +278,15 @@ export default async function DiscoveryPage() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Founder Discovery
+            {t("common.brandEyebrow")}
           </p>
           <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="max-w-3xl">
               <h1 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-4xl">
-                Co-Founder suchen
+                {t("index.title")}
               </h1>
               <p className="mt-3 text-base leading-7 text-slate-600">
-                Erstelle dein Suchprofil, setze deine Prioritäten und bereite dich darauf vor,
-                passende Co-Founder-Kandidat:innen vorgeschlagen zu bekommen.
+                {t("index.subtitle")}
               </p>
             </div>
           </div>
@@ -301,7 +296,7 @@ export default async function DiscoveryPage() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Dein Suchprofil
+                {t("index.profileEyebrow")}
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <h2 className="text-xl font-semibold text-slate-950 md:text-2xl">{statusView.label}</h2>
@@ -312,7 +307,7 @@ export default async function DiscoveryPage() {
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{statusView.hint}</p>
               {profile?.headline ? (
                 <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  Aktuelle Headline: <span className="font-semibold">{profile.headline}</span>
+                  {t("index.headlinePrefix")} <span className="font-semibold">{profile.headline}</span>
                 </p>
               ) : null}
             </div>
@@ -321,7 +316,7 @@ export default async function DiscoveryPage() {
                 {statusView.cta}
               </Link>
               <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                Offene Anfragen ansehen
+                {t("index.openRequests")}
               </Link>
             </div>
           </div>
@@ -330,22 +325,22 @@ export default async function DiscoveryPage() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <section className={CARD_CLASS}>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              So funktioniert es
+              {t("index.journeyEyebrow")}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Dein Discovery-Weg</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("index.journeyTitle")}</h2>
             <ol className="mt-4 grid gap-3">
               {JOURNEY_STEPS.map((step, index) => {
                 return (
                   <li
-                    key={step.title}
+                    key={step}
                     className="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3"
                   >
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-semibold text-white">
                       {index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-slate-950">{step.title}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-500">{step.description}</p>
+                      <p className="text-sm font-semibold text-slate-950">{t(`index.journey.${step}.title`)}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{t(`index.journey.${step}.description`)}</p>
                     </div>
                   </li>
                 );
@@ -357,44 +352,41 @@ export default async function DiscoveryPage() {
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  Kandidat:innenvorschläge
+                  {t("index.candidateEyebrow")}
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                  Erste Profile entdecken
+                  {t("index.candidateTitle")}
                 </h2>
                 {isActive ? (
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Sortiert nach deinen privaten Prioritäten, ohne sie öffentlich anzuzeigen.
+                    {t("index.candidateHint")}
                   </p>
                 ) : null}
               </div>
-              <span className={SECONDARY_BADGE_CLASS}>Ohne öffentliche Bewertung</span>
+              <span className={SECONDARY_BADGE_CLASS}>{t("index.noPublicScore")}</span>
             </div>
 
             {isActive && candidates.length > 0 ? (
               <div className="mt-5 grid gap-5">
                 {candidates.map((candidate) => (
-                  <CandidateCard key={candidate.profile.id} candidate={candidate} />
+                  <CandidateCard key={candidate.profile.id} candidate={candidate} t={t} />
                 ))}
               </div>
             ) : (
               <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5">
                 <p className="text-sm font-semibold text-slate-950">
-                  {isActive ? "Noch keine passenden Profile" : "Profil erst sichtbar machen"}
+                  {isActive ? t("index.emptyActiveTitle") : t("index.emptyInactiveTitle")}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {isActive
-                    ? "Aktuell sehen wir keine passenden Profile. Prüfe, ob deine erweiterten Filter zu eng gesetzt sind, oder schau später nochmal vorbei."
-                    : "Veröffentliche dein Suchprofil, damit wir passende Profile besser einordnen können."}
+                  {isActive ? t("index.emptyActiveText") : t("index.emptyInactiveText")}
                 </p>
               </div>
             )}
 
             <div className="mt-5 rounded-3xl border border-slate-200 bg-white p-5">
-              <p className="text-sm font-semibold text-slate-950">Datenschutz-Hinweis</p>
+              <p className="text-sm font-semibold text-slate-950">{t("index.privacyTitle")}</p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Deine privaten Suchprioritäten und Assessment-Antworten bleiben geschützt. Auf
-                deinem Profil erscheinen nur Angaben, die du bewusst veröffentlichst.
+                {t("index.privacyText")}
               </p>
             </div>
           </section>

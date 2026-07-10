@@ -1,0 +1,438 @@
+{
+  "common": {
+    "brandEyebrow": "Founder Discovery",
+    "notProvided": "Not provided yet",
+    "open": "Still open",
+    "backToDiscovery": "Back to Discovery",
+    "backToDashboard": "← Back to dashboard",
+    "viewProfile": "View profile",
+    "myIntros": "My intros",
+    "prepareSharedMatching": "Prepare shared matching",
+    "fillBaseQuestions": "Answer the foundation questions"
+  },
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused"
+  },
+  "roles": {
+    "tech": "Tech",
+    "product": "Product",
+    "sales": "Sales",
+    "growth": "Growth",
+    "marketing": "Marketing",
+    "operations": "Operations",
+    "finance": "Finance",
+    "design": "Design",
+    "strategy": "Strategy",
+    "research": "Research",
+    "community": "Community",
+    "other": "Another focus"
+  },
+  "remoteModes": {
+    "onsite": "On-site",
+    "hybrid": "Hybrid",
+    "remote": "Remote",
+    "flexible": "Flexible"
+  },
+  "commitmentLevels": {
+    "exploring": "Still exploring",
+    "side_project": "Side project",
+    "part_time": "Committed part-time",
+    "full_time": "Full-time",
+    "all_in": "All-in"
+  },
+  "ventureStages": {
+    "undecided": "Still open",
+    "no_idea_open_to_join": "No own idea, open to joining",
+    "exploring_ideas": "Exploring ideas",
+    "idea_validating": "Validating an idea",
+    "already_building": "Already building"
+  },
+  "ventureGoals": {
+    "undecided": "Still open",
+    "explore": "Figure it out together",
+    "side_project": "Build as a side project",
+    "profitable_business": "Sustainable business",
+    "venture_scale": "Highly scalable company",
+    "exit_oriented": "Clear exit option"
+  },
+  "priorities": {
+    "shared_vision": {
+      "label": "Shared vision",
+      "description": "How important a similar direction for the company is to you."
+    },
+    "commitment": {
+      "label": "Similar commitment",
+      "description": "How important comparable effort and priority are to you."
+    },
+    "skill_complementarity": {
+      "label": "Complementary skills",
+      "description": "How much someone should complement you instead of bringing the same strengths."
+    },
+    "venture_goal": {
+      "label": "Similar company ambition",
+      "description": "How important it is that you think similarly about size, pace and ambition."
+    },
+    "exit_logic": {
+      "label": "Exit logic",
+      "description": "How important a similar feel for long-term building or a potential exit is."
+    },
+    "availability": {
+      "label": "Availability",
+      "description": "How important it is that time and commitment fit well."
+    },
+    "work_style": {
+      "label": "Working style",
+      "description": "How important a similar day-to-day rhythm is to you."
+    },
+    "execution_strength": {
+      "label": "Execution strength",
+      "description": "How important it is that someone moves strongly into action."
+    },
+    "location": {
+      "label": "Location and proximity",
+      "description": "How important place, time zone or meeting in person are to you."
+    },
+    "industry": {
+      "label": "Industry and interests",
+      "description": "How important overlap in market, topic or interest is to you."
+    },
+    "communication": {
+      "label": "Trust and communication",
+      "description": "How important clear, reliable communication is to you."
+    }
+  },
+  "introStatus": {
+    "pending": "Intro requested",
+    "accepted": "Intro accepted",
+    "declined": "Intro not accepted",
+    "canceled": "Request withdrawn",
+    "pill": {
+      "pending": "Open",
+      "accepted": "Accepted",
+      "declined": "Not accepted",
+      "canceled": "Withdrawn"
+    }
+  },
+  "index": {
+    "title": "Find a co-founder",
+    "subtitle": "Create your search profile, set your priorities and get ready to discover fitting co-founder candidates.",
+    "profileEyebrow": "Your search profile",
+    "openRequests": "View open requests",
+    "headlinePrefix": "Current headline:",
+    "missingProfile": {
+      "label": "No search profile yet",
+      "hint": "Create a search profile first. You decide later when it becomes visible.",
+      "cta": "Create search profile"
+    },
+    "activeProfile": {
+      "hint": "Your profile is visible to logged-in Cofoundery users.",
+      "cta": "Edit profile"
+    },
+    "pausedProfile": {
+      "hint": "Your profile is currently not visible.",
+      "cta": "Reactivate profile"
+    },
+    "draftProfile": {
+      "hint": "Only you can see this profile.",
+      "cta": "Keep editing profile"
+    },
+    "journeyEyebrow": "How it works",
+    "journeyTitle": "Your Discovery path",
+    "journey": {
+      "profile": {
+        "title": "Create profile",
+        "description": "Show who you are, what you bring and what you are looking for."
+      },
+      "priorities": {
+        "title": "Set priorities",
+        "description": "Define what matters most to you in a co-founder."
+      },
+      "suggestions": {
+        "title": "Receive suggestions",
+        "description": "Later, we suggest profiles that fit your priorities."
+      },
+      "intro": {
+        "title": "Request intro",
+        "description": "If both sides are interested, you can start a first conversation."
+      },
+      "matching": {
+        "title": "Start shared Cofoundery Matching",
+        "description": "After that, you can deepen the collaboration with the existing matching and workbook."
+      }
+    },
+    "candidateEyebrow": "Candidate suggestions",
+    "candidateTitle": "Discover first profiles",
+    "candidateHint": "Sorted by your private priorities without showing them publicly.",
+    "noPublicScore": "No public rating",
+    "emptyActiveTitle": "No fitting profiles yet",
+    "emptyActiveText": "We do not see fitting profiles right now. Check whether your advanced filters are too narrow, or come back later.",
+    "emptyInactiveTitle": "Make your profile visible first",
+    "emptyInactiveText": "Publish your search profile so we can better place matching profiles.",
+    "privacyTitle": "Privacy note",
+    "privacyText": "Your private search priorities and assessment answers stay protected. Your profile only shows details you intentionally publish.",
+    "candidateCard": {
+      "eyebrow": "Good reason to talk",
+      "view": "View profile",
+      "hint": "Review the profile first. An intro flow comes as the next step.",
+      "goalPrefix": "Goal:",
+      "brings": "Brings",
+      "seeks": "Looking for",
+      "emptyRole": "Still open",
+      "reasonsEyebrow": "Curated cues",
+      "reasonsTitle": "Why it is interesting",
+      "topicsEyebrow": "For the first conversation",
+      "topicsTitle": "Discuss early"
+    }
+  },
+  "profile": {
+    "title": "Your co-founder search profile",
+    "subtitle": "Create a profile for people who might build with you. You decide when it becomes visible.",
+    "status": {
+      "eyebrow": "Status",
+      "activeHint": "Logged-in Cofoundery users can see your profile.",
+      "pausedHint": "Your profile is paused and not visible to others.",
+      "draftHint": "Only you can see this profile."
+    },
+    "messages": {
+      "fallbackError": "The action could not be completed right now.",
+      "draftSaved": "Your Discovery draft was saved.",
+      "published": "Your Discovery profile is now active.",
+      "paused": "Your co-founder search is paused.",
+      "preferencesSaved": "Your search priorities were saved."
+    },
+    "publicProfile": {
+      "eyebrow": "Public search profile",
+      "title": "What others may see",
+      "description": "These details only become visible once you publish your profile.",
+      "displayName": "Display name",
+      "displayNamePlaceholder": "e.g. Sascha",
+      "headline": "Headline",
+      "headlinePlaceholder": "e.g. Product founder looking for a tech counterpart",
+      "bio": "Short description",
+      "bioPlaceholder": "What you are working on, what you bring and what kind of collaboration you are looking for.",
+      "ownRoles": "Your roles",
+      "ownRolesHelp": "What do you bring most strongly? Up to {count} roles.",
+      "ownRolesLimit": "You reached the maximum number of own roles.",
+      "seekingRoles": "Roles you are looking for",
+      "seekingRolesHelp": "What kind of complement are you looking for in a co-founder? Up to {count} roles.",
+      "seekingRolesLimit": "You reached the maximum number of roles you are looking for.",
+      "industries": "Industries / interests",
+      "industriesPlaceholder": "e.g. Climate, B2B SaaS, education",
+      "industriesHelp": "Separate multiple terms with commas. Up to {count} terms.",
+      "industriesLimit": "You reached the maximum number of industries/interests.",
+      "location": "Location",
+      "locationPlaceholder": "e.g. Berlin, DACH, Remote",
+      "remoteMode": "Remote mode",
+      "availability": "Availability per week",
+      "availabilityPlaceholder": "e.g. 20"
+    },
+    "venture": {
+      "eyebrow": "Your founding direction",
+      "title": "What you are looking for right now",
+      "description": "Help others understand whether direction, pace and ambition fit well.",
+      "commitment": "How much room does founding have right now?",
+      "stage": "Where are you right now?",
+      "goal": "What do you want to build?"
+    },
+    "actions": {
+      "saveDraft": "Save draft",
+      "publish": "Publish profile",
+      "pause": "Pause search",
+      "publishHelp": "When publishing, we save your current details and make your profile visible if everything is complete.",
+      "publishIssues": "Before your profile becomes visible, please add:"
+    },
+    "preview": {
+      "eyebrow": "Preview",
+      "title": "How others see your profile",
+      "displayNameFallback": "Your display name",
+      "headlineFallback": "A short headline about you and your search",
+      "bioFallback": "Briefly describe what you bring and what kind of collaboration you are looking for.",
+      "brings": "Brings",
+      "seeks": "Looking for",
+      "interests": "Interests",
+      "workFrame": "Work setup",
+      "timeOpen": "Time open",
+      "hoursPerWeek": "{hours} hrs/week",
+      "privacy": "Private search priorities are not shown here."
+    },
+    "preferences": {
+      "eyebrow": "Private search preferences",
+      "title": "What matters to you in a co-founder",
+      "description": "Choose up to {count} topics that really matter to you. 1 means “slightly important”, 5 means “very important”. Unselected topics stay private and count internally as 0.",
+      "limit": "You have set {count} weighted priorities.",
+      "rangeHelp": "0 = not prioritized · 5 = very important",
+      "save": "Save search preferences"
+    },
+    "assessment": {
+      "eyebrow": "Private setting",
+      "title": "Include Cofoundery Check",
+      "description": "If you want, we later use your Cofoundery assessment results to generate better suggestions and conversation cues. Raw answers or internal evaluations are not shown on your profile.",
+      "checkbox": "Include for better suggestions",
+      "checkboxHelp": "This setting is private and does not appear on your public Discovery profile.",
+      "fillBase": "Answer the foundation questions",
+      "defaulted": "For the beta phase, this private setting is preselected. Save your search priorities to keep it, or remove the checkmark.",
+      "missingBase": "Answer the foundation questions first to include the Cofoundery Check.",
+      "inactive": "Inactive: Your assessment results stay unused for Discovery.",
+      "active": "Active: Cofoundery privately uses your Check signals for better Discovery suggestions and conversation cues."
+    },
+    "filters": {
+      "title": "Advanced filters",
+      "description": "Use hard criteria sparingly. Too many must-haves can prevent good conversations.",
+      "minimumAvailability": "Minimum availability per week",
+      "minimumAvailabilityPlaceholder": "e.g. 10",
+      "acceptedRemoteModes": "Accepted remote modes",
+      "requiredRoles": "Roles that should be present",
+      "commitment": "Commitment level",
+      "stages": "Venture stages",
+      "goals": "Venture goals"
+    }
+  },
+  "intros": {
+    "title": "My intros",
+    "subtitle": "Here you can see who wants to meet you and which intros you requested. An accepted intro does not create a relationship, invitation or workbook.",
+    "defaultActionMessage": "The intro action was processed.",
+    "receivedEyebrow": "Received",
+    "receivedTitle": "Intro requests to you",
+    "receivedEmpty": "No received intro requests yet. Once someone finds your profile interesting, the request appears here.",
+    "sentEyebrow": "Sent",
+    "sentTitle": "Your requested intros",
+    "sentEmpty": "You have not requested any intros yet. When a profile feels interesting, you can signal first interest on the profile page.",
+    "profileHiddenTitle": "Discovery profile not visible",
+    "profileHiddenText": "The related profile is currently not publicly visible.",
+    "brings": "Brings:",
+    "seeks": "Looking for:",
+    "workFrame": "Work setup:",
+    "message": "Message",
+    "yourMessage": "Your message",
+    "response": "Response",
+    "yourResponse": "Your response",
+    "optionalResponse": "Optional response message",
+    "acceptPlaceholder": "What would you like to briefly send back?",
+    "declinePlaceholder": "You can reply briefly, but you do not have to.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Withdraw"
+  },
+  "detail": {
+    "eyebrow": "Discovery profile",
+    "editOwn": "Edit my search profile",
+    "shortBio": "Short description",
+    "searchProfile": "Search profile",
+    "publishedTitle": "What this person published",
+    "privacy": "This profile only shows details the person intentionally published for Discovery. Private search priorities and assessment answers are not shown.",
+    "emptyTitle": "Profile not visible",
+    "emptyText": "This Discovery profile is currently not publicly visible or does not exist.",
+    "details": {
+      "brings": "Brings",
+      "seeks": "Looking for",
+      "industries": "Industries / interests",
+      "location": "Location",
+      "remoteMode": "Remote mode",
+      "availability": "Availability",
+      "commitment": "Commitment level",
+      "stage": "Venture stage",
+      "goal": "Venture goal"
+    },
+    "intro": {
+      "eyebrow": "Discovery Intro",
+      "requestTitle": "Request intro",
+      "requestText": "If the profile feels interesting, you can signal first interest. The other person decides whether they want to accept the intro.",
+      "messageLabel": "Short message",
+      "messagePlaceholder": "What makes this profile interesting to you?",
+      "messageHelp": "Optional, maximum 600 characters. Share only what you intentionally want to send.",
+      "request": "Request intro",
+      "acceptedTitle": "Intro accepted",
+      "acceptedText": "You both signaled interest. Next, you can have a first conversation or later start shared Cofoundery Matching.",
+      "declinedTitle": "Intro not accepted right now",
+      "declinedText": "This person does not want to continue with the intro right now.",
+      "canceledTitle": "Request withdrawn",
+      "canceledText": "You withdrew this intro request.",
+      "pendingTitle": "Intro requested",
+      "pendingText": "Your request is waiting for a response.",
+      "responsePrefix": "Response:",
+      "yourMessagePrefix": "Your message:",
+      "cancel": "Withdraw request"
+    }
+  },
+  "matchingPreparation": {
+    "defaultActionMessage": "The matching preparation was processed.",
+    "matchingSessionUnavailable": "The matching session is currently unavailable.",
+    "backToIntros": "Back to my intros",
+    "backToOpenRequests": "Back to open requests",
+    "eyebrow": "Discovery Intro",
+    "title": "Prepare shared Cofoundery Matching",
+    "subtitle": "You both signaled interest. The next useful step is full Cofoundery Matching, so you can reflect on roles, commitment, working style and expectations together.",
+    "safetyNote": "Nothing is created automatically here: no invitation, no relationship, no report and no workbook.",
+    "existingContextTitle": "There is already an existing Cofoundery context",
+    "existingContextText": "It looks like a matching or connection state already exists for you. To avoid creating duplicates, this preparation page does not start a new process.",
+    "profilesEyebrow": "Involved profiles",
+    "profilesTitle": "Public Discovery projection",
+    "profilesText": "Only details that you intentionally published through Discovery are shown. Email addresses, private search priorities and assessment data stay hidden.",
+    "you": "You",
+    "counterpart": "Counterpart",
+    "profile": {
+      "brings": "Brings",
+      "seeks": "Looking for",
+      "workFrame": "Work setup",
+      "commitmentGoal": "Commitment / goal"
+    },
+    "readiness": {
+      "eyebrow": "Matching core",
+      "title": "Matching session prepared",
+      "text": "Cofoundery created a shared matching context and checked whether your foundation answers are already available. No report, relationship or workbook was created.",
+      "statusPrefix": "Status:",
+      "reportReady": "Dynamics report created",
+      "readyForReport": "Ready for report",
+      "waitingForAnswers": "Waiting for answers",
+      "profileHidden": "Discovery profile not visible",
+      "basePresent": "Foundation questions available",
+      "baseMissing": "Foundation questions missing",
+      "createReportHint": "Both foundation answers are available. You can now create a shared dynamics report as an immutable snapshot.",
+      "viewReport": "View dynamics report",
+      "createReport": "Create dynamics report"
+    },
+    "unavailable": {
+      "title": "This matching step is currently unavailable.",
+      "text": "The intro is unavailable, no longer accepted or does not belong to your account. Private details are intentionally not shown here."
+    },
+    "states": {
+      "canceledEyebrow": "Preparation ended",
+      "canceledTitle": "Matching preparation ended",
+      "canceledText": "This matching preparation was ended.",
+      "readyEyebrow": "Ready",
+      "readyTitle": "Ready for shared matching",
+      "readyText": "You both confirmed that you want to start full Cofoundery Matching. Next, Cofoundery can create a shared matching context and check whether your foundation answers are already available.",
+      "readyFollowup": "Cofoundery creates a shared matching context and checks whether your foundation answers are already available. No report, relationship or workbook is created yet.",
+      "confirmationEyebrow": "Confirmation",
+      "confirmationRequestedTitle": "Confirmation requested",
+      "confirmTitle": "Confirm Cofoundery Matching",
+      "confirmationRequestedText": "The other person still needs to confirm the shared matching start.",
+      "confirmText": "The other person wants to start the full shared matching. Once you confirm, you are ready for the next step.",
+      "startedEyebrow": "Preparation started",
+      "startedTitle": "Matching preparation started",
+      "startedText": "When you are ready, you can request the shared matching start. The other person then needs to confirm.",
+      "nextStepEyebrow": "Next step",
+      "startTitle": "Start matching preparation",
+      "startText": "This lets Cofoundery remember that you want to continue together from this accepted intro. No invitation, relationship, report or workbook is created yet."
+    },
+    "steps": {
+      "introAccepted": "Intro accepted",
+      "preparationCreated": "Matching preparation created",
+      "bothConfirmed": "Both sides have confirmed the shared matching start",
+      "awaitingSecondConfirmation": "Shared matching start is waiting for the second confirmation",
+      "needsBothConfirmations": "Full Cofoundery Matching needs confirmation from both sides",
+      "startFullMatching": "1. You start the full Cofoundery Matching.",
+      "answerQuestions": "2. Both of you answer the relevant Cofoundery questions or confirm existing answers.",
+      "reportAndWorkbook": "3. After that, a shared dynamics report is created and you can continue with the workbook."
+    },
+    "actions": {
+      "prepareSession": "Prepare matching session",
+      "waitingForConfirmation": "Waiting for confirmation",
+      "confirmMatching": "Confirm matching",
+      "requestFullMatching": "Request full matching",
+      "startPreparation": "Start matching preparation"
+    }
+  }
+}

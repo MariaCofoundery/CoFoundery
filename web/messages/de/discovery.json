@@ -1,0 +1,438 @@
+{
+  "common": {
+    "brandEyebrow": "Founder Discovery",
+    "notProvided": "Noch nicht angegeben",
+    "open": "Noch offen",
+    "backToDiscovery": "Zurück zu Discovery",
+    "backToDashboard": "← Zurück zum Dashboard",
+    "viewProfile": "Profil ansehen",
+    "myIntros": "Meine Intros",
+    "prepareSharedMatching": "Gemeinsames Matching vorbereiten",
+    "fillBaseQuestions": "Basis-Fragen ausfüllen"
+  },
+  "status": {
+    "draft": "Entwurf",
+    "active": "Aktiv",
+    "paused": "Pausiert"
+  },
+  "roles": {
+    "tech": "Tech",
+    "product": "Product",
+    "sales": "Sales",
+    "growth": "Growth",
+    "marketing": "Marketing",
+    "operations": "Operations",
+    "finance": "Finance",
+    "design": "Design",
+    "strategy": "Strategie",
+    "research": "Research",
+    "community": "Community",
+    "other": "Anderer Schwerpunkt"
+  },
+  "remoteModes": {
+    "onsite": "Vor Ort",
+    "hybrid": "Hybrid",
+    "remote": "Remote",
+    "flexible": "Flexibel"
+  },
+  "commitmentLevels": {
+    "exploring": "Ich orientiere mich noch",
+    "side_project": "Nebenprojekt",
+    "part_time": "Teilzeit verbindlich",
+    "full_time": "Vollzeit",
+    "all_in": "All-in"
+  },
+  "ventureStages": {
+    "undecided": "Noch offen",
+    "no_idea_open_to_join": "Keine eigene Idee, offen einzusteigen",
+    "exploring_ideas": "Ich prüfe Ideen",
+    "idea_validating": "Ich validiere eine Idee",
+    "already_building": "Ich baue bereits"
+  },
+  "ventureGoals": {
+    "undecided": "Noch offen",
+    "explore": "Gemeinsam herausfinden",
+    "side_project": "Nebenbei aufbauen",
+    "profitable_business": "Tragfähiges Unternehmen",
+    "venture_scale": "Stark skalierbares Unternehmen",
+    "exit_oriented": "Mit klarer Exit-Option"
+  },
+  "priorities": {
+    "shared_vision": {
+      "label": "Gemeinsames Bild",
+      "description": "Wie wichtig dir eine ähnliche Richtung für das Unternehmen ist."
+    },
+    "commitment": {
+      "label": "Ähnliches Commitment",
+      "description": "Wie wichtig dir ein vergleichbarer Einsatz und eine ähnliche Priorität sind."
+    },
+    "skill_complementarity": {
+      "label": "Ergänzende Fähigkeiten",
+      "description": "Wie stark dich jemand ergänzen soll, statt dass ihr dasselbe mitbringt."
+    },
+    "venture_goal": {
+      "label": "Ähnliches Aufbauziel",
+      "description": "Wie wichtig dir ist, dass ihr ähnlich über Größe, Tempo und Zielbild denkt."
+    },
+    "exit_logic": {
+      "label": "Exit-Logik",
+      "description": "Wie wichtig dir ein ähnliches Gefühl für langfristigen Aufbau oder möglichen Exit ist."
+    },
+    "availability": {
+      "label": "Verfügbarkeit",
+      "description": "Wie wichtig dir ist, dass Zeit und Verbindlichkeit gut zusammenpassen."
+    },
+    "work_style": {
+      "label": "Arbeitsstil",
+      "description": "Wie wichtig dir ein ähnlicher Rhythmus im Alltag ist."
+    },
+    "execution_strength": {
+      "label": "Umsetzungskraft",
+      "description": "Wie wichtig dir ist, dass jemand stark ins Tun kommt."
+    },
+    "location": {
+      "label": "Standort und Nähe",
+      "description": "Wie wichtig dir Ort, Zeitzone oder persönliches Treffen sind."
+    },
+    "industry": {
+      "label": "Branche und Interesse",
+      "description": "Wie wichtig dir Überschneidung bei Markt, Thema oder Interesse ist."
+    },
+    "communication": {
+      "label": "Vertrauen und Kommunikation",
+      "description": "Wie wichtig dir ein klarer, verlässlicher Austausch ist."
+    }
+  },
+  "introStatus": {
+    "pending": "Intro angefragt",
+    "accepted": "Intro angenommen",
+    "declined": "Intro nicht angenommen",
+    "canceled": "Anfrage zurückgezogen",
+    "pill": {
+      "pending": "Offen",
+      "accepted": "Angenommen",
+      "declined": "Nicht angenommen",
+      "canceled": "Zurückgezogen"
+    }
+  },
+  "index": {
+    "title": "Co-Founder suchen",
+    "subtitle": "Erstelle dein Suchprofil, setze deine Prioritäten und bereite dich darauf vor, passende Co-Founder-Kandidat:innen vorgeschlagen zu bekommen.",
+    "profileEyebrow": "Dein Suchprofil",
+    "openRequests": "Offene Anfragen ansehen",
+    "headlinePrefix": "Aktuelle Headline:",
+    "missingProfile": {
+      "label": "Noch kein Suchprofil",
+      "hint": "Lege zuerst ein Suchprofil an. Du entscheidest später bewusst, wann es sichtbar wird.",
+      "cta": "Suchprofil erstellen"
+    },
+    "activeProfile": {
+      "hint": "Dein Profil ist für eingeloggte Cofoundery-Nutzer:innen sichtbar.",
+      "cta": "Profil bearbeiten"
+    },
+    "pausedProfile": {
+      "hint": "Dein Profil ist aktuell nicht sichtbar.",
+      "cta": "Profil reaktivieren"
+    },
+    "draftProfile": {
+      "hint": "Nur du siehst dieses Profil.",
+      "cta": "Profil weiter bearbeiten"
+    },
+    "journeyEyebrow": "So funktioniert es",
+    "journeyTitle": "Dein Discovery-Weg",
+    "journey": {
+      "profile": {
+        "title": "Profil anlegen",
+        "description": "Zeig, wer du bist, was du mitbringst und wonach du suchst."
+      },
+      "priorities": {
+        "title": "Prioritäten setzen",
+        "description": "Lege fest, was dir bei einem Co-Founder besonders wichtig ist."
+      },
+      "suggestions": {
+        "title": "Vorschläge erhalten",
+        "description": "Später schlagen wir dir Profile vor, die zu deinen Prioritäten passen."
+      },
+      "intro": {
+        "title": "Intro anfragen",
+        "description": "Wenn beide Interesse haben, könnt ihr ein erstes Gespräch starten."
+      },
+      "matching": {
+        "title": "Gemeinsames Cofoundery-Matching starten",
+        "description": "Danach könnt ihr eure Zusammenarbeit mit dem bestehenden Matching und Workbook vertiefen."
+      }
+    },
+    "candidateEyebrow": "Kandidat:innenvorschläge",
+    "candidateTitle": "Erste Profile entdecken",
+    "candidateHint": "Sortiert nach deinen privaten Prioritäten, ohne sie öffentlich anzuzeigen.",
+    "noPublicScore": "Ohne öffentliche Bewertung",
+    "emptyActiveTitle": "Noch keine passenden Profile",
+    "emptyActiveText": "Aktuell sehen wir keine passenden Profile. Prüfe, ob deine erweiterten Filter zu eng gesetzt sind, oder schau später nochmal vorbei.",
+    "emptyInactiveTitle": "Profil erst sichtbar machen",
+    "emptyInactiveText": "Veröffentliche dein Suchprofil, damit wir passende Profile besser einordnen können.",
+    "privacyTitle": "Datenschutz-Hinweis",
+    "privacyText": "Deine privaten Suchprioritäten und Assessment-Antworten bleiben geschützt. Auf deinem Profil erscheinen nur Angaben, die du bewusst veröffentlichst.",
+    "candidateCard": {
+      "eyebrow": "Guter Gesprächsanlass",
+      "view": "Profil ansehen",
+      "hint": "Schau dir erst das Profil an. Ein Intro-Flow kommt als nächster Schritt.",
+      "goalPrefix": "Zielbild:",
+      "brings": "Bringt mit",
+      "seeks": "Sucht",
+      "emptyRole": "Noch offen",
+      "reasonsEyebrow": "Kuratierte Hinweise",
+      "reasonsTitle": "Warum spannend",
+      "topicsEyebrow": "Fürs erste Gespräch",
+      "topicsTitle": "Früh besprechen"
+    }
+  },
+  "profile": {
+    "title": "Dein Co-Founder-Suchprofil",
+    "subtitle": "Erstelle ein Profil für Menschen, die potenziell mit dir gründen könnten. Du entscheidest bewusst, wann es sichtbar wird.",
+    "status": {
+      "eyebrow": "Status",
+      "activeHint": "Eingeloggte Cofoundery-Nutzer können dein Profil sehen.",
+      "pausedHint": "Dein Profil ist pausiert und für andere nicht sichtbar.",
+      "draftHint": "Nur du siehst dieses Profil."
+    },
+    "messages": {
+      "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
+      "draftSaved": "Dein Discovery-Entwurf wurde gespeichert.",
+      "published": "Dein Discovery-Profil ist jetzt aktiv.",
+      "paused": "Deine Co-Founder-Suche ist pausiert.",
+      "preferencesSaved": "Deine Suchprioritäten wurden gespeichert."
+    },
+    "publicProfile": {
+      "eyebrow": "Öffentliches Suchprofil",
+      "title": "Was andere sehen dürfen",
+      "description": "Diese Angaben werden erst sichtbar, wenn du dein Profil veröffentlichst.",
+      "displayName": "Anzeigename",
+      "displayNamePlaceholder": "z. B. Sascha",
+      "headline": "Headline",
+      "headlinePlaceholder": "z. B. Product-Founder sucht Tech-Gegenpart",
+      "bio": "Kurzbeschreibung",
+      "bioPlaceholder": "Woran du arbeitest, was du einbringst und welche Art Zusammenarbeit du suchst.",
+      "ownRoles": "Eigene Rollen",
+      "ownRolesHelp": "Was bringst du selbst am stärksten ein? Maximal {count} Rollen.",
+      "ownRolesLimit": "Du hast die maximale Anzahl eigener Rollen erreicht.",
+      "seekingRoles": "Gesuchte Rollen",
+      "seekingRolesHelp": "Welche Ergänzung suchst du bei einem Co-Founder? Maximal {count} Rollen.",
+      "seekingRolesLimit": "Du hast die maximale Anzahl gesuchter Rollen erreicht.",
+      "industries": "Branchen / Interessen",
+      "industriesPlaceholder": "z. B. Climate, B2B SaaS, Bildung",
+      "industriesHelp": "Mehrere Begriffe einfach mit Komma trennen. Maximal {count} Begriffe.",
+      "industriesLimit": "Du hast die maximale Anzahl an Branchen/Interessen erreicht.",
+      "location": "Standort",
+      "locationPlaceholder": "z. B. Berlin, DACH, Remote",
+      "remoteMode": "Remote-Modus",
+      "availability": "Verfügbarkeit pro Woche",
+      "availabilityPlaceholder": "z. B. 20"
+    },
+    "venture": {
+      "eyebrow": "Deine Gründungsrichtung",
+      "title": "Was du gerade suchst",
+      "description": "Hilf anderen einzuschätzen, ob Richtung, Tempo und Ambition gut zusammenpassen.",
+      "commitment": "Wie viel Raum hat Gründung gerade?",
+      "stage": "Wo stehst du gerade?",
+      "goal": "Was möchtest du aufbauen?"
+    },
+    "actions": {
+      "saveDraft": "Entwurf speichern",
+      "publish": "Profil veröffentlichen",
+      "pause": "Suche pausieren",
+      "publishHelp": "Beim Veröffentlichen speichern wir deine aktuellen Angaben und machen dein Profil sichtbar, wenn alles vollständig ist.",
+      "publishIssues": "Bevor dein Profil sichtbar wird, ergänze noch:"
+    },
+    "preview": {
+      "eyebrow": "Vorschau",
+      "title": "So sehen andere dein Profil",
+      "displayNameFallback": "Dein Anzeigename",
+      "headlineFallback": "Eine kurze Headline über dich und deine Suche",
+      "bioFallback": "Beschreibe kurz, was du mitbringst und welche Art Zusammenarbeit du suchst.",
+      "brings": "Bringt mit",
+      "seeks": "Sucht",
+      "interests": "Interessen",
+      "workFrame": "Arbeitsrahmen",
+      "timeOpen": "Zeit offen",
+      "hoursPerWeek": "{hours} Std./Woche",
+      "privacy": "Private Suchprioritäten werden hier nicht angezeigt."
+    },
+    "preferences": {
+      "eyebrow": "Private Suchpräferenzen",
+      "title": "Was dir bei einem Co-Founder wichtig ist",
+      "description": "Wähle maximal {count} Themen, die dir wirklich wichtig sind. 1 bedeutet „leicht wichtig“, 5 bedeutet „sehr wichtig“. Nicht ausgewählte Themen bleiben privat und zählen intern als 0.",
+      "limit": "Du hast {count} Prioritäten mit Gewichtung gesetzt.",
+      "rangeHelp": "0 = nicht priorisiert · 5 = sehr wichtig",
+      "save": "Suchpräferenzen speichern"
+    },
+    "assessment": {
+      "eyebrow": "Private Einstellung",
+      "title": "Cofoundery Check einbeziehen",
+      "description": "Wenn du möchtest, nutzen wir deine Cofoundery-Assessment-Ergebnisse später, um bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne Auswertungen werden nicht auf deinem Profil angezeigt.",
+      "checkbox": "Für bessere Vorschläge einbeziehen",
+      "checkboxHelp": "Diese Einstellung ist privat und erscheint nicht auf deinem öffentlichen Discovery-Profil.",
+      "fillBase": "Basis-Fragen ausfüllen",
+      "defaulted": "Für die Testphase ist diese private Einstellung vorausgewählt. Speichere deine Suchprioritäten, um sie zu übernehmen, oder entferne den Haken.",
+      "missingBase": "Fülle zuerst die Basis-Fragen aus, um den Cofoundery Check einzubeziehen.",
+      "inactive": "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt.",
+      "active": "Aktiv: Cofoundery nutzt deine Check-Signale privat für bessere Discovery-Vorschläge und Gesprächsimpulse."
+    },
+    "filters": {
+      "title": "Erweiterte Filter",
+      "description": "Nutze harte Kriterien sparsam. Zu viele Must-haves können gute Gespräche verhindern.",
+      "minimumAvailability": "Mindestverfügbarkeit pro Woche",
+      "minimumAvailabilityPlaceholder": "z. B. 10",
+      "acceptedRemoteModes": "Akzeptierte Remote-Modi",
+      "requiredRoles": "Rollen, die unbedingt vorkommen sollten",
+      "commitment": "Commitment-Level",
+      "stages": "Venture Stages",
+      "goals": "Venture Goals"
+    }
+  },
+  "intros": {
+    "title": "Meine Intros",
+    "subtitle": "Hier siehst du, wer dich kennenlernen möchte und welche Intros du angefragt hast. Ein angenommenes Intro erzeugt noch keine Relationship, keine Invitation und kein Workbook.",
+    "defaultActionMessage": "Die Intro-Aktion wurde verarbeitet.",
+    "receivedEyebrow": "Eingegangen",
+    "receivedTitle": "Intro-Anfragen an dich",
+    "receivedEmpty": "Noch keine eingegangenen Intro-Anfragen. Sobald jemand dein Profil spannend findet, erscheint die Anfrage hier.",
+    "sentEyebrow": "Gesendet",
+    "sentTitle": "Deine angefragten Intros",
+    "sentEmpty": "Du hast noch keine Intros angefragt. Wenn ein Profil spannend wirkt, kannst du über die Profilseite ein erstes Interesse signalisieren.",
+    "profileHiddenTitle": "Discovery-Profil nicht sichtbar",
+    "profileHiddenText": "Das zugehörige Profil ist aktuell nicht öffentlich sichtbar.",
+    "brings": "Bringt mit:",
+    "seeks": "Sucht:",
+    "workFrame": "Arbeitsrahmen:",
+    "message": "Nachricht",
+    "yourMessage": "Deine Nachricht",
+    "response": "Antwort",
+    "yourResponse": "Deine Antwort",
+    "optionalResponse": "Antwortnachricht optional",
+    "acceptPlaceholder": "Was möchtest du kurz zurückgeben?",
+    "declinePlaceholder": "Du kannst kurz antworten, musst aber nicht.",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "cancel": "Zurückziehen"
+  },
+  "detail": {
+    "eyebrow": "Discovery-Profil",
+    "editOwn": "Mein Suchprofil bearbeiten",
+    "shortBio": "Kurzbeschreibung",
+    "searchProfile": "Suchprofil",
+    "publishedTitle": "Was diese Person veröffentlicht hat",
+    "privacy": "Dieses Profil zeigt nur Angaben, die die Person bewusst für Discovery veröffentlicht hat. Private Suchprioritäten und Assessment-Antworten werden nicht angezeigt.",
+    "emptyTitle": "Profil nicht sichtbar",
+    "emptyText": "Dieses Discovery-Profil ist aktuell nicht öffentlich sichtbar oder existiert nicht.",
+    "details": {
+      "brings": "Bringt mit",
+      "seeks": "Sucht",
+      "industries": "Branchen / Interessen",
+      "location": "Standort",
+      "remoteMode": "Remote-Modus",
+      "availability": "Verfügbarkeit",
+      "commitment": "Commitment-Level",
+      "stage": "Venture Stage",
+      "goal": "Venture Goal"
+    },
+    "intro": {
+      "eyebrow": "Discovery Intro",
+      "requestTitle": "Intro anfragen",
+      "requestText": "Wenn das Profil spannend wirkt, kannst du ein erstes Interesse signalisieren. Die andere Person entscheidet, ob sie das Intro annehmen möchte.",
+      "messageLabel": "Kurze Nachricht",
+      "messagePlaceholder": "Was macht das Profil für dich spannend?",
+      "messageHelp": "Optional, maximal 600 Zeichen. Teile nur, was du bewusst senden möchtest.",
+      "request": "Intro anfragen",
+      "acceptedTitle": "Intro angenommen",
+      "acceptedText": "Ihr habt beide Interesse signalisiert. Als nächstes könnt ihr ein erstes Gespräch führen oder später ein gemeinsames Cofoundery-Matching starten.",
+      "declinedTitle": "Intro aktuell nicht angenommen",
+      "declinedText": "Diese Person möchte das Intro aktuell nicht weiterverfolgen.",
+      "canceledTitle": "Anfrage zurückgezogen",
+      "canceledText": "Du hast diese Intro-Anfrage zurückgezogen.",
+      "pendingTitle": "Intro angefragt",
+      "pendingText": "Deine Anfrage wartet auf Antwort.",
+      "responsePrefix": "Antwort:",
+      "yourMessagePrefix": "Deine Nachricht:",
+      "cancel": "Anfrage zurückziehen"
+    }
+  },
+  "matchingPreparation": {
+    "defaultActionMessage": "Die Matching-Vorbereitung wurde verarbeitet.",
+    "matchingSessionUnavailable": "Die Matching-Session ist aktuell nicht verfügbar.",
+    "backToIntros": "Zurück zu meinen Intros",
+    "backToOpenRequests": "Zurück zu offenen Anfragen",
+    "eyebrow": "Discovery Intro",
+    "title": "Gemeinsames Cofoundery-Matching vorbereiten",
+    "subtitle": "Ihr habt beide Interesse signalisiert. Der nächste sinnvolle Schritt ist ein vollständiges Cofoundery-Matching, damit ihr Rollen, Commitment, Arbeitsweise und Erwartungen gemeinsam reflektieren könnt.",
+    "safetyNote": "Hier wird noch nichts automatisch erstellt: keine Einladung, keine Relationship, kein Report und kein Workbook.",
+    "existingContextTitle": "Es gibt bereits einen bestehenden Cofoundery-Kontext",
+    "existingContextText": "Für euch scheint bereits ein Matching- oder Verbindungsstand zu existieren. Damit nichts doppelt angelegt wird, startet diese Vorbereitungsseite keinen neuen Prozess.",
+    "profilesEyebrow": "Beteiligte Profile",
+    "profilesTitle": "Öffentliche Discovery-Projektion",
+    "profilesText": "Angezeigt werden nur Angaben, die ihr bewusst über Discovery veröffentlicht habt. E-Mail-Adressen, private Suchprioritäten und Assessment-Daten bleiben verborgen.",
+    "you": "Du",
+    "counterpart": "Gegenüber",
+    "profile": {
+      "brings": "Bringt mit",
+      "seeks": "Sucht",
+      "workFrame": "Arbeitsrahmen",
+      "commitmentGoal": "Commitment / Zielbild"
+    },
+    "readiness": {
+      "eyebrow": "Matching-Core",
+      "title": "Matching-Session vorbereitet",
+      "text": "Cofoundery hat einen gemeinsamen Matching-Kontext angelegt und geprüft, ob eure Basis-Antworten schon vorhanden sind. Es wurde kein Report, keine Relationship und kein Workbook erstellt.",
+      "statusPrefix": "Status:",
+      "reportReady": "Dynamik-Report erstellt",
+      "readyForReport": "Bereit für Report",
+      "waitingForAnswers": "Wartet auf Antworten",
+      "profileHidden": "Discovery-Profil nicht sichtbar",
+      "basePresent": "Basis-Fragen vorhanden",
+      "baseMissing": "Basis-Fragen fehlen",
+      "createReportHint": "Beide Basis-Antworten sind vorhanden. Ihr könnt jetzt einen gemeinsamen Dynamik-Report als unveränderlichen Snapshot erstellen.",
+      "viewReport": "Dynamik-Report ansehen",
+      "createReport": "Dynamik-Report erstellen"
+    },
+    "unavailable": {
+      "title": "Dieser Matching-Schritt ist aktuell nicht verfügbar.",
+      "text": "Das Intro ist nicht verfügbar, nicht mehr angenommen oder gehört nicht zu deinem Account. Private Details werden hier bewusst nicht angezeigt."
+    },
+    "states": {
+      "canceledEyebrow": "Vorbereitung beendet",
+      "canceledTitle": "Matching-Vorbereitung beendet",
+      "canceledText": "Diese Matching-Vorbereitung wurde beendet.",
+      "readyEyebrow": "Bereit",
+      "readyTitle": "Bereit für das gemeinsame Matching",
+      "readyText": "Ihr habt beide bestätigt, dass ihr das vollständige Cofoundery-Matching starten möchtet. Als nächstes kann Cofoundery einen gemeinsamen Matching-Kontext anlegen und prüfen, ob eure Basis-Antworten schon vorhanden sind.",
+      "readyFollowup": "Cofoundery legt einen gemeinsamen Matching-Kontext an und prüft, ob eure Basis-Antworten schon vorhanden sind. Es wird noch kein Report, keine Relationship und kein Workbook erstellt.",
+      "confirmationEyebrow": "Bestätigung",
+      "confirmationRequestedTitle": "Bestätigung angefragt",
+      "confirmTitle": "Cofoundery-Matching bestätigen",
+      "confirmationRequestedText": "Die andere Person muss den gemeinsamen Matching-Start noch bestätigen.",
+      "confirmText": "Die andere Person möchte das vollständige gemeinsame Matching starten. Wenn du bestätigst, seid ihr bereit für den nächsten Schritt.",
+      "startedEyebrow": "Vorbereitung gestartet",
+      "startedTitle": "Matching-Vorbereitung gestartet",
+      "startedText": "Wenn du bereit bist, kannst du den gemeinsamen Matching-Start anfragen. Die andere Person muss anschließend bestätigen.",
+      "nextStepEyebrow": "Nächster Schritt",
+      "startTitle": "Matching-Vorbereitung starten",
+      "startText": "Damit merkt Cofoundery sich, dass ihr aus diesem angenommenen Intro gemeinsam weitergehen möchtet. Dabei wird noch keine Einladung, keine Relationship, kein Report und kein Workbook erstellt."
+    },
+    "steps": {
+      "introAccepted": "Intro angenommen",
+      "preparationCreated": "Matching-Vorbereitung erstellt",
+      "bothConfirmed": "Beide haben den gemeinsamen Matching-Start bestätigt",
+      "awaitingSecondConfirmation": "Gemeinsamer Matching-Start wartet auf zweite Bestätigung",
+      "needsBothConfirmations": "Vollständiger Cofoundery-Matching-Start braucht beide Bestätigungen",
+      "startFullMatching": "1. Ihr startet das vollständige Cofoundery-Matching.",
+      "answerQuestions": "2. Beide füllen die relevanten Cofoundery-Fragen aus oder bestätigen vorhandene Antworten.",
+      "reportAndWorkbook": "3. Danach entsteht ein gemeinsamer Dynamik-Report und ihr könnt mit dem Workbook weiterarbeiten."
+    },
+    "actions": {
+      "prepareSession": "Matching-Session vorbereiten",
+      "waitingForConfirmation": "Warte auf Bestätigung",
+      "confirmMatching": "Matching bestätigen",
+      "requestFullMatching": "Vollständiges Matching anfragen",
+      "startPreparation": "Matching-Vorbereitung starten"
+    }
+  }
+}

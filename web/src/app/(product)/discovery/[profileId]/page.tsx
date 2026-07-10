@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  DISCOVERY_COMMITMENT_LABELS,
-  DISCOVERY_REMOTE_MODE_LABELS,
-  DISCOVERY_ROLE_LABELS,
-  DISCOVERY_VENTURE_GOAL_LABELS,
-  DISCOVERY_VENTURE_STAGE_LABELS,
-} from "@/features/discovery/discoveryConfig";
+import { getTranslations } from "next-intl/server";
 import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
 import {
   cancelDiscoveryIntroAction,
@@ -16,7 +10,6 @@ import {
 import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
 import {
   canCancelDiscoveryIntro,
-  DISCOVERY_INTRO_STATUS_LABELS,
   type DiscoveryIntroRequest,
 } from "@/features/discovery/discoveryIntroTypes";
 import type { DiscoveryFounderRole, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
@@ -31,6 +24,8 @@ const SECONDARY_CTA_CLASS =
 const TEXTAREA_CLASS =
   "mt-2 min-h-28 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
+type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
+
 type DiscoveryProfileDetailPageParams = {
   profileId: string;
 };
@@ -40,19 +35,19 @@ type DiscoveryProfileDetailSearchParams = {
   introOk?: string | string[];
 };
 
-function formatRoleList(values: DiscoveryFounderRole[]) {
+function formatRoleList(values: DiscoveryFounderRole[], t: DiscoveryT) {
   return values.length > 0
-    ? values.map((value) => DISCOVERY_ROLE_LABELS[value]).join(", ")
-    : "Noch nicht angegeben";
+    ? values.map((value) => t(`roles.${value}`)).join(", ")
+    : t("common.notProvided");
 }
 
-function formatText(value: string | null | undefined) {
+function formatText(value: string | null | undefined, t: DiscoveryT) {
   const normalized = value?.trim();
-  return normalized && normalized.length > 0 ? normalized : "Noch nicht angegeben";
+  return normalized && normalized.length > 0 ? normalized : t("common.notProvided");
 }
 
-function formatIndustries(values: string[]) {
-  return values.length > 0 ? values.join(", ") : "Noch nicht angegeben";
+function formatIndustries(values: string[], t: DiscoveryT) {
+  return values.length > 0 ? values.join(", ") : t("common.notProvided");
 }
 
 function DetailItem({ label, value }: { label: string; value: string }) {
@@ -68,9 +63,13 @@ function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function introResultUrl(profileId: string, result: DiscoveryIntroActionState) {
+function introResultUrl(
+  profileId: string,
+  result: DiscoveryIntroActionState,
+  fallbackMessage: string
+) {
   const params = new URLSearchParams();
-  params.set("introMessage", result.message ?? "Die Intro-Aktion wurde verarbeitet.");
+  params.set("introMessage", result.message ?? fallbackMessage);
   params.set("introOk", result.ok ? "1" : "0");
   return `/discovery/${profileId}?${params.toString()}`;
 }
@@ -93,22 +92,22 @@ function IntroPageMessage({ message, ok }: { message: string | null; ok: boolean
   );
 }
 
-function EmptyState() {
+function EmptyState({ t }: { t: DiscoveryT }) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
       <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-8">
         <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
-          Zurück zu Discovery
+          {t("common.backToDiscovery")}
         </Link>
         <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-slate-950">
-          Profil nicht sichtbar
+          {t("detail.emptyTitle")}
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Dieses Discovery-Profil ist aktuell nicht öffentlich sichtbar oder existiert nicht.
+          {t("detail.emptyText")}
         </p>
         <div className="mt-6">
           <Link href="/discovery" className={PRIMARY_CTA_CLASS}>
-            Zurück zu Discovery
+            {t("common.backToDiscovery")}
           </Link>
         </div>
       </section>
@@ -116,25 +115,25 @@ function EmptyState() {
   );
 }
 
-function ProfileDetails({ profile }: { profile: FounderDiscoveryProfile }) {
+function ProfileDetails({ profile, t }: { profile: FounderDiscoveryProfile; t: DiscoveryT }) {
   return (
     <dl className="grid gap-3 md:grid-cols-2">
-      <DetailItem label="Bringt mit" value={formatRoleList(profile.ownRoles)} />
-      <DetailItem label="Sucht" value={formatRoleList(profile.seekingRoles)} />
-      <DetailItem label="Branchen / Interessen" value={formatIndustries(profile.industries)} />
-      <DetailItem label="Standort" value={formatText(profile.locationLabel)} />
-      <DetailItem label="Remote-Modus" value={DISCOVERY_REMOTE_MODE_LABELS[profile.remoteMode]} />
+      <DetailItem label={t("detail.details.brings")} value={formatRoleList(profile.ownRoles, t)} />
+      <DetailItem label={t("detail.details.seeks")} value={formatRoleList(profile.seekingRoles, t)} />
+      <DetailItem label={t("detail.details.industries")} value={formatIndustries(profile.industries, t)} />
+      <DetailItem label={t("detail.details.location")} value={formatText(profile.locationLabel, t)} />
+      <DetailItem label={t("detail.details.remoteMode")} value={t(`remoteModes.${profile.remoteMode}`)} />
       <DetailItem
-        label="Verfügbarkeit"
+        label={t("detail.details.availability")}
         value={
           profile.availabilityHoursPerWeek
-            ? `${profile.availabilityHoursPerWeek} Std./Woche`
-            : "Noch nicht angegeben"
+            ? t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })
+            : t("common.notProvided")
         }
       />
-      <DetailItem label="Commitment-Level" value={DISCOVERY_COMMITMENT_LABELS[profile.commitmentLevel]} />
-      <DetailItem label="Venture Stage" value={DISCOVERY_VENTURE_STAGE_LABELS[profile.ventureStage]} />
-      <DetailItem label="Venture Goal" value={DISCOVERY_VENTURE_GOAL_LABELS[profile.ventureGoal]} />
+      <DetailItem label={t("detail.details.commitment")} value={t(`commitmentLevels.${profile.commitmentLevel}`)} />
+      <DetailItem label={t("detail.details.stage")} value={t(`ventureStages.${profile.ventureStage}`)} />
+      <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
     </dl>
   );
 }
@@ -142,46 +141,49 @@ function ProfileDetails({ profile }: { profile: FounderDiscoveryProfile }) {
 function IntroRequestCard({
   profile,
   introRequest,
+  t,
+  fallbackMessage,
 }: {
   profile: FounderDiscoveryProfile;
   introRequest: DiscoveryIntroRequest | null;
+  t: DiscoveryT;
+  fallbackMessage: string;
 }) {
   async function requestIntro(formData: FormData) {
     "use server";
     const result = await requestDiscoveryIntroAction(profile.id, formData);
-    redirect(introResultUrl(profile.id, result));
+    redirect(introResultUrl(profile.id, result, fallbackMessage));
   }
 
   if (!introRequest) {
     return (
       <section className={CARD_CLASS}>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          Discovery Intro
+          {t("detail.intro.eyebrow")}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro anfragen</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.intro.requestTitle")}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Wenn das Profil spannend wirkt, kannst du ein erstes Interesse signalisieren. Die
-          andere Person entscheidet, ob sie das Intro annehmen möchte.
+          {t("detail.intro.requestText")}
         </p>
         <form action={requestIntro} className="mt-5 grid gap-4">
           <label>
-            <span className="text-sm font-semibold text-slate-900">Kurze Nachricht</span>
+            <span className="text-sm font-semibold text-slate-900">{t("detail.intro.messageLabel")}</span>
             <textarea
               name="message"
               maxLength={600}
-              placeholder="Was macht das Profil für dich spannend?"
+              placeholder={t("detail.intro.messagePlaceholder")}
               className={TEXTAREA_CLASS}
             />
             <span className="mt-2 block text-xs leading-5 text-slate-500">
-              Optional, maximal 600 Zeichen. Teile nur, was du bewusst senden möchtest.
+              {t("detail.intro.messageHelp")}
             </span>
           </label>
           <div className="flex flex-wrap items-center gap-3">
             <button type="submit" className={PRIMARY_CTA_CLASS}>
-              Intro anfragen
+              {t("detail.intro.request")}
             </button>
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-              Meine Intros
+              {t("common.myIntros")}
             </Link>
           </div>
         </form>
@@ -193,16 +195,15 @@ function IntroRequestCard({
     return (
       <section className={CARD_CLASS}>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-          {DISCOVERY_INTRO_STATUS_LABELS.accepted}
+          {t("introStatus.accepted")}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro angenommen</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.intro.acceptedTitle")}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Ihr habt beide Interesse signalisiert. Als nächstes könnt ihr ein erstes Gespräch
-          führen oder später ein gemeinsames Cofoundery-Matching starten.
+          {t("detail.intro.acceptedText")}
         </p>
         {introRequest.responseMessage ? (
           <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-            Antwort: {introRequest.responseMessage}
+            {t("detail.intro.responsePrefix")} {introRequest.responseMessage}
           </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
@@ -210,10 +211,10 @@ function IntroRequestCard({
             href={`/discovery/intros/${introRequest.id}/matching`}
             className={PRIMARY_CTA_CLASS}
           >
-            Gemeinsames Matching vorbereiten
+            {t("common.prepareSharedMatching")}
           </Link>
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            Meine Intros
+            {t("common.myIntros")}
           </Link>
         </div>
       </section>
@@ -224,22 +225,22 @@ function IntroRequestCard({
     return (
       <section className={CARD_CLASS}>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          {DISCOVERY_INTRO_STATUS_LABELS.declined}
+          {t("introStatus.declined")}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          Intro aktuell nicht angenommen
+          {t("detail.intro.declinedTitle")}
         </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Diese Person möchte das Intro aktuell nicht weiterverfolgen.
+          {t("detail.intro.declinedText")}
         </p>
         {introRequest.responseMessage ? (
           <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-            Antwort: {introRequest.responseMessage}
+            {t("detail.intro.responsePrefix")} {introRequest.responseMessage}
           </p>
         ) : null}
         <div className="mt-5">
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            Meine Intros
+            {t("common.myIntros")}
           </Link>
         </div>
       </section>
@@ -250,15 +251,15 @@ function IntroRequestCard({
     return (
       <section className={CARD_CLASS}>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          {DISCOVERY_INTRO_STATUS_LABELS.canceled}
+          {t("introStatus.canceled")}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">Anfrage zurückgezogen</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.intro.canceledTitle")}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Du hast diese Intro-Anfrage zurückgezogen.
+          {t("detail.intro.canceledText")}
         </p>
         <div className="mt-5">
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            Meine Intros
+            {t("common.myIntros")}
           </Link>
         </div>
       </section>
@@ -268,15 +269,15 @@ function IntroRequestCard({
   return (
     <section className={CARD_CLASS}>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-        {DISCOVERY_INTRO_STATUS_LABELS.pending}
+        {t("introStatus.pending")}
       </p>
-      <h2 className="mt-2 text-2xl font-semibold text-slate-950">Intro angefragt</h2>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.intro.pendingTitle")}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Deine Anfrage wartet auf Antwort.
+        {t("detail.intro.pendingText")}
       </p>
       {introRequest.message ? (
         <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-          Deine Nachricht: {introRequest.message}
+          {t("detail.intro.yourMessagePrefix")} {introRequest.message}
         </p>
       ) : null}
       <div className="mt-5 flex flex-wrap gap-3">
@@ -285,16 +286,16 @@ function IntroRequestCard({
             action={async () => {
               "use server";
               const result = await cancelDiscoveryIntroAction(introRequest.id);
-              redirect(introResultUrl(profile.id, result));
+              redirect(introResultUrl(profile.id, result, fallbackMessage));
             }}
           >
             <button type="submit" className={SECONDARY_CTA_CLASS}>
-              Anfrage zurückziehen
+              {t("detail.intro.cancel")}
             </button>
           </form>
         ) : null}
         <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-          Meine Intros
+          {t("common.myIntros")}
         </Link>
       </div>
     </section>
@@ -308,6 +309,7 @@ export default async function DiscoveryProfileDetailPage({
   params: Promise<DiscoveryProfileDetailPageParams>;
   searchParams?: Promise<DiscoveryProfileDetailSearchParams>;
 }) {
+  const t = await getTranslations("discovery");
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const profileId = resolvedParams.profileId;
@@ -322,7 +324,7 @@ export default async function DiscoveryProfileDetailPage({
 
   const profile = await getActiveDiscoveryProfileById(profileId);
   if (!profile) {
-    return <EmptyState />;
+    return <EmptyState t={t} />;
   }
 
   const isOwner = profile.userId === user.id;
@@ -331,33 +333,34 @@ export default async function DiscoveryProfileDetailPage({
     : await getDiscoveryIntroRequestForProfile(user.id, profile.id);
   const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
+  const fallbackIntroMessage = t("intros.defaultActionMessage");
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
         <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
           <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
-            Zurück zu Discovery
+            {t("common.backToDiscovery")}
           </Link>
           <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Discovery-Profil
+                {t("detail.eyebrow")}
               </p>
               <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-                {formatText(profile.displayName)}
+                {formatText(profile.displayName, t)}
               </h1>
               <p className="mt-3 max-w-3xl text-xl font-semibold leading-8 text-slate-900">
-                {formatText(profile.headline)}
+                {formatText(profile.headline, t)}
               </p>
             </div>
             {isOwner ? (
               <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
-                Mein Suchprofil bearbeiten
+                {t("detail.editOwn")}
               </Link>
             ) : (
               <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                Meine Intros
+                {t("common.myIntros")}
               </Link>
             )}
           </div>
@@ -367,31 +370,37 @@ export default async function DiscoveryProfileDetailPage({
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Kurzbeschreibung
+            {t("detail.shortBio")}
           </p>
           <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">
-            {formatText(profile.bio)}
+            {formatText(profile.bio, t)}
           </p>
         </section>
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Suchprofil
+            {t("detail.searchProfile")}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            Was diese Person veröffentlicht hat
+            {t("detail.publishedTitle")}
           </h2>
           <div className="mt-5">
-            <ProfileDetails profile={profile} />
+            <ProfileDetails profile={profile} t={t} />
           </div>
         </section>
 
-        {isOwner ? null : <IntroRequestCard profile={profile} introRequest={introRequest} />}
+        {isOwner ? null : (
+          <IntroRequestCard
+            profile={profile}
+            introRequest={introRequest}
+            t={t}
+            fallbackMessage={fallbackIntroMessage}
+          />
+        )}
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">
-            Dieses Profil zeigt nur Angaben, die die Person bewusst für Discovery veröffentlicht
-            hat. Private Suchprioritäten und Assessment-Antworten werden nicht angezeigt.
+            {t("detail.privacy")}
           </p>
         </section>
       </div>
