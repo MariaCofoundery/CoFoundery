@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "eyebrow": "Founder Dashboard",
+    "greeting": "Schön, dass du da bist, {name}",
+    "quoteEyebrow": "Zitat des Tages",
+    "contextLabel": "Founder-Kontext",
+    "error": "Hinweis: {error}",
+    "expectation": "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
+  },
+  "actions": {
+    "startProfile": "Profil starten",
+    "startValues": "Werteprofil starten",
+    "continueValues": "Werteprofil fortsetzen",
+    "continueWorkbook": "Weiterarbeiten",
+    "startWorkbook": "Workbook starten",
+    "inviteCofounder": "Co-Founder einladen",
+    "trackMatching": "Matching verfolgen",
+    "openReport": "Report öffnen",
+    "open": "Öffnen",
+    "saveProfile": "Profil speichern",
+    "updateProfile": "Profil aktualisieren",
+    "editProfile": "Profildaten bearbeiten",
+    "contactSupport": "Support kontaktieren",
+    "signOutAll": "Alle Sitzungen beenden"
+  },
+  "heroPanel": {
+    "startProfileTitle": "Starte dein Profil.",
+    "startProfileText": "Das ist der erste Schritt.",
+    "continueValuesTitle": "Führe dein Werteprofil zu Ende.",
+    "startValuesTitle": "Starte jetzt dein Werteprofil.",
+    "valuesText": "Damit wird dein Profil für Matching-Report und Workbook belastbarer.",
+    "continueWorkbookTitle": "Arbeite im Workbook weiter.",
+    "continueWorkbookText": "Hier liegt euer aktueller Arbeitsstand.",
+    "startWorkbookTitle": "Starte jetzt das Workbook.",
+    "startWorkbookText": "Übersetze den Matching-Report in konkrete Regeln und nächste Schritte.",
+    "inviteTitle": "Starte jetzt das Matching.",
+    "inviteText": "Der nächste Schritt: Lade deinen Co-Founder ein und startet gemeinsam euer Matching.",
+    "trackTitle": "Behalte das laufende Matching im Blick.",
+    "trackText": "Sobald Antworten eingehen oder ein Matching-Report bereit ist, geht es hier weiter.",
+    "valuesContinueHint": "Führe dein Werteprofil zu Ende und schärfe eure Leitplanken weiter.",
+    "valuesStartHint": "Ergänze jetzt das optionale Werteprofil für mehr Tiefe im Matching und Workbook.",
+    "reportReadyWorkbookText": "Der Matching-Report ist bereit. Jetzt geht es ins Workbook."
+  },
+  "progress": {
+    "basis": {
+      "label": "Basisprofil",
+      "done": "fertig",
+      "open": "offen",
+      "description": "Hier entsteht die Grundlage für dein Founder-Profil."
+    },
+    "values": {
+      "label": "Werteprofil",
+      "done": "fertig",
+      "inProgress": "in Arbeit",
+      "open": "offen",
+      "optional": "optional",
+      "description": "Optionaler Deep-Dive zu Werten, Leitplanken und roten Linien."
+    },
+    "matching": {
+      "label": "Matching",
+      "done": "fertig",
+      "running": "läuft",
+      "open": "offen",
+      "description": "Hier wird sichtbar, wo ihr zusammenpasst und wo Spannungen entstehen können."
+    },
+    "workbook": {
+      "label": "Workbook",
+      "done": "abgeschlossen",
+      "active": "aktiv",
+      "ready": "bereit",
+      "open": "offen",
+      "description": "Hier haltet ihr eure gemeinsamen Absprachen für den Alltag fest."
+    }
+  },
+  "profileSnapshot": {
+    "eyebrow": "Profil-Snapshot",
+    "title": "Dein aktueller Stand in 6 Dimensionen",
+    "text": "Eine kompakte Einordnung deines aktuellen Founder-Profils.",
+    "empty": "Sobald du dein Basisprofil abgeschlossen hast, erscheint hier dein Profil-Snapshot."
+  },
+  "team": {
+    "eyebrow": "Team & Zusammenarbeit",
+    "title": "Einladungen, Matching und Zusammenarbeit",
+    "inviteTitle": "Co-Founder einladen",
+    "inviteText": "Starte oder begleite hier euren Matching-Prozess.",
+    "detailsTitle": "Einladungen und Reports",
+    "detailsText": "Offene Einladungen, Matching-Reports und weitere Teamdetails.",
+    "expand": "Ausklappen",
+    "invitations": "Einladungen",
+    "noInvitations": "Noch keine offenen Einladungen.",
+    "reports": "Matching Reports",
+    "noReports": "Sobald Matching-Reports bereit sind, erscheinen sie hier.",
+    "partner": "Partner: {email}",
+    "status": "Status: {status}",
+    "modulesAndExpiry": "Module: {modules} · Ablauf: {date}",
+    "modulesAndCreated": "Module: {modules} · Erstellt: {date}",
+    "modules": "Module: {modules}",
+    "created": "Erstellt: {date}",
+    "invitedBy": "{name} hat dich eingeladen",
+    "statuses": {
+      "reportReady": "Report bereit",
+      "matchingReady": "Matching bereit",
+      "waitingForPartner": "Warten auf Partner",
+      "questionnaireOpen": "Fragebogen offen",
+      "yourAnswersMissing": "Deine Antworten fehlen"
+    },
+    "moduleLabels": {
+      "base": "Basis",
+      "values": "Werte"
+    },
+    "incomingActions": {
+      "openStatus": "Status öffnen",
+      "continueNow": "Jetzt fortsetzen",
+      "startNow": "Jetzt starten",
+      "openValues": "Werte-Modul öffnen",
+      "startMatching": "Matching starten"
+    },
+    "incomingHero": {
+      "reportReadyLabel": "Matching-Report ansehen",
+      "reportReadyTitle": "Euer Matching ist bereit.",
+      "reportReadyText": "Der gemeinsame Report mit {name} ist jetzt verfügbar.",
+      "baseStartTitle": "Starte euer Matching mit dem Basisprofil.",
+      "baseStartText": "Lege jetzt dein Basisprofil für das Matching mit {name} an.",
+      "baseContinueLabel": "Matching fortsetzen",
+      "baseContinueTitle": "Setze deinen Basis-Fragebogen fort.",
+      "baseContinueText": "Führe dein Basisprofil für das Matching mit {name} genau dort weiter, wo du aufgehört hast.",
+      "priorityTitle": "Dein laufendes Matching hat Priorität.",
+      "statusText": "Steige direkt in den aktuellen Status mit {name} ein und gehe von dort weiter.",
+      "flowText": "Führe den eingeladenen Founder-Flow mit {name} genau dort weiter, wo du aufgehört hast."
+    }
+  },
+  "profile": {
+    "eyebrow": "Profil & Einstellungen",
+    "title": "Profil und Einstellungen an einer Stelle",
+    "text": "Hier pflegst du deine Basisdaten und verwaltest deine Account-Einstellungen.",
+    "profileEyebrow": "Profil",
+    "createTitle": "Lege zuerst dein Kernprofil an",
+    "currentTitle": "Deine aktuellen Profildaten",
+    "baseComplete": "Basisprofil abgeschlossen ({answered}/{total})",
+    "baseOpen": "Basisprofil noch offen",
+    "completion": "Profil {percent}%",
+    "valuesComplete": "Werteprofil abgeschlossen",
+    "valuesOptional": "Werteprofil optional",
+    "unset": "Noch nicht gesetzt",
+    "name": "Name",
+    "role": "Rolle",
+    "focus": "Fokus",
+    "intention": "Intention",
+    "additionalModes": "Weitere Modi"
+  },
+  "account": {
+    "eyebrow": "Einstellungen",
+    "title": "Zugang & Sicherheit",
+    "emailLabel": "E-Mail-Adresse",
+    "emailUnavailable": "E-Mail nicht verfügbar",
+    "magicLinkText": "Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.",
+    "securityText": "Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit Zwei-Faktor-Authentifizierung.",
+    "supportText": "Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.",
+    "supportSubject": "E-Mail-Adresse ändern"
+  },
+  "outlook": {
+    "eyebrow": "Ausblick",
+    "title": "Was als Nächstes kommt",
+    "text": "CoFoundery Align wächst Schritt für Schritt weiter. Hier seht ihr, welche nächsten Bausteine eure Zusammenarbeit später noch tiefer, klarer und belastbarer begleiten sollen.",
+    "comingSoon": "Kommt bald",
+    "planned": "In Planung",
+    "perspective": "Perspektive",
+    "later": "Später",
+    "expand": "Ausbau",
+    "items": {
+      "progressTitle": "Fortschritts-Check",
+      "progressText": "Ein späterer Check-in soll sichtbar machen, was sich nach einigen Monaten bewährt hat und wo ihr eure Absprachen nachschärfen wollt.",
+      "deepeningTitle": "Vertiefung eurer Zusammenarbeit",
+      "deepeningText": "Weitere Reflexionsmodule sollen euch helfen, Alignment nicht nur einmal festzuhalten, sondern über Zeit bewusster weiterzuentwickeln.",
+      "investorTitle": "Investor Readiness",
+      "investorText": "Künftige Auswertungen sollen zeigen, wie euer Founder-Setup von außen wirkt und wo daraus besondere Stärken oder Rückfragen entstehen.",
+      "teamTitle": "Team- und Rollenentwicklung",
+      "teamText": "Wenn euer Team wächst, sollen zusätzliche Rollen, Verantwortungen und Schnittstellen klarer in die Zusammenarbeit eingebunden werden.",
+      "libraryTitle": "Wissensbibliothek",
+      "libraryText": "Eine kuratierte Bibliothek soll euch später passende Impulse, Modelle und konkrete Hilfen für Founder-Zusammenarbeit direkt anschlussfähig machen."
+    }
+  },
+  "date": {
+    "unknown": "unbekannt",
+    "locale": "de-DE"
+  },
+  "quotes": {
+    "q0": "Klarheit spart Gründerteams später deutlich mehr Kraft als Tempo am falschen Punkt.",
+    "q1": "Nicht jede Spannung ist ein Problem. Aber jede ungeklärte Spannung kostet Fokus.",
+    "q2": "Gute Founder-Teams wirken nicht reibungslos. Sie klären Reibung früh.",
+    "q3": "Ein stabiles Team entsteht selten aus Gleichheit, sondern aus gut geklärten Unterschieden.",
+    "q4": "Wenn zwei Founder dieselbe Richtung sehen, werden Entscheidungen leichter und Konflikte kleiner.",
+    "q5": "Manchmal ist der produktivste Fortschritt nicht mehr Tempo, sondern eine bessere Absprache."
+  }
+}

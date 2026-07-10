@@ -1,6 +1,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import {
   BETA_ACCESS_REQUEST_EMAIL,
@@ -19,25 +20,27 @@ function buildStartHref(status: string, nextPath: string) {
   return `/start?${params.toString()}`;
 }
 
-function statusMessage(status: string | undefined) {
+type AuthT = Awaited<ReturnType<typeof getTranslations>>;
+
+function statusMessage(status: string | undefined, t: AuthT) {
   if (status === "sent") {
     return {
       tone: "neutral" as const,
-      text: "Wenn die Angaben passen, senden wir dir einen Magic Link. Bitte prüfe auch deinen Spam-Ordner.",
+      text: t("start.status.sent"),
     };
   }
 
   if (status === "invalid") {
     return {
       tone: "error" as const,
-      text: "Der Zugang konnte nicht geöffnet werden. Bitte prüfe deine Angaben oder frage Zugang an.",
+      text: t("start.status.invalid"),
     };
   }
 
   if (status === "send_failed") {
     return {
       tone: "error" as const,
-      text: "Der Magic Link konnte gerade nicht versendet werden. Bitte versuche es erneut.",
+      text: t("start.status.sendFailed"),
     };
   }
 
@@ -50,12 +53,13 @@ export default async function StartPage({
   searchParams: Promise<{ next?: string; status?: string }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("auth");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
-  const message = statusMessage(params.status);
+  const message = statusMessage(params.status, t);
 
   if (user) {
     redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
@@ -107,13 +111,17 @@ export default async function StartPage({
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-5 py-14 md:px-8">
       <section className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-[0_20px_40px_rgba(16,26,42,0.1)] md:p-8">
-        <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">Start</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[color:var(--ink)]">CoFoundery starten</h1>
+        <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">
+          {t("start.eyebrow")}
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold text-[color:var(--ink)]">
+          {t("start.title")}
+        </h1>
         <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-          Neue Zugänge sind aktuell nur mit Zugangscode möglich.
+          {t("start.subtitle")}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-          Wenn du bereits Zugang hast, kannst du dich direkt einloggen.
+          {t("start.existingAccess")}
         </p>
         {message ? (
           <p
@@ -127,32 +135,32 @@ export default async function StartPage({
         <form action={sendStartMagicLinkAction} className="mt-6 grid gap-3">
           <input type="hidden" name="nextPath" value={nextPath} />
           <label htmlFor="start-email" className="text-sm font-medium text-[color:var(--ink)]">
-            E-Mail
+            {t("start.emailLabel")}
           </label>
           <input
             id="start-email"
             name="email"
             type="email"
             required
-            placeholder="name@firma.de"
+            placeholder={t("start.emailPlaceholder")}
             className="rounded-lg border border-[color:var(--line)] bg-white px-4 py-3 text-sm outline-none focus:border-[color:var(--ink-soft)]"
           />
           <label htmlFor="beta-code" className="mt-2 text-sm font-medium text-[color:var(--ink)]">
-            Zugangscode
+            {t("start.codeLabel")}
           </label>
           <input
             id="beta-code"
             name="betaCode"
             type="text"
             required
-            placeholder="Code eingeben"
+            placeholder={t("start.codePlaceholder")}
             className="rounded-lg border border-[color:var(--line)] bg-white px-4 py-3 text-sm outline-none focus:border-[color:var(--ink-soft)]"
           />
           <button
             type="submit"
             className="mt-2 rounded-lg bg-[color:var(--ink)] px-4 py-3 text-sm font-semibold text-white"
           >
-            Magic Link senden
+            {t("start.submit")}
           </button>
         </form>
         <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
@@ -160,13 +168,13 @@ export default async function StartPage({
             href={`/login?next=${encodeURIComponent(nextPath)}`}
             className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
           >
-            Bereits Zugang? Login
+            {t("start.loginLink")}
           </Link>
           <a
             href={getBetaAccessRequestHref()}
             className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
           >
-            Zugang anfragen
+            {t("start.requestAccess")}
           </a>
         </div>
         <p className="mt-3 text-xs text-slate-500">{BETA_ACCESS_REQUEST_EMAIL}</p>

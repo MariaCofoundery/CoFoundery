@@ -1,0 +1,66 @@
+{
+  "agreement": {
+    "fallbackResult": "Das Operating Agreement wurde verarbeitet.",
+    "unavailable": {
+      "back": "Zurück zu meinen Intros",
+      "title": "Dieser Arbeitsraum ist aktuell nicht verfügbar.",
+      "text": "Der Arbeitsraum existiert nicht, gehört nicht zu deinem Account oder ist nicht mehr verfügbar. Private Details werden hier bewusst nicht angezeigt."
+    },
+    "header": {
+      "back": "Zurück zum Dynamik-Report",
+      "eyebrow": "Matching Workspace",
+      "title": "Euer Operating Agreement",
+      "text": "Haltet fest, wie ihr zusammenarbeiten, entscheiden und mit Spannungen umgehen wollt. Es ist ein Arbeitsdokument, kein Vertrag."
+    },
+    "status": {
+      "eyebrow": "Status",
+      "title": "Arbeitsraum vorbereitet",
+      "draft": "Agreement-Status: Entwurf",
+      "v1Notice": "In diesem V1-Arbeitsraum wird noch nichts finalisiert: keine Advisor-Freigabe, kein Export, keine Versionierung und keine Änderung am alten invitation-basierten Workbook."
+    },
+    "editor": {
+      "eyebrow": "Arbeitsdokument",
+      "title": "Euer Operating Agreement",
+      "text": "Haltet fest, wie ihr zusammenarbeiten, entscheiden und mit Spannungen umgehen wollt.",
+      "notes": "Notizen",
+      "agreement": "Vereinbarung",
+      "notesPlaceholder": "Gedanken, offene Punkte oder Beispiele aus eurem Gespräch.",
+      "agreementPlaceholder": "Was soll ab jetzt zwischen euch gelten?",
+      "saved": "Angelegt",
+      "ready": "Bereit",
+      "updatedAt": "Zuletzt aktualisiert: {value}",
+      "neverSaved": "Noch nicht gespeichert",
+      "saveSection": "Section speichern",
+      "sections": {
+        "roles": {
+          "title": "Rollen & Verantwortlichkeiten",
+          "description": "Haltet fest, wer welche Themen führt und wo frühe Mitsicht wichtig ist."
+        },
+        "commitment": {
+          "title": "Zeit & Commitment",
+          "description": "Beschreibt, was realistisch verfügbar ist und woran ihr Überlastung früh merkt."
+        },
+        "decisions": {
+          "title": "Entscheidungen",
+          "description": "Klärt, was eine Person allein entscheiden darf und wann beide gebraucht werden."
+        },
+        "conflict": {
+          "title": "Konflikt & Klärung",
+          "description": "Legt fest, wie ihr Spannungen früh, fair und handhabbar ansprecht."
+        },
+        "communication": {
+          "title": "Kommunikation",
+          "description": "Definiert, wie Wichtiges sichtbar bleibt, bevor es im Alltag untergeht."
+        },
+        "equity_conversation": {
+          "title": "Equity-Gespräch",
+          "description": "Sammelt Fragen zu Beiträgen, Risiken und Erwartungen, ohne sie vorschnell zu finalisieren."
+        },
+        "next_90_days": {
+          "title": "Nächste 90 Tage",
+          "description": "Haltet fest, was Vorrang hat, was liegen bleibt und woran ihr Fortschritt erkennt."
+        }
+      }
+    }
+  }
+}

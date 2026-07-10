@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
@@ -79,6 +80,8 @@ type WorkbookDashboardRow = {
   payload: unknown;
 };
 
+type DashboardT = Awaited<ReturnType<typeof getTranslations>>;
+
 const INVITE_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)]";
 const REPORT_CTA_CLASS =
@@ -105,6 +108,7 @@ export default async function DashboardPage({
   searchParams: Promise<DashboardSearchParams>;
 }) {
   const supabase = await createClient();
+  const t = await getTranslations("dashboard");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -212,9 +216,12 @@ export default async function DashboardPage({
   const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
   const valuesStatus = selfReport?.valuesModuleStatus ?? "not_started";
   const profileCompletionLabel = hasSubmittedBase
-    ? `Basisprofil abgeschlossen (${selfReport?.basisAnsweredA ?? 0}/${selfReport?.basisTotal ?? 0})`
-    : "Basisprofil noch offen";
-  const profileCompletionBadge = `Profil ${profileCompletion.percent}%`;
+    ? t("profile.baseComplete", {
+        answered: selfReport?.basisAnsweredA ?? 0,
+        total: selfReport?.basisTotal ?? 0,
+      })
+    : t("profile.baseOpen");
+  const profileCompletionBadge = t("profile.completion", { percent: profileCompletion.percent });
   const readyReports = reportRuns.slice(0, 3);
   const readyReportInvitationIds = new Set(readyReports.map((report) => report.invitation_id));
   const hasMatchingActivity =
@@ -264,7 +271,7 @@ export default async function DashboardPage({
     !latestReadyReport &&
     !latestActiveWorkbook;
   const heroExpectationText = shouldPrioritizeInviteCta
-    ? "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
+    ? t("hero.expectation")
     : null;
   const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
   const prioritizedIncomingInvite =
@@ -314,30 +321,31 @@ export default async function DashboardPage({
         ? "workbook"
         : "matching";
   const heroPrimaryAction = heroIncomingInvite
-    ? buildHeroIncomingInvitationAction(heroIncomingInvite)
+    ? buildHeroIncomingInvitationAction(heroIncomingInvite, t)
     : !hasSubmittedBase
     ? {
         href: contextualBaseHref,
-        label: "Profil starten",
-        title: "Starte dein Profil.",
-        text: "Das ist der erste Schritt.",
+        label: t("actions.startProfile"),
+        title: t("heroPanel.startProfileTitle"),
+        text: t("heroPanel.startProfileText"),
       }
     : !hasSubmittedValues && !hasMatchingActivity
       ? {
           href: contextualValuesHref,
-          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
+          label:
+            valuesStatus === "in_progress" ? t("actions.continueValues") : t("actions.startValues"),
           title:
             valuesStatus === "in_progress"
-              ? "Führe dein Werteprofil zu Ende."
-              : "Starte jetzt dein Werteprofil.",
-          text: "Damit wird dein Profil fuer Matching-Report und Workbook belastbarer.",
+              ? t("heroPanel.continueValuesTitle")
+              : t("heroPanel.startValuesTitle"),
+          text: t("heroPanel.valuesText"),
         }
       : latestActiveWorkbook
         ? {
             href: latestActiveWorkbook.href,
-            label: "Weiterarbeiten",
-            title: "Arbeite im Workbook weiter.",
-            text: "Hier liegt euer aktueller Arbeitsstand.",
+            label: t("actions.continueWorkbook"),
+            title: t("heroPanel.continueWorkbookTitle"),
+            text: t("heroPanel.continueWorkbookText"),
           }
         : latestReadyReport
           ? {
@@ -347,48 +355,49 @@ export default async function DashboardPage({
                     latestReadyReport.invitation_id,
                     invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
                 ),
-            label: "Workbook starten",
-            title: "Starte jetzt das Workbook.",
-            text: "Uebersetze den Matching-Report in konkrete Regeln und naechste Schritte.",
+            label: t("actions.startWorkbook"),
+            title: t("heroPanel.startWorkbookTitle"),
+            text: t("heroPanel.startWorkbookText"),
           }
         : !hasMatchingActivity
             ? {
                 href: "/invite/new",
-                label: "Co-Founder einladen",
-                title: "Starte jetzt das Matching.",
-                text: "Der nächste Schritt: Lade deinen Co-Founder ein und startet gemeinsam euer Matching.",
+                label: t("actions.inviteCofounder"),
+                title: t("heroPanel.inviteTitle"),
+                text: t("heroPanel.inviteText"),
               }
             : {
                 href: "/dashboard#dashboard-block-active",
-                label: "Matching verfolgen",
-                title: "Behalte das laufende Matching im Blick.",
-                text: "Sobald Antworten eingehen oder ein Matching-Report bereit ist, geht es hier weiter.",
+                label: t("actions.trackMatching"),
+                title: t("heroPanel.trackTitle"),
+                text: t("heroPanel.trackText"),
               };
   const heroCta = workbookFocusHref
     ? {
         href: workbookFocusHref,
-        label: latestActiveWorkbook ? "Arbeite im Workbook weiter" : "Workbook starten",
+        label: latestActiveWorkbook ? t("actions.continueWorkbook") : t("actions.startWorkbook"),
         text: latestActiveWorkbook
-          ? "Hier liegt euer aktueller Arbeitsstand."
-          : "Der Matching-Report ist bereit. Jetzt geht es ins Workbook.",
+          ? t("heroPanel.continueWorkbookText")
+          : t("heroPanel.reportReadyWorkbookText"),
       }
     : heroPrimaryAction;
   const heroValuesCta =
     hasSubmittedBase && !hasSubmittedValues && heroCta.href !== contextualValuesHref
       ? {
           href: contextualValuesHref,
-          label: valuesStatus === "in_progress" ? "Werteprofil fortsetzen" : "Werteprofil starten",
+          label:
+            valuesStatus === "in_progress" ? t("actions.continueValues") : t("actions.startValues"),
           text:
             valuesStatus === "in_progress"
-              ? "Führe dein Werteprofil zu Ende und schärfe eure Leitplanken weiter."
-              : "Ergänze jetzt das optionale Werteprofil für mehr Tiefe im Matching und Workbook.",
+              ? t("heroPanel.valuesContinueHint")
+              : t("heroPanel.valuesStartHint"),
         }
       : null;
   const heroPanel = workbookFocusHref
     ? {
         href: heroCta.href,
         label: heroCta.label,
-        title: latestActiveWorkbook ? "Arbeite im Workbook weiter." : "Starte jetzt das Workbook.",
+        title: latestActiveWorkbook ? t("heroPanel.continueWorkbookTitle") : t("heroPanel.startWorkbookTitle"),
         text: heroCta.text,
       }
     : heroPrimaryAction;
@@ -396,27 +405,27 @@ export default async function DashboardPage({
   const compactProgressItems = [
     {
       id: "basis",
-      label: "Basisprofil",
+      label: t("progress.basis.label"),
       state: hasSubmittedBase ? "done" : "active",
-      detail: hasSubmittedBase ? "fertig" : "offen",
-      description: "Hier entsteht die Grundlage fuer dein Founder-Profil.",
+      detail: hasSubmittedBase ? t("progress.basis.done") : t("progress.basis.open"),
+      description: t("progress.basis.description"),
     },
     {
       id: "values",
-      label: "Werteprofil",
+      label: t("progress.values.label"),
       state: hasSubmittedValues ? "done" : currentStep === "values" ? "active" : "upcoming",
       detail: hasSubmittedValues
-        ? "fertig"
+        ? t("progress.values.done")
         : currentStep === "values"
           ? valuesStatus === "in_progress"
-            ? "in Arbeit"
-            : "offen"
-          : "optional",
-      description: "Optionaler Deep-Dive zu Werten, Leitplanken und roten Linien.",
+            ? t("progress.values.inProgress")
+            : t("progress.values.open")
+          : t("progress.values.optional"),
+      description: t("progress.values.description"),
     },
     {
       id: "matching",
-      label: "Matching",
+      label: t("progress.matching.label"),
       state:
         workbookPhase !== "upcoming" || readyReports.length > 0
           ? "done"
@@ -425,15 +434,15 @@ export default async function DashboardPage({
             : "upcoming",
       detail:
         workbookPhase !== "upcoming" || readyReports.length > 0
-          ? "fertig"
+          ? t("progress.matching.done")
           : hasMatchingActivity
-            ? "läuft"
-            : "offen",
-      description: "Hier wird sichtbar, wo ihr zusammenpasst und wo Spannungen entstehen koennen.",
+            ? t("progress.matching.running")
+            : t("progress.matching.open"),
+      description: t("progress.matching.description"),
     },
     {
       id: "workbook",
-      label: "Workbook",
+      label: t("progress.workbook.label"),
       state:
         workbookPhase === "done"
           ? "done"
@@ -442,25 +451,25 @@ export default async function DashboardPage({
           : "upcoming",
       detail:
         workbookPhase === "done"
-          ? "abgeschlossen"
+          ? t("progress.workbook.done")
           : workbookPhase === "in_progress"
-          ? "aktiv"
+          ? t("progress.workbook.active")
           : workbookPhase === "ready_to_start"
-            ? "bereit"
-            : "offen",
-      description: "Hier haltet ihr eure gemeinsamen Absprachen fuer den Alltag fest.",
+            ? t("progress.workbook.ready")
+            : t("progress.workbook.open"),
+      description: t("progress.workbook.description"),
     },
   ] as const;
   const additionalRoles = normalizeProfileRoles(profileData?.roles ?? ["founder"]).slice(1);
   const profileInfoRows = [
-    { label: "Name", value: profileData?.display_name?.trim() || "Noch nicht gesetzt" },
-    { label: "Rolle", value: getPrimaryProfileRoleLabel(profileData) },
-    { label: "Fokus", value: profileData?.focus_skill?.trim() || "Noch nicht gesetzt" },
-    { label: "Intention", value: profileData?.intention?.trim() || "Noch nicht gesetzt" },
+    { label: t("profile.name"), value: profileData?.display_name?.trim() || t("profile.unset") },
+    { label: t("profile.role"), value: getPrimaryProfileRoleLabel(profileData) },
+    { label: t("profile.focus"), value: profileData?.focus_skill?.trim() || t("profile.unset") },
+    { label: t("profile.intention"), value: profileData?.intention?.trim() || t("profile.unset") },
     ...(additionalRoles.length > 0
       ? [
           {
-            label: "Weitere Modi",
+            label: t("profile.additionalModes"),
             value: additionalRoles.map((role) => profileRoleLabel(role)).join(", "),
           },
         ]
@@ -471,7 +480,7 @@ export default async function DashboardPage({
   const profileImageUrl = profileAvatarId
     ? null
     : profileData?.avatar_url?.trim() || null;
-  const quoteOfTheDay = getQuoteOfTheDay();
+  const quoteOfTheDay = getQuoteOfTheDay(t);
 
   const selfReportDebug = selfReport
     ? {
@@ -499,7 +508,7 @@ export default async function DashboardPage({
           matchingHref={contextualMatchingHref}
           workbookHref={contextualWorkbookHref}
           activeView="founder"
-          contextLabel="Founder-Kontext"
+          contextLabel={t("hero.contextLabel")}
         />
       ) : null}
       <DashboardJourneyLine />
@@ -510,7 +519,7 @@ export default async function DashboardPage({
           <div className="relative z-10">
             {params.error ? (
               <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Hinweis: {params.error}
+                {t("hero.error", { error: params.error })}
               </p>
             ) : null}
 
@@ -526,9 +535,11 @@ export default async function DashboardPage({
                     imageUrl={profileImageUrl}
                   />
                   <div className="min-w-0 max-w-xl">
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Founder Dashboard</p>
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+                      {t("hero.eyebrow")}
+                    </p>
                     <h1 className="mt-1.5 text-[1.9rem] font-semibold leading-[1.04] text-slate-950 md:text-[2.55rem] md:leading-[1.02]">
-                      Schön, dass du da bist, {displayName}
+                      {t("hero.greeting", { name: displayName })}
                     </h1>
                   </div>
                 </div>
@@ -539,7 +550,9 @@ export default async function DashboardPage({
                       <QuoteIcon className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Zitat des Tages</p>
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {t("hero.quoteEyebrow")}
+                      </p>
                       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-slate-700">
                         „{quoteOfTheDay.text}“
                       </p>
@@ -584,22 +597,22 @@ export default async function DashboardPage({
                       <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                         <ReportIcon className="h-4 w-4" />
                       </span>
-                      Profil-Snapshot
+                      {t("profileSnapshot.eyebrow")}
                     </p>
                     <h2 className="mt-2 text-lg font-semibold text-slate-900">
-                      Dein aktueller Stand in 6 Dimensionen
+                      {t("profileSnapshot.title")}
                     </h2>
                   </div>
                   {selfReport ? (
                     <Link href="/me/report" className={UTILITY_CTA_CLASS}>
-                      Report öffnen
+                      {t("actions.openReport")}
                     </Link>
                   ) : null}
                 </div>
                 {selfReport ? (
                   <>
                     <p className="mt-3 text-sm leading-7 text-slate-600">
-                      Eine kompakte Einordnung deines aktuellen Founder-Profils.
+                      {t("profileSnapshot.text")}
                     </p>
                     <div className="mt-5">
                       <FounderDimensionsOverview scores={selfReport.scoresA} />
@@ -607,7 +620,7 @@ export default async function DashboardPage({
                   </>
                 ) : (
                   <p className="mt-3 text-sm leading-7 text-slate-600">
-                    Sobald du dein Basisprofil abgeschlossen hast, erscheint hier dein Profil-Snapshot.
+                    {t("profileSnapshot.empty")}
                   </p>
                 )}
               </article>
@@ -626,23 +639,23 @@ export default async function DashboardPage({
             <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
               <MatchingIcon className="h-4 w-4" />
             </span>
-            Team & Zusammenarbeit
+            {t("team.eyebrow")}
           </p>
           <h2 className="mt-2 text-xl font-semibold text-slate-950">
-            Einladungen, Matching und Zusammenarbeit
+            {t("team.title")}
           </h2>
         </div>
 
         <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Co-Founder einladen</h3>
+              <h3 className="text-base font-semibold text-slate-900">{t("team.inviteTitle")}</h3>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                Starte oder begleite hier euren Matching-Prozess.
+                {t("team.inviteText")}
               </p>
             </div>
             <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-              Co-Founder einladen
+              {t("actions.inviteCofounder")}
             </Link>
           </div>
         </article>
@@ -650,18 +663,18 @@ export default async function DashboardPage({
         <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-slate-900">Einladungen und Reports</p>
+              <p className="text-sm font-semibold text-slate-900">{t("team.detailsTitle")}</p>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Offene Einladungen, Matching-Reports und weitere Teamdetails.
+                {t("team.detailsText")}
               </p>
             </div>
-            <span className="text-sm text-slate-500">Ausklappen</span>
+            <span className="text-sm text-slate-500">{t("team.expand")}</span>
           </summary>
 
           <div className="mt-5 grid gap-4">
             <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">Einladungen</h3>
+                <h3 className="text-sm font-semibold text-slate-900">{t("team.invitations")}</h3>
                 <span className="text-xs tracking-[0.08em] text-slate-500">
                   {actionableIncomingInvites.length + sentInvitesSorted.length}
                 </span>
@@ -670,36 +683,36 @@ export default async function DashboardPage({
                 {actionableIncomingInvites.length > 0 ? (
                   actionableIncomingInvites.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactIncomingInvitationRow(invite)}
+                      {renderCompactIncomingInvitationRow(invite, t)}
                     </div>
                   ))
                 ) : sentInvitesSorted.length > 0 ? (
                   sentInvitesSorted.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactSentInvitationRow(invite)}
+                      {renderCompactSentInvitationRow(invite, t)}
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm leading-7 text-slate-500">Noch keine offenen Einladungen.</p>
+                  <p className="text-sm leading-7 text-slate-500">{t("team.noInvitations")}</p>
                 )}
               </div>
             </article>
 
             <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">Matching Reports</h3>
+                <h3 className="text-sm font-semibold text-slate-900">{t("team.reports")}</h3>
                 <span className="text-xs tracking-[0.08em] text-slate-500">{readyReports.length}</span>
               </div>
               <div className="mt-3 space-y-2">
                 {readyReports.length > 0 ? (
                   readyReports.map((run) => (
                     <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactReportRow(run)}
+                      {renderCompactReportRow(run, t)}
                     </div>
                   ))
                 ) : (
                   <p className="text-sm leading-7 text-slate-500">
-                    Sobald Matching-Reports bereit sind, erscheinen sie hier.
+                    {t("team.noReports")}
                   </p>
                 )}
               </div>
@@ -719,13 +732,13 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                 <CompassIcon className="h-4 w-4" />
               </span>
-              Profil & Einstellungen
+              {t("profile.eyebrow")}
             </p>
             <h2 className="mt-2 text-xl font-semibold text-slate-900">
-              Profil und Einstellungen an einer Stelle
+              {t("profile.title")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              Hier pflegst du deine Basisdaten und verwaltest deine Account-Einstellungen.
+              {t("profile.text")}
             </p>
           </div>
         </div>
@@ -738,10 +751,10 @@ export default async function DashboardPage({
                   <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
                     <CompassIcon className="h-4 w-4" />
                   </span>
-                  Profil
+                  {t("profile.profileEyebrow")}
                 </p>
                 <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                  {needsOnboarding ? "Lege zuerst dein Kernprofil an" : "Deine aktuellen Profildaten"}
+                  {needsOnboarding ? t("profile.createTitle") : t("profile.currentTitle")}
                 </h3>
               </div>
               <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-[0.08em] text-slate-600">
@@ -752,7 +765,7 @@ export default async function DashboardPage({
                   {profileCompletionBadge}
                 </span>
                 <span className="rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1">
-                  {hasSubmittedValues ? "Werteprofil abgeschlossen" : "Werteprofil optional"}
+                  {hasSubmittedValues ? t("profile.valuesComplete") : t("profile.valuesOptional")}
                 </span>
                 {profileCompletion.ctaLabel ? (
                   <span className="rounded-full border border-slate-200 bg-white/75 px-3 py-1">
@@ -783,7 +796,7 @@ export default async function DashboardPage({
                     avatar_id: profileData?.avatar_id ?? null,
                     avatar_url: profileData?.avatar_url ?? null,
                   }}
-                  submitLabel="Profil speichern"
+                  submitLabel={t("actions.saveProfile")}
                   onSuccessRedirectTo={contextualDashboardHref}
                   variant="accent"
                   fallbackAvatarUrl={profileImageUrl}
@@ -791,7 +804,7 @@ export default async function DashboardPage({
               ) : (
                 <details className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
                   <summary className="cursor-pointer text-sm font-medium text-slate-700">
-                    Profildaten bearbeiten
+                    {t("actions.editProfile")}
                   </summary>
                   <div className="mt-4">
                     <ProfileBasicsForm
@@ -804,7 +817,7 @@ export default async function DashboardPage({
                         avatar_id: profileData?.avatar_id ?? null,
                         avatar_url: profileData?.avatar_url ?? null,
                       }}
-                      submitLabel="Profil aktualisieren"
+                      submitLabel={t("actions.updateProfile")}
                       onSuccessRedirectTo={contextualDashboardHref}
                       fallbackAvatarUrl={profileImageUrl}
                     />
@@ -819,31 +832,32 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
                 <ProfileIcon className="h-4 w-4" />
               </span>
-              Einstellungen
+              {t("account.eyebrow")}
             </p>
-            <h3 className="mt-2 text-xl font-semibold text-slate-950">Zugang &amp; Sicherheit</h3>
+            <h3 className="mt-2 text-xl font-semibold text-slate-950">{t("account.title")}</h3>
 
             <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/92 p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">E-Mail-Adresse</p>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                {t("account.emailLabel")}
+              </p>
               <div className="mt-3">
                 <p className="text-sm font-medium text-slate-900">
-                  {user.email ?? "E-Mail nicht verfügbar"}
+                  {user.email ?? t("account.emailUnavailable")}
                 </p>
                 <p className="mt-2 text-sm leading-7 text-slate-600">
-                  Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.
+                  {t("account.magicLinkText")}
                 </p>
                 <p className="mt-2 text-xs leading-6 text-slate-500">
-                  Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit
-                  Zwei-Faktor-Authentifizierung.
+                  {t("account.securityText")}
                 </p>
                 <p className="mt-3 text-xs leading-6 text-slate-500">
-                  Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.
+                  {t("account.supportText")}
                 </p>
                 <a
-                  href={`mailto:${supportEmail}?subject=${encodeURIComponent("E-Mail-Adresse ändern")}`}
+                  href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`}
                   className={`${UTILITY_CTA_CLASS} mt-4`}
                 >
-                  Support kontaktieren
+                  {t("actions.contactSupport")}
                 </a>
               </div>
             </div>
@@ -851,7 +865,7 @@ export default async function DashboardPage({
             <div className="mt-4 flex flex-wrap gap-3">
               <form action={signOutAllSessionsAction}>
                 <button type="submit" className={UTILITY_CTA_CLASS}>
-                  Alle Sitzungen beenden
+                  {t("actions.signOutAll")}
                 </button>
               </form>
             </div>
@@ -872,12 +886,11 @@ export default async function DashboardPage({
               <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
                 <ReportIcon className="h-4 w-4" />
               </span>
-              Ausblick
+              {t("outlook.eyebrow")}
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">Was als Nächstes kommt</h2>
+            <h2 className="mt-2 text-xl font-semibold text-slate-900">{t("outlook.title")}</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              CoFoundery Align wächst Schritt für Schritt weiter. Hier seht ihr, welche nächsten
-              Bausteine eure Zusammenarbeit später noch tiefer, klarer und belastbarer begleiten sollen.
+              {t("outlook.text")}
             </p>
           </div>
         </div>
@@ -885,62 +898,57 @@ export default async function DashboardPage({
         <div className="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Fortschritts-Check</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.progressTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                Kommt bald
+                {t("outlook.comingSoon")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Ein späterer Check-in soll sichtbar machen, was sich nach einigen Monaten bewährt hat
-              und wo ihr eure Absprachen nachschärfen wollt.
+              {t("outlook.items.progressText")}
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Vertiefung eurer Zusammenarbeit</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.deepeningTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                In Planung
+                {t("outlook.planned")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Weitere Reflexionsmodule sollen euch helfen, Alignment nicht nur einmal festzuhalten,
-              sondern über Zeit bewusster weiterzuentwickeln.
+              {t("outlook.items.deepeningText")}
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Investor Readiness</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.investorTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                Perspektive
+                {t("outlook.perspective")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Künftige Auswertungen sollen zeigen, wie euer Founder-Setup von außen wirkt und wo
-              daraus besondere Stärken oder Rückfragen entstehen.
+              {t("outlook.items.investorText")}
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Team- und Rollenentwicklung</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.teamTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                Später
+                {t("outlook.later")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Wenn euer Team wächst, sollen zusätzliche Rollen, Verantwortungen und Schnittstellen
-              klarer in die Zusammenarbeit eingebunden werden.
+              {t("outlook.items.teamText")}
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">Wissensbibliothek</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.libraryTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                Ausbau
+                {t("outlook.expand")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Eine kuratierte Bibliothek soll euch später passende Impulse, Modelle und konkrete
-              Hilfen für Founder-Zusammenarbeit direkt anschlussfähig machen.
+              {t("outlook.items.libraryText")}
             </p>
           </article>
         </div>
@@ -956,11 +964,11 @@ export default async function DashboardPage({
   );
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return "unbekannt";
+function formatDate(value: string | null | undefined, t: DashboardT) {
+  if (!value) return t("date.unknown");
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "unbekannt";
-  return date.toLocaleDateString("de-DE");
+  if (Number.isNaN(date.getTime())) return t("date.unknown");
+  return date.toLocaleDateString(t("date.locale"));
 }
 
 function resolveIncomingInviterName(invite: InvitationDashboardRow) {
@@ -971,38 +979,38 @@ function resolveIncomingInviterName(invite: InvitationDashboardRow) {
   return "Co-Founder";
 }
 
-function formatIncomingInviteTitle(invite: InvitationDashboardRow) {
-  return `${resolveIncomingInviterName(invite)} hat dich eingeladen`;
+function formatIncomingInviteTitle(invite: InvitationDashboardRow, t: DashboardT) {
+  return t("team.invitedBy", { name: resolveIncomingInviterName(invite) });
 }
 
-function getIncomingInviteStatusLabel(invite: InvitationDashboardRow) {
-  if (invite.isReportReady) return "Report bereit";
-  if (invite.isReadyForMatching) return "Matching bereit";
+function getIncomingInviteStatusLabel(invite: InvitationDashboardRow, t: DashboardT) {
+  if (invite.isReportReady) return t("team.statuses.reportReady");
+  if (invite.isReadyForMatching) return t("team.statuses.matchingReady");
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  return inviteeHasAllRequired ? "Warten auf Partner" : "Fragebogen offen";
+  return inviteeHasAllRequired ? t("team.statuses.waitingForPartner") : t("team.statuses.questionnaireOpen");
 }
 
-function getSentInviteStatusLabel(invite: InvitationDashboardRow) {
-  if (invite.isReportReady) return "Report bereit";
-  if (invite.isReadyForMatching) return "Matching bereit";
+function getSentInviteStatusLabel(invite: InvitationDashboardRow, t: DashboardT) {
+  if (invite.isReportReady) return t("team.statuses.reportReady");
+  if (invite.isReadyForMatching) return t("team.statuses.matchingReady");
   const requiresValues = invite.requiredModules.includes("values");
   const inviterHasAllRequired =
     invite.inviterBaseSubmitted && (!requiresValues || invite.inviterValuesSubmitted);
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  if (!inviterHasAllRequired) return "Deine Antworten fehlen";
-  return inviteeHasAllRequired ? "Matching bereit" : "Warten auf Partner";
+  if (!inviterHasAllRequired) return t("team.statuses.yourAnswersMissing");
+  return inviteeHasAllRequired ? t("team.statuses.matchingReady") : t("team.statuses.waitingForPartner");
 }
 
-function formatInvitationModules(modules: string[]) {
+function formatInvitationModules(modules: string[], t: DashboardT) {
   const moduleKeys = (modules ?? []).filter((value): value is string => Boolean(value));
-  if (moduleKeys.length === 0) return "Basis";
+  if (moduleKeys.length === 0) return t("team.moduleLabels.base");
 
   const labels = moduleKeys.map((key) => {
-    if (key === "base") return "Basis";
-    if (key === "values") return "Werte";
+    if (key === "base") return t("team.moduleLabels.base");
+    if (key === "values") return t("team.moduleLabels.values");
     return key;
   });
   return [...new Set(labels)].join(", ");
@@ -1079,7 +1087,7 @@ function FounderDimensionsOverview({
   );
 }
 
-function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
+function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: DashboardT) {
   const teamName = resolveInvitationTeamName(invite.label, invite.inviteeEmail);
   const title = teamName || invite.inviteeEmail;
 
@@ -1087,17 +1095,26 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
         <p className="font-medium text-slate-900">{title}</p>
-        {teamName ? <p className="mt-1 text-xs text-slate-500">Partner: {invite.inviteeEmail}</p> : null}
-        <p className="mt-1 text-sm text-slate-600">Status: {getSentInviteStatusLabel(invite)}</p>
+        {teamName ? (
+          <p className="mt-1 text-xs text-slate-500">
+            {t("team.partner", { email: invite.inviteeEmail })}
+          </p>
+        ) : null}
+        <p className="mt-1 text-sm text-slate-600">
+          {t("team.status", { status: getSentInviteStatusLabel(invite, t) })}
+        </p>
         <p className="text-xs text-slate-500">
-          Module: {formatInvitationModules(invite.requiredModules)} · Ablauf: {formatDate(invite.expiresAt)}
+          {t("team.modulesAndExpiry", {
+            modules: formatInvitationModules(invite.requiredModules, t),
+            date: formatDate(invite.expiresAt, t),
+          })}
         </p>
       </div>
 
       <div className="shrink-0">
         {invite.isReportReady ? (
           <Link href={`/report/${invite.id}`} className={REPORT_CTA_CLASS}>
-            Öffnen
+            {t("actions.open")}
           </Link>
         ) : (
           <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
@@ -1107,17 +1124,22 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow) {
   );
 }
 
-function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
-  const action = buildIncomingInvitationAction(invite);
+function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: DashboardT) {
+  const action = buildIncomingInvitationAction(invite, t);
   const helperText = null;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
-        <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite)}</p>
-        <p className="mt-1 text-sm text-slate-600">Status: {getIncomingInviteStatusLabel(invite)}</p>
+        <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite, t)}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          {t("team.status", { status: getIncomingInviteStatusLabel(invite, t) })}
+        </p>
         <p className="text-xs text-slate-500">
-          Module: {formatInvitationModules(invite.requiredModules)} · Erstellt: {formatDate(invite.createdAt)}
+          {t("team.modulesAndCreated", {
+            modules: formatInvitationModules(invite.requiredModules, t),
+            date: formatDate(invite.createdAt, t),
+          })}
         </p>
         {helperText ? <p className="mt-1 text-xs text-amber-700">{helperText}</p> : null}
       </div>
@@ -1132,13 +1154,12 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow) {
   );
 }
 
-function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
+function buildIncomingInvitationAction(invite: InvitationDashboardRow, t: DashboardT) {
   const requiresValues = invite.requiredModules.includes("values");
   const inviteeHasAllRequired =
     invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
   const isAccepted = invite.status === "accepted";
   const resumeHref = buildInvitationResumeHref(invite.id);
-  const dashboardHref = `/dashboard?invitationId=${encodeURIComponent(invite.id)}`;
   const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
   const needsBaseQuestionnaire = !invite.inviteeBaseSubmitted;
   const needsValuesQuestionnaire =
@@ -1147,18 +1168,18 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
   return {
     href: resumeHref,
     label: invite.isReportReady
-      ? "Öffnen"
+      ? t("actions.open")
       : canOpenCompletionStatus
-        ? "Status öffnen"
+        ? t("team.incomingActions.openStatus")
         : isAccepted
           ? needsBaseQuestionnaire
             ? invite.inviteeBaseStarted
-              ? "Jetzt fortsetzen"
-              : "Jetzt starten"
+              ? t("team.incomingActions.continueNow")
+              : t("team.incomingActions.startNow")
             : needsValuesQuestionnaire
-              ? "Werte-Modul öffnen"
-              : "Status öffnen"
-          : "Matching starten",
+              ? t("team.incomingActions.openValues")
+              : t("team.incomingActions.openStatus")
+          : t("team.incomingActions.startMatching"),
     className: invite.isReportReady
       ? REPORT_CTA_CLASS
       : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",
@@ -1166,8 +1187,8 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow) {
   };
 }
 
-function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
-  const action = buildIncomingInvitationAction(invite);
+function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow, t: DashboardT) {
+  const action = buildIncomingInvitationAction(invite, t);
   const inviterName = resolveIncomingInviterName(invite);
   const needsBaseStart = !invite.inviteeBaseSubmitted && !invite.inviteeBaseStarted;
   const needsBaseContinue = !invite.inviteeBaseSubmitted && invite.inviteeBaseStarted;
@@ -1175,48 +1196,48 @@ function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow) {
   if (invite.isReportReady) {
     return {
       href: action.href,
-      label: "Matching-Report ansehen",
-      title: "Euer Matching ist bereit.",
-      text: `Der gemeinsame Report mit ${inviterName} ist jetzt verfügbar.`,
+      label: t("team.incomingHero.reportReadyLabel"),
+      title: t("team.incomingHero.reportReadyTitle"),
+      text: t("team.incomingHero.reportReadyText", { name: inviterName }),
     };
   }
 
   if (needsBaseStart) {
     return {
       href: action.href,
-      label: "Matching starten",
-      title: "Starte euer Matching mit dem Basisprofil.",
-      text: `Lege jetzt dein Basisprofil für das Matching mit ${inviterName} an.`,
+      label: t("team.incomingActions.startMatching"),
+      title: t("team.incomingHero.baseStartTitle"),
+      text: t("team.incomingHero.baseStartText", { name: inviterName }),
     };
   }
 
   if (needsBaseContinue) {
     return {
       href: action.href,
-      label: "Matching fortsetzen",
-      title: "Setze deinen Basis-Fragebogen fort.",
-      text: `Führe dein Basisprofil für das Matching mit ${inviterName} genau dort weiter, wo du aufgehört hast.`,
+      label: t("team.incomingHero.baseContinueLabel"),
+      title: t("team.incomingHero.baseContinueTitle"),
+      text: t("team.incomingHero.baseContinueText", { name: inviterName }),
     };
   }
 
   if (action.canOpenCompletionStatus) {
     return {
       href: action.href,
-      label: "Matching fortsetzen",
-      title: "Dein laufendes Matching hat Priorität.",
-      text: `Steige direkt in den aktuellen Status mit ${inviterName} ein und gehe von dort weiter.`,
+      label: t("team.incomingHero.baseContinueLabel"),
+      title: t("team.incomingHero.priorityTitle"),
+      text: t("team.incomingHero.statusText", { name: inviterName }),
     };
   }
 
   return {
     href: action.href,
-    label: "Matching fortsetzen",
-    title: "Dein laufendes Matching hat Priorität.",
-    text: `Führe den eingeladenen Founder-Flow mit ${inviterName} genau dort weiter, wo du aufgehört hast.`,
+    label: t("team.incomingHero.baseContinueLabel"),
+    title: t("team.incomingHero.priorityTitle"),
+    text: t("team.incomingHero.flowText", { name: inviterName }),
   };
 }
 
-function renderCompactReportRow(run: ReportRunRow) {
+function renderCompactReportRow(run: ReportRunRow, t: DashboardT) {
   const invitation = Array.isArray(run.invitations) ? run.invitations[0] ?? null : run.invitations;
   const teamName = resolveInvitationTeamName(invitation?.label, invitation?.invitee_email);
 
@@ -1226,12 +1247,16 @@ function renderCompactReportRow(run: ReportRunRow) {
         <p className="font-medium text-slate-900">
           {teamName ?? invitation?.invitee_email ?? run.invitation_id}
         </p>
-        <p className="mt-1 text-sm text-slate-600">Module: {formatInvitationModules(run.modules ?? [])}</p>
-        <p className="text-xs text-slate-500">Erstellt: {formatDate(run.created_at)}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          {t("team.modules", { modules: formatInvitationModules(run.modules ?? [], t) })}
+        </p>
+        <p className="text-xs text-slate-500">
+          {t("team.created", { date: formatDate(run.created_at, t) })}
+        </p>
       </div>
 
       <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
-        Öffnen
+        {t("actions.open")}
       </Link>
     </div>
   );
@@ -1242,22 +1267,14 @@ function formatScoreValue(value: number | null | undefined) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-const DASHBOARD_QUOTES = [
-  "Klarheit spart Gruenderteams spaeter deutlich mehr Kraft als Tempo am falschen Punkt.",
-  "Nicht jede Spannung ist ein Problem. Aber jede ungeklärte Spannung kostet Fokus.",
-  "Gute Founder-Teams wirken nicht reibungslos. Sie klaeren Reibung frueh.",
-  "Ein stabiles Team entsteht selten aus Gleichheit, sondern aus gut geklaerten Unterschieden.",
-  "Wenn zwei Founder dieselbe Richtung sehen, werden Entscheidungen leichter und Konflikte kleiner.",
-  "Manchmal ist der produktivste Fortschritt nicht mehr Tempo, sondern eine bessere Absprache.",
-] as const;
-
-function getQuoteOfTheDay() {
+function getQuoteOfTheDay(t: DashboardT) {
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 0);
   const diff = now.getTime() - startOfYear.getTime();
   const dayOfYear = Math.floor(diff / 86_400_000);
+  const quoteKey = `quotes.q${dayOfYear % 6}`;
   return {
-    text: DASHBOARD_QUOTES[dayOfYear % DASHBOARD_QUOTES.length],
+    text: t(quoteKey),
   };
 }
 

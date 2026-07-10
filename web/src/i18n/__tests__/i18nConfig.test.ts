@@ -39,3 +39,24 @@ test("loads English discovery messages", () => {
   assert.equal(discovery.index?.title, "Find a co-founder");
   assert.equal(discovery.profile?.assessment?.title, "Include Cofoundery Check");
 });
+
+test("loads English auth, dashboard and workspace messages", () => {
+  const messages = getMessages("en");
+  const auth = messages.auth as {
+    login?: { subtitle?: string };
+    magicLinkForm?: { submit?: string };
+  };
+  const dashboard = messages.dashboard as {
+    hero?: { eyebrow?: string };
+    actions?: { inviteCofounder?: string };
+  };
+  const workspace = messages.workspace as {
+    agreement?: { editor?: { saveSection?: string } };
+  };
+
+  assert.equal(auth.login?.subtitle, "Sign in with a magic link if you already have access.");
+  assert.equal(auth.magicLinkForm?.submit, "Send magic link");
+  assert.equal(dashboard.hero?.eyebrow, "Founder dashboard");
+  assert.equal(dashboard.actions?.inviteCofounder, "Invite co-founder");
+  assert.equal(workspace.agreement?.editor?.saveSection, "Save section");
+});

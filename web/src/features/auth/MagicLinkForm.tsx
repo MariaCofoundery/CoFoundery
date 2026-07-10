@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
 import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
@@ -10,6 +11,7 @@ type MagicLinkFormProps = {
 };
 
 export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = false }: MagicLinkFormProps) {
+  const t = useTranslations("auth.magicLinkForm");
   const supabase = useMemo(
     () =>
       createSupabaseClient(
@@ -29,9 +31,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [message, setMessage] = useState<string>("");
-  const sentMessage = shouldCreateUser
-    ? "Wenn die E-Mail zur Einladung passt, senden wir dir einen Link."
-    : "Wenn ein Zugang existiert, senden wir dir einen Link. Wenn du neu bist, nutze bitte \"Jetzt starten\".";
+  const sentMessage = shouldCreateUser ? t("sentInvitation") : t("sentExisting");
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -44,7 +44,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
 
     if (!origin) {
       setStatus("error");
-      setMessage("Login-Konfiguration unvollständig. Bitte prüfe die öffentliche App-URL.");
+      setMessage(t("configurationError"));
       return;
     }
 
@@ -72,7 +72,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
   return (
     <form onSubmit={onSubmit} className="grid gap-3">
       <label htmlFor="email" className="text-sm font-medium text-[color:var(--ink)]">
-        E-Mail
+        {t("emailLabel")}
       </label>
       <input
         id="email"
@@ -80,7 +80,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
         required
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        placeholder="name@firma.de"
+        placeholder={t("emailPlaceholder")}
         className="rounded-lg border border-[color:var(--line)] bg-white px-4 py-3 text-sm outline-none focus:border-[color:var(--ink-soft)]"
       />
       <button
@@ -88,10 +88,10 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
         disabled={status === "loading"}
         className="rounded-lg bg-[color:var(--ink)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === "loading" ? "Sende..." : "Magic Link senden"}
+        {status === "loading" ? t("submitting") : t("submit")}
       </button>
       <p className="text-xs text-[color:var(--muted)]">
-        Hinweis: Der Login-Magic-Link ist 60 Minuten gültig.
+        {t("hint")}
       </p>
       {message ? (
         <p

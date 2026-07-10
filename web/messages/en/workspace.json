@@ -1,0 +1,66 @@
+{
+  "agreement": {
+    "fallbackResult": "The operating agreement was processed.",
+    "unavailable": {
+      "back": "Back to my intros",
+      "title": "This workspace is currently unavailable.",
+      "text": "The workspace does not exist, does not belong to your account, or is no longer available. Private details are intentionally not shown here."
+    },
+    "header": {
+      "back": "Back to dynamics report",
+      "eyebrow": "Matching workspace",
+      "title": "Your Operating Agreement",
+      "text": "Capture how you want to work together, make decisions, and handle tension. This is a working document, not a contract."
+    },
+    "status": {
+      "eyebrow": "Status",
+      "title": "Workspace prepared",
+      "draft": "Agreement status: Draft",
+      "v1Notice": "This V1 workspace does not finalize anything yet: no advisor approval, no export, no versioning, and no change to the old invitation-based workbook."
+    },
+    "editor": {
+      "eyebrow": "Working document",
+      "title": "Your Operating Agreement",
+      "text": "Capture how you want to work together, make decisions, and handle tension.",
+      "notes": "Notes",
+      "agreement": "Agreement",
+      "notesPlaceholder": "Thoughts, open points, or examples from your conversation.",
+      "agreementPlaceholder": "What should apply between you from now on?",
+      "saved": "Started",
+      "ready": "Ready",
+      "updatedAt": "Last updated: {value}",
+      "neverSaved": "Not saved yet",
+      "saveSection": "Save section",
+      "sections": {
+        "roles": {
+          "title": "Roles & responsibilities",
+          "description": "Capture who leads which topics and where early visibility matters."
+        },
+        "commitment": {
+          "title": "Time & commitment",
+          "description": "Describe what is realistically available and how you notice overload early."
+        },
+        "decisions": {
+          "title": "Decisions",
+          "description": "Clarify what one person can decide alone and when both of you are needed."
+        },
+        "conflict": {
+          "title": "Conflict & clarification",
+          "description": "Define how you raise tension early, fairly, and in a way you can handle."
+        },
+        "communication": {
+          "title": "Communication",
+          "description": "Define how important things stay visible before everyday work buries them."
+        },
+        "equity_conversation": {
+          "title": "Equity conversation",
+          "description": "Collect questions about contributions, risks, and expectations without finalizing too early."
+        },
+        "next_90_days": {
+          "title": "Next 90 days",
+          "description": "Capture what has priority, what waits, and how you recognize progress."
+        }
+      }
+    }
+  }
+}
