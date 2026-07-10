@@ -243,6 +243,16 @@
       "publishHelp": "Beim Veröffentlichen speichern wir deine aktuellen Angaben und machen dein Profil sichtbar, wenn alles vollständig ist.",
       "publishIssues": "Bevor dein Profil sichtbar wird, ergänze noch:"
     },
+    "publishIssueItems": {
+      "displayName": "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.",
+      "headline": "Ergänze eine kurze Headline, damit andere dich einordnen können.",
+      "ownRoles": "Wähle mindestens eine Rolle, die du selbst einbringst.",
+      "seekingRoles": "Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.",
+      "availability": "Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.",
+      "commitment": "Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.",
+      "ventureStage": "Wähle, wo du gerade mit deiner Idee oder Suche stehst.",
+      "ventureGoal": "Wähle, welche Art von Aufbau du gerade suchst."
+    },
     "preview": {
       "eyebrow": "Vorschau",
       "title": "So sehen andere dein Profil",

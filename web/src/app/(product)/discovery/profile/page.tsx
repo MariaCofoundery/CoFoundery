@@ -49,6 +49,17 @@ const SECONDARY_BUTTON_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 const INNER_SECTION_CLASS = "rounded-3xl border border-slate-200 bg-slate-50/60 p-5";
 
+const PUBLISH_ISSUE_KEYS = {
+  "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
+  "Ergänze eine kurze Headline, damit andere dich einordnen können.": "headline",
+  "Wähle mindestens eine Rolle, die du selbst einbringst.": "ownRoles",
+  "Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.": "seekingRoles",
+  "Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.": "availability",
+  "Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.": "commitment",
+  "Wähle, wo du gerade mit deiner Idee oder Suche stehst.": "ventureStage",
+  "Wähle, welche Art von Aufbau du gerade suchst.": "ventureGoal",
+} as const satisfies Record<string, string>;
+
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
 type DiscoveryProfileSearchParams = {
@@ -151,7 +162,20 @@ function buildDiscoveryProfileRedirect(
   return `/discovery/profile?${params.toString()}`;
 }
 
-function PageMessage({ message, issues }: { message: string | null; issues: string[] }) {
+function translatePublishIssue(issue: string, t: DiscoveryT) {
+  const issueKey = PUBLISH_ISSUE_KEYS[issue as keyof typeof PUBLISH_ISSUE_KEYS];
+  return issueKey ? t(`profile.publishIssueItems.${issueKey}`) : issue;
+}
+
+function PageMessage({
+  message,
+  issues,
+  t,
+}: {
+  message: string | null;
+  issues: string[];
+  t: DiscoveryT;
+}) {
   if (!message && issues.length === 0) {
     return null;
   }
@@ -171,7 +195,7 @@ function PageMessage({ message, issues }: { message: string | null; issues: stri
       {hasIssues ? (
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
           {issues.map((issue) => (
-            <li key={issue}>{issue}</li>
+            <li key={issue}>{translatePublishIssue(issue, t)}</li>
           ))}
         </ul>
       ) : null}
@@ -286,7 +310,7 @@ function PublishIssuesCard({ issues, t }: { issues: string[]; t: DiscoveryT }) {
       </p>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
         {issues.map((issue) => (
-          <li key={issue}>{issue}</li>
+          <li key={issue}>{translatePublishIssue(issue, t)}</li>
         ))}
       </ul>
     </div>
@@ -472,7 +496,7 @@ export default async function DiscoveryProfilePage({
         </header>
 
         <StatusCard profile={profile} t={t} />
-        <PageMessage message={pageMessage} issues={pageIssues} />
+        <PageMessage message={pageMessage} issues={pageIssues} t={t} />
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
           <section className={CARD_CLASS}>

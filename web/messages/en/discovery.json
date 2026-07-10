@@ -243,6 +243,16 @@
       "publishHelp": "When publishing, we save your current details and make your profile visible if everything is complete.",
       "publishIssues": "Before your profile becomes visible, please add:"
     },
+    "publishIssueItems": {
+      "displayName": "Give your search profile a name with at least 2 characters.",
+      "headline": "Add a short headline so others can understand your focus.",
+      "ownRoles": "Select at least one role you bring yourself.",
+      "seekingRoles": "Select at least one role you are looking for in a co-founder.",
+      "availability": "Add roughly how much time per week you can contribute.",
+      "commitment": "Choose a commitment level before publishing your profile.",
+      "ventureStage": "Choose where you currently are with your idea or search.",
+      "ventureGoal": "Choose what kind of venture setup you are looking for."
+    },
     "preview": {
       "eyebrow": "Preview",
       "title": "How others see your profile",
