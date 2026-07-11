@@ -27,6 +27,11 @@ export type ReportDimensionStatusLabelKey =
   | "abstimmung_nötig"
   | "kritisch";
 
+export type ReportDimensionReadingKey =
+  | "insufficientData"
+  | "sharedBlindSpot"
+  | ReportDimensionStatusLabelKey;
+
 export type ReportContent = {
   dimensions: Record<ReportDimensionContentKey, ReportDimensionContent>;
   headings: {
@@ -44,6 +49,14 @@ export type ReportContent = {
     consequence: string;
   };
   statusLabels: Record<ReportDimensionStatusLabelKey, string>;
+  dimensionReadings: Record<ReportDimensionReadingKey, string>;
+  dimensionBusinessMeanings: Record<
+    ReportDimensionContentKey,
+    {
+      critical: string;
+      default: string;
+    }
+  >;
   sectionLabels: {
     strength: string;
     complement: string;

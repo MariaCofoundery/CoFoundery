@@ -273,10 +273,10 @@ function FounderMatchingReportSections({
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-slate-700">
-                  {t(buildDimensionReading(dimension, status?.status ?? "nah"))}
+                  {t(buildDimensionReading(dimension, status?.status ?? "nah", reportContent))}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {t(buildDimensionBusinessMeaning(dimension.dimension, status?.status ?? "nah"))}
+                  {t(buildDimensionBusinessMeaning(dimension.dimension, status?.status ?? "nah", reportContent))}
                 </p>
 
                 <div className="mt-4 max-w-3xl">
@@ -537,9 +537,17 @@ function buildCentralPatternSections(
           : "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis.";
 
   const everydayImpact = selection.biggestTension
-    ? buildDimensionBusinessMeaning(selection.biggestTension.dimension, selection.biggestTension.status)
+    ? buildDimensionBusinessMeaning(
+        selection.biggestTension.dimension,
+        selection.biggestTension.status,
+        reportContent
+      )
     : selection.strongestComplement
-      ? buildDimensionBusinessMeaning(selection.strongestComplement.dimension, selection.strongestComplement.status)
+      ? buildDimensionBusinessMeaning(
+          selection.strongestComplement.dimension,
+          selection.strongestComplement.status,
+          reportContent
+        )
       : "Im Alltag zeigt sich das weniger in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen.";
 
   const consequence = selection.agreementFocusDimensions[0]
@@ -555,61 +563,27 @@ function buildCentralPatternSections(
 
 function buildDimensionReading(
   dimension: DimensionMatch,
-  status: MatchingDimensionStatus
+  status: MatchingDimensionStatus,
+  reportContent: ReportContent
 ) {
   if (dimension.scoreA == null || dimension.scoreB == null) {
-    return "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor.";
+    return reportContent.dimensionReadings.insufficientData;
   }
 
   if (dimension.hasSharedBlindSpotRisk) {
-    return "Eure Positionen liegen nah beieinander. Gerade diese Nähe kann aber dazu führen, dass gemeinsame Annahmen zu lange ungeprüft bleiben.";
+    return reportContent.dimensionReadings.sharedBlindSpot;
   }
 
-  if (status === "kritisch") {
-    return "Hier liegt ein deutliches Spannungsfeld. Ihr lest diese Dimension nicht automatisch aus derselben Logik heraus.";
-  }
-
-  if (status === "abstimmung_nötig") {
-    return "Hier seid ihr nicht fundamental gegensätzlich, aber der Alltag braucht bewusste Abstimmung.";
-  }
-
-  if (status === "ergänzend") {
-    return "Hier entsteht eine produktive Ergänzung, wenn Rollen, Timing und Entscheidungsrechte sauber geführt werden.";
-  }
-
-  return "Hier zeigt sich eine tragfähige gemeinsame Linie, die euch im Alltag entlasten kann.";
+  return reportContent.dimensionReadings[status];
 }
 
 function buildDimensionBusinessMeaning(
   dimension: DimensionMatch["dimension"],
-  status: MatchingDimensionStatus
+  status: MatchingDimensionStatus,
+  reportContent: ReportContent
 ) {
-  switch (dimension) {
-    case "Unternehmenslogik":
-      return status === "kritisch"
-        ? "Wenn ihr das nicht klärt, könnt ihr am selben Unternehmen mit verschiedenen Grundlogiken arbeiten."
-        : "Wenn ihr das offen lasst, können aus derselben Priorität unterschiedliche Zielbilder werden.";
-    case "Entscheidungslogik":
-      return status === "kritisch"
-        ? "Ohne klare Regel könnt ihr aneinander vorbei entscheiden oder Entscheidungen unterschiedlich früh als erledigt ansehen."
-        : "Wenn ihr das offen lasst, entstehen leicht Schleifen, obwohl beide schon weiter wollen.";
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return status === "kritisch"
-        ? "Ohne klare Regeln wird aus Alltag leicht direkte Reibung über Sichtbarkeit, Eigenraum und Mitsicht."
-        : "Wenn ihr das nicht klärt, kann sich dieselbe Zusammenarbeit für eine Person zu eng und für die andere zu lose anfühlen.";
-    case "Commitment":
-      return status === "kritisch"
-        ? "Ohne klare Abmachung wird Commitment leicht zum Dauerthema über Tempo, Verfügbarkeit und Fairness."
-        : "Wenn ihr das nicht klärt, entsteht leicht Frust über Tempo, Verfügbarkeit und Verantwortung.";
-    case "Risikoorientierung":
-      return status === "kritisch"
-        ? "Ohne klare Leitplanke zieht leicht eine Person an, während die andere früher bremst."
-        : "Wenn ihr das offen lasst, werden Chancen leicht zu früh gestoppt oder zu weit getrieben.";
-    case "Konfliktstil":
-      return status === "kritisch"
-        ? "Ohne Regel dazu können Kleinigkeiten eskalieren oder zu lange unter der Oberfläche bleiben."
-        : "Wenn ihr das offen lasst, fühlt sich eine Person leicht überfahren und die andere ausgebremst.";
-  }
+  const copy = reportContent.dimensionBusinessMeanings[dimension];
+  return status === "kritisch" ? copy.critical : copy.default;
 }
 
 function statusLabel(

@@ -89,6 +89,57 @@ export const REPORT_CONTENT_EN = {
     abstimmung_nötig: "Needs alignment",
     kritisch: "Needs clarification",
   },
+  dimensionReadings: {
+    insufficientData:
+      "There is not enough data for this dimension yet to give a reliable shared reading.",
+    sharedBlindSpot:
+      "Your positions are close. That closeness can still make shared assumptions stay untested for too long.",
+    kritisch:
+      "This is a clear area to align on. You may not read this dimension through the same working logic.",
+    abstimmung_nötig:
+      "You are not fundamentally opposed here, but day-to-day work will benefit from explicit alignment.",
+    ergänzend:
+      "This could create useful complementarity when roles, timing, and decision rights are handled clearly.",
+    nah: "This area looks broadly aligned and may reduce friction in day-to-day work.",
+  },
+  dimensionBusinessMeanings: {
+    Unternehmenslogik: {
+      critical:
+        "If you do not clarify this, you may work on the same company with different underlying logics.",
+      default:
+        "If this stays implicit, the same priority can still lead to different target pictures.",
+    },
+    Entscheidungslogik: {
+      critical:
+        "Without a clear rule, you may decide past each other or read decisions as closed at different moments.",
+      default:
+        "If this stays implicit, loops can emerge even when both of you are ready to move on.",
+    },
+    "Arbeitsstruktur & Zusammenarbeit": {
+      critical:
+        "Without clear rules, day-to-day work can create friction around visibility, autonomy, and shared context.",
+      default:
+        "If you do not clarify this, the same collaboration can feel too tight for one person and too loose for the other.",
+    },
+    Commitment: {
+      critical:
+        "Without a clear agreement, commitment can become a recurring topic around pace, availability, and fairness.",
+      default:
+        "If you do not clarify this, frustration can build around pace, availability, and responsibility.",
+    },
+    Risikoorientierung: {
+      critical:
+        "Without clear guardrails, one person may keep pulling forward while the other wants to slow down earlier.",
+      default:
+        "If this stays implicit, opportunities may be stopped too early or pushed too far.",
+    },
+    Konfliktstil: {
+      critical:
+        "Without a rule for this, small issues can escalate or stay under the surface for too long.",
+      default:
+        "If this stays implicit, one person may feel overrun while the other feels slowed down.",
+    },
+  },
   sectionLabels: {
     strength: "Your shared strength",
     complement: "Where you complement each other",

@@ -89,6 +89,57 @@ export const REPORT_CONTENT_DE = {
     abstimmung_nötig: "Braucht Abstimmung",
     kritisch: "Kritisch",
   },
+  dimensionReadings: {
+    insufficientData:
+      "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor.",
+    sharedBlindSpot:
+      "Eure Positionen liegen nah beieinander. Gerade diese Nähe kann aber dazu führen, dass gemeinsame Annahmen zu lange ungeprüft bleiben.",
+    kritisch:
+      "Hier liegt ein deutliches Spannungsfeld. Ihr lest diese Dimension nicht automatisch aus derselben Logik heraus.",
+    abstimmung_nötig:
+      "Hier seid ihr nicht fundamental gegensätzlich, aber der Alltag braucht bewusste Abstimmung.",
+    ergänzend:
+      "Hier entsteht eine produktive Ergänzung, wenn Rollen, Timing und Entscheidungsrechte sauber geführt werden.",
+    nah: "Hier zeigt sich eine tragfähige gemeinsame Linie, die euch im Alltag entlasten kann.",
+  },
+  dimensionBusinessMeanings: {
+    Unternehmenslogik: {
+      critical:
+        "Wenn ihr das nicht klärt, könnt ihr am selben Unternehmen mit verschiedenen Grundlogiken arbeiten.",
+      default:
+        "Wenn ihr das offen lasst, können aus derselben Priorität unterschiedliche Zielbilder werden.",
+    },
+    Entscheidungslogik: {
+      critical:
+        "Ohne klare Regel könnt ihr aneinander vorbei entscheiden oder Entscheidungen unterschiedlich früh als erledigt ansehen.",
+      default:
+        "Wenn ihr das offen lasst, entstehen leicht Schleifen, obwohl beide schon weiter wollen.",
+    },
+    "Arbeitsstruktur & Zusammenarbeit": {
+      critical:
+        "Ohne klare Regeln wird aus Alltag leicht direkte Reibung über Sichtbarkeit, Eigenraum und Mitsicht.",
+      default:
+        "Wenn ihr das nicht klärt, kann sich dieselbe Zusammenarbeit für eine Person zu eng und für die andere zu lose anfühlen.",
+    },
+    Commitment: {
+      critical:
+        "Ohne klare Abmachung wird Commitment leicht zum Dauerthema über Tempo, Verfügbarkeit und Fairness.",
+      default:
+        "Wenn ihr das nicht klärt, entsteht leicht Frust über Tempo, Verfügbarkeit und Verantwortung.",
+    },
+    Risikoorientierung: {
+      critical:
+        "Ohne klare Leitplanke zieht leicht eine Person an, während die andere früher bremst.",
+      default:
+        "Wenn ihr das offen lasst, werden Chancen leicht zu früh gestoppt oder zu weit getrieben.",
+    },
+    Konfliktstil: {
+      critical:
+        "Ohne Regel dazu können Kleinigkeiten eskalieren oder zu lange unter der Oberfläche bleiben.",
+      default:
+        "Wenn ihr das offen lasst, fühlt sich eine Person leicht überfahren und die andere ausgebremst.",
+    },
+  },
   sectionLabels: {
     strength: "Eure gemeinsame Stärke",
     complement: "Wo ihr euch ergänzt",
