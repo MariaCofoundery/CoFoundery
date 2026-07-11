@@ -91,6 +91,20 @@ export const REPORT_CONTENT_EN = {
     blind_spot_watch: "A close foundation with shared assumptions to keep visible.",
     alignment_led: "A strong starting point for your working dynamics.",
   },
+  introSummaries: {
+    session:
+      "This snapshot shows your shared patterns, differences, and alignment points as a visual moment in time.",
+    tension_led:
+      "The main friction is less about tone and more about how you read direction, decisions, or collaboration under pressure.",
+    complement_led:
+      "Your difference is neither automatically a problem nor automatically a strength. It becomes useful when you know where it broadens the team and where it needs clear leadership.",
+    coordination_led:
+      "Your profiles point less to open disagreement and more to follow-up work, loops, and quiet coordination that should be made explicit.",
+    blind_spot_watch:
+      "The first risk is not open opposition, but a shared tendency that may become visible too late unless you invite a counter-perspective.",
+    alignment_led:
+      "Many things look workable between you. It is still worth clarifying where shared direction ends and explicit agreements should begin.",
+  },
   statusLabels: {
     nah: "Close foundation",
     ergänzend: "Complementary",

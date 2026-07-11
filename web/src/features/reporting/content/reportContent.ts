@@ -57,6 +57,7 @@ export type ReportContent = {
     consequence: string;
   };
   matchHeadlines: Record<ReportMatchHeadlineKey, string>;
+  introSummaries: Record<ReportMatchHeadlineKey, string>;
   statusLabels: Record<ReportDimensionStatusLabelKey, string>;
   dimensionReadings: Record<ReportDimensionReadingKey, string>;
   dimensionBusinessMeanings: Record<

@@ -88,7 +88,7 @@ export function FounderMatchingView({
             {t(buildMatchHeadline(selection, isSessionReport, reportContent))}
           </h1>
           <p className="mt-5 max-w-3xl text-[15px] leading-8 text-slate-700">
-            {t(buildIntroSummary(selection, isSessionReport))}
+            {t(buildIntroSummary(selection, isSessionReport, reportContent))}
           </p>
           <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
             {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
@@ -492,24 +492,16 @@ function buildMatchHeadline(
   return reportContent.matchHeadlines[selection.heroSelection.mode] ?? reportContent.matchHeadlines.alignment_led;
 }
 
-function buildIntroSummary(selection: FounderMatchingSelection, isSessionReport: boolean) {
+function buildIntroSummary(
+  selection: FounderMatchingSelection,
+  isSessionReport: boolean,
+  reportContent: ReportContent
+) {
   if (isSessionReport) {
-    return "Dieser Snapshot zeigt euch eure gemeinsamen Muster, Unterschiede und Abstimmungspunkte als visuelle Momentaufnahme.";
+    return reportContent.introSummaries.session;
   }
 
-  switch (selection.heroSelection.mode) {
-    case "tension_led":
-      return "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst.";
-    case "complement_led":
-      return "Euer Unterschied ist weder automatisch Problem noch automatisch Stärke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Führung braucht.";
-    case "coordination_led":
-      return "Bei euch geht eher Energie in Nachziehen, Schleifen und stille Koordination als in offenen Grundsatzstreit.";
-    case "blind_spot_watch":
-      return "Bei euch liegt das Risiko nicht zuerst in offenem Gegensatz, sondern in einer gemeinsamen Tendenz, die zu spät bewusst wird.";
-    case "alignment_led":
-    default:
-      return "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt.";
-  }
+  return reportContent.introSummaries[selection.heroSelection.mode] ?? reportContent.introSummaries.alignment_led;
 }
 
 function buildCentralPatternSections(

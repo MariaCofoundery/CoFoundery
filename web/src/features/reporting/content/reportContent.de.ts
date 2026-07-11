@@ -91,6 +91,20 @@ export const REPORT_CONTENT_DE = {
     blind_spot_watch: "Eure Nähe wirkt tragend und braucht gerade deshalb bewusste Watchpoints.",
     alignment_led: "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe.",
   },
+  introSummaries: {
+    session:
+      "Dieser Snapshot zeigt euch eure gemeinsamen Muster, Unterschiede und Abstimmungspunkte als visuelle Momentaufnahme.",
+    tension_led:
+      "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst.",
+    complement_led:
+      "Euer Unterschied ist weder automatisch Problem noch automatisch Stärke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Führung braucht.",
+    coordination_led:
+      "Bei euch geht eher Energie in Nachziehen, Schleifen und stille Koordination als in offenen Grundsatzstreit.",
+    blind_spot_watch:
+      "Bei euch liegt das Risiko nicht zuerst in offenem Gegensatz, sondern in einer gemeinsamen Tendenz, die zu spät bewusst wird.",
+    alignment_led:
+      "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt.",
+  },
   statusLabels: {
     nah: "Nahe Basis",
     ergänzend: "Ergänzend",

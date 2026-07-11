@@ -47,6 +47,18 @@ test("getReportContent returns German report labels by default", () => {
     "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe."
   );
   assert.equal(
+    content.introSummaries.session,
+    "Dieser Snapshot zeigt euch eure gemeinsamen Muster, Unterschiede und Abstimmungspunkte als visuelle Momentaufnahme."
+  );
+  assert.equal(
+    content.introSummaries.complement_led,
+    "Euer Unterschied ist weder automatisch Problem noch automatisch Stärke. Er wird wertvoll, wenn klar ist, wann er euch erweitert und wann er Führung braucht."
+  );
+  assert.equal(
+    content.introSummaries.alignment_led,
+    "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt."
+  );
+  assert.equal(
     content.dimensionReadings.insufficientData,
     "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor."
   );
@@ -90,6 +102,18 @@ test("getReportContent returns English report labels for locale en", () => {
     "A strong starting point for your working dynamics."
   );
   assert.equal(
+    content.introSummaries.session,
+    "This snapshot shows your shared patterns, differences, and alignment points as a visual moment in time."
+  );
+  assert.equal(
+    content.introSummaries.complement_led,
+    "Your difference is neither automatically a problem nor automatically a strength. It becomes useful when you know where it broadens the team and where it needs clear leadership."
+  );
+  assert.equal(
+    content.introSummaries.alignment_led,
+    "Many things look workable between you. It is still worth clarifying where shared direction ends and explicit agreements should begin."
+  );
+  assert.equal(
     content.dimensionReadings.insufficientData,
     "There is not enough data for this dimension yet to give a reliable shared reading."
   );
@@ -118,6 +142,10 @@ test("getReportContent falls back to German for unsupported locales", () => {
   assert.equal(
     getReportContent("fr").matchHeadlines.complement_led,
     "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst führt."
+  );
+  assert.equal(
+    getReportContent("fr").introSummaries.tension_led,
+    "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst."
   );
 });
 
@@ -152,6 +180,7 @@ test("German and English report content keep the same label map shape", () => {
   assert.deepEqual(Object.keys(english.headings), Object.keys(german.headings));
   assert.deepEqual(Object.keys(english.centralPatternLabels), Object.keys(german.centralPatternLabels));
   assert.deepEqual(Object.keys(english.matchHeadlines), Object.keys(german.matchHeadlines));
+  assert.deepEqual(Object.keys(english.introSummaries), Object.keys(german.introSummaries));
   assert.deepEqual(Object.keys(english.statusLabels), Object.keys(german.statusLabels));
   assert.deepEqual(Object.keys(english.dimensionReadings), Object.keys(german.dimensionReadings));
   assert.deepEqual(

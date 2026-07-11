@@ -18,6 +18,8 @@ function collectEnglishVisibleStringsForSample(
   const strings = [
     content.matchHeadlines[sample.selection.heroSelection.mode],
     content.matchHeadlines.session,
+    content.introSummaries[sample.selection.heroSelection.mode],
+    content.introSummaries.session,
   ];
 
   for (const dimension of sample.compareResult.dimensions) {
@@ -49,7 +51,7 @@ test("report narrative golden samples expose the expected selection modes", () =
   }
 });
 
-test("golden samples have locale-aware match headlines and labels in German and English", () => {
+test("golden samples have locale-aware match headlines, intro summaries, and labels", () => {
   const samples = buildReportNarrativeGoldenSamples();
   const german = getReportContent("de");
   const english = getReportContent("en");
@@ -57,6 +59,8 @@ test("golden samples have locale-aware match headlines and labels in German and 
   for (const sample of samples) {
     assert.ok(german.matchHeadlines[sample.selection.heroSelection.mode].length > 10);
     assert.ok(english.matchHeadlines[sample.selection.heroSelection.mode].length > 10);
+    assert.ok(german.introSummaries[sample.selection.heroSelection.mode].length > 40);
+    assert.ok(english.introSummaries[sample.selection.heroSelection.mode].length > 40);
 
     for (const status of sample.selection.dimensionStatuses) {
       assert.ok(german.statusLabels[status.status]);
@@ -65,9 +69,10 @@ test("golden samples have locale-aware match headlines and labels in German and 
   }
 
   assert.equal(getReportContent("fr").matchHeadlines.alignment_led, german.matchHeadlines.alignment_led);
+  assert.equal(getReportContent("fr").introSummaries.alignment_led, german.introSummaries.alignment_led);
 });
 
-test("English golden-sample headline and label copy passes report copy guards", () => {
+test("English golden-sample headline, intro summary, and label copy passes report copy guards", () => {
   for (const sample of buildReportNarrativeGoldenSamples()) {
     const visibleCopy = collectEnglishVisibleStringsForSample(sample);
 
