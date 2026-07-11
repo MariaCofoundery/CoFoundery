@@ -5,8 +5,10 @@ import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import type { FounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
 import {
   FOUNDER_DIMENSION_META,
+  getLocalizedFounderDimensionMeta,
   getFounderDimensionPoleLabels,
 } from "@/features/reporting/founderDimensionMeta";
+import { getReportContent } from "@/features/reporting/content/reportContent";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type {
   FounderMatchingSelection,
@@ -14,6 +16,7 @@ import type {
 } from "@/features/reporting/founderMatchingSelection";
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
 import type { SelfValuesProfile } from "@/features/reporting/types";
+import type { AppLocale } from "@/i18n/config";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type Props = {
@@ -29,6 +32,7 @@ type Props = {
   reportContext?: "invitation" | "matching_session";
   showUnlockSection?: boolean;
   reportAccessNotice?: "locked" | "free_beta" | "session_snapshot" | null;
+  contentLocale?: AppLocale;
 };
 
 type FounderReportSection = FounderAlignmentReport["sections"][keyof FounderAlignmentReport["sections"]];
@@ -59,6 +63,7 @@ export function FounderMatchingView({
   reportContext = "invitation",
   showUnlockSection = true,
   reportAccessNotice,
+  contentLocale,
 }: Props) {
   const rt = useTranslations("report");
   const effectiveTeamContext = teamContext ?? "pre_founder";
@@ -171,6 +176,7 @@ export function FounderMatchingView({
           valuesBlock={valuesBlock}
           workbookHref={workbookHref}
           isSessionReport={isSessionReport}
+          contentLocale={contentLocale}
         />
       )}
     </>
@@ -186,6 +192,7 @@ function FounderMatchingReportSections({
   valuesBlock,
   workbookHref,
   isSessionReport,
+  contentLocale,
 }: {
   founderReport?: FounderAlignmentReport | null;
   compareResult: CompareFoundersResult;
@@ -195,8 +202,10 @@ function FounderMatchingReportSections({
   valuesBlock: ReturnType<typeof buildFounderValuesBlockFromProfiles>;
   workbookHref: string;
   isSessionReport: boolean;
+  contentLocale?: AppLocale;
 }) {
   const rt = useTranslations("report");
+  const reportContent = getReportContent(contentLocale);
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const conversationPrompts = collectConversationPrompts(founderReport);
@@ -224,11 +233,19 @@ function FounderMatchingReportSections({
         </p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
-            const meta = FOUNDER_DIMENSION_META[dimension.dimension];
-            const reportPoles = getFounderDimensionPoleLabels(dimension.dimension, "report");
+            const meta =
+              getLocalizedFounderDimensionMeta(dimension.dimension, contentLocale) ??
+              FOUNDER_DIMENSION_META[dimension.dimension];
+            const reportPoles = getFounderDimensionPoleLabels(
+              dimension.dimension,
+              "report",
+              contentLocale
+            );
             const status = selection.dimensionStatuses.find(
               (entry) => entry.dimension === dimension.dimension
             );
+            const dimensionLabel =
+              "label" in meta && typeof meta.label === "string" ? meta.label : meta.canonicalName;
 
             return (
               <article
@@ -238,14 +255,14 @@ function FounderMatchingReportSections({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h4 className="text-[15px] font-semibold text-slate-900">
-                      {t(meta.canonicalName)}
+                      {t(dimensionLabel)}
                     </h4>
                     <p className="mt-2 text-xs leading-6 text-slate-500">
                       {t(meta.description)}
                     </p>
                   </div>
                   <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${statusTone(status?.status)}`}>
-                    {t(statusLabel(status?.status))}
+                    {t(statusLabel(status?.status, reportContent))}
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-slate-700">
@@ -570,11 +587,11 @@ function buildDimensionBusinessMeaning(
   }
 }
 
-function statusLabel(status: MatchingDimensionStatus | undefined) {
-  if (status === "kritisch") return "Kritisch";
-  if (status === "abstimmung_nötig") return "Braucht Abstimmung";
-  if (status === "ergänzend") return "Ergänzend";
-  return "Nahe Basis";
+function statusLabel(
+  status: MatchingDimensionStatus | undefined,
+  reportContent: ReturnType<typeof getReportContent>
+) {
+  return reportContent.statusLabels[status ?? "nah"];
 }
 
 function statusTone(status: MatchingDimensionStatus | undefined) {

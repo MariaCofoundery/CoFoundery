@@ -3,6 +3,8 @@ import {
   getRegistryDimension,
   type DimensionId,
 } from "@/features/scoring/founderCompatibilityRegistry";
+import { getReportContent } from "@/features/reporting/content/reportContent";
+import { type AppLocale } from "@/i18n/config";
 
 const CANONICAL_FOUNDER_DIMENSION_KEYS = [
   "Unternehmenslogik",
@@ -60,6 +62,10 @@ export type FounderDimensionMeta = {
   uiRightPole: string;
   reportRightPole: string;
   description: string;
+};
+
+export type LocalizedFounderDimensionMeta = FounderDimensionMeta & {
+  label: string;
 };
 
 export type FounderDimensionPoleTendency = {
@@ -178,6 +184,30 @@ export function getFounderDimensionMeta(dimension: string): FounderDimensionMeta
   return canonicalName ? FOUNDER_DIMENSION_META[canonicalName] : null;
 }
 
+export function getLocalizedFounderDimensionMeta(
+  dimension: string,
+  locale?: AppLocale
+): LocalizedFounderDimensionMeta | null {
+  const normalized = normalizeDimensionKey(dimension);
+  const canonicalName = DIMENSION_ALIASES[normalized];
+  if (!canonicalName) {
+    return null;
+  }
+
+  const localizedMeta = getReportContent(locale).dimensions[canonicalName];
+  return {
+    canonicalName,
+    label: localizedMeta.canonicalName,
+    shortLabel: localizedMeta.shortLabel,
+    uiLeftPole: localizedMeta.uiLeftPole,
+    reportLeftPole: localizedMeta.reportLeftPole,
+    centerLabel: localizedMeta.centerLabel,
+    uiRightPole: localizedMeta.uiRightPole,
+    reportRightPole: localizedMeta.reportRightPole,
+    description: localizedMeta.description,
+  };
+}
+
 export function requireFounderDimensionMeta(dimension: string): FounderDimensionMeta {
   const meta = getFounderDimensionMeta(dimension);
   if (!meta) {
@@ -189,9 +219,10 @@ export function requireFounderDimensionMeta(dimension: string): FounderDimension
 
 export function getFounderDimensionPoleLabels(
   dimension: string,
-  context: FounderDimensionPoleContext = "report"
+  context: FounderDimensionPoleContext = "report",
+  locale?: AppLocale
 ) {
-  const meta = getFounderDimensionMeta(dimension);
+  const meta = getLocalizedFounderDimensionMeta(dimension, locale);
   if (!meta) {
     return null;
   }
@@ -214,9 +245,10 @@ export function getFounderDimensionPoleLabels(
 export function getFounderDimensionPoleTendency(
   dimension: string,
   value: number | null,
-  context: FounderDimensionPoleContext = "report"
+  context: FounderDimensionPoleContext = "report",
+  locale?: AppLocale
 ): FounderDimensionPoleTendency | null {
-  const poles = getFounderDimensionPoleLabels(dimension, context);
+  const poles = getFounderDimensionPoleLabels(dimension, context, locale);
   if (!poles || value == null || !Number.isFinite(value)) {
     return null;
   }

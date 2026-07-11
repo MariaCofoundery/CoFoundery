@@ -9,6 +9,7 @@ import {
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
 import { buildFounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
+import { getFounderAlignmentReportPayloadLocale } from "@/features/reporting/founderAlignmentReportPayload";
 import {
   FOUNDER_DIMENSION_ORDER,
   type FounderDimensionKey,
@@ -158,9 +159,11 @@ export default async function ReportPage({ params }: PageProps) {
   const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
   const legacyReportAccess = getLegacyReportAccessState({ isLocked: true });
   const isLegacyReportLocked = !legacyReportAccess.isUnlocked;
+  const reportLocale = getFounderAlignmentReportPayloadLocale(snapshot.payload);
   const founderReport = buildFounderAlignmentReport({
     scoringResult: founderScoring,
     teamContext: teamContext ?? "pre_founder",
+    locale: reportLocale,
   });
 
   return (
@@ -214,6 +217,7 @@ export default async function ReportPage({ params }: PageProps) {
         teamContext={teamContext}
         showUnlockSection={isLegacyReportLocked}
         reportAccessNotice={legacyReportAccess.reason === "free_beta" ? "free_beta" : undefined}
+        contentLocale={reportLocale}
       />
     </main>
   );

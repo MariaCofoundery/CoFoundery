@@ -3,7 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
-import type { FounderAlignmentReportPayload } from "@/features/reporting/founderAlignmentReportPayload";
+import {
+  getFounderAlignmentReportPayloadLocale,
+  type FounderAlignmentReportPayload,
+} from "@/features/reporting/founderAlignmentReportPayload";
 import {
   FOUNDER_DIMENSION_ORDER,
   type FounderDimensionKey,
@@ -221,6 +224,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
   const workspaceOk = searchParamValue(resolvedSearchParams.workspaceOk) !== "0";
 
   const payload = summary.reportRun.payload;
+  const reportLocale = getFounderAlignmentReportPayloadLocale(payload);
   const founderScoring = payload.founderScoring;
   const compareResult = compareFounders(
     toFounderScores(founderScoring, "A"),
@@ -261,6 +265,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         teamContext={payload.teamContext}
         reportContext="matching_session"
         showUnlockSection={false}
+        contentLocale={reportLocale}
       />
     </main>
   );

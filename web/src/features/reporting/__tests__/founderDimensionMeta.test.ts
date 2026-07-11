@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getLocalizedFounderDimensionMeta,
   getFounderDimensionPoleLabels,
   getFounderDimensionPoleTendency,
 } from "@/features/reporting/founderDimensionMeta";
@@ -25,4 +26,17 @@ test("pole tendencies stay aligned with the corrected left-right semantics", () 
     getFounderDimensionPoleTendency("Unternehmenslogik", 80)?.label,
     "chancen & hebelorientiert"
   );
+});
+
+test("localized dimension labels are available without changing the German default", () => {
+  const defaultCompanyLogic = getLocalizedFounderDimensionMeta("Unternehmenslogik");
+  const englishCompanyLogic = getLocalizedFounderDimensionMeta("Unternehmenslogik", "en");
+  const englishPoles = getFounderDimensionPoleLabels("Unternehmenslogik", "report", "en");
+
+  assert.equal(defaultCompanyLogic?.label, "Unternehmenslogik");
+  assert.equal(defaultCompanyLogic?.reportLeftPole, "substanz & aufbauorientiert");
+  assert.equal(englishCompanyLogic?.canonicalName, "Unternehmenslogik");
+  assert.equal(englishCompanyLogic?.label, "Company logic");
+  assert.equal(englishPoles?.left, "substance and build-oriented");
+  assert.equal(englishPoles?.right, "opportunity and leverage-oriented");
 });
