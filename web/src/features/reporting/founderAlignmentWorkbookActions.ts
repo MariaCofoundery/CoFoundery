@@ -2,6 +2,7 @@
 
 import { randomBytes } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 import { sendAdvisorInviteEmail } from "@/lib/email/sendAdvisorInviteEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
@@ -22,7 +23,6 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
-  hasAdvisorAccessToRelationship,
   listRelationshipAdvisorsForRelationship,
   resolveRelationshipIdForInvitation,
   syncRelationshipAdvisorFromLegacyInvitation,
@@ -1760,6 +1760,7 @@ export async function sendFounderAlignmentAdvisorInvite({
   const inviteUrl = toPublicAppUrl(invitePath);
   const effectiveTeamContext =
     invitationContext.data?.team_context === "existing_team" ? "existing_team" : teamContext;
+  const locale = getRequestLocale();
 
   const emailResult = await sendAdvisorInviteEmail({
     advisorEmail: loaded.row.advisor_email,
@@ -1769,6 +1770,7 @@ export async function sendFounderAlignmentAdvisorInvite({
     founderBName: labels.founderBLabel,
     teamName: resolveInvitationTeamName(loaded.invitation.label, loaded.invitation.invitee_email),
     teamContext: effectiveTeamContext,
+    locale,
   });
 
   if (!emailResult.ok) {

@@ -1,3 +1,11 @@
+import type { AppLocale } from "@/i18n/config";
+import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
+import {
+  getAdvisorInviteEmailCopy,
+  getAdvisorTeamContextLabel,
+  getEmailPrivacyUrl,
+} from "@/features/email/emailMessages";
+
 type SendAdvisorInviteEmailParams = {
   advisorEmail: string;
   advisorName: string | null;
@@ -6,6 +14,7 @@ type SendAdvisorInviteEmailParams = {
   founderBName: string;
   teamName?: string | null;
   teamContext: "pre_founder" | "existing_team";
+  locale?: EmailLocaleInput;
 };
 
 type SendAdvisorInviteEmailResult =
@@ -33,35 +42,22 @@ function buildReplyToAddress() {
   return process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined;
 }
 
-function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team"
-    ? "Bestehendes Founder-Team"
-    : "Frühe Abstimmung vor einer engeren Zusammenarbeit";
-}
-
-function buildPrivacyUrl() {
-  return "https://cofoundery.de/datenschutz";
-}
-
-function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
-  const advisorGreetingName = params.advisorName?.trim()
-    ? `Hi ${escapeHtml(params.advisorName.trim())},`
-    : "Hi,";
-  const founderLine = `${escapeHtml(params.founderAName)} und ${escapeHtml(
-    params.founderBName
-  )} möchten Sie gezielt als Advisor in ihren Cofoundery-Align-Kontext einbinden.`;
+function buildHtmlBody(params: SendAdvisorInviteEmailParams, locale: AppLocale) {
+  const copy = getAdvisorInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    founderAName: params.founderAName,
+    founderBName: params.founderBName,
+  });
   const inviteUrl = escapeHtml(params.inviteUrl);
-  const privacyUrl = escapeHtml(buildPrivacyUrl());
-  const contextLabel = escapeHtml(teamContextLabel(params.teamContext));
+  const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
+  const contextLabel = escapeHtml(getAdvisorTeamContextLabel(locale, params.teamContext));
   const teamName = params.teamName?.trim() ? escapeHtml(params.teamName.trim()) : null;
 
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${copy.htmlLang}">
   <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#0f172a;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-      Persönliche Advisor-Einladung von ${escapeHtml(params.founderAName)} und ${escapeHtml(
-        params.founderBName
-      )} für Cofoundery Align.
+      ${escapeHtml(copy.preheader)}
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:32px 12px;">
       <tr>
@@ -82,50 +78,47 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
             <tr>
               <td style="padding:24px 32px 32px;">
                 <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
-                  Persönliche Advisor-Einladung
+                  ${escapeHtml(copy.eyebrow)}
                 </p>
                 <p style="margin:0 0 18px;font-size:16px;line-height:26px;color:#0f172a;">
-                  ${advisorGreetingName}
+                  ${escapeHtml(copy.greeting)}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  ${founderLine}
+                  ${escapeHtml(copy.founderLine)}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.
+                  ${escapeHtml(copy.productIntro)}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Als Advisor erhalten Sie Zugriff auf den freigegebenen Teamkontext, das gemeinsame Workbook und den Advisor-Report, um Beobachtungen, Rückfragen und nächste sinnvolle Schritte beizutragen.
+                  ${escapeHtml(copy.accessIntro)}
                 </p>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc;">
                   <tr>
                     <td style="padding:18px 20px;">
                       <p style="margin:0 0 10px;font-size:13px;line-height:20px;font-weight:700;color:#0f172a;">
-                        Was Sie sehen können
+                        ${escapeHtml(copy.listTitle)}
                       </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • den freigegebenen Teamkontext und die relevanten Founder-Perspektiven
-                      </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • das Workbook mit den aktuellen Arbeitsständen des Teams
-                      </p>
-                      <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        • den Advisor-Report als strukturierte Grundlage für Ihre Begleitung
-                      </p>
+                      ${copy.bullets
+                        .map(
+                          (bullet, index) =>
+                            `<p style="margin:0${index < copy.bullets.length - 1 ? " 0 8px" : ""};font-size:14px;line-height:22px;color:#475569;">• ${escapeHtml(bullet)}</p>`
+                        )
+                        .join("")}
                     </td>
                   </tr>
                 </table>
                 <p style="margin:18px 0 0;font-size:14px;line-height:22px;color:#475569;">
-                  ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}
-                  Kontext: <strong>${contextLabel}</strong>
+                  ${teamName ? `${escapeHtml(copy.teamLabel)}: <strong>${teamName}</strong><br />` : ""}
+                  ${escapeHtml(copy.contextLabel)}: <strong>${contextLabel}</strong>
                 </p>
                 <p style="margin:0 0 28px;">
                   <a href="${inviteUrl}" style="display:inline-block;margin-top:28px;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
-                    Advisor-Zugang oeffnen
+                    ${escapeHtml(copy.cta)}
                   </a>
                 </p>
                 <div style="margin-top:12px;padding:16px 18px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
-                    Falls der Button nicht funktioniert, können Sie auch direkt diesen Link öffnen:
+                    ${escapeHtml(copy.fallback)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
                     <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
@@ -133,15 +126,13 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
                 </div>
                 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:22px;color:#64748b;">
-                    Sie erhalten diese E-Mail, weil ${escapeHtml(params.founderAName)} und ${escapeHtml(
-                      params.founderBName
-                    )} Sie gezielt als Advisor einbinden möchten.
+                    ${escapeHtml(copy.footerReason)}
                   </p>
                   <p style="margin:0 0 12px;font-size:13px;line-height:22px;color:#64748b;">
-                    Wenn Sie diese Einladung nicht annehmen möchten, können Sie die E-Mail einfach ignorieren.
+                    ${escapeHtml(copy.footerIgnore)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:22px;color:#64748b;">
-                    Mehr zum Datenschutz: <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">Datenschutzerklärung</a>
+                    ${escapeHtml(locale === "en" ? "Privacy:" : "Mehr zum Datenschutz:")} <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">${escapeHtml(copy.privacy)}</a>
                   </p>
                 </div>
               </td>
@@ -154,38 +145,53 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams) {
 </html>`;
 }
 
-function buildTextBody(params: SendAdvisorInviteEmailParams) {
-  const greeting = params.advisorName?.trim()
-    ? `Hi ${params.advisorName.trim()},`
-    : "Hi,";
-  const privacyUrl = buildPrivacyUrl();
+function buildTextBody(params: SendAdvisorInviteEmailParams, locale: AppLocale) {
+  const copy = getAdvisorInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    founderAName: params.founderAName,
+    founderBName: params.founderBName,
+  });
+  const privacyUrl = getEmailPrivacyUrl(locale);
   const teamName = params.teamName?.trim();
 
   return [
-    greeting,
+    copy.greeting,
     "",
-    `${params.founderAName} und ${params.founderBName} möchten Sie gezielt als Advisor in ihren Cofoundery-Align-Kontext einbinden.`,
+    copy.founderLine,
     "",
-    "Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.",
+    copy.productIntro,
     "",
-    "Als Advisor erhalten Sie Zugriff auf den freigegebenen Teamkontext, das gemeinsame Workbook und den Advisor-Report, um Beobachtungen, Rückfragen und nächste sinnvolle Schritte beizutragen.",
+    copy.accessIntro,
     "",
-    "Was Sie sehen können:",
-    "- den freigegebenen Teamkontext und relevante Founder-Perspektiven",
-    "- das Workbook mit den aktuellen Arbeitsständen des Teams",
-    "- den Advisor-Report als strukturierte Grundlage für Ihre Begleitung",
+    `${copy.listTitle}:`,
+    ...copy.bullets.map((bullet) => `- ${bullet}`),
     "",
-    ...(teamName ? [`Team/Projekt: ${teamName}`] : []),
-    `Kontext: ${teamContextLabel(params.teamContext)}`,
+    ...(teamName ? [`${copy.teamLabel}: ${teamName}`] : []),
+    `${copy.contextLabel}: ${getAdvisorTeamContextLabel(locale, params.teamContext)}`,
     "",
-    "Advisor-Zugang oeffnen:",
+    `${copy.cta}:`,
     params.inviteUrl,
     "",
-    "Sie erhalten diese E-Mail, weil die beiden Founder Sie gezielt als Advisor einbinden möchten.",
-    "Wenn Sie diese Einladung nicht annehmen möchten, können Sie die E-Mail einfach ignorieren.",
+    copy.footerReason,
+    copy.footerIgnore,
     "",
-    `Datenschutzerklärung: ${privacyUrl}`,
+    `${copy.privacy}: ${privacyUrl}`,
   ].join("\n");
+}
+
+export function buildAdvisorInviteEmailPayload(params: SendAdvisorInviteEmailParams) {
+  const locale = resolveEmailLocale(params.locale);
+  const copy = getAdvisorInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    founderAName: params.founderAName,
+    founderBName: params.founderBName,
+  });
+
+  return {
+    subject: copy.subject,
+    html: buildHtmlBody(params, locale),
+    text: buildTextBody(params, locale),
+  };
 }
 
 export async function sendAdvisorInviteEmail(
@@ -202,6 +208,7 @@ export async function sendAdvisorInviteEmail(
     return { ok: false, error: "missing_resend_from_email" };
   }
 
+  const payload = buildAdvisorInviteEmailPayload(params);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -212,9 +219,9 @@ export async function sendAdvisorInviteEmail(
       from,
       to: [params.advisorEmail],
       reply_to: buildReplyToAddress(),
-      subject: `${params.founderAName} und ${params.founderBName} möchten Sie als Advisor einbinden`,
-      html: buildHtmlBody(params),
-      text: buildTextBody(params),
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
     }),
   });
 
@@ -226,6 +233,6 @@ export async function sendAdvisorInviteEmail(
     };
   }
 
-  const payload = (await response.json()) as { id?: string | null };
-  return { ok: true, id: payload.id ?? null };
+  const responsePayload = (await response.json()) as { id?: string | null };
+  return { ok: true, id: responsePayload.id ?? null };
 }

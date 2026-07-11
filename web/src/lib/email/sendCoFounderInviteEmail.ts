@@ -1,3 +1,12 @@
+import type { AppLocale } from "@/i18n/config";
+import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
+import {
+  getCoFounderContextLabel,
+  getCoFounderInviteEmailCopy,
+  getCoFounderModuleLabel,
+  getEmailPrivacyUrl,
+} from "@/features/email/emailMessages";
+
 type SendCoFounderInviteEmailParams = {
   inviteeEmail: string;
   inviteUrl: string;
@@ -5,6 +14,7 @@ type SendCoFounderInviteEmailParams = {
   teamName?: string | null;
   reportScope: "basis" | "basis_plus_values";
   teamContext: "pre_founder" | "existing_team";
+  locale?: EmailLocaleInput;
 };
 
 type SendCoFounderInviteEmailResult =
@@ -20,20 +30,6 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function buildContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team"
-    ? "Bestehendes Team"
-    : "Vor einer engeren Zusammenarbeit";
-}
-
-function buildModuleLabel(reportScope: "basis" | "basis_plus_values") {
-  return reportScope === "basis_plus_values" ? "Basis + Werte" : "Basis";
-}
-
-function buildPrivacyUrl() {
-  return "https://cofoundery.de/datenschutz";
-}
-
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
@@ -46,24 +42,21 @@ function buildReplyToAddress() {
   return process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined;
 }
 
-function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
-  const inviterName = params.inviterDisplayName ? escapeHtml(params.inviterDisplayName) : null;
-  const greeting = "Hi,";
-  const inviterLine = inviterName
-    ? `${inviterName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Cofoundery Align anschauen.`
-    : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Cofoundery Align anzuschauen.";
-
-  const contextLabel = escapeHtml(buildContextLabel(params.teamContext));
-  const moduleLabel = escapeHtml(buildModuleLabel(params.reportScope));
+function buildHtmlBody(params: SendCoFounderInviteEmailParams, locale: AppLocale) {
+  const copy = getCoFounderInviteEmailCopy(locale, {
+    inviterDisplayName: params.inviterDisplayName,
+  });
+  const contextLabel = escapeHtml(getCoFounderContextLabel(locale, params.teamContext));
+  const moduleLabel = escapeHtml(getCoFounderModuleLabel(locale, params.reportScope));
   const teamName = params.teamName?.trim() ? escapeHtml(params.teamName.trim()) : null;
   const inviteUrl = escapeHtml(params.inviteUrl);
-  const privacyUrl = escapeHtml(buildPrivacyUrl());
+  const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
 
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${copy.htmlLang}">
   <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#0f172a;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-      Persönliche Einladung zu Cofoundery Align: gemeinsamer Report und Workbook für eure Co-Founder-Dynamik.
+      ${escapeHtml(copy.preheader)}
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr>
@@ -83,32 +76,29 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
             <tr>
               <td style="padding:24px 32px 32px;">
                 <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
-                  Persönliche Einladung
+                  ${escapeHtml(copy.eyebrow)}
                 </p>
                 <h1 style="margin:0 0 16px;font-size:28px;line-height:34px;color:#0f172a;font-weight:700;">
-                  ${greeting}
+                  ${escapeHtml(copy.greeting)}
                 </h1>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  ${inviterLine}
+                  ${escapeHtml(copy.inviterLine)}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Cofoundery Align hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.
+                  ${escapeHtml(copy.productIntro)}
                 </p>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc;">
                   <tr>
                     <td style="padding:18px 20px;">
                       <p style="margin:0 0 10px;font-size:13px;line-height:20px;font-weight:700;color:#0f172a;">
-                        Was euch erwartet
+                        ${escapeHtml(copy.listTitle)}
                       </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik
-                      </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein gemeinsames Workbook, um zentrale Spannungen und Vereinbarungen konkret festzuhalten
-                      </p>
-                      <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        • ein klarer gemeinsamer Gesprächsrahmen statt vager Eindrücke
-                      </p>
+                      ${copy.bullets
+                        .map(
+                          (bullet, index) =>
+                            `<p style="margin:0${index < copy.bullets.length - 1 ? " 0 8px" : ""};font-size:14px;line-height:22px;color:#475569;">• ${escapeHtml(bullet)}</p>`
+                        )
+                        .join("")}
                     </td>
                   </tr>
                 </table>
@@ -116,24 +106,24 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
                   <tr>
                     <td style="padding:0;">
                       <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}
-                        Kontext: <strong>${contextLabel}</strong><br />
-                        Startmodul: <strong>${moduleLabel}</strong>
+                        ${teamName ? `${escapeHtml(copy.teamLabel)}: <strong>${teamName}</strong><br />` : ""}
+                        ${escapeHtml(copy.contextLabel)}: <strong>${contextLabel}</strong><br />
+                        ${escapeHtml(copy.moduleLabel)}: <strong>${moduleLabel}</strong>
                       </p>
                     </td>
                   </tr>
                 </table>
                 <p style="margin:22px 0 0;font-size:15px;line-height:25px;color:#334155;">
-                  Die Einladung ist persönlich und führt dich direkt in den bestehenden gemeinsamen Flow.
+                  ${escapeHtml(copy.personalNote)}
                 </p>
                 <p style="margin:0 0 28px;">
                   <a href="${inviteUrl}" style="display:inline-block;margin-top:28px;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
-                    Einladung öffnen
+                    ${escapeHtml(copy.cta)}
                   </a>
                 </p>
                 <div style="margin-top:12px;padding:16px 18px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
-                    Falls der Button nicht funktioniert, kannst du auch direkt diesen Link öffnen:
+                    ${escapeHtml(copy.fallback)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
                     <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
@@ -141,13 +131,13 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
                 </div>
                 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
-                    Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Cofoundery-Align-Prozess eingeladen wurdest.
+                    ${escapeHtml(copy.footerReason)}
                   </p>
                   <p style="margin:0 0 12px;font-size:13px;line-height:21px;color:#64748b;">
-                    Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.
+                    ${escapeHtml(copy.footerIgnore)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:21px;color:#64748b;">
-                    Mehr zum Datenschutz: <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">Datenschutzerklärung</a>
+                    ${escapeHtml(locale === "en" ? "Privacy:" : "Mehr zum Datenschutz:")} <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">${escapeHtml(copy.privacy)}</a>
                   </p>
                 </div>
               </td>
@@ -160,38 +150,49 @@ function buildHtmlBody(params: SendCoFounderInviteEmailParams) {
 </html>`;
 }
 
-function buildTextBody(params: SendCoFounderInviteEmailParams) {
-  const inviterLine = params.inviterDisplayName
-    ? `${params.inviterDisplayName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Cofoundery Align anschauen.`
-    : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Cofoundery Align anzuschauen.";
+function buildTextBody(params: SendCoFounderInviteEmailParams, locale: AppLocale) {
+  const copy = getCoFounderInviteEmailCopy(locale, {
+    inviterDisplayName: params.inviterDisplayName,
+  });
   const teamName = params.teamName?.trim();
 
   return [
-    "Hi,",
+    copy.greeting,
     "",
-    inviterLine,
+    copy.inviterLine,
     "",
-    "Cofoundery Align hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.",
+    copy.productIntro,
     "",
-    "Was euch erwartet:",
-    "- ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik",
-    "- ein gemeinsames Workbook, um Spannungen und Vereinbarungen konkret festzuhalten",
-    "- ein klarer gemeinsamer Gesprächsrahmen statt vager Eindrücke",
+    `${copy.listTitle}:`,
+    ...copy.bullets.map((bullet) => `- ${bullet}`),
     "",
-    ...(teamName ? [`Team/Projekt: ${teamName}`] : []),
-    `Kontext: ${buildContextLabel(params.teamContext)}`,
-    `Startmodul: ${buildModuleLabel(params.reportScope)}`,
+    ...(teamName ? [`${copy.teamLabel}: ${teamName}`] : []),
+    `${copy.contextLabel}: ${getCoFounderContextLabel(locale, params.teamContext)}`,
+    `${copy.moduleLabel}: ${getCoFounderModuleLabel(locale, params.reportScope)}`,
     "",
-    "Die Einladung ist persönlich und führt dich direkt in den bestehenden gemeinsamen Flow.",
+    copy.personalNote,
     "",
-    "Einladung öffnen:",
+    `${copy.cta}:`,
     params.inviteUrl,
     "",
-    "Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Cofoundery-Align-Prozess eingeladen wurdest.",
-    "Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.",
+    copy.footerReason,
+    copy.footerIgnore,
     "",
-    `Datenschutzerklärung: ${buildPrivacyUrl()}`,
+    `${copy.privacy}: ${getEmailPrivacyUrl(locale)}`,
   ].join("\n");
+}
+
+export function buildCoFounderInviteEmailPayload(params: SendCoFounderInviteEmailParams) {
+  const locale = resolveEmailLocale(params.locale);
+  const copy = getCoFounderInviteEmailCopy(locale, {
+    inviterDisplayName: params.inviterDisplayName,
+  });
+
+  return {
+    subject: copy.subject,
+    html: buildHtmlBody(params, locale),
+    text: buildTextBody(params, locale),
+  };
 }
 
 export async function sendCoFounderInviteEmail(
@@ -208,6 +209,7 @@ export async function sendCoFounderInviteEmail(
     return { ok: false, error: "missing_resend_from_email" };
   }
 
+  const payload = buildCoFounderInviteEmailPayload(params);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -218,11 +220,9 @@ export async function sendCoFounderInviteEmail(
       from,
       to: [params.inviteeEmail],
       reply_to: buildReplyToAddress(),
-      subject: params.inviterDisplayName
-        ? `${params.inviterDisplayName} lädt dich zu eurem Cofoundery Align ein`
-        : "Einladung zu eurem Cofoundery Align",
-      html: buildHtmlBody(params),
-      text: buildTextBody(params),
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
     }),
   });
 
@@ -234,6 +234,6 @@ export async function sendCoFounderInviteEmail(
     };
   }
 
-  const payload = (await response.json()) as { id?: string | null };
-  return { ok: true, id: payload.id ?? null };
+  const responsePayload = (await response.json()) as { id?: string | null };
+  return { ok: true, id: responsePayload.id ?? null };
 }

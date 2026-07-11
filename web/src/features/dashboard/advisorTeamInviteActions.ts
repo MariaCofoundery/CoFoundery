@@ -11,6 +11,7 @@ import {
   normalizeTeamName,
   type ClaimAdvisorTeamInviteResult,
 } from "@/features/dashboard/advisorTeamInviteData";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { sendAdvisorTeamFounderInviteEmail } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -131,6 +132,7 @@ export async function createAdvisorTeamInviteAction(
     return { ok: false, error: insertError?.message ?? "Team konnte gerade nicht angelegt werden." };
   }
 
+  const locale = getRequestLocale();
   const [founderAEmailResult, founderBEmailResult] = await Promise.all([
     sendAdvisorTeamFounderInviteEmail({
       inviteeEmail: normalizedEmails.founderAEmail,
@@ -138,6 +140,7 @@ export async function createAdvisorTeamInviteAction(
       advisorName,
       teamName,
       counterpartLabel: normalizedEmails.founderBEmail.split("@")[0]?.trim() || "die zweite Founder-Person",
+      locale,
     }),
     sendAdvisorTeamFounderInviteEmail({
       inviteeEmail: normalizedEmails.founderBEmail,
@@ -145,6 +148,7 @@ export async function createAdvisorTeamInviteAction(
       advisorName,
       teamName,
       counterpartLabel: normalizedEmails.founderAEmail.split("@")[0]?.trim() || "die zweite Founder-Person",
+      locale,
     }),
   ]);
 

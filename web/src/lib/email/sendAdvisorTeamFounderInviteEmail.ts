@@ -1,9 +1,17 @@
+import type { AppLocale } from "@/i18n/config";
+import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
+import {
+  getAdvisorTeamFounderInviteEmailCopy,
+  getEmailPrivacyUrl,
+} from "@/features/email/emailMessages";
+
 type SendAdvisorTeamFounderInviteEmailParams = {
   inviteeEmail: string;
   inviteUrl: string;
   advisorName: string | null;
   teamName?: string | null;
   counterpartLabel?: string | null;
+  locale?: EmailLocaleInput;
 };
 
 type SendAdvisorTeamFounderInviteEmailResult =
@@ -19,10 +27,6 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#39;");
 }
 
-function buildPrivacyUrl() {
-  return "https://cofoundery.de/datenschutz";
-}
-
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
@@ -35,20 +39,20 @@ function buildReplyToAddress() {
   return process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined;
 }
 
-function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams) {
-  const advisorName = params.advisorName?.trim() ? escapeHtml(params.advisorName.trim()) : null;
+function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams, locale: AppLocale) {
+  const copy = getAdvisorTeamFounderInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    counterpartLabel: params.counterpartLabel,
+  });
   const teamName = params.teamName?.trim() ? escapeHtml(params.teamName.trim()) : null;
-  const counterpartLabel = params.counterpartLabel?.trim()
-    ? escapeHtml(params.counterpartLabel.trim())
-    : "die zweite Founder-Person";
   const inviteUrl = escapeHtml(params.inviteUrl);
-  const privacyUrl = escapeHtml(buildPrivacyUrl());
+  const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
 
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${copy.htmlLang}">
   <body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;color:#0f172a;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-      Einladung in ein von einem Advisor initiiertes Founder-Matching bei Cofoundery Align.
+      ${escapeHtml(copy.preheader)}
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr>
@@ -68,48 +72,43 @@ function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams) {
             <tr>
               <td style="padding:24px 32px 32px;">
                 <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;color:#64748b;">
-                  Founder-Einladung
+                  ${escapeHtml(copy.eyebrow)}
                 </p>
                 <h1 style="margin:0 0 16px;font-size:28px;line-height:34px;color:#0f172a;font-weight:700;">
-                  Hi,
+                  ${escapeHtml(copy.greeting)}
                 </h1>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  ${advisorName
-                    ? `${advisorName} möchte euch in ein strukturiertes Founder-Matching mit Cofoundery Align einladen.`
-                    : "Du wurdest in ein strukturiertes Founder-Matching mit Cofoundery Align eingeladen."}
+                  ${escapeHtml(copy.advisorLine)}
                 </p>
                 <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">
-                  Mit diesem Schritt bestätigst du nur deinen Start in den Flow. Sobald auch ${counterpartLabel} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.
+                  ${escapeHtml(copy.startConfirmation)} ${escapeHtml(copy.counterpartLine)}
                 </p>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border:1px solid #e2e8f0;border-radius:18px;background:#f8fafc;">
                   <tr>
                     <td style="padding:18px 20px;">
                       <p style="margin:0 0 10px;font-size:13px;line-height:20px;font-weight:700;color:#0f172a;">
-                        Was danach entsteht
+                        ${escapeHtml(copy.listTitle)}
                       </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein gemeinsamer Matching-Kontext für beide Founder
-                      </p>
-                      <p style="margin:0 0 8px;font-size:14px;line-height:22px;color:#475569;">
-                        • ein Alignment-Workbook, sobald ihr beide gestartet habt
-                      </p>
-                      <p style="margin:0;font-size:14px;line-height:22px;color:#475569;">
-                        • ein sauberer Fortschrittsblick für eure begleitende Advisor-Person
-                      </p>
+                      ${copy.bullets
+                        .map(
+                          (bullet, index) =>
+                            `<p style="margin:0${index < copy.bullets.length - 1 ? " 0 8px" : ""};font-size:14px;line-height:22px;color:#475569;">• ${escapeHtml(bullet)}</p>`
+                        )
+                        .join("")}
                     </td>
                   </tr>
                 </table>
                 <p style="margin:18px 0 0;font-size:14px;line-height:22px;color:#475569;">
-                  ${teamName ? `Team/Projekt: <strong>${teamName}</strong><br />` : ""}Kontext: <strong>Founder-Matching</strong>
+                  ${teamName ? `${escapeHtml(copy.teamLabel)}: <strong>${teamName}</strong><br />` : ""}${escapeHtml(copy.contextLabel)}: <strong>${escapeHtml(copy.contextValue)}</strong>
                 </p>
                 <p style="margin:0 0 28px;">
                   <a href="${inviteUrl}" style="display:inline-block;margin-top:28px;padding:14px 22px;border-radius:999px;background:#67e8f9;color:#082f49;text-decoration:none;font-size:15px;font-weight:700;">
-                    Matching starten
+                    ${escapeHtml(copy.cta)}
                   </a>
                 </p>
                 <div style="margin-top:12px;padding:16px 18px;border:1px solid #e2e8f0;border-radius:16px;background:#ffffff;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
-                    Falls der Button nicht funktioniert, kannst du auch direkt diesen Link öffnen:
+                    ${escapeHtml(copy.fallback)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:22px;word-break:break-all;color:#0f172a;">
                     <a href="${inviteUrl}" style="color:#0f172a;">${inviteUrl}</a>
@@ -117,13 +116,13 @@ function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams) {
                 </div>
                 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0;">
                   <p style="margin:0 0 8px;font-size:13px;line-height:21px;color:#64748b;">
-                    Du erhältst diese E-Mail, weil du von einer Advisor-Person gezielt in ein Founder-Matching eingeladen wurdest.
+                    ${escapeHtml(copy.footerReason)}
                   </p>
                   <p style="margin:0 0 12px;font-size:13px;line-height:21px;color:#64748b;">
-                    Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.
+                    ${escapeHtml(copy.footerIgnore)}
                   </p>
                   <p style="margin:0;font-size:13px;line-height:21px;color:#64748b;">
-                    Mehr zum Datenschutz: <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">Datenschutzerklärung</a>
+                    ${escapeHtml(locale === "en" ? "Privacy:" : "Mehr zum Datenschutz:")} <a href="${privacyUrl}" style="color:#475569;text-decoration:underline;">${escapeHtml(copy.privacy)}</a>
                   </p>
                 </div>
               </td>
@@ -136,39 +135,51 @@ function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams) {
 </html>`;
 }
 
-function buildTextBody(params: SendAdvisorTeamFounderInviteEmailParams) {
+function buildTextBody(params: SendAdvisorTeamFounderInviteEmailParams, locale: AppLocale) {
+  const copy = getAdvisorTeamFounderInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    counterpartLabel: params.counterpartLabel,
+  });
   const teamName = params.teamName?.trim();
-  const advisorLine = params.advisorName?.trim()
-    ? `${params.advisorName.trim()} möchte euch in ein strukturiertes Founder-Matching mit Cofoundery Align einladen.`
-    : "Du wurdest in ein strukturiertes Founder-Matching mit Cofoundery Align eingeladen.";
-  const counterpartLine = params.counterpartLabel?.trim()
-    ? `Sobald auch ${params.counterpartLabel.trim()} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.`
-    : "Sobald auch die zweite Founder-Person gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.";
 
   return [
-    "Hi,",
+    copy.greeting,
     "",
-    advisorLine,
+    copy.advisorLine,
     "",
-    "Mit diesem Schritt bestätigst du nur deinen Start in den Flow.",
-    counterpartLine,
+    copy.startConfirmation,
+    copy.counterpartLine,
     "",
-    "Was danach entsteht:",
-    "- ein gemeinsamer Matching-Kontext für beide Founder",
-    "- ein Alignment-Workbook, sobald ihr beide gestartet habt",
-    "- ein sauberer Fortschrittsblick für eure begleitende Advisor-Person",
+    `${copy.listTitle}:`,
+    ...copy.bullets.map((bullet) => `- ${bullet}`),
     "",
-    ...(teamName ? [`Team/Projekt: ${teamName}`] : []),
-    "Kontext: Founder-Matching",
+    ...(teamName ? [`${copy.teamLabel}: ${teamName}`] : []),
+    `${copy.contextLabel}: ${copy.contextValue}`,
     "",
-    "Matching starten:",
+    `${copy.cta}:`,
     params.inviteUrl,
     "",
-    "Du erhältst diese E-Mail, weil du von einer Advisor-Person gezielt in ein Founder-Matching eingeladen wurdest.",
-    "Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.",
+    copy.footerReason,
+    copy.footerIgnore,
     "",
-    `Datenschutzerklärung: ${buildPrivacyUrl()}`,
+    `${copy.privacy}: ${getEmailPrivacyUrl(locale)}`,
   ].join("\n");
+}
+
+export function buildAdvisorTeamFounderInviteEmailPayload(
+  params: SendAdvisorTeamFounderInviteEmailParams
+) {
+  const locale = resolveEmailLocale(params.locale);
+  const copy = getAdvisorTeamFounderInviteEmailCopy(locale, {
+    advisorName: params.advisorName,
+    counterpartLabel: params.counterpartLabel,
+  });
+
+  return {
+    subject: copy.subject,
+    html: buildHtmlBody(params, locale),
+    text: buildTextBody(params, locale),
+  };
 }
 
 export async function sendAdvisorTeamFounderInviteEmail(
@@ -185,6 +196,7 @@ export async function sendAdvisorTeamFounderInviteEmail(
     return { ok: false, error: "missing_resend_from_email" };
   }
 
+  const payload = buildAdvisorTeamFounderInviteEmailPayload(params);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -195,11 +207,9 @@ export async function sendAdvisorTeamFounderInviteEmail(
       from,
       to: [params.inviteeEmail],
       reply_to: buildReplyToAddress(),
-      subject: params.advisorName?.trim()
-        ? `${params.advisorName.trim()} lädt dich in ein Founder-Matching ein`
-        : "Einladung in ein Founder-Matching",
-      html: buildHtmlBody(params),
-      text: buildTextBody(params),
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
     }),
   });
 
@@ -211,6 +221,6 @@ export async function sendAdvisorTeamFounderInviteEmail(
     };
   }
 
-  const payload = (await response.json()) as { id?: string | null };
-  return { ok: true, id: payload.id ?? null };
+  const responsePayload = (await response.json()) as { id?: string | null };
+  return { ok: true, id: responsePayload.id ?? null };
 }
