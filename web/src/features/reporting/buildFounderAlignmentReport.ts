@@ -32,6 +32,7 @@ import {
   buildConflictStyleSection,
   type ConflictStyleSection,
 } from "@/features/reporting/buildConflictStyleSection";
+import { type AppLocale } from "@/i18n/config";
 
 export type FounderAlignmentReport = {
   teamContext: TeamContext;
@@ -55,6 +56,7 @@ export type FounderAlignmentReport = {
 type BuildFounderAlignmentReportInput = {
   scoringResult: TeamScoringResult;
   teamContext: TeamContext;
+  locale?: AppLocale;
 };
 
 const DIMENSION_KEYS = {

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createMatchingReportRunFromSession } from "@/features/matchingCore/matchingCoreReportData";
+import { getRequestLocale } from "@/i18n/getLocale";
 
 export type MatchingReportActionState = {
   ok: boolean;
@@ -58,6 +59,7 @@ export async function createMatchingReportRunFromSessionAction(
     const report = await createMatchingReportRunFromSession({
       matchingSessionId,
       userId,
+      locale: getRequestLocale(),
     });
     const reportHref = `/matching/${report.reportRun.matchingSessionId}/report`;
 

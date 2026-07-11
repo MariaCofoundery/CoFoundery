@@ -48,6 +48,8 @@ import {
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
 import { buildFounderAlignmentReportPayload } from "@/features/reporting/founderAlignmentReportPayload";
+import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/config";
+import { getRequestLocale } from "@/i18n/getLocale";
 
 export type ReportRunSnapshot = {
   id: string;
@@ -118,7 +120,16 @@ type EnsureReportRunPrivilegedOptions = {
   requesterUserId?: string | null;
   skipMembershipCheck?: boolean;
   sourceTag?: string;
+  locale?: AppLocale;
 };
+
+function getReportBuildLocale(): AppLocale {
+  try {
+    return getRequestLocale();
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
 
 export type BackfillReportRunItem = {
   invitationId: string;
@@ -2158,6 +2169,7 @@ async function ensureReportRunForInvitationWithPrivilegedClient(
     teamContext: normalizeTeamContext(invitation.team_context),
     inviteConsentCaptured: Boolean(invitation.accepted_at),
     source: sourceTag,
+    locale: options?.locale ?? DEFAULT_LOCALE,
   });
   const { payload, inputAssessmentIds } = reportPayload;
 
@@ -2399,6 +2411,7 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     requesterUserId: user.id,
     skipMembershipCheck: false,
     sourceTag: "ensureReportRunForInvitation",
+    locale: getReportBuildLocale(),
   });
 }
 

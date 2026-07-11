@@ -17,6 +17,7 @@ import {
   type MatchingReportRun,
   type MatchingReportRunSummary,
 } from "@/features/matchingCore/matchingCoreReportTypes";
+import { DEFAULT_LOCALE, type AppLocale } from "@/i18n/config";
 
 const MATCHING_REPORT_RUN_COLUMNS = [
   "id",
@@ -334,6 +335,7 @@ async function buildSessionFounderAlignmentPayload(params: {
   matchingSessionId: string;
   userId: string;
   client: SupabaseLikeClient;
+  locale?: AppLocale;
 }): Promise<{
   payload: FounderAlignmentReportPayload;
   modules: MatchingSessionModule[];
@@ -455,12 +457,14 @@ async function buildSessionFounderAlignmentPayload(params: {
     personBInvitedAt: null,
     inviteConsentCaptured: true,
     source: "matching_session_report",
+    locale: params.locale ?? DEFAULT_LOCALE,
   });
 }
 
 export async function createMatchingReportRunFromSession(params: {
   matchingSessionId: string;
   userId: string;
+  locale?: AppLocale;
 }): Promise<MatchingReportRunSummary> {
   const normalizedSessionId = assertMatchingSessionId(params.matchingSessionId);
   const normalizedUserId = assertUserId(params.userId);
@@ -478,6 +482,7 @@ export async function createMatchingReportRunFromSession(params: {
     matchingSessionId: normalizedSessionId,
     userId: normalizedUserId,
     client: privileged,
+    locale: params.locale ?? DEFAULT_LOCALE,
   });
 
   const supabase = await createClient();

@@ -25,6 +25,7 @@ import {
   type KeyInsight,
   type SessionAlignmentReport,
 } from "@/features/reporting/types";
+import { DEFAULT_LOCALE, normalizeLocale, type AppLocale } from "@/i18n/config";
 
 export type FounderAlignmentReportModule = "base" | "values";
 
@@ -56,10 +57,12 @@ type BuildFounderAlignmentReportPayloadInput = {
   inviteConsentCaptured: boolean;
   source: string;
   generatedAt?: string;
+  locale?: AppLocale;
 };
 
 export type FounderAlignmentReportPayload = {
   reportType: "founder_alignment_v1";
+  locale?: AppLocale;
   report: SessionAlignmentReport;
   compareJson: CompareReportJson;
   founderReport: FounderAlignmentReport;
@@ -76,6 +79,12 @@ export type FounderAlignmentReportPayloadResult = {
   modules: FounderAlignmentReportModule[];
   inputAssessmentIds: string[];
 };
+
+export function getFounderAlignmentReportPayloadLocale(
+  payload: { locale?: unknown } | null | undefined
+): AppLocale {
+  return normalizeLocale(typeof payload?.locale === "string" ? payload.locale : DEFAULT_LOCALE);
+}
 
 function toValuesInput(
   answers: AssessmentAnswerRow[],
@@ -105,6 +114,7 @@ export function buildFounderAlignmentReportPayload({
   inviteConsentCaptured,
   source,
   generatedAt = new Date().toISOString(),
+  locale = DEFAULT_LOCALE,
 }: BuildFounderAlignmentReportPayloadInput): FounderAlignmentReportPayloadResult {
   const includeValuesInReport = modules.includes("values");
   const baseScoresA = aggregateBaseScoresFromAnswers(
@@ -122,6 +132,7 @@ export function buildFounderAlignmentReportPayload({
   const founderReport = buildFounderAlignmentReport({
     scoringResult: founderScoring,
     teamContext,
+    locale,
   });
 
   const valuesAnswersA = includeValuesInReport ? (participantA.valuesAnswers ?? []) : [];
@@ -234,6 +245,7 @@ export function buildFounderAlignmentReportPayload({
   const uniqueModules = [...new Set(modules)];
   const payload: FounderAlignmentReportPayload = {
     reportType: "founder_alignment_v1",
+    locale,
     report: finalReport,
     compareJson,
     founderReport,
