@@ -32,6 +32,14 @@ export type ReportDimensionReadingKey =
   | "sharedBlindSpot"
   | ReportDimensionStatusLabelKey;
 
+export type ReportMatchHeadlineKey =
+  | "session"
+  | "tension_led"
+  | "complement_led"
+  | "coordination_led"
+  | "blind_spot_watch"
+  | "alignment_led";
+
 export type ReportContent = {
   dimensions: Record<ReportDimensionContentKey, ReportDimensionContent>;
   headings: {
@@ -48,6 +56,7 @@ export type ReportContent = {
     everydayImpact: string;
     consequence: string;
   };
+  matchHeadlines: Record<ReportMatchHeadlineKey, string>;
   statusLabels: Record<ReportDimensionStatusLabelKey, string>;
   dimensionReadings: Record<ReportDimensionReadingKey, string>;
   dimensionBusinessMeanings: Record<

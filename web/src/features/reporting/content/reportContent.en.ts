@@ -83,6 +83,14 @@ export const REPORT_CONTENT_EN = {
     everydayImpact: "Day-to-day impact",
     consequence: "What this means",
   },
+  matchHeadlines: {
+    session: "Your founder dynamics report is ready.",
+    tension_led: "A few dynamics are worth aligning on early.",
+    complement_led: "Complementary dynamics worth exploring.",
+    coordination_led: "Aligned foundations with a few coordination points.",
+    blind_spot_watch: "A close foundation with shared assumptions to keep visible.",
+    alignment_led: "A strong starting point for your working dynamics.",
+  },
   statusLabels: {
     nah: "Close foundation",
     ergänzend: "Complementary",

@@ -37,6 +37,15 @@ test("getReportContent returns German report labels by default", () => {
   assert.equal(content.sectionLabels.complement, "Wo ihr euch ergänzt");
   assert.equal(content.sectionLabels.clarificationField, "Früh besprechen");
   assert.equal(content.statusLabels.nah, "Nahe Basis");
+  assert.equal(content.matchHeadlines.session, "Euer Dynamik-Report ist fertig.");
+  assert.equal(
+    content.matchHeadlines.tension_led,
+    "Ein zentrales Spannungsfeld wird bei euch früh im Alltag sichtbar."
+  );
+  assert.equal(
+    content.matchHeadlines.alignment_led,
+    "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe."
+  );
   assert.equal(
     content.dimensionReadings.insufficientData,
     "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor."
@@ -71,6 +80,15 @@ test("getReportContent returns English report labels for locale en", () => {
   assert.equal(content.sectionLabels.clarificationField, "Discuss early");
   assert.equal(content.sectionLabels.possibleTensionFields, "Areas to align on");
   assert.equal(content.statusLabels.abstimmung_nötig, "Needs alignment");
+  assert.equal(content.matchHeadlines.session, "Your founder dynamics report is ready.");
+  assert.equal(
+    content.matchHeadlines.complement_led,
+    "Complementary dynamics worth exploring."
+  );
+  assert.equal(
+    content.matchHeadlines.alignment_led,
+    "A strong starting point for your working dynamics."
+  );
   assert.equal(
     content.dimensionReadings.insufficientData,
     "There is not enough data for this dimension yet to give a reliable shared reading."
@@ -96,6 +114,10 @@ test("getReportContent falls back to German for unsupported locales", () => {
   assert.equal(
     getReportContent("fr").dimensionBusinessMeanings.Commitment.default,
     "Wenn ihr das nicht klärt, entsteht leicht Frust über Tempo, Verfügbarkeit und Verantwortung."
+  );
+  assert.equal(
+    getReportContent("fr").matchHeadlines.complement_led,
+    "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst führt."
   );
 });
 
@@ -129,6 +151,7 @@ test("German and English report content keep the same label map shape", () => {
   assert.deepEqual(Object.keys(english.dimensions), Object.keys(german.dimensions));
   assert.deepEqual(Object.keys(english.headings), Object.keys(german.headings));
   assert.deepEqual(Object.keys(english.centralPatternLabels), Object.keys(german.centralPatternLabels));
+  assert.deepEqual(Object.keys(english.matchHeadlines), Object.keys(german.matchHeadlines));
   assert.deepEqual(Object.keys(english.statusLabels), Object.keys(german.statusLabels));
   assert.deepEqual(Object.keys(english.dimensionReadings), Object.keys(german.dimensionReadings));
   assert.deepEqual(

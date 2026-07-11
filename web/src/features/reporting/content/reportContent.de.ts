@@ -83,6 +83,14 @@ export const REPORT_CONTENT_DE = {
     everydayImpact: "Auswirkung im Alltag",
     consequence: "Konsequenz",
   },
+  matchHeadlines: {
+    session: "Euer Dynamik-Report ist fertig.",
+    tension_led: "Ein zentrales Spannungsfeld wird bei euch früh im Alltag sichtbar.",
+    complement_led: "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst führt.",
+    coordination_led: "Ihr seid nicht weit auseinander, aber auch nicht automatisch im selben Takt.",
+    blind_spot_watch: "Eure Nähe wirkt tragend und braucht gerade deshalb bewusste Watchpoints.",
+    alignment_led: "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe.",
+  },
   statusLabels: {
     nah: "Nahe Basis",
     ergänzend: "Ergänzend",

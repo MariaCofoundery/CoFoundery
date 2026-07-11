@@ -85,7 +85,7 @@ export function FounderMatchingView({
             {isSessionReport ? rt("view.dynamicsReport") : rt("view.matchingReport")}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-            {t(buildMatchHeadline(selection, isSessionReport))}
+            {t(buildMatchHeadline(selection, isSessionReport, reportContent))}
           </h1>
           <p className="mt-5 max-w-3xl text-[15px] leading-8 text-slate-700">
             {t(buildIntroSummary(selection, isSessionReport))}
@@ -480,24 +480,16 @@ function buildMarkerLabel(name: string) {
   return `${parts[0].slice(0, 1)}${parts[1].slice(0, 1)}`.toUpperCase();
 }
 
-function buildMatchHeadline(selection: FounderMatchingSelection, isSessionReport: boolean) {
+function buildMatchHeadline(
+  selection: FounderMatchingSelection,
+  isSessionReport: boolean,
+  reportContent: ReportContent
+) {
   if (isSessionReport) {
-    return "Euer Dynamik-Report ist fertig.";
+    return reportContent.matchHeadlines.session;
   }
 
-  switch (selection.heroSelection.mode) {
-    case "tension_led":
-      return "Ein zentrales Spannungsfeld wird bei euch früh im Alltag sichtbar.";
-    case "complement_led":
-      return "Euer Unterschied kann euch breiter machen, wenn ihr ihn bewusst führt.";
-    case "coordination_led":
-      return "Ihr seid nicht weit auseinander, aber auch nicht automatisch im selben Takt.";
-    case "blind_spot_watch":
-      return "Eure Nähe wirkt tragend und braucht gerade deshalb bewusste Watchpoints.";
-    case "alignment_led":
-    default:
-      return "Ihr habt eine tragfähige Basis, aber nicht automatisch dieselben Maßstäbe.";
-  }
+  return reportContent.matchHeadlines[selection.heroSelection.mode] ?? reportContent.matchHeadlines.alignment_led;
 }
 
 function buildIntroSummary(selection: FounderMatchingSelection, isSessionReport: boolean) {
