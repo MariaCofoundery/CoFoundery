@@ -8,7 +8,11 @@ import {
   getLocalizedFounderDimensionMeta,
   getFounderDimensionPoleLabels,
 } from "@/features/reporting/founderDimensionMeta";
-import { getReportContent } from "@/features/reporting/content/reportContent";
+import {
+  getReportContent,
+  type ReportContent,
+  type ReportDimensionContentKey,
+} from "@/features/reporting/content/reportContent";
 import type { CompareFoundersResult } from "@/features/reporting/founderMatchingEngine";
 import type {
   FounderMatchingSelection,
@@ -40,7 +44,7 @@ type DimensionMatch = CompareFoundersResult["dimensions"][number];
 
 const SECTION_ORDER: Array<{
   key: keyof FounderAlignmentReport["sections"];
-  label: string;
+  label: ReportDimensionContentKey;
 }> = [
   { key: "vision", label: "Unternehmenslogik" },
   { key: "decisionLogic", label: "Entscheidungslogik" },
@@ -66,6 +70,7 @@ export function FounderMatchingView({
   contentLocale,
 }: Props) {
   const rt = useTranslations("report");
+  const reportContent = getReportContent(contentLocale);
   const effectiveTeamContext = teamContext ?? "pre_founder";
   const isSessionReport = reportContext === "matching_session";
   const effectiveAccessNotice =
@@ -93,10 +98,10 @@ export function FounderMatchingView({
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {rt("view.centralPatterns")}
+          {t(reportContent.headings.centralPatterns)}
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {buildCentralPatternSections(selection).map((section) => (
+          {buildCentralPatternSections(selection, reportContent).map((section) => (
             <article
               key={section.label}
               className="rounded-[22px] border border-slate-200/80 bg-white/80 px-5 py-5"
@@ -225,11 +230,13 @@ function FounderMatchingReportSections({
 
   return (
     <>
-      {founderReport ? <ExecutiveSummarySection founderReport={founderReport} /> : null}
+      {founderReport ? (
+        <ExecutiveSummarySection founderReport={founderReport} reportContent={reportContent} />
+      ) : null}
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {rt("view.dynamicsOverview")}
+          {t(reportContent.headings.dynamicsOverview)}
         </p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
@@ -297,8 +304,9 @@ function FounderMatchingReportSections({
           {SECTION_ORDER.map(({ key, label }) => (
             <FounderMatchingDimensionSection
               key={key}
-              label={label}
+              label={reportContent.dimensions[label].canonicalName}
               section={founderReport.sections[key]}
+              reportContent={reportContent}
             />
           ))}
         </section>
@@ -307,14 +315,17 @@ function FounderMatchingReportSections({
       {valuesBlock ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Zusatzmodul Wertefokus")}
+            {t(reportContent.headings.valuesFocus)}
           </p>
           <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
           <div className="mt-5 grid gap-4 lg:grid-cols-3">
             {[
-              { label: "Gemeinsame Basis", entry: valuesBlock.gemeinsameBasis },
-              { label: "Unterschied unter Druck", entry: valuesBlock.unterschiedUnterDruck },
-              { label: "Leitplanke", entry: valuesBlock.leitplanke },
+              { label: reportContent.valuesLabels.sharedBasis, entry: valuesBlock.gemeinsameBasis },
+              {
+                label: reportContent.valuesLabels.differenceUnderPressure,
+                entry: valuesBlock.unterschiedUnterDruck,
+              },
+              { label: reportContent.valuesLabels.guardrail, entry: valuesBlock.leitplanke },
             ].map(({ label, entry }) => (
               <article
                 key={`${label}-${entry.title}`}
@@ -332,10 +343,10 @@ function FounderMatchingReportSections({
       {conversationPrompts.length > 0 ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {rt("view.conversationPrompts")}
+            {t(reportContent.headings.conversationPrompts)}
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            {rt("view.conversationPromptsText")}
+            {t(reportContent.headings.conversationPromptsIntro)}
           </p>
           <ul className="mt-6 grid gap-3 lg:grid-cols-2">
             {conversationPrompts.map((prompt) => (
@@ -353,7 +364,7 @@ function FounderMatchingReportSections({
       {!isSessionReport ? (
         <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:hidden">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {rt("common.nextStep")}
+            {t(reportContent.headings.nextStep)}
           </p>
           <h3 className="mt-3 text-xl font-semibold text-slate-900">
             {rt("legacy.workbookTitle")}
@@ -370,11 +381,17 @@ function FounderMatchingReportSections({
   );
 }
 
-function ExecutiveSummarySection({ founderReport }: { founderReport: FounderAlignmentReport }) {
+function ExecutiveSummarySection({
+  founderReport,
+  reportContent,
+}: {
+  founderReport: FounderAlignmentReport;
+  reportContent: ReportContent;
+}) {
   return (
     <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
       <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-        {t("Executive Summary")}
+        {t(reportContent.headings.executiveSummary)}
       </p>
       <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-slate-950">
         {t(founderReport.executiveSummary.headline)}
@@ -383,7 +400,7 @@ function ExecutiveSummarySection({ founderReport }: { founderReport: FounderAlig
         {t(founderReport.executiveSummary.summaryIntro)}
       </p>
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {summaryMessages(founderReport).map((message) => (
+        {summaryMessages(founderReport, reportContent).map((message) => (
           <article
             key={message.label}
             className="rounded-[22px] border border-slate-200/80 bg-slate-50/75 px-5 py-5"
@@ -402,9 +419,11 @@ function ExecutiveSummarySection({ founderReport }: { founderReport: FounderAlig
 function FounderMatchingDimensionSection({
   label,
   section,
+  reportContent,
 }: {
   label: string;
   section: FounderReportSection;
+  reportContent: ReportContent;
 }) {
   return (
     <article className="rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
@@ -418,7 +437,7 @@ function FounderMatchingDimensionSection({
       {section.potentialTensions.length > 0 ? (
         <div className="mt-7 rounded-[24px] border border-amber-200/80 bg-amber-50/70 p-6">
           <h3 className="text-base font-semibold text-slate-950">
-            {t("Mögliche Spannungsfelder")}
+            {t(reportContent.sectionLabels.possibleTensionFields)}
           </h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {section.potentialTensions.map((tension) => (
@@ -436,14 +455,17 @@ function FounderMatchingDimensionSection({
   );
 }
 
-function summaryMessages(founderReport: FounderAlignmentReport) {
+function summaryMessages(founderReport: FounderAlignmentReport, reportContent: ReportContent) {
   return [
-    { label: "Stärke", text: founderReport.executiveSummary.topMessages.strength },
+    { label: reportContent.sectionLabels.strength, text: founderReport.executiveSummary.topMessages.strength },
     {
-      label: "Ergänzung",
+      label: reportContent.sectionLabels.complement,
       text: founderReport.executiveSummary.topMessages.complementaryDynamic,
     },
-    { label: "Klärungsfeld", text: founderReport.executiveSummary.topMessages.tension },
+    {
+      label: reportContent.sectionLabels.clarificationField,
+      text: founderReport.executiveSummary.topMessages.tension,
+    },
   ].filter((entry): entry is { label: string; text: string } => Boolean(entry.text));
 }
 
@@ -498,7 +520,10 @@ function buildIntroSummary(selection: FounderMatchingSelection, isSessionReport:
   }
 }
 
-function buildCentralPatternSections(selection: FounderMatchingSelection) {
+function buildCentralPatternSections(
+  selection: FounderMatchingSelection,
+  reportContent: ReportContent
+) {
   const corePattern = selection.heroSelection.mode === "blind_spot_watch"
     ? selection.heroSelection.biggestRisk
       ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich zunächst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.`
@@ -522,9 +547,9 @@ function buildCentralPatternSections(selection: FounderMatchingSelection) {
     : "Ohne bewusste Klärung entstehen unterschiedliche Maßstäbe genau dort, wo ihr gemeinsam tragen und entscheiden müsst.";
 
   return [
-    { label: "Kernmuster", body: corePattern },
-    { label: "Auswirkung im Alltag", body: everydayImpact },
-    { label: "Konsequenz", body: consequence },
+    { label: reportContent.centralPatternLabels.corePattern, body: corePattern },
+    { label: reportContent.centralPatternLabels.everydayImpact, body: everydayImpact },
+    { label: reportContent.centralPatternLabels.consequence, body: consequence },
   ];
 }
 

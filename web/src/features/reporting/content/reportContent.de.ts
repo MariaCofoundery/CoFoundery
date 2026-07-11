@@ -69,6 +69,20 @@ export const REPORT_CONTENT_DE = {
         "Beschreibt, wie Spannungen, Feedback und Meinungsverschiedenheiten eher erst sortiert oder unmittelbarer und direkter bearbeitet werden.",
     },
   },
+  headings: {
+    centralPatterns: "Zentrale Muster",
+    dynamicsOverview: "Eure Dynamik im Überblick",
+    executiveSummary: "Executive Summary",
+    conversationPrompts: "Gesprächsimpulse",
+    conversationPromptsIntro: "Gesprächsimpulse für euer nächstes Gespräch",
+    nextStep: "Nächster Schritt",
+    valuesFocus: "Zusatzmodul Wertefokus",
+  },
+  centralPatternLabels: {
+    corePattern: "Kernmuster",
+    everydayImpact: "Auswirkung im Alltag",
+    consequence: "Konsequenz",
+  },
   statusLabels: {
     nah: "Nahe Basis",
     ergänzend: "Ergänzend",
@@ -76,9 +90,14 @@ export const REPORT_CONTENT_DE = {
     kritisch: "Kritisch",
   },
   sectionLabels: {
-    strength: "Stärke",
-    complement: "Ergänzung",
-    clarificationField: "Klärungsfeld",
+    strength: "Eure gemeinsame Stärke",
+    complement: "Wo ihr euch ergänzt",
+    clarificationField: "Früh besprechen",
     possibleTensionFields: "Mögliche Spannungsfelder",
+  },
+  valuesLabels: {
+    sharedBasis: "Gemeinsame Basis",
+    differenceUnderPressure: "Unterschied unter Druck",
+    guardrail: "Leitplanke",
   },
 } as const satisfies ReportContent;

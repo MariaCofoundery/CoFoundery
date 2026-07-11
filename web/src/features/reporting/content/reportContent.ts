@@ -29,12 +29,31 @@ export type ReportDimensionStatusLabelKey =
 
 export type ReportContent = {
   dimensions: Record<ReportDimensionContentKey, ReportDimensionContent>;
+  headings: {
+    centralPatterns: string;
+    dynamicsOverview: string;
+    executiveSummary: string;
+    conversationPrompts: string;
+    conversationPromptsIntro: string;
+    nextStep: string;
+    valuesFocus: string;
+  };
+  centralPatternLabels: {
+    corePattern: string;
+    everydayImpact: string;
+    consequence: string;
+  };
   statusLabels: Record<ReportDimensionStatusLabelKey, string>;
   sectionLabels: {
     strength: string;
     complement: string;
     clarificationField: string;
     possibleTensionFields: string;
+  };
+  valuesLabels: {
+    sharedBasis: string;
+    differenceUnderPressure: string;
+    guardrail: string;
   };
 };
 

@@ -69,6 +69,20 @@ export const REPORT_CONTENT_EN = {
         "Describes whether tension, feedback, and disagreement are handled by sorting things first or by addressing them more directly.",
     },
   },
+  headings: {
+    centralPatterns: "Key patterns",
+    dynamicsOverview: "Your dynamics at a glance",
+    executiveSummary: "Executive summary",
+    conversationPrompts: "Conversation prompts",
+    conversationPromptsIntro: "Conversation prompts for your next discussion",
+    nextStep: "Next step",
+    valuesFocus: "Values focus add-on",
+  },
+  centralPatternLabels: {
+    corePattern: "Core pattern",
+    everydayImpact: "Day-to-day impact",
+    consequence: "What this means",
+  },
   statusLabels: {
     nah: "Close foundation",
     ergänzend: "Complementary",
@@ -76,9 +90,14 @@ export const REPORT_CONTENT_EN = {
     kritisch: "Needs clarification",
   },
   sectionLabels: {
-    strength: "Strength",
-    complement: "Complement",
-    clarificationField: "Clarification field",
-    possibleTensionFields: "Possible tension fields",
+    strength: "Your shared strength",
+    complement: "Where you complement each other",
+    clarificationField: "Discuss early",
+    possibleTensionFields: "Areas to align on",
+  },
+  valuesLabels: {
+    sharedBasis: "Shared basis",
+    differenceUnderPressure: "Difference under pressure",
+    guardrail: "Guardrail",
   },
 } as const satisfies ReportContent;
