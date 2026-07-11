@@ -1,0 +1,46 @@
+{
+  "trigger": "Feedback",
+  "workbookTitle": "Quick check: did this actually help you move forward?",
+  "workbookText": "I am actively improving Cofoundery - your feedback helps make the tool genuinely better.",
+  "giveFeedback": "Give feedback",
+  "close": "Close feedback",
+  "dialogTitle": "Quick product check",
+  "dialogText": "I really appreciate your feedback - especially what helped, what felt unclear, and what is still missing.",
+  "requiredError": "Please answer the first three questions first. They are the most important ones for me.",
+  "invalidError": "Please check your answers once more.",
+  "saveError": "Feedback could not be saved right now.",
+  "thanks": "Thank you - this genuinely helps.",
+  "done": "Close",
+  "questions": {
+    "q1": "1. What was the most valuable moment for you in the tool?",
+    "q2": "2. Where did it feel unclear or unnecessarily complicated?",
+    "q3": "3. What would need to change for you to say: this really helped me?",
+    "q4": "4. Where would you want more support?",
+    "q4Other": "What exactly is still missing?",
+    "q5": "5. Is there anything else you would like to tell me?"
+  },
+  "assistance": {
+    "matching_besser_verstehen": "Understand matching better",
+    "unterschiede_klarer_sehen": "See differences more clearly",
+    "entscheidungen_treffen": "Make decisions",
+    "zusammenarbeit_strukturieren": "Structure collaboration",
+    "konflikte_greifbarer_machen": "Make tensions easier to grasp",
+    "anderes": "Something else"
+  },
+  "requiredHint": "The first three questions are especially important for me; everything else is optional.",
+  "cancel": "Cancel",
+  "saving": "Saving...",
+  "submit": "Send feedback",
+  "dictation": {
+    "accepted": "Text added. You can keep dictating.",
+    "unsupported": "Dictation is not available in this browser.",
+    "unsupportedLong": "Dictation is unfortunately not available in this browser.",
+    "restartFailed": "Recording could not be restarted.",
+    "listening": "Listening...",
+    "startFailed": "Recording could not be started right now.",
+    "stop": "Stop dictation",
+    "start": "Start dictation",
+    "recording": "Recording",
+    "waiting": "Waiting for speech"
+  }
+}

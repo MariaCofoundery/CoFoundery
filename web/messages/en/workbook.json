@@ -50,7 +50,101 @@
     "backToLastStep": "Back to last step",
     "toSummary": "Go to summary",
     "nextDimension": "Go to next dimension",
-    "leaveStep": "Leave this step for now"
+    "leaveStep": "Leave this step for now",
+    "stepsEyebrow": "Steps",
+    "stepLabel": "Step {current}",
+    "ready": "Ready",
+    "inProgress": "In progress",
+    "open": "Open",
+    "focus": "Focus",
+    "context": "1. Context",
+    "leadQuestion": "Guiding question"
+    ,
+    "teamContextPreFounder": "Potential founding partnership",
+    "teamContextExistingTeam": "Existing founder team"
+  },
+  "steps": {
+    "vision_direction": {
+      "title": "Company logic",
+      "subtitle": "How do you decide in everyday work what takes priority, what waits, and what pulls you away from your core focus?",
+      "prompts": [
+        "What takes priority when revenue opportunity, product focus, and company building all pull at once?",
+        "Which opportunities or requests do you intentionally not pursue, even if they bring short-term money or visibility?",
+        "What applies when something brings revenue but pulls you away from the core focus?"
+      ]
+    },
+    "roles_responsibility": {
+      "title": "Roles & responsibility",
+      "subtitle": "How do you decide who leads, what stays visible, and when the other person needs to be brought in?",
+      "prompts": [
+        "Which topics does one person lead clearly and independently?",
+        "Where does the other person need early visibility?",
+        "When does individual ownership become a shared topic?"
+      ]
+    },
+    "decision_rules": {
+      "title": "Decision rules",
+      "subtitle": "How do you make sure decisions stay clear under pressure?",
+      "prompts": [
+        "What can one person decide alone without asking first?",
+        "When do both people need to agree?",
+        "What applies when you disagree and need to decide quickly?"
+      ]
+    },
+    "commitment_load": {
+      "title": "Commitment & load",
+      "subtitle": "How do you make effort, availability, and load visible early before quiet pressure builds up?",
+      "prompts": [
+        "What is realistically manageable in normal mode?",
+        "What needs to become visible early when capacity starts tipping?",
+        "What do you reprioritize first when commitments are no longer sustainable?"
+      ]
+    },
+    "collaboration_conflict": {
+      "title": "Collaboration & conflict",
+      "subtitle": "How do you handle feedback, clarification, and conflict so they do not linger or block daily work?",
+      "prompts": [
+        "What do you address immediately, and what waits for a fixed clarification point?",
+        "How do you give critical feedback so it stays clear and does not land as an attack?",
+        "What happens when a topic is not resolved in the conversation?"
+      ]
+    },
+    "ownership_risk": {
+      "title": "Ownership & risk",
+      "subtitle": "How do you define who leads risks, when they become visible, and at what threshold you decide together?",
+      "prompts": [
+        "Which risks does one person lead alone, and where do you need early visibility?",
+        "Which threshold ends quiet observation?",
+        "When does safeguarding take priority over speed?"
+      ]
+    },
+    "values_guardrails": {
+      "title": "Values & entrepreneurial guardrails",
+      "subtitle": "How do you define what is still sustainable, what remains a borderline case, and what is not your path?",
+      "prompts": [
+        "Which compromises are still sustainable for you?",
+        "Which cases always need deliberate shared approval?",
+        "What do you not do, even if it looks economically attractive?"
+      ]
+    },
+    "alignment_90_days": {
+      "title": "90-day focus",
+      "subtitle": "How do you clearly define for the next 90 days what takes priority, what waits, and how you measure progress?",
+      "prompts": [
+        "What has absolute priority in the next 90 days?",
+        "What do you deliberately not do, even if it could seem useful?",
+        "How do you notice early that you are truly moving forward with your priorities?"
+      ]
+    },
+    "advisor_closing": {
+      "title": "Advisor closing",
+      "subtitle": "Which observations, open questions, and next steps should the advisor make visible at the end?",
+      "prompts": [
+        "What should this team not overlook after the session?",
+        "Which follow-up questions remain important?",
+        "What is the most useful next step?"
+      ]
+    }
   },
   "save": {
     "preview": "Preview without saving",

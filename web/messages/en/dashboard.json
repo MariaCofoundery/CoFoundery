@@ -76,7 +76,39 @@
     "eyebrow": "Profile snapshot",
     "title": "Your current state across 6 dimensions",
     "text": "A compact view of your current founder profile.",
-    "empty": "Once you complete your foundation profile, your profile snapshot appears here."
+    "empty": "Once you complete your foundation profile, your profile snapshot appears here.",
+    "dimensions": {
+      "companyLogic": {
+        "label": "Company logic",
+        "left": "sustainable",
+        "right": "growth-driven"
+      },
+      "decisionLogic": {
+        "label": "Decision logic",
+        "left": "evaluating",
+        "right": "decisive"
+      },
+      "riskOrientation": {
+        "label": "Risk orientation",
+        "left": "protective",
+        "right": "opportunity-driven"
+      },
+      "workStructure": {
+        "label": "Work structure",
+        "left": "independent",
+        "right": "closely synced"
+      },
+      "commitment": {
+        "label": "Commitment",
+        "left": "balanced",
+        "right": "fully focused"
+      },
+      "conflictStyle": {
+        "label": "Conflict style",
+        "left": "harmonizing",
+        "right": "direct"
+      }
+    }
   },
   "team": {
     "eyebrow": "Team & collaboration",
@@ -156,7 +188,22 @@
     "magicLinkText": "Login happens through a secure magic link that we send to you by email.",
     "securityText": "Your email account is your access point, so ideally protect it with two-factor authentication.",
     "supportText": "Changing your email address currently runs through support.",
-    "supportSubject": "Change email address"
+    "supportSubject": "Change email address",
+    "delete": {
+      "summary": "Danger zone",
+      "title": "Delete account",
+      "confirmText": "Your account will be deleted.\nYour personal data will be removed.\nShared reports and workbooks from this founder constellation will also be deleted.\nThis step cannot be undone.\n\nDo you really want to delete your account?",
+      "inputHelp": "Type",
+      "inputHelpSuffix": "to continue",
+      "confirmToken": "DELETE",
+      "pending": "Deleting account...",
+      "button": "Delete account",
+      "errors": {
+        "missingServiceRole": "Account deletion is currently not technically available. Please try again later.",
+        "cleanupFailed": "Your account could not be fully deleted right now. Please try again.",
+        "notAuthenticated": "Your session is no longer active. Please sign in again."
+      }
+    }
   },
   "outlook": {
     "eyebrow": "Outlook",

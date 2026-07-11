@@ -13,5 +13,19 @@
   "report": "Report",
   "reportContextHelp": "Choose the founder context whose report you want to open.",
   "workbook": "Workbook",
-  "workbookContextHelp": "Choose the founder context you want to keep working in."
+  "workbookContextHelp": "Choose the founder context you want to keep working in.",
+  "teamContexts": {
+    "existingTeam": "Existing team",
+    "preFounder": "Pre-Founder"
+  },
+  "statusLabels": {
+    "reportReady": "Report ready",
+    "workbookReady": "Workbook ready",
+    "completed": "Completed",
+    "inProgress": "In progress"
+  },
+  "date": {
+    "unknown": "no date",
+    "locale": "en-US"
+  }
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   claimFounderAlignmentAdvisorAccess,
   getFounderAlignmentAdvisorInviteByToken,
@@ -13,8 +14,10 @@ const PRIMARY_CTA_CLASS =
 const SECONDARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50";
 
-function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+type AdvisorT = Awaited<ReturnType<typeof getTranslations>>;
+
+function teamContextLabel(teamContext: "pre_founder" | "existing_team", t: AdvisorT) {
+  return teamContext === "existing_team" ? t("teamContext.existingTeam") : t("teamContext.preFounder");
 }
 
 function statusChip(ready: boolean, readyLabel: string, pendingLabel: string) {
@@ -30,31 +33,32 @@ export default async function AdvisorInvitePage({
 }) {
   const { token: rawToken } = await params;
   const resolvedSearchParams = await searchParams;
+  const t = await getTranslations("advisor");
   const token = rawToken?.trim() ?? "";
   const invite = await getFounderAlignmentAdvisorInviteByToken(token);
   const actionError =
     resolvedSearchParams.error === "already_claimed"
-      ? "Dieser Advisor-Link ist bereits mit einem anderen Profil verknüpft."
+      ? t("invite.errors.alreadyClaimed")
       : resolvedSearchParams.error === "invalid_token"
-        ? "Der Advisor-Link konnte nicht bestätigt werden."
+        ? t("invite.errors.invalidToken")
         : resolvedSearchParams.error === "update_failed"
-          ? "Die Verknüpfung konnte gerade nicht gespeichert werden."
+          ? t("invite.errors.updateFailed")
           : null;
 
   if (invite.status !== "ready") {
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor-Einladung</p>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("invite.eyebrow")}</p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            Einladung nicht gefunden
+            {t("invite.notFoundTitle")}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
-            Dieser Advisor-Link ist nicht mehr gültig oder konnte keinem Team zugeordnet werden.
+            {t("invite.notFoundText")}
           </p>
           <div className="mt-8">
             <Link href="/login" className={SECONDARY_CTA_CLASS}>
-              Zur Anmeldung
+              {t("invite.toLogin")}
             </Link>
           </div>
         </section>
@@ -121,53 +125,51 @@ export default async function AdvisorInvitePage({
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              Advisor-Einladung
+              {t("invite.eyebrow")}
             </p>
             <h1 className="mt-3 text-3xl font-semibold text-slate-950 md:text-4xl">
               {inviteData.founderAName} x {inviteData.founderBName}
             </h1>
             <div className="mt-4 flex flex-wrap gap-3">
               <span className="inline-flex rounded-full border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/7 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
-                {teamContextLabel(inviteData.teamContext)}
+                {teamContextLabel(inviteData.teamContext, t)}
               </span>
               <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
                 {inviteData.reportReady
-                  ? "Founder-Report vorhanden"
-                  : "Founder-Report in Vorbereitung"}
+                  ? t("invite.reportReady")
+                  : t("invite.reportPending")}
               </span>
             </div>
             <p className="mt-5 text-sm leading-7 text-slate-700">
-              Als Advisor siehst du den Founder-Snapshot, die Fokusfelder und das Alignment
-              Workbook. Rohantworten der Assessments bleiben dabei geschützt.
+              {t("invite.intro")}
             </p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Deine Rolle ist eine strukturierte Außenperspektive: Beobachtungen festhalten,
-              Rückfragen ergänzen und nächste sinnvolle Schritte mitgeben.
+              {t("invite.roleText")}
             </p>
           </div>
 
           <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Status</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("invite.status")}</p>
             <div className="mt-4 space-y-3 text-sm text-slate-700">
               <StatusRow
-                label="Founder-Freigaben"
+                label={t("invite.founderApprovals")}
                 value={
                   inviteData.founderAApproved && inviteData.founderBApproved
-                    ? "beide bestätigt"
-                    : "noch nicht vollständig"
+                    ? t("invite.bothConfirmed")
+                    : t("invite.notComplete")
                 }
               />
               <StatusRow
-                label="Base Assessments"
-                value={statusChip(inviteData.reportReady, "auswertbar", "noch in Arbeit")}
+                label={t("invite.baseAssessments")}
+                value={statusChip(inviteData.reportReady, t("invite.assessable"), t("invite.inProgress"))}
               />
               <StatusRow
-                label="Founder-Report"
-                value={statusChip(inviteData.reportReady, "verfügbar", "noch nicht bereit")}
+                label={t("invite.founderReport")}
+                value={statusChip(inviteData.reportReady, t("invite.available"), t("invite.notReady"))}
               />
               <StatusRow
-                label="Workbook"
-                value={statusChip(inviteData.workbookReady, "zugänglich", "wird freigeschaltet")}
+                label={t("invite.workbook")}
+                value={statusChip(inviteData.workbookReady, t("invite.accessible"), t("invite.unlocking"))}
               />
             </div>
           </div>
@@ -175,7 +177,7 @@ export default async function AdvisorInvitePage({
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-3xl border border-slate-200 bg-slate-50/60 p-6">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Dein Einstieg</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("invite.entry")}</p>
             {actionError ? (
               <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {actionError}
@@ -184,66 +186,62 @@ export default async function AdvisorInvitePage({
             {isLinkedToOtherUser ? (
               <>
                 <h2 className="mt-3 text-xl font-semibold text-slate-950">
-                  Diese Einladung ist bereits verknüpft
+                  {t("invite.alreadyLinkedTitle")}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
-                  Der Advisor-Link wurde schon mit einem anderen Profil verbunden. Wenn das nicht
-                  beabsichtigt war, braucht ihr einen neuen Advisor-Link aus dem Workbook.
+                  {t("invite.alreadyLinkedText")}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link href="/advisor/dashboard" className={SECONDARY_CTA_CLASS}>
-                    Zum Advisor Dashboard
+                    {t("invite.toDashboard")}
                   </Link>
                 </div>
               </>
             ) : !user ? (
               <>
                 <h2 className="mt-3 text-xl font-semibold text-slate-950">
-                  Mit deinem Profil verknüpfen
+                  {t("invite.linkProfileTitle")}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
-                  Melde dich an, damit dein Advisor-Profil sauber mit diesem Team verknüpft werden
-                  kann. Danach landest du direkt im Advisor-Bereich.
+                  {t("invite.linkProfileText")}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link href={loginHref} className={PRIMARY_CTA_CLASS}>
-                    Login / Profil verknüpfen
+                    {t("invite.loginAndLink")}
                   </Link>
                 </div>
               </>
             ) : canClaim ? (
               <>
                 <h2 className="mt-3 text-xl font-semibold text-slate-950">
-                  Advisor-Zugriff jetzt aktivieren
+                  {t("invite.activateTitle")}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
-                  Dein Profil ist angemeldet. Mit einem Klick verknüpfst du dich als Advisor mit
-                  diesem Team und bekommst Zugriff auf Snapshot, Fokusfelder und Workbook.
+                  {t("invite.activateText")}
                 </p>
                 <form action={claimAction} className="mt-6 flex flex-wrap gap-3">
                   <button type="submit" className={PRIMARY_CTA_CLASS}>
-                    Profil verknüpfen
+                    {t("invite.linkProfile")}
                   </button>
                 </form>
               </>
             ) : (
               <>
                 <h2 className="mt-3 text-xl font-semibold text-slate-950">
-                  Advisor-Zugriff ist aktiv
+                  {t("invite.activeTitle")}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
-                  Dein Profil ist bereits mit diesem Team verknüpft. Du kannst direkt ins Advisor
-                  Dashboard wechseln oder sofort ins Workbook springen.
+                  {t("invite.activeText")}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link href="/advisor/dashboard" className={PRIMARY_CTA_CLASS}>
-                    Weiter zum Dashboard
+                    {t("invite.continueDashboard")}
                   </Link>
                   <Link
                     href={`/founder-alignment/workbook?invitationId=${encodeURIComponent(inviteData.invitationId)}&teamContext=${encodeURIComponent(inviteData.teamContext)}`}
                     className={SECONDARY_CTA_CLASS}
                   >
-                    Workbook öffnen
+                    {t("invite.openWorkbook")}
                   </Link>
                 </div>
               </>
@@ -252,16 +250,15 @@ export default async function AdvisorInvitePage({
 
           <section className="rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              Was du als Advisor siehst
+              {t("invite.whatYouSee")}
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-              <li>• Founder-Snapshot und priorisierte Spannungs- bzw. Fokusfelder</li>
-              <li>• das gemeinsame Alignment Workbook inklusive Advisor-Impulse</li>
-              <li>• Founder-Reaktionen und Follow-up-Status</li>
+              <li>• {t("invite.visibleItems.snapshot")}</li>
+              <li>• {t("invite.visibleItems.workbook")}</li>
+              <li>• {t("invite.visibleItems.followUp")}</li>
             </ul>
             <p className="mt-5 text-sm leading-7 text-slate-600">
-              Nicht Teil des Advisor-Zugriffs sind rohe Assessment-Antworten oder die komplette
-              Antworthistorie der beiden Founder.
+              {t("invite.notVisible")}
             </p>
           </section>
         </div>

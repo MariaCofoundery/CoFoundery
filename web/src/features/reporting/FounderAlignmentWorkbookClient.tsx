@@ -1388,6 +1388,9 @@ export function FounderAlignmentWorkbookClient({
     : (visibleSteps[0]?.id ?? workbook.currentStepId);
   const currentIndex = workbookStepIndex(activeStepId, visibleSteps);
   const currentStep = visibleSteps[Math.max(currentIndex, 0)];
+  const currentStepPrompts = wt.raw(`steps.${currentStep.id}.prompts`) as string[];
+  const currentStepTitle = wt(`steps.${currentStep.id}.title`);
+  const currentStepSubtitle = wt(`steps.${currentStep.id}.subtitle`);
   const founderALabel = founderAName?.trim() || "Founder A";
   const founderBLabel = founderBName?.trim() || "Founder B";
 
@@ -1978,9 +1981,9 @@ export function FounderAlignmentWorkbookClient({
   ]);
   const currentAgreementValue = currentStepEntry.agreement.trim();
   const currentStepHasAgreement = currentAgreementValue.length > 0;
-  const helperQuestion = currentStep.prompts[0] ?? "Welche gemeinsame Absprache soll hier fuer euch gelten?";
+  const helperQuestion = currentStepPrompts[0] ?? currentStep.prompts[0] ?? "Welche gemeinsame Absprache soll hier fuer euch gelten?";
   const shortContext = currentStepContent.context.slice(0, 1);
-  const helperDetails = currentStep.prompts.slice(1);
+  const helperDetails = currentStepPrompts.slice(1);
   const stepProgressMeta = useMemo(
     () =>
       Object.fromEntries(
@@ -3374,7 +3377,9 @@ export function FounderAlignmentWorkbookClient({
                   {wt("common.workbook")}
                 </p>
                 <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
-                  {teamContextLabel(teamContext)}
+                  {teamContext === "existing_team"
+                    ? wt("client.teamContextExistingTeam")
+                    : wt("client.teamContextPreFounder")}
                 </div>
                 <h1 className="mt-3 text-3xl font-semibold text-slate-950">
                   {wt("client.title")}
@@ -3839,7 +3844,10 @@ export function FounderAlignmentWorkbookClient({
               </p>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {wt("client.existingWorkbookDescription", {
-                  context: teamContextLabel(storedTeamContext),
+                  context:
+                    storedTeamContext === "existing_team"
+                      ? wt("client.teamContextExistingTeam")
+                      : wt("client.teamContextPreFounder"),
                 })}
               </p>
             </div>
@@ -3868,13 +3876,15 @@ export function FounderAlignmentWorkbookClient({
             className="order-2 self-start rounded-[30px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.045)] xl:order-1 xl:sticky xl:top-24"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Schritte</p>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                {wt("client.stepsEyebrow")}
+              </p>
               <span className="text-sm text-slate-600">
                 {completedStepsCount}/{visibleSteps.length}
               </span>
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              {t(`Schritt ${currentIndex + 1} von ${visibleSteps.length}`)}
+              {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
             </p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
               <div
@@ -3890,10 +3900,10 @@ export function FounderAlignmentWorkbookClient({
                 const stepToneMeta = workbookToneMeta(workbookStepVisualTone(step.id));
                 const progressMeta = stepProgressMeta[step.id];
                 const statusLabel = progressMeta?.completed
-                  ? t("Bereit")
+                  ? wt("client.ready")
                   : progressMeta?.started
-                    ? t("In Arbeit")
-                    : t("Offen");
+                    ? wt("client.inProgress")
+                    : wt("client.open");
                 return (
                   <li
                     key={step.id}
@@ -3915,9 +3925,9 @@ export function FounderAlignmentWorkbookClient({
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">
-                            Schritt {index + 1}
+                            {wt("client.stepLabel", { current: index + 1 })}
                           </p>
-                          <p className="mt-1 truncate text-sm font-medium">{step.title}</p>
+                          <p className="mt-1 truncate text-sm font-medium">{wt(`steps.${step.id}.title`)}</p>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {isPrioritized ? (
@@ -3926,7 +3936,7 @@ export function FounderAlignmentWorkbookClient({
                                 stepToneMeta.sidebarFocus
                               }`}
                             >
-                              {t("Fokus")}
+                              {wt("client.focus")}
                             </span>
                           ) : null}
                           {progressMeta?.started ? (
@@ -3959,9 +3969,9 @@ export function FounderAlignmentWorkbookClient({
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="max-w-3xl">
                     <p className={`text-[11px] uppercase tracking-[0.22em] ${currentToneMeta.headerKicker}`}>
-                      Schritt {currentIndex + 1} von {visibleSteps.length}
+                      {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
                     </p>
-                    <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
+                    <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStepTitle}</h2>
                     {!isAdvisorViewer ? (
                       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
                         {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll.")}
@@ -3970,7 +3980,7 @@ export function FounderAlignmentWorkbookClient({
                     {currentStepIsPrioritized ? (
                       <div className="mt-4 flex flex-wrap items-center gap-2">
                         <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
-                          {t("Fokus")}
+                          {wt("client.focus")}
                         </span>
                       </div>
                     ) : null}
@@ -4023,7 +4033,7 @@ export function FounderAlignmentWorkbookClient({
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className={`text-[11px] uppercase tracking-[0.22em] ${currentToneMeta.headerKicker}`}>
-                        Schritt {currentIndex + 1} von {visibleSteps.length}
+                        {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
                         {t(
@@ -4042,23 +4052,23 @@ export function FounderAlignmentWorkbookClient({
                     </span>
                   </div>
                 </div>
-                <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStep.title}</h2>
+                <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStepTitle}</h2>
                 {currentStepIsPrioritized ? (
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <span className={`rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
-                      {t("Fokus")}
+                      {wt("client.focus")}
                     </span>
                   </div>
                 ) : null}
                 <p className="mt-3 max-w-3xl text-[15px] leading-8 text-slate-700">
-                  {currentStep.subtitle}
+                  {currentStepSubtitle}
                 </p>
               </>
             )}
 
             {!currentStepIsPremiumPilot ? (
               <>
-                <StepSection title="1. Kontext" className="mt-8 border-slate-200 bg-slate-50/80">
+                <StepSection title={wt("client.context")} className="mt-8 border-slate-200 bg-slate-50/80">
                   <div className="space-y-3">
                     {shortContext.map((paragraph) => (
                       <p key={paragraph} className="text-sm leading-7 text-slate-700">
@@ -4343,11 +4353,12 @@ export function FounderAlignmentWorkbookClient({
                 <section className={`mt-8 rounded-[30px] px-5 py-7 sm:px-7 sm:py-8 ${currentToneMeta.headerSurface}`}>
                   <div className="max-w-4xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      {t("Leitfrage")}
+                      {wt("client.leadQuestion")}
                     </p>
                     <p className="mt-3 text-[1.55rem] font-semibold leading-[1.28] text-slate-950 sm:text-[2rem] sm:leading-[1.22]">
                       {t(
                         currentPremiumV2Config.question ??
+                          currentStepPrompts[0] ??
                           currentStep.prompts[0] ??
                           "Wie regelt ihr Entscheidungen so, dass sie auch unter Druck klar bleiben?"
                       )}

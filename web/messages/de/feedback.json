@@ -1,0 +1,46 @@
+{
+  "trigger": "Feedback",
+  "workbookTitle": "Kurzer Check: Hat euch das wirklich weitergebracht?",
+  "workbookText": "Ich baue CoFoundery gerade aktiv weiter - dein Feedback hilft mir extrem, das Tool wirklich besser zu machen.",
+  "giveFeedback": "Feedback geben",
+  "close": "Feedback schließen",
+  "dialogTitle": "Kurzer Produkt-Check",
+  "dialogText": "Ich freue mich wirklich über dein Feedback - vor allem, was dir geholfen hat, was unklar war und was noch fehlt.",
+  "requiredError": "Bitte beantworte zuerst die drei Fragen, die für mich besonders wichtig sind.",
+  "invalidError": "Bitte prüfe deine Antworten noch einmal.",
+  "saveError": "Das Feedback konnte gerade nicht gespeichert werden.",
+  "thanks": "Danke - das hilft mir wirklich weiter.",
+  "done": "Schließen",
+  "questions": {
+    "q1": "1. Was war für dich der wertvollste Moment im Tool?",
+    "q2": "2. Wo hat es sich nicht klar oder unnötig kompliziert angefühlt?",
+    "q3": "3. Was müsste sich ändern, damit du sagen würdest: Das hat mir wirklich geholfen?",
+    "q4": "4. Wobei würdest du dir noch mehr Unterstützung wünschen?",
+    "q4Other": "Was genau fehlt dir noch?",
+    "q5": "5. Gibt es noch etwas, das du mir sagen möchtest?"
+  },
+  "assistance": {
+    "matching_besser_verstehen": "Matching besser verstehen",
+    "unterschiede_klarer_sehen": "Unterschiede klarer sehen",
+    "entscheidungen_treffen": "Entscheidungen treffen",
+    "zusammenarbeit_strukturieren": "Zusammenarbeit strukturieren",
+    "konflikte_greifbarer_machen": "Konflikte greifbarer machen",
+    "anderes": "Etwas anderes"
+  },
+  "requiredHint": "Die ersten drei Fragen sind für mich besonders wichtig, alles andere ist optional.",
+  "cancel": "Abbrechen",
+  "saving": "Speichere...",
+  "submit": "Feedback senden",
+  "dictation": {
+    "accepted": "Text übernommen. Du kannst direkt weiter diktieren.",
+    "unsupported": "Diktieren ist in diesem Browser nicht verfügbar.",
+    "unsupportedLong": "Diktieren ist in diesem Browser leider nicht verfügbar.",
+    "restartFailed": "Die Aufnahme konnte nicht erneut gestartet werden.",
+    "listening": "Ich höre zu ...",
+    "startFailed": "Die Aufnahme konnte gerade nicht gestartet werden.",
+    "stop": "Diktat stoppen",
+    "start": "Diktat starten",
+    "recording": "Aufnahme läuft",
+    "waiting": "Wartet auf Sprache"
+  }
+}

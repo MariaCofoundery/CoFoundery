@@ -49,6 +49,12 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
   const dashboard = messages.dashboard as {
     hero?: { eyebrow?: string };
     actions?: { inviteCofounder?: string };
+    profileSnapshot?: {
+      dimensions?: {
+        companyLogic?: { label?: string };
+      };
+    };
+    account?: { delete?: { button?: string } };
   };
   const workspace = messages.workspace as {
     agreement?: { editor?: { saveSection?: string } };
@@ -56,6 +62,7 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
   const workbook = messages.workbook as {
     intro?: { start?: string };
     client?: { title?: string };
+    steps?: { vision_direction?: { title?: string } };
   };
   const report = messages.report as {
     common?: { savePdf?: string };
@@ -66,9 +73,37 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
   assert.equal(auth.magicLinkForm?.submit, "Send magic link");
   assert.equal(dashboard.hero?.eyebrow, "Founder dashboard");
   assert.equal(dashboard.actions?.inviteCofounder, "Invite co-founder");
+  assert.equal(dashboard.profileSnapshot?.dimensions?.companyLogic?.label, "Company logic");
+  assert.equal(dashboard.account?.delete?.button, "Delete account");
   assert.equal(workspace.agreement?.editor?.saveSection, "Save section");
   assert.equal(workbook.intro?.start, "Start workbook");
   assert.equal(workbook.client?.title, "Workbook for your conversation");
+  assert.equal(workbook.steps?.vision_direction?.title, "Company logic");
   assert.equal(report.common?.savePdf, "Save as PDF");
   assert.equal(report.session?.startWorkspace, "Start shared workspace");
+});
+
+test("loads English feedback and advisor messages", () => {
+  const messages = getMessages("en");
+  const feedback = messages.feedback as {
+    dialogTitle?: string;
+    dictation?: { start?: string };
+  };
+  const advisor = messages.advisor as {
+    dashboard?: { statuses?: { reportReady?: string } };
+    invite?: { openWorkbook?: string };
+    teamContext?: { existingTeam?: string };
+  };
+  const navigation = messages.navigation as {
+    statusLabels?: { inProgress?: string };
+    teamContexts?: { existingTeam?: string };
+  };
+
+  assert.equal(feedback.dialogTitle, "Quick product check");
+  assert.equal(feedback.dictation?.start, "Start dictation");
+  assert.equal(advisor.teamContext?.existingTeam, "Existing team");
+  assert.equal(advisor.dashboard?.statuses?.reportReady, "Report ready");
+  assert.equal(advisor.invite?.openWorkbook, "Open workbook");
+  assert.equal(navigation.statusLabels?.inProgress, "In progress");
+  assert.equal(navigation.teamContexts?.existingTeam, "Existing team");
 });

@@ -50,7 +50,101 @@
     "backToLastStep": "Zurück zum letzten Schritt",
     "toSummary": "Zur Zusammenfassung",
     "nextDimension": "Zur nächsten Dimension",
-    "leaveStep": "Diesen Schritt vorerst verlassen"
+    "leaveStep": "Diesen Schritt vorerst verlassen",
+    "stepsEyebrow": "Schritte",
+    "stepLabel": "Schritt {current}",
+    "ready": "Bereit",
+    "inProgress": "In Arbeit",
+    "open": "Offen",
+    "focus": "Fokus",
+    "context": "1. Kontext",
+    "leadQuestion": "Leitfrage"
+    ,
+    "teamContextPreFounder": "Mögliche Gründungspartnerschaft",
+    "teamContextExistingTeam": "Bestehendes Founder-Team"
+  },
+  "steps": {
+    "vision_direction": {
+      "title": "Unternehmenslogik",
+      "subtitle": "Wie entscheidet ihr im Alltag, was Vorrang bekommt, was liegen bleibt und was euch vom Kernfokus wegzieht?",
+      "prompts": [
+        "Was bekommt Vorrang, wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen?",
+        "Welche Chancen oder Anfragen verfolgt ihr bewusst nicht, auch wenn sie kurzfristig Geld oder Sichtbarkeit bringen?",
+        "Was gilt, wenn ein Thema Umsatz bringt, euch aber vom Kernfokus wegzieht?"
+      ]
+    },
+    "roles_responsibility": {
+      "title": "Rollen & Verantwortung",
+      "subtitle": "Wie legt ihr fest, wer führt, was sichtbar bleibt und ab wann die andere Person mit rein muss?",
+      "prompts": [
+        "Welche Themen führt eine Person klar eigenständig?",
+        "Wo braucht die andere Person früh Mitsicht?",
+        "Ab wann wird aus Eigenverantwortung ein gemeinsames Thema?"
+      ]
+    },
+    "decision_rules": {
+      "title": "Entscheidungsregeln",
+      "subtitle": "Wie sorgt ihr dafür, dass Entscheidungen auch unter Druck klar fallen?",
+      "prompts": [
+        "Was darf eine Person allein entscheiden, ohne vorher zu fragen?",
+        "Wann müssen beide zustimmen?",
+        "Was gilt, wenn ihr euch nicht einig seid und schnell entscheiden müsst?"
+      ]
+    },
+    "commitment_load": {
+      "title": "Commitment & Belastung",
+      "subtitle": "Wie macht ihr Einsatz, Verfügbarkeit und Belastung früh sichtbar, bevor stiller Druck entsteht?",
+      "prompts": [
+        "Was ist im Normalmodus realistisch leistbar?",
+        "Was muss früh sichtbar werden, wenn Kapazität kippt?",
+        "Was sortiert ihr zuerst neu, wenn Zusagen nicht mehr tragbar sind?"
+      ]
+    },
+    "collaboration_conflict": {
+      "title": "Zusammenarbeit & Konflikt",
+      "subtitle": "Wie regelt ihr Feedback, Klärung und Konflikte so, dass sie nicht liegen bleiben oder den Alltag blockieren?",
+      "prompts": [
+        "Was sprecht ihr sofort an und was wartet bis zu einem festen Klärungspunkt?",
+        "Wie gebt ihr kritisches Feedback, damit es klar bleibt und nicht als Angriff landet?",
+        "Was passiert, wenn ein Thema im Gespräch nicht gelöst wird?"
+      ]
+    },
+    "ownership_risk": {
+      "title": "Ownership & Risiko",
+      "subtitle": "Wie legt ihr fest, wer Risiken führt, wann sie sichtbar werden und ab welcher Schwelle gemeinsam entschieden wird?",
+      "prompts": [
+        "Welche Risiken führt eine Person selbst, und wo braucht es früh Sichtbarkeit?",
+        "Welche Schwelle beendet stille Beobachtung?",
+        "Wann hat Absicherung Vorrang vor Tempo?"
+      ]
+    },
+    "values_guardrails": {
+      "title": "Werte & unternehmerische Leitplanken",
+      "subtitle": "Wie legt ihr fest, was tragbar ist, was ein Grenzfall bleibt und was nicht euer Weg ist?",
+      "prompts": [
+        "Welche Kompromisse sind für euch noch tragbar?",
+        "Welche Fälle brauchen immer eine bewusste gemeinsame Freigabe?",
+        "Was macht ihr nicht, auch wenn es wirtschaftlich attraktiv wirkt?"
+      ]
+    },
+    "alignment_90_days": {
+      "title": "90-Tage-Fokus",
+      "subtitle": "Wie legt ihr für die nächsten 90 Tage klar fest, was Vorrang hat, was liegen bleibt und woran ihr Fortschritt messt?",
+      "prompts": [
+        "Was hat in den nächsten 90 Tagen absolute Priorität?",
+        "Was macht ihr bewusst nicht, auch wenn es sinnvoll wirken könnte?",
+        "Woran erkennt ihr früh, dass ihr mit euren Prioritäten wirklich vorankommt?"
+      ]
+    },
+    "advisor_closing": {
+      "title": "Advisor-Abschluss",
+      "subtitle": "Welche Beobachtungen, offenen Rückfragen und nächsten Schritte sollte der Advisor am Ende sichtbar machen?",
+      "prompts": [
+        "Was sollte dieses Team nach der Session nicht übersehen?",
+        "Welche Rückfragen bleiben fachlich wichtig?",
+        "Was ist der sinnvollste nächste Schritt?"
+      ]
+    }
   },
   "save": {
     "preview": "Vorschau ohne Speichern",

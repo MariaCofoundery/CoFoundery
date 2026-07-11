@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { revokeAdvisorPendingTeamInviteAction } from "@/features/dashboard/advisorTeamInviteActions";
 import { AdvisorTeamInviteForm } from "@/features/dashboard/AdvisorTeamInviteForm";
 import {
@@ -14,6 +15,7 @@ import {
   type AdvisorDashboardTeam,
 } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
@@ -24,6 +26,8 @@ const TERTIARY_CTA_CLASS =
   "inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700";
 const DISABLED_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400";
+
+type AdvisorT = Awaited<ReturnType<typeof getTranslations>>;
 
 function accessStatusClassName(status: AdvisorDashboardTeam["accessStatus"]) {
   if (status === "ready") {
@@ -53,103 +57,146 @@ function progressToneClassName(params: { active: boolean; tone: "default" | "suc
   return "border-sky-200 bg-sky-50/80 text-sky-800";
 }
 
-function reportStatusLabel(team: AdvisorDashboardTeam) {
+function reportStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   if (!team.workbookAvailable) {
-    return "Noch kein Zugriff";
+    return t("dashboard.statuses.noAccess");
   }
 
   if (team.reportReady) {
-    return "Bereit";
+    return t("dashboard.statuses.ready");
   }
 
-  return "In Vorbereitung";
+  return t("dashboard.statuses.preparing");
 }
 
-function teamStandLabel(team: AdvisorDashboardTeam) {
+function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   if (team.accessStatus === "paused") {
-    return "Advisor-Zugriff pausiert";
+    return t("dashboard.statuses.advisorPaused");
   }
 
   if (team.accessStatus === "waiting_for_approval") {
-    return "Wartet auf Founder-Freigabe";
+    return t("dashboard.statuses.waitingApproval");
   }
 
   if (!team.workbookAvailable) {
-    return "Team noch im Start";
+    return t("dashboard.statuses.teamStarting");
   }
 
   if (team.reportReady) {
-    return "Report bereit";
+    return t("dashboard.statuses.reportReady");
   }
 
   if (team.statusLabel === "Founder-Reaktion liegt vor") {
-    return "Founder-Reaktion liegt vor";
+    return t("dashboard.statuses.founderReactionReady");
   }
 
   if (team.statusLabel === "Founder-Reaktion offen") {
-    return "Absprache wartet auf Founder-Reaktion";
+    return t("dashboard.statuses.founderReactionOpen");
   }
 
   if (team.statusLabel === "Workbook in Arbeit") {
-    return "Workbook wurde aktualisiert";
+    return t("dashboard.statuses.workbookUpdated");
   }
 
   if (team.statusLabel === "Workbook noch leer") {
-    return "Workbook noch im Start";
+    return t("dashboard.statuses.workbookStarting");
   }
 
   return team.statusLabel;
 }
 
-function teamAttentionLabel(team: AdvisorDashboardTeam) {
+function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   if (team.accessStatus !== "ready") {
     return team.accessStatus === "paused"
-      ? "Freigabestatus pruefen"
-      : "Wartet auf zweite Founder-Freigabe";
+      ? t("dashboard.statuses.checkApproval")
+      : t("dashboard.statuses.waitingSecondApproval");
   }
 
   if (!team.reportReady) {
     if (team.statusLabel === "Workbook noch leer") {
-      return "Ersten Workbook-Stand abwarten";
+      return t("dashboard.statuses.waitWorkbook");
     }
-    return "Workbook oeffnen und Stand pruefen";
+    return t("dashboard.statuses.checkWorkbook");
   }
 
   if (team.statusLabel === "Founder-Reaktion liegt vor") {
-    return "Founder-Reaktion ansehen";
+    return t("dashboard.statuses.viewFounderReaction");
   }
 
   if (team.statusLabel === "Founder-Reaktion offen") {
-    return "Workbook auf neue Reaktion pruefen";
+    return t("dashboard.statuses.checkNewReaction");
   }
 
   if (team.statusLabel === "Workbook in Arbeit") {
-    return "Aktuelle Absprache ansehen";
+    return t("dashboard.statuses.viewCurrentAgreement");
   }
 
-  return "Report oder Workbook oeffnen";
+  return t("dashboard.statuses.openReportOrWorkbook");
 }
 
-function teamLastActivityLabel(team: AdvisorDashboardTeam) {
-  return team.lastActivityLabel.replace(/^Pre-Founder\s·\s/, "Pre-Founder · Zuletzt aktiv ").replace(
-    /^Bestehendes Team\s·\s/,
-    "Bestehendes Team · Zuletzt aktiv "
-  );
+function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
+  const teamContext =
+    team.teamContext === "existing_team"
+      ? t("teamContext.existingTeam")
+      : t("teamContext.preFounder");
+  const timestamp = team.lastActivityLabel
+    .replace(/^Pre-Founder\s·\s/, "")
+    .replace(/^Bestehendes Team\s·\s/, "");
+
+  return `${teamContext} · ${t("dashboard.lastActivityPrefix")} ${timestamp}`;
 }
 
-function pendingStandLabel(invite: AdvisorPendingTeamInvite) {
+function accessStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
+  if (team.accessStatus === "paused") {
+    return team.canOpenWorkbook
+      ? t("dashboard.statuses.accessPaused")
+      : t("dashboard.statuses.accessRevoked");
+  }
+
+  if (team.accessStatus === "ready") {
+    return t("dashboard.statuses.accessGranted");
+  }
+
+  return t("dashboard.statuses.accessWaiting");
+}
+
+function accessStatusDescription(team: AdvisorDashboardTeam, t: AdvisorT) {
+  if (team.accessStatus === "paused") {
+    return team.canOpenWorkbook
+      ? t("dashboard.accessDescription.paused")
+      : t("dashboard.accessDescription.revoked");
+  }
+
+  if (team.accessStatus === "ready") {
+    return t("dashboard.accessDescription.ready");
+  }
+
+  return t("dashboard.accessDescription.waiting");
+}
+
+function approvalSummary(team: AdvisorDashboardTeam, t: AdvisorT) {
+  if (team.accessStatus === "ready") {
+    return t("dashboard.approvals", { count: 2 });
+  }
+
+  const match = team.approvalSummary.match(/^(\d+)/);
+  const count = match ? Number(match[1]) : 0;
+  return t("dashboard.approvals", { count });
+}
+
+function pendingStandLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
   if (invite.founderAStarted && invite.founderBStarted) {
-    return "Beide Founder haben gestartet";
+    return t("dashboard.statuses.bothStarted");
   }
   if (invite.founderAStarted || invite.founderBStarted) {
-    return "1 von 2 Foundern gestartet";
+    return t("dashboard.statuses.oneStarted");
   }
-  return "Team noch im Start";
+  return t("dashboard.statuses.teamStarting");
 }
 
-function pendingAttentionLabel(invite: AdvisorPendingTeamInvite) {
+function pendingAttentionLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
   if (!invite.founderAStarted && !invite.founderBStarted) {
-    return "Wartet auf den ersten Start";
+    return t("dashboard.statuses.waitingFirstStart");
   }
 
   const openFounder = !invite.founderAStarted
@@ -159,19 +206,19 @@ function pendingAttentionLabel(invite: AdvisorPendingTeamInvite) {
       : null;
 
   if (openFounder) {
-    return `${openFounder} noch offen`;
+    return t("dashboard.statuses.founderOpen", { name: openFounder });
   }
 
-  return "Wechselt gleich in die begleiteten Teams";
+  return t("dashboard.statuses.movesToTeams");
 }
 
-function pendingFounderProgressLabel(invite: AdvisorPendingTeamInvite, founder: "A" | "B") {
+function pendingFounderProgressLabel(invite: AdvisorPendingTeamInvite, founder: "A" | "B", t: AdvisorT) {
   const isStarted = founder === "A" ? invite.founderAStarted : invite.founderBStarted;
-  return isStarted ? "gestartet" : "offen";
+  return isStarted ? t("dashboard.statuses.started") : t("dashboard.statuses.open");
 }
 
-function formatPendingTimestamp(value: string) {
-  return new Intl.DateTimeFormat("de-DE", {
+function formatPendingTimestamp(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -198,7 +245,7 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   );
 }
 
-function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?: boolean }) {
+function TeamCard({ team, t, debug = false }: { team: AdvisorDashboardTeam; t: AdvisorT; debug?: boolean }) {
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -207,13 +254,17 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
             <TeamFounderAvatars team={team} />
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                {team.teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder"}
+                {team.teamContext === "existing_team"
+                  ? t("teamContext.existingTeam")
+                  : t("teamContext.preFounder")}
               </p>
               <h3 className="mt-1 text-xl font-semibold text-slate-950">
                 {team.founderAName} & {team.founderBName}
               </h3>
               {team.teamName ? (
-                <p className="mt-1 text-sm text-slate-600">Team/Projekt: {team.teamName}</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  {t("dashboard.teamProject", { name: team.teamName })}
+                </p>
               ) : null}
             </div>
           </div>
@@ -221,45 +272,47 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
           <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Stand
+                {t("dashboard.fields.status")}
               </span>
-              {teamStandLabel(team)}
+              {teamStandLabel(team, t)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Zuletzt
+                {t("dashboard.fields.last")}
               </span>
-              {teamLastActivityLabel(team)}
+              {teamLastActivityLabel(team, t)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Naechster Blick
+                {t("dashboard.fields.nextLook")}
               </span>
-              {teamAttentionLabel(team)}
+              {teamAttentionLabel(team, t)}
             </p>
           </div>
         </div>
 
         <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-64">
           <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${accessStatusClassName(team.accessStatus)}`}>
-            {team.accessStatusLabel}
+            {accessStatusLabel(team, t)}
           </span>
-          <p className="mt-3 font-medium text-slate-900">Freigabe: {team.approvalSummary}</p>
-          <p className="mt-1 leading-6 text-slate-600">{team.accessStatusDescription}</p>
+          <p className="mt-3 font-medium text-slate-900">
+            {t("dashboard.fields.approval")}: {approvalSummary(team, t)}
+          </p>
+          <p className="mt-1 leading-6 text-slate-600">{accessStatusDescription(team, t)}</p>
           <div className="mt-4 grid gap-2">
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Report</span>
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.report")}</span>
               <span
                 className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${progressToneClassName({
                   active: team.reportReady && team.workbookAvailable,
                   tone: team.reportReady ? "success" : "warning",
                 })}`}
               >
-                {reportStatusLabel(team)}
+                {reportStatusLabel(team, t)}
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Follow-up</span>
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>
               <span className="text-xs font-medium text-slate-700">{team.followUpLabel}</span>
             </div>
           </div>
@@ -269,23 +322,23 @@ function TeamCard({ team, debug = false }: { team: AdvisorDashboardTeam; debug?:
       <div className="mt-6 flex flex-wrap gap-3">
         {team.canOpenWorkbook ? (
           <Link href={team.workbookHref} className={PRIMARY_CTA_CLASS}>
-            Workbook öffnen
+            {t("dashboard.openWorkbook")}
           </Link>
         ) : (
-          <span className={DISABLED_CTA_CLASS}>{team.accessStatusLabel}</span>
+          <span className={DISABLED_CTA_CLASS}>{accessStatusLabel(team, t)}</span>
         )}
         {team.canOpenWorkbook && team.reportReady ? (
           <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
-            Report ansehen
+            {t("dashboard.viewReport")}
           </Link>
         ) : null}
         {team.canOpenWorkbook ? (
           <Link href={team.snapshotHref} className={TERTIARY_CTA_CLASS}>
-            Snapshot exportieren
+            {t("dashboard.exportSnapshot")}
           </Link>
         ) : null}
         {team.canOpenWorkbook && !team.reportReady ? (
-          <span className={DISABLED_CTA_CLASS}>Report noch nicht bereit</span>
+          <span className={DISABLED_CTA_CLASS}>{t("dashboard.reportNotReady")}</span>
         ) : null}
       </div>
 
@@ -312,11 +365,13 @@ function TeamSection({
   title,
   description,
   teams,
+  t,
   debug = false,
 }: {
   title: string;
   description: string;
   teams: AdvisorDashboardTeam[];
+  t: AdvisorT;
   debug?: boolean;
 }) {
   if (teams.length === 0) return null;
@@ -329,24 +384,32 @@ function TeamSection({
           <p className="mt-1 text-sm leading-6 text-slate-600">{description}</p>
         </div>
         <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
-          {teams.length} Team{teams.length === 1 ? "" : "s"}
+          {t("dashboard.teamCount", { count: teams.length })}
         </span>
       </div>
       <div className="grid gap-5">
         {teams.map((team) => (
-          <TeamCard key={team.invitationId} team={team} debug={debug} />
+          <TeamCard key={team.invitationId} team={team} t={t} debug={debug} />
         ))}
       </div>
     </section>
   );
 }
 
-function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
+function PendingInviteCard({
+  invite,
+  t,
+  locale,
+}: {
+  invite: AdvisorPendingTeamInvite;
+  t: AdvisorT;
+  locale: string;
+}) {
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 max-w-3xl">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Founder-Matching</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("dashboard.pending.type")}</p>
           <h3 className="mt-1 text-xl font-semibold text-slate-950">
             {invite.teamName || `${invite.founderALabel} & ${invite.founderBLabel}`}
           </h3>
@@ -359,28 +422,28 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
           <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Stand
+                {t("dashboard.fields.status")}
               </span>
-              {pendingStandLabel(invite)}
+              {pendingStandLabel(invite, t)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Zuletzt
+                {t("dashboard.fields.last")}
               </span>
-              {formatPendingTimestamp(invite.lastActivityAt)}
+              {formatPendingTimestamp(invite.lastActivityAt, locale)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                Naechster Blick
+                {t("dashboard.fields.nextLook")}
               </span>
-              {pendingAttentionLabel(invite)}
+              {pendingAttentionLabel(invite, t)}
             </p>
           </div>
         </div>
 
         <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
           <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-            Founder eingeladen
+            {t("dashboard.statuses.founderInvited")}
           </span>
           <div className="mt-4 grid gap-2">
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
@@ -392,7 +455,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
                     : "border-slate-200 bg-slate-50 text-slate-500"
                 }`}
               >
-                {pendingFounderProgressLabel(invite, "A")}
+                {pendingFounderProgressLabel(invite, "A", t)}
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
@@ -404,7 +467,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
                     : "border-slate-200 bg-slate-50 text-slate-500"
                 }`}
               >
-                {pendingFounderProgressLabel(invite, "B")}
+                {pendingFounderProgressLabel(invite, "B", t)}
               </span>
             </div>
           </div>
@@ -415,7 +478,7 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
                 type="submit"
                 className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800"
               >
-                Aus Übersicht entfernen
+                {t("dashboard.pending.remove")}
               </button>
             </form>
           ) : null}
@@ -427,8 +490,12 @@ function PendingInviteCard({ invite }: { invite: AdvisorPendingTeamInvite }) {
 
 function PendingInviteSection({
   invites,
+  t,
+  locale,
 }: {
   invites: AdvisorPendingTeamInvite[];
+  t: AdvisorT;
+  locale: string;
 }) {
   if (invites.length === 0) {
     return null;
@@ -438,18 +505,18 @@ function PendingInviteSection({
     <section className="mt-8">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950">Neu eingeladen</h2>
+          <h2 className="text-lg font-semibold text-slate-950">{t("dashboard.pending.title")}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">
-            Diese Teams hast du bereits angestoßen. Sobald beide Founder gestartet haben, wechseln sie automatisch in deine begleiteten Teams.
+            {t("dashboard.pending.description")}
           </p>
         </div>
         <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
-          {invites.length} offen
+          {t("dashboard.pending.openCount", { count: invites.length })}
         </span>
       </div>
       <div className="grid gap-5">
         {invites.map((invite) => (
-          <PendingInviteCard key={invite.id} invite={invite} />
+          <PendingInviteCard key={invite.id} invite={invite} t={t} locale={locale} />
         ))}
       </div>
     </section>
@@ -464,6 +531,8 @@ export default async function AdvisorDashboardPage({
   const params = await searchParams;
   const debug = params.debug === "1";
   const supabase = await createClient();
+  const t = await getTranslations("advisor");
+  const locale = getRequestLocale();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -532,13 +601,12 @@ export default async function AdvisorDashboardPage({
               fallbackClassName="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-lg font-semibold text-white shadow-[0_14px_32px_rgba(15,23,42,0.08)]"
             />
             <div className="max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Advisor-Arbeitsplatz</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("dashboard.workspaceEyebrow")}</p>
               <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
                 {displayName}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-                Du begleitest Founder-Teams mit Außenblick. Zugriff entsteht erst, wenn beide Founder
-                die Begleitung aktiv freigegeben haben.
+                {t("dashboard.heroText")}
               </p>
             </div>
           </div>
@@ -547,19 +615,19 @@ export default async function AdvisorDashboardPage({
             <div className="rounded-2xl bg-emerald-50/80 px-3 py-3">
               <p className="text-2xl font-semibold text-emerald-800">{readyTeams.length}</p>
               <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-emerald-700">
-                Bereit
+                {t("dashboard.summary.ready")}
               </p>
             </div>
             <div className="rounded-2xl bg-slate-50 px-3 py-3">
               <p className="text-2xl font-semibold text-slate-800">{waitingTeams.length}</p>
               <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                Wartet
+                {t("dashboard.summary.waiting")}
               </p>
             </div>
             <div className="rounded-2xl bg-amber-50/80 px-3 py-3">
               <p className="text-2xl font-semibold text-amber-800">{pausedTeams.length}</p>
               <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-amber-700">
-                Pausiert
+                {t("dashboard.summary.paused")}
               </p>
             </div>
           </div>
@@ -576,12 +644,12 @@ export default async function AdvisorDashboardPage({
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Teams & Workbooks</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("dashboard.teamsEyebrow")}</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              Deine begleiteten Teams
+              {t("dashboard.teamsTitle")}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-              Du siehst pro Team Freigabe, aktuellen Stand und worauf sich dein Blick gerade am ehesten lohnt.
+              {t("dashboard.teamsDescription")}
             </p>
           </div>
         </div>
@@ -604,7 +672,9 @@ export default async function AdvisorDashboardPage({
                   <p className="font-semibold text-slate-900">
                     {team.founderAName} & {team.founderBName}
                   </p>
-                  {team.teamName ? <p className="text-slate-600">Team/Projekt: {team.teamName}</p> : null}
+                  {team.teamName ? (
+                    <p className="text-slate-600">{t("dashboard.teamProject", { name: team.teamName })}</p>
+                  ) : null}
                   <p>invitationId: {team.invitationId}</p>
                   <p>workbookHref: {team.workbookHref}</p>
                   <p>reportHref: {team.reportHref}</p>
@@ -617,7 +687,7 @@ export default async function AdvisorDashboardPage({
           </div>
         ) : null}
 
-        <PendingInviteSection invites={pendingInvites} />
+        <PendingInviteSection invites={pendingInvites} t={t} locale={locale} />
 
         {teams.length === 0 && pendingInvites.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white/82 p-8">
@@ -641,13 +711,12 @@ export default async function AdvisorDashboardPage({
               </div>
 
               <div className="max-w-2xl">
-                <p className="text-lg font-semibold text-slate-900">Noch keine Teams verknüpft</p>
+                <p className="text-lg font-semibold text-slate-900">{t("dashboard.emptyTitle")}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
-                  Sobald beide Founder gestartet und mit deinem Invite verknüpft sind, erscheint das Team hier
-                  mit seinem Freigabestatus.
+                  {t("dashboard.emptyText")}
                 </p>
                 <p className="mt-2 text-sm leading-7 text-slate-500">
-                  Bis dahin siehst du neue Einladungen oben bereits als offene Teamstarts.
+                  {t("dashboard.emptyHint")}
                 </p>
               </div>
             </div>
@@ -655,21 +724,24 @@ export default async function AdvisorDashboardPage({
         ) : (
           <>
             <TeamSection
-              title="Bereit zur Begleitung"
-              description="Freigabe vollstaendig. Hier lohnt sich der Blick ins Workbook, in den Report oder in den aktuellen Snapshot."
+              title={t("dashboard.readySectionTitle")}
+              description={t("dashboard.readySectionDescription")}
               teams={readyTeams}
+              t={t}
               debug={debug}
             />
             <TeamSection
-              title="Wartet auf Freigabe"
-              description="Diese Teams sind sichtbar, aber noch nicht vollstaendig freigegeben. Behalte den Freigabestand im Blick."
+              title={t("dashboard.waitingSectionTitle")}
+              description={t("dashboard.waitingSectionDescription")}
               teams={waitingTeams}
+              t={t}
               debug={debug}
             />
             <TeamSection
-              title="Zugriff pausiert"
-              description="Hier ist die Freigabe aktuell nicht vollstaendig aktiv. Der Stand bleibt sichtbar, der Arbeitszugriff pausiert."
+              title={t("dashboard.pausedSectionTitle")}
+              description={t("dashboard.pausedSectionDescription")}
               teams={pausedTeams}
+              t={t}
               debug={debug}
             />
           </>

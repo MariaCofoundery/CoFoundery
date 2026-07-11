@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import {
   PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS,
@@ -8,7 +9,6 @@ import {
   type ProductFeedbackSource,
 } from "@/features/feedback/productFeedback";
 import { submitProductFeedbackAction } from "@/features/feedback/actions";
-import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type ProductFeedbackEntryProps = {
   source: ProductFeedbackSource;
@@ -61,6 +61,7 @@ export function ProductFeedbackEntry({
   variant,
   triggerClassName,
 }: ProductFeedbackEntryProps) {
+  const t = useTranslations("feedback");
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -71,22 +72,20 @@ export function ProductFeedbackEntry({
           onClick={() => setIsOpen(true)}
           className={triggerClassName}
         >
-          {t("Feedback")}
+          {t("trigger")}
         </button>
       ) : (
         <section className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/80 p-6 print:hidden">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Feedback")}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("trigger")}</p>
           <h3 className="mt-3 text-xl font-semibold text-slate-950">
-            {t("Kurzer Check: Hat euch das wirklich weitergebracht?")}
+            {t("workbookTitle")}
           </h3>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-            {t(
-              "Ich baue CoFoundery gerade aktiv weiter — dein Feedback hilft mir extrem, das Tool wirklich besser zu machen."
-            )}
+            {t("workbookText")}
           </p>
           <div className="mt-5">
             <ReportActionButton onClick={() => setIsOpen(true)}>
-              {t("Feedback geben")}
+              {t("giveFeedback")}
             </ReportActionButton>
           </div>
         </section>
@@ -112,6 +111,7 @@ function ProductFeedbackDialog({
   invitationId: string | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("feedback");
   const [q1Value, setQ1Value] = useState("");
   const [q2Value, setQ2Value] = useState("");
   const [q3Value, setQ3Value] = useState("");
@@ -121,10 +121,7 @@ function ProductFeedbackDialog({
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const titleId = useMemo(
-    () => `product-feedback-title-${Math.random().toString(36).slice(2, 8)}`,
-    []
-  );
+  const titleId = useId();
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -145,7 +142,7 @@ function ProductFeedbackDialog({
 
   function handleSubmit() {
     if (!q1Value.trim() || !q2Value.trim() || !q3Value.trim()) {
-      setError(t("Bitte beantworte zuerst die drei Fragen, die fuer mich besonders wichtig sind."));
+      setError(t("requiredError"));
       return;
     }
 
@@ -166,8 +163,8 @@ function ProductFeedbackDialog({
       if (!result.ok) {
         setError(
           result.reason === "invalid_input"
-            ? t("Bitte pruefe deine Antworten noch einmal.")
-            : t("Das Feedback konnte gerade nicht gespeichert werden.")
+            ? t("invalidError")
+            : t("saveError")
         );
         return;
       }
@@ -185,7 +182,7 @@ function ProductFeedbackDialog({
     >
       <button
         type="button"
-        aria-label={t("Feedback schliessen")}
+        aria-label={t("close")}
         className="absolute inset-0 cursor-default"
         onClick={onClose}
       />
@@ -199,21 +196,19 @@ function ProductFeedbackDialog({
           <div className="shrink-0 border-b border-slate-200/80 px-6 py-6 sm:px-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Feedback")}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("trigger")}</p>
                 <h2 id={titleId} className="mt-3 text-2xl font-semibold text-slate-950">
-                  {t("Kurzer Produkt-Check")}
+                  {t("dialogTitle")}
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">
-                  {t(
-                    "Ich freue mich wirklich ueber dein Feedback — vor allem, was dir geholfen hat, was unklar war und was noch fehlt."
-                  )}
+                  {t("dialogText")}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onClose}
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
-                aria-label={t("Feedback schliessen")}
+                aria-label={t("close")}
               >
                 <span aria-hidden="true">×</span>
               </button>
@@ -224,11 +219,11 @@ function ProductFeedbackDialog({
             {submitted ? (
               <div className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6">
                 <p className="text-lg font-semibold text-emerald-900">
-                  {t("Danke — das hilft mir wirklich weiter.")}
+                  {t("thanks")}
                 </p>
                 <div className="mt-5">
                   <ReportActionButton onClick={onClose} variant="utility">
-                    {t("Schliessen")}
+                    {t("done")}
                   </ReportActionButton>
                 </div>
               </div>
@@ -237,23 +232,21 @@ function ProductFeedbackDialog({
                 <div className="grid gap-5">
                   <FeedbackTextarea
                     id="q1"
-                    label={t("1. Was war fuer dich der wertvollste Moment im Tool?")}
+                    label={t("questions.q1")}
                     value={q1Value}
                     onChange={setQ1Value}
                     required
                   />
                   <FeedbackTextarea
                     id="q2"
-                    label={t("2. Wo hat es sich nicht klar oder unnoetig kompliziert angefuehlt?")}
+                    label={t("questions.q2")}
                     value={q2Value}
                     onChange={setQ2Value}
                     required
                   />
                   <FeedbackTextarea
                     id="q3"
-                    label={t(
-                      "3. Was muesste sich aendern, damit du sagen wuerdest: Das hat mir wirklich geholfen?"
-                    )}
+                    label={t("questions.q3")}
                     value={q3Value}
                     onChange={setQ3Value}
                     required
@@ -262,7 +255,7 @@ function ProductFeedbackDialog({
 
                 <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50/75 p-5">
                   <p className="text-sm font-semibold text-slate-950">
-                    {t("4. Wobei wuerdest du dir noch mehr Unterstuetzung wuenschen?")}
+                    {t("questions.q4")}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS.map((option) => {
@@ -278,7 +271,7 @@ function ProductFeedbackDialog({
                               : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                           }`}
                         >
-                          {t(option.label)}
+                          {t(`assistance.${option.value}`)}
                         </button>
                       );
                     })}
@@ -287,7 +280,7 @@ function ProductFeedbackDialog({
                     <div className="mt-4">
                       <FeedbackTextarea
                         id="q4-other"
-                        label={t("Was genau fehlt dir noch?")}
+                        label={t("questions.q4Other")}
                         value={q4OtherText}
                         onChange={setQ4OtherText}
                         rows={4}
@@ -299,7 +292,7 @@ function ProductFeedbackDialog({
                 <div className="mt-8">
                   <FeedbackTextarea
                     id="q5"
-                    label={t("5. Gibt es noch etwas, das du mir sagen moechtest?")}
+                    label={t("questions.q5")}
                     value={q5Text}
                     onChange={setQ5Text}
                     rows={5}
@@ -314,14 +307,14 @@ function ProductFeedbackDialog({
 
                 <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs leading-6 text-slate-500">
-                    {t("Die ersten drei Fragen sind fuer mich besonders wichtig, alles andere ist optional.")}
+                    {t("requiredHint")}
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <ReportActionButton onClick={onClose} variant="utility">
-                      {t("Abbrechen")}
+                      {t("cancel")}
                     </ReportActionButton>
                     <ReportActionButton onClick={handleSubmit} disabled={isPending}>
-                      {isPending ? t("Speichere...") : t("Feedback senden")}
+                      {isPending ? t("saving") : t("submit")}
                     </ReportActionButton>
                   </div>
                 </div>
@@ -349,6 +342,7 @@ function FeedbackTextarea({
   required?: boolean;
   rows?: number;
 }) {
+  const t = useTranslations("feedback");
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const shouldKeepListeningRef = useRef(false);
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -384,7 +378,7 @@ function FeedbackTextarea({
       clearTimeoutIfSet(restartTimeoutRef);
       setSpeechActive(false);
       setDictationStatus("ended");
-      setSpeechMessage(t("Text uebernommen. Du kannst direkt weiter diktieren."));
+      setSpeechMessage(t("dictation.accepted"));
       recognitionRef.current?.stop();
     }, DICTATION_INACTIVITY_MS);
   }
@@ -421,7 +415,7 @@ function FeedbackTextarea({
   }
 
   function stopDictation() {
-    finishDictationSession("ended", t("Text uebernommen. Du kannst direkt weiter diktieren."));
+    finishDictationSession("ended", t("dictation.accepted"));
     recognitionRef.current?.stop();
   }
 
@@ -430,7 +424,7 @@ function FeedbackTextarea({
 
     const SpeechRecognitionCtor = getSpeechRecognitionConstructor(window);
     if (!SpeechRecognitionCtor) {
-      setSpeechMessage(t("Diktieren ist in diesem Browser nicht verfuegbar."));
+      setSpeechMessage(t("dictation.unsupported"));
       return;
     }
 
@@ -462,14 +456,14 @@ function FeedbackTextarea({
             setDictationStatus("listening");
             setSpeechMessage(null);
           } catch {
-            finishDictationSession("error", t("Die Aufnahme konnte nicht erneut gestartet werden."));
+            finishDictationSession("error", t("dictation.restartFailed"));
           }
         }, DICTATION_RESTART_MS);
         return;
       }
 
       if (dictationStatus !== "error") {
-        finishDictationSession("ended", t("Text uebernommen. Du kannst direkt weiter diktieren."));
+        finishDictationSession("ended", t("dictation.accepted"));
       }
     };
 
@@ -484,10 +478,10 @@ function FeedbackTextarea({
       recognition.start();
       setSpeechActive(true);
       setDictationStatus("listening");
-      setSpeechMessage(t("Ich hoere zu ..."));
+      setSpeechMessage(t("dictation.listening"));
       scheduleInactivityTimeout();
     } catch {
-      finishDictationSession("error", t("Die Aufnahme konnte gerade nicht gestartet werden."));
+      finishDictationSession("error", t("dictation.startFailed"));
     }
   }
 
@@ -526,8 +520,8 @@ function FeedbackTextarea({
                 ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
                 : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
             }`}
-            aria-label={speechActive ? t("Diktat stoppen") : t("Diktat starten")}
-            title={speechActive ? t("Diktat stoppen") : t("Diktat starten")}
+            aria-label={speechActive ? t("dictation.stop") : t("dictation.start")}
+            title={speechActive ? t("dictation.stop") : t("dictation.start")}
           >
             <MicIcon active={speechActive} />
           </button>
@@ -539,13 +533,13 @@ function FeedbackTextarea({
                 speechActive ? "bg-[color:var(--brand-primary)]" : "bg-amber-400"
               }`}
             />
-            <span>{speechActive ? t("Aufnahme laeuft") : t("Wartet auf Sprache")}</span>
+            <span>{speechActive ? t("dictation.recording") : t("dictation.waiting")}</span>
           </div>
         ) : null}
       </div>
       {speechSupportState === "unsupported" ? (
         <p className="mt-2 text-xs leading-6 text-slate-500">
-          {t("Diktieren ist in diesem Browser leider nicht verfuegbar.")}
+          {t("dictation.unsupportedLong")}
         </p>
       ) : speechMessage ? (
         <p

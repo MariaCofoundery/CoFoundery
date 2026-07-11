@@ -76,7 +76,39 @@
     "eyebrow": "Profil-Snapshot",
     "title": "Dein aktueller Stand in 6 Dimensionen",
     "text": "Eine kompakte Einordnung deines aktuellen Founder-Profils.",
-    "empty": "Sobald du dein Basisprofil abgeschlossen hast, erscheint hier dein Profil-Snapshot."
+    "empty": "Sobald du dein Basisprofil abgeschlossen hast, erscheint hier dein Profil-Snapshot.",
+    "dimensions": {
+      "companyLogic": {
+        "label": "Unternehmenslogik",
+        "left": "tragfähig",
+        "right": "wachstumsstark"
+      },
+      "decisionLogic": {
+        "label": "Entscheidungslogik",
+        "left": "prüfend",
+        "right": "entscheidend"
+      },
+      "riskOrientation": {
+        "label": "Risikoorientierung",
+        "left": "absichernd",
+        "right": "chancenorientiert"
+      },
+      "workStructure": {
+        "label": "Arbeitsstruktur",
+        "left": "eigenständig",
+        "right": "eng gekoppelt"
+      },
+      "commitment": {
+        "label": "Commitment",
+        "left": "balanciert",
+        "right": "voll fokussiert"
+      },
+      "conflictStyle": {
+        "label": "Konfliktstil",
+        "left": "harmonisierend",
+        "right": "direkt"
+      }
+    }
   },
   "team": {
     "eyebrow": "Team & Zusammenarbeit",
@@ -156,7 +188,22 @@
     "magicLinkText": "Der Login erfolgt über einen sicheren Magic Link, den wir dir per E-Mail senden.",
     "securityText": "Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit Zwei-Faktor-Authentifizierung.",
     "supportText": "Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.",
-    "supportSubject": "E-Mail-Adresse ändern"
+    "supportSubject": "E-Mail-Adresse ändern",
+    "delete": {
+      "summary": "Danger Zone",
+      "title": "Account löschen",
+      "confirmText": "Dein Account wird gelöscht.\nDeine personenbezogenen Daten werden entfernt.\nGemeinsame Reports und Workbooks aus dieser Founder-Konstellation werden ebenfalls gelöscht.\nDieser Schritt kann nicht rückgängig gemacht werden.\n\nMöchtest du deinen Account wirklich löschen?",
+      "inputHelp": "Tippe",
+      "inputHelpSuffix": "um fortzufahren",
+      "confirmToken": "LÖSCHEN",
+      "pending": "Account wird gelöscht...",
+      "button": "Account löschen",
+      "errors": {
+        "missingServiceRole": "Die Löschung ist gerade technisch nicht verfügbar. Bitte versuche es später erneut.",
+        "cleanupFailed": "Dein Account konnte gerade nicht vollständig gelöscht werden. Bitte versuche es erneut.",
+        "notAuthenticated": "Deine Sitzung ist nicht mehr aktiv. Bitte melde dich erneut an."
+      }
+    }
   },
   "outlook": {
     "eyebrow": "Ausblick",

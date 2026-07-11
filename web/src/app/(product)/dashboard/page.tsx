@@ -22,6 +22,7 @@ import {
   FOUNDER_DIMENSION_META,
   FOUNDER_DIMENSION_ORDER,
   getFounderDimensionPoleLabels,
+  type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import {
@@ -92,9 +93,22 @@ const PRIMARY_SURFACE_CLASS =
   "dashboard-card rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_12px_30px_rgba(15,23,42,0.04)]";
 const SECONDARY_SURFACE_CLASS =
   "dashboard-card rounded-2xl border border-slate-200/80 bg-slate-50/70 shadow-[0_10px_24px_rgba(15,23,42,0.035)]";
-const SELF_RADAR_LABELS = Object.fromEntries(
-  FOUNDER_DIMENSION_ORDER.map((dimension) => [dimension, FOUNDER_DIMENSION_META[dimension].shortLabel])
-) as Record<string, string>;
+function dashboardDimensionKey(dimension: FounderDimensionKey) {
+  switch (dimension) {
+    case "Unternehmenslogik":
+      return "companyLogic";
+    case "Entscheidungslogik":
+      return "decisionLogic";
+    case "Risikoorientierung":
+      return "riskOrientation";
+    case "Arbeitsstruktur & Zusammenarbeit":
+      return "workStructure";
+    case "Commitment":
+      return "commitment";
+    case "Konfliktstil":
+      return "conflictStyle";
+  }
+}
 
 function staggerStyle(delayMs: number) {
   return {
@@ -615,7 +629,7 @@ export default async function DashboardPage({
                       {t("profileSnapshot.text")}
                     </p>
                     <div className="mt-5">
-                      <FounderDimensionsOverview scores={selfReport.scoresA} />
+                      <FounderDimensionsOverview scores={selfReport.scoresA} t={t} />
                     </div>
                   </>
                 ) : (
@@ -1055,20 +1069,24 @@ function formatDashboardInvitationTitle(invitation: InvitationDashboardRow | nul
 
 function FounderDimensionsOverview({
   scores,
+  t,
 }: {
   scores: Record<string, number | null | undefined>;
+  t: DashboardT;
 }) {
   return (
     <div className="space-y-3">
       {FOUNDER_DIMENSION_ORDER.map((dimension) => {
         const value = formatScoreValue(scores[dimension]);
         const meta = FOUNDER_DIMENSION_META[dimension];
-        const uiPoles = getFounderDimensionPoleLabels(dimension, "ui");
+        const i18nKey = dashboardDimensionKey(dimension);
         const reportPoles = getFounderDimensionPoleLabels(dimension, "report");
         return (
           <div key={dimension}>
             <div className="mb-1.5">
-              <span className="text-sm font-medium text-slate-700">{SELF_RADAR_LABELS[dimension]}</span>
+              <span className="text-sm font-medium text-slate-700">
+                {t(`profileSnapshot.dimensions.${i18nKey}.label`)}
+              </span>
             </div>
             <div className="relative h-2 rounded-full bg-slate-100">
               <div
@@ -1077,8 +1095,12 @@ function FounderDimensionsOverview({
               />
             </div>
             <div className="mt-1 flex items-center justify-between gap-3 text-[11px] text-slate-400">
-              <span title={reportPoles?.left}>{uiPoles?.left ?? meta.uiLeftPole}</span>
-              <span title={reportPoles?.right}>{uiPoles?.right ?? meta.uiRightPole}</span>
+              <span title={reportPoles?.left ?? meta.reportLeftPole}>
+                {t(`profileSnapshot.dimensions.${i18nKey}.left`)}
+              </span>
+              <span title={reportPoles?.right ?? meta.reportRightPole}>
+                {t(`profileSnapshot.dimensions.${i18nKey}.right`)}
+              </span>
             </div>
           </div>
         );

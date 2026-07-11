@@ -57,15 +57,42 @@ type ProfileListRow = {
   avatar_url: string | null;
 };
 
-function teamContextLabel(value: "pre_founder" | "existing_team") {
-  return value === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+type NavigationMessages = {
+  teamContexts?: { existingTeam?: string; preFounder?: string };
+  statusLabels?: {
+    reportReady?: string;
+    workbookReady?: string;
+    completed?: string;
+    inProgress?: string;
+  };
+  date?: { unknown?: string; locale?: string };
+};
+
+function teamContextLabel(value: "pre_founder" | "existing_team", copy: NavigationMessages) {
+  return value === "existing_team"
+    ? copy.teamContexts?.existingTeam ?? "Bestehendes Team"
+    : copy.teamContexts?.preFounder ?? "Pre-Founder";
 }
 
-function formatNavigationTimestamp(value: string | null) {
-  if (!value) return "ohne Datum";
-  return new Intl.DateTimeFormat("de-DE", {
+function formatNavigationTimestamp(value: string | null, copy: NavigationMessages) {
+  if (!value) return copy.date?.unknown ?? "ohne Datum";
+  return new Intl.DateTimeFormat(copy.date?.locale ?? "de-DE", {
     dateStyle: "medium",
   }).format(new Date(value));
+}
+
+function navigationStatusLabel(
+  value: string,
+  kind: ProductNavigationContextItem["statusKind"],
+  copy: NavigationMessages
+) {
+  if (value === "Report bereit") return copy.statusLabels?.reportReady ?? value;
+  if (value === "Workbook bereit") return copy.statusLabels?.workbookReady ?? value;
+  if (value === "Abgeschlossen") return copy.statusLabels?.completed ?? value;
+  if (value === "In Arbeit") return copy.statusLabels?.inProgress ?? value;
+  if (kind === "completed") return copy.statusLabels?.completed ?? value;
+  if (kind === "in_progress") return copy.statusLabels?.inProgress ?? value;
+  return value;
 }
 
 function fallbackNameFromEmail(value: string | null | undefined) {
@@ -117,6 +144,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = getRequestLocale();
   const messages = getMessages(locale);
+  const navigationCopy = messages.navigation as NavigationMessages;
   const supabase = await createClient();
   const {
     data: { user },
@@ -242,10 +270,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 id: invitation.id,
                 href: `/report/${encodeURIComponent(invitation.id)}`,
                 title: counterpartName,
-                subtitle: `${teamContextLabel(invitation.teamContext)} · ${formatNavigationTimestamp(
-                  reportRun?.created_at ?? invitation.createdAt
+                subtitle: `${teamContextLabel(invitation.teamContext, navigationCopy)} · ${formatNavigationTimestamp(
+                  reportRun?.created_at ?? invitation.createdAt,
+                  navigationCopy
                 )}`,
-                statusLabel: "Report bereit",
+                statusLabel: navigationStatusLabel("Report bereit", "ready", navigationCopy),
                 avatarLabel: buildAvatarLabel(counterpartName),
                 avatarUrl: counterpartProfile?.avatarUrl || null,
                 statusKind: "ready" as const,
@@ -253,7 +282,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 _sortDate: reportRun?.created_at ?? invitation.createdAt,
               } satisfies ProductNavigationContextItem & { _sortDate: string };
             })
-            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, "de"))
+            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, locale))
             .map((item) => {
               const { _sortDate: _ignoredSortDate, ...navigationItem } = item;
               void _ignoredSortDate;
@@ -297,10 +326,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 id: invitation.id,
                 href: workbookHrefForItem,
                 title: counterpartName,
-                subtitle: `${teamContextLabel(invitation.teamContext)} · ${formatNavigationTimestamp(
-                  workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt
+                subtitle: `${teamContextLabel(invitation.teamContext, navigationCopy)} · ${formatNavigationTimestamp(
+                  workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt,
+                  navigationCopy
                 )}`,
-                statusLabel: workbookState.statusLabel,
+                statusLabel: navigationStatusLabel(
+                  workbookState.statusLabel,
+                  workbookState.statusKind,
+                  navigationCopy
+                ),
                 avatarLabel: buildAvatarLabel(counterpartName),
                 avatarUrl: counterpartProfile?.avatarUrl || null,
                 statusKind: workbookState.statusKind,
@@ -308,7 +342,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 _sortDate: workbook?.updatedAt ?? reportRun?.created_at ?? invitation.createdAt,
               } satisfies ProductNavigationContextItem & { _sortDate: string };
             })
-            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, "de"))
+            .sort((left, right) => right._sortDate.localeCompare(left._sortDate, locale))
             .map((item) => {
               const { _sortDate: _ignoredSortDate, ...navigationItem } = item;
               void _ignoredSortDate;
