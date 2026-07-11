@@ -184,6 +184,13 @@ function approvalSummary(team: AdvisorDashboardTeam, t: AdvisorT) {
   return t("dashboard.approvals", { count });
 }
 
+function advisorFollowUpLabel(value: string, t: AdvisorT) {
+  if (value === "Follow-up in 4 Wochen") return t("dashboard.followUps.fourWeeks");
+  if (value === "Follow-up in 3 Monaten") return t("dashboard.followUps.threeMonths");
+  if (value === "Kein Follow-up gesetzt") return t("dashboard.followUps.none");
+  return value;
+}
+
 function pendingStandLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
   if (invite.founderAStarted && invite.founderBStarted) {
     return t("dashboard.statuses.bothStarted");
@@ -313,7 +320,9 @@ function TeamCard({ team, t, debug = false }: { team: AdvisorDashboardTeam; t: A
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>
-              <span className="text-xs font-medium text-slate-700">{team.followUpLabel}</span>
+              <span className="text-xs font-medium text-slate-700">
+                {advisorFollowUpLabel(team.followUpLabel, t)}
+              </span>
             </div>
           </div>
         </div>

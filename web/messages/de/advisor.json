@@ -43,6 +43,26 @@
       "report": "Report",
       "followUp": "Follow-up"
     },
+    "inviteTeam": {
+      "eyebrow": "Neues Team",
+      "title": "Team einladen",
+      "description": "Lege einen neuen Founder-Matching-Startpunkt an. Beide Founder erhalten eine Einladung, und der Fortschritt erscheint danach direkt in deinem Advisor-Dashboard.",
+      "founderAEmail": "E-Mail Founder A",
+      "founderBEmail": "E-Mail Founder B",
+      "teamName": "Name eures Teams oder Projekts",
+      "teamNamePlaceholder": "optional, z. B. Projekt Atlas",
+      "teamNameHint": "Optional. Wenn du einen Team- oder Projektnamen mitgibst, erscheint er später im Dashboard und in der Founder-Einladung.",
+      "submit": "Team einladen",
+      "submitting": "Team wird eingeladen...",
+      "v1Hint": "V1 startet bewusst schlank: Founder-Matching zuerst, ohne neue Parallel-Workflows.",
+      "sent": "Team eingeladen",
+      "created": "Team angelegt",
+      "sentText": "Beide Founder wurden per E-Mail eingeladen. Das Team erscheint jetzt direkt in deinem Dashboard.",
+      "createdText": "Das Team ist angelegt und im Dashboard sichtbar. Teile die Founder-Links notfalls manuell, wenn der Mailversand gerade nicht vollständig geklappt hat.",
+      "copyLink": "Link kopieren",
+      "copied": "Link kopiert.",
+      "copyFailed": "Kopieren gerade nicht möglich."
+    },
     "teamProject": "Team/Projekt: {name}",
     "openWorkbook": "Workbook öffnen",
     "viewReport": "Report ansehen",
@@ -82,6 +102,11 @@
       "started": "gestartet",
       "open": "offen"
     },
+    "followUps": {
+      "fourWeeks": "Follow-up in 4 Wochen",
+      "threeMonths": "Follow-up in 3 Monaten",
+      "none": "Kein Follow-up gesetzt"
+    },
     "accessDescription": {
       "revoked": "Die Freigabe ist für dieses Team nicht mehr aktiv. Du siehst den Stand, arbeitest aber nicht weiter.",
       "ready": "Freigabe vollständig. Workbook, Report und Snapshot können genutzt werden, sobald der jeweilige Stand vorliegt.",
@@ -95,6 +120,39 @@
       "openCount": "{count} offen",
       "type": "Founder-Matching",
       "remove": "Aus Übersicht entfernen"
+    }
+  },
+  "report": {
+    "context": "Advisor-Kontext",
+    "debugEyebrow": "Advisor Report Debug",
+    "debugTitle": "Advisor-Report konnte nicht geladen werden",
+    "debugText": "Die Produktseite würde dich in diesem Zustand direkt zurück ins Advisor-Dashboard schicken. Im Debug-Modus bleibt dieser Zustand sichtbar, damit wir den echten Bruchpunkt sehen können.",
+    "eyebrow": "Advisor Report",
+    "missingTitle": "Report noch nicht verfügbar",
+    "missingText": "Für dieses Team liegt noch kein renderbarer Advisor-Report vor. Sobald der Founder-Report vollständig erzeugt wurde, kannst du hier direkt mit dem Advisor-Report weiterarbeiten.",
+    "backToDashboard": "Zurück zum Advisor-Dashboard",
+    "openWorkbook": "Workbook öffnen",
+    "exportSnapshot": "Snapshot exportieren",
+    "impulsesEyebrow": "Advisor-Impulse",
+    "impulsesTitle": "Kurze Impulse pro Abschnitt",
+    "impulsesText": "Halte hier knappe Beobachtungen oder Moderationshinweise fest. Pro Abschnitt gibt es genau einen editierbaren Advisor-Impuls. Leere Felder entfernen den Eintrag wieder.",
+    "saved": "Gespeichert",
+    "lastSaved": "Zuletzt gespeichert: {date}",
+    "noImpulse": "Noch kein Impuls hinterlegt",
+    "save": "Speichern"
+  },
+  "snapshot": {
+    "eyebrow": "Advisor Snapshot",
+    "context": "Advisor-Kontext",
+    "notAvailableTitle": "Snapshot aktuell noch nicht verfügbar",
+    "notAvailableText": "Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.",
+    "backToDashboard": "Zurück zum Advisor Dashboard",
+    "export": "Snapshot exportieren",
+    "intro": "Kompakter Coaching-Snapshot mit Fokusfeldern, Advisor-Impulsen, Founder-Reaktion und den nächsten sinnvollen Schritten.",
+    "followUps": {
+      "fourWeeks": "Follow-up in 4 Wochen",
+      "threeMonths": "Follow-up in 3 Monaten",
+      "none": "Kein Follow-up gesetzt"
     }
   },
   "invite": {

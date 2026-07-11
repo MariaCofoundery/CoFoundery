@@ -20,11 +20,25 @@ type Props = {
   snapshotHref: string;
   savedSectionKey: AdvisorImpulseSectionKey | null;
   saveAction: (formData: FormData) => void | Promise<void>;
+  locale: string;
+  copy: {
+    backToDashboard: string;
+    openWorkbook: string;
+    exportSnapshot: string;
+    impulsesEyebrow: string;
+    impulsesTitle: string;
+    impulsesText: string;
+    saved: string;
+    lastSaved: (date: string) => string;
+    noImpulse: string;
+    save: string;
+    eyebrow: string;
+  };
 };
 
-function formatSavedLabel(value: string | null) {
+function formatSavedLabel(value: string | null, locale: string) {
   if (!value) return null;
-  return new Intl.DateTimeFormat("de-DE", {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -41,6 +55,8 @@ export function AdvisorReportProductView({
   snapshotHref,
   savedSectionKey,
   saveAction,
+  locale,
+  copy,
 }: Props) {
   const topActions = (
     <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
@@ -48,20 +64,20 @@ export function AdvisorReportProductView({
         href="/advisor/dashboard"
         className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
       >
-        Zurück zum Advisor-Dashboard
+        {copy.backToDashboard}
       </Link>
       <div className="flex flex-wrap gap-3">
         <Link
           href={workbookHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
         >
-          Workbook öffnen
+          {copy.openWorkbook}
         </Link>
         <Link
           href={snapshotHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
         >
-          Snapshot exportieren
+          {copy.exportSnapshot}
         </Link>
       </div>
     </div>
@@ -70,11 +86,12 @@ export function AdvisorReportProductView({
   const appendix = (
     <section id="advisor-impulses" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="max-w-3xl">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Advisor-Impulse</p>
-        <h2 className="mt-2 text-lg font-semibold text-slate-950">Kurze Impulse pro Abschnitt</h2>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+          {copy.impulsesEyebrow}
+        </p>
+        <h2 className="mt-2 text-lg font-semibold text-slate-950">{copy.impulsesTitle}</h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Halte hier knappe Beobachtungen oder Moderationshinweise fest. Pro Abschnitt gibt es genau
-          einen editierbaren Advisor-Impuls. Leere Felder entfernen den Eintrag wieder.
+          {copy.impulsesText}
         </p>
       </div>
 
@@ -82,7 +99,7 @@ export function AdvisorReportProductView({
         {ADVISOR_IMPULSE_SECTION_ORDER.map((sectionKey) => {
           const meta = ADVISOR_IMPULSE_SECTION_META[sectionKey];
           const impulse = impulses[sectionKey];
-          const savedLabel = formatSavedLabel(impulse?.updatedAt ?? null);
+          const savedLabel = formatSavedLabel(impulse?.updatedAt ?? null, locale);
           return (
             <form
               key={sectionKey}
@@ -99,7 +116,7 @@ export function AdvisorReportProductView({
                 </div>
                 {savedSectionKey === sectionKey ? (
                   <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700">
-                    Gespeichert
+                    {copy.saved}
                   </span>
                 ) : null}
               </div>
@@ -111,13 +128,13 @@ export function AdvisorReportProductView({
               />
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs leading-6 text-slate-500">
-                  {savedLabel ? `Zuletzt gespeichert: ${savedLabel}` : "Noch kein Impuls hinterlegt"}
+                  {savedLabel ? copy.lastSaved(savedLabel) : copy.noImpulse}
                 </p>
                 <button
                   type="submit"
                   className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                 >
-                  Speichern
+                  {copy.save}
                 </button>
               </div>
             </form>
@@ -134,7 +151,7 @@ export function AdvisorReportProductView({
         participantBName={participantBName}
         report={report}
         title={`${participantAName} + ${participantBName}`}
-        eyebrow="Advisor Report"
+        eyebrow={copy.eyebrow}
         topActions={topActions}
         appendix={appendix}
       />

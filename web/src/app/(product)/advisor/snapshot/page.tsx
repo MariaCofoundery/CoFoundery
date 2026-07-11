@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import {
@@ -28,10 +29,12 @@ function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
   return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
 }
 
-function followUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp) {
-  if (value === "four_weeks") return "Follow-up in 4 Wochen";
-  if (value === "three_months") return "Follow-up in 3 Monaten";
-  return "Kein Follow-up gesetzt";
+type AdvisorT = Awaited<ReturnType<typeof getTranslations>>;
+
+function followUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp, t: AdvisorT) {
+  if (value === "four_weeks") return t("snapshot.followUps.fourWeeks");
+  if (value === "three_months") return t("snapshot.followUps.threeMonths");
+  return t("snapshot.followUps.none");
 }
 
 function founderReactionLabel(value: "understood" | "open" | "in_clarification" | null) {
@@ -47,6 +50,7 @@ export default async function AdvisorSnapshotPage({
   searchParams: Promise<PageSearchParams>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("advisor");
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const debug = params.debug === "1";
@@ -84,25 +88,27 @@ export default async function AdvisorSnapshotPage({
       <>
         <ProductNavigationOverride
           activeView="advisor"
-          contextLabel="Advisor-Kontext"
+          contextLabel={t("snapshot.context")}
           matchingHref={reportHref}
           workbookHref={workbookHref}
         />
         <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
           <div className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              {t("snapshot.eyebrow")}
+            </p>
             <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-              Snapshot aktuell noch nicht verfügbar
+              {t("snapshot.notAvailableTitle")}
             </h1>
             <p className="mt-4 text-sm leading-7 text-slate-700">
-              Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.
+              {t("snapshot.notAvailableText")}
             </p>
             <div className="mt-6">
               <Link
                 href="/advisor/dashboard"
                 className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
-                Zurück zum Advisor Dashboard
+                {t("snapshot.backToDashboard")}
               </Link>
             </div>
             {debug ? (
@@ -136,7 +142,7 @@ export default async function AdvisorSnapshotPage({
     <>
       <ProductNavigationOverride
         activeView="advisor"
-        contextLabel="Advisor-Kontext"
+        contextLabel={t("snapshot.context")}
         matchingHref={reportHref}
         workbookHref={workbookHref}
       />
@@ -159,10 +165,10 @@ export default async function AdvisorSnapshotPage({
             href="/advisor/dashboard"
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
           >
-            Zurück zum Advisor Dashboard
+            {t("snapshot.backToDashboard")}
           </Link>
           <PrintReportButton
-            label="Snapshot exportieren"
+            label={t("snapshot.export")}
             eventName="advisor_snapshot_print_clicked"
             invitationId={data.invitationId}
             teamContext={data.teamContext}
@@ -172,7 +178,9 @@ export default async function AdvisorSnapshotPage({
 
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:p-0 print:shadow-none">
         <header className="border-b border-slate-200 pb-8">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Snapshot</p>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            {t("snapshot.eyebrow")}
+          </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">
             {founderALabel} x {founderBLabel}
           </h1>
@@ -181,12 +189,11 @@ export default async function AdvisorSnapshotPage({
               {teamContextLabel(data.teamContext)}
             </span>
             <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
-              {followUpLabel(data.workbook.advisorFollowUp)}
+              {followUpLabel(data.workbook.advisorFollowUp, t)}
             </span>
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            Kompakter Coaching-Snapshot mit Fokusfeldern, Advisor-Impulsen, Founder-Reaktion und
-            den nächsten sinnvollen Schritten.
+            {t("snapshot.intro")}
           </p>
         </header>
 

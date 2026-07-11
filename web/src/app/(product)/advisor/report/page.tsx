@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { AdvisorReportProductView } from "@/features/reporting/AdvisorReportProductView";
 import {
@@ -14,6 +15,7 @@ import {
   ADVISOR_IMPULSE_SECTION_ORDER,
   type AdvisorImpulseSectionKey,
 } from "@/features/reporting/advisorSectionImpulses";
+import { getRequestLocale } from "@/i18n/getLocale";
 
 function isAdvisorImpulseSectionKey(value: string): value is AdvisorImpulseSectionKey {
   return (ADVISOR_IMPULSE_SECTION_ORDER as readonly string[]).includes(value);
@@ -30,6 +32,8 @@ export default async function AdvisorReportPage({
   }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("advisor");
+  const locale = getRequestLocale();
   const invitationId = params.invitationId?.trim() ?? "";
   const requestedTeamContext = params.teamContext
     ? normalizeAdvisorTeamContext(params.teamContext)
@@ -95,15 +99,13 @@ export default async function AdvisorReportPage({
         <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
           <section className="rounded-[32px] border border-amber-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
             <p className="text-[11px] uppercase tracking-[0.22em] text-amber-700">
-              Advisor Report Debug
+              {t("report.debugEyebrow")}
             </p>
             <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-              Advisor-Report konnte nicht geladen werden
+              {t("report.debugTitle")}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
-              Die Produktseite würde dich in diesem Zustand direkt zurück ins Advisor-Dashboard
-              schicken. Im Debug-Modus bleibt dieser Zustand sichtbar, damit wir den echten
-              Bruchpunkt sehen können.
+              {t("report.debugText")}
             </p>
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
               <p className="font-semibold text-slate-900">Debug · Advisor Report Redirect</p>
@@ -144,13 +146,14 @@ export default async function AdvisorReportPage({
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Advisor Report</p>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            {t("report.eyebrow")}
+          </p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            Report noch nicht verfügbar
+            {t("report.missingTitle")}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
-            Für dieses Team liegt noch kein renderbarer Advisor-Report vor. Sobald der Founder-Report
-            vollständig erzeugt wurde, kannst du hier direkt mit dem Advisor-Report weiterarbeiten.
+            {t("report.missingText")}
           </p>
           {debug && data.debugMeta ? (
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
@@ -193,7 +196,7 @@ export default async function AdvisorReportPage({
     <>
       <ProductNavigationOverride
         activeView="advisor"
-        contextLabel="Advisor-Kontext"
+        contextLabel={t("report.context")}
         matchingHref={reportHref}
         workbookHref={data.workbookHref}
       />
@@ -235,6 +238,20 @@ export default async function AdvisorReportPage({
         snapshotHref={data.snapshotHref}
         savedSectionKey={savedSectionKey}
         saveAction={saveImpulseAction}
+        locale={locale}
+        copy={{
+          backToDashboard: t("report.backToDashboard"),
+          openWorkbook: t("report.openWorkbook"),
+          exportSnapshot: t("report.exportSnapshot"),
+          impulsesEyebrow: t("report.impulsesEyebrow"),
+          impulsesTitle: t("report.impulsesTitle"),
+          impulsesText: t("report.impulsesText"),
+          saved: t("report.saved"),
+          lastSaved: (date) => t("report.lastSaved", { date }),
+          noImpulse: t("report.noImpulse"),
+          save: t("report.save"),
+          eyebrow: t("report.eyebrow"),
+        }}
       />
     </>
   );

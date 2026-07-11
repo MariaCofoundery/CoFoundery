@@ -43,6 +43,26 @@
       "report": "Report",
       "followUp": "Follow-up"
     },
+    "inviteTeam": {
+      "eyebrow": "New team",
+      "title": "Invite team",
+      "description": "Create a new founder matching starting point. Both founders receive an invitation, and progress appears directly in your advisor dashboard.",
+      "founderAEmail": "Founder A email",
+      "founderBEmail": "Founder B email",
+      "teamName": "Team or project name",
+      "teamNamePlaceholder": "optional, e.g. Project Atlas",
+      "teamNameHint": "Optional. If you add a team or project name, it will appear later in the dashboard and in the founder invitation.",
+      "submit": "Invite team",
+      "submitting": "Inviting team...",
+      "v1Hint": "V1 stays intentionally lean: founder matching first, without new parallel workflows.",
+      "sent": "Team invited",
+      "created": "Team created",
+      "sentText": "Both founders were invited by email. The team now appears directly in your dashboard.",
+      "createdText": "The team has been created and is visible in the dashboard. Share the founder links manually if email delivery did not fully work right now.",
+      "copyLink": "Copy link",
+      "copied": "Link copied.",
+      "copyFailed": "Copying is not available right now."
+    },
     "teamProject": "Team/project: {name}",
     "openWorkbook": "Open workbook",
     "viewReport": "View report",
@@ -82,6 +102,11 @@
       "started": "started",
       "open": "open"
     },
+    "followUps": {
+      "fourWeeks": "Follow-up in 4 weeks",
+      "threeMonths": "Follow-up in 3 months",
+      "none": "No follow-up set"
+    },
     "accessDescription": {
       "revoked": "The approval for this team is no longer active. You can see the status, but cannot continue working.",
       "ready": "Approval is complete. Workbook, report, and snapshot can be used as soon as each item is available.",
@@ -95,6 +120,39 @@
       "openCount": "{count} open",
       "type": "Founder matching",
       "remove": "Remove from overview"
+    }
+  },
+  "report": {
+    "context": "Advisor context",
+    "debugEyebrow": "Advisor report debug",
+    "debugTitle": "Advisor report could not be loaded",
+    "debugText": "In this state, the product page would send you straight back to the advisor dashboard. Debug mode keeps this state visible so we can see the actual break point.",
+    "eyebrow": "Advisor report",
+    "missingTitle": "Report not available yet",
+    "missingText": "There is no renderable advisor report for this team yet. Once the founder report has been fully generated, you can continue working with the advisor report here.",
+    "backToDashboard": "Back to advisor dashboard",
+    "openWorkbook": "Open workbook",
+    "exportSnapshot": "Export snapshot",
+    "impulsesEyebrow": "Advisor prompts",
+    "impulsesTitle": "Short prompts per section",
+    "impulsesText": "Capture brief observations or facilitation notes here. Each section has exactly one editable advisor prompt. Empty fields remove the entry again.",
+    "saved": "Saved",
+    "lastSaved": "Last saved: {date}",
+    "noImpulse": "No prompt added yet",
+    "save": "Save"
+  },
+  "snapshot": {
+    "eyebrow": "Advisor snapshot",
+    "context": "Advisor context",
+    "notAvailableTitle": "Snapshot not available yet",
+    "notAvailableText": "There is no reliable snapshot available for this team context yet.",
+    "backToDashboard": "Back to advisor dashboard",
+    "export": "Export snapshot",
+    "intro": "A compact coaching snapshot with focus areas, advisor prompts, founder response, and the next useful steps.",
+    "followUps": {
+      "fourWeeks": "Follow-up in 4 weeks",
+      "threeMonths": "Follow-up in 3 months",
+      "none": "No follow-up set"
     }
   },
   "invite": {

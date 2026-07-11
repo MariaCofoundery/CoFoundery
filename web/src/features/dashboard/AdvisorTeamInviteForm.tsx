@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   createAdvisorTeamInviteAction,
   type CreateAdvisorTeamInviteActionResult,
@@ -10,9 +11,15 @@ import {
 function InviteLinkRow({
   label,
   href,
+  copyLink,
+  copied,
+  copyFailed,
 }: {
   label: string;
   href: string;
+  copyLink: string;
+  copied: string;
+  copyFailed: string;
 }) {
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -25,14 +32,14 @@ function InviteLinkRow({
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(href);
-            setNotice("Link kopiert.");
+            setNotice(copied);
           } catch {
-            setNotice("Kopieren gerade nicht möglich.");
+            setNotice(copyFailed);
           }
         }}
         className="mt-3 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
       >
-        Link kopieren
+        {copyLink}
       </button>
       {notice ? <p className="mt-2 text-xs text-slate-500">{notice}</p> : null}
     </div>
@@ -40,6 +47,7 @@ function InviteLinkRow({
 }
 
 export function AdvisorTeamInviteForm() {
+  const t = useTranslations("advisor");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [founderAEmail, setFounderAEmail] = useState("");
@@ -58,11 +66,14 @@ export function AdvisorTeamInviteForm() {
         className="flex w-full items-start justify-between gap-4 text-left"
       >
         <div className="max-w-3xl">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Neues Team</p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">Team einladen</h2>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            {t("dashboard.inviteTeam.eyebrow")}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+            {t("dashboard.inviteTeam.title")}
+          </h2>
           <p className="mt-3 text-sm leading-7 text-slate-600">
-            Lege einen neuen Founder-Matching-Startpunkt an. Beide Founder erhalten eine Einladung,
-            und der Fortschritt erscheint danach direkt in deinem Advisor-Dashboard.
+            {t("dashboard.inviteTeam.description")}
           </p>
         </div>
         <span className="mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500">
@@ -114,7 +125,7 @@ export function AdvisorTeamInviteForm() {
           >
             <div>
               <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-                E-Mail Founder A
+                {t("dashboard.inviteTeam.founderAEmail")}
               </label>
               <input
                 type="email"
@@ -128,7 +139,7 @@ export function AdvisorTeamInviteForm() {
 
             <div>
               <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-                E-Mail Founder B
+                {t("dashboard.inviteTeam.founderBEmail")}
               </label>
               <input
                 type="email"
@@ -142,18 +153,17 @@ export function AdvisorTeamInviteForm() {
 
             <div className="lg:col-span-2">
               <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-                Name eures Teams oder Projekts
+                {t("dashboard.inviteTeam.teamName")}
               </label>
               <input
                 type="text"
                 value={teamName}
                 onChange={(event) => setTeamName(event.target.value)}
-                placeholder="optional, z. B. Projekt Atlas"
+                placeholder={t("dashboard.inviteTeam.teamNamePlaceholder")}
                 className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700"
               />
               <p className="mt-2 text-xs leading-6 text-slate-500">
-                Optional. Wenn du einen Team- oder Projektnamen mitgibst, erscheint er später im
-                Dashboard und in der Founder-Einladung.
+                {t("dashboard.inviteTeam.teamNameHint")}
               </p>
             </div>
 
@@ -163,10 +173,10 @@ export function AdvisorTeamInviteForm() {
                 disabled={isPending}
                 className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-[color:var(--brand-primary-hover)] disabled:opacity-60"
               >
-                {isPending ? "Team wird eingeladen..." : "Team einladen"}
+                {isPending ? t("dashboard.inviteTeam.submitting") : t("dashboard.inviteTeam.submit")}
               </button>
               <p className="text-xs leading-6 text-slate-500">
-                V1 startet bewusst schlank: Founder-Matching zuerst, ohne neue Parallel-Workflows.
+                {t("dashboard.inviteTeam.v1Hint")}
               </p>
             </div>
           </form>
@@ -190,7 +200,9 @@ export function AdvisorTeamInviteForm() {
                   result.emailStatus === "sent" ? "text-emerald-800" : "text-amber-800"
                 }`}
               >
-                {result.emailStatus === "sent" ? "Team eingeladen" : "Team angelegt"}
+                {result.emailStatus === "sent"
+                  ? t("dashboard.inviteTeam.sent")
+                  : t("dashboard.inviteTeam.created")}
               </p>
               <p
                 className={`mt-2 text-sm leading-7 ${
@@ -198,16 +210,28 @@ export function AdvisorTeamInviteForm() {
                 }`}
               >
                 {result.emailStatus === "sent"
-                  ? "Beide Founder wurden per E-Mail eingeladen. Das Team erscheint jetzt direkt in deinem Dashboard."
-                  : "Das Team ist angelegt und im Dashboard sichtbar. Teile die Founder-Links notfalls manuell, wenn der Mailversand gerade nicht vollständig geklappt hat."}
+                  ? t("dashboard.inviteTeam.sentText")
+                  : t("dashboard.inviteTeam.createdText")}
               </p>
               {result.emailError ? (
                 <p className="mt-2 text-xs leading-6 text-amber-900">{result.emailError}</p>
               ) : null}
               {result.emailStatus !== "sent" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <InviteLinkRow label={`Founder A · ${result.founderAEmail}`} href={result.founderAInviteUrl} />
-                  <InviteLinkRow label={`Founder B · ${result.founderBEmail}`} href={result.founderBInviteUrl} />
+                  <InviteLinkRow
+                    label={`Founder A · ${result.founderAEmail}`}
+                    href={result.founderAInviteUrl}
+                    copyLink={t("dashboard.inviteTeam.copyLink")}
+                    copied={t("dashboard.inviteTeam.copied")}
+                    copyFailed={t("dashboard.inviteTeam.copyFailed")}
+                  />
+                  <InviteLinkRow
+                    label={`Founder B · ${result.founderBEmail}`}
+                    href={result.founderBInviteUrl}
+                    copyLink={t("dashboard.inviteTeam.copyLink")}
+                    copied={t("dashboard.inviteTeam.copied")}
+                    copyFailed={t("dashboard.inviteTeam.copyFailed")}
+                  />
                 </div>
               ) : null}
             </div>
