@@ -99,6 +99,30 @@ test("keeps assessment conversation prompts bounded to two texts", () => {
   assert.ok(prompts.length <= 2);
 });
 
+test("localizes assessment conversation prompts when English locale is requested", () => {
+  const prompts = selectDiscoveryAssessmentConversationPrompts({
+    availability: READY,
+    ownerScores: OWNER_SCORES,
+    candidateScores: CANDIDATE_SCORES,
+    locale: "en",
+  });
+
+  assert.ok(prompts.length > 0);
+  assert.ok(prompts.includes("Talk early about what kind of company you want to build."));
+  assert.equal(prompts.some((text) => /Sprecht|Kläre|Besprecht/.test(text)), false);
+});
+
+test("falls back to German assessment prompts for invalid locale", () => {
+  const prompts = selectDiscoveryAssessmentConversationPrompts({
+    availability: READY,
+    ownerScores: OWNER_SCORES,
+    candidateScores: CANDIDATE_SCORES,
+    locale: "fr",
+  });
+
+  assert.ok(prompts.includes("Sprecht früh darüber, welche Art von Unternehmen ihr aufbauen wollt."));
+});
+
 test("keeps assessment conversation prompts free of numbers, percentages and dimension keys", () => {
   const prompts = selectDiscoveryAssessmentConversationPrompts({
     availability: READY,

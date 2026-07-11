@@ -68,7 +68,8 @@ function createPreferences(
 
 function recommend(
   candidateProfiles: FounderDiscoveryProfile[],
-  preferences: FounderSearchPreferences | null = null
+  preferences: FounderSearchPreferences | null = null,
+  locale?: string | null
 ) {
   return buildDiscoveryCandidateRecommendations({
     ownProfile: createProfile({
@@ -86,6 +87,7 @@ function recommend(
     }),
     candidateProfiles,
     preferences,
+    locale,
   });
 }
 
@@ -329,4 +331,49 @@ test("keeps explainability bounded and free of scores or private preference text
   const visibleText = [...candidate.reasons, ...candidate.conversationTopics].join(" ");
   assert.equal(/\d+\s*%/.test(visibleText), false);
   assert.equal(/score|rohscore|priority|priorität|suchpräferenz/i.test(visibleText), false);
+});
+
+test("localizes recommendation reasons and topics when English locale is requested", () => {
+  const [candidate] = recommend(
+    [
+      createProfile({
+        id: "english-fit",
+        userId: "english-fit-user",
+        ownRoles: ["tech"],
+        commitmentLevel: "part_time",
+        ventureGoal: "venture_scale",
+      }),
+    ],
+    createPreferences({
+      priorityWeights: { skill_complementarity: 5, communication: 5 },
+    }),
+    "en"
+  );
+
+  assert.ok(candidate);
+  assert.ok(candidate.reasons.includes("Your roles could complement each other."));
+  assert.ok(candidate.conversationTopics.includes("Discuss decision rhythm, pace, and communication early."));
+  assert.equal(
+    [...candidate.reasons, ...candidate.conversationTopics].some((text) =>
+      /Ihr|Sprecht|Kläre|Euer/.test(text)
+    ),
+    false
+  );
+});
+
+test("falls back to German recommendation text for invalid locale without changing scores", () => {
+  const candidatesDe = recommend(
+    [createProfile({ id: "fallback-fit", userId: "fallback-fit-user", ownRoles: ["tech"] })],
+    null,
+    "de"
+  );
+  const candidatesInvalid = recommend(
+    [createProfile({ id: "fallback-fit", userId: "fallback-fit-user", ownRoles: ["tech"] })],
+    null,
+    "fr"
+  );
+
+  assert.equal(candidatesInvalid[0]?.score, candidatesDe[0]?.score);
+  assert.deepEqual(candidatesInvalid[0]?.reasons, candidatesDe[0]?.reasons);
+  assert.deepEqual(candidatesInvalid[0]?.conversationTopics, candidatesDe[0]?.conversationTopics);
 });

@@ -11,6 +11,7 @@ import type {
   DiscoveryStatus,
   FounderDiscoveryProfile,
 } from "@/features/discovery/discoveryTypes";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 const CARD_CLASS =
@@ -257,6 +258,7 @@ function CandidateCard({ candidate, t }: { candidate: DiscoveryCandidate; t: Dis
 
 export default async function DiscoveryPage() {
   const t = await getTranslations("discovery");
+  const locale = getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },
@@ -268,7 +270,7 @@ export default async function DiscoveryPage() {
 
   const [profile, candidates] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
-    getDiscoveryCandidatesForCurrentUser(user.id),
+    getDiscoveryCandidatesForCurrentUser(user.id, undefined, locale),
   ]);
   const statusView = getStatusView(profile, t);
   const isActive = profile?.status === "active";

@@ -253,10 +253,12 @@ export async function getDiscoveryAssessmentConversationPromptsForCandidates({
   ownerUserId,
   candidateUserIds,
   availabilityByUserId,
+  locale,
 }: {
   ownerUserId: string;
   candidateUserIds: string[];
   availabilityByUserId: Map<string, DiscoveryAssessmentSignalAvailability>;
+  locale?: string | null;
 }): Promise<Map<string, string[]>> {
   const normalizedCandidateUserIds = normalizeDiscoveryAssessmentSignalCandidateUserIds({
     ownerUserId,
@@ -361,6 +363,7 @@ export async function getDiscoveryAssessmentConversationPromptsForCandidates({
             availability: availabilityByUserId.get(assessment.user_id) ?? null,
             ownerScores,
             candidateScores,
+            locale,
           });
 
           return [assessment.user_id, prompts] as const;

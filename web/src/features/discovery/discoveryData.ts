@@ -361,7 +361,8 @@ export async function getActiveDiscoveryProfileById(
 
 async function prepareDiscoveryAssessmentConversationPrompts(
   ownerUserId: string,
-  candidateProfiles: FounderDiscoveryProfile[]
+  candidateProfiles: FounderDiscoveryProfile[],
+  locale?: string | null
 ) {
   if (candidateProfiles.length === 0) {
     return new Map<string, string[]>();
@@ -376,6 +377,7 @@ async function prepareDiscoveryAssessmentConversationPrompts(
       ownerUserId,
       candidateUserIds: candidateProfiles.map((profile) => profile.userId),
       availabilityByUserId,
+      locale,
     });
   } catch (error) {
     console.warn("discovery assessment conversation prompt preparation failed", {
@@ -387,7 +389,8 @@ async function prepareDiscoveryAssessmentConversationPrompts(
 
 export async function getDiscoveryCandidatesForCurrentUser(
   userId: string,
-  client?: SupabaseLikeClient
+  client?: SupabaseLikeClient,
+  locale?: string | null
 ): Promise<DiscoveryCandidate[]> {
   const normalizedUserId = assertUserId(userId);
   const supabase = await resolveClient(client);
@@ -413,11 +416,13 @@ export async function getDiscoveryCandidatesForCurrentUser(
     ownProfile,
     candidateProfiles,
     preferences,
+    locale,
   });
 
   const promptsByUserId = await prepareDiscoveryAssessmentConversationPrompts(
     normalizedUserId,
-    candidateProfiles
+    candidateProfiles,
+    locale
   );
   const profileIdByUserId = new Map(candidateProfiles.map((profile) => [profile.userId, profile.id]));
   const promptsByProfileId = new Map(
