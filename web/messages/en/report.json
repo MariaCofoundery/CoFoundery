@@ -1,0 +1,56 @@
+{
+  "common": {
+    "backToDashboard": "Back to dashboard",
+    "backToIntros": "Back to my intros",
+    "savePdf": "Save as PDF",
+    "pdfLocked": "PDF available after unlock",
+    "fullReport": "Full report",
+    "nextStep": "Next step"
+  },
+  "legacy": {
+    "notAvailableTitle": "Report not available yet",
+    "notAvailableText": "There is no renderable matching report for this invitation yet.",
+    "autoRefresh": "We are checking the status automatically in the background.",
+    "renderingTitle": "Report is being created",
+    "renderingText": "The new founder matching report is not fully available yet. Please check again in a few moments.",
+    "lockedEyebrow": "Unlock",
+    "lockedTitle": "This team report is not unlocked yet.",
+    "lockedText": "Unlocking is not active for this legacy report yet.",
+    "lockedAdvisorText": "Once an advisor or accelerator unlocks the report for you, it will be available to the team.",
+    "lockedPdfText": "Unlocking is coming soon. Until then, PDF export stays disabled for this report.",
+    "lockedFullText": "The full report becomes visible after unlock.",
+    "freeBetaEyebrow": "Available for free during the test phase",
+    "freeBetaTitle": "This report is fully unlocked during the current test phase.",
+    "freeBetaText": "Later, unlocking can run through team or report access.",
+    "unrenderableText": "The report is unlocked, but the detailed analysis cannot be rendered for this older data set yet.",
+    "workbookTitle": "These points should not be clarified on the side.",
+    "workbookText": "In the workbook, you define how you want to work with them.",
+    "workbookCta": "Start workbook"
+  },
+  "session": {
+    "emptyTitle": "The dynamics report has not been created yet.",
+    "emptyText": "Once the matching session is ready, you can create the report as a snapshot from the matching preparation page.",
+    "snapshotHint": "Session-based snapshot · no invitation, no legacy report, no workbook",
+    "snapshotEyebrow": "Session snapshot",
+    "snapshotText": "This report was created from your matching session. It does not create an invitation, relationship, or workbook.",
+    "workspaceProcessed": "The workspace was processed.",
+    "workspaceEyebrow": "Workspace",
+    "workspaceReadyTitle": "Workspace ready",
+    "workspaceReadyText": "Your shared connection has been created. The workbook/operating agreement will be connected as the next step.",
+    "openWorkspace": "Open workspace",
+    "prepareWorkspaceTitle": "Prepare shared workspace",
+    "prepareWorkspaceText": "If you want to continue, you can prepare a shared workspace from this report. This creates a shared connection. The workbook will be connected in the next step.",
+    "prepareWorkspaceSafety": "No invitation, legacy report, or workbook will be created.",
+    "startWorkspace": "Start shared workspace"
+  },
+  "view": {
+    "matchingReport": "Matching report",
+    "dynamicsReport": "Dynamics report",
+    "centralPatterns": "Your central patterns",
+    "sessionCentralPatternHint": "Use these points as a starting point for a calm conversation about roles, expectations, and collaboration.",
+    "legacyCentralPatternHint": "You will see the key points for your collaboration in the full report.",
+    "dynamicsOverview": "Your dynamics at a glance",
+    "conversationPrompts": "Conversation prompts for your next conversation",
+    "conversationPromptsText": "These questions are intended as a next step after you have reviewed the patterns and scales."
+  }
+}

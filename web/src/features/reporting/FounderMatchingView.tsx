@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
@@ -59,6 +60,7 @@ export function FounderMatchingView({
   showUnlockSection = true,
   reportAccessNotice,
 }: Props) {
+  const rt = useTranslations("report");
   const effectiveTeamContext = teamContext ?? "pre_founder";
   const isSessionReport = reportContext === "matching_session";
   const effectiveAccessNotice =
@@ -70,7 +72,7 @@ export function FounderMatchingView({
       <section className="page-section rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <div className="max-w-4xl">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t(isSessionReport ? "Dynamik-Report" : "Matching-Report")}
+            {isSessionReport ? rt("view.dynamicsReport") : rt("view.matchingReport")}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
             {t(buildMatchHeadline(selection, isSessionReport))}
@@ -86,7 +88,7 @@ export function FounderMatchingView({
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Eure zentralen Muster")}
+          {rt("view.centralPatterns")}
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {buildCentralPatternSections(selection).map((section) => (
@@ -103,50 +105,48 @@ export function FounderMatchingView({
         </div>
 
         <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-700">
-          {t(
-            isSessionReport
-              ? "Nutzt diese Punkte als Ausgangspunkt für ein ruhiges Gespräch über Rollen, Erwartungen und Zusammenarbeit."
-              : "Die entscheidenden Punkte für eure Zusammenarbeit seht ihr im vollständigen Report."
-          )}
+          {isSessionReport
+            ? rt("view.sessionCentralPatternHint")
+            : rt("view.legacyCentralPatternHint")}
         </p>
 
         {effectiveAccessNotice === "locked" ? (
           <div id="report-paywall-placeholder" className="mt-8 rounded-[24px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_10px_28px_rgba(15,23,42,0.04)]">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              {t("Freischaltung")}
+              {rt("legacy.lockedEyebrow")}
             </p>
             <h2 className="mt-3 text-xl font-semibold text-slate-950">
-              {t("Dieser Team-Report ist noch nicht freigeschaltet.")}
+              {rt("legacy.lockedTitle")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("Die Freischaltung für diesen Legacy-Report ist noch nicht aktiv.")}
+              {rt("legacy.lockedText")}
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-              {t("Wenn ein Advisor oder Accelerator den Report für euch freischaltet, ist er für das Team verfügbar.")}
+              {rt("legacy.lockedAdvisorText")}
             </p>
             <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-              {t("Freischaltung kommt bald. Bis dahin bleibt der PDF-Export für diesen Report deaktiviert.")}
+              {rt("legacy.lockedPdfText")}
             </p>
           </div>
         ) : effectiveAccessNotice === "free_beta" ? (
           <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
-              {t("Kostenlos verfügbar in der Testphase")}
+              {rt("legacy.freeBetaEyebrow")}
             </p>
             <h2 className="mt-3 text-xl font-semibold text-slate-950">
-              {t("Dieser Report ist in der aktuellen Testphase vollständig geöffnet.")}
+              {rt("legacy.freeBetaTitle")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("Später kann die Freischaltung über einen Team- oder Report-Zugang laufen.")}
+              {rt("legacy.freeBetaText")}
             </p>
           </div>
         ) : effectiveAccessNotice === "session_snapshot" ? (
           <div className="mt-8 rounded-[24px] border border-emerald-200/80 bg-emerald-50/70 p-6">
             <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700">
-              {t("Session-Snapshot")}
+              {rt("session.snapshotEyebrow")}
             </p>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">
-              {t("Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.")}
+              {rt("session.snapshotText")}
             </p>
           </div>
         ) : null}
@@ -155,10 +155,10 @@ export function FounderMatchingView({
       {effectiveAccessNotice === "locked" ? (
         <section className="page-section mt-8 rounded-[28px] border border-dashed border-slate-300 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Vollständiger Report")}
+            {rt("common.fullReport")}
           </p>
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            {t("Der vollständige Report wird nach der Freischaltung sichtbar.")}
+            {rt("legacy.lockedFullText")}
           </p>
         </section>
       ) : (
@@ -196,6 +196,7 @@ function FounderMatchingReportSections({
   workbookHref: string;
   isSessionReport: boolean;
 }) {
+  const rt = useTranslations("report");
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const conversationPrompts = collectConversationPrompts(founderReport);
@@ -204,10 +205,10 @@ function FounderMatchingReportSections({
     return (
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/92 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Vollständiger Report")}
+          {rt("common.fullReport")}
         </p>
         <p className="mt-4 text-sm leading-7 text-slate-700">
-          {t("Der Report ist freigeschaltet, aber die Detailauswertung ist für diesen alten Datensatz noch nicht renderbar.")}
+          {rt("legacy.unrenderableText")}
         </p>
       </section>
     );
@@ -219,7 +220,7 @@ function FounderMatchingReportSections({
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t("Eure Dynamik im Überblick")}
+          {rt("view.dynamicsOverview")}
         </p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
@@ -314,10 +315,10 @@ function FounderMatchingReportSections({
       {conversationPrompts.length > 0 ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Gesprächsimpulse für euer nächstes Gespräch")}
+            {rt("view.conversationPrompts")}
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            {t("Diese Fragen sind als nächster Schritt gedacht, nachdem ihr die Muster und Skalen eingeordnet habt.")}
+            {rt("view.conversationPromptsText")}
           </p>
           <ul className="mt-6 grid gap-3 lg:grid-cols-2">
             {conversationPrompts.map((prompt) => (
@@ -335,16 +336,16 @@ function FounderMatchingReportSections({
       {!isSessionReport ? (
         <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:hidden">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t("Nächster Schritt")}
+            {rt("common.nextStep")}
           </p>
           <h3 className="mt-3 text-xl font-semibold text-slate-900">
-            {t("Diese Punkte klärt ihr nicht nebenbei.")}
+            {rt("legacy.workbookTitle")}
           </h3>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            {t("Im Workbook legt ihr fest, wie ihr damit arbeitet.")}
+            {rt("legacy.workbookText")}
           </p>
           <div className="mt-6">
-            <ReportActionButton href={workbookHref}>{t("Workbook starten")}</ReportActionButton>
+            <ReportActionButton href={workbookHref}>{rt("legacy.workbookCta")}</ReportActionButton>
           </div>
         </section>
       ) : null}

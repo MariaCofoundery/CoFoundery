@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
@@ -24,6 +25,8 @@ type PageProps = {
   }>;
 };
 
+type ReportT = Awaited<ReturnType<typeof getTranslations>>;
+
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_CTA_CLASS =
@@ -35,10 +38,11 @@ function searchParamValue(value: string | string[] | undefined) {
 
 function workspaceResultUrl(
   matchingSessionId: string,
-  result: { ok: boolean; message?: string }
+  result: { ok: boolean; message?: string },
+  fallbackMessage: string
 ) {
   const params = new URLSearchParams();
-  params.set("workspaceMessage", result.message ?? "Der Arbeitsraum wurde verarbeitet.");
+  params.set("workspaceMessage", result.message ?? fallbackMessage);
   params.set("workspaceOk", result.ok ? "1" : "0");
   return `/matching/${matchingSessionId}/report?${params.toString()}`;
 }
@@ -81,7 +85,7 @@ function isFounderAlignmentReportPayload(
   );
 }
 
-function EmptyReportState({ matchingSessionId }: { matchingSessionId: string }) {
+function EmptyReportState({ matchingSessionId, t }: { matchingSessionId: string; t: ReportT }) {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
       <ProductNavigationOverride matchingHref={`/matching/${matchingSessionId}/report`} />
@@ -90,21 +94,20 @@ function EmptyReportState({ matchingSessionId }: { matchingSessionId: string }) 
           href="/discovery/intros"
           className="text-sm font-medium text-slate-500 hover:text-slate-900"
         >
-          Zurück zu meinen Intros
+          {t("common.backToIntros")}
         </Link>
         <h1 className="mt-6 text-2xl font-semibold text-slate-950">
-          Der Dynamik-Report ist noch nicht erstellt.
+          {t("session.emptyTitle")}
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Sobald die Matching-Session bereit ist, könnt ihr den Report über die
-          Matching-Vorbereitungsseite als Snapshot erstellen.
+          {t("session.emptyText")}
         </p>
         <div className="mt-6">
           <Link
             href="/discovery/intros"
             className="inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
-            Zurück zu meinen Intros
+            {t("common.backToIntros")}
           </Link>
         </div>
       </section>
@@ -133,35 +136,38 @@ function PageMessage({ message, ok }: { message: string | null; ok: boolean }) {
 function WorkspacePanel({
   matchingSessionId,
   workspace,
+  t,
 }: {
   matchingSessionId: string;
   workspace: MatchingWorkspaceSummary | null;
+  t: ReportT;
 }) {
+  const workspaceProcessedMessage = t("session.workspaceProcessed");
+
   async function startWorkspace() {
     "use server";
     const result = await startWorkspaceFromMatchingSessionAction(matchingSessionId);
-    redirect(workspaceResultUrl(matchingSessionId, result));
+    redirect(workspaceResultUrl(matchingSessionId, result, workspaceProcessedMessage));
   }
 
   if (workspace) {
     return (
       <section className="no-print mb-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.04)] md:p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-          Arbeitsraum
+          {t("session.workspaceEyebrow")}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          Arbeitsraum vorbereitet
+          {t("session.workspaceReadyTitle")}
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-emerald-950">
-          Eure gemeinsame Verbindung wurde angelegt. Das Workbook/Operating Agreement wird als
-          nächster Schritt angebunden.
+          {t("session.workspaceReadyText")}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link href={`/workspaces/${workspace.workspace.id}`} className={PRIMARY_CTA_CLASS}>
-            Arbeitsraum öffnen
+            {t("session.openWorkspace")}
           </Link>
           <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            Zurück zu meinen Intros
+            {t("common.backToIntros")}
           </Link>
         </div>
       </section>
@@ -171,23 +177,21 @@ function WorkspacePanel({
   return (
     <section className="no-print mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] md:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-        Nächster Schritt
+        {t("common.nextStep")}
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        Gemeinsamen Arbeitsraum vorbereiten
+        {t("session.prepareWorkspaceTitle")}
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        Wenn ihr weitermachen möchtet, könnt ihr aus diesem Report einen gemeinsamen Arbeitsraum
-        vorbereiten. Dabei wird eine gemeinsame Verbindung angelegt. Das Workbook wird im nächsten
-        Schritt angebunden.
+        {t("session.prepareWorkspaceText")}
       </p>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        Es wird keine Einladung, kein legacy Report und kein Workbook erstellt.
+        {t("session.prepareWorkspaceSafety")}
       </p>
       <div className="mt-5">
         <form action={startWorkspace}>
           <button type="submit" className={PRIMARY_CTA_CLASS}>
-            Gemeinsamen Arbeitsraum starten
+            {t("session.startWorkspace")}
           </button>
         </form>
       </div>
@@ -198,6 +202,7 @@ function WorkspacePanel({
 export default async function MatchingSessionReportPage({ params, searchParams }: PageProps) {
   const { matchingSessionId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
+  const t = await getTranslations("report");
   const supabase = await createClient();
   const {
     data: { user },
@@ -209,7 +214,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
 
   const summary = await getMatchingReportRunForSession(matchingSessionId, user.id);
   if (!summary || !isFounderAlignmentReportPayload(summary.reportRun.payload)) {
-    return <EmptyReportState matchingSessionId={matchingSessionId} />;
+    return <EmptyReportState matchingSessionId={matchingSessionId} t={t} />;
   }
   const workspace = await getMatchingWorkspaceForSession(matchingSessionId, user.id);
   const workspaceMessage = searchParamValue(resolvedSearchParams.workspaceMessage) ?? null;
@@ -234,15 +239,15 @@ export default async function MatchingSessionReportPage({ params, searchParams }
           href="/discovery/intros"
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
         >
-          Zurück zu meinen Intros
+          {t("common.backToIntros")}
         </Link>
         <p className="text-xs font-medium text-slate-500">
-          Session-basierter Snapshot · keine Einladung, kein legacy Report, kein Workbook
+          {t("session.snapshotHint")}
         </p>
       </div>
 
       <PageMessage message={workspaceMessage} ok={workspaceOk} />
-      <WorkspacePanel matchingSessionId={matchingSessionId} workspace={workspace} />
+      <WorkspacePanel matchingSessionId={matchingSessionId} workspace={workspace} t={t} />
 
       <FounderMatchingView
         participantAName={participantAName}

@@ -1,0 +1,56 @@
+{
+  "common": {
+    "backToDashboard": "Zurück zum Dashboard",
+    "backToIntros": "Zurück zu meinen Intros",
+    "savePdf": "Als PDF speichern",
+    "pdfLocked": "PDF nach Freischaltung verfügbar",
+    "fullReport": "Vollständiger Report",
+    "nextStep": "Nächster Schritt"
+  },
+  "legacy": {
+    "notAvailableTitle": "Report noch nicht verfügbar",
+    "notAvailableText": "Für diese Einladung gibt es noch keinen renderbaren Matching-Report.",
+    "autoRefresh": "Wir prüfen den Status automatisch im Hintergrund.",
+    "renderingTitle": "Report wird gerade erstellt",
+    "renderingText": "Der neue Founder-Matching-Report ist noch nicht vollständig verfügbar. Bitte prüft den Report in wenigen Momenten erneut.",
+    "lockedEyebrow": "Freischaltung",
+    "lockedTitle": "Dieser Team-Report ist noch nicht freigeschaltet.",
+    "lockedText": "Die Freischaltung für diesen Legacy-Report ist noch nicht aktiv.",
+    "lockedAdvisorText": "Wenn ein Advisor oder Accelerator den Report für euch freischaltet, ist er für das Team verfügbar.",
+    "lockedPdfText": "Freischaltung kommt bald. Bis dahin bleibt der PDF-Export für diesen Report deaktiviert.",
+    "lockedFullText": "Der vollständige Report wird nach der Freischaltung sichtbar.",
+    "freeBetaEyebrow": "Kostenlos verfügbar in der Testphase",
+    "freeBetaTitle": "Dieser Report ist in der aktuellen Testphase vollständig geöffnet.",
+    "freeBetaText": "Später kann die Freischaltung über einen Team- oder Report-Zugang laufen.",
+    "unrenderableText": "Der Report ist freigeschaltet, aber die Detailauswertung ist für diesen alten Datensatz noch nicht renderbar.",
+    "workbookTitle": "Diese Punkte klärt ihr nicht nebenbei.",
+    "workbookText": "Im Workbook legt ihr fest, wie ihr damit arbeitet.",
+    "workbookCta": "Workbook starten"
+  },
+  "session": {
+    "emptyTitle": "Der Dynamik-Report ist noch nicht erstellt.",
+    "emptyText": "Sobald die Matching-Session bereit ist, könnt ihr den Report über die Matching-Vorbereitungsseite als Snapshot erstellen.",
+    "snapshotHint": "Session-basierter Snapshot · keine Einladung, kein legacy Report, kein Workbook",
+    "snapshotEyebrow": "Session-Snapshot",
+    "snapshotText": "Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.",
+    "workspaceProcessed": "Der Arbeitsraum wurde verarbeitet.",
+    "workspaceEyebrow": "Arbeitsraum",
+    "workspaceReadyTitle": "Arbeitsraum vorbereitet",
+    "workspaceReadyText": "Eure gemeinsame Verbindung wurde angelegt. Das Workbook/Operating Agreement wird als nächster Schritt angebunden.",
+    "openWorkspace": "Arbeitsraum öffnen",
+    "prepareWorkspaceTitle": "Gemeinsamen Arbeitsraum vorbereiten",
+    "prepareWorkspaceText": "Wenn ihr weitermachen möchtet, könnt ihr aus diesem Report einen gemeinsamen Arbeitsraum vorbereiten. Dabei wird eine gemeinsame Verbindung angelegt. Das Workbook wird im nächsten Schritt angebunden.",
+    "prepareWorkspaceSafety": "Es wird keine Einladung, kein legacy Report und kein Workbook erstellt.",
+    "startWorkspace": "Gemeinsamen Arbeitsraum starten"
+  },
+  "view": {
+    "matchingReport": "Matching-Report",
+    "dynamicsReport": "Dynamik-Report",
+    "centralPatterns": "Eure zentralen Muster",
+    "sessionCentralPatternHint": "Nutzt diese Punkte als Ausgangspunkt für ein ruhiges Gespräch über Rollen, Erwartungen und Zusammenarbeit.",
+    "legacyCentralPatternHint": "Die entscheidenden Punkte für eure Zusammenarbeit seht ihr im vollständigen Report.",
+    "dynamicsOverview": "Eure Dynamik im Überblick",
+    "conversationPrompts": "Gesprächsimpulse für euer nächstes Gespräch",
+    "conversationPromptsText": "Diese Fragen sind als nächster Schritt gedacht, nachdem ihr die Muster und Skalen eingeordnet habt."
+  }
+}

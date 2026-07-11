@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
@@ -59,6 +60,7 @@ function toFounderScores(scoring: TeamScoringResult, person: "A" | "B"): Founder
 
 export default async function ReportPage({ params }: PageProps) {
   const { sessionId } = await params;
+  const t = await getTranslations("report");
   const supabase = await createClient();
   const {
     data: { user },
@@ -91,18 +93,18 @@ export default async function ReportPage({ params }: PageProps) {
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8">
           <ResearchPageTracker eventName="report_page_viewed" invitationId={sessionId} />
           <ReportAutoRefresh />
-          <h1 className="text-2xl font-semibold text-slate-900">Report noch nicht verfügbar</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">{t("legacy.notAvailableTitle")}</h1>
           <p className="mt-3 text-sm text-slate-700">
-            Für diese Einladung gibt es noch keinen renderbaren Matching-Report.
+            {t("legacy.notAvailableText")}
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            Wir prüfen den Status automatisch im Hintergrund.
+            {t("legacy.autoRefresh")}
           </p>
           <Link
             href="/dashboard"
             className="mt-6 inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
           >
-            Zurück zum Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </section>
       </main>
@@ -128,17 +130,16 @@ export default async function ReportPage({ params }: PageProps) {
             }}
           />
           <ReportAutoRefresh />
-          <h1 className="text-2xl font-semibold text-slate-900">Report wird gerade erstellt</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">{t("legacy.renderingTitle")}</h1>
           <p className="mt-3 text-sm text-slate-700">
-            Der neue Founder-Matching-Report ist noch nicht vollständig verfügbar. Bitte prüft den
-            Report in wenigen Momenten erneut.
+            {t("legacy.renderingText")}
           </p>
           <p className="mt-1 text-xs text-slate-500">Invitation: {snapshot.invitationId}</p>
           <Link
             href="/dashboard"
             className="mt-6 inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
           >
-            Zurück zum Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </section>
       </main>
@@ -185,14 +186,15 @@ export default async function ReportPage({ params }: PageProps) {
           href="/dashboard"
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
         >
-          Zurück zum Dashboard
+          {t("common.backToDashboard")}
         </Link>
         {isLegacyReportLocked ? (
           <span className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500">
-            PDF nach Freischaltung verfügbar
+            {t("common.pdfLocked")}
           </span>
         ) : (
           <PrintReportButton
+            label={t("common.savePdf")}
             invitationId={snapshot.invitationId}
             teamContext={teamContext}
             properties={{ reportType: snapshot.reportType, renderMode: "founder_matching_live" }}

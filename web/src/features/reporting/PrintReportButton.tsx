@@ -1,10 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { trackResearchEvent } from "@/features/research/client";
 
 export function PrintReportButton({
-  label = "Als PDF speichern",
+  label,
   className = "",
   eventName = null,
   invitationId = null,
@@ -20,6 +21,8 @@ export function PrintReportButton({
   module?: "base" | "values" | null;
   properties?: Record<string, unknown>;
 }) {
+  const t = useTranslations("report");
+
   return (
     <ReportActionButton
       onClick={() => {
@@ -36,7 +39,7 @@ export function PrintReportButton({
       }}
       className={className}
     >
-      {label}
+      {label ?? t("common.savePdf")}
     </ReportActionButton>
   );
 }

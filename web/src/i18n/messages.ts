@@ -5,6 +5,7 @@ import deCommon from "../../messages/de/common.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deNavigation from "../../messages/de/navigation.json";
+import deReport from "../../messages/de/report.json";
 import deWorkspace from "../../messages/de/workspace.json";
 import deWorkbook from "../../messages/de/workbook.json";
 import enAuth from "../../messages/en/auth.json";
@@ -12,6 +13,7 @@ import enCommon from "../../messages/en/common.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enNavigation from "../../messages/en/navigation.json";
+import enReport from "../../messages/en/report.json";
 import enWorkspace from "../../messages/en/workspace.json";
 import enWorkbook from "../../messages/en/workbook.json";
 
@@ -22,6 +24,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: deDashboard,
     discovery: deDiscovery,
     navigation: deNavigation,
+    report: deReport,
     workspace: deWorkspace,
     workbook: deWorkbook,
   },
@@ -31,6 +34,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: enDashboard,
     discovery: enDiscovery,
     navigation: enNavigation,
+    report: enReport,
     workspace: enWorkspace,
     workbook: enWorkbook,
   },
