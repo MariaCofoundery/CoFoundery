@@ -6,12 +6,14 @@ import deDashboard from "../../messages/de/dashboard.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deNavigation from "../../messages/de/navigation.json";
 import deWorkspace from "../../messages/de/workspace.json";
+import deWorkbook from "../../messages/de/workbook.json";
 import enAuth from "../../messages/en/auth.json";
 import enCommon from "../../messages/en/common.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enNavigation from "../../messages/en/navigation.json";
 import enWorkspace from "../../messages/en/workspace.json";
+import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
@@ -21,6 +23,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     discovery: deDiscovery,
     navigation: deNavigation,
     workspace: deWorkspace,
+    workbook: deWorkbook,
   },
   en: {
     auth: enAuth,
@@ -29,6 +32,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     discovery: enDiscovery,
     navigation: enNavigation,
     workspace: enWorkspace,
+    workbook: enWorkbook,
   },
 };
 

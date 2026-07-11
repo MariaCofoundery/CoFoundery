@@ -10,6 +10,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
@@ -1302,6 +1303,8 @@ export function FounderAlignmentWorkbookClient({
   storedTeamContext,
   hasTeamContextMismatch,
 }: FounderAlignmentWorkbookClientProps) {
+  const wt = useTranslations("workbook");
+  const locale = useLocale();
   const [workbook, setWorkbook] = useState(initialWorkbook);
   const [saveState, setSaveState] = useState<{
     kind: "idle" | "dirty" | "saving" | "saved" | "autosaved" | "error";
@@ -1469,7 +1472,7 @@ export function FounderAlignmentWorkbookClient({
   const advisorClosingFounderReactionLabel =
     workbook.founderReaction.status != null
       ? founderReactionStatusLabel(workbook.founderReaction.status)
-      : "Noch keine Team-Reaktion";
+      : t("Noch keine Team-Reaktion");
   const founderAAdvisorApproved = advisorInviteState.founderAApproved;
   const founderBAdvisorApproved = advisorInviteState.founderBApproved;
   const advisorApprovalCount =
@@ -1486,7 +1489,7 @@ export function FounderAlignmentWorkbookClient({
       ? founderBLabel
       : currentUserRole === "founderB"
         ? founderALabel
-        : "die andere Person";
+        : t("die andere Person");
   const advisorAccessState =
     advisorInviteState.advisorLinked && !advisorBothFoundersApproved
       ? "paused"
@@ -1500,50 +1503,46 @@ export function FounderAlignmentWorkbookClient({
   const advisorAccessMeta =
     advisorAccessState === "active"
       ? {
-          badge: "Advisor freigegeben",
+          badge: wt("advisor.accessGranted"),
           badgeClassName: "border-emerald-200 bg-emerald-50 text-emerald-700",
-          title: `${advisorLabel} kann jetzt mitlesen und eigene Hinweise ergänzen`,
-          description:
-            "Beide Founder haben freigegeben. Der Advisor sieht das Workbook und den zugehörigen Report, bearbeitet aber nur die vorgesehenen Advisor-Bereiche.",
+          title: wt("advisor.activeTitle", { advisor: advisorLabel }),
+          description: wt("advisor.activeDescription"),
         }
       : advisorAccessState === "ready"
         ? {
-            badge: "Freigabe liegt vor",
+            badge: wt("advisor.approvalReady"),
             badgeClassName: "border-sky-200 bg-sky-50 text-sky-700",
-            title: "Beide Founder haben zugestimmt",
-            description:
-              "Der Zugriff wird aktiv, sobald der Advisor den Einladungslink nutzt. Bis dahin bleibt der Arbeitsraum unverändert.",
+            title: wt("advisor.readyTitle"),
+            description: wt("advisor.readyDescription"),
           }
         : advisorAccessState === "waiting"
           ? {
-              badge: "Wartet auf zweite Zustimmung",
+              badge: wt("advisor.waitingSecondApproval"),
               badgeClassName: "border-amber-200 bg-amber-50 text-amber-700",
-              title: "Eine Zustimmung allein reicht noch nicht",
-              description: `Der Advisor bleibt blockiert, bis ${otherFounderAdvisorLabel} ebenfalls freigibt.`,
+              title: wt("advisor.waitingTitle"),
+              description: wt("advisor.waitingDescription", { founder: otherFounderAdvisorLabel }),
             }
           : advisorAccessState === "paused"
             ? {
-                badge: "Zugriff pausiert",
+                badge: wt("advisor.accessPaused"),
                 badgeClassName: "border-amber-200 bg-amber-50 text-amber-700",
-                title: "Der Advisor bleibt verknüpft, hat aber aktuell keinen Zugriff",
-                description:
-                  "Mindestens eine Freigabe ist nicht mehr aktiv. Der Advisor kann erst wieder arbeiten, wenn beide Founder erneut freigegeben haben.",
+                title: wt("advisor.pausedTitle"),
+                description: wt("advisor.pausedDescription"),
               }
             : {
-                badge: "Noch nicht freigegeben",
+                badge: wt("advisor.notGranted"),
                 badgeClassName: "border-slate-200 bg-white text-slate-600",
-                title: "Optional eine externe Begleitung freigeben",
-                description:
-                  "Wenn ihr eine dritte Perspektive einbinden wollt, gebt den Zugriff bewusst gemeinsam frei. Vorher bleibt der Advisor vollständig blockiert.",
+                title: wt("advisor.idleTitle"),
+                description: wt("advisor.idleDescription"),
               };
   const advisorActionLabel =
     advisorAccessState === "ready"
-      ? "Einladungslink erstellen"
+      ? wt("advisor.createInviteLink")
       : advisorAccessState === "paused" && !viewerFounderApproved
-        ? "Freigabe erneut erteilen"
+        ? wt("advisor.approveAgain")
         : advisorAccessState === "idle"
-          ? "Freigabe starten"
-          : "Freigabe erteilen";
+          ? wt("advisor.startApproval")
+          : wt("advisor.approve");
   const showAdvisorApprovalButton =
     (currentUserRole === "founderA" || currentUserRole === "founderB") &&
     (
@@ -2089,60 +2088,60 @@ export function FounderAlignmentWorkbookClient({
 
   const formattedUpdatedAt = useMemo(() => {
     if (!saveState.updatedAt) return null;
-    return new Intl.DateTimeFormat("de-DE", {
+    return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "de-DE", {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(saveState.updatedAt));
-  }, [saveState.updatedAt]);
+  }, [locale, saveState.updatedAt]);
 
   const saveStatusMeta = useMemo(() => {
     if (!canSave || source === "mock") {
       return {
-        label: t("Vorschau ohne Speichern"),
+        label: wt("save.preview"),
         tone: "neutral" as const,
       };
     }
 
     switch (saveState.kind) {
       case "dirty":
-        return { label: t("Wird gleich gesichert"), tone: "warning" as const };
+        return { label: wt("save.savingSoon"), tone: "warning" as const };
       case "saving":
-        return { label: t("Speichert"), tone: "info" as const };
+        return { label: wt("save.saving"), tone: "info" as const };
       case "autosaved":
       case "saved":
-        return { label: t("Alles gesichert"), tone: "success" as const };
+        return { label: wt("save.saved"), tone: "success" as const };
       case "error":
-        return { label: t("Speichern klappt gerade nicht"), tone: "error" as const };
+        return { label: wt("save.error"), tone: "error" as const };
       default:
         return {
-          label: persisted ? t("Bereit") : t("Startklar"),
+          label: persisted ? wt("save.ready") : wt("save.startReady"),
           tone: "neutral" as const,
         };
     }
-  }, [canSave, persisted, saveState.kind, source]);
+  }, [canSave, persisted, saveState.kind, source, wt]);
   const saveStatusDetail = useMemo(() => {
     if (!canSave || source === "mock") {
-      return t("Diese Vorschau speichert keine Eingaben.");
+      return wt("save.previewDetail");
     }
 
     switch (saveState.kind) {
       case "dirty":
-        return t("Aenderungen werden automatisch gesichert.");
+        return wt("save.dirtyDetail");
       case "saving":
-        return t("Euer aktueller Stand wird gerade gesichert.");
+        return wt("save.savingDetail");
       case "autosaved":
       case "saved":
         return formattedUpdatedAt
-          ? `${t("Alles gesichert")} · ${formattedUpdatedAt}`
-          : t("Alles gesichert.");
+          ? wt("save.savedWithDate", { date: formattedUpdatedAt })
+          : wt("save.savedDetail");
       case "error":
-        return t("Bitte kurz warten. Euer letzter gesicherter Stand bleibt erhalten.");
+        return wt("save.errorDetail");
       default:
         return persisted
-          ? t("Euer Stand ist geladen und bleibt automatisch gesichert.")
-          : t("Sobald ihr losschreibt, wird euer Stand automatisch gesichert.");
+          ? wt("save.loadedDetail")
+          : wt("save.startDetail");
     }
-  }, [canSave, formattedUpdatedAt, persisted, saveState.kind, source]);
+  }, [canSave, formattedUpdatedAt, persisted, saveState.kind, source, wt]);
 
   useEffect(() => {
     if (!shouldHydrateLegacyDecisionRulesWorkspace || !decisionRulesWorkspace) {
@@ -3344,23 +3343,23 @@ export function FounderAlignmentWorkbookClient({
                   CoFoundery Align
                 </p>
                 <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.035em] text-slate-950">
-                  Eure gemeinsame Vereinbarung
+                  {wt("client.summaryTitle")}
                 </h1>
                 <p className="mt-3 text-[15px] leading-7 text-slate-600">
-                  {t("Basierend auf eurem Alignment-Workbook")}
+                  {wt("client.summaryBasedOn")}
                 </p>
                 <p className="mt-5 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
                 </p>
                 <p className="mt-4 max-w-3xl text-[16px] leading-8 text-slate-700">
-                  {t("Das ist die Arbeitsbasis, auf die ihr euch aktuell einigt.")}
+                  {wt("client.summaryIntro")}
                 </p>
               </div>
 
               {formattedUpdatedAt ? (
                 <div className="rounded-[22px] border border-slate-200/80 bg-slate-50/65 px-4 py-3 text-sm text-slate-600 print:min-w-[170px]">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {t("Stand")}
+                    {wt("client.summaryUpdated")}
                   </p>
                   <p className="mt-2 font-medium text-slate-700">{formattedUpdatedAt}</p>
                 </div>
@@ -3371,12 +3370,14 @@ export function FounderAlignmentWorkbookClient({
           <section className="rounded-[36px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.055)] sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Workbook</p>
+                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+                  {wt("common.workbook")}
+                </p>
                 <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
                   {teamContextLabel(teamContext)}
                 </div>
                 <h1 className="mt-3 text-3xl font-semibold text-slate-950">
-                  {t("Workbook fuer euer Gespraech")}
+                  {wt("client.title")}
                 </h1>
                 <p className="mt-3 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
@@ -3387,7 +3388,7 @@ export function FounderAlignmentWorkbookClient({
               </div>
 
               <div className="flex min-w-[260px] flex-col items-start gap-3 rounded-[30px] border border-slate-200/70 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,0.96))] p-5 lg:items-end">
-                <div className="text-sm text-slate-600">Dauer: 60-90 Minuten</div>
+                <div className="text-sm text-slate-600">{wt("client.duration")}</div>
                 <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
                   <div className="flex items-center gap-3">
                     <span
@@ -3423,10 +3424,10 @@ export function FounderAlignmentWorkbookClient({
                 </div>
                 <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
                   <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                    {t("Fortschritt")}
+                    {wt("client.progress")}
                   </p>
                   <p className="mt-2 text-sm font-medium text-slate-900">
-                    {t(`Schritt ${currentIndex + 1} von ${visibleSteps.length}`)}
+                    {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
                   </p>
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                     <div
@@ -3436,8 +3437,8 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                   <p className="mt-3 text-xs leading-6 text-slate-500">
                     {completedStepsCount > 0
-                      ? t(`${completedStepsCount} Schritte sind schon festgehalten.`)
-                      : t("Die erste klare Regel entsteht gleich im Workbook.")}
+                      ? wt("client.completedSteps", { count: completedStepsCount })
+                      : wt("client.firstRuleSoon")}
                   </p>
                 </div>
               </div>
@@ -3466,7 +3467,7 @@ export function FounderAlignmentWorkbookClient({
                         </p>
                       </div>
                       <span className="rounded-full border border-slate-200 bg-white/88 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                        {t(`Schritt ${currentIndex + 1}`)}
+                        {wt("client.stepShort", { current: currentIndex + 1 })}
                       </span>
                     </div>
 
@@ -3506,27 +3507,27 @@ export function FounderAlignmentWorkbookClient({
                         <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
                           <div className="max-w-md">
                             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                              {t("Advisor-Kontext")}
+                              {wt("advisor.context")}
                             </p>
                             <div className="mt-2 flex flex-wrap items-center gap-2">
                               <span
                                 className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${advisorAccessMeta.badgeClassName}`}
                               >
-                                {t(advisorAccessMeta.badge)}
+                                {advisorAccessMeta.badge}
                               </span>
                               <span className="text-xs text-slate-500">
-                                {t("Freigabe und Rollenhinweise")}
+                                {wt("advisor.rolesHint")}
                               </span>
                             </div>
                             <h3 className="mt-3 text-base font-semibold text-slate-950">
-                              {t("Advisor-Zugriff")}
+                              {wt("advisor.access")}
                             </h3>
                             <p className="mt-2 text-sm leading-6 text-slate-600">
-                              {t("Nur bei Bedarf öffnen: Hier siehst du Freigabestatus und den Rahmen deiner Rolle.")}
+                              {wt("advisor.accessDetails")}
                             </p>
                           </div>
                           <span className="mt-1 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500 transition group-open:bg-slate-100">
-                            {t("Details")}
+                            {wt("common.details")}
                           </span>
                         </summary>
 
@@ -3549,9 +3550,7 @@ export function FounderAlignmentWorkbookClient({
                             ) : null}
                           </div>
                           <p className="mt-4 text-sm leading-6 text-slate-600">
-                            {t(
-                              "Du arbeitest nur im freigegebenen Workbook- und Report-Kontext. Founder-Beiträge und Zustimmungen bleiben unverändert."
-                            )}
+                            {wt("advisor.viewerScope")}
                           </p>
                         </div>
                       </details>
@@ -3559,29 +3558,25 @@ export function FounderAlignmentWorkbookClient({
                       <>
                         <div className="max-w-md">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                            {t("Advisor-Begleitung")}
+                            {wt("advisor.guidance")}
                           </p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <span
                               className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${advisorAccessMeta.badgeClassName}`}
                             >
-                              {t(advisorAccessMeta.badge)}
+                              {advisorAccessMeta.badge}
                             </span>
                             <span className="text-xs text-slate-500">
-                              {t(
-                                advisorEntriesState.length > 0
-                                  ? `${advisorEntriesState.length} Advisor-Eintraege`
-                                  : "Noch kein Advisor vorgeschlagen"
-                              )}
+                              {advisorEntriesState.length > 0
+                                ? wt("advisor.entriesCount", { count: advisorEntriesState.length })
+                                : wt("advisor.noAdvisorProposed")}
                             </span>
                           </div>
                           <h3 className="mt-3 text-base font-semibold text-slate-950">
-                            {t("Mehrere Advisors pro Team vorbereiten")}
+                            {wt("advisor.prepareMultiple")}
                           </h3>
                           <p className="mt-2 text-sm leading-6 text-slate-600">
-                            {t(
-                              "Schlagt konkrete Personen vor, haltet die zweite Founder-Zustimmung fest und bereitet so einen sauberen Advisor-Kontext pro Person vor."
-                            )}
+                            {wt("advisor.prepareDescription")}
                           </p>
                           <div className="mt-4">
                             <button
@@ -3589,11 +3584,7 @@ export function FounderAlignmentWorkbookClient({
                               onClick={() => setIsAdvisorSectionExpanded((current) => !current)}
                               className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
                             >
-                              {t(
-                                isAdvisorSectionExpanded
-                                  ? "Advisor-Begleitung ausblenden"
-                                  : "Advisor-Begleitung anzeigen"
-                              )}
+                              {isAdvisorSectionExpanded ? wt("advisor.hide") : wt("advisor.show")}
                             </button>
                           </div>
                         </div>
@@ -3698,12 +3689,10 @@ export function FounderAlignmentWorkbookClient({
                                                 onClick={() => handleSendAdvisorInvite(entry)}
                                                 disabled={isAdvisorActionPending}
                                                 className="justify-center"
-                                              >
-                                                {t(
-                                                  isAdvisorActionPending
-                                                    ? "Versendet..."
-                                                    : "Einladung senden"
-                                                )}
+                                            >
+                                                {isAdvisorActionPending
+                                                  ? wt("advisor.sending")
+                                                  : wt("advisor.sendInvite")}
                                               </ReportActionButton>
                                             ) : null}
                                             {canResendInvite ? (
@@ -3713,7 +3702,7 @@ export function FounderAlignmentWorkbookClient({
                                                 disabled={isAdvisorActionPending}
                                                 className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
                                               >
-                                                {t("Erneut senden")}
+                                                {wt("advisor.resend")}
                                               </button>
                                             ) : null}
                                             {canCopyInviteLink ? (
@@ -3723,7 +3712,7 @@ export function FounderAlignmentWorkbookClient({
                                                 disabled={isAdvisorActionPending}
                                                 className="text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
                                               >
-                                                {t("Einladungslink kopieren")}
+                                                {wt("advisor.copyInviteLink")}
                                               </button>
                                             ) : null}
                                           </div>
@@ -3735,7 +3724,7 @@ export function FounderAlignmentWorkbookClient({
                               ) : (
                                 <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 p-4">
                                   <p className="text-sm font-medium text-slate-900">
-                                    {t("Noch kein Advisor vorgeschlagen")}
+                                    {wt("advisor.noAdvisorProposed")}
                                   </p>
                                   <p className="mt-2 text-sm leading-6 text-slate-600">
                                     {t(
@@ -3748,14 +3737,14 @@ export function FounderAlignmentWorkbookClient({
                               {currentUserRole === "founderA" || currentUserRole === "founderB" ? (
                                 <div className="rounded-2xl border border-slate-200 bg-white p-4">
                                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                    {t("Advisor vorschlagen")}
+                                    {wt("advisor.propose")}
                                   </p>
                                   <div className="mt-3 grid gap-3">
                                     <input
                                       type="text"
                                       value={advisorProposalName}
                                       onChange={(event) => setAdvisorProposalName(event.target.value)}
-                                      placeholder={t("Advisor-Name (optional)")}
+                                      placeholder={wt("advisor.namePlaceholder")}
                                       className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
                                     />
                                     <input
@@ -3772,14 +3761,10 @@ export function FounderAlignmentWorkbookClient({
                                         disabled={isAdvisorActionPending}
                                         className="justify-center"
                                       >
-                                        {t(
-                                          isAdvisorActionPending
-                                            ? "Speichert..."
-                                            : "Advisor vorschlagen"
-                                        )}
+                                        {isAdvisorActionPending ? wt("advisor.saving") : wt("advisor.propose")}
                                       </ReportActionButton>
                                       <p className="text-xs leading-6 text-slate-600">
-                                        {t("E-Mail ist Pflicht. Dein Vorschlag bleibt sichtbar, auch wenn die zweite Zustimmung noch fehlt.")}
+                                        {wt("advisor.emailRequired")}
                                       </p>
                                     </div>
                                   </div>
@@ -3788,19 +3773,19 @@ export function FounderAlignmentWorkbookClient({
 
                               <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                  {t("Was der Advisor spaeter darf")}
+                                  {wt("advisor.permissionsTitle")}
                                 </p>
                                 <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-700">
-                                  <li>{t("Sieht den freigegebenen Report und das Workbook.")}</li>
-                                  <li>{t("Antwortet auf sichtbare Founder-Beitraege und ergaenzt pro Abschnitt einen Impuls.")}</li>
-                                  <li>{t("Aendert keine Founder-Beitraege, Regeln oder Zustimmungen.")}</li>
+                                  <li>{wt("advisor.permissionReportWorkbook")}</li>
+                                  <li>{wt("advisor.permissionReplies")}</li>
+                                  <li>{wt("advisor.permissionNoFounderEdits")}</li>
                                 </ul>
                               </div>
 
                               {advisorImpulses.length > 0 ? (
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
                                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                                    {t("Impulse aus der Advisor-Begleitung")}
+                                    {wt("advisor.impulses")}
                                   </p>
                                   <div className="mt-3 space-y-3">
                                     {advisorImpulses.map((impulse) => {
@@ -3850,14 +3835,12 @@ export function FounderAlignmentWorkbookClient({
           {hasTeamContextMismatch ? (
             <div className="mt-6 rounded-3xl border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/6 p-6">
               <p className="text-[11px] uppercase tracking-[0.22em] text-[color:var(--brand-accent)]">
-                Bereits vorhandenes Workbook
+                {wt("client.existingWorkbook")}
               </p>
               <p className="mt-3 text-sm leading-7 text-slate-700">
-                {t("Zu dieser Einladung existiert bereits ein Workbook im Kontext")}{" "}
-                <strong>{teamContextLabel(storedTeamContext)}</strong>
-                {t(
-                  ". Die vorhandenen Inhalte wurden geladen, damit nichts verloren wirkt. Beim naechsten Speichern wird das Workbook im aktuell geoeffneten Kontext weitergefuehrt."
-                )}
+                {wt("client.existingWorkbookDescription", {
+                  context: teamContextLabel(storedTeamContext),
+                })}
               </p>
             </div>
           ) : null}
@@ -5398,7 +5381,7 @@ export function FounderAlignmentWorkbookClient({
                   onClick={() => persist(previousStepId)}
                   className={currentIndex === 0 ? "pointer-events-none opacity-50" : ""}
                 >
-                  {t("Zurueck")}
+                  {wt("common.back")}
                 </ReportActionButton>
 
                 <div className="flex flex-wrap gap-3">
@@ -5411,10 +5394,10 @@ export function FounderAlignmentWorkbookClient({
                     }
                   >
                     {currentIndex === visibleSteps.length - 1
-                      ? t("Zur Zusammenfassung")
+                      ? wt("client.toSummary")
                       : currentStepStatus === "finalized"
-                        ? t("Zur naechsten Dimension")
-                        : t("Diesen Schritt vorerst verlassen")}
+                        ? wt("client.nextDimension")
+                        : wt("client.leaveStep")}
                   </ReportActionButton>
                 </div>
               </div>
@@ -6675,6 +6658,8 @@ function WorkbookSummaryView({
   invitationId: string | null;
   teamContext: TeamContext;
 }) {
+  const wt = useTranslations("workbook");
+
   return (
     <>
       <div className="mt-10 space-y-8 print:mt-6 print:space-y-6">
@@ -6776,7 +6761,7 @@ function WorkbookSummaryView({
             </p>
           </div>
           <ReportActionButton type="button" onClick={() => window.print()} className="shrink-0 print:hidden">
-            {t("Als PDF exportieren")}
+            {wt("client.exportPdf")}
           </ReportActionButton>
         </div>
       </div>
@@ -6789,7 +6774,7 @@ function WorkbookSummaryView({
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <ReportActionButton variant="utility" onClick={onBack}>
-          {t("Zurueck zum letzten Schritt")}
+          {wt("client.backToLastStep")}
         </ReportActionButton>
       </div>
     </>

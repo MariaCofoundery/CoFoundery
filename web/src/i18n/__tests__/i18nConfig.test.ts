@@ -40,7 +40,7 @@ test("loads English discovery messages", () => {
   assert.equal(discovery.profile?.assessment?.title, "Include Cofoundery Check");
 });
 
-test("loads English auth, dashboard and workspace messages", () => {
+test("loads English auth, dashboard, workspace and workbook messages", () => {
   const messages = getMessages("en");
   const auth = messages.auth as {
     login?: { subtitle?: string };
@@ -53,10 +53,16 @@ test("loads English auth, dashboard and workspace messages", () => {
   const workspace = messages.workspace as {
     agreement?: { editor?: { saveSection?: string } };
   };
+  const workbook = messages.workbook as {
+    intro?: { start?: string };
+    client?: { title?: string };
+  };
 
   assert.equal(auth.login?.subtitle, "Sign in with a magic link if you already have access.");
   assert.equal(auth.magicLinkForm?.submit, "Send magic link");
   assert.equal(dashboard.hero?.eyebrow, "Founder dashboard");
   assert.equal(dashboard.actions?.inviteCofounder, "Invite co-founder");
   assert.equal(workspace.agreement?.editor?.saveSection, "Save section");
+  assert.equal(workbook.intro?.start, "Start workbook");
+  assert.equal(workbook.client?.title, "Workbook for your conversation");
 });

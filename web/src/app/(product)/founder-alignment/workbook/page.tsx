@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlignmentWorkbookClient";
@@ -12,7 +13,6 @@ import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founde
 import { buildWorkbookHref } from "@/features/reporting/workbookNavigation";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
-import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type PageSearchParams = {
   invitationId?: string;
@@ -37,6 +37,7 @@ export default async function FounderAlignmentWorkbookPage({
   searchParams: Promise<PageSearchParams>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("workbook");
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const advisorContext = isAdvisorContext(params.advisorContext);
@@ -78,27 +79,26 @@ export default async function FounderAlignmentWorkbookPage({
           matchingHref={fallbackReportHref}
           workbookHref={fallbackWorkbookHref}
           activeView={advisorContext ? "advisor" : "founder"}
-          contextLabel={advisorContext ? "Advisor-Kontext" : "Founder-Kontext"}
+          contextLabel={advisorContext ? t("common.advisorContext") : t("common.founderContext")}
         />
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-            Workbook
+            {t("common.workbook")}
           </p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            {t("Workbook aktuell noch nicht verfuegbar")}
+            {t("unavailable.title")}
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            {t(
-              "Das Workbook knuepft an einen vorhandenen Matching-Report an. Sobald beide Basisprofile vollstaendig vorliegen und auswertbar sind, kann das Workbook daraus seine Schwerpunkte ableiten."
-            )}
+            {t("unavailable.description")}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-600">
-            Status: {data.status}
-            {data.reason ? ` · ${data.reason}` : ""}
+            {data.reason
+              ? t("common.statusWithReason", { status: data.status, reason: data.reason })
+              : t("common.status", { status: data.status })}
           </p>
           <div className="mt-8 flex justify-center">
             <ReportActionButton href={fallbackReportHref} variant="utility">
-              {advisorContext ? "Zum Advisor-Report" : "Zum Matching-Report"}
+              {advisorContext ? t("common.advisorReport") : t("common.matchingReport")}
             </ReportActionButton>
           </div>
           {debug ? (
@@ -135,7 +135,7 @@ export default async function FounderAlignmentWorkbookPage({
         workbookHref={resolvedWorkbookHref}
         feedbackInvitationId={data.invitationId ?? invitationId}
         activeView={data.currentUserRole === "advisor" ? "advisor" : "founder"}
-        contextLabel={data.currentUserRole === "advisor" ? "Advisor-Kontext" : "Founder-Kontext"}
+        contextLabel={data.currentUserRole === "advisor" ? t("common.advisorContext") : t("common.founderContext")}
       />
       <ResearchPageTracker
         eventName="workbook_page_viewed"
@@ -164,7 +164,7 @@ export default async function FounderAlignmentWorkbookPage({
               href={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
               className="text-sm text-slate-500 transition hover:text-slate-900"
             >
-              {t("Zurueck zum Matching-Report")}
+              {t("common.backToMatchingReport")}
             </Link>
           ) : null}
         </div>
