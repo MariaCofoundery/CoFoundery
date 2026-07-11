@@ -24,8 +24,11 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbookActions";
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
 import { buildWorkbookStepImpulseContent } from "@/features/reporting/founderAlignmentWorkbookImpulses";
-import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
 import { buildPilotAgreementDraftFromStructuredOutputs } from "@/features/reporting/founderAlignmentWorkbookPilotDraft";
+import {
+  getWorkbookContent,
+  resolveWorkbookContentSteps,
+} from "@/features/reporting/workbookContent/workbookContent";
 import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   WORKBOOK_STRUCTURED_STEP_IDS,
@@ -33,7 +36,6 @@ import {
   getWorkbookRequiredStructuredOutputKeys,
   getWorkbookStepStructuredOutputs,
   isWorkbookStructuredStepId,
-  resolveFounderAlignmentWorkbookSteps,
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
   sanitizeWorkbookStructuredOutputsByStep,
@@ -1305,6 +1307,7 @@ export function FounderAlignmentWorkbookClient({
 }: FounderAlignmentWorkbookClientProps) {
   const wt = useTranslations("workbook");
   const locale = useLocale();
+  const workbookContent = useMemo(() => getWorkbookContent(locale), [locale]);
   const [workbook, setWorkbook] = useState(initialWorkbook);
   const [saveState, setSaveState] = useState<{
     kind: "idle" | "dirty" | "saving" | "saved" | "autosaved" | "error";
@@ -1357,13 +1360,13 @@ export function FounderAlignmentWorkbookClient({
           {
             stepId,
             dimension:
-              FOUNDER_ALIGNMENT_WORKBOOK_STEPS.find((step) => step.id === stepId)?.reportDimensions[0] ??
+              workbookContent.steps.find((step) => step.id === stepId)?.reportDimensions[0] ??
               stepId,
             markerClass: "stable_base",
           },
         ])
       ),
-    [stepMarkersByStep]
+    [stepMarkersByStep, workbookContent.steps]
   );
   const [advisorInviteMessage, setAdvisorInviteMessage] = useState<string | null>(null);
   const [advisorInviteLink, setAdvisorInviteLink] = useState<string | null>(null);
@@ -1380,17 +1383,17 @@ export function FounderAlignmentWorkbookClient({
     workbook.advisorId || advisorInviteState.advisorLinked || currentUserRole === "advisor"
   );
   const visibleSteps = useMemo(
-    () => resolveFounderAlignmentWorkbookSteps(showValuesStep, hasActiveAdvisor),
-    [hasActiveAdvisor, showValuesStep]
+    () => resolveWorkbookContentSteps(workbookContent, showValuesStep, hasActiveAdvisor),
+    [hasActiveAdvisor, showValuesStep, workbookContent]
   );
   const activeStepId = visibleSteps.some((step) => step.id === workbook.currentStepId)
     ? workbook.currentStepId
     : (visibleSteps[0]?.id ?? workbook.currentStepId);
   const currentIndex = workbookStepIndex(activeStepId, visibleSteps);
   const currentStep = visibleSteps[Math.max(currentIndex, 0)];
-  const currentStepPrompts = wt.raw(`steps.${currentStep.id}.prompts`) as string[];
-  const currentStepTitle = wt(`steps.${currentStep.id}.title`);
-  const currentStepSubtitle = wt(`steps.${currentStep.id}.subtitle`);
+  const currentStepPrompts = currentStep.prompts;
+  const currentStepTitle = currentStep.title;
+  const currentStepSubtitle = currentStep.subtitle;
   const founderALabel = founderAName?.trim() || "Founder A";
   const founderBLabel = founderBName?.trim() || "Founder B";
 
@@ -1451,7 +1454,7 @@ export function FounderAlignmentWorkbookClient({
     advisorInviteState.founderBApproved ||
     advisorInviteState.advisorLinked;
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
-  const currentStepContent = WORKBOOK_STEP_CONTENT[currentStep.id];
+  const currentStepContent = workbookContent.stepContent[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
   const advisorClosingHasAdvisorInput =
     workbook.advisorClosing.observations.trim().length > 0 ||
@@ -3927,7 +3930,7 @@ export function FounderAlignmentWorkbookClient({
                           <p className="text-[11px] uppercase tracking-[0.18em] opacity-70">
                             {wt("client.stepLabel", { current: index + 1 })}
                           </p>
-                          <p className="mt-1 truncate text-sm font-medium">{wt(`steps.${step.id}.title`)}</p>
+                          <p className="mt-1 truncate text-sm font-medium">{step.title}</p>
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {isPrioritized ? (

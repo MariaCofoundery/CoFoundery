@@ -3,12 +3,13 @@ import { redirect } from "next/navigation";
 import { type CSSProperties } from "react";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
-import {
-  resolveFounderAlignmentWorkbookSteps,
-  workbookContextIntro,
-} from "@/features/reporting/founderAlignmentWorkbook";
+import { workbookContextIntro } from "@/features/reporting/founderAlignmentWorkbook";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
-import { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
+import {
+  getWorkbookContent,
+  resolveWorkbookContentSteps,
+} from "@/features/reporting/workbookContent/workbookContent";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 const DECISION_RULES_STEP_ID = "decision_rules";
@@ -71,11 +72,13 @@ export default async function FounderAlignmentWorkbookPrintPage({
   const founderALabel = data.founderAName?.trim() || "Founder A";
   const founderBLabel = data.founderBName?.trim() || "Founder B";
   const founderPairLabel = `${founderALabel} × ${founderBLabel}`;
+  const locale = getRequestLocale();
+  const workbookContent = getWorkbookContent(locale);
   const hasActiveAdvisor = Boolean(
     data.workbook.advisorId || data.advisorInvite.advisorLinked
   );
-  const visibleSteps = resolveFounderAlignmentWorkbookSteps(data.showValuesStep, hasActiveAdvisor);
-  const documentDate = new Intl.DateTimeFormat("de-DE", {
+  const visibleSteps = resolveWorkbookContentSteps(workbookContent, data.showValuesStep, hasActiveAdvisor);
+  const documentDate = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "de-DE", {
     dateStyle: "medium",
   }).format(data.updatedAt ? new Date(data.updatedAt) : new Date());
   const workbookHref = data.invitationId
@@ -149,7 +152,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
 
           <div className="mt-8 space-y-8 print:mt-6">
             {visibleSteps.map((step, index) => {
-              const content = WORKBOOK_STEP_CONTENT[step.id];
+              const content = workbookContent.stepContent[step.id];
               const isDecisionRulesStep = step.id === DECISION_RULES_STEP_ID;
               const structuredOutputFields = content.outputFields ?? null;
               const isStructuredOutputStep = Boolean(
