@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
-import { getReportContent } from "@/features/reporting/content/reportContent";
+import {
+  getReportContent,
+  type ReportContent,
+  type ReportDimensionContentKey,
+} from "@/features/reporting/content/reportContent";
 import {
   findEnglishReportCopyQualityIssues,
   findGermanResidueInEnglishReportCopy,
@@ -9,10 +13,59 @@ import {
 import {
   buildReportNarrativeGoldenSamples,
   REPORT_NARRATIVE_GOLDEN_SAMPLE_DEFINITIONS,
+  type ReportNarrativeGoldenSample,
 } from "@/features/reporting/content/__tests__/reportNarrativeFixtures";
 
+function formatReportTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (formatted, [key, value]) => formatted.replaceAll(`{${key}}`, value),
+    template
+  );
+}
+
+function dimensionName(dimension: ReportDimensionContentKey, content: ReportContent) {
+  return content.dimensions[dimension].canonicalName;
+}
+
+function collectCentralPatternBodies(
+  sample: ReportNarrativeGoldenSample,
+  content: ReportContent
+) {
+  const templates = content.centralPatternBodies;
+  const corePattern = sample.selection.heroSelection.mode === "blind_spot_watch"
+    ? sample.selection.heroSelection.biggestRisk
+      ? formatReportTemplate(templates.corePattern.blindSpotWithDimension, {
+          dimension: dimensionName(sample.selection.heroSelection.biggestRisk.dimension, content),
+        })
+      : templates.corePattern.blindSpotFallback
+    : sample.selection.biggestTension
+      ? formatReportTemplate(templates.corePattern.tensionWithDimension, {
+          dimension: dimensionName(sample.selection.biggestTension.dimension, content),
+        })
+      : sample.selection.strongestComplement
+        ? formatReportTemplate(templates.corePattern.complementWithDimension, {
+            dimension: dimensionName(sample.selection.strongestComplement.dimension, content),
+          })
+        : sample.selection.stableBase
+          ? formatReportTemplate(templates.corePattern.stableBaseWithDimension, {
+              dimension: dimensionName(sample.selection.stableBase.dimension, content),
+            })
+          : templates.corePattern.fallback;
+  const consequence = sample.selection.agreementFocusDimensions[0]
+    ? formatReportTemplate(templates.consequence.agreementFocusWithDimension, {
+        dimension: dimensionName(sample.selection.agreementFocusDimensions[0].dimension, content),
+      })
+    : templates.consequence.fallback;
+
+  return [
+    corePattern,
+    templates.everydayImpact.fallback,
+    consequence,
+  ];
+}
+
 function collectEnglishVisibleStringsForSample(
-  sample: ReturnType<typeof buildReportNarrativeGoldenSamples>[number]
+  sample: ReportNarrativeGoldenSample
 ) {
   const content = getReportContent("en");
   const strings = [
@@ -20,6 +73,7 @@ function collectEnglishVisibleStringsForSample(
     content.matchHeadlines.session,
     content.introSummaries[sample.selection.heroSelection.mode],
     content.introSummaries.session,
+    ...collectCentralPatternBodies(sample, content),
   ];
 
   for (const dimension of sample.compareResult.dimensions) {
@@ -61,6 +115,10 @@ test("golden samples have locale-aware match headlines, intro summaries, and lab
     assert.ok(english.matchHeadlines[sample.selection.heroSelection.mode].length > 10);
     assert.ok(german.introSummaries[sample.selection.heroSelection.mode].length > 40);
     assert.ok(english.introSummaries[sample.selection.heroSelection.mode].length > 40);
+    assert.equal(collectCentralPatternBodies(sample, german).length, 3);
+    assert.equal(collectCentralPatternBodies(sample, english).length, 3);
+    assert.ok(collectCentralPatternBodies(sample, german).every((body) => body.length > 30));
+    assert.ok(collectCentralPatternBodies(sample, english).every((body) => body.length > 30));
 
     for (const status of sample.selection.dimensionStatuses) {
       assert.ok(german.statusLabels[status.status]);

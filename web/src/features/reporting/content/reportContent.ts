@@ -58,6 +58,23 @@ export type ReportContent = {
   };
   matchHeadlines: Record<ReportMatchHeadlineKey, string>;
   introSummaries: Record<ReportMatchHeadlineKey, string>;
+  centralPatternBodies: {
+    corePattern: {
+      blindSpotWithDimension: string;
+      blindSpotFallback: string;
+      tensionWithDimension: string;
+      complementWithDimension: string;
+      stableBaseWithDimension: string;
+      fallback: string;
+    };
+    everydayImpact: {
+      fallback: string;
+    };
+    consequence: {
+      agreementFocusWithDimension: string;
+      fallback: string;
+    };
+  };
   statusLabels: Record<ReportDimensionStatusLabelKey, string>;
   dimensionReadings: Record<ReportDimensionReadingKey, string>;
   dimensionBusinessMeanings: Record<

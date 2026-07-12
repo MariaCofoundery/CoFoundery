@@ -508,17 +508,26 @@ function buildCentralPatternSections(
   selection: FounderMatchingSelection,
   reportContent: ReportContent
 ) {
+  const templates = reportContent.centralPatternBodies;
   const corePattern = selection.heroSelection.mode === "blind_spot_watch"
     ? selection.heroSelection.biggestRisk
-      ? `Der Kern liegt in einer gemeinsamen Tendenz rund um ${selection.heroSelection.biggestRisk.dimension}. Gerade weil sie sich zunächst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.`
-      : "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und gerade deshalb leicht zu spät geprüft wird."
+      ? formatReportTemplate(templates.corePattern.blindSpotWithDimension, {
+          dimension: reportDimensionName(selection.heroSelection.biggestRisk.dimension, reportContent),
+        })
+      : templates.corePattern.blindSpotFallback
     : selection.biggestTension
-      ? `${selection.biggestTension.dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Maßstäben schaut.`
+      ? formatReportTemplate(templates.corePattern.tensionWithDimension, {
+          dimension: reportDimensionName(selection.biggestTension.dimension, reportContent),
+        })
       : selection.strongestComplement
-        ? `Euer stärkster Unterschied liegt in ${selection.strongestComplement.dimension} und kann euch breiter machen, wenn ihr ihn bewusst führt.`
+        ? formatReportTemplate(templates.corePattern.complementWithDimension, {
+            dimension: reportDimensionName(selection.strongestComplement.dimension, reportContent),
+          })
         : selection.stableBase
-          ? `Eure gemeinsame Basis in ${selection.stableBase.dimension} ist tragfähig, aber kein Ersatz für klare Regeln an offenen Punkten.`
-          : "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis.";
+          ? formatReportTemplate(templates.corePattern.stableBaseWithDimension, {
+              dimension: reportDimensionName(selection.stableBase.dimension, reportContent),
+            })
+          : templates.corePattern.fallback;
 
   const everydayImpact = selection.biggestTension
     ? buildDimensionBusinessMeaning(
@@ -532,17 +541,33 @@ function buildCentralPatternSections(
           selection.strongestComplement.status,
           reportContent
         )
-      : "Im Alltag zeigt sich das weniger in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen.";
+      : templates.everydayImpact.fallback;
 
   const consequence = selection.agreementFocusDimensions[0]
-    ? `Der wichtigste Arbeitsauftrag liegt aktuell bei ${selection.agreementFocusDimensions[0].dimension}. Dort braucht ihr eine explizite Vereinbarung.`
-    : "Ohne bewusste Klärung entstehen unterschiedliche Maßstäbe genau dort, wo ihr gemeinsam tragen und entscheiden müsst.";
+    ? formatReportTemplate(templates.consequence.agreementFocusWithDimension, {
+        dimension: reportDimensionName(selection.agreementFocusDimensions[0].dimension, reportContent),
+      })
+    : templates.consequence.fallback;
 
   return [
     { label: reportContent.centralPatternLabels.corePattern, body: corePattern },
     { label: reportContent.centralPatternLabels.everydayImpact, body: everydayImpact },
     { label: reportContent.centralPatternLabels.consequence, body: consequence },
   ];
+}
+
+function reportDimensionName(
+  dimension: ReportDimensionContentKey,
+  reportContent: ReportContent
+) {
+  return reportContent.dimensions[dimension].canonicalName;
+}
+
+function formatReportTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (formatted, [key, value]) => formatted.replaceAll(`{${key}}`, value),
+    template
+  );
 }
 
 function buildDimensionReading(

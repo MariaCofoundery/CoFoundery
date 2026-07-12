@@ -105,6 +105,32 @@ export const REPORT_CONTENT_DE = {
     alignment_led:
       "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt.",
   },
+  centralPatternBodies: {
+    corePattern: {
+      blindSpotWithDimension:
+        "Der Kern liegt in einer gemeinsamen Tendenz rund um {dimension}. Gerade weil sie sich zunächst stabil anfühlen kann, braucht sie bewusste Aufmerksamkeit.",
+      blindSpotFallback:
+        "Der Kern liegt in einer gemeinsamen Tendenz, die sich zuerst tragend anfühlt und gerade deshalb leicht zu spät geprüft wird.",
+      tensionWithDimension:
+        "{dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Maßstäben schaut.",
+      complementWithDimension:
+        "Euer stärkster Unterschied liegt in {dimension} und kann euch breiter machen, wenn ihr ihn bewusst führt.",
+      stableBaseWithDimension:
+        "Eure gemeinsame Basis in {dimension} ist tragfähig, aber kein Ersatz für klare Regeln an offenen Punkten.",
+      fallback:
+        "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis.",
+    },
+    everydayImpact: {
+      fallback:
+        "Im Alltag zeigt sich das weniger in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen.",
+    },
+    consequence: {
+      agreementFocusWithDimension:
+        "Der wichtigste Arbeitsauftrag liegt aktuell bei {dimension}. Dort braucht ihr eine explizite Vereinbarung.",
+      fallback:
+        "Ohne bewusste Klärung entstehen unterschiedliche Maßstäbe genau dort, wo ihr gemeinsam tragen und entscheiden müsst.",
+    },
+  },
   statusLabels: {
     nah: "Nahe Basis",
     ergänzend: "Ergänzend",

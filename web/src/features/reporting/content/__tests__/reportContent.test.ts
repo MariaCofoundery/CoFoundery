@@ -59,6 +59,18 @@ test("getReportContent returns German report labels by default", () => {
     "Vieles ist bei euch anschlussfähig. Gerade deshalb lohnt sich ein genauer Blick darauf, wo gemeinsame Linie endet und klares Führen beginnt."
   );
   assert.equal(
+    content.centralPatternBodies.corePattern.tensionWithDimension,
+    "{dimension} ist der Punkt, an dem ihr nicht automatisch nach denselben Maßstäben schaut."
+  );
+  assert.equal(
+    content.centralPatternBodies.everydayImpact.fallback,
+    "Im Alltag zeigt sich das weniger in großen Szenen, sondern in Prioritäten, Timing und unausgesprochenen Erwartungen."
+  );
+  assert.equal(
+    content.centralPatternBodies.consequence.agreementFocusWithDimension,
+    "Der wichtigste Arbeitsauftrag liegt aktuell bei {dimension}. Dort braucht ihr eine explizite Vereinbarung."
+  );
+  assert.equal(
     content.dimensionReadings.insufficientData,
     "Für diese Dimension liegen noch nicht genug Daten für eine belastbare gemeinsame Einordnung vor."
   );
@@ -114,6 +126,18 @@ test("getReportContent returns English report labels for locale en", () => {
     "Many things look workable between you. It is still worth clarifying where shared direction ends and explicit agreements should begin."
   );
   assert.equal(
+    content.centralPatternBodies.corePattern.tensionWithDimension,
+    "{dimension} is the area where you may not naturally use the same criteria."
+  );
+  assert.equal(
+    content.centralPatternBodies.everydayImpact.fallback,
+    "Day to day, this is less about big moments and more about priorities, timing, and unspoken expectations."
+  );
+  assert.equal(
+    content.centralPatternBodies.consequence.agreementFocusWithDimension,
+    "The most important working topic right now is {dimension}. This is where an explicit agreement will help."
+  );
+  assert.equal(
     content.dimensionReadings.insufficientData,
     "There is not enough data for this dimension yet to give a reliable shared reading."
   );
@@ -146,6 +170,10 @@ test("getReportContent falls back to German for unsupported locales", () => {
   assert.equal(
     getReportContent("fr").introSummaries.tension_led,
     "Die zentrale Reibung liegt weniger im Umgangston als in der Frage, woran ihr Richtung, Entscheidungen oder Zusammenarbeit bemesst."
+  );
+  assert.equal(
+    getReportContent("fr").centralPatternBodies.corePattern.fallback,
+    "Ihr habt genug gemeinsame Linie für Zusammenarbeit, aber nicht genug Gleichlauf für stilles Verständnis."
   );
 });
 
@@ -181,6 +209,19 @@ test("German and English report content keep the same label map shape", () => {
   assert.deepEqual(Object.keys(english.centralPatternLabels), Object.keys(german.centralPatternLabels));
   assert.deepEqual(Object.keys(english.matchHeadlines), Object.keys(german.matchHeadlines));
   assert.deepEqual(Object.keys(english.introSummaries), Object.keys(german.introSummaries));
+  assert.deepEqual(Object.keys(english.centralPatternBodies), Object.keys(german.centralPatternBodies));
+  assert.deepEqual(
+    Object.keys(english.centralPatternBodies.corePattern),
+    Object.keys(german.centralPatternBodies.corePattern)
+  );
+  assert.deepEqual(
+    Object.keys(english.centralPatternBodies.everydayImpact),
+    Object.keys(german.centralPatternBodies.everydayImpact)
+  );
+  assert.deepEqual(
+    Object.keys(english.centralPatternBodies.consequence),
+    Object.keys(german.centralPatternBodies.consequence)
+  );
   assert.deepEqual(Object.keys(english.statusLabels), Object.keys(german.statusLabels));
   assert.deepEqual(Object.keys(english.dimensionReadings), Object.keys(german.dimensionReadings));
   assert.deepEqual(

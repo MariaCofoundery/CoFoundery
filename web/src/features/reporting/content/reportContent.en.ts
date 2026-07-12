@@ -105,6 +105,32 @@ export const REPORT_CONTENT_EN = {
     alignment_led:
       "Many things look workable between you. It is still worth clarifying where shared direction ends and explicit agreements should begin.",
   },
+  centralPatternBodies: {
+    corePattern: {
+      blindSpotWithDimension:
+        "The core pattern is a shared tendency around {dimension}. Because it can feel stable at first, it is worth keeping visible.",
+      blindSpotFallback:
+        "The core pattern is a shared tendency that can feel supportive at first and therefore may be checked too late.",
+      tensionWithDimension:
+        "{dimension} is the area where you may not naturally use the same criteria.",
+      complementWithDimension:
+        "Your strongest difference is around {dimension}, and it can broaden the team if you work with it deliberately.",
+      stableBaseWithDimension:
+        "Your shared basis in {dimension} looks workable, but it is not a substitute for clear agreements on open points.",
+      fallback:
+        "You have enough shared direction to work together, but not enough automatic alignment to rely on silent understanding.",
+    },
+    everydayImpact: {
+      fallback:
+        "Day to day, this is less about big moments and more about priorities, timing, and unspoken expectations.",
+    },
+    consequence: {
+      agreementFocusWithDimension:
+        "The most important working topic right now is {dimension}. This is where an explicit agreement will help.",
+      fallback:
+        "Without deliberate clarification, different criteria can show up exactly where you need to carry and decide together.",
+    },
+  },
   statusLabels: {
     nah: "Close foundation",
     ergänzend: "Complementary",
