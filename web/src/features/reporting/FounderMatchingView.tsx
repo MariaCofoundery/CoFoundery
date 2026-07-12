@@ -75,7 +75,7 @@ export function FounderMatchingView({
   const isSessionReport = reportContext === "matching_session";
   const effectiveAccessNotice =
     reportAccessNotice ?? (showUnlockSection ? "locked" : isSessionReport ? "session_snapshot" : null);
-  const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB);
+  const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB, contentLocale);
 
   return (
     <>
