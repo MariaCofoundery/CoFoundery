@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { buildExecutiveSummary } from "@/features/reporting/buildExecutiveSummary";
 import { getReportBuilderCopy } from "@/features/reporting/content/builderCopy/builderCopy";
 import {
   findEnglishReportCopyQualityIssues,
   findGermanResidueInEnglishReportCopy,
 } from "@/features/reporting/content/reportCopyGuards";
+import type { TeamScoringResult } from "@/features/scoring/founderScoring";
 
 function collectStringValues(value: unknown): string[] {
   if (typeof value === "string") {
@@ -35,11 +37,32 @@ test("getReportBuilderCopy returns German builder copy by default", () => {
   );
 });
 
-test("getReportBuilderCopy exposes an English locale without changing productive builder narratives yet", () => {
+const fallbackOnlyScoringResult = {
+  alignmentScore: 74,
+  workingCompatibilityScore: 76,
+  sharedBlindSpotRisk: false,
+  sharedBlindSpotDimensions: [],
+  executiveInsights: {
+    topStrength: null,
+    topComplementaryDynamic: null,
+    topTension: null,
+  },
+  dimensions: [],
+} as unknown as TeamScoringResult;
+
+test("getReportBuilderCopy exposes English executive-summary focus fallbacks", () => {
   const german = getReportBuilderCopy("de");
   const english = getReportBuilderCopy("en");
 
-  assert.deepEqual(english.executiveSummary, german.executiveSummary);
+  assert.deepEqual(english.executiveSummary.fallbackFocus, [
+    "What expectations do you want to set for shared responsibility and decision paths?",
+    "Where do you need early clarity so collaboration stays workable under pressure?",
+  ]);
+  assert.equal(
+    english.executiveSummary.focusPromptsByDimension.Commitment[0],
+    "What expectations do you have for prioritization, availability, and level of effort day to day?"
+  );
+  assert.notDeepEqual(english.executiveSummary, german.executiveSummary);
   assert.notEqual(english.enPilotExamples.fallbackSummary, german.enPilotExamples.fallbackSummary);
 });
 
@@ -48,8 +71,32 @@ test("getReportBuilderCopy falls back to German for unsupported locales", () => 
 });
 
 test("English report builder pilot copy passes copy guards", () => {
-  const visibleEnglishCopy = collectStringValues(getReportBuilderCopy("en").enPilotExamples).join("\n");
+  const englishCopy = getReportBuilderCopy("en");
+  const visibleEnglishCopy = [
+    ...collectStringValues(englishCopy.executiveSummary),
+    ...collectStringValues(englishCopy.enPilotExamples),
+  ].join("\n");
 
   assert.deepEqual(findEnglishReportCopyQualityIssues(visibleEnglishCopy), []);
   assert.deepEqual(findGermanResidueInEnglishReportCopy(visibleEnglishCopy), []);
+});
+
+test("buildExecutiveSummary uses localized recommended-focus fallbacks", () => {
+  const germanCopy = getReportBuilderCopy("de");
+  const englishCopy = getReportBuilderCopy("en");
+
+  const germanSummary = buildExecutiveSummary({
+    scoringResult: fallbackOnlyScoringResult,
+    teamContext: "pre_founder",
+    builderCopy: germanCopy,
+  });
+  const englishSummary = buildExecutiveSummary({
+    scoringResult: fallbackOnlyScoringResult,
+    teamContext: "pre_founder",
+    builderCopy: englishCopy,
+  });
+
+  assert.deepEqual(germanSummary.recommendedFocus, germanCopy.executiveSummary.fallbackFocus);
+  assert.deepEqual(englishSummary.recommendedFocus, englishCopy.executiveSummary.fallbackFocus);
+  assert.notDeepEqual(englishSummary.recommendedFocus, germanSummary.recommendedFocus);
 });

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { getReportBuilderCopy } from "@/features/reporting/content/builderCopy/builderCopy";
 import {
   buildFounderAlignmentReportPayload,
   getFounderAlignmentReportPayloadLocale,
@@ -51,7 +52,7 @@ test("builds the founder alignment payload contract without DB access", () => {
   assert.equal(result.payload.generatedAt, "2026-06-19T11:00:00.000Z");
 });
 
-test("marks new report payloads with the requested locale without changing report content", () => {
+test("marks new report payloads with the requested locale and localized focus fallbacks", () => {
   const baseInput: Parameters<typeof buildFounderAlignmentReportPayload>[0] = {
     sessionId: "session-locale",
     participantA: {
@@ -93,8 +94,29 @@ test("marks new report payloads with the requested locale without changing repor
   assert.equal(englishResult.payload.locale, "en");
   assert.equal(getFounderAlignmentReportPayloadLocale(englishResult.payload), "en");
 
-  const defaultWithoutLocale = { ...defaultResult.payload, locale: "en" };
-  assert.deepEqual(englishResult.payload, defaultWithoutLocale);
+  const englishFocusPrompts = Object.values(
+    getReportBuilderCopy("en").executiveSummary.focusPromptsByDimension
+  ).flat();
+  assert.deepEqual(englishResult.payload.founderReport.executiveSummary.recommendedFocus, [
+    "How do you want to make decisions when pace and careful review pull in different directions?",
+    "What expectations do you have for prioritization, availability, and level of effort day to day?",
+  ]);
+  for (const focus of englishResult.payload.founderReport.executiveSummary.recommendedFocus) {
+    assert.ok(englishFocusPrompts.includes(focus));
+  }
+
+  const defaultWithEnglishLocaleAndFocus = {
+    ...defaultResult.payload,
+    locale: "en" as const,
+    founderReport: {
+      ...defaultResult.payload.founderReport,
+      executiveSummary: {
+        ...defaultResult.payload.founderReport.executiveSummary,
+        recommendedFocus: englishResult.payload.founderReport.executiveSummary.recommendedFocus,
+      },
+    },
+  };
+  assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndFocus);
 });
 
 test("treats legacy report payloads without locale metadata as German", () => {
