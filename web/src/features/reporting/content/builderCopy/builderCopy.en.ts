@@ -112,6 +112,85 @@ export const REPORT_BUILDER_COPY_EN = {
         "How can you keep your current strength {dimensionPrefix} stable in day-to-day work?",
     },
   },
+  sections: {
+    commitment: {
+      dimension: "Commitment",
+      interpretations: {
+        fallback: {
+          pre_founder:
+            "There is not enough reliable data yet to describe what role the startup should play in everyday work or what level of commitment each person expects.",
+          existing_team:
+            "There is not enough reliable data yet to describe how strongly the startup is prioritized in your day-to-day collaboration or what level of commitment the team should carry.",
+        },
+        very_high: {
+          pre_founder:
+            "Your views on the role the startup should play day to day look very close. That can be a stable basis for exploring a collaboration, because prioritization and expected level of effort appear similar.",
+          existing_team:
+            "Your views on how strongly the startup is prioritized day to day look very close. For an existing team, this can create stability because availability and intensity are understood in similar ways.",
+        },
+        high: {
+          pre_founder:
+            "You share a strong basis around commitment, even if differences around priority, availability, or intensity are visible. This can work well if those differences are addressed early.",
+          existing_team:
+            "You share a strong basis around commitment, even if differences around priority, availability, or intensity are visible. For your collaboration, expectations need to stay explicit in day-to-day work.",
+        },
+        mixed: {
+          pre_founder:
+            "Commitment shows visible differences, especially around priority, availability, or expected day-to-day effort. Before working together more closely, it is worth discussing this openly so expectations do not remain implicit.",
+          existing_team:
+            "Commitment shows visible differences, especially around priority, availability, or expected day-to-day effort. In an existing team, unspoken assumptions in this area can create friction if they are not discussed.",
+        },
+        low: {
+          pre_founder:
+            "Commitment shows clear differences. This may strongly shape how you experience availability, intensity, and prioritization day to day, so it is worth clarifying openly before founding together.",
+          existing_team:
+            "Commitment shows clear differences. In everyday work, this can affect availability, intensity, and collaboration, so the team needs clear language and shared expectations around it.",
+        },
+      },
+      everydaySignals: {
+        pre_founder:
+          "Day to day, this may show up in different expectations around availability, a different sense of how central the startup should be, or different readings of intensity across phases.",
+        existing_team:
+          "Day to day, this often shows up when availability, level of effort, and priorities are understood differently or silently assumed.",
+      },
+      tensionCards: {
+        startupPriority: {
+          topic: "Startup priority",
+          explanation:
+            "Different assumptions about the role the startup should play compared with other life or work commitments.",
+        },
+        dayToDayCommitment: {
+          topic: "Day-to-day commitment level",
+          explanation:
+            "Different expectations around how much time, energy, and presence the collaboration can reliably carry.",
+        },
+        handlingPressure: {
+          topic: "Handling pressure",
+          explanation:
+            "Different views on how intense phases should be bounded, aligned, and scaled back again.",
+        },
+        focusAndSideProjects: {
+          topic: "Focus and side projects",
+          explanation:
+            "Friction can emerge when one person expects clear startup priority while the other deliberately keeps room for additional work or life topics.",
+        },
+      },
+      conversationPrompts: {
+        pre_founder: [
+          "What role should the startup play in your everyday work and life right now?",
+          "How would you notice early that your expectations around effort and availability are diverging?",
+          "How much focus on the company do you expect from each other, and what is realistic for both of you?",
+          "How do you want to handle phases where pressure, energy, or capacity differ noticeably?",
+        ],
+        existing_team: [
+          "Where do you already notice differences in level of effort, prioritization, or availability?",
+          "Which unspoken expectations around commitment may already exist between you?",
+          "How do you talk about changes in pressure or priorities?",
+          "What do you need so commitment does not become a quiet source of friction?",
+        ],
+      },
+    },
+  },
   enPilotExamples: {
     fallbackSummary:
       "Use this report as a careful starting point for a focused conversation, not as a final verdict.",

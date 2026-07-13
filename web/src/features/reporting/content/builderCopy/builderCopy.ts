@@ -56,6 +56,35 @@ export type ReportBuilderCopy = {
       protectStrengthExistingTeam: string;
     };
   };
+  sections: {
+    commitment: {
+      dimension: "Commitment";
+      interpretations: Record<
+        "fallback" | "very_high" | "high" | "mixed" | "low",
+        Record<"pre_founder" | "existing_team", string>
+      >;
+      everydaySignals: Record<"pre_founder" | "existing_team", string>;
+      tensionCards: {
+        startupPriority: {
+          topic: string;
+          explanation: string;
+        };
+        dayToDayCommitment: {
+          topic: string;
+          explanation: string;
+        };
+        handlingPressure: {
+          topic: string;
+          explanation: string;
+        };
+        focusAndSideProjects: {
+          topic: string;
+          explanation: string;
+        };
+      };
+      conversationPrompts: Record<"pre_founder" | "existing_team", string[]>;
+    };
+  };
   enPilotExamples: {
     fallbackSummary: string;
     focusPrompt: string;

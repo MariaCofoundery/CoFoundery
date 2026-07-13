@@ -128,6 +128,7 @@ export function buildFounderAlignmentReport({
           DIMENSION_KEYS.commitment
         ),
         teamContext,
+        builderCopy,
       }),
       conflictStyle: buildConflictStyleSection({
         dimensionResult: getDimensionResult(

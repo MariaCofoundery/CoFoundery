@@ -105,6 +105,18 @@ test("marks new report payloads with the requested locale and localized executiv
     englishResult.payload.founderReport.executiveSummary.summaryIntro,
     /Before founding together/
   );
+  assert.equal(
+    defaultResult.payload.founderReport.sections.commitment.interpretation,
+    "Fuer die Frage, welchen Stellenwert das Startup im Alltag haben soll und welches Einsatzniveau ihr erwartet, liegt derzeit noch keine belastbare Grundlage vor."
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.commitment.interpretation,
+    "There is not enough reliable data yet to describe what role the startup should play in everyday work or what level of commitment each person expects."
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.commitment.conversationPrompts[0],
+    "What role should the startup play in your everyday work and life right now?"
+  );
 
   const englishFocusPrompts = Object.values(
     getReportBuilderCopy("en").executiveSummary.focusPromptsByDimension
@@ -117,15 +129,19 @@ test("marks new report payloads with the requested locale and localized executiv
     assert.ok(englishFocusPrompts.includes(focus));
   }
 
-  const defaultWithEnglishLocaleAndExecutiveSummary = {
+  const defaultWithEnglishLocaleAndLocalizedBlocks = {
     ...defaultResult.payload,
     locale: "en" as const,
     founderReport: {
       ...defaultResult.payload.founderReport,
       executiveSummary: englishResult.payload.founderReport.executiveSummary,
+      sections: {
+        ...defaultResult.payload.founderReport.sections,
+        commitment: englishResult.payload.founderReport.sections.commitment,
+      },
     },
   };
-  assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndExecutiveSummary);
+  assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndLocalizedBlocks);
 });
 
 test("treats legacy report payloads without locale metadata as German", () => {
