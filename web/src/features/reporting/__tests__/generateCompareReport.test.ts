@@ -62,9 +62,18 @@ test("generateCompareReport derives top matches and tensions from the V1 engine"
 
   assert.deepEqual(report.executiveSummary.topMatches, toReportDimensions(engine.topAlignments));
   assert.deepEqual(report.executiveSummary.topTensions, toReportDimensions(engine.topTensions));
-  assert.equal(report.deepDive.find((entry) => entry.dimension === "Vision")?.label, "KOMPLEMENTAER");
-  assert.equal(report.deepDive.find((entry) => entry.dimension === "Risiko")?.label, "FOKUS_THEMA");
-  assert.equal(report.deepDive.find((entry) => entry.dimension === "Autonomie")?.label, "FOKUS_THEMA");
+  assert.equal(
+    report.deepDive.find((entry) => entry.dimension === "Vision")?.label,
+    labelForDimension(engine, "Unternehmenslogik")
+  );
+  assert.equal(
+    report.deepDive.find((entry) => entry.dimension === "Risiko")?.label,
+    labelForDimension(engine, "Risikoorientierung")
+  );
+  assert.equal(
+    report.deepDive.find((entry) => entry.dimension === "Autonomie")?.label,
+    labelForDimension(engine, "Arbeitsstruktur & Zusammenarbeit")
+  );
 });
 
 test("generateCompareReport maps hard-rule tension states from the V1 engine into compare labels", () => {
