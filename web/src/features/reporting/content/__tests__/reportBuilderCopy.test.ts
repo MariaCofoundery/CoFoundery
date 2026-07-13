@@ -50,6 +50,43 @@ const fallbackOnlyScoringResult = {
   dimensions: [],
 } as unknown as TeamScoringResult;
 
+const insightHeavyScoringResult = {
+  alignmentScore: 70,
+  workingCompatibilityScore: 58,
+  sharedBlindSpotRisk: false,
+  sharedBlindSpotDimensions: [],
+  executiveInsights: {
+    topStrength: {
+      kind: "strength",
+      dimension: "Unternehmenslogik",
+      title: "Deutsche Staerke sollte nicht in EN erscheinen",
+      priorityScore: 90,
+      source: "unit_test",
+    },
+    topComplementaryDynamic: {
+      kind: "complementary_dynamic",
+      dimension: "Commitment",
+      title: "Deutsche Ergaenzung sollte nicht in EN erscheinen",
+      priorityScore: 80,
+      source: "unit_test",
+    },
+    topTension: {
+      kind: "tension",
+      dimension: "Entscheidungslogik",
+      title: "Deutsche Spannung sollte nicht in EN erscheinen",
+      priorityScore: 95,
+      source: "unit_test",
+    },
+  },
+  dimensions: [
+    {
+      dimension: "Entscheidungslogik",
+      jointState: "OPPOSITE",
+      conflictRisk: "high",
+    },
+  ],
+} as unknown as TeamScoringResult;
+
 test("getReportBuilderCopy exposes English executive-summary focus fallbacks", () => {
   const german = getReportBuilderCopy("de");
   const english = getReportBuilderCopy("en");
@@ -99,4 +136,40 @@ test("buildExecutiveSummary uses localized recommended-focus fallbacks", () => {
   assert.deepEqual(germanSummary.recommendedFocus, germanCopy.executiveSummary.fallbackFocus);
   assert.deepEqual(englishSummary.recommendedFocus, englishCopy.executiveSummary.fallbackFocus);
   assert.notDeepEqual(englishSummary.recommendedFocus, germanSummary.recommendedFocus);
+});
+
+test("buildExecutiveSummary returns English headline, intro, top messages, and focus copy", () => {
+  const englishSummary = buildExecutiveSummary({
+    scoringResult: insightHeavyScoringResult,
+    teamContext: "pre_founder",
+    builderCopy: getReportBuilderCopy("en"),
+  });
+
+  assert.equal(
+    englishSummary.headline,
+    "Strategically aligned, with operational points to clarify"
+  );
+  assert.match(englishSummary.summaryIntro, /day-to-day collaboration/i);
+  assert.match(englishSummary.summaryIntro, /decision logic/i);
+  assert.equal(
+    englishSummary.topMessages.strength,
+    "The strongest current signal in your collaboration is around company logic."
+  );
+  assert.equal(
+    englishSummary.topMessages.complementaryDynamic,
+    "Your strongest complementary signal is around commitment."
+  );
+  assert.equal(
+    englishSummary.topMessages.tension,
+    "The most important area to discuss deliberately is around decision logic."
+  );
+  assert.ok(
+    englishSummary.recommendedFocus.some((focus) =>
+      focus.includes("pace and careful review")
+    )
+  );
+
+  const visibleEnglishSummary = collectStringValues(englishSummary).join("\n");
+  assert.deepEqual(findEnglishReportCopyQualityIssues(visibleEnglishSummary), []);
+  assert.deepEqual(findGermanResidueInEnglishReportCopy(visibleEnglishSummary), []);
 });

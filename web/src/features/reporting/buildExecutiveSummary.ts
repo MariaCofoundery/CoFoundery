@@ -4,6 +4,8 @@ import {
   type TeamScoringResult,
 } from "@/features/scoring/founderScoring";
 import {
+  type BuilderDimensionContentKey,
+  type ExecutiveSummaryStateKey,
   getReportBuilderCopy,
   type ReportBuilderCopy,
 } from "@/features/reporting/content/builderCopy/builderCopy";
@@ -28,8 +30,38 @@ type BuildExecutiveSummaryInput = {
   builderCopy?: ReportBuilderCopy;
 };
 
-function dimensionPrefix(dimension: string | null) {
-  return dimension ? `im Bereich ${dimension}` : "in eurer Zusammenarbeit";
+function formatTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce(
+    (formatted, [key, value]) => formatted.replaceAll(`{${key}}`, value),
+    template
+  );
+}
+
+function isBuilderDimension(value: string | null): value is BuilderDimensionContentKey {
+  return (
+    value === "Unternehmenslogik" ||
+    value === "Entscheidungslogik" ||
+    value === "Risikoorientierung" ||
+    value === "Arbeitsstruktur & Zusammenarbeit" ||
+    value === "Commitment" ||
+    value === "Konfliktstil"
+  );
+}
+
+function localizedDimensionLabel(dimension: string | null, builderCopy: ReportBuilderCopy) {
+  if (!isBuilderDimension(dimension)) {
+    return dimension ?? "";
+  }
+
+  return builderCopy.executiveSummary.dimensionLabels[dimension];
+}
+
+function dimensionPrefix(dimension: string | null, builderCopy: ReportBuilderCopy) {
+  if (!dimension) return builderCopy.executiveSummary.dimensionPrefix.fallback;
+
+  return formatTemplate(builderCopy.executiveSummary.dimensionPrefix.withDimension, {
+    dimension: localizedDimensionLabel(dimension, builderCopy),
+  });
 }
 
 function getDimensionResult(scoringResult: TeamScoringResult, dimension: string | null) {
@@ -65,80 +97,83 @@ function getWorkingFocusDimension(executiveInsights: ExecutiveInsights) {
     : "Commitment";
 }
 
-function headlineFromState(scoringResult: TeamScoringResult) {
+function executiveSummaryState(scoringResult: TeamScoringResult): ExecutiveSummaryStateKey {
   const alignmentScore = scoringResult.alignmentScore;
   const workingCompatibilityScore = scoringResult.workingCompatibilityScore;
 
   if (alignmentScore == null || workingCompatibilityScore == null) {
-    return "Noch keine belastbare Gesamteinschaetzung";
+    return "insufficientData";
   }
 
   if (scoringResult.sharedBlindSpotRisk && alignmentScore >= 60 && workingCompatibilityScore >= 60) {
-    return "Viel gemeinsame Basis mit stillen Watchpoints";
+    return "sharedBlindSpot";
   }
 
   if (alignmentScore >= 72 && workingCompatibilityScore >= 72) {
-    return "Strategisch und operativ tragfaehige Basis";
+    return "strongBase";
   }
 
   if (alignmentScore >= 68 && workingCompatibilityScore < 60) {
-    return "Strategisch nah, operativ mit Klaerungsbedarf";
+    return "strategicCloseOperationalClarify";
   }
 
   if (alignmentScore < 60 && workingCompatibilityScore >= 68) {
-    return "Im Alltag anschlussfaehig, strategisch mit Spannungsfeld";
+    return "everydayCloseStrategicTension";
   }
 
   if (alignmentScore < 60 && workingCompatibilityScore < 60) {
-    return "Strategisch und operativ mit hohem Klaerungsbedarf";
+    return "highClarification";
   }
 
-  return "Teilweise tragfaehig, aber nicht in denselben Feldern";
+  return "partial";
+}
+
+function headlineFromState(scoringResult: TeamScoringResult, builderCopy: ReportBuilderCopy) {
+  return builderCopy.executiveSummary.headlines[executiveSummaryState(scoringResult)];
 }
 
 function introForContext(
   teamContext: TeamContext,
-  scoringResult: TeamScoringResult
+  scoringResult: TeamScoringResult,
+  builderCopy: ReportBuilderCopy
 ) {
-  const alignmentScore = scoringResult.alignmentScore;
-  const workingCompatibilityScore = scoringResult.workingCompatibilityScore;
   const executiveInsights = scoringResult.executiveInsights;
   const strengthDimension = executiveInsights.topStrength?.dimension;
   const tensionDimension = executiveInsights.topTension?.dimension ?? null;
   const complementaryDimension = executiveInsights.topComplementaryDynamic?.dimension;
   const tensionResult = getDimensionResult(scoringResult, tensionDimension);
+  const copy = builderCopy.executiveSummary.intro;
 
-  const fitText =
-    alignmentScore == null || workingCompatibilityScore == null
-      ? "Die aktuelle Datenlage erlaubt noch keine belastbare Gesamteinschaetzung eurer Zusammenarbeit."
-      : alignmentScore >= 72 && workingCompatibilityScore >= 72
-        ? "Strategisch und im Arbeitsalltag habt ihr eine tragfaehige gemeinsame Basis."
-        : alignmentScore >= 68 && workingCompatibilityScore < 60
-          ? "Strategisch seid ihr naeher beieinander als im Alltag; Reibung entsteht eher aus Zusammenarbeit als aus Richtung."
-          : alignmentScore < 60 && workingCompatibilityScore >= 68
-            ? "Im Alltag koennt ihr gut anschliessen, aber strategisch lest ihr zentrale Fragen noch nicht nach denselben Massstaeben."
-            : alignmentScore < 60 && workingCompatibilityScore < 60
-              ? "Strategische Richtung und operative Zusammenarbeit brauchen beide deutlich mehr bewusste Klaerung."
-              : "Ihr habt belastbare Anknuepfungspunkte, aber nicht in denselben Feldern.";
+  const fitText = copy.fit[executiveSummaryState(scoringResult)];
 
   const strengthSentence = strengthDimension
-    ? `Eine klare Staerke liegt derzeit ${dimensionPrefix(strengthDimension)}.`
-    : "Einige gemeinsame Staerken sind bereits gut erkennbar.";
+    ? formatTemplate(copy.strengthWithDimension, {
+        dimensionPrefix: dimensionPrefix(strengthDimension, builderCopy),
+      })
+    : copy.strengthFallback;
 
   const complementarySentence =
     complementaryDimension && complementaryDimension !== strengthDimension
-      ? `Gerade Unterschiede ${dimensionPrefix(complementaryDimension)} koennen eine produktive Ergaenzung sein.`
+      ? formatTemplate(copy.complementaryWithDimension, {
+          dimensionPrefix: dimensionPrefix(complementaryDimension, builderCopy),
+        })
       : null;
 
   const tensionSentence = scoringResult.sharedBlindSpotRisk
     ? tensionDimension
-      ? `Besonders aufmerksam solltet ihr auf ${dimensionPrefix(tensionDimension)} schauen, weil gemeinsame Tendenzen dort leicht still mitlaufen koennen.`
-      : "Gerade Felder mit hoher gemeinsamer Naehe verdienen Aufmerksamkeit, damit aus Gleichlauf kein stiller Blind Spot wird."
+      ? formatTemplate(copy.sharedBlindSpotWithDimension, {
+          dimensionPrefix: dimensionPrefix(tensionDimension, builderCopy),
+        })
+      : copy.sharedBlindSpotFallback
     : tensionDimension
       ? tensionResult?.jointState === "OPPOSITE" || tensionResult?.conflictRisk === "high"
-        ? `Besonders aufmerksam solltet ihr auf die Abstimmung ${dimensionPrefix(tensionDimension)} schauen.`
-        : `Besonders bewusst fuehren solltet ihr ${dimensionPrefix(tensionDimension)}, weil dort wiederkehrende Koordination noetig wird.`
-      : "Die wichtigsten Abstimmungsthemen wirken derzeit gut besprechbar.";
+        ? formatTemplate(copy.tensionOppositeWithDimension, {
+            dimensionPrefix: dimensionPrefix(tensionDimension, builderCopy),
+          })
+        : formatTemplate(copy.tensionCoordinationWithDimension, {
+            dimensionPrefix: dimensionPrefix(tensionDimension, builderCopy),
+          })
+      : copy.tensionFallback;
 
   if (teamContext === "pre_founder") {
     return [
@@ -146,7 +181,7 @@ function introForContext(
       strengthSentence,
       complementarySentence,
       tensionSentence,
-      "Vor einer gemeinsamen Gruendung ist jetzt vor allem relevant, welche Unterschiede ihr gut nutzen koennt und was ihr vorher klar miteinander besprecht.",
+      copy.closing.preFounder,
     ]
       .filter(Boolean)
       .join(" ");
@@ -157,25 +192,34 @@ function introForContext(
     strengthSentence,
     complementarySentence,
     tensionSentence,
-    "Fuer eure bestehende Zusammenarbeit ist jetzt besonders relevant, was euch bereits traegt und an welchen Stellen eine klarere gemeinsame Linie entlastend wirken kann.",
+    copy.closing.existingTeam,
   ]
     .filter(Boolean)
     .join(" ");
 }
 
-function strengthMessage(insight: ReportInsight | null) {
+function strengthMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
   if (!insight) return null;
-  return `Staerke eurer Zusammenarbeit liegt aktuell vor allem ${dimensionPrefix(insight.dimension)}: ${insight.title}`;
+  return formatTemplate(builderCopy.executiveSummary.topMessages.strength, {
+    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
+    title: insight.title,
+  });
 }
 
-function complementaryMessage(insight: ReportInsight | null) {
+function complementaryMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
   if (!insight) return null;
-  return `Ergaenzend wirkt bei euch besonders ${dimensionPrefix(insight.dimension)}: ${insight.title}`;
+  return formatTemplate(builderCopy.executiveSummary.topMessages.complementaryDynamic, {
+    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
+    title: insight.title,
+  });
 }
 
-function tensionMessage(insight: ReportInsight | null) {
+function tensionMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
   if (!insight) return null;
-  return `Bewusst besprechen solltet ihr vor allem ${dimensionPrefix(insight.dimension)}: ${insight.title}`;
+  return formatTemplate(builderCopy.executiveSummary.topMessages.tension, {
+    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
+    title: insight.title,
+  });
 }
 
 function promptsForDimension(dimension: string | null, builderCopy: ReportBuilderCopy) {
@@ -227,19 +271,20 @@ function collectRecommendedFocus(
     if (complementaryPrompts.length > 0) {
       prompts.push(complementaryPrompts[complementaryPrompts.length - 1]);
     } else {
-      prompts.push("Welche Unterschiede sind fuer euch produktiv und welche brauchen klare Moderation?");
+      prompts.push(builderCopy.executiveSummary.dynamicFocus.complementaryFallback);
     }
   }
 
   if (executiveInsights.topStrength) {
     prompts.push(
-      teamContext === "pre_founder"
-        ? `Was muesstet ihr bewusst schuetzen, damit eure aktuelle Staerke ${dimensionPrefix(
-            executiveInsights.topStrength.dimension
-          )} auch in der Gruendungsphase tragfaehig bleibt?`
-        : `Wie koennt ihr eure aktuelle Staerke ${dimensionPrefix(
-            executiveInsights.topStrength.dimension
-          )} im Alltag gezielt stabil halten?`
+      formatTemplate(
+        teamContext === "pre_founder"
+          ? builderCopy.executiveSummary.dynamicFocus.protectStrengthPreFounder
+          : builderCopy.executiveSummary.dynamicFocus.protectStrengthExistingTeam,
+        {
+          dimensionPrefix: dimensionPrefix(executiveInsights.topStrength.dimension, builderCopy),
+        }
+      )
     );
   }
 
@@ -264,18 +309,25 @@ export function buildExecutiveSummary({
     scoringResult.executiveInsights.topTension == null
       ? null
       : topTensionResult?.hasSharedBlindSpotRisk
-        ? `Aufmerksam beobachten solltet ihr vor allem ${dimensionPrefix(
-            scoringResult.executiveInsights.topTension.dimension
-          )}: ${scoringResult.executiveInsights.topTension.title}`
-        : tensionMessage(scoringResult.executiveInsights.topTension);
+        ? formatTemplate(builderCopy.executiveSummary.topMessages.sharedBlindSpotTension, {
+            dimensionPrefix: dimensionPrefix(
+              scoringResult.executiveInsights.topTension.dimension,
+              builderCopy
+            ),
+            title: scoringResult.executiveInsights.topTension.title,
+          })
+        : tensionMessage(scoringResult.executiveInsights.topTension, builderCopy);
 
   return {
     teamContext,
-    headline: headlineFromState(scoringResult),
-    summaryIntro: introForContext(teamContext, scoringResult),
+    headline: headlineFromState(scoringResult, builderCopy),
+    summaryIntro: introForContext(teamContext, scoringResult, builderCopy),
     topMessages: {
-      strength: strengthMessage(scoringResult.executiveInsights.topStrength),
-      complementaryDynamic: complementaryMessage(scoringResult.executiveInsights.topComplementaryDynamic),
+      strength: strengthMessage(scoringResult.executiveInsights.topStrength, builderCopy),
+      complementaryDynamic: complementaryMessage(
+        scoringResult.executiveInsights.topComplementaryDynamic,
+        builderCopy
+      ),
       tension: topTensionMessage,
     },
     recommendedFocus: collectRecommendedFocus(scoringResult, teamContext, builderCopy),

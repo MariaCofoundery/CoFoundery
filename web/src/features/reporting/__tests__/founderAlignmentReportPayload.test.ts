@@ -52,7 +52,7 @@ test("builds the founder alignment payload contract without DB access", () => {
   assert.equal(result.payload.generatedAt, "2026-06-19T11:00:00.000Z");
 });
 
-test("marks new report payloads with the requested locale and localized focus fallbacks", () => {
+test("marks new report payloads with the requested locale and localized executive summary", () => {
   const baseInput: Parameters<typeof buildFounderAlignmentReportPayload>[0] = {
     sessionId: "session-locale",
     participantA: {
@@ -93,6 +93,18 @@ test("marks new report payloads with the requested locale and localized focus fa
   assert.equal(defaultResult.payload.locale, "de");
   assert.equal(englishResult.payload.locale, "en");
   assert.equal(getFounderAlignmentReportPayloadLocale(englishResult.payload), "en");
+  assert.equal(
+    defaultResult.payload.founderReport.executiveSummary.headline,
+    "Noch keine belastbare Gesamteinschaetzung"
+  );
+  assert.equal(
+    englishResult.payload.founderReport.executiveSummary.headline,
+    "Not enough signal for a reliable overall reading yet"
+  );
+  assert.match(
+    englishResult.payload.founderReport.executiveSummary.summaryIntro,
+    /Before founding together/
+  );
 
   const englishFocusPrompts = Object.values(
     getReportBuilderCopy("en").executiveSummary.focusPromptsByDimension
@@ -105,18 +117,15 @@ test("marks new report payloads with the requested locale and localized focus fa
     assert.ok(englishFocusPrompts.includes(focus));
   }
 
-  const defaultWithEnglishLocaleAndFocus = {
+  const defaultWithEnglishLocaleAndExecutiveSummary = {
     ...defaultResult.payload,
     locale: "en" as const,
     founderReport: {
       ...defaultResult.payload.founderReport,
-      executiveSummary: {
-        ...defaultResult.payload.founderReport.executiveSummary,
-        recommendedFocus: englishResult.payload.founderReport.executiveSummary.recommendedFocus,
-      },
+      executiveSummary: englishResult.payload.founderReport.executiveSummary,
     },
   };
-  assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndFocus);
+  assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndExecutiveSummary);
 });
 
 test("treats legacy report payloads without locale metadata as German", () => {

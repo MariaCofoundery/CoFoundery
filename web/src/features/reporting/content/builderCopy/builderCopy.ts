@@ -10,10 +10,51 @@ export type BuilderDimensionContentKey =
   | "Commitment"
   | "Konfliktstil";
 
+export type ExecutiveSummaryStateKey =
+  | "insufficientData"
+  | "sharedBlindSpot"
+  | "strongBase"
+  | "strategicCloseOperationalClarify"
+  | "everydayCloseStrategicTension"
+  | "highClarification"
+  | "partial";
+
 export type ReportBuilderCopy = {
   executiveSummary: {
+    dimensionLabels: Record<BuilderDimensionContentKey, string>;
+    dimensionPrefix: {
+      withDimension: string;
+      fallback: string;
+    };
+    headlines: Record<ExecutiveSummaryStateKey, string>;
+    intro: {
+      fit: Record<ExecutiveSummaryStateKey, string>;
+      strengthWithDimension: string;
+      strengthFallback: string;
+      complementaryWithDimension: string;
+      sharedBlindSpotWithDimension: string;
+      sharedBlindSpotFallback: string;
+      tensionOppositeWithDimension: string;
+      tensionCoordinationWithDimension: string;
+      tensionFallback: string;
+      closing: {
+        preFounder: string;
+        existingTeam: string;
+      };
+    };
+    topMessages: {
+      strength: string;
+      complementaryDynamic: string;
+      tension: string;
+      sharedBlindSpotTension: string;
+    };
     fallbackFocus: string[];
     focusPromptsByDimension: Record<BuilderDimensionContentKey, string[]>;
+    dynamicFocus: {
+      complementaryFallback: string;
+      protectStrengthPreFounder: string;
+      protectStrengthExistingTeam: string;
+    };
   };
   enPilotExamples: {
     fallbackSummary: string;
