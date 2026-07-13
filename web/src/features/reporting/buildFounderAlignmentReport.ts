@@ -32,6 +32,7 @@ import {
   buildConflictStyleSection,
   type ConflictStyleSection,
 } from "@/features/reporting/buildConflictStyleSection";
+import { getReportBuilderCopy } from "@/features/reporting/content/builderCopy/builderCopy";
 import { type AppLocale } from "@/i18n/config";
 
 export type FounderAlignmentReport = {
@@ -81,7 +82,10 @@ function getDimensionResult(
 export function buildFounderAlignmentReport({
   scoringResult,
   teamContext,
+  locale,
 }: BuildFounderAlignmentReportInput): FounderAlignmentReport {
+  const builderCopy = getReportBuilderCopy(locale);
+
   return {
     teamContext,
     overallFit: scoringResult.overallFit,
@@ -90,6 +94,7 @@ export function buildFounderAlignmentReport({
     executiveSummary: buildExecutiveSummary({
       scoringResult,
       teamContext,
+      builderCopy,
     }),
     sections: {
       vision: buildVisionSection({
