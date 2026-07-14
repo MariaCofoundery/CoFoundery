@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 
 const navItems = [
   { label: "Produkt", href: "/#produkt" },
@@ -80,6 +81,7 @@ export function LandingTopNav() {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <PublicLanguageSwitcher />
             <Link
               href="/login"
               className="inline-flex items-center rounded-xl px-3 py-2 text-sm text-slate-600 transition hover:bg-white/70 hover:text-slate-950"
@@ -147,6 +149,7 @@ export function LandingTopNav() {
             </nav>
 
             <div className="mt-4 border-t border-slate-200/80 pt-4">
+              <PublicLanguageSwitcher className="mb-3" />
               <Link
                 href="/login"
                 onClick={() => setIsMenuOpen(false)}

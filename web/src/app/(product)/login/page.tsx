@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
+import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { createClient } from "@/lib/supabase/server";
 
 type AuthT = Awaited<ReturnType<typeof getTranslations>>;
@@ -50,6 +51,9 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-5 py-14 md:px-8">
+      <div className="mb-5 flex justify-end">
+        <PublicLanguageSwitcher />
+      </div>
       <section className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-[0_20px_40px_rgba(16,26,42,0.1)] md:p-8">
         <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">
           {t("login.eyebrow")}

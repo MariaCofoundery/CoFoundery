@@ -12,6 +12,7 @@ import {
   normalizeEmail,
   normalizeTeamName,
 } from "@/features/dashboard/advisorTeamInviteData";
+import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { createClient } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
@@ -61,6 +62,9 @@ export default async function AdvisorTeamInvitePage({
   if (invite.status !== "ready") {
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
+        <div className="mb-5 flex justify-end">
+          <PublicLanguageSwitcher />
+        </div>
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("eyebrow")}</p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">{t("notFoundTitle")}</h1>
@@ -124,6 +128,9 @@ export default async function AdvisorTeamInvitePage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
+      <div className="mb-5 flex justify-end">
+        <PublicLanguageSwitcher />
+      </div>
       <section className="rounded-[36px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] md:p-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">

@@ -9,6 +9,7 @@ import {
   inviteFlowDebugQueryEnabled,
   logInviteFlowDebug,
 } from "@/features/onboarding/inviteFlowDebug";
+import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
@@ -92,6 +93,9 @@ function invitationContextMeta(teamContext: string | null | undefined, t: Invite
 function renderErrorState(title: string, detail: string, t: InviteT) {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
+      <div className="mb-5 flex justify-end">
+        <PublicLanguageSwitcher />
+      </div>
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
         <p className="mt-3 text-sm text-slate-700">{t("errors.loadFailed")}</p>
@@ -237,6 +241,9 @@ export default async function JoinWelcomePage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
+      <div className="mb-5 flex justify-end">
+        <PublicLanguageSwitcher />
+      </div>
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
         <div className="border-b border-cyan-200 pb-3">
           <h1 className="text-3xl font-semibold text-slate-900">{t("title")}</h1>

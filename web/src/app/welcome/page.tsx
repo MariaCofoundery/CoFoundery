@@ -4,6 +4,7 @@ import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { WelcomeAlignmentVisual } from "@/features/profile/WelcomeAlignmentVisual";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,6 +38,9 @@ export default async function WelcomePage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
+      <div className="mb-5 flex justify-end">
+        <PublicLanguageSwitcher />
+      </div>
       <section className="rounded-3xl border border-slate-200 bg-white/96 p-4 shadow-sm md:p-6">
         <div>
           <ProfileBasicsForm
