@@ -25,6 +25,10 @@ import {
   getSelfReportMisreadingCopy,
   type SelfReportMisreadingBlock,
 } from "@/features/reporting/selfReportMisreadingContent";
+import {
+  getSelfReportLeverCopy,
+  type SelfReportLeverBlock,
+} from "@/features/reporting/selfReportLeverContent";
 import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -44,10 +48,7 @@ type TeamBreakBlock = SelfReportTeamBreakBlock & { highSignal?: boolean };
 
 type InterpretationBlock = SelfReportMisreadingBlock;
 
-type LeverBlock = {
-  title: string;
-  text: string;
-};
+type LeverBlock = SelfReportLeverBlock;
 
 export function SelfReportView({ report }: Props) {
   const chrome = getSelfReportChrome(report.locale);
@@ -61,7 +62,7 @@ export function SelfReportView({ report }: Props) {
   const everydayBlocks = buildEverydayBlocks(selection, signals, report.locale);
   const teamBreakBlocks = buildTeamBreakBlocks(selection, report.locale);
   const misreadings = buildMisreadingBlocks(selection, signals, report.locale);
-  const levers = buildLeverBlocks(selection, signals);
+  const levers = buildLeverBlocks(selection, signals, report.locale);
   const showValuesSection =
     report.valuesModuleStatus !== "not_started" ||
     Boolean(report.selfValuesProfile) ||
@@ -312,11 +313,12 @@ function buildMisreadingBlocks(
 
 function buildLeverBlocks(
   selection: SelfReportSelection,
-  signals: SelfReportSignal[]
+  signals: SelfReportSignal[],
+  locale?: string | null
 ): LeverBlock[] {
   return collectUniqueSignals(selection.conversationHintDimensions, selection.patternDimensions, signals)
     .slice(0, 4)
-    .map(buildLeverCopy);
+    .map((signal) => getSelfReportLeverCopy(signal, locale));
 }
 
 function collectUniqueSignals(
@@ -447,88 +449,6 @@ function buildCoreTensionParagraph(signal: SelfReportSignal | null) {
       return "Im Team wird es fuer dich dann anspruchsvoll, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will frueher auf den Tisch, die andere erst spaeter und sortierter.";
     default:
       return "Im Team wird es fuer dich vor allem dort anspruchsvoll, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
-  }
-}
-
-function buildLeverCopy(signal: SelfReportSignal): LeverBlock {
-  switch (signal.dimension) {
-    case "Unternehmenslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Sag früher, woran du eine Chance misst",
-            text:
-              "Mach frueh konkret, was fuer dich tragfaehig genug ist. Dann wirkt dein Nein weniger pauschal und deine Logik wird fuer andere besser lesbar.",
-          }
-        : {
-            title: "Sag früher, warum du eine Chance nicht liegen lassen willst",
-            text:
-              "Benenne klar, welchen Hebel oder welches Potenzial du siehst. Dann wirkt dein Vorwaertsdrang weniger wie reiner Impuls und mehr wie eine begruendete Prioritaet.",
-          };
-    case "Entscheidungslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Sag, was dir noch fehlt",
-            text:
-              "Formuliere die zwei oder drei Punkte, die fuer dich vor einer Entscheidung noch geklaert sein muessen. So bleibt Pruefung konkret und wird nicht diffus oder endlos.",
-          }
-        : {
-            title: "Sag, was schon entschieden ist und was noch offen bleiben darf",
-            text:
-              "Wenn du frueh festlegen willst, markiere klar den tragfaehigen Kern der Entscheidung. Das nimmt anderen eher das Gefuehl, ueberrollt zu werden.",
-          };
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Definiere deine Rückkopplungspunkte",
-            text:
-              "Sag nicht nur, dass du autonom arbeiten willst. Sag auch, wann du bewusst einbindest. Dann wirkt Eigenraum weniger wie Funkstille.",
-          }
-        : {
-            title: "Sag, welche Sichtbarkeit du brauchst",
-            text:
-              "Mach klar, welche Zwischenstaende du frueh sehen willst und welche nicht. Dann fuehlt sich dein Abstimmungsbedarf weniger diffus an.",
-          };
-    case "Commitment":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Sprich deinen Rahmen aus, bevor andere ihn erraten",
-            text:
-              "Sag frueh, was du realistisch tragen kannst. So wird aus deinem Rahmen eher eine klare Abmachung als ein stiller Unterschied.",
-          }
-        : {
-            title: "Mach Erwartungen an Einsatz explizit",
-            text:
-              "Wenn dir hoher Fokus wichtig ist, sag konkret, woran man ihn im Alltag sehen soll. Dann bleibt er weniger als stille Messlatte im Raum.",
-          };
-    case "Risikoorientierung":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Nenne deine Grenze vor der Entscheidung",
-            text:
-              "Sag frueh, welches Risiko fuer dich noch okay ist und ab wann du absichern willst. Das macht deine Vorsicht eher berechenbar als bremsend.",
-          }
-        : {
-            title: "Verbinde Mut mit klaren Stopps",
-            text:
-              "Wenn du eine offene Chance spielen willst, nenne auch die Schwelle, an der ihr wieder aussteigt. So wird Risiko fuehrbar statt diffus.",
-          };
-    case "Konfliktstil":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Sag, wann du ein Thema ansprichst",
-            text:
-              "Wenn du erst sortieren willst, kuendige das an. Dann wirkt dein Abwarten weniger wie Ausweichen und mehr wie ein bewusster Schritt.",
-          }
-        : {
-            title: "Rahme direkte Ansprache kurz ein",
-            text:
-              "Ein kurzer Satz wie 'ich will das frueh klaeren, nicht groesser machen' hilft oft schon. So wird Direktheit fuer andere besser lesbar.",
-          };
-    default:
-      return {
-        title: "Mach deine Logik früh sichtbar",
-        text: "Je früher andere verstehen, wie du Entscheidungen und Zusammenarbeit liest, desto seltener kippt es unnötig im Alltag.",
-      };
   }
 }
 
