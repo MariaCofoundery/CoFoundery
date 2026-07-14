@@ -2,14 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
-
-const navItems = [
-  { label: "Produkt", href: "/#produkt" },
-  { label: "So funktioniert’s", href: "/#ablauf" },
-  { label: "FAQ", href: "/#faq" },
-];
+import { getMarketingContent } from "@/data/marketing";
 
 function NavLink({
   href,
@@ -33,6 +29,13 @@ function NavLink({
 }
 
 export function LandingTopNav() {
+  const locale = useLocale();
+  const content = getMarketingContent(locale);
+  const navItems = [
+    { label: content.topNav.product, href: "/#produkt" },
+    { label: content.topNav.howItWorks, href: "/#ablauf" },
+    { label: content.topNav.faq, href: "/#faq" },
+  ];
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -86,13 +89,13 @@ export function LandingTopNav() {
               href="/login"
               className="inline-flex items-center rounded-xl px-3 py-2 text-sm text-slate-600 transition hover:bg-white/70 hover:text-slate-950"
             >
-              Login
+              {content.topNav.login}
             </Link>
             <Link
               href="/start"
               className="inline-flex items-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_25px_rgba(38,118,255,0.16)] transition duration-200 hover:-translate-y-[1px] hover:shadow-[0_14px_30px_rgba(38,118,255,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
             >
-              Jetzt starten
+              {content.topNav.start}
             </Link>
           </div>
 
@@ -101,12 +104,12 @@ export function LandingTopNav() {
               href="/start"
               className="inline-flex items-center rounded-xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-2 font-[var(--font-display)] text-[10px] tracking-[0.14em] text-slate-950 shadow-[0_8px_22px_rgba(38,118,255,0.14)] transition hover:-translate-y-[1px]"
             >
-              Starten
+              {content.topNav.mobileStart}
             </Link>
             <button
               type="button"
               aria-expanded={isMenuOpen}
-              aria-label="Navigation öffnen"
+              aria-label={content.topNav.openNavigation}
               onClick={() => setIsMenuOpen((open) => !open)}
               className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200/80 bg-white/78 text-slate-700 transition hover:bg-white"
             >
@@ -155,14 +158,14 @@ export function LandingTopNav() {
                 onClick={() => setIsMenuOpen(false)}
                 className="inline-flex items-center rounded-xl px-1 py-2 text-sm text-slate-600 transition hover:text-slate-950"
               >
-                Login
+                {content.topNav.login}
               </Link>
               <Link
                 href="/start"
                 onClick={() => setIsMenuOpen(false)}
                 className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-5 py-3 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 shadow-[0_10px_24px_rgba(38,118,255,0.16)] transition hover:-translate-y-[1px]"
               >
-                Jetzt starten
+                {content.topNav.start}
               </Link>
             </div>
           </div>

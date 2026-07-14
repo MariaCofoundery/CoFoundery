@@ -1,48 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { BASE_QUESTION_COUNT_LABEL_DE } from "@/data/marketing";
+import { getMarketingContent, type MarketingContent } from "@/data/marketing";
 
-const panels = [
-  {
-    step: "1",
-    title: "Startet mit eurem Profil",
-    text: "Ihr beantwortet strukturierte Fragen zu Zusammenarbeit, Entscheidungen, Konflikten und Verantwortung.",
-    label: "Selbstbild sichtbar machen",
-  },
-  {
-    step: "2",
-    title: "Seht, wo ihr zusammenpasst",
-    text: "Der Matching-Report zeigt, wo ihr gleich tickt, wo ihr unterschiedlich entscheidet und wo daraus Spannungen entstehen können.",
-    label: "Gemeinsamkeiten, Unterschiede, Spannungen",
-  },
-  {
-    step: "3",
-    title: "Macht daraus klare Regeln",
-    text: "Im Workbook klärt ihr die Punkte, die später sonst Reibung erzeugen würden – und haltet konkrete Vereinbarungen fest.",
-    label: "Von Analyse zu Vereinbarung",
-  },
-];
+type HowItWorksContent = MarketingContent["howItWorks"];
 
-function QuestionScale() {
+function QuestionScale({ content }: { content: HowItWorksContent }) {
   return (
     <div className="rounded-[26px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
       <div className="flex items-center justify-between gap-3">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-          Profil
+          {content.profileEyebrow}
         </p>
         <span className="rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1 text-[10px] tracking-[0.12em] text-slate-500">
-          {BASE_QUESTION_COUNT_LABEL_DE}
+          {content.questionCountLabel}
         </span>
       </div>
 
       <div className="mt-5 space-y-4">
-        {[
-          "Wie schnell sprichst du Reibung im Team an?",
-          "Wann ist ein Risiko für dich sichtbar genug?",
-          "Wie klar sollte Ownership verteilt sein?",
-        ].map((question, index) => (
+        {content.exampleQuestions.map((question, index) => (
           <div key={question} className="rounded-2xl border border-slate-200/75 bg-slate-50/75 px-4 py-4">
             <p className="text-sm leading-6 text-slate-700">{question}</p>
             <div className="mt-3 flex gap-2">
@@ -66,29 +44,25 @@ function QuestionScale() {
   );
 }
 
-function MatchingSnapshot() {
+function MatchingSnapshot({ content }: { content: HowItWorksContent }) {
   return (
     <div className="rounded-[30px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-            Matching-Report
+            {content.reportEyebrow}
           </p>
           <p className="mt-2 font-[var(--font-display)] text-xl tracking-[-0.02em] text-slate-950">
-            Zwei Perspektiven, ein klarer Vergleich
+            {content.reportTitle}
           </p>
         </div>
         <span className="rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1 text-[10px] tracking-[0.12em] text-slate-500">
-          Report
+          {content.reportBadge}
         </span>
       </div>
 
       <div className="mt-5 space-y-4">
-        {[
-          { label: "Gemeinsamkeiten", left: "76%", right: "76%", tone: "bg-emerald-300/85" },
-          { label: "Unterschiede", left: "42%", right: "72%", tone: "bg-slate-300/90" },
-          { label: "Spannungen", left: "58%", right: "68%", tone: "bg-amber-300/85" },
-        ].map((row) => (
+        {content.reportRows.map((row) => (
           <div key={row.label} className="rounded-2xl border border-slate-200/75 bg-slate-50/80 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{row.label}</p>
@@ -114,20 +88,16 @@ function MatchingSnapshot() {
   );
 }
 
-function WorkbookVisual() {
+function WorkbookVisual({ content }: { content: HowItWorksContent }) {
+  const entries = [
+    { title: content.perspectiveA, lines: content.perspectiveALines },
+    { title: content.perspectiveB, lines: content.perspectiveBLines },
+  ];
+
   return (
     <div className="grid gap-4">
       <div className="grid gap-4 md:grid-cols-2">
-        {[
-          {
-            title: "Perspektive A",
-            lines: ["Wir sprechen Kritik direkt an.", "Entscheidungen lieber früh klären."],
-          },
-          {
-            title: "Perspektive B",
-            lines: ["Erst einordnen, dann ansprechen.", "Mehr Abgleich bei strategischen Themen."],
-          },
-        ].map((entry, index) => (
+        {entries.map((entry, index) => (
           <motion.div
             key={entry.title}
             initial={{ opacity: 0, y: 18 }}
@@ -158,14 +128,14 @@ function WorkbookVisual() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              Gemeinsame Regel
+              {content.sharedRuleEyebrow}
             </p>
             <p className="mt-2 font-[var(--font-display)] text-xl tracking-[-0.02em] text-slate-950">
-              Konflikte sprechen wir innerhalb von 24 Stunden an und klären sie in einem festen Gespräch.
+              {content.sharedRule}
             </p>
           </div>
           <span className="rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[10px] tracking-[0.12em] text-slate-600">
-            Workbook
+            {content.workbookBadge}
           </span>
         </div>
       </motion.div>
@@ -173,10 +143,10 @@ function WorkbookVisual() {
   );
 }
 
-function StepVisual({ index }: { index: number }) {
-  if (index === 0) return <QuestionScale />;
-  if (index === 1) return <MatchingSnapshot />;
-  return <WorkbookVisual />;
+function StepVisual({ index, content }: { index: number; content: HowItWorksContent }) {
+  if (index === 0) return <QuestionScale content={content} />;
+  if (index === 1) return <MatchingSnapshot content={content} />;
+  return <WorkbookVisual content={content} />;
 }
 
 function StepCard({
@@ -184,10 +154,12 @@ function StepCard({
   index,
   isActive,
   setRef,
+  content,
 }: {
-  panel: (typeof panels)[number];
+  panel: HowItWorksContent["panels"][number];
   index: number;
   isActive: boolean;
+  content: HowItWorksContent;
   setRef?: (node: HTMLDivElement | null) => void;
 }) {
   return (
@@ -232,7 +204,9 @@ function StepCard({
         <div className="mt-8 flex items-center gap-3">
           <div className="h-px flex-1 bg-[color:var(--line)]" />
           <span className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
-            Schritt {index + 1} von {panels.length}
+            {content.progressLabel
+              .replace("{current}", String(index + 1))
+              .replace("{total}", String(content.panels.length))}
           </span>
         </div>
       </div>
@@ -247,7 +221,7 @@ function StepCard({
           className="absolute -right-4 bottom-4 h-24 w-24 rounded-full bg-[color:var(--brand-accent)]/8 blur-3xl"
         />
         <div className="relative">
-          <StepVisual index={index} />
+          <StepVisual index={index} content={content} />
         </div>
       </div>
     </motion.article>
@@ -296,6 +270,8 @@ function TimelineRail({
 }
 
 export function HowItWorksSection() {
+  const locale = useLocale();
+  const content = getMarketingContent(locale).howItWorks;
   const [activeStep, setActiveStep] = useState(0);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -339,37 +315,38 @@ export function HowItWorksSection() {
     <section id="ablauf" className="mt-20">
       <div className="max-w-3xl">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-          So funktioniert CoFoundery Align
+          {content.eyebrow}
         </p>
         <h2 className="mt-3 font-[var(--font-display)] text-3xl tracking-tight md:text-4xl">
-          Drei Schritte zu einem stärkeren Founder-Team
+          {content.title}
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-8 text-[color:var(--muted)]">
-          Von der ersten Selbsteinschätzung bis zu klaren gemeinsamen Regeln.
+          {content.text}
         </p>
       </div>
 
       <div className="mt-10">
         <div className="space-y-6 lg:hidden">
-          {panels.map((panel, index) => (
-            <StepCard key={panel.step} panel={panel} index={index} isActive={index === 0} />
+          {content.panels.map((panel, index) => (
+            <StepCard key={panel.step} panel={panel} index={index} isActive={index === 0} content={content} />
           ))}
         </div>
 
         <div className="hidden lg:grid lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-8">
-          {panels.map((panel, index) => (
+          {content.panels.map((panel, index) => (
             <div key={panel.step} className="contents">
               <TimelineRail
                 index={index}
                 isActive={activeStep === index}
                 isComplete={activeStep > index}
-                isLast={index === panels.length - 1}
+                isLast={index === content.panels.length - 1}
               />
               <StepCard
                 panel={panel}
                 index={index}
                 isActive={activeStep === index}
                 setRef={setCardRef(index)}
+                content={content}
               />
             </div>
           ))}

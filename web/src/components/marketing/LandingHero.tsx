@@ -1,67 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { motion, useReducedMotion } from "framer-motion";
-import { BASE_QUESTION_COUNT_STRUCTURED_LABEL_DE } from "@/data/marketing";
+import { getMarketingContent, type MarketingContent } from "@/data/marketing";
 
-const supportPoints = [
-  BASE_QUESTION_COUNT_STRUCTURED_LABEL_DE,
-  "Klarer Matching-Report",
-  "Gemeinsames Workbook",
-];
-
-const founderSignals = [
-  {
-    title: "Founder A",
-    items: [
-      { label: "Tempo", width: "76%", tone: "bg-slate-900/80" },
-      { label: "Risiko", width: "48%", tone: "bg-slate-300" },
-      { label: "Ownership", width: "84%", tone: "bg-emerald-300/85" },
-      { label: "Konflikt", width: "58%", tone: "bg-amber-300/90" },
-    ],
-  },
-  {
-    title: "Founder B",
-    items: [
-      { label: "Tempo", width: "54%", tone: "bg-slate-900/72" },
-      { label: "Risiko", width: "72%", tone: "bg-slate-300" },
-      { label: "Ownership", width: "62%", tone: "bg-emerald-300/85" },
-      { label: "Konflikt", width: "78%", tone: "bg-amber-300/90" },
-    ],
-  },
-];
-
-const comparisonRows = [
-  {
-    label: "Gemeinsamkeiten",
-    hint: "Tragende Basis",
-    leftWidth: "82%",
-    rightWidth: "82%",
-    tone: "bg-emerald-300/90",
-  },
-  {
-    label: "Unterschiede",
-    hint: "Anderer Zugriff",
-    leftWidth: "54%",
-    rightWidth: "80%",
-    tone: "bg-slate-900/78",
-  },
-  {
-    label: "Spannungen",
-    hint: "Früh klären",
-    leftWidth: "38%",
-    rightWidth: "66%",
-    tone: "bg-amber-300/95",
-  },
-];
-
-const summaryPoints = [
-  "Unterschiede früh sichtbar",
-  "Klärungsbedarf vor Konflikt",
-  "Grundlage für gemeinsame Regeln",
-];
-
-function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
+function HeroProductVisual({
+  reduceMotion,
+  content,
+}: {
+  reduceMotion: boolean;
+  content: MarketingContent["hero"];
+}) {
   return (
     <div className="relative h-[420px] overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(160deg,rgba(255,255,255,0.92),rgba(244,247,251,0.90))] shadow-[0_24px_70px_rgba(15,23,42,0.10)]">
       <div
@@ -74,7 +24,7 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
       />
       <div className="relative flex h-full flex-col gap-4 p-5 md:p-6">
         <div className="grid gap-4 sm:grid-cols-2">
-          {founderSignals.map((founder, founderIndex) => (
+          {content.founderSignals.map((founder, founderIndex) => (
             <motion.div
               key={founder.title}
               initial={{ opacity: 0, y: 18 }}
@@ -87,7 +37,7 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
                   {founder.title}
                 </p>
                 <span className="rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-[10px] tracking-[0.14em] text-slate-500">
-                  Profil
+                  {founder.profileLabel}
                 </span>
               </div>
 
@@ -127,19 +77,19 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-                Matching-Auswertung
+                {content.visual.reportEyebrow}
               </p>
               <p className="mt-2 font-[var(--font-display)] text-xl tracking-[-0.02em] text-slate-950">
-                Founder-Kompatibilität wird lesbar
+                {content.visual.reportTitle}
               </p>
             </div>
             <span className="rounded-full border border-slate-200/80 bg-slate-50 px-3 py-1 text-[10px] tracking-[0.14em] text-slate-500">
-              Report
+              {content.visual.reportBadge}
             </span>
           </div>
 
           <div className="mt-5 space-y-4">
-            {comparisonRows.map((row, rowIndex) => (
+            {content.comparisonRows.map((row, rowIndex) => (
               <motion.div
                 key={row.label}
                 initial={{ opacity: 0, y: 10 }}
@@ -152,7 +102,7 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
                   <motion.p
                     className="text-[11px] tracking-[0.08em] text-slate-500"
                     animate={
-                      !reduceMotion && row.label === "Spannungen"
+                      !reduceMotion && rowIndex === 2
                         ? { opacity: [0.5, 1, 0.5] }
                         : undefined
                     }
@@ -192,7 +142,7 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
           className="rounded-[22px] border border-[color:var(--brand-accent)]/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(38,118,255,0.06))] px-4 py-4"
         >
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
-            {summaryPoints.map((item, index) => (
+            {content.summaryPoints.map((item, index) => (
               <motion.div
                 key={item}
                 initial={{ opacity: 0, y: 6 }}
@@ -212,6 +162,8 @@ function HeroProductVisual({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 export function LandingHero() {
+  const locale = useLocale();
+  const content = getMarketingContent(locale).hero;
   const reduceMotion = useReducedMotion() ?? false;
 
   return (
@@ -223,13 +175,11 @@ export function LandingHero() {
         className="reveal"
       >
         <h1 className="max-w-4xl font-[var(--font-display)] text-4xl leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[3.75rem] lg:leading-[0.9] xl:text-[3.95rem]">
-          Die meisten Founder merken zu spät, dass sie nicht zusammenpassen.
+          {content.headline}
         </h1>
 
         <p className="mt-6 max-w-2xl text-lg leading-8 text-[color:var(--muted)] lg:text-[1.15rem]">
-          CoFoundery Align zeigt euch, wie ihr wirklich zusammenarbeitet: wo ihr gleich tickt,
-          wo Unterschiede Konfliktpotenzial erzeugen – und wie ihr daraus eine stabile
-          Zusammenarbeit entwickelt.
+          {content.subline}
         </p>
 
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -237,18 +187,18 @@ export function LandingHero() {
             href="/start"
             className="inline-flex items-center justify-center rounded-2xl bg-[color:var(--brand-primary)] px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-slate-950 transition hover:translate-y-[-1px] hover:bg-[color:var(--brand-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]"
           >
-            Founder-Kompatibilität prüfen
+            {content.primaryCta}
           </Link>
           <Link
             href="#ablauf"
             className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--line)] bg-white/86 px-6 py-4 font-[var(--font-display)] text-[11px] tracking-[0.16em] text-[color:var(--ink)] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/30"
           >
-            So funktioniert&apos;s
+            {content.secondaryCta}
           </Link>
         </div>
 
         <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-sm text-[color:var(--muted)]">
-          {supportPoints.map((item) => (
+          {content.supportPoints.map((item) => (
             <div key={item} className="inline-flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--brand-primary)]/80" />
               <span>{item}</span>
@@ -274,7 +224,7 @@ export function LandingHero() {
             transition={{ duration: 0.72, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative"
           >
-            <HeroProductVisual reduceMotion={reduceMotion} />
+            <HeroProductVisual reduceMotion={reduceMotion} content={content} />
           </motion.div>
         </div>
       </div>
