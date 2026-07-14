@@ -1,0 +1,120 @@
+{
+  "basicsForm": {
+    "uploadedImage": "Eigenes Profilbild",
+    "uploadedFile": "{fileName} hochgeladen",
+    "onboarding": {
+      "steps": {
+        "welcome": {
+          "eyebrow": "Schritt 1 von 7",
+          "title": "Willkommen bei CoFoundery Align",
+          "hint": "Hier geht es nicht nur darum, wen du findest. Sondern wie gut ihr wirklich zusammenarbeitet."
+        },
+        "name": {
+          "eyebrow": "Schritt 2 von 7",
+          "title": "Wie sollen wir dich nennen?",
+          "hint": "So erscheinst du später in deinem Profil und im Matching."
+        },
+        "role": {
+          "eyebrow": "Schritt 3 von 7",
+          "title": "Wähle die Rolle, mit der du gerade am ehesten unterwegs bist.",
+          "hint": ""
+        },
+        "focus": {
+          "eyebrow": "Schritt 4 von 7",
+          "title": "Worauf liegt dein Schwerpunkt?",
+          "hint": "Das hilft uns, dein Profil später besser einzuordnen."
+        },
+        "intention": {
+          "eyebrow": "Schritt 5 von 7",
+          "title": "Woran arbeitest du gerade?",
+          "hint": "Deine Intention hilft uns, den richtigen Kontext für Matching und Zusammenarbeit zu setzen."
+        },
+        "avatar": {
+          "eyebrow": "Schritt 6 von 7",
+          "title": "Willst du noch ein Bild hinzufügen?",
+          "hint": "Optional. Du kannst das auch später machen."
+        },
+        "next": {
+          "eyebrow": "Schritt 7 von 7",
+          "title": "So geht es jetzt weiter",
+          "hint": "Du startest gleich nicht in ein Formular, sondern in ein Produkt, das Zusammenarbeit früh klarer macht."
+        }
+      },
+      "welcomeText": "Du legst jetzt nur dein Kernprofil an. Das dauert kurz und bringt dich danach direkt in das Produkt.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Dein Name",
+      "roleBoth": "Beides",
+      "roleBothDescription": "Du bewegst dich gerade sowohl als Founder als auch mit beratender Perspektive.",
+      "roleAdvisorDescription": "Du begleitest Founder-Teams mit einer beratenden Perspektive.",
+      "roleFounderDescription": "Du nutzt CoFoundery für dein eigenes Matching, Profil und Alignment.",
+      "focusOtherLabel": "Optionaler Schwerpunkt",
+      "focusOtherPlaceholder": "Wenn du willst, kannst du hier deinen Schwerpunkt genauer benennen",
+      "avatarSkipHint": "Wenn du gerade überspringen willst, ist das völlig okay.",
+      "nextButton": "Weiter",
+      "startButton": "Profil starten",
+      "skipImageButton": "Ohne Bild weitermachen",
+      "backButton": "Zurück",
+      "nextCards": {
+        "profileTitle": "Profil aufbauen",
+        "profileText": "Dein Kernprofil gibt deinem Einstieg sofort Richtung.",
+        "insightsTitle": "Insights bekommen",
+        "insightsText": "Deine Antworten machen Unterschiede und Muster greifbar.",
+        "collaborationTitle": "Matching und Zusammenarbeit klären",
+        "collaborationText": "Daraus werden klare Gespräche, Reports und später konkrete Arbeitsregeln."
+      },
+      "nonDiagnosticHint": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft dir, Zusammenarbeit früh klarer und belastbarer zu machen."
+    },
+    "avatar": {
+      "title": "Avatar",
+      "help": "Optional. Du kannst ihn jetzt setzen oder später im Dashboard ändern.",
+      "closeSelection": "Auswahl schließen",
+      "chooseAvatar": "Avatar wählen",
+      "chooseAvatarEdit": "Avatar auswählen",
+      "uploadOwn": "Eigenes Bild hochladen",
+      "uploadImage": "Bild hochladen"
+    },
+    "edit": {
+      "displayNameLabel": "Anzeigename",
+      "displayNamePlaceholder": "Dein Name",
+      "focusLabel": "Fokus",
+      "intentionLabel": "Intention",
+      "selectPlaceholder": "Bitte auswählen",
+      "focusOtherPlaceholder": "Optional genauer beschreiben",
+      "rolesLegend": "Deine Rollen",
+      "rolesHelp": "Die Kernrolle für dein Onboarding ist bereits gesetzt. Hier kannst du zusätzlich weitere Modi aktivieren.",
+      "advisorRoleHelp": "Nutze CoFoundery auch, um Founder-Teams als Advisor zu begleiten.",
+      "founderRoleHelp": "Nutze CoFoundery für dein eigenes Founder-Profil, Matching und Alignment."
+    },
+    "roles": {
+      "founder": "Founder",
+      "advisor": "Advisor"
+    },
+    "skills": {
+      "Tech": "Tech",
+      "Sales": "Sales",
+      "Marketing": "Marketing",
+      "Product": "Product",
+      "Operations": "Operations",
+      "Finance": "Finance",
+      "Allrounder": "Allrounder",
+      "Sonstiges": "Sonstiges"
+    },
+    "intentions": {
+      "Suche": {
+        "label": "Suche",
+        "description": "Du willst früh sehen, mit wem Zusammenarbeit wirklich tragen könnte."
+      },
+      "Partner-Match": {
+        "label": "Partner-Match",
+        "description": "Du willst Passung und Unterschiede in einer konkreten Co-Founder-Konstellation klären."
+      },
+      "Selbsttest": {
+        "label": "Selbsttest",
+        "description": "Du willst dein eigenes Profil und deine Arbeitsweise erst einmal sauber einordnen."
+      }
+    }
+  },
+  "welcome": {
+    "submit": "Los geht's"
+  }
+}

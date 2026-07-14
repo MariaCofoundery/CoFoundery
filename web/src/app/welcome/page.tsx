@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
@@ -16,6 +17,7 @@ export default async function WelcomePage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("profile.welcome");
   const nextPath = normalizeNextPath(params.next);
   const supabase = await createClient();
   const {
@@ -47,7 +49,7 @@ export default async function WelcomePage({
               avatar_id: profile?.avatar_id ?? null,
               avatar_url: profile?.avatar_url ?? null,
             }}
-            submitLabel="Los geht's"
+            submitLabel={t("submit")}
             onSuccessRedirectTo={nextPath}
             variant="accent"
             fallbackAvatarUrl={fallbackAvatarUrl}

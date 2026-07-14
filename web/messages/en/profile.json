@@ -1,0 +1,120 @@
+{
+  "basicsForm": {
+    "uploadedImage": "Custom profile image",
+    "uploadedFile": "{fileName} uploaded",
+    "onboarding": {
+      "steps": {
+        "welcome": {
+          "eyebrow": "Step 1 of 7",
+          "title": "Welcome to CoFoundery Align",
+          "hint": "This is not only about who you find. It is about how well you can actually work together."
+        },
+        "name": {
+          "eyebrow": "Step 2 of 7",
+          "title": "What should we call you?",
+          "hint": "This is how you will appear in your profile and in matching."
+        },
+        "role": {
+          "eyebrow": "Step 3 of 7",
+          "title": "Choose the role that fits where you are right now.",
+          "hint": ""
+        },
+        "focus": {
+          "eyebrow": "Step 4 of 7",
+          "title": "What is your main focus?",
+          "hint": "This helps us understand your profile in the right context later."
+        },
+        "intention": {
+          "eyebrow": "Step 5 of 7",
+          "title": "What are you working on right now?",
+          "hint": "Your intention helps us set the right context for matching and collaboration."
+        },
+        "avatar": {
+          "eyebrow": "Step 6 of 7",
+          "title": "Would you like to add a picture?",
+          "hint": "Optional. You can also do this later."
+        },
+        "next": {
+          "eyebrow": "Step 7 of 7",
+          "title": "What happens next",
+          "hint": "You are not heading into just another form, but into a product that makes collaboration clearer early."
+        }
+      },
+      "welcomeText": "You are only creating your core profile now. It takes a moment and then brings you straight into the product.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "roleBoth": "Both",
+      "roleBothDescription": "You are currently active both as a founder and from an advisory perspective.",
+      "roleAdvisorDescription": "You support founder teams from an advisory perspective.",
+      "roleFounderDescription": "You use CoFoundery for your own matching, profile, and alignment.",
+      "focusOtherLabel": "Optional focus area",
+      "focusOtherPlaceholder": "If you like, describe your focus more specifically here",
+      "avatarSkipHint": "It is completely fine to skip this for now.",
+      "nextButton": "Continue",
+      "startButton": "Start profile",
+      "skipImageButton": "Continue without image",
+      "backButton": "Back",
+      "nextCards": {
+        "profileTitle": "Build your profile",
+        "profileText": "Your core profile gives your start a clear direction.",
+        "insightsTitle": "Get insights",
+        "insightsText": "Your answers make differences and patterns easier to discuss.",
+        "collaborationTitle": "Clarify matching and collaboration",
+        "collaborationText": "This becomes clearer conversations, reports, and later concrete working agreements."
+      },
+      "nonDiagnosticHint": "CoFoundery Align is not a personality test. It helps you make collaboration clearer and more resilient early."
+    },
+    "avatar": {
+      "title": "Avatar",
+      "help": "Optional. You can set it now or change it later in the dashboard.",
+      "closeSelection": "Close selection",
+      "chooseAvatar": "Choose avatar",
+      "chooseAvatarEdit": "Choose avatar",
+      "uploadOwn": "Upload own image",
+      "uploadImage": "Upload image"
+    },
+    "edit": {
+      "displayNameLabel": "Display name",
+      "displayNamePlaceholder": "Your name",
+      "focusLabel": "Focus",
+      "intentionLabel": "Intention",
+      "selectPlaceholder": "Please select",
+      "focusOtherPlaceholder": "Optionally describe more specifically",
+      "rolesLegend": "Your roles",
+      "rolesHelp": "The core role for your onboarding is already set. Here you can activate additional modes.",
+      "advisorRoleHelp": "Use CoFoundery to support founder teams as an advisor as well.",
+      "founderRoleHelp": "Use CoFoundery for your own founder profile, matching, and alignment."
+    },
+    "roles": {
+      "founder": "Founder",
+      "advisor": "Advisor"
+    },
+    "skills": {
+      "Tech": "Tech",
+      "Sales": "Sales",
+      "Marketing": "Marketing",
+      "Product": "Product",
+      "Operations": "Operations",
+      "Finance": "Finance",
+      "Allrounder": "Generalist",
+      "Sonstiges": "Other"
+    },
+    "intentions": {
+      "Suche": {
+        "label": "Searching",
+        "description": "You want to see early who collaboration could really work with."
+      },
+      "Partner-Match": {
+        "label": "Partner match",
+        "description": "You want to clarify fit and differences in a specific co-founder constellation."
+      },
+      "Selbsttest": {
+        "label": "Self-check",
+        "description": "You first want to understand your own profile and way of working more clearly."
+      }
+    }
+  },
+  "welcome": {
+    "submit": "Let's start"
+  }
+}

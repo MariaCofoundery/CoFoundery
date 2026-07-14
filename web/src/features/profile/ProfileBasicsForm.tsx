@@ -1,13 +1,13 @@
 "use client";
 
 import { type ChangeEvent, type ReactNode, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { upsertProfileBasicsAction } from "@/features/profile/actions";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
 import {
   PROFILE_ROLE_OPTIONS,
   normalizeProfileRoles,
-  profileRoleLabel,
   type ProfileRole,
 } from "@/features/profile/profileRoles";
 
@@ -70,6 +70,7 @@ export function ProfileBasicsForm({
   fallbackAvatarUrl = null,
   welcomeVisual,
 }: Props) {
+  const t = useTranslations("profile.basicsForm");
   const successRedirect = normalizePath(onSuccessRedirectTo, "/dashboard");
   const errorRedirect = successRedirect;
   const cardClass =
@@ -92,7 +93,7 @@ export function ProfileBasicsForm({
     initialValues.avatar_id?.trim() ? "" : initialAvatarUrl
   );
   const [uploadedAvatarLabel, setUploadedAvatarLabel] = useState<string | null>(
-    initialValues.avatar_id?.trim() ? null : initialAvatarUrl ? "Eigenes Profilbild" : null
+    initialValues.avatar_id?.trim() ? null : initialAvatarUrl ? t("uploadedImage") : null
   );
   const [selectedAvatarId, setSelectedAvatarId] = useState(initialValues.avatar_id?.trim() ?? "");
   const [displayName, setDisplayName] = useState(initialValues.display_name?.trim() ?? "");
@@ -109,7 +110,6 @@ export function ProfileBasicsForm({
   const previewName = displayName.trim() || "Founder";
   const resolvedFocusSkill =
     focusChoice === "Sonstiges" ? focusOtherText.trim() || "Sonstiges" : focusChoice;
-  const resolvedRoles = primaryRole === "both" ? ["founder", "advisor"] : [primaryRole];
   const resolvedAvatarImageUrl = selectedAvatarId ? null : uploadedAvatarUrl || initialAvatarUrl || null;
   const hasAvatarImage = Boolean(selectedAvatarId || resolvedAvatarImageUrl);
 
@@ -133,43 +133,59 @@ export function ProfileBasicsForm({
   const onboardingStepMeta = useMemo(
     () => ({
       welcome: {
-        eyebrow: "Schritt 1 von 7",
-        title: "Willkommen bei CoFoundery Align",
-        hint: "Hier geht es nicht nur darum, wen du findest. Sondern wie gut ihr wirklich zusammenarbeitet.",
+        eyebrow: t("onboarding.steps.welcome.eyebrow"),
+        title: t("onboarding.steps.welcome.title"),
+        hint: t("onboarding.steps.welcome.hint"),
       },
       name: {
-        eyebrow: "Schritt 2 von 7",
-        title: "Wie sollen wir dich nennen?",
-        hint: "So erscheinst du spaeter in deinem Profil und im Matching.",
+        eyebrow: t("onboarding.steps.name.eyebrow"),
+        title: t("onboarding.steps.name.title"),
+        hint: t("onboarding.steps.name.hint"),
       },
       role: {
-        eyebrow: "Schritt 3 von 7",
-        title: "Wähle die Rolle, mit der du gerade am ehesten unterwegs bist.",
-        hint: "",
+        eyebrow: t("onboarding.steps.role.eyebrow"),
+        title: t("onboarding.steps.role.title"),
+        hint: t("onboarding.steps.role.hint"),
       },
       focus: {
-        eyebrow: "Schritt 4 von 7",
-        title: "Worauf liegt dein Schwerpunkt?",
-        hint: "Das hilft uns, dein Profil spaeter besser einzuordnen.",
+        eyebrow: t("onboarding.steps.focus.eyebrow"),
+        title: t("onboarding.steps.focus.title"),
+        hint: t("onboarding.steps.focus.hint"),
       },
       intention: {
-        eyebrow: "Schritt 5 von 7",
-        title: "Woran arbeitest du gerade?",
-        hint: "Deine Intention hilft uns, den richtigen Kontext fuer Matching und Zusammenarbeit zu setzen.",
+        eyebrow: t("onboarding.steps.intention.eyebrow"),
+        title: t("onboarding.steps.intention.title"),
+        hint: t("onboarding.steps.intention.hint"),
       },
       avatar: {
-        eyebrow: "Schritt 6 von 7",
-        title: "Willst du noch ein Bild hinzufuegen?",
-        hint: "Optional. Du kannst das auch spaeter machen.",
+        eyebrow: t("onboarding.steps.avatar.eyebrow"),
+        title: t("onboarding.steps.avatar.title"),
+        hint: t("onboarding.steps.avatar.hint"),
       },
       next: {
-        eyebrow: "Schritt 7 von 7",
-        title: "So geht es jetzt weiter",
-        hint: "Du startest gleich nicht in ein Formular, sondern in ein Produkt, das Zusammenarbeit frueh klarer macht.",
+        eyebrow: t("onboarding.steps.next.eyebrow"),
+        title: t("onboarding.steps.next.title"),
+        hint: t("onboarding.steps.next.hint"),
       },
     }),
-    []
+    [t]
   );
+
+  function roleDisplayLabel(role: ProfileRole) {
+    return t(`roles.${role}`);
+  }
+
+  function skillDisplayLabel(skill: (typeof SKILLS)[number]) {
+    return t(`skills.${skill}`);
+  }
+
+  function intentionDisplayLabel(intentionValue: (typeof INTENTIONS)[number]) {
+    return t(`intentions.${intentionValue}.label`);
+  }
+
+  function intentionDescription(intentionValue: (typeof INTENTIONS)[number]) {
+    return t(`intentions.${intentionValue}.description`);
+  }
 
   function handleOnboardingEnter() {
     if (activeStepIndex < ONBOARDING_STEP_ORDER.length - 1 && canGoNext) {
@@ -190,9 +206,9 @@ export function ProfileBasicsForm({
               fallbackClassName="flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.92)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.06)]"
             />
             <div>
-              <p className="text-sm font-medium text-slate-900">Avatar</p>
+              <p className="text-sm font-medium text-slate-900">{t("avatar.title")}</p>
               <p className="mt-1 text-xs leading-6 text-slate-500">
-                Optional. Du kannst ihn jetzt setzen oder spaeter im Dashboard aendern.
+                {t("avatar.help")}
               </p>
               {uploadedAvatarLabel && !selectedAvatarId ? (
                 <p className="mt-2 text-xs font-medium text-slate-700">{uploadedAvatarLabel}</p>
@@ -205,14 +221,14 @@ export function ProfileBasicsForm({
               onClick={() => setAvatarPickerOpen((current) => !current)}
               className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
-              {avatarPickerOpen ? "Auswahl schliessen" : "Avatar waehlen"}
+              {avatarPickerOpen ? t("avatar.closeSelection") : t("avatar.chooseAvatar")}
             </button>
             <button
               type="button"
               onClick={() => avatarUploadRef.current?.click()}
               className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Eigenes Bild hochladen
+              {t("avatar.uploadOwn")}
             </button>
           </div>
         </div>
@@ -287,11 +303,11 @@ export function ProfileBasicsForm({
 
           <div className="flex w-full flex-wrap gap-2">
             {renderAvatarActionButton({
-              label: "Bild hochladen",
+              label: t("avatar.uploadImage"),
               onClick: () => avatarUploadRef.current?.click(),
             })}
             {renderAvatarActionButton({
-              label: avatarPickerOpen ? "Auswahl schließen" : "Avatar auswählen",
+              label: avatarPickerOpen ? t("avatar.closeSelection") : t("avatar.chooseAvatarEdit"),
               onClick: () => setAvatarPickerOpen((current) => !current),
             })}
           </div>
@@ -303,13 +319,13 @@ export function ProfileBasicsForm({
 
         <div className="min-w-0">
           <label className="grid gap-2 text-sm text-slate-700">
-            Anzeigename
+            {t("edit.displayNameLabel")}
             <input
               name="displayName"
               required
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
-              placeholder="Dein Name"
+              placeholder={t("edit.displayNamePlaceholder")}
               className="h-11 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
             />
           </label>
@@ -389,7 +405,7 @@ export function ProfileBasicsForm({
     try {
       const dataUrl = await toAvatarDataUrl(file);
       setUploadedAvatarUrl(dataUrl);
-      setUploadedAvatarLabel(`${file.name} hochgeladen`);
+      setUploadedAvatarLabel(t("uploadedFile", { fileName: file.name }));
       setSelectedAvatarId("");
       setAvatarPickerOpen(false);
     } finally {
@@ -404,10 +420,10 @@ export function ProfileBasicsForm({
     const showProgress = true;
     const nextButtonLabel =
       activeStep === "welcome"
-        ? "Profil starten"
+        ? t("onboarding.startButton")
         : activeStep === "avatar"
-          ? "Weiter"
-          : "Weiter";
+          ? t("onboarding.nextButton")
+          : t("onboarding.nextButton");
 
     return (
       <>
@@ -425,7 +441,7 @@ export function ProfileBasicsForm({
           ) : null}
           {isWelcomeStep ? (
             <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-              Du legst jetzt nur dein Kernprofil an. Das dauert kurz und bringt dich danach direkt in das Produkt.
+              {t("onboarding.welcomeText")}
             </p>
           ) : null}
           {showProgress ? (
@@ -446,7 +462,7 @@ export function ProfileBasicsForm({
         <div className="grid gap-5 pt-4">
           {activeStep === "name" ? (
             <label className="grid gap-2 text-sm text-slate-700">
-              Name
+              {t("onboarding.nameLabel")}
               <input
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
@@ -456,7 +472,7 @@ export function ProfileBasicsForm({
                     handleOnboardingEnter();
                   }
                 }}
-                placeholder="Dein Name"
+                placeholder={t("onboarding.namePlaceholder")}
                 autoComplete="name"
                 className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
               />
@@ -468,13 +484,13 @@ export function ProfileBasicsForm({
               {[...PROFILE_ROLE_OPTIONS, "both"].map((role) =>
                 renderChoiceCard({
                   id: role,
-                  title: role === "both" ? "Beides" : profileRoleLabel(role as ProfileRole),
+                  title: role === "both" ? t("onboarding.roleBoth") : roleDisplayLabel(role as ProfileRole),
                   description:
                     role === "both"
-                      ? "Du bewegst dich gerade sowohl als Founder als auch mit beratender Perspektive."
+                      ? t("onboarding.roleBothDescription")
                       : role === "advisor"
-                      ? "Du begleitest Founder-Teams mit einer beratenden Perspektive."
-                      : "Du nutzt CoFoundery fuer dein eigenes Matching, Profil und Alignment.",
+                      ? t("onboarding.roleAdvisorDescription")
+                      : t("onboarding.roleFounderDescription"),
                   selected: primaryRole === role,
                   onSelect: () => setPrimaryRole(role as OnboardingPrimaryRole),
                 })
@@ -487,18 +503,18 @@ export function ProfileBasicsForm({
               {SKILLS.map((skill) =>
                 renderChoiceCard({
                   id: skill,
-                  title: skill,
+                  title: skillDisplayLabel(skill),
                   selected: focusChoice === skill,
                   onSelect: () => setFocusChoice(skill),
                 })
               )}
               {focusChoice === "Sonstiges" ? (
                 <label className="sm:col-span-2 grid gap-2 text-sm text-slate-700">
-                  Optionaler Schwerpunkt
+                  {t("onboarding.focusOtherLabel")}
                   <input
                     value={focusOtherText}
                     onChange={(event) => setFocusOtherText(event.target.value)}
-                    placeholder="Wenn du willst, kannst du hier deinen Schwerpunkt genauer benennen"
+                    placeholder={t("onboarding.focusOtherPlaceholder")}
                     className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
                   />
                 </label>
@@ -511,13 +527,8 @@ export function ProfileBasicsForm({
               {INTENTIONS.map((entry) =>
                 renderChoiceCard({
                   id: entry,
-                  title: entry,
-                  description:
-                    entry === "Suche"
-                      ? "Du willst frueh sehen, mit wem Zusammenarbeit wirklich tragen koennte."
-                      : entry === "Partner-Match"
-                        ? "Du willst Passung und Unterschiede in einer konkreten Co-Founder-Konstellation klaeren."
-                        : "Du willst dein eigenes Profil und deine Arbeitsweise erst einmal sauber einordnen.",
+                  title: intentionDisplayLabel(entry),
+                  description: intentionDescription(entry),
                   selected: intention === entry,
                   onSelect: () => setIntention(entry),
                 })
@@ -529,7 +540,7 @@ export function ProfileBasicsForm({
             <>
               {renderAvatarCard()}
               <p className="text-xs leading-6 text-slate-500">
-                Wenn du gerade ueberspringen willst, ist das voellig okay.
+                {t("onboarding.avatarSkipHint")}
               </p>
             </>
           ) : null}
@@ -539,30 +550,30 @@ export function ProfileBasicsForm({
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">1</p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">Profil aufbauen</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">{t("onboarding.nextCards.profileTitle")}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Dein Kernprofil gibt deinem Einstieg sofort Richtung.
+                    {t("onboarding.nextCards.profileText")}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">2</p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">Insights bekommen</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">{t("onboarding.nextCards.insightsTitle")}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Deine Antworten machen Unterschiede und Muster greifbar.
+                    {t("onboarding.nextCards.insightsText")}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">3</p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">Matching und Zusammenarbeit klaeren</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-950">{t("onboarding.nextCards.collaborationTitle")}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Daraus werden klare Gespraeche, Reports und spaeter konkrete Arbeitsregeln.
+                    {t("onboarding.nextCards.collaborationText")}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-2xl border border-cyan-200 bg-cyan-50/70 px-5 py-4">
                 <p className="text-sm leading-7 text-slate-800">
-                  CoFoundery Align ist kein Persoenlichkeitstest. Es hilft dir, Zusammenarbeit frueh klarer und belastbarer zu machen.
+                  {t("onboarding.nonDiagnosticHint")}
                 </p>
               </div>
             </div>
@@ -576,7 +587,7 @@ export function ProfileBasicsForm({
             disabled={!canGoBack || isWelcomeStep}
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
           >
-            Zurück
+            {t("onboarding.backButton")}
           </button>
           {isFinalStep ? (
             <button
@@ -595,11 +606,11 @@ export function ProfileBasicsForm({
               className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-45"
             >
               {activeStep === "welcome"
-                ? "Profil starten"
+                ? t("onboarding.startButton")
                 : activeStep === "avatar"
                   ? hasAvatarImage
-                    ? "Weiter"
-                    : "Ohne Bild weitermachen"
+                    ? t("onboarding.nextButton")
+                    : t("onboarding.skipImageButton")
                   : nextButtonLabel}
             </button>
           )}
@@ -616,7 +627,7 @@ export function ProfileBasicsForm({
 
           <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-sm text-slate-700">
-            Fokus
+            {t("edit.focusLabel")}
             <div className="grid gap-3">
               <select
                 required
@@ -625,11 +636,11 @@ export function ProfileBasicsForm({
                 className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
               >
                 <option value="" disabled>
-                  Bitte auswaehlen
+                  {t("edit.selectPlaceholder")}
                 </option>
                 {SKILLS.map((skill) => (
                   <option key={skill} value={skill}>
-                    {skill}
+                    {skillDisplayLabel(skill)}
                   </option>
                 ))}
               </select>
@@ -637,7 +648,7 @@ export function ProfileBasicsForm({
                 <input
                   value={focusOtherText}
                   onChange={(event) => setFocusOtherText(event.target.value)}
-                  placeholder="Optional genauer beschreiben"
+                  placeholder={t("edit.focusOtherPlaceholder")}
                   className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
                 />
               ) : null}
@@ -645,7 +656,7 @@ export function ProfileBasicsForm({
           </label>
 
           <label className="grid gap-2 text-sm text-slate-700">
-            Intention
+            {t("edit.intentionLabel")}
             <select
               name="intention"
               required
@@ -654,11 +665,11 @@ export function ProfileBasicsForm({
               className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-violet-200"
             >
               <option value="" disabled>
-                Bitte auswaehlen
+                {t("edit.selectPlaceholder")}
               </option>
               {INTENTIONS.map((entry) => (
                 <option key={entry} value={entry}>
-                  {entry}
+                  {intentionDisplayLabel(entry)}
                 </option>
               ))}
             </select>
@@ -667,9 +678,9 @@ export function ProfileBasicsForm({
         </div>
 
         <fieldset className="mt-4 grid gap-3 text-sm text-slate-700">
-          <legend className="text-sm font-medium text-slate-900">Deine Rollen</legend>
+          <legend className="text-sm font-medium text-slate-900">{t("edit.rolesLegend")}</legend>
           <p className="text-xs leading-6 text-slate-500">
-            Die Kernrolle fuer dein Onboarding ist bereits gesetzt. Hier kannst du zusaetzlich weitere Modi aktivieren.
+            {t("edit.rolesHelp")}
           </p>
           <div className="grid gap-3 md:grid-cols-2">
             {PROFILE_ROLE_OPTIONS.map((role) => {
@@ -687,11 +698,11 @@ export function ProfileBasicsForm({
                     className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-500 focus:ring-violet-200"
                   />
                   <span>
-                    <span className="block font-medium text-slate-900">{profileRoleLabel(role)}</span>
+                    <span className="block font-medium text-slate-900">{roleDisplayLabel(role)}</span>
                     <span className="mt-1 block text-xs leading-6 text-slate-500">
                       {role === "advisor"
-                        ? "Nutze CoFoundery auch, um Founder-Teams als Advisor zu begleiten."
-                        : "Nutze CoFoundery fuer dein eigenes Founder-Profil, Matching und Alignment."}
+                        ? t("edit.advisorRoleHelp")
+                        : t("edit.founderRoleHelp")}
                     </span>
                   </span>
                 </label>

@@ -132,3 +132,24 @@ test("loads English invite token-flow messages", () => {
   assert.equal(invite.teamInvite?.title, "Matching start for two founders");
   assert.equal(invite.teamInvite?.activateCta, "Confirm start");
 });
+
+test("loads English profile basics messages", () => {
+  const messages = getMessages("en");
+  const profile = messages.profile as {
+    basicsForm?: {
+      onboarding?: {
+        steps?: { welcome?: { title?: string } };
+        startButton?: string;
+      };
+      skills?: { Sonstiges?: string };
+      intentions?: { Suche?: { label?: string } };
+    };
+    welcome?: { submit?: string };
+  };
+
+  assert.equal(profile.basicsForm?.onboarding?.steps?.welcome?.title, "Welcome to CoFoundery Align");
+  assert.equal(profile.basicsForm?.onboarding?.startButton, "Start profile");
+  assert.equal(profile.basicsForm?.skills?.Sonstiges, "Other");
+  assert.equal(profile.basicsForm?.intentions?.Suche?.label, "Searching");
+  assert.equal(profile.welcome?.submit, "Let's start");
+});
