@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient } from "@/lib/supabase/client";
 
@@ -15,33 +16,33 @@ type JoinUiState =
       technicalError: string;
     };
 
-function resolveInviteError(message: string) {
+function resolveInviteError(message: string, t: ReturnType<typeof useTranslations>) {
   const normalized = message.trim().toLowerCase();
 
   if (normalized.includes("invalid_token")) {
     return {
-      title: "Link ungültig",
-      description: "Der Einladungslink ist nicht mehr gültig.",
+      title: t("invalidTitle"),
+      description: t("invalidDescription"),
     };
   }
 
   if (normalized.includes("expired")) {
     return {
-      title: "Link abgelaufen",
-      description: "Diese Einladung ist abgelaufen.",
+      title: t("expiredTitle"),
+      description: t("expiredDescription"),
     };
   }
 
   if (normalized.includes("revoked")) {
     return {
-      title: "Einladung widerrufen",
-      description: "Diese Einladung wurde widerrufen.",
+      title: t("revokedTitle"),
+      description: t("revokedDescription"),
     };
   }
 
   return {
-    title: "Einladung konnte nicht angenommen werden",
-    description: "Die Einladung konnte nicht verarbeitet werden.",
+    title: t("acceptFailedTitle"),
+    description: t("acceptFailedDescription"),
   };
 }
 
@@ -84,12 +85,13 @@ function buildJoinStartHref(invitationId: string) {
 export default function JoinClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("invite.join");
   const supabase = useMemo(() => createClient(), []);
   const hasRunRef = useRef(false);
   const [uiState, setUiState] = useState<JoinUiState>({
     type: "loading",
-    title: "Einladung wird geprüft",
-    description: "Wir verarbeiten deinen Einladungslink.",
+    title: t("loadingTitle"),
+    description: t("loadingDescription"),
   });
 
   useEffect(() => {
@@ -119,8 +121,8 @@ export default function JoinClient() {
       if (sessionError) {
         setUiState({
           type: "error",
-          title: "Anmeldung konnte nicht geprüft werden",
-          description: "Bitte versuche es erneut.",
+          title: t("sessionCheckFailedTitle"),
+          description: t("sessionCheckFailedDescription"),
           technicalError: sessionError.message,
         });
         return;
@@ -136,8 +138,8 @@ export default function JoinClient() {
         });
         setUiState({
           type: "redirecting",
-          title: "Weiter zum Login",
-          description: "Bitte melde dich per Magic Link an, danach wird die Einladung automatisch fortgesetzt.",
+          title: t("loginRedirectTitle"),
+          description: t("loginRedirectDescription"),
         });
         if (tokenFromUrl && typeof window !== "undefined") {
           window.location.replace(`/join/prepare?token=${encodeURIComponent(tokenFromUrl)}`);
@@ -178,7 +180,7 @@ export default function JoinClient() {
             return;
           }
 
-          const mapped = resolveInviteError(error.message);
+          const mapped = resolveInviteError(error.message, t);
           setUiState({
             type: "error",
             title: mapped.title,
@@ -205,8 +207,8 @@ export default function JoinClient() {
         });
         setUiState({
           type: "error",
-          title: "Link ungültig",
-          description: "Es wurde keine Einladung gefunden.",
+          title: t("invalidTitle"),
+          description: t("missingInvitationDescription"),
           technicalError: "missing_invitation_context",
         });
         return;
@@ -221,7 +223,7 @@ export default function JoinClient() {
     };
 
     void run();
-  }, [router, searchParams, supabase]);
+  }, [router, searchParams, supabase, t]);
 
   /*
    * Testplan:
@@ -241,14 +243,16 @@ export default function JoinClient() {
         {uiState.type === "error" ? (
           <>
             <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              Falls der Link wirklich abgelaufen ist, bitte die einladende Person um eine neue Einladung.
+              {t("expiredHint")}
             </p>
-            <p className="mt-3 text-xs text-slate-500">Technischer Hinweis: {uiState.technicalError}</p>
+            <p className="mt-3 text-xs text-slate-500">
+              {t("technicalHint", { detail: uiState.technicalError })}
+            </p>
             <a
               href="/dashboard"
               className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
             >
-              Zum Dashboard
+              {t("toDashboard")}
             </a>
           </>
         ) : null}

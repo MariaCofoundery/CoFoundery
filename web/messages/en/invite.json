@@ -1,0 +1,100 @@
+{
+  "join": {
+    "loadingTitle": "Checking invitation",
+    "loadingDescription": "We are processing your invitation link.",
+    "sessionCheckFailedTitle": "Sign-in could not be checked",
+    "sessionCheckFailedDescription": "Please try again.",
+    "loginRedirectTitle": "Continue to sign-in",
+    "loginRedirectDescription": "Please sign in with a magic link. After that, the invitation continues automatically.",
+    "invalidTitle": "Invalid link",
+    "invalidDescription": "This invitation link is no longer valid.",
+    "expiredTitle": "Link expired",
+    "expiredDescription": "This invitation has expired.",
+    "revokedTitle": "Invitation revoked",
+    "revokedDescription": "This invitation has been revoked.",
+    "acceptFailedTitle": "Invitation could not be accepted",
+    "acceptFailedDescription": "The invitation could not be processed.",
+    "missingInvitationDescription": "No invitation was found.",
+    "expiredHint": "If the link has expired, please ask the inviting person for a new invitation.",
+    "technicalHint": "Technical note: {detail}",
+    "toDashboard": "Go to dashboard",
+    "fallback": "Loading invitation…"
+  },
+  "welcome": {
+    "errors": {
+      "invalidToken": "Invalid link",
+      "expired": "Link expired",
+      "revoked": "Invitation revoked",
+      "notAuthenticated": "Please sign in again",
+      "processingFailed": "Invitation could not be processed",
+      "notFound": "Invitation not found",
+      "unavailable": "Invitation unavailable",
+      "loadFailed": "The invitation could not be loaded."
+    },
+    "technicalHint": "Technical note: {detail}",
+    "toDashboard": "Go to dashboard",
+    "title": "Welcome",
+    "invitedBy": "{name} invited you",
+    "context": {
+      "existing": {
+        "badge": "Existing founder team",
+        "title": "This invitation is set up for an existing team.",
+        "text": "The flow focuses more on alignment, roles, tensions, and concrete collaboration in your current day-to-day work."
+      },
+      "preFounder": {
+        "badge": "Potential founding partnership",
+        "title": "This invitation is set up for early matching.",
+        "text": "The flow helps you make expectations, differences, and fit visible before entering closer collaboration."
+      }
+    },
+    "profileIntro": "Set up your core profile briefly. CoFoundery uses your name, role, focus, and intention so reports, matching, and the workbook can connect cleanly to your profile.",
+    "profileOptional": "You can add more profile details later.",
+    "profileBasicsTitle": "Your profile basics",
+    "profile": {
+      "name": "Name",
+      "role": "Role",
+      "focus": "Focus",
+      "intention": "Intention"
+    },
+    "later": "Later",
+    "nextLabels": {
+      "report": "Go to report",
+      "completion": "Go to completion",
+      "base": "Go to foundation questionnaire",
+      "values": "Go to values module"
+    }
+  },
+  "teamInvite": {
+    "statusErrors": {
+      "emailMismatch": "This invitation does not match the email address of your current profile.",
+      "alreadyClaimed": "This founder slot has already been connected to another profile.",
+      "activationFailed": "The team connection could not be completed right now. Please try again in a moment.",
+      "invalidToken": "This founder link is no longer valid or could not be found."
+    },
+    "eyebrow": "Founder invitation",
+    "notFoundTitle": "Invitation not found",
+    "notFoundText": "This link is no longer valid or could not be connected to an open team start point.",
+    "toLogin": "Go to sign-in",
+    "title": "Matching start for two founders",
+    "invitedByAdvisor": "{advisorName} invited you to start a shared founder matching context in Cofoundery Align.",
+    "invitedGeneric": "You have been invited to start a shared founder matching context in Cofoundery Align.",
+    "intro": "Your step is intentionally lightweight: connect your profile, confirm your start, and then wait until {counterpart} has started as well. Only then will your shared flow be activated.",
+    "teamProject": "Team/project: {teamName}",
+    "currentStatus": "Current status",
+    "founderA": "Founder A",
+    "founderB": "Founder B",
+    "started": "started",
+    "open": "still open",
+    "yourSlot": "Your slot",
+    "signInTitle": "Start with your profile",
+    "signInText": "Sign in with {email} so your founder slot can be connected cleanly.",
+    "signInCta": "Sign in / founder start",
+    "wrongEmailTitle": "Please sign in with the right email",
+    "wrongEmailText": "This founder slot is intended for {slotEmail}. You are currently signed in as {currentEmail}.",
+    "activateTitle": "Activate your founder slot",
+    "activateText": "This link belongs to {email}. Confirm your start in the matching flow with one click.",
+    "activateCta": "Confirm start",
+    "waitingTitle": "Waiting for the second founder",
+    "waitingText": "Your slot is already connected. Once {counterpart} has started as well, your shared matching context will activate automatically."
+  }
+}

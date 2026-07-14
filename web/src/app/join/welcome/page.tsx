@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   buildInvitationDashboardHref,
   resolveInvitationContinueTarget,
@@ -54,13 +55,15 @@ function extractInvitationIdFromAcceptPayload(payload: unknown): string | null {
   return typeof direct?.invitation_id === "string" ? direct.invitation_id : null;
 }
 
-function resolveInviteError(message: string) {
+type InviteT = Awaited<ReturnType<typeof getTranslations>>;
+
+function resolveInviteError(message: string, t: InviteT) {
   const normalized = message.trim().toLowerCase();
-  if (normalized.includes("invalid_token")) return "Link ungültig";
-  if (normalized.includes("expired")) return "Link abgelaufen";
-  if (normalized.includes("revoked")) return "Einladung widerrufen";
-  if (normalized.includes("not_authenticated")) return "Bitte erneut anmelden";
-  return "Einladung konnte nicht verarbeitet werden";
+  if (normalized.includes("invalid_token")) return t("errors.invalidToken");
+  if (normalized.includes("expired")) return t("errors.expired");
+  if (normalized.includes("revoked")) return t("errors.revoked");
+  if (normalized.includes("not_authenticated")) return t("errors.notAuthenticated");
+  return t("errors.processingFailed");
 }
 
 function isInvitationExpired(expiresAt: string | null | undefined) {
@@ -70,38 +73,46 @@ function isInvitationExpired(expiresAt: string | null | undefined) {
   return parsed < Date.now();
 }
 
-function invitationContextMeta(teamContext: string | null | undefined) {
+function invitationContextMeta(teamContext: string | null | undefined, t: InviteT) {
   if (teamContext === "existing_team") {
     return {
-      badge: "Bestehendes Gründerteam",
-      title: "Diese Einladung läuft im Modus für ein bestehendes Team.",
-      text: "Der folgende Flow ist stärker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet.",
+      badge: t("context.existing.badge"),
+      title: t("context.existing.title"),
+      text: t("context.existing.text"),
     };
   }
 
   return {
-    badge: "Mögliche Gründungspartnerschaft",
-    title: "Diese Einladung läuft im Modus für frühes Matching.",
-    text: "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen.",
+    badge: t("context.preFounder.badge"),
+    title: t("context.preFounder.title"),
+    text: t("context.preFounder.text"),
   };
 }
 
-function renderErrorState(title: string, detail: string) {
+function renderErrorState(title: string, detail: string, t: InviteT) {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-        <p className="mt-3 text-sm text-slate-700">Die Einladung konnte nicht geladen werden.</p>
-        <p className="mt-2 text-xs text-slate-500">Technischer Hinweis: {detail}</p>
+        <p className="mt-3 text-sm text-slate-700">{t("errors.loadFailed")}</p>
+        <p className="mt-2 text-xs text-slate-500">{t("technicalHint", { detail })}</p>
         <Link
           href="/dashboard"
           className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
         >
-          Zum Dashboard
+          {t("toDashboard")}
         </Link>
       </section>
     </main>
   );
+}
+
+function localizeNextStepLabel(label: string, t: InviteT) {
+  if (label === "Zum Report") return t("nextLabels.report");
+  if (label === "Zum Abschluss") return t("nextLabels.completion");
+  if (label === "Zum Basis-Fragebogen") return t("nextLabels.base");
+  if (label === "Zum Werte-Modul") return t("nextLabels.values");
+  return label;
 }
 
 export default async function JoinWelcomePage({
@@ -109,6 +120,7 @@ export default async function JoinWelcomePage({
 }: {
   searchParams: Promise<WelcomeSearchParams>;
 }) {
+  const t = await getTranslations("invite.welcome");
   const params = await searchParams;
   const token = readToken(params);
   let invitationId = readInvitationId(params);
@@ -156,7 +168,7 @@ export default async function JoinWelcomePage({
         userId: user.id,
         error: error.message,
       });
-      return renderErrorState(resolveInviteError(error.message), error.message);
+      return renderErrorState(resolveInviteError(error.message, t), error.message, t);
     }
     const acceptedInvitationId = extractInvitationIdFromAcceptPayload(data);
     invitationId = acceptedInvitationId ?? invitationId;
@@ -169,7 +181,7 @@ export default async function JoinWelcomePage({
   }
 
   if (!invitationId) {
-    return renderErrorState("Einladung nicht gefunden", "missing_invitation_id");
+    return renderErrorState(t("errors.notFound"), "missing_invitation_id", t);
   }
 
   const { data: invitationData, error: invitationError } = await supabase
@@ -181,7 +193,7 @@ export default async function JoinWelcomePage({
     .maybeSingle();
 
   if (invitationError || !invitationData) {
-    return renderErrorState("Einladung nicht gefunden", invitationError?.message ?? "invitation_not_found");
+    return renderErrorState(t("errors.notFound"), invitationError?.message ?? "invitation_not_found", t);
   }
 
   const invitation = invitationData as InvitationRow;
@@ -196,15 +208,15 @@ export default async function JoinWelcomePage({
     (userEmail.length > 0 && normalizeEmail(invitation.invitee_email) === userEmail);
 
   if (!isInvitee) {
-    return renderErrorState("Einladung nicht verfügbar", "not_invitee");
+    return renderErrorState(t("errors.unavailable"), "not_invitee", t);
   }
 
   if (invitation.revoked_at || invitation.status === "revoked") {
-    return renderErrorState("Einladung widerrufen", "revoked");
+    return renderErrorState(t("errors.revoked"), "revoked", t);
   }
 
   if (isInvitationExpired(invitation.expires_at)) {
-    return renderErrorState("Einladung abgelaufen", "expired");
+    return renderErrorState(t("errors.expired"), "expired", t);
   }
 
   const profile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
@@ -212,7 +224,7 @@ export default async function JoinWelcomePage({
 
   const inviterName =
     invitation.inviter_display_name?.trim() || invitation.inviter_email?.trim() || "Co-Founder";
-  const contextMeta = invitationContextMeta(invitation.team_context);
+  const contextMeta = invitationContextMeta(invitation.team_context, t);
 
   const nextStep = await resolveInvitationContinueTarget(invitationId);
   logInviteFlowDebug("join/welcome:next_step", {
@@ -221,17 +233,18 @@ export default async function JoinWelcomePage({
     nextStep,
   });
   if (!nextStep.ok) {
-    return renderErrorState("Einladung nicht verfügbar", nextStep.detail ?? nextStep.reason);
+    return renderErrorState(t("errors.unavailable"), nextStep.detail ?? nextStep.reason, t);
   }
   const primaryHref = nextStep.resolvedHref;
+  const primaryLabel = localizeNextStepLabel(nextStep.label, t);
   const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
         <div className="border-b border-cyan-200 pb-3">
-          <h1 className="text-3xl font-semibold text-slate-900">Willkommen</h1>
-          <p className="mt-2 text-base text-slate-700">{inviterName} hat dich eingeladen</p>
+          <h1 className="text-3xl font-semibold text-slate-900">{t("title")}</h1>
+          <p className="mt-2 text-base text-slate-700">{t("invitedBy", { name: inviterName })}</p>
           <div className="mt-4 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
             {contextMeta.badge}
           </div>
@@ -240,11 +253,10 @@ export default async function JoinWelcomePage({
         </div>
 
         <p className="mt-4 text-sm leading-6 text-slate-700">
-          Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention braucht CoFoundery,
-          damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten können.
+          {t("profileIntro")}
         </p>
         <p className="mt-1 text-xs text-slate-500">
-          Weitere Profildaten kannst du später optional ergänzen.
+          {t("profileOptional")}
         </p>
 
         <div className="mt-6">
@@ -289,22 +301,22 @@ export default async function JoinWelcomePage({
           ) : null}
           {hasProfileBasics ? (
             <section className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50/80 via-white to-violet-50/70 p-6">
-              <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">Deine Profil-Basics</h2>
+              <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-900">{t("profileBasicsTitle")}</h2>
               <dl className="mt-3 space-y-2 text-sm text-slate-700">
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Name</dt>
+                  <dt className="text-slate-500">{t("profile.name")}</dt>
                   <dd className="font-medium text-slate-900">{profile?.display_name}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Rolle</dt>
+                  <dt className="text-slate-500">{t("profile.role")}</dt>
                   <dd className="font-medium text-slate-900">{getPrimaryProfileRoleLabel(profile)}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Fokus</dt>
+                  <dt className="text-slate-500">{t("profile.focus")}</dt>
                   <dd className="font-medium text-slate-900">{profile?.focus_skill}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Intention</dt>
+                  <dt className="text-slate-500">{t("profile.intention")}</dt>
                   <dd className="font-medium text-slate-900">{profile?.intention}</dd>
                 </div>
               </dl>
@@ -319,7 +331,7 @@ export default async function JoinWelcomePage({
                 roles: profile?.roles ?? null,
                 avatar_id: profile?.avatar_id ?? null,
               }}
-              submitLabel={nextStep.label}
+              submitLabel={primaryLabel}
               onSuccessRedirectTo={primaryHref}
               variant="accent"
             />
@@ -332,14 +344,14 @@ export default async function JoinWelcomePage({
               href={primaryHref}
               className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >
-              {nextStep.label}
+              {primaryLabel}
             </Link>
           ) : null}
           <Link
             href={dashboardHref}
             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
           >
-            Später
+            {t("later")}
           </Link>
         </div>
       </section>

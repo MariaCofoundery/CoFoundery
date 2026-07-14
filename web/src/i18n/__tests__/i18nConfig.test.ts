@@ -116,3 +116,19 @@ test("loads English feedback and advisor messages", () => {
   assert.equal(navigation.statusLabels?.inProgress, "In progress");
   assert.equal(navigation.teamContexts?.existingTeam, "Existing team");
 });
+
+test("loads English invite token-flow messages", () => {
+  const messages = getMessages("en");
+  const invite = messages.invite as {
+    join?: { loadingTitle?: string; toDashboard?: string };
+    welcome?: { title?: string; nextLabels?: { base?: string } };
+    teamInvite?: { title?: string; activateCta?: string };
+  };
+
+  assert.equal(invite.join?.loadingTitle, "Checking invitation");
+  assert.equal(invite.join?.toDashboard, "Go to dashboard");
+  assert.equal(invite.welcome?.title, "Welcome");
+  assert.equal(invite.welcome?.nextLabels?.base, "Go to foundation questionnaire");
+  assert.equal(invite.teamInvite?.title, "Matching start for two founders");
+  assert.equal(invite.teamInvite?.activateCta, "Confirm start");
+});

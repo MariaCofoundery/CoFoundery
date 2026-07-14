@@ -6,6 +6,7 @@ import deCommon from "../../messages/de/common.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFeedback from "../../messages/de/feedback.json";
+import deInvite from "../../messages/de/invite.json";
 import deNavigation from "../../messages/de/navigation.json";
 import deReport from "../../messages/de/report.json";
 import deWorkspace from "../../messages/de/workspace.json";
@@ -16,6 +17,7 @@ import enCommon from "../../messages/en/common.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFeedback from "../../messages/en/feedback.json";
+import enInvite from "../../messages/en/invite.json";
 import enNavigation from "../../messages/en/navigation.json";
 import enReport from "../../messages/en/report.json";
 import enWorkspace from "../../messages/en/workspace.json";
@@ -29,6 +31,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: deDashboard,
     discovery: deDiscovery,
     feedback: deFeedback,
+    invite: deInvite,
     navigation: deNavigation,
     report: deReport,
     workspace: deWorkspace,
@@ -41,6 +44,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: enDashboard,
     discovery: enDiscovery,
     feedback: enFeedback,
+    invite: enInvite,
     navigation: enNavigation,
     report: enReport,
     workspace: enWorkspace,

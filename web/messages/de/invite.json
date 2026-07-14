@@ -1,0 +1,100 @@
+{
+  "join": {
+    "loadingTitle": "Einladung wird geprüft",
+    "loadingDescription": "Wir verarbeiten deinen Einladungslink.",
+    "sessionCheckFailedTitle": "Anmeldung konnte nicht geprüft werden",
+    "sessionCheckFailedDescription": "Bitte versuche es erneut.",
+    "loginRedirectTitle": "Weiter zum Login",
+    "loginRedirectDescription": "Bitte melde dich per Magic Link an, danach wird die Einladung automatisch fortgesetzt.",
+    "invalidTitle": "Link ungültig",
+    "invalidDescription": "Der Einladungslink ist nicht mehr gültig.",
+    "expiredTitle": "Link abgelaufen",
+    "expiredDescription": "Diese Einladung ist abgelaufen.",
+    "revokedTitle": "Einladung widerrufen",
+    "revokedDescription": "Diese Einladung wurde widerrufen.",
+    "acceptFailedTitle": "Einladung konnte nicht angenommen werden",
+    "acceptFailedDescription": "Die Einladung konnte nicht verarbeitet werden.",
+    "missingInvitationDescription": "Es wurde keine Einladung gefunden.",
+    "expiredHint": "Falls der Link wirklich abgelaufen ist, bitte die einladende Person um eine neue Einladung.",
+    "technicalHint": "Technischer Hinweis: {detail}",
+    "toDashboard": "Zum Dashboard",
+    "fallback": "Lade Einladung…"
+  },
+  "welcome": {
+    "errors": {
+      "invalidToken": "Link ungültig",
+      "expired": "Link abgelaufen",
+      "revoked": "Einladung widerrufen",
+      "notAuthenticated": "Bitte erneut anmelden",
+      "processingFailed": "Einladung konnte nicht verarbeitet werden",
+      "notFound": "Einladung nicht gefunden",
+      "unavailable": "Einladung nicht verfügbar",
+      "loadFailed": "Die Einladung konnte nicht geladen werden."
+    },
+    "technicalHint": "Technischer Hinweis: {detail}",
+    "toDashboard": "Zum Dashboard",
+    "title": "Willkommen",
+    "invitedBy": "{name} hat dich eingeladen",
+    "context": {
+      "existing": {
+        "badge": "Bestehendes Gründerteam",
+        "title": "Diese Einladung läuft im Modus für ein bestehendes Team.",
+        "text": "Der folgende Flow ist stärker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet."
+      },
+      "preFounder": {
+        "badge": "Mögliche Gründungspartnerschaft",
+        "title": "Diese Einladung läuft im Modus für frühes Matching.",
+        "text": "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen."
+      }
+    },
+    "profileIntro": "Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention braucht CoFoundery, damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten können.",
+    "profileOptional": "Weitere Profildaten kannst du später optional ergänzen.",
+    "profileBasicsTitle": "Deine Profil-Basics",
+    "profile": {
+      "name": "Name",
+      "role": "Rolle",
+      "focus": "Fokus",
+      "intention": "Intention"
+    },
+    "later": "Später",
+    "nextLabels": {
+      "report": "Zum Report",
+      "completion": "Zum Abschluss",
+      "base": "Zum Basis-Fragebogen",
+      "values": "Zum Werte-Modul"
+    }
+  },
+  "teamInvite": {
+    "statusErrors": {
+      "emailMismatch": "Diese Einladung passt nicht zur E-Mail-Adresse deines aktuellen Profils.",
+      "alreadyClaimed": "Dieser Founder-Platz wurde bereits mit einem anderen Profil verknüpft.",
+      "activationFailed": "Die Team-Verknüpfung konnte gerade nicht abgeschlossen werden. Bitte versuche es gleich noch einmal.",
+      "invalidToken": "Dieser Founder-Link ist nicht mehr gültig oder konnte nicht gefunden werden."
+    },
+    "eyebrow": "Founder-Einladung",
+    "notFoundTitle": "Einladung nicht gefunden",
+    "notFoundText": "Dieser Link ist nicht mehr gültig oder konnte keinem offenen Team-Startpunkt zugeordnet werden.",
+    "toLogin": "Zur Anmeldung",
+    "title": "Matching-Start für zwei Founder",
+    "invitedByAdvisor": "{advisorName} hat euch eingeladen, einen gemeinsamen Founder-Matching-Kontext in Cofoundery Align zu starten.",
+    "invitedGeneric": "Ihr wurdet eingeladen, einen gemeinsamen Founder-Matching-Kontext in Cofoundery Align zu starten.",
+    "intro": "Dein Schritt bleibt bewusst schlank: Profil verknüpfen, Start bestätigen und danach warten, bis auch {counterpart} gestartet ist. Erst dann wird euer gemeinsamer Flow aktiviert.",
+    "teamProject": "Team/Projekt: {teamName}",
+    "currentStatus": "Aktueller Stand",
+    "founderA": "Founder A",
+    "founderB": "Founder B",
+    "started": "gestartet",
+    "open": "noch offen",
+    "yourSlot": "Dein Platz",
+    "signInTitle": "Mit deinem Profil starten",
+    "signInText": "Melde dich mit der E-Mail-Adresse {email} an, damit dein Founder-Platz sauber verknüpft werden kann.",
+    "signInCta": "Login / Founder-Start",
+    "wrongEmailTitle": "Bitte mit der richtigen E-Mail anmelden",
+    "wrongEmailText": "Dieser Founder-Platz ist für {slotEmail} vorgesehen. Aktuell bist du mit {currentEmail} angemeldet.",
+    "activateTitle": "Deinen Founder-Platz aktivieren",
+    "activateText": "Dieser Link gehört zu {email}. Mit einem Klick bestätigst du deinen Start in den Matching-Flow.",
+    "activateCta": "Start bestätigen",
+    "waitingTitle": "Wartet auf den zweiten Founder",
+    "waitingText": "Dein Platz ist bereits verknüpft. Sobald auch {counterpart} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert."
+  }
+}
