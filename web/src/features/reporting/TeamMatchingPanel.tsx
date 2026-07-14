@@ -4,6 +4,7 @@ import { InviteParticipantForm } from "@/features/dashboard/InviteParticipantFor
 import { PersonBStatusBadge } from "@/features/reporting/PersonBStatusBadge";
 import { type PersonBStatus } from "@/features/reporting/types";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type Props = {
@@ -46,6 +47,7 @@ export function TeamMatchingPanel({
   valuesTotal,
   outboundInvites,
 }: Props) {
+  const t = useTranslations("invite.teamMatching");
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
   const [latestInviteUrl, setLatestInviteUrl] = useState<string | null>(null);
@@ -55,7 +57,7 @@ export function TeamMatchingPanel({
 
   const onCopyLink = async () => {
     if (!targetSessionId && !latestInviteUrl) {
-      setCopyError("Bitte erst eine Einladung erstellen.");
+      setCopyError(t("copyErrors.missingInvite"));
       setCopied(false);
       return;
     }
@@ -70,7 +72,7 @@ export function TeamMatchingPanel({
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      setCopyError("Link konnte nicht kopiert werden.");
+      setCopyError(t("copyErrors.copyFailed"));
       setCopied(false);
     }
   };
@@ -85,30 +87,32 @@ export function TeamMatchingPanel({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-slate-500">
           <span aria-hidden>👥</span>
-          Team-Matching
+          {t("title")}
         </h3>
         <PersonBStatusBadge status={status} />
       </div>
       <p className="mt-4 text-sm leading-7 text-slate-600">
-        Lade potenzielle Co-Founder ein, um das Matching auf Basis deiner aktuellen Auswertung zu starten.
+        {t("intro")}
       </p>
       <p className="mt-2 text-xs leading-6 tracking-[0.02em] text-slate-500">
-        Datenschutz: Die E-Mail-Adresse wird ausschließlich für die Einladung und Zuordnung zu dieser Analyse genutzt.
+        {t("privacyHint")}
       </p>
       <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">{analysisDateLabel}</p>
       <p className="mt-3 text-xs tracking-[0.08em] text-slate-500">{statusDateLabel}</p>
       <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">
-        Angeforderter Umfang: {addOnRequested ? "Basis + Werte-Add-on" : "Nur Basis"}
+        {t("requestedScope", {
+          scope: addOnRequested ? t("scopes.basisValues") : t("scopes.basis"),
+        })}
       </p>
       {inviteConsentCaptured ? (
-        <p className="mt-1 text-xs tracking-[0.08em] text-slate-500">Einwilligung zur E-Mail-Nutzung dokumentiert.</p>
+        <p className="mt-1 text-xs tracking-[0.08em] text-slate-500">{t("consentCaptured")}</p>
       ) : null}
       {!isOpen && partnerName ? (
-        <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">Partner: {partnerName}</p>
+        <p className="mt-2 text-xs tracking-[0.08em] text-slate-500">{t("partner", { name: partnerName })}</p>
       ) : null}
       {staleInvite ? (
         <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-          Einladung zur vorherigen Analyse ({formatDate(staleInvite.invitedAt)}) erkannt. Für diese aktuelle Analyse bitte neu versenden.
+          {t("staleInvite", { date: formatDate(staleInvite.invitedAt, t) })}
         </div>
       ) : null}
       <div className="mt-5">
@@ -124,14 +128,14 @@ export function TeamMatchingPanel({
         onClick={onCopyLink}
         className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium tracking-[0.08em] text-slate-700"
       >
-        {copied ? "Link kopiert" : "Einladungslink kopieren"}
+        {copied ? t("copied") : t("copyLink")}
       </button>
       {copyError ? <p className="mt-2 text-xs text-amber-700">{copyError}</p> : null}
       <a
         href={demoReportHref}
         className="mt-3 inline-flex rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-xs font-medium tracking-[0.08em] text-violet-700"
       >
-        Demo: Partner abgeschlossen simulieren
+        {t("demoCta")}
       </a>
 
       {isPremiumReport ? (
@@ -141,11 +145,15 @@ export function TeamMatchingPanel({
             className="inline-flex items-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-semibold tracking-[0.08em] text-emerald-800 hover:bg-emerald-100"
           >
             <span aria-hidden>📘</span>
-            Match-Report öffnen
+            {t("openMatchReport")}
           </a>
           {addOnRequested ? (
             <p className="text-xs tracking-[0.08em] text-slate-600">
-              Werte-Add-on Status: A {valuesAnsweredA}/{valuesTotal}, B {valuesAnsweredB}/{valuesTotal}. Vollreport wird aktiviert, sobald beide Profile vollstaendig abgeschlossen sind.
+              {t("valuesStatus", {
+                answeredA: valuesAnsweredA,
+                answeredB: valuesAnsweredB,
+                total: valuesTotal,
+              })}
             </p>
           ) : null}
           {addOnRequested && !valuesCompletedA ? (
@@ -153,7 +161,7 @@ export function TeamMatchingPanel({
               href={`/session/${sessionId}/values`}
               className="inline-flex rounded-lg border border-cyan-300 bg-cyan-50 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-cyan-800"
             >
-              Werte-Add-on für Profil A abschließen
+              {t("completeValuesA")}
             </a>
           ) : null}
         </div>
@@ -162,24 +170,27 @@ export function TeamMatchingPanel({
       {outboundInvites.length > 0 ? (
         <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            Versandte Einladungen
+            {t("sentInvitations")}
           </p>
           <ul className="mt-3 space-y-2 text-xs text-slate-700">
             {outboundInvites.map((invite) => (
               <li key={invite.sessionId} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <p>
-                  Einladung an <span className="font-semibold">{invite.invitedEmail}</span> versendet am{" "}
-                  {formatDate(invite.invitedAt)}
+                  {t.rich("sentInvitationRow", {
+                    email: invite.invitedEmail,
+                    date: formatDate(invite.invitedAt, t),
+                    strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+                  })}
                 </p>
                 <p className="mt-1 text-slate-600">
-                  Status: <StatusBadge status={invite.status} />
+                  {t("status")} <StatusBadge status={invite.status} />
                 </p>
                 {invite.status === "abgeschlossen" ? (
                   <a
                     href={`/report/${invite.sessionId}`}
                     className="mt-2 inline-flex rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-800"
                   >
-                    Vergleichsreport öffnen
+                    {t("openComparisonReport")}
                   </a>
                 ) : null}
               </li>
@@ -191,20 +202,21 @@ export function TeamMatchingPanel({
   );
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "unbekannt";
+function formatDate(value: string | null, t: ReturnType<typeof useTranslations>) {
+  if (!value) return t("unknownDate");
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "unbekannt";
-  return date.toLocaleDateString("de-DE");
+  if (Number.isNaN(date.getTime())) return t("unknownDate");
+  return date.toLocaleDateString(t("dateLocale"));
 }
 
-function statusLabel(status: "offen" | "in_bearbeitung" | "abgeschlossen") {
-  if (status === "abgeschlossen") return "Bearbeitung abgeschlossen";
-  if (status === "in_bearbeitung") return "In Bearbeitung";
-  return "Offen";
+function statusLabel(status: "offen" | "in_bearbeitung" | "abgeschlossen", t: ReturnType<typeof useTranslations>) {
+  if (status === "abgeschlossen") return t("statuses.completed");
+  if (status === "in_bearbeitung") return t("statuses.processing");
+  return t("statuses.open");
 }
 
 function StatusBadge({ status }: { status: "offen" | "in_bearbeitung" | "abgeschlossen" }) {
+  const t = useTranslations("invite.teamMatching");
   const classes =
     status === "abgeschlossen"
       ? "border-emerald-300 bg-emerald-50 text-emerald-800"
@@ -213,7 +225,7 @@ function StatusBadge({ status }: { status: "offen" | "in_bearbeitung" | "abgesch
       : "border-slate-300 bg-slate-100 text-slate-700";
   return (
     <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-[0.08em] ${classes}`}>
-      {statusLabel(status)}
+      {statusLabel(status, t)}
     </span>
   );
 }

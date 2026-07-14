@@ -3,12 +3,14 @@ import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient } from "@/lib/supabase/server";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
+export type InvitationContinueLabelKey = "report" | "completion" | "base" | "values";
 
 export type InvitationContinueResolution =
   | {
       ok: true;
       mode: InvitationJoinMode;
       invitationId: string;
+      labelKey: InvitationContinueLabelKey;
       label: string;
       resolvedHref: string;
       entryHref: string;
@@ -120,6 +122,7 @@ export async function resolveInvitationContinueTarget(
       ok: true,
       invitationId: normalizedInvitationId,
       mode: decision.mode,
+      labelKey: decision.mode === "report_ready" ? "report" : "completion",
       label: decision.mode === "report_ready" ? "Zum Report" : "Zum Abschluss",
       resolvedHref: buildInvitationDoneHref(normalizedInvitationId),
       entryHref: buildInvitationStartHref(normalizedInvitationId),
@@ -133,6 +136,7 @@ export async function resolveInvitationContinueTarget(
     ok: true,
     invitationId: normalizedInvitationId,
     mode: decision.mode,
+    labelKey: nextModule === "base" ? "base" : "values",
     label: nextModule === "base" ? "Zum Basis-Fragebogen" : "Zum Werte-Modul",
     resolvedHref: buildInvitationQuestionnaireHref(normalizedInvitationId, nextModule),
     entryHref: buildInvitationStartHref(normalizedInvitationId),

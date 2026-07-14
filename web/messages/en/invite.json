@@ -159,5 +159,42 @@
       "title": "Questionnaire complete",
       "description": "The report could not be prepared right now ({reason}). Please check the status in the dashboard."
     }
+  },
+  "teamMatching": {
+    "title": "Team matching",
+    "intro": "Invite potential co-founders to start matching based on your current report.",
+    "privacyHint": "Privacy: the email address is used only for the invitation and assignment to this analysis.",
+    "requestedScope": "Requested scope: {scope}",
+    "scopes": {
+      "basis": "Foundation only",
+      "basisValues": "Foundation + values add-on"
+    },
+    "consentCaptured": "Consent for email use has been documented.",
+    "partner": "Partner: {name}",
+    "staleInvite": "Invitation for the previous analysis ({date}) detected. Please send a new one for this current analysis.",
+    "copyErrors": {
+      "missingInvite": "Please create an invitation first.",
+      "copyFailed": "The link could not be copied."
+    },
+    "copyLink": "Copy invitation link",
+    "copied": "Link copied",
+    "demoCta": "Demo: simulate partner completed",
+    "openMatchReport": "Open match report",
+    "valuesStatus": "Values add-on status: A {answeredA}/{total}, B {answeredB}/{total}. The full report is unlocked once both profiles are fully completed.",
+    "completeValuesA": "Complete values add-on for profile A",
+    "sentInvitations": "Sent invitations",
+    "sentInvitationRow": "Invitation to <strong>{email}</strong> sent on {date}",
+    "status": "Status:",
+    "openComparisonReport": "Open comparison report",
+    "unknownDate": "unknown",
+    "dateLocale": "en-US",
+    "statuses": {
+      "invitation_open": "Invitation open",
+      "in_progress": "In progress",
+      "match_ready": "Match ready",
+      "open": "Open",
+      "processing": "In progress",
+      "completed": "Processing completed"
+    }
   }
 }

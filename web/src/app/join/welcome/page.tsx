@@ -107,12 +107,8 @@ function renderErrorState(title: string, detail: string, t: InviteT) {
   );
 }
 
-function localizeNextStepLabel(label: string, t: InviteT) {
-  if (label === "Zum Report") return t("nextLabels.report");
-  if (label === "Zum Abschluss") return t("nextLabels.completion");
-  if (label === "Zum Basis-Fragebogen") return t("nextLabels.base");
-  if (label === "Zum Werte-Modul") return t("nextLabels.values");
-  return label;
+function localizeNextStepLabel(labelKey: "report" | "completion" | "base" | "values", t: InviteT) {
+  return t(`nextLabels.${labelKey}`);
 }
 
 export default async function JoinWelcomePage({
@@ -236,7 +232,7 @@ export default async function JoinWelcomePage({
     return renderErrorState(t("errors.unavailable"), nextStep.detail ?? nextStep.reason, t);
   }
   const primaryHref = nextStep.resolvedHref;
-  const primaryLabel = localizeNextStepLabel(nextStep.label, t);
+  const primaryLabel = localizeNextStepLabel(nextStep.labelKey, t);
   const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (

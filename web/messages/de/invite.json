@@ -159,5 +159,42 @@
       "title": "Fragebogen abgeschlossen",
       "description": "Der Report konnte gerade noch nicht erstellt werden ({reason}). Bitte prüfe den Status im Dashboard."
     }
+  },
+  "teamMatching": {
+    "title": "Team-Matching",
+    "intro": "Lade potenzielle Co-Founder ein, um das Matching auf Basis deiner aktuellen Auswertung zu starten.",
+    "privacyHint": "Datenschutz: Die E-Mail-Adresse wird ausschließlich für die Einladung und Zuordnung zu dieser Analyse genutzt.",
+    "requestedScope": "Angeforderter Umfang: {scope}",
+    "scopes": {
+      "basis": "Nur Basis",
+      "basisValues": "Basis + Werte-Add-on"
+    },
+    "consentCaptured": "Einwilligung zur E-Mail-Nutzung dokumentiert.",
+    "partner": "Partner: {name}",
+    "staleInvite": "Einladung zur vorherigen Analyse ({date}) erkannt. Für diese aktuelle Analyse bitte neu versenden.",
+    "copyErrors": {
+      "missingInvite": "Bitte erst eine Einladung erstellen.",
+      "copyFailed": "Link konnte nicht kopiert werden."
+    },
+    "copyLink": "Einladungslink kopieren",
+    "copied": "Link kopiert",
+    "demoCta": "Demo: Partner abgeschlossen simulieren",
+    "openMatchReport": "Match-Report öffnen",
+    "valuesStatus": "Werte-Add-on Status: A {answeredA}/{total}, B {answeredB}/{total}. Vollreport wird aktiviert, sobald beide Profile vollständig abgeschlossen sind.",
+    "completeValuesA": "Werte-Add-on für Profil A abschließen",
+    "sentInvitations": "Versandte Einladungen",
+    "sentInvitationRow": "Einladung an <strong>{email}</strong> versendet am {date}",
+    "status": "Status:",
+    "openComparisonReport": "Vergleichsreport öffnen",
+    "unknownDate": "unbekannt",
+    "dateLocale": "de-DE",
+    "statuses": {
+      "invitation_open": "Einladung offen",
+      "in_progress": "In Bearbeitung",
+      "match_ready": "Match bereit",
+      "open": "Offen",
+      "processing": "In Bearbeitung",
+      "completed": "Bearbeitung abgeschlossen"
+    }
   }
 }
