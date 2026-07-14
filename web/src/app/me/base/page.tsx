@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
   createDraftAssessment,
@@ -35,6 +36,7 @@ export default async function MeBasePage({
   searchParams: Promise<MeBaseSearchParams>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("assessment.base");
   const supabase = await createClient();
   const {
     data: { user },
@@ -167,7 +169,7 @@ export default async function MeBasePage({
     draft = await getOrCreateDraftAssessment("base");
   }
   if (!draft) {
-    return <main className="p-8">Fehler beim Erstellen des Fragebogens.</main>;
+    return <main className="p-8">{t("createError")}</main>;
   }
 
   const { questions, choices } = buildFounderCompatibilityBaseQuestionnaire();
@@ -198,26 +200,26 @@ export default async function MeBasePage({
           href={dashboardHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-700"
         >
-          Zurück zum Dashboard
+          {t("backToDashboard")}
         </a>
       </div>
 
       <section className="mb-5 rounded-2xl border border-slate-200/70 bg-slate-50/72 px-5 py-4">
         <p className="text-sm leading-7 text-slate-700">
-          Hier legt ihr die Grundlage für euren Matching-Report.
+          {t("intro")}
         </p>
       </section>
 
       <QuestionnaireClient
         assessmentId={draft.id}
-        title="Basis-Fragebogen"
-        subtitle="Selbstprofil"
+        title={t("title")}
+        subtitle={t("subtitle")}
         questions={questions}
         choices={choices}
         responses={responses}
         completeRedirect={completeRedirect}
         allowDefaultScaleFallback={false}
-        missingChoicesMessage="Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
+        missingChoicesMessage={t("missingChoices")}
         trackingContext={{
           module: "base",
           instrumentVersion: "founder_base_v2",

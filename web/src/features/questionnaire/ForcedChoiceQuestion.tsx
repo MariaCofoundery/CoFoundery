@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 type ForcedChoiceOption = {
   id: string;
   question_id: string;
@@ -40,6 +42,8 @@ export function ForcedChoiceQuestion({
   missingChoicesMessage,
   onSelect,
 }: Props) {
+  const t = useTranslations("assessment.forcedChoice");
+
   if (options.length === 0) {
     return (
       <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -52,8 +56,7 @@ export function ForcedChoiceQuestion({
     return (
       <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4">
         <p className="text-sm text-amber-900">
-          Für Forced-Choice wurden weniger als 5 Antwortstufen geladen. Die Frage wird als einfache Auswahlliste
-          angezeigt.
+          {t("tooFewOptions")}
         </p>
         <div className="mt-4 grid gap-3">
           {options.map((option) => {
@@ -80,11 +83,11 @@ export function ForcedChoiceQuestion({
   }
 
   const scaleMeta = [
-    { longLabel: "A deutlich" },
-    { longLabel: "A eher" },
-    { longLabel: "beide gleich" },
-    { longLabel: "B eher" },
-    { longLabel: "B deutlich" },
+    { longLabel: t("scale.aStrong") },
+    { longLabel: t("scale.aSoft") },
+    { longLabel: t("scale.both") },
+    { longLabel: t("scale.bSoft") },
+    { longLabel: t("scale.bStrong") },
   ];
 
   return (

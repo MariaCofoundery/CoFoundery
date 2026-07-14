@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
   getAssessmentAnswerMap,
@@ -34,6 +35,7 @@ export default async function MeValuesPage({
   searchParams: Promise<MeValuesSearchParams>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("assessment.values");
   const supabase = await createClient();
   const {
     data: { user },
@@ -128,15 +130,15 @@ export default async function MeValuesPage({
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
-          <h1 className="text-xl font-semibold text-slate-900">Basis zuerst abschließen</h1>
+          <h1 className="text-xl font-semibold text-slate-900">{t("requiresBase.title")}</h1>
           <p className="mt-3 text-sm text-slate-700">
-            Das Werte Add-on ist verfügbar, sobald dein Basis-Fragebogen eingereicht ist.
+            {t("requiresBase.description")}
           </p>
           <a
             href={baseHref}
             className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           >
-            Basis-Fragebogen starten
+            {t("requiresBase.cta")}
           </a>
         </section>
       </main>
@@ -171,7 +173,7 @@ export default async function MeValuesPage({
     draft = await getOrCreateDraftAssessment("values");
   }
   if (!draft) {
-    return <main className="p-8">Fehler beim Erstellen des Werte-Fragebogens.</main>;
+    return <main className="p-8">{t("createError")}</main>;
   }
 
   const { data: questionsData, error: questionsError } = await supabase
@@ -182,7 +184,7 @@ export default async function MeValuesPage({
     .order("sort_order", { ascending: true });
 
   if (questionsError) {
-    return <main className="p-8">Fehler beim Laden des Werte-Add-ons: {questionsError.message}</main>;
+    return <main className="p-8">{t("questionsLoadError", { error: questionsError.message })}</main>;
   }
 
   const questions = (questionsData ?? []) as QuestionnaireQuestion[];
@@ -191,13 +193,13 @@ export default async function MeValuesPage({
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
         <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
-          <h1 className="text-base font-semibold text-red-900">Werte-Fragebogen</h1>
+          <h1 className="text-base font-semibold text-red-900">{t("loadErrorTitle")}</h1>
           <p className="mt-2 text-sm text-red-700">
-            Die aktive Werte-Fragenbasis stimmt nicht mit der versionierten Werte-Definition im Repo überein.
+            {t("schemaMismatch")}
           </p>
           <p className="mt-2 text-xs text-red-800">
-            Unknown: {valuesQuestionMismatch.unknownIds.join(", ") || "keine"} · Missing:{" "}
-            {valuesQuestionMismatch.missingIds.join(", ") || "keine"}
+            Unknown: {valuesQuestionMismatch.unknownIds.join(", ") || t("missingNone")} · Missing:{" "}
+            {valuesQuestionMismatch.missingIds.join(", ") || t("missingNone")}
           </p>
         </section>
       </main>
@@ -220,9 +222,9 @@ export default async function MeValuesPage({
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
         <section className="rounded-2xl border border-red-200 bg-red-50 p-8">
-          <h1 className="text-base font-semibold text-red-900">Werte-Fragebogen</h1>
+          <h1 className="text-base font-semibold text-red-900">{t("loadErrorTitle")}</h1>
           <p className="mt-2 text-sm text-red-700">
-            Antwortoptionen konnten nicht geladen werden. Bitte neu laden.
+            {t("choicesLoadError")}
           </p>
         </section>
       </main>
@@ -242,18 +244,17 @@ export default async function MeValuesPage({
           href={dashboardHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-700"
         >
-          Zurück zum Dashboard
+          {t("backToDashboard")}
         </a>
       </div>
 
       <section className="mb-5 rounded-2xl border border-slate-200/70 bg-slate-50/72 px-5 py-4">
-        <p className="text-sm leading-7 text-slate-700">Das Werteprofil ist optional.</p>
+        <p className="text-sm leading-7 text-slate-700">{t("intro.line1")}</p>
         <p className="mt-1 text-sm leading-7 text-slate-600">
-          Es hilft euch zu klären, was für euch unter Druck wirklich zählt und wo ihr klare
-          Grenzen zieht.
+          {t("intro.line2")}
         </p>
         <p className="mt-1 text-sm leading-7 text-slate-600">
-          Ihr könnt es direkt machen oder auch später ergänzen.
+          {t("intro.line3")}
         </p>
       </section>
 
@@ -263,6 +264,8 @@ export default async function MeValuesPage({
         choices={choices}
         responses={responses}
         completeRedirect={completeRedirect}
+        title={t("title")}
+        subtitle={t("subtitle")}
         trackingContext={{
           module: "values",
           instrumentVersion: "values_v2",

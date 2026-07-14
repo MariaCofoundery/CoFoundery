@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   QuestionnaireClient,
   type QuestionnaireChoice,
@@ -13,6 +14,8 @@ type Props = {
   choices: QuestionnaireChoice[];
   responses: QuestionnaireResponse[];
   completeRedirect?: string;
+  title?: string | null;
+  subtitle?: string | null;
   trackingContext?: {
     module: "base" | "values";
     instrumentVersion?: string | null;
@@ -27,13 +30,17 @@ export function ValuesQuestionnaire({
   choices,
   responses,
   completeRedirect = "/dashboard?valuesStatus=completed",
+  title,
+  subtitle,
   trackingContext,
 }: Props) {
+  const t = useTranslations("assessment.values");
+
   return (
     <QuestionnaireClient
       assessmentId={assessmentId}
-      title="Werte-Fragebogen"
-      subtitle="Werte-Vertiefung"
+      title={title ?? t("title")}
+      subtitle={subtitle ?? t("subtitle")}
       questions={questions}
       choices={choices}
       responses={responses}

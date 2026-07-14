@@ -1,5 +1,6 @@
 import type { AbstractIntlMessages } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
+import deAssessment from "../../messages/de/assessment.json";
 import deAdvisor from "../../messages/de/advisor.json";
 import deAuth from "../../messages/de/auth.json";
 import deCommon from "../../messages/de/common.json";
@@ -12,6 +13,7 @@ import deProfile from "../../messages/de/profile.json";
 import deReport from "../../messages/de/report.json";
 import deWorkspace from "../../messages/de/workspace.json";
 import deWorkbook from "../../messages/de/workbook.json";
+import enAssessment from "../../messages/en/assessment.json";
 import enAdvisor from "../../messages/en/advisor.json";
 import enAuth from "../../messages/en/auth.json";
 import enCommon from "../../messages/en/common.json";
@@ -27,6 +29,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
+    assessment: deAssessment,
     advisor: deAdvisor,
     auth: deAuth,
     common: deCommon,
@@ -41,6 +44,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workbook: deWorkbook as unknown as AbstractIntlMessages,
   },
   en: {
+    assessment: enAssessment,
     advisor: enAdvisor,
     auth: enAuth,
     common: enCommon,

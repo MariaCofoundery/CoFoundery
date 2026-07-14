@@ -168,3 +168,24 @@ test("loads English profile basics messages", () => {
   assert.equal(profile.basicsForm?.intentions?.Suche?.label, "Searching");
   assert.equal(profile.welcome?.submit, "Let's start");
 });
+
+test("loads English assessment messages", () => {
+  const messages = getMessages("en");
+  const assessment = messages.assessment as {
+    base?: { title?: string };
+    values?: { title?: string };
+    questionnaire?: { progress?: string; back?: string };
+    forcedChoice?: { scale?: { aStrong?: string; bStrong?: string } };
+    baseComplete?: { actions?: { startValues?: string } };
+    valuesComplete?: { actions?: { individualReport?: string } };
+  };
+
+  assert.equal(assessment.base?.title, "Base questions");
+  assert.equal(assessment.values?.title, "Values questions");
+  assert.equal(assessment.questionnaire?.progress, "Question {current} of {total}");
+  assert.equal(assessment.questionnaire?.back, "Back");
+  assert.equal(assessment.forcedChoice?.scale?.aStrong, "A strongly");
+  assert.equal(assessment.forcedChoice?.scale?.bStrong, "B strongly");
+  assert.equal(assessment.baseComplete?.actions?.startValues, "Start values profile");
+  assert.equal(assessment.valuesComplete?.actions?.individualReport, "View individual report");
+});

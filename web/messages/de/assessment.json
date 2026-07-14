@@ -1,0 +1,84 @@
+{
+  "base": {
+    "backToDashboard": "Zurück zum Dashboard",
+    "intro": "Hier legt ihr die Grundlage für euren Matching-Report.",
+    "title": "Basis-Fragebogen",
+    "subtitle": "Selbstprofil",
+    "createError": "Fehler beim Erstellen des Fragebogens.",
+    "missingChoices": "Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
+  },
+  "values": {
+    "backToDashboard": "Zurück zum Dashboard",
+    "intro": {
+      "line1": "Das Werteprofil ist optional.",
+      "line2": "Es hilft euch zu klären, was für euch unter Druck wirklich zählt und wo ihr klare Grenzen zieht.",
+      "line3": "Ihr könnt es direkt machen oder auch später ergänzen."
+    },
+    "title": "Werte-Fragebogen",
+    "subtitle": "Werte-Vertiefung",
+    "requiresBase": {
+      "title": "Basis zuerst abschließen",
+      "description": "Das Werte Add-on ist verfügbar, sobald dein Basis-Fragebogen eingereicht ist.",
+      "cta": "Basis-Fragebogen starten"
+    },
+    "createError": "Fehler beim Erstellen des Werte-Fragebogens.",
+    "questionsLoadError": "Fehler beim Laden des Werte-Add-ons: {error}",
+    "loadErrorTitle": "Werte-Fragebogen",
+    "schemaMismatch": "Die aktive Werte-Fragenbasis stimmt nicht mit der versionierten Werte-Definition im Repo überein.",
+    "missingNone": "keine",
+    "choicesLoadError": "Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
+  },
+  "questionnaire": {
+    "forcedChoicePrompt": "Welche Aussage passt eher zu dir?",
+    "saveAnswerError": "Antwort konnte nicht gespeichert werden.",
+    "submitError": "Fragebogen konnte nicht abgeschlossen werden.",
+    "empty": "Keine Fragen gefunden.",
+    "progress": "Frage {current} von {total}",
+    "unknownTypeName": "unbekannt",
+    "unknownType": "Unbekannter Fragetyp \"{type}\". Die Antwortoptionen werden als Standardliste angezeigt.",
+    "back": "Zurück",
+    "saving": "Speichere...",
+    "missingChoices": "Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
+  },
+  "forcedChoice": {
+    "tooFewOptions": "Für Forced-Choice wurden weniger als 5 Antwortstufen geladen. Die Frage wird als einfache Auswahlliste angezeigt.",
+    "scale": {
+      "aStrong": "A deutlich",
+      "aSoft": "A eher",
+      "both": "beide gleich",
+      "bSoft": "B eher",
+      "bStrong": "B deutlich"
+    }
+  },
+  "baseComplete": {
+    "eyebrow": "Basisprofil",
+    "title": "Stark. Dein Basisprofil steht.",
+    "description": "Deine Antworten sind gespeichert und bilden jetzt die Grundlage für dein Founder-Profil. Du kannst direkt weitermachen oder dir zuerst schon deinen individuellen Report ansehen.",
+    "supportingText": {
+      "valuesCompleted": "Dein Werteprofil ist bereits vorhanden. Damit ist dein Profil gerade besonders aussagekräftig.",
+      "valuesMissing": "Das Werteprofil ist der nächste optionale Layer. Es macht sichtbar, welche inneren Prioritäten deine Entscheidungen als Founder prägen."
+    },
+    "highlight": {
+      "valuesCompleted": "Alles Wichtige ist da: Basisprofil und Werteprofil sind beide verfügbar.",
+      "valuesMissing": "Wenn du direkt weitermachst, ist das Werteprofil in wenigen Minuten abgeschlossen."
+    },
+    "actions": {
+      "individualReport": "Individuellen Report ansehen",
+      "dashboard": "Zum Dashboard",
+      "startValues": "Werteprofil starten",
+      "viewReportNow": "Report jetzt ansehen",
+      "continueLater": "Später weitermachen"
+    }
+  },
+  "valuesComplete": {
+    "eyebrow": "Werteprofil",
+    "title": "Sehr gut. Dein Werteprofil ist komplett.",
+    "description": "Damit ist jetzt auch der zweite Profil-Layer ausgefüllt. Dein Report kann nicht nur zeigen, wie du als Founder arbeitest, sondern auch, welche Leitplanken und Prioritäten deine Entscheidungen mitprägen.",
+    "supportingText": "Gerade im späteren Matching, im Gespräch und im Workbook ist das oft der Teil, der die spannendsten Unterschiede sichtbar macht.",
+    "highlight": "Basisprofil und Werteprofil greifen jetzt sauber ineinander.",
+    "actions": {
+      "individualReport": "Individuellen Report ansehen",
+      "dashboard": "Zum Dashboard"
+    }
+  }
+}

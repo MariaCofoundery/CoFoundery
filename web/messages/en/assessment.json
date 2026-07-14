@@ -1,0 +1,84 @@
+{
+  "base": {
+    "backToDashboard": "Back to dashboard",
+    "intro": "This is where you set the foundation for your matching report.",
+    "title": "Base questions",
+    "subtitle": "Self profile",
+    "createError": "Something went wrong while creating the questionnaire.",
+    "missingChoices": "Answer options could not be loaded. Please reload."
+  },
+  "values": {
+    "backToDashboard": "Back to dashboard",
+    "intro": {
+      "line1": "The values profile is optional.",
+      "line2": "It helps you clarify what really matters under pressure and where you draw clear boundaries.",
+      "line3": "You can answer it now or add it later."
+    },
+    "title": "Values questions",
+    "subtitle": "Values deep dive",
+    "requiresBase": {
+      "title": "Complete the foundation questions first",
+      "description": "The values add-on becomes available once your foundation questionnaire has been submitted.",
+      "cta": "Start foundation questions"
+    },
+    "createError": "Something went wrong while creating the values questionnaire.",
+    "questionsLoadError": "Something went wrong while loading the values add-on: {error}",
+    "loadErrorTitle": "Values questions",
+    "schemaMismatch": "The active values question set does not match the versioned values definition in the repository.",
+    "missingNone": "none",
+    "choicesLoadError": "Answer options could not be loaded. Please reload."
+  },
+  "questionnaire": {
+    "forcedChoicePrompt": "Which statement feels closer to you?",
+    "saveAnswerError": "Something went wrong while saving your answer.",
+    "submitError": "The questionnaire could not be completed.",
+    "empty": "No questions found.",
+    "progress": "Question {current} of {total}",
+    "unknownTypeName": "unknown",
+    "unknownType": "Unknown question type \"{type}\". The answer options are shown as a standard list.",
+    "back": "Back",
+    "saving": "Saving...",
+    "missingChoices": "Answer options could not be loaded. Please reload."
+  },
+  "forcedChoice": {
+    "tooFewOptions": "Fewer than 5 answer levels were loaded for this forced-choice question. It is shown as a simple selection list.",
+    "scale": {
+      "aStrong": "A strongly",
+      "aSoft": "A somewhat",
+      "both": "Both equally",
+      "bSoft": "B somewhat",
+      "bStrong": "B strongly"
+    }
+  },
+  "baseComplete": {
+    "eyebrow": "Base profile",
+    "title": "Nice. Your base profile is ready.",
+    "description": "Your answers have been saved and now form the foundation for your founder profile. You can continue right away or review your individual report first.",
+    "supportingText": {
+      "valuesCompleted": "Your values profile is already available. That makes your profile especially useful right now.",
+      "valuesMissing": "The values profile is the next optional layer. It shows which inner priorities shape your decisions as a founder."
+    },
+    "highlight": {
+      "valuesCompleted": "The key pieces are in place: your base profile and values profile are both available.",
+      "valuesMissing": "If you continue now, you can complete the values profile in a few minutes."
+    },
+    "actions": {
+      "individualReport": "View individual report",
+      "dashboard": "Go to dashboard",
+      "startValues": "Start values profile",
+      "viewReportNow": "View report now",
+      "continueLater": "Continue later"
+    }
+  },
+  "valuesComplete": {
+    "eyebrow": "Values profile",
+    "title": "Great. Your values profile is complete.",
+    "description": "The second profile layer is now complete too. Your report can show not only how you work as a founder, but also which guardrails and priorities shape your decisions.",
+    "supportingText": "In later matching, conversations and the workbook, this is often where the most useful differences become visible.",
+    "highlight": "Your base profile and values profile now work together.",
+    "actions": {
+      "individualReport": "View individual report",
+      "dashboard": "Go to dashboard"
+    }
+  }
+}

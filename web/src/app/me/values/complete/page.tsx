@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getLatestSubmittedAssessment } from "@/features/assessments/actions";
 import { resolveActiveInvitationIdForCurrentUser } from "@/features/onboarding/invitationFlow";
 import { QuestionnaireCompletionShell } from "@/features/questionnaire/QuestionnaireCompletionShell";
 
 export default async function MeValuesCompletePage() {
+  const t = await getTranslations("assessment.valuesComplete");
   const submittedValues = await getLatestSubmittedAssessment("values");
 
   if (!submittedValues) {
@@ -17,14 +19,14 @@ export default async function MeValuesCompletePage() {
 
   return (
     <QuestionnaireCompletionShell
-      eyebrow="Werteprofil"
-      title="Sehr gut. Dein Werteprofil ist komplett."
-      description="Damit ist jetzt auch der zweite Profil-Layer ausgefüllt. Dein Report kann nicht nur zeigen, wie du als Founder arbeitest, sondern auch, welche Leitplanken und Prioritäten deine Entscheidungen mitprägen."
-      supportingText="Gerade im späteren Matching, im Gespräch und im Workbook ist das oft der Teil, der die spannendsten Unterschiede sichtbar macht."
-      highlight="Basisprofil und Werteprofil greifen jetzt sauber ineinander."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
+      supportingText={t("supportingText")}
+      highlight={t("highlight")}
       actions={[
-        { href: "/me/report", label: "Individuellen Report ansehen" },
-        { href: "/dashboard", label: "Zum Dashboard", variant: "secondary" },
+        { href: "/me/report", label: t("actions.individualReport") },
+        { href: "/dashboard", label: t("actions.dashboard"), variant: "secondary" },
       ]}
     />
   );

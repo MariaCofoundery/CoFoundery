@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { submitAssessment, upsertAssessmentAnswer } from "@/features/assessments/actions";
 import { ForcedChoiceQuestion } from "@/features/questionnaire/ForcedChoiceQuestion";
 import {
@@ -94,10 +95,10 @@ function normalizeForcedChoiceStatement(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-function getForcedChoicePrompt(question: QuestionnaireQuestion | null | undefined) {
+function getForcedChoicePrompt(question: QuestionnaireQuestion | null | undefined, fallbackPrompt: string) {
   const source = String(question?.prompt ?? "").trim();
   if (!source) {
-    return "Welche Aussage passt eher zu dir?";
+    return fallbackPrompt;
   }
 
   const lineParts = source
@@ -107,7 +108,7 @@ function getForcedChoicePrompt(question: QuestionnaireQuestion | null | undefine
 
   const firstLine = lineParts[0];
   if (!firstLine || /^(?:aussage\s*a|a)\s*[:)\-]/i.test(firstLine)) {
-    return "Welche Aussage passt eher zu dir?";
+    return fallbackPrompt;
   }
 
   return firstLine;
@@ -196,13 +197,15 @@ export function QuestionnaireClient({
   responses,
   completeRedirect,
   allowDefaultScaleFallback = false,
-  missingChoicesMessage = "Antwortoptionen konnten nicht geladen werden. Bitte neu laden.",
+  missingChoicesMessage,
   onSaveAnswer,
   onSubmitAssessment,
   trackingContext,
   disableTracking = false,
 }: Props) {
   const router = useRouter();
+  const t = useTranslations("assessment.questionnaire");
+  const resolvedMissingChoicesMessage = missingChoicesMessage ?? t("missingChoices");
 
   const questionIds = useMemo(() => new Set(questions.map((question) => question.id)), [questions]);
 
@@ -393,7 +396,10 @@ export function QuestionnaireClient({
     () => parseForcedChoiceStatements(current),
     [current]
   );
-  const forcedChoicePrompt = useMemo(() => getForcedChoicePrompt(current), [current]);
+  const forcedChoicePrompt = useMemo(
+    () => getForcedChoicePrompt(current, t("forcedChoicePrompt")),
+    [current, t]
+  );
 
   const handleBack = () => {
     if (saving || finishing) {
@@ -439,7 +445,7 @@ export function QuestionnaireClient({
         return next;
       });
       setSaving(false);
-      setError("Antwort konnte nicht gespeichert werden.");
+      setError(t("saveAnswerError"));
       return;
     }
 
@@ -486,7 +492,7 @@ export function QuestionnaireClient({
 
     if (!submitResult.ok) {
       setFinishing(false);
-      setError("Fragebogen konnte nicht abgeschlossen werden.");
+      setError(t("submitError"));
       return;
     }
 
@@ -517,13 +523,13 @@ export function QuestionnaireClient({
     return (
       <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
         <h3 className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{title}</h3>
-        <p className="mt-4 text-sm text-slate-600">Keine Fragen gefunden.</p>
+        <p className="mt-4 text-sm text-slate-600">{t("empty")}</p>
       </section>
     );
   }
 
   const selectedAnswer = answers.get(current.id);
-  const unknownType = currentType === "unknown" ? current.type?.trim() || "unbekannt" : null;
+  const unknownType = currentType === "unknown" ? current.type?.trim() || t("unknownTypeName") : null;
 
   const renderChoiceButton = (choice: QuestionnaireChoice, variant: "likert" | "scenario" | "default") => {
     const active = selectedAnswer?.choice_id
@@ -578,7 +584,7 @@ export function QuestionnaireClient({
     if (currentOptions.length === 0) {
       return (
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {missingChoicesMessage}
+          {resolvedMissingChoicesMessage}
         </p>
       );
     }
@@ -604,7 +610,7 @@ export function QuestionnaireClient({
           selectedChoiceId={selectedAnswer?.choice_id}
           selectedValue={selectedAnswer?.value}
           disabled={saving || finishing}
-          missingChoicesMessage={missingChoicesMessage}
+          missingChoicesMessage={resolvedMissingChoicesMessage}
           onSelect={(choice) => {
             void handleSelect(choice);
           }}
@@ -620,7 +626,7 @@ export function QuestionnaireClient({
       <p className="text-xs tracking-[0.16em] text-slate-500">{title}</p>
       <h3 className="mt-2 text-xl font-semibold text-slate-900">{subtitle}</h3>
       <p className="mt-2 text-sm text-slate-600">
-        Frage {currentPosition} von {total}
+        {t("progress", { current: currentPosition, total })}
       </p>
       <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
         <div
@@ -638,8 +644,7 @@ export function QuestionnaireClient({
 
         {unknownType ? (
           <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Unbekannter Fragetyp &quot;{unknownType}&quot;. Die Antwortoptionen werden als Standardliste
-            angezeigt.
+            {t("unknownType", { type: unknownType })}
           </p>
         ) : null}
 
@@ -653,9 +658,9 @@ export function QuestionnaireClient({
           disabled={saving || finishing || index === 0}
           className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs text-slate-700 disabled:opacity-50"
         >
-          Zurück
+          {t("back")}
         </button>
-        {saving || finishing ? <p className="text-xs text-slate-500">Speichere...</p> : null}
+        {saving || finishing ? <p className="text-xs text-slate-500">{t("saving")}</p> : null}
       </div>
 
       {error ? <p className="mt-4 text-xs text-red-700">{error}</p> : null}
