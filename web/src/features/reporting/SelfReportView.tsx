@@ -17,6 +17,10 @@ import {
   getSelfReportEverydayFallbackBlock,
   type SelfReportEverydayBlock,
 } from "@/features/reporting/selfReportEverydayContent";
+import {
+  getSelfReportTeamBreakCopy,
+  type SelfReportTeamBreakBlock,
+} from "@/features/reporting/selfReportTeamBreakContent";
 import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -32,12 +36,7 @@ type CoreParagraph = {
 
 type EverydayBlock = SelfReportEverydayBlock & { highSignal?: boolean };
 
-type TeamBreakBlock = {
-  dimension: FounderDimensionKey;
-  title: string;
-  text: string;
-  highSignal?: boolean;
-};
+type TeamBreakBlock = SelfReportTeamBreakBlock & { highSignal?: boolean };
 
 type InterpretationBlock = {
   title: string;
@@ -59,7 +58,7 @@ export function SelfReportView({ report }: Props) {
       ? buildLocalizedHeroParagraphs(selection, report.locale)
       : buildCorePatternParagraphs(selection);
   const everydayBlocks = buildEverydayBlocks(selection, signals, report.locale);
-  const teamBreakBlocks = buildTeamBreakBlocks(selection);
+  const teamBreakBlocks = buildTeamBreakBlocks(selection, report.locale);
   const misreadings = buildMisreadingBlocks(selection, signals);
   const levers = buildLeverBlocks(selection, signals);
   const showValuesSection =
@@ -288,9 +287,9 @@ function buildEverydayBlocks(
   });
 }
 
-function buildTeamBreakBlocks(selection: SelfReportSelection): TeamBreakBlock[] {
+function buildTeamBreakBlocks(selection: SelfReportSelection, locale?: string | null): TeamBreakBlock[] {
   return selection.challengeDimensions.slice(0, 3).map((signal) => ({
-    ...buildTeamBreakCopy(signal),
+    ...getSelfReportTeamBreakCopy(signal, locale),
     highSignal: true,
   }));
 }
@@ -446,59 +445,6 @@ function buildCoreTensionParagraph(signal: SelfReportSignal | null) {
       return "Im Team wird es fuer dich dann anspruchsvoll, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will frueher auf den Tisch, die andere erst spaeter und sortierter.";
     default:
       return "Im Team wird es fuer dich vor allem dort anspruchsvoll, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
-  }
-}
-
-function buildTeamBreakCopy(signal: SelfReportSignal): TeamBreakBlock {
-  switch (signal.dimension) {
-    case "Unternehmenslogik":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn eine Chance gut aussieht, aber den Fokus verschiebt",
-        text:
-          "Hier wird es haeufig schwierig, wenn eine Moeglichkeit fuer andere schon attraktiv genug ist, du aber zuerst wissen willst, was sie mit Klarheit, Aufbau oder Richtung des Unternehmens macht.",
-      };
-    case "Entscheidungslogik":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn dieselbe Entscheidung zweimal geführt wird",
-        text:
-          "Hier wird es haeufig schwierig, wenn eine Person innerlich schon entschieden hat und die andere noch pruefen will. Dann entsteht Spannung nicht nur an der Sache, sondern daran, ob die Entscheidung ueberhaupt schon reif ist.",
-      };
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn Sichtbarkeit und Eigenraum unterschiedlich gelesen werden",
-        text:
-          "Hier wird es haeufig schwierig, wenn die eine Person laufend Einblick erwartet und die andere denkt, ein klarer Zwischenstand reiche voellig aus. Das fuehlt sich dann leicht nach Kontrolle oder nach zu spaetem Einbinden an.",
-      };
-    case "Commitment":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn Einsatz unterschiedlich ernst genommen wird",
-        text:
-          "Hier wird es haeufig schwierig, wenn ihr nicht nur unterschiedlich viel gebt, sondern dieses Niveau auch unterschiedlich lest. Dann werden Reaktionszeit, Verfuegbarkeit und Fokus leicht zum stillen Streitpunkt.",
-      };
-    case "Risikoorientierung":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn dieselbe Lage für euch nicht gleich riskant ist",
-        text:
-          "Hier wird es haeufig schwierig, wenn eine Person in einer offenen Lage noch eine vertretbare Chance sieht und die andere schon zu viel Unsicherheit spürt. Dann redet ihr scheinbar ueber denselben Schritt, aber nicht ueber dieselbe Schwelle.",
-      };
-    case "Konfliktstil":
-      return {
-        dimension: signal.dimension,
-        title: "Wenn Unterschiede nicht im gleichen Takt geklärt werden",
-        text:
-          "Hier wird es haeufig schwierig, wenn eine Person etwas direkt ansprechen will und die andere erst sortieren oder den richtigen Moment abwarten moechte. Dann wird schon der Zeitpunkt der Klaerung selbst zum Konfliktfeld.",
-      };
-    default:
-      return {
-        dimension: signal.dimension,
-        title: "Wenn Alltagserwartungen auseinanderlaufen",
-        text: "Hier wird es haeufig schwierig, wenn im Alltag unterschiedliche Regeln gelten, ohne dass sie ausgesprochen werden.",
-      };
   }
 }
 
