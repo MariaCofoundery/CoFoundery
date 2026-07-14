@@ -21,6 +21,10 @@ import {
   getSelfReportTeamBreakCopy,
   type SelfReportTeamBreakBlock,
 } from "@/features/reporting/selfReportTeamBreakContent";
+import {
+  getSelfReportMisreadingCopy,
+  type SelfReportMisreadingBlock,
+} from "@/features/reporting/selfReportMisreadingContent";
 import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -38,10 +42,7 @@ type EverydayBlock = SelfReportEverydayBlock & { highSignal?: boolean };
 
 type TeamBreakBlock = SelfReportTeamBreakBlock & { highSignal?: boolean };
 
-type InterpretationBlock = {
-  title: string;
-  text: string;
-};
+type InterpretationBlock = SelfReportMisreadingBlock;
 
 type LeverBlock = {
   title: string;
@@ -59,7 +60,7 @@ export function SelfReportView({ report }: Props) {
       : buildCorePatternParagraphs(selection);
   const everydayBlocks = buildEverydayBlocks(selection, signals, report.locale);
   const teamBreakBlocks = buildTeamBreakBlocks(selection, report.locale);
-  const misreadings = buildMisreadingBlocks(selection, signals);
+  const misreadings = buildMisreadingBlocks(selection, signals, report.locale);
   const levers = buildLeverBlocks(selection, signals);
   const showValuesSection =
     report.valuesModuleStatus !== "not_started" ||
@@ -296,7 +297,8 @@ function buildTeamBreakBlocks(selection: SelfReportSelection, locale?: string | 
 
 function buildMisreadingBlocks(
   selection: SelfReportSelection,
-  signals: SelfReportSignal[]
+  signals: SelfReportSignal[],
+  locale?: string | null
 ): InterpretationBlock[] {
   return collectUniqueSignals(
     selection.hero.primarySignal,
@@ -305,7 +307,7 @@ function buildMisreadingBlocks(
     signals
   )
     .slice(0, 3)
-    .map(buildMisreadingCopy);
+    .map((signal) => getSelfReportMisreadingCopy(signal, locale));
 }
 
 function buildLeverBlocks(
@@ -445,88 +447,6 @@ function buildCoreTensionParagraph(signal: SelfReportSignal | null) {
       return "Im Team wird es fuer dich dann anspruchsvoll, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will frueher auf den Tisch, die andere erst spaeter und sortierter.";
     default:
       return "Im Team wird es fuer dich vor allem dort anspruchsvoll, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
-  }
-}
-
-function buildMisreadingCopy(signal: SelfReportSignal): InterpretationBlock {
-  switch (signal.dimension) {
-    case "Unternehmenslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Bremsen aussehen",
-            text:
-              "Andere können deinen Blick auf Aufbau und Tragfähigkeit als Vorsicht lesen. Für dich geht es meist nicht um Blockade, sondern darum, dass eine Chance den Kern nicht aufweicht.",
-          }
-        : {
-            title: "Das kann nach Sprung wirken",
-            text:
-              "Andere können deine Offenheit für eine größere Chance als zu schnellen Kurswechsel lesen. Für dich ist es eher der Versuch, echtes Potenzial nicht zu spät zu sehen.",
-          };
-    case "Entscheidungslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Zögern wirken",
-            text:
-              "Wenn du noch prüfst, können andere das als Unentschlossenheit lesen. Für dich ist es eher der Punkt, an dem eine Entscheidung erst belastbar wird.",
-          }
-        : {
-            title: "Das kann nach zu viel Tempo wirken",
-            text:
-              "Wenn du früh festlegst, kann das für andere nach Sprung oder Bauchgefühl aussehen. Für dich ist der nächste Schritt dann meist schon klar genug.",
-          };
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Abstand wirken",
-            text:
-              "Dein Wunsch nach Eigenraum kann wie Rückzug wirken. Für dich ist es oft einfach die Arbeitsweise, in der Verantwortung wirklich trägt.",
-          }
-        : {
-            title: "Das kann nach Kontrollbedarf wirken",
-            text:
-              "Dein Wunsch nach frühen Zwischenständen kann wie Einmischung wirken. Für dich geht es meist darum, dass Arbeit nicht erst sichtbar wird, wenn sie schon festgelaufen ist.",
-          };
-    case "Commitment":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Distanz wirken",
-            text:
-              "Wenn du deinen Rahmen hältst, können andere das als geringere Priorität lesen. Für dich heißt es meist nur, dass Verbindlichkeit realistisch bleiben muss.",
-          }
-        : {
-            title: "Das kann nach stiller Erwartung wirken",
-            text:
-              "Dein hoher Einsatz kann bei anderen den Eindruck erzeugen, dass alle denselben Modus mitgehen sollen. Auch wenn du das nicht aussprichst, wird es oft so gelesen.",
-          };
-    case "Risikoorientierung":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Sicherheitsdenken wirken",
-            text:
-              "Andere können deine Leitplanken als Angst vor Risiko lesen. Für dich geht es meist darum, Unsicherheit nicht blind zu romantisieren.",
-          }
-        : {
-            title: "Das kann nach Wette wirken",
-            text:
-              "Andere können deine Offenheit für Unsicherheit als zu mutig lesen. Für dich ist das oft kein Leichtsinn, sondern die Bereitschaft, für eine echte Chance nicht zu früh auszusteigen.",
-          };
-    case "Konfliktstil":
-      return signal.tendencyKey === "left"
-        ? {
-            title: "Das kann nach Ausweichen wirken",
-            text:
-              "Wenn du erst sortierst, können andere das als Wegducken lesen. Für dich ist es oft der Versuch, das Thema später klarer und fairer aufzumachen.",
-          }
-        : {
-            title: "Das kann nach Härte wirken",
-            text:
-              "Wenn du Unterschiede direkt ansprichst, kann das auf andere schneller oder schärfer wirken, als du es meinst. Für dich ist es meist der kürzere Weg zu echter Klärung.",
-          };
-    default:
-      return {
-        title: "Das kann missverstanden werden",
-        text: "Andere sehen oft zuerst das Verhalten und erst später die Logik dahinter.",
-      };
   }
 }
 
