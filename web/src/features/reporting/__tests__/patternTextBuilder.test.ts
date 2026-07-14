@@ -4,6 +4,7 @@ import {
   buildPatternExamples,
   buildPatternsFromScores,
 } from "@/features/reporting/patternTextBuilder";
+import { findEnglishReportCopyQualityIssues } from "@/features/reporting/content/reportCopyGuards";
 import { SELF_REPORT_SELECTION_DEBUG_CASES } from "@/features/reporting/selfReportSelection";
 
 test("pattern text builder returns deterministic cards for the tracked audit cases", () => {
@@ -81,5 +82,55 @@ test("pattern text builder always returns exactly three cards for the tracked ex
   for (const testCase of trackedCases) {
     const patterns = buildPatternsFromScores(testCase.scores);
     assert.equal(patterns.length, 3, testCase.name);
+  }
+});
+
+test("pattern text builder returns English cards when requested", () => {
+  const testCase = SELF_REPORT_SELECTION_DEBUG_CASES.find(
+    (entry) => entry.name === "stark_ausgepraegtes_profil"
+  );
+
+  assert.ok(testCase);
+
+  const patterns = buildPatternsFromScores(testCase.scores, "en");
+
+  assert.deepEqual(
+    patterns.map((entry) => entry.title),
+    ["Putting focus first", "Staying in the loop", "Actively playing opportunities"]
+  );
+  assert.match(patterns[0].description, /A recurring pattern in your profile/);
+  assert.match(patterns[0].description, /startup as a clear priority/);
+});
+
+test("pattern text builder falls back to German for unknown locale", () => {
+  const testCase = SELF_REPORT_SELECTION_DEBUG_CASES.find(
+    (entry) => entry.name === "gemischtes_profil"
+  );
+
+  assert.ok(testCase);
+
+  assert.deepEqual(
+    buildPatternsFromScores(testCase.scores, "fr"),
+    buildPatternsFromScores(testCase.scores, "de")
+  );
+});
+
+test("English pattern copy passes report copy guards", () => {
+  for (const example of buildPatternExamples("en")) {
+    const text = example.patterns
+      .flatMap((pattern) => [pattern.title, pattern.description])
+      .join("\n");
+
+    assert.deepEqual(findEnglishReportCopyQualityIssues(text), [], example.name);
+  }
+});
+
+test("pattern text builder keeps selected pattern dimensions stable across locales", () => {
+  for (const testCase of SELF_REPORT_SELECTION_DEBUG_CASES) {
+    assert.deepEqual(
+      buildPatternsFromScores(testCase.scores, "en").length,
+      buildPatternsFromScores(testCase.scores, "de").length,
+      testCase.name
+    );
   }
 });

@@ -7,6 +7,7 @@ import {
 } from "@/features/reporting/selfReportSelection";
 import type { FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import type { SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
+import { normalizeLocale, type AppLocale } from "@/i18n/config";
 
 export type Pattern = {
   title: string;
@@ -19,6 +20,7 @@ type PatternEntry = {
 };
 
 type PatternMap = Record<FounderDimensionKey, Record<SelfReportTendencyKey, PatternEntry>>;
+type PatternLocale = AppLocale | string | null | undefined;
 
 const PATTERN_TEXT: PatternMap = {
   Unternehmenslogik: {
@@ -137,8 +139,129 @@ const PATTERN_TEXT: PatternMap = {
   },
 };
 
-function resolvePatternEntry(signal: SelfReportSignal): Pattern {
-  const entry = PATTERN_TEXT[signal.dimension][signal.tendencyKey];
+const EN_PATTERN_TEXT: PatternMap = {
+  Unternehmenslogik: {
+    left: {
+      title: "Foundation before speed",
+      description:
+        "A recurring pattern in your profile is that new opportunities first need to show how they strengthen the company and make it more resilient. In a founding context, this can help protect substance before momentum takes over. It can also create friction when others are already looking at reach, expansion or speed while you still want to test whether the foundation is stable enough.",
+    },
+    center: {
+      title: "Substance and leverage",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that you move between building substance and opening space for bigger leverage. This flexibility can be useful, but others may not always see which logic is leading in the moment. In a founding context, it helps to make explicit whether you are currently protecting the foundation or pursuing the opportunity."
+          : "A recurring pattern in your profile is that you keep substance and leverage in view at the same time. This can help you test opportunities from more than one angle. It can also create ambiguity if the team has not agreed whether the current priority is to strengthen the foundation or move toward the next opening.",
+    },
+    right: {
+      title: "Seeing leverage early",
+      description:
+        "A recurring pattern in your profile is that you notice reach, access and momentum early when a new opportunity appears. In a founding context, this can help the team avoid moving too slowly. It can also create tension when others first want to understand whether the model is stable enough before turning the opportunity into the next step.",
+    },
+  },
+  Entscheidungslogik: {
+    left: {
+      title: "Clarify before committing",
+      description:
+        "A recurring pattern in your profile is that you want to understand the basis of a decision before locking it in. This can help surface assumptions, gaps and counterarguments before they become costly. It may also feel like an extra loop to people who are already ready to move, so the useful move is to name what still needs clarification.",
+    },
+    center: {
+      title: "Clarify and decide",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that you switch between careful clarification and a clear next step. This can be a strength when it matches the situation, but the switch may not always be readable to others. In a founding context, it helps to say what would make a question ready for decision."
+          : "A recurring pattern in your profile is that you often clarify briefly and then move toward a conclusion. This can keep the team practical without skipping substance. It becomes more useful when others can see why the discussion has moved from exploration into decision.",
+    },
+    right: {
+      title: "Decide once the next step is workable",
+      description:
+        "A recurring pattern in your profile is that you prefer to decide once the direction is workable enough. This can help a founding team avoid circling for too long. It can also create friction when others experience the same question as still open, so the key is to make the threshold for action explicit.",
+    },
+  },
+  Risikoorientierung: {
+    left: {
+      title: "Move with guardrails",
+      description:
+        "A recurring pattern in your profile is that you move more comfortably when limits, costs and buffers are visible. This can help a founding team avoid treating uncertainty too casually. It may also feel slow to people who want to test sooner, so the useful conversation is which guardrails are truly needed before acting.",
+    },
+    center: {
+      title: "Courage with calibration",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that your risk threshold changes with the situation. Sometimes you want clearer guardrails, sometimes a plausible upside is enough to move. This can be useful, but it becomes easier for others to work with when you name where your line is in the current case."
+          : "A recurring pattern in your profile is that you weigh protection and movement rather than defaulting to either side. This can keep you from being either too cautious or too exposed. In a founding context, it helps to make explicit which risk the team is actually choosing to carry.",
+    },
+    right: {
+      title: "Actively playing opportunities",
+      description:
+        "A recurring pattern in your profile is that you move into tests, bets and action when you see meaningful room to learn or grow. This can help the team use open windows while they are still available. It can also create pressure for people who need more containment first, so it helps to agree what downside you are willing to carry.",
+    },
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: {
+      title: "Room to work keeps momentum",
+      description:
+        "A recurring pattern in your profile is that you work best with clear ownership and enough room to make progress without sharing every interim step. This can protect focus and speed. It can also leave others feeling involved too late if they need more visibility, so it helps to agree what should be shared early and what can stay autonomous.",
+    },
+    center: {
+      title: "Deliberate closeness",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that you move between independent work and close feedback. This flexibility can be useful, but others may not always know which mode you expect. In a founding context, it helps to define when a topic needs shared visibility and when ownership should stay clearer."
+          : "A recurring pattern in your profile is that you dose collaboration so it gives orientation without turning every step into alignment. This can keep work moving. It becomes easier for others when the team names how much visibility a task actually needs.",
+    },
+    right: {
+      title: "Staying in the loop",
+      description:
+        "A recurring pattern in your profile is that you prefer close visibility over quiet parallel work. You want to know where things stand, what has been decided and where something is still open. This can support shared direction, but it may feel like too much coordination for more autonomous people unless you agree which updates matter most.",
+    },
+  },
+  Commitment: {
+    left: {
+      title: "Focus with boundaries",
+      description:
+        "A recurring pattern in your profile is that the startup matters to you without automatically becoming the only organizing principle. This can protect sustainability and honest capacity planning. It can create tension when constant availability is silently assumed, so it helps to be clear about what you can reliably contribute.",
+    },
+    center: {
+      title: "Adjusting intensity deliberately",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that you can raise your intensity and bring it back down rather than staying in one mode. This can be useful across different phases, but others may not always know what level of priority you currently expect. In a founding context, it helps to name when a high-focus phase starts and ends."
+          : "A recurring pattern in your profile is that you adapt your level of commitment to the phase instead of keeping it permanently high or permanently bounded. This gives you range. It also makes explicit agreements important, because different people may read the same phase differently.",
+    },
+    right: {
+      title: "Putting focus first",
+      description:
+        "A recurring pattern in your profile is that you treat the startup as a clear priority and read collaboration through that level of focus. This can create momentum and commitment. It can also create pressure when others pace intensity differently, so it helps to agree what level of availability is realistic rather than silently expected.",
+    },
+  },
+  Konfliktstil: {
+    left: {
+      title: "Sort first, then address",
+      description:
+        "A recurring pattern in your profile is that you do not always move into a disagreement immediately. You may first take a little distance before naming a sensitive point. This can make your response more considered, but others may not know how important the issue already is for you unless you signal when you will come back to it.",
+    },
+    center: {
+      title: "Choosing the moment",
+      description: (band) =>
+        band === "balanced"
+          ? "A recurring pattern in your profile is that you do not address every difference in the same way. Some topics you put on the table quickly, others you return to with some distance. This sense of timing can be useful, but others may need to know when tension will turn into clarification."
+          : "A recurring pattern in your profile is that you choose between directness and timing. This can help you avoid making sensitive topics unnecessarily sharper while still not leaving them aside. It works best when the team can tell whether a point is being paused or avoided.",
+    },
+    right: {
+      title: "Surface tension early",
+      description:
+        "A recurring pattern in your profile is that you prefer to address differences before they run in the background for too long. This can keep important issues workable. It can also feel intense to people who need more distance first, so it helps to agree how direct clarification should happen under pressure.",
+    },
+  },
+};
+
+function resolvePatternMap(locale: PatternLocale) {
+  return normalizeLocale(locale) === "en" ? EN_PATTERN_TEXT : PATTERN_TEXT;
+}
+
+function resolvePatternEntry(signal: SelfReportSignal, locale?: PatternLocale): Pattern {
+  const entry = resolvePatternMap(locale)[signal.dimension][signal.tendencyKey];
   return {
     title: entry.title,
     description:
@@ -146,21 +269,21 @@ function resolvePatternEntry(signal: SelfReportSignal): Pattern {
   };
 }
 
-export function buildPatterns(patternDimensions: SelfReportSignal[]): Pattern[] {
-  return patternDimensions.slice(0, 3).map((signal) => resolvePatternEntry(signal));
+export function buildPatterns(patternDimensions: SelfReportSignal[], locale?: PatternLocale): Pattern[] {
+  return patternDimensions.slice(0, 3).map((signal) => resolvePatternEntry(signal, locale));
 }
 
-export function buildPatternExamples() {
+export function buildPatternExamples(locale?: PatternLocale) {
   return SELF_REPORT_SELECTION_DEBUG_CASES.filter((entry) =>
     ["stark_ausgepraegtes_profil", "komplett_balanciertes_profil", "gemischtes_profil"].includes(
       entry.name
     )
   ).map((entry) => ({
     name: entry.name,
-    patterns: buildPatterns(buildSelfReportSelection(entry.scores).patternDimensions),
+    patterns: buildPatterns(buildSelfReportSelection(entry.scores).patternDimensions, locale),
   }));
 }
 
-export function buildPatternsFromScores(scores: SelfAlignmentReport["scoresA"]) {
-  return buildPatterns(buildSelfReportSelection(scores).patternDimensions);
+export function buildPatternsFromScores(scores: SelfAlignmentReport["scoresA"], locale?: PatternLocale) {
+  return buildPatterns(buildSelfReportSelection(scores).patternDimensions, locale);
 }
