@@ -812,8 +812,8 @@ export const SELF_REPORT_SELECTION_DEBUG_CASES: SelfReportSelectionDebugCase[] =
       Konfliktstil: 49,
     },
     expected: {
-      primarySignal: "Arbeitsstruktur & Zusammenarbeit",
-      workModeSignal: "Unternehmenslogik",
+      primarySignal: "Konfliktstil",
+      workModeSignal: "Commitment",
       tensionCarrier: "Entscheidungslogik",
       patternDimensions: [
         "Unternehmenslogik",
