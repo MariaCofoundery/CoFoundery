@@ -12,6 +12,11 @@ import {
   type SelfReportSelection,
   type SelfReportSignal,
 } from "@/features/reporting/selfReportSelection";
+import {
+  getSelfReportEverydayCopy,
+  getSelfReportEverydayFallbackBlock,
+  type SelfReportEverydayBlock,
+} from "@/features/reporting/selfReportEverydayContent";
 import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -25,13 +30,7 @@ type CoreParagraph = {
   highSignal?: boolean;
 };
 
-type EverydayBlock = {
-  dimension: FounderDimensionKey;
-  title: string;
-  statement: string;
-  situation: string;
-  highSignal?: boolean;
-};
+type EverydayBlock = SelfReportEverydayBlock & { highSignal?: boolean };
 
 type TeamBreakBlock = {
   dimension: FounderDimensionKey;
@@ -59,7 +58,7 @@ export function SelfReportView({ report }: Props) {
     report.locale === "en"
       ? buildLocalizedHeroParagraphs(selection, report.locale)
       : buildCorePatternParagraphs(selection);
-  const everydayBlocks = buildEverydayBlocks(selection, signals);
+  const everydayBlocks = buildEverydayBlocks(selection, signals, report.locale);
   const teamBreakBlocks = buildTeamBreakBlocks(selection);
   const misreadings = buildMisreadingBlocks(selection, signals);
   const levers = buildLeverBlocks(selection, signals);
@@ -258,7 +257,8 @@ function splitHeroSentences(text: string) {
 
 function buildEverydayBlocks(
   selection: SelfReportSelection,
-  signals: SelfReportSignal[]
+  signals: SelfReportSignal[],
+  locale?: string | null
 ): EverydayBlock[] {
   const prioritizedSignals = collectUniqueSignals(
     selection.patternDimensions,
@@ -278,11 +278,11 @@ function buildEverydayBlocks(
     const signal = prioritizedEntry?.signal ?? signalMap.get(dimension) ?? null;
 
     if (!signal) {
-      return buildEverydayFallbackBlock(dimension);
+      return getSelfReportEverydayFallbackBlock(dimension, locale);
     }
 
     return {
-      ...buildEverydayCopy(signal),
+      ...getSelfReportEverydayCopy(signal, locale),
       highSignal: prioritizedEntry?.index === 0 && signal.isClear,
     };
   });
@@ -446,248 +446,6 @@ function buildCoreTensionParagraph(signal: SelfReportSignal | null) {
       return "Im Team wird es fuer dich dann anspruchsvoll, wenn Unterschiede nicht im gleichen Takt bearbeitet werden: eine Person will frueher auf den Tisch, die andere erst spaeter und sortierter.";
     default:
       return "Im Team wird es fuer dich vor allem dort anspruchsvoll, wo Erwartungen im Alltag nicht mehr still zusammenpassen.";
-  }
-}
-
-function buildEverydayCopy(signal: SelfReportSignal): EverydayBlock {
-  switch (signal.dimension) {
-    case "Unternehmenslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du prüfst Chancen gegen den Aufbau",
-            statement:
-              "Neue Möglichkeiten müssen für dich erst zeigen, dass sie das Unternehmen tragfähiger machen und nicht nur kurzfristig attraktiv sind.",
-            situation:
-              "Wenn ein neuer Markt, Kunde oder Kanal auftaucht, fragst du früh, was das mit Fokus, Positionierung und Aufbau macht.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du wägest Fokus und Chance gegeneinander ab",
-              statement:
-                "Du hast keine starre Lieblingsrichtung. Für dich hängt es von der Lage ab, ob Aufbau oder Chance zuerst zählt.",
-              situation:
-                "In einer neuen Option prüfst du meist beides zugleich: Was öffnet sie und was kostet sie an Klarheit oder Stabilität?",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du willst Chancen nicht liegen lassen",
-              statement:
-                "Wenn etwas spürbar mehr Reichweite oder Wachstum öffnen kann, willst du es eher prüfen und bewegen als nur theoretisch einordnen.",
-              situation:
-                "Taucht eine größere Marktchance auf, denkst du schnell in nächsten Schritten statt nur in Bedenken.",
-            };
-    case "Entscheidungslogik":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du entscheidest auf geklärter Basis",
-            statement:
-              "Wichtige Entscheidungen tragen für dich erst, wenn die entscheidenden Punkte und Einwände sichtbar sind.",
-            situation:
-              "Vor einem größeren Schritt willst du meist noch einmal sauber verstehen, worauf die Entscheidung steht.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du passt die Tiefe an die Frage an",
-              statement:
-                "Du behandelst nicht jede Entscheidung gleich. Manche Fragen brauchen für dich Klärung, andere nur eine tragfähige Richtung.",
-              situation:
-                "Im Alltag wechselst du zwischen gründlichem Prüfen und frühem Festlegen, je nachdem, wie groß die Folge ist.",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du gehst früh in eine Richtung",
-              statement:
-                "Wenn eine Richtung für dich trägt, willst du entscheiden und nicht länger auf Vollständigkeit warten.",
-            situation:
-              "Du gehst eher mit einem tragfähigen nächsten Schritt als mit einem komplett ausgeleuchteten Entscheidungsbild.",
-            };
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du brauchst Eigenraum, damit Arbeit trägt",
-            statement:
-              "Zusammenarbeit funktioniert für dich gut, wenn Zuständigkeiten klar sind und nicht jeder Zwischenschritt gemeinsam laufen muss.",
-            situation:
-              "Du meldest dich lieber an klaren Punkten zurück, statt laufend kleine Zwischenstände zu teilen.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du willst abgestimmt sein, aber nicht dauernd",
-              statement:
-                "Du suchst eine Arbeitsweise, in der Eigenraum möglich bleibt und wichtige Punkte trotzdem nicht zu spät sichtbar werden.",
-              situation:
-                "Dir reicht kein Dauer-Loop, aber auch kein Arbeiten, das erst am Ende wieder auftaucht.",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du willst früh sehen, wo Dinge stehen",
-              statement:
-                "Du arbeitest ruhiger, wenn Fortschritt, offene Punkte und Richtungswechsel nicht erst spät sichtbar werden.",
-              situation:
-                "Wenn ein Thema läuft, willst du eher Zwischenstände sehen als nur das Endergebnis.",
-            };
-    case "Commitment":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du hältst deinen Rahmen bewusst",
-            statement:
-              "Du willst, dass das Startup wichtig ist, aber in einem Rahmen, den du im Alltag wirklich tragen kannst.",
-            situation:
-              "Wenn andere mehr Intensität erwarten, wirst du erst mitgehen, wenn klar ist, wie lange und wofür das gelten soll.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du kannst verdichten, aber nicht endlos",
-              statement:
-                "Du bist bereit, phasenweise mehr zu geben, willst aber nicht, dass Ausnahmezustand still zur Norm wird.",
-              situation:
-                "In intensiven Phasen ziehst du mit. Danach brauchst du aber wieder einen erkennbaren Normalmodus.",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du liest Priorität an sichtbarem Einsatz",
-              statement:
-                "Für dich zeigt sich Ernsthaftigkeit nicht nur in Worten, sondern in Zeit, Energie und Verfügbarkeit.",
-              situation:
-                "Wenn ein Vorhaben wichtig ist, erwartest du eher, dass das im Alltag auch konkret sichtbar wird.",
-            };
-    case "Risikoorientierung":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du willst Risiko begrenzen, bevor du mitgehst",
-            statement:
-              "Du brauchst bei unsicheren Schritten erkennbare Leitplanken und eine überschaubare Downside.",
-            situation:
-              "Wenn eine Wette offen ist, fragst du früh nach Grenzen, Sicherungen und dem Punkt, an dem ihr wieder stoppt.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du gehst mit, wenn Unsicherheit einen guten Grund hat",
-              statement:
-                "Du bist weder reflexhaft vorsichtig noch dauerhaft auf Risiko. Für dich muss Unsicherheit begründbar sein.",
-              situation:
-                "Du trägst offene Lage eher dann mit, wenn klar ist, was genau die Chance ist und wo die Grenze liegt.",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du hältst offene Lage eher aus",
-              statement:
-                "Hohe Unsicherheit schreckt dich nicht automatisch, wenn die Chance groß genug wirkt.",
-              situation:
-                "Du bist eher bereit, mit offenen Fragen zu starten, solange die Richtung für dich genug Potenzial hat.",
-            };
-    case "Konfliktstil":
-      return signal.tendencyKey === "left"
-        ? {
-            dimension: signal.dimension,
-            title: "Du sortierst erst, bevor du ansprichst",
-            statement:
-              "Du gehst Unterschiede lieber mit geklärter eigener Sicht an als im ersten Impuls.",
-            situation:
-              "Wenn dich etwas stört, beobachtest du oft noch kurz, bevor du es aufmachst.",
-          }
-        : signal.tendencyKey === "center"
-          ? {
-              dimension: signal.dimension,
-              title: "Du wählst den Moment für Klärung bewusst",
-              statement:
-                "Du sprichst nicht alles sofort an, aber du lässt es auch nicht beliebig laufen.",
-              situation:
-                "Im Alltag entscheidest du eher situativ, ob ein Unterschied sofort auf den Tisch muss oder erst in einem besseren Moment.",
-            }
-          : {
-              dimension: signal.dimension,
-              title: "Du klärst Unterschiede lieber früh",
-              statement:
-                "Du arbeitest mit Reibung lieber offen als im Hintergrund weiter.",
-              situation:
-                "Wenn etwas nicht passt, willst du den Unterschied eher direkt benennen als ihn länger mitzuschleppen.",
-            };
-    default:
-      return {
-        dimension: signal.dimension,
-        title: "Dein Alltag ist klar lesbar",
-        statement: "Deine Präferenzen zeigen sich nicht nur im Test, sondern in echten Arbeitssituationen.",
-        situation: "Vor allem unter Druck werden sie für andere klar sichtbar.",
-      };
-  }
-}
-
-function buildEverydayFallbackBlock(dimension: FounderDimensionKey): EverydayBlock {
-  switch (dimension) {
-    case "Unternehmenslogik":
-      return {
-        dimension,
-        title: "Deine Linie ist hier noch nicht klar lesbar",
-        statement:
-          "Ob du eher den Aufbau schützt oder eine größere Chance früh ziehst, ist in diesem Profil gerade nicht sauber belastbar.",
-        situation:
-          "Im Alltag zeigt sich das oft erst dann klar, wenn eine neue Option gleichzeitig Fokus verspricht und Fokus kostet.",
-      };
-    case "Entscheidungslogik":
-      return {
-        dimension,
-        title: "Dein Entscheidungsmodus ist hier noch offen",
-        statement:
-          "Ob du eher über Klärung oder über eine tragfähige Richtung entscheidest, ist in diesem Profil gerade nicht klar genug belegt.",
-        situation:
-          "Sichtbar wird das meist erst dann deutlich, wenn eine größere Entscheidung unter Zeitdruck reif werden muss.",
-      };
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return {
-        dimension,
-        title: "Dein Arbeitsrhythmus ist hier noch nicht klar genug",
-        statement:
-          "Wie viel Eigenraum oder Mitsicht du im Alltag wirklich brauchst, ist in diesem Profil gerade nicht sauber ablesbar.",
-        situation:
-          "Das zeigt sich meist erst dann klar, wenn Verantwortung läuft und gleichzeitig Sichtbarkeit erwartet wird.",
-      };
-    case "Commitment":
-      return {
-        dimension,
-        title: "Dein Einsatzrahmen bleibt hier noch offen",
-        statement:
-          "Wie stark du das Startup im Alltag priorisierst, ist in diesem Profil gerade nicht belastbar genug zu lesen.",
-        situation:
-          "Im Alltag wird das oft erst deutlich, wenn Intensität, Verfügbarkeit und Erwartung nicht mehr nur theoretisch sind.",
-      };
-    case "Risikoorientierung":
-      return {
-        dimension,
-        title: "Deine Risikoschwelle ist hier noch nicht klar genug",
-        statement:
-          "Ob du Unsicherheit eher früh begrenzen oder eher länger tragen würdest, ist in diesem Profil gerade nicht sauber belegt.",
-        situation:
-          "Sichtbar wird das meist dann, wenn eine Chance offen ist, aber Folgen und Sicherungen noch nicht ganz feststehen.",
-      };
-    case "Konfliktstil":
-      return {
-        dimension,
-        title: "Dein Klärungsstil bleibt hier noch offen",
-        statement:
-          "Ob du Unterschiede eher früh ansprichst oder erst sortierst, ist in diesem Profil gerade nicht eindeutig lesbar.",
-        situation:
-          "Im Alltag zeigt sich das meist erst dann klar, wenn ein Thema gleichzeitig heikel und nicht mehr gut aufschiebbar ist.",
-      };
-    default:
-      return {
-        dimension,
-        title: "Dein Alltag ist hier noch nicht klar lesbar",
-        statement:
-          "Diese Dimension ist im aktuellen Profil noch nicht stabil genug ausgeprägt, um eine klare Alltagswirkung zu zeigen.",
-        situation:
-          "Im Alltag wird das meist erst unter echter Belastung oder in wiederkehrenden Situationen deutlicher sichtbar.",
-      };
   }
 }
 
