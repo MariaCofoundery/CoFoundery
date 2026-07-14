@@ -79,7 +79,7 @@ export function SelfReportView({ report }: Props) {
             <h2 className="mt-3 text-2xl font-semibold text-slate-900">
               {chrome.sections.profileNow}
             </h2>
-            <DimensionOverview scores={report.scoresA} />
+            <DimensionOverview scores={report.scoresA} locale={report.locale} />
             <div className="mt-5 space-y-4">
               {coreParagraphs.map((paragraph) => (
                 <article key={paragraph.text} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">

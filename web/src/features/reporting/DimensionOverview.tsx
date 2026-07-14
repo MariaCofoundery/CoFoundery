@@ -1,26 +1,33 @@
-import {
-  FOUNDER_DIMENSION_META,
-  FOUNDER_DIMENSION_ORDER,
-  type FounderDimensionKey,
-} from "@/features/reporting/founderDimensionMeta";
 import { DimensionScale } from "@/features/reporting/DimensionScale";
+import { getDimensionOverviewContent } from "@/features/reporting/dimensionOverviewContent";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 
 type Props = {
   scores: SelfAlignmentReport["scoresA"];
+  locale?: string | null;
 };
 
-export function DimensionOverview({ scores }: Props) {
+export function DimensionOverview({ scores, locale }: Props) {
+  const overview = getDimensionOverviewContent(scores, locale);
+
   return (
     <section className="mt-6 rounded-2xl border border-slate-200/80 bg-white/80 p-5">
       <div>
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Übersicht</p>
-        <h3 className="mt-2 text-base font-semibold text-slate-900">Dein aktueller Stand in 6 Dimensionen</h3>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+          {overview.eyebrow}
+        </p>
+        <h3 className="mt-2 text-base font-semibold text-slate-900">{overview.title}</h3>
       </div>
 
       <div className="mt-5 grid gap-x-6 gap-y-4 md:grid-cols-2">
-        {FOUNDER_DIMENSION_ORDER.map((dimension) => (
-          <DimensionOverviewRow key={dimension} dimension={dimension} score={scores[dimension]} />
+        {overview.rows.map((row) => (
+          <DimensionOverviewRow
+            key={row.dimension}
+            score={row.score}
+            label={row.label}
+            leftLabel={row.leftLabel}
+            rightLabel={row.rightLabel}
+          />
         ))}
       </div>
     </section>
@@ -28,21 +35,23 @@ export function DimensionOverview({ scores }: Props) {
 }
 
 function DimensionOverviewRow({
-  dimension,
   score,
+  label,
+  leftLabel,
+  rightLabel,
 }: {
-  dimension: FounderDimensionKey;
   score: number | null;
+  label: string;
+  leftLabel: string;
+  rightLabel: string;
 }) {
-  const meta = FOUNDER_DIMENSION_META[dimension];
-
   return (
     <article className="rounded-xl border border-slate-200/70 bg-slate-50/55 px-4 py-3">
-      <p className="text-sm font-medium text-slate-800">{meta.shortLabel}</p>
+      <p className="text-sm font-medium text-slate-800">{label}</p>
       <DimensionScale
         score={score}
-        leftLabel={meta.reportLeftPole}
-        rightLabel={meta.reportRightPole}
+        leftLabel={leftLabel}
+        rightLabel={rightLabel}
         compact
         showPoleLabels
         className="mt-2"
