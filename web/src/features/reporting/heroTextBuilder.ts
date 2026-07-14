@@ -8,6 +8,7 @@ import {
   type SelfReportTendencyKey,
 } from "@/features/reporting/selfReportSelection";
 import type { SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
+import { normalizeLocale, type AppLocale } from "@/i18n/config";
 
 type HeroTextInput = Pick<
   SelfReportHeroSignals,
@@ -18,6 +19,8 @@ type DimensionSentenceMap = Record<
   FounderDimensionKey,
   Record<SelfReportTendencyKey, string | ((band: SelfReportStrengthBand) => string)>
 >;
+
+type HeroLocale = AppLocale | string | null | undefined;
 
 const PRIMARY_SENTENCES: DimensionSentenceMap = {
   Unternehmenslogik: {
@@ -210,6 +213,149 @@ function buildFallbackHeroText() {
   ].join(" ");
 }
 
+const EN_DIMENSION_FOCUS: Record<FounderDimensionKey, Record<SelfReportTendencyKey, string>> = {
+  Unternehmenslogik: {
+    left: "you first check whether new opportunities make the company more solid and sustainable",
+    center: "you hold company substance and growth potential in view at the same time",
+    right: "you first notice reach, momentum and strategic upside in new opportunities",
+  },
+  Entscheidungslogik: {
+    left: "you prefer to clarify important assumptions before committing to a decision",
+    center: "you vary the depth of a decision process depending on what the situation needs",
+    right: "you move toward a decision once the next step looks workable enough",
+  },
+  Risikoorientierung: {
+    left: "you look for clear guardrails before moving into uncertainty",
+    center: "you weigh courage and protection without automatically defaulting to either side",
+    right: "you can move into uncertainty when the opportunity seems meaningful enough",
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: "you work best with clear ownership and targeted check-ins",
+    center: "you adjust between independent work and shared visibility depending on the task",
+    right: "you want progress, open questions and direction changes to become visible early",
+  },
+  Commitment: {
+    left: "you give the startup real weight while keeping a sustainable working frame",
+    center: "you can raise your focus in intense phases without treating that mode as permanent",
+    right: "you clearly orient time, energy and attention around the startup",
+  },
+  Konfliktstil: {
+    left: "you tend to sort differences internally before addressing them openly",
+    center: "you choose between direct clarification and more timing depending on the situation",
+    right: "you prefer to surface differences early while they are still workable",
+  },
+};
+
+const EN_WORK_MODE_FOCUS: Record<FounderDimensionKey, Record<SelfReportTendencyKey, string>> = {
+  Unternehmenslogik: {
+    left: "In day-to-day work, this often means giving space to themes that strengthen the foundation.",
+    center: "In day-to-day work, this often means comparing long-term substance with the size of the opportunity.",
+    right: "In day-to-day work, this often means moving themes forward when access, reach or momentum becomes visible.",
+  },
+  Entscheidungslogik: {
+    left: "In day-to-day work, this often means making assumptions and open questions visible before locking in a direction.",
+    center: "In day-to-day work, this often means moving between short analysis and pragmatic decisions.",
+    right: "In day-to-day work, this often means setting a next step once there is enough shape to act.",
+  },
+  Risikoorientierung: {
+    left: "In day-to-day work, this often means asking for limits, buffers and stop criteria early.",
+    center: "In day-to-day work, this often means deciding when protection is enough and when a bolder step is useful.",
+    right: "In day-to-day work, this often means moving faster into tests and open bets when the upside is clear.",
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: "In day-to-day work, this often means doing focused work independently before bringing others back in.",
+    center: "In day-to-day work, this often means calibrating visibility so it gives orientation without tracking every step.",
+    right: "In day-to-day work, this often means wanting to see progress, decisions and open points early.",
+  },
+  Commitment: {
+    left: "In day-to-day work, this often means protecting a frame that the startup can realistically fit into.",
+    center: "In day-to-day work, this often means increasing intensity when it is justified and lowering it again when pressure drops.",
+    right: "In day-to-day work, this often means treating the startup as a clear priority and reading collaboration through that focus.",
+  },
+  Konfliktstil: {
+    left: "In day-to-day work, this often means taking a little time before naming sensitive differences.",
+    center: "In day-to-day work, this often means deciding whether directness or timing will help the issue most.",
+    right: "In day-to-day work, this often means making differences visible early instead of letting them run in the background.",
+  },
+};
+
+const EN_TENSION_FOCUS: Record<FounderDimensionKey, Record<SelfReportTendencyKey, string>> = {
+  Unternehmenslogik: {
+    left: "others are already deriving the next lever from an opportunity while you still want to test its foundation",
+    center: "it is not clear whether you are currently protecting the foundation or opening room for a bigger lever",
+    right: "you already see the next lever in an opportunity while others first want to secure the foundation",
+  },
+  Entscheidungslogik: {
+    left: "a next step is being fixed while central assumptions still feel open to you",
+    center: "others cannot yet tell when you are still testing and when something has become decidable for you",
+    right: "the next step already looks clear to you while others still want to examine the question further",
+  },
+  Risikoorientierung: {
+    left: "others want to test or commit while you still miss guardrails, buffers or stop criteria",
+    center: "the team has not yet named which uncertainty it is genuinely willing to carry",
+    right: "others first want more safety while you already see a meaningful opening",
+  },
+  "Arbeitsstruktur & Zusammenarbeit": {
+    left: "others expect ongoing visibility while you would rather show work once something is substantial",
+    center: "the mode between independent work and feedback has not been made explicit early enough",
+    right: "others keep working autonomously while important decisions or intermediate steps become visible too late for you",
+  },
+  Commitment: {
+    left: "the team silently expects more presence, pace or availability than you have actually agreed to",
+    center: "your level of intensity changes and others only notice late which priority level you are currently assuming",
+    right: "you treat high priority and availability as obvious while others place the startup differently in everyday life",
+  },
+  Konfliktstil: {
+    left: "others want to discuss a difference immediately while you still need to sort it first",
+    center: "the timing of clarification is unclear and the moment itself becomes part of the friction",
+    right: "you want to address a difference directly while the other side needs more space or a softer approach",
+  },
+};
+
+function resolveEnglishHeroText(input: HeroTextInput) {
+  if (!input.primarySignal) {
+    return [
+      "Your founder profile does not yet show a strong enough core signal.",
+      "Use this as a starting point for reflection, not as a fixed label.",
+      "The working patterns will become clearer as more answers are available.",
+      "For now, avoid over-interpreting single signals and focus on what you can observe in real collaboration.",
+    ].join(" ");
+  }
+
+  const primaryFocus = EN_DIMENSION_FOCUS[input.primarySignal.dimension][input.primarySignal.tendencyKey];
+  const workModeSentence = input.workModeSignal
+    ? EN_WORK_MODE_FOCUS[input.workModeSignal.dimension][input.workModeSignal.tendencyKey]
+    : "In day-to-day work, this often shows up in how you handle pace, visibility and decisions.";
+  const tensionSentence = input.tensionCarrier
+    ? `The main friction point is likely to appear when ${EN_TENSION_FOCUS[input.tensionCarrier.dimension][input.tensionCarrier.tendencyKey]}.`
+    : "Friction is most likely to appear where expectations are not made explicit early enough.";
+  const impactSentence = resolveEnglishImpactSentence(input);
+
+  return [
+    `Your core pattern: ${primaryFocus}.`,
+    workModeSentence,
+    tensionSentence,
+    impactSentence,
+  ].join(" ");
+}
+
+function resolveEnglishImpactSentence(input: HeroTextInput) {
+  if (input.balancedProfile) {
+    return "This can become useful when you make clear which working mode you are using in a specific situation.";
+  }
+
+  switch (input.tensionCarrier?.family) {
+    case "direction":
+      return "Use this as a starting point for a focused conversation about direction, focus and the assumptions behind new opportunities.";
+    case "decision_under_uncertainty":
+      return "Use this as a starting point for clarifying how you want to make decisions when not everything is fully known yet.";
+    case "collaboration_under_pressure":
+      return "Use this as a starting point for making expectations about visibility, timing and feedback explicit before pressure builds.";
+    default:
+      return "Use this as a starting point for reflection, not as a fixed label or a final verdict.";
+  }
+}
+
 export function buildPrimarySentence(signal: SelfReportSignal | null) {
   if (!signal) return null;
   return resolveSentence(PRIMARY_SENTENCES, signal);
@@ -229,7 +375,11 @@ export function buildImpactSentence(input: HeroTextInput) {
   return resolveImpactSentence(input);
 }
 
-export function buildHeroText(input: HeroTextInput): string {
+export function buildHeroText(input: HeroTextInput, locale?: HeroLocale): string {
+  if (normalizeLocale(locale) === "en") {
+    return resolveEnglishHeroText(input);
+  }
+
   const primarySentence = buildPrimarySentence(input.primarySignal);
   if (!primarySentence) return buildFallbackHeroText();
 
@@ -246,17 +396,17 @@ export function buildHeroText(input: HeroTextInput): string {
   return [primarySentence, workModeSentence, tensionSentence, impactSentence].join(" ");
 }
 
-export function buildHeroTextFromScores(scores: SelfAlignmentReport["scoresA"]) {
-  return buildHeroText(buildSelfReportSelection(scores).hero);
+export function buildHeroTextFromScores(scores: SelfAlignmentReport["scoresA"], locale?: HeroLocale) {
+  return buildHeroText(buildSelfReportSelection(scores).hero, locale);
 }
 
-export function buildHeroTextExamples() {
+export function buildHeroTextExamples(locale?: HeroLocale) {
   return SELF_REPORT_SELECTION_DEBUG_CASES.filter((entry) =>
     ["stark_ausgepraegtes_profil", "komplett_balanciertes_profil", "gemischtes_profil"].includes(
       entry.name
     )
   ).map((entry) => ({
     name: entry.name,
-    heroText: buildHeroTextFromScores(entry.scores),
+    heroText: buildHeroTextFromScores(entry.scores, locale),
   }));
 }

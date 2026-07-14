@@ -4,6 +4,7 @@ import {
   buildHeroTextExamples,
   buildHeroTextFromScores,
 } from "@/features/reporting/heroTextBuilder";
+import { findEnglishReportCopyQualityIssues } from "@/features/reporting/content/reportCopyGuards";
 import { SELF_REPORT_SELECTION_DEBUG_CASES } from "@/features/reporting/selfReportSelection";
 
 test("hero text builder returns deterministic examples for the main audit cases", () => {
@@ -42,4 +43,45 @@ test("hero text always contains exactly five sentences for the tracked example c
 
     assert.equal(sentenceCount, 5, testCase.name);
   }
+});
+
+test("hero text builder returns English copy for locale en", () => {
+  const trackedCase = SELF_REPORT_SELECTION_DEBUG_CASES.find(
+    (entry) => entry.name === "stark_ausgepraegtes_profil"
+  );
+  assert.ok(trackedCase);
+
+  const hero = buildHeroTextFromScores(trackedCase.scores, "en");
+
+  assert.match(hero, /^Your core pattern:/);
+  assert.match(hero, /In day-to-day work/);
+  assert.match(hero, /The main friction point/);
+  assert.match(hero, /Use this as a starting point/);
+  assert.equal(findEnglishReportCopyQualityIssues(hero).length, 0);
+});
+
+test("hero text builder falls back to German for unsupported locales", () => {
+  const trackedCase = SELF_REPORT_SELECTION_DEBUG_CASES.find(
+    (entry) => entry.name === "gemischtes_profil"
+  );
+  assert.ok(trackedCase);
+
+  assert.equal(
+    buildHeroTextFromScores(trackedCase.scores, "fr"),
+    buildHeroTextFromScores(trackedCase.scores, "de")
+  );
+});
+
+test("English hero examples pass copy guards", () => {
+  const visibleText = buildHeroTextExamples("en")
+    .map((entry) => entry.heroText)
+    .join("\n");
+
+  assert.equal(findEnglishReportCopyQualityIssues(visibleText).length, 0);
+  assert.equal(
+    /\b(?:Dein|Kernmuster|Alltag|Reibung|Entscheidung|Klaerung|Klärung|Gespraech|Gespräch|Arbeitsdynamik)\b/i.test(
+      visibleText
+    ),
+    false
+  );
 });

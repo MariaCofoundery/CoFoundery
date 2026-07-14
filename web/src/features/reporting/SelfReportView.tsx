@@ -12,6 +12,7 @@ import {
   type SelfReportSelection,
   type SelfReportSignal,
 } from "@/features/reporting/selfReportSelection";
+import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
@@ -54,7 +55,10 @@ export function SelfReportView({ report }: Props) {
   const reportContent = getReportContent(report.locale);
   const selection = buildSelfReportSelection(report.scoresA);
   const signals = buildSelfReportSignals(report.scoresA);
-  const coreParagraphs = buildCorePatternParagraphs(selection);
+  const coreParagraphs =
+    report.locale === "en"
+      ? buildLocalizedHeroParagraphs(selection, report.locale)
+      : buildCorePatternParagraphs(selection);
   const everydayBlocks = buildEverydayBlocks(selection, signals);
   const teamBreakBlocks = buildTeamBreakBlocks(selection);
   const misreadings = buildMisreadingBlocks(selection, signals);
@@ -234,6 +238,22 @@ function buildCorePatternParagraphs(selection: SelfReportSelection): CoreParagra
   });
 
   return paragraphs.slice(0, 4);
+}
+
+function buildLocalizedHeroParagraphs(selection: SelfReportSelection, locale: string): CoreParagraph[] {
+  const sentences = splitHeroSentences(buildHeroText(selection.hero, locale));
+
+  return sentences.map((text, index) => ({
+    text,
+    highSignal: index === 0 || index === 2,
+  }));
+}
+
+function splitHeroSentences(text: string) {
+  return text
+    .split(/(?<=\.)\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
 }
 
 function buildEverydayBlocks(
