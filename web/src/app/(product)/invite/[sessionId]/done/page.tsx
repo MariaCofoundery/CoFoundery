@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { type ReactNode } from "react";
 import { DelayedRedirect } from "@/features/navigation/DelayedRedirect";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
@@ -33,10 +34,12 @@ function completionButtonClass(variant: "primary" | "secondary" | "ghost" = "pri
 }
 
 function CompletionShell({
+  eyebrow,
   title,
   description,
   children,
 }: {
+  eyebrow: string;
   title: string;
   description: string;
   children: ReactNode;
@@ -49,7 +52,7 @@ function CompletionShell({
           <div className="absolute right-6 top-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.10),transparent_72%)] blur-xl" />
         </div>
         <div className="relative">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Abschluss</p>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{eyebrow}</p>
           <h1 className="mt-3 text-2xl font-semibold text-slate-900">{title}</h1>
           <p className="mt-4 text-sm leading-7 text-slate-700">{description}</p>
           {children}
@@ -60,6 +63,7 @@ function CompletionShell({
 }
 
 export default async function InvitationDonePage({ params, searchParams }: PageProps) {
+  const t = await getTranslations("invite.done");
   const [{ sessionId }, query] = await Promise.all([params, searchParams]);
   const invitationId = sessionId.trim();
   if (!invitationId) {
@@ -113,8 +117,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   if (!decision.ok) {
     return (
       <CompletionShell
-        title="Einladung nicht verfügbar"
-        description={`Die Einladung konnte nicht geladen werden (${decision.reason}).`}
+        eyebrow={t("eyebrow")}
+        title={t("error.title")}
+        description={t("error.description", { reason: decision.reason })}
       >
           <ResearchTrackedLink
             href={dashboardHref}
@@ -122,7 +127,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             className="mt-6 inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
           >
-            Zurück zum Dashboard
+            {t("actions.dashboard")}
           </ResearchTrackedLink>
       </CompletionShell>
     );
@@ -138,13 +143,13 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           <form action={navigateWithEnsuredMatchingReport}>
             <input type="hidden" name="target" value="matching" />
             <button type="submit" className={completionButtonClass("primary")}>
-              Matching-Report ansehen
+              {t("actions.matchingReport")}
             </button>
           </form>
           <form action={navigateWithEnsuredMatchingReport}>
             <input type="hidden" name="target" value="values" />
             <button type="submit" className={completionButtonClass("secondary")}>
-              Weiter zum Werte-Modul
+              {t("actions.valuesModule")}
             </button>
           </form>
           <ResearchTrackedLink
@@ -153,7 +158,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             className={completionButtonClass("ghost")}
           >
-            Zurück zum Dashboard
+            {t("actions.dashboard")}
           </ResearchTrackedLink>
         </div>
       );
@@ -164,13 +169,13 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
         <form action={navigateWithEnsuredMatchingReport}>
           <input type="hidden" name="target" value="matching" />
           <button type="submit" className={completionButtonClass("primary")}>
-            Matching-Report ansehen
+            {t("actions.matchingReport")}
           </button>
         </form>
         <form action={navigateWithEnsuredMatchingReport}>
           <input type="hidden" name="target" value="individual" />
           <button type="submit" className={completionButtonClass("secondary")}>
-            Individuellen Report ansehen
+            {t("actions.individualReport")}
           </button>
         </form>
         <ResearchTrackedLink
@@ -179,7 +184,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           invitationId={invitationId}
           className={completionButtonClass("ghost")}
         >
-          Zurück zum Dashboard
+          {t("actions.dashboard")}
         </ResearchTrackedLink>
       </div>
     );
@@ -192,7 +197,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           <form action={navigateWithEnsuredMatchingReport}>
             <input type="hidden" name="target" value="values" />
             <button type="submit" className={completionButtonClass("primary")}>
-              Weiter zum Werte-Modul
+              {t("actions.valuesModule")}
             </button>
           </form>
           <ResearchTrackedLink
@@ -201,7 +206,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             className={completionButtonClass("secondary")}
           >
-            Zurück zum Dashboard
+            {t("actions.dashboard")}
           </ResearchTrackedLink>
         </div>
       );
@@ -212,7 +217,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
         <form action={navigateWithEnsuredMatchingReport}>
           <input type="hidden" name="target" value="individual" />
           <button type="submit" className={completionButtonClass("primary")}>
-            Individuellen Report ansehen
+            {t("actions.individualReport")}
           </button>
         </form>
         <ResearchTrackedLink
@@ -221,7 +226,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           invitationId={invitationId}
           className={completionButtonClass("secondary")}
         >
-          Zurück zum Dashboard
+          {t("actions.dashboard")}
         </ResearchTrackedLink>
       </div>
     );
@@ -236,8 +241,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     const ensuredReportResult = await ensureReportRunForInvitation(invitationId);
     return (
       <CompletionShell
-        title="Stark, alles ist komplett."
-        description="Euer Founder-Report ist bereit. Du wirst in wenigen Sekunden weitergeleitet und kannst ihn direkt gemeinsam nutzen."
+        eyebrow={t("eyebrow")}
+        title={t("reportReady.title")}
+        description={t("reportReady.description")}
       >
           <ResearchPageTracker
             eventName="invite_done_viewed"
@@ -247,13 +253,13 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
             {showValuesNextStep
-              ? "Euer Matching-Report auf Basis der Basisprofile ist bereit. Wenn du jetzt weitermachst, ergänzt du ihn noch um das Werte-Modul."
-              : "Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt."}
+              ? t("reportReady.valuesHint")
+              : t("reportReady.completeHint")}
           </div>
           {renderReadyActions()}
           {!ensuredReportResult.ok ? (
             <p className="mt-4 text-xs text-slate-500">
-              Der Matching-Report wurde beim Laden erneut angestoßen ({ensuredReportResult.reason}).
+              {t("reportReady.retryHint", { reason: ensuredReportResult.reason })}
             </p>
           ) : null}
       </CompletionShell>
@@ -269,8 +275,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
       if (existingProfileResult.ok && existingProfileResult.waiting) {
         return (
           <CompletionShell
-            title="Dein bestehendes Profil ist eingebunden."
-            description="Deine bereits eingereichten Antworten gelten jetzt für diese Einladung. Sobald die andere Person fertig ist, wird euer Matching-Report erstellt."
+            eyebrow={t("eyebrow")}
+            title={t("existingProfileLinked.title")}
+            description={t("existingProfileLinked.description")}
           >
             <ResearchPageTracker
               eventName="invite_done_viewed"
@@ -278,7 +285,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
               properties={{ state: "waiting_for_answers_after_existing_choice" }}
             />
             <div className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-700">
-              Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht.
+              {t("existingProfileLinked.hint")}
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <ResearchTrackedLink
@@ -287,7 +294,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
                 invitationId={invitationId}
                 className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
               >
-                Zum Dashboard
+                {t("actions.toDashboard")}
               </ResearchTrackedLink>
             </div>
           </CompletionShell>
@@ -304,8 +311,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
 
     return (
       <CompletionShell
-        title="Wie möchtest du für dieses Matching starten?"
-        description="Du hast bereits ein eingereichtes Profil. Für dieses Matching kannst du es bewusst übernehmen oder für diesen Kontext neu beantworten."
+        eyebrow={t("eyebrow")}
+        title={t("existingChoice.title")}
+        description={t("existingChoice.description")}
       >
         <ResearchPageTracker
           eventName="invite_done_viewed"
@@ -314,15 +322,15 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
         />
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
-            <p className="font-medium text-slate-900">Bestehendes Profil verwenden</p>
+            <p className="font-medium text-slate-900">{t("existingChoice.useExistingTitle")}</p>
             <p className="mt-2">
-              Nutze deine zuletzt eingereichten Antworten als Matching-Grundlage für diese Einladung.
+              {t("existingChoice.useExistingText")}
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
-            <p className="font-medium text-slate-900">Für dieses Matching neu beantworten</p>
+            <p className="font-medium text-slate-900">{t("existingChoice.refreshTitle")}</p>
             <p className="mt-2">
-              Starte mit einem frischen Lauf, wenn du deinen aktuellen Stand bewusst neu einbringen willst.
+              {t("existingChoice.refreshText")}
             </p>
           </div>
         </div>
@@ -333,7 +341,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
           >
-            Bestehendes Profil verwenden
+            {t("actions.useExisting")}
           </ResearchTrackedLink>
           <ResearchTrackedLink
             href={refreshHref}
@@ -341,7 +349,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
             invitationId={invitationId}
             className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
           >
-            Neu beantworten
+            {t("actions.refresh")}
           </ResearchTrackedLink>
         </div>
       </CompletionShell>
@@ -352,8 +360,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   if (ensuredReportResult.ok) {
     return (
       <CompletionShell
-        title="Sehr gut, dein Teil ist abgeschlossen."
-        description="Deine Antworten sind gespeichert und euer gemeinsamer Founder-Report wurde gerade erzeugt. Du wirst in wenigen Sekunden weitergeleitet."
+        eyebrow={t("eyebrow")}
+        title={t("finalized.title")}
+        description={t("finalized.description")}
       >
           <ResearchPageTracker
             eventName="invite_done_viewed"
@@ -363,8 +372,8 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           <DelayedRedirect href={matchingReportHref} />
           <div className="mt-5 rounded-2xl border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
             {showValuesNextStep
-              ? "Euer Matching-Report ist jetzt verfügbar. Wenn du als Nächstes das Werte-Modul ergänzt, wird der nächste Report-Stand noch aussagekräftiger."
-              : "Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar."}
+              ? t("finalized.valuesHint")
+              : t("finalized.reportHint")}
           </div>
           {renderReadyActions()}
       </CompletionShell>
@@ -374,8 +383,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   if (ensuredReportResult.reason === "waiting_for_answers") {
     return (
       <CompletionShell
-        title="Sehr gut, dein Teil ist abgeschlossen."
-        description="Deine Antworten sind gespeichert. Sobald die andere Person fertig ist, erstellt sich euer Founder-Report automatisch."
+        eyebrow={t("eyebrow")}
+        title={t("waiting.title")}
+        description={t("waiting.description")}
       >
           <ResearchPageTracker
             eventName="invite_done_viewed"
@@ -384,8 +394,8 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           />
           <div className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-7 text-slate-700">
             {showValuesNextStep
-              ? "Dein Basisprofil ist gespeichert. Sobald die andere Person ebenfalls mit dem Basisprofil fertig ist, wird euer Matching-Report sichtbar. Du kannst bis dahin direkt mit dem Werte-Modul weitermachen."
-              : "Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht."}
+              ? t("waiting.valuesHint")
+              : t("waiting.dashboardHint")}
           </div>
           {renderWaitingActions()}
       </CompletionShell>
@@ -394,8 +404,9 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
 
   return (
     <CompletionShell
-      title="Fragebogen abgeschlossen"
-      description={`Der Report konnte gerade noch nicht erstellt werden (${ensuredReportResult.reason}). Bitte prüfe den Status im Dashboard.`}
+      eyebrow={t("eyebrow")}
+      title={t("fallback.title")}
+      description={t("fallback.description", { reason: ensuredReportResult.reason })}
     >
         <ResearchPageTracker
           eventName="invite_done_viewed"

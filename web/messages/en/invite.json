@@ -96,5 +96,68 @@
     "activateCta": "Confirm start",
     "waitingTitle": "Waiting for the second founder",
     "waitingText": "Your slot is already connected. Once {counterpart} has started as well, your shared matching context will activate automatically."
+  },
+  "basisComplete": {
+    "eyebrow": "Intermediate step",
+    "title": "Nice. The foundation questionnaire is complete.",
+    "intro": "That was the larger part. Your progress is safely saved and the next step is clear.",
+    "choice": "You can now pause briefly or continue directly with the 12 questions in the values module. After that, your part is complete.",
+    "reportHint": "Almost there: once both of you are done, your matching report is prepared automatically.",
+    "continueCard": "If you continue now, your full part is completed in one flow.",
+    "pauseCard": "If you continue later, your current progress stays saved and you can pick up right here.",
+    "continueValues": "Continue now: values module (12 questions)",
+    "pause": "Pause briefly and continue later"
+  },
+  "done": {
+    "eyebrow": "Completion",
+    "actions": {
+      "matchingReport": "View matching report",
+      "valuesModule": "Continue to values module",
+      "dashboard": "Back to dashboard",
+      "individualReport": "View individual report",
+      "toDashboard": "Go to dashboard",
+      "useExisting": "Use existing profile",
+      "refresh": "Answer again"
+    },
+    "error": {
+      "title": "Invitation unavailable",
+      "description": "The invitation could not be loaded ({reason})."
+    },
+    "reportReady": {
+      "title": "You’re all set.",
+      "description": "Your founder report is ready. You will be redirected in a few seconds and can open it right away.",
+      "valuesHint": "Your matching report based on the foundation profiles is ready. If you continue now, you can add the values module next.",
+      "completeHint": "Foundation profile and, where relevant, values profile are now combined in the shared report.",
+      "retryHint": "The matching report was triggered again while loading ({reason})."
+    },
+    "existingProfileLinked": {
+      "title": "Your existing profile is connected.",
+      "description": "Your already submitted answers now apply to this invitation. Once the other person is done, your matching report will be prepared.",
+      "hint": "There is nothing else you need to do right now. The dashboard will show you when your shared report is ready."
+    },
+    "existingChoice": {
+      "title": "How would you like to start this matching?",
+      "description": "You already have a submitted profile. For this matching, you can intentionally reuse it or answer again for this specific context.",
+      "useExistingTitle": "Use existing profile",
+      "useExistingText": "Use your most recently submitted answers as the matching foundation for this invitation.",
+      "refreshTitle": "Answer again for this matching",
+      "refreshText": "Start with a fresh run if you want to bring in your current state deliberately."
+    },
+    "finalized": {
+      "title": "Great, your part is complete.",
+      "description": "Your answers have been saved and your shared founder report has just been prepared. You will be redirected in a few seconds.",
+      "valuesHint": "Your matching report is now available. If you add the values module next, the next report state becomes more useful.",
+      "reportHint": "This is a good moment to open the report: it makes differences, strengths, and first conversation areas visible."
+    },
+    "waiting": {
+      "title": "Great, your part is complete.",
+      "description": "Your answers have been saved. Once the other person is done, your founder report will be prepared automatically.",
+      "valuesHint": "Your foundation profile is saved. Once the other person has also completed the foundation profile, your matching report will become visible. You can continue with the values module in the meantime.",
+      "dashboardHint": "There is nothing else you need to do right now. The dashboard will show you when your shared report is ready."
+    },
+    "fallback": {
+      "title": "Questionnaire complete",
+      "description": "The report could not be prepared right now ({reason}). Please check the status in the dashboard."
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { ResearchTrackedLink } from "@/features/research/ResearchTrackedLink";
 import { createClient } from "@/lib/supabase/server";
@@ -27,6 +28,7 @@ function buildDoneHref(invitationId: string) {
 }
 
 export default async function InvitationBasisCompletePage({ params, searchParams }: PageProps) {
+  const t = await getTranslations("invite.basisComplete");
   const [{ sessionId }, query] = await Promise.all([params, searchParams]);
   const invitationId = sessionId.trim();
   if (!invitationId) {
@@ -88,27 +90,26 @@ export default async function InvitationBasisCompletePage({ params, searchParams
           module="base"
           properties={{ isRefreshFlow }}
         />
-        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">Zwischenschritt</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("eyebrow")}</p>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-          Stark. Der Basis-Fragebogen ist geschafft.
+          {t("title")}
         </h1>
         <p className="mt-4 text-sm leading-7 text-slate-700">
-          Das war der größere Teil. Dein Fortschritt ist sicher gespeichert und der nächste Schritt ist jetzt klar.
+          {t("intro")}
         </p>
         <p className="mt-2 text-sm leading-7 text-slate-700">
-          Jetzt hast du die Wahl: kurz Pause machen oder direkt mit den 12 Fragen im Werte-Modul weitermachen.
-          Danach ist dein Teil komplett.
+          {t("choice")}
         </p>
         <p className="mt-2 rounded-xl border border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 px-4 py-3 text-sm leading-7 text-slate-700">
-          Fast geschafft: Sobald ihr beide fertig seid, erstellt sich euer Matching-Report automatisch.
+          {t("reportHint")}
         </p>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
-            Wenn du jetzt weitermachst, ist dein kompletter Teil in einem Zug abgeschlossen.
+            {t("continueCard")}
           </div>
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-sm leading-7 text-slate-700">
-            Wenn du später weitermachst, bleibt dein bisheriger Stand erhalten und du steigst genau hier wieder ein.
+            {t("pauseCard")}
           </div>
         </div>
 
@@ -121,7 +122,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
             properties={{ isRefreshFlow }}
             className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]"
           >
-            Jetzt durchziehen: Werte-Modul (12 Fragen)
+            {t("continueValues")}
           </ResearchTrackedLink>
           <ResearchTrackedLink
             href={dashboardHref}
@@ -131,7 +132,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
             properties={{ isRefreshFlow }}
             className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
           >
-            Kurz pausieren, später weitermachen
+            {t("pause")}
           </ResearchTrackedLink>
         </div>
         </div>

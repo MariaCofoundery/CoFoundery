@@ -123,6 +123,8 @@ test("loads English invite token-flow messages", () => {
     join?: { loadingTitle?: string; toDashboard?: string };
     welcome?: { title?: string; nextLabels?: { base?: string } };
     teamInvite?: { title?: string; activateCta?: string };
+    basisComplete?: { title?: string; continueValues?: string };
+    done?: { reportReady?: { title?: string }; actions?: { matchingReport?: string } };
   };
 
   assert.equal(invite.join?.loadingTitle, "Checking invitation");
@@ -131,6 +133,10 @@ test("loads English invite token-flow messages", () => {
   assert.equal(invite.welcome?.nextLabels?.base, "Go to foundation questionnaire");
   assert.equal(invite.teamInvite?.title, "Matching start for two founders");
   assert.equal(invite.teamInvite?.activateCta, "Confirm start");
+  assert.equal(invite.basisComplete?.title, "Nice. The foundation questionnaire is complete.");
+  assert.equal(invite.basisComplete?.continueValues, "Continue now: values module (12 questions)");
+  assert.equal(invite.done?.reportReady?.title, "You’re all set.");
+  assert.equal(invite.done?.actions?.matchingReport, "View matching report");
 });
 
 test("loads English profile basics messages", () => {

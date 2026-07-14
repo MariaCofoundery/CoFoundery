@@ -96,5 +96,68 @@
     "activateCta": "Start bestätigen",
     "waitingTitle": "Wartet auf den zweiten Founder",
     "waitingText": "Dein Platz ist bereits verknüpft. Sobald auch {counterpart} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert."
+  },
+  "basisComplete": {
+    "eyebrow": "Zwischenschritt",
+    "title": "Stark. Der Basis-Fragebogen ist geschafft.",
+    "intro": "Das war der größere Teil. Dein Fortschritt ist sicher gespeichert und der nächste Schritt ist jetzt klar.",
+    "choice": "Jetzt hast du die Wahl: kurz Pause machen oder direkt mit den 12 Fragen im Werte-Modul weitermachen. Danach ist dein Teil komplett.",
+    "reportHint": "Fast geschafft: Sobald ihr beide fertig seid, erstellt sich euer Matching-Report automatisch.",
+    "continueCard": "Wenn du jetzt weitermachst, ist dein kompletter Teil in einem Zug abgeschlossen.",
+    "pauseCard": "Wenn du später weitermachst, bleibt dein bisheriger Stand erhalten und du steigst genau hier wieder ein.",
+    "continueValues": "Jetzt durchziehen: Werte-Modul (12 Fragen)",
+    "pause": "Kurz pausieren, später weitermachen"
+  },
+  "done": {
+    "eyebrow": "Abschluss",
+    "actions": {
+      "matchingReport": "Matching-Report ansehen",
+      "valuesModule": "Weiter zum Werte-Modul",
+      "dashboard": "Zurück zum Dashboard",
+      "individualReport": "Individuellen Report ansehen",
+      "toDashboard": "Zum Dashboard",
+      "useExisting": "Bestehendes Profil verwenden",
+      "refresh": "Neu beantworten"
+    },
+    "error": {
+      "title": "Einladung nicht verfügbar",
+      "description": "Die Einladung konnte nicht geladen werden ({reason})."
+    },
+    "reportReady": {
+      "title": "Stark, alles ist komplett.",
+      "description": "Euer Founder-Report ist bereit. Du wirst in wenigen Sekunden weitergeleitet und kannst ihn direkt gemeinsam nutzen.",
+      "valuesHint": "Euer Matching-Report auf Basis der Basisprofile ist bereit. Wenn du jetzt weitermachst, ergänzt du ihn noch um das Werte-Modul.",
+      "completeHint": "Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt.",
+      "retryHint": "Der Matching-Report wurde beim Laden erneut angestoßen ({reason})."
+    },
+    "existingProfileLinked": {
+      "title": "Dein bestehendes Profil ist eingebunden.",
+      "description": "Deine bereits eingereichten Antworten gelten jetzt für diese Einladung. Sobald die andere Person fertig ist, wird euer Matching-Report erstellt.",
+      "hint": "Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht."
+    },
+    "existingChoice": {
+      "title": "Wie möchtest du für dieses Matching starten?",
+      "description": "Du hast bereits ein eingereichtes Profil. Für dieses Matching kannst du es bewusst übernehmen oder für diesen Kontext neu beantworten.",
+      "useExistingTitle": "Bestehendes Profil verwenden",
+      "useExistingText": "Nutze deine zuletzt eingereichten Antworten als Matching-Grundlage für diese Einladung.",
+      "refreshTitle": "Für dieses Matching neu beantworten",
+      "refreshText": "Starte mit einem frischen Lauf, wenn du deinen aktuellen Stand bewusst neu einbringen willst."
+    },
+    "finalized": {
+      "title": "Sehr gut, dein Teil ist abgeschlossen.",
+      "description": "Deine Antworten sind gespeichert und euer gemeinsamer Founder-Report wurde gerade erzeugt. Du wirst in wenigen Sekunden weitergeleitet.",
+      "valuesHint": "Euer Matching-Report ist jetzt verfügbar. Wenn du als Nächstes das Werte-Modul ergänzt, wird der nächste Report-Stand noch aussagekräftiger.",
+      "reportHint": "Jetzt lohnt sich der Blick in den Report besonders: Dort werden Unterschiede, Stärken und erste Gesprächsfelder direkt sichtbar."
+    },
+    "waiting": {
+      "title": "Sehr gut, dein Teil ist abgeschlossen.",
+      "description": "Deine Antworten sind gespeichert. Sobald die andere Person fertig ist, erstellt sich euer Founder-Report automatisch.",
+      "valuesHint": "Dein Basisprofil ist gespeichert. Sobald die andere Person ebenfalls mit dem Basisprofil fertig ist, wird euer Matching-Report sichtbar. Du kannst bis dahin direkt mit dem Werte-Modul weitermachen.",
+      "dashboardHint": "Du musst jetzt nichts weiter tun. Im Dashboard siehst du später direkt, sobald euer gemeinsamer Report bereitsteht."
+    },
+    "fallback": {
+      "title": "Fragebogen abgeschlossen",
+      "description": "Der Report konnte gerade noch nicht erstellt werden ({reason}). Bitte prüfe den Status im Dashboard."
+    }
   }
 }
