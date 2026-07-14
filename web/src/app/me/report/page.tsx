@@ -15,6 +15,7 @@ import {
 export default async function MeReportPage() {
   const locale = getRequestLocale();
   const t = await getTranslations("report.common");
+  const tIndividual = await getTranslations("report.individual");
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,15 +34,15 @@ export default async function MeReportPage() {
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
         <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-8">
-          <h1 className="text-2xl font-semibold text-slate-900">Individueller Report</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">{tIndividual("missing.title")}</h1>
           <p className="mt-3 text-sm text-slate-700">
-            Für deinen individuellen Report fehlt noch ein eingereichter Basis-Fragebogen.
+            {tIndividual("missing.description")}
           </p>
           <a
             href={baseHref}
             className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           >
-            Basis-Fragebogen starten
+            {tIndividual("missing.cta")}
           </a>
         </section>
       </main>
