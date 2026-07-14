@@ -110,12 +110,36 @@ test("marks new report payloads with the requested locale and localized executiv
     "Fuer die Frage, welchen Stellenwert das Startup im Alltag haben soll und welches Einsatzniveau ihr erwartet, liegt derzeit noch keine belastbare Grundlage vor."
   );
   assert.equal(
+    defaultResult.payload.founderReport.sections.vision.interpretation,
+    "Fuer die Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, liegt derzeit noch keine tragfaehige Grundlage fuer eine gemeinsame Einschaetzung vor."
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.vision.interpretation,
+    "There is not enough reliable data yet to describe what should guide your entrepreneurial decisions together."
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.decisionLogic.conversationPrompts[0],
+    "How quickly do you want to make strategic decisions when not all information is available?"
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.riskOrientation.everydaySignals,
+    "Day to day, this may show up when one person would test or launch earlier while the other wants more clarity, data, or financial safeguards first."
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.workStructure.interpretation,
+    "There is not enough reliable data yet to describe how closely you would work together day to day or how much ongoing coordination you would need."
+  );
+  assert.equal(
     englishResult.payload.founderReport.sections.commitment.interpretation,
     "There is not enough reliable data yet to describe what role the startup should play in everyday work or what level of commitment each person expects."
   );
   assert.equal(
     englishResult.payload.founderReport.sections.commitment.conversationPrompts[0],
     "What role should the startup play in your everyday work and life right now?"
+  );
+  assert.equal(
+    englishResult.payload.founderReport.sections.conflictStyle.conversationPrompts[0],
+    "How quickly do you want to raise tension or irritation?"
   );
 
   const englishFocusPrompts = Object.values(
@@ -135,10 +159,7 @@ test("marks new report payloads with the requested locale and localized executiv
     founderReport: {
       ...defaultResult.payload.founderReport,
       executiveSummary: englishResult.payload.founderReport.executiveSummary,
-      sections: {
-        ...defaultResult.payload.founderReport.sections,
-        commitment: englishResult.payload.founderReport.sections.commitment,
-      },
+      sections: englishResult.payload.founderReport.sections,
     },
   };
   assert.deepEqual(englishResult.payload, defaultWithEnglishLocaleAndLocalizedBlocks);

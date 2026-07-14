@@ -19,6 +19,30 @@ export type ExecutiveSummaryStateKey =
   | "highClarification"
   | "partial";
 
+export type ReportSectionBuilderCopy = {
+  dimension: BuilderDimensionContentKey;
+  interpretations: Record<
+    "fallback" | "very_high" | "high" | "mixed" | "low",
+    Record<"pre_founder" | "existing_team", string>
+  >;
+  everydaySignals: Record<"pre_founder" | "existing_team", string>;
+  tensionCards: {
+    base: {
+      topic: string;
+      explanation: string;
+    };
+    extended: Array<{
+      topic: string;
+      explanation: string;
+    }>;
+    elevated: {
+      topic: string;
+      explanation: string;
+    };
+  };
+  conversationPrompts: Record<"pre_founder" | "existing_team", string[]>;
+};
+
 export type ReportBuilderCopy = {
   executiveSummary: {
     dimensionLabels: Record<BuilderDimensionContentKey, string>;
@@ -57,33 +81,12 @@ export type ReportBuilderCopy = {
     };
   };
   sections: {
-    commitment: {
-      dimension: "Commitment";
-      interpretations: Record<
-        "fallback" | "very_high" | "high" | "mixed" | "low",
-        Record<"pre_founder" | "existing_team", string>
-      >;
-      everydaySignals: Record<"pre_founder" | "existing_team", string>;
-      tensionCards: {
-        startupPriority: {
-          topic: string;
-          explanation: string;
-        };
-        dayToDayCommitment: {
-          topic: string;
-          explanation: string;
-        };
-        handlingPressure: {
-          topic: string;
-          explanation: string;
-        };
-        focusAndSideProjects: {
-          topic: string;
-          explanation: string;
-        };
-      };
-      conversationPrompts: Record<"pre_founder" | "existing_team", string[]>;
-    };
+    vision: ReportSectionBuilderCopy;
+    decisionLogic: ReportSectionBuilderCopy;
+    riskOrientation: ReportSectionBuilderCopy;
+    workStructure: ReportSectionBuilderCopy;
+    commitment: ReportSectionBuilderCopy;
+    conflictStyle: ReportSectionBuilderCopy;
   };
   enPilotExamples: {
     fallbackSummary: string;

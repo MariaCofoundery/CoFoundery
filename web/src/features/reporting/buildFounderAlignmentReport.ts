@@ -100,6 +100,7 @@ export function buildFounderAlignmentReport({
       vision: buildVisionSection({
         dimensionResult: getDimensionResult(scoringResult.dimensions, DIMENSION_KEYS.vision),
         teamContext,
+        builderCopy,
       }),
       decisionLogic: buildDecisionLogicSection({
         dimensionResult: getDimensionResult(
@@ -107,6 +108,7 @@ export function buildFounderAlignmentReport({
           DIMENSION_KEYS.decisionLogic
         ),
         teamContext,
+        builderCopy,
       }),
       riskOrientation: buildRiskOrientationSection({
         dimensionResult: getDimensionResult(
@@ -114,6 +116,7 @@ export function buildFounderAlignmentReport({
           DIMENSION_KEYS.riskOrientation
         ),
         teamContext,
+        builderCopy,
       }),
       workStructure: buildWorkStructureSection({
         dimensionResult: getDimensionResult(
@@ -121,6 +124,7 @@ export function buildFounderAlignmentReport({
           DIMENSION_KEYS.workStructure
         ),
         teamContext,
+        builderCopy,
       }),
       commitment: buildCommitmentSection({
         dimensionResult: getDimensionResult(
@@ -136,6 +140,7 @@ export function buildFounderAlignmentReport({
           DIMENSION_KEYS.conflictStyle
         ),
         teamContext,
+        builderCopy,
       }),
     },
   };

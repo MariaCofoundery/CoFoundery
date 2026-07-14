@@ -55,19 +55,14 @@ function potentialTensionsFromState(
   }
 
   const cards = builderCopy.sections.commitment.tensionCards;
-  const topics = [
-    cards.startupPriority,
-  ];
+  const topics = [cards.base];
 
   if (tensionScore != null && tensionScore >= 26) {
-    topics.push(
-      cards.dayToDayCommitment,
-      cards.handlingPressure
-    );
+    topics.push(...cards.extended);
   }
 
   if (tensionCategory === "elevated" || (tensionScore != null && tensionScore >= 40)) {
-    topics.push(cards.focusAndSideProjects);
+    topics.push(cards.elevated);
   }
 
   return topics.filter(
