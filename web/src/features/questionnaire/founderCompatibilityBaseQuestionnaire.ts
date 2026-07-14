@@ -4,7 +4,9 @@ import {
   type ItemId,
   type RegistryItem,
 } from "@/features/scoring/founderCompatibilityRegistry";
+import { normalizeLocale, type AppLocale } from "@/i18n/config";
 import type { AnswerMap } from "@/features/assessments/actions";
+import { getEnglishFounderCompatibilityBaseItemTranslation } from "@/features/questionnaire/founderCompatibilityBaseQuestionnaireTranslations";
 import {
   getCanonicalLegacyFounderQuestionIdForItem,
   getLegacyFounderQuestionBridgeMeta,
@@ -31,8 +33,18 @@ const ACTIVE_BASE_REGISTRY_ITEM_IDS = new Set(
 );
 
 function forcedChoiceStatementsFromPrompt(prompt: string) {
-  const match = prompt.match(/^\s*Welche Aussage passt eher zu dir\?\s*A:\s*(.+?)\s*B:\s*(.+?)\s*$/i);
-  if (!match) {
+  const lineParts = prompt
+    .split(/\r?\n+/)
+    .map((part) => part.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  const optionA = lineParts
+    .map((part) => part.match(/^(?:aussage\s*a|a)\s*[:)\-]\s*(.+)$/i)?.[1]?.trim() ?? null)
+    .find((value): value is string => Boolean(value));
+  const optionB = lineParts
+    .map((part) => part.match(/^(?:aussage\s*b|b)\s*[:)\-]\s*(.+)$/i)?.[1]?.trim() ?? null)
+    .find((value): value is string => Boolean(value));
+
+  if (!optionA || !optionB) {
     return {
       optionA: null,
       optionB: null,
@@ -40,19 +52,36 @@ function forcedChoiceStatementsFromPrompt(prompt: string) {
   }
 
   return {
-    optionA: match[1]?.trim() || null,
-    optionB: match[2]?.trim() || null,
+    optionA,
+    optionB,
   };
 }
 
-function toQuestion(item: RegistryItem): QuestionnaireQuestion {
-  const forcedChoice = item.type === "forced_choice" ? forcedChoiceStatementsFromPrompt(item.prompt) : null;
+function getVisiblePrompt(item: RegistryItem, locale: AppLocale) {
+  if (locale !== "en") {
+    return item.prompt;
+  }
+
+  return getEnglishFounderCompatibilityBaseItemTranslation(item.itemId)?.prompt ?? item.prompt;
+}
+
+function getVisibleChoiceLabel(item: RegistryItem, choiceValue: string, fallbackLabel: string, locale: AppLocale) {
+  if (locale !== "en") {
+    return fallbackLabel;
+  }
+
+  return getEnglishFounderCompatibilityBaseItemTranslation(item.itemId)?.choices[choiceValue] ?? fallbackLabel;
+}
+
+function toQuestion(item: RegistryItem, locale: AppLocale): QuestionnaireQuestion {
+  const prompt = getVisiblePrompt(item, locale);
+  const forcedChoice = item.type === "forced_choice" ? forcedChoiceStatementsFromPrompt(prompt) : null;
 
   return {
     id: item.itemId,
     dimension: item.dimensionLabel,
     type: item.type,
-    prompt: item.prompt,
+    prompt,
     sort_order: item.order,
     is_active: item.isActive,
     category: "basis",
@@ -63,19 +92,20 @@ function toQuestion(item: RegistryItem): QuestionnaireQuestion {
   };
 }
 
-function toChoices(item: RegistryItem): FounderCompatibilityBaseQuestionnaireChoice[] {
+function toChoices(item: RegistryItem, locale: AppLocale): FounderCompatibilityBaseQuestionnaireChoice[] {
   return item.choices.map((choice, index) => ({
     id: `${item.itemId}:${choice.value}`,
     question_id: item.itemId,
-    label: choice.label,
+    label: getVisibleChoiceLabel(item, String(choice.value), choice.label, locale),
     value: String(choice.value),
     sort_order: index,
   }));
 }
 
-export function buildFounderCompatibilityBaseQuestionnaire() {
-  const questions = ACTIVE_BASE_REGISTRY_ITEMS.map(toQuestion);
-  const choices = ACTIVE_BASE_REGISTRY_ITEMS.flatMap(toChoices);
+export function buildFounderCompatibilityBaseQuestionnaire(locale?: AppLocale | string | null) {
+  const resolvedLocale = normalizeLocale(locale);
+  const questions = ACTIVE_BASE_REGISTRY_ITEMS.map((item) => toQuestion(item, resolvedLocale));
+  const choices = ACTIVE_BASE_REGISTRY_ITEMS.flatMap((item) => toChoices(item, resolvedLocale));
 
   return {
     questions,
