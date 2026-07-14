@@ -29,6 +29,10 @@ import {
   getSelfReportLeverCopy,
   type SelfReportLeverBlock,
 } from "@/features/reporting/selfReportLeverContent";
+import {
+  getSelfReportValuesDisplayProfile,
+  getSelfReportValuesFallbackText,
+} from "@/features/reporting/selfReportValuesContent";
 import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
@@ -456,11 +460,16 @@ function renderCompactValuesSection(report: SelfAlignmentReport, chrome: SelfRep
   const profile = report.selfValuesProfile;
 
   if (!profile) {
+    const fallbackText = getSelfReportValuesFallbackText(
+      report.valuesModuleStatus,
+      report.valuesModulePreview,
+      report.locale
+    );
+
     return (
       <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-6">
         <p className="text-sm leading-7 text-slate-700">
-          {report.valuesModulePreview?.trim() ||
-            t(chrome.labels.valuesFallback)}
+          {report.locale === "en" ? normalizeSentence(fallbackText) : normalizeSentence(t(fallbackText))}
         </p>
         <div className="mt-4">
           <a
@@ -474,12 +483,19 @@ function renderCompactValuesSection(report: SelfAlignmentReport, chrome: SelfRep
     );
   }
 
-  const insights = profile.insights.slice(0, 2).map((item) => normalizeSentence(t(item)));
-  const watchout = profile.watchouts[0] ? normalizeSentence(t(profile.watchouts[0])) : null;
+  const displayProfile = getSelfReportValuesDisplayProfile(profile, report.locale);
+  const normalizeDisplaySentence =
+    report.locale === "en" ? normalizeSentence : (value: string) => normalizeSentence(t(value));
+  const insights = displayProfile.insights.slice(0, 2).map(normalizeDisplaySentence);
+  const watchout = displayProfile.watchouts[0]
+    ? normalizeDisplaySentence(displayProfile.watchouts[0])
+    : null;
 
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-6">
-      <p className="text-sm leading-7 text-slate-800">{normalizeSentence(t(profile.summary))}</p>
+      <p className="text-sm leading-7 text-slate-800">
+        {normalizeDisplaySentence(displayProfile.summary)}
+      </p>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
