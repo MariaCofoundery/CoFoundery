@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 import {
   getAssessmentAnswerMap,
@@ -15,6 +16,7 @@ import {
 } from "@/features/questionnaire/QuestionnaireClient";
 import { type QuestionnaireQuestion } from "@/features/questionnaire/questionnaireShared";
 import { ValuesQuestionnaire } from "@/features/questionnaire/ValuesQuestionnaire";
+import { localizeValuesQuestionsAndChoices } from "@/features/questionnaire/valuesQuestionnaireTranslations";
 import { getValuesQuestionVersionMismatch } from "@/features/reporting/valuesQuestionMeta";
 import {
   buildInvitationDashboardHref,
@@ -36,6 +38,7 @@ export default async function MeValuesPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("assessment.values");
+  const locale = getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },
@@ -232,6 +235,11 @@ export default async function MeValuesPage({
   }
 
   const choices = (choicesData ?? []) as QuestionnaireChoice[];
+  const localizedQuestionnaire = localizeValuesQuestionsAndChoices({
+    questions,
+    choices,
+    locale,
+  });
   const responses: QuestionnaireResponse[] = Object.entries(answerMap).map(([questionId, choiceValue]) => ({
     question_id: questionId,
     choice_value: choiceValue,
@@ -260,8 +268,8 @@ export default async function MeValuesPage({
 
       <ValuesQuestionnaire
         assessmentId={draft.id}
-        questions={questions}
-        choices={choices}
+        questions={localizedQuestionnaire.questions}
+        choices={localizedQuestionnaire.choices}
         responses={responses}
         completeRedirect={completeRedirect}
         title={t("title")}
