@@ -41,9 +41,9 @@ test("buildCommitmentSection keeps the German default stable", () => {
   assert.equal(section.dimension, "Commitment");
   assert.equal(
     section.interpretation,
-    "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Priorisierung, Verfuegbarkeit oder dem erwarteten Einsatzniveau im Alltag. Vor einer gemeinsamen Zusammenarbeit lohnt es sich, darueber offen zu sprechen, bevor daraus stille Erwartungen entstehen."
+    "Beim Commitment zeigen sich erkennbare Unterschiede, etwa bei Priorisierung, Verfügbarkeit oder dem erwarteten Einsatzniveau im Alltag. Vor einer gemeinsamen Zusammenarbeit lohnt es sich, darüber offen zu sprechen, bevor daraus stille Erwartungen entstehen."
   );
-  assert.equal(section.potentialTensions[0]?.topic, "Prioritaet des Startups");
+  assert.equal(section.potentialTensions[0]?.topic, "Priorität des Startups");
   assert.equal(section.potentialTensions[1]?.topic, "Einsatzniveau im Alltag");
   assert.equal(section.potentialTensions[2]?.topic, "Umgang mit Belastung");
   assert.equal(section.potentialTensions[3]?.topic, "Fokus und Nebenprojekte");

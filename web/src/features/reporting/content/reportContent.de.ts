@@ -22,7 +22,7 @@ export const REPORT_CONTENT_DE = {
       uiRightPole: "intuitiv",
       reportRightPole: "intuitiv handlungsorientiert",
       description:
-        "Beschreibt, ob Entscheidungen eher ueber Analyse und Absicherung oder staerker ueber Urteil, Gespuer und direkte Einordnung getroffen werden.",
+        "Beschreibt, ob Entscheidungen eher über Analyse und Absicherung oder stärker über Urteil, Gespür und direkte Einordnung getroffen werden.",
     },
     Risikoorientierung: {
       canonicalName: "Risikoorientierung",
@@ -33,7 +33,7 @@ export const REPORT_CONTENT_DE = {
       uiRightPole: "unsicherheitsbereit",
       reportRightPole: "unsicherheitsbereit",
       description:
-        "Beschreibt, wie Risiko, Unsicherheit und Wagnis eher vorsichtig abgesichert oder staerker als vertretbare Unsicherheit eingeordnet werden.",
+        "Beschreibt, wie Risiko, Unsicherheit und Wagnis eher vorsichtig abgesichert oder stärker als vertretbare Unsicherheit eingeordnet werden.",
     },
     "Arbeitsstruktur & Zusammenarbeit": {
       canonicalName: "Arbeitsstruktur & Zusammenarbeit",
@@ -44,7 +44,7 @@ export const REPORT_CONTENT_DE = {
       uiRightPole: "abgestimmt",
       reportRightPole: "abgestimmt",
       description:
-        "Beschreibt, wie autonom oder eng abgestimmt jemand im Alltag mit anderen arbeiten will: eher ueber klare Zustaendigkeiten und gezielte Abstimmung oder eher ueber laufenden Austausch und ein gemeinsames Bild der Arbeit.",
+        "Beschreibt, wie autonom oder eng abgestimmt jemand im Alltag mit anderen arbeiten will: eher über klare Zuständigkeiten und gezielte Abstimmung oder eher über laufenden Austausch und ein gemeinsames Bild der Arbeit.",
     },
     Commitment: {
       canonicalName: "Commitment",
@@ -55,7 +55,7 @@ export const REPORT_CONTENT_DE = {
       uiRightPole: "hoch priorisiert",
       reportRightPole: "hoch priorisiert",
       description:
-        "Beschreibt, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau eine Person fuer sich und das Team erwartet.",
+        "Beschreibt, wie stark das Startup im Alltag priorisiert wird und welches Einsatzniveau eine Person für sich und das Team erwartet.",
     },
     Konfliktstil: {
       canonicalName: "Konfliktstil",

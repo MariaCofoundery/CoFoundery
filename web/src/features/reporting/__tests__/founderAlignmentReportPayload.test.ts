@@ -95,7 +95,7 @@ test("marks new report payloads with the requested locale and localized executiv
   assert.equal(getFounderAlignmentReportPayloadLocale(englishResult.payload), "en");
   assert.equal(
     defaultResult.payload.founderReport.executiveSummary.headline,
-    "Noch keine belastbare Gesamteinschaetzung"
+    "Noch keine belastbare Gesamteinschätzung"
   );
   assert.equal(
     englishResult.payload.founderReport.executiveSummary.headline,
@@ -107,11 +107,11 @@ test("marks new report payloads with the requested locale and localized executiv
   );
   assert.equal(
     defaultResult.payload.founderReport.sections.commitment.interpretation,
-    "Fuer die Frage, welchen Stellenwert das Startup im Alltag haben soll und welches Einsatzniveau ihr erwartet, liegt derzeit noch keine belastbare Grundlage vor."
+    "Für die Frage, welchen Stellenwert das Startup im Alltag haben soll und welches Einsatzniveau ihr erwartet, liegt derzeit noch keine belastbare Grundlage vor."
   );
   assert.equal(
     defaultResult.payload.founderReport.sections.vision.interpretation,
-    "Fuer die Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, liegt derzeit noch keine tragfaehige Grundlage fuer eine gemeinsame Einschaetzung vor."
+    "Für die Frage, woran ihr unternehmerische Entscheidungen ausrichten wollt, liegt derzeit noch keine tragfähige Grundlage für eine gemeinsame Einschätzung vor."
   );
   assert.equal(
     englishResult.payload.founderReport.sections.vision.interpretation,

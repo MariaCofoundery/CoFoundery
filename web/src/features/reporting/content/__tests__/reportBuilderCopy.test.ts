@@ -29,11 +29,11 @@ test("getReportBuilderCopy returns German builder copy by default", () => {
 
   assert.deepEqual(copy.executiveSummary.fallbackFocus, [
     "Welche Erwartungen habt ihr an gemeinsame Verantwortung und Entscheidungswege?",
-    "Wo braucht ihr frueh Klarheit, damit Zusammenarbeit unter Druck stabil bleibt?",
+    "Wo braucht ihr früh Klarheit, damit Zusammenarbeit unter Druck stabil bleibt?",
   ]);
   assert.equal(
     copy.executiveSummary.focusPromptsByDimension.Commitment[0],
-    "Welche Erwartungen habt ihr an Priorisierung, Verfuegbarkeit und Einsatzniveau im Alltag?"
+    "Welche Erwartungen habt ihr an Priorisierung, Verfügbarkeit und Einsatzniveau im Alltag?"
   );
 });
 
@@ -59,14 +59,14 @@ const insightHeavyScoringResult = {
     topStrength: {
       kind: "strength",
       dimension: "Unternehmenslogik",
-      title: "Deutsche Staerke sollte nicht in EN erscheinen",
+      title: "Deutsche Stärke sollte nicht in EN erscheinen",
       priorityScore: 90,
       source: "unit_test",
     },
     topComplementaryDynamic: {
       kind: "complementary_dynamic",
       dimension: "Commitment",
-      title: "Deutsche Ergaenzung sollte nicht in EN erscheinen",
+      title: "Deutsche Ergänzung sollte nicht in EN erscheinen",
       priorityScore: 80,
       source: "unit_test",
     },
