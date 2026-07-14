@@ -2,21 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { inviteParticipantBAction } from "@/app/(product)/dashboard/actions";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
 
-function teamContextMeta(teamContext: TeamContext | null) {
+function teamContextMeta(teamContext: TeamContext | null, t: ReturnType<typeof useTranslations>) {
   if (teamContext === "existing_team") {
     return {
-      badge: "Bestehendes Team",
-      text: "Dieser Invite führt in einen Alignment-Flow für ein Team, das bereits zusammenarbeitet.",
+      badge: t("participantInvite.teamContext.existingBadge"),
+      text: t("participantInvite.teamContext.existingText"),
     };
   }
 
   return {
-    badge: "Mögliche Gründungspartnerschaft",
-    text: "Dieser Invite führt in einen Matching- und Kennenlern-Flow vor einer engeren Zusammenarbeit.",
+    badge: t("participantInvite.teamContext.preFounderBadge"),
+    text: t("participantInvite.teamContext.preFounderText"),
   };
 }
 
@@ -34,6 +35,7 @@ export function InviteParticipantForm({
   onInviteCreated,
 }: Props) {
   const router = useRouter();
+  const t = useTranslations("dashboard");
   const [label, setLabel] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [reportScope, setReportScope] = useState<"basis" | "basis_plus_values">("basis");
@@ -42,7 +44,7 @@ export function InviteParticipantForm({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ text: string; tone: "success" | "warning" } | null>(null);
   const [isPending, startTransition] = useTransition();
-  const selectedContextMeta = teamContextMeta(teamContext);
+  const selectedContextMeta = teamContextMeta(teamContext, t);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,15 +53,15 @@ export function InviteParticipantForm({
     }
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
-      setError("Bitte eine gültige E-Mail eingeben.");
+      setError(t("participantInvite.validation.email"));
       return;
     }
     if (!teamContext) {
-      setError("Bitte wähle den Team-Kontext für diese Einladung.");
+      setError(t("participantInvite.validation.teamContext"));
       return;
     }
     if (!inviteConsent) {
-      setError("Bitte bestätige die Einwilligung zur Nutzung der E-Mail-Adresse.");
+      setError(t("participantInvite.validation.consent"));
       return;
     }
 
@@ -75,7 +77,7 @@ export function InviteParticipantForm({
       formData.set("inviteConsent", inviteConsent ? "true" : "false");
       const result = await inviteParticipantBAction(formData);
       if (!result.ok) {
-        setError(result.error);
+        setError(mapParticipantInviteActionError(result.error, t));
         return;
       }
 
@@ -84,17 +86,17 @@ export function InviteParticipantForm({
 
       let nextNotice: { text: string; tone: "success" | "warning" };
       if (result.emailStatus === "sent") {
-        nextNotice = { text: "Einladung per E-Mail versendet.", tone: "success" };
+        nextNotice = { text: t("participantInvite.notice.sent"), tone: "success" };
       } else {
         try {
           await navigator.clipboard.writeText(inviteUrl);
           nextNotice = {
-            text: "E-Mail nicht versendet. Einladungslink wurde automatisch kopiert.",
+            text: t("participantInvite.notice.copied"),
             tone: "warning",
           };
         } catch {
           nextNotice = {
-            text: "E-Mail nicht versendet. Bitte nutze den Button 'Link kopieren'.",
+            text: t("participantInvite.notice.copyManually"),
             tone: "warning",
           };
         }
@@ -114,7 +116,7 @@ export function InviteParticipantForm({
         <form onSubmit={onSubmit} className="space-y-3">
           <div>
             <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-              Team- oder Projektname
+              {t("participantInvite.projectLabel")}
             </label>
             <input
               type="text"
@@ -123,12 +125,11 @@ export function InviteParticipantForm({
                 setLabel(event.target.value);
                 setNotice(null);
               }}
-              placeholder="optional, z. B. Projekt Atlas"
+              placeholder={t("participantInvite.projectPlaceholder")}
               className="mt-1 min-w-[240px] w-full rounded-lg border border-[color:var(--line)] px-3 py-2 text-xs"
             />
             <p className="mt-1 text-[11px] leading-5 text-slate-500">
-              Optional. Wenn ihr euer Matching benennen möchtet, erscheint der Name später im Dashboard
-              und in Einladungen.
+              {t("participantInvite.projectHelp")}
             </p>
           </div>
           <input
@@ -151,15 +152,15 @@ export function InviteParticipantForm({
             }
             className="w-full rounded-lg border border-[color:var(--line)] px-3 py-2 text-xs text-slate-700"
           >
-            <option value="basis">Report-Umfang: Nur Basis</option>
-            <option value="basis_plus_values">Report-Umfang: Basis + Werte-Add-on</option>
+            <option value="basis">{t("participantInvite.scopeBasis")}</option>
+            <option value="basis_plus_values">{t("participantInvite.scopeBasisValues")}</option>
           </select>
           <div className="rounded-xl border border-cyan-100 bg-cyan-50/70 p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-              Team-Kontext
+              {t("participantInvite.teamContext.label")}
             </p>
             <p className="mt-2 text-xs leading-6 text-slate-600">
-              So ist früh klar, ob ihr einen Matching-Flow oder ein Alignment für ein bestehendes Team startet.
+              {t("participantInvite.teamContext.help")}
             </p>
             <div className="mt-3 grid gap-2">
               <button
@@ -174,7 +175,7 @@ export function InviteParticipantForm({
                     : "border-slate-200 bg-white/90 text-slate-700 hover:border-cyan-200"
                 }`}
               >
-                Wir überlegen, zusammenzuarbeiten
+                {t("participantInvite.teamContext.preFounder")}
               </button>
               <button
                 type="button"
@@ -188,7 +189,7 @@ export function InviteParticipantForm({
                     : "border-slate-200 bg-white/90 text-slate-700 hover:border-cyan-200"
                 }`}
               >
-                Wir arbeiten bereits zusammen
+                {t("participantInvite.teamContext.existingTeam")}
               </button>
             </div>
             <div className="mt-3 rounded-xl border border-white/80 bg-white/85 px-3 py-3">
@@ -206,11 +207,10 @@ export function InviteParticipantForm({
                 setInviteConsent(event.target.checked);
                 setNotice(null);
               }}
-              className="mt-0.5"
+            className="mt-0.5"
             />
             <span>
-              Ich bestätige, dass ich die E-Mail-Adresse für die Einladung zur Analyse verwenden darf
-              (zweckgebunden für dieses Matching).
+              {t("participantInvite.consent")}
             </span>
           </label>
           <button
@@ -218,12 +218,12 @@ export function InviteParticipantForm({
             disabled={isPending}
             className="rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_10px_24px_rgba(103,232,249,0.16)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
           >
-            {isPending ? "Sende..." : "Potenziellen Co-Founder einladen"}
+            {isPending ? t("participantInvite.submitPending") : t("participantInvite.submit")}
           </button>
         </form>
       ) : (
         <p className="text-xs text-[color:var(--muted)]">
-          Einladung erst nach Abschluss deiner eigenen Analyse möglich.
+          {t("participantInvite.disabled")}
         </p>
       )}
       {error ? <p className="mt-2 text-xs text-red-700">{error}</p> : null}
@@ -239,8 +239,17 @@ export function InviteParticipantForm({
         </p>
       ) : null}
       <p className="mt-2 text-[11px] leading-5 text-slate-500">
-        Aktuell wird der Einladungslink manuell geteilt. Ein späterer E-Mail-Versand kann denselben Link verwenden.
+        {t("participantInvite.manualLinkHint")}
       </p>
     </div>
   );
+}
+
+function mapParticipantInviteActionError(reason: string, t: ReturnType<typeof useTranslations>) {
+  if (reason === "not_authenticated") return t("participantInvite.actionErrors.notAuthenticated");
+  if (reason === "ungueltige_email") return t("participantInvite.actionErrors.invalidEmail");
+  if (reason === "ungueltiger_teamkontext") return t("participantInvite.actionErrors.invalidTeamContext");
+  if (reason === "legacy_sessions_disabled") return t("participantInvite.actionErrors.legacyDisabled");
+  if (reason === "invite_create_failed") return t("participantInvite.actionErrors.createFailed");
+  return t("participantInvite.actionErrors.generic");
 }

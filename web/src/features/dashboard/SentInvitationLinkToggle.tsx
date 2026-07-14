@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { getSentInvitationLinkAction } from "@/app/(product)/dashboard/actions";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -16,22 +17,23 @@ type LoadState = {
 
 const LINKABLE_STATUSES = new Set(["sent", "opened"]);
 
-function mapStatusHint(status: string) {
+function mapStatusHint(status: string, t: ReturnType<typeof useTranslations>) {
   const normalized = status.trim().toLowerCase();
-  if (normalized === "accepted") return "Link nicht mehr verfügbar: Einladung bereits angenommen.";
-  if (normalized === "expired") return "Link nicht mehr verfügbar: Einladung abgelaufen.";
-  if (normalized === "revoked") return "Link nicht mehr verfügbar: Einladung widerrufen.";
-  return "Link für diesen Status nicht mehr verfügbar.";
+  if (normalized === "accepted") return t("sentInvitationLink.status.accepted");
+  if (normalized === "expired") return t("sentInvitationLink.status.expired");
+  if (normalized === "revoked") return t("sentInvitationLink.status.revoked");
+  return t("sentInvitationLink.status.unavailable");
 }
 
-function mapActionError(reason: string) {
-  if (reason === "status_not_linkable") return "Link für diese Einladung nicht mehr verfügbar.";
-  if (reason === "not_found") return "Einladung nicht gefunden.";
-  if (reason === "not_authenticated") return "Bitte erneut anmelden.";
-  return "Link konnte nicht geladen werden.";
+function mapActionError(reason: string, t: ReturnType<typeof useTranslations>) {
+  if (reason === "status_not_linkable") return t("sentInvitationLink.errors.statusNotLinkable");
+  if (reason === "not_found") return t("sentInvitationLink.errors.notFound");
+  if (reason === "not_authenticated") return t("sentInvitationLink.errors.notAuthenticated");
+  return t("sentInvitationLink.errors.loadFailed");
 }
 
 export function SentInvitationLinkToggle({ invitationId, status }: Props) {
+  const t = useTranslations("dashboard");
   const [isOpen, setIsOpen] = useState(false);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
   const [state, setState] = useState<LoadState>({ inviteUrl: null, error: null });
@@ -60,7 +62,7 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
     startTransition(async () => {
       const result = await getSentInvitationLinkAction(invitationId);
       if (!result.ok) {
-        setState({ inviteUrl: null, error: mapActionError(result.reason) });
+        setState({ inviteUrl: null, error: mapActionError(result.reason, t) });
         return;
       }
       const absoluteUrl = toAbsoluteUrl(result.inviteUrl);
@@ -72,16 +74,16 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
     if (!state.inviteUrl) return;
     try {
       await navigator.clipboard.writeText(state.inviteUrl);
-      setCopyNotice("Link kopiert.");
+      setCopyNotice(t("sentInvitationLink.copySuccess"));
     } catch {
-      setCopyNotice("Kopieren nicht möglich. Bitte Link manuell kopieren.");
+      setCopyNotice(t("sentInvitationLink.copyError"));
     }
   };
 
   return (
     <div className="mt-2">
       {!isLinkable ? (
-        <p className="text-xs text-slate-600">{mapStatusHint(normalizedStatus)}</p>
+        <p className="text-xs text-slate-600">{mapStatusHint(normalizedStatus, t)}</p>
       ) : (
         <>
           <button
@@ -89,13 +91,13 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
             onClick={onToggle}
             className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
           >
-            {isOpen ? "Link ausblenden" : "Link anzeigen"}
+            {isOpen ? t("sentInvitationLink.hide") : t("sentInvitationLink.show")}
           </button>
 
           {isOpen ? (
             <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50/70 p-3">
               {isPending ? (
-                <p className="text-xs text-slate-600">Link wird geladen...</p>
+                <p className="text-xs text-slate-600">{t("sentInvitationLink.loading")}</p>
               ) : state.error ? (
                 <p className="text-xs text-amber-700">{state.error}</p>
               ) : state.inviteUrl ? (
@@ -108,12 +110,12 @@ export function SentInvitationLinkToggle({ invitationId, status }: Props) {
                     onClick={onCopy}
                     className="mt-2 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
                   >
-                    Link kopieren
+                    {t("sentInvitationLink.copy")}
                   </button>
                   {copyNotice ? <p className="mt-2 text-xs text-slate-600">{copyNotice}</p> : null}
                 </>
               ) : (
-                <p className="text-xs text-slate-600">Kein Link verfügbar.</p>
+                <p className="text-xs text-slate-600">{t("sentInvitationLink.empty")}</p>
               )}
             </div>
           ) : null}

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
@@ -12,6 +13,7 @@ function toAbsoluteUrl(path: string) {
 
 export function CoFounderInviteForm() {
   const router = useRouter();
+  const t = useTranslations("dashboard.coFounderInviteForm");
   const [label, setLabel] = useState("");
   const [email, setEmail] = useState("");
   const [includeValues, setIncludeValues] = useState(false);
@@ -27,18 +29,23 @@ export function CoFounderInviteForm() {
   const [isPending, startTransition] = useTransition();
 
   const selectedModulesLabel = useMemo(() => {
-    return includeValues ? "Basis, Werte" : "Basis";
-  }, [includeValues]);
+    return includeValues ? t("modules.selectedBasisValues") : t("modules.selectedBasis");
+  }, [includeValues, t]);
+
+  const teamContextLabel =
+    teamContext === "existing_team"
+      ? t("teamContext.existingTeam")
+      : t("teamContext.preFounder");
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
-      setError("Bitte eine gültige E-Mail-Adresse eingeben.");
+      setError(t("validation.email"));
       return;
     }
     if (!teamContext) {
-      setError("Bitte wähle aus, ob ihr euch erst kennenlernt oder bereits zusammenarbeitet.");
+      setError(t("validation.teamContext"));
       return;
     }
 
@@ -57,7 +64,7 @@ export function CoFounderInviteForm() {
       if (!result.ok) {
         setInviteUrl(null);
         setResultState(null);
-        setError(result.error);
+        setError(mapInviteActionError(result.error, t));
         return;
       }
 
@@ -69,13 +76,12 @@ export function CoFounderInviteForm() {
           ? {
               tone: "success",
               recipient: result.emailRecipient,
-              message: `Die Einladung wurde an ${result.emailRecipient} versendet.`,
+              message: t("result.sentMessage", { email: result.emailRecipient }),
             }
           : {
               tone: "warning",
               recipient: result.emailRecipient,
-              message:
-                "Die Einladung wurde erstellt, aber die E-Mail konnte nicht versendet werden. Teile den Link bitte manuell.",
+              message: t("result.manualShareMessage"),
             }
       );
       router.refresh();
@@ -86,9 +92,9 @@ export function CoFounderInviteForm() {
     if (!inviteUrl) return;
     try {
       await navigator.clipboard.writeText(inviteUrl);
-      setCopyNotice("Link kopiert.");
+      setCopyNotice(t("copy.success"));
     } catch {
-      setCopyNotice("Kopieren nicht möglich. Bitte Link manuell kopieren.");
+      setCopyNotice(t("copy.error"));
     }
   };
 
@@ -97,33 +103,32 @@ export function CoFounderInviteForm() {
       id="cofounder-invite-form"
       className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
     >
-      <h1 className="text-xl font-semibold text-slate-900">Co-Founder einladen</h1>
+      <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.
+        {t("intro")}
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
         <div>
           <label htmlFor="invite-label" className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            Name eures Teams oder Projekts
+            {t("label.projectName")}
           </label>
           <input
             id="invite-label"
             type="text"
             value={label}
             onChange={(event) => setLabel(event.target.value)}
-            placeholder="optional, z. B. Cofoundery oder Projekt Atlas"
+            placeholder={t("placeholder.projectName")}
             className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           />
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Optional. Wenn ihr euer Matching benennen möchtet, nutzen wir den Namen später dort, wo
-            euer Team sichtbar wird.
+            {t("help.projectName")}
           </p>
         </div>
 
         <div>
           <label htmlFor="invite-email" className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            E-Mail-Adresse
+            {t("label.email")}
           </label>
           <input
             id="invite-email"
@@ -138,10 +143,10 @@ export function CoFounderInviteForm() {
 
         <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            Team-Kontext
+            {t("teamContext.label")}
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.
+            {t("teamContext.help")}
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
@@ -157,7 +162,7 @@ export function CoFounderInviteForm() {
               }`}
               aria-pressed={teamContext === "pre_founder"}
             >
-              <p className="text-sm font-semibold text-slate-900">Wir überlegen zusammenzuarbeiten</p>
+              <p className="text-sm font-semibold text-slate-900">{t("teamContext.preFounder")}</p>
             </button>
             <button
               type="button"
@@ -172,27 +177,26 @@ export function CoFounderInviteForm() {
               }`}
               aria-pressed={teamContext === "existing_team"}
             >
-              <p className="text-sm font-semibold text-slate-900">Wir arbeiten bereits zusammen</p>
+              <p className="text-sm font-semibold text-slate-900">{t("teamContext.existingTeam")}</p>
             </button>
           </div>
           <p className="mt-3 text-xs leading-5 text-slate-500">
-            Dieser Kontext beeinflusst später eure Auswertung.
+            {t("teamContext.reportHint")}
           </p>
           <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
-            Die Ergebnisse gehören euch beiden. Wenn eine Person ihre Daten löscht, werden auch
-            die gemeinsamen Ergebnisse entfernt.
+            {t("teamContext.dataHint")}
           </p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">Module</p>
+          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">{t("modules.label")}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Für den produktiven Founder-Flow startet ihr mit Basis und optional Werte. Report und Workbook bauen anschließend auf diesen beiden Modulen auf.
+            {t("modules.help")}
           </p>
           <div className="mt-3 space-y-2 text-sm text-slate-700">
             <label className="flex items-center gap-2">
               <input type="checkbox" checked disabled className="h-4 w-4" />
-              <span>Basis (aktiv)</span>
+              <span>{t("modules.baseActive")}</span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -201,7 +205,7 @@ export function CoFounderInviteForm() {
                 onChange={(event) => setIncludeValues(event.target.checked)}
                 className="h-4 w-4"
               />
-              <span>Werte (optional)</span>
+              <span>{t("modules.valuesOptional")}</span>
             </label>
           </div>
         </div>
@@ -211,10 +215,10 @@ export function CoFounderInviteForm() {
           disabled={isPending}
           className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm text-slate-900 shadow-[0_10px_30px_rgba(103,232,249,0.22)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
         >
-          {isPending ? "Einladung wird gesendet..." : "Einladung senden"}
+          {isPending ? t("submit.pending") : t("submit.idle")}
         </button>
         <p className="text-xs text-slate-500">
-          Fallback: Wenn der Versand scheitert, kannst du den Einladungslink danach manuell teilen.
+          {t("fallbackHint")}
         </p>
       </form>
 
@@ -233,7 +237,7 @@ export function CoFounderInviteForm() {
               resultState.tone === "success" ? "text-emerald-800" : "text-amber-800"
             }`}
           >
-            {resultState.tone === "success" ? "Einladung versendet" : "Einladung erstellt"}
+            {resultState.tone === "success" ? t("result.sentTitle") : t("result.createdTitle")}
           </p>
           <p
             className={`mt-2 text-sm ${
@@ -247,7 +251,7 @@ export function CoFounderInviteForm() {
               resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
             }`}
           >
-            Aktive Module: {selectedModulesLabel}
+            {t("result.activeModules", { modules: selectedModulesLabel })}
           </p>
           {teamContext ? (
             <p
@@ -255,7 +259,7 @@ export function CoFounderInviteForm() {
                 resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
               }`}
             >
-              Kontext: {teamContext === "existing_team" ? "Wir arbeiten bereits zusammen" : "Wir überlegen, zusammenzuarbeiten"}
+              {t("result.context", { context: teamContextLabel })}
             </p>
           ) : null}
           <p
@@ -264,8 +268,8 @@ export function CoFounderInviteForm() {
             }`}
           >
             {resultState.tone === "success"
-              ? "Falls du zusätzlich manuell nachfassen willst, kannst du denselben Einladungslink kopieren."
-              : "Die Einladung ist gültig. Nutze den Link jetzt als manuellen Rettungsweg, damit der Flow nicht blockiert."}
+              ? t("result.successManualHint")
+              : t("result.warningManualHint")}
           </p>
           <p
             className={`mt-2 break-all rounded-md border bg-white px-3 py-2 text-xs ${
@@ -286,13 +290,13 @@ export function CoFounderInviteForm() {
                   : "border-amber-300 text-amber-900"
               }`}
             >
-              Einladungslink kopieren
+              {t("copy.button")}
             </button>
             <a
               href="/dashboard"
               className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700"
             >
-              Zum Dashboard
+              {t("dashboardCta")}
             </a>
           </div>
           {copyNotice ? (
@@ -308,4 +312,15 @@ export function CoFounderInviteForm() {
       ) : null}
     </section>
   );
+}
+
+function mapInviteActionError(
+  reason: string,
+  t: ReturnType<typeof useTranslations<"dashboard.coFounderInviteForm">>
+) {
+  if (reason === "not_authenticated") return t("actionErrors.notAuthenticated");
+  if (reason === "ungueltige_email") return t("actionErrors.invalidEmail");
+  if (reason === "ungueltiger_teamkontext") return t("actionErrors.invalidTeamContext");
+  if (reason === "invite_create_failed") return t("actionErrors.createFailed");
+  return t("actionErrors.generic");
 }

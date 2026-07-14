@@ -227,6 +227,143 @@
       "libraryText": "A curated library should later make relevant prompts, models, and practical tools for founder collaboration easy to use."
     }
   },
+  "coFounderInvitePage": {
+    "backToDashboard": "Back to dashboard"
+  },
+  "inviteStart": {
+    "eyebrow": "Currently free during the test phase.",
+    "title": "Start your matching",
+    "stepInvite": "Invite your co-founder.",
+    "stepReport": "After that, you receive your matching report and work together in the workbook.",
+    "inviteCta": "Invite co-founder",
+    "supportCta": "Support the test phase (€39)",
+    "paymentWindowHint": "Payment opens in a new window. After that, you can simply continue here.",
+    "invoiceHint": "If you need an invoice, send us your billing details by email after payment.",
+    "regularPrice": "Regular price later: €99 per founder team"
+  },
+  "coFounderInviteForm": {
+    "title": "Invite a co-founder",
+    "intro": "Choose your context and send the invitation directly by email. If needed, you can still share the link manually afterwards.",
+    "label": {
+      "projectName": "Team or project name",
+      "email": "Email address"
+    },
+    "placeholder": {
+      "projectName": "optional, e.g. Cofoundery or Project Atlas"
+    },
+    "help": {
+      "projectName": "Optional. If you want to name your matching, we will use this name later wherever your team becomes visible."
+    },
+    "validation": {
+      "email": "Please enter a valid email address.",
+      "teamContext": "Please choose whether you are exploring working together or already work together."
+    },
+    "actionErrors": {
+      "notAuthenticated": "Please sign in again.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidTeamContext": "Please choose whether you are exploring working together or already work together.",
+      "createFailed": "The invitation could not be created right now. Please try again.",
+      "generic": "The invitation could not be created right now. Please try again."
+    },
+    "teamContext": {
+      "label": "Team context",
+      "help": "Choose deliberately whether you are exploring a potential collaboration or already working together.",
+      "preFounder": "We are exploring working together",
+      "existingTeam": "We already work together",
+      "reportHint": "This context will shape your later report.",
+      "dataHint": "The results belong to both of you. If one person deletes their data, the shared results are removed as well."
+    },
+    "modules": {
+      "label": "Modules",
+      "help": "For the productive founder flow, you start with the foundation module and optional values. Report and workbook then build on these modules.",
+      "baseActive": "Foundation (active)",
+      "valuesOptional": "Values (optional)",
+      "selectedBasis": "Foundation",
+      "selectedBasisValues": "Foundation, values"
+    },
+    "submit": {
+      "idle": "Send invitation",
+      "pending": "Sending invitation..."
+    },
+    "fallbackHint": "Fallback: If sending fails, you can share the invitation link manually afterwards.",
+    "result": {
+      "sentTitle": "Invitation sent",
+      "createdTitle": "Invitation created",
+      "sentMessage": "The invitation was sent to {email}.",
+      "manualShareMessage": "The invitation was created, but the email could not be sent. Please share the link manually.",
+      "activeModules": "Active modules: {modules}",
+      "context": "Context: {context}",
+      "successManualHint": "If you want to follow up manually as well, you can copy the same invitation link.",
+      "warningManualHint": "The invitation is valid. Use the link now as a manual fallback so the flow does not get blocked."
+    },
+    "copy": {
+      "button": "Copy invitation link",
+      "success": "Link copied.",
+      "error": "Copying is not possible. Please copy the link manually."
+    },
+    "dashboardCta": "Go to dashboard"
+  },
+  "participantInvite": {
+    "projectLabel": "Team or project name",
+    "projectPlaceholder": "optional, e.g. Project Atlas",
+    "projectHelp": "Optional. If you want to name your matching, the name appears later in the dashboard and invitations.",
+    "scopeBasis": "Report scope: Foundation only",
+    "scopeBasisValues": "Report scope: Foundation + values add-on",
+    "consent": "I confirm that I may use this email address for the invitation to the analysis flow (only for this matching).",
+    "submit": "Invite potential co-founder",
+    "submitPending": "Sending...",
+    "disabled": "You can invite someone after completing your own analysis.",
+    "manualLinkHint": "The invitation link is currently shared manually. A later email delivery can use the same link.",
+    "validation": {
+      "email": "Please enter a valid email address.",
+      "teamContext": "Please choose the team context for this invitation.",
+      "consent": "Please confirm consent to use this email address."
+    },
+    "actionErrors": {
+      "notAuthenticated": "Please sign in again.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidTeamContext": "Please choose the team context for this invitation.",
+      "legacyDisabled": "This older invitation flow is currently unavailable.",
+      "createFailed": "The invitation could not be created right now. Please try again.",
+      "generic": "The invitation could not be created right now. Please try again."
+    },
+    "notice": {
+      "sent": "Invitation sent by email.",
+      "copied": "Email not sent. The invitation link was copied automatically.",
+      "copyManually": "Email not sent. Please use the \"Copy link\" button."
+    },
+    "teamContext": {
+      "label": "Team context",
+      "help": "This makes clear early on whether you are starting a matching flow or alignment for an existing team.",
+      "preFounder": "We are exploring working together",
+      "existingTeam": "We already work together",
+      "existingBadge": "Existing team",
+      "existingText": "This invite leads into an alignment flow for a team that already works together.",
+      "preFounderBadge": "Potential founding partnership",
+      "preFounderText": "This invite leads into a matching and getting-to-know-each-other flow before closer collaboration."
+    }
+  },
+  "sentInvitationLink": {
+    "show": "Show link",
+    "hide": "Hide link",
+    "loading": "Loading link...",
+    "copy": "Copy link",
+    "copySuccess": "Link copied.",
+    "copyError": "Copying is not possible. Please copy the link manually.",
+    "empty": "No link available.",
+    "status": {
+      "accepted": "Link no longer available: invitation already accepted.",
+      "expired": "Link no longer available: invitation expired.",
+      "revoked": "Link no longer available: invitation revoked.",
+      "unavailable": "Link no longer available for this status."
+    },
+    "errors": {
+      "statusNotLinkable": "Link no longer available for this invitation.",
+      "notFound": "Invitation not found.",
+      "notAuthenticated": "Please sign in again.",
+      "loadFailed": "Link could not be loaded."
+    }
+  },
   "date": {
     "unknown": "unknown",
     "locale": "en-US"

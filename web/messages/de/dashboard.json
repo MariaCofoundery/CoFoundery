@@ -227,6 +227,143 @@
       "libraryText": "Eine kuratierte Bibliothek soll euch später passende Impulse, Modelle und konkrete Hilfen für Founder-Zusammenarbeit direkt anschlussfähig machen."
     }
   },
+  "coFounderInvitePage": {
+    "backToDashboard": "Zurück zum Dashboard"
+  },
+  "inviteStart": {
+    "eyebrow": "Aktuell in der Testphase kostenlos.",
+    "title": "Starte euer Matching",
+    "stepInvite": "Du lädst deinen Co-Founder ein.",
+    "stepReport": "Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook.",
+    "inviteCta": "Co-Founder einladen",
+    "supportCta": "Testphase unterstützen (39 €)",
+    "paymentWindowHint": "Die Zahlung öffnet ein neues Fenster. Danach könnt ihr hier einfach weitermachen.",
+    "invoiceHint": "Wenn ihr eine Rechnung braucht, schickt uns eure Rechnungsdaten nach der Zahlung per E-Mail.",
+    "regularPrice": "Regulärer Preis später: 99 € pro Founder-Team"
+  },
+  "coFounderInviteForm": {
+    "title": "Co-Founder einladen",
+    "intro": "Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.",
+    "label": {
+      "projectName": "Name eures Teams oder Projekts",
+      "email": "E-Mail-Adresse"
+    },
+    "placeholder": {
+      "projectName": "optional, z. B. Cofoundery oder Projekt Atlas"
+    },
+    "help": {
+      "projectName": "Optional. Wenn ihr euer Matching benennen möchtet, nutzen wir den Namen später dort, wo euer Team sichtbar wird."
+    },
+    "validation": {
+      "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "teamContext": "Bitte wähle aus, ob ihr euch erst kennenlernt oder bereits zusammenarbeitet."
+    },
+    "actionErrors": {
+      "notAuthenticated": "Bitte melde dich erneut an.",
+      "invalidEmail": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "invalidTeamContext": "Bitte wähle aus, ob ihr euch erst kennenlernt oder bereits zusammenarbeitet.",
+      "createFailed": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
+      "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."
+    },
+    "teamContext": {
+      "label": "Team-Kontext",
+      "help": "Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.",
+      "preFounder": "Wir überlegen zusammenzuarbeiten",
+      "existingTeam": "Wir arbeiten bereits zusammen",
+      "reportHint": "Dieser Kontext beeinflusst später eure Auswertung.",
+      "dataHint": "Die Ergebnisse gehören euch beiden. Wenn eine Person ihre Daten löscht, werden auch die gemeinsamen Ergebnisse entfernt."
+    },
+    "modules": {
+      "label": "Module",
+      "help": "Für den produktiven Founder-Flow startet ihr mit Basis und optional Werte. Report und Workbook bauen anschließend auf diesen beiden Modulen auf.",
+      "baseActive": "Basis (aktiv)",
+      "valuesOptional": "Werte (optional)",
+      "selectedBasis": "Basis",
+      "selectedBasisValues": "Basis, Werte"
+    },
+    "submit": {
+      "idle": "Einladung senden",
+      "pending": "Einladung wird gesendet..."
+    },
+    "fallbackHint": "Fallback: Wenn der Versand scheitert, kannst du den Einladungslink danach manuell teilen.",
+    "result": {
+      "sentTitle": "Einladung versendet",
+      "createdTitle": "Einladung erstellt",
+      "sentMessage": "Die Einladung wurde an {email} versendet.",
+      "manualShareMessage": "Die Einladung wurde erstellt, aber die E-Mail konnte nicht versendet werden. Teile den Link bitte manuell.",
+      "activeModules": "Aktive Module: {modules}",
+      "context": "Kontext: {context}",
+      "successManualHint": "Falls du zusätzlich manuell nachfassen willst, kannst du denselben Einladungslink kopieren.",
+      "warningManualHint": "Die Einladung ist gültig. Nutze den Link jetzt als manuellen Rettungsweg, damit der Flow nicht blockiert."
+    },
+    "copy": {
+      "button": "Einladungslink kopieren",
+      "success": "Link kopiert.",
+      "error": "Kopieren nicht möglich. Bitte Link manuell kopieren."
+    },
+    "dashboardCta": "Zum Dashboard"
+  },
+  "participantInvite": {
+    "projectLabel": "Team- oder Projektname",
+    "projectPlaceholder": "optional, z. B. Projekt Atlas",
+    "projectHelp": "Optional. Wenn ihr euer Matching benennen möchtet, erscheint der Name später im Dashboard und in Einladungen.",
+    "scopeBasis": "Report-Umfang: Nur Basis",
+    "scopeBasisValues": "Report-Umfang: Basis + Werte-Add-on",
+    "consent": "Ich bestätige, dass ich die E-Mail-Adresse für die Einladung zur Analyse verwenden darf (zweckgebunden für dieses Matching).",
+    "submit": "Potenziellen Co-Founder einladen",
+    "submitPending": "Sende...",
+    "disabled": "Einladung erst nach Abschluss deiner eigenen Analyse möglich.",
+    "manualLinkHint": "Aktuell wird der Einladungslink manuell geteilt. Ein späterer E-Mail-Versand kann denselben Link verwenden.",
+    "validation": {
+      "email": "Bitte eine gültige E-Mail eingeben.",
+      "teamContext": "Bitte wähle den Team-Kontext für diese Einladung.",
+      "consent": "Bitte bestätige die Einwilligung zur Nutzung der E-Mail-Adresse."
+    },
+    "actionErrors": {
+      "notAuthenticated": "Bitte melde dich erneut an.",
+      "invalidEmail": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "invalidTeamContext": "Bitte wähle den Team-Kontext für diese Einladung.",
+      "legacyDisabled": "Dieser alte Einladungsflow ist aktuell nicht verfügbar.",
+      "createFailed": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
+      "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."
+    },
+    "notice": {
+      "sent": "Einladung per E-Mail versendet.",
+      "copied": "E-Mail nicht versendet. Einladungslink wurde automatisch kopiert.",
+      "copyManually": "E-Mail nicht versendet. Bitte nutze den Button 'Link kopieren'."
+    },
+    "teamContext": {
+      "label": "Team-Kontext",
+      "help": "So ist früh klar, ob ihr einen Matching-Flow oder ein Alignment für ein bestehendes Team startet.",
+      "preFounder": "Wir überlegen, zusammenzuarbeiten",
+      "existingTeam": "Wir arbeiten bereits zusammen",
+      "existingBadge": "Bestehendes Team",
+      "existingText": "Dieser Invite führt in einen Alignment-Flow für ein Team, das bereits zusammenarbeitet.",
+      "preFounderBadge": "Mögliche Gründungspartnerschaft",
+      "preFounderText": "Dieser Invite führt in einen Matching- und Kennenlern-Flow vor einer engeren Zusammenarbeit."
+    }
+  },
+  "sentInvitationLink": {
+    "show": "Link anzeigen",
+    "hide": "Link ausblenden",
+    "loading": "Link wird geladen...",
+    "copy": "Link kopieren",
+    "copySuccess": "Link kopiert.",
+    "copyError": "Kopieren nicht möglich. Bitte Link manuell kopieren.",
+    "empty": "Kein Link verfügbar.",
+    "status": {
+      "accepted": "Link nicht mehr verfügbar: Einladung bereits angenommen.",
+      "expired": "Link nicht mehr verfügbar: Einladung abgelaufen.",
+      "revoked": "Link nicht mehr verfügbar: Einladung widerrufen.",
+      "unavailable": "Link für diesen Status nicht mehr verfügbar."
+    },
+    "errors": {
+      "statusNotLinkable": "Link für diese Einladung nicht mehr verfügbar.",
+      "notFound": "Einladung nicht gefunden.",
+      "notAuthenticated": "Bitte erneut anmelden.",
+      "loadFailed": "Link konnte nicht geladen werden."
+    }
+  },
   "date": {
     "unknown": "unbekannt",
     "locale": "de-DE"
