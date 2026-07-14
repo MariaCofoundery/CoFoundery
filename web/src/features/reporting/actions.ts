@@ -25,6 +25,7 @@ import {
   toSelfParticipantDebugReport,
 } from "@/features/reporting/selfReportScoring";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
+import { resolveSelfReportLocale } from "@/features/reporting/selfReportLocale";
 import {
   computeValuesContinuumScore,
   scoreSelfValuesProfile,
@@ -1750,8 +1751,15 @@ export async function debug_invitation_readiness(
   };
 }
 
-export async function getLatestSelfAlignmentReport(): Promise<SelfAlignmentReport | null> {
+type GetLatestSelfAlignmentReportOptions = {
+  locale?: AppLocale | string | null;
+};
+
+export async function getLatestSelfAlignmentReport(
+  options: GetLatestSelfAlignmentReportOptions = {}
+): Promise<SelfAlignmentReport | null> {
   const supabase = await createClient();
+  const locale = resolveSelfReportLocale(options.locale);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -1889,6 +1897,7 @@ export async function getLatestSelfAlignmentReport(): Promise<SelfAlignmentRepor
 
   return {
     sessionId: baseAssessment.id,
+    locale,
     createdAt: baseAssessment.created_at,
     participantAId: user.id,
     participantAName: profileName,

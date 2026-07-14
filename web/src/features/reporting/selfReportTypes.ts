@@ -1,5 +1,6 @@
 import type { FounderDimensionKey } from "@/features/reporting/founderDimensionMeta";
 import type { DebugQuestionEntry, SelfValuesProfile, SessionAlignmentReport } from "@/features/reporting/types";
+import type { AppLocale } from "@/i18n/config";
 
 export type SelfRadarSeries = Record<FounderDimensionKey, number | null>;
 export type SelfInsightDimensionKey = FounderDimensionKey | "profile";
@@ -34,6 +35,7 @@ export type SelfParticipantDebugReport = {
 
 export type SelfAlignmentReport = {
   sessionId: string;
+  locale: AppLocale;
   createdAt: string | null;
   participantAId: string | null;
   participantAName: string;

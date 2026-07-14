@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
@@ -11,6 +13,8 @@ import {
 } from "@/features/onboarding/invitationFlow";
 
 export default async function MeReportPage() {
+  const locale = getRequestLocale();
+  const t = await getTranslations("report.common");
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,7 +27,7 @@ export default async function MeReportPage() {
   const invitationId = await resolveActiveInvitationIdForCurrentUser();
   const dashboardHref = invitationId ? buildInvitationDashboardHref(invitationId) : "/dashboard";
   const baseHref = invitationId ? buildInvitationQuestionnaireHref(invitationId, "base") : "/me/base";
-  const report = await getLatestSelfAlignmentReport();
+  const report = await getLatestSelfAlignmentReport({ locale });
 
   if (!report) {
     return (
@@ -55,7 +59,7 @@ export default async function MeReportPage() {
               href={dashboardHref}
               className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
             >
-              Zurück zum Dashboard
+              {t("backToDashboard")}
             </a>
             <PrintReportButton eventName="self_report_print_clicked" module="base" />
           </div>

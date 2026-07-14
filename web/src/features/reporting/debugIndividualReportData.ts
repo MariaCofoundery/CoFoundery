@@ -113,6 +113,7 @@ function buildReport(input: {
 }): SelfAlignmentReport {
   return {
     sessionId: `debug-individual-${input.id}`,
+    locale: "de",
     createdAt: input.createdAt,
     participantAId: `debug-${input.id}`,
     participantAName: input.participantAName,
