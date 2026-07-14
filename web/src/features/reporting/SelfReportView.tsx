@@ -2,9 +2,10 @@ import { DimensionOverview } from "@/features/reporting/DimensionOverview";
 import { DimensionScale } from "@/features/reporting/DimensionScale";
 import {
   FOUNDER_DIMENSION_ORDER,
-  FOUNDER_DIMENSION_META,
   type FounderDimensionKey,
 } from "@/features/reporting/founderDimensionMeta";
+import { getReportContent } from "@/features/reporting/content/reportContent";
+import { getSelfReportChrome, type SelfReportChrome } from "@/features/reporting/selfReportChrome";
 import {
   buildSelfReportSelection,
   buildSelfReportSignals,
@@ -49,6 +50,8 @@ type LeverBlock = {
 };
 
 export function SelfReportView({ report }: Props) {
+  const chrome = getSelfReportChrome(report.locale);
+  const reportContent = getReportContent(report.locale);
   const selection = buildSelfReportSelection(report.scoresA);
   const signals = buildSelfReportSignals(report.scoresA);
   const coreParagraphs = buildCorePatternParagraphs(selection);
@@ -66,26 +69,30 @@ export function SelfReportView({ report }: Props) {
       <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-4xl">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">1. Kernmuster</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-900">So funktioniert dein Profil gerade</h2>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+              {chrome.sections.corePattern}
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-900">
+              {chrome.sections.profileNow}
+            </h2>
             <DimensionOverview scores={report.scoresA} />
             <div className="mt-5 space-y-4">
               {coreParagraphs.map((paragraph) => (
                 <article key={paragraph.text} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
-                  {paragraph.highSignal ? <SignalBadge label="High-Signal" tone="high" /> : null}
+                  {paragraph.highSignal ? <SignalBadge label={chrome.labels.highSignal} tone="high" /> : null}
                   <p className="mt-2 text-sm leading-7 text-slate-800">{paragraph.text}</p>
                 </article>
               ))}
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
-              <SignalBadge label="Basisprofil abgeschlossen" tone="neutral" />
+              <SignalBadge label={chrome.labels.baseCompleted} tone="neutral" />
               <SignalBadge
                 label={
                   report.valuesModuleStatus === "completed"
-                    ? "Werteprofil verfügbar"
+                    ? chrome.labels.valuesAvailable
                     : report.valuesModuleStatus === "in_progress"
-                      ? "Werteprofil in Bearbeitung"
-                      : "Werteprofil optional"
+                      ? chrome.labels.valuesInProgress
+                      : chrome.labels.valuesOptional
                 }
                 tone={report.valuesModuleStatus === "completed" ? "accent" : "soft"}
               />
@@ -95,27 +102,30 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">2. So wirkst du im Alltag</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          {chrome.sections.everyday}
+        </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {everydayBlocks.map((block) => (
             <article key={`${block.dimension}-${block.title}`} className="rounded-2xl border border-slate-200/80 bg-white p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                  {FOUNDER_DIMENSION_META[block.dimension].canonicalName}
+                  {reportContent.dimensions[block.dimension].canonicalName}
                 </p>
-                {block.highSignal ? <SignalBadge label="High-Signal" tone="soft" /> : null}
+                {block.highSignal ? <SignalBadge label={chrome.labels.highSignal} tone="soft" /> : null}
               </div>
               <h3 className="mt-3 text-base font-semibold text-slate-900">{block.title}</h3>
               <DimensionScale
                 score={report.scoresA[block.dimension]}
-                leftLabel={FOUNDER_DIMENSION_META[block.dimension].reportLeftPole}
-                rightLabel={FOUNDER_DIMENSION_META[block.dimension].reportRightPole}
+                leftLabel={reportContent.dimensions[block.dimension].reportLeftPole}
+                rightLabel={reportContent.dimensions[block.dimension].reportRightPole}
                 compact
                 className="mt-3"
               />
               <p className="mt-3 text-sm leading-7 text-slate-800">{block.statement}</p>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                <span className="font-medium text-slate-900">Typische Situation:</span> {block.situation}
+                <span className="font-medium text-slate-900">{chrome.labels.typicalSituation}</span>{" "}
+                {block.situation}
               </p>
             </article>
           ))}
@@ -123,21 +133,23 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">3. Wo es im Team kippt</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          {chrome.sections.teamBreak}
+        </p>
         <div className="mt-6 grid gap-4">
           {teamBreakBlocks.map((block) => (
             <article key={`break-${block.dimension}-${block.title}`} className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-amber-800">
-                  {FOUNDER_DIMENSION_META[block.dimension].canonicalName}
+                  {reportContent.dimensions[block.dimension].canonicalName}
                 </p>
-                {block.highSignal ? <SignalBadge label="High-Signal" tone="warning" /> : null}
+                {block.highSignal ? <SignalBadge label={chrome.labels.highSignal} tone="warning" /> : null}
               </div>
               <h3 className="mt-3 text-base font-semibold text-slate-900">{block.title}</h3>
               <DimensionScale
                 score={report.scoresA[block.dimension]}
-                leftLabel={FOUNDER_DIMENSION_META[block.dimension].reportLeftPole}
-                rightLabel={FOUNDER_DIMENSION_META[block.dimension].reportRightPole}
+                leftLabel={reportContent.dimensions[block.dimension].reportLeftPole}
+                rightLabel={reportContent.dimensions[block.dimension].reportRightPole}
                 compact
                 className="mt-3"
               />
@@ -148,7 +160,9 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">4. Wie andere dich lesen könnten</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          {chrome.sections.misreadings}
+        </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {misreadings.map((entry) => (
             <article key={`misreading-${entry.title}`} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
@@ -160,7 +174,9 @@ export function SelfReportView({ report }: Props) {
       </section>
 
       <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">5. Deine Hebel im Alltag</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          {chrome.sections.levers}
+        </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {levers.map((entry) => (
             <article key={`lever-${entry.title}`} className="rounded-2xl border border-slate-200/80 bg-white p-5">
@@ -173,8 +189,10 @@ export function SelfReportView({ report }: Props) {
 
       {showValuesSection ? (
         <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">6. Werteprofil</p>
-          <div className="mt-5">{renderCompactValuesSection(report)}</div>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+            {chrome.sections.valuesProfile}
+          </p>
+          <div className="mt-5">{renderCompactValuesSection(report, chrome)}</div>
         </section>
       ) : null}
     </>
@@ -870,7 +888,7 @@ function buildLeverCopy(signal: SelfReportSignal): LeverBlock {
   }
 }
 
-function renderCompactValuesSection(report: SelfAlignmentReport) {
+function renderCompactValuesSection(report: SelfAlignmentReport, chrome: SelfReportChrome) {
   const profile = report.selfValuesProfile;
 
   if (!profile) {
@@ -878,14 +896,14 @@ function renderCompactValuesSection(report: SelfAlignmentReport) {
       <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-6">
         <p className="text-sm leading-7 text-slate-700">
           {report.valuesModulePreview?.trim() ||
-            t("Schließe das Werte-Add-on ab, um eine verdichtete Werte-Einordnung zu erhalten.")}
+            t(chrome.labels.valuesFallback)}
         </p>
         <div className="mt-4">
           <a
             href="/me/values"
             className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
           >
-            Werte Add-on starten
+            {chrome.labels.startValues}
           </a>
         </div>
       </div>
@@ -900,7 +918,9 @@ function renderCompactValuesSection(report: SelfAlignmentReport) {
       <p className="text-sm leading-7 text-slate-800">{normalizeSentence(t(profile.summary))}</p>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">Zeigt sich im Alltag</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
+            {chrome.labels.everydaySignals}
+          </p>
           <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-700">
             {insights.map((item) => (
               <li key={`values-insight-${item}`}>• {item}</li>
@@ -909,7 +929,9 @@ function renderCompactValuesSection(report: SelfAlignmentReport) {
         </div>
         {watchout ? (
           <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-800">Achte besonders auf</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-800">
+              {chrome.labels.watchout}
+            </p>
             <p className="mt-3 text-sm leading-7 text-amber-900">{watchout}</p>
           </div>
         ) : null}

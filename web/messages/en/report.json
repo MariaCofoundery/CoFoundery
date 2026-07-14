@@ -52,5 +52,35 @@
     "dynamicsOverview": "Your dynamics at a glance",
     "conversationPrompts": "Conversation prompts for your next conversation",
     "conversationPromptsText": "These questions are intended as a next step after you have reviewed the patterns and scales."
+  },
+  "individual": {
+    "eyebrow": "Individual report",
+    "defaultDescription": "This report shows your current founder profile through the six dimensions first and adds scale interpretation only where it helps you understand day-to-day work.",
+    "missing": {
+      "title": "Individual report",
+      "description": "Your individual report needs a submitted base questionnaire first.",
+      "cta": "Start base questions"
+    },
+    "sections": {
+      "corePattern": "1. Core pattern",
+      "profileNow": "How your profile currently works",
+      "everyday": "2. How you show up day to day",
+      "teamBreak": "3. Where things can tip in a team",
+      "misreadings": "4. How others might read you",
+      "levers": "5. Your day-to-day levers",
+      "valuesProfile": "6. Values profile"
+    },
+    "labels": {
+      "highSignal": "High signal",
+      "baseCompleted": "Base profile complete",
+      "valuesAvailable": "Values profile available",
+      "valuesInProgress": "Values profile in progress",
+      "valuesOptional": "Values profile optional",
+      "typicalSituation": "Typical situation:",
+      "valuesFallback": "Complete the values add-on to receive a condensed values interpretation.",
+      "startValues": "Start values add-on",
+      "everydaySignals": "Shows up day to day",
+      "watchout": "Pay particular attention to"
+    }
   }
 }

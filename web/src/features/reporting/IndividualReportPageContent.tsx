@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
+import { getSelfReportChrome } from "@/features/reporting/selfReportChrome";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 
 type Props = {
@@ -12,18 +13,17 @@ type Props = {
   beforeReport?: ReactNode;
 };
 
-const DEFAULT_DESCRIPTION =
-  "Dieser Report zeigt dir dein aktuelles Founder-Profil zuerst über die sechs Dimensionen und ergänzt die Skalen nur dort, wo Einordnung im Alltag wirklich hilft.";
-
 export function IndividualReportPageContent({
   report,
   toolbar,
-  eyebrow = "Individueller Report",
+  eyebrow,
   title,
-  description = DEFAULT_DESCRIPTION,
+  description,
   headerMeta,
   beforeReport,
 }: Props) {
+  const chrome = getSelfReportChrome(report.locale);
+
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
       {toolbar ? <div className="no-print mb-8">{toolbar}</div> : null}
@@ -31,9 +31,13 @@ export function IndividualReportPageContent({
       <section className="page-section mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mb-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-0">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{eyebrow}</p>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+              {eyebrow ?? chrome.eyebrow}
+            </p>
             <h1 className="mt-3 text-3xl font-semibold text-slate-900">{title ?? report.participantAName}</h1>
-            <p className="mt-3 text-sm leading-7 text-slate-700">{description}</p>
+            <p className="mt-3 text-sm leading-7 text-slate-700">
+              {description ?? chrome.defaultDescription}
+            </p>
           </div>
           {headerMeta ? <div className="flex flex-wrap gap-2">{headerMeta}</div> : null}
         </div>
