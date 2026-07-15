@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { EventProfile, EventRecord } from "@/features/events/eventTypes";
 import { EventScaleTrack } from "@/features/events/EventScaleTrack";
+import { generateEventQrCode } from "@/features/events/eventQrCode";
 
 type EventParticipantCardProps = {
   event: EventRecord;
@@ -10,23 +11,15 @@ type EventParticipantCardProps = {
   scanUrl: string;
 };
 
-function buildQrImageUrl(compareUrl: string) {
-  const params = new URLSearchParams({
-    size: "260x260",
-    margin: "0",
-    data: compareUrl,
-  });
-
-  return `https://api.qrserver.com/v1/create-qr-code/?${params.toString()}`;
-}
-
-export function EventParticipantCard({
+export async function EventParticipantCard({
   event,
   participantName,
   profile,
   compareUrl,
   scanUrl,
 }: EventParticipantCardProps) {
+  const qrCode = await generateEventQrCode(compareUrl);
+
   return (
     <section className="rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)] sm:p-8">
       <div className="max-w-3xl">
@@ -70,13 +63,25 @@ export function EventParticipantCard({
         <aside className="rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.95))] p-5 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Dein QR-Code</p>
           <div className="mt-4 flex justify-center rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.92),rgba(246,241,234,0.38))] p-4">
-            <img
-              src={buildQrImageUrl(compareUrl)}
-              alt={`QR-Code fuer ${participantName}`}
-              width={260}
-              height={260}
-              className="h-auto w-full max-w-[260px] rounded-2xl"
-            />
+            {qrCode.ok ? (
+              <img
+                src={qrCode.dataUrl}
+                alt={`QR-Code fuer ${participantName}`}
+                width={260}
+                height={260}
+                className="h-auto w-full max-w-[260px] rounded-2xl"
+              />
+            ) : (
+              <div
+                role="status"
+                className="flex min-h-[260px] w-full max-w-[260px] flex-col items-center justify-center rounded-2xl bg-white px-5 text-center"
+              >
+                <p className="text-sm font-medium text-slate-800">QR-Code gerade nicht verfuegbar</p>
+                <p className="mt-2 text-xs leading-6 text-slate-600">
+                  Nutze bitte den Vergleichslink unterhalb.
+                </p>
+              </div>
+            )}
           </div>
 
           <p className="mt-4 text-sm leading-6 text-slate-700">
