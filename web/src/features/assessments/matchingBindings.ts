@@ -511,17 +511,17 @@ export async function bindLatestSubmittedInvitationMatchingInputs(
       .map((binding) => [binding.module, binding] as const)
   );
 
-  for (const module of uniqueModules) {
+  for (const moduleKey of uniqueModules) {
     const latestSubmitted = await getLatestSubmittedAssessmentForUserModule(
       normalizedUserId,
-      module,
+      moduleKey,
       options?.client
     );
     if (!latestSubmitted) {
       continue;
     }
 
-    const existing = existingByModule.get(module) ?? null;
+    const existing = existingByModule.get(moduleKey) ?? null;
     const shouldReplace = shouldReplaceBindingWithLatestSubmitted({
       existing,
       latestSubmitted,
@@ -533,7 +533,7 @@ export async function bindLatestSubmittedInvitationMatchingInputs(
       continue;
     }
 
-    const binding = await ensureInvitationMatchingBinding(normalizedInvitationId, normalizedUserId, module, {
+    const binding = await ensureInvitationMatchingBinding(normalizedInvitationId, normalizedUserId, moduleKey, {
       client: options?.client,
       assessmentId: latestSubmitted.id,
       allowLatestSubmitted: false,
@@ -541,7 +541,7 @@ export async function bindLatestSubmittedInvitationMatchingInputs(
       replaceExisting: shouldReplace,
     });
     bindings.push(binding);
-    existingByModule.set(module, binding);
+    existingByModule.set(moduleKey, binding);
   }
 
   return bindings;

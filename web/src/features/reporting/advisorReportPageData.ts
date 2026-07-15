@@ -157,7 +157,7 @@ async function resolveAdvisorParticipantIds(params: {
   privileged: PrivilegedClient;
 }) {
   const founderAUserId = params.invitation.inviter_user_id ?? null;
-  let founderBUserId = params.invitation.invitee_user_id ?? null;
+  const founderBUserId = params.invitation.invitee_user_id ?? null;
 
   if (!founderAUserId || !founderBUserId) {
     const { data: relationship } = await params.privileged
