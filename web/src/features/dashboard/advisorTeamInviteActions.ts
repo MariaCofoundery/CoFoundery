@@ -132,7 +132,7 @@ export async function createAdvisorTeamInviteAction(
     return { ok: false, error: insertError?.message ?? "Team konnte gerade nicht angelegt werden." };
   }
 
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const [founderAEmailResult, founderBEmailResult] = await Promise.all([
     sendAdvisorTeamFounderInviteEmail({
       inviteeEmail: normalizedEmails.founderAEmail,

@@ -33,7 +33,7 @@ export default async function AdvisorReportPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("advisor");
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const invitationId = params.invitationId?.trim() ?? "";
   const requestedTeamContext = params.teamContext
     ? normalizeAdvisorTeamContext(params.teamContext)

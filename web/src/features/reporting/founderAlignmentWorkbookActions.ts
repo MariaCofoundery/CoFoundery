@@ -1760,7 +1760,7 @@ export async function sendFounderAlignmentAdvisorInvite({
   const inviteUrl = toPublicAppUrl(invitePath);
   const effectiveTeamContext =
     invitationContext.data?.team_context === "existing_team" ? "existing_team" : teamContext;
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
 
   const emailResult = await sendAdvisorInviteEmail({
     advisorEmail: loaded.row.advisor_email,

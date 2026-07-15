@@ -59,7 +59,7 @@ export async function createMatchingReportRunFromSessionAction(
     const report = await createMatchingReportRunFromSession({
       matchingSessionId,
       userId,
-      locale: getRequestLocale(),
+      locale: await getRequestLocale(),
     });
     const reportHref = `/matching/${report.reportRun.matchingSessionId}/report`;
 

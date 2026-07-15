@@ -6,8 +6,8 @@ import { LandingTopNav } from "@/components/marketing/LandingTopNav";
 import { getMarketingContent } from "@/data/marketing";
 import { getRequestLocale } from "@/i18n/getLocale";
 
-export default function Page() {
-  const content = getMarketingContent(getRequestLocale());
+export default async function Page() {
+  const content = getMarketingContent(await getRequestLocale());
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[color:var(--bg)] text-[color:var(--ink)]">

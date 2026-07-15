@@ -72,7 +72,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
   const founderALabel = data.founderAName?.trim() || "Founder A";
   const founderBLabel = data.founderBName?.trim() || "Founder B";
   const founderPairLabel = `${founderALabel} × ${founderBLabel}`;
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const workbookContent = getWorkbookContent(locale);
   const hasActiveAdvisor = Boolean(
     data.workbook.advisorId || data.advisorInvite.advisorLinked

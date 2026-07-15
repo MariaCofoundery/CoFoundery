@@ -124,9 +124,9 @@ type EnsureReportRunPrivilegedOptions = {
   locale?: AppLocale;
 };
 
-function getReportBuildLocale(): AppLocale {
+async function getReportBuildLocale(): Promise<AppLocale> {
   try {
-    return getRequestLocale();
+    return await getRequestLocale();
   } catch {
     return DEFAULT_LOCALE;
   }
@@ -2420,7 +2420,7 @@ export async function ensureReportRunForInvitation(invitationId: string): Promis
     requesterUserId: user.id,
     skipMembershipCheck: false,
     sourceTag: "ensureReportRunForInvitation",
-    locale: getReportBuildLocale(),
+    locale: await getReportBuildLocale(),
   });
 }
 

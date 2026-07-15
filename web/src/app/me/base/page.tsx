@@ -38,7 +38,7 @@ export default async function MeBasePage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("assessment.base");
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },

@@ -142,7 +142,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const messages = getMessages(locale);
   const navigationCopy = messages.navigation as NavigationMessages;
   const supabase = await createClient();

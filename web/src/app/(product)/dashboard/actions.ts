@@ -195,7 +195,7 @@ async function createInvitation(params: {
   let emailError: string | undefined;
 
   if (params.sendEmail) {
-    const locale = getRequestLocale();
+    const locale = await getRequestLocale();
     const sendResult = await sendCoFounderInviteEmail({
       inviteeEmail: invitedEmail,
       inviteUrl: buildAbsoluteInviteUrl(token),

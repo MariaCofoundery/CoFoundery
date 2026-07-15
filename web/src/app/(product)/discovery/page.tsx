@@ -258,7 +258,7 @@ function CandidateCard({ candidate, t }: { candidate: DiscoveryCandidate; t: Dis
 
 export default async function DiscoveryPage() {
   const t = await getTranslations("discovery");
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },

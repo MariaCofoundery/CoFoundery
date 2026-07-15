@@ -38,7 +38,7 @@ export default async function MeValuesPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("assessment.values");
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,9 +1,9 @@
 import { cookies, headers } from "next/headers";
-import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/i18n/config";
+import { LOCALE_COOKIE_NAME, resolveLocalePreference, type AppLocale } from "@/i18n/config";
 
-export function getRequestLocale() {
-  const cookieLocale = cookies().get(LOCALE_COOKIE_NAME)?.value ?? null;
-  const acceptLanguage = headers().get("accept-language");
+export async function getRequestLocale(): Promise<AppLocale> {
+  const cookieLocale = (await cookies()).get(LOCALE_COOKIE_NAME)?.value ?? null;
+  const acceptLanguage = (await headers()).get("accept-language");
 
   return resolveLocalePreference(cookieLocale, acceptLanguage);
 }

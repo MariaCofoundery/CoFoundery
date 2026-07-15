@@ -3,8 +3,8 @@ import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { getMarketingContent } from "@/data/marketing";
 import { getRequestLocale } from "@/i18n/getLocale";
 
-export default function InformierteEntscheidungenPage() {
-  const content = getMarketingContent(getRequestLocale());
+export default async function InformierteEntscheidungenPage() {
+  const content = getMarketingContent(await getRequestLocale());
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[color:var(--bg)] text-[color:var(--ink)]">

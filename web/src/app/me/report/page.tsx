@@ -13,7 +13,7 @@ import {
 } from "@/features/onboarding/invitationFlow";
 
 export default async function MeReportPage() {
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const t = await getTranslations("report.common");
   const tIndividual = await getTranslations("report.individual");
   const supabase = await createClient();

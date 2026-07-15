@@ -541,7 +541,7 @@ export default async function AdvisorDashboardPage({
   const debug = params.debug === "1";
   const supabase = await createClient();
   const t = await getTranslations("advisor");
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -3,7 +3,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { getMessages } from "@/i18n/messages";
 
 export default getRequestConfig(async () => {
-  const locale = getRequestLocale();
+  const locale = await getRequestLocale();
 
   return {
     locale,
