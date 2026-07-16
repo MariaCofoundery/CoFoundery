@@ -1807,7 +1807,6 @@ export async function sendFounderAlignmentAdvisorInvite({
     teamContext: effectiveTeamContext,
     properties: {
       advisorEntryId: loaded.row.id,
-      advisorEmail: loaded.row.advisor_email,
       resent: loaded.row.status === "invited",
     },
   });
