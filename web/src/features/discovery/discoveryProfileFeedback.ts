@@ -7,6 +7,13 @@ export const DISCOVERY_PROFILE_DRAFT_ERROR_REASONS = [
   "draft_save_failed",
 ] as const;
 
+export const DISCOVERY_PREFERENCES_SUCCESS_REASONS = ["preferences_saved"] as const;
+
+export const DISCOVERY_PREFERENCES_ERROR_REASONS = [
+  "not_authenticated",
+  "preferences_save_failed",
+] as const;
+
 export const DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS = [
   "not_authenticated",
   "profile_missing",
@@ -57,6 +64,28 @@ export type DiscoveryProfileDraftMessageKey =
   | "profile.messages.draftSaveFailed"
   | "profile.messages.fallbackError";
 
+export type DiscoveryPreferencesSuccessReason =
+  (typeof DISCOVERY_PREFERENCES_SUCCESS_REASONS)[number];
+export type DiscoveryPreferencesErrorReason =
+  (typeof DISCOVERY_PREFERENCES_ERROR_REASONS)[number];
+export type DiscoveryPreferencesReason =
+  | DiscoveryPreferencesSuccessReason
+  | DiscoveryPreferencesErrorReason;
+
+export type DiscoveryPreferencesResult =
+  | { ok: true; reason: DiscoveryPreferencesSuccessReason }
+  | { ok: false; reason: DiscoveryPreferencesErrorReason };
+
+export type DiscoveryPreferencesFeedbackReason =
+  | DiscoveryPreferencesReason
+  | "unexpected_error";
+
+export type DiscoveryPreferencesMessageKey =
+  | "profile.messages.preferencesSaved"
+  | "profile.messages.notAuthenticated"
+  | "profile.messages.preferencesSaveFailed"
+  | "profile.messages.fallbackError";
+
 export type DiscoveryProfilePublishResult =
   | { ok: true; reason: DiscoveryProfilePublishSuccessReason }
   | {
@@ -82,6 +111,8 @@ const publishErrorReasons = new Set<string>(DISCOVERY_PROFILE_PUBLISH_ERROR_REAS
 const publishIssues = new Set<string>(DISCOVERY_PROFILE_PUBLISH_ISSUES);
 const draftSuccessReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS);
 const draftErrorReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_ERROR_REASONS);
+const preferencesSuccessReasons = new Set<string>(DISCOVERY_PREFERENCES_SUCCESS_REASONS);
+const preferencesErrorReasons = new Set<string>(DISCOVERY_PREFERENCES_ERROR_REASONS);
 
 const publishIssueByValidationText: Record<string, DiscoveryProfilePublishIssue> = {
   "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
@@ -178,6 +209,57 @@ export function resolveDiscoveryProfileDraftFeedback({
   return null;
 }
 
+export function getDiscoveryPreferencesMessageKey(
+  reason: DiscoveryPreferencesFeedbackReason
+): DiscoveryPreferencesMessageKey {
+  switch (reason) {
+    case "preferences_saved":
+      return "profile.messages.preferencesSaved";
+    case "not_authenticated":
+      return "profile.messages.notAuthenticated";
+    case "preferences_save_failed":
+      return "profile.messages.preferencesSaveFailed";
+    case "unexpected_error":
+      return "profile.messages.fallbackError";
+  }
+}
+
+export function resolveDiscoveryPreferencesFeedback({
+  result,
+  error,
+}: {
+  result?: string | null;
+  error?: string | null;
+}): {
+  ok: boolean;
+  reason: DiscoveryPreferencesFeedbackReason;
+  messageKey: DiscoveryPreferencesMessageKey;
+} | null {
+  if (error) {
+    const reason: DiscoveryPreferencesFeedbackReason = preferencesErrorReasons.has(error)
+      ? (error as DiscoveryPreferencesErrorReason)
+      : "unexpected_error";
+    return {
+      ok: false,
+      reason,
+      messageKey: getDiscoveryPreferencesMessageKey(reason),
+    };
+  }
+
+  if (result) {
+    const reason: DiscoveryPreferencesFeedbackReason = preferencesSuccessReasons.has(result)
+      ? (result as DiscoveryPreferencesSuccessReason)
+      : "unexpected_error";
+    return {
+      ok: reason === "preferences_saved",
+      reason,
+      messageKey: getDiscoveryPreferencesMessageKey(reason),
+    };
+  }
+
+  return null;
+}
+
 export function resolveDiscoveryProfilePublishFeedback({
   result,
   error,
@@ -228,4 +310,31 @@ export function resolveDiscoveryProfilePublishFeedback({
   }
 
   return null;
+}
+
+type ResolvedPublishFeedback = NonNullable<
+  ReturnType<typeof resolveDiscoveryProfilePublishFeedback>
+>;
+type ResolvedDraftFeedback = NonNullable<ReturnType<typeof resolveDiscoveryProfileDraftFeedback>>;
+type ResolvedPreferencesFeedback = NonNullable<
+  ReturnType<typeof resolveDiscoveryPreferencesFeedback>
+>;
+
+export function selectDiscoveryProfileFeedback({
+  publish,
+  draft,
+  preferences,
+}: {
+  publish: ResolvedPublishFeedback | null;
+  draft: ResolvedDraftFeedback | null;
+  preferences: ResolvedPreferencesFeedback | null;
+}): ResolvedPublishFeedback | ResolvedDraftFeedback | ResolvedPreferencesFeedback | null {
+  return (
+    (publish?.ok === false ? publish : null) ??
+    (draft?.ok === false ? draft : null) ??
+    (preferences?.ok === false ? preferences : null) ??
+    (publish?.ok === true ? publish : null) ??
+    (draft?.ok === true ? draft : null) ??
+    (preferences?.ok === true ? preferences : null)
+  );
 }

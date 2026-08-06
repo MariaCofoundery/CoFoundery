@@ -204,7 +204,8 @@
       "profileMissing": "Lege zuerst ein Discovery-Profil als Entwurf an.",
       "publishFailed": "Dein Discovery-Profil konnte gerade nicht veröffentlicht werden. Bitte versuche es erneut.",
       "paused": "Deine Co-Founder-Suche ist pausiert.",
-      "preferencesSaved": "Deine Suchprioritäten wurden gespeichert."
+      "preferencesSaved": "Deine Suchprioritäten wurden gespeichert.",
+      "preferencesSaveFailed": "Deine Suchpräferenzen konnten gerade nicht gespeichert werden."
     },
     "publicProfile": {
       "eyebrow": "Öffentliches Suchprofil",

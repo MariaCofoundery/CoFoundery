@@ -23,8 +23,11 @@ import {
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
+  resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePublishFeedback,
+  selectDiscoveryProfileFeedback,
+  type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
   type DiscoveryProfilePublishIssue,
   type DiscoveryProfilePublishResult,
@@ -64,6 +67,8 @@ type DiscoveryProfileSearchParams = {
   issue?: string | string[];
   draftResult?: string | string[];
   draftError?: string | string[];
+  preferencesResult?: string | string[];
+  preferencesError?: string | string[];
   publishResult?: string | string[];
   publishError?: string | string[];
   publishIssue?: string | string[];
@@ -180,6 +185,12 @@ function buildDiscoveryProfilePublishRedirect(result: DiscoveryProfilePublishRes
 function buildDiscoveryProfileDraftRedirect(result: DiscoveryProfileDraftResult) {
   const params = new URLSearchParams();
   params.set(result.ok ? "draftResult" : "draftError", result.reason);
+  return `/discovery/profile?${params.toString()}`;
+}
+
+function buildDiscoveryPreferencesRedirect(result: DiscoveryPreferencesResult) {
+  const params = new URLSearchParams();
+  params.set(result.ok ? "preferencesResult" : "preferencesError", result.reason);
   return `/discovery/profile?${params.toString()}`;
 }
 
@@ -426,11 +437,15 @@ export default async function DiscoveryProfilePage({
     result: searchParamValue(params.draftResult),
     error: searchParamValue(params.draftError),
   });
-  const localizedFeedback =
-    (publishFeedback?.ok === false ? publishFeedback : null) ??
-    (draftFeedback?.ok === false ? draftFeedback : null) ??
-    (publishFeedback?.ok === true ? publishFeedback : null) ??
-    (draftFeedback?.ok === true ? draftFeedback : null);
+  const preferencesFeedback = resolveDiscoveryPreferencesFeedback({
+    result: searchParamValue(params.preferencesResult),
+    error: searchParamValue(params.preferencesError),
+  });
+  const localizedFeedback = selectDiscoveryProfileFeedback({
+    publish: publishFeedback,
+    draft: draftFeedback,
+    preferences: preferencesFeedback,
+  });
   const pageMessage = localizedFeedback
     ? t(localizedFeedback.messageKey)
     : searchParamValue(params.message) ?? null;
@@ -469,7 +484,6 @@ export default async function DiscoveryProfilePage({
     selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
   const actionMessages = {
     paused: t("profile.messages.paused"),
-    preferencesSaved: t("profile.messages.preferencesSaved"),
     fallbackError: t("profile.messages.fallbackError"),
   };
 
@@ -500,13 +514,7 @@ export default async function DiscoveryProfilePage({
   async function savePreferences(formData: FormData) {
     "use server";
     const result = await saveDiscoveryPreferencesAction(formData);
-    redirect(
-      buildDiscoveryProfileRedirect(
-        result,
-        actionMessages.preferencesSaved,
-        actionMessages.fallbackError
-      )
-    );
+    redirect(buildDiscoveryPreferencesRedirect(result));
   }
 
   return (

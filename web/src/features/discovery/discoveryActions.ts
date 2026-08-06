@@ -13,6 +13,7 @@ import {
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
+  type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
@@ -396,10 +397,13 @@ export async function pauseDiscoveryProfileAction(): Promise<DiscoveryActionStat
 
 export async function saveDiscoveryPreferencesAction(
   formData: FormData
-): Promise<DiscoveryActionState> {
+): Promise<DiscoveryPreferencesResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
-    return unauthenticatedState();
+    return {
+      ok: false,
+      reason: "not_authenticated",
+    };
   }
 
   try {
@@ -409,12 +413,12 @@ export async function saveDiscoveryPreferencesAction(
     revalidateDiscoveryPaths();
     return {
       ok: true,
-      message: "Deine Suchprioritäten wurden gespeichert.",
+      reason: "preferences_saved",
     };
   } catch {
     return {
       ok: false,
-      message: "Deine Suchprioritäten konnten gerade nicht gespeichert werden.",
+      reason: "preferences_save_failed",
     };
   }
 }

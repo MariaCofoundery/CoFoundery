@@ -3,17 +3,22 @@ import test from "node:test";
 import deDiscovery from "../../../../messages/de/discovery.json";
 import enDiscovery from "../../../../messages/en/discovery.json";
 import {
+  DISCOVERY_PREFERENCES_ERROR_REASONS,
+  DISCOVERY_PREFERENCES_SUCCESS_REASONS,
   DISCOVERY_PROFILE_DRAFT_ERROR_REASONS,
   DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ISSUES,
   DISCOVERY_PROFILE_PUBLISH_SUCCESS_REASONS,
   filterDiscoveryProfilePublishIssues,
+  getDiscoveryPreferencesMessageKey,
   getDiscoveryProfileDraftMessageKey,
   getDiscoveryProfilePublishMessageKey,
   mapDiscoveryProfilePublishIssues,
+  resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePublishFeedback,
+  selectDiscoveryProfileFeedback,
 } from "@/features/discovery/discoveryProfileFeedback";
 
 const publishValidationTexts = [
@@ -179,4 +184,133 @@ test("Discovery profile draft feedback has parallel German and English messages"
   });
 
   assert.doesNotMatch(visibleMessages.join(" "), /discovery_profiles|relation .* does not exist/i);
+});
+
+test("Discovery preferences reasons are classified safely", () => {
+  assert.deepEqual(DISCOVERY_PREFERENCES_SUCCESS_REASONS, ["preferences_saved"]);
+  assert.deepEqual(resolveDiscoveryPreferencesFeedback({ result: "preferences_saved" }), {
+    ok: true,
+    reason: "preferences_saved",
+    messageKey: "profile.messages.preferencesSaved",
+  });
+
+  for (const reason of DISCOVERY_PREFERENCES_ERROR_REASONS) {
+    const feedback = resolveDiscoveryPreferencesFeedback({ error: reason });
+    assert.equal(feedback?.ok, false);
+    assert.equal(feedback?.reason, reason);
+  }
+});
+
+test("Discovery preferences query values are validated with errors taking priority", () => {
+  const rawError = 'relation "discovery_preferences" does not exist';
+  const feedback = resolveDiscoveryPreferencesFeedback({
+    result: "preferences_saved",
+    error: rawError,
+  });
+
+  assert.deepEqual(feedback, {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+  assert.notEqual(feedback?.reason, rawError);
+  assert.deepEqual(resolveDiscoveryPreferencesFeedback({ result: "<script>" }), {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+});
+
+test("Discovery profile feedback follows the cross-flow priority", () => {
+  const publishError = resolveDiscoveryProfilePublishFeedback({ error: "publish_failed" });
+  const draftError = resolveDiscoveryProfileDraftFeedback({ error: "draft_save_failed" });
+  const preferencesError = resolveDiscoveryPreferencesFeedback({
+    error: "preferences_save_failed",
+  });
+  const publishSuccess = resolveDiscoveryProfilePublishFeedback({ result: "profile_published" });
+  const draftSuccess = resolveDiscoveryProfileDraftFeedback({ result: "draft_saved" });
+  const preferencesSuccess = resolveDiscoveryPreferencesFeedback({ result: "preferences_saved" });
+
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: publishError,
+      draft: draftError,
+      preferences: preferencesError,
+    })?.reason,
+    "publish_failed"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: publishSuccess,
+      draft: draftError,
+      preferences: preferencesError,
+    })?.reason,
+    "draft_save_failed"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: publishSuccess,
+      draft: draftSuccess,
+      preferences: preferencesError,
+    })?.reason,
+    "preferences_save_failed"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: publishSuccess,
+      draft: draftSuccess,
+      preferences: preferencesSuccess,
+    })?.reason,
+    "profile_published"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: null,
+      draft: draftSuccess,
+      preferences: preferencesSuccess,
+    })?.reason,
+    "draft_saved"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: null,
+      draft: null,
+      preferences: preferencesSuccess,
+    })?.reason,
+    "preferences_saved"
+  );
+
+  const legacyPauseMessage = "Deine Co-Founder-Suche ist pausiert.";
+  const preferencesBeforeLegacy = selectDiscoveryProfileFeedback({
+    publish: null,
+    draft: null,
+    preferences: preferencesSuccess,
+  });
+  assert.equal(
+    preferencesBeforeLegacy?.messageKey ?? legacyPauseMessage,
+    "profile.messages.preferencesSaved"
+  );
+});
+
+test("Discovery preferences feedback has parallel German and English messages", () => {
+  const visibleReasons = [
+    ...DISCOVERY_PREFERENCES_SUCCESS_REASONS,
+    ...DISCOVERY_PREFERENCES_ERROR_REASONS,
+    "unexpected_error",
+  ] as const;
+
+  const visibleMessages = visibleReasons.flatMap((reason) => {
+    const key = getDiscoveryPreferencesMessageKey(reason);
+    const deMessage = readMessage({ profile: deDiscovery.profile }, key);
+    const enMessage = readMessage({ profile: enDiscovery.profile }, key);
+    assert.ok(deMessage, `missing German message for ${reason}`);
+    assert.ok(enMessage, `missing English message for ${reason}`);
+    assert.deepEqual(placeholders(deMessage), placeholders(enMessage));
+    return [deMessage, enMessage];
+  });
+
+  assert.doesNotMatch(
+    visibleMessages.join(" "),
+    /discovery_preferences|relation .* does not exist/i
+  );
 });

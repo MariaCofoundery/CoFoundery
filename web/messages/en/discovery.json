@@ -204,7 +204,8 @@
       "profileMissing": "Create a Discovery profile draft before publishing it.",
       "publishFailed": "Your Discovery profile could not be published right now. Please try again.",
       "paused": "Your co-founder search is paused.",
-      "preferencesSaved": "Your search priorities were saved."
+      "preferencesSaved": "Your search priorities were saved.",
+      "preferencesSaveFailed": "Your search preferences could not be saved right now."
     },
     "publicProfile": {
       "eyebrow": "Public search profile",
