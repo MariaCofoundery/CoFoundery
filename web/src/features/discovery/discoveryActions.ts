@@ -12,6 +12,10 @@ import {
   upsertOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
+  mapDiscoveryProfilePublishIssues,
+  type DiscoveryProfilePublishResult,
+} from "@/features/discovery/discoveryProfileFeedback";
+import {
   getDiscoveryProfilePublishIssues,
   normalizeDiscoveryPreferencesInput,
   normalizeDiscoveryProfileInput,
@@ -49,6 +53,13 @@ function unauthenticatedState(): DiscoveryActionState {
   return {
     ok: false,
     message: "Bitte melde dich an, um dein Discovery-Profil zu bearbeiten.",
+  };
+}
+
+function unauthenticatedPublishResult(): DiscoveryProfilePublishResult {
+  return {
+    ok: false,
+    reason: "not_authenticated",
   };
 }
 
@@ -200,11 +211,13 @@ function getPublishabilityIssues(error: unknown) {
     return [];
   }
 
-  return error.message
-    .replace("discovery_profile_not_publishable:", "")
-    .split("|")
-    .map((issue: string) => issue.trim())
-    .filter(Boolean);
+  return mapDiscoveryProfilePublishIssues(
+    error.message
+      .replace("discovery_profile_not_publishable:", "")
+      .split("|")
+      .map((issue: string) => issue.trim())
+      .filter(Boolean)
+  );
 }
 
 export async function saveDiscoveryProfileDraftAction(
@@ -236,10 +249,10 @@ export async function saveDiscoveryProfileDraftAction(
   }
 }
 
-export async function publishDiscoveryProfileAction(): Promise<DiscoveryActionState> {
+export async function publishDiscoveryProfileAction(): Promise<DiscoveryProfilePublishResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
-    return unauthenticatedState();
+    return unauthenticatedPublishResult();
   }
 
   try {
@@ -247,16 +260,15 @@ export async function publishDiscoveryProfileAction(): Promise<DiscoveryActionSt
     if (!profile) {
       return {
         ok: false,
-        message: "Lege zuerst ein Discovery-Profil als Entwurf an.",
-        issues: ["Lege zuerst ein Discovery-Profil als Entwurf an."],
+        reason: "profile_missing",
       };
     }
 
-    const issues = getDiscoveryProfilePublishIssues(profile);
+    const issues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(profile));
     if (issues.length > 0) {
       return {
         ok: false,
-        message: "Dein Profil ist noch nicht bereit zur Veröffentlichung.",
+        reason: "profile_not_publishable",
         issues,
       };
     }
@@ -270,31 +282,31 @@ export async function publishDiscoveryProfileAction(): Promise<DiscoveryActionSt
     revalidateDiscoveryPaths();
     return {
       ok: true,
-      message: "Dein Discovery-Profil ist jetzt aktiv.",
+      reason: "profile_published",
     };
   } catch (error) {
     const issues = getPublishabilityIssues(error);
     if (issues.length > 0) {
       return {
         ok: false,
-        message: "Dein Profil ist noch nicht bereit zur Veröffentlichung.",
+        reason: "profile_not_publishable",
         issues,
       };
     }
 
     return {
       ok: false,
-      message: "Dein Discovery-Profil konnte gerade nicht veröffentlicht werden.",
+      reason: "publish_failed",
     };
   }
 }
 
 export async function publishDiscoveryProfileFromFormAction(
   formData: FormData
-): Promise<DiscoveryActionState> {
+): Promise<DiscoveryProfilePublishResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
-    return unauthenticatedState();
+    return unauthenticatedPublishResult();
   }
 
   try {
@@ -307,12 +319,12 @@ export async function publishDiscoveryProfileFromFormAction(
 
     await upsertOwnDiscoveryProfile(userId, draftInput);
 
-    const issues = getDiscoveryProfilePublishIssues(draftInput);
+    const issues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(draftInput));
     if (issues.length > 0) {
       revalidateDiscoveryPaths();
       return {
         ok: false,
-        message: "Dein Profil ist noch nicht bereit zur Veröffentlichung.",
+        reason: "profile_not_publishable",
         issues,
       };
     }
@@ -326,21 +338,21 @@ export async function publishDiscoveryProfileFromFormAction(
     revalidateDiscoveryPaths();
     return {
       ok: true,
-      message: "Dein Discovery-Profil ist jetzt aktiv.",
+      reason: "profile_published",
     };
   } catch (error) {
     const issues = getPublishabilityIssues(error);
     if (issues.length > 0) {
       return {
         ok: false,
-        message: "Dein Profil ist noch nicht bereit zur Veröffentlichung.",
+        reason: "profile_not_publishable",
         issues,
       };
     }
 
     return {
       ok: false,
-      message: "Dein Discovery-Profil konnte gerade nicht veröffentlicht werden.",
+      reason: "publish_failed",
     };
   }
 }

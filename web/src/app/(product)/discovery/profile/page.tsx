@@ -22,6 +22,12 @@ import {
   getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
+  mapDiscoveryProfilePublishIssues,
+  resolveDiscoveryProfilePublishFeedback,
+  type DiscoveryProfilePublishIssue,
+  type DiscoveryProfilePublishResult,
+} from "@/features/discovery/discoveryProfileFeedback";
+import {
   getOwnDiscoveryAssessmentSignalReadiness,
   type OwnDiscoveryAssessmentSignalReadiness,
 } from "@/features/discovery/discoveryAssessmentSignals";
@@ -49,22 +55,14 @@ const SECONDARY_BUTTON_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
 const INNER_SECTION_CLASS = "rounded-3xl border border-slate-200 bg-slate-50/60 p-5";
 
-const PUBLISH_ISSUE_KEYS = {
-  "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
-  "Ergänze eine kurze Headline, damit andere dich einordnen können.": "headline",
-  "Wähle mindestens eine Rolle, die du selbst einbringst.": "ownRoles",
-  "Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.": "seekingRoles",
-  "Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.": "availability",
-  "Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.": "commitment",
-  "Wähle, wo du gerade mit deiner Idee oder Suche stehst.": "ventureStage",
-  "Wähle, welche Art von Aufbau du gerade suchst.": "ventureGoal",
-} as const satisfies Record<string, string>;
-
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
 type DiscoveryProfileSearchParams = {
   message?: string | string[];
   issue?: string | string[];
+  publishResult?: string | string[];
+  publishError?: string | string[];
+  publishIssue?: string | string[];
 };
 
 function emptyProfile(): Partial<FounderDiscoveryProfile> {
@@ -162,37 +160,51 @@ function buildDiscoveryProfileRedirect(
   return `/discovery/profile?${params.toString()}`;
 }
 
-function translatePublishIssue(issue: string, t: DiscoveryT) {
-  const issueKey = PUBLISH_ISSUE_KEYS[issue as keyof typeof PUBLISH_ISSUE_KEYS];
-  return issueKey ? t(`profile.publishIssueItems.${issueKey}`) : issue;
+function buildDiscoveryProfilePublishRedirect(result: DiscoveryProfilePublishResult) {
+  const params = new URLSearchParams();
+  if (result.ok) {
+    params.set("publishResult", result.reason);
+  } else {
+    params.set("publishError", result.reason);
+    for (const issue of result.issues ?? []) {
+      params.append("publishIssue", issue);
+    }
+  }
+  return `/discovery/profile?${params.toString()}`;
+}
+
+function translatePublishIssue(issue: DiscoveryProfilePublishIssue, t: DiscoveryT) {
+  return t(`profile.publishIssueItems.${issue}`);
 }
 
 function PageMessage({
   message,
   issues,
+  tone,
   t,
 }: {
   message: string | null;
-  issues: string[];
+  issues: DiscoveryProfilePublishIssue[];
+  tone?: "success" | "error";
   t: DiscoveryT;
 }) {
   if (!message && issues.length === 0) {
     return null;
   }
 
-  const hasIssues = issues.length > 0;
+  const isError = tone ? tone === "error" : issues.length > 0;
   return (
     <section
       className={`rounded-3xl border p-5 ${
-        hasIssues ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"
+        isError ? "border-amber-200 bg-amber-50" : "border-emerald-200 bg-emerald-50"
       }`}
     >
       {message ? (
-        <p className={`text-sm font-semibold ${hasIssues ? "text-amber-900" : "text-emerald-900"}`}>
+        <p className={`text-sm font-semibold ${isError ? "text-amber-900" : "text-emerald-900"}`}>
           {message}
         </p>
       ) : null}
-      {hasIssues ? (
+      {issues.length > 0 ? (
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
           {issues.map((issue) => (
             <li key={issue}>{translatePublishIssue(issue, t)}</li>
@@ -298,7 +310,13 @@ function RoleCheckboxGrid({
   );
 }
 
-function PublishIssuesCard({ issues, t }: { issues: string[]; t: DiscoveryT }) {
+function PublishIssuesCard({
+  issues,
+  t,
+}: {
+  issues: DiscoveryProfilePublishIssue[];
+  t: DiscoveryT;
+}) {
   if (issues.length === 0) {
     return null;
   }
@@ -389,8 +407,17 @@ export default async function DiscoveryProfilePage({
     getOwnDiscoveryAssessmentSignalReadiness(user.id),
   ]);
   const params = await searchParams;
-  const pageMessage = searchParamValue(params.message) ?? null;
-  const pageIssues = searchParamValues(params.issue);
+  const publishFeedback = resolveDiscoveryProfilePublishFeedback({
+    result: searchParamValue(params.publishResult),
+    error: searchParamValue(params.publishError),
+    issues: searchParamValues(params.publishIssue),
+  });
+  const pageMessage = publishFeedback
+    ? t(publishFeedback.messageKey)
+    : searchParamValue(params.message) ?? null;
+  const pageIssues = publishFeedback
+    ? publishFeedback.issues
+    : mapDiscoveryProfilePublishIssues(searchParamValues(params.issue));
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const defaultAssessmentSignalsForSubmittedBase =
     !loadedPreferences && assessmentSignalReadiness.hasSubmittedBaseAssessment;
@@ -407,7 +434,7 @@ export default async function DiscoveryProfilePage({
     isAssessmentSignalReady:
       preferences.includeAssessmentSignals && assessmentSignalReadiness.hasSubmittedBaseAssessment,
   };
-  const publishIssues = getDiscoveryProfilePublishIssues(profile);
+  const publishIssues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(profile));
   const selectedPriorityCount = Object.values(preferences.priorityWeights).filter(
     (value) => typeof value === "number" && value > 0
   ).length;
@@ -421,7 +448,6 @@ export default async function DiscoveryProfilePage({
     selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
   const actionMessages = {
     draftSaved: t("profile.messages.draftSaved"),
-    published: t("profile.messages.published"),
     paused: t("profile.messages.paused"),
     preferencesSaved: t("profile.messages.preferencesSaved"),
     fallbackError: t("profile.messages.fallbackError"),
@@ -442,13 +468,7 @@ export default async function DiscoveryProfilePage({
   async function publishProfileFromForm(formData: FormData) {
     "use server";
     const result = await publishDiscoveryProfileFromFormAction(formData);
-    redirect(
-      buildDiscoveryProfileRedirect(
-        result,
-        actionMessages.published,
-        actionMessages.fallbackError
-      )
-    );
+    redirect(buildDiscoveryProfilePublishRedirect(result));
   }
 
   async function pauseProfile() {
@@ -496,7 +516,12 @@ export default async function DiscoveryProfilePage({
         </header>
 
         <StatusCard profile={profile} t={t} />
-        <PageMessage message={pageMessage} issues={pageIssues} t={t} />
+        <PageMessage
+          message={pageMessage}
+          issues={pageIssues}
+          tone={publishFeedback ? (publishFeedback.ok ? "success" : "error") : undefined}
+          t={t}
+        />
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
           <section className={CARD_CLASS}>

@@ -199,6 +199,9 @@
       "fallbackError": "The action could not be completed right now.",
       "draftSaved": "Your Discovery draft was saved.",
       "published": "Your Discovery profile is now active.",
+      "notAuthenticated": "Please sign in to publish your Discovery profile.",
+      "profileMissing": "Create a Discovery profile draft before publishing it.",
+      "publishFailed": "Your Discovery profile could not be published right now. Please try again.",
       "paused": "Your co-founder search is paused.",
       "preferencesSaved": "Your search priorities were saved."
     },

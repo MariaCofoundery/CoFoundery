@@ -199,6 +199,9 @@
       "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
       "draftSaved": "Dein Discovery-Entwurf wurde gespeichert.",
       "published": "Dein Discovery-Profil ist jetzt aktiv.",
+      "notAuthenticated": "Bitte melde dich an, um dein Discovery-Profil zu veröffentlichen.",
+      "profileMissing": "Lege zuerst ein Discovery-Profil als Entwurf an.",
+      "publishFailed": "Dein Discovery-Profil konnte gerade nicht veröffentlicht werden. Bitte versuche es erneut.",
       "paused": "Deine Co-Founder-Suche ist pausiert.",
       "preferencesSaved": "Deine Suchprioritäten wurden gespeichert."
     },
