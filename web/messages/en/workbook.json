@@ -63,6 +63,60 @@
     "teamContextPreFounder": "Potential founding partnership",
     "teamContextExistingTeam": "Existing founder team"
   },
+  "print": {
+    "documentTitle": "Founder Alignment Workbook",
+    "unavailableTitle": "Print version is not available yet",
+    "unavailableDescription": "The printable workbook builds on an existing Founder Alignment result. Once both Base Assessments are complete, the worksheet can be generated.",
+    "unavailableStatuses": {
+      "missingInvitation": "Invitation not found",
+      "forbidden": "No access",
+      "inProgress": "Not ready yet"
+    },
+    "unavailableReasons": {
+      "reportSnapshotPending": "The report is still being prepared",
+      "viewerNotLinked": "This account does not have linked access",
+      "notAuthenticated": "Sign-in required",
+      "invitationNotFound": "Invitation not found",
+      "notParticipant": "This account does not belong to a participant",
+      "invitationNotActive": "The invitation is not currently active",
+      "missingInvitee": "The second person has not been linked yet",
+      "baseAssessmentInProgress": "The Base Assessments are not complete yet",
+      "assessmentIncomplete": "The submitted Base Assessments are not complete yet"
+    },
+    "backToWorkbook": "Back to the working document",
+    "logoLabel": "CoFoundery Align logo",
+    "dateLabel": "Date",
+    "documentIntro": "This document contains the structured working version of your Founder Alignment session and is designed for workshops, in-person meetings, or offline work.",
+    "contextIntro": {
+      "preFounder": "A shared session for two founders who want to make key expectations, differences, and agreements concrete before working more closely together.",
+      "existingTeam": "A shared session for an existing founder team to turn agreements from the report into concrete ways of working together."
+    },
+    "whyImportant": "Why this topic matters",
+    "realityScenario": "Real-world scenario",
+    "decisionQuestions": "Concrete decision questions",
+    "discussionQuestions": "Questions for your discussion",
+    "advisorClosing": {
+      "observations": "Key observations",
+      "questions": "Open questions for the founders",
+      "nextSteps": "Recommended next steps / to-dos",
+      "founderReaction": "Founder response",
+      "understood": "understood",
+      "open": "open",
+      "inClarification": "being clarified",
+      "comment": "Brief shared comment"
+    },
+    "perspective": "{founder}'s perspective",
+    "decisionOutput": "Decision output",
+    "bindingOutput": "Binding output",
+    "riskHint": "Risk note",
+    "sharedAgreement": "Shared agreement",
+    "statusLabel": "Status",
+    "statuses": {
+      "open": "Still open",
+      "partiallyClarified": "Partially clarified",
+      "agreed": "Clearly agreed"
+    }
+  },
   "steps": {
     "vision_direction": {
       "title": "Company logic",

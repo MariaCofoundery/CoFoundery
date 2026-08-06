@@ -63,6 +63,60 @@
     "teamContextPreFounder": "Mögliche Gründungspartnerschaft",
     "teamContextExistingTeam": "Bestehendes Founder-Team"
   },
+  "print": {
+    "documentTitle": "Founder Alignment Workbook",
+    "unavailableTitle": "Druckversion aktuell noch nicht verfügbar",
+    "unavailableDescription": "Die druckbare Arbeitsversion baut auf einem vorhandenen Founder-Alignment-Ergebnis auf. Sobald beide Base-Assessments vollständig vorliegen, kann das Arbeitsblatt erzeugt werden.",
+    "unavailableStatuses": {
+      "missingInvitation": "Einladung nicht gefunden",
+      "forbidden": "Kein Zugriff",
+      "inProgress": "Noch nicht bereit"
+    },
+    "unavailableReasons": {
+      "reportSnapshotPending": "Der Report wird noch vorbereitet",
+      "viewerNotLinked": "Für dieses Konto ist kein Zugriff verknüpft",
+      "notAuthenticated": "Anmeldung erforderlich",
+      "invitationNotFound": "Einladung nicht gefunden",
+      "notParticipant": "Dieses Konto gehört nicht zu den Teilnehmenden",
+      "invitationNotActive": "Die Einladung ist derzeit nicht aktiv",
+      "missingInvitee": "Die zweite Person ist noch nicht verknüpft",
+      "baseAssessmentInProgress": "Die Base-Assessments sind noch nicht abgeschlossen",
+      "assessmentIncomplete": "Die eingereichten Base-Assessments sind noch nicht vollständig"
+    },
+    "backToWorkbook": "Zurück zum Arbeitsdokument",
+    "logoLabel": "CoFoundery Align Logo",
+    "dateLabel": "Datum",
+    "documentIntro": "Dieses Dokument enthält die strukturierte Arbeitsversion eurer Founder Alignment Session und ist für Workshops, persönliche Treffen oder Offline-Arbeit gedacht.",
+    "contextIntro": {
+      "preFounder": "Gemeinsame Session für zwei Founder, die zentrale Erwartungen, Unterschiede und Vereinbarungen vor einer engeren Zusammenarbeit konkret machen wollen.",
+      "existingTeam": "Gemeinsame Session für ein bestehendes Gründerteam, um Vereinbarungen aus dem Report in konkrete Zusammenarbeit zu übersetzen."
+    },
+    "whyImportant": "Warum dieses Thema wichtig ist",
+    "realityScenario": "Realitätsszenario",
+    "decisionQuestions": "Konkrete Entscheidungsfragen",
+    "discussionQuestions": "Fragen für eure Diskussion",
+    "advisorClosing": {
+      "observations": "Wichtigste Beobachtungen",
+      "questions": "Offene Rückfragen an die Founder",
+      "nextSteps": "Empfohlene nächste Schritte / To-dos",
+      "founderReaction": "Founder-Reaktion",
+      "understood": "verstanden",
+      "open": "offen",
+      "inClarification": "wird geklärt",
+      "comment": "Kurzer gemeinsamer Kommentar"
+    },
+    "perspective": "Perspektive {founder}",
+    "decisionOutput": "Entscheidungs-Output",
+    "bindingOutput": "Verbindlicher Output",
+    "riskHint": "Risiko-Hinweis",
+    "sharedAgreement": "Gemeinsame Vereinbarung",
+    "statusLabel": "Status",
+    "statuses": {
+      "open": "Noch offen",
+      "partiallyClarified": "Teilweise geklärt",
+      "agreed": "Klar vereinbart"
+    }
+  },
   "steps": {
     "vision_direction": {
       "title": "Unternehmenslogik",

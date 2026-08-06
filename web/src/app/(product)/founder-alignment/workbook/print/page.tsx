@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { type CSSProperties } from "react";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
-import { workbookContextIntro } from "@/features/reporting/founderAlignmentWorkbook";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
 import {
   getWorkbookContent,
   resolveWorkbookContentSteps,
 } from "@/features/reporting/workbookContent/workbookContent";
 import { getRequestLocale } from "@/i18n/getLocale";
-import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 const DECISION_RULES_STEP_ID = "decision_rules";
 
@@ -23,6 +22,44 @@ type PageSearchParams = {
 
 function resolveTeamContext(value: string | undefined): TeamContext {
   return value === "existing_team" ? "existing_team" : "pre_founder";
+}
+
+function resolveUnavailableStatusKey(status: "missing_invitation" | "forbidden" | "in_progress") {
+  switch (status) {
+    case "missing_invitation":
+      return "print.unavailableStatuses.missingInvitation" as const;
+    case "forbidden":
+      return "print.unavailableStatuses.forbidden" as const;
+    case "in_progress":
+      return "print.unavailableStatuses.inProgress" as const;
+  }
+}
+
+function resolveUnavailableReasonKey(reason: string | null) {
+  if (reason?.startsWith("invitation_status_")) {
+    return "print.unavailableReasons.invitationNotActive" as const;
+  }
+
+  switch (reason) {
+    case "report_snapshot_pending":
+      return "print.unavailableReasons.reportSnapshotPending" as const;
+    case "viewer_not_linked":
+      return "print.unavailableReasons.viewerNotLinked" as const;
+    case "not_authenticated":
+      return "print.unavailableReasons.notAuthenticated" as const;
+    case "invitation_not_found":
+      return "print.unavailableReasons.invitationNotFound" as const;
+    case "not_a_participant":
+      return "print.unavailableReasons.notParticipant" as const;
+    case "missing_invitee":
+      return "print.unavailableReasons.missingInvitee" as const;
+    case "base_assessment_in_progress":
+      return "print.unavailableReasons.baseAssessmentInProgress" as const;
+    case "submitted_but_not_fully_answered":
+      return "print.unavailableReasons.assessmentIncomplete" as const;
+    default:
+      return null;
+  }
 }
 
 export default async function FounderAlignmentWorkbookPrintPage({
@@ -43,26 +80,30 @@ export default async function FounderAlignmentWorkbookPrintPage({
     redirect(`/advisor/invite/${encodeURIComponent(legacyAdvisorToken)}`);
   }
 
+  const locale = await getRequestLocale();
+  const t = await getTranslations({ locale, namespace: "workbook" });
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext);
 
   if (data.status !== "ready") {
+    const statusLabel = t(resolveUnavailableStatusKey(data.status));
+    const reasonKey = resolveUnavailableReasonKey(data.reason);
+
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-            Founder Alignment Workbook
+            {t("print.documentTitle")}
           </p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
-            {t("Druckversion aktuell noch nicht verfuegbar")}
+            {t("print.unavailableTitle")}
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-700">
-            {t(
-              "Die druckbare Arbeitsversion baut auf einem vorhandenen Founder-Alignment-Ergebnis auf. Sobald beide Base-Assessments vollstaendig vorliegen, kann das Arbeitsblatt erzeugt werden."
-            )}
+            {t("print.unavailableDescription")}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-600">
-            Status: {data.status}
-            {data.reason ? ` · ${data.reason}` : ""}
+            {reasonKey
+              ? t("common.statusWithReason", { status: statusLabel, reason: t(reasonKey) })
+              : t("common.status", { status: statusLabel })}
           </p>
         </div>
       </main>
@@ -72,7 +113,6 @@ export default async function FounderAlignmentWorkbookPrintPage({
   const founderALabel = data.founderAName?.trim() || "Founder A";
   const founderBLabel = data.founderBName?.trim() || "Founder B";
   const founderPairLabel = `${founderALabel} × ${founderBLabel}`;
-  const locale = await getRequestLocale();
   const workbookContent = getWorkbookContent(locale);
   const hasActiveAdvisor = Boolean(
     data.workbook.advisorId || data.advisorInvite.advisorLinked
@@ -98,10 +138,10 @@ export default async function FounderAlignmentWorkbookPrintPage({
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-5xl justify-between gap-3">
           <Link href={workbookHref} className="text-sm text-slate-500 transition hover:text-slate-900">
-            {t("Zurueck zum Arbeitsdokument")}
+            {t("print.backToWorkbook")}
           </Link>
           <PrintReportButton
-            label="Als PDF speichern"
+            label={t("client.exportPdf")}
             eventName="workbook_print_clicked"
             invitationId={data.invitationId}
             teamContext={data.teamContext}
@@ -118,7 +158,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
                 <object
                   data="/cofoundery-align-logo.svg"
                   type="image/svg+xml"
-                  aria-label="CoFoundery Align Logo"
+                  aria-label={t("print.logoLabel")}
                   className="h-9 w-auto max-w-[190px] print:h-7"
                 >
                   <span className="text-sm font-semibold tracking-[0.08em] text-slate-900">
@@ -126,27 +166,31 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   </span>
                 </object>
                 <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                  Founder Alignment Workbook
+                  {t("print.documentTitle")}
                 </p>
                 <h1 className="mt-3 text-3xl font-semibold text-slate-950">
-                  Founder Alignment Workbook
+                  {t("print.documentTitle")}
                 </h1>
                 <p className="mt-3 text-base leading-7 text-slate-700">{founderPairLabel}</p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-600 print:min-w-[160px]">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Datum</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {t("print.dateLabel")}
+                </p>
                 <p className="mt-2 font-medium text-slate-700">{documentDate}</p>
               </div>
             </div>
 
             <p className="mt-4 max-w-3xl text-[15px] leading-8 text-slate-700">
-              {t(
-                "Dieses Dokument enthaelt die strukturierte Arbeitsversion eurer Founder Alignment Session und ist fuer Workshops, persoenliche Treffen oder Offline-Arbeit gedacht."
-              )}
+              {t("print.documentIntro")}
             </p>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
-              {t(workbookContextIntro(data.teamContext))}
+              {t(
+                data.teamContext === "existing_team"
+                  ? "print.contextIntro.existingTeam"
+                  : "print.contextIntro.preFounder"
+              )}
             </p>
           </header>
 
@@ -169,16 +213,18 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   className={`rounded-[28px] border p-7 shadow-[0_10px_30px_rgba(15,23,42,0.04)] print:break-inside-avoid print:rounded-none print:border-x-0 print:border-t-0 print:px-0 print:py-7 print:shadow-none ${sectionAccent}`}
                 >
                   <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                    Schritt {index + 1}
+                    {t("client.stepLabel", { current: index + 1 })}
                   </p>
                   <h2 className="mt-3 text-2xl font-semibold text-slate-950">{step.title}</h2>
 
                   <div className="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6">
-                    <p className="text-sm font-semibold text-slate-900">Warum dieses Thema wichtig ist</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {t("print.whyImportant")}
+                    </p>
                     <div className="mt-3 space-y-3">
                       {content.context.map((paragraph) => (
                         <p key={paragraph} className="text-sm leading-7 text-slate-700">
-                          {t(paragraph)}
+                          {paragraph}
                         </p>
                       ))}
                     </div>
@@ -187,15 +233,19 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   {isStructuredOutputStep && content.scenario ? (
                     <div className="mt-5 rounded-3xl border border-[color:var(--brand-accent)]/16 bg-white/90 p-6">
                       <p className="text-sm font-semibold text-slate-900">
-                        {t("Realitaetsszenario")}
+                        {t("print.realityScenario")}
                       </p>
-                      <p className="mt-3 text-sm leading-7 text-slate-700">{t(content.scenario)}</p>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">{content.scenario}</p>
                     </div>
                   ) : null}
 
                   <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
                     <p className="text-sm font-semibold text-slate-900">
-                      {t(isStructuredOutputStep ? "Konkrete Entscheidungsfragen" : "Fragen fuer eure Diskussion")}
+                      {t(
+                        isStructuredOutputStep
+                          ? "print.decisionQuestions"
+                          : "print.discussionQuestions"
+                      )}
                     </p>
                     <ol className="mt-4 space-y-3">
                       {step.prompts.map((prompt, promptIndex) => (
@@ -203,7 +253,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
                           key={prompt}
                           className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm leading-6 text-slate-700"
                         >
-                          {promptIndex + 1}. {t(prompt)}
+                          {promptIndex + 1}. {prompt}
                         </li>
                       ))}
                     </ol>
@@ -212,31 +262,33 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   {step.id === "advisor_closing" ? (
                     <div className="mt-5 grid gap-5">
                       <WorksheetField
-                        title={t("Wichtigste Beobachtungen")}
+                        title={t("print.advisorClosing.observations")}
                         minHeightClass="min-h-[220px]"
                         lineCount={6}
                       />
                       <WorksheetField
-                        title={t("Offene Rueckfragen an die Founder")}
+                        title={t("print.advisorClosing.questions")}
                         minHeightClass="min-h-[220px]"
                         lineCount={6}
                       />
                       <WorksheetField
-                        title={t("Empfohlene naechste Schritte / To-dos")}
+                        title={t("print.advisorClosing.nextSteps")}
                         highlight
                         minHeightClass="min-h-[220px]"
                         lineCount={6}
                       />
                       <div className="rounded-3xl border border-slate-200 bg-white/90 p-6">
-                        <p className="text-sm font-semibold text-slate-900">{t("Founder-Reaktion")}</p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {t("print.advisorClosing.founderReaction")}
+                        </p>
                         <div className="mt-4 flex flex-wrap gap-6 text-sm text-slate-700">
-                          <CheckboxLine label={t("verstanden")} />
-                          <CheckboxLine label={t("offen")} />
-                          <CheckboxLine label={t("wird geklaert")} />
+                          <CheckboxLine label={t("print.advisorClosing.understood")} />
+                          <CheckboxLine label={t("print.advisorClosing.open")} />
+                          <CheckboxLine label={t("print.advisorClosing.inClarification")} />
                         </div>
                         <div className="mt-5">
                           <WorksheetField
-                            title={t("Kurzer gemeinsamer Kommentar")}
+                            title={t("print.advisorClosing.comment")}
                             minHeightClass="min-h-[160px]"
                             lineCount={4}
                           />
@@ -246,21 +298,25 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   ) : (
                     <>
                       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-                        <WorksheetField title={`Perspektive ${founderALabel}`} />
-                        <WorksheetField title={`Perspektive ${founderBLabel}`} />
+                        <WorksheetField title={t("print.perspective", { founder: founderALabel })} />
+                        <WorksheetField title={t("print.perspective", { founder: founderBLabel })} />
                       </div>
 
                       {isStructuredOutputStep && structuredOutputFields ? (
                         <>
                           <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
                             <p className="text-sm font-semibold text-slate-900">
-                              {t(isDecisionRulesStep ? "Entscheidungs-Output" : "Verbindlicher Output")}
+                              {t(
+                                isDecisionRulesStep
+                                  ? "print.decisionOutput"
+                                  : "print.bindingOutput"
+                              )}
                             </p>
                             <div className="mt-5 grid gap-5">
                               {structuredOutputFields.map((field) => (
                                 <WorksheetField
                                   key={field.key}
-                                  title={t(field.title)}
+                                  title={field.title}
                                   highlight={field.highlight === true}
                                   minHeightClass={field.highlight ? "min-h-[180px]" : "min-h-[160px]"}
                                   lineCount={field.highlight ? 5 : 4}
@@ -272,26 +328,33 @@ export default async function FounderAlignmentWorkbookPrintPage({
                           {content.riskHint ? (
                             <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50/70 p-6">
                               <p className="text-sm font-semibold text-slate-900">
-                                {t("Risiko-Hinweis")}
+                                {t("print.riskHint")}
                               </p>
                               <p className="mt-3 text-sm leading-7 text-slate-700">
-                                {t(content.riskHint)}
+                                {content.riskHint}
                               </p>
                             </div>
                           ) : null}
                         </>
                       ) : (
                         <div className="mt-5">
-                          <WorksheetField title="Gemeinsame Vereinbarung" highlight minHeightClass="min-h-[260px]" lineCount={8} />
+                          <WorksheetField
+                            title={t("print.sharedAgreement")}
+                            highlight
+                            minHeightClass="min-h-[260px]"
+                            lineCount={8}
+                          />
                         </div>
                       )}
 
                       <div className="mt-5 rounded-3xl border border-slate-200 bg-white/90 p-6">
-                        <p className="text-sm font-semibold text-slate-900">Status</p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {t("print.statusLabel")}
+                        </p>
                         <div className="mt-4 flex flex-wrap gap-6 text-sm text-slate-700">
-                          <CheckboxLine label={t("Noch offen")} />
-                          <CheckboxLine label={t("Teilweise geklaert")} />
-                          <CheckboxLine label={t("Klar vereinbart")} />
+                          <CheckboxLine label={t("print.statuses.open")} />
+                          <CheckboxLine label={t("print.statuses.partiallyClarified")} />
+                          <CheckboxLine label={t("print.statuses.agreed")} />
                         </div>
                       </div>
                     </>
