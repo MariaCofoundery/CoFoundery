@@ -23,7 +23,9 @@ import {
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
+  resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePublishFeedback,
+  type DiscoveryProfileDraftResult,
   type DiscoveryProfilePublishIssue,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
@@ -60,6 +62,8 @@ type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 type DiscoveryProfileSearchParams = {
   message?: string | string[];
   issue?: string | string[];
+  draftResult?: string | string[];
+  draftError?: string | string[];
   publishResult?: string | string[];
   publishError?: string | string[];
   publishIssue?: string | string[];
@@ -170,6 +174,12 @@ function buildDiscoveryProfilePublishRedirect(result: DiscoveryProfilePublishRes
       params.append("publishIssue", issue);
     }
   }
+  return `/discovery/profile?${params.toString()}`;
+}
+
+function buildDiscoveryProfileDraftRedirect(result: DiscoveryProfileDraftResult) {
+  const params = new URLSearchParams();
+  params.set(result.ok ? "draftResult" : "draftError", result.reason);
   return `/discovery/profile?${params.toString()}`;
 }
 
@@ -412,11 +422,22 @@ export default async function DiscoveryProfilePage({
     error: searchParamValue(params.publishError),
     issues: searchParamValues(params.publishIssue),
   });
-  const pageMessage = publishFeedback
-    ? t(publishFeedback.messageKey)
+  const draftFeedback = resolveDiscoveryProfileDraftFeedback({
+    result: searchParamValue(params.draftResult),
+    error: searchParamValue(params.draftError),
+  });
+  const localizedFeedback =
+    (publishFeedback?.ok === false ? publishFeedback : null) ??
+    (draftFeedback?.ok === false ? draftFeedback : null) ??
+    (publishFeedback?.ok === true ? publishFeedback : null) ??
+    (draftFeedback?.ok === true ? draftFeedback : null);
+  const pageMessage = localizedFeedback
+    ? t(localizedFeedback.messageKey)
     : searchParamValue(params.message) ?? null;
-  const pageIssues = publishFeedback
-    ? publishFeedback.issues
+  const pageIssues = localizedFeedback
+    ? "issues" in localizedFeedback
+      ? localizedFeedback.issues
+      : []
     : mapDiscoveryProfilePublishIssues(searchParamValues(params.issue));
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const defaultAssessmentSignalsForSubmittedBase =
@@ -447,7 +468,6 @@ export default async function DiscoveryProfilePage({
   const prioritiesAtLimit =
     selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
   const actionMessages = {
-    draftSaved: t("profile.messages.draftSaved"),
     paused: t("profile.messages.paused"),
     preferencesSaved: t("profile.messages.preferencesSaved"),
     fallbackError: t("profile.messages.fallbackError"),
@@ -456,13 +476,7 @@ export default async function DiscoveryProfilePage({
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
-    redirect(
-      buildDiscoveryProfileRedirect(
-        result,
-        actionMessages.draftSaved,
-        actionMessages.fallbackError
-      )
-    );
+    redirect(buildDiscoveryProfileDraftRedirect(result));
   }
 
   async function publishProfileFromForm(formData: FormData) {
@@ -519,7 +533,7 @@ export default async function DiscoveryProfilePage({
         <PageMessage
           message={pageMessage}
           issues={pageIssues}
-          tone={publishFeedback ? (publishFeedback.ok ? "success" : "error") : undefined}
+          tone={localizedFeedback ? (localizedFeedback.ok ? "success" : "error") : undefined}
           t={t}
         />
 

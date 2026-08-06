@@ -198,6 +198,7 @@
     "messages": {
       "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
       "draftSaved": "Dein Discovery-Entwurf wurde gespeichert.",
+      "draftSaveFailed": "Dein Discovery-Profil konnte gerade nicht gespeichert werden.",
       "published": "Dein Discovery-Profil ist jetzt aktiv.",
       "notAuthenticated": "Bitte melde dich an, um dein Discovery-Profil zu veröffentlichen.",
       "profileMissing": "Lege zuerst ein Discovery-Profil als Entwurf an.",

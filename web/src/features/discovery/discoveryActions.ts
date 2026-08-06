@@ -13,6 +13,7 @@ import {
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
+  type DiscoveryProfileDraftResult,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
 import {
@@ -222,10 +223,13 @@ function getPublishabilityIssues(error: unknown) {
 
 export async function saveDiscoveryProfileDraftAction(
   formData: FormData
-): Promise<DiscoveryActionState> {
+): Promise<DiscoveryProfileDraftResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
-    return unauthenticatedState();
+    return {
+      ok: false,
+      reason: "not_authenticated",
+    };
   }
 
   try {
@@ -239,12 +243,12 @@ export async function saveDiscoveryProfileDraftAction(
     revalidateDiscoveryPaths();
     return {
       ok: true,
-      message: "Dein Discovery-Entwurf wurde gespeichert.",
+      reason: "draft_saved",
     };
   } catch {
     return {
       ok: false,
-      message: "Dein Discovery-Profil konnte gerade nicht gespeichert werden.",
+      reason: "draft_save_failed",
     };
   }
 }

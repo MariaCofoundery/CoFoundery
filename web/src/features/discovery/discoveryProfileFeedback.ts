@@ -1,5 +1,12 @@
 export const DISCOVERY_PROFILE_PUBLISH_SUCCESS_REASONS = ["profile_published"] as const;
 
+export const DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS = ["draft_saved"] as const;
+
+export const DISCOVERY_PROFILE_DRAFT_ERROR_REASONS = [
+  "not_authenticated",
+  "draft_save_failed",
+] as const;
+
 export const DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS = [
   "not_authenticated",
   "profile_missing",
@@ -28,6 +35,28 @@ export type DiscoveryProfilePublishReason =
 export type DiscoveryProfilePublishIssue =
   (typeof DISCOVERY_PROFILE_PUBLISH_ISSUES)[number];
 
+export type DiscoveryProfileDraftSuccessReason =
+  (typeof DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS)[number];
+export type DiscoveryProfileDraftErrorReason =
+  (typeof DISCOVERY_PROFILE_DRAFT_ERROR_REASONS)[number];
+export type DiscoveryProfileDraftReason =
+  | DiscoveryProfileDraftSuccessReason
+  | DiscoveryProfileDraftErrorReason;
+
+export type DiscoveryProfileDraftResult =
+  | { ok: true; reason: DiscoveryProfileDraftSuccessReason }
+  | { ok: false; reason: DiscoveryProfileDraftErrorReason };
+
+export type DiscoveryProfileDraftFeedbackReason =
+  | DiscoveryProfileDraftReason
+  | "unexpected_error";
+
+export type DiscoveryProfileDraftMessageKey =
+  | "profile.messages.draftSaved"
+  | "profile.messages.notAuthenticated"
+  | "profile.messages.draftSaveFailed"
+  | "profile.messages.fallbackError";
+
 export type DiscoveryProfilePublishResult =
   | { ok: true; reason: DiscoveryProfilePublishSuccessReason }
   | {
@@ -51,6 +80,8 @@ export type DiscoveryProfilePublishMessageKey =
 const publishSuccessReasons = new Set<string>(DISCOVERY_PROFILE_PUBLISH_SUCCESS_REASONS);
 const publishErrorReasons = new Set<string>(DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS);
 const publishIssues = new Set<string>(DISCOVERY_PROFILE_PUBLISH_ISSUES);
+const draftSuccessReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS);
+const draftErrorReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_ERROR_REASONS);
 
 const publishIssueByValidationText: Record<string, DiscoveryProfilePublishIssue> = {
   "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
@@ -94,6 +125,57 @@ export function getDiscoveryProfilePublishMessageKey(
     case "unexpected_error":
       return "profile.messages.fallbackError";
   }
+}
+
+export function getDiscoveryProfileDraftMessageKey(
+  reason: DiscoveryProfileDraftFeedbackReason
+): DiscoveryProfileDraftMessageKey {
+  switch (reason) {
+    case "draft_saved":
+      return "profile.messages.draftSaved";
+    case "not_authenticated":
+      return "profile.messages.notAuthenticated";
+    case "draft_save_failed":
+      return "profile.messages.draftSaveFailed";
+    case "unexpected_error":
+      return "profile.messages.fallbackError";
+  }
+}
+
+export function resolveDiscoveryProfileDraftFeedback({
+  result,
+  error,
+}: {
+  result?: string | null;
+  error?: string | null;
+}): {
+  ok: boolean;
+  reason: DiscoveryProfileDraftFeedbackReason;
+  messageKey: DiscoveryProfileDraftMessageKey;
+} | null {
+  if (error) {
+    const reason: DiscoveryProfileDraftFeedbackReason = draftErrorReasons.has(error)
+      ? (error as DiscoveryProfileDraftErrorReason)
+      : "unexpected_error";
+    return {
+      ok: false,
+      reason,
+      messageKey: getDiscoveryProfileDraftMessageKey(reason),
+    };
+  }
+
+  if (result) {
+    const reason: DiscoveryProfileDraftFeedbackReason = draftSuccessReasons.has(result)
+      ? (result as DiscoveryProfileDraftSuccessReason)
+      : "unexpected_error";
+    return {
+      ok: reason === "draft_saved",
+      reason,
+      messageKey: getDiscoveryProfileDraftMessageKey(reason),
+    };
+  }
+
+  return null;
 }
 
 export function resolveDiscoveryProfilePublishFeedback({

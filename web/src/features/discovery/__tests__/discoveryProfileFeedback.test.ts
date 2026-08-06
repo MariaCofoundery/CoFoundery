@@ -3,12 +3,16 @@ import test from "node:test";
 import deDiscovery from "../../../../messages/de/discovery.json";
 import enDiscovery from "../../../../messages/en/discovery.json";
 import {
+  DISCOVERY_PROFILE_DRAFT_ERROR_REASONS,
+  DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ISSUES,
   DISCOVERY_PROFILE_PUBLISH_SUCCESS_REASONS,
   filterDiscoveryProfilePublishIssues,
+  getDiscoveryProfileDraftMessageKey,
   getDiscoveryProfilePublishMessageKey,
   mapDiscoveryProfilePublishIssues,
+  resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePublishFeedback,
 } from "@/features/discovery/discoveryProfileFeedback";
 
@@ -119,5 +123,60 @@ test("Discovery profile publish feedback has parallel German and English message
       readMessage({ profile: enDiscovery.profile }, key),
     ];
   });
+  assert.doesNotMatch(visibleMessages.join(" "), /discovery_profiles|relation .* does not exist/i);
+});
+
+test("Discovery profile draft reasons are classified safely", () => {
+  assert.deepEqual(DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS, ["draft_saved"]);
+  assert.deepEqual(resolveDiscoveryProfileDraftFeedback({ result: "draft_saved" }), {
+    ok: true,
+    reason: "draft_saved",
+    messageKey: "profile.messages.draftSaved",
+  });
+
+  for (const reason of DISCOVERY_PROFILE_DRAFT_ERROR_REASONS) {
+    const feedback = resolveDiscoveryProfileDraftFeedback({ error: reason });
+    assert.equal(feedback?.ok, false);
+    assert.equal(feedback?.reason, reason);
+  }
+});
+
+test("Discovery profile draft query values are validated with errors taking priority", () => {
+  const rawError = 'relation "discovery_profiles" does not exist';
+  const feedback = resolveDiscoveryProfileDraftFeedback({
+    result: "draft_saved",
+    error: rawError,
+  });
+
+  assert.deepEqual(feedback, {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+  assert.notEqual(feedback?.reason, rawError);
+  assert.deepEqual(resolveDiscoveryProfileDraftFeedback({ result: "<script>" }), {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+});
+
+test("Discovery profile draft feedback has parallel German and English messages", () => {
+  const visibleReasons = [
+    ...DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS,
+    ...DISCOVERY_PROFILE_DRAFT_ERROR_REASONS,
+    "unexpected_error",
+  ] as const;
+
+  const visibleMessages = visibleReasons.flatMap((reason) => {
+    const key = getDiscoveryProfileDraftMessageKey(reason);
+    const deMessage = readMessage({ profile: deDiscovery.profile }, key);
+    const enMessage = readMessage({ profile: enDiscovery.profile }, key);
+    assert.ok(deMessage, `missing German message for ${reason}`);
+    assert.ok(enMessage, `missing English message for ${reason}`);
+    assert.deepEqual(placeholders(deMessage), placeholders(enMessage));
+    return [deMessage, enMessage];
+  });
+
   assert.doesNotMatch(visibleMessages.join(" "), /discovery_profiles|relation .* does not exist/i);
 });
