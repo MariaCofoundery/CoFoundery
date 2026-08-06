@@ -7,13 +7,12 @@ import {
   requestDiscoveryIntro,
   respondDiscoveryIntro,
 } from "@/features/discovery/discoveryIntroData";
+import type {
+  DiscoveryIntroActionErrorReason,
+  DiscoveryIntroActionState,
+} from "@/features/discovery/discoveryIntroFeedback";
 import { isDiscoveryIntroResponseStatus } from "@/features/discovery/discoveryIntroTypes";
 import { createClient } from "@/lib/supabase/server";
-
-export type DiscoveryIntroActionState = {
-  ok: boolean;
-  message?: string;
-};
 
 function revalidateDiscoveryIntroPaths(profileId?: string) {
   revalidatePath("/discovery");
@@ -40,59 +39,59 @@ function getFormString(formData: FormData, name: string) {
 function unauthenticatedState(): DiscoveryIntroActionState {
   return {
     ok: false,
-    message: "Bitte melde dich an, um Discovery-Intros zu nutzen.",
+    reason: "not_authenticated",
   };
 }
 
-function requestErrorMessage(error: unknown) {
+function requestErrorReason(error: unknown): DiscoveryIntroActionErrorReason {
   if (!(error instanceof Error)) {
-    return "Deine Intro-Anfrage konnte gerade nicht gesendet werden.";
+    return "request_failed";
   }
 
   if (error.message === "discovery_intro_requester_profile_inactive") {
-    return "Veröffentliche zuerst dein eigenes Discovery-Profil, bevor du ein Intro anfragst.";
+    return "requester_profile_inactive";
   }
   if (error.message === "discovery_intro_recipient_profile_inactive") {
-    return "Dieses Discovery-Profil ist aktuell nicht sichtbar.";
+    return "recipient_profile_inactive";
   }
   if (error.message === "discovery_intro_self_request_forbidden") {
-    return "Du kannst für dein eigenes Profil kein Intro anfragen.";
+    return "self_request_forbidden";
   }
   if (error.message === "discovery_intro_pending_exists") {
-    return "Für dieses Profil wartet bereits eine Intro-Anfrage auf Antwort.";
+    return "pending_request_exists";
   }
 
-  return "Deine Intro-Anfrage konnte gerade nicht gesendet werden.";
+  return "request_failed";
 }
 
-function responseErrorMessage(error: unknown) {
+function responseErrorReason(error: unknown): DiscoveryIntroActionErrorReason {
   if (!(error instanceof Error)) {
-    return "Die Intro-Anfrage konnte gerade nicht beantwortet werden.";
+    return "response_failed";
   }
 
   if (error.message === "discovery_intro_not_pending") {
-    return "Diese Anfrage ist nicht mehr offen.";
+    return "intro_not_pending";
   }
   if (error.message === "discovery_intro_response_forbidden") {
-    return "Du kannst diese Intro-Anfrage nicht beantworten.";
+    return "response_forbidden";
   }
 
-  return "Die Intro-Anfrage konnte gerade nicht beantwortet werden.";
+  return "response_failed";
 }
 
-function cancelErrorMessage(error: unknown) {
+function cancelErrorReason(error: unknown): DiscoveryIntroActionErrorReason {
   if (!(error instanceof Error)) {
-    return "Die Intro-Anfrage konnte gerade nicht zurückgezogen werden.";
+    return "cancel_failed";
   }
 
   if (error.message === "discovery_intro_not_pending") {
-    return "Diese Anfrage ist nicht mehr offen.";
+    return "intro_not_pending";
   }
   if (error.message === "discovery_intro_cancel_forbidden") {
-    return "Du kannst diese Intro-Anfrage nicht zurückziehen.";
+    return "cancel_forbidden";
   }
 
-  return "Die Intro-Anfrage konnte gerade nicht zurückgezogen werden.";
+  return "cancel_failed";
 }
 
 export async function requestDiscoveryIntroAction(
@@ -114,12 +113,12 @@ export async function requestDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths(profileId);
     return {
       ok: true,
-      message: "Intro-Anfrage gesendet.",
+      reason: "request_sent",
     };
   } catch (error) {
     return {
       ok: false,
-      message: requestErrorMessage(error),
+      reason: requestErrorReason(error),
     };
   }
 }
@@ -136,7 +135,7 @@ export async function respondDiscoveryIntroAction(
   if (!isDiscoveryIntroResponseStatus(response)) {
     return {
       ok: false,
-      message: "Diese Antwort ist für Discovery-Intros nicht vorgesehen.",
+      reason: "invalid_response",
     };
   }
 
@@ -151,12 +150,12 @@ export async function respondDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths();
     return {
       ok: true,
-      message: response === "accepted" ? "Intro angenommen." : "Intro abgelehnt.",
+      reason: response === "accepted" ? "response_accepted" : "response_declined",
     };
   } catch (error) {
     return {
       ok: false,
-      message: responseErrorMessage(error),
+      reason: responseErrorReason(error),
     };
   }
 }
@@ -178,12 +177,12 @@ export async function cancelDiscoveryIntroAction(
     revalidateDiscoveryIntroPaths();
     return {
       ok: true,
-      message: "Anfrage zurückgezogen.",
+      reason: "request_canceled",
     };
   } catch (error) {
     return {
       ok: false,
-      message: cancelErrorMessage(error),
+      reason: cancelErrorReason(error),
     };
   }
 }

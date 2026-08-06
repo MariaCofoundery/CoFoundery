@@ -4,10 +4,13 @@ import { getTranslations } from "next-intl/server";
 import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
 import {
   cancelDiscoveryIntroAction,
-  type DiscoveryIntroActionState,
   requestDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
+import {
+  resolveDiscoveryIntroFeedback,
+  type DiscoveryIntroActionState,
+} from "@/features/discovery/discoveryIntroFeedback";
 import {
   canCancelDiscoveryIntro,
   type DiscoveryIntroRequest,
@@ -65,11 +68,10 @@ function searchParamValue(value: string | string[] | undefined) {
 
 function introResultUrl(
   profileId: string,
-  result: DiscoveryIntroActionState,
-  fallbackMessage: string
+  result: DiscoveryIntroActionState
 ) {
   const params = new URLSearchParams();
-  params.set("introMessage", result.message ?? fallbackMessage);
+  params.set("introMessage", result.reason);
   params.set("introOk", result.ok ? "1" : "0");
   return `/discovery/${profileId}?${params.toString()}`;
 }
@@ -142,17 +144,15 @@ function IntroRequestCard({
   profile,
   introRequest,
   t,
-  fallbackMessage,
 }: {
   profile: FounderDiscoveryProfile;
   introRequest: DiscoveryIntroRequest | null;
   t: DiscoveryT;
-  fallbackMessage: string;
 }) {
   async function requestIntro(formData: FormData) {
     "use server";
     const result = await requestDiscoveryIntroAction(profile.id, formData);
-    redirect(introResultUrl(profile.id, result, fallbackMessage));
+    redirect(introResultUrl(profile.id, result));
   }
 
   if (!introRequest) {
@@ -286,7 +286,7 @@ function IntroRequestCard({
             action={async () => {
               "use server";
               const result = await cancelDiscoveryIntroAction(introRequest.id);
-              redirect(introResultUrl(profile.id, result, fallbackMessage));
+              redirect(introResultUrl(profile.id, result));
             }}
           >
             <button type="submit" className={SECONDARY_CTA_CLASS}>
@@ -331,9 +331,9 @@ export default async function DiscoveryProfileDetailPage({
   const introRequest = isOwner
     ? null
     : await getDiscoveryIntroRequestForProfile(user.id, profile.id);
-  const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
-  const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
-  const fallbackIntroMessage = t("intros.defaultActionMessage");
+  const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
+  const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
+  const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -366,7 +366,7 @@ export default async function DiscoveryProfileDetailPage({
           </div>
         </header>
 
-        <IntroPageMessage message={introMessage} ok={introOk} />
+        <IntroPageMessage message={introMessage} ok={introFeedback?.ok ?? false} />
 
         <section className={CARD_CLASS}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -394,7 +394,6 @@ export default async function DiscoveryProfileDetailPage({
             profile={profile}
             introRequest={introRequest}
             t={t}
-            fallbackMessage={fallbackIntroMessage}
           />
         )}
 

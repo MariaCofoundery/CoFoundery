@@ -3,13 +3,16 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   cancelDiscoveryIntroAction,
-  type DiscoveryIntroActionState,
   respondDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import {
   getReceivedDiscoveryIntroRequests,
   getSentDiscoveryIntroRequests,
 } from "@/features/discovery/discoveryIntroData";
+import {
+  resolveDiscoveryIntroFeedback,
+  type DiscoveryIntroActionState,
+} from "@/features/discovery/discoveryIntroFeedback";
 import {
   canCancelDiscoveryIntro,
   canRespondToDiscoveryIntro,
@@ -40,9 +43,9 @@ function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function introsResultUrl(result: DiscoveryIntroActionState, fallbackMessage: string) {
+function introsResultUrl(result: DiscoveryIntroActionState) {
   const params = new URLSearchParams();
-  params.set("introMessage", result.message ?? fallbackMessage);
+  params.set("introMessage", result.reason);
   params.set("introOk", result.ok ? "1" : "0");
   return `/discovery/intros?${params.toString()}`;
 }
@@ -145,22 +148,20 @@ function RequestMessage({
 function ReceivedIntroCard({
   request,
   t,
-  fallbackMessage,
 }: {
   request: DiscoveryIntroRequestWithProfile;
   t: DiscoveryT;
-  fallbackMessage: string;
 }) {
   async function acceptIntro(formData: FormData) {
     "use server";
     const result = await respondDiscoveryIntroAction(request.id, "accepted", formData);
-    redirect(introsResultUrl(result, fallbackMessage));
+    redirect(introsResultUrl(result));
   }
 
   async function declineIntro(formData: FormData) {
     "use server";
     const result = await respondDiscoveryIntroAction(request.id, "declined", formData);
-    redirect(introsResultUrl(result, fallbackMessage));
+    redirect(introsResultUrl(result));
   }
 
   return (
@@ -231,16 +232,14 @@ function ReceivedIntroCard({
 function SentIntroCard({
   request,
   t,
-  fallbackMessage,
 }: {
   request: DiscoveryIntroRequestWithProfile;
   t: DiscoveryT;
-  fallbackMessage: string;
 }) {
   async function cancelIntro() {
     "use server";
     const result = await cancelDiscoveryIntroAction(request.id);
-    redirect(introsResultUrl(result, fallbackMessage));
+    redirect(introsResultUrl(result));
   }
 
   return (
@@ -310,9 +309,9 @@ export default async function DiscoveryIntrosPage({
 
   const sortedReceived = sortIntroRequests(received);
   const sortedSent = sortIntroRequests(sent);
-  const introMessage = searchParamValue(resolvedSearchParams.introMessage) ?? null;
-  const introOk = searchParamValue(resolvedSearchParams.introOk) !== "0";
-  const fallbackIntroMessage = t("intros.defaultActionMessage");
+  const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
+  const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
+  const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -332,7 +331,7 @@ export default async function DiscoveryIntrosPage({
           </p>
         </header>
 
-        <IntroPageMessage message={introMessage} ok={introOk} />
+        <IntroPageMessage message={introMessage} ok={introFeedback?.ok ?? false} />
 
         <section className={CARD_CLASS}>
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -352,7 +351,6 @@ export default async function DiscoveryIntrosPage({
                   key={request.id}
                   request={request}
                   t={t}
-                  fallbackMessage={fallbackIntroMessage}
                 />
               ))}
             </div>
@@ -377,7 +375,6 @@ export default async function DiscoveryIntrosPage({
                   key={request.id}
                   request={request}
                   t={t}
-                  fallbackMessage={fallbackIntroMessage}
                 />
               ))}
             </div>
