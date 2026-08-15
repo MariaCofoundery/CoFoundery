@@ -15,6 +15,7 @@ import {
   mapDiscoveryProfilePublishIssues,
   type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
+  type DiscoveryProfilePauseResult,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
 import {
@@ -23,12 +24,6 @@ import {
   normalizeDiscoveryProfileInput,
 } from "@/features/discovery/discoveryValidation";
 import { createClient } from "@/lib/supabase/server";
-
-export type DiscoveryActionState = {
-  ok: boolean;
-  message?: string;
-  issues?: string[];
-};
 
 const DISCOVERY_REVALIDATION_PATHS = ["/discovery", "/discovery/profile"] as const;
 
@@ -49,13 +44,6 @@ async function getAuthenticatedUserId() {
   }
 
   return user.id;
-}
-
-function unauthenticatedState(): DiscoveryActionState {
-  return {
-    ok: false,
-    message: "Bitte melde dich an, um dein Discovery-Profil zu bearbeiten.",
-  };
 }
 
 function unauthenticatedPublishResult(): DiscoveryProfilePublishResult {
@@ -362,10 +350,13 @@ export async function publishDiscoveryProfileFromFormAction(
   }
 }
 
-export async function pauseDiscoveryProfileAction(): Promise<DiscoveryActionState> {
+export async function pauseDiscoveryProfileAction(): Promise<DiscoveryProfilePauseResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
-    return unauthenticatedState();
+    return {
+      ok: false,
+      reason: "not_authenticated",
+    };
   }
 
   try {
@@ -373,7 +364,7 @@ export async function pauseDiscoveryProfileAction(): Promise<DiscoveryActionStat
     if (!profile) {
       return {
         ok: false,
-        message: "Es gibt noch kein Discovery-Profil, das pausiert werden kann.",
+        reason: "profile_missing",
       };
     }
 
@@ -385,12 +376,12 @@ export async function pauseDiscoveryProfileAction(): Promise<DiscoveryActionStat
     revalidateDiscoveryPaths();
     return {
       ok: true,
-      message: "Deine Co-Founder-Suche ist pausiert.",
+      reason: "profile_paused",
     };
   } catch {
     return {
       ok: false,
-      message: "Deine Co-Founder-Suche konnte gerade nicht pausiert werden.",
+      reason: "pause_failed",
     };
   }
 }

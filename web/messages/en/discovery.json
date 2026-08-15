@@ -204,6 +204,8 @@
       "profileMissing": "Create a Discovery profile draft before publishing it.",
       "publishFailed": "Your Discovery profile could not be published right now. Please try again.",
       "paused": "Your co-founder search is paused.",
+      "pauseProfileMissing": "There is no Discovery profile to pause yet.",
+      "pauseFailed": "Your co-founder search could not be paused right now.",
       "preferencesSaved": "Your search priorities were saved.",
       "preferencesSaveFailed": "Your search preferences could not be saved right now."
     },

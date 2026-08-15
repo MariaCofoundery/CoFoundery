@@ -204,6 +204,8 @@
       "profileMissing": "Lege zuerst ein Discovery-Profil als Entwurf an.",
       "publishFailed": "Dein Discovery-Profil konnte gerade nicht veröffentlicht werden. Bitte versuche es erneut.",
       "paused": "Deine Co-Founder-Suche ist pausiert.",
+      "pauseProfileMissing": "Es gibt noch kein Discovery-Profil, das pausiert werden kann.",
+      "pauseFailed": "Deine Co-Founder-Suche konnte gerade nicht pausiert werden.",
       "preferencesSaved": "Deine Suchprioritäten wurden gespeichert.",
       "preferencesSaveFailed": "Deine Suchpräferenzen konnten gerade nicht gespeichert werden."
     },

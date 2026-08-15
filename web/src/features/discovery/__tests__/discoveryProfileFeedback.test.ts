@@ -7,16 +7,20 @@ import {
   DISCOVERY_PREFERENCES_SUCCESS_REASONS,
   DISCOVERY_PROFILE_DRAFT_ERROR_REASONS,
   DISCOVERY_PROFILE_DRAFT_SUCCESS_REASONS,
+  DISCOVERY_PROFILE_PAUSE_ERROR_REASONS,
+  DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS,
   DISCOVERY_PROFILE_PUBLISH_ISSUES,
   DISCOVERY_PROFILE_PUBLISH_SUCCESS_REASONS,
   filterDiscoveryProfilePublishIssues,
   getDiscoveryPreferencesMessageKey,
   getDiscoveryProfileDraftMessageKey,
+  getDiscoveryProfilePauseMessageKey,
   getDiscoveryProfilePublishMessageKey,
   mapDiscoveryProfilePublishIssues,
   resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
+  resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
   selectDiscoveryProfileFeedback,
 } from "@/features/discovery/discoveryProfileFeedback";
@@ -221,21 +225,79 @@ test("Discovery preferences query values are validated with errors taking priori
   });
 });
 
+test("Discovery profile pause reasons are classified safely", () => {
+  assert.deepEqual(DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS, ["profile_paused"]);
+  assert.deepEqual(resolveDiscoveryProfilePauseFeedback({ result: "profile_paused" }), {
+    ok: true,
+    reason: "profile_paused",
+    messageKey: "profile.messages.paused",
+  });
+
+  for (const reason of DISCOVERY_PROFILE_PAUSE_ERROR_REASONS) {
+    const feedback = resolveDiscoveryProfilePauseFeedback({ error: reason });
+    assert.equal(feedback?.ok, false);
+    assert.equal(feedback?.reason, reason);
+  }
+});
+
+test("Discovery profile pause query values are validated with errors taking priority", () => {
+  const rawError = 'relation "discovery_profiles" does not exist';
+  const feedback = resolveDiscoveryProfilePauseFeedback({
+    result: "profile_paused",
+    error: rawError,
+  });
+
+  assert.deepEqual(feedback, {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+  assert.notEqual(feedback?.reason, rawError);
+  assert.deepEqual(resolveDiscoveryProfilePauseFeedback({ result: "<script>" }), {
+    ok: false,
+    reason: "unexpected_error",
+    messageKey: "profile.messages.fallbackError",
+  });
+});
+
+test("Discovery profile pause feedback has parallel German and English messages", () => {
+  const visibleReasons = [
+    ...DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS,
+    ...DISCOVERY_PROFILE_PAUSE_ERROR_REASONS,
+    "unexpected_error",
+  ] as const;
+
+  const visibleMessages = visibleReasons.flatMap((reason) => {
+    const key = getDiscoveryProfilePauseMessageKey(reason);
+    const deMessage = readMessage({ profile: deDiscovery.profile }, key);
+    const enMessage = readMessage({ profile: enDiscovery.profile }, key);
+    assert.ok(deMessage, `missing German message for ${reason}`);
+    assert.ok(enMessage, `missing English message for ${reason}`);
+    assert.deepEqual(placeholders(deMessage), placeholders(enMessage));
+    return [deMessage, enMessage];
+  });
+
+  assert.doesNotMatch(visibleMessages.join(" "), /discovery_profiles|relation .* does not exist/i);
+});
+
 test("Discovery profile feedback follows the cross-flow priority", () => {
   const publishError = resolveDiscoveryProfilePublishFeedback({ error: "publish_failed" });
   const draftError = resolveDiscoveryProfileDraftFeedback({ error: "draft_save_failed" });
   const preferencesError = resolveDiscoveryPreferencesFeedback({
     error: "preferences_save_failed",
   });
+  const pauseError = resolveDiscoveryProfilePauseFeedback({ error: "pause_failed" });
   const publishSuccess = resolveDiscoveryProfilePublishFeedback({ result: "profile_published" });
   const draftSuccess = resolveDiscoveryProfileDraftFeedback({ result: "draft_saved" });
   const preferencesSuccess = resolveDiscoveryPreferencesFeedback({ result: "preferences_saved" });
+  const pauseSuccess = resolveDiscoveryProfilePauseFeedback({ result: "profile_paused" });
 
   assert.equal(
     selectDiscoveryProfileFeedback({
       publish: publishError,
       draft: draftError,
       preferences: preferencesError,
+      pause: pauseError,
     })?.reason,
     "publish_failed"
   );
@@ -244,6 +306,7 @@ test("Discovery profile feedback follows the cross-flow priority", () => {
       publish: publishSuccess,
       draft: draftError,
       preferences: preferencesError,
+      pause: pauseError,
     })?.reason,
     "draft_save_failed"
   );
@@ -252,6 +315,7 @@ test("Discovery profile feedback follows the cross-flow priority", () => {
       publish: publishSuccess,
       draft: draftSuccess,
       preferences: preferencesError,
+      pause: pauseError,
     })?.reason,
     "preferences_save_failed"
   );
@@ -260,6 +324,16 @@ test("Discovery profile feedback follows the cross-flow priority", () => {
       publish: publishSuccess,
       draft: draftSuccess,
       preferences: preferencesSuccess,
+      pause: pauseError,
+    })?.reason,
+    "pause_failed"
+  );
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: publishSuccess,
+      draft: draftSuccess,
+      preferences: preferencesSuccess,
+      pause: pauseSuccess,
     })?.reason,
     "profile_published"
   );
@@ -268,6 +342,7 @@ test("Discovery profile feedback follows the cross-flow priority", () => {
       publish: null,
       draft: draftSuccess,
       preferences: preferencesSuccess,
+      pause: pauseSuccess,
     })?.reason,
     "draft_saved"
   );
@@ -276,18 +351,29 @@ test("Discovery profile feedback follows the cross-flow priority", () => {
       publish: null,
       draft: null,
       preferences: preferencesSuccess,
+      pause: pauseSuccess,
     })?.reason,
     "preferences_saved"
   );
 
-  const legacyPauseMessage = "Deine Co-Founder-Suche ist pausiert.";
-  const preferencesBeforeLegacy = selectDiscoveryProfileFeedback({
+  assert.equal(
+    selectDiscoveryProfileFeedback({
+      publish: null,
+      draft: null,
+      preferences: null,
+      pause: pauseSuccess,
+    })?.reason,
+    "profile_paused"
+  );
+
+  const preferencesBeforePause = selectDiscoveryProfileFeedback({
     publish: null,
     draft: null,
     preferences: preferencesSuccess,
+    pause: pauseSuccess,
   });
   assert.equal(
-    preferencesBeforeLegacy?.messageKey ?? legacyPauseMessage,
+    preferencesBeforePause?.messageKey,
     "profile.messages.preferencesSaved"
   );
 });

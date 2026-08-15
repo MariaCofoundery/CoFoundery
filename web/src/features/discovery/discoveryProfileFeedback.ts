@@ -14,6 +14,14 @@ export const DISCOVERY_PREFERENCES_ERROR_REASONS = [
   "preferences_save_failed",
 ] as const;
 
+export const DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS = ["profile_paused"] as const;
+
+export const DISCOVERY_PROFILE_PAUSE_ERROR_REASONS = [
+  "not_authenticated",
+  "profile_missing",
+  "pause_failed",
+] as const;
+
 export const DISCOVERY_PROFILE_PUBLISH_ERROR_REASONS = [
   "not_authenticated",
   "profile_missing",
@@ -86,6 +94,29 @@ export type DiscoveryPreferencesMessageKey =
   | "profile.messages.preferencesSaveFailed"
   | "profile.messages.fallbackError";
 
+export type DiscoveryProfilePauseSuccessReason =
+  (typeof DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS)[number];
+export type DiscoveryProfilePauseErrorReason =
+  (typeof DISCOVERY_PROFILE_PAUSE_ERROR_REASONS)[number];
+export type DiscoveryProfilePauseReason =
+  | DiscoveryProfilePauseSuccessReason
+  | DiscoveryProfilePauseErrorReason;
+
+export type DiscoveryProfilePauseResult =
+  | { ok: true; reason: DiscoveryProfilePauseSuccessReason }
+  | { ok: false; reason: DiscoveryProfilePauseErrorReason };
+
+export type DiscoveryProfilePauseFeedbackReason =
+  | DiscoveryProfilePauseReason
+  | "unexpected_error";
+
+export type DiscoveryProfilePauseMessageKey =
+  | "profile.messages.paused"
+  | "profile.messages.notAuthenticated"
+  | "profile.messages.pauseProfileMissing"
+  | "profile.messages.pauseFailed"
+  | "profile.messages.fallbackError";
+
 export type DiscoveryProfilePublishResult =
   | { ok: true; reason: DiscoveryProfilePublishSuccessReason }
   | {
@@ -113,6 +144,8 @@ const draftSuccessReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_SUCCESS_REAS
 const draftErrorReasons = new Set<string>(DISCOVERY_PROFILE_DRAFT_ERROR_REASONS);
 const preferencesSuccessReasons = new Set<string>(DISCOVERY_PREFERENCES_SUCCESS_REASONS);
 const preferencesErrorReasons = new Set<string>(DISCOVERY_PREFERENCES_ERROR_REASONS);
+const pauseSuccessReasons = new Set<string>(DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS);
+const pauseErrorReasons = new Set<string>(DISCOVERY_PROFILE_PAUSE_ERROR_REASONS);
 
 const publishIssueByValidationText: Record<string, DiscoveryProfilePublishIssue> = {
   "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
@@ -260,6 +293,59 @@ export function resolveDiscoveryPreferencesFeedback({
   return null;
 }
 
+export function getDiscoveryProfilePauseMessageKey(
+  reason: DiscoveryProfilePauseFeedbackReason
+): DiscoveryProfilePauseMessageKey {
+  switch (reason) {
+    case "profile_paused":
+      return "profile.messages.paused";
+    case "not_authenticated":
+      return "profile.messages.notAuthenticated";
+    case "profile_missing":
+      return "profile.messages.pauseProfileMissing";
+    case "pause_failed":
+      return "profile.messages.pauseFailed";
+    case "unexpected_error":
+      return "profile.messages.fallbackError";
+  }
+}
+
+export function resolveDiscoveryProfilePauseFeedback({
+  result,
+  error,
+}: {
+  result?: string | null;
+  error?: string | null;
+}): {
+  ok: boolean;
+  reason: DiscoveryProfilePauseFeedbackReason;
+  messageKey: DiscoveryProfilePauseMessageKey;
+} | null {
+  if (error) {
+    const reason: DiscoveryProfilePauseFeedbackReason = pauseErrorReasons.has(error)
+      ? (error as DiscoveryProfilePauseErrorReason)
+      : "unexpected_error";
+    return {
+      ok: false,
+      reason,
+      messageKey: getDiscoveryProfilePauseMessageKey(reason),
+    };
+  }
+
+  if (result) {
+    const reason: DiscoveryProfilePauseFeedbackReason = pauseSuccessReasons.has(result)
+      ? (result as DiscoveryProfilePauseSuccessReason)
+      : "unexpected_error";
+    return {
+      ok: reason === "profile_paused",
+      reason,
+      messageKey: getDiscoveryProfilePauseMessageKey(reason),
+    };
+  }
+
+  return null;
+}
+
 export function resolveDiscoveryProfilePublishFeedback({
   result,
   error,
@@ -319,22 +405,32 @@ type ResolvedDraftFeedback = NonNullable<ReturnType<typeof resolveDiscoveryProfi
 type ResolvedPreferencesFeedback = NonNullable<
   ReturnType<typeof resolveDiscoveryPreferencesFeedback>
 >;
+type ResolvedPauseFeedback = NonNullable<ReturnType<typeof resolveDiscoveryProfilePauseFeedback>>;
 
 export function selectDiscoveryProfileFeedback({
   publish,
   draft,
   preferences,
+  pause,
 }: {
   publish: ResolvedPublishFeedback | null;
   draft: ResolvedDraftFeedback | null;
   preferences: ResolvedPreferencesFeedback | null;
-}): ResolvedPublishFeedback | ResolvedDraftFeedback | ResolvedPreferencesFeedback | null {
+  pause: ResolvedPauseFeedback | null;
+}):
+  | ResolvedPublishFeedback
+  | ResolvedDraftFeedback
+  | ResolvedPreferencesFeedback
+  | ResolvedPauseFeedback
+  | null {
   return (
     (publish?.ok === false ? publish : null) ??
     (draft?.ok === false ? draft : null) ??
     (preferences?.ok === false ? preferences : null) ??
+    (pause?.ok === false ? pause : null) ??
     (publish?.ok === true ? publish : null) ??
     (draft?.ok === true ? draft : null) ??
-    (preferences?.ok === true ? preferences : null)
+    (preferences?.ok === true ? preferences : null) ??
+    (pause?.ok === true ? pause : null)
   );
 }

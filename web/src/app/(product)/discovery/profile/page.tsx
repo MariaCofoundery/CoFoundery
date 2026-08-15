@@ -15,7 +15,6 @@ import {
   publishDiscoveryProfileFromFormAction,
   saveDiscoveryPreferencesAction,
   saveDiscoveryProfileDraftAction,
-  type DiscoveryActionState,
 } from "@/features/discovery/discoveryActions";
 import {
   getOwnDiscoveryProfile,
@@ -25,10 +24,12 @@ import {
   mapDiscoveryProfilePublishIssues,
   resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
+  resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
   selectDiscoveryProfileFeedback,
   type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
+  type DiscoveryProfilePauseResult,
   type DiscoveryProfilePublishIssue,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
@@ -63,12 +64,12 @@ const INNER_SECTION_CLASS = "rounded-3xl border border-slate-200 bg-slate-50/60 
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
 type DiscoveryProfileSearchParams = {
-  message?: string | string[];
-  issue?: string | string[];
   draftResult?: string | string[];
   draftError?: string | string[];
   preferencesResult?: string | string[];
   preferencesError?: string | string[];
+  pauseResult?: string | string[];
+  pauseError?: string | string[];
   publishResult?: string | string[];
   publishError?: string | string[];
   publishIssue?: string | string[];
@@ -156,19 +157,6 @@ function searchParamValues(value: string | string[] | undefined) {
   return Array.isArray(value) ? value : [value];
 }
 
-function buildDiscoveryProfileRedirect(
-  result: DiscoveryActionState,
-  successMessage: string,
-  fallbackErrorMessage: string
-) {
-  const params = new URLSearchParams();
-  params.set("message", result.ok ? successMessage : result.message ?? fallbackErrorMessage);
-  for (const issue of result.issues ?? []) {
-    params.append("issue", issue);
-  }
-  return `/discovery/profile?${params.toString()}`;
-}
-
 function buildDiscoveryProfilePublishRedirect(result: DiscoveryProfilePublishResult) {
   const params = new URLSearchParams();
   if (result.ok) {
@@ -191,6 +179,12 @@ function buildDiscoveryProfileDraftRedirect(result: DiscoveryProfileDraftResult)
 function buildDiscoveryPreferencesRedirect(result: DiscoveryPreferencesResult) {
   const params = new URLSearchParams();
   params.set(result.ok ? "preferencesResult" : "preferencesError", result.reason);
+  return `/discovery/profile?${params.toString()}`;
+}
+
+function buildDiscoveryProfilePauseRedirect(result: DiscoveryProfilePauseResult) {
+  const params = new URLSearchParams();
+  params.set(result.ok ? "pauseResult" : "pauseError", result.reason);
   return `/discovery/profile?${params.toString()}`;
 }
 
@@ -441,19 +435,22 @@ export default async function DiscoveryProfilePage({
     result: searchParamValue(params.preferencesResult),
     error: searchParamValue(params.preferencesError),
   });
+  const pauseFeedback = resolveDiscoveryProfilePauseFeedback({
+    result: searchParamValue(params.pauseResult),
+    error: searchParamValue(params.pauseError),
+  });
   const localizedFeedback = selectDiscoveryProfileFeedback({
     publish: publishFeedback,
     draft: draftFeedback,
     preferences: preferencesFeedback,
+    pause: pauseFeedback,
   });
-  const pageMessage = localizedFeedback
-    ? t(localizedFeedback.messageKey)
-    : searchParamValue(params.message) ?? null;
+  const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
   const pageIssues = localizedFeedback
     ? "issues" in localizedFeedback
       ? localizedFeedback.issues
       : []
-    : mapDiscoveryProfilePublishIssues(searchParamValues(params.issue));
+    : [];
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const defaultAssessmentSignalsForSubmittedBase =
     !loadedPreferences && assessmentSignalReadiness.hasSubmittedBaseAssessment;
@@ -482,11 +479,6 @@ export default async function DiscoveryProfilePage({
     (profile.industries?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.industries;
   const prioritiesAtLimit =
     selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
-  const actionMessages = {
-    paused: t("profile.messages.paused"),
-    fallbackError: t("profile.messages.fallbackError"),
-  };
-
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
@@ -502,13 +494,7 @@ export default async function DiscoveryProfilePage({
   async function pauseProfile() {
     "use server";
     const result = await pauseDiscoveryProfileAction();
-    redirect(
-      buildDiscoveryProfileRedirect(
-        result,
-        actionMessages.paused,
-        actionMessages.fallbackError
-      )
-    );
+    redirect(buildDiscoveryProfilePauseRedirect(result));
   }
 
   async function savePreferences(formData: FormData) {
