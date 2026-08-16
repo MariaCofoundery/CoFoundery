@@ -33,7 +33,15 @@
     "snapshotHint": "Session-based snapshot · no invitation, no legacy report, no workbook",
     "snapshotEyebrow": "Session snapshot",
     "snapshotText": "This report was created from your matching session. It does not create an invitation, relationship, or workbook.",
-    "workspaceProcessed": "The workspace was processed.",
+    "workspaceFeedback": {
+      "notAuthenticated": "Please sign in to prepare the shared workspace.",
+      "sessionUnavailable": "This matching workspace is currently unavailable.",
+      "reportNotReady": "The dynamics report must be created before you can prepare the workspace.",
+      "reportMissing": "The dynamics report is not available for this matching session yet.",
+      "participantsInvalid": "The workspace can only be prepared for exactly two active founders.",
+      "startFailed": "The shared workspace could not be prepared right now.",
+      "unexpectedError": "The shared workspace could not be prepared right now."
+    },
     "workspaceEyebrow": "Workspace",
     "workspaceReadyTitle": "Workspace ready",
     "workspaceReadyText": "Your shared connection has been created. The workbook/operating agreement will be connected as the next step.",

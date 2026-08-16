@@ -16,6 +16,10 @@ import { buildFounderMatchingSelection } from "@/features/reporting/founderMatch
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
 import { startWorkspaceFromMatchingSessionAction } from "@/features/matchingCore/matchingWorkspaceActions";
+import {
+  resolveMatchingWorkspaceFeedback,
+  type MatchingWorkspaceStartResult,
+} from "@/features/matchingCore/matchingWorkspaceFeedback";
 import { getMatchingWorkspaceForSession } from "@/features/matchingCore/matchingWorkspaceData";
 import type { MatchingWorkspaceSummary } from "@/features/matchingCore/matchingWorkspaceTypes";
 import { createClient } from "@/lib/supabase/server";
@@ -23,8 +27,8 @@ import { createClient } from "@/lib/supabase/server";
 type PageProps = {
   params: Promise<{ matchingSessionId: string }>;
   searchParams?: Promise<{
-    workspaceMessage?: string | string[];
-    workspaceOk?: string | string[];
+    workspaceResult?: string | string[];
+    workspaceError?: string | string[];
   }>;
 };
 
@@ -41,12 +45,16 @@ function searchParamValue(value: string | string[] | undefined) {
 
 function workspaceResultUrl(
   matchingSessionId: string,
-  result: { ok: boolean; message?: string },
-  fallbackMessage: string
+  result: MatchingWorkspaceStartResult
 ) {
   const params = new URLSearchParams();
-  params.set("workspaceMessage", result.message ?? fallbackMessage);
-  params.set("workspaceOk", result.ok ? "1" : "0");
+
+  if (result.ok) {
+    params.set("workspaceResult", result.reason);
+  } else {
+    params.set("workspaceError", result.reason);
+  }
+
   return `/matching/${matchingSessionId}/report?${params.toString()}`;
 }
 
@@ -145,12 +153,10 @@ function WorkspacePanel({
   workspace: MatchingWorkspaceSummary | null;
   t: ReportT;
 }) {
-  const workspaceProcessedMessage = t("session.workspaceProcessed");
-
   async function startWorkspace() {
     "use server";
     const result = await startWorkspaceFromMatchingSessionAction(matchingSessionId);
-    redirect(workspaceResultUrl(matchingSessionId, result, workspaceProcessedMessage));
+    redirect(workspaceResultUrl(matchingSessionId, result));
   }
 
   if (workspace) {
@@ -220,8 +226,13 @@ export default async function MatchingSessionReportPage({ params, searchParams }
     return <EmptyReportState matchingSessionId={matchingSessionId} t={t} />;
   }
   const workspace = await getMatchingWorkspaceForSession(matchingSessionId, user.id);
-  const workspaceMessage = searchParamValue(resolvedSearchParams.workspaceMessage) ?? null;
-  const workspaceOk = searchParamValue(resolvedSearchParams.workspaceOk) !== "0";
+  const workspaceFeedback = resolveMatchingWorkspaceFeedback({
+    result: searchParamValue(resolvedSearchParams.workspaceResult),
+    error: searchParamValue(resolvedSearchParams.workspaceError),
+  });
+  const workspaceFeedbackMessage = workspaceFeedback
+    ? t(workspaceFeedback.messageKey)
+    : null;
 
   const payload = summary.reportRun.payload;
   const reportLocale = getFounderAlignmentReportPayloadLocale(payload);
@@ -250,7 +261,10 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         </p>
       </div>
 
-      <PageMessage message={workspaceMessage} ok={workspaceOk} />
+      <PageMessage
+        message={workspaceFeedbackMessage}
+        ok={workspaceFeedback?.ok ?? false}
+      />
       <WorkspacePanel matchingSessionId={matchingSessionId} workspace={workspace} t={t} />
 
       <FounderMatchingView

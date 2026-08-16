@@ -33,7 +33,15 @@
     "snapshotHint": "Session-basierter Snapshot · keine Einladung, kein legacy Report, kein Workbook",
     "snapshotEyebrow": "Session-Snapshot",
     "snapshotText": "Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.",
-    "workspaceProcessed": "Der Arbeitsraum wurde verarbeitet.",
+    "workspaceFeedback": {
+      "notAuthenticated": "Bitte melde dich an, um den gemeinsamen Arbeitsraum vorzubereiten.",
+      "sessionUnavailable": "Dieser Matching-Arbeitsraum ist aktuell nicht verfügbar.",
+      "reportNotReady": "Der Dynamik-Report muss erstellt sein, bevor ihr den Arbeitsraum vorbereitet.",
+      "reportMissing": "Für diese Matching-Session fehlt noch der Dynamik-Report.",
+      "participantsInvalid": "Der Arbeitsraum kann nur für genau zwei aktive Founder vorbereitet werden.",
+      "startFailed": "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden.",
+      "unexpectedError": "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden."
+    },
     "workspaceEyebrow": "Arbeitsraum",
     "workspaceReadyTitle": "Arbeitsraum vorbereitet",
     "workspaceReadyText": "Eure gemeinsame Verbindung wurde angelegt. Das Workbook/Operating Agreement wird als nächster Schritt angebunden.",

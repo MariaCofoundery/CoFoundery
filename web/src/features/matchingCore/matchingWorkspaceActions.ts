@@ -3,12 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { startWorkspaceFromMatchingSession } from "@/features/matchingCore/matchingWorkspaceData";
-
-export type MatchingWorkspaceActionState = {
-  ok: boolean;
-  message?: string;
-  reportHref?: string;
-};
+import type {
+  MatchingWorkspaceStartErrorReason,
+  MatchingWorkspaceStartResult,
+} from "@/features/matchingCore/matchingWorkspaceFeedback";
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient();
@@ -19,35 +17,37 @@ async function getAuthenticatedUserId() {
   return user?.id ?? null;
 }
 
-function createWorkspaceErrorMessage(error: unknown) {
+function getWorkspaceStartErrorReason(
+  error: unknown
+): MatchingWorkspaceStartErrorReason {
   if (!(error instanceof Error)) {
-    return "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden.";
+    return "workspace_start_failed";
   }
 
   if (error.message === "matching_workspace_session_unavailable") {
-    return "Dieser Matching-Arbeitsraum ist aktuell nicht verfügbar.";
+    return "session_unavailable";
   }
   if (error.message === "matching_workspace_session_not_report_ready") {
-    return "Der Dynamik-Report muss erstellt sein, bevor ihr den Arbeitsraum vorbereitet.";
+    return "report_not_ready";
   }
   if (error.message === "matching_workspace_report_missing") {
-    return "Für diese Matching-Session fehlt noch der Dynamik-Report.";
+    return "report_missing";
   }
   if (error.message === "matching_workspace_participants_invalid") {
-    return "Der Arbeitsraum kann nur für genau zwei aktive Founder vorbereitet werden.";
+    return "participants_invalid";
   }
 
-  return "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden.";
+  return "workspace_start_failed";
 }
 
 export async function startWorkspaceFromMatchingSessionAction(
   matchingSessionId: string
-): Promise<MatchingWorkspaceActionState> {
+): Promise<MatchingWorkspaceStartResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um den gemeinsamen Arbeitsraum vorzubereiten.",
+      reason: "not_authenticated",
     };
   }
 
@@ -62,13 +62,12 @@ export async function startWorkspaceFromMatchingSessionAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Arbeitsraum vorbereitet.",
-      reportHref,
+      reason: "workspace_prepared",
     };
   } catch (error) {
     return {
       ok: false,
-      message: createWorkspaceErrorMessage(error),
+      reason: getWorkspaceStartErrorReason(error),
     };
   }
 }
