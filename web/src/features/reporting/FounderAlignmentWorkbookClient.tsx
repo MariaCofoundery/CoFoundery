@@ -71,6 +71,10 @@ import {
   type FounderVisibleAdvisorImpulse,
 } from "@/features/reporting/advisorSectionImpulses";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
+import {
+  normalizeWorkbookSystemText,
+  normalizeWorkbookSystemTextWithProtectedValues,
+} from "@/features/reporting/workbookRendering";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -1307,6 +1311,15 @@ export function FounderAlignmentWorkbookClient({
 }: FounderAlignmentWorkbookClientProps) {
   const wt = useTranslations("workbook");
   const locale = useLocale();
+  const systemText = useCallback(
+    (text: string) => normalizeWorkbookSystemText(text, locale),
+    [locale]
+  );
+  const systemTextWithProtectedValues = useCallback(
+    (text: string, protectedValues: readonly string[]) =>
+      normalizeWorkbookSystemTextWithProtectedValues(text, locale, protectedValues),
+    [locale]
+  );
   const workbookContent = useMemo(() => getWorkbookContent(locale), [locale]);
   const [workbook, setWorkbook] = useState(initialWorkbook);
   const [saveState, setSaveState] = useState<{
@@ -2291,18 +2304,33 @@ export function FounderAlignmentWorkbookClient({
 
     if (field === "founderA") {
       return isAdvisorViewer
-        ? t(`Hier siehst du den bisher festgehaltenen Beitrag von ${founderALabel}.`)
-        : t(`Dieses Feld wird von ${founderALabel} ausgefuellt.`);
+        ? systemTextWithProtectedValues(
+            `Hier siehst du den bisher festgehaltenen Beitrag von ${founderALabel}.`,
+            [founderALabel]
+          )
+        : systemTextWithProtectedValues(
+            `Dieses Feld wird von ${founderALabel} ausgefuellt.`,
+            [founderALabel]
+          );
     }
 
     if (field === "founderB") {
       return isAdvisorViewer
-        ? t(`Hier siehst du den bisher festgehaltenen Beitrag von ${founderBLabel}.`)
-        : t(`Dieses Feld wird von ${founderBLabel} ausgefuellt.`);
+        ? systemTextWithProtectedValues(
+            `Hier siehst du den bisher festgehaltenen Beitrag von ${founderBLabel}.`,
+            [founderBLabel]
+          )
+        : systemTextWithProtectedValues(
+            `Dieses Feld wird von ${founderBLabel} ausgefuellt.`,
+            [founderBLabel]
+          );
     }
 
     if (field === "advisorNotes") {
-      return t(`Dieses Feld wird von ${advisorLabel} ausgefuellt.`);
+      return systemTextWithProtectedValues(
+        `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
+        [advisorLabel]
+      );
     }
 
     return null;
@@ -3041,7 +3069,10 @@ export function FounderAlignmentWorkbookClient({
     if (result.status === "advisor_linked") {
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
-        t(`Advisor aktiv: ${result.advisorName ?? "Advisor"}. Der Zugriff auf die Advisor-Bereiche ist jetzt freigegeben.`)
+        systemTextWithProtectedValues(
+          `Advisor aktiv: ${result.advisorName ?? "Advisor"}. Der Zugriff auf die Advisor-Bereiche ist jetzt freigegeben.`,
+          [result.advisorName ?? "Advisor"]
+        )
       );
       return;
     }
@@ -3285,8 +3316,9 @@ export function FounderAlignmentWorkbookClient({
       upsertAdvisorEntry(result.entry);
       setAdvisorInviteLink(result.inviteUrl);
       setAdvisorInviteMessage(
-        t(
-          `Einladung gesendet an ${result.entry.advisorEmail ?? "die hinterlegte Adresse"}.`
+        systemTextWithProtectedValues(
+          `Einladung gesendet an ${result.entry.advisorEmail ?? "die hinterlegte Adresse"}.`,
+          result.entry.advisorEmail ? [result.entry.advisorEmail] : []
         )
       );
     });
@@ -3627,13 +3659,16 @@ export function FounderAlignmentWorkbookClient({
                                         <div className="flex flex-wrap items-start justify-between gap-3">
                                           <div className="min-w-0">
                                             <p className="text-sm font-semibold text-slate-900">
-                                              {t(entry.advisorName?.trim() || entry.advisorEmail || "Advisor")}
+                                              {entry.advisorName || entry.advisorEmail || "Advisor"}
                                             </p>
                                             {entry.advisorEmail ? (
                                               <p className="mt-1 text-xs text-slate-600">{entry.advisorEmail}</p>
                                             ) : null}
                                             <p className="mt-2 text-xs text-slate-500">
-                                              {t(`Vorgeschlagen von ${advisorSuggestedByDisplayLabel(entry)}`)}
+                                              {systemTextWithProtectedValues(
+                                                `Vorgeschlagen von ${advisorSuggestedByDisplayLabel(entry)}`,
+                                                [advisorSuggestedByDisplayLabel(entry)]
+                                              )}
                                             </p>
                                           </div>
                                           <span
@@ -3649,7 +3684,10 @@ export function FounderAlignmentWorkbookClient({
 
                                         {entry.status === "invited" && invitedAtLabel ? (
                                           <p className="mt-2 text-xs leading-6 text-slate-500">
-                                            {t(`Gesendet am ${invitedAtLabel}${entry.advisorEmail ? ` an ${entry.advisorEmail}` : ""}.`)}
+                                            {systemTextWithProtectedValues(
+                                              `Gesendet am ${invitedAtLabel}${entry.advisorEmail ? ` an ${entry.advisorEmail}` : ""}.`,
+                                              entry.advisorEmail ? [entry.advisorEmail] : []
+                                            )}
                                           </p>
                                         ) : null}
 
@@ -3674,17 +3712,22 @@ export function FounderAlignmentWorkbookClient({
                                               {t("Zustimmen")}
                                             </ReportActionButton>
                                             <p className="text-xs leading-6 text-slate-600">
-                                              {t(
-                                                missingLabel
-                                                  ? `Danach fehlt noch ${missingLabel}, falls die zweite Zustimmung noch offen ist.`
-                                                  : "Damit wird dieser Advisor-Eintrag weiter freigegeben."
-                                              )}
+                                              {missingLabel
+                                                ? systemTextWithProtectedValues(
+                                                    `Danach fehlt noch ${missingLabel}, falls die zweite Zustimmung noch offen ist.`,
+                                                    [missingLabel]
+                                                  )
+                                                : t(
+                                                    "Damit wird dieser Advisor-Eintrag weiter freigegeben."
+                                                  )
+                                              }
                                             </p>
                                           </div>
                                         ) : currentFounderApprovedEntry(entry) && entry.status === "pending" ? (
                                           <p className="mt-3 text-xs leading-6 text-slate-600">
-                                            {t(
-                                              `Deine Zustimmung liegt vor. Jetzt fehlt noch ${missingLabel ?? "die zweite Founder-Zustimmung"}.`
+                                            {systemTextWithProtectedValues(
+                                              `Deine Zustimmung liegt vor. Jetzt fehlt noch ${missingLabel ?? "die zweite Founder-Zustimmung"}.`,
+                                              missingLabel ? [missingLabel] : []
                                             )}
                                           </p>
                                         ) : null}
@@ -3809,16 +3852,14 @@ export function FounderAlignmentWorkbookClient({
                                                 {t(sectionMeta.title)}
                                               </p>
                                               <p className="mt-1 text-xs text-slate-500">
-                                                {t(
-                                                  `${impulse.advisorName ?? "Advisor"} · ${formatAdvisorImpulseTimestamp(
-                                                    impulse.updatedAt
-                                                  )}`
+                                                {impulse.advisorName ?? "Advisor"} · {formatAdvisorImpulseTimestamp(
+                                                  impulse.updatedAt
                                                 )}
                                               </p>
                                             </div>
                                           </div>
                                           <p className="mt-3 text-sm leading-6 text-slate-700">
-                                            {t(impulse.text)}
+                                            {impulse.text}
                                           </p>
                                         </div>
                                       );
@@ -4075,10 +4116,12 @@ export function FounderAlignmentWorkbookClient({
                   <div className="space-y-3">
                     {shortContext.map((paragraph) => (
                       <p key={paragraph} className="text-sm leading-7 text-slate-700">
-                        {t(paragraph)}
+                        {systemText(paragraph)}
                       </p>
                     ))}
-                    <p className="text-sm leading-7 text-slate-700">{t(currentStepContent.everyday)}</p>
+                    <p className="text-sm leading-7 text-slate-700">
+                      {systemText(currentStepContent.everyday)}
+                    </p>
                   </div>
                 </StepSection>
 
@@ -4103,7 +4146,7 @@ export function FounderAlignmentWorkbookClient({
                             {t("Beispiel")}
                           </p>
                           <p className="mt-2 text-sm leading-7 text-slate-700">
-                            {t(currentStepContent.scenario)}
+                            {systemText(currentStepContent.scenario)}
                           </p>
                         </div>
                       ) : null}
@@ -4114,7 +4157,7 @@ export function FounderAlignmentWorkbookClient({
                               key={prompt}
                               className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-700"
                             >
-                              {t(prompt)}
+                              {systemText(prompt)}
                             </li>
                           ))}
                         </ul>
@@ -4125,7 +4168,7 @@ export function FounderAlignmentWorkbookClient({
                             {t("Worauf ihr achten solltet")}
                           </p>
                           <p className="mt-2 text-sm leading-7 text-slate-700">
-                            {t(currentStepContent.riskHint)}
+                            {systemText(currentStepContent.riskHint)}
                           </p>
                         </div>
                       ) : null}
@@ -4186,7 +4229,10 @@ export function FounderAlignmentWorkbookClient({
                     </div>
                     {!canEditAdvisorClosing() ? (
                       <p className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-500">
-                        {t(`Bearbeitung durch ${advisorLabel}`)}
+                        {systemTextWithProtectedValues(
+                          `Bearbeitung durch ${advisorLabel}`,
+                          [advisorLabel]
+                        )}
                       </p>
                     ) : null}
                   </div>
@@ -4201,7 +4247,10 @@ export function FounderAlignmentWorkbookClient({
                       helperText={
                         canEditAdvisorClosing()
                           ? t("Kurz, konkret, beobachtbar. Keine zweite Analyse schreiben.")
-                          : t(`Dieses Feld wird von ${advisorLabel} ausgefuellt.`)
+                          : systemTextWithProtectedValues(
+                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
+                              [advisorLabel]
+                            )
                       }
                       rows={5}
                       minHeightClassName="min-h-[150px]"
@@ -4215,7 +4264,10 @@ export function FounderAlignmentWorkbookClient({
                       helperText={
                         canEditAdvisorClosing()
                           ? t("Nur Fragen notieren, die wirklich weitere Klaerung ausloesen.")
-                          : t(`Dieses Feld wird von ${advisorLabel} ausgefuellt.`)
+                          : systemTextWithProtectedValues(
+                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
+                              [advisorLabel]
+                            )
                       }
                       rows={4}
                       minHeightClassName="min-h-[132px]"
@@ -4229,7 +4281,10 @@ export function FounderAlignmentWorkbookClient({
                       helperText={
                         canEditAdvisorClosing()
                           ? t("Ein klarer naechster Schritt ist besser als eine lange Empfehlungsliste.")
-                          : t(`Dieses Feld wird von ${advisorLabel} ausgefuellt.`)
+                          : systemTextWithProtectedValues(
+                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
+                              [advisorLabel]
+                            )
                       }
                       rows={4}
                       minHeightClassName="min-h-[132px]"
@@ -4605,13 +4660,17 @@ export function FounderAlignmentWorkbookClient({
                           {t("Gemeinsamer Raum")}
                         </span>
                         <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                          {t(
-                            currentUserRole === "founderA"
-                              ? `Du schreibst als ${founderALabel}`
-                              : currentUserRole === "founderB"
-                                ? `Du schreibst als ${founderBLabel}`
-                                : "Advisor-Kontext"
-                          )}
+                          {currentUserRole === "founderA"
+                            ? systemTextWithProtectedValues(
+                                `Du schreibst als ${founderALabel}`,
+                                [founderALabel]
+                              )
+                            : currentUserRole === "founderB"
+                              ? systemTextWithProtectedValues(
+                                  `Du schreibst als ${founderBLabel}`,
+                                  [founderBLabel]
+                                )
+                              : t("Advisor-Kontext")}
                         </span>
                       </div>
                     </div>
@@ -4623,12 +4682,13 @@ export function FounderAlignmentWorkbookClient({
                             {t("Basis fuer deinen Punkt")}
                           </span>
                           <span>
-                            {t(
-                              `Beitrag von ${
+                            {systemTextWithProtectedValues(
+                              `Beitrag von ${currentDiscussionDraftSourceEntry.createdBy === "founderA" ? founderALabel : founderBLabel}`,
+                              [
                                 currentDiscussionDraftSourceEntry.createdBy === "founderA"
                                   ? founderALabel
-                                  : founderBLabel
-                              }`
+                                  : founderBLabel,
+                              ]
                             )}
                           </span>
                         </div>
@@ -4702,10 +4762,11 @@ export function FounderAlignmentWorkbookClient({
                           : null
                         : hasDecisionRulesBothPerspectives
                           ? t(currentPremiumV2Config.collectReadyText)
-                          : t(
+                          : systemTextWithProtectedValues(
                               currentPremiumV2Config.missingPerspectiveText(
                                 hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel
-                              )
+                              ),
+                              [hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel]
                             )}
                     </div>
                     {!isAdvisorViewer && hasDecisionRulesBothPerspectives ? (
@@ -4967,7 +5028,7 @@ export function FounderAlignmentWorkbookClient({
                       </p>
                       <p className="mt-3 text-sm leading-7 text-slate-700">
                         {currentStepEntry.agreement.trim().length > 0
-                          ? t(currentStepEntry.agreement)
+                          ? currentStepEntry.agreement
                           : t("Noch keine finale Absprache sichtbar.")}
                       </p>
                     </div>
@@ -4983,12 +5044,13 @@ export function FounderAlignmentWorkbookClient({
                   <p className="text-sm leading-7 text-slate-700">
                     {isAdvisorViewer
                       ? t("Hier siehst du die Leitfrage und die bisher festgehaltenen Perspektiven der Founder.")
-                      : t(helperQuestion)}
+                      : systemText(helperQuestion)}
                   </p>
                   {isCollaborativeMode ? (
                     <div className="mt-6 grid gap-6 xl:grid-cols-2">
                       <WorkbookField
                         title={founderALabel}
+                        titleKind="identity"
                         showAvatar
                         avatarId={founderAAvatarId}
                         imageUrl={founderAAvatarUrl}
@@ -5000,6 +5062,7 @@ export function FounderAlignmentWorkbookClient({
                       />
                       <WorkbookField
                         title={founderBLabel}
+                        titleKind="identity"
                         showAvatar
                         avatarId={founderBAvatarId}
                         imageUrl={founderBAvatarUrl}
@@ -5015,6 +5078,7 @@ export function FounderAlignmentWorkbookClient({
                       {viewerFounderField ? (
                         <WorkbookField
                           title={viewerFounderField === "founderA" ? founderALabel : founderBLabel}
+                          titleKind="identity"
                           showAvatar
                           avatarId={viewerFounderField === "founderA" ? founderAAvatarId : founderBAvatarId}
                           imageUrl={
@@ -5195,7 +5259,7 @@ export function FounderAlignmentWorkbookClient({
                     </p>
                     <p className="mt-3 text-sm leading-7 text-slate-700">
                       {currentAgreementDraft
-                        ? t(currentAgreementDraft.draft)
+                        ? currentAgreementDraft.draft
                         : t(
                             isAdvisorViewer
                               ? "Sobald hier ein Entwurf vorliegt, wird er in diesem Bereich sichtbar."
@@ -5573,7 +5637,7 @@ function AdvisorApprovalRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-3 py-2">
-      <span className="text-sm text-slate-700">{t(label)}</span>
+      <span className="text-sm text-slate-700">{label}</span>
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
           approved
@@ -5753,6 +5817,7 @@ function WorkbookV2DiscussionThreadList({
   entrySharedClassName: string;
   sourceBadgeClassName: string;
 }) {
+  const locale = useLocale();
   const viewerFounderRole =
     currentUserRole === "founderA" || currentUserRole === "founderB" ? currentUserRole : null;
   const isAdvisorViewer = currentUserRole === "advisor";
@@ -5936,7 +6001,11 @@ function WorkbookV2DiscussionThreadList({
               <span
                 className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${sourceBadgeClassName}`}
               >
-                {t(attachmentLabel)}
+                {normalizeWorkbookSystemTextWithProtectedValues(
+                  attachmentLabel,
+                  locale,
+                  sourceEntry ? [authorLabelFor(sourceEntry.createdBy)] : []
+                )}
               </span>
             ) : null}
             <span className="text-xs text-slate-500">
@@ -5976,7 +6045,7 @@ function WorkbookV2DiscussionThreadList({
               </>
             ) : (
               <>
-                <p className="mt-3 text-sm leading-7 text-slate-700">{t(entry.content)}</p>
+                <p className="mt-3 text-sm leading-7 text-slate-700">{entry.content}</p>
                 {viewerFounderRole ? (
                   <div className="mt-3 flex flex-wrap items-center gap-3">
                     <button
@@ -6070,11 +6139,11 @@ function WorkbookV2DiscussionThreadList({
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/8 text-xs font-semibold text-slate-700">
-                            {t((reply.advisorName ?? advisorLabel).slice(0, 1).toUpperCase())}
+                            {(reply.advisorName ?? advisorLabel).slice(0, 1).toUpperCase()}
                           </div>
                           <div>
                             <p className="text-sm font-medium text-slate-900">
-                              {t(reply.advisorName?.trim() || advisorLabel)}
+                              {reply.advisorName || advisorLabel}
                             </p>
                             <p className="text-xs text-slate-500">
                               {formatDiscussionTimestamp(reply.updatedAt ?? reply.createdAt)}
@@ -6085,7 +6154,7 @@ function WorkbookV2DiscussionThreadList({
                           {t("Advisor")}
                         </span>
                       </div>
-                      <p className="mt-3 text-sm leading-7 text-slate-700">{t(reply.content)}</p>
+                      <p className="mt-3 text-sm leading-7 text-slate-700">{reply.content}</p>
                     </div>
                   ))}
                 </div>
@@ -6094,7 +6163,7 @@ function WorkbookV2DiscussionThreadList({
           </>
         ) : (
           <div className="mt-3">
-            <p className="text-sm leading-7 text-slate-700">{t(compactPreview)}</p>
+            <p className="text-sm leading-7 text-slate-700">{compactPreview}</p>
             {mode === "weight" ? <div className="mt-3">{renderSignals(entry, true)}</div> : null}
             {hasAdvisorReplies ? (
               <p className="mt-3 text-xs leading-6 text-slate-500">
@@ -6196,6 +6265,7 @@ function WorkbookV2DiscussionThreadList({
 
 function WorkbookField({
   title,
+  titleKind = "system",
   avatarId = null,
   imageUrl = null,
   showAvatar = false,
@@ -6210,6 +6280,7 @@ function WorkbookField({
   minHeightClassName = "min-h-[220px]",
 }: {
   title: string;
+  titleKind?: "system" | "identity";
   avatarId?: string | null;
   imageUrl?: string | null;
   showAvatar?: boolean;
@@ -6223,6 +6294,9 @@ function WorkbookField({
   rows?: number;
   minHeightClassName?: string;
 }) {
+  const locale = useLocale();
+  const renderedTitle =
+    titleKind === "identity" ? title : normalizeWorkbookSystemText(title, locale);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const shouldKeepListeningRef = useRef(false);
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -6414,7 +6488,7 @@ function WorkbookField({
 
           <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm font-semibold text-slate-900">{t(title)}</p>
+            <p className="text-sm font-semibold text-slate-900">{renderedTitle}</p>
             {readOnly ? (
               <span className="text-xs text-slate-400">{t("Nur lesbar")}</span>
             ) : null}
@@ -6427,9 +6501,13 @@ function WorkbookField({
           onClick={toggleDictation}
           disabled={dictationDisabled}
           aria-label={
-            speechActive
-              ? t(`Diktat fuer ${title} stoppen`)
-              : t(`Diktat fuer ${title} starten`)
+            titleKind === "identity"
+              ? speechActive
+                ? `${t("Diktat fuer")} ${title} ${t("stoppen")}`
+                : `${t("Diktat fuer")} ${title} ${t("starten")}`
+              : speechActive
+                ? t(`Diktat fuer ${title} stoppen`)
+                : t(`Diktat fuer ${title} starten`)
           }
           title={t("Sprich frei. Der Text landet direkt im Feld.")}
           className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all duration-300 ${
@@ -6486,7 +6564,7 @@ function WorkbookField({
         ref={textareaRef}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={t(placeholder)}
+        placeholder={normalizeWorkbookSystemText(placeholder, locale)}
         rows={rows}
         readOnly={readOnly}
         className={`mt-4 ${minHeightClassName} w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition-all duration-300 ease-out ${
@@ -6644,9 +6722,13 @@ function StepSection({
   children: ReactNode;
   className?: string;
 }) {
+  const locale = useLocale();
+
   return (
     <section className={`rounded-[28px] border p-5 sm:p-6 ${className}`}>
-      <h3 className="text-base font-semibold text-slate-950">{t(title)}</h3>
+      <h3 className="text-base font-semibold text-slate-950">
+        {normalizeWorkbookSystemText(title, locale)}
+      </h3>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -6673,6 +6755,7 @@ function WorkbookSummaryView({
   teamContext: TeamContext;
 }) {
   const wt = useTranslations("workbook");
+  const locale = useLocale();
 
   return (
     <>
@@ -6691,21 +6774,32 @@ function WorkbookSummaryView({
               className="rounded-[30px] border border-slate-200/75 bg-white px-7 py-8 shadow-[0_12px_34px_rgba(15,23,42,0.035)] print:break-inside-avoid print:rounded-none print:border-x-0 print:border-t-0 print:px-0 print:py-7 print:shadow-none"
             >
               <div className="w-full">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(item.title)}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {normalizeWorkbookSystemText(item.title, locale)}
+                </p>
 
                 {item.id === "advisor_closing" ? (
                   <div className="mt-5 space-y-5">
                     <SummaryInsightBlock
                       title={t("Aussenblick")}
-                      text={item.advisorClosing?.observations || "Noch kein Aussenblick festgehalten."}
+                      text={
+                        item.advisorClosing?.observations ||
+                        t("Noch kein Aussenblick festgehalten.")
+                      }
                     />
                     <SummaryInsightBlock
                       title={t("Offene Rueckfragen")}
-                      text={item.advisorClosing?.questions || "Noch keine Rueckfragen festgehalten."}
+                      text={
+                        item.advisorClosing?.questions ||
+                        t("Noch keine Rueckfragen festgehalten.")
+                      }
                     />
                     <SummaryInsightBlock
                       title={t("Naechster sinnvoller Schritt")}
-                      text={item.advisorClosing?.nextSteps || "Noch kein naechster Schritt festgehalten."}
+                      text={
+                        item.advisorClosing?.nextSteps ||
+                        t("Noch kein naechster Schritt festgehalten.")
+                      }
                     />
                     <SummaryInsightBlock
                       title={t("Antwort des Teams")}
@@ -6714,11 +6808,11 @@ function WorkbookSummaryView({
                           ? `${
                               item.founderReaction?.status
                                 ? founderReactionStatusLabel(item.founderReaction.status)
-                                : "Noch kein Reaktionsstatus festgehalten."
+                                : t("Noch kein Reaktionsstatus festgehalten.")
                             }\n\n${item.founderReaction.comment}`
                           : item.founderReaction?.status
                             ? founderReactionStatusLabel(item.founderReaction.status)
-                            : "Noch kein Reaktionsstatus festgehalten."
+                            : t("Noch kein Reaktionsstatus festgehalten.")
                       }
                     />
                     <SummaryInsightBlock
@@ -6730,7 +6824,7 @@ function WorkbookSummaryView({
                   <>
                     <div className="mt-5 border-l-2 border-slate-200 pl-5">
                       <p className="text-[17px] leading-8 text-slate-900">
-                        {t(primaryAgreement || "Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
+                        {primaryAgreement || t("Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
                       </p>
                     </div>
                     {structuredSummaryItems.length > 0 ? (
@@ -6752,7 +6846,7 @@ function WorkbookSummaryView({
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                       {t("Impuls aus der Begleitung")}
                     </p>
-                    <p className="mt-3 text-[15px] leading-8 text-slate-700">{t(item.advisorNotes)}</p>
+                    <p className="mt-3 text-[15px] leading-8 text-slate-700">{item.advisorNotes}</p>
                   </div>
                 ) : null}
               </div>
@@ -6834,11 +6928,15 @@ function buildWorkbookSummaryStructuredItems(
 }
 
 function SummaryInsightBlock({ title, text }: { title: string; text: string }) {
+  const locale = useLocale();
+
   return (
     <div className="rounded-[24px] bg-slate-50/60 px-5 py-5">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t(title)}</p>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+        {normalizeWorkbookSystemText(title, locale)}
+      </p>
       <div className="mt-3 space-y-3">
-        {t(text)
+        {text
           .split("\n\n")
           .filter((part) => part.trim().length > 0)
           .map((part) => (
