@@ -166,6 +166,71 @@
         "threeMonths": "Check-in in 3 Monaten",
         "none": "Kein Check-in gesetzt."
       }
+    },
+    "premium": {
+      "intro": {
+        "founder": "Sammelt zuerst eure Perspektiven, ordnet die Punkte anschließend ein und haltet danach eure Absprache fest.",
+        "advisor": "Du kannst Beiträge, Einordnungen, Absprache und Status dieses Schritts ansehen."
+      },
+      "phases": {
+        "collect": "Sammeln",
+        "boundaries": "Grenzen",
+        "focus": "Fokus",
+        "weight": "Schärfen",
+        "classify": "Einordnen",
+        "prioritize": "Priorisieren",
+        "rule": "Regel",
+        "guardrail": "Leitplanke",
+        "agreement": "Vereinbarung",
+        "approval": "Bestätigen"
+      },
+      "advisorPhase": {
+        "collectSubtitle": "Founder-Beiträge lesen",
+        "collectSummary": "Founder-Beiträge und Advisor-Antworten",
+        "weightSubtitle": "Einordnungen ansehen",
+        "weightSummary": "Einordnungen der Founder",
+        "ruleSubtitle": "Entwurf prüfen",
+        "ruleSummary": "aktueller Entwurf",
+        "approvalSubtitle": "Absprache und Status",
+        "approvalSummary": "finale Absprache und Zustimmung"
+      },
+      "founderPhase": {
+        "collectSummary": "Perspektiven sammeln",
+        "weightSummary": "Punkte gemeinsam einordnen",
+        "ruleSummary": "Entwurf konkretisieren",
+        "approvalSummary": "Absprache bestätigen"
+      },
+      "currentPhase": "Aktuell: {phase} · {summary}",
+      "status": {
+        "title": "Aktueller Stand",
+        "founderDescription": "Kurze Orientierung für diesen Abschnitt.",
+        "advisorDescription": "So steht das Team in diesem Abschnitt gerade.",
+        "perspectives": "Perspektiven",
+        "classification": "Einordnung",
+        "workingDraft": "Arbeitsfassung",
+        "finalAgreement": "Finale Absprache",
+        "bothVisible": "beide sichtbar",
+        "open": "noch offen",
+        "complete": "vollständig",
+        "available": "liegt vor",
+        "missing": "fehlt noch",
+        "confirmed": "bestätigt",
+        "awaitingSecondApproval": "wartet auf zweite Bestätigung",
+        "awaitingApproval": "wartet auf Zustimmung",
+        "guidance": "Begleitung",
+        "advisorReplies": "{count, plural, one {# Antwort vorhanden} other {# Antworten vorhanden}}",
+        "impulse": "Impuls",
+        "advisorImpulseAvailable": "Advisor-Impuls vorhanden"
+      },
+      "transitions": {
+        "toWeightHint": "Beide Perspektiven sind vorhanden. Als Nächstes ordnet ihr die Punkte gemeinsam ein.",
+        "toWeightAction": "Weiter zur Einordnung",
+        "weightingHint": "Hier ordnet ihr die Punkte ein. Die Zustimmung erfolgt erst bei der finalen Absprache.",
+        "toRuleHint": "Die Einordnung ist abgeschlossen. Als Nächstes erstellt ihr einen Entwurf.",
+        "toRuleAction": "Weiter zum Entwurf",
+        "toApprovalHint": "Der Entwurf ist vollständig. Als Nächstes folgt die finale Bestätigung.",
+        "toApprovalAction": "Weiter zur finalen Absprache"
+      }
     }
   },
   "print": {

@@ -166,6 +166,71 @@
         "threeMonths": "Check-in in 3 months",
         "none": "No check-in scheduled."
       }
+    },
+    "premium": {
+      "intro": {
+        "founder": "Collect your perspectives first, classify the points, and then capture your agreement.",
+        "advisor": "You can view the contributions, classifications, agreement, and status for this step."
+      },
+      "phases": {
+        "collect": "Collect",
+        "boundaries": "Boundaries",
+        "focus": "Focus",
+        "weight": "Refine",
+        "classify": "Classify",
+        "prioritize": "Prioritize",
+        "rule": "Rule",
+        "guardrail": "Guardrail",
+        "agreement": "Agreement",
+        "approval": "Confirm"
+      },
+      "advisorPhase": {
+        "collectSubtitle": "Review founder contributions",
+        "collectSummary": "Founder contributions and advisor replies",
+        "weightSubtitle": "Review classifications",
+        "weightSummary": "Founder classifications",
+        "ruleSubtitle": "Review draft",
+        "ruleSummary": "current draft",
+        "approvalSubtitle": "Agreement and status",
+        "approvalSummary": "final agreement and approval"
+      },
+      "founderPhase": {
+        "collectSummary": "Collect perspectives",
+        "weightSummary": "Classify points together",
+        "ruleSummary": "Refine the draft",
+        "approvalSummary": "Confirm the agreement"
+      },
+      "currentPhase": "Current: {phase} · {summary}",
+      "status": {
+        "title": "Current status",
+        "founderDescription": "A brief overview for this section.",
+        "advisorDescription": "The team's current status in this section.",
+        "perspectives": "Perspectives",
+        "classification": "Classification",
+        "workingDraft": "Working draft",
+        "finalAgreement": "Final agreement",
+        "bothVisible": "both visible",
+        "open": "still open",
+        "complete": "complete",
+        "available": "available",
+        "missing": "still missing",
+        "confirmed": "confirmed",
+        "awaitingSecondApproval": "awaiting second approval",
+        "awaitingApproval": "awaiting approval",
+        "guidance": "Guidance",
+        "advisorReplies": "{count, plural, one {# reply available} other {# replies available}}",
+        "impulse": "Prompt",
+        "advisorImpulseAvailable": "Advisor prompt available"
+      },
+      "transitions": {
+        "toWeightHint": "Both perspectives are available. Next, classify the points together.",
+        "toWeightAction": "Continue to classification",
+        "weightingHint": "Classify the points here. Approval only happens in the final agreement.",
+        "toRuleHint": "The classification is complete. Next, create a draft.",
+        "toRuleAction": "Continue to draft",
+        "toApprovalHint": "The draft is complete. Final confirmation is next.",
+        "toApprovalAction": "Continue to final agreement"
+      }
     }
   },
   "print": {

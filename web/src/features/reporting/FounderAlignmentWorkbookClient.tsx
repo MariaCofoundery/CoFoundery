@@ -75,7 +75,11 @@ import {
   normalizeWorkbookSystemText,
   normalizeWorkbookSystemTextWithProtectedValues,
 } from "@/features/reporting/workbookRendering";
-import { workbookStepStatusMessageKey } from "@/features/reporting/workbookClientChrome";
+import {
+  workbookPremiumPhaseMessageKey,
+  workbookStepStatusMessageKey,
+  type WorkbookPremiumPhase,
+} from "@/features/reporting/workbookClientChrome";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -111,7 +115,7 @@ type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
 type FounderReactionField = "status" | "comment";
 type AdvisorFollowUpOption = FounderAlignmentWorkbookAdvisorFollowUp;
 type WorkbookModeOption = Exclude<FounderAlignmentWorkbookStepMode, never>;
-type WorkbookV2Phase = "collect" | "weight" | "rule" | "approval";
+type WorkbookV2Phase = WorkbookPremiumPhase;
 type WorkbookVisualTone = "default" | "core" | "light" | "closing" | "guardrails" | "advisor";
 type DiscussionSignalOption = {
   value: FounderAlignmentWorkbookDiscussionSignal;
@@ -1721,69 +1725,81 @@ export function FounderAlignmentWorkbookClient({
   const canOpenWeightPhase = hasDecisionRulesBothPerspectives;
   const canOpenRulePhase = decisionRulesWeightingReady;
   const canOpenApprovalPhase = decisionRulesRuleReady;
+  const premiumPhaseLabels: Record<WorkbookV2Phase, string> = {
+    collect: wt(workbookPremiumPhaseMessageKey("collect", currentStep.id)),
+    weight: wt(workbookPremiumPhaseMessageKey("weight", currentStep.id)),
+    rule: wt(workbookPremiumPhaseMessageKey("rule", currentStep.id)),
+    approval: wt(workbookPremiumPhaseMessageKey("approval", currentStep.id)),
+  };
   const advisorPhaseMeta: Record<
     WorkbookV2Phase,
     { label: string; subtitle: string; activeSummary: string; disabled: boolean }
   > = {
     collect: {
-      label: currentPremiumV2Config?.collectPhaseLabel ?? "Sammeln",
-      subtitle: "Founder-Beitraege lesen",
-      activeSummary: "Founder-Beitraege und Advisor-Antworten",
+      label: premiumPhaseLabels.collect,
+      subtitle: wt("client.premium.advisorPhase.collectSubtitle"),
+      activeSummary: wt("client.premium.advisorPhase.collectSummary"),
       disabled: !canOpenCollectPhase,
     },
     weight: {
-      label: currentPremiumV2Config?.weightingPhaseLabel ?? "Schaerfen",
-      subtitle: "Einordnungen ansehen",
-      activeSummary: "Einordnungen der Founder",
+      label: premiumPhaseLabels.weight,
+      subtitle: wt("client.premium.advisorPhase.weightSubtitle"),
+      activeSummary: wt("client.premium.advisorPhase.weightSummary"),
       disabled: !canOpenWeightPhase,
     },
     rule: {
-      label: currentPremiumV2Config?.rulePhaseLabel ?? "Regel",
-      subtitle: "Entwurf pruefen",
-      activeSummary: "aktueller Entwurf",
+      label: premiumPhaseLabels.rule,
+      subtitle: wt("client.premium.advisorPhase.ruleSubtitle"),
+      activeSummary: wt("client.premium.advisorPhase.ruleSummary"),
       disabled: !canOpenRulePhase,
     },
     approval: {
-      label: "Bestaetigen",
-      subtitle: "Absprache & Status",
-      activeSummary: "finale Absprache und Zustimmung",
+      label: premiumPhaseLabels.approval,
+      subtitle: wt("client.premium.advisorPhase.approvalSubtitle"),
+      activeSummary: wt("client.premium.advisorPhase.approvalSummary"),
       disabled: !canOpenApprovalPhase,
     },
   };
   const advisorCurrentPhaseMeta = advisorPhaseMeta[visibleWorkbookV2Phase];
   const founderCurrentPhaseSummary =
     visibleWorkbookV2Phase === "collect"
-      ? "Perspektiven sammeln"
+      ? wt("client.premium.founderPhase.collectSummary")
       : visibleWorkbookV2Phase === "weight"
-        ? "Unterschiede und Anschlussstellen schaerfen"
+        ? wt("client.premium.founderPhase.weightSummary")
         : visibleWorkbookV2Phase === "rule"
-          ? "Euren Entwurf konkretisieren"
-          : "Eure Absprache verbindlich festhalten";
+          ? wt("client.premium.founderPhase.ruleSummary")
+          : wt("client.premium.founderPhase.approvalSummary");
   const currentStepStatusSummaryItems = [
     {
-      label: "Perspektiven",
-      value: hasDecisionRulesBothPerspectives ? "beide sichtbar" : "noch offen",
+      label: wt("client.premium.status.perspectives"),
+      value: hasDecisionRulesBothPerspectives
+        ? wt("client.premium.status.bothVisible")
+        : wt("client.premium.status.open"),
       tone: hasDecisionRulesBothPerspectives ? "success" : "default",
     },
     {
-      label: "Einordnung",
-      value: decisionRulesWeightingReady ? "vollstaendig" : "noch offen",
+      label: wt("client.premium.status.classification"),
+      value: decisionRulesWeightingReady
+        ? wt("client.premium.status.complete")
+        : wt("client.premium.status.open"),
       tone: decisionRulesWeightingReady ? "success" : "default",
     },
     {
-      label: "Arbeitsfassung",
-      value: currentStepEntry.agreement.trim().length > 0 ? "liegt vor" : "fehlt noch",
+      label: wt("client.premium.status.workingDraft"),
+      value: currentStepEntry.agreement.trim().length > 0
+        ? wt("client.premium.status.available")
+        : wt("client.premium.status.missing"),
       tone: currentStepEntry.agreement.trim().length > 0 ? "success" : "default",
     },
     {
-      label: "Finale Absprache",
+      label: wt("client.premium.status.finalAgreement"),
       value: currentStepIsApprovedByBoth
-        ? "bestaetigt"
+        ? wt("client.premium.status.confirmed")
         : decisionRulesRuleReady && currentStepEntry.agreement.trim().length > 0
           ? currentStepEntry.founderAApproved || currentStepEntry.founderBApproved
-            ? "wartet auf zweite Bestaetigung"
-            : "wartet auf Zustimmung"
-          : "noch offen",
+            ? wt("client.premium.status.awaitingSecondApproval")
+            : wt("client.premium.status.awaitingApproval")
+          : wt("client.premium.status.open"),
       tone: currentStepIsApprovedByBoth
         ? "success"
         : decisionRulesRuleReady && currentStepEntry.agreement.trim().length > 0
@@ -1794,16 +1810,16 @@ export function FounderAlignmentWorkbookClient({
   const currentStepGuidanceItems = [
     currentStepAdvisorReplies.length > 0
       ? {
-          label: "Begleitung",
-          value: `${currentStepAdvisorReplies.length} Antwort${
-            currentStepAdvisorReplies.length === 1 ? "" : "en"
-          } vorhanden`,
+          label: wt("client.premium.status.guidance"),
+          value: wt("client.premium.status.advisorReplies", {
+            count: currentStepAdvisorReplies.length,
+          }),
         }
       : null,
     advisorImpulses.length > 0
       ? {
-          label: "Impuls",
-          value: "Advisor-Impuls vorhanden",
+          label: wt("client.premium.status.impulse"),
+          value: wt("client.premium.status.advisorImpulseAvailable"),
         }
       : null,
   ].filter((item): item is { label: string; value: string } => Boolean(item));
@@ -4400,8 +4416,8 @@ export function FounderAlignmentWorkbookClient({
                     </p>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-700">
                       {isAdvisorViewer
-                        ? t("Du kannst Beitraege, Einordnungen, Absprache und Status dieses Schritts ansehen.")
-                        : t("Sammelt erst Perspektiven, schaerft dann Unterschiede und haltet unten eure gemeinsame Absprache fest.")}
+                        ? wt("client.premium.intro.advisor")
+                        : wt("client.premium.intro.founder")}
                     </p>
                   </div>
 
@@ -4438,14 +4454,14 @@ export function FounderAlignmentWorkbookClient({
                                 }`}
                               >
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em]">
-                                  {t(meta.label)}
+                                  {meta.label}
                                 </p>
                                 <p
                                   className={`mt-1 text-xs leading-5 ${
                                     isActive ? "text-white/78" : "text-slate-500"
                                   }`}
                                 >
-                                  {t(meta.subtitle)}
+                                  {meta.subtitle}
                                 </p>
                               </button>
                             );
@@ -4455,7 +4471,7 @@ export function FounderAlignmentWorkbookClient({
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         <WorkbookV2PhasePill
-                          label={t(currentPremiumV2Config.collectPhaseLabel ?? "Sammeln")}
+                          label={premiumPhaseLabels.collect}
                           tone={currentVisualTone}
                           onClick={() => openWorkbookV2Phase("collect")}
                           disabled={!canOpenCollectPhase}
@@ -4468,7 +4484,7 @@ export function FounderAlignmentWorkbookClient({
                           }
                         />
                         <WorkbookV2PhasePill
-                          label={t(currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen")}
+                          label={premiumPhaseLabels.weight}
                           tone={currentVisualTone}
                           onClick={() => openWorkbookV2Phase("weight")}
                           disabled={!canOpenWeightPhase}
@@ -4481,7 +4497,7 @@ export function FounderAlignmentWorkbookClient({
                           }
                         />
                         <WorkbookV2PhasePill
-                          label={t(currentPremiumV2Config.rulePhaseLabel ?? "Regel")}
+                          label={premiumPhaseLabels.rule}
                           tone={currentVisualTone}
                           onClick={() => openWorkbookV2Phase("rule")}
                           disabled={!canOpenRulePhase}
@@ -4494,7 +4510,7 @@ export function FounderAlignmentWorkbookClient({
                           }
                         />
                         <WorkbookV2PhasePill
-                          label={t("Bestaetigen")}
+                          label={premiumPhaseLabels.approval}
                           tone={currentVisualTone}
                           onClick={() => openWorkbookV2Phase("approval")}
                           disabled={!canOpenApprovalPhase}
@@ -4513,18 +4529,14 @@ export function FounderAlignmentWorkbookClient({
                       <div className="min-w-0 max-w-3xl">
                         <p className="text-xs leading-6 text-slate-600">
                           {isAdvisorViewer
-                            ? t(`Aktuell: ${advisorCurrentPhaseMeta.label} · ${advisorCurrentPhaseMeta.activeSummary}`)
-                            : t(
-                                `Aktuell: ${
-                                  visibleWorkbookV2Phase === "collect"
-                                    ? currentPremiumV2Config.collectPhaseLabel ?? "Sammeln"
-                                    : visibleWorkbookV2Phase === "weight"
-                                      ? currentPremiumV2Config.weightingPhaseLabel ?? "Schaerfen"
-                                      : visibleWorkbookV2Phase === "rule"
-                                        ? currentPremiumV2Config.rulePhaseLabel ?? "Regel"
-                                        : "Bestaetigen"
-                                } · ${founderCurrentPhaseSummary}`
-                              )}
+                            ? wt("client.premium.currentPhase", {
+                                phase: advisorCurrentPhaseMeta.label,
+                                summary: advisorCurrentPhaseMeta.activeSummary,
+                              })
+                            : wt("client.premium.currentPhase", {
+                                phase: premiumPhaseLabels[visibleWorkbookV2Phase],
+                                summary: founderCurrentPhaseSummary,
+                              })}
                         </p>
                         {decisionRulesMatchingHint ? (
                           <p className="mt-1 text-xs leading-5 text-slate-500">
@@ -4560,12 +4572,12 @@ export function FounderAlignmentWorkbookClient({
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Aktueller Stand")}
+                        {wt("client.premium.status.title")}
                       </p>
                       <p className="mt-1 text-xs leading-5 text-slate-500">
                         {isAdvisorViewer
-                          ? t("So steht das Team in diesem Abschnitt gerade.")
-                          : t("Kurze Orientierung fuer diesen Abschnitt.")}
+                          ? wt("client.premium.status.advisorDescription")
+                          : wt("client.premium.status.founderDescription")}
                       </p>
                     </div>
                     {currentStepGuidanceItems.length > 0 ? (
@@ -4575,7 +4587,7 @@ export function FounderAlignmentWorkbookClient({
                             key={`${item.label}-${item.value}`}
                             className="inline-flex rounded-full border border-slate-200 bg-slate-50/85 px-3 py-1 text-[11px] font-medium text-slate-600"
                           >
-                            {t(`${item.label}: ${item.value}`)}
+                            {item.label}: {item.value}
                           </span>
                         ))}
                       </div>
@@ -4589,7 +4601,7 @@ export function FounderAlignmentWorkbookClient({
                         className="rounded-2xl border border-slate-200/80 bg-slate-50/68 px-3.5 py-3"
                       >
                         <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">
-                          {t(item.label)}
+                          {item.label}
                         </p>
                         <span
                           className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
@@ -4600,7 +4612,7 @@ export function FounderAlignmentWorkbookClient({
                                 : "bg-slate-200 text-slate-600"
                           }`}
                         >
-                          {t(item.value)}
+                          {item.value}
                         </span>
                       </div>
                     ))}
@@ -4741,14 +4753,14 @@ export function FounderAlignmentWorkbookClient({
                     {!isAdvisorViewer && hasDecisionRulesBothPerspectives ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
-                          {t("Beide Perspektiven liegen jetzt in derselben Dimension vor. Als Naechstes ordnet ihr die Punkte gemeinsam ein.")}
+                          {wt("client.premium.transitions.toWeightHint")}
                         </p>
                         <ReportActionButton
                           variant="utility"
                           type="button"
                           onClick={() => openWorkbookV2Phase("weight")}
                         >
-                          {t("Weiter zur Einordnung")}
+                          {wt("client.premium.transitions.toWeightAction")}
                         </ReportActionButton>
                       </div>
                     ) : null}
@@ -4765,7 +4777,7 @@ export function FounderAlignmentWorkbookClient({
                         {t(currentPremiumV2Config.weightingIntro)}
                       </p>
                       <p className="mt-2 text-xs leading-6 text-slate-500">
-                        {t("Hier ordnet ihr eure Punkte nur ein. Die eigentliche Zustimmung kommt erst in der finalen Absprache.")}
+                        {wt("client.premium.transitions.weightingHint")}
                       </p>
                     </div>
 
@@ -4820,14 +4832,14 @@ export function FounderAlignmentWorkbookClient({
                     {!isAdvisorViewer && decisionRulesWeightingReady ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
-                          {t("Die Einordnung ist abgeschlossen. In derselben Dimension macht ihr daraus jetzt einen ersten Entwurf.")}
+                          {wt("client.premium.transitions.toRuleHint")}
                         </p>
                         <ReportActionButton
                           variant="utility"
                           type="button"
                           onClick={() => openWorkbookV2Phase("rule")}
                         >
-                          {t("Weiter zum Entwurf")}
+                          {wt("client.premium.transitions.toRuleAction")}
                         </ReportActionButton>
                       </div>
                     ) : null}
@@ -4938,14 +4950,14 @@ export function FounderAlignmentWorkbookClient({
                     {!isAdvisorViewer && decisionRulesRuleReady ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
-                          {t("Der Entwurf steht. Im letzten Teil dieser Dimension bestaetigt ihr nur noch eure finale Absprache.")}
+                          {wt("client.premium.transitions.toApprovalHint")}
                         </p>
                         <ReportActionButton
                           variant="utility"
                           type="button"
                           onClick={() => openWorkbookV2Phase("approval")}
                         >
-                          {t("Weiter zur finalen Absprache")}
+                          {wt("client.premium.transitions.toApprovalAction")}
                         </ReportActionButton>
                       </div>
                     ) : null}
