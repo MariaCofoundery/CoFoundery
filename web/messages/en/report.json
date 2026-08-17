@@ -54,6 +54,11 @@
   "view": {
     "matchingReport": "Matching report",
     "dynamicsReport": "Dynamics report",
+    "participantContext": "{participantA} and {participantB} · {teamContext}",
+    "teamContexts": {
+      "existingTeam": "Existing team",
+      "preFounder": "Founder matching"
+    },
     "centralPatterns": "Your central patterns",
     "sessionCentralPatternHint": "Use these points as a starting point for a calm conversation about roles, expectations, and collaboration.",
     "legacyCentralPatternHint": "You will see the key points for your collaboration in the full report.",

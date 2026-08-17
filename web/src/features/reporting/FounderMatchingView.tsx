@@ -19,9 +19,12 @@ import type {
   MatchingDimensionStatus,
 } from "@/features/reporting/founderMatchingSelection";
 import { buildFounderValuesBlockFromProfiles } from "@/features/reporting/founderValuesTextBuilder";
+import {
+  formatMatchingReportParticipantContext,
+  normalizeMatchingReportText,
+} from "@/features/reporting/matchingReportChrome";
 import type { SelfValuesProfile } from "@/features/reporting/types";
 import type { AppLocale } from "@/i18n/config";
-import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
 type Props = {
   participantAName: string;
@@ -76,6 +79,7 @@ export function FounderMatchingView({
   const effectiveAccessNotice =
     reportAccessNotice ?? (showUnlockSection ? "locked" : isSessionReport ? "session_snapshot" : null);
   const valuesBlock = buildFounderValuesBlockFromProfiles(valuesProfileA, valuesProfileB, contentLocale);
+  const renderText = (text: string) => normalizeMatchingReportText(text, contentLocale);
 
   return (
     <>
@@ -85,20 +89,25 @@ export function FounderMatchingView({
             {isSessionReport ? rt("view.dynamicsReport") : rt("view.matchingReport")}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-5xl">
-            {t(buildMatchHeadline(selection, isSessionReport, reportContent))}
+            {renderText(buildMatchHeadline(selection, isSessionReport, reportContent))}
           </h1>
           <p className="mt-5 max-w-3xl text-[15px] leading-8 text-slate-700">
-            {t(buildIntroSummary(selection, isSessionReport, reportContent))}
+            {renderText(buildIntroSummary(selection, isSessionReport, reportContent))}
           </p>
           <p className="mt-6 text-[12px] uppercase tracking-[0.16em] text-slate-500">
-            {t(`${participantAName} und ${participantBName} · ${teamContextLabel(effectiveTeamContext)}`)}
+            {formatMatchingReportParticipantContext({
+              participantAName,
+              participantBName,
+              teamContext: effectiveTeamContext,
+              locale: contentLocale,
+            })}
           </p>
         </div>
       </section>
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t(reportContent.headings.centralPatterns)}
+          {renderText(reportContent.headings.centralPatterns)}
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {buildCentralPatternSections(selection, reportContent).map((section) => (
@@ -107,9 +116,9 @@ export function FounderMatchingView({
               className="rounded-[22px] border border-slate-200/80 bg-white/80 px-5 py-5"
             >
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                {t(section.label)}
+                {renderText(section.label)}
               </p>
-              <p className="mt-3 text-sm leading-7 text-slate-700">{t(section.body)}</p>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{renderText(section.body)}</p>
             </article>
           ))}
         </div>
@@ -214,6 +223,7 @@ function FounderMatchingReportSections({
   const markerA = buildMarkerLabel(participantAName);
   const markerB = buildMarkerLabel(participantBName);
   const conversationPrompts = collectConversationPrompts(founderReport);
+  const renderText = (text: string) => normalizeMatchingReportText(text, contentLocale);
 
   if (!founderReport && compareResult.dimensions.length === 0) {
     return (
@@ -231,12 +241,16 @@ function FounderMatchingReportSections({
   return (
     <>
       {founderReport ? (
-        <ExecutiveSummarySection founderReport={founderReport} reportContent={reportContent} />
+        <ExecutiveSummarySection
+          founderReport={founderReport}
+          reportContent={reportContent}
+          contentLocale={contentLocale}
+        />
       ) : null}
 
       <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {t(reportContent.headings.dynamicsOverview)}
+          {renderText(reportContent.headings.dynamicsOverview)}
         </p>
         <div className="mt-6 space-y-4">
           {compareResult.dimensions.map((dimension) => {
@@ -262,21 +276,21 @@ function FounderMatchingReportSections({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h4 className="text-[15px] font-semibold text-slate-900">
-                      {t(dimensionLabel)}
+                      {renderText(dimensionLabel)}
                     </h4>
                     <p className="mt-2 text-xs leading-6 text-slate-500">
-                      {t(meta.description)}
+                      {renderText(meta.description)}
                     </p>
                   </div>
                   <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${statusTone(status?.status)}`}>
-                    {t(statusLabel(status?.status, reportContent))}
+                    {renderText(statusLabel(status?.status, reportContent))}
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-slate-700">
-                  {t(buildDimensionReading(dimension, status?.status ?? "nah", reportContent))}
+                  {renderText(buildDimensionReading(dimension, status?.status ?? "nah", reportContent))}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {t(buildDimensionBusinessMeaning(dimension.dimension, status?.status ?? "nah", reportContent))}
+                  {renderText(buildDimensionBusinessMeaning(dimension.dimension, status?.status ?? "nah", reportContent))}
                 </p>
 
                 <div className="mt-4 max-w-3xl">
@@ -287,8 +301,8 @@ function FounderMatchingReportSections({
                     markerB={markerB}
                     participantAName={participantAName}
                     participantBName={participantBName}
-                    lowLabel={t(reportPoles?.left ?? meta.reportLeftPole)}
-                    highLabel={t(reportPoles?.right ?? meta.reportRightPole)}
+                    lowLabel={renderText(reportPoles?.left ?? meta.reportLeftPole)}
+                    highLabel={renderText(reportPoles?.right ?? meta.reportRightPole)}
                     valueScale="founder_percent"
                     compact
                   />
@@ -307,6 +321,7 @@ function FounderMatchingReportSections({
               label={reportContent.dimensions[label].canonicalName}
               section={founderReport.sections[key]}
               reportContent={reportContent}
+              contentLocale={contentLocale}
             />
           ))}
         </section>
@@ -315,9 +330,9 @@ function FounderMatchingReportSections({
       {valuesBlock ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t(reportContent.headings.valuesFocus)}
+            {renderText(reportContent.headings.valuesFocus)}
           </p>
-          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{t(valuesBlock.intro)}</p>
+          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-700">{renderText(valuesBlock.intro)}</p>
           <div className="mt-5 grid gap-4 lg:grid-cols-3">
             {[
               { label: reportContent.valuesLabels.sharedBasis, entry: valuesBlock.gemeinsameBasis },
@@ -331,9 +346,9 @@ function FounderMatchingReportSections({
                 key={`${label}-${entry.title}`}
                 className="rounded-[22px] border border-slate-200/80 bg-slate-50/60 px-5 py-5"
               >
-                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{t(label)}</p>
-                <h3 className="mt-2 text-sm font-semibold text-slate-900">{t(entry.title)}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-700">{t(entry.body)}</p>
+                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{renderText(label)}</p>
+                <h3 className="mt-2 text-sm font-semibold text-slate-900">{renderText(entry.title)}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{renderText(entry.body)}</p>
               </article>
             ))}
           </div>
@@ -343,10 +358,10 @@ function FounderMatchingReportSections({
       {conversationPrompts.length > 0 ? (
         <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-slate-50/70 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t(reportContent.headings.conversationPrompts)}
+            {renderText(reportContent.headings.conversationPrompts)}
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">
-            {t(reportContent.headings.conversationPromptsIntro)}
+            {renderText(reportContent.headings.conversationPromptsIntro)}
           </p>
           <ul className="mt-6 grid gap-3 lg:grid-cols-2">
             {conversationPrompts.map((prompt) => (
@@ -354,7 +369,7 @@ function FounderMatchingReportSections({
                 key={prompt}
                 className="rounded-[20px] border border-slate-200/80 bg-white/88 px-5 py-4 text-sm leading-7 text-slate-800"
               >
-                {t(prompt)}
+                {renderText(prompt)}
               </li>
             ))}
           </ul>
@@ -364,7 +379,7 @@ function FounderMatchingReportSections({
       {!isSessionReport ? (
         <section className="page-section mt-8 rounded-[30px] border border-[color:var(--brand-accent)]/18 bg-[linear-gradient(180deg,rgba(124,58,237,0.07)_0%,rgba(255,255,255,0.99)_100%)] p-8 shadow-[0_18px_50px_rgba(124,58,237,0.08)] print:hidden">
           <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {t(reportContent.headings.nextStep)}
+            {renderText(reportContent.headings.nextStep)}
           </p>
           <h3 className="mt-3 text-xl font-semibold text-slate-900">
             {rt("legacy.workbookTitle")}
@@ -384,20 +399,24 @@ function FounderMatchingReportSections({
 function ExecutiveSummarySection({
   founderReport,
   reportContent,
+  contentLocale,
 }: {
   founderReport: FounderAlignmentReport;
   reportContent: ReportContent;
+  contentLocale?: AppLocale;
 }) {
+  const renderText = (text: string) => normalizeMatchingReportText(text, contentLocale);
+
   return (
     <section className="page-section mt-8 rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
       <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-        {t(reportContent.headings.executiveSummary)}
+        {renderText(reportContent.headings.executiveSummary)}
       </p>
       <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-slate-950">
-        {t(founderReport.executiveSummary.headline)}
+        {renderText(founderReport.executiveSummary.headline)}
       </h2>
       <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-700">
-        {t(founderReport.executiveSummary.summaryIntro)}
+        {renderText(founderReport.executiveSummary.summaryIntro)}
       </p>
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         {summaryMessages(founderReport, reportContent).map((message) => (
@@ -406,9 +425,9 @@ function ExecutiveSummarySection({
             className="rounded-[22px] border border-slate-200/80 bg-slate-50/75 px-5 py-5"
           >
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              {t(message.label)}
+              {renderText(message.label)}
             </p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">{t(message.text)}</p>
+            <p className="mt-3 text-sm leading-7 text-slate-700">{renderText(message.text)}</p>
           </article>
         ))}
       </div>
@@ -420,31 +439,34 @@ function FounderMatchingDimensionSection({
   label,
   section,
   reportContent,
+  contentLocale,
 }: {
   label: string;
   section: FounderReportSection;
   reportContent: ReportContent;
+  contentLocale?: AppLocale;
 }) {
+  const renderText = (text: string) => normalizeMatchingReportText(text, contentLocale);
+
   return (
     <article className="rounded-[28px] border border-slate-200/80 bg-white/96 p-8 shadow-[0_18px_60px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:px-0 print:py-4 sm:p-10">
-      <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t(label)}</p>
       <h2 className="mt-4 text-2xl font-semibold tracking-[-0.02em] text-slate-950">
-        {t(section.dimension)}
+        {renderText(label)}
       </h2>
-      <p className="mt-5 text-sm leading-7 text-slate-700">{t(section.interpretation)}</p>
-      <p className="mt-4 text-sm leading-7 text-slate-600">{t(section.everydaySignals)}</p>
+      <p className="mt-5 text-sm leading-7 text-slate-700">{renderText(section.interpretation)}</p>
+      <p className="mt-4 text-sm leading-7 text-slate-600">{renderText(section.everydaySignals)}</p>
 
       {section.potentialTensions.length > 0 ? (
         <div className="mt-7 rounded-[24px] border border-amber-200/80 bg-amber-50/70 p-6">
           <h3 className="text-base font-semibold text-slate-950">
-            {t(reportContent.sectionLabels.possibleTensionFields)}
+            {renderText(reportContent.sectionLabels.possibleTensionFields)}
           </h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {section.potentialTensions.map((tension) => (
               <div key={tension.topic} className="rounded-2xl bg-white/75 p-4">
-                <p className="text-sm font-semibold text-slate-900">{t(tension.topic)}</p>
+                <p className="text-sm font-semibold text-slate-900">{renderText(tension.topic)}</p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
-                  {t(tension.explanation)}
+                  {renderText(tension.explanation)}
                 </p>
               </div>
             ))}
@@ -467,10 +489,6 @@ function summaryMessages(founderReport: FounderAlignmentReport, reportContent: R
       text: founderReport.executiveSummary.topMessages.tension,
     },
   ].filter((entry): entry is { label: string; text: string } => Boolean(entry.text));
-}
-
-function teamContextLabel(teamContext: TeamContext) {
-  return teamContext === "existing_team" ? "Bestehendes Team" : "Founder-Matching";
 }
 
 function buildMarkerLabel(name: string) {

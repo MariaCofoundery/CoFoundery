@@ -54,6 +54,11 @@
   "view": {
     "matchingReport": "Matching-Report",
     "dynamicsReport": "Dynamik-Report",
+    "participantContext": "{participantA} und {participantB} · {teamContext}",
+    "teamContexts": {
+      "existingTeam": "Bestehendes Team",
+      "preFounder": "Founder-Matching"
+    },
     "centralPatterns": "Eure zentralen Muster",
     "sessionCentralPatternHint": "Nutzt diese Punkte als Ausgangspunkt für ein ruhiges Gespräch über Rollen, Erwartungen und Zusammenarbeit.",
     "legacyCentralPatternHint": "Die entscheidenden Punkte für eure Zusammenarbeit seht ihr im vollständigen Report.",
