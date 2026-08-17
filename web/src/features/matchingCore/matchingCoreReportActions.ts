@@ -3,13 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createMatchingReportRunFromSession } from "@/features/matchingCore/matchingCoreReportData";
+import type {
+  MatchingReportCreationResult,
+  MatchingReportErrorReason,
+} from "@/features/matchingCore/matchingSessionReportFeedback";
 import { getRequestLocale } from "@/i18n/getLocale";
-
-export type MatchingReportActionState = {
-  ok: boolean;
-  message?: string;
-  reportHref?: string;
-};
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient();
@@ -20,38 +18,40 @@ async function getAuthenticatedUserId() {
   return user?.id ?? null;
 }
 
-function createReportErrorMessage(error: unknown) {
+function createReportErrorReason(
+  error: unknown
+): MatchingReportErrorReason {
   if (!(error instanceof Error)) {
-    return "Der Dynamik-Report konnte gerade nicht erstellt werden.";
+    return "report_creation_failed";
   }
 
   if (error.message === "matching_report_session_unavailable") {
-    return "Dieser Matching-Report ist aktuell nicht verfügbar.";
+    return "report_unavailable";
   }
   if (error.message === "matching_report_session_not_ready") {
-    return "Die Matching-Session ist noch nicht bereit für den Dynamik-Report.";
+    return "session_not_ready";
   }
   if (error.message === "matching_report_required_inputs_missing") {
-    return "Für den Dynamik-Report fehlen noch erforderliche Basis-Antworten.";
+    return "required_answers_missing";
   }
   if (error.message === "matching_report_missing_service_role") {
-    return "Der Dynamik-Report kann lokal gerade nicht erstellt werden.";
+    return "local_report_unavailable";
   }
   if (error.message === "matching_report_values_not_supported") {
-    return "Session-basierte Werte-Reports sind noch nicht aktiviert.";
+    return "values_report_not_supported";
   }
 
-  return "Der Dynamik-Report konnte gerade nicht erstellt werden.";
+  return "report_creation_failed";
 }
 
 export async function createMatchingReportRunFromSessionAction(
   matchingSessionId: string
-): Promise<MatchingReportActionState> {
+): Promise<MatchingReportCreationResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um den Dynamik-Report zu erstellen.",
+      reason: "not_authenticated",
     };
   }
 
@@ -67,13 +67,13 @@ export async function createMatchingReportRunFromSessionAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Dynamik-Report erstellt.",
+      reason: "matching_report_created",
       reportHref,
     };
   } catch (error) {
     return {
       ok: false,
-      message: createReportErrorMessage(error),
+      reason: createReportErrorReason(error),
     };
   }
 }

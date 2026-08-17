@@ -3,11 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createMatchingSessionFromDiscoveryStart } from "@/features/matchingCore/matchingCoreData";
-
-export type MatchingCoreActionState = {
-  ok: boolean;
-  message?: string;
-};
+import type {
+  MatchingSessionErrorReason,
+  MatchingSessionPreparationResult,
+} from "@/features/matchingCore/matchingSessionReportFeedback";
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient();
@@ -18,39 +17,41 @@ async function getAuthenticatedUserId() {
   return user?.id ?? null;
 }
 
-function createSessionErrorMessage(error: unknown) {
+function createSessionErrorReason(
+  error: unknown
+): MatchingSessionErrorReason {
   if (!(error instanceof Error)) {
-    return "Die Matching-Session konnte gerade nicht vorbereitet werden.";
+    return "session_prepare_failed";
   }
 
   if (error.message === "matching_core_discovery_start_unavailable") {
-    return "Dieser Matching-Schritt ist aktuell nicht verfügbar.";
+    return "matching_unavailable";
   }
   if (error.message === "matching_core_discovery_start_not_ready") {
-    return "Das gemeinsame Matching ist noch nicht von beiden bestätigt.";
+    return "confirmation_incomplete";
   }
   if (error.message === "matching_core_relationship_exists") {
-    return "Für euch gibt es bereits einen bestehenden Cofoundery-Kontext.";
+    return "relationship_exists";
   }
   if (error.message === "matching_core_profiles_inactive") {
-    return "Beide Discovery-Profile müssen aktiv sein, um die Matching-Session vorzubereiten.";
+    return "profiles_inactive";
   }
   if (error.message === "matching_core_missing_service_role") {
-    return "Die Matching-Session kann lokal gerade nicht vorbereitet werden.";
+    return "local_session_unavailable";
   }
 
-  return "Die Matching-Session konnte gerade nicht vorbereitet werden.";
+  return "session_prepare_failed";
 }
 
 export async function createMatchingSessionFromDiscoveryStartAction(
   introRequestId: string,
   discoveryMatchingStartId: string
-): Promise<MatchingCoreActionState> {
+): Promise<MatchingSessionPreparationResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um die Matching-Session vorzubereiten.",
+      reason: "not_authenticated",
     };
   }
 
@@ -64,12 +65,12 @@ export async function createMatchingSessionFromDiscoveryStartAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Matching-Session vorbereitet.",
+      reason: "matching_session_prepared",
     };
   } catch (error) {
     return {
       ok: false,
-      message: createSessionErrorMessage(error),
+      reason: createSessionErrorReason(error),
     };
   }
 }

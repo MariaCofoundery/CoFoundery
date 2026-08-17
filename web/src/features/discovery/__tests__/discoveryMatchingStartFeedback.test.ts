@@ -13,7 +13,6 @@ import {
   DISCOVERY_MATCHING_START_SUCCESS_REASONS,
   getDiscoveryMatchingStartFeedbackMessageKey,
   resolveDiscoveryMatchingStartFeedback,
-  selectDiscoveryMatchingFeedbackSource,
   type DiscoveryMatchingStartFeedbackReason,
 } from "@/features/discovery/discoveryMatchingStartFeedback";
 
@@ -102,27 +101,6 @@ test("Discovery matching start query values are validated with errors taking pri
   assert.equal(feedback?.ok, false);
   assert.equal(feedback?.reason, "unexpected_error");
   assert.doesNotMatch(JSON.stringify(feedback), /duplicate key|unique constraint/i);
-});
-
-test("Typed matching start feedback takes priority while legacy feedback remains available", () => {
-  const matchingStartFeedback = resolveDiscoveryMatchingStartFeedback({
-    result: "matching_start_requested",
-  });
-
-  assert.equal(
-    selectDiscoveryMatchingFeedbackSource({
-      matchingStartFeedback,
-      legacyMessage: "Legacy matching message",
-    }),
-    "matching_start"
-  );
-  assert.equal(
-    selectDiscoveryMatchingFeedbackSource({
-      matchingStartFeedback: null,
-      legacyMessage: "Legacy matching message",
-    }),
-    "legacy"
-  );
 });
 
 test("Discovery matching start feedback has parallel German and English messages", () => {

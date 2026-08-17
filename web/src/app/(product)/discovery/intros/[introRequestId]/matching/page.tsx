@@ -9,7 +9,6 @@ import {
 import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
 import {
   resolveDiscoveryMatchingStartFeedback,
-  selectDiscoveryMatchingFeedbackSource,
   type DiscoveryMatchingStartResult,
 } from "@/features/discovery/discoveryMatchingStartFeedback";
 import type { DiscoveryMatchingStart } from "@/features/discovery/discoveryMatchingStartTypes";
@@ -22,6 +21,13 @@ import { getMatchingSessionForDiscoveryStart } from "@/features/matchingCore/mat
 import { createMatchingReportRunFromSessionAction } from "@/features/matchingCore/matchingCoreReportActions";
 import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
 import type { MatchingReportRunSummary } from "@/features/matchingCore/matchingCoreReportTypes";
+import {
+  resolveMatchingReportFeedback,
+  resolveMatchingSessionFeedback,
+  selectMatchingPreparationFeedback,
+  type MatchingReportCreationResult,
+  type MatchingSessionPreparationResult,
+} from "@/features/matchingCore/matchingSessionReportFeedback";
 import type { MatchingSessionSummary } from "@/features/matchingCore/matchingCoreTypes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,8 +47,10 @@ type MatchingPreparationPageParams = {
 type MatchingPreparationSearchParams = {
   matchingStartResult?: string | string[];
   matchingStartError?: string | string[];
-  matchingMessage?: string | string[];
-  matchingOk?: string | string[];
+  matchingSessionResult?: string | string[];
+  matchingSessionError?: string | string[];
+  matchingReportResult?: string | string[];
+  matchingReportError?: string | string[];
 };
 
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
@@ -51,14 +59,33 @@ function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function matchingPreparationResultUrl(
+function matchingSessionResultUrl(
   introRequestId: string,
-  result: { ok: boolean; message?: string },
-  fallbackMessage: string
+  result: MatchingSessionPreparationResult
 ) {
   const params = new URLSearchParams();
-  params.set("matchingMessage", result.message ?? fallbackMessage);
-  params.set("matchingOk", result.ok ? "1" : "0");
+
+  if (result.ok) {
+    params.set("matchingSessionResult", result.reason);
+  } else {
+    params.set("matchingSessionError", result.reason);
+  }
+
+  return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
+}
+
+function matchingReportResultUrl(
+  introRequestId: string,
+  result: MatchingReportCreationResult
+) {
+  const params = new URLSearchParams();
+
+  if (result.ok) {
+    params.set("matchingReportResult", result.reason);
+  } else {
+    params.set("matchingReportError", result.reason);
+  }
+
   return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
 }
 
@@ -273,8 +300,6 @@ function MatchingStartStatusContent({
   matchingSession,
   reportRun,
   t,
-  fallbackMessage,
-  matchingSessionUnavailableMessage,
 }: {
   introRequestId: string;
   matchingStart: DiscoveryMatchingStart;
@@ -282,8 +307,6 @@ function MatchingStartStatusContent({
   matchingSession: MatchingSessionSummary | null;
   reportRun: MatchingReportRunSummary | null;
   t: DiscoveryT;
-  fallbackMessage: string;
-  matchingSessionUnavailableMessage: string;
 }) {
   async function requestFullMatching() {
     "use server";
@@ -300,20 +323,19 @@ function MatchingStartStatusContent({
   async function createMatchingSession() {
     "use server";
     const result = await createMatchingSessionFromDiscoveryStartAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
+    redirect(matchingSessionResultUrl(introRequestId, result));
   }
 
   async function createMatchingReport() {
     "use server";
     if (!matchingSession) {
       redirect(
-        matchingPreparationResultUrl(
+        matchingReportResultUrl(
           introRequestId,
           {
             ok: false,
-            message: matchingSessionUnavailableMessage,
-          },
-          fallbackMessage
+            reason: "report_unavailable",
+          }
         )
       );
     }
@@ -322,7 +344,7 @@ function MatchingStartStatusContent({
     if (result.ok && result.reportHref) {
       redirect(result.reportHref);
     }
-    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
+    redirect(matchingReportResultUrl(introRequestId, result));
   }
 
   if (matchingStart.status === "canceled") {
@@ -505,9 +527,6 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   if (!preparation) {
     return <UnavailableState t={t} />;
   }
-  const fallbackMatchingMessage = t("matchingPreparation.defaultActionMessage");
-  const matchingSessionUnavailableMessage = t("matchingPreparation.matchingSessionUnavailable");
-
   async function startMatchingPreparation() {
     "use server";
     const result = await startDiscoveryMatchingPreparationAction(introRequestId);
@@ -529,26 +548,34 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   const reportRun = matchingSession
     ? await getMatchingReportRunForSession(matchingSession.session.id, user.id)
     : null;
-  const matchingStartFeedback = resolveDiscoveryMatchingStartFeedback({
-    result: searchParamValue(resolvedSearchParams.matchingStartResult),
-    error: searchParamValue(resolvedSearchParams.matchingStartError),
+  const matchingStartError = searchParamValue(resolvedSearchParams.matchingStartError);
+  const matchingSessionError = searchParamValue(resolvedSearchParams.matchingSessionError);
+  const matchingReportError = searchParamValue(resolvedSearchParams.matchingReportError);
+  const matchingStartResult = searchParamValue(resolvedSearchParams.matchingStartResult);
+  const matchingSessionResult = searchParamValue(resolvedSearchParams.matchingSessionResult);
+  const matchingReportResult = searchParamValue(resolvedSearchParams.matchingReportResult);
+  const matchingFeedback = selectMatchingPreparationFeedback({
+    matchingStartError: matchingStartError
+      ? resolveDiscoveryMatchingStartFeedback({ error: matchingStartError })
+      : null,
+    matchingSessionError: matchingSessionError
+      ? resolveMatchingSessionFeedback({ error: matchingSessionError })
+      : null,
+    matchingReportError: matchingReportError
+      ? resolveMatchingReportFeedback({ error: matchingReportError })
+      : null,
+    matchingStartResult: matchingStartResult
+      ? resolveDiscoveryMatchingStartFeedback({ result: matchingStartResult })
+      : null,
+    matchingSessionResult: matchingSessionResult
+      ? resolveMatchingSessionFeedback({ result: matchingSessionResult })
+      : null,
+    matchingReportResult: matchingReportResult
+      ? resolveMatchingReportFeedback({ result: matchingReportResult })
+      : null,
   });
-  const legacyMatchingMessage =
-    searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
-  const feedbackSource = selectDiscoveryMatchingFeedbackSource({
-    matchingStartFeedback,
-    legacyMessage: legacyMatchingMessage,
-  });
-  const matchingMessage =
-    feedbackSource === "matching_start" && matchingStartFeedback
-      ? t(matchingStartFeedback.messageKey)
-      : feedbackSource === "legacy"
-        ? legacyMatchingMessage
-        : null;
-  const matchingOk =
-    feedbackSource === "matching_start" && matchingStartFeedback
-      ? matchingStartFeedback.ok
-      : searchParamValue(resolvedSearchParams.matchingOk) !== "0";
+  const feedbackMessage = matchingFeedback ? t(matchingFeedback.messageKey) : null;
+  const feedbackOk = matchingFeedback?.ok ?? false;
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
@@ -571,7 +598,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
           </p>
         </header>
 
-        <PageMessage message={matchingMessage} ok={matchingOk} />
+        <PageMessage message={feedbackMessage} ok={feedbackOk} />
 
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-sm font-semibold leading-6 text-amber-950">
@@ -615,8 +642,6 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               matchingSession={matchingSession}
               reportRun={reportRun}
               t={t}
-              fallbackMessage={fallbackMatchingMessage}
-              matchingSessionUnavailableMessage={matchingSessionUnavailableMessage}
             />
           ) : (
             <>

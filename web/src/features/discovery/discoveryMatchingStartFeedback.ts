@@ -204,16 +204,3 @@ export function resolveDiscoveryMatchingStartFeedback(input: {
 
   return null;
 }
-
-export function selectDiscoveryMatchingFeedbackSource(input: {
-  matchingStartFeedback: DiscoveryMatchingStartFeedback | null;
-  legacyMessage?: string | null;
-}) {
-  if (input.matchingStartFeedback) {
-    return "matching_start" as const;
-  }
-  if (input.legacyMessage) {
-    return "legacy" as const;
-  }
-  return null;
-}

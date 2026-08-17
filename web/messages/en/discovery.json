@@ -392,8 +392,6 @@
     }
   },
   "matchingPreparation": {
-    "defaultActionMessage": "The matching preparation was processed.",
-    "matchingSessionUnavailable": "The matching session is currently unavailable.",
     "feedback": {
       "matchingStartRequested": "Shared matching start requested.",
       "notAuthenticated": "Please sign in to continue with the matching preparation.",
@@ -405,6 +403,18 @@
       "selfConfirmationForbidden": "The other person needs to confirm the shared matching start.",
       "confirmationNotAllowed": "You cannot confirm this matching start right now.",
       "confirmationFailed": "The shared matching start could not be confirmed right now.",
+      "sessionPrepared": "Matching session prepared.",
+      "confirmationIncomplete": "Both people need to confirm the shared matching first.",
+      "profilesInactive": "Both Discovery profiles need to be active before the matching session can be prepared.",
+      "localSessionUnavailable": "The matching session cannot be prepared right now.",
+      "sessionPrepareFailed": "The matching session could not be prepared right now.",
+      "reportCreated": "Dynamics report created.",
+      "reportUnavailable": "This dynamics report is currently unavailable.",
+      "sessionNotReady": "The matching session is not ready for the dynamics report yet.",
+      "requiredAnswersMissing": "Required foundation answers are still missing for the dynamics report.",
+      "localReportUnavailable": "The dynamics report cannot be created right now.",
+      "valuesReportNotSupported": "Session-based values reports are not currently available.",
+      "reportCreationFailed": "The dynamics report could not be created right now.",
       "unexpectedError": "This matching step could not be completed right now."
     },
     "backToIntros": "Back to my intros",

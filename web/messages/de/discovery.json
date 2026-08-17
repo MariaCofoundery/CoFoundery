@@ -392,8 +392,6 @@
     }
   },
   "matchingPreparation": {
-    "defaultActionMessage": "Die Matching-Vorbereitung wurde verarbeitet.",
-    "matchingSessionUnavailable": "Die Matching-Session ist aktuell nicht verfügbar.",
     "feedback": {
       "matchingStartRequested": "Gemeinsamer Matching-Start angefragt.",
       "notAuthenticated": "Bitte melde dich an, um mit der Matching-Vorbereitung fortzufahren.",
@@ -405,6 +403,18 @@
       "selfConfirmationForbidden": "Die andere Person muss den gemeinsamen Matching-Start bestätigen.",
       "confirmationNotAllowed": "Du kannst diesen Matching-Start aktuell nicht bestätigen.",
       "confirmationFailed": "Der gemeinsame Matching-Start konnte gerade nicht bestätigt werden.",
+      "sessionPrepared": "Matching-Session vorbereitet.",
+      "confirmationIncomplete": "Das gemeinsame Matching muss zuerst von beiden bestätigt werden.",
+      "profilesInactive": "Beide Discovery-Profile müssen aktiv sein, um die Matching-Session vorzubereiten.",
+      "localSessionUnavailable": "Die Matching-Session kann gerade nicht vorbereitet werden.",
+      "sessionPrepareFailed": "Die Matching-Session konnte gerade nicht vorbereitet werden.",
+      "reportCreated": "Dynamik-Report erstellt.",
+      "reportUnavailable": "Dieser Dynamik-Report ist aktuell nicht verfügbar.",
+      "sessionNotReady": "Die Matching-Session ist noch nicht bereit für den Dynamik-Report.",
+      "requiredAnswersMissing": "Für den Dynamik-Report fehlen noch erforderliche Basis-Antworten.",
+      "localReportUnavailable": "Der Dynamik-Report kann gerade nicht erstellt werden.",
+      "valuesReportNotSupported": "Session-basierte Werte-Reports sind derzeit nicht verfügbar.",
+      "reportCreationFailed": "Der Dynamik-Report konnte gerade nicht erstellt werden.",
       "unexpectedError": "Dieser Matching-Schritt konnte gerade nicht abgeschlossen werden."
     },
     "backToIntros": "Zurück zu meinen Intros",
