@@ -6731,6 +6731,30 @@ function WorkbookSummaryView({
   const wt = useTranslations("workbook");
   const locale = useLocale();
 
+  function summaryReactionStatusLabel(
+    status: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>
+  ) {
+    switch (status) {
+      case "understood":
+        return wt("client.summary.reactionStatuses.understood");
+      case "open":
+        return wt("client.summary.reactionStatuses.open");
+      case "in_clarification":
+        return wt("client.summary.reactionStatuses.inClarification");
+    }
+  }
+
+  function summaryAdvisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | null) {
+    switch (value) {
+      case "four_weeks":
+        return wt("client.summary.followUp.fourWeeks");
+      case "three_months":
+        return wt("client.summary.followUp.threeMonths");
+      default:
+        return wt("client.summary.followUp.none");
+    }
+  }
+
   return (
     <>
       <div className="mt-10 space-y-8 print:mt-6 print:space-y-6">
@@ -6755,50 +6779,50 @@ function WorkbookSummaryView({
                 {item.id === "advisor_closing" ? (
                   <div className="mt-5 space-y-5">
                     <SummaryInsightBlock
-                      title={t("Aussenblick")}
+                      title={wt("client.summary.outsidePerspective")}
                       text={
                         item.advisorClosing?.observations ||
-                        t("Noch kein Aussenblick festgehalten.")
+                        wt("client.summary.empty.outsidePerspective")
                       }
                     />
                     <SummaryInsightBlock
-                      title={t("Offene Rueckfragen")}
+                      title={wt("client.summary.openQuestions")}
                       text={
                         item.advisorClosing?.questions ||
-                        t("Noch keine Rueckfragen festgehalten.")
+                        wt("client.summary.empty.openQuestions")
                       }
                     />
                     <SummaryInsightBlock
-                      title={t("Naechster sinnvoller Schritt")}
+                      title={wt("client.summary.nextStep")}
                       text={
                         item.advisorClosing?.nextSteps ||
-                        t("Noch kein naechster Schritt festgehalten.")
+                        wt("client.summary.empty.nextStep")
                       }
                     />
                     <SummaryInsightBlock
-                      title={t("Antwort des Teams")}
+                      title={wt("client.summary.teamResponse")}
                       text={
                         item.founderReaction?.comment
                           ? `${
                               item.founderReaction?.status
-                                ? founderReactionStatusLabel(item.founderReaction.status)
-                                : t("Noch kein Reaktionsstatus festgehalten.")
+                                ? summaryReactionStatusLabel(item.founderReaction.status)
+                                : wt("client.summary.empty.reactionStatus")
                             }\n\n${item.founderReaction.comment}`
                           : item.founderReaction?.status
-                            ? founderReactionStatusLabel(item.founderReaction.status)
-                            : t("Noch kein Reaktionsstatus festgehalten.")
+                            ? summaryReactionStatusLabel(item.founderReaction.status)
+                            : wt("client.summary.empty.reactionStatus")
                       }
                     />
                     <SummaryInsightBlock
-                      title={t("Naechster Check-in")}
-                      text={advisorFollowUpLabel(item.advisorFollowUp)}
+                      title={wt("client.summary.nextCheckIn")}
+                      text={summaryAdvisorFollowUpLabel(item.advisorFollowUp)}
                     />
                   </div>
                 ) : (
                   <>
                     <div className="mt-5 border-l-2 border-slate-200 pl-5">
                       <p className="text-[17px] leading-8 text-slate-900">
-                        {primaryAgreement || t("Zu diesem Schritt liegt aktuell noch keine klare Regel vor.")}
+                        {primaryAgreement || wt("client.summary.empty.agreement")}
                       </p>
                     </div>
                     {structuredSummaryItems.length > 0 ? (
@@ -6818,7 +6842,7 @@ function WorkbookSummaryView({
                 {item.advisorNotes ? (
                   <div className="mt-6 border-t border-slate-200/80 pt-5">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Impuls aus der Begleitung")}
+                      {wt("client.summary.advisorNotes")}
                     </p>
                     <p className="mt-3 text-[15px] leading-8 text-slate-700">{item.advisorNotes}</p>
                   </div>

@@ -141,6 +141,31 @@
       "openThread": "Open",
       "connections": "Follow-ups",
       "secondLevel": "a lightweight second level"
+    },
+    "summary": {
+      "outsidePerspective": "External perspective",
+      "openQuestions": "Open questions",
+      "nextStep": "Next useful step",
+      "teamResponse": "Team response",
+      "nextCheckIn": "Next check-in",
+      "advisorNotes": "Advisor guidance",
+      "empty": {
+        "outsidePerspective": "No external perspective has been captured yet.",
+        "openQuestions": "No open questions have been captured yet.",
+        "nextStep": "No next step has been captured yet.",
+        "reactionStatus": "No response status has been captured yet.",
+        "agreement": "No clear rule has been captured for this step yet."
+      },
+      "reactionStatuses": {
+        "understood": "Acknowledged",
+        "open": "Remains open",
+        "inClarification": "Needs clarification"
+      },
+      "followUp": {
+        "fourWeeks": "Check-in in 4 weeks",
+        "threeMonths": "Check-in in 3 months",
+        "none": "No check-in scheduled."
+      }
     }
   },
   "print": {

@@ -141,6 +141,31 @@
       "openThread": "Öffnen",
       "connections": "Anschlüsse",
       "secondLevel": "eine leichte zweite Ebene"
+    },
+    "summary": {
+      "outsidePerspective": "Außenblick",
+      "openQuestions": "Offene Rückfragen",
+      "nextStep": "Nächster sinnvoller Schritt",
+      "teamResponse": "Antwort des Teams",
+      "nextCheckIn": "Nächster Check-in",
+      "advisorNotes": "Impuls aus der Begleitung",
+      "empty": {
+        "outsidePerspective": "Noch kein Außenblick festgehalten.",
+        "openQuestions": "Noch keine Rückfragen festgehalten.",
+        "nextStep": "Noch kein nächster Schritt festgehalten.",
+        "reactionStatus": "Noch kein Reaktionsstatus festgehalten.",
+        "agreement": "Zu diesem Schritt liegt aktuell noch keine klare Regel vor."
+      },
+      "reactionStatuses": {
+        "understood": "Aufgenommen",
+        "open": "Bleibt offen",
+        "inClarification": "Weiter klären"
+      },
+      "followUp": {
+        "fourWeeks": "Check-in in 4 Wochen",
+        "threeMonths": "Check-in in 3 Monaten",
+        "none": "Kein Check-in gesetzt."
+      }
     }
   },
   "print": {
