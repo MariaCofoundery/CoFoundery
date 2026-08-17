@@ -4634,20 +4634,14 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                       <div className="flex flex-col items-start gap-1 sm:items-end">
                         <span className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.14em] ${currentToneMeta.focusPill}`}>
-                          {t("Gemeinsamer Raum")}
+                          {wt("client.discussion.sharedSpace")}
                         </span>
                         <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
                           {currentUserRole === "founderA"
-                            ? systemTextWithProtectedValues(
-                                `Du schreibst als ${founderALabel}`,
-                                [founderALabel]
-                              )
+                            ? wt("client.discussion.writingAs", { name: founderALabel })
                             : currentUserRole === "founderB"
-                              ? systemTextWithProtectedValues(
-                                  `Du schreibst als ${founderBLabel}`,
-                                  [founderBLabel]
-                                )
-                              : t("Advisor-Kontext")}
+                              ? wt("client.discussion.writingAs", { name: founderBLabel })
+                              : wt("advisor.context")}
                         </span>
                       </div>
                     </div>
@@ -4656,17 +4650,15 @@ export function FounderAlignmentWorkbookClient({
                       {currentDiscussionDraftSourceEntry && !isAdvisorViewer ? (
                         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 text-xs text-slate-600">
                           <span className="font-medium text-slate-700">
-                            {t("Basis fuer deinen Punkt")}
+                            {wt("client.discussion.draftBasis")}
                           </span>
                           <span>
-                            {systemTextWithProtectedValues(
-                              `Beitrag von ${currentDiscussionDraftSourceEntry.createdBy === "founderA" ? founderALabel : founderBLabel}`,
-                              [
+                            {wt("client.discussion.contributionBy", {
+                              name:
                                 currentDiscussionDraftSourceEntry.createdBy === "founderA"
                                   ? founderALabel
                                   : founderBLabel,
-                              ]
-                            )}
+                            })}
                           </span>
                         </div>
                       ) : null}
@@ -4694,7 +4686,7 @@ export function FounderAlignmentWorkbookClient({
                               onClick={addDecisionRulesDiscussionEntry}
                               disabled={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
                             >
-                              {t("Eigenen Punkt hinzufuegen")}
+                              {wt("client.discussion.addOwnPoint")}
                             </ReportActionButton>
                           </div>
                         </>
@@ -4704,7 +4696,7 @@ export function FounderAlignmentWorkbookClient({
                     <div className="mt-5">
                       {decisionRulesWorkspace.entries.length === 0 ? (
                         <div className="rounded-[20px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-5 text-sm leading-7 text-slate-600">
-                          {t("Noch keine Punkte im gemeinsamen Raum. Der Einstieg wird leicht, sobald der erste konkrete Satz da ist.")}
+                          {wt("client.discussion.empty")}
                         </div>
                       ) : (
                         <WorkbookV2DiscussionThreadList
@@ -5794,7 +5786,7 @@ function WorkbookV2DiscussionThreadList({
   entrySharedClassName: string;
   sourceBadgeClassName: string;
 }) {
-  const locale = useLocale();
+  const wt = useTranslations("workbook");
   const viewerFounderRole =
     currentUserRole === "founderA" || currentUserRole === "founderB" ? currentUserRole : null;
   const isAdvisorViewer = currentUserRole === "advisor";
@@ -5945,11 +5937,6 @@ function WorkbookV2DiscussionThreadList({
     const hasAdvisorReplies = advisorReplies.length > 0;
     const showReplyComposer = isAdvisorViewer && replyComposerEntryId === entry.id;
     const compactPreview = truncateDiscussionPreview(entry.content, options.isChild ? 120 : 180);
-    const attachmentLabel = options.isChild
-      ? sourceEntry
-        ? `Greift den Punkt von ${authorLabelFor(sourceEntry.createdBy)} auf`
-        : "Baut auf einem frueheren Punkt auf"
-      : null;
 
     return (
       <div
@@ -5974,25 +5961,23 @@ function WorkbookV2DiscussionThreadList({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {attachmentLabel ? (
+            {options.isChild ? (
               <span
                 className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${sourceBadgeClassName}`}
               >
-                {normalizeWorkbookSystemTextWithProtectedValues(
-                  attachmentLabel,
-                  locale,
-                  sourceEntry ? [authorLabelFor(sourceEntry.createdBy)] : []
-                )}
+                {sourceEntry
+                  ? wt("client.discussion.buildsOnAuthor", {
+                      author: authorLabelFor(sourceEntry.createdBy),
+                    })
+                  : wt("client.discussion.buildsOnEarlierPoint")}
               </span>
             ) : null}
             <span className="text-xs text-slate-500">
-              {t(
-                reactionCount > 0
-                  ? `${reactionCount} Einordnungen`
-                  : options.isChild
-                    ? "Noch nicht eingeordnet"
-                    : "Noch offen"
-              )}
+              {reactionCount > 0
+                ? wt("client.discussion.classifications", { count: reactionCount })
+                : options.isChild
+                  ? wt("client.discussion.notClassified")
+                  : wt("client.discussion.open")}
             </span>
           </div>
         </div>
@@ -6009,14 +5994,18 @@ function WorkbookV2DiscussionThreadList({
                 />
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs leading-5 text-slate-500">
-                    {t("Aenderungen halten den Punkt aktuell und setzen seine Einordnung neu offen.")}
+                    {wt("client.discussion.editResetsClassification")}
                   </p>
                   <button
                     type="button"
                     onClick={() => onRemoveEntry(entry.id)}
                     className="text-xs font-medium text-slate-500 underline-offset-4 hover:text-rose-600 hover:underline"
                   >
-                    {t(options.isChild ? "Anschluss entfernen" : "Punkt entfernen")}
+                    {wt(
+                      options.isChild
+                        ? "client.discussion.removeConnection"
+                        : "client.discussion.removePoint"
+                    )}
                   </button>
                 </div>
               </>
@@ -6030,10 +6019,10 @@ function WorkbookV2DiscussionThreadList({
                       onClick={() => onUseAsDraft(entry)}
                       className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
                     >
-                      {t("Als Basis fuer eigenen Punkt nutzen")}
+                      {wt("client.discussion.useAsBasis")}
                     </button>
                     <span className="text-xs leading-5 text-slate-500">
-                      {t("Der Ursprungspunkt bleibt unveraendert.")}
+                      {wt("client.discussion.sourceRemainsUnchanged")}
                     </span>
                   </div>
                 ) : null}
@@ -6049,14 +6038,14 @@ function WorkbookV2DiscussionThreadList({
                   onClick={() => openReplyComposer(entry.id)}
                   className="text-xs font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
                 >
-                  {t("Antworten")}
+                  {wt("client.discussion.reply")}
                 </button>
                 <span className="text-xs leading-5 text-slate-500">
-                  {t(
-                    hasAdvisorReplies
-                      ? `${advisorReplies.length} Antwort${advisorReplies.length === 1 ? "" : "en"} aus der Begleitung`
-                      : "Kurze Rueckfrage oder Einordnung direkt am Beitrag."
-                  )}
+                  {hasAdvisorReplies
+                    ? wt("client.discussion.advisorReplyCount", {
+                        count: advisorReplies.length,
+                      })
+                    : wt("client.discussion.replyHint")}
                 </span>
               </div>
             ) : null}
@@ -6064,18 +6053,18 @@ function WorkbookV2DiscussionThreadList({
             {showReplyComposer ? (
               <div className="mt-4 rounded-[20px] border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/5 p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                  {t("Antwort aus der Begleitung")}
+                  {wt("client.discussion.advisorReply")}
                 </p>
                 <textarea
                   value={replyDraftByEntryId[entry.id] ?? ""}
                   onChange={(event) => updateReplyDraft(entry.id, event.target.value)}
                   rows={3}
-                  placeholder={t("Welche Rueckfrage, Beobachtung oder kurze Einordnung ist hier hilfreich?")}
+                  placeholder={wt("client.discussion.replyPlaceholder")}
                   className="mt-3 w-full rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-[color:var(--brand-primary)]/16"
                 />
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs leading-6 text-slate-500">
-                    {t("Kurz und bezogen auf diesen Beitrag halten.")}
+                    {wt("client.discussion.replyHelper")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -6083,14 +6072,14 @@ function WorkbookV2DiscussionThreadList({
                       onClick={() => closeReplyComposer(entry.id)}
                       className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
                     >
-                      {t("Abbrechen")}
+                      {wt("client.discussion.cancel")}
                     </button>
                     <ReportActionButton
                       type="button"
                       onClick={() => submitAdvisorReply(entry.id)}
                       disabled={(replyDraftByEntryId[entry.id] ?? "").trim().length === 0}
                     >
-                      {t("Antwort speichern")}
+                      {wt("client.discussion.saveReply")}
                     </ReportActionButton>
                   </div>
                 </div>
@@ -6101,10 +6090,10 @@ function WorkbookV2DiscussionThreadList({
               <div className="mt-4 border-l border-[color:var(--brand-accent)]/18 pl-4">
                 <div className="mb-3 flex items-center gap-2">
                   <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    {t("Antworten aus der Begleitung")}
+                    {wt("client.discussion.advisorReplies")}
                   </span>
                   <span className="text-xs text-slate-400">
-                    {t(`${advisorReplies.length} sichtbar`)}
+                    {wt("client.discussion.visibleCount", { count: advisorReplies.length })}
                   </span>
                 </div>
                 <div className="space-y-3">
@@ -6128,7 +6117,7 @@ function WorkbookV2DiscussionThreadList({
                           </div>
                         </div>
                         <span className="inline-flex rounded-full border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/8 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-600">
-                          {t("Advisor")}
+                          {wt("client.discussion.advisor")}
                         </span>
                       </div>
                       <p className="mt-3 text-sm leading-7 text-slate-700">{reply.content}</p>
@@ -6144,9 +6133,9 @@ function WorkbookV2DiscussionThreadList({
             {mode === "weight" ? <div className="mt-3">{renderSignals(entry, true)}</div> : null}
             {hasAdvisorReplies ? (
               <p className="mt-3 text-xs leading-6 text-slate-500">
-                {t(
-                  `${advisorReplies.length} Antwort${advisorReplies.length === 1 ? "" : "en"} aus der Begleitung sichtbar`
-                )}
+                {wt("client.discussion.visibleAdvisorReplyCount", {
+                  count: advisorReplies.length,
+                })}
               </p>
             ) : null}
           </div>
@@ -6181,21 +6170,27 @@ function WorkbookV2DiscussionThreadList({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                  {t(threadEntryCount > 0 ? "Gedanke mit Anschluss" : "Gedanke")}
+                  {wt(
+                    threadEntryCount > 0
+                      ? "client.discussion.threadWithConnection"
+                      : "client.discussion.thread"
+                  )}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-slate-500">
-                  {threadEntryCount > 0 ? t(`${threadEntryCount} Anschlussbeitraege`) : t("Kein Anschluss")}
+                  {threadEntryCount > 0
+                    ? wt("client.discussion.connectionCount", { count: threadEntryCount })
+                    : wt("client.discussion.noConnection")}
                 </span>
                 {threadReplyCount > 0 ? (
                   <span className="text-xs text-slate-500">
-                    {t(`${threadReplyCount} Advisor-Antwort${threadReplyCount === 1 ? "" : "en"}`)}
+                    {wt("client.discussion.advisorReplyCount", { count: threadReplyCount })}
                   </span>
                 ) : null}
                 {mode === "weight" && unresolvedCount > 0 ? (
                   <span className="rounded-full border border-amber-200 bg-amber-50/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700">
-                    {t(`${unresolvedCount} offen`)}
+                    {wt("client.discussion.unresolvedCount", { count: unresolvedCount })}
                   </span>
                 ) : null}
                 <button
@@ -6203,7 +6198,7 @@ function WorkbookV2DiscussionThreadList({
                   onClick={() => onToggleThread(group.rootEntry.id)}
                   className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                 >
-                  {t(isOpen ? "Schliessen" : "Oeffnen")}
+                  {wt(isOpen ? "client.discussion.close" : "client.discussion.openThread")}
                 </button>
               </div>
             </div>
@@ -6219,9 +6214,11 @@ function WorkbookV2DiscussionThreadList({
               <div className="mt-4 border-l border-slate-200/90 pl-4">
                 <div className="mb-3 flex items-center gap-2">
                   <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    {t("Anschluesse")}
+                    {wt("client.discussion.connections")}
                   </span>
-                  <span className="text-xs text-slate-400">{t("eine leichte zweite Ebene")}</span>
+                  <span className="text-xs text-slate-400">
+                    {wt("client.discussion.secondLevel")}
+                  </span>
                 </div>
                 <div className="space-y-3">
                   {group.childEntries.map((entry) =>
