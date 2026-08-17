@@ -394,6 +394,19 @@
   "matchingPreparation": {
     "defaultActionMessage": "The matching preparation was processed.",
     "matchingSessionUnavailable": "The matching session is currently unavailable.",
+    "feedback": {
+      "matchingStartRequested": "Shared matching start requested.",
+      "notAuthenticated": "Please sign in to continue with the matching preparation.",
+      "preparationNotAllowed": "You cannot start this matching preparation right now.",
+      "preparationFailed": "The matching preparation could not be started right now.",
+      "otherParticipantRequested": "The other person has already requested the matching start. You can confirm it.",
+      "requestNotAllowed": "You cannot request the shared matching start right now.",
+      "requestFailed": "The shared matching start could not be requested right now.",
+      "selfConfirmationForbidden": "The other person needs to confirm the shared matching start.",
+      "confirmationNotAllowed": "You cannot confirm this matching start right now.",
+      "confirmationFailed": "The shared matching start could not be confirmed right now.",
+      "unexpectedError": "This matching step could not be completed right now."
+    },
     "backToIntros": "Back to my intros",
     "backToOpenRequests": "Back to open requests",
     "eyebrow": "Discovery Intro",

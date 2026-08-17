@@ -394,6 +394,19 @@
   "matchingPreparation": {
     "defaultActionMessage": "Die Matching-Vorbereitung wurde verarbeitet.",
     "matchingSessionUnavailable": "Die Matching-Session ist aktuell nicht verfügbar.",
+    "feedback": {
+      "matchingStartRequested": "Gemeinsamer Matching-Start angefragt.",
+      "notAuthenticated": "Bitte melde dich an, um mit der Matching-Vorbereitung fortzufahren.",
+      "preparationNotAllowed": "Du kannst diese Matching-Vorbereitung aktuell nicht starten.",
+      "preparationFailed": "Die Matching-Vorbereitung konnte gerade nicht gestartet werden.",
+      "otherParticipantRequested": "Die andere Person hat den Matching-Start bereits angefragt. Du kannst ihn bestätigen.",
+      "requestNotAllowed": "Du kannst den gemeinsamen Matching-Start aktuell nicht anfragen.",
+      "requestFailed": "Der gemeinsame Matching-Start konnte gerade nicht angefragt werden.",
+      "selfConfirmationForbidden": "Die andere Person muss den gemeinsamen Matching-Start bestätigen.",
+      "confirmationNotAllowed": "Du kannst diesen Matching-Start aktuell nicht bestätigen.",
+      "confirmationFailed": "Der gemeinsame Matching-Start konnte gerade nicht bestätigt werden.",
+      "unexpectedError": "Dieser Matching-Schritt konnte gerade nicht abgeschlossen werden."
+    },
     "backToIntros": "Zurück zu meinen Intros",
     "backToOpenRequests": "Zurück zu offenen Anfragen",
     "eyebrow": "Discovery Intro",

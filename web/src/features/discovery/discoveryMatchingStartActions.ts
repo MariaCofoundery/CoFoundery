@@ -6,12 +6,15 @@ import {
   requestFullDiscoveryMatching,
   startDiscoveryMatchingPreparation,
 } from "@/features/discovery/discoveryMatchingStartData";
+import type {
+  DiscoveryMatchingConfirmationErrorReason,
+  DiscoveryMatchingConfirmationResult,
+  DiscoveryMatchingPreparationErrorReason,
+  DiscoveryMatchingPreparationResult,
+  DiscoveryMatchingRequestErrorReason,
+  DiscoveryMatchingRequestResult,
+} from "@/features/discovery/discoveryMatchingStartFeedback";
 import { createClient } from "@/lib/supabase/server";
-
-export type DiscoveryMatchingStartActionState = {
-  ok: boolean;
-  message?: string;
-};
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient();
@@ -22,74 +25,80 @@ async function getAuthenticatedUserId() {
   return user?.id ?? null;
 }
 
-function matchingStartErrorMessage(error: unknown) {
+function matchingPreparationErrorReason(
+  error: unknown
+): DiscoveryMatchingPreparationErrorReason {
   if (!(error instanceof Error)) {
-    return "Die Matching-Vorbereitung konnte gerade nicht gestartet werden.";
+    return "preparation_failed";
   }
 
   if (error.message === "discovery_matching_start_unavailable") {
-    return "Dieser Matching-Schritt ist aktuell nicht verfügbar.";
+    return "matching_unavailable";
   }
   if (error.message === "discovery_matching_start_relationship_exists") {
-    return "Für euch gibt es bereits einen bestehenden Cofoundery-Kontext.";
+    return "relationship_exists";
   }
   if (error.message === "discovery_matching_start_forbidden") {
-    return "Du kannst diese Matching-Vorbereitung nicht starten.";
+    return "preparation_not_allowed";
   }
 
-  return "Die Matching-Vorbereitung konnte gerade nicht gestartet werden.";
+  return "preparation_failed";
 }
 
-function fullMatchingRequestErrorMessage(error: unknown) {
+function fullMatchingRequestErrorReason(
+  error: unknown
+): DiscoveryMatchingRequestErrorReason {
   if (!(error instanceof Error)) {
-    return "Der gemeinsame Matching-Start konnte gerade nicht angefragt werden.";
+    return "request_failed";
   }
 
   if (error.message === "discovery_matching_start_unavailable") {
-    return "Dieser Matching-Schritt ist aktuell nicht verfügbar.";
+    return "matching_unavailable";
   }
   if (error.message === "discovery_matching_start_relationship_exists") {
-    return "Für euch gibt es bereits einen bestehenden Cofoundery-Kontext.";
+    return "relationship_exists";
   }
   if (error.message === "discovery_matching_start_other_user_requested") {
-    return "Die andere Person hat den Matching-Start bereits angefragt. Du kannst ihn bestätigen.";
+    return "other_participant_requested";
   }
   if (error.message === "discovery_matching_start_request_forbidden") {
-    return "Du kannst den gemeinsamen Matching-Start aktuell nicht anfragen.";
+    return "request_not_allowed";
   }
 
-  return "Der gemeinsame Matching-Start konnte gerade nicht angefragt werden.";
+  return "request_failed";
 }
 
-function fullMatchingConfirmErrorMessage(error: unknown) {
+function fullMatchingConfirmationErrorReason(
+  error: unknown
+): DiscoveryMatchingConfirmationErrorReason {
   if (!(error instanceof Error)) {
-    return "Der gemeinsame Matching-Start konnte gerade nicht bestätigt werden.";
+    return "confirmation_failed";
   }
 
   if (error.message === "discovery_matching_start_unavailable") {
-    return "Dieser Matching-Schritt ist aktuell nicht verfügbar.";
+    return "matching_unavailable";
   }
   if (error.message === "discovery_matching_start_relationship_exists") {
-    return "Für euch gibt es bereits einen bestehenden Cofoundery-Kontext.";
+    return "relationship_exists";
   }
   if (error.message === "discovery_matching_start_self_confirm_forbidden") {
-    return "Die andere Person muss den gemeinsamen Matching-Start bestätigen.";
+    return "self_confirmation_forbidden";
   }
   if (error.message === "discovery_matching_start_confirm_forbidden") {
-    return "Du kannst diesen Matching-Start aktuell nicht bestätigen.";
+    return "confirmation_not_allowed";
   }
 
-  return "Der gemeinsame Matching-Start konnte gerade nicht bestätigt werden.";
+  return "confirmation_failed";
 }
 
 export async function startDiscoveryMatchingPreparationAction(
   introRequestId: string
-): Promise<DiscoveryMatchingStartActionState> {
+): Promise<DiscoveryMatchingPreparationResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um die Matching-Vorbereitung zu starten.",
+      reason: "not_authenticated",
     };
   }
 
@@ -103,12 +112,12 @@ export async function startDiscoveryMatchingPreparationAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Matching-Vorbereitung gestartet.",
+      reason: "matching_preparation_started",
     };
   } catch (error) {
     return {
       ok: false,
-      message: matchingStartErrorMessage(error),
+      reason: matchingPreparationErrorReason(error),
     };
   }
 }
@@ -116,12 +125,12 @@ export async function startDiscoveryMatchingPreparationAction(
 export async function requestFullDiscoveryMatchingAction(
   introRequestId: string,
   matchingStartId: string
-): Promise<DiscoveryMatchingStartActionState> {
+): Promise<DiscoveryMatchingRequestResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um den Matching-Start anzufragen.",
+      reason: "not_authenticated",
     };
   }
 
@@ -135,12 +144,12 @@ export async function requestFullDiscoveryMatchingAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Gemeinsamer Matching-Start angefragt.",
+      reason: "matching_start_requested",
     };
   } catch (error) {
     return {
       ok: false,
-      message: fullMatchingRequestErrorMessage(error),
+      reason: fullMatchingRequestErrorReason(error),
     };
   }
 }
@@ -148,12 +157,12 @@ export async function requestFullDiscoveryMatchingAction(
 export async function confirmFullDiscoveryMatchingAction(
   introRequestId: string,
   matchingStartId: string
-): Promise<DiscoveryMatchingStartActionState> {
+): Promise<DiscoveryMatchingConfirmationResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um den Matching-Start zu bestätigen.",
+      reason: "not_authenticated",
     };
   }
 
@@ -167,12 +176,12 @@ export async function confirmFullDiscoveryMatchingAction(
     revalidatePath("/discovery/intros");
     return {
       ok: true,
-      message: "Gemeinsamer Matching-Start bestätigt.",
+      reason: "matching_start_confirmed",
     };
   } catch (error) {
     return {
       ok: false,
-      message: fullMatchingConfirmErrorMessage(error),
+      reason: fullMatchingConfirmationErrorReason(error),
     };
   }
 }

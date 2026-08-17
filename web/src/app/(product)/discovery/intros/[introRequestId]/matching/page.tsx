@@ -5,9 +5,13 @@ import {
   confirmFullDiscoveryMatchingAction,
   requestFullDiscoveryMatchingAction,
   startDiscoveryMatchingPreparationAction,
-  type DiscoveryMatchingStartActionState,
 } from "@/features/discovery/discoveryMatchingStartActions";
 import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
+import {
+  resolveDiscoveryMatchingStartFeedback,
+  selectDiscoveryMatchingFeedbackSource,
+  type DiscoveryMatchingStartResult,
+} from "@/features/discovery/discoveryMatchingStartFeedback";
 import type { DiscoveryMatchingStart } from "@/features/discovery/discoveryMatchingStartTypes";
 import type {
   DiscoveryFounderRole,
@@ -35,6 +39,8 @@ type MatchingPreparationPageParams = {
 };
 
 type MatchingPreparationSearchParams = {
+  matchingStartResult?: string | string[];
+  matchingStartError?: string | string[];
   matchingMessage?: string | string[];
   matchingOk?: string | string[];
 };
@@ -47,12 +53,27 @@ function searchParamValue(value: string | string[] | undefined) {
 
 function matchingPreparationResultUrl(
   introRequestId: string,
-  result: DiscoveryMatchingStartActionState,
+  result: { ok: boolean; message?: string },
   fallbackMessage: string
 ) {
   const params = new URLSearchParams();
   params.set("matchingMessage", result.message ?? fallbackMessage);
   params.set("matchingOk", result.ok ? "1" : "0");
+  return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
+}
+
+function matchingStartResultUrl(
+  introRequestId: string,
+  result: DiscoveryMatchingStartResult
+) {
+  const params = new URLSearchParams();
+
+  if (result.ok) {
+    params.set("matchingStartResult", result.reason);
+  } else {
+    params.set("matchingStartError", result.reason);
+  }
+
   return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
 }
 
@@ -267,13 +288,13 @@ function MatchingStartStatusContent({
   async function requestFullMatching() {
     "use server";
     const result = await requestFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
+    redirect(matchingStartResultUrl(introRequestId, result));
   }
 
   async function confirmFullMatching() {
     "use server";
     const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMessage));
+    redirect(matchingStartResultUrl(introRequestId, result));
   }
 
   async function createMatchingSession() {
@@ -490,7 +511,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   async function startMatchingPreparation() {
     "use server";
     const result = await startDiscoveryMatchingPreparationAction(introRequestId);
-    redirect(matchingPreparationResultUrl(introRequestId, result, fallbackMatchingMessage));
+    redirect(matchingStartResultUrl(introRequestId, result));
   }
 
   const currentUserProfile =
@@ -508,8 +529,26 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   const reportRun = matchingSession
     ? await getMatchingReportRunForSession(matchingSession.session.id, user.id)
     : null;
-  const matchingMessage = searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
-  const matchingOk = searchParamValue(resolvedSearchParams.matchingOk) !== "0";
+  const matchingStartFeedback = resolveDiscoveryMatchingStartFeedback({
+    result: searchParamValue(resolvedSearchParams.matchingStartResult),
+    error: searchParamValue(resolvedSearchParams.matchingStartError),
+  });
+  const legacyMatchingMessage =
+    searchParamValue(resolvedSearchParams.matchingMessage) ?? null;
+  const feedbackSource = selectDiscoveryMatchingFeedbackSource({
+    matchingStartFeedback,
+    legacyMessage: legacyMatchingMessage,
+  });
+  const matchingMessage =
+    feedbackSource === "matching_start" && matchingStartFeedback
+      ? t(matchingStartFeedback.messageKey)
+      : feedbackSource === "legacy"
+        ? legacyMatchingMessage
+        : null;
+  const matchingOk =
+    feedbackSource === "matching_start" && matchingStartFeedback
+      ? matchingStartFeedback.ok
+      : searchParamValue(resolvedSearchParams.matchingOk) !== "0";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
