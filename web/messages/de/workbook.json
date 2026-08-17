@@ -58,10 +58,51 @@
     "open": "Offen",
     "focus": "Fokus",
     "context": "1. Kontext",
-    "leadQuestion": "Leitfrage"
-    ,
+    "leadQuestion": "Leitfrage",
     "teamContextPreFounder": "Mögliche Gründungspartnerschaft",
-    "teamContextExistingTeam": "Bestehendes Founder-Team"
+    "teamContextExistingTeam": "Bestehendes Founder-Team",
+    "logoLabel": "CoFoundery Align Logo",
+    "mode": {
+      "eyebrow": "Arbeitsweise",
+      "title": "Wie möchtet ihr in diesen Schritt gehen?",
+      "description": "Das betrifft nur eure Startform. Rechte, Autorenschaft und Zustimmung bleiben getrennt.",
+      "options": {
+        "solo": {
+          "label": "Erst allein starten",
+          "shortLabel": "Erst allein",
+          "description": "Du legst einen ersten Stand im gemeinsamen Raum an. Die zweite Perspektive kommt später mit eigener Autorenschaft dazu.",
+          "hint": "Gemeinsamer Raum: Du startest mit deinen Punkten. Die andere Person sieht sie hier und ergänzt später ihre eigene Sicht."
+        },
+        "collaborative": {
+          "label": "Direkt gemeinsam starten",
+          "shortLabel": "Direkt gemeinsam",
+          "description": "Ihr sammelt direkt im selben Raum. Jeder Punkt bleibt klar einer Person zugeordnet.",
+          "hint": "Gemeinsamer Raum: Ihr sammelt direkt zusammen. Jeder Punkt bleibt einer Person zugeordnet, die Vereinbarung entsteht gemeinsam."
+        }
+      }
+    },
+    "statuses": {
+      "inProgress": "In Arbeit",
+      "draftReady": "Entwurf bereit",
+      "awaitingApproval": "Wartet auf Zustimmung",
+      "finalized": "Finalisiert"
+    },
+    "stepChrome": {
+      "founderIntro": "Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.",
+      "showHelp": "Hilfestellung anzeigen",
+      "example": "Beispiel",
+      "riskHint": "Worauf ihr achten solltet"
+    },
+    "navigation": {
+      "nextStep": "Nächster Schritt",
+      "finalized": "Guter Fortschritt. Dieser Schritt ist finalisiert.",
+      "awaitingApproval": "Die finale Absprache steht. Es fehlt nur noch die Bestätigung beider Founder.",
+      "draftReady": "Es gibt bereits einen Entwurf. Schärft ihn jetzt zur finalen Absprache.",
+      "collectingInputs": "Sammelt zuerst eure Perspektiven, verdichtet sie dann gemeinsam und haltet erst danach die finale Absprache fest.",
+      "summaryKeepsProgress": "Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.",
+      "continueKeepsProgress": "Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im nächsten Schritt.",
+      "leaveWithoutFinalizing": "Du kannst weitergehen, aber die eigentliche Entscheidung dieses Schritts liegt in der finalen Absprache oben."
+    }
   },
   "print": {
     "documentTitle": "Founder Alignment Workbook",

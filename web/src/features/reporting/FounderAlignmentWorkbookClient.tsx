@@ -75,6 +75,7 @@ import {
   normalizeWorkbookSystemText,
   normalizeWorkbookSystemTextWithProtectedValues,
 } from "@/features/reporting/workbookRendering";
+import { workbookStepStatusMessageKey } from "@/features/reporting/workbookClientChrome";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -710,34 +711,10 @@ type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
 
 const WORKBOOK_MODE_OPTIONS: ReadonlyArray<{
   value: WorkbookModeOption;
-  label: string;
-  description: string;
 }> = [
-  {
-    value: "solo",
-    label: "Erst allein starten",
-    description:
-      "Du legst einen ersten Stand im gemeinsamen Raum an. Die zweite Perspektive kommt spaeter mit eigener Autorenschaft dazu.",
-  },
-  {
-    value: "collaborative",
-    label: "Direkt gemeinsam starten",
-    description:
-      "Ihr sammelt direkt im selben Raum. Jeder Punkt bleibt klar einer Person zugeordnet.",
-  },
+  { value: "solo" },
+  { value: "collaborative" },
 ] as const;
-
-const WORKBOOK_MODE_SHORT_LABELS: Record<WorkbookModeOption, string> = {
-  solo: "Erst allein",
-  collaborative: "Direkt gemeinsam",
-};
-
-const WORKBOOK_MODE_V2_HINTS: Record<WorkbookModeOption, string> = {
-  solo:
-    "Gemeinsamer Raum: Du startest mit deinen Punkten. Die andere Person sieht sie hier und ergaenzt spaeter ihre eigene Sicht.",
-  collaborative:
-    "Gemeinsamer Raum: Ihr sammelt direkt zusammen. Jeder Punkt bleibt einer Person zugeordnet, die Vereinbarung entsteht gemeinsam.",
-};
 
 const FOUNDER_REACTION_OPTIONS: Array<{
   value: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>;
@@ -3375,7 +3352,7 @@ export function FounderAlignmentWorkbookClient({
                   type="image/svg+xml"
                   data="/cofoundery-align-logo.svg"
                   className="h-9 w-auto max-w-[190px] print:h-7"
-                  aria-label="CoFoundery Align Logo"
+                  aria-label={wt("client.logoLabel")}
                 />
                 <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-slate-500">
                   CoFoundery Align
@@ -3497,13 +3474,13 @@ export function FounderAlignmentWorkbookClient({
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="max-w-2xl">
                         <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
-                          {t("Arbeitsweise")}
+                          {wt("client.mode.eyebrow")}
                         </p>
                         <h2 className="mt-2 text-base font-semibold text-slate-900">
-                          {t("Wie moechtet ihr in diesen Schritt gehen?")}
+                          {wt("client.mode.title")}
                         </h2>
                         <p className="mt-2 text-xs leading-6 text-slate-500">
-                          {t("Das betrifft nur eure Startform. Rechte, Autorenschaft und Zustimmung bleiben getrennt.")}
+                          {wt("client.mode.description")}
                         </p>
                       </div>
                       <span className="rounded-full border border-slate-200 bg-white/88 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
@@ -3529,9 +3506,11 @@ export function FounderAlignmentWorkbookClient({
                                   : "border-slate-200 bg-white/88 hover:border-slate-300 hover:bg-white"
                             }`}
                           >
-                            <p className="text-sm font-semibold text-slate-900">{t(option.label)}</p>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {wt(`client.mode.options.${option.value}.label`)}
+                            </p>
                             <p className="mt-2 text-sm leading-6 text-slate-600">
-                              {t(option.description)}
+                              {wt(`client.mode.options.${option.value}.description`)}
                             </p>
                           </button>
                         );
@@ -4031,7 +4010,7 @@ export function FounderAlignmentWorkbookClient({
                     {!isAdvisorViewer ? (
                       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
                         <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                          {t("Arbeitsweise")}
+                          {wt("client.mode.eyebrow")}
                         </span>
                         <div className="inline-flex w-fit rounded-full border border-slate-200 bg-slate-50 p-1">
                           {WORKBOOK_MODE_OPTIONS.map((option) => {
@@ -4051,13 +4030,13 @@ export function FounderAlignmentWorkbookClient({
                                       : "text-slate-600 hover:bg-white hover:text-slate-900"
                                 }`}
                               >
-                                {t(WORKBOOK_MODE_SHORT_LABELS[option.value])}
+                                {wt(`client.mode.options.${option.value}.shortLabel`)}
                               </button>
                             );
                           })}
                         </div>
                         <p className="text-xs leading-6 text-slate-500">
-                          {t(WORKBOOK_MODE_V2_HINTS[currentStepMode])}
+                          {wt(`client.mode.options.${currentStepMode}.hint`)}
                         </p>
                       </div>
                     ) : null}
@@ -4067,7 +4046,7 @@ export function FounderAlignmentWorkbookClient({
                       currentStepStatus
                     )}`}
                   >
-                    {t(workbookStepStatusLabel(currentStepStatus))}
+                    {wt(workbookStepStatusMessageKey(currentStepStatus))}
                   </span>
                 </div>
               </div>
@@ -4080,11 +4059,9 @@ export function FounderAlignmentWorkbookClient({
                         {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
-                        {t(
-                          isAdvisorViewer
-                            ? "Hier siehst du, was die Founder in diesem Abschnitt bisher festgehalten haben."
-                            : "Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest."
-                        )}
+                        {isAdvisorViewer
+                          ? t("Hier siehst du, was die Founder in diesem Abschnitt bisher festgehalten haben.")
+                          : wt("client.stepChrome.founderIntro")}
                       </p>
                     </div>
                     <span
@@ -4092,7 +4069,7 @@ export function FounderAlignmentWorkbookClient({
                         currentStepStatus
                       )}`}
                     >
-                      {t(workbookStepStatusLabel(currentStepStatus))}
+                      {wt(workbookStepStatusMessageKey(currentStepStatus))}
                     </span>
                   </div>
                 </div>
@@ -4137,13 +4114,13 @@ export function FounderAlignmentWorkbookClient({
                     }
                   >
                     <summary className="cursor-pointer text-base font-semibold text-slate-950">
-                      {t("Hilfestellung anzeigen")}
+                      {wt("client.stepChrome.showHelp")}
                     </summary>
                     <div className="mt-4 space-y-4">
                       {currentStepContent.scenario ? (
                         <div className="rounded-2xl border border-[color:var(--brand-accent)]/14 bg-[color:var(--brand-accent)]/5 p-4">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--brand-accent)]">
-                            {t("Beispiel")}
+                            {wt("client.stepChrome.example")}
                           </p>
                           <p className="mt-2 text-sm leading-7 text-slate-700">
                             {systemText(currentStepContent.scenario)}
@@ -4165,7 +4142,7 @@ export function FounderAlignmentWorkbookClient({
                       {currentStepContent.riskHint ? (
                         <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
                           <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
-                            {t("Worauf ihr achten solltet")}
+                            {wt("client.stepChrome.riskHint")}
                           </p>
                           <p className="mt-2 text-sm leading-7 text-slate-700">
                             {systemText(currentStepContent.riskHint)}
@@ -5317,7 +5294,7 @@ export function FounderAlignmentWorkbookClient({
                           currentStepStatus
                         )}`}
                       >
-                        {t(workbookStepStatusLabel(currentStepStatus))}
+                        {wt(workbookStepStatusMessageKey(currentStepStatus))}
                       </span>
                     </div>
 
@@ -5416,7 +5393,7 @@ export function FounderAlignmentWorkbookClient({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {t("Naechster Schritt")}
+                    {wt("client.navigation.nextStep")}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {isAdvisorViewer
@@ -5428,12 +5405,12 @@ export function FounderAlignmentWorkbookClient({
                             ? t("Es liegt bereits ein Entwurf fuer diesen Abschnitt vor.")
                             : t("Hier entwickelt sich der Abschnitt noch aus den bisherigen Founder-Perspektiven.")
                       : currentStepStatus === "finalized"
-                        ? t("Guter Fortschritt. Dieser Schritt ist finalisiert.")
+                        ? wt("client.navigation.finalized")
                       : currentStepStatus === "awaiting_approval"
-                          ? t("Die finale Absprache steht. Es fehlt nur noch die Bestaetigung beider Founder.")
+                          ? wt("client.navigation.awaitingApproval")
                           : currentStepStatus === "draft_ready"
-                            ? t("Es gibt bereits einen Entwurf. Schaerft ihn jetzt zur finalen Absprache.")
-                            : t("Sammelt zuerst eure Perspektiven, verdichtet sie dann gemeinsam und haltet erst danach die finale Absprache fest.")}
+                            ? wt("client.navigation.draftReady")
+                            : wt("client.navigation.collectingInputs")}
                   </p>
                 </div>
                 <span
@@ -5482,9 +5459,9 @@ export function FounderAlignmentWorkbookClient({
               <p className="mt-4 text-xs leading-6 text-slate-500">
                 {currentStepStatus === "finalized"
                   ? currentIndex === visibleSteps.length - 1
-                    ? t("Beim Wechsel in die Zusammenfassung bleibt euer aktueller Stand erhalten.")
-                    : t("Beim Weitergehen bleibt euer aktueller Stand erhalten und ihr landet direkt im naechsten Schritt.")
-                  : t("Du kannst weitergehen, aber die eigentliche Entscheidung dieses Schritts liegt in der finalen Absprache oben.")}
+                    ? wt("client.navigation.summaryKeepsProgress")
+                    : wt("client.navigation.continueKeepsProgress")
+                  : wt("client.navigation.leaveWithoutFinalizing")}
               </p>
             </div>
           </section>
@@ -7527,19 +7504,6 @@ function deriveWorkbookStepStatus(
   }
 
   return "collecting_inputs";
-}
-
-function workbookStepStatusLabel(status: FounderAlignmentWorkbookStepStatus) {
-  switch (status) {
-    case "draft_ready":
-      return "Entwurf bereit";
-    case "awaiting_approval":
-      return "Wartet auf Zustimmung";
-    case "finalized":
-      return "Finalisiert";
-    default:
-      return "In Arbeit";
-  }
 }
 
 function workbookStepStatusClassName(status: FounderAlignmentWorkbookStepStatus) {

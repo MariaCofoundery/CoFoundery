@@ -58,10 +58,51 @@
     "open": "Open",
     "focus": "Focus",
     "context": "1. Context",
-    "leadQuestion": "Guiding question"
-    ,
+    "leadQuestion": "Guiding question",
     "teamContextPreFounder": "Potential founding partnership",
-    "teamContextExistingTeam": "Existing founder team"
+    "teamContextExistingTeam": "Existing founder team",
+    "logoLabel": "CoFoundery Align logo",
+    "mode": {
+      "eyebrow": "Working mode",
+      "title": "How would you like to approach this step?",
+      "description": "This only affects how you begin. Rights, authorship, and approval remain separate.",
+      "options": {
+        "solo": {
+          "label": "Start individually",
+          "shortLabel": "Start individually",
+          "description": "You add an initial perspective in the shared space. The second perspective can be added later with separate authorship.",
+          "hint": "Shared space: Start with your points. The other person can see them here and add their own perspective later."
+        },
+        "collaborative": {
+          "label": "Start together",
+          "shortLabel": "Start together",
+          "description": "You collect your thoughts in the same space. Each point remains clearly assigned to one person.",
+          "hint": "Shared space: Collect your thoughts together. Each point remains assigned to one person, while the agreement is created jointly."
+        }
+      }
+    },
+    "statuses": {
+      "inProgress": "In progress",
+      "draftReady": "Draft ready",
+      "awaitingApproval": "Awaiting approval",
+      "finalized": "Finalized"
+    },
+    "stepChrome": {
+      "founderIntro": "Work through this step at your own pace and capture one clear rule at the end.",
+      "showHelp": "Show guidance",
+      "example": "Example",
+      "riskHint": "What to watch for"
+    },
+    "navigation": {
+      "nextStep": "Next step",
+      "finalized": "Good progress. This step is finalized.",
+      "awaitingApproval": "The final agreement is ready. Approval from both founders is still needed.",
+      "draftReady": "A draft is ready. Refine it into the final agreement.",
+      "collectingInputs": "Collect your perspectives first, consolidate them together, and then capture the final agreement.",
+      "summaryKeepsProgress": "Your current progress remains saved when you open the summary.",
+      "continueKeepsProgress": "Your current progress remains saved and you will go directly to the next step.",
+      "leaveWithoutFinalizing": "You can continue, but the decision for this step remains in the final agreement above."
+    }
   },
   "print": {
     "documentTitle": "Founder Alignment Workbook",

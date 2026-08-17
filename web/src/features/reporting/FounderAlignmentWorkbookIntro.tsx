@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import {
-  FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   type FounderAlignmentWorkbookHighlights,
 } from "@/features/reporting/founderAlignmentWorkbook";
+import { getWorkbookContent } from "@/features/reporting/workbookContent/workbookContent";
 
 type Props = {
   reportHref: string;
@@ -15,10 +15,13 @@ type Props = {
   highlights: FounderAlignmentWorkbookHighlights;
 };
 
-function getSuggestedTopics(highlights: FounderAlignmentWorkbookHighlights) {
+function getSuggestedTopics(
+  highlights: FounderAlignmentWorkbookHighlights,
+  steps: ReturnType<typeof getWorkbookContent>["steps"]
+) {
   return highlights.prioritizedStepIds
     .slice(0, 2)
-    .map((stepId) => FOUNDER_ALIGNMENT_WORKBOOK_STEPS.find((step) => step.id === stepId)?.title)
+    .map((stepId) => steps.find((step) => step.id === stepId)?.title)
     .filter((title): title is string => Boolean(title));
 }
 
@@ -29,7 +32,8 @@ export function FounderAlignmentWorkbookIntro({
   highlights,
 }: Props) {
   const wt = useTranslations("workbook");
-  const suggestedTopics = getSuggestedTopics(highlights);
+  const locale = useLocale();
+  const suggestedTopics = getSuggestedTopics(highlights, getWorkbookContent(locale).steps);
 
   return (
     <section className="mx-auto max-w-4xl rounded-[32px] border border-slate-200/80 bg-white/95 p-8 shadow-[0_16px_50px_rgba(15,23,42,0.05)] sm:p-10">
