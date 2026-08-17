@@ -5,6 +5,10 @@ import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { saveMatchingWorkspaceAgreementSectionAction } from "@/features/matchingCore/matchingWorkspaceAgreementActions";
 import { createOrGetMatchingWorkspaceAgreement } from "@/features/matchingCore/matchingWorkspaceAgreementData";
 import {
+  resolveMatchingWorkspaceAgreementFeedback,
+  type MatchingWorkspaceAgreementSectionSaveResult,
+} from "@/features/matchingCore/matchingWorkspaceAgreementFeedback";
+import {
   type MatchingWorkspaceAgreementSectionKey,
   type MatchingWorkspaceAgreementSummary,
 } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
@@ -13,8 +17,8 @@ import { createClient } from "@/lib/supabase/server";
 type PageProps = {
   params: Promise<{ workspaceId: string }>;
   searchParams?: Promise<{
-    agreementMessage?: string | string[];
-    agreementOk?: string | string[];
+    agreementResult?: string | string[];
+    agreementError?: string | string[];
   }>;
 };
 
@@ -43,12 +47,16 @@ function searchParamValue(value: string | string[] | undefined) {
 
 function agreementResultUrl(
   workspaceId: string,
-  result: { ok: boolean; message?: string },
-  fallbackMessage: string
+  result: MatchingWorkspaceAgreementSectionSaveResult
 ) {
   const params = new URLSearchParams();
-  params.set("agreementMessage", result.message ?? fallbackMessage);
-  params.set("agreementOk", result.ok ? "1" : "0");
+
+  if (result.ok) {
+    params.set("agreementResult", result.reason);
+  } else {
+    params.set("agreementError", result.reason);
+  }
+
   return `/workspaces/${workspaceId}?${params.toString()}`;
 }
 
@@ -226,16 +234,18 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
     return <UnavailableState t={t} />;
   }
 
-  const fallbackResultMessage = t("agreement.fallbackResult");
-
   async function saveAgreementSection(formData: FormData) {
     "use server";
     const result = await saveMatchingWorkspaceAgreementSectionAction(workspaceId, formData);
-    redirect(agreementResultUrl(workspaceId, result, fallbackResultMessage));
+    redirect(agreementResultUrl(workspaceId, result));
   }
 
-  const message = searchParamValue(resolvedSearchParams.agreementMessage) ?? null;
-  const ok = searchParamValue(resolvedSearchParams.agreementOk) !== "0";
+  const agreementFeedback = resolveMatchingWorkspaceAgreementFeedback({
+    result: searchParamValue(resolvedSearchParams.agreementResult),
+    error: searchParamValue(resolvedSearchParams.agreementError),
+  });
+  const feedbackMessage = agreementFeedback ? t(agreementFeedback.messageKey) : null;
+  const feedbackOk = agreementFeedback?.ok ?? false;
   const reportHref = `/matching/${summary.workspace.matchingSessionId}/report`;
 
   return (
@@ -257,7 +267,7 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
           </p>
         </header>
 
-        <PageMessage message={message} ok={ok} />
+        <PageMessage message={feedbackMessage} ok={feedbackOk} />
 
         <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">

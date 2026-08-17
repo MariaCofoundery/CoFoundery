@@ -1,6 +1,14 @@
 {
   "agreement": {
-    "fallbackResult": "Das Operating Agreement wurde verarbeitet.",
+    "feedback": {
+      "sectionSaved": "Agreement-Section gespeichert.",
+      "notAuthenticated": "Bitte melde dich an, um das Operating Agreement zu bearbeiten.",
+      "invalidSection": "Diese Agreement-Section ist nicht verfügbar.",
+      "workspaceUnavailable": "Dieser Arbeitsraum ist aktuell nicht verfügbar.",
+      "workspaceNotPrepared": "Der Arbeitsraum ist noch nicht bereit für das Operating Agreement.",
+      "saveFailed": "Die Agreement-Section konnte gerade nicht gespeichert werden.",
+      "unexpectedError": "Die Agreement-Section konnte gerade nicht gespeichert werden."
+    },
     "unavailable": {
       "back": "Zurück zu meinen Intros",
       "title": "Dieser Arbeitsraum ist aktuell nicht verfügbar.",

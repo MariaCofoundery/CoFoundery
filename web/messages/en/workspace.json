@@ -1,6 +1,14 @@
 {
   "agreement": {
-    "fallbackResult": "The operating agreement was processed.",
+    "feedback": {
+      "sectionSaved": "Agreement section saved.",
+      "notAuthenticated": "Please sign in to edit the Operating Agreement.",
+      "invalidSection": "This agreement section is not available.",
+      "workspaceUnavailable": "This workspace is currently unavailable.",
+      "workspaceNotPrepared": "The workspace is not ready for the Operating Agreement yet.",
+      "saveFailed": "The agreement section could not be saved right now.",
+      "unexpectedError": "The agreement section could not be saved right now."
+    },
     "unavailable": {
       "back": "Back to my intros",
       "title": "This workspace is currently unavailable.",

@@ -10,6 +10,10 @@ import {
   isMatchingWorkspaceAgreementSectionKey,
   normalizeMatchingWorkspaceAgreementSectionInput,
 } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
+import type {
+  MatchingWorkspaceAgreementErrorReason,
+  MatchingWorkspaceAgreementSectionSaveResult,
+} from "@/features/matchingCore/matchingWorkspaceAgreementFeedback";
 
 export type MatchingWorkspaceAgreementActionState = {
   ok: boolean;
@@ -41,25 +45,27 @@ function createAgreementErrorMessage(error: unknown) {
   return "Das Operating Agreement konnte gerade nicht vorbereitet werden.";
 }
 
-function saveAgreementSectionErrorMessage(error: unknown) {
+function saveAgreementSectionErrorReason(
+  error: unknown
+): MatchingWorkspaceAgreementErrorReason {
   if (!(error instanceof Error)) {
-    return "Die Section konnte gerade nicht gespeichert werden.";
+    return "agreement_save_failed";
   }
 
   if (error.message === "matching_workspace_agreement_invalid_section_key") {
-    return "Diese Agreement-Section ist nicht verfügbar.";
+    return "invalid_section";
   }
   if (error.message === "matching_workspace_agreement_workspace_unavailable") {
-    return "Dieser Arbeitsraum ist aktuell nicht verfügbar.";
+    return "workspace_unavailable";
   }
   if (error.message === "matching_workspace_agreement_workspace_not_prepared") {
-    return "Der Arbeitsraum ist noch nicht bereit für das Operating Agreement.";
+    return "workspace_not_prepared";
   }
   if (error.message === "matching_workspace_agreement_service_role_unavailable") {
-    return "Die Speicherfunktion ist serverseitig nicht vollständig konfiguriert.";
+    return "agreement_save_failed";
   }
 
-  return "Die Section konnte gerade nicht gespeichert werden.";
+  return "agreement_save_failed";
 }
 
 function getFormString(formData: FormData, name: string) {
@@ -102,12 +108,12 @@ export async function createOrGetMatchingWorkspaceAgreementAction(
 export async function saveMatchingWorkspaceAgreementSectionAction(
   workspaceId: string,
   formData: FormData
-): Promise<MatchingWorkspaceAgreementActionState> {
+): Promise<MatchingWorkspaceAgreementSectionSaveResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return {
       ok: false,
-      message: "Bitte melde dich an, um das Operating Agreement zu bearbeiten.",
+      reason: "not_authenticated",
     };
   }
 
@@ -134,13 +140,12 @@ export async function saveMatchingWorkspaceAgreementSectionAction(
     revalidatePath(workspaceHref);
     return {
       ok: true,
-      message: "Section gespeichert.",
-      workspaceHref,
+      reason: "agreement_section_saved",
     };
   } catch (error) {
     return {
       ok: false,
-      message: saveAgreementSectionErrorMessage(error),
+      reason: saveAgreementSectionErrorReason(error),
     };
   }
 }
