@@ -8,9 +8,19 @@ import type { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmen
 import { WORKBOOK_CONTENT_DE } from "@/features/reporting/workbookContent/workbookContent.de";
 import { WORKBOOK_CONTENT_EN } from "@/features/reporting/workbookContent/workbookContent.en";
 
+export type PremiumWorkbookFieldGuidance = {
+  collectHelper: string;
+  agreementTitle: string;
+  reviewSummary: string;
+};
+
 export type WorkbookContent = {
   steps: FounderAlignmentWorkbookStepDefinition[];
   stepContent: typeof WORKBOOK_STEP_CONTENT;
+  premiumSteps: Record<
+    Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
+    PremiumWorkbookFieldGuidance
+  >;
 };
 
 const workbookContentByLocale: Record<AppLocale, WorkbookContent> = {

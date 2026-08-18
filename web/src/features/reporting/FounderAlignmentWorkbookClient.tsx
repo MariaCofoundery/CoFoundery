@@ -159,7 +159,6 @@ type PremiumWorkbookV2Config = {
   collectActionLabel?: string;
   collectIntro: string;
   collectPlaceholder: string;
-  collectHelper: string;
   collectReadyText: string;
   missingPerspectiveText: (missingLabel: string) => string;
   weightingPhaseLabel?: string;
@@ -177,7 +176,6 @@ type PremiumWorkbookV2Config = {
   rulePhaseLabel?: string;
   ruleTitle?: string;
   ruleIntro: string;
-  agreementTitle: string;
   agreementPlaceholder: string;
   escalationTitle: string;
   escalationPlaceholder: string;
@@ -185,7 +183,6 @@ type PremiumWorkbookV2Config = {
   reviewTitle: string;
   reviewPlaceholder: string;
   reviewHelper: string;
-  reviewSummary: string;
   requireReviewForApproval?: boolean;
   approvalTitle?: string;
   approvalIntro?: string;
@@ -199,7 +196,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst die Punkte fest, die eure Richtung im Alltag wirklich steuern: was bei euch Vorrang bekommt, welche Chancen attraktiv wirken und wann ihr bewusst beim Fokus bleibt. Ein klarer Punkt pro Beobachtung reicht.",
     collectPlaceholder:
       "Zum Beispiel: Umsatzchancen kippen bei uns schnell in Vorrang. Oder: Wir wechseln den Fokus erst, wenn ein Thema klar zum Kern passt und nicht nur laut wirkt.",
-    collectHelper: "Startet mit zwei oder drei klaren Prioritaets- oder Fokusbeobachtungen.",
     collectReadyText:
       "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, welche Richtung euch gemeinsam traegt und wo ihr Chancen unterschiedlich lest.",
     missingPerspectiveText: (missingLabel) =>
@@ -208,7 +204,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jetzt jeden Punkt ein. So wird sichtbar, was fuer euch beide Prioritaet hat, wo eine Chance unterschiedlich attraktiv wirkt und welche Linie euch gemeinsam traegt.",
     ruleIntro:
       "Verdichtet eure Punkte jetzt zu einer klaren Richtungsregel fuer Fokus, Chancen und bewusste Nicht-Prioritaeten. Hier legt ihr fest, was im Zweifel Vorrang hat und wann ihr euch nicht vom Kern wegziehen lasst.",
-    agreementTitle: "Richtungsregel",
     agreementPlaceholder:
       "Wenn neue Chancen, Produktfokus und Aufbau gleichzeitig ziehen, hat ... Vorrang. Eine neue Richtung prueft ihr erst dann weiter, wenn ...",
     escalationTitle: "Wann ihr bewusst nein sagt",
@@ -220,7 +215,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn sich Markt, Team oder Prioritaeten sichtbar veraendern und eure bisherige Linie nicht mehr sauber traegt.",
     reviewHelper: "Hilfreich, damit Richtungswechsel bewusst und nicht nebenbei passieren.",
-    reviewSummary: "Review-Punkt optional ergaenzen",
     rulePreviewSummary:
       "Die gemeinsame Linie wird erst stark, wenn eure Prioritaeten und Fokusmuster sichtbar eingeordnet sind.",
     rulePreviewDetail:
@@ -233,7 +227,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Ownership-Punkte: welche Themen eine Person fuehrt, was sie allein entscheiden kann und wo fruehe Sichtbarkeit wichtig ist.",
     collectPlaceholder:
       "Zum Beispiel: Produktprioritaeten fuehrt ... allein. Oder: Hiring-Entscheidungen bleiben sichtbar, sobald Budget, Kultur oder Timing betroffen sind.",
-    collectHelper: "Ein guter Punkt nennt Thema, Fuehrung und wann die andere Person reinmuss.",
     collectReadyText:
       "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, welche Ownership klar tragbar ist und wo Mitsicht oder Mitsprache fehlt.",
     missingPerspectiveText: (missingLabel) =>
@@ -253,7 +246,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     criticalInsightText: "Punkte, bei denen Ownership oder Mitsprache noch offen ist.",
     ruleIntro:
       "Formuliert jetzt eure Verantwortungsregel. Sie soll im Alltag klar machen, wer fuehrt, was sichtbar bleibt und ab wann gemeinsam abgestimmt wird.",
-    agreementTitle: "Verantwortungsregel",
     agreementPlaceholder:
       "Dieses Thema fuehrt ... eigenstaendig. Die andere Person bekommt frueh Mitsicht, sobald ...",
     escalationTitle: "Grenze fuer Mitsprache",
@@ -265,7 +257,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn Entscheidungen zurueckgeholt werden, Arbeit doppelt laeuft oder wichtige Themen erst spaet sichtbar werden.",
     reviewHelper: "Hilfreich, damit Rollen nicht erst bei Reibung neu verhandelt werden.",
-    reviewSummary: "Ownership-Signal optional ergaenzen",
     rulePreviewSummary:
       "Die Verantwortungsregel wird erst tragfaehig, wenn Fuehrung, Mitsicht und Mitsprache sauber eingeordnet sind.",
     rulePreviewDetail:
@@ -276,7 +267,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst nur die Punkte fest, die eure Entscheidungen im Alltag tragen oder blockieren. Ein klarer Satz pro Punkt reicht.",
     collectPlaceholder:
       "Zum Beispiel: Ab Budget X entscheidet niemand mehr allein. Oder: Marktfenster duerfen nicht zweimal in dieselbe Schleife fallen.",
-    collectHelper: "Startet mit zwei oder drei Punkten, nicht mit einem perfekten Text.",
     collectReadyText:
       "Beide Perspektiven sind jetzt auf dem Tisch. Als Naechstes ordnet ihr jeden Punkt gemeinsam ein.",
     missingPerspectiveText: (missingLabel) =>
@@ -285,7 +275,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jetzt jeden vorhandenen Punkt ein. Erst wenn beide Seiten alle Punkte gelesen und markiert haben, wird die Regel wirklich belastbar.",
     ruleIntro:
       "Verdichtet jetzt eure Punkte zu einer Regel, die im Alltag wirklich traegt. Hier entscheidet sich, was kuenftig gilt.",
-    agreementTitle: "Entscheidungsregel",
     agreementPlaceholder:
       "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet ... Sobald Risiko, Budget oder Aussenwirkung groesser werden, ...",
     escalationTitle: "Wenn ihr nicht einig seid",
@@ -296,7 +285,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn Entscheidungen wieder haengen bleiben oder Verantwortung unklar wird.",
     reviewHelper: "Hilfreich, wenn ihr spaeter bewusst nachschaerfen wollt.",
-    reviewSummary: "Review-Trigger optional ergaenzen",
     rulePreviewSummary:
       "Die Regel wird erst wichtig, wenn eure Punkte und Gewichtungen sauber sichtbar sind.",
     rulePreviewDetail:
@@ -309,7 +297,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Punkte zu Einsatz, Verfuegbarkeit und Belastung: was realistisch ist, was frueh sichtbar werden muss und was nicht still vorausgesetzt werden darf.",
     collectPlaceholder:
       "Zum Beispiel: Abends reagiere ich nicht verlaesslich. Oder: Wenn Kundenarbeit und Produkt gleichzeitig ziehen, muss zuerst ... neu priorisiert werden.",
-    collectHelper: "Ein guter Punkt nennt Erwartung, Grenze oder fruehes Signal. Kein Rechtfertigungstext noetig.",
     collectReadyText:
       "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, was tragbar ist, was frueh gesagt werden muss und wo ihr neu priorisieren muesst.",
     missingPerspectiveText: (missingLabel) =>
@@ -329,7 +316,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     criticalInsightText: "Punkte, bei denen Belastung oder Erwartung aktiv geklaert werden muss.",
     ruleIntro:
       "Formuliert jetzt eure Commitment-Regel. Sie soll klar machen, was realistisch gilt, was frueh transparent wird und wie ihr neu priorisiert, wenn Kapazitaet kippt.",
-    agreementTitle: "Commitment-Regel",
     agreementPlaceholder:
       "Im Normalmodus ist realistisch: ... Wenn sich Verfuegbarkeit oder Belastung veraendert, wird das frueh sichtbar gemacht durch ...",
     escalationTitle: "Wenn Kapazitaet kippt",
@@ -341,7 +327,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn Reaktionszeiten kippen, Zusagen wiederholt wackeln oder wichtige Arbeit nur noch mit Druck erledigt wird.",
     reviewHelper: "Hilfreich, damit Belastung frueh sichtbar wird und nicht als Vorwurf auftaucht.",
-    reviewSummary: "Fruehwarnsignal optional ergaenzen",
     rulePreviewSummary:
       "Die Commitment-Regel wird erst tragfaehig, wenn Einsatz, Grenzen und Repriorisierung sauber eingeordnet sind.",
     rulePreviewDetail:
@@ -352,7 +337,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst die Situationen fest, in denen Reibung entsteht, Kritik haengen bleibt oder ein Thema einen eigenen Klaerungsrahmen braucht. Ein klarer Punkt pro Beobachtung reicht.",
     collectPlaceholder:
       "Zum Beispiel: Kritik kommt oft erst, wenn der Frust schon da ist. Oder: In angespannten Meetings wird zu schnell in der Sache weitergemacht.",
-    collectHelper: "Startet mit konkreten Situationen, nicht mit langen Erklaerungen.",
     collectReadyText:
       "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, was ihr gemeinsam tragen koennt und wo klare Spielregeln fehlen.",
     missingPerspectiveText: (missingLabel) =>
@@ -361,7 +345,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ordnet jetzt jeden Punkt ein. So wird sichtbar, welche Reibungen ihr gemeinsam klaeren koennt und wo ihr bewusst andere Spielregeln braucht.",
     ruleIntro:
       "Verdichtet eure Punkte jetzt zu einer klaren Regel fuer Feedback, Klaerung und Konflikt. Hier legt ihr fest, was im Alltag gilt und wann ihr aus dem Tagesgeschaeft in einen eigenen Klaerungsrahmen wechselt.",
-    agreementTitle: "Klaerungsregel",
     agreementPlaceholder:
       "Wenn mich etwas stoert, spreche ich es ... an. Wenn ein Thema im laufenden Austausch nicht sauber geklaert wird, ...",
     escalationTitle: "Wenn ein Thema nicht im Alltag geloest wird",
@@ -373,7 +356,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn Feedback liegen bleibt, Gespraeche schaerfer werden oder dieselbe Reibung mehrfach auftaucht.",
     reviewHelper: "Hilfreich, damit Konflikte nicht erst spaet einen eigenen Raum bekommen.",
-    reviewSummary: "Fruehwarnsignal optional ergaenzen",
     rulePreviewSummary:
       "Die Regel fuer Feedback und Klaerung wird erst tragfaehig, wenn eure Spannungen und Muster sichtbar eingeordnet sind.",
     rulePreviewDetail:
@@ -386,7 +368,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Legt konkrete Risikosituationen auf den Tisch: was frueh sichtbar werden muss, was noch tragbar ist und wo niemand still allein weiterlaufen darf.",
     collectPlaceholder:
       "Zum Beispiel: Runway unter X Monaten. Ein rechtlicher Punkt mit Aussenwirkung. Eine Produktentscheidung, die Budget, Haftung oder Reputation beruehrt.",
-    collectHelper: "Ein guter Punkt nennt Risiko, Schwelle und wer spaetestens dazu muss.",
     collectReadyText:
       "Beide Perspektiven sind sichtbar. Als Naechstes trennt ihr, was tragbar bleibt, was frueh sichtbar werden muss und wo ihr gemeinsam entscheidet.",
     missingPerspectiveText: (missingLabel) =>
@@ -406,7 +387,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     criticalInsightText: "Punkte, die eine gemeinsame Entscheidung brauchen.",
     ruleIntro:
       "Formuliert jetzt eure Arbeitsregel fuer Risiko-Fuehrung, Sichtbarkeit und Eingriff. Sie soll im Alltag sofort klarmachen, wer fuehrt und wann Absicherung Vorrang hat.",
-    agreementTitle: "Fuehrungsregel fuer Risiken",
     agreementPlaceholder:
       "Bis zu dieser Schwelle fuehrt ... das Risiko selbst. Sichtbar wird es fuer beide spaetestens, wenn ...",
     escalationTitle: "Schwelle fuer gemeinsamen Eingriff",
@@ -418,7 +398,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Zum Beispiel: wenn ein Risiko erst im Notfall auftaucht, laenger still weiterlaeuft oder eine Person es wiederholt frueher kritisch sieht.",
     reviewHelper: "Hilfreich, damit Risiken nicht erst unter Druck auf den gemeinsamen Tisch kommen.",
-    reviewSummary: "Fruehwarnsignal optional ergaenzen",
     rulePreviewSummary:
       "Die Risikoregel wird erst tragfaehig, wenn Fuehrung, Sichtbarkeit und Eingriffsschwelle sauber geklaert sind.",
     rulePreviewDetail:
@@ -434,8 +413,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Grenzfaelle: was noch tragbar waere, wo ihr bewusst nein sagt und was nie still nebenher entschieden wird.",
     collectPlaceholder:
       "Zum Beispiel: Ein Investor bringt Tempo, aber verlangt eine Richtung, die nicht zu uns passt. Oder: Ein Kunde ist wirtschaftlich attraktiv, passt aber nicht zu unserer Arbeitsweise.",
-    collectHelper:
-      "Ein guter Punkt beschreibt einen echten Fall, keine abstrakte Werteformel.",
     collectReadyText:
       "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, was tragbar ist, was ein Grenzfall bleibt und was nicht euer Weg ist.",
     missingPerspectiveText: (missingLabel) =>
@@ -461,7 +438,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     ruleTitle: "3. Leitplanken-Vereinbarung",
     ruleIntro:
       "Verdichtet eure Einordnung zu einer Leitplanken-Vereinbarung. Sie soll im Alltag klar machen, was okay ist, was bewusste Freigabe braucht und was ihr nicht macht.",
-    agreementTitle: "Leitplankenregel",
     agreementPlaceholder:
       "Fuer uns ist tragbar: ... Ein Grenzfall beginnt, wenn ... Dann entscheiden wir bewusst gemeinsam.",
     escalationTitle: "Rote Linie und bewusste Freigabe",
@@ -474,7 +450,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Zum Beispiel: Koennen wir diese Entscheidung auch dann vertreten, wenn sie sichtbar wird, skaliert oder spaeter erklaert werden muss?",
     reviewHelper:
       "Hilfreich, damit neue Grenzfaelle nicht jedes Mal bei null beginnen.",
-    reviewSummary: "Prueffrage optional ergaenzen",
     approvalTitle: "4. Leitplanke bestaetigen",
     approvalIntro:
       "Bestaetigt diese Leitplanke erst, wenn tragbare Kompromisse, Grenzfaelle und rote Linien fuer euch beide klar sind.",
@@ -493,7 +468,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt nur die Punkte, die fuer die naechsten 90 Tage wirklich eine Entscheidung brauchen: Fokus, Nicht-Fokus, Fortschritt oder Review.",
     collectPlaceholder:
       "Zum Beispiel: Bis Ende Quartal hat Produktvalidierung Vorrang. Oder: Fundraising-Vorbereitung laeuft nur weiter, wenn ... dafuer runtergeht.",
-    collectHelper: "Ein guter Punkt ist kein To-do, sondern eine Fokusentscheidung fuer die naechste Phase.",
     collectReadyText:
       "Beide Perspektiven sind sichtbar. Als Naechstes waehlt ihr, was Vorrang hat, was warten kann und was nur bewusst freigegeben wird.",
     missingPerspectiveText: (missingLabel) =>
@@ -519,7 +493,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     ruleTitle: "3. 90-Tage-Vereinbarung",
     ruleIntro:
       "Verdichtet eure Auswahl jetzt zu einer 90-Tage-Vereinbarung. Sie soll festhalten, was Vorrang hat, was nicht parallel mitlaeuft und woran ihr Fortschritt prueft.",
-    agreementTitle: "90-Tage-Fokus",
     agreementPlaceholder:
       "In den naechsten 90 Tagen konzentrieren wir uns auf ... Vorrang hat ...",
     escalationTitle: "Was bewusst nicht parallel laeuft",
@@ -531,7 +504,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     reviewPlaceholder:
       "Ihr prueft euren Fortschritt an ... Neu entschieden wird spaetestens am ... oder wenn ...",
     reviewHelper: "Dieser Punkt macht aus Fokus eine pruefbare Vereinbarung.",
-    reviewSummary: "Fortschritts- und Review-Punkt festlegen",
     requireReviewForApproval: true,
     approvalTitle: "4. Gemeinsames Commitment",
     approvalIntro:
@@ -1428,6 +1400,8 @@ export function FounderAlignmentWorkbookClient({
     : null;
   const currentPremiumV2Config =
     currentPremiumV2StepId != null ? PREMIUM_WORKBOOK_V2_CONFIG[currentPremiumV2StepId] : null;
+  const currentPremiumFieldGuidance =
+    currentPremiumV2StepId != null ? workbookContent.premiumSteps[currentPremiumV2StepId] : null;
   const currentPremiumV2IsLight =
     currentPremiumV2StepId != null && LIGHT_PREMIUM_WORKBOOK_V2_STEP_IDS.includes(currentPremiumV2StepId);
   const currentPremiumV2SignalOptions =
@@ -4403,7 +4377,10 @@ export function FounderAlignmentWorkbookClient({
                   </p>
                 </div>
               </StepSection>
-            ) : currentStepIsPremiumPilot && decisionRulesWorkspace && currentPremiumV2Config ? (
+            ) : currentStepIsPremiumPilot &&
+              decisionRulesWorkspace &&
+              currentPremiumV2Config &&
+              currentPremiumFieldGuidance ? (
               <>
                 <section className={`mt-8 rounded-[30px] px-5 py-7 sm:px-7 sm:py-8 ${currentToneMeta.headerSurface}`}>
                   <div className="max-w-4xl">
@@ -4697,7 +4674,7 @@ export function FounderAlignmentWorkbookClient({
                           />
                           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                             <p className="text-xs leading-6 text-slate-500">
-                              {t(currentPremiumV2Config.collectHelper)}
+                              {systemText(currentPremiumFieldGuidance.collectHelper)}
                             </p>
                             <ReportActionButton
                               type="button"
@@ -4905,7 +4882,7 @@ export function FounderAlignmentWorkbookClient({
                       }`}
                     >
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t(currentPremiumV2Config.agreementTitle)}
+                        {systemText(currentPremiumFieldGuidance.agreementTitle)}
                       </p>
                       <textarea
                         value={currentStepEntry.agreement}
@@ -4937,7 +4914,7 @@ export function FounderAlignmentWorkbookClient({
                       />
                       <details className="rounded-[24px] border border-slate-200/80 bg-white/80 p-4">
                         <summary className="cursor-pointer text-sm font-medium text-slate-900">
-                          {t(currentPremiumV2Config.reviewSummary)}
+                          {systemText(currentPremiumFieldGuidance.reviewSummary)}
                         </summary>
                         <div className="mt-4">
                           <WorkbookField

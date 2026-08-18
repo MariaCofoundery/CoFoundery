@@ -538,4 +538,48 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
         "In everyday work, this helps when important observations and open questions should not disappear between the session and implementation.",
     },
   },
+  premiumSteps: {
+    vision_direction: {
+      collectHelper: "Start with two or three clear observations about priorities or focus.",
+      agreementTitle: "Direction rule",
+      reviewSummary: "Add an optional review point",
+    },
+    roles_responsibility: {
+      collectHelper:
+        "A useful point names the topic, who leads it, and when the other person needs to be involved.",
+      agreementTitle: "Responsibility rule",
+      reviewSummary: "Add an optional ownership signal",
+    },
+    decision_rules: {
+      collectHelper: "Start with two or three points rather than a perfect formulation.",
+      agreementTitle: "Decision rule",
+      reviewSummary: "Add an optional review trigger",
+    },
+    commitment_load: {
+      collectHelper:
+        "A useful point names an expectation, boundary, or early signal. No justification is needed.",
+      agreementTitle: "Commitment rule",
+      reviewSummary: "Add an optional early warning signal",
+    },
+    collaboration_conflict: {
+      collectHelper: "Start with specific situations rather than long explanations.",
+      agreementTitle: "Clarification rule",
+      reviewSummary: "Add an optional early warning signal",
+    },
+    ownership_risk: {
+      collectHelper: "A useful point names the risk, the threshold, and who needs to be involved by then.",
+      agreementTitle: "Risk ownership rule",
+      reviewSummary: "Add an optional early warning signal",
+    },
+    values_guardrails: {
+      collectHelper: "A useful point describes a real case rather than an abstract statement of values.",
+      agreementTitle: "Guardrail rule",
+      reviewSummary: "Add an optional review question",
+    },
+    alignment_90_days: {
+      collectHelper: "A useful point is a focus decision for the next phase, not a to-do.",
+      agreementTitle: "90-day focus",
+      reviewSummary: "Set a progress and review point",
+    },
+  },
 };
