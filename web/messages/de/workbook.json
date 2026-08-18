@@ -241,6 +241,13 @@
         "questions": "Gute Fragen",
         "matchingTitle": "Impuls aus eurem Matching",
         "contextual": "Kontextbezogen"
+      },
+      "structured": {
+        "sectionTitle": "3. Arbeitsregeln festhalten",
+        "requiredHint": "Mit * markierte Felder sind für diesen Schritt erforderlich.",
+        "missingTitle": "Noch auszufüllen",
+        "advisorMissingRequired": "Die erforderlichen Felder sind noch nicht vollständig ausgefüllt.",
+        "founderMissingRequired": "Vervollständigt die erforderlichen Felder, bevor ihr diesen Schritt finalisiert."
       }
     }
   },

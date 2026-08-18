@@ -241,6 +241,13 @@
         "questions": "Useful questions",
         "matchingTitle": "Prompt from your matching report",
         "contextual": "Context-based"
+      },
+      "structured": {
+        "sectionTitle": "3. Capture working rules",
+        "requiredHint": "Fields marked with * are required for this step.",
+        "missingTitle": "Still required",
+        "advisorMissingRequired": "The required fields are not complete yet.",
+        "founderMissingRequired": "Complete the required fields before finalizing this step."
       }
     }
   },

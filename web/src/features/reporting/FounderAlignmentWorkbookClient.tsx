@@ -25,6 +25,7 @@ import {
 import { type FounderAlignmentWorkbookViewerRole } from "@/features/reporting/founderAlignmentWorkbookData";
 import { buildWorkbookStepImpulseContent } from "@/features/reporting/founderAlignmentWorkbookImpulses";
 import { buildPilotAgreementDraftFromStructuredOutputs } from "@/features/reporting/founderAlignmentWorkbookPilotDraft";
+import type { WorkbookStructuredOutputField } from "@/features/reporting/founderAlignmentWorkbookStepContent";
 import {
   getWorkbookContent,
   resolveWorkbookContentSteps,
@@ -1582,6 +1583,10 @@ export function FounderAlignmentWorkbookClient({
     currentStructuredStepId != null && currentStepMarker
       ? getWorkbookRequiredStructuredOutputKeys(currentStructuredStepId, currentStepMarker.markerClass)
       : [];
+  const currentStepMissingStructuredFields =
+    currentStepContent.outputFields?.filter((field) =>
+      currentStepMissingStructuredKeys.includes(field.key)
+    ) ?? [];
   const currentStepStructuredReady = currentStepMissingStructuredKeys.length === 0;
   const currentStepMode = currentStepEntry.mode;
   const isCollaborativeMode = currentStepMode === "collaborative";
@@ -3904,7 +3909,6 @@ export function FounderAlignmentWorkbookClient({
                 items={workbookSummaryItems}
                 onBack={returnToWorkbook}
                 invitationId={invitationId}
-                teamContext={teamContext}
               />
             </section>
           </div>
@@ -5110,7 +5114,7 @@ export function FounderAlignmentWorkbookClient({
 
                 {currentStepHasStructuredOutputs && currentStepContent.outputFields?.length ? (
                   <StepSection
-                    title="3. Arbeitsregel festhalten"
+                    title={wt("client.premium.structured.sectionTitle")}
                     className="mt-8 border-[color:var(--brand-primary)]/16 bg-[linear-gradient(180deg,rgba(103,232,249,0.06),rgba(255,255,255,0.98))]"
                   >
                     <div className="max-w-3xl">
@@ -5130,6 +5134,9 @@ export function FounderAlignmentWorkbookClient({
                           {t(`Report-Marker fuer diesen Schritt: ${pilotMarkerLabel(currentStepMarker.markerClass, teamContext)}.`)}
                         </p>
                       ) : null}
+                      <p className="mt-3 text-xs leading-6 text-slate-500">
+                        {wt("client.premium.structured.requiredHint")}
+                      </p>
                     </div>
 
                     <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -5145,8 +5152,8 @@ export function FounderAlignmentWorkbookClient({
                             key={field.key}
                             title={
                               required
-                                ? `${structuredOutputLabel(field.outputType, teamContext)} *`
-                                : structuredOutputLabel(field.outputType, teamContext)
+                                ? `${field.title} *`
+                                : field.title
                             }
                             value={fieldValue}
                             onChange={(value) => updateStructuredOutput(field.key, value)}
@@ -5170,19 +5177,13 @@ export function FounderAlignmentWorkbookClient({
                     {currentStepMissingStructuredKeys.length > 0 ? (
                       <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/75 p-4">
                         <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700">
-                          {t("Vor der Finalisierung noch offen")}
+                          {wt("client.premium.structured.missingTitle")}
                         </p>
-                        <p className="mt-2 text-sm leading-7 text-slate-700">
-                          {t(
-                            currentStructuredStepId
-                              ? buildMissingStructuredOutputsText(
-                                  currentStructuredStepId,
-                                  currentStepMissingStructuredKeys,
-                                  teamContext
-                                )
-                              : ""
-                          )}
-                        </p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-7 text-slate-700">
+                          {currentStepMissingStructuredFields.map((field) => (
+                            <li key={field.key}>{field.title}</li>
+                          ))}
+                        </ul>
                       </div>
                     ) : null}
                   </StepSection>
@@ -5343,14 +5344,14 @@ export function FounderAlignmentWorkbookClient({
                           ? !hasBothPerspectives
                             ? t("Aktuell ist noch nicht von beiden Foundern eine vollstaendige Perspektive sichtbar.")
                             : currentStepHasStructuredOutputs && !currentStepStructuredReady
-                              ? t("Die zugehoerige Arbeitsregel ist noch nicht vollstaendig ausgefuellt.")
+                              ? wt("client.premium.structured.advisorMissingRequired")
                             : currentStepIsApprovedByBoth
                               ? t("Die Founder haben diese Absprache bereits gemeinsam bestaetigt.")
                               : t("Es liegt ein Entwurf vor, aber die finale Bestaetigung der Founder fehlt noch.")
                           : !hasBothPerspectives
                             ? t("Finalisieren koennt ihr erst, wenn beide Perspektiven vorliegen.")
                             : currentStepHasStructuredOutputs && !currentStepStructuredReady
-                              ? t("Vor der Finalisierung muessen die Pflichtfelder fuer diese Arbeitsregel ausgefuellt sein.")
+                              ? wt("client.premium.structured.founderMissingRequired")
                             : currentStepIsApprovedByBoth
                               ? t("Beide Founder haben diese finale Absprache bestaetigt. Der Schritt ist damit festgehalten.")
                               : t("Die Zustimmung gehoert erst hierher: Sobald beide Founder diese finale Absprache bestaetigen, ist der Schritt abgeschlossen.")}
@@ -5561,52 +5562,6 @@ function buildStructuredFieldHelperText(
           : "Schreibt auf, was ihr vor dem Start ausdrücklich festlegen wollt.";
 
   return required ? `${baseHelperText} ${contextSuffix}` : `${baseHelperText} ${contextSuffix}`;
-}
-
-function buildMissingStructuredOutputsText(
-  stepId: Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
-  missingKeys: WorkbookStructuredOutputType[],
-  teamContext: TeamContext
-) {
-  const fieldLabels = missingKeys.map((key) => structuredOutputLabel(key, teamContext));
-  const intro =
-    teamContext === "existing_team"
-      ? "Bevor ihr diesen Schritt finalisiert, fehlt noch:"
-      : "Bevor ihr diesen Schritt als tragfähige Vorabklärung finalisiert, fehlt noch:";
-
-  return `${intro} ${joinWithComma(fieldLabels)}.`;
-}
-
-function structuredOutputLabel(
-  outputType: WorkbookStructuredOutputType,
-  teamContext: TeamContext
-) {
-  const preFounderLabels: Record<WorkbookStructuredOutputType, string> = {
-    principle: "Was gilt grundsätzlich?",
-    operatingRule: "Was macht ihr im Normalfall?",
-    escalationRule: "Was passiert bei Uneinigkeit oder Druck?",
-    boundaryRule: "Wo ist eure Grenze?",
-    reviewTrigger: "Woran merkt ihr, dass es nicht mehr passt?",
-  };
-
-  const existingTeamLabels: Record<WorkbookStructuredOutputType, string> = {
-    principle: "Was gilt ab jetzt grundsätzlich?",
-    operatingRule: "Was macht ihr im Alltag konkret?",
-    escalationRule: "Was passiert bei Reibung oder Druck?",
-    boundaryRule: "Wo zieht ihr ab jetzt die Grenze?",
-    reviewTrigger: "Woran merkt ihr, dass die Regel nicht mehr trägt?",
-  };
-
-  return teamContext === "existing_team"
-    ? existingTeamLabels[outputType]
-    : preFounderLabels[outputType];
-}
-
-function joinWithComma(values: string[]) {
-  if (values.length === 0) return "";
-  if (values.length === 1) return values[0];
-  if (values.length === 2) return `${values[0]} und ${values[1]}`;
-  return `${values.slice(0, -1).join(", ")} und ${values[values.length - 1]}`;
 }
 
 function AdvisorApprovalRow({
@@ -6730,7 +6685,6 @@ function WorkbookSummaryView({
   items,
   onBack,
   invitationId,
-  teamContext,
 }: {
   items: Array<{
     id: FounderAlignmentWorkbookStepId;
@@ -6744,10 +6698,10 @@ function WorkbookSummaryView({
   }>;
   onBack: () => void;
   invitationId: string | null;
-  teamContext: TeamContext;
 }) {
   const wt = useTranslations("workbook");
   const locale = useLocale();
+  const summaryWorkbookContent = getWorkbookContent(locale);
 
   function summaryReactionStatusLabel(
     status: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>
@@ -6781,7 +6735,7 @@ function WorkbookSummaryView({
           const structuredSummaryItems = buildWorkbookSummaryStructuredItems(
             item.id,
             item.structuredOutputs,
-            teamContext
+            summaryWorkbookContent.stepContent[item.id].outputFields ?? []
           );
 
           return (
@@ -6908,19 +6862,15 @@ function WorkbookSummaryView({
 function buildWorkbookSummaryStructuredItems(
   stepId: FounderAlignmentWorkbookStepId,
   outputs: WorkbookStructuredStepOutputs | null,
-  teamContext: TeamContext
+  outputFields: WorkbookStructuredOutputField[]
 ) {
   if (!outputs || !isWorkbookStructuredStepId(stepId)) {
     return [];
   }
 
-  const config = isPremiumWorkbookV2StepId(stepId) ? PREMIUM_WORKBOOK_V2_CONFIG[stepId] : null;
-  const labelByType: Partial<Record<WorkbookStructuredOutputType, string>> = {
-    principle: structuredOutputLabel("principle", teamContext),
-    escalationRule: config?.escalationTitle ?? structuredOutputLabel("escalationRule", teamContext),
-    boundaryRule: structuredOutputLabel("boundaryRule", teamContext),
-    reviewTrigger: config?.reviewTitle ?? structuredOutputLabel("reviewTrigger", teamContext),
-  };
+  const labelByType = new Map(
+    outputFields.map((field) => [field.outputType, field.title] as const)
+  );
   const summaryOrder: WorkbookStructuredOutputType[] = [
     "escalationRule",
     "boundaryRule",
@@ -6931,12 +6881,13 @@ function buildWorkbookSummaryStructuredItems(
   return summaryOrder
     .map((key) => {
       const text = outputs[key]?.trim();
-      if (!text) {
+      const title = labelByType.get(key);
+      if (!text || !title) {
         return null;
       }
 
       return {
-        title: labelByType[key] ?? structuredOutputLabel(key, teamContext),
+        title,
         text,
       };
     })
