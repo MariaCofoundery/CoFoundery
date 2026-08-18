@@ -230,6 +230,17 @@
         "toRuleAction": "Weiter zum Entwurf",
         "toApprovalHint": "Der Entwurf ist vollständig. Als Nächstes folgt die finale Bestätigung.",
         "toApprovalAction": "Weiter zur finalen Absprache"
+      },
+      "impulses": {
+        "title": "Fragen und Impulse",
+        "show": "öffnen",
+        "hide": "ausblenden",
+        "intro": "Nutzt die Fragen als Einstieg. Ein Klick übernimmt den Text als editierbaren Startpunkt in euren Denkraum.",
+        "editable": "Direkt übernehmbar und frei anpassbar",
+        "readOnly": "Nur lesbar in dieser Rolle",
+        "questions": "Gute Fragen",
+        "matchingTitle": "Impuls aus eurem Matching",
+        "contextual": "Kontextbezogen"
       }
     }
   },

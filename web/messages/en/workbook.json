@@ -230,6 +230,17 @@
         "toRuleAction": "Continue to draft",
         "toApprovalHint": "The draft is complete. Final confirmation is next.",
         "toApprovalAction": "Continue to final agreement"
+      },
+      "impulses": {
+        "title": "Questions and prompts",
+        "show": "show",
+        "hide": "hide",
+        "intro": "Use these questions as a starting point. Select one to add it to your shared space as an editable draft.",
+        "editable": "Ready to use and freely editable",
+        "readOnly": "Read-only for this role",
+        "questions": "Useful questions",
+        "matchingTitle": "Prompt from your matching report",
+        "contextual": "Context-based"
       }
     }
   },

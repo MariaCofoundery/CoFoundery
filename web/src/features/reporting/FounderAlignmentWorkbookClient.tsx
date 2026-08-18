@@ -4558,9 +4558,11 @@ export function FounderAlignmentWorkbookClient({
                           aria-expanded={helperOpenByStep[currentStep.id]}
                           aria-controls={`workbook-impulses-${currentStep.id}`}
                         >
-                          <span>{t("Fragen & Impulse")}</span>
+                          <span>{wt("client.premium.impulses.title")}</span>
                           <span className="text-slate-400">
-                            {helperOpenByStep[currentStep.id] ? t("ausblenden") : t("oeffnen")}
+                            {helperOpenByStep[currentStep.id]
+                              ? wt("client.premium.impulses.hide")
+                              : wt("client.premium.impulses.show")}
                           </span>
                         </button>
                       ) : null}
@@ -5649,6 +5651,8 @@ function WorkbookStepImpulsePanel({
   onUseItem: (value: string) => void;
   className?: string;
 }) {
+  const wt = useTranslations("workbook");
+
   return (
     <section
       id={id}
@@ -5656,23 +5660,25 @@ function WorkbookStepImpulsePanel({
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Fragen & Impulse")}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            {wt("client.premium.impulses.title")}
+          </p>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            {t(
-              "Nutzt die Fragen als klugen Einstieg. Ein Klick setzt den Text direkt als editierbaren Startpunkt in euren Denkraum."
-            )}
+            {wt("client.premium.impulses.intro")}
           </p>
         </div>
         <span className="text-xs leading-6 text-slate-500">
           {canUse
-            ? t("Direkt uebernehmbar und frei anpassbar")
-            : t("Nur lesbar in dieser Rolle")}
+            ? wt("client.premium.impulses.editable")
+            : wt("client.premium.impulses.readOnly")}
         </span>
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("Gute Fragen")}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            {wt("client.premium.impulses.questions")}
+          </p>
           <div className="mt-3 grid gap-2.5">
             {questions.map((question) => (
               <button
@@ -5686,7 +5692,7 @@ function WorkbookStepImpulsePanel({
                     : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
                 }`}
               >
-                {t(question)}
+                {question}
               </button>
             ))}
           </div>
@@ -5695,10 +5701,10 @@ function WorkbookStepImpulsePanel({
         <div>
           <div className="flex items-center gap-2">
             <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              {t("Impuls aus eurem Matching")}
+              {wt("client.premium.impulses.matchingTitle")}
             </p>
             <span className="rounded-full border border-slate-200/80 bg-slate-50/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500">
-              {t("Kontextbezogen")}
+              {wt("client.premium.impulses.contextual")}
             </span>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-700">
@@ -5717,7 +5723,7 @@ function WorkbookStepImpulsePanel({
                     : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
                 }`}
               >
-                {t(impulse)}
+                {impulse}
               </button>
             ))}
           </div>
