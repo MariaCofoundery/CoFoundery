@@ -66,10 +66,13 @@ export type WorkbookStructuredOutputsByStep = Partial<
 const LEGACY_WORKBOOK_REPLY_TIMESTAMP = "1970-01-01T00:00:00.000Z";
 
 export const WORKBOOK_DISCUSSION_SIGNAL_VALUES = ["important", "agree", "critical"] as const;
+export const CURRENT_WORKBOOK_REACTION_SEMANTICS_VERSION = 2 as const;
 
 export type FounderAlignmentWorkbookDiscussionAuthor = "founderA" | "founderB";
 export type FounderAlignmentWorkbookDiscussionSignal =
   (typeof WORKBOOK_DISCUSSION_SIGNAL_VALUES)[number];
+export type WorkbookReactionSemanticsVersion =
+  typeof CURRENT_WORKBOOK_REACTION_SEMANTICS_VERSION;
 
 export type FounderAlignmentWorkbookDiscussionEntry = {
   id: string;
@@ -86,12 +89,32 @@ export type FounderAlignmentWorkbookDiscussionReaction = {
   userId: FounderAlignmentWorkbookDiscussionAuthor;
   signal: FounderAlignmentWorkbookDiscussionSignal;
   updatedAt: string | null;
+  semanticsVersion?: WorkbookReactionSemanticsVersion;
 };
 
 export type FounderAlignmentWorkbookStepWorkspaceV2 = {
   entries: FounderAlignmentWorkbookDiscussionEntry[];
   reactions: FounderAlignmentWorkbookDiscussionReaction[];
 };
+
+export function upsertCurrentWorkbookDiscussionReaction(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  reaction: FounderAlignmentWorkbookDiscussionReaction
+): FounderAlignmentWorkbookStepWorkspaceV2 {
+  return {
+    ...workspace,
+    reactions: [
+      ...workspace.reactions.filter(
+        (candidate) =>
+          !(candidate.entryId === reaction.entryId && candidate.userId === reaction.userId)
+      ),
+      {
+        ...reaction,
+        semanticsVersion: CURRENT_WORKBOOK_REACTION_SEMANTICS_VERSION,
+      },
+    ],
+  };
+}
 
 export type FounderAlignmentWorkbookAdvisorReply = {
   id: string;
@@ -631,6 +654,7 @@ export function sanitizeWorkbookStepWorkspaceV2(
       userId?: unknown;
       signal?: unknown;
       updatedAt?: unknown;
+      semanticsVersion?: unknown;
     }>;
   };
 
@@ -683,6 +707,9 @@ export function sanitizeWorkbookStepWorkspaceV2(
             userId: reaction.userId,
             signal: reaction.signal,
             updatedAt: typeof reaction.updatedAt === "string" ? reaction.updatedAt : null,
+            ...(reaction.semanticsVersion === CURRENT_WORKBOOK_REACTION_SEMANTICS_VERSION
+              ? { semanticsVersion: CURRENT_WORKBOOK_REACTION_SEMANTICS_VERSION }
+              : {}),
           } satisfies FounderAlignmentWorkbookDiscussionReaction;
         })
         .filter(

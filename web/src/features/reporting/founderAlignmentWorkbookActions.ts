@@ -11,6 +11,7 @@ import {
   sanitizeWorkbookStructuredOutputsByStep,
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
+  upsertCurrentWorkbookDiscussionReaction,
   type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookStepId,
@@ -897,12 +898,7 @@ function mergeFounderPayload(
           };
         }
 
-        workspace.reactions = workspace.reactions.filter(
-          (candidate) =>
-            !(candidate.entryId === reaction.entryId && candidate.userId === reaction.userId)
-        );
-        workspace.reactions.push(reaction);
-        stepEntry.workspaceV2 = workspace;
+        stepEntry.workspaceV2 = upsertCurrentWorkbookDiscussionReaction(workspace, reaction);
         resetFounderApprovals(stepEntry);
         break;
       }

@@ -40,6 +40,7 @@ import {
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
   sanitizeWorkbookStructuredOutputsByStep,
+  upsertCurrentWorkbookDiscussionReaction,
   workbookContextIntro,
   workbookNextStepId,
   workbookPreviousStepId,
@@ -2604,25 +2605,22 @@ export function FounderAlignmentWorkbookClient({
     const existingReaction = decisionRulesWorkspace.reactions.find(
       (reaction) => reaction.entryId === entryId && reaction.userId === currentUserRole
     );
-    const nextReactions = decisionRulesWorkspace.reactions.filter(
-      (reaction) => !(reaction.entryId === entryId && reaction.userId === currentUserRole)
-    );
     setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entryId));
 
     updateWorkspaceV2({
       ...decisionRulesWorkspace,
       reactions:
         existingReaction?.signal === signal
-          ? nextReactions
-          : [
-              ...nextReactions,
-              {
-                entryId,
-                userId: currentUserRole,
-                signal,
-                updatedAt: new Date().toISOString(),
-              },
-            ],
+          ? decisionRulesWorkspace.reactions.filter(
+              (reaction) =>
+                !(reaction.entryId === entryId && reaction.userId === currentUserRole)
+            )
+          : upsertCurrentWorkbookDiscussionReaction(decisionRulesWorkspace, {
+              entryId,
+              userId: currentUserRole,
+              signal,
+              updatedAt: new Date().toISOString(),
+            }).reactions,
     });
   }
 
