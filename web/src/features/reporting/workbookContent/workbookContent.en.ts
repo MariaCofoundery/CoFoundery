@@ -538,6 +538,20 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
         "In everyday work, this helps when important observations and open questions should not disappear between the session and implementation.",
     },
   },
+  premiumWorkflow: {
+    readyText:
+      "You have both added your perspective. Next, you can review and discuss the points together.",
+    advisorReadyText: "Both founders have added their perspective.",
+    missingPerspectiveText: (missingLabel) =>
+      `Before you continue together, a perspective from ${missingLabel} is still missing.`,
+    approval: {
+      title: "Confirm this version",
+      intro:
+        "Review the current version once more. Confirm it if it reflects what you have agreed to record for this point.",
+      confirmButton: "I confirm this version",
+      withdrawButton: "Withdraw confirmation",
+    },
+  },
   premiumSteps: {
     vision_direction: {
       collectHelper: "Start with two or three clear observations about priorities or focus.",

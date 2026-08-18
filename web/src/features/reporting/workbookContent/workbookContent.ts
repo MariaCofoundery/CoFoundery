@@ -14,9 +14,22 @@ export type PremiumWorkbookFieldGuidance = {
   reviewSummary: string;
 };
 
+export type PremiumWorkbookWorkflowCopy = {
+  readyText: string;
+  advisorReadyText: string;
+  missingPerspectiveText: (missingLabel: string) => string;
+  approval: {
+    title: string;
+    intro: string;
+    confirmButton: string;
+    withdrawButton: string;
+  };
+};
+
 export type WorkbookContent = {
   steps: FounderAlignmentWorkbookStepDefinition[];
   stepContent: typeof WORKBOOK_STEP_CONTENT;
+  premiumWorkflow: PremiumWorkbookWorkflowCopy;
   premiumSteps: Record<
     Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">,
     PremiumWorkbookFieldGuidance

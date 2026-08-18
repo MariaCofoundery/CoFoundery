@@ -104,27 +104,22 @@ test("the active client renders only the approved field guidance from locale-awa
   }
 });
 
-test("yellow and red premium copy remains on the existing config path", () => {
+test("remaining yellow and red premium copy stays on the existing config path", () => {
   for (const property of [
     "collectPlaceholder",
-    "collectReadyText",
-    "missingPerspectiveText",
     "weightingIntro",
     "ruleIntro",
     "signalOptions",
     "sharedInsightTitle",
     "pendingInsightTitle",
     "criticalInsightTitle",
-    "approvalIntro",
   ]) {
     assert.match(clientSource, new RegExp(`${property}[?:]`, "u"), `missing config property ${property}`);
   }
 
   assert.match(clientSource, /currentPremiumV2Config\.collectPlaceholder/u);
-  assert.match(clientSource, /currentPremiumV2Config\.collectReadyText/u);
   assert.match(clientSource, /currentPremiumV2Config\.weightingIntro/u);
   assert.match(clientSource, /currentPremiumV2Config\.ruleIntro/u);
-  assert.match(clientSource, /currentPremiumV2Config\.approvalIntro/u);
 });
 
 test("premium field guidance stays outside founder content and persistence paths", () => {

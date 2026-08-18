@@ -5,6 +5,20 @@ import type { WorkbookContent } from "@/features/reporting/workbookContent/workb
 export const WORKBOOK_CONTENT_DE: WorkbookContent = {
   steps: FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   stepContent: WORKBOOK_STEP_CONTENT,
+  premiumWorkflow: {
+    readyText:
+      "Ihr habt beide eure Perspektive eingebracht. Im naechsten Schritt koennt ihr die Punkte gemeinsam einordnen.",
+    advisorReadyText: "Beide Founder haben ihre Perspektive eingebracht.",
+    missingPerspectiveText: (missingLabel) =>
+      `Bevor ihr gemeinsam weiterarbeitet, fehlt noch die Perspektive von ${missingLabel}.`,
+    approval: {
+      title: "Diese Fassung bestaetigen",
+      intro:
+        "Prueft die aktuelle Fassung noch einmal. Bestaetigt sie, wenn sie das festhaelt, worauf ihr euch fuer diesen Punkt verstaendigt habt.",
+      confirmButton: "Ich bestaetige diese Fassung",
+      withdrawButton: "Bestaetigung zuruecknehmen",
+    },
+  },
   premiumSteps: {
     vision_direction: {
       collectHelper: "Startet mit zwei oder drei klaren Prioritaets- oder Fokusbeobachtungen.",

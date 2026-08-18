@@ -159,8 +159,6 @@ type PremiumWorkbookV2Config = {
   collectActionLabel?: string;
   collectIntro: string;
   collectPlaceholder: string;
-  collectReadyText: string;
-  missingPerspectiveText: (missingLabel: string) => string;
   weightingPhaseLabel?: string;
   weightingTitle?: string;
   weightingActionLabel?: string;
@@ -184,8 +182,6 @@ type PremiumWorkbookV2Config = {
   reviewPlaceholder: string;
   reviewHelper: string;
   requireReviewForApproval?: boolean;
-  approvalTitle?: string;
-  approvalIntro?: string;
   rulePreviewSummary: string;
   rulePreviewDetail: string;
 };
@@ -196,10 +192,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst die Punkte fest, die eure Richtung im Alltag wirklich steuern: was bei euch Vorrang bekommt, welche Chancen attraktiv wirken und wann ihr bewusst beim Fokus bleibt. Ein klarer Punkt pro Beobachtung reicht.",
     collectPlaceholder:
       "Zum Beispiel: Umsatzchancen kippen bei uns schnell in Vorrang. Oder: Wir wechseln den Fokus erst, wenn ein Thema klar zum Kern passt und nicht nur laut wirkt.",
-    collectReadyText:
-      "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, welche Richtung euch gemeinsam traegt und wo ihr Chancen unterschiedlich lest.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird sichtbar, wie ihr Fokus, Chancen und Richtungswechsel wirklich abwaegt.`,
     weightingIntro:
       "Ordnet jetzt jeden Punkt ein. So wird sichtbar, was fuer euch beide Prioritaet hat, wo eine Chance unterschiedlich attraktiv wirkt und welche Linie euch gemeinsam traegt.",
     ruleIntro:
@@ -227,10 +219,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Ownership-Punkte: welche Themen eine Person fuehrt, was sie allein entscheiden kann und wo fruehe Sichtbarkeit wichtig ist.",
     collectPlaceholder:
       "Zum Beispiel: Produktprioritaeten fuehrt ... allein. Oder: Hiring-Entscheidungen bleiben sichtbar, sobald Budget, Kultur oder Timing betroffen sind.",
-    collectReadyText:
-      "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, welche Ownership klar tragbar ist und wo Mitsicht oder Mitsprache fehlt.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Ownership-Punkt von ${missingLabel}. Erst dann wird sichtbar, wo Fuehrung, Mitsicht und Entscheidungsspielraum wirklich passen.`,
     weightingIntro:
       "Ordnet jeden Punkt ein. So seht ihr, was eigenstaendig laufen kann, wo fruehe Mitsicht reicht und wo ihr gemeinsam klaeren muesst.",
     signalOptions: [
@@ -267,10 +255,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst nur die Punkte fest, die eure Entscheidungen im Alltag tragen oder blockieren. Ein klarer Satz pro Punkt reicht.",
     collectPlaceholder:
       "Zum Beispiel: Ab Budget X entscheidet niemand mehr allein. Oder: Marktfenster duerfen nicht zweimal in dieselbe Schleife fallen.",
-    collectReadyText:
-      "Beide Perspektiven sind jetzt auf dem Tisch. Als Naechstes ordnet ihr jeden Punkt gemeinsam ein.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird die Gewichtung wirklich belastbar.`,
     weightingIntro:
       "Ordnet jetzt jeden vorhandenen Punkt ein. Erst wenn beide Seiten alle Punkte gelesen und markiert haben, wird die Regel wirklich belastbar.",
     ruleIntro:
@@ -297,10 +281,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Punkte zu Einsatz, Verfuegbarkeit und Belastung: was realistisch ist, was frueh sichtbar werden muss und was nicht still vorausgesetzt werden darf.",
     collectPlaceholder:
       "Zum Beispiel: Abends reagiere ich nicht verlaesslich. Oder: Wenn Kundenarbeit und Produkt gleichzeitig ziehen, muss zuerst ... neu priorisiert werden.",
-    collectReadyText:
-      "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, was tragbar ist, was frueh gesagt werden muss und wo ihr neu priorisieren muesst.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Commitment-Punkt von ${missingLabel}. Erst dann wird sichtbar, welche Erwartungen, Grenzen und Belastungssignale wirklich zusammenpassen.`,
     weightingIntro:
       "Ordnet jeden Punkt ein. So seht ihr, was realistisch tragbar ist, was frueh transparent werden muss und wo ihr Erwartungen neu sortieren solltet.",
     signalOptions: [
@@ -337,10 +317,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Haltet zuerst die Situationen fest, in denen Reibung entsteht, Kritik haengen bleibt oder ein Thema einen eigenen Klaerungsrahmen braucht. Ein klarer Punkt pro Beobachtung reicht.",
     collectPlaceholder:
       "Zum Beispiel: Kritik kommt oft erst, wenn der Frust schon da ist. Oder: In angespannten Meetings wird zu schnell in der Sache weitergemacht.",
-    collectReadyText:
-      "Beide Perspektiven sind jetzt sichtbar. Als Naechstes ordnet ihr, was ihr gemeinsam tragen koennt und wo klare Spielregeln fehlen.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Punkt von ${missingLabel}. Erst dann wird sichtbar, wie ihr mit Spannung und Feedback wirklich umgeht.`,
     weightingIntro:
       "Ordnet jetzt jeden Punkt ein. So wird sichtbar, welche Reibungen ihr gemeinsam klaeren koennt und wo ihr bewusst andere Spielregeln braucht.",
     ruleIntro:
@@ -368,10 +344,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Legt konkrete Risikosituationen auf den Tisch: was frueh sichtbar werden muss, was noch tragbar ist und wo niemand still allein weiterlaufen darf.",
     collectPlaceholder:
       "Zum Beispiel: Runway unter X Monaten. Ein rechtlicher Punkt mit Aussenwirkung. Eine Produktentscheidung, die Budget, Haftung oder Reputation beruehrt.",
-    collectReadyText:
-      "Beide Perspektiven sind sichtbar. Als Naechstes trennt ihr, was tragbar bleibt, was frueh sichtbar werden muss und wo ihr gemeinsam entscheidet.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Risikopunkt von ${missingLabel}. Erst dann wird sichtbar, wo ihr Schwellen, Verantwortung und Absicherung unterschiedlich setzt.`,
     weightingIntro:
       "Ordnet jeden Punkt ein. So seht ihr, was fuer beide tragbar ist, was frueh sichtbar werden muss und wo eine Person nicht allein weitergehen sollte.",
     signalOptions: [
@@ -413,10 +385,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt konkrete Grenzfaelle: was noch tragbar waere, wo ihr bewusst nein sagt und was nie still nebenher entschieden wird.",
     collectPlaceholder:
       "Zum Beispiel: Ein Investor bringt Tempo, aber verlangt eine Richtung, die nicht zu uns passt. Oder: Ein Kunde ist wirtschaftlich attraktiv, passt aber nicht zu unserer Arbeitsweise.",
-    collectReadyText:
-      "Beide Perspektiven sind sichtbar. Als Naechstes ordnet ihr, was tragbar ist, was ein Grenzfall bleibt und was nicht euer Weg ist.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Grenzfall von ${missingLabel}. Erst dann wird sichtbar, welche Kompromisse, roten Linien und Freigaben fuer euch beide gelten.`,
     weightingPhaseLabel: "Einordnen",
     weightingTitle: "2. Einordnung im Denkraum",
     weightingActionLabel: "Einordnung bearbeiten",
@@ -450,9 +418,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Zum Beispiel: Koennen wir diese Entscheidung auch dann vertreten, wenn sie sichtbar wird, skaliert oder spaeter erklaert werden muss?",
     reviewHelper:
       "Hilfreich, damit neue Grenzfaelle nicht jedes Mal bei null beginnen.",
-    approvalTitle: "4. Leitplanke bestaetigen",
-    approvalIntro:
-      "Bestaetigt diese Leitplanke erst, wenn tragbare Kompromisse, Grenzfaelle und rote Linien fuer euch beide klar sind.",
     rulePreviewSummary:
       "Die Leitplanke wird erst stark, wenn eure Grenzfaelle und roten Linien sauber eingeordnet sind.",
     rulePreviewDetail:
@@ -468,10 +433,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Sammelt nur die Punkte, die fuer die naechsten 90 Tage wirklich eine Entscheidung brauchen: Fokus, Nicht-Fokus, Fortschritt oder Review.",
     collectPlaceholder:
       "Zum Beispiel: Bis Ende Quartal hat Produktvalidierung Vorrang. Oder: Fundraising-Vorbereitung laeuft nur weiter, wenn ... dafuer runtergeht.",
-    collectReadyText:
-      "Beide Perspektiven sind sichtbar. Als Naechstes waehlt ihr, was Vorrang hat, was warten kann und was nur bewusst freigegeben wird.",
-    missingPerspectiveText: (missingLabel) =>
-      `Noch fehlt mindestens ein eigener Fokuspunkt von ${missingLabel}. Erst dann wird sichtbar, worauf ihr beide in den naechsten 90 Tagen wirklich Energie geben wollt.`,
     weightingPhaseLabel: "Priorisieren",
     weightingTitle: "2. Priorisierung",
     weightingActionLabel: "Priorisierung bearbeiten",
@@ -505,9 +466,6 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
       "Ihr prueft euren Fortschritt an ... Neu entschieden wird spaetestens am ... oder wenn ...",
     reviewHelper: "Dieser Punkt macht aus Fokus eine pruefbare Vereinbarung.",
     requireReviewForApproval: true,
-    approvalTitle: "4. Gemeinsames Commitment",
-    approvalIntro:
-      "Bestaetigt diese 90-Tage-Vereinbarung erst, wenn Fokus, Nicht-Fokus und Review fuer euch beide klar sind.",
     rulePreviewSummary:
       "Die 90-Tage-Vereinbarung kommt erst nach eurer gemeinsamen Priorisierung nach vorn.",
     rulePreviewDetail:
@@ -4722,12 +4680,12 @@ export function FounderAlignmentWorkbookClient({
                     <div className="mt-5 text-sm leading-7 text-slate-600">
                       {isAdvisorViewer
                         ? hasDecisionRulesBothPerspectives
-                          ? t("Hier sind bereits Beitraege von beiden Foundern sichtbar.")
+                          ? systemText(workbookContent.premiumWorkflow.advisorReadyText)
                           : null
                         : hasDecisionRulesBothPerspectives
-                          ? t(currentPremiumV2Config.collectReadyText)
+                          ? systemText(workbookContent.premiumWorkflow.readyText)
                           : systemTextWithProtectedValues(
-                              currentPremiumV2Config.missingPerspectiveText(
+                              workbookContent.premiumWorkflow.missingPerspectiveText(
                                 hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel
                               ),
                               [hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel]
@@ -4952,13 +4910,10 @@ export function FounderAlignmentWorkbookClient({
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="max-w-3xl">
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          {t(currentPremiumV2Config.approvalTitle ?? "4. Zustimmung")}
+                          {systemText(workbookContent.premiumWorkflow.approval.title)}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-slate-700">
-                          {t(
-                            currentPremiumV2Config.approvalIntro ??
-                              "Bestaetigt diese Fassung erst dann, wenn sie fuer euch beide im Alltag wirklich traegt. Relevante Aenderungen setzen die Zustimmung automatisch zurueck."
-                          )}
+                          {systemText(workbookContent.premiumWorkflow.approval.intro)}
                         </p>
                       </div>
                       {viewerFounderField ? (
@@ -4971,7 +4926,11 @@ export function FounderAlignmentWorkbookClient({
                               : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                           }`}
                         >
-                          {currentUserApproved ? t("Zustimmung zuruecknehmen") : t("Regel bestaetigen")}
+                          {systemText(
+                            currentUserApproved
+                              ? workbookContent.premiumWorkflow.approval.withdrawButton
+                              : workbookContent.premiumWorkflow.approval.confirmButton
+                          )}
                         </button>
                       ) : null}
                     </div>
@@ -6513,11 +6472,13 @@ function ApprovalStatusCard({
   label: string;
   approved: boolean;
 }) {
+  const wt = useTranslations("workbook");
+
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
       <p className="text-sm font-medium text-slate-900">{label}</p>
       <p className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-500">
-        {approved ? t("Zugestimmt") : t("Noch offen")}
+        {approved ? wt("client.premium.status.confirmed") : wt("client.premium.status.open")}
       </p>
     </div>
   );
