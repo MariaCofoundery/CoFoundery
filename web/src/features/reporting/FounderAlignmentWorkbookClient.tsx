@@ -1340,6 +1340,7 @@ export function FounderAlignmentWorkbookClient({
   const currentPremiumV2IsLight =
     currentPremiumV2StepId != null && LIGHT_PREMIUM_WORKBOOK_V2_STEP_IDS.includes(currentPremiumV2StepId);
   const isAdvisorViewer = currentUserRole === "advisor";
+  const guidedFlow = workbookContent.premiumWorkflow.guidedFlow;
   const reactionPresentation = workbookContent.premiumWorkflow.reactionPresentation;
   const showAdvisorInviteCard =
     currentUserRole === "founderA" ||
@@ -4210,12 +4211,7 @@ export function FounderAlignmentWorkbookClient({
                       {wt("client.leadQuestion")}
                     </p>
                     <p className="mt-3 text-[1.55rem] font-semibold leading-[1.28] text-slate-950 sm:text-[2rem] sm:leading-[1.22]">
-                      {t(
-                        currentPremiumV2Config.question ??
-                          currentStepPrompts[0] ??
-                          currentStep.prompts[0] ??
-                          "Wie regelt ihr Entscheidungen so, dass sie auch unter Druck klar bleiben?"
-                      )}
+                      {systemText(currentPremiumFieldGuidance.question)}
                     </p>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-700">
                       {isAdvisorViewer
@@ -4443,7 +4439,7 @@ export function FounderAlignmentWorkbookClient({
                           {t(currentPremiumV2Config.collectTitle ?? "1. Denkraum")}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-slate-700">
-                          {t(currentPremiumV2Config.collectIntro)}
+                          {systemText(guidedFlow.collectIntro)}
                         </p>
                         <p className="mt-2 text-xs leading-6 text-slate-500">
                           {t(workbookV2SharedSpaceHint)}
@@ -4578,9 +4574,12 @@ export function FounderAlignmentWorkbookClient({
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                         {t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
                       </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {systemText(guidedFlow.weightingIntro)}
+                      </p>
                       {!isAdvisorViewer ? (
                         <>
-                          <p className="mt-2 text-sm leading-6 text-slate-700">
+                          <p className="mt-2 text-xs leading-6 text-slate-600">
                             {systemText(reactionPresentation.prompt)}
                           </p>
                           <p className="mt-2 text-xs leading-6 text-slate-500">
@@ -4656,7 +4655,7 @@ export function FounderAlignmentWorkbookClient({
                         {t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-700">
-                        {t(currentPremiumV2Config.ruleIntro)}
+                        {systemText(guidedFlow.ruleIntro)}
                       </p>
                     </div>
 

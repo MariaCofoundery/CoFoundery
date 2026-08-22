@@ -551,6 +551,13 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       confirmButton: "I confirm this version",
       withdrawButton: "Withdraw confirmation",
     },
+    guidedFlow: {
+      collectIntro:
+        "Start by adding your individual perspectives. You do not need to agree on a shared wording at this stage.",
+      weightingIntro: "Review the points you have added and respond to each one individually.",
+      ruleIntro:
+        "Next, write down what you want to agree on for this point. The current version should capture your agreement clearly and can be revised later.",
+    },
     reactionPresentation: {
       prompt: "How would you like to respond to this point right now?",
       choiceHint: "Choose the option that fits best.",
@@ -603,43 +610,55 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
   },
   premiumSteps: {
     vision_direction: {
+      question:
+        "What direction do you want to pursue with the company, and what matters to each of you along the way?",
       collectHelper: "Start with two or three clear observations about priorities or focus.",
       agreementTitle: "Direction rule",
       reviewSummary: "Add an optional review point",
     },
     roles_responsibility: {
+      question: "How do you want to divide roles and responsibilities within the team?",
       collectHelper:
         "A useful point names the topic, who leads it, and when the other person needs to be involved.",
       agreementTitle: "Responsibility rule",
       reviewSummary: "Add an optional ownership signal",
     },
     decision_rules: {
+      question: "How do you want to make decisions, especially when you see things differently?",
       collectHelper: "Start with two or three points rather than a perfect formulation.",
       agreementTitle: "Decision rule",
       reviewSummary: "Add an optional review trigger",
     },
     commitment_load: {
+      question:
+        "What level of time commitment and workload can each of you realistically take on right now?",
       collectHelper:
         "A useful point names an expectation, boundary, or early signal. No justification is needed.",
       agreementTitle: "Commitment rule",
       reviewSummary: "Add an optional early warning signal",
     },
     collaboration_conflict: {
+      question: "How do you want to handle disagreements, tension, or difficult situations?",
       collectHelper: "Start with specific situations rather than long explanations.",
       agreementTitle: "Clarification rule",
       reviewSummary: "Add an optional early warning signal",
     },
     ownership_risk: {
+      question:
+        "How do you want to clarify responsibility, ownership, and personal or financial risk between you?",
       collectHelper: "A useful point names the risk, the threshold, and who needs to be involved by then.",
       agreementTitle: "Risk ownership rule",
       reviewSummary: "Add an optional early warning signal",
     },
     values_guardrails: {
+      question:
+        "Which principles, boundaries, or priorities should guide you when making important decisions?",
       collectHelper: "A useful point describes a real case rather than an abstract statement of values.",
       agreementTitle: "Guardrail rule",
       reviewSummary: "Add an optional review question",
     },
     alignment_90_days: {
+      question: "What do you want to focus on over the next 90 days?",
       collectHelper: "A useful point is a focus decision for the next phase, not a to-do.",
       agreementTitle: "90-day focus",
       reviewSummary: "Set a progress and review point",

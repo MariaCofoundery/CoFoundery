@@ -10,6 +10,7 @@ import { WORKBOOK_CONTENT_DE } from "@/features/reporting/workbookContent/workbo
 import { WORKBOOK_CONTENT_EN } from "@/features/reporting/workbookContent/workbookContent.en";
 
 export type PremiumWorkbookFieldGuidance = {
+  question: string;
   collectHelper: string;
   agreementTitle: string;
   reviewSummary: string;
@@ -24,6 +25,11 @@ export type PremiumWorkbookWorkflowCopy = {
     intro: string;
     confirmButton: string;
     withdrawButton: string;
+  };
+  guidedFlow: {
+    collectIntro: string;
+    weightingIntro: string;
+    ruleIntro: string;
   };
   reactionPresentation: {
     prompt: string;
