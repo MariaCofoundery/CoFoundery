@@ -6,15 +6,25 @@ import type {
   FounderAlignmentWorkbookStepId,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import type { WORKBOOK_STEP_CONTENT } from "@/features/reporting/founderAlignmentWorkbookStepContent";
+import type { FounderMatchingMarkerClass } from "@/features/reporting/founderMatchingMarkers";
 import { WORKBOOK_CONTENT_DE } from "@/features/reporting/workbookContent/workbookContent.de";
 import { WORKBOOK_CONTENT_EN } from "@/features/reporting/workbookContent/workbookContent.en";
 
 export type PremiumWorkbookFieldGuidance = {
   question: string;
+  collectPlaceholder: string;
   collectHelper: string;
   agreementTitle: string;
   reviewSummary: string;
+  impulseQuestions: string[];
+  suggestion: {
+    agreement: string;
+    escalationRule: string;
+    reviewTrigger: string;
+  };
 };
+
+type WorkbookMarkerContentKey = FounderMatchingMarkerClass | "default";
 
 export type PremiumWorkbookWorkflowCopy = {
   readyText: string;
@@ -31,6 +41,40 @@ export type PremiumWorkbookWorkflowCopy = {
     weightingIntro: string;
     ruleIntro: string;
   };
+  sectionTitles: {
+    collect: string;
+    weighting: string;
+    rule: string;
+  };
+  sharedSpace: {
+    collaborativeFounder: string;
+    soloFounder: string;
+    advisor: string;
+  };
+  ruleFields: {
+    editingIntro: string;
+    agreementPlaceholder: string;
+    escalationTitle: string;
+    escalationPlaceholder: string;
+    escalationHelper: string;
+    reviewTitle: string;
+    reviewPlaceholder: string;
+    reviewHelper: string;
+    currentAgreementTitle: string;
+    emptyAgreementText: string;
+  };
+  suggestionPresentation: {
+    title: string;
+    intro: string;
+    applyButton: string;
+  };
+  suggestionGuidance: {
+    furtherDiscussion: string;
+    differentResponses: string;
+  };
+  matchingHints: Record<WorkbookMarkerContentKey, string>;
+  markerImpulseIntro: string;
+  markerImpulses: Record<WorkbookMarkerContentKey, string[]>;
   reactionPresentation: {
     prompt: string;
     choiceHint: string;

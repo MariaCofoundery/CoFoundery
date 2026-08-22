@@ -558,6 +558,81 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       ruleIntro:
         "Next, write down what you want to agree on for this point. The current version should capture your agreement clearly and can be revised later.",
     },
+    sectionTitles: {
+      collect: "1. Add perspectives",
+      weighting: "2. Respond to the points",
+      rule: "3. Record your agreement",
+    },
+    sharedSpace: {
+      collaborativeFounder:
+        "You are working in the same space. You can edit your own points; you can respond to the other person's points or add a point of your own.",
+      soloFounder:
+        "Start with your perspective. The other person can add their own points and respond to existing points later.",
+      advisor:
+        "Here you can see the founder perspectives added so far. Each contribution remains attributed to the person who added it.",
+    },
+    ruleFields: {
+      editingIntro:
+        "Record the current version of your agreement here. You can continue editing it before confirming it.",
+      agreementPlaceholder: "Capture your agreement in one or two clear sentences.",
+      escalationTitle: "What to do when further clarification is needed",
+      escalationPlaceholder:
+        "Record how you will proceed if this point remains open or the situation changes.",
+      escalationHelper: "Describe a concrete next step, responsibility, or point in time.",
+      reviewTitle: "When to review this again",
+      reviewPlaceholder: "Record when you want to review this agreement again.",
+      reviewHelper: "Name a point in time or an observable change as the trigger.",
+      currentAgreementTitle: "Current agreement for this point",
+      emptyAgreementText: "No agreement has been recorded yet.",
+    },
+    suggestionPresentation: {
+      title: "Possible starting point",
+      intro:
+        "This system suggestion is a drafting aid. Review and edit it before adopting it as your agreement.",
+      applyButton: "Use as a starting point",
+    },
+    suggestionGuidance: {
+      furtherDiscussion:
+        "Discuss points that need further clarification before settling on a final version, and record what remains open.",
+      differentResponses:
+        "Discuss points you responded to differently and record what each person needs from the agreement.",
+    },
+    matchingHints: {
+      stable_base:
+        "The matching result does not prescribe a specific action for this point. You can still review what you want to record explicitly.",
+      conditional_complement:
+        "The matching result points to different perspectives that may matter differently depending on the situation. Clarify how you want to handle them in practice.",
+      high_rule_need:
+        "The matching result suggests that an explicit rule may be useful here. Review which responsibility, boundary, or decision you want to record.",
+      critical_clarification_point:
+        "The matching result marks this point as a possible topic for clarification. Discuss what you want to make more specific before agreeing on a version.",
+      default:
+        "You can discuss the expectations behind this point and what you want to agree on explicitly.",
+    },
+    markerImpulseIntro:
+      "These questions use the matching context as a possible conversation prompt, not as an assessment of your collaboration.",
+    markerImpulses: {
+      stable_base: [
+        "Which assumptions do you share on this point, and what should still be recorded explicitly?",
+        "One possible question is when you want to review this agreement again.",
+      ],
+      conditional_complement: [
+        "You can discuss how your different perspectives should inform a concrete agreement.",
+        "What does each person need so that a difference remains manageable in everyday work?",
+      ],
+      high_rule_need: [
+        "It can be helpful to record responsibility, a boundary, and the next review point explicitly.",
+        "Which situation should your agreement cover in concrete terms?",
+      ],
+      critical_clarification_point: [
+        "One possible question is what still needs clarification before you settle on a final version.",
+        "What next conversation step do you want to agree on for this point?",
+      ],
+      default: [
+        "You can discuss what each person needs regarding this point.",
+        "What concrete agreement would help with the next step?",
+      ],
+    },
     reactionPresentation: {
       prompt: "How would you like to respond to this point right now?",
       choiceHint: "Choose the option that fits best.",
@@ -612,56 +687,176 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
     vision_direction: {
       question:
         "What direction do you want to pursue with the company, and what matters to each of you along the way?",
+      collectPlaceholder: "Describe a direction, priority, or open trade-off.",
       collectHelper: "Start with two or three clear observations about priorities or focus.",
       agreementTitle: "Direction rule",
       reviewSummary: "Add an optional review point",
+      impulseQuestions: [
+        "Which direction matters to you for the next phase?",
+        "Which opportunities do you want to examine more closely before changing priorities?",
+        "What should guide you when topics compete for attention?",
+        "When do you want to review your direction together again?",
+      ],
+      suggestion: {
+        agreement:
+          "Record which direction or priority should currently apply to this point and which trade-off you are taking into account.",
+        escalationRule:
+          "Define how you will proceed if you assess a new opportunity differently or the circumstances change.",
+        reviewTrigger:
+          "Review the agreement at a defined time or when relevant assumptions change.",
+      },
     },
     roles_responsibility: {
       question: "How do you want to divide roles and responsibilities within the team?",
+      collectPlaceholder: "Describe a role, responsibility, or necessary coordination point.",
       collectHelper:
         "A useful point names the topic, who leads it, and when the other person needs to be involved.",
       agreementTitle: "Responsibility rule",
       reviewSummary: "Add an optional ownership signal",
+      impulseQuestions: [
+        "Which topics should one person lead?",
+        "When does the other person need information or involvement?",
+        "Where do you want to make decisions together?",
+        "When should you revisit how roles are divided?",
+      ],
+      suggestion: {
+        agreement:
+          "Record who leads this point and when the other person will be informed or involved.",
+        escalationRule:
+          "Define how you will proceed if responsibility is unclear or several areas are involved.",
+        reviewTrigger:
+          "Review the division of roles when tasks, decision scope, or how you work together changes.",
+      },
     },
     decision_rules: {
       question: "How do you want to make decisions, especially when you see things differently?",
+      collectPlaceholder: "Describe a decision situation or a rule you would find useful.",
       collectHelper: "Start with two or three points rather than a perfect formulation.",
       agreementTitle: "Decision rule",
       reviewSummary: "Add an optional review trigger",
+      impulseQuestions: [
+        "Which decisions can one person make independently?",
+        "When do you want to consult each other before a decision?",
+        "How do you want to handle different assessments?",
+        "Which deadline or next step helps when a decision is still open?",
+      ],
+      suggestion: {
+        agreement:
+          "Record who decides in which situation and when you plan to consult each other.",
+        escalationRule:
+          "Define how you will proceed with an open decision, who takes the next step, and which deadline applies.",
+        reviewTrigger:
+          "Review the rule when decisions repeatedly remain open or responsibilities change.",
+      },
     },
     commitment_load: {
       question:
         "What level of time commitment and workload can each of you realistically take on right now?",
+      collectPlaceholder: "Describe your current availability, an expectation, or a boundary.",
       collectHelper:
         "A useful point names an expectation, boundary, or early signal. No justification is needed.",
       agreementTitle: "Commitment rule",
       reviewSummary: "Add an optional early warning signal",
+      impulseQuestions: [
+        "What level of availability is realistic for you right now?",
+        "Which expectations do you want to make transparent to each other?",
+        "How do you want to raise changes in workload?",
+        "What should be reprioritized when capacity changes?",
+      ],
+      suggestion: {
+        agreement:
+          "Record the availability and communication you currently agree on for this point.",
+        escalationRule:
+          "Define how you will adjust priorities, responsibilities, or timelines when capacity changes.",
+        reviewTrigger:
+          "Review the agreement when availability, workload, or circumstances change.",
+      },
     },
     collaboration_conflict: {
       question: "How do you want to handle disagreements, tension, or difficult situations?",
+      collectPlaceholder: "Describe what matters to you when giving feedback or disagreeing.",
       collectHelper: "Start with specific situations rather than long explanations.",
       agreementTitle: "Clarification rule",
       reviewSummary: "Add an optional early warning signal",
+      impulseQuestions: [
+        "How would you like to raise a disagreement?",
+        "What helps you give and receive feedback well?",
+        "When would a dedicated conversation be helpful?",
+        "How do you want to record open points after a conversation?",
+      ],
+      suggestion: {
+        agreement:
+          "Record how you want to raise and discuss disagreements or difficult situations.",
+        escalationRule:
+          "Define the conversation format or support you will use if a point remains open.",
+        reviewTrigger:
+          "Review the agreement if your current way of clarifying issues no longer meets your needs.",
+      },
     },
     ownership_risk: {
       question:
         "How do you want to clarify responsibility, ownership, and personal or financial risk between you?",
+      collectPlaceholder: "Describe a responsibility, uncertainty, or decision threshold.",
       collectHelper: "A useful point names the risk, the threshold, and who needs to be involved by then.",
       agreementTitle: "Risk ownership rule",
       reviewSummary: "Add an optional early warning signal",
+      impulseQuestions: [
+        "Which responsibility should one person take on independently?",
+        "Which uncertainties should become visible early?",
+        "From what point do you want to make a decision together?",
+        "When would additional professional advice be useful?",
+      ],
+      suggestion: {
+        agreement:
+          "Record who monitors or works on this point and when the other person will be involved.",
+        escalationRule:
+          "Define which change or threshold leads you to decide together or seek external advice.",
+        reviewTrigger:
+          "Review the agreement when impacts, uncertainty, or responsibilities change.",
+      },
     },
     values_guardrails: {
       question:
         "Which principles, boundaries, or priorities should guide you when making important decisions?",
+      collectPlaceholder: "Describe a principle, priority, or boundary that guides you.",
       collectHelper: "A useful point describes a real case rather than an abstract statement of values.",
       agreementTitle: "Guardrail rule",
       reviewSummary: "Add an optional review question",
+      impulseQuestions: [
+        "Which principles should guide your decisions?",
+        "Which priorities do you want to make visible in difficult trade-offs?",
+        "Which boundaries does each person want to name explicitly?",
+        "How do you want to handle new or ambiguous situations?",
+      ],
+      suggestion: {
+        agreement:
+          "Record which principle, priority, or boundary you want to agree on for this point.",
+        escalationRule:
+          "Define how you will discuss a situation when it affects your principles or boundaries differently.",
+        reviewTrigger:
+          "Review the agreement when new situations or changed circumstances call for another discussion.",
+      },
     },
     alignment_90_days: {
       question: "What do you want to focus on over the next 90 days?",
+      collectPlaceholder: "Describe a focus, an outcome, or something you intentionally will not prioritize.",
       collectHelper: "A useful point is a focus decision for the next phase, not a to-do.",
       agreementTitle: "90-day focus",
       reviewSummary: "Set a progress and review point",
+      impulseQuestions: [
+        "Which outcomes matter to you over the next 90 days?",
+        "Where do you want to focus your limited time?",
+        "Which topics should not run in parallel for now?",
+        "When and how do you want to review your focus?",
+      ],
+      suggestion: {
+        agreement:
+          "Record what you want to focus on over the next 90 days and which topics you do not want to pursue in parallel for now.",
+        escalationRule:
+          "Define how you will handle new topics and decide what to adjust or postpone in response.",
+        reviewTrigger:
+          "Review your focus at the agreed time or when goals, capacity, or circumstances change substantially.",
+      },
     },
   },
 };

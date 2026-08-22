@@ -99,18 +99,17 @@ test("toggle and panel chrome use localized messages", () => {
   }
 });
 
-test("question and matching impulse content remain direct source values", () => {
+test("locale-aware impulse content is normalized only before display or explicit use", () => {
   const panelSource = functionSource("WorkbookStepImpulsePanel", "WorkbookFounderAvatar");
 
-  assert.match(panelSource, /\{question\}/u);
-  assert.match(panelSource, /\{impulse\}/u);
-  assert.match(panelSource, /onClick=\{\(\) => onUseItem\(question\)\}/u);
-  assert.match(panelSource, /onClick=\{\(\) => onUseItem\(impulse\)\}/u);
-  assert.doesNotMatch(panelSource, /(?:\bt|\bwt|normalizeGermanText)\((?:question|impulse)\)/u);
+  assert.match(panelSource, /\{systemText\(question\)\}/u);
+  assert.match(panelSource, /\{systemText\(impulse\)\}/u);
+  assert.match(panelSource, /onClick=\{\(\) => onUseItem\(systemText\(question\)\)\}/u);
+  assert.match(panelSource, /onClick=\{\(\) => onUseItem\(systemText\(impulse\)\)\}/u);
   assert.doesNotMatch(panelSource, /onUseItem\(wt\(/u);
 
-  assert.match(impulseSource, /const STEP_QUESTIONS:/u);
-  assert.match(impulseSource, /const STEP_MATCHING_IMPULSES:/u);
+  assert.doesNotMatch(impulseSource, /const STEP_QUESTIONS:/u);
+  assert.doesNotMatch(impulseSource, /const STEP_MATCHING_IMPULSES:/u);
   assert.match(impulseSource, /export function buildWorkbookStepImpulseContent/u);
 });
 

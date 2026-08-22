@@ -97,14 +97,20 @@ test("premium field guidance has identical typed DE and EN structure", () => {
     assert.deepEqual(Object.keys(de[stepId]).sort(), [
       "agreementTitle",
       "collectHelper",
+      "collectPlaceholder",
+      "impulseQuestions",
       "question",
       "reviewSummary",
+      "suggestion",
     ]);
     assert.deepEqual(Object.keys(en[stepId]).sort(), [
       "agreementTitle",
       "collectHelper",
+      "collectPlaceholder",
+      "impulseQuestions",
       "question",
       "reviewSummary",
+      "suggestion",
     ]);
     for (const property of ["question", "collectHelper", "agreementTitle", "reviewSummary"] as const) {
       assert.notEqual(de[stepId][property].trim(), "", `empty German ${stepId}.${property}`);
@@ -112,7 +118,17 @@ test("premium field guidance has identical typed DE and EN structure", () => {
     }
   }
 
-  assert.deepEqual(en, expectedEnglishGuidance);
+  for (const stepId of premiumStepIds) {
+    assert.deepEqual(
+      {
+        question: en[stepId].question,
+        collectHelper: en[stepId].collectHelper,
+        agreementTitle: en[stepId].agreementTitle,
+        reviewSummary: en[stepId].reviewSummary,
+      },
+      expectedEnglishGuidance[stepId]
+    );
+  }
 });
 
 test("the active client renders only the approved field guidance from locale-aware content", () => {
@@ -128,11 +144,8 @@ test("the active client renders only the approved field guidance from locale-awa
   assert.doesNotMatch(clientSource, /currentPremiumV2Config\.question/u);
 });
 
-test("remaining yellow and red premium copy stays on the existing config path", () => {
+test("only still-unreleased premium copy stays on the existing config path", () => {
   for (const property of [
-    "collectPlaceholder",
-    "weightingIntro",
-    "ruleIntro",
     "signalOptions",
     "sharedInsightTitle",
     "pendingInsightTitle",
@@ -141,7 +154,8 @@ test("remaining yellow and red premium copy stays on the existing config path", 
     assert.match(clientSource, new RegExp(`${property}[?:]`, "u"), `missing config property ${property}`);
   }
 
-  assert.match(clientSource, /currentPremiumV2Config\.collectPlaceholder/u);
+  assert.match(clientSource, /currentPremiumFieldGuidance\.collectPlaceholder/u);
+  assert.doesNotMatch(clientSource, /currentPremiumV2Config\.collectPlaceholder/u);
   assert.match(clientSource, /workbookContent\.premiumWorkflow\.guidedFlow/u);
   assert.match(clientSource, /workbookContent\.premiumWorkflow\.reactionPresentation/u);
   assert.doesNotMatch(clientSource, /currentPremiumV2Config\.(?:collectIntro|weightingIntro|ruleIntro)/u);

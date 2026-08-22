@@ -106,7 +106,11 @@ test("the active premium client uses only locale-aware question and intro source
     /currentPremiumV2Config\.(?:question|collectIntro|weightingIntro|ruleIntro)/u
   );
 
-  assert.match(clientSource, /placeholder=\{t\(currentPremiumV2Config\.collectPlaceholder\)\}/u);
+  assert.match(
+    clientSource,
+    /placeholder=\{systemText\(currentPremiumFieldGuidance\.collectPlaceholder\)\}/u
+  );
+  assert.doesNotMatch(clientSource, /currentPremiumV2Config\.collectPlaceholder/u);
   assert.match(clientSource, /systemText\(currentPremiumFieldGuidance\.collectHelper\)/u);
   assert.match(clientSource, /workbookContent\.premiumWorkflow\.reactionPresentation/u);
 });

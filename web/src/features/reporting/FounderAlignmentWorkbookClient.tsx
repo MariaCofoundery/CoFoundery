@@ -42,7 +42,6 @@ import {
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
   sanitizeWorkbookStructuredOutputsByStep,
-  workbookContextIntro,
   workbookNextStepId,
   workbookPreviousStepId,
   workbookStepIndex,
@@ -780,113 +779,6 @@ function hasDecisionRulesWeightingForAllEntries(
   );
 }
 
-function buildWorkbookV2MatchingHint(
-  stepId: PremiumWorkbookV2StepId,
-  markerClass: FounderMatchingMarkerClass | null
-) {
-  if (stepId === "vision_direction") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Hier zieht ihr strategisch nicht automatisch in dieselbe Richtung. Ohne klare Prioritaetslinie entscheidet ihr Chancen jedes Mal neu.";
-      case "high_rule_need":
-        return "Gutes Verstaendnis reicht hier nicht. Ihr braucht eine klare Linie dafuer, was wirklich Vorrang hat und was bewusst liegen bleibt.";
-      case "conditional_complement":
-        return "Ihr bringt unterschiedliche Blickwinkel auf Fokus und Chancen mit. Das hilft euch, wenn klar ist, wann Wachstum zieht und wann ihr den Kern schuetzt.";
-      default:
-        return "Euer Matching zeigt hier Unterschiede darin, wie ihr Fokus haltet, Chancen bewertet und wann fuer euch ein Richtungswechsel wirklich Sinn ergibt.";
-    }
-  }
-
-  if (stepId === "roles_responsibility") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Hier koennen Fuehrung und Mitsicht schnell auseinanderlaufen. Ohne klare Ownership greift ihr zu spaet ein oder zieht Themen doppelt.";
-      case "high_rule_need":
-        return "Gutes Vertrauen reicht hier nicht. Ihr braucht klare Grenzen dafuer, was eigenstaendig laeuft und was frueh sichtbar werden muss.";
-      case "conditional_complement":
-        return "Ihr koennt euch gut ergaenzen, wenn klar ist, wer fuehrt und wann die andere Person nicht erst am Ende dazukommt.";
-      default:
-        return "Euer Matching zeigt Unterschiede darin, wie viel Eigenstaendigkeit, Mitsicht und Abstimmung ihr im Alltag braucht.";
-    }
-  }
-
-  if (stepId === "ownership_risk") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Hier setzt ihr Risikoschwellen unterschiedlich. Wenn ihr das nicht klaert, wird ein Thema oft erst sichtbar, wenn Tempo, Geld oder Haftung schon betroffen sind.";
-      case "high_rule_need":
-        return "Bei euch reicht gutes Gefuehl nicht. Ihr braucht klare Schwellen: was eine Person selbst fuehrt, was frueh sichtbar wird und wann ihr gemeinsam entscheidet.";
-      case "conditional_complement":
-        return "Ihr seht Risiken unterschiedlich frueh. Das kann stark sein, wenn eine Person Tempo halten kann und die andere rechtzeitig Absicherung reinbringt.";
-      default:
-        return "Euer Matching zeigt Unterschiede darin, wie frueh ihr Risiken seht, wie viel Unsicherheit ihr tragt und wann Absicherung Vorrang vor Tempo bekommt.";
-    }
-  }
-
-  if (stepId === "commitment_load") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Hier koennen Erwartungen an Einsatz und Verfuegbarkeit deutlich auseinandergehen. Ohne klare Transparenz entsteht schnell stiller Druck.";
-      case "high_rule_need":
-        return "Gute Absicht reicht hier nicht. Ihr braucht eine klare Regel dafuer, was realistisch ist und was passiert, wenn Kapazitaet kippt.";
-      case "conditional_complement":
-        return "Ihr bringt unterschiedliche Arbeitsrhythmen und Belastungsgrenzen mit. Das kann funktionieren, wenn Verfuegbarkeit und Repriorisierung klar sind.";
-      default:
-        return "Euer Matching zeigt Unterschiede darin, wie ihr Einsatz, Tempo und Belastung im Alltag lest. Dieser Schritt macht daraus eine realistische Arbeitsbasis.";
-    }
-  }
-
-  if (stepId === "values_guardrails") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Hier koennen rote Linien unterschiedlich liegen. Unter Druck wird das gefaehrlich, wenn wirtschaftlich attraktive Faelle still weiterlaufen.";
-      case "high_rule_need":
-        return "Gute Werte reichen hier nicht. Ihr braucht eine klare Leitplanke dafuer, was tragbar ist, was bewusste Freigabe braucht und was ihr nicht macht.";
-      case "conditional_complement":
-        return "Ihr koennt euch gut ergaenzen, wenn eine Person Chancen sieht und die andere Grenzen frueh benennt. Stark wird das erst mit klaren Grauzonen.";
-      default:
-        return "Euer Matching zeigt, wie ihr Kompromisse, Druck und unternehmerische Grenzen lest. Dieser Schritt macht daraus eine gemeinsame Linie.";
-    }
-  }
-
-  if (stepId === "alignment_90_days") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Euer Workbook hat wichtige Klaerungspunkte sichtbar gemacht. Jetzt geht es darum, daraus einen klaren 90-Tage-Fokus zu machen und Nebenbaustellen bewusst zu stoppen.";
-      case "high_rule_need":
-        return "Ihr habt mehrere Felder, die Fuehrung brauchen. Dieser Schritt setzt daraus eine kurze, verbindliche Linie fuer die naechsten 90 Tage.";
-      case "conditional_complement":
-        return "Eure Unterschiede koennen euch breiter machen. Fuer die naechsten 90 Tage braucht ihr trotzdem eine klare Auswahl, worauf Energie geht und was wartet.";
-      default:
-        return "Ihr habt eure Zusammenarbeit geklaert. Jetzt uebersetzt ihr das in Fokus, Nicht-Fokus und einen pruefbaren Review-Moment fuer die naechsten 90 Tage.";
-    }
-  }
-
-  if (stepId === "collaboration_conflict") {
-    switch (markerClass) {
-      case "critical_clarification_point":
-        return "Wenn Reibung hier liegen bleibt, zieht sie sich schnell durch andere Themen. Ihr braucht eine klare Form fuer Feedback und Klaerung.";
-      case "high_rule_need":
-        return "Gute Absicht reicht hier nicht. Ihr braucht klare Spielregeln dafuer, wann ihr Dinge ansprecht und wann ihr sie aus dem Tagesgeschaeft herausnehmt.";
-      case "conditional_complement":
-        return "Ihr bringt unterschiedliche Konflikt- und Abstimmungsstile mit. Das hilft euch nur dann, wenn Timing und Form der Klaerung klar sind.";
-      default:
-        return "Euer Matching zeigt hier Unterschiede darin, wie direkt ihr Feedback gebt, wie viel Abstimmung ihr braucht und wann Reibung wirklich geklaert werden muss.";
-    }
-  }
-
-  switch (markerClass) {
-    case "critical_clarification_point":
-      return "Hier braucht ihr eine klare Entscheidungsgrenze. Sonst kippt Druck schnell in Blockade oder Rueckzug.";
-    case "high_rule_need":
-      return "In diesem Feld reicht gutes Verstaendnis nicht. Ihr braucht eine Regel, die auch unter Druck traegt.";
-    case "conditional_complement":
-      return "Ihr bringt unterschiedliche Staerken in Entscheidungen ein. Das hilft nur dann, wenn klar ist, wann Tempo und wann Absicherung fuehrt.";
-    default:
-      return "An diesem Punkt zeigt euer Matching, wie unterschiedlich ihr Tempo, Risiko und Verantwortung in Entscheidungen lest.";
-  }
-}
-
 function formatDiscussionTimestamp(value: string) {
   if (!value || value === LEGACY_WORKSPACE_TIMESTAMP) {
     return "Vorhandener Stand";
@@ -1003,173 +895,27 @@ function countDiscussionEntryReactions(
 }
 
 function buildWorkbookV2Suggestion(params: {
-  stepId: PremiumWorkbookV2StepId;
   workspace: FounderAlignmentWorkbookStepWorkspaceV2;
-  founderALabel: string;
-  founderBLabel: string;
+  suggestion: {
+    agreement: string;
+    escalationRule: string;
+    reviewTrigger: string;
+  };
+  guidance: {
+    furtherDiscussion: string;
+    differentResponses: string;
+  };
 }) {
-  const hasFounderA = hasDecisionRulesPerspective(params.workspace, "founderA");
-  const hasFounderB = hasDecisionRulesPerspective(params.workspace, "founderB");
-  const reactionGuidance = getWorkbookReactionSuggestionGuidance(params.workspace);
-  const withReactionGuidance = (suggestion: string) =>
-    reactionGuidance ? `${suggestion} ${reactionGuidance}` : suggestion;
-
-  if (params.stepId === "vision_direction") {
-    const agreement = withReactionGuidance(
-      "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Neue Chancen verfolgt ihr nur weiter, wenn sie klar zu eurer Richtung passen und nicht nur kurzfristig attraktiv wirken."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn eine Chance oder Richtungsveraenderung unterschiedlich gelesen wird, stoppt ihr zuerst den Zug zum lauteren Thema und legt fest, wann ${params.founderALabel} und ${params.founderBLabel} die Prioritaet gemeinsam neu pruefen.`
-        : "Wenn eine Chance attraktiv wirkt, eure Richtung aber unscharf wird, stoppt ihr sie zuerst und legt direkt fest, wann ihr die Prioritaet gemeinsam neu prueft.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Linie neu, wenn neue Chancen haeufig zu Richtungswechseln fuehren oder Prioritaeten immer wieder neu verhandelt werden.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "roles_responsibility") {
-    const agreement = withReactionGuidance(
-      "Jedes zentrale Thema hat eine fuehrende Person. Diese Person entscheidet im eigenen Bereich eigenstaendig und teilt frueh, was fuer die andere Person relevant wird."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn Ownership unklar wird oder ein Thema beide Bereiche beruehrt, stoppt ihr stille Weiterarbeit und legt fest, ob ${params.founderALabel}, ${params.founderBLabel} oder ihr beide die Fuehrung fuer den naechsten Schritt uebernehmt.`
-        : "Wenn Ownership unklar wird oder ein Thema beide Bereiche beruehrt, stoppt ihr stille Weiterarbeit und legt zuerst die Fuehrung fuer den naechsten Schritt fest.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Regel neu, wenn unklar bleibt, wer fuehrt, wer mitreden muss oder was frueh geteilt werden sollte.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "ownership_risk") {
-    const agreement = withReactionGuidance(
-      "Bis zur vereinbarten Schwelle fuehrt die verantwortliche Person das Risiko selbst. Sobald die Auswirkung groesser wird oder eine feste Schwelle erreicht ist, macht ihr es frueh fuer beide sichtbar und entscheidet gemeinsam ueber den naechsten Schritt."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn ein Risiko unterschiedlich gelesen wird oder eine Schwelle erreicht, stoppt ihr die stille Weiterarbeit, benennt die betroffene Folge und legt fest, ob ${params.founderALabel}, ${params.founderBLabel} oder ihr beide bis wann entscheidet.`
-        : "Wenn ein Risiko kritisch wird oder unterschiedlich gelesen bleibt, stoppt ihr die stille Weiterarbeit und legt direkt fest, wer bis wann gemeinsam entscheidet.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Regel neu, wenn ein Risiko zu lange bei einer Person bleibt oder erst unter Druck auf den gemeinsamen Tisch kommt.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "commitment_load") {
-    const agreement = withReactionGuidance(
-      "Einsatz und Verfuegbarkeit werden realistisch zugesagt. Wenn Kapazitaet, Reaktionszeit oder Fokus sichtbar kippen, macht die betroffene Person das frueh transparent und ihr prueft gemeinsam die Prioritaeten."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn Kapazitaet kippt, sortieren ${params.founderALabel} und ${params.founderBLabel} zuerst die laufenden Prioritaeten neu: was bleibt, was wartet und was aktiv abgesagt oder uebergeben wird.`
-        : "Wenn Kapazitaet kippt, sortiert ihr zuerst die laufenden Prioritaeten neu: was bleibt, was wartet und was aktiv abgesagt oder uebergeben wird.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Regel neu, wenn Verfuegbarkeit, Tempo oder Belastung immer wieder neu verhandelt werden muessen.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "values_guardrails") {
-    const agreement = withReactionGuidance(
-      "Fuer diesen Punkt haltet ihr die Formulierung fest, die ihr beide ausdruecklich vereinbaren moechtet. Offene Aspekte besprecht ihr, bevor ihr die Fassung bestaetigt."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn ein wirtschaftlich attraktiver Fall eure Leitplanke beruehrt, entscheiden ${params.founderALabel} und ${params.founderBLabel} nicht still weiter. Ihr benennt zuerst die Grenze, die betroffen ist, und legt dann gemeinsam fest, ob ihr ablehnt, begrenzt oder bewusst freigebt.`
-        : "Wenn ein wirtschaftlich attraktiver Fall eure Leitplanke beruehrt, entscheidet ihr nicht still weiter. Ihr benennt zuerst die betroffene Grenze und legt dann gemeinsam fest, ob ihr ablehnt, begrenzt oder bewusst freigebt.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Leitplanke neu, wenn wirtschaftlicher Druck eure Grenzen unscharf macht oder Entscheidungen haeufig als Ausnahme begruendet werden.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "alignment_90_days") {
-    const agreement = withReactionGuidance(
-      "Fuer die naechsten 90 Tage haltet ihr konkret fest, welche Prioritaet ihr gemeinsam vereinbart und welche Themen vorerst nicht parallel laufen. Neue Themen nehmt ihr nur nach einer ausdruecklichen gemeinsamen Entscheidung auf."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Nicht parallel mitlaufen laesst ihr alles, was euren Fokus verwischt oder Kapazitaet bindet, ohne die 90-Tage-Prioritaet zu staerken. Wenn ein neues Thema rein soll, entscheiden ${params.founderALabel} und ${params.founderBLabel} zuerst, was dafuer runtergeht.`
-        : "Nicht parallel mitlaufen lasst ihr alles, was euren Fokus verwischt oder Kapazitaet bindet, ohne die 90-Tage-Prioritaet zu staerken. Wenn ein neues Thema rein soll, entscheidet ihr zuerst, was dafuer runtergeht.";
-
-    const reviewTrigger =
-      "Ihr prueft den Fortschritt spaetestens nach 90 Tagen und frueher, wenn Prioritaeten wieder nebeneinander statt nacheinander laufen.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  if (params.stepId === "collaboration_conflict") {
-    const agreement = withReactionGuidance(
-      "Wenn etwas stoert, sprecht ihr es frueh und direkt an. Wenn im laufenden Austausch keine saubere Klaerung entsteht, legt ihr zeitnah ein eigenes Gespraech dafuer fest."
-    );
-
-    const escalationRule =
-      hasFounderA && hasFounderB
-        ? `Wenn ein Thema im Alltag nicht geloest wird, benennt ihr noch im selben Termin, was offen ist, und legt fest, wann ${params.founderALabel} und ${params.founderBLabel} es in einem eigenen Klaerungsrahmen besprechen.`
-        : "Wenn ein Thema im Alltag nicht sauber geloest wird, nehmt ihr es aus dem laufenden Geschaeft heraus und legt direkt einen festen Klaerungstermin fest.";
-
-    const reviewTrigger =
-      "Ihr prueft diese Regel neu, wenn Kritik zu spaet kommt, zwischen den Zeilen landet oder ein Thema mehrfach offen bleibt.";
-
-    return {
-      agreement,
-      escalationRule,
-      reviewTrigger,
-    };
-  }
-
-  const agreement = withReactionGuidance(
-    "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet die fuehrende Person. Sobald Risiko, Budget oder Aussenwirkung groesser werden, zieht ihr die andere Person frueh dazu und entscheidet gemeinsam bis zu einer festen Frist."
+  const reactionGuidance = getWorkbookReactionSuggestionGuidance(
+    params.workspace,
+    params.guidance
   );
 
-  const escalationRule =
-    hasFounderA && hasFounderB
-      ? `Wenn ihr euch in einer Entscheidung festfahrt, stoppt ihr die Schleife, benennt die offene Frage und legt noch im selben Termin fest, ob ${params.founderALabel}, ${params.founderBLabel} oder ihr beide gemeinsam bis wann entscheidet.`
-      : "Wenn eine Entscheidung offen bleibt oder Zeitdruck steigt, stoppt ihr die Schleife sofort und legt eine klare Frist fuer die finale Entscheidung fest.";
-
-  const reviewTrigger =
-    "Ihr prueft diese Regel neu, wenn Entscheidungen zu lange offen bleiben oder im Nachgang wieder aufgemacht werden.";
-
   return {
-    agreement,
-    escalationRule,
-    reviewTrigger,
+    ...params.suggestion,
+    agreement: reactionGuidance
+      ? `${params.suggestion.agreement} ${reactionGuidance}`
+      : params.suggestion.agreement,
   };
 }
 
@@ -1461,13 +1207,18 @@ export function FounderAlignmentWorkbookClient({
     currentStructuredStepId != null ? effectiveStepMarkersByStep[currentStructuredStepId] ?? null : null;
   const currentStepImpulseContent = useMemo(
     () =>
-      currentPremiumV2StepId
+      currentPremiumFieldGuidance
         ? buildWorkbookStepImpulseContent(
-            currentPremiumV2StepId,
+            currentPremiumFieldGuidance.impulseQuestions,
+            workbookContent.premiumWorkflow.markerImpulses,
             currentStepMarker?.markerClass ?? null
           )
         : null,
-    [currentPremiumV2StepId, currentStepMarker?.markerClass]
+    [
+      currentPremiumFieldGuidance,
+      currentStepMarker?.markerClass,
+      workbookContent.premiumWorkflow.markerImpulses,
+    ]
   );
   const currentStepEntry = workbook.steps[currentStep.id];
   const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
@@ -1562,13 +1313,12 @@ export function FounderAlignmentWorkbookClient({
     () =>
       decisionRulesWorkspace && currentPremiumV2StepId
         ? buildWorkbookV2Suggestion({
-            stepId: currentPremiumV2StepId,
             workspace: decisionRulesWorkspace,
-            founderALabel,
-            founderBLabel,
+            suggestion: workbookContent.premiumSteps[currentPremiumV2StepId].suggestion,
+            guidance: workbookContent.premiumWorkflow.suggestionGuidance,
           })
         : null,
-    [decisionRulesWorkspace, currentPremiumV2StepId, founderALabel, founderBLabel]
+    [decisionRulesWorkspace, currentPremiumV2StepId, workbookContent]
   );
   const decisionRulesThreadGroups = useMemo(
     () => (decisionRulesWorkspace ? buildDiscussionThreadGroups(decisionRulesWorkspace) : []),
@@ -1580,7 +1330,9 @@ export function FounderAlignmentWorkbookClient({
   );
   const decisionRulesMatchingHint =
     currentPremiumV2StepId != null
-      ? buildWorkbookV2MatchingHint(currentPremiumV2StepId, currentStepMarker?.markerClass ?? null)
+      ? workbookContent.premiumWorkflow.matchingHints[
+          currentStepMarker?.markerClass ?? "default"
+        ]
       : "";
   const decisionRulesEscalationValue =
     currentStepStructuredOutputs?.escalationRule?.trim() ?? "";
@@ -1768,9 +1520,9 @@ export function FounderAlignmentWorkbookClient({
   const workbookV2SharedSpaceHint =
     currentUserRole === "founderA" || currentUserRole === "founderB"
       ? isCollaborativeMode
-        ? "Ihr arbeitet im selben Raum. Eigene Punkte bleiben editierbar, fremde Punkte koennt ihr einordnen, ergaenzen oder als Basis fuer einen eigenen Punkt nutzen."
-        : "Du startest mit deinem ersten Stand im gemeinsamen Raum. Die andere Person sieht ihn hier, ordnet ihn spaeter ein und ergaenzt eigene Punkte mit eigener Autorenschaft."
-      : "Hier siehst du, welche Punkte die Founder bisher festgehalten haben. Die Beitraege bleiben pro Person sichtbar.";
+        ? workbookContent.premiumWorkflow.sharedSpace.collaborativeFounder
+        : workbookContent.premiumWorkflow.sharedSpace.soloFounder
+      : workbookContent.premiumWorkflow.sharedSpace.advisor;
   const workbookV2ReactionCounts = decisionRulesWorkspace
     ? countWorkbookReactionPresentationStates(decisionRulesWorkspace)
     : { similar: 0, different: 0, open: 0 };
@@ -2525,13 +2277,19 @@ export function FounderAlignmentWorkbookClient({
       return;
     }
 
+    const localizedSuggestion = {
+      agreement: systemText(decisionRulesSuggestion.agreement),
+      escalationRule: systemText(decisionRulesSuggestion.escalationRule),
+      reviewTrigger: systemText(decisionRulesSuggestion.reviewTrigger),
+    };
+
     const nextStructuredOutputs = sanitizeWorkbookStructuredOutputsByStep(activeStepId, {
       ...(currentStepEntry.structuredOutputs ?? {}),
       [activeStepId]: {
         ...(getWorkbookStepStructuredOutputs(currentStepEntry, activeStepId) ?? {}),
-        operatingRule: decisionRulesSuggestion.agreement,
-        escalationRule: decisionRulesSuggestion.escalationRule,
-        reviewTrigger: decisionRulesSuggestion.reviewTrigger,
+        operatingRule: localizedSuggestion.agreement,
+        escalationRule: localizedSuggestion.escalationRule,
+        reviewTrigger: localizedSuggestion.reviewTrigger,
       },
     });
 
@@ -2546,7 +2304,7 @@ export function FounderAlignmentWorkbookClient({
         ...current.steps,
         [activeStepId]: {
           ...current.steps[activeStepId],
-          agreement: decisionRulesSuggestion.agreement,
+          agreement: localizedSuggestion.agreement,
           structuredOutputs: nextStructuredOutputs,
           founderAApproved: false,
           founderBApproved: false,
@@ -3218,7 +2976,11 @@ export function FounderAlignmentWorkbookClient({
                   {founderALabel} x {founderBLabel}
                 </p>
                 <p className="mt-4 text-[15px] leading-8 text-slate-700">
-                  {t(workbookContextIntro(teamContext))}
+                  {wt(
+                    teamContext === "existing_team"
+                      ? "print.contextIntro.existingTeam"
+                      : "print.contextIntro.preFounder"
+                  )}
                 </p>
               </div>
 
@@ -3814,7 +3576,7 @@ export function FounderAlignmentWorkbookClient({
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStepTitle}</h2>
                     {!isAdvisorViewer ? (
                       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-                        {t("Erst legt ihr die Punkte auf den Tisch. Danach haltet ihr fest, was künftig klar gelten soll.")}
+                        {wt("client.premium.intro.founder")}
                       </p>
                     ) : null}
                     {currentStepIsPrioritized ? (
@@ -4339,7 +4101,7 @@ export function FounderAlignmentWorkbookClient({
                         </p>
                         {decisionRulesMatchingHint ? (
                           <p className="mt-1 text-xs leading-5 text-slate-500">
-                            {t(decisionRulesMatchingHint)}
+                            {systemText(decisionRulesMatchingHint)}
                           </p>
                         ) : null}
                       </div>
@@ -4425,6 +4187,7 @@ export function FounderAlignmentWorkbookClient({
                     id={`workbook-impulses-${currentStep.id}`}
                     questions={currentStepImpulseContent.questions}
                     matchingImpulses={currentStepImpulseContent.matchingImpulses}
+                    matchingIntro={workbookContent.premiumWorkflow.markerImpulseIntro}
                     canUse={currentUserRole === "founderA" || currentUserRole === "founderB"}
                     onUseItem={useWorkbookImpulseAsDraft}
                     className="mt-4"
@@ -4436,13 +4199,13 @@ export function FounderAlignmentWorkbookClient({
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
                       <div className="max-w-3xl">
                         <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                          {t(currentPremiumV2Config.collectTitle ?? "1. Denkraum")}
+                          {systemText(workbookContent.premiumWorkflow.sectionTitles.collect)}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-slate-700">
                           {systemText(guidedFlow.collectIntro)}
                         </p>
                         <p className="mt-2 text-xs leading-6 text-slate-500">
-                          {t(workbookV2SharedSpaceHint)}
+                          {systemText(workbookV2SharedSpaceHint)}
                         </p>
                       </div>
                       <div className="flex flex-col items-start gap-1 sm:items-end">
@@ -4481,7 +4244,7 @@ export function FounderAlignmentWorkbookClient({
                             ref={discussionTextareaRef}
                             value={currentDiscussionDraft}
                             onChange={(event) => setDiscussionDraft(event.target.value)}
-                            placeholder={t(currentPremiumV2Config.collectPlaceholder)}
+                            placeholder={systemText(currentPremiumFieldGuidance.collectPlaceholder)}
                             readOnly={currentUserRole !== "founderA" && currentUserRole !== "founderB"}
                             rows={3}
                             className={`w-full rounded-2xl border px-4 py-3 text-sm leading-7 outline-none transition ${
@@ -4572,7 +4335,7 @@ export function FounderAlignmentWorkbookClient({
                   <section className={`mt-6 rounded-[30px] border p-6 sm:p-7 ${currentToneMeta.weightSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
+                        {systemText(workbookContent.premiumWorkflow.sectionTitles.weighting)}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-700">
                         {systemText(guidedFlow.weightingIntro)}
@@ -4652,7 +4415,7 @@ export function FounderAlignmentWorkbookClient({
                   <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t(currentPremiumV2Config.ruleTitle ?? "3. Gemeinsame Regel")}
+                        {systemText(workbookContent.premiumWorkflow.sectionTitles.rule)}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-700">
                         {systemText(guidedFlow.ruleIntro)}
@@ -4664,13 +4427,13 @@ export function FounderAlignmentWorkbookClient({
                         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                           <div className="max-w-3xl">
                             <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                              {t("Entwurf fuer eure Absprache")}
+                              {systemText(workbookContent.premiumWorkflow.suggestionPresentation.title)}
                             </p>
                             <p className="mt-2 text-sm leading-7 text-slate-700">
-                              {t(decisionRulesSuggestion.agreement)}
+                              {systemText(decisionRulesSuggestion.agreement)}
                             </p>
                             <p className="mt-2 text-xs leading-6 text-slate-500">
-                              {t("Nutzt diesen Entwurf als Startpunkt und schaerft eure eigentliche Entscheidung direkt darunter.")}
+                              {systemText(workbookContent.premiumWorkflow.suggestionPresentation.intro)}
                             </p>
                           </div>
                           <ReportActionButton
@@ -4679,7 +4442,7 @@ export function FounderAlignmentWorkbookClient({
                             disabled={decisionRulesWorkspace.entries.length === 0}
                             className="shrink-0"
                           >
-                            {t("Als Startpunkt uebernehmen")}
+                            {systemText(workbookContent.premiumWorkflow.suggestionPresentation.applyButton)}
                           </ReportActionButton>
                         </div>
                       </div>
@@ -4688,7 +4451,7 @@ export function FounderAlignmentWorkbookClient({
                     <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="max-w-3xl">
                         <p className="text-xs leading-6 text-slate-500">
-                          {t("Jetzt verdichtet ihr die sichtbaren Punkte zu einer Fassung, nach der ihr im Alltag wirklich arbeiten wollt.")}
+                          {systemText(workbookContent.premiumWorkflow.ruleFields.editingIntro)}
                         </p>
                       </div>
                     </div>
@@ -4706,7 +4469,7 @@ export function FounderAlignmentWorkbookClient({
                       <textarea
                         value={currentStepEntry.agreement}
                         onChange={(event) => updateDecisionRulesAgreement(event.target.value)}
-                        placeholder={t(currentPremiumV2Config.agreementPlaceholder)}
+                        placeholder={systemText(workbookContent.premiumWorkflow.ruleFields.agreementPlaceholder)}
                         rows={currentPremiumV2IsLight ? 3 : 4}
                         readOnly={!canEditField("agreement")}
                         className={`mt-4 w-full rounded-2xl border px-4 py-4 text-sm leading-7 outline-none transition ${
@@ -4721,13 +4484,13 @@ export function FounderAlignmentWorkbookClient({
 
                     <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)]">
                       <WorkbookField
-                        title={t(currentPremiumV2Config.escalationTitle)}
+                        title={systemText(workbookContent.premiumWorkflow.ruleFields.escalationTitle)}
                         value={decisionRulesEscalationValue}
                         onChange={(value) => updateStructuredOutput("escalationRule", value)}
-                        placeholder={t(currentPremiumV2Config.escalationPlaceholder)}
+                        placeholder={systemText(workbookContent.premiumWorkflow.ruleFields.escalationPlaceholder)}
                         highlight
                         readOnly={!canEditStructuredOutputs()}
-                        helperText={t(currentPremiumV2Config.escalationHelper)}
+                        helperText={systemText(workbookContent.premiumWorkflow.ruleFields.escalationHelper)}
                         rows={currentPremiumV2IsLight ? 3 : 4}
                         minHeightClassName={currentPremiumV2IsLight ? "min-h-[112px]" : "min-h-[132px]"}
                       />
@@ -4737,12 +4500,12 @@ export function FounderAlignmentWorkbookClient({
                         </summary>
                         <div className="mt-4">
                           <WorkbookField
-                            title={t(currentPremiumV2Config.reviewTitle)}
+                            title={systemText(workbookContent.premiumWorkflow.ruleFields.reviewTitle)}
                             value={decisionRulesReviewTriggerValue}
                             onChange={(value) => updateStructuredOutput("reviewTrigger", value)}
-                            placeholder={t(currentPremiumV2Config.reviewPlaceholder)}
+                            placeholder={systemText(workbookContent.premiumWorkflow.ruleFields.reviewPlaceholder)}
                             readOnly={!canEditStructuredOutputs()}
-                            helperText={t(currentPremiumV2Config.reviewHelper)}
+                            helperText={systemText(workbookContent.premiumWorkflow.ruleFields.reviewHelper)}
                             rows={currentPremiumV2IsLight ? 3 : 4}
                             minHeightClassName={currentPremiumV2IsLight ? "min-h-[112px]" : "min-h-[132px]"}
                           />
@@ -4808,12 +4571,12 @@ export function FounderAlignmentWorkbookClient({
                     </div>
                     <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/88 p-4">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Finale Absprache in dieser Dimension")}
+                        {systemText(workbookContent.premiumWorkflow.ruleFields.currentAgreementTitle)}
                       </p>
                       <p className="mt-3 text-sm leading-7 text-slate-700">
                         {currentStepEntry.agreement.trim().length > 0
                           ? currentStepEntry.agreement
-                          : t("Noch keine finale Absprache sichtbar.")}
+                          : systemText(workbookContent.premiumWorkflow.ruleFields.emptyAgreementText)}
                       </p>
                     </div>
                   </section>
@@ -5392,6 +5155,7 @@ function WorkbookStepImpulsePanel({
   id,
   questions,
   matchingImpulses,
+  matchingIntro,
   canUse,
   onUseItem,
   className = "",
@@ -5399,11 +5163,14 @@ function WorkbookStepImpulsePanel({
   id: string;
   questions: string[];
   matchingImpulses: string[];
+  matchingIntro: string;
   canUse: boolean;
   onUseItem: (value: string) => void;
   className?: string;
 }) {
   const wt = useTranslations("workbook");
+  const locale = useLocale();
+  const systemText = (text: string) => normalizeWorkbookSystemText(text, locale);
 
   return (
     <section
@@ -5436,7 +5203,7 @@ function WorkbookStepImpulsePanel({
               <button
                 key={question}
                 type="button"
-                onClick={() => onUseItem(question)}
+                onClick={() => onUseItem(systemText(question))}
                 disabled={!canUse}
                 className={`w-full rounded-[20px] border px-4 py-3 text-left text-sm leading-6 transition ${
                   canUse
@@ -5444,7 +5211,7 @@ function WorkbookStepImpulsePanel({
                     : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
                 }`}
               >
-                {question}
+                {systemText(question)}
               </button>
             ))}
           </div>
@@ -5460,14 +5227,14 @@ function WorkbookStepImpulsePanel({
             </span>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-700">
-            {t("Diese Denkstoesse greifen die Dynamik auf, die fuer diesen Schritt bei euch gerade besonders relevant ist.")}
+            {systemText(matchingIntro)}
           </p>
           <div className="mt-3 grid gap-2.5">
             {matchingImpulses.map((impulse) => (
               <button
                 key={impulse}
                 type="button"
-                onClick={() => onUseItem(impulse)}
+                onClick={() => onUseItem(systemText(impulse))}
                 disabled={!canUse}
                 className={`w-full rounded-[20px] border px-4 py-3 text-left text-sm leading-6 transition ${
                   canUse
@@ -5475,7 +5242,7 @@ function WorkbookStepImpulsePanel({
                     : "cursor-not-allowed border-slate-200/70 bg-slate-100/80 text-slate-500"
                 }`}
               >
-                {impulse}
+                {systemText(impulse)}
               </button>
             ))}
           </div>

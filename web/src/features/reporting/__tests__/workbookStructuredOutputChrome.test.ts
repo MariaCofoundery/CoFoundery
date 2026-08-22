@@ -158,5 +158,9 @@ test("structured founder values and persistence paths remain free of chrome mess
   assert.doesNotMatch(updateSource, /client\.premium\.structured/u);
   assert.doesNotMatch(suggestionSource, /client\.premium\.structured/u);
   assert.match(updateSource, /\[field\]: value/u);
-  assert.match(suggestionSource, /operatingRule: decisionRulesSuggestion\.agreement/u);
+  assert.match(suggestionSource, /operatingRule: localizedSuggestion\.agreement/u);
+  assert.match(
+    suggestionSource,
+    /agreement: systemText\(decisionRulesSuggestion\.agreement\)/u
+  );
 });

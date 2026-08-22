@@ -1,13 +1,12 @@
 import type { FounderAlignmentWorkbookStepWorkspaceV2 } from "@/features/reporting/founderAlignmentWorkbook";
 import { getWorkbookReactionObservation } from "@/features/reporting/workbookReactionObservation";
 
-const FURTHER_DISCUSSION_GUIDANCE =
-  "Punkte, die mindestens eine Person weiter klaeren moechte, besprecht ihr vor einer endgueltigen Fassung erneut und haltet fest, was noch offen ist.";
-const DIFFERENT_REACTIONS_GUIDANCE =
-  "Unterschiedlich eingeordnete Punkte besprecht ihr vor einer endgueltigen Fassung und haltet fest, was jede Person fuer die Vereinbarung braucht.";
-
 export function getWorkbookReactionSuggestionGuidance(
-  workspace: FounderAlignmentWorkbookStepWorkspaceV2
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  copy: {
+    furtherDiscussion: string;
+    differentResponses: string;
+  }
 ): string | null {
   let hasDifferentCurrentReactions = false;
 
@@ -15,7 +14,7 @@ export function getWorkbookReactionSuggestionGuidance(
     const observation = getWorkbookReactionObservation(workspace.reactions, entry.id);
 
     if (observation.hasFurtherDiscussion) {
-      return FURTHER_DISCUSSION_GUIDANCE;
+      return copy.furtherDiscussion;
     }
 
     if (observation.comparison === "different") {
@@ -23,5 +22,5 @@ export function getWorkbookReactionSuggestionGuidance(
     }
   }
 
-  return hasDifferentCurrentReactions ? DIFFERENT_REACTIONS_GUIDANCE : null;
+  return hasDifferentCurrentReactions ? copy.differentResponses : null;
 }

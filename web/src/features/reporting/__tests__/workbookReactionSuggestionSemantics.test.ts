@@ -9,6 +9,7 @@ import {
   type FounderAlignmentWorkbookStepWorkspaceV2,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { getWorkbookReactionSuggestionGuidance } from "@/features/reporting/workbookReactionSuggestion";
+import { getWorkbookContent } from "@/features/reporting/workbookContent/workbookContent";
 
 const root = process.cwd();
 const clientSource = fs.readFileSync(
@@ -31,6 +32,7 @@ const premiumStepIds = [
   "values_guardrails",
   "alignment_90_days",
 ] as const;
+const suggestionGuidance = getWorkbookContent("de").premiumWorkflow.suggestionGuidance;
 
 function reaction(
   userId: "founderA" | "founderB",
@@ -69,18 +71,23 @@ function workspace(
 
 test("legacy reactions do not create current suggestion meaning", () => {
   assert.equal(
-    getWorkbookReactionSuggestionGuidance(workspace([reaction("founderA", "critical")])),
-    null
-  );
-  assert.equal(
     getWorkbookReactionSuggestionGuidance(
-      workspace([reaction("founderA", "agree"), reaction("founderB", "agree")])
+      workspace([reaction("founderA", "critical")]),
+      suggestionGuidance
     ),
     null
   );
   assert.equal(
     getWorkbookReactionSuggestionGuidance(
-      workspace([reaction("founderA", "important"), reaction("founderB", "important")])
+      workspace([reaction("founderA", "agree"), reaction("founderB", "agree")]),
+      suggestionGuidance
+    ),
+    null
+  );
+  assert.equal(
+    getWorkbookReactionSuggestionGuidance(
+      workspace([reaction("founderA", "important"), reaction("founderB", "important")]),
+      suggestionGuidance
     ),
     null
   );
@@ -88,10 +95,12 @@ test("legacy reactions do not create current suggestion meaning", () => {
 
 test("current further-discussion reactions produce only neutral guidance", () => {
   const guidance = getWorkbookReactionSuggestionGuidance(
-    workspace([reaction("founderA", "critical", true)])
+    workspace([reaction("founderA", "critical", true)]),
+    suggestionGuidance
   );
 
-  assert.match(guidance ?? "", /weiter klaeren/u);
+  assert.equal(guidance, suggestionGuidance.furtherDiscussion);
+  assert.match(guidance ?? "", /Klaerungsbedarf/u);
   assert.match(guidance ?? "", /was noch offen ist/u);
   assert.doesNotMatch(guidance ?? "", forbiddenSeverity);
 });
@@ -102,7 +111,8 @@ test("current same and different reactions remain descriptive", () => {
       workspace([
         reaction("founderA", "agree", true),
         reaction("founderB", "agree", true),
-      ])
+      ]),
+      suggestionGuidance
     ),
     null
   );
@@ -111,7 +121,8 @@ test("current same and different reactions remain descriptive", () => {
       workspace([
         reaction("founderA", "important", true),
         reaction("founderB", "important", true),
-      ])
+      ]),
+      suggestionGuidance
     ),
     null
   );
@@ -120,15 +131,18 @@ test("current same and different reactions remain descriptive", () => {
     workspace([
       reaction("founderA", "important", true),
       reaction("founderB", "agree", true),
-    ])
+    ]),
+    suggestionGuidance
   );
-  assert.match(different ?? "", /Unterschiedlich eingeordnete Punkte/u);
+  assert.equal(different, suggestionGuidance.differentResponses);
+  assert.match(different ?? "", /unterschiedlich eingeordnete Punkte/u);
   assert.doesNotMatch(different ?? "", /gemeinsam getragen|gemeinsame Position/iu);
 });
 
 test("all premium steps share the neutral current-critical guidance", () => {
   const guidance = getWorkbookReactionSuggestionGuidance(
-    workspace([reaction("founderA", "critical", true)])
+    workspace([reaction("founderA", "critical", true)]),
+    suggestionGuidance
   );
 
   for (const stepId of premiumStepIds) {
@@ -140,11 +154,11 @@ test("all premium steps share the neutral current-critical guidance", () => {
 test("the active builder uses observations without legacy shared or severity branches", () => {
   assert.notEqual(builderStart, -1);
   assert.notEqual(builderEnd, -1);
-  assert.match(builderSource, /getWorkbookReactionSuggestionGuidance\(params\.workspace\)/u);
-  assert.equal(
-    [...builderSource.matchAll(/const agreement = withReactionGuidance\(/gu)].length,
-    premiumStepIds.length
+  assert.match(
+    builderSource,
+    /getWorkbookReactionSuggestionGuidance\(\s*params\.workspace,\s*params\.guidance\s*\)/u
   );
+  assert.match(builderSource, /\.\.\.params\.suggestion/u);
   assert.doesNotMatch(builderSource, /criticalEntries|sharedEntries/u);
 
   for (const oldReactionClaim of [
@@ -163,9 +177,10 @@ test("applying a suggestion keeps the existing explicit persistence boundary", (
   const end = clientSource.indexOf("function canEditStructuredOutputs", start);
   const applySource = clientSource.slice(start, end);
 
-  assert.match(applySource, /operatingRule: decisionRulesSuggestion\.agreement/u);
-  assert.match(applySource, /escalationRule: decisionRulesSuggestion\.escalationRule/u);
-  assert.match(applySource, /reviewTrigger: decisionRulesSuggestion\.reviewTrigger/u);
-  assert.match(applySource, /agreement: decisionRulesSuggestion\.agreement/u);
+  assert.match(applySource, /agreement: systemText\(decisionRulesSuggestion\.agreement\)/u);
+  assert.match(applySource, /escalationRule: systemText\(decisionRulesSuggestion\.escalationRule\)/u);
+  assert.match(applySource, /reviewTrigger: systemText\(decisionRulesSuggestion\.reviewTrigger\)/u);
+  assert.match(applySource, /operatingRule: localizedSuggestion\.agreement/u);
+  assert.match(applySource, /agreement: localizedSuggestion\.agreement/u);
   assert.doesNotMatch(applySource, /semanticsVersion|workspace\.reactions/u);
 });
