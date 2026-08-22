@@ -1,6 +1,7 @@
 import type { AppLocale } from "@/i18n/config";
 import { normalizeLocale } from "@/i18n/config";
 import type {
+  FounderAlignmentWorkbookDiscussionSignal,
   FounderAlignmentWorkbookStepDefinition,
   FounderAlignmentWorkbookStepId,
 } from "@/features/reporting/founderAlignmentWorkbook";
@@ -23,6 +24,39 @@ export type PremiumWorkbookWorkflowCopy = {
     intro: string;
     confirmButton: string;
     withdrawButton: string;
+  };
+  reactionPresentation: {
+    prompt: string;
+    choiceHint: string;
+    labels: Record<FounderAlignmentWorkbookDiscussionSignal, string>;
+    missingLabel: string;
+    legacy: {
+      label: string;
+      title: string;
+      body: string;
+    };
+    observations: {
+      missing: {
+        title: string;
+        body: string;
+      };
+      similar: {
+        title: string;
+        importantBody: string;
+        agreeBody: string;
+        furtherDiscussionBody: string;
+      };
+      different: {
+        title: string;
+        body: string;
+        furtherDiscussionBody: string;
+      };
+    };
+    counters: {
+      similar: { label: string; body: string };
+      different: { label: string; body: string };
+      open: { label: string; body: string };
+    };
   };
 };
 

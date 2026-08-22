@@ -18,6 +18,54 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
       confirmButton: "Ich bestaetige diese Fassung",
       withdrawButton: "Bestaetigung zuruecknehmen",
     },
+    reactionPresentation: {
+      prompt: "Wie moechtest du diesen Punkt im Moment einordnen?",
+      choiceHint: "Waehle die Option, die am ehesten passt.",
+      labels: {
+        important: "Besonders wichtig",
+        agree: "Kann so stehen",
+        critical: "Weiter klaeren",
+      },
+      missingLabel: "Noch offen",
+      legacy: {
+        label: "Fruehere Einordnung",
+        title: "Fruehere Einordnung vorhanden",
+        body:
+          "Mindestens eine Einordnung stammt aus einer frueheren Version. Bitte ordnet diesen Punkt erneut ein, damit eure aktuelle Einordnung eindeutig ist.",
+      },
+      observations: {
+        missing: {
+          title: "Einordnung noch offen",
+          body: "Mindestens eine aktuelle Einordnung fehlt noch.",
+        },
+        similar: {
+          title: "Aehnlich eingeordnet",
+          importantBody: "Dieser Punkt ist euch beiden besonders wichtig.",
+          agreeBody: "Dieser Punkt kann fuer euch beide aktuell so stehen.",
+          furtherDiscussionBody: "Ihr moechtet diesen Punkt beide noch weiter klaeren.",
+        },
+        different: {
+          title: "Unterschiedlich eingeordnet",
+          body:
+            "Ihr habt diesen Punkt unterschiedlich eingeordnet. Sprecht kurz darueber, was hinter euren jeweiligen Einordnungen steht.",
+          furtherDiscussionBody: "Mindestens eine Person moechte diesen Punkt noch weiter klaeren.",
+        },
+      },
+      counters: {
+        similar: {
+          label: "Aehnlich eingeordnet",
+          body: "Beide aktuellen Einordnungen verwenden dieselbe Option.",
+        },
+        different: {
+          label: "Unterschiedlich eingeordnet",
+          body: "Beide aktuellen Einordnungen verwenden unterschiedliche Optionen.",
+        },
+        open: {
+          label: "Noch offen",
+          body: "Mindestens eine Einordnung fehlt oder stammt aus einer frueheren Version.",
+        },
+      },
+    },
   },
   premiumSteps: {
     vision_direction: {

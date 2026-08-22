@@ -29,9 +29,11 @@ import type { WorkbookStructuredOutputField } from "@/features/reporting/founder
 import {
   getWorkbookContent,
   resolveWorkbookContentSteps,
+  type PremiumWorkbookWorkflowCopy,
 } from "@/features/reporting/workbookContent/workbookContent";
 import {
   FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
+  WORKBOOK_DISCUSSION_SIGNAL_VALUES,
   WORKBOOK_STRUCTURED_STEP_IDS,
   getMissingWorkbookStructuredOutputKeys,
   getWorkbookRequiredStructuredOutputKeys,
@@ -40,7 +42,6 @@ import {
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
   sanitizeWorkbookStructuredOutputsByStep,
-  upsertCurrentWorkbookDiscussionReaction,
   workbookContextIntro,
   workbookNextStepId,
   workbookPreviousStepId,
@@ -83,6 +84,12 @@ import {
   type WorkbookPremiumPhase,
 } from "@/features/reporting/workbookClientChrome";
 import { getWorkbookReactionSuggestionGuidance } from "@/features/reporting/workbookReactionSuggestion";
+import {
+  applyWorkbookReactionSelection,
+  countWorkbookReactionPresentationStates,
+  getWorkbookReactionPresentationState,
+  isCurrentWorkbookReaction,
+} from "@/features/reporting/workbookReactionPresentation";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -681,6 +688,8 @@ const DISCUSSION_SIGNAL_OPTIONS: DiscussionSignalOption[] = [
   { value: "agree", label: "Ist anschlussfaehig", shortLabel: "Anschlussfaehig" },
   { value: "critical", label: "Ist klaerungsbeduerftig", shortLabel: "Klaerungsbeduerftig" },
 ];
+// Retained with the inactive step-specific options for a dedicated config cleanup.
+void DISCUSSION_SIGNAL_OPTIONS;
 
 function createDiscussionEntryId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -740,6 +749,16 @@ function getDecisionRulesReaction(
   return workspace.reactions.find(
     (reaction) => reaction.entryId === entryId && reaction.userId === userId
   )?.signal ?? null;
+}
+
+function getDecisionRulesReactionRecord(
+  workspace: FounderAlignmentWorkbookStepWorkspaceV2,
+  entryId: string,
+  userId: FounderAlignmentWorkbookDiscussionAuthor
+) {
+  return workspace.reactions.find(
+    (reaction) => reaction.entryId === entryId && reaction.userId === userId
+  );
 }
 
 function hasDecisionRulesPerspective(
@@ -893,14 +912,6 @@ function formatAdvisorImpulseTimestamp(value: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function getDiscussionSignalShortLabel(
-  options: DiscussionSignalOption[],
-  signal: FounderAlignmentWorkbookDiscussionSignal | null
-) {
-  if (!signal) return null;
-  return options.find((option) => option.value === signal)?.shortLabel ?? null;
 }
 
 function truncateDiscussionPreview(content: string, maxLength = 180) {
@@ -1328,17 +1339,8 @@ export function FounderAlignmentWorkbookClient({
     currentPremiumV2StepId != null ? workbookContent.premiumSteps[currentPremiumV2StepId] : null;
   const currentPremiumV2IsLight =
     currentPremiumV2StepId != null && LIGHT_PREMIUM_WORKBOOK_V2_STEP_IDS.includes(currentPremiumV2StepId);
-  const currentPremiumV2SignalOptions =
-    currentPremiumV2Config?.signalOptions ?? DISCUSSION_SIGNAL_OPTIONS;
   const isAdvisorViewer = currentUserRole === "advisor";
-  const currentPremiumV2InsightCopy = {
-    sharedTitle: currentPremiumV2Config?.sharedInsightTitle ?? "Gemeinsam getragen",
-    sharedText: currentPremiumV2Config?.sharedInsightText ?? "Punkte, die fuer euch beide klar passen.",
-    pendingTitle: currentPremiumV2Config?.pendingInsightTitle ?? "Einseitig wichtig",
-    pendingText: currentPremiumV2Config?.pendingInsightText ?? "Punkte, die vor allem einer Person wichtig sind.",
-    criticalTitle: currentPremiumV2Config?.criticalInsightTitle ?? "Offen oder kritisch",
-    criticalText: currentPremiumV2Config?.criticalInsightText ?? "Punkte, bei denen ihr bewusst klaeren muesst.",
-  };
+  const reactionPresentation = workbookContent.premiumWorkflow.reactionPresentation;
   const showAdvisorInviteCard =
     currentUserRole === "founderA" ||
     currentUserRole === "founderB" ||
@@ -1746,9 +1748,11 @@ export function FounderAlignmentWorkbookClient({
         ? decisionRulesThreadGroups.find((group) => {
             const threadEntries = [group.rootEntry, ...group.childEntries];
             return threadEntries.some((entry) => {
-              const reactionA = getDecisionRulesReaction(decisionRulesWorkspace!, entry.id, "founderA");
-              const reactionB = getDecisionRulesReaction(decisionRulesWorkspace!, entry.id, "founderB");
-              return reactionA === null || reactionB === null;
+              const state = getWorkbookReactionPresentationState(
+                decisionRulesWorkspace!.reactions,
+                entry.id
+              );
+              return state.kind === "open" || state.kind === "legacy";
             });
           })?.rootEntry.id ?? null
         : null
@@ -1766,102 +1770,9 @@ export function FounderAlignmentWorkbookClient({
         ? "Ihr arbeitet im selben Raum. Eigene Punkte bleiben editierbar, fremde Punkte koennt ihr einordnen, ergaenzen oder als Basis fuer einen eigenen Punkt nutzen."
         : "Du startest mit deinem ersten Stand im gemeinsamen Raum. Die andere Person sieht ihn hier, ordnet ihn spaeter ein und ergaenzt eigene Punkte mit eigener Autorenschaft."
       : "Hier siehst du, welche Punkte die Founder bisher festgehalten haben. Die Beitraege bleiben pro Person sichtbar.";
-  const workbookV2WeightingHint =
-    currentUserRole === "founderA" || currentUserRole === "founderB"
-      ? "Ordnet jeden Punkt klar ein. Fremde Punkte bleiben unveraendert; wenn ihr darauf aufbauen wollt, macht daraus einen eigenen Punkt."
-      : "Hier wird sichtbar, welche Punkte beide tragen, was nur eine Person stark sieht und wo noch Klaerung noetig ist.";
-  const decisionRulesSharedCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return (
-          reactionA !== "critical" &&
-          reactionB !== "critical" &&
-          Boolean(reactionA) &&
-          Boolean(reactionB)
-        );
-      }).length
-    : 0;
-  const decisionRulesCriticalCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return reactionA === "critical" || reactionB === "critical";
-      }).length
-    : 0;
-  const decisionRulesImportantSinglesCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return (
-          (reactionA === "important" || reactionA === "agree" || reactionA === "critical") !==
-          (reactionB === "important" || reactionB === "agree" || reactionB === "critical")
-        );
-      }).length
-    : 0;
-  const decisionRulesFounderAOpenWeightingCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter(
-        (entry) => getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA") === null
-      ).length
-    : 0;
-  const decisionRulesFounderBOpenWeightingCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter(
-        (entry) => getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB") === null
-      ).length
-    : 0;
-  const decisionRulesPendingWeightingCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return reactionA === null || reactionB === null;
-      }).length
-    : 0;
-  const workbookV2PriorityCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return reactionA === "important" && reactionB === "important";
-      }).length
-    : 0;
-  const workbookV2DeferredCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return reactionA === "agree" && reactionB === "agree";
-      }).length
-    : 0;
-  const workbookV2GuardrailTragbarCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return reactionA === "agree" && reactionB === "agree";
-      }).length
-    : 0;
-  const workbookV2GuardrailCaseCount = decisionRulesWorkspace
-    ? decisionRulesWorkspace.entries.filter((entry) => {
-        const reactionA = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderA");
-        const reactionB = getDecisionRulesReaction(decisionRulesWorkspace, entry.id, "founderB");
-        return (
-          reactionA !== "critical" &&
-          reactionB !== "critical" &&
-          (reactionA === "important" || reactionB === "important")
-        );
-      }).length
-    : 0;
-  const workbookV2SharedInsightCount =
-    currentPremiumV2Config?.insightCountMode === "alignment"
-      ? workbookV2PriorityCount
-      : currentPremiumV2Config?.insightCountMode === "guardrails"
-        ? workbookV2GuardrailTragbarCount
-      : decisionRulesSharedCount;
-  const workbookV2PendingInsightCount =
-    currentPremiumV2Config?.insightCountMode === "alignment"
-      ? workbookV2DeferredCount
-      : currentPremiumV2Config?.insightCountMode === "guardrails"
-        ? workbookV2GuardrailCaseCount
-      : currentPremiumV2Config?.pendingInsightTitle
-        ? decisionRulesPendingWeightingCount
-        : decisionRulesImportantSinglesCount;
+  const workbookV2ReactionCounts = decisionRulesWorkspace
+    ? countWorkbookReactionPresentationStates(decisionRulesWorkspace)
+    : { similar: 0, different: 0, open: 0 };
   const currentStepStatus = deriveWorkbookStepStatus(
     currentStep.id,
     currentStepEntry,
@@ -2567,26 +2478,16 @@ export function FounderAlignmentWorkbookClient({
       return;
     }
 
-    const existingReaction = decisionRulesWorkspace.reactions.find(
-      (reaction) => reaction.entryId === entryId && reaction.userId === currentUserRole
-    );
     setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entryId));
 
-    updateWorkspaceV2({
-      ...decisionRulesWorkspace,
-      reactions:
-        existingReaction?.signal === signal
-          ? decisionRulesWorkspace.reactions.filter(
-              (reaction) =>
-                !(reaction.entryId === entryId && reaction.userId === currentUserRole)
-            )
-          : upsertCurrentWorkbookDiscussionReaction(decisionRulesWorkspace, {
-              entryId,
-              userId: currentUserRole,
-              signal,
-              updatedAt: new Date().toISOString(),
-            }).reactions,
-    });
+    updateWorkspaceV2(
+      applyWorkbookReactionSelection(decisionRulesWorkspace, {
+        entryId,
+        userId: currentUserRole,
+        signal,
+        updatedAt: new Date().toISOString(),
+      })
+    );
   }
 
   function updateDecisionRulesAgreement(value: string) {
@@ -4624,7 +4525,7 @@ export function FounderAlignmentWorkbookClient({
                           founderBLabel={founderBLabel}
                           advisorLabel={advisorLabel}
                           founderAvatarByAuthor={founderAvatarByAuthor}
-                          signalOptions={currentPremiumV2SignalOptions}
+                          reactionPresentation={reactionPresentation}
                           mode="collect"
                           openThreadId={visibleDiscussionOpenThreadId}
                           onToggleThread={toggleDiscussionOpenThread}
@@ -4677,35 +4578,33 @@ export function FounderAlignmentWorkbookClient({
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                         {t(currentPremiumV2Config.weightingTitle ?? "2. Gemeinsam verdichten")}
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-slate-700">
-                        {t(currentPremiumV2Config.weightingIntro)}
-                      </p>
-                      <p className="mt-2 text-xs leading-6 text-slate-500">
-                        {wt("client.premium.transitions.weightingHint")}
-                      </p>
+                      {!isAdvisorViewer ? (
+                        <>
+                          <p className="mt-2 text-sm leading-6 text-slate-700">
+                            {systemText(reactionPresentation.prompt)}
+                          </p>
+                          <p className="mt-2 text-xs leading-6 text-slate-500">
+                            {systemText(reactionPresentation.choiceHint)}
+                          </p>
+                        </>
+                      ) : null}
                     </div>
 
                     <div className="mt-5 grid gap-3 md:grid-cols-3">
                       <WorkbookV2InsightCard
-                        title={t(currentPremiumV2InsightCopy.sharedTitle)}
-                        count={workbookV2SharedInsightCount}
-                        text={t(currentPremiumV2InsightCopy.sharedText)}
-                        tone="shared"
-                        visualTone={currentVisualTone}
+                        title={systemText(reactionPresentation.counters.similar.label)}
+                        count={workbookV2ReactionCounts.similar}
+                        text={systemText(reactionPresentation.counters.similar.body)}
                       />
                       <WorkbookV2InsightCard
-                        title={t(currentPremiumV2InsightCopy.pendingTitle)}
-                        count={workbookV2PendingInsightCount}
-                        text={t(currentPremiumV2InsightCopy.pendingText)}
-                        tone="focus"
-                        visualTone={currentVisualTone}
+                        title={systemText(reactionPresentation.counters.different.label)}
+                        count={workbookV2ReactionCounts.different}
+                        text={systemText(reactionPresentation.counters.different.body)}
                       />
                       <WorkbookV2InsightCard
-                        title={t(currentPremiumV2InsightCopy.criticalTitle)}
-                        count={decisionRulesCriticalCount}
-                        text={t(currentPremiumV2InsightCopy.criticalText)}
-                        tone="critical"
-                        visualTone={currentVisualTone}
+                        title={systemText(reactionPresentation.counters.open.label)}
+                        count={workbookV2ReactionCounts.open}
+                        text={systemText(reactionPresentation.counters.open.body)}
                       />
                     </div>
 
@@ -4719,7 +4618,7 @@ export function FounderAlignmentWorkbookClient({
                         founderBLabel={founderBLabel}
                         advisorLabel={advisorLabel}
                         founderAvatarByAuthor={founderAvatarByAuthor}
-                        signalOptions={currentPremiumV2SignalOptions}
+                        reactionPresentation={reactionPresentation}
                         mode="weight"
                         openThreadId={visibleDiscussionOpenThreadId}
                         onToggleThread={toggleDiscussionOpenThread}
@@ -5621,7 +5520,7 @@ function WorkbookV2DiscussionThreadList({
   founderBLabel,
   advisorLabel,
   founderAvatarByAuthor,
-  signalOptions,
+  reactionPresentation,
   mode,
   openThreadId,
   onToggleThread,
@@ -5645,7 +5544,7 @@ function WorkbookV2DiscussionThreadList({
     FounderAlignmentWorkbookDiscussionAuthor,
     { avatarId: string | null; imageUrl: string | null }
   >;
-  signalOptions: DiscussionSignalOption[];
+  reactionPresentation: PremiumWorkbookWorkflowCopy["reactionPresentation"];
   mode: "collect" | "weight";
   openThreadId: string | null;
   onToggleThread: (rootEntryId: string) => void;
@@ -5659,6 +5558,7 @@ function WorkbookV2DiscussionThreadList({
   sourceBadgeClassName: string;
 }) {
   const wt = useTranslations("workbook");
+  const locale = useLocale();
   const viewerFounderRole =
     currentUserRole === "founderA" || currentUserRole === "founderB" ? currentUserRole : null;
   const isAdvisorViewer = currentUserRole === "advisor";
@@ -5707,87 +5607,111 @@ function WorkbookV2DiscussionThreadList({
   }
 
   function renderSignals(entry: FounderAlignmentWorkbookDiscussionEntry, compact: boolean) {
-    const signalA = getDecisionRulesReaction(workspace, entry.id, "founderA");
-    const signalB = getDecisionRulesReaction(workspace, entry.id, "founderB");
+    const reactionA = getDecisionRulesReactionRecord(workspace, entry.id, "founderA");
+    const reactionB = getDecisionRulesReactionRecord(workspace, entry.id, "founderB");
+    const presentationState = getWorkbookReactionPresentationState(
+      workspace.reactions,
+      entry.id
+    );
+    const localize = (text: string) => normalizeWorkbookSystemText(text, locale);
+    const reactionLabel = (reaction: FounderAlignmentWorkbookDiscussionReaction | undefined) =>
+      reaction == null
+        ? reactionPresentation.missingLabel
+        : isCurrentWorkbookReaction(reaction)
+          ? reactionPresentation.labels[reaction.signal]
+          : reactionPresentation.legacy.label;
+    const badges = (
+      <div className="flex flex-wrap gap-2 lg:justify-end">
+        <WorkbookV2SignalBadge
+          label={founderALabel}
+          signalLabel={localize(reactionLabel(reactionA))}
+        />
+        <WorkbookV2SignalBadge
+          label={founderBLabel}
+          signalLabel={localize(reactionLabel(reactionB))}
+        />
+      </div>
+    );
+    const insight = (() => {
+      if (presentationState.kind === "legacy") {
+        return reactionPresentation.legacy;
+      }
+      if (presentationState.kind === "open") {
+        return reactionPresentation.observations.missing;
+      }
+      if (presentationState.kind === "different") {
+        return {
+          title: reactionPresentation.observations.different.title,
+          body: reactionPresentation.observations.different.body,
+          detail: presentationState.hasFurtherDiscussion
+            ? reactionPresentation.observations.different.furtherDiscussionBody
+            : null,
+        };
+      }
+      return {
+        title: reactionPresentation.observations.similar.title,
+        body:
+          presentationState.response === "important"
+            ? reactionPresentation.observations.similar.importantBody
+            : presentationState.response === "agree"
+              ? reactionPresentation.observations.similar.agreeBody
+              : reactionPresentation.observations.similar.furtherDiscussionBody,
+      };
+    })();
 
     if (compact) {
-      return (
-        <div className="flex flex-wrap gap-2">
-          <WorkbookV2SignalBadge
-            label={founderALabel}
-            signal={signalA}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
-          />
-          <WorkbookV2SignalBadge
-            label={founderBLabel}
-            signal={signalB}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
-          />
-        </div>
-      );
+      return badges;
     }
 
     if (viewerFounderRole == null) {
       return (
-        <div className="mt-4 flex flex-wrap gap-2 lg:justify-end">
-          <WorkbookV2SignalBadge
-            label={founderALabel}
-            signal={signalA}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
-          />
-          <WorkbookV2SignalBadge
-            label={founderBLabel}
-            signal={signalB}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
+        <div className="mt-4 space-y-3">
+          {badges}
+          <WorkbookV2ObservationInsight
+            title={localize(insight.title)}
+            body={localize(insight.body)}
+            detail={"detail" in insight && insight.detail ? localize(insight.detail) : null}
           />
         </div>
       );
     }
 
     return (
-      <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap gap-2">
-          {signalOptions.map((option) => {
-            const isActive =
-              viewerFounderRole != null &&
-              getDecisionRulesReaction(workspace, entry.id, viewerFounderRole) === option.value;
+      <div className="mt-4 space-y-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {WORKBOOK_DISCUSSION_SIGNAL_VALUES.map((signal) => {
+              const ownReaction = getDecisionRulesReactionRecord(
+                workspace,
+                entry.id,
+                viewerFounderRole
+              );
+              const isActive = isCurrentWorkbookReaction(ownReaction) && ownReaction.signal === signal;
 
-            return (
-              <button
-                key={`${entry.id}-${option.value}`}
-                type="button"
-                disabled={viewerFounderRole == null}
-                onClick={() => onUpdateReaction(entry.id, option.value)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                  isActive
-                    ? option.value === "critical"
-                      ? "border-rose-200/80 bg-rose-50/80 text-rose-700"
-                      : option.value === "important"
-                        ? "border-amber-200/80 bg-amber-50/80 text-amber-700"
-                        : "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
-                    : viewerFounderRole != null
-                      ? "border-slate-200/90 bg-white/92 text-slate-700 hover:border-slate-300 hover:bg-white"
-                      : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                }`}
-              >
-                {t(option.shortLabel)}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={`${entry.id}-${signal}`}
+                  type="button"
+                  onClick={() => onUpdateReaction(entry.id, signal)}
+                  aria-pressed={isActive}
+                  className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                    isActive
+                      ? "border-slate-500 bg-slate-800 text-white shadow-sm"
+                      : "border-slate-200/90 bg-white/92 text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                  }`}
+                >
+                  {localize(reactionPresentation.labels[signal])}
+                </button>
+              );
+            })}
+          </div>
+          {badges}
         </div>
-
-        <div className="flex flex-wrap gap-2 lg:justify-end">
-          <WorkbookV2SignalBadge
-            label={founderALabel}
-            signal={signalA}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalA)}
-          />
-          <WorkbookV2SignalBadge
-            label={founderBLabel}
-            signal={signalB}
-            signalLabel={getDiscussionSignalShortLabel(signalOptions, signalB)}
-          />
-        </div>
+        <WorkbookV2ObservationInsight
+          title={localize(insight.title)}
+          body={localize(insight.body)}
+          detail={"detail" in insight && insight.detail ? localize(insight.detail) : null}
+        />
       </div>
     );
   }
@@ -6028,9 +5952,11 @@ function WorkbookV2DiscussionThreadList({
         const unresolvedCount =
           mode === "weight"
             ? [group.rootEntry, ...group.childEntries].filter((entry) => {
-                const reactionA = getDecisionRulesReaction(workspace, entry.id, "founderA");
-                const reactionB = getDecisionRulesReaction(workspace, entry.id, "founderB");
-                return reactionA === null || reactionB === null;
+                const state = getWorkbookReactionPresentationState(
+                  workspace.reactions,
+                  entry.id
+                );
+                return state.kind === "open" || state.kind === "legacy";
               }).length
             : 0;
 
@@ -6061,7 +5987,7 @@ function WorkbookV2DiscussionThreadList({
                   </span>
                 ) : null}
                 {mode === "weight" && unresolvedCount > 0 ? (
-                  <span className="rounded-full border border-amber-200 bg-amber-50/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-700">
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-600">
                     {wt("client.discussion.unresolvedCount", { count: unresolvedCount })}
                   </span>
                 ) : null}
@@ -6496,37 +6422,34 @@ function WorkbookV2PhasePill({
 
 function WorkbookV2SignalBadge({
   label,
-  signal,
   signalLabel,
 }: {
   label: string;
-  signal: FounderAlignmentWorkbookDiscussionSignal | null;
-  signalLabel?: string | null;
+  signalLabel: string;
 }) {
-  const toneClass =
-    signal === "critical"
-      ? "border-rose-200 bg-rose-50/80 text-rose-700"
-      : signal === "important"
-        ? "border-amber-200 bg-amber-50/80 text-amber-700"
-        : signal === "agree"
-          ? "border-emerald-200 bg-emerald-50/80 text-emerald-700"
-          : "border-slate-200 bg-white text-slate-500";
-
-  const text =
-    signalLabel ??
-    (signal === "critical"
-      ? "kritisch"
-      : signal === "important"
-        ? "wichtig"
-        : signal === "agree"
-          ? "traegt mit"
-          : "offen");
-
   return (
-    <div className={`rounded-full border px-3 py-1.5 text-[11px] ${toneClass}`}>
+    <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] text-slate-700">
       <span className="font-medium">{label}</span>
       <span className="mx-1 opacity-50">·</span>
-      <span>{t(text)}</span>
+      <span>{signalLabel}</span>
+    </div>
+  );
+}
+
+function WorkbookV2ObservationInsight({
+  title,
+  body,
+  detail = null,
+}: {
+  title: string;
+  body: string;
+  detail?: string | null;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+      <p className="text-xs font-medium text-slate-800">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-600">{body}</p>
+      {detail ? <p className="mt-1 text-xs leading-5 text-slate-600">{detail}</p> : null}
     </div>
   );
 }
@@ -6535,25 +6458,13 @@ function WorkbookV2InsightCard({
   title,
   count,
   text,
-  tone,
-  visualTone = "default",
 }: {
   title: string;
   count: number;
   text: string;
-  tone: "shared" | "focus" | "critical";
-  visualTone?: WorkbookVisualTone;
 }) {
-  const toneMeta = workbookToneMeta(visualTone);
-  const toneClass =
-    tone === "critical"
-      ? toneMeta.insightCritical
-      : tone === "focus"
-        ? toneMeta.insightFocus
-        : toneMeta.insightShared;
-
   return (
-    <div className={`rounded-[22px] border p-4 ${toneClass}`}>
+    <div className="rounded-[22px] border border-slate-200 bg-slate-50/70 p-4">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{title}</p>
       <p className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-slate-950">{count}</p>
       <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>

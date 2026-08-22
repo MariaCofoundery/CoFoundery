@@ -118,7 +118,7 @@ test("remaining yellow and red premium copy stays on the existing config path", 
   }
 
   assert.match(clientSource, /currentPremiumV2Config\.collectPlaceholder/u);
-  assert.match(clientSource, /currentPremiumV2Config\.weightingIntro/u);
+  assert.match(clientSource, /workbookContent\.premiumWorkflow\.reactionPresentation/u);
   assert.match(clientSource, /currentPremiumV2Config\.ruleIntro/u);
 });
 

@@ -551,6 +551,55 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       confirmButton: "I confirm this version",
       withdrawButton: "Withdraw confirmation",
     },
+    reactionPresentation: {
+      prompt: "How would you like to respond to this point right now?",
+      choiceHint: "Choose the option that fits best.",
+      labels: {
+        important: "Especially important",
+        agree: "Works for me as is",
+        critical: "Discuss further",
+      },
+      missingLabel: "Still open",
+      legacy: {
+        label: "Earlier response",
+        title: "Earlier response detected",
+        body:
+          "At least one response comes from an earlier version. Please respond to this point again so your current responses are clear.",
+      },
+      observations: {
+        missing: {
+          title: "Response still open",
+          body: "At least one current response is still missing.",
+        },
+        similar: {
+          title: "Similar responses",
+          importantBody: "This point is especially important to both of you.",
+          agreeBody: "This point currently works for both of you as is.",
+          furtherDiscussionBody: "You both want to discuss this point further.",
+        },
+        different: {
+          title: "Different responses",
+          body:
+            "You responded to this point differently. Briefly discuss what is behind each of your responses.",
+          furtherDiscussionBody:
+            "At least one of you would like to discuss this point further.",
+        },
+      },
+      counters: {
+        similar: {
+          label: "Similar responses",
+          body: "Both current responses use the same option.",
+        },
+        different: {
+          label: "Different responses",
+          body: "Both current responses use different options.",
+        },
+        open: {
+          label: "Still open",
+          body: "At least one response is missing or comes from an earlier version.",
+        },
+      },
+    },
   },
   premiumSteps: {
     vision_direction: {

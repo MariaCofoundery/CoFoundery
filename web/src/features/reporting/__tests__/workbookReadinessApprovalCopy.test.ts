@@ -135,7 +135,7 @@ test("reaction and insight configuration remains on its existing path", () => {
     assert.match(clientSource, new RegExp(`${property}[?:]`, "u"));
   }
   assert.match(clientSource, /function updateDecisionRulesReaction/u);
-  assert.match(clientSource, /currentPremiumV2InsightCopy/u);
+  assert.match(clientSource, /workbookContent\.premiumWorkflow\.reactionPresentation/u);
 });
 
 test("workflow copy stays outside approval and founder-content persistence paths", () => {
