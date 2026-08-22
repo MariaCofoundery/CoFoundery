@@ -82,6 +82,7 @@ import {
   workbookStepStatusMessageKey,
   type WorkbookPremiumPhase,
 } from "@/features/reporting/workbookClientChrome";
+import { getWorkbookReactionSuggestionGuidance } from "@/features/reporting/workbookReactionSuggestion";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
@@ -998,27 +999,14 @@ function buildWorkbookV2Suggestion(params: {
 }) {
   const hasFounderA = hasDecisionRulesPerspective(params.workspace, "founderA");
   const hasFounderB = hasDecisionRulesPerspective(params.workspace, "founderB");
-  const criticalEntries = params.workspace.entries.filter((entry) => {
-    const reactionA = getDecisionRulesReaction(params.workspace, entry.id, "founderA");
-    const reactionB = getDecisionRulesReaction(params.workspace, entry.id, "founderB");
-    return reactionA === "critical" || reactionB === "critical";
-  });
-  const sharedEntries = params.workspace.entries.filter((entry) => {
-    const reactionA = getDecisionRulesReaction(params.workspace, entry.id, "founderA");
-    const reactionB = getDecisionRulesReaction(params.workspace, entry.id, "founderB");
-    return (
-      reactionA !== "critical" &&
-      reactionB !== "critical" &&
-      Boolean(reactionA) &&
-      Boolean(reactionB)
-    );
-  });
+  const reactionGuidance = getWorkbookReactionSuggestionGuidance(params.workspace);
+  const withReactionGuidance = (suggestion: string) =>
+    reactionGuidance ? `${suggestion} ${reactionGuidance}` : suggestion;
 
   if (params.stepId === "vision_direction") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Sobald eine Person eine Chance klar kritisch sieht oder sie euch sichtbar vom Kern wegzieht, verfolgt ihr sie nicht weiter, bevor ihr die Richtung gemeinsam neu prueft."
-        : "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Neue Chancen verfolgt ihr nur weiter, wenn sie klar zu eurer Richtung passen und nicht nur kurzfristig attraktiv wirken.";
+    const agreement = withReactionGuidance(
+      "Wenn Umsatzchance, Produktfokus und Aufbau gleichzeitig ziehen, richtet ihr euch zuerst an eurer gemeinsamen Prioritaet aus. Neue Chancen verfolgt ihr nur weiter, wenn sie klar zu eurer Richtung passen und nicht nur kurzfristig attraktiv wirken."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1026,9 +1014,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn eine Chance attraktiv wirkt, eure Richtung aber unscharf wird, stoppt ihr sie zuerst und legt direkt fest, wann ihr die Prioritaet gemeinsam neu prueft.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Linie neu, wenn wieder zu viele Themen gleichzeitig ziehen, gute Chancen unterschiedlich gelesen werden oder euer Kernfokus unscharf wird."
-        : "Ihr prueft diese Linie neu, wenn neue Chancen haeufig zu Richtungswechseln fuehren oder Prioritaeten immer wieder neu verhandelt werden.";
+      "Ihr prueft diese Linie neu, wenn neue Chancen haeufig zu Richtungswechseln fuehren oder Prioritaeten immer wieder neu verhandelt werden.";
 
     return {
       agreement,
@@ -1038,10 +1024,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "roles_responsibility") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Jedes zentrale Thema hat eine fuehrende Person. Diese Person entscheidet im eigenen Bereich eigenstaendig, macht aber frueh sichtbar, wenn Budget, Timing, Team, Kultur oder die Arbeit der anderen Person betroffen sind."
-        : "Jedes zentrale Thema hat eine fuehrende Person. Diese Person entscheidet im eigenen Bereich eigenstaendig und teilt frueh, was fuer die andere Person relevant wird.";
+    const agreement = withReactionGuidance(
+      "Jedes zentrale Thema hat eine fuehrende Person. Diese Person entscheidet im eigenen Bereich eigenstaendig und teilt frueh, was fuer die andere Person relevant wird."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1049,9 +1034,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn Ownership unklar wird oder ein Thema beide Bereiche beruehrt, stoppt ihr stille Weiterarbeit und legt zuerst die Fuehrung fuer den naechsten Schritt fest.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Regel neu, wenn Themen doppelt laufen, Entscheidungen zurueckgeholt werden oder wichtige Arbeit erst spaet sichtbar wird."
-        : "Ihr prueft diese Regel neu, wenn unklar bleibt, wer fuehrt, wer mitreden muss oder was frueh geteilt werden sollte.";
+      "Ihr prueft diese Regel neu, wenn unklar bleibt, wer fuehrt, wer mitreden muss oder was frueh geteilt werden sollte.";
 
     return {
       agreement,
@@ -1061,10 +1044,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "ownership_risk") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Bis zur vereinbarten Schwelle fuehrt die verantwortliche Person das Risiko selbst. Sobald eine Person es als nicht mehr allein tragbar einordnet oder Geld, Haftung, Reputation oder Runway beruehrt sind, wird es fuer beide sichtbar und ihr entscheidet gemeinsam ueber Stop, Begrenzung oder den naechsten Schritt."
-        : "Bis zur vereinbarten Schwelle fuehrt die verantwortliche Person das Risiko selbst. Sobald die Auswirkung groesser wird oder eine feste Schwelle erreicht ist, macht ihr es frueh fuer beide sichtbar und entscheidet gemeinsam ueber den naechsten Schritt.";
+    const agreement = withReactionGuidance(
+      "Bis zur vereinbarten Schwelle fuehrt die verantwortliche Person das Risiko selbst. Sobald die Auswirkung groesser wird oder eine feste Schwelle erreicht ist, macht ihr es frueh fuer beide sichtbar und entscheidet gemeinsam ueber den naechsten Schritt."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1072,9 +1054,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn ein Risiko kritisch wird oder unterschiedlich gelesen bleibt, stoppt ihr die stille Weiterarbeit und legt direkt fest, wer bis wann gemeinsam entscheidet.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Regel neu, wenn Risiken zu spaet sichtbar werden, unterschiedlich lange still weiterlaufen oder erst im kritischen Moment gemeinsam entschieden werden."
-        : "Ihr prueft diese Regel neu, wenn ein Risiko zu lange bei einer Person bleibt oder erst unter Druck auf den gemeinsamen Tisch kommt.";
+      "Ihr prueft diese Regel neu, wenn ein Risiko zu lange bei einer Person bleibt oder erst unter Druck auf den gemeinsamen Tisch kommt.";
 
     return {
       agreement,
@@ -1084,10 +1064,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "commitment_load") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Einsatz und Verfuegbarkeit werden nicht still vorausgesetzt. Jede Person macht frueh sichtbar, wenn Zusagen, Reaktionszeit oder Energie nicht mehr tragbar sind, und ihr entscheidet gemeinsam, was zuerst reduziert oder verschoben wird."
-        : "Einsatz und Verfuegbarkeit werden realistisch zugesagt. Wenn Kapazitaet, Reaktionszeit oder Fokus sichtbar kippen, macht die betroffene Person das frueh transparent und ihr prueft gemeinsam die Prioritaeten.";
+    const agreement = withReactionGuidance(
+      "Einsatz und Verfuegbarkeit werden realistisch zugesagt. Wenn Kapazitaet, Reaktionszeit oder Fokus sichtbar kippen, macht die betroffene Person das frueh transparent und ihr prueft gemeinsam die Prioritaeten."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1095,9 +1074,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn Kapazitaet kippt, sortiert ihr zuerst die laufenden Prioritaeten neu: was bleibt, was wartet und was aktiv abgesagt oder uebergeben wird.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Regel neu, wenn Zusagen wiederholt wackeln, Reaktionszeiten unklar werden oder Belastung erst als Frust sichtbar wird."
-        : "Ihr prueft diese Regel neu, wenn Verfuegbarkeit, Tempo oder Belastung immer wieder neu verhandelt werden muessen.";
+      "Ihr prueft diese Regel neu, wenn Verfuegbarkeit, Tempo oder Belastung immer wieder neu verhandelt werden muessen.";
 
     return {
       agreement,
@@ -1107,10 +1084,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "values_guardrails") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Tragbare Kompromisse sind nur solche, die beide bewusst vertreten koennen. Sobald ein Fall eine rote Linie beruehrt oder eine Person ihn nicht mehr mittraegt, stoppt ihr die stille Weiterarbeit und entscheidet gemeinsam, ob ihr ablehnt, begrenzt oder neu verhandelt."
-        : "Tragbare Kompromisse sind erlaubt, wenn sie zu eurer Linie passen und beide sie bewusst vertreten koennen. Grenzfaelle werden nicht nebenbei entschieden, sondern klar benannt und gemeinsam freigegeben.";
+    const agreement = withReactionGuidance(
+      "Fuer diesen Punkt haltet ihr die Formulierung fest, die ihr beide ausdruecklich vereinbaren moechtet. Offene Aspekte besprecht ihr, bevor ihr die Fassung bestaetigt."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1118,9 +1094,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn ein wirtschaftlich attraktiver Fall eure Leitplanke beruehrt, entscheidet ihr nicht still weiter. Ihr benennt zuerst die betroffene Grenze und legt dann gemeinsam fest, ob ihr ablehnt, begrenzt oder bewusst freigebt.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Leitplanke neu, wenn Grenzfaelle wiederkehren, Kompromisse still groesser werden oder eine Entscheidung spaeter schwer erklaerbar waere."
-        : "Ihr prueft diese Leitplanke neu, wenn wirtschaftlicher Druck eure Grenzen unscharf macht oder Entscheidungen haeufig als Ausnahme begruendet werden.";
+      "Ihr prueft diese Leitplanke neu, wenn wirtschaftlicher Druck eure Grenzen unscharf macht oder Entscheidungen haeufig als Ausnahme begruendet werden.";
 
     return {
       agreement,
@@ -1130,10 +1104,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "alignment_90_days") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "In den naechsten 90 Tagen konzentriert ihr eure Energie auf die Punkte, die beide klar tragen. Neue oder strittige Themen laufen nur weiter, wenn ihr bewusst entscheidet, was dafuer reduziert, gestoppt oder verschoben wird."
-        : "In den naechsten 90 Tagen konzentriert ihr eure Energie auf die gemeinsame Prioritaet. Neue Themen kommen nur dazu, wenn sie diesen Fokus direkt staerken oder ihr bewusst etwas anderes herausnehmt.";
+    const agreement = withReactionGuidance(
+      "Fuer die naechsten 90 Tage haltet ihr konkret fest, welche Prioritaet ihr gemeinsam vereinbart und welche Themen vorerst nicht parallel laufen. Neue Themen nehmt ihr nur nach einer ausdruecklichen gemeinsamen Entscheidung auf."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1141,9 +1114,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Nicht parallel mitlaufen lasst ihr alles, was euren Fokus verwischt oder Kapazitaet bindet, ohne die 90-Tage-Prioritaet zu staerken. Wenn ein neues Thema rein soll, entscheidet ihr zuerst, was dafuer runtergeht.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft den Fortschritt spaetestens nach 90 Tagen und frueher, wenn zu viele Themen parallel ziehen, Fokus verwischt oder Fortschritt nicht mehr sichtbar ist."
-        : "Ihr prueft den Fortschritt spaetestens nach 90 Tagen und frueher, wenn Prioritaeten wieder nebeneinander statt nacheinander laufen.";
+      "Ihr prueft den Fortschritt spaetestens nach 90 Tagen und frueher, wenn Prioritaeten wieder nebeneinander statt nacheinander laufen.";
 
     return {
       agreement,
@@ -1153,10 +1124,9 @@ function buildWorkbookV2Suggestion(params: {
   }
 
   if (params.stepId === "collaboration_conflict") {
-    const agreement =
-      criticalEntries.length > 0
-        ? "Wenn etwas stoert oder kippt, sprecht ihr es frueh und direkt an. Sobald eine Person einen Punkt klar kritisch sieht oder dieselbe Reibung wiederkommt, nehmt ihr ihn aus dem Tagesgeschaeft und klaert ihn in einem eigenen ruhigen Gespraech."
-        : "Wenn etwas stoert, sprecht ihr es frueh und direkt an. Wenn im laufenden Austausch keine saubere Klaerung entsteht, legt ihr zeitnah ein eigenes Gespraech dafuer fest.";
+    const agreement = withReactionGuidance(
+      "Wenn etwas stoert, sprecht ihr es frueh und direkt an. Wenn im laufenden Austausch keine saubere Klaerung entsteht, legt ihr zeitnah ein eigenes Gespraech dafuer fest."
+    );
 
     const escalationRule =
       hasFounderA && hasFounderB
@@ -1164,9 +1134,7 @@ function buildWorkbookV2Suggestion(params: {
         : "Wenn ein Thema im Alltag nicht sauber geloest wird, nehmt ihr es aus dem laufenden Geschaeft heraus und legt direkt einen festen Klaerungstermin fest.";
 
     const reviewTrigger =
-      sharedEntries.length > 0
-        ? "Ihr prueft diese Regel neu, wenn Feedback wieder liegen bleibt, Gespraeche schaerfer werden oder dieselbe Reibung mehrfach auftaucht."
-        : "Ihr prueft diese Regel neu, wenn Kritik zu spaet kommt, zwischen den Zeilen landet oder ein Thema mehrfach offen bleibt.";
+      "Ihr prueft diese Regel neu, wenn Kritik zu spaet kommt, zwischen den Zeilen landet oder ein Thema mehrfach offen bleibt.";
 
     return {
       agreement,
@@ -1175,10 +1143,9 @@ function buildWorkbookV2Suggestion(params: {
     };
   }
 
-  const agreement =
-    criticalEntries.length > 0
-      ? "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet die fuehrende Person. Sobald Risiko, Budget oder Aussenwirkung groesser werden oder eine Person einen Punkt klar kritisch sieht, zieht ihr die andere Person sofort dazu und entscheidet bis zu einer festen Frist gemeinsam."
-      : "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet die fuehrende Person. Sobald Risiko, Budget oder Aussenwirkung groesser werden, zieht ihr die andere Person frueh dazu und entscheidet gemeinsam bis zu einer festen Frist.";
+  const agreement = withReactionGuidance(
+    "Wenn eine Entscheidung im Verantwortungsbereich bleibt, entscheidet die fuehrende Person. Sobald Risiko, Budget oder Aussenwirkung groesser werden, zieht ihr die andere Person frueh dazu und entscheidet gemeinsam bis zu einer festen Frist."
+  );
 
   const escalationRule =
     hasFounderA && hasFounderB
@@ -1186,9 +1153,7 @@ function buildWorkbookV2Suggestion(params: {
       : "Wenn eine Entscheidung offen bleibt oder Zeitdruck steigt, stoppt ihr die Schleife sofort und legt eine klare Frist fuer die finale Entscheidung fest.";
 
   const reviewTrigger =
-    sharedEntries.length > 0
-      ? "Ihr prueft diese Regel neu, wenn Entscheidungen trotz Regel wieder haengen bleiben, mehrfach zurueckgeholt werden oder Verantwortung unklar wird."
-      : "Ihr prueft diese Regel neu, wenn Entscheidungen zu lange offen bleiben oder im Nachgang wieder aufgemacht werden.";
+    "Ihr prueft diese Regel neu, wenn Entscheidungen zu lange offen bleiben oder im Nachgang wieder aufgemacht werden.";
 
   return {
     agreement,
