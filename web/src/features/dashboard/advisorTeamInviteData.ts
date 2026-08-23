@@ -418,7 +418,7 @@ async function createBootstrapInvitationForAdvisorTeam(params: {
   inviteeEmail: string;
   client: SupabaseLikeClient;
 }) {
-  const [{ data: inviterProfile }, existingInvitation] = await Promise.all([
+  const [{ data: inviterProfile }, existingInvitation, { data: reusableInvitation }] = await Promise.all([
     params.client
       .from("profiles")
       .select("display_name")
@@ -427,10 +427,38 @@ async function createBootstrapInvitationForAdvisorTeam(params: {
     params.row.invitation_id
       ? loadInvitationBootstrapRow(params.row.invitation_id, params.client)
       : Promise.resolve(null),
+    params.client
+      .from("invitations")
+      .select("id")
+      .eq("inviter_user_id", params.inviterUserId)
+      .eq("invitee_email", normalizeEmail(params.inviteeEmail))
+      .eq("team_context", "pre_founder")
+      .in("status", ["sent", "opened"])
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (existingInvitation?.id) {
     return existingInvitation.id;
+  }
+
+  if ((reusableInvitation as InsertedInvitationRow | null)?.id) {
+    const invitationId = (reusableInvitation as InsertedInvitationRow).id;
+    await params.client.from("invitation_modules").upsert(
+      { invitation_id: invitationId, module: "base" },
+      { onConflict: "invitation_id,module" }
+    );
+    const { error: pendingUpdateError } = await params.client
+      .from("advisor_team_invites")
+      .update({ invitation_id: invitationId })
+      .eq("id", params.row.id);
+    if (pendingUpdateError) {
+      throw new Error(pendingUpdateError.message);
+    }
+    return invitationId;
   }
 
   const token = createOpaqueToken();

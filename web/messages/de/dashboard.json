@@ -263,6 +263,8 @@
       "notAuthenticated": "Bitte melde dich erneut an.",
       "invalidEmail": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "invalidTeamContext": "Bitte wähle aus, ob ihr euch erst kennenlernt oder bereits zusammenarbeitet.",
+      "selfInvite": "Bitte verwende die E-Mail-Adresse der anderen Person, nicht deine eigene.",
+      "duplicateInvite": "Für diese Person und diesen Kontext besteht bereits eine offene Einladung.",
       "createFailed": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
       "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."
     },
@@ -324,6 +326,8 @@
       "notAuthenticated": "Bitte melde dich erneut an.",
       "invalidEmail": "Bitte eine gültige E-Mail-Adresse eingeben.",
       "invalidTeamContext": "Bitte wähle den Team-Kontext für diese Einladung.",
+      "selfInvite": "Bitte verwende die E-Mail-Adresse der anderen Person, nicht deine eigene.",
+      "duplicateInvite": "Für diese Person und diesen Kontext besteht bereits eine offene Einladung.",
       "legacyDisabled": "Dieser alte Einladungsflow ist aktuell nicht verfügbar.",
       "createFailed": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
       "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."

@@ -7,6 +7,7 @@ import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { deleteFounderAccount } from "@/features/account/deleteFounderAccount";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendCoFounderInviteEmail } from "@/lib/email/sendCoFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -92,16 +93,16 @@ function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
-function buildInviteUrl(token: string) {
-  return `/join?token=${encodeURIComponent(token)}`;
+function buildInviteUrl(token: string, locale: "de" | "en") {
+  return buildLocaleContinuationPath(`/join?token=${encodeURIComponent(token)}`, locale);
 }
 
 function getSiteUrlOrigin() {
   return getPublicAppOrigin();
 }
 
-function buildAbsoluteInviteUrl(token: string) {
-  const relative = buildInviteUrl(token);
+function buildAbsoluteInviteUrl(token: string, locale: "de" | "en") {
+  const relative = buildInviteUrl(token, locale);
   const origin = getSiteUrlOrigin();
   return origin ? `${origin}${relative}` : relative;
 }
@@ -128,6 +129,10 @@ async function createInvitation(params: {
   }
 
   const inviterEmail = normalizeEmail(user.email ?? null) || null;
+  if (!inviterEmail || invitedEmail === inviterEmail) {
+    return { ok: false, error: "self_invite_not_allowed" };
+  }
+
   const { data: inviterProfile } = await supabase
     .from("profiles")
     .select("display_name")
@@ -142,54 +147,57 @@ async function createInvitation(params: {
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data: invitation, error: inviteError } = await supabase
-    .from("invitations")
-    .insert({
-      inviter_user_id: user.id,
-      invitee_email: invitedEmail,
-      label: params.label ?? invitedEmail,
-      inviter_display_name: inviterDisplayName,
-      inviter_email: inviterEmail,
-      team_context: params.teamContext,
-      token_hash: tokenHash,
-      expires_at: expiresAt,
-      status: "sent",
-    })
-    .select("id")
-    .single();
-
-  if (inviteError || !invitation?.id) {
-    return { ok: false, error: inviteError?.message ?? "invite_create_failed" };
-  }
-
-  const modules: Array<{ invitation_id: string; module: "base" | "values" }> =
-    params.reportScope === "basis_plus_values"
-      ? [
-          { invitation_id: invitation.id, module: "base" },
-          { invitation_id: invitation.id, module: "values" },
-        ]
-      : [{ invitation_id: invitation.id, module: "base" }];
-
-  const { error: moduleError } = await supabase.from("invitation_modules").insert(modules);
-  if (moduleError) {
-    return { ok: false, error: moduleError.message };
-  }
-
-  await bindLatestSubmittedInvitationMatchingInputs(
-    invitation.id,
-    user.id,
-    modules.map((row) => row.module),
+  const { data: invitationRows, error: inviteError } = await supabase.rpc(
+    "create_founder_invitation_reliable",
     {
+      p_invitee_email: invitedEmail,
+      p_label: params.label ?? invitedEmail,
+      p_inviter_display_name: inviterDisplayName,
+      p_inviter_email: inviterEmail,
+      p_team_context: params.teamContext,
+      p_report_scope: params.reportScope,
+      p_token_hash: tokenHash,
+      p_expires_at: expiresAt,
+    }
+  );
+  const invitation = (invitationRows as Array<{ invitation_id: string }> | null)?.[0] ?? null;
+
+  if (inviteError || !invitation?.invitation_id) {
+    return {
+      ok: false,
+      error:
+        inviteError?.code === "23505" || inviteError?.message?.includes("duplicate_open_invitation")
+          ? "duplicate_invite"
+          : "invite_create_failed",
+    };
+  }
+
+  const invitationId = invitation.invitation_id;
+  const modules: Array<"base" | "values"> =
+    params.reportScope === "basis_plus_values" ? ["base", "values"] : ["base"];
+
+  try {
+    await bindLatestSubmittedInvitationMatchingInputs(invitationId, user.id, modules, {
       client: supabase,
       replaceExisting: false,
-    }
-  ).catch((error) => {
+    });
+  } catch (error) {
+    const { data: revokedInvitation, error: revokeError } = await supabase
+      .from("invitations")
+      .update({ status: "revoked", revoked_at: new Date().toISOString() })
+      .eq("id", invitationId)
+      .eq("inviter_user_id", user.id)
+      .in("status", ["sent", "opened"])
+      .select("id")
+      .maybeSingle();
     console.error("createInvitation matching binding bootstrap failed", {
-      invitationId: invitation.id,
+      invitationId,
       userId: user.id,
       error: error instanceof Error ? error.message : String(error),
+      compensated: !revokeError && Boolean(revokedInvitation),
     });
-  });
+    return { ok: false, error: "invite_create_failed" };
+  }
 
   let emailStatus: EmailStatus = "not_sent";
   let emailError: string | undefined;
@@ -198,20 +206,20 @@ async function createInvitation(params: {
     const locale = await getRequestLocale();
     const sendResult = await sendCoFounderInviteEmail({
       inviteeEmail: invitedEmail,
-      inviteUrl: buildAbsoluteInviteUrl(token),
+      inviteUrl: buildAbsoluteInviteUrl(token, locale),
       inviterDisplayName,
       teamName: params.label ?? null,
       reportScope: params.reportScope,
       teamContext: params.teamContext,
       locale,
-    });
+    }).catch(() => ({ ok: false as const, error: "email_delivery_failed" }));
 
     if (sendResult.ok) {
       emailStatus = "sent";
     } else {
-      emailError = sendResult.error;
+      emailError = "email_delivery_failed";
       console.error("createInvitation email send failed", {
-        invitationId: invitation.id,
+        invitationId,
         userId: user.id,
         invitedEmail,
         error: sendResult.error,
@@ -221,8 +229,8 @@ async function createInvitation(params: {
 
   return {
     ok: true,
-    sessionId: invitation.id,
-    inviteUrl: buildInviteUrl(token),
+    sessionId: invitationId,
+    inviteUrl: buildInviteUrl(token, await getRequestLocale()),
     emailStatus,
     emailError,
     emailRecipient: invitedEmail,
@@ -248,7 +256,7 @@ export async function getSentInvitationLinkAction(
 
   const { data: invitation, error: invitationError } = await supabase
     .from("invitations")
-    .select("id, inviter_user_id, status")
+    .select("id, inviter_user_id, status, updated_at")
     .eq("id", normalizedInvitationId)
     .maybeSingle();
 
@@ -262,27 +270,32 @@ export async function getSentInvitationLinkAction(
 
   const token = randomBytes(24).toString("hex");
   const tokenHash = hashToken(token);
-  const { error: rotateError } = await supabase
+  const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: rotatedInvitation, error: rotateError } = await supabase
     .from("invitations")
     .update({
       token_hash: tokenHash,
+      expires_at: expiresAt,
       updated_at: new Date().toISOString(),
     })
     .eq("id", normalizedInvitationId)
-    .eq("inviter_user_id", user.id);
+    .eq("inviter_user_id", user.id)
+    .eq("updated_at", invitation.updated_at)
+    .select("id")
+    .maybeSingle();
 
-  if (rotateError) {
+  if (rotateError || !rotatedInvitation) {
     return {
       ok: false,
       reason: "rotate_failed",
-      error: rotateError.message,
+      error: rotateError?.message ?? "concurrent_rotation",
     };
   }
 
   return {
     ok: true,
     invitationId: normalizedInvitationId,
-    inviteUrl: buildAbsoluteInviteUrl(token),
+    inviteUrl: buildAbsoluteInviteUrl(token, await getRequestLocale()),
   };
 }
 

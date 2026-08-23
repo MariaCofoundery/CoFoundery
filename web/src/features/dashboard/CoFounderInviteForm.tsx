@@ -321,6 +321,8 @@ function mapInviteActionError(
   if (reason === "not_authenticated") return t("actionErrors.notAuthenticated");
   if (reason === "ungueltige_email") return t("actionErrors.invalidEmail");
   if (reason === "ungueltiger_teamkontext") return t("actionErrors.invalidTeamContext");
+  if (reason === "self_invite_not_allowed") return t("actionErrors.selfInvite");
+  if (reason === "duplicate_invite") return t("actionErrors.duplicateInvite");
   if (reason === "invite_create_failed") return t("actionErrors.createFailed");
   return t("actionErrors.generic");
 }

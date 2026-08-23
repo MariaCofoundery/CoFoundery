@@ -19,6 +19,7 @@ export type RelationshipAdvisorRow = {
   requested_by_user_id: string | null;
   source_invitation_id: string | null;
   invite_token_hash: string | null;
+  invite_expires_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -198,6 +199,7 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
     requested_by_user_id: legacy.requested_by,
     source_invitation_id: legacy.invitation_id,
     invite_token_hash: legacy.token_hash,
+    invite_expires_at: null,
     created_at: legacy.created_at,
     updated_at: legacy.updated_at,
   };
@@ -205,7 +207,7 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
   const existingQuery = client
     .from("relationship_advisors")
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("source_invitation_id", legacy.invitation_id);
 
@@ -226,7 +228,7 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
 
   const { data: persistedRow, error: writeError } = await writeQuery
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .maybeSingle();
 

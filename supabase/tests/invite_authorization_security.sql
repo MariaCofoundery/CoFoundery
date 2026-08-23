@@ -42,7 +42,8 @@ insert into public.invitations (
   invitee_email,
   status,
   token_hash,
-  expires_at
+  expires_at,
+  team_context
 )
 values
   (
@@ -51,7 +52,8 @@ values
     'invitee@example.com',
     'sent',
     encode(extensions.digest('valid-founder-token', 'sha256'), 'hex'),
-    now() + interval '1 day'
+    now() + interval '1 day',
+    'pre_founder'
   ),
   (
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2',
@@ -59,7 +61,8 @@ values
     'invitee@example.com',
     'sent',
     encode(extensions.digest('expired-founder-token', 'sha256'), 'hex'),
-    now() - interval '1 day'
+    now() - interval '1 day',
+    'existing_team'
   ),
   (
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
@@ -67,7 +70,8 @@ values
     'invitee@example.com',
     'revoked',
     encode(extensions.digest('revoked-founder-token', 'sha256'), 'hex'),
-    now() + interval '1 day'
+    now() + interval '1 day',
+    'pre_founder'
   ),
   (
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4',
@@ -75,7 +79,8 @@ values
     'invitee@example.com',
     'sent',
     encode(extensions.digest('rls-founder-token', 'sha256'), 'hex'),
-    now() + interval '1 day'
+    now() + interval '1 day',
+    null
   );
 
 update public.invitations
@@ -417,14 +422,26 @@ insert into public.relationship_advisors (
   relationship_id,
   advisor_email,
   advisor_name,
-  requested_by_user_id
+  requested_by_user_id,
+  status,
+  founder_a_approved,
+  founder_b_approved,
+  invite_token_hash,
+  invited_at,
+  invite_expires_at
 )
 select
   'cccccccc-cccc-4ccc-8ccc-ccccccccccc1',
   r.id,
   'advisor@example.com',
   'Advisor',
-  '11111111-1111-4111-8111-111111111111'
+  '11111111-1111-4111-8111-111111111111',
+  'invited',
+  true,
+  true,
+  encode(extensions.digest('advisor-token', 'sha256'), 'hex'),
+  now(),
+  now() + interval '14 days'
 from public.relationships r
 where r.user_low = least(
   '11111111-1111-4111-8111-111111111111'::uuid,

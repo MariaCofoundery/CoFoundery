@@ -249,6 +249,8 @@ function mapParticipantInviteActionError(reason: string, t: ReturnType<typeof us
   if (reason === "not_authenticated") return t("participantInvite.actionErrors.notAuthenticated");
   if (reason === "ungueltige_email") return t("participantInvite.actionErrors.invalidEmail");
   if (reason === "ungueltiger_teamkontext") return t("participantInvite.actionErrors.invalidTeamContext");
+  if (reason === "self_invite_not_allowed") return t("participantInvite.actionErrors.selfInvite");
+  if (reason === "duplicate_invite") return t("participantInvite.actionErrors.duplicateInvite");
   if (reason === "legacy_sessions_disabled") return t("participantInvite.actionErrors.legacyDisabled");
   if (reason === "invite_create_failed") return t("participantInvite.actionErrors.createFailed");
   return t("participantInvite.actionErrors.generic");

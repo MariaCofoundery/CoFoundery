@@ -3,6 +3,8 @@
 import { randomBytes } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
+import { persistInviteBeforeMail } from "@/features/invitations/inviteDelivery";
 import { createClient } from "@/lib/supabase/server";
 import { sendAdvisorInviteEmail } from "@/lib/email/sendAdvisorInviteEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
@@ -432,7 +434,7 @@ async function loadRelationshipAdvisorAccessRowByToken(
   const { data, error } = await supabase
     .from("relationship_advisors")
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("invite_token_hash", tokenHash)
     .is("revoked_at", null)
@@ -1755,49 +1757,63 @@ export async function sendFounderAlignmentAdvisorInvite({
 
   const token = randomBytes(24).toString("hex");
   const tokenHash = hashFounderAlignmentAdvisorToken(token);
-  const invitePath = buildFounderAlignmentAdvisorInvitePath({ token });
+  const locale = await getRequestLocale();
+  const invitePath = buildLocaleContinuationPath(
+    buildFounderAlignmentAdvisorInvitePath({ token }),
+    locale
+  );
   const inviteUrl = toPublicAppUrl(invitePath);
   const effectiveTeamContext =
     invitationContext.data?.team_context === "existing_team" ? "existing_team" : teamContext;
-  const locale = await getRequestLocale();
+  const delivery = await persistInviteBeforeMail<RelationshipAdvisorRow>({
+    persist: async () => {
+      const sentAt = new Date().toISOString();
+      const inviteExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: updated, error: updateError } = await supabase
+        .from("relationship_advisors")
+        .update({
+          status: "invited",
+          invited_at: sentAt,
+          invite_expires_at: inviteExpiresAt,
+          invite_token_hash: tokenHash,
+          source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
+        })
+        .eq("id", loaded.row.id)
+        .eq("updated_at", loaded.row.updated_at)
+        .select(
+          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+        )
+        .maybeSingle();
 
-  const emailResult = await sendAdvisorInviteEmail({
-    advisorEmail: loaded.row.advisor_email,
-    advisorName: loaded.row.advisor_name,
-    inviteUrl,
-    founderAName: labels.founderALabel,
-    founderBName: labels.founderBLabel,
-    teamName: resolveInvitationTeamName(loaded.invitation.label, loaded.invitation.invitee_email),
-    teamContext: effectiveTeamContext,
-    locale,
+      return updateError || !updated
+        ? { ok: false as const }
+        : { ok: true as const, value: updated as RelationshipAdvisorRow };
+    },
+    send: () =>
+      sendAdvisorInviteEmail({
+        advisorEmail: loaded.row.advisor_email as string,
+        advisorName: loaded.row.advisor_name,
+        inviteUrl,
+        founderAName: labels.founderALabel,
+        founderBName: labels.founderBLabel,
+        teamName: resolveInvitationTeamName(
+          loaded.invitation.label,
+          loaded.invitation.invitee_email
+        ),
+        teamContext: effectiveTeamContext,
+        locale,
+      }),
   });
 
-  if (!emailResult.ok) {
+  if (!delivery.ok) {
     return {
       ok: false,
-      reason: "email_failed",
-      error: emailResult.error,
+      reason: delivery.stage === "persistence" ? "save_failed" : "email_failed",
+      error: delivery.stage === "delivery" ? "email_delivery_failed" : undefined,
     };
   }
 
-  const sentAt = new Date().toISOString();
-  const { data: updated, error: updateError } = await supabase
-    .from("relationship_advisors")
-    .update({
-      status: "invited",
-      invited_at: sentAt,
-      invite_token_hash: tokenHash,
-      source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
-    })
-    .eq("id", loaded.row.id)
-    .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-    )
-    .single();
-
-  if (updateError || !updated) {
-    return { ok: false, reason: "save_failed" };
-  }
+  const updated = delivery.value;
 
   await trackServerResearchEvent({
     eventName: "advisor_invite_sent",
@@ -1869,20 +1885,30 @@ export async function copyFounderAlignmentAdvisorInviteLink({
   const labels = await loadFounderLabelsForInvitation(loaded.invitation, supabase);
   const token = randomBytes(24).toString("hex");
   const tokenHash = hashFounderAlignmentAdvisorToken(token);
-  const invitePath = buildFounderAlignmentAdvisorInvitePath({ token });
+  const locale = await getRequestLocale();
+  const invitePath = buildLocaleContinuationPath(
+    buildFounderAlignmentAdvisorInvitePath({ token }),
+    locale
+  );
   const inviteUrl = toPublicAppUrl(invitePath);
+  const invitedAt = new Date().toISOString();
+  const inviteExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data: updated, error: updateError } = await supabase
     .from("relationship_advisors")
     .update({
       invite_token_hash: tokenHash,
+      invited_at: invitedAt,
+      invite_expires_at: inviteExpiresAt,
+      status: "invited",
       source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
     })
     .eq("id", loaded.row.id)
+    .eq("updated_at", loaded.row.updated_at)
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
-    .single();
+    .maybeSingle();
 
   if (updateError || !updated) {
     return { ok: false, reason: "save_failed" };
@@ -1931,7 +1957,7 @@ export async function claimFounderAlignmentAdvisorAccess({
   const { data: relationshipAdvisorRow, error: relationshipError } = await privileged
     .from("relationship_advisors")
     .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
     )
     .eq("source_invitation_id", invitationId)
     .eq("invite_token_hash", tokenHash)
@@ -1950,6 +1976,14 @@ export async function claimFounderAlignmentAdvisorAccess({
       typedRelationshipRow.founder_a_approved !== true ||
       typedRelationshipRow.founder_b_approved !== true
     ) {
+      return { ok: false, reason: "invalid_token" };
+    }
+
+    const inviteExpired =
+      !typedRelationshipRow.advisor_user_id &&
+      (!typedRelationshipRow.invite_expires_at ||
+        new Date(typedRelationshipRow.invite_expires_at).getTime() <= Date.now());
+    if (inviteExpired) {
       return { ok: false, reason: "invalid_token" };
     }
 
@@ -1986,7 +2020,7 @@ export async function claimFounderAlignmentAdvisorAccess({
     const { data: updatedRelationshipRow, error: updateRelationshipError } =
       await updateRelationshipQuery
       .select(
-        "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
+        "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
       )
       .maybeSingle();
 
@@ -2062,6 +2096,14 @@ export async function getFounderAlignmentAdvisorInviteByToken(
     normalizedToken,
     privileged
   );
+  if (
+    relationshipAdvisorRow &&
+    !relationshipAdvisorRow.advisor_user_id &&
+    (!relationshipAdvisorRow.invite_expires_at ||
+      new Date(relationshipAdvisorRow.invite_expires_at).getTime() <= Date.now())
+  ) {
+    return { status: "not_found" };
+  }
   const advisorRow = relationshipAdvisorRow
     ? null
     : await loadAdvisorAccessRowByToken(normalizedToken, privileged);

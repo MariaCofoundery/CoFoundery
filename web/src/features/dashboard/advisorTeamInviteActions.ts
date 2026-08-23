@@ -12,6 +12,7 @@ import {
   type ClaimAdvisorTeamInviteResult,
 } from "@/features/dashboard/advisorTeamInviteData";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendAdvisorTeamFounderInviteEmail } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -44,9 +45,9 @@ function buildInvitePath(token: string) {
   return `/team-invite/${encodeURIComponent(token)}`;
 }
 
-function buildAbsoluteInviteUrl(token: string) {
+function buildAbsoluteInviteUrl(token: string, locale: "de" | "en") {
   const origin = getPublicAppOrigin();
-  const path = buildInvitePath(token);
+  const path = buildLocaleContinuationPath(buildInvitePath(token), locale);
   return origin ? `${origin}${path}` : path;
 }
 
@@ -118,8 +119,8 @@ export async function createAdvisorTeamInviteAction(
 
   const founderAToken = createOpaqueToken();
   const founderBToken = createOpaqueToken();
-  const founderAInviteUrl = buildAbsoluteInviteUrl(founderAToken);
-  const founderBInviteUrl = buildAbsoluteInviteUrl(founderBToken);
+  const founderAInviteUrl = buildAbsoluteInviteUrl(founderAToken, locale);
+  const founderBInviteUrl = buildAbsoluteInviteUrl(founderBToken, locale);
 
   const { data: insertedRow, error: insertError } = await supabase
     .from("advisor_team_invites")
@@ -138,7 +139,13 @@ export async function createAdvisorTeamInviteAction(
     .single();
 
   if (insertError || !insertedRow?.id) {
-    console.error("Failed to create advisor team invite", insertError);
+    if (insertError?.code === "23505") {
+      return { ok: false, error: "duplicate_invite" };
+    }
+    console.error("Failed to create advisor team invite", {
+      code: insertError?.code ?? null,
+      message: insertError?.message ?? "unknown_error",
+    });
     return { ok: false, error: "create_failed" };
   }
 
@@ -151,7 +158,7 @@ export async function createAdvisorTeamInviteAction(
       counterpartLabel:
         normalizedEmails.founderBEmail.split("@")[0]?.trim() || fallbackCounterpartLabel,
       locale,
-    }),
+    }).catch(() => ({ ok: false as const, error: "email_delivery_failed" })),
     sendAdvisorTeamFounderInviteEmail({
       inviteeEmail: normalizedEmails.founderBEmail,
       inviteUrl: founderBInviteUrl,
@@ -160,7 +167,7 @@ export async function createAdvisorTeamInviteAction(
       counterpartLabel:
         normalizedEmails.founderAEmail.split("@")[0]?.trim() || fallbackCounterpartLabel,
       locale,
-    }),
+    }).catch(() => ({ ok: false as const, error: "email_delivery_failed" })),
   ]);
 
   const emailResults = [founderAEmailResult, founderBEmailResult];

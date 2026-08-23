@@ -263,6 +263,8 @@
       "notAuthenticated": "Please sign in again.",
       "invalidEmail": "Please enter a valid email address.",
       "invalidTeamContext": "Please choose whether you are exploring working together or already work together.",
+      "selfInvite": "Please use the other person's email address rather than your own.",
+      "duplicateInvite": "There is already an open invitation for this person and context.",
       "createFailed": "The invitation could not be created right now. Please try again.",
       "generic": "The invitation could not be created right now. Please try again."
     },
@@ -324,6 +326,8 @@
       "notAuthenticated": "Please sign in again.",
       "invalidEmail": "Please enter a valid email address.",
       "invalidTeamContext": "Please choose the team context for this invitation.",
+      "selfInvite": "Please use the other person's email address rather than your own.",
+      "duplicateInvite": "There is already an open invitation for this person and context.",
       "legacyDisabled": "This older invitation flow is currently unavailable.",
       "createFailed": "The invitation could not be created right now. Please try again.",
       "generic": "The invitation could not be created right now. Please try again."

@@ -4,7 +4,6 @@ type ReadonlyCookieStore = {
   get: (name: string) => { value: string } | undefined;
 };
 
-const LOCAL_ALLOWED_BETA_CODES = ["cofoundery-beta"];
 export const BETA_ACCESS_REQUEST_EMAIL =
   process.env.RESEND_REPLY_TO_EMAIL?.trim() || "hello@cofoundery.de";
 
@@ -31,9 +30,7 @@ export function getAllowedBetaCodes() {
     .map((value) => normalizeCode(value))
     .filter(Boolean);
 
-  return configuredCodes.length > 0
-    ? configuredCodes
-    : LOCAL_ALLOWED_BETA_CODES.map((value) => normalizeCode(value));
+  return configuredCodes;
 }
 
 export function isValidBetaAccessCode(value: string) {
