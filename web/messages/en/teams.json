@@ -11,6 +11,13 @@
       "title": "Founders",
       "fallback": "Founder {index}"
     },
+    "setup": {
+      "title": "Founder Setup",
+      "description": "Capture important shared understandings about collaboration, ownership, and change.",
+      "notStarted": "Not started yet",
+      "started": "Already started",
+      "open": "Open Founder Setup"
+    },
     "alignment": {
       "title": "Alignment",
       "description": "Your existing perspectives, reports, and discussion work.",
@@ -42,6 +49,83 @@
         "invited": "Invited",
         "linked": "Connected"
       }
+    }
+  },
+  "setup": {
+    "title": "Founder Setup",
+    "subtitle": "Work through the topics that matter for your collaboration, one step at a time.",
+    "backToCollaboration": "Back to collaboration",
+    "backToSetup": "Back to Founder Setup",
+    "openItem": "Open topic",
+    "founderFallback": "Founder {index}",
+    "summary": "{clarified} captured · {discussing} being discussed · {open} open · {pending} confirmations open",
+    "legalGeneral": "CoFoundery helps you structure topics for discussion and clarification. The specific legal or tax implementation may require professional advice.",
+    "legalSpecific": "The specific legal or tax implementation of this topic may require professional advice.",
+    "categories": {
+      "collaboration": "Collaboration",
+      "money_equity": "Money & equity",
+      "company_rights": "Company & rights",
+      "change": "When things change"
+    },
+    "statuses": {
+      "open": "Open",
+      "discussing": "Being discussed",
+      "confirmation_pending": "Confirmation pending",
+      "clarified": "Clarified",
+      "documented": "Documented",
+      "not_relevant": "Not relevant"
+    },
+    "actions": {
+      "save": "Save working state",
+      "propose": "Propose shared wording",
+      "confirm": "Confirm wording",
+      "withdraw": "Withdraw confirmation"
+    },
+    "detail": {
+      "workingTitle": "Shared working state",
+      "workingHelp": "This note is a shared working state and not yet a confirmed agreement.",
+      "workStatus": "Working status",
+      "workingNote": "Working note",
+      "currentTitle": "Currently confirmed",
+      "pendingTitle": "Change proposed",
+      "proposalTitle": "Propose shared wording",
+      "proposalHelp": "The proposal becomes the shared position only after every current founder has confirmed it.",
+      "proposalReplacesPending": "A new proposal transparently supersedes the open proposal. The confirmed position remains unchanged until everyone confirms the new one.",
+      "proposalNote": "Proposed wording",
+      "resolutionStatus": "How should this wording be captured?",
+      "documentationReference": "Documentation reference (optional)",
+      "documentationPlaceholder": "Short reference or https://…",
+      "confirmations": "Confirmations",
+      "confirmed": "confirmed",
+      "awaiting": "open",
+      "noNote": "No additional wording was provided."
+    },
+    "feedback": {
+      "saved": "Working state saved.",
+      "proposed": "The shared wording was proposed for confirmation.",
+      "confirmed": "Your confirmation was saved.",
+      "withdrawn": "Your confirmation was withdrawn.",
+      "error": "The change could not be saved safely right now. Please try again."
+    },
+    "items": {
+      "roles_responsibilities": { "title": "Roles & responsibilities", "question": "Who takes ownership of which areas, and where are the boundaries for responsibilities and decisions?" },
+      "decision_rights": { "title": "Decisions & decision rights", "question": "What do you decide together, what can individual founders decide, and how do you handle different judgments?" },
+      "time_commitment": { "title": "Time & commitment", "question": "How much time can and does each person want to contribute right now, and which changes should you discuss early?" },
+      "communication": { "title": "Communication & ways of working", "question": "How do you want to share information, coordinate, give feedback, and stay reachable day to day?" },
+      "conflict_deadlock": { "title": "Conflict & deadlock", "question": "How do you want to raise disagreements, and what will you do when you cannot move forward on an important question?" },
+      "equity": { "title": "Equity split", "question": "How should equity be divided, and what considerations are behind that distribution?" },
+      "vesting": { "title": "Vesting & cliff", "question": "Should equity be tied to time or contribution, and what should apply if someone leaves early?" },
+      "compensation": { "title": "Salary & compensation", "question": "When and under what conditions do you want to compensate yourselves, and how will you handle different levels of compensation?" },
+      "contributions_expenses": { "title": "Contributions, expenses & founder loans", "question": "How will you handle personal funds, expenses, contributions, or loans that founders provide for the company?" },
+      "personal_financial_risk": { "title": "Personal financial risk", "question": "Which financial commitments can and does each person want to take on, and which ones explicitly not?" },
+      "legal_entity": { "title": "Legal entity & formal setup", "question": "Which formal incorporation steps are still open, and where might you need professional advice?" },
+      "founder_agreements": { "title": "Company & founder agreements", "question": "Which important understandings do you want to record in a binding written form?" },
+      "intellectual_property": { "title": "Intellectual property / IP", "question": "How do you want to handle existing and future code, designs, brands, content, inventions, or other work products?" },
+      "outside_activities": { "title": "Outside activities & other projects", "question": "Which other jobs, companies, or projects are running in parallel, and what would you like to clarify transparently with each other?" },
+      "accounts_access": { "title": "Accounts, access & key company information", "question": "How will you ensure that important accounts, access, and company information do not depend on only one person?" },
+      "prolonged_absence": { "title": "Extended absence", "question": "How do you want to proceed if a founder is absent for an extended period or becomes significantly less available?" },
+      "changing_commitment": { "title": "Changing commitment or role", "question": "What do you want to clarify if someone wants to change their scope, responsibilities, or role significantly?" },
+      "founder_exit": { "title": "Founder exit", "question": "What should be clarified if a founder wants to leave the company or the founder team?" }
     }
   },
   "dashboard": {

@@ -6,6 +6,7 @@ import {
   getFounderTeamHomebase,
   type FounderTeamHomebase,
 } from "@/features/teams/founderTeamHomebaseData";
+import { getFounderSetupStarted } from "@/features/teams/founderSetupData";
 
 type TeamHomebasePageProps = {
   params: Promise<{ teamId: string }>;
@@ -51,6 +52,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
+  const setupState = await getFounderSetupStarted(teamId, user.id, supabase);
 
   const t = await getTranslations("teams.homebase");
   const fallback = (index: number) => t("founders.fallback", { index });
@@ -99,6 +101,19 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className={SECTION_CLASS} aria-labelledby="team-setup-title">
+          <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
+            {t("setup.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
+          <p className="mt-4 text-sm font-medium text-slate-700">
+            {setupState?.started ? t("setup.started") : t("setup.notStarted")}
+          </p>
+          <Link href={`/teams/${teamId}/setup`} className={`${LINK_CLASS} mt-4`}>
+            {t("setup.open")}
+          </Link>
         </section>
 
         <section className={SECTION_CLASS} aria-labelledby="team-alignment-title">

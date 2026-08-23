@@ -11,6 +11,13 @@
       "title": "Founder",
       "fallback": "Founder {index}"
     },
+    "setup": {
+      "title": "Founder Setup",
+      "description": "Haltet wichtige Absprachen rund um Zusammenarbeit, Beteiligung und Veränderungen gemeinsam fest.",
+      "notStarted": "Noch nicht gestartet",
+      "started": "Bereits gestartet",
+      "open": "Founder Setup öffnen"
+    },
     "alignment": {
       "title": "Alignment",
       "description": "Eure bisherigen Perspektiven, Reports und Gesprächsarbeit.",
@@ -42,6 +49,83 @@
         "invited": "Eingeladen",
         "linked": "Verbunden"
       }
+    }
+  },
+  "setup": {
+    "title": "Founder Setup",
+    "subtitle": "Klärt Schritt für Schritt die Themen, die für eure Zusammenarbeit wichtig sind.",
+    "backToCollaboration": "Zur Zusammenarbeit",
+    "backToSetup": "Zurück zum Founder Setup",
+    "openItem": "Thema öffnen",
+    "founderFallback": "Founder {index}",
+    "summary": "{clarified} festgehalten · {discussing} in Klärung · {open} offen · {pending} Bestätigungen offen",
+    "legalGeneral": "CoFoundery hilft euch, Gesprächs- und Klärungspunkte zu strukturieren. Die konkrete rechtliche oder steuerliche Ausgestaltung kann professionelle Beratung erfordern.",
+    "legalSpecific": "Die konkrete rechtliche oder steuerliche Ausgestaltung dieses Themas kann professionelle Beratung erfordern.",
+    "categories": {
+      "collaboration": "Zusammenarbeit",
+      "money_equity": "Geld & Beteiligung",
+      "company_rights": "Unternehmen & Rechte",
+      "change": "Wenn sich etwas verändert"
+    },
+    "statuses": {
+      "open": "Offen",
+      "discussing": "In Klärung",
+      "confirmation_pending": "Bestätigung offen",
+      "clarified": "Geklärt",
+      "documented": "Dokumentiert",
+      "not_relevant": "Nicht relevant"
+    },
+    "actions": {
+      "save": "Arbeitsstand speichern",
+      "propose": "Gemeinsame Fassung vorschlagen",
+      "confirm": "Fassung bestätigen",
+      "withdraw": "Bestätigung zurücknehmen"
+    },
+    "detail": {
+      "workingTitle": "Gemeinsamer Arbeitsstand",
+      "workingHelp": "Diese Notiz ist ein gemeinsamer Arbeitsstand und noch keine bestätigte Vereinbarung.",
+      "workStatus": "Arbeitsstatus",
+      "workingNote": "Arbeitsnotiz",
+      "currentTitle": "Aktuell bestätigt",
+      "pendingTitle": "Änderung vorgeschlagen",
+      "proposalTitle": "Gemeinsame Fassung vorschlagen",
+      "proposalHelp": "Der Vorschlag wird erst zum gemeinsamen Stand, wenn alle aktuellen Founder ihn bestätigt haben.",
+      "proposalReplacesPending": "Ein neuer Vorschlag löst den aktuell offenen Vorschlag transparent ab. Der bestätigte Stand bleibt bis zur vollständigen Bestätigung unverändert.",
+      "proposalNote": "Vorgeschlagene Fassung",
+      "resolutionStatus": "Wie soll die Fassung festgehalten werden?",
+      "documentationReference": "Dokumentationsreferenz (optional)",
+      "documentationPlaceholder": "Kurze Referenz oder https://…",
+      "confirmations": "Bestätigungen",
+      "confirmed": "bestätigt",
+      "awaiting": "offen",
+      "noNote": "Keine zusätzliche Fassung hinterlegt."
+    },
+    "feedback": {
+      "saved": "Arbeitsstand gespeichert.",
+      "proposed": "Die gemeinsame Fassung wurde zur Bestätigung vorgeschlagen.",
+      "confirmed": "Deine Bestätigung wurde gespeichert.",
+      "withdrawn": "Deine Bestätigung wurde zurückgenommen.",
+      "error": "Die Änderung konnte gerade nicht sicher gespeichert werden. Bitte versuche es erneut."
+    },
+    "items": {
+      "roles_responsibilities": { "title": "Rollen & Verantwortlichkeiten", "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?" },
+      "decision_rights": { "title": "Entscheidungen & Entscheidungsrechte", "question": "Was entscheidet ihr gemeinsam, was einzelne Founder – und wie geht ihr mit unterschiedlichen Einschätzungen um?" },
+      "time_commitment": { "title": "Zeit & Commitment", "question": "Wie viel Zeit kann und möchte jede Person aktuell einbringen, und welche Veränderungen solltet ihr früh miteinander besprechen?" },
+      "communication": { "title": "Kommunikation & Zusammenarbeit", "question": "Wie wollt ihr Informationen teilen, euch abstimmen, Feedback geben und im Alltag erreichbar sein?" },
+      "conflict_deadlock": { "title": "Konflikte & festgefahrene Situationen", "question": "Wie wollt ihr Meinungsverschiedenheiten ansprechen, und was tut ihr, wenn ihr bei einer wichtigen Frage nicht weiterkommt?" },
+      "equity": { "title": "Beteiligungsverteilung / Equity", "question": "Wie sollen Anteile verteilt werden, und welche Überlegungen stehen hinter dieser Verteilung?" },
+      "vesting": { "title": "Vesting & Cliff", "question": "Soll die Beteiligung an Zeit oder Mitarbeit geknüpft sein, und was soll bei einem frühen Ausscheiden gelten?" },
+      "compensation": { "title": "Gehalt & Vergütung", "question": "Wann und unter welchen Bedingungen wollt ihr euch vergüten, und wie geht ihr mit unterschiedlichen Vergütungen um?" },
+      "contributions_expenses": { "title": "Einlagen, Auslagen & Founder-Darlehen", "question": "Wie behandelt ihr privates Geld, Auslagen, Einlagen oder Darlehen, die Founder für das Unternehmen übernehmen?" },
+      "personal_financial_risk": { "title": "Persönliches finanzielles Risiko", "question": "Welche finanziellen Verpflichtungen kann und möchte jede Person übernehmen – und welche ausdrücklich nicht?" },
+      "legal_entity": { "title": "Gesellschaft & formale Gründung", "question": "Welche formalen Gründungsschritte sind noch offen, und wo benötigt ihr gegebenenfalls professionelle Beratung?" },
+      "founder_agreements": { "title": "Gesellschafts- & Founder-Vereinbarungen", "question": "Welche wichtigen Absprachen wollt ihr verbindlich schriftlich festhalten?" },
+      "intellectual_property": { "title": "Geistiges Eigentum / IP", "question": "Wie wollt ihr mit bestehendem und künftig entstehendem Code, Designs, Marken, Inhalten, Erfindungen oder anderen Arbeitsergebnissen umgehen?" },
+      "outside_activities": { "title": "Nebentätigkeiten & andere Projekte", "question": "Welche anderen Jobs, Unternehmen oder Projekte laufen parallel, und was möchtet ihr dazu transparent miteinander klären?" },
+      "accounts_access": { "title": "Accounts, Zugänge & wichtige Unternehmensdaten", "question": "Wie stellt ihr sicher, dass wichtige Accounts, Zugänge und Unternehmensinformationen nicht nur von einer Person abhängen?" },
+      "prolonged_absence": { "title": "Längerer Ausfall", "question": "Wie wollt ihr vorgehen, wenn ein Founder für längere Zeit ausfällt oder deutlich weniger verfügbar ist?" },
+      "changing_commitment": { "title": "Commitment reduzieren oder Rolle verändern", "question": "Was wollt ihr klären, wenn jemand Umfang, Verantwortungsbereich oder Rolle deutlich verändern möchte?" },
+      "founder_exit": { "title": "Founder Exit / Ausscheiden", "question": "Was soll geklärt sein, wenn ein Founder das Unternehmen oder das Founder-Team verlassen möchte?" }
     }
   },
   "dashboard": {
