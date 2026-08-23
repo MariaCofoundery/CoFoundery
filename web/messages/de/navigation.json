@@ -3,6 +3,8 @@
   "current": "Aktuell",
   "dashboard": "Dashboard",
   "discovery": "Co-Founder suchen",
+  "incomingRequestBadgeSingular": "1 offene Co-Founder-Anfrage",
+  "incomingRequestBadgePlural": "{count} offene Co-Founder-Anfragen",
   "editProfile": "Profil bearbeiten",
   "lastOpened": "Zuletzt geöffnet",
   "logoLabel": "Zum Dashboard",

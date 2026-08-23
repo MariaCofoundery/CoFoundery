@@ -432,6 +432,22 @@ export async function getReceivedDiscoveryIntroRequests(
   }));
 }
 
+export async function getIncomingOpenDiscoveryIntroRequestCount(userId: string): Promise<number> {
+  const normalizedUserId = assertUserId(userId);
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("discovery_intro_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("recipient_user_id", normalizedUserId)
+    .eq("status", "pending");
+
+  if (error) {
+    throw new Error(getErrorMessage(error, "discovery_intro_incoming_count_failed"));
+  }
+
+  return count ?? 0;
+}
+
 export async function getSentDiscoveryIntroRequests(
   userId: string
 ): Promise<DiscoveryIntroRequestWithProfile[]> {

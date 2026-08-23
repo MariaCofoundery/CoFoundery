@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
+import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import {
@@ -150,7 +151,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, navigationTargets] = user
+  const [roleViews, profileData, navigationTargets, incomingOpenRequestCount] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -386,6 +387,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             workbookItems,
           } satisfies ProductNavigationTargets;
         })(),
+        getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
       ])
     : [
         {
@@ -400,6 +402,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           matchingItems: [],
           workbookItems: [],
         } satisfies ProductNavigationTargets,
+        0,
       ];
   const displayName =
     profileData?.display_name?.trim() ||
@@ -420,6 +423,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             workbookHref={navigationTargets.workbookHref}
             matchingItems={navigationTargets.matchingItems}
             workbookItems={navigationTargets.workbookItems}
+            incomingOpenRequestCount={incomingOpenRequestCount}
           >
             {children}
           </ProductShell>

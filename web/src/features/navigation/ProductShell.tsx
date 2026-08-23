@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
+import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 
@@ -18,6 +19,7 @@ type Props = {
   workbookHref: string;
   matchingItems: ProductNavigationContextItem[];
   workbookItems: ProductNavigationContextItem[];
+  incomingOpenRequestCount: number;
 };
 
 type NavigationItem = {
@@ -118,6 +120,7 @@ export function ProductShell({
   workbookHref,
   matchingItems,
   workbookItems,
+  incomingOpenRequestCount,
 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -247,9 +250,10 @@ export function ProductShell({
                 {resolvedActiveView !== "advisor" ? (
                   <Link
                     href="/discovery"
-                    className={discoveryCtaClassName(pathname.startsWith("/discovery"))}
+                    className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
                   >
-                    {t("discovery")}
+                    <span>{t("discovery")}</span>
+                    <IncomingRequestBadge count={incomingOpenRequestCount} />
                   </Link>
                 ) : null}
               </nav>

@@ -15,6 +15,7 @@ import { isDiscoveryIntroResponseStatus } from "@/features/discovery/discoveryIn
 import { createClient } from "@/lib/supabase/server";
 
 function revalidateDiscoveryIntroPaths(profileId?: string) {
+  revalidatePath("/", "layout");
   revalidatePath("/discovery");
   revalidatePath("/discovery/intros");
   if (profileId) {

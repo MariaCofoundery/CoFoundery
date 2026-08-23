@@ -56,6 +56,43 @@ export function canRespondToDiscoveryIntro(request: Pick<DiscoveryIntroRequest, 
   return request.status === "pending";
 }
 
+export function isIncomingOpenDiscoveryIntroRequest(
+  request: Pick<DiscoveryIntroRequest, "recipientUserId" | "status">,
+  userId: string
+) {
+  return request.recipientUserId === userId && request.status === "pending";
+}
+
+export function countIncomingOpenDiscoveryIntroRequests(
+  requests: Array<Pick<DiscoveryIntroRequest, "recipientUserId" | "status">>,
+  userId: string
+) {
+  return requests.filter((request) => isIncomingOpenDiscoveryIntroRequest(request, userId)).length;
+}
+
+export function formatIncomingRequestBadgeCount(count: number) {
+  if (!Number.isFinite(count) || count <= 0) {
+    return null;
+  }
+
+  return count > 9 ? "9+" : String(Math.floor(count));
+}
+
+export function getIncomingRequestBadgePresentation(count: number) {
+  const displayCount = formatIncomingRequestBadgeCount(count);
+  if (!displayCount) {
+    return null;
+  }
+
+  return {
+    displayCount,
+    messageKey:
+      count === 1
+        ? ("incomingRequestBadgeSingular" as const)
+        : ("incomingRequestBadgePlural" as const),
+  };
+}
+
 export function canPrepareDiscoveryIntroMatching(
   request: Pick<DiscoveryIntroRequest, "status" | "requesterUserId" | "recipientUserId">,
   userId: string
