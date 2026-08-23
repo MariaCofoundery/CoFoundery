@@ -1,0 +1,59 @@
+{
+  "homebase": {
+    "eyebrow": "Founder-Team",
+    "title": "Unsere Zusammenarbeit",
+    "back": "Zurück zum Dashboard",
+    "context": {
+      "preFounder": "Ihr prüft eine gemeinsame Gründung",
+      "existingTeam": "Ihr arbeitet bereits als Founder-Team zusammen"
+    },
+    "founders": {
+      "title": "Founder",
+      "fallback": "Founder {index}"
+    },
+    "alignment": {
+      "title": "Alignment",
+      "description": "Eure bisherigen Perspektiven, Reports und Gesprächsarbeit.",
+      "empty": "Für dieses Team gibt es noch keinen gemeinsamen Alignment-Bereich.",
+      "noArtifacts": "Für diese Verbindung liegen noch keine Reports oder gemeinsamen Arbeitsbereiche vor.",
+      "pair": "Alignment zwischen {names}",
+      "report": "Report ansehen",
+      "workbook": "Workbook öffnen",
+      "continue": "Alignment fortsetzen",
+      "matchingReport": "Matching-Report ansehen",
+      "workspace": "Matching Workspace öffnen"
+    },
+    "agreements": {
+      "title": "Vereinbarungen",
+      "description": "Einstiege zu den Bereichen, in denen ihr bereits Vereinbarungen festgehalten habt.",
+      "empty": "Noch keine gemeinsamen Vereinbarungen festgehalten.",
+      "workbook": "Vereinbarungen im Workbook",
+      "workspace": "Vereinbarungen im Matching Workspace",
+      "open": "Öffnen",
+      "pair": "Zwischen {names}"
+    },
+    "advisor": {
+      "title": "Advisor",
+      "description": "Advisor-Zugänge zu euren bestehenden Alignment-Bereichen.",
+      "pair": "Zugang für {names}",
+      "statuses": {
+        "pending": "Freigabe offen",
+        "approved": "Freigegeben",
+        "invited": "Eingeladen",
+        "linked": "Verbunden"
+      }
+    }
+  },
+  "dashboard": {
+    "eyebrow": "Gemeinsame Bereiche",
+    "title": "Meine Founder-Teams",
+    "description": "Öffne die gemeinsame Übersicht für ein bestehendes Founder-Team.",
+    "empty": "Neue Founder-Teams erscheinen hier, sobald eine gemeinsame Verbindung angelegt wurde.",
+    "open": "Öffnen",
+    "memberFallback": "Founder {index}",
+    "context": {
+      "preFounder": "Ihr prüft eine gemeinsame Gründung",
+      "existingTeam": "Bestehendes Founder-Team"
+    }
+  }
+}

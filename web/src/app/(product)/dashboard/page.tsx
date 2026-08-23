@@ -43,6 +43,7 @@ import {
   deriveWorkbookNavigationState,
 } from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
+import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 
 type DashboardSearchParams = {
   error?: string;
@@ -122,7 +123,10 @@ export default async function DashboardPage({
   searchParams: Promise<DashboardSearchParams>;
 }) {
   const supabase = await createClient();
-  const t = await getTranslations("dashboard");
+  const [t, teamsT] = await Promise.all([
+    getTranslations("dashboard"),
+    getTranslations("teams.dashboard"),
+  ]);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -136,7 +140,14 @@ export default async function DashboardPage({
     await finalizeInvitationIfReady(params.invitationId);
   }
 
-  const [selfReport, profileData, initialInvitationRows, initialRunsResult, roleViews] =
+  const [
+    selfReport,
+    profileData,
+    initialInvitationRows,
+    initialRunsResult,
+    roleViews,
+    founderTeams,
+  ] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
       getProfileBasicsRow(supabase, user.id).catch(() => null),
@@ -149,6 +160,10 @@ export default async function DashboardPage({
         .order("created_at", { ascending: false })
         .limit(20),
       getDashboardRoleViews(user.id),
+      getFounderTeamDashboardSummaries(user.id, supabase).catch((error) => {
+        console.error("dashboard founder teams load failed", error);
+        return [];
+      }),
     ]);
 
   if (!roleViews.hasFounder && roleViews.hasAdvisor) {
@@ -661,6 +676,53 @@ export default async function DashboardPage({
             {t("team.title")}
           </h2>
         </div>
+
+        <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">
+            {teamsT("eyebrow")}
+          </p>
+          <h3 className="mt-2 text-base font-semibold text-slate-900">
+            {teamsT("title")}
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            {teamsT("description")}
+          </p>
+
+          {founderTeams.length === 0 ? (
+            <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+              {teamsT("empty")}
+            </p>
+          ) : (
+            <ul className="mt-4 grid gap-3 md:grid-cols-2">
+              {founderTeams.map((team) => {
+                const memberNames = team.members.map(
+                  (member, index) =>
+                    member.displayName ?? teamsT("memberFallback", { index: index + 1 })
+                );
+                const teamTitle = team.name ?? memberNames.join(" + ");
+                const context =
+                  team.teamContext === "existing_team"
+                    ? teamsT("context.existingTeam")
+                    : teamsT("context.preFounder");
+
+                return (
+                  <li
+                    key={team.id}
+                    className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{teamTitle}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{context}</p>
+                    </div>
+                    <Link href={`/teams/${encodeURIComponent(team.id)}`} className={UTILITY_CTA_CLASS}>
+                      {teamsT("open")}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </article>
 
         <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
           <div className="flex flex-wrap items-center justify-between gap-4">

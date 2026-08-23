@@ -1,0 +1,59 @@
+{
+  "homebase": {
+    "eyebrow": "Founder team",
+    "title": "Our collaboration",
+    "back": "Back to dashboard",
+    "context": {
+      "preFounder": "You are exploring founding a company together",
+      "existingTeam": "You already work together as a founder team"
+    },
+    "founders": {
+      "title": "Founders",
+      "fallback": "Founder {index}"
+    },
+    "alignment": {
+      "title": "Alignment",
+      "description": "Your existing perspectives, reports, and discussion work.",
+      "empty": "This team does not have a shared alignment area yet.",
+      "noArtifacts": "No reports or shared work areas are available for this connection yet.",
+      "pair": "Alignment between {names}",
+      "report": "View report",
+      "workbook": "Open workbook",
+      "continue": "Continue alignment",
+      "matchingReport": "View matching report",
+      "workspace": "Open matching workspace"
+    },
+    "agreements": {
+      "title": "Agreements",
+      "description": "Entry points to the areas where you have already captured agreements.",
+      "empty": "No shared agreements have been captured yet.",
+      "workbook": "Agreements in the workbook",
+      "workspace": "Agreements in the matching workspace",
+      "open": "Open",
+      "pair": "Between {names}"
+    },
+    "advisor": {
+      "title": "Advisor",
+      "description": "Advisor access to your existing alignment areas.",
+      "pair": "Access for {names}",
+      "statuses": {
+        "pending": "Approval open",
+        "approved": "Approved",
+        "invited": "Invited",
+        "linked": "Connected"
+      }
+    }
+  },
+  "dashboard": {
+    "eyebrow": "Shared areas",
+    "title": "My founder teams",
+    "description": "Open the shared overview for an existing founder team.",
+    "empty": "New founder teams appear here once a shared connection has been created.",
+    "open": "Open",
+    "memberFallback": "Founder {index}",
+    "context": {
+      "preFounder": "You are exploring founding a company together",
+      "existingTeam": "Existing founder team"
+    }
+  }
+}
