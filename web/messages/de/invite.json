@@ -121,14 +121,14 @@
     },
     "error": {
       "title": "Einladung nicht verfügbar",
-      "description": "Die Einladung konnte nicht geladen werden ({reason})."
+      "description": "Die Einladung konnte gerade nicht geladen werden. Bitte versuche es erneut oder prüfe den Status im Dashboard."
     },
     "reportReady": {
       "title": "Stark, alles ist komplett.",
       "description": "Euer Founder-Report ist bereit. Du wirst in wenigen Sekunden weitergeleitet und kannst ihn direkt gemeinsam nutzen.",
       "valuesHint": "Euer Matching-Report auf Basis der Basisprofile ist bereit. Wenn du jetzt weitermachst, ergänzt du ihn noch um das Werte-Modul.",
       "completeHint": "Basisprofil und ggf. Werteprofil sind jetzt im gemeinsamen Report zusammengeführt.",
-      "retryHint": "Der Matching-Report wurde beim Laden erneut angestoßen ({reason})."
+      "retryHint": "Der Matching-Report wird noch vorbereitet. Bitte prüfe den Status gleich noch einmal."
     },
     "existingProfileLinked": {
       "title": "Dein bestehendes Profil ist eingebunden.",
@@ -157,7 +157,7 @@
     },
     "fallback": {
       "title": "Fragebogen abgeschlossen",
-      "description": "Der Report konnte gerade noch nicht erstellt werden ({reason}). Bitte prüfe den Status im Dashboard."
+      "description": "Der Report konnte gerade noch nicht erstellt werden. Bitte prüfe den Status im Dashboard."
     }
   },
   "teamMatching": {

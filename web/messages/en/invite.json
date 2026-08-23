@@ -121,14 +121,14 @@
     },
     "error": {
       "title": "Invitation unavailable",
-      "description": "The invitation could not be loaded ({reason})."
+      "description": "The invitation could not be loaded right now. Please try again or check its status in the dashboard."
     },
     "reportReady": {
       "title": "You’re all set.",
       "description": "Your founder report is ready. You will be redirected in a few seconds and can open it right away.",
       "valuesHint": "Your matching report based on the foundation profiles is ready. If you continue now, you can add the values module next.",
       "completeHint": "Foundation profile and, where relevant, values profile are now combined in the shared report.",
-      "retryHint": "The matching report was triggered again while loading ({reason})."
+      "retryHint": "The matching report is still being prepared. Please check its status again shortly."
     },
     "existingProfileLinked": {
       "title": "Your existing profile is connected.",
@@ -157,7 +157,7 @@
     },
     "fallback": {
       "title": "Questionnaire complete",
-      "description": "The report could not be prepared right now ({reason}). Please check the status in the dashboard."
+      "description": "The report could not be prepared right now. Please check its status in the dashboard."
     }
   },
   "teamMatching": {

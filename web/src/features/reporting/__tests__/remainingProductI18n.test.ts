@@ -30,9 +30,15 @@ function source(relativePath: string) {
   return fs.readFileSync(path.resolve(root, relativePath), "utf8");
 }
 
-test("advisor, workbook speech, feedback speech, and auth messages stay structurally symmetric", () => {
+test("active founder and advisor message groups stay structurally symmetric", () => {
   const deAdvisor = readJson("messages/de/advisor.json");
   const enAdvisor = readJson("messages/en/advisor.json");
+  const deAssessment = readJson("messages/de/assessment.json");
+  const enAssessment = readJson("messages/en/assessment.json");
+  const deDashboard = readJson("messages/de/dashboard.json");
+  const enDashboard = readJson("messages/en/dashboard.json");
+  const deInvite = readJson("messages/de/invite.json");
+  const enInvite = readJson("messages/en/invite.json");
   const deWorkbook = readJson("messages/de/workbook.json");
   const enWorkbook = readJson("messages/en/workbook.json");
   const deFeedback = readJson("messages/de/feedback.json");
@@ -41,6 +47,9 @@ test("advisor, workbook speech, feedback speech, and auth messages stay structur
   const enAuth = readJson("messages/en/auth.json");
 
   assert.deepEqual(shape(deAdvisor), shape(enAdvisor));
+  assert.deepEqual(shape(deAssessment), shape(enAssessment));
+  assert.deepEqual(shape(deDashboard), shape(enDashboard));
+  assert.deepEqual(shape(deInvite), shape(enInvite));
   assert.deepEqual(shape(deWorkbook.speech), shape(enWorkbook.speech));
   assert.deepEqual(shape(deFeedback.dictation), shape(enFeedback.dictation));
   assert.deepEqual(shape(deAuth.login), shape(enAuth.login));
@@ -79,8 +88,15 @@ test("advisor impulse system copy is locale-aware while stored impulse text stay
 
 test("user-facing error boundaries do not render raw advisor or workbook diagnostics", () => {
   const client = source("src/features/reporting/FounderAlignmentWorkbookClient.tsx");
+  const advisorInviteForm = source("src/features/dashboard/AdvisorTeamInviteForm.tsx");
+  const advisorInviteAction = source("src/features/dashboard/advisorTeamInviteActions.ts");
+  const dashboard = source("src/app/(product)/dashboard/page.tsx");
+  const inviteDone = source("src/app/(product)/invite/[sessionId]/done/page.tsx");
+  const joinClient = source("src/app/join/JoinClient.tsx");
+  const joinWelcome = source("src/app/join/welcome/page.tsx");
   const workbookPage = source("src/app/(product)/founder-alignment/workbook/page.tsx");
   const loginPage = source("src/app/(product)/login/page.tsx");
+  const valuesPage = source("src/app/me/values/page.tsx");
 
   const proposalFailure = client.slice(
     client.indexOf("function formatAdvisorProposalFailure"),
@@ -92,6 +108,32 @@ test("user-facing error boundaries do not render raw advisor or workbook diagnos
   );
   assert.doesNotMatch(workbookPage, /statusWithReason|whyNotUsable|data\.reason/);
   assert.doesNotMatch(loginPage, /generic", \{ error \}/);
+  assert.doesNotMatch(dashboard, /t\("hero\.error", \{ error: params\.error \}\)/);
+  assert.doesNotMatch(dashboard, /runsResult\.error\.message\}<\/main>/);
+  assert.doesNotMatch(valuesPage, /questionsLoadError", \{ error:/);
+  assert.doesNotMatch(inviteDone, /description", \{ reason:/);
+  assert.doesNotMatch(joinClient, /technicalHint", \{ detail: uiState\.technicalError/);
+  assert.doesNotMatch(joinWelcome, /technicalHint", \{ detail/);
+  assert.doesNotMatch(advisorInviteForm, /\{result\.emailError\}/);
+  assert.doesNotMatch(advisorInviteAction, /error: insertError\?\.message/);
+});
+
+test("active advisor invite and workbook advisor chrome use locale-aware system copy", () => {
+  const client = source("src/features/reporting/FounderAlignmentWorkbookClient.tsx");
+  const form = source("src/features/dashboard/AdvisorTeamInviteForm.tsx");
+
+  assert.match(client, /wt\("advisor\.proposedBy"/);
+  assert.match(client, /wt\("advisor\.sentAt"/);
+  assert.match(client, /wt\("advisor\.waitingForFounder"/);
+  assert.match(client, /wt\("advisor\.approvalRow\.approved"/);
+  assert.match(client, /wt\("client\.fieldReadOnly"\)/);
+  assert.match(client, /wt\("client\.summary\.footer\.current"\)/);
+  assert.doesNotMatch(client, /`Vorgeschlagen von \$\{/);
+  assert.doesNotMatch(client, /`Gesendet am \$\{/);
+  assert.doesNotMatch(client, /t\("Nur lesbar"\)/);
+  assert.doesNotMatch(client, /t\("Diese Vereinbarung ist eure aktuelle Arbeitsgrundlage\./);
+  assert.match(form, /dashboard\.inviteTeam\.errors\.invalidFounderAEmail/);
+  assert.match(form, /dashboard\.inviteTeam\.emailDeliveryFailed/);
 });
 
 test("advisor report chrome uses neutral localized labels instead of raw classifications", () => {

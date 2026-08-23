@@ -119,7 +119,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
       <CompletionShell
         eyebrow={t("eyebrow")}
         title={t("error.title")}
-        description={t("error.description", { reason: decision.reason })}
+        description={t("error.description")}
       >
           <ResearchTrackedLink
             href={dashboardHref}
@@ -259,7 +259,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
           {renderReadyActions()}
           {!ensuredReportResult.ok ? (
             <p className="mt-4 text-xs text-slate-500">
-              {t("reportReady.retryHint", { reason: ensuredReportResult.reason })}
+              {t("reportReady.retryHint")}
             </p>
           ) : null}
       </CompletionShell>
@@ -406,7 +406,7 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     <CompletionShell
       eyebrow={t("eyebrow")}
       title={t("fallback.title")}
-      description={t("fallback.description", { reason: ensuredReportResult.reason })}
+      description={t("fallback.description")}
     >
         <ResearchPageTracker
           eventName="invite_done_viewed"

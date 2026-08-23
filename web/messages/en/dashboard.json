@@ -4,7 +4,8 @@
     "greeting": "Good to see you, {name}",
     "quoteEyebrow": "Quote of the day",
     "contextLabel": "Founder context",
-    "error": "Note: {error}",
+    "error": "The action could not be completed right now. Please try again.",
+    "loadError": "The dashboard could not be loaded completely right now. Please try again.",
     "expectation": "You invite your co-founder. After that, you get your matching report and work together in the workbook."
   },
   "actions": {
@@ -28,7 +29,7 @@
     "startProfileText": "This is the first step.",
     "continueValuesTitle": "Finish your values profile.",
     "startValuesTitle": "Start your values profile now.",
-    "valuesText": "This makes your profile more useful for the matching report and workbook.",
+    "valuesText": "This adds more information for the matching report and workbook.",
     "continueWorkbookTitle": "Keep working in the workbook.",
     "continueWorkbookText": "This is where your current working state lives.",
     "startWorkbookTitle": "Start the workbook now.",
@@ -61,7 +62,7 @@
       "done": "done",
       "running": "running",
       "open": "open",
-      "description": "This shows where you fit together and where tension may arise."
+      "description": "This compares your responses and highlights topics for discussion together."
     },
     "workbook": {
       "label": "Workbook",

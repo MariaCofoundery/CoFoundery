@@ -59,9 +59,18 @@
       "created": "Team created",
       "sentText": "Both founders were invited by email. The team now appears directly in your dashboard.",
       "createdText": "The team has been created and is visible in the dashboard. Share the founder links manually if email delivery did not fully work right now.",
+      "emailDeliveryFailed": "At least one email could not be sent right now. The invitation links remain available.",
       "copyLink": "Copy link",
       "copied": "Link copied.",
-      "copyFailed": "Copying is not available right now."
+      "copyFailed": "Copying is not available right now.",
+      "errors": {
+        "invalidFounderAEmail": "Please enter a valid email address for Founder A.",
+        "invalidFounderBEmail": "Please enter a valid email address for Founder B.",
+        "emailsMustDiffer": "Please use two different founder email addresses.",
+        "notAuthenticated": "Please sign in first.",
+        "duplicateInvite": "This team has already been invited and appears in your advisor dashboard.",
+        "createFailed": "The team could not be created right now. Please try again."
+      }
     },
     "teamProject": "Team/project: {name}",
     "openWorkbook": "Open workbook",
@@ -174,7 +183,7 @@
     "eyebrow": "Advisor snapshot",
     "context": "Advisor context",
     "notAvailableTitle": "Snapshot not available yet",
-    "notAvailableText": "There is no reliable snapshot available for this team context yet.",
+    "notAvailableText": "There is no snapshot available for this team context yet.",
     "backToDashboard": "Back to advisor dashboard",
     "export": "Export snapshot",
     "intro": "A compact coaching snapshot with focus areas, advisor prompts, founder response, and the next useful steps.",

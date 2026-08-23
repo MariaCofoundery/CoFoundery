@@ -4,7 +4,8 @@
     "greeting": "Schön, dass du da bist, {name}",
     "quoteEyebrow": "Zitat des Tages",
     "contextLabel": "Founder-Kontext",
-    "error": "Hinweis: {error}",
+    "error": "Die Aktion konnte gerade nicht abgeschlossen werden. Bitte versuche es erneut.",
+    "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut.",
     "expectation": "Du lädst deinen Co-Founder ein. Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook."
   },
   "actions": {
@@ -28,7 +29,7 @@
     "startProfileText": "Das ist der erste Schritt.",
     "continueValuesTitle": "Führe dein Werteprofil zu Ende.",
     "startValuesTitle": "Starte jetzt dein Werteprofil.",
-    "valuesText": "Damit wird dein Profil für Matching-Report und Workbook belastbarer.",
+    "valuesText": "Damit ergänzt du weitere Angaben für Matching-Report und Workbook.",
     "continueWorkbookTitle": "Arbeite im Workbook weiter.",
     "continueWorkbookText": "Hier liegt euer aktueller Arbeitsstand.",
     "startWorkbookTitle": "Starte jetzt das Workbook.",
@@ -61,7 +62,7 @@
       "done": "fertig",
       "running": "läuft",
       "open": "offen",
-      "description": "Hier wird sichtbar, wo ihr zusammenpasst und wo Spannungen entstehen können."
+      "description": "Hier vergleicht ihr eure Angaben und macht Themen für das gemeinsame Gespräch sichtbar."
     },
     "workbook": {
       "label": "Workbook",

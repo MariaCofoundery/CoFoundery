@@ -38,6 +38,7 @@
     "later": "Später starten"
   },
   "client": {
+    "fieldReadOnly": "Nur lesbar",
     "title": "Workbook für euer Gespräch",
     "duration": "Dauer: 60-90 Minuten",
     "progress": "Fortschritt",
@@ -94,6 +95,7 @@
     },
     "stepChrome": {
       "founderIntro": "Geht diesen Schritt in Ruhe durch und haltet am Ende eine klare Regel fest.",
+      "advisorIntro": "Hier siehst du, was die Founder in diesem Abschnitt bisher festgehalten haben.",
       "showHelp": "Hilfestellung anzeigen",
       "example": "Beispiel",
       "riskHint": "Worauf ihr achten solltet"
@@ -155,6 +157,11 @@
       "teamResponse": "Antwort des Teams",
       "nextCheckIn": "Nächster Check-in",
       "advisorNotes": "Impuls aus der Begleitung",
+      "footer": {
+        "current": "Diese Zusammenfassung zeigt eure aktuell festgehaltenen Vereinbarungen.",
+        "adjustable": "Ihr könnt die Formulierungen später gemeinsam anpassen.",
+        "legal": "Kein rechtlicher Vertrag."
+      },
       "empty": {
         "outsidePerspective": "Noch kein Außenblick festgehalten.",
         "openQuestions": "Noch keine Rückfragen festgehalten.",
@@ -454,6 +461,7 @@
     "startApproval": "Freigabe starten",
     "approve": "Freigabe erteilen",
     "context": "Advisor-Kontext",
+    "otherFounder": "die andere Founder-Person",
     "guidance": "Advisor-Begleitung",
     "rolesHint": "Freigabe und Rollenhinweise",
     "access": "Advisor-Zugriff",
@@ -482,6 +490,16 @@
     "sentAt": "Gesendet am {date}{email}.",
     "emailSuffix": " an {email}",
     "agree": "Zustimmen",
+    "approvalHintWithFounder": "Danach fehlt noch {founder}, falls die zweite Zustimmung noch offen ist.",
+    "approvalHint": "Damit wird dieser Advisor-Eintrag weiter freigegeben.",
+    "waitingForFounder": "Deine Zustimmung liegt vor. Jetzt fehlt noch {founder}.",
+    "waitingForSecondApproval": "Deine Zustimmung liegt vor. Jetzt fehlt noch die zweite Founder-Zustimmung.",
+    "noAdvisorDescription": "Schlagt bei Bedarf eine konkrete Person vor. Der Vorschlag bleibt sichtbar, bis die zweite Founder-Zustimmung vorliegt.",
+    "approvalRow": {
+      "approved": "Zugestimmt",
+      "linked": "Verbunden",
+      "open": "Offen"
+    },
     "errors": {
       "invalidEmail": "Bitte gib eine gültige Advisor-E-Mail-Adresse ein.",
       "relationshipUnavailable": "Der Advisor-Vorschlag kann diesem Team gerade nicht zugeordnet werden.",

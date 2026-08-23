@@ -17,6 +17,13 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 type EmailStatus = "sent" | "partial" | "not_sent";
+export type CreateAdvisorTeamInviteError =
+  | "invalid_founder_a_email"
+  | "invalid_founder_b_email"
+  | "founder_emails_must_differ"
+  | "not_authenticated"
+  | "duplicate_invite"
+  | "create_failed";
 
 export type CreateAdvisorTeamInviteActionResult =
   | {
@@ -27,11 +34,10 @@ export type CreateAdvisorTeamInviteActionResult =
       founderBInviteUrl: string;
       founderAEmail: string;
       founderBEmail: string;
-      emailError?: string;
     }
   | {
       ok: false;
-      error: string;
+      error: CreateAdvisorTeamInviteError;
     };
 
 function buildInvitePath(token: string) {
@@ -48,13 +54,13 @@ function normalizeDistinctFounderEmails(params: { founderAEmail: FormDataEntryVa
   const founderAEmail = normalizeEmail(String(params.founderAEmail ?? ""));
   const founderBEmail = normalizeEmail(String(params.founderBEmail ?? ""));
   if (!founderAEmail || !founderAEmail.includes("@")) {
-    return { ok: false as const, error: "Bitte eine gültige E-Mail für Founder A eingeben." };
+    return { ok: false as const, error: "invalid_founder_a_email" as const };
   }
   if (!founderBEmail || !founderBEmail.includes("@")) {
-    return { ok: false as const, error: "Bitte eine gültige E-Mail für Founder B eingeben." };
+    return { ok: false as const, error: "invalid_founder_b_email" as const };
   }
   if (founderAEmail === founderBEmail) {
-    return { ok: false as const, error: "Bitte zwei unterschiedliche Founder-E-Mails verwenden." };
+    return { ok: false as const, error: "founder_emails_must_differ" as const };
   }
 
   return {
@@ -73,7 +79,7 @@ export async function createAdvisorTeamInviteAction(
   } = await supabase.auth.getUser();
 
   if (!user?.id) {
-    return { ok: false, error: "Bitte zuerst anmelden." };
+    return { ok: false, error: "not_authenticated" };
   }
 
   const normalizedEmails = normalizeDistinctFounderEmails({
@@ -95,7 +101,7 @@ export async function createAdvisorTeamInviteAction(
   if (duplicateInvite) {
     return {
       ok: false,
-      error: "Dieses Team ist bereits eingeladen und erscheint schon in deinem Advisor-Dashboard.",
+      error: "duplicate_invite",
     };
   }
 
@@ -106,6 +112,9 @@ export async function createAdvisorTeamInviteAction(
       : "";
   const advisorName = profile?.display_name?.trim() || metadataName || null;
   const advisorEmail = normalizeEmail(user.email ?? null) || null;
+  const locale = await getRequestLocale();
+  const fallbackCounterpartLabel =
+    locale === "en" ? "the other founder" : "die zweite Founder-Person";
 
   const founderAToken = createOpaqueToken();
   const founderBToken = createOpaqueToken();
@@ -129,17 +138,18 @@ export async function createAdvisorTeamInviteAction(
     .single();
 
   if (insertError || !insertedRow?.id) {
-    return { ok: false, error: insertError?.message ?? "Team konnte gerade nicht angelegt werden." };
+    console.error("Failed to create advisor team invite", insertError);
+    return { ok: false, error: "create_failed" };
   }
 
-  const locale = await getRequestLocale();
   const [founderAEmailResult, founderBEmailResult] = await Promise.all([
     sendAdvisorTeamFounderInviteEmail({
       inviteeEmail: normalizedEmails.founderAEmail,
       inviteUrl: founderAInviteUrl,
       advisorName,
       teamName,
-      counterpartLabel: normalizedEmails.founderBEmail.split("@")[0]?.trim() || "die zweite Founder-Person",
+      counterpartLabel:
+        normalizedEmails.founderBEmail.split("@")[0]?.trim() || fallbackCounterpartLabel,
       locale,
     }),
     sendAdvisorTeamFounderInviteEmail({
@@ -147,7 +157,8 @@ export async function createAdvisorTeamInviteAction(
       inviteUrl: founderBInviteUrl,
       advisorName,
       teamName,
-      counterpartLabel: normalizedEmails.founderAEmail.split("@")[0]?.trim() || "die zweite Founder-Person",
+      counterpartLabel:
+        normalizedEmails.founderAEmail.split("@")[0]?.trim() || fallbackCounterpartLabel,
       locale,
     }),
   ]);
@@ -156,14 +167,6 @@ export async function createAdvisorTeamInviteAction(
   const sentCount = emailResults.filter((result) => result.ok).length;
   const emailStatus: EmailStatus =
     sentCount === 2 ? "sent" : sentCount === 0 ? "not_sent" : "partial";
-  const emailError =
-    emailStatus === "sent"
-      ? undefined
-      : emailResults
-          .filter((result): result is { ok: false; error: string } => !result.ok)
-          .map((result) => result.error)
-          .join(" | ");
-
   revalidatePath("/advisor/dashboard");
 
   return {
@@ -174,7 +177,6 @@ export async function createAdvisorTeamInviteAction(
     founderBInviteUrl,
     founderAEmail: normalizedEmails.founderAEmail,
     founderBEmail: normalizedEmails.founderBEmail,
-    emailError,
   };
 }
 

@@ -22,7 +22,7 @@
       "cta": "Start foundation questions"
     },
     "createError": "Something went wrong while creating the values questionnaire.",
-    "questionsLoadError": "Something went wrong while loading the values add-on: {error}",
+    "questionsLoadError": "The values add-on could not be loaded right now. Please try again.",
     "loadErrorTitle": "Values questions",
     "schemaMismatch": "The active values question set does not match the versioned values definition in the repository.",
     "missingNone": "none",

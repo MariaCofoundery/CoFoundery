@@ -245,9 +245,6 @@ export default function JoinClient() {
             <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               {t("expiredHint")}
             </p>
-            <p className="mt-3 text-xs text-slate-500">
-              {t("technicalHint", { detail: uiState.technicalError })}
-            </p>
             <a
               href="/dashboard"
               className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"

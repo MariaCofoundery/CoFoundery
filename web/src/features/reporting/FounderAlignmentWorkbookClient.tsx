@@ -1147,7 +1147,7 @@ export function FounderAlignmentWorkbookClient({
       ? founderBLabel
       : currentUserRole === "founderB"
         ? founderALabel
-        : t("die andere Person");
+        : wt("advisor.otherFounder");
   const advisorAccessState =
     advisorInviteState.advisorLinked && !advisorBothFoundersApproved
       ? "paused"
@@ -3121,16 +3121,22 @@ export function FounderAlignmentWorkbookClient({
                             <AdvisorApprovalRow
                               label={founderALabel}
                               approved={advisorInviteState.founderAApproved}
+                              approvedLabel={wt("advisor.approvalRow.approved")}
+                              openLabel={wt("advisor.approvalRow.open")}
                             />
                             <AdvisorApprovalRow
                               label={founderBLabel}
                               approved={advisorInviteState.founderBApproved}
+                              approvedLabel={wt("advisor.approvalRow.approved")}
+                              openLabel={wt("advisor.approvalRow.open")}
                             />
                             {advisorInviteState.advisorLinked ? (
                               <AdvisorApprovalRow
                                 label={advisorInviteState.advisorName ?? advisorLabel}
                                 approved
                                 tone="linked"
+                                approvedLabel={wt("advisor.approvalRow.linked")}
+                                openLabel={wt("advisor.approvalRow.open")}
                               />
                             ) : null}
                           </div>
@@ -3210,10 +3216,9 @@ export function FounderAlignmentWorkbookClient({
                                               <p className="mt-1 text-xs text-slate-600">{entry.advisorEmail}</p>
                                             ) : null}
                                             <p className="mt-2 text-xs text-slate-500">
-                                              {systemTextWithProtectedValues(
-                                                `Vorgeschlagen von ${advisorSuggestedByDisplayLabel(entry)}`,
-                                                [advisorSuggestedByDisplayLabel(entry)]
-                                              )}
+                                              {wt("advisor.proposedBy", {
+                                                name: advisorSuggestedByDisplayLabel(entry),
+                                              })}
                                             </p>
                                           </div>
                                           <span
@@ -3229,10 +3234,12 @@ export function FounderAlignmentWorkbookClient({
 
                                         {entry.status === "invited" && invitedAtLabel ? (
                                           <p className="mt-2 text-xs leading-6 text-slate-500">
-                                            {systemTextWithProtectedValues(
-                                              `Gesendet am ${invitedAtLabel}${entry.advisorEmail ? ` an ${entry.advisorEmail}` : ""}.`,
-                                              entry.advisorEmail ? [entry.advisorEmail] : []
-                                            )}
+                                            {wt("advisor.sentAt", {
+                                              date: invitedAtLabel,
+                                              email: entry.advisorEmail
+                                                ? wt("advisor.emailSuffix", { email: entry.advisorEmail })
+                                                : "",
+                                            })}
                                           </p>
                                         ) : null}
 
@@ -3240,10 +3247,14 @@ export function FounderAlignmentWorkbookClient({
                                           <AdvisorApprovalRow
                                             label={founderALabel}
                                             approved={entry.founderAApproved}
+                                            approvedLabel={wt("advisor.approvalRow.approved")}
+                                            openLabel={wt("advisor.approvalRow.open")}
                                           />
                                           <AdvisorApprovalRow
                                             label={founderBLabel}
                                             approved={entry.founderBApproved}
+                                            approvedLabel={wt("advisor.approvalRow.approved")}
+                                            openLabel={wt("advisor.approvalRow.open")}
                                           />
                                         </div>
 
@@ -3254,26 +3265,22 @@ export function FounderAlignmentWorkbookClient({
                                               onClick={() => handleApproveAdvisorEntry(entry.id)}
                                               className="justify-center"
                                             >
-                                              {t("Zustimmen")}
+                                              {wt("advisor.agree")}
                                             </ReportActionButton>
                                             <p className="text-xs leading-6 text-slate-600">
                                               {missingLabel
-                                                ? systemTextWithProtectedValues(
-                                                    `Danach fehlt noch ${missingLabel}, falls die zweite Zustimmung noch offen ist.`,
-                                                    [missingLabel]
-                                                  )
-                                                : t(
-                                                    "Damit wird dieser Advisor-Eintrag weiter freigegeben."
-                                                  )
+                                                ? wt("advisor.approvalHintWithFounder", {
+                                                    founder: missingLabel,
+                                                  })
+                                                : wt("advisor.approvalHint")
                                               }
                                             </p>
                                           </div>
                                         ) : currentFounderApprovedEntry(entry) && entry.status === "pending" ? (
                                           <p className="mt-3 text-xs leading-6 text-slate-600">
-                                            {systemTextWithProtectedValues(
-                                              `Deine Zustimmung liegt vor. Jetzt fehlt noch ${missingLabel ?? "die zweite Founder-Zustimmung"}.`,
-                                              missingLabel ? [missingLabel] : []
-                                            )}
+                                            {missingLabel
+                                              ? wt("advisor.waitingForFounder", { founder: missingLabel })
+                                              : wt("advisor.waitingForSecondApproval")}
                                           </p>
                                         ) : null}
 
@@ -3323,9 +3330,7 @@ export function FounderAlignmentWorkbookClient({
                                     {wt("advisor.noAdvisorProposed")}
                                   </p>
                                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                                    {t(
-                                      "Schlagt bei Bedarf eine konkrete Person vor. Der Vorschlag bleibt sichtbar, bis die zweite Founder-Zustimmung vorliegt."
-                                    )}
+                                    {wt("advisor.noAdvisorDescription")}
                                   </p>
                                 </div>
                               )}
@@ -3626,7 +3631,7 @@ export function FounderAlignmentWorkbookClient({
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
                         {isAdvisorViewer
-                          ? t("Hier siehst du, was die Founder in diesem Abschnitt bisher festgehalten haben.")
+                          ? wt("client.stepChrome.advisorIntro")
                           : wt("client.stepChrome.founderIntro")}
                       </p>
                     </div>
@@ -5114,10 +5119,14 @@ function buildStructuredFieldHelperText(
 function AdvisorApprovalRow({
   label,
   approved,
+  approvedLabel,
+  openLabel,
   tone = "default",
 }: {
   label: string;
   approved: boolean;
+  approvedLabel: string;
+  openLabel: string;
   tone?: "default" | "linked";
 }) {
   return (
@@ -5132,7 +5141,7 @@ function AdvisorApprovalRow({
             : "bg-slate-200/80 text-slate-500"
         }`}
       >
-        {approved ? (tone === "linked" ? t("verbunden") : t("zugestimmt")) : t("offen")}
+        {approved ? approvedLabel : openLabel}
       </span>
     </div>
   );
@@ -6024,7 +6033,7 @@ function WorkbookField({
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm font-semibold text-slate-900">{renderedTitle}</p>
             {readOnly ? (
-              <span className="text-xs text-slate-400">{t("Nur lesbar")}</span>
+              <span className="text-xs text-slate-400">{wt("client.fieldReadOnly")}</span>
             ) : null}
           </div>
         </div>
@@ -6403,13 +6412,13 @@ function WorkbookSummaryView({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-3xl">
             <p className="text-[15px] leading-8 text-slate-700">
-              {t("Diese Vereinbarung ist eure aktuelle Arbeitsgrundlage.")}
+              {wt("client.summary.footer.current")}
             </p>
             <p className="mt-2 text-sm leading-7 text-slate-700">
-              {t("Ihr könnt das jederzeit anpassen – entscheidend ist, dass ihr bewusst danach arbeitet.")}
+              {wt("client.summary.footer.adjustable")}
             </p>
             <p className="mt-3 text-xs leading-6 text-slate-400">
-              {t("Kein rechtlicher Vertrag – aber eure gemeinsame Grundlage.")}
+              {wt("client.summary.footer.legal")}
             </p>
           </div>
           <ReportActionButton type="button" onClick={() => window.print()} className="shrink-0 print:hidden">

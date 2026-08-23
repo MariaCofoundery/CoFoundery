@@ -188,7 +188,8 @@ export default async function DashboardPage({
   }
 
   if (runsResult.error) {
-    return <main className="p-8">Fehler beim Laden der Report-Runs: {runsResult.error.message}</main>;
+    console.error("dashboard report runs load failed", runsResult.error);
+    return <main className="p-8">{t("hero.loadError")}</main>;
   }
 
   const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
@@ -205,7 +206,8 @@ export default async function DashboardPage({
       : { data: [] as WorkbookDashboardRow[], error: null };
 
   if (workbookResult.error) {
-    return <main className="p-8">Fehler beim Laden der Workbooks: {workbookResult.error.message}</main>;
+    console.error("dashboard workbooks load failed", workbookResult.error);
+    return <main className="p-8">{t("hero.loadError")}</main>;
   }
 
   const profileCompletion = computeProfileCompletion(profileData);
@@ -533,7 +535,7 @@ export default async function DashboardPage({
           <div className="relative z-10">
             {params.error ? (
               <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                {t("hero.error", { error: params.error })}
+                {t("hero.error")}
               </p>
             ) : null}
 

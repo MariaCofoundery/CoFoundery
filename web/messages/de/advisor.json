@@ -59,9 +59,18 @@
       "created": "Team angelegt",
       "sentText": "Beide Founder wurden per E-Mail eingeladen. Das Team erscheint jetzt direkt in deinem Dashboard.",
       "createdText": "Das Team ist angelegt und im Dashboard sichtbar. Teile die Founder-Links notfalls manuell, wenn der Mailversand gerade nicht vollständig geklappt hat.",
+      "emailDeliveryFailed": "Mindestens eine E-Mail konnte gerade nicht versendet werden. Die Einladungslinks bleiben verfügbar.",
       "copyLink": "Link kopieren",
       "copied": "Link kopiert.",
-      "copyFailed": "Kopieren gerade nicht möglich."
+      "copyFailed": "Kopieren gerade nicht möglich.",
+      "errors": {
+        "invalidFounderAEmail": "Bitte gib eine gültige E-Mail-Adresse für Founder A ein.",
+        "invalidFounderBEmail": "Bitte gib eine gültige E-Mail-Adresse für Founder B ein.",
+        "emailsMustDiffer": "Bitte verwende zwei unterschiedliche Founder-E-Mail-Adressen.",
+        "notAuthenticated": "Bitte melde dich zuerst an.",
+        "duplicateInvite": "Dieses Team ist bereits eingeladen und erscheint schon in deinem Advisor-Dashboard.",
+        "createFailed": "Das Team konnte gerade nicht angelegt werden. Bitte versuche es erneut."
+      }
     },
     "teamProject": "Team/Projekt: {name}",
     "openWorkbook": "Workbook öffnen",
@@ -174,7 +183,7 @@
     "eyebrow": "Advisor Snapshot",
     "context": "Advisor-Kontext",
     "notAvailableTitle": "Snapshot aktuell noch nicht verfügbar",
-    "notAvailableText": "Für diesen Team-Kontext ist noch kein belastbarer Snapshot verfügbar.",
+    "notAvailableText": "Für diesen Team-Kontext ist noch kein Snapshot verfügbar.",
     "backToDashboard": "Zurück zum Advisor Dashboard",
     "export": "Snapshot exportieren",
     "intro": "Kompakter Coaching-Snapshot mit Fokusfeldern, Advisor-Impulsen, Founder-Reaktion und den nächsten sinnvollen Schritten.",

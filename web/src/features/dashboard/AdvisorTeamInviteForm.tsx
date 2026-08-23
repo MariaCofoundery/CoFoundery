@@ -5,8 +5,18 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   createAdvisorTeamInviteAction,
+  type CreateAdvisorTeamInviteError,
   type CreateAdvisorTeamInviteActionResult,
 } from "@/features/dashboard/advisorTeamInviteActions";
+
+const inviteErrorMessageKeys: Record<CreateAdvisorTeamInviteError, string> = {
+  invalid_founder_a_email: "dashboard.inviteTeam.errors.invalidFounderAEmail",
+  invalid_founder_b_email: "dashboard.inviteTeam.errors.invalidFounderBEmail",
+  founder_emails_must_differ: "dashboard.inviteTeam.errors.emailsMustDiffer",
+  not_authenticated: "dashboard.inviteTeam.errors.notAuthenticated",
+  duplicate_invite: "dashboard.inviteTeam.errors.duplicateInvite",
+  create_failed: "dashboard.inviteTeam.errors.createFailed",
+};
 
 function InviteLinkRow({
   label,
@@ -112,7 +122,7 @@ export function AdvisorTeamInviteForm() {
                 setResult(actionResult);
 
                 if (!actionResult.ok) {
-                  setError(actionResult.error);
+                  setError(t(inviteErrorMessageKeys[actionResult.error]));
                   return;
                 }
 
@@ -213,8 +223,10 @@ export function AdvisorTeamInviteForm() {
                   ? t("dashboard.inviteTeam.sentText")
                   : t("dashboard.inviteTeam.createdText")}
               </p>
-              {result.emailError ? (
-                <p className="mt-2 text-xs leading-6 text-amber-900">{result.emailError}</p>
+              {result.emailStatus !== "sent" ? (
+                <p className="mt-2 text-xs leading-6 text-amber-900">
+                  {t("dashboard.inviteTeam.emailDeliveryFailed")}
+                </p>
               ) : null}
               {result.emailStatus !== "sent" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">

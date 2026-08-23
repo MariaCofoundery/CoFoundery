@@ -38,6 +38,7 @@
     "later": "Start later"
   },
   "client": {
+    "fieldReadOnly": "Read-only",
     "title": "Workbook for your conversation",
     "duration": "Duration: 60-90 minutes",
     "progress": "Progress",
@@ -94,6 +95,7 @@
     },
     "stepChrome": {
       "founderIntro": "Work through this step at your own pace and capture one clear rule at the end.",
+      "advisorIntro": "Here you can see what the founders have captured in this section so far.",
       "showHelp": "Show guidance",
       "example": "Example",
       "riskHint": "What to watch for"
@@ -155,6 +157,11 @@
       "teamResponse": "Team response",
       "nextCheckIn": "Next check-in",
       "advisorNotes": "Advisor guidance",
+      "footer": {
+        "current": "This summary shows the agreements you have currently captured.",
+        "adjustable": "You can revise the wording together later.",
+        "legal": "This is not a legal contract."
+      },
       "empty": {
         "outsidePerspective": "No external perspective has been captured yet.",
         "openQuestions": "No open questions have been captured yet.",
@@ -454,6 +461,7 @@
     "startApproval": "Start approval",
     "approve": "Approve access",
     "context": "Advisor context",
+    "otherFounder": "the other founder",
     "guidance": "Advisor guidance",
     "rolesHint": "Approval and role guidance",
     "access": "Advisor access",
@@ -482,6 +490,16 @@
     "sentAt": "Sent on {date}{email}.",
     "emailSuffix": " to {email}",
     "agree": "Approve",
+    "approvalHintWithFounder": "After that, {founder} still needs to approve if the second approval is still open.",
+    "approvalHint": "This moves the advisor entry forward in the approval process.",
+    "waitingForFounder": "Your approval is recorded. Now {founder} still needs to approve.",
+    "waitingForSecondApproval": "Your approval is recorded. The second founder approval is still missing.",
+    "noAdvisorDescription": "Propose a specific person if needed. The proposal remains visible until the second founder approval is recorded.",
+    "approvalRow": {
+      "approved": "Approved",
+      "linked": "Linked",
+      "open": "Open"
+    },
     "errors": {
       "invalidEmail": "Please enter a valid advisor email address.",
       "relationshipUnavailable": "The advisor proposal cannot be linked to this team right now.",

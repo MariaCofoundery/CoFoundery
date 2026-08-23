@@ -22,7 +22,7 @@
       "cta": "Basis-Fragebogen starten"
     },
     "createError": "Fehler beim Erstellen des Werte-Fragebogens.",
-    "questionsLoadError": "Fehler beim Laden des Werte-Add-ons: {error}",
+    "questionsLoadError": "Das Werte-Add-on konnte gerade nicht geladen werden. Bitte versuche es erneut.",
     "loadErrorTitle": "Werte-Fragebogen",
     "schemaMismatch": "Die aktive Werte-Fragenbasis stimmt nicht mit der versionierten Werte-Definition im Repo überein.",
     "missingNone": "keine",

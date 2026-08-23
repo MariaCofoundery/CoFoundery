@@ -187,7 +187,8 @@ export default async function MeValuesPage({
     .order("sort_order", { ascending: true });
 
   if (questionsError) {
-    return <main className="p-8">{t("questionsLoadError", { error: questionsError.message })}</main>;
+    console.error("values questions load failed", questionsError);
+    return <main className="p-8">{t("questionsLoadError")}</main>;
   }
 
   const questions = (questionsData ?? []) as QuestionnaireQuestion[];

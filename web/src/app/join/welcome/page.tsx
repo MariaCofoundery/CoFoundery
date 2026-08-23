@@ -90,7 +90,7 @@ function invitationContextMeta(teamContext: string | null | undefined, t: Invite
   };
 }
 
-function renderErrorState(title: string, detail: string, t: InviteT) {
+function renderErrorState(title: string, t: InviteT) {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
       <div className="mb-5 flex justify-end">
@@ -99,7 +99,6 @@ function renderErrorState(title: string, detail: string, t: InviteT) {
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
         <p className="mt-3 text-sm text-slate-700">{t("errors.loadFailed")}</p>
-        <p className="mt-2 text-xs text-slate-500">{t("technicalHint", { detail })}</p>
         <Link
           href="/dashboard"
           className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
@@ -168,7 +167,7 @@ export default async function JoinWelcomePage({
         userId: user.id,
         error: error.message,
       });
-      return renderErrorState(resolveInviteError(error.message, t), error.message, t);
+      return renderErrorState(resolveInviteError(error.message, t), t);
     }
     const acceptedInvitationId = extractInvitationIdFromAcceptPayload(data);
     invitationId = acceptedInvitationId ?? invitationId;
@@ -181,7 +180,7 @@ export default async function JoinWelcomePage({
   }
 
   if (!invitationId) {
-    return renderErrorState(t("errors.notFound"), "missing_invitation_id", t);
+    return renderErrorState(t("errors.notFound"), t);
   }
 
   const { data: invitationData, error: invitationError } = await supabase
@@ -193,7 +192,7 @@ export default async function JoinWelcomePage({
     .maybeSingle();
 
   if (invitationError || !invitationData) {
-    return renderErrorState(t("errors.notFound"), invitationError?.message ?? "invitation_not_found", t);
+    return renderErrorState(t("errors.notFound"), t);
   }
 
   const invitation = invitationData as InvitationRow;
@@ -208,15 +207,15 @@ export default async function JoinWelcomePage({
     (userEmail.length > 0 && normalizeEmail(invitation.invitee_email) === userEmail);
 
   if (!isInvitee) {
-    return renderErrorState(t("errors.unavailable"), "not_invitee", t);
+    return renderErrorState(t("errors.unavailable"), t);
   }
 
   if (invitation.revoked_at || invitation.status === "revoked") {
-    return renderErrorState(t("errors.revoked"), "revoked", t);
+    return renderErrorState(t("errors.revoked"), t);
   }
 
   if (isInvitationExpired(invitation.expires_at)) {
-    return renderErrorState(t("errors.expired"), "expired", t);
+    return renderErrorState(t("errors.expired"), t);
   }
 
   const profile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
@@ -233,7 +232,7 @@ export default async function JoinWelcomePage({
     nextStep,
   });
   if (!nextStep.ok) {
-    return renderErrorState(t("errors.unavailable"), nextStep.detail ?? nextStep.reason, t);
+    return renderErrorState(t("errors.unavailable"), t);
   }
   const primaryHref = nextStep.resolvedHref;
   const primaryLabel = localizeNextStepLabel(nextStep.labelKey, t);
