@@ -26,6 +26,9 @@ export type AdvisorReportPreviewCopy = {
   detailsTitle: string;
   optional: string;
   intensity: string;
+  intensityLow: string;
+  intensityMedium: string;
+  intensityHigh: string;
   observation: string;
   possibleContribution: string;
   revisitWhen: string;
@@ -51,6 +54,9 @@ const DEFAULT_PREVIEW_COPY: AdvisorReportPreviewCopy = {
   detailsTitle: "Weitere Angaben je Dimension anzeigen",
   optional: "Optional",
   intensity: "Ausprägung",
+  intensityLow: "geringer Abstand",
+  intensityMedium: "mittlerer Abstand",
+  intensityHigh: "größerer Abstand",
   observation: "Beobachtung",
   possibleContribution: "Möglicher Beitrag",
   revisitWhen: "Erneut betrachten, wenn",
@@ -89,14 +95,12 @@ function initials(name: string) {
 }
 
 function badgeTone(value: AdvisorClassification) {
-  if (value === "risk") return "border-rose-200 bg-rose-50 text-rose-700";
-  if (value === "chance") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  void value;
   return "border-slate-200 bg-slate-50 text-slate-700";
 }
 
 function scaleTone(value: AdvisorClassification) {
-  if (value === "chance") return "border-emerald-200 bg-emerald-50/70 text-emerald-800";
-  if (value === "risk") return "border-amber-200 bg-amber-50/80 text-amber-800";
+  void value;
   return "border-slate-200 bg-slate-50 text-slate-700";
 }
 
@@ -138,35 +142,24 @@ function stripRepeatedLead(summary: string, title: string) {
 }
 
 function tightenPreviewCopy(text: string) {
-  return text
-    .replace("bleibt zu lange unkommentiert", "bleibt lange unkommentiert")
-    .replace("wird mehrfach neu bewertet", "wird wiederholt neu aufgerollt")
-    .replace("wird mehrfach gefuehrt", "wird wiederholt gefuehrt")
-    .replace("wirkt nicht offen gegensaetzlich, aber auch nicht selbsterklaerend deckungsgleich", "ist nicht offen strittig, aber auch nicht klar abgestimmt")
-    .replace("nicht selbsterklaerend deckungsgleich", "nicht klar abgestimmt")
-    .replace("wird wiederholt neu bewertet", "wird wiederholt neu aufgerollt")
-    .replace("kann aber auch", "kann aber")
-    .replace("Dadurch werden", "Dadurch wirken")
-    .replace("Dadurch koennen", "Dadurch wirken")
-    .trim();
+  return text.trim();
 }
 
 function shortenStabilityRationale(text: string) {
-  return tightenPreviewCopy(
-    text
-      .replace("Diese Dimension entlastet das Team derzeit, weil ", "")
-      .replace("Diese Dimension traegt derzeit, weil ", "")
-      .replace("Diese Dimension entlastet das Team, weil ", "")
-  );
+  return tightenPreviewCopy(text);
 }
 
 function shortenStabilityConstraint(text: string) {
-  return tightenPreviewCopy(
-    text
-      .replace("Stabil bleibt das nur, solange ", "")
-      .replace("Stabil bleibt das nur, wenn ", "")
-      .replace("Tragfaehig bleibt das nur, wenn ", "")
-  );
+  return tightenPreviewCopy(text);
+}
+
+function intensityLabel(
+  intensity: AdvisorDimensionAssessment["intensity"],
+  copy: AdvisorReportPreviewCopy
+) {
+  if (intensity === "high") return copy.intensityHigh;
+  if (intensity === "medium") return copy.intensityMedium;
+  return copy.intensityLow;
 }
 
 function renderDebugMeta(dimension: AdvisorDimensionAssessment) {
@@ -247,7 +240,9 @@ function DimensionInsightCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-slate-950">{meta.label}</h3>
-          <p className="mt-1 text-xs text-slate-500">{copy.intensity}: {dimension.intensity}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {copy.intensity}: {intensityLabel(dimension.intensity, copy)}
+          </p>
         </div>
         <ClassificationBadge dimension={dimension} copy={copy} />
       </div>
@@ -410,7 +405,7 @@ export function AdvisorReportPreview({
               <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm font-medium text-slate-950">{tightenPreviewCopy(item.marker)}</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-500">
-                  {item.dimensionKey}
+                  {getLocalizedFounderDimensionMeta(item.dimensionKey, locale)?.label ?? item.dimensionKey}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
                   {tightenPreviewCopy(item.whyItMatters)}
@@ -431,9 +426,6 @@ export function AdvisorReportPreview({
                     <span className="font-mono text-xs text-slate-500">{item.priorityScore}</span>
                   ) : null}
                 </div>
-                <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
-                  {item.interventionType}
-                </p>
                 <p className="mt-3 text-sm leading-6 text-slate-700">{item.objective}</p>
                 <p className="mt-3 text-sm leading-6 text-slate-900">{item.prompt}</p>
               </div>

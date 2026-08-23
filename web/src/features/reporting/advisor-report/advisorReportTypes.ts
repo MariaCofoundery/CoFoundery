@@ -31,6 +31,7 @@ export interface AdvisorDimensionAssessment {
   jointState: AdvisorJointState | null;
   riskLevel: AdvisorRiskLevel | null;
   hasSharedBlindSpotRisk: boolean;
+  hasMissingData?: boolean;
 
   distanceValue: number | null;
   intensity: AdvisorIntensity;
@@ -54,6 +55,7 @@ export interface AdvisorTopTension {
   priorityScore: number;
   intensity: AdvisorIntensity;
   classification: "risk" | "chance";
+  hasMissingData?: boolean;
   title: string;
   summary: string;
   tensionRisk: string;

@@ -44,7 +44,7 @@ export default async function AdvisorReportPage({
     redirect("/advisor/dashboard");
   }
 
-  const data = await getAdvisorReportPageData(invitationId);
+  const data = await getAdvisorReportPageData(invitationId, locale);
   const savedSectionKey = isAdvisorImpulseSectionKey(params.saved ?? "")
     ? (params.saved as AdvisorImpulseSectionKey)
     : null;
@@ -266,6 +266,9 @@ export default async function AdvisorReportPage({
             detailsTitle: t("report.preview.detailsTitle"),
             optional: t("report.preview.optional"),
             intensity: t("report.preview.intensity"),
+            intensityLow: t("report.preview.intensityLow"),
+            intensityMedium: t("report.preview.intensityMedium"),
+            intensityHigh: t("report.preview.intensityHigh"),
             observation: t("report.preview.observation"),
             possibleContribution: t("report.preview.possibleContribution"),
             revisitWhen: t("report.preview.revisitWhen"),

@@ -52,7 +52,8 @@ test("BOTH_LOW plus blind spot is treated as risk even with low founder distance
 
   assert.equal(assessment.intensity, "low");
   assert.equal(assessment.classification, "risk");
-  assert.match(assessment.tensionRisk, /gemeinsamer|gemeinsame/i);
+  assert.match(assessment.tensionRisk, /liegen näher beieinander/i);
+  assert.doesNotMatch(assessment.tensionRisk, /Risiko|Schieflage|blind/i);
 });
 
 test("MID_HIGH plus low risk can be read as chance in complementary dimensions", () => {

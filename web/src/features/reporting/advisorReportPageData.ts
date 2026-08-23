@@ -1,5 +1,5 @@
 import { compareFounders, type FounderScores } from "@/features/reporting/founderMatchingEngine";
-import { buildAdvisorReportData } from "@/features/reporting/advisor-report/advisorReportBuilders";
+import { buildLocalizedAdvisorReportData } from "@/features/reporting/advisor-report/advisorReportBuilders";
 import type { AdvisorReportData } from "@/features/reporting/advisor-report/advisorReportTypes";
 import {
   ADVISOR_IMPULSE_SECTION_ORDER,
@@ -330,7 +330,8 @@ async function resolveFounderScoringForAdvisorReport(
 }
 
 export async function getAdvisorReportPageData(
-  invitationId: string
+  invitationId: string,
+  locale: string | null | undefined = "de"
 ): Promise<AdvisorReportPageData> {
   const normalizedInvitationId = invitationId.trim();
   if (!normalizedInvitationId) {
@@ -594,7 +595,7 @@ export async function getAdvisorReportPageData(
     toFounderScores(founderScoring, "A"),
     toFounderScores(founderScoring, "B")
   );
-  const report = buildAdvisorReportData(compareResult);
+  const report = buildLocalizedAdvisorReportData(compareResult, locale);
   const impulseMap = emptyImpulseMap();
   for (const row of (impulseRowsResult.data ?? []) as AdvisorSectionImpulseRow[]) {
     impulseMap[row.section_key] = {

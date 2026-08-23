@@ -6,7 +6,11 @@ import {
 } from "@/features/reporting/advisor-report/advisorReportConfig";
 import {
   ADVISOR_DIMENSION_COPY,
+  ADVISOR_NARRATIVE_COPY,
+  getAdvisorDimensionCopy,
+  getAdvisorNarrativeCopy,
   type AdvisorDimensionCopy,
+  type AdvisorNarrativeCopy,
 } from "@/features/reporting/advisor-report/advisorReportCopy";
 import { selectAdvisorDimensionInputs } from "@/features/reporting/advisor-report/advisorReportSelectors";
 import type {
@@ -193,17 +197,22 @@ function getObservationVariant(input: AdvisorDimensionInput) {
 
 function summarizeTension(
   assessment: AdvisorDimensionAssessment,
-  copy: AdvisorDimensionCopy
+  copy: AdvisorDimensionCopy,
+  narrativeCopy: AdvisorNarrativeCopy
 ) {
+  if (assessment.hasMissingData) {
+    return narrativeCopy.topTensionSummary.missing(copy.title);
+  }
+
   if (assessment.classification === "chance") {
-    return `${copy.title}: produktive Differenz, solange der Unterschied explizit gefuehrt wird.`;
+    return narrativeCopy.topTensionSummary.difference(copy.title);
   }
 
   if (assessment.classification === "risk") {
-    return `${copy.title}: erhoehtes Moderationsrisiko, weil derselbe Sachverhalt nicht nach derselben Logik bearbeitet wird.`;
+    return narrativeCopy.topTensionSummary.markedDifference(copy.title);
   }
 
-  return `${copy.title}: aktuell eher entlastend, aber nur tragfaehig mit klaren Leitplanken.`;
+  return narrativeCopy.topTensionSummary.similar(copy.title);
 }
 
 function getTieBreakerIndex(config: AdvisorReportConfig, dimensionKey: AdvisorDimensionKey) {
@@ -278,24 +287,25 @@ function applyClusterBonuses(
 
 function buildLeadStatement(
   topTensions: AdvisorTopTension[],
-  stabilityFactors: AdvisorStabilityFactor[]
+  stabilityFactors: AdvisorStabilityFactor[],
+  copy: AdvisorNarrativeCopy
 ) {
   const lead = topTensions[0];
   const stability = stabilityFactors[0];
 
+  if (lead?.hasMissingData) {
+    return copy.leadStatement.missing(lead.title);
+  }
+
   if (!lead && stability) {
-    return `Das Team wirkt derzeit vor allem ueber ${stability.title} stabil. Entscheidend bleibt, dass diese Basis nicht still zur Annahme wird.`;
+    return copy.leadStatement.similar(stability.title);
   }
 
   if (!lead) {
-    return "Das Team zeigt aktuell keine stark eskalierende Hauptspannung, braucht aber weiterhin klare Regeln fuer belastbare Zusammenarbeit.";
+    return copy.leadStatement.noPriority;
   }
 
-  if (lead.classification === "chance") {
-    return `Die groesste Fuehrungsaufgabe liegt aktuell darin, den Unterschied in ${lead.title} bewusst tragfaehig zu fuehren.`;
-  }
-
-  return `Die groesste Moderationsaufgabe liegt aktuell in ${lead.title}, weil hier Spannungs- und Fehlsteuerungsrisiko zusammenlaufen.`;
+  return copy.leadStatement.discussion(lead.title);
 }
 
 export function buildAdvisorDimensionAssessment(
@@ -316,11 +326,22 @@ export function buildAdvisorDimensionAssessment(
     config.dimensionWeights[input.dimensionKey];
 
   const stabilityScore = getStabilityScore(input, config, classification);
-  const tensionRisk = copy.tensionRisk[getCopyVariant(input)];
-  const strengthPotential = copy.strengthPotential[getStrengthVariant(classification)];
-  const tippingPoint = copy.tippingPoint[getTippingPointVariant(input)];
-  const moderationQuestion = copy.moderationQuestion.default;
-  const observationMarkers = [...copy.observationMarkers[getObservationVariant(input)]];
+  const hasMissingData = input.founderAScore == null || input.founderBScore == null;
+  const tensionRisk = hasMissingData
+    ? copy.missingData.observation
+    : copy.tensionRisk[getCopyVariant(input)];
+  const strengthPotential = hasMissingData
+    ? copy.missingData.possibleContribution
+    : copy.strengthPotential[getStrengthVariant(classification)];
+  const tippingPoint = hasMissingData
+    ? copy.missingData.revisitWhen
+    : copy.tippingPoint[getTippingPointVariant(input)];
+  const moderationQuestion = hasMissingData
+    ? copy.missingData.moderationQuestion
+    : copy.moderationQuestion.default;
+  const observationMarkers = hasMissingData
+    ? [...copy.missingData.observationMarkers]
+    : [...copy.observationMarkers[getObservationVariant(input)]];
 
   return {
     dimensionKey: input.dimensionKey,
@@ -329,6 +350,7 @@ export function buildAdvisorDimensionAssessment(
     jointState: input.jointState,
     riskLevel: input.riskLevel,
     hasSharedBlindSpotRisk: input.hasSharedBlindSpotRisk,
+    hasMissingData,
     distanceValue,
     intensity,
     classification,
@@ -347,7 +369,8 @@ export function buildAdvisorDimensionAssessment(
 export function buildAdvisorTopTensions(
   assessments: AdvisorDimensionAssessment[],
   config: AdvisorReportConfig = DEFAULT_ADVISOR_REPORT_CONFIG,
-  copyMap: Record<AdvisorDimensionKey, AdvisorDimensionCopy> = ADVISOR_DIMENSION_COPY
+  copyMap: Record<AdvisorDimensionKey, AdvisorDimensionCopy> = ADVISOR_DIMENSION_COPY,
+  narrativeCopy: AdvisorNarrativeCopy = ADVISOR_NARRATIVE_COPY
 ): AdvisorTopTension[] {
   const ranked = applyClusterBonuses(assessments, config);
   const primaryCandidates = ranked.filter((assessment) => assessment.classification !== "neutral");
@@ -368,8 +391,9 @@ export function buildAdvisorTopTensions(
       priorityScore: assessment.clusteredPriorityScore,
       intensity: assessment.intensity,
       classification,
+      hasMissingData: assessment.hasMissingData,
       title: copy.title,
-      summary: summarizeTension(assessment, copy),
+      summary: summarizeTension(assessment, copy, narrativeCopy),
       tensionRisk: assessment.tensionRisk,
       strengthPotential: assessment.strengthPotential,
       tippingPoint: assessment.tippingPoint,
@@ -388,6 +412,7 @@ export function buildAdvisorStabilityFactors(
   return assessments
     .filter(
       (assessment) =>
+        !assessment.hasMissingData &&
         assessment.stabilityScore > 0 &&
         (assessment.classification === "neutral" || assessment.classification === "chance")
     )
@@ -455,21 +480,22 @@ export function buildAdvisorInterventions(
 export function buildAdvisorReportData(
   compareResult: CompareFoundersResult,
   config: AdvisorReportConfig = DEFAULT_ADVISOR_REPORT_CONFIG,
-  copyMap: Record<AdvisorDimensionKey, AdvisorDimensionCopy> = ADVISOR_DIMENSION_COPY
+  copyMap: Record<AdvisorDimensionKey, AdvisorDimensionCopy> = ADVISOR_DIMENSION_COPY,
+  narrativeCopy: AdvisorNarrativeCopy = ADVISOR_NARRATIVE_COPY
 ): AdvisorReportData {
   const dimensionInputs = selectAdvisorDimensionInputs(compareResult);
   const dimensions = applyClusterBonuses(
     dimensionInputs.map((input) => buildAdvisorDimensionAssessment(input, config, copyMap)),
     config
   );
-  const topTensions = buildAdvisorTopTensions(dimensions, config, copyMap);
+  const topTensions = buildAdvisorTopTensions(dimensions, config, copyMap, narrativeCopy);
   const stabilityFactors = buildAdvisorStabilityFactors(dimensions, config, copyMap);
   const observationPoints = buildAdvisorObservationPoints(topTensions, config);
   const interventions = buildAdvisorInterventions(topTensions, copyMap);
 
   return {
     teamSummary: {
-      leadStatement: buildLeadStatement(topTensions, stabilityFactors),
+      leadStatement: buildLeadStatement(topTensions, stabilityFactors, narrativeCopy),
       topPatternKeys: topTensions.map((entry) => entry.dimensionKey),
     },
     dimensions,
@@ -478,4 +504,17 @@ export function buildAdvisorReportData(
     observationPoints,
     interventions,
   };
+}
+
+export function buildLocalizedAdvisorReportData(
+  compareResult: CompareFoundersResult,
+  locale: string | null | undefined,
+  config: AdvisorReportConfig = DEFAULT_ADVISOR_REPORT_CONFIG
+): AdvisorReportData {
+  return buildAdvisorReportData(
+    compareResult,
+    config,
+    getAdvisorDimensionCopy(locale),
+    getAdvisorNarrativeCopy(locale)
+  );
 }
