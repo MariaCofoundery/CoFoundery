@@ -28,7 +28,6 @@ type InvitationRelationshipRow = {
   id: string;
   inviter_user_id: string;
   invitee_user_id: string | null;
-  relationship_id: string | null;
 };
 
 type LegacyWorkbookAdvisorRow = {
@@ -97,7 +96,7 @@ export async function resolveRelationshipIdForInvitation(
 
   const { data, error } = await client
     .from("invitations")
-    .select("id, inviter_user_id, invitee_user_id, relationship_id")
+    .select("id, inviter_user_id, invitee_user_id")
     .eq("id", normalizedInvitationId)
     .maybeSingle();
 
@@ -106,10 +105,6 @@ export async function resolveRelationshipIdForInvitation(
   }
 
   const invitation = data as InvitationRelationshipRow;
-  if (invitation.relationship_id) {
-    return invitation.relationship_id;
-  }
-
   const { data: reportRunData, error: reportRunError } = await client
     .from("report_runs")
     .select("relationship_id, created_at")
