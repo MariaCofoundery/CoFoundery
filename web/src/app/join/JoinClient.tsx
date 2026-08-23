@@ -40,6 +40,16 @@ function resolveInviteError(message: string, t: ReturnType<typeof useTranslation
     };
   }
 
+  if (
+    normalized.includes("invitation_email_mismatch") ||
+    normalized.includes("invitation_already_accepted")
+  ) {
+    return {
+      title: t("emailMismatchTitle"),
+      description: t("emailMismatchDescription"),
+    };
+  }
+
   return {
     title: t("acceptFailedTitle"),
     description: t("acceptFailedDescription"),

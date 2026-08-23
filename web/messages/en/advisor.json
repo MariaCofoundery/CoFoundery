@@ -267,6 +267,7 @@
     "notVisible": "Raw assessment answers and the full answer history of both founders are not part of advisor access.",
     "errors": {
       "alreadyClaimed": "This advisor link is already connected to another profile.",
+      "emailMismatch": "Please sign in with the email address this advisor invitation was sent to.",
       "invalidToken": "The advisor link could not be confirmed.",
       "updateFailed": "The link could not be saved right now."
     }

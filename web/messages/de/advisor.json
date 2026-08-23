@@ -267,6 +267,7 @@
     "notVisible": "Nicht Teil des Advisor-Zugriffs sind rohe Assessment-Antworten oder die komplette Antworthistorie der beiden Founder.",
     "errors": {
       "alreadyClaimed": "Dieser Advisor-Link ist bereits mit einem anderen Profil verknüpft.",
+      "emailMismatch": "Bitte melde dich mit der E-Mail-Adresse an, an die diese Advisor-Einladung gesendet wurde.",
       "invalidToken": "Der Advisor-Link konnte nicht bestätigt werden.",
       "updateFailed": "Die Verknüpfung konnte gerade nicht gespeichert werden."
     }

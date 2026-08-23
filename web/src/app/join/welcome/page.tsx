@@ -63,6 +63,12 @@ function resolveInviteError(message: string, t: InviteT) {
   if (normalized.includes("invalid_token")) return t("errors.invalidToken");
   if (normalized.includes("expired")) return t("errors.expired");
   if (normalized.includes("revoked")) return t("errors.revoked");
+  if (
+    normalized.includes("invitation_email_mismatch") ||
+    normalized.includes("invitation_already_accepted")
+  ) {
+    return t("errors.emailMismatch");
+  }
   if (normalized.includes("not_authenticated")) return t("errors.notAuthenticated");
   return t("errors.processingFailed");
 }

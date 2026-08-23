@@ -39,6 +39,9 @@ export default async function AdvisorInvitePage({
   const actionError =
     resolvedSearchParams.error === "already_claimed"
       ? t("invite.errors.alreadyClaimed")
+      : resolvedSearchParams.error === "email_mismatch" ||
+          resolvedSearchParams.error === "not_authenticated"
+        ? t("invite.errors.emailMismatch")
       : resolvedSearchParams.error === "invalid_token"
         ? t("invite.errors.invalidToken")
         : resolvedSearchParams.error === "update_failed"
@@ -97,7 +100,6 @@ export default async function AdvisorInvitePage({
     const result = await claimFounderAlignmentAdvisorAccess({
       invitationId: inviteData.invitationId,
       advisorToken: token,
-      userId: user.id,
       fallbackName: profileName || (user.email?.split("@")[0] ?? null),
       teamContext: inviteData.teamContext,
     });

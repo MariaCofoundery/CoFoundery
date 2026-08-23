@@ -1,5 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeSafeInternalPath } from "@/features/auth/safeInternalPath";
 
 export type AuthErrorCode = "magic_link_failed" | "auth_callback_failed";
 const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
@@ -18,17 +19,7 @@ type AuthSessionLikeClient = {
 };
 
 export function normalizeNextPath(value: string | null | undefined, fallback = "/dashboard") {
-  const trimmed = (value ?? "").trim();
-  if (!trimmed.startsWith("/")) {
-    return fallback;
-  }
-
-  if (trimmed.startsWith("//")) {
-    const normalized = `/${trimmed.replace(/^\/+/, "")}`;
-    return normalized.length > 1 ? normalized : fallback;
-  }
-
-  return trimmed;
+  return normalizeSafeInternalPath(value, fallback);
 }
 
 function readNestedNextPath(rawUrl: string | null | undefined) {

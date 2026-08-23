@@ -30,6 +30,7 @@ import {
   type RelationshipAdvisorRow,
 } from "@/features/reporting/relationshipAdvisorAccess";
 import { trackServerResearchEvent } from "@/features/research/server";
+import { getAdvisorInviteClaimIdentityDecision } from "@/features/reporting/advisorInviteClaimIdentity";
 
 type SaveFounderAlignmentWorkbookInput = {
   invitationId: string;
@@ -252,7 +253,9 @@ export type ClaimFounderAlignmentAdvisorAccessResult =
       ok: false;
       reason:
         | "missing_service_role"
+        | "not_authenticated"
         | "invalid_token"
+        | "email_mismatch"
         | "already_claimed"
         | "update_failed";
     };
@@ -1901,16 +1904,24 @@ export async function copyFounderAlignmentAdvisorInviteLink({
 export async function claimFounderAlignmentAdvisorAccess({
   invitationId,
   advisorToken,
-  userId,
   fallbackName,
   teamContext = null,
 }: {
   invitationId: string;
   advisorToken: string;
-  userId: string;
   fallbackName: string | null;
   teamContext?: TeamContext | null;
 }): Promise<ClaimFounderAlignmentAdvisorAccessResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const userId = user.id;
   const privileged = createPrivilegedClient();
   if (!privileged) {
     return { ok: false, reason: "missing_service_role" };
@@ -1942,12 +1953,23 @@ export async function claimFounderAlignmentAdvisorAccess({
       return { ok: false, reason: "invalid_token" };
     }
 
-    if (typedRelationshipRow.advisor_user_id && typedRelationshipRow.advisor_user_id !== userId) {
+    const identityDecision = getAdvisorInviteClaimIdentityDecision({
+      invitedEmail: typedRelationshipRow.advisor_email,
+      authenticatedEmail: user.email,
+      linkedAdvisorUserId: typedRelationshipRow.advisor_user_id,
+      authenticatedUserId: userId,
+    });
+
+    if (identityDecision === "email_mismatch") {
+      return { ok: false, reason: "email_mismatch" };
+    }
+
+    if (identityDecision === "already_claimed") {
       return { ok: false, reason: "already_claimed" };
     }
 
     const claimedAt = typedRelationshipRow.linked_at ?? new Date().toISOString();
-    const { data: updatedRelationshipRow, error: updateRelationshipError } = await privileged
+    let updateRelationshipQuery = privileged
       .from("relationship_advisors")
       .update({
         advisor_user_id: userId,
@@ -1955,7 +1977,14 @@ export async function claimFounderAlignmentAdvisorAccess({
         status: "linked",
         linked_at: claimedAt,
       })
-      .eq("id", typedRelationshipRow.id)
+      .eq("id", typedRelationshipRow.id);
+
+    updateRelationshipQuery = typedRelationshipRow.advisor_user_id
+      ? updateRelationshipQuery.eq("advisor_user_id", userId)
+      : updateRelationshipQuery.is("advisor_user_id", null);
+
+    const { data: updatedRelationshipRow, error: updateRelationshipError } =
+      await updateRelationshipQuery
       .select(
         "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
       )
@@ -2006,97 +2035,10 @@ export async function claimFounderAlignmentAdvisorAccess({
     };
   }
 
-  const { data: advisorRow, error } = await privileged
-    .from("founder_alignment_workbook_advisors")
-    .select(
-      "invitation_id, advisor_user_id, advisor_name, token_hash, founder_a_approved, founder_b_approved, requested_by, approved_at, claimed_at"
-    )
-    .eq("invitation_id", invitationId)
-    .eq("token_hash", tokenHash)
-    .maybeSingle();
-
-  if (error || !advisorRow) {
-    return { ok: false, reason: "invalid_token" };
-  }
-
-  const typedAdvisorRow = advisorRow as AdvisorAccessRow;
-  const nextAdvisorName = typedAdvisorRow.advisor_name ?? fallbackName;
-
-  if (
-    typedAdvisorRow.founder_a_approved !== true ||
-    typedAdvisorRow.founder_b_approved !== true
-  ) {
-    return { ok: false, reason: "invalid_token" };
-  }
-
-  if (typedAdvisorRow.advisor_user_id && typedAdvisorRow.advisor_user_id !== userId) {
-    return { ok: false, reason: "already_claimed" };
-  }
-
-  const { data: updatedAdvisorRow, error: updateError } = await privileged
-    .from("founder_alignment_workbook_advisors")
-    .update({
-      advisor_user_id: userId,
-      advisor_name: nextAdvisorName,
-      claimed_at: typedAdvisorRow.claimed_at ?? new Date().toISOString(),
-    })
-    .eq("invitation_id", invitationId)
-    .eq("token_hash", tokenHash)
-    .select(
-      "invitation_id, advisor_user_id, advisor_name, token_hash, founder_a_approved, founder_b_approved, requested_by, approved_at, claimed_at"
-    )
-    .maybeSingle();
-
-  if (updateError || !updatedAdvisorRow) {
-    return { ok: false, reason: "update_failed" };
-  }
-
-  const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(invitationId, privileged);
-  if (!syncResult.ok && syncResult.reason !== "missing_relationship") {
-    console.error("relationship advisor sync failed after advisor claim", {
-      invitationId,
-      reason: syncResult.reason,
-    });
-  }
-
-  const { payload: currentPayload } = await loadWorkbookRow(invitationId, privileged);
-  const nextPayload = {
-    ...currentPayload,
-    advisorId: userId,
-    advisorName: nextAdvisorName,
-  } satisfies FounderAlignmentWorkbookPayload;
-
-  await privileged
-    .from("founder_alignment_workbooks")
-    .update({
-      payload: nextPayload,
-      updated_by: userId,
-    })
-    .eq("invitation_id", invitationId);
-
-  await trackServerResearchEvent({
-    eventName: "advisor_invite_claimed",
-    userId,
-    invitationId,
-    teamContext,
-    properties: {
-      hasFallbackName: Boolean(fallbackName),
-      advisorFlow: "legacy_single_advisor",
-    },
-  });
-
-  return {
-    ok: true,
-    row: {
-      invitation_id: updatedAdvisorRow.invitation_id,
-      advisor_user_id: updatedAdvisorRow.advisor_user_id,
-      advisor_name: updatedAdvisorRow.advisor_name,
-      founder_a_approved: updatedAdvisorRow.founder_a_approved,
-      founder_b_approved: updatedAdvisorRow.founder_b_approved,
-      approved_at: updatedAdvisorRow.approved_at,
-      claimed_at: updatedAdvisorRow.claimed_at,
-    },
-  };
+  // Legacy advisor rows do not contain an invited email and therefore cannot satisfy the
+  // identity boundary required for a secure claim. They remain readable for historical data,
+  // but must be re-invited through the current relationship_advisors flow before claiming.
+  return { ok: false, reason: "email_mismatch" };
 }
 
 function normalizeAdvisorInviteTeamContext(value: string | null | undefined): TeamContext {
