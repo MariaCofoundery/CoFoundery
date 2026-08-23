@@ -69,7 +69,7 @@ import type { FounderMatchingMarkerClass } from "@/features/reporting/founderMat
 import { type FounderAlignmentWorkbookAdvisorInviteState } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { type FounderAlignmentWorkbookAdvisorEntry } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import {
-  ADVISOR_IMPULSE_SECTION_META,
+  getAdvisorImpulseSectionMeta,
   type FounderVisibleAdvisorImpulse,
 } from "@/features/reporting/advisorSectionImpulses";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
@@ -91,6 +91,10 @@ import {
 } from "@/features/reporting/workbookReactionPresentation";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
+import {
+  getPresentationLocale,
+  getSpeechRecognitionLocale,
+} from "@/i18n/presentationLocale";
 
 type FounderAlignmentWorkbookClientProps = {
   invitationId: string | null;
@@ -661,24 +665,20 @@ const WORKBOOK_MODE_OPTIONS: ReadonlyArray<{
 
 const FOUNDER_REACTION_OPTIONS: Array<{
   value: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>;
-  label: string;
 }> = [
-  { value: "understood", label: t("Aufgenommen") },
-  { value: "open", label: t("Bleibt offen") },
-  { value: "in_clarification", label: t("Weiter klaeren") },
+  { value: "understood" },
+  { value: "open" },
+  { value: "in_clarification" },
 ];
 
 const ADVISOR_FOLLOW_UP_OPTIONS: Array<{
   value: AdvisorFollowUpOption;
-  label: string;
 }> = [
-  { value: "none", label: t("Kein Check-in gesetzt") },
-  { value: "four_weeks", label: t("Check-in in 4 Wochen") },
-  { value: "three_months", label: t("Check-in in 3 Monaten") },
+  { value: "none" },
+  { value: "four_weeks" },
+  { value: "three_months" },
 ];
 
-const AVAILABLE_SPEECH_LANGUAGES = ["de-DE", "en-US"] as const;
-const DEFAULT_SPEECH_LANGUAGE = AVAILABLE_SPEECH_LANGUAGES[0];
 const DICTATION_INACTIVITY_MS = 9000;
 const DICTATION_RESTART_MS = 250;
 const WORKBOOK_AUTOSAVE_DELAY_MS = 1800;
@@ -779,28 +779,28 @@ function hasDecisionRulesWeightingForAllEntries(
   );
 }
 
-function formatDiscussionTimestamp(value: string) {
+function formatDiscussionTimestamp(value: string, locale: string, legacyLabel: string) {
   if (!value || value === LEGACY_WORKSPACE_TIMESTAMP) {
-    return "Vorhandener Stand";
+    return legacyLabel;
   }
 
-  return new Intl.DateTimeFormat("de-DE", {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-function formatAdvisorInviteTimestamp(value: string | null) {
+function formatAdvisorInviteTimestamp(value: string | null, locale: string) {
   if (!value) return null;
 
-  return new Intl.DateTimeFormat("de-DE", {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-function formatAdvisorImpulseTimestamp(value: string) {
-  return new Intl.DateTimeFormat("de-DE", {
+function formatAdvisorImpulseTimestamp(value: string, locale: string) {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -956,6 +956,10 @@ export function FounderAlignmentWorkbookClient({
     [locale]
   );
   const workbookContent = useMemo(() => getWorkbookContent(locale), [locale]);
+  const advisorImpulseSectionMeta = useMemo(
+    () => getAdvisorImpulseSectionMeta(locale),
+    [locale]
+  );
   const [workbook, setWorkbook] = useState(initialWorkbook);
   const [saveState, setSaveState] = useState<{
     kind: "idle" | "dirty" | "saving" | "saved" | "autosaved" | "error";
@@ -1106,10 +1110,10 @@ export function FounderAlignmentWorkbookClient({
     workbook.advisorClosing.observations.trim().length > 0 &&
     workbook.advisorClosing.nextSteps.trim().length > 0;
   const advisorClosingAdvisorStatusLabel = advisorClosingHasCoreInput
-    ? "Advisor-Impuls liegt vor"
+    ? wt("advisor.closing.status.complete")
     : advisorClosingHasAdvisorInput
-      ? "Advisor-Impuls in Arbeit"
-      : "Advisor-Impuls offen";
+      ? wt("advisor.closing.status.inProgress")
+      : wt("advisor.closing.status.open");
   const advisorClosingAdvisorStatusClassName = advisorClosingHasCoreInput
     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
     : advisorClosingHasAdvisorInput
@@ -1119,8 +1123,14 @@ export function FounderAlignmentWorkbookClient({
     workbook.founderReaction.status !== null || workbook.founderReaction.comment.trim().length > 0;
   const advisorClosingFounderReactionLabel =
     workbook.founderReaction.status != null
-      ? founderReactionStatusLabel(workbook.founderReaction.status)
-      : t("Noch keine Team-Reaktion");
+      ? wt(
+          workbook.founderReaction.status === "understood"
+            ? "advisor.closing.reactionStatuses.understood"
+            : workbook.founderReaction.status === "open"
+              ? "advisor.closing.reactionStatuses.open"
+              : "advisor.closing.reactionStatuses.clarification"
+        )
+      : wt("advisor.closing.reactionStatuses.missing");
   const founderAAdvisorApproved = advisorInviteState.founderAApproved;
   const founderBAdvisorApproved = advisorInviteState.founderBApproved;
   const advisorApprovalCount =
@@ -2613,8 +2623,8 @@ export function FounderAlignmentWorkbookClient({
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
         currentUserRole === "founderA"
-          ? t("Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder B ebenfalls zustimmt.")
-          : t("Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder A ebenfalls zustimmt.")
+          ? wt("advisor.actions.waitingFounderB")
+          : wt("advisor.actions.waitingFounderA")
       );
       return;
     }
@@ -2622,10 +2632,7 @@ export function FounderAlignmentWorkbookClient({
     if (result.status === "advisor_linked") {
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
-        systemTextWithProtectedValues(
-          `Advisor aktiv: ${result.advisorName ?? "Advisor"}. Der Zugriff auf die Advisor-Bereiche ist jetzt freigegeben.`,
-          [result.advisorName ?? "Advisor"]
-        )
+        wt("advisor.actions.linked", { advisor: result.advisorName ?? "Advisor" })
       );
       return;
     }
@@ -2636,11 +2643,11 @@ export function FounderAlignmentWorkbookClient({
       try {
         await navigator.clipboard.writeText(absoluteInviteUrl);
         setAdvisorInviteMessage(
-          t("Beide Founder haben freigegeben. Der Einladungslink wurde erstellt und in die Zwischenablage kopiert.")
+          wt("advisor.actions.inviteCopied")
         );
       } catch {
         setAdvisorInviteMessage(
-          t("Beide Founder haben freigegeben. Der Einladungslink wurde erstellt und kann jetzt weitergegeben werden.")
+          wt("advisor.actions.inviteReady")
         );
       }
       return;
@@ -2676,7 +2683,7 @@ export function FounderAlignmentWorkbookClient({
         if (statusDiff !== 0) return statusDiff;
         return (left.advisorName ?? left.advisorEmail ?? "").localeCompare(
           right.advisorName ?? right.advisorEmail ?? "",
-          "de"
+          locale
         );
       });
     syncAdvisorAggregate(nextEntries);
@@ -2685,36 +2692,36 @@ export function FounderAlignmentWorkbookClient({
   function statusMetaForAdvisorEntry(entry: FounderAlignmentWorkbookAdvisorEntry) {
     if (entry.status === "linked") {
       return {
-        label: "Aktiv",
+        label: wt("advisor.entryStatuses.linkedLabel"),
         className: "border-emerald-200 bg-emerald-50 text-emerald-700",
-        description: "Advisor ist verknüpft und kann im freigegebenen Kontext arbeiten.",
+        description: wt("advisor.entryStatuses.linkedDescription"),
       };
     }
     if (entry.status === "invited") {
       return {
-        label: "Eingeladen",
+        label: wt("advisor.entryStatuses.invitedLabel"),
         className: "border-sky-200 bg-sky-50 text-sky-700",
-        description: "Die Einladung wurde versendet. Der Advisor kann den Zugang jetzt über den Link öffnen.",
+        description: wt("advisor.entryStatuses.invitedDescription"),
       };
     }
     if (entry.status === "approved") {
       return {
-        label: "Freigegeben",
+        label: wt("advisor.entryStatuses.approvedLabel"),
         className: "border-sky-200 bg-sky-50 text-sky-700",
-        description: "Beide Founder haben zugestimmt. Der Eintrag ist bereit für den nächsten Invite-Schritt.",
+        description: wt("advisor.entryStatuses.approvedDescription"),
       };
     }
     if (entry.status === "revoked") {
       return {
-        label: "Pausiert",
+        label: wt("advisor.entryStatuses.revokedLabel"),
         className: "border-amber-200 bg-amber-50 text-amber-700",
-        description: "Die Freigabe wurde pausiert oder widerrufen.",
+        description: wt("advisor.entryStatuses.revokedDescription"),
       };
     }
     return {
-      label: "Wartet auf Zustimmung",
+      label: wt("advisor.entryStatuses.pendingLabel"),
       className: "border-amber-200 bg-amber-50 text-amber-700",
-      description: "Eine zweite Founder-Zustimmung fehlt noch.",
+      description: wt("advisor.entryStatuses.pendingDescription"),
     };
   }
 
@@ -2746,32 +2753,14 @@ export function FounderAlignmentWorkbookClient({
     }
 
     if (result.reason === "invalid_email") {
-      return t("Bitte gib eine gültige Advisor-E-Mail-Adresse ein.");
+      return wt("advisor.errors.invalidEmail");
     }
 
     if (result.reason === "missing_relationship") {
-      const debugParts = [
-        `invitationId=${result.debug.invitationId || "-"}`,
-        `relationshipId=${result.debug.relationshipId || "-"}`,
-        result.debug.validationError ? `validation=${result.debug.validationError}` : null,
-      ].filter(Boolean);
-      return `${t("Beziehung konnte nicht aufgelöst werden.")} ${debugParts.join(" | ")}`;
+      return wt("advisor.errors.relationshipUnavailable");
     }
 
-    const debugParts = [
-      `result=${result.debug.finalResult}`,
-      `invitationId=${result.debug.invitationId || "-"}`,
-      `relationshipId=${result.debug.relationshipId || "-"}`,
-      `userId=${result.debug.userId || "-"}`,
-      `role=${result.debug.founderRole}`,
-      `advisor_name=${result.debug.advisorName || "-"}`,
-      `advisor_email=${result.debug.advisorEmail || "-"}`,
-      result.debug.validationError ? `validation=${result.debug.validationError}` : null,
-      result.debug.dbError ? `db=${result.debug.dbError}` : null,
-      result.debug.repairResult ? `repair=${result.debug.repairResult}` : null,
-    ].filter(Boolean);
-
-    return `${t("Der Advisor-Vorschlag konnte nicht gespeichert werden.")} ${debugParts.join(" | ")}`;
+    return wt("advisor.errors.proposalFailed");
   }
 
   function handleProposeAdvisor() {
@@ -2799,8 +2788,8 @@ export function FounderAlignmentWorkbookClient({
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
         currentUserRole === "founderA"
-          ? t("Advisor vorgeschlagen. Jetzt kann Founder B zustimmen.")
-          : t("Advisor vorgeschlagen. Jetzt kann Founder A zustimmen.")
+          ? wt("advisor.actions.proposedWaitingB")
+          : wt("advisor.actions.proposedWaitingA")
       );
     });
   }
@@ -2821,8 +2810,8 @@ export function FounderAlignmentWorkbookClient({
         setAdvisorInviteLink(null);
         setAdvisorInviteMessage(
           result.reason === "missing_relationship"
-            ? t("Beziehung konnte nicht aufgelöst werden.")
-            : t("Die Zustimmung konnte gerade nicht gespeichert werden.")
+            ? wt("advisor.errors.relationshipUnavailable")
+            : wt("advisor.errors.approvalFailed")
         );
         return;
       }
@@ -2831,8 +2820,8 @@ export function FounderAlignmentWorkbookClient({
       setAdvisorInviteLink(null);
       setAdvisorInviteMessage(
         result.entry.status === "approved"
-          ? t("Beide Founder haben zugestimmt. Der Advisor ist jetzt freigegeben.")
-          : t("Die Zustimmung wurde gespeichert.")
+          ? wt("advisor.actions.approved")
+          : wt("advisor.actions.approvalSaved")
       );
     });
   }
@@ -2854,14 +2843,12 @@ export function FounderAlignmentWorkbookClient({
         setAdvisorInviteLink(null);
         setAdvisorInviteMessage(
           result.reason === "missing_email"
-            ? t("Für diesen Advisor fehlt noch eine E-Mail-Adresse.")
+            ? wt("advisor.errors.missingEmail")
             : result.reason === "not_ready"
-              ? t("Dieser Advisor-Eintrag ist noch nicht bereit für den Versand.")
+              ? wt("advisor.errors.inviteNotReady")
               : result.reason === "missing_relationship"
-                ? t("Beziehung konnte nicht aufgelöst werden.")
-              : t(
-                  "Die Einladung wurde noch nicht versendet. Der Advisor-Eintrag bleibt erhalten und kann bei Bedarf manuell geteilt werden."
-                )
+                ? wt("advisor.errors.relationshipUnavailable")
+                : wt("advisor.errors.inviteFailed")
         );
         return;
       }
@@ -2869,10 +2856,9 @@ export function FounderAlignmentWorkbookClient({
       upsertAdvisorEntry(result.entry);
       setAdvisorInviteLink(result.inviteUrl);
       setAdvisorInviteMessage(
-        systemTextWithProtectedValues(
-          `Einladung gesendet an ${result.entry.advisorEmail ?? "die hinterlegte Adresse"}.`,
-          result.entry.advisorEmail ? [result.entry.advisorEmail] : []
-        )
+        wt("advisor.actions.sentTo", {
+          email: result.entry.advisorEmail ?? advisorLabel,
+        })
       );
     });
   }
@@ -2893,8 +2879,8 @@ export function FounderAlignmentWorkbookClient({
         setAdvisorInviteLink(null);
         setAdvisorInviteMessage(
           result.reason === "missing_relationship"
-            ? t("Beziehung konnte nicht aufgelöst werden.")
-            : t("Der Einladungslink konnte gerade nicht vorbereitet werden.")
+            ? wt("advisor.errors.relationshipUnavailable")
+            : wt("advisor.errors.linkFailed")
         );
         return;
       }
@@ -2905,15 +2891,15 @@ export function FounderAlignmentWorkbookClient({
       if (typeof window !== "undefined") {
         try {
           await navigator.clipboard.writeText(result.inviteUrl);
-          setAdvisorInviteMessage(t("Einladungslink kopiert. Du kannst ihn jetzt manuell teilen."));
+          setAdvisorInviteMessage(wt("advisor.actions.linkCopied"));
           return;
         } catch {
-          setAdvisorInviteMessage(t("Einladungslink erstellt. Du kannst ihn jetzt manuell teilen."));
+          setAdvisorInviteMessage(wt("advisor.actions.linkReady"));
           return;
         }
       }
 
-      setAdvisorInviteMessage(t("Einladungslink erstellt."));
+      setAdvisorInviteMessage(wt("advisor.actions.linkCreated"));
     });
   }
 
@@ -3195,7 +3181,7 @@ export function FounderAlignmentWorkbookClient({
                                 <div className="space-y-3">
                                   {advisorEntriesState.map((entry) => {
                                     const statusMeta = statusMetaForAdvisorEntry(entry);
-                                    const invitedAtLabel = formatAdvisorInviteTimestamp(entry.invitedAt);
+                                    const invitedAtLabel = formatAdvisorInviteTimestamp(entry.invitedAt, locale);
                                     const canApproveCurrentFounder =
                                       (currentUserRole === "founderA" || currentUserRole === "founderB") &&
                                       entry.status === "pending" &&
@@ -3399,7 +3385,7 @@ export function FounderAlignmentWorkbookClient({
                                   </p>
                                   <div className="mt-3 space-y-3">
                                     {advisorImpulses.map((impulse) => {
-                                      const sectionMeta = ADVISOR_IMPULSE_SECTION_META[impulse.sectionKey];
+                                      const sectionMeta = advisorImpulseSectionMeta[impulse.sectionKey];
                                       return (
                                         <div
                                           key={impulse.id}
@@ -3412,7 +3398,8 @@ export function FounderAlignmentWorkbookClient({
                                               </p>
                                               <p className="mt-1 text-xs text-slate-500">
                                                 {impulse.advisorName ?? "Advisor"} · {formatAdvisorImpulseTimestamp(
-                                                  impulse.updatedAt
+                                                  impulse.updatedAt,
+                                                  locale
                                                 )}
                                               </p>
                                             </div>
@@ -3736,37 +3723,41 @@ export function FounderAlignmentWorkbookClient({
 
             {currentStepIsAdvisorClosing ? (
               <StepSection
-                title="Advisor-Abschluss"
+                title={wt("advisor.closing.title")}
                 className="mt-8 border-[color:var(--brand-accent)]/14 bg-[linear-gradient(135deg,rgba(15,23,42,0.035),rgba(255,255,255,0.98))]"
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-3xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      {t("Externe Perspektive")}
+                      {wt("advisor.closing.eyebrow")}
                     </p>
                     <p className="mt-2 text-lg font-semibold leading-8 text-slate-950 sm:text-xl">
-                      {t("Was sollte dieses Team nach der Session nicht uebersehen?")}
+                      {wt("advisor.closing.lead")}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-slate-700">
-                      {t(
-                        "Dieser Schritt buendelt den Aussenblick des Advisors. Er ersetzt keine Founder-Vereinbarung, sondern markiert Beobachtungen, offene Rueckfragen und den sinnvollsten naechsten Schritt."
-                      )}
+                      {wt("advisor.closing.description")}
                     </p>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${advisorClosingAdvisorStatusClassName}`}>
-                      {t(advisorClosingAdvisorStatusLabel)}
+                      {advisorClosingAdvisorStatusLabel}
                     </span>
                     <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600">
-                      {t(advisorFollowUpLabel(workbook.advisorFollowUp))}
+                      {wt(
+                        workbook.advisorFollowUp === "four_weeks"
+                          ? "advisor.closing.followUps.fourWeeks"
+                          : workbook.advisorFollowUp === "three_months"
+                            ? "advisor.closing.followUps.threeMonths"
+                            : "advisor.closing.followUps.none"
+                      )}
                     </span>
                     <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
                       advisorClosingHasFounderReaction
                         ? "border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/12 text-slate-900"
                         : "border-slate-200 bg-white text-slate-500"
                     }`}>
-                      {t(advisorClosingFounderReactionLabel)}
+                      {advisorClosingFounderReactionLabel}
                     </span>
                   </div>
                 </div>
@@ -3775,72 +3766,58 @@ export function FounderAlignmentWorkbookClient({
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("Advisor-Impuls")}
+                        {wt("advisor.closing.impulse")}
                       </p>
                       <p className="mt-2 text-sm leading-7 text-slate-700">
-                        {t(
-                          "Wenige klare Punkte reichen. Der Wert liegt nicht in Laenge, sondern in der Verdichtung."
-                        )}
+                        {wt("advisor.closing.impulseHint")}
                       </p>
                     </div>
                     {!canEditAdvisorClosing() ? (
                       <p className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-500">
-                        {systemTextWithProtectedValues(
-                          `Bearbeitung durch ${advisorLabel}`,
-                          [advisorLabel]
-                        )}
+                        {wt("advisor.closing.editingBy", { advisor: advisorLabel })}
                       </p>
                     ) : null}
                   </div>
 
                   <div className="mt-6 grid gap-5">
                     <WorkbookField
-                      title={t("1. Was auffaellt")}
+                      title={wt("advisor.closing.observationsTitle")}
                       value={workbook.advisorClosing.observations}
                       onChange={(value) => updateAdvisorClosing("observations", value)}
-                      placeholder={t("Welche zwei oder drei Muster, Staerken oder Spannungen sollte das Team nach der Session bewusst sehen?")}
+                      placeholder={wt("advisor.closing.observationsPlaceholder")}
                       readOnly={!canEditAdvisorClosing()}
                       helperText={
                         canEditAdvisorClosing()
-                          ? t("Kurz, konkret, beobachtbar. Keine zweite Analyse schreiben.")
-                          : systemTextWithProtectedValues(
-                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
-                              [advisorLabel]
-                            )
+                          ? wt("advisor.closing.observationsHelper")
+                          : wt("advisor.closing.fieldBy", { advisor: advisorLabel })
                       }
                       rows={5}
                       minHeightClassName="min-h-[150px]"
                     />
                     <WorkbookField
-                      title={t("2. Was offen bleibt")}
+                      title={wt("advisor.closing.questionsTitle")}
                       value={workbook.advisorClosing.questions}
                       onChange={(value) => updateAdvisorClosing("questions", value)}
-                      placeholder={t("Welche Rueckfragen sollten die Founder nicht liegen lassen, bevor sie enger zusammenarbeiten?")}
+                      placeholder={wt("advisor.closing.questionsPlaceholder")}
                       readOnly={!canEditAdvisorClosing()}
                       helperText={
                         canEditAdvisorClosing()
-                          ? t("Nur Fragen notieren, die wirklich weitere Klaerung ausloesen.")
-                          : systemTextWithProtectedValues(
-                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
-                              [advisorLabel]
-                            )
+                          ? wt("advisor.closing.questionsHelper")
+                          : wt("advisor.closing.fieldBy", { advisor: advisorLabel })
                       }
                       rows={4}
                       minHeightClassName="min-h-[132px]"
                     />
                     <WorkbookField
-                      title={t("3. Naechster sinnvoller Schritt")}
+                      title={wt("advisor.closing.nextStepsTitle")}
                       value={workbook.advisorClosing.nextSteps}
                       onChange={(value) => updateAdvisorClosing("nextSteps", value)}
-                      placeholder={t("Was sollte das Team als Naechstes konkret tun, pruefen oder terminieren?")}
+                      placeholder={wt("advisor.closing.nextStepsPlaceholder")}
                       readOnly={!canEditAdvisorClosing()}
                       helperText={
                         canEditAdvisorClosing()
-                          ? t("Ein klarer naechster Schritt ist besser als eine lange Empfehlungsliste.")
-                          : systemTextWithProtectedValues(
-                              `Dieses Feld wird von ${advisorLabel} ausgefuellt.`,
-                              [advisorLabel]
-                            )
+                          ? wt("advisor.closing.nextStepsHelper")
+                          : wt("advisor.closing.fieldBy", { advisor: advisorLabel })
                       }
                       rows={4}
                       minHeightClassName="min-h-[132px]"
@@ -3851,10 +3828,10 @@ export function FounderAlignmentWorkbookClient({
                 <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                   <div className="rounded-[26px] border border-slate-200/80 bg-white/88 p-5">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {t("Follow-up")}
+                      {wt("advisor.closing.followUp")}
                     </p>
                     <p className="mt-2 text-sm leading-7 text-slate-700">
-                      {t("Setzt nur dann einen Check-in, wenn er dem Team wirklich beim Dranbleiben hilft.")}
+                      {wt("advisor.closing.followUpHint")}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {ADVISOR_FOLLOW_UP_OPTIONS.map((option) => {
@@ -3873,7 +3850,13 @@ export function FounderAlignmentWorkbookClient({
                                   : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
                             }`}
                           >
-                            {option.label}
+                            {wt(
+                              option.value === "four_weeks"
+                                ? "advisor.closing.followUps.fourWeeks"
+                                : option.value === "three_months"
+                                  ? "advisor.closing.followUps.threeMonths"
+                                  : "advisor.closing.followUps.none"
+                            )}
                           </button>
                         );
                       })}
@@ -3882,12 +3865,10 @@ export function FounderAlignmentWorkbookClient({
 
                   <div className="rounded-[26px] border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/8 p-5">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-slate-600">
-                      {t("Antwort des Teams")}
+                      {wt("advisor.closing.teamResponse")}
                     </p>
                     <p className="mt-2 text-sm leading-7 text-slate-700">
-                      {t(
-                        "Die Founder reagieren knapp: Was nehmt ihr mit, was bleibt offen, worauf kommt ihr zurueck?"
-                      )}
+                      {wt("advisor.closing.teamResponseHint")}
                     </p>
 
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -3912,7 +3893,13 @@ export function FounderAlignmentWorkbookClient({
                                   : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
                             }`}
                           >
-                            {option.label}
+                            {wt(
+                              option.value === "understood"
+                                ? "advisor.closing.reactionStatuses.understood"
+                                : option.value === "open"
+                                  ? "advisor.closing.reactionStatuses.open"
+                                  : "advisor.closing.reactionStatuses.clarification"
+                            )}
                           </button>
                         );
                       })}
@@ -3920,21 +3907,21 @@ export function FounderAlignmentWorkbookClient({
 
                     {!canEditFounderReaction() ? (
                       <p className="mt-3 text-xs leading-6 text-slate-500">
-                        {t("Dieser Bereich wird von den Foundern gepflegt.")}
+                        {wt("advisor.closing.foundersOnly")}
                       </p>
                     ) : null}
 
                     <div className="mt-5">
                       <WorkbookField
-                        title={t("Kurze Antwort")}
+                        title={wt("advisor.closing.shortResponse")}
                         value={workbook.founderReaction.comment}
                         onChange={(value) => updateFounderReaction("comment", value)}
-                        placeholder={t("Zum Beispiel: Nehmen wir auf. Offene Frage bleibt ... Naechster Check ist ...")}
+                        placeholder={wt("advisor.closing.responsePlaceholder")}
                         readOnly={!canEditFounderReaction()}
                         helperText={
                           canEditFounderReaction()
-                            ? t("Kurz halten. Das ist eine Antwort, kein neuer Diskursraum.")
-                            : t("Dieses Feld wird von den Foundern ausgefuellt.")
+                            ? wt("advisor.closing.responseHelper")
+                            : wt("advisor.closing.founderField")
                         }
                         rows={4}
                         minHeightClassName="min-h-[132px]"
@@ -3945,19 +3932,19 @@ export function FounderAlignmentWorkbookClient({
 
                 <div className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/70 px-5 py-4">
                   <p className="text-sm font-medium text-slate-900">
-                    {t(
+                    {wt(
                       advisorClosingHasCoreInput
-                        ? "Der Advisor-Abschluss ist fachlich gefuellt."
-                        : "Der Advisor-Abschluss braucht mindestens Beobachtung und naechsten Schritt."
+                        ? "advisor.closing.complete"
+                        : "advisor.closing.incomplete"
                     )}
                   </p>
                   <p className="mt-1 text-xs leading-5 text-slate-500">
-                    {t(
+                    {wt(
                       !advisorClosingHasCoreInput
-                        ? "Die Team-Antwort ist nachgelagert. Fuer den Abschluss zaehlt zuerst ein belastbarer Advisor-Impuls."
+                        ? "advisor.closing.waitingTeam"
                         : advisorClosingHasFounderReaction
-                        ? "Das Team hat eine Antwort hinterlegt. Damit ist der Sondermodus sauber nachgelagert."
-                        : "Die Founder koennen danach kurz markieren, was sie aufnehmen, offenlassen oder weiter klaeren."
+                          ? "advisor.closing.teamResponded"
+                          : "advisor.closing.teamCanRespond"
                     )}
                   </p>
                 </div>
@@ -5517,7 +5504,11 @@ function WorkbookV2DiscussionThreadList({
             <div>
               <p className="text-sm font-medium text-slate-900">{authorLabel}</p>
               <p className="text-xs text-slate-500">
-                {formatDiscussionTimestamp(entry.updatedAt ?? entry.createdAt)}
+                {formatDiscussionTimestamp(
+                  entry.updatedAt ?? entry.createdAt,
+                  locale,
+                  wt("client.discussion.existingState")
+                )}
               </p>
             </div>
           </div>
@@ -5674,7 +5665,11 @@ function WorkbookV2DiscussionThreadList({
                               {reply.advisorName || advisorLabel}
                             </p>
                             <p className="text-xs text-slate-500">
-                              {formatDiscussionTimestamp(reply.updatedAt ?? reply.createdAt)}
+                              {formatDiscussionTimestamp(
+                                reply.updatedAt ?? reply.createdAt,
+                                locale,
+                                wt("client.discussion.existingState")
+                              )}
                             </p>
                           </div>
                         </div>
@@ -5833,6 +5828,7 @@ function WorkbookField({
   minHeightClassName?: string;
 }) {
   const locale = useLocale();
+  const wt = useTranslations("workbook");
   const renderedTitle =
     titleKind === "identity" ? title : normalizeWorkbookSystemText(title, locale);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
@@ -5877,7 +5873,7 @@ function WorkbookField({
       clearTimeoutIfSet(restartTimeoutRef);
       setSpeechActive(false);
       setDictationStatus("ended");
-      setSpeechMessage(t("Text uebernommen. Du kannst direkt weiter sprechen."));
+      setSpeechMessage(wt("speech.accepted"));
       recognitionRef.current?.stop();
     }, DICTATION_INACTIVITY_MS);
   }
@@ -5914,7 +5910,7 @@ function WorkbookField({
   }
 
   function stopDictation() {
-    finishDictationSession("ended", t("Text uebernommen. Du kannst direkt weiter sprechen."));
+    finishDictationSession("ended", wt("speech.accepted"));
     recognitionRef.current?.stop();
   }
 
@@ -5923,14 +5919,14 @@ function WorkbookField({
 
     const SpeechRecognitionCtor = getSpeechRecognitionConstructor(window);
     if (!SpeechRecognitionCtor) {
-      setSpeechMessage(t("Diktieren ist in diesem Browser nicht verfuegbar."));
+      setSpeechMessage(wt("speech.unsupported"));
       return;
     }
 
     const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = DEFAULT_SPEECH_LANGUAGE;
+    recognition.lang = getSpeechRecognitionLocale(locale);
     recognition.onresult = handleSpeechResult;
     recognition.onerror = (event) => {
       if (event.error === "no-speech" && shouldKeepListeningRef.current) {
@@ -5939,7 +5935,7 @@ function WorkbookField({
         return;
       }
 
-      finishDictationSession("error", mapSpeechError(event.error));
+      finishDictationSession("error", wt(`speech.errors.${mapSpeechErrorKey(event.error)}`));
     };
     recognition.onend = () => {
       if (shouldKeepListeningRef.current) {
@@ -5957,7 +5953,7 @@ function WorkbookField({
           } catch {
             finishDictationSession(
               "error",
-              t("Die Aufnahme konnte nicht erneut gestartet werden.")
+              wt("speech.restartFailed")
             );
           }
         }, DICTATION_RESTART_MS);
@@ -5981,7 +5977,7 @@ function WorkbookField({
       recognition.start();
       setSpeechActive(true);
     } catch {
-      finishDictationSession("error", t("Die Aufnahme konnte gerade nicht gestartet werden."));
+      finishDictationSession("error", wt("speech.startFailed"));
     }
   }
 
@@ -5997,9 +5993,9 @@ function WorkbookField({
   const dictationDisabled = readOnly || speechSupportState !== "supported";
   const dictationButtonLabel = speechActive
     ? dictationStatus === "paused"
-      ? t("Kurze Pause")
-      : t("Aufnahme laeuft")
-    : t("Diktieren");
+      ? wt("speech.paused")
+      : wt("speech.recording")
+    : wt("speech.start");
 
   return (
     <section
@@ -6041,13 +6037,13 @@ function WorkbookField({
           aria-label={
             titleKind === "identity"
               ? speechActive
-                ? `${t("Diktat fuer")} ${title} ${t("stoppen")}`
-                : `${t("Diktat fuer")} ${title} ${t("starten")}`
+                ? wt("speech.stopFor", { title })
+                : wt("speech.startFor", { title })
               : speechActive
-                ? t(`Diktat fuer ${title} stoppen`)
-                : t(`Diktat fuer ${title} starten`)
+                ? wt("speech.stopFor", { title: renderedTitle })
+                : wt("speech.startFor", { title: renderedTitle })
           }
-          title={t("Sprich frei. Der Text landet direkt im Feld.")}
+          title={wt("speech.hint")}
           className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-all duration-300 ${
             speechActive && dictationStatus === "paused"
               ? "border-amber-200 bg-amber-50 text-amber-700"
@@ -6073,19 +6069,19 @@ function WorkbookField({
 
       {!readOnly && speechSupportState === "unsupported" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Diktieren geht in diesem Browser gerade nicht. Schreiben funktioniert trotzdem.")}
+          {wt("speech.unsupportedLong")}
         </p>
       ) : null}
 
       {dictationStatus === "listening" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Aufnahme laeuft. Der Text erscheint direkt im Feld.")}
+          {wt("speech.listening")}
         </p>
       ) : null}
 
       {dictationStatus === "paused" ? (
         <p className="mt-3 text-xs leading-6 text-slate-500">
-          {t("Kurze Pause erkannt. Sprich einfach weiter.")}
+          {wt("speech.pauseHint")}
         </p>
       ) : null}
 
@@ -6492,28 +6488,6 @@ function SummaryInsightBlock({ title, text }: { title: string; text: string }) {
       </div>
     </div>
   );
-}
-
-function founderReactionStatusLabel(status: Exclude<FounderAlignmentWorkbookFounderReactionStatus, null>) {
-  switch (status) {
-    case "understood":
-      return t("Aufgenommen");
-    case "open":
-      return t("Bleibt offen");
-    case "in_clarification":
-      return t("Weiter klaeren");
-  }
-}
-
-function advisorFollowUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp | null) {
-  switch (value) {
-    case "four_weeks":
-      return t("Check-in in 4 Wochen");
-    case "three_months":
-      return t("Check-in in 3 Monaten");
-    default:
-      return t("Kein Check-in gesetzt.");
-  }
 }
 
 function workbookStepVisualTone(stepId: FounderAlignmentWorkbookStepId): WorkbookVisualTone {
@@ -7296,18 +7270,20 @@ function mergeSpeechIntoValue(baseValue: string, finalizedChunk: string, interim
   return pieces.join(baseValue.trim() ? "\n\n" : " ");
 }
 
-function mapSpeechError(error: string) {
+function mapSpeechErrorKey(
+  error: string
+): "permission" | "microphone" | "aborted" | "noSpeech" | "generic" {
   switch (error) {
     case "not-allowed":
     case "service-not-allowed":
-      return "Der Mikrofonzugriff wurde nicht freigegeben.";
+      return "permission";
     case "audio-capture":
-      return "Es konnte kein Mikrofon gefunden werden.";
+      return "microphone";
     case "aborted":
-      return "Die Aufnahme wurde beendet.";
+      return "aborted";
     case "no-speech":
-      return "Es wurde gerade keine Sprache erkannt.";
+      return "noSpeech";
     default:
-      return "Die Sprachaufnahme konnte gerade nicht verarbeitet werden.";
+      return "generic";
   }
 }

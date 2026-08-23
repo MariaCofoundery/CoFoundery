@@ -17,7 +17,7 @@ function authErrorMessage(error: string | undefined, t: AuthT) {
   if (normalized === "auth_callback_failed") {
     return t("login.errors.authCallbackFailed");
   }
-  return error ? t("login.errors.generic", { error }) : null;
+  return error ? t("login.errors.generic") : null;
 }
 
 function canCreateUserFromLogin(nextPath: string) {

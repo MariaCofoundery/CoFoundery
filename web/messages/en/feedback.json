@@ -41,6 +41,13 @@
     "stop": "Stop dictation",
     "start": "Start dictation",
     "recording": "Recording",
-    "waiting": "Waiting for speech"
+    "waiting": "Waiting for speech",
+    "errors": {
+      "permission": "Microphone access was not granted.",
+      "microphone": "No microphone could be found.",
+      "aborted": "Recording was stopped.",
+      "noSpeech": "No speech was detected.",
+      "generic": "The recording could not be processed right now."
+    }
   }
 }

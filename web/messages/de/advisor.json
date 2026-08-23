@@ -100,7 +100,9 @@
       "founderOpen": "{name} noch offen",
       "movesToTeams": "Wechselt gleich in die begleiteten Teams",
       "started": "gestartet",
-      "open": "offen"
+      "open": "offen",
+      "noActivity": "Noch keine Aktivität",
+      "currentStatus": "Aktueller Stand verfügbar"
     },
     "followUps": {
       "fourWeeks": "Follow-up in 4 Wochen",
@@ -139,7 +141,31 @@
     "saved": "Gespeichert",
     "lastSaved": "Zuletzt gespeichert: {date}",
     "noImpulse": "Noch kein Impuls hinterlegt",
-    "save": "Speichern"
+    "save": "Speichern",
+    "preview": {
+      "teamProfile": "Team-Kurzprofil",
+      "dimensionsEyebrow": "6 Dimensionen im Vergleich",
+      "dimensionsTitle": "Die Angaben beider Founder je Dimension",
+      "dimensionsText": "Die Darstellung beschreibt Unterschiede und Ähnlichkeiten als Ausgangspunkt für ein gemeinsames Gespräch. Sie bewertet nicht die Qualität des Teams.",
+      "conversationTopicsEyebrow": "Gesprächsthemen",
+      "conversationTopicsTitle": "Themen für die gemeinsame Betrachtung",
+      "observations": "Beobachtungspunkte",
+      "conversationPrompts": "Gesprächsimpulse",
+      "additionalContext": "Zusätzlicher Kontext",
+      "details": "Vertiefung",
+      "detailsTitle": "Weitere Angaben je Dimension anzeigen",
+      "optional": "Optional",
+      "intensity": "Ausprägung",
+      "observation": "Beobachtung",
+      "possibleContribution": "Möglicher Beitrag",
+      "revisitWhen": "Erneut betrachten, wenn",
+      "conversationQuestion": "Gesprächsfrage",
+      "responseContext": "Gesprächskontext",
+      "reviewTogether": "Gemeinsam betrachten",
+      "classificationContext": "Diese Einordnung dient als Gesprächsanlass und bewertet nicht die Qualität des Teams.",
+      "keepInMind": "Im Blick behalten",
+      "internalPreview": "Interne Vorschau · Advisor-Report"
+    }
   },
   "snapshot": {
     "eyebrow": "Advisor Snapshot",
@@ -149,6 +175,35 @@
     "backToDashboard": "Zurück zum Advisor Dashboard",
     "export": "Snapshot exportieren",
     "intro": "Kompakter Coaching-Snapshot mit Fokusfeldern, Advisor-Impulsen, Founder-Reaktion und den nächsten sinnvollen Schritten.",
+    "teamContexts": {
+      "existing": "Bestehendes Team",
+      "preFounder": "Pre-Founder"
+    },
+    "focus": {
+      "eyebrow": "Gesprächsfelder",
+      "first": "Erste hervorgehobene Beobachtung",
+      "second": "Zweite hervorgehobene Beobachtung",
+      "third": "Weiteres Gesprächsthema",
+      "empty": "Noch keine Beobachtung hervorgehoben.",
+      "prioritized": "Ausgewählte Gesprächsthemen"
+    },
+    "advisorClosing": {
+      "eyebrow": "Advisor-Impulse",
+      "observations": "Beobachtungen",
+      "questions": "Rückfragen",
+      "nextSteps": "Mögliche nächste Schritte",
+      "emptyObservations": "Noch keine Beobachtungen festgehalten.",
+      "emptyQuestions": "Noch keine Rückfragen festgehalten.",
+      "emptyNextSteps": "Noch keine nächsten Schritte festgehalten."
+    },
+    "founderResponse": {
+      "eyebrow": "Founder-Antwort",
+      "understood": "Aufgenommen",
+      "open": "Bleibt offen",
+      "clarification": "Weiter klären",
+      "missing": "Noch keine Founder-Antwort",
+      "emptyComment": "Noch kein gemeinsamer Kommentar festgehalten."
+    },
     "followUps": {
       "fourWeeks": "Follow-up in 4 Wochen",
       "threeMonths": "Follow-up in 3 Monaten",

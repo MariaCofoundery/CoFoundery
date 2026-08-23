@@ -112,6 +112,7 @@ export type AdvisorDashboardTeam = {
   approvalSummary: string;
   statusLabel: string;
   lastActivityLabel: string;
+  lastActivityAt: string | null;
   followUpLabel: string;
   canOpenWorkbook: boolean;
   workbookHref: string;
@@ -519,6 +520,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
           teamContext,
         }),
         lastActivityLabel: `${teamContextLabel(teamContext)} · ${formatTimestamp(lastActivitySource)}`,
+        lastActivityAt: lastActivitySource,
         followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
         workbookHref: buildAdvisorWorkbookHref(invitation.id, teamContext),
         reportHref: buildAdvisorReportHref(invitation.id, teamContext),

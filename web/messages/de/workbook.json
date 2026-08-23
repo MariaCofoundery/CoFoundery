@@ -14,7 +14,12 @@
   "unavailable": {
     "title": "Workbook aktuell noch nicht verfügbar",
     "description": "Das Workbook knüpft an einen vorhandenen Matching-Report an. Sobald beide Basisprofile vollständig vorliegen und auswertbar sind, kann das Workbook daraus seine Schwerpunkte ableiten.",
-    "introDescription": "Das Workbook setzt auf einem vorhandenen Matching-Report auf. Sobald euer Match vollständig bereit ist, könnt ihr hier in die gemeinsame Arbeit starten."
+    "introDescription": "Das Workbook setzt auf einem vorhandenen Matching-Report auf. Sobald euer Match vollständig bereit ist, könnt ihr hier in die gemeinsame Arbeit starten.",
+    "statuses": {
+      "missingInvitation": "Dieser Workbook-Zugang ist nicht verfügbar.",
+      "forbidden": "Du kannst auf dieses Workbook derzeit nicht zugreifen.",
+      "inProgress": "Das Workbook wird vorbereitet und ist noch nicht verfügbar."
+    }
   },
   "intro": {
     "title": "Bevor ihr ins Workbook geht",
@@ -105,6 +110,7 @@
     },
     "discussion": {
       "sharedSpace": "Gemeinsamer Raum",
+      "existingState": "Vorhandener Stand",
       "writingAs": "Du schreibst als {name}",
       "draftBasis": "Basis für deinen Punkt",
       "contributionBy": "Beitrag von {name}",
@@ -405,6 +411,28 @@
     "loadedDetail": "Euer Stand ist geladen und bleibt automatisch gesichert.",
     "startDetail": "Sobald ihr losschreibt, wird euer Stand automatisch gesichert."
   },
+  "speech": {
+    "accepted": "Text übernommen. Du kannst direkt weiter diktieren.",
+    "unsupported": "Diktieren ist in diesem Browser nicht verfügbar.",
+    "unsupportedLong": "Diktieren ist in diesem Browser nicht verfügbar. Schreiben funktioniert weiterhin.",
+    "restartFailed": "Die Aufnahme konnte nicht erneut gestartet werden.",
+    "startFailed": "Die Aufnahme konnte gerade nicht gestartet werden.",
+    "paused": "Kurze Pause",
+    "recording": "Aufnahme läuft",
+    "start": "Diktieren",
+    "startFor": "Diktat für {title} starten",
+    "stopFor": "Diktat für {title} stoppen",
+    "hint": "Sprich frei. Der Text landet direkt im Feld.",
+    "listening": "Aufnahme läuft. Der Text erscheint direkt im Feld.",
+    "pauseHint": "Kurze Pause erkannt. Sprich einfach weiter.",
+    "errors": {
+      "permission": "Der Mikrofonzugriff wurde nicht freigegeben.",
+      "microphone": "Es konnte kein Mikrofon gefunden werden.",
+      "aborted": "Die Aufnahme wurde beendet.",
+      "noSpeech": "Es wurde gerade keine Sprache erkannt.",
+      "generic": "Die Sprachaufnahme konnte gerade nicht verarbeitet werden."
+    }
+  },
   "advisor": {
     "accessGranted": "Advisor freigegeben",
     "approvalReady": "Freigabe liegt vor",
@@ -453,6 +481,92 @@
     "proposedBy": "Vorgeschlagen von {name}",
     "sentAt": "Gesendet am {date}{email}.",
     "emailSuffix": " an {email}",
-    "agree": "Zustimmen"
+    "agree": "Zustimmen",
+    "errors": {
+      "invalidEmail": "Bitte gib eine gültige Advisor-E-Mail-Adresse ein.",
+      "relationshipUnavailable": "Der Advisor-Vorschlag kann diesem Team gerade nicht zugeordnet werden.",
+      "proposalFailed": "Der Advisor-Vorschlag konnte gerade nicht gespeichert werden.",
+      "approvalFailed": "Die Zustimmung konnte gerade nicht gespeichert werden.",
+      "missingEmail": "Für diesen Advisor fehlt noch eine E-Mail-Adresse.",
+      "inviteNotReady": "Dieser Advisor-Eintrag ist noch nicht bereit für den Versand.",
+      "inviteFailed": "Die Einladung wurde noch nicht versendet. Der Advisor-Eintrag bleibt erhalten.",
+      "linkFailed": "Der Einladungslink konnte gerade nicht vorbereitet werden."
+    },
+    "actions": {
+      "waitingFounderA": "Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder A ebenfalls zustimmt.",
+      "waitingFounderB": "Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder B ebenfalls zustimmt.",
+      "linked": "Advisor aktiv: {advisor}. Der Zugriff auf die Advisor-Bereiche ist jetzt freigegeben.",
+      "inviteCopied": "Beide Founder haben freigegeben. Der Einladungslink wurde erstellt und kopiert.",
+      "inviteReady": "Beide Founder haben freigegeben. Der Einladungslink kann jetzt weitergegeben werden.",
+      "proposedWaitingA": "Advisor vorgeschlagen. Jetzt kann Founder A zustimmen.",
+      "proposedWaitingB": "Advisor vorgeschlagen. Jetzt kann Founder B zustimmen.",
+      "approved": "Beide Founder haben zugestimmt. Der Advisor ist jetzt freigegeben.",
+      "approvalSaved": "Die Zustimmung wurde gespeichert.",
+      "sentTo": "Einladung gesendet an {email}.",
+      "linkCopied": "Einladungslink kopiert. Du kannst ihn jetzt manuell teilen.",
+      "linkReady": "Einladungslink erstellt. Du kannst ihn jetzt manuell teilen.",
+      "linkCreated": "Einladungslink erstellt."
+    },
+    "entryStatuses": {
+      "linkedLabel": "Aktiv",
+      "linkedDescription": "Der Advisor ist verknüpft und kann im freigegebenen Kontext arbeiten.",
+      "invitedLabel": "Eingeladen",
+      "invitedDescription": "Die Einladung wurde versendet. Der Advisor kann den Zugang über den Link öffnen.",
+      "approvedLabel": "Freigegeben",
+      "approvedDescription": "Beide Founder haben zugestimmt. Der Eintrag ist für den Einladungsversand bereit.",
+      "revokedLabel": "Pausiert",
+      "revokedDescription": "Die Freigabe wurde pausiert oder widerrufen.",
+      "pendingLabel": "Wartet auf Zustimmung",
+      "pendingDescription": "Eine zweite Founder-Zustimmung fehlt noch."
+    },
+    "closing": {
+      "title": "Advisor-Abschluss",
+      "eyebrow": "Externe Perspektive",
+      "lead": "Was sollte das Team nach der Session noch gemeinsam betrachten?",
+      "description": "Dieser Schritt bündelt Beobachtungen, offene Rückfragen und mögliche nächste Schritte. Er ersetzt keine Founder-Vereinbarung.",
+      "impulse": "Advisor-Impuls",
+      "impulseHint": "Wenige klare und beobachtbare Punkte reichen.",
+      "editingBy": "Bearbeitung durch {advisor}",
+      "fieldBy": "Dieses Feld wird von {advisor} ausgefüllt.",
+      "observationsTitle": "1. Beobachtungen",
+      "observationsPlaceholder": "Welche zwei oder drei Beobachtungen sollte das Team nach der Session gemeinsam betrachten?",
+      "observationsHelper": "Kurz, konkret und beobachtbar formulieren.",
+      "questionsTitle": "2. Offene Fragen",
+      "questionsPlaceholder": "Welche Rückfragen können die Founder in einem weiteren Gespräch klären?",
+      "questionsHelper": "Nur konkrete Fragen notieren, die ein weiteres Gespräch unterstützen.",
+      "nextStepsTitle": "3. Möglicher nächster Schritt",
+      "nextStepsPlaceholder": "Was könnte das Team als Nächstes konkret tun, prüfen oder terminieren?",
+      "nextStepsHelper": "Ein klarer nächster Schritt reicht.",
+      "followUp": "Follow-up",
+      "followUpHint": "Setzt einen Check-in, wenn er für die weitere Vereinbarung hilfreich ist.",
+      "followUps": {
+        "none": "Kein Check-in gesetzt",
+        "fourWeeks": "Check-in in 4 Wochen",
+        "threeMonths": "Check-in in 3 Monaten"
+      },
+      "teamResponse": "Antwort des Teams",
+      "teamResponseHint": "Die Founder können knapp festhalten, was sie aufnehmen, offenlassen oder weiter klären möchten.",
+      "reactionStatuses": {
+        "understood": "Aufgenommen",
+        "open": "Bleibt offen",
+        "clarification": "Weiter klären",
+        "missing": "Noch keine Team-Antwort"
+      },
+      "status": {
+        "complete": "Advisor-Impuls liegt vor",
+        "inProgress": "Advisor-Impuls in Arbeit",
+        "open": "Advisor-Impuls offen"
+      },
+      "foundersOnly": "Dieser Bereich wird von den Foundern gepflegt.",
+      "shortResponse": "Kurze Antwort",
+      "responsePlaceholder": "Haltet kurz fest, was ihr aufnehmt, offenlasst oder weiter klären möchtet.",
+      "responseHelper": "Kurz halten. Das ist eine Antwort, kein neuer Diskursraum.",
+      "founderField": "Dieses Feld wird von den Foundern ausgefüllt.",
+      "complete": "Beobachtung und nächster Schritt sind festgehalten.",
+      "incomplete": "Beobachtung und nächster Schritt fehlen noch.",
+      "waitingTeam": "Die Antwort des Teams kann anschließend ergänzt werden.",
+      "teamResponded": "Das Team hat eine Antwort hinterlegt.",
+      "teamCanRespond": "Die Founder können anschließend kurz reagieren."
+    }
   }
 }

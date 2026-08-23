@@ -16,6 +16,7 @@ import {
 } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
@@ -102,7 +103,7 @@ function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.statuses.workbookStarting");
   }
 
-  return team.statusLabel;
+  return t("dashboard.statuses.currentStatus");
 }
 
 function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
@@ -134,14 +135,14 @@ function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   return t("dashboard.statuses.openReportOrWorkbook");
 }
 
-function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
+function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT, locale: string) {
   const teamContext =
     team.teamContext === "existing_team"
       ? t("teamContext.existingTeam")
       : t("teamContext.preFounder");
-  const timestamp = team.lastActivityLabel
-    .replace(/^Pre-Founder\s·\s/, "")
-    .replace(/^Bestehendes Team\s·\s/, "");
+  const timestamp = team.lastActivityAt
+    ? formatPendingTimestamp(team.lastActivityAt, locale)
+    : t("dashboard.statuses.noActivity");
 
   return `${teamContext} · ${t("dashboard.lastActivityPrefix")} ${timestamp}`;
 }
@@ -188,7 +189,7 @@ function advisorFollowUpLabel(value: string, t: AdvisorT) {
   if (value === "Follow-up in 4 Wochen") return t("dashboard.followUps.fourWeeks");
   if (value === "Follow-up in 3 Monaten") return t("dashboard.followUps.threeMonths");
   if (value === "Kein Follow-up gesetzt") return t("dashboard.followUps.none");
-  return value;
+  return t("dashboard.followUps.none");
 }
 
 function pendingStandLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
@@ -225,7 +226,7 @@ function pendingFounderProgressLabel(invite: AdvisorPendingTeamInvite, founder: 
 }
 
 function formatPendingTimestamp(value: string, locale: string) {
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -252,7 +253,7 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   );
 }
 
-function TeamCard({ team, t, debug = false }: { team: AdvisorDashboardTeam; t: AdvisorT; debug?: boolean }) {
+function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string; debug?: boolean }) {
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -287,7 +288,7 @@ function TeamCard({ team, t, debug = false }: { team: AdvisorDashboardTeam; t: A
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
                 {t("dashboard.fields.last")}
               </span>
-              {teamLastActivityLabel(team, t)}
+              {teamLastActivityLabel(team, t, locale)}
             </p>
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
@@ -375,12 +376,14 @@ function TeamSection({
   description,
   teams,
   t,
+  locale,
   debug = false,
 }: {
   title: string;
   description: string;
   teams: AdvisorDashboardTeam[];
   t: AdvisorT;
+  locale: string;
   debug?: boolean;
 }) {
   if (teams.length === 0) return null;
@@ -398,7 +401,7 @@ function TeamSection({
       </div>
       <div className="grid gap-5">
         {teams.map((team) => (
-          <TeamCard key={team.invitationId} team={team} t={t} debug={debug} />
+          <TeamCard key={team.invitationId} team={team} t={t} locale={locale} debug={debug} />
         ))}
       </div>
     </section>
@@ -532,13 +535,9 @@ function PendingInviteSection({
   );
 }
 
-export default async function AdvisorDashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ debug?: string }>;
-}) {
-  const params = await searchParams;
-  const debug = params.debug === "1";
+export default async function AdvisorDashboardPage() {
+  // Internal relationship and invitation metadata is never rendered in the product UI.
+  const debug = false;
   const supabase = await createClient();
   const t = await getTranslations("advisor");
   const locale = await getRequestLocale();
@@ -737,6 +736,7 @@ export default async function AdvisorDashboardPage({
               description={t("dashboard.readySectionDescription")}
               teams={readyTeams}
               t={t}
+              locale={locale}
               debug={debug}
             />
             <TeamSection
@@ -744,6 +744,7 @@ export default async function AdvisorDashboardPage({
               description={t("dashboard.waitingSectionDescription")}
               teams={waitingTeams}
               t={t}
+              locale={locale}
               debug={debug}
             />
             <TeamSection
@@ -751,6 +752,7 @@ export default async function AdvisorDashboardPage({
               description={t("dashboard.pausedSectionDescription")}
               teams={pausedTeams}
               t={t}
+              locale={locale}
               debug={debug}
             />
           </>

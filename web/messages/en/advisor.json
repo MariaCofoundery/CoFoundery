@@ -100,7 +100,9 @@
       "founderOpen": "{name} still open",
       "movesToTeams": "Will move to your supported teams shortly",
       "started": "started",
-      "open": "open"
+      "open": "open",
+      "noActivity": "No activity yet",
+      "currentStatus": "Current status available"
     },
     "followUps": {
       "fourWeeks": "Follow-up in 4 weeks",
@@ -139,7 +141,31 @@
     "saved": "Saved",
     "lastSaved": "Last saved: {date}",
     "noImpulse": "No prompt added yet",
-    "save": "Save"
+    "save": "Save",
+    "preview": {
+      "teamProfile": "Team overview",
+      "dimensionsEyebrow": "6 dimensions compared",
+      "dimensionsTitle": "Both founders' responses by dimension",
+      "dimensionsText": "This view describes differences and similarities as a starting point for discussion. It does not evaluate the quality of the team.",
+      "conversationTopicsEyebrow": "Topics to discuss",
+      "conversationTopicsTitle": "Topics for joint review",
+      "observations": "Observations",
+      "conversationPrompts": "Conversation prompts",
+      "additionalContext": "Additional context",
+      "details": "Details",
+      "detailsTitle": "Show more information by dimension",
+      "optional": "Optional",
+      "intensity": "Expression",
+      "observation": "Observation",
+      "possibleContribution": "Possible contribution",
+      "revisitWhen": "Revisit when",
+      "conversationQuestion": "Conversation question",
+      "responseContext": "Conversation context",
+      "reviewTogether": "Review together",
+      "classificationContext": "This classification is a conversation prompt and does not evaluate the quality of the team.",
+      "keepInMind": "Keep in mind",
+      "internalPreview": "Internal preview · Advisor report"
+    }
   },
   "snapshot": {
     "eyebrow": "Advisor snapshot",
@@ -149,6 +175,35 @@
     "backToDashboard": "Back to advisor dashboard",
     "export": "Export snapshot",
     "intro": "A compact coaching snapshot with focus areas, advisor prompts, founder response, and the next useful steps.",
+    "teamContexts": {
+      "existing": "Existing team",
+      "preFounder": "Pre-Founder"
+    },
+    "focus": {
+      "eyebrow": "Conversation areas",
+      "first": "First highlighted observation",
+      "second": "Second highlighted observation",
+      "third": "Another topic to discuss",
+      "empty": "No observation has been highlighted yet.",
+      "prioritized": "Selected conversation topics"
+    },
+    "advisorClosing": {
+      "eyebrow": "Advisor prompts",
+      "observations": "Observations",
+      "questions": "Follow-up questions",
+      "nextSteps": "Possible next steps",
+      "emptyObservations": "No observations have been captured yet.",
+      "emptyQuestions": "No follow-up questions have been captured yet.",
+      "emptyNextSteps": "No next steps have been captured yet."
+    },
+    "founderResponse": {
+      "eyebrow": "Founder response",
+      "understood": "Acknowledged",
+      "open": "Remains open",
+      "clarification": "Discuss further",
+      "missing": "No founder response yet",
+      "emptyComment": "No shared comment has been captured yet."
+    },
     "followUps": {
       "fourWeeks": "Follow-up in 4 weeks",
       "threeMonths": "Follow-up in 3 months",

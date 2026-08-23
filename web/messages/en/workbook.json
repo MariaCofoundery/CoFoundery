@@ -14,7 +14,12 @@
   "unavailable": {
     "title": "Workbook is not available yet",
     "description": "The workbook builds on an existing matching report. Once both foundation profiles are complete and ready to evaluate, the workbook can derive its focus areas from them.",
-    "introDescription": "The workbook builds on an existing matching report. Once your match is fully ready, you can start working together here."
+    "introDescription": "The workbook builds on an existing matching report. Once your match is fully ready, you can start working together here.",
+    "statuses": {
+      "missingInvitation": "This workbook access is not available.",
+      "forbidden": "You cannot access this workbook right now.",
+      "inProgress": "The workbook is being prepared and is not available yet."
+    }
   },
   "intro": {
     "title": "Before you enter the workbook",
@@ -105,6 +110,7 @@
     },
     "discussion": {
       "sharedSpace": "Shared space",
+      "existingState": "Existing state",
       "writingAs": "You are writing as {name}",
       "draftBasis": "Basis for your point",
       "contributionBy": "Contribution by {name}",
@@ -405,6 +411,28 @@
     "loadedDetail": "Your state is loaded and will stay saved automatically.",
     "startDetail": "Once you start writing, your state will be saved automatically."
   },
+  "speech": {
+    "accepted": "Text added. You can keep dictating.",
+    "unsupported": "Dictation is not available in this browser.",
+    "unsupportedLong": "Dictation is not available in this browser. You can still type normally.",
+    "restartFailed": "Recording could not be restarted.",
+    "startFailed": "Recording could not be started right now.",
+    "paused": "Short pause",
+    "recording": "Recording",
+    "start": "Dictate",
+    "startFor": "Start dictation for {title}",
+    "stopFor": "Stop dictation for {title}",
+    "hint": "Speak freely. The text will appear directly in the field.",
+    "listening": "Recording. The text will appear directly in the field.",
+    "pauseHint": "Short pause detected. Just keep speaking.",
+    "errors": {
+      "permission": "Microphone access was not granted.",
+      "microphone": "No microphone could be found.",
+      "aborted": "Recording was stopped.",
+      "noSpeech": "No speech was detected.",
+      "generic": "The recording could not be processed right now."
+    }
+  },
   "advisor": {
     "accessGranted": "Advisor enabled",
     "approvalReady": "Approval is ready",
@@ -453,6 +481,92 @@
     "proposedBy": "Proposed by {name}",
     "sentAt": "Sent on {date}{email}.",
     "emailSuffix": " to {email}",
-    "agree": "Approve"
+    "agree": "Approve",
+    "errors": {
+      "invalidEmail": "Please enter a valid advisor email address.",
+      "relationshipUnavailable": "The advisor proposal cannot be linked to this team right now.",
+      "proposalFailed": "The advisor proposal could not be saved right now.",
+      "approvalFailed": "The approval could not be saved right now.",
+      "missingEmail": "This advisor does not have an email address yet.",
+      "inviteNotReady": "This advisor entry is not ready to be sent yet.",
+      "inviteFailed": "The invitation has not been sent yet. The advisor entry remains saved.",
+      "linkFailed": "The invitation link could not be prepared right now."
+    },
+    "actions": {
+      "waitingFounderA": "Your approval has been recorded. Access starts once Founder A also approves.",
+      "waitingFounderB": "Your approval has been recorded. Access starts once Founder B also approves.",
+      "linked": "Advisor active: {advisor}. Access to the advisor areas is now enabled.",
+      "inviteCopied": "Both founders have approved. The invitation link was created and copied.",
+      "inviteReady": "Both founders have approved. The invitation link can now be shared.",
+      "proposedWaitingA": "Advisor proposed. Founder A can now approve.",
+      "proposedWaitingB": "Advisor proposed. Founder B can now approve.",
+      "approved": "Both founders have approved. The advisor is now enabled.",
+      "approvalSaved": "The approval was saved.",
+      "sentTo": "Invitation sent to {email}.",
+      "linkCopied": "Invitation link copied. You can now share it manually.",
+      "linkReady": "Invitation link created. You can now share it manually.",
+      "linkCreated": "Invitation link created."
+    },
+    "entryStatuses": {
+      "linkedLabel": "Active",
+      "linkedDescription": "The advisor is linked and can work in the approved context.",
+      "invitedLabel": "Invited",
+      "invitedDescription": "The invitation was sent. The advisor can open access through the link.",
+      "approvedLabel": "Approved",
+      "approvedDescription": "Both founders have approved. The entry is ready for the invitation to be sent.",
+      "revokedLabel": "Paused",
+      "revokedDescription": "Approval was paused or withdrawn.",
+      "pendingLabel": "Waiting for approval",
+      "pendingDescription": "The second founder approval is still missing."
+    },
+    "closing": {
+      "title": "Advisor closing",
+      "eyebrow": "Outside perspective",
+      "lead": "What should the team review together after the session?",
+      "description": "This step brings together observations, open questions, and possible next steps. It does not replace a founder agreement.",
+      "impulse": "Advisor prompt",
+      "impulseHint": "A few clear, observable points are enough.",
+      "editingBy": "Edited by {advisor}",
+      "fieldBy": "This field is completed by {advisor}.",
+      "observationsTitle": "1. Observations",
+      "observationsPlaceholder": "Which two or three observations should the team review together after the session?",
+      "observationsHelper": "Keep it brief, concrete, and observable.",
+      "questionsTitle": "2. Open questions",
+      "questionsPlaceholder": "Which questions could the founders clarify in another conversation?",
+      "questionsHelper": "Only add concrete questions that support a further conversation.",
+      "nextStepsTitle": "3. Possible next step",
+      "nextStepsPlaceholder": "What could the team do, review, or schedule next?",
+      "nextStepsHelper": "One clear next step is enough.",
+      "followUp": "Follow-up",
+      "followUpHint": "Set a check-in if it would support the next agreement.",
+      "followUps": {
+        "none": "No check-in set",
+        "fourWeeks": "Check-in in 4 weeks",
+        "threeMonths": "Check-in in 3 months"
+      },
+      "teamResponse": "Team response",
+      "teamResponseHint": "The founders can briefly capture what they acknowledge, leave open, or want to discuss further.",
+      "reactionStatuses": {
+        "understood": "Acknowledged",
+        "open": "Remains open",
+        "clarification": "Discuss further",
+        "missing": "No team response yet"
+      },
+      "status": {
+        "complete": "Advisor prompt available",
+        "inProgress": "Advisor prompt in progress",
+        "open": "Advisor prompt open"
+      },
+      "foundersOnly": "This area is maintained by the founders.",
+      "shortResponse": "Brief response",
+      "responsePlaceholder": "Briefly capture what you acknowledge, leave open, or want to discuss further.",
+      "responseHelper": "Keep it brief. This is a response, not a new discussion space.",
+      "founderField": "This field is completed by the founders.",
+      "complete": "An observation and next step have been captured.",
+      "incomplete": "An observation and next step are still missing.",
+      "waitingTeam": "The team's response can be added afterwards.",
+      "teamResponded": "The team has added a response.",
+      "teamCanRespond": "The founders can add a brief response afterwards."
+    }
   }
 }

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { ComparisonScale } from "@/features/reporting/ComparisonScale";
 import {
-  FOUNDER_DIMENSION_META,
   getFounderDimensionPoleLabels,
+  getLocalizedFounderDimensionMeta,
 } from "@/features/reporting/founderDimensionMeta";
 import type { AdvisorReportPreviewCase } from "@/features/reporting/advisorReportPreviewData";
 import type {
@@ -10,6 +10,57 @@ import type {
   AdvisorDimensionAssessment,
   AdvisorReportData,
 } from "@/features/reporting/advisor-report/advisorReportTypes";
+import { normalizeLocale, type AppLocale } from "@/i18n/config";
+
+export type AdvisorReportPreviewCopy = {
+  teamProfile: string;
+  dimensionsEyebrow: string;
+  dimensionsTitle: string;
+  dimensionsText: string;
+  conversationTopicsEyebrow: string;
+  conversationTopicsTitle: string;
+  observations: string;
+  conversationPrompts: string;
+  additionalContext: string;
+  details: string;
+  detailsTitle: string;
+  optional: string;
+  intensity: string;
+  observation: string;
+  possibleContribution: string;
+  revisitWhen: string;
+  conversationQuestion: string;
+  responseContext: string;
+  reviewTogether: string;
+  classificationContext: string;
+  keepInMind: string;
+  internalPreview: string;
+};
+
+const DEFAULT_PREVIEW_COPY: AdvisorReportPreviewCopy = {
+  teamProfile: "Team-Kurzprofil",
+  dimensionsEyebrow: "6 Dimensionen im Vergleich",
+  dimensionsTitle: "Die Angaben beider Founder je Dimension",
+  dimensionsText: "Die Darstellung beschreibt Unterschiede und Ähnlichkeiten als Ausgangspunkt für ein gemeinsames Gespräch.",
+  conversationTopicsEyebrow: "Gesprächsthemen",
+  conversationTopicsTitle: "Themen für die gemeinsame Betrachtung",
+  observations: "Beobachtungspunkte",
+  conversationPrompts: "Gesprächsimpulse",
+  additionalContext: "Zusätzlicher Kontext",
+  details: "Vertiefung",
+  detailsTitle: "Weitere Angaben je Dimension anzeigen",
+  optional: "Optional",
+  intensity: "Ausprägung",
+  observation: "Beobachtung",
+  possibleContribution: "Möglicher Beitrag",
+  revisitWhen: "Erneut betrachten, wenn",
+  conversationQuestion: "Gesprächsfrage",
+  responseContext: "Gesprächskontext",
+  reviewTogether: "Gemeinsam betrachten",
+  classificationContext: "Diese Einordnung dient als Gesprächsanlass und bewertet nicht die Qualität des Teams.",
+  keepInMind: "Im Blick behalten",
+  internalPreview: "Interne Vorschau · Advisor-Report",
+};
 
 type Props = {
   preview?: AdvisorReportPreviewCase;
@@ -22,6 +73,8 @@ type Props = {
   topActions?: ReactNode;
   appendix?: ReactNode;
   debug?: boolean;
+  locale?: string;
+  copy?: AdvisorReportPreviewCopy;
 };
 
 function formatFlag(value: boolean) {
@@ -47,62 +100,33 @@ function scaleTone(value: AdvisorClassification) {
   return "border-slate-200 bg-slate-50 text-slate-700";
 }
 
-function summaryTone(value: AdvisorClassification) {
-  if (value === "chance") return "Produktive Differenz";
-  if (value === "risk") return "Moderationsrelevant";
-  return "Aktuell stabil";
-}
-
-function getClassificationTooltip(dimension: AdvisorDimensionAssessment) {
-  if (dimension.classification === "chance") {
-    return "Unterschied kann produktiv genutzt werden, wenn Rollen, Timing und Entscheidungslogik klar sind.";
-  }
-
-  if (dimension.classification === "neutral") {
-    return "Aktuell stabil – wenig Spannungsdruck in dieser Dimension.";
-  }
-
-  if (dimension.hasSharedBlindSpotRisk) {
-    return "Kann auf fehlende Spannung oder blinde Flecken hinweisen – wichtige Perspektiven werden nicht ausreichend hinterfragt.";
-  }
-
-  if (
-    dimension.jointState === "OPPOSITE" ||
-    dimension.intensity === "high" ||
-    (typeof dimension.distanceValue === "number" && dimension.distanceValue >= 40)
-  ) {
-    return "Kann zu Reibung oder blockierten Entscheidungen fuehren, wenn Unterschiede nicht aktiv moderiert werden.";
-  }
-
-  return "Unterschied wird relevant, sobald Entscheidungsdruck oder Abstimmungsbedarf steigt.";
-}
-
 function ClassificationBadge({
   dimension,
+  copy,
   tone = "default",
 }: {
   dimension: AdvisorDimensionAssessment;
+  copy: AdvisorReportPreviewCopy;
   tone?: "default" | "scale";
 }) {
   const className = tone === "scale" ? scaleTone(dimension.classification) : badgeTone(dimension.classification);
-  const tooltip = getClassificationTooltip(dimension);
-  const showBlindSpotHint = dimension.classification === "risk" && dimension.hasSharedBlindSpotRisk;
+  const tooltip = copy.classificationContext;
 
   return (
     <span className="inline-flex items-center gap-1.5">
       <span
         className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${className}`}
         title={tooltip}
-        aria-label={`${dimension.classification}: ${tooltip}`}
+        aria-label={tooltip}
       >
-        {dimension.classification}
+        {copy.reviewTogether}
       </span>
       <span
         className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] font-semibold text-slate-500"
         title={tooltip}
         aria-hidden="true"
       >
-        {showBlindSpotHint ? "!" : "i"}
+        i
       </span>
     </span>
   );
@@ -160,23 +184,27 @@ function DimensionScaleCard({
   participantAName,
   participantBName,
   debug,
+  locale,
+  copy,
 }: {
   dimension: AdvisorDimensionAssessment;
   participantAName: string;
   participantBName: string;
   debug: boolean;
+  locale: AppLocale;
+  copy: AdvisorReportPreviewCopy;
 }) {
-  const meta = FOUNDER_DIMENSION_META[dimension.dimensionKey];
-  const poles = getFounderDimensionPoleLabels(dimension.dimensionKey, "report");
+  const meta = getLocalizedFounderDimensionMeta(dimension.dimensionKey, locale)!;
+  const poles = getFounderDimensionPoleLabels(dimension.dimensionKey, "report", locale);
 
   return (
     <article className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-slate-950">{meta.shortLabel}</h3>
-          <p className="mt-1 text-xs text-slate-500">{summaryTone(dimension.classification)}</p>
+          <p className="mt-1 text-xs text-slate-500">{copy.responseContext}</p>
         </div>
-        <ClassificationBadge dimension={dimension} tone="scale" />
+        <ClassificationBadge dimension={dimension} copy={copy} tone="scale" />
       </div>
 
       <div className="mt-4">
@@ -204,37 +232,41 @@ function DimensionScaleCard({
 function DimensionInsightCard({
   dimension,
   debug,
+  locale,
+  copy,
 }: {
   dimension: AdvisorDimensionAssessment;
   debug: boolean;
+  locale: AppLocale;
+  copy: AdvisorReportPreviewCopy;
 }) {
-  const meta = FOUNDER_DIMENSION_META[dimension.dimensionKey];
+  const meta = getLocalizedFounderDimensionMeta(dimension.dimensionKey, locale)!;
 
   return (
     <article className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-slate-950">{meta.canonicalName}</h3>
-          <p className="mt-1 text-xs text-slate-500">Intensitaet: {dimension.intensity}</p>
+          <h3 className="text-sm font-semibold text-slate-950">{meta.label}</h3>
+          <p className="mt-1 text-xs text-slate-500">{copy.intensity}: {dimension.intensity}</p>
         </div>
-        <ClassificationBadge dimension={dimension} />
+        <ClassificationBadge dimension={dimension} copy={copy} />
       </div>
 
       <div className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
         <div>
-          <p className="font-medium text-slate-950">Spannungsrisiko</p>
+          <p className="font-medium text-slate-950">{copy.observation}</p>
           <p>{tightenPreviewCopy(dimension.tensionRisk)}</p>
         </div>
         <div>
-          <p className="font-medium text-slate-950">Tragfaehigkeit</p>
+          <p className="font-medium text-slate-950">{copy.possibleContribution}</p>
           <p>{tightenPreviewCopy(dimension.strengthPotential)}</p>
         </div>
         <div>
-          <p className="font-medium text-slate-950">Kipppunkt</p>
+          <p className="font-medium text-slate-950">{copy.revisitWhen}</p>
           <p>{tightenPreviewCopy(dimension.tippingPoint)}</p>
         </div>
         <div>
-          <p className="font-medium text-slate-950">Moderationsfrage</p>
+          <p className="font-medium text-slate-950">{copy.conversationQuestion}</p>
           <p>{dimension.moderationQuestion}</p>
         </div>
       </div>
@@ -259,7 +291,11 @@ export function AdvisorReportPreview({
   topActions,
   appendix,
   debug = false,
+  locale: localeProp = "de",
+  copy: copyProp,
 }: Props) {
+  const locale = normalizeLocale(localeProp);
+  const copy = copyProp ?? DEFAULT_PREVIEW_COPY;
   const participantAName = preview?.participantAName ?? participantANameProp ?? null;
   const participantBName = preview?.participantBName ?? participantBNameProp ?? null;
   const report = preview?.report ?? reportProp ?? null;
@@ -267,7 +303,7 @@ export function AdvisorReportPreview({
     titleProp ??
     (preview ? `${preview.title}: ${preview.participantAName} + ${preview.participantBName}` : null);
   const summary = summaryProp ?? preview?.summary ?? null;
-  const eyebrow = eyebrowProp ?? (preview ? "Interne Preview · Advisor Report" : "Advisor Report");
+  const eyebrow = eyebrowProp ?? (preview ? copy.internalPreview : "Advisor Report");
 
   if (!participantAName || !participantBName || !report) {
     return null;
@@ -289,7 +325,7 @@ export function AdvisorReportPreview({
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Team-Kurzprofil</p>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.teamProfile}</p>
         <p className="mt-3 max-w-4xl text-base leading-7 text-slate-900">
           {report.teamSummary.leadStatement}
         </p>
@@ -299,7 +335,7 @@ export function AdvisorReportPreview({
               key={dimension}
               className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
             >
-              {dimension}
+              {getLocalizedFounderDimensionMeta(dimension, locale)?.label ?? dimension}
             </span>
           ))}
         </div>
@@ -308,13 +344,10 @@ export function AdvisorReportPreview({
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-baseline justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">6 Dimensionen im Vergleich</p>
-            <h2 className="mt-2 text-lg font-semibold text-slate-950">Wo die beiden Founder pro Dimension liegen</h2>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.dimensionsEyebrow}</p>
+            <h2 className="mt-2 text-lg font-semibold text-slate-950">{copy.dimensionsTitle}</h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-              Unterschiede sind nicht automatisch gut oder schlecht: Naehe kann Stabilitaet bringen
-              oder blinde Flecken erzeugen. Unterschiede koennen Reibung erzeugen oder produktiv
-              wirken. Die Einordnung `risk / chance / neutral` zeigt, wie moderationsrelevant die
-              jeweilige Konstellation aktuell ist.
+              {copy.dimensionsText}
             </p>
           </div>
         </div>
@@ -326,24 +359,29 @@ export function AdvisorReportPreview({
               participantAName={participantAName}
               participantBName={participantBName}
               debug={debug}
+              locale={locale}
+              copy={copy}
             />
           ))}
         </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Top 3 Spannungsfelder</p>
-        <h2 className="mt-2 text-lg font-semibold text-slate-950">Priorisierte Moderationsfelder</h2>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.conversationTopicsEyebrow}</p>
+        <h2 className="mt-2 text-lg font-semibold text-slate-950">{copy.conversationTopicsTitle}</h2>
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
           {report.topTensions.map((item) => (
             <article key={item.dimensionKey} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-950">{item.title}</h3>
+                <h3 className="text-sm font-semibold text-slate-950">
+                  {getLocalizedFounderDimensionMeta(item.dimensionKey, locale)?.label ?? item.title}
+                </h3>
                 <ClassificationBadge
                   dimension={
                     report.dimensions.find((dimension) => dimension.dimensionKey === item.dimensionKey) ??
                     report.dimensions[0]!
                   }
+                  copy={copy}
                 />
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-700">
@@ -351,11 +389,11 @@ export function AdvisorReportPreview({
               </p>
               <dl className="mt-4 space-y-2 text-sm leading-6 text-slate-700">
                 <div>
-                  <dt className="font-medium text-slate-950">Kipprisiko</dt>
+                  <dt className="font-medium text-slate-950">{copy.revisitWhen}</dt>
                   <dd>{tightenPreviewCopy(item.tippingPoint)}</dd>
                 </div>
                 <div>
-                  <dt className="font-medium text-slate-950">Moderationsfrage</dt>
+                  <dt className="font-medium text-slate-950">{copy.conversationQuestion}</dt>
                   <dd>{item.moderationQuestion}</dd>
                 </div>
               </dl>
@@ -366,7 +404,7 @@ export function AdvisorReportPreview({
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Beobachtungspunkte</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.observations}</p>
           <ul className="mt-4 space-y-3">
             {report.observationPoints.map((item) => (
               <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -383,7 +421,7 @@ export function AdvisorReportPreview({
         </article>
 
         <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Interventionen</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.conversationPrompts}</p>
           <div className="mt-4 space-y-4">
             {report.interventions.map((item) => (
               <div key={item.dimensionKey} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -405,7 +443,7 @@ export function AdvisorReportPreview({
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Stabilitaetsfaktoren</p>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.additionalContext}</p>
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {report.stabilityFactors.map((item) => (
             <div key={item.dimensionKey} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -419,7 +457,7 @@ export function AdvisorReportPreview({
                 {shortenStabilityRationale(item.rationale)}
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Blind Spot: {shortenStabilityConstraint(item.constraintNote)}
+                {copy.keepInMind}: {shortenStabilityConstraint(item.constraintNote)}
               </p>
             </div>
           ))}
@@ -429,16 +467,22 @@ export function AdvisorReportPreview({
       <details className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Vertiefung</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{copy.details}</p>
             <h2 className="mt-2 text-lg font-semibold text-slate-950">
-              Detaillierte Lesart je Dimension anzeigen
+              {copy.detailsTitle}
             </h2>
           </div>
-          <span className="text-sm text-slate-500">Optional</span>
+          <span className="text-sm text-slate-500">{copy.optional}</span>
         </summary>
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           {report.dimensions.map((dimension) => (
-            <DimensionInsightCard key={dimension.dimensionKey} dimension={dimension} debug={debug} />
+            <DimensionInsightCard
+              key={dimension.dimensionKey}
+              dimension={dimension}
+              debug={debug}
+              locale={locale}
+              copy={copy}
+            />
           ))}
         </div>
       </details>

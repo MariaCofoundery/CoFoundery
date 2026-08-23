@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { saveMatchingWorkspaceAgreementSectionAction } from "@/features/matchingCore/matchingWorkspaceAgreementActions";
 import { createOrGetMatchingWorkspaceAgreement } from "@/features/matchingCore/matchingWorkspaceAgreementData";
@@ -99,9 +101,9 @@ function UnavailableState({ t }: { t: WorkspaceT }) {
   );
 }
 
-function formatUpdatedAt(value: string | null, t: WorkspaceT) {
+function formatUpdatedAt(value: string | null, t: WorkspaceT, locale: string) {
   if (!value) return t("agreement.editor.neverSaved");
-  return new Intl.DateTimeFormat("de-DE", {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -111,10 +113,12 @@ function AgreementEditor({
   summary,
   saveSection,
   t,
+  locale,
 }: {
   summary: MatchingWorkspaceAgreementSummary;
   saveSection: (formData: FormData) => Promise<void>;
   t: WorkspaceT;
+  locale: string;
 }) {
   const agreement = summary.agreement;
 
@@ -193,7 +197,7 @@ function AgreementEditor({
               </div>
               <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs leading-5 text-slate-500">
-                  {t("agreement.editor.updatedAt", { value: formatUpdatedAt(section.updatedAt, t) })}
+                  {t("agreement.editor.updatedAt", { value: formatUpdatedAt(section.updatedAt, t, locale) })}
                 </p>
                 <button type="submit" className={PRIMARY_CTA_CLASS}>
                   {t("agreement.editor.saveSection")}
@@ -211,6 +215,7 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
   const { workspaceId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const t = await getTranslations("workspace");
+  const locale = await getRequestLocale();
   const supabase = await createClient();
   const {
     data: { user },
@@ -287,7 +292,7 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
           </p>
         </section>
 
-        <AgreementEditor summary={summary} saveSection={saveAgreementSection} t={t} />
+      <AgreementEditor summary={summary} saveSection={saveAgreementSection} t={t} locale={locale} />
       </div>
     </main>
   );

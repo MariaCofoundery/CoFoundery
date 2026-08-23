@@ -18,7 +18,6 @@ type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
   advisorContext?: string;
-  debug?: string;
   // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
 };
@@ -31,6 +30,19 @@ function isAdvisorContext(value: string | undefined) {
   return value === "1" || value === "true";
 }
 
+function resolveUnavailableCopyKey(
+  status: "missing_invitation" | "forbidden" | "in_progress"
+) {
+  switch (status) {
+    case "missing_invitation":
+      return "unavailable.statuses.missingInvitation" as const;
+    case "forbidden":
+      return "unavailable.statuses.forbidden" as const;
+    case "in_progress":
+      return "unavailable.statuses.inProgress" as const;
+  }
+}
+
 export default async function FounderAlignmentWorkbookPage({
   searchParams,
 }: {
@@ -41,7 +53,6 @@ export default async function FounderAlignmentWorkbookPage({
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const advisorContext = isAdvisorContext(params.advisorContext);
-  const debug = params.debug === "1";
   const legacyAdvisorToken = params.advisorToken?.trim() || null;
 
   if (legacyAdvisorToken) {
@@ -92,27 +103,13 @@ export default async function FounderAlignmentWorkbookPage({
             {t("unavailable.description")}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-600">
-            {data.reason
-              ? t("common.statusWithReason", { status: data.status, reason: data.reason })
-              : t("common.status", { status: data.status })}
+            {t(resolveUnavailableCopyKey(data.status))}
           </p>
           <div className="mt-8 flex justify-center">
             <ReportActionButton href={fallbackReportHref} variant="utility">
               {advisorContext ? t("common.advisorReport") : t("common.matchingReport")}
             </ReportActionButton>
           </div>
-          {debug ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-left text-xs leading-6 text-slate-700">
-              <p className="font-semibold text-slate-900">Debug · Workbook Target</p>
-              <p>currentUserRole: -</p>
-              <p>advisorContext: {String(advisorContext)}</p>
-              <p>invitationId: {invitationId}</p>
-              <p>relationshipId: -</p>
-              <p>teamContext: {requestedTeamContext}</p>
-              <p>resolvedViewMode: {advisorContext ? "advisor" : "founder"}</p>
-              <p>whyNotUsable: {data.reason ?? data.status}</p>
-            </div>
-          ) : null}
         </div>
       </main>
     );
@@ -143,20 +140,6 @@ export default async function FounderAlignmentWorkbookPage({
         teamContext={data.teamContext}
         properties={{ role: data.currentUserRole, source: data.source }}
       />
-      {debug ? (
-        <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8 print:hidden">
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
-            <p className="font-semibold text-slate-900">Debug · Workbook Target</p>
-            <p>currentUserRole: {data.currentUserRole}</p>
-            <p>advisorContext: {String(advisorContext)}</p>
-            <p>invitationId: {data.invitationId ?? invitationId}</p>
-            <p>relationshipId: {data.relationshipId ?? "-"}</p>
-            <p>teamContext: {data.teamContext}</p>
-            <p>resolvedViewMode: {data.currentUserRole === "advisor" ? "advisor" : "founder"}</p>
-            <p>whyNotUsable: -</p>
-          </div>
-        </div>
-      ) : null}
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-7xl justify-end">
           {data.currentUserRole !== "advisor" ? (

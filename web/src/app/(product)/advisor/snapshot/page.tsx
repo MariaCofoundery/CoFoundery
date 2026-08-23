@@ -9,10 +9,14 @@ import {
   normalizeAdvisorTeamContext,
 } from "@/features/reporting/advisorTeamTargets";
 import {
-  FOUNDER_ALIGNMENT_WORKBOOK_STEPS,
   type FounderAlignmentWorkbookAdvisorFollowUp,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
+import {
+  getWorkbookContent,
+  resolveWorkbookContentSteps,
+} from "@/features/reporting/workbookContent/workbookContent";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 type PageSearchParams = {
@@ -25,8 +29,10 @@ function resolveTeamContext(value: string | undefined) {
   return normalizeAdvisorTeamContext(value);
 }
 
-function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
+function teamContextLabel(teamContext: "pre_founder" | "existing_team", t: AdvisorT) {
+  return teamContext === "existing_team"
+    ? t("snapshot.teamContexts.existing")
+    : t("snapshot.teamContexts.preFounder");
 }
 
 type AdvisorT = Awaited<ReturnType<typeof getTranslations>>;
@@ -37,11 +43,14 @@ function followUpLabel(value: FounderAlignmentWorkbookAdvisorFollowUp, t: Adviso
   return t("snapshot.followUps.none");
 }
 
-function founderReactionLabel(value: "understood" | "open" | "in_clarification" | null) {
-  if (value === "understood") return "verstanden";
-  if (value === "open") return "offen";
-  if (value === "in_clarification") return "wird geklärt";
-  return "Noch keine Founder-Reaktion";
+function founderReactionLabel(
+  value: "understood" | "open" | "in_clarification" | null,
+  t: AdvisorT
+) {
+  if (value === "understood") return t("snapshot.founderResponse.understood");
+  if (value === "open") return t("snapshot.founderResponse.open");
+  if (value === "in_clarification") return t("snapshot.founderResponse.clarification");
+  return t("snapshot.founderResponse.missing");
 }
 
 export default async function AdvisorSnapshotPage({
@@ -51,9 +60,11 @@ export default async function AdvisorSnapshotPage({
 }) {
   const params = await searchParams;
   const t = await getTranslations("advisor");
+  const locale = await getRequestLocale();
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
-  const debug = params.debug === "1";
+  // Technical access metadata is intentionally never rendered to product users.
+  const debug = false;
 
   if (!invitationId) {
     redirect("/advisor/dashboard");
@@ -134,9 +145,12 @@ export default async function AdvisorSnapshotPage({
 
   const founderALabel = data.founderAName?.trim() || "Founder A";
   const founderBLabel = data.founderBName?.trim() || "Founder B";
-  const focusSteps = FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter((step) =>
-    data.highlights.prioritizedStepIds.includes(step.id)
-  ).slice(0, 3);
+  const focusSteps = resolveWorkbookContentSteps(
+    getWorkbookContent(locale),
+    data.showValuesStep
+  )
+    .filter((step) => data.highlights.prioritizedStepIds.includes(step.id))
+    .slice(0, 3);
 
   return (
     <>
@@ -186,7 +200,7 @@ export default async function AdvisorSnapshotPage({
           </h1>
           <div className="mt-4 flex flex-wrap gap-3">
             <span className="inline-flex rounded-full border border-[color:var(--brand-accent)]/18 bg-[color:var(--brand-accent)]/7 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
-              {teamContextLabel(data.teamContext)}
+              {teamContextLabel(data.teamContext, t)}
             </span>
             <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
               {followUpLabel(data.workbook.advisorFollowUp, t)}
@@ -199,27 +213,27 @@ export default async function AdvisorSnapshotPage({
 
         <div className="mt-8 grid gap-5">
           <section className="rounded-3xl border border-slate-200 bg-slate-50/70 p-6">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Wichtigste Fokusfelder</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("snapshot.focus.eyebrow")}</p>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               <FocusCard
-                title="Stärkste gemeinsame Grundlage"
-                text={data.highlights.topStrength || "Noch keine hervorgehobene Stärke."}
+                title={t("snapshot.focus.first")}
+                text={data.highlights.topStrength || t("snapshot.focus.empty")}
               />
               <FocusCard
-                title="Ergänzende Dynamik"
+                title={t("snapshot.focus.second")}
                 text={
                   data.highlights.topComplementaryDynamic ||
-                  "Noch keine hervorgehobene ergänzende Dynamik."
+                  t("snapshot.focus.empty")
                 }
               />
               <FocusCard
-                title="Wichtigstes Spannungsthema"
-                text={data.highlights.topTension || "Noch kein hervorgehobenes Spannungsthema."}
+                title={t("snapshot.focus.third")}
+                text={data.highlights.topTension || t("snapshot.focus.empty")}
               />
             </div>
             {focusSteps.length > 0 ? (
               <div className="mt-5 rounded-2xl border border-slate-200 bg-white/90 p-4">
-                <p className="text-sm font-semibold text-slate-900">Priorisierte Gesprächsfelder</p>
+                <p className="text-sm font-semibold text-slate-900">{t("snapshot.focus.prioritized")}</p>
                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-700">
                   {focusSteps.map((step) => (
                     <li key={step.id}>• {step.title}</li>
@@ -230,30 +244,30 @@ export default async function AdvisorSnapshotPage({
           </section>
 
           <section className="rounded-3xl border border-[color:var(--brand-accent)]/16 bg-[color:var(--brand-accent)]/6 p-6">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Advisor-Impulse</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("snapshot.advisorClosing.eyebrow")}</p>
             <div className="mt-4 grid gap-4">
               <FocusCard
-                title="Beobachtungen"
-                text={data.workbook.advisorClosing.observations || "Noch keine Beobachtungen festgehalten."}
+                title={t("snapshot.advisorClosing.observations")}
+                text={data.workbook.advisorClosing.observations || t("snapshot.advisorClosing.emptyObservations")}
               />
               <FocusCard
-                title="Rückfragen"
-                text={data.workbook.advisorClosing.questions || "Noch keine Rückfragen festgehalten."}
+                title={t("snapshot.advisorClosing.questions")}
+                text={data.workbook.advisorClosing.questions || t("snapshot.advisorClosing.emptyQuestions")}
               />
               <FocusCard
-                title="Empfohlene nächste Schritte"
-                text={data.workbook.advisorClosing.nextSteps || "Noch keine Empfehlungen festgehalten."}
+                title={t("snapshot.advisorClosing.nextSteps")}
+                text={data.workbook.advisorClosing.nextSteps || t("snapshot.advisorClosing.emptyNextSteps")}
               />
             </div>
           </section>
 
           <section className="rounded-3xl border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/6 p-6">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Founder-Reaktion</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("snapshot.founderResponse.eyebrow")}</p>
             <p className="mt-3 text-sm font-semibold text-slate-900">
-              {founderReactionLabel(data.workbook.founderReaction.status)}
+              {founderReactionLabel(data.workbook.founderReaction.status, t)}
             </p>
             <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
-              {data.workbook.founderReaction.comment || "Noch kein gemeinsamer Kommentar festgehalten."}
+              {data.workbook.founderReaction.comment || t("snapshot.founderResponse.emptyComment")}
             </p>
           </section>
         </div>

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
-import { AdvisorReportPreview } from "@/features/reporting/AdvisorReportPreview";
-import type { AdvisorReportData } from "@/features/reporting/advisor-report/advisorReportTypes";
 import {
-  ADVISOR_IMPULSE_SECTION_META,
+  AdvisorReportPreview,
+  type AdvisorReportPreviewCopy,
+} from "@/features/reporting/AdvisorReportPreview";
+import type { AdvisorReportData } from "@/features/reporting/advisor-report/advisorReportTypes";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
+import {
   ADVISOR_IMPULSE_SECTION_ORDER,
+  getAdvisorImpulseSectionMeta,
   type AdvisorImpulseSectionKey,
   type AdvisorSectionImpulse,
 } from "@/features/reporting/advisorSectionImpulses";
@@ -33,12 +37,13 @@ type Props = {
     noImpulse: string;
     save: string;
     eyebrow: string;
+    preview: AdvisorReportPreviewCopy;
   };
 };
 
 function formatSavedLabel(value: string | null, locale: string) {
   if (!value) return null;
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -58,6 +63,7 @@ export function AdvisorReportProductView({
   locale,
   copy,
 }: Props) {
+  const impulseSectionMeta = getAdvisorImpulseSectionMeta(locale);
   const topActions = (
     <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
       <Link
@@ -97,7 +103,7 @@ export function AdvisorReportProductView({
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {ADVISOR_IMPULSE_SECTION_ORDER.map((sectionKey) => {
-          const meta = ADVISOR_IMPULSE_SECTION_META[sectionKey];
+          const meta = impulseSectionMeta[sectionKey];
           const impulse = impulses[sectionKey];
           const savedLabel = formatSavedLabel(impulse?.updatedAt ?? null, locale);
           return (
@@ -154,6 +160,8 @@ export function AdvisorReportProductView({
         eyebrow={copy.eyebrow}
         topActions={topActions}
         appendix={appendix}
+        locale={locale}
+        copy={copy.preview}
       />
     </main>
   );

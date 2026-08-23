@@ -38,7 +38,8 @@ export default async function AdvisorReportPage({
   const requestedTeamContext = params.teamContext
     ? normalizeAdvisorTeamContext(params.teamContext)
     : null;
-  const debug = params.debug === "1";
+  // Technical loader metadata is intentionally never rendered to product users.
+  const debug = false;
   if (!invitationId) {
     redirect("/advisor/dashboard");
   }
@@ -251,6 +252,30 @@ export default async function AdvisorReportPage({
           noImpulse: t("report.noImpulse"),
           save: t("report.save"),
           eyebrow: t("report.eyebrow"),
+          preview: {
+            teamProfile: t("report.preview.teamProfile"),
+            dimensionsEyebrow: t("report.preview.dimensionsEyebrow"),
+            dimensionsTitle: t("report.preview.dimensionsTitle"),
+            dimensionsText: t("report.preview.dimensionsText"),
+            conversationTopicsEyebrow: t("report.preview.conversationTopicsEyebrow"),
+            conversationTopicsTitle: t("report.preview.conversationTopicsTitle"),
+            observations: t("report.preview.observations"),
+            conversationPrompts: t("report.preview.conversationPrompts"),
+            additionalContext: t("report.preview.additionalContext"),
+            details: t("report.preview.details"),
+            detailsTitle: t("report.preview.detailsTitle"),
+            optional: t("report.preview.optional"),
+            intensity: t("report.preview.intensity"),
+            observation: t("report.preview.observation"),
+            possibleContribution: t("report.preview.possibleContribution"),
+            revisitWhen: t("report.preview.revisitWhen"),
+            conversationQuestion: t("report.preview.conversationQuestion"),
+            responseContext: t("report.preview.responseContext"),
+            reviewTogether: t("report.preview.reviewTogether"),
+            classificationContext: t("report.preview.classificationContext"),
+            keepInMind: t("report.preview.keepInMind"),
+            internalPreview: t("report.preview.internalPreview"),
+          },
         }}
       />
     </>

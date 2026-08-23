@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import {
   PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS,
@@ -9,6 +9,7 @@ import {
   type ProductFeedbackSource,
 } from "@/features/feedback/productFeedback";
 import { submitProductFeedbackAction } from "@/features/feedback/actions";
+import { getSpeechRecognitionLocale } from "@/i18n/presentationLocale";
 
 type ProductFeedbackEntryProps = {
   source: ProductFeedbackSource;
@@ -51,7 +52,6 @@ type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
 type SpeechSupportState = "unknown" | "supported" | "unsupported";
 type DictationStatus = "idle" | "listening" | "paused" | "ended" | "error";
 
-const DEFAULT_SPEECH_LANGUAGE = "de-DE";
 const DICTATION_INACTIVITY_MS = 9000;
 const DICTATION_RESTART_MS = 250;
 
@@ -343,6 +343,7 @@ function FeedbackTextarea({
   rows?: number;
 }) {
   const t = useTranslations("feedback");
+  const locale = useLocale();
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const shouldKeepListeningRef = useRef(false);
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -431,7 +432,7 @@ function FeedbackTextarea({
     const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = DEFAULT_SPEECH_LANGUAGE;
+    recognition.lang = getSpeechRecognitionLocale(locale);
     recognition.onresult = handleSpeechResult;
     recognition.onerror = (event) => {
       if (event.error === "no-speech" && shouldKeepListeningRef.current) {
@@ -440,7 +441,7 @@ function FeedbackTextarea({
         return;
       }
 
-      finishDictationSession("error", mapSpeechError(event.error));
+      finishDictationSession("error", t(`dictation.errors.${mapSpeechErrorKey(event.error)}`));
     };
     recognition.onend = () => {
       if (shouldKeepListeningRef.current) {
@@ -623,18 +624,20 @@ function mergeSpeechIntoValue(baseValue: string, finalizedChunk: string, interim
   return pieces.join(baseValue.trim() ? "\n\n" : " ");
 }
 
-function mapSpeechError(error: string) {
+function mapSpeechErrorKey(
+  error: string
+): "permission" | "microphone" | "aborted" | "noSpeech" | "generic" {
   switch (error) {
     case "not-allowed":
     case "service-not-allowed":
-      return "Der Mikrofonzugriff wurde nicht freigegeben.";
+      return "permission";
     case "audio-capture":
-      return "Es konnte kein Mikrofon gefunden werden.";
+      return "microphone";
     case "aborted":
-      return "Die Aufnahme wurde beendet.";
+      return "aborted";
     case "no-speech":
-      return "Es wurde gerade keine Sprache erkannt.";
+      return "noSpeech";
     default:
-      return "Die Sprachaufnahme konnte gerade nicht verarbeitet werden.";
+      return "generic";
   }
 }
