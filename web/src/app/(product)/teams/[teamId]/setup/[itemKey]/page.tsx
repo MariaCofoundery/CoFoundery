@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
+import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { getFounderSetupCatalogItem, isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
@@ -35,7 +36,13 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   if (!setup) notFound();
   const item = setup.items.find((entry) => entry.key === itemKey);
   if (!item) notFound();
-  const t = await getTranslations("teams.setup");
+  const [t, navigationT] = await Promise.all([
+    getTranslations("teams.setup"),
+    getTranslations("teams.teamNavigation"),
+  ]);
+  const teamLabel = setup.members
+    .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
+    .join(" + ");
   const saveAction = saveFounderSetupWorkingStateAction.bind(null, teamId, itemKey);
   const proposeAction = proposeFounderSetupRevisionAction.bind(null, teamId, itemKey);
   const confirmAction = confirmFounderSetupRevisionAction.bind(null, teamId, itemKey);
@@ -110,6 +117,17 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
         <p className="mt-4 text-sm leading-7 text-slate-600">{t(`items.${itemKey}.question`)}</p>
         {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-white px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
       </header>
+      <FounderTeamNavigation
+        teamId={teamId}
+        active="setup"
+        labels={{
+          ariaLabel: navigationT("ariaLabel"),
+          context: navigationT("context", { team: teamLabel }),
+          overview: navigationT("overview"),
+          setup: navigationT("setup"),
+          alignment: navigationT("alignment"),
+        }}
+      />
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}
       <div className="mt-6 grid gap-6">
         {revisionCard("pending")}

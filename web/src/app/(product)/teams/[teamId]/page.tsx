@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import {
   getFounderTeamHomebase,
   type FounderTeamHomebase,
@@ -55,7 +56,10 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
   if (!team) notFound();
   const setupState = await getFounderSetupStarted(teamId, user.id, supabase);
 
-  const t = await getTranslations("teams.homebase");
+  const [t, navigationT] = await Promise.all([
+    getTranslations("teams.homebase"),
+    getTranslations("teams.teamNavigation"),
+  ]);
   const fallback = (index: number) => t("founders.fallback", { index });
   const names = memberNames(team, fallback);
   const founderNames = team.members.map(
@@ -70,7 +74,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <Link
-        href="/dashboard"
+        href="/connections"
         className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
       >
         {t("back")}
@@ -86,6 +90,18 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
         <p className="mt-4 text-xl font-medium text-slate-900">{title}</p>
         <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{context}</p>
       </header>
+
+      <FounderTeamNavigation
+        teamId={teamId}
+        active="overview"
+        labels={{
+          ariaLabel: navigationT("ariaLabel"),
+          context: navigationT("context", { team: title }),
+          overview: navigationT("overview"),
+          setup: navigationT("setup"),
+          alignment: navigationT("alignment"),
+        }}
+      />
 
       <div className="mt-6 grid gap-6">
         <section className={SECTION_CLASS} aria-labelledby="team-founders-title">
@@ -110,7 +126,11 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           </ul>
         </section>
 
-        <section className={SECTION_CLASS} aria-labelledby="team-alignment-title">
+        <section
+          id="team-alignment"
+          className={`${SECTION_CLASS} scroll-mt-32`}
+          aria-labelledby="team-alignment-title"
+        >
           <h2 id="team-alignment-title" className="text-xl font-semibold text-slate-950">
             {t("alignment.title")}
           </h2>
@@ -177,7 +197,10 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           )}
         </section>
 
-        <section className={SECTION_CLASS} aria-labelledby="team-setup-title">
+        <section
+          className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
+          aria-labelledby="team-setup-title"
+        >
           <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
             {t("setup.title")}
           </h2>
@@ -186,7 +209,10 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             <p className="text-sm font-medium text-slate-700">
               {setupState?.started ? t("setup.started") : t("setup.notStarted")}
             </p>
-            <Link href={`/teams/${teamId}/setup`} className={LINK_CLASS}>
+            <Link
+              href={`/teams/${teamId}/setup`}
+              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+            >
               {t("setup.open")}
             </Link>
           </div>

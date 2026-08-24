@@ -6,6 +6,7 @@ import { FOUNDER_SETUP_CATEGORY_KEYS } from "@/features/teams/founderSetupCatalo
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
+import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 
 type Props = { params: Promise<{ teamId: string }> };
 
@@ -16,8 +17,14 @@ export default async function FounderSetupPage({ params }: Props) {
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) notFound();
-  const t = await getTranslations("teams.setup");
+  const [t, navigationT] = await Promise.all([
+    getTranslations("teams.setup"),
+    getTranslations("teams.teamNavigation"),
+  ]);
   const counts = countFounderSetupStatuses(setup);
+  const teamLabel = setup.members
+    .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
+    .join(" + ");
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
@@ -38,6 +45,18 @@ export default async function FounderSetupPage({ params }: Props) {
           </p>
         ) : null}
       </header>
+
+      <FounderTeamNavigation
+        teamId={teamId}
+        active="setup"
+        labels={{
+          ariaLabel: navigationT("ariaLabel"),
+          context: navigationT("context", { team: teamLabel }),
+          overview: navigationT("overview"),
+          setup: navigationT("setup"),
+          alignment: navigationT("alignment"),
+        }}
+      />
 
       <div className="mt-7 grid gap-8">
         {FOUNDER_SETUP_CATEGORY_KEYS.map((category) => (

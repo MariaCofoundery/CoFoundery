@@ -2,7 +2,7 @@
   "homebase": {
     "eyebrow": "Founder-Team",
     "title": "Unsere Zusammenarbeit",
-    "back": "Zurück zum Dashboard",
+    "back": "Zurück zu Verbindungen",
     "context": {
       "preFounder": "Ihr prüft eine gemeinsame Gründung",
       "existingTeam": "Ihr arbeitet bereits als Founder-Team zusammen"
@@ -49,6 +49,52 @@
         "approved": "Freigegeben",
         "invited": "Eingeladen",
         "linked": "Verbunden"
+      }
+    }
+  },
+  "teamNavigation": {
+    "ariaLabel": "Bereiche des Founder-Teams",
+    "context": "Bereiche für {team}",
+    "overview": "Übersicht",
+    "setup": "Founder Setup",
+    "alignment": "Alignment"
+  },
+  "connections": {
+    "eyebrow": "Verbindungen",
+    "title": "Deine Founder-Verbindungen",
+    "subtitle": "Hier findest du Founder, mit denen du eine Zusammenarbeit prüfst oder bereits zusammenarbeitest.",
+    "find": "Co-Founder finden",
+    "founderFallback": "Founder {index}",
+    "founderUnknown": "Founder",
+    "openTeam": "Verbindung öffnen",
+    "respond": "Öffnen",
+    "continue": "Fortsetzen",
+    "contexts": {
+      "preFounder": "Gemeinsame Gründung prüfen",
+      "existingTeam": "Bestehendes Founder-Team"
+    },
+    "established": {
+      "title": "Gemeinsame Bereiche",
+      "description": "Dauerhafte Arbeitsbereiche für eure bestehenden Founder-Verbindungen.",
+      "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden."
+    },
+    "potential": {
+      "title": "Kennenlernen und Alignment",
+      "description": "Offene Anfragen und Verbindungen, bei denen ihr eine Zusammenarbeit noch prüft.",
+      "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen."
+    },
+    "states": {
+      "request_pending": {
+        "incoming": "Deine Antwort ist offen",
+        "sent": "Anfrage gesendet"
+      },
+      "intro_accepted": {
+        "incoming": "Intro angenommen",
+        "sent": "Intro angenommen"
+      },
+      "alignment_in_progress": {
+        "incoming": "Alignment läuft",
+        "sent": "Alignment läuft"
       }
     }
   },
@@ -136,6 +182,7 @@
     "description": "Öffne die gemeinsame Übersicht für ein bestehendes Founder-Team.",
     "empty": "Neue Founder-Teams erscheinen hier, sobald eine gemeinsame Verbindung angelegt wurde.",
     "open": "Öffnen",
+    "allConnections": "Alle Verbindungen",
     "memberFallback": "Founder {index}",
     "context": {
       "preFounder": "Ihr prüft eine gemeinsame Gründung",

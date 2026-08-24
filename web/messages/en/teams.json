@@ -2,7 +2,7 @@
   "homebase": {
     "eyebrow": "Founder team",
     "title": "Our collaboration",
-    "back": "Back to dashboard",
+    "back": "Back to connections",
     "context": {
       "preFounder": "You are exploring founding a company together",
       "existingTeam": "You already work together as a founder team"
@@ -49,6 +49,52 @@
         "approved": "Approved",
         "invited": "Invited",
         "linked": "Connected"
+      }
+    }
+  },
+  "teamNavigation": {
+    "ariaLabel": "Founder team areas",
+    "context": "Areas for {team}",
+    "overview": "Overview",
+    "setup": "Founder Setup",
+    "alignment": "Alignment"
+  },
+  "connections": {
+    "eyebrow": "Connections",
+    "title": "Your founder connections",
+    "subtitle": "Find the founders you are exploring a collaboration with or already working with.",
+    "find": "Find a Co-Founder",
+    "founderFallback": "Founder {index}",
+    "founderUnknown": "Founder",
+    "openTeam": "Open connection",
+    "respond": "Open",
+    "continue": "Continue",
+    "contexts": {
+      "preFounder": "Exploring a company together",
+      "existingTeam": "Existing founder team"
+    },
+    "established": {
+      "title": "Shared areas",
+      "description": "Long-term workspaces for your established founder connections.",
+      "empty": "You do not have a long-term founder connection yet."
+    },
+    "potential": {
+      "title": "Introductions and alignment",
+      "description": "Open requests and connections where you are still exploring a collaboration.",
+      "empty": "There are no open or ongoing connections right now."
+    },
+    "states": {
+      "request_pending": {
+        "incoming": "Your response is open",
+        "sent": "Request sent"
+      },
+      "intro_accepted": {
+        "incoming": "Introduction accepted",
+        "sent": "Introduction accepted"
+      },
+      "alignment_in_progress": {
+        "incoming": "Alignment in progress",
+        "sent": "Alignment in progress"
       }
     }
   },
@@ -136,6 +182,7 @@
     "description": "Open the shared overview for an existing founder team.",
     "empty": "New founder teams appear here once a shared connection has been created.",
     "open": "Open",
+    "allConnections": "All connections",
     "memberFallback": "Founder {index}",
     "context": {
       "preFounder": "You are exploring founding a company together",
