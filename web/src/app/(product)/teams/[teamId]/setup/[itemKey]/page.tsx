@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
+import { FounderSetupDiscussionComposer } from "@/features/teams/FounderSetupDiscussionComposer";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { getFounderSetupCatalogItem, isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
-import { getFounderSetup } from "@/features/teams/founderSetupData";
+import { getFounderSetup, getFounderSetupDiscussion } from "@/features/teams/founderSetupData";
+import { groupFounderSetupDiscussionEntries } from "@/features/teams/founderSetupDiscussion";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
 import {
   confirmFounderSetupRevisionAction,
+  createFounderSetupDiscussionEntryAction,
   proposeFounderSetupRevisionAction,
   saveFounderSetupWorkingStateAction,
   withdrawFounderSetupConfirmationAction,
 } from "@/features/teams/founderSetupActions";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 type Props = {
   params: Promise<{ teamId: string; itemKey: string }>;
@@ -36,10 +40,23 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   if (!setup) notFound();
   const item = setup.items.find((entry) => entry.key === itemKey);
   if (!item) notFound();
-  const [t, navigationT] = await Promise.all([
+  const [t, navigationT, locale, discussionEntries] = await Promise.all([
     getTranslations("teams.setup"),
     getTranslations("teams.teamNavigation"),
+    getLocale(),
+    getFounderSetupDiscussion(teamId, itemKey, supabase),
   ]);
+  const discussionThreads = groupFounderSetupDiscussionEntries(discussionEntries);
+  const dateFormatter = new Intl.DateTimeFormat(getPresentationLocale(locale), {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  const memberName = (userId: string) => {
+    const index = setup.members.findIndex((member) => member.userId === userId);
+    return index >= 0
+      ? setup.members[index].displayName ?? t("founderFallback", { index: index + 1 })
+      : t("founderFallback", { index: 1 });
+  };
   const teamLabel = setup.members
     .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
     .join(" + ");
@@ -47,8 +64,9 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   const proposeAction = proposeFounderSetupRevisionAction.bind(null, teamId, itemKey);
   const confirmAction = confirmFounderSetupRevisionAction.bind(null, teamId, itemKey);
   const withdrawAction = withdrawFounderSetupConfirmationAction.bind(null, teamId, itemKey);
+  const discussionAction = createFounderSetupDiscussionEntryAction.bind(null, teamId, itemKey);
   const currentUserConfirmed = item.pendingRevision?.confirmations.some((confirmation) => confirmation.userId === user.id) ?? false;
-  const feedbackKey = result && ["saved", "proposed", "confirmed", "withdrawn"].includes(result)
+  const feedbackKey = result && ["saved", "proposed", "confirmed", "withdrawn", "commented"].includes(result)
     ? result
     : result
       ? "error"
@@ -130,8 +148,45 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
       />
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}
       <div className="mt-6 grid gap-6">
-        {revisionCard("pending")}
         {revisionCard("current")}
+        <section className={CARD} aria-labelledby="discussion-title">
+          <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("discussion.help")}</p>
+          <p className="mt-2 text-xs leading-5 text-slate-500">{t("discussion.visibility")}</p>
+          <FounderSetupDiscussionComposer action={discussionAction} />
+          {discussionThreads.length > 0 ? (
+            <ol className="mt-6 space-y-4">
+              {discussionThreads.map((thread) => (
+                <li key={thread.root.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                  <p className="text-xs text-slate-500">
+                    {memberName(thread.root.authorUserId)} · {dateFormatter.format(new Date(thread.root.createdAt))}
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-800">{thread.root.body}</p>
+                  {thread.replies.length > 0 ? (
+                    <ol className="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">
+                      {thread.replies.map((reply) => (
+                        <li key={reply.id}>
+                          <p className="text-xs text-slate-500">
+                            {memberName(reply.authorUserId)} · {dateFormatter.format(new Date(reply.createdAt))}
+                          </p>
+                          <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{reply.body}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : null}
+                  <details className="mt-3">
+                    <summary className="cursor-pointer rounded-sm text-sm font-medium text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+                      {t("discussion.replyAction")}
+                    </summary>
+                    <FounderSetupDiscussionComposer action={discussionAction} parentEntryId={thread.root.id} compact />
+                  </details>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="mt-6 rounded-xl border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-600">{t("discussion.empty")}</p>
+          )}
+        </section>
         <section className={CARD} aria-labelledby="working-note-title">
           <h2 id="working-note-title" className="text-xl font-semibold text-slate-950">{t("detail.workingTitle")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("detail.workingHelp")}</p>
@@ -150,6 +205,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
             </ReportActionButton>
           </form>
         </section>
+        {revisionCard("pending")}
         <section className={CARD} aria-labelledby="proposal-title">
           <h2 id="proposal-title" className="text-xl font-semibold text-slate-950">{t("detail.proposalTitle")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{item.pendingRevision ? t("detail.proposalReplacesPending") : t("detail.proposalHelp")}</p>

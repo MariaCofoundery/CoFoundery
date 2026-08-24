@@ -27,6 +27,14 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
     },
     deepDivePilot: {
       label: "Alignment vertiefen",
+      shortIntro: "Was steckt hinter euren unterschiedlichen oder ähnlichen Perspektiven?",
+      whyTitle: "Warum dieses Thema",
+      whyByStep: {
+        decision_rules:
+          "Entscheidungen werden nicht nur durch Regeln geprägt, sondern auch dadurch, was jede Person braucht, um Einfluss, Zuständigkeit und Fairness zu erleben.",
+        collaboration_conflict:
+          "Schwierige Situationen werden leichter besprechbar, wenn ihr versteht, wie ihr Belastung, Feedback und den Weg zurück in die Zusammenarbeit erlebt.",
+      },
       reflectionPhase: "Reflexion",
       reflectionTitle: "Was moechtet ihr daraus festhalten?",
       reflectionHelp:
@@ -39,13 +47,17 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
       handoffTitle: "In Founder Setup weiterarbeiten",
       handoffReady:
         "Ihr koennt diese Reflexionsnotiz als offenen Arbeitsstand in Founder Setup uebernehmen.",
-      handoffAction: "In Founder Setup uebernehmen",
+      handoffAction: "Reflexion ins Founder Setup uebernehmen",
       handoffSuccess:
         "Die Reflexionsnotiz wurde als offener Arbeitsstand in Founder Setup uebernommen.",
       handoffError: "Die Reflexionsnotiz konnte gerade nicht uebernommen werden.",
       existingNote:
         "In Founder Setup gibt es zu diesem Thema bereits eine gemeinsame Notiz. Oeffnet den Punkt dort und entscheidet, was ihr aus diesem Gespraech ergaenzen moechtet.",
       openSetup: "Founder Setup oeffnen",
+      continueExistingNote: "Im Founder Setup weiterfuehren",
+      continueWithTeam: "Mit eurem Team im Founder Setup weiterfuehren",
+      openTeamContext: "Zu euren Verbindungen",
+      backToAlignment: "Zurueck zum Alignment",
       threeFounder:
         "Diese Reflexion stammt aus eurem paarweisen Alignment. Im Founder Setup koennt ihr das Thema gemeinsam mit dem gesamten Team weiterfuehren.",
       unavailable:

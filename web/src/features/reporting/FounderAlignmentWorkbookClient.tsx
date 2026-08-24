@@ -1270,6 +1270,7 @@ export function FounderAlignmentWorkbookClient({
           currentDeepDiveSetupKey
         )}`
       : null;
+  const currentDeepDiveDestinationHref = currentDeepDiveSetupHref ?? "/connections";
   const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
   const currentStepMissingStructuredKeys =
@@ -3054,29 +3055,35 @@ export function FounderAlignmentWorkbookClient({
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                  {wt("common.workbook")}
+                  {currentStepIsDeepDivePilot
+                    ? systemText(workbookContent.premiumWorkflow.deepDivePilot.label)
+                    : wt("common.workbook")}
                 </p>
-                <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
+                {!currentStepIsDeepDivePilot ? <div className="mt-4 inline-flex rounded-full border border-[color:var(--brand-primary)]/18 bg-[color:var(--brand-primary)]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
                   {teamContext === "existing_team"
                     ? wt("client.teamContextExistingTeam")
                     : wt("client.teamContextPreFounder")}
-                </div>
+                </div> : null}
                 <h1 className="mt-3 text-3xl font-semibold text-slate-950">
-                  {wt("client.title")}
+                  {currentStepIsDeepDivePilot
+                    ? systemText(workbookContent.premiumWorkflow.deepDivePilot.label)
+                    : wt("client.title")}
                 </h1>
                 <p className="mt-3 text-base leading-7 text-slate-700">
                   {founderALabel} x {founderBLabel}
                 </p>
                 <p className="mt-4 text-[15px] leading-8 text-slate-700">
-                  {wt(
+                  {currentStepIsDeepDivePilot
+                    ? systemText(workbookContent.premiumWorkflow.deepDivePilot.shortIntro)
+                    : wt(
                     teamContext === "existing_team"
                       ? "print.contextIntro.existingTeam"
                       : "print.contextIntro.preFounder"
-                  )}
+                    )}
                 </p>
               </div>
 
-              <div className="flex min-w-[260px] flex-col items-start gap-3 rounded-[30px] border border-slate-200/70 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,0.96))] p-5 lg:items-end">
+              <div className={currentStepIsDeepDivePilot ? "hidden" : "flex min-w-[260px] flex-col items-start gap-3 rounded-[30px] border border-slate-200/70 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,0.96))] p-5 lg:items-end"}>
                 <div className="text-sm text-slate-600">{wt("client.duration")}</div>
                 <div className="w-full rounded-2xl border border-slate-200/70 bg-white/92 px-4 py-4 lg:max-w-xs">
                   <div className="flex items-center gap-3">
@@ -3133,7 +3140,8 @@ export function FounderAlignmentWorkbookClient({
               </div>
             </div>
 
-            {((!currentStepIsAdvisorClosing && !currentStepIsPremiumPilot) || showAdvisorInviteCard) && (
+            {((!currentStepIsAdvisorClosing && !currentStepIsPremiumPilot) ||
+              (showAdvisorInviteCard && !currentStepIsDeepDivePilot)) && (
               <div
                 className={`mt-6 grid gap-4 ${
                   showAdvisorInviteCard
@@ -3191,7 +3199,7 @@ export function FounderAlignmentWorkbookClient({
                   </section>
                 ) : null}
 
-                {showAdvisorInviteCard ? (
+                {showAdvisorInviteCard && !currentStepIsDeepDivePilot ? (
                   <aside className="rounded-[24px] border border-slate-200/80 bg-slate-50/78 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
                     {isAdvisorViewer ? (
                       <details className="group" open={false}>
@@ -3570,8 +3578,8 @@ export function FounderAlignmentWorkbookClient({
             </section>
           </div>
         ) : (
-        <div className="mt-8 grid gap-8 xl:grid-cols-[280px_minmax(0,1fr)]">
-          <aside
+        <div className={`mt-8 grid gap-8 ${currentStepIsDeepDivePilot ? "xl:grid-cols-1" : "xl:grid-cols-[280px_minmax(0,1fr)]"}`}>
+          {!currentStepIsDeepDivePilot ? <aside
             id="sessionverlauf"
             className="order-2 self-start rounded-[30px] border border-slate-200/70 bg-white/96 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.045)] xl:order-1 xl:sticky xl:top-24"
           >
@@ -3657,7 +3665,7 @@ export function FounderAlignmentWorkbookClient({
                 );
               })}
             </ol>
-          </aside>
+          </aside> : null}
 
           <section
             ref={currentStepRef}
@@ -3669,12 +3677,16 @@ export function FounderAlignmentWorkbookClient({
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="max-w-3xl">
                     <p className={`text-[11px] uppercase tracking-[0.22em] ${currentToneMeta.headerKicker}`}>
-                      {wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
+                      {currentStepIsDeepDivePilot
+                        ? systemText(workbookContent.premiumWorkflow.deepDivePilot.label)
+                        : wt("client.stepOf", { current: currentIndex + 1, total: visibleSteps.length })}
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-950">{currentStepTitle}</h2>
                     {!isAdvisorViewer ? (
                       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-                        {wt("client.premium.intro.founder")}
+                        {currentStepIsDeepDivePilot
+                          ? systemText(workbookContent.premiumWorkflow.deepDivePilot.shortIntro)
+                          : wt("client.premium.intro.founder")}
                       </p>
                     ) : null}
                     {currentStepIsPrioritized ? (
@@ -3684,7 +3696,7 @@ export function FounderAlignmentWorkbookClient({
                         </span>
                       </div>
                     ) : null}
-                    {!isAdvisorViewer ? (
+                    {!isAdvisorViewer && !currentStepIsDeepDivePilot ? (
                       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
                         <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
                           {wt("client.mode.eyebrow")}
@@ -3718,13 +3730,13 @@ export function FounderAlignmentWorkbookClient({
                       </div>
                     ) : null}
                   </div>
-                  <span
+                  {!currentStepIsDeepDivePilot ? <span
                     className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${workbookStepStatusClassName(
                       currentStepStatus
                     )}`}
                   >
                     {wt(workbookStepStatusMessageKey(currentStepStatus))}
-                  </span>
+                  </span> : null}
                 </div>
               </div>
             ) : (
@@ -4069,20 +4081,26 @@ export function FounderAlignmentWorkbookClient({
                   <div className="max-w-4xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
                       {currentStepIsDeepDivePilot
-                        ? systemText(workbookContent.premiumWorkflow.deepDivePilot.label)
+                        ? systemText(workbookContent.premiumWorkflow.deepDivePilot.whyTitle)
                         : wt("client.leadQuestion")}
                     </p>
                     <p className="mt-3 text-[1.55rem] font-semibold leading-[1.28] text-slate-950 sm:text-[2rem] sm:leading-[1.22]">
                       {systemText(currentPremiumFieldGuidance.question)}
                     </p>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-700">
-                      {isAdvisorViewer
+                      {currentStepIsDeepDivePilot
+                        ? systemText(
+                            workbookContent.premiumWorkflow.deepDivePilot.whyByStep[
+                              currentDeepDivePilotStepId!
+                            ]
+                          )
+                        : isAdvisorViewer
                         ? wt("client.premium.intro.advisor")
                         : wt("client.premium.intro.founder")}
                     </p>
                   </div>
 
-                  <div className="mt-6 space-y-3">
+                  <div className={currentStepIsDeepDivePilot ? "hidden" : "mt-6 space-y-3"}>
                     {isAdvisorViewer ? (
                       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                         {visiblePremiumPhases.map(
@@ -4234,7 +4252,7 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </section>
 
-                <section className="mt-4 rounded-[24px] border border-slate-200/80 bg-white/78 px-4 py-4 sm:px-5">
+                <section className={currentStepIsDeepDivePilot ? "hidden" : "mt-4 rounded-[24px] border border-slate-200/80 bg-white/78 px-4 py-4 sm:px-5"}>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4285,11 +4303,37 @@ export function FounderAlignmentWorkbookClient({
                   </div>
                 </section>
 
+                {currentStepIsDeepDivePilot && currentStepImpulseContent ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setHelperOpenByStep((current) => ({
+                        ...current,
+                        [currentStep.id]: !current[currentStep.id],
+                      }))
+                    }
+                    className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                    aria-expanded={helperOpenByStep[currentStep.id]}
+                    aria-controls={`workbook-impulses-${currentStep.id}`}
+                  >
+                    {wt("client.premium.impulses.title")}
+                    <span className="text-slate-500">
+                      {helperOpenByStep[currentStep.id]
+                        ? wt("client.premium.impulses.hide")
+                        : wt("client.premium.impulses.show")}
+                    </span>
+                  </button>
+                ) : null}
+
                 {currentStepImpulseContent && helperOpenByStep[currentStep.id] ? (
                   <WorkbookStepImpulsePanel
                     id={`workbook-impulses-${currentStep.id}`}
                     questions={currentStepImpulseContent.questions}
-                    matchingImpulses={currentStepImpulseContent.matchingImpulses}
+                    matchingImpulses={
+                      currentStepIsDeepDivePilot
+                        ? []
+                        : currentStepImpulseContent.matchingImpulses
+                    }
                     matchingIntro={workbookContent.premiumWorkflow.markerImpulseIntro}
                     canUse={currentUserRole === "founderA" || currentUserRole === "founderB"}
                     onUseItem={useWorkbookImpulseAsDraft}
@@ -4297,7 +4341,7 @@ export function FounderAlignmentWorkbookClient({
                   />
                 ) : null}
 
-                {visibleWorkbookV2Phase === "collect" ? (
+                {visibleWorkbookV2Phase === "collect" || currentStepIsDeepDivePilot ? (
                   <section className="mt-8 rounded-[30px] border border-slate-200/80 bg-white p-6 sm:p-7">
                     <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-4">
                       <div className="max-w-3xl">
@@ -4388,7 +4432,7 @@ export function FounderAlignmentWorkbookClient({
                           advisorLabel={advisorLabel}
                           founderAvatarByAuthor={founderAvatarByAuthor}
                           reactionPresentation={reactionPresentation}
-                          mode="collect"
+                          mode={currentStepIsDeepDivePilot ? "weight" : "collect"}
                           openThreadId={visibleDiscussionOpenThreadId}
                           onToggleThread={toggleDiscussionOpenThread}
                           onUseAsDraft={useDecisionRulesDiscussionEntryAsDraft}
@@ -4417,7 +4461,7 @@ export function FounderAlignmentWorkbookClient({
                               [hasDecisionRulesFounderAPerspective ? founderBLabel : founderALabel]
                             )}
                     </div>
-                    {!isAdvisorViewer && hasDecisionRulesBothPerspectives ? (
+                    {!isAdvisorViewer && hasDecisionRulesBothPerspectives && !currentStepIsDeepDivePilot ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
                           {wt("client.premium.transitions.toWeightHint")}
@@ -4434,7 +4478,7 @@ export function FounderAlignmentWorkbookClient({
                   </section>
                 ) : null}
 
-                {visibleWorkbookV2Phase === "weight" ? (
+                {visibleWorkbookV2Phase === "weight" && !currentStepIsDeepDivePilot ? (
                   <section className={`mt-6 rounded-[30px] border p-6 sm:p-7 ${currentToneMeta.weightSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4455,7 +4499,7 @@ export function FounderAlignmentWorkbookClient({
                       ) : null}
                     </div>
 
-                    <div className="mt-5 grid gap-3 md:grid-cols-3">
+                    {!currentStepIsDeepDivePilot ? <div className="mt-5 grid gap-3 md:grid-cols-3">
                       <WorkbookV2InsightCard
                         title={systemText(reactionPresentation.counters.similar.label)}
                         count={workbookV2ReactionCounts.similar}
@@ -4471,7 +4515,7 @@ export function FounderAlignmentWorkbookClient({
                         count={workbookV2ReactionCounts.open}
                         text={systemText(reactionPresentation.counters.open.body)}
                       />
-                    </div>
+                    </div> : null}
 
                     <div className="mt-5">
                       <WorkbookV2DiscussionThreadList
@@ -4497,7 +4541,7 @@ export function FounderAlignmentWorkbookClient({
                         sourceBadgeClassName={currentToneMeta.sourceBadge}
                       />
                     </div>
-                    {!isAdvisorViewer && decisionRulesWeightingReady ? (
+                    {!isAdvisorViewer && decisionRulesWeightingReady && !currentStepIsDeepDivePilot ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
                           {currentStepIsDeepDivePilot
@@ -4518,7 +4562,7 @@ export function FounderAlignmentWorkbookClient({
                   </section>
                 ) : null}
 
-                {visibleWorkbookV2Phase === "rule" ? currentStepIsDeepDivePilot ? (
+                {visibleWorkbookV2Phase === "rule" || currentStepIsDeepDivePilot ? currentStepIsDeepDivePilot ? (
                   <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4564,6 +4608,28 @@ export function FounderAlignmentWorkbookClient({
                           <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">
                             {currentStepEntry.agreement}
                           </p>
+                        ) : null}
+                        {currentStepContent.outputFields?.some((field) =>
+                          readStructuredOutputValue(currentStepStructuredOutputs, field.key).trim()
+                        ) ? (
+                          <dl className="mt-4 space-y-3">
+                            {currentStepContent.outputFields.map((field) => {
+                              const value = readStructuredOutputValue(
+                                currentStepStructuredOutputs,
+                                field.key
+                              ).trim();
+                              return value ? (
+                                <div key={field.key} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                                  <dt className="text-xs font-medium text-slate-600">
+                                    {systemText(field.title)}
+                                  </dt>
+                                  <dd className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                                    {value}
+                                  </dd>
+                                </div>
+                              ) : null;
+                            })}
+                          </dl>
                         ) : null}
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
                           <ApprovalStatusCard
@@ -4625,14 +4691,19 @@ export function FounderAlignmentWorkbookClient({
                               )}
                             </ReportActionButton>
                           ) : null}
-                          {currentDeepDiveSetupHref &&
-                          currentDeepDiveHandoffState !== "two_founder_ready" ? (
+                          {currentDeepDiveHandoffState !== "two_founder_ready" ? (
                             <Link
-                              href={currentDeepDiveSetupHref}
+                              href={currentDeepDiveDestinationHref}
                               className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
                             >
                               {systemText(
-                                workbookContent.premiumWorkflow.deepDivePilot.openSetup
+                                !currentDeepDiveSetupHref
+                                  ? workbookContent.premiumWorkflow.deepDivePilot.openTeamContext
+                                  : currentDeepDiveHandoffState === "three_founder_link_only"
+                                    ? workbookContent.premiumWorkflow.deepDivePilot.continueWithTeam
+                                    : currentDeepDiveHandoffState === "existing_note"
+                                      ? workbookContent.premiumWorkflow.deepDivePilot.continueExistingNote
+                                      : workbookContent.premiumWorkflow.deepDivePilot.openSetup
                               )}
                             </Link>
                           ) : null}
@@ -5185,7 +5256,18 @@ export function FounderAlignmentWorkbookClient({
               </>
             )}
 
-            <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
+            <div className={currentStepIsDeepDivePilot ? "mt-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-4" : "mt-10 rounded-3xl border border-slate-200 bg-slate-50/80 p-5"}>
+              {currentStepIsDeepDivePilot ? (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <Link
+                    href={deepDiveHandoffState?.teamId ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}` : "/connections"}
+                    className="rounded-sm text-sm font-medium text-slate-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                  >
+                    {systemText(workbookContent.premiumWorkflow.deepDivePilot.backToAlignment)}
+                  </Link>
+                  <span className="text-xs text-slate-500">{saveStatusMeta.label}</span>
+                </div>
+              ) : <>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -5259,6 +5341,7 @@ export function FounderAlignmentWorkbookClient({
                     : wt("client.navigation.continueKeepsProgress")
                   : wt("client.navigation.leaveWithoutFinalizing")}
               </p>
+              </>}
             </div>
           </section>
         </div>

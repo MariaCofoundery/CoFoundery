@@ -562,6 +562,14 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
     },
     deepDivePilot: {
       label: "Alignment deep dive",
+      shortIntro: "What is behind your different or similar perspectives?",
+      whyTitle: "Why this topic",
+      whyByStep: {
+        decision_rules:
+          "Decisions are shaped not only by rules, but also by what each person needs in order to experience influence, ownership, and fairness.",
+        collaboration_conflict:
+          "Difficult situations become easier to discuss when you understand how each of you experiences pressure, feedback, and the way back into collaboration.",
+      },
       reflectionPhase: "Reflection",
       reflectionTitle: "What would you like to take forward from this?",
       reflectionHelp:
@@ -574,13 +582,17 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       handoffTitle: "Continue in Founder Setup",
       handoffReady:
         "You can copy this reflection note into Founder Setup as an open working note.",
-      handoffAction: "Copy to Founder Setup",
+      handoffAction: "Copy reflection to Founder Setup",
       handoffSuccess:
         "The reflection note was copied to Founder Setup as an open working note.",
       handoffError: "The reflection note could not be copied right now.",
       existingNote:
         "Founder Setup already has a shared note for this topic. Open the item there and decide what you want to add from this conversation.",
       openSetup: "Open Founder Setup",
+      continueExistingNote: "Continue in Founder Setup",
+      continueWithTeam: "Continue with your team in Founder Setup",
+      openTeamContext: "Go to your connections",
+      backToAlignment: "Back to alignment",
       threeFounder:
         "This reflection comes from your pairwise alignment. In Founder Setup, you can continue the topic with the whole team.",
       unavailable:

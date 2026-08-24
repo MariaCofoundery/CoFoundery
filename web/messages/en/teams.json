@@ -149,6 +149,22 @@
       "confirm": "Confirm proposal",
       "withdraw": "Withdraw confirmation"
     },
+    "discussion": {
+      "title": "Discussion & notes",
+      "help": "Collect thoughts, questions, and perspectives here. Then use the shared working note to summarize what you want to take forward.",
+      "visibility": "These contributions are visible to all current founders on this team.",
+      "empty": "No contributions on this topic yet.",
+      "postLabel": "New contribution",
+      "postPlaceholder": "What would you like to add to this topic?",
+      "postAction": "Add contribution",
+      "replyLabel": "Reply",
+      "replyPlaceholder": "What would you like to reply?",
+      "replyAction": "Reply",
+      "dictationStart": "Start dictation",
+      "dictationStop": "Stop dictation",
+      "dictationListening": "Dictation is active…",
+      "dictationUnavailable": "Dictation is currently unavailable in this browser."
+    },
     "detail": {
       "workingTitle": "Your shared note",
       "workingHelp": "Use this space to collect thoughts and open points. The note is not yet a jointly confirmed position.",
@@ -174,6 +190,7 @@
       "proposed": "The shared wording was proposed for confirmation.",
       "confirmed": "Your confirmation was saved.",
       "withdrawn": "Your confirmation was withdrawn.",
+      "commented": "Your contribution was added.",
       "error": "The change could not be saved safely right now. Please try again."
     },
     "items": {

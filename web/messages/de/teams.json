@@ -149,6 +149,22 @@
       "confirm": "Vorschlag bestätigen",
       "withdraw": "Bestätigung zurücknehmen"
     },
+    "discussion": {
+      "title": "Gespräch & Notizen",
+      "help": "Sammelt hier Gedanken, Fragen und Perspektiven. Fasst anschließend in der gemeinsamen Arbeitsnotiz zusammen, was ihr daraus festhalten möchtet.",
+      "visibility": "Diese Beiträge sind für alle aktuellen Founder dieses Teams sichtbar.",
+      "empty": "Noch keine Beiträge zu diesem Thema.",
+      "postLabel": "Neuer Beitrag",
+      "postPlaceholder": "Was möchtest du zu diesem Thema einbringen?",
+      "postAction": "Beitrag hinzufügen",
+      "replyLabel": "Antwort",
+      "replyPlaceholder": "Was möchtest du darauf antworten?",
+      "replyAction": "Antworten",
+      "dictationStart": "Diktat starten",
+      "dictationStop": "Diktat stoppen",
+      "dictationListening": "Diktat läuft …",
+      "dictationUnavailable": "Diktat ist in diesem Browser gerade nicht verfügbar."
+    },
     "detail": {
       "workingTitle": "Eure gemeinsame Notiz",
       "workingHelp": "Hier könnt ihr Gedanken und offene Punkte sammeln. Die Notiz ist noch kein gemeinsam bestätigter Stand.",
@@ -174,6 +190,7 @@
       "proposed": "Die gemeinsame Fassung wurde zur Bestätigung vorgeschlagen.",
       "confirmed": "Deine Bestätigung wurde gespeichert.",
       "withdrawn": "Deine Bestätigung wurde zurückgenommen.",
+      "commented": "Dein Beitrag wurde hinzugefügt.",
       "error": "Die Änderung konnte gerade nicht sicher gespeichert werden. Bitte versuche es erneut."
     },
     "items": {

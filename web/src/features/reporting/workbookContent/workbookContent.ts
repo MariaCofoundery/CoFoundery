@@ -43,6 +43,9 @@ export type PremiumWorkbookWorkflowCopy = {
   };
   deepDivePilot: {
     label: string;
+    shortIntro: string;
+    whyTitle: string;
+    whyByStep: Record<"decision_rules" | "collaboration_conflict", string>;
     reflectionPhase: string;
     reflectionTitle: string;
     reflectionHelp: string;
@@ -57,6 +60,10 @@ export type PremiumWorkbookWorkflowCopy = {
     handoffError: string;
     existingNote: string;
     openSetup: string;
+    continueExistingNote: string;
+    continueWithTeam: string;
+    openTeamContext: string;
+    backToAlignment: string;
     threeFounder: string;
     unavailable: string;
   };

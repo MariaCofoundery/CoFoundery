@@ -9,6 +9,8 @@ import {
   type FounderSetupReadModel,
   type FounderSetupRevisionRow,
 } from "@/features/teams/founderSetupModel";
+import type { FounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
+import type { FounderSetupDiscussionEntry } from "@/features/teams/founderSetupDiscussion";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -92,4 +94,36 @@ export async function getFounderSetupStarted(
     .eq("team_id", teamId);
   if (result.error) return { started: false, unavailable: true };
   return { started: (result.count ?? 0) > 0, unavailable: false };
+}
+
+export async function getFounderSetupDiscussion(
+  teamId: string,
+  itemKey: FounderSetupItemKey,
+  client?: SupabaseServerClient
+): Promise<FounderSetupDiscussionEntry[]> {
+  const supabase = client ?? (await createClient());
+  const result = await supabase
+    .from("founder_team_setup_discussion_entries")
+    .select("id, team_id, item_key, author_user_id, parent_entry_id, body, created_at")
+    .eq("team_id", teamId)
+    .eq("item_key", itemKey)
+    .order("created_at", { ascending: true });
+  if (result.error) throw new Error("founder_team_setup_discussion_unavailable");
+  return ((result.data ?? []) as Array<{
+    id: string;
+    team_id: string;
+    item_key: FounderSetupItemKey;
+    author_user_id: string;
+    parent_entry_id: string | null;
+    body: string;
+    created_at: string;
+  }>).map((entry) => ({
+    id: entry.id,
+    teamId: entry.team_id,
+    itemKey: entry.item_key,
+    authorUserId: entry.author_user_id,
+    parentEntryId: entry.parent_entry_id,
+    body: entry.body,
+    createdAt: entry.created_at,
+  }));
 }

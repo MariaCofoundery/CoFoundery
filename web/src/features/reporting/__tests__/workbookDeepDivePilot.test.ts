@@ -96,9 +96,26 @@ test("the pilot reuses discussion, reactions, advisor replies, speech, and legac
     "utf8"
   );
   assert.match(client, /WorkbookV2DiscussionThreadList/);
+  assert.match(client, /mode=\{currentStepIsDeepDivePilot \? "weight" : "collect"\}/);
   assert.match(client, /getWorkbookReactionPresentationState/);
   assert.match(client, /currentStepAdvisorReplyGroups/);
   assert.match(client, /getSpeechRecognitionLocale/);
   assert.match(client, /deepDivePilot\.legacyTitle/);
   assert.match(client, /reflectionNote/);
+});
+
+test("pilot topics render as focused linear deep dives with an always-present setup destination", () => {
+  const client = readFileSync(
+    "src/features/reporting/FounderAlignmentWorkbookClient.tsx",
+    "utf8"
+  );
+  assert.match(client, /visibleWorkbookV2Phase === "collect" \|\| currentStepIsDeepDivePilot/u);
+  assert.match(client, /visibleWorkbookV2Phase === "weight" && !currentStepIsDeepDivePilot/u);
+  assert.match(client, /visibleWorkbookV2Phase === "rule" \|\| currentStepIsDeepDivePilot/u);
+  assert.match(client, /currentDeepDiveDestinationHref/u);
+  assert.match(client, /openTeamContext/u);
+  assert.match(client, /continueExistingNote/u);
+  assert.match(client, /continueWithTeam/u);
+  assert.match(client, /currentStepIsDeepDivePilot \? "xl:grid-cols-1"/u);
+  assert.match(client, /readStructuredOutputValue\(currentStepStructuredOutputs, field\.key\)/u);
 });

@@ -10,7 +10,11 @@ function formString(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function itemHref(teamId: string, itemKey: string, result?: "saved" | "proposed" | "confirmed" | "withdrawn" | "error") {
+function itemHref(
+  teamId: string,
+  itemKey: string,
+  result?: "saved" | "proposed" | "confirmed" | "withdrawn" | "commented" | "error"
+) {
   const path = `/teams/${encodeURIComponent(teamId)}/setup/${encodeURIComponent(itemKey)}`;
   return result ? `${path}?result=${result}` : path;
 }
@@ -104,4 +108,25 @@ export async function confirmFounderSetupRevisionAction(teamId: string, itemKey:
 
 export async function withdrawFounderSetupConfirmationAction(teamId: string, itemKey: string, formData: FormData) {
   return changeConfirmation("withdraw", teamId, itemKey, formString(formData, "revisionId"));
+}
+
+export async function createFounderSetupDiscussionEntryAction(
+  teamId: string,
+  itemKey: string,
+  formData: FormData
+) {
+  const supabase = await authenticatedClient();
+  if (!supabase || !isFounderSetupItemKey(itemKey)) redirect(itemHref(teamId, itemKey, "error"));
+  const body = formString(formData, "body");
+  const parentEntryId = formString(formData, "parentEntryId");
+  if (!body || body.length > 5000) redirect(itemHref(teamId, itemKey, "error"));
+  const { error } = await supabase.rpc("create_founder_team_setup_discussion_entry", {
+    p_team_id: teamId,
+    p_item_key: itemKey,
+    p_body: body,
+    p_parent_entry_id: parentEntryId || null,
+  });
+  if (error) redirect(itemHref(teamId, itemKey, "error"));
+  revalidateSetup(teamId, itemKey);
+  redirect(itemHref(teamId, itemKey, "commented"));
 }
