@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   DISCOVERY_COMMITMENT_OPTIONS,
-  DISCOVERY_PRIORITY_OPTIONS,
   DISCOVERY_REMOTE_MODE_OPTIONS,
   DISCOVERY_ROLE_OPTIONS,
   DISCOVERY_SELECTION_LIMITS,
@@ -13,39 +12,27 @@ import {
 import {
   pauseDiscoveryProfileAction,
   publishDiscoveryProfileFromFormAction,
-  saveDiscoveryPreferencesAction,
   saveDiscoveryProfileDraftAction,
 } from "@/features/discovery/discoveryActions";
 import {
   getOwnDiscoveryProfile,
-  getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
-  resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
   selectDiscoveryProfileFeedback,
-  type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
   type DiscoveryProfilePauseResult,
   type DiscoveryProfilePublishIssue,
   type DiscoveryProfilePublishResult,
 } from "@/features/discovery/discoveryProfileFeedback";
-import {
-  getOwnDiscoveryAssessmentSignalReadiness,
-  type OwnDiscoveryAssessmentSignalReadiness,
-} from "@/features/discovery/discoveryAssessmentSignals";
 import { getDiscoveryProfilePublishIssues } from "@/features/discovery/discoveryValidation";
 import type {
-  DiscoveryCommitmentLevel,
   DiscoveryFounderRole,
   DiscoveryRemoteMode,
-  DiscoveryVentureGoal,
-  DiscoveryVentureStage,
   FounderDiscoveryProfile,
-  FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -83,35 +70,16 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
     bio: "",
     ownRoles: [],
     seekingRoles: [],
+    expertise: [],
     industries: [],
     locationLabel: "",
+    locationRegion: "",
     remoteMode: "flexible",
     availabilityHoursPerWeek: null,
     commitmentLevel: "exploring",
     ventureStage: "undecided",
     ventureGoal: "undecided",
     publishedAt: null,
-  };
-}
-
-function emptyPreferences(): Pick<
-  FounderSearchPreferences,
-  "priorityWeights" | "mustHaves" | "includeAssessmentSignals" | "assessmentSignalsConsentedAt"
-> & { isDefaultedForSubmittedBase: boolean } {
-  return {
-    priorityWeights: {},
-    mustHaves: {
-      minimumAvailabilityHoursPerWeek: null,
-      acceptedRemoteModes: [],
-      requiredRolesAny: [],
-      requiredIndustriesAny: [],
-      acceptedCommitmentLevels: [],
-      acceptedVentureStages: [],
-      acceptedVentureGoals: [],
-    },
-    includeAssessmentSignals: false,
-    assessmentSignalsConsentedAt: null,
-    isDefaultedForSubmittedBase: false,
   };
 }
 
@@ -173,12 +141,6 @@ function buildDiscoveryProfilePublishRedirect(result: DiscoveryProfilePublishRes
 function buildDiscoveryProfileDraftRedirect(result: DiscoveryProfileDraftResult) {
   const params = new URLSearchParams();
   params.set(result.ok ? "draftResult" : "draftError", result.reason);
-  return `/discovery/profile?${params.toString()}`;
-}
-
-function buildDiscoveryPreferencesRedirect(result: DiscoveryPreferencesResult) {
-  const params = new URLSearchParams();
-  params.set(result.ok ? "preferencesResult" : "preferencesError", result.reason);
   return `/discovery/profile?${params.toString()}`;
 }
 
@@ -350,57 +312,6 @@ function PublishIssuesCard({
   );
 }
 
-function MultiCheckboxGrid<T extends string>({
-  name,
-  selected,
-  options,
-}: {
-  name: string;
-  selected: T[] | undefined;
-  options: Array<{ value: T; label: string }>;
-}) {
-  return (
-    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-      {options.map((option) => (
-        <OptionCheckbox
-          key={option.value}
-          name={name}
-          value={option.value}
-          label={option.label}
-          defaultChecked={isChecked(selected, option.value)}
-        />
-      ))}
-    </div>
-  );
-}
-
-function assessmentSignalStatusCopy(
-  readiness: OwnDiscoveryAssessmentSignalReadiness,
-  t: DiscoveryT
-) {
-  if (!readiness.hasSubmittedBaseAssessment) {
-    return t("profile.assessment.missingBase");
-  }
-
-  if (!readiness.includeAssessmentSignals) {
-    return t("profile.assessment.inactive");
-  }
-
-  return t("profile.assessment.active");
-}
-
-function assessmentSignalStatusClass(readiness: OwnDiscoveryAssessmentSignalReadiness) {
-  if (readiness.isAssessmentSignalReady) {
-    return "bg-emerald-50 text-emerald-900";
-  }
-
-  if (!readiness.hasSubmittedBaseAssessment) {
-    return "bg-amber-50 text-amber-900";
-  }
-
-  return "bg-slate-100 text-slate-600";
-}
-
 export default async function DiscoveryProfilePage({
   searchParams,
 }: {
@@ -416,11 +327,7 @@ export default async function DiscoveryProfilePage({
     redirect(`/login?next=${encodeURIComponent("/discovery/profile")}`);
   }
 
-  const [loadedProfile, loadedPreferences, assessmentSignalReadiness] = await Promise.all([
-    getOwnDiscoveryProfile(user.id),
-    getOwnSearchPreferences(user.id),
-    getOwnDiscoveryAssessmentSignalReadiness(user.id),
-  ]);
+  const loadedProfile = await getOwnDiscoveryProfile(user.id);
   const params = await searchParams;
   const publishFeedback = resolveDiscoveryProfilePublishFeedback({
     result: searchParamValue(params.publishResult),
@@ -431,10 +338,6 @@ export default async function DiscoveryProfilePage({
     result: searchParamValue(params.draftResult),
     error: searchParamValue(params.draftError),
   });
-  const preferencesFeedback = resolveDiscoveryPreferencesFeedback({
-    result: searchParamValue(params.preferencesResult),
-    error: searchParamValue(params.preferencesError),
-  });
   const pauseFeedback = resolveDiscoveryProfilePauseFeedback({
     result: searchParamValue(params.pauseResult),
     error: searchParamValue(params.pauseError),
@@ -442,7 +345,7 @@ export default async function DiscoveryProfilePage({
   const localizedFeedback = selectDiscoveryProfileFeedback({
     publish: publishFeedback,
     draft: draftFeedback,
-    preferences: preferencesFeedback,
+    preferences: null,
     pause: pauseFeedback,
   });
   const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
@@ -452,33 +355,13 @@ export default async function DiscoveryProfilePage({
       : []
     : [];
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
-  const defaultAssessmentSignalsForSubmittedBase =
-    !loadedPreferences && assessmentSignalReadiness.hasSubmittedBaseAssessment;
-  const preferences = loadedPreferences
-    ? { ...loadedPreferences, isDefaultedForSubmittedBase: false }
-    : {
-        ...emptyPreferences(),
-        includeAssessmentSignals: defaultAssessmentSignalsForSubmittedBase,
-        isDefaultedForSubmittedBase: defaultAssessmentSignalsForSubmittedBase,
-      };
-  const effectiveAssessmentSignalReadiness: OwnDiscoveryAssessmentSignalReadiness = {
-    ...assessmentSignalReadiness,
-    includeAssessmentSignals: preferences.includeAssessmentSignals,
-    isAssessmentSignalReady:
-      preferences.includeAssessmentSignals && assessmentSignalReadiness.hasSubmittedBaseAssessment,
-  };
   const publishIssues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(profile));
-  const selectedPriorityCount = Object.values(preferences.priorityWeights).filter(
-    (value) => typeof value === "number" && value > 0
-  ).length;
   const ownRolesAtLimit =
     (profile.ownRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.ownRoles;
   const seekingRolesAtLimit =
     (profile.seekingRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.seekingRoles;
   const industriesAtLimit =
     (profile.industries?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.industries;
-  const prioritiesAtLimit =
-    selectedPriorityCount >= DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero;
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
@@ -495,12 +378,6 @@ export default async function DiscoveryProfilePage({
     "use server";
     const result = await pauseDiscoveryProfileAction();
     redirect(buildDiscoveryProfilePauseRedirect(result));
-  }
-
-  async function savePreferences(formData: FormData) {
-    "use server";
-    const result = await saveDiscoveryPreferencesAction(formData);
-    redirect(buildDiscoveryPreferencesRedirect(result));
   }
 
   return (
@@ -548,129 +425,64 @@ export default async function DiscoveryProfilePage({
                 </div>
 
                 <div className="mt-5 grid gap-5">
-              <div className="grid gap-4 md:grid-cols-2">
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.displayName")}</span>
-                  <input
-                    name="displayName"
-                    type="text"
-                    defaultValue={profile.displayName}
-                    maxLength={80}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.publicProfile.displayNamePlaceholder")}
-                  />
-                </label>
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.headline")}</span>
-                  <input
-                    name="headline"
-                    type="text"
-                    defaultValue={profile.headline}
-                    maxLength={160}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.publicProfile.headlinePlaceholder")}
-                  />
-                </label>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label>
+                      <span className={LABEL_CLASS}>{t("profile.publicProfile.displayName")}</span>
+                      <input name="displayName" type="text" defaultValue={profile.displayName} maxLength={80} className={FIELD_CLASS} placeholder={t("profile.publicProfile.displayNamePlaceholder")} />
+                    </label>
+                    <label>
+                      <span className={LABEL_CLASS}>{t("profile.publicProfile.headline")}</span>
+                      <input name="headline" type="text" defaultValue={profile.headline} maxLength={160} className={FIELD_CLASS} placeholder={t("profile.publicProfile.headlinePlaceholder")} />
+                    </label>
+                  </div>
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.publicProfile.bio")}</span>
+                    <textarea name="bio" defaultValue={profile.bio} rows={5} maxLength={1200} className={FIELD_CLASS} placeholder={t("profile.publicProfile.bioPlaceholder")} />
+                  </label>
+                  <input type="hidden" name="locationLabel" value={profile.locationLabel ?? ""} />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label>
+                      <span className={LABEL_CLASS}>{t("profile.publicProfile.locationRegion")}</span>
+                      <input name="locationRegion" type="text" defaultValue={profile.locationRegion ?? ""} maxLength={120} className={FIELD_CLASS} placeholder={t("profile.publicProfile.locationRegionPlaceholder")} />
+                      <span className={HELP_CLASS}>{t("profile.publicProfile.locationRegionHelp")}</span>
+                    </label>
+                    <label>
+                      <span className={LABEL_CLASS}>{t("profile.publicProfile.remoteMode")}</span>
+                      <select name="remoteMode" defaultValue={profile.remoteMode} className={FIELD_CLASS}>
+                        {DISCOVERY_REMOTE_MODE_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>{t(`remoteModes.${option.value}`)}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
               </div>
 
-              <label>
-                <span className={LABEL_CLASS}>{t("profile.publicProfile.bio")}</span>
-                <textarea
-                  name="bio"
-                  defaultValue={profile.bio}
-                  rows={5}
-                  maxLength={1200}
-                  className={FIELD_CLASS}
-                  placeholder={t("profile.publicProfile.bioPlaceholder")}
-                />
-              </label>
-
-              <div>
-                <p className={LABEL_CLASS}>{t("profile.publicProfile.ownRoles")}</p>
-                <p className={HELP_CLASS}>
-                  {t("profile.publicProfile.ownRolesHelp", {
-                    count: DISCOVERY_SELECTION_LIMITS.ownRoles,
-                  })}
-                </p>
-                <RoleCheckboxGrid name="ownRoles" selected={profile.ownRoles} t={t} />
-                {limitHint(ownRolesAtLimit, t("profile.publicProfile.ownRolesLimit"))}
-              </div>
-
-              <div>
-                <p className={LABEL_CLASS}>{t("profile.publicProfile.seekingRoles")}</p>
-                <p className={HELP_CLASS}>
-                  {t("profile.publicProfile.seekingRolesHelp", {
-                    count: DISCOVERY_SELECTION_LIMITS.seekingRoles,
-                  })}
-                </p>
-                <RoleCheckboxGrid name="seekingRoles" selected={profile.seekingRoles} t={t} />
-                {limitHint(
-                  seekingRolesAtLimit,
-                  t("profile.publicProfile.seekingRolesLimit")
-                )}
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.industries")}</span>
-                  <input
-                    name="industries"
-                    type="text"
-                    defaultValue={(profile.industries ?? []).join(", ")}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.publicProfile.industriesPlaceholder")}
-                  />
-                  <p className={HELP_CLASS}>
-                    {t("profile.publicProfile.industriesHelp", {
-                      count: DISCOVERY_SELECTION_LIMITS.industries,
-                    })}
-                  </p>
-                  {limitHint(
-                    industriesAtLimit,
-                    t("profile.publicProfile.industriesLimit")
-                  )}
-                </label>
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.location")}</span>
-                  <input
-                    name="locationLabel"
-                    type="text"
-                    defaultValue={profile.locationLabel ?? ""}
-                    maxLength={120}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.publicProfile.locationPlaceholder")}
-                  />
-                </label>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.remoteMode")}</span>
-                  <select
-                    name="remoteMode"
-                    defaultValue={profile.remoteMode}
-                    className={FIELD_CLASS}
-                  >
-                    {DISCOVERY_REMOTE_MODE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {t(`remoteModes.${option.value}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.publicProfile.availability")}</span>
-                  <input
-                    name="availabilityHoursPerWeek"
-                    type="number"
-                    min={1}
-                    max={100}
-                    defaultValue={profile.availabilityHoursPerWeek ?? ""}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.publicProfile.availabilityPlaceholder")}
-                  />
-                </label>
-              </div>
+              <div className={INNER_SECTION_CLASS}>
+                <h2 className="text-2xl font-semibold text-slate-950">{t("profile.brings.title")}</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.brings.description")}</p>
+                <div className="mt-5 grid gap-5">
+                  <div>
+                    <p className={LABEL_CLASS}>{t("profile.publicProfile.ownRoles")}</p>
+                    <p className={HELP_CLASS}>{t("profile.publicProfile.ownRolesHelp", { count: DISCOVERY_SELECTION_LIMITS.ownRoles })}</p>
+                    <RoleCheckboxGrid name="ownRoles" selected={profile.ownRoles} t={t} />
+                    {limitHint(ownRolesAtLimit, t("profile.publicProfile.ownRolesLimit"))}
+                  </div>
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.publicProfile.expertise")}</span>
+                    <input name="expertise" type="text" defaultValue={(profile.expertise ?? []).join(", ")} className={FIELD_CLASS} placeholder={t("profile.publicProfile.expertisePlaceholder")} />
+                    <span className={HELP_CLASS}>{t("profile.publicProfile.expertiseHelp", { count: DISCOVERY_SELECTION_LIMITS.expertise })}</span>
+                  </label>
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.publicProfile.availabilityV2")}</span>
+                    <input name="availabilityHoursPerWeek" type="number" min={1} max={100} defaultValue={profile.availabilityHoursPerWeek ?? ""} className={FIELD_CLASS} placeholder={t("profile.publicProfile.availabilityPlaceholder")} />
+                  </label>
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.publicProfile.industries")}</span>
+                    <input name="industries" type="text" defaultValue={(profile.industries ?? []).join(", ")} className={FIELD_CLASS} placeholder={t("profile.publicProfile.industriesPlaceholder")} />
+                    <p className={HELP_CLASS}>{t("profile.publicProfile.industriesLegacyHelp", { count: DISCOVERY_SELECTION_LIMITS.industries })}</p>
+                    {limitHint(industriesAtLimit, t("profile.publicProfile.industriesLimit"))}
+                  </label>
                 </div>
               </div>
 
@@ -729,15 +541,31 @@ export default async function DiscoveryProfilePage({
                 </div>
               </div>
 
+              <div className={INNER_SECTION_CLASS}>
+                <h2 className="text-2xl font-semibold text-slate-950">{t("profile.seeking.title")}</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.seeking.description")}</p>
+                <div className="mt-5">
+                  <p className={LABEL_CLASS}>{t("profile.publicProfile.seekingRoles")}</p>
+                  <p className={HELP_CLASS}>{t("profile.publicProfile.seekingRolesHelp", { count: DISCOVERY_SELECTION_LIMITS.seekingRoles })}</p>
+                  <RoleCheckboxGrid name="seekingRoles" selected={profile.seekingRoles} t={t} />
+                  {limitHint(seekingRolesAtLimit, t("profile.publicProfile.seekingRolesLimit"))}
+                </div>
+                <Link href="/discovery#search" className={`${SECONDARY_BUTTON_CLASS} mt-5`}>
+                  {t("profile.seeking.editPrivateSearch")}
+                </Link>
+              </div>
+
               <PublishIssuesCard issues={publishIssues} t={t} />
 
               <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
                 <button type="submit" className={PRIMARY_BUTTON_CLASS}>
-                  {t("profile.actions.saveDraft")}
+                  {profile.status === "active" ? t("profile.actions.saveChanges") : t("profile.actions.saveDraft")}
                 </button>
-                <button type="submit" formAction={publishProfileFromForm} className={PRIMARY_BUTTON_CLASS}>
-                  {t("profile.actions.publish")}
-                </button>
+                {profile.status !== "active" ? (
+                  <button type="submit" formAction={publishProfileFromForm} className={PRIMARY_BUTTON_CLASS}>
+                    {t("profile.actions.publish")}
+                  </button>
+                ) : null}
               </div>
               <p className="-mt-3 text-xs leading-5 text-slate-500">
                 {t("profile.actions.publishHelp")}
@@ -788,9 +616,13 @@ export default async function DiscoveryProfilePage({
                     <dd className="mt-1 text-slate-600">{formatIndustries(profile.industries, t)}</dd>
                   </div>
                   <div>
+                    <dt className="font-semibold text-slate-900">{t("profile.preview.expertise")}</dt>
+                    <dd className="mt-1 text-slate-600">{formatIndustries(profile.expertise ?? [], t)}</dd>
+                  </div>
+                  <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.workFrame")}</dt>
                     <dd className="mt-1 text-slate-600">
-                      {t(`remoteModes.${profile.remoteMode as DiscoveryRemoteMode}`)} ·{" "}
+                      {profile.locationRegion ? `${profile.locationRegion} · ` : ""}{t(`remoteModes.${profile.remoteMode as DiscoveryRemoteMode}`)} ·{" "}
                       {profile.availabilityHoursPerWeek
                         ? t("profile.preview.hoursPerWeek", {
                             hours: profile.availabilityHoursPerWeek,
@@ -808,191 +640,6 @@ export default async function DiscoveryProfilePage({
           </aside>
         </div>
 
-        <section className={CARD_CLASS}>
-          <div className="border-b border-slate-200 pb-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              {t("profile.preferences.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              {t("profile.preferences.title")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("profile.preferences.description", {
-                count: DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero,
-              })}
-            </p>
-            {limitHint(
-              prioritiesAtLimit,
-              t("profile.preferences.limit", {
-                count: DISCOVERY_SELECTION_LIMITS.priorityWeightsAboveZero,
-              })
-            )}
-          </div>
-
-          <form action={savePreferences} className="mt-6 grid gap-6">
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {DISCOVERY_PRIORITY_OPTIONS.map((option) => (
-                <label
-                  key={option.value}
-                  className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3"
-                >
-                  <span className="text-sm font-semibold text-slate-950">
-                    {t(`priorities.${option.value}.label`)}
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-slate-500">
-                    {t(`priorities.${option.value}.description`)}
-                  </span>
-                  <input
-                    name={`priorityWeights.${option.value}`}
-                    type="range"
-                    min={0}
-                    max={5}
-                    step={1}
-                    defaultValue={preferences.priorityWeights[option.value] ?? 0}
-                    className="mt-3 w-full accent-[color:var(--brand-primary)]"
-                  />
-                  <span className="mt-1 block text-xs text-slate-500">
-                    {t("profile.preferences.rangeHelp")}
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            <section className="rounded-3xl border border-slate-200 bg-slate-50/70 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                {t("profile.assessment.eyebrow")}
-              </p>
-              <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                {t("profile.assessment.title")}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {t("profile.assessment.description")}
-              </p>
-              <label className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
-                <input
-                  type="checkbox"
-                  name="includeAssessmentSignals"
-                  value="true"
-                  defaultChecked={preferences.includeAssessmentSignals}
-                  disabled={!effectiveAssessmentSignalReadiness.hasSubmittedBaseAssessment}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-950"
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-slate-950">
-                    {t("profile.assessment.checkbox")}
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-slate-500">
-                    {t("profile.assessment.checkboxHelp")}
-                  </span>
-                </span>
-              </label>
-              {!effectiveAssessmentSignalReadiness.hasSubmittedBaseAssessment ? (
-                <Link href="/me/base?next=/discovery/profile" className={`${PRIMARY_BUTTON_CLASS} mt-4`}>
-                  {t("profile.assessment.fillBase")}
-                </Link>
-              ) : null}
-              {preferences.isDefaultedForSubmittedBase ? (
-                <p className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-900">
-                  {t("profile.assessment.defaulted")}
-                </p>
-              ) : null}
-              <p
-                className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${assessmentSignalStatusClass(
-                  effectiveAssessmentSignalReadiness
-                )}`}
-              >
-                {assessmentSignalStatusCopy(effectiveAssessmentSignalReadiness, t)}
-              </p>
-            </section>
-
-            <details className="rounded-3xl border border-slate-200 bg-white p-5">
-              <summary className="cursor-pointer text-lg font-semibold text-slate-950">
-                {t("profile.filters.title")}
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                {t("profile.filters.description")}
-              </p>
-
-              <div className="mt-5 grid gap-5">
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.filters.minimumAvailability")}</span>
-                  <input
-                    name="minimumAvailabilityHoursPerWeek"
-                    type="number"
-                    min={1}
-                    max={100}
-                    defaultValue={preferences.mustHaves.minimumAvailabilityHoursPerWeek ?? ""}
-                    className={FIELD_CLASS}
-                    placeholder={t("profile.filters.minimumAvailabilityPlaceholder")}
-                  />
-                </label>
-
-                <div>
-                  <p className={LABEL_CLASS}>{t("profile.filters.acceptedRemoteModes")}</p>
-                  <MultiCheckboxGrid<DiscoveryRemoteMode>
-                    name="acceptedRemoteModes"
-                    selected={preferences.mustHaves.acceptedRemoteModes}
-                    options={DISCOVERY_REMOTE_MODE_OPTIONS.map((option) => ({
-                      value: option.value,
-                      label: t(`remoteModes.${option.value}`),
-                    }))}
-                  />
-                </div>
-
-                <div>
-                  <p className={LABEL_CLASS}>{t("profile.filters.requiredRoles")}</p>
-                  <RoleCheckboxGrid
-                    name="requiredRolesAny"
-                    selected={preferences.mustHaves.requiredRolesAny}
-                    t={t}
-                  />
-                </div>
-
-                <div className="grid gap-5 lg:grid-cols-3">
-                  <div>
-                    <p className={LABEL_CLASS}>{t("profile.filters.commitment")}</p>
-                    <MultiCheckboxGrid<DiscoveryCommitmentLevel>
-                      name="acceptedCommitmentLevels"
-                      selected={preferences.mustHaves.acceptedCommitmentLevels}
-                      options={DISCOVERY_COMMITMENT_OPTIONS.map((option) => ({
-                        value: option.value,
-                        label: t(`commitmentLevels.${option.value}`),
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <p className={LABEL_CLASS}>{t("profile.filters.stages")}</p>
-                    <MultiCheckboxGrid<DiscoveryVentureStage>
-                      name="acceptedVentureStages"
-                      selected={preferences.mustHaves.acceptedVentureStages}
-                      options={DISCOVERY_VENTURE_STAGE_OPTIONS.map((option) => ({
-                        value: option.value,
-                        label: t(`ventureStages.${option.value}`),
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <p className={LABEL_CLASS}>{t("profile.filters.goals")}</p>
-                    <MultiCheckboxGrid<DiscoveryVentureGoal>
-                      name="acceptedVentureGoals"
-                      selected={preferences.mustHaves.acceptedVentureGoals}
-                      options={DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => ({
-                        value: option.value,
-                        label: t(`ventureGoals.${option.value}`),
-                      }))}
-                    />
-                  </div>
-                </div>
-              </div>
-            </details>
-
-            <div>
-              <button type="submit" className={PRIMARY_BUTTON_CLASS}>
-                {t("profile.preferences.save")}
-              </button>
-            </div>
-          </form>
-        </section>
       </div>
     </main>
   );

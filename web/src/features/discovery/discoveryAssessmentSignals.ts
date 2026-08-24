@@ -13,6 +13,11 @@ import type { AssessmentAnswerRow, QuestionMetaRow } from "@/features/reporting/
 import { aggregateFounderBaseScoresFromAnswers } from "@/features/reporting/selfReportScoring";
 import type { SelfRadarSeries } from "@/features/reporting/selfReportTypes";
 import { createClient } from "@/lib/supabase/server";
+import {
+  normalizeDiscoveryAlignmentDimensions,
+  selectSimilarPrioritizedAlignmentDimensions,
+} from "@/features/discovery/discoveryV2Alignment";
+import type { DiscoveryAlignmentDimension } from "@/features/discovery/discoveryTypes";
 
 export type {
   DiscoveryAssessmentSignalAvailability,
@@ -24,6 +29,11 @@ type DiscoveryServiceRoleClient = ReturnType<typeof createSupabaseClient>;
 type CandidatePreferenceRow = {
   user_id: string;
   include_assessment_signals: boolean;
+};
+
+type DiscoveryV2CandidatePreferenceRow = {
+  user_id: string;
+  discovery_v2_alignment_enabled: boolean;
 };
 
 type OwnerPreferenceRow = {
@@ -372,6 +382,164 @@ export async function getDiscoveryAssessmentConversationPromptsForCandidates({
     );
   } catch (error) {
     console.warn("discovery assessment prompt preparation failed", {
+      reason: error instanceof Error ? error.message : "unknown_error",
+    });
+    return new Map();
+  }
+}
+
+export async function getDiscoveryV2AlignmentSimilaritiesForCandidates({
+  ownerUserId,
+  candidateUserIds,
+  prioritizedDimensions,
+}: {
+  ownerUserId: string;
+  candidateUserIds: string[];
+  prioritizedDimensions: DiscoveryAlignmentDimension[];
+}): Promise<Map<string, DiscoveryAlignmentDimension[]>> {
+  const normalizedOwnerUserId = ownerUserId.trim();
+  const normalizedDimensions = normalizeDiscoveryAlignmentDimensions(prioritizedDimensions);
+  const normalizedCandidateUserIds = normalizeDiscoveryAssessmentSignalCandidateUserIds({
+    ownerUserId: normalizedOwnerUserId,
+    candidateUserIds,
+  });
+  if (
+    !normalizedOwnerUserId ||
+    normalizedDimensions.length === 0 ||
+    normalizedCandidateUserIds.length === 0
+  ) {
+    return new Map();
+  }
+
+  const supabase = await createClient();
+  const { data: ownerPreference, error: ownerPreferenceError } = await supabase
+    .from("founder_search_preferences")
+    .select("discovery_v2_alignment_enabled, discovery_v2_alignment_dimensions")
+    .eq("user_id", normalizedOwnerUserId)
+    .maybeSingle();
+  if (
+    ownerPreferenceError ||
+    ownerPreference?.discovery_v2_alignment_enabled !== true
+  ) {
+    return new Map();
+  }
+
+  const storedDimensions = normalizeDiscoveryAlignmentDimensions(
+    ownerPreference.discovery_v2_alignment_dimensions
+  );
+  const allowedDimensions = normalizedDimensions.filter((dimension) =>
+    storedDimensions.includes(dimension)
+  );
+  if (allowedDimensions.length === 0) {
+    return new Map();
+  }
+
+  const serviceClient = createDiscoveryServiceRoleClient();
+  if (!serviceClient) {
+    return new Map();
+  }
+
+  try {
+    const { data: candidatePreferenceRows, error: candidatePreferenceError } =
+      await serviceClient
+        .from("founder_search_preferences")
+        .select("user_id, discovery_v2_alignment_enabled")
+        .in("user_id", normalizedCandidateUserIds);
+    if (candidatePreferenceError) {
+      return new Map();
+    }
+    const consentedCandidateUserIds = new Set(
+      ((candidatePreferenceRows ?? []) as DiscoveryV2CandidatePreferenceRow[])
+        .filter((row) => row.discovery_v2_alignment_enabled === true)
+        .map((row) => row.user_id)
+    );
+    const eligibleCandidateUserIds = normalizedCandidateUserIds.filter((userId) =>
+      consentedCandidateUserIds.has(userId)
+    );
+    if (eligibleCandidateUserIds.length === 0) {
+      return new Map();
+    }
+
+    const userIdsToLoad = [normalizedOwnerUserId, ...eligibleCandidateUserIds];
+    const { data: assessmentRows, error: assessmentError } = await serviceClient
+      .from("assessments")
+      .select("id, user_id, module, submitted_at, created_at")
+      .in("user_id", userIdsToLoad)
+      .eq("module", "base")
+      .not("submitted_at", "is", null)
+      .order("submitted_at", { ascending: false })
+      .order("created_at", { ascending: false });
+    if (assessmentError) {
+      return new Map();
+    }
+
+    const latestAssessmentByUserId = pickLatestAssessmentByUserId(
+      (assessmentRows ?? []) as SubmittedBaseAssessmentRow[]
+    );
+    const ownerAssessment = latestAssessmentByUserId.get(normalizedOwnerUserId);
+    if (!ownerAssessment) {
+      return new Map();
+    }
+    const candidateAssessments = eligibleCandidateUserIds
+      .map((userId) => latestAssessmentByUserId.get(userId) ?? null)
+      .filter((row): row is SubmittedBaseAssessmentRow => row != null);
+    if (candidateAssessments.length === 0) {
+      return new Map();
+    }
+
+    const assessmentIds = [ownerAssessment.id, ...candidateAssessments.map((row) => row.id)];
+    const { data: answerRows, error: answerError } = await serviceClient
+      .from("assessment_answers")
+      .select("assessment_id, question_id, choice_value")
+      .in("assessment_id", assessmentIds);
+    if (answerError) {
+      return new Map();
+    }
+    const answers = (answerRows ?? []) as AssessmentAnswerWithAssessmentIdRow[];
+    const questionIds = Array.from(new Set(answers.map((entry) => entry.question_id)));
+    if (questionIds.length === 0) {
+      return new Map();
+    }
+    const { data: questionRows, error: questionError } = await serviceClient
+      .from("questions")
+      .select("id, dimension, category, prompt")
+      .in("id", questionIds);
+    if (questionError) {
+      return new Map();
+    }
+
+    const answersByAssessmentId = groupAnswersByAssessmentId(answers);
+    const questionById = new Map(
+      ((questionRows ?? []) as QuestionMetaRow[]).map((row) => [row.id, row])
+    );
+    const ownerScores = aggregateScoresForAssessment({
+      assessmentId: ownerAssessment.id,
+      answersByAssessmentId,
+      questionById,
+    });
+    if (!ownerScores) {
+      return new Map();
+    }
+
+    return new Map(
+      candidateAssessments.map((assessment) => {
+        const candidateScores = aggregateScoresForAssessment({
+          assessmentId: assessment.id,
+          answersByAssessmentId,
+          questionById,
+        });
+        return [
+          assessment.user_id,
+          selectSimilarPrioritizedAlignmentDimensions({
+            prioritizedDimensions: allowedDimensions,
+            ownerScores,
+            candidateScores,
+          }),
+        ] as const;
+      })
+    );
+  } catch (error) {
+    console.warn("discovery v2 alignment signal preparation failed", {
       reason: error instanceof Error ? error.message : "unknown_error",
     });
     return new Map();

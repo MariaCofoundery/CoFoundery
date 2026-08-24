@@ -69,6 +69,8 @@ export type DiscoveryMustHaves = {
   minimumAvailabilityHoursPerWeek: number | null;
   acceptedRemoteModes: DiscoveryRemoteMode[];
   requiredRolesAny: DiscoveryFounderRole[];
+  requiredExpertiseAny: string[];
+  desiredLocationRegion: string | null;
   requiredIndustriesAny: string[];
   acceptedCommitmentLevels: DiscoveryCommitmentLevel[];
   acceptedVentureStages: DiscoveryVentureStage[];
@@ -84,8 +86,10 @@ export type FounderDiscoveryProfile = {
   bio: string;
   ownRoles: DiscoveryFounderRole[];
   seekingRoles: DiscoveryFounderRole[];
+  expertise: string[];
   industries: string[];
   locationLabel: string | null;
+  locationRegion: string | null;
   remoteMode: DiscoveryRemoteMode;
   availabilityHoursPerWeek: number | null;
   commitmentLevel: DiscoveryCommitmentLevel;
@@ -103,6 +107,9 @@ export type FounderSearchPreferences = {
   mustHaves: DiscoveryMustHaves;
   includeAssessmentSignals: boolean;
   assessmentSignalsConsentedAt: string | null;
+  discoveryV2AlignmentEnabled: boolean;
+  discoveryV2AlignmentDimensions: DiscoveryAlignmentDimension[];
+  discoveryV2AlignmentConsentedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -114,8 +121,10 @@ export type DiscoveryProfileInput = Partial<{
   bio: unknown;
   ownRoles: unknown;
   seekingRoles: unknown;
+  expertise: unknown;
   industries: unknown;
   locationLabel: unknown;
+  locationRegion: unknown;
   remoteMode: unknown;
   availabilityHoursPerWeek: unknown;
   commitmentLevel: unknown;
@@ -128,7 +137,19 @@ export type DiscoveryPreferencesInput = Partial<{
   priorityWeights: unknown;
   mustHaves: unknown;
   includeAssessmentSignals: unknown;
+  discoveryV2AlignmentEnabled: unknown;
+  discoveryV2AlignmentDimensions: unknown;
 }>;
+
+export const DISCOVERY_ALIGNMENT_DIMENSIONS = [
+  "company_logic",
+  "decision_logic",
+  "work_structure",
+  "commitment",
+  "risk_orientation",
+  "conflict_style",
+] as const;
+export type DiscoveryAlignmentDimension = (typeof DISCOVERY_ALIGNMENT_DIMENSIONS)[number];
 
 export type DiscoveryProfilePreview = Pick<
   FounderDiscoveryProfile,
@@ -138,8 +159,10 @@ export type DiscoveryProfilePreview = Pick<
   | "bio"
   | "ownRoles"
   | "seekingRoles"
+  | "expertise"
   | "industries"
   | "locationLabel"
+  | "locationRegion"
   | "remoteMode"
   | "availabilityHoursPerWeek"
   | "commitmentLevel"
@@ -152,5 +175,21 @@ export type DiscoveryCandidate = {
   profile: DiscoveryProfilePreview;
   reasons: string[];
   conversationTopics: string[];
+  practicalMatches?: DiscoveryPracticalMatch[];
+  alignmentSimilarDimensions?: DiscoveryAlignmentDimension[];
   score?: number;
+};
+
+export type DiscoveryPracticalMatch =
+  | "role"
+  | "expertise"
+  | "location"
+  | "remote"
+  | "availability";
+
+export type DiscoverySearchPage = {
+  candidates: DiscoveryCandidate[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
 };

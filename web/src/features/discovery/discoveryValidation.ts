@@ -18,6 +18,7 @@ import {
   type DiscoveryVentureGoal,
   type DiscoveryVentureStage,
 } from "@/features/discovery/discoveryTypes";
+import { normalizeDiscoveryAlignmentDimensions } from "@/features/discovery/discoveryV2Alignment";
 import {
   DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_TEXT_LIMITS,
@@ -27,6 +28,8 @@ const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   minimumAvailabilityHoursPerWeek: null,
   acceptedRemoteModes: [],
   requiredRolesAny: [],
+  requiredExpertiseAny: [],
+  desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],
   acceptedVentureStages: [],
@@ -59,7 +62,10 @@ export function normalizeAllowedArray<T extends string>(
   return Array.from(new Set(normalized));
 }
 
-export function normalizeStringArray(value: unknown, maxItemLength = DISCOVERY_TEXT_LIMITS.industry) {
+export function normalizeStringArray(
+  value: unknown,
+  maxItemLength: number = DISCOVERY_TEXT_LIMITS.industry
+) {
   const values = Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
   const normalized = values
     .map((entry) => normalizeText(entry, maxItemLength))
@@ -151,6 +157,15 @@ export function normalizeMustHaves(value: unknown): DiscoveryMustHaves {
       value.requiredRolesAny ?? value.required_roles_any,
       DISCOVERY_FOUNDER_ROLES
     ),
+    requiredExpertiseAny: normalizeStringArray(
+      value.requiredExpertiseAny ?? value.required_expertise_any,
+      DISCOVERY_TEXT_LIMITS.expertise
+    ).slice(0, DISCOVERY_SELECTION_LIMITS.requiredExpertise),
+    desiredLocationRegion:
+      normalizeText(
+        value.desiredLocationRegion ?? value.desired_location_region,
+        DISCOVERY_TEXT_LIMITS.locationRegion
+      ) || null,
     requiredIndustriesAny: normalizeStringArray(
       value.requiredIndustriesAny ?? value.required_industries_any
     ),
@@ -183,8 +198,14 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
       input.seekingRoles,
       DISCOVERY_FOUNDER_ROLES
     ).slice(0, DISCOVERY_SELECTION_LIMITS.seekingRoles),
+    expertise: normalizeStringArray(input.expertise, DISCOVERY_TEXT_LIMITS.expertise).slice(
+      0,
+      DISCOVERY_SELECTION_LIMITS.expertise
+    ),
     industries: normalizeStringArray(input.industries).slice(0, DISCOVERY_SELECTION_LIMITS.industries),
     locationLabel: normalizeText(input.locationLabel, DISCOVERY_TEXT_LIMITS.locationLabel) || null,
+    locationRegion:
+      normalizeText(input.locationRegion, DISCOVERY_TEXT_LIMITS.locationRegion) || null,
     remoteMode: normalizeRemoteMode(input.remoteMode),
     availabilityHoursPerWeek: normalizeAvailabilityHours(input.availabilityHoursPerWeek),
     commitmentLevel: normalizeCommitmentLevel(input.commitmentLevel),
@@ -203,6 +224,14 @@ export function normalizeDiscoveryPreferencesInput(input: DiscoveryPreferencesIn
       input.includeAssessmentSignals === "true" ||
       input.includeAssessmentSignals === "on" ||
       input.includeAssessmentSignals === "1",
+    discoveryV2AlignmentEnabled:
+      input.discoveryV2AlignmentEnabled === true ||
+      input.discoveryV2AlignmentEnabled === "true" ||
+      input.discoveryV2AlignmentEnabled === "on" ||
+      input.discoveryV2AlignmentEnabled === "1",
+    discoveryV2AlignmentDimensions: normalizeDiscoveryAlignmentDimensions(
+      input.discoveryV2AlignmentDimensions
+    ),
   };
 }
 

@@ -9,18 +9,14 @@ import {
   getDiscoveryProfilePublishIssues,
 } from "@/features/discovery/discoveryValidation";
 import {
-  buildDiscoveryCandidateRecommendations,
-} from "@/features/discovery/discoveryRecommendation";
+  attachDiscoveryV2AlignmentSimilarities,
+  buildDiscoveryV2Candidate,
+} from "@/features/discovery/discoveryV2Search";
 import {
-  appendDiscoveryAssessmentConversationPromptsToCandidates,
-} from "@/features/discovery/discoveryAssessmentConversationPrompts";
-import {
-  getDiscoveryAssessmentConversationPromptsForCandidates,
-  getDiscoveryAssessmentSignalAvailabilityForCandidates,
+  getDiscoveryV2AlignmentSimilaritiesForCandidates,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
-  DiscoveryCandidate,
   DiscoveryCommitmentLevel,
   DiscoveryFounderRole,
   DiscoveryMustHaves,
@@ -28,6 +24,7 @@ import type {
   DiscoveryPriorityWeights,
   DiscoveryProfileInput,
   DiscoveryProfilePreview,
+  DiscoverySearchPage,
   DiscoveryRemoteMode,
   DiscoveryStatus,
   DiscoveryVentureGoal,
@@ -36,8 +33,27 @@ import type {
   FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 
+type DiscoveryV2SearchRow = {
+  id: string;
+  candidate_user_id: string;
+  display_name: string;
+  headline: string;
+  own_roles: DiscoveryFounderRole[];
+  seeking_roles: DiscoveryFounderRole[];
+  expertise: string[];
+  location_region: string | null;
+  remote_mode: DiscoveryRemoteMode;
+  availability_hours_per_week: number | null;
+  commitment_level: DiscoveryCommitmentLevel;
+  venture_stage: DiscoveryVentureStage;
+  venture_goal: DiscoveryVentureGoal;
+  published_at: string | null;
+  total_count: number | string;
+};
+
 type SupabaseLikeClient = {
   from: (table: string) => unknown;
+  rpc?: (name: string, args: Record<string, unknown>) => unknown;
 };
 
 type SupabaseError = {
@@ -79,8 +95,10 @@ type FounderDiscoveryProfileRow = {
   bio: string;
   own_roles: string[];
   seeking_roles: string[];
+  expertise: string[];
   industries: string[];
   location_label: string | null;
+  location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
   commitment_level: string;
@@ -98,6 +116,9 @@ type FounderSearchPreferencesRow = {
   must_haves: unknown;
   include_assessment_signals: boolean;
   assessment_signals_consented_at: string | null;
+  discovery_v2_alignment_enabled: boolean;
+  discovery_v2_alignment_dimensions: string[];
+  discovery_v2_alignment_consented_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -111,8 +132,10 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "bio",
   "own_roles",
   "seeking_roles",
+  "expertise",
   "industries",
   "location_label",
+  "location_region",
   "remote_mode",
   "availability_hours_per_week",
   "commitment_level",
@@ -130,6 +153,9 @@ const DISCOVERY_PREFERENCES_COLUMNS = [
   "must_haves",
   "include_assessment_signals",
   "assessment_signals_consented_at",
+  "discovery_v2_alignment_enabled",
+  "discovery_v2_alignment_dimensions",
+  "discovery_v2_alignment_consented_at",
   "created_at",
   "updated_at",
 ].join(", ");
@@ -175,8 +201,10 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     bio: row.bio,
     ownRoles: row.own_roles as DiscoveryFounderRole[],
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
+    expertise: row.expertise ?? [],
     industries: row.industries,
     locationLabel: row.location_label,
+    locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryRemoteMode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
@@ -196,6 +224,11 @@ function mapPreferencesRow(row: FounderSearchPreferencesRow): FounderSearchPrefe
     mustHaves: normalizeMustHaves(row.must_haves) as DiscoveryMustHaves,
     includeAssessmentSignals: row.include_assessment_signals === true,
     assessmentSignalsConsentedAt: row.assessment_signals_consented_at,
+    discoveryV2AlignmentEnabled: row.discovery_v2_alignment_enabled === true,
+    discoveryV2AlignmentDimensions: normalizeDiscoveryPreferencesInput({
+      discoveryV2AlignmentDimensions: row.discovery_v2_alignment_dimensions,
+    }).discoveryV2AlignmentDimensions,
+    discoveryV2AlignmentConsentedAt: row.discovery_v2_alignment_consented_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -209,8 +242,10 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     bio: profile.bio,
     ownRoles: profile.ownRoles,
     seekingRoles: profile.seekingRoles,
+    expertise: profile.expertise,
     industries: profile.industries,
     locationLabel: profile.locationLabel,
+    locationRegion: profile.locationRegion,
     remoteMode: profile.remoteMode,
     availabilityHoursPerWeek: profile.availabilityHoursPerWeek,
     commitmentLevel: profile.commitmentLevel,
@@ -266,8 +301,10 @@ export async function upsertOwnDiscoveryProfile(
         bio: normalized.bio,
         own_roles: normalized.ownRoles,
         seeking_roles: normalized.seekingRoles,
+        expertise: normalized.expertise,
         industries: normalized.industries,
         location_label: normalized.locationLabel,
+        location_region: normalized.locationRegion,
         remote_mode: normalized.remoteMode,
         availability_hours_per_week: normalized.availabilityHoursPerWeek,
         commitment_level: normalized.commitmentLevel,
@@ -314,19 +351,55 @@ export async function upsertOwnSearchPreferences(
   const normalized = normalizeDiscoveryPreferencesInput(input);
   const supabase = await resolveClient(client);
   const existing = await getOwnSearchPreferences(normalizedUserId, supabase);
+  const rawMustHaves =
+    input.mustHaves && typeof input.mustHaves === "object" && !Array.isArray(input.mustHaves)
+      ? (input.mustHaves as Record<string, unknown>)
+      : null;
+  const hasV2PracticalInput =
+    rawMustHaves != null &&
+    [
+      "requiredExpertiseAny",
+      "required_expertise_any",
+      "desiredLocationRegion",
+      "desired_location_region",
+    ].some((key) => Object.prototype.hasOwnProperty.call(rawMustHaves, key));
+  const persistedMustHaves = hasV2PracticalInput
+    ? normalized.mustHaves
+    : {
+        ...normalized.mustHaves,
+        requiredExpertiseAny: existing?.mustHaves.requiredExpertiseAny ?? [],
+        desiredLocationRegion: existing?.mustHaves.desiredLocationRegion ?? null,
+      };
   const consentState = resolveDiscoveryAssessmentConsentState({
     includeAssessmentSignals: normalized.includeAssessmentSignals === true,
     existingConsentedAt: existing?.assessmentSignalsConsentedAt ?? null,
     now: new Date().toISOString(),
   });
+  const hasDiscoveryV2AlignmentInput =
+    input.discoveryV2AlignmentEnabled !== undefined ||
+    input.discoveryV2AlignmentDimensions !== undefined;
+  const requestedAlignmentDimensions = hasDiscoveryV2AlignmentInput
+    ? normalized.discoveryV2AlignmentDimensions
+    : existing?.discoveryV2AlignmentDimensions ?? [];
+  const alignmentEnabled = hasDiscoveryV2AlignmentInput
+    ? normalized.discoveryV2AlignmentEnabled && requestedAlignmentDimensions.length > 0
+    : existing?.discoveryV2AlignmentEnabled === true;
+  const alignmentConsentedAt = alignmentEnabled
+    ? existing?.discoveryV2AlignmentConsentedAt ?? new Date().toISOString()
+    : null;
   const { data, error } = await getPreferencesTable(supabase)
     .upsert(
       {
         user_id: normalizedUserId,
         priority_weights: normalized.priorityWeights,
-        must_haves: normalized.mustHaves,
+        must_haves: persistedMustHaves,
         include_assessment_signals: consentState.includeAssessmentSignals,
         assessment_signals_consented_at: consentState.assessmentSignalsConsentedAt,
+        discovery_v2_alignment_enabled: alignmentEnabled,
+        discovery_v2_alignment_dimensions: alignmentEnabled
+          ? requestedAlignmentDimensions
+          : [],
+        discovery_v2_alignment_consented_at: alignmentConsentedAt,
       },
       { onConflict: "user_id" }
     )
@@ -338,6 +411,51 @@ export async function upsertOwnSearchPreferences(
   }
 
   return mapPreferencesRow(data);
+}
+
+export async function upsertOwnDiscoveryV2SearchPreferences(
+  userId: string,
+  input: {
+    requiredRolesAny: unknown;
+    requiredExpertiseAny: unknown;
+    desiredLocationRegion: unknown;
+    acceptedRemoteModes: unknown;
+    minimumAvailabilityHoursPerWeek: unknown;
+    discoveryV2AlignmentEnabled: unknown;
+    discoveryV2AlignmentDimensions: unknown;
+  },
+  client?: SupabaseLikeClient
+) {
+  const normalizedUserId = assertUserId(userId);
+  const supabase = await resolveClient(client);
+  const existing = await getOwnSearchPreferences(normalizedUserId, supabase);
+  const practicalMustHaves = normalizeMustHaves({
+    requiredRolesAny: input.requiredRolesAny,
+    requiredExpertiseAny: input.requiredExpertiseAny,
+    desiredLocationRegion: input.desiredLocationRegion,
+    acceptedRemoteModes: input.acceptedRemoteModes,
+    minimumAvailabilityHoursPerWeek: input.minimumAvailabilityHoursPerWeek,
+  });
+
+  return upsertOwnSearchPreferences(
+    normalizedUserId,
+    {
+      priorityWeights: existing?.priorityWeights ?? {},
+      mustHaves: {
+        ...(existing?.mustHaves ?? normalizeMustHaves(null)),
+        requiredRolesAny: practicalMustHaves.requiredRolesAny,
+        requiredExpertiseAny: practicalMustHaves.requiredExpertiseAny,
+        desiredLocationRegion: practicalMustHaves.desiredLocationRegion,
+        acceptedRemoteModes: practicalMustHaves.acceptedRemoteModes,
+        minimumAvailabilityHoursPerWeek:
+          practicalMustHaves.minimumAvailabilityHoursPerWeek,
+      },
+      includeAssessmentSignals: existing?.includeAssessmentSignals ?? false,
+      discoveryV2AlignmentEnabled: input.discoveryV2AlignmentEnabled,
+      discoveryV2AlignmentDimensions: input.discoveryV2AlignmentDimensions,
+    },
+    supabase
+  );
 }
 
 export async function getActiveDiscoveryProfileById(
@@ -359,83 +477,84 @@ export async function getActiveDiscoveryProfileById(
   return data ? mapProfileRow(data) : null;
 }
 
-async function prepareDiscoveryAssessmentConversationPrompts(
-  ownerUserId: string,
-  candidateProfiles: FounderDiscoveryProfile[],
-  locale?: string | null
-) {
-  if (candidateProfiles.length === 0) {
-    return new Map<string, string[]>();
-  }
-
-  try {
-    const availabilityByUserId = await getDiscoveryAssessmentSignalAvailabilityForCandidates({
-      ownerUserId,
-      candidateUserIds: candidateProfiles.map((profile) => profile.userId),
-    });
-    return getDiscoveryAssessmentConversationPromptsForCandidates({
-      ownerUserId,
-      candidateUserIds: candidateProfiles.map((profile) => profile.userId),
-      availabilityByUserId,
-      locale,
-    });
-  } catch (error) {
-    console.warn("discovery assessment conversation prompt preparation failed", {
-      reason: error instanceof Error ? error.message : "unknown_error",
-    });
-    return new Map<string, string[]>();
-  }
-}
-
 export async function getDiscoveryCandidatesForCurrentUser(
   userId: string,
   client?: SupabaseLikeClient,
-  locale?: string | null
-): Promise<DiscoveryCandidate[]> {
+  _locale?: string | null,
+  requestedPage = 1
+): Promise<DiscoverySearchPage> {
   const normalizedUserId = assertUserId(userId);
   const supabase = await resolveClient(client);
   const ownProfile = await getOwnDiscoveryProfile(normalizedUserId, supabase);
   if (!ownProfile || ownProfile.status !== "active") {
-    return [];
+    return { candidates: [], page: 1, pageSize: 12, totalCount: 0 };
   }
   const preferences = await getOwnSearchPreferences(normalizedUserId, supabase);
-
-  const { data, error } = await getProfilesTable(supabase)
-    .select(DISCOVERY_PROFILE_COLUMNS)
-    .eq("status", "active")
-    .neq("user_id", normalizedUserId)
-    .order("published_at", { ascending: false })
-    .limit(20);
+  const mustHaves = preferences?.mustHaves ?? normalizeMustHaves(null);
+  const pageSize = 12;
+  const page = Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1;
+  const rpcClient = supabase as unknown as {
+    rpc: (
+      name: string,
+      args: Record<string, unknown>
+    ) => PromiseLike<{ data: DiscoveryV2SearchRow[] | null; error: SupabaseError | null }>;
+  };
+  const { data, error } = await rpcClient.rpc("search_founder_discovery_profiles_v2", {
+    p_roles: mustHaves.requiredRolesAny,
+    p_expertise: mustHaves.requiredExpertiseAny,
+    p_location_region: mustHaves.desiredLocationRegion,
+    p_remote_modes: mustHaves.acceptedRemoteModes,
+    p_min_availability: mustHaves.minimumAvailabilityHoursPerWeek,
+    p_page_size: pageSize,
+    p_offset: (page - 1) * pageSize,
+  });
 
   if (error) {
     throw new Error(error.message ?? "discovery_candidates_load_failed");
   }
 
-  const candidateProfiles = (data ?? []).map(mapProfileRow);
-  const candidates = buildDiscoveryCandidateRecommendations({
-    ownProfile,
-    candidateProfiles,
-    preferences,
-    locale,
-  });
-
-  const promptsByUserId = await prepareDiscoveryAssessmentConversationPrompts(
-    normalizedUserId,
-    candidateProfiles,
-    locale
+  const rows = data ?? [];
+  const candidateProfiles: FounderDiscoveryProfile[] = rows.map((row) => ({
+    id: row.id,
+    userId: row.candidate_user_id,
+    status: "active",
+    displayName: row.display_name,
+    headline: row.headline,
+    bio: "",
+    ownRoles: row.own_roles,
+    seekingRoles: row.seeking_roles,
+    expertise: row.expertise ?? [],
+    industries: [],
+    locationLabel: null,
+    locationRegion: row.location_region,
+    remoteMode: row.remote_mode,
+    availabilityHoursPerWeek: row.availability_hours_per_week,
+    commitmentLevel: row.commitment_level,
+    ventureStage: row.venture_stage,
+    ventureGoal: row.venture_goal,
+    publishedAt: row.published_at,
+    createdAt: row.published_at ?? "",
+    updatedAt: row.published_at ?? "",
+  }));
+  const similarities =
+    preferences?.discoveryV2AlignmentEnabled &&
+    preferences.discoveryV2AlignmentDimensions.length > 0
+      ? await getDiscoveryV2AlignmentSimilaritiesForCandidates({
+          ownerUserId: normalizedUserId,
+          candidateUserIds: candidateProfiles.map((profile) => profile.userId),
+          prioritizedDimensions: preferences.discoveryV2AlignmentDimensions,
+        })
+      : new Map();
+  const candidates = attachDiscoveryV2AlignmentSimilarities(
+    candidateProfiles.map((profile) => buildDiscoveryV2Candidate(profile, mustHaves)),
+    similarities,
+    new Map(candidateProfiles.map((profile) => [profile.id, profile.userId]))
   );
-  const profileIdByUserId = new Map(candidateProfiles.map((profile) => [profile.userId, profile.id]));
-  const promptsByProfileId = new Map(
-    Array.from(promptsByUserId.entries())
-      .map(([userId, prompts]) => {
-        const profileId = profileIdByUserId.get(userId);
-        return profileId ? ([profileId, prompts] as const) : null;
-      })
-      .filter((entry): entry is readonly [string, string[]] => entry != null)
-  );
 
-  return appendDiscoveryAssessmentConversationPromptsToCandidates({
+  return {
     candidates,
-    promptsByProfileId,
-  });
+    page,
+    pageSize,
+    totalCount: rows[0] ? Number(rows[0].total_count) : 0,
+  };
 }

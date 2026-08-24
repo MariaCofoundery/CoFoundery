@@ -20,13 +20,17 @@ export const DISCOVERY_TEXT_LIMITS = {
   headline: 160,
   bio: 1200,
   locationLabel: 120,
+  locationRegion: 120,
   industry: 80,
+  expertise: 60,
 } as const;
 
 export const DISCOVERY_SELECTION_LIMITS = {
   ownRoles: 3,
   seekingRoles: 3,
   industries: 5,
+  expertise: 8,
+  requiredExpertise: 8,
   priorityWeightsAboveZero: 5,
 } as const;
 

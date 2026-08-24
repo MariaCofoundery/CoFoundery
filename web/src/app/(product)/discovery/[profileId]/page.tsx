@@ -122,8 +122,9 @@ function ProfileDetails({ profile, t }: { profile: FounderDiscoveryProfile; t: D
     <dl className="grid gap-3 md:grid-cols-2">
       <DetailItem label={t("detail.details.brings")} value={formatRoleList(profile.ownRoles, t)} />
       <DetailItem label={t("detail.details.seeks")} value={formatRoleList(profile.seekingRoles, t)} />
+      <DetailItem label={t("detail.details.expertise")} value={formatIndustries(profile.expertise, t)} />
       <DetailItem label={t("detail.details.industries")} value={formatIndustries(profile.industries, t)} />
-      <DetailItem label={t("detail.details.location")} value={formatText(profile.locationLabel, t)} />
+      <DetailItem label={t("detail.details.location")} value={formatText(profile.locationRegion ?? profile.locationLabel, t)} />
       <DetailItem label={t("detail.details.remoteMode")} value={t(`remoteModes.${profile.remoteMode}`)} />
       <DetailItem
         label={t("detail.details.availability")}

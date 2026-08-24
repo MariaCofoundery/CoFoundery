@@ -10,6 +10,7 @@ import {
   getOwnDiscoveryProfile,
   upsertOwnDiscoveryProfile,
   upsertOwnSearchPreferences,
+  upsertOwnDiscoveryV2SearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
   mapDiscoveryProfilePublishIssues,
@@ -115,8 +116,10 @@ function parseDiscoveryProfileFormData(formData: FormData): DiscoveryProfileInpu
     bio: getFirstString(formData, ["bio"]),
     ownRoles: getStringList(formData, ["ownRoles", "own_roles"]),
     seekingRoles: getStringList(formData, ["seekingRoles", "seeking_roles"]),
+    expertise: getStringList(formData, ["expertise"]),
     industries: getStringList(formData, ["industries", "industry"]),
     locationLabel: getFirstString(formData, ["locationLabel", "location_label"]),
+    locationRegion: getFirstString(formData, ["locationRegion", "location_region"]),
     remoteMode: getFirstString(formData, ["remoteMode", "remote_mode"]),
     availabilityHoursPerWeek: getFirstString(formData, [
       "availabilityHoursPerWeek",
@@ -223,10 +226,12 @@ export async function saveDiscoveryProfileDraftAction(
 
   try {
     const input = normalizeDiscoveryProfileInput(parseDiscoveryProfileFormData(formData));
+    const existing = await getOwnDiscoveryProfile(userId);
+    const keepPublished = existing?.status === "active";
     await upsertOwnDiscoveryProfile(userId, {
       ...input,
-      status: "draft",
-      publishedAt: null,
+      status: keepPublished ? "active" : "draft",
+      publishedAt: keepPublished ? existing.publishedAt : null,
     });
 
     revalidateDiscoveryPaths();
@@ -239,6 +244,37 @@ export async function saveDiscoveryProfileDraftAction(
       ok: false,
       reason: "draft_save_failed",
     };
+  }
+}
+
+export async function saveDiscoveryV2SearchPreferencesAction(
+  formData: FormData
+): Promise<DiscoveryPreferencesResult> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  try {
+    await upsertOwnDiscoveryV2SearchPreferences(userId, {
+      requiredRolesAny: getStringList(formData, ["requiredRolesAny"]),
+      requiredExpertiseAny: getStringList(formData, ["requiredExpertiseAny"]),
+      desiredLocationRegion: getFirstString(formData, ["desiredLocationRegion"]),
+      acceptedRemoteModes: getStringList(formData, ["acceptedRemoteModes"]),
+      minimumAvailabilityHoursPerWeek: getFirstString(formData, [
+        "minimumAvailabilityHoursPerWeek",
+      ]),
+      discoveryV2AlignmentEnabled: getFirstString(formData, [
+        "discoveryV2AlignmentEnabled",
+      ]),
+      discoveryV2AlignmentDimensions: getStringList(formData, [
+        "discoveryV2AlignmentDimensions",
+      ]),
+    });
+    revalidateDiscoveryPaths();
+    return { ok: true, reason: "preferences_saved" };
+  } catch {
+    return { ok: false, reason: "preferences_save_failed" };
   }
 }
 

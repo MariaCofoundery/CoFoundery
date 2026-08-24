@@ -179,11 +179,82 @@
       "goalPrefix": "Goal:",
       "brings": "Brings",
       "seeks": "Looking for",
+      "expertise": "Expertise",
       "emptyRole": "Still open",
       "reasonsEyebrow": "Curated cues",
       "reasonsTitle": "Why it is interesting",
       "topicsEyebrow": "For the first conversation",
       "topicsTitle": "Discuss early"
+    }
+  },
+  "v2": {
+    "title": "Find a co-founder",
+    "subtitle": "Search by practical criteria and optionally use Alignment as a transparent additional signal.",
+    "editProfile": "Edit my profile",
+    "search": {
+      "eyebrow": "My search",
+      "title": "Who are you looking for right now?",
+      "description": "These search criteria are private and can change at any time without republishing your public profile.",
+      "profileInactive": "Profile not active",
+      "practicalTitle": "Practical search",
+      "role": "Role",
+      "expertise": "Expertise you are looking for",
+      "expertisePlaceholder": "e.g. AI, React, B2B sales",
+      "expertiseHelp": "Separate multiple terms with commas.",
+      "location": "City / region",
+      "locationPlaceholder": "e.g. Berlin",
+      "locationHelp": "Use a broad location, not an address. V1 matches the same city or region label.",
+      "remote": "Accepted remote setup",
+      "minimumAvailability": "Approximate minimum time per week",
+      "apply": "Update search",
+      "reset": "Reset filters",
+      "activeFilters": "Active filters:",
+      "alignmentPrioritized": "Prioritized for Alignment:",
+      "minimumHoursChip": "{hours}+ hrs",
+      "feedback": {
+        "saved": "Your private search was updated.",
+        "reset": "The search filters were reset.",
+        "failed": "Your search could not be saved right now."
+      }
+    },
+    "alignment": {
+      "eyebrow": "Optional",
+      "title": "Use Alignment for your search",
+      "description": "If you have completed Founder Alignment, you can choose the areas where similar perspectives matter most to you.",
+      "enable": "Use Alignment for my search",
+      "choose": "Where do similar perspectives matter most to you?",
+      "chooseHelp": "Choose up to three areas. They are a limited soft signal and never an exclusion filter.",
+      "unavailable": "Complete Founder Alignment first. Your search works fully without Alignment signals.",
+      "transparency": "Alignment cues are based on both founders' own responses and the areas you prioritized. They are not an assessment of your compatibility. Your selection stays private.",
+      "dimensions": {
+        "company_logic": "Company logic",
+        "decision_logic": "Decision logic",
+        "work_structure": "Work structure & collaboration",
+        "commitment": "Commitment",
+        "risk_orientation": "Risk orientation",
+        "conflict_style": "Conflict style"
+      }
+    },
+    "results": {
+      "eyebrow": "Results",
+      "title": "Discover founders",
+      "count": "{count, plural, =0 {No profiles} =1 {One profile} other {# profiles}} match your practical filters.",
+      "emptyTitle": "No profiles with these filters",
+      "emptyText": "Adjust your practical filters or come back later. Missing Alignment data never excludes anyone.",
+      "inactiveTitle": "Activate your Discovery profile first",
+      "inactiveText": "Publish your profile before finding other founders in Discovery."
+    },
+    "cards": {
+      "roles": "Roles",
+      "expertise": "Expertise",
+      "practicalMatches": "Matches your search on:",
+      "alignmentMatches": "Similar perspectives in areas that matter to you"
+    },
+    "pagination": {
+      "label": "Discovery results",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page}"
     }
   },
   "profile": {
@@ -219,21 +290,38 @@
       "headlinePlaceholder": "e.g. Product founder looking for a tech counterpart",
       "bio": "Short description",
       "bioPlaceholder": "What you are working on, what you bring and what kind of collaboration you are looking for.",
+      "locationRegion": "City / region",
+      "locationRegionPlaceholder": "e.g. Berlin",
+      "locationRegionHelp": "Use a broad location only, not an address.",
       "ownRoles": "Your roles",
       "ownRolesHelp": "What do you bring most strongly? Up to {count} roles.",
       "ownRolesLimit": "You reached the maximum number of own roles.",
       "seekingRoles": "Roles you are looking for",
       "seekingRolesHelp": "What kind of complement are you looking for in a co-founder? Up to {count} roles.",
       "seekingRolesLimit": "You reached the maximum number of roles you are looking for.",
+      "expertise": "What expertise do you bring?",
+      "expertisePlaceholder": "e.g. AI, React, B2B sales",
+      "expertiseHelp": "Separate multiple terms with commas. Up to {count}.",
       "industries": "Industries / interests",
       "industriesPlaceholder": "e.g. Climate, B2B SaaS, education",
       "industriesHelp": "Separate multiple terms with commas. Up to {count} terms.",
+      "industriesLegacyHelp": "Existing profile context about industries and interests. Discovery V2 does not use it as a transparent match reason. Up to {count} terms.",
       "industriesLimit": "You reached the maximum number of industries/interests.",
       "location": "Location",
       "locationPlaceholder": "e.g. Berlin, DACH, Remote",
       "remoteMode": "Remote mode",
       "availability": "Availability per week",
-      "availabilityPlaceholder": "e.g. 20"
+      "availabilityPlaceholder": "e.g. 20",
+      "availabilityV2": "How much time can you realistically contribute to a venture right now?"
+    },
+    "brings": {
+      "title": "What you bring",
+      "description": "Your roles, expertise and the time you can realistically contribute right now."
+    },
+    "seeking": {
+      "title": "Who you are looking for",
+      "description": "These roles are part of your visible profile. Your specific search filters stay private and are managed directly in Discovery.",
+      "editPrivateSearch": "Edit private search"
     },
     "venture": {
       "eyebrow": "Your founding direction",
@@ -245,6 +333,7 @@
     },
     "actions": {
       "saveDraft": "Save draft",
+      "saveChanges": "Save changes",
       "publish": "Publish profile",
       "pause": "Pause search",
       "publishHelp": "When publishing, we save your current details and make your profile visible if everything is complete.",
@@ -269,6 +358,7 @@
       "brings": "Brings",
       "seeks": "Looking for",
       "interests": "Interests",
+      "expertise": "Expertise",
       "workFrame": "Work setup",
       "timeOpen": "Time open",
       "hoursPerWeek": "{hours} hrs/week",
@@ -362,6 +452,7 @@
     "details": {
       "brings": "Brings",
       "seeks": "Looking for",
+      "expertise": "Expertise",
       "industries": "Industries / interests",
       "location": "Location",
       "remoteMode": "Remote mode",

@@ -41,8 +41,10 @@ const DISCOVERY_INTRO_PROFILE_COLUMNS = [
   "bio",
   "own_roles",
   "seeking_roles",
+  "expertise",
   "industries",
   "location_label",
+  "location_region",
   "remote_mode",
   "availability_hours_per_week",
   "commitment_level",
@@ -78,8 +80,10 @@ type DiscoveryIntroProfileRow = {
   bio: string;
   own_roles: string[];
   seeking_roles: string[];
+  expertise: string[];
   industries: string[];
   location_label: string | null;
+  location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
   commitment_level: string;
@@ -140,8 +144,10 @@ function mapIntroProfileRow(row: DiscoveryIntroProfileRow): DiscoveryProfilePrev
     bio: row.bio,
     ownRoles: row.own_roles as DiscoveryFounderRole[],
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
+    expertise: row.expertise ?? [],
     industries: row.industries,
     locationLabel: row.location_label,
+    locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryRemoteMode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
