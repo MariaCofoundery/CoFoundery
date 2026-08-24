@@ -54,11 +54,20 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
-  const setupState = await getFounderSetupStarted(teamId, user.id, supabase);
+  const [setupState, labStateResult] = await Promise.all([
+    getFounderSetupStarted(teamId, user.id, supabase),
+    team.alignment.length
+      ? supabase.from("commitment_labs").select("relationship_id").in("relationship_id", team.alignment.map((entry) => entry.relationshipId))
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const startedLabRelationships = new Set(
+    labStateResult.error ? [] : ((labStateResult.data ?? []) as Array<{ relationship_id: string }>).map((row) => row.relationship_id)
+  );
 
-  const [t, navigationT] = await Promise.all([
+  const [t, navigationT, commitmentT] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.teamNavigation"),
+    getTranslations("teams.commitmentLab"),
   ]);
   const fallback = (index: number) => t("founders.fallback", { index });
   const names = memberNames(team, fallback);
@@ -198,6 +207,20 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </div>
           )}
         </section>
+
+        {team.alignment.length > 0 ? (
+          <section className={SECTION_CLASS} aria-labelledby="commitment-lab-title">
+            <h2 id="commitment-lab-title" className="text-xl font-semibold text-slate-950">{commitmentT("title")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{commitmentT("description")}</p>
+            <div className="mt-5 grid gap-3">
+              {team.alignment.map((entry) => {
+                const participants = pairName(entry.participantUserIds, names, fallback);
+                const started = startedLabRelationships.has(entry.relationshipId);
+                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(started ? "continue" : "start")}</Link></article>;
+              })}
+            </div>
+          </section>
+        ) : null}
 
         <section
           className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"

@@ -59,6 +59,116 @@
     "setup": "Founder Setup",
     "alignment": "Alignment"
   },
+  "commitmentLab": {
+    "title": "Commitment Lab",
+    "eyebrow": "Commitment & Verantwortung",
+    "description": "Klärt, was ihr realistisch einbringen könnt, was eure Zusage für euch bedeutet und was passieren soll, wenn sich Zeit, Motivation oder Lebensumstände verändern.",
+    "start": "Commitment Lab starten",
+    "continue": "Commitment Lab fortsetzen",
+    "back": "Zurück zur Zusammenarbeit",
+    "pair": "Für {names}",
+    "intro": "Was bedeutet eure Zusage in der Realität? Das Commitment Lab unterstützt eure Reflexion und euer Gespräch. Es bewertet weder euch noch eure Zusammenarbeit.",
+    "personal": {
+      "title": "Dein persönlicher Reality Check",
+      "help": "Fülle diesen Bereich aus deiner heutigen Perspektive aus. Deine Angaben werden nicht als Commitment-Score bewertet.",
+      "currentHours": "Wie viele Stunden kannst du aktuell realistisch pro Woche einbringen?",
+      "difficultHours": "Wie viele Stunden bleiben in einer deutlich volleren oder schwierigeren Woche realistisch?",
+      "hours": "Stunden pro Woche",
+      "obligations": "Welche regelmäßigen Verpflichtungen beanspruchen ebenfalls Zeit? (optional)",
+      "changeNote": "Was könnte deinen zeitlichen oder organisatorischen Rahmen in den nächsten Monaten verändern?",
+      "realityFit": "Passt deine geplante Zusage zu deiner aktuellen Realität?",
+      "realityOptions": {
+        "empty": "Bitte auswählen",
+        "realistic": "Ja, das fühlt sich realistisch an.",
+        "partly": "Teilweise – ich möchte genauer hinschauen.",
+        "reconsider": "Meine ursprüngliche Vorstellung würde ich heute anders einschätzen."
+      },
+      "save": "Meine Perspektive speichern"
+    },
+    "obligations": {
+      "employment": "Angestelltenjob",
+      "self_employment": "Selbstständigkeit",
+      "education": "Studium / Ausbildung",
+      "family_care": "Familie / Care",
+      "other_project": "Anderes Projekt",
+      "other_regular": "Sonstige regelmäßige Verpflichtungen"
+    },
+    "meaning": {
+      "title": "Was bedeutet Commitment für dich?",
+      "core": "Was bedeutet „Ich bin dabei“ für dich, wenn Motivation, Zeit oder äußere Umstände sich verändern?",
+      "aspectsHelp": "Die folgenden Aspekte strukturieren eure Reflexion. Sie sind keine psychometrische Skala und werden nicht bewertet.",
+      "priority": "Welchen Platz hat die Gründung gegenüber deinen anderen Verpflichtungen, wenn mehrere Dinge gleichzeitig wichtig werden?",
+      "reliability": "Was bedeutet deine Zusage für dich in Phasen, in denen Motivation oder Fortschritt deutlich geringer sind als erhofft?",
+      "transparency": "Wann sollte dein Co-Founder erfahren, dass du deine bisherige Zusage wahrscheinlich nicht mehr halten kannst?",
+      "responsibility": "Was möchtest du mit bereits übernommenen Aufgaben tun, wenn dein eigener Rahmen sich verändert?",
+      "renegotiation": "Wann ist es für dich legitim, Commitment neu zu verhandeln?"
+    },
+    "scenarios": {
+      "title": "Reality- und Stress-Szenarien",
+      "help": "Es gibt keine richtige oder falsche Antwort. Beschreibe, was du wahrscheinlich tun würdest.",
+      "action": "Was würdest du wahrscheinlich tun?",
+      "expectation": "Was sollte dein Co-Founder in dieser Situation von dir erwarten können?",
+      "motivation_progress": "Ihr arbeitet seit mehreren Monaten, aber Fortschritt und Motivation sind deutlich geringer als am Anfang.",
+      "time_circumstances": "Beruflich oder privat brauchst du plötzlich deutlich mehr Zeit als erwartet.",
+      "attractive_alternative": "Du erhältst ein berufliches Angebot, das finanziell oder fachlich sehr attraktiv ist.",
+      "team_responsibility": "Dein Co-Founder hält vereinbarte Aufgaben seit mehreren Wochen nicht wie besprochen ein."
+    },
+    "compare": {
+      "title": "Eure Perspektiven",
+      "ready": "Ihr habt beide eure persönliche Perspektive festgehalten. Vergleicht eure Aussagen und besprecht, was sie für euch bedeuten.",
+      "waiting": "Noch offen: Die gemeinsame Gegenüberstellung erscheint, sobald beide Founder die persönlichen Kernbereiche ausgefüllt haben.",
+      "hours": "Zeit & Verfügbarkeit",
+      "current": "Aktuell: {hours} Std.",
+      "difficult": "Schwierige Woche: {hours} Std.",
+      "meaning": "Bedeutung von „Ich bin dabei“"
+    },
+    "discussion": {
+      "title": "Gemeinsames Gespräch",
+      "help": "Nutzt die Fragen als Gesprächsimpulse und haltet Gedanken fest. Beiträge sind für beide Founder dieser Relationship sichtbar.",
+      "prompts": {
+        "meaning": "Was bedeutet „Ich bin dabei“ für euch jeweils konkret?",
+        "less": "Wann ist es für euch legitim, weniger einzubringen?",
+        "expectation": "Was erwartet ihr voneinander, wenn jemand seine bisherige Zusage nicht mehr halten kann?",
+        "timing": "Wie früh möchtet ihr Veränderungen ansprechen?",
+        "renegotiation": "Wann sollte aus einer individuellen Veränderung eine gemeinsame Neuverhandlung werden?"
+      },
+      "empty": "Noch keine gemeinsamen Gesprächsnotizen.",
+      "postLabel": "Gesprächsnotiz",
+      "postPlaceholder": "Was möchtet ihr aus dem Gespräch festhalten?",
+      "post": "Beitrag hinzufügen",
+      "replyLabel": "Antwort",
+      "replyPlaceholder": "Was möchtest du darauf antworten?",
+      "reply": "Antworten"
+    },
+    "reflection": {
+      "title": "Was nehmt ihr aus eurem Commitment Lab mit?",
+      "help": "Haltet fest, was ihr über eure Erwartungen an Commitment und Verantwortung gelernt habt. Das ist noch keine bestätigte Vereinbarung.",
+      "save": "Gemeinsame Reflexion speichern"
+    },
+    "handoff": {
+      "title": "In Founder Setup weiterführen",
+      "help": "Möchtet ihr daraus etwas für eure Zusammenarbeit festhalten? Wählt bewusst den passenden Founder-Setup-Punkt.",
+      "choose": "Founder-Setup-Thema auswählen",
+      "time": "Zeit & Commitment",
+      "changing": "Wenn sich Commitment verändert",
+      "copy": "Als Arbeitsnotiz übernehmen",
+      "open": "Founder Setup öffnen",
+      "existing": "Zu diesem Thema gibt es bereits eine gemeinsame Arbeitsnotiz. Sie wird nicht überschrieben.",
+      "three": "Diese Reflexion stammt aus einer paarweisen Founder-Verbindung. Führt sie im Founder Setup mit dem gesamten Team weiter; eine automatische Übernahme erfolgt nicht."
+    },
+    "feedback": {
+      "personal-saved": "Deine persönliche Perspektive wurde gespeichert.",
+      "reflection-saved": "Eure gemeinsame Reflexion wurde gespeichert.",
+      "commented": "Der Gesprächsbeitrag wurde hinzugefügt.",
+      "error": "Die Änderung konnte gerade nicht sicher gespeichert werden."
+    },
+    "speech": {
+      "start": "Diktat starten",
+      "stop": "Diktat stoppen",
+      "listening": "Diktat läuft …",
+      "unavailable": "Diktat ist in diesem Browser gerade nicht verfügbar."
+    }
+  },
   "connections": {
     "eyebrow": "Verbindungen",
     "title": "Deine Founder-Verbindungen",

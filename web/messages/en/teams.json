@@ -59,6 +59,116 @@
     "setup": "Founder Setup",
     "alignment": "Alignment"
   },
+  "commitmentLab": {
+    "title": "Commitment Lab",
+    "eyebrow": "Commitment & responsibility",
+    "description": "Clarify what you can realistically contribute, what your commitment means to you, and what should happen when time, motivation, or life circumstances change.",
+    "start": "Start Commitment Lab",
+    "continue": "Continue Commitment Lab",
+    "back": "Back to collaboration",
+    "pair": "For {names}",
+    "intro": "What does your commitment mean in real life? Commitment Lab supports reflection and conversation. It does not assess either of you or your collaboration.",
+    "personal": {
+      "title": "Your personal reality check",
+      "help": "Complete this section from your perspective today. Your responses are not evaluated as a commitment score.",
+      "currentHours": "How many hours can you realistically contribute per week right now?",
+      "difficultHours": "How many hours would still be realistic in a much fuller or more difficult week?",
+      "hours": "Hours per week",
+      "obligations": "Which regular commitments also require your time? (optional)",
+      "changeNote": "What could change your time or organizational situation over the next few months?",
+      "realityFit": "Does your planned commitment fit your current reality?",
+      "realityOptions": {
+        "empty": "Please choose",
+        "realistic": "Yes, this feels realistic.",
+        "partly": "Partly — I would like to look more closely.",
+        "reconsider": "I would assess my original expectation differently today."
+      },
+      "save": "Save my perspective"
+    },
+    "obligations": {
+      "employment": "Employment",
+      "self_employment": "Self-employment",
+      "education": "Education / training",
+      "family_care": "Family / care",
+      "other_project": "Another project",
+      "other_regular": "Other regular commitments"
+    },
+    "meaning": {
+      "title": "What does commitment mean to you?",
+      "core": "What does “I am in” mean to you when motivation, time, or external circumstances change?",
+      "aspectsHelp": "The following aspects structure your reflection. They are not a psychometric scale and are not scored.",
+      "priority": "What place does the startup have alongside your other commitments when several things matter at the same time?",
+      "reliability": "What does your commitment mean during periods when motivation or progress is much lower than you hoped?",
+      "transparency": "When should your co-founder learn that you will probably no longer be able to keep your previous commitment?",
+      "responsibility": "What do you want to do with responsibilities you have already taken on if your own capacity changes?",
+      "renegotiation": "When is it legitimate for you to renegotiate commitment?"
+    },
+    "scenarios": {
+      "title": "Reality and stress scenarios",
+      "help": "There is no right or wrong answer. Describe what you would probably do.",
+      "action": "What would you probably do?",
+      "expectation": "What should your co-founder be able to expect from you in this situation?",
+      "motivation_progress": "You have been working for several months, but progress and motivation are much lower than at the beginning.",
+      "time_circumstances": "Work or private circumstances suddenly require much more of your time than expected.",
+      "attractive_alternative": "You receive a professional opportunity that is financially or professionally very attractive.",
+      "team_responsibility": "Your co-founder has not completed agreed responsibilities as discussed for several weeks."
+    },
+    "compare": {
+      "title": "Your perspectives",
+      "ready": "You have both captured your personal perspectives. Compare your responses and discuss what they mean for you.",
+      "waiting": "Still open: the shared comparison appears once both founders have completed the personal core sections.",
+      "hours": "Time & availability",
+      "current": "Currently: {hours} hrs",
+      "difficult": "Difficult week: {hours} hrs",
+      "meaning": "Meaning of “I am in”"
+    },
+    "discussion": {
+      "title": "Shared conversation",
+      "help": "Use the questions as conversation prompts and capture your thoughts. Posts are visible to both founders in this relationship.",
+      "prompts": {
+        "meaning": "What does “I am in” mean concretely to each of you?",
+        "less": "When is it legitimate for each of you to contribute less?",
+        "expectation": "What do you expect from each other when someone can no longer keep their previous commitment?",
+        "timing": "How early do you want to discuss changes?",
+        "renegotiation": "When should an individual change lead to a shared renegotiation?"
+      },
+      "empty": "No shared conversation notes yet.",
+      "postLabel": "Conversation note",
+      "postPlaceholder": "What would you like to capture from the conversation?",
+      "post": "Add post",
+      "replyLabel": "Reply",
+      "replyPlaceholder": "What would you like to reply?",
+      "reply": "Reply"
+    },
+    "reflection": {
+      "title": "What are you taking away from your Commitment Lab?",
+      "help": "Capture what you learned about your expectations around commitment and responsibility. This is not yet a confirmed agreement.",
+      "save": "Save shared reflection"
+    },
+    "handoff": {
+      "title": "Continue in Founder Setup",
+      "help": "Would you like to record something for your collaboration? Deliberately choose the appropriate Founder Setup item.",
+      "choose": "Choose a Founder Setup topic",
+      "time": "Time & commitment",
+      "changing": "When commitment changes",
+      "copy": "Copy as working note",
+      "open": "Open Founder Setup",
+      "existing": "This topic already has a shared working note. It will not be overwritten.",
+      "three": "This reflection comes from a pairwise founder relationship. Continue it with the whole team in Founder Setup; it will not be copied automatically."
+    },
+    "feedback": {
+      "personal-saved": "Your personal perspective was saved.",
+      "reflection-saved": "Your shared reflection was saved.",
+      "commented": "The conversation post was added.",
+      "error": "The change could not be saved safely right now."
+    },
+    "speech": {
+      "start": "Start dictation",
+      "stop": "Stop dictation",
+      "listening": "Dictation is running…",
+      "unavailable": "Dictation is not available in this browser right now."
+    }
+  },
   "connections": {
     "eyebrow": "Connections",
     "title": "Your founder connections",
