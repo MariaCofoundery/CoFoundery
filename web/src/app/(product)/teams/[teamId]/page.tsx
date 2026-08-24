@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import {
   getFounderTeamHomebase,
   type FounderTeamHomebase,
@@ -70,7 +71,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <Link
         href="/dashboard"
-        className="text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+        className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
       >
         {t("back")}
       </Link>
@@ -95,25 +96,18 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             {founderNames.map((name, index) => (
               <li
                 key={team.members[index]?.userId ?? name}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900"
+                className="flex min-h-16 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm font-medium text-slate-900"
               >
-                {name}
+                <ProfileAvatar
+                  displayName={name}
+                  alt={t("founders.avatarAlt", { name })}
+                  className="h-10 w-10 shrink-0 rounded-full object-cover"
+                  fallbackClassName="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm"
+                />
+                <span className="min-w-0 break-words">{name}</span>
               </li>
             ))}
           </ul>
-        </section>
-
-        <section className={SECTION_CLASS} aria-labelledby="team-setup-title">
-          <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
-            {t("setup.title")}
-          </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
-          <p className="mt-4 text-sm font-medium text-slate-700">
-            {setupState?.started ? t("setup.started") : t("setup.notStarted")}
-          </p>
-          <Link href={`/teams/${teamId}/setup`} className={`${LINK_CLASS} mt-4`}>
-            {t("setup.open")}
-          </Link>
         </section>
 
         <section className={SECTION_CLASS} aria-labelledby="team-alignment-title">
@@ -181,6 +175,21 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               })}
             </div>
           )}
+        </section>
+
+        <section className={SECTION_CLASS} aria-labelledby="team-setup-title">
+          <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
+            {t("setup.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-slate-700">
+              {setupState?.started ? t("setup.started") : t("setup.notStarted")}
+            </p>
+            <Link href={`/teams/${teamId}/setup`} className={LINK_CLASS}>
+              {t("setup.open")}
+            </Link>
+          </div>
         </section>
 
         <section className={SECTION_CLASS} aria-labelledby="team-agreements-title">

@@ -9,7 +9,8 @@
     },
     "founders": {
       "title": "Founders",
-      "fallback": "Founder {index}"
+      "fallback": "Founder {index}",
+      "avatarAlt": "Profile for {name}"
     },
     "setup": {
       "title": "Founder Setup",
@@ -76,28 +77,29 @@
       "not_relevant": "Not relevant"
     },
     "actions": {
-      "save": "Save working state",
-      "propose": "Propose shared wording",
-      "confirm": "Confirm wording",
+      "save": "Save note",
+      "propose": "Propose shared position",
+      "confirm": "Confirm proposal",
       "withdraw": "Withdraw confirmation"
     },
     "detail": {
-      "workingTitle": "Shared working state",
-      "workingHelp": "This note is a shared working state and not yet a confirmed agreement.",
-      "workStatus": "Working status",
-      "workingNote": "Working note",
-      "currentTitle": "Currently confirmed",
-      "pendingTitle": "Change proposed",
-      "proposalTitle": "Propose shared wording",
-      "proposalHelp": "The proposal becomes the shared position only after every current founder has confirmed it.",
-      "proposalReplacesPending": "A new proposal transparently supersedes the open proposal. The confirmed position remains unchanged until everyone confirms the new one.",
-      "proposalNote": "Proposed wording",
-      "resolutionStatus": "How should this wording be captured?",
-      "documentationReference": "Documentation reference (optional)",
-      "documentationPlaceholder": "Short reference or https://…",
+      "workingTitle": "Your shared note",
+      "workingHelp": "Use this space to collect thoughts and open points. The note is not yet a jointly confirmed position.",
+      "workStatus": "Where are you right now?",
+      "workingNote": "Note",
+      "currentTitle": "Confirmed by all of you",
+      "pendingTitle": "Proposal awaiting confirmation",
+      "proposalTitle": "Propose a new shared position",
+      "proposalHelp": "The proposal becomes the jointly confirmed position only after every current founder has agreed to it.",
+      "proposalReplacesPending": "A new proposal replaces the open proposal. The position you have already confirmed together remains unchanged until everyone agrees to the new proposal.",
+      "proposalNote": "What would you like to capture together?",
+      "resolutionStatus": "How would you like to capture this point?",
+      "documentationReference": "For “Documented” only: Where did you capture this? (optional)",
+      "documentationPlaceholder": "For example, a document name or https://…",
       "confirmations": "Confirmations",
       "confirmed": "confirmed",
       "awaiting": "open",
+      "yourConfirmationPending": "Your confirmation is still open.",
       "noNote": "No additional wording was provided."
     },
     "feedback": {

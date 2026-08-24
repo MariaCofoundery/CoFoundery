@@ -8,6 +8,7 @@ import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
+import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 
 type Props = {
@@ -51,23 +52,6 @@ type NavigationOverride = {
 const ProductNavigationOverrideContext = createContext<
   ((override: NavigationOverride) => void) | null
 >(null);
-
-function isProductChromePath(pathname: string) {
-  if (!pathname) return false;
-  if (pathname.startsWith("/debug")) return false;
-  if (pathname === "/login") return false;
-  if (pathname === "/start") return true;
-
-  return (
-    pathname === "/dashboard" ||
-    pathname.startsWith("/advisor/") ||
-    pathname.startsWith("/discovery") ||
-    pathname.startsWith("/me/") ||
-    pathname.startsWith("/report/") ||
-    pathname.startsWith("/founder-alignment/") ||
-    pathname === "/invite/new"
-  );
-}
 
 function navLinkClassName(active: boolean) {
   return `rounded-full px-3 py-2 text-sm font-medium transition ${

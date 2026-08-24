@@ -9,7 +9,8 @@
     },
     "founders": {
       "title": "Founder",
-      "fallback": "Founder {index}"
+      "fallback": "Founder {index}",
+      "avatarAlt": "Profil von {name}"
     },
     "setup": {
       "title": "Founder Setup",
@@ -76,28 +77,29 @@
       "not_relevant": "Nicht relevant"
     },
     "actions": {
-      "save": "Arbeitsstand speichern",
-      "propose": "Gemeinsame Fassung vorschlagen",
-      "confirm": "Fassung bestätigen",
+      "save": "Notiz speichern",
+      "propose": "Gemeinsamen Stand vorschlagen",
+      "confirm": "Vorschlag bestätigen",
       "withdraw": "Bestätigung zurücknehmen"
     },
     "detail": {
-      "workingTitle": "Gemeinsamer Arbeitsstand",
-      "workingHelp": "Diese Notiz ist ein gemeinsamer Arbeitsstand und noch keine bestätigte Vereinbarung.",
-      "workStatus": "Arbeitsstatus",
-      "workingNote": "Arbeitsnotiz",
-      "currentTitle": "Aktuell bestätigt",
-      "pendingTitle": "Änderung vorgeschlagen",
-      "proposalTitle": "Gemeinsame Fassung vorschlagen",
-      "proposalHelp": "Der Vorschlag wird erst zum gemeinsamen Stand, wenn alle aktuellen Founder ihn bestätigt haben.",
-      "proposalReplacesPending": "Ein neuer Vorschlag löst den aktuell offenen Vorschlag transparent ab. Der bestätigte Stand bleibt bis zur vollständigen Bestätigung unverändert.",
-      "proposalNote": "Vorgeschlagene Fassung",
-      "resolutionStatus": "Wie soll die Fassung festgehalten werden?",
-      "documentationReference": "Dokumentationsreferenz (optional)",
-      "documentationPlaceholder": "Kurze Referenz oder https://…",
+      "workingTitle": "Eure gemeinsame Notiz",
+      "workingHelp": "Hier könnt ihr Gedanken und offene Punkte sammeln. Die Notiz ist noch kein gemeinsam bestätigter Stand.",
+      "workStatus": "Wo steht ihr gerade?",
+      "workingNote": "Notiz",
+      "currentTitle": "Von euch gemeinsam bestätigt",
+      "pendingTitle": "Vorschlag zur Bestätigung",
+      "proposalTitle": "Neuen gemeinsamen Stand vorschlagen",
+      "proposalHelp": "Der Vorschlag wird erst zum gemeinsam bestätigten Stand, wenn alle aktuellen Founder zugestimmt haben.",
+      "proposalReplacesPending": "Ein neuer Vorschlag ersetzt den offenen Vorschlag. Der bereits gemeinsam bestätigte Stand bleibt unverändert, bis alle dem neuen Vorschlag zugestimmt haben.",
+      "proposalNote": "Was möchtet ihr gemeinsam festhalten?",
+      "resolutionStatus": "Wie möchtet ihr diesen Punkt festhalten?",
+      "documentationReference": "Nur bei „Dokumentiert“: Wo habt ihr das festgehalten? (optional)",
+      "documentationPlaceholder": "Zum Beispiel Dokumentname oder https://…",
       "confirmations": "Bestätigungen",
       "confirmed": "bestätigt",
       "awaiting": "offen",
+      "yourConfirmationPending": "Deine Bestätigung ist noch offen.",
       "noNote": "Keine zusätzliche Fassung hinterlegt."
     },
     "feedback": {
