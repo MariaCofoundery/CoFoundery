@@ -23,9 +23,9 @@
     "freeBetaTitle": "Dieser Report ist in der aktuellen Testphase vollständig geöffnet.",
     "freeBetaText": "Später kann die Freischaltung über einen Team- oder Report-Zugang laufen.",
     "unrenderableText": "Der Report ist freigeschaltet, aber die Detailauswertung ist für diesen alten Datensatz noch nicht renderbar.",
-    "workbookTitle": "Diese Punkte klärt ihr nicht nebenbei.",
-    "workbookText": "Im Workbook legt ihr fest, wie ihr damit arbeitet.",
-    "workbookCta": "Workbook starten"
+    "workbookTitle": "Manche Unterschiede versteht man erst im Gespräch.",
+    "workbookText": "Vertieft ausgewählte Themen gemeinsam, vergleicht eure Perspektiven und haltet fest, was ihr daraus für eure Zusammenarbeit mitnehmt.",
+    "workbookCta": "Alignment vertiefen"
   },
   "session": {
     "emptyTitle": "Der Dynamik-Report ist noch nicht erstellt.",

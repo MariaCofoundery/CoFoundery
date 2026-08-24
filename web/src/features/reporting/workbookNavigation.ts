@@ -15,6 +15,14 @@ export function buildWorkbookIntroHref(invitationId: string, teamContext: TeamCo
   return teamContext ? `${base}&teamContext=${encodeURIComponent(teamContext)}` : base;
 }
 
+export function buildWorkbookDeepDiveHref(
+  invitationId: string,
+  teamContext: TeamContext | null,
+  stepId: "decision_rules" | "collaboration_conflict"
+) {
+  return `${buildWorkbookHref(invitationId, teamContext)}&deepDiveStep=${encodeURIComponent(stepId)}`;
+}
+
 function hasStructuredOutputs(step: FounderAlignmentWorkbookEntry) {
   return Object.values(step.structuredOutputs ?? {}).some((stepOutputs) =>
     Object.values(stepOutputs ?? {}).some(

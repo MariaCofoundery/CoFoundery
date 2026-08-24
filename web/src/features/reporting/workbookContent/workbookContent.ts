@@ -63,7 +63,7 @@ export type PremiumWorkbookWorkflowCopy = {
     continueExistingNote: string;
     continueWithTeam: string;
     openTeamContext: string;
-    backToAlignment: string;
+    backToTopics: string;
     threeFounder: string;
     unavailable: string;
   };

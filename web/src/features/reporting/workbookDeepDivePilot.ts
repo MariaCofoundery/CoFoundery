@@ -1,4 +1,4 @@
-import type { FounderAlignmentWorkbookEntry, FounderAlignmentWorkbookStepId } from "@/features/reporting/founderAlignmentWorkbook";
+import type { FounderAlignmentWorkbookEntry } from "@/features/reporting/founderAlignmentWorkbook";
 import type { FounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 
 export const WORKBOOK_DEEP_DIVE_PILOT_STEPS = [
@@ -21,7 +21,7 @@ const SETUP_KEY_BY_STEP: Record<WorkbookDeepDivePilotStepId, FounderSetupItemKey
 };
 
 export function isWorkbookDeepDivePilotStep(
-  stepId: FounderAlignmentWorkbookStepId
+  stepId: string
 ): stepId is WorkbookDeepDivePilotStepId {
   return (WORKBOOK_DEEP_DIVE_PILOT_STEPS as readonly string[]).includes(stepId);
 }

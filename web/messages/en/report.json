@@ -23,9 +23,9 @@
     "freeBetaTitle": "This report is fully unlocked during the current test phase.",
     "freeBetaText": "Later, unlocking can run through team or report access.",
     "unrenderableText": "The report is unlocked, but the detailed analysis cannot be rendered for this older data set yet.",
-    "workbookTitle": "These points should not be clarified on the side.",
-    "workbookText": "In the workbook, you define how you want to work with them.",
-    "workbookCta": "Start workbook"
+    "workbookTitle": "Some differences only become clear through conversation.",
+    "workbookText": "Explore selected topics together, compare your perspectives, and capture what you want to take forward in your collaboration.",
+    "workbookCta": "Alignment deep dive"
   },
   "session": {
     "emptyTitle": "The dynamics report has not been created yet.",

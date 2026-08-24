@@ -22,19 +22,36 @@
     }
   },
   "intro": {
-    "title": "Bevor ihr ins Workbook geht",
-    "reportShows": "Euer Report zeigt, wo ihr ähnlich denkt, wo Unterschiede liegen und was ihr vor dem Start klären solltet.",
-    "rules": "Im Workbook macht ihr daraus konkrete Regeln für eure Zusammenarbeit.",
-    "howToWork": "So könnt ihr damit arbeiten",
-    "workTogether": "Ihr könnt das gemeinsam machen oder euch erst einzeln orientieren.",
-    "notEverything": "Ihr müsst nicht alles auf einmal klären.",
-    "rightPoints": "Wichtiger als Tempo ist, dass ihr an den richtigen Punkten sauber werdet.",
-    "savedState": "Euer Stand bleibt erhalten, ihr könnt später weiterarbeiten.",
-    "focus": "Fokus statt Überforderung",
-    "focusDescription": "Nehmt euch zuerst die Themen vor, die für euch gerade am wichtigsten sind.",
-    "optionalLater": "Optional später",
-    "advisorLater": "Wenn ihr möchtet, könnt ihr später auch eine dritte Person dazuholen, zum Beispiel einen Advisor oder Coach.",
-    "start": "Workbook starten",
+    "eyebrow": "Alignment vertiefen",
+    "title": "Alignment vertiefen",
+    "description": "Hier könnt ihr ausgewählte Themen aus eurem Alignment genauer betrachten. Ihr beantwortet zunächst unabhängig voneinander eine zentrale Frage, besprecht eure Perspektiven und haltet anschließend fest, was ihr daraus mitnehmt.",
+    "steps": {
+      "choose": {
+        "title": "Thema auswählen",
+        "description": "Wählt aus, worüber ihr genauer sprechen möchtet."
+      },
+      "understand": {
+        "title": "Perspektiven verstehen",
+        "description": "Beantwortet die Frage zunächst unabhängig voneinander und schaut euch anschließend eure Sichtweisen an."
+      },
+      "continue": {
+        "title": "Gemeinsam weitergehen",
+        "description": "Haltet eure wichtigste Erkenntnis fest und führt sie bei Bedarf im Founder Setup weiter."
+      }
+    },
+    "chooseTopic": "Thema auswählen",
+    "topics": {
+      "title": "Worüber möchtet ihr genauer sprechen?",
+      "decisionRules": {
+        "title": "Entscheidungen & Entscheidungshoheit",
+        "description": "Wie viel Einfluss braucht ihr jeweils – und was hilft euch, Entscheidungen mitzutragen, wenn ihr unterschiedlich denkt?"
+      },
+      "collaborationConflict": {
+        "title": "Konflikt & Zusammenarbeit",
+        "description": "Was braucht ihr, wenn Zusammenarbeit schwierig wird – und wie findet ihr nach Spannungen wieder zusammen?"
+      },
+      "open": "Vertiefen"
+    },
     "later": "Später starten"
   },
   "client": {

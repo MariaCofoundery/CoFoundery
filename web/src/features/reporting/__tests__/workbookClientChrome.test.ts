@@ -64,11 +64,21 @@ test("workbook core chrome messages are complete and parallel", () => {
   }
 });
 
-test("intro topic chips use the locale-aware workbook step titles", () => {
-  assert.match(introSource, /getWorkbookContent\(locale\)\.steps/u);
-  assert.doesNotMatch(introSource, /FOUNDER_ALIGNMENT_WORKBOOK_STEPS/u);
-  assert.equal(getWorkbookContent("de").steps[0]?.title, "Unternehmenslogik");
-  assert.equal(getWorkbookContent("en").steps[0]?.title, "Company logic");
+test("intro presents both deep-dive pilots as equal direct choices", () => {
+  assert.match(introSource, /decisionRulesHref/u);
+  assert.match(introSource, /collaborationConflictHref/u);
+  assert.match(introSource, /intro\.topics\.decisionRules\.title/u);
+  assert.match(introSource, /intro\.topics\.collaborationConflict\.title/u);
+  assert.doesNotMatch(introSource, /prioritizedStepIds|suggestedTopics/u);
+  assert.equal(
+    getWorkbookContent("de").steps.find((step) => step.id === "decision_rules")?.title,
+    "Entscheidungen & Entscheidungshoheit"
+  );
+  assert.equal(
+    getWorkbookContent("en").steps.find((step) => step.id === "collaboration_conflict")
+      ?.title,
+    "Conflict & collaboration"
+  );
 });
 
 test("workbook step statuses map to localized chrome without changing their codes", () => {

@@ -57,7 +57,7 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
       continueExistingNote: "Im Founder Setup weiterfuehren",
       continueWithTeam: "Mit eurem Team im Founder Setup weiterfuehren",
       openTeamContext: "Zu euren Verbindungen",
-      backToAlignment: "Zurueck zum Alignment",
+      backToTopics: "Zurueck zu den Themen",
       threeFounder:
         "Diese Reflexion stammt aus eurem paarweisen Alignment. Im Founder Setup koennt ihr das Thema gemeinsam mit dem gesamten Team weiterfuehren.",
       unavailable:

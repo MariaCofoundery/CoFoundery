@@ -130,6 +130,7 @@ type FounderAlignmentWorkbookClientProps = {
   storedTeamContext: TeamContext | null;
   hasTeamContextMismatch: boolean;
   deepDiveHandoff: WorkbookDeepDiveHandoffContext | null;
+  deepDiveTopicsHref?: string;
 };
 
 type WorkbookEditableField =
@@ -959,6 +960,7 @@ export function FounderAlignmentWorkbookClient({
   storedTeamContext,
   hasTeamContextMismatch,
   deepDiveHandoff,
+  deepDiveTopicsHref,
 }: FounderAlignmentWorkbookClientProps) {
   const wt = useTranslations("workbook");
   const locale = useLocale();
@@ -5260,10 +5262,15 @@ export function FounderAlignmentWorkbookClient({
               {currentStepIsDeepDivePilot ? (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <Link
-                    href={deepDiveHandoffState?.teamId ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}` : "/connections"}
+                    href={
+                      deepDiveTopicsHref ??
+                      (deepDiveHandoffState?.teamId
+                        ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}`
+                        : "/connections")
+                    }
                     className="rounded-sm text-sm font-medium text-slate-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
                   >
-                    {systemText(workbookContent.premiumWorkflow.deepDivePilot.backToAlignment)}
+                    {systemText(workbookContent.premiumWorkflow.deepDivePilot.backToTopics)}
                   </Link>
                   <span className="text-xs text-slate-500">{saveStatusMeta.label}</span>
                 </div>

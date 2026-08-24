@@ -592,7 +592,7 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       continueExistingNote: "Continue in Founder Setup",
       continueWithTeam: "Continue with your team in Founder Setup",
       openTeamContext: "Go to your connections",
-      backToAlignment: "Back to alignment",
+      backToTopics: "Back to topics",
       threeFounder:
         "This reflection comes from your pairwise alignment. In Founder Setup, you can continue the topic with the whole team.",
       unavailable:

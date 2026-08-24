@@ -10,7 +10,11 @@ import {
 } from "@/features/reporting/advisorTeamTargets";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
-import { buildWorkbookHref } from "@/features/reporting/workbookNavigation";
+import {
+  buildWorkbookHref,
+  buildWorkbookIntroHref,
+} from "@/features/reporting/workbookNavigation";
+import { isWorkbookDeepDivePilotStep } from "@/features/reporting/workbookDeepDivePilot";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,6 +24,7 @@ type PageSearchParams = {
   advisorContext?: string;
   // Legacy fallback for old links. Productive access no longer uses query tokens.
   advisorToken?: string;
+  deepDiveStep?: string;
 };
 
 function resolveTeamContext(value: string | undefined): TeamContext {
@@ -54,6 +59,10 @@ export default async function FounderAlignmentWorkbookPage({
   const requestedTeamContext = resolveTeamContext(params.teamContext);
   const advisorContext = isAdvisorContext(params.advisorContext);
   const legacyAdvisorToken = params.advisorToken?.trim() || null;
+  const requestedDeepDiveStep =
+    params.deepDiveStep && isWorkbookDeepDivePilotStep(params.deepDiveStep)
+      ? params.deepDiveStep
+      : null;
 
   if (legacyAdvisorToken) {
     redirect(`/advisor/invite/${encodeURIComponent(legacyAdvisorToken)}`);
@@ -69,7 +78,9 @@ export default async function FounderAlignmentWorkbookPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const nextPath = `/founder-alignment/workbook?invitationId=${encodeURIComponent(invitationId)}&teamContext=${encodeURIComponent(requestedTeamContext)}`;
+    const nextPath = requestedDeepDiveStep
+      ? `${buildWorkbookHref(invitationId, requestedTeamContext)}&deepDiveStep=${encodeURIComponent(requestedDeepDiveStep)}`
+      : buildWorkbookHref(invitationId, requestedTeamContext);
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
@@ -122,6 +133,10 @@ export default async function FounderAlignmentWorkbookPage({
     data.currentUserRole === "advisor" || advisorContext
       ? buildAdvisorWorkbookHref(resolvedInvitationId, data.teamContext)
       : buildWorkbookHref(resolvedInvitationId, data.teamContext);
+  const deepDiveTopicsHref = buildWorkbookIntroHref(resolvedInvitationId, data.teamContext);
+  const initialWorkbook = requestedDeepDiveStep
+    ? { ...data.workbook, currentStepId: requestedDeepDiveStep }
+    : data.workbook;
 
   return (
     <main>
@@ -165,7 +180,7 @@ export default async function FounderAlignmentWorkbookPage({
           founderAAvatarUrl={data.founderAAvatarUrl}
           founderBAvatarUrl={data.founderBAvatarUrl}
           currentUserRole={data.currentUserRole}
-          initialWorkbook={data.workbook}
+          initialWorkbook={initialWorkbook}
           highlights={data.highlights}
           stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
@@ -179,6 +194,7 @@ export default async function FounderAlignmentWorkbookPage({
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
           deepDiveHandoff={data.deepDiveHandoff}
+          deepDiveTopicsHref={deepDiveTopicsHref}
         />
       ) : (
         <FounderAlignmentWorkbookClient
@@ -192,7 +208,7 @@ export default async function FounderAlignmentWorkbookPage({
           founderAAvatarUrl={data.founderAAvatarUrl}
           founderBAvatarUrl={data.founderBAvatarUrl}
           currentUserRole={data.currentUserRole}
-          initialWorkbook={data.workbook}
+          initialWorkbook={initialWorkbook}
           highlights={data.highlights}
           stepMarkersByStep={data.stepMarkersByStep}
           advisorInvite={data.advisorInvite}
@@ -206,6 +222,7 @@ export default async function FounderAlignmentWorkbookPage({
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
           deepDiveHandoff={data.deepDiveHandoff}
+          deepDiveTopicsHref={deepDiveTopicsHref}
         />
       )}
     </main>

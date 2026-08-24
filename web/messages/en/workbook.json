@@ -22,19 +22,36 @@
     }
   },
   "intro": {
-    "title": "Before you enter the workbook",
-    "reportShows": "Your report shows where you think similarly, where differences appear, and what you should clarify before getting started.",
-    "rules": "In the workbook, you turn that into concrete rules for how you work together.",
-    "howToWork": "How to work with it",
-    "workTogether": "You can work through it together or orient yourselves individually first.",
-    "notEverything": "You do not need to clarify everything at once.",
-    "rightPoints": "Clean thinking on the right points matters more than speed.",
-    "savedState": "Your progress is saved, so you can continue later.",
-    "focus": "Focus over overwhelm",
-    "focusDescription": "Start with the topics that matter most for you right now.",
-    "optionalLater": "Optional later",
-    "advisorLater": "If you want, you can bring in a third person later, such as an advisor or coach.",
-    "start": "Start workbook",
+    "eyebrow": "Alignment deep dive",
+    "title": "Alignment deep dive",
+    "description": "Explore selected topics from your alignment in more depth. Start by answering one central question independently, discuss your perspectives, and then capture what you want to take away from the conversation.",
+    "steps": {
+      "choose": {
+        "title": "Choose a topic",
+        "description": "Choose what you would like to explore in more depth."
+      },
+      "understand": {
+        "title": "Understand perspectives",
+        "description": "Answer the question independently first, then look at your perspectives together."
+      },
+      "continue": {
+        "title": "Move forward together",
+        "description": "Capture your most important insight and continue it in Founder Setup if useful."
+      }
+    },
+    "chooseTopic": "Choose a topic",
+    "topics": {
+      "title": "What would you like to explore in more depth?",
+      "decisionRules": {
+        "title": "Decisions & decision authority",
+        "description": "How much influence does each of you need, and what helps you support decisions when you see things differently?"
+      },
+      "collaborationConflict": {
+        "title": "Conflict & collaboration",
+        "description": "What do you need when working together becomes difficult, and how do you reconnect after tension?"
+      },
+      "open": "Explore"
+    },
     "later": "Start later"
   },
   "client": {

@@ -7,9 +7,8 @@ import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founde
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import {
-  buildWorkbookHref,
+  buildWorkbookDeepDiveHref,
   buildWorkbookIntroHref,
-  hasWorkbookStarted,
 } from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -72,10 +71,7 @@ export default async function FounderAlignmentWorkbookIntroPage({
     );
   }
 
-  if (hasWorkbookStarted(data.workbook)) {
-    redirect(buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext));
-  }
-
+  const resolvedInvitationId = data.invitationId ?? invitationId;
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_28%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
       <ProductNavigationOverride
@@ -90,13 +86,21 @@ export default async function FounderAlignmentWorkbookIntroPage({
         properties={{
           role: data.currentUserRole,
           source: data.source,
-          suggestedTopics: data.highlights.prioritizedStepIds.slice(0, 2),
+          pilotTopics: ["decision_rules", "collaboration_conflict"],
         }}
       />
       <FounderAlignmentWorkbookIntro
         reportHref={reportHref}
-        workbookHref={buildWorkbookHref(data.invitationId ?? invitationId, data.teamContext)}
-        highlights={data.highlights}
+        decisionRulesHref={buildWorkbookDeepDiveHref(
+          resolvedInvitationId,
+          data.teamContext,
+          "decision_rules"
+        )}
+        collaborationConflictHref={buildWorkbookDeepDiveHref(
+          resolvedInvitationId,
+          data.teamContext,
+          "collaboration_conflict"
+        )}
       />
     </main>
   );
