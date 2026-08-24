@@ -76,6 +76,9 @@ export async function handoffWorkbookDeepDiveReflectionToFounderSetup(
 
   const teamId = relationshipRow.founder_team_id;
   const setupKey = getWorkbookDeepDiveSetupKey(stepId);
+  if (!setupKey) {
+    return { ok: false, reason: "unavailable" };
+  }
   const setupHref = `/teams/${encodeURIComponent(teamId)}/setup/${encodeURIComponent(setupKey)}`;
   const [memberResult, itemResult] = await Promise.all([
     supabase.from("founder_team_members").select("user_id").eq("team_id", teamId),

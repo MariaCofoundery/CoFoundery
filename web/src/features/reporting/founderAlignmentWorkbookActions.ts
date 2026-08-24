@@ -10,6 +10,7 @@ import { sendAdvisorInviteEmail } from "@/lib/email/sendAdvisorInviteEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
+  ALIGNMENT_OPEN_POINT_AREA_VALUES,
   sanitizeWorkbookStructuredOutputsByStep,
   sanitizeFounderAlignmentWorkbookPayload,
   sanitizeWorkbookStepWorkspaceV2,
@@ -17,6 +18,7 @@ import {
   type FounderAlignmentWorkbookPatch,
   type FounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookStepId,
+  type AlignmentOpenPointArea,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import {
   buildFounderAlignmentAdvisorInvitePath,
@@ -768,6 +770,34 @@ function mergeFounderPayload(
         }
         if (typeof patch.value === "string") {
           stepEntry.reflectionNote = patch.value;
+        }
+        break;
+      case "deepDiveArea":
+        if (allowStaleWorkspaceMerge) {
+          return { ok: false, reason: "stale_conflict" };
+        }
+        if (
+          patch.stepId === "alignment_open_points" &&
+          (role === "founderA" || role === "founderB") &&
+          (patch.value === null ||
+            (typeof patch.value === "string" &&
+              ALIGNMENT_OPEN_POINT_AREA_VALUES.includes(
+                patch.value as AlignmentOpenPointArea
+              )))
+        ) {
+          stepEntry.deepDiveArea = patch.value as AlignmentOpenPointArea | null;
+        }
+        break;
+      case "deepDiveFocus":
+        if (allowStaleWorkspaceMerge) {
+          return { ok: false, reason: "stale_conflict" };
+        }
+        if (
+          patch.stepId === "alignment_open_points" &&
+          (role === "founderA" || role === "founderB") &&
+          typeof patch.value === "string"
+        ) {
+          stepEntry.deepDiveFocus = patch.value;
         }
         break;
       case "structuredOutputs":

@@ -16,6 +16,7 @@ export const WORKBOOK_STEP_IDS = [
   "ownership_risk",
   "values_guardrails",
   "alignment_90_days",
+  "alignment_open_points",
   "advisor_closing",
 ] as const;
 
@@ -34,6 +35,8 @@ export type FounderAlignmentWorkbookStepField =
   | "founderB"
   | "agreement"
   | "reflectionNote"
+  | "deepDiveArea"
+  | "deepDiveFocus"
   | "structuredOutputs"
   | "founderAApproved"
   | "founderBApproved"
@@ -41,8 +44,23 @@ export type FounderAlignmentWorkbookStepField =
   | "advisorReplies";
 
 export const WORKBOOK_STRUCTURED_STEP_IDS = WORKBOOK_STEP_IDS.filter(
-  (stepId) => stepId !== "advisor_closing"
-) as readonly Exclude<FounderAlignmentWorkbookStepId, "advisor_closing">[];
+  (stepId) => stepId !== "advisor_closing" && stepId !== "alignment_open_points"
+) as readonly Exclude<
+  FounderAlignmentWorkbookStepId,
+  "advisor_closing" | "alignment_open_points"
+>[];
+
+export const ALIGNMENT_OPEN_POINT_AREA_VALUES = [
+  "company_logic",
+  "decision_logic",
+  "work_structure",
+  "commitment",
+  "risk_orientation",
+  "conflict_style",
+  "values",
+  "other",
+] as const;
+export type AlignmentOpenPointArea = (typeof ALIGNMENT_OPEN_POINT_AREA_VALUES)[number];
 
 export type WorkbookPilotFieldBlock = "core_rule" | "escalation_rule" | "trigger";
 export type WorkbookStructuredOutputType =
@@ -215,6 +233,8 @@ export type FounderAlignmentWorkbookEntry = {
   founderB: string;
   agreement: string;
   reflectionNote?: string;
+  deepDiveArea?: AlignmentOpenPointArea | null;
+  deepDiveFocus?: string;
   structuredOutputs?: WorkbookStructuredOutputsByStep;
   workspaceV2?: FounderAlignmentWorkbookStepWorkspaceV2;
   founderAApproved: boolean;
@@ -373,6 +393,17 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
     ],
   },
   {
+    id: "alignment_open_points",
+    title: "Offene Punkte aus eurem Alignment",
+    subtitle: "Vertieft einen Bereich oder einen selbst beschriebenen Punkt, der euch im Alignment aufgefallen ist.",
+    prompts: [
+      "Wo versteht oder bewertet ihr diesen Punkt möglicherweise unterschiedlich?",
+      "Welche konkrete Erwartung, Erfahrung oder Situation steckt für euch dahinter?",
+      "Was möchtest du von deinem Co-Founder dazu besser verstehen?",
+    ],
+    reportDimensions: [],
+  },
+  {
     id: "advisor_closing",
     title: "Advisor-Abschluss",
     subtitle:
@@ -388,7 +419,8 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
 
 export function resolveFounderAlignmentWorkbookSteps(
   includeValuesStep: boolean,
-  includeAdvisorStep = false
+  includeAdvisorStep = false,
+  includeOpenPointDeepDive = false
 ) {
   return FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter((step) => {
     if (!includeValuesStep && step.id === "values_guardrails") {
@@ -396,6 +428,10 @@ export function resolveFounderAlignmentWorkbookSteps(
     }
 
     if (!includeAdvisorStep && step.id === "advisor_closing") {
+      return false;
+    }
+
+    if (!includeOpenPointDeepDive && step.id === "alignment_open_points") {
       return false;
     }
 
@@ -427,6 +463,8 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
           founderB: "",
           agreement: "",
           reflectionNote: "",
+          deepDiveArea: null,
+          deepDiveFocus: "",
           structuredOutputs: undefined,
           workspaceV2: undefined,
           founderAApproved: false,
@@ -441,7 +479,10 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
 
 export function isWorkbookStructuredStepId(
   stepId: FounderAlignmentWorkbookStepId
-): stepId is Exclude<FounderAlignmentWorkbookStepId, "advisor_closing"> {
+): stepId is Exclude<
+  FounderAlignmentWorkbookStepId,
+  "advisor_closing" | "alignment_open_points"
+> {
   return (WORKBOOK_STRUCTURED_STEP_IDS as readonly string[]).includes(stepId);
 }
 
@@ -887,7 +928,9 @@ export function deriveWorkbookStepMarkers(
   );
 
   const markers = Object.fromEntries(
-    FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter((step) => step.id !== "advisor_closing").map((step) => [
+    FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter(
+      (step) => step.id !== "advisor_closing" && step.id !== "alignment_open_points"
+    ).map((step) => [
       step.id,
       {
         stepId: step.id,
@@ -934,6 +977,8 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         founderB?: unknown;
         agreement?: unknown;
         reflectionNote?: unknown;
+        deepDiveArea?: unknown;
+        deepDiveFocus?: unknown;
         structuredOutputs?: unknown;
         workspaceV2?: unknown;
         founderAApproved?: unknown;
@@ -966,6 +1011,12 @@ export function sanitizeFounderAlignmentWorkbookPayload(
       founderB: typeof source?.founderB === "string" ? source.founderB : "",
       agreement: typeof source?.agreement === "string" ? source.agreement : "",
       reflectionNote: typeof source?.reflectionNote === "string" ? source.reflectionNote : "",
+      deepDiveArea:
+        typeof source?.deepDiveArea === "string" &&
+        ALIGNMENT_OPEN_POINT_AREA_VALUES.includes(source.deepDiveArea as AlignmentOpenPointArea)
+          ? (source.deepDiveArea as AlignmentOpenPointArea)
+          : null,
+      deepDiveFocus: typeof source?.deepDiveFocus === "string" ? source.deepDiveFocus : "",
       structuredOutputs: sanitizeWorkbookStructuredOutputsByStep(step.id, source?.structuredOutputs),
       workspaceV2,
       founderAApproved: source?.founderAApproved === true,
@@ -1027,6 +1078,7 @@ export function deriveFounderAlignmentWorkbookHighlights(
   const prioritizedStepIds = FOUNDER_ALIGNMENT_WORKBOOK_STEPS.filter(
     (step) =>
       step.id !== "advisor_closing" &&
+      step.id !== "alignment_open_points" &&
       step.id !== "alignment_90_days" &&
       step.reportDimensions.some((dimension) =>
         priorityDimensions.includes(normalizeDimensionName(dimension))

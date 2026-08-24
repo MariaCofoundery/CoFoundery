@@ -213,9 +213,9 @@ test("advisor replies persist against legacy founder fields when no workspaceV2 
   );
 });
 
-test("all non-advisor workbook steps expose the five structured output types", () => {
+test("all structured workbook steps expose the five structured output types", () => {
   for (const [stepId, content] of Object.entries(WORKBOOK_STEP_CONTENT)) {
-    if (stepId === "advisor_closing") {
+    if (stepId === "advisor_closing" || stepId === "alignment_open_points") {
       assert.equal(content.outputFields, undefined);
       continue;
     }

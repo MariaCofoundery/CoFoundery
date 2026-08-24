@@ -86,7 +86,11 @@ export default async function FounderAlignmentWorkbookIntroPage({
         properties={{
           role: data.currentUserRole,
           source: data.source,
-          pilotTopics: ["decision_rules", "collaboration_conflict"],
+          pilotTopics: [
+            "decision_rules",
+            "collaboration_conflict",
+            "alignment_open_points",
+          ],
         }}
       />
       <FounderAlignmentWorkbookIntro
@@ -100,6 +104,11 @@ export default async function FounderAlignmentWorkbookIntroPage({
           resolvedInvitationId,
           data.teamContext,
           "collaboration_conflict"
+        )}
+        openPointsHref={buildWorkbookDeepDiveHref(
+          resolvedInvitationId,
+          data.teamContext,
+          "alignment_open_points"
         )}
       />
     </main>

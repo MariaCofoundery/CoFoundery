@@ -18,7 +18,7 @@ export function buildWorkbookIntroHref(invitationId: string, teamContext: TeamCo
 export function buildWorkbookDeepDiveHref(
   invitationId: string,
   teamContext: TeamContext | null,
-  stepId: "decision_rules" | "collaboration_conflict"
+  stepId: "decision_rules" | "collaboration_conflict" | "alignment_open_points"
 ) {
   return `${buildWorkbookHref(invitationId, teamContext)}&deepDiveStep=${encodeURIComponent(stepId)}`;
 }

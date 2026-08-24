@@ -434,6 +434,13 @@ export const WORKBOOK_STEP_CONTENT: Record<
       },
     }),
   },
+  alignment_open_points: {
+    context: [
+      "Waehlt einen Bereich oder beschreibt selbst, welcher Punkt aus eurem Alignment euch beschaeftigt.",
+    ],
+    everyday:
+      "Der Bereich strukturiert nur euer Gespraech und enthaelt keine Bewertung oder Empfehlung.",
+  },
   advisor_closing: {
     context: [
       "Am Ende der Session buendelt der Advisor, was aus externer Sicht nicht verloren gehen sollte.",

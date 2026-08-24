@@ -1,6 +1,7 @@
 import type { AppLocale } from "@/i18n/config";
 import { normalizeLocale } from "@/i18n/config";
 import type {
+  AlignmentOpenPointArea,
   FounderAlignmentWorkbookDiscussionSignal,
   FounderAlignmentWorkbookStepDefinition,
   FounderAlignmentWorkbookStepId,
@@ -45,7 +46,21 @@ export type PremiumWorkbookWorkflowCopy = {
     label: string;
     shortIntro: string;
     whyTitle: string;
-    whyByStep: Record<"decision_rules" | "collaboration_conflict", string>;
+    whyByStep: Record<
+      "decision_rules" | "collaboration_conflict" | "alignment_open_points",
+      string
+    >;
+    openPoint: {
+      selectionTitle: string;
+      selectionHelp: string;
+      selectionPlaceholder: string;
+      areas: Record<AlignmentOpenPointArea, string>;
+      focusTitle: string;
+      focusPlaceholder: string;
+      focusHelp: string;
+      handoffText: string;
+      handoffAction: string;
+    };
     reflectionPhase: string;
     reflectionTitle: string;
     reflectionHelp: string;
@@ -158,7 +173,8 @@ export function getWorkbookContent(locale: string | null | undefined): WorkbookC
 export function resolveWorkbookContentSteps(
   content: WorkbookContent,
   includeValuesStep: boolean,
-  includeAdvisorStep = false
+  includeAdvisorStep = false,
+  includeOpenPointDeepDive = false
 ) {
   return content.steps.filter((step) => {
     if (!includeValuesStep && step.id === "values_guardrails") {
@@ -166,6 +182,10 @@ export function resolveWorkbookContentSteps(
     }
 
     if (!includeAdvisorStep && step.id === "advisor_closing") {
+      return false;
+    }
+
+    if (!includeOpenPointDeepDive && step.id === "alignment_open_points") {
       return false;
     }
 

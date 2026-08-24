@@ -16,7 +16,7 @@ test("active report CTA frames the next step as an alignment deep dive in DE and
   assert.notEqual(enReport.legacy.workbookCta, "Start workbook");
 });
 
-test("intro is a compact three-step guide with two equal direct topics", () => {
+test("intro is a compact three-step guide with three equal direct topics", () => {
   assert.equal(Object.keys(deWorkbook.intro.steps).length, 3);
   assert.deepEqual(Object.keys(deWorkbook.intro.steps), Object.keys(enWorkbook.intro.steps));
   assert.equal(deWorkbook.intro.chooseTopic, "Thema auswählen");
@@ -25,6 +25,10 @@ test("intro is a compact three-step guide with two equal direct topics", () => {
   assert.equal(deWorkbook.intro.topics.collaborationConflict.title, "Konflikt & Zusammenarbeit");
   assert.equal(enWorkbook.intro.topics.decisionRules.title, "Decisions & decision authority");
   assert.equal(enWorkbook.intro.topics.collaborationConflict.title, "Conflict & collaboration");
+  assert.equal(deWorkbook.intro.topics.openPoints.title, "Offene Punkte aus eurem Alignment");
+  assert.equal(enWorkbook.intro.topics.openPoints.title, "Open points from your alignment");
+  assert.equal(deWorkbook.intro.topics.openPoints.action, "Eigenen Punkt vertiefen");
+  assert.equal(enWorkbook.intro.topics.openPoints.action, "Explore your own point");
 });
 
 test("each topic opens its deep dive independently through the existing safe route", () => {
@@ -34,10 +38,17 @@ test("each topic opens its deep dive independently through the existing safe rou
     "pre_founder",
     "collaboration_conflict"
   );
+  const openPointHref = buildWorkbookDeepDiveHref(
+    "invite 1",
+    "pre_founder",
+    "alignment_open_points"
+  );
   assert.match(decisionHref, /invitationId=invite%201/u);
   assert.match(decisionHref, /deepDiveStep=decision_rules/u);
   assert.match(conflictHref, /deepDiveStep=collaboration_conflict/u);
+  assert.match(openPointHref, /deepDiveStep=alignment_open_points/u);
   assert.notEqual(decisionHref, conflictHref);
+  assert.notEqual(conflictHref, openPointHref);
 });
 
 test("started workbooks keep the topic overview and deep dives return to it", () => {

@@ -34,6 +34,31 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
           "Entscheidungen werden nicht nur durch Regeln geprägt, sondern auch dadurch, was jede Person braucht, um Einfluss, Zuständigkeit und Fairness zu erleben.",
         collaboration_conflict:
           "Schwierige Situationen werden leichter besprechbar, wenn ihr versteht, wie ihr Belastung, Feedback und den Weg zurück in die Zusammenarbeit erlebt.",
+        alignment_open_points:
+          "Waehlt einen Bereich oder beschreibt selbst, welcher Punkt aus eurem Alignment euch besonders aufgefallen ist.",
+      },
+      openPoint: {
+        selectionTitle: "Was ist euch aufgefallen?",
+        selectionHelp:
+          "Die Auswahl strukturiert nur euer Gespraech. Sie bewertet den Punkt nicht.",
+        selectionPlaceholder: "Bereich auswaehlen",
+        areas: {
+          company_logic: "Unternehmenslogik",
+          decision_logic: "Entscheidungslogik",
+          work_structure: "Arbeitsstruktur & Zusammenarbeit",
+          commitment: "Commitment",
+          risk_orientation: "Risikoorientierung",
+          conflict_style: "Konfliktstil",
+          values: "Werte",
+          other: "Anderer Punkt",
+        },
+        focusTitle: "Was genau moechtet ihr dazu besprechen?",
+        focusPlaceholder: "Beschreibt kurz, welcher konkrete Punkt euch beschaeftigt.",
+        focusHelp:
+          "Formuliert euren Gespraechsfokus in eigenen Worten. Daraus wird keine Bewertung oder automatische Vereinbarung abgeleitet.",
+        handoffText:
+          "Moechtet ihr daraus etwas fuer eure Zusammenarbeit festhalten? Im Founder Setup koennt ihr den passenden Punkt gemeinsam weiterbearbeiten.",
+        handoffAction: "Im Founder Setup weiterfuehren",
       },
       reflectionPhase: "Reflexion",
       reflectionTitle: "Was moechtet ihr daraus festhalten?",
@@ -362,6 +387,24 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
           "Legt fest, wie ihr mit neuen Themen umgeht und wie ihr entscheidet, was dafuer angepasst oder verschoben wird.",
         reviewTrigger:
           "Prueft euren Fokus zum vereinbarten Termin oder wenn sich Ziele, Kapazitaet oder Rahmenbedingungen wesentlich veraendern.",
+      },
+    },
+    alignment_open_points: {
+      question: "Was ist dir an diesem Punkt besonders aufgefallen oder wichtig?",
+      collectPlaceholder: "Beschreibe deine eigene Sicht auf den gewaehlten Punkt.",
+      collectHelper:
+        "Bleib bei deiner Perspektive. Ihr koennt die Sichtweisen anschliessend gemeinsam betrachten.",
+      agreementTitle: "Gemeinsame Reflexion",
+      reviewSummary: "Reflexion ansehen",
+      impulseQuestions: [
+        "Wo versteht oder bewertet ihr diesen Punkt moeglicherweise unterschiedlich?",
+        "Welche konkrete Erwartung, Erfahrung oder Situation steckt fuer euch dahinter?",
+        "Was moechtest du von deinem Co-Founder dazu besser verstehen?",
+      ],
+      suggestion: {
+        agreement: "",
+        escalationRule: "",
+        reviewTrigger: "",
       },
     },
   },

@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { buildEmptyFounderAlignmentWorkbookPayload, sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
+import {
+  buildEmptyFounderAlignmentWorkbookPayload,
+  sanitizeFounderAlignmentWorkbookPayload,
+} from "@/features/reporting/founderAlignmentWorkbook";
 import { getWorkbookContent } from "@/features/reporting/workbookContent/workbookContent";
 import {
   getWorkbookDeepDiveHandoffState,
   getWorkbookDeepDiveSetupKey,
+  getAlignmentOpenPointAreas,
   hasLegacyWorkbookAgreement,
 } from "@/features/reporting/workbookDeepDivePilot";
 
@@ -39,6 +43,72 @@ test("the two pilot topics use the new DE/EN deep-dive contract", () => {
 test("pilot mappings target exactly one Founder Setup item", () => {
   assert.equal(getWorkbookDeepDiveSetupKey("decision_rules"), "decision_rights");
   assert.equal(getWorkbookDeepDiveSetupKey("collaboration_conflict"), "conflict_deadlock");
+  assert.equal(getWorkbookDeepDiveSetupKey("alignment_open_points"), null);
+});
+
+test("the fixed open-point deep dive is neutral, locale-aware, and has exactly three prompts", () => {
+  const de = getWorkbookContent("de");
+  const en = getWorkbookContent("en");
+  const deStep = de.steps.find((step) => step.id === "alignment_open_points");
+  const enStep = en.steps.find((step) => step.id === "alignment_open_points");
+
+  assert.equal(deStep?.title, "Offene Punkte aus eurem Alignment");
+  assert.equal(enStep?.title, "Open points from your alignment");
+  assert.equal(
+    de.premiumSteps.alignment_open_points.question,
+    "Was ist dir an diesem Punkt besonders aufgefallen oder wichtig?"
+  );
+  assert.equal(
+    en.premiumSteps.alignment_open_points.question,
+    "What particularly stood out to you or matters to you about this point?"
+  );
+  assert.equal(de.premiumSteps.alignment_open_points.impulseQuestions.length, 3);
+  assert.equal(en.premiumSteps.alignment_open_points.impulseQuestions.length, 3);
+  assert.deepEqual(getAlignmentOpenPointAreas(false), [
+    "company_logic",
+    "decision_logic",
+    "work_structure",
+    "commitment",
+    "risk_orientation",
+    "conflict_style",
+    "other",
+  ]);
+  assert.equal(getAlignmentOpenPointAreas(true).includes("values"), true);
+  assert.equal(de.premiumWorkflow.deepDivePilot.openPoint.areas.values, "Werte");
+  assert.equal(en.premiumWorkflow.deepDivePilot.openPoint.areas.values, "Values");
+});
+
+test("open-point selection and focus round-trip without changing agreement semantics", () => {
+  const payload = buildEmptyFounderAlignmentWorkbookPayload();
+  payload.steps.alignment_open_points.deepDiveArea = "conflict_style";
+  payload.steps.alignment_open_points.deepDiveFocus = "Wie gehen wir mit Pausen um?";
+  payload.steps.alignment_open_points.reflectionNote = "Wir sprechen Pausen explizit ab.";
+
+  const sanitized = sanitizeFounderAlignmentWorkbookPayload(payload);
+  assert.equal(sanitized.steps.alignment_open_points.deepDiveArea, "conflict_style");
+  assert.equal(
+    sanitized.steps.alignment_open_points.deepDiveFocus,
+    "Wie gehen wir mit Pausen um?"
+  );
+  assert.equal(
+    sanitized.steps.alignment_open_points.reflectionNote,
+    "Wir sprechen Pausen explizit ab."
+  );
+  assert.equal(sanitized.steps.alignment_open_points.agreement, "");
+  assert.equal(sanitized.steps.alignment_open_points.founderAApproved, false);
+  assert.equal(sanitized.steps.alignment_open_points.founderBApproved, false);
+
+  const invalid = sanitizeFounderAlignmentWorkbookPayload({
+    ...payload,
+    steps: {
+      ...payload.steps,
+      alignment_open_points: {
+        ...payload.steps.alignment_open_points,
+        deepDiveArea: "critical_risk",
+      },
+    },
+  });
+  assert.equal(invalid.steps.alignment_open_points.deepDiveArea, null);
 });
 
 test("reflection notes are additive and preserve historical agreement semantics", () => {
@@ -118,4 +188,12 @@ test("pilot topics render as focused linear deep dives with an always-present se
   assert.match(client, /continueWithTeam/u);
   assert.match(client, /currentStepIsDeepDivePilot \? "xl:grid-cols-1"/u);
   assert.match(client, /readStructuredOutputValue\(currentStepStructuredOutputs, field\.key\)/u);
+  assert.match(client, /getAlignmentOpenPointAreas\(showValuesStep\)/u);
+  assert.match(client, /updateEntry\("deepDiveFocus", value\)/u);
+  assert.match(client, /currentOpenPointDestinationHref/u);
+  assert.match(client, /openPoint\.handoffAction/u);
+  assert.doesNotMatch(
+    readFileSync("src/features/reporting/workbookDeepDiveHandoffActions.ts", "utf8"),
+    /alignment_open_points[\s\S]*handoff_workbook_deep_dive_note_if_empty/u
+  );
 });

@@ -79,8 +79,14 @@ test("all eight premium questions and shared intros have symmetric DE and EN con
   const de = getWorkbookContent("de");
   const en = getWorkbookContent("en");
 
-  assert.deepEqual(Object.keys(de.premiumSteps), premiumStepIds);
-  assert.deepEqual(Object.keys(en.premiumSteps), premiumStepIds);
+  assert.deepEqual(
+    Object.keys(de.premiumSteps).filter((stepId) => stepId !== "alignment_open_points"),
+    premiumStepIds
+  );
+  assert.deepEqual(
+    Object.keys(en.premiumSteps).filter((stepId) => stepId !== "alignment_open_points"),
+    premiumStepIds
+  );
   for (const stepId of premiumStepIds) {
     assert.equal(de.premiumSteps[stepId].question, expectedQuestions.de[stepId]);
     assert.equal(en.premiumSteps[stepId].question, expectedQuestions.en[stepId]);

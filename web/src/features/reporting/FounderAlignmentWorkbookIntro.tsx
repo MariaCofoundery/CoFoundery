@@ -8,6 +8,7 @@ type Props = {
   reportHref: string;
   decisionRulesHref: string;
   collaborationConflictHref: string;
+  openPointsHref: string;
   dashboardHref?: string;
 };
 
@@ -15,6 +16,7 @@ export function FounderAlignmentWorkbookIntro({
   reportHref,
   decisionRulesHref,
   collaborationConflictHref,
+  openPointsHref,
   dashboardHref = "/dashboard",
 }: Props) {
   const wt = useTranslations("workbook");
@@ -38,6 +40,13 @@ export function FounderAlignmentWorkbookIntro({
       href: collaborationConflictHref,
       title: wt("intro.topics.collaborationConflict.title"),
       description: wt("intro.topics.collaborationConflict.description"),
+    },
+    {
+      key: "alignment_open_points",
+      href: openPointsHref,
+      title: wt("intro.topics.openPoints.title"),
+      description: wt("intro.topics.openPoints.description"),
+      action: wt("intro.topics.openPoints.action"),
     },
   ];
 
@@ -70,7 +79,7 @@ export function FounderAlignmentWorkbookIntro({
         <h2 className="text-2xl font-semibold tracking-[-0.02em] text-slate-950">
           {wt("intro.topics.title")}
         </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
           {topics.map((topic) => (
             <article
               key={topic.key}
@@ -79,7 +88,9 @@ export function FounderAlignmentWorkbookIntro({
               <h3 className="text-lg font-semibold text-slate-950">{topic.title}</h3>
               <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">{topic.description}</p>
               <div className="mt-5">
-                <ReportActionButton href={topic.href}>{wt("intro.topics.open")}</ReportActionButton>
+                <ReportActionButton href={topic.href}>
+                  {topic.action ?? wt("intro.topics.open")}
+                </ReportActionButton>
               </div>
             </article>
           ))}

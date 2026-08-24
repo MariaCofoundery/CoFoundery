@@ -64,11 +64,13 @@ test("workbook core chrome messages are complete and parallel", () => {
   }
 });
 
-test("intro presents both deep-dive pilots as equal direct choices", () => {
+test("intro presents all three deep-dive pilots as equal direct choices", () => {
   assert.match(introSource, /decisionRulesHref/u);
   assert.match(introSource, /collaborationConflictHref/u);
+  assert.match(introSource, /openPointsHref/u);
   assert.match(introSource, /intro\.topics\.decisionRules\.title/u);
   assert.match(introSource, /intro\.topics\.collaborationConflict\.title/u);
+  assert.match(introSource, /intro\.topics\.openPoints\.title/u);
   assert.doesNotMatch(introSource, /prioritizedStepIds|suggestedTopics/u);
   assert.equal(
     getWorkbookContent("de").steps.find((step) => step.id === "decision_rules")?.title,

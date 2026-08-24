@@ -50,6 +50,11 @@
         "title": "Conflict & collaboration",
         "description": "What do you need when working together becomes difficult, and how do you reconnect after tension?"
       },
+      "openPoints": {
+        "title": "Open points from your alignment",
+        "description": "Did something in your report stand out that you would like to discuss in more depth? Choose an area or describe what is on your mind.",
+        "action": "Explore your own point"
+      },
       "open": "Explore"
     },
     "later": "Start later"

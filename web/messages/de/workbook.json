@@ -50,6 +50,11 @@
         "title": "Konflikt & Zusammenarbeit",
         "description": "Was braucht ihr, wenn Zusammenarbeit schwierig wird – und wie findet ihr nach Spannungen wieder zusammen?"
       },
+      "openPoints": {
+        "title": "Offene Punkte aus eurem Alignment",
+        "description": "Ist euch im Report etwas aufgefallen, das ihr genauer besprechen möchtet? Wählt einen Bereich oder beschreibt selbst, was euch beschäftigt.",
+        "action": "Eigenen Punkt vertiefen"
+      },
       "open": "Vertiefen"
     },
     "later": "Später starten"

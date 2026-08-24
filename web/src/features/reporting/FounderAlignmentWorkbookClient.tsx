@@ -61,6 +61,7 @@ import {
   type FounderAlignmentWorkbookDiscussionReaction,
   type FounderAlignmentWorkbookDiscussionSignal,
   type FounderAlignmentWorkbookAdvisorReply,
+  type AlignmentOpenPointArea,
   type WorkbookStepMarkersByStep,
   type WorkbookStructuredOutputsByStep,
   type WorkbookStructuredStepOutputs,
@@ -92,6 +93,7 @@ import {
 } from "@/features/reporting/workbookReactionPresentation";
 import { handoffWorkbookDeepDiveReflectionToFounderSetup } from "@/features/reporting/workbookDeepDiveHandoffActions";
 import {
+  getAlignmentOpenPointAreas,
   getWorkbookDeepDiveHandoffState,
   getWorkbookDeepDiveSetupKey,
   hasLegacyWorkbookAgreement,
@@ -138,6 +140,7 @@ type WorkbookEditableField =
   | "founderB"
   | "agreement"
   | "reflectionNote"
+  | "deepDiveFocus"
   | "advisorNotes";
 type WorkbookStructuredOutputValue = WorkbookStructuredStepOutputs;
 type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
@@ -171,6 +174,7 @@ const PREMIUM_WORKBOOK_V2_STEP_IDS = [
   "ownership_risk",
   "values_guardrails",
   "alignment_90_days",
+  "alignment_open_points",
 ] as const;
 type PremiumWorkbookV2StepId = (typeof PREMIUM_WORKBOOK_V2_STEP_IDS)[number];
 const LIGHT_PREMIUM_WORKBOOK_V2_STEP_IDS: ReadonlyArray<PremiumWorkbookV2StepId> = [
@@ -499,6 +503,21 @@ const PREMIUM_WORKBOOK_V2_CONFIG: Record<PremiumWorkbookV2StepId, PremiumWorkboo
     rulePreviewDetail:
       "So bleibt der Abschluss fokussiert und wird nicht zur naechsten Aufgabenliste.",
   },
+  alignment_open_points: {
+    collectIntro: "Bringt eure Perspektiven auf den selbst gewaehlten Punkt ein.",
+    collectPlaceholder: "Beschreibe, was dir an diesem Punkt auffaellt oder wichtig ist.",
+    weightingIntro: "Schaut euch eure Perspektiven an und ordnet sie jeweils fuer euch ein.",
+    ruleIntro: "Haltet fest, was ihr aus dem Gespraech mitnehmt.",
+    agreementPlaceholder: "",
+    escalationTitle: "",
+    escalationPlaceholder: "",
+    escalationHelper: "",
+    reviewTitle: "",
+    reviewPlaceholder: "",
+    reviewHelper: "",
+    rulePreviewSummary: "",
+    rulePreviewDetail: "",
+  },
 };
 
 function isPremiumWorkbookV2StepId(stepId: FounderAlignmentWorkbookStepId): stepId is PremiumWorkbookV2StepId {
@@ -613,6 +632,12 @@ const AGREEMENT_DRAFT_META: Record<
       { label: "konkrete Verantwortung", keywords: ["verantwort", "owner", "zustaendig", "zuordnen"] },
       { label: "messbare Umsetzung", keywords: ["sichtbar", "messbar", "umsetzung", "ergebnis"] },
     ],
+  },
+  alignment_open_points: {
+    fallbackSharedThemes: [],
+    differenceFocus: "",
+    ruleFocus: "",
+    themeSignals: [],
   },
   advisor_closing: {
     fallbackSharedThemes: ["eine klare Aussenperspektive", "konkrete Abschlussimpulse"],
@@ -1059,8 +1084,14 @@ export function FounderAlignmentWorkbookClient({
     workbook.advisorId || advisorInviteState.advisorLinked || currentUserRole === "advisor"
   );
   const visibleSteps = useMemo(
-    () => resolveWorkbookContentSteps(workbookContent, showValuesStep, hasActiveAdvisor),
-    [hasActiveAdvisor, showValuesStep, workbookContent]
+    () =>
+      resolveWorkbookContentSteps(
+        workbookContent,
+        showValuesStep,
+        hasActiveAdvisor,
+        workbook.currentStepId === "alignment_open_points"
+      ),
+    [hasActiveAdvisor, showValuesStep, workbook.currentStepId, workbookContent]
   );
   const activeStepId = visibleSteps.some((step) => step.id === workbook.currentStepId)
     ? workbook.currentStepId
@@ -1263,9 +1294,17 @@ export function FounderAlignmentWorkbookClient({
   const currentDeepDiveSetupKey = currentDeepDivePilotStepId
     ? getWorkbookDeepDiveSetupKey(currentDeepDivePilotStepId)
     : null;
-  const currentDeepDiveHandoffState = currentDeepDivePilotStepId
-    ? getWorkbookDeepDiveHandoffState(deepDiveHandoffState, currentDeepDivePilotStepId)
+  const currentStepIsOpenPointDeepDive = currentDeepDivePilotStepId === "alignment_open_points";
+  const currentDeepDiveHandoffState =
+    currentDeepDivePilotStepId && currentDeepDiveSetupKey
+    ? getWorkbookDeepDiveHandoffState(
+        deepDiveHandoffState,
+        currentDeepDivePilotStepId as "decision_rules" | "collaboration_conflict"
+      )
     : "unavailable";
+  const currentDeepDiveSetupOverviewHref = deepDiveHandoffState
+    ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}/setup`
+    : null;
   const currentDeepDiveSetupHref =
     deepDiveHandoffState && currentDeepDiveSetupKey
       ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}/setup/${encodeURIComponent(
@@ -1273,6 +1312,7 @@ export function FounderAlignmentWorkbookClient({
         )}`
       : null;
   const currentDeepDiveDestinationHref = currentDeepDiveSetupHref ?? "/connections";
+  const currentOpenPointDestinationHref = currentDeepDiveSetupOverviewHref ?? "/connections";
   const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
   const currentStepMissingStructuredKeys =
@@ -1997,6 +2037,25 @@ export function FounderAlignmentWorkbookClient({
     }));
   }
 
+  function updateDeepDiveArea(value: AlignmentOpenPointArea | null) {
+    if (!canEditField("deepDiveFocus")) return;
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setWorkbook((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activeStepId]: {
+          ...current.steps[activeStepId],
+          deepDiveArea: value,
+        },
+      },
+    }));
+  }
+
   function updateWorkspaceV2(
     workspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined
   ) {
@@ -2594,6 +2653,7 @@ export function FounderAlignmentWorkbookClient({
     if (
       !invitationId ||
       !currentDeepDivePilotStepId ||
+      !currentDeepDiveSetupKey ||
       currentDeepDiveHandoffState !== "two_founder_ready" ||
       !(currentStepEntry.reflectionNote?.trim())
     ) {
@@ -4100,6 +4160,68 @@ export function FounderAlignmentWorkbookClient({
                         ? wt("client.premium.intro.advisor")
                         : wt("client.premium.intro.founder")}
                     </p>
+
+                    {currentStepIsOpenPointDeepDive ? (
+                      <div className="mt-6 grid gap-5 rounded-[24px] border border-slate-200/80 bg-white/80 p-5 sm:p-6">
+                        <div>
+                          <label
+                            htmlFor="alignment-open-point-area"
+                            className="text-sm font-semibold text-slate-950"
+                          >
+                            {systemText(
+                              workbookContent.premiumWorkflow.deepDivePilot.openPoint.selectionTitle
+                            )}
+                          </label>
+                          <p className="mt-1 text-xs leading-5 text-slate-600">
+                            {systemText(
+                              workbookContent.premiumWorkflow.deepDivePilot.openPoint.selectionHelp
+                            )}
+                          </p>
+                          <select
+                            id="alignment-open-point-area"
+                            value={currentStepEntry.deepDiveArea ?? ""}
+                            onChange={(event) =>
+                              updateDeepDiveArea(
+                                event.target.value
+                                  ? (event.target.value as AlignmentOpenPointArea)
+                                  : null
+                              )
+                            }
+                            disabled={!canEditField("deepDiveFocus")}
+                            className="mt-3 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-violet-500 focus-visible:ring-2 focus-visible:ring-violet-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                          >
+                            <option value="">
+                              {systemText(
+                                workbookContent.premiumWorkflow.deepDivePilot.openPoint.selectionPlaceholder
+                              )}
+                            </option>
+                            {getAlignmentOpenPointAreas(showValuesStep).map((area) => (
+                              <option key={area} value={area}>
+                                {systemText(
+                                  workbookContent.premiumWorkflow.deepDivePilot.openPoint.areas[area]
+                                )}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <WorkbookField
+                          title={systemText(
+                            workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusTitle
+                          )}
+                          value={currentStepEntry.deepDiveFocus ?? ""}
+                          onChange={(value) => updateEntry("deepDiveFocus", value)}
+                          placeholder={systemText(
+                            workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusPlaceholder
+                          )}
+                          helperText={systemText(
+                            workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusHelp
+                          )}
+                          readOnly={!canEditField("deepDiveFocus")}
+                          rows={3}
+                          minHeightClassName="min-h-[108px]"
+                        />
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className={currentStepIsDeepDivePilot ? "hidden" : "mt-6 space-y-3"}>
@@ -4653,7 +4775,9 @@ export function FounderAlignmentWorkbookClient({
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-slate-700">
                           {systemText(
-                            currentDeepDiveHandoffState === "two_founder_ready"
+                            currentStepIsOpenPointDeepDive
+                              ? workbookContent.premiumWorkflow.deepDivePilot.openPoint.handoffText
+                              : currentDeepDiveHandoffState === "two_founder_ready"
                               ? workbookContent.premiumWorkflow.deepDivePilot.handoffReady
                               : currentDeepDiveHandoffState === "existing_note"
                                 ? workbookContent.premiumWorkflow.deepDivePilot.existingNote
@@ -4662,7 +4786,7 @@ export function FounderAlignmentWorkbookClient({
                                   : workbookContent.premiumWorkflow.deepDivePilot.unavailable
                           )}
                         </p>
-                        {deepDiveHandoffResult !== "idle" ? (
+                        {!currentStepIsOpenPointDeepDive && deepDiveHandoffResult !== "idle" ? (
                           <p
                             role="status"
                             className={`mt-3 text-sm ${
@@ -4679,7 +4803,7 @@ export function FounderAlignmentWorkbookClient({
                           </p>
                         ) : null}
                         <div className="mt-4 flex flex-wrap gap-3">
-                          {currentDeepDiveHandoffState === "two_founder_ready" ? (
+                          {!currentStepIsOpenPointDeepDive && currentDeepDiveHandoffState === "two_founder_ready" ? (
                             <ReportActionButton
                               type="button"
                               onClick={handoffDeepDiveReflection}
@@ -4693,7 +4817,16 @@ export function FounderAlignmentWorkbookClient({
                               )}
                             </ReportActionButton>
                           ) : null}
-                          {currentDeepDiveHandoffState !== "two_founder_ready" ? (
+                          {currentStepIsOpenPointDeepDive ? (
+                            <Link
+                              href={currentOpenPointDestinationHref}
+                              className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                            >
+                              {systemText(
+                                workbookContent.premiumWorkflow.deepDivePilot.openPoint.handoffAction
+                              )}
+                            </Link>
+                          ) : currentDeepDiveHandoffState !== "two_founder_ready" ? (
                             <Link
                               href={currentDeepDiveDestinationHref}
                               className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
@@ -7197,6 +7330,22 @@ function buildWorkbookPatches(
         stepId,
         field: "reflectionNote",
         value: nextStep.reflectionNote ?? "",
+      });
+    }
+    if ((previousStep.deepDiveArea ?? null) !== (nextStep.deepDiveArea ?? null)) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "deepDiveArea",
+        value: nextStep.deepDiveArea ?? null,
+      });
+    }
+    if ((previousStep.deepDiveFocus ?? "") !== (nextStep.deepDiveFocus ?? "")) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "deepDiveFocus",
+        value: nextStep.deepDiveFocus ?? "",
       });
     }
     if (

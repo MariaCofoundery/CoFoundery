@@ -166,6 +166,18 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       ],
     },
     {
+      id: "alignment_open_points",
+      title: "Open points from your alignment",
+      subtitle:
+        "Explore an area or a point you describe yourselves that stood out in your alignment.",
+      prompts: [
+        "Where might you understand or assess this point differently?",
+        "Which specific expectation, experience, or situation sits behind it for each of you?",
+        "What would you like to understand better about your co-founder's perspective?",
+      ],
+      reportDimensions: [],
+    },
+    {
       id: "advisor_closing",
       title: "Advisor closing",
       subtitle: "Which observations, open questions, and next steps should the advisor make visible at the end?",
@@ -531,6 +543,13 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
         },
       }),
     },
+    alignment_open_points: {
+      context: [
+        "Choose an area or describe the point from your alignment that is on your mind.",
+      ],
+      everyday:
+        "The area only structures your conversation and does not contain an assessment or recommendation.",
+    },
     advisor_closing: {
       context: [
         "At the end of the session, the advisor brings together what should not get lost from an outside perspective.",
@@ -569,6 +588,31 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
           "Decisions are shaped not only by rules, but also by what each person needs in order to experience influence, ownership, and fairness.",
         collaboration_conflict:
           "Difficult situations become easier to discuss when you understand how each of you experiences pressure, feedback, and the way back into collaboration.",
+        alignment_open_points:
+          "Choose an area or describe the point from your alignment that particularly stood out to you.",
+      },
+      openPoint: {
+        selectionTitle: "What stood out to you?",
+        selectionHelp:
+          "This selection only structures your conversation. It does not assess the point.",
+        selectionPlaceholder: "Choose an area",
+        areas: {
+          company_logic: "Company logic",
+          decision_logic: "Decision logic",
+          work_structure: "Work structure & collaboration",
+          commitment: "Commitment",
+          risk_orientation: "Risk orientation",
+          conflict_style: "Conflict style",
+          values: "Values",
+          other: "Another point",
+        },
+        focusTitle: "What exactly would you like to discuss?",
+        focusPlaceholder: "Briefly describe the specific point that is on your mind.",
+        focusHelp:
+          "Describe your conversation focus in your own words. It does not create an assessment or automatic agreement.",
+        handoffText:
+          "Would you like to capture something from this for your collaboration? In Founder Setup, you can continue working on the appropriate point together.",
+        handoffAction: "Continue in Founder Setup",
       },
       reflectionPhase: "Reflection",
       reflectionTitle: "What would you like to take forward from this?",
@@ -898,6 +942,24 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
           "Define how you will handle new topics and decide what to adjust or postpone in response.",
         reviewTrigger:
           "Review your focus at the agreed time or when goals, capacity, or circumstances change substantially.",
+      },
+    },
+    alignment_open_points: {
+      question: "What particularly stood out to you or matters to you about this point?",
+      collectPlaceholder: "Describe your own perspective on the point you selected.",
+      collectHelper:
+        "Stay with your perspective first. You can look at both viewpoints together afterwards.",
+      agreementTitle: "Shared reflection",
+      reviewSummary: "Review reflection",
+      impulseQuestions: [
+        "Where might you understand or assess this point differently?",
+        "Which specific expectation, experience, or situation sits behind it for each of you?",
+        "What would you like to understand better about your co-founder's perspective?",
+      ],
+      suggestion: {
+        agreement: "",
+        escalationRule: "",
+        reviewTrigger: "",
       },
     },
   },
