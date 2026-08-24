@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   AdvisorReportPreview,
@@ -25,6 +26,7 @@ type Props = {
   savedSectionKey: AdvisorImpulseSectionKey | null;
   saveAction: (formData: FormData) => void | Promise<void>;
   locale: string;
+  founderSetupSection?: ReactNode;
   copy: {
     backToDashboard: string;
     openWorkbook: string;
@@ -61,6 +63,7 @@ export function AdvisorReportProductView({
   savedSectionKey,
   saveAction,
   locale,
+  founderSetupSection = null,
   copy,
 }: Props) {
   const impulseSectionMeta = getAdvisorImpulseSectionMeta(locale);
@@ -90,28 +93,35 @@ export function AdvisorReportProductView({
   );
 
   const appendix = (
-    <section id="advisor-impulses" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="max-w-3xl">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-          {copy.impulsesEyebrow}
-        </p>
-        <h2 className="mt-2 text-lg font-semibold text-slate-950">{copy.impulsesTitle}</h2>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          {copy.impulsesText}
-        </p>
-      </div>
+    <div className="grid gap-6">
+      {founderSetupSection}
+      <section
+        id="advisor-impulses"
+        className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      >
+        <div className="max-w-3xl">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+            {copy.impulsesEyebrow}
+          </p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-950">
+            {copy.impulsesTitle}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            {copy.impulsesText}
+          </p>
+        </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        {ADVISOR_IMPULSE_SECTION_ORDER.map((sectionKey) => {
-          const meta = impulseSectionMeta[sectionKey];
-          const impulse = impulses[sectionKey];
-          const savedLabel = formatSavedLabel(impulse?.updatedAt ?? null, locale);
-          return (
-            <form
-              key={sectionKey}
-              action={saveAction}
-              className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
-            >
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {ADVISOR_IMPULSE_SECTION_ORDER.map((sectionKey) => {
+            const meta = impulseSectionMeta[sectionKey];
+            const impulse = impulses[sectionKey];
+            const savedLabel = formatSavedLabel(impulse?.updatedAt ?? null, locale);
+            return (
+              <form
+                key={sectionKey}
+                action={saveAction}
+                className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
+              >
               <input type="hidden" name="invitationId" value={invitationId} />
               <input type="hidden" name="teamContext" value={teamContext} />
               <input type="hidden" name="sectionKey" value={sectionKey} />
@@ -143,11 +153,12 @@ export function AdvisorReportProductView({
                   {copy.save}
                 </button>
               </div>
-            </form>
-          );
-        })}
-      </div>
-    </section>
+              </form>
+            );
+          })}
+        </div>
+      </section>
+    </div>
   );
 
   return (

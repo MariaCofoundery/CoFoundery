@@ -109,6 +109,26 @@
     "summary": "{clarified} captured · {discussing} being discussed · {open} open · {pending} confirmations open",
     "legalGeneral": "CoFoundery helps you structure topics for discussion and clarification. The specific legal or tax implementation may require professional advice.",
     "legalSpecific": "The specific legal or tax implementation of this topic may require professional advice.",
+    "advisorAccess": {
+      "title": "Share Founder Setup with an advisor",
+      "description": "The advisor can read only your jointly confirmed Founder Setup content. Working notes and open proposals remain private.",
+      "advisorFallback": "Advisor {index}",
+      "notShared": "Not shared with this advisor yet.",
+      "pending": "Approval from all current founders is not yet complete.",
+      "active": "The jointly confirmed content is shared with this advisor.",
+      "activeBadge": "Shared with advisor",
+      "approved": "Approved",
+      "approvalOpen": "Approval open",
+      "share": "Propose access",
+      "approve": "Approve",
+      "revoke": "End access"
+    },
+    "advisorView": {
+      "title": "Founder Setup",
+      "subtitle": "Points jointly confirmed by the founder team.",
+      "documentationReference": "Recorded in",
+      "confirmedAt": "Jointly confirmed on {date}"
+    },
     "categories": {
       "collaboration": "Collaboration",
       "money_equity": "Money & equity",

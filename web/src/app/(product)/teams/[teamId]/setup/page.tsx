@@ -6,6 +6,8 @@ import { FOUNDER_SETUP_CATEGORY_KEYS } from "@/features/teams/founderSetupCatalo
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
+import { FounderSetupAdvisorAccessPanel } from "@/features/teams/FounderSetupAdvisorAccessPanel";
+import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvisorAccessData";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 
 type Props = { params: Promise<{ teamId: string }> };
@@ -17,6 +19,7 @@ export default async function FounderSetupPage({ params }: Props) {
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) notFound();
+  const advisorAccess = await getFounderSetupAdvisorAccess(teamId, supabase);
   const [t, navigationT] = await Promise.all([
     getTranslations("teams.setup"),
     getTranslations("teams.teamNavigation"),
@@ -93,6 +96,12 @@ export default async function FounderSetupPage({ params }: Props) {
           </section>
         ))}
       </div>
+      <FounderSetupAdvisorAccessPanel
+        teamId={teamId}
+        currentUserId={user.id}
+        members={setup.members}
+        access={advisorAccess}
+      />
       <p className="mt-8 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("legalGeneral")}</p>
     </main>
   );

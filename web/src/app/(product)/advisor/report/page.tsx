@@ -16,6 +16,7 @@ import {
   type AdvisorImpulseSectionKey,
 } from "@/features/reporting/advisorSectionImpulses";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { AdvisorFounderSetupSection } from "@/features/teams/AdvisorFounderSetupSection";
 
 function isAdvisorImpulseSectionKey(value: string): value is AdvisorImpulseSectionKey {
   return (ADVISOR_IMPULSE_SECTION_ORDER as readonly string[]).includes(value);
@@ -240,6 +241,11 @@ export default async function AdvisorReportPage({
         savedSectionKey={savedSectionKey}
         saveAction={saveImpulseAction}
         locale={locale}
+        founderSetupSection={
+          data.founderSetupItems.length > 0 ? (
+            <AdvisorFounderSetupSection items={data.founderSetupItems} locale={locale} />
+          ) : null
+        }
         copy={{
           backToDashboard: t("report.backToDashboard"),
           openWorkbook: t("report.openWorkbook"),

@@ -29,6 +29,8 @@ import {
   createPrivilegedAccessClient,
   syncRelationshipAdvisorFromLegacyInvitation,
 } from "@/features/reporting/relationshipAdvisorAccess";
+import { getAdvisorConfirmedFounderSetup } from "@/features/teams/founderSetupAdvisorAccessData";
+import type { AdvisorConfirmedFounderSetupItem } from "@/features/teams/founderSetupAdvisorAccessModel";
 
 type InvitationReportContextRow = {
   id: string;
@@ -119,6 +121,7 @@ export type AdvisorReportPageData =
       impulses: Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
       workbookHref: string;
       snapshotHref: string;
+      founderSetupItems: AdvisorConfirmedFounderSetupItem[];
       debugMeta?: AdvisorReportDebugMeta;
     };
 
@@ -610,6 +613,7 @@ export async function getAdvisorReportPageData(
   }
 
   const teamContext = normalizeAdvisorTeamContext(invitation.team_context);
+  const founderSetupItems = await getAdvisorConfirmedFounderSetup(relationshipId, supabase);
 
   return {
     status: "ready",
@@ -622,6 +626,7 @@ export async function getAdvisorReportPageData(
     impulses: impulseMap,
     workbookHref: buildAdvisorWorkbookHref(normalizedInvitationId, teamContext),
     snapshotHref: buildAdvisorSnapshotHref(normalizedInvitationId, teamContext),
+    founderSetupItems,
     debugMeta: {
       requestedInvitationId: normalizedInvitationId,
       userId: user.id,

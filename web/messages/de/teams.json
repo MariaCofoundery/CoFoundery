@@ -109,6 +109,26 @@
     "summary": "{clarified} festgehalten · {discussing} in Klärung · {open} offen · {pending} Bestätigungen offen",
     "legalGeneral": "CoFoundery hilft euch, Gesprächs- und Klärungspunkte zu strukturieren. Die konkrete rechtliche oder steuerliche Ausgestaltung kann professionelle Beratung erfordern.",
     "legalSpecific": "Die konkrete rechtliche oder steuerliche Ausgestaltung dieses Themas kann professionelle Beratung erfordern.",
+    "advisorAccess": {
+      "title": "Founder Setup für Advisor freigeben",
+      "description": "Der Advisor kann ausschließlich eure gemeinsam bestätigten Founder-Setup-Inhalte lesen. Arbeitsnotizen und offene Vorschläge bleiben privat.",
+      "advisorFallback": "Advisor {index}",
+      "notShared": "Noch nicht für diesen Advisor freigegeben.",
+      "pending": "Die Zustimmung aller aktuellen Founder ist noch nicht vollständig.",
+      "active": "Die gemeinsam bestätigten Inhalte sind für diesen Advisor freigegeben.",
+      "activeBadge": "Für Advisor freigegeben",
+      "approved": "Zugestimmt",
+      "approvalOpen": "Zustimmung offen",
+      "share": "Freigabe vorschlagen",
+      "approve": "Zustimmen",
+      "revoke": "Zugriff beenden"
+    },
+    "advisorView": {
+      "title": "Founder Setup",
+      "subtitle": "Vom Founder-Team gemeinsam bestätigte Punkte.",
+      "documentationReference": "Festgehalten unter",
+      "confirmedAt": "Gemeinsam bestätigt am {date}"
+    },
     "categories": {
       "collaboration": "Zusammenarbeit",
       "money_equity": "Geld & Beteiligung",
