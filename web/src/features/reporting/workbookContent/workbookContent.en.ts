@@ -88,12 +88,13 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
     },
     {
       id: "decision_rules",
-      title: "Decision rules",
-      subtitle: "How do you make sure decisions stay clear under pressure?",
+      title: "Decisions & decision authority",
+      subtitle: "What does each of you need to support important decisions when your perspectives differ?",
       prompts: [
-        "What can one person decide alone without asking first?",
-        "When do both people need to agree?",
-        "What applies when you disagree but need to decide quickly?",
+        "For which decisions is having your own decision authority especially important to you, and why?",
+        "When is subject-matter ownership more important to you than deciding together?",
+        "What would make you feel that a decision was unfair, that you were bypassed, or that you had no influence?",
+        "How would you notice early that your current decision rule is no longer working well?",
       ],
       reportDimensions: ["Entscheidungslogik"],
     },
@@ -111,13 +112,14 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
     },
     {
       id: "collaboration_conflict",
-      title: "Collaboration & conflict",
+      title: "Conflict & collaboration",
       subtitle:
-        "How do you handle feedback, clarification, and conflict so they do not sit unresolved or block everyday work?",
+        "What does each of you need so difficult conflict can be raised, understood, and worked through again?",
       prompts: [
-        "What do you address immediately, and what waits for a fixed clarification point?",
-        "How do you give critical feedback so it stays clear and does not land as an attack?",
-        "What happens when a topic is not resolved in the conversation?",
+        "How might your co-founder notice that something is bothering you before you say it directly?",
+        "What makes feedback easier for you to take in, and what is more likely to make you withdraw or become defensive?",
+        "After an intense or hurtful conflict, what do you need for trust and collaboration to be rebuilt?",
+        "What should happen when one person wants to address something immediately and the other needs some space first?",
       ],
       reportDimensions: ["Arbeitsstruktur & Zusammenarbeit", "Konfliktstil"],
     },
@@ -558,6 +560,32 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       ruleIntro:
         "Next, write down what you want to agree on for this point. The current version should capture your agreement clearly and can be revised later.",
     },
+    deepDivePilot: {
+      label: "Alignment deep dive",
+      reflectionPhase: "Reflection",
+      reflectionTitle: "What would you like to take forward from this?",
+      reflectionHelp:
+        "Capture what you want to take from the conversation into your future collaboration. This is not yet a jointly confirmed agreement.",
+      reflectionField: "Shared reflection note",
+      reflectionPlaceholder: "What do you want to take away from this conversation?",
+      legacyTitle: "Previous workbook agreement",
+      legacyHelp:
+        "This historical agreement and its confirmations remain unchanged.",
+      handoffTitle: "Continue in Founder Setup",
+      handoffReady:
+        "You can copy this reflection note into Founder Setup as an open working note.",
+      handoffAction: "Copy to Founder Setup",
+      handoffSuccess:
+        "The reflection note was copied to Founder Setup as an open working note.",
+      handoffError: "The reflection note could not be copied right now.",
+      existingNote:
+        "Founder Setup already has a shared note for this topic. Open the item there and decide what you want to add from this conversation.",
+      openSetup: "Open Founder Setup",
+      threeFounder:
+        "This reflection comes from your pairwise alignment. In Founder Setup, you can continue the topic with the whole team.",
+      unavailable:
+        "Once this relationship is clearly linked to a founder team, you can continue the topic in Founder Setup.",
+    },
     sectionTitles: {
       collect: "1. Add perspectives",
       weighting: "2. Respond to the points",
@@ -729,16 +757,17 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       },
     },
     decision_rules: {
-      question: "How do you want to make decisions, especially when you see things differently?",
+      question:
+        "When you see an important issue differently, what do you need in order to support a decision even when it is not your own preference?",
       collectPlaceholder: "Describe a decision situation or a rule you would find useful.",
       collectHelper: "Start with two or three points rather than a perfect formulation.",
       agreementTitle: "Decision rule",
       reviewSummary: "Add an optional review trigger",
       impulseQuestions: [
-        "Which decisions can one person make independently?",
-        "When do you want to consult each other before a decision?",
-        "How do you want to handle different assessments?",
-        "Which deadline or next step helps when a decision is still open?",
+        "For which decisions is having your own decision authority especially important to you, and why?",
+        "When is subject-matter ownership more important to you than deciding together?",
+        "What would make you feel that a decision was unfair, that you were bypassed, or that you had no influence?",
+        "How would you notice early that your current decision rule is no longer working well?",
       ],
       suggestion: {
         agreement:
@@ -773,16 +802,17 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
       },
     },
     collaboration_conflict: {
-      question: "How do you want to handle disagreements, tension, or difficult situations?",
+      question:
+        "When things become genuinely difficult between you, what do you need so a conflict can be raised, understood, and worked through again?",
       collectPlaceholder: "Describe what matters to you when giving feedback or disagreeing.",
       collectHelper: "Start with specific situations rather than long explanations.",
       agreementTitle: "Clarification rule",
       reviewSummary: "Add an optional early warning signal",
       impulseQuestions: [
-        "How would you like to raise a disagreement?",
-        "What helps you give and receive feedback well?",
-        "When would a dedicated conversation be helpful?",
-        "How do you want to record open points after a conversation?",
+        "How might your co-founder notice that something is bothering you before you say it directly?",
+        "What makes feedback easier for you to take in, and what is more likely to make you withdraw or become defensive?",
+        "After an intense or hurtful conflict, what do you need for trust and collaboration to be rebuilt?",
+        "What should happen when one person wants to address something immediately and the other needs some space first?",
       ],
       suggestion: {
         agreement:

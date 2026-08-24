@@ -28,6 +28,7 @@ import {
   type FounderAlignmentWorkbookPayload,
   type WorkbookStepMarkersByStep,
 } from "@/features/reporting/founderAlignmentWorkbook";
+import type { WorkbookDeepDiveHandoffContext } from "@/features/reporting/workbookDeepDivePilot";
 import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
   getPrivilegedReportRunSnapshotForInvitation,
@@ -154,6 +155,7 @@ export type FounderAlignmentWorkbookPageData =
       advisorInvite: FounderAlignmentWorkbookAdvisorInviteState;
       advisorEntries: FounderAlignmentWorkbookAdvisorEntry[];
       advisorImpulses: FounderVisibleAdvisorImpulse[];
+      deepDiveHandoff: WorkbookDeepDiveHandoffContext | null;
     }
   | {
       status: "missing_invitation" | "forbidden" | "in_progress";
@@ -489,6 +491,63 @@ function hasActiveAdvisorAccess(
   );
 }
 
+async function loadDeepDiveHandoffContext(
+  relationshipId: string | null,
+  userId: string,
+  supabase: SupabaseLikeClient
+): Promise<WorkbookDeepDiveHandoffContext | null> {
+  if (!relationshipId) return null;
+
+  const { data: relationship, error: relationshipError } = await supabase
+    .from("relationships")
+    .select("id, user_a_id, user_b_id, founder_team_id")
+    .eq("id", relationshipId)
+    .maybeSingle();
+  const row = relationship as {
+    user_a_id?: string;
+    user_b_id?: string;
+    founder_team_id?: string | null;
+  } | null;
+  if (
+    relationshipError ||
+    !row?.founder_team_id ||
+    (row.user_a_id !== userId && row.user_b_id !== userId)
+  ) {
+    return null;
+  }
+
+  const [memberResult, itemResult] = await Promise.all([
+    supabase
+      .from("founder_team_members")
+      .select("user_id")
+      .eq("team_id", row.founder_team_id),
+    supabase
+      .from("founder_team_setup_items")
+      .select("item_key, working_note")
+      .eq("team_id", row.founder_team_id)
+      .in("item_key", ["decision_rights", "conflict_deadlock"]),
+  ]);
+  if (memberResult.error || itemResult.error) return null;
+
+  const members = (memberResult.data ?? []) as Array<{ user_id: string }>;
+  if (!members.some((member) => member.user_id === userId)) return null;
+
+  const notes = new Map(
+    ((itemResult.data ?? []) as Array<{ item_key: string; working_note: string }>).map((item) => [
+      item.item_key,
+      item.working_note,
+    ])
+  );
+  return {
+    teamId: row.founder_team_id,
+    memberCount: members.length,
+    targetWorkingNotes: {
+      decision_rules: notes.get("decision_rights") ?? "",
+      collaboration_conflict: notes.get("conflict_deadlock") ?? "",
+    },
+  };
+}
+
 export async function getFounderAlignmentWorkbookPageData(
   invitationId: string | null,
   teamContext: TeamContext,
@@ -538,6 +597,7 @@ export async function getFounderAlignmentWorkbookPageData(
       advisorInvite: advisorInviteStateFromRow(null),
       advisorEntries: [],
       advisorImpulses: [],
+      deepDiveHandoff: null,
     };
   }
 
@@ -759,6 +819,10 @@ export async function getFounderAlignmentWorkbookPageData(
       text: row.text,
       updatedAt: row.updated_at,
     }));
+  const deepDiveHandoff =
+    currentUserRole === "founderA" || currentUserRole === "founderB"
+      ? await loadDeepDiveHandoffContext(relationshipId, user!.id, supabase)
+      : null;
 
   return {
     status: "ready",
@@ -787,6 +851,7 @@ export async function getFounderAlignmentWorkbookPageData(
     advisorInvite: aggregateAdvisorInviteState,
     advisorEntries,
     advisorImpulses,
+    deepDiveHandoff,
   };
 }
 

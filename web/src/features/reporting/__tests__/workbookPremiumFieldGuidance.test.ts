@@ -37,7 +37,8 @@ const expectedEnglishGuidance = {
     reviewSummary: "Add an optional ownership signal",
   },
   decision_rules: {
-    question: "How do you want to make decisions, especially when you see things differently?",
+    question:
+      "When you see an important issue differently, what do you need in order to support a decision even when it is not your own preference?",
     collectHelper: "Start with two or three points rather than a perfect formulation.",
     agreementTitle: "Decision rule",
     reviewSummary: "Add an optional review trigger",
@@ -51,7 +52,8 @@ const expectedEnglishGuidance = {
     reviewSummary: "Add an optional early warning signal",
   },
   collaboration_conflict: {
-    question: "How do you want to handle disagreements, tension, or difficult situations?",
+    question:
+      "When things become genuinely difficult between you, what do you need so a conflict can be raised, understood, and worked through again?",
     collectHelper: "Start with specific situations rather than long explanations.",
     agreementTitle: "Clarification rule",
     reviewSummary: "Add an optional early warning signal",

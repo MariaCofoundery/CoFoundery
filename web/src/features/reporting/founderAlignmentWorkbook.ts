@@ -33,6 +33,7 @@ export type FounderAlignmentWorkbookStepField =
   | "founderA"
   | "founderB"
   | "agreement"
+  | "reflectionNote"
   | "structuredOutputs"
   | "founderAApproved"
   | "founderBApproved"
@@ -213,6 +214,7 @@ export type FounderAlignmentWorkbookEntry = {
   founderA: string;
   founderB: string;
   agreement: string;
+  reflectionNote?: string;
   structuredOutputs?: WorkbookStructuredOutputsByStep;
   workspaceV2?: FounderAlignmentWorkbookStepWorkspaceV2;
   founderAApproved: boolean;
@@ -294,12 +296,13 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   },
   {
     id: "decision_rules",
-    title: "Entscheidungsregeln",
-    subtitle: "Wie sorgt ihr dafuer, dass Entscheidungen auch unter Druck klar fallen?",
+    title: "Entscheidungen & Entscheidungshoheit",
+    subtitle: "Was braucht jede Person, um wichtige Entscheidungen auch bei unterschiedlichen Sichtweisen mitzutragen?",
     prompts: [
-      "Was darf eine Person allein entscheiden, ohne vorher zu fragen?",
-      "Wann muessen beide zustimmen?",
-      "Was gilt, wenn ihr euch nicht einig seid und schnell entscheiden muesst?",
+      "Bei welchen Entscheidungen ist dir eigene Entscheidungshoheit besonders wichtig - und warum?",
+      "Wann ist fachliche Zustaendigkeit fuer dich wichtiger als gemeinsames Entscheiden?",
+      "Was wuerde sich fuer dich bei Entscheidungen unfair, uebergangen oder machtlos anfuehlen?",
+      "Woran wuerdet ihr frueh merken, dass eure bisherige Entscheidungsregel nicht mehr gut funktioniert?",
     ],
     reportDimensions: ["Entscheidungslogik"],
   },
@@ -316,12 +319,13 @@ export const FOUNDER_ALIGNMENT_WORKBOOK_STEPS: FounderAlignmentWorkbookStepDefin
   },
   {
     id: "collaboration_conflict",
-    title: "Zusammenarbeit & Konflikt",
-    subtitle: "Wie regelt ihr Feedback, Klaerung und Konflikte so, dass sie nicht liegen bleiben oder den Alltag blockieren?",
+    title: "Konflikt & Zusammenarbeit",
+    subtitle: "Was braucht jede Person, damit schwierige Konflikte angesprochen, verstanden und wieder bearbeitet werden koennen?",
     prompts: [
-      "Was sprecht ihr sofort an und was wartet bis zu einem festen Klaerungspunkt?",
-      "Wie gebt ihr kritisches Feedback, damit es klar bleibt und nicht als Angriff landet?",
-      "Was passiert, wenn ein Thema im Gespraech nicht geloest wird?",
+      "Woran koennte dein Co-Founder merken, dass dich etwas beschaeftigt, bevor du es ausdruecklich ansprichst?",
+      "Was macht Feedback fuer dich leichter annehmbar - und was fuehrt eher dazu, dass du dich zurueckziehst oder verteidigst?",
+      "Was brauchst du nach einem heftigen oder verletzenden Konflikt, damit Vertrauen und Zusammenarbeit wieder entstehen koennen?",
+      "Was sollte passieren, wenn eine Person etwas sofort klaeren moechte und die andere zunaechst Abstand braucht?",
     ],
     reportDimensions: ["Arbeitsstruktur & Zusammenarbeit", "Konfliktstil"],
   },
@@ -422,6 +426,7 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
           founderA: "",
           founderB: "",
           agreement: "",
+          reflectionNote: "",
           structuredOutputs: undefined,
           workspaceV2: undefined,
           founderAApproved: false,
@@ -928,6 +933,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         founderA?: unknown;
         founderB?: unknown;
         agreement?: unknown;
+        reflectionNote?: unknown;
         structuredOutputs?: unknown;
         workspaceV2?: unknown;
         founderAApproved?: unknown;
@@ -959,6 +965,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
       founderA: typeof source?.founderA === "string" ? source.founderA : "",
       founderB: typeof source?.founderB === "string" ? source.founderB : "",
       agreement: typeof source?.agreement === "string" ? source.agreement : "",
+      reflectionNote: typeof source?.reflectionNote === "string" ? source.reflectionNote : "",
       structuredOutputs: sanitizeWorkbookStructuredOutputsByStep(step.id, source?.structuredOutputs),
       workspaceV2,
       founderAApproved: source?.founderAApproved === true,

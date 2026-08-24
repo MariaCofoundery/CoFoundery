@@ -26,8 +26,8 @@
       "noArtifacts": "Für diese Verbindung liegen noch keine Reports oder gemeinsamen Arbeitsbereiche vor.",
       "pair": "Alignment zwischen {names}",
       "report": "Report ansehen",
-      "workbook": "Workbook öffnen",
-      "continue": "Alignment fortsetzen",
+      "workbook": "Alignment vertiefen",
+      "continue": "Alignment vertiefen",
       "matchingReport": "Matching-Report ansehen",
       "workspace": "Matching Workspace öffnen"
     },

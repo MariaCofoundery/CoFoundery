@@ -64,6 +64,7 @@ export default async function WorkbookExistingTeamPreviewPage({
         source="mock"
         storedTeamContext={null}
         hasTeamContextMismatch={false}
+        deepDiveHandoff={null}
       />
     </main>
   );

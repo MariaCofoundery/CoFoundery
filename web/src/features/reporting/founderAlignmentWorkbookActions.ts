@@ -762,6 +762,14 @@ function mergeFounderPayload(
           resetFounderApprovals(stepEntry);
         }
         break;
+      case "reflectionNote":
+        if (allowStaleWorkspaceMerge) {
+          return { ok: false, reason: "stale_conflict" };
+        }
+        if (typeof patch.value === "string") {
+          stepEntry.reflectionNote = patch.value;
+        }
+        break;
       case "structuredOutputs":
         if (allowStaleWorkspaceMerge) {
           return { ok: false, reason: "stale_conflict" };

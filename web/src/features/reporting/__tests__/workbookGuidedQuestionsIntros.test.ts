@@ -27,11 +27,11 @@ const expectedQuestions = {
     roles_responsibility:
       "Wie wollt ihr Rollen, Zustaendigkeiten und Verantwortung im Team verteilen?",
     decision_rules:
-      "Wie wollt ihr Entscheidungen treffen, besonders wenn ihr unterschiedlich urteilt?",
+      "Wenn ihr bei einer wichtigen Frage unterschiedlich denkt: Was brauchst du, um eine Entscheidung mitzutragen - auch wenn sie nicht deiner eigenen Praeferenz entspricht?",
     commitment_load:
       "Welche zeitliche Verfuegbarkeit und Arbeitsbelastung koennt und wollt ihr aktuell einbringen?",
     collaboration_conflict:
-      "Wie wollt ihr mit Meinungsverschiedenheiten, Spannungen oder schwierigen Situationen umgehen?",
+      "Wenn es zwischen euch wirklich schwierig wird: Was brauchst du, damit ein Konflikt angesprochen, verstanden und wieder bearbeitet werden kann?",
     ownership_risk:
       "Wie wollt ihr Verantwortung, Beteiligung und persoenliche oder finanzielle Risiken miteinander klaeren?",
     values_guardrails:
@@ -45,11 +45,11 @@ const expectedQuestions = {
     roles_responsibility:
       "How do you want to divide roles and responsibilities within the team?",
     decision_rules:
-      "How do you want to make decisions, especially when you see things differently?",
+      "When you see an important issue differently, what do you need in order to support a decision even when it is not your own preference?",
     commitment_load:
       "What level of time commitment and workload can each of you realistically take on right now?",
     collaboration_conflict:
-      "How do you want to handle disagreements, tension, or difficult situations?",
+      "When things become genuinely difficult between you, what do you need so a conflict can be raised, understood, and worked through again?",
     ownership_risk:
       "How do you want to clarify responsibility, ownership, and personal or financial risk between you?",
     values_guardrails:

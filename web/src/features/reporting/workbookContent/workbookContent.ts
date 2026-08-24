@@ -41,6 +41,25 @@ export type PremiumWorkbookWorkflowCopy = {
     weightingIntro: string;
     ruleIntro: string;
   };
+  deepDivePilot: {
+    label: string;
+    reflectionPhase: string;
+    reflectionTitle: string;
+    reflectionHelp: string;
+    reflectionField: string;
+    reflectionPlaceholder: string;
+    legacyTitle: string;
+    legacyHelp: string;
+    handoffTitle: string;
+    handoffReady: string;
+    handoffAction: string;
+    handoffSuccess: string;
+    handoffError: string;
+    existingNote: string;
+    openSetup: string;
+    threeFounder: string;
+    unavailable: string;
+  };
   sectionTitles: {
     collect: string;
     weighting: string;

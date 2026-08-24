@@ -27,7 +27,8 @@ function hasStepV2Progress(step: FounderAlignmentWorkbookEntry) {
   return (
     (step.workspaceV2?.entries.length ?? 0) > 0 ||
     hasStructuredOutputs(step) ||
-    step.agreement.trim().length > 0
+    step.agreement.trim().length > 0 ||
+    (step.reflectionNote?.trim().length ?? 0) > 0
   );
 }
 

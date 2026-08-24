@@ -64,6 +64,7 @@ export default async function WorkbookAdvisorPreviewPage({
         source="mock"
         storedTeamContext={null}
         hasTeamContextMismatch={false}
+        deepDiveHandoff={null}
       />
     </main>
   );

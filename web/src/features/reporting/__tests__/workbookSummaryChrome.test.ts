@@ -91,7 +91,8 @@ test("summary structure, empty states, statuses, and actions use messages", () =
 
 test("stored summary content and identities remain direct", () => {
   for (const directValue of [
-    /primaryAgreement \|\| wt\("client\.summary\.empty\.agreement"\)/u,
+    /\{primaryAgreement\}/u,
+    /text=\{item\.reflectionNote\}/u,
     /item\.advisorClosing\?\.observations \|\|/u,
     /item\.advisorClosing\?\.questions \|\|/u,
     /item\.advisorClosing\?\.nextSteps \|\|/u,

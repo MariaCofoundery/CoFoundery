@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   type ReactNode,
   useCallback,
@@ -89,6 +90,14 @@ import {
   getWorkbookReactionPresentationState,
   isCurrentWorkbookReaction,
 } from "@/features/reporting/workbookReactionPresentation";
+import { handoffWorkbookDeepDiveReflectionToFounderSetup } from "@/features/reporting/workbookDeepDiveHandoffActions";
+import {
+  getWorkbookDeepDiveHandoffState,
+  getWorkbookDeepDiveSetupKey,
+  hasLegacyWorkbookAgreement,
+  isWorkbookDeepDivePilotStep,
+  type WorkbookDeepDiveHandoffContext,
+} from "@/features/reporting/workbookDeepDivePilot";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import {
@@ -120,9 +129,15 @@ type FounderAlignmentWorkbookClientProps = {
   source: "live" | "mock";
   storedTeamContext: TeamContext | null;
   hasTeamContextMismatch: boolean;
+  deepDiveHandoff: WorkbookDeepDiveHandoffContext | null;
 };
 
-type WorkbookEditableField = "founderA" | "founderB" | "agreement" | "advisorNotes";
+type WorkbookEditableField =
+  | "founderA"
+  | "founderB"
+  | "agreement"
+  | "reflectionNote"
+  | "advisorNotes";
 type WorkbookStructuredOutputValue = WorkbookStructuredStepOutputs;
 type AdvisorClosingField = keyof FounderAlignmentWorkbookAdvisorClosing;
 type FounderReactionField = "status" | "comment";
@@ -943,6 +958,7 @@ export function FounderAlignmentWorkbookClient({
   source,
   storedTeamContext,
   hasTeamContextMismatch,
+  deepDiveHandoff,
 }: FounderAlignmentWorkbookClientProps) {
   const wt = useTranslations("workbook");
   const locale = useLocale();
@@ -1023,6 +1039,12 @@ export function FounderAlignmentWorkbookClient({
   const [advisorInviteMessage, setAdvisorInviteMessage] = useState<string | null>(null);
   const [advisorInviteLink, setAdvisorInviteLink] = useState<string | null>(null);
   const [isAdvisorActionPending, startAdvisorActionTransition] = useTransition();
+  const [isDeepDiveHandoffPending, startDeepDiveHandoffTransition] = useTransition();
+  const [deepDiveHandoffResult, setDeepDiveHandoffResult] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+  const [deepDiveHandoffState, setDeepDiveHandoffState] =
+    useState<WorkbookDeepDiveHandoffContext | null>(deepDiveHandoff);
   const currentStepRef = useRef<HTMLElement | null>(null);
   const discussionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const shouldScrollToStepRef = useRef(false);
@@ -1102,6 +1124,10 @@ export function FounderAlignmentWorkbookClient({
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = workbookContent.stepContent[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
+  const currentDeepDivePilotStepId = isWorkbookDeepDivePilotStep(currentStep.id)
+    ? currentStep.id
+    : null;
+  const currentStepIsDeepDivePilot = currentDeepDivePilotStepId !== null;
   const advisorClosingHasAdvisorInput =
     workbook.advisorClosing.observations.trim().length > 0 ||
     workbook.advisorClosing.questions.trim().length > 0 ||
@@ -1231,6 +1257,19 @@ export function FounderAlignmentWorkbookClient({
     ]
   );
   const currentStepEntry = workbook.steps[currentStep.id];
+  const currentStepHasLegacyAgreement = hasLegacyWorkbookAgreement(currentStepEntry);
+  const currentDeepDiveSetupKey = currentDeepDivePilotStepId
+    ? getWorkbookDeepDiveSetupKey(currentDeepDivePilotStepId)
+    : null;
+  const currentDeepDiveHandoffState = currentDeepDivePilotStepId
+    ? getWorkbookDeepDiveHandoffState(deepDiveHandoffState, currentDeepDivePilotStepId)
+    : "unavailable";
+  const currentDeepDiveSetupHref =
+    deepDiveHandoffState && currentDeepDiveSetupKey
+      ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}/setup/${encodeURIComponent(
+          currentDeepDiveSetupKey
+        )}`
+      : null;
   const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
   const currentStepMissingStructuredKeys =
@@ -1363,18 +1402,21 @@ export function FounderAlignmentWorkbookClient({
     decisionRulesFounderAWeightingComplete &&
     decisionRulesFounderBWeightingComplete;
   const decisionRulesRuleReady =
-    decisionRulesWeightingReady &&
-    currentStepEntry.agreement.trim().length > 0 &&
-    decisionRulesEscalationValue.trim().length > 0 &&
-    (!currentPremiumV2Config?.requireReviewForApproval ||
-      decisionRulesReviewTriggerValue.trim().length > 0) &&
-    hasDecisionRulesBothPerspectives;
+    currentStepIsDeepDivePilot
+      ? decisionRulesWeightingReady &&
+        (currentStepEntry.reflectionNote?.trim().length ?? 0) > 0
+      : decisionRulesWeightingReady &&
+        currentStepEntry.agreement.trim().length > 0 &&
+        decisionRulesEscalationValue.trim().length > 0 &&
+        (!currentPremiumV2Config?.requireReviewForApproval ||
+          decisionRulesReviewTriggerValue.trim().length > 0) &&
+        hasDecisionRulesBothPerspectives;
   const currentDecisionRulesPhase: WorkbookV2Phase =
     !hasDecisionRulesBothPerspectives
       ? "collect"
       : !decisionRulesWeightingReady
         ? "weight"
-        : !decisionRulesRuleReady
+        : currentStepIsDeepDivePilot || !decisionRulesRuleReady
           ? "rule"
           : "approval";
   const requestedWorkbookV2Phase = workbookV2OpenPhaseByStep[activeStepId] ?? null;
@@ -1382,7 +1424,9 @@ export function FounderAlignmentWorkbookClient({
     requestedWorkbookV2Phase === "collect" ||
     (requestedWorkbookV2Phase === "weight" && hasDecisionRulesBothPerspectives) ||
     (requestedWorkbookV2Phase === "rule" && decisionRulesWeightingReady) ||
-    (requestedWorkbookV2Phase === "approval" && decisionRulesRuleReady);
+    (requestedWorkbookV2Phase === "approval" &&
+      decisionRulesRuleReady &&
+      !currentStepIsDeepDivePilot);
   const visibleWorkbookV2Phase =
     requestedWorkbookV2Phase && canShowRequestedWorkbookV2Phase
       ? requestedWorkbookV2Phase
@@ -1392,13 +1436,18 @@ export function FounderAlignmentWorkbookClient({
   const canOpenCollectPhase = true;
   const canOpenWeightPhase = hasDecisionRulesBothPerspectives;
   const canOpenRulePhase = decisionRulesWeightingReady;
-  const canOpenApprovalPhase = decisionRulesRuleReady;
+  const canOpenApprovalPhase = decisionRulesRuleReady && !currentStepIsDeepDivePilot;
   const premiumPhaseLabels: Record<WorkbookV2Phase, string> = {
     collect: wt(workbookPremiumPhaseMessageKey("collect", currentStep.id)),
     weight: wt(workbookPremiumPhaseMessageKey("weight", currentStep.id)),
-    rule: wt(workbookPremiumPhaseMessageKey("rule", currentStep.id)),
+    rule: currentStepIsDeepDivePilot
+      ? systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionPhase)
+      : wt(workbookPremiumPhaseMessageKey("rule", currentStep.id)),
     approval: wt(workbookPremiumPhaseMessageKey("approval", currentStep.id)),
   };
+  const visiblePremiumPhases: WorkbookV2Phase[] = currentStepIsDeepDivePilot
+    ? ["collect", "weight", "rule"]
+    : ["collect", "weight", "rule", "approval"];
   const advisorPhaseMeta: Record<
     WorkbookV2Phase,
     { label: string; subtitle: string; activeSummary: string; disabled: boolean }
@@ -1435,7 +1484,9 @@ export function FounderAlignmentWorkbookClient({
       : visibleWorkbookV2Phase === "weight"
         ? wt("client.premium.founderPhase.weightSummary")
         : visibleWorkbookV2Phase === "rule"
-          ? wt("client.premium.founderPhase.ruleSummary")
+          ? currentStepIsDeepDivePilot
+            ? systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionHelp)
+            : wt("client.premium.founderPhase.ruleSummary")
           : wt("client.premium.founderPhase.approvalSummary");
   const currentStepStatusSummaryItems = [
     {
@@ -1453,13 +1504,21 @@ export function FounderAlignmentWorkbookClient({
       tone: decisionRulesWeightingReady ? "success" : "default",
     },
     {
-      label: wt("client.premium.status.workingDraft"),
-      value: currentStepEntry.agreement.trim().length > 0
+      label: currentStepIsDeepDivePilot
+        ? systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionPhase)
+        : wt("client.premium.status.workingDraft"),
+      value: (currentStepIsDeepDivePilot
+        ? currentStepEntry.reflectionNote?.trim().length
+        : currentStepEntry.agreement.trim().length)
         ? wt("client.premium.status.available")
         : wt("client.premium.status.missing"),
-      tone: currentStepEntry.agreement.trim().length > 0 ? "success" : "default",
+      tone: (currentStepIsDeepDivePilot
+        ? currentStepEntry.reflectionNote?.trim().length
+        : currentStepEntry.agreement.trim().length)
+        ? "success"
+        : "default",
     },
-    {
+    ...(!currentStepIsDeepDivePilot ? [{
       label: wt("client.premium.status.finalAgreement"),
       value: currentStepIsApprovedByBoth
         ? wt("client.premium.status.confirmed")
@@ -1473,8 +1532,8 @@ export function FounderAlignmentWorkbookClient({
         : decisionRulesRuleReady && currentStepEntry.agreement.trim().length > 0
           ? "info"
           : "default",
-    },
-  ] as const;
+    } as const] : []),
+  ];
   const currentStepGuidanceItems = [
     currentStepAdvisorReplies.length > 0
       ? {
@@ -1644,6 +1703,7 @@ export function FounderAlignmentWorkbookClient({
           id: step.id,
           title: step.title,
           agreement: workbook.steps[step.id].agreement.trim(),
+          reflectionNote: workbook.steps[step.id].reflectionNote?.trim() ?? "",
           structuredOutputs: isWorkbookStructuredStepId(step.id)
             ? getWorkbookStepStructuredOutputs(workbook.steps[step.id], step.id)
             : null,
@@ -1810,7 +1870,7 @@ export function FounderAlignmentWorkbookClient({
       return currentUserRole === "founderB";
     }
 
-    if (field === "agreement") {
+    if (field === "agreement" || field === "reflectionNote") {
       return true;
     }
 
@@ -1923,7 +1983,7 @@ export function FounderAlignmentWorkbookClient({
         [activeStepId]: {
           ...current.steps[activeStepId],
           [field]: value,
-          ...(field === "advisorNotes"
+          ...(field === "advisorNotes" || field === "reflectionNote"
             ? {}
             : {
                 founderAApproved: false,
@@ -2524,6 +2584,52 @@ export function FounderAlignmentWorkbookClient({
 
     startTransition(async () => {
       await performSave(nextWorkbook, "manual");
+    });
+  }
+
+  function handoffDeepDiveReflection() {
+    if (
+      !invitationId ||
+      !currentDeepDivePilotStepId ||
+      currentDeepDiveHandoffState !== "two_founder_ready" ||
+      !(currentStepEntry.reflectionNote?.trim())
+    ) {
+      return;
+    }
+
+    const stepId = currentDeepDivePilotStepId;
+    const reflectionNote = currentStepEntry.reflectionNote;
+    setDeepDiveHandoffResult("idle");
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+      autosaveTimeoutRef.current = null;
+    }
+    startDeepDiveHandoffTransition(async () => {
+      const saved = await performSave(workbook, "manual");
+      if (!saved) {
+        setDeepDiveHandoffResult("error");
+        return;
+      }
+      const result = await handoffWorkbookDeepDiveReflectionToFounderSetup(
+        invitationId,
+        stepId
+      );
+      if (!result.ok) {
+        setDeepDiveHandoffResult("error");
+        return;
+      }
+      setDeepDiveHandoffState((current) =>
+        current
+          ? {
+              ...current,
+              targetWorkingNotes: {
+                ...current.targetWorkingNotes,
+                [stepId]: reflectionNote,
+              },
+            }
+          : current
+      );
+      setDeepDiveHandoffResult("success");
     });
   }
 
@@ -3962,7 +4068,9 @@ export function FounderAlignmentWorkbookClient({
                 <section className={`mt-8 rounded-[30px] px-5 py-7 sm:px-7 sm:py-8 ${currentToneMeta.headerSurface}`}>
                   <div className="max-w-4xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      {wt("client.leadQuestion")}
+                      {currentStepIsDeepDivePilot
+                        ? systemText(workbookContent.premiumWorkflow.deepDivePilot.label)
+                        : wt("client.leadQuestion")}
                     </p>
                     <p className="mt-3 text-[1.55rem] font-semibold leading-[1.28] text-slate-950 sm:text-[2rem] sm:leading-[1.22]">
                       {systemText(currentPremiumFieldGuidance.question)}
@@ -3977,8 +4085,9 @@ export function FounderAlignmentWorkbookClient({
                   <div className="mt-6 space-y-3">
                     {isAdvisorViewer ? (
                       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-                        {(Object.entries(advisorPhaseMeta) as Array<[WorkbookV2Phase, typeof advisorPhaseMeta[WorkbookV2Phase]]>).map(
-                          ([phase, meta]) => {
+                        {visiblePremiumPhases.map(
+                          (phase) => {
+                            const meta = advisorPhaseMeta[phase];
                             const isActive = visibleWorkbookV2Phase === phase;
                             const isDone =
                               phase === "collect"
@@ -4062,19 +4171,21 @@ export function FounderAlignmentWorkbookClient({
                                 : "upcoming"
                           }
                         />
-                        <WorkbookV2PhasePill
-                          label={premiumPhaseLabels.approval}
-                          tone={currentVisualTone}
-                          onClick={() => openWorkbookV2Phase("approval")}
-                          disabled={!canOpenApprovalPhase}
-                          state={
-                            visibleWorkbookV2Phase === "approval"
-                              ? "active"
-                              : currentStepIsApprovedByBoth
-                                ? "done"
-                                : "upcoming"
-                          }
-                        />
+                        {!currentStepIsDeepDivePilot ? (
+                          <WorkbookV2PhasePill
+                            label={premiumPhaseLabels.approval}
+                            tone={currentVisualTone}
+                            onClick={() => openWorkbookV2Phase("approval")}
+                            disabled={!canOpenApprovalPhase}
+                            state={
+                              visibleWorkbookV2Phase === "approval"
+                                ? "active"
+                                : currentStepIsApprovedByBoth
+                                  ? "done"
+                                  : "upcoming"
+                            }
+                          />
+                        ) : null}
                       </div>
                     )}
 
@@ -4389,21 +4500,147 @@ export function FounderAlignmentWorkbookClient({
                     {!isAdvisorViewer && decisionRulesWeightingReady ? (
                       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-4">
                         <p className="text-xs leading-6 text-slate-500">
-                          {wt("client.premium.transitions.toRuleHint")}
+                          {currentStepIsDeepDivePilot
+                            ? systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionHelp)
+                            : wt("client.premium.transitions.toRuleHint")}
                         </p>
                         <ReportActionButton
                           variant="utility"
                           type="button"
                           onClick={() => openWorkbookV2Phase("rule")}
                         >
-                          {wt("client.premium.transitions.toRuleAction")}
+                          {currentStepIsDeepDivePilot
+                            ? systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionPhase)
+                            : wt("client.premium.transitions.toRuleAction")}
                         </ReportActionButton>
                       </div>
                     ) : null}
                   </section>
                 ) : null}
 
-                {visibleWorkbookV2Phase === "rule" ? (
+                {visibleWorkbookV2Phase === "rule" ? currentStepIsDeepDivePilot ? (
+                  <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
+                    <div className="max-w-3xl">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                        {systemText(workbookContent.premiumWorkflow.deepDivePilot.label)}
+                      </p>
+                      <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                        {systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionTitle)}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {systemText(workbookContent.premiumWorkflow.deepDivePilot.reflectionHelp)}
+                      </p>
+                    </div>
+
+                    <div className="mt-5">
+                      <WorkbookField
+                        title={systemText(
+                          workbookContent.premiumWorkflow.deepDivePilot.reflectionField
+                        )}
+                        value={currentStepEntry.reflectionNote ?? ""}
+                        onChange={(value) => updateEntry("reflectionNote", value)}
+                        placeholder={systemText(
+                          workbookContent.premiumWorkflow.deepDivePilot.reflectionPlaceholder
+                        )}
+                        highlight
+                        readOnly={!canEditField("reflectionNote")}
+                        helperText={systemText(
+                          workbookContent.premiumWorkflow.deepDivePilot.reflectionHelp
+                        )}
+                        rows={5}
+                        minHeightClassName="min-h-[152px]"
+                      />
+                    </div>
+
+                    {currentStepHasLegacyAgreement ? (
+                      <details className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/80 p-4">
+                        <summary className="cursor-pointer text-sm font-medium text-slate-900">
+                          {systemText(workbookContent.premiumWorkflow.deepDivePilot.legacyTitle)}
+                        </summary>
+                        <p className="mt-3 text-xs leading-6 text-slate-500">
+                          {systemText(workbookContent.premiumWorkflow.deepDivePilot.legacyHelp)}
+                        </p>
+                        {currentStepEntry.agreement.trim() ? (
+                          <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                            {currentStepEntry.agreement}
+                          </p>
+                        ) : null}
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                          <ApprovalStatusCard
+                            label={founderALabel}
+                            approved={currentStepEntry.founderAApproved}
+                          />
+                          <ApprovalStatusCard
+                            label={founderBLabel}
+                            approved={currentStepEntry.founderBApproved}
+                          />
+                        </div>
+                      </details>
+                    ) : null}
+
+                    {!isAdvisorViewer ? (
+                      <div className="mt-5 rounded-[24px] border border-violet-200/80 bg-violet-50/45 p-5">
+                        <h3 className="text-base font-semibold text-slate-950">
+                          {systemText(workbookContent.premiumWorkflow.deepDivePilot.handoffTitle)}
+                        </h3>
+                        <p className="mt-2 text-sm leading-6 text-slate-700">
+                          {systemText(
+                            currentDeepDiveHandoffState === "two_founder_ready"
+                              ? workbookContent.premiumWorkflow.deepDivePilot.handoffReady
+                              : currentDeepDiveHandoffState === "existing_note"
+                                ? workbookContent.premiumWorkflow.deepDivePilot.existingNote
+                                : currentDeepDiveHandoffState === "three_founder_link_only"
+                                  ? workbookContent.premiumWorkflow.deepDivePilot.threeFounder
+                                  : workbookContent.premiumWorkflow.deepDivePilot.unavailable
+                          )}
+                        </p>
+                        {deepDiveHandoffResult !== "idle" ? (
+                          <p
+                            role="status"
+                            className={`mt-3 text-sm ${
+                              deepDiveHandoffResult === "success"
+                                ? "text-emerald-700"
+                                : "text-slate-700"
+                            }`}
+                          >
+                            {systemText(
+                              deepDiveHandoffResult === "success"
+                                ? workbookContent.premiumWorkflow.deepDivePilot.handoffSuccess
+                                : workbookContent.premiumWorkflow.deepDivePilot.handoffError
+                            )}
+                          </p>
+                        ) : null}
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          {currentDeepDiveHandoffState === "two_founder_ready" ? (
+                            <ReportActionButton
+                              type="button"
+                              onClick={handoffDeepDiveReflection}
+                              disabled={
+                                isDeepDiveHandoffPending ||
+                                !(currentStepEntry.reflectionNote?.trim())
+                              }
+                            >
+                              {systemText(
+                                workbookContent.premiumWorkflow.deepDivePilot.handoffAction
+                              )}
+                            </ReportActionButton>
+                          ) : null}
+                          {currentDeepDiveSetupHref &&
+                          currentDeepDiveHandoffState !== "two_founder_ready" ? (
+                            <Link
+                              href={currentDeepDiveSetupHref}
+                              className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                            >
+                              {systemText(
+                                workbookContent.premiumWorkflow.deepDivePilot.openSetup
+                              )}
+                            </Link>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
+                  </section>
+                ) : (
                   <section className={`mt-6 border ${currentToneMeta.ruleSurface}`}>
                     <div className="max-w-3xl">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
@@ -4521,7 +4758,7 @@ export function FounderAlignmentWorkbookClient({
                   </section>
                 ) : null}
 
-                {visibleWorkbookV2Phase === "approval" ? (
+                {visibleWorkbookV2Phase === "approval" && !currentStepIsDeepDivePilot ? (
                   <section className="mt-6 rounded-[24px] border border-slate-200/80 bg-slate-50/60 p-5 sm:p-6">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="max-w-3xl">
@@ -6273,6 +6510,7 @@ function WorkbookSummaryView({
     id: FounderAlignmentWorkbookStepId;
     title: string;
     agreement: string;
+    reflectionNote: string;
     structuredOutputs: WorkbookStructuredStepOutputs | null;
     advisorNotes: string;
     advisorClosing: FounderAlignmentWorkbookAdvisorClosing | null;
@@ -6375,11 +6613,28 @@ function WorkbookSummaryView({
                   </div>
                 ) : (
                   <>
-                    <div className="mt-5 border-l-2 border-slate-200 pl-5">
-                      <p className="text-[17px] leading-8 text-slate-900">
-                        {primaryAgreement || wt("client.summary.empty.agreement")}
-                      </p>
-                    </div>
+                    {isWorkbookDeepDivePilotStep(item.id) && item.reflectionNote ? (
+                      <SummaryInsightBlock
+                        title={normalizeWorkbookSystemText(
+                          summaryWorkbookContent.premiumWorkflow.deepDivePilot.reflectionField,
+                          locale
+                        )}
+                        text={item.reflectionNote}
+                      />
+                    ) : null}
+                    {primaryAgreement ? (
+                      <div className="mt-5 border-l-2 border-slate-200 pl-5">
+                        <p className="text-[17px] leading-8 text-slate-900">
+                          {primaryAgreement}
+                        </p>
+                      </div>
+                    ) : !isWorkbookDeepDivePilotStep(item.id) ? (
+                      <div className="mt-5 border-l-2 border-slate-200 pl-5">
+                        <p className="text-[17px] leading-8 text-slate-900">
+                          {wt("client.summary.empty.agreement")}
+                        </p>
+                      </div>
+                    ) : null}
                     {structuredSummaryItems.length > 0 ? (
                       <div className="mt-7 grid gap-4 lg:grid-cols-2">
                         {structuredSummaryItems.map((summaryItem) => (
@@ -6846,6 +7101,14 @@ function buildWorkbookPatches(
     if (previousStep.agreement !== nextStep.agreement) {
       patches.push({ scope: "step", stepId, field: "agreement", value: nextStep.agreement });
     }
+    if ((previousStep.reflectionNote ?? "") !== (nextStep.reflectionNote ?? "")) {
+      patches.push({
+        scope: "step",
+        stepId,
+        field: "reflectionNote",
+        value: nextStep.reflectionNote ?? "",
+      });
+    }
     if (
       JSON.stringify(previousStep.structuredOutputs ?? null) !==
       JSON.stringify(nextStep.structuredOutputs ?? null)
@@ -7041,6 +7304,12 @@ function deriveWorkbookStepStatus(
     : true;
   const hasAgreement = entry.agreement.trim().length > 0;
   const bothApproved = entry.founderAApproved && entry.founderBApproved;
+
+  if (isWorkbookDeepDivePilotStep(stepId) && !hasLegacyWorkbookAgreement(entry)) {
+    return (entry.reflectionNote?.trim().length ?? 0) > 0 && weightingReady
+      ? "draft_ready"
+      : "collecting_inputs";
+  }
 
   if (hasAgreement && weightingReady && structuredReady && bothApproved) {
     return "finalized";

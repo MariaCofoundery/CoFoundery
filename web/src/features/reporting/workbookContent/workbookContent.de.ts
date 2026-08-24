@@ -25,6 +25,32 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
       ruleIntro:
         "Formuliert anschliessend, was ihr fuer diesen Punkt konkret festhalten wollt. Die aktuelle Fassung soll eure Vereinbarung verstaendlich festhalten und kann spaeter angepasst werden.",
     },
+    deepDivePilot: {
+      label: "Alignment vertiefen",
+      reflectionPhase: "Reflexion",
+      reflectionTitle: "Was moechtet ihr daraus festhalten?",
+      reflectionHelp:
+        "Haltet hier fest, was ihr aus dem Gespraech fuer eure weitere Zusammenarbeit mitnehmen moechtet. Das ist noch keine gemeinsam bestaetigte Vereinbarung.",
+      reflectionField: "Gemeinsame Reflexionsnotiz",
+      reflectionPlaceholder: "Was wollt ihr aus diesem Gespraech mitnehmen?",
+      legacyTitle: "Bisherige Workbook-Vereinbarung",
+      legacyHelp:
+        "Diese historische Vereinbarung und ihre Bestaetigungen bleiben unveraendert erhalten.",
+      handoffTitle: "In Founder Setup weiterarbeiten",
+      handoffReady:
+        "Ihr koennt diese Reflexionsnotiz als offenen Arbeitsstand in Founder Setup uebernehmen.",
+      handoffAction: "In Founder Setup uebernehmen",
+      handoffSuccess:
+        "Die Reflexionsnotiz wurde als offener Arbeitsstand in Founder Setup uebernommen.",
+      handoffError: "Die Reflexionsnotiz konnte gerade nicht uebernommen werden.",
+      existingNote:
+        "In Founder Setup gibt es zu diesem Thema bereits eine gemeinsame Notiz. Oeffnet den Punkt dort und entscheidet, was ihr aus diesem Gespraech ergaenzen moechtet.",
+      openSetup: "Founder Setup oeffnen",
+      threeFounder:
+        "Diese Reflexion stammt aus eurem paarweisen Alignment. Im Founder Setup koennt ihr das Thema gemeinsam mit dem gesamten Team weiterfuehren.",
+      unavailable:
+        "Sobald diese Beziehung eindeutig einem Founder-Team zugeordnet ist, koennt ihr das Thema in Founder Setup weiterfuehren.",
+    },
     sectionTitles: {
       collect: "1. Perspektiven sammeln",
       weighting: "2. Punkte einordnen",
@@ -194,16 +220,17 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
       },
     },
     decision_rules: {
-      question: "Wie wollt ihr Entscheidungen treffen, besonders wenn ihr unterschiedlich urteilt?",
+      question:
+        "Wenn ihr bei einer wichtigen Frage unterschiedlich denkt: Was brauchst du, um eine Entscheidung mitzutragen - auch wenn sie nicht deiner eigenen Praeferenz entspricht?",
       collectPlaceholder: "Beschreibe eine Entscheidungssituation oder eine gewuenschte Regel.",
       collectHelper: "Startet mit zwei oder drei Punkten, nicht mit einem perfekten Text.",
       agreementTitle: "Entscheidungsregel",
       reviewSummary: "Review-Trigger optional ergaenzen",
       impulseQuestions: [
-        "Welche Entscheidungen kann eine Person eigenstaendig treffen?",
-        "Wann wollt ihr euch vor einer Entscheidung abstimmen?",
-        "Wie wollt ihr mit unterschiedlichen Einschaetzungen umgehen?",
-        "Welche Frist oder welcher naechste Schritt hilft bei offenen Entscheidungen?",
+        "Bei welchen Entscheidungen ist dir eigene Entscheidungshoheit besonders wichtig - und warum?",
+        "Wann ist fachliche Zustaendigkeit fuer dich wichtiger als gemeinsames Entscheiden?",
+        "Was wuerde sich fuer dich bei Entscheidungen unfair, uebergangen oder machtlos anfuehlen?",
+        "Woran wuerdet ihr frueh merken, dass eure bisherige Entscheidungsregel nicht mehr gut funktioniert?",
       ],
       suggestion: {
         agreement:
@@ -239,16 +266,16 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
     },
     collaboration_conflict: {
       question:
-        "Wie wollt ihr mit Meinungsverschiedenheiten, Spannungen oder schwierigen Situationen umgehen?",
+        "Wenn es zwischen euch wirklich schwierig wird: Was brauchst du, damit ein Konflikt angesprochen, verstanden und wieder bearbeitet werden kann?",
       collectPlaceholder: "Beschreibe, was dir bei Feedback oder Meinungsverschiedenheiten wichtig ist.",
       collectHelper: "Startet mit konkreten Situationen, nicht mit langen Erklaerungen.",
       agreementTitle: "Klaerungsregel",
       reviewSummary: "Fruehwarnsignal optional ergaenzen",
       impulseQuestions: [
-        "Wie moechtest du Meinungsverschiedenheiten ansprechen?",
-        "Was hilft dir, Feedback gut aufzunehmen und zu geben?",
-        "Wann ist ein eigener Gespraechsrahmen hilfreich?",
-        "Wie wollt ihr offene Punkte nach einem Gespraech festhalten?",
+        "Woran koennte dein Co-Founder merken, dass dich etwas beschaeftigt, bevor du es ausdruecklich ansprichst?",
+        "Was macht Feedback fuer dich leichter annehmbar - und was fuehrt eher dazu, dass du dich zurueckziehst oder verteidigst?",
+        "Was brauchst du nach einem heftigen oder verletzenden Konflikt, damit Vertrauen und Zusammenarbeit wieder entstehen koennen?",
+        "Was sollte passieren, wenn eine Person etwas sofort klaeren moechte und die andere zunaechst Abstand braucht?",
       ],
       suggestion: {
         agreement:

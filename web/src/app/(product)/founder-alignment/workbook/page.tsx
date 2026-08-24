@@ -178,6 +178,7 @@ export default async function FounderAlignmentWorkbookPage({
           storedTeamContext={data.storedTeamContext}
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
+          deepDiveHandoff={data.deepDiveHandoff}
         />
       ) : (
         <FounderAlignmentWorkbookClient
@@ -204,6 +205,7 @@ export default async function FounderAlignmentWorkbookPage({
           storedTeamContext={data.storedTeamContext}
           hasTeamContextMismatch={data.hasTeamContextMismatch}
           showValuesStep={data.showValuesStep}
+          deepDiveHandoff={data.deepDiveHandoff}
         />
       )}
     </main>
