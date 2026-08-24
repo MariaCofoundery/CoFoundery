@@ -44,6 +44,8 @@ type InsertedInvitationRow = {
 
 type ExistingRelationshipAdvisorRow = {
   id: string;
+  status: string;
+  revoked_at: string | null;
 };
 
 type InvitationBootstrapRow = {
@@ -355,7 +357,7 @@ async function resolveRelationshipIdForFounders(
 ) {
   const { data: existingRelationship, error: existingRelationshipError } = await client
     .from("relationships")
-    .select("id")
+    .select("id, status, revoked_at")
     .or(
       `and(user_a_id.eq.${founderAUserId},user_b_id.eq.${founderBUserId}),and(user_a_id.eq.${founderBUserId},user_b_id.eq.${founderAUserId})`
     )
@@ -372,7 +374,7 @@ async function resolveRelationshipIdForFounders(
       user_b_id: founderBUserId,
       status: "active",
     })
-    .select("id")
+    .select("id, status, revoked_at")
     .maybeSingle();
 
   if (!insertedRelationshipError && insertedRelationship) {
@@ -542,6 +544,14 @@ async function upsertRelationshipAdvisorLink(params: {
     .maybeSingle();
 
   const existingRelationshipAdvisor = existingByInvitation ?? existingByRelationship;
+
+  if (
+    (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow | null)?.status === "revoked" ||
+    (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow | null)?.revoked_at
+  ) {
+    // Retry/repair of an already activated team invite must never undo a founder revoke.
+    return;
+  }
 
   const basePayload = {
     relationship_id: params.relationshipId,

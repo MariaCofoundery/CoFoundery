@@ -164,9 +164,10 @@ select set_config(
   true
 );
 set local role authenticated;
-update public.relationship_advisors
-set invite_token_hash = repeat('6', 64), invite_expires_at = null
-where id = '66666666-6666-4666-8666-666666666662';
+select public.issue_relationship_advisor_invite(
+  '66666666-6666-4666-8666-666666666662',
+  repeat('6', 64)
+);
 reset role;
 
 select pg_temp.assert_true(

@@ -29,7 +29,6 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbookAdvisor";
 import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
-  listRelationshipAdvisorsForRelationship,
   resolveRelationshipIdForInvitation,
   syncRelationshipAdvisorFromLegacyInvitation,
   type RelationshipAdvisorRow,
@@ -226,6 +225,22 @@ export type CopyFounderAlignmentAdvisorInviteLinkResult =
         | "missing_relationship"
         | "not_found"
         | "not_ready"
+        | "save_failed";
+    };
+
+export type RevokeFounderAlignmentAdvisorAccessResult =
+  | {
+      ok: true;
+      entry: FounderAlignmentWorkbookAdvisorEntry;
+    }
+  | {
+      ok: false;
+      reason:
+        | "missing_invitation"
+        | "not_authenticated"
+        | "forbidden"
+        | "missing_relationship"
+        | "not_found"
         | "save_failed";
     };
 
@@ -492,6 +507,7 @@ async function resolveWorkbookViewerRole(
     return "advisor";
   }
   if (
+    !advisorRelationshipContext.hasRelationshipAdvisorRecord &&
     advisorRow?.advisor_user_id === userId &&
     advisorRow.founder_a_approved === true &&
     advisorRow.founder_b_approved === true
@@ -1481,62 +1497,19 @@ export async function proposeFounderAlignmentAdvisor({
     return { ok: false, reason: "missing_relationship", debug: debugInfo };
   }
 
-  const existingRows = await listRelationshipAdvisorsForRelationship(resolvedRelationshipId, supabase);
-  const existingRow =
-    existingRows.find(
-      (row) =>
-        normalizeAdvisorEmail(row.advisor_email) === normalizedEmail && row.revoked_at == null
-    ) ?? null;
-
-  const nextFounderAApproved =
-    founderRole === "founderA" ? true : (existingRow?.founder_a_approved ?? false);
-  const nextFounderBApproved =
-    founderRole === "founderB" ? true : (existingRow?.founder_b_approved ?? false);
-
-  const { data: persisted, error } = existingRow
-    ? await supabase
-        .from("relationship_advisors")
-        .update({
-          advisor_name: normalizedAdvisorName ?? existingRow.advisor_name ?? null,
-          advisor_email: normalizedEmail,
-          founder_a_approved: nextFounderAApproved,
-          founder_b_approved: nextFounderBApproved,
-          status: nextFounderAApproved && nextFounderBApproved ? "approved" : "pending",
-          approved_at:
-            nextFounderAApproved && nextFounderBApproved
-              ? existingRow.approved_at ?? new Date().toISOString()
-              : existingRow.approved_at,
-          requested_by_user_id: existingRow.requested_by_user_id ?? user.id,
-          source_invitation_id: existingRow.source_invitation_id ?? normalizedInvitationId,
-        })
-        .eq("id", existingRow.id)
-        .select(
-          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-        )
-        .single()
-    : await supabase
-        .from("relationship_advisors")
-        .insert({
-          relationship_id: resolvedRelationshipId,
-          advisor_name: normalizedAdvisorName,
-          advisor_email: normalizedEmail,
-          status: founderRole === "founderA" || founderRole === "founderB" ? "pending" : "pending",
-          founder_a_approved: founderRole === "founderA",
-          founder_b_approved: founderRole === "founderB",
-          requested_by_user_id: user.id,
-          source_invitation_id: normalizedInvitationId,
-        })
-        .select(
-          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-        )
-        .single();
+  const { data: persisted, error } = await supabase.rpc("propose_relationship_advisor", {
+    p_relationship_id: resolvedRelationshipId,
+    p_source_invitation_id: normalizedInvitationId,
+    p_advisor_name: normalizedAdvisorName,
+    p_advisor_email: normalizedEmail,
+  });
 
   if (error || !persisted) {
     debugInfo.dbError = formatSupabaseError(error);
     debugInfo.finalResult = "save_failed";
     console.error("advisor proposal persistence failed", {
       ...debugInfo,
-      existingAdvisorEntryId: existingRow?.id ?? null,
+      existingAdvisorEntryId: null,
     });
     return { ok: false, reason: "save_failed", debug: debugInfo };
   }
@@ -1605,49 +1578,13 @@ export async function approveFounderAlignmentAdvisorProposal({
     return { ok: false, reason: "missing_relationship" };
   }
 
-  const { data: existing, error: loadError } = await supabase
-    .from("relationship_advisors")
-    .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-    )
-    .eq("id", normalizedEntryId)
-    .eq("relationship_id", resolvedRelationshipId)
-    .maybeSingle();
-
-  if (loadError) {
-    return { ok: false, reason: "save_failed" };
-  }
-
-  if (!existing) {
-    return { ok: false, reason: "not_found" };
-  }
-
-  const row = existing as RelationshipAdvisorRow;
-  const nextFounderAApproved = founderRole === "founderA" ? true : row.founder_a_approved;
-  const nextFounderBApproved = founderRole === "founderB" ? true : row.founder_b_approved;
-  const nextStatus =
-    row.status === "linked" || row.status === "invited"
-      ? row.status
-      : nextFounderAApproved && nextFounderBApproved
-        ? "approved"
-        : "pending";
-
-  const { data: updated, error: updateError } = await supabase
-    .from("relationship_advisors")
-    .update({
-      founder_a_approved: nextFounderAApproved,
-      founder_b_approved: nextFounderBApproved,
-      status: nextStatus,
-      approved_at:
-        nextFounderAApproved && nextFounderBApproved
-          ? row.approved_at ?? new Date().toISOString()
-          : row.approved_at,
-    })
-    .eq("id", row.id)
-    .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-    )
-    .single();
+  const { data: updated, error: updateError } = await supabase.rpc(
+    "approve_relationship_advisor",
+    {
+      p_advisor_id: normalizedEntryId,
+      p_relationship_id: resolvedRelationshipId,
+    }
+  );
 
   if (updateError || !updated) {
     return { ok: false, reason: "save_failed" };
@@ -1778,6 +1715,21 @@ async function loadFounderLabelsForInvitation(
   };
 }
 
+async function issueRelationshipAdvisorInvite(params: {
+  advisorEntryId: string;
+  tokenHash: string;
+  supabase: SupabaseServerClient;
+}) {
+  const { data, error } = await params.supabase.rpc("issue_relationship_advisor_invite", {
+    p_advisor_id: params.advisorEntryId,
+    p_invite_token_hash: params.tokenHash,
+  });
+
+  return error || !data
+    ? { ok: false as const }
+    : { ok: true as const, value: data as RelationshipAdvisorRow };
+}
+
 function mapRelationshipAdvisorEntryWithInvitation(params: {
   row: RelationshipAdvisorRow;
   invitationId: string;
@@ -1864,29 +1816,12 @@ export async function sendFounderAlignmentAdvisorInvite({
   const effectiveTeamContext =
     invitationContext.data?.team_context === "existing_team" ? "existing_team" : teamContext;
   const delivery = await persistInviteBeforeMail<RelationshipAdvisorRow>({
-    persist: async () => {
-      const sentAt = new Date().toISOString();
-      const inviteExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: updated, error: updateError } = await supabase
-        .from("relationship_advisors")
-        .update({
-          status: "invited",
-          invited_at: sentAt,
-          invite_expires_at: inviteExpiresAt,
-          invite_token_hash: tokenHash,
-          source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
-        })
-        .eq("id", loaded.row.id)
-        .eq("updated_at", loaded.row.updated_at)
-        .select(
-          "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-        )
-        .maybeSingle();
-
-      return updateError || !updated
-        ? { ok: false as const }
-        : { ok: true as const, value: updated as RelationshipAdvisorRow };
-    },
+    persist: () =>
+      issueRelationshipAdvisorInvite({
+        advisorEntryId: loaded.row.id,
+        tokenHash,
+        supabase,
+      }),
     send: () =>
       sendAdvisorInviteEmail({
         advisorEmail: loaded.row.advisor_email as string,
@@ -1989,26 +1924,13 @@ export async function copyFounderAlignmentAdvisorInviteLink({
     locale
   );
   const inviteUrl = toPublicAppUrl(invitePath);
-  const invitedAt = new Date().toISOString();
-  const inviteExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const issued = await issueRelationshipAdvisorInvite({
+    advisorEntryId: loaded.row.id,
+    tokenHash,
+    supabase,
+  });
 
-  const { data: updated, error: updateError } = await supabase
-    .from("relationship_advisors")
-    .update({
-      invite_token_hash: tokenHash,
-      invited_at: invitedAt,
-      invite_expires_at: inviteExpiresAt,
-      status: "invited",
-      source_invitation_id: loaded.row.source_invitation_id ?? normalizedInvitationId,
-    })
-    .eq("id", loaded.row.id)
-    .eq("updated_at", loaded.row.updated_at)
-    .select(
-      "id, relationship_id, advisor_user_id, advisor_name, advisor_email, status, founder_a_approved, founder_b_approved, approved_at, invited_at, invite_expires_at, linked_at, revoked_at, requested_by_user_id, source_invitation_id, invite_token_hash, created_at, updated_at"
-    )
-    .maybeSingle();
-
-  if (updateError || !updated) {
+  if (!issued.ok) {
     return { ok: false, reason: "save_failed" };
   }
 
@@ -2016,7 +1938,61 @@ export async function copyFounderAlignmentAdvisorInviteLink({
     ok: true,
     inviteUrl,
     entry: mapRelationshipAdvisorEntryWithInvitation({
-      row: updated as RelationshipAdvisorRow,
+      row: issued.value,
+      invitationId: normalizedInvitationId,
+      invitation: loaded.invitation,
+      founderALabel: labels.founderALabel,
+      founderBLabel: labels.founderBLabel,
+    }),
+  };
+}
+
+export async function revokeFounderAlignmentAdvisorAccess({
+  invitationId,
+  relationshipId,
+  advisorEntryId,
+}: {
+  invitationId: string;
+  relationshipId?: string | null;
+  advisorEntryId: string;
+}): Promise<RevokeFounderAlignmentAdvisorAccessResult> {
+  const normalizedInvitationId = invitationId.trim();
+  if (!normalizedInvitationId) {
+    return { ok: false, reason: "missing_invitation" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const loaded = await loadRelationshipAdvisorEntryForFounder({
+    invitationId: normalizedInvitationId,
+    relationshipId,
+    advisorEntryId,
+    supabase,
+    userId: user.id,
+  });
+  if (!loaded.ok) {
+    return loaded;
+  }
+
+  const { data: revoked, error } = await supabase.rpc("revoke_relationship_advisor", {
+    p_advisor_id: loaded.row.id,
+    p_relationship_id: loaded.relationshipId,
+  });
+  if (error || !revoked) {
+    return { ok: false, reason: "save_failed" };
+  }
+
+  const labels = await loadFounderLabelsForInvitation(loaded.invitation, supabase);
+  return {
+    ok: true,
+    entry: mapRelationshipAdvisorEntryWithInvitation({
+      row: revoked as RelationshipAdvisorRow,
       invitationId: normalizedInvitationId,
       invitation: loaded.invitation,
       founderALabel: labels.founderALabel,

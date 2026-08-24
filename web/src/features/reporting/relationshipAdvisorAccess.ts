@@ -214,6 +214,15 @@ export async function syncRelationshipAdvisorFromLegacyInvitation(
     return { ok: false, reason: "upsert_failed" };
   }
 
+  const existingRelationshipAdvisor = existingRow as RelationshipAdvisorRow | null;
+  if (
+    existingRelationshipAdvisor?.status === "revoked" ||
+    existingRelationshipAdvisor?.revoked_at
+  ) {
+    // An explicit founder revoke always wins over historical compatibility sync.
+    return { ok: true, row: existingRelationshipAdvisor };
+  }
+
   const writeQuery = existingRow
     ? client
         .from("relationship_advisors")

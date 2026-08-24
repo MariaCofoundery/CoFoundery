@@ -623,8 +623,11 @@ export async function getFounderAlignmentWorkbookPageData(
     (user?.id && resolvedRelationshipId
       ? await hasAdvisorAccessToRelationship(user.id, resolvedRelationshipId, relationshipAccessClient)
       : false);
+  const canUseLegacyAdvisorFallback =
+    advisorRelationshipResolution?.hasRelationshipAdvisorRecord !== true;
   const isLinkedAdvisor =
-    hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id);
+    hasRelationshipAdvisorAccess ||
+    (canUseLegacyAdvisorFallback && hasActiveAdvisorAccess(advisorRow, user?.id));
   const privileged = isLinkedAdvisor ? privilegedAccessClient : null;
   const dataClient = privileged ?? supabase;
 
@@ -715,7 +718,8 @@ export async function getFounderAlignmentWorkbookPageData(
       ? "founderA"
       : user?.id && founderContext.founderBUserId === user.id
       ? "founderB"
-        : hasRelationshipAdvisorAccess || hasActiveAdvisorAccess(advisorRow, user?.id)
+        : hasRelationshipAdvisorAccess ||
+            (canUseLegacyAdvisorFallback && hasActiveAdvisorAccess(advisorRow, user?.id))
           ? "advisor"
           : "unknown";
 

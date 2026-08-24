@@ -438,7 +438,7 @@ export async function getAdvisorReportPageData(
   let legacySyncAttempted = false;
   let legacySyncResult: AdvisorReportDebugMeta["legacySyncResult"] = "not_attempted";
 
-  if (!hasAccess) {
+  if (!hasAccess && !relationshipResolution.hasRelationshipAdvisorRecord) {
     legacySyncAttempted = true;
     const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
       normalizedInvitationId,
@@ -679,7 +679,7 @@ export async function saveAdvisorSectionImpulse(params: {
   }
 
   let hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
-  if (!hasAccess) {
+  if (!hasAccess && !relationshipResolution.hasRelationshipAdvisorRecord) {
     const syncResult = await syncRelationshipAdvisorFromLegacyInvitation(
       normalizedInvitationId,
       privileged
@@ -694,9 +694,9 @@ export async function saveAdvisorSectionImpulse(params: {
     });
     relationshipId = relationshipResolution.relationshipId ?? relationshipId;
     hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
-    if (!hasAccess) {
-      return { ok: false, reason: "forbidden" };
-    }
+  }
+  if (!hasAccess) {
+    return { ok: false, reason: "forbidden" };
   }
 
   if (!normalizedText) {

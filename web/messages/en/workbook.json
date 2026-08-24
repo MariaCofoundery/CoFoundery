@@ -503,6 +503,9 @@
     "sending": "Sending...",
     "resend": "Send again",
     "copyInviteLink": "Copy invitation link",
+    "revokeAccess": "Revoke advisor access",
+    "revokeConfirm": "Do you really want to revoke advisor access for this connection?",
+    "revokeDescription": "The advisor loses access to the approved areas of this connection. Separate team grants such as Founder Setup remain inactive while this underlying advisor access is revoked.",
     "permissionsTitle": "What the advisor can do later",
     "permissionReportWorkbook": "See the approved report and workbook.",
     "permissionReplies": "Reply to visible founder contributions and add one impulse per section.",
@@ -530,7 +533,8 @@
       "missingEmail": "This advisor does not have an email address yet.",
       "inviteNotReady": "This advisor entry is not ready to be sent yet.",
       "inviteFailed": "The invitation has not been sent yet. The advisor entry remains saved.",
-      "linkFailed": "The invitation link could not be prepared right now."
+      "linkFailed": "The invitation link could not be prepared right now.",
+      "revokeFailed": "Advisor access could not be revoked right now."
     },
     "actions": {
       "waitingFounderA": "Your approval has been recorded. Access starts once Founder A also approves.",
@@ -545,7 +549,8 @@
       "sentTo": "Invitation sent to {email}.",
       "linkCopied": "Invitation link copied. You can now share it manually.",
       "linkReady": "Invitation link created. You can now share it manually.",
-      "linkCreated": "Invitation link created."
+      "linkCreated": "Invitation link created.",
+      "revoked": "Advisor access has been revoked."
     },
     "entryStatuses": {
       "linkedLabel": "Active",

@@ -12,6 +12,25 @@ type RelationshipAdvisorAccessRow = {
   relationship_id: string;
 };
 
+async function hasRelationshipAdvisorRecordWithClient(
+  relationshipId: string,
+  advisorUserId: string | null | undefined,
+  supabase: SupabaseLikeClient
+) {
+  const normalizedAdvisorUserId = advisorUserId?.trim() ?? "";
+  if (!relationshipId || !normalizedAdvisorUserId) return false;
+
+  const { data, error } = await supabase
+    .from("relationship_advisors")
+    .select("id")
+    .eq("relationship_id", relationshipId)
+    .eq("advisor_user_id", normalizedAdvisorUserId)
+    .limit(1)
+    .maybeSingle();
+
+  return !error && Boolean((data as { id?: string } | null)?.id);
+}
+
 export async function loadAdvisorRelationshipIdWithClient(
   invitationId: string,
   advisorUserId: string | null | undefined,
@@ -74,12 +93,14 @@ export async function resolveAdvisorRelationshipContext(params: {
 }): Promise<{
   relationshipId: string | null;
   hasRelationshipAdvisorAccess: boolean;
+  hasRelationshipAdvisorRecord: boolean;
 }> {
   const normalizedInvitationId = params.invitationId.trim();
   if (!normalizedInvitationId) {
     return {
       relationshipId: null,
       hasRelationshipAdvisorAccess: false,
+      hasRelationshipAdvisorRecord: false,
     };
   }
 
@@ -104,11 +125,22 @@ export async function resolveAdvisorRelationshipContext(params: {
         )
       : false;
 
-  return resolveWorkbookRelationshipAccess({
-    advisorContext: true,
-    relationshipIdFromAdvisorAccess: advisorRelationshipId,
-    relationshipIdFromReportRun: reportRunRelationshipId,
-    relationshipIdFromInvitation: invitationRelationshipId,
-    hasRelationshipAdvisorAccess: checkedRelationshipAdvisorAccess,
-  });
+  const hasRelationshipAdvisorRecord = candidateRelationshipId
+    ? await hasRelationshipAdvisorRecordWithClient(
+        candidateRelationshipId,
+        params.advisorUserId,
+        params.client
+      )
+    : false;
+
+  return {
+    ...resolveWorkbookRelationshipAccess({
+      advisorContext: true,
+      relationshipIdFromAdvisorAccess: advisorRelationshipId,
+      relationshipIdFromReportRun: reportRunRelationshipId,
+      relationshipIdFromInvitation: invitationRelationshipId,
+      hasRelationshipAdvisorAccess: checkedRelationshipAdvisorAccess,
+    }),
+    hasRelationshipAdvisorRecord,
+  };
 }

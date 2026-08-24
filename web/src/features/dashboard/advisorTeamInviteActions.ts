@@ -112,7 +112,6 @@ export async function createAdvisorTeamInviteAction(
       ? user.user_metadata.display_name.trim()
       : "";
   const advisorName = profile?.display_name?.trim() || metadataName || null;
-  const advisorEmail = normalizeEmail(user.email ?? null) || null;
   const locale = await getRequestLocale();
   const fallbackCounterpartLabel =
     locale === "en" ? "the other founder" : "die zweite Founder-Person";
@@ -122,21 +121,17 @@ export async function createAdvisorTeamInviteAction(
   const founderAInviteUrl = buildAbsoluteInviteUrl(founderAToken, locale);
   const founderBInviteUrl = buildAbsoluteInviteUrl(founderBToken, locale);
 
-  const { data: insertedRow, error: insertError } = await supabase
-    .from("advisor_team_invites")
-    .insert({
-      advisor_user_id: user.id,
-      advisor_email: advisorEmail,
-      advisor_name: advisorName,
-      team_name: teamName,
-      founder_a_email: normalizedEmails.founderAEmail,
-      founder_b_email: normalizedEmails.founderBEmail,
-      founder_a_token_hash: hashOpaqueToken(founderAToken),
-      founder_b_token_hash: hashOpaqueToken(founderBToken),
-      status: "pending",
-    })
-    .select("id")
-    .single();
+  const { data: insertedRow, error: insertError } = await supabase.rpc(
+    "create_advisor_team_invite",
+    {
+      p_advisor_name: advisorName,
+      p_team_name: teamName,
+      p_founder_a_email: normalizedEmails.founderAEmail,
+      p_founder_b_email: normalizedEmails.founderBEmail,
+      p_founder_a_token_hash: hashOpaqueToken(founderAToken),
+      p_founder_b_token_hash: hashOpaqueToken(founderBToken),
+    }
+  );
 
   if (insertError || !insertedRow?.id) {
     if (insertError?.code === "23505") {
@@ -230,15 +225,9 @@ export async function revokeAdvisorPendingTeamInviteAction(
     return;
   }
 
-  await supabase
-    .from("advisor_team_invites")
-    .update({
-      status: "revoked",
-    })
-    .eq("id", pendingTeamId)
-    .eq("advisor_user_id", user.id)
-    .eq("status", "pending")
-    .is("relationship_id", null);
+  await supabase.rpc("revoke_pending_advisor_team_invite", {
+    p_invite_id: pendingTeamId,
+  });
 
   revalidatePath("/advisor/dashboard");
 }

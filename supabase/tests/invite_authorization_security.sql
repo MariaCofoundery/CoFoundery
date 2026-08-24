@@ -498,41 +498,43 @@ select set_config(
 );
 set local role authenticated;
 do $$
-declare
-  changed_rows integer;
 begin
-  update public.relationship_advisors
-  set relationship_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2'
-  where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
-  get diagnostics changed_rows = row_count;
-  if changed_rows <> 0 then
+  begin
+    update public.relationship_advisors
+    set relationship_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2'
+    where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
     raise exception 'advisor changed relationship_id';
-  end if;
+  exception when sqlstate '42501' then null;
+  end;
 
-  update public.relationship_advisors
-  set advisor_user_id = '33333333-3333-4333-8333-333333333333'
-  where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
-  get diagnostics changed_rows = row_count;
-  if changed_rows <> 0 then
+  begin
+    update public.relationship_advisors
+    set advisor_user_id = '33333333-3333-4333-8333-333333333333'
+    where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
     raise exception 'advisor changed advisor_user_id';
-  end if;
+  exception when sqlstate '42501' then null;
+  end;
 end;
 $$;
 reset role;
 
--- Founders retain legitimate metadata updates but cannot change advisor identity fields.
+-- Founders cannot update any relationship-advisor fields directly; narrow RPCs own the lifecycle.
 select set_config(
   'request.jwt.claims',
   '{"sub":"11111111-1111-4111-8111-111111111111","email":"inviter@example.com","role":"authenticated"}',
   true
 );
 set local role authenticated;
-update public.relationship_advisors
-set advisor_name = 'Updated Advisor'
-where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
-
 do $$
 begin
+  begin
+    update public.relationship_advisors
+    set advisor_name = 'Updated Advisor'
+    where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1';
+    raise exception 'founder changed advisor metadata directly';
+  exception when sqlstate '42501' then null;
+  end;
+
   begin
     update public.relationship_advisors
     set relationship_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2'
@@ -553,8 +555,8 @@ $$;
 reset role;
 
 select pg_temp.assert_true(
-  (select advisor_name = 'Updated Advisor' from public.relationship_advisors where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1'),
-  'legitimate founder advisor metadata update was blocked'
+  (select advisor_name = 'Advisor' from public.relationship_advisors where id = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc1'),
+  'direct founder update changed advisor metadata'
 );
 
 -- Seed the minimum accepted-invitation inputs needed for the existing finalize success path.

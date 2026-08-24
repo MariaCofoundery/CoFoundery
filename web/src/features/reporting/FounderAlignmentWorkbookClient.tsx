@@ -20,6 +20,7 @@ import {
   copyFounderAlignmentAdvisorInviteLink,
   proposeFounderAlignmentAdvisor,
   prepareFounderAlignmentAdvisorInvite,
+  revokeFounderAlignmentAdvisorAccess,
   sendFounderAlignmentAdvisorInvite,
   saveFounderAlignmentWorkbook,
 } from "@/features/reporting/founderAlignmentWorkbookActions";
@@ -3269,6 +3270,32 @@ export function FounderAlignmentWorkbookClient({
     });
   }
 
+  function handleRevokeAdvisorAccess(entry: FounderAlignmentWorkbookAdvisorEntry) {
+    if (!invitationId || (currentUserRole !== "founderA" && currentUserRole !== "founderB")) {
+      return;
+    }
+    if (typeof window !== "undefined" && !window.confirm(wt("advisor.revokeConfirm"))) {
+      return;
+    }
+
+    startAdvisorActionTransition(async () => {
+      const result = await revokeFounderAlignmentAdvisorAccess({
+        invitationId,
+        relationshipId: entry.relationshipId || relationshipId,
+        advisorEntryId: entry.id,
+      });
+
+      if (!result.ok) {
+        setAdvisorInviteMessage(wt("advisor.errors.revokeFailed"));
+        return;
+      }
+
+      upsertAdvisorEntry(result.entry);
+      setAdvisorInviteLink(null);
+      setAdvisorInviteMessage(wt("advisor.actions.revoked"));
+    });
+  }
+
   return (
     <div className="print-document-root min-h-screen bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.08),transparent_28%),linear-gradient(180deg,#f8fafc_0%,#ffffff_24%,#f8fafc_100%)] px-4 py-10 sm:px-6 lg:px-8 print:min-h-0 print:bg-white print:px-0 print:py-0">
       <div className="mx-auto max-w-7xl print:max-w-none">
@@ -3574,6 +3601,9 @@ export function FounderAlignmentWorkbookClient({
                                     const canCopyInviteLink =
                                       (currentUserRole === "founderA" || currentUserRole === "founderB") &&
                                       (entry.status === "approved" || entry.status === "invited");
+                                    const canRevokeAccess =
+                                      (currentUserRole === "founderA" || currentUserRole === "founderB") &&
+                                      entry.status !== "revoked";
                                     const missingLabel = missingOtherFounderLabel(entry);
                                     return (
                                       <div
@@ -3691,6 +3721,22 @@ export function FounderAlignmentWorkbookClient({
                                                 {wt("advisor.copyInviteLink")}
                                               </button>
                                             ) : null}
+                                          </div>
+                                        ) : null}
+
+                                        {canRevokeAccess ? (
+                                          <div className="mt-4 border-t border-slate-200 pt-3">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRevokeAdvisorAccess(entry)}
+                                              disabled={isAdvisorActionPending}
+                                              className="rounded-lg text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                              {wt("advisor.revokeAccess")}
+                                            </button>
+                                            <p className="mt-2 text-xs leading-5 text-slate-500">
+                                              {wt("advisor.revokeDescription")}
+                                            </p>
                                           </div>
                                         ) : null}
                                       </div>

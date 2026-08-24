@@ -503,6 +503,9 @@
     "sending": "Versendet...",
     "resend": "Erneut senden",
     "copyInviteLink": "Einladungslink kopieren",
+    "revokeAccess": "Advisor-Zugriff widerrufen",
+    "revokeConfirm": "Möchtest du den Advisor-Zugriff für diese Verbindung wirklich widerrufen?",
+    "revokeDescription": "Der Advisor verliert den Zugriff auf die freigegebenen Bereiche dieser Verbindung. Separate Teamfreigaben wie Founder Setup bleiben unwirksam, solange dieser Advisor-Zugang widerrufen ist.",
     "permissionsTitle": "Was der Advisor später darf",
     "permissionReportWorkbook": "Sieht den freigegebenen Report und das Workbook.",
     "permissionReplies": "Antwortet auf sichtbare Founder-Beiträge und ergänzt pro Abschnitt einen Impuls.",
@@ -530,7 +533,8 @@
       "missingEmail": "Für diesen Advisor fehlt noch eine E-Mail-Adresse.",
       "inviteNotReady": "Dieser Advisor-Eintrag ist noch nicht bereit für den Versand.",
       "inviteFailed": "Die Einladung wurde noch nicht versendet. Der Advisor-Eintrag bleibt erhalten.",
-      "linkFailed": "Der Einladungslink konnte gerade nicht vorbereitet werden."
+      "linkFailed": "Der Einladungslink konnte gerade nicht vorbereitet werden.",
+      "revokeFailed": "Der Advisor-Zugriff konnte gerade nicht widerrufen werden."
     },
     "actions": {
       "waitingFounderA": "Deine Freigabe ist erfasst. Zugriff entsteht erst, wenn Founder A ebenfalls zustimmt.",
@@ -545,7 +549,8 @@
       "sentTo": "Einladung gesendet an {email}.",
       "linkCopied": "Einladungslink kopiert. Du kannst ihn jetzt manuell teilen.",
       "linkReady": "Einladungslink erstellt. Du kannst ihn jetzt manuell teilen.",
-      "linkCreated": "Einladungslink erstellt."
+      "linkCreated": "Einladungslink erstellt.",
+      "revoked": "Der Advisor-Zugriff wurde widerrufen."
     },
     "entryStatuses": {
       "linkedLabel": "Aktiv",
