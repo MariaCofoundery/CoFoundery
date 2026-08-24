@@ -103,6 +103,31 @@
       "responsibility": "Was möchtest du mit bereits übernommenen Aufgaben tun, wenn dein eigener Rahmen sich verändert?",
       "renegotiation": "Wann ist es für dich legitim, Commitment neu zu verhandeln?"
     },
+    "difficulty": {
+      "title": "Was wäre für dich schwierig?",
+      "question": "Welche Situation rund um Einsatz oder Verantwortung würde für dich in eurer Zusammenarbeit besonders schwierig werden?",
+      "help": "Es geht nicht darum, ein Risiko zu bewerten. Überlege, welche Situation du lieber früh ansprechen würdest.",
+      "desired": "Was würdest du dir stattdessen wünschen?"
+    },
+    "markers": {
+      "toggle": "Darüber möchte ich sprechen",
+      "limit": "Du kannst bis zu drei Gesprächspunkte auswählen.",
+      "sharedTitle": "Darüber möchtet ihr sprechen",
+      "sharedHelp": "Diese Punkte habt ihr selbst für euer gemeinsames Gespräch ausgewählt.",
+      "labels": {
+        "commitment_meaning": "Was deine Zusage für dich bedeutet",
+        "aspect_priority": "Priorität der Gründung",
+        "aspect_reliability": "Verbindlichkeit in schwierigen Phasen",
+        "aspect_transparency": "Veränderungen früh ansprechen",
+        "aspect_responsibility": "Verantwortung bei verändertem Rahmen",
+        "aspect_renegotiation": "Commitment neu verhandeln",
+        "scenario_motivation_progress": "Szenario: Motivation und Fortschritt",
+        "scenario_time_circumstances": "Szenario: Zeit und Lebensumstände",
+        "scenario_attractive_alternative": "Szenario: Attraktive berufliche Alternative",
+        "scenario_team_responsibility": "Szenario: Verantwortung im Team",
+        "difficulty_wish": "Schwierige Situation und eigener Wunsch"
+      }
+    },
     "scenarios": {
       "title": "Reality- und Stress-Szenarien",
       "help": "Es gibt keine richtige oder falsche Antwort. Beschreibe, was du wahrscheinlich tun würdest.",
@@ -114,13 +139,27 @@
       "team_responsibility": "Dein Co-Founder hält vereinbarte Aufgaben seit mehreren Wochen nicht wie besprochen ein."
     },
     "compare": {
-      "title": "Eure Perspektiven",
+      "title": "Eure Commitment Snapshots",
       "ready": "Ihr habt beide eure persönliche Perspektive festgehalten. Vergleicht eure Aussagen und besprecht, was sie für euch bedeuten.",
       "waiting": "Noch offen: Die gemeinsame Gegenüberstellung erscheint, sobald beide Founder die persönlichen Kernbereiche ausgefüllt haben.",
       "hours": "Zeit & Verfügbarkeit",
       "current": "Aktuell: {hours} Std.",
       "difficult": "Schwierige Woche: {hours} Std.",
       "meaning": "Bedeutung von „Ich bin dabei“"
+    },
+    "snapshot": {
+      "ownTitle": "Mein Commitment Snapshot",
+      "ownHelp": "Dein Snapshot fasst deine eigenen Angaben aus diesem Commitment Lab zusammen. Er ist keine Bewertung deines Commitments.",
+      "sharedHelp": "Eure Snapshots stellen eure eigenen Angaben gleichwertig nebeneinander. Sie enthalten keine Bewertung oder automatische Interpretation.",
+      "time": "Zeit & Verfügbarkeit",
+      "currentHours": "Aktuell: {hours} Std.",
+      "difficultHours": "Schwierige Woche: {hours} Std.",
+      "framework": "Dein aktueller Rahmen",
+      "changes": "Mögliche Veränderungen",
+      "meaning": "Was deine Zusage für dich bedeutet",
+      "difficult": "Was für dich schwierig wäre",
+      "desired": "Was du dir stattdessen wünschst",
+      "markers": "Deine ausgewählten Gesprächspunkte"
     },
     "discussion": {
       "title": "Gemeinsames Gespräch",
@@ -163,10 +202,10 @@
       "error": "Die Änderung konnte gerade nicht sicher gespeichert werden."
     },
     "speech": {
-      "start": "Diktat starten",
-      "stop": "Diktat stoppen",
-      "listening": "Diktat läuft …",
-      "unavailable": "Diktat ist in diesem Browser gerade nicht verfügbar."
+      "start": "Einsprechen",
+      "stop": "Aufnahme stoppen",
+      "listening": "Aufnahme läuft …",
+      "unavailable": "Einsprechen ist in diesem Browser gerade nicht verfügbar."
     }
   },
   "connections": {

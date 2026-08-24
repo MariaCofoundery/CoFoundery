@@ -25,8 +25,16 @@ export const COMMITMENT_LAB_SCENARIOS = [
   "team_responsibility",
 ] as const;
 
+export const COMMITMENT_LAB_DISCUSSION_MARKERS = [
+  "commitment_meaning",
+  ...COMMITMENT_LAB_ASPECTS.map((aspect) => `aspect:${aspect}` as const),
+  ...COMMITMENT_LAB_SCENARIOS.map((scenario) => `scenario:${scenario}` as const),
+  "difficulty_wish",
+] as const;
+
 export type CommitmentLabObligation = (typeof COMMITMENT_LAB_OBLIGATIONS)[number];
 export type CommitmentLabScenarioKey = (typeof COMMITMENT_LAB_SCENARIOS)[number];
+export type CommitmentLabDiscussionMarker = (typeof COMMITMENT_LAB_DISCUSSION_MARKERS)[number];
 export type CommitmentLabRealityFit = "realistic" | "partly" | "reconsider";
 export type CommitmentLabScenarioAnswer = { action: string; expectation: string };
 
@@ -45,7 +53,21 @@ export type CommitmentLabFounderEntry = {
   responsibilityReflection: string;
   renegotiationReflection: string;
   scenarioAnswers: Record<CommitmentLabScenarioKey, CommitmentLabScenarioAnswer>;
+  difficultSituation: string;
+  desiredAlternative: string;
+  discussionMarkers: CommitmentLabDiscussionMarker[];
   updatedAt: string;
+};
+
+export type CommitmentLabSnapshot = {
+  currentHours: number | null;
+  difficultWeekHours: number | null;
+  obligationCategories: CommitmentLabObligation[];
+  changeNote: string;
+  commitmentMeaning: string;
+  difficultSituation: string;
+  desiredAlternative: string;
+  discussionMarkers: CommitmentLabDiscussionMarker[];
 };
 
 export type CommitmentLabDiscussionEntry = {
@@ -77,6 +99,53 @@ export function normalizeScenarioAnswers(value: unknown) {
     };
   }
   return result;
+}
+
+export function normalizeCommitmentLabDiscussionMarkers(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (marker, index): marker is CommitmentLabDiscussionMarker =>
+      typeof marker === "string" &&
+      (COMMITMENT_LAB_DISCUSSION_MARKERS as readonly string[]).includes(marker) &&
+      value.indexOf(marker) === index
+  ).slice(0, 3);
+}
+
+export function getCommitmentLabMarkerMessageKey(marker: CommitmentLabDiscussionMarker) {
+  return `markers.labels.${marker.replace(":", "_")}`;
+}
+
+export function getCommitmentLabMarkerAnswer(
+  entry: CommitmentLabFounderEntry,
+  marker: CommitmentLabDiscussionMarker
+) {
+  if (marker === "commitment_meaning") return entry.commitmentMeaning;
+  if (marker === "difficulty_wish") {
+    return [entry.difficultSituation, entry.desiredAlternative].filter(Boolean).join("\n\n");
+  }
+  if (marker.startsWith("aspect:")) {
+    const aspect = marker.slice(7);
+    const field = `${aspect}Reflection` as keyof CommitmentLabFounderEntry;
+    return typeof entry[field] === "string" ? entry[field] : "";
+  }
+  const scenario = marker.slice(9) as CommitmentLabScenarioKey;
+  const answer = entry.scenarioAnswers[scenario];
+  return answer ? [answer.action, answer.expectation].filter(Boolean).join("\n\n") : "";
+}
+
+export function buildCommitmentLabSnapshot(
+  entry: CommitmentLabFounderEntry
+): CommitmentLabSnapshot {
+  return {
+    currentHours: entry.currentHours,
+    difficultWeekHours: entry.difficultWeekHours,
+    obligationCategories: [...entry.obligationCategories],
+    changeNote: entry.changeNote,
+    commitmentMeaning: entry.commitmentMeaning,
+    difficultSituation: entry.difficultSituation,
+    desiredAlternative: entry.desiredAlternative,
+    discussionMarkers: [...entry.discussionMarkers],
+  };
 }
 
 export function isCommitmentLabFounderReady(entry: CommitmentLabFounderEntry | null) {

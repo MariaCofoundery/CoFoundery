@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import {
   COMMITMENT_LAB_OBLIGATIONS,
+  isCommitmentLabFounderReady,
+  normalizeCommitmentLabDiscussionMarkers,
   normalizeScenarioAnswers,
   type CommitmentLabDiscussionEntry,
   type CommitmentLabFounderEntry,
@@ -26,7 +28,7 @@ export async function getCommitmentLab(
 
   const [labResult, founderResult, discussionResult, setupResult] = await Promise.all([
     supabase.from("commitment_labs").select("relationship_id, shared_reflection, created_at, updated_at").eq("relationship_id", relationshipId).maybeSingle(),
-    supabase.from("commitment_lab_founder_entries").select("relationship_id, user_id, current_hours, difficult_week_hours, obligation_categories, change_note, reality_fit, commitment_meaning, priority_reflection, reliability_reflection, transparency_reflection, responsibility_reflection, renegotiation_reflection, scenario_answers, updated_at").eq("relationship_id", relationshipId),
+    supabase.from("commitment_lab_founder_entries").select("relationship_id, user_id, current_hours, difficult_week_hours, obligation_categories, change_note, reality_fit, commitment_meaning, priority_reflection, reliability_reflection, transparency_reflection, responsibility_reflection, renegotiation_reflection, scenario_answers, difficult_situation, desired_alternative, discussion_markers, updated_at").eq("relationship_id", relationshipId),
     supabase.from("commitment_lab_discussion_entries").select("id, author_user_id, parent_entry_id, body, created_at").eq("relationship_id", relationshipId).order("created_at", { ascending: true }),
     supabase.from("founder_team_setup_items").select("item_key, working_note").eq("team_id", teamId).in("item_key", ["time_commitment", "changing_commitment"]),
   ]);
@@ -58,6 +60,9 @@ export async function getCommitmentLab(
     responsibilityReflection: typeof row.responsibility_reflection === "string" ? row.responsibility_reflection : "",
     renegotiationReflection: typeof row.renegotiation_reflection === "string" ? row.renegotiation_reflection : "",
     scenarioAnswers: normalizeScenarioAnswers(row.scenario_answers),
+    difficultSituation: typeof row.difficult_situation === "string" ? row.difficult_situation : "",
+    desiredAlternative: typeof row.desired_alternative === "string" ? row.desired_alternative : "",
+    discussionMarkers: normalizeCommitmentLabDiscussionMarkers(row.discussion_markers),
     updatedAt: String(row.updated_at),
   }));
   const discussion = ((discussionResult.data ?? []) as Array<Record<string, unknown>>).map<CommitmentLabDiscussionEntry>((row) => ({
@@ -70,12 +75,20 @@ export async function getCommitmentLab(
   const setupNotes = Object.fromEntries(
     ((setupResult.data ?? []) as Array<{ item_key: string; working_note: string }>).map((row) => [row.item_key, row.working_note])
   );
+  const bothFoundersReady = alignment.participantUserIds.every((userId) =>
+    isCommitmentLabFounderReady(founderEntries.find((entry) => entry.userId === userId) ?? null)
+  );
   return {
     team,
     relationshipId,
     participantUserIds: alignment.participantUserIds,
     participantNames: alignment.participantUserIds.map((id) => names.get(id) ?? "Founder") as [string, string],
     founderEntries,
+    sharedDiscussionMarkers: bothFoundersReady
+      ? founderEntries.flatMap((entry) =>
+          entry.discussionMarkers.map((marker) => ({ userId: entry.userId, marker }))
+        )
+      : [],
     discussion,
     sharedReflection: (labResult.data as { shared_reflection?: string } | null)?.shared_reflection ?? "",
     started: Boolean(labResult.data || founderEntries.length || discussion.length),

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   COMMITMENT_LAB_OBLIGATIONS,
+  COMMITMENT_LAB_DISCUSSION_MARKERS,
   COMMITMENT_LAB_SCENARIOS,
 } from "@/features/commitmentLab/commitmentLabModel";
 
@@ -49,11 +50,15 @@ export async function saveCommitmentLabFounderEntryAction(
       (COMMITMENT_LAB_OBLIGATIONS as readonly string[]).includes(entry)
   );
   const realityFit = value(formData, "realityFit", 20);
+  const discussionMarkers = formData.getAll("discussionMarkers").filter(
+    (entry): entry is string => typeof entry === "string" &&
+      (COMMITMENT_LAB_DISCUSSION_MARKERS as readonly string[]).includes(entry)
+  );
   const scenarioAnswers = Object.fromEntries(COMMITMENT_LAB_SCENARIOS.map((key) => [key, {
     action: value(formData, `scenario.${key}.action`),
     expectation: value(formData, `scenario.${key}.expectation`),
   }]));
-  const { error } = await auth.supabase.rpc("save_commitment_lab_founder_entry", {
+  const { error } = await auth.supabase.rpc("save_commitment_lab_founder_entry_v11", {
     p_relationship_id: relationshipId,
     p_current_hours: hours(formData, "currentHours"),
     p_difficult_week_hours: hours(formData, "difficultWeekHours"),
@@ -67,6 +72,9 @@ export async function saveCommitmentLabFounderEntryAction(
     p_responsibility_reflection: value(formData, "responsibilityReflection"),
     p_renegotiation_reflection: value(formData, "renegotiationReflection"),
     p_scenario_answers: scenarioAnswers,
+    p_difficult_situation: value(formData, "difficultSituation"),
+    p_desired_alternative: value(formData, "desiredAlternative"),
+    p_discussion_markers: discussionMarkers,
   });
   if (error) redirect(labHref(teamId, relationshipId, "error"));
   refresh(teamId, relationshipId);

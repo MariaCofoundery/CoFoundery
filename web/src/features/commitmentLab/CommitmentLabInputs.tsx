@@ -1,9 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { getSpeechRecognitionLocale } from "@/i18n/presentationLocale";
+import type { CommitmentLabDiscussionMarker } from "@/features/commitmentLab/commitmentLabModel";
 
 type Recognition = {
   lang: string;
@@ -16,6 +17,50 @@ type Recognition = {
   stop(): void;
 };
 type RecognitionConstructor = new () => Recognition;
+
+const MarkerContext = createContext<{
+  markers: Set<CommitmentLabDiscussionMarker>;
+  toggle: (marker: CommitmentLabDiscussionMarker) => void;
+} | null>(null);
+
+export function CommitmentLabMarkerProvider({
+  initialMarkers,
+  children,
+}: {
+  initialMarkers: CommitmentLabDiscussionMarker[];
+  children: React.ReactNode;
+}) {
+  const [selected, setSelected] = useState(initialMarkers);
+  const markers = useMemo(() => new Set(selected), [selected]);
+  function toggle(marker: CommitmentLabDiscussionMarker) {
+    setSelected((current) => current.includes(marker)
+      ? current.filter((entry) => entry !== marker)
+      : current.length < 3 ? [...current, marker] : current);
+  }
+  return <MarkerContext.Provider value={{ markers, toggle }}>{children}</MarkerContext.Provider>;
+}
+
+export function CommitmentLabMarkerToggle({ marker }: { marker: CommitmentLabDiscussionMarker }) {
+  const t = useTranslations("teams.commitmentLab.markers");
+  const context = useContext(MarkerContext);
+  if (!context) return null;
+  const checked = context.markers.has(marker);
+  const disabled = !checked && context.markers.size >= 3;
+  return (
+    <label className={`mt-2 inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${checked ? "border-violet-300 bg-violet-50 text-violet-900" : "border-slate-200 bg-white text-slate-600"} ${disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer"}`}>
+      <input
+        type="checkbox"
+        name="discussionMarkers"
+        value={marker}
+        checked={checked}
+        disabled={disabled}
+        onChange={() => context.toggle(marker)}
+        className="h-4 w-4 rounded border-slate-300 text-violet-700 focus:ring-violet-500"
+      />
+      {t("toggle")}
+    </label>
+  );
+}
 
 export function CommitmentLabSpeechTextarea({
   id,

@@ -103,6 +103,31 @@
       "responsibility": "What do you want to do with responsibilities you have already taken on if your own capacity changes?",
       "renegotiation": "When is it legitimate for you to renegotiate commitment?"
     },
+    "difficulty": {
+      "title": "What would be difficult for you?",
+      "question": "What situation around contribution or responsibility would be particularly difficult for you in your collaboration?",
+      "help": "This is not about assessing risk. Consider which situation you would prefer to discuss early.",
+      "desired": "What would you want instead?"
+    },
+    "markers": {
+      "toggle": "I want to talk about this",
+      "limit": "You can select up to three conversation topics.",
+      "sharedTitle": "Topics you want to discuss",
+      "sharedHelp": "You selected these topics yourselves for your shared conversation.",
+      "labels": {
+        "commitment_meaning": "What your commitment means to you",
+        "aspect_priority": "Priority of the venture",
+        "aspect_reliability": "Reliability during difficult phases",
+        "aspect_transparency": "Discussing changes early",
+        "aspect_responsibility": "Responsibility when circumstances change",
+        "aspect_renegotiation": "Renegotiating commitment",
+        "scenario_motivation_progress": "Scenario: motivation and progress",
+        "scenario_time_circumstances": "Scenario: time and life circumstances",
+        "scenario_attractive_alternative": "Scenario: attractive professional alternative",
+        "scenario_team_responsibility": "Scenario: team responsibility",
+        "difficulty_wish": "A difficult situation and what you want instead"
+      }
+    },
     "scenarios": {
       "title": "Reality and stress scenarios",
       "help": "There is no right or wrong answer. Describe what you would probably do.",
@@ -114,13 +139,27 @@
       "team_responsibility": "Your co-founder has not completed agreed responsibilities as discussed for several weeks."
     },
     "compare": {
-      "title": "Your perspectives",
+      "title": "Your Commitment Snapshots",
       "ready": "You have both captured your personal perspectives. Compare your responses and discuss what they mean for you.",
       "waiting": "Still open: the shared comparison appears once both founders have completed the personal core sections.",
       "hours": "Time & availability",
       "current": "Currently: {hours} hrs",
       "difficult": "Difficult week: {hours} hrs",
       "meaning": "Meaning of “I am in”"
+    },
+    "snapshot": {
+      "ownTitle": "My Commitment Snapshot",
+      "ownHelp": "Your snapshot summarizes your own input from this Commitment Lab. It is not an assessment of your commitment.",
+      "sharedHelp": "Your snapshots place your own inputs side by side as equals. They contain no assessment or automatic interpretation.",
+      "time": "Time & availability",
+      "currentHours": "Currently: {hours} hrs",
+      "difficultHours": "Difficult week: {hours} hrs",
+      "framework": "Your current situation",
+      "changes": "Possible changes",
+      "meaning": "What your commitment means to you",
+      "difficult": "What would be difficult for you",
+      "desired": "What you would want instead",
+      "markers": "Your selected conversation topics"
     },
     "discussion": {
       "title": "Shared conversation",
@@ -163,10 +202,10 @@
       "error": "The change could not be saved safely right now."
     },
     "speech": {
-      "start": "Start dictation",
-      "stop": "Stop dictation",
-      "listening": "Dictation is running…",
-      "unavailable": "Dictation is not available in this browser right now."
+      "start": "Speak",
+      "stop": "Stop recording",
+      "listening": "Recording…",
+      "unavailable": "Voice input is not available in this browser right now."
     }
   },
   "connections": {

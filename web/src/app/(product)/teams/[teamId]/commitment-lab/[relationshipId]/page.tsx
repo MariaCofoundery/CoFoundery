@@ -6,13 +6,18 @@ import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import {
   CommitmentLabDiscussionComposer,
+  CommitmentLabMarkerProvider,
+  CommitmentLabMarkerToggle,
   CommitmentLabSpeechTextarea,
 } from "@/features/commitmentLab/CommitmentLabInputs";
+import { CommitmentLabSnapshotCard } from "@/features/commitmentLab/CommitmentLabSnapshotCard";
 import { getCommitmentLab } from "@/features/commitmentLab/commitmentLabData";
 import {
   COMMITMENT_LAB_ASPECTS,
   COMMITMENT_LAB_OBLIGATIONS,
   COMMITMENT_LAB_SCENARIOS,
+  getCommitmentLabMarkerAnswer,
+  getCommitmentLabMarkerMessageKey,
   groupCommitmentLabDiscussion,
   isCommitmentLabFounderReady,
 } from "@/features/commitmentLab/commitmentLabModel";
@@ -46,6 +51,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
     getLocale(),
   ]);
   const ownEntry = lab.founderEntries.find((entry) => entry.userId === user.id) ?? null;
+  const ownReady = isCommitmentLabFounderReady(ownEntry);
   const entriesByUser = new Map(lab.founderEntries.map((entry) => [entry.userId, entry]));
   const bothReady = lab.participantUserIds.every((id) => isCommitmentLabFounderReady(entriesByUser.get(id) ?? null));
   const teamLabel = lab.team.name ?? lab.team.members.map((member, index) => member.displayName ?? `Founder ${index + 1}`).join(" + ");
@@ -63,6 +69,19 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   const prompts = ["meaning", "less", "expectation", "timing", "renegotiation"].map((key) =>
     t(`discussion.prompts.${key}`)
   );
+  const markerLabel = (marker: Parameters<typeof getCommitmentLabMarkerMessageKey>[0]) =>
+    t(getCommitmentLabMarkerMessageKey(marker));
+  const snapshotLabels = {
+    time: t("snapshot.time"),
+    currentHours: (hours: number) => t("snapshot.currentHours", { hours }),
+    difficultHours: (hours: number) => t("snapshot.difficultHours", { hours }),
+    framework: t("snapshot.framework"),
+    changes: t("snapshot.changes"),
+    meaning: t("snapshot.meaning"),
+    difficult: t("snapshot.difficult"),
+    desired: t("snapshot.desired"),
+    markers: t("snapshot.markers"),
+  };
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
@@ -76,6 +95,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
       <FounderTeamNavigation teamId={teamId} active="alignment" labels={{ ariaLabel: navigationT("ariaLabel"), context: navigationT("context", { team: teamLabel }), overview: navigationT("overview"), setup: navigationT("setup"), alignment: navigationT("alignment") }} />
       {feedback ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedback}`)}</p> : null}
 
+      <CommitmentLabMarkerProvider initialMarkers={ownEntry?.discussionMarkers ?? []}>
       <form action={personalAction} className="mt-6 grid gap-6">
         <section className={CARD} aria-labelledby="reality-title">
           <h2 id="reality-title" className="text-xl font-semibold text-slate-950">{t("personal.title")}</h2>
@@ -100,34 +120,58 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("meaning.aspectsHelp")}</p>
           <label className="mt-5 block text-sm font-medium text-slate-800" htmlFor="commitment-meaning">{t("meaning.core")}</label>
           <CommitmentLabSpeechTextarea id="commitment-meaning" name="commitmentMeaning" defaultValue={ownEntry?.commitmentMeaning} rows={5} />
+          <CommitmentLabMarkerToggle marker="commitment_meaning" />
           <div className="mt-6 grid gap-5">
             {COMMITMENT_LAB_ASPECTS.map((aspect) => {
               const field = `${aspect}Reflection` as const;
-              return <div key={aspect}><label className="block text-sm font-medium text-slate-800" htmlFor={`aspect-${aspect}`}>{t(`meaning.${aspect}`)}</label><CommitmentLabSpeechTextarea id={`aspect-${aspect}`} name={field} defaultValue={ownEntry?.[field]} /></div>;
+              return <div key={aspect}><label className="block text-sm font-medium text-slate-800" htmlFor={`aspect-${aspect}`}>{t(`meaning.${aspect}`)}</label><CommitmentLabSpeechTextarea id={`aspect-${aspect}`} name={field} defaultValue={ownEntry?.[field]} /><CommitmentLabMarkerToggle marker={`aspect:${aspect}`} /></div>;
             })}
           </div>
+        </section>
+
+        <section className={CARD} aria-labelledby="difficulty-title">
+          <h2 id="difficulty-title" className="text-xl font-semibold text-slate-950">{t("difficulty.title")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("difficulty.help")}</p>
+          <label className="mt-5 block text-sm font-medium text-slate-800" htmlFor="difficult-situation">{t("difficulty.question")}</label>
+          <CommitmentLabSpeechTextarea id="difficult-situation" name="difficultSituation" defaultValue={ownEntry?.difficultSituation} />
+          <label className="mt-5 block text-sm font-medium text-slate-800" htmlFor="desired-alternative">{t("difficulty.desired")}</label>
+          <CommitmentLabSpeechTextarea id="desired-alternative" name="desiredAlternative" defaultValue={ownEntry?.desiredAlternative} />
+          <CommitmentLabMarkerToggle marker="difficulty_wish" />
         </section>
 
         <section className={CARD} aria-labelledby="scenarios-title">
           <h2 id="scenarios-title" className="text-xl font-semibold text-slate-950">{t("scenarios.title")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("scenarios.help")}</p>
           <div className="mt-5 grid gap-5">
-            {COMMITMENT_LAB_SCENARIOS.map((scenario, index) => <article key={scenario} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{index + 1}</p><h3 className="mt-2 text-sm font-semibold leading-6 text-slate-900">{t(`scenarios.${scenario}`)}</h3><label className="mt-4 block text-sm font-medium text-slate-800" htmlFor={`${scenario}-action`}>{t("scenarios.action")}</label><CommitmentLabSpeechTextarea id={`${scenario}-action`} name={`scenario.${scenario}.action`} defaultValue={ownEntry?.scenarioAnswers[scenario].action} /><label className="mt-4 block text-sm font-medium text-slate-800" htmlFor={`${scenario}-expectation`}>{t("scenarios.expectation")}</label><CommitmentLabSpeechTextarea id={`${scenario}-expectation`} name={`scenario.${scenario}.expectation`} defaultValue={ownEntry?.scenarioAnswers[scenario].expectation} /></article>)}
+            {COMMITMENT_LAB_SCENARIOS.map((scenario, index) => <article key={scenario} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{index + 1}</p><h3 className="mt-2 text-sm font-semibold leading-6 text-slate-900">{t(`scenarios.${scenario}`)}</h3><label className="mt-4 block text-sm font-medium text-slate-800" htmlFor={`${scenario}-action`}>{t("scenarios.action")}</label><CommitmentLabSpeechTextarea id={`${scenario}-action`} name={`scenario.${scenario}.action`} defaultValue={ownEntry?.scenarioAnswers[scenario].action} /><label className="mt-4 block text-sm font-medium text-slate-800" htmlFor={`${scenario}-expectation`}>{t("scenarios.expectation")}</label><CommitmentLabSpeechTextarea id={`${scenario}-expectation`} name={`scenario.${scenario}.expectation`} defaultValue={ownEntry?.scenarioAnswers[scenario].expectation} /><CommitmentLabMarkerToggle marker={`scenario:${scenario}`} /></article>)}
           </div>
+          <p className="mt-4 text-xs leading-5 text-slate-500">{t("markers.limit")}</p>
           <ReportActionButton type="submit" variant="primary" className="mt-6 min-h-11">{t("personal.save")}</ReportActionButton>
         </section>
       </form>
+      </CommitmentLabMarkerProvider>
+
+      {ownEntry && ownReady ? (
+        <section className={`${CARD} mt-6`} aria-labelledby="own-snapshot-title">
+          <h2 id="own-snapshot-title" className="text-xl font-semibold text-slate-950">{t("snapshot.ownTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("snapshot.ownHelp")}</p>
+          <div className="mt-5">
+            <CommitmentLabSnapshotCard entry={ownEntry} labels={snapshotLabels} obligationLabel={(key) => t(`obligations.${key}`)} markerLabel={markerLabel} />
+          </div>
+        </section>
+      ) : null}
 
       <div className="mt-6 grid gap-6">
         <section className={CARD} aria-labelledby="compare-title">
           <h2 id="compare-title" className="text-xl font-semibold text-slate-950">{t("compare.title")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t(bothReady ? "compare.ready" : "compare.waiting")}</p>
-          {bothReady ? <div className="mt-5 grid gap-4 md:grid-cols-2">{lab.participantUserIds.map((id, index) => { const entry = entriesByUser.get(id)!; return <article key={id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"><h3 className="font-semibold text-slate-950">{lab.participantNames[index]}</h3><p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{t("compare.hours")}</p><p className="mt-1 text-sm text-slate-700">{t("compare.current", { hours: entry.currentHours ?? 0 })} · {t("compare.difficult", { hours: entry.difficultWeekHours ?? 0 })}</p><p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{t("compare.meaning")}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{entry.commitmentMeaning}</p></article>; })}</div> : null}
+          <p className="mt-2 text-sm leading-6 text-slate-600">{bothReady ? t("snapshot.sharedHelp") : t("compare.waiting")}</p>
+          {bothReady ? <div className="mt-5 grid gap-4 md:grid-cols-2">{lab.participantUserIds.map((id, index) => { const entry = entriesByUser.get(id)!; return <CommitmentLabSnapshotCard key={id} entry={entry} founderName={lab.participantNames[index]} labels={snapshotLabels} obligationLabel={(key) => t(`obligations.${key}`)} markerLabel={markerLabel} />; })}</div> : null}
         </section>
 
         <section className={CARD} aria-labelledby="discussion-title">
           <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("discussion.help")}</p>
+          {lab.sharedDiscussionMarkers.length ? <div className="mt-5 rounded-xl border border-violet-200 bg-violet-50/50 p-4"><h3 className="font-semibold text-slate-950">{t("markers.sharedTitle")}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{t("markers.sharedHelp")}</p><ul className="mt-3 grid gap-3 sm:grid-cols-2">{lab.sharedDiscussionMarkers.map(({ userId, marker }) => { const entry = entriesByUser.get(userId)!; return <li key={`${userId}:${marker}`} className="rounded-lg bg-white p-3"><p className="text-xs font-semibold text-violet-900">{memberName(userId)} · {markerLabel(marker)}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">{getCommitmentLabMarkerAnswer(entry, marker)}</p></li>; })}</ul></div> : null}
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">{prompts.map((prompt) => <li key={prompt} className="rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">{prompt}</li>)}</ul>
           <CommitmentLabDiscussionComposer action={discussionAction} />
           {threads.length ? <ol className="mt-6 space-y-4">{threads.map((thread) => <li key={thread.root.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"><p className="text-xs text-slate-500">{memberName(thread.root.authorUserId)} · {date.format(new Date(thread.root.createdAt))}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-800">{thread.root.body}</p>{thread.replies.length ? <ol className="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">{thread.replies.map((reply) => <li key={reply.id}><p className="text-xs text-slate-500">{memberName(reply.authorUserId)} · {date.format(new Date(reply.createdAt))}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{reply.body}</p></li>)}</ol> : null}<details className="mt-3"><summary className="cursor-pointer text-sm font-medium text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]">{t("discussion.reply")}</summary><CommitmentLabDiscussionComposer action={discussionAction} parentEntryId={thread.root.id} /></details></li>)}</ol> : <p className="mt-5 rounded-xl border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-600">{t("discussion.empty")}</p>}
