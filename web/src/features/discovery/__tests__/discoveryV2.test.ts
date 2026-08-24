@@ -187,3 +187,15 @@ test("Discovery V2 copy describes alignment as orientation rather than evaluativ
     );
   }
 });
+
+test("Explore reuses the narrow paginated RPC without private filters or alignment", () => {
+  const source = readFileSync("src/features/discovery/discoveryData.ts", "utf8");
+  const page = readFileSync("src/app/(product)/discovery/page.tsx", "utf8");
+  assert.match(source, /getDiscoveryExploreProfilesForCurrentUser/);
+  assert.match(source, /p_roles: \[\]/);
+  assert.match(source, /p_page_size: pageSize/);
+  assert.match(source, /p_offset: \(page - 1\) \* pageSize/);
+  assert.match(page, /showMatchReasons=\{mode === "search"\}/);
+  assert.match(page, /\["explore", "search"\]/);
+  assert.match(page, /t\(`v2\.modes\.\$\{item\}`\)/);
+});

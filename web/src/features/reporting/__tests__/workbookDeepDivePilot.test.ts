@@ -134,6 +134,7 @@ test("handoff presentation never treats a three-founder pair as team-wide input"
     teamId: "team-1",
     memberCount: 2,
     targetWorkingNotes: { decision_rules: "", collaboration_conflict: "Vorhanden" },
+    setupWorkingNotes: {},
   };
   assert.equal(getWorkbookDeepDiveHandoffState(twoFounder, "decision_rules"), "two_founder_ready");
   assert.equal(getWorkbookDeepDiveHandoffState(twoFounder, "collaboration_conflict"), "existing_note");
@@ -192,8 +193,59 @@ test("pilot topics render as focused linear deep dives with an always-present se
   assert.match(client, /updateEntry\("deepDiveFocus", value\)/u);
   assert.match(client, /currentOpenPointDestinationHref/u);
   assert.match(client, /openPoint\.handoffAction/u);
-  assert.doesNotMatch(
-    readFileSync("src/features/reporting/workbookDeepDiveHandoffActions.ts", "utf8"),
-    /alignment_open_points[\s\S]*handoff_workbook_deep_dive_note_if_empty/u
-  );
+  const handoff = readFileSync("src/features/reporting/workbookDeepDiveHandoffActions.ts", "utf8");
+  assert.match(handoff, /handoffWorkbookOpenPointReflectionToFounderSetup/u);
+  assert.match(handoff, /isFounderSetupItemKey/u);
+  assert.match(handoff, /members\.length !== 2/u);
+});
+
+test("multiple open points keep stable ids and isolate all point-owned content", () => {
+  const payload = buildEmptyFounderAlignmentWorkbookPayload();
+  payload.steps.alignment_open_points.openPoints = [
+    {
+      id: "point-a",
+      area: "commitment",
+      focus: "Zeit in der Startphase",
+      founderA: "A Perspektive",
+      founderB: "B Perspektive",
+      reflectionNote: "Reflexion A",
+      workspaceV2: {
+        entries: [{ id: "entry-a", content: "Beitrag A", createdBy: "founderA", createdAt: "2026-08-24T10:00:00.000Z", sourceEntryId: null, updatedAt: null, updatedBy: null }],
+        reactions: [{ entryId: "entry-a", userId: "founderB", signal: "agree", updatedAt: null, semanticsVersion: 2 }],
+      },
+      advisorReplies: [{ id: "reply-a", sourceEntryId: "entry-a", content: "Impuls A", advisorUserId: "advisor", advisorName: "Ada", createdAt: "2026-08-24T10:00:30.000Z", updatedAt: null }],
+      createdAt: "2026-08-24T10:00:00.000Z",
+      updatedAt: null,
+    },
+    {
+      id: "point-b",
+      area: "commitment",
+      focus: "Prioritäten bei Engpässen",
+      founderA: "Andere A Perspektive",
+      founderB: "Andere B Perspektive",
+      reflectionNote: "Reflexion B",
+      advisorReplies: [],
+      createdAt: "2026-08-24T10:01:00.000Z",
+      updatedAt: null,
+    },
+  ];
+  const sanitized = sanitizeFounderAlignmentWorkbookPayload(payload);
+  assert.deepEqual(sanitized.steps.alignment_open_points.openPoints?.map((point) => point.id), ["point-a", "point-b"]);
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.reflectionNote, "Reflexion A");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[1]?.reflectionNote, "Reflexion B");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.workspaceV2?.entries[0]?.id, "entry-a");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.workspaceV2?.reactions[0]?.entryId, "entry-a");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.advisorReplies[0]?.sourceEntryId, "entry-a");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[1]?.workspaceV2, undefined);
+  assert.deepEqual(sanitized.steps.alignment_open_points.openPoints?.[1]?.advisorReplies, []);
+});
+
+test("legacy single open-point content is decoded as one stable compatible point", () => {
+  const payload = buildEmptyFounderAlignmentWorkbookPayload();
+  payload.steps.alignment_open_points.deepDiveArea = "risk_orientation";
+  payload.steps.alignment_open_points.deepDiveFocus = "Unser Umgang mit Unsicherheit";
+  const sanitized = sanitizeFounderAlignmentWorkbookPayload(payload);
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.length, 1);
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.id, "legacy-open-point");
+  assert.equal(sanitized.steps.alignment_open_points.openPoints?.[0]?.focus, "Unser Umgang mit Unsicherheit");
 });

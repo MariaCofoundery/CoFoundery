@@ -13,6 +13,7 @@ import {
   ALIGNMENT_OPEN_POINT_AREA_VALUES,
   sanitizeWorkbookStructuredOutputsByStep,
   sanitizeFounderAlignmentWorkbookPayload,
+  sanitizeFounderAlignmentWorkbookOpenPoints,
   sanitizeWorkbookStepWorkspaceV2,
   upsertCurrentWorkbookDiscussionReaction,
   type FounderAlignmentWorkbookPatch,
@@ -637,6 +638,7 @@ function canAttemptStaleWorkspaceMerge(patches: FounderAlignmentWorkbookPatch[])
       }
 
       return (
+        patch.field === "openPointCreate" ||
         patch.field === "workspaceEntryCreate" ||
         patch.field === "workspaceEntryUpdate" ||
         patch.field === "workspaceEntryDelete" ||
@@ -717,18 +719,59 @@ function mergeFounderPayload(
       continue;
     }
 
+    if (patch.field === "openPointCreate") {
+      if (patch.stepId !== "alignment_open_points") {
+        return { ok: false, reason: "invalid_patch" };
+      }
+      const point = sanitizeFounderAlignmentWorkbookOpenPoints([patch.value])[0];
+      if (!point) return { ok: false, reason: "invalid_patch" };
+      const existingPoint = (stepEntry.openPoints ?? []).find((candidate) => candidate.id === point.id);
+      if (existingPoint) {
+        if (JSON.stringify(existingPoint) !== JSON.stringify(point)) {
+          return {
+            ok: false,
+            reason: allowStaleWorkspaceMerge ? "stale_conflict" : "invalid_patch",
+          };
+        }
+        continue;
+      }
+      stepEntry.openPoints = [...(stepEntry.openPoints ?? []), point];
+      continue;
+    }
+
+    const openPoint = patch.openPointId
+      ? patch.stepId === "alignment_open_points"
+        ? (stepEntry.openPoints ?? []).find((point) => point.id === patch.openPointId) ?? null
+        : null
+      : null;
+    if (patch.openPointId && !openPoint) {
+      return {
+        ok: false,
+        reason: allowStaleWorkspaceMerge ? "stale_conflict" : "invalid_patch",
+      };
+    }
+
     const founderCanCollaborate =
-      stepEntry.mode === "collaborative" && (role === "founderA" || role === "founderB");
+      !openPoint &&
+      stepEntry.mode === "collaborative" &&
+      (role === "founderA" || role === "founderB");
     const workspace =
-      stepEntry.workspaceV2 != null
+      (openPoint?.workspaceV2 ?? stepEntry.workspaceV2) != null
         ? {
-            entries: [...stepEntry.workspaceV2.entries],
-            reactions: [...stepEntry.workspaceV2.reactions],
+            entries: [...(openPoint?.workspaceV2 ?? stepEntry.workspaceV2)!.entries],
+            reactions: [...(openPoint?.workspaceV2 ?? stepEntry.workspaceV2)!.reactions],
           }
         : {
             entries: [],
             reactions: [],
           };
+    const setWorkspace = (value: typeof workspace | undefined) => {
+      if (openPoint) openPoint.workspaceV2 = value;
+      else stepEntry.workspaceV2 = value;
+    };
+    const resetApprovals = () => {
+      if (!openPoint) resetFounderApprovals(stepEntry);
+    };
 
     switch (patch.field) {
       case "mode":
@@ -742,8 +785,9 @@ function mergeFounderPayload(
           return { ok: false, reason: "stale_conflict" };
         }
         if (typeof patch.value === "string" && (role === "founderA" || founderCanCollaborate)) {
-          stepEntry.founderA = patch.value;
-          resetFounderApprovals(stepEntry);
+          if (openPoint) openPoint.founderA = patch.value;
+          else stepEntry.founderA = patch.value;
+          resetApprovals();
         }
         break;
       case "founderB":
@@ -751,8 +795,9 @@ function mergeFounderPayload(
           return { ok: false, reason: "stale_conflict" };
         }
         if (typeof patch.value === "string" && (role === "founderB" || founderCanCollaborate)) {
-          stepEntry.founderB = patch.value;
-          resetFounderApprovals(stepEntry);
+          if (openPoint) openPoint.founderB = patch.value;
+          else stepEntry.founderB = patch.value;
+          resetApprovals();
         }
         break;
       case "agreement":
@@ -760,8 +805,9 @@ function mergeFounderPayload(
           return { ok: false, reason: "stale_conflict" };
         }
         if (typeof patch.value === "string") {
+          if (openPoint) return { ok: false, reason: "invalid_patch" };
           stepEntry.agreement = patch.value;
-          resetFounderApprovals(stepEntry);
+          resetApprovals();
         }
         break;
       case "reflectionNote":
@@ -769,7 +815,8 @@ function mergeFounderPayload(
           return { ok: false, reason: "stale_conflict" };
         }
         if (typeof patch.value === "string") {
-          stepEntry.reflectionNote = patch.value;
+          if (openPoint) openPoint.reflectionNote = patch.value;
+          else stepEntry.reflectionNote = patch.value;
         }
         break;
       case "deepDiveArea":
@@ -785,7 +832,8 @@ function mergeFounderPayload(
                 patch.value as AlignmentOpenPointArea
               )))
         ) {
-          stepEntry.deepDiveArea = patch.value as AlignmentOpenPointArea | null;
+          if (openPoint && patch.value !== null) openPoint.area = patch.value as AlignmentOpenPointArea;
+          else stepEntry.deepDiveArea = patch.value as AlignmentOpenPointArea | null;
         }
         break;
       case "deepDiveFocus":
@@ -797,18 +845,20 @@ function mergeFounderPayload(
           (role === "founderA" || role === "founderB") &&
           typeof patch.value === "string"
         ) {
-          stepEntry.deepDiveFocus = patch.value;
+          if (openPoint) openPoint.focus = patch.value;
+          else stepEntry.deepDiveFocus = patch.value;
         }
         break;
       case "structuredOutputs":
         if (allowStaleWorkspaceMerge) {
           return { ok: false, reason: "stale_conflict" };
         }
+        if (openPoint) return { ok: false, reason: "invalid_patch" };
         stepEntry.structuredOutputs = sanitizeWorkbookStructuredOutputsByStep(
           patch.stepId,
           patch.value
         );
-        resetFounderApprovals(stepEntry);
+        resetApprovals();
         break;
       case "founderAApproved":
         if (role === "founderA") {
@@ -855,8 +905,8 @@ function mergeFounderPayload(
         }
 
         workspace.entries.push(entry);
-        stepEntry.workspaceV2 = workspace;
-        resetFounderApprovals(stepEntry);
+        setWorkspace(workspace);
+        resetApprovals();
         break;
       }
       case "workspaceEntryUpdate": {
@@ -892,8 +942,8 @@ function mergeFounderPayload(
           updatedBy: value.updatedBy,
         };
         workspace.reactions = workspace.reactions.filter((reaction) => reaction.entryId !== value.id);
-        stepEntry.workspaceV2 = workspace;
-        resetFounderApprovals(stepEntry);
+        setWorkspace(workspace);
+        resetApprovals();
         break;
       }
       case "workspaceEntryDelete": {
@@ -923,9 +973,10 @@ function mergeFounderPayload(
 
         workspace.entries = workspace.entries.filter((candidate) => candidate.id !== value.id);
         workspace.reactions = workspace.reactions.filter((reaction) => reaction.entryId !== value.id);
-        stepEntry.workspaceV2 =
-          workspace.entries.length > 0 || workspace.reactions.length > 0 ? workspace : undefined;
-        resetFounderApprovals(stepEntry);
+        setWorkspace(
+          workspace.entries.length > 0 || workspace.reactions.length > 0 ? workspace : undefined
+        );
+        resetApprovals();
         break;
       }
       case "workspaceReactionUpsert": {
@@ -941,8 +992,8 @@ function mergeFounderPayload(
           };
         }
 
-        stepEntry.workspaceV2 = upsertCurrentWorkbookDiscussionReaction(workspace, reaction);
-        resetFounderApprovals(stepEntry);
+        setWorkspace(upsertCurrentWorkbookDiscussionReaction(workspace, reaction));
+        resetApprovals();
         break;
       }
       case "workspaceReactionDelete": {
@@ -962,8 +1013,8 @@ function mergeFounderPayload(
           (candidate) =>
             !(candidate.entryId === value.entryId && candidate.userId === value.userId)
         );
-        stepEntry.workspaceV2 = workspace;
-        resetFounderApprovals(stepEntry);
+        setWorkspace(workspace);
+        resetApprovals();
         break;
       }
     }
@@ -1014,17 +1065,26 @@ function mergeAdvisorPayload(
     ) {
       const stepEntry = nextPayload.steps[patch.stepId];
       if (stepEntry) {
+        const openPoint = patch.openPointId
+          ? patch.stepId === "alignment_open_points"
+            ? (stepEntry.openPoints ?? []).find((point) => point.id === patch.openPointId) ?? null
+            : null
+          : null;
+        if (patch.openPointId && !openPoint) continue;
         if (patch.field === "advisorNotes") {
+          if (openPoint) continue;
           stepEntry.advisorNotes = typeof patch.value === "string" ? patch.value : "";
         } else {
-          stepEntry.advisorReplies = sanitizeFounderAlignmentWorkbookPayload({
+          const sanitizedReplies = sanitizeFounderAlignmentWorkbookPayload({
             steps: {
               [patch.stepId]: {
-                workspaceV2: stepEntry.workspaceV2,
+                workspaceV2: openPoint?.workspaceV2 ?? stepEntry.workspaceV2,
                 advisorReplies: patch.value,
               },
             },
-          }).steps[patch.stepId].advisorReplies;
+          }).steps[patch.stepId].advisorReplies ?? [];
+          if (openPoint) openPoint.advisorReplies = sanitizedReplies;
+          else stepEntry.advisorReplies = sanitizedReplies;
         }
       }
     }

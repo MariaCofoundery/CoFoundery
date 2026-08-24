@@ -29,6 +29,7 @@ import {
   type WorkbookStepMarkersByStep,
 } from "@/features/reporting/founderAlignmentWorkbook";
 import type { WorkbookDeepDiveHandoffContext } from "@/features/reporting/workbookDeepDivePilot";
+import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
 import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
   getPrivilegedReportRunSnapshotForInvitation,
@@ -525,7 +526,7 @@ async function loadDeepDiveHandoffContext(
       .from("founder_team_setup_items")
       .select("item_key, working_note")
       .eq("team_id", row.founder_team_id)
-      .in("item_key", ["decision_rights", "conflict_deadlock"]),
+      .in("item_key", [...FOUNDER_SETUP_ITEM_KEYS]),
   ]);
   if (memberResult.error || itemResult.error) return null;
 
@@ -545,6 +546,9 @@ async function loadDeepDiveHandoffContext(
       decision_rules: notes.get("decision_rights") ?? "",
       collaboration_conflict: notes.get("conflict_deadlock") ?? "",
     },
+    setupWorkingNotes: Object.fromEntries(
+      FOUNDER_SETUP_ITEM_KEYS.map((key) => [key, notes.get(key) ?? ""])
+    ),
   };
 }
 

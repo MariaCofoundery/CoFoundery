@@ -8,6 +8,7 @@ import {
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
 import {
   getDiscoveryCandidatesForCurrentUser,
+  getDiscoveryExploreProfilesForCurrentUser,
   getOwnDiscoveryProfile,
   getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
@@ -38,6 +39,7 @@ type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 type DiscoverySearchParams = {
   page?: string | string[];
   searchResult?: string | string[];
+  mode?: string | string[];
 };
 
 function searchParamValue(value: string | string[] | undefined) {
@@ -132,10 +134,12 @@ function CandidateCard({
   candidate,
   preferences,
   t,
+  showMatchReasons = true,
 }: {
   candidate: DiscoveryCandidate;
   preferences: FounderSearchPreferences["mustHaves"];
   t: DiscoveryT;
+  showMatchReasons?: boolean;
 }) {
   const { profile } = candidate;
   return (
@@ -156,6 +160,7 @@ function CandidateCard({
         {profile.availabilityHoursPerWeek ? (
           <span className={CHIP_CLASS}>{t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}</span>
         ) : null}
+        <span className={CHIP_CLASS}>{t(`ventureStages.${profile.ventureStage}`)}</span>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -169,7 +174,7 @@ function CandidateCard({
         </div>
       </div>
 
-      {(candidate.practicalMatches?.length ?? 0) > 0 ? (
+      {showMatchReasons && (candidate.practicalMatches?.length ?? 0) > 0 ? (
         <section className="mt-5 rounded-2xl bg-emerald-50/70 p-4">
           <p className="text-xs font-semibold text-emerald-900">{t("v2.cards.practicalMatches")}</p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -182,7 +187,7 @@ function CandidateCard({
         </section>
       ) : null}
 
-      {(candidate.alignmentSimilarDimensions?.length ?? 0) > 0 ? (
+      {showMatchReasons && (candidate.alignmentSimilarDimensions?.length ?? 0) > 0 ? (
         <section className="mt-3 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
           <p className="text-xs font-semibold text-violet-950">{t("v2.cards.alignmentMatches")}</p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -237,6 +242,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   const t = await getTranslations("discovery");
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const requestedPage = parsePage(searchParamValue(resolvedSearchParams.page));
+  const mode = searchParamValue(resolvedSearchParams.mode) === "search" ? "search" : "explore";
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) {
@@ -261,20 +267,22 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     createdAt: "",
     updatedAt: "",
   };
-  const result = await getDiscoveryCandidatesForCurrentUser(user.id, undefined, undefined, requestedPage);
+  const result = mode === "search"
+    ? await getDiscoveryCandidatesForCurrentUser(user.id, undefined, undefined, requestedPage)
+    : await getDiscoveryExploreProfilesForCurrentUser(user.id, undefined, requestedPage);
   const isActive = profile?.status === "active";
   const saved = searchParamValue(resolvedSearchParams.searchResult);
 
   async function saveSearch(formData: FormData) {
     "use server";
     const actionResult = await saveDiscoveryV2SearchPreferencesAction(formData);
-    redirect(`/discovery?searchResult=${actionResult.ok ? "saved" : "failed"}#search`);
+    redirect(`/discovery?mode=search&searchResult=${actionResult.ok ? "saved" : "failed"}#search`);
   }
 
   async function resetSearch() {
     "use server";
     const actionResult = await saveDiscoveryV2SearchPreferencesAction(new FormData());
-    redirect(`/discovery?searchResult=${actionResult.ok ? "reset" : "failed"}#search`);
+    redirect(`/discovery?mode=search&searchResult=${actionResult.ok ? "reset" : "failed"}#search`);
   }
 
   return (
@@ -290,7 +298,20 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           </div>
         </header>
 
-        <section id="search" className={CARD_CLASS}>
+        <nav aria-label={t("v2.modes.label")} className="grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-1 sm:w-fit">
+          {(["explore", "search"] as const).map((item) => (
+            <Link
+              key={item}
+              href={`/discovery?mode=${item}`}
+              aria-current={mode === item ? "page" : undefined}
+              className={`min-h-11 rounded-xl px-5 py-2.5 text-center text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200 ${mode === item ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"}`}
+            >
+              {t(`v2.modes.${item}`)}
+            </Link>
+          ))}
+        </nav>
+
+        {mode === "search" ? <section id="search" className={CARD_CLASS}>
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("v2.search.eyebrow")}</p>
@@ -379,35 +400,35 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
               <button formAction={resetSearch} className={SECONDARY_CTA_CLASS}>{t("v2.search.reset")}</button>
             </div>
           </form>
-        </section>
+        </section> : null}
 
         <section className={CARD_CLASS}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("v2.results.eyebrow")}</p>
-              <h2 className="mt-2 text-2xl font-semibold">{t("v2.results.title")}</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t(mode === "explore" ? "v2.explore.eyebrow" : "v2.results.eyebrow")}</p>
+              <h2 className="mt-2 text-2xl font-semibold">{t(mode === "explore" ? "v2.explore.title" : "v2.results.title")}</h2>
               <p className="mt-2 text-sm text-slate-600">{t("v2.results.count", { count: result.totalCount })}</p>
             </div>
-            <ActiveFilterChips preferences={preferences} t={t} />
+            {mode === "search" ? <ActiveFilterChips preferences={preferences} t={t} /> : null}
           </div>
         </section>
 
-        {isActive && result.candidates.length > 0 ? (
+        {(mode === "explore" || isActive) && result.candidates.length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-2">
-            {result.candidates.map((candidate) => <CandidateCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} />)}
+            {result.candidates.map((candidate) => <CandidateCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} showMatchReasons={mode === "search"} />)}
           </div>
         ) : (
           <section className={CARD_CLASS}>
-            <h2 className="text-lg font-semibold">{isActive ? t("v2.results.emptyTitle") : t("v2.results.inactiveTitle")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{isActive ? t("v2.results.emptyText") : t("v2.results.inactiveText")}</p>
+            <h2 className="text-lg font-semibold">{mode === "explore" ? t("v2.explore.emptyTitle") : isActive ? t("v2.results.emptyTitle") : t("v2.results.inactiveTitle")}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{mode === "explore" ? t("v2.explore.emptyText") : isActive ? t("v2.results.emptyText") : t("v2.results.inactiveText")}</p>
           </section>
         )}
 
         {result.totalCount > result.pageSize ? (
           <nav aria-label={t("v2.pagination.label")} className="flex items-center justify-center gap-3">
-            {result.page > 1 ? <Link href={`/discovery?page=${result.page - 1}#search`} className={SECONDARY_CTA_CLASS}>{t("v2.pagination.previous")}</Link> : null}
+            {result.page > 1 ? <Link href={`/discovery?mode=${mode}&page=${result.page - 1}`} className={SECONDARY_CTA_CLASS}>{t("v2.pagination.previous")}</Link> : null}
             <span className="text-sm text-slate-600">{t("v2.pagination.page", { page: result.page })}</span>
-            {result.page * result.pageSize < result.totalCount ? <Link href={`/discovery?page=${result.page + 1}#search`} className={SECONDARY_CTA_CLASS}>{t("v2.pagination.next")}</Link> : null}
+            {result.page * result.pageSize < result.totalCount ? <Link href={`/discovery?mode=${mode}&page=${result.page + 1}`} className={SECONDARY_CTA_CLASS}>{t("v2.pagination.next")}</Link> : null}
           </nav>
         ) : null}
       </div>

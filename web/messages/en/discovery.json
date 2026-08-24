@@ -191,6 +191,17 @@
     "title": "Find a co-founder",
     "subtitle": "Search by practical criteria and optionally use Alignment as a transparent additional signal.",
     "editProfile": "Edit my profile",
+    "modes": {
+      "label": "Discovery mode",
+      "explore": "Explore",
+      "search": "Search"
+    },
+    "explore": {
+      "eyebrow": "Explore",
+      "title": "Explore founders",
+      "emptyTitle": "No founders to explore yet",
+      "emptyText": "Founders will appear here once they publish their Discovery profiles."
+    },
     "search": {
       "eyebrow": "My search",
       "title": "Who are you looking for right now?",

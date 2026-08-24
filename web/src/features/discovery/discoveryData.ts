@@ -558,3 +558,66 @@ export async function getDiscoveryCandidatesForCurrentUser(
     totalCount: rows[0] ? Number(rows[0].total_count) : 0,
   };
 }
+
+export async function getDiscoveryExploreProfilesForCurrentUser(
+  userId: string,
+  client?: SupabaseLikeClient,
+  requestedPage = 1
+): Promise<DiscoverySearchPage> {
+  assertUserId(userId);
+  const supabase = await resolveClient(client);
+  const pageSize = 12;
+  const page = Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1;
+  const rpcClient = supabase as unknown as {
+    rpc: (
+      name: string,
+      args: Record<string, unknown>
+    ) => PromiseLike<{ data: DiscoveryV2SearchRow[] | null; error: SupabaseError | null }>;
+  };
+  const { data, error } = await rpcClient.rpc("search_founder_discovery_profiles_v2", {
+    p_roles: [],
+    p_expertise: [],
+    p_location_region: null,
+    p_remote_modes: [],
+    p_min_availability: null,
+    p_page_size: pageSize,
+    p_offset: (page - 1) * pageSize,
+  });
+  if (error) throw new Error(error.message ?? "discovery_explore_load_failed");
+
+  const rows = data ?? [];
+  const candidates = rows.map((row) =>
+    buildDiscoveryV2Candidate(
+      {
+        id: row.id,
+        userId: row.candidate_user_id,
+        status: "active",
+        displayName: row.display_name,
+        headline: row.headline,
+        bio: "",
+        ownRoles: row.own_roles,
+        seekingRoles: row.seeking_roles,
+        expertise: row.expertise ?? [],
+        industries: [],
+        locationLabel: null,
+        locationRegion: row.location_region,
+        remoteMode: row.remote_mode,
+        availabilityHoursPerWeek: row.availability_hours_per_week,
+        commitmentLevel: row.commitment_level,
+        ventureStage: row.venture_stage,
+        ventureGoal: row.venture_goal,
+        publishedAt: row.published_at,
+        createdAt: row.published_at ?? "",
+        updatedAt: row.published_at ?? "",
+      },
+      normalizeMustHaves(null)
+    )
+  );
+
+  return {
+    candidates,
+    page,
+    pageSize,
+    totalCount: rows[0] ? Number(rows[0].total_count) : 0,
+  };
+}

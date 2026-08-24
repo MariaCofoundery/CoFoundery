@@ -191,6 +191,17 @@
     "title": "Co-Founder finden",
     "subtitle": "Suche nach praktischen Kriterien und nutze Alignment optional als transparentes zusätzliches Signal.",
     "editProfile": "Mein Profil bearbeiten",
+    "modes": {
+      "label": "Discovery-Modus",
+      "explore": "Entdecken",
+      "search": "Gezielt suchen"
+    },
+    "explore": {
+      "eyebrow": "Entdecken",
+      "title": "Founder entdecken",
+      "emptyTitle": "Noch keine Founder zu entdecken",
+      "emptyText": "Sobald weitere Founder ihr Discovery-Profil veröffentlichen, erscheinen sie hier."
+    },
     "search": {
       "eyebrow": "Meine Suche",
       "title": "Wen suchst du gerade?",

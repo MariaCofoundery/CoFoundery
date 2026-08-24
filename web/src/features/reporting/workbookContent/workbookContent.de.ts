@@ -38,6 +38,16 @@ export const WORKBOOK_CONTENT_DE: WorkbookContent = {
           "Waehlt einen Bereich oder beschreibt selbst, welcher Punkt aus eurem Alignment euch besonders aufgefallen ist.",
       },
       openPoint: {
+        overviewTitle: "Eure offenen Punkte",
+        overviewHelp: "Haltet fest, welche Themen aus eurem Alignment ihr noch genauer besprechen möchtet.",
+        empty: "Noch keine offenen Punkte festgehalten.",
+        add: "+ Punkt hinzufügen",
+        create: "Punkt anlegen",
+        cancel: "Abbrechen",
+        deepen: "Vertiefen",
+        backToList: "Zurück zu euren offenen Punkten",
+        openStatus: "Noch offen",
+        reflectedStatus: "Reflexion festgehalten",
         selectionTitle: "Was ist euch aufgefallen?",
         selectionHelp:
           "Die Auswahl strukturiert nur euer Gespraech. Sie bewertet den Punkt nicht.",

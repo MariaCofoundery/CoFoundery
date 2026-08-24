@@ -61,6 +61,7 @@ import {
   type FounderAlignmentWorkbookDiscussionReaction,
   type FounderAlignmentWorkbookDiscussionSignal,
   type FounderAlignmentWorkbookAdvisorReply,
+  type FounderAlignmentWorkbookOpenPoint,
   type AlignmentOpenPointArea,
   type WorkbookStepMarkersByStep,
   type WorkbookStructuredOutputsByStep,
@@ -91,7 +92,14 @@ import {
   getWorkbookReactionPresentationState,
   isCurrentWorkbookReaction,
 } from "@/features/reporting/workbookReactionPresentation";
-import { handoffWorkbookDeepDiveReflectionToFounderSetup } from "@/features/reporting/workbookDeepDiveHandoffActions";
+import {
+  handoffWorkbookDeepDiveReflectionToFounderSetup,
+  handoffWorkbookOpenPointReflectionToFounderSetup,
+} from "@/features/reporting/workbookDeepDiveHandoffActions";
+import {
+  FOUNDER_SETUP_CATALOG,
+  type FounderSetupItemKey,
+} from "@/features/teams/founderSetupCatalog";
 import {
   getAlignmentOpenPointAreas,
   getWorkbookDeepDiveHandoffState,
@@ -988,6 +996,7 @@ export function FounderAlignmentWorkbookClient({
   deepDiveTopicsHref,
 }: FounderAlignmentWorkbookClientProps) {
   const wt = useTranslations("workbook");
+  const setupT = useTranslations("teams.setup");
   const locale = useLocale();
   const systemText = useCallback(
     (text: string) => normalizeWorkbookSystemText(text, locale),
@@ -1024,20 +1033,20 @@ export function FounderAlignmentWorkbookClient({
     ) as Record<FounderAlignmentWorkbookStepId, boolean>
   );
   const [discussionDraftByStep, setDiscussionDraftByStep] = useState<
-    Record<FounderAlignmentWorkbookStepId, string>
+    Record<string, string>
   >(() =>
     Object.fromEntries(
       FOUNDER_ALIGNMENT_WORKBOOK_STEPS.map((step) => [step.id, ""])
-    ) as Record<FounderAlignmentWorkbookStepId, string>
+    ) as Record<string, string>
   );
   const [discussionDraftSourceEntryIdByStep, setDiscussionDraftSourceEntryIdByStep] = useState<
-    Partial<Record<FounderAlignmentWorkbookStepId, string | null>>
+    Partial<Record<string, string | null>>
   >({});
   const [discussionOpenThreadByStep, setDiscussionOpenThreadByStep] = useState<
-    Partial<Record<FounderAlignmentWorkbookStepId, string | null>>
+    Partial<Record<string, string | null>>
   >({});
   const [workbookV2OpenPhaseByStep, setWorkbookV2OpenPhaseByStep] = useState<
-    Partial<Record<FounderAlignmentWorkbookStepId, WorkbookV2Phase>>
+    Partial<Record<string, WorkbookV2Phase>>
   >({});
   const [advisorInviteState, setAdvisorInviteState] =
     useState<FounderAlignmentWorkbookAdvisorInviteState>(advisorInvite);
@@ -1072,6 +1081,12 @@ export function FounderAlignmentWorkbookClient({
   >("idle");
   const [deepDiveHandoffState, setDeepDiveHandoffState] =
     useState<WorkbookDeepDiveHandoffContext | null>(deepDiveHandoff);
+  const [selectedOpenPointId, setSelectedOpenPointId] = useState<string | null>(null);
+  const [newOpenPointArea, setNewOpenPointArea] = useState<AlignmentOpenPointArea | "">("");
+  const [newOpenPointFocus, setNewOpenPointFocus] = useState("");
+  const [showOpenPointForm, setShowOpenPointForm] = useState(false);
+  const [selectedOpenPointSetupKey, setSelectedOpenPointSetupKey] =
+    useState<FounderSetupItemKey | "">("");
   const currentStepRef = useRef<HTMLElement | null>(null);
   const discussionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const shouldScrollToStepRef = useRef(false);
@@ -1289,12 +1304,31 @@ export function FounderAlignmentWorkbookClient({
       workbookContent.premiumWorkflow.markerImpulses,
     ]
   );
-  const currentStepEntry = workbook.steps[currentStep.id];
+  const currentStepIsOpenPointDeepDive = currentDeepDivePilotStepId === "alignment_open_points";
+  const rawCurrentStepEntry = workbook.steps[currentStep.id];
+  const currentOpenPoints = rawCurrentStepEntry.openPoints ?? [];
+  const selectedOpenPoint = currentStepIsOpenPointDeepDive
+    ? currentOpenPoints.find((point) => point.id === selectedOpenPointId) ?? null
+    : null;
+  const currentStepEntry = useMemo(
+    () => selectedOpenPoint
+      ? {
+          ...rawCurrentStepEntry,
+          founderA: selectedOpenPoint.founderA,
+          founderB: selectedOpenPoint.founderB,
+          reflectionNote: selectedOpenPoint.reflectionNote,
+          deepDiveArea: selectedOpenPoint.area,
+          deepDiveFocus: selectedOpenPoint.focus,
+          workspaceV2: selectedOpenPoint.workspaceV2,
+          advisorReplies: selectedOpenPoint.advisorReplies,
+        }
+      : rawCurrentStepEntry,
+    [rawCurrentStepEntry, selectedOpenPoint]
+  );
   const currentStepHasLegacyAgreement = hasLegacyWorkbookAgreement(currentStepEntry);
   const currentDeepDiveSetupKey = currentDeepDivePilotStepId
     ? getWorkbookDeepDiveSetupKey(currentDeepDivePilotStepId)
     : null;
-  const currentStepIsOpenPointDeepDive = currentDeepDivePilotStepId === "alignment_open_points";
   const currentDeepDiveHandoffState =
     currentDeepDivePilotStepId && currentDeepDiveSetupKey
     ? getWorkbookDeepDiveHandoffState(
@@ -1313,8 +1347,22 @@ export function FounderAlignmentWorkbookClient({
       : null;
   const currentDeepDiveDestinationHref = currentDeepDiveSetupHref ?? "/connections";
   const currentOpenPointDestinationHref = currentDeepDiveSetupOverviewHref ?? "/connections";
-  const currentStepAdvisorReplies = currentStepEntry.advisorReplies ?? [];
+  const selectedOpenPointSetupHref =
+    deepDiveHandoffState && selectedOpenPointSetupKey
+      ? `/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}/setup/${encodeURIComponent(selectedOpenPointSetupKey)}`
+      : currentOpenPointDestinationHref;
+  const selectedOpenPointSetupHasNote = Boolean(
+    selectedOpenPointSetupKey &&
+      deepDiveHandoffState?.setupWorkingNotes[selectedOpenPointSetupKey]?.trim()
+  );
+  const currentStepAdvisorReplies = useMemo(
+    () => currentStepEntry.advisorReplies ?? [],
+    [currentStepEntry.advisorReplies]
+  );
   const currentStepStructuredOutputs = getWorkbookStepStructuredOutputs(currentStepEntry, currentStep.id);
+  const currentDiscussionStateKey = selectedOpenPoint
+    ? `${currentStep.id}:${selectedOpenPoint.id}`
+    : currentStep.id;
   const currentStepMissingStructuredKeys =
     currentStructuredStepId != null && currentStepMarker
       ? getMissingWorkbookStructuredOutputKeys(
@@ -1386,9 +1434,9 @@ export function FounderAlignmentWorkbookClient({
     currentStepIsPremiumPilot &&
     !currentStepEntry.workspaceV2 &&
     (currentStepEntry.founderA.trim().length > 0 || currentStepEntry.founderB.trim().length > 0);
-  const currentDiscussionDraft = discussionDraftByStep[currentStep.id] ?? "";
+  const currentDiscussionDraft = discussionDraftByStep[currentDiscussionStateKey] ?? "";
   const currentDiscussionDraftSourceEntryId =
-    discussionDraftSourceEntryIdByStep[currentStep.id] ?? null;
+    discussionDraftSourceEntryIdByStep[currentDiscussionStateKey] ?? null;
   const currentDiscussionDraftSourceEntry =
     currentDiscussionDraftSourceEntryId && decisionRulesWorkspace
       ? decisionRulesWorkspace.entries.find((entry) => entry.id === currentDiscussionDraftSourceEntryId) ?? null
@@ -1462,7 +1510,8 @@ export function FounderAlignmentWorkbookClient({
         : currentStepIsDeepDivePilot || !decisionRulesRuleReady
           ? "rule"
           : "approval";
-  const requestedWorkbookV2Phase = workbookV2OpenPhaseByStep[activeStepId] ?? null;
+  const requestedWorkbookV2Phase: WorkbookV2Phase | null =
+    workbookV2OpenPhaseByStep[currentDiscussionStateKey] ?? null;
   const canShowRequestedWorkbookV2Phase =
     requestedWorkbookV2Phase === "collect" ||
     (requestedWorkbookV2Phase === "weight" && hasDecisionRulesBothPerspectives) ||
@@ -1623,7 +1672,7 @@ export function FounderAlignmentWorkbookClient({
         : null
     )
     ?? (decisionRulesThreadGroups.length === 1 ? decisionRulesThreadGroups[0]?.rootEntry.id ?? null : null);
-  const requestedDiscussionOpenThreadId = discussionOpenThreadByStep[currentStep.id] ?? null;
+  const requestedDiscussionOpenThreadId = discussionOpenThreadByStep[currentDiscussionStateKey] ?? null;
   const visibleDiscussionOpenThreadId =
     requestedDiscussionOpenThreadId &&
     decisionRulesThreadGroups.some((group) => group.rootEntry.id === requestedDiscussionOpenThreadId)
@@ -2019,22 +2068,47 @@ export function FounderAlignmentWorkbookClient({
       kind: canSave ? "dirty" : current.kind,
       message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
-    setWorkbook((current) => ({
-      ...current,
-      steps: {
-        ...current.steps,
-        [activeStepId]: {
-          ...current.steps[activeStepId],
-          [field]: value,
-          ...(field === "advisorNotes" || field === "reflectionNote"
-            ? {}
-            : {
-                founderAApproved: false,
-                founderBApproved: false,
-              }),
+    setWorkbook((current) => {
+      const step = current.steps[activeStepId];
+      if (activeStepId === "alignment_open_points" && selectedOpenPointId) {
+        const fieldByEntryField = {
+          founderA: "founderA",
+          founderB: "founderB",
+          reflectionNote: "reflectionNote",
+          deepDiveFocus: "focus",
+        } as const;
+        const pointField = fieldByEntryField[field as keyof typeof fieldByEntryField];
+        if (pointField) {
+          return {
+            ...current,
+            steps: {
+              ...current.steps,
+              [activeStepId]: {
+                ...step,
+                openPoints: (step.openPoints ?? []).map((point) =>
+                  point.id === selectedOpenPointId
+                    ? { ...point, [pointField]: value, updatedAt: new Date().toISOString() }
+                    : point
+                ),
+              },
+            },
+          };
+        }
+      }
+      return {
+        ...current,
+        steps: {
+          ...current.steps,
+          [activeStepId]: {
+            ...step,
+            [field]: value,
+            ...(field === "advisorNotes" || field === "reflectionNote"
+              ? {}
+              : { founderAApproved: false, founderBApproved: false }),
+          },
         },
-      },
-    }));
+      };
+    });
   }
 
   function updateDeepDiveArea(value: AlignmentOpenPointArea | null) {
@@ -2044,16 +2118,68 @@ export function FounderAlignmentWorkbookClient({
       kind: canSave ? "dirty" : current.kind,
       message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
+    setWorkbook((current) => {
+      const step = current.steps[activeStepId];
+      if (activeStepId === "alignment_open_points" && selectedOpenPointId && value) {
+        return {
+          ...current,
+          steps: {
+            ...current.steps,
+            [activeStepId]: {
+              ...step,
+              openPoints: (step.openPoints ?? []).map((point) =>
+                point.id === selectedOpenPointId
+                  ? { ...point, area: value, updatedAt: new Date().toISOString() }
+                  : point
+              ),
+            },
+          },
+        };
+      }
+      return {
+        ...current,
+        steps: {
+          ...current.steps,
+          [activeStepId]: { ...step, deepDiveArea: value },
+        },
+      };
+    });
+  }
+
+  function createOpenPoint() {
+    const focus = newOpenPointFocus.trim();
+    if (!newOpenPointArea || !focus || isAdvisorViewer) return;
+    const now = new Date().toISOString();
+    const point: FounderAlignmentWorkbookOpenPoint = {
+      id: createDiscussionEntryId(),
+      area: newOpenPointArea,
+      focus,
+      founderA: "",
+      founderB: "",
+      reflectionNote: "",
+      advisorReplies: [],
+      createdAt: now,
+      updatedAt: null,
+    };
     setWorkbook((current) => ({
       ...current,
       steps: {
         ...current.steps,
-        [activeStepId]: {
-          ...current.steps[activeStepId],
-          deepDiveArea: value,
+        alignment_open_points: {
+          ...current.steps.alignment_open_points,
+          openPoints: [...(current.steps.alignment_open_points.openPoints ?? []), point],
         },
       },
     }));
+    setSaveState((current) => ({
+      ...current,
+      kind: canSave ? "dirty" : current.kind,
+      message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
+    }));
+    setSelectedOpenPointId(point.id);
+    setNewOpenPointArea("");
+    setNewOpenPointFocus("");
+    setShowOpenPointForm(false);
   }
 
   function updateWorkspaceV2(
@@ -2064,18 +2190,37 @@ export function FounderAlignmentWorkbookClient({
       kind: canSave ? "dirty" : current.kind,
       message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
-    setWorkbook((current) => ({
-      ...current,
-      steps: {
-        ...current.steps,
-        [activeStepId]: {
-          ...current.steps[activeStepId],
-          workspaceV2: workspace,
-          founderAApproved: false,
-          founderBApproved: false,
+    setWorkbook((current) => {
+      const step = current.steps[activeStepId];
+      if (activeStepId === "alignment_open_points" && selectedOpenPointId) {
+        return {
+          ...current,
+          steps: {
+            ...current.steps,
+            [activeStepId]: {
+              ...step,
+              openPoints: (step.openPoints ?? []).map((point) =>
+                point.id === selectedOpenPointId
+                  ? { ...point, workspaceV2: workspace, updatedAt: new Date().toISOString() }
+                  : point
+              ),
+            },
+          },
+        };
+      }
+      return {
+        ...current,
+        steps: {
+          ...current.steps,
+          [activeStepId]: {
+            ...step,
+            workspaceV2: workspace,
+            founderAApproved: false,
+            founderBApproved: false,
+          },
         },
-      },
-    }));
+      };
+    });
   }
 
   function updateAdvisorReplies(
@@ -2092,27 +2237,46 @@ export function FounderAlignmentWorkbookClient({
       kind: canSave ? "dirty" : current.kind,
       message: canSave ? t("Aenderungen werden gleich gesichert") : current.message,
     }));
-    setWorkbook((current) => ({
-      ...current,
-      steps: {
-        ...current.steps,
-        [activeStepId]: {
-          ...current.steps[activeStepId],
-          advisorReplies: updater(current.steps[activeStepId].advisorReplies ?? []),
+    setWorkbook((current) => {
+      const step = current.steps[activeStepId];
+      if (activeStepId === "alignment_open_points" && selectedOpenPointId) {
+        return {
+          ...current,
+          steps: {
+            ...current.steps,
+            [activeStepId]: {
+              ...step,
+              openPoints: (step.openPoints ?? []).map((point) =>
+                point.id === selectedOpenPointId
+                  ? { ...point, advisorReplies: updater(point.advisorReplies) }
+                  : point
+              ),
+            },
+          },
+        };
+      }
+      return {
+        ...current,
+        steps: {
+          ...current.steps,
+          [activeStepId]: {
+            ...step,
+            advisorReplies: updater(step.advisorReplies ?? []),
+          },
         },
-      },
-    }));
+      };
+    });
   }
 
   function setDiscussionDraft(value: string) {
     setDiscussionDraftByStep((current) => ({
       ...current,
-      [activeStepId]: value,
+      [currentDiscussionStateKey]: value,
     }));
     if (value.trim().length === 0) {
       setDiscussionDraftSourceEntryIdByStep((current) => ({
         ...current,
-        [activeStepId]: null,
+        [currentDiscussionStateKey]: null,
       }));
     }
   }
@@ -2120,21 +2284,22 @@ export function FounderAlignmentWorkbookClient({
   function openWorkbookV2Phase(phase: WorkbookV2Phase) {
     setWorkbookV2OpenPhaseByStep((current) => ({
       ...current,
-      [activeStepId]: phase,
+      [currentDiscussionStateKey]: phase,
     }));
   }
 
   function setDiscussionOpenThread(rootEntryId: string | null) {
     setDiscussionOpenThreadByStep((current) => ({
       ...current,
-      [activeStepId]: rootEntryId,
+      [currentDiscussionStateKey]: rootEntryId,
     }));
   }
 
   function toggleDiscussionOpenThread(rootEntryId: string) {
     setDiscussionOpenThreadByStep((current) => ({
       ...current,
-      [activeStepId]: current[activeStepId] === rootEntryId ? null : rootEntryId,
+      [currentDiscussionStateKey]:
+        current[currentDiscussionStateKey] === rootEntryId ? null : rootEntryId,
     }));
   }
 
@@ -2155,7 +2320,7 @@ export function FounderAlignmentWorkbookClient({
     setDiscussionDraft(baseContent);
     setDiscussionDraftSourceEntryIdByStep((current) => ({
       ...current,
-      [activeStepId]: entry.id,
+      [currentDiscussionStateKey]: entry.id,
     }));
     if (decisionRulesWorkspace) {
       setDiscussionOpenThread(resolveDiscussionRootEntryId(decisionRulesWorkspace, entry.id));
@@ -2200,12 +2365,12 @@ export function FounderAlignmentWorkbookClient({
     setDiscussionDraft(nextDraft);
     setDiscussionDraftSourceEntryIdByStep((current) => ({
       ...current,
-      [activeStepId]: null,
+      [currentDiscussionStateKey]: null,
     }));
     setDiscussionOpenThread(null);
     setHelperOpenByStep((current) => ({
       ...current,
-      [activeStepId]: false,
+      [currentDiscussionStateKey]: false,
     }));
     openWorkbookV2Phase("collect");
     focusDiscussionDraftField();
@@ -2254,7 +2419,7 @@ export function FounderAlignmentWorkbookClient({
     setDiscussionDraft("");
     setDiscussionDraftSourceEntryIdByStep((current) => ({
       ...current,
-      [activeStepId]: null,
+      [currentDiscussionStateKey]: null,
     }));
   }
 
@@ -2342,10 +2507,10 @@ export function FounderAlignmentWorkbookClient({
       reactions: decisionRulesWorkspace.reactions.filter((reaction) => reaction.entryId !== entryId),
     });
     setDiscussionOpenThreadByStep((current) =>
-      current[activeStepId] === removedRootId
+      current[currentDiscussionStateKey] === removedRootId
         ? {
             ...current,
-            [activeStepId]: null,
+            [currentDiscussionStateKey]: null,
           }
         : current
     );
@@ -2692,6 +2857,38 @@ export function FounderAlignmentWorkbookClient({
             }
           : current
       );
+      setDeepDiveHandoffResult("success");
+    });
+  }
+
+  function handoffOpenPointReflection() {
+    if (!invitationId || !selectedOpenPoint || !selectedOpenPointSetupKey) return;
+    const reflectionNote = selectedOpenPoint.reflectionNote.trim();
+    if (!reflectionNote || deepDiveHandoffState?.memberCount !== 2) return;
+    setDeepDiveHandoffResult("idle");
+    if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
+    startDeepDiveHandoffTransition(async () => {
+      const saved = await performSave(workbook, "manual");
+      if (!saved) {
+        setDeepDiveHandoffResult("error");
+        return;
+      }
+      const result = await handoffWorkbookOpenPointReflectionToFounderSetup(
+        invitationId,
+        selectedOpenPoint.id,
+        selectedOpenPointSetupKey
+      );
+      if (!result.ok) {
+        setDeepDiveHandoffResult("error");
+        return;
+      }
+      setDeepDiveHandoffState((current) => current ? {
+        ...current,
+        setupWorkingNotes: {
+          ...current.setupWorkingNotes,
+          [selectedOpenPointSetupKey]: reflectionNote,
+        },
+      } : current);
       setDeepDiveHandoffResult("success");
     });
   }
@@ -4134,11 +4331,94 @@ export function FounderAlignmentWorkbookClient({
                   </p>
                 </div>
               </StepSection>
+            ) : currentStepIsOpenPointDeepDive && !selectedOpenPoint ? (
+              <section className="mt-8 rounded-[30px] border border-slate-200/80 bg-white/85 p-5 sm:p-7">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-slate-950">
+                      {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.overviewTitle)}
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                      {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.overviewHelp)}
+                    </p>
+                  </div>
+                  {!isAdvisorViewer ? (
+                    <ReportActionButton type="button" onClick={() => setShowOpenPointForm(true)}>
+                      {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.add)}
+                    </ReportActionButton>
+                  ) : null}
+                </div>
+
+                {showOpenPointForm ? (
+                  <div className="mt-6 grid gap-4 rounded-2xl border border-violet-200 bg-violet-50/40 p-4 sm:p-5">
+                    <label className="text-sm font-semibold text-slate-950">
+                      {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.selectionTitle)}
+                      <select
+                        value={newOpenPointArea}
+                        onChange={(event) => setNewOpenPointArea(event.target.value as AlignmentOpenPointArea | "")}
+                        className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                      >
+                        <option value="">{systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.selectionPlaceholder)}</option>
+                        {getAlignmentOpenPointAreas(showValuesStep).map((area) => (
+                          <option key={area} value={area}>{systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.areas[area])}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <WorkbookField
+                      title={systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusTitle)}
+                      value={newOpenPointFocus}
+                      onChange={setNewOpenPointFocus}
+                      placeholder={systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusPlaceholder)}
+                      helperText={systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.focusHelp)}
+                      rows={3}
+                      minHeightClassName="min-h-[108px]"
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      <ReportActionButton type="button" onClick={createOpenPoint} disabled={!newOpenPointArea || !newOpenPointFocus.trim()}>
+                        {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.create)}
+                      </ReportActionButton>
+                      <button type="button" onClick={() => setShowOpenPointForm(false)} className="min-h-11 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300">
+                        {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.cancel)}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="mt-6 grid gap-3">
+                  {currentOpenPoints.length ? currentOpenPoints.map((point) => (
+                    <button
+                      key={point.id}
+                      type="button"
+                      onClick={() => setSelectedOpenPointId(point.id)}
+                      className="flex min-h-16 w-full items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-violet-300 hover:bg-violet-50/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-xs font-semibold text-violet-700">{systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.areas[point.area])}</span>
+                        <span className="mt-1 block text-sm font-semibold text-slate-950">{point.focus}</span>
+                      </span>
+                      <span className="shrink-0 text-xs font-semibold text-slate-600">
+                        {systemText(point.reflectionNote.trim() ? workbookContent.premiumWorkflow.deepDivePilot.openPoint.reflectedStatus : workbookContent.premiumWorkflow.deepDivePilot.openPoint.openStatus)} · {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.deepen)}
+                      </span>
+                    </button>
+                  )) : (
+                    <p className="rounded-2xl bg-slate-50 px-4 py-5 text-sm text-slate-600">{systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.empty)}</p>
+                  )}
+                </div>
+              </section>
             ) : currentStepIsPremiumPilot &&
               decisionRulesWorkspace &&
               currentPremiumV2Config &&
               currentPremiumFieldGuidance ? (
               <>
+                {currentStepIsOpenPointDeepDive ? (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOpenPointId(null)}
+                    className="mt-6 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                  >
+                    ← {systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.backToList)}
+                  </button>
+                ) : null}
                 <section className={`mt-8 rounded-[30px] px-5 py-7 sm:px-7 sm:py-8 ${currentToneMeta.headerSurface}`}>
                   <div className="max-w-4xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
@@ -4786,7 +5066,7 @@ export function FounderAlignmentWorkbookClient({
                                   : workbookContent.premiumWorkflow.deepDivePilot.unavailable
                           )}
                         </p>
-                        {!currentStepIsOpenPointDeepDive && deepDiveHandoffResult !== "idle" ? (
+                        {deepDiveHandoffResult !== "idle" ? (
                           <p
                             role="status"
                             className={`mt-3 text-sm ${
@@ -4818,14 +5098,45 @@ export function FounderAlignmentWorkbookClient({
                             </ReportActionButton>
                           ) : null}
                           {currentStepIsOpenPointDeepDive ? (
-                            <Link
-                              href={currentOpenPointDestinationHref}
-                              className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-                            >
-                              {systemText(
-                                workbookContent.premiumWorkflow.deepDivePilot.openPoint.handoffAction
-                              )}
-                            </Link>
+                            <div className="grid w-full gap-3">
+                              {deepDiveHandoffState ? (
+                                <label className="max-w-xl text-sm font-semibold text-slate-900">
+                                  {locale === "de" ? "Welchen Founder-Setup-Punkt möchtet ihr weiterführen?" : "Which Founder Setup item would you like to continue?"}
+                                  <select
+                                    value={selectedOpenPointSetupKey}
+                                    onChange={(event) => setSelectedOpenPointSetupKey(event.target.value as FounderSetupItemKey | "")}
+                                    className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                                  >
+                                    <option value="">{locale === "de" ? "Founder-Setup-Thema auswählen" : "Choose a Founder Setup topic"}</option>
+                                    {FOUNDER_SETUP_CATALOG.map((item) => (
+                                      <option key={item.key} value={item.key}>{setupT(`items.${item.key}.title`)}</option>
+                                    ))}
+                                  </select>
+                                </label>
+                              ) : null}
+                              {selectedOpenPointSetupHasNote ? (
+                                <p className="text-sm text-slate-700">{locale === "de" ? "Zu diesem Thema gibt es bereits eine gemeinsame Arbeitsnotiz. Sie wird nicht überschrieben." : "This topic already has a shared working note. It will not be overwritten."}</p>
+                              ) : null}
+                              <div className="flex flex-wrap gap-3">
+                                {deepDiveHandoffState?.memberCount === 2 && selectedOpenPointSetupKey && !selectedOpenPointSetupHasNote ? (
+                                  <ReportActionButton
+                                    type="button"
+                                    onClick={handoffOpenPointReflection}
+                                    disabled={isDeepDiveHandoffPending || !selectedOpenPoint?.reflectionNote.trim()}
+                                  >
+                                    {locale === "de" ? "Als Arbeitsnotiz übernehmen" : "Copy as working note"}
+                                  </ReportActionButton>
+                                ) : null}
+                                <Link
+                                  href={selectedOpenPointSetupHref}
+                                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                                >
+                                  {deepDiveHandoffState?.memberCount === 3
+                                    ? systemText(workbookContent.premiumWorkflow.deepDivePilot.continueWithTeam)
+                                    : systemText(workbookContent.premiumWorkflow.deepDivePilot.openPoint.handoffAction)}
+                                </Link>
+                              </div>
+                            </div>
                           ) : currentDeepDiveHandoffState !== "two_founder_ready" ? (
                             <Link
                               href={currentDeepDiveDestinationHref}
@@ -7163,7 +7474,8 @@ function discussionEntryVersion(entry: FounderAlignmentWorkbookDiscussionEntry) 
 function buildWorkspaceV2Patches(
   stepId: FounderAlignmentWorkbookStepId,
   previousWorkspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined,
-  nextWorkspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined
+  nextWorkspace: FounderAlignmentWorkbookStepWorkspaceV2 | undefined,
+  openPointId?: string
 ): FounderAlignmentWorkbookPatch[] {
   const previous = previousWorkspace ?? { entries: [], reactions: [] };
   const next = nextWorkspace ?? { entries: [], reactions: [] };
@@ -7183,6 +7495,7 @@ function buildWorkspaceV2Patches(
       patches.push({
         scope: "step",
         stepId,
+        ...(openPointId ? { openPointId } : {}),
         field: "workspaceEntryCreate",
         value: entry,
       });
@@ -7197,6 +7510,7 @@ function buildWorkspaceV2Patches(
       patches.push({
         scope: "step",
         stepId,
+        ...(openPointId ? { openPointId } : {}),
         field: "workspaceEntryUpdate",
         value: {
           id: entry.id,
@@ -7214,6 +7528,7 @@ function buildWorkspaceV2Patches(
       patches.push({
         scope: "step",
         stepId,
+        ...(openPointId ? { openPointId } : {}),
         field: "workspaceEntryDelete",
         value: {
           id: entry.id,
@@ -7234,6 +7549,7 @@ function buildWorkspaceV2Patches(
       patches.push({
         scope: "step",
         stepId,
+        ...(openPointId ? { openPointId } : {}),
         field: "workspaceReactionUpsert",
         value: reaction,
       });
@@ -7246,6 +7562,7 @@ function buildWorkspaceV2Patches(
       patches.push({
         scope: "step",
         stepId,
+        ...(openPointId ? { openPointId } : {}),
         field: "workspaceReactionDelete",
         value: {
           entryId: reaction.entryId,
@@ -7394,6 +7711,60 @@ function buildWorkbookPatches(
         field: "advisorReplies",
         value: nextStep.advisorReplies ?? [],
       });
+    }
+
+    if (stepId === "alignment_open_points") {
+      const previousPoints = new Map(
+        (previousStep.openPoints ?? []).map((point) => [point.id, point])
+      );
+      for (const point of nextStep.openPoints ?? []) {
+        const previousPoint = previousPoints.get(point.id);
+        if (!previousPoint) {
+          patches.push({
+            scope: "step",
+            stepId: "alignment_open_points",
+            field: "openPointCreate",
+            value: point,
+          });
+          continue;
+        }
+        for (const [field, previousValue, nextValue] of [
+          ["deepDiveArea", previousPoint.area, point.area],
+          ["deepDiveFocus", previousPoint.focus, point.focus],
+          ["founderA", previousPoint.founderA, point.founderA],
+          ["founderB", previousPoint.founderB, point.founderB],
+          ["reflectionNote", previousPoint.reflectionNote, point.reflectionNote],
+        ] as const) {
+          if (previousValue !== nextValue) {
+            patches.push({
+              scope: "step",
+              stepId: "alignment_open_points",
+              openPointId: point.id,
+              field,
+              value: nextValue,
+            });
+          }
+        }
+        patches.push(
+          ...buildWorkspaceV2Patches(
+            "alignment_open_points",
+            previousPoint.workspaceV2,
+            point.workspaceV2,
+            point.id
+          )
+        );
+        if (
+          JSON.stringify(previousPoint.advisorReplies) !== JSON.stringify(point.advisorReplies)
+        ) {
+          patches.push({
+            scope: "step",
+            stepId: "alignment_open_points",
+            openPointId: point.id,
+            field: "advisorReplies",
+            value: point.advisorReplies,
+          });
+        }
+      }
     }
   }
 

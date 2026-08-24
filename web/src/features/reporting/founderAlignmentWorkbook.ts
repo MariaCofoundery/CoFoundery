@@ -116,6 +116,19 @@ export type FounderAlignmentWorkbookStepWorkspaceV2 = {
   reactions: FounderAlignmentWorkbookDiscussionReaction[];
 };
 
+export type FounderAlignmentWorkbookOpenPoint = {
+  id: string;
+  area: AlignmentOpenPointArea;
+  focus: string;
+  founderA: string;
+  founderB: string;
+  reflectionNote: string;
+  workspaceV2?: FounderAlignmentWorkbookStepWorkspaceV2;
+  advisorReplies: FounderAlignmentWorkbookAdvisorReply[];
+  createdAt: string;
+  updatedAt: string | null;
+};
+
 export function upsertCurrentWorkbookDiscussionReaction(
   workspace: FounderAlignmentWorkbookStepWorkspaceV2,
   reaction: FounderAlignmentWorkbookDiscussionReaction
@@ -161,6 +174,7 @@ export type FounderAlignmentWorkbookPatch =
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: FounderAlignmentWorkbookStepField;
       value:
         | string
@@ -172,12 +186,14 @@ export type FounderAlignmentWorkbookPatch =
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: "workspaceEntryCreate";
       value: FounderAlignmentWorkbookDiscussionEntry;
     }
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: "workspaceEntryUpdate";
       value: {
         id: string;
@@ -190,6 +206,7 @@ export type FounderAlignmentWorkbookPatch =
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: "workspaceEntryDelete";
       value: {
         id: string;
@@ -199,17 +216,25 @@ export type FounderAlignmentWorkbookPatch =
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: "workspaceReactionUpsert";
       value: FounderAlignmentWorkbookDiscussionReaction;
     }
   | {
       scope: "step";
       stepId: FounderAlignmentWorkbookStepId;
+      openPointId?: string;
       field: "workspaceReactionDelete";
       value: {
         entryId: string;
         userId: FounderAlignmentWorkbookDiscussionAuthor;
       };
+    }
+  | {
+      scope: "step";
+      stepId: "alignment_open_points";
+      field: "openPointCreate";
+      value: FounderAlignmentWorkbookOpenPoint;
     }
   | {
       scope: "root";
@@ -235,6 +260,7 @@ export type FounderAlignmentWorkbookEntry = {
   reflectionNote?: string;
   deepDiveArea?: AlignmentOpenPointArea | null;
   deepDiveFocus?: string;
+  openPoints?: FounderAlignmentWorkbookOpenPoint[];
   structuredOutputs?: WorkbookStructuredOutputsByStep;
   workspaceV2?: FounderAlignmentWorkbookStepWorkspaceV2;
   founderAApproved: boolean;
@@ -465,6 +491,7 @@ export function buildEmptyFounderAlignmentWorkbookPayload(): FounderAlignmentWor
           reflectionNote: "",
           deepDiveArea: null,
           deepDiveFocus: "",
+          openPoints: [],
           structuredOutputs: undefined,
           workspaceV2: undefined,
           founderAApproved: false,
@@ -773,6 +800,49 @@ export function sanitizeWorkbookStepWorkspaceV2(
   };
 }
 
+const OPEN_POINT_ID_PATTERN = /^[A-Za-z0-9_-]{1,100}$/;
+
+export function sanitizeFounderAlignmentWorkbookOpenPoints(
+  input: unknown
+): FounderAlignmentWorkbookOpenPoint[] {
+  if (!Array.isArray(input)) return [];
+
+  const seenIds = new Set<string>();
+  return input
+    .slice(0, 24)
+    .map<FounderAlignmentWorkbookOpenPoint | null>((value) => {
+      if (!value || typeof value !== "object") return null;
+      const raw = value as Record<string, unknown>;
+      if (
+        typeof raw.id !== "string" ||
+        !OPEN_POINT_ID_PATTERN.test(raw.id) ||
+        seenIds.has(raw.id) ||
+        typeof raw.area !== "string" ||
+        !ALIGNMENT_OPEN_POINT_AREA_VALUES.includes(raw.area as AlignmentOpenPointArea) ||
+        typeof raw.focus !== "string"
+      ) {
+        return null;
+      }
+
+      seenIds.add(raw.id);
+      const workspaceV2 = sanitizeWorkbookStepWorkspaceV2(raw.workspaceV2);
+      return {
+        id: raw.id,
+        area: raw.area as AlignmentOpenPointArea,
+        focus: raw.focus,
+        founderA: typeof raw.founderA === "string" ? raw.founderA : "",
+        founderB: typeof raw.founderB === "string" ? raw.founderB : "",
+        reflectionNote: typeof raw.reflectionNote === "string" ? raw.reflectionNote : "",
+        workspaceV2,
+        advisorReplies: sanitizeWorkbookAdvisorReplies(raw.advisorReplies, workspaceV2),
+        createdAt:
+          typeof raw.createdAt === "string" ? raw.createdAt : LEGACY_WORKBOOK_REPLY_TIMESTAMP,
+        updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
+      } satisfies FounderAlignmentWorkbookOpenPoint;
+    })
+    .filter((point): point is FounderAlignmentWorkbookOpenPoint => point != null);
+}
+
 export function getWorkbookStepStructuredOutputs(
   entry: FounderAlignmentWorkbookEntry,
   stepId: FounderAlignmentWorkbookStepId
@@ -979,6 +1049,7 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         reflectionNote?: unknown;
         deepDiveArea?: unknown;
         deepDiveFocus?: unknown;
+        openPoints?: unknown;
         structuredOutputs?: unknown;
         workspaceV2?: unknown;
         founderAApproved?: unknown;
@@ -1005,6 +1076,15 @@ export function sanitizeFounderAlignmentWorkbookPayload(
         founderA: typeof source?.founderA === "string" ? source.founderA : undefined,
         founderB: typeof source?.founderB === "string" ? source.founderB : undefined,
       });
+    const sanitizedOpenPoints = sanitizeFounderAlignmentWorkbookOpenPoints(source?.openPoints);
+    const legacyOpenPointWorkspace = workspaceV2 ?? advisorReplyWorkspace;
+    const hasLegacyOpenPoint =
+      step.id === "alignment_open_points" &&
+      sanitizedOpenPoints.length === 0 &&
+      (Boolean(typeof source?.deepDiveFocus === "string" && source.deepDiveFocus.trim()) ||
+        Boolean(typeof source?.reflectionNote === "string" && source.reflectionNote.trim()) ||
+        Boolean(source?.deepDiveArea) ||
+        Boolean(legacyOpenPointWorkspace));
     steps[step.id] = {
       mode: source?.mode === "collaborative" ? "collaborative" : "solo",
       founderA: typeof source?.founderA === "string" ? source.founderA : "",
@@ -1017,6 +1097,35 @@ export function sanitizeFounderAlignmentWorkbookPayload(
           ? (source.deepDiveArea as AlignmentOpenPointArea)
           : null,
       deepDiveFocus: typeof source?.deepDiveFocus === "string" ? source.deepDiveFocus : "",
+      openPoints:
+        step.id === "alignment_open_points"
+          ? hasLegacyOpenPoint
+            ? [
+                {
+                  id: "legacy-open-point",
+                  area:
+                    typeof source?.deepDiveArea === "string" &&
+                    ALIGNMENT_OPEN_POINT_AREA_VALUES.includes(
+                      source.deepDiveArea as AlignmentOpenPointArea
+                    )
+                      ? (source.deepDiveArea as AlignmentOpenPointArea)
+                      : "other",
+                  focus: typeof source?.deepDiveFocus === "string" ? source.deepDiveFocus : "",
+                  founderA: typeof source?.founderA === "string" ? source.founderA : "",
+                  founderB: typeof source?.founderB === "string" ? source.founderB : "",
+                  reflectionNote:
+                    typeof source?.reflectionNote === "string" ? source.reflectionNote : "",
+                  workspaceV2: legacyOpenPointWorkspace,
+                  advisorReplies: sanitizeWorkbookAdvisorReplies(
+                    source?.advisorReplies,
+                    legacyOpenPointWorkspace
+                  ),
+                  createdAt: LEGACY_WORKBOOK_REPLY_TIMESTAMP,
+                  updatedAt: null,
+                },
+              ]
+            : sanitizedOpenPoints
+          : [],
       structuredOutputs: sanitizeWorkbookStructuredOutputsByStep(step.id, source?.structuredOutputs),
       workspaceV2,
       founderAApproved: source?.founderAApproved === true,

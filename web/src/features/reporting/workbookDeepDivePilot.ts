@@ -20,6 +20,7 @@ export type WorkbookDeepDiveHandoffContext = {
   targetWorkingNotes: Partial<
     Record<Exclude<WorkbookDeepDivePilotStepId, "alignment_open_points">, string>
   >;
+  setupWorkingNotes: Partial<Record<FounderSetupItemKey, string>>;
 };
 
 const SETUP_KEY_BY_STEP: Partial<Record<WorkbookDeepDivePilotStepId, FounderSetupItemKey>> = {

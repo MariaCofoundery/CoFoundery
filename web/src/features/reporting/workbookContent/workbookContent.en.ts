@@ -592,6 +592,16 @@ export const WORKBOOK_CONTENT_EN: WorkbookContent = {
           "Choose an area or describe the point from your alignment that particularly stood out to you.",
       },
       openPoint: {
+        overviewTitle: "Your open points",
+        overviewHelp: "Capture the topics from your Alignment that you would like to discuss in more depth.",
+        empty: "No open points captured yet.",
+        add: "+ Add a point",
+        create: "Create point",
+        cancel: "Cancel",
+        deepen: "Deepen",
+        backToList: "Back to your open points",
+        openStatus: "Still open",
+        reflectedStatus: "Reflection captured",
         selectionTitle: "What stood out to you?",
         selectionHelp:
           "This selection only structures your conversation. It does not assess the point.",

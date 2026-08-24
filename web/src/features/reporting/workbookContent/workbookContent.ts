@@ -51,6 +51,16 @@ export type PremiumWorkbookWorkflowCopy = {
       string
     >;
     openPoint: {
+      overviewTitle: string;
+      overviewHelp: string;
+      empty: string;
+      add: string;
+      create: string;
+      cancel: string;
+      deepen: string;
+      backToList: string;
+      openStatus: string;
+      reflectedStatus: string;
       selectionTitle: string;
       selectionHelp: string;
       selectionPlaceholder: string;
