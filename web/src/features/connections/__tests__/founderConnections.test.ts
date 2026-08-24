@@ -23,6 +23,8 @@ function team(memberIds = [currentUserId, teammateId]): FounderTeamDashboardSumm
     members: memberIds.map((userId, index) => ({
       userId,
       displayName: ["Alex", "Sam", "Jo"][index] ?? null,
+      avatarId: index === 0 ? "avatar-1" : null,
+      avatarUrl: index === 1 ? "avatars/sam/profile.webp" : null,
       createdAt: `2026-08-2${index}T10:00:00.000Z`,
     })),
   };
@@ -184,6 +186,10 @@ test("connections page names pre-founder and existing-team contexts without expo
   assert.equal(de.connections.contexts.existingTeam, "Bestehendes Founder-Team");
   assert.equal(en.connections.contexts.existingTeam, "Existing founder team");
   assert.match(page, /getFounderConnections\(user\.id, user\.email, supabase\)/);
+  assert.match(page, /avatarId=\{team\.members\[index\]\?\.avatarId\}/);
+  assert.match(page, /imageUrl=\{team\.members\[index\]\?\.avatarUrl\}/);
+  assert.equal(de.connections.avatarAlt, "Profil von {name}");
+  assert.equal(en.connections.avatarAlt, "Profile for {name}");
   assert.doesNotMatch(page, /inviteeEmail|inviterEmail|connection\.email|team\.email/);
   assert.doesNotMatch(data, /createPrivilegedClient|service_role/);
 });

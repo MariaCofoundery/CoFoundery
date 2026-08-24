@@ -7,6 +7,8 @@ export type FounderTeamContext = "pre_founder" | "existing_team";
 export type FounderTeamMemberSummary = {
   userId: string;
   displayName: string | null;
+  avatarId: string | null;
+  avatarUrl: string | null;
   createdAt: string;
 };
 
@@ -114,6 +116,8 @@ export type RelationshipAdvisorRow = {
 export type DisplayNameRow = {
   user_id: string;
   display_name: string | null;
+  avatar_id?: string | null;
+  avatar_url?: string | null;
 };
 
 export type FounderTeamHomebaseRows = {
@@ -164,6 +168,10 @@ export function buildFounderTeamDashboardSummaries(params: {
         .map((member) => ({
           userId: member.user_id,
           displayName: names.get(member.user_id) ?? null,
+          avatarId:
+            params.profileNames.find((row) => row.user_id === member.user_id)?.avatar_id ?? null,
+          avatarUrl:
+            params.profileNames.find((row) => row.user_id === member.user_id)?.avatar_url ?? null,
           createdAt: member.created_at,
         })),
     }));
@@ -403,6 +411,8 @@ export function buildFounderTeamHomebaseReadModel(params: {
     members: teamMembers.map((member) => ({
       userId: member.user_id,
       displayName: displayNames.get(member.user_id) ?? null,
+      avatarId: rows.profileNames.find((row) => row.user_id === member.user_id)?.avatar_id ?? null,
+      avatarUrl: rows.profileNames.find((row) => row.user_id === member.user_id)?.avatar_url ?? null,
       createdAt: member.created_at,
     })),
     alignment,

@@ -54,11 +54,16 @@ test("setup status chips are textual and avoid warning colors", () => {
   assert.doesNotMatch(chip, /(?:red|rose|emerald)-/);
 });
 
-test("homebase presents founder initials and its modules in the intended order", () => {
+test("homebase presents localized real avatars with initials fallback in the intended order", () => {
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
+  const de = JSON.parse(readFileSync("messages/de/teams.json", "utf8"));
+  const en = JSON.parse(readFileSync("messages/en/teams.json", "utf8"));
   assert.match(page, /<ProfileAvatar/);
   assert.match(page, /displayName=\{name\}/);
-  assert.doesNotMatch(page, /avatarId=|imageUrl=/);
+  assert.match(page, /avatarId=\{team\.members\[index\]\?\.avatarId\}/);
+  assert.match(page, /imageUrl=\{team\.members\[index\]\?\.avatarUrl\}/);
+  assert.equal(de.homebase.founders.avatarAlt, "Profil von {name}");
+  assert.equal(en.homebase.founders.avatarAlt, "Profile for {name}");
 
   const founder = page.indexOf('aria-labelledby="team-founders-title"');
   const alignment = page.indexOf('aria-labelledby="team-alignment-title"');

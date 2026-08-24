@@ -64,6 +64,7 @@
     "title": "Deine Founder-Verbindungen",
     "subtitle": "Hier findest du Founder, mit denen du eine Zusammenarbeit prüfst oder bereits zusammenarbeitest.",
     "find": "Co-Founder finden",
+    "avatarAlt": "Profil von {name}",
     "founderFallback": "Founder {index}",
     "founderUnknown": "Founder",
     "openTeam": "Verbindung öffnen",

@@ -61,12 +61,14 @@ export default async function ConnectionsPage() {
                 return (
                   <li key={team.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                     <div className="flex items-start gap-3">
-                      <div className="flex -space-x-2" aria-hidden="true">
+                      <div className="flex -space-x-2">
                         {founderNames.map((name, index) => (
                           <ProfileAvatar
                             key={team.members[index]?.userId ?? name}
                             displayName={name}
-                            alt=""
+                            avatarId={team.members[index]?.avatarId}
+                            imageUrl={team.members[index]?.avatarUrl}
+                            alt={t("avatarAlt", { name })}
                             className="h-9 w-9 rounded-full object-cover ring-2 ring-white"
                             fallbackClassName="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 ring-2 ring-white"
                           />

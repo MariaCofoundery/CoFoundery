@@ -116,6 +116,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               >
                 <ProfileAvatar
                   displayName={name}
+                  avatarId={team.members[index]?.avatarId}
+                  imageUrl={team.members[index]?.avatarUrl}
                   alt={t("founders.avatarAlt", { name })}
                   className="h-10 w-10 shrink-0 rounded-full object-cover"
                   fallbackClassName="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm"

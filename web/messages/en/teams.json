@@ -64,6 +64,7 @@
     "title": "Your founder connections",
     "subtitle": "Find the founders you are exploring a collaboration with or already working with.",
     "find": "Find a Co-Founder",
+    "avatarAlt": "Profile for {name}",
     "founderFallback": "Founder {index}",
     "founderUnknown": "Founder",
     "openTeam": "Open connection",

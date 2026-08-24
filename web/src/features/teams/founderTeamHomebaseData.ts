@@ -25,23 +25,44 @@ export type {
 } from "@/features/teams/founderTeamHomebaseModel";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
+type SupabaseLikeClient = Pick<SupabaseServerClient, "from" | "rpc">;
 
-async function loadMemberNames(client: SupabaseLikeClient, userIds: string[]) {
+async function loadMemberPresentations(
+  client: SupabaseLikeClient,
+  teams: Array<{ teamId: string; userIds: string[] }>
+) {
+  const userIds = [...new Set(teams.flatMap((team) => team.userIds))];
   if (userIds.length === 0) {
     return { profileNames: [] as DisplayNameRow[], discoveryNames: [] as DisplayNameRow[] };
   }
 
-  const [profileResult, discoveryResult] = await Promise.all([
-    client.from("profiles").select("user_id, display_name").in("user_id", userIds),
+  const [presentationResults, profileResult, discoveryResult] = await Promise.all([
+    Promise.all(
+      teams.map(({ teamId }) =>
+        client.rpc("get_founder_team_member_presentations", { p_team_id: teamId })
+      )
+    ),
+    client
+      .from("profiles")
+      .select("user_id, display_name, avatar_id, avatar_url")
+      .in("user_id", userIds),
     client
       .from("founder_discovery_profiles")
       .select("user_id, display_name")
       .in("user_id", userIds),
   ]);
 
+  const projectedProfiles = presentationResults.flatMap((result) =>
+    result.error ? [] : ((result.data ?? []) as DisplayNameRow[])
+  );
+
   return {
-    profileNames: (profileResult.data ?? []) as DisplayNameRow[],
+    // The direct query remains as a backwards-compatible self-profile fallback while the
+    // additive RPC migration rolls out. Existing profiles RLS limits it to the current user.
+    profileNames: [
+      ...((profileResult.data ?? []) as DisplayNameRow[]),
+      ...projectedProfiles,
+    ],
     discoveryNames: (discoveryResult.data ?? []) as DisplayNameRow[],
   };
 }
@@ -86,7 +107,9 @@ export async function getFounderTeamHomebase(
   );
   const relationshipIds = relationships.map((relationship) => relationship.id);
   const memberIds = members.map((member) => member.user_id);
-  const namesPromise = loadMemberNames(supabase, memberIds);
+  const namesPromise = loadMemberPresentations(supabase, [
+    { teamId: normalizedTeamId, userIds: memberIds },
+  ]);
 
   if (relationshipIds.length === 0) {
     const names = await namesPromise;
@@ -211,9 +234,14 @@ export async function getFounderTeamDashboardSummaries(
 
   const teams = (teamResult.data ?? []) as FounderTeamRow[];
   const allMembers = (allMembersResult.data ?? []) as FounderTeamMemberRow[];
-  const names = await loadMemberNames(
+  const names = await loadMemberPresentations(
     supabase,
-    [...new Set(allMembers.map((member) => member.user_id))]
+    teams.map((team) => ({
+      teamId: team.id,
+      userIds: allMembers
+        .filter((member) => member.team_id === team.id)
+        .map((member) => member.user_id),
+    }))
   );
   return buildFounderTeamDashboardSummaries({
     currentUserId,

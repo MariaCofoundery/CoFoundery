@@ -31,7 +31,20 @@ function emptyRows(overrides: Partial<FounderTeamHomebaseRows> = {}): FounderTea
     matchingReports: [],
     matchingWorkspaceAgreements: [],
     advisors: [],
-    profileNames: [{ user_id: aliceId, display_name: "Alice" }],
+    profileNames: [
+      {
+        user_id: aliceId,
+        display_name: "Alice",
+        avatar_id: "avatar-1",
+        avatar_url: null,
+      },
+      {
+        user_id: bobId,
+        display_name: "Bob",
+        avatar_id: null,
+        avatar_url: "avatars/bob/profile.webp",
+      },
+    ],
     discoveryNames: [{ user_id: bobId, display_name: "Bob" }],
     ...overrides,
   };
@@ -68,6 +81,13 @@ test("two-founder team without artifacts remains a valid quiet homebase", () => 
   assert.deepEqual(
     homebase.members.map((member) => member.displayName),
     ["Alice", "Bob"]
+  );
+  assert.deepEqual(
+    homebase.members.map(({ avatarId, avatarUrl }) => ({ avatarId, avatarUrl })),
+    [
+      { avatarId: "avatar-1", avatarUrl: null },
+      { avatarId: null, avatarUrl: "avatars/bob/profile.webp" },
+    ]
   );
   assert.deepEqual(homebase.alignment, []);
   assert.deepEqual(homebase.agreements, []);
@@ -298,7 +318,21 @@ test("dashboard summaries include own teams only and keep three members", () => 
         created_at: "2026-08-01T10:00:00.000Z",
       },
     ],
-    profileNames: [{ user_id: aliceId, display_name: "Alice" }],
+    profileNames: [
+      {
+        user_id: aliceId,
+        display_name: "Alice",
+        avatar_id: "avatar-1",
+        avatar_url: null,
+      },
+      {
+        user_id: bobId,
+        display_name: "Bob",
+        avatar_id: null,
+        avatar_url: "avatars/bob/profile.webp",
+      },
+      { user_id: caraId, display_name: "Cara", avatar_id: null, avatar_url: null },
+    ],
     discoveryNames: [
       { user_id: bobId, display_name: "Bob" },
       { user_id: caraId, display_name: "Cara" },
@@ -308,6 +342,18 @@ test("dashboard summaries include own teams only and keep three members", () => 
   assert.equal(summaries.length, 1);
   assert.equal(summaries[0]?.id, teamId);
   assert.equal(summaries[0]?.members.length, 3);
+  assert.equal(summaries[0]?.members[0]?.avatarId, "avatar-1");
+  assert.equal(summaries[0]?.members[1]?.avatarUrl, "avatars/bob/profile.webp");
+  assert.equal(summaries[0]?.members[2]?.avatarUrl, null);
+});
+
+test("team member presentation loading uses only the narrow membership-checked projection", () => {
+  const data = readFileSync("src/features/teams/founderTeamHomebaseData.ts", "utf8");
+  assert.match(data, /get_founder_team_member_presentations/);
+  assert.match(data, /p_team_id: teamId/);
+  assert.match(data, /user_id, display_name, avatar_id, avatar_url/);
+  assert.doesNotMatch(data, /createPrivilegedClient|service_role/);
+  assert.doesNotMatch(data, /select\([^)]*(?:email|focus_skill|intention)/);
 });
 
 test("homebase and dashboard system copy stay structurally parallel in DE and EN", () => {
