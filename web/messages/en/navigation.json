@@ -4,6 +4,7 @@
   "dashboard": "Dashboard",
   "discovery": "Find a Co-Founder",
   "connections": "Connections",
+  "advisorConnections": "Founder connections",
   "incomingRequestBadgeSingular": "1 open co-founder request",
   "incomingRequestBadgePlural": "{count} open co-founder requests",
   "editProfile": "Edit profile",

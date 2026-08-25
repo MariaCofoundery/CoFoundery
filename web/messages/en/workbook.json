@@ -2,6 +2,8 @@
   "common": {
     "workbook": "Workbook",
     "advisorContext": "Advisor context",
+    "advisorLegacyTitle": "Historical working state",
+    "advisorLegacyDescription": "This view contains earlier workbook content from the existing collaboration. New alignment deep dives and open points remain private to founders.",
     "founderContext": "Founder context",
     "matchingReport": "Go to matching report",
     "advisorReport": "Go to advisor report",

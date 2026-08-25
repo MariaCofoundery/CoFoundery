@@ -60,7 +60,7 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
     agreement?: { editor?: { saveSection?: string } };
   };
   const workbook = messages.workbook as {
-    intro?: { start?: string };
+    intro?: { chooseTopic?: string };
     client?: { title?: string };
     steps?: { vision_direction?: { title?: string } };
   };
@@ -76,7 +76,7 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
   assert.equal(dashboard.profileSnapshot?.dimensions?.companyLogic?.label, "Company logic");
   assert.equal(dashboard.account?.delete?.button, "Delete account");
   assert.equal(workspace.agreement?.editor?.saveSection, "Save section");
-  assert.equal(workbook.intro?.start, "Start workbook");
+  assert.equal(workbook.intro?.chooseTopic, "Choose a topic");
   assert.equal(workbook.client?.title, "Workbook for your conversation");
   assert.equal(workbook.steps?.vision_direction?.title, "Company logic");
   assert.equal(report.common?.savePdf, "Save as PDF");

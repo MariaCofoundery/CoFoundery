@@ -260,7 +260,7 @@
     "legalSpecific": "Die konkrete rechtliche oder steuerliche Ausgestaltung dieses Themas kann professionelle Beratung erfordern.",
     "advisorAccess": {
       "title": "Founder Setup für Advisor freigeben",
-      "description": "Der Advisor kann ausschließlich eure gemeinsam bestätigten Founder-Setup-Inhalte lesen. Arbeitsnotizen und offene Vorschläge bleiben privat.",
+      "description": "Der Advisor kann ausschließlich eure gemeinsam bestätigten Founder-Setup-Inhalte lesen. Arbeitsnotizen, Gespräche, offene Vorschläge, Alignment-Vertiefungen und das Commitment Lab bleiben privat. Die Freigabe ist jederzeit widerrufbar.",
       "advisorFallback": "Advisor {index}",
       "notShared": "Noch nicht für diesen Advisor freigegeben.",
       "pending": "Die Zustimmung aller aktuellen Founder ist noch nicht vollständig.",
@@ -275,6 +275,21 @@
     "advisorView": {
       "title": "Founder Setup",
       "subtitle": "Vom Founder-Team gemeinsam bestätigte Punkte.",
+      "empty": "Founder Setup ist freigegeben, aktuell gibt es noch keine bestätigten gemeinsamen Inhalte.",
+      "accessStatuses": {
+        "not_granted": "Nicht freigegeben",
+        "pending": "Freigabe wartet auf Zustimmung",
+        "active": "Freigegeben",
+        "paused": "Freigabe pausiert",
+        "revoked": "Widerrufen"
+      },
+      "accessDescriptions": {
+        "not_granted": "Für diese Founder-Verbindung besteht keine separate Founder-Setup-Freigabe.",
+        "pending": "Noch nicht alle aktuellen Founder haben der confirmed-only Freigabe zugestimmt. Inhalte bleiben verborgen.",
+        "active": "Sichtbar sind ausschließlich gemeinsam bestätigte Founder-Setup-Inhalte.",
+        "paused": "Die Freigabe ist derzeit nicht vollständig wirksam, etwa nach einer Änderung der Teammitglieder. Inhalte bleiben verborgen.",
+        "revoked": "Die separate Founder-Setup-Freigabe wurde beendet. Inhalte bleiben verborgen."
+      },
       "documentationReference": "Festgehalten unter",
       "confirmedAt": "Gemeinsam bestätigt am {date}"
     },

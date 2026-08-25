@@ -1106,8 +1106,10 @@ export function FounderAlignmentWorkbookClient({
         showValuesStep,
         hasActiveAdvisor,
         workbook.currentStepId === "alignment_open_points"
+      ).filter(
+        (step) => currentUserRole !== "advisor" || step.id !== "alignment_open_points"
       ),
-    [hasActiveAdvisor, showValuesStep, workbook.currentStepId, workbookContent]
+    [currentUserRole, hasActiveAdvisor, showValuesStep, workbook.currentStepId, workbookContent]
   );
   const activeStepId = visibleSteps.some((step) => step.id === workbook.currentStepId)
     ? workbook.currentStepId
@@ -1173,7 +1175,7 @@ export function FounderAlignmentWorkbookClient({
   const progress = ((Math.max(currentIndex, 0) + 1) / visibleSteps.length) * 100;
   const currentStepContent = workbookContent.stepContent[currentStep.id];
   const currentStepIsAdvisorClosing = currentStep.id === "advisor_closing";
-  const currentDeepDivePilotStepId = isWorkbookDeepDivePilotStep(currentStep.id)
+  const currentDeepDivePilotStepId = !isAdvisorViewer && isWorkbookDeepDivePilotStep(currentStep.id)
     ? currentStep.id
     : null;
   const currentStepIsDeepDivePilot = currentDeepDivePilotStepId !== null;

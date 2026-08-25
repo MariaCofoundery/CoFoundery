@@ -1109,6 +1109,32 @@ function mergeAdvisorPayload(
   return sanitizeFounderAlignmentWorkbookPayload(nextPayload);
 }
 
+function advisorPatchTargetsFounderOnlyDeepDive(
+  payload: FounderAlignmentWorkbookPayload,
+  patch: FounderAlignmentWorkbookPatch
+) {
+  if (patch.scope === "root") {
+    return patch.field === "currentStepId" && patch.value === "alignment_open_points";
+  }
+  if (patch.scope !== "step") return false;
+  if (patch.stepId === "alignment_open_points" || patch.openPointId) return true;
+  if (patch.stepId !== "decision_rules" && patch.stepId !== "collaboration_conflict") {
+    return false;
+  }
+
+  if (patch.field !== "advisorNotes" && patch.field !== "advisorReplies") {
+    return true;
+  }
+  if (patch.field === "advisorNotes") return false;
+
+  const founderOnlyEntryIds = new Set(
+    payload.steps[patch.stepId].workspaceV2?.entries.map((entry) => entry.id) ?? []
+  );
+  return Array.isArray(patch.value) && patch.value.some(
+    (reply) => founderOnlyEntryIds.has(reply.sourceEntryId)
+  );
+}
+
 export async function saveFounderAlignmentWorkbook({
   invitationId,
   teamContext,
@@ -1154,6 +1180,9 @@ export async function saveFounderAlignmentWorkbook({
   let payloadToPersist: FounderAlignmentWorkbookPayload;
 
   if (role === "advisor") {
+    if (patches.some((patch) => advisorPatchTargetsFounderOnlyDeepDive(existingPayload, patch))) {
+      return { ok: false, reason: "forbidden", updatedAt: currentUpdatedAt ?? null };
+    }
     if ((expectedUpdatedAt ?? null) !== (currentUpdatedAt ?? null)) {
       return { ok: false, reason: "stale_version", updatedAt: currentUpdatedAt ?? null };
     }

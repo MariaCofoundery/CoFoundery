@@ -89,6 +89,11 @@ select pg_temp.assert_access(
   (select count(*) = 0 from public.get_advisor_confirmed_founder_setup('ac111111-1111-4111-8111-111111111111')),
   'relationship advisor received implicit Founder Setup access'
 );
+select pg_temp.assert_access(
+  (select access_status = 'not_granted' and confirmed_item_count = 0
+   from public.get_advisor_founder_setup_access_status('ac111111-1111-4111-8111-111111111111')),
+  'advisor status did not report a missing separate grant'
+);
 reset role;
 
 -- Membership and source relationship boundaries prevent arbitrary team-level grants.
@@ -137,6 +142,11 @@ select pg_temp.assert_access(
   (select count(*) = 0 from public.get_advisor_confirmed_founder_setup('ac111111-1111-4111-8111-111111111111')),
   'advisor read setup at 1/2 consent'
 );
+select pg_temp.assert_access(
+  (select access_status = 'pending' and consent_count = 1 and member_count = 2
+   from public.get_advisor_founder_setup_access_status('ac111111-1111-4111-8111-111111111111')),
+  'advisor status did not report pending 1/2 consent'
+);
 reset role;
 
 -- Founder B completes 2/2. Only the current confirmed snapshot and five projected fields appear.
@@ -152,6 +162,11 @@ set local role authenticated;
 select pg_temp.assert_access(
   (select count(*) = 1 from public.get_advisor_confirmed_founder_setup('ac111111-1111-4111-8111-111111111111')),
   '2/2 did not activate confirmed-only read access'
+);
+select pg_temp.assert_access(
+  (select access_status = 'active' and consent_count = 2 and member_count = 2 and confirmed_item_count = 1
+   from public.get_advisor_founder_setup_access_status('ac111111-1111-4111-8111-111111111111')),
+  'advisor status did not report active confirmed-only content'
 );
 select pg_temp.assert_access(
   (select note = 'CONFIRMED_CURRENT_NOTE'
@@ -208,6 +223,11 @@ select pg_temp.assert_access(
   (select count(*) = 0 from public.get_advisor_confirmed_founder_setup('ac111111-1111-4111-8111-111111111111')),
   'revocation did not immediately remove access'
 );
+select pg_temp.assert_access(
+  (select access_status = 'revoked' and confirmed_item_count = 0
+   from public.get_advisor_founder_setup_access_status('ac111111-1111-4111-8111-111111111111')),
+  'advisor status did not fail closed after grant revocation'
+);
 reset role;
 
 -- A+B consent is insufficient for A+B+C; C activates 3/3, then source revocation fails closed.
@@ -248,10 +268,15 @@ select * from public.confirm_founder_team_advisor_setup_grant((select grant_id f
 reset role;
 select pg_temp.assert_access((select status = 'active' from public.founder_team_advisor_setup_grants where team_id = 'ab333333-3333-4333-8333-333333333333'), '2/2 growing-team grant did not activate');
 insert into public.founder_team_members(team_id, user_id) values ('ab333333-3333-4333-8333-333333333333', 'a6666666-6666-4666-8666-666666666666');
-select pg_temp.assert_access((select status = 'pending' and activated_at is null from public.founder_team_advisor_setup_grants where team_id = 'ab333333-3333-4333-8333-333333333333'), 'new founder did not pause existing access');
+select pg_temp.assert_access((select status = 'pending' and activated_at is not null from public.founder_team_advisor_setup_grants where team_id = 'ab333333-3333-4333-8333-333333333333'), 'new founder did not pause existing access while preserving activation history');
 select set_config('request.jwt.claims', '{"sub":"aa111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
 set local role authenticated;
 select pg_temp.assert_access((select count(*) = 0 from public.get_advisor_confirmed_founder_setup('ac333333-3333-4333-8333-333333333333')), 'advisor retained access after third founder joined');
+select pg_temp.assert_access(
+  (select access_status = 'paused' and consent_count = 2 and member_count = 3 and confirmed_item_count = 0
+   from public.get_advisor_founder_setup_access_status('ac333333-3333-4333-8333-333333333333')),
+  'advisor status did not report membership-change pause'
+);
 reset role;
 select set_config('request.jwt.claims', '{"sub":"a6666666-6666-4666-8666-666666666666","role":"authenticated"}', true);
 set local role authenticated;

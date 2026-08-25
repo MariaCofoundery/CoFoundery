@@ -3,9 +3,12 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import {
   buildAdvisorConfirmedFounderSetup,
+  buildAdvisorFounderSetupAccessState,
   buildFounderSetupAdvisorAccess,
   type AdvisorConfirmedFounderSetupItem,
   type AdvisorConfirmedFounderSetupRow,
+  type AdvisorFounderSetupAccessState,
+  type AdvisorFounderSetupAccessStatusRow,
   type FounderSetupAdvisorAccess,
   type FounderSetupAdvisorAccessRow,
 } from "@/features/teams/founderSetupAdvisorAccessModel";
@@ -26,6 +29,23 @@ export async function getFounderSetupAdvisorAccess(
   // Additive rollout fallback: the Founder Setup remains usable before the DB migration lands.
   if (error || !data) return [];
   return buildFounderSetupAdvisorAccess(data as FounderSetupAdvisorAccessRow[]);
+}
+
+export async function getAdvisorFounderSetupAccessState(
+  relationshipId: string,
+  client?: SupabaseLikeClient
+): Promise<AdvisorFounderSetupAccessState> {
+  const normalizedRelationshipId = relationshipId.trim();
+  if (!normalizedRelationshipId) return buildAdvisorFounderSetupAccessState(null);
+  const supabase = client ?? (await createClient());
+  const { data, error } = await supabase.rpc("get_advisor_founder_setup_access_status", {
+    p_relationship_id: normalizedRelationshipId,
+  });
+  // Additive rollout fallback is fail-closed and does not infer access from content.
+  if (error || !Array.isArray(data) || data.length === 0) {
+    return buildAdvisorFounderSetupAccessState(null);
+  }
+  return buildAdvisorFounderSetupAccessState(data[0] as AdvisorFounderSetupAccessStatusRow);
 }
 
 export async function getAdvisorConfirmedFounderSetup(

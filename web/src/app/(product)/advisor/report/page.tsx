@@ -237,14 +237,17 @@ export default async function AdvisorReportPage({
         report={data.report}
         impulses={data.impulses}
         workbookHref={data.workbookHref}
+        historicalWorkbookAvailable={data.historicalWorkbookAvailable}
         snapshotHref={data.snapshotHref}
         savedSectionKey={savedSectionKey}
         saveAction={saveImpulseAction}
         locale={locale}
         founderSetupSection={
-          data.founderSetupItems.length > 0 ? (
-            <AdvisorFounderSetupSection items={data.founderSetupItems} locale={locale} />
-          ) : null
+          <AdvisorFounderSetupSection
+            items={data.founderSetupItems}
+            access={data.founderSetupAccess}
+            locale={locale}
+          />
         }
         copy={{
           backToDashboard: t("report.backToDashboard"),

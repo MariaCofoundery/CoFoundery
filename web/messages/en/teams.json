@@ -260,7 +260,7 @@
     "legalSpecific": "The specific legal or tax implementation of this topic may require professional advice.",
     "advisorAccess": {
       "title": "Share Founder Setup with an advisor",
-      "description": "The advisor can read only your jointly confirmed Founder Setup content. Working notes and open proposals remain private.",
+      "description": "The advisor can read only your jointly confirmed Founder Setup content. Working notes, discussions, open proposals, alignment deep dives, and the Commitment Lab remain private. You can revoke access at any time.",
       "advisorFallback": "Advisor {index}",
       "notShared": "Not shared with this advisor yet.",
       "pending": "Approval from all current founders is not yet complete.",
@@ -275,6 +275,21 @@
     "advisorView": {
       "title": "Founder Setup",
       "subtitle": "Points jointly confirmed by the founder team.",
+      "empty": "Founder Setup is shared, but there is no jointly confirmed content yet.",
+      "accessStatuses": {
+        "not_granted": "Not shared",
+        "pending": "Sharing awaits approval",
+        "active": "Shared",
+        "paused": "Sharing paused",
+        "revoked": "Revoked"
+      },
+      "accessDescriptions": {
+        "not_granted": "There is no separate Founder Setup sharing grant for this founder connection.",
+        "pending": "Not all current founders have approved confirmed-only sharing. Content remains hidden.",
+        "active": "Only jointly confirmed Founder Setup content is visible.",
+        "paused": "Sharing is not fully effective right now, for example after a team membership change. Content remains hidden.",
+        "revoked": "The separate Founder Setup grant has ended. Content remains hidden."
+      },
       "documentationReference": "Recorded in",
       "confirmedAt": "Jointly confirmed on {date}"
     },

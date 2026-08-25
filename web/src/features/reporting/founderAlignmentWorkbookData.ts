@@ -23,6 +23,7 @@ import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
   buildEmptyFounderAlignmentWorkbookPayload,
   deriveFounderAlignmentWorkbookHighlights,
+  projectFounderAlignmentWorkbookForLegacyAdvisor,
   sanitizeFounderAlignmentWorkbookPayload,
   type FounderAlignmentWorkbookHighlights,
   type FounderAlignmentWorkbookPayload,
@@ -692,7 +693,7 @@ export async function getFounderAlignmentWorkbookPageData(
           teamContext: effectiveTeamContext,
         });
 
-  const workbook = workbookRow
+  let workbook = workbookRow
     ? sanitizeFounderAlignmentWorkbookPayload(workbookRow.payload)
     : buildEmptyFounderAlignmentWorkbookPayload();
   if (advisorRow?.advisor_user_id) {
@@ -730,6 +731,10 @@ export async function getFounderAlignmentWorkbookPageData(
       teamContext: effectiveTeamContext,
       reason: "viewer_not_linked",
     };
+  }
+
+  if (currentUserRole === "advisor") {
+    workbook = projectFounderAlignmentWorkbookForLegacyAdvisor(workbook);
   }
 
   const highlights = deriveFounderAlignmentWorkbookHighlights(report, scoringResult);

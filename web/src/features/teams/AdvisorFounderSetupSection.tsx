@@ -3,18 +3,22 @@ import {
   FOUNDER_SETUP_CATEGORY_KEYS,
   FOUNDER_SETUP_CATALOG,
 } from "@/features/teams/founderSetupCatalog";
-import type { AdvisorConfirmedFounderSetupItem } from "@/features/teams/founderSetupAdvisorAccessModel";
+import type {
+  AdvisorConfirmedFounderSetupItem,
+  AdvisorFounderSetupAccessState,
+} from "@/features/teams/founderSetupAdvisorAccessModel";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 export async function AdvisorFounderSetupSection({
   items,
+  access,
   locale,
 }: {
   items: AdvisorConfirmedFounderSetupItem[];
+  access: AdvisorFounderSetupAccessState;
   locale: string;
 }) {
-  if (items.length === 0) return null;
   const t = await getTranslations("teams.setup");
   const byKey = new Map(items.map((item) => [item.itemKey, item]));
   const dateFormatter = new Intl.DateTimeFormat(getPresentationLocale(locale), {
@@ -33,7 +37,22 @@ export async function AdvisorFounderSetupSection({
         {t("advisorView.subtitle")}
       </p>
 
-      <div className="mt-5 grid gap-5">
+      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+        <span className="inline-flex rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+          {t(`advisorView.accessStatuses.${access.status}`)}
+        </span>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          {t(`advisorView.accessDescriptions.${access.status}`)}
+        </p>
+      </div>
+
+      {access.status === "active" && items.length === 0 ? (
+        <p className="mt-5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm leading-6 text-slate-600">
+          {t("advisorView.empty")}
+        </p>
+      ) : null}
+
+      {access.status === "active" && items.length > 0 ? <div className="mt-5 grid gap-5">
         {FOUNDER_SETUP_CATEGORY_KEYS.map((category) => {
           const categoryItems = FOUNDER_SETUP_CATALOG
             .filter((catalogItem) => catalogItem.category === category)
@@ -100,7 +119,7 @@ export async function AdvisorFounderSetupSection({
             </section>
           );
         })}
-      </div>
+      </div> : null}
     </section>
   );
 }

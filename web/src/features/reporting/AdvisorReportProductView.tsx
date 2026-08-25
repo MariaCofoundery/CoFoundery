@@ -22,6 +22,7 @@ type Props = {
   report: AdvisorReportData;
   impulses: Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
   workbookHref: string;
+  historicalWorkbookAvailable: boolean;
   snapshotHref: string;
   savedSectionKey: AdvisorImpulseSectionKey | null;
   saveAction: (formData: FormData) => void | Promise<void>;
@@ -59,6 +60,7 @@ export function AdvisorReportProductView({
   report,
   impulses,
   workbookHref,
+  historicalWorkbookAvailable,
   snapshotHref,
   savedSectionKey,
   saveAction,
@@ -76,12 +78,14 @@ export function AdvisorReportProductView({
         {copy.backToDashboard}
       </Link>
       <div className="flex flex-wrap gap-3">
-        <Link
-          href={workbookHref}
-          className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-        >
-          {copy.openWorkbook}
-        </Link>
+        {historicalWorkbookAvailable ? (
+          <Link
+            href={workbookHref}
+            className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+          >
+            {copy.openWorkbook}
+          </Link>
+        ) : null}
         <Link
           href={snapshotHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"

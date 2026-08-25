@@ -155,20 +155,12 @@ export function ProductShell({
                   </Link>
                 ))}
                 {resolvedActiveView === "advisor" ? (
-                  <>
-                    <Link
-                      href={resolvedWorkbookHref}
-                      className={navLinkClassName(pathname.startsWith("/founder-alignment/"))}
-                    >
-                      {t("workbook")}
-                    </Link>
-                    <Link
-                      href={resolvedMatchingHref}
-                      className={navLinkClassName(pathname.startsWith("/advisor/report"))}
-                    >
-                      {t("report")}
-                    </Link>
-                  </>
+                  <Link
+                    href={resolvedMatchingHref}
+                    className={navLinkClassName(pathname.startsWith("/advisor/report"))}
+                  >
+                    {t("advisorConnections")}
+                  </Link>
                 ) : (
                   <>
                     <Link

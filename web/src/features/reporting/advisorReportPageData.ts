@@ -24,13 +24,20 @@ import {
 import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
 import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import type { TeamScoringResult } from "@/features/scoring/founderScoring";
+import { hasLegacyFounderAlignmentWorkbookContent } from "@/features/reporting/founderAlignmentWorkbook";
 import { createClient } from "@/lib/supabase/server";
 import {
   createPrivilegedAccessClient,
   syncRelationshipAdvisorFromLegacyInvitation,
 } from "@/features/reporting/relationshipAdvisorAccess";
-import { getAdvisorConfirmedFounderSetup } from "@/features/teams/founderSetupAdvisorAccessData";
-import type { AdvisorConfirmedFounderSetupItem } from "@/features/teams/founderSetupAdvisorAccessModel";
+import {
+  getAdvisorConfirmedFounderSetup,
+  getAdvisorFounderSetupAccessState,
+} from "@/features/teams/founderSetupAdvisorAccessData";
+import type {
+  AdvisorConfirmedFounderSetupItem,
+  AdvisorFounderSetupAccessState,
+} from "@/features/teams/founderSetupAdvisorAccessModel";
 
 type InvitationReportContextRow = {
   id: string;
@@ -120,8 +127,10 @@ export type AdvisorReportPageData =
       report: AdvisorReportData;
       impulses: Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
       workbookHref: string;
+      historicalWorkbookAvailable: boolean;
       snapshotHref: string;
       founderSetupItems: AdvisorConfirmedFounderSetupItem[];
+      founderSetupAccess: AdvisorFounderSetupAccessState;
       debugMeta?: AdvisorReportDebugMeta;
     };
 
@@ -488,7 +497,7 @@ export async function getAdvisorReportPageData(
     };
   }
 
-  const [snapshot, invitationResult, impulseRowsResult] = await Promise.all([
+  const [snapshot, invitationResult, impulseRowsResult, workbookResult] = await Promise.all([
     getPrivilegedReportRunSnapshotForInvitation(normalizedInvitationId),
     privileged
       .from("invitations")
@@ -500,6 +509,11 @@ export async function getAdvisorReportPageData(
       .select("id, relationship_id, advisor_user_id, section_key, text, created_at, updated_at")
       .eq("relationship_id", relationshipId)
       .eq("advisor_user_id", user.id),
+    privileged
+      .from("founder_alignment_workbooks")
+      .select("payload")
+      .eq("invitation_id", normalizedInvitationId)
+      .maybeSingle(),
   ]);
 
   const invitation = invitationResult.data as InvitationReportContextRow | null;
@@ -613,7 +627,10 @@ export async function getAdvisorReportPageData(
   }
 
   const teamContext = normalizeAdvisorTeamContext(invitation.team_context);
-  const founderSetupItems = await getAdvisorConfirmedFounderSetup(relationshipId, supabase);
+  const [founderSetupItems, founderSetupAccess] = await Promise.all([
+    getAdvisorConfirmedFounderSetup(relationshipId, supabase),
+    getAdvisorFounderSetupAccessState(relationshipId, supabase),
+  ]);
 
   return {
     status: "ready",
@@ -625,8 +642,12 @@ export async function getAdvisorReportPageData(
     report,
     impulses: impulseMap,
     workbookHref: buildAdvisorWorkbookHref(normalizedInvitationId, teamContext),
+    historicalWorkbookAvailable: hasLegacyFounderAlignmentWorkbookContent(
+      (workbookResult.data as { payload?: unknown } | null)?.payload
+    ),
     snapshotHref: buildAdvisorSnapshotHref(normalizedInvitationId, teamContext),
     founderSetupItems,
+    founderSetupAccess,
     debugMeta: {
       requestedInvitationId: normalizedInvitationId,
       userId: user.id,

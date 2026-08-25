@@ -3,8 +3,24 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   buildAdvisorConfirmedFounderSetup,
+  buildAdvisorFounderSetupAccessState,
   buildFounderSetupAdvisorAccess,
 } from "@/features/teams/founderSetupAdvisorAccessModel";
+
+test("advisor access presentation preserves all V2 status states", () => {
+  assert.deepEqual(buildAdvisorFounderSetupAccessState({
+    access_status: "paused",
+    consent_count: 2,
+    member_count: 3,
+    confirmed_item_count: 0,
+  }), {
+    status: "paused",
+    consentCount: 2,
+    memberCount: 3,
+    confirmedItemCount: 0,
+  });
+  assert.equal(buildAdvisorFounderSetupAccessState(null).status, "not_granted");
+});
 
 test("founder grant presentation distinguishes pending and active unanimous consent", () => {
   const access = buildFounderSetupAdvisorAccess([
@@ -76,6 +92,7 @@ test("Founder and Advisor UI wire only the dedicated access RPCs and expose no e
 
   assert.match(data, /get_founder_team_advisor_setup_access/);
   assert.match(data, /get_advisor_confirmed_founder_setup/);
+  assert.match(data, /get_advisor_founder_setup_access_status/);
   assert.doesNotMatch(data, /createPrivilegedClient|service_role|working_note|pending_revision/);
   assert.match(founderPanel, /proposeFounderSetupAdvisorAccessAction/);
   assert.match(founderPanel, /confirmFounderSetupAdvisorAccessAction/);

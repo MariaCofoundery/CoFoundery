@@ -1168,6 +1168,88 @@ export function sanitizeFounderAlignmentWorkbookPayload(
   };
 }
 
+/**
+ * Keeps the historically shared workbook contract while removing the newer
+ * founder-only Alignment Deep Dive payload. This projection must be applied
+ * before an advisor workbook is returned to a client.
+ *
+ * decision_rules and collaboration_conflict existed in the legacy workbook,
+ * so their agreement/approval/structured-output fields remain available. The
+ * additive reflection/workspace fields are the new Deep Dive surface and are
+ * deliberately removed. alignment_open_points is entirely founder-only.
+ */
+export function projectFounderAlignmentWorkbookForLegacyAdvisor(
+  input: unknown
+): FounderAlignmentWorkbookPayload {
+  const payload = sanitizeFounderAlignmentWorkbookPayload(input);
+  const projectedSteps = Object.fromEntries(
+    WORKBOOK_STEP_IDS.map((stepId) => {
+      const entry = payload.steps[stepId];
+
+      if (stepId === "alignment_open_points") {
+        return [stepId, buildEmptyFounderAlignmentWorkbookPayload().steps[stepId]];
+      }
+
+      if (stepId === "decision_rules" || stepId === "collaboration_conflict") {
+        return [
+          stepId,
+          {
+            ...entry,
+            reflectionNote: "",
+            deepDiveArea: null,
+            deepDiveFocus: "",
+            openPoints: [],
+            workspaceV2: undefined,
+          },
+        ];
+      }
+
+      return [stepId, entry];
+    })
+  ) as Record<FounderAlignmentWorkbookStepId, FounderAlignmentWorkbookEntry>;
+
+  return sanitizeFounderAlignmentWorkbookPayload({
+    ...payload,
+    currentStepId:
+      payload.currentStepId === "alignment_open_points"
+        ? "vision_direction"
+        : payload.currentStepId,
+    steps: projectedSteps,
+  });
+}
+
+export function hasLegacyFounderAlignmentWorkbookContent(input: unknown): boolean {
+  const payload = projectFounderAlignmentWorkbookForLegacyAdvisor(input);
+  const hasStepContent = WORKBOOK_STEP_IDS.some((stepId) => {
+    if (stepId === "alignment_open_points" || stepId === "advisor_closing") return false;
+    const entry = payload.steps[stepId];
+    return Boolean(
+      entry.founderA.trim() ||
+        entry.founderB.trim() ||
+        entry.agreement.trim() ||
+        entry.advisorNotes.trim() ||
+        entry.founderAApproved ||
+        entry.founderBApproved ||
+        (entry.workspaceV2?.entries.length ?? 0) > 0 ||
+        (entry.advisorReplies?.length ?? 0) > 0 ||
+        Object.values(entry.structuredOutputs ?? {}).some((outputs) =>
+          Object.values(outputs ?? {}).some(
+            (value) => typeof value === "string" && value.trim().length > 0
+          )
+        )
+    );
+  });
+
+  return Boolean(
+    hasStepContent ||
+      payload.advisorClosing.observations.trim() ||
+      payload.advisorClosing.questions.trim() ||
+      payload.advisorClosing.nextSteps.trim() ||
+      payload.founderReaction.status ||
+      payload.founderReaction.comment.trim()
+  );
+}
+
 function collectPriorityDimensions(scoringResult: TeamScoringResult) {
   return [
     scoringResult.executiveInsights.topStrength?.dimension ?? null,

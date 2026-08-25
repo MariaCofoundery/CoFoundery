@@ -169,10 +169,6 @@ export default async function AdvisorInvitePage({
                 label={t("invite.founderReport")}
                 value={statusChip(inviteData.reportReady, t("invite.available"), t("invite.notReady"))}
               />
-              <StatusRow
-                label={t("invite.workbook")}
-                value={statusChip(inviteData.workbookReady, t("invite.accessible"), t("invite.unlocking"))}
-              />
             </div>
           </div>
         </div>
@@ -238,12 +234,6 @@ export default async function AdvisorInvitePage({
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link href="/advisor/dashboard" className={PRIMARY_CTA_CLASS}>
                     {t("invite.continueDashboard")}
-                  </Link>
-                  <Link
-                    href={`/founder-alignment/workbook?invitationId=${encodeURIComponent(inviteData.invitationId)}&teamContext=${encodeURIComponent(inviteData.teamContext)}`}
-                    className={SECONDARY_CTA_CLASS}
-                  >
-                    {t("invite.openWorkbook")}
                   </Link>
                 </div>
               </>

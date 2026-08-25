@@ -59,7 +59,7 @@ function progressToneClassName(params: { active: boolean; tone: "default" | "suc
 }
 
 function reportStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
-  if (!team.workbookAvailable) {
+  if (team.accessStatus !== "ready") {
     return t("dashboard.statuses.noAccess");
   }
 
@@ -79,10 +79,6 @@ function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.statuses.waitingApproval");
   }
 
-  if (!team.workbookAvailable) {
-    return t("dashboard.statuses.teamStarting");
-  }
-
   if (team.reportReady) {
     return t("dashboard.statuses.reportReady");
   }
@@ -93,14 +89,6 @@ function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
 
   if (team.statusLabel === "Founder-Reaktion offen") {
     return t("dashboard.statuses.founderReactionOpen");
-  }
-
-  if (team.statusLabel === "Workbook in Arbeit") {
-    return t("dashboard.statuses.workbookUpdated");
-  }
-
-  if (team.statusLabel === "Workbook noch leer") {
-    return t("dashboard.statuses.workbookStarting");
   }
 
   return t("dashboard.statuses.currentStatus");
@@ -114,10 +102,7 @@ function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   }
 
   if (!team.reportReady) {
-    if (team.statusLabel === "Workbook noch leer") {
-      return t("dashboard.statuses.waitWorkbook");
-    }
-    return t("dashboard.statuses.checkWorkbook");
+    return t("dashboard.statuses.waitReport");
   }
 
   if (team.statusLabel === "Founder-Reaktion liegt vor") {
@@ -128,11 +113,15 @@ function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.statuses.checkNewReaction");
   }
 
-  if (team.statusLabel === "Workbook in Arbeit") {
-    return t("dashboard.statuses.viewCurrentAgreement");
-  }
+  return t("dashboard.statuses.openReport");
+}
 
-  return t("dashboard.statuses.openReportOrWorkbook");
+function founderSetupStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
+  const { status, confirmedItemCount } = team.founderSetupAccess;
+  if (status === "active" && confirmedItemCount === 0) {
+    return t("dashboard.setupStatuses.activeEmpty");
+  }
+  return t(`dashboard.setupStatuses.${status}`);
 }
 
 function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT, locale: string) {
@@ -263,8 +252,8 @@ function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTe
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                 {team.teamContext === "existing_team"
-                  ? t("teamContext.existingTeam")
-                  : t("teamContext.preFounder")}
+                  ? t("teamContext.existingRelationship")
+                  : t("teamContext.exploringRelationship")}
               </p>
               <h3 className="mt-1 text-xl font-semibold text-slate-950">
                 {team.founderAName} & {team.founderBName}
@@ -319,6 +308,12 @@ function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTe
                 {reportStatusLabel(team, t)}
               </span>
             </div>
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Founder Setup</span>
+              <span className="text-right text-xs font-medium text-slate-700">
+                {founderSetupStatusLabel(team, t)}
+              </span>
+            </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>
               <span className="text-xs font-medium text-slate-700">
@@ -330,25 +325,26 @@ function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTe
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        {team.canOpenWorkbook ? (
-          <Link href={team.workbookHref} className={PRIMARY_CTA_CLASS}>
-            {t("dashboard.openWorkbook")}
-          </Link>
-        ) : (
-          <span className={DISABLED_CTA_CLASS}>{accessStatusLabel(team, t)}</span>
-        )}
-        {team.canOpenWorkbook && team.reportReady ? (
-          <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
+        {team.reportAvailable ? (
+          <Link href={team.reportHref} className={PRIMARY_CTA_CLASS}>
             {t("dashboard.viewReport")}
           </Link>
-        ) : null}
-        {team.canOpenWorkbook ? (
-          <Link href={team.snapshotHref} className={TERTIARY_CTA_CLASS}>
+        ) : (
+          <span className={DISABLED_CTA_CLASS}>
+            {team.accessStatus === "ready"
+              ? t("dashboard.reportNotReady")
+              : accessStatusLabel(team, t)}
+          </span>
+        )}
+        {team.snapshotAvailable ? (
+          <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
             {t("dashboard.exportSnapshot")}
           </Link>
         ) : null}
-        {team.canOpenWorkbook && !team.reportReady ? (
-          <span className={DISABLED_CTA_CLASS}>{t("dashboard.reportNotReady")}</span>
+        {team.canOpenWorkbook ? (
+          <Link href={team.workbookHref} className={TERTIARY_CTA_CLASS}>
+            {t("dashboard.openHistoricalWorkbook")}
+          </Link>
         ) : null}
       </div>
 
@@ -569,7 +565,7 @@ export default async function AdvisorDashboardPage() {
   const readyTeams = teams.filter((team) => team.accessStatus === "ready");
   const waitingTeams = teams.filter((team) => team.accessStatus === "waiting_for_approval");
   const pausedTeams = teams.filter((team) => team.accessStatus === "paused");
-  const preferredTeam = readyTeams[0] ?? teams.find((team) => team.canOpenWorkbook) ?? null;
+  const preferredTeam = readyTeams.find((team) => team.reportAvailable) ?? readyTeams[0] ?? null;
   const dashboardFallbackHref = debug ? "/advisor/dashboard?debug=1#advisor-teams" : "/advisor/dashboard#advisor-teams";
   const reportHref = preferredTeam?.reportHref ?? dashboardFallbackHref;
   const workbookHref = preferredTeam?.workbookHref ?? dashboardFallbackHref;

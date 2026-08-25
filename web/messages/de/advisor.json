@@ -2,23 +2,25 @@
   "context": "Advisor-Kontext",
   "teamContext": {
     "existingTeam": "Bestehendes Team",
-    "preFounder": "Pre-Founder"
+    "preFounder": "Pre-Founder",
+    "existingRelationship": "Founder-Verbindung · bestehendes Team",
+    "exploringRelationship": "Founder-Verbindung · Zusammenarbeit in Prüfung"
   },
   "dashboard": {
     "eyebrow": "Advisor Dashboard",
     "title": "Willkommen zurück, {name}",
     "description": "Behalte deine begleiteten Teams, offene Founder-Einladungen und die nächsten sinnvollen Schritte im Blick.",
     "workspaceEyebrow": "Advisor-Arbeitsplatz",
-    "heroText": "Du begleitest Founder-Teams mit Außenblick. Zugriff entsteht erst, wenn beide Founder die Begleitung aktiv freigegeben haben.",
+    "heroText": "Du begleitest Founder-Verbindungen mit Außenblick. Zugriff entsteht erst, wenn beide Founder die Begleitung aktiv freigegeben haben.",
     "summary": {
       "ready": "Bereit",
       "waiting": "Wartet",
       "paused": "Pausiert"
     },
     "createInviteTitle": "Neues Team einladen",
-    "teamsEyebrow": "Teams & Workbooks",
-    "teamsTitle": "Deine begleiteten Teams",
-    "teamsDescription": "Du siehst pro Team Freigabe, aktuellen Stand und worauf sich dein Blick gerade am ehesten lohnt.",
+    "teamsEyebrow": "Founder-Verbindungen",
+    "teamsTitle": "Deine Founder-Verbindungen",
+    "teamsDescription": "Du siehst pro Verbindung den Relationship-Zugang, aktuelle Reports und separate Founder-Setup-Freigaben.",
     "emptyTitle": "Noch keine Teams verknüpft",
     "emptyText": "Sobald beide Founder gestartet und mit deinem Invite verknüpft sind, erscheint das Team hier mit seinem Freigabestatus.",
     "emptyHint": "Bis dahin siehst du neue Einladungen oben bereits als offene Teamstarts.",
@@ -29,12 +31,12 @@
     "pausedTeamsTitle": "Pausierter Zugriff",
     "pausedTeamsDescription": "Teams, bei denen deine Advisor-Freigabe nicht aktiv ist.",
     "readySectionTitle": "Bereit zur Begleitung",
-    "readySectionDescription": "Freigabe vollständig. Hier lohnt sich der Blick ins Workbook, in den Report oder in den aktuellen Snapshot.",
+    "readySectionDescription": "Die Relationship-Freigabe ist vollständig. Der Advisor Report ist dein aktueller Einstieg; frühere Workbook-Inhalte bleiben bei Bedarf erreichbar.",
     "waitingSectionTitle": "Wartet auf Freigabe",
     "waitingSectionDescription": "Diese Teams sind sichtbar, aber noch nicht vollständig freigegeben. Behalte den Freigabestand im Blick.",
     "pausedSectionTitle": "Zugriff pausiert",
     "pausedSectionDescription": "Hier ist die Freigabe aktuell nicht vollständig aktiv. Der Stand bleibt sichtbar, der Arbeitszugriff pausiert.",
-    "teamCount": "{count, plural, one {# Team} other {# Teams}}",
+    "teamCount": "{count, plural, one {# Verbindung} other {# Verbindungen}}",
     "fields": {
       "status": "Stand",
       "last": "Zuletzt",
@@ -72,8 +74,9 @@
         "createFailed": "Das Team konnte gerade nicht angelegt werden. Bitte versuche es erneut."
       }
     },
-    "teamProject": "Team/Projekt: {name}",
+    "teamProject": "Kontext: {name}",
     "openWorkbook": "Workbook öffnen",
+    "openHistoricalWorkbook": "Historischen Arbeitsstand öffnen",
     "viewReport": "Report ansehen",
     "exportSnapshot": "Snapshot exportieren",
     "reportNotReady": "Report noch nicht bereit",
@@ -112,6 +115,16 @@
       "open": "offen",
       "noActivity": "Noch keine Aktivität",
       "currentStatus": "Aktueller Stand verfügbar"
+      ,"waitReport": "Advisor Report abwarten"
+      ,"openReport": "Advisor Report ansehen"
+    },
+    "setupStatuses": {
+      "not_granted": "Nicht freigegeben",
+      "pending": "Freigabe wartet auf Zustimmung",
+      "activeEmpty": "Freigegeben – noch keine bestätigten Inhalte",
+      "active": "Freigegeben",
+      "paused": "Freigabe pausiert",
+      "revoked": "Widerrufen"
     },
     "followUps": {
       "fourWeeks": "Follow-up in 4 Wochen",
@@ -120,7 +133,7 @@
     },
     "accessDescription": {
       "revoked": "Die Freigabe ist für dieses Team nicht mehr aktiv. Du siehst den Stand, arbeitest aber nicht weiter.",
-      "ready": "Freigabe vollständig. Workbook, Report und Snapshot können genutzt werden, sobald der jeweilige Stand vorliegt.",
+      "ready": "Die Relationship-Freigabe ist vollständig. Report und Snapshot sind verfügbar, sobald der jeweilige Stand vorliegt. Historische Workbook-Inhalte bleiben separat erreichbar.",
       "paused": "Mindestens eine Freigabe ist aktuell nicht aktiv. Du behältst den Status im Blick, arbeitest aber nicht weiter.",
       "waiting": "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team für die Begleitung offen."
     },
@@ -142,7 +155,7 @@
     "missingTitle": "Report noch nicht verfügbar",
     "missingText": "Für dieses Team liegt noch kein renderbarer Advisor-Report vor. Sobald der Founder-Report vollständig erzeugt wurde, kannst du hier direkt mit dem Advisor-Report weiterarbeiten.",
     "backToDashboard": "Zurück zum Advisor-Dashboard",
-    "openWorkbook": "Workbook öffnen",
+    "openWorkbook": "Historischen Arbeitsstand öffnen",
     "exportSnapshot": "Snapshot exportieren",
     "impulsesEyebrow": "Advisor-Impulse",
     "impulsesTitle": "Kurze Impulse pro Abschnitt",
@@ -229,7 +242,7 @@
     "toLogin": "Zur Anmeldung",
     "reportReady": "Founder-Report vorhanden",
     "reportPending": "Founder-Report in Vorbereitung",
-    "intro": "Als Advisor siehst du den Founder-Snapshot, die Fokusfelder und das Alignment Workbook. Rohantworten der Assessments bleiben dabei geschützt.",
+    "intro": "Als Advisor siehst du den Alignment Report, den Advisor Snapshot und – soweit vorhanden – historische, bereits freigegebene Workbook-Inhalte. Rohantworten der Assessments bleiben geschützt.",
     "roleText": "Deine Rolle ist eine strukturierte Außenperspektive: Beobachtungen festhalten, Rückfragen ergänzen und nächste sinnvolle Schritte mitgeben.",
     "status": "Status",
     "founderApprovals": "Founder-Freigaben",
@@ -252,19 +265,19 @@
     "linkProfileText": "Melde dich an, damit dein Advisor-Profil sauber mit diesem Team verknüpft werden kann. Danach landest du direkt im Advisor-Bereich.",
     "loginAndLink": "Login / Profil verknüpfen",
     "activateTitle": "Advisor-Zugriff jetzt aktivieren",
-    "activateText": "Dein Profil ist angemeldet. Mit einem Klick verknüpfst du dich als Advisor mit diesem Team und bekommst Zugriff auf Snapshot, Fokusfelder und Workbook.",
+    "activateText": "Dein Profil ist angemeldet. Mit einem Klick verknüpfst du dich als Advisor mit dieser Founder-Verbindung und erhältst den freigegebenen Relationship-Zugang.",
     "linkProfile": "Profil verknüpfen",
     "activeTitle": "Advisor-Zugriff ist aktiv",
-    "activeText": "Dein Profil ist bereits mit diesem Team verknüpft. Du kannst direkt ins Advisor Dashboard wechseln oder sofort ins Workbook springen.",
+    "activeText": "Dein Profil ist bereits mit dieser Founder-Verbindung verknüpft. Im Advisor Dashboard findest du die aktuell freigegebenen Bereiche.",
     "continueDashboard": "Weiter zum Dashboard",
     "openWorkbook": "Workbook öffnen",
     "whatYouSee": "Was du als Advisor siehst",
     "visibleItems": {
       "snapshot": "Founder-Snapshot und priorisierte Spannungs- bzw. Fokusfelder",
-      "workbook": "das gemeinsame Alignment Workbook inklusive Advisor-Impulse",
+      "workbook": "historische Workbook-Inhalte, soweit sie bereits vorhanden und freigegeben sind",
       "followUp": "Founder-Reaktionen und Follow-up-Status"
     },
-    "notVisible": "Nicht Teil des Advisor-Zugriffs sind rohe Assessment-Antworten oder die komplette Antworthistorie der beiden Founder.",
+    "notVisible": "Nicht Teil dieses Zugriffs sind rohe Assessment-Antworten, neue Alignment-Vertiefungen, Open Points oder das Commitment Lab. Founder Setup benötigt eine separate confirmed-only Teamfreigabe.",
     "errors": {
       "alreadyClaimed": "Dieser Advisor-Link ist bereits mit einem anderen Profil verknüpft.",
       "emailMismatch": "Bitte melde dich mit der E-Mail-Adresse an, an die diese Advisor-Einladung gesendet wurde.",

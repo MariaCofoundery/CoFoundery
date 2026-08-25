@@ -5,6 +5,19 @@ import {
 import type { FounderSetupResolutionStatus } from "@/features/teams/founderSetupModel";
 
 export type FounderSetupAdvisorGrantStatus = "not_granted" | "pending" | "active";
+export type AdvisorFounderSetupAccessStatus =
+  | "not_granted"
+  | "pending"
+  | "active"
+  | "paused"
+  | "revoked";
+
+export type AdvisorFounderSetupAccessState = {
+  status: AdvisorFounderSetupAccessStatus;
+  consentCount: number;
+  memberCount: number;
+  confirmedItemCount: number;
+};
 
 export type FounderSetupAdvisorAccess = {
   sourceRelationshipAdvisorId: string;
@@ -39,6 +52,33 @@ export type AdvisorConfirmedFounderSetupRow = {
   documentation_reference: string | null;
   confirmed_at: string;
 };
+
+export type AdvisorFounderSetupAccessStatusRow = {
+  access_status: string;
+  consent_count: number;
+  member_count: number;
+  confirmed_item_count: number;
+};
+
+export function buildAdvisorFounderSetupAccessState(
+  row: AdvisorFounderSetupAccessStatusRow | null | undefined
+): AdvisorFounderSetupAccessState {
+  const allowed: AdvisorFounderSetupAccessStatus[] = [
+    "not_granted",
+    "pending",
+    "active",
+    "paused",
+    "revoked",
+  ];
+  return {
+    status: allowed.includes(row?.access_status as AdvisorFounderSetupAccessStatus)
+      ? (row!.access_status as AdvisorFounderSetupAccessStatus)
+      : "not_granted",
+    consentCount: Math.max(0, Number(row?.consent_count ?? 0)),
+    memberCount: Math.max(0, Number(row?.member_count ?? 0)),
+    confirmedItemCount: Math.max(0, Number(row?.confirmed_item_count ?? 0)),
+  };
+}
 
 function grantStatus(value: string): FounderSetupAdvisorGrantStatus {
   if (value === "active" || value === "pending") return value;

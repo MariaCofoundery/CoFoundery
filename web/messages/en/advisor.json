@@ -2,23 +2,25 @@
   "context": "Advisor context",
   "teamContext": {
     "existingTeam": "Existing team",
-    "preFounder": "Pre-Founder"
+    "preFounder": "Pre-Founder",
+    "existingRelationship": "Founder connection · existing team",
+    "exploringRelationship": "Founder connection · exploring collaboration"
   },
   "dashboard": {
     "eyebrow": "Advisor dashboard",
     "title": "Welcome back, {name}",
     "description": "Keep track of your supported teams, open founder invitations, and the next useful steps.",
     "workspaceEyebrow": "Advisor workspace",
-    "heroText": "You support founder teams with an outside perspective. Access only starts once both founders have actively approved the advisor relationship.",
+    "heroText": "You support founder connections with an outside perspective. Access only starts once both founders have actively approved the advisor relationship.",
     "summary": {
       "ready": "Ready",
       "waiting": "Waiting",
       "paused": "Paused"
     },
     "createInviteTitle": "Invite a new team",
-    "teamsEyebrow": "Teams & workbooks",
-    "teamsTitle": "Your supported teams",
-    "teamsDescription": "See each team's approval status, current progress, and where your attention is most useful right now.",
+    "teamsEyebrow": "Founder connections",
+    "teamsTitle": "Your founder connections",
+    "teamsDescription": "See each connection's relationship access, current reports, and separate Founder Setup sharing status.",
     "emptyTitle": "No teams linked yet",
     "emptyText": "Once both founders have started and are linked through your invite, the team will appear here with its approval status.",
     "emptyHint": "Until then, new invitations already appear above as open team starts.",
@@ -29,12 +31,12 @@
     "pausedTeamsTitle": "Paused access",
     "pausedTeamsDescription": "Teams where your advisor access is not active.",
     "readySectionTitle": "Ready for support",
-    "readySectionDescription": "Approval is complete. This is where it is worth opening the workbook, report, or current snapshot.",
+    "readySectionDescription": "Relationship approval is complete. The advisor report is your current entry point; earlier workbook content remains available when needed.",
     "waitingSectionTitle": "Waiting for approval",
     "waitingSectionDescription": "These teams are visible, but not fully approved yet. Keep an eye on the approval status.",
     "pausedSectionTitle": "Access paused",
     "pausedSectionDescription": "Approval is currently not fully active here. The status remains visible, but working access is paused.",
-    "teamCount": "{count, plural, one {# team} other {# teams}}",
+    "teamCount": "{count, plural, one {# connection} other {# connections}}",
     "fields": {
       "status": "Status",
       "last": "Last",
@@ -72,8 +74,9 @@
         "createFailed": "The team could not be created right now. Please try again."
       }
     },
-    "teamProject": "Team/project: {name}",
+    "teamProject": "Context: {name}",
     "openWorkbook": "Open workbook",
+    "openHistoricalWorkbook": "Open historical working state",
     "viewReport": "View report",
     "exportSnapshot": "Export snapshot",
     "reportNotReady": "Report not ready yet",
@@ -111,7 +114,17 @@
       "started": "started",
       "open": "open",
       "noActivity": "No activity yet",
-      "currentStatus": "Current status available"
+      "currentStatus": "Current status available",
+      "waitReport": "Wait for the advisor report",
+      "openReport": "View advisor report"
+    },
+    "setupStatuses": {
+      "not_granted": "Not shared",
+      "pending": "Sharing awaits approval",
+      "activeEmpty": "Shared – no confirmed content yet",
+      "active": "Shared",
+      "paused": "Sharing paused",
+      "revoked": "Revoked"
     },
     "followUps": {
       "fourWeeks": "Follow-up in 4 weeks",
@@ -120,7 +133,7 @@
     },
     "accessDescription": {
       "revoked": "The approval for this team is no longer active. You can see the status, but cannot continue working.",
-      "ready": "Approval is complete. Workbook, report, and snapshot can be used as soon as each item is available.",
+      "ready": "Relationship approval is complete. Report and snapshot become available with their respective state. Historical workbook content remains separately accessible.",
       "paused": "At least one approval is currently not active. You can keep an eye on the status, but cannot continue working.",
       "waiting": "One founder approval is still missing. Once both founders approve, the team is open for advisor support."
     },
@@ -142,7 +155,7 @@
     "missingTitle": "Report not available yet",
     "missingText": "There is no renderable advisor report for this team yet. Once the founder report has been fully generated, you can continue working with the advisor report here.",
     "backToDashboard": "Back to advisor dashboard",
-    "openWorkbook": "Open workbook",
+    "openWorkbook": "Open historical working state",
     "exportSnapshot": "Export snapshot",
     "impulsesEyebrow": "Advisor prompts",
     "impulsesTitle": "Short prompts per section",
@@ -229,7 +242,7 @@
     "toLogin": "Go to login",
     "reportReady": "Founder report available",
     "reportPending": "Founder report in preparation",
-    "intro": "As an advisor, you can see the founder snapshot, focus areas, and alignment workbook. Raw assessment answers stay protected.",
+    "intro": "As an advisor, you can see the alignment report, advisor snapshot, and—where available—historical workbook content that was already shared. Raw assessment answers stay protected.",
     "roleText": "Your role is a structured outside perspective: capture observations, add follow-up questions, and suggest useful next steps.",
     "status": "Status",
     "founderApprovals": "Founder approvals",
@@ -252,19 +265,19 @@
     "linkProfileText": "Sign in so your advisor profile can be linked cleanly to this team. After that, you will land directly in the advisor area.",
     "loginAndLink": "Log in / link profile",
     "activateTitle": "Activate advisor access",
-    "activateText": "Your profile is signed in. With one click, you can link yourself as advisor to this team and get access to the snapshot, focus areas, and workbook.",
+    "activateText": "Your profile is signed in. With one click, you can link yourself as advisor to this founder connection and receive the approved relationship access.",
     "linkProfile": "Link profile",
     "activeTitle": "Advisor access is active",
-    "activeText": "Your profile is already linked to this team. You can go straight to the advisor dashboard or open the workbook.",
+    "activeText": "Your profile is already linked to this founder connection. The advisor dashboard shows the areas currently shared with you.",
     "continueDashboard": "Continue to dashboard",
     "openWorkbook": "Open workbook",
     "whatYouSee": "What you can see as advisor",
     "visibleItems": {
       "snapshot": "Founder snapshot and prioritized tension or focus areas",
-      "workbook": "the shared alignment workbook, including advisor prompts",
+      "workbook": "historical workbook content where it already exists and has been shared",
       "followUp": "founder responses and follow-up status"
     },
-    "notVisible": "Raw assessment answers and the full answer history of both founders are not part of advisor access.",
+    "notVisible": "Raw assessment answers, new alignment deep dives, open points, and the Commitment Lab are not part of this access. Founder Setup requires a separate confirmed-only team grant.",
     "errors": {
       "alreadyClaimed": "This advisor link is already connected to another profile.",
       "emailMismatch": "Please sign in with the email address this advisor invitation was sent to.",

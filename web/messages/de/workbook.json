@@ -2,6 +2,8 @@
   "common": {
     "workbook": "Workbook",
     "advisorContext": "Advisor-Kontext",
+    "advisorLegacyTitle": "Historischer Arbeitsstand",
+    "advisorLegacyDescription": "Diese Ansicht enthält frühere Workbook-Inhalte aus der bisherigen Zusammenarbeit. Neue Alignment-Vertiefungen und Open Points bleiben für Founder privat.",
     "founderContext": "Founder-Kontext",
     "matchingReport": "Zum Matching-Report",
     "advisorReport": "Zum Advisor-Report",

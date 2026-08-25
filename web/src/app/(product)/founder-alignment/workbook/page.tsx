@@ -169,6 +169,19 @@ export default async function FounderAlignmentWorkbookPage({
       </div>
 
       {data.currentUserRole === "advisor" ? (
+        <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8 print:hidden">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/90 p-4">
+            <p className="text-sm font-semibold text-slate-900">
+              {t("common.advisorLegacyTitle")}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              {t("common.advisorLegacyDescription")}
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {data.currentUserRole === "advisor" ? (
         <FounderAlignmentWorkbookClient
           invitationId={data.invitationId}
           relationshipId={data.relationshipId}
