@@ -6,25 +6,20 @@ import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
 import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
+import {
+  resolveDashboardHeroAction,
+  resolveDiscoveryFoundationState,
+  resolveFounderAlignmentFoundationState,
+  resolveValuesFoundationState,
+} from "@/features/dashboard/founderDashboardV2";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { signOutAllSessionsAction } from "@/app/(product)/dashboard/actions";
 import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
-import { normalizeProfileRoles, profileRoleLabel } from "@/features/profile/profileRoles";
-import {
-  computeProfileCompletion,
-  getPrimaryProfileRoleLabel,
-  isCoreProfileComplete,
-} from "@/features/profile/profileCompletion";
-import {
-  FOUNDER_DIMENSION_META,
-  FOUNDER_DIMENSION_ORDER,
-  getFounderDimensionPoleLabels,
-  type FounderDimensionKey,
-} from "@/features/reporting/founderDimensionMeta";
-import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
+import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
+import { getOwnDiscoveryProfile } from "@/features/discovery/discoveryData";
 import {
   debug_invitation_readiness,
   finalizeInvitationIfReady,
@@ -37,11 +32,6 @@ import {
   buildInvitationDashboardHref,
   buildInvitationResumeHref,
 } from "@/features/onboarding/invitationFlow";
-import {
-  buildWorkbookHref,
-  buildWorkbookIntroHref,
-  deriveWorkbookNavigationState,
-} from "@/features/reporting/workbookNavigation";
 import { createClient } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 
@@ -76,41 +66,25 @@ type ReportRunRow = {
     | null;
 };
 
-type WorkbookDashboardRow = {
-  invitation_id: string;
-  updated_at: string;
-  payload: unknown;
+type AssessmentProgressRow = {
+  id: string;
+  module: "base" | "values";
+  submitted_at: string | null;
+  created_at: string;
 };
 
 type DashboardT = Awaited<ReturnType<typeof getTranslations>>;
 
 const INVITE_CTA_CLASS =
-  "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)]";
+  "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const REPORT_CTA_CLASS =
-  "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
+  "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const UTILITY_CTA_CLASS =
-  "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50";
+  "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const PRIMARY_SURFACE_CLASS =
   "dashboard-card rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_12px_30px_rgba(15,23,42,0.04)]";
 const SECONDARY_SURFACE_CLASS =
   "dashboard-card rounded-2xl border border-slate-200/80 bg-slate-50/70 shadow-[0_10px_24px_rgba(15,23,42,0.035)]";
-function dashboardDimensionKey(dimension: FounderDimensionKey) {
-  switch (dimension) {
-    case "Unternehmenslogik":
-      return "companyLogic";
-    case "Entscheidungslogik":
-      return "decisionLogic";
-    case "Risikoorientierung":
-      return "riskOrientation";
-    case "Arbeitsstruktur & Zusammenarbeit":
-      return "workStructure";
-    case "Commitment":
-      return "commitment";
-    case "Konfliktstil":
-      return "conflictStyle";
-  }
-}
-
 function staggerStyle(delayMs: number) {
   return {
     animationDelay: `${delayMs}ms`,
@@ -147,6 +121,8 @@ export default async function DashboardPage({
     initialRunsResult,
     roleViews,
     founderTeams,
+    discoveryProfile,
+    assessmentProgressResult,
   ] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
@@ -164,6 +140,16 @@ export default async function DashboardPage({
         console.error("dashboard founder teams load failed", error);
         return [];
       }),
+      getOwnDiscoveryProfile(user.id, supabase).catch((error) => {
+        console.error("dashboard discovery profile load failed", error);
+        return null;
+      }),
+      supabase
+        .from("assessments")
+        .select("id, module, submitted_at, created_at")
+        .eq("user_id", user.id)
+        .in("module", ["base", "values"])
+        .order("created_at", { ascending: false }),
     ]);
 
   if (!roleViews.hasFounder && roleViews.hasAdvisor) {
@@ -208,24 +194,6 @@ export default async function DashboardPage({
   }
 
   const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
-  const relevantInvitationIds = [
-    ...new Set([...invitationRows.map((invitation) => invitation.id), ...reportRuns.map((run) => run.invitation_id)]),
-  ];
-  const workbookResult =
-    relevantInvitationIds.length > 0
-      ? await supabase
-          .from("founder_alignment_workbooks")
-          .select("invitation_id, updated_at, payload")
-          .in("invitation_id", relevantInvitationIds)
-          .order("updated_at", { ascending: false })
-      : { data: [] as WorkbookDashboardRow[], error: null };
-
-  if (workbookResult.error) {
-    console.error("dashboard workbooks load failed", workbookResult.error);
-    return <main className="p-8">{t("hero.loadError")}</main>;
-  }
-
-  const profileCompletion = computeProfileCompletion(profileData);
   const needsOnboarding = !isCoreProfileComplete(profileData);
   const sentInvites = invitationRows.filter((row) => row.direction === "sent");
   const receivedInvites = invitationRows.filter((row) => row.direction === "incoming");
@@ -245,78 +213,25 @@ export default async function DashboardPage({
 
   const hasSubmittedBase = Boolean(selfReport);
   const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
-  const valuesStatus = selfReport?.valuesModuleStatus ?? "not_started";
-  const profileCompletionLabel = hasSubmittedBase
-    ? t("profile.baseComplete", {
-        answered: selfReport?.basisAnsweredA ?? 0,
-        total: selfReport?.basisTotal ?? 0,
-      })
-    : t("profile.baseOpen");
-  const profileCompletionBadge = t("profile.completion", { percent: profileCompletion.percent });
+  const assessmentProgress = assessmentProgressResult.error
+    ? []
+    : ((assessmentProgressResult.data ?? []) as AssessmentProgressRow[]);
+  const latestBaseAssessment = assessmentProgress.find((row) => row.module === "base") ?? null;
+  const latestValuesAssessment = assessmentProgress.find((row) => row.module === "values") ?? null;
+  const hasStartedBase = Boolean(latestBaseAssessment);
+  const hasStartedValues = Boolean(latestValuesAssessment && !latestValuesAssessment.submitted_at);
   const readyReports = reportRuns.slice(0, 3);
-  const readyReportInvitationIds = new Set(readyReports.map((report) => report.invitation_id));
   const hasMatchingActivity =
     sentInvitesSorted.length > 0 || receivedInvitesSorted.length > 0 || readyReports.length > 0;
   const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
-  const workbookRows = ((workbookResult.data ?? []) as WorkbookDashboardRow[])
-    .map((row) => {
-      const invitation = invitationById.get(row.invitation_id) ?? null;
-      const payload = sanitizeFounderAlignmentWorkbookPayload(row.payload);
-      const navigationState = deriveWorkbookNavigationState(payload, invitation?.teamContext ?? null);
-      return {
-        invitationId: row.invitation_id,
-        title: formatDashboardInvitationTitle(invitation),
-        updatedAt: row.updated_at,
-        href: buildWorkbookHref(row.invitation_id, invitation?.teamContext ?? null),
-        hasStarted: navigationState.hasStarted,
-        isCompleted: navigationState.isCompleted,
-      };
-    })
-    .filter((row) => row.hasStarted || readyReportInvitationIds.has(row.invitationId));
-  const activeWorkbooks = workbookRows.filter((row) => row.hasStarted);
   const latestReadyReport = readyReports[0] ?? null;
-  const latestActiveWorkbook = activeWorkbooks[0] ?? null;
   const displayName =
     profileData?.display_name?.trim() || user.email?.split("@")[0]?.trim() || "Founder";
-  const workbookEntryPointHref = latestActiveWorkbook
-    ? latestActiveWorkbook.href
-    : latestReadyReport
-      ? buildWorkbookIntroHref(
-          latestReadyReport.invitation_id,
-          invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
-        )
-      : null;
-  const workbookPhase: "upcoming" | "ready_to_start" | "in_progress" | "done" =
-    activeWorkbooks.some((workbook) => !workbook.isCompleted)
-      ? "in_progress"
-      : activeWorkbooks.some((workbook) => workbook.isCompleted)
-        ? "done"
-        : readyReports.length > 0
-          ? "ready_to_start"
-          : "upcoming";
-  const shouldPrioritizeInviteCta =
-    hasSubmittedBase &&
-    hasSubmittedValues &&
-    !hasMatchingActivity &&
-    workbookPhase === "upcoming" &&
-    !latestReadyReport &&
-    !latestActiveWorkbook;
-  const heroExpectationText = shouldPrioritizeInviteCta
-    ? t("hero.expectation")
-    : null;
   const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
   const prioritizedIncomingInvite =
     actionableIncomingInvites.find((invite) => invite.status === "accepted") ??
     actionableIncomingInvites[0] ??
     null;
-  const workbookFocusHref =
-    workbookEntryPointHref ??
-    (latestReadyReport
-      ? buildWorkbookIntroHref(
-          latestReadyReport.invitation_id,
-          invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
-        )
-      : null);
   const contextualInvitationId = params.invitationId?.trim() || prioritizedIncomingInvite?.id || null;
   const contextualInvitation = contextualInvitationId
     ? invitationById.get(contextualInvitationId) ?? null
@@ -324,17 +239,10 @@ export default async function DashboardPage({
   const contextualDashboardHref = contextualInvitationId
     ? buildInvitationDashboardHref(contextualInvitationId)
     : "/dashboard";
-  const contextualWorkbook = contextualInvitation
-    ? workbookRows.find((row) => row.invitationId === contextualInvitation.id) ?? null
-    : null;
   const contextualMatchingHref = contextualInvitation
     ? contextualInvitation.isReportReady
       ? `/report/${encodeURIComponent(contextualInvitation.id)}`
       : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
-    : null;
-  const contextualWorkbookHref = contextualInvitation
-    ? contextualWorkbook?.href ??
-      buildWorkbookIntroHref(contextualInvitation.id, contextualInvitation.teamContext)
     : null;
   const contextualBaseHref = contextualInvitationId
     ? `/me/base?invitationId=${encodeURIComponent(contextualInvitationId)}`
@@ -344,168 +252,34 @@ export default async function DashboardPage({
     : "/me/values";
   const heroIncomingInvite =
     contextualInvitation?.direction === "incoming" ? contextualInvitation : prioritizedIncomingInvite;
-  const currentStep: "basis" | "values" | "matching" | "workbook" = !hasSubmittedBase
-    ? "basis"
-    : !hasSubmittedValues && !hasMatchingActivity && workbookPhase === "upcoming"
-      ? "values"
-      : workbookPhase === "ready_to_start" || workbookPhase === "in_progress"
-        ? "workbook"
-        : "matching";
-  const heroPrimaryAction = heroIncomingInvite
+  const heroActionKind = resolveDashboardHeroAction({
+    hasIncomingInvitation: Boolean(heroIncomingInvite),
+    hasSubmittedFounderAlignment: hasSubmittedBase,
+    hasStartedFounderAlignment: hasStartedBase,
+    hasStartedValues: hasStartedValues && !hasSubmittedValues,
+    hasAlignmentReport: Boolean(latestReadyReport),
+    hasTeam: founderTeams.length > 0,
+    hasConnectionActivity: hasMatchingActivity,
+  });
+  const heroPanel = heroIncomingInvite && heroActionKind === "incoming_invitation"
     ? buildHeroIncomingInvitationAction(heroIncomingInvite, t)
-    : !hasSubmittedBase
-    ? {
-        href: contextualBaseHref,
-        label: t("actions.startProfile"),
-        title: t("heroPanel.startProfileTitle"),
-        text: t("heroPanel.startProfileText"),
-      }
-    : !hasSubmittedValues && !hasMatchingActivity
-      ? {
-          href: contextualValuesHref,
-          label:
-            valuesStatus === "in_progress" ? t("actions.continueValues") : t("actions.startValues"),
-          title:
-            valuesStatus === "in_progress"
-              ? t("heroPanel.continueValuesTitle")
-              : t("heroPanel.startValuesTitle"),
-          text: t("heroPanel.valuesText"),
-        }
-      : latestActiveWorkbook
-        ? {
-            href: latestActiveWorkbook.href,
-            label: t("actions.continueWorkbook"),
-            title: t("heroPanel.continueWorkbookTitle"),
-            text: t("heroPanel.continueWorkbookText"),
-          }
-        : latestReadyReport
-          ? {
-              href:
-                workbookEntryPointHref ??
-                buildWorkbookIntroHref(
-                    latestReadyReport.invitation_id,
-                    invitationById.get(latestReadyReport.invitation_id)?.teamContext ?? null
-                ),
-            label: t("actions.startWorkbook"),
-            title: t("heroPanel.startWorkbookTitle"),
-            text: t("heroPanel.startWorkbookText"),
-          }
-        : !hasMatchingActivity
-            ? {
-                href: "/invite/new",
-                label: t("actions.inviteCofounder"),
-                title: t("heroPanel.inviteTitle"),
-                text: t("heroPanel.inviteText"),
-              }
-            : {
-                href: "/dashboard#dashboard-block-active",
-                label: t("actions.trackMatching"),
-                title: t("heroPanel.trackTitle"),
-                text: t("heroPanel.trackText"),
-              };
-  const heroCta = workbookFocusHref
-    ? {
-        href: workbookFocusHref,
-        label: latestActiveWorkbook ? t("actions.continueWorkbook") : t("actions.startWorkbook"),
-        text: latestActiveWorkbook
-          ? t("heroPanel.continueWorkbookText")
-          : t("heroPanel.reportReadyWorkbookText"),
-      }
-    : heroPrimaryAction;
-  const heroValuesCta =
-    hasSubmittedBase && !hasSubmittedValues && heroCta.href !== contextualValuesHref
-      ? {
-          href: contextualValuesHref,
-          label:
-            valuesStatus === "in_progress" ? t("actions.continueValues") : t("actions.startValues"),
-          text:
-            valuesStatus === "in_progress"
-              ? t("heroPanel.valuesContinueHint")
-              : t("heroPanel.valuesStartHint"),
-        }
-      : null;
-  const heroPanel = workbookFocusHref
-    ? {
-        href: heroCta.href,
-        label: heroCta.label,
-        title: latestActiveWorkbook ? t("heroPanel.continueWorkbookTitle") : t("heroPanel.startWorkbookTitle"),
-        text: heroCta.text,
-      }
-    : heroPrimaryAction;
-
-  const compactProgressItems = [
-    {
-      id: "basis",
-      label: t("progress.basis.label"),
-      state: hasSubmittedBase ? "done" : "active",
-      detail: hasSubmittedBase ? t("progress.basis.done") : t("progress.basis.open"),
-      description: t("progress.basis.description"),
-    },
-    {
-      id: "values",
-      label: t("progress.values.label"),
-      state: hasSubmittedValues ? "done" : currentStep === "values" ? "active" : "upcoming",
-      detail: hasSubmittedValues
-        ? t("progress.values.done")
-        : currentStep === "values"
-          ? valuesStatus === "in_progress"
-            ? t("progress.values.inProgress")
-            : t("progress.values.open")
-          : t("progress.values.optional"),
-      description: t("progress.values.description"),
-    },
-    {
-      id: "matching",
-      label: t("progress.matching.label"),
-      state:
-        workbookPhase !== "upcoming" || readyReports.length > 0
-          ? "done"
-          : currentStep === "matching"
-            ? "active"
-            : "upcoming",
-      detail:
-        workbookPhase !== "upcoming" || readyReports.length > 0
-          ? t("progress.matching.done")
-          : hasMatchingActivity
-            ? t("progress.matching.running")
-            : t("progress.matching.open"),
-      description: t("progress.matching.description"),
-    },
-    {
-      id: "workbook",
-      label: t("progress.workbook.label"),
-      state:
-        workbookPhase === "done"
-          ? "done"
-          : workbookPhase === "ready_to_start" || workbookPhase === "in_progress"
-          ? "active"
-          : "upcoming",
-      detail:
-        workbookPhase === "done"
-          ? t("progress.workbook.done")
-          : workbookPhase === "in_progress"
-          ? t("progress.workbook.active")
-          : workbookPhase === "ready_to_start"
-            ? t("progress.workbook.ready")
-            : t("progress.workbook.open"),
-      description: t("progress.workbook.description"),
-    },
-  ] as const;
-  const additionalRoles = normalizeProfileRoles(profileData?.roles ?? ["founder"]).slice(1);
-  const profileInfoRows = [
-    { label: t("profile.name"), value: profileData?.display_name?.trim() || t("profile.unset") },
-    { label: t("profile.role"), value: getPrimaryProfileRoleLabel(profileData) },
-    { label: t("profile.focus"), value: profileData?.focus_skill?.trim() || t("profile.unset") },
-    { label: t("profile.intention"), value: profileData?.intention?.trim() || t("profile.unset") },
-    ...(additionalRoles.length > 0
-      ? [
-          {
-            label: t("profile.additionalModes"),
-            value: additionalRoles.map((role) => profileRoleLabel(role)).join(", "),
-          },
-        ]
-      : []),
-  ] as const;
+    : buildDashboardV2HeroPanel({
+        kind: heroActionKind,
+        contextualBaseHref,
+        contextualValuesHref,
+        latestReadyReport,
+        firstTeamId: founderTeams[0]?.id ?? null,
+        t,
+      });
+  const founderAlignmentState = resolveFounderAlignmentFoundationState({
+    submitted: hasSubmittedBase,
+    started: hasStartedBase,
+  });
+  const valuesFoundationState = resolveValuesFoundationState({
+    submitted: hasSubmittedValues,
+    started: hasStartedValues,
+  });
+  const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
   const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
@@ -537,12 +311,18 @@ export default async function DashboardPage({
       {contextualInvitation ? (
         <ProductNavigationOverride
           matchingHref={contextualMatchingHref}
-          workbookHref={contextualWorkbookHref}
           activeView="founder"
           contextLabel={t("hero.contextLabel")}
         />
       ) : null}
-      <DashboardJourneyLine />
+      <DashboardJourneyLine
+        label={t("sectionNavigation.label")}
+        sections={[
+          { id: "dashboard-block-foundation", label: t("sectionNavigation.foundation") },
+          { id: "dashboard-block-connections", label: t("sectionNavigation.connections") },
+          { id: "dashboard-block-outlook", label: t("sectionNavigation.outlook") },
+        ]}
+      />
 
       <section data-dashboard-hero className="relative isolate mb-10 lg:mb-12">
         <div className="relative rounded-[32px]">
@@ -554,121 +334,81 @@ export default async function DashboardPage({
               </p>
             ) : null}
 
-            <section
-              className="dashboard-panel dashboard-fade-up grid gap-5 rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,0.94fr)_minmax(320px,0.86fr)] lg:p-6"
-              style={staggerStyle(40)}
-            >
-              <div>
-                <div className="flex items-center gap-3.5">
-                  <DashboardProfileAvatar
-                    displayName={displayName}
-                    avatarId={profileAvatarId}
-                    imageUrl={profileImageUrl}
-                  />
-                  <div className="min-w-0 max-w-xl">
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-                      {t("hero.eyebrow")}
-                    </p>
-                    <h1 className="mt-1.5 text-[1.9rem] font-semibold leading-[1.04] text-slate-950 md:text-[2.55rem] md:leading-[1.02]">
-                      {t("hero.greeting", { name: displayName })}
-                    </h1>
-                  </div>
+            <section className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:p-6" style={staggerStyle(40)}>
+              <div className="flex items-center gap-3.5">
+                <DashboardProfileAvatar displayName={displayName} avatarId={profileAvatarId} imageUrl={profileImageUrl} />
+                <div className="min-w-0 max-w-3xl">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("hero.eyebrow")}</p>
+                  <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.15rem]">
+                    {t("hero.greeting", { name: displayName })}
+                  </h1>
                 </div>
-
-                <article className="mt-5 overflow-hidden rounded-[24px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.08),rgba(255,255,255,0.95)_45%,rgba(124,58,237,0.05))] p-5 shadow-[0_12px_30px_rgba(15,23,42,0.035)]">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-white/80 text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">
-                      <QuoteIcon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                        {t("hero.quoteEyebrow")}
-                      </p>
-                      <p className="mt-3 max-w-2xl text-[15px] leading-7 text-slate-700">
-                        „{quoteOfTheDay.text}“
-                      </p>
-                    </div>
-                  </div>
-                </article>
-
-                <article className="mt-5 rounded-[24px] border border-slate-200/80 bg-white/88 p-5 shadow-[0_12px_28px_rgba(15,23,42,0.035)]">
-                  <h2 className="text-xl font-semibold text-slate-950">{heroPanel.title}</h2>
-                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-                    {heroPanel.text}
-                  </p>
-                  {heroExpectationText && heroCta.href === heroPrimaryAction.href ? (
-                    <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
-                      {heroExpectationText}
-                    </p>
-                  ) : null}
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <Link
-                      href={heroPanel.href}
-                      className={`${INVITE_CTA_CLASS} shadow-[0_12px_24px_rgba(34,211,238,0.16)]`}
-                    >
-                      {heroPanel.label}
-                    </Link>
-                    {heroValuesCta ? (
-                      <Link href={heroValuesCta.href} className={UTILITY_CTA_CLASS}>
-                        {heroValuesCta.label}
-                      </Link>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-6">
-                    <DashboardProgressRoadmap items={compactProgressItems} />
-                  </div>
-                </article>
               </div>
 
-              <article className={`${SECONDARY_SURFACE_CLASS} overflow-hidden p-5`}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                        <ReportIcon className="h-4 w-4" />
-                      </span>
-                      {t("profileSnapshot.eyebrow")}
-                    </p>
-                    <h2 className="mt-2 text-lg font-semibold text-slate-900">
-                      {t("profileSnapshot.title")}
-                    </h2>
-                  </div>
-                  {selfReport ? (
-                    <Link href="/me/report" className={UTILITY_CTA_CLASS}>
-                      {t("actions.openReport")}
-                    </Link>
-                  ) : null}
-                </div>
-                {selfReport ? (
-                  <>
-                    <p className="mt-3 text-sm leading-7 text-slate-600">
-                      {t("profileSnapshot.text")}
-                    </p>
-                    <div className="mt-5">
-                      <FounderDimensionsOverview scores={selfReport.scoresA} t={t} />
+              <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)]">
+                <article className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.07),rgba(255,255,255,0.94)_52%,rgba(124,58,237,0.04))] px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/80 bg-white/85 text-slate-600"><QuoteIcon className="h-4 w-4" /></span>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{t("hero.quoteEyebrow")}</p>
+                      <p className="mt-1.5 text-sm leading-6 text-slate-700">„{quoteOfTheDay.text}“</p>
                     </div>
-                  </>
-                ) : (
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    {t("profileSnapshot.empty")}
-                  </p>
-                )}
-              </article>
+                  </div>
+                </article>
+
+                <article className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-4">
+                  <h2 className="text-base font-semibold text-slate-950">{heroPanel.title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-600">{heroPanel.text}</p>
+                  <Link href={heroPanel.href} className={`${INVITE_CTA_CLASS} mt-3 shadow-[0_10px_20px_rgba(34,211,238,0.12)]`}>
+                    {heroPanel.label}
+                  </Link>
+                </article>
+              </div>
             </section>
           </div>
         </div>
       </section>
 
+      <section id="dashboard-block-foundation" className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6" style={staggerStyle(90)}>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("foundation.eyebrow")}</p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("foundation.title")}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{t("foundation.description")}</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <FoundationCard
+            title={t("foundation.alignment.title")}
+            description={t("foundation.alignment.description")}
+            status={t(`foundation.alignment.states.${founderAlignmentState}`)}
+            href={founderAlignmentState === "result_available" ? "/me/report" : contextualBaseHref}
+            action={t(`foundation.alignment.actions.${founderAlignmentState}`)}
+          />
+          <FoundationCard
+            title={t("foundation.values.title")}
+            description={t("foundation.values.description")}
+            status={t(`foundation.values.states.${valuesFoundationState}`)}
+            badge={t("foundation.values.optionalBadge")}
+            href={valuesFoundationState === "completed" ? "/me/report" : contextualValuesHref}
+            action={t(`foundation.values.actions.${valuesFoundationState}`)}
+          />
+          <FoundationCard
+            title={t("foundation.discovery.title")}
+            eyebrow={t("foundation.discovery.eyebrow")}
+            description={t("foundation.discovery.description")}
+            status={t(`foundation.discovery.states.${discoveryFoundationState}`)}
+            href="/discovery/profile"
+            action={t("foundation.discovery.action")}
+          />
+        </div>
+      </section>
+
       <section
-        id="dashboard-block-active"
+        id="dashboard-block-connections"
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-6"
         style={staggerStyle(120)}
       >
         <div>
           <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
             <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-              <MatchingIcon className="h-4 w-4" />
+              <ConnectionsIcon className="h-4 w-4" />
             </span>
             {t("team.eyebrow")}
           </p>
@@ -806,158 +546,46 @@ export default async function DashboardPage({
         </details>
       </section>
 
-      <section
-        id="dashboard-block-profile"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-white/88 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.03)]"
-        style={staggerStyle(130)}
-      >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                <CompassIcon className="h-4 w-4" />
-              </span>
-              {t("profile.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">
-              {t("profile.title")}
-            </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              {t("profile.text")}
-            </p>
+      <section id="dashboard-block-profile" className="dashboard-fade-up mb-8 grid gap-3 md:grid-cols-2" style={staggerStyle(130)} aria-label={t("utilities.title")}>
+        <details id="dashboard-block-profile-data" className="scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]" open={needsOnboarding}>
+          <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+            {needsOnboarding ? t("utilities.profileCreate") : t("utilities.profileEdit")}
+          </summary>
+          <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
+          <div className="mt-4 border-t border-slate-200 pt-4">
+            <ProfileBasicsForm
+              mode={needsOnboarding ? "onboarding" : "edit"}
+              initialValues={{
+                display_name: profileData?.display_name ?? null,
+                focus_skill: profileData?.focus_skill ?? null,
+                intention: profileData?.intention ?? null,
+                roles: profileData?.roles ?? null,
+                avatar_id: profileData?.avatar_id ?? null,
+                avatar_url: profileData?.avatar_url ?? null,
+              }}
+              submitLabel={needsOnboarding ? t("actions.saveProfile") : t("actions.updateProfile")}
+              onSuccessRedirectTo={contextualDashboardHref}
+              variant={needsOnboarding ? "accent" : undefined}
+              fallbackAvatarUrl={profileImageUrl}
+            />
           </div>
-        </div>
+        </details>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-          <section id="dashboard-block-profile-data" className={`${PRIMARY_SURFACE_CLASS} p-6`}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                  <span className="dashboard-icon-chip text-[color:var(--brand-primary)]">
-                    <CompassIcon className="h-4 w-4" />
-                  </span>
-                  {t("profile.profileEyebrow")}
-                </p>
-                <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                  {needsOnboarding ? t("profile.createTitle") : t("profile.currentTitle")}
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-[0.08em] text-slate-600">
-                <span className="rounded-full border border-[color:var(--brand-primary)]/25 bg-[color:var(--brand-primary)]/10 px-3 py-1">
-                  {profileCompletionLabel}
-                </span>
-                <span className="rounded-full border border-slate-200 bg-white/75 px-3 py-1">
-                  {profileCompletionBadge}
-                </span>
-                <span className="rounded-full border border-[color:var(--brand-accent)]/20 bg-[color:var(--brand-accent)]/8 px-3 py-1">
-                  {hasSubmittedValues ? t("profile.valuesComplete") : t("profile.valuesOptional")}
-                </span>
-                {profileCompletion.ctaLabel ? (
-                  <span className="rounded-full border border-slate-200 bg-white/75 px-3 py-1">
-                    {profileCompletion.ctaLabel}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {profileInfoRows.map((row) => (
-                <div key={row.label} className="rounded-xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{row.label}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{row.value}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5">
-              {needsOnboarding ? (
-                <ProfileBasicsForm
-                  mode="onboarding"
-                  initialValues={{
-                    display_name: profileData?.display_name ?? null,
-                    focus_skill: profileData?.focus_skill ?? null,
-                    intention: profileData?.intention ?? null,
-                    roles: profileData?.roles ?? null,
-                    avatar_id: profileData?.avatar_id ?? null,
-                    avatar_url: profileData?.avatar_url ?? null,
-                  }}
-                  submitLabel={t("actions.saveProfile")}
-                  onSuccessRedirectTo={contextualDashboardHref}
-                  variant="accent"
-                  fallbackAvatarUrl={profileImageUrl}
-                />
-              ) : (
-                <details className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
-                  <summary className="cursor-pointer text-sm font-medium text-slate-700">
-                    {t("actions.editProfile")}
-                  </summary>
-                  <div className="mt-4">
-                    <ProfileBasicsForm
-                      mode="edit"
-                      initialValues={{
-                        display_name: profileData?.display_name ?? null,
-                        focus_skill: profileData?.focus_skill ?? null,
-                        intention: profileData?.intention ?? null,
-                        roles: profileData?.roles ?? null,
-                        avatar_id: profileData?.avatar_id ?? null,
-                        avatar_url: profileData?.avatar_url ?? null,
-                      }}
-                      submitLabel={t("actions.updateProfile")}
-                      onSuccessRedirectTo={contextualDashboardHref}
-                      fallbackAvatarUrl={profileImageUrl}
-                    />
-                  </div>
-                </details>
-              )}
-            </div>
-          </section>
-
-          <section id="dashboard-block-account" className={`${SECONDARY_SURFACE_CLASS} p-6`}>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <ProfileIcon className="h-4 w-4" />
-              </span>
-              {t("account.eyebrow")}
-            </p>
-            <h3 className="mt-2 text-xl font-semibold text-slate-950">{t("account.title")}</h3>
-
-            <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/92 p-5">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                {t("account.emailLabel")}
-              </p>
-              <div className="mt-3">
-                <p className="text-sm font-medium text-slate-900">
-                  {user.email ?? t("account.emailUnavailable")}
-                </p>
-                <p className="mt-2 text-sm leading-7 text-slate-600">
-                  {t("account.magicLinkText")}
-                </p>
-                <p className="mt-2 text-xs leading-6 text-slate-500">
-                  {t("account.securityText")}
-                </p>
-                <p className="mt-3 text-xs leading-6 text-slate-500">
-                  {t("account.supportText")}
-                </p>
-                <a
-                  href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`}
-                  className={`${UTILITY_CTA_CLASS} mt-4`}
-                >
-                  {t("actions.contactSupport")}
-                </a>
-              </div>
-            </div>
-
+        <details id="dashboard-block-account" className="scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
+          <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+            {t("utilities.account")}
+          </summary>
+          <div className="mt-4 border-t border-slate-200 pt-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("account.emailLabel")}</p>
+            <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? t("account.emailUnavailable")}</p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{t("account.magicLinkText")}</p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <form action={signOutAllSessionsAction}>
-                <button type="submit" className={UTILITY_CTA_CLASS}>
-                  {t("actions.signOutAll")}
-                </button>
-              </form>
+              <a href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`} className={UTILITY_CTA_CLASS}>{t("actions.contactSupport")}</a>
+              <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
             </div>
-
             <DeleteAccountSection />
-          </section>
-        </div>
+          </div>
+        </details>
       </section>
 
       <section
@@ -980,60 +608,27 @@ export default async function DashboardPage({
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.progressTitle")}</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.collaborationTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.comingSoon")}
+                {t("outlook.inDevelopment")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.progressText")}
+              {t("outlook.items.collaborationText")}
             </p>
           </article>
           <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.deepeningTitle")}</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.checkInsTitle")}</h3>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.planned")}
+                {t("outlook.inDevelopment")}
               </span>
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.deepeningText")}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.investorTitle")}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.perspective")}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.investorText")}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.teamTitle")}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.later")}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.teamText")}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.libraryTitle")}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.expand")}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.libraryText")}
+              {t("outlook.items.checkInsText")}
             </p>
           </article>
         </div>
@@ -1046,6 +641,73 @@ export default async function DashboardPage({
         reportRuns={reportRunSummaries}
       />
     </main>
+  );
+}
+
+function buildDashboardV2HeroPanel({
+  kind,
+  contextualBaseHref,
+  contextualValuesHref,
+  latestReadyReport,
+  firstTeamId,
+  t,
+}: {
+  kind: ReturnType<typeof resolveDashboardHeroAction>;
+  contextualBaseHref: string;
+  contextualValuesHref: string;
+  latestReadyReport: ReportRunRow | null;
+  firstTeamId: string | null;
+  t: DashboardT;
+}) {
+  switch (kind) {
+    case "founder_alignment_start":
+      return { href: contextualBaseHref, label: t("actions.startAlignment"), title: t("heroPanel.startAlignmentTitle"), text: t("heroPanel.startAlignmentText") };
+    case "founder_alignment_continue":
+      return { href: contextualBaseHref, label: t("actions.continueAlignment"), title: t("heroPanel.continueAlignmentTitle"), text: t("heroPanel.continueAlignmentText") };
+    case "values_continue":
+      return { href: contextualValuesHref, label: t("actions.continueValues"), title: t("heroPanel.continueValuesTitle"), text: t("heroPanel.continueValuesText") };
+    case "alignment_report":
+      return { href: latestReadyReport ? `/report/${encodeURIComponent(latestReadyReport.invitation_id)}` : "/connections", label: t("actions.openAlignmentReport"), title: t("heroPanel.reportTitle"), text: t("heroPanel.reportText") };
+    case "open_team":
+      return { href: firstTeamId ? `/teams/${encodeURIComponent(firstTeamId)}` : "/connections", label: t("actions.openTeam"), title: t("heroPanel.teamTitle"), text: t("heroPanel.teamText") };
+    case "open_connections":
+      return { href: "/connections", label: t("actions.openConnections"), title: t("heroPanel.connectionsTitle"), text: t("heroPanel.connectionsText") };
+    case "invite_cofounder":
+    case "incoming_invitation":
+      return { href: "/invite/new", label: t("actions.inviteCofounder"), title: t("heroPanel.inviteTitle"), text: t("heroPanel.inviteText") };
+  }
+}
+
+function FoundationCard({
+  title,
+  eyebrow,
+  description,
+  status,
+  badge,
+  href,
+  action,
+}: {
+  title: string;
+  eyebrow?: string;
+  description: string;
+  status: string;
+  badge?: string;
+  href: string;
+  action: string;
+}) {
+  return (
+    <article className="flex min-h-64 flex-col rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
+      {eyebrow ? <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">{eyebrow}</p> : null}
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <h3 className="text-lg font-semibold text-slate-950">{title}</h3>
+        {badge ? <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-600">{badge}</span> : null}
+      </div>
+      <p className="mt-3 text-sm leading-6 text-slate-600">{description}</p>
+      <p className="mt-4 text-xs font-medium text-slate-700">{status}</p>
+      <div className="mt-auto pt-5">
+        <Link href={href} className={UTILITY_CTA_CLASS}>{action}</Link>
+      </div>
+    </article>
   );
 }
 
@@ -1127,57 +789,6 @@ function resolveInvitationTeamName(label: string | null | undefined, inviteeEmai
   }
 
   return normalizedLabel;
-}
-
-function formatDashboardInvitationTitle(invitation: InvitationDashboardRow | null) {
-  if (!invitation) return "Workbook";
-  return (
-    resolveInvitationTeamName(invitation.label, invitation.inviteeEmail) ||
-    invitation.inviteeEmail ||
-    invitation.id
-  );
-}
-
-function FounderDimensionsOverview({
-  scores,
-  t,
-}: {
-  scores: Record<string, number | null | undefined>;
-  t: DashboardT;
-}) {
-  return (
-    <div className="space-y-3">
-      {FOUNDER_DIMENSION_ORDER.map((dimension) => {
-        const value = formatScoreValue(scores[dimension]);
-        const meta = FOUNDER_DIMENSION_META[dimension];
-        const i18nKey = dashboardDimensionKey(dimension);
-        const reportPoles = getFounderDimensionPoleLabels(dimension, "report");
-        return (
-          <div key={dimension}>
-            <div className="mb-1.5">
-              <span className="text-sm font-medium text-slate-700">
-                {t(`profileSnapshot.dimensions.${i18nKey}.label`)}
-              </span>
-            </div>
-            <div className="relative h-2 rounded-full bg-slate-100">
-              <div
-                className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-white bg-[linear-gradient(180deg,rgba(34,211,238,0.95),rgba(124,58,237,0.75))] shadow-[0_8px_20px_rgba(34,211,238,0.18)]"
-                style={{ left: `clamp(0px, calc(${value}% - 8px), calc(100% - 16px))` }}
-              />
-            </div>
-            <div className="mt-1 flex items-center justify-between gap-3 text-[11px] text-slate-400">
-              <span title={reportPoles?.left ?? meta.reportLeftPole}>
-                {t(`profileSnapshot.dimensions.${i18nKey}.left`)}
-              </span>
-              <span title={reportPoles?.right ?? meta.reportRightPole}>
-                {t(`profileSnapshot.dimensions.${i18nKey}.right`)}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
 }
 
 function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: DashboardT) {
@@ -1355,11 +966,6 @@ function renderCompactReportRow(run: ReportRunRow, t: DashboardT) {
   );
 }
 
-function formatScoreValue(value: number | null | undefined) {
-  if (typeof value !== "number" || Number.isNaN(value)) return 0;
-  return Math.max(0, Math.min(100, Math.round(value)));
-}
-
 function getQuoteOfTheDay(t: DashboardT) {
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 0);
@@ -1391,145 +997,6 @@ function DashboardProfileAvatar({
   );
 }
 
-function DashboardProgressRoadmap({
-  items,
-}: {
-  items: ReadonlyArray<{
-    id: string;
-    label: string;
-    state: "done" | "active" | "upcoming";
-    detail: string;
-    description: string;
-  }>;
-}) {
-  const activeIndex = Math.max(
-    items.findIndex((item) => item.state === "active"),
-    items.findLastIndex((item) => item.state === "done")
-  );
-  const fillPercent =
-    items.length > 1 && activeIndex >= 0 ? (activeIndex / (items.length - 1)) * 100 : 0;
-
-  return (
-    <div className="rounded-[24px] border border-slate-200/80 bg-slate-50/78 px-3.5 py-4 sm:px-4 sm:py-[1.125rem] lg:px-5">
-      <div className="relative hidden md:block">
-        <div className="absolute left-[34px] right-[34px] top-4 h-px bg-slate-200/90" />
-        <div
-          className="absolute left-[34px] top-4 h-px bg-[linear-gradient(90deg,rgba(148,163,184,0.16),rgba(34,211,238,0.72),rgba(34,211,238,0.28))] transition-all duration-500"
-          style={{ width: `calc((100% - 68px) * ${fillPercent / 100})` }}
-        />
-
-        <div className="relative grid grid-cols-4 gap-2.5 lg:gap-3">
-          {items.map((item, index) => {
-            const isDone = item.state === "done";
-            const isActive = item.state === "active";
-
-            return (
-              <div key={item.id} className="group text-center" title={item.description}>
-                <div className="flex justify-center">
-                  <span className="relative z-10 inline-flex rounded-full bg-slate-50/95 p-1">
-                    <span
-                      className={`flex items-center justify-center rounded-full border transition-all duration-300 ${
-                        isActive
-                          ? "h-9 w-9 border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/16 text-slate-900 shadow-[0_10px_20px_rgba(34,211,238,0.12)]"
-                          : isDone
-                            ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
-                            : "h-8 w-8 border-slate-200 bg-white text-slate-400"
-                      }`}
-                    >
-                      {isDone ? (
-                        <RoadmapCheckIcon className="h-3.5 w-3.5" />
-                      ) : (
-                        <span className="text-[10px] font-semibold">{index + 1}</span>
-                      )}
-                    </span>
-                  </span>
-                </div>
-                <div className="mt-3 px-1">
-                  <p
-                    className={`text-[12px] font-medium leading-5 lg:text-[13px] ${
-                      isActive ? "text-slate-950" : "text-slate-800"
-                    }`}
-                  >
-                    {item.label}
-                  </p>
-                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">
-                    {item.detail}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5 md:hidden">
-        {items.map((item, index) => {
-          const isDone = item.state === "done";
-          const isActive = item.state === "active";
-
-          return (
-            <div
-              key={item.id}
-              title={item.description}
-              className={`rounded-2xl border px-3 py-3 ${
-                isActive
-                  ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10"
-                  : isDone
-                    ? "border-slate-200/80 bg-white/88"
-                    : "border-slate-200/80 bg-white/72"
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <span
-                  className={`flex shrink-0 items-center justify-center rounded-full border ${
-                    isActive
-                      ? "h-[2.125rem] w-[2.125rem] border-[color:var(--brand-primary)]/35 bg-[color:var(--brand-primary)]/14 text-slate-900"
-                      : isDone
-                        ? "h-8 w-8 border-emerald-200 bg-emerald-50 text-emerald-700"
-                        : "h-8 w-8 border-slate-200 bg-white text-slate-400"
-                  }`}
-                >
-                  {isDone ? (
-                    <RoadmapCheckIcon className="h-3.5 w-3.5" />
-                  ) : (
-                    <span className="text-[10px] font-semibold">{index + 1}</span>
-                  )}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[12px] font-medium leading-5 text-slate-900 sm:text-[13px]">
-                    {item.label}
-                  </p>
-                  <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">
-                    {item.detail}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function ProfileIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 13.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 20.25a7.5 7.5 0 0115 0" />
-    </svg>
-  );
-}
-
-function CompassIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <circle cx="12" cy="12" r="8.25" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14.9 9.1l-1.98 5.94-5.94 1.98 1.98-5.94 5.94-1.98z" />
-    </svg>
-  );
-}
-
 function ReportIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
@@ -1540,7 +1007,7 @@ function ReportIcon({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-function MatchingIcon({ className = "h-4 w-4" }: { className?: string }) {
+function ConnectionsIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
@@ -1563,14 +1030,6 @@ function QuoteIcon({ className = "h-4 w-4" }: { className?: string }) {
         strokeLinejoin="round"
         d="M17.25 8.75c-1.56.72-2.34 1.95-2.34 3.7v1.08c0 .97.79 1.76 1.76 1.76h.83c.97 0 1.75-.78 1.75-1.75v-.9c0-.96-.78-1.75-1.75-1.75h-1.84c.05-.93.57-1.71 1.59-2.34"
       />
-    </svg>
-  );
-}
-
-function RoadmapCheckIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12.75l3.5 3.5 7-8" />
     </svg>
   );
 }

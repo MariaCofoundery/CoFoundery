@@ -1,21 +1,20 @@
 {
   "hero": {
     "eyebrow": "Founder dashboard",
-    "greeting": "Good to see you, {name}",
+    "greeting": "Good to see you, {name}.",
     "quoteEyebrow": "Quote of the day",
     "contextLabel": "Founder context",
     "error": "The action could not be completed right now. Please try again.",
-    "loadError": "The dashboard could not be loaded completely right now. Please try again.",
-    "expectation": "You invite your co-founder. After that, you get your matching report and work together in the workbook."
+    "loadError": "The dashboard could not be loaded completely right now. Please try again."
   },
   "actions": {
-    "startProfile": "Start profile",
-    "startValues": "Start values profile",
+    "startAlignment": "Start Founder Alignment",
+    "continueAlignment": "Continue Founder Alignment",
+    "openAlignmentReport": "View alignment report",
+    "openTeam": "Open team",
+    "openConnections": "Open connections",
     "continueValues": "Continue values profile",
-    "continueWorkbook": "Keep working",
-    "startWorkbook": "Start workbook",
     "inviteCofounder": "Invite co-founder",
-    "trackMatching": "Track matching",
     "openReport": "Open report",
     "open": "Open",
     "saveProfile": "Save profile",
@@ -25,53 +24,79 @@
     "signOutAll": "End all sessions"
   },
   "heroPanel": {
-    "startProfileTitle": "Start your profile.",
-    "startProfileText": "This is the first step.",
+    "startAlignmentTitle": "Create your personal foundation.",
+    "startAlignmentText": "Reflect on your perspectives about collaboration, decisions, and building a company.",
+    "continueAlignmentTitle": "Continue your Founder Alignment.",
+    "continueAlignmentText": "Pick up your personal reflection where you left off.",
+    "continueValuesText": "Continue the optional values reflection you already started.",
+    "reportTitle": "Your alignment report is available.",
+    "reportText": "Open your shared result and compare your perspectives.",
+    "teamTitle": "Continue your work together.",
+    "teamText": "Open your team homebase for your current shared work.",
+    "connectionsTitle": "Open your founder connections.",
+    "connectionsText": "Find your existing connections, invitations, and results here.",
     "continueValuesTitle": "Finish your values profile.",
-    "startValuesTitle": "Start your values profile now.",
-    "valuesText": "This adds more information for the matching report and workbook.",
-    "continueWorkbookTitle": "Keep working in the workbook.",
-    "continueWorkbookText": "This is where your current working state lives.",
-    "startWorkbookTitle": "Start the workbook now.",
-    "startWorkbookText": "Turn the matching report into concrete rules and next steps.",
-    "inviteTitle": "Start matching now.",
-    "inviteText": "Next step: invite your co-founder and start your matching together.",
-    "trackTitle": "Keep an eye on the active matching.",
-    "trackText": "As soon as answers come in or a matching report is ready, you continue here.",
-    "valuesContinueHint": "Finish your values profile and sharpen your shared guardrails further.",
-    "valuesStartHint": "Add the optional values profile for more depth in matching and the workbook.",
-    "reportReadyWorkbookText": "The matching report is ready. Next up is the workbook."
+    "inviteTitle": "Invite a co-founder.",
+    "inviteText": "Start a founder connection and explore your perspectives together."
   },
-  "progress": {
-    "basis": {
-      "label": "Foundation profile",
-      "done": "done",
-      "open": "open",
-      "description": "This is the foundation for your founder profile."
+  "sectionNavigation": {
+    "label": "Dashboard sections",
+    "foundation": "Your foundation",
+    "connections": "Your connections and teams",
+    "outlook": "Outlook"
+  },
+  "foundation": {
+    "eyebrow": "Personal foundation",
+    "title": "Your foundation",
+    "description": "These areas belong to you. They are not combined into an overall progress score.",
+    "alignment": {
+      "title": "Founder Alignment",
+      "description": "Your perspectives on collaboration, decisions, and building a company.",
+      "states": {
+        "not_started": "Not started",
+        "started": "Started",
+        "result_available": "Completed · Result available"
+      },
+      "actions": {
+        "not_started": "Start",
+        "started": "Continue",
+        "result_available": "View result"
+      }
     },
     "values": {
-      "label": "Values profile",
-      "done": "done",
-      "inProgress": "in progress",
-      "open": "open",
-      "optional": "optional",
-      "description": "An optional deep dive into values, guardrails, and red lines."
+      "title": "Values profile",
+      "description": "If you want, you can also reflect on which values matter to you in collaboration.",
+      "optionalBadge": "Optional",
+      "states": {
+        "optional": "Not started",
+        "started": "Started",
+        "completed": "Completed"
+      },
+      "actions": {
+        "optional": "Reflect on values",
+        "started": "Continue",
+        "completed": "View result"
+      }
     },
-    "matching": {
-      "label": "Matching",
-      "done": "done",
-      "running": "running",
-      "open": "open",
-      "description": "This compares your responses and highlights topics for discussion together."
-    },
-    "workbook": {
-      "label": "Workbook",
-      "done": "completed",
-      "active": "active",
-      "ready": "ready",
-      "open": "open",
-      "description": "This is where you capture shared agreements for everyday work."
+    "discovery": {
+      "eyebrow": "Your discovery profile",
+      "title": "Find a co-founder",
+      "description": "Manage how you appear in Discovery and who you are looking for, separately from your alignment.",
+      "states": {
+        "not_created": "No discovery profile yet",
+        "draft": "Draft",
+        "active": "Published",
+        "paused": "Paused"
+      },
+      "action": "Manage discovery profile"
     }
+  },
+  "utilities": {
+    "title": "Profile and account",
+    "profileCreate": "Add personal profile details",
+    "profileEdit": "Edit profile details",
+    "profileHelp": "Manage your name, role, and essential details here when needed.",
+    "account": "Account & settings"
   },
   "profileSnapshot": {
     "eyebrow": "Profile snapshot",
@@ -112,17 +137,17 @@
     }
   },
   "team": {
-    "eyebrow": "Team & collaboration",
-    "title": "Invitations, matching, and collaboration",
+    "eyebrow": "Founder workspace",
+    "title": "Your connections & teams",
     "inviteTitle": "Invite co-founder",
-    "inviteText": "Start or continue your matching process here.",
+    "inviteText": "Start a new founder connection.",
     "detailsTitle": "Invitations and reports",
-    "detailsText": "Open invitations, matching reports, and more team details.",
+    "detailsText": "Open invitations, alignment reports, and more details.",
     "expand": "Expand",
     "invitations": "Invitations",
     "noInvitations": "No open invitations yet.",
-    "reports": "Matching reports",
-    "noReports": "Once matching reports are ready, they appear here.",
+    "reports": "Alignment reports",
+    "noReports": "Once alignment reports are ready, they appear here.",
     "partner": "Partner: {email}",
     "status": "Status: {status}",
     "modulesAndExpiry": "Modules: {modules} · Expires: {date}",
@@ -208,24 +233,14 @@
   },
   "outlook": {
     "eyebrow": "Outlook",
-    "title": "What comes next",
-    "text": "CoFoundery Align keeps growing step by step. Here you can see the next building blocks we plan to add for deeper, clearer, and more resilient collaboration.",
-    "comingSoon": "Coming soon",
-    "planned": "Planned",
-    "perspective": "Perspective",
-    "later": "Later",
-    "expand": "Expansion",
+    "title": "What could come next",
+    "text": "Two areas CoFoundery is exploring for long-term collaboration, without promising fixed release dates.",
+    "inDevelopment": "In development",
     "items": {
-      "progressTitle": "Progress check",
-      "progressText": "A later check-in should show what has worked after a few months and where you want to sharpen your agreements.",
-      "deepeningTitle": "Deepening your collaboration",
-      "deepeningText": "Additional reflection modules should help you not only capture alignment once, but develop it more consciously over time.",
-      "investorTitle": "Investor readiness",
-      "investorText": "Future views should show how your founder setup looks from the outside and where it creates particular strengths or questions.",
-      "teamTitle": "Team and role development",
-      "teamText": "As your team grows, additional roles, responsibilities, and interfaces should become clearer parts of your collaboration.",
-      "libraryTitle": "Knowledge library",
-      "libraryText": "A curated library should later make relevant prompts, models, and practical tools for founder collaboration easy to use."
+      "collaborationTitle": "Strengthen your collaboration",
+      "collaborationText": "Get to know your ways of working even better through shared questions, short scenarios, and experiments for your collaboration.",
+      "checkInsTitle": "Regular team check-ins",
+      "checkInsText": "Review together what works in your collaboration and what you want to agree differently."
     }
   },
   "coFounderInvitePage": {

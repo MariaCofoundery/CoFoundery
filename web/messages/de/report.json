@@ -17,7 +17,7 @@
     "lockedTitle": "Dieser Team-Report ist noch nicht freigeschaltet.",
     "lockedText": "Die Freischaltung für diesen Legacy-Report ist noch nicht aktiv.",
     "lockedAdvisorText": "Wenn ein Advisor oder Accelerator den Report für euch freischaltet, ist er für das Team verfügbar.",
-    "lockedPdfText": "Freischaltung kommt bald. Bis dahin bleibt der PDF-Export für diesen Report deaktiviert.",
+    "lockedPdfText": "PDF-Export ist derzeit nicht verfügbar.",
     "lockedFullText": "Der vollständige Report wird nach der Freischaltung sichtbar.",
     "freeBetaEyebrow": "Kostenlos verfügbar in der Testphase",
     "freeBetaTitle": "Dieser Report ist in der aktuellen Testphase vollständig geöffnet.",

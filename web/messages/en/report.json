@@ -17,7 +17,7 @@
     "lockedTitle": "This team report is not unlocked yet.",
     "lockedText": "Unlocking is not active for this legacy report yet.",
     "lockedAdvisorText": "Once an advisor or accelerator unlocks the report for you, it will be available to the team.",
-    "lockedPdfText": "Unlocking is coming soon. Until then, PDF export stays disabled for this report.",
+    "lockedPdfText": "PDF export is currently unavailable.",
     "lockedFullText": "The full report becomes visible after unlock.",
     "freeBetaEyebrow": "Available for free during the test phase",
     "freeBetaTitle": "This report is fully unlocked during the current test phase.",
