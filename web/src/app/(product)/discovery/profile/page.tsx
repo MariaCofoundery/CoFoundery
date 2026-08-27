@@ -384,8 +384,8 @@ export default async function DiscoveryProfilePage({
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6">
-          <Link href="/dashboard" className="text-sm font-medium text-slate-500 hover:text-slate-900">
-            {t("common.backToDashboard")}
+          <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
+            {t("common.backToDiscovery")}
           </Link>
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
