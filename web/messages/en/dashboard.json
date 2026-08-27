@@ -205,6 +205,33 @@
     "title": "Your connections & teams",
     "inviteTitle": "Invite co-founder",
     "inviteText": "Start a new founder connection.",
+    "cards": {
+      "empty": "No founder connection yet.",
+      "founderFallback": "Founder {index}",
+      "founderUnknown": "Founder connection",
+      "avatarAlt": "Profile of {name}",
+      "statusLabel": "Existing work",
+      "openTeam": "Open team",
+      "openConnection": "Open connection",
+      "contexts": {
+        "existingTeam": "Existing founder team",
+        "potentialTeam": "Potential collaboration",
+        "existingConnection": "Founder connection in an existing team context",
+        "potentialConnection": "Potential collaboration"
+      },
+      "statuses": {
+        "setupConfirmed": "{count, plural, one {1 topic confirmed} other {# topics confirmed}}",
+        "setupInProgress": "Founder Setup in progress",
+        "alignmentReport": "Alignment report available",
+        "alignmentReportWith": "Alignment with {name} · report available",
+        "commitmentLab": "Commitment Lab started",
+        "commitmentLabWith": "Commitment Lab with {name} · started",
+        "advisor": "Advisor connected",
+        "advisorWith": "Advisor for the connection with {name} · connected",
+        "connectionPending": "Founder connection requested",
+        "alignmentInProgress": "Alignment in progress"
+      }
+    },
     "detailsTitle": "Invitations and reports",
     "detailsText": "Open invitations, alignment reports, and more details.",
     "expand": "Expand",

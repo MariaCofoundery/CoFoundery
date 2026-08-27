@@ -408,8 +408,8 @@
   },
   "dashboard": {
     "eyebrow": "Shared areas",
-    "title": "My founder teams",
-    "description": "Open the shared overview for an existing founder team.",
+    "title": "Connections and teams",
+    "description": "Open your existing work contexts and see which shared work already exists.",
     "empty": "New founder teams appear here once a shared connection has been created.",
     "open": "Open",
     "allConnections": "All connections",

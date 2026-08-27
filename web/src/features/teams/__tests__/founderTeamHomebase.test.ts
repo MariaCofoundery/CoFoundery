@@ -374,10 +374,20 @@ test("homebase and dashboard system copy stay structurally parallel in DE and EN
 
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
   const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
+  const dashboardConnections = readFileSync(
+    "src/features/dashboard/founderDashboardConnections.ts",
+    "utf8"
+  );
+  const dashboardCards = readFileSync(
+    "src/features/dashboard/DashboardConnectionCards.tsx",
+    "utf8"
+  );
   assert.match(page, /getFounderTeamHomebase\(teamId, user\.id, supabase\)/);
   assert.match(page, /if \(!team\) notFound\(\)/);
   assert.match(page, /aria-labelledby="team-founders-title"/);
   assert.doesNotMatch(page, /alignmentPercent|compatibilityScore|teamHealth/);
   assert.match(dashboard, /getFounderTeamDashboardSummaries\(user\.id, supabase\)/);
-  assert.match(dashboard, /`\/teams\/\$\{encodeURIComponent\(team\.id\)\}`/);
+  assert.match(dashboard, /getFounderDashboardConnectionsV2/);
+  assert.match(dashboardConnections, /`\/teams\/\$\{encodeURIComponent\(team\.id\)\}`/);
+  assert.match(dashboardCards, /href=\{team\.href\}/);
 });

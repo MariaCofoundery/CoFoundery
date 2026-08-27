@@ -205,6 +205,33 @@
     "title": "Deine Verbindungen & Teams",
     "inviteTitle": "Co-Founder einladen",
     "inviteText": "Starte eine neue Founder-Verbindung.",
+    "cards": {
+      "empty": "Noch keine Founder-Verbindung vorhanden.",
+      "founderFallback": "Founder {index}",
+      "founderUnknown": "Founder-Verbindung",
+      "avatarAlt": "Profil von {name}",
+      "statusLabel": "Vorhandene Arbeitsstände",
+      "openTeam": "Team öffnen",
+      "openConnection": "Verbindung öffnen",
+      "contexts": {
+        "existingTeam": "Bestehendes Founder-Team",
+        "potentialTeam": "Mögliche Zusammenarbeit",
+        "existingConnection": "Founder-Verbindung im bestehenden Teamkontext",
+        "potentialConnection": "Mögliche Zusammenarbeit"
+      },
+      "statuses": {
+        "setupConfirmed": "{count, plural, one {1 Thema bestätigt} other {# Themen bestätigt}}",
+        "setupInProgress": "Founder Setup in Arbeit",
+        "alignmentReport": "Alignment Report vorhanden",
+        "alignmentReportWith": "Alignment mit {name} · Report vorhanden",
+        "commitmentLab": "Commitment Lab begonnen",
+        "commitmentLabWith": "Commitment Lab mit {name} · begonnen",
+        "advisor": "Advisor verbunden",
+        "advisorWith": "Advisor für die Verbindung mit {name} · verbunden",
+        "connectionPending": "Founder-Verbindung angefragt",
+        "alignmentInProgress": "Alignment in Arbeit"
+      }
+    },
     "detailsTitle": "Einladungen und Reports",
     "detailsText": "Offene Einladungen, Alignment Reports und weitere Details.",
     "expand": "Ausklappen",

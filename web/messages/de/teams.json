@@ -408,8 +408,8 @@
   },
   "dashboard": {
     "eyebrow": "Gemeinsame Bereiche",
-    "title": "Meine Founder-Teams",
-    "description": "Öffne die gemeinsame Übersicht für ein bestehendes Founder-Team.",
+    "title": "Verbindungen und Teams",
+    "description": "Öffne deine bestehenden Arbeitskontexte und sieh, welche gemeinsamen Arbeitsstände vorhanden sind.",
     "empty": "Neue Founder-Teams erscheinen hier, sobald eine gemeinsame Verbindung angelegt wurde.",
     "open": "Öffnen",
     "allConnections": "Alle Verbindungen",

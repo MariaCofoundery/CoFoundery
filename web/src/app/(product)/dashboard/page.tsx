@@ -5,12 +5,15 @@ import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
+import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
 } from "@/features/dashboard/DashboardTaskList";
 import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
+import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDashboardConnectionData";
+import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
 import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
   resolveDashboardHeroAction,
@@ -53,7 +56,6 @@ type ReportRunRow = {
   invitation_id: string;
   modules: string[];
   created_at: string;
-  payload: unknown;
   invitations:
     | {
         id: string;
@@ -138,7 +140,7 @@ export default async function DashboardPage({
       supabase
         .from("report_runs")
         .select(
-          "id, invitation_id, modules, created_at, payload, invitations:invitation_id(id, label, invitee_email, status, created_at)"
+          "id, invitation_id, modules, created_at, invitations:invitation_id(id, label, invitee_email, status, created_at)"
         )
         .order("created_at", { ascending: false })
         .limit(20),
@@ -188,7 +190,7 @@ export default async function DashboardPage({
       supabase
         .from("report_runs")
         .select(
-          "id, invitation_id, modules, created_at, payload, invitations:invitation_id(id, label, invitee_email, status, created_at)"
+          "id, invitation_id, modules, created_at, invitations:invitation_id(id, label, invitee_email, status, created_at)"
         )
         .order("created_at", { ascending: false })
         .limit(20),
@@ -284,6 +286,27 @@ export default async function DashboardPage({
     started: hasStartedValues,
   });
   const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
+  const connectionOverview = await getFounderDashboardConnectionsV2({
+    currentUserId: user.id,
+    teams: founderTeams,
+    invitations: invitationRows,
+    client: supabase,
+  }).catch((error) => {
+    console.error("dashboard connection overview load failed", error);
+    return buildFounderDashboardConnections({
+      currentUserId: user.id,
+      teams: founderTeams,
+      invitations: [],
+      signals: {
+        relationships: [],
+        reports: [],
+        commitmentLabs: [],
+        relationshipAdvisors: [],
+        setupItems: [],
+        counterpartNames: new Map(),
+      },
+    });
+  });
   const dashboardTasks = await getFounderDashboardTasks({
     currentUserId: user.id,
     invitations: invitationRows,
@@ -486,55 +509,20 @@ export default async function DashboardPage({
             {teamsT("description")}
           </p>
 
-          {founderTeams.length === 0 ? (
-            <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-              {teamsT("empty")}
+          <DashboardConnectionCards overview={connectionOverview} />
+        </article>
+
+        <div className={`${SECONDARY_SURFACE_CLASS} mt-4 flex flex-wrap items-center justify-between gap-4 p-4`}>
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">{t("team.inviteTitle")}</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              {t("team.inviteText")}
             </p>
-          ) : (
-            <ul className="mt-4 grid gap-3 md:grid-cols-2">
-              {founderTeams.map((team) => {
-                const memberNames = team.members.map(
-                  (member, index) =>
-                    member.displayName ?? teamsT("memberFallback", { index: index + 1 })
-                );
-                const teamTitle = team.name ?? memberNames.join(" + ");
-                const context =
-                  team.teamContext === "existing_team"
-                    ? teamsT("context.existingTeam")
-                    : teamsT("context.preFounder");
-
-                return (
-                  <li
-                    key={team.id}
-                    className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{teamTitle}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-500">{context}</p>
-                    </div>
-                    <Link href={`/teams/${encodeURIComponent(team.id)}`} className={UTILITY_CTA_CLASS}>
-                      {teamsT("open")}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </article>
-
-        <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h3 className="text-base font-semibold text-slate-900">{t("team.inviteTitle")}</h3>
-              <p className="mt-2 text-sm leading-7 text-slate-600">
-                {t("team.inviteText")}
-              </p>
-            </div>
-            <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-              {t("actions.inviteCofounder")}
-            </Link>
           </div>
-        </article>
+          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+            {t("actions.inviteCofounder")}
+          </Link>
+        </div>
 
         <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
