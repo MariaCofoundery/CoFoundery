@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { revokeAdvisorPendingTeamInviteAction } from "@/features/dashboard/advisorTeamInviteActions";
+import {
+  resendAdvisorTeamInviteFounderAction,
+  revokeAdvisorPendingTeamInviteAction,
+} from "@/features/dashboard/advisorTeamInviteActions";
 import { AdvisorTeamInviteForm } from "@/features/dashboard/AdvisorTeamInviteForm";
 import {
   getAdvisorPendingTeamInvites,
@@ -211,7 +214,11 @@ function pendingAttentionLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
 
 function pendingFounderProgressLabel(invite: AdvisorPendingTeamInvite, founder: "A" | "B", t: AdvisorT) {
   const isStarted = founder === "A" ? invite.founderAStarted : invite.founderBStarted;
-  return isStarted ? t("dashboard.statuses.started") : t("dashboard.statuses.open");
+  if (isStarted) return t("dashboard.statuses.accepted");
+  const sendStatus = founder === "A" ? invite.founderASendStatus : invite.founderBSendStatus;
+  if (sendStatus === "failed") return t("dashboard.statuses.sendFailed");
+  if (sendStatus === "sent") return t("dashboard.statuses.invitationSent");
+  return t("dashboard.statuses.notSent");
 }
 
 function formatPendingTimestamp(value: string, locale: string) {
@@ -451,7 +458,7 @@ function PendingInviteCard({
 
         <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
           <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-            {t("dashboard.statuses.founderInvited")}
+            {invite.status === "expired" ? t("dashboard.statuses.invitationExpired") : t("dashboard.statuses.founderInvited")}
           </span>
           <div className="mt-4 grid gap-2">
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
@@ -465,6 +472,13 @@ function PendingInviteCard({
               >
                 {pendingFounderProgressLabel(invite, "A", t)}
               </span>
+              {!invite.founderAStarted && invite.status === "pending" ? (
+                <form action={resendAdvisorTeamInviteFounderAction}>
+                  <input type="hidden" name="pendingTeamId" value={invite.id} />
+                  <input type="hidden" name="founderSlot" value="founderA" />
+                  <button type="submit" className="text-xs font-medium text-slate-700 underline underline-offset-4">{t("dashboard.pending.resend")}</button>
+                </form>
+              ) : null}
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderBLabel}</span>
@@ -477,6 +491,13 @@ function PendingInviteCard({
               >
                 {pendingFounderProgressLabel(invite, "B", t)}
               </span>
+              {!invite.founderBStarted && invite.status === "pending" ? (
+                <form action={resendAdvisorTeamInviteFounderAction}>
+                  <input type="hidden" name="pendingTeamId" value={invite.id} />
+                  <input type="hidden" name="founderSlot" value="founderB" />
+                  <button type="submit" className="text-xs font-medium text-slate-700 underline underline-offset-4">{t("dashboard.pending.resend")}</button>
+                </form>
+              ) : null}
             </div>
           </div>
           {invite.status === "pending" ? (
@@ -489,6 +510,11 @@ function PendingInviteCard({
                 {t("dashboard.pending.remove")}
               </button>
             </form>
+          ) : null}
+          {invite.status === "expired" ? (
+            <a href="#advisor-invite-form" className="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100">
+              {t("dashboard.pending.createNew")}
+            </a>
           ) : null}
         </div>
       </div>

@@ -287,7 +287,8 @@ test("three-founder homebase aggregates only authorized pair artifacts without a
     homebase.agreements.map((agreement) => agreement.source).sort(),
     ["matching_workspace", "workbook"]
   );
-  assert.deepEqual(homebase.advisors.map((advisor) => advisor.id), ["advisor-ac"]);
+  assert.deepEqual(homebase.advisors.map((advisor) => advisor.id), ["advisor-ac", "advisor-revoked"]);
+  assert.equal(homebase.advisors[1]?.status, "revoked");
   assert.equal("score" in homebase, false);
 });
 

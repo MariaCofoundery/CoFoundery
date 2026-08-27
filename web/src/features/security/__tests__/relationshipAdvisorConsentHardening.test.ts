@@ -88,7 +88,7 @@ test("advisor-owned team invites use narrow create and pending-revoke RPCs", () 
   assert.match(migration, /revoke insert, update, delete on table public\.advisor_team_invites from authenticated/);
   assert.match(migration, /create or replace function public\.create_advisor_team_invite/);
   assert.match(migration, /create or replace function public\.revoke_pending_advisor_team_invite/);
-  assert.match(advisorTeamInviteActions, /\.rpc\(\s*"create_advisor_team_invite"/);
+  assert.match(advisorTeamInviteActions, /\.rpc\(\s*"create_advisor_team_invite_reliable"/);
   assert.match(advisorTeamInviteActions, /\.rpc\("revoke_pending_advisor_team_invite"/);
   assert.doesNotMatch(advisorTeamInviteActions, /\.from\("advisor_team_invites"\)\s*\.update/);
   assert.doesNotMatch(advisorTeamInviteActions, /\.from\("advisor_team_invites"\)\s*\.insert/);

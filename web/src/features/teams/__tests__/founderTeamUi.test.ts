@@ -69,7 +69,7 @@ test("homebase presents localized real avatars with initials fallback in the int
   const alignment = page.indexOf('aria-labelledby="team-alignment-title"');
   const setup = page.indexOf('aria-labelledby="team-setup-title"');
   const agreements = page.indexOf('aria-labelledby="team-agreements-title"');
-  const advisor = page.indexOf('aria-labelledby="team-advisor-title"');
+  const advisor = page.indexOf("<FounderRelationshipAdvisorPanel");
   assert.ok(founder < alignment && alignment < setup && setup < agreements && agreements < advisor);
 });
 

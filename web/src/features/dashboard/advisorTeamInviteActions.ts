@@ -11,13 +11,17 @@ import {
   normalizeTeamName,
   type ClaimAdvisorTeamInviteResult,
 } from "@/features/dashboard/advisorTeamInviteData";
+import {
+  deriveAdvisorInviteEmailStatus,
+  type AdvisorInviteEmailStatus,
+  type AdvisorInviteRecipientEmailStatus,
+} from "@/features/dashboard/advisorTeamInviteDelivery";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendAdvisorTeamFounderInviteEmail } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
-type EmailStatus = "sent" | "partial" | "not_sent";
 export type CreateAdvisorTeamInviteError =
   | "invalid_founder_a_email"
   | "invalid_founder_b_email"
@@ -30,11 +34,13 @@ export type CreateAdvisorTeamInviteActionResult =
   | {
       ok: true;
       pendingTeamId: string;
-      emailStatus: EmailStatus;
+      emailStatus: AdvisorInviteEmailStatus;
       founderAInviteUrl: string;
       founderBInviteUrl: string;
       founderAEmail: string;
       founderBEmail: string;
+      founderAEmailStatus: AdvisorInviteRecipientEmailStatus;
+      founderBEmailStatus: AdvisorInviteRecipientEmailStatus;
     }
   | {
       ok: false;
@@ -49,6 +55,27 @@ function buildAbsoluteInviteUrl(token: string, locale: "de" | "en") {
   const origin = getPublicAppOrigin();
   const path = buildLocaleContinuationPath(buildInvitePath(token), locale);
   return origin ? `${origin}${path}` : path;
+}
+
+async function recordRecipientDelivery(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  inviteId: string;
+  founderSlot: "founder_a" | "founder_b";
+  status: AdvisorInviteRecipientEmailStatus;
+}) {
+  const { error } = await params.supabase.rpc("record_advisor_team_invite_delivery", {
+    p_invite_id: params.inviteId,
+    p_founder_slot: params.founderSlot,
+    p_send_status: params.status,
+    p_error_code: params.status === "failed" ? "delivery_failed" : null,
+  });
+  if (error) {
+    console.error("Failed to persist advisor invite recipient delivery state", {
+      inviteId: params.inviteId,
+      founderSlot: params.founderSlot,
+      code: error.code ?? null,
+    });
+  }
 }
 
 function normalizeDistinctFounderEmails(params: { founderAEmail: FormDataEntryValue | null; founderBEmail: FormDataEntryValue | null }) {
@@ -122,7 +149,7 @@ export async function createAdvisorTeamInviteAction(
   const founderBInviteUrl = buildAbsoluteInviteUrl(founderBToken, locale);
 
   const { data: insertedRow, error: insertError } = await supabase.rpc(
-    "create_advisor_team_invite",
+    "create_advisor_team_invite_reliable",
     {
       p_advisor_name: advisorName,
       p_team_name: teamName,
@@ -165,10 +192,23 @@ export async function createAdvisorTeamInviteAction(
     }).catch(() => ({ ok: false as const, error: "email_delivery_failed" })),
   ]);
 
-  const emailResults = [founderAEmailResult, founderBEmailResult];
-  const sentCount = emailResults.filter((result) => result.ok).length;
-  const emailStatus: EmailStatus =
-    sentCount === 2 ? "sent" : sentCount === 0 ? "not_sent" : "partial";
+  const founderAEmailStatus: AdvisorInviteRecipientEmailStatus = founderAEmailResult.ok ? "sent" : "failed";
+  const founderBEmailStatus: AdvisorInviteRecipientEmailStatus = founderBEmailResult.ok ? "sent" : "failed";
+  const emailStatus = deriveAdvisorInviteEmailStatus(founderAEmailStatus, founderBEmailStatus);
+  await Promise.all([
+    recordRecipientDelivery({
+      supabase,
+      inviteId: insertedRow.id,
+      founderSlot: "founder_a",
+      status: founderAEmailStatus,
+    }),
+    recordRecipientDelivery({
+      supabase,
+      inviteId: insertedRow.id,
+      founderSlot: "founder_b",
+      status: founderBEmailStatus,
+    }),
+  ]);
   revalidatePath("/advisor/dashboard");
 
   return {
@@ -179,7 +219,54 @@ export async function createAdvisorTeamInviteAction(
     founderBInviteUrl,
     founderAEmail: normalizedEmails.founderAEmail,
     founderBEmail: normalizedEmails.founderBEmail,
+    founderAEmailStatus,
+    founderBEmailStatus,
   };
+}
+
+export async function resendAdvisorTeamInviteFounderAction(formData: FormData): Promise<void> {
+  const inviteId = String(formData.get("pendingTeamId") ?? "").trim();
+  const slotValue = String(formData.get("founderSlot") ?? "");
+  const founderSlot = slotValue === "founderA" ? "founder_a" : slotValue === "founderB" ? "founder_b" : null;
+  if (!inviteId || !founderSlot) return;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.id) return;
+
+  const locale = await getRequestLocale();
+  const token = createOpaqueToken();
+  const { data, error } = await supabase.rpc("rotate_advisor_team_invite_founder_token", {
+    p_invite_id: inviteId,
+    p_founder_slot: founderSlot,
+    p_token_hash: hashOpaqueToken(token),
+  });
+  if (error || !data) return;
+
+  const row = data as {
+    advisor_name: string | null;
+    team_name: string | null;
+    founder_a_email: string;
+    founder_b_email: string;
+  };
+  const recipientEmail = founderSlot === "founder_a" ? row.founder_a_email : row.founder_b_email;
+  const counterpartEmail = founderSlot === "founder_a" ? row.founder_b_email : row.founder_a_email;
+  const delivery = await sendAdvisorTeamFounderInviteEmail({
+    inviteeEmail: recipientEmail,
+    inviteUrl: buildAbsoluteInviteUrl(token, locale),
+    advisorName: row.advisor_name,
+    teamName: row.team_name,
+    counterpartLabel: counterpartEmail.split("@")[0]?.trim() || (locale === "en" ? "the other founder" : "die zweite Founder-Person"),
+    locale,
+  }).catch(() => ({ ok: false as const, error: "email_delivery_failed" }));
+
+  await recordRecipientDelivery({
+    supabase,
+    inviteId,
+    founderSlot,
+    status: delivery.ok ? "sent" : "failed",
+  });
+  revalidatePath("/advisor/dashboard");
 }
 
 export async function claimAdvisorTeamInviteFounderAction(params: {

@@ -52,9 +52,10 @@ test("advisor invite email renders English subject and body", () => {
     locale: "en",
   });
 
-  assert.equal(payload.subject, "Mara and Noah would like to involve you as an advisor");
+  assert.equal(payload.subject, "Mara and Noah invited you as their advisor");
   assert.match(payload.html, /Personal advisor invitation/);
-  assert.match(payload.text, /As an advisor, you get access/);
+  assert.match(payload.text, /Once you accept, you can access/);
+  assert.match(payload.text, /not Commitment Lab, current deep dives, open points/);
   assert.match(payload.text, /Existing founder team/);
   assert.match(payload.text, new RegExp(escapeRegExp(INVITE_URL)));
 });
@@ -69,10 +70,12 @@ test("advisor team founder invite email renders English and preserves token URL"
     locale: "en",
   });
 
-  assert.equal(payload.subject, "Alex invited you into a founder matching");
+  assert.equal(payload.subject, "Alex invited you to Cofoundery");
   assert.match(payload.html, /<html lang="en">/);
-  assert.match(payload.html, /Start matching/);
-  assert.match(payload.text, /Once Noah has also started/);
+  assert.match(payload.html, /View invitation/);
+  assert.match(payload.text, /Once Noah has also accepted/);
+  assert.match(payload.text, /Founder Setup remains separate/);
+  assert.match(payload.text, /Commitment Lab, deep dives, and open points remain private/);
   assert.match(payload.html, new RegExp(escapeRegExp(INVITE_URL)));
   assert.match(payload.text, new RegExp(escapeRegExp(INVITE_URL)));
 });
@@ -85,9 +88,9 @@ test("invalid email locale falls back to German", () => {
     locale: "fr",
   });
 
-  assert.equal(payload.subject, "Einladung in ein Founder-Matching");
+  assert.equal(payload.subject, "Deine Einladung zu CoFoundery");
   assert.match(payload.html, /<html lang="de">/);
-  assert.match(payload.text, /Du wurdest in ein strukturiertes Founder-Matching/);
+  assert.match(payload.text, /Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung/);
 });
 
 function escapeRegExp(value: string) {

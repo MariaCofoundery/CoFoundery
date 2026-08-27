@@ -17,7 +17,12 @@
       "description": "Capture important shared understandings about collaboration, ownership, and change.",
       "notStarted": "Not started yet",
       "started": "Already started",
-      "open": "Open Founder Setup"
+      "open": "Open Founder Setup",
+      "advisorTask": {
+        "title": "Founder Setup: advisor sharing awaits your approval",
+        "description": "Review the separate sharing of confirmed Founder Setup content.",
+        "cta": "Review"
+      }
     },
     "alignment": {
       "title": "Alignment",
@@ -42,13 +47,36 @@
     },
     "advisor": {
       "title": "Advisor",
-      "description": "Advisor access to your existing alignment areas.",
+      "description": "You can approve an advisor for this founder connection. Founder Setup is shared separately and only for confirmed content; Commitment Lab, deep dives, and open points remain private.",
+      "name": "Name",
+      "email": "Email",
+      "propose": "Propose advisor",
+      "approve": "Approve",
+      "invite": "Invite advisor",
+      "resend": "Resend",
+      "revoke": "Revoke advisor access",
+      "confirmRevoke": "Revoke access now",
+      "revokeDescription": "The advisor loses access to the shared areas of this connection. Separate team grants such as Founder Setup also become ineffective while this advisor access is revoked.",
+      "ownApprovalSaved": "Your approval is saved.",
+      "otherFounder": "the other founder",
+      "founderA": "Founder A",
+      "founderB": "Founder B",
+      "advisorFallback": "Advisor",
+      "states": {
+        "waitingOther": "Waiting for approval from {name}.",
+        "needsYourApproval": "Advisor access awaits your approval.",
+        "approved": "Approval confirmed. The invitation can now be sent.",
+        "invited": "Invitation sent.",
+        "linked": "Advisor connected.",
+        "revoked": "Access revoked."
+      },
       "pair": "Access for {names}",
       "statuses": {
         "pending": "Approval open",
         "approved": "Approved",
         "invited": "Invited",
-        "linked": "Connected"
+        "linked": "Connected",
+        "revoked": "Revoked"
       }
     }
   },

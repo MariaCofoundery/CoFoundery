@@ -68,7 +68,7 @@ export function AdvisorTeamInviteForm() {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.04)] md:p-7">
+    <section id="advisor-invite-form" className="scroll-mt-24 rounded-[32px] border border-slate-200/80 bg-white/95 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.04)] md:p-7">
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
@@ -228,6 +228,14 @@ export function AdvisorTeamInviteForm() {
                   {t("dashboard.inviteTeam.emailDeliveryFailed")}
                 </p>
               ) : null}
+              <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+                <p className="rounded-xl border border-current/10 bg-white/70 px-3 py-2">
+                  Founder A · {result.founderAEmail}: {t(`dashboard.statuses.${result.founderAEmailStatus === "sent" ? "invitationSent" : "sendFailed"}`)}
+                </p>
+                <p className="rounded-xl border border-current/10 bg-white/70 px-3 py-2">
+                  Founder B · {result.founderBEmail}: {t(`dashboard.statuses.${result.founderBEmailStatus === "sent" ? "invitationSent" : "sendFailed"}`)}
+                </p>
+              </div>
               {result.emailStatus !== "sent" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <InviteLinkRow

@@ -129,20 +129,20 @@ export function getAdvisorInviteEmailCopy(
   if (locale === "en") {
     return {
       htmlLang: "en",
-      subject: `${input.founderAName} and ${input.founderBName} would like to involve you as an advisor`,
-      preheader: `Personal advisor invitation from ${input.founderAName} and ${input.founderBName} for Cofoundery Align.`,
+      subject: `${input.founderAName} and ${input.founderBName} invited you as their advisor`,
+      preheader: `Advisor invitation for the founder connection between ${input.founderAName} and ${input.founderBName}.`,
       eyebrow: "Personal advisor invitation",
       greeting: advisorGreeting,
-      founderLine: `${input.founderAName} and ${input.founderBName} would like to involve you as an advisor in their Cofoundery Align context.`,
+      founderLine: `${input.founderAName} and ${input.founderBName} invited you as an advisor for their founder connection in Cofoundery.`,
       productIntro:
         "Cofoundery Align helps founder teams make differences visible early, understand tension better, and structure important conversations.",
       accessIntro:
-        "As an advisor, you get access to the shared team context, the workbook, and the advisor report so you can add observations, questions, and useful next steps.",
+        "Once you accept, you can access the advisor and alignment areas intended for this connection. Founder Setup requires a separate approval from every current founder.",
       listTitle: "What you can see",
       bullets: [
-        "the shared team context and relevant founder perspectives",
-        "the workbook with the team’s current working state",
-        "the advisor report as a structured foundation for your support",
+        "the advisor report and the alignment context intended for advisors",
+        "historical workbook content, where it exists",
+        "not Commitment Lab, current deep dives, open points, or unconfirmed Founder Setup content",
       ],
       teamLabel: "Team/project",
       contextLabel: "Context",
@@ -156,20 +156,20 @@ export function getAdvisorInviteEmailCopy(
 
   return {
     htmlLang: "de",
-    subject: `${input.founderAName} und ${input.founderBName} möchten Sie als Advisor einbinden`,
-    preheader: `Persönliche Advisor-Einladung von ${input.founderAName} und ${input.founderBName} für Cofoundery Align.`,
+    subject: `${input.founderAName} und ${input.founderBName} laden Sie als Advisor ein`,
+    preheader: `Advisor-Einladung für die Founder-Verbindung von ${input.founderAName} und ${input.founderBName}.`,
     eyebrow: "Persönliche Advisor-Einladung",
     greeting: advisorGreeting,
-    founderLine: `${input.founderAName} und ${input.founderBName} möchten Sie gezielt als Advisor in ihren Cofoundery-Align-Kontext einbinden.`,
+    founderLine: `${input.founderAName} und ${input.founderBName} haben Sie als Advisor für ihre Founder-Verbindung in Cofoundery eingeladen.`,
     productIntro:
       "Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.",
     accessIntro:
-      "Als Advisor erhalten Sie Zugriff auf den freigegebenen Teamkontext, das gemeinsame Workbook und den Advisor-Report, um Beobachtungen, Rückfragen und nächste sinnvolle Schritte beizutragen.",
+      "Nach der Annahme erhalten Sie Zugriff auf die dafür vorgesehenen Advisor- und Alignment-Bereiche dieser Verbindung. Founder Setup wird nur separat und mit Zustimmung aller aktuellen Founder freigegeben.",
     listTitle: "Was Sie sehen können",
     bullets: [
-      "den freigegebenen Teamkontext und die relevanten Founder-Perspektiven",
-      "das Workbook mit den aktuellen Arbeitsständen des Teams",
-      "den Advisor-Report als strukturierte Grundlage für Ihre Begleitung",
+      "den Advisor-Report und den für Advisors vorgesehenen Alignment-Kontext",
+      "historische Workbook-Inhalte, soweit vorhanden",
+      "nicht Commitment Lab, aktuelle Deep Dives, offene Punkte oder unbestätigte Founder-Setup-Inhalte",
     ],
     teamLabel: "Team/Projekt",
     contextLabel: "Kontext",
@@ -203,30 +203,30 @@ export function getAdvisorTeamFounderInviteEmailCopy(
     return {
       htmlLang: "en",
       subject: advisorName
-        ? `${advisorName} invited you into a founder matching`
-        : "Invitation to a founder matching",
+        ? `${advisorName} invited you to Cofoundery`
+        : "Your invitation to Cofoundery",
       preheader:
-        "Invitation into an advisor-initiated founder matching in Cofoundery Align.",
+        "Invitation to a shared founder connection in Cofoundery.",
       eyebrow: "Founder invitation",
       greeting: "Hi,",
       advisorLine: advisorName
-        ? `${advisorName} would like to invite you into a structured founder matching with Cofoundery Align.`
-        : "You’ve been invited into a structured founder matching with Cofoundery Align.",
+        ? `${advisorName} would like to support both of you as founders in Cofoundery.`
+        : "An advisor invited both of you to a shared founder connection in Cofoundery.",
       counterpartLine: counterpartLabel
-        ? `Once ${counterpartLabel} has also started, your shared matching context will be created automatically.`
-        : "Once the second founder has also started, your shared matching context will be created automatically.",
+        ? `Once ${counterpartLabel} has also accepted, the founder connection and advisor access for its designated areas will be activated.`
+        : "Once the second founder has also accepted, the founder connection and advisor access for its designated areas will be activated.",
       startConfirmation:
-        "With this step, you only confirm your start in the flow.",
+        "By accepting, you confirm your part of this founder connection. Both founders must accept separately.",
       listTitle: "What happens next",
       bullets: [
-        "a shared matching context for both founders",
-        "an Alignment Workbook once both of you have started",
-        "a clear progress view for the advisor supporting you",
+        "the relationship and alignment areas intended for advisor access",
+        "Founder Setup remains separate and requires approval from every current founder",
+        "Commitment Lab, deep dives, and open points remain private",
       ],
       teamLabel: "Team/project",
       contextLabel: "Context",
-      contextValue: "Founder matching",
-      cta: "Start matching",
+      contextValue: "Pairwise founder connection",
+      cta: "View invitation",
       fallback: "If the button does not work, you can also open this link directly:",
       footerReason:
         "You are receiving this email because an advisor specifically invited you into a founder matching.",
@@ -238,31 +238,31 @@ export function getAdvisorTeamFounderInviteEmailCopy(
 
   return {
     htmlLang: "de",
-    subject: advisorName
-      ? `${advisorName} lädt dich in ein Founder-Matching ein`
-      : "Einladung in ein Founder-Matching",
+      subject: advisorName
+      ? `${advisorName} lädt dich zu CoFoundery ein`
+      : "Deine Einladung zu CoFoundery",
     preheader:
-      "Einladung in ein von einem Advisor initiiertes Founder-Matching bei Cofoundery Align.",
+      "Einladung zu einer gemeinsamen Founder-Verbindung in CoFoundery.",
     eyebrow: "Founder-Einladung",
     greeting: "Hi,",
     advisorLine: advisorName
-      ? `${advisorName} möchte euch in ein strukturiertes Founder-Matching mit Cofoundery Align einladen.`
-      : "Du wurdest in ein strukturiertes Founder-Matching mit Cofoundery Align eingeladen.",
+      ? `${advisorName} möchte euch als Founder in CoFoundery begleiten.`
+      : "Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung in CoFoundery eingeladen.",
     counterpartLine: counterpartLabel
-      ? `Sobald auch ${counterpartLabel} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.`
-      : "Sobald auch die zweite Founder-Person gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch angelegt.",
+      ? `Sobald auch ${counterpartLabel} angenommen hat, werden eure Founder-Verbindung und der Advisor-Zugang für die vorgesehenen Bereiche aktiviert.`
+      : "Sobald auch die zweite Founder-Person angenommen hat, werden eure Founder-Verbindung und der Advisor-Zugang für die vorgesehenen Bereiche aktiviert.",
     startConfirmation:
-      "Mit diesem Schritt bestätigst du nur deinen Start in den Flow.",
+      "Mit der Annahme bestätigst du deinen Teil dieser Founder-Verbindung. Beide Founder müssen jeweils selbst annehmen.",
     listTitle: "Was danach entsteht",
     bullets: [
-      "ein gemeinsamer Matching-Kontext für beide Founder",
-      "ein Alignment-Workbook, sobald ihr beide gestartet habt",
-      "ein sauberer Fortschrittsblick für eure begleitende Advisor-Person",
+      "die für Advisors vorgesehenen Relationship- und Alignment-Bereiche",
+      "Founder Setup bleibt separat und braucht die Zustimmung aller aktuellen Founder",
+      "Commitment Lab, Deep Dives und offene Punkte bleiben privat",
     ],
     teamLabel: "Team/Projekt",
     contextLabel: "Kontext",
-    contextValue: "Founder-Matching",
-    cta: "Matching starten",
+    contextValue: "Paarweise Founder-Verbindung",
+    cta: "Einladung ansehen",
     fallback: "Falls der Button nicht funktioniert, kannst du auch direkt diesen Link öffnen:",
     footerReason:
       "Du erhältst diese E-Mail, weil du von einer Advisor-Person gezielt in ein Founder-Matching eingeladen wurdest.",

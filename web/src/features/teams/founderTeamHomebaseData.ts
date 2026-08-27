@@ -144,7 +144,7 @@ export async function getFounderTeamHomebase(
       .order("updated_at", { ascending: false }),
     supabase
       .from("relationship_advisors")
-      .select("id, relationship_id, status")
+      .select("id, relationship_id, advisor_name, founder_a_approved, founder_b_approved, linked_at, status")
       .in("relationship_id", relationshipIds),
     namesPromise,
   ]);

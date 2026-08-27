@@ -26,6 +26,12 @@ type AdvisorTeamInviteRow = {
   relationship_id: string | null;
   status: "pending" | "activating" | "activated" | "revoked" | "expired";
   expires_at: string;
+  founder_a_send_status: "not_sent" | "sent" | "failed";
+  founder_b_send_status: "not_sent" | "sent" | "failed";
+  founder_a_last_sent_at: string | null;
+  founder_b_last_sent_at: string | null;
+  founder_a_send_error_code: string | null;
+  founder_b_send_error_code: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -70,7 +76,12 @@ export type AdvisorPendingTeamInvite = {
   founderBStarted: boolean;
   founderAStartedAt: string | null;
   founderBStartedAt: string | null;
-  status: "pending";
+  founderASendStatus: "not_sent" | "sent" | "failed";
+  founderBSendStatus: "not_sent" | "sent" | "failed";
+  founderALastSentAt: string | null;
+  founderBLastSentAt: string | null;
+  expiresAt: string;
+  status: "pending" | "expired";
   progressLabel: string;
   nextStepLabel: string;
   lastActivityAt: string;
@@ -217,11 +228,10 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
   const { data, error } = await supabase
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, founder_a_send_status, founder_b_send_status, founder_a_last_sent_at, founder_b_last_sent_at, founder_a_send_error_code, founder_b_send_error_code, created_at, updated_at"
     )
     .eq("advisor_user_id", normalizedUserId)
-    .eq("status", "pending")
-    .gt("expires_at", new Date().toISOString())
+    .in("status", ["pending", "expired"])
     .order("updated_at", { ascending: false });
 
   if (error || !data) {
@@ -276,7 +286,12 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
       founderBStarted: Boolean(row.founder_b_claimed_at),
       founderAStartedAt: row.founder_a_claimed_at,
       founderBStartedAt: row.founder_b_claimed_at,
-      status: "pending",
+      founderASendStatus: row.founder_a_send_status,
+      founderBSendStatus: row.founder_b_send_status,
+      founderALastSentAt: row.founder_a_last_sent_at,
+      founderBLastSentAt: row.founder_b_last_sent_at,
+      expiresAt: row.expires_at,
+      status: row.status === "expired" || Date.parse(row.expires_at) <= Date.now() ? "expired" : "pending",
       progressLabel: buildPendingProgressLabel(row),
       nextStepLabel: buildPendingNextStepLabel(row),
       lastActivityAt,
@@ -291,7 +306,7 @@ async function loadAdvisorTeamInviteByTokenHash(
   const { data, error } = await client
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, founder_a_send_status, founder_b_send_status, founder_a_last_sent_at, founder_b_last_sent_at, founder_a_send_error_code, founder_b_send_error_code, created_at, updated_at"
     )
     .or(`founder_a_token_hash.eq.${tokenHash},founder_b_token_hash.eq.${tokenHash}`)
     .in("status", ["pending", "activating"])
@@ -326,7 +341,7 @@ async function loadAdvisorTeamInviteById(
   const { data, error } = await client
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, founder_a_send_status, founder_b_send_status, founder_a_last_sent_at, founder_b_last_sent_at, founder_a_send_error_code, founder_b_send_error_code, created_at, updated_at"
     )
     .eq("id", normalizedId)
     .maybeSingle();

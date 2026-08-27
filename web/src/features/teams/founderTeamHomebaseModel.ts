@@ -15,6 +15,7 @@ export type FounderTeamMemberSummary = {
 export type FounderTeamAlignmentEntry = {
   relationshipId: string;
   participantUserIds: [string, string];
+  sourceInvitationId: string | null;
   classicReport: { href: string; createdAt: string } | null;
   workbook: { href: string; updatedAt: string; exists: boolean } | null;
   matchingReport: { href: string; createdAt: string } | null;
@@ -33,7 +34,11 @@ export type FounderTeamAdvisorEntry = {
   id: string;
   relationshipId: string;
   participantUserIds: [string, string];
-  status: "pending" | "approved" | "invited" | "linked";
+  advisorName: string | null;
+  founderAApproved: boolean;
+  founderBApproved: boolean;
+  linkedAt: string | null;
+  status: "pending" | "approved" | "invited" | "linked" | "revoked";
 };
 
 export type FounderTeamHomebase = {
@@ -110,6 +115,10 @@ export type MatchingWorkspaceAgreementRow = {
 export type RelationshipAdvisorRow = {
   id: string;
   relationship_id: string;
+  advisor_name?: string | null;
+  founder_a_approved?: boolean;
+  founder_b_approved?: boolean;
+  linked_at?: string | null;
   status: string;
 };
 
@@ -303,6 +312,7 @@ export function buildFounderTeamHomebaseReadModel(params: {
     return {
       relationshipId: relationship.id,
       participantUserIds: [relationship.user_a_id, relationship.user_b_id],
+      sourceInvitationId: classicReport?.invitation_id ?? null,
       classicReport: classicReport
         ? {
             href: `/report/${encodeURIComponent(classicReport.invitation_id)}`,
@@ -385,10 +395,11 @@ export function buildFounderTeamHomebaseReadModel(params: {
   }
 
   const advisors = rows.advisors.flatMap<FounderTeamAdvisorEntry>((advisor) => {
-    if (!relationshipIds.has(advisor.relationship_id) || advisor.status === "revoked") return [];
+    if (!relationshipIds.has(advisor.relationship_id)) return [];
     const relationship = relationships.find((row) => row.id === advisor.relationship_id);
     if (!relationship) return [];
     const status =
+      advisor.status === "revoked" ||
       advisor.status === "linked" ||
       advisor.status === "approved" ||
       advisor.status === "invited"
@@ -399,6 +410,10 @@ export function buildFounderTeamHomebaseReadModel(params: {
         id: advisor.id,
         relationshipId: relationship.id,
         participantUserIds: [relationship.user_a_id, relationship.user_b_id],
+        advisorName: advisor.advisor_name ?? null,
+        founderAApproved: advisor.founder_a_approved === true,
+        founderBApproved: advisor.founder_b_approved === true,
+        linkedAt: advisor.linked_at ?? null,
         status,
       },
     ];

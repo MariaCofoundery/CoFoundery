@@ -17,7 +17,12 @@
       "description": "Haltet wichtige Absprachen rund um Zusammenarbeit, Beteiligung und Veränderungen gemeinsam fest.",
       "notStarted": "Noch nicht gestartet",
       "started": "Bereits gestartet",
-      "open": "Founder Setup öffnen"
+      "open": "Founder Setup öffnen",
+      "advisorTask": {
+        "title": "Founder Setup: Advisor-Freigabe wartet auf deine Zustimmung",
+        "description": "Prüfe die separate Freigabe bestätigter Founder-Setup-Inhalte.",
+        "cta": "Prüfen"
+      }
     },
     "alignment": {
       "title": "Alignment",
@@ -42,13 +47,36 @@
     },
     "advisor": {
       "title": "Advisor",
-      "description": "Advisor-Zugänge zu euren bestehenden Alignment-Bereichen.",
+      "description": "Ihr könnt einen Advisor für diese Founder-Verbindung freigeben. Founder Setup wird separat und nur für bestätigte Inhalte geteilt; Commitment Lab, Deep Dives und offene Punkte bleiben privat.",
+      "name": "Name",
+      "email": "E-Mail",
+      "propose": "Advisor vorschlagen",
+      "approve": "Zustimmen",
+      "invite": "Advisor einladen",
+      "resend": "Erneut senden",
+      "revoke": "Advisor-Zugriff widerrufen",
+      "confirmRevoke": "Zugriff jetzt widerrufen",
+      "revokeDescription": "Der Advisor verliert den Zugriff auf die freigegebenen Bereiche dieser Verbindung. Separate Teamfreigaben wie Founder Setup werden ebenfalls unwirksam, solange dieser Advisor-Zugang widerrufen ist.",
+      "ownApprovalSaved": "Deine Zustimmung ist gespeichert.",
+      "otherFounder": "dem anderen Founder",
+      "founderA": "Founder A",
+      "founderB": "Founder B",
+      "advisorFallback": "Advisor",
+      "states": {
+        "waitingOther": "Wartet auf Zustimmung von {name}.",
+        "needsYourApproval": "Advisor-Freigabe wartet auf deine Zustimmung.",
+        "approved": "Freigabe bestätigt. Die Einladung kann versendet werden.",
+        "invited": "Einladung gesendet.",
+        "linked": "Advisor verbunden.",
+        "revoked": "Zugriff widerrufen."
+      },
       "pair": "Zugang für {names}",
       "statuses": {
         "pending": "Freigabe offen",
         "approved": "Freigegeben",
         "invited": "Eingeladen",
-        "linked": "Verbunden"
+        "linked": "Verbunden",
+        "revoked": "Widerrufen"
       }
     }
   },

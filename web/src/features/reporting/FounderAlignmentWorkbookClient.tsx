@@ -3572,17 +3572,26 @@ export function FounderAlignmentWorkbookClient({
                             {wt("advisor.prepareDescription")}
                           </p>
                           <div className="mt-4">
-                            <button
-                              type="button"
-                              onClick={() => setIsAdvisorSectionExpanded((current) => !current)}
-                              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
-                            >
-                              {isAdvisorSectionExpanded ? wt("advisor.hide") : wt("advisor.show")}
-                            </button>
+                            {deepDiveHandoffState?.teamId ? (
+                              <Link
+                                href={`/teams/${encodeURIComponent(deepDiveHandoffState.teamId)}#relationship-advisor-access`}
+                                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+                              >
+                                {wt("advisor.manageInConnection")}
+                              </Link>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setIsAdvisorSectionExpanded((current) => !current)}
+                                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+                              >
+                                {isAdvisorSectionExpanded ? wt("advisor.hide") : wt("advisor.show")}
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        {isAdvisorSectionExpanded ? (
+                        {isAdvisorSectionExpanded && !deepDiveHandoffState?.teamId ? (
                           <div className="mt-4 rounded-2xl border border-white/80 bg-white/92 p-3">
                             <div className="space-y-3">
                               {advisorEntriesState.length > 0 ? (

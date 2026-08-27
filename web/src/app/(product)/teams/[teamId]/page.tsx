@@ -4,11 +4,13 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
 import {
   getFounderTeamHomebase,
   type FounderTeamHomebase,
 } from "@/features/teams/founderTeamHomebaseData";
 import { getFounderSetupStarted } from "@/features/teams/founderSetupData";
+import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvisorAccessData";
 
 type TeamHomebasePageProps = {
   params: Promise<{ teamId: string }>;
@@ -54,8 +56,9 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
-  const [setupState, labStateResult] = await Promise.all([
+  const [setupState, setupAdvisorAccess, labStateResult] = await Promise.all([
     getFounderSetupStarted(teamId, user.id, supabase),
+    getFounderSetupAdvisorAccess(teamId, supabase),
     team.alignment.length
       ? supabase.from("commitment_labs").select("relationship_id").in("relationship_id", team.alignment.map((entry) => entry.relationshipId))
       : Promise.resolve({ data: [], error: null }),
@@ -79,6 +82,9 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
     team.teamContext === "existing_team"
       ? t("context.existingTeam")
       : t("context.preFounder");
+  const pendingSetupAdvisorTask = setupAdvisorAccess.find(
+    (entry) => Boolean(entry.grantId) && !entry.accessActive && !entry.consentedFounderUserIds.includes(user.id)
+  );
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
@@ -230,6 +236,13 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             {t("setup.title")}
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
+          {pendingSetupAdvisorTask ? (
+            <div className="mt-4 rounded-xl border border-violet-200 bg-white/80 p-4">
+              <p className="text-sm font-semibold text-slate-900">{t("setup.advisorTask.title")}</p>
+              <p className="mt-1 text-sm leading-6 text-slate-600">{t("setup.advisorTask.description")}</p>
+              <Link href={`/teams/${teamId}/setup#advisor-setup-access`} className={`${LINK_CLASS} mt-3`}>{t("setup.advisorTask.cta")}</Link>
+            </div>
+          ) : null}
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-medium text-slate-700">
               {setupState?.started ? t("setup.started") : t("setup.notStarted")}
@@ -283,34 +296,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           )}
         </section>
 
-        {team.advisors.length > 0 ? (
-          <section className={SECTION_CLASS} aria-labelledby="team-advisor-title">
-            <h2 id="team-advisor-title" className="text-xl font-semibold text-slate-950">
-              {t("advisor.title")}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("advisor.description")}
-            </p>
-            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-              {team.advisors.map((advisor) => {
-                const participants = pairName(advisor.participantUserIds, names, fallback);
-                return (
-                  <li
-                    key={advisor.id}
-                    className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
-                  >
-                    <p className="text-sm font-semibold text-slate-900">
-                      {t("advisor.pair", { names: participants })}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      {t(`advisor.statuses.${advisor.status}`)}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ) : null}
+        <FounderRelationshipAdvisorPanel team={team} currentUserId={user.id} names={names} />
+
       </div>
     </main>
   );

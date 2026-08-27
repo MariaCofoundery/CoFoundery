@@ -487,6 +487,7 @@
     "context": "Advisor context",
     "otherFounder": "the other founder",
     "guidance": "Advisor guidance",
+    "manageInConnection": "Manage advisor access in your founder connection",
     "rolesHint": "Approval and role guidance",
     "access": "Advisor access",
     "accessDetails": "Open only if needed: this shows the approval status and the frame for your role.",
