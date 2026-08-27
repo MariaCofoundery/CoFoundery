@@ -8,9 +8,7 @@
     "loadError": "The dashboard could not be loaded completely right now. Please try again."
   },
   "actions": {
-    "startAlignment": "Start Founder Alignment",
     "continueAlignment": "Continue Founder Alignment",
-    "openAlignmentReport": "View alignment report",
     "openTeam": "Open team",
     "openConnections": "Open connections",
     "continueValues": "Continue values profile",
@@ -24,13 +22,9 @@
     "signOutAll": "End all sessions"
   },
   "heroPanel": {
-    "startAlignmentTitle": "Create your personal foundation.",
-    "startAlignmentText": "Reflect on your perspectives about collaboration, decisions, and building a company.",
     "continueAlignmentTitle": "Continue your Founder Alignment.",
     "continueAlignmentText": "Pick up your personal reflection where you left off.",
     "continueValuesText": "Continue the optional values reflection you already started.",
-    "reportTitle": "Your alignment report is available.",
-    "reportText": "Open your shared result and compare your perspectives.",
     "teamTitle": "Continue your work together.",
     "teamText": "Open your team homebase for your current shared work.",
     "connectionsTitle": "Open your founder connections.",
@@ -41,9 +35,79 @@
   },
   "sectionNavigation": {
     "label": "Dashboard sections",
+    "tasks": "What needs your attention",
     "foundation": "Your foundation",
     "connections": "Your connections and teams",
     "outlook": "Outlook"
+  },
+  "tasks": {
+    "eyebrow": "Current work",
+    "title": "What needs your attention",
+    "description": "Only concrete actions and work you already started and can continue.",
+    "showAll": "Show all",
+    "showLess": "Show less",
+    "empty": {
+      "title": "Nothing is waiting for you right now.",
+      "text": "You can open your connections and teams whenever you want to continue."
+    },
+    "kinds": {
+      "NEEDS_YOU": "Waiting for you",
+      "CONTINUE_PERSONAL": "Continue personally",
+      "CONTINUE_SHARED": "Continue together"
+    },
+    "context": {
+      "connection": "Your founder connection",
+      "setupTopic": "Founder Setup topic"
+    },
+    "items": {
+      "incomingInvitation": {
+        "title": "Respond to founder invitation",
+        "titleWithName": "Respond to {name}'s invitation",
+        "text": "A founder connection is waiting for your response or details you still need to add.",
+        "action": "View invitation"
+      },
+      "discoveryIntro": {
+        "title": "New request through Find a Co-Founder",
+        "text": "You can now review and respond to the intro request.",
+        "action": "View request"
+      },
+      "relationshipAdvisor": {
+        "title": "Review advisor access",
+        "text": "Advisor access for {context} is waiting for your consent.",
+        "action": "Review"
+      },
+      "setupAdvisor": {
+        "title": "{context}: review advisor access",
+        "text": "Your consent to confirmed-only Founder Setup access is still missing.",
+        "action": "Open Founder Setup"
+      },
+      "setupConfirmation": {
+        "title": "{context}: confirm agreement",
+        "text": "A shared version of “{topic}” is ready for confirmation.",
+        "action": "View"
+      },
+      "founderAlignment": {
+        "title": "Continue Founder Alignment",
+        "text": "You can continue the personal reflection you already started.",
+        "action": "Continue"
+      },
+      "values": {
+        "title": "Continue values profile",
+        "text": "You started this optional values reflection and can continue it.",
+        "action": "Continue"
+      },
+      "commitmentLab": {
+        "title": "Continue Commitment Lab",
+        "titleWithName": "Continue Commitment Lab with {name}",
+        "text": "The Commitment Lab has already been started in {context}.",
+        "action": "Continue"
+      },
+      "founderSetup": {
+        "title": "{context}: continue Founder Setup",
+        "text": "You already started working together on “{topic}”.",
+        "action": "Continue"
+      }
+    }
   },
   "foundation": {
     "eyebrow": "Personal foundation",

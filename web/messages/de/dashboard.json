@@ -8,9 +8,7 @@
     "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut."
   },
   "actions": {
-    "startAlignment": "Founder Alignment starten",
     "continueAlignment": "Founder Alignment fortsetzen",
-    "openAlignmentReport": "Alignment Report ansehen",
     "openTeam": "Team öffnen",
     "openConnections": "Verbindungen öffnen",
     "continueValues": "Werteprofil fortsetzen",
@@ -24,13 +22,9 @@
     "signOutAll": "Alle Sitzungen beenden"
   },
   "heroPanel": {
-    "startAlignmentTitle": "Lege deine persönliche Grundlage an.",
-    "startAlignmentText": "Reflektiere deine Perspektiven auf Zusammenarbeit, Entscheidungen und Gründung.",
     "continueAlignmentTitle": "Setze dein Founder Alignment fort.",
     "continueAlignmentText": "Mach dort weiter, wo du deine persönliche Reflexion unterbrochen hast.",
     "continueValuesText": "Setze deine bereits begonnene optionale Werte-Reflexion fort.",
-    "reportTitle": "Euer Alignment Report ist verfügbar.",
-    "reportText": "Öffne euer gemeinsames Ergebnis und vergleicht eure Perspektiven.",
     "teamTitle": "Setzt eure Zusammenarbeit im Team fort.",
     "teamText": "Öffne eure Homebase für die aktuelle gemeinsame Arbeit.",
     "connectionsTitle": "Öffne deine Founder-Verbindungen.",
@@ -41,9 +35,79 @@
   },
   "sectionNavigation": {
     "label": "Dashboard-Abschnitte",
+    "tasks": "Was gerade ansteht",
     "foundation": "Deine Grundlage",
     "connections": "Deine Verbindungen und Teams",
     "outlook": "Ausblick"
+  },
+  "tasks": {
+    "eyebrow": "Aktuelle Arbeit",
+    "title": "Was gerade ansteht",
+    "description": "Nur konkrete Aufgaben und bereits begonnene Arbeit, die du fortsetzen kannst.",
+    "showAll": "Alle anzeigen",
+    "showLess": "Weniger anzeigen",
+    "empty": {
+      "title": "Aktuell wartet nichts auf dich.",
+      "text": "Du kannst deine Verbindungen und Teams jederzeit weiter öffnen."
+    },
+    "kinds": {
+      "NEEDS_YOU": "Wartet auf dich",
+      "CONTINUE_PERSONAL": "Persönlich fortsetzen",
+      "CONTINUE_SHARED": "Gemeinsam fortsetzen"
+    },
+    "context": {
+      "connection": "Eure Founder-Verbindung",
+      "setupTopic": "Founder-Setup-Thema"
+    },
+    "items": {
+      "incomingInvitation": {
+        "title": "Founder-Einladung beantworten",
+        "titleWithName": "Einladung von {name} beantworten",
+        "text": "Eine Founder-Verbindung wartet auf deine Antwort oder deine noch offenen Angaben.",
+        "action": "Einladung ansehen"
+      },
+      "discoveryIntro": {
+        "title": "Neue Anfrage über Co-Founder finden",
+        "text": "Du kannst die Intro-Anfrage jetzt ansehen und beantworten.",
+        "action": "Anfrage ansehen"
+      },
+      "relationshipAdvisor": {
+        "title": "Advisor-Freigabe prüfen",
+        "text": "Für {context} wartet eine Advisor-Freigabe auf deine Zustimmung.",
+        "action": "Prüfen"
+      },
+      "setupAdvisor": {
+        "title": "{context}: Advisor-Freigabe prüfen",
+        "text": "Deine Zustimmung zur Freigabe ausschließlich bestätigter Founder-Setup-Inhalte fehlt noch.",
+        "action": "Founder Setup öffnen"
+      },
+      "setupConfirmation": {
+        "title": "{context}: Vereinbarung bestätigen",
+        "text": "Für „{topic}“ liegt ein gemeinsamer Stand zur Bestätigung vor.",
+        "action": "Ansehen"
+      },
+      "founderAlignment": {
+        "title": "Founder Alignment fortsetzen",
+        "text": "Du kannst deine bereits begonnene persönliche Reflexion fortsetzen.",
+        "action": "Fortsetzen"
+      },
+      "values": {
+        "title": "Werteprofil fortsetzen",
+        "text": "Deine optionale Werte-Reflexion wurde begonnen und kann fortgesetzt werden.",
+        "action": "Fortsetzen"
+      },
+      "commitmentLab": {
+        "title": "Commitment Lab fortsetzen",
+        "titleWithName": "Commitment Lab mit {name} fortsetzen",
+        "text": "In {context} wurde das Commitment Lab bereits begonnen.",
+        "action": "Fortsetzen"
+      },
+      "founderSetup": {
+        "title": "{context}: Founder Setup fortsetzen",
+        "text": "Am Thema „{topic}“ wurde bereits gemeinsam gearbeitet.",
+        "action": "Fortsetzen"
+      }
+    }
   },
   "foundation": {
     "eyebrow": "Persönliche Grundlage",

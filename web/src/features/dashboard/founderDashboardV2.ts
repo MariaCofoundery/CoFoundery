@@ -1,9 +1,7 @@
 export type DashboardHeroActionKind =
   | "incoming_invitation"
-  | "founder_alignment_start"
   | "founder_alignment_continue"
   | "values_continue"
-  | "alignment_report"
   | "open_team"
   | "open_connections"
   | "invite_cofounder";
@@ -13,18 +11,14 @@ export function resolveDashboardHeroAction(params: {
   hasSubmittedFounderAlignment: boolean;
   hasStartedFounderAlignment: boolean;
   hasStartedValues: boolean;
-  hasAlignmentReport: boolean;
   hasTeam: boolean;
   hasConnectionActivity: boolean;
 }): DashboardHeroActionKind {
   if (params.hasIncomingInvitation) return "incoming_invitation";
-  if (!params.hasSubmittedFounderAlignment) {
-    return params.hasStartedFounderAlignment
-      ? "founder_alignment_continue"
-      : "founder_alignment_start";
+  if (params.hasStartedFounderAlignment && !params.hasSubmittedFounderAlignment) {
+    return "founder_alignment_continue";
   }
   if (params.hasStartedValues) return "values_continue";
-  if (params.hasAlignmentReport) return "alignment_report";
   if (params.hasTeam) return "open_team";
   if (params.hasConnectionActivity) return "open_connections";
   return "invite_cofounder";

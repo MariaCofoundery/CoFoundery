@@ -46,7 +46,6 @@ test("dashboard hero prioritizes an incoming invitation over all other states", 
       hasSubmittedFounderAlignment: true,
       hasStartedFounderAlignment: true,
       hasStartedValues: true,
-      hasAlignmentReport: true,
       hasTeam: true,
       hasConnectionActivity: true,
     }),
@@ -61,7 +60,6 @@ test("dashboard hero continues personal work without making unopened values mand
       hasSubmittedFounderAlignment: false,
       hasStartedFounderAlignment: true,
       hasStartedValues: false,
-      hasAlignmentReport: false,
       hasTeam: false,
       hasConnectionActivity: false,
     }),
@@ -74,11 +72,10 @@ test("dashboard hero continues personal work without making unopened values mand
       hasSubmittedFounderAlignment: true,
       hasStartedFounderAlignment: true,
       hasStartedValues: false,
-      hasAlignmentReport: true,
       hasTeam: true,
       hasConnectionActivity: true,
     }),
-    "alignment_report"
+    "open_team"
   );
 
   assert.equal(
@@ -87,12 +84,38 @@ test("dashboard hero continues personal work without making unopened values mand
       hasSubmittedFounderAlignment: true,
       hasStartedFounderAlignment: true,
       hasStartedValues: true,
-      hasAlignmentReport: true,
       hasTeam: true,
       hasConnectionActivity: true,
     }),
     "values_continue"
   );
+
+  assert.equal(
+    resolveDashboardHeroAction({
+      hasIncomingInvitation: false,
+      hasSubmittedFounderAlignment: false,
+      hasStartedFounderAlignment: false,
+      hasStartedValues: false,
+      hasTeam: false,
+      hasConnectionActivity: false,
+    }),
+    "invite_cofounder"
+  );
+});
+
+test("an old alignment report does not become a persistent hero action", () => {
+  assert.equal(
+    resolveDashboardHeroAction({
+      hasIncomingInvitation: false,
+      hasSubmittedFounderAlignment: true,
+      hasStartedFounderAlignment: true,
+      hasStartedValues: false,
+      hasTeam: false,
+      hasConnectionActivity: true,
+    }),
+    "open_connections"
+  );
+  assert.doesNotMatch(dashboardSource, /case "alignment_report"/);
 });
 
 test("foundation states remain factual and independent", () => {
@@ -136,6 +159,7 @@ test("personal hero, quote, foundation and connections remain visible", () => {
 
 test("right-side section navigation points only to existing V2 sections", () => {
   for (const id of [
+    "dashboard-block-tasks",
     "dashboard-block-foundation",
     "dashboard-block-connections",
     "dashboard-block-outlook",

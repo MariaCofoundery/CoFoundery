@@ -107,7 +107,7 @@ test("loads English feedback and advisor messages", () => {
   assert.equal(feedback.dialogTitle, "Quick product check");
   assert.equal(feedback.dictation?.start, "Start dictation");
   assert.equal(advisor.teamContext?.existingTeam, "Existing team");
-  assert.equal(advisor.dashboard?.inviteTeam?.title, "Invite team");
+  assert.equal(advisor.dashboard?.inviteTeam?.title, "Invite two founders");
   assert.equal(advisor.dashboard?.followUps?.none, "No follow-up set");
   assert.equal(advisor.dashboard?.statuses?.reportReady, "Report ready");
   assert.equal(advisor.report?.backToDashboard, "Back to advisor dashboard");
@@ -136,8 +136,8 @@ test("loads English invite token-flow messages", () => {
   assert.equal(invite.join?.toDashboard, "Go to dashboard");
   assert.equal(invite.welcome?.title, "Welcome");
   assert.equal(invite.welcome?.nextLabels?.base, "Go to foundation questionnaire");
-  assert.equal(invite.teamInvite?.title, "Matching start for two founders");
-  assert.equal(invite.teamInvite?.activateCta, "Confirm start");
+  assert.equal(invite.teamInvite?.title, "Confirm your founder connection together");
+  assert.equal(invite.teamInvite?.activateCta, "Accept invitation");
   assert.equal(invite.basisComplete?.title, "Nice. The foundation questionnaire is complete.");
   assert.equal(invite.basisComplete?.continueValues, "Continue now: values module (12 questions)");
   assert.equal(invite.done?.reportReady?.title, "You’re all set.");

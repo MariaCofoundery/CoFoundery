@@ -5,7 +5,13 @@ import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
+import {
+  DashboardTaskList,
+  type DashboardTaskPresentation,
+} from "@/features/dashboard/DashboardTaskList";
 import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
+import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
+import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
   resolveDashboardHeroAction,
   resolveDiscoveryFoundationState,
@@ -97,9 +103,10 @@ export default async function DashboardPage({
   searchParams: Promise<DashboardSearchParams>;
 }) {
   const supabase = await createClient();
-  const [t, teamsT] = await Promise.all([
+  const [t, teamsT, setupT] = await Promise.all([
     getTranslations("dashboard"),
     getTranslations("teams.dashboard"),
+    getTranslations("teams.setup"),
   ]);
   const {
     data: { user },
@@ -224,7 +231,6 @@ export default async function DashboardPage({
   const hasMatchingActivity =
     sentInvitesSorted.length > 0 || receivedInvitesSorted.length > 0 || readyReports.length > 0;
   const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
-  const latestReadyReport = readyReports[0] ?? null;
   const displayName =
     profileData?.display_name?.trim() || user.email?.split("@")[0]?.trim() || "Founder";
   const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
@@ -257,7 +263,6 @@ export default async function DashboardPage({
     hasSubmittedFounderAlignment: hasSubmittedBase,
     hasStartedFounderAlignment: hasStartedBase,
     hasStartedValues: hasStartedValues && !hasSubmittedValues,
-    hasAlignmentReport: Boolean(latestReadyReport),
     hasTeam: founderTeams.length > 0,
     hasConnectionActivity: hasMatchingActivity,
   });
@@ -267,7 +272,6 @@ export default async function DashboardPage({
         kind: heroActionKind,
         contextualBaseHref,
         contextualValuesHref,
-        latestReadyReport,
         firstTeamId: founderTeams[0]?.id ?? null,
         t,
       });
@@ -280,6 +284,31 @@ export default async function DashboardPage({
     started: hasStartedValues,
   });
   const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
+  const dashboardTasks = await getFounderDashboardTasks({
+    currentUserId: user.id,
+    invitations: invitationRows,
+    founderAlignmentStarted: hasStartedBase,
+    founderAlignmentSubmitted: hasSubmittedBase,
+    valuesStarted: hasStartedValues,
+    valuesSubmitted: hasSubmittedValues,
+    teams: founderTeams,
+    client: supabase,
+  }).catch((error) => {
+    console.error("dashboard tasks load failed", error);
+    return [];
+  });
+  const taskPresentations = dashboardTasks.map((task) =>
+    presentDashboardTask(task, t, setupT)
+  );
+  const prioritizedTask = taskPresentations[0] ?? null;
+  const resolvedHeroPanel = prioritizedTask
+    ? {
+        href: prioritizedTask.href,
+        label: prioritizedTask.action,
+        title: prioritizedTask.title,
+        text: prioritizedTask.text,
+      }
+    : heroPanel;
   const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
@@ -318,6 +347,7 @@ export default async function DashboardPage({
       <DashboardJourneyLine
         label={t("sectionNavigation.label")}
         sections={[
+          { id: "dashboard-block-tasks", label: t("sectionNavigation.tasks") },
           { id: "dashboard-block-foundation", label: t("sectionNavigation.foundation") },
           { id: "dashboard-block-connections", label: t("sectionNavigation.connections") },
           { id: "dashboard-block-outlook", label: t("sectionNavigation.outlook") },
@@ -357,16 +387,37 @@ export default async function DashboardPage({
                 </article>
 
                 <article className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-4">
-                  <h2 className="text-base font-semibold text-slate-950">{heroPanel.title}</h2>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600">{heroPanel.text}</p>
-                  <Link href={heroPanel.href} className={`${INVITE_CTA_CLASS} mt-3 shadow-[0_10px_20px_rgba(34,211,238,0.12)]`}>
-                    {heroPanel.label}
+                  <h2 className="text-base font-semibold text-slate-950">{resolvedHeroPanel.title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-600">{resolvedHeroPanel.text}</p>
+                  <Link href={resolvedHeroPanel.href} className={`${INVITE_CTA_CLASS} mt-3 shadow-[0_10px_20px_rgba(34,211,238,0.12)]`}>
+                    {resolvedHeroPanel.label}
                   </Link>
                 </article>
               </div>
             </section>
           </div>
         </div>
+      </section>
+
+      <section
+        id="dashboard-block-tasks"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
+        style={staggerStyle(80)}
+      >
+        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+          {t("tasks.eyebrow")}
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("tasks.title")}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+          {t("tasks.description")}
+        </p>
+        <DashboardTaskList
+          tasks={taskPresentations}
+          emptyTitle={t("tasks.empty.title")}
+          emptyText={t("tasks.empty.text")}
+          showAllLabel={t("tasks.showAll")}
+          showLessLabel={t("tasks.showLess")}
+        />
       </section>
 
       <section id="dashboard-block-foundation" className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6" style={staggerStyle(90)}>
@@ -644,30 +695,119 @@ export default async function DashboardPage({
   );
 }
 
+function presentDashboardTask(
+  task: FounderDashboardTask,
+  t: DashboardT,
+  setupT: DashboardT
+): DashboardTaskPresentation {
+  const context = task.contextLabel ?? t("tasks.context.connection");
+  const eyebrow = t(`tasks.kinds.${task.kind}`);
+  switch (task.type) {
+    case "incoming_invitation":
+      return {
+        ...task,
+        eyebrow,
+        title: task.personLabel
+          ? t("tasks.items.incomingInvitation.titleWithName", { name: task.personLabel })
+          : t("tasks.items.incomingInvitation.title"),
+        text: t("tasks.items.incomingInvitation.text"),
+        action: t("tasks.items.incomingInvitation.action"),
+      };
+    case "discovery_intro":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.discoveryIntro.title"),
+        text: t("tasks.items.discoveryIntro.text"),
+        action: t("tasks.items.discoveryIntro.action"),
+      };
+    case "relationship_advisor_consent":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.relationshipAdvisor.title"),
+        text: t("tasks.items.relationshipAdvisor.text", { context }),
+        action: t("tasks.items.relationshipAdvisor.action"),
+      };
+    case "setup_advisor_consent":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.setupAdvisor.title", { context }),
+        text: t("tasks.items.setupAdvisor.text"),
+        action: t("tasks.items.setupAdvisor.action"),
+      };
+    case "setup_confirmation": {
+      const topic = task.itemKey
+        ? setupT(`items.${task.itemKey}.title`)
+        : t("tasks.context.setupTopic");
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.setupConfirmation.title", { context }),
+        text: t("tasks.items.setupConfirmation.text", { topic }),
+        action: t("tasks.items.setupConfirmation.action"),
+      };
+    }
+    case "founder_alignment_continue":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.founderAlignment.title"),
+        text: t("tasks.items.founderAlignment.text"),
+        action: t("tasks.items.founderAlignment.action"),
+      };
+    case "values_continue":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.values.title"),
+        text: t("tasks.items.values.text"),
+        action: t("tasks.items.values.action"),
+      };
+    case "commitment_lab_continue":
+      return {
+        ...task,
+        eyebrow,
+        title: task.personLabel
+          ? t("tasks.items.commitmentLab.titleWithName", { name: task.personLabel })
+          : t("tasks.items.commitmentLab.title"),
+        text: t("tasks.items.commitmentLab.text", { context }),
+        action: t("tasks.items.commitmentLab.action"),
+      };
+    case "founder_setup_continue": {
+      const topic = task.itemKey
+        ? setupT(`items.${task.itemKey}.title`)
+        : t("tasks.context.setupTopic");
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.founderSetup.title", { context }),
+        text: t("tasks.items.founderSetup.text", { topic }),
+        action: t("tasks.items.founderSetup.action"),
+      };
+    }
+  }
+}
+
 function buildDashboardV2HeroPanel({
   kind,
   contextualBaseHref,
   contextualValuesHref,
-  latestReadyReport,
   firstTeamId,
   t,
 }: {
   kind: ReturnType<typeof resolveDashboardHeroAction>;
   contextualBaseHref: string;
   contextualValuesHref: string;
-  latestReadyReport: ReportRunRow | null;
   firstTeamId: string | null;
   t: DashboardT;
 }) {
   switch (kind) {
-    case "founder_alignment_start":
-      return { href: contextualBaseHref, label: t("actions.startAlignment"), title: t("heroPanel.startAlignmentTitle"), text: t("heroPanel.startAlignmentText") };
     case "founder_alignment_continue":
       return { href: contextualBaseHref, label: t("actions.continueAlignment"), title: t("heroPanel.continueAlignmentTitle"), text: t("heroPanel.continueAlignmentText") };
     case "values_continue":
       return { href: contextualValuesHref, label: t("actions.continueValues"), title: t("heroPanel.continueValuesTitle"), text: t("heroPanel.continueValuesText") };
-    case "alignment_report":
-      return { href: latestReadyReport ? `/report/${encodeURIComponent(latestReadyReport.invitation_id)}` : "/connections", label: t("actions.openAlignmentReport"), title: t("heroPanel.reportTitle"), text: t("heroPanel.reportText") };
     case "open_team":
       return { href: firstTeamId ? `/teams/${encodeURIComponent(firstTeamId)}` : "/connections", label: t("actions.openTeam"), title: t("heroPanel.teamTitle"), text: t("heroPanel.teamText") };
     case "open_connections":
