@@ -6,7 +6,7 @@ import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessme
 import { createClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-type SupabaseLikeClient = Pick<SupabaseServerClient, "from">;
+type SupabaseLikeClient = Pick<SupabaseServerClient, "from" | "rpc">;
 
 type AdvisorTeamInviteRow = {
   id: string;
@@ -20,11 +20,12 @@ type AdvisorTeamInviteRow = {
   founder_b_user_id: string | null;
   founder_a_claimed_at: string | null;
   founder_b_claimed_at: string | null;
-  founder_a_token_hash: string;
-  founder_b_token_hash: string;
+  founder_a_token_hash: string | null;
+  founder_b_token_hash: string | null;
   invitation_id: string | null;
   relationship_id: string | null;
-  status: "pending" | "activated" | "revoked";
+  status: "pending" | "activating" | "activated" | "revoked" | "expired";
+  expires_at: string;
   created_at: string;
   updated_at: string;
 };
@@ -216,10 +217,11 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
   const { data, error } = await supabase
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
     )
     .eq("advisor_user_id", normalizedUserId)
     .eq("status", "pending")
+    .gt("expires_at", new Date().toISOString())
     .order("updated_at", { ascending: false });
 
   if (error || !data) {
@@ -289,9 +291,11 @@ async function loadAdvisorTeamInviteByTokenHash(
   const { data, error } = await client
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
     )
     .or(`founder_a_token_hash.eq.${tokenHash},founder_b_token_hash.eq.${tokenHash}`)
+    .in("status", ["pending", "activating"])
+    .gt("expires_at", new Date().toISOString())
     .maybeSingle();
 
   if (error || !data) {
@@ -322,7 +326,7 @@ async function loadAdvisorTeamInviteById(
   const { data, error } = await client
     .from("advisor_team_invites")
     .select(
-      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, created_at, updated_at"
+      "id, advisor_user_id, advisor_email, advisor_name, team_name, founder_a_email, founder_b_email, founder_a_user_id, founder_b_user_id, founder_a_claimed_at, founder_b_claimed_at, founder_a_token_hash, founder_b_token_hash, invitation_id, relationship_id, status, expires_at, created_at, updated_at"
     )
     .eq("id", normalizedId)
     .maybeSingle();
@@ -527,30 +531,42 @@ async function upsertRelationshipAdvisorLink(params: {
 }) {
   const { data: existingByInvitation } = await params.client
     .from("relationship_advisors")
-    .select("id")
+    .select("id, status, revoked_at")
     .eq("source_invitation_id", params.invitationId)
     .eq("advisor_user_id", params.row.advisor_user_id)
     .limit(1)
     .maybeSingle();
 
-  const { data: existingByRelationship } = existingByInvitation
+  const { data: revokedByRelationship } = existingByInvitation
     ? { data: null }
     : await params.client
     .from("relationship_advisors")
-    .select("id")
+    .select("id, status, revoked_at")
+    .eq("relationship_id", params.relationshipId)
+    .eq("advisor_user_id", params.row.advisor_user_id)
+    .or("status.eq.revoked,revoked_at.not.is.null")
+    .limit(1)
+    .maybeSingle();
+
+  const { data: existingByRelationship } = existingByInvitation || revokedByRelationship
+    ? { data: null }
+    : await params.client
+    .from("relationship_advisors")
+    .select("id, status, revoked_at")
     .eq("relationship_id", params.relationshipId)
     .eq("advisor_user_id", params.row.advisor_user_id)
     .limit(1)
     .maybeSingle();
 
-  const existingRelationshipAdvisor = existingByInvitation ?? existingByRelationship;
+  const existingRelationshipAdvisor =
+    existingByInvitation ?? revokedByRelationship ?? existingByRelationship;
 
   if (
     (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow | null)?.status === "revoked" ||
     (existingRelationshipAdvisor as ExistingRelationshipAdvisorRow | null)?.revoked_at
   ) {
     // Retry/repair of an already activated team invite must never undo a founder revoke.
-    return;
+    return "revoked" as const;
   }
 
   const basePayload = {
@@ -586,7 +602,7 @@ async function upsertRelationshipAdvisorLink(params: {
 
   const extendedResult = await persist(extendedPayload);
   if (!extendedResult.error) {
-    return;
+    return "linked" as const;
   }
 
   if (!/advisor_email|invited_at/i.test(extendedResult.error.message)) {
@@ -609,6 +625,7 @@ async function upsertRelationshipAdvisorLink(params: {
   if (baseResult.error) {
     throw new Error(baseResult.error.message);
   }
+  return "linked" as const;
 }
 
 function resolveBootstrapStarter(row: AdvisorTeamInviteRow) {
@@ -702,6 +719,16 @@ export async function finalizeAdvisorTeamInviteIfPossible(
       relationshipId,
       detail: "missing_service_role",
     });
+    return resultBase();
+  }
+
+  const inviteExpired = new Date(row.expires_at).getTime() <= Date.now();
+  if (row.status === "revoked" || row.status === "expired" || inviteExpired) {
+    failures.push(row.status === "revoked" ? "invite_revoked" : "invite_expired");
+    return resultBase();
+  }
+
+  if (row.status === "activated") {
     return resultBase();
   }
 
@@ -914,18 +941,39 @@ export async function finalizeAdvisorTeamInviteIfPossible(
   );
 
   if (invitationId && relationshipId) {
-    const linkedAdvisor = await safeStep("ensure_relationship_advisor", async () => {
-      await upsertRelationshipAdvisorLink({
+    const advisorLinkResult = await safeStep("ensure_relationship_advisor", async () => {
+      return upsertRelationshipAdvisorLink({
         row,
         relationshipId,
         invitationId,
         client: resolvedClient,
       });
-      return true;
     });
-    advisorLinkReady = Boolean(linkedAdvisor);
+    advisorLinkReady = advisorLinkResult === "linked";
     if (advisorLinkReady) {
       repaired = true;
+    } else if (advisorLinkResult === "revoked") {
+      failures.push("ensure_relationship_advisor:revoked");
+      const revokedInvite = await safeStep("revoke_invite_after_relationship_revoke", async () => {
+        const { error } = await resolvedClient
+          .from("advisor_team_invites")
+          .update({
+            status: "revoked",
+            founder_a_token_hash: null,
+            founder_b_token_hash: null,
+          })
+          .eq("id", row.id);
+        if (error) {
+          throw new Error(error.message);
+        }
+        return true;
+      });
+      if (revokedInvite) {
+        const refreshedRow = await loadAdvisorTeamInviteById(row.id, resolvedClient);
+        if (refreshedRow) {
+          row = refreshedRow;
+        }
+      }
     }
   } else {
     logAdvisorTeamInviteActivation({
@@ -948,6 +996,8 @@ export async function finalizeAdvisorTeamInviteIfPossible(
           invitation_id: invitationId,
           relationship_id: relationshipId,
           status: "activated",
+          founder_a_token_hash: null,
+          founder_b_token_hash: null,
         })
         .eq("id", row.id);
       if (error) {
@@ -1014,59 +1064,35 @@ export async function claimAdvisorTeamInviteFounder(params: {
     return { ok: false, reason: "service_unavailable" };
   }
 
-  const inviteLookup = await loadAdvisorTeamInviteByTokenHash(
-    hashOpaqueToken(normalizedToken),
-    privileged
+  const supabase = await createClient();
+  const { data: claimedInviteId, error: claimError } = await supabase.rpc(
+    "claim_advisor_team_invite_founder",
+    { p_token_hash: hashOpaqueToken(normalizedToken) }
   );
 
-  if (inviteLookup.status !== "ready") {
-    return { ok: false, reason: "invalid_token" };
-  }
-
-  const { row, founderSlot, slotEmail } = inviteLookup;
-  if (row.status === "revoked") {
-    return { ok: false, reason: "invalid_token" };
-  }
-
-  if (normalizedUserEmail !== normalizeEmail(slotEmail)) {
-    return { ok: false, reason: "email_mismatch" };
-  }
-
-  const slotUserIdKey = founderSlot === "founderA" ? "founder_a_user_id" : "founder_b_user_id";
-  const slotClaimedAtKey = founderSlot === "founderA" ? "founder_a_claimed_at" : "founder_b_claimed_at";
-  const existingSlotUserId =
-    founderSlot === "founderA" ? row.founder_a_user_id : row.founder_b_user_id;
-  const existingClaimedAt =
-    founderSlot === "founderA" ? row.founder_a_claimed_at : row.founder_b_claimed_at;
-
-  if (existingSlotUserId && existingSlotUserId !== normalizedUserId) {
-    return { ok: false, reason: "already_claimed" };
-  }
-
-  if (!existingSlotUserId) {
-    const { error: claimError } = await privileged
-      .from("advisor_team_invites")
-      .update({
-        [slotUserIdKey]: normalizedUserId,
-        [slotClaimedAtKey]: existingClaimedAt ?? new Date().toISOString(),
-      })
-      .eq("id", row.id);
-
-    if (claimError) {
-      return { ok: false, reason: "claim_failed" };
+  if (claimError) {
+    if (/email_mismatch/i.test(claimError.message)) {
+      return { ok: false, reason: "email_mismatch" };
     }
-  }
-
-  const refreshedLookup = await loadAdvisorTeamInviteByTokenHash(
-    hashOpaqueToken(normalizedToken),
-    privileged
-  );
-
-  if (refreshedLookup.status !== "ready") {
+    if (/already_claimed/i.test(claimError.message)) {
+      return { ok: false, reason: "already_claimed" };
+    }
     return { ok: false, reason: "claim_failed" };
   }
 
-  const refreshedRow = refreshedLookup.row;
+  if (typeof claimedInviteId !== "string" || !claimedInviteId) {
+    return { ok: false, reason: "invalid_token" };
+  }
+
+  const refreshedRow = await loadAdvisorTeamInviteById(claimedInviteId, privileged);
+  if (!refreshedRow) {
+    return { ok: false, reason: "claim_failed" };
+  }
+  const founderSlot =
+    refreshedRow.founder_a_user_id === normalizedUserId &&
+    normalizeEmail(refreshedRow.founder_a_email) === normalizedUserEmail
+      ? "founderA"
+      : "founderB";
   logAdvisorTeamInviteActivation({
     stage: "claim_loaded",
     pendingInviteId: refreshedRow.id,
