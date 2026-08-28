@@ -3,6 +3,7 @@
     "title": "Zusammenarbeit stärken",
     "description": "Entdeckt gemeinsam, wie ihr arbeitet, was ihr voneinander erwartet und was euch überrascht.",
     "experience": "Read My Mind",
+    "betaLabel": "Beta · In Entwicklung",
     "experienceDescription": "Schätzt euch gegenseitig in fünf kurzen Arbeitssituationen ein. Eure Antworten bleiben verborgen, bis ihr beide fertig seid.",
     "revealWaitingText": "Die Runde wird abgeschlossen, sobald ihr beide alle fünf Reveals angesehen habt.",
     "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
@@ -23,6 +24,8 @@
   "entry": {
     "eyebrow": "Zusammenarbeit stärken",
     "title": "Read My Mind",
+    "betaLabel": "Beta · In Entwicklung",
+    "betaNotice": "Read My Mind befindet sich aktuell in der Testphase. Inhalte und Ablauf können sich noch verändern.",
     "intro": "Wählt eine Perspektive für fünf kurze Situationen.",
     "back": "Zur Teamübersicht",
     "recommended": "Guter Einstieg",

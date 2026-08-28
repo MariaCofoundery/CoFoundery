@@ -3,6 +3,7 @@
     "title": "Strengthen your collaboration",
     "description": "Explore how you work, what you expect from each other, and what might surprise you.",
     "experience": "Read My Mind",
+    "betaLabel": "Beta · In development",
     "experienceDescription": "Estimate how each other would respond to five short work situations. Your answers stay hidden until you have both finished.",
     "revealWaitingText": "The round will complete once you have both viewed all five reveals.",
     "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
@@ -23,6 +24,8 @@
   "entry": {
     "eyebrow": "Strengthen your collaboration",
     "title": "Read My Mind",
+    "betaLabel": "Beta · In development",
+    "betaNotice": "Read My Mind is currently in testing. Content and the experience may still change.",
     "intro": "Choose a perspective for five short situations.",
     "back": "Back to team overview",
     "recommended": "A good place to start",

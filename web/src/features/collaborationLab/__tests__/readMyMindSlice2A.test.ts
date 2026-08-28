@@ -71,6 +71,8 @@ test("Slice 2A source keeps the pre-reveal and 2-founder boundaries explicit", (
 
 test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract", () => {
   const homebase = readFileSync(new URL("../../../app/(product)/teams/[teamId]/page.tsx", import.meta.url), "utf8");
+  const card = readFileSync(new URL("../ReadMyMindHomebaseCard.tsx", import.meta.url), "utf8");
+  const entry = readFileSync(new URL("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx", import.meta.url), "utf8");
   const form = readFileSync(new URL("../ReadMyMindPromptForm.tsx", import.meta.url), "utf8");
   const de = JSON.parse(readFileSync(new URL("../../../../messages/de/collaborationLab.json", import.meta.url), "utf8"));
   const en = JSON.parse(readFileSync(new URL("../../../../messages/en/collaborationLab.json", import.meta.url), "utf8"));
@@ -83,6 +85,12 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.deepEqual(Object.keys(de), Object.keys(en));
   assert.match(de.homebase.unsupported, /drei Foundern/);
   assert.match(en.homebase.unsupported, /three founders/);
+  assert.match(card, /t\("betaLabel"\)/);
+  assert.match(entry, /t\("betaNotice"\)/);
+  assert.equal(de.homebase.betaLabel, "Beta · In Entwicklung");
+  assert.equal(en.homebase.betaLabel, "Beta · In development");
+  assert.match(de.entry.betaNotice, /Testphase/);
+  assert.match(en.entry.betaNotice, /currently in testing/);
   for (const serialized of [JSON.stringify(de), JSON.stringify(en)]) {
     for (const forbidden of ["Compatibility", "kompatibel", "Readiness", "Persönlichkeitstyp", "Accuracy", "Score", "Match %"]) assert.equal(serialized.includes(forbidden), false);
   }

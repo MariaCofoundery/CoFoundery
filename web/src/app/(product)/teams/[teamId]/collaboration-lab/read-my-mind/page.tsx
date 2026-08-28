@@ -26,6 +26,9 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
       </header>
+      <aside className="mt-5 rounded-2xl border border-violet-200 bg-violet-50/70 px-5 py-4 text-sm leading-6 text-violet-950" aria-label={t("betaLabel")}>
+        <span className="font-semibold">{t("betaLabel")}</span><span className="mx-2" aria-hidden="true">·</span>{t("betaNotice")}
+      </aside>
       {team.members.length !== 2 ? (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize")}</p></section>
       ) : (
