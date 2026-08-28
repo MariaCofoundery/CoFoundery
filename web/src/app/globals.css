@@ -500,6 +500,107 @@ body {
   }
 }
 
+/* Read My Mind uses short, one-time transitions to turn its answer and reveal
+   flow into a sequence of moments. No information depends on these effects. */
+.rmm-enter {
+  animation: rmm-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rmm-stage {
+  isolation: isolate;
+}
+
+.rmm-phase:focus-within {
+  box-shadow: 0 18px 42px rgba(76, 29, 149, 0.09);
+}
+
+.rmm-perspective-shift::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.35), transparent);
+}
+
+.rmm-sealed::after {
+  content: "";
+  position: absolute;
+  inset: -35% auto -35% -30%;
+  width: 24%;
+  pointer-events: none;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  animation: rmm-seal-sweep 560ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rmm-reveal-panel {
+  animation: rmm-reveal-panel 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rmm-reveal-panel:nth-of-type(2) {
+  animation-delay: 70ms;
+}
+
+.rmm-reveal-panel:nth-of-type(3) {
+  animation-delay: 140ms;
+}
+
+.rmm-reveal-panel:nth-of-type(4) {
+  animation-delay: 190ms;
+}
+
+@keyframes rmm-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rmm-seal-sweep {
+  from {
+    opacity: 0;
+    transform: translateX(0) skewX(-18deg);
+  }
+
+  35% {
+    opacity: 0.72;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(580%) skewX(-18deg);
+  }
+}
+
+@keyframes rmm-reveal-panel {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rmm-enter,
+  .rmm-sealed::after,
+  .rmm-reveal-panel {
+    animation: none !important;
+  }
+
+  .rmm-phase,
+  .rmm-perspective-shift {
+    transition: none !important;
+  }
+}
+
 @media print {
   @page {
     margin: 16mm;

@@ -83,7 +83,7 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.ok(cardPosition > homebase.indexOf("commitment-lab-title"));
   assert.ok(cardPosition < homebase.indexOf("team-setup-title"));
   assert.match(form, /type=\{multi \? "checkbox" : "radio"\}/);
-  assert.match(form, /disabled=\{!complete\}/);
+  assert.match(form, /disabled=\{!complete \|\| allLocked\}/);
   assert.match(form, /focus-visible:ring/);
   assert.deepEqual(Object.keys(de), Object.keys(en));
   assert.match(de.homebase.unsupported, /drei Foundern/);
