@@ -96,6 +96,17 @@
         "text": "Deine optionale Werte-Reflexion wurde begonnen und kann fortgesetzt werden.",
         "action": "Fortsetzen"
       },
+      "readMyMindInvitation": {
+        "title": "Read My Mind: Einladung ansehen",
+        "text": "Eine gemeinsame Runde wartet auf deine Entscheidung.",
+        "textWithName": "{name} hat eine gemeinsame Runde gestartet.",
+        "action": "Einladung ansehen"
+      },
+      "readMyMindContinue": {
+        "title": "Read My Mind fortsetzen",
+        "text": "Deine Antworten für {context} sind noch offen.",
+        "action": "Fortsetzen"
+      },
       "commitmentLab": {
         "title": "Commitment Lab fortsetzen",
         "titleWithName": "Commitment Lab mit {name} fortsetzen",

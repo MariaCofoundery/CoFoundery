@@ -96,6 +96,17 @@
         "text": "You started this optional values reflection and can continue it.",
         "action": "Continue"
       },
+      "readMyMindInvitation": {
+        "title": "Read My Mind: view invitation",
+        "text": "A shared round is waiting for your decision.",
+        "textWithName": "{name} started a shared round.",
+        "action": "View invitation"
+      },
+      "readMyMindContinue": {
+        "title": "Continue Read My Mind",
+        "text": "Your answers for {context} are still open.",
+        "action": "Continue"
+      },
       "commitmentLab": {
         "title": "Continue Commitment Lab",
         "titleWithName": "Continue Commitment Lab with {name}",

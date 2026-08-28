@@ -6,6 +6,7 @@ import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvis
 import { isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import type { FounderTeamDashboardSummary } from "@/features/teams/founderTeamHomebaseModel";
 import { createClient } from "@/lib/supabase/server";
+import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -51,7 +52,7 @@ export async function getFounderDashboardTasks(params: {
   const teamIds = params.teams.map((team) => team.id);
   const teamById = new Map(params.teams.map((team) => [team.id, team]));
 
-  const [introResult, relationshipResult, setupItemResult, setupAccessResults] =
+  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult] =
     await Promise.all([
       supabase
         .from("discovery_intro_requests")
@@ -76,6 +77,9 @@ export async function getFounderDashboardTasks(params: {
           access: await getFounderSetupAdvisorAccess(team.id, supabase),
         }))
       ),
+      teamIds.length > 0
+        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at").in("founder_team_id", teamIds).in("status", ["forming", "active"])
+        : Promise.resolve({ data: [], error: null }),
     ]);
 
   const relationships = relationshipResult.error
@@ -91,7 +95,9 @@ export async function getFounderDashboardTasks(params: {
     item.pending_revision_id ? [item.pending_revision_id] : []
   );
 
-  const [advisorResult, confirmationResult, commitmentLabResult] = await Promise.all([
+  const readMyMindRounds = readMyMindRoundResult.error ? [] : ((readMyMindRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; pack_key: string; pack_version: number; created_by_user_id: string; status: string; created_at: string }>);
+  const readMyMindRoundIds = readMyMindRounds.map((round) => round.id);
+  const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult] = await Promise.all([
     relationshipIds.length > 0
       ? supabase
           .from("relationship_advisors")
@@ -112,6 +118,12 @@ export async function getFounderDashboardTasks(params: {
           .from("commitment_labs")
           .select("relationship_id, updated_at")
           .in("relationship_id", relationshipIds)
+      : Promise.resolve({ data: [], error: null }),
+    readMyMindRoundIds.length > 0
+      ? supabase.from("collaboration_experience_round_participants").select("round_id, founder_user_id, state").in("round_id", readMyMindRoundIds).eq("founder_user_id", currentUserId)
+      : Promise.resolve({ data: [], error: null }),
+    readMyMindRoundIds.length > 0
+      ? supabase.from("collaboration_experience_responses").select("round_id, respondent_user_id, response_type").in("round_id", readMyMindRoundIds).eq("respondent_user_id", currentUserId)
       : Promise.resolve({ data: [], error: null }),
   ]);
 
@@ -235,5 +247,24 @@ export async function getFounderDashboardTasks(params: {
           relationshipId: lab.relationship_id,
           updatedAt: lab.updated_at,
         })),
+    readMyMindRounds: readMyMindRounds.map((round) => {
+      const team = teamById.get(round.founder_team_id);
+      const participant = readMyMindParticipantResult.error ? null : ((readMyMindParticipantResult.data ?? []) as Array<{ round_id: string; founder_user_id: string; state: string }>).find((entry) => entry.round_id === round.id);
+      const ownResponseCount = readMyMindOwnResponseResult.error ? 0 : ((readMyMindOwnResponseResult.data ?? []) as Array<{ round_id: string }>).filter((entry) => entry.round_id === round.id).length;
+      const pack = getReadMyMindPack(round.pack_key, round.pack_version);
+      const expectedOwnResponses = pack?.prompts.reduce((count, prompt) => count + 2 + (prompt.needMode === "required" ? 1 : 0), 0) ?? Number.POSITIVE_INFINITY;
+      const creator = team?.members.find((member) => member.userId === round.created_by_user_id);
+      return {
+        id: round.id,
+        teamId: round.founder_team_id,
+        teamLabel: team?.name ?? team?.members.map((member) => member.displayName).filter(Boolean).join(" + ") ?? null,
+        creatorLabel: creator?.displayName ?? null,
+        status: round.status,
+        ownParticipantState: participant?.state ?? "unavailable",
+        ownAnswerComplete: ownResponseCount === expectedOwnResponses,
+        supportedTwoFounderTeam: team?.members.length === 2,
+        createdAt: round.created_at,
+      };
+    }),
   });
 }

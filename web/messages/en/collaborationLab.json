@@ -1,0 +1,86 @@
+{
+  "homebase": {
+    "title": "Strengthen your collaboration",
+    "description": "Explore how you work, what you expect from each other, and what might surprise you.",
+    "experience": "Read My Mind",
+    "experienceDescription": "Estimate how each other would respond to five short work situations. Your answers stay hidden until you have both finished.",
+    "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
+    "partnerFallback": "Co-founder",
+    "status": {
+      "start": "Ready for a shared round",
+      "forming_waiting": "Waiting for {name}",
+      "forming_invitation": "Invitation open",
+      "active_continue": "Round in progress",
+      "active_waiting": "You are done — {name} is still answering",
+      "ready": "Your answers are ready",
+      "completed": "Round completed"
+    },
+    "action": { "start": "Start a round", "open": "View round", "continue": "Continue round" }
+  },
+  "entry": {
+    "eyebrow": "Strengthen your collaboration",
+    "title": "Read My Mind",
+    "intro": "Choose a perspective for five short situations.",
+    "back": "Back to team overview",
+    "recommended": "A good place to start",
+    "promptCount": "{count} situations",
+    "packs": {
+      "easy_start": "Start lightly and discover small things about how you work together.",
+      "how_we_work": "Take a closer look at how you organize decisions, ownership, and day-to-day work.",
+      "when_things_get_tricky": "How do you respond when pressure, feedback, or different opinions enter the picture?"
+    },
+    "transparencyTitle": "How your round works",
+    "transparency": {
+      "independent": "You first answer five short situations independently.",
+      "hidden": "Your answers stay hidden until you have both completed the full round.",
+      "compare": "You can then compare your perspectives together.",
+      "noRightAnswers": "There are no right answers.",
+      "sharedReveal": "Your answers in this round are intended for the shared reveal with your co-founder.",
+      "isolated": "Private answers from Founder Alignment, Commitment Lab, or other CoFoundery areas are not used."
+    },
+    "start": "Start round",
+    "unsupported": "Read My Mind for teams with three founders will follow in a later step."
+  },
+  "round": {
+    "back": "Back to team overview",
+    "partnerFallback": "Co-founder",
+    "progress": "{current} of {total}",
+    "creatorTitle": "Round started",
+    "creatorText": "{name} needs to join before you begin.",
+    "creatorHint": "Once you have both joined, you can answer independently.",
+    "inviteTitle": "{name} wants to play Read My Mind with you",
+    "inviteText": "Your answers only become visible after you have both answered all five situations. There are no right answers.",
+    "join": "Join",
+    "decline": "Don't participate",
+    "declineConfirm": "The proposed round will end. You can start a new one later.",
+    "declinedTitle": "The round has ended.",
+    "self": "You",
+    "guess": "And {name}?",
+    "guessHint": "You will see {name}'s answer later in the reveal.",
+    "need": "And what do you need?",
+    "multiHint": "Choose up to two.",
+    "saved": "Saved",
+    "lockWarning": "After this, you cannot change your answers for this situation.",
+    "lock": "Lock answers",
+    "previous": "Back",
+    "next": "Next",
+    "waitingTitle": "Your answers are saved",
+    "waitingText": "Once {name} has also completed the round, you can compare your answers together.",
+    "waitingStatus": "{name} is still answering",
+    "readyTitle": "You are both done",
+    "readyText": "Your answers are fully saved. The shared reveal will open in the next step.",
+    "readyStatus": "Reveal follows in the next step",
+    "completedTitle": "Round completed",
+    "endedTitle": "Round ended",
+    "endedText": "You can start a new round later.",
+    "abandon": "End round",
+    "abandonConfirm": "If you end the round, neither you nor {name} can continue answering or open new reveals. You can start a new round afterwards.",
+    "cancel": "Back",
+    "errors": {
+      "changed": "This round has changed. Reload the current state.",
+      "locked": "This answer has already been saved and can no longer be changed.",
+      "invalid": "Please choose a valid answer.",
+      "unavailable": "This round is not available."
+    }
+  }
+}

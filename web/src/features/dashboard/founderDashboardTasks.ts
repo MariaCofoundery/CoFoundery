@@ -16,6 +16,8 @@ export type DashboardTaskType =
   | "setup_confirmation"
   | "founder_alignment_continue"
   | "values_continue"
+  | "read_my_mind_invitation"
+  | "read_my_mind_continue"
   | "commitment_lab_continue"
   | "founder_setup_continue";
 
@@ -97,6 +99,17 @@ export type FounderDashboardTaskSignals = {
     relationshipId: string;
     updatedAt: string;
   }>;
+  readMyMindRounds: Array<{
+    id: string;
+    teamId: string;
+    teamLabel: string | null;
+    creatorLabel: string | null;
+    status: string;
+    ownParticipantState: string;
+    ownAnswerComplete: boolean;
+    supportedTwoFounderTeam: boolean;
+    createdAt: string;
+  }>;
 };
 
 const KIND_PRIORITY: Record<DashboardTaskKind, number> = {
@@ -111,6 +124,7 @@ const NEEDS_YOU_PRIORITY: Partial<Record<DashboardTaskType, number>> = {
   relationship_advisor_consent: 2,
   setup_advisor_consent: 3,
   setup_confirmation: 4,
+  read_my_mind_invitation: 2,
 };
 
 function isClaimableInvitation(
@@ -190,6 +204,15 @@ export function buildFounderDashboardTasks(
       personLabel: null,
       itemKey: null,
     });
+  }
+
+  for (const round of signals.readMyMindRounds) {
+    if (!round.supportedTwoFounderTeam) continue;
+    if (round.status === "forming" && round.ownParticipantState === "pending") {
+      tasks.push({ id: `read-my-mind:${round.id}`, kind: "NEEDS_YOU", type: "read_my_mind_invitation", href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(round.id)}`, createdAt: round.createdAt, contextLabel: round.teamLabel, personLabel: round.creatorLabel, itemKey: null });
+    } else if (round.status === "active" && round.ownParticipantState === "joined" && !round.ownAnswerComplete) {
+      tasks.push({ id: `read-my-mind:${round.id}`, kind: "CONTINUE_SHARED", type: "read_my_mind_continue", href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(round.id)}`, createdAt: round.createdAt, contextLabel: round.teamLabel, personLabel: null, itemKey: null });
+    }
   }
 
   for (const advisor of signals.relationshipAdvisors) {

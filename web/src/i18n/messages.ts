@@ -4,6 +4,7 @@ import deAssessment from "../../messages/de/assessment.json";
 import deAdvisor from "../../messages/de/advisor.json";
 import deAuth from "../../messages/de/auth.json";
 import deCommon from "../../messages/de/common.json";
+import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFeedback from "../../messages/de/feedback.json";
@@ -18,6 +19,7 @@ import enAssessment from "../../messages/en/assessment.json";
 import enAdvisor from "../../messages/en/advisor.json";
 import enAuth from "../../messages/en/auth.json";
 import enCommon from "../../messages/en/common.json";
+import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFeedback from "../../messages/en/feedback.json";
@@ -35,6 +37,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     advisor: deAdvisor,
     auth: deAuth,
     common: deCommon,
+    collaborationLab: deCollaborationLab,
     dashboard: deDashboard,
     discovery: deDiscovery,
     feedback: deFeedback,
@@ -51,6 +54,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     advisor: enAdvisor,
     auth: enAuth,
     common: enCommon,
+    collaborationLab: enCollaborationLab,
     dashboard: enDashboard,
     discovery: enDiscovery,
     feedback: enFeedback,

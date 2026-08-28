@@ -1,0 +1,86 @@
+{
+  "homebase": {
+    "title": "Zusammenarbeit stärken",
+    "description": "Entdeckt gemeinsam, wie ihr arbeitet, was ihr voneinander erwartet und was euch überrascht.",
+    "experience": "Read My Mind",
+    "experienceDescription": "Schätzt euch gegenseitig in fünf kurzen Arbeitssituationen ein. Eure Antworten bleiben verborgen, bis ihr beide fertig seid.",
+    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
+    "partnerFallback": "Co-Founder",
+    "status": {
+      "start": "Bereit für eine gemeinsame Runde",
+      "forming_waiting": "Wartet auf {name}",
+      "forming_invitation": "Einladung offen",
+      "active_continue": "Runde läuft",
+      "active_waiting": "Du bist fertig – {name} antwortet noch",
+      "ready": "Eure Antworten sind bereit",
+      "completed": "Runde abgeschlossen"
+    },
+    "action": { "start": "Runde starten", "open": "Runde ansehen", "continue": "Runde fortsetzen" }
+  },
+  "entry": {
+    "eyebrow": "Zusammenarbeit stärken",
+    "title": "Read My Mind",
+    "intro": "Wählt eine Perspektive für fünf kurze Situationen.",
+    "back": "Zur Teamübersicht",
+    "recommended": "Guter Einstieg",
+    "promptCount": "{count} Situationen",
+    "packs": {
+      "easy_start": "Leicht einsteigen und kleine Dinge über eure Arbeitsweise entdecken.",
+      "how_we_work": "Schaut genauer darauf, wie ihr Entscheidungen, Verantwortung und Arbeitsalltag organisiert.",
+      "when_things_get_tricky": "Wie reagiert ihr, wenn Druck, Feedback oder unterschiedliche Meinungen ins Spiel kommen?"
+    },
+    "transparencyTitle": "So funktioniert eure Runde",
+    "transparency": {
+      "independent": "Ihr beantwortet fünf kurze Situationen zunächst unabhängig voneinander.",
+      "hidden": "Eure Antworten bleiben verborgen, bis ihr beide die gesamte Runde beantwortet habt.",
+      "compare": "Danach könnt ihr eure Einschätzungen miteinander vergleichen.",
+      "noRightAnswers": "Es gibt keine richtigen Antworten.",
+      "sharedReveal": "Deine Antworten dieser Runde sind für den gemeinsamen Reveal mit deinem Co-Founder bestimmt.",
+      "isolated": "Private Antworten aus Founder Alignment, Commitment Lab oder anderen CoFoundery-Bereichen werden dafür nicht verwendet."
+    },
+    "start": "Runde starten",
+    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt."
+  },
+  "round": {
+    "back": "Zur Teamübersicht",
+    "partnerFallback": "Co-Founder",
+    "progress": "{current} von {total}",
+    "creatorTitle": "Runde gestartet",
+    "creatorText": "{name} muss noch zustimmen, bevor ihr beginnt.",
+    "creatorHint": "Sobald ihr beide dabei seid, könnt ihr unabhängig voneinander antworten.",
+    "inviteTitle": "{name} möchte mit dir Read My Mind spielen",
+    "inviteText": "Eure Antworten werden erst sichtbar, wenn ihr beide alle fünf Situationen beantwortet habt. Es gibt keine richtigen Antworten.",
+    "join": "Mitmachen",
+    "decline": "Nicht teilnehmen",
+    "declineConfirm": "Die vorgeschlagene Runde wird beendet. Ihr könnt später eine neue starten.",
+    "declinedTitle": "Die Runde wurde beendet.",
+    "self": "Du",
+    "guess": "Und {name}?",
+    "guessHint": "Du siehst {name}s Antwort erst später im Reveal.",
+    "need": "Und was brauchst du?",
+    "multiHint": "Wähle bis zu zwei.",
+    "saved": "Gespeichert",
+    "lockWarning": "Danach kannst du deine Antworten für diese Situation nicht mehr ändern.",
+    "lock": "Antworten festhalten",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "waitingTitle": "Deine Antworten sind gespeichert",
+    "waitingText": "Sobald {name} die Runde ebenfalls abgeschlossen hat, könnt ihr eure Antworten miteinander vergleichen.",
+    "waitingStatus": "{name} antwortet noch",
+    "readyTitle": "Ihr seid beide fertig",
+    "readyText": "Eure Antworten sind vollständig gespeichert. Der gemeinsame Reveal wird im nächsten Schritt geöffnet.",
+    "readyStatus": "Reveal folgt im nächsten Schritt",
+    "completedTitle": "Runde abgeschlossen",
+    "endedTitle": "Runde beendet",
+    "endedText": "Ihr könnt später eine neue Runde starten.",
+    "abandon": "Runde beenden",
+    "abandonConfirm": "Wenn du die Runde beendest, können weder du noch {name} sie weiter beantworten oder neue Reveals öffnen. Ihr könnt danach eine neue Runde starten.",
+    "cancel": "Zurück",
+    "errors": {
+      "changed": "Diese Runde hat sich inzwischen geändert. Lade den aktuellen Stand neu.",
+      "locked": "Diese Antwort wurde bereits gespeichert und kann nicht mehr geändert werden.",
+      "invalid": "Bitte wähle eine gültige Antwort.",
+      "unavailable": "Diese Runde ist nicht verfügbar."
+    }
+  }
+}

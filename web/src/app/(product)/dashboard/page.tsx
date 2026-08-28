@@ -753,6 +753,24 @@ function presentDashboardTask(
         text: t("tasks.items.values.text"),
         action: t("tasks.items.values.action"),
       };
+    case "read_my_mind_invitation":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.readMyMindInvitation.title"),
+        text: task.personLabel
+          ? t("tasks.items.readMyMindInvitation.textWithName", { name: task.personLabel })
+          : t("tasks.items.readMyMindInvitation.text"),
+        action: t("tasks.items.readMyMindInvitation.action"),
+      };
+    case "read_my_mind_continue":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.readMyMindContinue.title"),
+        text: t("tasks.items.readMyMindContinue.text", { context }),
+        action: t("tasks.items.readMyMindContinue.action"),
+      };
     case "commitment_lab_continue":
       return {
         ...task,

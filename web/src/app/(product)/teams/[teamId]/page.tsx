@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHomebaseCard";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
 import {
@@ -227,6 +228,20 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </div>
           </section>
         ) : null}
+
+        <ReadMyMindHomebaseCard
+          currentUserId={user.id}
+          team={{
+            id: team.id,
+            name: team.name,
+            members: team.members.map((member) => ({
+              userId: member.userId,
+              displayName: member.displayName,
+              avatarId: member.avatarId,
+              avatarUrl: member.avatarUrl,
+            })),
+          }}
+        />
 
         <section
           className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
