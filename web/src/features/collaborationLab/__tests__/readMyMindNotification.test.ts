@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
+import { buildReadMyMindStartedEmailPayload, sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
 
 const recipientSource = readFileSync(new URL("../readMyMindNotificationRecipient.ts", import.meta.url), "utf8");
 const actionSource = readFileSync(new URL("../readMyMindActions.ts", import.meta.url), "utf8");
 const foundationSource = readFileSync(new URL("../../../../../supabase/migrations/20260828160000_create_read_my_mind_foundation.sql", import.meta.url), "utf8");
+const sequentialSource = readFileSync(new URL("../../../../../supabase/migrations/20260828220000_add_read_my_mind_sequential_handoff.sql", import.meta.url), "utf8");
 
 test("recipient email lookup is narrow, server-only, and never enters the action response", () => {
   assert.match(recipientSource, /^import "server-only";/);
@@ -18,13 +19,15 @@ test("recipient email lookup is narrow, server-only, and never enters the action
   assert.doesNotMatch(actionSource, /return\s+\{[^}]*recipientEmail\s*:/);
 });
 
-test("start notification runs only after a newly inserted round and retries cannot send again", () => {
-  const rpcPosition = actionSource.indexOf('rpc("create_collaboration_experience_round"');
-  const successGuardPosition = actionSource.indexOf('if (error || typeof data !== "string")');
-  const sendPosition = actionSource.indexOf("await sendRoundStartedNotification");
-  assert.ok(rpcPosition >= 0 && successGuardPosition > rpcPosition && sendPosition > successGuardPosition);
+test("handoff notification is absent from create and persistently claimed after creator completion", () => {
+  const startAction = actionSource.slice(actionSource.indexOf("export async function startReadMyMindRoundAction"), actionSource.indexOf("async function mutateRound"));
+  const claimPosition = actionSource.indexOf('rpc("claim_collaboration_round_handoff_email"');
+  const sendPosition = actionSource.indexOf("await sendRoundHandoffNotification");
+  assert.doesNotMatch(startAction, /sendRoundHandoffNotification|sendReadMyMindStartedEmail/);
+  assert.ok(claimPosition >= 0 && sendPosition > claimPosition);
+  assert.match(sequentialSource, /handoff_email_claimed_at is null/);
+  assert.match(sequentialSource, /return found/);
   assert.match(foundationSource, /create unique index collaboration_experience_one_open_round_per_team_idx[\s\S]*where status in \('forming','active'\)/);
-  assert.match(foundationSource, /when unique_violation then[\s\S]*collaboration_round_already_open/);
 });
 
 test("delivery failure is best effort and does not expose the recipient", async () => {
@@ -50,7 +53,7 @@ test("delivery failure is best effort and does not expose the recipient", async 
     assert.equal(calls.length, 1);
     assert.equal(calls[0]?.url, "https://api.resend.com/emails");
     assert.match(calls[0]?.body ?? "", /ben@example\.com/);
-    assert.match(actionSource, /try \{[\s\S]*await sendRoundStartedNotification[\s\S]*\} catch \{/);
+    assert.match(actionSource, /try \{[\s\S]*await sendRoundHandoffNotification[\s\S]*\} catch \{/);
     assert.doesNotMatch(actionSource, /console\.error\([^\n]*recipientEmail/);
   } finally {
     globalThis.fetch = previousFetch;
@@ -87,12 +90,27 @@ test("one successful notification call sends exactly one email to the pending fo
     assert.doesNotMatch(JSON.stringify(request), /anna@example\.com/i);
     assert.match(request.subject ?? "", /Anna started Read My Mind/);
     assert.match(request.html ?? "", /teams\/team-1\/collaboration-lab\/read-my-mind\/round-1/);
+    assert.match(request.html ?? "", /already completed their part/);
   } finally {
     globalThis.fetch = previousFetch;
     if (previousApiKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = previousApiKey;
     if (previousFrom === undefined) delete process.env.RESEND_FROM_EMAIL;
     else process.env.RESEND_FROM_EMAIL = previousFrom;
+  }
+});
+
+test("DE and EN handoff mail say the creator is finished without private answers", () => {
+  for (const locale of ["de", "en"] as const) {
+    const payload = buildReadMyMindStartedEmailPayload({
+      recipientEmail: "ben@example.com",
+      roundUrl: "https://cofoundery.de/teams/team-1/collaboration-lab/read-my-mind/round-1",
+      creatorName: "Anna",
+      locale,
+    });
+    assert.match(payload.subject, /Anna/);
+    assert.match(payload.text, locale === "de" ? /eigenen Teil[\s\S]*abgeschlossen/ : /completed their part/);
+    assert.doesNotMatch(payload.text, /choice_|Self Answer|Guess Answer|Need Answer/i);
   }
 });
 

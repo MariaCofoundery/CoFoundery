@@ -30,6 +30,7 @@ export type ReadMyMindRoundRow = {
   created_by_user_id: string;
   status: string;
   created_at: string;
+  handoff_ready_at?: string | null;
   completed_at: string | null;
   abandoned_at: string | null;
 };
@@ -120,6 +121,7 @@ export type ReadMyMindRoundReadModel = {
   status: ReadMyMindRoundStatus;
   pack: ReadMyMindPack;
   createdAt: string;
+  handoffReadyAt: string | null;
   completedAt: string | null;
   abandonedAt: string | null;
   ownParticipantState: ReadMyMindParticipantState;
@@ -221,13 +223,14 @@ export function buildReadMyMindRoundReadModel(params: {
 
   // Prompt rows are intentionally hidden from pending participants by RLS. A forming
   // round still needs a narrow invitation/waiting projection, without answer slots.
-  if (status === "forming" || status === "abandoned") {
+  if ((status === "forming" && ownState !== "joined") || status === "abandoned") {
     return {
       id: params.round.id,
       team: params.team,
       status,
       pack,
       createdAt: params.round.created_at,
+      handoffReadyAt: params.round.handoff_ready_at ?? null,
       completedAt: params.round.completed_at,
       abandonedAt: params.round.abandoned_at,
       ownParticipantState: ownState,
@@ -335,6 +338,7 @@ export function buildReadMyMindRoundReadModel(params: {
     status,
     pack,
     createdAt: params.round.created_at,
+    handoffReadyAt: params.round.handoff_ready_at ?? null,
     completedAt: params.round.completed_at,
     abandonedAt: params.round.abandoned_at,
     ownParticipantState: ownState,

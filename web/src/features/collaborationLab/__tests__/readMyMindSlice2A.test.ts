@@ -99,12 +99,12 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.equal(en.homebase.betaLabel, "Beta · In development");
   assert.match(de.entry.betaNotice, /Testphase/);
   assert.match(en.entry.betaNotice, /currently in testing/);
-  assert.equal(de.entry.handoffTitle, "Das macht ihr gemeinsam.");
-  assert.match(de.entry.handoffText, /danach ist \{name\} dran/);
-  assert.equal(en.entry.handoffTitle, "You do this together.");
-  assert.match(en.entry.handoffText, /then it’s \{name\}’s turn/);
-  assert.equal(de.round.creatorText, "Jetzt ist {name} dran.");
-  assert.equal(en.round.creatorText, "Now it’s {name}’s turn.");
+  assert.equal(de.entry.handoffTitle, "Das macht ihr nacheinander.");
+  assert.match(de.entry.handoffText, /Danach ist \{name\} dran/);
+  assert.equal(en.entry.handoffTitle, "You take turns.");
+  assert.match(en.entry.handoffText, /Then it’s \{name\}’s turn/);
+  assert.equal(de.round.creatorTitle, "Du bist dran");
+  assert.equal(en.round.creatorTitle, "You’re up");
   assert.equal(de.round.join, "Ich bin dabei");
   assert.equal(en.round.join, "I’m in");
   assert.equal(de.round.decline, "Diesmal nicht");
@@ -113,8 +113,8 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.doesNotMatch(`${en.round.creatorText} ${en.round.creatorHint}`, /approval|needs to join before/iu);
   assert.equal(dashboardDe.tasks.items.readMyMindInvitation.title, "Read My Mind: Du bist dran");
   assert.equal(dashboardEn.tasks.items.readMyMindInvitation.title, "Read My Mind: You’re up");
-  assert.match(dashboardDe.tasks.items.readMyMindInvitation.textWithName, /mit dir gestartet/);
-  assert.match(dashboardEn.tasks.items.readMyMindInvitation.textWithName, /with you/);
+  assert.match(dashboardDe.tasks.items.readMyMindInvitation.textWithName, /Teil abgeschlossen/);
+  assert.match(dashboardEn.tasks.items.readMyMindInvitation.textWithName, /completed their part/);
   for (const serialized of [JSON.stringify(de), JSON.stringify(en)]) {
     for (const forbidden of ["Compatibility", "kompatibel", "Readiness", "Persönlichkeitstyp", "Accuracy", "Score", "Match %"]) assert.equal(serialized.includes(forbidden), false);
   }

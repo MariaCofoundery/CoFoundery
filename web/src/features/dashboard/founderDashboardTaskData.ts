@@ -78,7 +78,7 @@ export async function getFounderDashboardTasks(params: {
         }))
       ),
       teamIds.length > 0
-        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at").in("founder_team_id", teamIds).in("status", ["forming", "active"])
+        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at").in("founder_team_id", teamIds).in("status", ["forming", "active"])
         : Promise.resolve({ data: [], error: null }),
     ]);
 
@@ -95,7 +95,7 @@ export async function getFounderDashboardTasks(params: {
     item.pending_revision_id ? [item.pending_revision_id] : []
   );
 
-  const readMyMindRounds = readMyMindRoundResult.error ? [] : ((readMyMindRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; pack_key: string; pack_version: number; created_by_user_id: string; status: string; created_at: string }>);
+  const readMyMindRounds = readMyMindRoundResult.error ? [] : ((readMyMindRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; pack_key: string; pack_version: number; created_by_user_id: string; status: string; created_at: string; handoff_ready_at: string | null }>);
   const readMyMindRoundIds = readMyMindRounds.map((round) => round.id);
   const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult, readMyMindPromptResult, readMyMindReceiptResult, readMyMindStateResults] = await Promise.all([
     relationshipIds.length > 0
@@ -271,6 +271,7 @@ export async function getFounderDashboardTasks(params: {
         teamId: round.founder_team_id,
         teamLabel: team?.name ?? team?.members.map((member) => member.displayName).filter(Boolean).join(" + ") ?? null,
         creatorLabel: creator?.displayName ?? null,
+        handoffReady: round.handoff_ready_at !== null,
         status: round.status,
         ownParticipantState: participant?.state ?? "unavailable",
         ownAnswerComplete: ownResponseCount === expectedOwnResponses,

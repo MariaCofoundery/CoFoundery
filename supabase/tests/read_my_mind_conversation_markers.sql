@@ -61,7 +61,8 @@ returns void language sql as $$
    and contract.prompt_key = round_prompt.prompt_key
    and contract.prompt_version = round_prompt.prompt_version
    and contract.response_type = required_slot.response_type
-  where assignment.round_id = p_round_id;
+  where assignment.round_id = p_round_id
+  on conflict (prompt_assignment_id, respondent_user_id, response_type) do nothing;
 $$;
 
 create or replace function pg_temp.open_rmm_marker_reveal(p_round_id uuid, p_position integer)
@@ -118,6 +119,7 @@ select set_config('request.jwt.claims','{"sub":"c1111111-1111-4111-8111-11111111
 set local role authenticated;
 select public.create_collaboration_experience_round('cc111111-1111-4111-8111-111111111111','easy_start',1);
 reset role;
+select pg_temp.fill_rmm_marker_answers(pg_temp.rmm_marker_round('cc111111-1111-4111-8111-111111111111'));
 select set_config('request.jwt.claims','{"sub":"c2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_marker_round('cc111111-1111-4111-8111-111111111111'));
@@ -285,6 +287,7 @@ select set_config('request.jwt.claims','{"sub":"c1111111-1111-4111-8111-11111111
 set local role authenticated;
 select public.create_collaboration_experience_round('cc222222-2222-4222-8222-222222222222','how_we_work',1);
 reset role;
+select pg_temp.fill_rmm_marker_answers(pg_temp.rmm_marker_round('cc222222-2222-4222-8222-222222222222'));
 select set_config('request.jwt.claims','{"sub":"c2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_marker_round('cc222222-2222-4222-8222-222222222222'));
@@ -320,6 +323,7 @@ select set_config('request.jwt.claims','{"sub":"c5555555-5555-4555-8555-55555555
 set local role authenticated;
 select public.create_collaboration_experience_round('cc333333-3333-4333-8333-333333333333','easy_start',1);
 reset role;
+select pg_temp.fill_rmm_marker_answers(pg_temp.rmm_marker_round('cc333333-3333-4333-8333-333333333333'));
 select set_config('request.jwt.claims','{"sub":"c6666666-6666-4666-8666-666666666666","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_marker_round('cc333333-3333-4333-8333-333333333333'));

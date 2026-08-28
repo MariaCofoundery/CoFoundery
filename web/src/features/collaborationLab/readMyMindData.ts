@@ -9,7 +9,7 @@ type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 export type ReadMyMindHomebaseState =
   | { kind: "unsupported"; completedRound: ReadMyMindRoundReadModel | null }
   | { kind: "start" }
-  | { kind: "forming_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "reveal_ready" | "reveal_waiting" | "completed"; round: ReadMyMindRoundReadModel };
+  | { kind: "forming_creator_continue" | "forming_creator_waiting" | "forming_partner_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "reveal_ready" | "reveal_waiting" | "completed"; round: ReadMyMindRoundReadModel };
 
 export async function getReadMyMindTeamContext(
   teamId: string,
@@ -40,7 +40,7 @@ export async function getReadMyMindRound(
   const supabase = client ?? (await createClient());
   const roundResult = await supabase
     .from("collaboration_experience_rounds")
-    .select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, completed_at, abandoned_at")
+    .select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at, completed_at, abandoned_at")
     .eq("id", roundId)
     .eq("founder_team_id", team.id)
     .maybeSingle();
@@ -120,7 +120,12 @@ export async function getReadMyMindHomebaseState(
   if (!openResult.error && openResult.data) {
     const round = await getReadMyMindRound(team, openResult.data.id as string, currentUserId, supabase);
     if (round) {
-      if (round.status === "forming") return { kind: round.ownParticipantState === "pending" ? "forming_invitation" : "forming_waiting", round };
+      if (round.status === "forming") {
+        if (round.ownParticipantState === "pending") {
+          return { kind: round.handoffReadyAt ? "forming_invitation" : "forming_partner_waiting", round };
+        }
+        return { kind: round.handoffReadyAt ? "forming_creator_waiting" : "forming_creator_continue", round };
+      }
       if (round.wholeRoundAnswerComplete) return { kind: round.ownRevealComplete ? "reveal_waiting" : "reveal_ready", round };
       return { kind: round.ownAnswerComplete ? "active_waiting" : "active_continue", round };
     }

@@ -40,7 +40,7 @@ function refresh(teamId: string, roundId?: string) {
   if (roundId) revalidatePath(revealHref(teamId, roundId));
 }
 
-async function sendRoundStartedNotification(params: {
+async function sendRoundHandoffNotification(params: {
   supabase: Awaited<ReturnType<typeof createClient>>;
   teamId: string;
   roundId: string;
@@ -66,7 +66,7 @@ async function sendRoundStartedNotification(params: {
     locale: await getRequestLocale(),
   });
   if (!delivery.ok) {
-    console.error("Read My Mind start notification delivery failed", { roundId: params.roundId });
+    console.error("Read My Mind handoff notification delivery failed", { roundId: params.roundId });
   }
 }
 
@@ -84,18 +84,6 @@ export async function startReadMyMindRoundAction(teamId: string, formData: FormD
     p_pack_version: packVersion,
   });
   if (error || typeof data !== "string") redirect(entryHref(teamId, "changed"));
-  const creatorName = team.members.find((member) => member.userId === auth.user.id)?.displayName ?? null;
-  try {
-    await sendRoundStartedNotification({
-      supabase: auth.supabase,
-      teamId,
-      roundId: data,
-      creatorUserId: auth.user.id,
-      creatorName,
-    });
-  } catch {
-    console.error("Read My Mind start notification failed", { roundId: data });
-  }
   refresh(teamId, data);
   redirect(roundHref(teamId, data));
 }
@@ -141,7 +129,13 @@ export async function lockReadMyMindPromptAction(
   if (!team || team.members.length !== 2) redirect(entryHref(teamId, "unavailable"));
   const round = await getReadMyMindRound(team, roundId, auth.user.id, auth.supabase);
   const prompt = round?.prompts.find((entry) => entry.roundPromptId === roundPromptId);
-  if (!round || round.status !== "active" || round.ownParticipantState !== "joined" || !prompt) {
+  if (
+    !round ||
+    !["forming", "active"].includes(round.status) ||
+    round.ownParticipantState !== "joined" ||
+    (round.status === "forming" && round.handoffReadyAt !== null) ||
+    !prompt
+  ) {
     redirect(roundHref(teamId, roundId, "changed"));
   }
 
@@ -165,6 +159,26 @@ export async function lockReadMyMindPromptAction(
       const result = error.message.includes("is_locked") ? "locked" : "changed";
       refresh(teamId, roundId);
       redirect(roundHref(teamId, roundId, result));
+    }
+  }
+
+  if (round.status === "forming" && prompt.position === round.pack.prompts.length - 1) {
+    const claim = await auth.supabase.rpc("claim_collaboration_round_handoff_email", {
+      p_round_id: roundId,
+    });
+    if (!claim.error && claim.data === true) {
+      const creatorName = team.members.find((member) => member.userId === auth.user.id)?.displayName ?? null;
+      try {
+        await sendRoundHandoffNotification({
+          supabase: auth.supabase,
+          teamId,
+          roundId,
+          creatorUserId: auth.user.id,
+          creatorName,
+        });
+      } catch {
+        console.error("Read My Mind handoff notification failed", { roundId });
+      }
     }
   }
   refresh(teamId, roundId);

@@ -99,7 +99,7 @@
       "readMyMindInvitation": {
         "title": "Read My Mind: Du bist dran",
         "text": "Eine gemeinsame Runde wurde mit dir gestartet.",
-        "textWithName": "{name} hat eine gemeinsame Runde mit dir gestartet.",
+        "textWithName": "{name} hat den eigenen Teil abgeschlossen.",
         "action": "Read My Mind öffnen"
       },
       "readMyMindContinue": {

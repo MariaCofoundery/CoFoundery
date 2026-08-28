@@ -71,11 +71,12 @@ returns void language sql as $$
     and not (
       p_skip_one
       and round_prompt.position = 4
-      and participant.position = 0
+      and participant.position = 1
       and required_slot.response_type = case
         when participant.founder_user_id = assignment.target_user_id then 'self' else 'guess'
       end
-    );
+    )
+  on conflict (prompt_assignment_id, respondent_user_id, response_type) do nothing;
 $$;
 
 create or replace function pg_temp.open_rmm_reveals(
@@ -168,6 +169,8 @@ do $$ begin
   exception when insufficient_privilege then null; end;
 end $$;
 reset role;
+
+select pg_temp.fill_rmm_required_answers(pg_temp.rmm_round('aa111111-1111-4111-8111-111111111111'));
 
 select set_config('request.jwt.claims','{"sub":"a2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
@@ -308,6 +311,7 @@ select set_config('request.jwt.claims','{"sub":"a4444444-4444-4444-8444-44444444
 set local role authenticated;
 select public.create_collaboration_experience_round('aa222222-2222-4222-8222-222222222222','easy_start',1);
 reset role;
+select pg_temp.fill_rmm_required_answers(pg_temp.rmm_round('aa222222-2222-4222-8222-222222222222'));
 select set_config('request.jwt.claims','{"sub":"a5555555-5555-4555-8555-555555555555","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_round('aa222222-2222-4222-8222-222222222222'));
@@ -332,6 +336,7 @@ select set_config('request.jwt.claims','{"sub":"a4444444-4444-4444-8444-44444444
 set local role authenticated;
 select public.create_collaboration_experience_round('aa333333-3333-4333-8333-333333333333','easy_start',1);
 reset role;
+select pg_temp.fill_rmm_required_answers(pg_temp.rmm_round('aa333333-3333-4333-8333-333333333333'));
 select set_config('request.jwt.claims','{"sub":"a5555555-5555-4555-8555-555555555555","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_round('aa333333-3333-4333-8333-333333333333'));

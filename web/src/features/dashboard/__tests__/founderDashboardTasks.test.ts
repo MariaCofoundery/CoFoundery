@@ -99,9 +99,12 @@ test("only three tasks are initially visible and show-all is needed for more", (
 });
 
 test("Read My Mind only creates pending and own-answer tasks for supported two-founder teams", () => {
-  const base = { teamId: "team", teamLabel: "Team Atlas", creatorLabel: "Anna", status: "forming", ownParticipantState: "pending", ownAnswerComplete: false, wholeAnswerComplete: false, ownRevealComplete: false, nextRevealPosition: null, supportedTwoFounderTeam: true, createdAt: NOW };
+  const base = { teamId: "team", teamLabel: "Team Atlas", creatorLabel: "Anna", status: "forming", ownParticipantState: "pending", handoffReady: false, ownAnswerComplete: false, wholeAnswerComplete: false, ownRevealComplete: false, nextRevealPosition: null, supportedTwoFounderTeam: true, createdAt: NOW };
   const tasks = buildFounderDashboardTasks(signals({ readMyMindRounds: [
-    { id: "pending", ...base },
+    { id: "pre-handoff", ...base },
+    { id: "pending", ...base, handoffReady: true },
+    { id: "creator", ...base, ownParticipantState: "joined" },
+    { id: "creator-waiting", ...base, ownParticipantState: "joined", ownAnswerComplete: true, handoffReady: true },
     { id: "continue", ...base, status: "active", ownParticipantState: "joined" },
     { id: "waiting", ...base, status: "active", ownParticipantState: "joined", ownAnswerComplete: true },
     { id: "reveal", ...base, status: "active", ownParticipantState: "joined", ownAnswerComplete: true, wholeAnswerComplete: true, nextRevealPosition: 2 },
@@ -111,10 +114,11 @@ test("Read My Mind only creates pending and own-answer tasks for supported two-f
   assert.deepEqual(tasks.map((task) => [task.type, task.kind]), [
     ["read_my_mind_invitation", "NEEDS_YOU"],
     ["read_my_mind_continue", "CONTINUE_SHARED"],
+    ["read_my_mind_continue", "CONTINUE_SHARED"],
     ["read_my_mind_reveal", "CONTINUE_SHARED"],
   ]);
   assert.match(tasks[0]!.href, /collaboration-lab\/read-my-mind\/pending$/);
-  assert.match(tasks[2]!.href, /reveal\/2$/);
+  assert.match(tasks[3]!.href, /reveal\/2$/);
 });
 
 test("only actionable incoming invitations become tasks", () => {

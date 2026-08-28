@@ -26,6 +26,40 @@ returns uuid language sql stable as $$
     and round_prompt.position = p_position
 $$;
 
+create or replace function pg_temp.fill_rmm_creator_answers(p_round_id uuid)
+returns void language sql as $$
+  insert into public.collaboration_experience_responses (
+    round_id, prompt_assignment_id, respondent_user_id, response_type, choice_keys
+  )
+  select assignment.round_id, assignment.id, participant.founder_user_id,
+         required_slot.response_type, array[contract.allowed_choice_keys[1]]
+  from public.collaboration_experience_prompt_assignments assignment
+  join public.collaboration_experience_round_prompts round_prompt
+    on round_prompt.id = assignment.round_prompt_id
+  join public.collaboration_experience_prompt_versions prompt
+    on prompt.experience_key = round_prompt.experience_key
+   and prompt.pack_key = round_prompt.pack_key
+   and prompt.pack_version = round_prompt.pack_version
+   and prompt.prompt_key = round_prompt.prompt_key
+   and prompt.prompt_version = round_prompt.prompt_version
+  join public.collaboration_experience_round_participants participant
+    on participant.round_id = assignment.round_id and participant.state = 'joined'
+  cross join lateral (
+    select case when participant.founder_user_id = assignment.target_user_id then 'self' else 'guess' end::text response_type
+    union all
+    select 'need' where participant.founder_user_id <> assignment.target_user_id and prompt.need_mode = 'required'
+  ) required_slot
+  join public.collaboration_experience_prompt_response_contracts contract
+    on contract.experience_key = round_prompt.experience_key
+   and contract.pack_key = round_prompt.pack_key
+   and contract.pack_version = round_prompt.pack_version
+   and contract.prompt_key = round_prompt.prompt_key
+   and contract.prompt_version = round_prompt.prompt_version
+   and contract.response_type = required_slot.response_type
+  where assignment.round_id = p_round_id
+  on conflict (prompt_assignment_id, respondent_user_id, response_type) do nothing;
+$$;
+
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
   raw_app_meta_data, raw_user_meta_data, created_at, updated_at
@@ -144,7 +178,7 @@ do $$ begin
 end $$;
 reset role;
 
--- Creator joins explicitly by starting; the other founder remains pending and answers are blocked.
+-- Creator joins explicitly by starting; only that founder may answer during the sequential forming turn.
 select set_config('request.jwt.claims','{"sub":"d1111111-1111-4111-8111-111111111111","role":"authenticated"}',true);
 set local role authenticated;
 select public.create_collaboration_experience_round('da111111-1111-4111-8111-111111111111','easy_start',1);
@@ -157,12 +191,13 @@ select pg_temp.assert_rmm(
   'two-founder snapshot, forming state, or two-target assignments are wrong'
 );
 do $$ declare v_assignment uuid; begin
-  select id into v_assignment from public.collaboration_experience_prompt_assignments
-  where round_id = pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111') limit 1;
-  begin
-    perform public.lock_collaboration_response(v_assignment,'self',array['quiet_works_well']);
-    raise exception 'response in forming round succeeded';
-  exception when insufficient_privilege then null; end;
+  select assignment.id into v_assignment
+  from public.collaboration_experience_prompt_assignments assignment
+  join public.collaboration_experience_round_prompts prompt on prompt.id = assignment.round_prompt_id
+  where assignment.round_id = pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111')
+    and assignment.target_user_id = 'd1111111-1111-4111-8111-111111111111'
+    and prompt.position = 0;
+  perform public.lock_collaboration_response(v_assignment,'self',array['quiet_works_well']);
   begin
     perform public.create_collaboration_experience_round('da111111-1111-4111-8111-111111111111','how_we_work',1);
     raise exception 'second open round succeeded';
@@ -170,6 +205,25 @@ do $$ declare v_assignment uuid; begin
 end $$;
 reset role;
 
+select set_config('request.jwt.claims','{"sub":"d2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
+set local role authenticated;
+do $$ declare v_assignment uuid; begin
+  select assignment.id into v_assignment
+  from public.collaboration_experience_prompt_assignments assignment
+  join public.collaboration_experience_round_prompts prompt on prompt.id = assignment.round_prompt_id
+  where assignment.round_id = pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111')
+    and assignment.target_user_id = 'd2222222-2222-4222-8222-222222222222'
+    and prompt.position = 0;
+  begin perform public.lock_collaboration_response(v_assignment,'self',array['quiet_works_well']);
+    raise exception 'pending founder locked a forming response';
+  exception when insufficient_privilege then null; end;
+  begin perform public.join_collaboration_experience_round(pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111'));
+    raise exception 'pending founder joined before creator handoff';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+select pg_temp.fill_rmm_creator_answers(pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111'));
 select set_config('request.jwt.claims','{"sub":"d2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select pg_temp.assert_rmm(public.join_collaboration_experience_round(pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111')) = 'active','last join did not activate pair round');
@@ -468,6 +522,7 @@ select set_config('request.jwt.claims','{"sub":"d5555555-5555-4555-8555-55555555
 set local role authenticated;
 select public.create_collaboration_experience_round('da333333-3333-4333-8333-333333333333','when_things_get_tricky',1);
 reset role;
+select pg_temp.fill_rmm_creator_answers(pg_temp.rmm_round_for_team('da333333-3333-4333-8333-333333333333'));
 select set_config('request.jwt.claims','{"sub":"d6666666-6666-4666-8666-666666666666","role":"authenticated"}',true);
 set local role authenticated;
 select public.decline_collaboration_experience_round(pg_temp.rmm_round_for_team('da333333-3333-4333-8333-333333333333'));

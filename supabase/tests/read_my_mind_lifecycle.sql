@@ -65,7 +65,8 @@ returns void language sql as $$
    and contract.prompt_key = round_prompt.prompt_key
    and contract.prompt_version = round_prompt.prompt_version
    and contract.response_type = required_slot.response_type
-  where assignment.round_id = p_round_id;
+  where assignment.round_id = p_round_id
+  on conflict (prompt_assignment_id, respondent_user_id, response_type) do nothing;
 $$;
 
 create or replace function pg_temp.open_rmm_lifecycle_reveal(
@@ -193,6 +194,7 @@ reset role;
 insert into pg_temp.rmm_round_refs
 select 'forming_r2', id from public.collaboration_experience_rounds
 where founder_team_id = 'bb111111-1111-4111-8111-111111111111' and status = 'forming';
+select pg_temp.fill_rmm_lifecycle_answers(pg_temp.rmm_ref('forming_r2'));
 select set_config('request.jwt.claims','{"sub":"b2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.decline_collaboration_experience_round(pg_temp.rmm_ref('forming_r2'));
@@ -213,6 +215,7 @@ reset role;
 insert into pg_temp.rmm_round_refs
 select 'privacy_active', id from public.collaboration_experience_rounds
 where founder_team_id = 'bb222222-2222-4222-8222-222222222222' and status = 'forming';
+select pg_temp.fill_rmm_lifecycle_answers(pg_temp.rmm_ref('privacy_active'));
 select set_config('request.jwt.claims','{"sub":"b2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_ref('privacy_active'));
@@ -318,6 +321,7 @@ reset role;
 insert into pg_temp.rmm_round_refs
 select 'completed_round', id from public.collaboration_experience_rounds
 where founder_team_id = 'bb333333-3333-4333-8333-333333333333' and status = 'forming';
+select pg_temp.fill_rmm_lifecycle_answers(pg_temp.rmm_ref('completed_round'));
 select set_config('request.jwt.claims','{"sub":"b2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_ref('completed_round'));
@@ -354,6 +358,7 @@ reset role;
 insert into pg_temp.rmm_round_refs
 select 'membership_round', id from public.collaboration_experience_rounds
 where founder_team_id = 'bb444444-4444-4444-8444-444444444444' and status = 'forming';
+select pg_temp.fill_rmm_lifecycle_answers(pg_temp.rmm_ref('membership_round'));
 select set_config('request.jwt.claims','{"sub":"b2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select public.join_collaboration_experience_round(pg_temp.rmm_ref('membership_round'));

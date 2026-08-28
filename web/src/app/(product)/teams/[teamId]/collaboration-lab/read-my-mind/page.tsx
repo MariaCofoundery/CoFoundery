@@ -44,7 +44,7 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
           <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="rmm-transparency">
             <h2 id="rmm-transparency" className="text-xl font-semibold text-slate-950">{t("transparencyTitle")}</h2>
             <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
-              {["independent", "hidden", "compare", "noRightAnswers", "sharedReveal", "isolated"].map((key) => <li key={key} className="flex gap-3"><span aria-hidden="true" className="text-violet-500">•</span><span>{t(`transparency.${key}`)}</span></li>)}
+              {["independent", "hidden", "compare", "noRightAnswers", "sharedReveal", "isolated", "declinePurge"].map((key) => <li key={key} className="flex gap-3"><span aria-hidden="true" className="text-violet-500">•</span><span>{t(`transparency.${key}`, { name: partnerName })}</span></li>)}
             </ul>
           </section>
           <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label={t("title") }>

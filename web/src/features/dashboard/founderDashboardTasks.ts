@@ -105,6 +105,7 @@ export type FounderDashboardTaskSignals = {
     teamId: string;
     teamLabel: string | null;
     creatorLabel: string | null;
+    handoffReady?: boolean;
     status: string;
     ownParticipantState: string;
     ownAnswerComplete: boolean;
@@ -212,8 +213,10 @@ export function buildFounderDashboardTasks(
 
   for (const round of signals.readMyMindRounds) {
     if (!round.supportedTwoFounderTeam) continue;
-    if (round.status === "forming" && round.ownParticipantState === "pending") {
+    if (round.status === "forming" && round.ownParticipantState === "pending" && round.handoffReady) {
       tasks.push({ id: `read-my-mind:${round.id}`, kind: "NEEDS_YOU", type: "read_my_mind_invitation", href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(round.id)}`, createdAt: round.createdAt, contextLabel: round.teamLabel, personLabel: round.creatorLabel, itemKey: null });
+    } else if (round.status === "forming" && round.ownParticipantState === "joined" && !round.handoffReady && !round.ownAnswerComplete) {
+      tasks.push({ id: `read-my-mind:${round.id}`, kind: "CONTINUE_SHARED", type: "read_my_mind_continue", href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(round.id)}`, createdAt: round.createdAt, contextLabel: round.teamLabel, personLabel: null, itemKey: null });
     } else if (round.status === "active" && round.ownParticipantState === "joined" && !round.ownAnswerComplete) {
       tasks.push({ id: `read-my-mind:${round.id}`, kind: "CONTINUE_SHARED", type: "read_my_mind_continue", href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(round.id)}`, createdAt: round.createdAt, contextLabel: round.teamLabel, personLabel: null, itemKey: null });
     } else if (round.status === "active" && round.ownParticipantState === "joined" && round.wholeAnswerComplete && !round.ownRevealComplete && round.nextRevealPosition !== null) {
