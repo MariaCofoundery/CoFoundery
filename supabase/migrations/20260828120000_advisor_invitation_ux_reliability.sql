@@ -18,17 +18,24 @@ alter table public.advisor_team_invites
   add constraint advisor_team_invites_founder_b_send_status_check
     check (founder_b_send_status in ('not_sent', 'sent', 'failed'));
 
--- A successful claim proves that the recipient received a usable link. No other
--- historical delivery outcome is inferred during this additive backfill.
+-- A successful claim on a still-open invite proves that the recipient received
+-- a usable link. Terminal or time-expired history no longer needs delivery
+-- metadata and must not be touched across the terminal lifecycle guard.
 update public.advisor_team_invites
 set founder_a_send_status = 'sent',
     founder_a_last_sent_at = coalesce(founder_a_last_sent_at, founder_a_claimed_at)
-where founder_a_claimed_at is not null;
+where founder_a_claimed_at is not null
+  and status in ('pending', 'activating')
+  and expires_at > pg_catalog.now()
+  and (founder_a_send_status is distinct from 'sent' or founder_a_last_sent_at is null);
 
 update public.advisor_team_invites
 set founder_b_send_status = 'sent',
     founder_b_last_sent_at = coalesce(founder_b_last_sent_at, founder_b_claimed_at)
-where founder_b_claimed_at is not null;
+where founder_b_claimed_at is not null
+  and status in ('pending', 'activating')
+  and expires_at > pg_catalog.now()
+  and (founder_b_send_status is distinct from 'sent' or founder_b_last_sent_at is null);
 
 create or replace function public.record_advisor_team_invite_delivery(
   p_invite_id uuid,
