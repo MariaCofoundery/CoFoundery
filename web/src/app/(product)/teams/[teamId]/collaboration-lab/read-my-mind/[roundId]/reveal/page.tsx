@@ -26,10 +26,28 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
   const firstPosition = round.prompts[0]?.position ?? 0;
   const nextPosition = round.nextRevealPosition;
   const complete = completeReadMyMindRoundAction.bind(null, teamId, roundId);
+  const conversationPrompts = round.ownRevealComplete
+    ? round.prompts.filter((prompt) =>
+        round.conversationMarkers.some((marker) => marker.roundPromptId === prompt.roundPromptId)
+      )
+    : [];
+  const partnerName = round.partner.displayName ?? t(
+    round.status === "completed" ? "historicalPartnerFallback" : "partnerFallback"
+  );
+  const markerStatus = (roundPromptId: string) => {
+    const participantIds = round.conversationMarkers.find(
+      (marker) => marker.roundPromptId === roundPromptId
+    )?.participantUserIds ?? [];
+    const own = participantIds.includes(user.id);
+    const partner = participantIds.includes(round.partner.userId);
+    if (own && partner) return t("markerStatusBoth");
+    if (partner) return t("markerStatusPartner", { name: partnerName });
+    return t("markerStatusOwn");
+  };
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={roundHref} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("back")}</Link>
+      <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
       <header className="mt-6 overflow-hidden rounded-[30px] border border-violet-200/80 bg-gradient-to-br from-violet-100 via-white to-amber-100/70 p-6 shadow-[0_24px_60px_rgba(76,29,149,0.12)] sm:p-9">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">{t("eyebrow")}</p>
         <p className="mt-3 text-sm font-medium text-slate-600">{round.pack.title[locale]}</p>
@@ -61,6 +79,26 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
           </>
         )}
       </header>
+      {conversationPrompts.length > 0 ? (
+        <section className="mt-8" aria-labelledby="conversation-summary-title">
+          <h2 id="conversation-summary-title" className="text-2xl font-semibold tracking-tight text-slate-950">{t("conversationSummaryTitle")}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("conversationSummaryIntro")}</p>
+          <div className="mt-5 grid gap-4">
+            {conversationPrompts.map((prompt) => (
+              <article key={prompt.roundPromptId} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+                <h3 className="text-lg font-semibold text-slate-950">{prompt.content.title[locale]}</h3>
+                <p className="mt-2 text-sm font-medium text-violet-800">{markerStatus(prompt.roundPromptId)}</p>
+                <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
+                  {["conversationQuestion1", "conversationQuestion2", "conversationQuestion3"].map((key) => (
+                    <li key={key} className="flex gap-3"><span aria-hidden="true" className="text-violet-500">•</span><span>{t(key)}</span></li>
+                  ))}
+                </ul>
+                <Link prefetch={false} href={`${revealHref}/${prompt.position}`} className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">{t("reviewConversationReveal")}</Link>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

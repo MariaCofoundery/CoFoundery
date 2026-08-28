@@ -74,6 +74,18 @@ export type ReadMyMindOwnReceiptRow = {
   opened_at: string;
 };
 
+export type ReadMyMindConversationMarkerRow = {
+  round_id: string;
+  round_prompt_id: string;
+  participant_user_id: string;
+  created_at: string;
+};
+
+export type ReadMyMindConversationMarker = {
+  roundPromptId: string;
+  participantUserIds: string[];
+};
+
 export type ReadMyMindRevealResponseRow = {
   round_prompt_id: string;
   prompt_assignment_id: string;
@@ -119,6 +131,7 @@ export type ReadMyMindRoundReadModel = {
   openedPromptPositions: number[];
   nextRevealPosition: number | null;
   ownRevealComplete: boolean;
+  conversationMarkers: ReadMyMindConversationMarker[];
 };
 
 function participantState(value: string): ReadMyMindParticipantState | null {
@@ -163,6 +176,7 @@ export function buildReadMyMindRoundReadModel(params: {
   ownResponses: ReadMyMindOwnResponseRow[];
   wholeRoundAnswerComplete: boolean;
   ownReceipts?: ReadMyMindOwnReceiptRow[];
+  conversationMarkers?: ReadMyMindConversationMarkerRow[];
 }): ReadMyMindRoundReadModel | null {
   const status = roundStatus(params.round.status);
   const pack = getReadMyMindPack(params.round.pack_key, params.round.pack_version);
@@ -225,6 +239,7 @@ export function buildReadMyMindRoundReadModel(params: {
       openedPromptPositions: [],
       nextRevealPosition: null,
       ownRevealComplete: false,
+      conversationMarkers: [],
     };
   }
 
@@ -301,6 +316,19 @@ export function buildReadMyMindRoundReadModel(params: {
   const nextReveal = promptStates.find(
     (prompt) => !ownReceiptPromptIds.has(prompt.roundPromptId)
   );
+  const participantIds = new Set(params.participants.map((participant) => participant.founder_user_id));
+  const promptIds = new Set(promptStates.map((prompt) => prompt.roundPromptId));
+  const markersByPrompt = new Map<string, Set<string>>();
+  for (const marker of params.conversationMarkers ?? []) {
+    if (
+      marker.round_id !== params.round.id ||
+      !promptIds.has(marker.round_prompt_id) ||
+      !participantIds.has(marker.participant_user_id)
+    ) continue;
+    const markerParticipants = markersByPrompt.get(marker.round_prompt_id) ?? new Set<string>();
+    markerParticipants.add(marker.participant_user_id);
+    markersByPrompt.set(marker.round_prompt_id, markerParticipants);
+  }
   return {
     id: params.round.id,
     team: params.team,
@@ -318,6 +346,10 @@ export function buildReadMyMindRoundReadModel(params: {
     openedPromptPositions,
     nextRevealPosition: nextReveal?.position ?? null,
     ownRevealComplete: promptStates.length > 0 && openedPromptPositions.length === promptStates.length,
+    conversationMarkers: [...markersByPrompt.entries()].map(([roundPromptId, markerParticipants]) => ({
+      roundPromptId,
+      participantUserIds: [...markerParticipants],
+    })),
   };
 }
 

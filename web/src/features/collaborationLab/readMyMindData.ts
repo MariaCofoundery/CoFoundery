@@ -1,6 +1,6 @@
 import "server-only";
 
-import { buildReadMyMindPromptReveal, buildReadMyMindRoundReadModel, type ReadMyMindAssignmentRow, type ReadMyMindOwnReceiptRow, type ReadMyMindOwnResponseRow, type ReadMyMindParticipantRow, type ReadMyMindPromptReveal, type ReadMyMindRevealResponseRow, type ReadMyMindRoundPromptRow, type ReadMyMindRoundReadModel, type ReadMyMindRoundRow, type ReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindModel";
+import { buildReadMyMindPromptReveal, buildReadMyMindRoundReadModel, type ReadMyMindAssignmentRow, type ReadMyMindConversationMarkerRow, type ReadMyMindOwnReceiptRow, type ReadMyMindOwnResponseRow, type ReadMyMindParticipantRow, type ReadMyMindPromptReveal, type ReadMyMindRevealResponseRow, type ReadMyMindRoundPromptRow, type ReadMyMindRoundReadModel, type ReadMyMindRoundRow, type ReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindModel";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,16 +46,17 @@ export async function getReadMyMindRound(
     .maybeSingle();
   if (roundResult.error || !roundResult.data) return null;
 
-  const [participantsResult, promptsResult, assignmentsResult, responsesResult, receiptsResult, stateResult] =
+  const [participantsResult, promptsResult, assignmentsResult, responsesResult, receiptsResult, markersResult, stateResult] =
     await Promise.all([
       supabase.from("collaboration_experience_round_participants").select("round_id, founder_user_id, position, state, joined_at").eq("round_id", roundId),
       supabase.from("collaboration_experience_round_prompts").select("id, round_id, prompt_key, prompt_version, position").eq("round_id", roundId).order("position"),
       supabase.from("collaboration_experience_prompt_assignments").select("id, round_id, round_prompt_id, target_user_id").eq("round_id", roundId),
       supabase.from("collaboration_experience_responses").select("id, round_id, prompt_assignment_id, respondent_user_id, response_type, choice_keys, locked_at").eq("round_id", roundId).eq("respondent_user_id", currentUserId),
       supabase.from("collaboration_experience_reveal_receipts").select("round_id, round_prompt_id, participant_user_id, opened_at").eq("round_id", roundId).eq("participant_user_id", currentUserId),
+      supabase.from("collaboration_experience_conversation_markers").select("round_id, round_prompt_id, participant_user_id, created_at").eq("round_id", roundId),
       supabase.rpc("get_collaboration_round_state", { p_round_id: roundId }),
     ]);
-  if (participantsResult.error || promptsResult.error || assignmentsResult.error || responsesResult.error || receiptsResult.error || stateResult.error) return null;
+  if (participantsResult.error || promptsResult.error || assignmentsResult.error || responsesResult.error || receiptsResult.error || markersResult.error || stateResult.error) return null;
   const state = Array.isArray(stateResult.data) ? stateResult.data[0] : stateResult.data;
 
   return buildReadMyMindRoundReadModel({
@@ -68,6 +69,7 @@ export async function getReadMyMindRound(
     ownResponses: (responsesResult.data ?? []) as ReadMyMindOwnResponseRow[],
     wholeRoundAnswerComplete: Boolean((state as { answer_phase_complete?: boolean } | null)?.answer_phase_complete),
     ownReceipts: (receiptsResult.data ?? []) as ReadMyMindOwnReceiptRow[],
+    conversationMarkers: (markersResult.data ?? []) as ReadMyMindConversationMarkerRow[],
   });
 }
 

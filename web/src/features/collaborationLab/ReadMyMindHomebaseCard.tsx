@@ -15,7 +15,7 @@ export async function ReadMyMindHomebaseCard({ team, currentUserId }: { team: Re
   const action = state.kind === "start" ? t("action.start") : state.kind === "forming_waiting" || state.kind === "forming_invitation" ? t("action.handoff") : state.kind === "active_continue" ? t("action.continue") : state.kind === "reveal_ready" ? t("action.reveal") : state.kind === "reveal_waiting" ? t("action.check") : t("action.open");
   const historicalRound = state.kind === "unsupported" ? state.completedRound : null;
   return (
-    <section className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/90 via-white to-amber-50/60 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6" aria-labelledby="collaboration-lab-title">
+    <section id="collaboration-lab" className="scroll-mt-24 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/90 via-white to-amber-50/60 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6" aria-labelledby="collaboration-lab-title">
       <h2 id="collaboration-lab-title" className="text-xl font-semibold text-slate-950">{t("title")}</h2>
       <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{t("description")}</p>
       <article className="mt-5 flex flex-col gap-4 rounded-2xl border border-violet-200/70 bg-white/85 p-5 sm:flex-row sm:items-center sm:justify-between">

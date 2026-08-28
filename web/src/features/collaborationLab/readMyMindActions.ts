@@ -213,3 +213,63 @@ export async function completeReadMyMindRoundAction(teamId: string, roundId: str
   refresh(teamId, roundId);
   redirect(revealHref(teamId, roundId, undefined, "completed"));
 }
+
+async function mutateConversationMarker(
+  teamId: string,
+  roundId: string,
+  position: number,
+  roundPromptId: string,
+  rpc: "mark_collaboration_prompt_for_conversation" | "unmark_collaboration_prompt_for_conversation"
+) {
+  const auth = await authenticated();
+  if (!auth) redirect(`/login?next=${encodeURIComponent(revealHref(teamId, roundId, position))}`);
+  const team = await getReadMyMindTeamContext(teamId, auth.user.id, auth.supabase);
+  if (!team) redirect(entryHref(teamId, "unavailable"));
+  const round = await getReadMyMindRound(team, roundId, auth.user.id, auth.supabase);
+  const prompt = round?.prompts.find(
+    (entry) => entry.position === position && entry.roundPromptId === roundPromptId
+  );
+  if (
+    !round ||
+    !prompt ||
+    !round.openedPromptPositions.includes(position) ||
+    !["active", "completed"].includes(round.status)
+  ) {
+    redirect(revealHref(teamId, roundId, position, "changed"));
+  }
+  const { error } = await auth.supabase.rpc(rpc, { p_round_prompt_id: roundPromptId });
+  if (error) redirect(revealHref(teamId, roundId, position, "changed"));
+  refresh(teamId, roundId);
+  revalidatePath(revealHref(teamId, roundId, position));
+  redirect(`${revealHref(teamId, roundId, position)}#conversation-marker`);
+}
+
+export async function markReadMyMindConversationAction(
+  teamId: string,
+  roundId: string,
+  position: number,
+  roundPromptId: string
+) {
+  return mutateConversationMarker(
+    teamId,
+    roundId,
+    position,
+    roundPromptId,
+    "mark_collaboration_prompt_for_conversation"
+  );
+}
+
+export async function unmarkReadMyMindConversationAction(
+  teamId: string,
+  roundId: string,
+  position: number,
+  roundPromptId: string
+) {
+  return mutateConversationMarker(
+    teamId,
+    roundId,
+    position,
+    roundPromptId,
+    "unmark_collaboration_prompt_for_conversation"
+  );
+}

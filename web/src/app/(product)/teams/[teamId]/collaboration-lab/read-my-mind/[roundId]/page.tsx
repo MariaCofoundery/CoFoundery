@@ -25,7 +25,7 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
   const abandon = abandonReadMyMindRoundAction.bind(null, teamId, roundId);
   const shell = (children: React.ReactNode) => (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${encodeURIComponent(teamId)}`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("back")}</Link>
+      <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
       <header className="mt-6 rounded-[28px] bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 ring-1 ring-violet-200/70 sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Read My Mind</p>
         <h1 className="mt-3 text-2xl font-semibold text-slate-950 sm:text-3xl">{round.pack.title[locale]}</h1>

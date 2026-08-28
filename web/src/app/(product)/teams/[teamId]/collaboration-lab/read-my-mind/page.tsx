@@ -21,7 +21,7 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
   const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName ?? t("partnerFallback");
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${encodeURIComponent(teamId)}`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("back")}</Link>
+      <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
       <header className="mt-6 rounded-[28px] bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 ring-1 ring-violet-200/70 sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1>

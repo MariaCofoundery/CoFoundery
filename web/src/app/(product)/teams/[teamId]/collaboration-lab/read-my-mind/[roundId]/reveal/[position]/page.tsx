@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { completeReadMyMindRoundAction, openReadMyMindRevealAction } from "@/features/collaborationLab/readMyMindActions";
+import { completeReadMyMindRoundAction, markReadMyMindConversationAction, openReadMyMindRevealAction, unmarkReadMyMindConversationAction } from "@/features/collaborationLab/readMyMindActions";
 import { getOpenedReadMyMindPromptReveal, getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import type { ReadMyMindResponseContract } from "@/features/collaborationLab/readMyMindContent";
 import { normalizeLocale } from "@/i18n/config";
@@ -36,10 +36,22 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
   const previous = [...round.openedPromptPositions].filter((entry) => entry < position).sort((a, b) => b - a)[0];
   const next = round.prompts.find((entry) => entry.position > position)?.position;
   const comparison = (exact: boolean) => prompt.content.selfGuess.format === "multi_choice" ? t("multiComparison") : t(exact ? "exact" : "different");
+  const markerParticipantIds = round.conversationMarkers.find(
+    (marker) => marker.roundPromptId === prompt.roundPromptId
+  )?.participantUserIds ?? [];
+  const ownMarked = markerParticipantIds.includes(user.id);
+  const partnerMarked = markerParticipantIds.includes(round.partner.userId);
+  const markerStatus = ownMarked && partnerMarked
+    ? t("markerStatusBoth")
+    : partnerMarked
+      ? t("markerStatusPartner", { name: partnerName })
+      : ownMarked
+        ? t("markerStatusOwn")
+        : null;
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={revealHref} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("back")}</Link>
+      <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
       <header className="mt-6 rounded-[28px] border border-violet-200/80 bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
         <p className="mt-3 text-sm font-semibold text-violet-900">{t("progress", { current: position + 1, total: round.prompts.length })}</p>
@@ -78,6 +90,17 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
           {reveal.needs && prompt.content.need ? <section className="rounded-[28px] border border-slate-200 bg-white p-5 sm:p-7" aria-labelledby="needs-reveal-title"><h2 id="needs-reveal-title" className="text-xl font-semibold text-slate-950">{t("needsTitle")}</h2><div className="mt-5 grid gap-4 md:grid-cols-2"><article><h3 className="text-sm font-semibold text-violet-900">{t("ownNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.own} contract={prompt.content.need} locale={locale} /></article><article><h3 className="text-sm font-semibold text-amber-950">{t("partnerNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.partner} contract={prompt.content.need} locale={locale} /></article></div></section> : null}
 
           <p className="rounded-2xl bg-slate-50 px-5 py-4 text-center text-sm leading-6 text-slate-600">{t("reflection")}</p>
+          <section id="conversation-marker" className="scroll-mt-24 rounded-2xl border border-violet-200 bg-violet-50/60 p-5" aria-labelledby="conversation-marker-title">
+            <h2 id="conversation-marker-title" className="text-lg font-semibold text-slate-950">{t("conversationMarkerTitle")}</h2>
+            {ownMarked ? <p className="mt-2 text-sm font-semibold text-violet-900">{t("markedConversation")}</p> : null}
+            {markerStatus ? <p className="mt-2 text-sm font-medium text-violet-900">{markerStatus}</p> : null}
+            <p className="mt-2 text-sm leading-6 text-slate-600">{t("sharedVisibility")}</p>
+            <form action={(ownMarked ? unmarkReadMyMindConversationAction : markReadMyMindConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4">
+              <button type="submit" aria-pressed={ownMarked} className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                {ownMarked ? t("unmarkConversation") : t("markConversation")}
+              </button>
+            </form>
+          </section>
           {next === undefined ? <section className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-100 to-amber-50 p-6 text-center"><h2 className="text-2xl font-semibold text-slate-950">{t(round.status === "completed" ? "completedTitle" : "allSeenTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-700">{t(round.status === "completed" ? "completedText" : "allSeenText")}</p></section> : null}
           <nav className="flex flex-wrap items-center justify-between gap-3" aria-label={t("progress", { current: position + 1, total: round.prompts.length })}>
             {previous !== undefined ? <Link prefetch={false} href={`${revealHref}/${previous}`} className="min-h-11 px-3 py-3 text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-slate-400">{t("previous")}</Link> : <span />}
