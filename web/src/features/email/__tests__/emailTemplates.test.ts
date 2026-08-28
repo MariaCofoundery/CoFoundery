@@ -3,6 +3,7 @@ import test from "node:test";
 import { buildAdvisorInviteEmailPayload } from "@/lib/email/sendAdvisorInviteEmail";
 import { buildAdvisorTeamFounderInviteEmailPayload } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { buildCoFounderInviteEmailPayload } from "@/lib/email/sendCoFounderInviteEmail";
+import { buildReadMyMindStartedEmailPayload } from "@/lib/email/sendReadMyMindStartedEmail";
 
 const INVITE_URL = "https://app.cofoundery.de/join?token=opaque-token-123";
 
@@ -91,6 +92,37 @@ test("invalid email locale falls back to German", () => {
   assert.equal(payload.subject, "Deine Einladung zu CoFoundery");
   assert.match(payload.html, /<html lang="de">/);
   assert.match(payload.text, /Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung/);
+});
+
+test("Read My Mind start email renders the German handoff without private product data", () => {
+  const roundUrl = "https://cofoundery.de/teams/team-1/collaboration-lab/read-my-mind/round-1";
+  const payload = buildReadMyMindStartedEmailPayload({
+    recipientEmail: "ben@example.com",
+    roundUrl,
+    creatorName: "Anna",
+    locale: "de",
+  });
+
+  assert.equal(payload.subject, "Anna hat Read My Mind mit dir gestartet – du bist dran");
+  assert.match(payload.html, /Read My Mind öffnen/);
+  assert.match(payload.text, /Jetzt bist du dran/);
+  assert.match(payload.text, /Testphase/);
+  assert.match(payload.html, new RegExp(escapeRegExp(roundUrl)));
+  assert.doesNotMatch(`${payload.html} ${payload.text}`, /Self Answers|Guess Answers|Need Answers|Founder Setup|Commitment Lab|Discovery/);
+});
+
+test("Read My Mind start email renders the English handoff", () => {
+  const payload = buildReadMyMindStartedEmailPayload({
+    recipientEmail: "ben@example.com",
+    roundUrl: INVITE_URL,
+    creatorName: "Anna",
+    locale: "en",
+  });
+
+  assert.equal(payload.subject, "Anna started Read My Mind with you — you’re up");
+  assert.match(payload.html, /Open Read My Mind/);
+  assert.match(payload.text, /Now it’s your turn/);
+  assert.match(payload.text, /currently in testing/);
 });
 
 function escapeRegExp(value: string) {

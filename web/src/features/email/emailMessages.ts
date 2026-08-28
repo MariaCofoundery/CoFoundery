@@ -18,8 +18,53 @@ type AdvisorTeamFounderInviteCopyInput = {
   counterpartLabel: string | null | undefined;
 };
 
+type ReadMyMindStartedCopyInput = {
+  creatorName: string | null;
+};
+
 export function getEmailPrivacyUrl(locale: AppLocale) {
   return locale === "en" ? "https://cofoundery.de/datenschutz" : "https://cofoundery.de/datenschutz";
+}
+
+export function getReadMyMindStartedEmailCopy(
+  locale: AppLocale,
+  input: ReadMyMindStartedCopyInput
+) {
+  const creatorName = input.creatorName?.trim() || (locale === "en" ? "Your co-founder" : "Dein Co-Founder");
+
+  if (locale === "en") {
+    return {
+      htmlLang: "en",
+      subject: `${creatorName} started Read My Mind with you — you’re up`,
+      preheader: `${creatorName} started a shared Read My Mind round with you.`,
+      eyebrow: "Read My Mind · Beta",
+      greeting: "Hi,",
+      intro: `${creatorName} started a shared Read My Mind round with you.`,
+      explanation: "You’ll each respond to five short work situations independently, then reveal how you saw yourselves and each other.",
+      turn: "Now it’s your turn.",
+      cta: "Open Read My Mind",
+      note: "There are no right answers. The idea is simply to learn a little more about each other and how you work together.",
+      beta: "Read My Mind is currently in testing.",
+      fallback: "If the button does not work, you can open this link directly:",
+      privacy: "Privacy policy",
+    };
+  }
+
+  return {
+    htmlLang: "de",
+    subject: `${creatorName} hat Read My Mind mit dir gestartet – du bist dran`,
+    preheader: `${creatorName} hat eine gemeinsame Read-My-Mind-Runde mit dir gestartet.`,
+    eyebrow: "Read My Mind · Beta",
+    greeting: "Hi,",
+    intro: `${creatorName} hat eine gemeinsame Read-My-Mind-Runde mit dir gestartet.`,
+    explanation: "Ihr beantwortet fünf kurze Situationen unabhängig voneinander und schaut euch eure Einschätzungen danach gemeinsam im Reveal an.",
+    turn: "Jetzt bist du dran.",
+    cta: "Read My Mind öffnen",
+    note: "Es gibt keine richtigen Antworten. Es geht darum, euch und eure Zusammenarbeit noch ein bisschen besser kennenzulernen.",
+    beta: "Read My Mind befindet sich aktuell in der Testphase.",
+    fallback: "Falls der Button nicht funktioniert, kannst du diesen Link direkt öffnen:",
+    privacy: "Datenschutzerklärung",
+  };
 }
 
 export function getCoFounderInviteEmailCopy(

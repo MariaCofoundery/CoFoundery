@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent";
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { isValidReadMyMindSelection } from "@/features/collaborationLab/readMyMindModel";
+import { getReadMyMindNotificationRecipientEmail } from "@/features/collaborationLab/readMyMindNotificationRecipient";
+import { getRequestLocale } from "@/i18n/getLocale";
+import { sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 function entryHref(teamId: string, result?: string) {
@@ -36,6 +40,36 @@ function refresh(teamId: string, roundId?: string) {
   if (roundId) revalidatePath(revealHref(teamId, roundId));
 }
 
+async function sendRoundStartedNotification(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  teamId: string;
+  roundId: string;
+  creatorUserId: string;
+  creatorName: string | null;
+}) {
+  const participants = await params.supabase
+    .from("collaboration_experience_round_participants")
+    .select("founder_user_id, state")
+    .eq("round_id", params.roundId);
+  if (participants.error) return;
+  const recipients = (participants.data ?? []).filter(
+    (participant) => participant.founder_user_id !== params.creatorUserId && participant.state === "pending"
+  );
+  if (recipients.length !== 1) return;
+
+  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipients[0]!.founder_user_id);
+  if (!recipientEmail) return;
+  const delivery = await sendReadMyMindStartedEmail({
+    recipientEmail,
+    creatorName: params.creatorName,
+    roundUrl: toPublicAppUrl(roundHref(params.teamId, params.roundId)),
+    locale: await getRequestLocale(),
+  });
+  if (!delivery.ok) {
+    console.error("Read My Mind start notification delivery failed", { roundId: params.roundId });
+  }
+}
+
 export async function startReadMyMindRoundAction(teamId: string, formData: FormData) {
   const auth = await authenticated();
   if (!auth) redirect(`/login?next=${encodeURIComponent(entryHref(teamId))}`);
@@ -50,6 +84,18 @@ export async function startReadMyMindRoundAction(teamId: string, formData: FormD
     p_pack_version: packVersion,
   });
   if (error || typeof data !== "string") redirect(entryHref(teamId, "changed"));
+  const creatorName = team.members.find((member) => member.userId === auth.user.id)?.displayName ?? null;
+  try {
+    await sendRoundStartedNotification({
+      supabase: auth.supabase,
+      teamId,
+      roundId: data,
+      creatorUserId: auth.user.id,
+      creatorName,
+    });
+  } catch {
+    console.error("Read My Mind start notification failed", { roundId: data });
+  }
   refresh(teamId, data);
   redirect(roundHref(teamId, data));
 }
