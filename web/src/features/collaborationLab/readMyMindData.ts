@@ -1,15 +1,15 @@
 import "server-only";
 
-import { buildReadMyMindRoundReadModel, type ReadMyMindAssignmentRow, type ReadMyMindOwnResponseRow, type ReadMyMindParticipantRow, type ReadMyMindRoundPromptRow, type ReadMyMindRoundReadModel, type ReadMyMindRoundRow, type ReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindModel";
+import { buildReadMyMindPromptReveal, buildReadMyMindRoundReadModel, type ReadMyMindAssignmentRow, type ReadMyMindOwnReceiptRow, type ReadMyMindOwnResponseRow, type ReadMyMindParticipantRow, type ReadMyMindPromptReveal, type ReadMyMindRevealResponseRow, type ReadMyMindRoundPromptRow, type ReadMyMindRoundReadModel, type ReadMyMindRoundRow, type ReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindModel";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { createClient } from "@/lib/supabase/server";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 export type ReadMyMindHomebaseState =
-  | { kind: "unsupported" }
+  | { kind: "unsupported"; completedRound: ReadMyMindRoundReadModel | null }
   | { kind: "start" }
-  | { kind: "forming_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "ready" | "completed"; round: ReadMyMindRoundReadModel };
+  | { kind: "forming_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "reveal_ready" | "reveal_waiting" | "completed"; round: ReadMyMindRoundReadModel };
 
 export async function getReadMyMindTeamContext(
   teamId: string,
@@ -37,7 +37,6 @@ export async function getReadMyMindRound(
   currentUserId: string,
   client?: SupabaseClient
 ): Promise<ReadMyMindRoundReadModel | null> {
-  if (team.members.length !== 2) return null;
   const supabase = client ?? (await createClient());
   const roundResult = await supabase
     .from("collaboration_experience_rounds")
@@ -47,15 +46,16 @@ export async function getReadMyMindRound(
     .maybeSingle();
   if (roundResult.error || !roundResult.data) return null;
 
-  const [participantsResult, promptsResult, assignmentsResult, responsesResult, stateResult] =
+  const [participantsResult, promptsResult, assignmentsResult, responsesResult, receiptsResult, stateResult] =
     await Promise.all([
       supabase.from("collaboration_experience_round_participants").select("round_id, founder_user_id, position, state, joined_at").eq("round_id", roundId),
       supabase.from("collaboration_experience_round_prompts").select("id, round_id, prompt_key, prompt_version, position").eq("round_id", roundId).order("position"),
       supabase.from("collaboration_experience_prompt_assignments").select("id, round_id, round_prompt_id, target_user_id").eq("round_id", roundId),
       supabase.from("collaboration_experience_responses").select("id, round_id, prompt_assignment_id, respondent_user_id, response_type, choice_keys, locked_at").eq("round_id", roundId).eq("respondent_user_id", currentUserId),
+      supabase.from("collaboration_experience_reveal_receipts").select("round_id, round_prompt_id, participant_user_id, opened_at").eq("round_id", roundId).eq("participant_user_id", currentUserId),
       supabase.rpc("get_collaboration_round_state", { p_round_id: roundId }),
     ]);
-  if (participantsResult.error || promptsResult.error || assignmentsResult.error || responsesResult.error || stateResult.error) return null;
+  if (participantsResult.error || promptsResult.error || assignmentsResult.error || responsesResult.error || receiptsResult.error || stateResult.error) return null;
   const state = Array.isArray(stateResult.data) ? stateResult.data[0] : stateResult.data;
 
   return buildReadMyMindRoundReadModel({
@@ -67,7 +67,25 @@ export async function getReadMyMindRound(
     assignments: (assignmentsResult.data ?? []) as ReadMyMindAssignmentRow[],
     ownResponses: (responsesResult.data ?? []) as ReadMyMindOwnResponseRow[],
     wholeRoundAnswerComplete: Boolean((state as { answer_phase_complete?: boolean } | null)?.answer_phase_complete),
+    ownReceipts: (receiptsResult.data ?? []) as ReadMyMindOwnReceiptRow[],
   });
+}
+
+export async function getOpenedReadMyMindPromptReveal(params: {
+  team: ReadMyMindTeamContext;
+  roundId: string;
+  position: number;
+  currentUserId: string;
+  client?: SupabaseClient;
+}): Promise<{ round: ReadMyMindRoundReadModel; reveal: ReadMyMindPromptReveal } | null> {
+  const supabase = params.client ?? (await createClient());
+  const round = await getReadMyMindRound(params.team, params.roundId, params.currentUserId, supabase);
+  const prompt = round?.prompts.find((entry) => entry.position === params.position);
+  if (!round || !prompt || !round.wholeRoundAnswerComplete || !round.openedPromptPositions.includes(params.position) || !["active", "completed"].includes(round.status)) return null;
+  const revealResult = await supabase.rpc("get_collaboration_prompt_reveal", { p_round_prompt_id: prompt.roundPromptId });
+  if (revealResult.error) return null;
+  const reveal = buildReadMyMindPromptReveal({ round, currentUserId: params.currentUserId, rows: (revealResult.data ?? []) as ReadMyMindRevealResponseRow[], position: params.position });
+  return reveal ? { round, reveal } : null;
 }
 
 export async function getReadMyMindHomebaseState(
@@ -75,8 +93,21 @@ export async function getReadMyMindHomebaseState(
   currentUserId: string,
   client?: SupabaseClient
 ): Promise<ReadMyMindHomebaseState> {
-  if (team.members.length !== 2) return { kind: "unsupported" };
   const supabase = client ?? (await createClient());
+  if (team.members.length !== 2) {
+    const completedResult = await supabase
+      .from("collaboration_experience_rounds")
+      .select("id")
+      .eq("founder_team_id", team.id)
+      .eq("status", "completed")
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const completedRound = !completedResult.error && completedResult.data
+      ? await getReadMyMindRound(team, completedResult.data.id as string, currentUserId, supabase)
+      : null;
+    return { kind: "unsupported", completedRound };
+  }
   const openResult = await supabase
     .from("collaboration_experience_rounds")
     .select("id")
@@ -88,7 +119,7 @@ export async function getReadMyMindHomebaseState(
     const round = await getReadMyMindRound(team, openResult.data.id as string, currentUserId, supabase);
     if (round) {
       if (round.status === "forming") return { kind: round.ownParticipantState === "pending" ? "forming_invitation" : "forming_waiting", round };
-      if (round.wholeRoundAnswerComplete) return { kind: "ready", round };
+      if (round.wholeRoundAnswerComplete) return { kind: round.ownRevealComplete ? "reveal_waiting" : "reveal_ready", round };
       return { kind: round.ownAnswerComplete ? "active_waiting" : "active_continue", round };
     }
   }

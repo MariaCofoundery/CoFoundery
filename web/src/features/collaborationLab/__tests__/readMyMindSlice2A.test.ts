@@ -63,7 +63,7 @@ test("Slice 2A source keeps the pre-reveal and 2-founder boundaries explicit", (
   const actions = readFileSync(new URL("../readMyMindActions.ts", import.meta.url), "utf8");
   const page = readFileSync(new URL("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/page.tsx", import.meta.url), "utf8");
   assert.match(data, /\.eq\("respondent_user_id", currentUserId\)/);
-  assert.doesNotMatch(data, /get_collaboration_prompt_reveal/);
+  assert.doesNotMatch(data.split("export async function getOpenedReadMyMindPromptReveal")[0] ?? data, /get_collaboration_prompt_reveal/);
   assert.match(actions, /team\.members\.length !== 2/);
   assert.match(actions, /lock_collaboration_response/);
   assert.doesNotMatch(page, /choice_keys/);

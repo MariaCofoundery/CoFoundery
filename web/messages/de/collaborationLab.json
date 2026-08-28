@@ -4,7 +4,9 @@
     "description": "Entdeckt gemeinsam, wie ihr arbeitet, was ihr voneinander erwartet und was euch überrascht.",
     "experience": "Read My Mind",
     "experienceDescription": "Schätzt euch gegenseitig in fünf kurzen Arbeitssituationen ein. Eure Antworten bleiben verborgen, bis ihr beide fertig seid.",
+    "revealWaitingText": "Die Runde wird abgeschlossen, sobald ihr beide alle fünf Reveals angesehen habt.",
     "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
+    "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder.",
     "partnerFallback": "Co-Founder",
     "status": {
       "start": "Bereit für eine gemeinsame Runde",
@@ -12,10 +14,11 @@
       "forming_invitation": "Einladung offen",
       "active_continue": "Runde läuft",
       "active_waiting": "Du bist fertig – {name} antwortet noch",
-      "ready": "Eure Antworten sind bereit",
+      "reveal_ready": "Reveal bereit",
+      "reveal_waiting": "Du hast eure Reveals angesehen",
       "completed": "Runde abgeschlossen"
     },
-    "action": { "start": "Runde starten", "open": "Runde ansehen", "continue": "Runde fortsetzen" }
+    "action": { "start": "Runde starten", "open": "Runde ansehen", "continue": "Runde fortsetzen", "reveal": "Reveal ansehen", "check": "Rundenstatus prüfen", "reviewCompleted": "Abgeschlossene Runde ansehen" }
   },
   "entry": {
     "eyebrow": "Zusammenarbeit stärken",
@@ -39,11 +42,13 @@
       "isolated": "Private Antworten aus Founder Alignment, Commitment Lab oder anderen CoFoundery-Bereichen werden dafür nicht verwendet."
     },
     "start": "Runde starten",
-    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt."
+    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
+    "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder."
   },
   "round": {
     "back": "Zur Teamübersicht",
     "partnerFallback": "Co-Founder",
+    "historicalPartnerFallback": "Dein damaliger Co-Founder",
     "progress": "{current} von {total}",
     "creatorTitle": "Runde gestartet",
     "creatorText": "{name} muss noch zustimmen, bevor ihr beginnt.",
@@ -69,8 +74,10 @@
     "waitingStatus": "{name} antwortet noch",
     "readyTitle": "Ihr seid beide fertig",
     "readyText": "Eure Antworten sind vollständig gespeichert. Der gemeinsame Reveal wird im nächsten Schritt geöffnet.",
-    "readyStatus": "Reveal folgt im nächsten Schritt",
+    "readyStatus": "Euer Reveal ist bereit",
+    "readyAction": "Reveal ansehen",
     "completedTitle": "Runde abgeschlossen",
+    "newRoundAction": "Neue Runde starten",
     "endedTitle": "Runde beendet",
     "endedText": "Ihr könnt später eine neue Runde starten.",
     "abandon": "Runde beenden",
@@ -81,6 +88,48 @@
       "locked": "Diese Antwort wurde bereits gespeichert und kann nicht mehr geändert werden.",
       "invalid": "Bitte wähle eine gültige Antwort.",
       "unavailable": "Diese Runde ist nicht verfügbar."
+    }
+  },
+  "reveal": {
+    "eyebrow": "Read My Mind Reveal",
+    "back": "Zur Runde",
+    "partnerFallback": "Co-Founder",
+    "historicalPartnerFallback": "Dein damaliger Co-Founder",
+    "readyTitle": "Euer Reveal ist bereit",
+    "readyText": "Jetzt könnt ihr sehen, wie ihr euch gegenseitig eingeschätzt habt – und wo etwas anders war als erwartet.",
+    "readyNote": "Es gibt weiterhin keine richtigen Antworten. Ein Unterschied ist zuerst einmal nur etwas, das ihr neu voneinander wisst.",
+    "start": "Reveal starten",
+    "resume": "Reveal fortsetzen",
+    "open": "Aufdecken",
+    "openHint": "Erst mit diesem Schritt werden die Antworten für diese Situation gemeinsam sichtbar.",
+    "progress": "Reveal {current} von {total}",
+    "ownSelf": "So siehst du dich",
+    "partnerGuess": "So hat {name} dich eingeschätzt",
+    "partnerSelf": "So sieht {name} sich",
+    "ownGuess": "So hast du {name} eingeschätzt",
+    "exact": "Genau so eingeschätzt",
+    "different": "Anders als erwartet",
+    "multiComparison": "Eure Einschätzungen im Vergleich",
+    "needsTitle": "Was ihr voneinander braucht",
+    "ownNeed": "Was du von {name} brauchst",
+    "partnerNeed": "Was {name} von dir braucht",
+    "reflection": "Manchmal reicht es schon, etwas Neues voneinander zu wissen.",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "allSeenTitle": "Du hast alle fünf Reveals angesehen",
+    "allSeenText": "Die Runde wird abgeschlossen, sobald ihr beide die Reveals angesehen habt.",
+    "complete": "Runde abschließen",
+    "waiting": "Du hast deine Reveals angesehen. Die Runde wird abgeschlossen, sobald ihr beide fertig seid.",
+    "completedTitle": "Das war eure Runde",
+    "completedText": "Ihr habt alle Situationen beantwortet und gemeinsam aufgedeckt.",
+    "viewAgain": "Reveals noch einmal ansehen",
+    "teamOverview": "Zur Teamübersicht",
+    "roundOverview": "Zur Rundenübersicht",
+    "newRound": "Neue Runde starten",
+    "errors": {
+      "answers-incomplete": "Eure Antworten sind noch nicht vollständig.",
+      "changed": "Diese Runde hat sich inzwischen geändert.",
+      "waiting": "Du hast deine Reveals angesehen. Die Runde wird abgeschlossen, sobald ihr beide fertig seid."
     }
   }
 }

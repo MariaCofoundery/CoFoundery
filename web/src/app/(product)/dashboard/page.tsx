@@ -771,6 +771,14 @@ function presentDashboardTask(
         text: t("tasks.items.readMyMindContinue.text", { context }),
         action: t("tasks.items.readMyMindContinue.action"),
       };
+    case "read_my_mind_reveal":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.readMyMindReveal.title"),
+        text: t("tasks.items.readMyMindReveal.text"),
+        action: t("tasks.items.readMyMindReveal.action"),
+      };
     case "commitment_lab_continue":
       return {
         ...task,

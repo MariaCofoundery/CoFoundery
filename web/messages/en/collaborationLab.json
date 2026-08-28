@@ -4,7 +4,9 @@
     "description": "Explore how you work, what you expect from each other, and what might surprise you.",
     "experience": "Read My Mind",
     "experienceDescription": "Estimate how each other would respond to five short work situations. Your answers stay hidden until you have both finished.",
+    "revealWaitingText": "The round will complete once you have both viewed all five reveals.",
     "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
+    "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders.",
     "partnerFallback": "Co-founder",
     "status": {
       "start": "Ready for a shared round",
@@ -12,10 +14,11 @@
       "forming_invitation": "Invitation open",
       "active_continue": "Round in progress",
       "active_waiting": "You are done — {name} is still answering",
-      "ready": "Your answers are ready",
+      "reveal_ready": "Reveal ready",
+      "reveal_waiting": "You have viewed your reveals",
       "completed": "Round completed"
     },
-    "action": { "start": "Start a round", "open": "View round", "continue": "Continue round" }
+    "action": { "start": "Start a round", "open": "View round", "continue": "Continue round", "reveal": "View reveal", "check": "Check round status", "reviewCompleted": "View completed round" }
   },
   "entry": {
     "eyebrow": "Strengthen your collaboration",
@@ -39,11 +42,13 @@
       "isolated": "Private answers from Founder Alignment, Commitment Lab, or other CoFoundery areas are not used."
     },
     "start": "Start round",
-    "unsupported": "Read My Mind for teams with three founders will follow in a later step."
+    "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
+    "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders."
   },
   "round": {
     "back": "Back to team overview",
     "partnerFallback": "Co-founder",
+    "historicalPartnerFallback": "Your co-founder at the time",
     "progress": "{current} of {total}",
     "creatorTitle": "Round started",
     "creatorText": "{name} needs to join before you begin.",
@@ -69,8 +74,10 @@
     "waitingStatus": "{name} is still answering",
     "readyTitle": "You are both done",
     "readyText": "Your answers are fully saved. The shared reveal will open in the next step.",
-    "readyStatus": "Reveal follows in the next step",
+    "readyStatus": "Your reveal is ready",
+    "readyAction": "View reveal",
     "completedTitle": "Round completed",
+    "newRoundAction": "Start a new round",
     "endedTitle": "Round ended",
     "endedText": "You can start a new round later.",
     "abandon": "End round",
@@ -81,6 +88,48 @@
       "locked": "This answer has already been saved and can no longer be changed.",
       "invalid": "Please choose a valid answer.",
       "unavailable": "This round is not available."
+    }
+  },
+  "reveal": {
+    "eyebrow": "Read My Mind reveal",
+    "back": "Back to round",
+    "partnerFallback": "Co-founder",
+    "historicalPartnerFallback": "Your co-founder at the time",
+    "readyTitle": "Your reveal is ready",
+    "readyText": "Now you can see how you assessed each other — and where something was different from what you expected.",
+    "readyNote": "There are still no right answers. A difference is simply something new you now know about each other.",
+    "start": "Start reveal",
+    "resume": "Continue reveal",
+    "open": "Reveal answers",
+    "openHint": "Only this explicit step makes the answers for this situation visible together.",
+    "progress": "Reveal {current} of {total}",
+    "ownSelf": "How you see yourself",
+    "partnerGuess": "How {name} assessed you",
+    "partnerSelf": "How {name} sees themselves",
+    "ownGuess": "How you assessed {name}",
+    "exact": "Assessed exactly this way",
+    "different": "Different from expected",
+    "multiComparison": "Your perspectives in comparison",
+    "needsTitle": "What you need from each other",
+    "ownNeed": "What you need from {name}",
+    "partnerNeed": "What {name} needs from you",
+    "reflection": "Sometimes it is enough simply to know something new about each other.",
+    "previous": "Back",
+    "next": "Next",
+    "allSeenTitle": "You have viewed all five reveals",
+    "allSeenText": "The round will complete once you have both viewed the reveals.",
+    "complete": "Complete round",
+    "waiting": "You have viewed your reveals. The round will complete once you have both finished.",
+    "completedTitle": "That was your round",
+    "completedText": "You answered all situations and revealed them together.",
+    "viewAgain": "View reveals again",
+    "teamOverview": "Back to team overview",
+    "roundOverview": "Back to round overview",
+    "newRound": "Start a new round",
+    "errors": {
+      "answers-incomplete": "Your answers are not complete yet.",
+      "changed": "This round has changed in the meantime.",
+      "waiting": "You have viewed your reveals. The round will complete once you have both finished."
     }
   }
 }

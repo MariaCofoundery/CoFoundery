@@ -67,6 +67,23 @@ export type ReadMyMindOwnResponseRow = {
   locked_at: string;
 };
 
+export type ReadMyMindOwnReceiptRow = {
+  round_id: string;
+  round_prompt_id: string;
+  participant_user_id: string;
+  opened_at: string;
+};
+
+export type ReadMyMindRevealResponseRow = {
+  round_prompt_id: string;
+  prompt_assignment_id: string;
+  target_user_id: string;
+  respondent_user_id: string;
+  response_type: string;
+  choice_keys: string[];
+  locked_at: string;
+};
+
 export type ReadMyMindOwnSlot = {
   responseType: ReadMyMindResponseType;
   assignmentId: string;
@@ -99,6 +116,9 @@ export type ReadMyMindRoundReadModel = {
   nextPromptPosition: number | null;
   ownAnswerComplete: boolean;
   wholeRoundAnswerComplete: boolean;
+  openedPromptPositions: number[];
+  nextRevealPosition: number | null;
+  ownRevealComplete: boolean;
 };
 
 function participantState(value: string): ReadMyMindParticipantState | null {
@@ -142,6 +162,7 @@ export function buildReadMyMindRoundReadModel(params: {
   assignments: ReadMyMindAssignmentRow[];
   ownResponses: ReadMyMindOwnResponseRow[];
   wholeRoundAnswerComplete: boolean;
+  ownReceipts?: ReadMyMindOwnReceiptRow[];
 }): ReadMyMindRoundReadModel | null {
   const status = roundStatus(params.round.status);
   const pack = getReadMyMindPack(params.round.pack_key, params.round.pack_version);
@@ -152,18 +173,34 @@ export function buildReadMyMindRoundReadModel(params: {
   const partnerParticipant = params.participants.find(
     (participant) => participant.founder_user_id !== params.currentUserId
   );
-  const partner = partnerParticipant
+  const currentPartner = partnerParticipant
     ? params.team.members.find((member) => member.userId === partnerParticipant.founder_user_id)
     : null;
+  const partner = partnerParticipant
+    ? currentPartner ?? {
+        userId: partnerParticipant.founder_user_id,
+        displayName: null,
+        avatarId: null,
+        avatarUrl: null,
+      }
+    : null;
+  const currentMemberIds = new Set(params.team.members.map((member) => member.userId));
+  const hasSupportedLiveMembership =
+    params.team.members.length === 2 &&
+    params.participants.every((participant) => currentMemberIds.has(participant.founder_user_id));
+  const hasSupportedCompletedParticipants =
+    params.participants.length === 2 &&
+    params.participants.every((participant) => participant.state === "joined");
 
   if (
     !status ||
     !pack ||
     params.round.founder_team_id !== params.team.id ||
-    params.team.members.length !== 2 ||
     params.participants.length !== 2 ||
     !ownState ||
-    !partner
+    !partner ||
+    !currentMemberIds.has(params.currentUserId) ||
+    (status === "completed" ? !hasSupportedCompletedParticipants : !hasSupportedLiveMembership)
   ) {
     return null;
   }
@@ -185,6 +222,9 @@ export function buildReadMyMindRoundReadModel(params: {
       nextPromptPosition: null,
       ownAnswerComplete: false,
       wholeRoundAnswerComplete: false,
+      openedPromptPositions: [],
+      nextRevealPosition: null,
+      ownRevealComplete: false,
     };
   }
 
@@ -250,6 +290,17 @@ export function buildReadMyMindRoundReadModel(params: {
 
   if (promptStates.length !== pack.prompts.length) return null;
   const nextPrompt = promptStates.find((prompt) => !prompt.complete) ?? null;
+  const ownReceiptPromptIds = new Set(
+    (params.ownReceipts ?? [])
+      .filter((receipt) => receipt.participant_user_id === params.currentUserId)
+      .map((receipt) => receipt.round_prompt_id)
+  );
+  const openedPromptPositions = promptStates
+    .filter((prompt) => ownReceiptPromptIds.has(prompt.roundPromptId))
+    .map((prompt) => prompt.position);
+  const nextReveal = promptStates.find(
+    (prompt) => !ownReceiptPromptIds.has(prompt.roundPromptId)
+  );
   return {
     id: params.round.id,
     team: params.team,
@@ -264,6 +315,53 @@ export function buildReadMyMindRoundReadModel(params: {
     nextPromptPosition: nextPrompt?.position ?? null,
     ownAnswerComplete: promptStates.every((prompt) => prompt.complete),
     wholeRoundAnswerComplete: params.wholeRoundAnswerComplete,
+    openedPromptPositions,
+    nextRevealPosition: nextReveal?.position ?? null,
+    ownRevealComplete: promptStates.length > 0 && openedPromptPositions.length === promptStates.length,
+  };
+}
+
+export function haveExactChoiceSet(left: string[], right: string[]) {
+  const leftSorted = [...left].sort();
+  const rightSorted = [...right].sort();
+  return leftSorted.length === rightSorted.length && leftSorted.every((choice, index) => choice === rightSorted[index]);
+}
+
+export type ReadMyMindPromptReveal = {
+  roundPromptId: string;
+  position: number;
+  content: ReadMyMindPrompt;
+  ownPerspective: { self: string[]; partnerGuess: string[]; exact: boolean };
+  partnerPerspective: { self: string[]; ownGuess: string[]; exact: boolean };
+  needs: { own: string[]; partner: string[] } | null;
+};
+
+export function buildReadMyMindPromptReveal(params: {
+  round: ReadMyMindRoundReadModel;
+  currentUserId: string;
+  rows: ReadMyMindRevealResponseRow[];
+  position: number;
+}): ReadMyMindPromptReveal | null {
+  const prompt = params.round.prompts.find((entry) => entry.position === params.position);
+  if (!prompt || !params.round.wholeRoundAnswerComplete || !params.round.openedPromptPositions.includes(params.position)) return null;
+  const rows = params.rows.filter((row) => row.round_prompt_id === prompt.roundPromptId);
+  const find = (targetUserId: string, respondentUserId: string, responseType: ReadMyMindResponseType) =>
+    rows.find((row) => row.target_user_id === targetUserId && row.respondent_user_id === respondentUserId && row.response_type === responseType)?.choice_keys ?? null;
+  const ownSelf = find(params.currentUserId, params.currentUserId, "self");
+  const partnerGuessOwn = find(params.currentUserId, params.round.partner.userId, "guess");
+  const partnerSelf = find(params.round.partner.userId, params.round.partner.userId, "self");
+  const ownGuessPartner = find(params.round.partner.userId, params.currentUserId, "guess");
+  if (!ownSelf || !partnerGuessOwn || !partnerSelf || !ownGuessPartner) return null;
+  const ownNeed = prompt.need ? find(params.round.partner.userId, params.currentUserId, "need") : null;
+  const partnerNeed = prompt.need ? find(params.currentUserId, params.round.partner.userId, "need") : null;
+  if (prompt.need && (!ownNeed || !partnerNeed)) return null;
+  return {
+    roundPromptId: prompt.roundPromptId,
+    position: prompt.position,
+    content: prompt.content,
+    ownPerspective: { self: ownSelf, partnerGuess: partnerGuessOwn, exact: haveExactChoiceSet(ownSelf, partnerGuessOwn) },
+    partnerPerspective: { self: partnerSelf, ownGuess: ownGuessPartner, exact: haveExactChoiceSet(partnerSelf, ownGuessPartner) },
+    needs: ownNeed && partnerNeed ? { own: ownNeed, partner: partnerNeed } : null,
   };
 }
 

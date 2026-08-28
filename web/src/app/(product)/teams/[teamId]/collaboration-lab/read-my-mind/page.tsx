@@ -27,7 +27,7 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
       </header>
       {team.members.length !== 2 ? (
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t("unsupported")}</p></section>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize")}</p></section>
       ) : (
         <>
           <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="rmm-transparency">

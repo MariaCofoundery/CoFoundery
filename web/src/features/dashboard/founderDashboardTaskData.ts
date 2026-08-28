@@ -97,7 +97,7 @@ export async function getFounderDashboardTasks(params: {
 
   const readMyMindRounds = readMyMindRoundResult.error ? [] : ((readMyMindRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; pack_key: string; pack_version: number; created_by_user_id: string; status: string; created_at: string }>);
   const readMyMindRoundIds = readMyMindRounds.map((round) => round.id);
-  const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult] = await Promise.all([
+  const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult, readMyMindPromptResult, readMyMindReceiptResult, readMyMindStateResults] = await Promise.all([
     relationshipIds.length > 0
       ? supabase
           .from("relationship_advisors")
@@ -125,6 +125,13 @@ export async function getFounderDashboardTasks(params: {
     readMyMindRoundIds.length > 0
       ? supabase.from("collaboration_experience_responses").select("round_id, respondent_user_id, response_type").in("round_id", readMyMindRoundIds).eq("respondent_user_id", currentUserId)
       : Promise.resolve({ data: [], error: null }),
+    readMyMindRoundIds.length > 0
+      ? supabase.from("collaboration_experience_round_prompts").select("id, round_id, position").in("round_id", readMyMindRoundIds)
+      : Promise.resolve({ data: [], error: null }),
+    readMyMindRoundIds.length > 0
+      ? supabase.from("collaboration_experience_reveal_receipts").select("round_id, round_prompt_id, participant_user_id").in("round_id", readMyMindRoundIds).eq("participant_user_id", currentUserId)
+      : Promise.resolve({ data: [], error: null }),
+    Promise.all(readMyMindRoundIds.map(async (roundId) => ({ roundId, result: await supabase.rpc("get_collaboration_round_state", { p_round_id: roundId }) }))),
   ]);
 
   const relationshipSignals = relationships.map((relationship) => {
@@ -251,6 +258,11 @@ export async function getFounderDashboardTasks(params: {
       const team = teamById.get(round.founder_team_id);
       const participant = readMyMindParticipantResult.error ? null : ((readMyMindParticipantResult.data ?? []) as Array<{ round_id: string; founder_user_id: string; state: string }>).find((entry) => entry.round_id === round.id);
       const ownResponseCount = readMyMindOwnResponseResult.error ? 0 : ((readMyMindOwnResponseResult.data ?? []) as Array<{ round_id: string }>).filter((entry) => entry.round_id === round.id).length;
+      const prompts = readMyMindPromptResult.error ? [] : ((readMyMindPromptResult.data ?? []) as Array<{ id: string; round_id: string; position: number }>).filter((entry) => entry.round_id === round.id);
+      const ownReceiptPromptIds = new Set(readMyMindReceiptResult.error ? [] : ((readMyMindReceiptResult.data ?? []) as Array<{ round_id: string; round_prompt_id: string }>).filter((entry) => entry.round_id === round.id).map((entry) => entry.round_prompt_id));
+      const nextRevealPosition = prompts.filter((prompt) => !ownReceiptPromptIds.has(prompt.id)).sort((left, right) => left.position - right.position)[0]?.position ?? null;
+      const stateResult = readMyMindStateResults.find((entry) => entry.roundId === round.id)?.result;
+      const state = stateResult && !stateResult.error ? (Array.isArray(stateResult.data) ? stateResult.data[0] : stateResult.data) as { answer_phase_complete?: boolean } | null : null;
       const pack = getReadMyMindPack(round.pack_key, round.pack_version);
       const expectedOwnResponses = pack?.prompts.reduce((count, prompt) => count + 2 + (prompt.needMode === "required" ? 1 : 0), 0) ?? Number.POSITIVE_INFINITY;
       const creator = team?.members.find((member) => member.userId === round.created_by_user_id);
@@ -262,6 +274,9 @@ export async function getFounderDashboardTasks(params: {
         status: round.status,
         ownParticipantState: participant?.state ?? "unavailable",
         ownAnswerComplete: ownResponseCount === expectedOwnResponses,
+        wholeAnswerComplete: Boolean(state?.answer_phase_complete),
+        ownRevealComplete: prompts.length > 0 && ownReceiptPromptIds.size === prompts.length,
+        nextRevealPosition,
         supportedTwoFounderTeam: team?.members.length === 2,
         createdAt: round.created_at,
       };

@@ -17,6 +17,11 @@ function roundHref(teamId: string, roundId: string, result?: string) {
   return result ? `${href}?result=${encodeURIComponent(result)}` : href;
 }
 
+function revealHref(teamId: string, roundId: string, position?: number, result?: string) {
+  const href = `${roundHref(teamId, roundId)}/reveal${position === undefined ? "" : `/${position}`}`;
+  return result ? `${href}?result=${encodeURIComponent(result)}` : href;
+}
+
 async function authenticated() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -28,6 +33,7 @@ function refresh(teamId: string, roundId?: string) {
   revalidatePath(`/teams/${teamId}`);
   revalidatePath(entryHref(teamId));
   if (roundId) revalidatePath(roundHref(teamId, roundId));
+  if (roundId) revalidatePath(revealHref(teamId, roundId));
 }
 
 export async function startReadMyMindRoundAction(teamId: string, formData: FormData) {
@@ -117,4 +123,47 @@ export async function lockReadMyMindPromptAction(
   }
   refresh(teamId, roundId);
   redirect(roundHref(teamId, roundId));
+}
+
+export async function openReadMyMindRevealAction(
+  teamId: string,
+  roundId: string,
+  position: number
+) {
+  const auth = await authenticated();
+  if (!auth) redirect(`/login?next=${encodeURIComponent(revealHref(teamId, roundId, position))}`);
+  const team = await getReadMyMindTeamContext(teamId, auth.user.id, auth.supabase);
+  if (!team) redirect(entryHref(teamId, "unavailable"));
+  const round = await getReadMyMindRound(team, roundId, auth.user.id, auth.supabase);
+  const prompt = round?.prompts.find((entry) => entry.position === position);
+  if (!round || !prompt || !round.wholeRoundAnswerComplete || !["active", "completed"].includes(round.status)) {
+    redirect(revealHref(teamId, roundId, undefined, "answers-incomplete"));
+  }
+  const { error } = await auth.supabase.rpc("get_collaboration_prompt_reveal", {
+    p_round_prompt_id: prompt.roundPromptId,
+  });
+  if (error) redirect(revealHref(teamId, roundId, undefined, "answers-incomplete"));
+  refresh(teamId, roundId);
+  revalidatePath(revealHref(teamId, roundId, position));
+  redirect(revealHref(teamId, roundId, position));
+}
+
+export async function completeReadMyMindRoundAction(teamId: string, roundId: string) {
+  const auth = await authenticated();
+  if (!auth) redirect(`/login?next=${encodeURIComponent(revealHref(teamId, roundId))}`);
+  const team = await getReadMyMindTeamContext(teamId, auth.user.id, auth.supabase);
+  if (!team) redirect(entryHref(teamId, "unavailable"));
+  const round = await getReadMyMindRound(team, roundId, auth.user.id, auth.supabase);
+  if (!round || !round.wholeRoundAnswerComplete || !["active", "completed"].includes(round.status)) {
+    redirect(revealHref(teamId, roundId, undefined, "answers-incomplete"));
+  }
+  const { error } = await auth.supabase.rpc("complete_collaboration_experience_round", {
+    p_round_id: roundId,
+  });
+  if (error) {
+    const result = error.message.includes("reveals_incomplete") ? "waiting" : "changed";
+    redirect(revealHref(teamId, roundId, undefined, result));
+  }
+  refresh(teamId, roundId);
+  redirect(revealHref(teamId, roundId, undefined, "completed"));
 }

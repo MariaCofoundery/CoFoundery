@@ -107,6 +107,11 @@
         "text": "Your answers for {context} are still open.",
         "action": "Continue"
       },
+      "readMyMindReveal": {
+        "title": "Read My Mind: view reveal",
+        "text": "Your round is ready.",
+        "action": "View reveal"
+      },
       "commitmentLab": {
         "title": "Continue Commitment Lab",
         "titleWithName": "Continue Commitment Lab with {name}",

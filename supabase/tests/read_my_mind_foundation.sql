@@ -363,16 +363,63 @@ select pg_temp.assert_rmm(
 );
 reset role;
 
--- A completed round survives membership changes, while the removed participant immediately loses access.
+-- A completed two-founder round remains available to its current-member participants even
+-- after a third founder joins. Team membership alone never grants historical access.
 update public.collaboration_experience_rounds
 set status='completed', completed_at=now()
 where id=pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111');
+create temporary table pg_temp.rmm_completed_history_prompt on commit drop as
+select pg_temp.rmm_prompt_for_team('da111111-1111-4111-8111-111111111111',0) id;
+grant select on pg_temp.rmm_completed_history_prompt to authenticated;
+insert into public.founder_team_members(team_id,user_id)
+values ('da111111-1111-4111-8111-111111111111','d3333333-3333-4333-8333-333333333333');
+
+select set_config('request.jwt.claims','{"sub":"d1111111-1111-4111-8111-111111111111","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.assert_rmm(
+  (select count(*)=1 from public.collaboration_experience_rounds where id=pg_temp.rmm_round_for_team('da111111-1111-4111-8111-111111111111'))
+  and (select count(*)=4 from public.get_collaboration_prompt_reveal((select id from pg_temp.rmm_completed_history_prompt))),
+  'original founder A lost completed-round review after a third founder joined'
+);
+reset role;
+
+select set_config('request.jwt.claims','{"sub":"d2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.assert_rmm(
+  (select count(*)=4 from public.get_collaboration_prompt_reveal((select id from pg_temp.rmm_completed_history_prompt))),
+  'original founder B lost completed-round review after a third founder joined'
+);
+reset role;
+
+select set_config('request.jwt.claims','{"sub":"d3333333-3333-4333-8333-333333333333","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.assert_rmm(
+  (select count(*)=0 from public.collaboration_experience_rounds)
+  and (select count(*)=0 from public.collaboration_experience_round_participants)
+  and (select count(*)=0 from public.collaboration_experience_responses)
+  and (select count(*)=0 from public.collaboration_experience_reveal_receipts),
+  'new third founder received historical round or reveal data'
+);
+do $$ begin
+  begin perform public.get_collaboration_prompt_reveal((select id from pg_temp.rmm_completed_history_prompt)); raise exception 'new third founder revealed historical round'; exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+-- The completed round also survives removal. The remaining participant keeps review access,
+-- while the removed participant immediately loses it.
 delete from public.founder_team_members
 where team_id='da111111-1111-4111-8111-111111111111' and user_id='d2222222-2222-4222-8222-222222222222';
 select pg_temp.assert_rmm(
   (select status='completed' from public.collaboration_experience_rounds where founder_team_id='da111111-1111-4111-8111-111111111111'),
   'completed round was deleted or abandoned by membership change'
 );
+select set_config('request.jwt.claims','{"sub":"d1111111-1111-4111-8111-111111111111","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.assert_rmm(
+  (select count(*)=4 from public.get_collaboration_prompt_reveal((select id from pg_temp.rmm_completed_history_prompt))),
+  'remaining founder lost completed-round review after the other founder left'
+);
+reset role;
 select set_config('request.jwt.claims','{"sub":"d2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 set local role authenticated;
 select pg_temp.assert_rmm((select count(*)=0 from public.collaboration_experience_rounds),'removed participant retained completed-round access');

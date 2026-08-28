@@ -16,12 +16,12 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
   const href = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(roundId)}`;
   if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
-  if (!team || team.members.length !== 2) notFound();
+  if (!team) notFound();
   const round = await getReadMyMindRound(team, roundId, user.id, supabase);
   if (!round) notFound();
   const [t, rawLocale] = await Promise.all([getTranslations("collaborationLab.round"), getLocale()]);
   const locale = normalizeLocale(rawLocale);
-  const partnerName = round.partner.displayName ?? t("partnerFallback");
+  const partnerName = round.partner.displayName ?? t(round.status === "completed" ? "historicalPartnerFallback" : "partnerFallback");
   const abandon = abandonReadMyMindRoundAction.bind(null, teamId, roundId);
   const shell = (children: React.ReactNode) => (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
@@ -35,14 +35,14 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
     </main>
   );
   if (round.status === "abandoned") return shell(<section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("endedTitle")}</h2><p className="mt-2 text-sm text-slate-600">{t("endedText")}</p></section>);
-  if (round.status === "completed") return shell(<section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("completedTitle")}</h2></section>);
+  if (round.status === "completed") return shell(<section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("completedTitle")}</h2><div className="mt-5 flex flex-wrap gap-3"><Link prefetch={false} href={`${href}/reveal`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("readyAction")}</Link>{team.members.length === 2 ? <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">{t("newRoundAction")}</Link> : null}</div></section>);
   if (round.status === "forming" && round.ownParticipantState === "pending") return shell(
     <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("inviteTitle", { name: partnerName })}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("inviteText")}</p><div className="mt-5 flex flex-wrap gap-3"><form action={joinReadMyMindRoundAction.bind(null, teamId, roundId)}><button className="min-h-11 rounded-xl bg-violet-700 px-5 py-2 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-violet-500">{t("join")}</button></form><ReadMyMindEndControl action={declineReadMyMindRoundAction.bind(null, teamId, roundId)} label={t("decline")} confirmation={t("declineConfirm")} cancel={t("cancel")} /></div></section>
   );
   if (round.status === "forming") return shell(
     <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("creatorTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("creatorText", { name: partnerName })}</p><p className="mt-2 text-sm text-slate-500">{t("creatorHint")}</p><div className="mt-5"><ReadMyMindEndControl action={abandon} label={t("abandon")} confirmation={t("abandonConfirm", { name: partnerName })} cancel={t("cancel")} /></div></section>
   );
-  if (round.wholeRoundAnswerComplete) return shell(<section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("readyTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("readyText")}</p><p className="mt-3 text-sm font-medium text-violet-800">{t("readyStatus")}</p></section>);
+  if (round.wholeRoundAnswerComplete) return shell(<section className="mt-6 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-amber-50 p-6"><h2 className="text-xl font-semibold">{t("readyTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("readyText")}</p><p className="mt-3 text-sm font-medium text-violet-800">{t("readyStatus")}</p><Link prefetch={false} href={`${href}/reveal`} className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">{t("readyAction")}</Link></section>);
   if (round.ownAnswerComplete) return shell(<section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-semibold">{t("waitingTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("waitingText", { name: partnerName })}</p><p className="mt-3 text-sm font-medium text-violet-800">{t("waitingStatus", { name: partnerName })}</p><div className="mt-5"><ReadMyMindEndControl action={abandon} label={t("abandon")} confirmation={t("abandonConfirm", { name: partnerName })} cancel={t("cancel")} /></div></section>);
 
   const requested = Number(query.prompt);
