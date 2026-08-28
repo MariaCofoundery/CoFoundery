@@ -12,7 +12,7 @@ export async function ReadMyMindHomebaseCard({ team, currentUserId }: { team: Re
   const status = state.kind === "start" ? t("status.start") : state.kind === "unsupported" ? t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize") : t(`status.${state.kind}`, { name: partner ?? t("partnerFallback") });
   const roundHref = state.kind !== "start" && state.kind !== "unsupported" ? `${entry}/${encodeURIComponent(state.round.id)}` : entry;
   const href = state.kind === "reveal_ready" || state.kind === "reveal_waiting" ? `${roundHref}/reveal` : roundHref;
-  const action = state.kind === "start" ? t("action.start") : state.kind === "active_continue" ? t("action.continue") : state.kind === "reveal_ready" ? t("action.reveal") : state.kind === "reveal_waiting" ? t("action.check") : t("action.open");
+  const action = state.kind === "start" ? t("action.start") : state.kind === "forming_waiting" || state.kind === "forming_invitation" ? t("action.handoff") : state.kind === "active_continue" ? t("action.continue") : state.kind === "reveal_ready" ? t("action.reveal") : state.kind === "reveal_waiting" ? t("action.check") : t("action.open");
   const historicalRound = state.kind === "unsupported" ? state.completedRound : null;
   return (
     <section className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/90 via-white to-amber-50/60 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6" aria-labelledby="collaboration-lab-title">

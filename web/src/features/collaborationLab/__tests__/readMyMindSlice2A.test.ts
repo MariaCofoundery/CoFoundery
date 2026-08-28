@@ -73,9 +73,12 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   const homebase = readFileSync(new URL("../../../app/(product)/teams/[teamId]/page.tsx", import.meta.url), "utf8");
   const card = readFileSync(new URL("../ReadMyMindHomebaseCard.tsx", import.meta.url), "utf8");
   const entry = readFileSync(new URL("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx", import.meta.url), "utf8");
+  const roundPage = readFileSync(new URL("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/page.tsx", import.meta.url), "utf8");
   const form = readFileSync(new URL("../ReadMyMindPromptForm.tsx", import.meta.url), "utf8");
   const de = JSON.parse(readFileSync(new URL("../../../../messages/de/collaborationLab.json", import.meta.url), "utf8"));
   const en = JSON.parse(readFileSync(new URL("../../../../messages/en/collaborationLab.json", import.meta.url), "utf8"));
+  const dashboardDe = JSON.parse(readFileSync(new URL("../../../../messages/de/dashboard.json", import.meta.url), "utf8"));
+  const dashboardEn = JSON.parse(readFileSync(new URL("../../../../messages/en/dashboard.json", import.meta.url), "utf8"));
   const cardPosition = homebase.lastIndexOf("<ReadMyMindHomebaseCard");
   assert.ok(cardPosition > homebase.indexOf("commitment-lab-title"));
   assert.ok(cardPosition < homebase.indexOf("team-setup-title"));
@@ -86,11 +89,32 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.match(de.homebase.unsupported, /drei Foundern/);
   assert.match(en.homebase.unsupported, /three founders/);
   assert.match(card, /t\("betaLabel"\)/);
+  assert.match(card, /t\("action\.handoff"\)/);
   assert.match(entry, /t\("betaNotice"\)/);
+  assert.match(entry, /t\("handoffTitle"\)/);
+  assert.match(entry, /t\("handoffText", \{ name: partnerName \}\)/);
+  assert.match(roundPage, /joinReadMyMindRoundAction/);
+  assert.match(roundPage, /declineReadMyMindRoundAction/);
   assert.equal(de.homebase.betaLabel, "Beta · In Entwicklung");
   assert.equal(en.homebase.betaLabel, "Beta · In development");
   assert.match(de.entry.betaNotice, /Testphase/);
   assert.match(en.entry.betaNotice, /currently in testing/);
+  assert.equal(de.entry.handoffTitle, "Das macht ihr gemeinsam.");
+  assert.match(de.entry.handoffText, /danach ist \{name\} dran/);
+  assert.equal(en.entry.handoffTitle, "You do this together.");
+  assert.match(en.entry.handoffText, /then it’s \{name\}’s turn/);
+  assert.equal(de.round.creatorText, "Jetzt ist {name} dran.");
+  assert.equal(en.round.creatorText, "Now it’s {name}’s turn.");
+  assert.equal(de.round.join, "Ich bin dabei");
+  assert.equal(en.round.join, "I’m in");
+  assert.equal(de.round.decline, "Diesmal nicht");
+  assert.equal(en.round.decline, "Not this time");
+  assert.doesNotMatch(`${de.round.creatorText} ${de.round.creatorHint}`, /muss noch zustimmen|Genehmigung/);
+  assert.doesNotMatch(`${en.round.creatorText} ${en.round.creatorHint}`, /approval|needs to join before/iu);
+  assert.equal(dashboardDe.tasks.items.readMyMindInvitation.title, "Read My Mind: Du bist dran");
+  assert.equal(dashboardEn.tasks.items.readMyMindInvitation.title, "Read My Mind: You’re up");
+  assert.match(dashboardDe.tasks.items.readMyMindInvitation.textWithName, /mit dir gestartet/);
+  assert.match(dashboardEn.tasks.items.readMyMindInvitation.textWithName, /with you/);
   for (const serialized of [JSON.stringify(de), JSON.stringify(en)]) {
     for (const forbidden of ["Compatibility", "kompatibel", "Readiness", "Persönlichkeitstyp", "Accuracy", "Score", "Match %"]) assert.equal(serialized.includes(forbidden), false);
   }

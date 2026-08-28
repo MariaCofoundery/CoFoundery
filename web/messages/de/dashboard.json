@@ -97,10 +97,10 @@
         "action": "Fortsetzen"
       },
       "readMyMindInvitation": {
-        "title": "Read My Mind: Einladung ansehen",
-        "text": "Eine gemeinsame Runde wartet auf deine Entscheidung.",
-        "textWithName": "{name} hat eine gemeinsame Runde gestartet.",
-        "action": "Einladung ansehen"
+        "title": "Read My Mind: Du bist dran",
+        "text": "Eine gemeinsame Runde wurde mit dir gestartet.",
+        "textWithName": "{name} hat eine gemeinsame Runde mit dir gestartet.",
+        "action": "Read My Mind öffnen"
       },
       "readMyMindContinue": {
         "title": "Read My Mind fortsetzen",

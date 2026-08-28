@@ -18,6 +18,7 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
   if (openRoundId) redirect(`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(openRoundId)}`);
   const [t, rawLocale] = await Promise.all([getTranslations("collaborationLab.entry"), getLocale()]);
   const locale = normalizeLocale(rawLocale);
+  const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName ?? t("partnerFallback");
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <Link href={`/teams/${encodeURIComponent(teamId)}`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("back")}</Link>
@@ -33,6 +34,10 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize")}</p></section>
       ) : (
         <>
+          <section className="mt-6 rounded-2xl border border-amber-200/80 bg-amber-50/70 p-5 sm:p-6" aria-labelledby="rmm-handoff">
+            <h2 id="rmm-handoff" className="text-xl font-semibold text-slate-950">{t("handoffTitle")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{t("handoffText", { name: partnerName })}</p>
+          </section>
           <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="rmm-transparency">
             <h2 id="rmm-transparency" className="text-xl font-semibold text-slate-950">{t("transparencyTitle")}</h2>
             <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">

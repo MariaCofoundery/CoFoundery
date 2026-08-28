@@ -97,10 +97,10 @@
         "action": "Continue"
       },
       "readMyMindInvitation": {
-        "title": "Read My Mind: view invitation",
-        "text": "A shared round is waiting for your decision.",
-        "textWithName": "{name} started a shared round.",
-        "action": "View invitation"
+        "title": "Read My Mind: You’re up",
+        "text": "A shared round was started with you.",
+        "textWithName": "{name} started a shared round with you.",
+        "action": "Open Read My Mind"
       },
       "readMyMindContinue": {
         "title": "Continue Read My Mind",
