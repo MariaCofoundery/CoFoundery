@@ -21,7 +21,7 @@
       "reveal_waiting": "You have viewed your reveals",
       "completed": "Round completed"
     },
-    "action": { "start": "Start a round", "handoff": "Open Read My Mind", "open": "View round", "continue": "Continue round", "reveal": "View reveal", "check": "Check round status", "reviewCompleted": "View completed round" }
+    "action": { "start": "Start a round", "handoff": "Open Read My Mind", "open": "View round", "continue": "Continue round", "reveal": "View reveal", "check": "Check round status", "reviewCompleted": "View completed round", "allPacks": "View all packs" }
   },
   "entry": {
     "eyebrow": "Strengthen your collaboration",
@@ -36,6 +36,17 @@
     "handoffText": "You answer five short situations first. Then it’s {name}’s turn. Your answers stay hidden until you have both finished.",
     "recommended": "A good place to start",
     "promptCount": "{count} situations",
+    "oneRoundTitle": "One round at a time",
+    "oneRoundText": "Once you have completed or ended your current round, you can continue with another pack.",
+    "availableNow": "Available now",
+    "availableAfter": "Available afterwards",
+    "continueRound": "Continue round",
+    "currentStatus": {
+      "yourTurn": "You’re up",
+      "partnerTurn": "{name} is taking their turn",
+      "inProgress": "In progress",
+      "revealReady": "Reveal ready"
+    },
     "packs": {
       "easy_start": "Start lightly and discover small things about how you work together.",
       "how_we_work": "Take a closer look at how you organize decisions, ownership, and day-to-day work.",
@@ -60,6 +71,11 @@
     "backToCollaboration": "Back to collaboration",
     "partnerFallback": "Co-founder",
     "historicalPartnerFallback": "Your co-founder at the time",
+    "introEyebrow": "Before you begin",
+    "introTitle": "There is no right or wrong here.",
+    "introBodyGuess": "You will probably find some situations easy to predict for {name}, while others may be harder. Simply choose what you would guess right now.",
+    "introBodyReveal": "In the reveal, you will look together at how you understood the situations, what you expected from each other, and what you would like to talk about.",
+    "introAction": "Let’s begin",
     "progress": "{current} of {total}",
     "creatorTitle": "You’re up",
     "creatorText": "Place your answers face down first.",
@@ -78,6 +94,7 @@
     "self": "You",
     "guess": "And {name}?",
     "guessHint": "You will see {name}'s answer later in the reveal.",
+    "guessHelper": "Not sure yet? Just choose your best guess. This isn’t about getting it right.",
     "need": "And what do you need?",
     "multiHint": "Choose up to two.",
     "saved": "Saved",

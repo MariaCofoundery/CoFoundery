@@ -275,10 +275,11 @@ select pg_temp.assert_rmm_completion(
   'idempotent completion changed completed_at'
 );
 
--- Completion removes R1 from the open-round index; R2 is allowed and remains forming.
+-- Completion removes R1 from the open-round index; even the same pack may be replayed
+-- and R2 remains the only forming round.
 select set_config('request.jwt.claims','{"sub":"a1111111-1111-4111-8111-111111111111","role":"authenticated"}',true);
 set local role authenticated;
-select public.create_collaboration_experience_round('aa111111-1111-4111-8111-111111111111','how_we_work',1);
+select public.create_collaboration_experience_round('aa111111-1111-4111-8111-111111111111','easy_start',1);
 reset role;
 select pg_temp.assert_rmm_completion(
   (select count(*) = 1 from public.collaboration_experience_rounds

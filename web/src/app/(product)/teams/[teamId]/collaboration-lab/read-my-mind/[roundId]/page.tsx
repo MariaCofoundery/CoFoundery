@@ -7,10 +7,11 @@ import { ReadMyMindHandoffVisual, ReadMyMindProgress } from "@/features/collabor
 import { ReadMyMindPromptForm } from "@/features/collaborationLab/ReadMyMindPromptForm";
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { fillReadMyMindTarget } from "@/features/collaborationLab/readMyMindModel";
+import { shouldShowReadMyMindIntro } from "@/features/collaborationLab/readMyMindPackNavigation";
 import { normalizeLocale } from "@/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function ReadMyMindRoundPage({ params, searchParams }: { params: Promise<{ teamId: string; roundId: string }>; searchParams: Promise<{ prompt?: string; result?: string }> }) {
+export default async function ReadMyMindRoundPage({ params, searchParams }: { params: Promise<{ teamId: string; roundId: string }>; searchParams: Promise<{ prompt?: string; result?: string; intro?: string }> }) {
   const [{ teamId, roundId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -49,6 +50,20 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
   if (round.wholeRoundAnswerComplete) return shell(<section className="rmm-enter relative mt-6 overflow-hidden rounded-[30px] border border-violet-200 bg-gradient-to-br from-violet-100 via-white to-amber-100/70 p-6 shadow-[0_24px_60px_rgba(76,29,149,0.12)] sm:p-8"><div aria-hidden="true" className="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-violet-200/40 blur-3xl" /><div className="relative"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Read My Mind Reveal</p><h2 className="mt-3 text-2xl font-semibold tracking-tight">{t("readyTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("readyText")}</p><p className="mt-3 text-sm font-medium text-violet-800">{t("readyStatus")}</p><Link prefetch={false} href={`${href}/reveal`} className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(109,40,217,0.2)] transition-transform motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">{t("readyAction")}</Link></div></section>);
   if (round.ownAnswerComplete) return shell(<section className="rmm-enter mt-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-violet-50/40 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)]"><h2 className="text-xl font-semibold">{t("waitingTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{t("waitingText", { name: partnerName })}</p><p className="mt-3 text-sm font-medium text-violet-800">{t("waitingStatus", { name: partnerName })}</p><ReadMyMindHandoffVisual selfLabel={t("self")} partnerName={partnerName} /><div className="mt-6"><ReadMyMindEndControl action={abandon} label={t("abandon")} confirmation={t("abandonConfirm", { name: partnerName })} cancel={t("cancel")} /></div></section>);
 
+  if (shouldShowReadMyMindIntro(round, query.intro === "done")) return shell(
+    <section className="rmm-enter relative mt-6 overflow-hidden rounded-[30px] border border-violet-200 bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 shadow-[0_22px_55px_rgba(76,29,149,0.1)] sm:p-9" aria-labelledby="rmm-intro-title">
+      <div aria-hidden="true" className="absolute -right-10 -top-12 h-44 w-44 rounded-full bg-violet-200/45 blur-3xl" />
+      <div className="relative">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("introEyebrow")}</p>
+        <h2 id="rmm-intro-title" className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{t("introTitle")}</h2>
+        <div aria-hidden="true" className="my-6 flex items-center gap-3"><span className="h-12 w-20 rounded-2xl border border-violet-200 bg-violet-50 shadow-sm" /><span className="text-violet-400">↔</span><span className="h-12 w-20 rounded-2xl border border-amber-200 bg-amber-50 shadow-sm" /></div>
+        <p className="max-w-2xl text-sm leading-7 text-slate-700">{t("introBodyGuess", { name: partnerName })}</p>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{t("introBodyReveal")}</p>
+        <Link href={`${href}?intro=done`} className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(109,40,217,0.2)] transition-transform motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("introAction")}</Link>
+      </div>
+    </section>
+  );
+
   const requested = Number(query.prompt);
   const requestedPrompt = round.prompts.find((entry) => entry.position === requested);
   const current = requestedPrompt && (requestedPrompt.complete || requestedPrompt.position === round.nextPromptPosition) ? requestedPrompt : round.prompts.find((entry) => entry.position === round.nextPromptPosition);
@@ -67,7 +82,7 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
           <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-700 sm:text-xl sm:leading-9">{current.content.selfQuestion[locale]}</p>
         </div>
       </article>
-      <ReadMyMindPromptForm action={lockReadMyMindPromptAction.bind(null, teamId, roundId, current.roundPromptId)} locale={locale} selfLegend={t("self")} guessLegend={`${t("guess", { name: partnerName })} ${fillReadMyMindTarget(current.content.guessQuestion[locale], partnerName)}`} needLegend={`${t("need")} ${current.content.needQuestion ? fillReadMyMindTarget(current.content.needQuestion[locale], partnerName) : ""}`} partnerName={partnerName} prompt={current} labels={{ saved: t("saved"), lockWarning: t("lockWarning"), submit: t("lock"), submitPending: t("locking"), multiHint: t("multiHint"), perspectiveShift: t("perspectiveShift"), perspectiveShiftText: t("perspectiveShiftText", { name: partnerName }) }} />
+      <ReadMyMindPromptForm action={lockReadMyMindPromptAction.bind(null, teamId, roundId, current.roundPromptId)} locale={locale} selfLegend={t("self")} guessLegend={`${t("guess", { name: partnerName })} ${fillReadMyMindTarget(current.content.guessQuestion[locale], partnerName)}`} needLegend={`${t("need")} ${current.content.needQuestion ? fillReadMyMindTarget(current.content.needQuestion[locale], partnerName) : ""}`} partnerName={partnerName} prompt={current} labels={{ saved: t("saved"), lockWarning: t("lockWarning"), submit: t("lock"), submitPending: t("locking"), multiHint: t("multiHint"), perspectiveShift: t("perspectiveShift"), perspectiveShiftText: t("perspectiveShiftText", { name: partnerName }), guessHelper: t("guessHelper") }} />
       <nav className="mt-5 flex justify-between gap-3" aria-label={t("progress", { current: current.position + 1, total: round.prompts.length })}>{previous ? <Link href={`${href}?prompt=${previous.position}`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline">{t("previous")}</Link> : <span />}{nextComplete ? <Link href={`${href}?prompt=${nextComplete.position}`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline">{t("next")}</Link> : null}</nav>
       <div className="mt-8"><ReadMyMindEndControl action={abandon} label={t("abandon")} confirmation={t(round.status === "forming" ? "abandonFormingConfirm" : "abandonConfirm", { name: partnerName })} cancel={t("cancel")} /></div>
     </section>

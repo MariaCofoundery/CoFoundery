@@ -12,6 +12,7 @@ type Labels = {
   multiHint: string;
   perspectiveShift: string;
   perspectiveShiftText: string;
+  guessHelper: string;
 };
 
 function ChoiceGroup({ legend, slot, locale, labels, selected, setSelected, enabled = true, tone }: { legend: string; slot: ReadMyMindOwnSlot; locale: "de" | "en"; labels: Labels; selected: string[]; setSelected: (choices: string[]) => void; enabled?: boolean; tone: "self" | "guess" | "need" }) {
@@ -26,6 +27,7 @@ function ChoiceGroup({ legend, slot, locale, labels, selected, setSelected, enab
   return (
     <fieldset className={`rmm-phase rounded-[26px] border p-4 transition-[opacity,transform,box-shadow] duration-300 motion-reduce:transition-none sm:p-6 ${toneClasses} ${enabled ? "opacity-100" : "translate-y-1 opacity-55"}`} disabled={locked || !enabled}>
       <legend className="px-2 text-lg font-semibold tracking-tight text-slate-950">{legend}</legend>
+      {tone === "guess" ? <p id="guess-guidance" className="mt-1 text-sm leading-6 text-amber-900">{labels.guessHelper}</p> : null}
       {multi ? <p id={`${slot.responseType}-hint`} className="mt-1 text-sm text-slate-600">{labels.multiHint}</p> : null}
       <div className="mt-4 grid gap-3">
         {slot.contract.choices.map((choice) => {
@@ -39,7 +41,7 @@ function ChoiceGroup({ legend, slot, locale, labels, selected, setSelected, enab
                 value={choice.key}
                 checked={checked}
                 disabled={disabled}
-                aria-describedby={multi ? `${slot.responseType}-hint` : undefined}
+                aria-describedby={[tone === "guess" ? "guess-guidance" : null, multi ? `${slot.responseType}-hint` : null].filter(Boolean).join(" ") || undefined}
                 onChange={() => setSelected(multi ? (checked ? selected.filter((key) => key !== choice.key) : [...selected, choice.key]) : [choice.key])}
                 className="h-4 w-4 shrink-0 accent-violet-700"
               />

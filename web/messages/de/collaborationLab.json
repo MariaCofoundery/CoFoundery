@@ -21,7 +21,7 @@
       "reveal_waiting": "Du hast eure Reveals angesehen",
       "completed": "Runde abgeschlossen"
     },
-    "action": { "start": "Runde starten", "handoff": "Read My Mind öffnen", "open": "Runde ansehen", "continue": "Runde fortsetzen", "reveal": "Reveal ansehen", "check": "Rundenstatus prüfen", "reviewCompleted": "Abgeschlossene Runde ansehen" }
+    "action": { "start": "Runde starten", "handoff": "Read My Mind öffnen", "open": "Runde ansehen", "continue": "Runde fortsetzen", "reveal": "Reveal ansehen", "check": "Rundenstatus prüfen", "reviewCompleted": "Abgeschlossene Runde ansehen", "allPacks": "Alle Packs ansehen" }
   },
   "entry": {
     "eyebrow": "Zusammenarbeit stärken",
@@ -36,6 +36,17 @@
     "handoffText": "Du beantwortest zuerst fünf kurze Situationen. Danach ist {name} dran. Eure Antworten bleiben so lange verborgen, bis ihr beide fertig seid.",
     "recommended": "Guter Einstieg",
     "promptCount": "{count} Situationen",
+    "oneRoundTitle": "Eine Runde nach der anderen",
+    "oneRoundText": "Sobald ihr eure aktuelle Runde abgeschlossen oder beendet habt, könnt ihr mit dem nächsten Pack weitermachen.",
+    "availableNow": "Jetzt verfügbar",
+    "availableAfter": "Danach verfügbar",
+    "continueRound": "Runde fortsetzen",
+    "currentStatus": {
+      "yourTurn": "Du bist dran",
+      "partnerTurn": "{name} ist gerade dran",
+      "inProgress": "Läuft gerade",
+      "revealReady": "Reveal bereit"
+    },
     "packs": {
       "easy_start": "Leicht einsteigen und kleine Dinge über eure Arbeitsweise entdecken.",
       "how_we_work": "Schaut genauer darauf, wie ihr Entscheidungen, Verantwortung und Arbeitsalltag organisiert.",
@@ -60,6 +71,11 @@
     "backToCollaboration": "Zurück zu Zusammenarbeit stärken",
     "partnerFallback": "Co-Founder",
     "historicalPartnerFallback": "Dein damaliger Co-Founder",
+    "introEyebrow": "Bevor du loslegst",
+    "introTitle": "Hier gibt es kein Richtig oder Falsch.",
+    "introBodyGuess": "Bei manchen Situationen wirst du {name} wahrscheinlich gut einschätzen können, bei anderen vielleicht kaum. Wähle einfach, was du im Moment vermutest.",
+    "introBodyReveal": "Im Reveal schaut ihr gemeinsam darauf, wie ihr die Situationen verstanden habt, was ihr voneinander erwartet habt und worüber ihr sprechen möchtet.",
+    "introAction": "Los geht’s",
     "progress": "{current} von {total}",
     "creatorTitle": "Du bist dran",
     "creatorText": "Lege deine Antworten zuerst verdeckt fest.",
@@ -78,6 +94,7 @@
     "self": "Du",
     "guess": "Und {name}?",
     "guessHint": "Du siehst {name}s Antwort erst später im Reveal.",
+    "guessHelper": "Noch unsicher? Nimm einfach deine beste Vermutung. Es geht nicht darum, richtigzuliegen.",
     "need": "Und was brauchst du?",
     "multiHint": "Wähle bis zu zwei.",
     "saved": "Gespeichert",

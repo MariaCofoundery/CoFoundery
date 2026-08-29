@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { READ_MY_MIND_PACKS } from "@/features/collaborationLab/readMyMindContent";
 import { startReadMyMindRoundAction } from "@/features/collaborationLab/readMyMindActions";
-import { findOpenReadMyMindRoundId, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
+import { findOpenReadMyMindRoundId, getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
+import { buildReadMyMindPackNavigation } from "@/features/collaborationLab/readMyMindPackNavigation";
 import { normalizeLocale } from "@/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,10 +16,22 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
   if (!team) notFound();
   const openRoundId = await findOpenReadMyMindRoundId(team, supabase);
-  if (openRoundId) redirect(`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(openRoundId)}`);
+  const openRound = openRoundId ? await getReadMyMindRound(team, openRoundId, user.id, supabase) : null;
   const [t, rawLocale] = await Promise.all([getTranslations("collaborationLab.entry"), getLocale()]);
   const locale = normalizeLocale(rawLocale);
   const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName ?? t("partnerFallback");
+  const packNavigation = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, openRound);
+  const currentPackStatus = openRound
+    ? openRound.status === "forming"
+      ? openRound.ownParticipantState === "pending"
+        ? openRound.handoffReadyAt ? t("currentStatus.yourTurn") : t("currentStatus.partnerTurn", { name: partnerName })
+        : openRound.handoffReadyAt ? t("currentStatus.partnerTurn", { name: partnerName }) : t("currentStatus.yourTurn")
+      : openRound.wholeRoundAnswerComplete
+        ? t("currentStatus.revealReady")
+        : openRound.ownAnswerComplete
+          ? t("currentStatus.partnerTurn", { name: partnerName })
+          : t("currentStatus.inProgress")
+    : null;
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
@@ -47,19 +60,28 @@ export default async function ReadMyMindEntryPage({ params }: { params: Promise<
               {["independent", "hidden", "compare", "noRightAnswers", "sharedReveal", "isolated", "declinePurge"].map((key) => <li key={key} className="flex gap-3"><span aria-hidden="true" className="text-violet-500">•</span><span>{t(`transparency.${key}`, { name: partnerName })}</span></li>)}
             </ul>
           </section>
+          {openRound ? (
+            <section className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/60 p-5 sm:p-6" aria-labelledby="rmm-one-round">
+              <h2 id="rmm-one-round" className="text-lg font-semibold text-slate-950">{t("oneRoundTitle")}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{t("oneRoundText")}</p>
+            </section>
+          ) : null}
           <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label={t("title") }>
-            {READ_MY_MIND_PACKS.map((pack, index) => (
-              <article key={pack.key} className={`rmm-enter group relative flex min-w-0 flex-col overflow-hidden rounded-[26px] border bg-white p-5 shadow-[0_14px_35px_rgba(76,29,149,0.07)] transition-[transform,box-shadow,border-color] duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_22px_48px_rgba(76,29,149,0.12)] motion-reduce:transition-none ${index === 0 ? "border-violet-300" : "border-slate-200 hover:border-violet-200"}`} style={{ animationDelay: `${index * 70}ms` }}>
-                <div aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 ${index === 0 ? "bg-gradient-to-r from-violet-600 to-amber-400" : "bg-gradient-to-r from-slate-200 to-violet-200"}`} />
-                {index === 0 ? <span className="self-start rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-800">{t("recommended")}</span> : null}
+            {packNavigation.map(({ pack, isCurrent, canStart }, index) => (
+              <article key={pack.key} className={`rmm-enter group relative flex min-w-0 flex-col overflow-hidden rounded-[26px] border bg-white p-5 shadow-[0_14px_35px_rgba(76,29,149,0.07)] transition-[transform,box-shadow,border-color] duration-300 motion-reduce:transition-none ${isCurrent ? "border-violet-400 ring-2 ring-violet-100" : index === 0 && !openRound ? "border-violet-300" : "border-slate-200"} ${canStart || isCurrent ? "motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_22px_48px_rgba(76,29,149,0.12)]" : ""}`} style={{ animationDelay: `${index * 70}ms` }}>
+                <div aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 ${isCurrent || (index === 0 && !openRound) ? "bg-gradient-to-r from-violet-600 to-amber-400" : "bg-gradient-to-r from-slate-200 to-violet-200"}`} />
+                {index === 0 && !openRound ? <span className="self-start rounded-full bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-800">{t("recommended")}</span> : null}
                 <h2 className="mt-3 text-lg font-semibold text-slate-950">{pack.title[locale]}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{t(`packs.${pack.key}`)}</p>
                 <div className="mt-4 flex items-center gap-3"><span className="text-xs text-slate-500">{t("promptCount", { count: pack.prompts.length })}</span><span className="flex gap-1" aria-hidden="true">{pack.prompts.map((prompt) => <span key={prompt.key} className="h-1.5 w-4 rounded-full bg-violet-200 transition-colors duration-300 group-hover:bg-violet-300 motion-reduce:transition-none" />)}</span></div>
-                <form action={startReadMyMindRoundAction.bind(null, teamId)} className="mt-auto pt-5">
+                <p className={`mt-4 text-sm font-semibold ${isCurrent ? "text-violet-800" : "text-slate-500"}`}>{isCurrent ? currentPackStatus : openRound ? t("availableAfter") : t("availableNow")}</p>
+                {isCurrent && openRound ? (
+                  <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(openRound.id)}`} className="mt-auto inline-flex min-h-11 items-center justify-center rounded-xl bg-violet-700 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(109,40,217,0.16)] transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-800 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("continueRound")}</Link>
+                ) : canStart ? <form action={startReadMyMindRoundAction.bind(null, teamId)} className="mt-auto pt-5">
                   <input type="hidden" name="packKey" value={pack.key} />
                   <input type="hidden" name="packVersion" value={pack.version} />
                   <button type="submit" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-violet-700 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(109,40,217,0.16)] transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-800 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("start")}</button>
-                </form>
+                </form> : null}
               </article>
             ))}
           </section>

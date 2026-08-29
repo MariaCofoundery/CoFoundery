@@ -12,7 +12,7 @@ test("answer experience uses semantic progressive phases and decision cards with
   assert.match(form, /type=\{multi \? "checkbox" : "radio"\}/);
   assert.match(form, /enabled=\{selfComplete\}/);
   assert.match(form, /enabled=\{selfComplete && guessComplete\}/);
-  assert.match(form, /aria-describedby=\{multi/);
+  assert.match(form, /aria-describedby=\{\[tone === "guess"[\s\S]*multi/);
   assert.match(form, /useFormStatus/);
   assert.match(form, /allLocked/);
   assert.match(round, /ReadMyMindProgress/);
