@@ -1,59 +1,113 @@
 {
   "eyebrow": "Founder Library",
-  "title": "Terms and resources for founders",
-  "intro": "Short explanations of important topics around collaboration, equity, agreements, and building a company.",
+  "title": "Terms from founder life, briefly explained.",
+  "intro": "A focused glossary for terms you encounter while building a startup and working as a founder.",
   "professionalNote": "For legal or tax questions, the Library is not a substitute for individual professional advice.",
   "back": "Back to team overview",
   "founderFallback": "Founder {index}",
-  "openInSetup": "Open in Founder Setup: {topic} →",
+  "search": {
+    "label": "Search the glossary",
+    "placeholder": "Search terms …",
+    "noResults": "No matching term found.",
+    "noResultsHint": "Try a different search term."
+  },
+  "filters": {
+    "label": "Filter by category",
+    "all": "All"
+  },
+  "shortExplanation": "In brief",
+  "setupPrompt": "Relevant to your team right now?",
+  "openInSetup": "View in Founder Setup: {topic} →",
   "categories": {
-    "collaboration_responsibility": "Collaboration & responsibility",
-    "equity_money": "Equity & money",
-    "contracts_rights": "Contracts & rights",
-    "change": "When things change",
-    "protection_governance": "Protection & governance"
+    "equity_financing": "Equity & financing",
+    "contracts_governance": "Contracts & governance",
+    "company_building": "Building the company"
   },
-  "statuses": {
-    "draft": "In preparation",
-    "available": "Available"
-  },
-  "resources": {
-    "co_founder_agreement": {
-      "title": "Co-founder agreement",
-      "description": "Organizes the questions you may want to bring together in a founder agreement and have professionally reviewed."
+  "terms": {
+    "bootstrapping": {
+      "term": "Bootstrapping",
+      "shortDefinition": "Building a company primarily with the founders’ own resources and operating revenue rather than external equity financing."
     },
-    "roles_responsibilities": {
-      "title": "Roles and responsibilities",
-      "description": "Clarifies who takes ownership of what and where responsibilities remain shared."
+    "burn_rate": {
+      "term": "Burn Rate",
+      "shortDefinition": "The amount of cash a company uses on a net basis over a given period, often measured monthly."
     },
-    "decision_rights": {
-      "title": "Decision rights",
-      "description": "Helps you discuss which decisions you make together and which responsibilities individual founders take on."
+    "cap_table": {
+      "term": "Cap Table",
+      "shortDefinition": "A record of who owns which shares or other equity interests in a company."
     },
-    "deadlocks": {
-      "title": "Deadlocks",
-      "description": "Prepares you to discuss how to handle important decisions when you cannot reach agreement."
+    "deadlock": {
+      "term": "Deadlock",
+      "shortDefinition": "A decision-making stalemate in which the agreed voting rules or responsibilities cannot produce an outcome."
     },
-    "commitment": {
-      "title": "Commitment",
-      "description": "Clarifies the time and practical commitment you expect from each other and how you raise changes."
+    "dilution": {
+      "term": "Dilution",
+      "shortDefinition": "The reduction in an existing stakeholder’s percentage ownership when new shares are issued."
     },
-    "equity": {
-      "title": "Equity",
-      "description": "Organizes the questions founders can discuss when considering how equity is distributed."
+    "drag_along_tag_along": {
+      "term": "Drag-along / Tag-along",
+      "shortDefinition": "Contractual rules for the sale of company shares: drag-along can require certain shareholders to join a sale under defined conditions; tag-along can give other shareholders the right to participate in another shareholder’s sale on comparable terms."
     },
-    "vesting": {
-      "title": "Vesting",
-      "description": "Orientation around how equity and long-term commitment can be connected."
+    "esop_vsop": {
+      "term": "ESOP / VSOP",
+      "shortDefinition": "Employee participation models: An ESOP typically uses actual shares or options for actual shares. A VSOP contractually mirrors an equity interest without directly creating shareholder status."
+    },
+    "founder_agreement": {
+      "term": "Founder Agreement",
+      "shortDefinition": "An agreement between founders that records central rules about their collaboration, ownership, and possible changes."
     },
     "founder_exit": {
-      "title": "Founder exit",
-      "description": "Structures questions about what changes for the team, roles, and agreements when a founder leaves."
+      "term": "Founder Exit",
+      "shortDefinition": "A founder leaving the operating team, the company’s ownership structure, or both, with possible consequences for roles and equity."
+    },
+    "good_bad_leaver": {
+      "term": "Good Leaver / Bad Leaver",
+      "shortDefinition": "Contractual categories for different ways of leaving a company that may carry different consequences for equity rights."
+    },
+    "ip_assignment": {
+      "term": "IP Assignment",
+      "shortDefinition": "Contractual arrangements through which intellectual property rights or corresponding rights of use – such as rights in code, designs, trademarks, or inventions – are assigned to a company."
+    },
+    "mvp": {
+      "term": "MVP",
+      "shortDefinition": "A Minimum Viable Product is a deliberately limited first product version used to test core assumptions with real users."
+    },
+    "pivot": {
+      "term": "Pivot",
+      "shortDefinition": "A fundamental change in product, business model, or target market based on new evidence."
+    },
+    "pre_money_post_money": {
+      "term": "Pre-Money / Post-Money",
+      "shortDefinition": "Pre-money is a company’s valuation before a financing round; post-money includes the newly invested capital."
+    },
+    "product_market_fit": {
+      "term": "Product-Market Fit",
+      "shortDefinition": "The point at which a product meets a meaningful market need well enough for sustained demand to become evident."
+    },
+    "reverse_vesting": {
+      "term": "Reverse Vesting",
+      "shortDefinition": "An arrangement where shares have already been transferred but may remain subject to repurchase or retransfer rights that reduce over time."
+    },
+    "runway": {
+      "term": "Runway",
+      "shortDefinition": "The estimated time a company can continue operating with its available cash at its current rate of spending."
+    },
+    "term_sheet": {
+      "term": "Term Sheet",
+      "shortDefinition": "A summary of the main proposed terms of an investment or financing before the detailed agreements are drafted."
+    },
+    "vesting": {
+      "term": "Vesting",
+      "shortDefinition": "A mechanism that defines the period over which equity rights are gradually treated as earned or non-forfeitable and what consequences an early departure may have."
+    },
+    "convertible_loan": {
+      "term": "Convertible Loan",
+      "shortDefinition": "A loan whose repayment claim is converted, or can be converted, into equity under agreed conditions."
     }
   },
   "homebase": {
     "title": "Founder Library",
-    "description": "Terms, articles, and useful resources for founders.",
+    "description": "Terms from founder life, briefly explained.",
     "action": "Open Library"
   }
 }

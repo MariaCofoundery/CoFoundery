@@ -1,59 +1,113 @@
 {
   "eyebrow": "Founder Library",
-  "title": "Begriffe und Ressourcen für Founder",
-  "intro": "Kurze Erklärungen zu wichtigen Themen rund um Zusammenarbeit, Beteiligung, Vereinbarungen und Unternehmensaufbau.",
+  "title": "Begriffe aus dem Founder-Alltag – kurz erklärt.",
+  "intro": "Ein schlankes Glossar für Begriffe, die dir im Startup- und Founder-Alltag begegnen.",
   "professionalNote": "Bei rechtlichen oder steuerlichen Fragen ersetzt die Library keine individuelle fachliche Beratung.",
   "back": "Zurück zur Teamübersicht",
   "founderFallback": "Founder {index}",
-  "openInSetup": "In Founder Setup öffnen: {topic} →",
+  "search": {
+    "label": "Glossar durchsuchen",
+    "placeholder": "Begriff suchen …",
+    "noResults": "Kein passender Begriff gefunden.",
+    "noResultsHint": "Probier einen anderen Suchbegriff."
+  },
+  "filters": {
+    "label": "Nach Kategorie filtern",
+    "all": "Alle"
+  },
+  "shortExplanation": "Kurz erklärt",
+  "setupPrompt": "Für euch gerade relevant?",
+  "openInSetup": "In Founder Setup ansehen: {topic} →",
   "categories": {
-    "collaboration_responsibility": "Zusammenarbeit & Verantwortung",
-    "equity_money": "Beteiligung & Geld",
-    "contracts_rights": "Verträge & Rechte",
-    "change": "Wenn sich etwas verändert",
-    "protection_governance": "Schutz & Governance"
+    "equity_financing": "Beteiligung & Finanzierung",
+    "contracts_governance": "Verträge & Governance",
+    "company_building": "Unternehmensaufbau"
   },
-  "statuses": {
-    "draft": "In Vorbereitung",
-    "available": "Verfügbar"
-  },
-  "resources": {
-    "co_founder_agreement": {
-      "title": "Co-Founder-Vereinbarung",
-      "description": "Ordnet die Fragen, die ihr in einer gemeinsamen Founder-Vereinbarung zusammenführen und fachlich prüfen lassen möchtet."
+  "terms": {
+    "bootstrapping": {
+      "term": "Bootstrapping",
+      "shortDefinition": "Aufbau eines Unternehmens vor allem mit eigenen Mitteln und laufenden Einnahmen statt mit externer Beteiligungsfinanzierung."
     },
-    "roles_responsibilities": {
-      "title": "Rollen und Verantwortlichkeiten",
-      "description": "Klärt, wer wofür Verantwortung übernimmt und wo Zuständigkeiten gemeinsam bleiben."
+    "burn_rate": {
+      "term": "Burn Rate",
+      "shortDefinition": "Der Betrag, den ein Unternehmen in einem Zeitraum netto an Liquidität verbraucht – häufig pro Monat betrachtet."
     },
-    "decision_rights": {
-      "title": "Entscheidungsrechte",
-      "description": "Hilft euch zu besprechen, welche Entscheidungen ihr gemeinsam trefft und welche Verantwortung einzelne Founder übernehmen."
+    "cap_table": {
+      "term": "Cap Table",
+      "shortDefinition": "Eine Übersicht darüber, wem welche Anteile oder Beteiligungsrechte an einem Unternehmen gehören."
     },
-    "deadlocks": {
-      "title": "Deadlocks",
-      "description": "Bereitet vor, wie ihr mit wichtigen Entscheidungen umgeht, bei denen ihr euch nicht einigen könnt."
+    "deadlock": {
+      "term": "Deadlock",
+      "shortDefinition": "Eine festgefahrene Entscheidungssituation, in der die vorgesehenen Mehrheiten oder Zuständigkeiten keine Lösung ermöglichen."
     },
-    "commitment": {
-      "title": "Commitment",
-      "description": "Klärt, welches zeitliche und praktische Engagement ihr voneinander erwartet und wie ihr Veränderungen ansprecht."
+    "dilution": {
+      "term": "Dilution / Verwässerung",
+      "shortDefinition": "Die Verringerung des prozentualen Anteils bestehender Beteiligter, wenn neue Anteile ausgegeben werden."
     },
-    "equity": {
-      "title": "Equity",
-      "description": "Ordnet die Fragen, die Founder rund um die Verteilung von Beteiligung miteinander besprechen können."
+    "drag_along_tag_along": {
+      "term": "Drag-along / Tag-along",
+      "shortDefinition": "Vertragliche Regeln für den Verkauf von Unternehmensanteilen: Drag-along kann bestimmte Gesellschafter verpflichten, bei einem Verkauf mitzuverkaufen; Tag-along kann anderen Gesellschaftern das Recht geben, sich einem Verkauf zu vergleichbaren Bedingungen anzuschließen."
     },
-    "vesting": {
-      "title": "Vesting",
-      "description": "Orientierung zu der Frage, wie Beteiligung und langfristiges Engagement miteinander verknüpft werden können."
+    "esop_vsop": {
+      "term": "ESOP / VSOP",
+      "shortDefinition": "Modelle zur Beteiligung von Mitarbeitenden: Ein ESOP arbeitet typischerweise mit echten Anteilen oder Optionen auf echte Anteile. Ein VSOP bildet eine Beteiligung vertraglich nach, ohne dass dadurch unmittelbar eine Gesellschafterstellung entsteht."
+    },
+    "founder_agreement": {
+      "term": "Founder Agreement",
+      "shortDefinition": "Eine Vereinbarung zwischen Foundern, die zentrale Regeln ihrer Zusammenarbeit, Beteiligung und mögliche Veränderungen festhält."
     },
     "founder_exit": {
-      "title": "Founder Exit",
-      "description": "Strukturiert Fragen dazu, was sich für Team, Rollen und Vereinbarungen verändert, wenn ein Founder ausscheidet."
+      "term": "Founder Exit",
+      "shortDefinition": "Das Ausscheiden eines Founders aus dem operativen Team, der Gesellschaft oder beidem – mit möglichen Folgen für Rollen und Beteiligung."
+    },
+    "good_bad_leaver": {
+      "term": "Good Leaver / Bad Leaver",
+      "shortDefinition": "Vertragliche Kategorien für unterschiedliche Arten des Ausscheidens, an die verschiedene Folgen für Beteiligungsrechte geknüpft sein können."
+    },
+    "ip_assignment": {
+      "term": "IP Assignment",
+      "shortDefinition": "Vertragliche Regelungen, durch die Rechte an geistigem Eigentum oder entsprechende Nutzungsrechte – etwa an Code, Designs, Marken oder Erfindungen – einem Unternehmen zugeordnet werden."
+    },
+    "mvp": {
+      "term": "MVP",
+      "shortDefinition": "Ein Minimum Viable Product ist eine bewusst reduzierte erste Produktversion, mit der sich zentrale Annahmen bei echten Nutzenden prüfen lassen."
+    },
+    "pivot": {
+      "term": "Pivot",
+      "shortDefinition": "Eine grundlegende Kursänderung am Produkt, Geschäftsmodell oder Zielmarkt auf Basis neuer Erkenntnisse."
+    },
+    "pre_money_post_money": {
+      "term": "Pre-Money / Post-Money",
+      "shortDefinition": "Pre-Money bezeichnet die Unternehmensbewertung vor einer Finanzierungsrunde, Post-Money die Bewertung einschließlich des neu investierten Kapitals."
+    },
+    "product_market_fit": {
+      "term": "Product-Market Fit",
+      "shortDefinition": "Der Zustand, in dem ein Produkt ein relevantes Marktbedürfnis so gut trifft, dass eine belastbare Nachfrage erkennbar wird."
+    },
+    "reverse_vesting": {
+      "term": "Reverse Vesting",
+      "shortDefinition": "Ein Modell, bei dem Anteile bereits übertragen sind, aber zeitlich abnehmenden Rückübertragungs- oder Rückkaufsrechten unterliegen können."
+    },
+    "runway": {
+      "term": "Runway",
+      "shortDefinition": "Der geschätzte Zeitraum, den ein Unternehmen mit seiner vorhandenen Liquidität bei aktuellem Mittelverbrauch weiterarbeiten kann."
+    },
+    "term_sheet": {
+      "term": "Term Sheet",
+      "shortDefinition": "Eine Zusammenfassung der wesentlichen Eckpunkte einer geplanten Finanzierung oder Beteiligung, bevor die ausführlichen Verträge ausgearbeitet werden."
+    },
+    "vesting": {
+      "term": "Vesting",
+      "shortDefinition": "Ein Mechanismus, der festlegt, über welchen Zeitraum Beteiligungsrechte schrittweise als erdient oder unverfallbar gelten und welche Folgen ein vorzeitiges Ausscheiden haben kann."
+    },
+    "convertible_loan": {
+      "term": "Wandeldarlehen",
+      "shortDefinition": "Ein Darlehen, dessen Rückzahlungsanspruch unter vereinbarten Bedingungen in eine Beteiligung am Unternehmen umgewandelt wird oder werden kann."
     }
   },
   "homebase": {
     "title": "Founder Library",
-    "description": "Begriffe, Artikel und hilfreiche Ressourcen für Founder.",
+    "description": "Begriffe aus dem Founder-Alltag – kurz erklärt.",
     "action": "Library öffnen"
   }
 }

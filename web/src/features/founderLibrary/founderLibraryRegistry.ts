@@ -1,84 +1,71 @@
 import type { FounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 
 export const FOUNDER_LIBRARY_CATEGORY_KEYS = [
-  "collaboration_responsibility",
-  "equity_money",
-  "contracts_rights",
-  "change",
-  "protection_governance",
+  "equity_financing",
+  "contracts_governance",
+  "company_building",
 ] as const;
 
 export type FounderLibraryCategoryKey = (typeof FOUNDER_LIBRARY_CATEGORY_KEYS)[number];
 
-export type FounderLibraryResourceStatus = "draft" | "available";
+export type FounderLibraryTermStatus = "draft" | "available";
 
-export type FounderLibraryResource = {
+export type FounderLibraryTerm = {
   id: string;
   slug: string;
   category: FounderLibraryCategoryKey;
-  status: FounderLibraryResourceStatus;
+  status: FounderLibraryTermStatus;
   setupTopicKeys?: readonly FounderSetupItemKey[];
 };
 
-export const FOUNDER_LIBRARY_RESOURCES = [
-  {
-    id: "co_founder_agreement",
-    slug: "co-founder-agreement",
-    category: "contracts_rights",
-    setupTopicKeys: ["founder_agreements"],
-    status: "draft",
-  },
-  {
-    id: "roles_responsibilities",
-    slug: "roles-and-responsibilities",
-    category: "collaboration_responsibility",
-    setupTopicKeys: ["roles_responsibilities"],
-    status: "draft",
-  },
-  {
-    id: "decision_rights",
-    slug: "decision-rights",
-    category: "collaboration_responsibility",
-    setupTopicKeys: ["decision_rights"],
-    status: "draft",
-  },
-  {
-    id: "deadlocks",
-    slug: "deadlocks",
-    category: "protection_governance",
-    setupTopicKeys: ["conflict_deadlock"],
-    status: "draft",
-  },
-  {
-    id: "commitment",
-    slug: "commitment",
-    category: "collaboration_responsibility",
-    setupTopicKeys: ["time_commitment", "changing_commitment"],
-    status: "draft",
-  },
-  {
-    id: "equity",
-    slug: "equity",
-    category: "equity_money",
-    setupTopicKeys: ["equity"],
-    status: "draft",
-  },
-  {
-    id: "vesting",
-    slug: "vesting",
-    category: "equity_money",
-    setupTopicKeys: ["vesting"],
-    status: "draft",
-  },
-  {
-    id: "founder_exit",
-    slug: "founder-exit",
-    category: "change",
-    setupTopicKeys: ["founder_exit"],
-    status: "draft",
-  },
-] as const satisfies readonly FounderLibraryResource[];
+export type LocalizedFounderLibraryTerm = FounderLibraryTerm & {
+  term: string;
+  shortDefinition: string;
+};
 
-export function getFounderLibraryResourcesByCategory(category: FounderLibraryCategoryKey) {
-  return FOUNDER_LIBRARY_RESOURCES.filter((resource) => resource.category === category);
+export const FOUNDER_LIBRARY_TERMS = [
+  { id: "bootstrapping", slug: "bootstrapping", category: "company_building", setupTopicKeys: [], status: "available" },
+  { id: "burn_rate", slug: "burn-rate", category: "equity_financing", setupTopicKeys: [], status: "available" },
+  { id: "cap_table", slug: "cap-table", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
+  { id: "deadlock", slug: "deadlock", category: "contracts_governance", setupTopicKeys: ["conflict_deadlock"], status: "available" },
+  { id: "dilution", slug: "dilution", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
+  { id: "drag_along_tag_along", slug: "drag-along-tag-along", category: "contracts_governance", setupTopicKeys: [], status: "available" },
+  { id: "esop_vsop", slug: "esop-vsop", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
+  { id: "founder_agreement", slug: "founder-agreement", category: "contracts_governance", setupTopicKeys: ["founder_agreements"], status: "available" },
+  { id: "founder_exit", slug: "founder-exit", category: "contracts_governance", setupTopicKeys: ["founder_exit"], status: "available" },
+  { id: "good_bad_leaver", slug: "good-leaver-bad-leaver", category: "contracts_governance", setupTopicKeys: ["founder_exit"], status: "available" },
+  { id: "ip_assignment", slug: "ip-assignment", category: "contracts_governance", setupTopicKeys: ["intellectual_property"], status: "available" },
+  { id: "mvp", slug: "mvp", category: "company_building", setupTopicKeys: [], status: "available" },
+  { id: "pivot", slug: "pivot", category: "company_building", setupTopicKeys: [], status: "available" },
+  { id: "pre_money_post_money", slug: "pre-money-post-money", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
+  { id: "product_market_fit", slug: "product-market-fit", category: "company_building", setupTopicKeys: [], status: "available" },
+  { id: "reverse_vesting", slug: "reverse-vesting", category: "equity_financing", setupTopicKeys: ["vesting"], status: "available" },
+  { id: "runway", slug: "runway", category: "equity_financing", setupTopicKeys: [], status: "available" },
+  { id: "term_sheet", slug: "term-sheet", category: "equity_financing", setupTopicKeys: [], status: "available" },
+  { id: "vesting", slug: "vesting", category: "equity_financing", setupTopicKeys: ["vesting"], status: "available" },
+  { id: "convertible_loan", slug: "convertible-loan", category: "equity_financing", setupTopicKeys: [], status: "available" },
+] as const satisfies readonly FounderLibraryTerm[];
+
+export type FounderLibraryCategoryFilter = "all" | FounderLibraryCategoryKey;
+
+export function filterFounderLibraryTerms(
+  terms: readonly LocalizedFounderLibraryTerm[],
+  query: string,
+  category: FounderLibraryCategoryFilter,
+) {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  return terms.filter((entry) => {
+    const matchesCategory = category === "all" || entry.category === category;
+    const matchesQuery = normalizedQuery.length === 0
+      || entry.term.toLocaleLowerCase().includes(normalizedQuery)
+      || entry.shortDefinition.toLocaleLowerCase().includes(normalizedQuery);
+    return matchesCategory && matchesQuery;
+  });
+}
+
+export function sortFounderLibraryTerms(
+  terms: readonly LocalizedFounderLibraryTerm[],
+  locale: string,
+) {
+  return [...terms].sort((left, right) => left.term.localeCompare(right.term, locale, { sensitivity: "base" }));
 }

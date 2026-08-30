@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   FOUNDER_LIBRARY_CATEGORY_KEYS,
-  getFounderLibraryResourcesByCategory,
+  FOUNDER_LIBRARY_TERMS,
+  type FounderLibraryCategoryKey,
+  type LocalizedFounderLibraryTerm,
 } from "@/features/founderLibrary/founderLibraryRegistry";
+import { FounderLibraryGlossary } from "@/features/founderLibrary/FounderLibraryGlossary";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient } from "@/lib/supabase/server";
@@ -20,10 +23,11 @@ export default async function FounderLibraryPage({ params }: Props) {
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
 
-  const [t, setupT, navigationT] = await Promise.all([
+  const [t, setupT, navigationT, locale] = await Promise.all([
     getTranslations("founderLibrary"),
     getTranslations("teams.setup"),
     getTranslations("teams.teamNavigation"),
+    getLocale(),
   ]);
   const teamLabel = team.name ?? team.members
     .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
@@ -52,34 +56,32 @@ export default async function FounderLibraryPage({ params }: Props) {
         }}
       />
 
-      <div className="mt-8 space-y-9">
-        {FOUNDER_LIBRARY_CATEGORY_KEYS.map((category) => {
-          const resources = getFounderLibraryResourcesByCategory(category);
-          return (
-            <section key={category} aria-labelledby={`library-category-${category}`}>
-              <h2 id={`library-category-${category}`} className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500">{t(`categories.${category}`)}</h2>
-              <div className="mt-3 divide-y divide-slate-200 border-y border-slate-200">
-                {resources.map((resource) => (
-                  <article key={resource.id} className="min-w-0 py-5 sm:py-6">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h3 className="text-xl font-semibold text-slate-950">{t(`resources.${resource.id}.title`)}</h3>
-                      <span className="text-xs font-medium text-slate-500">{t(`statuses.${resource.status}`)}</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-7 text-slate-600">{t(`resources.${resource.id}.description`)}</p>
-                    {(resource.setupTopicKeys?.length ?? 0) > 0 ? (
-                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
-                        {resource.setupTopicKeys?.map((topicKey) => (
-                          <Link key={topicKey} href={`/teams/${encodeURIComponent(teamId)}/setup/${encodeURIComponent(topicKey)}`} className="rounded-sm text-xs font-medium text-slate-500 underline-offset-4 hover:text-slate-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">{t("openInSetup", { topic: setupT(`items.${topicKey}.title`) })}</Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+      <FounderLibraryGlossary
+        teamId={teamId}
+        locale={locale}
+        terms={FOUNDER_LIBRARY_TERMS.map((entry) => ({
+          ...entry,
+          term: t(`terms.${entry.id}.term`),
+          shortDefinition: t(`terms.${entry.id}.shortDefinition`),
+        })) satisfies LocalizedFounderLibraryTerm[]}
+        setupTopicLabels={Object.fromEntries(
+          FOUNDER_LIBRARY_TERMS.flatMap((entry) => entry.setupTopicKeys ?? []).map((topicKey) => [topicKey, setupT(`items.${topicKey}.title`)]),
+        )}
+        labels={{
+          searchLabel: t("search.label"),
+          searchPlaceholder: t("search.placeholder"),
+          filtersLabel: t("filters.label"),
+          allCategories: t("filters.all"),
+          categories: Object.fromEntries(
+            FOUNDER_LIBRARY_CATEGORY_KEYS.map((key) => [key, t(`categories.${key}`)]),
+          ) as Record<FounderLibraryCategoryKey, string>,
+          shortExplanation: t("shortExplanation"),
+          noResults: t("search.noResults"),
+          noResultsHint: t("search.noResultsHint"),
+          setupPrompt: t("setupPrompt"),
+          openInSetup: t.raw("openInSetup"),
+        }}
+      />
     </main>
   );
 }
