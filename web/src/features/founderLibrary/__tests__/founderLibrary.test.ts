@@ -5,9 +5,7 @@ import de from "../../../../messages/de/founderLibrary.json" with { type: "json"
 import en from "../../../../messages/en/founderLibrary.json" with { type: "json" };
 import {
   FOUNDER_LIBRARY_CATEGORY_KEYS,
-  FOUNDER_LIBRARY_PHASES,
   FOUNDER_LIBRARY_RESOURCES,
-  FOUNDER_LIBRARY_RESOURCE_TYPES,
 } from "@/features/founderLibrary/founderLibraryRegistry";
 import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
 import { getMessages } from "@/i18n/messages";
@@ -26,16 +24,12 @@ test("Founder Library registry contains five categories and eight unique draft r
   );
 });
 
-test("resource metadata only uses declared phases, types, and real Founder Setup keys", () => {
-  const phases = new Set<string>(FOUNDER_LIBRARY_PHASES);
-  const types = new Set<string>(FOUNDER_LIBRARY_RESOURCE_TYPES);
+test("the simplified resource contract only uses valid status and real Founder Setup keys", () => {
   const setupKeys = new Set<string>(FOUNDER_SETUP_ITEM_KEYS);
   for (const resource of FOUNDER_LIBRARY_RESOURCES) {
-    assert.ok(resource.phases.length > 0, resource.id);
-    assert.ok(resource.resourceTypes.length > 0, resource.id);
-    assert.ok(resource.phases.every((phase) => phases.has(phase)), resource.id);
-    assert.ok(resource.resourceTypes.every((type) => types.has(type)), resource.id);
-    assert.ok(resource.setupTopicKeys.every((key) => setupKeys.has(key)), resource.id);
+    assert.ok(["draft", "available"].includes(resource.status), resource.id);
+    assert.ok((resource.setupTopicKeys ?? []).every((key) => setupKeys.has(key)), resource.id);
+    assert.doesNotMatch(JSON.stringify(resource), /phases|resourceTypes/);
   }
   assert.deepEqual(
     FOUNDER_LIBRARY_RESOURCES.find((resource) => resource.id === "commitment")?.setupTopicKeys,
@@ -47,10 +41,10 @@ test("DE and EN cover the complete static information architecture", () => {
   assert.deepEqual(Object.keys(de), Object.keys(en));
   assert.deepEqual(Object.keys(de.categories), [...FOUNDER_LIBRARY_CATEGORY_KEYS]);
   assert.deepEqual(Object.keys(de.categories), Object.keys(en.categories));
-  assert.deepEqual(Object.keys(de.resourceTypes), [...FOUNDER_LIBRARY_RESOURCE_TYPES]);
-  assert.deepEqual(Object.keys(de.resourceTypes), Object.keys(en.resourceTypes));
-  assert.deepEqual(Object.keys(de.phases), [...FOUNDER_LIBRARY_PHASES]);
-  assert.deepEqual(Object.keys(de.phases), Object.keys(en.phases));
+  assert.equal("resourceTypes" in de, false);
+  assert.equal("resourceTypes" in en, false);
+  assert.equal("phases" in de, false);
+  assert.equal("phases" in en, false);
   assert.deepEqual(Object.keys(de.resources), FOUNDER_LIBRARY_RESOURCES.map((resource) => resource.id));
   assert.deepEqual(Object.keys(de.resources), Object.keys(en.resources));
   assert.ok(FOUNDER_LIBRARY_RESOURCES.every((resource) => de.resources[resource.id].title && de.resources[resource.id].description));
@@ -68,15 +62,16 @@ test("team-scoped route is server-authorized for founders and fails closed for a
   assert.match(page, /active="library"/);
 });
 
-test("draft cards are semantic, mobile-first, and expose only real Founder Setup links", () => {
+test("draft entries are semantic, editorial, mobile-first, and expose only real Founder Setup links", () => {
   const page = source("../../../app/(product)/teams/[teamId]/founder-library/page.tsx");
   assert.match(page, /<section key=\{category\} aria-labelledby=/);
   assert.match(page, /<article key=\{resource\.id\}/);
-  assert.match(page, /grid gap-4 lg:grid-cols-2/);
+  assert.match(page, /divide-y divide-slate-200/);
   assert.match(page, /flex flex-wrap/);
   assert.match(page, /setup\/\$\{encodeURIComponent\(topicKey\)\}/);
   assert.match(page, /focus-visible:ring-2/);
   assert.doesNotMatch(page, /resource\.slug\}|href=.*founder-library.*resource/);
+  assert.doesNotMatch(page, /resource\.phases|resource\.resourceTypes|phaseLabel|resourceTypes/);
   assert.doesNotMatch(page, /onClick=/);
 });
 
@@ -89,4 +84,5 @@ test("team homebase and navigation expose the Founder Library without advisor in
   assert.match(card, /<Link/);
   assert.match(navigation, /key: "library"/);
   assert.doesNotMatch(card, />8<|8 resources|8 Ressourcen|resources available|Ressourcen verfügbar/i);
+  assert.ok(homebase.indexOf('aria-labelledby="team-setup-title"') < homebase.indexOf("<FounderLibraryHomebaseCard"));
 });

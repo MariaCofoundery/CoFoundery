@@ -1,35 +1,17 @@
 {
   "eyebrow": "Founder Library",
-  "title": "Wichtige Themen für eure Zusammenarbeit",
-  "intro": "Orientierung, Gesprächshilfen und Checklisten für Themen, die Founder frühzeitig miteinander klären sollten.",
-  "professionalNote": "CoFoundery hilft euch, Fragen zu strukturieren. Rechtliche und steuerliche Themen sollten im Zweifel fachlich geprüft werden.",
+  "title": "Begriffe und Ressourcen für Founder",
+  "intro": "Kurze Erklärungen zu wichtigen Themen rund um Zusammenarbeit, Beteiligung, Vereinbarungen und Unternehmensaufbau.",
+  "professionalNote": "Bei rechtlichen oder steuerlichen Fragen ersetzt die Library keine individuelle fachliche Beratung.",
   "back": "Zurück zur Teamübersicht",
   "founderFallback": "Founder {index}",
-  "phaseLabel": "Relevante Phasen",
-  "setupConnection": "Passend zu Founder Setup",
-  "openInSetup": "In Founder Setup öffnen: {topic}",
+  "openInSetup": "In Founder Setup öffnen: {topic} →",
   "categories": {
     "collaboration_responsibility": "Zusammenarbeit & Verantwortung",
     "equity_money": "Beteiligung & Geld",
     "contracts_rights": "Verträge & Rechte",
     "change": "Wenn sich etwas verändert",
     "protection_governance": "Schutz & Governance"
-  },
-  "resourceTypes": {
-    "orientation": "Orientierung",
-    "conversation_guide": "Gesprächshilfe",
-    "checklist": "Checkliste",
-    "external_source": "Externe Quelle",
-    "professional_review": "Fachlich prüfen"
-  },
-  "phases": {
-    "getting_to_know": "Kennenlernen",
-    "pre_founding": "Vor der Gründung",
-    "founding": "Gründung",
-    "funding": "Finanzierung",
-    "first_hires": "Erste Einstellungen",
-    "growth": "Wachstum",
-    "change_crisis": "Veränderung & Krise"
   },
   "statuses": {
     "draft": "In Vorbereitung",
@@ -71,8 +53,7 @@
   },
   "homebase": {
     "title": "Founder Library",
-    "description": "Orientierung und Gesprächshilfen für wichtige Themen eurer Zusammenarbeit.",
-    "status": "Im Aufbau",
-    "action": "Founder Library öffnen"
+    "description": "Begriffe, Artikel und hilfreiche Ressourcen für Founder.",
+    "action": "Library öffnen"
   }
 }

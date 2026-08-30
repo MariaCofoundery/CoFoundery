@@ -1,35 +1,17 @@
 {
   "eyebrow": "Founder Library",
-  "title": "Important topics for working together",
-  "intro": "Guidance, conversation prompts, and checklists for topics founders benefit from clarifying early together.",
-  "professionalNote": "CoFoundery helps you structure questions. Legal and tax matters should be reviewed by qualified professionals when needed.",
+  "title": "Terms and resources for founders",
+  "intro": "Short explanations of important topics around collaboration, equity, agreements, and building a company.",
+  "professionalNote": "For legal or tax questions, the Library is not a substitute for individual professional advice.",
   "back": "Back to team overview",
   "founderFallback": "Founder {index}",
-  "phaseLabel": "Relevant phases",
-  "setupConnection": "Connected to Founder Setup",
-  "openInSetup": "Open in Founder Setup: {topic}",
+  "openInSetup": "Open in Founder Setup: {topic} →",
   "categories": {
     "collaboration_responsibility": "Collaboration & responsibility",
     "equity_money": "Equity & money",
     "contracts_rights": "Contracts & rights",
     "change": "When things change",
     "protection_governance": "Protection & governance"
-  },
-  "resourceTypes": {
-    "orientation": "Orientation",
-    "conversation_guide": "Conversation guide",
-    "checklist": "Checklist",
-    "external_source": "External source",
-    "professional_review": "Professional review"
-  },
-  "phases": {
-    "getting_to_know": "Getting to know each other",
-    "pre_founding": "Pre-founding",
-    "founding": "Founding",
-    "funding": "Funding",
-    "first_hires": "First hires",
-    "growth": "Growth",
-    "change_crisis": "Change & crisis"
   },
   "statuses": {
     "draft": "In preparation",
@@ -71,8 +53,7 @@
   },
   "homebase": {
     "title": "Founder Library",
-    "description": "Guidance and conversation prompts for important topics in your collaboration.",
-    "status": "In development",
-    "action": "Open Founder Library"
+    "description": "Terms, articles, and useful resources for founders.",
+    "action": "Open Library"
   }
 }

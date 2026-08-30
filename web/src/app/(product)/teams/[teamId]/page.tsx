@@ -245,8 +245,6 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           }}
         />
 
-        <FounderLibraryHomebaseCard teamId={teamId} />
-
         <section
           className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
           aria-labelledby="team-setup-title"
@@ -274,6 +272,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </Link>
           </div>
         </section>
+
+        <FounderLibraryHomebaseCard teamId={teamId} />
 
         <section className={SECTION_CLASS} aria-labelledby="team-agreements-title">
           <h2 id="team-agreements-title" className="text-xl font-semibold text-slate-950">
