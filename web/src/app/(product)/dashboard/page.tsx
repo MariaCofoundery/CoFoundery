@@ -800,6 +800,20 @@ function presentDashboardTask(
         text: t("tasks.items.readMyMindReveal.text"),
         action: t("tasks.items.readMyMindReveal.action"),
       };
+    case "founder_in_the_wild_handoff":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.founderInTheWildHandoff.title"),
+        text: task.started
+          ? t("tasks.items.founderInTheWildHandoff.continueText")
+          : task.personLabel
+            ? t("tasks.items.founderInTheWildHandoff.textWithName", { name: task.personLabel })
+            : t("tasks.items.founderInTheWildHandoff.text"),
+        action: task.started
+          ? t("tasks.items.founderInTheWildHandoff.continueAction")
+          : t("tasks.items.founderInTheWildHandoff.action"),
+      };
     case "commitment_lab_continue":
       return {
         ...task,

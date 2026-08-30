@@ -6,6 +6,10 @@ import { isFounderInTheWildChoice } from "./founderInTheWildContent";
 import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTheWildData";
 import { logFounderInTheWildServerError } from "./founderInTheWildDiagnostics";
 import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
+import { getReadMyMindNotificationRecipientEmail } from "@/features/collaborationLab/readMyMindNotificationRecipient";
+import { getRequestLocale } from "@/i18n/getLocale";
+import { sendFounderInTheWildHandoffEmail } from "@/lib/email/sendFounderInTheWildHandoffEmail";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 const entryHref = founderInTheWildEntryHref;
@@ -20,8 +24,46 @@ async function auth(next: string) {
 }
 
 function refresh(teamId: string, roundId?: string) {
+  revalidatePath("/dashboard");
   revalidatePath(`/teams/${teamId}`); revalidatePath(entryHref(teamId));
   if (roundId) { revalidatePath(roundHref(teamId, roundId)); revalidatePath(revealHref(teamId, roundId)); }
+}
+
+async function claimAndSendHandoff(params: {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  teamId: string;
+  roundId: string;
+  founderName: string | null;
+}) {
+  const claim = await params.supabase.rpc("claim_founder_in_the_wild_handoff_email", {
+    p_round_id: params.roundId,
+  });
+  if (claim.error) {
+    logFounderInTheWildServerError("claim_handoff_email", claim.error);
+    return;
+  }
+  const row = Array.isArray(claim.data) ? claim.data[0] : claim.data;
+  const recipientUserId = (row as { recipient_user_id?: unknown } | null)?.recipient_user_id;
+  if (typeof recipientUserId !== "string") return;
+
+  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipientUserId);
+  if (!recipientEmail) {
+    logFounderInTheWildServerError("resolve_handoff_recipient", { code: "recipient_unavailable" });
+    return;
+  }
+  try {
+    const delivery = await sendFounderInTheWildHandoffEmail({
+      recipientEmail,
+      founderName: params.founderName,
+      roundUrl: toPublicAppUrl(roundHref(params.teamId, params.roundId)),
+      locale: await getRequestLocale(),
+    });
+    if (!delivery.ok) {
+      logFounderInTheWildServerError("send_handoff_email", { code: delivery.error });
+    }
+  } catch {
+    logFounderInTheWildServerError("send_handoff_email", { code: "unexpected_delivery_error" });
+  }
 }
 
 export async function startFounderInTheWildRoundAction(teamId: string) {
@@ -56,6 +98,12 @@ export async function lockFounderInTheWildScenarioAction(teamId: string, roundId
     const result = await supabase.rpc("lock_founder_in_the_wild_response", { p_prompt_assignment_id: slot.assignmentId, p_response_type: responseType, p_choice_keys: keys });
     if (result.error) redirect(`${roundHref(teamId, roundId)}?result=changed`);
   }
+  await claimAndSendHandoff({
+    supabase,
+    teamId,
+    roundId,
+    founderName: team?.members.find((member) => member.userId === user.id)?.displayName ?? null,
+  });
   refresh(teamId, roundId); redirect(roundHref(teamId, roundId));
 }
 

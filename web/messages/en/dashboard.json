@@ -115,6 +115,14 @@
         "text": "Your round is ready.",
         "action": "View reveal"
       },
+      "founderInTheWildHandoff": {
+        "title": "Founder in the Wild",
+        "text": "Your co-founder has completed their part. You’re up now.",
+        "textWithName": "{name} has completed their part. You’re up now.",
+        "continueText": "Your Founder in the Wild round is still open.",
+        "action": "Answer round",
+        "continueAction": "Continue round"
+      },
       "commitmentLab": {
         "title": "Continue Commitment Lab",
         "titleWithName": "Continue Commitment Lab with {name}",

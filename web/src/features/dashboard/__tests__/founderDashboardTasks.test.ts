@@ -30,6 +30,7 @@ function signals(
     setupConfirmations: [],
     commitmentLabs: [],
     readMyMindRounds: [],
+    founderInTheWildRounds: [],
     ...overrides,
   };
 }
@@ -119,6 +120,23 @@ test("Read My Mind only creates pending and own-answer tasks for supported two-f
   ]);
   assert.match(tasks[0]!.href, /collaboration-lab\/read-my-mind\/pending$/);
   assert.match(tasks[3]!.href, /reveal\/2$/);
+});
+
+test("Founder in the Wild handoff is symmetric, recipient-only, and disappears when both complete or abandoned", () => {
+  const base = { teamId: "team", teamLabel: "Team Atlas", partnerLabel: "Ben", ownStarted: false, ownAnswerComplete: false, partnerAnswerComplete: false, wholeAnswerComplete: false, supportedTwoFounderTeam: true, createdAt: NOW };
+  const tasks = buildFounderDashboardTasks(signals({ founderInTheWildRounds: [
+    { id: "both-incomplete", ...base },
+    { id: "recipient", ...base, partnerAnswerComplete: true },
+    { id: "recipient-started", ...base, ownStarted: true, partnerAnswerComplete: true },
+    { id: "sender-waiting", ...base, ownAnswerComplete: true },
+    { id: "both-complete", ...base, ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true },
+    { id: "unsupported", ...base, partnerAnswerComplete: true, supportedTwoFounderTeam: false },
+  ] }));
+  assert.deepEqual(tasks.map((task) => [task.id, task.type, task.kind, task.started]), [
+    ["founder-in-the-wild:recipient", "founder_in_the_wild_handoff", "NEEDS_YOU", false],
+    ["founder-in-the-wild:recipient-started", "founder_in_the_wild_handoff", "NEEDS_YOU", true],
+  ]);
+  assert.match(tasks[0]!.href, /founder-in-the-wild\/recipient$/);
 });
 
 test("only actionable incoming invitations become tasks", () => {

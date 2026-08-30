@@ -23,6 +23,10 @@ type ReadMyMindStartedCopyInput = {
   packTitles: string[];
 };
 
+type FounderInTheWildHandoffCopyInput = {
+  founderName: string | null;
+};
+
 export function getEmailPrivacyUrl(locale: AppLocale) {
   return locale === "en" ? "https://cofoundery.de/datenschutz" : "https://cofoundery.de/datenschutz";
 }
@@ -70,6 +74,41 @@ export function getReadMyMindStartedEmailCopy(
     beta: "Read My Mind befindet sich aktuell in der Testphase.",
     fallback: "Falls der Button nicht funktioniert, kannst du diesen Link direkt öffnen:",
     privacy: "Datenschutzerklärung",
+  };
+}
+
+export function getFounderInTheWildHandoffEmailCopy(
+  locale: AppLocale,
+  input: FounderInTheWildHandoffCopyInput
+) {
+  const founderName = input.founderName?.trim() || (locale === "en" ? "Your co-founder" : "Dein Co-Founder");
+  if (locale === "en") {
+    return {
+      htmlLang: "en",
+      subject: "Founder in the Wild: You’re up",
+      preheader: `${founderName} has completed their part of Founder in the Wild.`,
+      eyebrow: "Founder in the Wild",
+      greeting: "Hi,",
+      intro: `${founderName} has completed their part of Founder in the Wild.`,
+      privacy: "Your answers remain hidden until you have both answered all five situations.",
+      turn: "You can answer your part now.",
+      cta: "Open Founder in the Wild",
+      fallback: "If the button does not work, you can open this link directly:",
+      privacyLink: "Privacy policy",
+    };
+  }
+  return {
+    htmlLang: "de",
+    subject: "Founder in the Wild: Du bist dran",
+    preheader: `${founderName} hat den eigenen Teil bei Founder in the Wild abgeschlossen.`,
+    eyebrow: "Founder in the Wild",
+    greeting: "Hi,",
+    intro: `${founderName} hat den eigenen Teil bei Founder in the Wild abgeschlossen.`,
+    privacy: "Eure Antworten bleiben verdeckt, bis ihr beide alle fünf Situationen beantwortet habt.",
+    turn: "Du kannst jetzt deinen Teil beantworten.",
+    cta: "Founder in the Wild öffnen",
+    fallback: "Falls der Button nicht funktioniert, kannst du diesen Link direkt öffnen:",
+    privacyLink: "Datenschutzerklärung",
   };
 }
 

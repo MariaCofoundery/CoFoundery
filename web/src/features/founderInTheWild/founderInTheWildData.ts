@@ -22,7 +22,7 @@ export async function getFounderInTheWildRound(team: FounderInTheWildTeam, round
     logFounderInTheWildServerError("read_round_not_visible");
     return null;
   }
-  const [participants, prompts, assignments, responses, receipts, markers, state] = await Promise.all([
+  const [participants, prompts, assignments, responses, receipts, markers, state, handoffState] = await Promise.all([
     supabase.from("collaboration_experience_round_participants").select("founder_user_id,state").eq("round_id", roundId),
     supabase.from("collaboration_experience_round_prompts").select("id,prompt_key,position").eq("round_id", roundId).order("position"),
     supabase.from("collaboration_experience_prompt_assignments").select("id,round_prompt_id,target_user_id").eq("round_id", roundId),
@@ -30,6 +30,7 @@ export async function getFounderInTheWildRound(team: FounderInTheWildTeam, round
     supabase.from("collaboration_experience_reveal_receipts").select("round_prompt_id").eq("round_id", roundId).eq("participant_user_id", userId),
     supabase.from("collaboration_experience_conversation_markers").select("round_prompt_id,participant_user_id").eq("round_id", roundId),
     supabase.rpc("get_founder_in_the_wild_round_state", { p_round_id: roundId }),
+    supabase.rpc("get_founder_in_the_wild_handoff_state", { p_round_id: roundId }),
   ]);
   const reads = [
     ["read_participants", participants],
@@ -39,6 +40,7 @@ export async function getFounderInTheWildRound(team: FounderInTheWildTeam, round
     ["read_own_receipts", receipts],
     ["read_conversation_markers", markers],
     ["read_round_state", state],
+    ["read_handoff_state", handoffState],
   ] as const;
   const failedRead = reads.find(([, result]) => result.error);
   if (failedRead) {
@@ -47,7 +49,9 @@ export async function getFounderInTheWildRound(team: FounderInTheWildTeam, round
   }
   const stateRow = Array.isArray(state.data) ? state.data[0] : state.data;
   const projectedState = stateRow as { answer_phase_complete?: boolean; can_discard?: boolean; can_decline?: boolean; both_started?: boolean } | null;
-  const readModel = buildFounderInTheWildRound({ currentUserId: userId, team, round: round.data, participants: participants.data ?? [], prompts: prompts.data ?? [], assignments: assignments.data ?? [], responses: responses.data ?? [], receipts: receipts.data ?? [], markers: markers.data ?? [], answerPhaseComplete: Boolean(projectedState?.answer_phase_complete), canDiscard: Boolean(projectedState?.can_discard), canDecline: Boolean(projectedState?.can_decline), bothStarted: Boolean(projectedState?.both_started) });
+  const handoffStateRow = Array.isArray(handoffState.data) ? handoffState.data[0] : handoffState.data;
+  const projectedHandoffState = handoffStateRow as { own_started?: boolean; own_complete?: boolean; partner_started?: boolean; partner_complete?: boolean } | null;
+  const readModel = buildFounderInTheWildRound({ currentUserId: userId, team, round: round.data, participants: participants.data ?? [], prompts: prompts.data ?? [], assignments: assignments.data ?? [], responses: responses.data ?? [], receipts: receipts.data ?? [], markers: markers.data ?? [], answerPhaseComplete: Boolean(projectedState?.answer_phase_complete), ownStarted: Boolean(projectedHandoffState?.own_started), ownAnswerComplete: Boolean(projectedHandoffState?.own_complete), partnerStarted: Boolean(projectedHandoffState?.partner_started), partnerAnswerComplete: Boolean(projectedHandoffState?.partner_complete), canDiscard: Boolean(projectedState?.can_discard), canDecline: Boolean(projectedState?.can_decline), bothStarted: Boolean(projectedState?.both_started) });
   if (!readModel) logFounderInTheWildServerError("build_round_read_model");
   return readModel;
 }

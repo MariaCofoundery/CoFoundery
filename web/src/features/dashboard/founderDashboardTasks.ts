@@ -19,6 +19,7 @@ export type DashboardTaskType =
   | "read_my_mind_invitation"
   | "read_my_mind_continue"
   | "read_my_mind_reveal"
+  | "founder_in_the_wild_handoff"
   | "commitment_lab_continue"
   | "founder_setup_continue";
 
@@ -32,6 +33,7 @@ export type FounderDashboardTask = {
   personLabel: string | null;
   itemKey: FounderSetupItemKey | null;
   packCount?: number;
+  started?: boolean;
 };
 
 export type FounderDashboardTaskSignals = {
@@ -116,6 +118,18 @@ export type FounderDashboardTaskSignals = {
     supportedTwoFounderTeam: boolean;
     createdAt: string;
   }>;
+  founderInTheWildRounds?: Array<{
+    id: string;
+    teamId: string;
+    teamLabel: string | null;
+    partnerLabel: string | null;
+    ownStarted: boolean;
+    ownAnswerComplete: boolean;
+    partnerAnswerComplete: boolean;
+    wholeAnswerComplete: boolean;
+    supportedTwoFounderTeam: boolean;
+    createdAt: string;
+  }>;
 };
 
 const KIND_PRIORITY: Record<DashboardTaskKind, number> = {
@@ -131,6 +145,7 @@ const NEEDS_YOU_PRIORITY: Partial<Record<DashboardTaskType, number>> = {
   setup_advisor_consent: 3,
   setup_confirmation: 4,
   read_my_mind_invitation: 2,
+  founder_in_the_wild_handoff: 2,
 };
 
 function isClaimableInvitation(
@@ -220,6 +235,26 @@ export function buildFounderDashboardTasks(
       existing.push(round);
       readMyMindInvitationsByTeam.set(round.teamId, existing);
     }
+  }
+
+  for (const round of signals.founderInTheWildRounds ?? []) {
+    if (
+      !round.supportedTwoFounderTeam ||
+      round.ownAnswerComplete ||
+      !round.partnerAnswerComplete ||
+      round.wholeAnswerComplete
+    ) continue;
+    tasks.push({
+      id: `founder-in-the-wild:${round.id}`,
+      kind: "NEEDS_YOU",
+      type: "founder_in_the_wild_handoff",
+      href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/founder-in-the-wild/${encodeURIComponent(round.id)}`,
+      createdAt: round.createdAt,
+      contextLabel: round.teamLabel,
+      personLabel: round.partnerLabel,
+      itemKey: null,
+      started: round.ownStarted,
+    });
   }
   for (const [teamId, rounds] of readMyMindInvitationsByTeam) {
     const newest = [...rounds].sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0]!;

@@ -52,7 +52,7 @@ export async function getFounderDashboardTasks(params: {
   const teamIds = params.teams.map((team) => team.id);
   const teamById = new Map(params.teams.map((team) => [team.id, team]));
 
-  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult] =
+  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult] =
     await Promise.all([
       supabase
         .from("discovery_intro_requests")
@@ -80,6 +80,9 @@ export async function getFounderDashboardTasks(params: {
       teamIds.length > 0
         ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at").in("founder_team_id", teamIds).eq("experience_key", "read_my_mind").in("status", ["forming", "active"])
         : Promise.resolve({ data: [], error: null }),
+      teamIds.length > 0
+        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, status, created_at").in("founder_team_id", teamIds).eq("experience_key", "founder_in_the_wild").eq("status", "active")
+        : Promise.resolve({ data: [], error: null }),
     ]);
 
   const relationships = relationshipResult.error
@@ -97,7 +100,8 @@ export async function getFounderDashboardTasks(params: {
 
   const readMyMindRounds = readMyMindRoundResult.error ? [] : ((readMyMindRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; pack_key: string; pack_version: number; created_by_user_id: string; status: string; created_at: string; handoff_ready_at: string | null }>);
   const readMyMindRoundIds = readMyMindRounds.map((round) => round.id);
-  const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult, readMyMindPromptResult, readMyMindReceiptResult, readMyMindStateResults] = await Promise.all([
+  const founderInTheWildRounds = founderInTheWildRoundResult.error ? [] : ((founderInTheWildRoundResult.data ?? []) as Array<{ id: string; founder_team_id: string; status: string; created_at: string }>);
+  const [advisorResult, confirmationResult, commitmentLabResult, readMyMindParticipantResult, readMyMindOwnResponseResult, readMyMindPromptResult, readMyMindReceiptResult, readMyMindStateResults, founderInTheWildStateResults] = await Promise.all([
     relationshipIds.length > 0
       ? supabase
           .from("relationship_advisors")
@@ -132,6 +136,7 @@ export async function getFounderDashboardTasks(params: {
       ? supabase.from("collaboration_experience_reveal_receipts").select("round_id, round_prompt_id, participant_user_id").in("round_id", readMyMindRoundIds).eq("participant_user_id", currentUserId)
       : Promise.resolve({ data: [], error: null }),
     Promise.all(readMyMindRoundIds.map(async (roundId) => ({ roundId, result: await supabase.rpc("get_collaboration_round_state", { p_round_id: roundId }) }))),
+    Promise.all(founderInTheWildRounds.map(async (round) => ({ roundId: round.id, result: await supabase.rpc("get_founder_in_the_wild_handoff_state", { p_round_id: round.id }) }))),
   ]);
 
   const relationshipSignals = relationships.map((relationship) => {
@@ -278,6 +283,27 @@ export async function getFounderDashboardTasks(params: {
         wholeAnswerComplete: Boolean(state?.answer_phase_complete),
         ownRevealComplete: prompts.length > 0 && ownReceiptPromptIds.size === prompts.length,
         nextRevealPosition,
+        supportedTwoFounderTeam: team?.members.length === 2,
+        createdAt: round.created_at,
+      };
+    }),
+    founderInTheWildRounds: founderInTheWildRounds.map((round) => {
+      const team = teamById.get(round.founder_team_id);
+      const stateResult = founderInTheWildStateResults.find((entry) => entry.roundId === round.id)?.result;
+      const rawState = stateResult && !stateResult.error
+        ? (Array.isArray(stateResult.data) ? stateResult.data[0] : stateResult.data)
+        : null;
+      const state = rawState as { own_started?: boolean; own_complete?: boolean; partner_complete?: boolean } | null;
+      const partner = team?.members.find((member) => member.userId !== currentUserId);
+      return {
+        id: round.id,
+        teamId: round.founder_team_id,
+        teamLabel: team?.name ?? team?.members.map((member) => member.displayName).filter(Boolean).join(" + ") ?? null,
+        partnerLabel: partner?.displayName ?? null,
+        ownStarted: Boolean(state?.own_started),
+        ownAnswerComplete: Boolean(state?.own_complete),
+        partnerAnswerComplete: Boolean(state?.partner_complete),
+        wholeAnswerComplete: Boolean(state?.own_complete && state?.partner_complete),
         supportedTwoFounderTeam: team?.members.length === 2,
         createdAt: round.created_at,
       };

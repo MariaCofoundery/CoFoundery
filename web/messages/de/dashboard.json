@@ -115,6 +115,14 @@
         "text": "Eure Runde ist bereit.",
         "action": "Reveal ansehen"
       },
+      "founderInTheWildHandoff": {
+        "title": "Founder in the Wild",
+        "text": "Dein Co-Founder hat den eigenen Teil abgeschlossen. Jetzt bist du dran.",
+        "textWithName": "{name} hat den eigenen Teil abgeschlossen. Jetzt bist du dran.",
+        "continueText": "Deine Founder-in-the-Wild-Runde ist noch offen.",
+        "action": "Runde beantworten",
+        "continueAction": "Runde fortsetzen"
+      },
       "commitmentLab": {
         "title": "Commitment Lab fortsetzen",
         "titleWithName": "Commitment Lab mit {name} fortsetzen",

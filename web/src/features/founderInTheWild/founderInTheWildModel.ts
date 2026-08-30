@@ -31,7 +31,10 @@ export type FounderInTheWildRound = {
   partner: FounderInTheWildTeam["members"][number];
   prompts: FounderInTheWildPromptState[];
   nextPromptPosition: number | null;
+  ownStarted: boolean;
   ownAnswerComplete: boolean;
+  partnerStarted: boolean;
+  partnerAnswerComplete: boolean;
   wholeRoundAnswerComplete: boolean;
   openedPromptPositions: number[];
   canDiscard: boolean;
@@ -59,6 +62,10 @@ export function buildFounderInTheWildRound(params: {
   receipts: Row[];
   markers: Row[];
   answerPhaseComplete: boolean;
+  ownStarted?: boolean;
+  ownAnswerComplete?: boolean;
+  partnerStarted?: boolean;
+  partnerAnswerComplete?: boolean;
   canDiscard?: boolean;
   canDecline?: boolean;
   bothStarted?: boolean;
@@ -89,7 +96,10 @@ export function buildFounderInTheWildRound(params: {
     id: String(params.round.id), status, team: params.team, createdByUserId: String(params.round.created_by_user_id), partner,
     prompts: promptStates,
     nextPromptPosition: promptStates.find((prompt) => !prompt.complete)?.position ?? null,
-    ownAnswerComplete: promptStates.every((prompt) => prompt.complete),
+    ownStarted: Boolean(params.ownStarted),
+    ownAnswerComplete: params.ownAnswerComplete ?? promptStates.every((prompt) => prompt.complete),
+    partnerStarted: Boolean(params.partnerStarted),
+    partnerAnswerComplete: Boolean(params.partnerAnswerComplete),
     wholeRoundAnswerComplete: params.answerPhaseComplete,
     canDiscard: Boolean(params.canDiscard),
     canDecline: Boolean(params.canDecline),
