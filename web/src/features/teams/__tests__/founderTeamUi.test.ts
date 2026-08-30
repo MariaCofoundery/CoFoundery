@@ -9,6 +9,7 @@ test("team routes use the existing product chrome", () => {
     "/teams/team-1",
     "/teams/team-1/setup",
     "/teams/team-1/setup/time_commitment",
+    "/teams/team-1/founder-library",
   ]) {
     assert.equal(isProductChromePath(pathname), true, pathname);
   }

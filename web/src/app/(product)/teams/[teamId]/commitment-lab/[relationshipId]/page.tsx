@@ -92,7 +92,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
         <p className="mt-3 text-sm font-medium text-slate-700">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
       </header>
-      <FounderTeamNavigation teamId={teamId} active="alignment" labels={{ ariaLabel: navigationT("ariaLabel"), context: navigationT("context", { team: teamLabel }), overview: navigationT("overview"), setup: navigationT("setup"), alignment: navigationT("alignment") }} />
+      <FounderTeamNavigation teamId={teamId} active="alignment" labels={{ ariaLabel: navigationT("ariaLabel"), context: navigationT("context", { team: teamLabel }), overview: navigationT("overview"), setup: navigationT("setup"), library: navigationT("library"), alignment: navigationT("alignment") }} />
       {feedback ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedback}`)}</p> : null}
 
       <CommitmentLabMarkerProvider initialMarkers={ownEntry?.discussionMarkers ?? []}>

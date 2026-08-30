@@ -1,0 +1,78 @@
+{
+  "eyebrow": "Founder Library",
+  "title": "Wichtige Themen für eure Zusammenarbeit",
+  "intro": "Orientierung, Gesprächshilfen und Checklisten für Themen, die Founder frühzeitig miteinander klären sollten.",
+  "professionalNote": "CoFoundery hilft euch, Fragen zu strukturieren. Rechtliche und steuerliche Themen sollten im Zweifel fachlich geprüft werden.",
+  "back": "Zurück zur Teamübersicht",
+  "founderFallback": "Founder {index}",
+  "phaseLabel": "Relevante Phasen",
+  "setupConnection": "Passend zu Founder Setup",
+  "openInSetup": "In Founder Setup öffnen: {topic}",
+  "categories": {
+    "collaboration_responsibility": "Zusammenarbeit & Verantwortung",
+    "equity_money": "Beteiligung & Geld",
+    "contracts_rights": "Verträge & Rechte",
+    "change": "Wenn sich etwas verändert",
+    "protection_governance": "Schutz & Governance"
+  },
+  "resourceTypes": {
+    "orientation": "Orientierung",
+    "conversation_guide": "Gesprächshilfe",
+    "checklist": "Checkliste",
+    "external_source": "Externe Quelle",
+    "professional_review": "Fachlich prüfen"
+  },
+  "phases": {
+    "getting_to_know": "Kennenlernen",
+    "pre_founding": "Vor der Gründung",
+    "founding": "Gründung",
+    "funding": "Finanzierung",
+    "first_hires": "Erste Einstellungen",
+    "growth": "Wachstum",
+    "change_crisis": "Veränderung & Krise"
+  },
+  "statuses": {
+    "draft": "In Vorbereitung",
+    "available": "Verfügbar"
+  },
+  "resources": {
+    "co_founder_agreement": {
+      "title": "Co-Founder-Vereinbarung",
+      "description": "Ordnet die Fragen, die ihr in einer gemeinsamen Founder-Vereinbarung zusammenführen und fachlich prüfen lassen möchtet."
+    },
+    "roles_responsibilities": {
+      "title": "Rollen und Verantwortlichkeiten",
+      "description": "Klärt, wer wofür Verantwortung übernimmt und wo Zuständigkeiten gemeinsam bleiben."
+    },
+    "decision_rights": {
+      "title": "Entscheidungsrechte",
+      "description": "Hilft euch zu besprechen, welche Entscheidungen ihr gemeinsam trefft und welche Verantwortung einzelne Founder übernehmen."
+    },
+    "deadlocks": {
+      "title": "Deadlocks",
+      "description": "Bereitet vor, wie ihr mit wichtigen Entscheidungen umgeht, bei denen ihr euch nicht einigen könnt."
+    },
+    "commitment": {
+      "title": "Commitment",
+      "description": "Klärt, welches zeitliche und praktische Engagement ihr voneinander erwartet und wie ihr Veränderungen ansprecht."
+    },
+    "equity": {
+      "title": "Equity",
+      "description": "Ordnet die Fragen, die Founder rund um die Verteilung von Beteiligung miteinander besprechen können."
+    },
+    "vesting": {
+      "title": "Vesting",
+      "description": "Orientierung zu der Frage, wie Beteiligung und langfristiges Engagement miteinander verknüpft werden können."
+    },
+    "founder_exit": {
+      "title": "Founder Exit",
+      "description": "Strukturiert Fragen dazu, was sich für Team, Rollen und Vereinbarungen verändert, wenn ein Founder ausscheidet."
+    }
+  },
+  "homebase": {
+    "title": "Founder Library",
+    "description": "Orientierung und Gesprächshilfen für wichtige Themen eurer Zusammenarbeit.",
+    "status": "Im Aufbau",
+    "action": "Founder Library öffnen"
+  }
+}

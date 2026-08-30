@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHomebaseCard";
+import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
 import {
@@ -115,6 +116,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           context: navigationT("context", { team: title }),
           overview: navigationT("overview"),
           setup: navigationT("setup"),
+          library: navigationT("library"),
           alignment: navigationT("alignment"),
         }}
       />
@@ -242,6 +244,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             })),
           }}
         />
+
+        <FounderLibraryHomebaseCard teamId={teamId} />
 
         <section
           className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"

@@ -1,0 +1,78 @@
+{
+  "eyebrow": "Founder Library",
+  "title": "Important topics for working together",
+  "intro": "Guidance, conversation prompts, and checklists for topics founders benefit from clarifying early together.",
+  "professionalNote": "CoFoundery helps you structure questions. Legal and tax matters should be reviewed by qualified professionals when needed.",
+  "back": "Back to team overview",
+  "founderFallback": "Founder {index}",
+  "phaseLabel": "Relevant phases",
+  "setupConnection": "Connected to Founder Setup",
+  "openInSetup": "Open in Founder Setup: {topic}",
+  "categories": {
+    "collaboration_responsibility": "Collaboration & responsibility",
+    "equity_money": "Equity & money",
+    "contracts_rights": "Contracts & rights",
+    "change": "When things change",
+    "protection_governance": "Protection & governance"
+  },
+  "resourceTypes": {
+    "orientation": "Orientation",
+    "conversation_guide": "Conversation guide",
+    "checklist": "Checklist",
+    "external_source": "External source",
+    "professional_review": "Professional review"
+  },
+  "phases": {
+    "getting_to_know": "Getting to know each other",
+    "pre_founding": "Pre-founding",
+    "founding": "Founding",
+    "funding": "Funding",
+    "first_hires": "First hires",
+    "growth": "Growth",
+    "change_crisis": "Change & crisis"
+  },
+  "statuses": {
+    "draft": "In preparation",
+    "available": "Available"
+  },
+  "resources": {
+    "co_founder_agreement": {
+      "title": "Co-founder agreement",
+      "description": "Organizes the questions you may want to bring together in a founder agreement and have professionally reviewed."
+    },
+    "roles_responsibilities": {
+      "title": "Roles and responsibilities",
+      "description": "Clarifies who takes ownership of what and where responsibilities remain shared."
+    },
+    "decision_rights": {
+      "title": "Decision rights",
+      "description": "Helps you discuss which decisions you make together and which responsibilities individual founders take on."
+    },
+    "deadlocks": {
+      "title": "Deadlocks",
+      "description": "Prepares you to discuss how to handle important decisions when you cannot reach agreement."
+    },
+    "commitment": {
+      "title": "Commitment",
+      "description": "Clarifies the time and practical commitment you expect from each other and how you raise changes."
+    },
+    "equity": {
+      "title": "Equity",
+      "description": "Organizes the questions founders can discuss when considering how equity is distributed."
+    },
+    "vesting": {
+      "title": "Vesting",
+      "description": "Orientation around how equity and long-term commitment can be connected."
+    },
+    "founder_exit": {
+      "title": "Founder exit",
+      "description": "Structures questions about what changes for the team, roles, and agreements when a founder leaves."
+    }
+  },
+  "homebase": {
+    "title": "Founder Library",
+    "description": "Guidance and conversation prompts for important topics in your collaboration.",
+    "status": "In development",
+    "action": "Open Founder Library"
+  }
+}

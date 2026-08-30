@@ -2,12 +2,13 @@ import Link from "next/link";
 
 type Props = {
   teamId: string;
-  active: "overview" | "setup" | "alignment";
+  active: "overview" | "setup" | "library" | "alignment";
   labels: {
     ariaLabel: string;
     context: string;
     overview: string;
     setup: string;
+    library: string;
     alignment: string;
   };
 };
@@ -16,6 +17,7 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
   const items = [
     { key: "overview" as const, href: `/teams/${encodeURIComponent(teamId)}` },
     { key: "setup" as const, href: `/teams/${encodeURIComponent(teamId)}/setup` },
+    { key: "library" as const, href: `/teams/${encodeURIComponent(teamId)}/founder-library` },
     { key: "alignment" as const, href: `/teams/${encodeURIComponent(teamId)}#team-alignment` },
   ];
 

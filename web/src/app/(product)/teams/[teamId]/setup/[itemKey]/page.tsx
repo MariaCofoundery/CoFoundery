@@ -143,6 +143,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           context: navigationT("context", { team: teamLabel }),
           overview: navigationT("overview"),
           setup: navigationT("setup"),
+          library: navigationT("library"),
           alignment: navigationT("alignment"),
         }}
       />

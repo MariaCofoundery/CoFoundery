@@ -57,6 +57,7 @@ export default async function FounderSetupPage({ params }: Props) {
           context: navigationT("context", { team: teamLabel }),
           overview: navigationT("overview"),
           setup: navigationT("setup"),
+          library: navigationT("library"),
           alignment: navigationT("alignment"),
         }}
       />

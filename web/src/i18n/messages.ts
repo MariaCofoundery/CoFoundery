@@ -8,6 +8,7 @@ import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFeedback from "../../messages/de/feedback.json";
+import deFounderLibrary from "../../messages/de/founderLibrary.json";
 import deInvite from "../../messages/de/invite.json";
 import deNavigation from "../../messages/de/navigation.json";
 import deProfile from "../../messages/de/profile.json";
@@ -23,6 +24,7 @@ import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFeedback from "../../messages/en/feedback.json";
+import enFounderLibrary from "../../messages/en/founderLibrary.json";
 import enInvite from "../../messages/en/invite.json";
 import enNavigation from "../../messages/en/navigation.json";
 import enProfile from "../../messages/en/profile.json";
@@ -41,6 +43,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: deDashboard,
     discovery: deDiscovery,
     feedback: deFeedback,
+    founderLibrary: deFounderLibrary,
     invite: deInvite,
     navigation: deNavigation,
     profile: deProfile,
@@ -58,6 +61,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: enDashboard,
     discovery: enDiscovery,
     feedback: enFeedback,
+    founderLibrary: enFounderLibrary,
     invite: enInvite,
     navigation: enNavigation,
     profile: enProfile,
