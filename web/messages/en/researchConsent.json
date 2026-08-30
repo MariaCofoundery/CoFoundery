@@ -1,0 +1,21 @@
+{
+  "notice": {
+    "eyebrow": "Research & product development",
+    "title": "Help us better understand collaboration in founder teams.",
+    "body": "If you choose to participate, we may use selected structured answers and usage data in pseudonymized form for scientific research on collaboration in founder teams and to improve our measurement instruments.\n\nParticipation is voluntary. You can use CoFoundery in exactly the same way if you choose not to participate.",
+    "decline": "No, thanks",
+    "accept": "Participate in research",
+    "error": "We couldn't save your choice right now. Please try again."
+  },
+  "settings": {
+    "title": "Research participation",
+    "description": "You decide voluntarily whether selected structured answers and usage data may be used in pseudonymized form for scientific research.",
+    "statusLabel": "Status:",
+    "active": "Active",
+    "inactive": "Not active",
+    "activate": "Enable participation",
+    "withdraw": "End participation",
+    "withdrawal": "After you end participation, no new research events are stored. Raw data that can still be linked to your participation is deleted; previously aggregated results that can no longer be linked to you may remain.",
+    "error": "We couldn't update this setting right now. Please try again."
+  }
+}

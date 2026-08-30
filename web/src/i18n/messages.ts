@@ -13,6 +13,7 @@ import deInvite from "../../messages/de/invite.json";
 import deNavigation from "../../messages/de/navigation.json";
 import deProfile from "../../messages/de/profile.json";
 import deReport from "../../messages/de/report.json";
+import deResearchConsent from "../../messages/de/researchConsent.json";
 import deTeams from "../../messages/de/teams.json";
 import deWorkspace from "../../messages/de/workspace.json";
 import deWorkbook from "../../messages/de/workbook.json";
@@ -29,6 +30,7 @@ import enInvite from "../../messages/en/invite.json";
 import enNavigation from "../../messages/en/navigation.json";
 import enProfile from "../../messages/en/profile.json";
 import enReport from "../../messages/en/report.json";
+import enResearchConsent from "../../messages/en/researchConsent.json";
 import enTeams from "../../messages/en/teams.json";
 import enWorkspace from "../../messages/en/workspace.json";
 import enWorkbook from "../../messages/en/workbook.json";
@@ -48,6 +50,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     navigation: deNavigation,
     profile: deProfile,
     report: deReport,
+    researchConsent: deResearchConsent,
     teams: deTeams,
     workspace: deWorkspace,
     workbook: deWorkbook as unknown as AbstractIntlMessages,
@@ -66,6 +69,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     navigation: enNavigation,
     profile: enProfile,
     report: enReport,
+    researchConsent: enResearchConsent,
     teams: enTeams,
     workspace: enWorkspace,
     workbook: enWorkbook as unknown as AbstractIntlMessages,

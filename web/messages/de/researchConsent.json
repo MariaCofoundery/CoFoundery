@@ -1,0 +1,21 @@
+{
+  "notice": {
+    "eyebrow": "Forschung & Produktentwicklung",
+    "title": "Hilf uns, Zusammenarbeit in Founder-Teams besser zu verstehen.",
+    "body": "Wenn du möchtest, dürfen wir ausgewählte strukturierte Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams und zur Weiterentwicklung unserer Messinstrumente verwenden.\n\nDeine Teilnahme ist freiwillig. Du kannst CoFoundery genauso nutzen, wenn du nicht teilnimmst.",
+    "decline": "Nein, danke",
+    "accept": "An Forschung teilnehmen",
+    "error": "Deine Auswahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
+  },
+  "settings": {
+    "title": "Forschungsteilnahme",
+    "description": "Du entscheidest freiwillig, ob ausgewählte strukturierte Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung verwendet werden dürfen.",
+    "statusLabel": "Status:",
+    "active": "Aktiv",
+    "inactive": "Nicht aktiv",
+    "activate": "Teilnahme aktivieren",
+    "withdraw": "Teilnahme beenden",
+    "withdrawal": "Nach dem Beenden werden keine neuen Research-Events gespeichert. Noch zuordenbare Rohdaten aus deiner Teilnahme werden gelöscht; bereits zusammengefasste, nicht mehr dir zuordenbare Auswertungen können bestehen bleiben.",
+    "error": "Die Einstellung konnte gerade nicht geändert werden. Bitte versuche es erneut."
+  }
+}

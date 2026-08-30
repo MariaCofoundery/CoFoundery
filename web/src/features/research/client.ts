@@ -26,6 +26,18 @@ export type ResearchTrackPayload = {
 
 const RESEARCH_FLOW_PREFIX = "research_flow_v1:";
 const TRACK_ENDPOINT = "/api/research/track";
+export type ResearchConsentState = "undecided" | "accepted" | "declined";
+let researchConsentState: ResearchConsentState = "undecided";
+
+export function configureResearchConsentState(state: ResearchConsentState) {
+  researchConsentState = state;
+  if (state !== "accepted" && typeof window !== "undefined") {
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.sessionStorage.key(index);
+      if (key?.startsWith(RESEARCH_FLOW_PREFIX)) window.sessionStorage.removeItem(key);
+    }
+  }
+}
 
 function getDeviceClass() {
   if (typeof window === "undefined") return "unknown";
@@ -36,27 +48,28 @@ function getDeviceClass() {
 }
 
 export function buildResearchClientProperties(extra?: Record<string, unknown>) {
+  const totalQuestions = Number(extra?.totalQuestions);
   return {
     deviceClass: getDeviceClass(),
     appVersion: process.env.NEXT_PUBLIC_APP_VERSION ?? null,
-    ...(extra ?? {}),
+    ...(Number.isInteger(totalQuestions) && totalQuestions > 0 && totalQuestions <= 5000
+      ? { totalQuestions }
+      : {}),
   };
 }
 
-function toFlowStorageKey(flowScope: string) {
-  return `${RESEARCH_FLOW_PREFIX}${flowScope}`;
+function getOrCreateFlowId(prefix: string, flowScope: string) {
+  if (typeof window === "undefined") return null;
+  const storageKey = `${prefix}${flowScope}`;
+  const existing = window.sessionStorage.getItem(storageKey)?.trim();
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  window.sessionStorage.setItem(storageKey, created);
+  return created;
 }
 
 export function getOrCreateResearchFlowId(flowScope: string) {
-  if (typeof window === "undefined") return null;
-  const storageKey = toFlowStorageKey(flowScope);
-  const existing = window.sessionStorage.getItem(storageKey)?.trim();
-  if (existing) return existing;
-  const created = typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  window.sessionStorage.setItem(storageKey, created);
-  return created;
+  return researchConsentState === "accepted" ? getOrCreateFlowId(RESEARCH_FLOW_PREFIX, flowScope) : null;
 }
 
 function postResearchEvent(body: Record<string, unknown>) {
@@ -78,8 +91,18 @@ function postResearchEvent(body: Record<string, unknown>) {
 
 export function trackResearchEvent(payload: ResearchTrackPayload) {
   if (typeof window === "undefined") return;
+  const consentedPayload = { ...payload };
+  if (researchConsentState !== "accepted") {
+    delete consentedPayload.flowId;
+    delete consentedPayload.choiceValue;
+    delete consentedPayload.dimension;
+    delete consentedPayload.invitationId;
+    delete consentedPayload.assessmentId;
+    delete consentedPayload.teamContext;
+    delete consentedPayload.questionType;
+  }
   postResearchEvent({
-    ...payload,
+    ...consentedPayload,
     clientOccurredAt: payload.clientOccurredAt ?? new Date().toISOString(),
     pagePath: payload.pagePath ?? window.location.pathname,
   });

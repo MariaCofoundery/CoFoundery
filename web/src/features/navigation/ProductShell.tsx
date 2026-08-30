@@ -10,6 +10,8 @@ import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge"
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
+import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
+import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
 
 type Props = {
   children: React.ReactNode;
@@ -17,6 +19,7 @@ type Props = {
   hasAdvisor: boolean;
   displayName: string | null;
   incomingOpenRequestCount: number;
+  researchConsentState: ResearchConsentState;
 };
 
 type NavigationItem = {
@@ -73,11 +76,14 @@ export function ProductShell({
   hasAdvisor,
   displayName,
   incomingOpenRequestCount,
+  researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const t = useTranslations("navigation");
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
+  const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
+  configureResearchConsentState(researchConsentState);
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
     navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
@@ -203,6 +209,9 @@ export function ProductShell({
         </header>
 
         {children}
+        {hasFounder && researchConsentState === "undecided" ? (
+          <ResearchConsentNotice onDecision={setResearchConsentState} />
+        ) : null}
       </div>
     </ProductNavigationOverrideContext.Provider>
   );

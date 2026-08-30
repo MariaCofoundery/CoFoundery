@@ -5,6 +5,8 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
+import { getResearchConsentState } from "@/features/research/consent";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getMessages } from "@/i18n/messages";
@@ -46,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, incomingOpenRequestCount] = user
+  const [roleViews, profileData, incomingOpenRequestCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -55,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         })),
         getProfileBasicsRow(supabase, user.id).catch(() => null),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
+        getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
       ])
     : [
         {
@@ -64,6 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         },
         null,
         0,
+        "undecided" as const,
       ];
   const displayName =
     profileData?.display_name?.trim() ||
@@ -81,6 +85,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasAdvisor={roleViews.hasAdvisor}
             displayName={displayName}
             incomingOpenRequestCount={incomingOpenRequestCount}
+            researchConsentState={researchConsentState}
           >
             {children}
           </ProductShell>

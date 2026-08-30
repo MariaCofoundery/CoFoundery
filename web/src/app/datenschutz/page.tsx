@@ -235,39 +235,36 @@ export default function DatenschutzPage() {
 
           <BulletSection number="11" title="Produktanalyse und Forschung">
             <p>
-              Wir erfassen bestimmte Nutzungsereignisse, um das Produkt technisch zu verstehen und
-              weiterzuentwickeln.
-            </p>
-            <List
-              items={[
-                "Start und Abschluss von Fragebögen",
-                "Anzeigen einzelner Fragen",
-                "Speichern von Antworten",
-                "Bearbeitungsdauer, Fortschritt und technische Nutzungskontexte",
-              ]}
-            />
-            <p>
-              Dabei können insbesondere Angaben wie Modul, Frage-ID, Dimension, Frageposition,
-              Antwortspeicherung, Bearbeitungsdauer, Fortschritt und Seitenpfad verarbeitet werden.
+              Für die technische Produktanalyse erfassen wir minimale Nutzungsmetadaten. Dazu
+              gehören zum Beispiel Modul, Ereignistyp, Frageposition, Instrumentversion,
+              Bearbeitungsdauer, Pausen, Abschlussstatus, Geräteklasse und Seitenpfad.
             </p>
             <p>
-              Soweit möglich, speichern wir diese Ereignisse nicht mit Klartext-Identifikatoren wie
-              E-Mail-Adresse oder offener Nutzer-ID, sondern in pseudonymisierter Form, z. B. über
-              Hash-Werte. Pseudonymisierte Daten bleiben personenbezogene Daten.
+              Diese Produktanalyse enthält keine ausgewählten Antwortwerte, Antworttexte,
+              Freitexte oder Reportinhalte.
             </p>
             <p>
-              Aus diesen Daten können anonyme oder ausreichend aggregierte Statistiken entstehen,
-              die wir für Produktanalyse und Forschung weiter nutzen.
+              Zusätzlich kannst du freiwillig an wissenschaftlicher Forschung teilnehmen. Nur nach
+              deinem ausdrücklichen Opt-in dürfen ausgewählte strukturierte Antwortwerte zusammen
+              mit Instrumentversion, Frage-ID, Dimension und wissenschaftlich relevanten
+              Timing-Metadaten in einen getrennten Research-Datensatz gelangen. Research V1
+              verarbeitet dabei keine Freitexte, Namen, E-Mail-Adressen oder Teamnamen.
+            </p>
+            <p>
+              Research-Ereignisse verwenden zufällige pseudonyme Kennungen. Pseudonymisierte Daten
+              sind nicht anonym. Du kannst deine Teilnahme in den Account-Einstellungen beenden;
+              danach werden keine neuen Research-Ereignisse gespeichert und noch zuordenbare
+              Research-Rohdaten aus dieser Teilnahme werden gelöscht.
             </p>
           </BulletSection>
 
           <BulletSection number="12" title="Anonymisierung und Weiterverwendung">
-            <p>Wir unterscheiden zwischen pseudonymisierten Rohdaten und anonymen Aggregaten.</p>
+            <p>Wir unterscheiden zwischen pseudonymisierten Research-Rohdaten und zusammengefassten Auswertungen.</p>
             <List
               items={[
-                "Pseudonymisierte Analyse-Rohdaten dienen nur der kurzfristigen Produktanalyse.",
+                "Pseudonymisierte Research-Rohdaten werden nur nach freiwilliger Teilnahme gespeichert.",
                 "Anschließend können daraus aggregierte statistische Auswertungen entstehen.",
-                "Aggregierte Auswertungen sollen keinen Rückschluss mehr auf einzelne Personen oder konkrete Founder-Paare erlauben.",
+                "Bereits zusammengefasste Auswertungen, die nicht mehr einer Teilnahme zugeordnet werden können, können nach einem Widerruf bestehen bleiben.",
               ]}
             />
             <p>
@@ -323,7 +320,7 @@ export default function DatenschutzPage() {
               items={[
                 "Session-Cookies für Login und geschützte Produktbereiche",
                 "kurzlebige Cookies für Founder- und Advisor-Einladungsprozesse",
-                "browserseitigen Speicher, z. B. sessionStorage, für technische Flow- und Analysekontexte",
+                "sessionStorage nur bei aktiver Forschungsteilnahme für eine zufällige, getrennte Research-Flow-ID",
               ]}
             />
             <p>
@@ -338,8 +335,8 @@ export default function DatenschutzPage() {
               items={[
                 "Account-, Profil-, Fragebogen-, Report- und Workbook-Daten speichern wir grundsätzlich so lange, wie sie für die Nutzung des Produkts erforderlich sind oder bis eine Löschung erfolgt.",
                 "Bei Event-Checks werden Event-Antworten und das Event-Kurzprofil nur temporär verarbeitet und 24 Stunden nach Ende des jeweiligen Events gelöscht.",
-                "Pseudonymisierte Analyse-Rohdaten speichern wir nur für einen begrenzten Zeitraum und löschen sie anschließend in der Regel wieder. Aktuell liegt dieser Zeitraum typischerweise bei bis zu 30 Tagen.",
-                "Anonyme oder ausreichend aggregierte Statistikdaten können länger aufbewahrt werden.",
+                "Produktanalyse- und pseudonymisierte Research-Rohdaten werden aktuell standardmäßig nach 30 Tagen bereinigt; technisch sind 1 bis 60 Tage konfigurierbar.",
+                "Zusammengefasste Statistikdaten können länger aufbewahrt werden; eine eigene automatische Löschfrist für Aggregate besteht derzeit nicht.",
                 "Gesetzliche Aufbewahrungspflichten, z. B. bei rechnungsbezogenen Daten, bleiben unberührt.",
               ]}
             />
