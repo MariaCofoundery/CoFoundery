@@ -7,7 +7,9 @@ import {
   FOUNDER_LIBRARY_CATEGORY_KEYS,
   FOUNDER_LIBRARY_TERMS,
   filterFounderLibraryTerms,
+  retainVisibleFounderLibraryOpenTerm,
   sortFounderLibraryTerms,
+  toggleFounderLibraryOpenTerm,
   type LocalizedFounderLibraryTerm,
 } from "@/features/founderLibrary/founderLibraryRegistry";
 import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
@@ -80,6 +82,30 @@ test("category filter combines with search and alphabetical sorting is locale-aw
   assert.deepEqual(sorted, [...sorted].sort((left, right) => left.localeCompare(right, "de", { sensitivity: "base" })));
 });
 
+test("accordion keeps at most one term open and toggles the current term closed", () => {
+  let openTermId: string | null = null;
+  assert.equal(openTermId, null);
+
+  openTermId = toggleFounderLibraryOpenTerm(openTermId, "vesting");
+  assert.equal(openTermId, "vesting");
+
+  openTermId = toggleFounderLibraryOpenTerm(openTermId, "runway");
+  assert.equal(openTermId, "runway");
+
+  openTermId = toggleFounderLibraryOpenTerm(openTermId, "runway");
+  assert.equal(openTermId, null);
+});
+
+test("search or category filtering clears an open term once it is no longer visible", () => {
+  const terms = localizedTerms("en");
+  const financingTerms = filterFounderLibraryTerms(terms, "", "equity_financing");
+  assert.equal(retainVisibleFounderLibraryOpenTerm("runway", financingTerms), "runway");
+
+  const searchResults = filterFounderLibraryTerms(terms, "Vesting", "all");
+  assert.equal(retainVisibleFounderLibraryOpenTerm("runway", searchResults), null);
+  assert.equal(retainVisibleFounderLibraryOpenTerm(null, terms), null);
+});
+
 test("team-scoped route remains server-authorized for founders and fails closed for advisors", () => {
   const page = source("../../../app/(product)/teams/[teamId]/founder-library/page.tsx");
   assert.match(page, /supabase\.auth\.getUser\(\)/);
@@ -97,6 +123,8 @@ test("glossary UI provides accessible search, filters, accordions, and deferred 
   assert.match(glossary, /aria-pressed=\{selected\}/);
   assert.match(glossary, /aria-expanded=\{isOpen\}/);
   assert.match(glossary, /aria-controls=\{panelId\}/);
+  assert.match(glossary, /useState<string \| null>\(null\)/);
+  assert.doesNotMatch(glossary, /ReadonlySet|new Set|openIds/);
   assert.match(glossary, /<button/);
   assert.match(glossary, /flex flex-wrap/);
   assert.match(glossary, /setup\/\$\{encodeURIComponent\(topicKey\)\}/);

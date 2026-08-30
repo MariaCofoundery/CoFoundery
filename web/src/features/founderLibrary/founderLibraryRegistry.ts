@@ -48,6 +48,17 @@ export const FOUNDER_LIBRARY_TERMS = [
 
 export type FounderLibraryCategoryFilter = "all" | FounderLibraryCategoryKey;
 
+export function toggleFounderLibraryOpenTerm(currentId: string | null, selectedId: string) {
+  return currentId === selectedId ? null : selectedId;
+}
+
+export function retainVisibleFounderLibraryOpenTerm(
+  currentId: string | null,
+  visibleTerms: readonly Pick<FounderLibraryTerm, "id">[],
+) {
+  return currentId !== null && visibleTerms.some((entry) => entry.id === currentId) ? currentId : null;
+}
+
 export function filterFounderLibraryTerms(
   terms: readonly LocalizedFounderLibraryTerm[],
   query: string,

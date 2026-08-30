@@ -5,7 +5,9 @@ import { useMemo, useState } from "react";
 import {
   FOUNDER_LIBRARY_CATEGORY_KEYS,
   filterFounderLibraryTerms,
+  retainVisibleFounderLibraryOpenTerm,
   sortFounderLibraryTerms,
+  toggleFounderLibraryOpenTerm,
   type FounderLibraryCategoryFilter,
   type FounderLibraryCategoryKey,
   type LocalizedFounderLibraryTerm,
@@ -35,7 +37,7 @@ type Props = {
 export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels, labels }: Props) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<FounderLibraryCategoryFilter>("all");
-  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [openTermId, setOpenTermId] = useState<string | null>(null);
 
   const visibleTerms = useMemo(
     () => sortFounderLibraryTerms(filterFounderLibraryTerms(terms, query, category), locale),
@@ -51,12 +53,19 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
   }, [locale, visibleTerms]);
 
   function toggleEntry(id: string) {
-    setOpenIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setOpenTermId((current) => toggleFounderLibraryOpenTerm(current, id));
+  }
+
+  function updateQuery(nextQuery: string) {
+    setQuery(nextQuery);
+    const nextVisibleTerms = filterFounderLibraryTerms(terms, nextQuery, category);
+    setOpenTermId((current) => retainVisibleFounderLibraryOpenTerm(current, nextVisibleTerms));
+  }
+
+  function updateCategory(nextCategory: FounderLibraryCategoryFilter) {
+    setCategory(nextCategory);
+    const nextVisibleTerms = filterFounderLibraryTerms(terms, query, nextCategory);
+    setOpenTermId((current) => retainVisibleFounderLibraryOpenTerm(current, nextVisibleTerms));
   }
 
   const filters: FounderLibraryCategoryFilter[] = ["all", ...FOUNDER_LIBRARY_CATEGORY_KEYS];
@@ -74,7 +83,7 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
             id="founder-library-search"
             type="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => updateQuery(event.target.value)}
             placeholder={labels.searchPlaceholder}
             className="min-h-12 w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 text-base text-slate-950 shadow-sm outline-none placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
           />
@@ -89,7 +98,7 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
                   key={filter}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => setCategory(filter)}
+                  onClick={() => updateCategory(filter)}
                   className={`min-h-10 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${selected ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"}`}
                 >
                   {filter === "all" ? labels.allCategories : labels.categories[filter]}
@@ -113,7 +122,7 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
                 <h2 id={`glossary-letter-${letter}`} className="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700">{letter}</h2>
                 <div className="mt-2 divide-y divide-slate-200 border-y border-slate-200">
                   {entries.map((entry) => {
-                    const isOpen = openIds.has(entry.id);
+                    const isOpen = openTermId === entry.id;
                     const panelId = `glossary-panel-${entry.id}`;
                     return (
                       <article key={entry.id}>
