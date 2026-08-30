@@ -9,15 +9,18 @@ export async function ReadMyMindHomebaseCard({ team, currentUserId }: { team: Re
   const state = await getReadMyMindHomebaseState(team, currentUserId, supabase);
   const entry = `/teams/${encodeURIComponent(team.id)}/collaboration-lab/read-my-mind`;
   const partner = state.kind !== "start" && state.kind !== "unsupported" ? state.round.partner.displayName ?? t("partnerFallback") : null;
-  const status = state.kind === "start" ? t("status.start") : state.kind === "unsupported" ? t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize") : t(`status.${state.kind}`, { name: partner ?? t("partnerFallback") });
+  const status = state.kind === "start" ? t("status.start") : state.kind === "unsupported" ? t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize") : state.kind === "forming_invitation" && state.waitingOnYouCount > 1 ? t("status.multiple_waiting_on_you", { count: state.waitingOnYouCount }) : state.kind === "forming_creator_waiting" && state.waitingOnPartnerCount > 1 ? t("status.multiple_waiting_on_partner", { count: state.waitingOnPartnerCount, name: partner ?? t("partnerFallback") }) : t(`status.${state.kind}`, { name: partner ?? t("partnerFallback") });
   const roundHref = state.kind !== "start" && state.kind !== "unsupported" ? `${entry}/${encodeURIComponent(state.round.id)}` : entry;
-  const href = state.kind === "reveal_ready" || state.kind === "reveal_waiting" ? `${roundHref}/reveal` : roundHref;
+  const aggregateOverview = state.kind !== "start" && state.kind !== "unsupported" && ((state.kind === "forming_invitation" && state.waitingOnYouCount > 1) || state.kind === "forming_creator_waiting");
+  const href = aggregateOverview ? entry : state.kind === "reveal_ready" || state.kind === "reveal_waiting" ? `${roundHref}/reveal` : roundHref;
   const action = state.kind === "start"
     ? t("action.start")
     : state.kind === "forming_creator_continue" || state.kind === "active_continue"
       ? t("action.continue")
       : state.kind === "forming_invitation"
         ? t("action.handoff")
+        : state.kind === "forming_creator_waiting"
+          ? t("action.packs")
         : state.kind === "reveal_ready"
           ? t("action.reveal")
           : state.kind === "reveal_waiting"

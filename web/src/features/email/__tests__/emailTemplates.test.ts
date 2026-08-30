@@ -100,6 +100,7 @@ test("Read My Mind start email renders the German handoff without private produc
     recipientEmail: "ben@example.com",
     roundUrl,
     creatorName: "Anna",
+    packTitles: ["Easy Start"],
     locale: "de",
   });
 
@@ -116,6 +117,7 @@ test("Read My Mind start email renders the English handoff", () => {
     recipientEmail: "ben@example.com",
     roundUrl: INVITE_URL,
     creatorName: "Anna",
+    packTitles: ["Easy Start"],
     locale: "en",
   });
 

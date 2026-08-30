@@ -3,22 +3,28 @@ import type { ReadMyMindRoundReadModel } from "@/features/collaborationLab/readM
 
 export type ReadMyMindPackNavigationItem = {
   pack: ReadMyMindPack;
-  isCurrent: boolean;
+  currentRound: ReadMyMindRoundReadModel | null;
   canStart: boolean;
 };
 
 export function buildReadMyMindPackNavigation(
   packs: readonly ReadMyMindPack[],
-  openRound: ReadMyMindRoundReadModel | null
+  openRounds: readonly ReadMyMindRoundReadModel[]
 ): ReadMyMindPackNavigationItem[] {
+  const hasUnfinishedCreatorTurn = openRounds.some(
+    (round) =>
+      round.status === "forming" &&
+      round.ownParticipantState === "joined" &&
+      round.handoffReadyAt === null
+  );
   return packs.map((pack) => {
-    const isCurrent = Boolean(
-      openRound && openRound.pack.key === pack.key && openRound.pack.version === pack.version
-    );
+    const currentRound = openRounds.find(
+      (round) => round.pack.key === pack.key && round.pack.version === pack.version
+    ) ?? null;
     return {
       pack,
-      isCurrent,
-      canStart: openRound === null,
+      currentRound,
+      canStart: currentRound === null && !hasUnfinishedCreatorTurn,
     };
   });
 }

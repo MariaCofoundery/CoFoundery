@@ -27,8 +27,10 @@ function roundFor(packIndex = 0, lockedAt: string | null = null): ReadMyMindRoun
     team: { id: "team", name: "Atlas", members: [] },
     status: "forming",
     pack,
+    createdByUserId: "a",
     createdAt: "2026-08-29",
     handoffReadyAt: null,
+    handoffEmailClaimedAt: null,
     completedAt: null,
     abandonedAt: null,
     ownParticipantState: "joined",
@@ -73,24 +75,24 @@ test("prediction stays required and the accessible helper is attached to Guess",
   assert.doesNotMatch(`${form}${page}`, /skipGuess|familiarity|how long.*know/i);
 });
 
-test("all three packs remain visible while only the open pack is actionable", () => {
-  const withoutOpenRound = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, null);
+test("all three packs remain visible while each existing pack stays singular", () => {
+  const withoutOpenRound = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, []);
   assert.equal(withoutOpenRound.length, 3);
-  assert.equal(withoutOpenRound.every((item) => item.canStart && !item.isCurrent), true);
+  assert.equal(withoutOpenRound.every((item) => item.canStart && item.currentRound === null), true);
 
   for (let index = 0; index < READ_MY_MIND_PACKS.length; index += 1) {
-    const withOpenRound = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, roundFor(index));
+    const withOpenRound = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, [roundFor(index)]);
     assert.equal(withOpenRound.length, 3);
     assert.deepEqual(withOpenRound.map((item) => item.pack.key), READ_MY_MIND_PACKS.map((pack) => pack.key));
-    assert.equal(withOpenRound.filter((item) => item.isCurrent).length, 1);
-    assert.equal(withOpenRound[index]?.isCurrent, true);
+    assert.equal(withOpenRound.filter((item) => item.currentRound !== null).length, 1);
+    assert.equal(withOpenRound[index]?.currentRound?.pack.key, READ_MY_MIND_PACKS[index]?.key);
     assert.equal(withOpenRound.every((item) => !item.canStart), true);
   }
 
   const entry = source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx");
   assert.doesNotMatch(entry, /if \(openRoundId\) redirect/);
-  assert.match(entry, /isCurrent && openRound/);
-  assert.match(entry, /openRound \? t\("availableAfter"\)/);
+  assert.match(entry, /currentRound \?/);
+  assert.match(entry, /canStart \? t\("availableNow"\)/);
 });
 
 test("DE and EN guidance and pack navigation chrome stay parallel", () => {
@@ -100,8 +102,8 @@ test("DE and EN guidance and pack navigation chrome stay parallel", () => {
   assert.equal(en.round.introTitle, "There is no right or wrong here.");
   assert.match(de.round.guessHelper, /beste Vermutung/);
   assert.match(en.round.guessHelper, /best guess/);
-  assert.equal(de.entry.oneRoundTitle, "Eine Runde nach der anderen");
-  assert.equal(en.entry.oneRoundTitle, "One round at a time");
+  assert.equal(de.entry.oneRoundTitle, "Ein eigener Teil nach dem anderen");
+  assert.equal(en.entry.oneRoundTitle, "One personal turn at a time");
   assert.equal(de.entry.availableAfter, "Danach verfügbar");
   assert.equal(en.entry.availableAfter, "Available afterwards");
 });
@@ -109,6 +111,6 @@ test("DE and EN guidance and pack navigation chrome stay parallel", () => {
 test("pack browsing and guidance add no side effects or schema contract", () => {
   const entry = source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx");
   const navigation = source("../readMyMindPackNavigation.ts");
-  assert.doesNotMatch(`${entry}${navigation}`, /sendReadMyMindStartedEmail|claim_collaboration_round_handoff_email/);
+  assert.doesNotMatch(navigation, /sendReadMyMindStartedEmail|claim_collaboration/);
   assert.doesNotMatch(`${entry}${navigation}`, /insert\(|update\(|delete\(|\.rpc\(/);
 });

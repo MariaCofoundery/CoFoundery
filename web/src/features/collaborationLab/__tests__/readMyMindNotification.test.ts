@@ -7,6 +7,7 @@ const recipientSource = readFileSync(new URL("../readMyMindNotificationRecipient
 const actionSource = readFileSync(new URL("../readMyMindActions.ts", import.meta.url), "utf8");
 const foundationSource = readFileSync(new URL("../../../../../supabase/migrations/20260828160000_create_read_my_mind_foundation.sql", import.meta.url), "utf8");
 const sequentialSource = readFileSync(new URL("../../../../../supabase/migrations/20260828220000_add_read_my_mind_sequential_handoff.sql", import.meta.url), "utf8");
+const multiPackSource = readFileSync(new URL("../../../../../supabase/migrations/20260829120000_add_read_my_mind_multi_pack_flow.sql", import.meta.url), "utf8");
 
 test("recipient email lookup is narrow, server-only, and never enters the action response", () => {
   assert.match(recipientSource, /^import "server-only";/);
@@ -19,15 +20,19 @@ test("recipient email lookup is narrow, server-only, and never enters the action
   assert.doesNotMatch(actionSource, /return\s+\{[^}]*recipientEmail\s*:/);
 });
 
-test("handoff notification is absent from create and persistently claimed after creator completion", () => {
+test("handoff notification is manual and persistently batch-claimed after creator completion", () => {
   const startAction = actionSource.slice(actionSource.indexOf("export async function startReadMyMindRoundAction"), actionSource.indexOf("async function mutateRound"));
-  const claimPosition = actionSource.indexOf('rpc("claim_collaboration_round_handoff_email"');
-  const sendPosition = actionSource.indexOf("await sendRoundHandoffNotification");
-  assert.doesNotMatch(startAction, /sendRoundHandoffNotification|sendReadMyMindStartedEmail/);
+  const lockAction = actionSource.slice(actionSource.indexOf("export async function lockReadMyMindPromptAction"), actionSource.indexOf("export async function openReadMyMindRevealAction"));
+  const claimPosition = actionSource.indexOf('rpc("claim_collaboration_team_handoff_emails"');
+  const sendPosition = actionSource.indexOf("await sendTeamHandoffNotification");
+  assert.doesNotMatch(startAction, /sendTeamHandoffNotification|sendReadMyMindStartedEmail/);
+  assert.doesNotMatch(lockAction, /claim_collaboration|sendTeamHandoffNotification|sendReadMyMindStartedEmail/);
   assert.ok(claimPosition >= 0 && sendPosition > claimPosition);
   assert.match(sequentialSource, /handoff_email_claimed_at is null/);
-  assert.match(sequentialSource, /return found/);
-  assert.match(foundationSource, /create unique index collaboration_experience_one_open_round_per_team_idx[\s\S]*where status in \('forming','active'\)/);
+  assert.match(multiPackSource, /claim_collaboration_team_handoff_emails/);
+  assert.match(multiPackSource, /handoff_email_claimed_at is null/);
+  assert.match(multiPackSource, /collaboration_experience_one_open_round_per_team_pack_idx/);
+  assert.match(foundationSource, /create unique index collaboration_experience_one_open_round_per_team_idx/);
 });
 
 test("delivery failure is best effort and does not expose the recipient", async () => {
@@ -47,13 +52,14 @@ test("delivery failure is best effort and does not expose the recipient", async 
       recipientEmail: "ben@example.com",
       roundUrl: "https://cofoundery.de/teams/team-1/collaboration-lab/read-my-mind/round-1",
       creatorName: "Anna",
+      packTitles: ["Easy Start"],
       locale: "de",
     });
     assert.deepEqual(result, { ok: false, error: "resend_request_failed:503" });
     assert.equal(calls.length, 1);
     assert.equal(calls[0]?.url, "https://api.resend.com/emails");
     assert.match(calls[0]?.body ?? "", /ben@example\.com/);
-    assert.match(actionSource, /try \{[\s\S]*await sendRoundHandoffNotification[\s\S]*\} catch \{/);
+    assert.match(actionSource, /try \{[\s\S]*await sendTeamHandoffNotification[\s\S]*\} catch \{/);
     assert.doesNotMatch(actionSource, /console\.error\([^\n]*recipientEmail/);
   } finally {
     globalThis.fetch = previousFetch;
@@ -81,6 +87,7 @@ test("one successful notification call sends exactly one email to the pending fo
       recipientEmail: "ben@example.com",
       roundUrl: "https://cofoundery.de/teams/team-1/collaboration-lab/read-my-mind/round-1",
       creatorName: "Anna",
+      packTitles: ["Easy Start"],
       locale: "en",
     });
     assert.deepEqual(result, { ok: true, id: "mail-1" });
@@ -106,6 +113,7 @@ test("DE and EN handoff mail say the creator is finished without private answers
       recipientEmail: "ben@example.com",
       roundUrl: "https://cofoundery.de/teams/team-1/collaboration-lab/read-my-mind/round-1",
       creatorName: "Anna",
+      packTitles: ["Easy Start"],
       locale,
     });
     assert.match(payload.subject, /Anna/);
@@ -121,5 +129,5 @@ test("normal founder authorization and the two-founder guard precede the privile
   const lookupPosition = actionSource.lastIndexOf("getReadMyMindNotificationRecipientEmail(");
   assert.ok(teamLoadPosition >= 0 && twoFounderGuardPosition > teamLoadPosition && createPosition > twoFounderGuardPosition);
   assert.ok(lookupPosition >= 0);
-  assert.match(actionSource, /\.eq\("round_id", params\.roundId\)/);
+  assert.match(actionSource, /\.in\("round_id", roundIds\)/);
 });

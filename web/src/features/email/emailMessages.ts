@@ -20,6 +20,7 @@ type AdvisorTeamFounderInviteCopyInput = {
 
 type ReadMyMindStartedCopyInput = {
   creatorName: string | null;
+  packTitles: string[];
 };
 
 export function getEmailPrivacyUrl(locale: AppLocale) {
@@ -31,16 +32,19 @@ export function getReadMyMindStartedEmailCopy(
   input: ReadMyMindStartedCopyInput
 ) {
   const creatorName = input.creatorName?.trim() || (locale === "en" ? "Your co-founder" : "Dein Co-Founder");
+  const packCount = input.packTitles.length;
 
   if (locale === "en") {
     return {
       htmlLang: "en",
-      subject: `${creatorName} started Read My Mind with you — you’re up`,
-      preheader: `${creatorName} has completed their part of a Read My Mind round. You’re up.`,
+      subject: packCount > 1 ? `${creatorName} prepared ${packCount} Read My Mind packs for you — you’re up` : `${creatorName} started Read My Mind with you — you’re up`,
+      preheader: packCount > 1 ? `${creatorName} has completed their part in ${packCount} Read My Mind packs.` : `${creatorName} has completed their part of a Read My Mind round. You’re up.`,
       eyebrow: "Read My Mind · Beta",
       greeting: "Hi,",
-      intro: `${creatorName} has already completed their part of a Read My Mind round.`,
-      explanation: `You answer five short work situations independently of ${creatorName}. Only when you are finished too can you reveal your answers together.`,
+      intro: packCount > 1 ? `${creatorName} has already completed their part in several Read My Mind packs.` : `${creatorName} has already completed their part of a Read My Mind round.`,
+      explanation: packCount > 1 ? `You can answer the packs one after another. Within each pack, your answers stay hidden until you have both finished.` : `You answer five short work situations independently of ${creatorName}. Only when you are finished too can you reveal your answers together.`,
+      packListTitle: packCount > 1 ? "Waiting for you:" : null,
+      packTitles: input.packTitles,
       turn: "Now it’s your turn.",
       cta: "Open Read My Mind",
       note: "There are no right answers. The idea is simply to learn a little more about each other and how you work together.",
@@ -52,12 +56,14 @@ export function getReadMyMindStartedEmailCopy(
 
   return {
     htmlLang: "de",
-    subject: `${creatorName} hat Read My Mind mit dir gestartet – du bist dran`,
-    preheader: `${creatorName} hat den eigenen Teil einer Read-My-Mind-Runde abgeschlossen. Jetzt bist du dran.`,
+    subject: packCount > 1 ? `${creatorName} hat ${packCount} Read-My-Mind-Packs für dich vorbereitet – du bist dran` : `${creatorName} hat Read My Mind mit dir gestartet – du bist dran`,
+    preheader: packCount > 1 ? `${creatorName} hat den eigenen Teil in ${packCount} Read-My-Mind-Packs abgeschlossen.` : `${creatorName} hat den eigenen Teil einer Read-My-Mind-Runde abgeschlossen. Jetzt bist du dran.`,
     eyebrow: "Read My Mind · Beta",
     greeting: "Hi,",
-    intro: `${creatorName} hat den eigenen Teil einer Read-My-Mind-Runde bereits abgeschlossen.`,
-    explanation: `Du beantwortest fünf kurze Arbeitssituationen unabhängig von ${creatorName}. Erst wenn auch du fertig bist, könnt ihr eure Antworten gemeinsam aufdecken.`,
+    intro: packCount > 1 ? `${creatorName} hat den eigenen Teil in mehreren Read-My-Mind-Packs bereits abgeschlossen.` : `${creatorName} hat den eigenen Teil einer Read-My-Mind-Runde bereits abgeschlossen.`,
+    explanation: packCount > 1 ? "Du kannst die Packs nacheinander beantworten. Innerhalb jedes Packs bleiben eure Antworten verborgen, bis ihr beide fertig seid." : `Du beantwortest fünf kurze Arbeitssituationen unabhängig von ${creatorName}. Erst wenn auch du fertig bist, könnt ihr eure Antworten gemeinsam aufdecken.`,
+    packListTitle: packCount > 1 ? "Auf dich warten:" : null,
+    packTitles: input.packTitles,
     turn: "Jetzt bist du dran.",
     cta: "Read My Mind öffnen",
     note: "Es gibt keine richtigen Antworten. Es geht darum, euch und eure Zusammenarbeit noch ein bisschen besser kennenzulernen.",

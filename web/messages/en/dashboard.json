@@ -98,8 +98,10 @@
       },
       "readMyMindInvitation": {
         "title": "Read My Mind: You’re up",
+        "multipleTitle": "Read My Mind: Several packs are waiting for you",
         "text": "A shared round was started with you.",
         "textWithName": "{name} has completed their part.",
+        "multipleText": "{name} prepared {count} packs for you.",
         "action": "Open Read My Mind"
       },
       "readMyMindContinue": {

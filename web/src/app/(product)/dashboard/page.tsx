@@ -757,10 +757,12 @@ function presentDashboardTask(
       return {
         ...task,
         eyebrow,
-        title: t("tasks.items.readMyMindInvitation.title"),
-        text: task.personLabel
-          ? t("tasks.items.readMyMindInvitation.textWithName", { name: task.personLabel })
-          : t("tasks.items.readMyMindInvitation.text"),
+        title: (task.packCount ?? 1) > 1 ? t("tasks.items.readMyMindInvitation.multipleTitle") : t("tasks.items.readMyMindInvitation.title"),
+        text: (task.packCount ?? 1) > 1
+          ? t("tasks.items.readMyMindInvitation.multipleText", { name: task.personLabel ?? t("tasks.context.connection"), count: task.packCount ?? 1 })
+          : task.personLabel
+            ? t("tasks.items.readMyMindInvitation.textWithName", { name: task.personLabel })
+            : t("tasks.items.readMyMindInvitation.text"),
         action: t("tasks.items.readMyMindInvitation.action"),
       };
     case "read_my_mind_continue":

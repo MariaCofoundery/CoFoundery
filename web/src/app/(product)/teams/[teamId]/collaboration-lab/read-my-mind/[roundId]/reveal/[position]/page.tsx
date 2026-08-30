@@ -62,7 +62,11 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
+      <nav className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm" aria-label={t("navigationLabel")}>
+        <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-xs font-medium text-slate-500 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("collaborationBreadcrumb")}</Link>
+        <span aria-hidden="true" className="text-slate-300">›</span>
+        <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind`} className="font-semibold text-violet-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToReadMyMind")}</Link>
+      </nav>
       <div className="mt-6"><ReadMyMindProgress current={position + 1} total={round.prompts.length} label={t("progress", { current: position + 1, total: round.prompts.length })} /></div>
       <header className="rmm-stage rmm-enter relative mt-5 overflow-hidden rounded-[30px] border border-violet-200/80 bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 shadow-[0_22px_55px_rgba(76,29,149,0.1)] sm:p-9">
         <div aria-hidden="true" className="absolute -right-10 -top-14 h-48 w-48 rounded-full bg-violet-200/45 blur-3xl" />

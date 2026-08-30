@@ -6,6 +6,7 @@ type SendReadMyMindStartedEmailParams = {
   recipientEmail: string;
   roundUrl: string;
   creatorName: string | null;
+  packTitles: string[];
   locale?: EmailLocaleInput;
 };
 
@@ -34,7 +35,7 @@ function buildReplyToAddress() {
 }
 
 function buildHtmlBody(params: SendReadMyMindStartedEmailParams, locale: AppLocale) {
-  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName });
+  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName, packTitles: params.packTitles });
   const roundUrl = escapeHtml(params.roundUrl);
   const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
 
@@ -51,6 +52,7 @@ function buildHtmlBody(params: SendReadMyMindStartedEmailParams, locale: AppLoca
             <h1 style="margin:0 0 18px;font-size:28px;line-height:34px;color:#0f172a;">${escapeHtml(copy.greeting)}</h1>
             <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">${escapeHtml(copy.intro)}</p>
             <p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155;">${escapeHtml(copy.explanation)}</p>
+            ${copy.packListTitle ? `<p style="margin:18px 0 8px;font-size:14px;line-height:22px;font-weight:700;color:#0f172a;">${escapeHtml(copy.packListTitle)}</p><ul style="margin:0 0 18px;padding-left:22px;color:#334155;">${copy.packTitles.map((title) => `<li style="margin:5px 0;font-size:15px;line-height:23px;">${escapeHtml(title)}</li>`).join("")}</ul>` : ""}
             <p style="margin:0;font-size:17px;line-height:27px;font-weight:700;color:#0f172a;">${escapeHtml(copy.turn)}</p>
             <p style="margin:28px 0;"><a href="${roundUrl}" style="display:inline-block;padding:14px 22px;border-radius:999px;background:#6d28d9;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;">${escapeHtml(copy.cta)}</a></p>
             <p style="margin:0 0 12px;font-size:14px;line-height:23px;color:#475569;">${escapeHtml(copy.note)}</p>
@@ -66,13 +68,14 @@ function buildHtmlBody(params: SendReadMyMindStartedEmailParams, locale: AppLoca
 }
 
 function buildTextBody(params: SendReadMyMindStartedEmailParams, locale: AppLocale) {
-  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName });
-  return [copy.greeting, "", copy.intro, "", copy.explanation, "", copy.turn, "", `${copy.cta}:`, params.roundUrl, "", copy.note, copy.beta, "", `${copy.privacy}: ${getEmailPrivacyUrl(locale)}`].join("\n");
+  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName, packTitles: params.packTitles });
+  const packList = copy.packListTitle ? ["", copy.packListTitle, ...copy.packTitles.map((title) => `• ${title}`)] : [];
+  return [copy.greeting, "", copy.intro, "", copy.explanation, ...packList, "", copy.turn, "", `${copy.cta}:`, params.roundUrl, "", copy.note, copy.beta, "", `${copy.privacy}: ${getEmailPrivacyUrl(locale)}`].join("\n");
 }
 
 export function buildReadMyMindStartedEmailPayload(params: SendReadMyMindStartedEmailParams) {
   const locale = resolveEmailLocale(params.locale);
-  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName });
+  const copy = getReadMyMindStartedEmailCopy(locale, { creatorName: params.creatorName, packTitles: params.packTitles });
   return { subject: copy.subject, html: buildHtmlBody(params, locale), text: buildTextBody(params, locale) };
 }
 

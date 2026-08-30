@@ -183,13 +183,14 @@ end $$;
 select public.join_collaboration_experience_round(pg_temp.rmm_round('aa111111-1111-4111-8111-111111111111'));
 reset role;
 
--- The open-round index still blocks a second round before completion.
+-- The per-pack open-round index still blocks a second round of the same pack
+-- before completion while other packs remain independent.
 select set_config('request.jwt.claims','{"sub":"a1111111-1111-4111-8111-111111111111","role":"authenticated"}',true);
 set local role authenticated;
 do $$ begin
   begin
-    perform public.create_collaboration_experience_round('aa111111-1111-4111-8111-111111111111','how_we_work',1);
-    raise exception 'second open round succeeded';
+    perform public.create_collaboration_experience_round('aa111111-1111-4111-8111-111111111111','easy_start',1);
+    raise exception 'duplicate open pack round succeeded';
   exception when unique_violation then null; end;
 end $$;
 reset role;

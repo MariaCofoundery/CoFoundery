@@ -140,11 +140,13 @@ do $$ declare v_ready_at timestamptz; begin
     'idempotent response retry changed handoff readiness'
   );
 end $$;
-select pg_temp.assert_sequential(
-  public.claim_collaboration_round_handoff_email(pg_temp.round_for('ee111111-1111-4111-8111-111111111111'))
-  and not public.claim_collaboration_round_handoff_email(pg_temp.round_for('ee111111-1111-4111-8111-111111111111')),
-  'handoff email claim was not at-most-once'
-);
+do $$ declare v_first integer; v_second integer; begin
+  select count(*) into v_first
+  from public.claim_collaboration_team_handoff_emails('ee111111-1111-4111-8111-111111111111');
+  select count(*) into v_second
+  from public.claim_collaboration_team_handoff_emails('ee111111-1111-4111-8111-111111111111');
+  perform pg_temp.assert_sequential(v_first = 1 and v_second = 0, 'handoff email claim was not at-most-once');
+end $$;
 reset role;
 
 select set_config('request.jwt.claims','{"sub":"e2222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
@@ -216,8 +218,9 @@ end $$;
 reset role;
 
 select pg_temp.assert_sequential(
-  has_function_privilege('authenticated','public.claim_collaboration_round_handoff_email(uuid)','EXECUTE')
-  and not has_function_privilege('anon','public.claim_collaboration_round_handoff_email(uuid)','EXECUTE')
+  has_function_privilege('authenticated','public.claim_collaboration_team_handoff_emails(uuid)','EXECUTE')
+  and not has_function_privilege('authenticated','public.claim_collaboration_round_handoff_email(uuid)','EXECUTE')
+  and not has_function_privilege('anon','public.claim_collaboration_team_handoff_emails(uuid)','EXECUTE')
   and not has_table_privilege('authenticated','public.collaboration_experience_responses','DELETE')
   and not has_table_privilege('authenticated','public.collaboration_experience_rounds','UPDATE'),
   'handoff grants exposed lifecycle mutation directly'

@@ -31,6 +31,7 @@ export type ReadMyMindRoundRow = {
   status: string;
   created_at: string;
   handoff_ready_at?: string | null;
+  handoff_email_claimed_at?: string | null;
   completed_at: string | null;
   abandoned_at: string | null;
 };
@@ -120,8 +121,10 @@ export type ReadMyMindRoundReadModel = {
   team: ReadMyMindTeamContext;
   status: ReadMyMindRoundStatus;
   pack: ReadMyMindPack;
+  createdByUserId: string;
   createdAt: string;
   handoffReadyAt: string | null;
+  handoffEmailClaimedAt: string | null;
   completedAt: string | null;
   abandonedAt: string | null;
   ownParticipantState: ReadMyMindParticipantState;
@@ -229,8 +232,10 @@ export function buildReadMyMindRoundReadModel(params: {
       team: params.team,
       status,
       pack,
+      createdByUserId: params.round.created_by_user_id,
       createdAt: params.round.created_at,
       handoffReadyAt: params.round.handoff_ready_at ?? null,
+      handoffEmailClaimedAt: params.round.handoff_email_claimed_at ?? null,
       completedAt: params.round.completed_at,
       abandonedAt: params.round.abandoned_at,
       ownParticipantState: ownState,
@@ -337,8 +342,10 @@ export function buildReadMyMindRoundReadModel(params: {
     team: params.team,
     status,
     pack,
+    createdByUserId: params.round.created_by_user_id,
     createdAt: params.round.created_at,
     handoffReadyAt: params.round.handoff_ready_at ?? null,
+    handoffEmailClaimedAt: params.round.handoff_email_claimed_at ?? null,
     completedAt: params.round.completed_at,
     abandonedAt: params.round.abandoned_at,
     ownParticipantState: ownState,

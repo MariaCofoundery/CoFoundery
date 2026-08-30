@@ -199,8 +199,8 @@ do $$ declare v_assignment uuid; begin
     and prompt.position = 0;
   perform public.lock_collaboration_response(v_assignment,'self',array['quiet_works_well']);
   begin
-    perform public.create_collaboration_experience_round('da111111-1111-4111-8111-111111111111','how_we_work',1);
-    raise exception 'second open round succeeded';
+    perform public.create_collaboration_experience_round('da111111-1111-4111-8111-111111111111','easy_start',1);
+    raise exception 'duplicate open pack round succeeded';
   exception when unique_violation then null; end;
 end $$;
 reset role;

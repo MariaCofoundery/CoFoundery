@@ -9,7 +9,8 @@ type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 export type ReadMyMindHomebaseState =
   | { kind: "unsupported"; completedRound: ReadMyMindRoundReadModel | null }
   | { kind: "start" }
-  | { kind: "forming_creator_continue" | "forming_creator_waiting" | "forming_partner_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "reveal_ready" | "reveal_waiting" | "completed"; round: ReadMyMindRoundReadModel };
+  | { kind: "forming_creator_continue" | "forming_creator_waiting" | "forming_partner_waiting" | "forming_invitation" | "active_continue" | "active_waiting" | "reveal_ready" | "reveal_waiting"; round: ReadMyMindRoundReadModel; rounds: ReadMyMindRoundReadModel[]; waitingOnYouCount: number; waitingOnPartnerCount: number }
+  | { kind: "completed"; round: ReadMyMindRoundReadModel; rounds: []; waitingOnYouCount: 0; waitingOnPartnerCount: 0 };
 
 export async function getReadMyMindTeamContext(
   teamId: string,
@@ -40,7 +41,7 @@ export async function getReadMyMindRound(
   const supabase = client ?? (await createClient());
   const roundResult = await supabase
     .from("collaboration_experience_rounds")
-    .select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at, completed_at, abandoned_at")
+    .select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at, handoff_email_claimed_at, completed_at, abandoned_at")
     .eq("id", roundId)
     .eq("founder_team_id", team.id)
     .maybeSingle();
@@ -110,25 +111,21 @@ export async function getReadMyMindHomebaseState(
       : null;
     return { kind: "unsupported", completedRound };
   }
-  const openResult = await supabase
-    .from("collaboration_experience_rounds")
-    .select("id")
-    .eq("founder_team_id", team.id)
-    .in("status", ["forming", "active"])
-    .limit(1)
-    .maybeSingle();
-  if (!openResult.error && openResult.data) {
-    const round = await getReadMyMindRound(team, openResult.data.id as string, currentUserId, supabase);
-    if (round) {
+  const rounds = await getOpenReadMyMindRounds(team, currentUserId, supabase);
+  if (rounds.length > 0) {
+    const waitingOnYou = rounds.filter((round) => round.status === "forming" && round.ownParticipantState === "pending" && round.handoffReadyAt !== null);
+    const waitingOnPartner = rounds.filter((round) => round.status === "forming" && round.ownParticipantState === "joined" && round.handoffReadyAt !== null);
+    const classify = (round: ReadMyMindRoundReadModel): Exclude<ReadMyMindHomebaseState, { kind: "start" | "unsupported" | "completed" }>["kind"] => {
       if (round.status === "forming") {
-        if (round.ownParticipantState === "pending") {
-          return { kind: round.handoffReadyAt ? "forming_invitation" : "forming_partner_waiting", round };
-        }
-        return { kind: round.handoffReadyAt ? "forming_creator_waiting" : "forming_creator_continue", round };
+        if (round.ownParticipantState === "pending") return round.handoffReadyAt ? "forming_invitation" : "forming_partner_waiting";
+        return round.handoffReadyAt ? "forming_creator_waiting" : "forming_creator_continue";
       }
-      if (round.wholeRoundAnswerComplete) return { kind: round.ownRevealComplete ? "reveal_waiting" : "reveal_ready", round };
-      return { kind: round.ownAnswerComplete ? "active_waiting" : "active_continue", round };
-    }
+      if (round.wholeRoundAnswerComplete) return round.ownRevealComplete ? "reveal_waiting" : "reveal_ready";
+      return round.ownAnswerComplete ? "active_waiting" : "active_continue";
+    };
+    const priority = ["forming_invitation", "forming_creator_continue", "active_continue", "reveal_ready", "reveal_waiting", "active_waiting", "forming_creator_waiting", "forming_partner_waiting"] as const;
+    const round = [...rounds].sort((left, right) => priority.indexOf(classify(left)) - priority.indexOf(classify(right)) || right.createdAt.localeCompare(left.createdAt))[0]!;
+    return { kind: classify(round), round, rounds, waitingOnYouCount: waitingOnYou.length, waitingOnPartnerCount: waitingOnPartner.length };
   }
   const completedResult = await supabase
     .from("collaboration_experience_rounds")
@@ -140,7 +137,7 @@ export async function getReadMyMindHomebaseState(
     .maybeSingle();
   if (!completedResult.error && completedResult.data) {
     const round = await getReadMyMindRound(team, completedResult.data.id as string, currentUserId, supabase);
-    if (round) return { kind: "completed", round };
+    if (round) return { kind: "completed", round, rounds: [], waitingOnYouCount: 0, waitingOnPartnerCount: 0 };
   }
   return { kind: "start" };
 }
@@ -152,4 +149,23 @@ export async function findOpenReadMyMindRoundId(
   const supabase = client ?? (await createClient());
   const result = await supabase.from("collaboration_experience_rounds").select("id").eq("founder_team_id", team.id).in("status", ["forming", "active"]).limit(1).maybeSingle();
   return result.error ? null : ((result.data?.id as string | undefined) ?? null);
+}
+
+export async function getOpenReadMyMindRounds(
+  team: ReadMyMindTeamContext,
+  currentUserId: string,
+  client?: SupabaseClient
+) {
+  const supabase = client ?? (await createClient());
+  const result = await supabase
+    .from("collaboration_experience_rounds")
+    .select("id")
+    .eq("founder_team_id", team.id)
+    .in("status", ["forming", "active"])
+    .order("created_at", { ascending: true });
+  if (result.error) return [];
+  const rounds = await Promise.all(
+    (result.data ?? []).map((row) => getReadMyMindRound(team, row.id as string, currentUserId, supabase))
+  );
+  return rounds.filter((round): round is ReadMyMindRoundReadModel => round !== null);
 }

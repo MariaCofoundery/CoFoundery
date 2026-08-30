@@ -40,34 +40,43 @@ function refresh(teamId: string, roundId?: string) {
   if (roundId) revalidatePath(revealHref(teamId, roundId));
 }
 
-async function sendRoundHandoffNotification(params: {
+async function sendTeamHandoffNotification(params: {
   supabase: Awaited<ReturnType<typeof createClient>>;
   teamId: string;
-  roundId: string;
+  claims: Array<{ round_id: string; pack_key: string; pack_version: number }>;
   creatorUserId: string;
   creatorName: string | null;
 }) {
+  const roundIds = params.claims.map((claim) => claim.round_id);
   const participants = await params.supabase
     .from("collaboration_experience_round_participants")
     .select("founder_user_id, state")
-    .eq("round_id", params.roundId);
-  if (participants.error) return;
-  const recipients = (participants.data ?? []).filter(
+    .in("round_id", roundIds);
+  if (participants.error) return false;
+  const recipients = [...new Set((participants.data ?? []).filter(
     (participant) => participant.founder_user_id !== params.creatorUserId && participant.state === "pending"
-  );
-  if (recipients.length !== 1) return;
+  ).map((participant) => participant.founder_user_id))];
+  if (recipients.length !== 1) return false;
 
-  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipients[0]!.founder_user_id);
-  if (!recipientEmail) return;
+  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipients[0]!);
+  if (!recipientEmail) return false;
+  const locale = await getRequestLocale();
+  const packTitles = params.claims.flatMap((claim) => {
+    const pack = getReadMyMindPack(claim.pack_key, claim.pack_version);
+    return pack ? [pack.title[locale]] : [];
+  });
+  if (packTitles.length !== params.claims.length) return false;
   const delivery = await sendReadMyMindStartedEmail({
     recipientEmail,
     creatorName: params.creatorName,
-    roundUrl: toPublicAppUrl(roundHref(params.teamId, params.roundId)),
-    locale: await getRequestLocale(),
+    packTitles,
+    roundUrl: toPublicAppUrl(entryHref(params.teamId)),
+    locale,
   });
   if (!delivery.ok) {
-    console.error("Read My Mind handoff notification delivery failed", { roundId: params.roundId });
+    console.error("Read My Mind handoff notification delivery failed", { teamId: params.teamId, roundCount: params.claims.length });
   }
+  return delivery.ok;
 }
 
 export async function startReadMyMindRoundAction(teamId: string, formData: FormData) {
@@ -117,6 +126,36 @@ export async function abandonReadMyMindRoundAction(teamId: string, roundId: stri
   return mutateRound(teamId, roundId, "abandon_collaboration_experience_round");
 }
 
+export async function notifyReadMyMindHandoffsAction(teamId: string) {
+  const auth = await authenticated();
+  if (!auth) redirect(`/login?next=${encodeURIComponent(entryHref(teamId))}`);
+  const team = await getReadMyMindTeamContext(teamId, auth.user.id, auth.supabase);
+  if (!team || team.members.length !== 2) redirect(entryHref(teamId, "unavailable"));
+  const claim = await auth.supabase.rpc("claim_collaboration_team_handoff_emails", {
+    p_founder_team_id: teamId,
+  });
+  const claims = !claim.error && Array.isArray(claim.data)
+    ? claim.data.filter((row): row is { round_id: string; pack_key: string; pack_version: number } =>
+        typeof row.round_id === "string" && typeof row.pack_key === "string" && typeof row.pack_version === "number")
+    : [];
+  if (claim.error || claims.length === 0) redirect(entryHref(teamId, "changed"));
+  const creatorName = team.members.find((member) => member.userId === auth.user.id)?.displayName ?? null;
+  let sent = false;
+  try {
+    sent = await sendTeamHandoffNotification({
+      supabase: auth.supabase,
+      teamId,
+      claims,
+      creatorUserId: auth.user.id,
+      creatorName,
+    });
+  } catch {
+    console.error("Read My Mind handoff notification failed", { teamId, roundCount: claims.length });
+  }
+  refresh(teamId);
+  redirect(entryHref(teamId, sent ? "email-sent" : "email-failed"));
+}
+
 export async function lockReadMyMindPromptAction(
   teamId: string,
   roundId: string,
@@ -162,25 +201,6 @@ export async function lockReadMyMindPromptAction(
     }
   }
 
-  if (round.status === "forming" && prompt.position === round.pack.prompts.length - 1) {
-    const claim = await auth.supabase.rpc("claim_collaboration_round_handoff_email", {
-      p_round_id: roundId,
-    });
-    if (!claim.error && claim.data === true) {
-      const creatorName = team.members.find((member) => member.userId === auth.user.id)?.displayName ?? null;
-      try {
-        await sendRoundHandoffNotification({
-          supabase: auth.supabase,
-          teamId,
-          roundId,
-          creatorUserId: auth.user.id,
-          creatorName,
-        });
-      } catch {
-        console.error("Read My Mind handoff notification failed", { roundId });
-      }
-    }
-  }
   refresh(teamId, roundId);
   redirect(roundHref(teamId, roundId));
 }

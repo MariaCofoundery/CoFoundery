@@ -47,16 +47,19 @@ test("conversation marker projection is shared, narrow, and limited to round par
   assert.deepEqual(Object.keys(model!.conversationMarkers[0]!).sort(), ["participantUserIds", "roundPromptId"]);
 });
 
-test("all Read My Mind contexts return to the stable collaboration section anchor", () => {
-  const pages = [
-    source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx"),
+test("all Read My Mind contexts preserve the collaboration anchor and round pages return to the pack overview", () => {
+  const entry = source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/page.tsx");
+  const roundPages = [
     source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/page.tsx"),
     source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/reveal/page.tsx"),
     source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/reveal/[position]/page.tsx"),
   ];
-  for (const page of pages) {
+  assert.match(entry, /#collaboration-lab/);
+  assert.match(entry, /backToCollaboration/);
+  for (const page of roundPages) {
     assert.match(page, /#collaboration-lab/);
-    assert.match(page, /backToCollaboration/);
+    assert.match(page, /backToReadMyMind/);
+    assert.match(page, /collaborationBreadcrumb/);
   }
   assert.match(source("../ReadMyMindHomebaseCard.tsx"), /id="collaboration-lab"/);
 });

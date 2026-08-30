@@ -34,11 +34,12 @@ test("recipient cannot join or receive an actionable invitation before creator h
   assert.match(roundPage, /partnerWaitingTitle/);
 });
 
-test("mail moves from create to one persistent post-answer handoff claim", () => {
+test("mail stays out of create and answer locking and uses the manual batch claim", () => {
   const startAction = actions.slice(actions.indexOf("export async function startReadMyMindRoundAction"), actions.indexOf("async function mutateRound"));
-  assert.doesNotMatch(startAction, /sendRoundHandoffNotification|sendReadMyMindStartedEmail/);
-  assert.match(actions, /claim_collaboration_round_handoff_email/);
-  assert.match(actions, /claim\.data === true/);
+  const lockAction = actions.slice(actions.indexOf("export async function lockReadMyMindPromptAction"), actions.indexOf("export async function openReadMyMindRevealAction"));
+  assert.doesNotMatch(startAction, /sendTeamHandoffNotification|sendReadMyMindStartedEmail/);
+  assert.doesNotMatch(lockAction, /claim_collaboration|sendReadMyMindStartedEmail/);
+  assert.match(actions, /claim_collaboration_team_handoff_emails/);
   assert.match(migration, /handoff_email_claimed_at is null/);
   assert.match(migration, /set handoff_email_claimed_at = pg_catalog\.now\(\)/);
 });
