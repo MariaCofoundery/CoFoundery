@@ -4,6 +4,7 @@
   "intro": "Ein schlankes Glossar für Begriffe, die dir im Startup- und Founder-Alltag begegnen.",
   "professionalNote": "Bei rechtlichen oder steuerlichen Fragen ersetzt die Library keine individuelle fachliche Beratung.",
   "back": "Zurück zur Teamübersicht",
+  "backToDashboard": "Zurück zum Dashboard",
   "founderFallback": "Founder {index}",
   "views": {
     "label": "Founder-Library-Ansicht",

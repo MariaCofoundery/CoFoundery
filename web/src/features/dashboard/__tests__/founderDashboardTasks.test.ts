@@ -78,7 +78,7 @@ test("task priorities follow NEEDS_YOU, CONTINUE_PERSONAL, CONTINUE_SHARED", () 
   ]);
 });
 
-test("only three tasks are initially visible and show-all is needed for more", () => {
+test("task projection retains its three-item priority split", () => {
   const tasks = buildFounderDashboardTasks(signals({
     discoveryIntros: ["one", "two", "three", "four"].map((id, index) => ({
       id,
@@ -370,11 +370,10 @@ test("task UI and DE/EN messages preserve the three-item limit and empty state",
     readFileSync("messages/en/dashboard.json", "utf8")
   ) as TaskMessages;
   assert.match(component, /tasks\.slice\(0, 3\)/);
-  assert.match(component, /aria-expanded/);
+  assert.doesNotMatch(component, /aria-expanded|showAll|useState/);
   assert.match(dashboard, /dashboard-block-tasks/);
   assert.match(dashboard, /sectionNavigation\.tasks/);
-  assert.match(dashboard, /prioritizedTask/);
-  assert.match(dashboard, /resolvedHeroPanel/);
+  assert.doesNotMatch(dashboard, /prioritizedTask|resolvedHeroPanel/);
   assert.equal(de.tasks.empty.title, "Aktuell wartet nichts auf dich.");
   assert.equal(en.tasks.empty.title, "Nothing is waiting for you right now.");
   assert.deepEqual(Object.keys(de.tasks.kinds), Object.keys(en.tasks.kinds));

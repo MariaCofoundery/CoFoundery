@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 import type { DashboardTaskKind } from "@/features/dashboard/founderDashboardTasks";
 
 export type DashboardTaskPresentation = {
@@ -21,17 +18,12 @@ export function DashboardTaskList({
   tasks,
   emptyTitle,
   emptyText,
-  showAllLabel,
-  showLessLabel,
 }: {
   tasks: DashboardTaskPresentation[];
   emptyTitle: string;
   emptyText: string;
-  showAllLabel: string;
-  showLessLabel: string;
 }) {
-  const [showAll, setShowAll] = useState(false);
-  const visibleTasks = showAll ? tasks : tasks.slice(0, 3);
+  const visibleTasks = tasks.slice(0, 3);
 
   if (tasks.length === 0) {
     return (
@@ -67,16 +59,6 @@ export function DashboardTaskList({
           </li>
         ))}
       </ul>
-      {tasks.length > 3 ? (
-        <button
-          type="button"
-          aria-expanded={showAll}
-          onClick={() => setShowAll((value) => !value)}
-          className="mt-4 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-        >
-          {showAll ? showLessLabel : showAllLabel}
-        </button>
-      ) : null}
     </div>
   );
 }

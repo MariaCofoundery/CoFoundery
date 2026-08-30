@@ -165,11 +165,13 @@ test("team-scoped route remains server-authorized for founders and fails closed 
   assert.match(page, /if \(!team\) notFound\(\)/);
   assert.doesNotMatch(page, /Advisor|advisor|serviceRole|service_role/);
   assert.match(page, /active="library"/);
+  assert.match(page, /<FounderLibraryView/);
+  assert.match(page, /teamId=\{teamId\}/);
 });
 
 test("glossary UI provides accessible search, filters, accordions, and deferred Setup links", () => {
   const glossary = source("../FounderLibraryGlossary.tsx");
-  const page = source("../../../app/(product)/teams/[teamId]/founder-library/page.tsx");
+  const view = source("../FounderLibraryView.tsx");
   assert.match(glossary, /type="search"/);
   assert.match(glossary, /<label htmlFor="founder-library-search"/);
   assert.match(glossary, /aria-pressed=\{selected\}/);
@@ -180,17 +182,18 @@ test("glossary UI provides accessible search, filters, accordions, and deferred 
   assert.match(glossary, /<button/);
   assert.match(glossary, /flex flex-wrap/);
   assert.match(glossary, /setup\/\$\{encodeURIComponent\(topicKey\)\}/);
+  assert.match(glossary, /teamId && \(entry\.setupTopicKeys/);
   assert.match(glossary, /isOpen \? \(/);
   assert.equal(glossary.match(/\{entry\.shortDefinition\}/g)?.length, 1);
   assert.doesNotMatch(glossary, /aria-describedby|definitionId/);
   assert.doesNotMatch(glossary, /href=.*founder-library.*entry|grid-cols-[234]/);
-  assert.doesNotMatch(page + glossary, /resourceTypes|resource\.phases|phaseLabel/);
+  assert.doesNotMatch(view + glossary, /resourceTypes|resource\.phases|phaseLabel/);
 });
 
 test("Founder Library defaults to Glossary and exposes a minimal Updates & Sources view", () => {
-  const page = source("../../../app/(product)/teams/[teamId]/founder-library/page.tsx");
+  const page = source("../FounderLibraryView.tsx");
   const updates = source("../FounderLibraryUpdates.tsx");
-  assert.match(page, /\?\.view === "updates" \? "updates" : "glossary"/);
+  assert.match(page, /view === "glossary"/);
   assert.match(page, /views\.glossary/);
   assert.match(page, /views\.updates/);
   assert.match(page, /<FounderLibraryGlossary/);
@@ -203,6 +206,21 @@ test("Founder Library defaults to Glossary and exposes a minimal Updates & Sourc
   assert.match(updates, /<time dateTime=\{update\.date\}>/);
   assert.match(updates, /labels\.disclaimer/);
   assert.doesNotMatch(updates, /search|filter|favorite|notification|riskScore|grid-cols/iu);
+});
+
+test("global Founder Library is founder-authenticated without requiring a team", () => {
+  const page = source("../../../app/(product)/founder-library/page.tsx");
+  const view = source("../FounderLibraryView.tsx");
+  const chrome = source("../../navigation/productChromePath.ts");
+  assert.match(page, /supabase\.auth\.getUser\(\)/);
+  assert.match(page, /getDashboardRoleViews\(user\.id\)/);
+  assert.match(page, /if \(!roles\.hasFounder\)/);
+  assert.match(page, /\?\.view === "updates" \? "updates" : "glossary"/);
+  assert.match(page, /pathname="\/founder-library"|pathname=\{pathname\}/);
+  assert.doesNotMatch(page, /getFounderTeamHomebase|teamId|membership/);
+  assert.match(view, /teamId\?/);
+  assert.match(view, /setupTopicLabels=\{teamId \?/);
+  assert.match(chrome, /pathname === "\/founder-library"/);
 });
 
 test("team homebase keeps Founder Setup before the concise glossary entry", () => {

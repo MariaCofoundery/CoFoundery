@@ -15,6 +15,11 @@ const journeySource = readFileSync(
 );
 type DashboardMessages = {
   hero: { eyebrow: string; quoteEyebrow: string };
+  explore: {
+    libraryLink: { title: string; text: string };
+    items: Record<string, { title: string; text: string; action: string }>;
+    controls: Record<string, string>;
+  };
   foundation: {
     alignment: { title: string };
     values: { optionalBadge: string };
@@ -155,6 +160,7 @@ test("personal hero, quote, foundation and connections remain visible", () => {
   assert.match(dashboardSource, /dashboard-block-connections/);
   assert.match(dashboardSource, /foundation\.values\.optionalBadge/);
   assert.match(dashboardSource, /getOwnDiscoveryProfile/);
+  assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|prioritizedTask|buildDashboardV2HeroPanel/);
 });
 
 test("right-side section navigation points only to existing V2 sections", () => {
@@ -162,6 +168,7 @@ test("right-side section navigation points only to existing V2 sections", () => 
     "dashboard-block-tasks",
     "dashboard-block-foundation",
     "dashboard-block-connections",
+    "dashboard-block-explore",
     "dashboard-block-outlook",
   ]) {
     assert.match(dashboardSource, new RegExp(`id=\\"${id}\\"`));
@@ -171,6 +178,30 @@ test("right-side section navigation points only to existing V2 sections", () => 
   assert.match(journeySource, /aria-current/);
   assert.match(journeySource, /href=\{`#\$\{section\.id\}`\}/);
   assert.doesNotMatch(dashboardSource, /dashboard-block-roadmap/);
+});
+
+test("Current work is the only task presentation and remains capped at three items", () => {
+  const taskList = readFileSync("src/features/dashboard/DashboardTaskList.tsx", "utf8");
+  assert.equal(dashboardSource.match(/<DashboardTaskList/g)?.length, 1);
+  assert.match(taskList, /tasks\.slice\(0, 3\)/);
+  assert.doesNotMatch(taskList, /showAll|aria-expanded|useState/);
+  assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|tasks\[0\]/);
+});
+
+test("Explore CoFoundery has three manual spotlight items and a permanent Library link", () => {
+  const spotlight = readFileSync("src/features/dashboard/DashboardSpotlight.tsx", "utf8");
+  assert.deepEqual(Object.keys(deDashboard.explore.items), ["library", "discovery", "collaboration"]);
+  assert.deepEqual(Object.keys(deDashboard.explore.items), Object.keys(enDashboard.explore.items));
+  assert.equal(deDashboard.explore.libraryLink.text, "Begriffe, Updates und Quellen für Founder.");
+  assert.equal(enDashboard.explore.libraryLink.text, "Terms, updates and sources for founders.");
+  assert.match(dashboardSource, /href="\/founder-library"/);
+  assert.match(dashboardSource, /id: "founder-library"/);
+  assert.match(dashboardSource, /id: "discovery"/);
+  assert.match(dashboardSource, /id: "collaboration"/);
+  assert.match(spotlight, /aria-label=\{previousLabel\}/);
+  assert.match(spotlight, /aria-label=\{nextLabel\}/);
+  assert.match(spotlight, /aria-pressed=\{index === activeIndex\}/);
+  assert.doesNotMatch(spotlight, /setInterval|setTimeout|autoplay|useEffect/i);
 });
 
 test("outlook contains exactly the two V2 future themes in DE and EN", () => {

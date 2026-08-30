@@ -38,6 +38,7 @@
     "tasks": "Was gerade ansteht",
     "foundation": "Deine Grundlage",
     "connections": "Deine Verbindungen und Teams",
+    "explore": "Entdecke CoFoundery",
     "outlook": "Ausblick"
   },
   "tasks": {
@@ -125,6 +126,37 @@
         "text": "Am Thema „{topic}“ wurde bereits gemeinsam gearbeitet.",
         "action": "Fortsetzen"
       }
+    }
+  },
+  "explore": {
+    "eyebrow": "Entdecke CoFoundery",
+    "title": "Was du mit CoFoundery machen kannst",
+    "libraryLink": {
+      "title": "Founder Library",
+      "text": "Begriffe, Updates und Quellen für Founder."
+    },
+    "items": {
+      "library": {
+        "title": "Founder Library",
+        "text": "Begriffe verstehen und wichtige Entwicklungen im Blick behalten.",
+        "action": "Library öffnen"
+      },
+      "discovery": {
+        "title": "Co-Founder finden",
+        "text": "Entdecke Founder und prüfe, wer zu dem passt, was du für eine gemeinsame Gründung suchst.",
+        "action": "Founder entdecken"
+      },
+      "collaboration": {
+        "title": "Zusammenarbeit verstehen",
+        "text": "Nutzt eure Zusammenarbeit bewusst – zum Beispiel mit Read My Mind und strukturierten Gesprächen.",
+        "action": "Zusammenarbeit entdecken"
+      }
+    },
+    "controls": {
+      "previous": "Vorheriges Element",
+      "next": "Nächstes Element",
+      "indicators": "Spotlight-Positionen",
+      "position": "Element {position} von {total} anzeigen"
     }
   },
   "foundation": {

@@ -27,7 +27,7 @@ type Labels = {
 };
 
 type Props = {
-  teamId: string;
+  teamId?: string;
   locale: string;
   terms: readonly LocalizedFounderLibraryTerm[];
   setupTopicLabels: Record<string, string>;
@@ -145,7 +145,7 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
                           <div id={panelId} className="pb-5 pr-9 sm:pb-6" role="region" aria-labelledby={`glossary-term-${entry.id}`}>
                             <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{labels.shortExplanation}</h3>
                             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{entry.shortDefinition}</p>
-                            {(entry.setupTopicKeys?.length ?? 0) > 0 ? (
+                            {teamId && (entry.setupTopicKeys?.length ?? 0) > 0 ? (
                               <div className="mt-5 border-l-2 border-amber-200 pl-3">
                                 <p className="text-xs text-slate-500">{labels.setupPrompt}</p>
                                 <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2">

@@ -4,6 +4,7 @@
   "intro": "A focused glossary for terms you encounter while building a startup and working as a founder.",
   "professionalNote": "For legal or tax questions, the Library is not a substitute for individual professional advice.",
   "back": "Back to team overview",
+  "backToDashboard": "Back to dashboard",
   "founderFallback": "Founder {index}",
   "views": {
     "label": "Founder Library view",

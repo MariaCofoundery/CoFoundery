@@ -38,6 +38,7 @@
     "tasks": "What needs your attention",
     "foundation": "Your foundation",
     "connections": "Your connections and teams",
+    "explore": "Explore CoFoundery",
     "outlook": "Outlook"
   },
   "tasks": {
@@ -125,6 +126,37 @@
         "text": "You already started working together on “{topic}”.",
         "action": "Continue"
       }
+    }
+  },
+  "explore": {
+    "eyebrow": "Explore CoFoundery",
+    "title": "What you can do with CoFoundery",
+    "libraryLink": {
+      "title": "Founder Library",
+      "text": "Terms, updates and sources for founders."
+    },
+    "items": {
+      "library": {
+        "title": "Founder Library",
+        "text": "Understand key terms and keep an eye on important developments.",
+        "action": "Open Library"
+      },
+      "discovery": {
+        "title": "Find a co-founder",
+        "text": "Discover founders and explore who may fit what you are looking for in a shared venture.",
+        "action": "Discover founders"
+      },
+      "collaboration": {
+        "title": "Understand collaboration",
+        "text": "Work with your collaboration intentionally—for example with Read My Mind and structured conversations.",
+        "action": "Explore collaboration"
+      }
+    },
+    "controls": {
+      "previous": "Previous item",
+      "next": "Next item",
+      "indicators": "Spotlight positions",
+      "position": "Show item {position} of {total}"
     }
   },
   "foundation": {

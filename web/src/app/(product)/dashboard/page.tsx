@@ -6,6 +6,7 @@ import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
 import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
+import { DashboardSpotlight } from "@/features/dashboard/DashboardSpotlight";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
@@ -16,7 +17,6 @@ import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDa
 import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
 import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
-  resolveDashboardHeroAction,
   resolveDiscoveryFoundationState,
   resolveFounderAlignmentFoundationState,
   resolveValuesFoundationState,
@@ -86,8 +86,6 @@ type AssessmentProgressRow = {
 
 type DashboardT = Awaited<ReturnType<typeof getTranslations>>;
 
-const INVITE_CTA_CLASS =
-  "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const REPORT_CTA_CLASS =
   "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const UTILITY_CTA_CLASS =
@@ -235,8 +233,6 @@ export default async function DashboardPage({
   const hasStartedBase = Boolean(latestBaseAssessment);
   const hasStartedValues = Boolean(latestValuesAssessment && !latestValuesAssessment.submitted_at);
   const readyReports = reportRuns.slice(0, 3);
-  const hasMatchingActivity =
-    sentInvitesSorted.length > 0 || receivedInvitesSorted.length > 0 || readyReports.length > 0;
   const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
   const displayName =
     profileData?.display_name?.trim() || user.email?.split("@")[0]?.trim() || "Founder";
@@ -263,25 +259,6 @@ export default async function DashboardPage({
   const contextualValuesHref = contextualInvitationId
     ? `/me/values?invitationId=${encodeURIComponent(contextualInvitationId)}`
     : "/me/values";
-  const heroIncomingInvite =
-    contextualInvitation?.direction === "incoming" ? contextualInvitation : prioritizedIncomingInvite;
-  const heroActionKind = resolveDashboardHeroAction({
-    hasIncomingInvitation: Boolean(heroIncomingInvite),
-    hasSubmittedFounderAlignment: hasSubmittedBase,
-    hasStartedFounderAlignment: hasStartedBase,
-    hasStartedValues: hasStartedValues && !hasSubmittedValues,
-    hasTeam: founderTeams.length > 0,
-    hasConnectionActivity: hasMatchingActivity,
-  });
-  const heroPanel = heroIncomingInvite && heroActionKind === "incoming_invitation"
-    ? buildHeroIncomingInvitationAction(heroIncomingInvite, t)
-    : buildDashboardV2HeroPanel({
-        kind: heroActionKind,
-        contextualBaseHref,
-        contextualValuesHref,
-        firstTeamId: founderTeams[0]?.id ?? null,
-        t,
-      });
   const founderAlignmentState = resolveFounderAlignmentFoundationState({
     submitted: hasSubmittedBase,
     started: hasStartedBase,
@@ -328,15 +305,9 @@ export default async function DashboardPage({
   const taskPresentations = dashboardTasks.map((task) =>
     presentDashboardTask(task, t, setupT)
   );
-  const prioritizedTask = taskPresentations[0] ?? null;
-  const resolvedHeroPanel = prioritizedTask
-    ? {
-        href: prioritizedTask.href,
-        label: prioritizedTask.action,
-        title: prioritizedTask.title,
-        text: prioritizedTask.text,
-      }
-    : heroPanel;
+  const collaborationSpotlightHref = founderTeams[0]?.id
+    ? `/teams/${encodeURIComponent(founderTeams[0].id)}#collaboration-lab`
+    : "/connections";
   const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
@@ -378,20 +349,21 @@ export default async function DashboardPage({
           { id: "dashboard-block-tasks", label: t("sectionNavigation.tasks") },
           { id: "dashboard-block-foundation", label: t("sectionNavigation.foundation") },
           { id: "dashboard-block-connections", label: t("sectionNavigation.connections") },
+          { id: "dashboard-block-explore", label: t("sectionNavigation.explore") },
           { id: "dashboard-block-outlook", label: t("sectionNavigation.outlook") },
         ]}
       />
+
+      {params.error ? (
+        <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {t("hero.error")}
+        </p>
+      ) : null}
 
       <section data-dashboard-hero className="relative isolate mb-10 lg:mb-12">
         <div className="relative rounded-[32px]">
           <DashboardHeroConstellation />
           <div className="relative z-10">
-            {params.error ? (
-              <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                {t("hero.error")}
-              </p>
-            ) : null}
-
             <section className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:p-6" style={staggerStyle(40)}>
               <div className="flex items-center gap-3.5">
                 <DashboardProfileAvatar displayName={displayName} avatarId={profileAvatarId} imageUrl={profileImageUrl} />
@@ -403,7 +375,7 @@ export default async function DashboardPage({
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)]">
+              <div className="mt-5">
                 <article className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.07),rgba(255,255,255,0.94)_52%,rgba(124,58,237,0.04))] px-4 py-4">
                   <div className="flex items-start gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/80 bg-white/85 text-slate-600"><QuoteIcon className="h-4 w-4" /></span>
@@ -412,14 +384,6 @@ export default async function DashboardPage({
                       <p className="mt-1.5 text-sm leading-6 text-slate-700">„{quoteOfTheDay.text}“</p>
                     </div>
                   </div>
-                </article>
-
-                <article className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-4">
-                  <h2 className="text-base font-semibold text-slate-950">{resolvedHeroPanel.title}</h2>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600">{resolvedHeroPanel.text}</p>
-                  <Link href={resolvedHeroPanel.href} className={`${INVITE_CTA_CLASS} mt-3 shadow-[0_10px_20px_rgba(34,211,238,0.12)]`}>
-                    {resolvedHeroPanel.label}
-                  </Link>
                 </article>
               </div>
             </section>
@@ -443,8 +407,6 @@ export default async function DashboardPage({
           tasks={taskPresentations}
           emptyTitle={t("tasks.empty.title")}
           emptyText={t("tasks.empty.text")}
-          showAllLabel={t("tasks.showAll")}
-          showLessLabel={t("tasks.showLess")}
         />
       </section>
 
@@ -588,6 +550,57 @@ export default async function DashboardPage({
             </article>
           </div>
         </details>
+      </section>
+
+      <section
+        id="dashboard-block-explore"
+        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
+        style={staggerStyle(130)}
+        aria-labelledby="dashboard-explore-title"
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("explore.eyebrow")}</p>
+            <h2 id="dashboard-explore-title" className="mt-2 text-2xl font-semibold text-slate-950">{t("explore.title")}</h2>
+          </div>
+          <Link
+            href="/founder-library"
+            className="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 sm:max-w-sm"
+          >
+            <span className="block text-sm font-semibold text-slate-900">{t("explore.libraryLink.title")}</span>
+            <span className="mt-1 block text-xs leading-5 text-slate-600">{t("explore.libraryLink.text")}</span>
+          </Link>
+        </div>
+
+        <DashboardSpotlight
+          items={[
+            {
+              id: "founder-library",
+              title: t("explore.items.library.title"),
+              text: t("explore.items.library.text"),
+              action: t("explore.items.library.action"),
+              href: "/founder-library",
+            },
+            {
+              id: "discovery",
+              title: t("explore.items.discovery.title"),
+              text: t("explore.items.discovery.text"),
+              action: t("explore.items.discovery.action"),
+              href: "/discovery",
+            },
+            {
+              id: "collaboration",
+              title: t("explore.items.collaboration.title"),
+              text: t("explore.items.collaboration.text"),
+              action: t("explore.items.collaboration.action"),
+              href: collaborationSpotlightHref,
+            },
+          ]}
+          previousLabel={t("explore.controls.previous")}
+          nextLabel={t("explore.controls.next")}
+          indicatorsLabel={t("explore.controls.indicators")}
+          positionLabel={t.raw("explore.controls.position")}
+        />
       </section>
 
       <section id="dashboard-block-profile" className="dashboard-fade-up mb-8 grid gap-3 md:grid-cols-2" style={staggerStyle(130)} aria-label={t("utilities.title")}>
@@ -812,34 +825,6 @@ function presentDashboardTask(
   }
 }
 
-function buildDashboardV2HeroPanel({
-  kind,
-  contextualBaseHref,
-  contextualValuesHref,
-  firstTeamId,
-  t,
-}: {
-  kind: ReturnType<typeof resolveDashboardHeroAction>;
-  contextualBaseHref: string;
-  contextualValuesHref: string;
-  firstTeamId: string | null;
-  t: DashboardT;
-}) {
-  switch (kind) {
-    case "founder_alignment_continue":
-      return { href: contextualBaseHref, label: t("actions.continueAlignment"), title: t("heroPanel.continueAlignmentTitle"), text: t("heroPanel.continueAlignmentText") };
-    case "values_continue":
-      return { href: contextualValuesHref, label: t("actions.continueValues"), title: t("heroPanel.continueValuesTitle"), text: t("heroPanel.continueValuesText") };
-    case "open_team":
-      return { href: firstTeamId ? `/teams/${encodeURIComponent(firstTeamId)}` : "/connections", label: t("actions.openTeam"), title: t("heroPanel.teamTitle"), text: t("heroPanel.teamText") };
-    case "open_connections":
-      return { href: "/connections", label: t("actions.openConnections"), title: t("heroPanel.connectionsTitle"), text: t("heroPanel.connectionsText") };
-    case "invite_cofounder":
-    case "incoming_invitation":
-      return { href: "/invite/new", label: t("actions.inviteCofounder"), title: t("heroPanel.inviteTitle"), text: t("heroPanel.inviteText") };
-  }
-}
-
 function FoundationCard({
   title,
   eyebrow,
@@ -1050,56 +1035,6 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow, t: Dashbo
       ? REPORT_CTA_CLASS
       : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",
     canOpenCompletionStatus,
-  };
-}
-
-function buildHeroIncomingInvitationAction(invite: InvitationDashboardRow, t: DashboardT) {
-  const action = buildIncomingInvitationAction(invite, t);
-  const inviterName = resolveIncomingInviterName(invite);
-  const needsBaseStart = !invite.inviteeBaseSubmitted && !invite.inviteeBaseStarted;
-  const needsBaseContinue = !invite.inviteeBaseSubmitted && invite.inviteeBaseStarted;
-
-  if (invite.isReportReady) {
-    return {
-      href: action.href,
-      label: t("team.incomingHero.reportReadyLabel"),
-      title: t("team.incomingHero.reportReadyTitle"),
-      text: t("team.incomingHero.reportReadyText", { name: inviterName }),
-    };
-  }
-
-  if (needsBaseStart) {
-    return {
-      href: action.href,
-      label: t("team.incomingActions.startMatching"),
-      title: t("team.incomingHero.baseStartTitle"),
-      text: t("team.incomingHero.baseStartText", { name: inviterName }),
-    };
-  }
-
-  if (needsBaseContinue) {
-    return {
-      href: action.href,
-      label: t("team.incomingHero.baseContinueLabel"),
-      title: t("team.incomingHero.baseContinueTitle"),
-      text: t("team.incomingHero.baseContinueText", { name: inviterName }),
-    };
-  }
-
-  if (action.canOpenCompletionStatus) {
-    return {
-      href: action.href,
-      label: t("team.incomingHero.baseContinueLabel"),
-      title: t("team.incomingHero.priorityTitle"),
-      text: t("team.incomingHero.statusText", { name: inviterName }),
-    };
-  }
-
-  return {
-    href: action.href,
-    label: t("team.incomingHero.baseContinueLabel"),
-    title: t("team.incomingHero.priorityTitle"),
-    text: t("team.incomingHero.flowText", { name: inviterName }),
   };
 }
 
