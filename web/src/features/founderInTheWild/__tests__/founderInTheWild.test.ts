@@ -85,8 +85,12 @@ test("new and existing rounds resolve to the real App Router round segment", () 
   assert.ok(readFileSync(`${root}/src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/[roundId]/page.tsx`, "utf8"));
 
   const actions = readFileSync(`${root}/src/features/founderInTheWild/founderInTheWildActions.ts`, "utf8");
+  const diagnostics = readFileSync(`${root}/src/features/founderInTheWild/founderInTheWildDiagnostics.ts`, "utf8");
   const entryPage = readFileSync(`${root}/src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/page.tsx`, "utf8");
   assert.match(actions, /getFounderInTheWildRound\(team, result\.data, user\.id, supabase\)/);
   assert.match(actions, /redirect\(roundHref\(teamId, round\.id\)\)/);
   assert.match(entryPage, /founderInTheWildRoundHref\(teamId, round\.id\)/);
+  assert.match(actions, /"create_round"/);
+  assert.match(diagnostics, /operation[\s\S]*code/);
+  assert.doesNotMatch(diagnostics, /userId|teamId|roundId|email|choice|token/);
 });

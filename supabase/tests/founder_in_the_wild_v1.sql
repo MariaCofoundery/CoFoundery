@@ -45,6 +45,21 @@ reset role;
 select set_config('request.jwt.claims','{"sub":"f1111111-1111-4111-8111-111111111111","role":"authenticated"}',true); set local role authenticated;
 select public.create_founder_in_the_wild_round('fa111111-1111-4111-8111-111111111111');
 select pg_temp.assert_fitw(
+  (select count(*)=1 from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active')
+  and (select count(*)=2 from public.collaboration_experience_round_participants where round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active'))
+  and (select count(*)=5 from public.collaboration_experience_round_prompts where round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active'))
+  and (select count(*)=10 from public.collaboration_experience_prompt_assignments where round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active'))
+  and (select count(*)=1 from public.get_founder_in_the_wild_round_state((select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active')))
+  and exists (
+    select 1
+    from public.collaboration_experience_round_prompts prompt
+    join public.collaboration_experience_prompt_assignments assignment on assignment.round_prompt_id=prompt.id and assignment.target_user_id=auth.uid()
+    where prompt.round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active')
+      and prompt.position=0
+  ),
+  'creator cannot immediately read the complete scenario-page projection after create'
+);
+select pg_temp.assert_fitw(
   public.create_founder_in_the_wild_round('fa111111-1111-4111-8111-111111111111') =
     (select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and status='active'),
   'an idempotent second start did not return the existing round'
@@ -66,7 +81,26 @@ do $$ declare v_assignment uuid; v_prompt uuid; begin
 end $$;
 reset role;
 
+select set_config('request.jwt.claims','{"sub":"f3333333-3333-4333-8333-333333333333","role":"authenticated"}',true); set local role authenticated;
+select pg_temp.assert_fitw(
+  not exists(select 1 from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild'),
+  'stranger can read the created round'
+);
+reset role;
+select set_config('request.jwt.claims','{"sub":"f4444444-4444-4444-8444-444444444444","role":"authenticated"}',true); set local role authenticated;
+select pg_temp.assert_fitw(
+  not exists(select 1 from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild'),
+  'advisor can read the created round'
+);
+reset role;
 select set_config('request.jwt.claims','{"sub":"f2222222-2222-4222-8222-222222222222","role":"authenticated"}',true); set local role authenticated;
+select pg_temp.assert_fitw(
+  (select count(*)=1 from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active')
+  and (select count(*)=5 from public.collaboration_experience_round_prompts where round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active'))
+  and (select count(*)=5 from public.collaboration_experience_prompt_assignments where round_id=(select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active') and target_user_id=auth.uid())
+  and (select count(*)=1 from public.get_founder_in_the_wild_round_state((select id from public.collaboration_experience_rounds where founder_team_id='fa111111-1111-4111-8111-111111111111' and experience_key='founder_in_the_wild' and status='active'))),
+  'partner cannot load the same scenario-page projection'
+);
 select pg_temp.assert_fitw(not exists(select 1 from public.collaboration_experience_responses where respondent_user_id='f1111111-1111-4111-8111-111111111111'),'partner raw response visible before reveal');
 do $$ declare v_foreign uuid; begin select id into v_foreign from public.collaboration_experience_prompt_assignments where target_user_id='f1111111-1111-4111-8111-111111111111' limit 1; begin perform public.lock_founder_in_the_wild_response(v_foreign,'move',array['clarify_shared_position']); raise exception 'foreign assignment accepted'; exception when insufficient_privilege then null; end; end $$;
 reset role;
