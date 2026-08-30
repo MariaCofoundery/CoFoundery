@@ -33,6 +33,7 @@ import type { WorkbookDeepDiveHandoffContext } from "@/features/reporting/workbo
 import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
 import { resolveAdvisorRelationshipContext } from "@/features/reporting/advisorTeamContext";
 import {
+  getFounderMatchingLiveData,
   getPrivilegedReportRunSnapshotForInvitation,
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
@@ -634,8 +635,9 @@ export async function getFounderAlignmentWorkbookPageData(
 
   const founderContextClient = privilegedAccessClient ?? dataClient;
 
-  const [debugResult, founderContext, workbookRow, reportSnapshot, advisorProfile] = await Promise.all([
+  const [debugResult, founderLiveData, founderContext, workbookRow, reportSnapshot, advisorProfile] = await Promise.all([
     isLinkedAdvisor ? Promise.resolve(null) : getFounderScoringDebug(normalizedInvitationId),
+    isLinkedAdvisor ? Promise.resolve(null) : getFounderMatchingLiveData(normalizedInvitationId),
     loadFounderContextWithClient(normalizedInvitationId, founderContextClient, resolvedRelationshipId),
     loadWorkbookRowWithClient(normalizedInvitationId, dataClient),
     isLinkedAdvisor
@@ -661,7 +663,7 @@ export async function getFounderAlignmentWorkbookPageData(
   if (
     !snapshotHasFounderAlignmentData &&
     (!advisorWorkbookScoring &&
-      (isLinkedAdvisor || !debugResult || debugResult.status !== "ready" || !debugResult.scoring))
+      (isLinkedAdvisor || !founderLiveData?.founderScoring))
   ) {
     const fallbackStatus: FounderAlignmentWorkbookPageData["status"] =
       (isLinkedAdvisor && !advisorWorkbookScoring) || !debugResult
@@ -684,7 +686,7 @@ export async function getFounderAlignmentWorkbookPageData(
       ? reportSnapshot.founderScoring
       : advisorWorkbookScoring
         ? advisorWorkbookScoring
-      : debugResult!.scoring!;
+      : founderLiveData!.founderScoring;
   const report =
     snapshotHasFounderAlignmentData && reportSnapshot?.founderReport
       ? reportSnapshot.founderReport
