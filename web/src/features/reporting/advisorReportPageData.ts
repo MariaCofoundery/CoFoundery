@@ -469,11 +469,9 @@ export async function getAdvisorReportPageData(
   }
 
   if (!hasAccess) {
-    console.info("[advisor-report-debug] access_denied", {
-      invitationId: normalizedInvitationId,
-      userId: user.id,
-      relationshipId,
-      accessBeforeLegacySync,
+    console.info("[advisor-report] access_denied", {
+      operation: "load_advisor_report",
+      status: "forbidden",
       legacySyncAttempted,
       legacySyncResult,
     });
@@ -545,19 +543,6 @@ export async function getAdvisorReportPageData(
     privileged
   );
   const founderScoring = founderScoringResolution.scoring;
-
-  console.info("[advisor-report-debug] loader", {
-    invitationId: normalizedInvitationId,
-    userId: user.id,
-    relationshipId,
-    accessBeforeLegacySync,
-    legacySyncAttempted,
-    legacySyncResult,
-    hasAccess,
-    reportRunId: snapshot?.id ?? null,
-    snapshotFounderScoring: Boolean(snapshot?.founderScoring),
-    scoringSource: founderScoringResolution.source,
-  });
 
   if (!founderScoring) {
     return {

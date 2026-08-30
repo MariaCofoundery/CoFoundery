@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { buildExecutiveSummary } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderScoringDebug } from "@/features/scoring/founderScoringDebug";
 
@@ -10,6 +11,10 @@ export default async function FounderScoringDebugPage({
 }: {
   searchParams: Promise<PageSearchParams>;
 }) {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   const params = await searchParams;
   const invitationId = params.invitationId?.trim() || null;
   const result = await getFounderScoringDebug(invitationId);

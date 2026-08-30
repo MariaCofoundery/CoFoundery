@@ -63,9 +63,13 @@ test("source files contain no mojibake outside the normalization repair table", 
   const projectRoot = path.resolve(process.cwd(), "src");
   const docsRoot = path.resolve(process.cwd(), "docs");
   const files = [...collectTextFiles(projectRoot), ...collectTextFiles(docsRoot)];
+  const excludedFiles = new Set([
+    path.resolve(projectRoot, "lib", "normalizeGermanText.ts"),
+    path.resolve(projectRoot, "features", "reporting", "__tests__", "encodingGuard.test.ts"),
+  ]);
 
   for (const filePath of files) {
-    if (filePath.endsWith(path.join("src", "lib", "normalizeGermanText.ts"))) {
+    if (excludedFiles.has(path.resolve(filePath))) {
       continue;
     }
 
@@ -74,6 +78,11 @@ test("source files contain no mojibake outside the normalization repair table", 
       assert.equal(pattern.test(content), false, `Unexpected encoding pattern ${pattern} in ${filePath}`);
     }
   }
+});
+
+test("encoding guard still detects a real mojibake fixture", () => {
+  const brokenFixture = `Ma${String.fromCodePoint(0xc3)}${String.fromCodePoint(0x0178)}`;
+  assert.equal(SUSPICIOUS_ENCODING_PATTERNS.some((pattern) => pattern.test(brokenFixture)), true);
 });
 
 function collectTextFiles(root: string): string[] {

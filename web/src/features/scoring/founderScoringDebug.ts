@@ -346,17 +346,6 @@ export async function getFounderScoringDebug(
     personB: personBAnswers,
   });
 
-  console.log("founder-scoring-debug", {
-    invitationId: normalizedInvitationId,
-    baseQuestionCount,
-    personAAnswered: Object.keys(personAAnswerMap).length,
-    personBAnswered: Object.keys(personBAnswerMap).length,
-    overallFit: scoring.overallFit,
-    overallTension: scoring.overallTension,
-    overallRedFlags: scoring.overallRedFlags,
-    overallGreenFlags: scoring.overallGreenFlags,
-  });
-
   return {
     ...resultWithAnswers,
     status: "ready",

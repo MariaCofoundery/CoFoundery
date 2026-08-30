@@ -597,18 +597,10 @@ export default async function AdvisorDashboardPage() {
   const workbookHref = preferredTeam?.workbookHref ?? dashboardFallbackHref;
 
   if (debug) {
-    console.info("[advisor-report-debug] dashboard_links", {
-      userId: user.id,
-      preferredTeamInvitationId: preferredTeam?.invitationId ?? null,
-      navReportHref: reportHref,
-      navWorkbookHref: workbookHref,
-      teams: teams.map((team) => ({
-        invitationId: team.invitationId,
-        workbookHref: team.workbookHref,
-        reportHref: team.reportHref,
-        reportReady: team.reportReady,
-        accessStatus: team.accessStatus,
-      })),
+    console.info("[advisor-report] dashboard_navigation", {
+      operation: "resolve_advisor_navigation",
+      status: preferredTeam ? "preferred_team" : "fallback",
+      teamCount: teams.length,
     });
   }
 

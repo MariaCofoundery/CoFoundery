@@ -12,6 +12,7 @@ import {
 } from "@/features/reporting/generateCompareReport";
 import { REPORT_DIMENSIONS, type RadarSeries, type ReportDimension } from "@/features/reporting/types";
 import { VALUES_QUESTION_DEFINITIONS } from "@/features/reporting/valuesQuestionMeta";
+import { getCoreRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 
 type BaseAnswerRow = {
   question_id: string;
@@ -52,14 +53,39 @@ function nullSeries(): RadarSeries {
   }, {} as RadarSeries);
 }
 
-test("aggregation: all non-numeric base answers -> all scores null", () => {
+test("aggregation: complete registered CORE answers produce complete base coverage", () => {
+  const coreItems = getCoreRegistryItems().filter((item) => item.isActive);
+  const meta = questionMetaMap(
+    coreItems.map((item) => ({
+      id: item.itemId,
+      dimension: item.dimensionLabel,
+      category: "basis",
+      prompt: item.prompt,
+    }))
+  );
+  const answers = coreItems.map((item) => ({
+    question_id: item.itemId,
+    choice_value: String(item.choices[0]?.value),
+  }));
+
+  const result = aggregateBaseScoresFromAnswers(answers as never[], meta as never);
+  assert.equal(coreItems.length, 24);
+  assert.equal(result.numericAnsweredTotal, 24);
+  assert.equal(result.expectedTotal, 24);
+  assert.equal(result.baseCoveragePercent, 100);
+  for (const dimension of REPORT_DIMENSIONS) {
+    assert.notEqual(result.scores[dimension], null);
+  }
+});
+
+test("aggregation: non-numeric registered base answers -> all scores null", () => {
   const meta = questionMetaMap([
-    { id: "q1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
-    { id: "q2", dimension: germanDimensionLabel("Entscheidung"), category: "basis", prompt: null },
+    { id: "cl_core_1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "dl_core_1", dimension: germanDimensionLabel("Entscheidung"), category: "basis", prompt: null },
   ]);
   const answers: BaseAnswerRow[] = [
-    { question_id: "q1", choice_value: "abc" },
-    { question_id: "q2", choice_value: "x" },
+    { question_id: "cl_core_1", choice_value: "abc" },
+    { question_id: "dl_core_1", choice_value: "x" },
   ];
 
   const result = aggregateBaseScoresFromAnswers(answers as never[], meta as never);
@@ -68,16 +94,16 @@ test("aggregation: all non-numeric base answers -> all scores null", () => {
   assert.equal(result.baseCoveragePercent, 0);
 });
 
-test("aggregation: partial numeric answers -> only affected dimensions set", () => {
+test("aggregation: partial registered CORE answers -> only affected dimensions set", () => {
   const meta = questionMetaMap([
-    { id: "q1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
-    { id: "q2", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
-    { id: "q3", dimension: germanDimensionLabel("Entscheidung"), category: "basis", prompt: null },
+    { id: "cl_core_1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "cl_core_2", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "dl_core_1", dimension: germanDimensionLabel("Entscheidung"), category: "basis", prompt: null },
   ]);
   const answers: BaseAnswerRow[] = [
-    { question_id: "q1", choice_value: "1" },
-    { question_id: "q2", choice_value: "4" },
-    { question_id: "q3", choice_value: "not-a-number" },
+    { question_id: "cl_core_1", choice_value: "100" },
+    { question_id: "cl_core_2", choice_value: "100" },
+    { question_id: "dl_core_1", choice_value: "not-a-number" },
   ];
 
   const result = aggregateBaseScoresFromAnswers(answers as never[], meta as never);
@@ -86,17 +112,20 @@ test("aggregation: partial numeric answers -> only affected dimensions set", () 
   assert.equal(result.scores.Risiko, null);
   assert.equal(result.answeredNumericByDimension.Vision, 2);
   assert.equal(result.answeredNumericByDimension.Entscheidung, 0);
+  assert.equal(result.numericAnsweredTotal, 2);
+  assert.equal(result.expectedTotal, 24);
+  assert.equal(result.baseCoveragePercent, 8.33);
 });
 
 test("aggregation: coverage metrics use expected question counts per dimension", () => {
   const meta = questionMetaMap([
-    { id: "q1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
-    { id: "q2", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
-    { id: "q3", dimension: germanDimensionLabel("Konflikt"), category: "basis", prompt: null },
+    { id: "cl_core_1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "cl_core_2", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "cs_core_1", dimension: germanDimensionLabel("Konflikt"), category: "basis", prompt: null },
   ]);
   const answers: BaseAnswerRow[] = [
-    { question_id: "q1", choice_value: "2" },
-    { question_id: "q2", choice_value: "3" },
+    { question_id: "cl_core_1", choice_value: "25" },
+    { question_id: "cl_core_2", choice_value: "75" },
   ];
   const expected = emptyDimensionCounts();
   expected.Vision = 2;
@@ -108,6 +137,22 @@ test("aggregation: coverage metrics use expected question counts per dimension",
   assert.equal(result.baseCoveragePercent, 66.67);
   assert.equal(result.expectedByDimension.Vision, 2);
   assert.equal(result.expectedByDimension.Konflikt, 1);
+});
+
+test("aggregation: unregistered item ids are ignored instead of creating report values", () => {
+  const meta = questionMetaMap([
+    { id: "cl_core_1", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+    { id: "legacy_dummy_id", dimension: germanDimensionLabel("Vision"), category: "basis", prompt: null },
+  ]);
+  const answers: BaseAnswerRow[] = [
+    { question_id: "cl_core_1", choice_value: "50" },
+    { question_id: "legacy_dummy_id", choice_value: "100" },
+  ];
+
+  const result = aggregateBaseScoresFromAnswers(answers as never[], meta as never);
+  assert.equal(result.numericAnsweredTotal, 1);
+  assert.equal(result.answeredNumericByDimension.Vision, 1);
+  assert.equal(result.scores.Vision, 3.5);
 });
 
 test("compare: delta logic only uses comparable dimensions", () => {

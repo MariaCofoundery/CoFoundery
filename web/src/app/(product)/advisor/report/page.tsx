@@ -93,10 +93,6 @@ export default async function AdvisorReportPage({
   if (data.status === "forbidden" || data.status === "not_found") {
     const redirectTarget = "/advisor/dashboard";
     if (debug) {
-      console.info("[advisor-report-debug] render_state", {
-        ...(data.debugMeta ?? null),
-        redirectTarget,
-      });
       return (
         <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
           <section className="rounded-[32px] border border-amber-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
@@ -142,9 +138,6 @@ export default async function AdvisorReportPage({
   }
 
   if (data.status === "missing_report") {
-    if (debug) {
-      console.info("[advisor-report-debug] render_state", data.debugMeta);
-    }
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
@@ -186,10 +179,6 @@ export default async function AdvisorReportPage({
 
   if (data.status !== "ready") {
     redirect("/advisor/dashboard");
-  }
-
-  if (debug) {
-    console.info("[advisor-report-debug] render_state", data.debugMeta);
   }
 
   const reportHref = buildAdvisorReportHref(data.invitationId, data.teamContext);
