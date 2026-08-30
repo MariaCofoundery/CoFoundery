@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isFounderInTheWildChoice } from "./founderInTheWildContent";
 import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTheWildData";
+import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
 import { createClient } from "@/lib/supabase/server";
 
-const entryHref = (teamId: string) => `/teams/${encodeURIComponent(teamId)}/collaboration-lab/founder-in-the-wild`;
-const roundHref = (teamId: string, roundId: string) => `${entryHref(teamId)}/${encodeURIComponent(roundId)}`;
-const revealHref = (teamId: string, roundId: string, position?: number) => `${roundHref(teamId, roundId)}/reveal${position === undefined ? "" : `/${position}`}`;
+const entryHref = founderInTheWildEntryHref;
+const roundHref = founderInTheWildRoundHref;
+const revealHref = founderInTheWildRevealHref;
 
 async function auth(next: string) {
   const supabase = await createClient();
@@ -28,7 +29,9 @@ export async function startFounderInTheWildRoundAction(teamId: string) {
   if (!team || team.members.length !== 2) redirect(`${entryHref(teamId)}?result=unavailable`);
   const result = await supabase.rpc("create_founder_in_the_wild_round", { p_founder_team_id: teamId, p_pack_key: "under_pressure_v1", p_pack_version: 1 });
   if (result.error || typeof result.data !== "string") redirect(`${entryHref(teamId)}?result=changed`);
-  refresh(teamId, result.data); redirect(roundHref(teamId, result.data));
+  const round = await getFounderInTheWildRound(team, result.data, user.id, supabase);
+  if (!round) redirect(`${entryHref(teamId)}?result=changed`);
+  refresh(teamId, round.id); redirect(roundHref(teamId, round.id));
 }
 
 export async function lockFounderInTheWildScenarioAction(teamId: string, roundId: string, roundPromptId: string, formData: FormData) {

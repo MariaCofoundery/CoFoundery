@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { FOUNDER_IN_THE_WILD_PACK, isFounderInTheWildChoice } from "@/features/founderInTheWild/founderInTheWildContent";
+import { founderInTheWildEntryHref, founderInTheWildRoundHref } from "@/features/founderInTheWild/founderInTheWildRoutes";
 
 test("Under Pressure is a frozen five-scenario DE/EN structured pack", () => {
   assert.equal(FOUNDER_IN_THE_WILD_PACK.experienceKey, "founder_in_the_wild");
@@ -56,4 +57,36 @@ test("the vertical slice keeps entry, privacy barrier, talk, marker and neutral 
   assert.match(migration, /count\(distinct response\.respondent_user_id\)=2/);
   assert.doesNotMatch(revealOverview, /new Map|const top|\[owner\]\.matters/);
   assert.doesNotMatch(`${JSON.stringify(de)}${JSON.stringify(en)}`.toLowerCase(), /compatibility|match %|personality score/);
+});
+
+test("entry copy keeps the pack secondary and the homebase action concise in DE and EN", () => {
+  const root = process.cwd();
+  const de = JSON.parse(readFileSync(`${root}/messages/de/founderInTheWild.json`, "utf8"));
+  const en = JSON.parse(readFileSync(`${root}/messages/en/founderInTheWild.json`, "utf8"));
+  assert.equal(de.homebase.action, "Starten");
+  assert.equal(en.homebase.action, "Start");
+  assert.equal(de.entry.title, "Wenn es hart auf hart kommt");
+  assert.equal(en.entry.title, "When things get real");
+  assert.equal(de.entry.pack, "Pack: Unter Druck");
+  assert.equal(en.entry.pack, "Pack: Under Pressure");
+  assert.equal(de.entry.start, "Runde starten");
+  assert.equal(en.entry.start, "Start round");
+  assert.equal(JSON.stringify(de.entry).match(/Unter Druck/g)?.length, 1);
+  assert.equal(JSON.stringify(en.entry).match(/Under Pressure/g)?.length, 1);
+});
+
+test("new and existing rounds resolve to the real App Router round segment", () => {
+  const root = process.cwd();
+  const teamId = "team / one";
+  const roundId = "round / one";
+  const expectedEntry = "/teams/team%20%2F%20one/collaboration-lab/founder-in-the-wild";
+  assert.equal(founderInTheWildEntryHref(teamId), expectedEntry);
+  assert.equal(founderInTheWildRoundHref(teamId, roundId), `${expectedEntry}/round%20%2F%20one`);
+  assert.ok(readFileSync(`${root}/src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/[roundId]/page.tsx`, "utf8"));
+
+  const actions = readFileSync(`${root}/src/features/founderInTheWild/founderInTheWildActions.ts`, "utf8");
+  const entryPage = readFileSync(`${root}/src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/page.tsx`, "utf8");
+  assert.match(actions, /getFounderInTheWildRound\(team, result\.data, user\.id, supabase\)/);
+  assert.match(actions, /redirect\(roundHref\(teamId, round\.id\)\)/);
+  assert.match(entryPage, /founderInTheWildRoundHref\(teamId, round\.id\)/);
 });
