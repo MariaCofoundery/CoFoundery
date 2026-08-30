@@ -94,6 +94,8 @@
     "description": "Clarify what you can realistically contribute, what your commitment means to you, and what should happen when time, motivation, or life circumstances change.",
     "start": "Start Commitment Lab",
     "continue": "Continue Commitment Lab",
+    "completed": "Completed",
+    "view": "View",
     "back": "Back to collaboration",
     "pair": "For {names}",
     "intro": "What does your commitment mean in real life? Commitment Lab supports reflection and conversation. It does not assess either of you or your collaboration.",

@@ -66,8 +66,22 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
       ? supabase.from("commitment_labs").select("relationship_id").in("relationship_id", team.alignment.map((entry) => entry.relationshipId))
       : Promise.resolve({ data: [], error: null }),
   ]);
-  const startedLabRelationships = new Set(
-    labStateResult.error ? [] : ((labStateResult.data ?? []) as Array<{ relationship_id: string }>).map((row) => row.relationship_id)
+  const labRows = labStateResult.error
+    ? []
+    : ((labStateResult.data ?? []) as Array<{ relationship_id: string }>);
+  const startedLabRelationships = new Set(labRows.map((row) => row.relationship_id));
+  const labCompletionResults = await Promise.all(
+    labRows.map(async (row) => ({
+      relationshipId: row.relationship_id,
+      result: await supabase.rpc("is_commitment_lab_complete", {
+        p_relationship_id: row.relationship_id,
+      }),
+    }))
+  );
+  const completedLabRelationships = new Set(
+    labCompletionResults.flatMap(({ relationshipId, result }) =>
+      !result.error && result.data ? [relationshipId] : []
+    )
   );
 
   const [t, navigationT, commitmentT] = await Promise.all([
@@ -226,7 +240,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               {team.alignment.map((entry) => {
                 const participants = pairName(entry.participantUserIds, names, fallback);
                 const started = startedLabRelationships.has(entry.relationshipId);
-                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(started ? "continue" : "start")}</Link></article>;
+                const completed = completedLabRelationships.has(entry.relationshipId);
+                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>{completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}</div><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(completed ? "view" : started ? "continue" : "start")}</Link></article>;
               })}
             </div>
           </section>

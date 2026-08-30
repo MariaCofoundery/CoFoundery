@@ -191,5 +191,29 @@ test("homebase places Commitment Lab between Alignment and Founder Setup", () =>
   const setup = page.indexOf('id="team-setup-title"');
   assert.ok(alignment >= 0 && lab > alignment && setup > lab);
   assert.match(page, /startedLabRelationships\.has\(entry\.relationshipId\)/);
-  assert.match(page, /commitmentT\(started \? "continue" : "start"\)/);
+  assert.match(page, /is_commitment_lab_complete/);
+  assert.match(page, /completedLabRelationships\.has\(entry\.relationshipId\)/);
+  assert.match(page, /commitmentT\(completed \? "view" : started \? "continue" : "start"\)/);
+});
+
+test("completion is a score-free derived contract and Setup handoff stays optional", () => {
+  const migration = readFileSync(
+    "../supabase/migrations/20260830230000_add_commitment_lab_completion_contract.sql",
+    "utf8"
+  );
+  const dashboardTasks = readFileSync(
+    "src/features/dashboard/founderDashboardTasks.ts",
+    "utf8"
+  );
+  const de = JSON.parse(readFileSync("messages/de/teams.json", "utf8")).commitmentLab;
+  const en = JSON.parse(readFileSync("messages/en/teams.json", "utf8")).commitmentLab;
+
+  assert.match(migration, /nullif\(btrim\(lab\.shared_reflection\), ''\) is not null/u);
+  assert.match(migration, /select count\(\*\) = 2/u);
+  assert.doesNotMatch(migration, /founder_team_setup|commitment_lab_discussion_entries/u);
+  assert.match(dashboardTasks, /if \(lab\.completed\) continue/u);
+  assert.equal(de.completed, "Abgeschlossen");
+  assert.equal(en.completed, "Completed");
+  assert.equal(de.view, "Ansehen");
+  assert.equal(en.view, "View");
 });

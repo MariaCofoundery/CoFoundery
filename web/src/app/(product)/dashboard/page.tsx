@@ -814,6 +814,14 @@ function presentDashboardTask(
           ? t("tasks.items.founderInTheWildHandoff.continueAction")
           : t("tasks.items.founderInTheWildHandoff.action"),
       };
+    case "founder_in_the_wild_reveal":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.founderInTheWildReveal.title"),
+        text: t("tasks.items.founderInTheWildReveal.text"),
+        action: t("tasks.items.founderInTheWildReveal.action"),
+      };
     case "commitment_lab_continue":
       return {
         ...task,

@@ -69,7 +69,7 @@ test("task priorities follow NEEDS_YOU, CONTINUE_PERSONAL, CONTINUE_SHARED", () 
       valuesSubmitted: false,
     },
     relationships: [relationship()],
-    commitmentLabs: [{ relationshipId: "relationship-ab", updatedAt: NOW }],
+    commitmentLabs: [{ relationshipId: "relationship-ab", updatedAt: NOW, completed: false }],
   }));
 
   assert.deepEqual(tasks.map((task) => task.kind), [
@@ -122,21 +122,26 @@ test("Read My Mind only creates pending and own-answer tasks for supported two-f
   assert.match(tasks[3]!.href, /reveal\/2$/);
 });
 
-test("Founder in the Wild handoff is symmetric, recipient-only, and disappears when both complete or abandoned", () => {
-  const base = { teamId: "team", teamLabel: "Team Atlas", partnerLabel: "Ben", ownStarted: false, ownAnswerComplete: false, partnerAnswerComplete: false, wholeAnswerComplete: false, supportedTwoFounderTeam: true, createdAt: NOW };
+test("Founder in the Wild projects handoff and founder-specific reveal-ready tasks", () => {
+  const base = { teamId: "team", teamLabel: "Team Atlas", partnerLabel: "Ben", status: "active", ownStarted: false, ownAnswerComplete: false, partnerAnswerComplete: false, wholeAnswerComplete: false, ownRevealComplete: false, supportedTwoFounderTeam: true, createdAt: NOW };
   const tasks = buildFounderDashboardTasks(signals({ founderInTheWildRounds: [
     { id: "both-incomplete", ...base },
     { id: "recipient", ...base, partnerAnswerComplete: true },
     { id: "recipient-started", ...base, ownStarted: true, partnerAnswerComplete: true },
     { id: "sender-waiting", ...base, ownAnswerComplete: true },
-    { id: "both-complete", ...base, ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true },
+    { id: "reveal-ready", ...base, ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true },
+    { id: "own-reveal-complete", ...base, ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true, ownRevealComplete: true },
+    { id: "completed-round", ...base, status: "completed", ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true },
+    { id: "abandoned-round", ...base, status: "abandoned", ownAnswerComplete: true, partnerAnswerComplete: true, wholeAnswerComplete: true },
     { id: "unsupported", ...base, partnerAnswerComplete: true, supportedTwoFounderTeam: false },
   ] }));
   assert.deepEqual(tasks.map((task) => [task.id, task.type, task.kind, task.started]), [
+    ["founder-in-the-wild-reveal:reveal-ready", "founder_in_the_wild_reveal", "NEEDS_YOU", undefined],
     ["founder-in-the-wild:recipient", "founder_in_the_wild_handoff", "NEEDS_YOU", false],
     ["founder-in-the-wild:recipient-started", "founder_in_the_wild_handoff", "NEEDS_YOU", true],
   ]);
-  assert.match(tasks[0]!.href, /founder-in-the-wild\/recipient$/);
+  assert.match(tasks[0]!.href, /founder-in-the-wild\/reveal-ready\/reveal$/);
+  assert.match(tasks[1]!.href, /founder-in-the-wild\/recipient$/);
 });
 
 test("only actionable incoming invitations become tasks", () => {
@@ -324,15 +329,25 @@ test("Commitment Lab tasks are limited to the current founder's pairwise relatio
       relationship({ id: "relationship-bc", userAId: "founder-b", userBId: "founder-c" }),
     ],
     commitmentLabs: [
-      { relationshipId: "relationship-ab", updatedAt: NOW },
-      { relationshipId: "relationship-ac", updatedAt: NOW },
-      { relationshipId: "relationship-bc", updatedAt: NOW },
+      { relationshipId: "relationship-ab", updatedAt: NOW, completed: false },
+      { relationshipId: "relationship-ac", updatedAt: NOW, completed: false },
+      { relationshipId: "relationship-bc", updatedAt: NOW, completed: false },
     ],
   }));
   assert.deepEqual(tasks.map((task) => task.id).sort(), [
     "commitment-lab:relationship-ab",
     "commitment-lab:relationship-ac",
   ]);
+});
+
+test("completed Commitment Labs remain outside current work", () => {
+  const tasks = buildFounderDashboardTasks(signals({
+    relationships: [relationship()],
+    commitmentLabs: [
+      { relationshipId: "relationship-ab", updatedAt: NOW, completed: true },
+    ],
+  }));
+  assert.equal(tasks.some((task) => task.type === "commitment_lab_continue"), false);
 });
 
 test("generic Founder Setup continuation is factual and suppressed by a concrete task", () => {
@@ -372,6 +387,7 @@ test("dashboard task loader remains narrow, read-only, and content-free", () => 
   assert.doesNotMatch(dataSource, /workbook|assessment_answers|working_note|shared_reflection|scenario_answers/);
   assert.doesNotMatch(dataSource, /\.insert\(|\.update\(|\.upsert\(|\.delete\(|\.rpc\([^)]*(save|confirm|finalize)/);
   assert.match(dataSource, /commitment_labs[\s\S]*relationship_id, updated_at/);
+  assert.match(dataSource, /is_commitment_lab_complete/);
   assert.match(dataSource, /founder_team_setup_items[\s\S]*pending_revision_id/);
   assert.match(dataSource, /collaboration_experience_rounds[\s\S]*\.eq\("experience_key", "read_my_mind"\)/);
 });

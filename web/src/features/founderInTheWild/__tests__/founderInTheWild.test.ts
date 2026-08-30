@@ -94,3 +94,29 @@ test("new and existing rounds resolve to the real App Router round segment", () 
   assert.match(diagnostics, /operation[\s\S]*code/);
   assert.doesNotMatch(diagnostics, /userId|teamId|roundId|email|choice|token/);
 });
+
+test("homebase distinguishes answer handoff, reveal-ready, and own reveal completion", () => {
+  const homebase = readFileSync(
+    "src/features/founderInTheWild/FounderInTheWildHomebaseCard.tsx",
+    "utf8"
+  );
+  const taskData = readFileSync(
+    "src/features/dashboard/founderDashboardTaskData.ts",
+    "utf8"
+  );
+  const taskModel = readFileSync(
+    "src/features/dashboard/founderDashboardTasks.ts",
+    "utf8"
+  );
+  const de = JSON.parse(readFileSync("messages/de/founderInTheWild.json", "utf8"));
+  const en = JSON.parse(readFileSync("messages/en/founderInTheWild.json", "utf8"));
+
+  assert.match(taskData, /get_founder_in_the_wild_round_state/u);
+  assert.match(taskData, /own_reveal_count/u);
+  assert.match(taskModel, /founder_in_the_wild_reveal/u);
+  assert.match(taskModel, /!round\.ownRevealComplete/u);
+  assert.match(homebase, /t\("revealReady"\)/u);
+  assert.match(homebase, /t\("completed"\)/u);
+  assert.equal(de.homebase.revealReady, "Reveal bereit");
+  assert.equal(en.homebase.revealReady, "Reveal ready");
+});

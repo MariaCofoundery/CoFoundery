@@ -94,6 +94,8 @@
     "description": "Klärt, was ihr realistisch einbringen könnt, was eure Zusage für euch bedeutet und was passieren soll, wenn sich Zeit, Motivation oder Lebensumstände verändern.",
     "start": "Commitment Lab starten",
     "continue": "Commitment Lab fortsetzen",
+    "completed": "Abgeschlossen",
+    "view": "Ansehen",
     "back": "Zurück zur Zusammenarbeit",
     "pair": "Für {names}",
     "intro": "Was bedeutet eure Zusage in der Realität? Das Commitment Lab unterstützt eure Reflexion und euer Gespräch. Es bewertet weder euch noch eure Zusammenarbeit.",

@@ -20,6 +20,7 @@ export type DashboardTaskType =
   | "read_my_mind_continue"
   | "read_my_mind_reveal"
   | "founder_in_the_wild_handoff"
+  | "founder_in_the_wild_reveal"
   | "commitment_lab_continue"
   | "founder_setup_continue";
 
@@ -102,6 +103,7 @@ export type FounderDashboardTaskSignals = {
   commitmentLabs: Array<{
     relationshipId: string;
     updatedAt: string;
+    completed: boolean;
   }>;
   readMyMindRounds: Array<{
     id: string;
@@ -123,10 +125,12 @@ export type FounderDashboardTaskSignals = {
     teamId: string;
     teamLabel: string | null;
     partnerLabel: string | null;
+    status: string;
     ownStarted: boolean;
     ownAnswerComplete: boolean;
     partnerAnswerComplete: boolean;
     wholeAnswerComplete: boolean;
+    ownRevealComplete: boolean;
     supportedTwoFounderTeam: boolean;
     createdAt: string;
   }>;
@@ -146,6 +150,7 @@ const NEEDS_YOU_PRIORITY: Partial<Record<DashboardTaskType, number>> = {
   setup_confirmation: 4,
   read_my_mind_invitation: 2,
   founder_in_the_wild_handoff: 2,
+  founder_in_the_wild_reveal: 2,
 };
 
 function isClaimableInvitation(
@@ -238,11 +243,25 @@ export function buildFounderDashboardTasks(
   }
 
   for (const round of signals.founderInTheWildRounds ?? []) {
+    if (round.status !== "active" || !round.supportedTwoFounderTeam) continue;
+    if (round.wholeAnswerComplete) {
+      if (!round.ownRevealComplete) {
+        tasks.push({
+          id: `founder-in-the-wild-reveal:${round.id}`,
+          kind: "NEEDS_YOU",
+          type: "founder_in_the_wild_reveal",
+          href: `/teams/${encodeURIComponent(round.teamId)}/collaboration-lab/founder-in-the-wild/${encodeURIComponent(round.id)}/reveal`,
+          createdAt: round.createdAt,
+          contextLabel: round.teamLabel,
+          personLabel: round.partnerLabel,
+          itemKey: null,
+        });
+      }
+      continue;
+    }
     if (
-      !round.supportedTwoFounderTeam ||
       round.ownAnswerComplete ||
-      !round.partnerAnswerComplete ||
-      round.wholeAnswerComplete
+      !round.partnerAnswerComplete
     ) continue;
     tasks.push({
       id: `founder-in-the-wild:${round.id}`,
@@ -377,6 +396,7 @@ export function buildFounderDashboardTasks(
   }
 
   for (const lab of signals.commitmentLabs) {
+    if (lab.completed) continue;
     const relationship = relationshipById.get(lab.relationshipId);
     if (!relationship?.teamId) continue;
     tasks.push({

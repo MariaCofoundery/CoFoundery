@@ -123,6 +123,11 @@
         "action": "Runde beantworten",
         "continueAction": "Runde fortsetzen"
       },
+      "founderInTheWildReveal": {
+        "title": "Founder in the Wild",
+        "text": "Ihr habt beide geantwortet. Jetzt könnt ihr eure Antworten vergleichen.",
+        "action": "Reveal ansehen"
+      },
       "commitmentLab": {
         "title": "Commitment Lab fortsetzen",
         "titleWithName": "Commitment Lab mit {name} fortsetzen",
