@@ -355,6 +355,7 @@ test("dashboard task loader remains narrow, read-only, and content-free", () => 
   assert.doesNotMatch(dataSource, /\.insert\(|\.update\(|\.upsert\(|\.delete\(|\.rpc\([^)]*(save|confirm|finalize)/);
   assert.match(dataSource, /commitment_labs[\s\S]*relationship_id, updated_at/);
   assert.match(dataSource, /founder_team_setup_items[\s\S]*pending_revision_id/);
+  assert.match(dataSource, /collaboration_experience_rounds[\s\S]*\.eq\("experience_key", "read_my_mind"\)/);
 });
 
 test("task UI and DE/EN messages preserve the three-item limit and empty state", () => {

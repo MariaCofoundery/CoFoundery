@@ -44,6 +44,7 @@ export async function getReadMyMindRound(
     .select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at, handoff_email_claimed_at, completed_at, abandoned_at")
     .eq("id", roundId)
     .eq("founder_team_id", team.id)
+    .eq("experience_key", "read_my_mind")
     .maybeSingle();
   if (roundResult.error || !roundResult.data) return null;
 
@@ -102,6 +103,7 @@ export async function getReadMyMindHomebaseState(
       .from("collaboration_experience_rounds")
       .select("id")
       .eq("founder_team_id", team.id)
+      .eq("experience_key", "read_my_mind")
       .eq("status", "completed")
       .order("completed_at", { ascending: false })
       .limit(1)
@@ -131,6 +133,7 @@ export async function getReadMyMindHomebaseState(
     .from("collaboration_experience_rounds")
     .select("id")
     .eq("founder_team_id", team.id)
+    .eq("experience_key", "read_my_mind")
     .eq("status", "completed")
     .order("completed_at", { ascending: false })
     .limit(1)
@@ -147,7 +150,7 @@ export async function findOpenReadMyMindRoundId(
   client?: SupabaseClient
 ) {
   const supabase = client ?? (await createClient());
-  const result = await supabase.from("collaboration_experience_rounds").select("id").eq("founder_team_id", team.id).in("status", ["forming", "active"]).limit(1).maybeSingle();
+  const result = await supabase.from("collaboration_experience_rounds").select("id").eq("founder_team_id", team.id).eq("experience_key", "read_my_mind").in("status", ["forming", "active"]).limit(1).maybeSingle();
   return result.error ? null : ((result.data?.id as string | undefined) ?? null);
 }
 
@@ -161,6 +164,7 @@ export async function getOpenReadMyMindRounds(
     .from("collaboration_experience_rounds")
     .select("id")
     .eq("founder_team_id", team.id)
+    .eq("experience_key", "read_my_mind")
     .in("status", ["forming", "active"])
     .order("created_at", { ascending: true });
   if (result.error) return [];

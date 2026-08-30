@@ -78,7 +78,7 @@ export async function getFounderDashboardTasks(params: {
         }))
       ),
       teamIds.length > 0
-        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at").in("founder_team_id", teamIds).in("status", ["forming", "active"])
+        ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, pack_key, pack_version, created_by_user_id, status, created_at, handoff_ready_at").in("founder_team_id", teamIds).eq("experience_key", "read_my_mind").in("status", ["forming", "active"])
         : Promise.resolve({ data: [], error: null }),
     ]);
 

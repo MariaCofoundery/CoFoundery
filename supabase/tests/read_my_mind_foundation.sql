@@ -85,9 +85,9 @@ insert into public.founder_team_members(team_id,user_id,created_at) values
   ('da333333-3333-4333-8333-333333333333','d6666666-6666-4666-8666-666666666666','2026-01-02');
 
 select pg_temp.assert_rmm(
-  (select count(*) = 3 from public.collaboration_experience_pack_versions)
-  and (select count(*) = 15 from public.collaboration_experience_prompt_versions)
-  and (select count(*) = 30 + 9 from public.collaboration_experience_prompt_response_contracts),
+  (select count(*) = 3 from public.collaboration_experience_pack_versions where experience_key = 'read_my_mind')
+  and (select count(*) = 15 from public.collaboration_experience_prompt_versions where experience_key = 'read_my_mind')
+  and (select count(*) = 30 + 9 from public.collaboration_experience_prompt_response_contracts where experience_key = 'read_my_mind'),
   'published structural content contract is incomplete'
 );
 

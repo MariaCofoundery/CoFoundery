@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHomebaseCard";
+import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/FounderInTheWildHomebaseCard";
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
@@ -242,6 +243,15 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               avatarId: member.avatarId,
               avatarUrl: member.avatarUrl,
             })),
+          }}
+        />
+
+        <FounderInTheWildHomebaseCard
+          currentUserId={user.id}
+          team={{
+            id: team.id,
+            name: team.name,
+            members: team.members.map((member) => ({ userId: member.userId, displayName: member.displayName, avatarId: member.avatarId, avatarUrl: member.avatarUrl })),
           }}
         />
 
