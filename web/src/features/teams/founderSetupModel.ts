@@ -21,7 +21,7 @@ export type FounderSetupRevision = {
   resolutionStatus: FounderSetupResolutionStatus;
   note: string;
   documentationReference: string | null;
-  proposedByUserId: string;
+  proposedByUserId: string | null;
   createdAt: string;
   confirmedAt: string | null;
   confirmations: { userId: string; confirmedAt: string }[];
@@ -63,7 +63,7 @@ export type FounderSetupRevisionRow = {
   resolution_status: string;
   note: string;
   documentation_reference: string | null;
-  proposed_by_user_id: string;
+  proposed_by_user_id: string | null;
   created_at: string;
   confirmed_at: string | null;
 };

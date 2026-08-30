@@ -43,10 +43,40 @@ function isZero(value: number | null | undefined) {
   return value === 0;
 }
 
+async function deleteOwnedAvatarObjects(
+  privileged: NonNullable<ReturnType<typeof createPrivilegedClient>>,
+  userId: string
+) {
+  const { data, error } = await privileged.storage.from("avatars").list(userId, {
+    limit: 1000,
+  });
+  if (error) {
+    return false;
+  }
+
+  const objectPaths = (data ?? [])
+    .filter((object) => object.name && object.id)
+    .map((object) => `${userId}/${object.name}`);
+  if (objectPaths.length === 0) {
+    return true;
+  }
+
+  const removal = await privileged.storage.from("avatars").remove(objectPaths);
+  return !removal.error;
+}
+
 export async function deleteFounderAccount(userId: string): Promise<DeleteFounderAccountResult> {
   const privileged = createPrivilegedClient();
   if (!privileged) {
     return { ok: false, error: "missing_service_role" };
+  }
+
+  // Storage is outside the database transaction. Remove only the authenticated
+  // founder's own avatar prefix before the atomic DB/auth cleanup and stop safely
+  // if Storage cannot confirm the deletion.
+  if (!(await deleteOwnedAvatarObjects(privileged, userId))) {
+    console.error("deleteFounderAccount avatar cleanup failed");
+    return { ok: false, error: "cleanup_failed" };
   }
 
   const { data, error } = await privileged.rpc("delete_founder_account_data", {
@@ -56,8 +86,7 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
 
   if (error) {
     console.error("deleteFounderAccount rpc failed", {
-      userId,
-      error: error.message,
+      code: error.code,
     });
     return { ok: false, error: "cleanup_failed" };
   }
@@ -77,10 +106,7 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
     || !isZero(summary.remainingProductFeedback)
     || !isZero(summary.remainingMatchingInputs)
   ) {
-    console.error("deleteFounderAccount verification failed", {
-      userId,
-      summary,
-    });
+    console.error("deleteFounderAccount verification failed");
     return { ok: false, error: "cleanup_failed" };
   }
 
