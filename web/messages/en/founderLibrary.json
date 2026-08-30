@@ -5,6 +5,11 @@
   "professionalNote": "For legal or tax questions, the Library is not a substitute for individual professional advice.",
   "back": "Back to team overview",
   "founderFallback": "Founder {index}",
+  "views": {
+    "label": "Founder Library view",
+    "glossary": "Glossary",
+    "updates": "Updates & Sources"
+  },
   "search": {
     "label": "Search the glossary",
     "placeholder": "Search terms …",
@@ -22,6 +27,61 @@
     "equity_financing": "Equity & financing",
     "contracts_governance": "Contracts & governance",
     "company_building": "Building the company"
+  },
+  "updates": {
+    "eyebrow": "Updates & Sources",
+    "title": "What founders should know",
+    "intro": "A curated selection of legal and regulatory developments that may be relevant to startups, briefly contextualized and linked directly to the official source.",
+    "listLabel": "Curated updates",
+    "officialSourceLink": "Open official source",
+    "externalLink": "external link",
+    "sourcesTitle": "Official sources",
+    "disclaimer": "CoFoundery presents a selection of relevant developments and does not claim to be complete. These notes are not a substitute for individual legal review.",
+    "statusDatePrefixes": {
+      "consultation": "Status as of",
+      "promulgated": "Promulgated on",
+      "in_force": "In force since"
+    },
+    "jurisdictions": {
+      "germany": "Germany"
+    },
+    "categories": {
+      "ai_data": "AI & data",
+      "data": "Data",
+      "consumer_sales": "Consumers & sales"
+    },
+    "entries": {
+      "ki_mig_2026": {
+        "title": "New German rules implementing the EU AI Act",
+        "relevance": "This may be relevant if your startup develops, provides, or uses AI systems. The KI-MIG governs the German implementation of the EU AI Act and designates the responsible market surveillance authorities, among other matters."
+      },
+      "dadg_2026": {
+        "title": "German implementation of the EU Data Act",
+        "relevance": "This may be relevant to startups whose products or services are affected by the EU Data Act rules on access to and use of data. The DADG governs implementation in Germany and designates the competent authority."
+      },
+      "electronic_withdrawal_function_2026": {
+        "title": "Electronic withdrawal function for online contracts",
+        "relevance": "Relevant to businesses that conclude certain distance contracts with consumers through an online interface. Section 356a of the German Civil Code provides for an electronic withdrawal function in this context."
+      }
+    },
+    "sources": {
+      "federal_law_gazette": {
+        "name": "Federal Law Gazette",
+        "description": "Official promulgation of German federal laws and regulations."
+      },
+      "laws_on_the_internet": {
+        "name": "Laws on the Internet",
+        "description": "Consolidated federal laws and an update service. The consolidated texts available there are not the official version."
+      },
+      "dip": {
+        "name": "DIP – German Bundestag",
+        "description": "Legislative procedures, parliamentary matters, and official parliamentary documents."
+      },
+      "eur_lex": {
+        "name": "EUR-Lex",
+        "description": "EU legal acts, legislation, and publications of the European Union."
+      }
+    }
   },
   "terms": {
     "bootstrapping": {

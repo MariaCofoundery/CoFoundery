@@ -5,6 +5,11 @@
   "professionalNote": "Bei rechtlichen oder steuerlichen Fragen ersetzt die Library keine individuelle fachliche Beratung.",
   "back": "Zurück zur Teamübersicht",
   "founderFallback": "Founder {index}",
+  "views": {
+    "label": "Founder-Library-Ansicht",
+    "glossary": "Begriffe",
+    "updates": "Updates & Quellen"
+  },
   "search": {
     "label": "Glossar durchsuchen",
     "placeholder": "Begriff suchen …",
@@ -22,6 +27,61 @@
     "equity_financing": "Beteiligung & Finanzierung",
     "contracts_governance": "Verträge & Governance",
     "company_building": "Unternehmensaufbau"
+  },
+  "updates": {
+    "eyebrow": "Updates & Quellen",
+    "title": "Wichtig für Founder",
+    "intro": "Ausgewählte gesetzliche und regulatorische Entwicklungen, die für Startups relevant sein können. Kurz eingeordnet und direkt mit der offiziellen Quelle verlinkt.",
+    "listLabel": "Kuratierte Updates",
+    "officialSourceLink": "Offizielle Quelle öffnen",
+    "externalLink": "externer Link",
+    "sourcesTitle": "Offizielle Quellen",
+    "disclaimer": "CoFoundery zeigt eine Auswahl relevanter Entwicklungen und erhebt keinen Anspruch auf Vollständigkeit. Die Hinweise ersetzen keine individuelle rechtliche Prüfung.",
+    "statusDatePrefixes": {
+      "consultation": "Stand:",
+      "promulgated": "Verkündet am",
+      "in_force": "In Kraft seit"
+    },
+    "jurisdictions": {
+      "germany": "Deutschland"
+    },
+    "categories": {
+      "ai_data": "AI & Daten",
+      "data": "Daten",
+      "consumer_sales": "Verbraucher & Vertrieb"
+    },
+    "entries": {
+      "ki_mig_2026": {
+        "title": "Neue deutsche Regeln zur Umsetzung des EU AI Act",
+        "relevance": "Kann relevant sein, wenn euer Startup KI-Systeme entwickelt, anbietet oder einsetzt. Das KI-MIG regelt die deutsche Durchführung des EU AI Act und bestimmt unter anderem zuständige Marktüberwachungsbehörden."
+      },
+      "dadg_2026": {
+        "title": "Deutsche Durchführung des EU Data Act",
+        "relevance": "Kann für Startups relevant sein, deren Produkte oder Dienste von den Regeln der EU-Datenverordnung zu Datenzugang und Datennutzung betroffen sind. Das DADG regelt die deutsche Durchführung und benennt die zuständige Behörde."
+      },
+      "electronic_withdrawal_function_2026": {
+        "title": "Elektronische Widerrufsfunktion bei Online-Verträgen",
+        "relevance": "Relevant für Unternehmen, die bestimmte Fernabsatzverträge mit Verbrauchern über eine Online-Benutzeroberfläche schließen. § 356a BGB regelt hierfür eine elektronische Widerrufsfunktion."
+      }
+    },
+    "sources": {
+      "federal_law_gazette": {
+        "name": "Bundesgesetzblatt",
+        "description": "Amtliche Verkündungen von Gesetzen und Verordnungen des Bundes."
+      },
+      "laws_on_the_internet": {
+        "name": "Gesetze im Internet",
+        "description": "Konsolidierte Bundesgesetze und Aktualitätendienst. Die abrufbaren konsolidierten Texte sind nicht die amtliche Fassung."
+      },
+      "dip": {
+        "name": "DIP – Deutscher Bundestag",
+        "description": "Gesetzgebungsverfahren, Vorgänge und parlamentarische Drucksachen."
+      },
+      "eur_lex": {
+        "name": "EUR-Lex",
+        "description": "EU-Rechtsakte, Gesetzgebung und Veröffentlichungen der Europäischen Union."
+      }
+    }
   },
   "terms": {
     "bootstrapping": {
