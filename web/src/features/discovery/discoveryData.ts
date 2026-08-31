@@ -2,6 +2,10 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import {
+  getPrioritizedDiscoveryAlignmentDimensions,
+  normalizeDiscoveryAlignmentPreferences,
+} from "@/features/discovery/discoveryV2Alignment";
+import {
   normalizeDiscoveryPreferencesInput,
   normalizeDiscoveryProfileInput,
   normalizeMustHaves,
@@ -9,11 +13,11 @@ import {
   getDiscoveryProfilePublishIssues,
 } from "@/features/discovery/discoveryValidation";
 import {
-  attachDiscoveryV2AlignmentSimilarities,
+  attachDiscoveryV2AlignmentSignals,
   buildDiscoveryV2Candidate,
 } from "@/features/discovery/discoveryV2Search";
 import {
-  getDiscoveryV2AlignmentSimilaritiesForCandidates,
+  getDiscoveryV2AlignmentSignalsForCandidates,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
@@ -26,6 +30,8 @@ import type {
   DiscoveryProfilePreview,
   DiscoverySearchPage,
   DiscoveryRemoteMode,
+  DiscoverySearchIntent,
+  DiscoveryStartHorizon,
   DiscoveryStatus,
   DiscoveryVentureGoal,
   DiscoveryVentureStage,
@@ -47,6 +53,8 @@ type DiscoveryV2SearchRow = {
   commitment_level: DiscoveryCommitmentLevel;
   venture_stage: DiscoveryVentureStage;
   venture_goal: DiscoveryVentureGoal;
+  search_intent: DiscoverySearchIntent | null;
+  start_horizon: DiscoveryStartHorizon | null;
   published_at: string | null;
   total_count: number | string;
 };
@@ -104,6 +112,8 @@ type FounderDiscoveryProfileRow = {
   commitment_level: string;
   venture_stage: string;
   venture_goal: string;
+  search_intent: DiscoverySearchIntent | null;
+  start_horizon: DiscoveryStartHorizon | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -118,6 +128,7 @@ type FounderSearchPreferencesRow = {
   assessment_signals_consented_at: string | null;
   discovery_v2_alignment_enabled: boolean;
   discovery_v2_alignment_dimensions: string[];
+  discovery_v2_alignment_preferences: unknown;
   discovery_v2_alignment_consented_at: string | null;
   created_at: string;
   updated_at: string;
@@ -141,6 +152,8 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "commitment_level",
   "venture_stage",
   "venture_goal",
+  "search_intent",
+  "start_horizon",
   "published_at",
   "created_at",
   "updated_at",
@@ -155,6 +168,7 @@ const DISCOVERY_PREFERENCES_COLUMNS = [
   "assessment_signals_consented_at",
   "discovery_v2_alignment_enabled",
   "discovery_v2_alignment_dimensions",
+  "discovery_v2_alignment_preferences",
   "discovery_v2_alignment_consented_at",
   "created_at",
   "updated_at",
@@ -210,6 +224,8 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
     ventureStage: row.venture_stage as DiscoveryVentureStage,
     ventureGoal: row.venture_goal as DiscoveryVentureGoal,
+    searchIntent: row.search_intent,
+    startHorizon: row.start_horizon,
     publishedAt: row.published_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -228,6 +244,9 @@ function mapPreferencesRow(row: FounderSearchPreferencesRow): FounderSearchPrefe
     discoveryV2AlignmentDimensions: normalizeDiscoveryPreferencesInput({
       discoveryV2AlignmentDimensions: row.discovery_v2_alignment_dimensions,
     }).discoveryV2AlignmentDimensions,
+    discoveryV2AlignmentPreferences: normalizeDiscoveryAlignmentPreferences(
+      row.discovery_v2_alignment_preferences
+    ),
     discoveryV2AlignmentConsentedAt: row.discovery_v2_alignment_consented_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -251,6 +270,8 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     commitmentLevel: profile.commitmentLevel,
     ventureStage: profile.ventureStage,
     ventureGoal: profile.ventureGoal,
+    searchIntent: profile.searchIntent,
+    startHorizon: profile.startHorizon,
     publishedAt: profile.publishedAt,
   };
 }
@@ -310,6 +331,8 @@ export async function upsertOwnDiscoveryProfile(
         commitment_level: normalized.commitmentLevel,
         venture_stage: normalized.ventureStage,
         venture_goal: normalized.ventureGoal,
+        search_intent: normalized.searchIntent,
+        start_horizon: normalized.startHorizon,
         published_at: nextPublishedAt,
       },
       { onConflict: "user_id" }
@@ -377,10 +400,17 @@ export async function upsertOwnSearchPreferences(
   });
   const hasDiscoveryV2AlignmentInput =
     input.discoveryV2AlignmentEnabled !== undefined ||
-    input.discoveryV2AlignmentDimensions !== undefined;
-  const requestedAlignmentDimensions = hasDiscoveryV2AlignmentInput
-    ? normalized.discoveryV2AlignmentDimensions
-    : existing?.discoveryV2AlignmentDimensions ?? [];
+    input.discoveryV2AlignmentDimensions !== undefined ||
+    input.discoveryV2AlignmentPreferences !== undefined;
+  const requestedAlignmentPreferences = hasDiscoveryV2AlignmentInput
+    ? normalized.discoveryV2AlignmentPreferences
+    : existing?.discoveryV2AlignmentPreferences ?? {};
+  const requestedAlignmentDimensions =
+    Object.keys(requestedAlignmentPreferences).length > 0
+      ? getPrioritizedDiscoveryAlignmentDimensions(requestedAlignmentPreferences)
+      : hasDiscoveryV2AlignmentInput
+        ? normalized.discoveryV2AlignmentDimensions
+        : existing?.discoveryV2AlignmentDimensions ?? [];
   const alignmentEnabled = hasDiscoveryV2AlignmentInput
     ? normalized.discoveryV2AlignmentEnabled && requestedAlignmentDimensions.length > 0
     : existing?.discoveryV2AlignmentEnabled === true;
@@ -399,6 +429,9 @@ export async function upsertOwnSearchPreferences(
         discovery_v2_alignment_dimensions: alignmentEnabled
           ? requestedAlignmentDimensions
           : [],
+        discovery_v2_alignment_preferences: alignmentEnabled
+          ? requestedAlignmentPreferences
+          : {},
         discovery_v2_alignment_consented_at: alignmentConsentedAt,
       },
       { onConflict: "user_id" }
@@ -421,8 +454,9 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
     desiredLocationRegion: unknown;
     acceptedRemoteModes: unknown;
     minimumAvailabilityHoursPerWeek: unknown;
-    discoveryV2AlignmentEnabled: unknown;
-    discoveryV2AlignmentDimensions: unknown;
+    discoveryV2AlignmentEnabled?: unknown;
+    discoveryV2AlignmentDimensions?: unknown;
+    discoveryV2AlignmentPreferences?: unknown;
   },
   client?: SupabaseLikeClient
 ) {
@@ -451,8 +485,15 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
           practicalMustHaves.minimumAvailabilityHoursPerWeek,
       },
       includeAssessmentSignals: existing?.includeAssessmentSignals ?? false,
-      discoveryV2AlignmentEnabled: input.discoveryV2AlignmentEnabled,
-      discoveryV2AlignmentDimensions: input.discoveryV2AlignmentDimensions,
+      ...(input.discoveryV2AlignmentEnabled !== undefined ||
+      input.discoveryV2AlignmentDimensions !== undefined ||
+      input.discoveryV2AlignmentPreferences !== undefined
+        ? {
+            discoveryV2AlignmentEnabled: input.discoveryV2AlignmentEnabled,
+            discoveryV2AlignmentDimensions: input.discoveryV2AlignmentDimensions,
+            discoveryV2AlignmentPreferences: input.discoveryV2AlignmentPreferences,
+          }
+        : {}),
     },
     supabase
   );
@@ -475,6 +516,32 @@ export async function getActiveDiscoveryProfileById(
   }
 
   return data ? mapProfileRow(data) : null;
+}
+
+export async function getDiscoveryV2AlignmentContextForCandidate(
+  ownerUserId: string,
+  candidateUserId: string,
+  client?: SupabaseLikeClient
+) {
+  const normalizedOwnerUserId = assertUserId(ownerUserId);
+  const normalizedCandidateUserId = assertUserId(candidateUserId);
+  const preferences = await getOwnSearchPreferences(normalizedOwnerUserId, client);
+  if (
+    !preferences?.discoveryV2AlignmentEnabled ||
+    preferences.discoveryV2AlignmentDimensions.length === 0
+  ) {
+    return { preferences: preferences?.discoveryV2AlignmentPreferences ?? {}, signals: [] };
+  }
+
+  const signals = await getDiscoveryV2AlignmentSignalsForCandidates({
+    ownerUserId: normalizedOwnerUserId,
+    candidateUserIds: [normalizedCandidateUserId],
+    prioritizedDimensions: preferences.discoveryV2AlignmentDimensions,
+  });
+  return {
+    preferences: preferences.discoveryV2AlignmentPreferences,
+    signals: signals.get(normalizedCandidateUserId) ?? [],
+  };
 }
 
 export async function getDiscoveryCandidatesForCurrentUser(
@@ -532,22 +599,24 @@ export async function getDiscoveryCandidatesForCurrentUser(
     commitmentLevel: row.commitment_level,
     ventureStage: row.venture_stage,
     ventureGoal: row.venture_goal,
+    searchIntent: row.search_intent,
+    startHorizon: row.start_horizon,
     publishedAt: row.published_at,
     createdAt: row.published_at ?? "",
     updatedAt: row.published_at ?? "",
   }));
-  const similarities =
+  const alignmentSignals =
     preferences?.discoveryV2AlignmentEnabled &&
     preferences.discoveryV2AlignmentDimensions.length > 0
-      ? await getDiscoveryV2AlignmentSimilaritiesForCandidates({
+      ? await getDiscoveryV2AlignmentSignalsForCandidates({
           ownerUserId: normalizedUserId,
           candidateUserIds: candidateProfiles.map((profile) => profile.userId),
           prioritizedDimensions: preferences.discoveryV2AlignmentDimensions,
         })
       : new Map();
-  const candidates = attachDiscoveryV2AlignmentSimilarities(
+  const candidates = attachDiscoveryV2AlignmentSignals(
     candidateProfiles.map((profile) => buildDiscoveryV2Candidate(profile, mustHaves)),
-    similarities,
+    alignmentSignals,
     new Map(candidateProfiles.map((profile) => [profile.id, profile.userId]))
   );
 
@@ -606,6 +675,8 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         commitmentLevel: row.commitment_level,
         ventureStage: row.venture_stage,
         ventureGoal: row.venture_goal,
+        searchIntent: row.search_intent,
+        startHorizon: row.start_horizon,
         publishedAt: row.published_at,
         createdAt: row.published_at ?? "",
         updatedAt: row.published_at ?? "",

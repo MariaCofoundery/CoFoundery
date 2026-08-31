@@ -67,6 +67,7 @@ function createPreferences(
     assessmentSignalsConsentedAt: null,
     discoveryV2AlignmentEnabled: false,
     discoveryV2AlignmentDimensions: [],
+    discoveryV2AlignmentPreferences: {},
     discoveryV2AlignmentConsentedAt: null,
     createdAt: "2026-06-18T09:00:00.000Z",
     updatedAt: "2026-06-18T10:00:00.000Z",

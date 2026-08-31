@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  DISCOVERY_ALIGNMENT_DIMENSIONS,
   DISCOVERY_PRIORITY_KEYS,
   type DiscoveryPreferencesInput,
   type DiscoveryProfileInput,
 } from "@/features/discovery/discoveryTypes";
 import {
   getOwnDiscoveryProfile,
+  getOwnSearchPreferences,
   upsertOwnDiscoveryProfile,
   upsertOwnSearchPreferences,
   upsertOwnDiscoveryV2SearchPreferences,
@@ -128,7 +130,23 @@ function parseDiscoveryProfileFormData(formData: FormData): DiscoveryProfileInpu
     commitmentLevel: getFirstString(formData, ["commitmentLevel", "commitment_level"]),
     ventureStage: getFirstString(formData, ["ventureStage", "venture_stage"]),
     ventureGoal: getFirstString(formData, ["ventureGoal", "venture_goal"]),
+    searchIntent: getFirstString(formData, ["searchIntent", "search_intent"]),
+    startHorizon: getFirstString(formData, ["startHorizon", "start_horizon"]),
   };
+}
+
+function parseDiscoveryV2AlignmentPreferences(formData: FormData) {
+  return Object.fromEntries(
+    DISCOVERY_ALIGNMENT_DIMENSIONS.map((dimension) => [
+      dimension,
+      {
+        importance: getFirstString(formData, [`alignmentImportance.${dimension}`]),
+        relationPreference: getFirstString(formData, [
+          `alignmentRelationPreference.${dimension}`,
+        ]),
+      },
+    ])
+  );
 }
 
 function parsePriorityWeightsFormData(formData: FormData) {
@@ -264,12 +282,30 @@ export async function saveDiscoveryV2SearchPreferencesAction(
       minimumAvailabilityHoursPerWeek: getFirstString(formData, [
         "minimumAvailabilityHoursPerWeek",
       ]),
+    });
+    revalidateDiscoveryPaths();
+    return { ok: true, reason: "preferences_saved" };
+  } catch {
+    return { ok: false, reason: "preferences_save_failed" };
+  }
+}
+
+export async function saveDiscoveryV2AlignmentPreferencesAction(
+  formData: FormData
+): Promise<DiscoveryPreferencesResult> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) return { ok: false, reason: "not_authenticated" };
+
+  try {
+    const existing = await getOwnSearchPreferences(userId);
+    await upsertOwnSearchPreferences(userId, {
+      priorityWeights: existing?.priorityWeights ?? {},
+      mustHaves: existing?.mustHaves,
+      includeAssessmentSignals: existing?.includeAssessmentSignals ?? false,
       discoveryV2AlignmentEnabled: getFirstString(formData, [
         "discoveryV2AlignmentEnabled",
       ]),
-      discoveryV2AlignmentDimensions: getStringList(formData, [
-        "discoveryV2AlignmentDimensions",
-      ]),
+      discoveryV2AlignmentPreferences: parseDiscoveryV2AlignmentPreferences(formData),
     });
     revalidateDiscoveryPaths();
     return { ok: true, reason: "preferences_saved" };

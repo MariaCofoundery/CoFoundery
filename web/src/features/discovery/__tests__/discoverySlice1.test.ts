@@ -47,13 +47,15 @@ test("card values stay compact without changing their meaning", () => {
   });
 });
 
-test("Search cards expose sought roles and existing founding context without readiness claims", () => {
+test("Search cards expose sought roles, founding context, and only explicit Slice 2 intent", () => {
   const page = readFileSync("src/app/(product)/discovery/page.tsx", "utf8");
   assert.match(page, /profile\.seekingRoles/);
   assert.match(page, /commitmentLevels/);
   assert.match(page, /ventureStages/);
   assert.match(page, /ventureGoals/);
-  assert.doesNotMatch(page, /ready_now|actively_exploring|open_later|startHorizon/);
+  assert.match(page, /profile\.searchIntent \?/);
+  assert.match(page, /profile\.startHorizon \?/);
+  assert.doesNotMatch(page, /high_intent|seriousFounder|readinessScore/);
   assert.match(page, /candidate\.practicalMatches/);
   assert.match(page, /showMatchReasons=\{mode === "search"\}/);
 });

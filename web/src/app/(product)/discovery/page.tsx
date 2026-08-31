@@ -17,9 +17,7 @@ import {
   compactDiscoveryValues,
   getDiscoverySearchBriefCriteria,
 } from "@/features/discovery/discoveryPresentation";
-import { getOwnDiscoveryAssessmentSignalReadiness } from "@/features/discovery/discoveryAssessmentSignals";
 import {
-  DISCOVERY_ALIGNMENT_DIMENSIONS,
   type DiscoveryAlignmentDimension,
   type DiscoveryCandidate,
   type DiscoveryFounderRole,
@@ -165,6 +163,14 @@ function CandidateCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-600">
+        {profile.searchIntent ? (
+          <span className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-900">
+            {t(`searchIntents.${profile.searchIntent}.short`)}
+          </span>
+        ) : null}
+        {profile.startHorizon ? (
+          <span className={CHIP_CLASS}>{t(`startHorizons.${profile.startHorizon}.short`)}</span>
+        ) : null}
         {profile.locationRegion ? <span className={CHIP_CLASS}>{profile.locationRegion}</span> : null}
         <span className={CHIP_CLASS}>{t(`remoteModes.${profile.remoteMode}`)}</span>
         {profile.availabilityHoursPerWeek ? (
@@ -213,10 +219,16 @@ function CandidateCard({
         </section>
       ) : null}
 
-      {showMatchReasons && (candidate.alignmentSimilarDimensions?.length ?? 0) > 0 ? (
-        <section className="mt-3 text-xs leading-5 text-violet-800">
-          <span className="font-semibold">{t("v2.cards.alignmentMatches")}:</span>{" "}
-          {candidate.alignmentSimilarDimensions?.map((dimension) => alignmentLabel(t, dimension)).join(", ")}
+      {showMatchReasons && (candidate.alignmentSignals?.length ?? 0) > 0 ? (
+        <section className="mt-3 border-t border-violet-100 pt-4 text-xs leading-5 text-violet-900">
+          <p className="font-semibold">{t("v2.cards.alignmentSignals")}</p>
+          <ul className="mt-1 space-y-1">
+            {candidate.alignmentSignals?.slice(0, 2).map((entry) => (
+              <li key={entry.dimension}>
+                {alignmentLabel(t, entry.dimension)} · {t(`v2.alignment.signals.${entry.signal}`)}
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
@@ -301,10 +313,9 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     redirect("/advisor/dashboard");
   }
 
-  const [profile, loadedPreferences, alignmentReadiness] = await Promise.all([
+  const [profile, loadedPreferences] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
     getOwnSearchPreferences(user.id),
-    getOwnDiscoveryAssessmentSignalReadiness(user.id),
   ]);
   const preferences: FounderSearchPreferences = loadedPreferences ?? {
     id: "",
@@ -315,6 +326,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     assessmentSignalsConsentedAt: null,
     discoveryV2AlignmentEnabled: false,
     discoveryV2AlignmentDimensions: [],
+    discoveryV2AlignmentPreferences: {},
     discoveryV2AlignmentConsentedAt: null,
     createdAt: "",
     updatedAt: "",
@@ -419,37 +431,6 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
                     ))}
                   </div>
                 </div>
-              </div>
-            </details>
-
-            <details className="rounded-2xl border border-violet-100 bg-violet-50/50 p-4">
-              <summary className="cursor-pointer text-lg font-semibold text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-100">
-                {t("v2.alignment.title")}
-              </summary>
-              <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">{t("v2.alignment.eyebrow")}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.alignment.description")}</p>
-                {alignmentReadiness.hasSubmittedBaseAssessment ? (
-                  <>
-                    <label className="mt-4 flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
-                      <input type="checkbox" name="discoveryV2AlignmentEnabled" value="true" defaultChecked={preferences.discoveryV2AlignmentEnabled} className="mt-1 h-4 w-4 rounded border-slate-300" />
-                      <span className="text-sm font-semibold text-slate-900">{t("v2.alignment.enable")}</span>
-                    </label>
-                    <p className="mt-4 text-sm font-semibold text-slate-900">{t("v2.alignment.choose")}</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">{t("v2.alignment.chooseHelp")}</p>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                      {DISCOVERY_ALIGNMENT_DIMENSIONS.map((dimension) => (
-                        <Checkbox key={dimension} name="discoveryV2AlignmentDimensions" value={dimension} label={alignmentLabel(t, dimension)} checked={preferences.discoveryV2AlignmentDimensions.includes(dimension)} />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <div className="mt-4 rounded-2xl bg-white p-4">
-                    <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
-                    <Link href="/me/base?next=/discovery" className={`${SECONDARY_CTA_CLASS} mt-3`}>{t("common.fillBaseQuestions")}</Link>
-                  </div>
-                )}
-                <p className="mt-4 text-xs leading-5 text-violet-900">{t("v2.alignment.transparency")}</p>
               </div>
             </details>
 

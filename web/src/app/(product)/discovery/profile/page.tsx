@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   DISCOVERY_COMMITMENT_OPTIONS,
   DISCOVERY_REMOTE_MODE_OPTIONS,
@@ -12,17 +12,25 @@ import {
 import {
   pauseDiscoveryProfileAction,
   publishDiscoveryProfileFromFormAction,
+  saveDiscoveryV2AlignmentPreferencesAction,
   saveDiscoveryProfileDraftAction,
 } from "@/features/discovery/discoveryActions";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getOwnDiscoveryProfile,
+  getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
+import {
+  getOwnDiscoveryAssessmentSignalReadiness,
+  getOwnDiscoveryV2AlignmentTendencies,
+} from "@/features/discovery/discoveryAssessmentSignals";
+import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
 import {
   mapDiscoveryProfilePublishIssues,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
+  resolveDiscoveryPreferencesFeedback,
   selectDiscoveryProfileFeedback,
   type DiscoveryProfileDraftResult,
   type DiscoveryProfilePauseResult,
@@ -35,7 +43,12 @@ import type {
   DiscoveryRemoteMode,
   FounderDiscoveryProfile,
 } from "@/features/discovery/discoveryTypes";
+import {
+  DISCOVERY_SEARCH_INTENTS,
+  DISCOVERY_START_HORIZONS,
+} from "@/features/discovery/discoveryTypes";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeLocale } from "@/i18n/config";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -80,6 +93,8 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
     commitmentLevel: "exploring",
     ventureStage: "undecided",
     ventureGoal: "undecided",
+    searchIntent: null,
+    startHorizon: null,
     publishedAt: null,
   };
 }
@@ -331,7 +346,13 @@ export default async function DiscoveryProfilePage({
     redirect("/advisor/dashboard");
   }
 
-  const loadedProfile = await getOwnDiscoveryProfile(user.id);
+  const locale = normalizeLocale(await getLocale());
+  const [loadedProfile, loadedPreferences, alignmentReadiness, ownAlignmentTendencies] = await Promise.all([
+    getOwnDiscoveryProfile(user.id),
+    getOwnSearchPreferences(user.id),
+    getOwnDiscoveryAssessmentSignalReadiness(user.id),
+    getOwnDiscoveryV2AlignmentTendencies({ ownerUserId: user.id, locale }),
+  ]);
   const params = await searchParams;
   const publishFeedback = resolveDiscoveryProfilePublishFeedback({
     result: searchParamValue(params.publishResult),
@@ -346,10 +367,14 @@ export default async function DiscoveryProfilePage({
     result: searchParamValue(params.pauseResult),
     error: searchParamValue(params.pauseError),
   });
+  const preferencesFeedback = resolveDiscoveryPreferencesFeedback({
+    result: searchParamValue(params.preferencesResult),
+    error: searchParamValue(params.preferencesError),
+  });
   const localizedFeedback = selectDiscoveryProfileFeedback({
     publish: publishFeedback,
     draft: draftFeedback,
-    preferences: null,
+    preferences: preferencesFeedback,
     pause: pauseFeedback,
   });
   const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
@@ -382,6 +407,14 @@ export default async function DiscoveryProfilePage({
     "use server";
     const result = await pauseDiscoveryProfileAction();
     redirect(buildDiscoveryProfilePauseRedirect(result));
+  }
+
+  async function saveAlignmentPreferences(formData: FormData) {
+    "use server";
+    const result = await saveDiscoveryV2AlignmentPreferencesAction(formData);
+    redirect(
+      `/discovery/profile?preferences${result.ok ? "Result=preferences_saved" : "Error=preferences_save_failed"}`
+    );
   }
 
   return (
@@ -543,6 +576,45 @@ export default async function DiscoveryProfilePage({
                   </select>
                 </label>
                 </div>
+                <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2">
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.intent.searchIntent")}</span>
+                    <select
+                      name="searchIntent"
+                      defaultValue={profile.searchIntent ?? ""}
+                      className={FIELD_CLASS}
+                    >
+                      <option value="">{t("profile.intent.notProvided")}</option>
+                      {DISCOVERY_SEARCH_INTENTS.map((value) => (
+                        <option key={value} value={value}>
+                          {t(`searchIntents.${value}.long`)}
+                        </option>
+                      ))}
+                    </select>
+                    <span className={HELP_CLASS}>{t("profile.intent.searchIntentHelp")}</span>
+                  </label>
+                  <label>
+                    <span className={LABEL_CLASS}>{t("profile.intent.startHorizon")}</span>
+                    <select
+                      name="startHorizon"
+                      defaultValue={profile.startHorizon ?? ""}
+                      className={FIELD_CLASS}
+                    >
+                      <option value="">{t("profile.intent.notProvided")}</option>
+                      {DISCOVERY_START_HORIZONS.map((value) => (
+                        <option key={value} value={value}>
+                          {t(`startHorizons.${value}.long`)}
+                        </option>
+                      ))}
+                    </select>
+                    <span className={HELP_CLASS}>{t("profile.intent.startHorizonHelp")}</span>
+                  </label>
+                </div>
+                {!profile.searchIntent || !profile.startHorizon ? (
+                  <p className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+                    {t("profile.intent.missingHint")}
+                  </p>
+                ) : null}
               </div>
 
               <div className={INNER_SECTION_CLASS}>
@@ -575,6 +647,59 @@ export default async function DiscoveryProfilePage({
                 {t("profile.actions.publishHelp")}
               </p>
             </form>
+
+            <section className="mt-5 rounded-3xl border border-violet-100 bg-violet-50/40 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+                {t("v2.alignment.eyebrow")}
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                {t("v2.alignment.choose")}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {t("v2.alignment.description")}
+              </p>
+              {alignmentReadiness.hasSubmittedBaseAssessment ? (
+                <form action={saveAlignmentPreferences} className="mt-4">
+                  <label className="flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
+                    <input
+                      type="checkbox"
+                      name="discoveryV2AlignmentEnabled"
+                      value="true"
+                      defaultChecked={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
+                      className="mt-1 h-4 w-4 rounded border-slate-300"
+                    />
+                    <span className="text-sm font-semibold text-slate-900">
+                      {t("v2.alignment.enable")}
+                    </span>
+                  </label>
+                  <p className="mt-3 text-xs leading-5 text-slate-500">
+                    {t("v2.alignment.chooseHelp")}
+                  </p>
+                  <DiscoveryAlignmentPreferencesEditor
+                    initialPreferences={
+                      loadedPreferences?.discoveryV2AlignmentPreferences ?? {}
+                    }
+                    ownTendencies={ownAlignmentTendencies}
+                  />
+                  <p className="mt-4 text-xs leading-5 text-violet-900">
+                    {t("v2.alignment.transparency")}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                    {t("v2.alignment.disclaimer")}
+                  </p>
+                  <button type="submit" className={`${PRIMARY_BUTTON_CLASS} mt-4`}>
+                    {t("profile.intent.saveAlignment")}
+                  </button>
+                </form>
+              ) : (
+                <div className="mt-4 rounded-2xl bg-white p-4">
+                  <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
+                  <Link href="/me/base?next=/discovery/profile" className={`${SECONDARY_BUTTON_CLASS} mt-3`}>
+                    {t("common.fillBaseQuestions")}
+                  </Link>
+                </div>
+              )}
+            </section>
 
             <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
               <form action={pauseProfile}>

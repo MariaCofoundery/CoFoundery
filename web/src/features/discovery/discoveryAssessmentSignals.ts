@@ -14,10 +14,18 @@ import { aggregateFounderBaseScoresFromAnswers } from "@/features/reporting/self
 import type { SelfRadarSeries } from "@/features/reporting/selfReportTypes";
 import { createClient } from "@/lib/supabase/server";
 import {
+  DISCOVERY_ALIGNMENT_DIMENSION_TO_FOUNDER_DIMENSION,
   normalizeDiscoveryAlignmentDimensions,
-  selectSimilarPrioritizedAlignmentDimensions,
+  selectPrioritizedAlignmentSignals,
 } from "@/features/discovery/discoveryV2Alignment";
-import type { DiscoveryAlignmentDimension } from "@/features/discovery/discoveryTypes";
+import type {
+  DiscoveryAlignmentDimension,
+  DiscoveryAlignmentSignal,
+  DiscoveryOwnAlignmentTendency,
+} from "@/features/discovery/discoveryTypes";
+import { DISCOVERY_ALIGNMENT_DIMENSIONS } from "@/features/discovery/discoveryTypes";
+import { getFounderDimensionPoleTendency } from "@/features/reporting/founderDimensionMeta";
+import { normalizeLocale } from "@/i18n/config";
 
 export type {
   DiscoveryAssessmentSignalAvailability,
@@ -259,6 +267,67 @@ function aggregateScoresForAssessment(params: {
   return aggregateFounderBaseScoresFromAnswers(answers, params.questionById).scores;
 }
 
+export async function getOwnDiscoveryV2AlignmentTendencies({
+  ownerUserId,
+  locale,
+}: {
+  ownerUserId: string;
+  locale?: string | null;
+}): Promise<DiscoveryOwnAlignmentTendency[]> {
+  const normalizedOwnerUserId = ownerUserId.trim();
+  if (!normalizedOwnerUserId) return [];
+
+  const supabase = await createClient();
+  try {
+    const { data: assessment, error: assessmentError } = await supabase
+      .from("assessments")
+      .select("id")
+      .eq("user_id", normalizedOwnerUserId)
+      .eq("module", "base")
+      .not("submitted_at", "is", null)
+      .order("submitted_at", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (assessmentError || !assessment?.id) return [];
+
+    const { data: answerRows, error: answerError } = await supabase
+      .from("assessment_answers")
+      .select("question_id, choice_value")
+      .eq("assessment_id", assessment.id);
+    if (answerError || !answerRows?.length) return [];
+
+    const answers = answerRows as AssessmentAnswerRow[];
+    const questionIds = Array.from(new Set(answers.map((entry) => entry.question_id)));
+    const { data: questionRows, error: questionError } = await supabase
+      .from("questions")
+      .select("id, dimension, category, prompt")
+      .in("id", questionIds);
+    if (questionError) return [];
+
+    const scores = aggregateFounderBaseScoresFromAnswers(
+      answers,
+      new Map(((questionRows ?? []) as QuestionMetaRow[]).map((row) => [row.id, row]))
+    ).scores;
+    const appLocale = normalizeLocale(locale);
+
+    return DISCOVERY_ALIGNMENT_DIMENSIONS.flatMap((dimension) => {
+      const founderDimension = DISCOVERY_ALIGNMENT_DIMENSION_TO_FOUNDER_DIMENSION[dimension];
+      const tendency = getFounderDimensionPoleTendency(
+        founderDimension,
+        scores[founderDimension],
+        "report",
+        appLocale
+      );
+      return tendency
+        ? [{ dimension, tendency: tendency.tendency, label: tendency.label }]
+        : [];
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function getDiscoveryAssessmentConversationPromptsForCandidates({
   ownerUserId,
   candidateUserIds,
@@ -388,7 +457,7 @@ export async function getDiscoveryAssessmentConversationPromptsForCandidates({
   }
 }
 
-export async function getDiscoveryV2AlignmentSimilaritiesForCandidates({
+export async function getDiscoveryV2AlignmentSignalsForCandidates({
   ownerUserId,
   candidateUserIds,
   prioritizedDimensions,
@@ -396,7 +465,7 @@ export async function getDiscoveryV2AlignmentSimilaritiesForCandidates({
   ownerUserId: string;
   candidateUserIds: string[];
   prioritizedDimensions: DiscoveryAlignmentDimension[];
-}): Promise<Map<string, DiscoveryAlignmentDimension[]>> {
+}): Promise<Map<string, DiscoveryAlignmentSignal[]>> {
   const normalizedOwnerUserId = ownerUserId.trim();
   const normalizedDimensions = normalizeDiscoveryAlignmentDimensions(prioritizedDimensions);
   const normalizedCandidateUserIds = normalizeDiscoveryAssessmentSignalCandidateUserIds({
@@ -478,14 +547,20 @@ export async function getDiscoveryV2AlignmentSimilaritiesForCandidates({
     );
     const ownerAssessment = latestAssessmentByUserId.get(normalizedOwnerUserId);
     if (!ownerAssessment) {
-      return new Map();
+      return new Map(
+        eligibleCandidateUserIds.map((userId) => [
+          userId,
+          selectPrioritizedAlignmentSignals({
+            prioritizedDimensions: allowedDimensions,
+            ownerScores: null,
+            candidateScores: null,
+          }),
+        ])
+      );
     }
     const candidateAssessments = eligibleCandidateUserIds
       .map((userId) => latestAssessmentByUserId.get(userId) ?? null)
       .filter((row): row is SubmittedBaseAssessmentRow => row != null);
-    if (candidateAssessments.length === 0) {
-      return new Map();
-    }
 
     const assessmentIds = [ownerAssessment.id, ...candidateAssessments.map((row) => row.id)];
     const { data: answerRows, error: answerError } = await serviceClient
@@ -522,15 +597,18 @@ export async function getDiscoveryV2AlignmentSimilaritiesForCandidates({
     }
 
     return new Map(
-      candidateAssessments.map((assessment) => {
-        const candidateScores = aggregateScoresForAssessment({
-          assessmentId: assessment.id,
-          answersByAssessmentId,
-          questionById,
-        });
+      eligibleCandidateUserIds.map((userId) => {
+        const assessment = latestAssessmentByUserId.get(userId);
+        const candidateScores = assessment
+          ? aggregateScoresForAssessment({
+              assessmentId: assessment.id,
+              answersByAssessmentId,
+              questionById,
+            })
+          : null;
         return [
-          assessment.user_id,
-          selectSimilarPrioritizedAlignmentDimensions({
+          userId,
+          selectPrioritizedAlignmentSignals({
             prioritizedDimensions: allowedDimensions,
             ownerScores,
             candidateScores,

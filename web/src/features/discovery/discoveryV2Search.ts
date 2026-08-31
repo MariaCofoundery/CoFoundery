@@ -18,6 +18,24 @@ export function attachDiscoveryV2AlignmentSimilarities(
   }));
 }
 
+export function attachDiscoveryV2AlignmentSignals(
+  candidates: DiscoveryCandidate[],
+  signalsByUserId: Map<string, NonNullable<DiscoveryCandidate["alignmentSignals"]>>,
+  candidateUserIdByProfileId: Map<string, string>
+) {
+  return candidates.map((candidate) => {
+    const signals =
+      signalsByUserId.get(candidateUserIdByProfileId.get(candidate.profile.id) ?? "") ?? [];
+    return {
+      ...candidate,
+      alignmentSignals: signals,
+      alignmentSimilarDimensions: signals
+        .filter((entry) => entry.signal === "similar_tendency")
+        .map((entry) => entry.dimension),
+    };
+  });
+}
+
 function normalizedSet(values: string[]) {
   return new Set(values.map((value) => value.trim().toLocaleLowerCase()).filter(Boolean));
 }
@@ -90,11 +108,14 @@ export function buildDiscoveryV2Candidate(
       commitmentLevel: profile.commitmentLevel,
       ventureStage: profile.ventureStage,
       ventureGoal: profile.ventureGoal,
+      searchIntent: profile.searchIntent ?? null,
+      startHorizon: profile.startHorizon ?? null,
       publishedAt: profile.publishedAt,
     },
     reasons: [],
     conversationTopics: [],
     practicalMatches: getDiscoveryV2PracticalMatches(profile, mustHaves),
     alignmentSimilarDimensions: [],
+    alignmentSignals: [],
   };
 }

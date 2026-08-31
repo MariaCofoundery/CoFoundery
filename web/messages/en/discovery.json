@@ -16,6 +16,26 @@
     "active": "Active",
     "paused": "Paused"
   },
+  "searchIntents": {
+    "ready_now": {
+      "short": "Looking now",
+      "long": "I want to find a co-founder now."
+    },
+    "actively_exploring": {
+      "short": "Actively meeting founders",
+      "long": "I am actively searching and want to get to know the right person first."
+    },
+    "open_later": {
+      "short": "Open for later",
+      "long": "I am open to connections but do not plan to start immediately."
+    }
+  },
+  "startHorizons": {
+    "now": { "short": "Start: now", "long": "Now or very soon" },
+    "next_3_months": { "short": "Start: next 3 months", "long": "Within the next 3 months" },
+    "next_6_months": { "short": "Start: next 6 months", "long": "Within the next 6 months" },
+    "later_or_flexible": { "short": "Start: later or flexible", "long": "Later or flexible timing" }
+  },
   "roles": {
     "tech": "Tech",
     "product": "Product",
@@ -238,12 +258,69 @@
     "alignment": {
       "eyebrow": "Optional",
       "title": "Use Alignment for your search",
-      "description": "If you have completed Founder Alignment, you can choose the areas where similar perspectives matter most to you.",
+      "description": "If you have completed Founder Alignment, you can prioritize up to three areas and say whether you prefer similarity there or welcome a different perspective.",
       "enable": "Use Alignment for my search",
-      "choose": "Where do similar perspectives matter most to you?",
-      "chooseHelp": "Choose up to three areas. They are a limited soft signal and never an exclusion filter.",
+      "choose": "What matters most to you in a co-founder?",
+      "chooseHelp": "Choose up to three areas. These cues are not hard filters and do not affect profile order or visibility.",
+      "priorityCount": "{count} of up to 3 areas prioritized",
       "unavailable": "Complete Founder Alignment first. Your search works fully without Alignment signals.",
-      "transparency": "Alignment cues are based on both founders' own responses and the areas you prioritized. They are not an assessment of your compatibility. Your selection stays private.",
+      "transparency": "Your selection stays private. A cue is only produced with bilateral sharing and sufficient responses.",
+      "disclaimer": "These cues describe similarities and differences in your stated preferences. They do not predict whether you will work well together or build a successful company.",
+      "importance": {
+        "label": "Importance for your search",
+        "not_prioritized": "Not prioritized",
+        "important": "Important to you",
+        "very_important": "Especially important to you"
+      },
+      "relation": {
+        "label": "What direction do you prefer?",
+        "prefer_similar": "A more similar tendency",
+        "different_perspective_welcome": "A different perspective is welcome",
+        "no_direction_preference": "No particular direction"
+      },
+      "signals": {
+        "similar_tendency": "the same broad tendency",
+        "different_tendency": "not the same broad tendency",
+        "insufficient_data": "not enough data yet"
+      },
+      "ownContext": {
+        "title": "Your starting point",
+        "description": "Your previous answers currently sit more in the “{tendency}” range.",
+        "note": "This is not an evaluation. In your search, you decide whether you prefer a similar perspective here or are open to difference."
+      },
+      "info": {
+        "open": "Why might this area matter?",
+        "company_logic": {
+          "summary": "Vision, growth and overall direction.",
+          "body": "A similar overall direction can make it easier to carry priorities and strategic decisions together. Different views can reveal additional options, but they require clear conversations about what you are building toward together.",
+          "conversation": "Clarify early which goals are negotiable for each of you—and which are not."
+        },
+        "decision_logic": {
+          "summary": "Pace, coordination and autonomous decisions.",
+          "body": "Founders differ in how quickly they decide, how much alignment they expect and when individuals should act autonomously. Different preferences can work when decision rights and check-in points are clear.",
+          "conversation": "Define which decisions individuals may make and which ones you make together."
+        },
+        "work_structure": {
+          "summary": "Working style, communication and coordination.",
+          "body": "Different working styles can bring different strengths into a team while also creating additional coordination needs.",
+          "conversation": "Discuss communication rhythm, availability, focus time and expectations for collaboration."
+        },
+        "commitment": {
+          "summary": "Time, priority and reliability.",
+          "body": "Different expectations around time, priority and commitment can become especially relevant for founders. Difference is not automatically a useful complement here.",
+          "conversation": "Clarify the effort you expect over the coming months and when changes should be renegotiated."
+        },
+        "risk_orientation": {
+          "summary": "Opportunity, safeguards and hard-to-reverse decisions.",
+          "body": "Different risk thresholds can bring several perspectives to opportunity and safeguards. They can also make decisions more difficult.",
+          "conversation": "For larger or hard-to-reverse decisions, shared criteria, bounded experiments or external expertise can help."
+        },
+        "conflict_style": {
+          "summary": "Raising tension and navigating difficult conversations.",
+          "body": "People differ in whether they address tension immediately, need distance first or prefer to structure conflict factually. Differences need not be a problem, but they can lead to recurring misunderstandings.",
+          "conversation": "Clarify how you notice that something should be discussed and what each person needs for a difficult conversation to remain possible."
+        }
+      },
       "dimensions": {
         "company_logic": "Company logic",
         "decision_logic": "Decision logic",
@@ -268,7 +345,8 @@
       "seeks": "Looking for",
       "foundingFrame": "Founding setup",
       "practicalMatches": "Matches your search",
-      "alignmentMatches": "Voluntarily shared similar preferences in selected areas"
+      "alignmentMatches": "Voluntarily shared similar preferences in selected areas",
+      "alignmentSignals": "Alignment cues"
     },
     "pagination": {
       "label": "Discovery results",
@@ -285,6 +363,15 @@
       "activeHint": "Logged-in Cofoundery users can see your profile.",
       "pausedHint": "Your profile is paused and not visible to others.",
       "draftHint": "Only you can see this profile."
+    },
+    "intent": {
+      "searchIntent": "How actively are you searching right now?",
+      "searchIntentHelp": "This describes your current search mode and does not rate how serious you are.",
+      "startHorizon": "When would you roughly like to start?",
+      "startHorizonHelp": "A broad orientation, not a binding commitment.",
+      "notProvided": "Not provided yet",
+      "missingHint": "Add your search mode and start horizon so others can understand your current situation. Your existing profile remains visible without them.",
+      "saveAlignment": "Save Alignment preferences"
     },
     "messages": {
       "fallbackError": "The action could not be completed right now.",
@@ -470,6 +557,13 @@
     "privacy": "This profile only shows details the person intentionally published for Discovery. Private search priorities and assessment answers are not shown.",
     "emptyTitle": "Profile not visible",
     "emptyText": "This Discovery profile is currently not publicly visible or does not exist.",
+    "alignment": {
+      "eyebrow": "Private search context",
+      "title": "Your Alignment perspectives",
+      "description": "You only see the areas that you personally prioritized for your search.",
+      "whatItCanMean": "What might this mean?",
+      "preferenceDiffers": "You prioritized a similar tendency here. Your responses currently do not fall within the same broad tendency."
+    },
     "details": {
       "brings": "Brings",
       "seeks": "Looking for",

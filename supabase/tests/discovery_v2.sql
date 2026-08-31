@@ -41,11 +41,21 @@ values
 
 insert into public.founder_search_preferences (
   user_id, discovery_v2_alignment_enabled, discovery_v2_alignment_dimensions,
-  discovery_v2_alignment_consented_at
+  discovery_v2_alignment_consented_at, discovery_v2_alignment_preferences
 )
 values (
   'a1111111-1111-4111-8111-111111111111', true,
-  array['commitment', 'decision_logic'], now()
+  array['commitment', 'decision_logic'], now(),
+  '{
+    "commitment": {
+      "importance": "important",
+      "relationPreference": "prefer_similar"
+    },
+    "decision_logic": {
+      "importance": "important",
+      "relationPreference": "prefer_similar"
+    }
+  }'::jsonb
 );
 
 select set_config(

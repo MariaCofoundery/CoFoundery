@@ -1,6 +1,17 @@
 export const DISCOVERY_STATUSES = ["draft", "active", "paused"] as const;
 export type DiscoveryStatus = (typeof DISCOVERY_STATUSES)[number];
 
+export const DISCOVERY_SEARCH_INTENTS = ["ready_now", "actively_exploring", "open_later"] as const;
+export type DiscoverySearchIntent = (typeof DISCOVERY_SEARCH_INTENTS)[number];
+
+export const DISCOVERY_START_HORIZONS = [
+  "now",
+  "next_3_months",
+  "next_6_months",
+  "later_or_flexible",
+] as const;
+export type DiscoveryStartHorizon = (typeof DISCOVERY_START_HORIZONS)[number];
+
 export const DISCOVERY_FOUNDER_ROLES = [
   "tech",
   "product",
@@ -95,6 +106,8 @@ export type FounderDiscoveryProfile = {
   commitmentLevel: DiscoveryCommitmentLevel;
   ventureStage: DiscoveryVentureStage;
   ventureGoal: DiscoveryVentureGoal;
+  searchIntent?: DiscoverySearchIntent | null;
+  startHorizon?: DiscoveryStartHorizon | null;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -109,6 +122,7 @@ export type FounderSearchPreferences = {
   assessmentSignalsConsentedAt: string | null;
   discoveryV2AlignmentEnabled: boolean;
   discoveryV2AlignmentDimensions: DiscoveryAlignmentDimension[];
+  discoveryV2AlignmentPreferences: DiscoveryAlignmentPreferences;
   discoveryV2AlignmentConsentedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -130,6 +144,8 @@ export type DiscoveryProfileInput = Partial<{
   commitmentLevel: unknown;
   ventureStage: unknown;
   ventureGoal: unknown;
+  searchIntent: unknown;
+  startHorizon: unknown;
   publishedAt: string | null;
 }>;
 
@@ -139,6 +155,7 @@ export type DiscoveryPreferencesInput = Partial<{
   includeAssessmentSignals: unknown;
   discoveryV2AlignmentEnabled: unknown;
   discoveryV2AlignmentDimensions: unknown;
+  discoveryV2AlignmentPreferences: unknown;
 }>;
 
 export const DISCOVERY_ALIGNMENT_DIMENSIONS = [
@@ -150,6 +167,44 @@ export const DISCOVERY_ALIGNMENT_DIMENSIONS = [
   "conflict_style",
 ] as const;
 export type DiscoveryAlignmentDimension = (typeof DISCOVERY_ALIGNMENT_DIMENSIONS)[number];
+
+export const DISCOVERY_ALIGNMENT_IMPORTANCE = [
+  "not_prioritized",
+  "important",
+  "very_important",
+] as const;
+export type DiscoveryAlignmentImportance = (typeof DISCOVERY_ALIGNMENT_IMPORTANCE)[number];
+
+export const DISCOVERY_ALIGNMENT_RELATION_PREFERENCES = [
+  "prefer_similar",
+  "different_perspective_welcome",
+  "no_direction_preference",
+] as const;
+export type DiscoveryAlignmentRelationPreference =
+  (typeof DISCOVERY_ALIGNMENT_RELATION_PREFERENCES)[number];
+
+export type DiscoveryAlignmentPreference = {
+  importance: Exclude<DiscoveryAlignmentImportance, "not_prioritized">;
+  relationPreference: DiscoveryAlignmentRelationPreference;
+};
+export type DiscoveryAlignmentPreferences = Partial<
+  Record<DiscoveryAlignmentDimension, DiscoveryAlignmentPreference>
+>;
+
+export type DiscoveryAlignmentSignalKind =
+  | "similar_tendency"
+  | "different_tendency"
+  | "insufficient_data";
+export type DiscoveryAlignmentSignal = {
+  dimension: DiscoveryAlignmentDimension;
+  signal: DiscoveryAlignmentSignalKind;
+};
+
+export type DiscoveryOwnAlignmentTendency = {
+  dimension: DiscoveryAlignmentDimension;
+  tendency: "left" | "center" | "right";
+  label: string;
+};
 
 export type DiscoveryProfilePreview = Pick<
   FounderDiscoveryProfile,
@@ -168,6 +223,8 @@ export type DiscoveryProfilePreview = Pick<
   | "commitmentLevel"
   | "ventureStage"
   | "ventureGoal"
+  | "searchIntent"
+  | "startHorizon"
   | "publishedAt"
 >;
 
@@ -177,6 +234,7 @@ export type DiscoveryCandidate = {
   conversationTopics: string[];
   practicalMatches?: DiscoveryPracticalMatch[];
   alignmentSimilarDimensions?: DiscoveryAlignmentDimension[];
+  alignmentSignals?: DiscoveryAlignmentSignal[];
   score?: number;
 };
 

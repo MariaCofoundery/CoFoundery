@@ -3,6 +3,8 @@ import {
   DISCOVERY_FOUNDER_ROLES,
   DISCOVERY_PRIORITY_KEYS,
   DISCOVERY_REMOTE_MODES,
+  DISCOVERY_SEARCH_INTENTS,
+  DISCOVERY_START_HORIZONS,
   DISCOVERY_STATUSES,
   DISCOVERY_VENTURE_GOALS,
   DISCOVERY_VENTURE_STAGES,
@@ -14,11 +16,17 @@ import {
   type DiscoveryPriorityWeights,
   type DiscoveryProfileInput,
   type DiscoveryRemoteMode,
+  type DiscoverySearchIntent,
+  type DiscoveryStartHorizon,
   type DiscoveryStatus,
   type DiscoveryVentureGoal,
   type DiscoveryVentureStage,
 } from "@/features/discovery/discoveryTypes";
-import { normalizeDiscoveryAlignmentDimensions } from "@/features/discovery/discoveryV2Alignment";
+import {
+  getPrioritizedDiscoveryAlignmentDimensions,
+  normalizeDiscoveryAlignmentDimensions,
+  normalizeDiscoveryAlignmentPreferences,
+} from "@/features/discovery/discoveryV2Alignment";
 import {
   DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_TEXT_LIMITS,
@@ -105,6 +113,14 @@ function normalizeVentureStage(value: unknown): DiscoveryVentureStage {
 
 function normalizeVentureGoal(value: unknown): DiscoveryVentureGoal {
   return isAllowedValue(value, DISCOVERY_VENTURE_GOALS) ? value : "undecided";
+}
+
+function normalizeOptionalSearchIntent(value: unknown): DiscoverySearchIntent | null {
+  return isAllowedValue(value, DISCOVERY_SEARCH_INTENTS) ? value : null;
+}
+
+function normalizeOptionalStartHorizon(value: unknown): DiscoveryStartHorizon | null {
+  return isAllowedValue(value, DISCOVERY_START_HORIZONS) ? value : null;
 }
 
 export function normalizePriorityWeights(value: unknown): DiscoveryPriorityWeights {
@@ -211,11 +227,16 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
     commitmentLevel: normalizeCommitmentLevel(input.commitmentLevel),
     ventureStage: normalizeVentureStage(input.ventureStage),
     ventureGoal: normalizeVentureGoal(input.ventureGoal),
+    searchIntent: normalizeOptionalSearchIntent(input.searchIntent),
+    startHorizon: normalizeOptionalStartHorizon(input.startHorizon),
     publishedAt: input.publishedAt ?? null,
   };
 }
 
 export function normalizeDiscoveryPreferencesInput(input: DiscoveryPreferencesInput = {}) {
+  const alignmentPreferences = normalizeDiscoveryAlignmentPreferences(
+    input.discoveryV2AlignmentPreferences
+  );
   return {
     priorityWeights: normalizePriorityWeights(input.priorityWeights),
     mustHaves: normalizeMustHaves(input.mustHaves),
@@ -229,9 +250,11 @@ export function normalizeDiscoveryPreferencesInput(input: DiscoveryPreferencesIn
       input.discoveryV2AlignmentEnabled === "true" ||
       input.discoveryV2AlignmentEnabled === "on" ||
       input.discoveryV2AlignmentEnabled === "1",
-    discoveryV2AlignmentDimensions: normalizeDiscoveryAlignmentDimensions(
-      input.discoveryV2AlignmentDimensions
-    ),
+    discoveryV2AlignmentDimensions:
+      Object.keys(alignmentPreferences).length > 0
+        ? getPrioritizedDiscoveryAlignmentDimensions(alignmentPreferences)
+        : normalizeDiscoveryAlignmentDimensions(input.discoveryV2AlignmentDimensions),
+    discoveryV2AlignmentPreferences: alignmentPreferences,
   };
 }
 

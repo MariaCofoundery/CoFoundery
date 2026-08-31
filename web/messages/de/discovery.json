@@ -16,6 +16,26 @@
     "active": "Aktiv",
     "paused": "Pausiert"
   },
+  "searchIntents": {
+    "ready_now": {
+      "short": "Sucht jetzt konkret",
+      "long": "Ich möchte jetzt konkret einen Co-Founder finden."
+    },
+    "actively_exploring": {
+      "short": "Aktiv im Kennenlernen",
+      "long": "Ich suche aktiv und möchte die richtige Person erst kennenlernen."
+    },
+    "open_later": {
+      "short": "Offen für später",
+      "long": "Ich bin offen für Kontakte, plane aber noch nicht unmittelbar zu gründen."
+    }
+  },
+  "startHorizons": {
+    "now": { "short": "Start: jetzt", "long": "Jetzt oder sehr zeitnah" },
+    "next_3_months": { "short": "Start: nächste 3 Monate", "long": "In den nächsten 3 Monaten" },
+    "next_6_months": { "short": "Start: nächste 6 Monate", "long": "In den nächsten 6 Monaten" },
+    "later_or_flexible": { "short": "Start: später oder flexibel", "long": "Später oder zeitlich flexibel" }
+  },
   "roles": {
     "tech": "Tech",
     "product": "Product",
@@ -238,12 +258,69 @@
     "alignment": {
       "eyebrow": "Optional",
       "title": "Alignment für deine Suche nutzen",
-      "description": "Wenn du dein Founder Alignment ausgefüllt hast, kannst du auswählen, in welchen Bereichen dir ähnliche Vorstellungen besonders wichtig sind.",
+      "description": "Wenn du dein Founder Alignment ausgefüllt hast, kannst du bis zu drei Bereiche priorisieren und angeben, ob du dort eher Ähnlichkeit suchst oder für eine andere Perspektive offen bist.",
       "enable": "Alignment für meine Suche nutzen",
-      "choose": "Wo sind dir ähnliche Vorstellungen besonders wichtig?",
-      "chooseHelp": "Wähle bis zu drei Bereiche. Sie sind ein begrenztes Soft-Signal und niemals ein Ausschlussfilter.",
+      "choose": "Was ist dir bei einem Co-Founder besonders wichtig?",
+      "chooseHelp": "Wähle bis zu drei Bereiche. Die Hinweise sind keine harten Filter und verändern weder Reihenfolge noch Sichtbarkeit der Profile.",
+      "priorityCount": "{count} von maximal 3 Bereichen priorisiert",
       "unavailable": "Fülle zuerst das Founder Alignment aus. Deine Suche funktioniert auch ohne Alignment-Signale vollständig.",
-      "transparency": "Alignment-Hinweise basieren auf euren eigenen Angaben und den Bereichen, die du priorisiert hast. Sie sind keine Bewertung eurer Kompatibilität. Deine Auswahl bleibt privat.",
+      "transparency": "Deine Auswahl bleibt privat. Ein Hinweis entsteht nur bei beidseitiger Freigabe und ausreichenden Angaben.",
+      "disclaimer": "Diese Hinweise beschreiben Ähnlichkeiten und Unterschiede in euren angegebenen Präferenzen. Sie sagen nicht voraus, ob ihr gut zusammenarbeitet oder erfolgreich gründet.",
+      "importance": {
+        "label": "Bedeutung für deine Suche",
+        "not_prioritized": "Nicht priorisiert",
+        "important": "Für dich wichtig",
+        "very_important": "Für dich besonders wichtig"
+      },
+      "relation": {
+        "label": "Welche Richtung wünschst du dir?",
+        "prefer_similar": "Eher ähnliche Tendenz",
+        "different_perspective_welcome": "Eine andere Perspektive ist willkommen",
+        "no_direction_preference": "Keine bestimmte Richtung"
+      },
+      "signals": {
+        "similar_tendency": "dieselbe grobe Tendenz",
+        "different_tendency": "nicht dieselbe grobe Tendenz",
+        "insufficient_data": "noch nicht ausreichend Daten"
+      },
+      "ownContext": {
+        "title": "Dein Ausgangspunkt",
+        "description": "Deine bisherigen Antworten liegen hier eher im Bereich „{tendency}“.",
+        "note": "Das ist keine Bewertung. Bei der Suche entscheidest du selbst, ob du hier eher eine ähnliche Perspektive möchtest oder für Unterschiedlichkeit offen bist."
+      },
+      "info": {
+        "open": "Warum kann dieser Bereich relevant sein?",
+        "company_logic": {
+          "summary": "Vision, Wachstum und grundsätzliche Ausrichtung.",
+          "body": "Eine ähnliche Grundrichtung kann es erleichtern, Prioritäten und strategische Entscheidungen gemeinsam zu tragen. Unterschiedliche Vorstellungen können zusätzliche Optionen sichtbar machen, brauchen aber klare Gespräche darüber, worauf ihr gemeinsam hinarbeitet.",
+          "conversation": "Klärt früh, welche Ziele für euch verhandelbar sind – und welche nicht."
+        },
+        "decision_logic": {
+          "summary": "Tempo, Abstimmung und autonome Entscheidungen.",
+          "body": "Founder unterscheiden sich darin, wie schnell sie entscheiden, wie viel Abstimmung sie erwarten und wann Einzelne autonom handeln sollen. Unterschiedliche Präferenzen können funktionieren, wenn Entscheidungsrechte und Rücksprachepunkte klar sind.",
+          "conversation": "Legt fest, welche Entscheidungen Einzelne treffen dürfen und welche ihr gemeinsam trefft."
+        },
+        "work_structure": {
+          "summary": "Arbeitsweise, Kommunikation und Koordination.",
+          "body": "Unterschiedliche Arbeitsweisen können verschiedene Stärken in ein Team bringen, gleichzeitig aber zusätzlichen Koordinationsbedarf erzeugen.",
+          "conversation": "Sprecht über Kommunikationsrhythmus, Erreichbarkeit, Fokuszeiten und Erwartungen an Zusammenarbeit."
+        },
+        "commitment": {
+          "summary": "Zeit, Priorität und Verbindlichkeit.",
+          "body": "Unterschiedliche Erwartungen an Zeit, Priorität und Verbindlichkeit können für Founder besonders relevant werden. Unterschiedlichkeit ist hier nicht automatisch eine sinnvolle Ergänzung.",
+          "conversation": "Klärt konkret, welchen Einsatz ihr in den nächsten Monaten erwartet und wann Veränderungen neu verhandelt werden."
+        },
+        "risk_orientation": {
+          "summary": "Chancen, Absicherung und schwer reversible Entscheidungen.",
+          "body": "Unterschiedliche Risikoschwellen können dazu führen, dass Chancen und Absicherung aus mehreren Perspektiven betrachtet werden. Sie können Entscheidungen aber auch schwieriger machen.",
+          "conversation": "Bei größeren oder schwer reversiblen Entscheidungen können gemeinsame Kriterien, begrenzte Experimente oder externe Expertise helfen."
+        },
+        "conflict_style": {
+          "summary": "Spannungen ansprechen und schwierige Gespräche führen.",
+          "body": "Menschen unterscheiden sich darin, ob sie Spannungen sofort ansprechen, erst Abstand brauchen oder Konflikte eher sachlich strukturieren. Unterschiede müssen kein Problem sein, können aber zu wiederkehrenden Missverständnissen führen.",
+          "conversation": "Klärt, wie ihr merkt, dass ein Thema angesprochen werden sollte und was jede Person braucht, damit ein schwieriges Gespräch möglich bleibt."
+        }
+      },
       "dimensions": {
         "company_logic": "Unternehmenslogik",
         "decision_logic": "Entscheidungslogik",
@@ -268,7 +345,8 @@
       "seeks": "Sucht",
       "foundingFrame": "Gründungsrahmen",
       "practicalMatches": "Passt zu deiner Suche",
-      "alignmentMatches": "Freiwillig ähnliche Präferenzen in ausgewählten Bereichen"
+      "alignmentMatches": "Freiwillig ähnliche Präferenzen in ausgewählten Bereichen",
+      "alignmentSignals": "Alignment-Hinweise"
     },
     "pagination": {
       "label": "Discovery-Ergebnisse",
@@ -285,6 +363,15 @@
       "activeHint": "Eingeloggte Cofoundery-Nutzer können dein Profil sehen.",
       "pausedHint": "Dein Profil ist pausiert und für andere nicht sichtbar.",
       "draftHint": "Nur du siehst dieses Profil."
+    },
+    "intent": {
+      "searchIntent": "Wie aktiv suchst du gerade?",
+      "searchIntentHelp": "Diese Angabe beschreibt deinen aktuellen Suchmodus und ist keine Bewertung deiner Ernsthaftigkeit.",
+      "startHorizon": "Wann möchtest du ungefähr starten?",
+      "startHorizonHelp": "Eine grobe Orientierung, keine verbindliche Zusage.",
+      "notProvided": "Noch nicht angegeben",
+      "missingHint": "Ergänze Suchmodus und Startzeitraum, damit andere deine aktuelle Situation besser einordnen können. Dein bestehendes Profil bleibt auch ohne diese Angaben sichtbar.",
+      "saveAlignment": "Alignment-Präferenzen speichern"
     },
     "messages": {
       "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
@@ -470,6 +557,13 @@
     "privacy": "Dieses Profil zeigt nur Angaben, die die Person bewusst für Discovery veröffentlicht hat. Private Suchprioritäten und Assessment-Antworten werden nicht angezeigt.",
     "emptyTitle": "Profil nicht sichtbar",
     "emptyText": "Dieses Discovery-Profil ist aktuell nicht öffentlich sichtbar oder existiert nicht.",
+    "alignment": {
+      "eyebrow": "Privater Suchkontext",
+      "title": "Eure Alignment-Perspektiven",
+      "description": "Hier siehst du ausschließlich die Bereiche, die du selbst für deine Suche priorisiert hast.",
+      "whatItCanMean": "Was kann das bedeuten?",
+      "preferenceDiffers": "Du hattest hier eine ähnliche Tendenz priorisiert. Eure Antworten liegen aktuell nicht in derselben groben Tendenz."
+    },
     "details": {
       "brings": "Bringt mit",
       "seeks": "Sucht",

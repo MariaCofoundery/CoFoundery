@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
+import {
+  getActiveDiscoveryProfileById,
+  getDiscoveryV2AlignmentContextForCandidate,
+} from "@/features/discovery/discoveryData";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   cancelDiscoveryIntroAction,
@@ -309,9 +312,12 @@ export default async function DiscoveryProfileDetailPage({
   }
 
   const isOwner = profile.userId === user.id;
-  const introRequest = isOwner
-    ? null
-    : await getDiscoveryIntroRequestForProfile(user.id, profile.id);
+  const [introRequest, alignmentContext] = isOwner
+    ? [null, { preferences: {}, signals: [] }]
+    : await Promise.all([
+        getDiscoveryIntroRequestForProfile(user.id, profile.id),
+        getDiscoveryV2AlignmentContextForCandidate(user.id, profile.userId),
+      ]);
   const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
   const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
@@ -335,6 +341,16 @@ export default async function DiscoveryProfileDetailPage({
                 {formatText(profile.headline, t)}
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
+                {profile.searchIntent ? (
+                  <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">
+                    {t(`searchIntents.${profile.searchIntent}.short`)}
+                  </span>
+                ) : null}
+                {profile.startHorizon ? (
+                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                    {t(`startHorizons.${profile.startHorizon}.short`)}
+                  </span>
+                ) : null}
                 {profile.locationRegion ?? profile.locationLabel ? (
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
                     {profile.locationRegion ?? profile.locationLabel}
@@ -425,6 +441,60 @@ export default async function DiscoveryProfileDetailPage({
             <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
           </dl>
         </section>
+
+        {!isOwner && alignmentContext.signals.length > 0 ? (
+          <section className={CARD_CLASS}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+              {t("detail.alignment.eyebrow")}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+              {t("detail.alignment.title")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {t("detail.alignment.description")}
+            </p>
+            <div className="mt-5 grid gap-3">
+              {alignmentContext.signals.map((entry) => {
+                const preference = alignmentContext.preferences[entry.dimension];
+                if (!preference) return null;
+                return (
+                  <article key={entry.dimension} className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4">
+                    <h3 className="font-semibold text-slate-950">
+                      {t(`v2.alignment.dimensions.${entry.dimension}`)}
+                    </h3>
+                    <p className="mt-2 text-sm text-slate-700">
+                      {t(`v2.alignment.importance.${preference.importance}`)} ·{" "}
+                      {t(`v2.alignment.relation.${preference.relationPreference}`)}
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-violet-900">
+                      {t(`v2.alignment.signals.${entry.signal}`)}
+                    </p>
+                    {preference.relationPreference === "prefer_similar" &&
+                    entry.signal === "different_tendency" ? (
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {t("detail.alignment.preferenceDiffers")}
+                      </p>
+                    ) : null}
+                    <details className="mt-3 rounded-xl bg-white px-3 py-2">
+                      <summary className="cursor-pointer text-sm font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-100">
+                        {t("detail.alignment.whatItCanMean")}
+                      </summary>
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        {t(`v2.alignment.info.${entry.dimension}.body`)}
+                      </p>
+                      <p className="mt-2 text-sm font-medium leading-6 text-slate-800">
+                        {t(`v2.alignment.info.${entry.dimension}.conversation`)}
+                      </p>
+                    </details>
+                  </article>
+                );
+              })}
+            </div>
+            <p className="mt-5 border-t border-violet-100 pt-4 text-xs leading-5 text-slate-500">
+              {t("v2.alignment.disclaimer")}
+            </p>
+          </section>
+        ) : null}
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">
