@@ -6,12 +6,17 @@ import {
   DISCOVERY_ROLE_OPTIONS,
 } from "@/features/discovery/discoveryConfig";
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getDiscoveryCandidatesForCurrentUser,
   getDiscoveryExploreProfilesForCurrentUser,
   getOwnDiscoveryProfile,
   getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
+import {
+  compactDiscoveryValues,
+  getDiscoverySearchBriefCriteria,
+} from "@/features/discovery/discoveryPresentation";
 import { getOwnDiscoveryAssessmentSignalReadiness } from "@/features/discovery/discoveryAssessmentSignals";
 import {
   DISCOVERY_ALIGNMENT_DIMENSIONS,
@@ -142,8 +147,13 @@ function CandidateCard({
   showMatchReasons?: boolean;
 }) {
   const { profile } = candidate;
+  const roles = compactDiscoveryValues(profile.ownRoles.map((role) => roleLabel(t, role)));
+  const expertise = compactDiscoveryValues(profile.expertise);
+  const seekingRoles = compactDiscoveryValues(
+    profile.seekingRoles.map((role) => roleLabel(t, role))
+  );
   return (
-    <article className="rounded-[1.75rem] border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.055)] md:p-6">
+    <article className="flex h-full flex-col rounded-[1.75rem] border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.055)] md:p-6">
       <div className="flex items-start gap-4">
         <div aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-950 text-sm font-semibold text-white">
           {initials(profile.displayName)}
@@ -160,26 +170,42 @@ function CandidateCard({
         {profile.availabilityHoursPerWeek ? (
           <span className={CHIP_CLASS}>{t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}</span>
         ) : null}
-        <span className={CHIP_CLASS}>{t(`ventureStages.${profile.ventureStage}`)}</span>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{t("v2.cards.roles")}</p>
-          <p className="mt-1 text-sm text-slate-800">{profile.ownRoles.map((role) => roleLabel(t, role)).join(", ") || t("common.notProvided")}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{t("v2.cards.expertise")}</p>
-          <p className="mt-1 text-sm text-slate-800">{profile.expertise.join(", ") || t("common.notProvided")}</p>
-        </div>
+      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+        <CardValueGroup
+          title={t("v2.cards.brings")}
+          values={[...roles.visible, ...expertise.visible]}
+          remaining={roles.remaining + expertise.remaining}
+          t={t}
+        />
+        <CardValueGroup
+          title={t("v2.cards.seeks")}
+          values={seekingRoles.visible}
+          remaining={seekingRoles.remaining}
+          t={t}
+        />
+      </div>
+
+      <div className="mt-5 border-t border-slate-100 pt-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          {t("v2.cards.foundingFrame")}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          {[
+            t(`commitmentLevels.${profile.commitmentLevel}`),
+            t(`ventureStages.${profile.ventureStage}`),
+            t(`ventureGoals.${profile.ventureGoal}`),
+          ].join(" · ")}
+        </p>
       </div>
 
       {showMatchReasons && (candidate.practicalMatches?.length ?? 0) > 0 ? (
-        <section className="mt-5 rounded-2xl bg-emerald-50/70 p-4">
-          <p className="text-xs font-semibold text-emerald-900">{t("v2.cards.practicalMatches")}</p>
+        <section className="mt-5 border-t border-emerald-100 pt-4">
+          <p className="text-xs font-semibold text-emerald-800">{t("v2.cards.practicalMatches")}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {candidate.practicalMatches?.map((match) => (
-              <span key={match} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-900">
+              <span key={match} className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
                 {practicalMatchLabel(t, match, candidate, preferences)}
               </span>
             ))}
@@ -188,53 +214,76 @@ function CandidateCard({
       ) : null}
 
       {showMatchReasons && (candidate.alignmentSimilarDimensions?.length ?? 0) > 0 ? (
-        <section className="mt-3 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
-          <p className="text-xs font-semibold text-violet-950">{t("v2.cards.alignmentMatches")}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {candidate.alignmentSimilarDimensions?.map((dimension) => (
-              <span key={dimension} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-violet-900">
-                {alignmentLabel(t, dimension)}
-              </span>
-            ))}
-          </div>
+        <section className="mt-3 text-xs leading-5 text-violet-800">
+          <span className="font-semibold">{t("v2.cards.alignmentMatches")}:</span>{" "}
+          {candidate.alignmentSimilarDimensions?.map((dimension) => alignmentLabel(t, dimension)).join(", ")}
         </section>
       ) : null}
 
-      <div className="mt-5">
+      <div className="mt-auto pt-6">
         <Link href={`/discovery/${profile.id}`} className={PRIMARY_CTA_CLASS}>{t("common.viewProfile")}</Link>
       </div>
     </article>
   );
 }
 
-function ActiveFilterChips({ preferences, t }: { preferences: FounderSearchPreferences; t: DiscoveryT }) {
-  const filters = preferences.mustHaves;
-  const practical = [
-    ...filters.requiredRolesAny.map((role) => roleLabel(t, role)),
-    ...filters.requiredExpertiseAny,
-    ...(filters.desiredLocationRegion ? [filters.desiredLocationRegion] : []),
-    ...filters.acceptedRemoteModes.map((mode) => t(`remoteModes.${mode}`)),
-    ...(filters.minimumAvailabilityHoursPerWeek
-      ? [t("v2.search.minimumHoursChip", { hours: filters.minimumAvailabilityHoursPerWeek })]
-      : []),
-  ];
+function CardValueGroup({
+  title,
+  values,
+  remaining,
+  t,
+}: {
+  title: string;
+  values: string[];
+  remaining: number;
+  t: DiscoveryT;
+}) {
   return (
-    <div className="grid gap-3">
-      {practical.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500">{t("v2.search.activeFilters")}</span>
-          {practical.map((value) => <span key={value} className={CHIP_CLASS}>{value}</span>)}
-        </div>
-      ) : null}
-      {preferences.discoveryV2AlignmentEnabled ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-violet-700">{t("v2.search.alignmentPrioritized")}</span>
-          {preferences.discoveryV2AlignmentDimensions.map((dimension) => (
-            <span key={dimension} className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-900">{alignmentLabel(t, dimension)}</span>
-          ))}
-        </div>
-      ) : null}
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-800">
+        {values.length > 0 ? values.join(", ") : t("common.notProvided")}
+        {remaining > 0 ? ` ${t("common.moreCount", { count: remaining })}` : ""}
+      </p>
     </div>
+  );
+}
+
+function SearchBrief({ preferences, t }: { preferences: FounderSearchPreferences; t: DiscoveryT }) {
+  const criteria = getDiscoverySearchBriefCriteria(preferences.mustHaves);
+  const labels = criteria.flatMap((criterion) => {
+    if (criterion.key === "role") {
+      return criterion.values.map((role) => roleLabel(t, role as DiscoveryFounderRole));
+    }
+    if (criterion.key === "remote") {
+      return criterion.values.map((mode) => t(`remoteModes.${mode}`));
+    }
+    if (criterion.key === "availability") {
+      return [t("v2.search.minimumHoursChip", { hours: Number(criterion.values[0]) })];
+    }
+    return criterion.values;
+  });
+  return (
+    <section className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.04)] md:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {t("v2.search.briefEyebrow")}
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">
+            {labels.length > 0 ? t("v2.search.briefTitle") : t("v2.search.briefEmptyTitle")}
+          </h2>
+          {labels.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {labels.map((label) => <span key={label} className={CHIP_CLASS}>{label}</span>)}
+            </div>
+          ) : (
+            <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.search.briefEmptyText")}</p>
+          )}
+        </div>
+        <a href="#search" className={SECONDARY_CTA_CLASS}>{t("v2.search.edit")}</a>
+      </div>
+    </section>
   );
 }
 
@@ -247,6 +296,9 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery")}`);
+  }
+  if (!(await hasFounderDiscoveryAccess(user.id, supabase))) {
+    redirect("/advisor/dashboard");
   }
 
   const [profile, loadedPreferences, alignmentReadiness] = await Promise.all([
@@ -311,6 +363,8 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           ))}
         </nav>
 
+        {mode === "search" ? <SearchBrief preferences={preferences} t={t} /> : null}
+
         {mode === "search" ? <section id="search" className={CARD_CLASS}>
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -330,7 +384,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           ) : null}
 
           <form action={saveSearch} className="mt-5 grid gap-6">
-            <details open className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            <details className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
               <summary className="cursor-pointer text-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">{t("v2.search.practicalTitle")}</summary>
               <div className="mt-5 grid gap-5">
                 <div>
@@ -368,32 +422,36 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
               </div>
             </details>
 
-            <section className="rounded-2xl border border-violet-100 bg-violet-50/50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">{t("v2.alignment.eyebrow")}</p>
-              <h3 className="mt-2 text-lg font-semibold text-slate-950">{t("v2.alignment.title")}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.alignment.description")}</p>
-              {alignmentReadiness.hasSubmittedBaseAssessment ? (
-                <>
-                  <label className="mt-4 flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
-                    <input type="checkbox" name="discoveryV2AlignmentEnabled" value="true" defaultChecked={preferences.discoveryV2AlignmentEnabled} className="mt-1 h-4 w-4 rounded border-slate-300" />
-                    <span className="text-sm font-semibold text-slate-900">{t("v2.alignment.enable")}</span>
-                  </label>
-                  <p className="mt-4 text-sm font-semibold text-slate-900">{t("v2.alignment.choose")}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">{t("v2.alignment.chooseHelp")}</p>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    {DISCOVERY_ALIGNMENT_DIMENSIONS.map((dimension) => (
-                      <Checkbox key={dimension} name="discoveryV2AlignmentDimensions" value={dimension} label={alignmentLabel(t, dimension)} checked={preferences.discoveryV2AlignmentDimensions.includes(dimension)} />
-                    ))}
+            <details className="rounded-2xl border border-violet-100 bg-violet-50/50 p-4">
+              <summary className="cursor-pointer text-lg font-semibold text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-100">
+                {t("v2.alignment.title")}
+              </summary>
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">{t("v2.alignment.eyebrow")}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.alignment.description")}</p>
+                {alignmentReadiness.hasSubmittedBaseAssessment ? (
+                  <>
+                    <label className="mt-4 flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
+                      <input type="checkbox" name="discoveryV2AlignmentEnabled" value="true" defaultChecked={preferences.discoveryV2AlignmentEnabled} className="mt-1 h-4 w-4 rounded border-slate-300" />
+                      <span className="text-sm font-semibold text-slate-900">{t("v2.alignment.enable")}</span>
+                    </label>
+                    <p className="mt-4 text-sm font-semibold text-slate-900">{t("v2.alignment.choose")}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">{t("v2.alignment.chooseHelp")}</p>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {DISCOVERY_ALIGNMENT_DIMENSIONS.map((dimension) => (
+                        <Checkbox key={dimension} name="discoveryV2AlignmentDimensions" value={dimension} label={alignmentLabel(t, dimension)} checked={preferences.discoveryV2AlignmentDimensions.includes(dimension)} />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-4 rounded-2xl bg-white p-4">
+                    <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
+                    <Link href="/me/base?next=/discovery" className={`${SECONDARY_CTA_CLASS} mt-3`}>{t("common.fillBaseQuestions")}</Link>
                   </div>
-                </>
-              ) : (
-                <div className="mt-4 rounded-2xl bg-white p-4">
-                  <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
-                  <Link href="/me/base?next=/discovery" className={`${SECONDARY_CTA_CLASS} mt-3`}>{t("common.fillBaseQuestions")}</Link>
-                </div>
-              )}
-              <p className="mt-4 text-xs leading-5 text-violet-900">{t("v2.alignment.transparency")}</p>
-            </section>
+                )}
+                <p className="mt-4 text-xs leading-5 text-violet-900">{t("v2.alignment.transparency")}</p>
+              </div>
+            </details>
 
             <div className="flex flex-wrap gap-3">
               <button type="submit" className={PRIMARY_CTA_CLASS}>{t("v2.search.apply")}</button>
@@ -403,13 +461,10 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
         </section> : null}
 
         <section className={CARD_CLASS}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t(mode === "explore" ? "v2.explore.eyebrow" : "v2.results.eyebrow")}</p>
-              <h2 className="mt-2 text-2xl font-semibold">{t(mode === "explore" ? "v2.explore.title" : "v2.results.title")}</h2>
-              <p className="mt-2 text-sm text-slate-600">{t("v2.results.count", { count: result.totalCount })}</p>
-            </div>
-            {mode === "search" ? <ActiveFilterChips preferences={preferences} t={t} /> : null}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t(mode === "explore" ? "v2.explore.eyebrow" : "v2.results.eyebrow")}</p>
+            <h2 className="mt-2 text-2xl font-semibold">{t(mode === "explore" ? "v2.explore.title" : "v2.results.title")}</h2>
+            <p className="mt-2 text-sm text-slate-600">{t(mode === "explore" ? "v2.explore.count" : "v2.results.count", { count: result.totalCount })}</p>
           </div>
         </section>
 
@@ -421,6 +476,11 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           <section className={CARD_CLASS}>
             <h2 className="text-lg font-semibold">{mode === "explore" ? t("v2.explore.emptyTitle") : isActive ? t("v2.results.emptyTitle") : t("v2.results.inactiveTitle")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{mode === "explore" ? t("v2.explore.emptyText") : isActive ? t("v2.results.emptyText") : t("v2.results.inactiveText")}</p>
+            {mode === "search" && isActive ? (
+              <form action={resetSearch} className="mt-5">
+                <button className={SECONDARY_CTA_CLASS}>{t("v2.results.reset")}</button>
+              </form>
+            ) : null}
           </section>
         )}
 

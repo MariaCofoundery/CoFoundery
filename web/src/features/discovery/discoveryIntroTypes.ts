@@ -48,6 +48,10 @@ export function isDiscoveryIntroResponseStatus(
   return value === "accepted" || value === "declined";
 }
 
+export function isAcceptedInvitationContextStatus(value: unknown) {
+  return value === "accepted";
+}
+
 export function canCancelDiscoveryIntro(request: Pick<DiscoveryIntroRequest, "status">) {
   return request.status === "pending";
 }

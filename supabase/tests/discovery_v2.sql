@@ -23,6 +23,12 @@ values
   ('00000000-0000-0000-0000-000000000000', 'a2222222-2222-4222-8222-222222222222', 'authenticated', 'authenticated', 'matching-founder@example.com', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
   ('00000000-0000-0000-0000-000000000000', 'a3333333-3333-4333-8333-333333333333', 'authenticated', 'authenticated', 'other-founder@example.com', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now());
 
+insert into public.profiles(user_id, display_name, roles)
+values
+  ('a1111111-1111-4111-8111-111111111111', 'Owner', array['founder']),
+  ('a2222222-2222-4222-8222-222222222222', 'Match', array['founder']),
+  ('a3333333-3333-4333-8333-333333333333', 'Other', array['founder']);
+
 insert into public.founder_discovery_profiles (
   user_id, status, display_name, headline, bio, own_roles, seeking_roles,
   expertise, industries, location_label, location_region, remote_mode,

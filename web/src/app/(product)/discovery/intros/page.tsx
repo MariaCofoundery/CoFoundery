@@ -5,6 +5,7 @@ import {
   cancelDiscoveryIntroAction,
   respondDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getReceivedDiscoveryIntroRequests,
   getSentDiscoveryIntroRequests,
@@ -301,6 +302,9 @@ export default async function DiscoveryIntrosPage({
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/intros")}`);
   }
+  if (!(await hasFounderDiscoveryAccess(user.id, supabase))) {
+    redirect("/advisor/dashboard");
+  }
 
   const [received, sent] = await Promise.all([
     getReceivedDiscoveryIntroRequests(user.id),
@@ -321,7 +325,7 @@ export default async function DiscoveryIntrosPage({
             {t("common.backToDiscovery")}
           </Link>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Discovery Intros
+            {t("intros.eyebrow")}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
             {t("intros.title")}

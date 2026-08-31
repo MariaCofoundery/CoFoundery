@@ -14,6 +14,7 @@ import {
   publishDiscoveryProfileFromFormAction,
   saveDiscoveryProfileDraftAction,
 } from "@/features/discovery/discoveryActions";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getOwnDiscoveryProfile,
 } from "@/features/discovery/discoveryData";
@@ -325,6 +326,9 @@ export default async function DiscoveryProfilePage({
 
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/profile")}`);
+  }
+  if (!(await hasFounderDiscoveryAccess(user.id, supabase))) {
+    redirect("/advisor/dashboard");
   }
 
   const loadedProfile = await getOwnDiscoveryProfile(user.id);

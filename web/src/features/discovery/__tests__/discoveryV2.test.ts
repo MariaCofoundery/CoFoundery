@@ -178,8 +178,8 @@ test("Discovery V2 copy describes alignment as orientation rather than evaluativ
   const de = readFileSync("messages/de/discovery.json", "utf8");
   const en = readFileSync("messages/en/discovery.json", "utf8");
 
-  assert.match(de, /Ähnliche Vorstellungen in Bereichen, die dir wichtig sind/);
-  assert.match(en, /Similar perspectives in areas that matter to you/);
+  assert.match(de, /Freiwillig ähnliche Präferenzen in ausgewählten Bereichen/);
+  assert.match(en, /Voluntarily shared similar preferences in selected areas/);
   for (const messages of [de, en]) {
     assert.doesNotMatch(
       messages,

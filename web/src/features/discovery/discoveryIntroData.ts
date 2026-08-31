@@ -234,6 +234,7 @@ async function checkAcceptedInvitationExistsBetweenUsers(leftUserId: string, rig
     .select("id")
     .eq("inviter_user_id", leftUserId)
     .eq("invitee_user_id", rightUserId)
+    .eq("status", "accepted")
     .limit(1)
     .maybeSingle();
 
@@ -250,6 +251,7 @@ async function checkAcceptedInvitationExistsBetweenUsers(leftUserId: string, rig
     .select("id")
     .eq("inviter_user_id", rightUserId)
     .eq("invitee_user_id", leftUserId)
+    .eq("status", "accepted")
     .limit(1)
     .maybeSingle();
 

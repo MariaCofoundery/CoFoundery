@@ -6,6 +6,7 @@ import {
   requestFullDiscoveryMatchingAction,
   startDiscoveryMatchingPreparationAction,
 } from "@/features/discovery/discoveryMatchingStartActions";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
 import {
   resolveDiscoveryMatchingStartFeedback,
@@ -520,6 +521,9 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   if (!user?.id) {
     const next = `/discovery/intros/${introRequestId}/matching`;
     redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
+  if (!(await hasFounderDiscoveryAccess(user.id, supabase))) {
+    redirect("/advisor/dashboard");
   }
 
   const preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);

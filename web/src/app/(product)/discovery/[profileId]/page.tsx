@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   cancelDiscoveryIntroAction,
   requestDiscoveryIntroAction,
@@ -114,30 +115,6 @@ function EmptyState({ t }: { t: DiscoveryT }) {
         </div>
       </section>
     </main>
-  );
-}
-
-function ProfileDetails({ profile, t }: { profile: FounderDiscoveryProfile; t: DiscoveryT }) {
-  return (
-    <dl className="grid gap-3 md:grid-cols-2">
-      <DetailItem label={t("detail.details.brings")} value={formatRoleList(profile.ownRoles, t)} />
-      <DetailItem label={t("detail.details.seeks")} value={formatRoleList(profile.seekingRoles, t)} />
-      <DetailItem label={t("detail.details.expertise")} value={formatIndustries(profile.expertise, t)} />
-      <DetailItem label={t("detail.details.industries")} value={formatIndustries(profile.industries, t)} />
-      <DetailItem label={t("detail.details.location")} value={formatText(profile.locationRegion ?? profile.locationLabel, t)} />
-      <DetailItem label={t("detail.details.remoteMode")} value={t(`remoteModes.${profile.remoteMode}`)} />
-      <DetailItem
-        label={t("detail.details.availability")}
-        value={
-          profile.availabilityHoursPerWeek
-            ? t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })
-            : t("common.notProvided")
-        }
-      />
-      <DetailItem label={t("detail.details.commitment")} value={t(`commitmentLevels.${profile.commitmentLevel}`)} />
-      <DetailItem label={t("detail.details.stage")} value={t(`ventureStages.${profile.ventureStage}`)} />
-      <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
-    </dl>
   );
 }
 
@@ -322,6 +299,9 @@ export default async function DiscoveryProfileDetailPage({
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent(`/discovery/${profileId}`)}`);
   }
+  if (!(await hasFounderDiscoveryAccess(user.id, supabase))) {
+    redirect("/advisor/dashboard");
+  }
 
   const profile = await getActiveDiscoveryProfileById(profileId);
   if (!profile) {
@@ -354,6 +334,21 @@ export default async function DiscoveryProfileDetailPage({
               <p className="mt-3 max-w-3xl text-xl font-semibold leading-8 text-slate-900">
                 {formatText(profile.headline, t)}
               </p>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
+                {profile.locationRegion ?? profile.locationLabel ? (
+                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                    {profile.locationRegion ?? profile.locationLabel}
+                  </span>
+                ) : null}
+                <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                  {t(`remoteModes.${profile.remoteMode}`)}
+                </span>
+                {profile.availabilityHoursPerWeek ? (
+                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                    {t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}
+                  </span>
+                ) : null}
+              </div>
             </div>
             {isOwner ? (
               <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
@@ -369,27 +364,6 @@ export default async function DiscoveryProfileDetailPage({
 
         <IntroPageMessage message={introMessage} ok={introFeedback?.ok ?? false} />
 
-        <section className={CARD_CLASS}>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("detail.shortBio")}
-          </p>
-          <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700">
-            {formatText(profile.bio, t)}
-          </p>
-        </section>
-
-        <section className={CARD_CLASS}>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("detail.searchProfile")}
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            {t("detail.publishedTitle")}
-          </h2>
-          <div className="mt-5">
-            <ProfileDetails profile={profile} t={t} />
-          </div>
-        </section>
-
         {isOwner ? null : (
           <IntroRequestCard
             profile={profile}
@@ -397,6 +371,60 @@ export default async function DiscoveryProfileDetailPage({
             t={t}
           />
         )}
+
+        <section className={CARD_CLASS}>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {t("detail.sections.interests.eyebrow")}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+            {t("detail.sections.interests.title")}
+          </h2>
+          {profile.bio.trim() ? (
+            <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{profile.bio}</p>
+          ) : null}
+          <dl className="mt-5 grid gap-3 md:grid-cols-2">
+            {profile.industries.length > 0 ? (
+              <DetailItem label={t("detail.details.industries")} value={formatIndustries(profile.industries, t)} />
+            ) : null}
+            <DetailItem label={t("detail.details.stage")} value={t(`ventureStages.${profile.ventureStage}`)} />
+          </dl>
+        </section>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <section className={CARD_CLASS}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              {t("detail.sections.brings.eyebrow")}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.brings.title")}</h2>
+            <dl className="mt-5 grid gap-3">
+              <DetailItem label={t("detail.details.brings")} value={formatRoleList(profile.ownRoles, t)} />
+              {profile.expertise.length > 0 ? (
+                <DetailItem label={t("detail.details.expertise")} value={formatIndustries(profile.expertise, t)} />
+              ) : null}
+            </dl>
+          </section>
+
+          <section className={CARD_CLASS}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              {t("detail.sections.seeks.eyebrow")}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.seeks.title")}</h2>
+            <dl className="mt-5 grid gap-3">
+              <DetailItem label={t("detail.details.seeks")} value={formatRoleList(profile.seekingRoles, t)} />
+            </dl>
+          </section>
+        </div>
+
+        <section className={CARD_CLASS}>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {t("detail.sections.founding.eyebrow")}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.founding.title")}</h2>
+          <dl className="mt-5 grid gap-3 md:grid-cols-2">
+            <DetailItem label={t("detail.details.commitment")} value={t(`commitmentLevels.${profile.commitmentLevel}`)} />
+            <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
+          </dl>
+        </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">

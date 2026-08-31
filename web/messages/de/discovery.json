@@ -6,8 +6,9 @@
     "backToDiscovery": "Zurück zu Co-Founder finden",
     "backToDashboard": "← Zurück zum Dashboard",
     "viewProfile": "Profil ansehen",
+    "moreCount": "+{count}",
     "myIntros": "Meine Intros",
-    "prepareSharedMatching": "Gemeinsames Matching vorbereiten",
+    "prepareSharedMatching": "Gemeinsam prüfen",
     "fillBaseQuestions": "Basis-Fragen ausfüllen"
   },
   "status": {
@@ -189,7 +190,7 @@
   },
   "v2": {
     "title": "Co-Founder finden",
-    "subtitle": "Suche nach praktischen Kriterien und nutze Alignment optional als transparentes zusätzliches Signal.",
+    "subtitle": "Finde Founder, die zu dem passen, was du gerade suchst.",
     "editProfile": "Mein Profil bearbeiten",
     "modes": {
       "label": "Discovery-Modus",
@@ -199,6 +200,7 @@
     "explore": {
       "eyebrow": "Entdecken",
       "title": "Founder entdecken",
+      "count": "{count, plural, =0 {Noch keine Profile} =1 {Ein veröffentlichtes Profil} other {# veröffentlichte Profile}}",
       "emptyTitle": "Noch keine Founder zu entdecken",
       "emptyText": "Sobald weitere Founder ihr Discovery-Profil veröffentlichen, erscheinen sie hier."
     },
@@ -207,6 +209,11 @@
       "title": "Wen suchst du gerade?",
       "description": "Diese Suchkriterien sind privat und lassen sich jederzeit ändern, ohne dein öffentliches Profil neu zu veröffentlichen.",
       "profileInactive": "Profil nicht aktiv",
+      "briefEyebrow": "Deine Suche",
+      "briefTitle": "Das suchst du gerade",
+      "briefEmptyTitle": "Offen entdecken",
+      "briefEmptyText": "Du hast noch keine Suchkriterien gesetzt und siehst alle aktuell veröffentlichten Profile.",
+      "edit": "Suche bearbeiten",
       "practicalTitle": "Praktische Suche",
       "role": "Rolle",
       "expertise": "Gesuchte Expertise",
@@ -251,15 +258,17 @@
       "title": "Founder entdecken",
       "count": "{count, plural, =0 {Keine Profile} =1 {Ein Profil} other {# Profile}} entsprechen deinen praktischen Filtern.",
       "emptyTitle": "Keine Profile mit diesen Filtern",
-      "emptyText": "Passe deine praktischen Filter an oder schau später wieder vorbei. Fehlende Alignment-Daten schließen niemanden aus.",
+      "emptyText": "Aktuell gibt es keine Profile, die alle gewählten Kriterien erfüllen. Du kannst deine Suche anpassen oder alle Filter zurücksetzen.",
+      "reset": "Alle Filter zurücksetzen",
       "inactiveTitle": "Aktiviere zuerst dein Discovery-Profil",
       "inactiveText": "Veröffentliche dein Profil, bevor du andere Founder in Discovery findest."
     },
     "cards": {
-      "roles": "Rollen",
-      "expertise": "Expertise",
-      "practicalMatches": "Entspricht deiner Suche bei:",
-      "alignmentMatches": "Ähnliche Vorstellungen in Bereichen, die dir wichtig sind"
+      "brings": "Bringt mit",
+      "seeks": "Sucht",
+      "foundingFrame": "Gründungsrahmen",
+      "practicalMatches": "Passt zu deiner Suche",
+      "alignmentMatches": "Freiwillig ähnliche Präferenzen in ausgewählten Bereichen"
     },
     "pagination": {
       "label": "Discovery-Ergebnisse",
@@ -408,6 +417,7 @@
     }
   },
   "intros": {
+    "eyebrow": "Kennenlernen",
     "title": "Meine Intros",
     "subtitle": "Hier siehst du, wer dich kennenlernen möchte und welche Intros du angefragt hast. Ein angenommenes Intro erzeugt noch keine Relationship, keine Invitation und kein Workbook.",
     "feedback": {
@@ -472,16 +482,34 @@
       "stage": "Venture Stage",
       "goal": "Venture Goal"
     },
+    "sections": {
+      "interests": {
+        "eyebrow": "Interessen & Vorhaben",
+        "title": "Woran ich interessiert bin"
+      },
+      "brings": {
+        "eyebrow": "Erfahrung & Stärken",
+        "title": "Was ich mitbringe"
+      },
+      "seeks": {
+        "eyebrow": "Gesuchte Ergänzung",
+        "title": "Was ich suche"
+      },
+      "founding": {
+        "eyebrow": "Arbeitsrahmen",
+        "title": "Wie ich gründen möchte"
+      }
+    },
     "intro": {
-      "eyebrow": "Discovery Intro",
-      "requestTitle": "Intro anfragen",
-      "requestText": "Wenn das Profil spannend wirkt, kannst du ein erstes Interesse signalisieren. Die andere Person entscheidet, ob sie das Intro annehmen möchte.",
+      "eyebrow": "Kennenlernen",
+      "requestTitle": "Möchtest du diese Person kennenlernen?",
+      "requestText": "Wenn das Profil interessant wirkt, kannst du ein Kennenlernen anfragen. Die andere Person entscheidet in Ruhe, ob sie annehmen möchte.",
       "messageLabel": "Kurze Nachricht",
       "messagePlaceholder": "Was macht das Profil für dich spannend?",
       "messageHelp": "Optional, maximal 600 Zeichen. Teile nur, was du bewusst senden möchtest.",
-      "request": "Intro anfragen",
-      "acceptedTitle": "Intro angenommen",
-      "acceptedText": "Ihr habt beide Interesse signalisiert. Als nächstes könnt ihr ein erstes Gespräch führen oder später ein gemeinsames Cofoundery-Matching starten.",
+      "request": "Kennenlernen anfragen",
+      "acceptedTitle": "Kennenlernen angenommen",
+      "acceptedText": "Ihr habt beide Interesse signalisiert. Ihr könnt euch jetzt kennenlernen und anschließend gemeinsam euer Alignment ansehen.",
       "declinedTitle": "Intro aktuell nicht angenommen",
       "declinedText": "Diese Person möchte das Intro aktuell nicht weiterverfolgen.",
       "canceledTitle": "Anfrage zurückgezogen",
@@ -495,35 +523,35 @@
   },
   "matchingPreparation": {
     "feedback": {
-      "matchingStartRequested": "Gemeinsamer Matching-Start angefragt.",
-      "notAuthenticated": "Bitte melde dich an, um mit der Matching-Vorbereitung fortzufahren.",
-      "preparationNotAllowed": "Du kannst diese Matching-Vorbereitung aktuell nicht starten.",
-      "preparationFailed": "Die Matching-Vorbereitung konnte gerade nicht gestartet werden.",
-      "otherParticipantRequested": "Die andere Person hat den Matching-Start bereits angefragt. Du kannst ihn bestätigen.",
-      "requestNotAllowed": "Du kannst den gemeinsamen Matching-Start aktuell nicht anfragen.",
-      "requestFailed": "Der gemeinsame Matching-Start konnte gerade nicht angefragt werden.",
-      "selfConfirmationForbidden": "Die andere Person muss den gemeinsamen Matching-Start bestätigen.",
-      "confirmationNotAllowed": "Du kannst diesen Matching-Start aktuell nicht bestätigen.",
-      "confirmationFailed": "Der gemeinsame Matching-Start konnte gerade nicht bestätigt werden.",
-      "sessionPrepared": "Matching-Session vorbereitet.",
-      "confirmationIncomplete": "Das gemeinsame Matching muss zuerst von beiden bestätigt werden.",
-      "profilesInactive": "Beide Discovery-Profile müssen aktiv sein, um die Matching-Session vorzubereiten.",
-      "localSessionUnavailable": "Die Matching-Session kann gerade nicht vorbereitet werden.",
-      "sessionPrepareFailed": "Die Matching-Session konnte gerade nicht vorbereitet werden.",
+      "matchingStartRequested": "Gemeinsamer Vergleich angefragt.",
+      "notAuthenticated": "Bitte melde dich an, um gemeinsam weiterzumachen.",
+      "preparationNotAllowed": "Ihr könnt diesen gemeinsamen Schritt aktuell nicht starten.",
+      "preparationFailed": "Der gemeinsame Schritt konnte gerade nicht gestartet werden.",
+      "otherParticipantRequested": "Die andere Person hat den gemeinsamen Vergleich bereits angefragt. Du kannst ihn bestätigen.",
+      "requestNotAllowed": "Du kannst den gemeinsamen Vergleich aktuell nicht anfragen.",
+      "requestFailed": "Der gemeinsame Vergleich konnte gerade nicht angefragt werden.",
+      "selfConfirmationForbidden": "Die andere Person muss den gemeinsamen Vergleich bestätigen.",
+      "confirmationNotAllowed": "Du kannst den gemeinsamen Vergleich aktuell nicht bestätigen.",
+      "confirmationFailed": "Der gemeinsame Vergleich konnte gerade nicht bestätigt werden.",
+      "sessionPrepared": "Gemeinsamer Vergleich vorbereitet.",
+      "confirmationIncomplete": "Der gemeinsame Vergleich muss zuerst von euch beiden bestätigt werden.",
+      "profilesInactive": "Beide Discovery-Profile müssen aktiv sein, um gemeinsam weiterzumachen.",
+      "localSessionUnavailable": "Der gemeinsame Vergleich kann gerade nicht vorbereitet werden.",
+      "sessionPrepareFailed": "Der gemeinsame Vergleich konnte gerade nicht vorbereitet werden.",
       "reportCreated": "Dynamik-Report erstellt.",
       "reportUnavailable": "Dieser Dynamik-Report ist aktuell nicht verfügbar.",
-      "sessionNotReady": "Die Matching-Session ist noch nicht bereit für den Dynamik-Report.",
+      "sessionNotReady": "Euer gemeinsamer Vergleich ist noch nicht bereit für den Dynamik-Report.",
       "requiredAnswersMissing": "Für den Dynamik-Report fehlen noch erforderliche Basis-Antworten.",
       "localReportUnavailable": "Der Dynamik-Report kann gerade nicht erstellt werden.",
-      "valuesReportNotSupported": "Session-basierte Werte-Reports sind derzeit nicht verfügbar.",
+      "valuesReportNotSupported": "Werte-Reports sind in diesem gemeinsamen Flow derzeit nicht verfügbar.",
       "reportCreationFailed": "Der Dynamik-Report konnte gerade nicht erstellt werden.",
       "unexpectedError": "Dieser Matching-Schritt konnte gerade nicht abgeschlossen werden."
     },
     "backToIntros": "Zurück zu meinen Intros",
     "backToOpenRequests": "Zurück zu offenen Anfragen",
-    "eyebrow": "Discovery Intro",
-    "title": "Gemeinsames Cofoundery-Matching vorbereiten",
-    "subtitle": "Ihr habt beide Interesse signalisiert. Der nächste sinnvolle Schritt ist ein vollständiges Cofoundery-Matching, damit ihr Rollen, Commitment, Arbeitsweise und Erwartungen gemeinsam reflektieren könnt.",
+    "eyebrow": "Gemeinsam prüfen",
+    "title": "Euer Alignment gemeinsam ansehen",
+    "subtitle": "Ihr habt beide Interesse signalisiert. Wenn ihr möchtet, könnt ihr als Nächstes Rollen, Commitment, Arbeitsweise und Erwartungen gemeinsam reflektieren.",
     "safetyNote": "Hier wird noch nichts automatisch erstellt: keine Einladung, keine Relationship, kein Report und kein Workbook.",
     "existingContextTitle": "Es gibt bereits einen bestehenden Cofoundery-Kontext",
     "existingContextText": "Für euch scheint bereits ein Matching- oder Verbindungsstand zu existieren. Damit nichts doppelt angelegt wird, startet diese Vorbereitungsseite keinen neuen Prozess.",
@@ -539,9 +567,9 @@
       "commitmentGoal": "Commitment / Zielbild"
     },
     "readiness": {
-      "eyebrow": "Matching-Core",
-      "title": "Matching-Session vorbereitet",
-      "text": "Cofoundery hat einen gemeinsamen Matching-Kontext angelegt und geprüft, ob eure Basis-Antworten schon vorhanden sind. Es wurde kein Report, keine Relationship und kein Workbook erstellt.",
+      "eyebrow": "Alignment",
+      "title": "Gemeinsamer Vergleich vorbereitet",
+      "text": "Cofoundery hat euren gemeinsamen Vergleich vorbereitet und geprüft, ob eure Basis-Antworten schon vorhanden sind. Es wurde noch kein Report und kein gemeinsamer Arbeitsbereich erstellt.",
       "statusPrefix": "Status:",
       "reportReady": "Dynamik-Report erstellt",
       "readyForReport": "Bereit für Report",
@@ -559,40 +587,40 @@
     },
     "states": {
       "canceledEyebrow": "Vorbereitung beendet",
-      "canceledTitle": "Matching-Vorbereitung beendet",
-      "canceledText": "Diese Matching-Vorbereitung wurde beendet.",
+      "canceledTitle": "Gemeinsamen Vergleich beendet",
+      "canceledText": "Dieser gemeinsame Schritt wurde beendet.",
       "readyEyebrow": "Bereit",
-      "readyTitle": "Bereit für das gemeinsame Matching",
-      "readyText": "Ihr habt beide bestätigt, dass ihr das vollständige Cofoundery-Matching starten möchtet. Als nächstes kann Cofoundery einen gemeinsamen Matching-Kontext anlegen und prüfen, ob eure Basis-Antworten schon vorhanden sind.",
-      "readyFollowup": "Cofoundery legt einen gemeinsamen Matching-Kontext an und prüft, ob eure Basis-Antworten schon vorhanden sind. Es wird noch kein Report, keine Relationship und kein Workbook erstellt.",
+      "readyTitle": "Bereit für euren gemeinsamen Vergleich",
+      "readyText": "Ihr habt beide bestätigt, dass ihr euer Alignment gemeinsam ansehen möchtet. Als Nächstes prüft Cofoundery, ob eure Basis-Antworten schon vorhanden sind.",
+      "readyFollowup": "Cofoundery bereitet euren Vergleich vor und prüft, ob eure Basis-Antworten schon vorhanden sind. Es wird noch kein Report und kein gemeinsamer Arbeitsbereich erstellt.",
       "confirmationEyebrow": "Bestätigung",
       "confirmationRequestedTitle": "Bestätigung angefragt",
-      "confirmTitle": "Cofoundery-Matching bestätigen",
-      "confirmationRequestedText": "Die andere Person muss den gemeinsamen Matching-Start noch bestätigen.",
-      "confirmText": "Die andere Person möchte das vollständige gemeinsame Matching starten. Wenn du bestätigst, seid ihr bereit für den nächsten Schritt.",
+      "confirmTitle": "Gemeinsamen Vergleich bestätigen",
+      "confirmationRequestedText": "Die andere Person muss den gemeinsamen Vergleich noch bestätigen.",
+      "confirmText": "Die andere Person möchte euer Alignment gemeinsam ansehen. Wenn du bestätigst, seid ihr bereit für den nächsten Schritt.",
       "startedEyebrow": "Vorbereitung gestartet",
-      "startedTitle": "Matching-Vorbereitung gestartet",
-      "startedText": "Wenn du bereit bist, kannst du den gemeinsamen Matching-Start anfragen. Die andere Person muss anschließend bestätigen.",
+      "startedTitle": "Gemeinsamen Schritt gestartet",
+      "startedText": "Wenn du bereit bist, kannst du euren gemeinsamen Vergleich anfragen. Die andere Person muss anschließend bestätigen.",
       "nextStepEyebrow": "Nächster Schritt",
-      "startTitle": "Matching-Vorbereitung starten",
+      "startTitle": "Gemeinsam prüfen",
       "startText": "Damit merkt Cofoundery sich, dass ihr aus diesem angenommenen Intro gemeinsam weitergehen möchtet. Dabei wird noch keine Einladung, keine Relationship, kein Report und kein Workbook erstellt."
     },
     "steps": {
       "introAccepted": "Intro angenommen",
-      "preparationCreated": "Matching-Vorbereitung erstellt",
-      "bothConfirmed": "Beide haben den gemeinsamen Matching-Start bestätigt",
-      "awaitingSecondConfirmation": "Gemeinsamer Matching-Start wartet auf zweite Bestätigung",
-      "needsBothConfirmations": "Vollständiger Cofoundery-Matching-Start braucht beide Bestätigungen",
-      "startFullMatching": "1. Ihr startet das vollständige Cofoundery-Matching.",
+      "preparationCreated": "Gemeinsamer Schritt gestartet",
+      "bothConfirmed": "Beide haben den gemeinsamen Vergleich bestätigt",
+      "awaitingSecondConfirmation": "Gemeinsamer Vergleich wartet auf die zweite Bestätigung",
+      "needsBothConfirmations": "Der gemeinsame Vergleich braucht beide Bestätigungen",
+      "startFullMatching": "1. Ihr entscheidet euch beide für den gemeinsamen Vergleich.",
       "answerQuestions": "2. Beide füllen die relevanten Cofoundery-Fragen aus oder bestätigen vorhandene Antworten.",
       "reportAndWorkbook": "3. Danach entsteht ein gemeinsamer Dynamik-Report und ihr könnt mit dem Workbook weiterarbeiten."
     },
     "actions": {
-      "prepareSession": "Matching-Session vorbereiten",
+      "prepareSession": "Alignment vorbereiten",
       "waitingForConfirmation": "Warte auf Bestätigung",
-      "confirmMatching": "Matching bestätigen",
-      "requestFullMatching": "Vollständiges Matching anfragen",
-      "startPreparation": "Matching-Vorbereitung starten"
+      "confirmMatching": "Gemeinsamen Vergleich bestätigen",
+      "requestFullMatching": "Gemeinsamen Vergleich anfragen",
+      "startPreparation": "Gemeinsam prüfen"
     }
   }
 }

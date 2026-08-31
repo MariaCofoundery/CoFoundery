@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   canCancelDiscoveryIntro,
   canPrepareDiscoveryIntroMatching,
   canRespondToDiscoveryIntro,
+  isAcceptedInvitationContextStatus,
   isDiscoveryIntroResponseStatus,
 } from "@/features/discovery/discoveryIntroTypes";
 
@@ -13,6 +15,16 @@ test("accepts only accepted or declined as intro response statuses", () => {
   assert.equal(isDiscoveryIntroResponseStatus("pending"), false);
   assert.equal(isDiscoveryIntroResponseStatus("canceled"), false);
   assert.equal(isDiscoveryIntroResponseStatus("other"), false);
+});
+
+test("only an accepted invitation counts as an existing accepted context", () => {
+  assert.equal(isAcceptedInvitationContextStatus("accepted"), true);
+  for (const status of ["pending", "declined", "canceled", "sent", "opened", "revoked"]) {
+    assert.equal(isAcceptedInvitationContextStatus(status), false);
+  }
+
+  const source = readFileSync("src/features/discovery/discoveryIntroData.ts", "utf8");
+  assert.equal(source.match(/\.eq\("status", "accepted"\)/g)?.length, 2);
 });
 
 test("allows canceling only pending intro requests", () => {

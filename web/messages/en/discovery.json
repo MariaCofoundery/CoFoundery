@@ -6,8 +6,9 @@
     "backToDiscovery": "Back to Find a Co-Founder",
     "backToDashboard": "← Back to dashboard",
     "viewProfile": "View profile",
+    "moreCount": "+{count}",
     "myIntros": "My intros",
-    "prepareSharedMatching": "Prepare shared matching",
+    "prepareSharedMatching": "Explore together",
     "fillBaseQuestions": "Answer the foundation questions"
   },
   "status": {
@@ -189,7 +190,7 @@
   },
   "v2": {
     "title": "Find a co-founder",
-    "subtitle": "Search by practical criteria and optionally use Alignment as a transparent additional signal.",
+    "subtitle": "Find founders who fit what you are looking for right now.",
     "editProfile": "Edit my profile",
     "modes": {
       "label": "Discovery mode",
@@ -199,6 +200,7 @@
     "explore": {
       "eyebrow": "Explore",
       "title": "Explore founders",
+      "count": "{count, plural, =0 {No profiles yet} =1 {One published profile} other {# published profiles}}",
       "emptyTitle": "No founders to explore yet",
       "emptyText": "Founders will appear here once they publish their Discovery profiles."
     },
@@ -207,6 +209,11 @@
       "title": "Who are you looking for right now?",
       "description": "These search criteria are private and can change at any time without republishing your public profile.",
       "profileInactive": "Profile not active",
+      "briefEyebrow": "Your search",
+      "briefTitle": "What you are looking for",
+      "briefEmptyTitle": "Explore openly",
+      "briefEmptyText": "You have not set any search criteria yet and are seeing all currently published profiles.",
+      "edit": "Edit search",
       "practicalTitle": "Practical search",
       "role": "Role",
       "expertise": "Expertise you are looking for",
@@ -251,15 +258,17 @@
       "title": "Discover founders",
       "count": "{count, plural, =0 {No profiles} =1 {One profile} other {# profiles}} match your practical filters.",
       "emptyTitle": "No profiles with these filters",
-      "emptyText": "Adjust your practical filters or come back later. Missing Alignment data never excludes anyone.",
+      "emptyText": "There are currently no profiles that meet every selected criterion. You can adjust your search or reset all filters.",
+      "reset": "Reset all filters",
       "inactiveTitle": "Activate your Discovery profile first",
       "inactiveText": "Publish your profile before finding other founders in Discovery."
     },
     "cards": {
-      "roles": "Roles",
-      "expertise": "Expertise",
-      "practicalMatches": "Matches your search on:",
-      "alignmentMatches": "Similar perspectives in areas that matter to you"
+      "brings": "Brings",
+      "seeks": "Looking for",
+      "foundingFrame": "Founding setup",
+      "practicalMatches": "Matches your search",
+      "alignmentMatches": "Voluntarily shared similar preferences in selected areas"
     },
     "pagination": {
       "label": "Discovery results",
@@ -408,6 +417,7 @@
     }
   },
   "intros": {
+    "eyebrow": "Meet",
     "title": "My intros",
     "subtitle": "Here you can see who wants to meet you and which intros you requested. An accepted intro does not create a relationship, invitation or workbook.",
     "feedback": {
@@ -472,16 +482,34 @@
       "stage": "Venture stage",
       "goal": "Venture goal"
     },
+    "sections": {
+      "interests": {
+        "eyebrow": "Interests & direction",
+        "title": "What I am interested in"
+      },
+      "brings": {
+        "eyebrow": "Experience & strengths",
+        "title": "What I bring"
+      },
+      "seeks": {
+        "eyebrow": "The complement I seek",
+        "title": "What I am looking for"
+      },
+      "founding": {
+        "eyebrow": "Working setup",
+        "title": "How I want to build"
+      }
+    },
     "intro": {
-      "eyebrow": "Discovery Intro",
-      "requestTitle": "Request intro",
-      "requestText": "If the profile feels interesting, you can signal first interest. The other person decides whether they want to accept the intro.",
+      "eyebrow": "Meet",
+      "requestTitle": "Would you like to meet this person?",
+      "requestText": "If the profile feels interesting, you can ask to connect. The other person can decide in their own time whether to accept.",
       "messageLabel": "Short message",
       "messagePlaceholder": "What makes this profile interesting to you?",
       "messageHelp": "Optional, maximum 600 characters. Share only what you intentionally want to send.",
-      "request": "Request intro",
-      "acceptedTitle": "Intro accepted",
-      "acceptedText": "You both signaled interest. Next, you can have a first conversation or later start shared Cofoundery Matching.",
+      "request": "Ask to connect",
+      "acceptedTitle": "Connection accepted",
+      "acceptedText": "You both signaled interest. You can get to know each other and then explore your Alignment together.",
       "declinedTitle": "Intro not accepted right now",
       "declinedText": "This person does not want to continue with the intro right now.",
       "canceledTitle": "Request withdrawn",
@@ -495,35 +523,35 @@
   },
   "matchingPreparation": {
     "feedback": {
-      "matchingStartRequested": "Shared matching start requested.",
-      "notAuthenticated": "Please sign in to continue with the matching preparation.",
-      "preparationNotAllowed": "You cannot start this matching preparation right now.",
-      "preparationFailed": "The matching preparation could not be started right now.",
-      "otherParticipantRequested": "The other person has already requested the matching start. You can confirm it.",
-      "requestNotAllowed": "You cannot request the shared matching start right now.",
-      "requestFailed": "The shared matching start could not be requested right now.",
-      "selfConfirmationForbidden": "The other person needs to confirm the shared matching start.",
-      "confirmationNotAllowed": "You cannot confirm this matching start right now.",
-      "confirmationFailed": "The shared matching start could not be confirmed right now.",
-      "sessionPrepared": "Matching session prepared.",
-      "confirmationIncomplete": "Both people need to confirm the shared matching first.",
-      "profilesInactive": "Both Discovery profiles need to be active before the matching session can be prepared.",
-      "localSessionUnavailable": "The matching session cannot be prepared right now.",
-      "sessionPrepareFailed": "The matching session could not be prepared right now.",
+      "matchingStartRequested": "Shared comparison requested.",
+      "notAuthenticated": "Please sign in to continue together.",
+      "preparationNotAllowed": "You cannot start this shared step right now.",
+      "preparationFailed": "The shared step could not be started right now.",
+      "otherParticipantRequested": "The other person has already requested the shared comparison. You can confirm it.",
+      "requestNotAllowed": "You cannot request the shared comparison right now.",
+      "requestFailed": "The shared comparison could not be requested right now.",
+      "selfConfirmationForbidden": "The other person needs to confirm the shared comparison.",
+      "confirmationNotAllowed": "You cannot confirm the shared comparison right now.",
+      "confirmationFailed": "The shared comparison could not be confirmed right now.",
+      "sessionPrepared": "Shared comparison prepared.",
+      "confirmationIncomplete": "Both of you need to confirm the shared comparison first.",
+      "profilesInactive": "Both Discovery profiles need to be active before you continue together.",
+      "localSessionUnavailable": "The shared comparison cannot be prepared right now.",
+      "sessionPrepareFailed": "The shared comparison could not be prepared right now.",
       "reportCreated": "Dynamics report created.",
       "reportUnavailable": "This dynamics report is currently unavailable.",
-      "sessionNotReady": "The matching session is not ready for the dynamics report yet.",
+      "sessionNotReady": "Your shared comparison is not ready for the dynamics report yet.",
       "requiredAnswersMissing": "Required foundation answers are still missing for the dynamics report.",
       "localReportUnavailable": "The dynamics report cannot be created right now.",
-      "valuesReportNotSupported": "Session-based values reports are not currently available.",
+      "valuesReportNotSupported": "Values reports are not currently available in this shared flow.",
       "reportCreationFailed": "The dynamics report could not be created right now.",
       "unexpectedError": "This matching step could not be completed right now."
     },
     "backToIntros": "Back to my intros",
     "backToOpenRequests": "Back to open requests",
-    "eyebrow": "Discovery Intro",
-    "title": "Prepare shared Cofoundery Matching",
-    "subtitle": "You both signaled interest. The next useful step is full Cofoundery Matching, so you can reflect on roles, commitment, working style and expectations together.",
+    "eyebrow": "Explore together",
+    "title": "Explore your Alignment together",
+    "subtitle": "You both signaled interest. If you want, you can now reflect on roles, commitment, working style and expectations together.",
     "safetyNote": "Nothing is created automatically here: no invitation, no relationship, no report and no workbook.",
     "existingContextTitle": "There is already an existing Cofoundery context",
     "existingContextText": "It looks like a matching or connection state already exists for you. To avoid creating duplicates, this preparation page does not start a new process.",
@@ -539,9 +567,9 @@
       "commitmentGoal": "Commitment / goal"
     },
     "readiness": {
-      "eyebrow": "Matching core",
-      "title": "Matching session prepared",
-      "text": "Cofoundery created a shared matching context and checked whether your foundation answers are already available. No report, relationship or workbook was created.",
+      "eyebrow": "Alignment",
+      "title": "Shared comparison prepared",
+      "text": "Cofoundery prepared your shared comparison and checked whether your foundation answers are already available. No report or shared workspace was created yet.",
       "statusPrefix": "Status:",
       "reportReady": "Dynamics report created",
       "readyForReport": "Ready for report",
@@ -559,40 +587,40 @@
     },
     "states": {
       "canceledEyebrow": "Preparation ended",
-      "canceledTitle": "Matching preparation ended",
-      "canceledText": "This matching preparation was ended.",
+      "canceledTitle": "Shared comparison ended",
+      "canceledText": "This shared step was ended.",
       "readyEyebrow": "Ready",
-      "readyTitle": "Ready for shared matching",
-      "readyText": "You both confirmed that you want to start full Cofoundery Matching. Next, Cofoundery can create a shared matching context and check whether your foundation answers are already available.",
-      "readyFollowup": "Cofoundery creates a shared matching context and checks whether your foundation answers are already available. No report, relationship or workbook is created yet.",
+      "readyTitle": "Ready for your shared comparison",
+      "readyText": "You both confirmed that you want to explore your Alignment together. Next, Cofoundery checks whether your foundation answers are already available.",
+      "readyFollowup": "Cofoundery prepares your comparison and checks whether your foundation answers are already available. No report or shared workspace is created yet.",
       "confirmationEyebrow": "Confirmation",
       "confirmationRequestedTitle": "Confirmation requested",
-      "confirmTitle": "Confirm Cofoundery Matching",
-      "confirmationRequestedText": "The other person still needs to confirm the shared matching start.",
-      "confirmText": "The other person wants to start the full shared matching. Once you confirm, you are ready for the next step.",
+      "confirmTitle": "Confirm shared comparison",
+      "confirmationRequestedText": "The other person still needs to confirm the shared comparison.",
+      "confirmText": "The other person wants to explore your Alignment together. Once you confirm, you are ready for the next step.",
       "startedEyebrow": "Preparation started",
-      "startedTitle": "Matching preparation started",
-      "startedText": "When you are ready, you can request the shared matching start. The other person then needs to confirm.",
+      "startedTitle": "Shared step started",
+      "startedText": "When you are ready, you can request your shared comparison. The other person then needs to confirm.",
       "nextStepEyebrow": "Next step",
-      "startTitle": "Start matching preparation",
+      "startTitle": "Explore together",
       "startText": "This lets Cofoundery remember that you want to continue together from this accepted intro. No invitation, relationship, report or workbook is created yet."
     },
     "steps": {
       "introAccepted": "Intro accepted",
-      "preparationCreated": "Matching preparation created",
-      "bothConfirmed": "Both sides have confirmed the shared matching start",
-      "awaitingSecondConfirmation": "Shared matching start is waiting for the second confirmation",
-      "needsBothConfirmations": "Full Cofoundery Matching needs confirmation from both sides",
-      "startFullMatching": "1. You start the full Cofoundery Matching.",
+      "preparationCreated": "Shared step started",
+      "bothConfirmed": "Both sides confirmed the shared comparison",
+      "awaitingSecondConfirmation": "Shared comparison is waiting for the second confirmation",
+      "needsBothConfirmations": "The shared comparison needs confirmation from both sides",
+      "startFullMatching": "1. You both choose to start the shared comparison.",
       "answerQuestions": "2. Both of you answer the relevant Cofoundery questions or confirm existing answers.",
       "reportAndWorkbook": "3. After that, a shared dynamics report is created and you can continue with the workbook."
     },
     "actions": {
-      "prepareSession": "Prepare matching session",
+      "prepareSession": "Prepare Alignment",
       "waitingForConfirmation": "Waiting for confirmation",
-      "confirmMatching": "Confirm matching",
-      "requestFullMatching": "Request full matching",
-      "startPreparation": "Start matching preparation"
+      "confirmMatching": "Confirm shared comparison",
+      "requestFullMatching": "Request shared comparison",
+      "startPreparation": "Explore together"
     }
   }
 }
