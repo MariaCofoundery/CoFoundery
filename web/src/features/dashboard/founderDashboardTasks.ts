@@ -35,6 +35,11 @@ export type FounderDashboardTask = {
   itemKey: FounderSetupItemKey | null;
   packCount?: number;
   started?: boolean;
+  discoveryStage?:
+    | "incoming_intro"
+    | "joint_check_consent"
+    | "own_inputs_missing"
+    | "alignment_ready";
 };
 
 export type FounderDashboardTaskSignals = {
@@ -63,6 +68,17 @@ export type FounderDashboardTaskSignals = {
     id: string;
     recipientUserId: string;
     status: string;
+    updatedAt: string;
+  }>;
+  discoveryJourneys?: Array<{
+    introRequestId: string;
+    counterpartLabel: string | null;
+    matchingStartStatus: string;
+    requestedByUserId: string | null;
+    matchingSessionStatus: string | null;
+    ownBaseInputPresent: boolean;
+    partnerBaseInputPresent: boolean;
+    reportReady: boolean;
     updatedAt: string;
   }>;
   relationships: Array<{
@@ -203,6 +219,9 @@ export function buildFounderDashboardTasks(
       )
       .map((relationship) => [relationship.id, relationship])
   );
+  const discoveryJourneyIntroIds = new Set(
+    (signals.discoveryJourneys ?? []).map((journey) => journey.introRequestId)
+  );
 
   for (const invitation of signals.invitations) {
     if (!isClaimableInvitation(invitation, signals.now)) continue;
@@ -219,7 +238,13 @@ export function buildFounderDashboardTasks(
   }
 
   for (const intro of signals.discoveryIntros) {
-    if (intro.recipientUserId !== signals.currentUserId || intro.status !== "pending") continue;
+    if (
+      intro.recipientUserId !== signals.currentUserId ||
+      intro.status !== "pending" ||
+      discoveryJourneyIntroIds.has(intro.id)
+    ) {
+      continue;
+    }
     tasks.push({
       id: `discovery-intro:${intro.id}`,
       kind: "NEEDS_YOU",
@@ -229,6 +254,82 @@ export function buildFounderDashboardTasks(
       contextLabel: null,
       personLabel: null,
       itemKey: null,
+      discoveryStage: "incoming_intro",
+    });
+  }
+
+  const discoveryOwnInputJourneys: NonNullable<
+    FounderDashboardTaskSignals["discoveryJourneys"]
+  > = [];
+  for (const journey of signals.discoveryJourneys ?? []) {
+    if (journey.matchingStartStatus === "awaiting_other_confirmation") {
+      if (
+        !journey.requestedByUserId ||
+        journey.requestedByUserId === signals.currentUserId
+      ) {
+        continue;
+      }
+      tasks.push({
+        id: `discovery-journey:${journey.introRequestId}`,
+        kind: "NEEDS_YOU",
+        type: "discovery_intro",
+        href: `/discovery/intros/${encodeURIComponent(journey.introRequestId)}/matching`,
+        createdAt: journey.updatedAt,
+        contextLabel: null,
+        personLabel: journey.counterpartLabel,
+        itemKey: null,
+        discoveryStage: "joint_check_consent",
+      });
+      continue;
+    }
+
+    if (
+      journey.matchingStartStatus !== "ready_for_matching" ||
+      !journey.matchingSessionStatus
+    ) {
+      continue;
+    }
+    if (
+      journey.matchingSessionStatus === "awaiting_inputs" &&
+      !journey.ownBaseInputPresent
+    ) {
+      discoveryOwnInputJourneys.push(journey);
+      continue;
+    }
+    if (
+      journey.matchingSessionStatus === "ready_for_report" &&
+      journey.ownBaseInputPresent &&
+      journey.partnerBaseInputPresent &&
+      !journey.reportReady
+    ) {
+      tasks.push({
+        id: `discovery-journey:${journey.introRequestId}`,
+        kind: "CONTINUE_SHARED",
+        type: "discovery_intro",
+        href: `/discovery/intros/${encodeURIComponent(journey.introRequestId)}/matching`,
+        createdAt: journey.updatedAt,
+        contextLabel: null,
+        personLabel: journey.counterpartLabel,
+        itemKey: null,
+        discoveryStage: "alignment_ready",
+      });
+    }
+  }
+
+  const newestDiscoveryOwnInputJourney = discoveryOwnInputJourneys.sort((left, right) =>
+    right.updatedAt.localeCompare(left.updatedAt)
+  )[0];
+  if (newestDiscoveryOwnInputJourney) {
+    tasks.push({
+      id: "discovery-journey:own-inputs",
+      kind: "CONTINUE_PERSONAL",
+      type: "discovery_intro",
+      href: "/me/base",
+      createdAt: newestDiscoveryOwnInputJourney.updatedAt,
+      contextLabel: null,
+      personLabel: null,
+      itemKey: null,
+      discoveryStage: "own_inputs_missing",
     });
   }
 
@@ -370,7 +471,11 @@ export function buildFounderDashboardTasks(
     }
   }
 
-  if (signals.personal.founderAlignmentStarted && !signals.personal.founderAlignmentSubmitted) {
+  if (
+    signals.personal.founderAlignmentStarted &&
+    !signals.personal.founderAlignmentSubmitted &&
+    !newestDiscoveryOwnInputJourney
+  ) {
     tasks.push({
       id: "personal:founder-alignment",
       kind: "CONTINUE_PERSONAL",

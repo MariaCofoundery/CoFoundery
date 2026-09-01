@@ -35,6 +35,23 @@ type SetupItemRow = {
   updated_at: string;
 };
 
+type DiscoveryMatchingStartRow = {
+  id: string;
+  intro_request_id: string;
+  requester_user_id: string;
+  recipient_user_id: string;
+  status: string;
+  requested_by_user_id: string | null;
+  updated_at: string;
+};
+
+type MatchingSessionTaskRow = {
+  id: string;
+  source_id: string | null;
+  status: string;
+  updated_at: string;
+};
+
 export async function getFounderDashboardTasks(params: {
   currentUserId: string;
   invitations: InvitationDashboardRow[];
@@ -52,7 +69,7 @@ export async function getFounderDashboardTasks(params: {
   const teamIds = params.teams.map((team) => team.id);
   const teamById = new Map(params.teams.map((team) => [team.id, team]));
 
-  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult] =
+  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult, discoveryMatchingStartResult] =
     await Promise.all([
       supabase
         .from("discovery_intro_requests")
@@ -83,7 +100,89 @@ export async function getFounderDashboardTasks(params: {
       teamIds.length > 0
         ? supabase.from("collaboration_experience_rounds").select("id, founder_team_id, status, created_at").in("founder_team_id", teamIds).eq("experience_key", "founder_in_the_wild").eq("status", "active")
         : Promise.resolve({ data: [], error: null }),
+      supabase
+        .from("discovery_matching_starts")
+        .select(
+          "id, intro_request_id, requester_user_id, recipient_user_id, status, requested_by_user_id, updated_at"
+        )
+        .or(`requester_user_id.eq.${currentUserId},recipient_user_id.eq.${currentUserId}`)
+        .in("status", ["awaiting_other_confirmation", "ready_for_matching"])
+        .order("updated_at", { ascending: false })
+        .limit(20),
     ]);
+
+  const discoveryMatchingStarts = discoveryMatchingStartResult.error
+    ? []
+    : ((discoveryMatchingStartResult.data ?? []) as DiscoveryMatchingStartRow[]);
+  const discoveryMatchingStartIds = discoveryMatchingStarts.map(
+    (start) => start.id
+  );
+  const discoveryCounterpartUserIds = [
+    ...new Set(
+      discoveryMatchingStarts.map((start) =>
+        start.requester_user_id === currentUserId
+          ? start.recipient_user_id
+          : start.requester_user_id
+      )
+    ),
+  ];
+  const [matchingSessionResult, discoveryCounterpartProfileResult] = await Promise.all([
+    discoveryMatchingStartIds.length > 0
+      ? supabase
+          .from("matching_sessions")
+          .select("id, source_id, status, updated_at")
+          .eq("source_type", "discovery_matching_start")
+          .in("source_id", discoveryMatchingStartIds)
+      : Promise.resolve({ data: [], error: null }),
+    discoveryCounterpartUserIds.length > 0
+      ? supabase
+          .from("founder_discovery_profiles")
+          .select("user_id, display_name")
+          .in("user_id", discoveryCounterpartUserIds)
+          .eq("status", "active")
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const matchingSessions = matchingSessionResult.error
+    ? []
+    : ((matchingSessionResult.data ?? []) as MatchingSessionTaskRow[]);
+  const matchingSessionIds = matchingSessions.map((session) => session.id);
+  const [matchingInputResult, matchingReportResult] = await Promise.all([
+    matchingSessionIds.length > 0
+      ? supabase
+          .from("matching_session_inputs")
+          .select("matching_session_id, user_id, module")
+          .in("matching_session_id", matchingSessionIds)
+          .eq("module", "base")
+      : Promise.resolve({ data: [], error: null }),
+    matchingSessionIds.length > 0
+      ? supabase
+          .from("matching_report_runs")
+          .select("matching_session_id")
+          .in("matching_session_id", matchingSessionIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const matchingInputs = matchingInputResult.error
+    ? []
+    : ((matchingInputResult.data ?? []) as Array<{
+        matching_session_id: string;
+        user_id: string;
+        module: string;
+      }>);
+  const matchingReportSessionIds = new Set(
+    matchingReportResult.error
+      ? []
+      : ((matchingReportResult.data ?? []) as Array<{ matching_session_id: string }>).map(
+          (report) => report.matching_session_id
+        )
+  );
+  const discoveryCounterpartLabels = new Map(
+    discoveryCounterpartProfileResult.error
+      ? []
+      : ((discoveryCounterpartProfileResult.data ?? []) as Array<{
+          user_id: string;
+          display_name: string;
+        }>).map((profile) => [profile.user_id, profile.display_name] as const)
+  );
 
   const relationships = relationshipResult.error
     ? []
@@ -217,6 +316,35 @@ export async function getFounderDashboardTasks(params: {
           status: intro.status,
           updatedAt: intro.updated_at,
         })),
+    discoveryJourneys: discoveryMatchingStarts.map((start) => {
+      const counterpartUserId =
+        start.requester_user_id === currentUserId
+          ? start.recipient_user_id
+          : start.requester_user_id;
+      const session = matchingSessions.find(
+        (candidate) => candidate.source_id === start.id
+      );
+      const sessionInputs = session
+        ? matchingInputs.filter((input) => input.matching_session_id === session.id)
+        : [];
+      return {
+        introRequestId: start.intro_request_id,
+        counterpartLabel: discoveryCounterpartLabels.get(counterpartUserId) ?? null,
+        matchingStartStatus: start.status,
+        requestedByUserId: start.requested_by_user_id,
+        matchingSessionStatus: session?.status ?? null,
+        ownBaseInputPresent: sessionInputs.some(
+          (input) => input.user_id === currentUserId && input.module === "base"
+        ),
+        partnerBaseInputPresent: sessionInputs.some(
+          (input) => input.user_id === counterpartUserId && input.module === "base"
+        ),
+        reportReady:
+          session?.status === "report_ready" ||
+          Boolean(session && matchingReportSessionIds.has(session.id)),
+        updatedAt: session?.updated_at ?? start.updated_at,
+      };
+    }),
     relationships: relationshipSignals,
     relationshipAdvisors: advisorResult.error
       ? []

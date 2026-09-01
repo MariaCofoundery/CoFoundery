@@ -68,9 +68,26 @@
         "action": "Einladung ansehen"
       },
       "discoveryIntro": {
-        "title": "Neue Anfrage über Co-Founder finden",
-        "text": "Du kannst die Intro-Anfrage jetzt ansehen und beantworten.",
+        "title": "Kennenlernen",
+        "text": "Ein Founder möchte dich kennenlernen.",
+        "textWithName": "{name} möchte dich kennenlernen.",
         "action": "Anfrage ansehen"
+      },
+      "discoveryJointCheck": {
+        "title": "Gemeinsam prüfen",
+        "text": "Ein Founder möchte mit dir gemeinsam eure Erwartungen und Vorstellungen vergleichen.",
+        "textWithName": "{name} möchte mit dir gemeinsam eure Erwartungen und Vorstellungen vergleichen.",
+        "action": "Anfrage ansehen"
+      },
+      "discoveryOwnInputs": {
+        "title": "Gemeinsam prüfen",
+        "text": "Dir fehlen noch ein paar Angaben, bevor ihr euer Alignment ansehen könnt.",
+        "action": "Angaben vervollständigen"
+      },
+      "discoveryAlignmentReady": {
+        "title": "Euer Alignment ist bereit",
+        "text": "Ihr habt beide euren Teil abgeschlossen. Jetzt könnt ihr euren gemeinsamen Blick ansehen.",
+        "action": "Alignment ansehen"
       },
       "relationshipAdvisor": {
         "title": "Advisor-Freigabe prüfen",

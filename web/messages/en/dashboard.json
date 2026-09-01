@@ -68,9 +68,26 @@
         "action": "View invitation"
       },
       "discoveryIntro": {
-        "title": "New request through Find a Co-Founder",
-        "text": "You can now review and respond to the intro request.",
+        "title": "Meet a founder",
+        "text": "A founder would like to meet you.",
+        "textWithName": "{name} would like to meet you.",
         "action": "View request"
+      },
+      "discoveryJointCheck": {
+        "title": "Explore together",
+        "text": "A founder would like to compare your expectations and perspectives together.",
+        "textWithName": "{name} would like to compare your expectations and perspectives together.",
+        "action": "View request"
+      },
+      "discoveryOwnInputs": {
+        "title": "Explore together",
+        "text": "You still need to add a few details before you can view your Alignment together.",
+        "action": "Complete your details"
+      },
+      "discoveryAlignmentReady": {
+        "title": "Your Alignment is ready",
+        "text": "You have both completed your part. You can now view your shared perspective.",
+        "action": "View Alignment"
       },
       "relationshipAdvisor": {
         "title": "Review advisor access",

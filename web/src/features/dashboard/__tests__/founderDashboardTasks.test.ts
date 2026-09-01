@@ -47,6 +47,25 @@ function relationship(overrides: Partial<FounderDashboardTaskSignals["relationsh
   };
 }
 
+function discoveryJourney(
+  overrides: Partial<
+    NonNullable<FounderDashboardTaskSignals["discoveryJourneys"]>[number]
+  > = {}
+) {
+  return {
+    introRequestId: "intro-ab",
+    counterpartLabel: "Ben",
+    matchingStartStatus: "awaiting_other_confirmation",
+    requestedByUserId: "founder-b",
+    matchingSessionStatus: null,
+    ownBaseInputPresent: false,
+    partnerBaseInputPresent: false,
+    reportReady: false,
+    updatedAt: NOW,
+    ...overrides,
+  };
+}
+
 test("task priorities follow NEEDS_YOU, CONTINUE_PERSONAL, CONTINUE_SHARED", () => {
   const tasks = buildFounderDashboardTasks(signals({
     invitations: [{
@@ -191,6 +210,151 @@ test("Discovery intros are recipient-only and expose no search preferences", () 
   assert.deepEqual(tasks.map((task) => task.id), ["discovery-intro:own"]);
   assert.equal(tasks[0]?.href, "/discovery/intros");
   assert.equal("searchPreferences" in tasks[0]!, false);
+});
+
+test("Discovery joint-check consent is recipient-only and disappears after consent", () => {
+  const recipientTasks = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [discoveryJourney()],
+  }));
+  assert.deepEqual(recipientTasks.map((task) => [task.kind, task.discoveryStage]), [
+    ["NEEDS_YOU", "joint_check_consent"],
+  ]);
+  assert.equal(recipientTasks[0]?.personLabel, "Ben");
+  assert.equal(recipientTasks[0]?.href, "/discovery/intros/intro-ab/matching");
+
+  const requesterTasks = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [
+      discoveryJourney({ requestedByUserId: "founder-a", counterpartLabel: "Ben" }),
+    ],
+  }));
+  assert.equal(requesterTasks.length, 0);
+
+  const consentedTasks = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [
+      discoveryJourney({
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "awaiting_inputs",
+        ownBaseInputPresent: true,
+        partnerBaseInputPresent: false,
+      }),
+    ],
+  }));
+  assert.equal(consentedTasks.length, 0);
+});
+
+test("Discovery missing-input tasks are personal, deduplicated and owner-only", () => {
+  const ownMissing = buildFounderDashboardTasks(signals({
+    personal: {
+      founderAlignmentStarted: true,
+      founderAlignmentSubmitted: false,
+      valuesStarted: false,
+      valuesSubmitted: false,
+    },
+    discoveryJourneys: [
+      discoveryJourney({
+        introRequestId: "older",
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "awaiting_inputs",
+        requestedByUserId: "founder-a",
+        updatedAt: "2026-08-27T12:00:00.000Z",
+      }),
+      discoveryJourney({
+        introRequestId: "newer",
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "awaiting_inputs",
+        requestedByUserId: "founder-a",
+      }),
+    ],
+  }));
+  assert.deepEqual(ownMissing.map((task) => [task.id, task.kind, task.discoveryStage]), [
+    ["discovery-journey:own-inputs", "CONTINUE_PERSONAL", "own_inputs_missing"],
+  ]);
+  assert.equal(ownMissing[0]?.href, "/me/base");
+
+  const onlyPartnerMissing = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [
+      discoveryJourney({
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "awaiting_inputs",
+        ownBaseInputPresent: true,
+        partnerBaseInputPresent: false,
+      }),
+    ],
+  }));
+  assert.equal(onlyPartnerMissing.length, 0);
+});
+
+test("Discovery Alignment-ready tasks end when the report exists", () => {
+  const ready = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [
+      discoveryJourney({
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "ready_for_report",
+        ownBaseInputPresent: true,
+        partnerBaseInputPresent: true,
+      }),
+    ],
+  }));
+  assert.deepEqual(ready.map((task) => [task.kind, task.discoveryStage]), [
+    ["CONTINUE_SHARED", "alignment_ready"],
+  ]);
+  assert.equal(ready[0]?.href, "/discovery/intros/intro-ab/matching");
+
+  const reportReady = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [
+      discoveryJourney({
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: "report_ready",
+        ownBaseInputPresent: true,
+        partnerBaseInputPresent: true,
+        reportReady: true,
+      }),
+    ],
+  }));
+  assert.equal(reportReady.length, 0);
+});
+
+test("Discovery tasks omit waiting, processing, canceled and duplicate states", () => {
+  const tasks = buildFounderDashboardTasks(signals({
+    discoveryIntros: [
+      { id: "same", recipientUserId: "founder-a", status: "pending", updatedAt: NOW },
+      { id: "outgoing", recipientUserId: "founder-b", status: "pending", updatedAt: NOW },
+      { id: "declined", recipientUserId: "founder-a", status: "declined", updatedAt: NOW },
+      { id: "canceled", recipientUserId: "founder-a", status: "canceled", updatedAt: NOW },
+    ],
+    discoveryJourneys: [
+      discoveryJourney({ introRequestId: "same" }),
+      discoveryJourney({
+        introRequestId: "requester-waits",
+        requestedByUserId: "founder-a",
+      }),
+      discoveryJourney({
+        introRequestId: "processing",
+        matchingStartStatus: "ready_for_matching",
+        matchingSessionStatus: null,
+      }),
+    ],
+  }));
+  assert.deepEqual(tasks.map((task) => task.id), ["discovery-journey:same"]);
+});
+
+test("Discovery task payloads contain no answers, scores, preferences or partner progress", () => {
+  const tasks = buildFounderDashboardTasks(signals({
+    discoveryJourneys: [discoveryJourney()],
+  }));
+  const serialized = JSON.stringify(tasks);
+  assert.doesNotMatch(serialized, /answer|score|dimension|preference|progress|assessment/i);
+  assert.deepEqual(Object.keys(tasks[0]!).sort(), [
+    "contextLabel",
+    "createdAt",
+    "discoveryStage",
+    "href",
+    "id",
+    "itemKey",
+    "kind",
+    "personLabel",
+    "type",
+  ]);
 });
 
 test("relationship advisor consent is shown only to the founder whose approval is missing", () => {
@@ -390,6 +554,62 @@ test("dashboard task loader remains narrow, read-only, and content-free", () => 
   assert.match(dataSource, /is_commitment_lab_complete/);
   assert.match(dataSource, /founder_team_setup_items[\s\S]*pending_revision_id/);
   assert.match(dataSource, /collaboration_experience_rounds[\s\S]*\.eq\("experience_key", "read_my_mind"\)/);
+  assert.match(
+    dataSource,
+    /discovery_matching_starts[\s\S]*requested_by_user_id[\s\S]*updated_at/
+  );
+  assert.match(
+    dataSource,
+    /matching_session_inputs[\s\S]*matching_session_id, user_id, module/
+  );
+  assert.match(dataSource, /matching_report_runs[\s\S]*matching_session_id/);
+  assert.doesNotMatch(
+    dataSource,
+    /matching_report_runs[\s\S]*\.select\([^)]*(payload|report_content)/
+  );
+  assert.doesNotMatch(dataSource, /resend|sendEmail|notification_claim/i);
+});
+
+test("Discovery journey task copy is parallel, actionable and non-evaluative", () => {
+  const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
+  type DiscoveryTaskMessages = {
+    tasks: {
+      items: Record<
+        string,
+        { title: string; text: string; textWithName?: string; action: string }
+      >;
+    };
+  };
+  const de = JSON.parse(
+    readFileSync("messages/de/dashboard.json", "utf8")
+  ) as DiscoveryTaskMessages;
+  const en = JSON.parse(
+    readFileSync("messages/en/dashboard.json", "utf8")
+  ) as DiscoveryTaskMessages;
+  const keys = [
+    "discoveryIntro",
+    "discoveryJointCheck",
+    "discoveryOwnInputs",
+    "discoveryAlignmentReady",
+  ];
+  for (const key of keys) {
+    assert.ok(de.tasks.items[key]?.title);
+    assert.ok(de.tasks.items[key]?.text);
+    assert.ok(de.tasks.items[key]?.action);
+    assert.ok(en.tasks.items[key]?.title);
+    assert.ok(en.tasks.items[key]?.text);
+    assert.ok(en.tasks.items[key]?.action);
+  }
+  assert.match(dashboard, /discoveryStage === "joint_check_consent"/);
+  assert.match(dashboard, /discoveryStage === "own_inputs_missing"/);
+  assert.match(dashboard, /discoveryStage === "alignment_ready"/);
+  assert.doesNotMatch(
+    JSON.stringify({
+      de: keys.map((key) => de.tasks.items[key]),
+      en: keys.map((key) => en.tasks.items[key]),
+    }),
+    /compatib|kompatib|match score|perfect match|success probability|score|%/i
+  );
 });
 
 test("task UI and DE/EN messages preserve the three-item limit and empty state", () => {

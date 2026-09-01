@@ -721,11 +721,44 @@ function presentDashboardTask(
         action: t("tasks.items.incomingInvitation.action"),
       };
     case "discovery_intro":
+      if (task.discoveryStage === "joint_check_consent") {
+        return {
+          ...task,
+          eyebrow,
+          title: t("tasks.items.discoveryJointCheck.title"),
+          text: task.personLabel
+            ? t("tasks.items.discoveryJointCheck.textWithName", {
+                name: task.personLabel,
+              })
+            : t("tasks.items.discoveryJointCheck.text"),
+          action: t("tasks.items.discoveryJointCheck.action"),
+        };
+      }
+      if (task.discoveryStage === "own_inputs_missing") {
+        return {
+          ...task,
+          eyebrow,
+          title: t("tasks.items.discoveryOwnInputs.title"),
+          text: t("tasks.items.discoveryOwnInputs.text"),
+          action: t("tasks.items.discoveryOwnInputs.action"),
+        };
+      }
+      if (task.discoveryStage === "alignment_ready") {
+        return {
+          ...task,
+          eyebrow,
+          title: t("tasks.items.discoveryAlignmentReady.title"),
+          text: t("tasks.items.discoveryAlignmentReady.text"),
+          action: t("tasks.items.discoveryAlignmentReady.action"),
+        };
+      }
       return {
         ...task,
         eyebrow,
         title: t("tasks.items.discoveryIntro.title"),
-        text: t("tasks.items.discoveryIntro.text"),
+        text: task.personLabel
+          ? t("tasks.items.discoveryIntro.textWithName", { name: task.personLabel })
+          : t("tasks.items.discoveryIntro.text"),
         action: t("tasks.items.discoveryIntro.action"),
       };
     case "relationship_advisor_consent":
