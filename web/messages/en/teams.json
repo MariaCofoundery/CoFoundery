@@ -241,7 +241,7 @@
   },
   "connections": {
     "eyebrow": "Connections",
-    "title": "Your founder connections",
+      "title": "Connections & teams",
     "subtitle": "Find the founders you are exploring a collaboration with or already working with.",
     "find": "Find a Co-Founder",
     "avatarAlt": "Profile for {name}",
@@ -260,8 +260,8 @@
       "empty": "You do not have a long-term founder connection yet."
     },
     "potential": {
-      "title": "Introductions and alignment",
-      "description": "Open requests and connections where you are still exploring a collaboration.",
+        "title": "Meet & explore together",
+        "description": "Open introduction requests and connections where you are still exploring collaboration together.",
       "empty": "There are no open or ongoing connections right now."
     },
     "states": {
@@ -270,12 +270,12 @@
         "sent": "Request sent"
       },
       "intro_accepted": {
-        "incoming": "Introduction accepted",
-        "sent": "Introduction accepted"
+          "incoming": "You would like to get to know each other",
+          "sent": "You would like to get to know each other"
       },
       "alignment_in_progress": {
-        "incoming": "Alignment in progress",
-        "sent": "Alignment in progress"
+          "incoming": "You are exploring together",
+          "sent": "You are exploring together"
       }
     }
   },

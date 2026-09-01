@@ -241,7 +241,7 @@
   },
   "connections": {
     "eyebrow": "Verbindungen",
-    "title": "Deine Founder-Verbindungen",
+      "title": "Verbindungen & Teams",
     "subtitle": "Hier findest du Founder, mit denen du eine Zusammenarbeit prüfst oder bereits zusammenarbeitest.",
     "find": "Co-Founder finden",
     "avatarAlt": "Profil von {name}",
@@ -260,8 +260,8 @@
       "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden."
     },
     "potential": {
-      "title": "Kennenlernen und Alignment",
-      "description": "Offene Anfragen und Verbindungen, bei denen ihr eine Zusammenarbeit noch prüft.",
+        "title": "Kennenlernen & gemeinsam prüfen",
+        "description": "Offene Kennenlern-Anfragen und Verbindungen, bei denen ihr eure Zusammenarbeit noch gemeinsam prüft.",
       "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen."
     },
     "states": {
@@ -270,12 +270,12 @@
         "sent": "Anfrage gesendet"
       },
       "intro_accepted": {
-        "incoming": "Intro angenommen",
-        "sent": "Intro angenommen"
+          "incoming": "Ihr möchtet euch kennenlernen",
+          "sent": "Ihr möchtet euch kennenlernen"
       },
       "alignment_in_progress": {
-        "incoming": "Alignment läuft",
-        "sent": "Alignment läuft"
+          "incoming": "Ihr prüft gemeinsam",
+          "sent": "Ihr prüft gemeinsam"
       }
     }
   },

@@ -13,6 +13,7 @@ import type {
   DiscoveryMatchingPreparationResult,
   DiscoveryMatchingRequestErrorReason,
   DiscoveryMatchingRequestResult,
+  DiscoveryMatchingStartResult,
 } from "@/features/discovery/discoveryMatchingStartFeedback";
 import { createClient } from "@/lib/supabase/server";
 
@@ -118,6 +119,59 @@ export async function startDiscoveryMatchingPreparationAction(
     return {
       ok: false,
       reason: matchingPreparationErrorReason(error),
+    };
+  }
+}
+
+/**
+ * Treats the founder's explicit "explore together" action as both the
+ * technical preparation and the request that needs the other founder's
+ * confirmation. Both data operations are idempotent, so a retry can safely
+ * resume after either step without creating another preparation.
+ */
+export async function requestDiscoveryJointCheckAction(
+  introRequestId: string
+): Promise<DiscoveryMatchingStartResult> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return {
+      ok: false,
+      reason: "not_authenticated",
+    };
+  }
+
+  try {
+    const preparation = await startDiscoveryMatchingPreparation({
+      introRequestId,
+      userId,
+    });
+    const matchingStart = preparation.matchingStart;
+    if (!matchingStart) {
+      return {
+        ok: false,
+        reason: "preparation_failed",
+      };
+    }
+
+    await requestFullDiscoveryMatching({
+      matchingStartId: matchingStart.id,
+      userId,
+    });
+
+    revalidatePath(`/discovery/intros/${introRequestId}/matching`);
+    revalidatePath("/discovery/intros");
+    return {
+      ok: true,
+      reason: "matching_start_requested",
+    };
+  } catch (error) {
+    const preparationReason = matchingPreparationErrorReason(error);
+    if (preparationReason !== "preparation_failed") {
+      return { ok: false, reason: preparationReason };
+    }
+    return {
+      ok: false,
+      reason: fullMatchingRequestErrorReason(error),
     };
   }
 }

@@ -28,28 +28,28 @@
     "workbookCta": "Alignment deep dive"
   },
   "session": {
-    "emptyTitle": "The dynamics report has not been created yet.",
-    "emptyText": "Once the matching session is ready, you can create the report as a snapshot from the matching preparation page.",
-    "snapshotHint": "Session-based snapshot · no invitation, no legacy report, no workbook",
-    "snapshotEyebrow": "Session snapshot",
-    "snapshotText": "This report was created from your matching session. It does not create an invitation, relationship, or workbook.",
+    "emptyTitle": "Your Alignment is not ready yet.",
+    "emptyText": "Once your required details are complete, you can open your shared Alignment view.",
+    "snapshotHint": "Shared Alignment view",
+    "snapshotEyebrow": "Your Alignment",
+    "snapshotText": "This shared view captures the state that you released for this comparison.",
     "workspaceFeedback": {
-      "notAuthenticated": "Please sign in to prepare the shared workspace.",
-      "sessionUnavailable": "This matching workspace is currently unavailable.",
-      "reportNotReady": "The dynamics report must be created before you can prepare the workspace.",
-      "reportMissing": "The dynamics report is not available for this matching session yet.",
-      "participantsInvalid": "The workspace can only be prepared for exactly two active founders.",
-      "startFailed": "The shared workspace could not be prepared right now.",
-      "unexpectedError": "The shared workspace could not be prepared right now."
+      "notAuthenticated": "Please sign in to start collaborating.",
+      "sessionUnavailable": "This shared area is currently unavailable.",
+      "reportNotReady": "Your Alignment needs to be ready before you start collaborating.",
+      "reportMissing": "Your shared Alignment view is not available yet.",
+      "participantsInvalid": "The shared area can only be prepared for exactly two active founders.",
+      "startFailed": "The collaboration could not be started right now.",
+      "unexpectedError": "The collaboration could not be started right now."
     },
-    "workspaceEyebrow": "Workspace",
-    "workspaceReadyTitle": "Workspace ready",
-    "workspaceReadyText": "Your shared connection has been created. The workbook/operating agreement will be connected as the next step.",
-    "openWorkspace": "Open workspace",
-    "prepareWorkspaceTitle": "Prepare shared workspace",
-    "prepareWorkspaceText": "If you want to continue, you can prepare a shared workspace from this report. This creates a shared connection. The workbook will be connected in the next step.",
-    "prepareWorkspaceSafety": "No invitation, legacy report, or workbook will be created.",
-    "startWorkspace": "Start shared workspace"
+    "workspaceEyebrow": "Collaboration",
+    "workspaceReadyTitle": "Shared area started",
+    "workspaceReadyText": "Your shared area in CoFoundery is ready.",
+    "openWorkspace": "Open shared area",
+    "prepareWorkspaceTitle": "Would you like to keep working together?",
+    "prepareWorkspaceText": "If you want to keep getting to know each other or are already building together, you can now start a shared area in CoFoundery.",
+    "prepareWorkspaceSafety": "This creates a shared workspace. It does not state whether or how you will found a company together.",
+    "startWorkspace": "Start collaborating"
   },
   "view": {
     "matchingReport": "Matching report",

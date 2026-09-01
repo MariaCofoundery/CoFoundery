@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   confirmFullDiscoveryMatchingAction,
+  requestDiscoveryJointCheckAction,
   requestFullDiscoveryMatchingAction,
-  startDiscoveryMatchingPreparationAction,
 } from "@/features/discovery/discoveryMatchingStartActions";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { getDiscoveryMatchingPreparation } from "@/features/discovery/discoveryMatchingStartData";
@@ -168,17 +168,23 @@ function MatchingSessionReadinessCard({
   summary,
   currentUserId,
   reportRun,
+  counterpartName,
   t,
 }: {
   summary: MatchingSessionSummary;
   currentUserId: string;
   reportRun: MatchingReportRunSummary | null;
+  counterpartName: string;
   t: DiscoveryT;
 }) {
   const currentUserReadiness = summary.participants.find(
     (participant) => participant.userId === currentUserId
   );
   const currentUserBaseMissing = currentUserReadiness?.baseInputStatus === "missing";
+  const counterpartReadiness = summary.participants.find(
+    (participant) => participant.userId !== currentUserId
+  );
+  const counterpartBaseMissing = counterpartReadiness?.baseInputStatus === "missing";
   const isReadyForReport = summary.session.status === "ready_for_report";
   const isReportReady = summary.session.status === "report_ready" || Boolean(reportRun);
 
@@ -188,7 +194,15 @@ function MatchingSessionReadinessCard({
         {t("matchingPreparation.readiness.eyebrow")}
       </p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        {t("matchingPreparation.readiness.title")}
+        {isReportReady || isReadyForReport
+          ? t("matchingPreparation.readiness.alignmentReadyTitle")
+          : currentUserBaseMissing
+            ? t("matchingPreparation.readiness.ownInputsMissingTitle")
+            : counterpartBaseMissing
+              ? t("matchingPreparation.readiness.partnerInputsMissingTitle", {
+                  name: counterpartName,
+                })
+              : t("matchingPreparation.readiness.title")}
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
         {t("matchingPreparation.readiness.text")}
@@ -232,12 +246,12 @@ function MatchingSessionReadinessCard({
       <div className="mt-6 flex flex-wrap gap-3">
         {currentUserBaseMissing ? (
           <Link href="/me/base" className={PRIMARY_CTA_CLASS}>
-            {t("common.fillBaseQuestions")}
+            {t("matchingPreparation.readiness.completeInputs")}
           </Link>
         ) : null}
         {isReportReady ? (
           <Link href={`/matching/${summary.session.id}/report`} className={PRIMARY_CTA_CLASS}>
-            {t("matchingPreparation.readiness.viewReport")}
+            {t("matchingPreparation.readiness.viewAlignment")}
           </Link>
         ) : null}
         {isReadyForReport && !isReportReady ? (
@@ -300,6 +314,7 @@ function MatchingStartStatusContent({
   currentUserId,
   matchingSession,
   reportRun,
+  counterpartName,
   t,
 }: {
   introRequestId: string;
@@ -307,6 +322,7 @@ function MatchingStartStatusContent({
   currentUserId: string;
   matchingSession: MatchingSessionSummary | null;
   reportRun: MatchingReportRunSummary | null;
+  counterpartName: string;
   t: DiscoveryT;
 }) {
   async function requestFullMatching() {
@@ -318,7 +334,14 @@ function MatchingStartStatusContent({
   async function confirmFullMatching() {
     "use server";
     const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    redirect(matchingStartResultUrl(introRequestId, result));
+    if (!result.ok) {
+      redirect(matchingStartResultUrl(introRequestId, result));
+    }
+    const sessionResult = await createMatchingSessionFromDiscoveryStartAction(
+      introRequestId,
+      matchingStart.id
+    );
+    redirect(matchingSessionResultUrl(introRequestId, sessionResult));
   }
 
   async function createMatchingSession() {
@@ -372,13 +395,14 @@ function MatchingStartStatusContent({
             summary={matchingSession}
             currentUserId={currentUserId}
             reportRun={reportRun}
+            counterpartName={counterpartName}
             t={t}
           />
           {matchingSession.session.status === "ready_for_report" && !reportRun ? (
             <div className="mt-6">
               <form action={createMatchingReport}>
                 <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  {t("matchingPreparation.readiness.createReport")}
+                  {t("matchingPreparation.readiness.viewAlignment")}
                 </button>
               </form>
             </div>
@@ -433,13 +457,17 @@ function MatchingStartStatusContent({
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
           {isRequester
-            ? t("matchingPreparation.states.confirmationRequestedTitle")
-            : t("matchingPreparation.states.confirmTitle")}
+            ? t("matchingPreparation.states.confirmationRequestedTitle", {
+                name: counterpartName,
+              })
+            : t("matchingPreparation.states.confirmTitle", { name: counterpartName })}
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
           {isRequester
-            ? t("matchingPreparation.states.confirmationRequestedText")
-            : t("matchingPreparation.states.confirmText")}
+            ? t("matchingPreparation.states.confirmationRequestedText", {
+                name: counterpartName,
+              })
+            : t("matchingPreparation.states.confirmText", { name: counterpartName })}
         </p>
         <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
           <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
@@ -531,9 +559,9 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   if (!preparation) {
     return <UnavailableState t={t} />;
   }
-  async function startMatchingPreparation() {
+  async function requestJointCheck() {
     "use server";
-    const result = await startDiscoveryMatchingPreparationAction(introRequestId);
+    const result = await requestDiscoveryJointCheckAction(introRequestId);
     redirect(matchingStartResultUrl(introRequestId, result));
   }
 
@@ -645,6 +673,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               currentUserId={user.id}
               matchingSession={matchingSession}
               reportRun={reportRun}
+              counterpartName={otherProfile.displayName}
               t={t}
             />
           ) : (
@@ -670,7 +699,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
                 </li>
               </ol>
               <div className="mt-6">
-                <form action={startMatchingPreparation}>
+                <form action={requestJointCheck}>
                   <button type="submit" className={PRIMARY_CTA_CLASS}>
                     {t("matchingPreparation.actions.startPreparation")}
                   </button>

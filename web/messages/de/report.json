@@ -28,28 +28,28 @@
     "workbookCta": "Alignment vertiefen"
   },
   "session": {
-    "emptyTitle": "Der Dynamik-Report ist noch nicht erstellt.",
-    "emptyText": "Sobald die Matching-Session bereit ist, könnt ihr den Report über die Matching-Vorbereitungsseite als Snapshot erstellen.",
-    "snapshotHint": "Session-basierter Snapshot · keine Einladung, kein legacy Report, kein Workbook",
-    "snapshotEyebrow": "Session-Snapshot",
-    "snapshotText": "Dieser Report wurde aus eurer Matching-Session erstellt. Er erzeugt keine Einladung, keine Relationship und kein Workbook.",
+    "emptyTitle": "Euer Alignment ist noch nicht bereit.",
+    "emptyText": "Sobald eure erforderlichen Angaben vollständig sind, könnt ihr euren gemeinsamen Alignment-Blick öffnen.",
+    "snapshotHint": "Gemeinsamer Alignment-Blick",
+    "snapshotEyebrow": "Euer Alignment",
+    "snapshotText": "Dieser gemeinsame Blick hält den Stand fest, den ihr für diesen Vergleich freigegeben habt.",
     "workspaceFeedback": {
-      "notAuthenticated": "Bitte melde dich an, um den gemeinsamen Arbeitsraum vorzubereiten.",
-      "sessionUnavailable": "Dieser Matching-Arbeitsraum ist aktuell nicht verfügbar.",
-      "reportNotReady": "Der Dynamik-Report muss erstellt sein, bevor ihr den Arbeitsraum vorbereitet.",
-      "reportMissing": "Für diese Matching-Session fehlt noch der Dynamik-Report.",
-      "participantsInvalid": "Der Arbeitsraum kann nur für genau zwei aktive Founder vorbereitet werden.",
-      "startFailed": "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden.",
-      "unexpectedError": "Der gemeinsame Arbeitsraum konnte gerade nicht vorbereitet werden."
+      "notAuthenticated": "Bitte melde dich an, um die Zusammenarbeit zu starten.",
+      "sessionUnavailable": "Dieser gemeinsame Bereich ist aktuell nicht verfügbar.",
+      "reportNotReady": "Euer Alignment muss bereit sein, bevor ihr die Zusammenarbeit startet.",
+      "reportMissing": "Euer gemeinsamer Alignment-Blick ist noch nicht verfügbar.",
+      "participantsInvalid": "Der gemeinsame Bereich kann nur für genau zwei aktive Founder vorbereitet werden.",
+      "startFailed": "Die Zusammenarbeit konnte gerade nicht gestartet werden.",
+      "unexpectedError": "Die Zusammenarbeit konnte gerade nicht gestartet werden."
     },
-    "workspaceEyebrow": "Arbeitsraum",
-    "workspaceReadyTitle": "Arbeitsraum vorbereitet",
-    "workspaceReadyText": "Eure gemeinsame Verbindung wurde angelegt. Das Workbook/Operating Agreement wird als nächster Schritt angebunden.",
-    "openWorkspace": "Arbeitsraum öffnen",
-    "prepareWorkspaceTitle": "Gemeinsamen Arbeitsraum vorbereiten",
-    "prepareWorkspaceText": "Wenn ihr weitermachen möchtet, könnt ihr aus diesem Report einen gemeinsamen Arbeitsraum vorbereiten. Dabei wird eine gemeinsame Verbindung angelegt. Das Workbook wird im nächsten Schritt angebunden.",
-    "prepareWorkspaceSafety": "Es wird keine Einladung, kein legacy Report und kein Workbook erstellt.",
-    "startWorkspace": "Gemeinsamen Arbeitsraum starten"
+    "workspaceEyebrow": "Zusammenarbeit",
+    "workspaceReadyTitle": "Gemeinsamer Bereich gestartet",
+    "workspaceReadyText": "Euer gemeinsamer Bereich in CoFoundery ist bereit.",
+    "openWorkspace": "Gemeinsamen Bereich öffnen",
+    "prepareWorkspaceTitle": "Möchtet ihr weiter zusammenarbeiten?",
+    "prepareWorkspaceText": "Wenn ihr euch weiter kennenlernen oder bereits gemeinsam aufbauen möchtet, könnt ihr jetzt einen gemeinsamen Bereich in CoFoundery starten.",
+    "prepareWorkspaceSafety": "Damit erstellt ihr einen gemeinsamen Arbeitsbereich. Das ist keine Aussage darüber, ob oder wie ihr miteinander gründet.",
+    "startWorkspace": "Zusammenarbeit starten"
   },
   "view": {
     "matchingReport": "Matching-Report",
