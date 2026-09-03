@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { NetworkValidationError, normalizeNetworkContactMessage, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
+import { NetworkValidationError, normalizeNetworkContactMessage, normalizeNetworkMessageBody, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
 
 async function context() {
   const client = await createClient();
@@ -18,6 +18,11 @@ function refresh() { ["/network", "/network/my", "/network/profile", "/dashboard
 function refreshContacts(listingId?: string) {
   refresh(); revalidatePath("/network/contacts");
   if (listingId) revalidatePath(`/network/listings/${listingId}`);
+}
+function refreshMessaging(conversationId?: string) {
+  refreshContacts();
+  revalidatePath("/", "layout");
+  if (conversationId) revalidatePath(`/network/messages/${conversationId}`);
 }
 
 export async function saveNetworkProfileAction(formData: FormData) {
@@ -119,4 +124,29 @@ export async function cancelNetworkContactAction(formData: FormData) {
   const { error } = await client.rpc("cancel_network_contact", { p_request_id: id });
   if (error) redirect("/network/contacts?error=cancel");
   refreshContacts(); redirect("/network/contacts?changed=canceled");
+}
+
+export async function sendNetworkMessageAction(formData: FormData) {
+  const { client } = await context();
+  const conversationId = String(formData.get("conversation_id") ?? "").trim();
+  const body = normalizeNetworkMessageBody(formData.get("body"));
+  if (!conversationId) redirect("/network/contacts?error=message");
+  if (!body) redirect(`/network/messages/${conversationId}?error=message`);
+  const { error } = await client.rpc("send_network_message", {
+    p_conversation_id: conversationId,
+    p_body: body,
+  });
+  if (error) redirect(`/network/messages/${conversationId}?error=message`);
+  refreshMessaging(conversationId);
+  redirect(`/network/messages/${conversationId}?sent=1`);
+}
+
+export async function markNetworkConversationReadAction(conversationId: string) {
+  const { client } = await context();
+  const { error } = await client.rpc("mark_network_conversation_read", {
+    p_conversation_id: conversationId,
+  });
+  if (error) return { ok: false };
+  refreshMessaging(conversationId);
+  return { ok: true };
 }

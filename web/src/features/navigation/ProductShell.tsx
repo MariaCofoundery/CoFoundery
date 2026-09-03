@@ -9,6 +9,7 @@ import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
+import { getNetworkAttentionCount } from "@/features/network/networkPresentation";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
@@ -21,6 +22,7 @@ type Props = {
   displayName: string | null;
   incomingOpenRequestCount: number;
   incomingNetworkContactCount: number;
+  unreadNetworkMessageCount: number;
   researchConsentState: ResearchConsentState;
 };
 
@@ -58,7 +60,7 @@ function discoveryCtaClassName(active: boolean) {
   }`;
 }
 
-function NetworkContactBadge({ count, label }: { count: number; label: string }) {
+function NetworkAttentionBadge({ count, label }: { count: number; label: string }) {
   if (count < 1) return null;
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
 }
@@ -85,6 +87,7 @@ export function ProductShell({
   displayName,
   incomingOpenRequestCount,
   incomingNetworkContactCount,
+  unreadNetworkMessageCount,
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
@@ -107,6 +110,7 @@ export function ProductShell({
       : navigationOverride?.workbookHref ?? "/connections";
   const isNetworkOnly = hasNetwork && !hasFounder && !hasAdvisor;
   const dashboardHref = isNetworkOnly ? "/network" : resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
+  const networkAttentionCount = getNetworkAttentionCount(incomingNetworkContactCount, unreadNetworkMessageCount);
   const navigationItems: NavigationItem[] = isNetworkOnly ? [] : [
     {
       href: dashboardHref,
@@ -172,12 +176,12 @@ export function ProductShell({
                 ))}
                 {resolvedActiveView === "advisor" ? (
                   <>
-                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkContactBadge count={incomingNetworkContactCount} label={t("incomingNetworkContactBadge", { count: incomingNetworkContactCount })} /></Link> : null}
+                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkAttentionBadge count={networkAttentionCount} label={t("networkAttentionBadge", { count: networkAttentionCount })} /></Link> : null}
                     <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
                   </>
                 ) : (
                   <>
-                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkContactBadge count={incomingNetworkContactCount} label={t("incomingNetworkContactBadge", { count: incomingNetworkContactCount })} /></Link> : null}
+                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkAttentionBadge count={networkAttentionCount} label={t("networkAttentionBadge", { count: networkAttentionCount })} /></Link> : null}
                     {hasFounder ? <><Link
                       href="/discovery"
                       className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}

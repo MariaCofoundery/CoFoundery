@@ -63,3 +63,8 @@ export function normalizeNetworkContactMessage(value: FormDataEntryValue | null)
   const message = String(value ?? "").trim();
   return message.length >= 10 && message.length <= 500 ? message : null;
 }
+
+export function normalizeNetworkMessageBody(value: FormDataEntryValue | null) {
+  const body = String(value ?? "").trim();
+  return body.length >= 1 && body.length <= 2000 ? body : null;
+}

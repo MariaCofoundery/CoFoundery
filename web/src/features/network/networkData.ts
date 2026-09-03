@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { NetworkContactRequest, NetworkListing, NetworkProfile } from "./networkTypes";
+import type { NetworkContactRequest, NetworkConversation, NetworkListing, NetworkMessage, NetworkProfile } from "./networkTypes";
 import { NETWORK_CATEGORIES, NETWORK_DIRECTIONS, NETWORK_GEOGRAPHIC_SCOPES, NETWORK_REMOTE_MODES, isOneOf } from "./networkTypes";
 
 type Client = SupabaseClient;
@@ -54,4 +54,27 @@ export async function getIncomingPendingNetworkContactCount(client: Client, user
   const { count, error } = await client.from("network_contact_requests").select("id", { count: "exact", head: true }).eq("recipient_user_id", userId).eq("status", "pending");
   if (error) return 0;
   return count ?? 0;
+}
+
+export async function getNetworkConversations(client: Client) {
+  const { data, error } = await client.rpc("list_network_conversations");
+  if (error) throw new Error("network_conversations_load_failed");
+  return (data ?? []) as NetworkConversation[];
+}
+
+export async function getNetworkConversation(client: Client, conversationId: string) {
+  const conversations = await getNetworkConversations(client);
+  return conversations.find((conversation) => conversation.conversation_id === conversationId) ?? null;
+}
+
+export async function getNetworkMessages(client: Client, conversationId: string) {
+  const { data, error } = await client.rpc("list_network_messages", { p_conversation_id: conversationId });
+  if (error) throw new Error("network_messages_load_failed");
+  return (data ?? []) as NetworkMessage[];
+}
+
+export async function getUnreadNetworkMessageCount(client: Client) {
+  const { data, error } = await client.rpc("get_unread_network_message_count");
+  if (error) return 0;
+  return typeof data === "number" ? data : Number(data ?? 0);
 }

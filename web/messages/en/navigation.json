@@ -9,6 +9,7 @@
   "incomingRequestBadgeSingular": "1 open co-founder request",
   "incomingRequestBadgePlural": "{count} open co-founder requests",
   "incomingNetworkContactBadge": "{count} open Network contact requests",
+  "networkAttentionBadge": "{count} open Network contact requests or unread messages",
   "editProfile": "Edit profile",
   "editNetworkProfile": "Edit Network profile",
   "lastOpened": "Last opened",

@@ -1,5 +1,9 @@
 export type TimeframeCopy = { from: string; until: string };
 
+export function getNetworkAttentionCount(pendingIncomingContacts: number, unreadIncomingMessages: number) {
+  return Math.max(0, pendingIncomingContacts) + Math.max(0, unreadIncomingMessages);
+}
+
 export function normalizeNetworkLocations(value: unknown) {
   return Array.isArray(value)
     ? value.filter((location): location is string => typeof location === "string")

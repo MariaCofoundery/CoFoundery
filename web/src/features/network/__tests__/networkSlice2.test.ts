@@ -70,7 +70,7 @@ test("listing detail shows the correct contact state and never offers owners a r
   assert.match(detail, /getOwnContactRequestForListing/);
 });
 
-test("contacts are an inbox and outbox with only pending lifecycle actions", () => {
+test("contacts keep pending lifecycle actions separate from accepted conversations", () => {
   const contacts = source("src/app/(product)/network/contacts/page.tsx");
   const controls = source("src/features/network/NetworkContactActions.tsx");
   assert.match(contacts, /contact\.incoming/);
@@ -80,7 +80,9 @@ test("contacts are an inbox and outbox with only pending lifecycle actions", () 
   assert.match(controls, /cancelNetworkContactAction/);
   assert.match(controls, /fieldName="response" intent="accepted"/);
   assert.match(controls, /fieldName="response" intent="declined"/);
-  assert.doesNotMatch(contacts, /conversation|reply|thread/i);
+  assert.match(contacts, /request\.status !== "accepted"/);
+  assert.match(contacts, /messages\.acceptedContacts/);
+  assert.match(contacts, /network\/messages/);
 });
 
 test("incoming pending requests become NEEDS_YOU tasks while resolved and outgoing requests do not", () => {

@@ -36,6 +36,18 @@ export type NetworkContactRequest = {
   responded_at: string | null; updated_at: string;
 };
 
+export type NetworkConversation = {
+  conversation_id: string; contact_request_id: string; listing_id: string;
+  counterpart_user_id: string; counterpart_display_name: string;
+  listing_title: string; created_at: string; last_message_at: string | null;
+  unread_count: number;
+};
+
+export type NetworkMessage = {
+  id: string; conversation_id: string; sender_user_id: string;
+  body: string; created_at: string;
+};
+
 export function isOneOf<T extends readonly string[]>(values: T, value: unknown): value is T[number] {
   return typeof value === "string" && values.includes(value);
 }
