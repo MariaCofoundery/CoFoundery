@@ -61,6 +61,13 @@
       "setupTopic": "Founder-Setup-Thema"
     },
     "items": {
+      "networkContact": {
+        "title": "Neue Kontaktanfrage",
+        "text": "{name} interessiert sich für deinen Eintrag „{listing}“.",
+        "someone": "Ein Network-Mitglied",
+        "listing": "deinen Network-Eintrag",
+        "action": "Anfrage ansehen"
+      },
       "incomingInvitation": {
         "title": "Founder-Einladung beantworten",
         "titleWithName": "Einladung von {name} beantworten",

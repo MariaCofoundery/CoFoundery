@@ -61,6 +61,13 @@
       "setupTopic": "Founder Setup topic"
     },
     "items": {
+      "networkContact": {
+        "title": "New contact request",
+        "text": "{name} is interested in your listing “{listing}”.",
+        "someone": "A Network member",
+        "listing": "your Network listing",
+        "action": "View request"
+      },
       "incomingInvitation": {
         "title": "Respond to founder invitation",
         "titleWithName": "Respond to {name}'s invitation",

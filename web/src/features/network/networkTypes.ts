@@ -9,6 +9,8 @@ export type NetworkCategory = (typeof NETWORK_CATEGORIES)[number];
 export type NetworkRole = (typeof NETWORK_ROLES)[number];
 export type NetworkRemoteMode = (typeof NETWORK_REMOTE_MODES)[number];
 export type NetworkGeographicScope = (typeof NETWORK_GEOGRAPHIC_SCOPES)[number];
+export const NETWORK_CONTACT_STATUSES = ["pending", "accepted", "declined", "canceled"] as const;
+export type NetworkContactStatus = (typeof NETWORK_CONTACT_STATUSES)[number];
 
 export type NetworkProfile = {
   user_id: string; display_name: string; headline: string; bio: string;
@@ -24,6 +26,14 @@ export type NetworkListing = {
   venture_stage: string | null; status: "draft" | "active" | "paused" | "completed";
   published_at: string | null; expires_at: string | null; updated_at: string; created_at: string;
   network_profiles?: NetworkProfile | NetworkProfile[] | null;
+};
+
+export type NetworkContactRequest = {
+  id: string; listing_id: string; sender_user_id: string; recipient_user_id: string;
+  message: string; status: NetworkContactStatus; listing_title_snapshot: string;
+  sender_display_name_snapshot: string; sender_headline_snapshot: string;
+  recipient_display_name_snapshot: string; created_at: string;
+  responded_at: string | null; updated_at: string;
 };
 
 export function isOneOf<T extends readonly string[]>(values: T, value: unknown): value is T[number] {

@@ -3,6 +3,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
+import { getIncomingPendingNetworkContactCount } from "@/features/network/networkData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
@@ -48,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, networkProfileData, hasNetwork, incomingOpenRequestCount, researchConsentState] = user
+  const [roleViews, profileData, networkProfileData, hasNetwork, incomingOpenRequestCount, incomingNetworkContactCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         Promise.resolve(supabase.from("network_profiles").select("display_name").eq("user_id", user.id).maybeSingle()).then(({ data }) => data).catch(() => null),
         Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
+        getIncomingPendingNetworkContactCount(supabase, user.id).catch(() => 0),
         getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
       ])
     : [
@@ -70,6 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         null,
         null,
         false,
+        0,
         0,
         "undecided" as const,
       ];
@@ -91,6 +94,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasNetwork={hasNetwork}
             displayName={displayName}
             incomingOpenRequestCount={incomingOpenRequestCount}
+            incomingNetworkContactCount={incomingNetworkContactCount}
             researchConsentState={researchConsentState}
           >
             {children}

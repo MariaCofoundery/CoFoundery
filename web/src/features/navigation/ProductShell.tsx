@@ -20,6 +20,7 @@ type Props = {
   hasNetwork: boolean;
   displayName: string | null;
   incomingOpenRequestCount: number;
+  incomingNetworkContactCount: number;
   researchConsentState: ResearchConsentState;
 };
 
@@ -57,6 +58,11 @@ function discoveryCtaClassName(active: boolean) {
   }`;
 }
 
+function NetworkContactBadge({ count, label }: { count: number; label: string }) {
+  if (count < 1) return null;
+  return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
+}
+
 function normalizeDisplayName(value: string | null) {
   const trimmed = value?.trim();
   return trimmed && trimmed.length > 0 ? trimmed : null;
@@ -78,6 +84,7 @@ export function ProductShell({
   hasNetwork,
   displayName,
   incomingOpenRequestCount,
+  incomingNetworkContactCount,
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
@@ -165,12 +172,12 @@ export function ProductShell({
                 ))}
                 {resolvedActiveView === "advisor" ? (
                   <>
-                    {hasNetwork ? <Link href="/network" className={navLinkClassName(pathname.startsWith("/network"))}>{t("network")}</Link> : null}
+                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkContactBadge count={incomingNetworkContactCount} label={t("incomingNetworkContactBadge", { count: incomingNetworkContactCount })} /></Link> : null}
                     <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
                   </>
                 ) : (
                   <>
-                    {hasNetwork ? <Link href="/network" className={navLinkClassName(pathname.startsWith("/network"))}>{t("network")}</Link> : null}
+                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkContactBadge count={incomingNetworkContactCount} label={t("incomingNetworkContactBadge", { count: incomingNetworkContactCount })} /></Link> : null}
                     {hasFounder ? <><Link
                       href="/discovery"
                       className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}

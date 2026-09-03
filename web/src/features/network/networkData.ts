@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { NetworkListing, NetworkProfile } from "./networkTypes";
+import type { NetworkContactRequest, NetworkListing, NetworkProfile } from "./networkTypes";
 import { NETWORK_CATEGORIES, NETWORK_DIRECTIONS, NETWORK_GEOGRAPHIC_SCOPES, NETWORK_REMOTE_MODES, isOneOf } from "./networkTypes";
 
 type Client = SupabaseClient;
@@ -36,4 +36,22 @@ export async function getActiveOwnNetworkCounts(client: Client, userId: string) 
   const { data } = await client.from("network_listings").select("direction").eq("owner_user_id", userId).eq("status", "active").gt("expires_at", new Date().toISOString());
   const rows = (data ?? []) as Array<{ direction: string }>;
   return { seeking: rows.filter((r) => r.direction === "seeking").length, offering: rows.filter((r) => r.direction === "offering").length };
+}
+
+export async function getOwnContactRequestForListing(client: Client, userId: string, listingId: string) {
+  const { data, error } = await client.from("network_contact_requests").select("*").eq("sender_user_id", userId).eq("listing_id", listingId).maybeSingle();
+  if (error) throw new Error("network_contact_load_failed");
+  return (data as NetworkContactRequest | null) ?? null;
+}
+
+export async function getNetworkContactRequests(client: Client, userId: string) {
+  const { data, error } = await client.from("network_contact_requests").select("*").or(`sender_user_id.eq.${userId},recipient_user_id.eq.${userId}`).order("created_at", { ascending: false });
+  if (error) throw new Error("network_contacts_load_failed");
+  return (data ?? []) as NetworkContactRequest[];
+}
+
+export async function getIncomingPendingNetworkContactCount(client: Client, userId: string) {
+  const { count, error } = await client.from("network_contact_requests").select("id", { count: "exact", head: true }).eq("recipient_user_id", userId).eq("status", "pending");
+  if (error) return 0;
+  return count ?? 0;
 }

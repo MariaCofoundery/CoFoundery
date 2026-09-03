@@ -58,3 +58,8 @@ export function profilePublishable(p: ReturnType<typeof parseNetworkProfile>) {
 export function listingPublishable(p: ReturnType<typeof parseNetworkListing>) {
   return p.title.length >= 5 && p.summary.length >= 20 && !(p.starts_on && p.ends_on && p.ends_on < p.starts_on);
 }
+
+export function normalizeNetworkContactMessage(value: FormDataEntryValue | null) {
+  const message = String(value ?? "").trim();
+  return message.length >= 10 && message.length <= 500 ? message : null;
+}

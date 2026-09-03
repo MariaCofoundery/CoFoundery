@@ -1,25 +1,30 @@
 \set ON_ERROR_STOP on
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(42);
+select extensions.plan(48);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000001','authenticated','authenticated','network-a@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000002','authenticated','authenticated','network-b@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000003','authenticated','authenticated','network-c@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000004','authenticated','authenticated','network-d@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
-('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000005','authenticated','authenticated','network-e@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now());
+('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000005','authenticated','authenticated','network-e@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
+('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000006','authenticated','authenticated','network-empty-profile@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now()),
+('00000000-0000-0000-0000-000000000000','a1000000-0000-4000-8000-000000000007','authenticated','authenticated','network-empty-listings@example.com','',now(),'{"provider":"email","providers":["email"]}','{}',now(),now());
 insert into public.profiles(user_id,display_name,roles,linkedin_url,intention) values
 ('a1000000-0000-4000-8000-000000000001','Founder A',array['founder'],'https://private.example/a','Private intention'),
 ('a1000000-0000-4000-8000-000000000002','Advisor B',array['advisor'],'https://private.example/b','Private advisor note'),
 ('a1000000-0000-4000-8000-000000000003','Network C','{}','https://private.example/c','Private network-only note'),
 ('a1000000-0000-4000-8000-000000000004','Unsupported D','{}','https://private.example/d','Private unsupported note'),
-('a1000000-0000-4000-8000-000000000005','Founder Advisor E',array['founder','advisor'],'https://private.example/e','Private combined-role note');
+('a1000000-0000-4000-8000-000000000005','Founder Advisor E',array['founder','advisor'],'https://private.example/e','Private combined-role note'),
+('a1000000-0000-4000-8000-000000000006','Founder Without Network Profile',array['founder'],null,null),
+('a1000000-0000-4000-8000-000000000007','Founder With Empty Network',array['founder'],null,null);
 insert into public.network_memberships(user_id) values ('a1000000-0000-4000-8000-000000000003');
 insert into public.network_profiles(user_id,display_name,headline,bio,network_roles,status,published_at) values
 ('a1000000-0000-4000-8000-000000000001','Founder A','Builds climate products','Long enough explicitly published network biography.',array['founder'],'active',now()),
 ('a1000000-0000-4000-8000-000000000002','Advisor B','Advises early teams','Long enough private draft network biography.',array['advisor_mentor'],'draft',null),
-('a1000000-0000-4000-8000-000000000003','Network C','Angel by description','Long enough explicit network-only biography.',array['business_angel'],'active',now());
+('a1000000-0000-4000-8000-000000000003','Network C','Angel by description','Long enough explicit network-only biography.',array['business_angel'],'active',now()),
+('a1000000-0000-4000-8000-000000000007','Founder With Empty Network','Published but without listings','Long enough biography for the zero-listing render fixture.',array['founder'],'active',now());
 insert into public.network_listings(id,owner_user_id,direction,category,title,summary,status,published_at,expires_at) values
 ('b1000000-0000-4000-8000-000000000001','a1000000-0000-4000-8000-000000000001','seeking','expertise','Active current help','A sufficiently long and concrete active summary.','active',now(),now()+interval '60 days'),
 ('b1000000-0000-4000-8000-000000000002','a1000000-0000-4000-8000-000000000001','offering','sparring','Private draft offer','A sufficiently long and concrete draft summary.','draft',null,null),
@@ -49,7 +54,7 @@ select extensions.is((select roles from public.profiles where user_id=auth.uid()
 reset role; select set_config('request.jwt.claims','{"sub":"a1000000-0000-4000-8000-000000000002","role":"authenticated"}',true); set local role authenticated;
 select extensions.ok(public.is_network_member(), 'advisor-only is eligible');
 select extensions.ok(not public.is_current_user_discovery_founder(), 'advisor-only receives no Founder Discovery right');
-select extensions.is((select count(*)::int from public.network_profiles),3,'advisor member reads own draft and published Network projections only');
+select extensions.is((select count(*)::int from public.network_profiles),4,'advisor member reads own draft and published Network projections only');
 select extensions.is((select count(*)::int from public.network_listings),1,'other member reads only active unexpired listing');
 select extensions.is((select count(*)::int from public.network_listings where status='draft'),0,'other member cannot read draft');
 select extensions.is((select count(*)::int from public.network_listings where status='paused'),0,'other member cannot read paused');
@@ -61,7 +66,7 @@ select extensions.throws_ok($$insert into public.network_listings(owner_user_id,
 reset role; select set_config('request.jwt.claims','{"sub":"a1000000-0000-4000-8000-000000000003","role":"authenticated"}',true); set local role authenticated;
 select extensions.ok(public.is_network_member(), 'independently provisioned Network-only account has Network access');
 select extensions.ok(not public.is_current_user_discovery_founder(), 'Network-only account has no Founder Discovery access');
-select extensions.is((select count(*)::int from public.network_profiles),2,'Network-only member can browse published profiles');
+select extensions.is((select count(*)::int from public.network_profiles),3,'Network-only member can browse published profiles');
 select extensions.is((select count(*)::int from public.network_listings),1,'Network-only member can browse current listings');
 select extensions.is((select count(*)::int from public.assessments),0,'Network-only member cannot read Founder assessments');
 select extensions.throws_ok($$insert into public.assessments(user_id,module) values('a1000000-0000-4000-8000-000000000003','base')$$,'42501',null,'Network-only member cannot create a Founder assessment');
@@ -76,6 +81,17 @@ select extensions.ok(not public.is_network_member(), 'unsupported authenticated 
 select extensions.is((select count(*)::int from public.network_profiles),0,'unsupported authenticated account is fail-closed');
 select extensions.is((select count(*)::int from public.network_listings),0,'unsupported authenticated account cannot browse');
 select extensions.throws_ok($$insert into public.assessments(user_id,module) values('a1000000-0000-4000-8000-000000000004','base')$$,'42501',null,'unsupported account cannot create a Founder assessment');
+
+reset role; update public.network_listings set status='completed';
+select set_config('request.jwt.claims','{"sub":"a1000000-0000-4000-8000-000000000006","role":"authenticated"}',true); set local role authenticated;
+select extensions.ok(public.is_network_member(), 'Founder without a Network profile retains Network capability');
+select extensions.is((select count(*)::int from public.network_profiles where user_id=auth.uid()),0,'Founder without a Network profile has a valid empty owner-profile state');
+select extensions.is((select count(*)::int from public.network_listings),0,'Founder without a Network profile receives a valid zero-listing browse result');
+
+reset role; select set_config('request.jwt.claims','{"sub":"a1000000-0000-4000-8000-000000000007","role":"authenticated"}',true); set local role authenticated;
+select extensions.ok(public.is_network_member(), 'Founder with an active Network profile retains Network capability');
+select extensions.is((select count(*)::int from public.network_profiles where user_id=auth.uid()),1,'Founder with an active Network profile reads the owner projection');
+select extensions.is((select count(*)::int from public.network_listings),0,'Founder with an active Network profile receives a valid zero-listing browse result');
 
 reset role; set local role anon;
 select extensions.throws_ok($$select count(*) from public.network_profiles$$,'42501',null,'unauthenticated profile read denied');
