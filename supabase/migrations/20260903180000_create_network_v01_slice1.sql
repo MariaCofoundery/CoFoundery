@@ -95,11 +95,9 @@ create table public.network_listings (
   summary text not null default '',
   topics text[] not null default '{}',
   industries text[] not null default '{}',
-  locations text[] not null default '{}',
-  geographic_scope text,
+  location_region text,
   remote_mode text,
-  starts_on date,
-  ends_on date,
+  timeframe text,
   venture_stage text,
   status text not null default 'draft',
   published_at timestamptz,
@@ -110,16 +108,13 @@ create table public.network_listings (
   constraint network_listings_category_check check (category in ('expertise','cooperation','investment','sparring','succession')),
   constraint network_listings_status_check check (status in ('draft','active','paused','completed')),
   constraint network_listings_remote_mode_check check (remote_mode is null or remote_mode in ('onsite','hybrid','remote','flexible')),
-  constraint network_listings_geographic_scope_check check (geographic_scope is null or geographic_scope in ('regional','germany','europe','global')),
-  constraint network_listings_remote_category_check check (remote_mode is null or category in ('expertise','cooperation','sparring')),
   constraint network_listings_venture_stage_check check (venture_stage is null or venture_stage in ('exploring','idea','validation','early','growth','established')),
-  constraint network_listings_stage_category_check check (venture_stage is null or category in ('expertise','cooperation','investment')),
   constraint network_listings_topics_check check (cardinality(topics) <= 8),
   constraint network_listings_industries_check check (cardinality(industries) <= 5),
-  constraint network_listings_locations_check check (cardinality(locations) <= 3),
-  constraint network_listings_content_dates_check check (starts_on is null or ends_on is null or ends_on >= starts_on),
   constraint network_listings_text_check check (
-    char_length(title) <= 100 and char_length(summary) <= 800
+    char_length(title) <= 100 and char_length(summary) <= 800 and
+    (location_region is null or char_length(location_region) <= 120) and
+    (timeframe is null or char_length(timeframe) <= 80)
   ),
   constraint network_listings_active_complete_check check (
     status <> 'active' or (
@@ -137,8 +132,6 @@ create index network_listings_browse_idx on public.network_listings (published_a
 create index network_listings_owner_idx on public.network_listings (owner_user_id, updated_at desc);
 create index network_listings_topics_idx on public.network_listings using gin (topics);
 create index network_listings_industries_idx on public.network_listings using gin (industries);
-create index network_listings_locations_idx on public.network_listings using gin (locations);
-create index network_listings_scope_idx on public.network_listings (geographic_scope, published_at desc) where status = 'active';
 
 create or replace function public.set_network_updated_at()
 returns trigger language plpgsql set search_path = '' as $$
@@ -226,7 +219,6 @@ comment on table public.network_memberships is 'Technical Network access capabil
 comment on table public.network_profiles is 'Explicit member-only Network identity projection; never populated or published implicitly from private profiles.';
 comment on table public.network_listings is 'Member-only time-bounded needs and offers. Co-founder search deliberately remains in Founder Discovery.';
 comment on column public.network_profiles.network_roles is 'Descriptive Network identity only; never grants product authorization.';
-comment on column public.network_listings.expires_at is 'Publication freshness lifecycle; independent from optional content dates starts_on and ends_on.';
 
 -- A Network-only capability must not open the personal Founder assessment module.
 -- Invitation participants created before the profile-role contract remain compatible

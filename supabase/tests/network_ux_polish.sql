@@ -55,9 +55,10 @@ select extensions.lives_ok($$
   values ('ac200000-0000-4000-8000-000000000001','offering','cooperation','Independent expiry','A sufficiently complete listing summary for UX tests.','2027-01-01','2027-12-31','active',now(),now()+interval '60 days')
 $$,'content timeframe is independent from the 60-day listing expiry');
 
-select extensions.ok(not exists (
+select extensions.ok(exists (
   select 1 from information_schema.columns where table_schema='public' and table_name='network_listings' and column_name in ('location_region','timeframe')
-),'legacy ambiguous listing location and timeframe columns are absent');
+  group by table_schema, table_name having count(*) = 2
+),'legacy listing location and timeframe columns remain available for lossless migration');
 
 select extensions.ok(exists (
   select 1 from information_schema.columns where table_schema='public' and table_name='network_listings' and column_name='expires_at' and data_type='timestamp with time zone'
