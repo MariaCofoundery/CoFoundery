@@ -387,10 +387,12 @@
     "securityText": "Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit Zwei-Faktor-Authentifizierung.",
     "supportText": "Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.",
     "supportSubject": "E-Mail-Adresse ändern",
+    "sharedText": "Hier verwaltest du dein persönliches CoFoundery-Konto unabhängig davon, welche Produktbereiche du nutzt.",
+    "manage": "Account verwalten",
     "delete": {
       "summary": "Danger Zone",
       "title": "Account löschen",
-      "confirmText": "Dein Account wird gelöscht.\nDeine personenbezogenen Daten werden entfernt.\nGemeinsame Reports und Workbooks aus dieser Founder-Konstellation werden ebenfalls gelöscht.\nDieser Schritt kann nicht rückgängig gemacht werden.\n\nMöchtest du deinen Account wirklich löschen?",
+      "confirmText": "Dein Account und die dazugehörigen personenbezogenen CoFoundery-Daten werden dauerhaft gelöscht. Gemeinsame Inhalte werden entsprechend dem bestehenden Löschvertrag bereinigt oder entfernt. Dieser Schritt kann nicht rückgängig gemacht werden.\n\nMöchtest du deinen Account wirklich löschen?",
       "inputHelp": "Tippe",
       "inputHelpSuffix": "um fortzufahren",
       "confirmToken": "LÖSCHEN",

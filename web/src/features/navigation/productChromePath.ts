@@ -6,6 +6,7 @@ export function isProductChromePath(pathname: string) {
 
   return (
     pathname === "/dashboard" ||
+    pathname === "/account" ||
     pathname === "/founder-library" ||
     pathname === "/connections" ||
     pathname.startsWith("/advisor/") ||

@@ -11,7 +11,6 @@ import {
   DashboardTaskList,
   type DashboardTaskPresentation,
 } from "@/features/dashboard/DashboardTaskList";
-import { DeleteAccountSection } from "@/features/dashboard/DeleteAccountSection";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
 import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDashboardConnectionData";
 import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
@@ -649,7 +648,7 @@ export default async function DashboardPage({
               <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
             </div>
             <ResearchConsentSettings initialState={researchConsentState} />
-            <DeleteAccountSection />
+            <Link href="/account" className={UTILITY_CTA_CLASS}>{t("account.manage")}</Link>
           </div>
         </details>
       </section>

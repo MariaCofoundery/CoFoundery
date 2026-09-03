@@ -1,10 +1,8 @@
 "use server";
 
 import { createHash, randomBytes } from "crypto";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
-import { deleteFounderAccount } from "@/features/account/deleteFounderAccount";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
@@ -38,16 +36,6 @@ export type SentInvitationLinkActionResult =
       ok: false;
       reason: "not_authenticated" | "invalid_invitation_id" | "not_found" | "status_not_linkable" | "rotate_failed";
       error?: string;
-    };
-
-export type DeleteAccountActionResult =
-  | { ok: true }
-  | {
-      ok: false;
-      error:
-        | "not_authenticated"
-        | "missing_service_role"
-        | "cleanup_failed";
     };
 
 type MySessionResponseRow = {
@@ -313,33 +301,6 @@ export async function signOutAllSessionsAction() {
   const supabase = await createClient();
   await supabase.auth.signOut({ scope: "global" });
   redirect("/login");
-}
-
-export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user?.id) {
-    return { ok: false, error: "not_authenticated" };
-  }
-
-  const deleteResult = await deleteFounderAccount(user.id);
-  if (!deleteResult.ok) {
-    return { ok: false, error: deleteResult.error };
-  }
-
-  try {
-    await supabase.auth.signOut();
-  } catch {
-    // Best effort: once the auth user is gone, stale sessions should no longer be usable.
-  }
-
-  revalidatePath("/", "layout");
-  revalidatePath("/dashboard");
-
-  redirect("/?status=account_deleted");
 }
 
 export async function updateDisplayNameAction(formData: FormData) {

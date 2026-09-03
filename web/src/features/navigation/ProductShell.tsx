@@ -327,14 +327,14 @@ function ProfileMenu({ displayName, networkOnly }: { displayName: string | null;
           >
             {networkOnly ? t("editNetworkProfile") : t("editProfile")}
           </Link>
-          {!networkOnly ? <Link
-            href="/dashboard#dashboard-block-account"
+          <Link
+            href="/account"
             onClick={() => setIsOpen(false)}
             className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
             role="menuitem"
           >
             {t("account")}
-          </Link> : null}
+          </Link>
           <form action={signOutAction}>
             <button
               type="submit"

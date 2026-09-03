@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NetworkListing, NetworkProfile } from "./networkTypes";
+import { NETWORK_CATEGORIES, NETWORK_DIRECTIONS, NETWORK_GEOGRAPHIC_SCOPES, NETWORK_REMOTE_MODES, isOneOf } from "./networkTypes";
 
 type Client = SupabaseClient;
 export async function isNetworkMember(client: Client) {
@@ -21,11 +22,10 @@ export async function getOwnNetworkListings(client: Client, userId: string) {
 }
 export async function getActiveNetworkListings(client: Client, filters: Record<string, string | undefined>) {
   let query = client.from("network_listings").select("*, network_profiles(*)").eq("status", "active").gt("expires_at", new Date().toISOString()).order("published_at", { ascending: false }).limit(50);
-  if (filters.direction) query = query.eq("direction", filters.direction);
-  if (filters.category) query = query.eq("category", filters.category);
-  if (filters.remote_mode) query = query.eq("remote_mode", filters.remote_mode);
-  if (filters.location_region) query = query.ilike("location_region", `%${filters.location_region}%`);
-  if (filters.timeframe) query = query.ilike("timeframe", `%${filters.timeframe}%`);
+  if (isOneOf(NETWORK_DIRECTIONS, filters.direction)) query = query.eq("direction", filters.direction);
+  if (isOneOf(NETWORK_CATEGORIES, filters.category)) query = query.eq("category", filters.category);
+  if (isOneOf(NETWORK_REMOTE_MODES, filters.remote_mode)) query = query.eq("remote_mode", filters.remote_mode);
+  if (isOneOf(NETWORK_GEOGRAPHIC_SCOPES, filters.geographic_scope)) query = query.eq("geographic_scope", filters.geographic_scope);
   if (filters.topic) query = query.contains("topics", [filters.topic]);
   if (filters.industry) query = query.contains("industries", [filters.industry]);
   const { data, error } = await query;

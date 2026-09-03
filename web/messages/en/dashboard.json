@@ -387,10 +387,12 @@
     "securityText": "Your email account is your access point, so ideally protect it with two-factor authentication.",
     "supportText": "Changing your email address currently runs through support.",
     "supportSubject": "Change email address",
+    "sharedText": "Manage your personal CoFoundery account here, regardless of which product areas you use.",
+    "manage": "Manage account",
     "delete": {
       "summary": "Danger zone",
       "title": "Delete account",
-      "confirmText": "Your account will be deleted.\nYour personal data will be removed.\nShared reports and workbooks from this founder constellation will also be deleted.\nThis step cannot be undone.\n\nDo you really want to delete your account?",
+      "confirmText": "Your account and its associated personal CoFoundery data will be permanently deleted. Shared content will be cleaned up or removed according to the existing deletion contract. This step cannot be undone.\n\nDo you really want to delete your account?",
       "inputHelp": "Type",
       "inputHelpSuffix": "to continue",
       "confirmToken": "DELETE",

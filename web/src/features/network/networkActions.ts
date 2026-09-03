@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
+import { NetworkValidationError, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
 
 async function context() {
   const client = await createClient();
@@ -17,7 +17,10 @@ async function context() {
 function refresh() { ["/network", "/network/my", "/network/profile", "/dashboard"].forEach((path) => revalidatePath(path)); }
 
 export async function saveNetworkProfileAction(formData: FormData) {
-  const { client, user } = await context(); const values = parseNetworkProfile(formData);
+  const { client, user } = await context();
+  let values: ReturnType<typeof parseNetworkProfile>;
+  try { values = parseNetworkProfile(formData); }
+  catch (error) { redirect(`/network/profile?error=${error instanceof NetworkValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (publish && !profilePublishable(values)) redirect("/network/profile?error=incomplete");
   const { error } = await client.from("network_profiles").upsert({
@@ -48,9 +51,15 @@ export async function reuseExistingProfileAction() {
 }
 
 export async function saveNetworkListingAction(formData: FormData) {
-  const { client, user } = await context(); const values = parseNetworkListing(formData);
-  const id = String(formData.get("id") ?? "").trim(); const publish = formData.get("intent") === "publish";
-  if (publish && !listingPublishable(values)) redirect(`/network/listings/${id || "new"}/edit?error=incomplete`);
+  const { client, user } = await context(); const id = String(formData.get("id") ?? "").trim();
+  const rawDirection = String(formData.get("direction") ?? "seeking"); const rawCategory = String(formData.get("category") ?? "expertise");
+  const editRoute = id ? `/network/listings/${id}/edit` : `/network/listings/new?direction=${rawDirection}&category=${rawCategory}`;
+  let values: ReturnType<typeof parseNetworkListing>;
+  try { values = parseNetworkListing(formData); }
+  catch (error) { redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=${error instanceof NetworkValidationError ? error.code : "save"}`); }
+  const publish = formData.get("intent") === "publish";
+  if (values.starts_on && values.ends_on && values.ends_on < values.starts_on) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=invalid_dates`);
+  if (publish && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
   const payload = { owner_user_id: user.id, ...values, status: publish ? "active" : "draft",
     published_at: publish ? new Date().toISOString() : null,
     expires_at: publish ? new Date(Date.now() + 60 * 86400000).toISOString() : null };
@@ -58,7 +67,7 @@ export async function saveNetworkListingAction(formData: FormData) {
     ? await client.from("network_listings").update(payload).eq("id", id).eq("owner_user_id", user.id).select("id").single()
     : await client.from("network_listings").insert(payload).select("id").single();
   if (result.error) redirect(`/network/my?error=${result.error.message.includes("active_network_profile_required") ? "profile" : "save"}`);
-  refresh(); redirect(`/network/listings/${result.data.id}`);
+  refresh(); redirect(`/network/listings/${result.data.id}?saved=${publish ? "published" : "draft"}`);
 }
 
 export async function changeNetworkListingStatusAction(formData: FormData) {
@@ -69,6 +78,9 @@ export async function changeNetworkListingStatusAction(formData: FormData) {
     : intent === "renew" ? { status: "active", published_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60 * 86400000).toISOString() }
     : intent === "publish" ? { status: "active", published_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60 * 86400000).toISOString() }
     : {};
-  if (Object.keys(updates).length) await client.from("network_listings").update(updates).eq("id", id).eq("owner_user_id", user.id);
-  refresh(); redirect("/network/my");
+  if (Object.keys(updates).length) {
+    const { error } = await client.from("network_listings").update(updates).eq("id", id).eq("owner_user_id", user.id);
+    if (error) redirect("/network/my?error=save");
+  }
+  refresh(); redirect(`/network/my?changed=${intent}`);
 }

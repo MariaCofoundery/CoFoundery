@@ -9,7 +9,7 @@ const accountSource = readFileSync(
   "utf8"
 );
 const actionSource = readFileSync(
-  path.join(root, "src/app/(product)/dashboard/actions.ts"),
+  path.join(root, "src/features/account/actions.ts"),
   "utf8"
 );
 const migration = readFileSync(
