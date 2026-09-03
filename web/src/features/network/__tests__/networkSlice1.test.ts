@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { resolveProductEntryPath } from "@/features/auth/productEntry";
 import { categorySupportsRemoteMode, coFounderBridgeHref, NETWORK_CATEGORIES, NETWORK_GEOGRAPHIC_SCOPES, NETWORK_ROLES } from "@/features/network/networkTypes";
-import { formatNetworkContentTimeframe } from "@/features/network/networkPresentation";
+import { formatNetworkContentTimeframe, normalizeNetworkLocations } from "@/features/network/networkPresentation";
 import { NetworkValidationError, listingPublishable, parseCommaSeparatedList, parseNetworkListing, parseNetworkProfile, profilePublishable } from "@/features/network/networkValidation";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 
@@ -160,6 +161,28 @@ test("migration is member-only and keeps private domains outside projections", (
   assert.match(sql, /revoke insert, update, delete on public\.network_memberships from authenticated/);
   assert.doesNotMatch(sql, /network_roles[^;]+is_network_member/i);
   assert.doesNotMatch(sql, /linkedin_url|private_email/);
+});
+
+test("migration history matches Production and the repair is additive and lossless", () => {
+  const historical = readFileSync("../supabase/migrations/20260903180000_create_network_v01_slice1.sql", "utf8");
+  const repair = readFileSync("../supabase/migrations/20260903190000_repair_network_v01_listing_schema_drift.sql", "utf8");
+  assert.equal(createHash("sha256").update(historical).digest("hex"), "0168c80783cde05bdbfefebfd41edde5f8d6f52fe6440aae9e08f1f5796d24fd");
+  assert.match(repair, /add column if not exists locations text\[\]/);
+  assert.match(repair, /array\[btrim\(location_region\)\]/);
+  assert.match(repair, /category in \('investment', 'succession'\)/);
+  assert.match(repair, /category not in \('expertise', 'cooperation', 'investment'\)/);
+  assert.doesNotMatch(repair, /drop column|set starts_on =|set ends_on =/i);
+});
+
+test("legacy-shaped listing locations cannot crash card or detail rendering", () => {
+  assert.deepEqual(normalizeNetworkLocations(undefined), []);
+  assert.deepEqual(normalizeNetworkLocations(null), []);
+  assert.deepEqual(normalizeNetworkLocations(["Berlin"]), ["Berlin"]);
+  for (const path of ["src/features/network/NetworkListingCard.tsx", "src/app/(product)/network/listings/[listingId]/page.tsx"]) {
+    const renderSource = readFileSync(path, "utf8");
+    assert.match(renderSource, /normalizeNetworkLocations\(listing\.locations\)/);
+    assert.doesNotMatch(renderSource, /listing\.locations\.length/);
+  }
 });
 
 test("product shell and Founder dashboard enforce capability separation", () => {

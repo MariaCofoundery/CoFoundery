@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { NetworkListing, NetworkProfile } from "./networkTypes";
-import { formatNetworkContentTimeframe } from "./networkPresentation";
+import { formatNetworkContentTimeframe, normalizeNetworkLocations } from "./networkPresentation";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function owner(listing: NetworkListing) {
@@ -9,8 +9,9 @@ function owner(listing: NetworkListing) {
 }
 export function NetworkListingCard({ listing, t, locale }: { listing: NetworkListing; t: T; locale: string }) {
   const profile = owner(listing);
+  const locations = normalizeNetworkLocations(listing.locations);
   const timeframe = formatNetworkContentTimeframe(listing.starts_on, listing.ends_on, locale, { from: t("timeframe.from"), until: t("timeframe.until") });
-  const geography = listing.locations.length ? listing.locations.join(" & ") : listing.geographic_scope ? t(`scopes.${listing.geographic_scope}`) : null;
+  const geography = locations.length ? locations.join(" & ") : listing.geographic_scope ? t(`scopes.${listing.geographic_scope}`) : null;
   const facts = [geography, listing.remote_mode ? t(`remote.${listing.remote_mode}`) : null, timeframe].filter(Boolean);
   return <article className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_14px_36px_rgba(15,23,42,.05)]">
     <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[.14em]">
