@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { NetworkValidationError, normalizeNetworkContactMessage, normalizeNetworkMessageBody, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
+import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
+import { randomUUID } from "node:crypto";
+
+const NETWORK_PHOTO_BUCKET = "network-profile-images";
 
 async function context() {
   const client = await createClient();
@@ -24,6 +28,10 @@ function refreshMessaging(conversationId?: string) {
   revalidatePath("/", "layout");
   if (conversationId) revalidatePath(`/network/messages/${conversationId}`);
 }
+function safeNetworkRedirect(value: FormDataEntryValue | null, fallback = "/network/contacts") {
+  const path = String(value ?? "").trim();
+  return path.startsWith("/network") && !path.startsWith("//") ? path : fallback;
+}
 
 export async function saveNetworkProfileAction(formData: FormData) {
   const { client, user } = await context();
@@ -32,13 +40,59 @@ export async function saveNetworkProfileAction(formData: FormData) {
   catch (error) { redirect(`/network/profile?error=${error instanceof NetworkValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (publish && !profilePublishable(values)) redirect("/network/profile?error=incomplete");
+  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,photo_visibility").eq("user_id", user.id).maybeSingle();
+  const photoChoice = String(formData.get("photo_choice") ?? "keep");
+  const visibility = formData.get("photo_visibility") === "public_allowed" ? "public_allowed" : "platform_only";
+  let uploadedPath: string | null = null;
+  let photoValues: Record<string, string | null> = { photo_visibility: visibility };
+
+  if (photoChoice === "none") {
+    photoValues = { ...photoValues, photo_source: null, photo_avatar_id: null, photo_path: null };
+  } else if (photoChoice === "existing") {
+    const base = await getProfileBasicsRow(client, user.id).catch(() => null);
+    const avatarId = normalizeAvatarId(base?.avatar_id);
+    if (avatarId) {
+      photoValues = { ...photoValues, photo_source: "profile_avatar", photo_avatar_id: avatarId, photo_path: null };
+    } else redirect("/network/profile?error=photo_reuse");
+  } else if (photoChoice === "upload") {
+    const upload = await uploadNetworkPhoto(client, user.id, String(formData.get("photo_image_data") ?? ""));
+    if (!upload) redirect("/network/profile?error=photo_upload");
+    uploadedPath = upload;
+    photoValues = { ...photoValues, photo_source: "network_upload", photo_avatar_id: null, photo_path: upload };
+  }
   const { error } = await client.from("network_profiles").upsert({
     user_id: user.id, ...values, status: publish ? "active" : "draft",
-    published_at: publish ? new Date().toISOString() : null,
+    published_at: publish ? new Date().toISOString() : null, ...photoValues,
   }, { onConflict: "user_id" });
-  if (error) redirect("/network/profile?error=save");
+  if (error) {
+    if (uploadedPath) await client.storage.from(NETWORK_PHOTO_BUCKET).remove([uploadedPath]);
+    redirect("/network/profile?error=save");
+  }
+  const oldPath = currentProfile.data?.photo_path?.trim() || null;
+  const nextPath = typeof photoValues.photo_path === "string" ? photoValues.photo_path : photoChoice === "keep" ? oldPath : null;
+  if (oldPath && oldPath !== nextPath && oldPath.startsWith(`${user.id}/`)) {
+    await client.storage.from(NETWORK_PHOTO_BUCKET).remove([oldPath]);
+  }
   refresh(); redirect(`/network/profile?saved=${publish ? "published" : "draft"}`);
 }
+
+function decodePhotoData(value: string) {
+  const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
+  if (!match) return null;
+  const buffer = Buffer.from(match[2], "base64");
+  if (!buffer.length || buffer.byteLength > 2 * 1024 * 1024) return null;
+  return { buffer, mimeType: match[1] };
+}
+
+async function uploadNetworkPhoto(client: Awaited<ReturnType<typeof createClient>>, userId: string, value: string) {
+  const decoded = decodePhotoData(value);
+  if (!decoded) return null;
+  const extension = decoded.mimeType === "image/png" ? "png" : decoded.mimeType === "image/webp" ? "webp" : "jpg";
+  const path = `${userId}/${Date.now()}-${randomUUID()}.${extension}`;
+  const { error } = await client.storage.from(NETWORK_PHOTO_BUCKET).upload(path, decoded.buffer, { contentType: decoded.mimeType, upsert: false });
+  return error ? null : path;
+}
+
 
 export async function reuseExistingProfileAction() {
   const { client, user } = await context();
@@ -136,9 +190,46 @@ export async function sendNetworkMessageAction(formData: FormData) {
     p_conversation_id: conversationId,
     p_body: body,
   });
-  if (error) redirect(`/network/messages/${conversationId}?error=message`);
+  if (error) redirect(`/network/messages/${conversationId}?error=${error.message.includes("interaction_blocked") ? "blocked" : "message"}`);
   refreshMessaging(conversationId);
   redirect(`/network/messages/${conversationId}?sent=1`);
+}
+
+export async function blockNetworkUserAction(formData: FormData) {
+  const { client } = await context();
+  const otherUserId = String(formData.get("other_user_id") ?? "").trim();
+  const returnTo = safeNetworkRedirect(formData.get("return_to"));
+  if (!otherUserId) redirect(`${returnTo}?error=safety`);
+  const { error } = await client.rpc("block_network_user", { p_blocked_user_id: otherUserId });
+  refreshMessaging();
+  redirect(`${returnTo}?${error ? "error=safety" : "safety=blocked"}`);
+}
+
+export async function unblockNetworkUserAction(formData: FormData) {
+  const { client } = await context();
+  const otherUserId = String(formData.get("other_user_id") ?? "").trim();
+  const returnTo = safeNetworkRedirect(formData.get("return_to"));
+  if (!otherUserId) redirect(`${returnTo}?error=safety`);
+  const { error } = await client.rpc("unblock_network_user", { p_blocked_user_id: otherUserId });
+  refreshMessaging();
+  redirect(`${returnTo}?${error ? "error=safety" : "safety=unblocked"}`);
+}
+
+export async function reportNetworkInteractionAction(formData: FormData) {
+  const { client } = await context();
+  const contactRequestId = String(formData.get("contact_request_id") ?? "").trim();
+  const category = String(formData.get("category") ?? "");
+  const comment = String(formData.get("comment") ?? "").trim();
+  const returnTo = safeNetworkRedirect(formData.get("return_to"));
+  if (!contactRequestId || !["spam", "harassment", "misleading", "other"].includes(category) || comment.length > 1000) {
+    redirect(`${returnTo}?error=report`);
+  }
+  const { error } = await client.rpc("report_network_interaction", {
+    p_contact_request_id: contactRequestId,
+    p_category: category,
+    p_comment: comment || null,
+  });
+  redirect(`${returnTo}?${error ? "error=report" : "safety=reported"}`);
 }
 
 export async function markNetworkConversationReadAction(conversationId: string) {

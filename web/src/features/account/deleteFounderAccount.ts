@@ -43,11 +43,12 @@ function isZero(value: number | null | undefined) {
   return value === 0;
 }
 
-async function deleteOwnedAvatarObjects(
+async function deleteOwnedImageObjects(
   privileged: NonNullable<ReturnType<typeof createPrivilegedClient>>,
-  userId: string
+  bucket: "avatars" | "network-profile-images",
+  userId: string,
 ) {
-  const { data, error } = await privileged.storage.from("avatars").list(userId, {
+  const { data, error } = await privileged.storage.from(bucket).list(userId, {
     limit: 1000,
   });
   if (error) {
@@ -61,7 +62,7 @@ async function deleteOwnedAvatarObjects(
     return true;
   }
 
-  const removal = await privileged.storage.from("avatars").remove(objectPaths);
+  const removal = await privileged.storage.from(bucket).remove(objectPaths);
   return !removal.error;
 }
 
@@ -74,7 +75,9 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
   // Storage is outside the database transaction. Remove only the authenticated
   // founder's own avatar prefix before the atomic DB/auth cleanup and stop safely
   // if Storage cannot confirm the deletion.
-  if (!(await deleteOwnedAvatarObjects(privileged, userId))) {
+  const avatarCleanup = await deleteOwnedImageObjects(privileged, "avatars", userId);
+  const networkPhotoCleanup = await deleteOwnedImageObjects(privileged, "network-profile-images", userId);
+  if (!avatarCleanup || !networkPhotoCleanup) {
     console.error("deleteFounderAccount avatar cleanup failed");
     return { ok: false, error: "cleanup_failed" };
   }

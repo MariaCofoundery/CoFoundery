@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { NetworkContactRequest, NetworkConversation, NetworkListing, NetworkMessage, NetworkProfile } from "./networkTypes";
+import type { NetworkBlockedMember, NetworkBlockState, NetworkContactRequest, NetworkConversation, NetworkListing, NetworkMessage, NetworkProfile } from "./networkTypes";
 import { NETWORK_CATEGORIES, NETWORK_DIRECTIONS, NETWORK_GEOGRAPHIC_SCOPES, NETWORK_REMOTE_MODES, isOneOf } from "./networkTypes";
 
 type Client = SupabaseClient;
@@ -77,4 +77,28 @@ export async function getUnreadNetworkMessageCount(client: Client) {
   const { data, error } = await client.rpc("get_unread_network_message_count");
   if (error) return 0;
   return typeof data === "number" ? data : Number(data ?? 0);
+}
+
+export async function getNetworkProfilesByUserIds(client: Client, userIds: string[]) {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  if (!ids.length) return new Map<string, NetworkProfile>();
+  const { data, error } = await client.from("network_profiles").select("*").in("user_id", ids).eq("status", "active");
+  if (error) return new Map<string, NetworkProfile>();
+  return new Map(((data ?? []) as NetworkProfile[]).map((profile) => [profile.user_id, profile]));
+}
+
+export async function getNetworkBlockState(client: Client, otherUserId: string) {
+  const { data, error } = await client.rpc("get_network_block_state", { p_other_user_id: otherUserId });
+  if (error) return { interaction_blocked: true, blocked_by_current_user: false } satisfies NetworkBlockState;
+  const row = Array.isArray(data) ? data[0] : data;
+  return {
+    interaction_blocked: row?.interaction_blocked === true,
+    blocked_by_current_user: row?.blocked_by_current_user === true,
+  } satisfies NetworkBlockState;
+}
+
+export async function getOwnNetworkBlocks(client: Client) {
+  const { data, error } = await client.rpc("list_network_blocks");
+  if (error) return [];
+  return (data ?? []) as NetworkBlockedMember[];
 }

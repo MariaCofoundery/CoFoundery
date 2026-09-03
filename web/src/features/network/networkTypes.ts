@@ -16,6 +16,9 @@ export type NetworkProfile = {
   user_id: string; display_name: string; headline: string; bio: string;
   location_region: string | null; remote_mode: string | null; expertise: string[];
   industries: string[]; network_roles: NetworkRole[]; status: "draft" | "active" | "paused";
+  photo_source: "profile_avatar" | "network_upload" | null;
+  photo_avatar_id: string | null; photo_path: string | null;
+  photo_visibility: "platform_only" | "public_allowed";
   published_at: string | null; updated_at: string;
 };
 export type NetworkListing = {
@@ -46,6 +49,17 @@ export type NetworkConversation = {
 export type NetworkMessage = {
   id: string; conversation_id: string; sender_user_id: string;
   body: string; created_at: string;
+};
+
+export type NetworkBlockState = {
+  interaction_blocked: boolean;
+  blocked_by_current_user: boolean;
+};
+
+export type NetworkBlockedMember = {
+  blocked_user_id: string;
+  display_name: string;
+  created_at: string;
 };
 
 export function isOneOf<T extends readonly string[]>(values: T, value: unknown): value is T[number] {

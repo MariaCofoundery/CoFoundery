@@ -5,13 +5,16 @@ import { getOwnNetworkProfile } from "@/features/network/networkData";
 import { reuseExistingProfileAction, saveNetworkProfileAction } from "@/features/network/networkActions";
 import { NetworkSubmitButton } from "@/features/network/NetworkSubmitButton";
 import { NETWORK_REMOTE_MODES, NETWORK_ROLES } from "@/features/network/networkTypes";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { NetworkPhotoField } from "@/features/network/NetworkPhotoField";
+import { networkPhotoUrl } from "@/features/network/NetworkAvatar";
 
 const field = "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 
 export default async function NetworkProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("network"); const { client, user } = await requireNetworkMember("/network/profile");
-  const [profile, params] = await Promise.all([getOwnNetworkProfile(client, user.id), searchParams]);
+  const [profile, baseProfile, params] = await Promise.all([getOwnNetworkProfile(client, user.id), getProfileBasicsRow(client, user.id).catch(() => null), searchParams]);
   return <main className="mx-auto max-w-4xl px-5 py-10">
     <Link href="/network" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
     <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold">{t("profile.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("profile.text")}</p>
@@ -29,6 +32,19 @@ export default async function NetworkProfilePage({ searchParams }: { searchParam
         <label className="text-sm font-medium">{t("profile.location")}<input name="location_region" maxLength={120} defaultValue={profile?.location_region || ""} className={field} /></label>
         <label className="text-sm font-medium">{t("profile.remote")}<select name="remote_mode" defaultValue={profile?.remote_mode || ""} className={field}><option value="">{t("form.optional")}</option>{NETWORK_REMOTE_MODES.map((value) => <option key={value} value={value}>{t(`remote.${value}`)}</option>)}</select></label>
       </div>
+      <NetworkPhotoField
+        displayName={profile?.display_name || baseProfile?.display_name || ""}
+        currentAvatarId={profile?.photo_avatar_id}
+        currentPhotoUrl={networkPhotoUrl(profile)}
+        existingAvatarId={baseProfile?.avatar_id}
+        initialVisibility={profile?.photo_visibility || "platform_only"}
+        copy={{
+          title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
+          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
+          visibilityTitle: t("profile.photo.visibilityTitle"), platformOnly: t("profile.photo.platformOnly"), platformOnlyHint: t("profile.photo.platformOnlyHint"),
+          publicAllowed: t("profile.photo.publicAllowed"), publicAllowedHint: t("profile.photo.publicAllowedHint"),
+        }}
+      />
       <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">{t("profile.consent")}</p>
       <div className="flex flex-wrap gap-3"><NetworkSubmitButton intent="publish" label={t("profile.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold" /><NetworkSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 text-sm font-semibold" /></div>
     </form>

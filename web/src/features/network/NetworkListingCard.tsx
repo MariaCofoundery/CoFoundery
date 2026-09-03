@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { NetworkListing, NetworkProfile } from "./networkTypes";
 import { formatNetworkContentTimeframe, normalizeNetworkLocations } from "./networkPresentation";
+import { NetworkAvatar } from "./NetworkAvatar";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function owner(listing: NetworkListing) {
@@ -23,7 +24,7 @@ export function NetworkListingCard({ listing, t, locale }: { listing: NetworkLis
     {listing.topics.length ? <div className="mt-4 flex flex-wrap gap-2">{listing.topics.slice(0, 4).map((topic) => <span key={topic} className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">{topic}</span>)}</div> : null}
     {facts.length ? <p className="mt-4 text-xs text-slate-500">{facts.join(" · ")}</p> : null}
     <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
-      <div><p className="text-sm font-semibold text-slate-900">{profile?.display_name}</p><p className="text-xs text-slate-500">{profile?.headline}</p></div>
+      <div className="flex min-w-0 items-center gap-3"><NetworkAvatar profile={profile} displayName={profile?.display_name || "Network"} /><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{profile?.display_name}</p><p className="truncate text-xs text-slate-500">{profile?.headline}</p></div></div>
       <Link href={`/network/listings/${listing.id}`} className="shrink-0 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{t("actions.details")}</Link>
     </div>
   </article>;
