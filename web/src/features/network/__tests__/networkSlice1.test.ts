@@ -92,6 +92,18 @@ test("home layout and empty state support low-liquidity counts without ranking",
   assert.match(data, /order\("published_at"/); assert.doesNotMatch(page, /score|popularity|best match|infinite/i);
 });
 
+test("initial Network render accepts membership without an owner Network profile and zero listings", () => {
+  const page = readFileSync("src/app/(product)/network/page.tsx", "utf8");
+  const data = readFileSync("src/features/network/networkData.ts", "utf8");
+  const layout = readFileSync("src/app/layout.tsx", "utf8");
+  assert.match(data, /return \(data \?\? \[\]\) as NetworkListing\[\]/);
+  assert.match(page, /listings\.length \?/);
+  assert.match(page, /empty\.title/);
+  assert.doesNotMatch(page, /getOwnNetworkProfile/);
+  assert.match(layout, /network_profiles"\)\.select\("display_name"\).*\.maybeSingle\(\)/);
+  assert.match(layout, /\.catch\(\(\) => null\)/);
+});
+
 test("co-founder selection bridges to Discovery and never reaches the listing editor", () => {
   const page = readFileSync("src/app/(product)/network/listings/new/page.tsx", "utf8");
   assert.match(page, /params\.category === "cofounder"/);

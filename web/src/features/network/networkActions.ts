@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { NetworkValidationError, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
+import { NetworkValidationError, normalizeNetworkContactMessage, parseNetworkListing, parseNetworkProfile, listingPublishable, profilePublishable } from "./networkValidation";
 
 async function context() {
   const client = await createClient();
@@ -15,6 +15,10 @@ async function context() {
   return { client, user };
 }
 function refresh() { ["/network", "/network/my", "/network/profile", "/dashboard"].forEach((path) => revalidatePath(path)); }
+function refreshContacts(listingId?: string) {
+  refresh(); revalidatePath("/network/contacts");
+  if (listingId) revalidatePath(`/network/listings/${listingId}`);
+}
 
 export async function saveNetworkProfileAction(formData: FormData) {
   const { client, user } = await context();
@@ -83,4 +87,36 @@ export async function changeNetworkListingStatusAction(formData: FormData) {
     if (error) redirect("/network/my?error=save");
   }
   refresh(); redirect(`/network/my?changed=${intent}`);
+}
+
+export async function requestNetworkContactAction(formData: FormData) {
+  const { client } = await context(); const listingId = String(formData.get("listing_id") ?? "").trim();
+  const message = normalizeNetworkContactMessage(formData.get("message"));
+  if (!listingId) redirect("/network?error=contact");
+  if (!message) redirect(`/network/listings/${listingId}/contact?error=message`);
+  const { error } = await client.rpc("request_network_contact", { p_listing_id: listingId, p_message: message });
+  if (error) {
+    const reason = error.message.includes("sender_profile_required") ? "contact_profile"
+      : error.message.includes("listing_unavailable") || error.message.includes("recipient_unavailable") ? "contact_unavailable"
+      : error.message.includes("self_request") ? "contact_self" : "contact";
+    redirect(`/network/listings/${listingId}/contact?error=${reason}`);
+  }
+  refreshContacts(listingId); redirect(`/network/listings/${listingId}?contact=sent`);
+}
+
+export async function respondNetworkContactAction(formData: FormData) {
+  const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
+  const response = String(formData.get("response") ?? "");
+  if (!id || (response !== "accepted" && response !== "declined")) redirect("/network/contacts?error=response");
+  const { error } = await client.rpc("respond_network_contact", { p_request_id: id, p_response: response });
+  if (error) redirect("/network/contacts?error=response");
+  refreshContacts(); redirect(`/network/contacts?changed=${response}`);
+}
+
+export async function cancelNetworkContactAction(formData: FormData) {
+  const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
+  if (!id) redirect("/network/contacts?error=cancel");
+  const { error } = await client.rpc("cancel_network_contact", { p_request_id: id });
+  if (error) redirect("/network/contacts?error=cancel");
+  refreshContacts(); redirect("/network/contacts?changed=canceled");
 }

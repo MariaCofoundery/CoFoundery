@@ -8,6 +8,7 @@
   "advisorConnections": "Founder connections",
   "incomingRequestBadgeSingular": "1 open co-founder request",
   "incomingRequestBadgePlural": "{count} open co-founder requests",
+  "incomingNetworkContactBadge": "{count} open Network contact requests",
   "editProfile": "Edit profile",
   "editNetworkProfile": "Edit Network profile",
   "lastOpened": "Last opened",

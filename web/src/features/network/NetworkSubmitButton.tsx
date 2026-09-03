@@ -7,19 +7,21 @@ export function NetworkSubmitButton({
   label,
   pendingLabel,
   className,
+  fieldName = "intent",
 }: {
   intent?: string;
   label: string;
   pendingLabel: string;
   className: string;
+  fieldName?: string;
 }) {
   const { pending, data } = useFormStatus();
-  const activeIntent = data?.get("intent");
+  const activeIntent = data?.get(fieldName);
   const showsPending = pending && (!intent || activeIntent === intent);
   return (
     <button
       type="submit"
-      name={intent ? "intent" : undefined}
+      name={intent ? fieldName : undefined}
       value={intent}
       disabled={pending}
       aria-disabled={pending}

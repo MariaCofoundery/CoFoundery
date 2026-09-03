@@ -10,6 +10,7 @@ export type DashboardTaskKind = (typeof DASHBOARD_TASK_KINDS)[number];
 
 export type DashboardTaskType =
   | "incoming_invitation"
+  | "network_contact"
   | "discovery_intro"
   | "relationship_advisor_consent"
   | "setup_advisor_consent"
@@ -68,6 +69,12 @@ export type FounderDashboardTaskSignals = {
     id: string;
     recipientUserId: string;
     status: string;
+    updatedAt: string;
+  }>;
+  networkContacts?: Array<{
+    id: string;
+    senderLabel: string;
+    listingTitle: string;
     updatedAt: string;
   }>;
   discoveryJourneys?: Array<{
@@ -160,7 +167,8 @@ const KIND_PRIORITY: Record<DashboardTaskKind, number> = {
 
 const NEEDS_YOU_PRIORITY: Partial<Record<DashboardTaskType, number>> = {
   incoming_invitation: 0,
-  discovery_intro: 1,
+  network_contact: 1,
+  discovery_intro: 2,
   relationship_advisor_consent: 2,
   setup_advisor_consent: 3,
   setup_confirmation: 4,
@@ -255,6 +263,19 @@ export function buildFounderDashboardTasks(
       personLabel: null,
       itemKey: null,
       discoveryStage: "incoming_intro",
+    });
+  }
+
+  for (const request of signals.networkContacts ?? []) {
+    tasks.push({
+      id: `network-contact:${request.id}`,
+      kind: "NEEDS_YOU",
+      type: "network_contact",
+      href: "/network/contacts",
+      createdAt: request.updatedAt,
+      contextLabel: request.listingTitle,
+      personLabel: request.senderLabel,
+      itemKey: null,
     });
   }
 

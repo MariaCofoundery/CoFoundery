@@ -69,11 +69,18 @@ export async function getFounderDashboardTasks(params: {
   const teamIds = params.teams.map((team) => team.id);
   const teamById = new Map(params.teams.map((team) => [team.id, team]));
 
-  const [introResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult, discoveryMatchingStartResult] =
+  const [introResult, networkContactResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult, discoveryMatchingStartResult] =
     await Promise.all([
       supabase
         .from("discovery_intro_requests")
         .select("id, recipient_user_id, status, updated_at")
+        .eq("recipient_user_id", currentUserId)
+        .eq("status", "pending")
+        .order("updated_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("network_contact_requests")
+        .select("id, sender_display_name_snapshot, listing_title_snapshot, updated_at")
         .eq("recipient_user_id", currentUserId)
         .eq("status", "pending")
         .order("updated_at", { ascending: false })
@@ -315,6 +322,19 @@ export async function getFounderDashboardTasks(params: {
           recipientUserId: intro.recipient_user_id,
           status: intro.status,
           updatedAt: intro.updated_at,
+        })),
+    networkContacts: networkContactResult.error
+      ? []
+      : ((networkContactResult.data ?? []) as Array<{
+          id: string;
+          sender_display_name_snapshot: string;
+          listing_title_snapshot: string;
+          updated_at: string;
+        }>).map((request) => ({
+          id: request.id,
+          senderLabel: request.sender_display_name_snapshot,
+          listingTitle: request.listing_title_snapshot,
+          updatedAt: request.updated_at,
         })),
     discoveryJourneys: discoveryMatchingStarts.map((start) => {
       const counterpartUserId =

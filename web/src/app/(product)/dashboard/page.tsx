@@ -717,6 +717,17 @@ function presentDashboardTask(
   const context = task.contextLabel ?? t("tasks.context.connection");
   const eyebrow = t(`tasks.kinds.${task.kind}`);
   switch (task.type) {
+    case "network_contact":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.networkContact.title"),
+        text: t("tasks.items.networkContact.text", {
+          name: task.personLabel ?? t("tasks.items.networkContact.someone"),
+          listing: task.contextLabel ?? t("tasks.items.networkContact.listing"),
+        }),
+        action: t("tasks.items.networkContact.action"),
+      };
     case "incoming_invitation":
       return {
         ...task,
