@@ -2,7 +2,6 @@ import { normalizeProfileRoles, profileRoleLabel, type ProfileRole } from "@/fea
 import type { ProfileBasicsRow } from "@/features/profile/profileData";
 
 const CORE_COMPLETION_TARGET = 40;
-const EXTENDED_COMPLETION_TARGET = 60;
 
 const EXTENDED_WEIGHTS = {
   headline: 10,
@@ -14,7 +13,7 @@ const EXTENDED_WEIGHTS = {
 
 export type ProfileCoreModel = {
   name: string | null;
-  role: ProfileRole;
+  role: ProfileRole | null;
   focus: string | null;
   intention: string | null;
   avatarId: string | null;
@@ -58,7 +57,7 @@ export function buildProfileModel(profile: ProfileBasicsRow | null): ProfileMode
   return {
     core: {
       name: normalizeText(profile?.display_name),
-      role: roles[0] ?? "founder",
+      role: roles[0] ?? null,
       focus: normalizeText(profile?.focus_skill),
       intention: normalizeText(profile?.intention),
       avatarId: normalizeText(profile?.avatar_id),
@@ -79,7 +78,8 @@ export function isCoreProfileComplete(profile: ProfileBasicsRow | null) {
 }
 
 export function getPrimaryProfileRoleLabel(profile: ProfileBasicsRow | null) {
-  return profileRoleLabel(buildProfileModel(profile).core.role);
+  const role = buildProfileModel(profile).core.role;
+  return role ? profileRoleLabel(role) : "–";
 }
 
 export function computeProfileCompletion(profile: ProfileBasicsRow | null): ProfileCompletion {

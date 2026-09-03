@@ -1,0 +1,4 @@
+import { notFound, redirect } from "next/navigation"; import { getTranslations } from "next-intl/server";
+import { requireNetworkMember } from "@/features/network/networkAccess"; import { getNetworkListing } from "@/features/network/networkData"; import { NetworkListingForm } from "@/features/network/NetworkListingForm";
+export default async function EditListing({ params }: { params: Promise<{listingId:string}> }) { const { listingId } = await params; const t = await getTranslations("network"); const { client, user } = await requireNetworkMember(); const listing = await getNetworkListing(client, listingId); if (!listing) notFound(); if (listing.owner_user_id !== user.id) redirect(`/network/listings/${listingId}`); return <main className="mx-auto max-w-4xl px-5 py-10"><h1 className="text-3xl font-semibold">{t("edit.title")}</h1><div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6"><NetworkListingForm listing={listing} t={t} /></div></main>; }
+

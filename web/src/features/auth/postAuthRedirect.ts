@@ -1,5 +1,7 @@
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { hasProfileRole } from "@/features/profile/profileRoles";
+import { resolveProductEntryPath } from "@/features/auth/productEntry";
 
 type SupabaseAuthUserClient = {
   auth: {
@@ -9,6 +11,7 @@ type SupabaseAuthUserClient = {
     }>;
   };
   from: (table: string) => unknown;
+  rpc: (fn: string) => PromiseLike<{ data: unknown; error: { message?: string | null } | null }>;
 };
 
 function normalizePath(value: string | null | undefined, fallback = "/dashboard") {
@@ -53,9 +56,22 @@ export async function resolvePostAuthRedirectPath(
   }
 
   const profile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
-  if (!isCoreProfileComplete(profile)) {
-    return buildWelcomeRedirectPath(normalizedNext);
+  const [hasFounder, hasAdvisor] = [
+    hasProfileRole(profile?.roles, "founder"),
+    hasProfileRole(profile?.roles, "advisor"),
+  ];
+  let hasNetwork = false;
+  try {
+    const networkResult = await supabase.rpc("is_network_member");
+    hasNetwork = networkResult.data === true;
+  } catch {
+    hasNetwork = false;
   }
 
-  return normalizedNext;
+  return resolveProductEntryPath(normalizedNext, {
+    hasFounder,
+    hasAdvisor,
+    hasNetwork,
+    coreProfileComplete: isCoreProfileComplete(profile),
+  }, buildWelcomeRedirectPath(normalizedNext));
 }

@@ -10,6 +10,7 @@ export function isProductChromePath(pathname: string) {
     pathname === "/connections" ||
     pathname.startsWith("/advisor/") ||
     pathname.startsWith("/discovery") ||
+    pathname.startsWith("/network") ||
     pathname.startsWith("/me/") ||
     pathname.startsWith("/report/") ||
     pathname.startsWith("/founder-alignment/") ||

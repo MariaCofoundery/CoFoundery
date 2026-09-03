@@ -48,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, incomingOpenRequestCount, researchConsentState] = user
+  const [roleViews, profileData, networkProfileData, hasNetwork, incomingOpenRequestCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -56,6 +56,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         })),
         getProfileBasicsRow(supabase, user.id).catch(() => null),
+        Promise.resolve(supabase.from("network_profiles").select("display_name").eq("user_id", user.id).maybeSingle()).then(({ data }) => data).catch(() => null),
+        Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
         getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
       ])
@@ -66,11 +68,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         },
         null,
+        null,
+        false,
         0,
         "undecided" as const,
       ];
   const displayName =
     profileData?.display_name?.trim() ||
+    networkProfileData?.display_name?.trim() ||
     user?.user_metadata?.display_name?.trim() ||
     user?.user_metadata?.full_name?.trim() ||
     user?.email?.split("@")[0] ||
@@ -83,6 +88,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ProductShell
             hasFounder={roleViews.hasFounder}
             hasAdvisor={roleViews.hasAdvisor}
+            hasNetwork={hasNetwork}
             displayName={displayName}
             incomingOpenRequestCount={incomingOpenRequestCount}
             researchConsentState={researchConsentState}

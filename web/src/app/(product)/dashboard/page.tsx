@@ -45,6 +45,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { getResearchConsentState } from "@/features/research/consent";
 import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
+import { getActiveOwnNetworkCounts } from "@/features/network/networkData";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 type DashboardSearchParams = {
@@ -164,9 +165,12 @@ export default async function DashboardPage({
       getResearchConsentState(supabase as unknown as SupabaseClient, user.id),
     ]);
 
-  if (!roleViews.hasFounder && roleViews.hasAdvisor) {
-    redirect("/advisor/dashboard");
+  if (!roleViews.hasFounder) {
+    if (roleViews.hasAdvisor) redirect("/advisor/dashboard");
+    const { data: hasNetwork } = await supabase.rpc("is_network_member");
+    redirect(hasNetwork === true ? "/network" : "/start");
   }
+  const networkCounts = await getActiveOwnNetworkCounts(supabase, user.id).catch(() => ({ seeking: 0, offering: 0 }));
 
   let invitationRows = initialInvitationRows;
   let runsResult = initialRunsResult;
@@ -390,6 +394,10 @@ export default async function DashboardPage({
           </div>
         </div>
       </section>
+
+      {networkCounts.seeking + networkCounts.offering > 0 ? <section className="dashboard-fade-up mb-8 rounded-2xl border border-cyan-200/80 bg-cyan-50/55 p-5" aria-labelledby="dashboard-network-title">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[11px] uppercase tracking-[.2em] text-slate-500">{t("network.eyebrow")}</p><h2 id="dashboard-network-title" className="mt-2 text-xl font-semibold">{t("network.title")}</h2><p className="mt-1 text-sm text-slate-600">{t("network.summary", { seeking: networkCounts.seeking, offering: networkCounts.offering })}</p></div><div className="flex flex-wrap gap-2"><Link href="/network" className={UTILITY_CTA_CLASS}>{t("network.open")}</Link><Link href="/network/listings/new" className={UTILITY_CTA_CLASS}>{t("network.create")}</Link></div></div>
+      </section> : null}
 
       <section
         id="dashboard-block-tasks"

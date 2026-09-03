@@ -158,6 +158,7 @@
       }
     }
   },
+  "network": {"eyebrow":"Deine Aktivitäten","title":"Dein Netzwerk","summary":"{seeking} Gesuche · {offering} Angebote aktiv","open":"Network öffnen","create":"+ Gesuch oder Angebot"},
   "explore": {
     "eyebrow": "Entdecke CoFoundery",
     "title": "Was du mit CoFoundery machen kannst",

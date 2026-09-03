@@ -17,6 +17,7 @@ type Props = {
   children: React.ReactNode;
   hasFounder: boolean;
   hasAdvisor: boolean;
+  hasNetwork: boolean;
   displayName: string | null;
   incomingOpenRequestCount: number;
   researchConsentState: ResearchConsentState;
@@ -74,6 +75,7 @@ export function ProductShell({
   children,
   hasFounder,
   hasAdvisor,
+  hasNetwork,
   displayName,
   incomingOpenRequestCount,
   researchConsentState: initialResearchConsentState,
@@ -96,8 +98,9 @@ export function ProductShell({
     resolvedActiveView === "advisor"
       ? navigationOverride?.workbookHref ?? advisorFallbackHref
       : navigationOverride?.workbookHref ?? "/connections";
-  const dashboardHref = resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
-  const navigationItems: NavigationItem[] = [
+  const isNetworkOnly = hasNetwork && !hasFounder && !hasAdvisor;
+  const dashboardHref = isNetworkOnly ? "/network" : resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
+  const navigationItems: NavigationItem[] = isNetworkOnly ? [] : [
     {
       href: dashboardHref,
       label: t("dashboard"),
@@ -161,15 +164,14 @@ export function ProductShell({
                   </Link>
                 ))}
                 {resolvedActiveView === "advisor" ? (
-                  <Link
-                    href={resolvedMatchingHref}
-                    className={navLinkClassName(pathname.startsWith("/advisor/report"))}
-                  >
-                    {t("advisorConnections")}
-                  </Link>
+                  <>
+                    {hasNetwork ? <Link href="/network" className={navLinkClassName(pathname.startsWith("/network"))}>{t("network")}</Link> : null}
+                    <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
+                  </>
                 ) : (
                   <>
-                    <Link
+                    {hasNetwork ? <Link href="/network" className={navLinkClassName(pathname.startsWith("/network"))}>{t("network")}</Link> : null}
+                    {hasFounder ? <><Link
                       href="/discovery"
                       className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
                     >
@@ -184,6 +186,7 @@ export function ProductShell({
                     >
                       {t("connections")}
                     </Link>
+                    </> : null}
                   </>
                 )}
               </nav>
@@ -203,7 +206,7 @@ export function ProductShell({
               />
 
               <LanguageSwitcher />
-              <ProfileMenu displayName={displayName} />
+              <ProfileMenu displayName={displayName} networkOnly={isNetworkOnly} />
             </div>
           </div>
         </header>
@@ -251,7 +254,7 @@ export function ProductNavigationOverride({
   return null;
 }
 
-function ProfileMenu({ displayName }: { displayName: string | null }) {
+function ProfileMenu({ displayName, networkOnly }: { displayName: string | null; networkOnly: boolean }) {
   const t = useTranslations("navigation");
   const normalizedName = normalizeDisplayName(displayName) || t("profileFallback");
   const avatarLabel = normalizedName.charAt(0).toUpperCase();
@@ -317,21 +320,21 @@ function ProfileMenu({ displayName }: { displayName: string | null }) {
           role="menu"
         >
           <Link
-            href="/dashboard#dashboard-block-profile-data"
+            href={networkOnly ? "/network/profile" : "/dashboard#dashboard-block-profile-data"}
             onClick={() => setIsOpen(false)}
             className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
             role="menuitem"
           >
-            {t("editProfile")}
+            {networkOnly ? t("editNetworkProfile") : t("editProfile")}
           </Link>
-          <Link
+          {!networkOnly ? <Link
             href="/dashboard#dashboard-block-account"
             onClick={() => setIsOpen(false)}
             className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
             role="menuitem"
           >
             {t("account")}
-          </Link>
+          </Link> : null}
           <form action={signOutAction}>
             <button
               type="submit"

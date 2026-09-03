@@ -12,6 +12,7 @@ import deFounderLibrary from "../../messages/de/founderLibrary.json";
 import deFounderInTheWild from "../../messages/de/founderInTheWild.json";
 import deInvite from "../../messages/de/invite.json";
 import deNavigation from "../../messages/de/navigation.json";
+import deNetwork from "../../messages/de/network.json";
 import deProfile from "../../messages/de/profile.json";
 import deReport from "../../messages/de/report.json";
 import deResearchConsent from "../../messages/de/researchConsent.json";
@@ -30,6 +31,7 @@ import enFounderLibrary from "../../messages/en/founderLibrary.json";
 import enFounderInTheWild from "../../messages/en/founderInTheWild.json";
 import enInvite from "../../messages/en/invite.json";
 import enNavigation from "../../messages/en/navigation.json";
+import enNetwork from "../../messages/en/network.json";
 import enProfile from "../../messages/en/profile.json";
 import enReport from "../../messages/en/report.json";
 import enResearchConsent from "../../messages/en/researchConsent.json";
@@ -51,6 +53,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     founderInTheWild: deFounderInTheWild,
     invite: deInvite,
     navigation: deNavigation,
+    network: deNetwork,
     profile: deProfile,
     report: deReport,
     researchConsent: deResearchConsent,
@@ -71,6 +74,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     founderInTheWild: enFounderInTheWild,
     invite: enInvite,
     navigation: enNavigation,
+    network: enNetwork,
     profile: enProfile,
     report: enReport,
     researchConsent: enResearchConsent,

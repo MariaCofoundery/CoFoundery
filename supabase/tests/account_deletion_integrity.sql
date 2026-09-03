@@ -193,6 +193,13 @@ insert into public.discovery_intro_requests(
   'Founder A intro message'
 );
 
+insert into public.network_profiles(user_id, display_name, headline, bio, network_roles, status, published_at) values
+  ('e1111111-1111-4111-8111-111111111111', 'Founder A', 'Network founder A', 'Explicit Network biography for deletion testing.', array['founder'], 'active', now()),
+  ('e2222222-2222-4222-8222-222222222222', 'Founder B', 'Network founder B', 'Explicit surviving Network biography for testing.', array['expert'], 'active', now());
+insert into public.network_listings(owner_user_id, direction, category, title, summary, status, published_at, expires_at) values
+  ('e1111111-1111-4111-8111-111111111111', 'seeking', 'expertise', 'Deletion test listing', 'This listing must cascade with the deleted owner profile.', 'active', now(), now() + interval '60 days'),
+  ('e2222222-2222-4222-8222-222222222222', 'offering', 'sparring', 'Surviving test listing', 'This listing must remain after another account is deleted.', 'active', now(), now() + interval '60 days');
+
 insert into public.events(id, slug, name, status, ends_at)
 values ('f3111111-1111-4111-8111-111111111111', 'delete-fixture', 'Delete Fixture', 'live', now() + interval '1 day');
 insert into public.event_participants(
@@ -300,6 +307,12 @@ select pg_temp.assert_account_delete(
   and not exists (select 1 from public.founder_discovery_saves where owner_user_id = 'e1111111-1111-4111-8111-111111111111')
   and not exists (select 1 from public.founder_discovery_saves where owner_user_id = 'e2222222-2222-4222-8222-222222222222')
   and not exists (select 1 from public.discovery_intro_requests where requester_user_id = 'e1111111-1111-4111-8111-111111111111' or recipient_user_id = 'e1111111-1111-4111-8111-111111111111')
+  and not exists (select 1 from public.network_memberships where user_id = 'e1111111-1111-4111-8111-111111111111')
+  and not exists (select 1 from public.network_profiles where user_id = 'e1111111-1111-4111-8111-111111111111')
+  and not exists (select 1 from public.network_listings where owner_user_id = 'e1111111-1111-4111-8111-111111111111')
+  and exists (select 1 from public.network_profiles where user_id = 'e2222222-2222-4222-8222-222222222222')
+  and exists (select 1 from public.network_memberships where user_id = 'e2222222-2222-4222-8222-222222222222')
+  and exists (select 1 from public.network_listings where owner_user_id = 'e2222222-2222-4222-8222-222222222222')
   and not exists (select 1 from public.event_participants where email = 'delete-a@example.com')
   and not exists (select 1 from public.event_answers where participant_id = 'f3222222-2222-4222-8222-222222222222')
   and not exists (select 1 from public.advisor_team_invites where founder_a_user_id = 'e1111111-1111-4111-8111-111111111111' or founder_a_email = 'delete-a@example.com')
@@ -343,6 +356,9 @@ reset role;
 
 select pg_temp.assert_account_delete(
   not exists (select 1 from auth.users where id = 'e2222222-2222-4222-8222-222222222222')
+  and not exists (select 1 from public.network_memberships where user_id = 'e2222222-2222-4222-8222-222222222222')
+  and not exists (select 1 from public.network_profiles where user_id = 'e2222222-2222-4222-8222-222222222222')
+  and not exists (select 1 from public.network_listings where owner_user_id = 'e2222222-2222-4222-8222-222222222222')
   and not exists (select 1 from public.founder_teams where id = 'ea111111-1111-4111-8111-111111111111')
   and not exists (select 1 from public.founder_team_setup_items where team_id = 'ea111111-1111-4111-8111-111111111111')
   and not exists (select 1 from public.founder_team_setup_revisions where setup_item_id = 'ee111111-1111-4111-8111-111111111111')

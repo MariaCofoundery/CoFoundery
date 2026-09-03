@@ -158,6 +158,7 @@
       }
     }
   },
+  "network": {"eyebrow":"Your activity","title":"Your network","summary":"{seeking} needs · {offering} offers active","open":"Open Network","create":"+ Need or offer"},
   "explore": {
     "eyebrow": "Explore CoFoundery",
     "title": "What you can do with CoFoundery",

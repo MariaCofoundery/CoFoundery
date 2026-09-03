@@ -18,7 +18,7 @@ export function normalizeProfileRoles(input: unknown): ProfileRole[] {
     .filter((value): value is ProfileRole => isProfileRole(value));
 
   const unique = Array.from(new Set(normalized));
-  return unique.length > 0 ? unique : ["founder"];
+  return unique;
 }
 
 export function hasProfileRole(roles: unknown, role: ProfileRole) {
