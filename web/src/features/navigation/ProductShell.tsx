@@ -19,6 +19,7 @@ type Props = {
   hasFounder: boolean;
   hasAdvisor: boolean;
   hasNetwork: boolean;
+  hasNetworkAccount: boolean;
   displayName: string | null;
   incomingOpenRequestCount: number;
   incomingNetworkContactCount: number;
@@ -84,6 +85,7 @@ export function ProductShell({
   hasFounder,
   hasAdvisor,
   hasNetwork,
+  hasNetworkAccount,
   displayName,
   incomingOpenRequestCount,
   incomingNetworkContactCount,
@@ -109,7 +111,14 @@ export function ProductShell({
       ? navigationOverride?.workbookHref ?? advisorFallbackHref
       : navigationOverride?.workbookHref ?? "/connections";
   const isNetworkOnly = hasNetwork && !hasFounder && !hasAdvisor;
-  const dashboardHref = isNetworkOnly ? "/network" : resolvedActiveView === "advisor" ? "/advisor/dashboard" : "/dashboard";
+  const isSuspendedNetworkOnly = hasNetworkAccount && !hasNetwork && !hasFounder && !hasAdvisor;
+  const dashboardHref = isNetworkOnly
+    ? "/network"
+    : isSuspendedNetworkOnly
+      ? "/account"
+      : resolvedActiveView === "advisor"
+        ? "/advisor/dashboard"
+        : "/dashboard";
   const networkAttentionCount = getNetworkAttentionCount(incomingNetworkContactCount, unreadNetworkMessageCount);
   const navigationItems: NavigationItem[] = isNetworkOnly ? [] : [
     {
@@ -217,7 +226,11 @@ export function ProductShell({
               />
 
               <LanguageSwitcher />
-              <ProfileMenu displayName={displayName} networkOnly={isNetworkOnly} />
+              <ProfileMenu
+                displayName={displayName}
+                networkOnly={isNetworkOnly}
+                accountOnly={isSuspendedNetworkOnly}
+              />
             </div>
           </div>
         </header>
@@ -265,7 +278,15 @@ export function ProductNavigationOverride({
   return null;
 }
 
-function ProfileMenu({ displayName, networkOnly }: { displayName: string | null; networkOnly: boolean }) {
+function ProfileMenu({
+  displayName,
+  networkOnly,
+  accountOnly,
+}: {
+  displayName: string | null;
+  networkOnly: boolean;
+  accountOnly: boolean;
+}) {
   const t = useTranslations("navigation");
   const normalizedName = normalizeDisplayName(displayName) || t("profileFallback");
   const avatarLabel = normalizedName.charAt(0).toUpperCase();
@@ -330,14 +351,16 @@ function ProfileMenu({ displayName, networkOnly }: { displayName: string | null;
           className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 bg-white/96 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)] backdrop-blur-xl"
           role="menu"
         >
-          <Link
-            href={networkOnly ? "/network/profile" : "/dashboard#dashboard-block-profile-data"}
-            onClick={() => setIsOpen(false)}
-            className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
-            role="menuitem"
-          >
-            {networkOnly ? t("editNetworkProfile") : t("editProfile")}
-          </Link>
+          {!accountOnly ? (
+            <Link
+              href={networkOnly ? "/network/profile" : "/dashboard#dashboard-block-profile-data"}
+              onClick={() => setIsOpen(false)}
+              className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+              role="menuitem"
+            >
+              {networkOnly ? t("editNetworkProfile") : t("editProfile")}
+            </Link>
+          ) : null}
           <Link
             href="/account"
             onClick={() => setIsOpen(false)}

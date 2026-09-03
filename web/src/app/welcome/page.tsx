@@ -15,11 +15,12 @@ function buildWelcomeNextParam(nextPath: string) {
 export default async function WelcomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ intent?: string; next?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("profile.welcome");
   const nextPath = normalizeNextPath(params.next);
+  const profileIntent = params.intent === "advisor" ? "advisor" : "founder";
   const supabase = await createClient();
   const {
     data: { user },
@@ -49,7 +50,7 @@ export default async function WelcomePage({
               display_name: profile?.display_name ?? null,
               focus_skill: profile?.focus_skill ?? null,
               intention: profile?.intention ?? null,
-              roles: profile?.roles ?? null,
+              roles: profile?.roles ?? [profileIntent],
               avatar_id: profile?.avatar_id ?? null,
               avatar_url: profile?.avatar_url ?? null,
             }}

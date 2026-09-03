@@ -73,7 +73,9 @@ export async function saveNetworkProfileAction(formData: FormData) {
   if (oldPath && oldPath !== nextPath && oldPath.startsWith(`${user.id}/`)) {
     await client.storage.from(NETWORK_PHOTO_BUCKET).remove([oldPath]);
   }
-  refresh(); redirect(`/network/profile?saved=${publish ? "published" : "draft"}`);
+  refresh();
+  if (publish && !currentProfile.data) redirect("/network?profile=published");
+  redirect(`/network/profile?saved=${publish ? "published" : "draft"}`);
 }
 
 function decodePhotoData(value: string) {

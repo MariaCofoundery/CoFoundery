@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, networkProfileData, hasNetwork, incomingOpenRequestCount, incomingNetworkContactCount, unreadNetworkMessageCount, researchConsentState] = user
+  const [roleViews, profileData, networkProfileData, hasNetwork, hasNetworkAccount, incomingOpenRequestCount, incomingNetworkContactCount, unreadNetworkMessageCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -59,6 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         getProfileBasicsRow(supabase, user.id).catch(() => null),
         Promise.resolve(supabase.from("network_profiles").select("display_name").eq("user_id", user.id).maybeSingle()).then(({ data }) => data).catch(() => null),
         Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
+        Promise.resolve(supabase.rpc("has_network_account")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
         getIncomingPendingNetworkContactCount(supabase, user.id).catch(() => 0),
         getUnreadNetworkMessageCount(supabase).catch(() => 0),
@@ -72,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         },
         null,
         null,
+        false,
         false,
         0,
         0,
@@ -94,6 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasFounder={roleViews.hasFounder}
             hasAdvisor={roleViews.hasAdvisor}
             hasNetwork={hasNetwork}
+            hasNetworkAccount={hasNetworkAccount}
             displayName={displayName}
             incomingOpenRequestCount={incomingOpenRequestCount}
             incomingNetworkContactCount={incomingNetworkContactCount}

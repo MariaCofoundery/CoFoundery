@@ -16,10 +16,18 @@ function buildLoginErrorHref(nextPath: string) {
   return `/login?${params.toString()}`;
 }
 
-function buildAuthLandingHref(nextPath: string) {
+function buildAuthLandingHref(
+  nextPath: string,
+  networkSignupToken: string | null,
+  profileSignupIntent: string | null
+) {
   const params = new URLSearchParams({
     next: normalizeNextPath(nextPath),
   });
+  if (networkSignupToken) params.set("network_signup_token", networkSignupToken);
+  if (profileSignupIntent === "founder" || profileSignupIntent === "advisor") {
+    params.set("profile_signup_intent", profileSignupIntent);
+  }
 
   return `/auth/landing?${params.toString()}`;
 }
@@ -79,6 +87,8 @@ export default function AuthCallbackClientPage() {
       const refreshToken = storedTokens?.refreshToken ?? getParam("refresh_token");
       const callbackError =
         getParam("error") ?? getParam("error_code") ?? getParam("error_description");
+      const networkSignupToken = getParam("network_signup_token");
+      const profileSignupIntent = getParam("profile_signup_intent");
 
       const fail = () => {
         if (!cancelled) {
@@ -135,7 +145,9 @@ export default function AuthCallbackClientPage() {
         }
 
         if (!cancelled) {
-          window.location.replace(buildAuthLandingHref(nextPath));
+          window.location.replace(
+            buildAuthLandingHref(nextPath, networkSignupToken, profileSignupIntent)
+          );
         }
       } catch {
         fail();

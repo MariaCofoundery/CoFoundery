@@ -15,12 +15,12 @@ export default async function AccountPage() {
 
   const [roleViews, membershipResult, t] = await Promise.all([
     getDashboardRoleViews(user.id).catch(() => ({ hasFounder: false, hasAdvisor: false, roles: [] })),
-    supabase.rpc("is_network_member"),
+    supabase.rpc("has_network_account"),
     getTranslations("dashboard"),
   ]);
-  const hasNetwork = membershipResult.data === true;
+  const hasNetworkAccount = membershipResult.data === true;
 
-  if (!canAccessAccountSettings({ ...roleViews, hasNetwork })) redirect("/start");
+  if (!canAccessAccountSettings({ ...roleViews, hasNetwork: hasNetworkAccount })) redirect("/start");
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10 md:px-8">

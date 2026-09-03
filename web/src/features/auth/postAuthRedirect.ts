@@ -36,9 +36,17 @@ export function buildWelcomeRedirectPath(nextPath: string) {
   return `/welcome?next=${encodeURIComponent(normalizedNext)}`;
 }
 
+function withProfileIntent(path: string, intent: "founder" | "advisor" | null) {
+  if (!intent) return path;
+  const url = new URL(path, "https://cofoundery.local");
+  url.searchParams.set("intent", intent);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 export async function resolvePostAuthRedirectPath(
   supabase: SupabaseAuthUserClient,
-  nextPath: string
+  nextPath: string,
+  profileSignupIntent: "founder" | "advisor" | null = null
 ) {
   const normalizedNext = normalizePath(nextPath);
 
@@ -61,17 +69,37 @@ export async function resolvePostAuthRedirectPath(
     hasProfileRole(profile?.roles, "advisor"),
   ];
   let hasNetwork = false;
+  let hasNetworkAccount = false;
+  let networkProfileReady = false;
   try {
-    const networkResult = await supabase.rpc("is_network_member");
+    const [networkResult, networkAccountResult] = await Promise.all([
+      supabase.rpc("is_network_member"),
+      supabase.rpc("has_network_account"),
+    ]);
     hasNetwork = networkResult.data === true;
+    hasNetworkAccount = networkAccountResult.data === true;
+    if (hasNetwork && !hasFounder && !hasAdvisor) {
+      const profileResult = await (supabase.from("network_profiles") as {
+        select: (columns: string) => {
+          eq: (column: string, value: string) => {
+            maybeSingle: () => Promise<{ data: { status?: string | null } | null; error: unknown }>;
+          };
+        };
+      }).select("status").eq("user_id", user.id).maybeSingle();
+      networkProfileReady = !profileResult.error && profileResult.data?.status === "active";
+    }
   } catch {
     hasNetwork = false;
+    hasNetworkAccount = false;
   }
 
   return resolveProductEntryPath(normalizedNext, {
     hasFounder,
     hasAdvisor,
     hasNetwork,
+    hasNetworkAccount,
+    networkProfileReady,
+    profileOnboardingAllowed: profileSignupIntent !== null,
     coreProfileComplete: isCoreProfileComplete(profile),
-  }, buildWelcomeRedirectPath(normalizedNext));
+  }, withProfileIntent(buildWelcomeRedirectPath(normalizedNext), profileSignupIntent));
 }

@@ -1,6 +1,9 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { normalizeSafeInternalPath } from "@/features/auth/safeInternalPath";
+import { readNetworkSignupToken, readProfileSignupIntent } from "@/features/auth/signupIntent";
+
+export { readNetworkSignupToken, readProfileSignupIntent } from "@/features/auth/signupIntent";
 
 export type AuthErrorCode = "magic_link_failed" | "auth_callback_failed";
 const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
@@ -70,6 +73,11 @@ export function buildAuthCallbackClientBridgeResponse(
 ) {
   const clientUrl = new URL("/auth/callback/client", request.url);
   clientUrl.searchParams.set("next", normalizeNextPath(nextPath));
+  const requestUrl = new URL(request.url);
+  const networkSignupToken = readNetworkSignupToken(requestUrl);
+  const profileSignupIntent = readProfileSignupIntent(requestUrl);
+  if (networkSignupToken) clientUrl.searchParams.set("network_signup_token", networkSignupToken);
+  if (profileSignupIntent) clientUrl.searchParams.set("profile_signup_intent", profileSignupIntent);
 
   const loginUrl = new URL("/login", request.url);
   loginUrl.searchParams.set("error", errorCode);

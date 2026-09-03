@@ -9,13 +9,25 @@ import {
   isValidBetaAccessCode,
 } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import {
+  issueNetworkSignupIntent,
+  revokeNetworkSignupIntent,
+} from "@/features/auth/networkSignup";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
-function buildStartHref(status: string, nextPath: string) {
+const SIGNUP_INTENTS = ["founder", "advisor", "network"] as const;
+type SignupIntent = (typeof SIGNUP_INTENTS)[number];
+
+function normalizeSignupIntent(value: string | null | undefined): SignupIntent {
+  return SIGNUP_INTENTS.includes(value as SignupIntent) ? value as SignupIntent : "founder";
+}
+
+function buildStartHref(status: string, nextPath: string, intent: SignupIntent) {
   const params = new URLSearchParams({
     status,
     next: normalizeNextPath(nextPath),
+    intent,
   });
   return `/start?${params.toString()}`;
 }
@@ -44,13 +56,20 @@ function statusMessage(status: string | undefined, t: AuthT) {
     };
   }
 
+  if (status === "network_failed") {
+    return {
+      tone: "error" as const,
+      text: t("start.status.networkFailed"),
+    };
+  }
+
   return null;
 }
 
 export default async function StartPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; status?: string }>;
+  searchParams: Promise<{ intent?: string; next?: string; status?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("auth");
@@ -59,10 +78,12 @@ export default async function StartPage({
     data: { user },
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
+  const selectedIntent = normalizeSignupIntent(params.intent);
   const message = statusMessage(params.status, t);
 
   if (user) {
-    redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
+    const destination = await resolvePostAuthRedirectPath(supabase, nextPath);
+    if (destination !== "/start") redirect(destination);
   }
 
   async function sendStartMagicLinkAction(formData: FormData) {
@@ -70,15 +91,27 @@ export default async function StartPage({
 
     const email = String(formData.get("email") ?? "").trim().toLowerCase();
     const code = String(formData.get("betaCode") ?? "");
+    const intent = normalizeSignupIntent(String(formData.get("intent") ?? "founder"));
     const redirectNextPath = normalizeNextPath(String(formData.get("nextPath") ?? "/dashboard"));
 
     if (!email || !email.includes("@") || !isValidBetaAccessCode(code)) {
-      redirect(buildStartHref("invalid", redirectNextPath));
+      redirect(buildStartHref("invalid", redirectNextPath, intent));
     }
 
     const origin = getPublicAppOrigin();
     const redirectTo = new URL("/auth/callback", `${origin}/`);
-    redirectTo.searchParams.set("next", redirectNextPath);
+    let networkSignupToken: string | null = null;
+    if (intent === "network") {
+      networkSignupToken = await issueNetworkSignupIntent(email);
+      if (!networkSignupToken) {
+        redirect(buildStartHref("send_failed", redirectNextPath, intent));
+      }
+      redirectTo.searchParams.set("next", "/network/profile");
+      redirectTo.searchParams.set("network_signup_token", networkSignupToken);
+    } else {
+      redirectTo.searchParams.set("next", redirectNextPath);
+      redirectTo.searchParams.set("profile_signup_intent", intent);
+    }
 
     const startClient = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -102,10 +135,11 @@ export default async function StartPage({
     });
 
     if (error) {
-      redirect(buildStartHref("send_failed", redirectNextPath));
+      if (networkSignupToken) await revokeNetworkSignupIntent(networkSignupToken);
+      redirect(buildStartHref("send_failed", redirectNextPath, intent));
     }
 
-    redirect(buildStartHref("sent", redirectNextPath));
+    redirect(buildStartHref("sent", redirectNextPath, intent));
   }
 
   return (
@@ -134,6 +168,33 @@ export default async function StartPage({
         ) : null}
         <form action={sendStartMagicLinkAction} className="mt-6 grid gap-3">
           <input type="hidden" name="nextPath" value={nextPath} />
+          <fieldset className="grid gap-3">
+            <legend className="text-sm font-medium text-[color:var(--ink)]">
+              {t("start.intentLegend")}
+            </legend>
+            {SIGNUP_INTENTS.map((intent) => (
+              <label
+                key={intent}
+                className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300"
+              >
+                <input
+                  type="radio"
+                  name="intent"
+                  value={intent}
+                  defaultChecked={intent === selectedIntent}
+                  className="mt-1"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-slate-900">
+                    {t(`start.intents.${intent}.title`)}
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-600">
+                    {t(`start.intents.${intent}.description`)}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
           <label htmlFor="start-email" className="text-sm font-medium text-[color:var(--ink)]">
             {t("start.emailLabel")}
           </label>
