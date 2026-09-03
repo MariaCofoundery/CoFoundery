@@ -1,5 +1,11 @@
 export type TimeframeCopy = { from: string; until: string };
 
+export function normalizeNetworkLocations(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((location): location is string => typeof location === "string")
+    : [];
+}
+
 function parseDate(value: string) {
   const [year, month, day] = value.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day));
