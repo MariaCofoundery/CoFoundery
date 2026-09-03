@@ -6,6 +6,8 @@ import {
   getDiscoveryV2AlignmentContextForCandidate,
 } from "@/features/discovery/discoveryData";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
+import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
+import { getOwnSavedDiscoveryProfileIds } from "@/features/discovery/discoverySavesData";
 import {
   cancelDiscoveryIntroAction,
   requestDiscoveryIntroAction,
@@ -312,11 +314,12 @@ export default async function DiscoveryProfileDetailPage({
   }
 
   const isOwner = profile.userId === user.id;
-  const [introRequest, alignmentContext] = isOwner
-    ? [null, { preferences: {}, signals: [] }]
+  const [introRequest, alignmentContext, savedProfileIds] = isOwner
+    ? [null, { preferences: {}, signals: [] }, new Set<string>()]
     : await Promise.all([
         getDiscoveryIntroRequestForProfile(user.id, profile.id),
         getDiscoveryV2AlignmentContextForCandidate(user.id, profile.userId),
+        getOwnSavedDiscoveryProfileIds(user.id),
       ]);
   const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
@@ -371,9 +374,12 @@ export default async function DiscoveryProfileDetailPage({
                 {t("detail.editOwn")}
               </Link>
             ) : (
-              <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-                {t("common.myIntros")}
-              </Link>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
+                  {t("common.myIntros")}
+                </Link>
+                <FounderDiscoverySaveButton profileId={profile.id} saved={savedProfileIds.has(profile.id)} saveLabel={t("common.saveProfile")} savedLabel={t("common.savedProfile")} />
+              </div>
             )}
           </div>
         </header>

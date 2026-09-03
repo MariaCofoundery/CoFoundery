@@ -74,6 +74,7 @@ type MutationResult<T> = Promise<{ data: T | null; error: SupabaseError | null }
 type SelectBuilder<T> = {
   eq: (column: string, value: unknown) => SelectBuilder<T>;
   neq: (column: string, value: unknown) => SelectBuilder<T>;
+  in: (column: string, values: unknown[]) => SelectBuilder<T>;
   order: (column: string, options?: { ascending?: boolean }) => SelectBuilder<T>;
   limit: (count: number) => SelectBuilder<T>;
   maybeSingle: () => QueryResult<T>;
@@ -292,6 +293,26 @@ export async function getOwnDiscoveryProfile(
   }
 
   return data ? mapProfileRow(data) : null;
+}
+
+export async function getActiveDiscoveryProfilesByIds(
+  profileIds: string[],
+  client?: SupabaseLikeClient
+): Promise<FounderDiscoveryProfile[]> {
+  const normalizedIds = [...new Set(profileIds.map(assertProfileId))];
+  if (normalizedIds.length === 0) return [];
+
+  const supabase = await resolveClient(client);
+  const { data, error } = await getProfilesTable(supabase)
+    .select(DISCOVERY_PROFILE_COLUMNS)
+    .in("id", normalizedIds)
+    .eq("status", "active");
+
+  if (error) {
+    throw new Error(error.message ?? "discovery_profiles_load_failed");
+  }
+
+  return (data ?? []).map(mapProfileRow);
 }
 
 export async function upsertOwnDiscoveryProfile(

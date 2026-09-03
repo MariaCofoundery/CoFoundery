@@ -6,10 +6,21 @@
     "backToDiscovery": "Zurück zu Co-Founder finden",
     "backToDashboard": "← Zurück zum Dashboard",
     "viewProfile": "Profil ansehen",
+    "saveProfile": "Merken",
+    "savedProfile": "Gemerkt",
+    "savedProfiles": "Gemerkt",
     "moreCount": "+{count}",
     "myIntros": "Kennenlernen",
     "prepareSharedMatching": "Gemeinsam prüfen",
     "fillBaseQuestions": "Basis-Fragen ausfüllen"
+  },
+  "saved": {
+    "eyebrow": "Deine Discovery-Auswahl",
+    "title": "Gemerkt",
+    "description": "Founder-Profile, die du später noch einmal ansehen möchtest.",
+    "emptyTitle": "Noch nichts gemerkt",
+    "emptyText": "Wenn du ein interessantes Founder-Profil später noch einmal ansehen möchtest, kannst du es hier merken.",
+    "discover": "Founder entdecken"
   },
   "status": {
     "draft": "Entwurf",

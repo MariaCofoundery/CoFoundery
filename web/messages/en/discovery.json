@@ -6,10 +6,21 @@
     "backToDiscovery": "Back to Find a Co-Founder",
     "backToDashboard": "← Back to dashboard",
     "viewProfile": "View profile",
+    "saveProfile": "Save",
+    "savedProfile": "Saved",
+    "savedProfiles": "Saved",
     "moreCount": "+{count}",
     "myIntros": "Meet founders",
     "prepareSharedMatching": "Explore together",
     "fillBaseQuestions": "Answer the foundation questions"
+  },
+  "saved": {
+    "eyebrow": "Your Discovery selection",
+    "title": "Saved",
+    "description": "Founder profiles you want to revisit later.",
+    "emptyTitle": "Nothing saved yet",
+    "emptyText": "Save an interesting founder profile here if you want to revisit it later.",
+    "discover": "Explore founders"
   },
   "status": {
     "draft": "Draft",

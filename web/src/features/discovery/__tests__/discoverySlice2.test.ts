@@ -165,7 +165,7 @@ test("Alignment signals neither rank candidates nor add a score", () => {
 
 test("profile editor and cards only render explicitly stored intent and horizon", () => {
   const editor = readFileSync("src/app/(product)/discovery/profile/page.tsx", "utf8");
-  const search = readFileSync("src/app/(product)/discovery/page.tsx", "utf8");
+  const search = readFileSync("src/features/discovery/FounderDiscoveryCard.tsx", "utf8");
   assert.match(editor, /name="searchIntent"/);
   assert.match(editor, /name="startHorizon"/);
   assert.match(search, /profile\.searchIntent \?/);

@@ -49,14 +49,15 @@ test("card values stay compact without changing their meaning", () => {
 
 test("Search cards expose sought roles, founding context, and only explicit Slice 2 intent", () => {
   const page = readFileSync("src/app/(product)/discovery/page.tsx", "utf8");
-  assert.match(page, /profile\.seekingRoles/);
-  assert.match(page, /commitmentLevels/);
-  assert.match(page, /ventureStages/);
-  assert.match(page, /ventureGoals/);
-  assert.match(page, /profile\.searchIntent \?/);
-  assert.match(page, /profile\.startHorizon \?/);
-  assert.doesNotMatch(page, /high_intent|seriousFounder|readinessScore/);
-  assert.match(page, /candidate\.practicalMatches/);
+  const card = readFileSync("src/features/discovery/FounderDiscoveryCard.tsx", "utf8");
+  assert.match(card, /profile\.seekingRoles/);
+  assert.match(card, /commitmentLevels/);
+  assert.match(card, /ventureStages/);
+  assert.match(card, /ventureGoals/);
+  assert.match(card, /profile\.searchIntent \?/);
+  assert.match(card, /profile\.startHorizon \?/);
+  assert.doesNotMatch(card, /high_intent|seriousFounder|readinessScore/);
+  assert.match(card, /candidate\.practicalMatches/);
   assert.match(page, /showMatchReasons=\{mode === "search"\}/);
 });
 
@@ -84,6 +85,7 @@ test("all Discovery routes use the founder access guard", () => {
     "src/app/(product)/discovery/page.tsx",
     "src/app/(product)/discovery/profile/page.tsx",
     "src/app/(product)/discovery/[profileId]/page.tsx",
+    "src/app/(product)/discovery/saved/page.tsx",
     "src/app/(product)/discovery/intros/page.tsx",
     "src/app/(product)/discovery/intros/[introRequestId]/matching/page.tsx",
   ]) {
@@ -98,7 +100,7 @@ test("Discovery profile editor loads the owner profile without an active-status 
   const data = readFileSync("src/features/discovery/discoveryData.ts", "utf8");
   const ownProfileLoader = data.slice(
     data.indexOf("export async function getOwnDiscoveryProfile"),
-    data.indexOf("export async function upsertOwnDiscoveryProfile")
+    data.indexOf("export async function getActiveDiscoveryProfilesByIds")
   );
   assert.match(page, /getOwnDiscoveryProfile\(user\.id\)/);
   assert.match(ownProfileLoader, /\.eq\("user_id", normalizedUserId\)\s*\.maybeSingle\(\)/);

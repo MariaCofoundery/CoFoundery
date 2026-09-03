@@ -169,6 +169,22 @@ insert into public.founder_discovery_profiles(user_id, status, display_name, hea
 values
   ('e1111111-1111-4111-8111-111111111111', 'draft', 'Founder A', 'A headline', 'A bio'),
   ('e2222222-2222-4222-8222-222222222222', 'draft', 'Founder B', 'B headline', 'B bio');
+update public.founder_discovery_profiles
+set status = 'active', own_roles = array['product'], seeking_roles = array['tech'],
+    availability_hours_per_week = 20, commitment_level = 'part_time',
+    venture_stage = 'idea_validating', venture_goal = 'venture_scale', published_at = now()
+where user_id in (
+  'e1111111-1111-4111-8111-111111111111',
+  'e2222222-2222-4222-8222-222222222222'
+);
+insert into public.founder_discovery_saves(owner_user_id, saved_profile_id)
+select 'e1111111-1111-4111-8111-111111111111', id
+from public.founder_discovery_profiles
+where user_id = 'e2222222-2222-4222-8222-222222222222';
+insert into public.founder_discovery_saves(owner_user_id, saved_profile_id)
+select 'e2222222-2222-4222-8222-222222222222', id
+from public.founder_discovery_profiles
+where user_id = 'e1111111-1111-4111-8111-111111111111';
 insert into public.discovery_intro_requests(
   requester_user_id, recipient_user_id, message
 ) values (
@@ -281,6 +297,8 @@ select pg_temp.assert_account_delete(
   and not exists (select 1 from public.research_events where research_consent_version = 'research_consent_v1')
   and not exists (select 1 from public.product_feedback where user_id = 'e1111111-1111-4111-8111-111111111111')
   and not exists (select 1 from public.founder_discovery_profiles where user_id = 'e1111111-1111-4111-8111-111111111111')
+  and not exists (select 1 from public.founder_discovery_saves where owner_user_id = 'e1111111-1111-4111-8111-111111111111')
+  and not exists (select 1 from public.founder_discovery_saves where owner_user_id = 'e2222222-2222-4222-8222-222222222222')
   and not exists (select 1 from public.discovery_intro_requests where requester_user_id = 'e1111111-1111-4111-8111-111111111111' or recipient_user_id = 'e1111111-1111-4111-8111-111111111111')
   and not exists (select 1 from public.event_participants where email = 'delete-a@example.com')
   and not exists (select 1 from public.event_answers where participant_id = 'f3222222-2222-4222-8222-222222222222')
