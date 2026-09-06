@@ -80,7 +80,7 @@ test("loads English auth, dashboard, workspace, workbook and report messages", (
   assert.equal(workbook.client?.title, "Workbook for your conversation");
   assert.equal(workbook.steps?.vision_direction?.title, "Company logic");
   assert.equal(report.common?.savePdf, "Save as PDF");
-  assert.equal(report.session?.startWorkspace, "Start shared workspace");
+  assert.equal(report.session?.startWorkspace, "Start collaborating");
 });
 
 test("loads English feedback and advisor messages", () => {
