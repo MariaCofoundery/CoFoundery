@@ -19,6 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${origin}${entry.path}`,
     lastModified: new Date(entry.updated_at),
     changeFrequency: "weekly" as const,
-    priority: entry.path.startsWith("/network/l/") ? 0.7 : 0.6,
+    priority: entry.path.startsWith("/connect/l/") ? 0.7 : 0.6,
   }))];
 }

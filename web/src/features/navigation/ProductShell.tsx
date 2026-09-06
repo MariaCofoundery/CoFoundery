@@ -9,7 +9,7 @@ import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
-import { getNetworkAttentionCount } from "@/features/network/networkPresentation";
+import { getConnectAttentionCount } from "@/features/connect/connectPresentation";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
@@ -18,12 +18,12 @@ type Props = {
   children: React.ReactNode;
   hasFounder: boolean;
   hasAdvisor: boolean;
-  hasNetwork: boolean;
-  hasNetworkAccount: boolean;
+  hasConnect: boolean;
+  hasConnectAccount: boolean;
   displayName: string | null;
   incomingOpenRequestCount: number;
-  incomingNetworkContactCount: number;
-  unreadNetworkMessageCount: number;
+  incomingConnectContactCount: number;
+  unreadConnectMessageCount: number;
   researchConsentState: ResearchConsentState;
 };
 
@@ -61,7 +61,7 @@ function discoveryCtaClassName(active: boolean) {
   }`;
 }
 
-function NetworkAttentionBadge({ count, label }: { count: number; label: string }) {
+function ConnectAttentionBadge({ count, label }: { count: number; label: string }) {
   if (count < 1) return null;
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
 }
@@ -84,12 +84,12 @@ export function ProductShell({
   children,
   hasFounder,
   hasAdvisor,
-  hasNetwork,
-  hasNetworkAccount,
+  hasConnect,
+  hasConnectAccount,
   displayName,
   incomingOpenRequestCount,
-  incomingNetworkContactCount,
-  unreadNetworkMessageCount,
+  incomingConnectContactCount,
+  unreadConnectMessageCount,
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
@@ -110,17 +110,17 @@ export function ProductShell({
     resolvedActiveView === "advisor"
       ? navigationOverride?.workbookHref ?? advisorFallbackHref
       : navigationOverride?.workbookHref ?? "/connections";
-  const isNetworkOnly = hasNetwork && !hasFounder && !hasAdvisor;
-  const isSuspendedNetworkOnly = hasNetworkAccount && !hasNetwork && !hasFounder && !hasAdvisor;
-  const dashboardHref = isNetworkOnly
-    ? "/network"
-    : isSuspendedNetworkOnly
+  const isConnectOnly = hasConnect && !hasFounder && !hasAdvisor;
+  const isSuspendedConnectOnly = hasConnectAccount && !hasConnect && !hasFounder && !hasAdvisor;
+  const dashboardHref = isConnectOnly
+    ? "/connect"
+    : isSuspendedConnectOnly
       ? "/account"
       : resolvedActiveView === "advisor"
         ? "/advisor/dashboard"
         : "/dashboard";
-  const networkAttentionCount = getNetworkAttentionCount(incomingNetworkContactCount, unreadNetworkMessageCount);
-  const navigationItems: NavigationItem[] = isNetworkOnly ? [] : [
+  const connectAttentionCount = getConnectAttentionCount(incomingConnectContactCount, unreadConnectMessageCount);
+  const navigationItems: NavigationItem[] = isConnectOnly ? [] : [
     {
       href: dashboardHref,
       label: t("dashboard"),
@@ -185,12 +185,12 @@ export function ProductShell({
                 ))}
                 {resolvedActiveView === "advisor" ? (
                   <>
-                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkAttentionBadge count={networkAttentionCount} label={t("networkAttentionBadge", { count: networkAttentionCount })} /></Link> : null}
+                    {hasConnect ? <Link href="/connect" className={`${navLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}>{t("connect")}<ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} /></Link> : null}
                     <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
                   </>
                 ) : (
                   <>
-                    {hasNetwork ? <Link href="/network" className={`${navLinkClassName(pathname.startsWith("/network"))} inline-flex items-center gap-2`}>{t("network")}<NetworkAttentionBadge count={networkAttentionCount} label={t("networkAttentionBadge", { count: networkAttentionCount })} /></Link> : null}
+                    {hasConnect ? <Link href="/connect" className={`${navLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}>{t("connect")}<ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} /></Link> : null}
                     {hasFounder ? <><Link
                       href="/discovery"
                       className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
@@ -228,8 +228,8 @@ export function ProductShell({
               <LanguageSwitcher />
               <ProfileMenu
                 displayName={displayName}
-                networkOnly={isNetworkOnly}
-                accountOnly={isSuspendedNetworkOnly}
+                connectOnly={isConnectOnly}
+                accountOnly={isSuspendedConnectOnly}
               />
             </div>
           </div>
@@ -280,11 +280,11 @@ export function ProductNavigationOverride({
 
 function ProfileMenu({
   displayName,
-  networkOnly,
+  connectOnly,
   accountOnly,
 }: {
   displayName: string | null;
-  networkOnly: boolean;
+  connectOnly: boolean;
   accountOnly: boolean;
 }) {
   const t = useTranslations("navigation");
@@ -353,12 +353,12 @@ function ProfileMenu({
         >
           {!accountOnly ? (
             <Link
-              href={networkOnly ? "/network/profile" : "/dashboard#dashboard-block-profile-data"}
+              href={connectOnly ? "/connect/profile" : "/dashboard#dashboard-block-profile-data"}
               onClick={() => setIsOpen(false)}
               className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
               role="menuitem"
             >
-              {networkOnly ? t("editNetworkProfile") : t("editProfile")}
+              {connectOnly ? t("editConnectProfile") : t("editProfile")}
             </Link>
           ) : null}
           <Link

@@ -76,8 +76,8 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
   // founder's own avatar prefix before the atomic DB/auth cleanup and stop safely
   // if Storage cannot confirm the deletion.
   const avatarCleanup = await deleteOwnedImageObjects(privileged, "avatars", userId);
-  const networkPhotoCleanup = await deleteOwnedImageObjects(privileged, "network-profile-images", userId);
-  if (!avatarCleanup || !networkPhotoCleanup) {
+  const connectPhotoCleanup = await deleteOwnedImageObjects(privileged, "network-profile-images", userId);
+  if (!avatarCleanup || !connectPhotoCleanup) {
     console.error("deleteFounderAccount avatar cleanup failed");
     return { ok: false, error: "cleanup_failed" };
   }

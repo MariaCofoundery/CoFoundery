@@ -36,7 +36,7 @@ export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountAct
   revalidatePath("/", "layout");
   revalidatePath("/account");
   revalidatePath("/dashboard");
-  revalidatePath("/network");
+  revalidatePath("/connect");
 
   redirect("/?status=account_deleted");
 }

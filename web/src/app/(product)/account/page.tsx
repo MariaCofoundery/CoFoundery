@@ -18,9 +18,9 @@ export default async function AccountPage() {
     supabase.rpc("has_network_account"),
     getTranslations("dashboard"),
   ]);
-  const hasNetworkAccount = membershipResult.data === true;
+  const hasConnectAccount = membershipResult.data === true;
 
-  if (!canAccessAccountSettings({ ...roleViews, hasNetwork: hasNetworkAccount })) redirect("/start");
+  if (!canAccessAccountSettings({ ...roleViews, hasConnect: hasConnectAccount })) redirect("/start");
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10 md:px-8">

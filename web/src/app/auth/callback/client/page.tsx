@@ -18,13 +18,13 @@ function buildLoginErrorHref(nextPath: string) {
 
 function buildAuthLandingHref(
   nextPath: string,
-  networkSignupToken: string | null,
+  connectSignupToken: string | null,
   profileSignupIntent: string | null
 ) {
   const params = new URLSearchParams({
     next: normalizeNextPath(nextPath),
   });
-  if (networkSignupToken) params.set("network_signup_token", networkSignupToken);
+  if (connectSignupToken) params.set("network_signup_token", connectSignupToken);
   if (profileSignupIntent === "founder" || profileSignupIntent === "advisor") {
     params.set("profile_signup_intent", profileSignupIntent);
   }
@@ -87,7 +87,7 @@ export default function AuthCallbackClientPage() {
       const refreshToken = storedTokens?.refreshToken ?? getParam("refresh_token");
       const callbackError =
         getParam("error") ?? getParam("error_code") ?? getParam("error_description");
-      const networkSignupToken = getParam("network_signup_token");
+      const connectSignupToken = getParam("network_signup_token");
       const profileSignupIntent = getParam("profile_signup_intent");
 
       const fail = () => {
@@ -146,7 +146,7 @@ export default function AuthCallbackClientPage() {
 
         if (!cancelled) {
           window.location.replace(
-            buildAuthLandingHref(nextPath, networkSignupToken, profileSignupIntent)
+            buildAuthLandingHref(nextPath, connectSignupToken, profileSignupIntent)
           );
         }
       } catch {

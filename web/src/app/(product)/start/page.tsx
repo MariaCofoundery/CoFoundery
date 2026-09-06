@@ -10,13 +10,13 @@ import {
 } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import {
-  issueNetworkSignupIntent,
-  revokeNetworkSignupIntent,
-} from "@/features/auth/networkSignup";
+  issueConnectSignupIntent,
+  revokeConnectSignupIntent,
+} from "@/features/auth/connectSignup";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
-const SIGNUP_INTENTS = ["founder", "advisor", "network"] as const;
+const SIGNUP_INTENTS = ["founder", "advisor", "connect"] as const;
 type SignupIntent = (typeof SIGNUP_INTENTS)[number];
 
 function normalizeSignupIntent(value: string | null | undefined): SignupIntent {
@@ -56,10 +56,10 @@ function statusMessage(status: string | undefined, t: AuthT) {
     };
   }
 
-  if (status === "network_failed") {
+  if (status === "connect_failed") {
     return {
       tone: "error" as const,
-      text: t("start.status.networkFailed"),
+      text: t("start.status.connectFailed"),
     };
   }
 
@@ -100,14 +100,14 @@ export default async function StartPage({
 
     const origin = getPublicAppOrigin();
     const redirectTo = new URL("/auth/callback", `${origin}/`);
-    let networkSignupToken: string | null = null;
-    if (intent === "network") {
-      networkSignupToken = await issueNetworkSignupIntent(email);
-      if (!networkSignupToken) {
+    let connectSignupToken: string | null = null;
+    if (intent === "connect") {
+      connectSignupToken = await issueConnectSignupIntent(email);
+      if (!connectSignupToken) {
         redirect(buildStartHref("send_failed", redirectNextPath, intent));
       }
       redirectTo.searchParams.set("next", redirectNextPath);
-      redirectTo.searchParams.set("network_signup_token", networkSignupToken);
+      redirectTo.searchParams.set("network_signup_token", connectSignupToken);
     } else {
       redirectTo.searchParams.set("next", redirectNextPath);
       redirectTo.searchParams.set("profile_signup_intent", intent);
@@ -135,7 +135,7 @@ export default async function StartPage({
     });
 
     if (error) {
-      if (networkSignupToken) await revokeNetworkSignupIntent(networkSignupToken);
+      if (connectSignupToken) await revokeConnectSignupIntent(connectSignupToken);
       redirect(buildStartHref("send_failed", redirectNextPath, intent));
     }
 

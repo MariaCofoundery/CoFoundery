@@ -3,7 +3,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
-import { getIncomingPendingNetworkContactCount, getUnreadNetworkMessageCount } from "@/features/network/networkData";
+import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, networkProfileData, hasNetwork, hasNetworkAccount, incomingOpenRequestCount, incomingNetworkContactCount, unreadNetworkMessageCount, researchConsentState] = user
+  const [roleViews, profileData, connectProfileData, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -61,8 +61,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
         Promise.resolve(supabase.rpc("has_network_account")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
-        getIncomingPendingNetworkContactCount(supabase, user.id).catch(() => 0),
-        getUnreadNetworkMessageCount(supabase).catch(() => 0),
+        getIncomingPendingConnectContactCount(supabase, user.id).catch(() => 0),
+        getUnreadConnectMessageCount(supabase).catch(() => 0),
         getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
       ])
     : [
@@ -82,7 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       ];
   const displayName =
     profileData?.display_name?.trim() ||
-    networkProfileData?.display_name?.trim() ||
+    connectProfileData?.display_name?.trim() ||
     user?.user_metadata?.display_name?.trim() ||
     user?.user_metadata?.full_name?.trim() ||
     user?.email?.split("@")[0] ||
@@ -95,12 +95,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ProductShell
             hasFounder={roleViews.hasFounder}
             hasAdvisor={roleViews.hasAdvisor}
-            hasNetwork={hasNetwork}
-            hasNetworkAccount={hasNetworkAccount}
+            hasConnect={hasConnect}
+            hasConnectAccount={hasConnectAccount}
             displayName={displayName}
             incomingOpenRequestCount={incomingOpenRequestCount}
-            incomingNetworkContactCount={incomingNetworkContactCount}
-            unreadNetworkMessageCount={unreadNetworkMessageCount}
+            incomingConnectContactCount={incomingConnectContactCount}
+            unreadConnectMessageCount={unreadConnectMessageCount}
             researchConsentState={researchConsentState}
           >
             {children}

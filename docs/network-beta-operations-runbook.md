@@ -1,12 +1,12 @@
-# CoFoundery Network – Beta Operations Runbook
+# CoFoundery Connect – Beta Operations Runbook
 
 Status: **BETA OPERATIONS RUNBOOK**
 
-Dieses Runbook beschreibt den minimalen manuellen Umgang mit Network-Meldungen. Es ist kein automatisiertes Moderationssystem und ersetzt keine rechtliche Einzelfallprüfung.
+Dieses Runbook beschreibt den minimalen manuellen Umgang mit Connect-Meldungen. Es ist kein automatisiertes Moderationssystem und ersetzt keine rechtliche Einzelfallprüfung.
 
 ## Verantwortung
 
-Die interne Funktion **Network Beta Operations** prüft vertraulich gespeicherte Network-Reports. Zugriff erfolgt ausschließlich in einem privilegierten, nicht nutzerseitigen Operations-Kontext; normale Founder-, Advisor- und Network-Rollen erhalten keinen Zugriff.
+Die interne Funktion **Connect Beta Operations** prüft vertraulich gespeicherte Connect-Reports. Zugriff erfolgt ausschließlich in einem privilegierten, nicht nutzerseitigen Operations-Kontext; normale Founder-, Advisor- und Connect-Rollen erhalten keinen Zugriff.
 
 ## Rhythmus
 
@@ -23,7 +23,7 @@ Offene Reports werden an Werktagen mindestens einmal geprüft. Es wird keine 24/
 
 - keine Maßnahme nach Prüfung
 - vertrauliche Kontaktaufnahme zur Abklärung
-- Network Membership suspendieren
+- Connect Membership suspendieren
 - Account-, Sicherheits- oder rechtliche Eskalation bei schwerwiegenden Fällen
 
 Eine einzelne Meldung löst keine automatische Sanktion, kein Ranking und keinen öffentlichen Hinweis aus.
@@ -38,4 +38,4 @@ Bei glaubhafter unmittelbarer Gefahr oder offensichtlich rechtswidrigem Inhalt w
 
 ## Beta-Freigabegrenze
 
-Network-only Signup bleibt an den bestehenden Zugangscode und Magic Link gebunden. Vor einer uneingeschränkt öffentlich beworbenen Öffnung werden mindestens Intake-Monitoring, operative Zuständigkeit, angemessene Rate Limits sowie Block-/Report-Abläufe erneut geprüft.
+Connect-only Signup bleibt an den bestehenden Zugangscode und Magic Link gebunden. Vor einer uneingeschränkt öffentlich beworbenen Öffnung werden mindestens Intake-Monitoring, operative Zuständigkeit, angemessene Rate Limits sowie Block-/Report-Abläufe erneut geprüft.

@@ -69,7 +69,7 @@ export async function getFounderDashboardTasks(params: {
   const teamIds = params.teams.map((team) => team.id);
   const teamById = new Map(params.teams.map((team) => [team.id, team]));
 
-  const [introResult, networkContactResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult, discoveryMatchingStartResult] =
+  const [introResult, connectContactResult, relationshipResult, setupItemResult, setupAccessResults, readMyMindRoundResult, founderInTheWildRoundResult, discoveryMatchingStartResult] =
     await Promise.all([
       supabase
         .from("discovery_intro_requests")
@@ -323,9 +323,9 @@ export async function getFounderDashboardTasks(params: {
           status: intro.status,
           updatedAt: intro.updated_at,
         })),
-    networkContacts: networkContactResult.error
+    connectContacts: connectContactResult.error
       ? []
-      : ((networkContactResult.data ?? []) as Array<{
+      : ((connectContactResult.data ?? []) as Array<{
           id: string;
           sender_display_name_snapshot: string;
           listing_title_snapshot: string;

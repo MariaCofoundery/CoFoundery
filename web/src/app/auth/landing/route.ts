@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeNextPath, readNetworkSignupToken, readProfileSignupIntent, redirectToLoginError } from "@/features/auth/authRedirects";
+import { normalizeNextPath, readConnectSignupToken, readProfileSignupIntent, redirectToLoginError } from "@/features/auth/authRedirects";
 import { cleanupOversizedAvatarMetadata } from "@/features/auth/authSessionHygiene";
-import { claimNetworkSignupIntent } from "@/features/auth/networkSignup";
+import { claimConnectSignupIntent } from "@/features/auth/connectSignup";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
     return redirectToLoginError(request, "auth_callback_failed", nextPath);
   }
 
-  const networkSignupToken = readNetworkSignupToken(new URL(request.url));
-  if (networkSignupToken && !(await claimNetworkSignupIntent(supabase, networkSignupToken))) {
-    return NextResponse.redirect(new URL("/start?status=network_failed&intent=network", request.url));
+  const connectSignupToken = readConnectSignupToken(new URL(request.url));
+  if (connectSignupToken && !(await claimConnectSignupIntent(supabase, connectSignupToken))) {
+    return NextResponse.redirect(new URL("/start?status=connect_failed&intent=connect", request.url));
   }
 
   await cleanupOversizedAvatarMetadata(supabase, user);

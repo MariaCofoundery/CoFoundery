@@ -24,7 +24,7 @@ test("account deletion removes only the founder avatar prefix before the atomic 
   assert.match(accountSource, /deleteOwnedImageObjects\(privileged, "avatars", userId\)/u);
   assert.match(accountSource, /deleteOwnedImageObjects\(privileged, "network-profile-images", userId\)/u);
   assert.match(accountSource, /\.map\(\(object\) => `\$\{userId\}\/\$\{object\.name\}`\)/u);
-  assert.match(accountSource, /networkPhotoCleanup[\s\S]*delete_founder_account_data/u);
+  assert.match(accountSource, /connectPhotoCleanup[\s\S]*delete_founder_account_data/u);
   assert.doesNotMatch(accountSource, /console\.error\([^\n]*userId/u);
 });
 

@@ -61,11 +61,11 @@
       "setupTopic": "Founder Setup topic"
     },
     "items": {
-      "networkContact": {
+      "connectContact": {
         "title": "New contact request",
         "text": "{name} is interested in your listing “{listing}”.",
-        "someone": "A Network member",
-        "listing": "your Network listing",
+        "someone": "A Connect member",
+        "listing": "your Connect listing",
         "action": "View request"
       },
       "incomingInvitation": {
@@ -165,7 +165,7 @@
       }
     }
   },
-  "network": {"eyebrow":"Your activity","title":"Your network","summary":"{seeking} needs · {offering} offers active","open":"Open Network","create":"+ Need or offer"},
+  "connect": {"eyebrow":"Your activity","title":"Your connect","summary":"{seeking} needs · {offering} offers active","open":"Open Connect","create":"+ Need or offer"},
   "explore": {
     "eyebrow": "Explore CoFoundery",
     "title": "What you can do with CoFoundery",

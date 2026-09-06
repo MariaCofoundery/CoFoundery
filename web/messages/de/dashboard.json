@@ -61,11 +61,11 @@
       "setupTopic": "Founder-Setup-Thema"
     },
     "items": {
-      "networkContact": {
+      "connectContact": {
         "title": "Neue Kontaktanfrage",
         "text": "{name} interessiert sich für deinen Eintrag „{listing}“.",
-        "someone": "Ein Network-Mitglied",
-        "listing": "deinen Network-Eintrag",
+        "someone": "Ein Connect-Mitglied",
+        "listing": "deinen Connect-Eintrag",
         "action": "Anfrage ansehen"
       },
       "incomingInvitation": {
@@ -165,7 +165,7 @@
       }
     }
   },
-  "network": {"eyebrow":"Deine Aktivitäten","title":"Dein Netzwerk","summary":"{seeking} Gesuche · {offering} Angebote aktiv","open":"Network öffnen","create":"+ Gesuch oder Angebot"},
+  "connect": {"eyebrow":"Deine Aktivitäten","title":"Dein Netzwerk","summary":"{seeking} Gesuche · {offering} Angebote aktiv","open":"Connect öffnen","create":"+ Gesuch oder Angebot"},
   "explore": {
     "eyebrow": "Entdecke CoFoundery",
     "title": "Was du mit CoFoundery machen kannst",

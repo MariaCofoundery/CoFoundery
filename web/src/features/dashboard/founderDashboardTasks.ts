@@ -71,7 +71,7 @@ export type FounderDashboardTaskSignals = {
     status: string;
     updatedAt: string;
   }>;
-  networkContacts?: Array<{
+  connectContacts?: Array<{
     id: string;
     senderLabel: string;
     listingTitle: string;
@@ -266,12 +266,12 @@ export function buildFounderDashboardTasks(
     });
   }
 
-  for (const request of signals.networkContacts ?? []) {
+  for (const request of signals.connectContacts ?? []) {
     tasks.push({
       id: `network-contact:${request.id}`,
       kind: "NEEDS_YOU",
       type: "network_contact",
-      href: "/network/contacts",
+      href: "/connect/contacts",
       createdAt: request.updatedAt,
       contextLabel: request.listingTitle,
       personLabel: request.senderLabel,

@@ -68,17 +68,17 @@ export async function resolvePostAuthRedirectPath(
     hasProfileRole(profile?.roles, "founder"),
     hasProfileRole(profile?.roles, "advisor"),
   ];
-  let hasNetwork = false;
-  let hasNetworkAccount = false;
-  let networkProfileReady = false;
+  let hasConnect = false;
+  let hasConnectAccount = false;
+  let connectProfileReady = false;
   try {
-    const [networkResult, networkAccountResult] = await Promise.all([
+    const [connectResult, connectAccountResult] = await Promise.all([
       supabase.rpc("is_network_member"),
       supabase.rpc("has_network_account"),
     ]);
-    hasNetwork = networkResult.data === true;
-    hasNetworkAccount = networkAccountResult.data === true;
-    if (hasNetwork && !hasFounder && !hasAdvisor) {
+    hasConnect = connectResult.data === true;
+    hasConnectAccount = connectAccountResult.data === true;
+    if (hasConnect && !hasFounder && !hasAdvisor) {
       const profileResult = await (supabase.from("network_profiles") as {
         select: (columns: string) => {
           eq: (column: string, value: string) => {
@@ -86,19 +86,19 @@ export async function resolvePostAuthRedirectPath(
           };
         };
       }).select("status").eq("user_id", user.id).maybeSingle();
-      networkProfileReady = !profileResult.error && profileResult.data?.status === "active";
+      connectProfileReady = !profileResult.error && profileResult.data?.status === "active";
     }
   } catch {
-    hasNetwork = false;
-    hasNetworkAccount = false;
+    hasConnect = false;
+    hasConnectAccount = false;
   }
 
   return resolveProductEntryPath(normalizedNext, {
     hasFounder,
     hasAdvisor,
-    hasNetwork,
-    hasNetworkAccount,
-    networkProfileReady,
+    hasConnect,
+    hasConnectAccount,
+    connectProfileReady,
     profileOnboardingAllowed: profileSignupIntent !== null,
     coreProfileComplete: isCoreProfileComplete(profile),
   }, withProfileIntent(buildWelcomeRedirectPath(normalizedNext), profileSignupIntent));

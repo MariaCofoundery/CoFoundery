@@ -4,11 +4,11 @@ import test from "node:test";
 import { canAccessAccountSettings } from "@/features/account/accountAccess";
 
 test("shared account access accepts every supported capability and rejects unsupported accounts", () => {
-  assert.equal(canAccessAccountSettings({ hasFounder: true, hasAdvisor: false, hasNetwork: true }), true);
-  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: true, hasNetwork: true }), true);
-  assert.equal(canAccessAccountSettings({ hasFounder: true, hasAdvisor: true, hasNetwork: true }), true);
-  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: false, hasNetwork: true }), true);
-  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: false, hasNetwork: false }), false);
+  assert.equal(canAccessAccountSettings({ hasFounder: true, hasAdvisor: false, hasConnect: true }), true);
+  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: true, hasConnect: true }), true);
+  assert.equal(canAccessAccountSettings({ hasFounder: true, hasAdvisor: true, hasConnect: true }), true);
+  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: false, hasConnect: true }), true);
+  assert.equal(canAccessAccountSettings({ hasFounder: false, hasAdvisor: false, hasConnect: false }), false);
 });
 
 test("account route is owner-only, uses the shared delete UI, and loads no product data", () => {
@@ -20,11 +20,11 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   assert.doesNotMatch(page, /\.from\(|network_listings|assessments|founder_teams|advisor_team/);
 });
 
-test("profile menu keeps Network identity separate and exposes Account for every supported role", () => {
+test("profile menu keeps Connect identity separate and exposes Account for every supported role", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  assert.match(shell, /networkOnly \? "\/network\/profile"/);
+  assert.match(shell, /connectOnly \? "\/connect\/profile"/);
   assert.match(shell, /href="\/account"/);
-  assert.doesNotMatch(shell, /!networkOnly \? <Link\s+href="\/account"/);
+  assert.doesNotMatch(shell, /!connectOnly \? <Link\s+href="\/account"/);
 });
 
 test("Founder dashboard delegates deletion to shared Account settings", () => {
@@ -38,5 +38,5 @@ test("shared action reuses deletion backend, signs out, and returns to the publi
   assert.match(action, /deleteFounderAccount\(user\.id\)/);
   assert.match(action, /supabase\.auth\.signOut\(\)/);
   assert.match(action, /redirect\("\/\?status=account_deleted"\)/);
-  assert.doesNotMatch(action, /network.*delete|deleteNetwork/i);
+  assert.doesNotMatch(action, /connect.*delete|deleteConnect/i);
 });

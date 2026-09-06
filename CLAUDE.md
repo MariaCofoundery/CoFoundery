@@ -28,7 +28,7 @@ There is no test runner config (no Vitest/Jest) despite `PROJECT_CONFIG.md` sayi
 node --import ./scripts/register-ts-alias.mjs --test --experimental-strip-types <path-to-test-file> [more files...]
 ```
 
-The only predefined script is `npm run test:founder-compat`, which hardcodes an explicit list of test files (scoring/reporting/questionnaire suites) in `web/package.json`. Many other `__tests__/` directories exist across the codebase (network, auth, teams, discovery, dashboard, etc.) but are **not** wired into any npm script — run them directly with the command above, and if you add a new test file that should run in CI, add it to the `test:founder-compat` file list (or ask whether a new script is warranted) rather than assuming it runs automatically.
+The only predefined script is `npm run test:founder-compat`, which hardcodes an explicit list of test files (scoring/reporting/questionnaire suites) in `web/package.json`. Many other `__tests__/` directories exist across the codebase (connect, auth, teams, discovery, dashboard, etc.) but are **not** wired into any npm script — run them directly with the command above, and if you add a new test file that should run in CI, add it to the `test:founder-compat` file list (or ask whether a new script is warranted) rather than assuming it runs automatically.
 
 Supabase/DB logic is tested separately with pgTAP suites in `supabase/tests/*.sql` (see below).
 
@@ -46,21 +46,21 @@ Any change to tables/columns/policies must go through a **new** migration file i
 
 ### Feature-based source structure (`web/src/`)
 
-- `src/features/<name>/` — one directory per product feature (co-located `__tests__/`, actions, types). Current features include `auth`, `scoring`, `questionnaire`, `reporting`, `matchingCore`, `discovery`, `network`, `teams`, `dashboard`, `founderLibrary`, `founderInTheWild`, `collaborationLab`, `commitmentLab`, `events`, `connections`, `account`, `email`, `security`, `navigation`, `i18n`, and others. When working on a feature, look for the matching directory before introducing new top-level structure.
+- `src/features/<name>/` — one directory per product feature (co-located `__tests__/`, actions, types). Current features include `auth`, `scoring`, `questionnaire`, `reporting`, `matchingCore`, `discovery`, `connect`, `teams`, `dashboard`, `founderLibrary`, `founderInTheWild`, `collaborationLab`, `commitmentLab`, `events`, `connections`, `account`, `email`, `security`, `navigation`, `i18n`, and others. When working on a feature, look for the matching directory before introducing new top-level structure.
 - `src/app/` — Next.js route segments, grouped by route-group folders that gate which chrome/auth rules apply:
-  - `(product)/*` — authenticated app surfaces (dashboard, network, teams, discovery, etc.)
+  - `(product)/*` — authenticated app surfaces (dashboard, connect, teams, discovery, etc.)
   - `(marketing)/*` — public marketing pages
-  - `(public-network)/network/{p,l}/*` — unauthenticated public profile/listing pages served via slugs, backed by the narrow RPCs above
-  - `api/*` — route handlers, including `api/network/public-photos/[entityType]` for public asset serving
+  - `(public-connect)/connect/{p,l}/*` — unauthenticated public profile/listing pages served via slugs, backed by the narrow RPCs above
+  - `api/*` — route handlers, including `api/connect/public-photos/[entityType]` for public asset serving
 - `src/lib/supabase/` — `client.ts` (browser), `server.ts` (server components/actions), `middleware.ts` (session refresh, wired into `src/middleware.ts`).
-- `src/i18n/` — `next-intl` setup; supported locales are defined in `src/i18n/config.ts` (`de` default, `en`), with per-locale message bundles under `web/messages/<locale>/*.json` split by domain (e.g. `network.json`, `dashboard.json`, `auth.json`). Keep both locale files in sync when adding copy.
+- `src/i18n/` — `next-intl` setup; supported locales are defined in `src/i18n/config.ts` (`de` default, `en`), with per-locale message bundles under `web/messages/<locale>/*.json` split by domain (e.g. `connect.json`, `dashboard.json`, `auth.json`). Keep both locale files in sync when adding copy.
 
 ### Access/role routing
 
-Users can hold combinations of capabilities (`hasFounder`, `hasAdvisor`, `hasNetwork`/`hasNetworkAccount`) rather than a single role. Two files encode the resulting routing logic and are worth reading before touching auth/navigation flows:
+Users can hold combinations of capabilities (`hasFounder`, `hasAdvisor`, `hasConnect`/`hasConnectAccount`) rather than a single role. Two files encode the resulting routing logic and are worth reading before touching auth/navigation flows:
 
-- `src/features/auth/productEntry.ts` (`resolveProductEntryPath`) — decides where a user lands post-auth based on their capability combination and profile completeness (e.g. a network-only user without a founder/advisor profile is routed into `/network` or forced through `/network/profile` first).
-- `src/features/navigation/productChromePath.ts` (`isProductChromePath`) — decides which routes get the authenticated app chrome vs. render standalone (public network profile/listing pages explicitly opt out).
+- `src/features/auth/productEntry.ts` (`resolveProductEntryPath`) — decides where a user lands post-auth based on their capability combination and profile completeness (e.g. a network-only user without a founder/advisor profile is routed into `/connect` or forced through `/connect/profile` first).
+- `src/features/navigation/productChromePath.ts` (`isProductChromePath`) — decides which routes get the authenticated app chrome vs. render standalone (public connect profile/listing pages explicitly opt out).
 
 Both are pure functions with dedicated unit tests — when changing routing behavior, update the tests alongside the logic.
 

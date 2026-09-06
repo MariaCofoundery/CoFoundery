@@ -1,9 +1,9 @@
 export type ProductCapabilities = {
   hasFounder: boolean;
   hasAdvisor: boolean;
-  hasNetwork: boolean;
-  hasNetworkAccount?: boolean;
-  networkProfileReady?: boolean;
+  hasConnect: boolean;
+  hasConnectAccount?: boolean;
+  connectProfileReady?: boolean;
   profileOnboardingAllowed?: boolean;
   coreProfileComplete: boolean;
 };
@@ -16,22 +16,22 @@ export function resolveProductEntryPath(
   const {
     hasFounder,
     hasAdvisor,
-    hasNetwork,
-    hasNetworkAccount = hasNetwork,
-    networkProfileReady = true,
+    hasConnect,
+    hasConnectAccount = hasConnect,
+    connectProfileReady = true,
     profileOnboardingAllowed = false,
     coreProfileComplete,
   } = capabilities;
-  if (!hasFounder && !hasAdvisor && hasNetwork) {
+  if (!hasFounder && !hasAdvisor && hasConnect) {
     if (nextPath === "/account") return nextPath;
-    if (!networkProfileReady) {
-      return nextPath.startsWith("/network/l/")
-        ? `/network/profile?next=${encodeURIComponent(nextPath)}`
-        : "/network/profile";
+    if (!connectProfileReady) {
+      return nextPath.startsWith("/connect/l/")
+        ? `/connect/profile?next=${encodeURIComponent(nextPath)}`
+        : "/connect/profile";
     }
-    return nextPath.startsWith("/network") ? nextPath : "/network";
+    return nextPath.startsWith("/connect") ? nextPath : "/connect";
   }
-  if (!hasFounder && !hasAdvisor && hasNetworkAccount) return "/account";
+  if (!hasFounder && !hasAdvisor && hasConnectAccount) return "/account";
   if (!coreProfileComplete && (hasFounder || hasAdvisor || profileOnboardingAllowed)) return welcomePath;
   if (!hasFounder && !hasAdvisor) return "/start";
   if (!coreProfileComplete) return welcomePath;
