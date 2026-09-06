@@ -15,6 +15,7 @@ import {
   type NetworkListing,
 } from "./networkTypes";
 import { normalizeNetworkLocations } from "./networkPresentation";
+import { NetworkVisibilityField } from "./NetworkVisibilityField";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
@@ -44,6 +45,11 @@ export function NetworkListingForm({ listing, direction, category, t }: { listin
       <label className="text-sm font-medium">{t("form.endsOn")}<input type="date" name="ends_on" defaultValue={listing?.ends_on || ""} className={field} /><span className={hint}>{t("form.endsOnHint")}</span></label>
     </div>
     {selectedCategory === "investment" ? <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">{t("investmentNotice")}</p> : null}
+    <NetworkVisibilityField initial={listing?.visibility} copy={{
+      title: t("visibility.listingTitle"), membersOnly: t("visibility.membersOnly"), public: t("visibility.public"),
+      publicHint: t("visibility.listingPublicHint"), confirm: t("visibility.listingConfirm"),
+      previewTitle: t("visibility.publicFields"), previewItems: t("visibility.listingFields"),
+    }} />
     <div className="flex flex-wrap gap-3">
       <NetworkSubmitButton intent="publish" label={t("actions.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold" />
       <NetworkSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold" />

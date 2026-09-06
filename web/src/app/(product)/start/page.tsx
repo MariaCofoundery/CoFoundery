@@ -106,7 +106,7 @@ export default async function StartPage({
       if (!networkSignupToken) {
         redirect(buildStartHref("send_failed", redirectNextPath, intent));
       }
-      redirectTo.searchParams.set("next", "/network/profile");
+      redirectTo.searchParams.set("next", redirectNextPath);
       redirectTo.searchParams.set("network_signup_token", networkSignupToken);
     } else {
       redirectTo.searchParams.set("next", redirectNextPath);

@@ -18,7 +18,7 @@ async function context() {
   if (!eligible) redirect("/dashboard");
   return { client, user };
 }
-function refresh() { ["/network", "/network/my", "/network/profile", "/dashboard"].forEach((path) => revalidatePath(path)); }
+function refresh() { ["/network", "/network/my", "/network/profile", "/dashboard", "/sitemap.xml"].forEach((path) => revalidatePath(path)); }
 function refreshContacts(listingId?: string) {
   refresh(); revalidatePath("/network/contacts");
   if (listingId) revalidatePath(`/network/listings/${listingId}`);
@@ -40,7 +40,11 @@ export async function saveNetworkProfileAction(formData: FormData) {
   catch (error) { redirect(`/network/profile?error=${error instanceof NetworkValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (publish && !profilePublishable(values)) redirect("/network/profile?error=incomplete");
-  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,photo_visibility").eq("user_id", user.id).maybeSingle();
+  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,photo_visibility,visibility,public_slug").eq("user_id", user.id).maybeSingle();
+  const profileVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
+  if (profileVisibility === "public" && currentProfile.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
+    redirect("/network/profile?error=public_confirmation");
+  }
   const photoChoice = String(formData.get("photo_choice") ?? "keep");
   const visibility = formData.get("photo_visibility") === "public_allowed" ? "public_allowed" : "platform_only";
   let uploadedPath: string | null = null;
@@ -62,7 +66,7 @@ export async function saveNetworkProfileAction(formData: FormData) {
   }
   const { error } = await client.from("network_profiles").upsert({
     user_id: user.id, ...values, status: publish ? "active" : "draft",
-    published_at: publish ? new Date().toISOString() : null, ...photoValues,
+    published_at: publish ? new Date().toISOString() : null, visibility: profileVisibility, ...photoValues,
   }, { onConflict: "user_id" });
   if (error) {
     if (uploadedPath) await client.storage.from(NETWORK_PHOTO_BUCKET).remove([uploadedPath]);
@@ -74,7 +78,8 @@ export async function saveNetworkProfileAction(formData: FormData) {
     await client.storage.from(NETWORK_PHOTO_BUCKET).remove([oldPath]);
   }
   refresh();
-  if (publish && !currentProfile.data) redirect("/network?profile=published");
+  if (currentProfile.data?.public_slug) revalidatePath(`/network/p/${currentProfile.data.public_slug}`);
+  if (publish && !currentProfile.data) redirect(safeNetworkRedirect(formData.get("next"), "/network?profile=published"));
   redirect(`/network/profile?saved=${publish ? "published" : "draft"}`);
 }
 
@@ -125,14 +130,24 @@ export async function saveNetworkListingAction(formData: FormData) {
   const publish = formData.get("intent") === "publish";
   if (values.starts_on && values.ends_on && values.ends_on < values.starts_on) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=invalid_dates`);
   if (publish && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
+  const currentListing = id
+    ? await client.from("network_listings").select("visibility,public_slug").eq("id", id).eq("owner_user_id", user.id).maybeSingle()
+    : { data: null };
+  const listingVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
+  if (listingVisibility === "public" && currentListing.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
+    redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=public_confirmation`);
+  }
   const payload = { owner_user_id: user.id, ...values, status: publish ? "active" : "draft",
+    visibility: listingVisibility,
     published_at: publish ? new Date().toISOString() : null,
     expires_at: publish ? new Date(Date.now() + 60 * 86400000).toISOString() : null };
   const result = id
-    ? await client.from("network_listings").update(payload).eq("id", id).eq("owner_user_id", user.id).select("id").single()
-    : await client.from("network_listings").insert(payload).select("id").single();
+    ? await client.from("network_listings").update(payload).eq("id", id).eq("owner_user_id", user.id).select("id,public_slug").single()
+    : await client.from("network_listings").insert(payload).select("id,public_slug").single();
   if (result.error) redirect(`/network/my?error=${result.error.message.includes("active_network_profile_required") ? "profile" : "save"}`);
-  refresh(); redirect(`/network/listings/${result.data.id}?saved=${publish ? "published" : "draft"}`);
+  refresh();
+  if (result.data.public_slug) revalidatePath(`/network/l/${result.data.public_slug}`);
+  redirect(`/network/listings/${result.data.id}?saved=${publish ? "published" : "draft"}`);
 }
 
 export async function changeNetworkListingStatusAction(formData: FormData) {
@@ -144,8 +159,9 @@ export async function changeNetworkListingStatusAction(formData: FormData) {
     : intent === "publish" ? { status: "active", published_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60 * 86400000).toISOString() }
     : {};
   if (Object.keys(updates).length) {
-    const { error } = await client.from("network_listings").update(updates).eq("id", id).eq("owner_user_id", user.id);
+    const { data, error } = await client.from("network_listings").update(updates).eq("id", id).eq("owner_user_id", user.id).select("public_slug").maybeSingle();
     if (error) redirect("/network/my?error=save");
+    if (data?.public_slug) revalidatePath(`/network/l/${data.public_slug}`);
   }
   refresh(); redirect(`/network/my?changed=${intent}`);
 }

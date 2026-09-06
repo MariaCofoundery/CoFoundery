@@ -9,6 +9,7 @@ export type NetworkCategory = (typeof NETWORK_CATEGORIES)[number];
 export type NetworkRole = (typeof NETWORK_ROLES)[number];
 export type NetworkRemoteMode = (typeof NETWORK_REMOTE_MODES)[number];
 export type NetworkGeographicScope = (typeof NETWORK_GEOGRAPHIC_SCOPES)[number];
+export type NetworkVisibility = "members_only" | "public";
 export const NETWORK_CONTACT_STATUSES = ["pending", "accepted", "declined", "canceled"] as const;
 export type NetworkContactStatus = (typeof NETWORK_CONTACT_STATUSES)[number];
 
@@ -19,6 +20,7 @@ export type NetworkProfile = {
   photo_source: "profile_avatar" | "network_upload" | null;
   photo_avatar_id: string | null; photo_path: string | null;
   photo_visibility: "platform_only" | "public_allowed";
+  visibility: NetworkVisibility; public_slug: string;
   published_at: string | null; updated_at: string;
 };
 export type NetworkListing = {
@@ -27,8 +29,30 @@ export type NetworkListing = {
   locations: string[]; geographic_scope: NetworkGeographicScope | null; remote_mode: string | null;
   starts_on: string | null; ends_on: string | null;
   venture_stage: string | null; status: "draft" | "active" | "paused" | "completed";
+  visibility: NetworkVisibility; public_slug: string;
   published_at: string | null; expires_at: string | null; updated_at: string; created_at: string;
   network_profiles?: NetworkProfile | NetworkProfile[] | null;
+};
+
+export type PublicNetworkProfile = Pick<NetworkProfile,
+  "public_slug" | "display_name" | "headline" | "bio" | "network_roles" |
+  "expertise" | "industries" | "location_region" | "updated_at"
+> & { photo_available: boolean };
+
+export type PublicNetworkProfileListing = Pick<NetworkListing,
+  "public_slug" | "direction" | "category" | "title" | "summary" |
+  "topics" | "industries" | "geographic_scope" | "updated_at"
+>;
+
+export type PublicNetworkListing = Pick<NetworkListing,
+  "public_slug" | "direction" | "category" | "title" | "summary" | "topics" |
+  "industries" | "locations" | "geographic_scope" | "remote_mode" |
+  "starts_on" | "ends_on" | "venture_stage" | "updated_at"
+> & {
+  owner_display_name: string;
+  owner_headline: string;
+  owner_profile_slug: string | null;
+  owner_photo_available: boolean;
 };
 
 export type NetworkContactRequest = {

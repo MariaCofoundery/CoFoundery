@@ -24,7 +24,11 @@ export function resolveProductEntryPath(
   } = capabilities;
   if (!hasFounder && !hasAdvisor && hasNetwork) {
     if (nextPath === "/account") return nextPath;
-    if (!networkProfileReady) return "/network/profile";
+    if (!networkProfileReady) {
+      return nextPath.startsWith("/network/l/")
+        ? `/network/profile?next=${encodeURIComponent(nextPath)}`
+        : "/network/profile";
+    }
     return nextPath.startsWith("/network") ? nextPath : "/network";
   }
   if (!hasFounder && !hasAdvisor && hasNetworkAccount) return "/account";

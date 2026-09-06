@@ -54,6 +54,7 @@ test("product entry separates first-run, ready, suspended, and unsupported Netwo
     coreProfileComplete: false,
   };
   assert.equal(resolveProductEntryPath("/dashboard", base, "/welcome"), "/network/profile");
+  assert.equal(resolveProductEntryPath("/network/l/listing-aaaaaaaaaaaaaaaaaaaaaaaa", base, "/welcome"), "/network/profile?next=%2Fnetwork%2Fl%2Flisting-aaaaaaaaaaaaaaaaaaaaaaaa");
   assert.equal(resolveProductEntryPath("/dashboard", { ...base, networkProfileReady: true }, "/welcome"), "/network");
   assert.equal(resolveProductEntryPath("/account", base, "/welcome"), "/account");
   assert.equal(resolveProductEntryPath("/dashboard", { ...base, hasNetwork: false }, "/welcome"), "/account");
