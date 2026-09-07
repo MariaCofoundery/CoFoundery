@@ -198,11 +198,17 @@ set display_name = (
       select quelle.headline from quellen quelle
       where quelle.user_id = core.user_id and quelle.headline is not null
       order by quelle.updated_at desc limit 1),
-    -- auf die Kern-Obergrenze kappen, falls eine Quelle laenger war
-    bio = left((
-      select quelle.bio from quellen quelle
-      where quelle.user_id = core.user_id and quelle.bio is not null
-      order by quelle.updated_at desc limit 1), 1200),
+    -- bio wird BEWUSST NICHT uebernommen.
+    --
+    -- Der Preflight gegen die Zieldatenbank zeigte: von 19 Nutzern haben zwei
+    -- ein Discovery- und einer zusaetzlich ein Connect-Profil, und genau eine
+    -- Person hat dort zwei verschiedene Bios. Produktseitige Entscheidung:
+    -- diese Texte stammen aus der Testphase und werden neu geschrieben,
+    -- sobald es einen einzigen Profil-Ort gibt.
+    --
+    -- Die Quelldaten bleiben unberuehrt in founder_discovery_profiles und
+    -- network_profiles, werden dort weiter angezeigt und sind damit jederzeit
+    -- nachtraeglich uebernehmbar. Der Kern startet bei bio nur leer.
     location_region = (
       select quelle.location_region from quellen quelle
       where quelle.user_id = core.user_id and quelle.location_region is not null

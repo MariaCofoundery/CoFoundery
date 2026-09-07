@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(21);
+select extensions.plan(22);
 
 -- ---------------------------------------------------------------------------
 -- 1. Struktur: der Kern impliziert nichts
@@ -116,10 +116,7 @@ set display_name = (
       select quelle.headline from quellen quelle
       where quelle.user_id = core.user_id and quelle.headline is not null
       order by quelle.updated_at desc limit 1),
-    bio = left((
-      select quelle.bio from quellen quelle
-      where quelle.user_id = core.user_id and quelle.bio is not null
-      order by quelle.updated_at desc limit 1), 1200),
+    -- bio bewusst ausgelassen, siehe Migration
     location_region = (
       select quelle.location_region from quellen quelle
       where quelle.user_id = core.user_id and quelle.location_region is not null
@@ -145,8 +142,10 @@ select extensions.is((select display_name from public.person_core where user_id=
   'Echter Name', 'leeres neueres Connect-Profil ueberschreibt den echten Namen NICHT');
 select extensions.is((select headline from public.person_core where user_id='fc000000-0000-4000-8000-000000000002'),
   'Echte Headline', 'dasselbe fuer die Headline');
-select extensions.is((select bio from public.person_core where user_id='fc000000-0000-4000-8000-000000000002'),
-  'Eine echte Biografie aus dem Discovery-Profil.', 'Bio kommt aus der einzigen Quelle, die eine hat');
+select extensions.ok((select bio is null from public.person_core where user_id='fc000000-0000-4000-8000-000000000002'),
+  'bio bleibt leer - Bestandstexte aus der Testphase werden nicht uebernommen');
+select extensions.is((select bio from public.founder_discovery_profiles where user_id='fc000000-0000-4000-8000-000000000002'),
+  'Eine echte Biografie aus dem Discovery-Profil.', 'die Quell-Bio bleibt erhalten und ist nachtraeglich uebernehmbar');
 select extensions.is((select expertise from public.person_core where user_id='fc000000-0000-4000-8000-000000000002'),
   array['Product'], 'leeres Connect-Array ueberschreibt echte Expertise NICHT');
 select extensions.is((select remote_mode from public.person_core where user_id='fc000000-0000-4000-8000-000000000002'),
