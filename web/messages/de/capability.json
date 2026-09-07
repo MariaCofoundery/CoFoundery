@@ -2,6 +2,25 @@
   "eyebrow": "Profil",
   "title": "Was du mitbringst",
   "text": "Ein kurzer Überblick über deine praktische Erfahrung, was du übernehmen möchtest und was du entwickeln willst. Drei bis fünf Minuten. Du kannst jederzeit ergänzen.",
+  "identity": {
+    "title": "Wer du bist",
+    "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
+    "name": "Name",
+    "headline": "Headline",
+    "headlineHint": "Ein Satz, der sagt, was du tust.",
+    "bio": "Über dich",
+    "bioHint": "Was sollte man über deine Arbeit wissen?",
+    "region": "Region",
+    "regionHint": "Grob reicht: Berlin, Rhein-Main, Nordrhein-Westfalen.",
+    "remote": "Zusammenarbeitsmodus",
+    "remoteUnset": "Keine Angabe",
+    "expertise": "Expertise",
+    "expertiseHint": "Mit Komma trennen, maximal {max}.",
+    "industries": "Branchen & Themen",
+    "industriesHint": "Mit Komma trennen, maximal {max}.",
+    "submit": "Speichern",
+    "publishedNote": "Dein Connect-Profil ist veröffentlicht. Änderungen hier sind dort sofort sichtbar."
+  },
   "steps": {
     "evidence": "Eine Sache erzählen",
     "areas": "Bereiche ergänzen",
@@ -125,13 +144,21 @@
   "errors": {
     "narrative": "Bitte schreibe mindestens zwei kurze Sätze.",
     "area": "Bitte wähle einen Bereich aus.",
-    "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal."
+    "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal.",
+    "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",
-    "evidence_removed": "Der Eintrag wurde entfernt."
+    "evidence_removed": "Der Eintrag wurde entfernt.",
+    "identity": "Deine Angaben sind gespeichert."
   },
   "pending": {
     "save": "Wird gespeichert …"
+  },
+  "remoteModes": {
+    "onsite": "Vor Ort",
+    "hybrid": "Hybrid",
+    "remote": "Remote",
+    "flexible": "Flexibel"
   }
 }

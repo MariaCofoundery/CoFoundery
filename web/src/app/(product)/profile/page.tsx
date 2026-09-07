@@ -18,6 +18,8 @@ import {
   groupEntriesByFamily,
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
+import { getPersonCore } from "@/features/profile/personCoreData";
+import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { createClient } from "@/lib/supabase/server";
 
 const field =
@@ -28,8 +30,9 @@ const primary =
 const secondary = "inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold";
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
-const SAVED_KEYS = ["snapshot", "evidence_removed"];
-const ERROR_KEYS = ["narrative", "area", "save"];
+const SAVED_KEYS = ["snapshot", "evidence_removed", "identity"];
+const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete"];
+const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
 export default async function ProfilePage({
   searchParams,
@@ -42,11 +45,16 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries] = await Promise.all([
+  const [t, params, vocabulary, entries, core, connectProfile] = await Promise.all([
     getTranslations("capability"),
     searchParams,
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, user.id),
+    getPersonCore(supabase, user.id),
+    // Nur fuer den Hinweis, dass Aenderungen sofort oeffentlich wirken.
+    Promise.resolve(supabase.from("network_profiles").select("status").eq("user_id", user.id).maybeSingle())
+      .then(({ data }) => data)
+      .catch(() => null),
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
@@ -250,6 +258,67 @@ export default async function ProfilePage({
 
       {/* Ergebnis. Es entsteht direkt nach dem ersten Schritt, damit der Nutzen
           nicht davon abhaengt, dass jemand alles ausfuellt. */}
+      {/* Identitaet. Der eine Ort, an dem sie bearbeitet wird - der Trigger aus
+          20260907180000 verteilt sie in Basis-, Discovery- und Connect-Profil. */}
+      {step === null ? (
+        <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+          <div>
+            <h2 className="text-xl font-semibold">{t("identity.title")}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{t("identity.text")}</p>
+          </div>
+          {connectProfile?.status === "active" ? (
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("identity.publishedNote")}</p>
+          ) : null}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="text-sm font-medium">
+              {t("identity.name")}
+              <input name="display_name" maxLength={80} defaultValue={core?.display_name ?? ""} className={field} />
+            </label>
+            <label className="text-sm font-medium">
+              {t("identity.headline")}
+              <input name="headline" maxLength={160} defaultValue={core?.headline ?? ""} className={field} />
+              <span className={hint}>{t("identity.headlineHint")}</span>
+            </label>
+          </div>
+          <label className="block text-sm font-medium">
+            {t("identity.bio")}
+            <textarea name="bio" rows={4} maxLength={1200} defaultValue={core?.bio ?? ""} className={field} />
+            <span className={hint}>{t("identity.bioHint")}</span>
+          </label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="text-sm font-medium">
+              {t("identity.region")}
+              <input name="location_region" maxLength={120} defaultValue={core?.location_region ?? ""} className={field} />
+              <span className={hint}>{t("identity.regionHint")}</span>
+            </label>
+            <label className="text-sm font-medium">
+              {t("identity.remote")}
+              <select name="remote_mode" defaultValue={core?.remote_mode ?? ""} className={field}>
+                <option value="">{t("identity.remoteUnset")}</option>
+                {REMOTE_MODES.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {t(`remoteModes.${mode}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="text-sm font-medium">
+              {t("identity.expertise")}
+              <input name="expertise" defaultValue={(core?.expertise ?? []).join(", ")} className={field} />
+              <span className={hint}>{t("identity.expertiseHint", { max: 8 })}</span>
+            </label>
+            <label className="text-sm font-medium">
+              {t("identity.industries")}
+              <input name="industries" defaultValue={(core?.industries ?? []).join(", ")} className={field} />
+              <span className={hint}>{t("identity.industriesHint", { max: 5 })}</span>
+            </label>
+          </div>
+          <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
+        </form>
+      ) : null}
+
       {step === null ? (
         <section className="mt-8">
           {entries.length === 0 ? (

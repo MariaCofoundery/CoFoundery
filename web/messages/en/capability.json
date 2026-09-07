@@ -2,6 +2,25 @@
   "eyebrow": "Profile",
   "title": "What you bring",
   "text": "A short picture of your practical experience, what you want to own and what you want to develop. Three to five minutes. You can always add more later.",
+  "identity": {
+    "title": "Who you are",
+    "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
+    "name": "Name",
+    "headline": "Headline",
+    "headlineHint": "One sentence saying what you do.",
+    "bio": "About you",
+    "bioHint": "What should people know about your work?",
+    "region": "Region",
+    "regionHint": "Roughly is enough: Berlin, Rhine-Main, North Rhine-Westphalia.",
+    "remote": "Collaboration mode",
+    "remoteUnset": "Not specified",
+    "expertise": "Expertise",
+    "expertiseHint": "Separate with commas, up to {max}.",
+    "industries": "Industries & topics",
+    "industriesHint": "Separate with commas, up to {max}.",
+    "submit": "Save",
+    "publishedNote": "Your Connect profile is published. Changes here are visible there immediately."
+  },
   "steps": {
     "evidence": "Tell one story",
     "areas": "Add areas",
@@ -125,13 +144,21 @@
   "errors": {
     "narrative": "Please write at least two short sentences.",
     "area": "Please choose an area.",
-    "save": "That could not be saved just now. Please try again."
+    "save": "That could not be saved just now. Please try again.",
+    "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",
-    "evidence_removed": "The entry was removed."
+    "evidence_removed": "The entry was removed.",
+    "identity": "Your details are saved."
   },
   "pending": {
     "save": "Saving …"
+  },
+  "remoteModes": {
+    "onsite": "On site",
+    "hybrid": "Hybrid",
+    "remote": "Remote",
+    "flexible": "Flexible"
   }
 }

@@ -196,3 +196,50 @@ test("query parameters are validated before they reach the translator", () => {
   assert.deepEqual(savedKeys.slice().sort(), Object.keys(de.success).sort());
   assert.deepEqual(errorKeys.slice().sort(), Object.keys(de.errors).sort());
 });
+
+// ---------------------------------------------------------------------------
+// Ein Ort statt drei
+// ---------------------------------------------------------------------------
+test("identity is edited in the core only, and reaches the context rows from there", () => {
+  const actions = source("src/features/profile/personCoreActions.ts");
+  const propagation = source(
+    "../supabase/migrations/20260907180000_propagate_person_core_to_context_rows.sql"
+  );
+
+  // Der Editor schreibt ausschliesslich den Kern. Wuerde er zusaetzlich in die
+  // Kontextzeilen schreiben, waere die Doppelpflege nur verlagert.
+  assert.match(actions, /from\("person_core"\)/);
+  assert.doesNotMatch(actions, /from\("network_profiles"\)/);
+  assert.doesNotMatch(actions, /from\("founder_discovery_profiles"\)/);
+  assert.doesNotMatch(actions, /from\("profiles"\)/);
+
+  // Die Verteilung ist die Gegenrichtung zum Sync aus Phase 2 und braucht
+  // deshalb einen Schleifenschutz.
+  assert.match(propagation, /pg_trigger_depth\(\) > 1/);
+  // Leere Kernwerte duerfen Kontextwerte nicht loeschen.
+  assert.match(propagation, /coalesce\(new\.display_name, target\.display_name\)/);
+  // Und die Veroeffentlichungsentscheidung bleibt unberuehrt.
+  assert.doesNotMatch(propagation, /set[\s\S]{0,400}(visibility|published_at|public_slug|status) =/);
+});
+
+test("an empty field clears nothing, in code as in the trigger", () => {
+  const actions = source("src/features/profile/personCoreActions.ts");
+  // parseList und parseText geben null zurueck, nicht "" oder []. Ein leeres
+  // Array wuerde bei der Verteilung die Kontextwerte ueberschreiben.
+  assert.match(actions, /return items\.length \? items : null/);
+  assert.match(actions, /if \(!text\) return null/);
+});
+
+test("the publication conflict has its own message instead of a generic save error", () => {
+  const actions = source("src/features/profile/personCoreActions.ts");
+  const de = JSON.parse(source("messages/de/capability.json"));
+  const en = JSON.parse(source("messages/en/capability.json"));
+
+  assert.match(actions, /active_complete/, "der Konflikt muss erkannt werden");
+  assert.match(actions, /published_incomplete/);
+  assert.ok(de.errors.published_incomplete, "DE-Meldung fehlt");
+  assert.ok(en.errors.published_incomplete, "EN-Meldung fehlt");
+  // Die Meldung muss den Ausweg nennen, nicht nur das Problem.
+  assert.match(de.errors.published_incomplete, /Entwurf/);
+  assert.match(en.errors.published_incomplete, /draft/);
+});
