@@ -76,8 +76,7 @@
     "publish": "Publishing …",
     "pause": "Pausing …",
     "complete": "Marking complete …",
-    "renew": "Renewing …",
-    "reuse": "Copying …"
+    "renew": "Renewing …"
   },
   "success": {
     "profile": {
@@ -270,9 +269,6 @@
   "profile": {
     "title": "Your Connect profile",
     "text": "You explicitly choose the compact identity other members can see. Private profile, Discovery, and assessment data remain separate.",
-    "reuseText": "You can copy suitable details from your existing CoFoundery profile into an unpublished draft, then review them before publishing.",
-    "reuse": "Reuse existing details",
-    "reused": "Details copied into a draft. Review them and publish explicitly.",
     "name": "Display name",
     "headline": "Headline",
     "bio": "Short about text",
@@ -335,7 +331,6 @@
     "incomplete": "Complete the required information before publishing.",
     "public_confirmation": "Please explicitly confirm public publication.",
     "save": "Could not save. Please check your details.",
-    "reuse": "Existing details could not be reused.",
     "photo_reuse": "The existing profile image could not be copied securely.",
     "photo_upload": "The image could not be saved. Use JPG, PNG or WebP up to 2 MB.",
     "profile": "Publish your Connect profile first.",

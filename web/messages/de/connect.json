@@ -76,8 +76,7 @@
     "publish": "Wird veröffentlicht …",
     "pause": "Wird pausiert …",
     "complete": "Wird als erledigt markiert …",
-    "renew": "Wird verlängert …",
-    "reuse": "Wird übernommen …"
+    "renew": "Wird verlängert …"
   },
   "success": {
     "profile": {
@@ -270,9 +269,6 @@
   "profile": {
     "title": "Dein Connect-Profil",
     "text": "Du entscheidest bewusst, welche kompakte Identität andere Mitglieder sehen. Private Profil-, Discovery- und Assessmentdaten bleiben getrennt.",
-    "reuseText": "Du kannst geeignete Angaben aus deinem bestehenden CoFoundery-Profil in einen unveröffentlichten Entwurf übernehmen und vor der Veröffentlichung prüfen.",
-    "reuse": "Vorhandene Angaben übernehmen",
-    "reused": "Angaben wurden in den Entwurf übernommen. Bitte prüfen und bewusst veröffentlichen.",
     "name": "Anzeigename",
     "headline": "Headline",
     "bio": "Kurzer About-Text",
@@ -335,7 +331,6 @@
     "incomplete": "Ergänze alle notwendigen Angaben für die Veröffentlichung.",
     "public_confirmation": "Bitte bestätige die öffentliche Veröffentlichung ausdrücklich.",
     "save": "Speichern war nicht möglich. Bitte prüfe deine Angaben.",
-    "reuse": "Die vorhandenen Angaben konnten nicht übernommen werden.",
     "photo_reuse": "Das vorhandene Profilbild konnte nicht sicher übernommen werden.",
     "photo_upload": "Das Bild konnte nicht gespeichert werden. Nutze JPG, PNG oder WebP bis 2 MB.",
     "profile": "Veröffentliche zuerst dein Connect-Profil.",

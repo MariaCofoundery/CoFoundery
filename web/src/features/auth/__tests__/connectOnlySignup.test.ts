@@ -86,10 +86,14 @@ test("Connect-only navigation exposes Connect and Account without Founder or Adv
 test("first Connect profile has no implicit base-profile reuse or technical role", () => {
   const page = source("src/app/(product)/connect/profile/page.tsx");
   const action = source("src/features/connect/connectActions.ts");
-  assert.match(page, /!profile && baseProfile/);
-  assert.match(page, /CONNECT_ROLES\.map/);
+  // Der frühere "Bestehendes Profil übernehmen"-Knopf ist entfallen: Identität
+  // kommt seit dem Profilzusammenzug aus person_core. Damit ist die Zusage
+  // strenger als vorher - es gibt gar keine Ableitung einer Connect-Rolle mehr,
+  // auch keine explizit angestoßene.
+  assert.match(page, /CONNECT_ROLES\.map/, "Connect-Rollen bleiben eine bewusste Auswahl");
   assert.match(action, /publish && !currentProfile\.data/);
-  assert.doesNotMatch(action, /network_roles[\s\S]{0,100}roles:\s*\["founder"\]/);
+  assert.doesNotMatch(action, /advisor_mentor/, "keine Ableitung aus profiles.roles mehr");
+  assert.doesNotMatch(action, /network_roles:/, "die Actions setzen Rollen nirgends selbst");
 });
 
 test("co-founder bridge requires the existing explicit Founder setup", () => {

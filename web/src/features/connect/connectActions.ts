@@ -106,29 +106,6 @@ async function uploadConnectPhoto(client: Awaited<ReturnType<typeof createClient
 }
 
 
-export async function reuseExistingProfileAction() {
-  const { client, user } = await context();
-  // Der Kern haelt Name, Headline, Bio, Expertise, Branchen und Region bereits
-  // zusammengefuehrt; vorher wurde hier feldweise zwischen Basis- und
-  // Discovery-Profil gemergt, inklusive der toten Spalte profiles.skills.
-  // profiles.roles bleibt noetig, weil daraus die Connect-Rolle abgeleitet
-  // wird - das ist Produktrolle, nicht Identitaet, und gehoert nicht in den Kern.
-  const [core, base] = await Promise.all([
-    getPersonCore(client, user.id),
-    getProfileBasicsRow(client, user.id),
-  ]);
-  const { error } = await client.from("network_profiles").upsert({
-    user_id: user.id, display_name: core?.display_name || "",
-    headline: core?.headline || "", bio: core?.bio || "",
-    expertise: core?.expertise || [], industries: core?.industries || [],
-    location_region: core?.location_region || null, remote_mode: core?.remote_mode || null,
-    network_roles: base?.roles?.includes("founder") ? ["founder"] : base?.roles?.includes("advisor") ? ["advisor_mentor"] : [],
-    status: "draft", published_at: null,
-  }, { onConflict: "user_id" });
-  if (error) redirect("/connect/profile?error=reuse");
-  refresh(); redirect("/connect/profile?reused=1");
-}
-
 export async function saveConnectListingAction(formData: FormData) {
   const { client, user } = await context(); const id = String(formData.get("id") ?? "").trim();
   const rawDirection = String(formData.get("direction") ?? "seeking"); const rawCategory = String(formData.get("category") ?? "expertise");

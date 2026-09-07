@@ -69,7 +69,8 @@ test("Connect actions have pending and success feedback without duplicate submit
   const profile = readFileSync("src/app/(product)/connect/profile/page.tsx", "utf8");
   assert.match(submit, /useFormStatus/); assert.match(submit, /disabled=\{pending\}/); assert.match(submit, /pendingLabel/);
   for (const intent of ["pause", "complete", "publish", "renew"]) assert.match(lifecycle, new RegExp(intent));
-  assert.match(profile, /pending\.reuse/); assert.match(profile, /pending\.publish/); assert.match(profile, /success\.profile/);
+  // pending.reuse ist mit dem Uebernehmen-Knopf entfallen.
+  assert.match(profile, /pending\.publish/); assert.match(profile, /success\.profile/);
 });
 
 test("every Connect editing context has deterministic back navigation", () => {
@@ -77,7 +78,7 @@ test("every Connect editing context has deterministic back navigation", () => {
   for (const path of paths) assert.match(readFileSync(`src/app/(product)/connect/${path}`, "utf8"), /navigation\.(overview|connect|myListings)/);
 });
 
-test("profile reuse remains a draft and publication requires concrete fields", () => {
+test("a Connect profile stays a draft unless publishing is asked for, and publication requires concrete fields", () => {
   // Identitaet kommt seit dem Profilzusammenzug aus person_core, nicht aus dem
   // Formular; das Formular traegt nur noch die Connect-Rollen.
   const form = new FormData(); form.append("network_roles", CONNECT_ROLES[2]);
@@ -90,7 +91,8 @@ test("profile reuse remains a draft and publication requires concrete fields", (
   // Ohne Kernangaben bleibt das Profil speicherbar, aber nicht veroeffentlichbar.
   assert.equal(profilePublishable(parseConnectProfile(form, null)), false);
   const action = readFileSync("src/features/connect/connectActions.ts", "utf8");
-  assert.match(action, /status: "draft", published_at: null/); assert.doesNotMatch(action, /linkedin_url/);
+  // Veroeffentlichen bleibt ein eigener Klick; ohne intent=publish Entwurf.
+  assert.match(action, /status: publish \? "active" : "draft"/); assert.doesNotMatch(action, /linkedin_url/);
 });
 
 test("home layout and empty state support low-liquidity counts without ranking", () => {
