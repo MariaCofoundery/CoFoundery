@@ -351,4 +351,9 @@ test("uploaded photos are no longer reachable without a session", () => {
   assert.match(route, /X-Robots-Tag/);
   // Nur das Bucket-Layout ist erlaubt, kein beliebiger Pfad.
   assert.match(route, /PATH_PATTERN\.test\(objectPath\)/);
+
+  // Und nicht ueber next/image: der Optimierer holt die Datei serverseitig
+  // ohne Sitzungs-Cookies, bekommt vom geschuetzten Endpunkt eine 404 und
+  // liefert ein leeres Bild. Genau das ist beim ersten Deploy passiert.
+  assert.match(avatar, /resolvedSrc\.startsWith\(PHOTO_ROUTE_PREFIX\)/);
 });

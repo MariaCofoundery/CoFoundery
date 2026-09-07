@@ -10,6 +10,8 @@ type ProfileAvatarProps = {
   alt?: string;
 };
 
+const PHOTO_ROUTE_PREFIX = "/api/profile/photo/";
+
 function buildInitials(displayName: string) {
   return displayName
     .split(/\s+/)
@@ -33,8 +35,14 @@ export function ProfileAvatar({
   const resolvedAlt = alt ?? `Avatar von ${displayName}`;
 
   if (resolvedSrc) {
-    if (!resolvedSrc.startsWith("/")) {
+    // Nicht ueber next/image ausliefern, wenn die Quelle eine Sitzung braucht.
+    // Der Bild-Optimierer holt die Datei serverseitig und ohne die Cookies der
+    // Nutzerin; eine authentifizierte Route antwortet ihm mit 404, und das Bild
+    // bleibt leer. Statische Bibliotheks-Illustrationen sind davon nicht
+    // betroffen, deshalb faellt der Fehler nur bei eigenen Fotos auf.
+    if (!resolvedSrc.startsWith("/") || resolvedSrc.startsWith(PHOTO_ROUTE_PREFIX)) {
       return (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={resolvedSrc}
           alt={resolvedAlt}
@@ -85,5 +93,5 @@ function resolveProfileAvatarUrl(value: string | null | undefined) {
   // Der avatars-Bucket ist privat. Die Auslieferung laeuft ueber eine
   // authentifizierte Route statt ueber eine oeffentliche Storage-URL - vorher
   // war jede hochgeladene Datei ohne Login per Direkt-URL abrufbar.
-  return `/api/profile/photo/${normalized.slice("avatars/".length)}`;
+  return `${PHOTO_ROUTE_PREFIX}${normalized.slice("avatars/".length)}`;
 }
