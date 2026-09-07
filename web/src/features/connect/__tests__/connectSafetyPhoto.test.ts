@@ -82,8 +82,14 @@ test("German and English photo and safety copy remain key-parallel", () => {
   const en = JSON.parse(source("messages/en/connect.json"));
   assert.deepEqual(Object.keys(de.profile.photo).sort(), Object.keys(en.profile.photo).sort());
   assert.deepEqual(Object.keys(de.safety).sort(), Object.keys(en.safety).sort());
-  assert.match(de.profile.photo.publicAllowedHint, /erst.*ausdrücklich öffentlich veröffentlichst/i);
-  assert.match(en.profile.photo.publicAllowedHint, /only if.*explicitly publish/i);
+  // Die Fotoerlaubnis ist entfallen: oeffentliche Seiten zeigen niemals ein
+  // Bild, deshalb gibt es keinen Sichtbarkeitstext mehr zu pruefen. Statt
+  // dessen die Zusage, dass hier gar keine Freigabe mehr angeboten wird.
+  for (const copy of [de.profile.photo, en.profile.photo]) {
+    assert.equal(copy.publicAllowed, undefined);
+    assert.equal(copy.publicAllowedHint, undefined);
+    assert.equal(copy.platformOnly, undefined);
+  }
 });
 
 test("account deletion cleans both physical image prefixes before DB/auth deletion", () => {

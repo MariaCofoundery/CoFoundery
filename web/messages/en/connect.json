@@ -288,12 +288,7 @@
       "keep": "Keep current Connect photo",
       "existing": "Use existing CoFoundery profile image",
       "none": "No profile photo",
-      "upload": "Use a different image",
-      "visibilityTitle": "Photo visibility",
-      "platformOnly": "Only within CoFoundery",
-      "platformOnlyHint": "Only signed-in, active Connect members can retrieve this image.",
-      "publicAllowed": "May also appear on public CoFoundery pages",
-      "publicAllowedHint": "This is a preference only. Your photo appears publicly only if you later explicitly publish a profile or listing publicly."
+      "upload": "Use a different image"
     },
     "identityTitle": "Name, headline and about you",
     "identityText": "You maintain these details in one place in your profile. Changes there appear here immediately.",

@@ -25,7 +25,3 @@ export async function getPublicConnectListing(client: SupabaseClient, slug: stri
   if (error) throw new Error("public_network_listing_load_failed");
   return one<PublicConnectListing>(data);
 }
-
-export function publicConnectPhotoUrl(entity: "profile" | "listing", slug: string, updatedAt: string) {
-  return `/api/connect/public-photos/${entity}/${encodeURIComponent(slug)}?v=${encodeURIComponent(updatedAt)}`;
-}

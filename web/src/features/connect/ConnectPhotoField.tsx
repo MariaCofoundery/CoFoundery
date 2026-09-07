@@ -10,14 +10,12 @@ export function ConnectPhotoField({
   currentAvatarId,
   currentPhotoUrl,
   existingAvatarId,
-  initialVisibility,
   copy,
 }: {
   displayName: string;
   currentAvatarId?: string | null;
   currentPhotoUrl?: string | null;
   existingAvatarId?: string | null;
-  initialVisibility: "platform_only" | "public_allowed";
   copy: Record<string, string>;
 }) {
   const hasCurrent = Boolean(currentAvatarId || currentPhotoUrl);
@@ -57,11 +55,6 @@ export function ConnectPhotoField({
     <input type="hidden" name="photo_choice" value={choice} />
     <input type="hidden" name="photo_image_data" value={choice === "upload" ? uploaded : ""} />
 
-    <div className="mt-5 border-t border-slate-100 pt-5">
-      <p className="text-sm font-semibold text-slate-900">{copy.visibilityTitle}</p>
-      <label className="mt-3 flex min-h-11 items-start gap-3 text-sm"><input type="radio" name="photo_visibility" value="platform_only" defaultChecked={initialVisibility !== "public_allowed"} className="mt-1" /><span><span className="font-medium">{copy.platformOnly}</span><span className="mt-1 block text-xs leading-5 text-slate-500">{copy.platformOnlyHint}</span></span></label>
-      <label className="mt-2 flex min-h-11 items-start gap-3 text-sm"><input type="radio" name="photo_visibility" value="public_allowed" defaultChecked={initialVisibility === "public_allowed"} className="mt-1" /><span><span className="font-medium">{copy.publicAllowed}</span><span className="mt-1 block text-xs leading-5 text-slate-500">{copy.publicAllowedHint}</span></span></label>
-    </div>
   </fieldset>;
 }
 

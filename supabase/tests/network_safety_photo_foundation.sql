@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(39);
+select extensions.plan(38);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','da000000-0000-4000-8000-000000000001','authenticated','authenticated','safety-a@example.com','',now(),'{}','{}',now(),now()),
@@ -18,13 +18,12 @@ insert into public.network_profiles(user_id,display_name,headline,bio,network_ro
 ('da000000-0000-4000-8000-000000000003','Safety C','Advisor C','A sufficiently complete biography for safety tests.',array['advisor_mentor'],'active',now());
 
 select extensions.ok((select not public and file_size_limit=2097152 from storage.buckets where id='network-profile-images'),'Network photo bucket is private and bounded');
-select extensions.is((select photo_visibility from public.network_profiles where user_id='da000000-0000-4000-8000-000000000001'),'platform_only','platform_only is the default');
+select extensions.hasnt_column('public','network_profiles','photo_visibility','die Fotoerlaubnis ist entfallen - oeffentliche Seiten zeigen niemals ein Bild');
 select extensions.ok((select photo_source is null and photo_path is null and photo_avatar_id is null from public.network_profiles where user_id='da000000-0000-4000-8000-000000000001'),'existing base avatar is never silently reused');
 select extensions.lives_ok($$update public.network_profiles set photo_source='profile_avatar',photo_avatar_id='avatar-03' where user_id='da000000-0000-4000-8000-000000000001'$$,'explicit library avatar reuse is valid');
 select extensions.throws_ok($$update public.network_profiles set photo_source='profile_copy',photo_avatar_id=null,photo_path='da000000-0000-4000-8000-000000000001/copied.jpg' where user_id='da000000-0000-4000-8000-000000000001'$$,'23514',null,'public personal Founder upload cannot masquerade as a private Network reuse');
 select extensions.lives_ok($$update public.network_profiles set photo_source='network_upload',photo_avatar_id=null,photo_path='da000000-0000-4000-8000-000000000001/replacement.jpg' where user_id='da000000-0000-4000-8000-000000000001'$$,'Network photo replacement is valid');
 select extensions.lives_ok($$update public.network_profiles set photo_source=null,photo_path=null where user_id='da000000-0000-4000-8000-000000000001'$$,'Network photo removal returns to fallback');
-select extensions.lives_ok($$update public.network_profiles set photo_visibility='public_allowed' where user_id='da000000-0000-4000-8000-000000000001'$$,'public_allowed is stored as a preference');
 select extensions.ok((select not public from storage.buckets where id='network-profile-images'),'public_allowed does not make the bucket public');
 select extensions.is((select count(*)::int from pg_policies where schemaname='storage' and tablename='objects' and policyname='network_profile_images_member_read' and roles::text like '%authenticated%'),1,'photo read policy is authenticated-only');
 

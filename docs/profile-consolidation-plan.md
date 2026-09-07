@@ -82,9 +82,13 @@ Die Onboarding-Variante des Formulars bleibt, wo sie ist: `/welcome` und `/join/
 
 ### 4.5 Foto zusammenlegen
 
-Die aufwendigste Phase und deshalb die letzte. Zwei Buckets, zwei Sichtbarkeitsverträge, und der Connect-Vertrag wurde gerade gehärtet — inklusive einer server-only Auflösungsfunktion und der Regel, dass ein Foto nur bei veröffentlichter Entity und `public_allowed` ausgeliefert wird.
+**Entschieden am 07.09.2026, erste Hälfte umgesetzt:** Auf öffentlichen Seiten erscheint niemals ein Bild — weder Foto noch Bibliotheks-Avatar, auch nicht mit Zustimmung. Öffentliche Profil- und Listingseiten zeigen immer Initialen.
 
-Vor jeder Umsetzung zu entscheiden: Gilt künftig **ein** Foto mit einem Sichtbarkeitsvertrag, oder bleiben Founder-Avatar und Connect-Foto getrennt? Ein einziges Foto ist die bessere Erfahrung, bedeutet aber, den öffentlichen `avatars`-Bucket aufzugeben oder den privaten zu öffnen. Letzteres wäre ein Rückschritt.
+Begründung: Ein Gesicht auf einer indexierbaren Seite ermöglicht Rückwärts-Bildsuche und Scraping für Gesichtserkennung, und das lässt sich nach der Indexierung nicht zurückholen — auch nicht durch Depublizieren. Der Gegenwert war überwiegend ästhetisch.
+
+Damit ist eine ganze Ebene entfallen statt reguliert zu werden: die Fotoerlaubnis als Nutzerentscheidung, die privilegierte Auflösungsfunktion für anonyme Aufrufe und das Bildfeld in beiden öffentlichen Projektionen.
+
+**Offen bleibt** die Zusammenlegung *innerhalb* von CoFoundery: Heute gibt es `profiles.avatar_id`/`avatar_url` im öffentlichen `avatars`-Bucket und `network_profiles.photo_*` im privaten. Ein Foto, eine Wahl, auf dem privaten Pfad — die elf Uploads im öffentlichen Bucket werden gelöscht, die Betroffenen wählen neu. Danach zeigt die Menüleiste das Bild statt des grauen Buchstabens.
 
 ### 4.6 Research-Einwilligung nach `/account`
 
@@ -116,6 +120,6 @@ Schritt 2 ist der, der den Nutzen freischaltet. Alles davor ist Aufräumen hinte
 ## 7. Offene Entscheidungen
 
 1. Bleibt `profileCompletion` mit Gewichten, oder fällt der Vollständigkeitswert? (blockiert 4.3)
-2. Ein Foto mit einem Sichtbarkeitsvertrag, oder zwei getrennte? (blockiert 4.5)
+2. ~~Ein Foto mit einem Sichtbarkeitsvertrag, oder zwei getrennte?~~ Entschieden: öffentlich gar kein Bild. Für die interne Zusammenlegung offen bleibt nur, ob die elf Bestandsuploads migriert oder neu erfasst werden — entschieden: neu erfassen.
 3. Wohin mit `intention`? (blockiert 4.4)
 4. Soll `roles` auf `/profile` sichtbar und änderbar sein, oder nur sichtbar?

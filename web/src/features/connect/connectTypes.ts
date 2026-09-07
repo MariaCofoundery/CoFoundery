@@ -19,7 +19,6 @@ export type ConnectProfile = {
   industries: string[]; network_roles: ConnectRole[]; status: "draft" | "active" | "paused";
   photo_source: "profile_avatar" | "network_upload" | null;
   photo_avatar_id: string | null; photo_path: string | null;
-  photo_visibility: "platform_only" | "public_allowed";
   visibility: ConnectVisibility; public_slug: string;
   published_at: string | null; updated_at: string;
 };
@@ -37,7 +36,7 @@ export type ConnectListing = {
 export type PublicConnectProfile = Pick<ConnectProfile,
   "public_slug" | "display_name" | "headline" | "bio" | "network_roles" |
   "expertise" | "industries" | "location_region" | "updated_at"
-> & { photo_available: boolean };
+>;
 
 export type PublicConnectProfileListing = Pick<ConnectListing,
   "public_slug" | "direction" | "category" | "title" | "summary" |
@@ -52,7 +51,6 @@ export type PublicConnectListing = Pick<ConnectListing,
   owner_display_name: string;
   owner_headline: string;
   owner_profile_slug: string | null;
-  owner_photo_available: boolean;
 };
 
 export type ConnectContactRequest = {

@@ -49,12 +49,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         currentAvatarId={profile?.photo_avatar_id}
         currentPhotoUrl={connectPhotoUrl(profile)}
         existingAvatarId={baseProfile?.avatar_id}
-        initialVisibility={profile?.photo_visibility || "platform_only"}
         copy={{
           title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
           keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
-          visibilityTitle: t("profile.photo.visibilityTitle"), platformOnly: t("profile.photo.platformOnly"), platformOnlyHint: t("profile.photo.platformOnlyHint"),
-          publicAllowed: t("profile.photo.publicAllowed"), publicAllowedHint: t("profile.photo.publicAllowedHint"),
+          visibilityTitle: t("profile.photo.visibilityTitle"), platformOnly: t("profile.photo.platformOnly"), platformOnlyHint: t("profile.photo.platformOnlyHint"), publicAllowedHint: t("profile.photo.publicAllowedHint"),
         }}
       />
       <ConnectVisibilityField initial={profile?.visibility} copy={{

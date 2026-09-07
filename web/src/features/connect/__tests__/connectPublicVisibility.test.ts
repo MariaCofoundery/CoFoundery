@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const source = (path: string) => readFileSync(path, "utf8");
@@ -38,16 +38,40 @@ test("public pages are fail-closed, indexable only when found, and uncached", ()
   }
 });
 
-test("photo delivery requires entity publication plus public_allowed and remains server-only", () => {
-  const sql = migration();
-  const route = source("src/app/api/connect/public-photos/[entityType]/[publicSlug]/route.ts");
-  assert.match(sql, /profile\.photo_visibility = 'public_allowed'/);
-  assert.match(sql, /listing\.visibility = 'public'/);
-  assert.match(sql, /profile\.visibility = 'public'/);
-  assert.match(sql, /public_network_photo_service_required/);
-  assert.match(route, /SUPABASE_SERVICE_ROLE_KEY/);
-  assert.match(route, /Cache-Control": "no-store/);
-  assert.doesNotMatch(route, /getPublicUrl|createSignedUrl/);
+test("public pages never show an image at all", () => {
+  // Produktentscheidung vom 07.09.2026. Ein Gesicht auf einer indexierbaren
+  // Seite ermoeglicht Rueckwaerts-Bildsuche und laesst sich nach der
+  // Indexierung nicht zurueckholen; der Gegenwert war aesthetisch. Damit
+  // entfaellt die Ebene komplett statt weiter reguliert zu werden.
+  const removal = source(
+    "../supabase/migrations/20260907200000_remove_public_photo_delivery.sql"
+  );
+  assert.match(removal, /drop function if exists public\.resolve_public_network_photo/);
+  assert.match(removal, /drop column if exists photo_visibility/);
+  // Praezise auf die Spaltendeklaration, nicht auf die Erwaehnung im Kommentar.
+  assert.doesNotMatch(removal, /photo_available boolean/);
+  assert.doesNotMatch(removal, /photo_avatar_id text,\s*photo_path text/);
+
+  // Die Projektionen tragen kein Bildfeld mehr, und die Seiten rendern Initialen.
+  for (const page of [
+    "src/app/(public-connect)/connect/p/[publicSlug]/page.tsx",
+    "src/app/(public-connect)/connect/l/[publicSlug]/page.tsx",
+  ]) {
+    const body = source(page);
+    assert.match(body, /src=\{null\}/, `${page} muss immer Initialen zeigen`);
+    assert.doesNotMatch(body, /photo_available|publicConnectPhotoUrl/);
+  }
+
+  // Der privilegierte service_role-Pfad fuer anonyme Aufrufe ist weg.
+  assert.equal(
+    existsSync("src/app/api/connect/public-photos/[entityType]/[publicSlug]/route.ts"),
+    false,
+    "die oeffentliche Fotoroute darf nicht mehr existieren"
+  );
+
+  // Innerhalb CoFoundery bleibt das Bild: diese Route haengt an der
+  // Mitgliedschaft, nicht an einer Fotoerlaubnis.
+  assert.equal(existsSync("src/app/api/connect/photos/[userId]/route.ts"), true);
 });
 
 test("visibility UI requires explicit first-public confirmation in profile and listing forms", () => {

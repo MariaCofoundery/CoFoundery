@@ -45,15 +45,14 @@ export async function saveConnectProfileAction(formData: FormData) {
   catch (error) { redirect(`/connect/profile?error=${error instanceof ConnectValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (publish && !profilePublishable(values)) redirect("/connect/profile?error=incomplete");
-  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,photo_visibility,visibility,public_slug").eq("user_id", user.id).maybeSingle();
+  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,visibility,public_slug").eq("user_id", user.id).maybeSingle();
   const profileVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
   if (profileVisibility === "public" && currentProfile.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect("/connect/profile?error=public_confirmation");
   }
   const photoChoice = String(formData.get("photo_choice") ?? "keep");
-  const visibility = formData.get("photo_visibility") === "public_allowed" ? "public_allowed" : "platform_only";
   let uploadedPath: string | null = null;
-  let photoValues: Record<string, string | null> = { photo_visibility: visibility };
+  let photoValues: Record<string, string | null> = {};
 
   if (photoChoice === "none") {
     photoValues = { ...photoValues, photo_source: null, photo_avatar_id: null, photo_path: null };

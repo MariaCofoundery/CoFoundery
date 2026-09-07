@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PublicConnectAvatar, PublicConnectShell } from "@/features/connect/PublicConnectShell";
-import { getPublicConnectProfile, getPublicConnectProfileListings, publicConnectPhotoUrl } from "@/features/connect/publicConnectData";
+import { getPublicConnectProfile, getPublicConnectProfileListings } from "@/features/connect/publicConnectData";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
@@ -32,13 +32,12 @@ export default async function PublicConnectProfilePage({ params }: { params: Pro
     getPublicConnectProfileListings(client, publicSlug).catch(() => []),
   ]);
   if (!profile) notFound();
-  const photo = profile.photo_available ? publicConnectPhotoUrl("profile", profile.public_slug, profile.updated_at) : null;
 
   return <PublicConnectShell><main className="mx-auto max-w-4xl px-5 py-10 md:px-8 md:py-14">
     <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t("public.profileEyebrow")}</p>
     <article className="mt-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-9">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-        <PublicConnectAvatar src={photo} displayName={profile.display_name} className="h-20 w-20" />
+        <PublicConnectAvatar src={null} displayName={profile.display_name} className="h-20 w-20" />
         <div><h1 className="text-3xl font-semibold tracking-tight">{profile.display_name}</h1><p className="mt-2 text-lg text-slate-600">{profile.headline}</p></div>
       </div>
       <p className="mt-7 whitespace-pre-wrap leading-7 text-slate-700">{profile.bio}</p>

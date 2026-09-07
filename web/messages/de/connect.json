@@ -288,12 +288,7 @@
       "keep": "Aktuelles Connect-Bild beibehalten",
       "existing": "Vorhandenes CoFoundery-Profilbild verwenden",
       "none": "Kein Profilbild",
-      "upload": "Anderes Bild verwenden",
-      "visibilityTitle": "Foto-Sichtbarkeit",
-      "platformOnly": "Nur innerhalb von CoFoundery",
-      "platformOnlyHint": "Nur eingeloggte, aktive Connect-Mitglieder können dieses Bild abrufen.",
-      "publicAllowed": "Darf auch auf öffentlichen CoFoundery-Seiten angezeigt werden",
-      "publicAllowedHint": "Das ist nur eine Präferenz. Öffentlich wird dein Bild erst angezeigt, wenn du später ein Profil oder einen Eintrag ausdrücklich öffentlich veröffentlichst."
+      "upload": "Anderes Bild verwenden"
     },
     "identityTitle": "Name, Headline und Über mich",
     "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",
