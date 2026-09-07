@@ -327,3 +327,28 @@ test("the menu bar shows the chosen picture, with initials as the fallback", () 
   // Die Abfrage holt nur das Bild, nicht die ganze Profilzeile.
   assert.match(reader, /select\("avatar_id,avatar_url"\)/);
 });
+
+test("uploaded photos are no longer reachable without a session", () => {
+  const migration = source("../supabase/migrations/20260907220000_make_avatar_bucket_private.sql");
+  const avatar = source("src/features/profile/ProfileAvatar.tsx");
+  const route = source("src/app/api/profile/photo/[...path]/route.ts");
+
+  // Der Bucket war public = true mit einer Policy ohne Rolleneinschraenkung.
+  assert.match(migration, /update storage\.buckets set public = false where id = 'avatars'/);
+  assert.match(migration, /drop policy if exists avatars_public_read/);
+  assert.match(migration, /to authenticated/);
+  // Bestandsdateien bleiben liegen - kein Umzug, kein Wertwechsel.
+  assert.doesNotMatch(migration, /update public\.profiles|delete from storage\.objects/);
+
+  // Kein Rendern mehr ueber eine oeffentliche Storage-URL.
+  assert.doesNotMatch(avatar, /object\/public/);
+  assert.match(avatar, /\/api\/profile\/photo\//);
+
+  // Die Route verlangt eine Sitzung und braucht keinen Service-Role-Schluessel,
+  // schafft also keinen neuen privilegierten Pfad.
+  assert.match(route, /if \(!user\) return new NextResponse\(null, \{ status: 404 \}\)/);
+  assert.doesNotMatch(route, /SERVICE_ROLE/);
+  assert.match(route, /X-Robots-Tag/);
+  // Nur das Bucket-Layout ist erlaubt, kein beliebiger Pfad.
+  assert.match(route, /PATH_PATTERN\.test\(objectPath\)/);
+});

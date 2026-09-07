@@ -82,10 +82,8 @@ function resolveProfileAvatarUrl(value: string | null | undefined) {
     return normalized;
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!supabaseUrl) {
-    return null;
-  }
-
-  return `${supabaseUrl.replace(/\/+$/, "")}/storage/v1/object/public/${normalized}`;
+  // Der avatars-Bucket ist privat. Die Auslieferung laeuft ueber eine
+  // authentifizierte Route statt ueber eine oeffentliche Storage-URL - vorher
+  // war jede hochgeladene Datei ohne Login per Direkt-URL abrufbar.
+  return `/api/profile/photo/${normalized.slice("avatars/".length)}`;
 }
