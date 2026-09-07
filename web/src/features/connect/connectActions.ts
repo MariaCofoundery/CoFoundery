@@ -36,8 +36,12 @@ function safeConnectRedirect(value: FormDataEntryValue | null, fallback = "/conn
 
 export async function saveConnectProfileAction(formData: FormData) {
   const { client, user } = await context();
+  // Identitaet kommt aus dem Kern, nicht aus diesem Formular - sie wird auf
+  // /profile gepflegt. Ohne Kernangaben bleibt das Profil speicherbar, aber
+  // nicht veroeffentlichbar; profilePublishable faengt das ab.
+  const identity = await getPersonCore(client, user.id);
   let values: ReturnType<typeof parseConnectProfile>;
-  try { values = parseConnectProfile(formData); }
+  try { values = parseConnectProfile(formData, identity); }
   catch (error) { redirect(`/connect/profile?error=${error instanceof ConnectValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (publish && !profilePublishable(values)) redirect("/connect/profile?error=incomplete");

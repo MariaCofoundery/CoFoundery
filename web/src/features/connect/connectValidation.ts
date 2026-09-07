@@ -24,14 +24,35 @@ function optionalDate(value: FormDataEntryValue | null) {
   return /^\d{4}-\d{2}-\d{2}$/.test(result) ? result : null;
 }
 
-export function parseConnectProfile(formData: FormData) {
+/**
+ * Identitaet kommt aus person_core, nicht aus diesem Formular. Sie wird an
+ * genau einem Ort gepflegt - auf /profile - und von dort verteilt. Diese Seite
+ * entscheidet nur noch das Kontextspezifische: Connect-Rollen, Foto und
+ * Sichtbarkeit.
+ *
+ * Die Rueckgabeform bleibt unveraendert, damit profilePublishable und der
+ * Upsert nichts davon merken.
+ */
+export type ConnectIdentitySource = {
+  display_name: string | null;
+  headline: string | null;
+  bio: string | null;
+  location_region: string | null;
+  remote_mode: string | null;
+  expertise: string[] | null;
+  industries: string[] | null;
+};
+
+export function parseConnectProfile(formData: FormData, identity: ConnectIdentitySource | null) {
   const roles = formData.getAll("network_roles").filter((v): v is string => isOneOf(CONNECT_ROLES, v)).slice(0, 4);
-  const remote = formData.get("remote_mode");
+  const remote = identity?.remote_mode ?? null;
   return {
-    display_name: text(formData.get("display_name"), 80), headline: text(formData.get("headline"), 160),
-    bio: text(formData.get("bio"), 800), location_region: optional(formData.get("location_region"), 120),
+    display_name: text(identity?.display_name ?? null, 80), headline: text(identity?.headline ?? null, 160),
+    // Der Kern erlaubt 1200 Zeichen, Connect 800 - hier wird gekappt, nicht abgewiesen.
+    bio: text(identity?.bio ?? null, 800), location_region: optional(identity?.location_region ?? null, 120),
     remote_mode: isOneOf(CONNECT_REMOTE_MODES, remote) ? remote : null,
-    expertise: parseCommaSeparatedList(formData.get("expertise"), 8, "too_many_topics", 60), industries: parseCommaSeparatedList(formData.get("industries"), 5, "too_many_industries"),
+    expertise: (identity?.expertise ?? []).slice(0, 8).map((item) => item.slice(0, 60)),
+    industries: (identity?.industries ?? []).slice(0, 5).map((item) => item.slice(0, 80)),
     network_roles: roles,
   };
 }

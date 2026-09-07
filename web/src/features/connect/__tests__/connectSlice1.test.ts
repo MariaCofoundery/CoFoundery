@@ -78,9 +78,17 @@ test("every Connect editing context has deterministic back navigation", () => {
 });
 
 test("profile reuse remains a draft and publication requires concrete fields", () => {
-  const form = new FormData(); form.set("display_name", "Ada"); form.set("headline", "Product expert");
-  form.set("bio", "I support early teams with product discovery."); form.append("network_roles", CONNECT_ROLES[2]);
-  assert.ok(profilePublishable(parseConnectProfile(form)));
+  // Identitaet kommt seit dem Profilzusammenzug aus person_core, nicht aus dem
+  // Formular; das Formular traegt nur noch die Connect-Rollen.
+  const form = new FormData(); form.append("network_roles", CONNECT_ROLES[2]);
+  const identity = {
+    display_name: "Ada", headline: "Product expert",
+    bio: "I support early teams with product discovery.",
+    location_region: null, remote_mode: null, expertise: null, industries: null,
+  };
+  assert.ok(profilePublishable(parseConnectProfile(form, identity)));
+  // Ohne Kernangaben bleibt das Profil speicherbar, aber nicht veroeffentlichbar.
+  assert.equal(profilePublishable(parseConnectProfile(form, null)), false);
   const action = readFileSync("src/features/connect/connectActions.ts", "utf8");
   assert.match(action, /status: "draft", published_at: null/); assert.doesNotMatch(action, /linkedin_url/);
 });

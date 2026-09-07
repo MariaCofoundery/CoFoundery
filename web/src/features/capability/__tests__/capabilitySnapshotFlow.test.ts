@@ -243,3 +243,26 @@ test("the publication conflict has its own message instead of a generic save err
   assert.match(de.errors.published_incomplete, /Entwurf/);
   assert.match(en.errors.published_incomplete, /draft/);
 });
+
+test("the Connect profile page no longer maintains identity itself", () => {
+  const page = source("src/app/(product)/connect/profile/page.tsx");
+  const validation = source("src/features/connect/connectValidation.ts");
+  const actions = source("src/features/connect/connectActions.ts");
+
+  // Die Doppelpflege ist beendet: keine Identitaetseingaben mehr auf dieser
+  // Seite, nur noch das Kontextspezifische.
+  for (const removed of ["display_name", "headline", "bio", "expertise", "industries", "location_region", "remote_mode"]) {
+    assert.doesNotMatch(page, new RegExp(`name="${removed}"`), `${removed} wird hier noch gepflegt`);
+  }
+  // Was hier bleibt, gehoert hierher.
+  assert.match(page, /name="network_roles"/);
+  assert.match(page, /ConnectVisibilityField/);
+  assert.match(page, /ConnectPhotoField/);
+  // Und ein Weg zum einen Ort.
+  assert.match(page, /href="\/profile"/);
+
+  // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
+  assert.match(validation, /parseConnectProfile\(formData: FormData, identity: ConnectIdentitySource \| null\)/);
+  assert.doesNotMatch(validation, /display_name: text\(formData/);
+  assert.match(actions, /getPersonCore\(client, user\.id\)/);
+});
