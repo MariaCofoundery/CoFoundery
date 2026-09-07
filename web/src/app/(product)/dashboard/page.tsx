@@ -615,23 +615,36 @@ export default async function DashboardPage({
           <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
             {needsOnboarding ? t("utilities.profileCreate") : t("utilities.profileEdit")}
           </summary>
-          <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
+          <p className="mt-2 text-xs leading-5 text-slate-500">
+            {needsOnboarding ? t("utilities.profileHelp") : t("utilities.profileEntryHelp")}
+          </p>
           <div className="mt-4 border-t border-slate-200 pt-4">
-            <ProfileBasicsForm
-              mode={needsOnboarding ? "onboarding" : "edit"}
-              initialValues={{
-                display_name: profileData?.display_name ?? null,
-                focus_skill: profileData?.focus_skill ?? null,
-                intention: profileData?.intention ?? null,
-                roles: profileData?.roles ?? null,
-                avatar_id: profileData?.avatar_id ?? null,
-                avatar_url: profileData?.avatar_url ?? null,
-              }}
-              submitLabel={needsOnboarding ? t("actions.saveProfile") : t("actions.updateProfile")}
-              onSuccessRedirectTo={contextualDashboardHref}
-              variant={needsOnboarding ? "accent" : undefined}
-              fallbackAvatarUrl={profileImageUrl}
-            />
+            {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als ein
+                Editor. Wer das Basisprofil ausgefuellt hat, geht auf /profile -
+                den einen Ort fuer Identitaet, Expertise und Capability. */}
+            {needsOnboarding ? (
+              <ProfileBasicsForm
+                mode="onboarding"
+                initialValues={{
+                  display_name: profileData?.display_name ?? null,
+                  focus_skill: profileData?.focus_skill ?? null,
+                  intention: profileData?.intention ?? null,
+                  roles: profileData?.roles ?? null,
+                  avatar_id: profileData?.avatar_id ?? null,
+                  avatar_url: profileData?.avatar_url ?? null,
+                }}
+                submitLabel={t("actions.saveProfile")}
+                onSuccessRedirectTo={contextualDashboardHref}
+                variant="accent"
+                fallbackAvatarUrl={profileImageUrl}
+              />
+            ) : null}
+            <Link
+              href="/profile"
+              className={`inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50${needsOnboarding ? " mt-4" : ""}`}
+            >
+              {t("utilities.profileOpen")}
+            </Link>
           </div>
         </details>
 

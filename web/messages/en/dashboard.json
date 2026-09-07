@@ -165,7 +165,13 @@
       }
     }
   },
-  "connect": {"eyebrow":"Your activity","title":"Your connect","summary":"{seeking} needs · {offering} offers active","open":"Open Connect","create":"+ Need or offer"},
+  "connect": {
+    "eyebrow": "Your activity",
+    "title": "Your connect",
+    "summary": "{seeking} needs · {offering} offers active",
+    "open": "Open Connect",
+    "create": "+ Need or offer"
+  },
   "explore": {
     "eyebrow": "Explore CoFoundery",
     "title": "What you can do with CoFoundery",
@@ -248,7 +254,9 @@
     "profileCreate": "Add personal profile details",
     "profileEdit": "Edit profile details",
     "profileHelp": "Manage your name, role, and essential details here when needed.",
-    "account": "Account & settings"
+    "account": "Account & settings",
+    "profileEntryHelp": "Name, about you, expertise and what you practically bring – all in one place.",
+    "profileOpen": "Open profile"
   },
   "profileSnapshot": {
     "eyebrow": "Profile snapshot",

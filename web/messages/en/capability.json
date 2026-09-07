@@ -160,5 +160,11 @@
     "hybrid": "Hybrid",
     "remote": "Remote",
     "flexible": "Flexible"
+  },
+  "contexts": {
+    "title": "Where you decide what is shown",
+    "text": "Your details live here. Whether and how they appear in an area is decided there.",
+    "discovery": "Discovery profile",
+    "connect": "Connect profile"
   }
 }

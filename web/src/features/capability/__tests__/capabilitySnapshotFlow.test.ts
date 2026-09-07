@@ -295,3 +295,16 @@ test("both context pages keep their own publication decision", () => {
   assert.match(connect, /ConnectVisibilityField/);
   assert.match(discovery, /publishResult|publishProfile|saveProfileDraft/);
 });
+
+test("/profile is reachable from the dashboard and the account menu", () => {
+  const dashboard = source("src/app/(product)/dashboard/page.tsx");
+  const shell = source("src/features/navigation/ProductShell.tsx");
+
+  assert.match(shell, /href="\/profile"/, "das Kontomenue muss dorthin fuehren");
+  assert.match(dashboard, /href="\/profile"/, "das Dashboard ist der zentrale Anlaufpunkt");
+
+  // Der Erststart bleibt im Dashboard eingebettet - ein Einstieg ist etwas
+  // anderes als ein Editor. Danach ist der Block nur noch ein Eingang.
+  assert.match(dashboard, /needsOnboarding \? \(\s*<ProfileBasicsForm/);
+  assert.doesNotMatch(dashboard, /mode=\{needsOnboarding \? "onboarding" : "edit"\}/);
+});

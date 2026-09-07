@@ -22,7 +22,18 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
 
 test("profile menu keeps Connect identity separate and exposes Account for every supported role", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  assert.match(shell, /connectOnly \? "\/connect\/profile"/);
+  const profile = readFileSync("src/app/(product)/profile/page.tsx", "utf8");
+
+  // Der Eintrag verzweigt nicht mehr nach Rolle: /profile gilt fuer jeden
+  // registrierten Menschen, weil jeder eine person_core-Zeile hat. Das ist
+  // eine Vereinfachung gegenueber der frueheren Connect-Sonderbehandlung.
+  assert.match(shell, /href="\/profile"/);
+  assert.doesNotMatch(shell, /connectOnly \? "\/connect\/profile"/);
+  // Connect-only-Nutzer erreichen ihr Connect-Profil weiterhin - von /profile
+  // aus, wo Sichtbarkeit und Rollen entschieden werden.
+  assert.match(profile, /href="\/connect\/profile"/);
+  assert.match(profile, /isConnectMember \?/);
+
   assert.match(shell, /href="\/account"/);
   assert.doesNotMatch(shell, /!connectOnly \? <Link\s+href="\/account"/);
 });

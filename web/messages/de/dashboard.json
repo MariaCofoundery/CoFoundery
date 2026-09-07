@@ -165,7 +165,13 @@
       }
     }
   },
-  "connect": {"eyebrow":"Deine Aktivitäten","title":"Dein Netzwerk","summary":"{seeking} Gesuche · {offering} Angebote aktiv","open":"Connect öffnen","create":"+ Gesuch oder Angebot"},
+  "connect": {
+    "eyebrow": "Deine Aktivitäten",
+    "title": "Dein Netzwerk",
+    "summary": "{seeking} Gesuche · {offering} Angebote aktiv",
+    "open": "Connect öffnen",
+    "create": "+ Gesuch oder Angebot"
+  },
   "explore": {
     "eyebrow": "Entdecke CoFoundery",
     "title": "Was du mit CoFoundery machen kannst",
@@ -248,7 +254,9 @@
     "profileCreate": "Persönliche Profildaten ergänzen",
     "profileEdit": "Profildaten bearbeiten",
     "profileHelp": "Name, Rolle und Basisangaben kannst du hier bei Bedarf kompakt verwalten.",
-    "account": "Account & Einstellungen"
+    "account": "Account & Einstellungen",
+    "profileEntryHelp": "Name, Über dich, Expertise und was du praktisch mitbringst – alles an einem Ort.",
+    "profileOpen": "Profil öffnen"
   },
   "profileSnapshot": {
     "eyebrow": "Profil-Snapshot",

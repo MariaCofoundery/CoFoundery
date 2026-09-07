@@ -18,6 +18,7 @@ import {
   groupEntriesByFamily,
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { createClient } from "@/lib/supabase/server";
@@ -45,7 +46,7 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, connectProfile] = await Promise.all([
+  const [t, params, vocabulary, entries, core, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
     getTranslations("capability"),
     searchParams,
     getCapabilityVocabulary(supabase),
@@ -55,6 +56,8 @@ export default async function ProfilePage({
     Promise.resolve(supabase.from("network_profiles").select("status").eq("user_id", user.id).maybeSingle())
       .then(({ data }) => data)
       .catch(() => null),
+    Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
+    hasFounderDiscoveryAccess(user.id, supabase).catch(() => false),
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
@@ -375,6 +378,27 @@ export default async function ProfilePage({
               </div>
             </div>
           )}
+        </section>
+      ) : null}
+
+      {/* Rueckverweise in die Kontexte. Hier stehen Inhalte, dort wird
+          entschieden, was davon wo gezeigt wird. */}
+      {step === null && (isConnectMember || hasDiscovery) ? (
+        <section className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <h2 className="text-sm font-semibold">{t("contexts.title")}</h2>
+          <p className={hint}>{t("contexts.text")}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {hasDiscovery ? (
+              <Link href="/discovery/profile" className={secondary}>
+                {t("contexts.discovery")}
+              </Link>
+            ) : null}
+            {isConnectMember ? (
+              <Link href="/connect/profile" className={secondary}>
+                {t("contexts.connect")}
+              </Link>
+            ) : null}
+          </div>
         </section>
       ) : null}
     </main>

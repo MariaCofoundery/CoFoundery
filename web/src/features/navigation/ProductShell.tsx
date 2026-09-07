@@ -228,7 +228,6 @@ export function ProductShell({
               <LanguageSwitcher />
               <ProfileMenu
                 displayName={displayName}
-                connectOnly={isConnectOnly}
                 accountOnly={isSuspendedConnectOnly}
               />
             </div>
@@ -280,11 +279,9 @@ export function ProductNavigationOverride({
 
 function ProfileMenu({
   displayName,
-  connectOnly,
   accountOnly,
 }: {
   displayName: string | null;
-  connectOnly: boolean;
   accountOnly: boolean;
 }) {
   const t = useTranslations("navigation");
@@ -353,12 +350,12 @@ function ProfileMenu({
         >
           {!accountOnly ? (
             <Link
-              href={connectOnly ? "/connect/profile" : "/dashboard#dashboard-block-profile-data"}
+              href="/profile"
               onClick={() => setIsOpen(false)}
               className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
               role="menuitem"
             >
-              {connectOnly ? t("editConnectProfile") : t("editProfile")}
+              {t("editProfile")}
             </Link>
           ) : null}
           <Link

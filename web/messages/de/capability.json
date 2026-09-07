@@ -160,5 +160,11 @@
     "hybrid": "Hybrid",
     "remote": "Remote",
     "flexible": "Flexibel"
+  },
+  "contexts": {
+    "title": "Wo du entscheidest, was gezeigt wird",
+    "text": "Deine Angaben stehen hier. Ob und wie sie in einem Bereich erscheinen, entscheidest du dort.",
+    "discovery": "Discovery-Profil",
+    "connect": "Connect-Profil"
   }
 }
