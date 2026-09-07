@@ -100,7 +100,12 @@ test("initial Connect render accepts membership without an owner Connect profile
   assert.match(page, /listings\.length \?/);
   assert.match(page, /empty\.title/);
   assert.doesNotMatch(page, /getOwnConnectProfile/);
-  assert.match(layout, /network_profiles"\)\.select\("display_name"\).*\.maybeSingle\(\)/);
+  // Seit Phase 2 des Profilzusammenzugs kommt der Shell-Name aus person_core,
+  // das fuer jede registrierte Person existiert. Ein fehlendes Connect-Profil
+  // kann den Namen damit gar nicht mehr beeinflussen - staerker als die
+  // frueher hier gepruefte maybeSingle-Toleranz.
+  assert.match(layout, /getPersonCore\(supabase, user\.id\)/);
+  assert.doesNotMatch(layout, /from\("network_profiles"\)/);
   assert.match(layout, /\.catch\(\(\) => null\)/);
 });
 

@@ -79,6 +79,16 @@ insert into public.network_profiles(user_id, created_at, updated_at) values
 insert into public.founder_discovery_profiles(user_id, bio, expertise, industries, location_region, remote_mode, created_at, updated_at) values
 ('fc000000-0000-4000-8000-000000000002','Eine echte Biografie aus dem Discovery-Profil.',array['Product'],array['SaaS'],'Berlin','flexible', now() - interval '5 days', now() - interval '5 days');
 
+-- Seit Phase 2 (20260907140000) halten Trigger den Kern bei jeder Schreibung
+-- in eine Kontextzeile aktuell. Die Inserts oben haben deshalb schon
+-- synchronisiert, unter anderem die Discovery-Bio.
+--
+-- In Produktion lief der Backfill, bevor diese Trigger existierten. Damit hier
+-- weiterhin die BACKFILL-Anweisung geprueft wird und nicht der Sync, wird bio
+-- vor dem Backfill zurueckgesetzt. Die Assertion danach zeigt dann, dass der
+-- Backfill selbst bio nicht setzt - genau die Entscheidung aus Phase 1.
+update public.person_core set bio = null where user_id='fc000000-0000-4000-8000-000000000002';
+
 with quellen as (
   select profile.user_id,
          nullif(btrim(profile.display_name), '') as display_name,

@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
-import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { getPersonCore } from "@/features/profile/personCoreData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -49,15 +49,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, profileData, connectProfileData, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
+  const [roleViews, personCore, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
           hasAdvisor: false,
           roles: [],
         })),
-        getProfileBasicsRow(supabase, user.id).catch(() => null),
-        Promise.resolve(supabase.from("network_profiles").select("display_name").eq("user_id", user.id).maybeSingle()).then(({ data }) => data).catch(() => null),
+        getPersonCore(supabase, user.id).catch(() => null),
         Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
         Promise.resolve(supabase.rpc("has_network_account")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
@@ -72,7 +71,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         },
         null,
-        null,
         false,
         false,
         0,
@@ -80,9 +78,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         0,
         "undecided" as const,
       ];
+  // Der Kern ist die einzige Datenquelle fuer den Namen; vorher konkurrierten
+  // hier profiles und network_profiles. Die beiden Auth-Metadaten-Stufen und
+  // das E-Mail-Praefix bleiben als reine Anzeige-Rueckfaelle fuer Menschen,
+  // die noch nichts eingetragen haben - sie werden nie in den Kern geschrieben.
   const displayName =
-    profileData?.display_name?.trim() ||
-    connectProfileData?.display_name?.trim() ||
+    personCore?.display_name?.trim() ||
     user?.user_metadata?.display_name?.trim() ||
     user?.user_metadata?.full_name?.trim() ||
     user?.email?.split("@")[0] ||

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnectMessageBody, parseConnectListing, parseConnectProfile, listingPublishable, profilePublishable } from "./connectValidation";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { randomUUID } from "node:crypto";
@@ -103,16 +104,20 @@ async function uploadConnectPhoto(client: Awaited<ReturnType<typeof createClient
 
 export async function reuseExistingProfileAction() {
   const { client, user } = await context();
-  const [base, discovery] = await Promise.all([
+  // Der Kern haelt Name, Headline, Bio, Expertise, Branchen und Region bereits
+  // zusammengefuehrt; vorher wurde hier feldweise zwischen Basis- und
+  // Discovery-Profil gemergt, inklusive der toten Spalte profiles.skills.
+  // profiles.roles bleibt noetig, weil daraus die Connect-Rolle abgeleitet
+  // wird - das ist Produktrolle, nicht Identitaet, und gehoert nicht in den Kern.
+  const [core, base] = await Promise.all([
+    getPersonCore(client, user.id),
     getProfileBasicsRow(client, user.id),
-    client.from("founder_discovery_profiles").select("display_name,headline,bio,expertise,industries,location_region,remote_mode").eq("user_id", user.id).maybeSingle(),
   ]);
-  const source = discovery.data;
   const { error } = await client.from("network_profiles").upsert({
-    user_id: user.id, display_name: source?.display_name || base?.display_name || "",
-    headline: source?.headline || base?.headline || "", bio: source?.bio || "",
-    expertise: source?.expertise || base?.skills || [], industries: source?.industries || [],
-    location_region: source?.location_region || null, remote_mode: source?.remote_mode || null,
+    user_id: user.id, display_name: core?.display_name || "",
+    headline: core?.headline || "", bio: core?.bio || "",
+    expertise: core?.expertise || [], industries: core?.industries || [],
+    location_region: core?.location_region || null, remote_mode: core?.remote_mode || null,
     network_roles: base?.roles?.includes("founder") ? ["founder"] : base?.roles?.includes("advisor") ? ["advisor_mentor"] : [],
     status: "draft", published_at: null,
   }, { onConflict: "user_id" });
