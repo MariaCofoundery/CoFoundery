@@ -8,6 +8,7 @@ import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { getConnectAttentionCount } from "@/features/connect/connectPresentation";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
@@ -21,6 +22,8 @@ type Props = {
   hasConnect: boolean;
   hasConnectAccount: boolean;
   displayName: string | null;
+  avatarId?: string | null;
+  avatarImageUrl?: string | null;
   incomingOpenRequestCount: number;
   incomingConnectContactCount: number;
   unreadConnectMessageCount: number;
@@ -87,6 +90,8 @@ export function ProductShell({
   hasConnect,
   hasConnectAccount,
   displayName,
+  avatarId = null,
+  avatarImageUrl = null,
   incomingOpenRequestCount,
   incomingConnectContactCount,
   unreadConnectMessageCount,
@@ -228,6 +233,8 @@ export function ProductShell({
               <LanguageSwitcher />
               <ProfileMenu
                 displayName={displayName}
+                avatarId={avatarId}
+                avatarImageUrl={avatarImageUrl}
                 accountOnly={isSuspendedConnectOnly}
               />
             </div>
@@ -279,14 +286,17 @@ export function ProductNavigationOverride({
 
 function ProfileMenu({
   displayName,
+  avatarId,
+  avatarImageUrl,
   accountOnly,
 }: {
   displayName: string | null;
+  avatarId: string | null;
+  avatarImageUrl: string | null;
   accountOnly: boolean;
 }) {
   const t = useTranslations("navigation");
   const normalizedName = normalizeDisplayName(displayName) || t("profileFallback");
-  const avatarLabel = normalizedName.charAt(0).toUpperCase();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -327,9 +337,13 @@ function ProfileMenu({
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700">
-          {avatarLabel}
-        </span>
+        <ProfileAvatar
+          displayName={normalizedName}
+          avatarId={avatarId}
+          imageUrl={avatarImageUrl}
+          className="h-8 w-8 shrink-0 rounded-full object-cover"
+          fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
+        />
         <span className="hidden max-w-28 truncate md:inline">{normalizedName}</span>
         <svg
           aria-hidden="true"

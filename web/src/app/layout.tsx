@@ -5,6 +5,7 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { getOwnProfileImage } from "@/features/profile/profileData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -49,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [roleViews, personCore, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
+  const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -57,6 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         })),
         getPersonCore(supabase, user.id).catch(() => null),
+        getOwnProfileImage(supabase, user.id).catch(() => ({ avatarId: null, imageUrl: null })),
         Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
         Promise.resolve(supabase.rpc("has_network_account")).then(({ data }) => data === true).catch(() => false),
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
@@ -71,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
         },
         null,
+        { avatarId: null, imageUrl: null },
         false,
         false,
         0,
@@ -99,6 +102,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             displayName={displayName}
+            avatarId={profileImage.avatarId}
+            avatarImageUrl={profileImage.imageUrl}
             incomingOpenRequestCount={incomingOpenRequestCount}
             incomingConnectContactCount={incomingConnectContactCount}
             unreadConnectMessageCount={unreadConnectMessageCount}

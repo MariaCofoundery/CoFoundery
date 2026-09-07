@@ -308,3 +308,22 @@ test("/profile is reachable from the dashboard and the account menu", () => {
   assert.match(dashboard, /needsOnboarding \? \(\s*<ProfileBasicsForm/);
   assert.doesNotMatch(dashboard, /mode=\{needsOnboarding \? "onboarding" : "edit"\}/);
 });
+
+test("the menu bar shows the chosen picture, with initials as the fallback", () => {
+  const shell = source("src/features/navigation/ProductShell.tsx");
+  const layout = source("src/app/layout.tsx");
+  const reader = source("src/features/profile/profileData.ts");
+
+  // Keine zweite Auflösungskette: ProfileAvatar entscheidet selbst, ob die
+  // Bibliotheks-Illustration oder der eigene Upload gewinnt, und faellt sonst
+  // auf Initialen zurueck. Genau diese Komponente nutzt auch das Dashboard.
+  assert.match(shell, /<ProfileAvatar/);
+  assert.match(shell, /avatarId=\{avatarId\}/);
+  assert.match(shell, /imageUrl=\{avatarImageUrl\}/);
+  assert.match(shell, /fallbackClassName=/, "die Initialen bleiben als Rueckfall");
+  assert.doesNotMatch(shell, /const avatarLabel/, "der einzelne Buchstabe ist ersetzt");
+
+  assert.match(layout, /getOwnProfileImage\(supabase, user\.id\)/);
+  // Die Abfrage holt nur das Bild, nicht die ganze Profilzeile.
+  assert.match(reader, /select\("avatar_id,avatar_url"\)/);
+});

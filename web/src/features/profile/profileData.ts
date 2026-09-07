@@ -188,3 +188,28 @@ export async function upsertProfileBasicsRow(
     omittedColumns.add(missingColumn);
   }
 }
+
+/**
+ * Nur das Bild, fuer die Menueleiste. Bewusst eine eigene schmale Abfrage und
+ * nicht die ganze Profilzeile: hier wird ausschliesslich ein Avatar oder Foto
+ * gebraucht.
+ *
+ * Das Bild wohnt heute noch in `profiles` - `avatar_id` fuer eine Illustration
+ * aus der Bibliothek, `avatar_url` fuer einen eigenen Upload. Mit der
+ * Fotozusammenlegung wandert es nach person_core; dann faellt diese Funktion
+ * weg und die Leiste liest den Kern mit.
+ *
+ * ProfileAvatar entscheidet selbst, welche Quelle gewinnt (Bibliothek vor
+ * Upload), deshalb werden beide Werte unveraendert weitergegeben.
+ */
+export async function getOwnProfileImage(supabase: SupabaseLikeClient, userId: string) {
+  const table = supabase.from("profiles") as ProfilesTableAccess;
+  const { data, error } = await table.select("avatar_id,avatar_url").eq("user_id", userId).maybeSingle();
+
+  if (error || !data) return { avatarId: null, imageUrl: null };
+  const row = data as { avatar_id: string | null; avatar_url: string | null };
+  return {
+    avatarId: row.avatar_id?.trim() || null,
+    imageUrl: row.avatar_url?.trim() || null,
+  };
+}
