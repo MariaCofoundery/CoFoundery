@@ -180,39 +180,152 @@ Heute existieren drei Vokabulare, die scheinbar dasselbe beschreiben. Zwei davon
 
 Die Funktionsachse bekommt acht Familien als obere Ebene und feinere Bereiche darunter. Deckung rollt nach oben auf, Suche und Selbstbeschreibung greifen nach unten durch. Acht Zeilen sind als Deckungsansicht lesbar, fuenfzehn nicht mehr.
 
-| Familie | Beispielbereiche darunter |
-|---|---|
-| Customer & Market | Customer Discovery, User Research, Marktanalyse, Wettbewerbsanalyse, Branchenverstaendnis, Segmentierung |
-| Product & Value Proposition | Product Discovery, Product Management, UX, Prototyping, Product Strategy, Value Proposition |
-| Strategy & Business Model | Geschaeftsmodell, Positionierung, Pricing, strategische Planung, Geschaeftsmodelltests |
-| Technology & Delivery | Software Engineering, Architektur, Data, AI/ML, Hardware, Produktion, Service Delivery |
-| Commercial & Growth | B2B Sales, B2C Acquisition, Marketing, Performance Marketing, Partnerships, Customer Success, Growth, Community |
-| Finance & Funding | Finanzplanung, Cashflow, Runway, Unit Economics, Accounting, Fundraising, Investor Relations |
-| Operations, People & Organisation | Operations, Prozessgestaltung, Recruiting, Hiring, People Management, Organisationsstruktur |
-| Legal, Governance, Risk & Compliance | Gesellschaftsrecht, IP, Datenschutz, Compliance, Security, Regulatorik, Governance |
+Die acht Familien mit ihren IDs:
 
-Die Bereichsliste unterhalb der Familien ist bewusst als Beispielmenge notiert. Die kuratierte Taxonomie entsteht mit dem Snapshot und soll gross genug fuer relevante Unterschiede und klein genug fuer tatsaechliche Nutzung sein.
-
-### 4.3 Mapping der Bestandslisten
-
-| Familie | Discovery-Rolle | `focus_skill` |
+| ID | DE | EN |
 |---|---|---|
-| Customer & Market | `research` | - |
-| Product & Value Proposition | `product`, `design` | Product |
-| Strategy & Business Model | `strategy` | - |
-| Technology & Delivery | `tech` | Tech |
-| Commercial & Growth | `sales`, `marketing`, `growth`, `community` | Sales, Marketing |
-| Finance & Funding | `finance` | Finance |
-| Operations, People & Organisation | `operations` | Operations |
-| Legal, Governance, Risk & Compliance | - | - |
-| (Auffangwert) | `other` | Sonstiges |
+| `customer_market` | Kunden & Markt | Customer & Market |
+| `product_value` | Produkt & Nutzenversprechen | Product & Value Proposition |
+| `strategy_business_model` | Strategie & Geschaeftsmodell | Strategy & Business Model |
+| `technology_delivery` | Technologie & Umsetzung | Technology & Delivery |
+| `commercial_growth` | Vertrieb & Wachstum | Commercial & Growth |
+| `finance_funding` | Finanzen & Finanzierung | Finance & Funding |
+| `operations_people` | Operations, People & Organisation | Operations, People & Organisation |
+| `legal_governance` | Recht, Governance & Compliance | Legal, Governance & Compliance |
+
+### 4.3 Kuratierte Bereichsliste
+
+42 Bereiche, vier bis sieben pro Familie. Die Groesse ist bewusst gewaehlt: Der Snapshot fragt zuerst die Familien, danach erscheinen nur die Bereiche der gewaehlten Familien. Wer zwei bis drei Familien waehlt, sieht rund zehn bis zwanzig Bereiche - eine Menge, die man tatsaechlich durchklickt.
+
+**`customer_market`**
+
+| ID | DE | EN |
+|---|---|---|
+| `customer_discovery` | Customer Discovery & Kundeninterviews | Customer Discovery |
+| `user_research` | User Research | User Research |
+| `market_analysis` | Markt- & Wettbewerbsanalyse | Market & Competitive Analysis |
+| `target_segments` | Zielgruppen & Segmentierung | Segmentation |
+| `industry_domain` | Branchen- & Domaenenwissen | Industry & Domain Knowledge |
+
+**`product_value`**
+
+| ID | DE | EN |
+|---|---|---|
+| `product_discovery` | Product Discovery | Product Discovery |
+| `product_management` | Product Management | Product Management |
+| `product_strategy` | Product Strategy & Roadmap | Product Strategy & Roadmap |
+| `ux_design` | UX & Interface Design | UX & Interface Design |
+| `prototyping` | Prototyping | Prototyping |
+
+**`strategy_business_model`**
+
+| ID | DE | EN |
+|---|---|---|
+| `business_model` | Geschaeftsmodell | Business Model |
+| `pricing` | Pricing & Monetarisierung | Pricing & Monetisation |
+| `positioning` | Positionierung | Positioning |
+| `strategic_planning` | Strategische Planung | Strategic Planning |
+
+**`technology_delivery`**
+
+| ID | DE | EN |
+|---|---|---|
+| `software_engineering` | Software-Entwicklung | Software Engineering |
+| `technical_architecture` | Technische Architektur | Technical Architecture |
+| `data_analytics` | Data & Analytics | Data & Analytics |
+| `ai_ml` | AI & Machine Learning | AI & Machine Learning |
+| `hardware_production` | Hardware & Produktion | Hardware & Production |
+| `service_delivery` | Service Delivery | Service Delivery |
+
+**`commercial_growth`**
+
+| ID | DE | EN |
+|---|---|---|
+| `b2b_sales` | B2B Sales | B2B Sales |
+| `b2c_growth` | B2C Wachstum & Akquise | B2C Growth & Acquisition |
+| `marketing_brand` | Marketing & Brand | Marketing & Brand |
+| `performance_marketing` | Performance Marketing | Performance Marketing |
+| `partnerships` | Partnerships & Business Development | Partnerships & Business Development |
+| `customer_success` | Customer Success | Customer Success |
+| `community` | Community | Community |
+
+**`finance_funding`**
+
+| ID | DE | EN |
+|---|---|---|
+| `financial_planning` | Finanzplanung & Forecast | Financial Planning & Forecasting |
+| `unit_economics` | Unit Economics | Unit Economics |
+| `accounting_controlling` | Buchhaltung & Controlling | Accounting & Controlling |
+| `fundraising` | Fundraising | Fundraising |
+| `investor_relations` | Investor Relations | Investor Relations |
+
+**`operations_people`**
+
+| ID | DE | EN |
+|---|---|---|
+| `operations` | Operations | Operations |
+| `process_design` | Prozesse & Tooling | Process Design & Tooling |
+| `recruiting` | Recruiting & Hiring | Recruiting & Hiring |
+| `people_management` | Fuehrung & People Management | Leadership & People Management |
+| `org_design` | Organisationsaufbau | Organisational Design |
+
+**`legal_governance`**
+
+| ID | DE | EN |
+|---|---|---|
+| `corporate_legal` | Gesellschaftsrecht & Vertraege | Corporate Law & Contracts |
+| `ip` | IP & Marken | IP & Trademarks |
+| `data_protection` | Datenschutz | Data Protection |
+| `compliance_regulatory` | Compliance & Regulatorik | Compliance & Regulation |
+| `security` | Security | Security |
+
+**Auffangwert**
+
+| ID | DE | EN |
+|---|---|---|
+| `other` | Anderer Schwerpunkt | Other |
+
+Ein globaler Auffangwert mit Freitextfeld, nicht einer pro Familie. Haeufen sich dort Eintraege, ist das das Signal fuer die naechste Ueberarbeitung der Liste.
+
+### 4.4 Drei bewusste Unschaerfen dieser Liste
+
+1. **`commercial_growth` ist die groesste Familie** mit sieben Bereichen, weil sie vier der zwoelf Discovery-Rollen aufnimmt. Falls sie die Deckungsansicht spaeter dominiert, ist sie der erste Kandidat fuer eine Teilung in Sales und Marketing/Growth.
+2. **Die Grenze zwischen `product_strategy` und `strategy_business_model` ist die weichste.** Produktstrategie liegt bewusst bei Produkt, weil Founder sie dort suchen; Geschaeftsmodellfragen liegen in der Strategiefamilie. Bei Nutzertests ist das die Stelle, an der Fehlzuordnungen zu erwarten sind.
+3. **`legal_governance` hat heute null Bestandsdaten.** Diese Familie wird bei jedem bestehenden Profil zunaechst `nicht_erhoben` anzeigen. Das ist korrekt und kein Fehler - aber es ist der Grund, warum die Deckungsansicht erst nach dem Snapshot Sinn ergibt.
+
+### 4.5 Mapping der Bestandslisten
+
+| Bestandswert | Quelle | Familie | vorgeschlagener Bereich |
+|---|---|---|---|
+| `tech` | Discovery | `technology_delivery` | `software_engineering` |
+| `product` | Discovery | `product_value` | `product_management` |
+| `design` | Discovery | `product_value` | `ux_design` |
+| `sales` | Discovery | `commercial_growth` | `b2b_sales` |
+| `growth` | Discovery | `commercial_growth` | `b2c_growth` |
+| `marketing` | Discovery | `commercial_growth` | `marketing_brand` |
+| `community` | Discovery | `commercial_growth` | `community` |
+| `operations` | Discovery | `operations_people` | `operations` |
+| `finance` | Discovery | `finance_funding` | `financial_planning` |
+| `strategy` | Discovery | `strategy_business_model` | `strategic_planning` |
+| `research` | Discovery | `customer_market` | `user_research` |
+| `other` | Discovery | - | `other` |
+| Tech | `focus_skill` | `technology_delivery` | `software_engineering` |
+| Product | `focus_skill` | `product_value` | `product_management` |
+| Sales | `focus_skill` | `commercial_growth` | `b2b_sales` |
+| Marketing | `focus_skill` | `commercial_growth` | `marketing_brand` |
+| Operations | `focus_skill` | `operations_people` | `operations` |
+| Finance | `focus_skill` | `finance_funding` | `financial_planning` |
+| Sonstiges | `focus_skill` | - | `other` |
+| Allrounder | `focus_skill` | - | - |
+
+**Die Familie wird uebernommen, der Bereich nur vorgeschlagen.** Eine Rolle ist breiter als ein Bereich: Wer bei Discovery `tech` angegeben hat, macht vielleicht Architektur und nicht Software-Entwicklung. Die Familie ist damit belastbar, der Bereich ist eine Vermutung. Der Snapshot zeigt sie als Vorauswahl, die die Person bestaetigt oder aendert - eine stille Zuordnung waere genau die Art unbelegter Behauptung, die dieses Modell vermeiden soll.
 
 Zwei Bestandswerte gehen nicht in die Funktionsachse ueber:
 
 - **`Allrounder`** ist keine Funktion, sondern eine Aussage ueber Breite. Das ergibt sich kuenftig von selbst, wenn jemand mehrere Familien belegt hat.
-- **`Legal, Governance, Risk & Compliance`** hat heute keine Entsprechung. Fuer ein Pre-Seed-Team ist das folgenlos, ab Seed sind Arbeitsrecht, IP und Vertraege echte Bereiche.
+- **`legal_governance`** hat umgekehrt keine Entsprechung in den Bestandslisten. Fuer ein Pre-Seed-Team ist das folgenlos, ab Seed sind Arbeitsrecht, IP und Vertraege echte Bereiche.
 
-Die Migrationskosten dieser Umstellung sind derzeit praktisch null: Es existieren zwei Discovery-Profile und ein Connect-Profil.
+Die Migrationskosten dieser Umstellung sind derzeit praktisch null: Es existieren zwei Discovery-Profile und ein Connect-Profil. Stand 07.09.2026 haben 17 von 19 Nutzern einen `focus_skill`-Wert oder gar keine Fachangabe.
 
 ---
 
@@ -534,13 +647,13 @@ Diese drei Punkte waren Abwaegungen, keine Sachzwaenge. Sie sind hier festgehalt
 2. **Was passiert mit `focus_skill`?** Einfachauswahl aus acht Werten, fliesst mit Gewicht 20 in `profileCompletion` ein. Abloesen bedeutet, dass sich sichtbare Vollstaendigkeitsprozente aller Bestandsnutzer aendern.
 3. **Sichtbarkeitsgrenze fuer Lebenslaufdaten.** Ausbildung, Zertifikate und Stationen mit Arbeitgeber und Zeitraum sind Profiling-relevant. Die Public-Visibility-Spec haelt fest, dass neue Profilfelder nicht automatisch oeffentlich werden - fuer diese Felder braucht es eine ausdrueckliche Entscheidung.
 4. **Team-Ebene ohne Team.** Gilt die Deckungsansicht nur fuer bestehende Founder-Teams, oder auch fuer ein Duo in der Discovery-Pruefphase?
-5. **Kuratierte Bereichsliste.** Wie viele Bereiche pro Familie sind gross genug fuer relevante Unterschiede und klein genug fuer tatsaechliche Nutzung?
+5. **Bereichsliste im Nutzertest.** Die Liste in Kapitel 4.3 steht, aber ungetestet. Die drei bekannten Unschaerfen sind in 4.4 notiert; zu pruefen ist vor allem, ob `commercial_growth` mit sieben Bereichen zu dominant wirkt und ob die Grenze zwischen `product_strategy` und der Strategiefamilie verstanden wird.
 
 ---
 
 ## 19. Baureihenfolge
 
-1. **Funktionsvokabular final** - die acht Familien plus kuratierte Bereichsliste, Mapping auf die drei Bestandslisten (Kapitel 4)
+1. ~~**Funktionsvokabular final**~~ - erledigt am 07.09.2026: acht Familien, 42 Bereiche, Mapping der Bestandswerte (Kapitel 4). Als Code entsteht die Liste erst mit Schritt 3, damit keine ungenutzte Konstante im Repo liegt.
 2. **person_core Phase 2** - Leser auf den Kern umstellen
 3. **Snapshot v0.1 als der eine Profil-Ort** - Phase 3 des Profilzusammenzugs und der Capability-Snapshot sind dieselbe Arbeit, nicht zwei Schritte
 4. **person_core Phase 4** - Doppelspalten und tote Spalten loeschen
