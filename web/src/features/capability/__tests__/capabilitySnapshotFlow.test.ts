@@ -1,0 +1,198 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+import {
+  APPLICATION_LEVELS,
+  OWNERSHIP_WISHES,
+  SNAPSHOT_STEPS,
+  groupEntriesByFamily,
+  isSnapshotStep,
+  parseApplicationLevel,
+  parseOwnershipWish,
+  type CapabilityArea,
+  type CapabilityEntry,
+  type CapabilityFamily,
+} from "@/features/capability/capabilityTypes";
+
+const source = (path: string) => readFileSync(path, "utf8");
+
+const families: CapabilityFamily[] = [
+  { family_id: "commercial_growth", sort_order: 5 },
+  { family_id: "product_value", sort_order: 2 },
+  { family_id: "legal_governance", sort_order: 8 },
+];
+const areas: CapabilityArea[] = [
+  { area_id: "product_management", family_id: "product_value", sort_order: 2 },
+  { area_id: "product_discovery", family_id: "product_value", sort_order: 1 },
+  { area_id: "b2b_sales", family_id: "commercial_growth", sort_order: 1 },
+];
+const entry = (areaId: string, over: Partial<CapabilityEntry> = {}): CapabilityEntry => ({
+  id: `entry-${areaId}`,
+  area_id: areaId,
+  application_level: null,
+  ownership_wish: null,
+  evidence: [],
+  ...over,
+});
+
+// ---------------------------------------------------------------------------
+// Eingabepruefung
+// ---------------------------------------------------------------------------
+test("levels and ownership wishes only accept documented values", () => {
+  assert.deepEqual([...APPLICATION_LEVELS], [1, 2, 3, 4, 5]);
+  assert.equal(parseApplicationLevel("3"), 3);
+  assert.equal(parseApplicationLevel("0"), null, "es gibt keine Stufe 0");
+  assert.equal(parseApplicationLevel("6"), null);
+  assert.equal(parseApplicationLevel(""), null, "leer bleibt leer statt Stufe 1");
+  assert.equal(parseApplicationLevel(null), null);
+
+  assert.equal(parseOwnershipWish("prefer_other"), "prefer_other");
+  assert.equal(parseOwnershipWish("vielleicht"), null);
+  assert.equal(parseOwnershipWish(""), null, "kein Default-Ownership-Wunsch");
+});
+
+test("only the three snapshot steps are routable", () => {
+  assert.deepEqual([...SNAPSHOT_STEPS], ["evidence", "areas", "ownership"]);
+  assert.ok(isSnapshotStep("areas"));
+  assert.equal(isSnapshotStep("summary"), false);
+  assert.equal(isSnapshotStep(undefined), false);
+});
+
+// ---------------------------------------------------------------------------
+// Gruppierung
+// ---------------------------------------------------------------------------
+test("entries group by family in vocabulary order and empty families disappear", () => {
+  const grouped = groupEntriesByFamily(
+    [entry("b2b_sales"), entry("product_management"), entry("product_discovery")],
+    areas,
+    families
+  );
+  assert.deepEqual(
+    grouped.map((group) => group.familyId),
+    ["product_value", "commercial_growth"],
+    "Familien nach sort_order, legal_governance ohne Eintrag entfaellt"
+  );
+  assert.deepEqual(
+    grouped[0].entries.map((item) => item.area_id),
+    ["product_discovery", "product_management"],
+    "Bereiche innerhalb der Familie in Vokabularreihenfolge"
+  );
+});
+
+test("an entry for an unknown area is skipped rather than crashing the view", () => {
+  const grouped = groupEntriesByFamily([entry("gibt_es_nicht"), entry("b2b_sales")], areas, families);
+  assert.deepEqual(grouped.map((group) => group.familyId), ["commercial_growth"]);
+});
+
+// ---------------------------------------------------------------------------
+// Vertraege im Code
+// ---------------------------------------------------------------------------
+test("the ownership wish list matches the database check constraint", () => {
+  const migration = source("../supabase/migrations/20260907160000_create_capability_snapshot_v01.sql");
+  const clause = migration.match(/ownership_wish in \(([\s\S]*?)\)/)?.[1] ?? "";
+  const declared = (clause.match(/'[a-z_]+'/g) ?? []).map((value) => value.replaceAll("'", ""));
+  assert.deepEqual(
+    declared.slice().sort(),
+    [...OWNERSHIP_WISHES].sort(),
+    "TypeScript und Check-Constraint muessen dieselben Zustaende kennen"
+  );
+});
+
+test("selecting away an area keeps a narrated proof", () => {
+  const actions = source("src/features/capability/capabilityActions.ts");
+  // Ein abgewaehlter Haken darf keinen erzaehlten Beleg vernichten.
+  assert.match(actions, /person_capability_evidence \?\? \[\]\)\.length === 0/);
+});
+
+test("the snapshot never writes a level or an ownership wish on its own", () => {
+  const actions = source("src/features/capability/capabilityActions.ts");
+  assert.match(actions, /if \(level !== null\)/, "eine vorhandene Stufe wird nur bei Angabe ueberschrieben");
+  assert.doesNotMatch(actions, /application_level: 1\b/, "kein Default auf die niedrigste Stufe");
+  assert.doesNotMatch(actions, /ownership_wish: "unclear"/, "kein Default-Ownership-Wunsch");
+});
+
+// ---------------------------------------------------------------------------
+// Seite
+// ---------------------------------------------------------------------------
+test("the profile page is member-only, uncrawlable and inside the product shell", () => {
+  const page = source("src/app/(product)/profile/page.tsx");
+  assert.match(page, /redirect\("\/login\?next=\/profile"\)/, "ohne Login kein Profil");
+
+  const robots = source("src/app/robots.ts");
+  assert.match(robots, /"\/profile"/, "das Profil gehoert nicht in den Index");
+
+  const chrome = source("src/features/navigation/productChromePath.ts");
+  assert.match(chrome, /pathname === "\/profile"/, "die Seite braucht die Produkt-Navigation");
+});
+
+test("the ownership step asks the negation, not the affirmation", () => {
+  const de = JSON.parse(source("messages/de/capability.json"));
+  const en = JSON.parse(source("messages/en/capability.json"));
+  assert.match(de.ownership.title, /nicht dauerhaft verantworten/);
+  assert.match(en.ownership.title, /not want to own/);
+});
+
+test("the result view says that a gap may only be a missing entry", () => {
+  const de = JSON.parse(source("messages/de/capability.json"));
+  const en = JSON.parse(source("messages/en/capability.json"));
+  // Kapitel 12 des Briefs, Regel 2: Unvollstaendigkeit immer mitsagen.
+  assert.match(de.summary.incompleteNote, /noch nicht eingetragen/);
+  assert.match(en.summary.incompleteNote, /not entered it yet/);
+});
+
+test("German and English capability messages are key-parallel", () => {
+  const flatten = (value: unknown, prefix = ""): string[] =>
+    value && typeof value === "object" && !Array.isArray(value)
+      ? Object.entries(value as Record<string, unknown>).flatMap(([key, nested]) =>
+          flatten(nested, prefix ? `${prefix}.${key}` : key)
+        )
+      : [prefix];
+  const de = flatten(JSON.parse(source("messages/de/capability.json"))).sort();
+  const en = flatten(JSON.parse(source("messages/en/capability.json"))).sort();
+  assert.deepEqual(de, en);
+});
+
+test("every area and family in the migration has a label in both locales", () => {
+  const migration = source("../supabase/migrations/20260907160000_create_capability_snapshot_v01.sql");
+  const de = JSON.parse(source("messages/de/capability.json"));
+  const en = JSON.parse(source("messages/en/capability.json"));
+
+  const areaBlock = migration.split("insert into public.capability_areas")[1] ?? "";
+  const areaIds = [...new Set((areaBlock.match(/\('([a-z_0-9]+)', '[a-z_]+', \d+\)/g) ?? []).map((row) => row.split("'")[1]))];
+  assert.ok(areaIds.length >= 42, `nur ${areaIds.length} Bereiche aus der Migration gelesen`);
+
+  for (const areaId of areaIds) {
+    assert.ok(de.areaLabels[areaId], `DE-Label fehlt fuer ${areaId}`);
+    assert.ok(en.areaLabels[areaId], `EN-Label fehlt fuer ${areaId}`);
+  }
+
+  const familyIds = [...new Set((migration.match(/\('([a-z_]+)', \d+\)/g) ?? []).map((row) => row.split("'")[1]))];
+  for (const familyId of familyIds) {
+    assert.ok(de.families[familyId], `DE-Label fehlt fuer Familie ${familyId}`);
+    assert.ok(en.families[familyId], `EN-Label fehlt fuer Familie ${familyId}`);
+  }
+});
+
+test("query parameters are validated before they reach the translator", () => {
+  const page = source("src/app/(product)/profile/page.tsx");
+  const de = JSON.parse(source("messages/de/capability.json"));
+
+  // next-intl wirft bei einem fehlenden Schluessel. Ungeprueft weitergegebene
+  // Query-Parameter wuerden die Seite dadurch mit einem 500 beenden.
+  assert.match(page, /SAVED_KEYS\.includes/);
+  assert.match(page, /ERROR_KEYS\.includes/);
+  assert.doesNotMatch(page, /t\(`success\.\$\{params\.saved\}`\)/);
+  assert.doesNotMatch(page, /t\(`errors\.\$\{params\.error\}`\)/);
+
+  const savedKeys = (page.match(/const SAVED_KEYS = \[([^\]]*)\]/)?.[1] ?? "")
+    .split(",")
+    .map((value) => value.trim().replaceAll('"', ""))
+    .filter(Boolean);
+  const errorKeys = (page.match(/const ERROR_KEYS = \[([^\]]*)\]/)?.[1] ?? "")
+    .split(",")
+    .map((value) => value.trim().replaceAll('"', ""))
+    .filter(Boolean);
+
+  assert.deepEqual(savedKeys.slice().sort(), Object.keys(de.success).sort());
+  assert.deepEqual(errorKeys.slice().sort(), Object.keys(de.errors).sort());
+});

@@ -1,0 +1,137 @@
+{
+  "eyebrow": "Profil",
+  "title": "Was du mitbringst",
+  "text": "Ein kurzer Überblick über deine praktische Erfahrung, was du übernehmen möchtest und was du entwickeln willst. Drei bis fünf Minuten. Du kannst jederzeit ergänzen.",
+  "steps": {
+    "evidence": "Eine Sache erzählen",
+    "areas": "Bereiche ergänzen",
+    "ownership": "Verantwortung klären"
+  },
+  "evidence": {
+    "title": "Erzähl von einer Sache, die du zuletzt selbst hinbekommen hast.",
+    "text": "Kein Lebenslauf, kein Anschreiben. Eine konkrete Sache, bei der du weißt: das habe ich gemacht. Sie darf aus dem Job kommen, aus einem eigenen Projekt, dem Ehrenamt oder ganz woanders.",
+    "narrativeLabel": "Was war das?",
+    "narrativePlaceholder": "Zum Beispiel: Ich habe unseren ersten Enterprise-Kunden von der ersten Mail bis zum unterschriebenen Vertrag begleitet – inklusive der beiden Absagen davor.",
+    "narrativeHint": "Mindestens {min} Zeichen. Zwei bis drei Sätze reichen völlig.",
+    "areaLabel": "Wozu gehört das am ehesten?",
+    "areaPlaceholder": "Bereich wählen",
+    "areaHint": "Nicht perfekt passend? Nimm das Nächstliegende – du kannst es später ändern.",
+    "levelLabel": "Wie oft hast du das schon gemacht?",
+    "submit": "Weiter",
+    "skip": "Überspringen und direkt Bereiche wählen"
+  },
+  "areas": {
+    "title": "Was kannst du außerdem?",
+    "text": "Wähle zuerst die Felder, in denen du tatsächlich gearbeitet hast. Danach erscheinen die konkreten Bereiche. Bewusst nur das Wichtigste – nicht alles, was du schon einmal angefasst hast.",
+    "familyLabel": "Bereiche in {family}",
+    "empty": "Noch nichts ausgewählt.",
+    "submit": "Weiter",
+    "back": "Zurück"
+  },
+  "ownership": {
+    "title": "Was davon möchtest du nicht dauerhaft verantworten?",
+    "text": "Etwas zu können heißt nicht, es dauerhaft verantworten zu wollen. Diese Frage stellt Gründerinnen und Gründern sonst selten jemand – und sie klärt später viel.",
+    "noEntries": "Du hast bisher keine Bereiche ausgewählt.",
+    "submit": "Snapshot abschließen",
+    "back": "Zurück"
+  },
+  "levels": {
+    "label": "Erfahrung",
+    "1": "Noch nicht praktisch angewandt",
+    "2": "Mit Unterstützung ausprobiert",
+    "3": "Selbstständig angewandt",
+    "4": "Wiederholt angewandt",
+    "5": "Auch in schwierigen Situationen angewandt, kann andere unterstützen",
+    "unset": "Noch nicht eingestuft"
+  },
+  "ownershipWishes": {
+    "label": "Verantwortung",
+    "own": "Möchte ich verantwortlich übernehmen",
+    "contribute": "Möchte ich aktiv beitragen",
+    "grow_into": "Möchte ich mich hineinentwickeln",
+    "prefer_other": "Lieber eine andere Person",
+    "prefer_external": "Lieber extern abdecken",
+    "unclear": "Noch unklar",
+    "unset": "Noch offen"
+  },
+  "summary": {
+    "title": "Was du mitbringst",
+    "empty": "Hier entsteht dein Bild, sobald du den Snapshot ausgefüllt hast.",
+    "start": "Snapshot starten",
+    "continue": "Snapshot fortsetzen",
+    "edit": "Ergänzen oder ändern",
+    "evidenceTitle": "Wovon du erzählt hast",
+    "removeEvidence": "Entfernen",
+    "wantsToOwn": "Möchtest du übernehmen",
+    "notOwning": "Ausdrücklich nicht dauerhaft",
+    "incompleteNote": "Was hier nicht steht, heißt nur, dass du es noch nicht eingetragen hast."
+  },
+  "families": {
+    "customer_market": "Kunden & Markt",
+    "product_value": "Produkt & Nutzenversprechen",
+    "strategy_business_model": "Strategie & Geschäftsmodell",
+    "technology_delivery": "Technologie & Umsetzung",
+    "commercial_growth": "Vertrieb & Wachstum",
+    "finance_funding": "Finanzen & Finanzierung",
+    "operations_people": "Operations, People & Organisation",
+    "legal_governance": "Recht, Governance & Compliance",
+    "other": "Anderer Schwerpunkt"
+  },
+  "areaLabels": {
+    "customer_discovery": "Customer Discovery & Kundeninterviews",
+    "user_research": "User Research",
+    "market_analysis": "Markt- & Wettbewerbsanalyse",
+    "target_segments": "Zielgruppen & Segmentierung",
+    "industry_domain": "Branchen- & Domänenwissen",
+    "product_discovery": "Product Discovery",
+    "product_management": "Product Management",
+    "product_strategy": "Product Strategy & Roadmap",
+    "ux_design": "UX & Interface Design",
+    "prototyping": "Prototyping",
+    "business_model": "Geschäftsmodell",
+    "pricing": "Pricing & Monetarisierung",
+    "positioning": "Positionierung",
+    "strategic_planning": "Strategische Planung",
+    "software_engineering": "Software-Entwicklung",
+    "technical_architecture": "Technische Architektur",
+    "data_analytics": "Data & Analytics",
+    "ai_ml": "AI & Machine Learning",
+    "hardware_production": "Hardware & Produktion",
+    "service_delivery": "Service Delivery",
+    "b2b_sales": "B2B Sales",
+    "b2c_growth": "B2C Wachstum & Akquise",
+    "marketing_brand": "Marketing & Brand",
+    "performance_marketing": "Performance Marketing",
+    "partnerships": "Partnerships & Business Development",
+    "customer_success": "Customer Success",
+    "community": "Community",
+    "financial_planning": "Finanzplanung & Forecast",
+    "unit_economics": "Unit Economics",
+    "accounting_controlling": "Buchhaltung & Controlling",
+    "fundraising": "Fundraising",
+    "investor_relations": "Investor Relations",
+    "operations": "Operations",
+    "process_design": "Prozesse & Tooling",
+    "recruiting": "Recruiting & Hiring",
+    "people_management": "Führung & People Management",
+    "org_design": "Organisationsaufbau",
+    "corporate_legal": "Gesellschaftsrecht & Verträge",
+    "ip": "IP & Marken",
+    "data_protection": "Datenschutz",
+    "compliance_regulatory": "Compliance & Regulatorik",
+    "security": "Security",
+    "other": "Etwas anderes"
+  },
+  "errors": {
+    "narrative": "Bitte schreibe mindestens zwei kurze Sätze.",
+    "area": "Bitte wähle einen Bereich aus.",
+    "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal."
+  },
+  "success": {
+    "snapshot": "Dein Snapshot ist gespeichert.",
+    "evidence_removed": "Der Eintrag wurde entfernt."
+  },
+  "pending": {
+    "save": "Wird gespeichert …"
+  }
+}

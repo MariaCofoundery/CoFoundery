@@ -3,6 +3,7 @@ import type { AppLocale } from "@/i18n/config";
 import deAssessment from "../../messages/de/assessment.json";
 import deAdvisor from "../../messages/de/advisor.json";
 import deAuth from "../../messages/de/auth.json";
+import deCapability from "../../messages/de/capability.json";
 import deCommon from "../../messages/de/common.json";
 import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
@@ -22,6 +23,7 @@ import deWorkbook from "../../messages/de/workbook.json";
 import enAssessment from "../../messages/en/assessment.json";
 import enAdvisor from "../../messages/en/advisor.json";
 import enAuth from "../../messages/en/auth.json";
+import enCapability from "../../messages/en/capability.json";
 import enCommon from "../../messages/en/common.json";
 import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
@@ -44,6 +46,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     assessment: deAssessment,
     advisor: deAdvisor,
     auth: deAuth,
+    capability: deCapability,
     common: deCommon,
     collaborationLab: deCollaborationLab,
     dashboard: deDashboard,
@@ -65,6 +68,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     assessment: enAssessment,
     advisor: enAdvisor,
     auth: enAuth,
+    capability: enCapability,
     common: enCommon,
     collaborationLab: enCollaborationLab,
     dashboard: enDashboard,

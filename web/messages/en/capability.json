@@ -1,0 +1,137 @@
+{
+  "eyebrow": "Profile",
+  "title": "What you bring",
+  "text": "A short picture of your practical experience, what you want to own and what you want to develop. Three to five minutes. You can always add more later.",
+  "steps": {
+    "evidence": "Tell one story",
+    "areas": "Add areas",
+    "ownership": "Clarify ownership"
+  },
+  "evidence": {
+    "title": "Tell us about something you recently pulled off yourself.",
+    "text": "No CV, no cover letter. One concrete thing where you know: I did that. It can come from work, from your own project, from volunteering or from somewhere else entirely.",
+    "narrativeLabel": "What was it?",
+    "narrativePlaceholder": "For example: I took our first enterprise customer from the first email to a signed contract – including the two rejections before that.",
+    "narrativeHint": "At least {min} characters. Two or three sentences are plenty.",
+    "areaLabel": "Which area does this belong to?",
+    "areaPlaceholder": "Choose an area",
+    "areaHint": "Not a perfect fit? Pick the closest one – you can change it later.",
+    "levelLabel": "How often have you done this?",
+    "submit": "Continue",
+    "skip": "Skip and choose areas directly"
+  },
+  "areas": {
+    "title": "What else can you do?",
+    "text": "Start with the fields you have actually worked in. The concrete areas appear afterwards. Deliberately only the important ones – not everything you have touched once.",
+    "familyLabel": "Areas in {family}",
+    "empty": "Nothing selected yet.",
+    "submit": "Continue",
+    "back": "Back"
+  },
+  "ownership": {
+    "title": "Which of these do you not want to own long term?",
+    "text": "Being able to do something does not mean wanting to be responsible for it. Founders are rarely asked this question – and it settles a lot later on.",
+    "noEntries": "You have not selected any areas yet.",
+    "submit": "Finish snapshot",
+    "back": "Back"
+  },
+  "levels": {
+    "label": "Experience",
+    "1": "Not applied in practice yet",
+    "2": "Tried with support",
+    "3": "Applied independently",
+    "4": "Applied repeatedly",
+    "5": "Applied in demanding situations too, can support others",
+    "unset": "Not rated yet"
+  },
+  "ownershipWishes": {
+    "label": "Ownership",
+    "own": "I want to own this",
+    "contribute": "I want to contribute actively",
+    "grow_into": "I want to grow into it",
+    "prefer_other": "I would prefer someone else",
+    "prefer_external": "I would rather cover it externally",
+    "unclear": "Still unclear",
+    "unset": "Still open"
+  },
+  "summary": {
+    "title": "What you bring",
+    "empty": "Your picture appears here once you have filled in the snapshot.",
+    "start": "Start snapshot",
+    "continue": "Continue snapshot",
+    "edit": "Add or change",
+    "evidenceTitle": "What you told us about",
+    "removeEvidence": "Remove",
+    "wantsToOwn": "You want to own",
+    "notOwning": "Explicitly not long term",
+    "incompleteNote": "Anything not listed here only means you have not entered it yet."
+  },
+  "families": {
+    "customer_market": "Customer & Market",
+    "product_value": "Product & Value Proposition",
+    "strategy_business_model": "Strategy & Business Model",
+    "technology_delivery": "Technology & Delivery",
+    "commercial_growth": "Commercial & Growth",
+    "finance_funding": "Finance & Funding",
+    "operations_people": "Operations, People & Organisation",
+    "legal_governance": "Legal, Governance & Compliance",
+    "other": "Other focus"
+  },
+  "areaLabels": {
+    "customer_discovery": "Customer Discovery",
+    "user_research": "User Research",
+    "market_analysis": "Market & Competitive Analysis",
+    "target_segments": "Segmentation",
+    "industry_domain": "Industry & Domain Knowledge",
+    "product_discovery": "Product Discovery",
+    "product_management": "Product Management",
+    "product_strategy": "Product Strategy & Roadmap",
+    "ux_design": "UX & Interface Design",
+    "prototyping": "Prototyping",
+    "business_model": "Business Model",
+    "pricing": "Pricing & Monetisation",
+    "positioning": "Positioning",
+    "strategic_planning": "Strategic Planning",
+    "software_engineering": "Software Engineering",
+    "technical_architecture": "Technical Architecture",
+    "data_analytics": "Data & Analytics",
+    "ai_ml": "AI & Machine Learning",
+    "hardware_production": "Hardware & Production",
+    "service_delivery": "Service Delivery",
+    "b2b_sales": "B2B Sales",
+    "b2c_growth": "B2C Growth & Acquisition",
+    "marketing_brand": "Marketing & Brand",
+    "performance_marketing": "Performance Marketing",
+    "partnerships": "Partnerships & Business Development",
+    "customer_success": "Customer Success",
+    "community": "Community",
+    "financial_planning": "Financial Planning & Forecasting",
+    "unit_economics": "Unit Economics",
+    "accounting_controlling": "Accounting & Controlling",
+    "fundraising": "Fundraising",
+    "investor_relations": "Investor Relations",
+    "operations": "Operations",
+    "process_design": "Process Design & Tooling",
+    "recruiting": "Recruiting & Hiring",
+    "people_management": "Leadership & People Management",
+    "org_design": "Organisational Design",
+    "corporate_legal": "Corporate Law & Contracts",
+    "ip": "IP & Trademarks",
+    "data_protection": "Data Protection",
+    "compliance_regulatory": "Compliance & Regulation",
+    "security": "Security",
+    "other": "Something else"
+  },
+  "errors": {
+    "narrative": "Please write at least two short sentences.",
+    "area": "Please choose an area.",
+    "save": "That could not be saved just now. Please try again."
+  },
+  "success": {
+    "snapshot": "Your snapshot is saved.",
+    "evidence_removed": "The entry was removed."
+  },
+  "pending": {
+    "save": "Saving …"
+  }
+}
