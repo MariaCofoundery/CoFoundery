@@ -136,6 +136,9 @@ test("connections keep legacy invitation and discovery resume routes without mer
         inviteeUserId: null,
       }),
     ],
+    // Ohne festes now nimmt das Modell die Wanduhr, und das Fixture laeuft am
+    // 2026-09-07T10:00:00Z ab - der Test wurde an diesem Tag von selbst rot.
+    now: new Date("2026-08-24T12:00:00.000Z"),
   });
 
   assert.equal(model.potentialConnections.length, 2);
