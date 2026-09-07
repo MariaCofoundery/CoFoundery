@@ -266,3 +266,32 @@ test("the Connect profile page no longer maintains identity itself", () => {
   assert.doesNotMatch(validation, /display_name: text\(formData/);
   assert.match(actions, /getPersonCore\(client, user\.id\)/);
 });
+
+test("the Discovery profile page no longer maintains identity either", () => {
+  const page = source("src/app/(product)/discovery/profile/page.tsx");
+  const actions = source("src/features/discovery/discoveryActions.ts");
+
+  for (const removed of ["displayName", "headline", "bio", "expertise", "industries", "locationRegion", "remoteMode"]) {
+    assert.doesNotMatch(page, new RegExp(`name="${removed}"`), `${removed} wird hier noch gepflegt`);
+  }
+  // Was hier bleibt, ist kontextspezifisch und hat im Kern keine Entsprechung.
+  for (const kept of ["ownRoles", "seekingRoles", "availabilityHoursPerWeek", "commitmentLevel", "ventureStage", "ventureGoal", "searchIntent", "startHorizon"]) {
+    assert.match(page, new RegExp(`name="${kept}"`), `${kept} gehoert hierher und fehlt`);
+  }
+  assert.match(page, /href="\/profile"/);
+
+  // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
+  assert.match(actions, /parseDiscoveryProfileFormData\(\s*formData: FormData,\s*identity: PersonCore \| null/);
+  assert.match(actions, /displayName: identity\?\.display_name/);
+  assert.doesNotMatch(actions, /displayName: getFirstString/);
+  assert.match(actions, /getPersonCore\(client, userId\)/);
+});
+
+test("both context pages keep their own publication decision", () => {
+  const connect = source("src/app/(product)/connect/profile/page.tsx");
+  const discovery = source("src/app/(product)/discovery/profile/page.tsx");
+  // Der Kern aendert Inhalte, nie die Entscheidung, sie zu zeigen - also muss
+  // jede Kontextseite ihren Veroeffentlichungsschalter behalten.
+  assert.match(connect, /ConnectVisibilityField/);
+  assert.match(discovery, /publishResult|publishProfile|saveProfileDraft/);
+});

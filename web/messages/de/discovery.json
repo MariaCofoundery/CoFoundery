@@ -42,10 +42,22 @@
     }
   },
   "startHorizons": {
-    "now": { "short": "Start: jetzt", "long": "Jetzt oder sehr zeitnah" },
-    "next_3_months": { "short": "Start: nächste 3 Monate", "long": "In den nächsten 3 Monaten" },
-    "next_6_months": { "short": "Start: nächste 6 Monate", "long": "In den nächsten 6 Monaten" },
-    "later_or_flexible": { "short": "Start: später oder flexibel", "long": "Später oder zeitlich flexibel" }
+    "now": {
+      "short": "Start: jetzt",
+      "long": "Jetzt oder sehr zeitnah"
+    },
+    "next_3_months": {
+      "short": "Start: nächste 3 Monate",
+      "long": "In den nächsten 3 Monaten"
+    },
+    "next_6_months": {
+      "short": "Start: nächste 6 Monate",
+      "long": "In den nächsten 6 Monaten"
+    },
+    "later_or_flexible": {
+      "short": "Start: später oder flexibel",
+      "long": "Später oder zeitlich flexibel"
+    }
   },
   "roles": {
     "tech": "Tech",
@@ -430,7 +442,11 @@
       "remoteMode": "Remote-Modus",
       "availability": "Verfügbarkeit pro Woche",
       "availabilityPlaceholder": "z. B. 20",
-      "availabilityV2": "Wie viel Zeit kannst du aktuell realistisch für eine Gründung einbringen?"
+      "availabilityV2": "Wie viel Zeit kannst du aktuell realistisch für eine Gründung einbringen?",
+      "identityTitle": "Name, Headline, Über dich und Region",
+      "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",
+      "identityLink": "Profil bearbeiten",
+      "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Discovery-Profil nicht veröffentlichen."
     },
     "brings": {
       "title": "Was du mitbringst",

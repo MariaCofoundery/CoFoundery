@@ -26,6 +26,7 @@ import {
   normalizeDiscoveryPreferencesInput,
   normalizeDiscoveryProfileInput,
 } from "@/features/discovery/discoveryValidation";
+import { getPersonCore, type PersonCore } from "@/features/profile/personCoreData";
 import { createClient } from "@/lib/supabase/server";
 
 const DISCOVERY_REVALIDATION_PATHS = ["/discovery", "/discovery/profile"] as const;
@@ -111,18 +112,31 @@ function getJsonObject(formData: FormData, names: string[]) {
   return null;
 }
 
-function parseDiscoveryProfileFormData(formData: FormData): DiscoveryProfileInput {
+/**
+ * Identitaet kommt aus person_core, nicht aus diesem Formular. Sie wird an
+ * einem Ort gepflegt - auf /profile - und von dort verteilt. Diese Seite
+ * entscheidet nur noch das Kontextspezifische: eigene und gesuchte Rollen,
+ * Verfuegbarkeit, Commitment, Venture-Phase und -Ziel, Suchabsicht,
+ * Start-Horizont und die Alignment-Praeferenzen.
+ *
+ * locationLabel bleibt vorerst aus dem Formular: es ist ein abgeleitetes
+ * Altfeld ohne Entsprechung im Kern und wird eigenstaendig abgeloest.
+ */
+function parseDiscoveryProfileFormData(
+  formData: FormData,
+  identity: PersonCore | null
+): DiscoveryProfileInput {
   return {
-    displayName: getFirstString(formData, ["displayName", "display_name"]),
-    headline: getFirstString(formData, ["headline"]),
-    bio: getFirstString(formData, ["bio"]),
+    displayName: identity?.display_name ?? "",
+    headline: identity?.headline ?? "",
+    bio: identity?.bio ?? "",
     ownRoles: getStringList(formData, ["ownRoles", "own_roles"]),
     seekingRoles: getStringList(formData, ["seekingRoles", "seeking_roles"]),
-    expertise: getStringList(formData, ["expertise"]),
-    industries: getStringList(formData, ["industries", "industry"]),
+    expertise: identity?.expertise ?? [],
+    industries: identity?.industries ?? [],
     locationLabel: getFirstString(formData, ["locationLabel", "location_label"]),
-    locationRegion: getFirstString(formData, ["locationRegion", "location_region"]),
-    remoteMode: getFirstString(formData, ["remoteMode", "remote_mode"]),
+    locationRegion: identity?.location_region ?? "",
+    remoteMode: identity?.remote_mode ?? "",
     availabilityHoursPerWeek: getFirstString(formData, [
       "availabilityHoursPerWeek",
       "availability_hours_per_week",
@@ -243,7 +257,9 @@ export async function saveDiscoveryProfileDraftAction(
   }
 
   try {
-    const input = normalizeDiscoveryProfileInput(parseDiscoveryProfileFormData(formData));
+    const client = await createClient();
+    const identity = await getPersonCore(client, userId);
+    const input = normalizeDiscoveryProfileInput(parseDiscoveryProfileFormData(formData, identity));
     const existing = await getOwnDiscoveryProfile(userId);
     const keepPublished = existing?.status === "active";
     await upsertOwnDiscoveryProfile(userId, {
@@ -375,7 +391,9 @@ export async function publishDiscoveryProfileFromFormAction(
   }
 
   try {
-    const input = normalizeDiscoveryProfileInput(parseDiscoveryProfileFormData(formData));
+    const client = await createClient();
+    const identity = await getPersonCore(client, userId);
+    const input = normalizeDiscoveryProfileInput(parseDiscoveryProfileFormData(formData, identity));
     const draftInput = {
       ...input,
       status: "draft" as const,

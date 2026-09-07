@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import {
   DISCOVERY_COMMITMENT_OPTIONS,
-  DISCOVERY_REMOTE_MODE_OPTIONS,
   DISCOVERY_ROLE_OPTIONS,
   DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_VENTURE_GOAL_OPTIONS,
@@ -47,6 +46,7 @@ import {
   DISCOVERY_SEARCH_INTENTS,
   DISCOVERY_START_HORIZONS,
 } from "@/features/discovery/discoveryTypes";
+import { getPersonCore } from "@/features/profile/personCoreData";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeLocale } from "@/i18n/config";
 
@@ -347,11 +347,12 @@ export default async function DiscoveryProfilePage({
   }
 
   const locale = normalizeLocale(await getLocale());
-  const [loadedProfile, loadedPreferences, alignmentReadiness, ownAlignmentTendencies] = await Promise.all([
+  const [loadedProfile, loadedPreferences, alignmentReadiness, ownAlignmentTendencies, core] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
     getOwnSearchPreferences(user.id),
     getOwnDiscoveryAssessmentSignalReadiness(user.id),
     getOwnDiscoveryV2AlignmentTendencies({ ownerUserId: user.id, locale }),
+    getPersonCore(supabase, user.id),
   ]);
   const params = await searchParams;
   const publishFeedback = resolveDiscoveryProfilePublishFeedback({
@@ -389,8 +390,6 @@ export default async function DiscoveryProfilePage({
     (profile.ownRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.ownRoles;
   const seekingRolesAtLimit =
     (profile.seekingRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.seekingRoles;
-  const industriesAtLimit =
-    (profile.industries?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.industries;
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
@@ -461,37 +460,25 @@ export default async function DiscoveryProfilePage({
                   </p>
                 </div>
 
-                <div className="mt-5 grid gap-5">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <label>
-                      <span className={LABEL_CLASS}>{t("profile.publicProfile.displayName")}</span>
-                      <input name="displayName" type="text" defaultValue={profile.displayName} maxLength={80} className={FIELD_CLASS} placeholder={t("profile.publicProfile.displayNamePlaceholder")} />
-                    </label>
-                    <label>
-                      <span className={LABEL_CLASS}>{t("profile.publicProfile.headline")}</span>
-                      <input name="headline" type="text" defaultValue={profile.headline} maxLength={160} className={FIELD_CLASS} placeholder={t("profile.publicProfile.headlinePlaceholder")} />
-                    </label>
-                  </div>
-                  <label>
-                    <span className={LABEL_CLASS}>{t("profile.publicProfile.bio")}</span>
-                    <textarea name="bio" defaultValue={profile.bio} rows={5} maxLength={1200} className={FIELD_CLASS} placeholder={t("profile.publicProfile.bioPlaceholder")} />
-                  </label>
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                  <h3 className="text-sm font-semibold">{t("profile.publicProfile.identityTitle")}</h3>
+                  {core?.display_name ? (
+                    <div className="mt-3 space-y-1 text-sm text-slate-700">
+                      <p className="font-medium">{core.display_name}</p>
+                      {core.headline ? <p>{core.headline}</p> : null}
+                      {core.bio ? <p className="line-clamp-2 text-slate-600">{core.bio}</p> : null}
+                      {core.location_region ? <p className="text-slate-600">{core.location_region}</p> : null}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-sm text-amber-900">{t("profile.publicProfile.identityMissing")}</p>
+                  )}
+                  <p className={HELP_CLASS}>{t("profile.publicProfile.identityText")}</p>
+                  <Link href="/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
+                    {t("profile.publicProfile.identityLink")}
+                  </Link>
+                  {/* locationLabel ist ein abgeleitetes Altfeld und bleibt als
+                      verstecktes Feld erhalten, bis es eigenstaendig abgeloest wird. */}
                   <input type="hidden" name="locationLabel" value={profile.locationLabel ?? ""} />
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <label>
-                      <span className={LABEL_CLASS}>{t("profile.publicProfile.locationRegion")}</span>
-                      <input name="locationRegion" type="text" defaultValue={profile.locationRegion ?? ""} maxLength={120} className={FIELD_CLASS} placeholder={t("profile.publicProfile.locationRegionPlaceholder")} />
-                      <span className={HELP_CLASS}>{t("profile.publicProfile.locationRegionHelp")}</span>
-                    </label>
-                    <label>
-                      <span className={LABEL_CLASS}>{t("profile.publicProfile.remoteMode")}</span>
-                      <select name="remoteMode" defaultValue={profile.remoteMode} className={FIELD_CLASS}>
-                        {DISCOVERY_REMOTE_MODE_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>{t(`remoteModes.${option.value}`)}</option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
                 </div>
               </div>
 
@@ -506,19 +493,8 @@ export default async function DiscoveryProfilePage({
                     {limitHint(ownRolesAtLimit, t("profile.publicProfile.ownRolesLimit"))}
                   </div>
                   <label>
-                    <span className={LABEL_CLASS}>{t("profile.publicProfile.expertise")}</span>
-                    <input name="expertise" type="text" defaultValue={(profile.expertise ?? []).join(", ")} className={FIELD_CLASS} placeholder={t("profile.publicProfile.expertisePlaceholder")} />
-                    <span className={HELP_CLASS}>{t("profile.publicProfile.expertiseHelp", { count: DISCOVERY_SELECTION_LIMITS.expertise })}</span>
-                  </label>
-                  <label>
                     <span className={LABEL_CLASS}>{t("profile.publicProfile.availabilityV2")}</span>
                     <input name="availabilityHoursPerWeek" type="number" min={1} max={100} defaultValue={profile.availabilityHoursPerWeek ?? ""} className={FIELD_CLASS} placeholder={t("profile.publicProfile.availabilityPlaceholder")} />
-                  </label>
-                  <label>
-                    <span className={LABEL_CLASS}>{t("profile.publicProfile.industries")}</span>
-                    <input name="industries" type="text" defaultValue={(profile.industries ?? []).join(", ")} className={FIELD_CLASS} placeholder={t("profile.publicProfile.industriesPlaceholder")} />
-                    <p className={HELP_CLASS}>{t("profile.publicProfile.industriesLegacyHelp", { count: DISCOVERY_SELECTION_LIMITS.industries })}</p>
-                    {limitHint(industriesAtLimit, t("profile.publicProfile.industriesLimit"))}
                   </label>
                 </div>
               </div>

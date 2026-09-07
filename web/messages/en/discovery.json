@@ -42,10 +42,22 @@
     }
   },
   "startHorizons": {
-    "now": { "short": "Start: now", "long": "Now or very soon" },
-    "next_3_months": { "short": "Start: next 3 months", "long": "Within the next 3 months" },
-    "next_6_months": { "short": "Start: next 6 months", "long": "Within the next 6 months" },
-    "later_or_flexible": { "short": "Start: later or flexible", "long": "Later or flexible timing" }
+    "now": {
+      "short": "Start: now",
+      "long": "Now or very soon"
+    },
+    "next_3_months": {
+      "short": "Start: next 3 months",
+      "long": "Within the next 3 months"
+    },
+    "next_6_months": {
+      "short": "Start: next 6 months",
+      "long": "Within the next 6 months"
+    },
+    "later_or_flexible": {
+      "short": "Start: later or flexible",
+      "long": "Later or flexible timing"
+    }
   },
   "roles": {
     "tech": "Tech",
@@ -430,7 +442,11 @@
       "remoteMode": "Remote mode",
       "availability": "Availability per week",
       "availabilityPlaceholder": "e.g. 20",
-      "availabilityV2": "How much time can you realistically contribute to a venture right now?"
+      "availabilityV2": "How much time can you realistically contribute to a venture right now?",
+      "identityTitle": "Name, headline, about you and region",
+      "identityText": "You maintain these details in one place in your profile. Changes there appear here immediately.",
+      "identityLink": "Edit profile",
+      "identityMissing": "Nothing entered yet. Without a name, a headline and a text about you, your discovery profile cannot be published."
     },
     "brings": {
       "title": "What you bring",
