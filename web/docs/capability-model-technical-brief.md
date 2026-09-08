@@ -582,20 +582,112 @@ Das gilt fuer die gesamte Modulsprache, nicht nur fuer den Snapshot. Der Anspruc
 
 ---
 
-## 13. Sichtbarkeit und Datenschutz
+## 13. Sichtbarkeit: eine Leiter, keine Matrix
 
-Capability-Daten haben vier Sichtbarkeitsebenen. Sie werden **nicht** im Personen-Kern gefuehrt, sondern in den kontextspezifischen Publikationszeilen - damit bleibt die Grenze aus der Public-Visibility-Spec strukturell erzwungen: Ein neues Kernfeld ist nicht automatisch sichtbar, weil Veroeffentlichung eine eigene Zeile mit eigener Whitelist ist.
+### 13.1 Das Problem
 
-| Ebene | Beispielinhalte |
+Capability-Daten sind nicht gleich sensibel. Vier Arten mit vier verschiedenen Wirkungen:
+
+| Angabe | Charakter | Wirkung nach aussen |
+|---|---|---|
+| **Bereiche** | in welchen Feldern jemand gearbeitet hat | gering; entspricht der heutigen Expertise-Liste |
+| **Erfahrungstiefe** | Selbsteinschaetzung 1 bis 5 | hoch; "Stufe 2" neben einem Bereich liest sich als Eingestaendnis, besonders wo verglichen wird |
+| **Verantwortungswunsch** | will ich das dauerhaft verantworten | heikel; "lieber jemand anders" ist Verhandlungsinformation |
+| **Belege** | erzaehlte Beispiele | wertvollste Inhalte, gleichzeitig die persoenlichsten |
+
+Ein einziger Schalter "Capability zeigen" waere deshalb falsch: Er wuerde erzwingen, die Tiefe zusammen mit den Bereichen freizugeben, und die meisten wuerden dann gar nichts freigeben.
+
+Der naive Ausweg - je Angabe und je Kontext ein Schalter - waere sechs oder mehr Entscheidungen in einem Formular. Das ist keine Freiheit, sondern eine Zumutung, und im Zweifel bleibt alles zu.
+
+### 13.2 Die Loesung: Freigabe entlang der Beziehung
+
+Statt einer Matrix eine **Leiter**. Die Person entscheidet **einmal**, wie weit sie geht; wie viel davon jemand sieht, haengt an der Beziehung zu dieser Person.
+
+| Stufe | Wer sieht was | Default |
+|---|---|---|
+| `private` | niemand ausser dir | **ja** |
+| `areas` | Mitglieder sehen die Bereiche in deinen veroeffentlichten Profilen | |
+| `areas_depth_on_contact` | zusaetzlich Erfahrungstiefe und Verantwortungswunsch, aber nur fuer Menschen mit angenommener Verbindung | |
+
+Damit ist die Entscheidung eine Wahl aus drei Zeilen statt sechs Haken. Und die dritte Stufe erlaubt Grosszuegigkeit ohne Blossstellung: Wer ernsthaft ins Gespraech kommt, sieht mehr als wer nur vorbeischaut.
+
+Die Stufe knuepft an einen Zustand, den es schon gibt - die angenommene Kontaktanfrage in Connect und die angenommene Intro-Anfrage in Discovery. Es entsteht kein neuer Beziehungsbegriff.
+
+**Belege werden in v1 gar nicht angeboten.** Sie sind die reichsten und persoenlichsten Inhalte; eine Stufe anzubieten, die niemand jetzt waehlen sollte, ist schlechter als sie weglassen. Sie gehoeren zur spaeteren Deep Analysis, wo ohnehin nur ein bestehendes Team hineinsieht.
+
+### 13.3 Komposition: drei Bedingungen, keine davon allein genuegt
+
+Capability erscheint in einem Kontext nur, wenn **alle** zutreffen:
+
+```text
+Kontextprofil existiert und ist aktiv        (Entscheidung im Kontext)
+  UND Freigabestufe >= areas                 (Entscheidung auf /profile)
+  UND fuer Tiefe: angenommene Verbindung     (Zustand der Beziehung)
+```
+
+Das ist dieselbe Bauform wie der fruehere Fotovertrag: mehrere unabhaengige Bedingungen, jede einzeln notwendig, keine hinreichend. Sie hat sich als pruefbar erwiesen, und sie verhindert, dass eine einzelne Aenderung versehentlich etwas oeffnet.
+
+### 13.4 Wo die Entscheidung wohnt
+
+Auf den ersten Blick widerspricht die Leiter dem Grundsatz, dass Veroeffentlichungsentscheidungen in den Kontext gehoeren. Sie tut es nicht, weil es zwei verschiedene Fragen sind:
+
+- **"Ist mein Connect-Profil veroeffentlicht?"** ist eine Kontextfrage. Bleibt in Connect.
+- **"Wie viel meiner Capability-Angaben gebe ich ueberhaupt weiter?"** ist eine Eigenschaft der Daten. Gehoert auf `/profile`, direkt neben den Snapshot.
+
+Sie werden beim Lesen zusammengesetzt, nicht beim Schreiben vermischt. Wer sein Connect-Profil depubliziert, aendert damit nichts an der Freigabestufe - und umgekehrt.
+
+### 13.5 Wo es erscheint, und wo ausdruecklich nicht
+
+**Erscheint:**
+
+- Discovery-Profil, Detailseite: Block "Was ich mitbringe"
+- Connect-Profil, Detailseite: derselbe Block
+- Dashboard: Zusammenfassung mit Eingang zu `/profile`
+
+**Erscheint nicht:**
+
+- **Nicht in Suchergebnissen und Listen.** Sobald Bereiche in einer Trefferliste stehen, werden sie zum Filter- oder Sortiersignal, und daraus entsteht ein Passungswert. Das Modell verbietet den ausdruecklich. Capability ist auf der Detailseite beschreibend, nicht in der Liste vergleichend.
+- **Nicht auf oeffentlichen Seiten.** Die oeffentliche Whitelist wurde feldweise festgelegt, und neue Profilfelder werden nicht automatisch oeffentlich. Bereiche plus Tiefe plus Verantwortungswunsch sind zusammen ein recht detailliertes Berufsprofil - deutlich mehr als die heutige Whitelist. Das ist eine eigene Entscheidung fuer einen eigenen Schritt, kein Nebeneffekt.
+- **Nicht als Prozentwert.** Kein Vollstaendigkeitsbalken auf `/profile`, keine Abdeckungsquote im Dashboard.
+
+### 13.6 Was der Leser sieht, wenn nichts freigegeben ist
+
+**Nichts.** Kein leerer Block, kein "keine Angaben", kein ausgegrauter Platzhalter.
+
+Das folgt direkt aus der Kernregel des Modells: Ein fehlender Eintrag ist keine Aussage. Ein sichtbarer Leerplatz macht daraus eine - er liest sich als Luecke, obwohl er nur bedeutet, dass jemand nichts freigegeben hat. Wer nichts zeigt, zeigt nichts, nicht "wenig".
+
+### 13.7 Wie es im Dashboard ineinandergreift
+
+Das Dashboard ist der Anlaufpunkt und soll die naechste sinnvolle Handlung zeigen - nicht einen Zustand bewerten. Drei Faelle:
+
+| Zustand | Was der Block zeigt |
 |---|---|
-| fuer Suche freigebbar | ausgewaehlte Familien und Bereiche, grobe Erfahrung, Ownership-Interessen, Contribution Patterns, Branchenwissen |
-| nach Connection teilbar | detailliertere Bereichsangaben, tiefere Erfahrungsangaben, mehr Ownership-Information |
-| team-privat | Deep Analysis, Team-Deckung, Entwicklungsfelder, vereinbarte Ownership, externe Ressourcenplanung |
-| nur fuer mich | konkrete Beispiele, persoenliche Belege, sensible biografische Angaben, private Selbsteinschaetzungen |
+| Snapshot leer | Einladung, ihn auszufuellen, mit der Zeitangabe |
+| ausgefuellt, Stufe `private` | die eigene Aufstellung plus den Hinweis, dass sie derzeit nur du siehst - mit dem Weg zur Freigabe |
+| ausgefuellt und freigegeben | die Aufstellung plus wo sie erscheint |
+
+Der mittlere Fall ist der wichtige. Er ist heute der Normalzustand und wird sonst nicht erklaert: Man hat etwas ausgefuellt und wundert sich, dass es keine Wirkung hat.
+
+### 13.8 Die vier Ebenen als Begriffsrahmen
+
+Die Leiter ist die Umsetzung fuer v1. Der begriffliche Rahmen bleibt vierstufig und traegt spaetere Erweiterungen:
+
+| Ebene | Beispielinhalte | Umsetzung |
+|---|---|---|
+| fuer Suche freigebbar | Bereiche | Stufe `areas` |
+| nach Verbindung teilbar | Erfahrungstiefe, Verantwortungswunsch | Stufe `areas_depth_on_contact` |
+| team-privat | Belege, Deckungsansicht, vereinbarte Ownership | spaeter, Deep Analysis |
+| nur fuer mich | alles ohne Freigabe | Stufe `private`, Default |
 
 Jede Freigabe ist eine bewusste Owner-Entscheidung mit Default auf der geschlossenen Seite.
 
-**Alignment-Antworten fliessen nicht in Capability-Suche oder -Matching ein.** Das ist keine Bequemlichkeitsregel, sondern folgt aus der Trennung der beiden Modelle.
+**Alignment-Antworten fliessen nicht in Capability-Sichtbarkeit oder -Matching ein.** Das ist keine Bequemlichkeitsregel, sondern folgt aus der Trennung der beiden Modelle.
+
+### 13.9 Offene Frage: Reziprozitaet
+
+Denkbar waere, die Tiefe nur zu zeigen, wer selbst Tiefe freigegeben hat - "du zeigst, ich zeige". Das erhoeht die Ausfuellquote und wirkt fair.
+
+Es hat aber einen Preis: Es macht aus einer freien Entscheidung eine Bedingung, und es benachteiligt Menschen, die aus guten Gruenden zurueckhaltend sind. Fuer v1 nicht vorgesehen, aber bewusst notiert statt uebergangen.
 
 ---
 
