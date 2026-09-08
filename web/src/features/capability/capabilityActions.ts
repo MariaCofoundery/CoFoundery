@@ -7,6 +7,7 @@ import {
   NARRATIVE_MAX_LENGTH,
   NARRATIVE_MIN_LENGTH,
   parseApplicationLevel,
+  parseCapabilityDisclosure,
   parseOwnershipWish,
 } from "./capabilityTypes";
 
@@ -176,4 +177,26 @@ export async function deleteCapabilityEvidenceAction(formData: FormData) {
 
   revalidatePath("/profile");
   redirect("/profile?saved=evidence_removed");
+}
+
+/**
+ * Die Freigabestufe. Eigene Aktion und eigener Abschnitt, weil es eine eigene
+ * Entscheidung ist: was ich eingetragen habe und wie weit ich es weitergebe
+ * sind zwei Fragen.
+ */
+export async function saveCapabilityDisclosureAction(formData: FormData) {
+  const { client, user } = await context();
+  const level = parseCapabilityDisclosure(formData.get("capability_disclosure"));
+
+  const { error } = await client
+    .from("person_core")
+    .update({ capability_disclosure: level })
+    .eq("user_id", user.id);
+  if (error) {
+    revalidatePath("/profile");
+    redirect("/profile?error=save");
+  }
+
+  revalidatePath("/profile");
+  redirect("/profile?saved=disclosure");
 }

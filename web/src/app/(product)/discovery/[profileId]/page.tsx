@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DisclosedCapability } from "@/features/capability/DisclosedCapability";
+import { getDisclosedCapability } from "@/features/capability/capabilityData";
 import {
   getActiveDiscoveryProfileById,
   getDiscoveryV2AlignmentContextForCandidate,
@@ -321,6 +323,12 @@ export default async function DiscoveryProfileDetailPage({
         getDiscoveryV2AlignmentContextForCandidate(user.id, profile.userId),
         getOwnSavedDiscoveryProfileIds(user.id),
       ]);
+  // Die Bedingungen prueft get_disclosed_capability; hier wird nur nicht
+  // gefragt, wenn es das eigene Profil ist.
+  const disclosedCapability = isOwner
+    ? []
+    : await getDisclosedCapability(supabase, profile.userId, "discovery");
+  const capabilityT = await getTranslations("capability");
   const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
   const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
@@ -501,6 +509,17 @@ export default async function DiscoveryProfileDetailPage({
             </p>
           </section>
         ) : null}
+
+        <DisclosedCapability
+          rows={disclosedCapability}
+          copy={{
+            title: capabilityT("foreign.title"),
+            familyLabel: (familyId) => capabilityT(`families.${familyId}`),
+            areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
+            levelLabel: (level) => capabilityT(`levels.${level}`),
+            ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
+          }}
+        />
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">

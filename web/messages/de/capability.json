@@ -150,7 +150,8 @@
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",
     "evidence_removed": "Der Eintrag wurde entfernt.",
-    "identity": "Deine Angaben sind gespeichert."
+    "identity": "Deine Angaben sind gespeichert.",
+    "disclosure": "Deine Freigabe ist gespeichert."
   },
   "pending": {
     "save": "Wird gespeichert …"
@@ -166,5 +167,21 @@
     "text": "Deine Angaben stehen hier. Ob und wie sie in einem Bereich erscheinen, entscheidest du dort.",
     "discovery": "Discovery-Profil",
     "connect": "Connect-Profil"
+  },
+  "disclosure": {
+    "title": "Wie weit gibst du das weiter?",
+    "text": "Deine Angaben gehören dir. Standardmäßig sieht sie niemand außer dir.",
+    "private": "Nur für mich",
+    "privateHint": "Niemand sieht deine Bereiche. Du nutzt den Snapshot für dich.",
+    "areas": "Bereiche zeigen",
+    "areasHint": "Mitglieder sehen in deinen veröffentlichten Profilen, in welchen Bereichen du gearbeitet hast – ohne Erfahrungsstufe und ohne Verantwortungswunsch.",
+    "areas_depth_on_contact": "Bereiche zeigen, Tiefe nach Kontakt",
+    "areas_depth_on_contactHint": "Zusätzlich Erfahrungsstufe und Verantwortungswunsch, aber nur für Menschen, mit denen eine angenommene Verbindung besteht.",
+    "note": "Belege werden nie weitergegeben. Öffentliche Seiten zeigen niemals Capability-Angaben.",
+    "submit": "Freigabe speichern",
+    "currentPrivate": "Derzeit sieht deine Aufstellung niemand außer dir."
+  },
+  "foreign": {
+    "title": "Was diese Person mitbringt"
   }
 }

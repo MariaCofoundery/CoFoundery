@@ -104,3 +104,29 @@ export function groupEntriesByFamily(
       ];
     });
 }
+
+/**
+ * Eine Zeile der freigegebenen Sicht. `application_level` und `ownership_wish`
+ * sind null, solange die Tiefe nicht freigegeben ist - der Leser kann nicht
+ * unterscheiden, ob sie fehlt oder zurueckgehalten wird.
+ */
+export type DisclosedCapabilityRow = {
+  area_id: string;
+  family_id: string;
+  application_level: ApplicationLevel | null;
+  ownership_wish: OwnershipWish | null;
+};
+
+export const CAPABILITY_DISCLOSURE_LEVELS = [
+  "private",
+  "areas",
+  "areas_depth_on_contact",
+] as const;
+export type CapabilityDisclosure = (typeof CAPABILITY_DISCLOSURE_LEVELS)[number];
+
+export function parseCapabilityDisclosure(value: FormDataEntryValue | null): CapabilityDisclosure {
+  const raw = String(value ?? "").trim();
+  return (CAPABILITY_DISCLOSURE_LEVELS as readonly string[]).includes(raw)
+    ? (raw as CapabilityDisclosure)
+    : "private";
+}

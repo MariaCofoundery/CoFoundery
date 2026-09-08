@@ -5,6 +5,7 @@ import type {
   CapabilityArea,
   CapabilityEntry,
   CapabilityFamily,
+  DisclosedCapabilityRow,
 } from "./capabilityTypes";
 
 /**
@@ -55,4 +56,28 @@ export async function getOwnCapabilityEntries(client: SupabaseClient, userId: st
       evidence: raw.person_capability_evidence ?? [],
     } as CapabilityEntry;
   });
+}
+
+/**
+ * Die freigegebene Capability-Sicht auf eine ANDERE Person.
+ *
+ * Die Bedingungen prueft die Datenbank in get_disclosed_capability, damit die
+ * Zusage an einer Stelle steht: aktives Kontextprofil, Freigabestufe
+ * mindestens `areas`, und fuer die Tiefe zusaetzlich eine angenommene
+ * Verbindung. Kommt eine leere Liste zurueck, wird nichts angezeigt - kein
+ * leerer Block, kein Hinweis. Ein sichtbarer Leerplatz wuerde aus einem
+ * fehlenden Eintrag eine Aussage machen.
+ */
+export async function getDisclosedCapability(
+  client: SupabaseClient,
+  userId: string,
+  context: "discovery" | "connect"
+) {
+  const { data, error } = await client.rpc("get_disclosed_capability", {
+    p_user_id: userId,
+    p_context: context,
+  });
+
+  if (error) return [];
+  return (data ?? []) as DisclosedCapabilityRow[];
 }

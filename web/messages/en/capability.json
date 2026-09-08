@@ -150,7 +150,8 @@
   "success": {
     "snapshot": "Your snapshot is saved.",
     "evidence_removed": "The entry was removed.",
-    "identity": "Your details are saved."
+    "identity": "Your details are saved.",
+    "disclosure": "Your sharing setting is saved."
   },
   "pending": {
     "save": "Saving …"
@@ -166,5 +167,21 @@
     "text": "Your details live here. Whether and how they appear in an area is decided there.",
     "discovery": "Discovery profile",
     "connect": "Connect profile"
+  },
+  "disclosure": {
+    "title": "How far do you share this?",
+    "text": "Your entries are yours. By default nobody but you sees them.",
+    "private": "Only me",
+    "privateHint": "Nobody sees your areas. You use the snapshot for yourself.",
+    "areas": "Show areas",
+    "areasHint": "Members see which areas you have worked in, on your published profiles – without the experience level and without the ownership wish.",
+    "areas_depth_on_contact": "Show areas, depth after contact",
+    "areas_depth_on_contactHint": "Additionally the experience level and ownership wish, but only for people you have an accepted connection with.",
+    "note": "Narratives are never shared. Public pages never show capability details.",
+    "submit": "Save sharing",
+    "currentPrivate": "Right now nobody but you sees your overview."
+  },
+  "foreign": {
+    "title": "What this person brings"
   }
 }

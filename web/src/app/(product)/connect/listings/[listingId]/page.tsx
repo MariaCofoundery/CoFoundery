@@ -3,10 +3,15 @@ import { requireConnectMember } from "@/features/connect/connectAccess"; import 
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
 import type { ConnectProfile } from "@/features/connect/connectTypes";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { DisclosedCapability } from "@/features/capability/DisclosedCapability";
+import { getDisclosedCapability } from "@/features/capability/capabilityData";
 export default async function ListingDetail({ params, searchParams }: { params: Promise<{listingId:string}>; searchParams: Promise<Record<string,string|undefined>> }) {
   const { listingId } = await params; const [t, locale, query] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]); const { client, user } = await requireConnectMember(`/connect/listings/${listingId}`); const listing = await getConnectListing(client, listingId); if (!listing) notFound();
   const profileValue = listing.network_profiles; const profile = (Array.isArray(profileValue) ? profileValue[0] : profileValue) as ConnectProfile | null;
   const own = listing.owner_user_id === user.id;
+  // Bedingungen prueft get_disclosed_capability; nur beim eigenen Eintrag wird gar nicht gefragt.
+  const disclosedCapability = own ? [] : await getDisclosedCapability(client, listing.owner_user_id, "connect");
+  const capabilityT = await getTranslations("capability");
   const [contactRequest, blockState] = own ? [null, null] : await Promise.all([getOwnContactRequestForListing(client, user.id, listing.id), getConnectBlockState(client, listing.owner_user_id)]);
   const locations = normalizeConnectLocations(listing.locations);
   const timeframe = formatConnectContentTimeframe(listing.starts_on, listing.ends_on, locale, { from: t("timeframe.from"), until: t("timeframe.until") });
@@ -20,5 +25,16 @@ export default async function ListingDetail({ params, searchParams }: { params: 
     {framework.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.framework")}</h2><p className="mt-2 text-slate-600">{framework.join(" · ")}</p></section> : null}
     {profile ? <section className="mt-8 rounded-2xl bg-slate-50 p-5"><p className="text-xs font-semibold uppercase tracking-[.16em] text-slate-500">{t("detail.person")}</p><div className="mt-3 flex items-center gap-4"><ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" /><div><h2 className="text-xl font-semibold">{profile.display_name}</h2><p className="mt-1 text-sm text-slate-600">{profile.headline}</p></div></div><p className="mt-3 leading-7 text-slate-700">{profile.bio}</p></section> : null}
     {!own ? <section className="mt-8 border-t border-slate-100 pt-6">{blockState?.interaction_blocked ? <p className="text-sm text-slate-600">{t("safety.blockedState")}</p> : !contactRequest ? <Link href={`/connect/listings/${listing.id}/contact`} className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold">{t("contact.cta")}</Link> : <div><p className="font-semibold text-slate-900">{t(`contact.listingStatus.${contactRequest.status}`)}</p><p className="mt-1 text-sm text-slate-600">{t(`contact.statusText.${contactRequest.status}`)}</p><Link href="/connect/contacts" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("contact.openContacts")}</Link></div>}</section> : null}
-  </article></div></main>;
+  </article>
+    <DisclosedCapability
+      rows={disclosedCapability}
+      copy={{
+        title: capabilityT("foreign.title"),
+        familyLabel: (familyId) => capabilityT(`families.${familyId}`),
+        areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
+        levelLabel: (level) => capabilityT(`levels.${level}`),
+        ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
+      }}
+    />
+  </div></main>;
 }

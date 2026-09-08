@@ -357,3 +357,59 @@ test("uploaded photos are no longer reachable without a session", () => {
   // liefert ein leeres Bild. Genau das ist beim ersten Deploy passiert.
   assert.match(avatar, /resolvedSrc\.startsWith\(PHOTO_ROUTE_PREFIX\)/);
 });
+
+// ---------------------------------------------------------------------------
+// Freigabe
+// ---------------------------------------------------------------------------
+test("the disclosure ladder is three rungs, closed by default, and offers no narrative rung", () => {
+  const migration = source("../supabase/migrations/20260908120000_create_capability_disclosure_v01.sql");
+  const de = JSON.parse(source("messages/de/capability.json"));
+
+  assert.match(migration, /capability_disclosure text not null default 'private'/);
+  assert.match(migration, /'private', 'areas', 'areas_depth_on_contact'/);
+  // Kein Feld und kein Text fuer eine Belegfreigabe - eine Stufe, die niemand
+  // waehlen sollte, wird nicht angeboten.
+  assert.equal(de.disclosure.evidence, undefined);
+  assert.match(de.disclosure.note, /Belege werden nie weitergegeben/);
+
+  // Und die Freigabe ist ausdruecklich nicht fuer anon - `revoke from public`
+  // allein genuegt bei Supabase-Default-Privilegien nicht.
+  assert.match(migration, /revoke all on function public\.get_disclosed_capability\(uuid, text\) from anon/);
+  assert.doesNotMatch(migration, /to anon/);
+});
+
+test("a withheld depth is indistinguishable from a missing one", () => {
+  const migration = source("../supabase/migrations/20260908120000_create_capability_disclosure_v01.sql");
+  const view = source("src/features/capability/DisclosedCapability.tsx");
+
+  // Die Tiefe kommt als null zurueck statt als eigener Fall - sonst waere die
+  // Zurueckhaltung selbst eine Aussage.
+  assert.match(migration, /case when eligible\.capability_disclosure = 'areas_depth_on_contact' and eligible\.connected/);
+
+  // Und wer nichts freigegeben hat, erzeugt keinen Block: kein "keine
+  // Angaben", kein Platzhalter. Ein sichtbarer Leerplatz macht aus einem
+  // fehlenden Eintrag eine Aussage.
+  assert.match(view, /if \(rows\.length === 0\) return null/);
+  assert.doesNotMatch(view, /noEntries|empty/);
+});
+
+test("the disclosed block appears on both context pages but never on a public one", () => {
+  for (const page of [
+    "src/app/(product)/discovery/[profileId]/page.tsx",
+    "src/app/(product)/connect/listings/[listingId]/page.tsx",
+  ]) {
+    const body = source(page);
+    assert.match(body, /<DisclosedCapability/, `${page} zeigt den Block nicht`);
+    // Beim eigenen Profil wird gar nicht gefragt.
+    assert.match(body, /(isOwner|own)\s*\?\s*\[\]/, `${page} fragt auch beim eigenen Eintrag`);
+  }
+
+  for (const publicPage of [
+    "src/app/(public-connect)/connect/p/[publicSlug]/page.tsx",
+    "src/app/(public-connect)/connect/l/[publicSlug]/page.tsx",
+  ]) {
+    const body = source(publicPage);
+    assert.doesNotMatch(body, /DisclosedCapability|get_disclosed_capability/,
+      `${publicPage} darf keine Capability zeigen`);
+  }
+});

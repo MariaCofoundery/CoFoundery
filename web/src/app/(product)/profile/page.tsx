@@ -7,12 +7,14 @@ import { ConnectSubmitButton as SubmitButton } from "@/features/connect/ConnectS
 import {
   deleteCapabilityEvidenceAction,
   saveCapabilityAreasAction,
+  saveCapabilityDisclosureAction,
   saveCapabilityEvidenceAction,
   saveCapabilityOwnershipAction,
 } from "@/features/capability/capabilityActions";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import {
   APPLICATION_LEVELS,
+  CAPABILITY_DISCLOSURE_LEVELS,
   NARRATIVE_MIN_LENGTH,
   OWNERSHIP_WISHES,
   groupEntriesByFamily,
@@ -31,7 +33,7 @@ const primary =
 const secondary = "inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold";
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
-const SAVED_KEYS = ["snapshot", "evidence_removed", "identity"];
+const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
 const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
@@ -46,12 +48,15 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
+  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
     getTranslations("capability"),
     searchParams,
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, user.id),
     getPersonCore(supabase, user.id),
+    Promise.resolve(supabase.from("person_core").select("capability_disclosure").eq("user_id", user.id).maybeSingle())
+      .then(({ data }) => (data?.capability_disclosure as string | undefined) ?? "private")
+      .catch(() => "private"),
     // Nur fuer den Hinweis, dass Aenderungen sofort oeffentlich wirken.
     Promise.resolve(supabase.from("network_profiles").select("status").eq("user_id", user.id).maybeSingle())
       .then(({ data }) => data)
@@ -379,6 +384,37 @@ export default async function ProfilePage({
             </div>
           )}
         </section>
+      ) : null}
+
+      {/* Die Freigabe. Eigener Abschnitt, weil es eine eigene Entscheidung ist:
+          was ich eingetragen habe und wie weit ich es weitergebe sind zwei
+          Fragen. Erscheint nur, wenn es ueberhaupt etwas freizugeben gibt. */}
+      {step === null && entries.length > 0 ? (
+        <form action={saveCapabilityDisclosureAction} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
+          <div>
+            <h2 className="text-xl font-semibold">{t("disclosure.title")}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{t("disclosure.text")}</p>
+          </div>
+          <div className="grid gap-3">
+            {CAPABILITY_DISCLOSURE_LEVELS.map((level) => (
+              <label key={level} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4">
+                <input
+                  type="radio"
+                  name="capability_disclosure"
+                  value={level}
+                  defaultChecked={disclosure === level}
+                  className="mt-1"
+                />
+                <span>
+                  <span className="block text-sm font-semibold">{t(`disclosure.${level}`)}</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-600">{t(`disclosure.${level}Hint`)}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("disclosure.note")}</p>
+          <SubmitButton label={t("disclosure.submit")} pendingLabel={t("pending.save")} className={primary} />
+        </form>
       ) : null}
 
       {/* Rueckverweise in die Kontexte. Hier stehen Inhalte, dort wird
