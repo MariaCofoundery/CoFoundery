@@ -10,6 +10,7 @@ import {
   parseCapabilityDisclosure,
   parseOwnershipWish,
 } from "./capabilityTypes";
+import { analyzeNarrativeWithRules } from "./narrativeAnalysis";
 
 async function context() {
   const client = await createClient();
@@ -24,9 +25,12 @@ async function context() {
 // Kontrollfluss ab, aber TypeScript leitet fuer Funktionsdeklarationen kein
 // `never` ab. Ohne die Annotation haelt der Compiler den Code nach jedem
 // back()-Aufruf fuer erreichbar.
-function back(step: string, error?: string): never {
+function back(step: string, error?: string, notice?: string): never {
   revalidatePath("/profile");
-  redirect(`/profile?step=${step}${error ? `&error=${error}` : ""}`);
+  const query = [error ? `error=${error}` : null, notice ? `notice=${notice}` : null]
+    .filter(Boolean)
+    .join("&");
+  redirect(`/profile?step=${step}${query ? `&${query}` : ""}`);
 }
 
 /**
@@ -38,50 +42,66 @@ function back(step: string, error?: string): never {
 export async function saveCapabilityEvidenceAction(formData: FormData) {
   const { client, user } = await context();
   const narrative = String(formData.get("narrative") ?? "").trim();
-  const areaId = String(formData.get("area_id") ?? "").trim();
   const level = parseApplicationLevel(formData.get("application_level"));
 
   if (narrative.length < NARRATIVE_MIN_LENGTH || narrative.length > NARRATIVE_MAX_LENGTH) {
     back("evidence", "narrative");
   }
-  if (!areaId) back("evidence", "area");
 
-  // Der Eintrag muss existieren, bevor der Beleg daran haengen kann. Eine
-  // vorhandene Stufe wird nur ueberschrieben, wenn jetzt eine angegeben ist -
-  // leer heisst leer, nicht Stufe 1.
+  // Das System ordnet zu, nicht die Person. Sie soll erzaehlen, nicht
+  // klassifizieren - die manuelle Bereichsauswahl hat den Blick auf
+  // Arbeitsbereiche verengt, obwohl es um Staerken geht.
+  const analysis = await analyzeNarrativeWithRules({ narrative, locale: "de" });
+
+  // Erkennt die Analyse nichts, wandert die Erzaehlung in den Auffangwert
+  // statt verloren zu gehen. Das ist ehrlicher als eine schlechte Zuordnung,
+  // und haeufende Eintraege dort sind das Signal, die Begriffe zu ueberarbeiten.
+  const suggested = analysis.areas.length ? analysis.areas.map((area) => area.areaId) : ["other"];
+  const primary = suggested[0];
+
   const existing = await client
     .from("person_capability_entries")
-    .select("id,application_level")
+    .select("id,area_id")
     .eq("user_id", user.id)
-    .eq("area_id", areaId)
-    .maybeSingle();
+    .in("area_id", suggested);
+  if (existing.error) back("evidence", "save");
 
-  let entryId = existing.data?.id ?? null;
+  const known = new Map((existing.data ?? []).map((row) => [row.area_id as string, row.id as string]));
+  const missing = suggested.filter((areaId) => !known.has(areaId));
 
-  if (entryId) {
-    if (level !== null) {
-      const { error } = await client
-        .from("person_capability_entries")
-        .update({ application_level: level })
-        .eq("id", entryId);
-      if (error) back("evidence", "save");
-    }
-  } else {
+  if (missing.length) {
     const inserted = await client
       .from("person_capability_entries")
-      .insert({ user_id: user.id, area_id: areaId, application_level: level })
-      .select("id")
-      .single();
-    if (inserted.error) back("evidence", inserted.error.message.includes("area_id") ? "area" : "save");
-    entryId = inserted.data.id;
+      .insert(missing.map((areaId) => ({ user_id: user.id, area_id: areaId })))
+      .select("id,area_id");
+    if (inserted.error) back("evidence", "save");
+    for (const row of inserted.data ?? []) {
+      known.set(row.area_id as string, row.id as string);
+    }
+  }
+
+  const primaryEntryId = known.get(primary);
+  if (!primaryEntryId) back("evidence", "save");
+
+  // Die Stufe gilt fuer den Bereich, dem die Erzaehlung zugeordnet wurde.
+  // Eine vorhandene wird nur ueberschrieben, wenn jetzt eine angegeben ist -
+  // leer heisst leer, nicht Stufe 1.
+  if (level !== null) {
+    const { error } = await client
+      .from("person_capability_entries")
+      .update({ application_level: level })
+      .eq("id", primaryEntryId);
+    if (error) back("evidence", "save");
   }
 
   const { error } = await client
     .from("person_capability_evidence")
-    .insert({ entry_id: entryId, narrative });
+    .insert({ entry_id: primaryEntryId, narrative });
   if (error) back("evidence", "save");
 
-  back("areas");
+  // Zur Bestaetigung: die vorgeschlagenen Bereiche stehen dort schon
+  // angehakt, die Person kann sie aendern.
+  back("areas", undefined, analysis.areas.length ? "recognised" : "unmatched");
 }
 
 /**

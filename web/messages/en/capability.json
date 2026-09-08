@@ -32,12 +32,10 @@
     "narrativeLabel": "What was it, and what was yours to carry?",
     "narrativePlaceholder": "For example: I took our first enterprise customer from the first approach to a signed contract – the proposal, the follow-up questions and the negotiation were mine.",
     "narrativeHint": "Two or three sentences are enough. At least {min} characters.",
-    "areaLabel": "Which area would you file this under?",
-    "areaPlaceholder": "Select an area",
-    "areaHint": "If nothing fits exactly, take the closest area. You can adjust it later.",
     "levelLabel": "And how much experience do you have in that area overall?",
     "submit": "Continue",
-    "skip": "Continue without an example"
+    "skip": "Continue without an example",
+    "assignmentNote": "We take care of filing it under the right area. You can change that in the next step."
   },
   "areas": {
     "title": "Which other areas have you worked in?",
@@ -183,5 +181,9 @@
   },
   "foreign": {
     "title": "What this person brings"
+  },
+  "notices": {
+    "recognised": "We filed your description under one or more areas – already ticked below. Check whether that fits and add what is missing.",
+    "unmatched": "We could not derive an area from your description yet. It is stored under “Other focus” – pick the area below that actually fits."
   }
 }

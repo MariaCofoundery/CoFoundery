@@ -35,6 +35,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
 const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete"];
+const NOTICE_KEYS = ["recognised", "unmatched"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
 export default async function ProfilePage({
@@ -71,6 +72,7 @@ export default async function ProfilePage({
   // einem 500 beenden statt sie nur ohne Hinweis zu rendern.
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
+  const notice = NOTICE_KEYS.includes(params.notice ?? "") ? params.notice : null;
   const { families, areas } = vocabulary;
   const areasByFamily = families.map((family) => ({
     family,
@@ -91,6 +93,9 @@ export default async function ProfilePage({
       ) : null}
       {errorKey ? (
         <p className="mt-6 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p>
+      ) : null}
+      {notice ? (
+        <p className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{t(`notices.${notice}`)}</p>
       ) : null}
 
       {step ? (
@@ -127,24 +132,10 @@ export default async function ProfilePage({
             />
             <span className={hint}>{t("evidence.narrativeHint", { min: NARRATIVE_MIN_LENGTH })}</span>
           </label>
-          <label className="block text-sm font-medium">
-            {t("evidence.areaLabel")}
-            <select required name="area_id" defaultValue="" className={field}>
-              <option value="" disabled>
-                {t("evidence.areaPlaceholder")}
-              </option>
-              {areasByFamily.map(({ family, areas: familyAreas }) => (
-                <optgroup key={family.family_id} label={t(`families.${family.family_id}`)}>
-                  {familyAreas.map((area) => (
-                    <option key={area.area_id} value={area.area_id}>
-                      {areaLabel(area.area_id)}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            <span className={hint}>{t("evidence.areaHint")}</span>
-          </label>
+          {/* Keine Bereichsauswahl mehr: Das System ordnet zu, die Person
+              erzaehlt. Selbst klassifizieren zu muessen hat den Blick auf
+              Arbeitsbereiche verengt, obwohl es um Staerken geht. */}
+          <p className={hint}>{t("evidence.assignmentNote")}</p>
           <fieldset>
             <legend className="text-sm font-medium">{t("evidence.levelLabel")}</legend>
             <div className="mt-3 grid gap-2">

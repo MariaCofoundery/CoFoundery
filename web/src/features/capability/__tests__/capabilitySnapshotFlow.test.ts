@@ -195,6 +195,14 @@ test("query parameters are validated before they reach the translator", () => {
 
   assert.deepEqual(savedKeys.slice().sort(), Object.keys(de.success).sort());
   assert.deepEqual(errorKeys.slice().sort(), Object.keys(de.errors).sort());
+
+  // Dasselbe fuer den Hinweis-Parameter, der mit der Analyse dazukam.
+  assert.match(page, /NOTICE_KEYS\.includes/);
+  const noticeKeys = (page.match(/const NOTICE_KEYS = \[([^\]]*)\]/)?.[1] ?? "")
+    .split(",")
+    .map((value) => value.trim().replaceAll('"', ""))
+    .filter(Boolean);
+  assert.deepEqual(noticeKeys.slice().sort(), Object.keys(de.notices).sort());
 });
 
 // ---------------------------------------------------------------------------
@@ -412,4 +420,41 @@ test("the disclosed block appears on both context pages but never on a public on
     assert.doesNotMatch(body, /DisclosedCapability|get_disclosed_capability/,
       `${publicPage} darf keine Capability zeigen`);
   }
+});
+
+test("the first step no longer asks the person to classify", () => {
+  const page = source("src/app/(product)/profile/page.tsx");
+  const actions = source("src/features/capability/capabilityActions.ts");
+  const de = JSON.parse(source("messages/de/capability.json"));
+
+  // Kein Bereichsfeld mehr im ersten Schritt: erzaehlen, nicht einordnen.
+  // Eingegrenzt auf das Erzaehl-Formular - in Schritt 2 gehoert area_id hin.
+  const evidenceForm = page.slice(
+    page.indexOf("saveCapabilityEvidenceAction}"),
+    page.indexOf("saveCapabilityAreasAction}")
+  );
+  assert.ok(evidenceForm.length > 0, "das Erzaehl-Formular wurde nicht gefunden");
+  assert.doesNotMatch(evidenceForm, /name="area_id"/);
+  assert.match(evidenceForm, /name="narrative"/);
+  assert.equal(de.evidence.areaLabel, undefined, "die alten Auswahltexte sind weg");
+  assert.ok(de.evidence.assignmentNote, "stattdessen der Hinweis, dass zugeordnet wird");
+
+  // Das System ordnet zu, und zwar ueber die auswechselbare Schnittstelle.
+  assert.match(actions, /analyzeNarrativeWithRules\(\{ narrative, locale: "de" \}\)/);
+  // Erkennt sie nichts, geht die Erzaehlung in den Auffangwert statt verloren.
+  assert.match(actions, /analysis\.areas\.length \? analysis\.areas\.map\(\(area\) => area\.areaId\) : \["other"\]/);
+  // Und der Nutzer erfaehrt, welcher der beiden Faelle eingetreten ist.
+  assert.match(actions, /analysis\.areas\.length \? "recognised" : "unmatched"/);
+});
+
+test("the analysis interface is swappable and says which engine ran", () => {
+  const analyzer = source("src/features/capability/narrativeAnalysis.ts");
+  // Der Platz fuer eine abgeleitete Staerke ist vorbereitet, bleibt bei den
+  // Regeln aber leer - eine Auswahlliste waere soziale Erwuenschtheit ohne
+  // Gegengewicht und muesste spaeter wieder weichen.
+  assert.match(analyzer, /strength: string \| null/);
+  assert.match(analyzer, /engine: "rules" \| "model"/);
+  assert.match(analyzer, /strength: null/);
+  // Jeder Vorschlag traegt seine Begruendung mit.
+  assert.match(analyzer, /matchedTerms: string\[\]/);
 });
