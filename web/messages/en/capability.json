@@ -1,7 +1,7 @@
 {
   "eyebrow": "Profile",
   "title": "What you bring",
-  "text": "A short picture of your practical experience, what you want to own and what you want to develop. Three to five minutes. You can always add more later.",
+  "text": "An overview of your practical experience, the areas you want to own and the ones you want to grow into. Around three to five minutes – you can always add more later.",
   "identity": {
     "title": "Who you are",
     "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
@@ -22,26 +22,26 @@
     "publishedNote": "Your Connect profile is published. Changes here are visible there immediately."
   },
   "steps": {
-    "evidence": "Tell one story",
-    "areas": "Add areas",
-    "ownership": "Clarify ownership"
+    "evidence": "One example",
+    "areas": "Areas",
+    "ownership": "Ownership"
   },
   "evidence": {
-    "title": "Tell us about something you recently pulled off yourself.",
-    "text": "No CV, no cover letter. One concrete thing where you know: I did that. It can come from work, from your own project, from volunteering or from somewhere else entirely.",
-    "narrativeLabel": "What was it?",
-    "narrativePlaceholder": "For example: I took our first enterprise customer from the first email to a signed contract – including the two rejections before that.",
-    "narrativeHint": "At least {min} characters. Two or three sentences are plenty.",
-    "areaLabel": "Which area does this belong to?",
-    "areaPlaceholder": "Choose an area",
-    "areaHint": "Not a perfect fit? Pick the closest one – you can change it later.",
-    "levelLabel": "How often have you done this?",
+    "title": "What was the last piece of work you owned and saw through?",
+    "text": "A concrete example says more about your experience than a list of keywords. It does not have to come from a job – your own project, volunteering or freelance work counts just as much.",
+    "narrativeLabel": "What was it, and what was yours to carry?",
+    "narrativePlaceholder": "For example: I took our first enterprise customer from the first approach to a signed contract – the proposal, the follow-up questions and the negotiation were mine.",
+    "narrativeHint": "Two or three sentences are enough. At least {min} characters.",
+    "areaLabel": "Which area would you file this under?",
+    "areaPlaceholder": "Select an area",
+    "areaHint": "If nothing fits exactly, take the closest area. You can adjust it later.",
+    "levelLabel": "And how much experience do you have in that area overall?",
     "submit": "Continue",
-    "skip": "Skip and choose areas directly"
+    "skip": "Continue without an example"
   },
   "areas": {
-    "title": "What else can you do?",
-    "text": "Start with the fields you have actually worked in. The concrete areas appear afterwards. Deliberately only the important ones – not everything you have touched once.",
+    "title": "Which other areas have you worked in?",
+    "text": "Start with the fields you have actually worked in. The specific areas appear afterwards. Focus on what matters rather than everything you have touched once.",
     "familyLabel": "Areas in {family}",
     "empty": "Nothing selected yet.",
     "submit": "Continue",
@@ -49,7 +49,7 @@
   },
   "ownership": {
     "title": "Which of these do you not want to own long term?",
-    "text": "Being able to do something does not mean wanting to be responsible for it. Founders are rarely asked this question – and it settles a lot later on.",
+    "text": "Being able to do something does not mean wanting to be responsible for it. Settling that distinction early saves a lot of misunderstanding later.",
     "noEntries": "You have not selected any areas yet.",
     "submit": "Finish snapshot",
     "back": "Back"

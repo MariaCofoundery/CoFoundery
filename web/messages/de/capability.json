@@ -1,7 +1,7 @@
 {
   "eyebrow": "Profil",
   "title": "Was du mitbringst",
-  "text": "Ein kurzer Überblick über deine praktische Erfahrung, was du übernehmen möchtest und was du entwickeln willst. Drei bis fünf Minuten. Du kannst jederzeit ergänzen.",
+  "text": "Ein Überblick über deine praktische Erfahrung, die Bereiche, die du verantworten möchtest, und die, in die du hineinwachsen willst. Etwa drei bis fünf Minuten – du kannst jederzeit ergänzen.",
   "identity": {
     "title": "Wer du bist",
     "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
@@ -22,26 +22,26 @@
     "publishedNote": "Dein Connect-Profil ist veröffentlicht. Änderungen hier sind dort sofort sichtbar."
   },
   "steps": {
-    "evidence": "Eine Sache erzählen",
-    "areas": "Bereiche ergänzen",
-    "ownership": "Verantwortung klären"
+    "evidence": "Ein Beispiel",
+    "areas": "Bereiche",
+    "ownership": "Verantwortung"
   },
   "evidence": {
-    "title": "Erzähl von einer Sache, die du zuletzt selbst hinbekommen hast.",
-    "text": "Kein Lebenslauf, kein Anschreiben. Eine konkrete Sache, bei der du weißt: das habe ich gemacht. Sie darf aus dem Job kommen, aus einem eigenen Projekt, dem Ehrenamt oder ganz woanders.",
-    "narrativeLabel": "Was war das?",
-    "narrativePlaceholder": "Zum Beispiel: Ich habe unseren ersten Enterprise-Kunden von der ersten Mail bis zum unterschriebenen Vertrag begleitet – inklusive der beiden Absagen davor.",
-    "narrativeHint": "Mindestens {min} Zeichen. Zwei bis drei Sätze reichen völlig.",
-    "areaLabel": "Wozu gehört das am ehesten?",
-    "areaPlaceholder": "Bereich wählen",
-    "areaHint": "Nicht perfekt passend? Nimm das Nächstliegende – du kannst es später ändern.",
-    "levelLabel": "Wie oft hast du das schon gemacht?",
+    "title": "Was war die letzte Aufgabe, die du verantwortet und zu Ende gebracht hast?",
+    "text": "Ein konkretes Beispiel sagt mehr über deine Erfahrung als eine Liste von Stichworten. Es muss nicht aus dem Beruf kommen – ein eigenes Projekt, ein Ehrenamt oder eine Nebentätigkeit zählen genauso.",
+    "narrativeLabel": "Worum ging es, und was lag dabei bei dir?",
+    "narrativePlaceholder": "Zum Beispiel: Ich habe unseren ersten Enterprise-Kunden von der ersten Ansprache bis zum unterschriebenen Vertrag begleitet – Angebot, Rückfragen und Verhandlung lagen bei mir.",
+    "narrativeHint": "Zwei bis drei Sätze genügen. Mindestens {min} Zeichen.",
+    "areaLabel": "Welchem Bereich ordnest du das zu?",
+    "areaPlaceholder": "Bereich auswählen",
+    "areaHint": "Wenn nichts genau passt, nimm den nächstliegenden Bereich. Du kannst das später anpassen.",
+    "levelLabel": "Und wie viel Erfahrung hast du in diesem Bereich insgesamt?",
     "submit": "Weiter",
-    "skip": "Überspringen und direkt Bereiche wählen"
+    "skip": "Ohne Beispiel fortfahren"
   },
   "areas": {
-    "title": "Was kannst du außerdem?",
-    "text": "Wähle zuerst die Felder, in denen du tatsächlich gearbeitet hast. Danach erscheinen die konkreten Bereiche. Bewusst nur das Wichtigste – nicht alles, was du schon einmal angefasst hast.",
+    "title": "In welchen Bereichen hast du außerdem gearbeitet?",
+    "text": "Wähle zuerst die Felder aus, in denen du praktisch tätig warst. Danach erscheinen die konkreten Bereiche. Konzentriere dich auf das Wesentliche, nicht auf alles, was du einmal berührt hast.",
     "familyLabel": "Bereiche in {family}",
     "empty": "Noch nichts ausgewählt.",
     "submit": "Weiter",
@@ -49,7 +49,7 @@
   },
   "ownership": {
     "title": "Was davon möchtest du nicht dauerhaft verantworten?",
-    "text": "Etwas zu können heißt nicht, es dauerhaft verantworten zu wollen. Diese Frage stellt Gründerinnen und Gründern sonst selten jemand – und sie klärt später viel.",
+    "text": "Etwas zu können heißt nicht, dauerhaft dafür verantwortlich sein zu wollen. Diese Unterscheidung früh zu klären erspart später viele Missverständnisse.",
     "noEntries": "Du hast bisher keine Bereiche ausgewählt.",
     "submit": "Snapshot abschließen",
     "back": "Zurück"
