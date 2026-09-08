@@ -562,6 +562,20 @@ Nicht:
 > "Ihr deckt 4 von 6 kritischen Funktionen ab."
 > "Anna passt zu 87 Prozent auf eure Luecke."
 
+### Register
+
+Das Modul erhebt einen anspruchsvollen Gegenstand: Was ein Mensch fachlich mitbringt und wofuer er Verantwortung uebernehmen will. Die Sprache muss diesem Gegenstand entsprechen, sonst wirkt das Ergebnis beliebig - und ein beliebig wirkendes Ergebnis wird nicht ernst genommen, egal wie sorgfaeltig das Modell dahinter ist.
+
+Konkret heisst das:
+
+- **Nach Verantwortung fragen, nicht nach Anekdoten.** "Was war die letzte Aufgabe, die du verantwortet und zu Ende gebracht hast?" statt "Erzaehl von einer Sache, die du hinbekommen hast."
+- **Keine anbiedernde Erleichterung.** Formulierungen wie "Kein Lebenslauf, kein Anschreiben", "ganz einfach", "in nur drei Minuten" klopfen dem Leser auf die Schulter. Kuerze und Aufwand darf man nennen, aber sachlich.
+- **Praezision vor Freundlichkeit, wenn beides nicht geht.** Eine Frage, die zwei Dinge meinen kann, ist kein freundlicher Text, sondern ein unklarer. Beispiel: Die Stufenfrage bezieht sich auf den Bereich insgesamt, nicht auf das erzaehlte Beispiel - und muss das sagen.
+- **Kein Eigenlob im Produkttext.** Saetze wie "diese Frage stellt sonst niemand" gehoeren in die Positionierung, nicht in ein Formular.
+- **Wertschaetzend heisst nicht lobend.** Die Anerkennung liegt darin, dass eine ernsthafte Frage gestellt wird, nicht darin, dass die Antwort gelobt wird.
+
+Das gilt fuer die gesamte Modulsprache, nicht nur fuer den Snapshot. Der Anspruch ist derselbe, den die Alignment-Reports schon einhalten: vorsichtig in der Aussage, aber nie vereinfachend im Ton.
+
 ### Maschinelle Absicherung
 
 `web/src/features/reporting/content/reportCopyGuards.ts` prueft heute gegen `FORBIDDEN_ENGLISH_PHRASES` und ein Prozentanspruchs-Pattern. Capability-Texte sollten in dieselbe Pruefung aufgenommen werden, erweitert um deutsche Begriffe: `euch fehlt`, `ungeeignet`, `vollstaendig aufgestellt`, `sollte uebernehmen`, `schwach in`, sowie `ist eure` oder `ist euer` in Verbindung mit einem Funktionsnamen.
