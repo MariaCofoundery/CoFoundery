@@ -43,6 +43,10 @@ test("active founder and advisor message groups stay structurally symmetric", ()
   const enWorkbook = readJson("messages/en/workbook.json");
   const deFeedback = readJson("messages/de/feedback.json");
   const enFeedback = readJson("messages/en/feedback.json");
+  // Die Diktat-Copy liegt jetzt in common: ein Namensraum fuer alle Felder,
+  // die diktiert werden koennen.
+  const deCommon = readJson("messages/de/common.json");
+  const enCommon = readJson("messages/en/common.json");
   const deAuth = readJson("messages/de/auth.json");
   const enAuth = readJson("messages/en/auth.json");
 
@@ -51,7 +55,8 @@ test("active founder and advisor message groups stay structurally symmetric", ()
   assert.deepEqual(shape(deDashboard), shape(enDashboard));
   assert.deepEqual(shape(deInvite), shape(enInvite));
   assert.deepEqual(shape(deWorkbook.speech), shape(enWorkbook.speech));
-  assert.deepEqual(shape(deFeedback.dictation), shape(enFeedback.dictation));
+  assert.deepEqual(shape(deFeedback), shape(enFeedback));
+  assert.deepEqual(shape(deCommon.dictation), shape(enCommon.dictation));
   assert.deepEqual(shape(deAuth.login), shape(enAuth.login));
 
   assert.equal(
@@ -72,9 +77,11 @@ test("presentation locale controls dates and both speech entry points", () => {
   assert.equal(getSpeechRecognitionLocale("en-GB"), "en-US");
 
   const workbook = source("src/features/reporting/FounderAlignmentWorkbookClient.tsx");
-  const feedback = source("src/features/feedback/ProductFeedbackEntry.tsx");
+  // Das Feedback-Diktat liegt jetzt im gemeinsamen Hook; die Zusage bleibt
+  // dieselbe, sie wird nur an ihrem neuen Ort geprueft.
+  const dictationHook = source("src/features/dictation/useDictation.ts");
   assert.match(workbook, /recognition\.lang = getSpeechRecognitionLocale\(locale\)/);
-  assert.match(feedback, /recognition\.lang = getSpeechRecognitionLocale\(locale\)/);
+  assert.match(dictationHook, /recognition\.lang = getSpeechRecognitionLocale\(locale\)/);
   assert.doesNotMatch(workbook, /new Intl\.DateTimeFormat\("de-DE"/);
 });
 

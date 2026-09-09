@@ -20,6 +20,7 @@ import {
   groupEntriesByFamily,
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
+import { DictatedTextarea } from "@/features/dictation/DictatedTextarea";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
@@ -49,8 +50,9 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
+  const [t, commonT, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
     getTranslations("capability"),
+    getTranslations("common"),
     searchParams,
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, user.id),
@@ -119,11 +121,15 @@ export default async function ProfilePage({
             <h2 className="text-xl font-semibold">{t("evidence.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("evidence.text")}</p>
           </div>
-          <label className="block text-sm font-medium">
+          {/* Diktierbar: Erzaehlen faellt den meisten leichter als schreiben,
+              und wer erzaehlt, schreibt konkreter - genau das braucht die
+              Zuordnung. Getipptes bleibt beim Diktieren erhalten. */}
+          <label className="block text-sm font-medium" htmlFor="capability-narrative">
             {t("evidence.narrativeLabel")}
-            <textarea
-              required
+            <DictatedTextarea
+              id="capability-narrative"
               name="narrative"
+              required
               rows={5}
               minLength={NARRATIVE_MIN_LENGTH}
               maxLength={2000}
@@ -131,6 +137,7 @@ export default async function ProfilePage({
               className={field}
             />
             <span className={hint}>{t("evidence.narrativeHint", { min: NARRATIVE_MIN_LENGTH })}</span>
+            <span className={hint}>{commonT("dictation.browserHint")}</span>
           </label>
           {/* Keine Bereichsauswahl mehr: Das System ordnet zu, die Person
               erzaehlt. Selbst klassifizieren zu muessen hat den Blick auf

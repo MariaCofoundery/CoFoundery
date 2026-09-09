@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import {
@@ -9,7 +9,15 @@ import {
   type ProductFeedbackSource,
 } from "@/features/feedback/productFeedback";
 import { submitProductFeedbackAction } from "@/features/feedback/actions";
-import { getSpeechRecognitionLocale } from "@/i18n/presentationLocale";
+// Das Diktat lag hier zuerst und ist von hier nach @/features/dictation
+// gezogen, weil inzwischen mehrere Felder es brauchen.
+import {
+  DictationBadge,
+  DictationButton,
+  DictationMessage,
+  useDictationCopy,
+} from "@/features/dictation/DictationControls";
+import { useDictation } from "@/features/dictation/useDictation";
 
 type ProductFeedbackEntryProps = {
   source: ProductFeedbackSource;
@@ -17,43 +25,6 @@ type ProductFeedbackEntryProps = {
   variant: "nav" | "workbook";
   triggerClassName?: string;
 };
-
-type BrowserSpeechRecognition = {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-};
-
-type SpeechRecognitionAlternativeLike = {
-  transcript: string;
-};
-
-type SpeechRecognitionResultLike = {
-  isFinal: boolean;
-  0: SpeechRecognitionAlternativeLike;
-};
-
-type SpeechRecognitionEventLike = {
-  resultIndex: number;
-  results: ArrayLike<SpeechRecognitionResultLike>;
-};
-
-type SpeechRecognitionErrorEventLike = {
-  error: string;
-};
-
-type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
-type SpeechSupportState = "unknown" | "supported" | "unsupported";
-type DictationStatus = "idle" | "listening" | "paused" | "ended" | "error";
-
-const DICTATION_INACTIVITY_MS = 9000;
-const DICTATION_RESTART_MS = 250;
 
 export function ProductFeedbackEntry({
   source,
@@ -342,161 +313,9 @@ function FeedbackTextarea({
   required?: boolean;
   rows?: number;
 }) {
-  const t = useTranslations("feedback");
   const locale = useLocale();
-  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
-  const shouldKeepListeningRef = useRef(false);
-  const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const baseValueRef = useRef(value);
-  const finalTranscriptRef = useRef("");
-  const speechSupportState = useSyncExternalStore(
-    subscribeToSpeechSupport,
-    getSpeechSupportSnapshot,
-    getSpeechSupportServerSnapshot
-  );
-  const [speechActive, setSpeechActive] = useState(false);
-  const [dictationStatus, setDictationStatus] = useState<DictationStatus>("idle");
-  const [speechMessage, setSpeechMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (speechActive) return;
-    baseValueRef.current = value;
-  }, [speechActive, value]);
-
-  useEffect(() => {
-    return () => {
-      shouldKeepListeningRef.current = false;
-      clearDictationTimers(inactivityTimeoutRef, restartTimeoutRef);
-      recognitionRef.current?.abort();
-    };
-  }, []);
-
-  function scheduleInactivityTimeout() {
-    clearTimeoutIfSet(inactivityTimeoutRef);
-    inactivityTimeoutRef.current = setTimeout(() => {
-      shouldKeepListeningRef.current = false;
-      clearTimeoutIfSet(restartTimeoutRef);
-      setSpeechActive(false);
-      setDictationStatus("ended");
-      setSpeechMessage(t("dictation.accepted"));
-      recognitionRef.current?.stop();
-    }, DICTATION_INACTIVITY_MS);
-  }
-
-  function finishDictationSession(status: DictationStatus, message: string | null) {
-    shouldKeepListeningRef.current = false;
-    clearDictationTimers(inactivityTimeoutRef, restartTimeoutRef);
-    setSpeechActive(false);
-    setDictationStatus(status);
-    setSpeechMessage(message);
-  }
-
-  function handleSpeechResult(event: SpeechRecognitionEventLike) {
-    let finalizedChunk = finalTranscriptRef.current;
-    let interimChunk = "";
-
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
-      const result = event.results[index];
-      const transcript = result?.[0]?.transcript?.trim();
-      if (!transcript) continue;
-
-      if (result.isFinal) {
-        finalizedChunk = appendSpeechChunk(finalizedChunk, transcript);
-      } else {
-        interimChunk = appendSpeechChunk(interimChunk, transcript);
-      }
-    }
-
-    finalTranscriptRef.current = finalizedChunk;
-    setDictationStatus("listening");
-    setSpeechMessage(null);
-    scheduleInactivityTimeout();
-    onChange(mergeSpeechIntoValue(baseValueRef.current, finalizedChunk, interimChunk));
-  }
-
-  function stopDictation() {
-    finishDictationSession("ended", t("dictation.accepted"));
-    recognitionRef.current?.stop();
-  }
-
-  function startDictation() {
-    if (typeof window === "undefined") return;
-
-    const SpeechRecognitionCtor = getSpeechRecognitionConstructor(window);
-    if (!SpeechRecognitionCtor) {
-      setSpeechMessage(t("dictation.unsupported"));
-      return;
-    }
-
-    const recognition = new SpeechRecognitionCtor();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = getSpeechRecognitionLocale(locale);
-    recognition.onresult = handleSpeechResult;
-    recognition.onerror = (event) => {
-      if (event.error === "no-speech" && shouldKeepListeningRef.current) {
-        setDictationStatus("paused");
-        setSpeechMessage(null);
-        return;
-      }
-
-      finishDictationSession("error", t(`dictation.errors.${mapSpeechErrorKey(event.error)}`));
-    };
-    recognition.onend = () => {
-      if (shouldKeepListeningRef.current) {
-        setDictationStatus("paused");
-        setSpeechMessage(null);
-        clearTimeoutIfSet(restartTimeoutRef);
-        restartTimeoutRef.current = setTimeout(() => {
-          if (!shouldKeepListeningRef.current) return;
-
-          try {
-            recognition.start();
-            setSpeechActive(true);
-            setDictationStatus("listening");
-            setSpeechMessage(null);
-          } catch {
-            finishDictationSession("error", t("dictation.restartFailed"));
-          }
-        }, DICTATION_RESTART_MS);
-        return;
-      }
-
-      if (dictationStatus !== "error") {
-        finishDictationSession("ended", t("dictation.accepted"));
-      }
-    };
-
-    baseValueRef.current = value;
-    finalTranscriptRef.current = "";
-    shouldKeepListeningRef.current = true;
-    clearDictationTimers(inactivityTimeoutRef, restartTimeoutRef);
-    recognitionRef.current?.abort();
-    recognitionRef.current = recognition;
-
-    try {
-      recognition.start();
-      setSpeechActive(true);
-      setDictationStatus("listening");
-      setSpeechMessage(t("dictation.listening"));
-      scheduleInactivityTimeout();
-    } catch {
-      finishDictationSession("error", t("dictation.startFailed"));
-    }
-  }
-
-  function toggleDictation() {
-    if (speechActive) {
-      stopDictation();
-      return;
-    }
-
-    startDictation();
-  }
-
-  const showMicButton = speechSupportState !== "unsupported";
-  const showListeningBadge = speechActive || dictationStatus === "paused";
+  const copy = useDictationCopy();
+  const dictation = useDictation({ value, onChange, locale, copy });
 
   return (
     <label htmlFor={id} className="block">
@@ -512,132 +331,10 @@ function FeedbackTextarea({
           rows={rows}
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-14 text-sm leading-7 text-slate-800 outline-none transition focus:border-[color:var(--brand-primary)] focus:ring-2 focus:ring-[color:var(--brand-primary)]/20"
         />
-        {showMicButton ? (
-          <button
-            type="button"
-            onClick={toggleDictation}
-            className={`absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${
-              speechActive
-                ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
-                : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-            }`}
-            aria-label={speechActive ? t("dictation.stop") : t("dictation.start")}
-            title={speechActive ? t("dictation.stop") : t("dictation.start")}
-          >
-            <MicIcon active={speechActive} />
-          </button>
-        ) : null}
-        {showListeningBadge ? (
-          <div className="pointer-events-none absolute left-4 top-3 inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/92 px-2.5 py-1 text-[11px] text-slate-600 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                speechActive ? "bg-[color:var(--brand-primary)]" : "bg-amber-400"
-              }`}
-            />
-            <span>{speechActive ? t("dictation.recording") : t("dictation.waiting")}</span>
-          </div>
-        ) : null}
+        <DictationButton dictation={dictation} />
+        <DictationBadge dictation={dictation} />
       </div>
-      {speechSupportState === "unsupported" ? (
-        <p className="mt-2 text-xs leading-6 text-slate-500">
-          {t("dictation.unsupportedLong")}
-        </p>
-      ) : speechMessage ? (
-        <p
-          className={`mt-2 text-xs leading-6 ${
-            dictationStatus === "error" ? "text-rose-600" : speechActive ? "text-[color:var(--brand-primary)]" : "text-slate-500"
-          }`}
-        >
-          {speechMessage}
-        </p>
-      ) : null}
+      <DictationMessage dictation={dictation} />
     </label>
   );
-}
-
-function MicIcon({ active }: { active: boolean }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-4.5 w-4.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={active ? 2 : 1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" />
-      <path d="M19 11a7 7 0 0 1-14 0" />
-      <path d="M12 18v3" />
-      <path d="M8 21h8" />
-    </svg>
-  );
-}
-
-function getSpeechRecognitionConstructor(windowObject: Window) {
-  const extendedWindow = windowObject as Window & {
-    SpeechRecognition?: SpeechRecognitionConstructor;
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  };
-
-  return extendedWindow.SpeechRecognition ?? extendedWindow.webkitSpeechRecognition ?? null;
-}
-
-function subscribeToSpeechSupport() {
-  return () => {};
-}
-
-function getSpeechSupportSnapshot(): SpeechSupportState {
-  if (typeof window === "undefined") return "unknown";
-  return getSpeechRecognitionConstructor(window) ? "supported" : "unsupported";
-}
-
-function getSpeechSupportServerSnapshot(): SpeechSupportState {
-  return "unknown";
-}
-
-function clearTimeoutIfSet(timeoutRef: { current: ReturnType<typeof setTimeout> | null }) {
-  if (timeoutRef.current === null) return;
-  clearTimeout(timeoutRef.current);
-  timeoutRef.current = null;
-}
-
-function clearDictationTimers(
-  inactivityTimeoutRef: { current: ReturnType<typeof setTimeout> | null },
-  restartTimeoutRef: { current: ReturnType<typeof setTimeout> | null }
-) {
-  clearTimeoutIfSet(inactivityTimeoutRef);
-  clearTimeoutIfSet(restartTimeoutRef);
-}
-
-function appendSpeechChunk(currentText: string, nextChunk: string) {
-  const trimmedChunk = nextChunk.trim();
-  if (!trimmedChunk) return currentText;
-  if (!currentText.trim()) return trimmedChunk;
-  return `${currentText.trim()} ${trimmedChunk}`;
-}
-
-function mergeSpeechIntoValue(baseValue: string, finalizedChunk: string, interimChunk: string) {
-  const pieces = [baseValue.trim(), finalizedChunk.trim(), interimChunk.trim()].filter(Boolean);
-  if (pieces.length === 0) return "";
-  return pieces.join(baseValue.trim() ? "\n\n" : " ");
-}
-
-function mapSpeechErrorKey(
-  error: string
-): "permission" | "microphone" | "aborted" | "noSpeech" | "generic" {
-  switch (error) {
-    case "not-allowed":
-    case "service-not-allowed":
-      return "permission";
-    case "audio-capture":
-      return "microphone";
-    case "aborted":
-      return "aborted";
-    case "no-speech":
-      return "noSpeech";
-    default:
-      return "generic";
-  }
 }

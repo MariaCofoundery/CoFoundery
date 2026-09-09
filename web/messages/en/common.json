@@ -3,5 +3,25 @@
     "de": "Deutsch",
     "en": "English",
     "switchLabel": "Language"
+  },
+  "dictation": {
+    "start": "Start dictation",
+    "stop": "Stop dictation",
+    "listening": "Listening...",
+    "recording": "Recording",
+    "waiting": "Waiting for speech",
+    "accepted": "Text added. You can keep dictating.",
+    "startFailed": "Recording could not be started right now.",
+    "restartFailed": "Recording could not be restarted.",
+    "unsupported": "Dictation is not available in this browser.",
+    "unsupportedLong": "Dictation is unfortunately not available in this browser.",
+    "browserHint": "Dictation uses your browser's own speech recognition. We do not process anything on top of that – only the text you finally submit is stored.",
+    "errors": {
+      "permission": "Microphone access was not granted.",
+      "microphone": "No microphone could be found.",
+      "aborted": "Recording was stopped.",
+      "noSpeech": "No speech was detected.",
+      "generic": "The recording could not be processed right now."
+    }
   }
 }

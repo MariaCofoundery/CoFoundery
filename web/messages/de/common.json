@@ -3,5 +3,25 @@
     "de": "Deutsch",
     "en": "English",
     "switchLabel": "Sprache"
+  },
+  "dictation": {
+    "start": "Diktat starten",
+    "stop": "Diktat stoppen",
+    "listening": "Ich höre zu ...",
+    "recording": "Aufnahme läuft",
+    "waiting": "Wartet auf Sprache",
+    "accepted": "Text übernommen. Du kannst direkt weiter diktieren.",
+    "startFailed": "Die Aufnahme konnte gerade nicht gestartet werden.",
+    "restartFailed": "Die Aufnahme konnte nicht erneut gestartet werden.",
+    "unsupported": "Diktieren ist in diesem Browser nicht verfügbar.",
+    "unsupportedLong": "Diktieren ist in diesem Browser leider nicht verfügbar.",
+    "browserHint": "Diktieren nutzt die Spracherkennung deines Browsers. Wir verarbeiten dabei nichts zusätzlich – gespeichert wird nur der Text, den du am Ende abschickst.",
+    "errors": {
+      "permission": "Der Mikrofonzugriff wurde nicht freigegeben.",
+      "microphone": "Es konnte kein Mikrofon gefunden werden.",
+      "aborted": "Die Aufnahme wurde beendet.",
+      "noSpeech": "Es wurde gerade keine Sprache erkannt.",
+      "generic": "Die Sprachaufnahme konnte gerade nicht verarbeitet werden."
+    }
   }
 }

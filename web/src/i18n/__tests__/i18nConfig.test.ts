@@ -87,6 +87,9 @@ test("loads English feedback and advisor messages", () => {
   const messages = getMessages("en");
   const feedback = messages.feedback as {
     dialogTitle?: string;
+  };
+  // Die Diktat-Copy liegt in common, weil inzwischen mehrere Felder sie nutzen.
+  const common = messages.common as {
     dictation?: { start?: string };
   };
   const advisor = messages.advisor as {
@@ -105,7 +108,7 @@ test("loads English feedback and advisor messages", () => {
   };
 
   assert.equal(feedback.dialogTitle, "Quick product check");
-  assert.equal(feedback.dictation?.start, "Start dictation");
+  assert.equal(common.dictation?.start, "Start dictation");
   assert.equal(advisor.teamContext?.existingTeam, "Existing team");
   assert.equal(advisor.dashboard?.inviteTeam?.title, "Invite two founders");
   assert.equal(advisor.dashboard?.followUps?.none, "No follow-up set");
