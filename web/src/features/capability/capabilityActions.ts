@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
+  MAX_CONFIRMED_AREAS,
   NARRATIVE_MAX_LENGTH,
   NARRATIVE_MIN_LENGTH,
   parseApplicationLevel,
@@ -38,25 +39,52 @@ function back(step: string, error?: string, notice?: string): never {
  * hinbekommen hat, getaggt auf einen Bereich und eine Anwendungsstufe.
  *
  * Der Beleg haengt am Eintrag, weil er genau diese Einstufung begruendet.
+ *
+ * Zwei Wege fuehren hierher:
+ *
+ *   mit `areas_confirmed`  Die Person hat die erkannten Bereiche im Browser
+ *                          gesehen und ausgewaehlt. Ihre Auswahl gilt - auch
+ *                          eine leere. Wer alle Vorschlaege ablehnt, hat eine
+ *                          Aussage gemacht, und die darf nicht ueberschrieben
+ *                          werden.
+ *   ohne                   Kein JavaScript. Dann ordnet die Regel-Auswertung
+ *                          hier zu, wie bisher - lieber ohne Rueckfrage als
+ *                          gar nicht.
  */
 export async function saveCapabilityEvidenceAction(formData: FormData) {
   const { client, user } = await context();
   const narrative = String(formData.get("narrative") ?? "").trim();
   const level = parseApplicationLevel(formData.get("application_level"));
+  const confirmed = formData.get("areas_confirmed") === "1";
 
   if (narrative.length < NARRATIVE_MIN_LENGTH || narrative.length > NARRATIVE_MAX_LENGTH) {
     back("evidence", "narrative");
   }
 
-  // Das System ordnet zu, nicht die Person. Sie soll erzaehlen, nicht
-  // klassifizieren - die manuelle Bereichsauswahl hat den Blick auf
-  // Arbeitsbereiche verengt, obwohl es um Staerken geht.
-  const analysis = await analyzeNarrativeWithRules({ narrative, locale: "de" });
+  const chosen = confirmed
+    ? [
+        ...new Set(
+          formData
+            .getAll("area_id")
+            .map((value) => String(value).trim())
+            .filter(Boolean)
+        ),
+      ].slice(0, MAX_CONFIRMED_AREAS)
+    : [];
 
-  // Erkennt die Analyse nichts, wandert die Erzaehlung in den Auffangwert
-  // statt verloren zu gehen. Das ist ehrlicher als eine schlechte Zuordnung,
-  // und haeufende Eintraege dort sind das Signal, die Begriffe zu ueberarbeiten.
-  const suggested = analysis.areas.length ? analysis.areas.map((area) => area.areaId) : ["other"];
+  // Die Auswertung bleibt Vorschlag, nicht Befund. Ohne Bestaetigung ordnet
+  // sie zu, weil eine Erzaehlung ohne Bereich niemandem hilft; mit
+  // Bestaetigung ist die Person die Instanz.
+  const analysis = confirmed
+    ? null
+    : await analyzeNarrativeWithRules({ narrative, locale: "de" });
+
+  // Bleibt nichts uebrig - nichts erkannt oder nichts angenommen -, wandert
+  // die Erzaehlung in den Auffangwert statt verloren zu gehen. Das ist
+  // ehrlicher als eine schlechte Zuordnung, und haeufende Eintraege dort sind
+  // das Signal, die Begriffe zu ueberarbeiten.
+  const recognised = confirmed ? chosen : (analysis?.areas ?? []).map((area) => area.areaId);
+  const suggested = recognised.length ? recognised : ["other"];
   const primary = suggested[0];
 
   const existing = await client
@@ -74,7 +102,10 @@ export async function saveCapabilityEvidenceAction(formData: FormData) {
       .from("person_capability_entries")
       .insert(missing.map((areaId) => ({ user_id: user.id, area_id: areaId })))
       .select("id,area_id");
-    if (inserted.error) back("evidence", "save");
+    // Ein unbekannter Bereich kommt aus einem manipulierten Formular, nicht
+    // aus der Oberflaeche. Der Fremdschluessel auf capability_areas faengt ihn
+    // ab; der eigene Fehlerschluessel sagt nur genauer, was war.
+    if (inserted.error) back("evidence", inserted.error.message.includes("area_id") ? "area" : "save");
     for (const row of inserted.data ?? []) {
       known.set(row.area_id as string, row.id as string);
     }
@@ -99,9 +130,11 @@ export async function saveCapabilityEvidenceAction(formData: FormData) {
     .insert({ entry_id: primaryEntryId, narrative });
   if (error) back("evidence", "save");
 
-  // Zur Bestaetigung: die vorgeschlagenen Bereiche stehen dort schon
-  // angehakt, die Person kann sie aendern.
-  back("areas", undefined, analysis.areas.length ? "recognised" : "unmatched");
+  // Der naechste Schritt zeigt alle Bereiche mit den jetzt gesetzten Haken.
+  // Wer bestaetigt hat, soll dort nicht noch einmal gefragt werden, ob die
+  // Zuordnung passt - das ist erledigt; es geht nur noch ums Ergaenzen.
+  const notice = recognised.length ? (confirmed ? "confirmed" : "recognised") : "unmatched";
+  back("areas", undefined, notice);
 }
 
 /**

@@ -32,6 +32,7 @@ export function DictatedTextarea({
   maxLength,
   placeholder,
   className,
+  onValueChange,
 }: {
   id?: string;
   name: string;
@@ -42,11 +43,24 @@ export function DictatedTextarea({
   maxLength?: number;
   placeholder?: string;
   className?: string;
+  /**
+   * Meldet jede Aenderung nach oben - getippt wie diktiert. Bewusst nur eine
+   * Meldung und kein `value`-Prop: Der Wert bleibt hier, und eine Seite, die
+   * mit dem Text noch etwas vorhat (etwa ihn auswerten), spiegelt ihn mit,
+   * statt ihn zu besitzen. So gibt es keine zwei Wahrheiten.
+   */
+  onValueChange?: (value: string) => void;
 }) {
   const locale = useLocale();
   const copy = useDictationCopy();
   const [value, setValue] = useState(defaultValue);
-  const dictation = useDictation({ value, onChange: setValue, locale, copy });
+
+  function update(next: string) {
+    setValue(next);
+    onValueChange?.(next);
+  }
+
+  const dictation = useDictation({ value, onChange: update, locale, copy });
 
   return (
     <>
@@ -55,7 +69,7 @@ export function DictatedTextarea({
           id={id}
           name={name}
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => update(event.target.value)}
           rows={rows}
           required={required}
           minLength={minLength}

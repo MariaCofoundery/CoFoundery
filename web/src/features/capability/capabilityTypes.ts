@@ -34,6 +34,16 @@ export type SnapshotStep = (typeof SNAPSHOT_STEPS)[number];
 export const NARRATIVE_MIN_LENGTH = 10;
 export const NARRATIVE_MAX_LENGTH = 2000;
 
+/**
+ * Wie viele Bereiche eine Person aus den Vorschlaegen bestaetigen kann.
+ *
+ * Drei ist eine Entscheidung, keine technische Grenze: Wer alles anhaken darf,
+ * hakt alles an, und dann sagt die Auswahl nichts mehr. "Bis zu drei" statt
+ * "genau drei", weil eine erzaehlte Aufgabe oft nur einen Bereich trifft -
+ * eine Pflicht auf drei wuerde zum Auffuellen zwingen.
+ */
+export const MAX_CONFIRMED_AREAS = 3;
+
 export type CapabilityFamily = { family_id: string; sort_order: number };
 export type CapabilityArea = { area_id: string; family_id: string; sort_order: number };
 

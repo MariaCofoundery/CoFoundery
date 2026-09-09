@@ -106,13 +106,16 @@ test("the form field keeps its name and its validation", () => {
 });
 
 test("the capability narrative is dictatable and still posts as narrative", () => {
-  const page = source("src/app/(product)/profile/page.tsx");
-  const narrativeField = page.split('name="narrative"')[0]?.slice(-400) ?? "";
+  const start = source("src/features/capability/CapabilitySnapshotStart.tsx");
+  // Nur der Block des Textfelds - "narrative" steht in der Bestaetigungsphase
+  // auch als hidden input, und der traegt zu Recht keine Validierung.
+  const narrativeField = start.slice(start.indexOf("<DictatedTextarea"));
 
-  assert.match(narrativeField, /DictatedTextarea/, "das Feld soll diktierbar sein");
-  assert.match(page, /minLength=\{NARRATIVE_MIN_LENGTH\}/);
+  assert.match(narrativeField, /name="narrative"/, "das Feld muss so heissen");
+  assert.match(narrativeField, /minLength=\{NARRATIVE_MIN_LENGTH\}/);
+  assert.match(narrativeField, /maxLength=\{NARRATIVE_MAX_LENGTH\}/);
   // Die Person soll wissen, wer da zuhoert.
-  assert.match(page, /dictation\.browserHint/);
+  assert.match(start, /dictation\.browserHint/);
 });
 
 test("the dictation logic lives in one place, not next to the field that uses it", () => {

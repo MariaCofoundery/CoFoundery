@@ -35,7 +35,23 @@
     "levelLabel": "And how much experience do you have in that area overall?",
     "submit": "Continue",
     "skip": "Continue without an example",
-    "assignmentNote": "We take care of filing it under the right area. You can change that in the next step."
+    "assignmentNote": "I will suggest which area that is in the next step – confirming it is up to you."
+  },
+  "confirm": {
+    "title": "Here is what I read into it",
+    "text": "I only go by terms in your text – that can fit well and it can be off. So I would rather ask: which of these was genuinely your strength?",
+    "pickLabel": "Pick up to {max}",
+    "matchedTerms": "Recognised from: {terms}",
+    "noneIsFine": "If none of these fit, simply pick nothing. You can set the area yourself in the next step.",
+    "showNarrative": "Show your description",
+    "submit": "That fits, continue",
+    "back": "Edit the text again",
+    "emptyTitle": "This is where I get stuck",
+    "emptyText": "I could not derive an area from your text. That says nothing about your description – my list of terms is limited and does not catch paraphrases. You will pick the area yourself in the next step.",
+    "engine": {
+      "rules": "Assigned from a fixed list of terms inside your browser, without an AI model. Your text is not transmitted for this.",
+      "model": "Assigned by an AI model. The result can be wrong – your selection is what counts."
+    }
   },
   "areas": {
     "title": "Which other areas have you worked in?",
@@ -82,6 +98,34 @@
     "wantsToOwn": "You want to own",
     "notOwning": "Explicitly not long term",
     "incompleteNote": "Anything not listed here only means you have not entered it yet."
+  },
+  "readout": {
+    "title": "What can be read from this",
+    "coverage": "{areas} areas recorded, {levelled} of them with an experience level and {wished} with an ownership preference.",
+    "focus": "Your entries centre on {family}.",
+    "basis": "This readout only places your own entries side by side – experience level and ownership preference. It reads nothing into them, and an empty field only means nothing is written there.",
+    "findings": {
+      "anchor": {
+        "title": "This is where you want to carry the responsibility",
+        "text": "These are the areas you want to be permanently in charge of. In a founding conversation, this is your claim."
+      },
+      "canButHandsOver": {
+        "title": "You can do this – you just do not want to keep it",
+        "text": "You stated depth here and still said someone else should own it permanently. That is not a contradiction but the most important input for dividing roles: you can be counted on when it matters, yet this is not your seat."
+      },
+      "growingInto": {
+        "title": "This is where you want to grow into it",
+        "text": "Responsibility yes, depth of experience not yet. That can be planned for – once it is said out loud."
+      },
+      "contributes": {
+        "title": "Here you contribute without leading it",
+        "text": "You get involved but do not want to be in charge. That tends to ease a division of roles rather than restrict it."
+      },
+      "undecided": {
+        "title": "Here it is still open what you want",
+        "text": "No ownership preference given, or explicitly still unclear. That is a good place for a conversation to start."
+      }
+    }
   },
   "families": {
     "customer_market": "Customer & Market",
@@ -184,6 +228,7 @@
   },
   "notices": {
     "recognised": "We filed your description under one or more areas – already ticked below. Check whether that fits and add what is missing.",
-    "unmatched": "We could not derive an area from your description yet. It is stored under “Other focus” – pick the area below that actually fits."
+    "unmatched": "We could not derive an area from your description yet. It is stored under “Other focus” – pick the area below that actually fits.",
+    "confirmed": "Your selection is saved. Here you can add whatever is still missing."
   }
 }

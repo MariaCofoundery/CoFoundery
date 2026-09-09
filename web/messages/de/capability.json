@@ -35,7 +35,23 @@
     "levelLabel": "Und wie viel Erfahrung hast du in diesem Bereich insgesamt?",
     "submit": "Weiter",
     "skip": "Ohne Beispiel fortfahren",
-    "assignmentNote": "Den passenden Bereich ordnen wir zu. Du kannst das im nächsten Schritt ändern."
+    "assignmentNote": "Welcher Bereich das ist, schlage ich dir im nächsten Schritt vor – bestätigen musst du es."
+  },
+  "confirm": {
+    "title": "Das lese ich daraus",
+    "text": "Ich gehe dabei nur nach Begriffen in deinem Text – das kann gut passen und genauso danebenliegen. Deshalb frage ich lieber: Was davon war wirklich deine Stärke?",
+    "pickLabel": "Wähle bis zu {max} aus",
+    "matchedTerms": "Erkannt an: {terms}",
+    "noneIsFine": "Wenn nichts davon passt, wähle einfach nichts aus. Im nächsten Schritt kannst du den Bereich selbst setzen.",
+    "showNarrative": "Deine Beschreibung ansehen",
+    "submit": "Passt so, weiter",
+    "back": "Text noch ändern",
+    "emptyTitle": "Hier komme ich nicht weiter",
+    "emptyText": "Aus deinem Text konnte ich keinen Bereich ableiten. Das sagt nichts über deine Beschreibung – meine Begriffsliste ist begrenzt und trifft Umschreibungen nicht. Im nächsten Schritt wählst du den Bereich selbst.",
+    "engine": {
+      "rules": "Zugeordnet über eine feste Begriffsliste in deinem Browser, ohne KI-Modell. Dein Text wird dafür nicht übertragen.",
+      "model": "Zugeordnet von einem KI-Modell. Das Ergebnis kann falsch sein – deine Auswahl zählt."
+    }
   },
   "areas": {
     "title": "In welchen Bereichen hast du außerdem gearbeitet?",
@@ -82,6 +98,34 @@
     "wantsToOwn": "Möchtest du übernehmen",
     "notOwning": "Ausdrücklich nicht dauerhaft",
     "incompleteNote": "Was hier nicht steht, heißt nur, dass du es noch nicht eingetragen hast."
+  },
+  "readout": {
+    "title": "Was sich daraus ablesen lässt",
+    "coverage": "{areas} Bereiche erfasst, {levelled} davon mit Erfahrungsstufe und {wished} mit Verantwortungswunsch.",
+    "focus": "Der Schwerpunkt deiner Angaben liegt in {family}.",
+    "basis": "Diese Auswertung stellt nur deine eigenen Angaben nebeneinander – Erfahrungsstufe und Verantwortungswunsch. Sie deutet nichts hinein, und ein leeres Feld heißt nur, dass dort nichts steht.",
+    "findings": {
+      "anchor": {
+        "title": "Hier willst du die Verantwortung tragen",
+        "text": "Das sind die Bereiche, für die du dauerhaft zuständig sein willst. In einem Gründungsgespräch ist das dein Anspruch."
+      },
+      "canButHandsOver": {
+        "title": "Das kannst du – behalten willst du es nicht",
+        "text": "Du hast hier Tiefe angegeben und trotzdem, dass es dauerhaft jemand anders übernehmen soll. Das ist kein Widerspruch, sondern die wichtigste Information für die Rollenverteilung: Ihr könnt auf dich zählen, wenn es brennt, aber es ist nicht dein Platz."
+      },
+      "growingInto": {
+        "title": "Hier willst du hineinwachsen",
+        "text": "Verantwortung ja, Erfahrung noch nicht in der Tiefe. Das lässt sich planen – wenn es ausgesprochen ist."
+      },
+      "contributes": {
+        "title": "Hier arbeitest du mit, ohne es zu führen",
+        "text": "Du bringst dich ein, willst die Zuständigkeit aber nicht. Das entlastet eine Rollenverteilung eher, als dass es sie einschränkt."
+      },
+      "undecided": {
+        "title": "Hier ist noch offen, was du willst",
+        "text": "Kein Verantwortungswunsch angegeben oder ausdrücklich noch unklar. Das ist ein guter Punkt, an dem ein Gespräch anfangen kann."
+      }
+    }
   },
   "families": {
     "customer_market": "Kunden & Markt",
@@ -184,6 +228,7 @@
   },
   "notices": {
     "recognised": "Wir haben deine Beschreibung einem oder mehreren Bereichen zugeordnet – unten schon angehakt. Prüf, ob das passt, und ergänze, was fehlt.",
-    "unmatched": "Aus deiner Beschreibung konnten wir noch keinen Bereich ableiten. Sie ist unter „Anderer Schwerpunkt“ gespeichert – wähle unten den Bereich, der wirklich passt."
+    "unmatched": "Aus deiner Beschreibung konnten wir noch keinen Bereich ableiten. Sie ist unter „Anderer Schwerpunkt“ gespeichert – wähle unten den Bereich, der wirklich passt.",
+    "confirmed": "Deine Auswahl ist gespeichert. Hier kannst du ergänzen, was noch fehlt."
   }
 }

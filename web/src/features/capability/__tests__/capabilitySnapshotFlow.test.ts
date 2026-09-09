@@ -423,28 +423,30 @@ test("the disclosed block appears on both context pages but never on a public on
 });
 
 test("the first step no longer asks the person to classify", () => {
-  const page = source("src/app/(product)/profile/page.tsx");
+  const start = source("src/features/capability/CapabilitySnapshotStart.tsx");
   const actions = source("src/features/capability/capabilityActions.ts");
   const de = JSON.parse(source("messages/de/capability.json"));
 
-  // Kein Bereichsfeld mehr im ersten Schritt: erzaehlen, nicht einordnen.
-  // Eingegrenzt auf das Erzaehl-Formular - in Schritt 2 gehoert area_id hin.
-  const evidenceForm = page.slice(
-    page.indexOf("saveCapabilityEvidenceAction}"),
-    page.indexOf("saveCapabilityAreasAction}")
-  );
-  assert.ok(evidenceForm.length > 0, "das Erzaehl-Formular wurde nicht gefunden");
-  assert.doesNotMatch(evidenceForm, /name="area_id"/);
-  assert.match(evidenceForm, /name="narrative"/);
+  // Kein Bereichsfeld in der Erzaehl-Phase: erzaehlen, nicht einordnen. Der
+  // area_id-Haken kommt erst in der Bestaetigung, und dort mit Begruendung -
+  // deshalb ist die Pruefung auf die erste Phase eingegrenzt.
+  // Die Erzaehl-Phase ist das letzte return - die Bestaetigung kehrt vorher
+  // zurueck, und in der gehoert area_id hin.
+  const writePhase = start.slice(start.lastIndexOf("return ("));
+  assert.ok(writePhase.length > 0, "die Erzaehl-Phase wurde nicht gefunden");
+  assert.doesNotMatch(writePhase, /name="area_id"/);
+  assert.match(writePhase, /name="narrative"/);
   assert.equal(de.evidence.areaLabel, undefined, "die alten Auswahltexte sind weg");
   assert.ok(de.evidence.assignmentNote, "stattdessen der Hinweis, dass zugeordnet wird");
 
-  // Das System ordnet zu, und zwar ueber die auswechselbare Schnittstelle.
+  // Das System ordnet zu, und zwar ueber die auswechselbare Schnittstelle -
+  // im Browser vor der Rueckfrage, auf dem Server nur ohne JavaScript.
+  assert.match(start, /analyzeNarrativeWithRules\(\{ narrative, locale: "de" \}\)/);
   assert.match(actions, /analyzeNarrativeWithRules\(\{ narrative, locale: "de" \}\)/);
-  // Erkennt sie nichts, geht die Erzaehlung in den Auffangwert statt verloren.
-  assert.match(actions, /analysis\.areas\.length \? analysis\.areas\.map\(\(area\) => area\.areaId\) : \["other"\]/);
-  // Und der Nutzer erfaehrt, welcher der beiden Faelle eingetreten ist.
-  assert.match(actions, /analysis\.areas\.length \? "recognised" : "unmatched"/);
+  // Bleibt nichts uebrig, geht die Erzaehlung in den Auffangwert statt verloren.
+  assert.match(actions, /recognised\.length \? recognised : \["other"\]/);
+  // Und der Nutzer erfaehrt, welcher Fall eingetreten ist.
+  assert.match(actions, /recognised\.length \? \(confirmed \? "confirmed" : "recognised"\) : "unmatched"/);
 });
 
 test("the analysis interface is swappable and says which engine ran", () => {

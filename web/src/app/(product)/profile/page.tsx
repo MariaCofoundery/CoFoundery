@@ -11,16 +11,16 @@ import {
   saveCapabilityEvidenceAction,
   saveCapabilityOwnershipAction,
 } from "@/features/capability/capabilityActions";
+import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
+import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
+import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapshotStart";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import {
-  APPLICATION_LEVELS,
   CAPABILITY_DISCLOSURE_LEVELS,
-  NARRATIVE_MIN_LENGTH,
   OWNERSHIP_WISHES,
   groupEntriesByFamily,
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
-import { DictatedTextarea } from "@/features/dictation/DictatedTextarea";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
@@ -36,7 +36,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
 const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete"];
-const NOTICE_KEYS = ["recognised", "unmatched"];
+const NOTICE_KEYS = ["recognised", "confirmed", "unmatched"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
 export default async function ProfilePage({
@@ -50,9 +50,8 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, commonT, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
+  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
     getTranslations("capability"),
-    getTranslations("common"),
     searchParams,
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, user.id),
@@ -83,6 +82,7 @@ export default async function ProfilePage({
   const selectedAreaIds = new Set(entries.map((entry) => entry.area_id));
   const grouped = groupEntriesByFamily(entries, areas, families);
   const areaLabel = (areaId: string) => t(`areaLabels.${areaId}`);
+  const readout = buildCapabilityReadout(entries, areas, families);
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 md:px-8">
@@ -113,54 +113,18 @@ export default async function ProfilePage({
         </ol>
       ) : null}
 
-      {/* Schritt 1: die erzaehlte Sache. Sie ist der Beleg, aus dem die
-          Einstufung abgeleitet wird - nicht eine freie Selbstbewertung. */}
+      {/* Schritt 1: die erzaehlte Sache, dann die Rueckfrage, was davon
+          wirklich eine Staerke war. Beides in einer Client-Komponente, weil
+          die Zuordnung im Browser laeuft und die Person sie vor dem Speichern
+          bestaetigen soll. */}
       {step === "evidence" ? (
-        <form action={saveCapabilityEvidenceAction} className="mt-8 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <div>
-            <h2 className="text-xl font-semibold">{t("evidence.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("evidence.text")}</p>
-          </div>
-          {/* Diktierbar: Erzaehlen faellt den meisten leichter als schreiben,
-              und wer erzaehlt, schreibt konkreter - genau das braucht die
-              Zuordnung. Getipptes bleibt beim Diktieren erhalten. */}
-          <label className="block text-sm font-medium" htmlFor="capability-narrative">
-            {t("evidence.narrativeLabel")}
-            <DictatedTextarea
-              id="capability-narrative"
-              name="narrative"
-              required
-              rows={5}
-              minLength={NARRATIVE_MIN_LENGTH}
-              maxLength={2000}
-              placeholder={t("evidence.narrativePlaceholder")}
-              className={field}
-            />
-            <span className={hint}>{t("evidence.narrativeHint", { min: NARRATIVE_MIN_LENGTH })}</span>
-            <span className={hint}>{commonT("dictation.browserHint")}</span>
-          </label>
-          {/* Keine Bereichsauswahl mehr: Das System ordnet zu, die Person
-              erzaehlt. Selbst klassifizieren zu muessen hat den Blick auf
-              Arbeitsbereiche verengt, obwohl es um Staerken geht. */}
-          <p className={hint}>{t("evidence.assignmentNote")}</p>
-          <fieldset>
-            <legend className="text-sm font-medium">{t("evidence.levelLabel")}</legend>
-            <div className="mt-3 grid gap-2">
-              {APPLICATION_LEVELS.map((level) => (
-                <label key={level} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm">
-                  <input type="radio" name="application_level" value={level} />
-                  {t(`levels.${level}`)}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <div className="flex flex-wrap items-center gap-4">
-            <SubmitButton label={t("evidence.submit")} pendingLabel={t("pending.save")} className={primary} />
-            <Link href="/profile?step=areas" className="text-sm font-semibold text-slate-600 hover:underline">
-              {t("evidence.skip")}
-            </Link>
-          </div>
-        </form>
+        <CapabilitySnapshotStart
+          action={saveCapabilityEvidenceAction}
+          fieldClassName={field}
+          hintClassName={hint}
+          primaryClassName={primary}
+          secondaryClassName={secondary}
+        />
       ) : null}
 
       {/* Schritt 2: Familien aufklappen, darunter die Bereiche. Natives
@@ -323,6 +287,29 @@ export default async function ProfilePage({
           </div>
           <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
         </form>
+      ) : null}
+
+      {/* Die Auswertung steht vor der Liste: Wer die Schritte ausgefuellt hat,
+          soll ein Ergebnis sehen und nicht zuerst seine eigene Eingabe. */}
+      {step === null ? (
+        <CapabilityReadoutSection
+          readout={readout}
+          copy={{
+            title: t("readout.title"),
+            coverage: t("readout.coverage", {
+              areas: readout.areaCount,
+              levelled: readout.levelledCount,
+              wished: readout.wishedCount,
+            }),
+            focus: readout.focusFamilyId
+              ? t("readout.focus", { family: t(`families.${readout.focusFamilyId}`) })
+              : null,
+            basis: t("readout.basis"),
+            findingTitle: (key) => t(`readout.findings.${key}.title`),
+            findingText: (key) => t(`readout.findings.${key}.text`),
+            areaLabel,
+          }}
+        />
       ) : null}
 
       {step === null ? (
