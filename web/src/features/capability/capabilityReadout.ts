@@ -1,3 +1,4 @@
+import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
 import type { CapabilityArea, CapabilityEntry, CapabilityFamily } from "./capabilityTypes";
 
 /**
@@ -24,9 +25,6 @@ import type { CapabilityArea, CapabilityEntry, CapabilityFamily } from "./capabi
  * Bereiche: Ein leeres Feld heisst, dass dort nichts steht - nicht, dass dort
  * nichts ist.
  */
-
-/** Ab hier gilt eine Angabe als Tiefe, nicht als Beruehrung. */
-export const DEPTH_LEVEL = 4;
 
 /** Wuensche, die "jemand anders soll das dauerhaft haben" bedeuten. */
 const HANDS_OVER = ["prefer_other", "prefer_external"] as const;

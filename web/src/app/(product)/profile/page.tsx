@@ -14,6 +14,7 @@ import {
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
 import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
 import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapshotStart";
+import { getComparablePeople, type ComparablePerson } from "@/features/capability/capabilityComparisonData";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import {
   CAPABILITY_DISCLOSURE_LEVELS,
@@ -51,7 +52,7 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles] = await Promise.all([
+  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople] = await Promise.all([
     getTranslations("capability"),
     searchParams,
     getCapabilityVocabulary(supabase),
@@ -71,6 +72,9 @@ export default async function ProfilePage({
     Promise.resolve(supabase.from("profiles").select("roles").eq("user_id", user.id).maybeSingle())
       .then(({ data }) => normalizeProfileRoles(data?.roles ?? null))
       .catch((): ProfileRole[] => []),
+    // Wer verglichen werden darf. Eine leere Liste ist der Normalfall am
+    // Anfang und laesst den Abschnitt einfach entfallen.
+    getComparablePeople(supabase, user.id).catch((): ComparablePerson[] => []),
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
@@ -405,6 +409,29 @@ export default async function ProfilePage({
               </div>
             </div>
           )}
+        </section>
+      ) : null}
+
+      {/* Der Vergleich. Nur mit verbundenen Menschen, und nur wenn es
+          ueberhaupt einen eigenen Snapshot gibt - sonst waere es eine
+          Einladung zu einer leeren Seite. */}
+      {step === null && entries.length > 0 && comparablePeople.length > 0 ? (
+        <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
+          <h2 className="text-xl font-semibold">{t("comparison.sectionTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("comparison.sectionText")}</p>
+          <ul className="mt-4 space-y-2">
+            {comparablePeople.map((person) => (
+              <li key={person.userId}>
+                <Link
+                  href={`/profile/compare/${person.userId}`}
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-2xl border border-slate-200 px-4 text-sm font-semibold hover:bg-slate-50"
+                >
+                  {t("comparison.openFor", { name: person.displayName })}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 

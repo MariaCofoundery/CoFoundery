@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { DEPTH_LEVEL, buildCapabilityReadout } from "@/features/capability/capabilityReadout";
+import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
+import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
 import type {
   ApplicationLevel,
   CapabilityArea,

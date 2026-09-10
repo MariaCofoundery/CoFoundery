@@ -133,6 +133,55 @@
       }
     }
   },
+  "comparison": {
+    "title": "If the two of you were to found together",
+    "intro": "This is not an assessment and not a compatibility score. It places your entries side by side and sorts them by what should be settled before founding.",
+    "basis": "The basis is two self-reports – experience level and ownership preference. This is a conversation starter, not a test instrument, and it does not predict success.",
+    "coverage": "{together} areas in total, {shared} of them entered by both of you, {onlyA} only by you, {onlyB} only by {name}.",
+    "gapNote": "Where entries are missing, nothing is shown. That can mean: not entered – or not shared. We deliberately do not tell those apart, because otherwise holding back would itself be a statement.",
+    "yours": "You",
+    "ownerLabel": "Would sit with {who}",
+    "levelUnset": "no level given",
+    "wishUnset": "no preference given",
+    "overlap": {
+      "high": "You have both entered something almost everywhere. That means plenty of shared language about the work – and probably shared blind spots too.",
+      "balanced": "Your entries overlap in part and complement each other in part.",
+      "low": "You have barely entered the same areas. That means a lot of complementarity – and little shared language about what the other one's work looks like."
+    },
+    "states": {
+      "contested": {
+        "title": "Both of you want to own it",
+        "text": "You are claiming the same responsibility here. This is the question founding teams usually ask too late – and unsettled responsibility has a measurably poor effect. Settle it before it shows up as conflict."
+      },
+      "openPosition": {
+        "title": "Nobody wants to own it",
+        "text": "Neither of you wants to be permanently in charge here. Whether that is a problem depends on what your venture needs – which we do not know. All we say is: it is not filled."
+      },
+      "bothShallow": {
+        "title": "Wanted, but without depth yet",
+        "text": "At least one of you wants to take this on, and neither has stated deep experience here. As a team you are thin at this point."
+      },
+      "handoverPath": {
+        "title": "A path that can be planned",
+        "text": "One of you has depth here and does not want to keep it; the other wants to take it on but is not there yet. That can be planned for – once it is said out loud."
+      },
+      "settled": {
+        "title": "This one already sits",
+        "text": "One of you wants the responsibility and has the experience for it, the other does not want it. Nothing to negotiate here, only to name."
+      },
+      "noBasis": {
+        "title": "Not enough to go on",
+        "text": "For these areas there is not enough information to say anything. That is a finding about the data, not about you."
+      }
+    },
+    "back": "Back to profile",
+    "empty": "There is not enough information yet for a comparison with {name}. That may be down to either of your snapshots, or to how far they are shared.",
+    "fillOwn": "Add to your snapshot",
+    "openFor": "Compare with {name}",
+    "sectionTitle": "Comparison",
+    "sectionText": "With people you are connected to, you can place your snapshots side by side – ordered by what should be settled before founding.",
+    "noneYet": "As soon as a contact request is accepted, that person appears here."
+  },
   "families": {
     "customer_market": "Customer & Market",
     "product_value": "Product & Value Proposition",

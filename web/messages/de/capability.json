@@ -133,6 +133,55 @@
       }
     }
   },
+  "comparison": {
+    "title": "Wenn ihr gemeinsam gründen würdet",
+    "intro": "Das hier ist keine Bewertung und kein Passungswert. Es stellt eure Angaben nebeneinander und sortiert sie danach, was vor einer Gründung geklärt sein sollte.",
+    "basis": "Grundlage sind zwei Selbstauskünfte – Erfahrungsstufe und Verantwortungswunsch. Das ist eine Gesprächsgrundlage, kein Testverfahren, und es sagt nichts über Erfolg vorher.",
+    "coverage": "{together} Bereiche insgesamt, {shared} davon bei euch beiden, {onlyA} nur bei dir, {onlyB} nur bei {name}.",
+    "gapNote": "Wo Angaben fehlen, steht hier nichts. Das kann heißen: nicht eingetragen – oder nicht freigegeben. Wir unterscheiden das absichtlich nicht, sonst wäre Zurückhaltung selbst eine Aussage.",
+    "yours": "Du",
+    "ownerLabel": "Läge bei {who}",
+    "levelUnset": "keine Stufe angegeben",
+    "wishUnset": "kein Wunsch angegeben",
+    "overlap": {
+      "high": "Ihr habt fast überall beide etwas eingetragen. Das heißt: viel gemeinsame Sprache über die Arbeit – und wahrscheinlich auch gemeinsame blinde Flecken.",
+      "balanced": "Eure Angaben überschneiden sich teilweise und ergänzen sich teilweise.",
+      "low": "Ihr habt kaum dieselben Bereiche eingetragen. Das heißt: viel Ergänzung – und wenig gemeinsame Sprache darüber, wie die Arbeit des anderen aussieht."
+    },
+    "states": {
+      "contested": {
+        "title": "Beide wollen es verantworten",
+        "text": "Hier beansprucht ihr dieselbe Zuständigkeit. Das ist die Frage, die in Gründungsteams meist zu spät gestellt wird – und ungeklärte Zuständigkeit wirkt sich messbar schlecht aus. Klärt sie, bevor sie sich als Konflikt äußert."
+      },
+      "openPosition": {
+        "title": "Niemand will es verantworten",
+        "text": "Keiner von euch will hier dauerhaft zuständig sein. Ob das ein Problem ist, hängt daran, was euer Vorhaben braucht – das wissen wir nicht. Wir sagen nur: besetzt ist es nicht."
+      },
+      "bothShallow": {
+        "title": "Gewollt, aber noch ohne Tiefe",
+        "text": "Mindestens einer von euch will das übernehmen, und keiner hat hier tiefe Erfahrung angegeben. Als Team seid ihr an dieser Stelle dünn."
+      },
+      "handoverPath": {
+        "title": "Ein Weg, der planbar ist",
+        "text": "Einer von euch hat hier Tiefe und will es nicht behalten; der andere will es übernehmen, ist aber noch nicht so weit. Das lässt sich planen – wenn es ausgesprochen ist."
+      },
+      "settled": {
+        "title": "Das sitzt schon",
+        "text": "Einer will die Verantwortung und hat die Erfahrung dazu, der andere will sie nicht. Hier gibt es nichts zu verhandeln, nur zu benennen."
+      },
+      "noBasis": {
+        "title": "Dazu fehlt die Grundlage",
+        "text": "Für diese Bereiche liegen nicht genug Angaben vor, um etwas zu sagen. Das ist kein Befund über euch, sondern über die Datenlage."
+      }
+    },
+    "back": "Zurück zum Profil",
+    "empty": "Für einen Vergleich mit {name} liegen noch nicht genug Angaben vor. Das kann an eurer beider Snapshots liegen oder daran, wie weit sie freigegeben sind.",
+    "fillOwn": "Eigenen Snapshot ergänzen",
+    "openFor": "Vergleich mit {name}",
+    "sectionTitle": "Vergleich",
+    "sectionText": "Mit verbundenen Menschen kannst du euren Snapshot nebeneinanderstellen – geordnet danach, was vor einer Gründung geklärt sein sollte.",
+    "noneYet": "Sobald eine Kontaktanfrage angenommen ist, erscheint die Person hier."
+  },
   "families": {
     "customer_market": "Kunden & Markt",
     "product_value": "Produkt & Nutzenversprechen",

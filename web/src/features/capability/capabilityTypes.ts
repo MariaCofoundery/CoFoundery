@@ -7,6 +7,14 @@
  * niedrigste Stufe.
  */
 export const APPLICATION_LEVELS = [1, 2, 3, 4, 5] as const;
+
+/**
+ * Ab welcher Anwendungsstufe eine Angabe als Tiefe gilt und nicht als
+ * Beruehrung. Steht hier bei den Stufen, auf die sie sich bezieht, weil
+ * Auswertung und Vergleich dieselbe Grenze brauchen - zwei Zahlen an zwei
+ * Orten wuerden irgendwann auseinanderlaufen.
+ */
+export const DEPTH_LEVEL = 4;
 export type ApplicationLevel = (typeof APPLICATION_LEVELS)[number];
 
 /**
