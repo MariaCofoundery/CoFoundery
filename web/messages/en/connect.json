@@ -158,7 +158,9 @@
   "create": {
     "kindTitle": "What is it about?",
     "kindText": "Choose a category. Co-Founder search remains a dedicated, deeper workflow.",
-    "editorTitle": "Create listing"
+    "editorTitle": "Create listing",
+    "profileRequiredTitle": "Publishing needs a profile first",
+    "profileRequiredText": "You can save this listing as a draft at any time. It can only be published once your Connect profile is active – otherwise nobody can see who the offer comes from."
   },
   "edit": {
     "title": "Edit listing"
@@ -238,7 +240,10 @@
       "accepted": "Contact established.",
       "declined": "Request not accepted.",
       "canceled": "Request withdrawn."
-    }
+    },
+    "profileRequiredTitle": "Your Connect profile comes first",
+    "profileRequiredText": "Before you message someone, the other side needs something to look at. Create your Connect profile and publish it – you will come back here afterwards.",
+    "profileRequiredCta": "Create Connect profile"
   },
   "messages": {
     "eyebrow": "Private Connect exchange",

@@ -158,7 +158,9 @@
   "create": {
     "kindTitle": "Worum geht es?",
     "kindText": "Wähle eine Kategorie. Die Co-Founder-Suche bleibt ein eigener, vertiefter Bereich.",
-    "editorTitle": "Eintrag erstellen"
+    "editorTitle": "Eintrag erstellen",
+    "profileRequiredTitle": "Veröffentlichen geht erst mit Profil",
+    "profileRequiredText": "Als Entwurf kannst du diese Anzeige jederzeit speichern. Veröffentlichen lässt sie sich erst, wenn dein Connect-Profil aktiv ist – sonst sieht niemand, von wem das Angebot kommt."
   },
   "edit": {
     "title": "Eintrag bearbeiten"
@@ -238,7 +240,10 @@
       "accepted": "Kontakt hergestellt.",
       "declined": "Anfrage wurde nicht angenommen.",
       "canceled": "Anfrage zurückgezogen."
-    }
+    },
+    "profileRequiredTitle": "Zuerst dein Connect-Profil",
+    "profileRequiredText": "Bevor du jemanden anschreibst, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an und veröffentliche es – danach landest du wieder hier.",
+    "profileRequiredCta": "Connect-Profil anlegen"
   },
   "messages": {
     "eyebrow": "Privater Connect-Austausch",

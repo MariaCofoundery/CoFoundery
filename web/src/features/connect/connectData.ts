@@ -12,6 +12,26 @@ export async function getOwnConnectProfile(client: Client, userId: string) {
   const { data } = await client.from("network_profiles").select("*").eq("user_id", userId).maybeSingle();
   return (data as ConnectProfile | null) ?? null;
 }
+/**
+ * Ob ein aktives Connect-Profil vorliegt.
+ *
+ * Die Datenbank verlangt es an zwei Stellen - beim Absenden einer
+ * Kontaktanfrage und beim Veroeffentlichen einer Anzeige - und das ist die
+ * richtige, autoritative Stelle. Falsch war, dass die Oberflaeche es erst
+ * danach gesagt hat: Man schrieb eine Nachricht fertig und erfuhr beim
+ * Absenden, dass es nicht geht. Diese Funktion existiert, damit die Seiten
+ * es vorher wissen.
+ */
+export async function hasActiveConnectProfile(client: Client, userId: string) {
+  const { data } = await client
+    .from("network_profiles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+  return data !== null;
+}
+
 export async function getConnectListing(client: Client, id: string) {
   const { data } = await client.from("network_listings").select("*, network_profiles(*)").eq("id", id).maybeSingle();
   return (data as ConnectListing | null) ?? null;

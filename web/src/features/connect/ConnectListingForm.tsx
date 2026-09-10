@@ -21,7 +21,14 @@ type T = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 
-export function ConnectListingForm({ listing, direction, category, t }: { listing?: ConnectListing | null; direction?: string; category?: ConnectCategory; t: T }) {
+export function ConnectListingForm({ listing, direction, category, canPublish = true, t }: { listing?: ConnectListing | null; direction?: string; category?: ConnectCategory;
+  /**
+   * Ob ein aktives Connect-Profil vorliegt. Ohne eines weist die Datenbank
+   * das Veroeffentlichen ab (enforce_network_publication) - der Entwurf geht
+   * aber. Der Knopf, der nicht funktioniert, wird deshalb nicht angeboten;
+   * der Hinweis dazu steht auf der Seite ueber dem Formular.
+   */
+  canPublish?: boolean; t: T }) {
   const [selectedCategory, setSelectedCategory] = useState<ConnectCategory>(listing?.category || category || "expertise");
   const showRemote = categorySupportsRemoteMode(selectedCategory);
   const showStage = categorySupportsVentureStage(selectedCategory);
@@ -51,7 +58,9 @@ export function ConnectListingForm({ listing, direction, category, t }: { listin
       previewTitle: t("visibility.publicFields"), previewItems: t("visibility.listingFields"),
     }} />
     <div className="flex flex-wrap gap-3">
-      <ConnectSubmitButton intent="publish" label={t("actions.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold" />
+      {canPublish ? (
+        <ConnectSubmitButton intent="publish" label={t("actions.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold" />
+      ) : null}
       <ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold" />
     </div>
   </form>;
