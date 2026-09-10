@@ -193,9 +193,8 @@ test("every finding the code can produce has copy", () => {
   const readoutModule = source("src/features/capability/capabilityReadout.ts");
   const de = (readJson("messages/de/capability.json").readout as Record<string, unknown>).findings as Record<string, unknown>;
 
-  // Ein Befund ohne Text wuerde next-intl werfen und die Profilseite mit 500
-  // beenden - und zwar erst bei der Person, die genau diese Kombination
-  // eingetragen hat.
+  // Ein Befund ohne Text erscheint als roher Schluesselpfad auf der Seite -
+  // und zwar erst bei der Person, die genau diese Kombination eingetragen hat.
   const keys = [...readoutModule.matchAll(/bucket\.(\w+)\.push/g)].map((match) => match[1]);
   assert.ok(keys.length >= 5, `nur ${keys.length} Befunde im Code gefunden`);
   for (const key of new Set(keys)) {

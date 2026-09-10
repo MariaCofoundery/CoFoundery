@@ -83,9 +83,11 @@ export default async function ProfilePage({
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
-  // Nur bekannte Schluessel an t() geben. next-intl wirft bei einem fehlenden
-  // Schluessel, ein manipulierter Query-Parameter wuerde die Seite sonst mit
-  // einem 500 beenden statt sie nur ohne Hinweis zu rendern.
+  // Nur bekannte Schluessel an t() geben. Ein manipulierter Query-Parameter
+  // wuerde sonst als roher Schluesselpfad auf der Seite landen: next-intl
+  // wirft bei einem fehlenden Schluessel nicht, es loggt einen IntlError und
+  // rendert den Pfad selbst - etwa "capability.errors.abc". Kein Absturz,
+  // aber sichtbarer Muell. Mit Version 3.26.5 nachgemessen.
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   const notice = NOTICE_KEYS.includes(params.notice ?? "") ? params.notice : null;

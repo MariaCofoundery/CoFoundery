@@ -157,8 +157,8 @@ test("the Connect profile page validates query keys before translating them", ()
   const errors = de.errors as Record<string, string>;
   const successProfile = (de.success as Record<string, unknown>).profile as Record<string, string>;
 
-  // Ohne Allowlist beendet ein erfundenes ?error= die Seite mit 500, weil
-  // next-intl bei einem fehlenden Schluessel wirft.
+  // Ohne Allowlist zeigt ein erfundenes ?error= den rohen Schluesselpfad.
+  // next-intl wirft dabei nicht - es loggt und rendert den Pfad selbst.
   assert.match(page, /const ERROR_KEYS = \[/);
   assert.match(page, /ERROR_KEYS\.includes\(params\.error \?\? ""\)/);
   assert.match(page, /SAVED_KEYS\.includes\(params\.saved \?\? ""\)/);

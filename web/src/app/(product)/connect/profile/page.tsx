@@ -13,10 +13,11 @@ import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityFiel
 
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 
-// Nur bekannte Schluessel an t() geben. next-intl wirft bei einem fehlenden
-// Schluessel, ein erfundener Query-Parameter wuerde die Seite also mit einem
-// 500 beenden statt sie nur ohne Hinweis zu rendern. Muessen mit
-// messages/*/connect.json uebereinstimmen; ein Test vergleicht beide.
+// Nur bekannte Schluessel an t() geben. Ein erfundener Query-Parameter wuerde
+// sonst als roher Schluesselpfad auf der Seite landen - next-intl wirft bei
+// einem fehlenden Schluessel nicht, es loggt und rendert den Pfad selbst.
+// Muessen mit messages/*/connect.json uebereinstimmen; ein Test vergleicht
+// beide.
 const SAVED_KEYS = ["draft", "published"];
 const ERROR_KEYS = [
   "identity_incomplete",

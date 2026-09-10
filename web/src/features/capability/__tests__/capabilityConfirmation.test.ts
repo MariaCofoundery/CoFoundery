@@ -151,8 +151,8 @@ test("the notice after a confirmed selection differs from the one after a guess"
   // werden, ob die Zuordnung passt.
   assert.ok(notices.confirmed, "notices.confirmed fehlt");
   assert.doesNotMatch(notices.confirmed, /Prüf, ob das passt/);
-  // Unbekannte Schluessel wuerden next-intl werfen und die Seite mit 500
-  // beenden - die Allowlist muss den neuen Wert kennen.
+  // Unbekannte Schluessel erscheinen als roher Schluesselpfad - die Allowlist
+  // muss den neuen Wert kennen.
   assert.match(page, /const NOTICE_KEYS = \["recognised", "confirmed", "unmatched"\]/);
 });
 
