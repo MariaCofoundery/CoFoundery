@@ -10,25 +10,31 @@ The actual application lives in `web/`. The repo root also contains a set of mar
 
 ## Commands
 
-All app commands run from `web/` (or via the root `package.json` proxies: `npm run dev|build|start|lint`, which just `--prefix web`).
+All app commands run from `web/` (or via the root `package.json` proxies: `npm run dev|build|start|lint|test|ci:check`, which just `--prefix web`).
 
 ```bash
 cd web
 npm run dev            # next dev
 npm run build           # next build
 npm run lint            # eslint
-npm run ci:check        # tsc --noEmit && next build — run this before considering a change done
+npm test                # every test file under src/
+npm run ci:check        # tsc --noEmit && npm test && next build — run this before considering a change done
 ```
 
 ### Tests
 
-There is no test runner config (no Vitest/Jest) despite `PROJECT_CONFIG.md` saying "Vitest + Playwright" — that doc is stale. Tests actually run on Node's built-in test runner (`node:test`) with a custom ESM loader (`web/scripts/register-ts-alias.mjs`) that resolves the `@/*` path alias and strips TypeScript types:
+There is no test runner config (no Vitest/Jest) despite `PROJECT_CONFIG.md` saying "Vitest + Playwright" — that doc is stale. Tests run on Node's built-in test runner (`node:test`) with a custom ESM loader (`web/scripts/register-ts-alias.mjs`) that resolves the `@/*` path alias and strips TypeScript types.
+
+`npm test` matches `src/**/*.test.ts`, so a new test file is picked up by its name alone — do **not** register it anywhere. The pattern is deliberately not restricted to `__tests__/` directories: one suite lives outside one (`src/features/reporting/advisor-report/advisorReportExamples.test.ts`) and went unrun for a long time under a narrower pattern.
+
+To run a single file while iterating:
 
 ```bash
+cd web
 node --import ./scripts/register-ts-alias.mjs --test --experimental-strip-types <path-to-test-file> [more files...]
 ```
 
-The only predefined script is `npm run test:founder-compat`, which hardcodes an explicit list of test files (scoring/reporting/questionnaire suites) in `web/package.json`. Many other `__tests__/` directories exist across the codebase (connect, auth, teams, discovery, dashboard, etc.) but are **not** wired into any npm script — run them directly with the command above, and if you add a new test file that should run in CI, add it to the `test:founder-compat` file list (or ask whether a new script is warranted) rather than assuming it runs automatically.
+`npm run test:founder-compat` is a hardcoded fast subset (scoring/reporting/questionnaire) for work on the compatibility model — a convenience, not a gate. Nothing is gated: **there is no CI in this repo** (no GitHub Actions workflow, no `vercel.json`), so no test, typecheck or lint runs automatically on push, and Vercel deploys `main` on a successful `next build` alone. `npm run ci:check` is the manual stand-in and has to actually be run.
 
 Supabase/DB logic is tested separately with pgTAP suites in `supabase/tests/*.sql` (see below).
 
