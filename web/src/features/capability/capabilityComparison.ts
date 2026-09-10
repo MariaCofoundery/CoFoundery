@@ -111,11 +111,17 @@ export function buildCapabilityComparison(
   sideA: ComparisonSide[],
   sideB: ComparisonSide[],
   areas: CapabilityArea[],
-  families: CapabilityFamily[]
+  families: CapabilityFamily[],
 ): CapabilityComparison {
-  const familyOfArea = new Map(areas.map((area) => [area.area_id, area.family_id]));
-  const areaOrder = new Map(areas.map((area) => [area.area_id, area.sort_order]));
-  const familyOrder = new Map(families.map((family) => [family.family_id, family.sort_order]));
+  const familyOfArea = new Map(
+    areas.map((area) => [area.area_id, area.family_id]),
+  );
+  const areaOrder = new Map(
+    areas.map((area) => [area.area_id, area.sort_order]),
+  );
+  const familyOrder = new Map(
+    families.map((family) => [family.family_id, family.sort_order]),
+  );
 
   const byAreaA = new Map(sideA.map((side) => [side.areaId, side]));
   const byAreaB = new Map(sideB.map((side) => [side.areaId, side]));
@@ -125,37 +131,53 @@ export function buildCapabilityComparison(
     // ihn zu zeigen waere ein Label-Fehler auf einer Seite ueber Menschen.
     .filter((areaId) => familyOfArea.has(areaId));
 
-  const compared: ComparisonArea[] = areaIds.map((areaId) => {
-    const a = byAreaA.get(areaId) ?? null;
-    const b = byAreaB.get(areaId) ?? null;
-    const { state, owner } = deriveState(a, b);
-    return {
-      areaId,
-      familyId: familyOfArea.get(areaId) as string,
-      state,
-      owner,
-      a: a ? { level: a.applicationLevel, wish: a.ownershipWish } : null,
-      b: b ? { level: b.applicationLevel, wish: b.ownershipWish } : null,
-    };
-  });
+  // Nur Bereiche, die beide eingetragen haben, ergeben einen Befund.
+  //
+  // Hat nur eine Seite etwas eingetragen, gibt es nichts zu vergleichen -
+  // Schweigen ist keine Absage. Solche Bereiche unter "keine Grundlage" zu
+  // fuehren liest sich wie ein Fehlschlag, wo einfach keine zweite Angabe
+  // existiert. In der Deckung sind sie als "nur du" beziehungsweise "nur die
+  // andere Person" ohnehin enthalten.
+  const compared: ComparisonArea[] = areaIds
+    .filter((areaId) => byAreaA.has(areaId) && byAreaB.has(areaId))
+    .map((areaId) => {
+      const a = byAreaA.get(areaId) ?? null;
+      const b = byAreaB.get(areaId) ?? null;
+      const { state, owner } = deriveState(a, b);
+      return {
+        areaId,
+        familyId: familyOfArea.get(areaId) as string,
+        state,
+        owner,
+        a: a ? { level: a.applicationLevel, wish: a.ownershipWish } : null,
+        b: b ? { level: b.applicationLevel, wish: b.ownershipWish } : null,
+      };
+    });
 
   const groups = STATE_ORDER.flatMap((state) => {
     const inState = compared
       .filter((area) => area.state === state)
       .sort(
         (x, y) =>
-          (familyOrder.get(x.familyId) ?? 0) - (familyOrder.get(y.familyId) ?? 0) ||
-          (areaOrder.get(x.areaId) ?? 0) - (areaOrder.get(y.areaId) ?? 0)
+          (familyOrder.get(x.familyId) ?? 0) -
+            (familyOrder.get(y.familyId) ?? 0) ||
+          (areaOrder.get(x.areaId) ?? 0) - (areaOrder.get(y.areaId) ?? 0),
       );
     return inState.length ? [{ state, areas: inState }] : [];
   });
 
-  const shared = areaIds.filter((areaId) => byAreaA.has(areaId) && byAreaB.has(areaId)).length;
+  const shared = areaIds.filter(
+    (areaId) => byAreaA.has(areaId) && byAreaB.has(areaId),
+  ).length;
   const coverage = {
     together: areaIds.length,
     shared,
-    onlyA: areaIds.filter((areaId) => byAreaA.has(areaId) && !byAreaB.has(areaId)).length,
-    onlyB: areaIds.filter((areaId) => byAreaB.has(areaId) && !byAreaA.has(areaId)).length,
+    onlyA: areaIds.filter(
+      (areaId) => byAreaA.has(areaId) && !byAreaB.has(areaId),
+    ).length,
+    onlyB: areaIds.filter(
+      (areaId) => byAreaB.has(areaId) && !byAreaA.has(areaId),
+    ).length,
   };
 
   return { groups, coverage, overlap: describeOverlap(coverage) };
@@ -169,7 +191,7 @@ export function buildCapabilityComparison(
  */
 function deriveState(
   a: ComparisonSide | null,
-  b: ComparisonSide | null
+  b: ComparisonSide | null,
 ): { state: ComparisonStateKey; owner: "a" | "b" | null } {
   const wishA = a?.ownershipWish ?? null;
   const wishB = b?.ownershipWish ?? null;
@@ -200,7 +222,8 @@ function deriveState(
 
   // Wer es will, kann es noch nicht, und die Tiefe liegt beim anderen, der
   // sie nicht behalten will: ein Weg, der sich planen laesst.
-  if (otherHasDepth) return { state: "handoverPath", owner: claimer === "a" ? "b" : "a" };
+  if (otherHasDepth)
+    return { state: "handoverPath", owner: claimer === "a" ? "b" : "a" };
 
   // Gewollt, und keiner hat Tiefe angegeben.
   return { state: "bothShallow", owner: null };

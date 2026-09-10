@@ -93,6 +93,12 @@ Pro Bereich entstehen aus zwei Snapshots genau diese Zustaende. Jeder ist eine U
 
 Dazu zwei Lagebeschreibungen ueber alle Bereiche: **Deckung** (wie viel des Vokabulars das Paar zusammen abdeckt) und **Ueberlappung** (Abschnitt 3, beide Extreme).
 
+### 6.0 Nur beidseitig eingetragene Bereiche ergeben einen Befund
+
+Hat nur eine Person einen Bereich eingetragen, entsteht kein Zustand - auch nicht "keine Grundlage". **Schweigen ist keine Absage**, und es ist auch kein gescheiterter Vergleich: Es gibt dort schlicht keine zweite Angabe. Diese Bereiche erscheinen ausschliesslich in der Deckung, als "nur du" beziehungsweise "nur die andere Person".
+
+Der Unterschied ist nicht kosmetisch. Ein erster Entwurf hat einseitige Bereiche unter "keine Grundlage" gefuehrt; bei einem realistischen Paar landete damit die Haelfte aller Bereiche in dieser Gruppe und die Seite las sich als Fehlschlag. `noBasis` ist jetzt der informative Fall: **beide haben etwas dazu gesagt, aber eine Seite hat sich nicht entschieden** (`unclear`, oder die Tiefe ist nicht freigegeben).
+
 ### 6.1 Reihenfolge der Ausgabe
 
 Nach Dringlichkeit, nicht nach Vokabular-Sortierung: doppelter Anspruch → offene Stelle → beide flach → Uebergabepfad → geklaerte Uebergabe. Die Dinge, die vor einer Gruendung geklaert werden muessen, stehen oben.

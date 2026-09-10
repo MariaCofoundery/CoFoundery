@@ -156,11 +156,26 @@ test("the numbers each side gave travel with the finding", () => {
   assert.deepEqual(area.b, { level: 2, wish: "prefer_other" });
 });
 
-test("an area only one person entered keeps the other side null", () => {
+test("an area only one person entered produces no finding, only coverage", () => {
   const result = compare([side("b2b_sales", 5, "own")], []);
+
+  // Schweigen ist keine Absage. Es gibt hier nichts zu vergleichen, und das
+  // unter "keine Grundlage" zu fuehren liest sich wie ein Fehlschlag.
+  assert.deepEqual(result.groups, [], "kein Befund ohne zweite Angabe");
+  // In der Deckung erscheint der Bereich trotzdem - dort gehoert er hin.
+  assert.equal(result.coverage.together, 1);
+  assert.equal(result.coverage.onlyA, 1);
+  assert.equal(result.coverage.shared, 0);
+});
+
+test("noBasis is reserved for areas both entered but one left undecided", () => {
+  // So bleibt der Befund informativ: Ihr habt beide etwas dazu gesagt, aber
+  // eine Seite hat sich nicht entschieden.
+  const result = compare([side("b2b_sales", 5, "own")], [side("b2b_sales", 3, "unclear")]);
+  assert.deepEqual(result.groups.map((group) => group.state), ["noBasis"]);
   const area = result.groups[0].areas[0];
-  assert.equal(area.b, null, "kein erfundener Nullwert fuer die andere Person");
-  assert.equal(area.state, "noBasis");
+  assert.deepEqual(area.a, { level: 5, wish: "own" });
+  assert.deepEqual(area.b, { level: 3, wish: "unclear" });
 });
 
 test("an area outside the vocabulary is dropped instead of shown unlabelled", () => {
