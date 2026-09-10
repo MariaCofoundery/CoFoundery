@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectListings } from "@/features/connect/connectData";
 import { ConnectLifecycleForm } from "@/features/connect/ConnectLifecycleForm";
+import { knownKey } from "@/i18n/knownKey";
+import { CONNECT_ERROR_KEYS, CONNECT_LIFECYCLE_KEYS } from "@/features/connect/connectFeedbackKeys";
 
 export default async function MyConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/my");
@@ -11,8 +13,8 @@ export default async function MyConnectPage({ searchParams }: { searchParams: Pr
   return <main className="mx-auto max-w-5xl px-5 py-10">
     <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
     <div className="mt-3 flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold">{t("my.title")}</h1></div><Link href="/connect/listings/new" className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold">{t("my.create")}</Link></div>
-    {params.changed ? <p className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.lifecycle.${params.changed}`)}</p> : null}
-    {params.error ? <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${params.error}`)}</p> : null}
+    {knownKey(params.changed, CONNECT_LIFECYCLE_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.lifecycle.${knownKey(params.changed, CONNECT_LIFECYCLE_KEYS)}`)}</p> : null}
+    {knownKey(params.error, CONNECT_ERROR_KEYS) ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${knownKey(params.error, CONNECT_ERROR_KEYS)}`)}</p> : null}
     {groups.map((status) => {
       const rows = listings.filter((listing) => status === "completed"
         ? listing.status === "completed" || (listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()))

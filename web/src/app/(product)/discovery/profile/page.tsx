@@ -25,7 +25,6 @@ import {
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
 import {
-  mapDiscoveryProfilePublishIssues,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
@@ -49,6 +48,7 @@ import {
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeLocale } from "@/i18n/config";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -385,7 +385,7 @@ export default async function DiscoveryProfilePage({
       : []
     : [];
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
-  const publishIssues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(profile));
+  const publishIssues = getDiscoveryProfilePublishIssues(profile);
   const ownRolesAtLimit =
     (profile.ownRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.ownRoles;
   const seekingRolesAtLimit =
@@ -610,13 +610,19 @@ export default async function DiscoveryProfilePage({
               <PublishIssuesCard issues={publishIssues} t={t} />
 
               <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
-                <button type="submit" className={PRIMARY_BUTTON_CLASS}>
-                  {profile.status === "active" ? t("profile.actions.saveChanges") : t("profile.actions.saveDraft")}
-                </button>
+                <SubmitButton
+                  label={profile.status === "active" ? t("profile.actions.saveChanges") : t("profile.actions.saveDraft")}
+                  pendingLabel={t("profile.actions.saving")}
+                  className={PRIMARY_BUTTON_CLASS}
+                />
                 {profile.status !== "active" ? (
-                  <button type="submit" formAction={publishProfileFromForm} className={PRIMARY_BUTTON_CLASS}>
-                    {t("profile.actions.publish")}
-                  </button>
+                  <SubmitButton
+                    intent="publish"
+                    formAction={publishProfileFromForm}
+                    label={t("profile.actions.publish")}
+                    pendingLabel={t("profile.actions.publishing")}
+                    className={PRIMARY_BUTTON_CLASS}
+                  />
                 ) : null}
               </div>
               <p className="-mt-3 text-xs leading-5 text-slate-500">
@@ -663,9 +669,11 @@ export default async function DiscoveryProfilePage({
                   <p className="mt-2 text-xs leading-5 text-slate-500">
                     {t("v2.alignment.disclaimer")}
                   </p>
-                  <button type="submit" className={`${PRIMARY_BUTTON_CLASS} mt-4`}>
-                    {t("profile.intent.saveAlignment")}
-                  </button>
+                  <SubmitButton
+                    label={t("profile.intent.saveAlignment")}
+                    pendingLabel={t("profile.actions.saving")}
+                    className={`${PRIMARY_BUTTON_CLASS} mt-4`}
+                  />
                 </form>
               ) : (
                 <div className="mt-4 rounded-2xl bg-white p-4">
@@ -679,9 +687,11 @@ export default async function DiscoveryProfilePage({
 
             <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
               <form action={pauseProfile}>
-                <button type="submit" className={SECONDARY_BUTTON_CLASS}>
-                  {t("profile.actions.pause")}
-                </button>
+                <SubmitButton
+                  label={t("profile.actions.pause")}
+                  pendingLabel={t("profile.actions.saving")}
+                  className={SECONDARY_BUTTON_CLASS}
+                />
               </form>
             </div>
           </section>

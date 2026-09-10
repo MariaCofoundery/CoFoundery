@@ -8,6 +8,8 @@ import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { ConnectSafetyActions } from "@/features/connect/ConnectSafetyActions";
 import { unblockConnectUserAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
+import { knownKey } from "@/i18n/knownKey";
+import { CONNECT_CONTACT_KEYS, CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function safetyCopy(t: T) { return {
@@ -74,9 +76,9 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
 
   return <main className="mx-auto max-w-5xl px-5 py-10"><Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("navigation.overview")}</Link>
     <h1 className="mt-3 text-3xl font-semibold">{t("contact.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("contact.text")}</p>
-    {query.changed ? <p className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`contact.success.${query.changed}`)}</p> : null}
-    {query.error ? <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(query.error === "report" ? "safety.reportError" : "contact.error")}</p> : null}
-    {query.safety ? <p className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${query.safety}`)}</p> : null}
+    {knownKey(query.changed, CONNECT_CONTACT_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`contact.success.${knownKey(query.changed, CONNECT_CONTACT_KEYS)}`)}</p> : null}
+    {query.error ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(query.error === "report" ? "safety.reportError" : "contact.error")}</p> : null}
+    {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
     <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={profiles.get(conversation.counterpart_user_id)} blockState={stateFor(conversation.counterpart_user_id)} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>

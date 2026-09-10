@@ -66,7 +66,7 @@ export async function EventParticipantCard({
             {qrCode.ok ? (
               <img
                 src={qrCode.dataUrl}
-                alt={`QR-Code fuer ${participantName}`}
+                alt={`QR-Code für ${participantName}`}
                 width={260}
                 height={260}
                 className="h-auto w-full max-w-[260px] rounded-2xl"

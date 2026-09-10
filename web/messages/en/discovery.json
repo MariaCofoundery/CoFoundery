@@ -234,7 +234,7 @@
   "v2": {
     "title": "Find a co-founder",
     "subtitle": "Find founders who fit what you are looking for right now.",
-    "editProfile": "Edit my profile",
+    "editProfile": "Edit search profile",
     "modes": {
       "label": "Discovery mode",
       "explore": "Explore",
@@ -276,7 +276,8 @@
         "saved": "Your private search was updated.",
         "reset": "The search filters were reset.",
         "failed": "Your search could not be saved right now."
-      }
+      },
+      "applying": "Applying …"
     },
     "alignment": {
       "eyebrow": "Optional",
@@ -471,7 +472,9 @@
       "publish": "Publish profile",
       "pause": "Pause search",
       "publishHelp": "When publishing, we save your current details and make your profile visible if everything is complete.",
-      "publishIssues": "Before your profile becomes visible, please add:"
+      "publishIssues": "Before your profile becomes visible, please add:",
+      "saving": "Saving …",
+      "publishing": "Publishing …"
     },
     "publishIssueItems": {
       "displayName": "Give your search profile a name with at least 2 characters.",

@@ -31,6 +31,7 @@ import {
   DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_TEXT_LIMITS,
 } from "@/features/discovery/discoveryConfig";
+import type { DiscoveryProfilePublishIssue } from "@/features/discovery/discoveryProfileFeedback";
 
 const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   minimumAvailabilityHoursPerWeek: null,
@@ -258,41 +259,31 @@ export function normalizeDiscoveryPreferencesInput(input: DiscoveryPreferencesIn
   };
 }
 
-export function getDiscoveryProfilePublishIssues(input: DiscoveryProfileInput): string[] {
+/**
+ * Was dem Suchprofil zum Veroeffentlichen fehlt - als stabile Schluessel.
+ *
+ * Hier standen bis 10.09.2026 vollstaendige deutsche Saetze, die anschliessend
+ * ueber eine Tabelle auf ebendiese Schluessel abgebildet wurden. Angezeigt
+ * wurde immer der uebersetzte Text, es lief also kein Deutsch in die
+ * englische Oberflaeche - der Fehler lag anderswo: Der Satz war der
+ * Verbindungsschluessel zwischen Pruefung und Anzeige, und die Abbildung
+ * verwarf still, was sie nicht kannte. Ein geaendertes Komma haette einen
+ * Veroeffentlichungs-Blocker unsichtbar gemacht, ohne Fehler.
+ */
+export function getDiscoveryProfilePublishIssues(
+  input: DiscoveryProfileInput
+): DiscoveryProfilePublishIssue[] {
   const normalized = normalizeDiscoveryProfileInput(input);
-  const issues: string[] = [];
+  const issues: DiscoveryProfilePublishIssue[] = [];
 
-  if (normalized.displayName.trim().length < 2) {
-    issues.push("Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.");
-  }
-
-  if (normalized.headline.trim().length < 3) {
-    issues.push("Ergänze eine kurze Headline, damit andere dich einordnen können.");
-  }
-
-  if (normalized.ownRoles.length === 0) {
-    issues.push("Wähle mindestens eine Rolle, die du selbst einbringst.");
-  }
-
-  if (normalized.seekingRoles.length === 0) {
-    issues.push("Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.");
-  }
-
-  if (normalized.availabilityHoursPerWeek == null) {
-    issues.push("Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.");
-  }
-
-  if (normalized.commitmentLevel === "exploring") {
-    issues.push("Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.");
-  }
-
-  if (normalized.ventureStage === "undecided") {
-    issues.push("Wähle, wo du gerade mit deiner Idee oder Suche stehst.");
-  }
-
-  if (normalized.ventureGoal === "undecided") {
-    issues.push("Wähle, welche Art von Aufbau du gerade suchst.");
-  }
+  if (normalized.displayName.trim().length < 2) issues.push("displayName");
+  if (normalized.headline.trim().length < 3) issues.push("headline");
+  if (normalized.ownRoles.length === 0) issues.push("ownRoles");
+  if (normalized.seekingRoles.length === 0) issues.push("seekingRoles");
+  if (normalized.availabilityHoursPerWeek == null) issues.push("availability");
+  if (normalized.commitmentLevel === "exploring") issues.push("commitment");
+  if (normalized.ventureStage === "undecided") issues.push("ventureStage");
+  if (normalized.ventureGoal === "undecided") issues.push("ventureGoal");
 
   return issues;
 }

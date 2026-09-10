@@ -8,6 +8,8 @@ import { ConnectMarkConversationRead } from "@/features/connect/ConnectMarkConve
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { ConnectSafetyActions } from "@/features/connect/ConnectSafetyActions";
+import { knownKey } from "@/i18n/knownKey";
+import { CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
 
 export default async function ConnectConversationPage({
   params,
@@ -64,7 +66,7 @@ export default async function ConnectConversationPage({
         </ol> : <div className="py-8 text-center"><h2 className="text-lg font-semibold text-slate-950">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">{t("messages.emptyText")}</p></div>}
       </section>
 
-      {query.safety ? <p className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${query.safety}`)}</p> : null}
+      {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
       {blockState.interaction_blocked ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700">{t("safety.chatStopped")}</p> : <form action={sendConnectMessageAction} className="sticky bottom-3 mt-5 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
         <input type="hidden" name="conversation_id" value={conversationId} />
         <label htmlFor="network-message" className="text-sm font-semibold text-slate-900">{t("messages.composeLabel")}</label>

@@ -1,7 +1,7 @@
 {
   "eyebrow": "Profil",
-  "title": "Was du mitbringst",
-  "text": "Ein Überblick über deine praktische Erfahrung, die Bereiche, die du verantworten möchtest, und die, in die du hineinwachsen willst. Etwa drei bis fünf Minuten – du kannst jederzeit ergänzen.",
+  "title": "Dein Profil",
+  "text": "Hier steht alles über dich an einem Ort: wer du bist, was du mitbringst, was du davon weitergibst – und der Vergleich mit Menschen, mit denen du verbunden bist.",
   "identity": {
     "title": "Wer du bist",
     "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
@@ -41,7 +41,8 @@
   "steps": {
     "evidence": "Ein Beispiel",
     "areas": "Bereiche",
-    "ownership": "Verantwortung"
+    "ownership": "Verantwortung",
+    "later": "Später fortsetzen"
   },
   "evidence": {
     "title": "Was war die letzte Aufgabe, die du verantwortet und zu Ende gebracht hast?",
@@ -114,7 +115,11 @@
     "removeEvidence": "Entfernen",
     "wantsToOwn": "Möchtest du übernehmen",
     "notOwning": "Ausdrücklich nicht dauerhaft",
-    "incompleteNote": "Was hier nicht steht, heißt nur, dass du es noch nicht eingetragen hast."
+    "incompleteNote": "Was hier nicht steht, heißt nur, dass du es noch nicht eingetragen hast.",
+    "sectionTitle": "Was du mitbringst",
+    "removeEvidenceQuestion": "Diesen Beleg wirklich entfernen? Der Text ist danach weg.",
+    "removeEvidenceConfirm": "Ja, entfernen",
+    "removeEvidenceCancel": "Behalten"
   },
   "readout": {
     "title": "Was sich daraus ablesen lässt",

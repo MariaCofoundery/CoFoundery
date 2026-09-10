@@ -1,7 +1,7 @@
 {
   "eyebrow": "Profile",
-  "title": "What you bring",
-  "text": "An overview of your practical experience, the areas you want to own and the ones you want to grow into. Around three to five minutes – you can always add more later.",
+  "title": "Your profile",
+  "text": "Everything about you in one place: who you are, what you bring, what you share of it – and the comparison with people you are connected to.",
   "identity": {
     "title": "Who you are",
     "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
@@ -41,7 +41,8 @@
   "steps": {
     "evidence": "One example",
     "areas": "Areas",
-    "ownership": "Ownership"
+    "ownership": "Ownership",
+    "later": "Continue later"
   },
   "evidence": {
     "title": "What was the last piece of work you owned and saw through?",
@@ -114,7 +115,11 @@
     "removeEvidence": "Remove",
     "wantsToOwn": "You want to own",
     "notOwning": "Explicitly not long term",
-    "incompleteNote": "Anything not listed here only means you have not entered it yet."
+    "incompleteNote": "Anything not listed here only means you have not entered it yet.",
+    "sectionTitle": "What you bring",
+    "removeEvidenceQuestion": "Really remove this evidence? The text will be gone.",
+    "removeEvidenceConfirm": "Yes, remove",
+    "removeEvidenceCancel": "Keep it"
   },
   "readout": {
     "title": "What can be read from this",

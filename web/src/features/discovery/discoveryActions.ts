@@ -15,7 +15,7 @@ import {
   upsertOwnDiscoveryV2SearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
-  mapDiscoveryProfilePublishIssues,
+  filterDiscoveryProfilePublishIssues,
   type DiscoveryPreferencesResult,
   type DiscoveryProfileDraftResult,
   type DiscoveryProfilePauseResult,
@@ -236,7 +236,10 @@ function getPublishabilityIssues(error: unknown) {
     return [];
   }
 
-  return mapDiscoveryProfilePublishIssues(
+  // Der Fehler aus discoveryData traegt jetzt die Schluessel selbst. filter
+  // statt map: Unbekanntes wird verworfen, aber es gibt nichts mehr zu
+  // uebersetzen.
+  return filterDiscoveryProfilePublishIssues(
     error.message
       .replace("discovery_profile_not_publishable:", "")
       .split("|")
@@ -345,7 +348,7 @@ export async function publishDiscoveryProfileAction(): Promise<DiscoveryProfileP
       };
     }
 
-    const issues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(profile));
+    const issues = getDiscoveryProfilePublishIssues(profile);
     if (issues.length > 0) {
       return {
         ok: false,
@@ -402,7 +405,7 @@ export async function publishDiscoveryProfileFromFormAction(
 
     await upsertOwnDiscoveryProfile(userId, draftInput);
 
-    const issues = mapDiscoveryProfilePublishIssues(getDiscoveryProfilePublishIssues(draftInput));
+    const issues = getDiscoveryProfilePublishIssues(draftInput);
     if (issues.length > 0) {
       revalidateDiscoveryPaths();
       return {

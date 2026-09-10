@@ -64,7 +64,11 @@ test("content dates validate independently from listing expiry and format withou
 });
 
 test("Connect actions have pending and success feedback without duplicate submit", () => {
-  const submit = readFileSync("src/features/connect/ConnectSubmitButton.tsx", "utf8");
+  // Der Knopf liegt jetzt neutral unter features/ui - sein alter Name war der
+  // Grund, warum ausserhalb von Connect niemand ihn benutzt hat.
+  const submit = readFileSync("src/features/ui/SubmitButton.tsx", "utf8");
+  const reexport = readFileSync("src/features/connect/ConnectSubmitButton.tsx", "utf8");
+  assert.match(reexport, /export \{ SubmitButton as ConnectSubmitButton \}/);
   const lifecycle = readFileSync("src/features/connect/ConnectLifecycleForm.tsx", "utf8");
   const profile = readFileSync("src/app/(product)/connect/profile/page.tsx", "utf8");
   assert.match(submit, /useFormStatus/); assert.match(submit, /disabled=\{pending\}/); assert.match(submit, /pendingLabel/);

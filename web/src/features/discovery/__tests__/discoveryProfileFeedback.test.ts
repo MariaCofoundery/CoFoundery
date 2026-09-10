@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import deDiscovery from "../../../../messages/de/discovery.json";
 import enDiscovery from "../../../../messages/en/discovery.json";
+
+const source = (path: string) => readFileSync(path, "utf8");
 import {
   DISCOVERY_PREFERENCES_ERROR_REASONS,
   DISCOVERY_PREFERENCES_SUCCESS_REASONS,
@@ -17,24 +20,13 @@ import {
   getDiscoveryProfileDraftMessageKey,
   getDiscoveryProfilePauseMessageKey,
   getDiscoveryProfilePublishMessageKey,
-  mapDiscoveryProfilePublishIssues,
   resolveDiscoveryPreferencesFeedback,
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
   resolveDiscoveryProfilePublishFeedback,
   selectDiscoveryProfileFeedback,
 } from "@/features/discovery/discoveryProfileFeedback";
-
-const publishValidationTexts = [
-  "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.",
-  "Ergänze eine kurze Headline, damit andere dich einordnen können.",
-  "Wähle mindestens eine Rolle, die du selbst einbringst.",
-  "Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.",
-  "Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.",
-  "Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.",
-  "Wähle, wo du gerade mit deiner Idee oder Suche stehst.",
-  "Wähle, welche Art von Aufbau du gerade suchst.",
-];
+import { getDiscoveryProfilePublishIssues } from "@/features/discovery/discoveryValidation";
 
 function readMessage(messages: unknown, key: string) {
   let current: unknown = messages;
@@ -93,10 +85,29 @@ test("Discovery profile publish query values are validated", () => {
   });
 });
 
-test("Discovery profile publish validation text maps only to known issue codes", () => {
+test("the publish check returns stable keys, not sentences", () => {
+  // Vorher waren vollstaendige deutsche Saetze der Verbindungsschluessel
+  // zwischen Pruefung und Anzeige, und die Abbildung verwarf still, was sie
+  // nicht kannte: Ein geaendertes Komma haette einen Blocker unsichtbar
+  // gemacht, ohne Fehler.
+  const empty = getDiscoveryProfilePublishIssues({} as never);
+  for (const issue of empty) {
+    assert.ok(
+      (DISCOVERY_PROFILE_PUBLISH_ISSUES as readonly string[]).includes(issue),
+      `${issue} ist kein bekannter Schluessel`
+    );
+  }
+  assert.ok(empty.length > 0, "ein leeres Profil ist nicht veroeffentlichbar");
+  assert.match(
+    source("src/features/discovery/discoveryValidation.ts"),
+    /issues\.push\("displayName"\)/,
+    "die Pruefung gibt Schluessel zurueck"
+  );
+
+  // Und aus einer Fehlermeldung mit Fremdinhalt kommt nur Bekanntes zurueck.
   assert.deepEqual(
-    mapDiscoveryProfilePublishIssues([...publishValidationTexts, "unknown database detail"]),
-    DISCOVERY_PROFILE_PUBLISH_ISSUES
+    filterDiscoveryProfilePublishIssues(["displayName", "unknown database detail"]),
+    ["displayName"]
   );
 });
 

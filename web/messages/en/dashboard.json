@@ -17,7 +17,7 @@
     "open": "Open",
     "saveProfile": "Save profile",
     "updateProfile": "Update profile",
-    "editProfile": "Edit profile details",
+    "editProfile": "Profile",
     "contactSupport": "Contact support",
     "signOutAll": "End all sessions"
   },
@@ -252,7 +252,7 @@
   "utilities": {
     "title": "Profile and account",
     "profileCreate": "Add personal profile details",
-    "profileEdit": "Edit profile details",
+    "profileEdit": "Profile",
     "profileHelp": "Manage your name, role, and essential details here when needed.",
     "account": "Account & settings",
     "profileEntryHelp": "Name, about you, expertise and what you practically bring – all in one place.",

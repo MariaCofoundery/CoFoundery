@@ -97,7 +97,7 @@ export default async function EventComparePage({
         title="Profil aktuell nicht verfuegbar"
         text="Dieses Event-Kurzprofil kann gerade nicht fuer einen Vergleich geladen werden."
         href={buildEventCardHref(event.slug)}
-        ctaLabel="Zurueck zu meiner Event-Karte"
+        ctaLabel="Zurück zu meiner Event-Karte"
       />
     );
   }
@@ -108,7 +108,7 @@ export default async function EventComparePage({
         title="Das ist dein eigener QR-Code"
         text="Scanne fuer einen Vergleich den QR-Code einer anderen teilnehmenden Person."
         href={buildEventCardHref(event.slug)}
-        ctaLabel="Zurueck zu meiner Event-Karte"
+        ctaLabel="Zurück zu meiner Event-Karte"
       />
     );
   }
@@ -119,7 +119,7 @@ export default async function EventComparePage({
         title="Vergleich aktuell nicht moeglich"
         text="Dieses Profil ist innerhalb des Events derzeit nicht fuer Vergleiche freigegeben."
         href={buildEventCardHref(event.slug)}
-        ctaLabel="Zurueck zu meiner Event-Karte"
+        ctaLabel="Zurück zu meiner Event-Karte"
       />
     );
   }
@@ -134,7 +134,7 @@ export default async function EventComparePage({
         title="Vergleich noch nicht bereit"
         text="Das andere Event-Profil ist noch nicht vollstaendig und kann deshalb noch nicht verglichen werden."
         href={buildEventCardHref(event.slug)}
-        ctaLabel="Zurueck zu meiner Event-Karte"
+        ctaLabel="Zurück zu meiner Event-Karte"
       />
     );
   }

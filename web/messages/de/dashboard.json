@@ -17,7 +17,7 @@
     "open": "Öffnen",
     "saveProfile": "Profil speichern",
     "updateProfile": "Profil aktualisieren",
-    "editProfile": "Profildaten bearbeiten",
+    "editProfile": "Profil",
     "contactSupport": "Support kontaktieren",
     "signOutAll": "Alle Sitzungen beenden"
   },
@@ -252,7 +252,7 @@
   "utilities": {
     "title": "Profil und Account",
     "profileCreate": "Persönliche Profildaten ergänzen",
-    "profileEdit": "Profildaten bearbeiten",
+    "profileEdit": "Profil",
     "profileHelp": "Name, Rolle und Basisangaben kannst du hier bei Bedarf kompakt verwalten.",
     "account": "Account & Einstellungen",
     "profileEntryHelp": "Name, Über dich, Expertise und was du praktisch mitbringst – alles an einem Ort.",

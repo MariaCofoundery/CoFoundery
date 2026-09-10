@@ -147,24 +147,11 @@ const preferencesErrorReasons = new Set<string>(DISCOVERY_PREFERENCES_ERROR_REAS
 const pauseSuccessReasons = new Set<string>(DISCOVERY_PROFILE_PAUSE_SUCCESS_REASONS);
 const pauseErrorReasons = new Set<string>(DISCOVERY_PROFILE_PAUSE_ERROR_REASONS);
 
-const publishIssueByValidationText: Record<string, DiscoveryProfilePublishIssue> = {
-  "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.": "displayName",
-  "Ergänze eine kurze Headline, damit andere dich einordnen können.": "headline",
-  "Wähle mindestens eine Rolle, die du selbst einbringst.": "ownRoles",
-  "Wähle mindestens eine Rolle, die du bei einem Co-Founder suchst.": "seekingRoles",
-  "Gib an, wie viel Zeit du pro Woche ungefähr einbringen kannst.": "availability",
-  "Wähle ein Commitment-Level, bevor du dein Profil veröffentlichst.": "commitment",
-  "Wähle, wo du gerade mit deiner Idee oder Suche stehst.": "ventureStage",
-  "Wähle, welche Art von Aufbau du gerade suchst.": "ventureGoal",
-};
-
-export function mapDiscoveryProfilePublishIssues(
-  values: readonly string[]
-): DiscoveryProfilePublishIssue[] {
-  return values
-    .map((value) => publishIssueByValidationText[value])
-    .filter((value): value is DiscoveryProfilePublishIssue => value !== undefined);
-}
+// Hier stand eine Tabelle, die vollstaendige deutsche Saetze auf diese
+// Schluessel abbildete - der Satz war der Verbindungsschluessel zwischen
+// Pruefung und Anzeige. Nicht Zuordenbares verwarf sie still, ein geaendertes
+// Komma haette also einen Veroeffentlichungs-Blocker unsichtbar gemacht.
+// getDiscoveryProfilePublishIssues gibt die Schluessel jetzt direkt zurueck.
 
 export function filterDiscoveryProfilePublishIssues(
   values: readonly string[]

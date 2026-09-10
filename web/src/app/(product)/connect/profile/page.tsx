@@ -38,8 +38,8 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   return <main className="mx-auto max-w-4xl px-5 py-10">
     <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
     <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold">{t("profile.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("profile.text")}</p>
-    {saved ? <p className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
-    {errorKey ? <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
+    {saved ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
+    {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
     <form action={saveConnectProfileAction} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
       {continuation ? <input type="hidden" name="next" value={continuation} /> : null}
       {/* Identitaet wird zentral auf /profile gepflegt und von dort verteilt.

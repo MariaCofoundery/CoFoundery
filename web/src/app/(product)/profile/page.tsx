@@ -31,6 +31,7 @@ import {
 } from "@/features/profile/identityReadiness";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
+import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { createClient } from "@/lib/supabase/server";
 
 const field =
@@ -111,26 +112,47 @@ export default async function ProfilePage({
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("text")}</p>
 
       {saved ? (
-        <p className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.${saved}`)}</p>
+        <p role="status" className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.${saved}`)}</p>
       ) : null}
       {errorKey ? (
-        <p className="mt-6 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p>
+        <p role="alert" className="mt-6 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p>
       ) : null}
       {notice ? (
-        <p className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{t(`notices.${notice}`)}</p>
+        <p role="status" className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{t(`notices.${notice}`)}</p>
       ) : null}
 
       {step ? (
-        <ol className="mt-8 flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
-          {(["evidence", "areas", "ownership"] as const).map((name, index) => (
-            <li
-              key={name}
-              className={`rounded-full px-3 py-1 ${step === name ? "bg-slate-900 text-white" : "bg-slate-100"}`}
-            >
-              {index + 1}. {t(`steps.${name}`)}
-            </li>
-          ))}
-        </ol>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          {/* Erledigte Schritte sahen genauso aus wie kommende - die Anzeige
+              zeigte, wo man ist, aber nicht, was schon sitzt. */}
+          <ol className="flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
+            {(["evidence", "areas", "ownership"] as const).map((name, index) => {
+              const position = ["evidence", "areas", "ownership"].indexOf(step);
+              const done = index < position;
+              return (
+                <li
+                  key={name}
+                  aria-current={step === name ? "step" : undefined}
+                  className={`rounded-full px-3 py-1 ${
+                    step === name
+                      ? "bg-slate-900 text-white"
+                      : done
+                        ? "bg-emerald-50 text-emerald-800"
+                        : "bg-slate-100"
+                  }`}
+                >
+                  {done ? "✓" : `${index + 1}.`} {t(`steps.${name}`)}
+                </li>
+              );
+            })}
+          </ol>
+          {/* Der Fluss hatte keinen Ausgang: nur vorwaerts oder einen Schritt
+              zurueck. Wer spaeter weitermachen will, brauchte den
+              Browser-Zurueck. Eingetragenes bleibt ohnehin gespeichert. */}
+          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:underline">
+            {t("steps.later")}
+          </Link>
+        </div>
       ) : null}
 
       {/* Schritt 1: die erzaehlte Sache, dann die Rueckfrage, was davon
@@ -394,15 +416,18 @@ export default async function ProfilePage({
 
       {step === null ? (
         <section className="mt-8">
+          {/* Der Abschnittstitel: Er stand vorher als h1 ueber der ganzen
+              Seite und beschrieb damit nur einen von sechs Abschnitten. */}
+          <h2 className="text-xl font-semibold">{t("summary.sectionTitle")}</h2>
           {entries.length === 0 ? (
-            <div className="rounded-3xl border border-slate-200 bg-white p-6">
+            <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-6">
               <p className="text-sm leading-6 text-slate-600">{t("summary.empty")}</p>
               <Link href="/profile?step=evidence" className={`${primary} mt-5 inline-flex items-center`}>
                 {t("summary.start")}
               </Link>
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="mt-4 space-y-5">
               {grouped.map(({ familyId, entries: familyEntries }) => (
                 <article key={familyId} className="rounded-3xl border border-slate-200 bg-white p-6">
                   <h2 className="text-lg font-semibold">{t(`families.${familyId}`)}</h2>
@@ -421,12 +446,19 @@ export default async function ProfilePage({
                             {entry.evidence.map((evidence) => (
                               <li key={evidence.id} className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
                                 <p className="whitespace-pre-wrap">{evidence.narrative}</p>
+                                {/* Rueckfrage vor dem Loeschen: Das hier ist
+                                    der laengste selbst geschriebene Text im
+                                    Produkt und war auf einen Klick weg. */}
                                 <form action={deleteCapabilityEvidenceAction} className="mt-2">
                                   <input type="hidden" name="evidence_id" value={evidence.id} />
-                                  <SubmitButton
+                                  <ConfirmSubmitButton
                                     label={t("summary.removeEvidence")}
+                                    question={t("summary.removeEvidenceQuestion")}
+                                    confirmLabel={t("summary.removeEvidenceConfirm")}
+                                    cancelLabel={t("summary.removeEvidenceCancel")}
                                     pendingLabel={t("pending.save")}
                                     className="text-xs font-semibold text-slate-500 underline underline-offset-2"
+                                    confirmClassName="min-h-11 rounded-full border border-rose-200 bg-rose-50 px-4 text-xs font-semibold text-rose-900"
                                   />
                                 </form>
                               </li>

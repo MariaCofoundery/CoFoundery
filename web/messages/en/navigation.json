@@ -10,7 +10,7 @@
   "incomingRequestBadgePlural": "{count} open co-founder requests",
   "incomingConnectContactBadge": "{count} open Connect contact requests",
   "connectAttentionBadge": "{count} open Connect contact requests or unread messages",
-  "editProfile": "Edit profile",
+  "editProfile": "Profile",
   "editConnectProfile": "Edit Connect profile",
   "lastOpened": "Last opened",
   "logoLabel": "Go to dashboard",

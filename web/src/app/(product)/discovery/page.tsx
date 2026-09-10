@@ -24,6 +24,7 @@ import {
   type FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 import { createClient } from "@/lib/supabase/server";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -267,7 +268,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
             </details>
 
             <div className="flex flex-wrap gap-3">
-              <button type="submit" className={PRIMARY_CTA_CLASS}>{t("v2.search.apply")}</button>
+              <SubmitButton label={t("v2.search.apply")} pendingLabel={t("v2.search.applying")} className={PRIMARY_CTA_CLASS} />
               <button formAction={resetSearch} className={SECONDARY_CTA_CLASS}>{t("v2.search.reset")}</button>
             </div>
           </form>

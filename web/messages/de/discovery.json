@@ -234,7 +234,7 @@
   "v2": {
     "title": "Co-Founder finden",
     "subtitle": "Finde Founder, die zu dem passen, was du gerade suchst.",
-    "editProfile": "Mein Profil bearbeiten",
+    "editProfile": "Suchprofil bearbeiten",
     "modes": {
       "label": "Discovery-Modus",
       "explore": "Entdecken",
@@ -276,7 +276,8 @@
         "saved": "Deine private Suche wurde aktualisiert.",
         "reset": "Die Suchfilter wurden zurückgesetzt.",
         "failed": "Deine Suche konnte gerade nicht gespeichert werden."
-      }
+      },
+      "applying": "Wird angewendet …"
     },
     "alignment": {
       "eyebrow": "Optional",
@@ -471,7 +472,9 @@
       "publish": "Profil veröffentlichen",
       "pause": "Suche pausieren",
       "publishHelp": "Beim Veröffentlichen speichern wir deine aktuellen Angaben und machen dein Profil sichtbar, wenn alles vollständig ist.",
-      "publishIssues": "Bevor dein Profil sichtbar wird, ergänze noch:"
+      "publishIssues": "Bevor dein Profil sichtbar wird, ergänze noch:",
+      "saving": "Wird gespeichert …",
+      "publishing": "Wird veröffentlicht …"
     },
     "publishIssueItems": {
       "displayName": "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.",
