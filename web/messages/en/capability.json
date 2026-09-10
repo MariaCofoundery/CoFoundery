@@ -25,6 +25,17 @@
     "roles": {
       "founder": "Founder – I am founding or looking to",
       "advisor": "Advisor – I support founding teams"
+    },
+    "publishTitle": "Still needed for publishing:",
+    "publishNote": "You can save at any time – this only applies if you want your profile visible to others in Connect or in co-founder search.",
+    "gaps": {
+      "displayName": "A name with at least {min} characters",
+      "headline": "A headline with at least {min} characters",
+      "bio": "A text about you with at least {min} characters"
+    },
+    "backTo": {
+      "connect": "Back to the Connect profile",
+      "discovery": "Back to the search profile"
     }
   },
   "steps": {

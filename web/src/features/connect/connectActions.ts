@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { getIdentityGaps } from "@/features/profile/identityReadiness";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnectMessageBody, parseConnectListing, parseConnectProfile, listingPublishable, profilePublishable } from "./connectValidation";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
@@ -44,7 +45,15 @@ export async function saveConnectProfileAction(formData: FormData) {
   try { values = parseConnectProfile(formData, identity); }
   catch (error) { redirect(`/connect/profile?error=${error instanceof ConnectValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
-  if (publish && !profilePublishable(values)) redirect("/connect/profile?error=incomplete");
+  if (publish && !profilePublishable(values)) {
+    // "Ergaenze alle notwendigen Angaben" hat niemandem geholfen: Die
+    // Identitaet wird auf /profile gepflegt, die Rollen hier. Ohne zu sagen,
+    // welches von beiden fehlt, schickt die Meldung Leute im Kreis.
+    const identityGaps = getIdentityGaps({
+      display_name: values.display_name, headline: values.headline, bio: values.bio,
+    });
+    redirect(`/connect/profile?error=${identityGaps.length ? "identity_incomplete" : "roles_missing"}`);
+  }
   const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,visibility,public_slug").eq("user_id", user.id).maybeSingle();
   const profileVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
   if (profileVisibility === "public" && currentProfile.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {

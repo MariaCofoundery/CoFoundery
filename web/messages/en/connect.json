@@ -337,6 +337,8 @@
     "contact_profile": "Publish your Connect profile first so the recipient knows who is getting in touch.",
     "contact_unavailable": "A new contact request cannot be sent for this listing right now.",
     "contact_self": "You cannot send a contact request to yourself.",
-    "contact": "The contact request could not be sent."
+    "contact": "The contact request could not be sent.",
+    "identity_incomplete": "Publishing still needs a name, a headline or a text about you. Those live in your profile – the link in the section above takes you there and back.",
+    "roles_missing": "Pick at least one role before publishing your profile."
   }
 }

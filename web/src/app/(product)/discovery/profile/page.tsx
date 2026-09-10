@@ -473,7 +473,7 @@ export default async function DiscoveryProfilePage({
                     <p className="mt-3 text-sm text-amber-900">{t("profile.publicProfile.identityMissing")}</p>
                   )}
                   <p className={HELP_CLASS}>{t("profile.publicProfile.identityText")}</p>
-                  <Link href="/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
+                  <Link href="/profile?next=/discovery/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
                     {t("profile.publicProfile.identityLink")}
                   </Link>
                   {/* locationLabel ist ein abgeleitetes Altfeld und bleibt als

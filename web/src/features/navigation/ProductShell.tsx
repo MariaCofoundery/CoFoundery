@@ -188,6 +188,13 @@ export function ProductShell({
                     {item.label}
                   </Link>
                 ))}
+                {/* Das Profil ist der eine Ort fuer Identitaet, Snapshot,
+                    Freigabe und Vergleich - es gehoert in die Leiste und
+                    nicht nur in ein Menue hinter dem Bild. Genau dieses
+                    Versteck war die Beschwerde. */}
+                <Link href="/profile" className={navLinkClassName(pathname.startsWith("/profile"))}>
+                  {t("profile")}
+                </Link>
                 {resolvedActiveView === "advisor" ? (
                   <>
                     {hasConnect ? <Link href="/connect" className={`${navLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}>{t("connect")}<ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} /></Link> : null}

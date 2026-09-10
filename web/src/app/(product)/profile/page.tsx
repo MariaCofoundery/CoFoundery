@@ -24,6 +24,11 @@ import {
 } from "@/features/capability/capabilityTypes";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { PROFILE_ROLE_OPTIONS, normalizeProfileRoles, type ProfileRole } from "@/features/profile/profileRoles";
+import {
+  IDENTITY_THRESHOLDS,
+  getIdentityGaps,
+  parseIdentityReturnPath,
+} from "@/features/profile/identityReadiness";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { createClient } from "@/lib/supabase/server";
@@ -93,6 +98,9 @@ export default async function ProfilePage({
   const grouped = groupEntriesByFamily(entries, areas, families);
   const areaLabel = (areaId: string) => t(`areaLabels.${areaId}`);
   const readout = buildCapabilityReadout(entries, areas, families);
+  // Woher jemand kam, und was den Kernangaben zum Veroeffentlichen fehlt.
+  const returnPath = parseIdentityReturnPath(params.next);
+  const identityGaps = getIdentityGaps(core);
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 md:px-8">
@@ -242,10 +250,30 @@ export default async function ProfilePage({
           20260907180000 verteilt sie in Basis-, Discovery- und Connect-Profil. */}
       {step === null ? (
         <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+          {/* Reist mit, damit das Speichern zurueckfuehrt, wo es hergekommen
+              ist - siehe parseIdentityReturnPath fuer die Allowlist. */}
+          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
             <h2 className="text-xl font-semibold">{t("identity.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("identity.text")}</p>
           </div>
+          {/* Was zum Veroeffentlichen noch fehlt, steht dort, wo man es
+              aendert. Vorher stand es nur dort, wo es abgewiesen wurde -
+              man speicherte erfolgreich und scheiterte eine Seite spaeter,
+              ohne zu erfahren, an welcher Angabe. */}
+          {identityGaps.length > 0 && (isConnectMember || hasDiscovery) ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <p className="text-sm font-semibold text-amber-900">{t("identity.publishTitle")}</p>
+              <ul className="mt-2 space-y-1 text-sm text-amber-900">
+                {identityGaps.map((gap) => (
+                  <li key={gap}>
+                    · {t(`identity.gaps.${gap}`, { min: IDENTITY_THRESHOLDS[gap] })}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs leading-5 text-amber-900/80">{t("identity.publishNote")}</p>
+            </div>
+          ) : null}
           {connectProfile?.status === "active" ? (
             <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("identity.publishedNote")}</p>
           ) : null}
@@ -326,7 +354,16 @@ export default async function ProfilePage({
               </div>
             </fieldset>
           ) : null}
-          <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
+          <div className="flex flex-wrap items-center gap-3">
+            <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
+            {/* Der Weg zurueck, wenn Connect oder Discovery hierher geschickt
+                hat. Ohne ihn war die Identitaetsseite eine Sackgasse. */}
+            {returnPath ? (
+              <Link href={returnPath} className={secondary}>
+                {t(`identity.backTo.${returnPath === "/connect/profile" ? "connect" : "discovery"}`)}
+              </Link>
+            ) : null}
+          </div>
         </form>
       ) : null}
 

@@ -35,5 +35,6 @@
   "date": {
     "unknown": "ohne Datum",
     "locale": "de-DE"
-  }
+  },
+  "profile": "Profil"
 }

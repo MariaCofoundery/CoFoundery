@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { parseIdentityReturnPath } from "@/features/profile/identityReadiness";
 import { createClient } from "@/lib/supabase/server";
 
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"];
@@ -45,19 +46,39 @@ export async function saveIdentityAction(formData: FormData) {
   if (!user) redirect("/login?next=/profile");
 
   const remoteMode = String(formData.get("remote_mode") ?? "").trim();
+  // Wohin es danach zurueckgeht, wenn jemand von Connect oder Discovery
+  // hierher geschickt wurde. Ohne diesen Rueckweg endet der Weg zur
+  // Identitaet in einer Sackgasse: Die Kontextseite schickt einen hierher,
+  // und von hier fuehrt nichts zurueck.
+  const returnPath = parseIdentityReturnPath(formData.get("next"));
+  const back = (query: string) =>
+    `/profile?${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
 
-  const { error } = await client
+  const { error, count } = await client
     .from("person_core")
-    .update({
-      display_name: parseText(formData.get("display_name"), 80),
-      headline: parseText(formData.get("headline"), 160),
-      bio: parseText(formData.get("bio"), 1200),
-      location_region: parseText(formData.get("location_region"), 120),
-      remote_mode: REMOTE_MODES.includes(remoteMode) ? remoteMode : null,
-      expertise: parseList(formData.get("expertise"), 8),
-      industries: parseList(formData.get("industries"), 5),
-    })
+    .update(
+      {
+        display_name: parseText(formData.get("display_name"), 80),
+        headline: parseText(formData.get("headline"), 160),
+        bio: parseText(formData.get("bio"), 1200),
+        location_region: parseText(formData.get("location_region"), 120),
+        remote_mode: REMOTE_MODES.includes(remoteMode) ? remoteMode : null,
+        expertise: parseList(formData.get("expertise"), 8),
+        industries: parseList(formData.get("industries"), 5),
+      },
+      // Ohne count koennte diese Aktion "Gespeichert" melden, ohne etwas
+      // geschrieben zu haben: Ein update ohne passende Zeile ist fuer
+      // PostgREST kein Fehler. Der Trigger aus 20260907120000 legt die Zeile
+      // fuer jedes neue Konto an, aber ein stiller Erfolg wiegt schwerer als
+      // die Wahrscheinlichkeit, dass sie fehlt.
+      { count: "exact" }
+    )
     .eq("user_id", user.id);
+
+  if (!error && count === 0) {
+    revalidatePath("/profile");
+    redirect(back("error=save"));
+  }
 
   if (error) {
     // Der Kern ist permissiv, die Veroeffentlichung ist streng. Wer ein
@@ -68,13 +89,16 @@ export async function saveIdentityAction(formData: FormData) {
     // Meldung, sonst liest er sich wie ein technischer Fehler.
     const published = error.message.includes("active_complete");
     revalidatePath("/profile");
-    redirect(`/profile?error=${published ? "published_incomplete" : "save"}`);
+    redirect(back(`error=${published ? "published_incomplete" : "save"}`));
   }
 
-  await saveRoles(client, user.id, formData);
+  await saveRoles(client, user.id, formData, returnPath);
 
   revalidatePath("/profile");
-  redirect("/profile?saved=identity");
+  // Der Rueckweg wird nicht automatisch genommen. Wer von Connect kommt, hat
+  // hier vielleicht noch mehr vor - der Weg zurueck steht als Knopf da, statt
+  // die Person wegzuschicken.
+  redirect(back("saved=identity"));
 }
 
 /**
@@ -94,8 +118,12 @@ export async function saveIdentityAction(formData: FormData) {
 async function saveRoles(
   client: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-  formData: FormData
+  formData: FormData,
+  returnPath: string | null
 ) {
+  const back = (query: string) =>
+    `/profile?${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+
   if (!formData.has("roles")) return;
 
   const roles = [
@@ -113,12 +141,12 @@ async function saveRoles(
   // stillschweigend zu tun.
   if (roles.length === 0) {
     revalidatePath("/profile");
-    redirect("/profile?error=roles");
+    redirect(back("error=roles"));
   }
 
   const { error } = await client.from("profiles").update({ roles }).eq("user_id", userId);
   if (error) {
     revalidatePath("/profile");
-    redirect("/profile?error=save");
+    redirect(back("error=save"));
   }
 }

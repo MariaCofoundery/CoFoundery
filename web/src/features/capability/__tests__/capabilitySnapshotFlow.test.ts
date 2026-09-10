@@ -289,8 +289,9 @@ test("the Connect profile page no longer maintains identity itself", () => {
   assert.match(page, /name="network_roles"/);
   assert.match(page, /ConnectVisibilityField/);
   assert.match(page, /ConnectPhotoField/);
-  // Und ein Weg zum einen Ort.
-  assert.match(page, /href="\/profile"/);
+  // Und ein Weg zum einen Ort - mit Rueckweg, sonst ist die Identitaetsseite
+  // von hier aus eine Sackgasse.
+  assert.match(page, /href="\/profile\?next=\/connect\/profile"/);
 
   // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
   assert.match(validation, /parseConnectProfile\(formData: FormData, identity: ConnectIdentitySource \| null\)/);
@@ -309,7 +310,7 @@ test("the Discovery profile page no longer maintains identity either", () => {
   for (const kept of ["ownRoles", "seekingRoles", "availabilityHoursPerWeek", "commitmentLevel", "ventureStage", "ventureGoal", "searchIntent", "startHorizon"]) {
     assert.match(page, new RegExp(`name="${kept}"`), `${kept} gehoert hierher und fehlt`);
   }
-  assert.match(page, /href="\/profile"/);
+  assert.match(page, /href="\/profile\?next=\/discovery\/profile"/);
 
   // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
   assert.match(actions, /parseDiscoveryProfileFormData\(\s*formData: FormData,\s*identity: PersonCore \| null/);

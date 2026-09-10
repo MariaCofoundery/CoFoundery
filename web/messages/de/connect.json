@@ -337,6 +337,8 @@
     "contact_profile": "Veröffentliche zuerst dein Connect-Profil, damit der Empfänger weiß, wer Kontakt aufnimmt.",
     "contact_unavailable": "Für diesen Eintrag kann aktuell keine neue Kontaktanfrage gesendet werden.",
     "contact_self": "Du kannst dir nicht selbst eine Kontaktanfrage senden.",
-    "contact": "Die Kontaktanfrage konnte nicht gesendet werden."
+    "contact": "Die Kontaktanfrage konnte nicht gesendet werden.",
+    "identity_incomplete": "Zum Veröffentlichen fehlen noch Name, Headline oder ein Text über dich. Diese Angaben pflegst du in deinem Profil – der Link oben im Abschnitt führt hin und wieder zurück.",
+    "roles_missing": "Wähle mindestens eine Rolle, bevor du dein Profil veröffentlichst."
   }
 }

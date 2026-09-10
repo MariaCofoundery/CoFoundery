@@ -25,6 +25,17 @@
     "roles": {
       "founder": "Founder – ich gründe oder suche dafür",
       "advisor": "Advisor – ich begleite Gründungsteams"
+    },
+    "publishTitle": "Zum Veröffentlichen fehlt noch:",
+    "publishNote": "Speichern kannst du jederzeit – das hier gilt nur, wenn dein Profil in Connect oder in der Co-Founder-Suche für andere sichtbar sein soll.",
+    "gaps": {
+      "displayName": "Ein Name mit mindestens {min} Zeichen",
+      "headline": "Eine Headline mit mindestens {min} Zeichen",
+      "bio": "Ein Text über dich mit mindestens {min} Zeichen"
+    },
+    "backTo": {
+      "connect": "Zurück zum Connect-Profil",
+      "discovery": "Zurück zum Suchprofil"
     }
   },
   "steps": {
