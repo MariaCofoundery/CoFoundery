@@ -219,7 +219,30 @@ test("identity is edited in the core only, and reaches the context rows from the
   assert.match(actions, /from\("person_core"\)/);
   assert.doesNotMatch(actions, /from\("network_profiles"\)/);
   assert.doesNotMatch(actions, /from\("founder_discovery_profiles"\)/);
-  assert.doesNotMatch(actions, /from\("profiles"\)/);
+
+  // profiles wird genau einmal angefasst, und zwar nur fuer roles. Rollen sind
+  // keine Identitaet, sondern Zugehoerigkeit - die traegt der Kern absichtlich
+  // nicht. Wuerde hier ein Identitaetsfeld mitgeschrieben, waere die
+  // Doppelpflege zurueck, deshalb wird der Aufruf selbst geprueft und nicht
+  // nur sein Vorkommen.
+  const profilesWrites = actions.match(/from\("profiles"\)[^;]*/g) ?? [];
+  assert.equal(profilesWrites.length, 1, "profiles darf nur an einer Stelle geschrieben werden");
+  assert.match(profilesWrites[0], /\.update\(\{ roles \}\)/);
+  for (const identityField of [
+    "display_name",
+    "headline",
+    "bio",
+    "location_region",
+    "remote_mode",
+    "expertise",
+    "industries",
+  ]) {
+    assert.doesNotMatch(
+      profilesWrites[0],
+      new RegExp(identityField),
+      `${identityField} gehoert in den Kern, nicht nach profiles`
+    );
+  }
 
   // Die Verteilung ist die Gegenrichtung zum Sync aus Phase 2 und braucht
   // deshalb einen Schleifenschutz.

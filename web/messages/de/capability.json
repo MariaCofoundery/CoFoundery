@@ -19,7 +19,13 @@
     "industries": "Branchen & Themen",
     "industriesHint": "Mit Komma trennen, maximal {max}.",
     "submit": "Speichern",
-    "publishedNote": "Dein Connect-Profil ist veröffentlicht. Änderungen hier sind dort sofort sichtbar."
+    "publishedNote": "Dein Connect-Profil ist veröffentlicht. Änderungen hier sind dort sofort sichtbar.",
+    "rolesLegend": "Wofür bist du hier?",
+    "rolesHint": "Das steuert, welche Bereiche dir angeboten werden – nicht, worauf du Zugriff hast. Advisor-Einblicke bleiben an die Teams gebunden, die dich dazu eingeladen haben.",
+    "roles": {
+      "founder": "Founder – ich gründe oder suche dafür",
+      "advisor": "Advisor – ich begleite Gründungsteams"
+    }
   },
   "steps": {
     "evidence": "Ein Beispiel",
@@ -187,7 +193,8 @@
     "narrative": "Bitte schreibe mindestens zwei kurze Sätze.",
     "area": "Bitte wähle einen Bereich aus.",
     "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal.",
-    "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf."
+    "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf.",
+    "roles": "Mindestens eine Rolle muss gesetzt bleiben. Ohne Rolle hätte die Plattform keinen Bereich, in den sie dich führen kann."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",

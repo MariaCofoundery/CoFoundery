@@ -22,6 +22,7 @@ import {
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
+import { PROFILE_ROLE_OPTIONS, normalizeProfileRoles, type ProfileRole } from "@/features/profile/profileRoles";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { createClient } from "@/lib/supabase/server";
@@ -35,7 +36,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
-const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete"];
+const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles"];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
@@ -50,7 +51,7 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery] = await Promise.all([
+  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles] = await Promise.all([
     getTranslations("capability"),
     searchParams,
     getCapabilityVocabulary(supabase),
@@ -65,6 +66,11 @@ export default async function ProfilePage({
       .catch(() => null),
     Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
     hasFounderDiscoveryAccess(user.id, supabase).catch(() => false),
+    // Rollen liegen weiterhin auf profiles; person_core traegt Identitaet,
+    // nicht Zugehoerigkeit.
+    Promise.resolve(supabase.from("profiles").select("roles").eq("user_id", user.id).maybeSingle())
+      .then(({ data }) => normalizeProfileRoles(data?.roles ?? null))
+      .catch((): ProfileRole[] => []),
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
@@ -285,6 +291,37 @@ export default async function ProfilePage({
               <span className={hint}>{t("identity.industriesHint", { max: 5 })}</span>
             </label>
           </div>
+          {/* Rollen sind eine Navigationsangabe, keine Berechtigung: Wer
+              "Advisor" anhakt, sieht das Advisor-Dashboard - was darauf steht,
+              entscheidet weiterhin RLS ueber advisor_user_id. Deshalb darf das
+              hier aenderbar sein.
+
+              Nur sichtbar fuer Menschen, die schon eine dieser Rollen haben.
+              Einem Connect-Konto hier "Founder" anzubieten waere eine
+              Selbstfreischaltung ins Founder-Produkt und damit eine
+              Produktentscheidung, nicht ein Formularfeld. */}
+          {currentRoles.length > 0 ? (
+            <fieldset>
+              <legend className="text-sm font-medium">{t("identity.rolesLegend")}</legend>
+              <p className={hint}>{t("identity.rolesHint")}</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {PROFILE_ROLE_OPTIONS.map((role) => (
+                  <label
+                    key={role}
+                    className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      name="roles"
+                      value={role}
+                      defaultChecked={currentRoles.includes(role)}
+                    />
+                    {t(`identity.roles.${role}`)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
           <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
         </form>
       ) : null}

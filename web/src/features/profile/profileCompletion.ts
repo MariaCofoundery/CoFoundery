@@ -1,15 +1,28 @@
 import { normalizeProfileRoles, profileRoleLabel, type ProfileRole } from "@/features/profile/profileRoles";
 import type { ProfileBasicsRow } from "@/features/profile/profileData";
 
-const CORE_COMPLETION_TARGET = 40;
-
-const EXTENDED_WEIGHTS = {
-  headline: 10,
-  experience: 20,
-  skills: 20,
-  linkedin_url: 5,
-  imported_at: 5,
-} as const;
+/**
+ * Ob die vier Kernangaben da sind - eine Weiche, kein Fortschrittswert.
+ *
+ * Hier stand bis 10.09.2026 zusaetzlich ein Prozentwert (`computeProfileCompletion`)
+ * mit Punktgewichten je Feld: Kernangaben 40, Headline 10, Erfahrung 20,
+ * Skills 20, LinkedIn-URL 5, LinkedIn-Import 5. Er ist entfernt, aus drei
+ * Gruenden:
+ *
+ *   Die Gewichte waren frei gewaehlt. Aus nichts abgeleitet, also sagt
+ *   "68 % Profil" der Person nichts Wahres.
+ *
+ *   Die letzten fuenf Punkte belohnten eine Plattformhandlung - dass jemand
+ *   den LinkedIn-Import ausgefuehrt hat -, keine Eigenschaft des Menschen.
+ *
+ *   Er war schon aus der Oberflaeche entfernt und damit toter Code; ein Test
+ *   im Dashboard hielt lediglich fest, dass er dort nicht mehr auftaucht.
+ *
+ * Kein Ersatz durch einen "besseren" Vollstaendigkeitswert: Wie vollstaendig
+ * ein Formular ausgefuellt ist, ist kein Konstrukt, zu dem es etwas zu messen
+ * gibt. Was gemessen und verglichen werden kann, steht im Capability-Modell -
+ * siehe docs/capability-comparison-theory-brief.md.
+ */
 
 export type ProfileCoreModel = {
   name: string | null;
@@ -19,94 +32,32 @@ export type ProfileCoreModel = {
   avatarId: string | null;
 };
 
-export type ProfileExtendedModel = {
-  headline: string | null;
-  experience: string[];
-  skills: string[];
-  linkedin_url: string | null;
-  imported_at: string | null;
-};
-
-export type ProfileModel = {
-  core: ProfileCoreModel;
-  extended: ProfileExtendedModel;
-};
-
-export type ProfileCompletion = {
-  corePercent: number;
-  extendedPercent: number;
-  percent: number;
-  isCoreComplete: boolean;
-  hasExtendedProfile: boolean;
-  ctaLabel: string | null;
-};
-
 function normalizeText(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
   return normalized.length > 0 ? normalized : null;
 }
 
-function normalizeStringArray(values: string[] | null | undefined) {
-  return (values ?? [])
-    .map((value) => String(value ?? "").trim())
-    .filter((value) => value.length > 0);
-}
-
-export function buildProfileModel(profile: ProfileBasicsRow | null): ProfileModel {
+export function buildProfileCore(profile: ProfileBasicsRow | null): ProfileCoreModel {
   const roles = normalizeProfileRoles(profile?.roles ?? null);
   return {
-    core: {
-      name: normalizeText(profile?.display_name),
-      role: roles[0] ?? null,
-      focus: normalizeText(profile?.focus_skill),
-      intention: normalizeText(profile?.intention),
-      avatarId: normalizeText(profile?.avatar_id),
-    },
-    extended: {
-      headline: normalizeText(profile?.headline),
-      experience: normalizeStringArray(profile?.experience),
-      skills: normalizeStringArray(profile?.skills),
-      linkedin_url: normalizeText(profile?.linkedin_url),
-      imported_at: normalizeText(profile?.imported_at),
-    },
+    name: normalizeText(profile?.display_name),
+    role: roles[0] ?? null,
+    focus: normalizeText(profile?.focus_skill),
+    intention: normalizeText(profile?.intention),
+    avatarId: normalizeText(profile?.avatar_id),
   };
 }
 
+/**
+ * Steuert das Routing nach der Anmeldung. Vier Angaben, alle vier noetig -
+ * bewusst hart und ohne Abstufung, weil eine Weiche keine Zwischenstufe hat.
+ */
 export function isCoreProfileComplete(profile: ProfileBasicsRow | null) {
-  const model = buildProfileModel(profile);
-  return Boolean(model.core.name && model.core.role && model.core.focus && model.core.intention);
+  const core = buildProfileCore(profile);
+  return Boolean(core.name && core.role && core.focus && core.intention);
 }
 
 export function getPrimaryProfileRoleLabel(profile: ProfileBasicsRow | null) {
-  const role = buildProfileModel(profile).core.role;
+  const role = buildProfileCore(profile).role;
   return role ? profileRoleLabel(role) : "–";
-}
-
-export function computeProfileCompletion(profile: ProfileBasicsRow | null): ProfileCompletion {
-  const model = buildProfileModel(profile);
-  const coreChecks = [model.core.name, model.core.role, model.core.focus, model.core.intention];
-  const completedCoreChecks = coreChecks.filter(Boolean).length;
-  const corePercent = Math.round((completedCoreChecks / coreChecks.length) * CORE_COMPLETION_TARGET);
-
-  const extendedPercent =
-    (model.extended.headline ? EXTENDED_WEIGHTS.headline : 0) +
-    (model.extended.experience.length > 0 ? EXTENDED_WEIGHTS.experience : 0) +
-    (model.extended.skills.length > 0 ? EXTENDED_WEIGHTS.skills : 0) +
-    (model.extended.linkedin_url ? EXTENDED_WEIGHTS.linkedin_url : 0) +
-    (model.extended.imported_at ? EXTENDED_WEIGHTS.imported_at : 0);
-
-  const percent = Math.min(100, corePercent + extendedPercent);
-  return {
-    corePercent,
-    extendedPercent,
-    percent,
-    isCoreComplete: completedCoreChecks === coreChecks.length,
-    hasExtendedProfile:
-      Boolean(model.extended.headline) ||
-      model.extended.experience.length > 0 ||
-      model.extended.skills.length > 0 ||
-      Boolean(model.extended.linkedin_url) ||
-      Boolean(model.extended.imported_at),
-    ctaLabel: completedCoreChecks === coreChecks.length && percent < 100 ? "Profil vervollständigen" : null,
-  };
 }

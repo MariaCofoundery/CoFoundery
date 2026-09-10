@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"];
+// Muss mit PROFILE_ROLE_OPTIONS uebereinstimmen; ein Test vergleicht beide.
+const PROFILE_ROLES: string[] = ["founder", "advisor"];
 
 /**
  * Kommaliste zu Werteliste. Leer bleibt null, nicht [] - im Kern bedeutet
@@ -69,6 +71,54 @@ export async function saveIdentityAction(formData: FormData) {
     redirect(`/profile?error=${published ? "published_incomplete" : "save"}`);
   }
 
+  await saveRoles(client, user.id, formData);
+
   revalidatePath("/profile");
   redirect("/profile?saved=identity");
+}
+
+/**
+ * Rollen liegen auf `profiles`, nicht im Kern: Der Kern traegt, wer jemand
+ * ist, nicht wozu die Person auf der Plattform gehoert.
+ *
+ * Rollen sind eine Navigationsangabe, keine Berechtigung. Wer "Advisor"
+ * anhakt, bekommt das Advisor-Dashboard zu sehen; was darauf erscheint,
+ * entscheidet weiterhin RLS ueber `advisor_user_id`. Ein Haken hier oeffnet
+ * also keine fremden Daten - deshalb darf die Person das selbst aendern.
+ *
+ * Das Feld erscheint nur bei Menschen, die schon eine dieser Rollen haben,
+ * und wird hier nur angefasst, wenn das Formular es mitgeschickt hat. Sonst
+ * wuerde ein Speichern aus einem Formular ohne diesen Abschnitt die Rollen
+ * loeschen.
+ */
+async function saveRoles(
+  client: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  formData: FormData
+) {
+  if (!formData.has("roles")) return;
+
+  const roles = [
+    ...new Set(
+      formData
+        .getAll("roles")
+        .map((value) => String(value).trim().toLowerCase())
+        .filter((value) => PROFILE_ROLES.includes(value))
+    ),
+  ];
+
+  // Ohne Rolle greift die Weiche in resolveProductEntryPath nicht mehr und
+  // die Person landet beim naechsten Login auf /start - aus dem Produkt
+  // geworfen durch zwei abgewaehlte Haken. Das wird abgewiesen, statt es
+  // stillschweigend zu tun.
+  if (roles.length === 0) {
+    revalidatePath("/profile");
+    redirect("/profile?error=roles");
+  }
+
+  const { error } = await client.from("profiles").update({ roles }).eq("user_id", userId);
+  if (error) {
+    revalidatePath("/profile");
+    redirect("/profile?error=save");
+  }
 }

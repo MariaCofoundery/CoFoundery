@@ -19,7 +19,13 @@
     "industries": "Industries & topics",
     "industriesHint": "Separate with commas, up to {max}.",
     "submit": "Save",
-    "publishedNote": "Your Connect profile is published. Changes here are visible there immediately."
+    "publishedNote": "Your Connect profile is published. Changes here are visible there immediately.",
+    "rolesLegend": "What are you here for?",
+    "rolesHint": "This controls which areas are offered to you – not what you have access to. Advisor insight stays tied to the teams that invited you.",
+    "roles": {
+      "founder": "Founder – I am founding or looking to",
+      "advisor": "Advisor – I support founding teams"
+    }
   },
   "steps": {
     "evidence": "One example",
@@ -187,7 +193,8 @@
     "narrative": "Please write at least two short sentences.",
     "area": "Please choose an area.",
     "save": "That could not be saved just now. Please try again.",
-    "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first."
+    "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first.",
+    "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",

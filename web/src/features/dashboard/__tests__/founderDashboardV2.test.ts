@@ -147,7 +147,15 @@ test("foundation states remain factual and independent", () => {
 test("dashboard no longer renders a global roadmap, profile percentage, or workbook step", () => {
   assert.doesNotMatch(dashboardSource, /DashboardProgressRoadmap/);
   assert.doesNotMatch(dashboardSource, /currentStep/);
+  // Der Prozentwert ist nicht nur aus dem Dashboard verschwunden, sondern
+  // ganz: seine Gewichte waren frei gewaehlt, und einer davon belohnte eine
+  // Plattformhandlung statt einer Eigenschaft der Person.
   assert.doesNotMatch(dashboardSource, /computeProfileCompletion/);
+  const completionSource = readFileSync("src/features/profile/profileCompletion.ts", "utf8");
+  assert.doesNotMatch(completionSource, /export function computeProfileCompletion/);
+  assert.doesNotMatch(completionSource, /EXTENDED_WEIGHTS/);
+  // Die Weiche fuers Routing bleibt - sie ist kein Score.
+  assert.match(completionSource, /export function isCoreProfileComplete/);
   assert.doesNotMatch(dashboardSource, /founder_alignment_workbooks/);
   assert.doesNotMatch(dashboardSource, /startWorkbook|continueWorkbook|workbookFocus/);
 });
