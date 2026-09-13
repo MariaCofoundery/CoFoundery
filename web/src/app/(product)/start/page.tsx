@@ -6,6 +6,7 @@ import { normalizeNextPath } from "@/features/auth/authRedirects";
 import {
   BETA_ACCESS_REQUEST_EMAIL,
   getBetaAccessRequestHref,
+  getAllowedBetaCodes,
   isValidBetaAccessCode,
 } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
@@ -46,6 +47,13 @@ function statusMessage(status: string | undefined, t: AuthT) {
     return {
       tone: "error" as const,
       text: t("start.status.invalid"),
+    };
+  }
+
+  if (status === "not_configured") {
+    return {
+      tone: "error" as const,
+      text: t("start.status.notConfigured"),
     };
   }
 
@@ -93,6 +101,14 @@ export default async function StartPage({
     const code = String(formData.get("betaCode") ?? "");
     const intent = normalizeSignupIntent(String(formData.get("intent") ?? "founder"));
     const redirectNextPath = normalizeNextPath(String(formData.get("nextPath") ?? "/dashboard"));
+
+    // Ohne konfigurierte Codes ist JEDER Code ungueltig - und die Meldung
+    // sagte dann "Bitte pruefe deine Angaben", obwohl an den Angaben nichts
+    // falsch war. Das ist die Art Fehler, bei der man sich selbst die Schuld
+    // gibt und weiterprobiert. Der Fall bekommt eine eigene Meldung.
+    if (getAllowedBetaCodes().length === 0) {
+      redirect(buildStartHref("not_configured", redirectNextPath, intent));
+    }
 
     if (!email || !email.includes("@") || !isValidBetaAccessCode(code)) {
       redirect(buildStartHref("invalid", redirectNextPath, intent));

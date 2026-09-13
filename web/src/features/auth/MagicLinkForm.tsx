@@ -59,9 +59,18 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
       },
     });
 
-    if (error) {
-      setStatus("sent");
-      setMessage(sentMessage);
+    // Die neutrale Meldung ist Absicht und bleibt: Ob es zu einer Adresse ein
+    // Konto gibt, darf ein Formular nicht verraten - sonst laesst sich damit
+    // die Mitgliederliste abfragen. Deshalb sieht der Fall "kein Konto"
+    // genauso aus wie der Erfolg.
+    //
+    // Falsch war, dass auch BETRIEBLICHE Fehler so aussahen. Wer das
+    // Stundenlimit fuer Mails reisst, bekam "Wir senden dir einen Link" und
+    // wartete auf eine Mail, die nie kommt. Das Limit sagt nichts darueber
+    // aus, ob das Konto existiert - es darf also benannt werden.
+    if (error && isRateLimited(error)) {
+      setStatus("error");
+      setMessage(t("rateLimited"));
       return;
     }
 
@@ -95,11 +104,31 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
       </p>
       {message ? (
         <p
+          role={status === "error" ? "alert" : "status"}
           className={`text-sm ${status === "error" ? "text-red-700" : "text-[color:var(--muted)]"}`}
         >
           {message}
         </p>
       ) : null}
+      {/* Weil die Erfolgsmeldung bewusst neutral ist - sie darf nicht
+          verraten, ob es das Konto gibt -, braucht sie einen Weg nach vorn
+          fuer den Fall, dass nichts ankommt. Sonst wartet man auf eine Mail
+          und weiss nicht, woran es liegen koennte. */}
+      {status === "sent" ? (
+        <p className="text-xs text-[color:var(--muted)]">{t("noMailHint")}</p>
+      ) : null}
     </form>
   );
+}
+
+/**
+ * Ob Supabase wegen des Stundenlimits abgelehnt hat.
+ *
+ * Geprueft wird der Status, nicht der Text: Die Meldung ist nicht stabil und
+ * nicht uebersetzt. `code` gibt es erst in neueren Fassungen, deshalb beides.
+ */
+function isRateLimited(error: { status?: number; code?: string; message?: string }) {
+  if (error.status === 429) return true;
+  if (error.code === "over_email_send_rate_limit") return true;
+  return /rate limit/i.test(error.message ?? "");
 }

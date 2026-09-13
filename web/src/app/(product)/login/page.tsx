@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
+import { canCreateAccountFromPath } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
@@ -20,16 +21,6 @@ function authErrorMessage(error: string | undefined, t: AuthT) {
   return error ? t("login.errors.generic") : null;
 }
 
-function canCreateUserFromLogin(nextPath: string) {
-  return (
-    nextPath === "/join/continue" ||
-    nextPath.startsWith("/join/continue?") ||
-    nextPath.startsWith("/team-invite/") ||
-    nextPath === "/advisor/invite/continue" ||
-    nextPath.startsWith("/advisor/invite/continue?")
-  );
-}
-
 export default async function LoginPage({
   searchParams,
 }: {
@@ -43,7 +34,7 @@ export default async function LoginPage({
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
   const errorMessage = authErrorMessage(params.error, t);
-  const shouldCreateUser = canCreateUserFromLogin(nextPath);
+  const shouldCreateUser = canCreateAccountFromPath(nextPath);
 
   if (user) {
     redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
