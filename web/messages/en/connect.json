@@ -106,14 +106,17 @@
     "allScopes": "All geographic scopes",
     "remote": "Collaboration mode",
     "allRemote": "All work modes",
-    "apply": "Apply filters"
+    "apply": "Apply filters",
+    "search": "Search titles, descriptions, topics and industries"
   },
   "empty": {
     "title": "No listing currently meets every selected criterion.",
     "text": "Reset the filters or make your own current need or contribution concrete.",
     "reset": "Reset filters",
     "createSeeking": "Create a need",
-    "createOffering": "Create an offer"
+    "createOffering": "Create an offer",
+    "firstTitle": "Nothing here yet.",
+    "firstText": "Connect only works once someone starts. Say what you are looking for or what you can contribute – that becomes the first entry others see."
   },
   "form": {
     "direction": "What would you like to do?",

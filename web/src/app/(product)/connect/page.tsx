@@ -14,6 +14,9 @@ const action = "inline-flex min-h-11 items-center justify-center rounded-full px
 const field = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm";
 export default async function ConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const [t, locale, filters] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]);
+  // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
+  const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
+    .some((key) => (filters[key] ?? "").trim().length > 0);
   const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client)]);
   const connectAttentionCount = getConnectAttentionCount(incomingContacts, unreadMessages);
   const cofounderHref = coFounderBridgeHref(hasProfileRole(baseProfile?.roles, "founder"));
@@ -24,15 +27,34 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <nav className="mt-5 flex flex-wrap gap-4 text-sm"><Link href="/connect/my" className="font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.my")}</Link><Link href="/connect/contacts" className="inline-flex items-center gap-2 font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}{connectAttentionCount > 0 ? <span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span> : null}</Link><Link href="/connect/profile" className="font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.profile")}</Link></nav>
       </header>
       <section className={card}><h2 className="text-lg font-semibold">{t("filters.title")}</h2><form className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <input
+          name="q"
+          type="search"
+          defaultValue={filters.q}
+          className={`${field} sm:col-span-2 lg:col-span-4`}
+          placeholder={t("filters.search")}
+          aria-label={t("filters.search")}
+        />
         <select name="direction" defaultValue={filters.direction || ""} className={field} aria-label={t("filters.direction")}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select>
         <select name="category" defaultValue={filters.category || ""} className={field} aria-label={t("filters.category")}><option value="">{t("filters.allCategories")}</option>{CONNECT_CATEGORIES.map((v) => <option key={v} value={v}>{t(`categories.${v}`)}</option>)}</select>
-        <input name="topic" defaultValue={filters.topic} className={field} placeholder={t("filters.topic")} />
-        <input name="industry" defaultValue={filters.industry} className={field} placeholder={t("filters.industry")} />
         <select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={field} aria-label={t("filters.scope")}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select>
         <select name="remote_mode" defaultValue={filters.remote_mode || ""} className={field} aria-label={t("filters.remote")}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select>
         <button className="min-h-11 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white">{t("filters.apply")}</button>
       </form></section>
-      {listings.length ? <section aria-label={t("browseTitle")} className="grid gap-4 md:grid-cols-2">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}><h2 className="text-xl font-semibold">{t("empty.title")}</h2><p className="mt-2 text-sm text-slate-600">{t("empty.text")}</p><div className="mt-5 flex flex-wrap justify-center gap-3"><Link href="/connect" className={`${action} border border-slate-200`}>{t("empty.reset")}</Link><Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)]`}>{t("empty.createSeeking")}</Link><Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200`}>{t("empty.createOffering")}</Link></div></section>}
+      {listings.length ? <section aria-label={t("browseTitle")} className="grid gap-4 md:grid-cols-2">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
+        {/* Zwei verschiedene Leerzustaende, die vorher gleich aussahen.
+            Wer ohne Filter auf eine leere Flaeche kommt, ist der erste
+            Mensch hier - "kein Eintrag passt zu allen Kriterien" und ein
+            Knopf "Filter zuruecksetzen", der nichts tut, liest sich dann
+            wie eine Stoerung. */}
+        <h2 className="text-xl font-semibold">{t(isFiltered ? "empty.title" : "empty.firstTitle")}</h2>
+        <p className="mt-2 text-sm text-slate-600">{t(isFiltered ? "empty.text" : "empty.firstText")}</p>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          {isFiltered ? <Link href="/connect" className={`${action} border border-slate-200`}>{t("empty.reset")}</Link> : null}
+          <Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)]`}>{t("empty.createSeeking")}</Link>
+          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200`}>{t("empty.createOffering")}</Link>
+        </div>
+      </section>}
     </div>
   </main>;
 }

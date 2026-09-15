@@ -106,14 +106,17 @@
     "allScopes": "Alle Reichweiten",
     "remote": "Zusammenarbeitsmodus",
     "allRemote": "Alle Arbeitsweisen",
-    "apply": "Filter anwenden"
+    "apply": "Filter anwenden",
+    "search": "Suche in Titel, Beschreibung, Themen und Branchen"
   },
   "empty": {
     "title": "Gerade passt kein Eintrag zu allen Kriterien.",
     "text": "Du kannst die Filter zurücksetzen oder selbst konkret machen, was du suchst oder beitragen kannst.",
     "reset": "Filter zurücksetzen",
     "createSeeking": "Eigenes Gesuch erstellen",
-    "createOffering": "Eigenes Angebot erstellen"
+    "createOffering": "Eigenes Angebot erstellen",
+    "firstTitle": "Hier ist noch nichts.",
+    "firstText": "Connect lebt davon, dass jemand anfängt. Sag, was du gerade suchst oder was du beitragen kannst – das ist der erste Eintrag, den andere sehen."
   },
   "form": {
     "direction": "Was möchtest du tun?",

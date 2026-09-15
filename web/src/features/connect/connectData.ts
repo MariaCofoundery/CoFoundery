@@ -48,6 +48,19 @@ export async function getActiveConnectListings(client: Client, filters: Record<s
   if (isOneOf(CONNECT_GEOGRAPHIC_SCOPES, filters.geographic_scope)) query = query.eq("geographic_scope", filters.geographic_scope);
   if (filters.topic) query = query.contains("topics", [filters.topic]);
   if (filters.industry) query = query.contains("industries", [filters.industry]);
+  // Freitext ueber Titel, Beschreibung, Themen und Branchen. search_text haelt
+  // der Trigger aus 20260915120000 aktuell; ilike findet dabei auch Teile von
+  // Komposita - "vertrieb" findet "Vertriebsstrukturen".
+  //
+  // Die Sonderzeichen von LIKE werden entschaerft, sonst waere ein getipptes
+  // "%" eine Suche nach allem und "_" nach beliebigem Zeichen. Das ist keine
+  // Sicherheitsfrage - PostgREST parametrisiert -, aber ein verwirrendes
+  // Ergebnis.
+  const term = (filters.q ?? "").trim();
+  if (term) {
+    const escaped = term.replace(/[\\%_]/g, (match) => `\\${match}`);
+    query = query.ilike("search_text", `%${escaped}%`);
+  }
   const { data, error } = await query;
   if (error) throw new Error("network_listings_load_failed");
   return (data ?? []) as ConnectListing[];
