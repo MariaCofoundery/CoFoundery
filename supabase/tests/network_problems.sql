@@ -15,6 +15,16 @@ insert into public.network_memberships (user_id, status) values
   ('b2222222-2222-4222-8222-222222222222', 'active'),
   ('c3333333-3333-4333-8333-333333333333', 'active');
 
+-- Seit 20260916120000 verlangt ein veroeffentlichtes Problem ein aktives
+-- Connect-Profil - sonst koennte niemand darauf antworten.
+insert into public.network_profiles (user_id, display_name, headline, bio, network_roles, status, published_at) values
+  ('a1111111-1111-4111-8111-111111111111', 'Autorin', 'Sieht ein Problem',
+   'Arbeitet in der Pflege und beobachtet dort seit Jahren dieselbe Luecke.', array['founder'], 'active', now()),
+  ('b2222222-2222-4222-8222-222222222222', 'Interessent', 'Baut Software',
+   'Entwickelt seit zehn Jahren Anwendungen fuer kleine Organisationen und Teams.', array['expert'], 'active', now()),
+  ('c3333333-3333-4333-8333-333333333333', 'Unbeteiligt', 'Sieht nichts',
+   'Hat mit dieser Sache nichts zu tun und darf deshalb nichts davon sehen.', array['expert'], 'active', now());
+
 set local role authenticated;
 
 -- ---------------------------------------------------------------------------
