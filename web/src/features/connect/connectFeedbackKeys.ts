@@ -23,6 +23,10 @@ export const CONNECT_ERROR_KEYS = [
   "contact_profile",
   "contact_self",
   "contact_unavailable",
+  "problem_title",
+  "problem_description",
+  "problem_intent",
+  "interest_note",
   "save",
 ] as const;
 

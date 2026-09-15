@@ -69,7 +69,8 @@
   "navigation": {
     "overview": "Back to Connect overview",
     "connect": "Back to Connect",
-    "myListings": "Back to my listings"
+    "myListings": "Back to my listings",
+    "problems": "Problems"
   },
   "pending": {
     "save": "Saving …",
@@ -348,6 +349,82 @@
     "contact_self": "You cannot send a contact request to yourself.",
     "contact": "The contact request could not be sent.",
     "identity_incomplete": "Publishing still needs a name, a headline or a text about you. Those live in your profile – the link in the section above takes you there and back.",
-    "roles_missing": "Pick at least one role before publishing your profile."
+    "roles_missing": "Pick at least one role before publishing your profile.",
+    "problem_title": "The title needs between 5 and 120 characters.",
+    "problem_description": "The description needs at least 50 characters – who does it affect, and what is missing today?",
+    "problem_intent": "Choose what you intend with the problem.",
+    "interest_note": "Write briefly what you bring – at least 10 characters."
+  },
+  "problems": {
+    "title": "Problems people see",
+    "text": "This is what people experience as unsolved around them. Some want to build something from it, some already are, and some simply describe it because someone ought to know.",
+    "create": "Describe a problem",
+    "createTitle": "What do you see that ought to be solved?",
+    "createText": "Describe it concretely enough that someone without your background understands it – who it affects, and what is missing today.",
+    "backToBoard": "Back to the problems",
+    "searchPlaceholder": "Search titles, descriptions, topics and places",
+    "intentLabel": "What the person intends",
+    "allIntents": "All",
+    "unknownAuthor": "No profile",
+    "interestCount": "{count, plural, =0 {Nobody would work on it yet} one {1 person would work on it} other {# people would work on it}}",
+    "emptyFirst": "Nothing here yet.",
+    "emptyFirstText": "The first problem is the hardest. Describe something you notice around you – even if you have no solution for it.",
+    "emptyFiltered": "Nothing matches right now.",
+    "emptyFilteredText": "Reset the filters, or describe what you notice yourself.",
+    "intents": {
+      "observation": "Observation",
+      "wants_to_build": "Looking for co-founders",
+      "already_building": "Already working on it"
+    },
+    "intentHints": {
+      "observation": "I am describing it because someone ought to know. I have no plans with it myself.",
+      "wants_to_build": "I would build something from this and am looking for people to found with.",
+      "already_building": "I am already working on a solution – so nobody starts the same thing independently."
+    },
+    "statuses": {
+      "draft": "Not published yet. Only you can see this.",
+      "withdrawn": "Withdrawn.",
+      "resolved": "Marked as solved."
+    },
+    "form": {
+      "title": "What is it about, in one sentence?",
+      "titlePlaceholder": "For example: Care services cannot find short-notice cover",
+      "titleHint": "This sentence appears in the overview later.",
+      "description": "What exactly is missing today?",
+      "descriptionPlaceholder": "For example: When someone drops out at short notice, managers spend hours phoning down lists. There is no shared overview of who could step in when.",
+      "descriptionHint": "At least {min} characters. Who does it affect, how often, and what happens instead today?",
+      "intent": "What do you intend with this?",
+      "intentHint": "This decides what others can expect from you – and whether they approach you.",
+      "locations": "Where do you notice this?",
+      "locationsPlaceholder": "Berlin, Brandenburg",
+      "locationsHint": "Separate with commas, at most {max}.",
+      "publish": "Publish",
+      "saveDraft": "Save as draft"
+    },
+    "profileRequiredTitle": "Publishing needs a profile first",
+    "profileRequiredText": "You can save a draft at any time. A problem can only be published once your Connect profile is active – otherwise nobody can respond to it.",
+    "ownTitle": "Your entry",
+    "ownText": "Withdrawing hides it from others. Marking it solved leaves it standing but ends the search.",
+    "publish": "Publish now",
+    "markResolved": "Mark as solved",
+    "withdraw": "Withdraw",
+    "interestedTitle": "Who would work on it",
+    "interestedEmpty": "Nobody yet. That says little – a problem usually takes a while before someone comes across it.",
+    "startConversation": "Start a conversation",
+    "interestTitle": "Would you work on this?",
+    "interestText": "Say briefly what you bring or why this concerns you. The person who posted it then decides whether to start a conversation.",
+    "interestNoteLabel": "What do you bring?",
+    "interestNotePlaceholder": "For example: I have worked in this field for years and know the processes from the inside.",
+    "interestNoteHint": "At least {min} characters. A click without words helps nobody.",
+    "expressInterest": "I would work on this",
+    "interestSaved": "Your response has arrived. If the person who posted it starts a conversation, you will find it under Messages.",
+    "yourInterestTitle": "This is what you wrote",
+    "yourInterestText": "Only the person who posted it sees your name. For everyone else, only the number counts.",
+    "withdrawInterest": "Withdraw interest",
+    "withdrawInterestQuestion": "Really withdraw? A conversation that came from it will disappear too.",
+    "withdrawInterestConfirm": "Yes, withdraw",
+    "withdrawInterestCancel": "Keep it",
+    "interestProfileRequiredTitle": "Your Connect profile comes first",
+    "interestProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards."
   }
 }

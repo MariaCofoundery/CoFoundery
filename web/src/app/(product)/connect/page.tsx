@@ -26,6 +26,13 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <div className="mt-6 flex flex-wrap gap-3"><Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)] text-slate-950`}>{t("actions.seek")}</Link><Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link><Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link></div>
         <nav className="mt-5 flex flex-wrap gap-4 text-sm"><Link href="/connect/my" className="font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.my")}</Link><Link href="/connect/contacts" className="inline-flex items-center gap-2 font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}{connectAttentionCount > 0 ? <span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span> : null}</Link><Link href="/connect/profile" className="font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.profile")}</Link></nav>
       </header>
+      <section className={`${card} mb-6`}>
+        <h2 className="text-lg font-semibold">{t("problems.title")}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{t("problems.text")}</p>
+        <Link href="/connect/problems" className={`${action} mt-4 border border-slate-200`}>
+          {t("navigation.problems")}
+        </Link>
+      </section>
       <section className={card}><h2 className="text-lg font-semibold">{t("filters.title")}</h2><form className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <input
           name="q"

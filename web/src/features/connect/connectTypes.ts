@@ -99,3 +99,56 @@ export function categorySupportsRemoteMode(category: ConnectCategory) {
 export function categorySupportsVentureStage(category: ConnectCategory) {
   return category === "expertise" || category === "cooperation" || category === "investment";
 }
+
+// ---------------------------------------------------------------------------
+// Problembrett
+// ---------------------------------------------------------------------------
+/**
+ * Was die einstellende Person mit dem Problem vorhat. Der Unterschied ist
+ * wesentlich: Eine Beobachtung sucht niemanden, eine Mitgruendersuche schon,
+ * und "ich arbeite schon daran" verhindert, dass zwei Leute dasselbe
+ * unabhaengig anfangen.
+ */
+export const CONNECT_PROBLEM_INTENTS = ["observation", "wants_to_build", "already_building"] as const;
+export type ConnectProblemIntent = (typeof CONNECT_PROBLEM_INTENTS)[number];
+
+export const CONNECT_PROBLEM_STATUSES = ["draft", "active", "withdrawn", "resolved"] as const;
+export type ConnectProblemStatus = (typeof CONNECT_PROBLEM_STATUSES)[number];
+
+/** Muessen mit den Check-Constraints in 20260915140000 uebereinstimmen. */
+export const PROBLEM_TITLE_MIN = 5;
+export const PROBLEM_TITLE_MAX = 120;
+export const PROBLEM_DESCRIPTION_MIN = 50;
+export const PROBLEM_DESCRIPTION_MAX = 2000;
+export const PROBLEM_INTEREST_NOTE_MIN = 10;
+export const PROBLEM_INTEREST_NOTE_MAX = 500;
+
+export type ConnectProblem = {
+  id: string;
+  author_user_id: string;
+  title: string;
+  description: string;
+  author_intent: ConnectProblemIntent;
+  locations: string[];
+  geographic_scope: ConnectGeographicScope;
+  topics: string[];
+  industries: string[];
+  status: ConnectProblemStatus;
+  published_at: string | null;
+  resolved_at: string | null;
+  interest_count: number;
+  created_at: string;
+  network_profiles?: ConnectProfile | ConnectProfile[] | null;
+};
+
+export type ConnectProblemInterest = {
+  id: string;
+  problem_id: string;
+  user_id: string;
+  note: string;
+  created_at: string;
+};
+
+export function isConnectProblemIntent(value: unknown): value is ConnectProblemIntent {
+  return typeof value === "string" && (CONNECT_PROBLEM_INTENTS as readonly string[]).includes(value);
+}

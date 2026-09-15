@@ -69,7 +69,8 @@
   "navigation": {
     "overview": "Zur Connect-Übersicht",
     "connect": "Zurück zum Connect",
-    "myListings": "Zurück zu meinen Einträgen"
+    "myListings": "Zurück zu meinen Einträgen",
+    "problems": "Probleme"
   },
   "pending": {
     "save": "Speichert …",
@@ -348,6 +349,82 @@
     "contact_self": "Du kannst dir nicht selbst eine Kontaktanfrage senden.",
     "contact": "Die Kontaktanfrage konnte nicht gesendet werden.",
     "identity_incomplete": "Zum Veröffentlichen fehlen noch Name, Headline oder ein Text über dich. Diese Angaben pflegst du in deinem Profil – der Link oben im Abschnitt führt hin und wieder zurück.",
-    "roles_missing": "Wähle mindestens eine Rolle, bevor du dein Profil veröffentlichst."
+    "roles_missing": "Wähle mindestens eine Rolle, bevor du dein Profil veröffentlichst.",
+    "problem_title": "Der Titel braucht zwischen 5 und 120 Zeichen.",
+    "problem_description": "Die Beschreibung braucht mindestens 50 Zeichen – wen betrifft es, und was fehlt heute?",
+    "problem_intent": "Wähle, was du mit dem Problem vorhast.",
+    "interest_note": "Schreib kurz, was du mitbringst – mindestens 10 Zeichen."
+  },
+  "problems": {
+    "title": "Probleme, die jemand sieht",
+    "text": "Hier steht, was Menschen in ihrem Umfeld als ungelöst erleben. Manche wollen selbst etwas daraus machen, manche arbeiten schon daran, und manche schildern es einfach, weil es jemand wissen sollte.",
+    "create": "Ein Problem schildern",
+    "createTitle": "Was siehst du, das gelöst gehört?",
+    "createText": "Beschreib es so konkret, dass jemand ohne deinen Hintergrund versteht, worum es geht – wen es betrifft, und was heute daran fehlt.",
+    "backToBoard": "Zurück zu den Problemen",
+    "searchPlaceholder": "Suche in Titel, Beschreibung, Themen und Orten",
+    "intentLabel": "Was die Person vorhat",
+    "allIntents": "Alle",
+    "unknownAuthor": "Ohne Profil",
+    "interestCount": "{count, plural, =0 {Noch niemand würde mitarbeiten} one {1 Person würde mitarbeiten} other {# Personen würden mitarbeiten}}",
+    "emptyFirst": "Hier ist noch nichts.",
+    "emptyFirstText": "Das erste Problem ist das schwerste. Schildere etwas, das dir in deinem Umfeld auffällt – auch wenn du selbst keine Lösung dafür hast.",
+    "emptyFiltered": "Dazu passt gerade nichts.",
+    "emptyFilteredText": "Setz die Eingrenzung zurück oder schildere selbst, was dir auffällt.",
+    "intents": {
+      "observation": "Beobachtung",
+      "wants_to_build": "Sucht Mitgründer",
+      "already_building": "Arbeitet schon daran"
+    },
+    "intentHints": {
+      "observation": "Ich schildere es, weil es jemand wissen sollte. Ich selbst habe nichts damit vor.",
+      "wants_to_build": "Ich würde daraus etwas machen und suche Menschen, die mitgründen.",
+      "already_building": "Ich arbeite bereits an einer Lösung – damit niemand dasselbe unabhängig anfängt."
+    },
+    "statuses": {
+      "draft": "Noch nicht veröffentlicht. Nur du siehst das hier.",
+      "withdrawn": "Zurückgezogen.",
+      "resolved": "Als gelöst markiert."
+    },
+    "form": {
+      "title": "Worum geht es, in einem Satz?",
+      "titlePlaceholder": "Zum Beispiel: Pflegedienste finden keine kurzfristige Vertretung",
+      "titleHint": "Der Satz steht später in der Übersicht.",
+      "description": "Was genau fehlt heute?",
+      "descriptionPlaceholder": "Zum Beispiel: Wenn jemand kurzfristig ausfällt, telefonieren Leitungen stundenlang Listen ab. Es gibt keine gemeinsame Übersicht, wer wann einspringen könnte.",
+      "descriptionHint": "Mindestens {min} Zeichen. Wen betrifft es, wie oft, und was passiert heute stattdessen?",
+      "intent": "Was hast du damit vor?",
+      "intentHint": "Das entscheidet, was andere von dir erwarten können – und ob sie dich ansprechen.",
+      "locations": "Wo fällt dir das auf?",
+      "locationsPlaceholder": "Berlin, Brandenburg",
+      "locationsHint": "Mit Komma trennen, maximal {max}.",
+      "publish": "Veröffentlichen",
+      "saveDraft": "Als Entwurf speichern"
+    },
+    "profileRequiredTitle": "Veröffentlichen geht erst mit Profil",
+    "profileRequiredText": "Als Entwurf kannst du jederzeit speichern. Veröffentlichen lässt sich ein Problem erst, wenn dein Connect-Profil aktiv ist – sonst kann niemand darauf antworten.",
+    "ownTitle": "Dein Eintrag",
+    "ownText": "Zurückziehen macht ihn für andere unsichtbar. Als gelöst zu markieren lässt ihn stehen, aber beendet die Suche.",
+    "publish": "Jetzt veröffentlichen",
+    "markResolved": "Als gelöst markieren",
+    "withdraw": "Zurückziehen",
+    "interestedTitle": "Wer mitarbeiten würde",
+    "interestedEmpty": "Noch niemand. Das sagt wenig – ein Problem braucht meist etwas Zeit, bis jemand darauf stößt.",
+    "startConversation": "Gespräch beginnen",
+    "interestTitle": "Würdest du daran arbeiten?",
+    "interestText": "Sag kurz, was du mitbringst oder warum dich das angeht. Die einstellende Person entscheidet dann, ob sie ein Gespräch beginnt.",
+    "interestNoteLabel": "Was bringst du mit?",
+    "interestNotePlaceholder": "Zum Beispiel: Ich arbeite seit Jahren in dem Bereich und kenne die Abläufe von innen.",
+    "interestNoteHint": "Mindestens {min} Zeichen. Ein Klick ohne Worte hilft niemandem weiter.",
+    "expressInterest": "Ich würde daran arbeiten",
+    "interestSaved": "Deine Rückmeldung ist angekommen. Wenn die einstellende Person ein Gespräch beginnt, findest du es unter Nachrichten.",
+    "yourInterestTitle": "Das hast du geschrieben",
+    "yourInterestText": "Nur die einstellende Person sieht deinen Namen. Für alle anderen zählt nur die Zahl.",
+    "withdrawInterest": "Interesse zurückziehen",
+    "withdrawInterestQuestion": "Wirklich zurückziehen? Ein Gespräch, das daraus entstanden ist, verschwindet damit auch.",
+    "withdrawInterestConfirm": "Ja, zurückziehen",
+    "withdrawInterestCancel": "Doch nicht",
+    "interestProfileRequiredTitle": "Zuerst dein Connect-Profil",
+    "interestProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach landest du wieder hier."
   }
 }
