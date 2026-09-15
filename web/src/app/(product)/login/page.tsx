@@ -15,6 +15,14 @@ function authErrorMessage(error: string | undefined, t: AuthT) {
   if (normalized === "magic_link_failed") {
     return t("login.errors.magicLinkFailed");
   }
+  if (normalized === "link_expired") {
+    return t("login.errors.linkExpired");
+  }
+  // Der wichtigste Fall, weil er als einziger NICHT an der Person liegt: Der
+  // Link kam ohne Tokens an. Ein neuer Link hilft dann nicht.
+  if (normalized === "link_incomplete") {
+    return t("login.errors.linkIncomplete");
+  }
   if (normalized === "auth_callback_failed") {
     return t("login.errors.authCallbackFailed");
   }

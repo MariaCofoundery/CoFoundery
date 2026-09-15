@@ -48,6 +48,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
       return;
     }
 
+
     const redirectTo = new URL("/auth/callback", `${origin}/`);
     redirectTo.searchParams.set("next", nextPath);
 
@@ -75,7 +76,15 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
     }
 
     setStatus("sent");
-    setMessage(sentMessage);
+    // Der Link zeigt auf die konfigurierte Adresse, nicht auf die, auf der man
+    // gerade steht. Normalerweise dasselbe. Auf einer Vorschau-Adresse nicht -
+    // dann fuehrt der Link woandershin, und das faellt niemandem auf, weil er
+    // ja funktioniert, nur eben auf der anderen Seite. Nicht blockieren: Eine
+    // Alias-Domain (mit und ohne www) wuerde sonst die Anmeldung ganz
+    // verhindern. Nur sagen, wohin es geht.
+    setMessage(
+      origin === window.location.origin ? sentMessage : t("originMismatch", { origin })
+    );
   };
 
   return (

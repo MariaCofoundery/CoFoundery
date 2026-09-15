@@ -7,9 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 
 const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
 
-function buildLoginErrorHref(nextPath: string) {
+function buildLoginErrorHref(nextPath: string, error = "auth_callback_failed") {
   const params = new URLSearchParams({
-    error: "auth_callback_failed",
+    error,
     next: normalizeNextPath(nextPath),
   });
 
@@ -90,9 +90,9 @@ export default function AuthCallbackClientPage() {
       const connectSignupToken = getParam("network_signup_token");
       const profileSignupIntent = getParam("profile_signup_intent");
 
-      const fail = () => {
+      const fail = (error = "auth_callback_failed") => {
         if (!cancelled) {
-          window.location.replace(buildLoginErrorHref(nextPath));
+          window.location.replace(buildLoginErrorHref(nextPath, error));
         }
       };
 
@@ -129,7 +129,10 @@ export default function AuthCallbackClientPage() {
         } else {
           const existing = await supabase.auth.getUser();
           if (existing.error || !existing.data.user) {
-            fail();
+            // Weder Code noch token_hash noch Tokens im Hash, und keine
+            // bestehende Sitzung: Der Link kam unvollstaendig an. Ein neuer
+            // Link aendert daran nichts - das ist ein Konfigurationsfall.
+            fail("link_incomplete");
             return;
           }
         }

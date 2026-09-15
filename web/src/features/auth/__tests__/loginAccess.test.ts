@@ -136,7 +136,8 @@ test("a rate limit is named, while account existence stays hidden", () => {
 
   // Alles andere bleibt neutral: sonst laesst sich damit abfragen, wer
   // Mitglied ist.
-  assert.match(form, /setStatus\("sent"\);\s*\n\s*setMessage\(sentMessage\);/);
+  assert.match(form, /setStatus\("sent"\)/);
+  assert.match(form, /\? sentMessage :/, "der Normalfall bleibt die neutrale Meldung");
 
   for (const locale of ["de", "en"]) {
     const magicLink = readJson(`messages/${locale}/auth.json`).magicLinkForm as Record<string, string>;
@@ -155,4 +156,71 @@ test("the neutral message offers a way forward", () => {
   const de = readJson("messages/de/auth.json").magicLinkForm as Record<string, string>;
   assert.match(de.noMailHint, /Spam/);
   assert.match(de.noMailHint, /Zugangscode/);
+});
+
+// ---------------------------------------------------------------------------
+// Warum die Anmeldung scheiterte - jetzt unterscheidbar
+// ---------------------------------------------------------------------------
+test("an expired link and an incomplete one are told apart", () => {
+  const redirects = source("src/features/auth/authRedirects.ts");
+
+  // Vorher hatte jeder Fehlschlag denselben Text. Damit war ein abgelaufener
+  // Link nicht von einem zu unterscheiden, der ohne Tokens ankommt - und das
+  // sind voellig verschiedene Ursachen: die eine liegt an der Person, die
+  // andere an der Konfiguration.
+  assert.match(redirects, /"link_expired"/);
+  assert.match(redirects, /"link_incomplete"/);
+  assert.match(redirects, /classifyCallbackError\(error, requestUrl, errorCode\)/);
+  // Supabase nennt den Grund im error_code; der wird gelesen statt geraten.
+  assert.match(redirects, /requestUrl\.searchParams\.get\("error_code"\)/);
+  assert.match(redirects, /otp_expired/);
+
+  // Der Fall "gar keine Tokens" faellt der Bruecke zu, weil nur der Browser
+  // den Hash sieht.
+  assert.match(redirects, /buildAuthCallbackClientBridgeResponse\(request, nextPath, "link_incomplete"\)/);
+  assert.match(source("src/app/auth/callback/client/page.tsx"), /fail\("link_incomplete"\)/);
+});
+
+test("each reason has its own message, and the incomplete one says a new link will not help", () => {
+  const page = source("src/app/(product)/login/page.tsx");
+  assert.match(page, /normalized === "link_expired"/);
+  assert.match(page, /normalized === "link_incomplete"/);
+
+  for (const locale of ["de", "en"]) {
+    const errors = ((readJson(`messages/${locale}/auth.json`).login as Record<string, unknown>)
+      .errors as Record<string, string>);
+    assert.ok(errors.linkExpired, `${locale}: linkExpired fehlt`);
+    assert.ok(errors.linkIncomplete, `${locale}: linkIncomplete fehlt`);
+  }
+
+  const de = ((readJson("messages/de/auth.json").login as Record<string, unknown>)
+    .errors as Record<string, string>);
+  // Der Unterschied muss in der Meldung ankommen, sonst ist er nur im Code.
+  assert.match(de.linkExpired, /neuen/i);
+  assert.match(de.linkIncomplete, /hilft/i);
+});
+
+test("a link that would land on another host says so instead of pretending", () => {
+  const form = source("src/features/auth/MagicLinkForm.tsx");
+
+  // Auf einer Vorschau-Adresse zeigt der Link auf die konfigurierte Adresse.
+  // Er funktioniert dann - nur eben woanders, und das faellt sonst niemandem
+  // auf.
+  assert.match(form, /origin === window\.location\.origin \? sentMessage : t\("originMismatch"/);
+  // Nicht blockieren: Eine Alias-Domain wuerde sonst die Anmeldung ganz
+  // verhindern.
+  assert.doesNotMatch(form, /setStatus\("error"\);[\s\S]{0,40}originMismatch/);
+
+  for (const locale of ["de", "en"]) {
+    const magicLink = readJson(`messages/${locale}/auth.json`).magicLinkForm as Record<string, string>;
+    assert.ok(magicLink.originMismatch, `${locale}: originMismatch fehlt`);
+    assert.match(magicLink.originMismatch, /\{origin\}/, `${locale}: die Adresse muss genannt werden`);
+  }
+});
+
+test("both entry points link to each other", () => {
+  // Wer kein Konto hat, braucht von der Anmeldung aus den Weg zum Code - und
+  // wer eines hat, von dort aus den Weg zurueck.
+  assert.match(source("src/app/(product)/login/page.tsx"), /href=\{`\/start\?next=/);
+  assert.match(source("src/app/(product)/start/page.tsx"), /href=\{`\/login\?next=/);
 });

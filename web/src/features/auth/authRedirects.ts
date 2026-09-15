@@ -5,7 +5,43 @@ import { readConnectSignupToken, readProfileSignupIntent } from "@/features/auth
 
 export { readConnectSignupToken, readProfileSignupIntent } from "@/features/auth/signupIntent";
 
-export type AuthErrorCode = "magic_link_failed" | "auth_callback_failed";
+/**
+ * Warum die Anmeldung nicht durchging.
+ *
+ * Bis 15.09.2026 gab es nur "auth_callback_failed" fuer jeden Fall, und die
+ * Meldung lautete immer "Die Anmeldung konnte nicht abgeschlossen werden".
+ * Damit war ein abgelaufener Link nicht von einem Link zu unterscheiden, der
+ * voellig ohne Tokens ankommt - und das sind voellig verschiedene Ursachen:
+ * der eine liegt an der Person, der andere an der Konfiguration.
+ *
+ *   link_expired     Der Link war abgelaufen oder schon benutzt. Ein neuer
+ *                    hilft.
+ *   link_incomplete  Der Link kam ohne Tokens an. Ein neuer hilft NICHT -
+ *                    das deutet darauf, dass die Rueckkehradresse bei
+ *                    Supabase nicht freigegeben ist und der Dienst
+ *                    stattdessen auf die Site-URL umgeleitet hat.
+ */
+export type AuthErrorCode =
+  | "magic_link_failed"
+  | "auth_callback_failed"
+  | "link_expired"
+  | "link_incomplete";
+
+/** Supabase-Fehlercodes, die einen abgelaufenen oder benutzten Link bedeuten. */
+const EXPIRED_LINK_CODES = ["otp_expired", "access_denied", "otp_disabled"];
+
+function classifyCallbackError(
+  message: string | null,
+  requestUrl: URL,
+  fallback: AuthErrorCode
+): AuthErrorCode {
+  const supabaseCode = requestUrl.searchParams.get("error_code") ?? "";
+  if (EXPIRED_LINK_CODES.includes(supabaseCode)) return "link_expired";
+  if (/expired|already been used|invalid/i.test(message ?? "")) return "link_expired";
+  // Der Aufrufer bestimmt, was uebrig bleibt - /auth/confirm und
+  // /auth/callback duerfen sich unterschiedlich melden.
+  return fallback;
+}
 const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
 type AuthSessionLikeClient = {
   auth: {
@@ -176,12 +212,15 @@ export async function completeAuthRedirectSession(
   } else {
     const existingSession = await supabase.auth.getUser();
     if (existingSession.error || !existingSession.data.user) {
-      return buildAuthCallbackClientBridgeResponse(request, nextPath, errorCode);
+      // Hier ist noch offen, ob Tokens im Hash stehen - das sieht nur der
+      // Browser. Die Bruecke entscheidet: findet sie keine, war der Link
+      // unvollstaendig, und ein neuer Link wuerde daran nichts aendern.
+      return buildAuthCallbackClientBridgeResponse(request, nextPath, "link_incomplete");
     }
   }
 
   if (error) {
-    return redirectToLoginError(request, errorCode, nextPath);
+    return redirectToLoginError(request, classifyCallbackError(error, requestUrl, errorCode), nextPath);
   }
 
   if (options?.onSuccessRedirect) {
