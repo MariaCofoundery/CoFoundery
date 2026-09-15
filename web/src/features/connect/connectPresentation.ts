@@ -33,3 +33,29 @@ export function formatConnectContentTimeframe(
   if (endsOn) return `${copy.until} ${monthYear.format(parseDate(endsOn))}`;
   return null;
 }
+
+/**
+ * Wie viele Tage eine Anzeige noch laeuft.
+ *
+ * Der Ablauf nach spaetestens 60 Tagen ist bewusst gebaut - er verhindert ein
+ * Netzwerk voller zwei Jahre alter Gesuche. Er funktioniert aber nur, wenn
+ * man rechtzeitig verlaengern kann, und das ging bisher nicht: In der eigenen
+ * Uebersicht stand nicht, wann eine aktive Anzeige ausläuft. Man erfuhr es,
+ * wenn sie weg war.
+ *
+ * Angebrochene Tage zaehlen als ganzer Tag: Wer "noch 1 Tag" liest, hat noch
+ * heute Zeit. Abrunden wuerde bei 23 Stunden "0" anzeigen und damit falsch
+ * beruhigen beziehungsweise falsch alarmieren.
+ */
+export function getConnectListingDaysLeft(expiresAt: string | null | undefined, now = new Date()) {
+  if (!expiresAt) return null;
+  const expiry = new Date(expiresAt);
+  if (Number.isNaN(expiry.getTime())) return null;
+
+  const millisecondsLeft = expiry.getTime() - now.getTime();
+  if (millisecondsLeft <= 0) return 0;
+  return Math.ceil(millisecondsLeft / (1000 * 60 * 60 * 24));
+}
+
+/** Ab wann der Hinweis dringlich wird. Eine Woche reicht, um zu reagieren. */
+export const CONNECT_EXPIRY_WARNING_DAYS = 7;

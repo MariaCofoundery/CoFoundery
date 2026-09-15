@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { getConnectListingDaysLeft } from "@/features/connect/connectPresentation";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
@@ -121,4 +122,42 @@ test("the search term counts as a filter for the empty state", () => {
   const page = source(PAGE);
   // Sonst saehe eine ergebnislose Suche aus wie ein leeres Brett.
   assert.match(page, /const isFiltered = \["q",/);
+});
+
+// ---------------------------------------------------------------------------
+// Ablauf: rechtzeitig sichtbar
+// ---------------------------------------------------------------------------
+test("an owner sees when a listing will expire", () => {
+  const page = source("src/app/(product)/connect/my/page.tsx");
+  // Der Ablauf nach 60 Tagen ist gewollt - er haelt das Netzwerk frisch. Er
+  // funktioniert aber nur, wenn man rechtzeitig verlaengern kann, und dafuer
+  // muss dastehen, wann Schluss ist.
+  assert.match(page, /getConnectListingDaysLeft\(listing\.expires_at\)/);
+  assert.match(page, /my\.expiresIn/);
+  assert.match(page, /CONNECT_EXPIRY_WARNING_DAYS/);
+
+  for (const locale of ["de", "en"]) {
+    const my = readJson(`messages/${locale}/connect.json`).my as Record<string, string>;
+    assert.ok(my.expiresIn, `${locale}: my.expiresIn fehlt`);
+    assert.match(my.expiresIn, /\{days\}/, `${locale}: die Zahl muss vorkommen`);
+  }
+});
+
+test("days left round up, so the last day still counts as a day", () => {
+  const now = new Date("2026-09-15T12:00:00Z");
+  const inHours = (hours: number) =>
+    new Date(now.getTime() + hours * 60 * 60 * 1000).toISOString();
+
+  // Abrunden wuerde bei 23 Stunden "0" anzeigen und damit falsch alarmieren.
+  assert.equal(getConnectListingDaysLeft(inHours(23), now), 1);
+  assert.equal(getConnectListingDaysLeft(inHours(25), now), 2);
+  assert.equal(getConnectListingDaysLeft(inHours(24 * 30), now), 30);
+
+  // Abgelaufen ist abgelaufen, nie eine negative Zahl.
+  assert.equal(getConnectListingDaysLeft(inHours(-1), now), 0);
+  assert.equal(getConnectListingDaysLeft(inHours(-500), now), 0);
+
+  // Und was nicht lesbar ist, ergibt keine Aussage statt einer falschen.
+  assert.equal(getConnectListingDaysLeft(null, now), null);
+  assert.equal(getConnectListingDaysLeft("keinDatum", now), null);
 });

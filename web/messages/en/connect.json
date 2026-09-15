@@ -272,7 +272,8 @@
     "title": "My connect listings",
     "create": "Create a new listing",
     "empty": "No listings with this status.",
-    "untitled": "Untitled draft"
+    "untitled": "Untitled draft",
+    "expiresIn": "Expires in {days} days – after that it is no longer visible to others."
   },
   "profile": {
     "title": "Your Connect profile",

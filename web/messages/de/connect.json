@@ -272,7 +272,8 @@
     "title": "Meine Connect-Einträge",
     "create": "Neuen Eintrag erstellen",
     "empty": "Keine Einträge in diesem Status.",
-    "untitled": "Unbenannter Entwurf"
+    "untitled": "Unbenannter Entwurf",
+    "expiresIn": "Läuft in {days} Tagen aus – danach ist sie für andere nicht mehr sichtbar."
   },
   "profile": {
     "title": "Dein Connect-Profil",

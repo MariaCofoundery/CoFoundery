@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectListings } from "@/features/connect/connectData";
+import { CONNECT_EXPIRY_WARNING_DAYS, getConnectListingDaysLeft } from "@/features/connect/connectPresentation";
 import { ConnectLifecycleForm } from "@/features/connect/ConnectLifecycleForm";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_ERROR_KEYS, CONNECT_LIFECYCLE_KEYS } from "@/features/connect/connectFeedbackKeys";
@@ -19,7 +20,20 @@ export default async function MyConnectPage({ searchParams }: { searchParams: Pr
       const rows = listings.filter((listing) => status === "completed"
         ? listing.status === "completed" || (listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()))
         : listing.status === status && !(status === "active" && listing.expires_at && new Date(listing.expires_at) <= new Date()));
-      return <section key={status} className="mt-8"><h2 className="text-lg font-semibold">{t(`statuses.${status}`)}</h2>{rows.length ? <div className="mt-3 space-y-3">{rows.map((listing) => { const expired = listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()); return <article key={listing.id} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p><h3 className="mt-2 font-semibold">{listing.title || t("my.untitled")}</h3></div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} t={t} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
+      return <section key={status} className="mt-8"><h2 className="text-lg font-semibold">{t(`statuses.${status}`)}</h2>{rows.length ? <div className="mt-3 space-y-3">{rows.map((listing) => { const expired = listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()); return <article key={listing.id} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p><h3 className="mt-2 font-semibold">{listing.title || t("my.untitled")}</h3>
+          {/* Wann laeuft sie aus? Ohne diese Angabe kann niemand rechtzeitig
+              verlaengern - und der Ablauf nach 60 Tagen war genau dafuer
+              gedacht, nicht zum Verschwindenlassen. */}
+          {!expired && listing.status === "active" ? (() => {
+            const daysLeft = getConnectListingDaysLeft(listing.expires_at);
+            if (daysLeft === null) return null;
+            const urgent = daysLeft <= CONNECT_EXPIRY_WARNING_DAYS;
+            return (
+              <p className={`mt-1 text-xs ${urgent ? "font-semibold text-amber-800" : "text-slate-500"}`}>
+                {t("my.expiresIn", { days: daysLeft })}
+              </p>
+            );
+          })() : null}</div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} t={t} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
     })}
   </main>;
 }
