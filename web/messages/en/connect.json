@@ -274,7 +274,9 @@
     "create": "Create a new listing",
     "empty": "No listings with this status.",
     "untitled": "Untitled draft",
-    "expiresIn": "Expires in {days} days – after that it is no longer visible to others."
+    "expiresIn": "Expires in {days} days – after that it is no longer visible to others.",
+    "problemsTitle": "Problems you described",
+    "problemsEmpty": "You have not described anything yet."
   },
   "profile": {
     "title": "Your Connect profile",
@@ -399,7 +401,8 @@
       "locationsPlaceholder": "Berlin, Brandenburg",
       "locationsHint": "Separate with commas, at most {max}.",
       "publish": "Publish",
-      "saveDraft": "Save as draft"
+      "saveDraft": "Save as draft",
+      "saveChanges": "Save changes"
     },
     "profileRequiredTitle": "Publishing needs a profile first",
     "profileRequiredText": "You can save a draft at any time. A problem can only be published once your Connect profile is active – otherwise nobody can respond to it.",
@@ -425,6 +428,23 @@
     "withdrawInterestConfirm": "Yes, withdraw",
     "withdrawInterestCancel": "Keep it",
     "interestProfileRequiredTitle": "Your Connect profile comes first",
-    "interestProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards."
+    "interestProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards.",
+    "shortStatuses": {
+      "draft": "Draft",
+      "withdrawn": "Withdrawn",
+      "resolved": "Solved",
+      "active": "Published"
+    },
+    "backToProblem": "Back to the problem",
+    "editTitle": "Edit problem",
+    "editText": "Changes are visible immediately. Anyone who already expressed interest stays."
+  },
+  "notifications": {
+    "title": "Connect notifications",
+    "text": "We write to you when someone contacts you, shows interest in one of your problems, or sends you a message. At most once per event – an ongoing conversation does not trigger an email per line.",
+    "stateOn": "Currently on.",
+    "stateOff": "Currently off.",
+    "turnOn": "Turn on",
+    "turnOff": "Turn off"
   }
 }

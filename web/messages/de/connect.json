@@ -274,7 +274,9 @@
     "create": "Neuen Eintrag erstellen",
     "empty": "Keine Einträge in diesem Status.",
     "untitled": "Unbenannter Entwurf",
-    "expiresIn": "Läuft in {days} Tagen aus – danach ist sie für andere nicht mehr sichtbar."
+    "expiresIn": "Läuft in {days} Tagen aus – danach ist sie für andere nicht mehr sichtbar.",
+    "problemsTitle": "Geschilderte Probleme",
+    "problemsEmpty": "Du hast noch nichts geschildert."
   },
   "profile": {
     "title": "Dein Connect-Profil",
@@ -399,7 +401,8 @@
       "locationsPlaceholder": "Berlin, Brandenburg",
       "locationsHint": "Mit Komma trennen, maximal {max}.",
       "publish": "Veröffentlichen",
-      "saveDraft": "Als Entwurf speichern"
+      "saveDraft": "Als Entwurf speichern",
+      "saveChanges": "Änderungen speichern"
     },
     "profileRequiredTitle": "Veröffentlichen geht erst mit Profil",
     "profileRequiredText": "Als Entwurf kannst du jederzeit speichern. Veröffentlichen lässt sich ein Problem erst, wenn dein Connect-Profil aktiv ist – sonst kann niemand darauf antworten.",
@@ -425,6 +428,23 @@
     "withdrawInterestConfirm": "Ja, zurückziehen",
     "withdrawInterestCancel": "Doch nicht",
     "interestProfileRequiredTitle": "Zuerst dein Connect-Profil",
-    "interestProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach landest du wieder hier."
+    "interestProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach landest du wieder hier.",
+    "shortStatuses": {
+      "draft": "Entwurf",
+      "withdrawn": "Zurückgezogen",
+      "resolved": "Gelöst",
+      "active": "Veröffentlicht"
+    },
+    "backToProblem": "Zurück zum Problem",
+    "editTitle": "Problem bearbeiten",
+    "editText": "Änderungen sind sofort sichtbar. Wer schon Interesse bekundet hat, bleibt dabei."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen aus Connect",
+    "text": "Wir schreiben dir, wenn jemand dich kontaktiert, Interesse an einem deiner Probleme zeigt oder dir eine Nachricht schickt. Höchstens einmal je Vorgang – ein laufendes Gespräch löst keine Mail je Zeile aus.",
+    "stateOn": "Zurzeit eingeschaltet.",
+    "stateOff": "Zurzeit ausgeschaltet.",
+    "turnOn": "Einschalten",
+    "turnOff": "Ausschalten"
   }
 }

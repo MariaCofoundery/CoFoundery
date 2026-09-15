@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireConnectMember } from "@/features/connect/connectAccess";
+import { getOwnConnectProfile } from "@/features/connect/connectData";
+import { notifyConnectProblemInterest } from "@/features/connect/connectNotifications";
+import { getConnectProblem } from "@/features/connect/connectProblemData";
 import {
   CONNECT_GEOGRAPHIC_SCOPES,
   PROBLEM_DESCRIPTION_MAX,
@@ -124,6 +127,26 @@ export async function expressConnectProblemInterestAction(formData: FormData) {
     back(path, "save");
   }
 
+  // Die einstellende Person erfaehrt davon - sonst haengt das Interesse in
+  // einer Seite, die sie vielleicht wochenlang nicht oeffnet.
+  const { data: interest } = await client
+    .from("network_problem_interests")
+    .select("id")
+    .eq("problem_id", problemId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const problem = await getConnectProblem(client, problemId);
+  if (interest && problem) {
+    const sender = await getOwnConnectProfile(client, user.id);
+    await notifyConnectProblemInterest(
+      client,
+      interest.id,
+      problemId,
+      problem.author_user_id,
+      sender?.display_name ?? null
+    );
+  }
+
   revalidatePath(path);
   redirect(`${path}?saved=interest`);
 }
@@ -197,4 +220,77 @@ export async function updateConnectProblemStatusAction(formData: FormData) {
   revalidatePath(path);
   revalidatePath("/connect/problems");
   redirect(path);
+}
+
+/**
+ * Ein bestehendes Problem aendern.
+ *
+ * Bewusst getrennt vom Anlegen: Hier gilt zusaetzlich, dass nur die
+ * einstellende Person aendern darf, und ein veroeffentlichtes Problem bleibt
+ * veroeffentlicht - der Zustand gehoert auf die Detailseite, nicht in ein
+ * Formular, in dem man ihn versehentlich mitaendert.
+ */
+export async function updateConnectProblemAction(formData: FormData) {
+  const { client, user } = await requireConnectMember();
+
+  const problemId = String(formData.get("problem_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const intentValue = String(formData.get("author_intent") ?? "");
+  const scope = String(formData.get("geographic_scope") ?? "regional");
+  const publish = formData.get("intent") === "publish";
+  const path = `/connect/problems/${problemId}/edit`;
+
+  if (!problemId) back("/connect/problems", "save");
+  if (title.length < PROBLEM_TITLE_MIN || title.length > PROBLEM_TITLE_MAX) {
+    back(path, "problem_title");
+  }
+  if (description.length < PROBLEM_DESCRIPTION_MIN || description.length > PROBLEM_DESCRIPTION_MAX) {
+    back(path, "problem_description");
+  }
+  if (!isConnectProblemIntent(intentValue)) {
+    back(path, "problem_intent");
+  }
+
+  const { data: existing } = await client
+    .from("network_problems")
+    .select("status")
+    .eq("id", problemId)
+    .eq("author_user_id", user.id)
+    .maybeSingle();
+  if (!existing) back("/connect/problems", "save");
+
+  // Ein veroeffentlichtes Problem bleibt veroeffentlicht. Ein Entwurf wird es
+  // nur, wenn der Veroeffentlichen-Knopf gedrueckt wurde.
+  const nextStatus = existing.status === "active" ? "active" : publish ? "active" : "draft";
+
+  const { error } = await client
+    .from("network_problems")
+    .update({
+      title,
+      description,
+      author_intent: intentValue,
+      geographic_scope: isOneOf(CONNECT_GEOGRAPHIC_SCOPES, scope) ? scope : "regional",
+      locations: parseList(formData.get("locations"), 3),
+      topics: parseList(formData.get("topics"), 8),
+      industries: parseList(formData.get("industries"), 5),
+      status: nextStatus,
+      published_at:
+        nextStatus === "active" && existing.status !== "active"
+          ? new Date().toISOString()
+          : undefined,
+    })
+    .eq("id", problemId)
+    .eq("author_user_id", user.id);
+
+  if (error) {
+    back(
+      path,
+      error.message.includes("active_network_profile_required") ? "identity_incomplete" : "save"
+    );
+  }
+
+  revalidatePath(`/connect/problems/${problemId}`);
+  revalidatePath("/connect/problems");
+  redirect(`/connect/problems/${problemId}`);
 }

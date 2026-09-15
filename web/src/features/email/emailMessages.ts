@@ -361,3 +361,88 @@ export function getAdvisorTeamFounderInviteEmailCopy(
     privacy: "Datenschutzerklärung",
   };
 }
+
+// ---------------------------------------------------------------------------
+// Connect-Benachrichtigungen
+// ---------------------------------------------------------------------------
+export type ConnectNotificationCopyKind = "contact_request" | "problem_interest" | "message";
+
+/**
+ * Eine Vorlage fuer drei Anlaesse statt drei Vorlagen.
+ *
+ * Der Aufbau ist immer derselbe - jemand hat sich bei dir gemeldet, hier ist
+ * der Weg hin. Was sich unterscheidet, sind zwei Saetze. Drei getrennte
+ * Vorlagen waeren dreimal dieselbe Fusszeile zu pflegen.
+ */
+export function getConnectNotificationEmailCopy(
+  locale: AppLocale,
+  input: { kind: ConnectNotificationCopyKind; senderName: string | null }
+) {
+  const name = input.senderName?.trim() || (locale === "en" ? "Someone" : "Jemand");
+
+  if (locale === "en") {
+    const byKind = {
+      contact_request: {
+        subject: `${name} would like to get in touch`,
+        headline: "A new contact request",
+        intro: `${name} has responded to one of your entries and would like to get in touch.`,
+        cta: "Open contact requests",
+      },
+      problem_interest: {
+        subject: `${name} would work on your problem`,
+        headline: "Someone would work on it",
+        intro: `${name} has responded to a problem you described and would work on it.`,
+        cta: "Open the problem",
+      },
+      message: {
+        subject: `New message from ${name}`,
+        headline: "A new message",
+        intro: `${name} has written to you on CoFoundery.`,
+        cta: "Open the conversation",
+      },
+    }[input.kind];
+
+    return {
+      htmlLang: "en",
+      eyebrow: "CoFoundery Connect",
+      ...byKind,
+      preheader: byKind.intro,
+      note: "We only notify you about your own activity, and at most once per event.",
+      settings: "You can switch these emails off in your account settings.",
+      fallback: "If the button does not work, use this link:",
+      privacy: "Privacy",
+    };
+  }
+
+  const byKind = {
+    contact_request: {
+      subject: `${name} möchte mit dir in Kontakt kommen`,
+      headline: "Eine neue Kontaktanfrage",
+      intro: `${name} hat auf einen deiner Einträge reagiert und möchte mit dir in Kontakt kommen.`,
+      cta: "Kontaktanfragen öffnen",
+    },
+    problem_interest: {
+      subject: `${name} würde an deinem Problem arbeiten`,
+      headline: "Jemand würde mitarbeiten",
+      intro: `${name} hat auf ein Problem reagiert, das du geschildert hast, und würde daran arbeiten.`,
+      cta: "Problem öffnen",
+    },
+    message: {
+      subject: `Neue Nachricht von ${name}`,
+      headline: "Eine neue Nachricht",
+      intro: `${name} hat dir auf CoFoundery geschrieben.`,
+      cta: "Gespräch öffnen",
+    },
+  }[input.kind];
+
+  return {
+    htmlLang: "de",
+    eyebrow: "CoFoundery Connect",
+    ...byKind,
+    preheader: byKind.intro,
+    note: "Wir benachrichtigen dich nur über deine eigenen Vorgänge, und höchstens einmal je Vorgang.",
+    settings: "Du kannst diese Mails in deinen Kontoeinstellungen abschalten.",
+    fallback: "Falls der Knopf nicht funktioniert, nutze diesen Link:",
+    privacy: "Datenschutz",
+  };
+}

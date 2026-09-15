@@ -105,9 +105,11 @@ test("publishing a problem asks for the profile before the form, not after", () 
   assert.match(page, /hasActiveConnectProfile\(client, user\.id\)/);
   assert.match(page, /<ConnectProfileRequired/);
   // Der Knopf, der nicht funktionieren kann, wird nicht angeboten - der
-  // Entwurf bleibt.
-  assert.match(page, /\{canPublish \? \(/);
-  assert.match(page, /intent="draft"/);
+  // Entwurf bleibt. Beides sitzt jetzt im gemeinsamen Formular.
+  assert.match(page, /canPublish=\{canPublish\}/);
+  const form = source("src/features/connect/ConnectProblemForm.tsx");
+  assert.match(form, /\{canPublish \? \(/);
+  assert.match(form, /intent="draft"/);
 });
 
 test("expressing interest asks for the profile too", () => {
@@ -195,6 +197,103 @@ test("the new error keys are allowed and have copy", () => {
     for (const locale of ["de", "en"]) {
       const errors = readJson(`messages/${locale}/connect.json`).errors as Record<string, string>;
       assert.ok(errors[key], `${locale}: errors.${key} fehlt`);
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Uebersicht und Bearbeiten
+// ---------------------------------------------------------------------------
+test("drafts are reachable, and there is no second overview", () => {
+  const my = source("src/app/(product)/connect/my/page.tsx");
+  // Ohne diesen Abschnitt waeren Entwuerfe nur ueber den direkten Link
+  // erreichbar - eine Funktion, die halb gebaut ist.
+  assert.match(my, /getOwnConnectProblems\(client, user\.id\)/);
+  assert.match(my, /my\.problemsTitle/);
+  assert.match(my, /\/connect\/problems\/\$\{problem\.id\}\/edit/);
+
+  const de = readJson("messages/de/connect.json").my as Record<string, string>;
+  // "Meine Probleme" liest sich wie persoenliche Sorgen.
+  assert.doesNotMatch(de.problemsTitle, /Meine Probleme/);
+});
+
+test("the form exists once, for creating and editing", () => {
+  const form = source("src/features/connect/ConnectProblemForm.tsx");
+  assert.match(form, /problem\?: ConnectProblem/);
+  for (const page of [NEW, "src/app/(product)/connect/problems/[problemId]/edit/page.tsx"]) {
+    assert.match(source(page), /<ConnectProblemForm/, `${page} baut das Formular selbst`);
+  }
+});
+
+test("editing keeps a published problem published", () => {
+  const actions = source(ACTIONS);
+  // Sonst wuerde ein Speichern die Veroeffentlichung versehentlich
+  // zuruecknehmen - und die Interessierten saehen den Eintrag nicht mehr.
+  assert.match(actions, /existing\.status === "active" \? "active"/);
+  assert.match(source("src/app/(product)/connect/problems/[problemId]/edit/page.tsx"), /redirect\(`\/connect\/problems\/\$\{problemId\}`\)/);
+});
+
+// ---------------------------------------------------------------------------
+// Benachrichtigungen
+// ---------------------------------------------------------------------------
+test("all three occasions notify, and nothing else does", () => {
+  const notifications = source("src/features/connect/connectNotifications.ts");
+  for (const kind of ["contact_request", "problem_interest", "message"]) {
+    assert.match(notifications, new RegExp(`"${kind}"`), `${kind} fehlt`);
+  }
+  // Die Liste ist in der Datenbank festgeschrieben.
+  const migration = source("../supabase/migrations/20260916140000_network_notifications.sql");
+  assert.match(migration, /kind in \('contact_request', 'problem_interest', 'message'\)/);
+});
+
+test("a failed email never breaks the action", () => {
+  const notifications = source("src/features/connect/connectNotifications.ts");
+  // Wer eine Kontaktanfrage stellt, hat sie gestellt - auch wenn die Mail
+  // nicht rausgeht.
+  assert.match(notifications, /try \{/);
+  assert.match(notifications, /\} catch \{/);
+});
+
+test("the claim is taken before sending, not after", () => {
+  const notifications = source("src/features/connect/connectNotifications.ts");
+  const claimAt = notifications.indexOf("await claim(");
+  const sendAt = notifications.indexOf("sendConnectNotificationEmail(");
+  assert.ok(claimAt > 0 && claimAt < sendAt, "lieber eine Mail zu wenig als zwei");
+});
+
+test("an ongoing conversation does not send a mail per line", () => {
+  const migration = source("../supabase/migrations/20260916140000_network_notifications.sql");
+  // Wer noch nicht gelesen hat, was vorher kam, braucht keinen zweiten Hinweis.
+  assert.match(migration, /network_message_notification_recipient/);
+  assert.match(migration, /if v_earlier > 0 then return null; end if;/);
+  // Und bei Blockierung gar nichts.
+  assert.match(migration, /is_network_interaction_blocked/);
+});
+
+test("the email carries no content, only that something happened", () => {
+  const email = source("src/lib/email/sendConnectNotificationEmail.ts");
+  // Eine Mail landet in Postfaechern, die wir nicht kennen, und in Vorschauen
+  // auf Sperrbildschirmen.
+  assert.doesNotMatch(codeOnly("src/lib/email/sendConnectNotificationEmail.ts"), /messageBody|params\.message\b|noteText/);
+  assert.match(email, /senderName/);
+});
+
+test("the switch is reachable and the database respects it", () => {
+  const account = source("src/app/(product)/account/page.tsx");
+  assert.match(account, /<ConnectNotificationSetting/);
+  // Nur bei Connect-Konten - eine Einstellung fuer etwas, das man nicht hat,
+  // ist Rauschen.
+  assert.match(account, /\{hasConnectAccount \? \(/);
+
+  const migration = source("../supabase/migrations/20260916140000_network_notifications.sql");
+  // Es gibt keinen Weg am Schalter vorbei: dieselbe Funktion, die den Anspruch
+  // vergibt, prueft ihn.
+  assert.match(migration, /if v_wants is distinct from true then\s*\n\s*return false;/);
+
+  for (const locale of ["de", "en"]) {
+    const notifications = readJson(`messages/${locale}/connect.json`).notifications as Record<string, string>;
+    for (const key of ["title", "text", "stateOn", "stateOff", "turnOn", "turnOff"]) {
+      assert.ok(notifications[key], `${locale}: notifications.${key} fehlt`);
     }
   }
 });

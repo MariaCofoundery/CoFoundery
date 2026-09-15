@@ -5,6 +5,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
+import { getConnectListing, getOwnConnectProfile } from "@/features/connect/connectData";
+import {
+  notifyConnectContactRequest,
+  notifyConnectMessage,
+} from "@/features/connect/connectNotifications";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnectMessageBody, parseConnectListing, parseConnectProfile, listingPublishable, profilePublishable } from "./connectValidation";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
@@ -161,16 +166,23 @@ export async function changeConnectListingStatusAction(formData: FormData) {
 }
 
 export async function requestConnectContactAction(formData: FormData) {
-  const { client } = await context(); const listingId = String(formData.get("listing_id") ?? "").trim();
+  const { client, user } = await context(); const listingId = String(formData.get("listing_id") ?? "").trim();
   const message = normalizeConnectContactMessage(formData.get("message"));
   if (!listingId) redirect("/connect?error=contact");
   if (!message) redirect(`/connect/listings/${listingId}/contact?error=message`);
-  const { error } = await client.rpc("request_network_contact", { p_listing_id: listingId, p_message: message });
+  const { data: requestId, error } = await client.rpc("request_network_contact", { p_listing_id: listingId, p_message: message });
   if (error) {
     const reason = error.message.includes("sender_profile_required") ? "contact_profile"
       : error.message.includes("listing_unavailable") || error.message.includes("recipient_unavailable") ? "contact_unavailable"
       : error.message.includes("self_request") ? "contact_self" : "contact";
     redirect(`/connect/listings/${listingId}/contact?error=${reason}`);
+  }
+  // Bestenfalls und nach dem Schreiben: Die Anfrage steht, auch wenn die Mail
+  // nicht rausgeht.
+  const listing = await getConnectListing(client, listingId);
+  if (requestId && listing) {
+    const sender = await getOwnConnectProfile(client, user.id);
+    await notifyConnectContactRequest(client, String(requestId), listing.owner_user_id, sender?.display_name ?? null);
   }
   refreshContacts(listingId); redirect(`/connect/listings/${listingId}?contact=sent`);
 }
@@ -193,16 +205,20 @@ export async function cancelConnectContactAction(formData: FormData) {
 }
 
 export async function sendConnectMessageAction(formData: FormData) {
-  const { client } = await context();
+  const { client, user } = await context();
   const conversationId = String(formData.get("conversation_id") ?? "").trim();
   const body = normalizeConnectMessageBody(formData.get("body"));
   if (!conversationId) redirect("/connect/contacts?error=message");
   if (!body) redirect(`/connect/messages/${conversationId}?error=message`);
-  const { error } = await client.rpc("send_network_message", {
+  const { data: messageId, error } = await client.rpc("send_network_message", {
     p_conversation_id: conversationId,
     p_body: body,
   });
   if (error) redirect(`/connect/messages/${conversationId}?error=${error.message.includes("interaction_blocked") ? "blocked" : "message"}`);
+  if (messageId) {
+    const sender = await getOwnConnectProfile(client, user.id);
+    await notifyConnectMessage(client, String(messageId), conversationId, sender?.display_name ?? null);
+  }
   refreshMessaging(conversationId);
   redirect(`/connect/messages/${conversationId}?sent=1`);
 }
@@ -252,4 +268,22 @@ export async function markConnectConversationReadAction(conversationId: string) 
   if (error) return { ok: false };
   refreshMessaging(conversationId);
   return { ok: true };
+}
+
+/**
+ * Connect-Benachrichtigungen ein- oder ausschalten.
+ *
+ * Die Entscheidung liegt in der Datenbank: claim_network_notification prueft
+ * dieselbe Spalte, bevor es einen Anspruch vergibt. Damit gibt es keinen Weg,
+ * an dem Schalter vorbei eine Mail zu verschicken.
+ */
+export async function setConnectEmailNotificationsAction(formData: FormData) {
+  const { client } = await context();
+  const enabled = String(formData.get("enabled") ?? "") === "true";
+
+  const { error } = await client.rpc("set_network_email_notifications", { p_enabled: enabled });
+  if (error) redirect("/account?error=save");
+
+  revalidatePath("/account");
+  redirect("/account?saved=notifications");
 }
