@@ -439,7 +439,18 @@
     },
     "backToProblem": "Back to the problem",
     "editTitle": "Edit problem",
-    "editText": "Changes are visible immediately. Anyone who already expressed interest stays."
+    "editText": "Changes are visible immediately. Anyone who already expressed interest stays.",
+    "usageTitle": "How a business idea comes out of this",
+    "usageLead": "Most companies do not start with an idea. They start with a problem someone knows up close and nobody solves. Those are what stand here – before anyone turned them into an idea.",
+    "usageWaysTitle": "Three ways to use this",
+    "usageWays": {
+      "read": "Read, if you want to found something but do not yet know what. These are observations from people working in the field – not a list of trends.",
+      "join": "Join in, if one of them concerns you. Say what you bring; the person who posted decides whether it becomes a conversation.",
+      "write": "Describe one yourself, even with no intention of your own. What you have noticed for years may be someone else's beginning."
+    },
+    "usageCaveatTitle": "And what this does not do",
+    "usageCaveat": "Not every problem becomes a business. Whether anyone would pay for a solution, whether it adds up, whether it already exists – this board answers none of that. It only makes sure you ask the question about something real rather than a hunch.",
+    "usageNext": "If one of them stays with you: describe it from your own side, or get in touch with the person who posted it."
   },
   "notifications": {
     "title": "Connect notifications",

@@ -57,6 +57,40 @@ export default async function ConnectProblemsPage({
         </Link>
       </div>
 
+      {/* Wozu das Brett da ist.
+          Der erste Absatz steht offen, weil ohne ihn niemand weiss, warum hier
+          Probleme statt Ideen stehen. Der Rest ist eingeklappt: Wer das einmal
+          gelesen hat, will es beim zweiten Besuch nicht wieder ueber der Liste
+          haben. */}
+      <section className={`${card} mt-6 border-violet-100 bg-violet-50/40`}>
+        <h2 className="text-lg font-semibold">{t("problems.usageTitle")}</h2>
+        <p className="mt-2 leading-7 text-slate-700">{t("problems.usageLead")}</p>
+
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-semibold text-violet-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200">
+            {t("problems.usageWaysTitle")}
+          </summary>
+          <ul className="mt-3 space-y-3 text-sm leading-6 text-slate-700">
+            {(["read", "join", "write"] as const).map((way) => (
+              <li key={way} className="flex gap-3">
+                <span aria-hidden className="text-violet-700">
+                  ·
+                </span>
+                <span>{t(`problems.usageWays.${way}`)}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Die Einschraenkung gehoert dazu, nicht ans Ende einer AGB:
+              Ein Brett, das Geschaeftsideen verspricht, waere unehrlich. */}
+          <h3 className="mt-5 text-sm font-semibold text-slate-900">
+            {t("problems.usageCaveatTitle")}
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("problems.usageCaveat")}</p>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{t("problems.usageNext")}</p>
+        </details>
+      </section>
+
       <section className={`${card} mt-6`}>
         <h2 className="text-lg font-semibold">{t("filters.title")}</h2>
         <form className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

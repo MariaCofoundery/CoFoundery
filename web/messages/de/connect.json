@@ -439,7 +439,18 @@
     },
     "backToProblem": "Zurück zum Problem",
     "editTitle": "Problem bearbeiten",
-    "editText": "Änderungen sind sofort sichtbar. Wer schon Interesse bekundet hat, bleibt dabei."
+    "editText": "Änderungen sind sofort sichtbar. Wer schon Interesse bekundet hat, bleibt dabei.",
+    "usageTitle": "Wie daraus eine Geschäftsidee wird",
+    "usageLead": "Die meisten Unternehmen fangen nicht mit einer Idee an, sondern mit einem Problem, das jemand aus der Nähe kennt und das niemand löst. Genau die stehen hier – bevor jemand sie zur Idee gemacht hat.",
+    "usageWaysTitle": "Drei Wege, das hier zu nutzen",
+    "usageWays": {
+      "read": "Lesen, wenn du gründen willst, aber noch nicht weißt, woran. Hier stehen Beobachtungen von Menschen, die in dem Feld arbeiten – keine Trendliste.",
+      "join": "Mitarbeiten, wenn dich eins davon angeht. Sag, was du mitbringst; die einstellende Person entscheidet, ob daraus ein Gespräch wird.",
+      "write": "Selbst schildern, auch ohne eigene Absicht. Was dir seit Jahren auffällt, ist für jemand anderen vielleicht der Anfang."
+    },
+    "usageCaveatTitle": "Und was das hier nicht leistet",
+    "usageCaveat": "Nicht aus jedem Problem wird ein Geschäft. Ob jemand für eine Lösung zahlen würde, ob sie sich rechnet, ob es sie längst gibt – das beantwortet dieses Brett nicht. Es sorgt nur dafür, dass du die Frage an etwas Echtem stellst statt an einer Vermutung.",
+    "usageNext": "Wenn dich eins davon nicht mehr loslässt: Schilder es selbst aus deiner Sicht oder melde dich bei der Person, die es eingestellt hat."
   },
   "notifications": {
     "title": "Benachrichtigungen aus Connect",
