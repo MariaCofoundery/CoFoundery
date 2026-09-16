@@ -127,7 +127,6 @@ function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): DiscoveryP
     seekingRoles: profile.seekingRoles,
     expertise: profile.expertise,
     industries: profile.industries,
-    locationLabel: profile.locationLabel,
     locationRegion: profile.locationRegion,
     remoteMode: profile.remoteMode,
     availabilityHoursPerWeek: profile.availabilityHoursPerWeek,

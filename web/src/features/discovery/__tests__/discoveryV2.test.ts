@@ -30,7 +30,6 @@ const profile: FounderDiscoveryProfile = {
   seekingRoles: ["product"],
   expertise: ["AI", "React"],
   industries: ["Legacy interest"],
-  locationLabel: "Legacy Berlin",
   locationRegion: "Berlin",
   remoteMode: "remote",
   availabilityHoursPerWeek: 25,

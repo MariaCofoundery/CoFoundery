@@ -432,7 +432,11 @@
       "eyebrow": "Status",
       "activeHint": "Signed-in members can find your profile in the co-founder search.",
       "pausedHint": "Your profile is paused. Nobody sees it, your entries stay.",
-      "draftHint": "Only you see this profile. It appears in no search."
+      "draftHint": "Only you see this profile. It appears in no search.",
+      "completionTitle": "Completeness",
+      "completionCount": "{done} of {total} entries are in",
+      "completionDone": "Everything is there.",
+      "completionRemaining": "{count, plural, one {One entry is} other {# entries are}} still missing."
     },
     "intent": {
       "searchIntent": "How actively are you searching right now?",

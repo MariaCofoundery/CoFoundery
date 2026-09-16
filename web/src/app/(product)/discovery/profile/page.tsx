@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -24,6 +25,7 @@ import {
   getOwnDiscoveryV2AlignmentTendencies,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
+import { DISCOVERY_PROFILE_PUBLISH_ISSUES } from "@/features/discovery/discoveryProfileFeedback";
 import {
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
@@ -60,7 +62,10 @@ const PRIMARY_BUTTON_CLASS =
   "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
 const SECONDARY_BUTTON_CLASS =
   "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
-const INNER_SECTION_CLASS = "rounded-3xl border border-slate-200 bg-slate-50/60 p-5";
+// Ein Abschnitt im Formular, getrennt durch eine Haarlinie statt durch einen
+// eigenen Rahmen: Karte im Kasten im Kasten war drei Rahmen tief und liess
+// jede Ueberschrift wie eine eigene Seite aussehen.
+const INNER_SECTION_CLASS = "border-t border-slate-200/70 pt-7 first:border-t-0 first:pt-0";
 
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
@@ -86,7 +91,6 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
     seekingRoles: [],
     expertise: [],
     industries: [],
-    locationLabel: "",
     locationRegion: "",
     remoteMode: "flexible",
     availabilityHoursPerWeek: null,
@@ -233,11 +237,65 @@ function OptionCheckbox({
   );
 }
 
+/**
+ * Wie weit das Profil ist.
+ *
+ * Dieselben acht Angaben, die das Veroeffentlichen verlangt - kein zweites
+ * Mass, das etwas anderes zaehlt. Der Balken zeigt, was die Liste weiter unten
+ * aufzaehlt; er ersetzt sie nicht.
+ */
+function CompletionMeter({
+  issues,
+  t,
+}: {
+  issues: DiscoveryProfilePublishIssue[];
+  t: DiscoveryT;
+}) {
+  const total = DISCOVERY_PROFILE_PUBLISH_ISSUES.length;
+  const done = total - issues.length;
+  const percent = Math.round((done / total) * 100);
+
+  return (
+    <div className="mt-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          {t("profile.status.completionTitle")}
+        </p>
+        <p className="text-sm font-semibold text-slate-900">
+          {t("profile.status.completionCount", { done, total })}
+        </p>
+      </div>
+      <div
+        className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200/80"
+        role="progressbar"
+        aria-valuenow={done}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-label={t("profile.status.completionTitle")}
+      >
+        <div
+          className={`discovery-meter-fill h-full rounded-full ${
+            issues.length === 0 ? "bg-emerald-500" : "bg-[color:var(--brand-primary)]"
+          }`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <p className="mt-2 text-xs leading-5 text-slate-500">
+        {issues.length === 0
+          ? t("profile.status.completionDone")
+          : t("profile.status.completionRemaining", { count: issues.length })}
+      </p>
+    </div>
+  );
+}
+
 function StatusCard({
   profile,
+  issues,
   t,
 }: {
   profile: Partial<FounderDiscoveryProfile>;
+  issues: DiscoveryProfilePublishIssue[];
   t: DiscoveryT;
 }) {
   const status = profile.status ?? "draft";
@@ -249,7 +307,10 @@ function StatusCard({
         : t("profile.status.draftHint");
 
   return (
-    <section className={CARD_CLASS}>
+    <section
+      className={`${CARD_CLASS} discovery-rise`}
+      style={{ "--rise-delay": "60ms" } as CSSProperties}
+    >
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -285,6 +346,7 @@ function StatusCard({
           {t(`status.${status}`)}
         </span>
       </div>
+      {status !== "active" || issues.length > 0 ? <CompletionMeter issues={issues} t={t} /> : null}
     </section>
   );
 }
@@ -424,7 +486,10 @@ export default async function DiscoveryProfilePage({
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <header className="flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6">
+        <header
+          className="discovery-rise flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6"
+          style={{ "--rise-delay": "0ms" } as CSSProperties}
+        >
           <Link
             href="/discovery"
             className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-slate-950"
@@ -445,7 +510,7 @@ export default async function DiscoveryProfilePage({
           </div>
         </header>
 
-        <StatusCard profile={profile} t={t} />
+        <StatusCard profile={profile} issues={publishIssues} t={t} />
         <PageMessage
           message={pageMessage}
           issues={[]}
@@ -455,14 +520,17 @@ export default async function DiscoveryProfilePage({
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
           <div className="flex flex-col gap-5">
-          <section className={CARD_CLASS}>
+          <section
+            className={`${CARD_CLASS} discovery-rise`}
+            style={{ "--rise-delay": "120ms" } as CSSProperties}
+          >
             <form action={saveProfileDraft} className="grid gap-5">
               <div className={INNER_SECTION_CLASS}>
-                <div className="border-b border-slate-200 pb-4">
+                <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     {t("profile.publicProfile.eyebrow")}
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                  <h2 className="mt-2 text-xl font-semibold text-slate-950">
                     {t("profile.publicProfile.title")}
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -523,14 +591,11 @@ export default async function DiscoveryProfilePage({
                   <Link href="/profile?next=/discovery/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
                     {t("profile.publicProfile.identityLink")}
                   </Link>
-                  {/* locationLabel ist ein abgeleitetes Altfeld und bleibt als
-                      verstecktes Feld erhalten, bis es eigenstaendig abgeloest wird. */}
-                  <input type="hidden" name="locationLabel" value={profile.locationLabel ?? ""} />
                 </div>
               </div>
 
               <div className={INNER_SECTION_CLASS}>
-                <h2 className="text-2xl font-semibold text-slate-950">{t("profile.brings.title")}</h2>
+                <h2 className="text-xl font-semibold text-slate-950">{t("profile.brings.title")}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.brings.description")}</p>
                 <div className="mt-5 grid gap-5">
                   <div>
@@ -547,11 +612,11 @@ export default async function DiscoveryProfilePage({
               </div>
 
               <div className={INNER_SECTION_CLASS}>
-                <div className="border-b border-slate-200 pb-4">
+                <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                     {t("profile.venture.eyebrow")}
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                  <h2 className="mt-2 text-xl font-semibold text-slate-950">
                     {t("profile.venture.title")}
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -641,7 +706,7 @@ export default async function DiscoveryProfilePage({
               </div>
 
               <div className={INNER_SECTION_CLASS}>
-                <h2 className="text-2xl font-semibold text-slate-950">{t("profile.seeking.title")}</h2>
+                <h2 className="text-xl font-semibold text-slate-950">{t("profile.seeking.title")}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.seeking.description")}</p>
                 <div className="mt-5">
                   <p className={LABEL_CLASS}>{t("profile.publicProfile.seekingRoles")}</p>
@@ -718,7 +783,10 @@ export default async function DiscoveryProfilePage({
 
           {/* Eigener Rahmen: Das hier ist privat und gehoert nicht in
               denselben Kasten wie das, was andere sehen sollen. */}
-          <section className={`${CARD_CLASS} border-violet-100 bg-violet-50/50`}>
+          <section
+            className={`${CARD_CLASS} discovery-rise border-violet-100 bg-violet-50/50`}
+            style={{ "--rise-delay": "180ms" } as CSSProperties}
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
               {t("v2.alignment.eyebrow")}
             </p>
@@ -775,7 +843,10 @@ export default async function DiscoveryProfilePage({
           </div>
 
           <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
-            <section className={CARD_CLASS}>
+            <section
+              className={`${CARD_CLASS} discovery-rise`}
+              style={{ "--rise-delay": "180ms" } as CSSProperties}
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 {t("profile.preview.eyebrow")}
               </p>

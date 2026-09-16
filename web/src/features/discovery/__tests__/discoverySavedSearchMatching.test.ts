@@ -30,7 +30,7 @@ const profile = (over: Partial<SearchableDiscoveryProfile> = {}): SearchableDisc
   ownRoles: ["tech"],
   expertise: ["Software Development", "Architektur"],
   industries: ["HealthTech"],
-  locationLabel: "Berlin",
+  locationRegion: "Berlin",
   remoteMode: "hybrid",
   capabilityAreaIds: ["software_engineering"],
   ...over,

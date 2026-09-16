@@ -99,7 +99,6 @@ export type FounderDiscoveryProfile = {
   seekingRoles: DiscoveryFounderRole[];
   expertise: string[];
   industries: string[];
-  locationLabel: string | null;
   locationRegion: string | null;
   remoteMode: DiscoveryRemoteMode;
   availabilityHoursPerWeek: number | null;
@@ -137,7 +136,6 @@ export type DiscoveryProfileInput = Partial<{
   seekingRoles: unknown;
   expertise: unknown;
   industries: unknown;
-  locationLabel: unknown;
   locationRegion: unknown;
   remoteMode: unknown;
   availabilityHoursPerWeek: unknown;
@@ -216,7 +214,6 @@ export type DiscoveryProfilePreview = Pick<
   | "seekingRoles"
   | "expertise"
   | "industries"
-  | "locationLabel"
   | "locationRegion"
   | "remoteMode"
   | "availabilityHoursPerWeek"

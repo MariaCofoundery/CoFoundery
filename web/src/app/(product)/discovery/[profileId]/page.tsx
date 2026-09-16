@@ -362,9 +362,9 @@ export default async function DiscoveryProfileDetailPage({
                     {t(`startHorizons.${profile.startHorizon}.short`)}
                   </span>
                 ) : null}
-                {profile.locationRegion ?? profile.locationLabel ? (
+                {profile.locationRegion ? (
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                    {profile.locationRegion ?? profile.locationLabel}
+                    {profile.locationRegion}
                   </span>
                 ) : null}
                 <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">

@@ -119,9 +119,6 @@ function getJsonObject(formData: FormData, names: string[]) {
  * entscheidet nur noch das Kontextspezifische: eigene und gesuchte Rollen,
  * Verfuegbarkeit, Commitment, Venture-Phase und -Ziel, Suchabsicht,
  * Start-Horizont und die Alignment-Praeferenzen.
- *
- * locationLabel bleibt vorerst aus dem Formular: es ist ein abgeleitetes
- * Altfeld ohne Entsprechung im Kern und wird eigenstaendig abgeloest.
  */
 function parseDiscoveryProfileFormData(
   formData: FormData,
@@ -135,7 +132,6 @@ function parseDiscoveryProfileFormData(
     seekingRoles: getStringList(formData, ["seekingRoles", "seeking_roles"]),
     expertise: identity?.expertise ?? [],
     industries: identity?.industries ?? [],
-    locationLabel: getFirstString(formData, ["locationLabel", "location_label"]),
     locationRegion: identity?.location_region ?? "",
     remoteMode: identity?.remote_mode ?? "",
     availabilityHoursPerWeek: getFirstString(formData, [
@@ -356,7 +352,7 @@ async function notifyDiscoverySavedSearches(userId: string) {
     ownRoles: published.ownRoles,
     expertise: published.expertise,
     industries: published.industries,
-    locationLabel: published.locationLabel,
+    locationRegion: published.locationRegion,
     remoteMode: published.remoteMode,
     capabilityAreaIds: [],
   });

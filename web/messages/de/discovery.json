@@ -432,7 +432,11 @@
       "eyebrow": "Status",
       "activeHint": "Eingeloggte Mitglieder können dein Profil in der Co-Founder-Suche finden.",
       "pausedHint": "Dein Profil ist pausiert. Niemand sieht es, deine Angaben bleiben erhalten.",
-      "draftHint": "Nur du siehst dieses Profil. Es taucht in keiner Suche auf."
+      "draftHint": "Nur du siehst dieses Profil. Es taucht in keiner Suche auf.",
+      "completionTitle": "Vollständigkeit",
+      "completionCount": "{done} von {total} Angaben stehen",
+      "completionDone": "Alles beisammen.",
+      "completionRemaining": "Es fehlt noch {count, plural, one {eine Angabe} other {# Angaben}}."
     },
     "intent": {
       "searchIntent": "Wie aktiv suchst du gerade?",

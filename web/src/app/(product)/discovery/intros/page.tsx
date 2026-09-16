@@ -102,7 +102,7 @@ function ProfileSummary({ profile, t }: { profile: DiscoveryProfilePreview | nul
         </p>
         <p>
           <span className="font-semibold text-slate-900">{t("intros.workFrame")}</span>{" "}
-          {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
+          {profile.locationRegion ? `${profile.locationRegion} · ` : ""}
           {t(`remoteModes.${profile.remoteMode}`)}
         </p>
       </div>

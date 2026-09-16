@@ -143,7 +143,7 @@ function ProfileCard({
         <div>
           <dt className="font-semibold text-slate-900">{t("matchingPreparation.profile.workFrame")}</dt>
           <dd className="mt-1">
-            {profile.locationLabel ? `${profile.locationLabel} · ` : ""}
+            {profile.locationRegion ? `${profile.locationRegion} · ` : ""}
             {t(`remoteModes.${profile.remoteMode}`)}
           </dd>
         </div>

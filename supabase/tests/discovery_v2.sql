@@ -31,13 +31,13 @@ values
 
 insert into public.founder_discovery_profiles (
   user_id, status, display_name, headline, bio, own_roles, seeking_roles,
-  expertise, industries, location_label, location_region, remote_mode,
+  expertise, industries, location_region, remote_mode,
   availability_hours_per_week, commitment_level, venture_stage, venture_goal, published_at
 )
 values
-  ('a1111111-1111-4111-8111-111111111111', 'active', 'Owner', 'Product founder', '', array['product'], array['tech'], array['Product'], array['SaaS'], 'Legacy Berlin', 'Berlin', 'remote', 20, 'part_time', 'idea_validating', 'venture_scale', now()),
-  ('a2222222-2222-4222-8222-222222222222', 'active', 'Match', 'AI engineer', '', array['tech'], array['product'], array['AI', 'React'], array['Health'], 'Legacy value', 'Berlin', 'remote', 25, 'part_time', 'already_building', 'venture_scale', now() - interval '30 days'),
-  ('a3333333-3333-4333-8333-333333333333', 'active', 'Other', 'Sales founder', '', array['sales'], array['product'], array['Sales'], array['SaaS'], 'Berlin', 'Hamburg', 'onsite', 10, 'full_time', 'already_building', 'profitable_business', now());
+  ('a1111111-1111-4111-8111-111111111111', 'active', 'Owner', 'Product founder', '', array['product'], array['tech'], array['Product'], array['SaaS'], 'Berlin', 'remote', 20, 'part_time', 'idea_validating', 'venture_scale', now()),
+  ('a2222222-2222-4222-8222-222222222222', 'active', 'Match', 'AI engineer', '', array['tech'], array['product'], array['AI', 'React'], array['Health'], 'Berlin', 'remote', 25, 'part_time', 'already_building', 'venture_scale', now() - interval '30 days'),
+  ('a3333333-3333-4333-8333-333333333333', 'active', 'Other', 'Sales founder', '', array['sales'], array['product'], array['Sales'], array['SaaS'], 'Hamburg', 'onsite', 10, 'full_time', 'already_building', 'profitable_business', now());
 
 insert into public.founder_search_preferences (
   user_id, discovery_v2_alignment_enabled, discovery_v2_alignment_dimensions,
@@ -86,7 +86,7 @@ select pg_temp.assert_true(
       ]
       and not (to_jsonb(result) ?| array[
         'email', 'assessment_id', 'assessment_scores', 'priority_weights',
-        'bio', 'industries', 'location_label'
+        'bio', 'industries'
       ])
     )
     from public.search_founder_discovery_profiles_v2(

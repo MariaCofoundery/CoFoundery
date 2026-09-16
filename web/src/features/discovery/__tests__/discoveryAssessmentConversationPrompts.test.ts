@@ -50,7 +50,6 @@ function createCandidate(id: string): DiscoveryCandidate {
       seekingRoles: ["product"],
       expertise: ["AI"],
       industries: ["SaaS"],
-      locationLabel: "Berlin",
       locationRegion: "Berlin",
       remoteMode: "remote",
       availabilityHoursPerWeek: 25,

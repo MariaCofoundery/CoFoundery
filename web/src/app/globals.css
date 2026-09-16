@@ -643,3 +643,52 @@ body {
     font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "hlig" 0 !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Discovery: Eintreten und Fortschritt
+   ---------------------------------------------------------------------------
+   Zwei Bewegungen, beide mit einer Aufgabe. Das Aufsteigen der Karten gibt der
+   Seite eine Leserichtung von oben nach unten; der Balken zeigt, dass sich
+   etwas gefuellt hat, statt es nur zu behaupten.
+
+   Beides ist reines CSS und laeuft genau einmal. Wer Bewegung abbestellt hat,
+   sieht den Endzustand sofort - nicht nichts.
+   --------------------------------------------------------------------------- */
+.discovery-rise {
+  animation: discovery-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+@keyframes discovery-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Die Breite steht inline, bewegt wird die Skalierung - so kommt der Balken
+   ohne JavaScript aus und kennt trotzdem sein Ziel. */
+.discovery-meter-fill {
+  transform-origin: left center;
+  animation: discovery-meter 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+@keyframes discovery-meter {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discovery-rise,
+  .discovery-meter-fill {
+    animation: none !important;
+  }
+}

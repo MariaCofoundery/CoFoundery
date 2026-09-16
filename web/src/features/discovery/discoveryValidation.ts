@@ -220,7 +220,6 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
       DISCOVERY_SELECTION_LIMITS.expertise
     ),
     industries: normalizeStringArray(input.industries).slice(0, DISCOVERY_SELECTION_LIMITS.industries),
-    locationLabel: normalizeText(input.locationLabel, DISCOVERY_TEXT_LIMITS.locationLabel) || null,
     locationRegion:
       normalizeText(input.locationRegion, DISCOVERY_TEXT_LIMITS.locationRegion) || null,
     remoteMode: normalizeRemoteMode(input.remoteMode),

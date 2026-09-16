@@ -38,7 +38,6 @@ const profile: FounderDiscoveryProfile = {
   seekingRoles: ["tech"],
   expertise: ["Product"],
   industries: [],
-  locationLabel: null,
   locationRegion: "Berlin",
   remoteMode: "remote",
   availabilityHoursPerWeek: 20,

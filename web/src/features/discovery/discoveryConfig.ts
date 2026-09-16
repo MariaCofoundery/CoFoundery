@@ -19,7 +19,6 @@ export const DISCOVERY_TEXT_LIMITS = {
   displayName: 80,
   headline: 160,
   bio: 1200,
-  locationLabel: 120,
   locationRegion: 120,
   industry: 80,
   expertise: 60,

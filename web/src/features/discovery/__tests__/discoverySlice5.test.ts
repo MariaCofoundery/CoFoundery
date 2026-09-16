@@ -18,7 +18,6 @@ function profile(id: string, displayName: string): FounderDiscoveryProfile {
     seekingRoles: ["product"],
     expertise: [],
     industries: [],
-    locationLabel: null,
     locationRegion: null,
     remoteMode: "remote",
     availabilityHoursPerWeek: 20,

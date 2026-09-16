@@ -101,7 +101,6 @@ export function buildDiscoveryV2Candidate(
       seekingRoles: profile.seekingRoles,
       expertise: profile.expertise,
       industries: profile.industries,
-      locationLabel: profile.locationLabel,
       locationRegion: profile.locationRegion,
       remoteMode: profile.remoteMode,
       availabilityHoursPerWeek: profile.availabilityHoursPerWeek,

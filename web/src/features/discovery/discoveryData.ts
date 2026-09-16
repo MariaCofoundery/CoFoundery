@@ -106,7 +106,6 @@ type FounderDiscoveryProfileRow = {
   seeking_roles: string[];
   expertise: string[];
   industries: string[];
-  location_label: string | null;
   location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
@@ -146,7 +145,6 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "seeking_roles",
   "expertise",
   "industries",
-  "location_label",
   "location_region",
   "remote_mode",
   "availability_hours_per_week",
@@ -218,7 +216,6 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
     expertise: row.expertise ?? [],
     industries: row.industries,
-    locationLabel: row.location_label,
     locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryRemoteMode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
@@ -264,7 +261,6 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     seekingRoles: profile.seekingRoles,
     expertise: profile.expertise,
     industries: profile.industries,
-    locationLabel: profile.locationLabel,
     locationRegion: profile.locationRegion,
     remoteMode: profile.remoteMode,
     availabilityHoursPerWeek: profile.availabilityHoursPerWeek,
@@ -345,7 +341,6 @@ export async function upsertOwnDiscoveryProfile(
         seeking_roles: normalized.seekingRoles,
         expertise: normalized.expertise,
         industries: normalized.industries,
-        location_label: normalized.locationLabel,
         location_region: normalized.locationRegion,
         remote_mode: normalized.remoteMode,
         availability_hours_per_week: normalized.availabilityHoursPerWeek,
@@ -613,7 +608,6 @@ export async function getDiscoveryCandidatesForCurrentUser(
     seekingRoles: row.seeking_roles,
     expertise: row.expertise ?? [],
     industries: [],
-    locationLabel: null,
     locationRegion: row.location_region,
     remoteMode: row.remote_mode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
@@ -689,7 +683,6 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         seekingRoles: row.seeking_roles,
         expertise: row.expertise ?? [],
         industries: [],
-        locationLabel: null,
         locationRegion: row.location_region,
         remoteMode: row.remote_mode,
         availabilityHoursPerWeek: row.availability_hours_per_week,

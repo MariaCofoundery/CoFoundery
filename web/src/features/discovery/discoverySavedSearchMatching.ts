@@ -44,7 +44,7 @@ export type SearchableDiscoveryProfile = {
   ownRoles: string[];
   expertise: string[];
   industries: string[];
-  locationLabel: string | null;
+  locationRegion: string | null;
   remoteMode: string | null;
   /** Freigegebene Capability-Bereiche; leer heisst nicht freigegeben. */
   capabilityAreaIds: string[];
@@ -84,7 +84,7 @@ function containsTerm(profile: SearchableDiscoveryProfile, term: string) {
     ...profile.expertise,
     ...profile.industries,
     ...profile.ownRoles,
-    profile.locationLabel ?? "",
+    profile.locationRegion ?? "",
   ]
     .join(" ")
     .toLocaleLowerCase("de-DE");
@@ -120,7 +120,7 @@ export function matchDiscoverySavedSearch(
   }
 
   if (criteria.locations.length) {
-    const label = profile.locationLabel ?? "";
+    const label = profile.locationRegion ?? "";
     const hit = criteria.locations.find((location) =>
       label.toLocaleLowerCase("de-DE").includes(normalize(location))
     );
