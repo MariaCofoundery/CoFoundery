@@ -26,6 +26,7 @@ import {
   normalizeDiscoveryPreferencesInput,
   normalizeDiscoveryProfileInput,
 } from "@/features/discovery/discoveryValidation";
+import { notifyDiscoverySavedSearchMatches } from "@/features/discovery/discoverySavedSearchNotifications";
 import { getPersonCore, type PersonCore } from "@/features/profile/personCoreData";
 import { createClient } from "@/lib/supabase/server";
 
@@ -333,6 +334,34 @@ export async function saveDiscoveryV2AlignmentPreferencesAction(
   }
 }
 
+/**
+ * Der Abgleich mit gespeicherten Suchen, nachdem ein Profil sichtbar wurde.
+ *
+ * Laeuft nach dem Speichern und nie davor: Erst ist das Profil veroeffentlicht,
+ * dann wird verglichen. Geht der Abgleich schief, bleibt das Profil trotzdem
+ * veroeffentlicht - deshalb schluckt die Funktion ihre Fehler selbst.
+ *
+ * Mehrfaches Veroeffentlichen - etwa nach einer Pause - loest keine zweite
+ * Meldung aus; dafuer sorgt die Anspruchsvergabe in der Datenbank, nicht diese
+ * Stelle.
+ */
+async function notifyDiscoverySavedSearches(userId: string) {
+  const published = await getOwnDiscoveryProfile(userId).catch(() => null);
+  if (!published || published.status !== "active") return;
+
+  await notifyDiscoverySavedSearchMatches({
+    userId: published.userId,
+    displayName: published.displayName,
+    headline: published.headline,
+    ownRoles: published.ownRoles,
+    expertise: published.expertise,
+    industries: published.industries,
+    locationLabel: published.locationLabel,
+    remoteMode: published.remoteMode,
+    capabilityAreaIds: [],
+  });
+}
+
 export async function publishDiscoveryProfileAction(): Promise<DiscoveryProfilePublishResult> {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
@@ -363,6 +392,7 @@ export async function publishDiscoveryProfileAction(): Promise<DiscoveryProfileP
       publishedAt: profile.publishedAt ?? new Date().toISOString(),
     });
 
+    await notifyDiscoverySavedSearches(userId);
     revalidateDiscoveryPaths();
     return {
       ok: true,
@@ -421,6 +451,7 @@ export async function publishDiscoveryProfileFromFormAction(
       publishedAt: new Date().toISOString(),
     });
 
+    await notifyDiscoverySavedSearches(userId);
     revalidateDiscoveryPaths();
     return {
       ok: true,

@@ -275,7 +275,9 @@
       "feedback": {
         "saved": "Your private search was updated.",
         "reset": "The search filters were reset.",
-        "failed": "Your search could not be saved right now."
+        "failed": "Your search could not be saved right now.",
+        "label": "Please give your search a name (2 to 80 characters).",
+        "empty": "Without a single criterion we cannot remember the search."
       },
       "applying": "Applying …"
     },
@@ -377,6 +379,50 @@
       "previous": "Previous",
       "next": "Next",
       "page": "Page {page}"
+    },
+    "watch": {
+      "title": "Notify me about new matches",
+      "text": "We remember your current search criteria. When someone new publishes a profile that fits, you get an email – at most once per profile.",
+      "carriedTitle": "What gets remembered",
+      "industries": "Industries",
+      "noCriteria": "You have not set any criteria yet. Narrow your search above or pick capabilities below – otherwise the notification would be a subscription to every new profile.",
+      "capabilitiesTitle": "Require particular capabilities",
+      "capabilitiesText": "Only profiles that have disclosed at least one of these areas will trigger a notification. Anyone keeping their capabilities private never shows up here.",
+      "alignmentNote": "Your alignment dimensions remain part of the search. They apply to the list here, not to the email – that comparison needs your own answers.",
+      "labelPlaceholder": "Name for this search",
+      "save": "Remember search",
+      "saving": "Saving …",
+      "open": "View remembered searches"
+    },
+    "searches": {
+      "title": "Remembered searches",
+      "text": "Every search shows its criteria in plain words – so that weeks later you still know why a notification arrived.",
+      "emptyTitle": "Nothing remembered yet",
+      "emptyText": "Narrow your search and remember it. CoFoundery will then get in touch when someone new fits.",
+      "emptyCta": "Go to search",
+      "criteria": {
+        "roles": "Roles and expertise",
+        "industries": "Industries",
+        "locations": "Place",
+        "capabilities": "Capabilities",
+        "remote": "Way of working",
+        "alignment": "Alignment dimensions"
+      },
+      "alignmentHint": "Alignment dimensions apply to the result list, not to the email.",
+      "notifyOn": "Turn notification on",
+      "notifyOff": "Turn notification off",
+      "notifyStateOn": "You will be notified.",
+      "notifyStateOff": "You will not be notified.",
+      "delete": "Delete search",
+      "deleteQuestion": "Really delete this remembered search?",
+      "deleteConfirm": "Yes, delete",
+      "deleteCancel": "Cancel",
+      "saved": {
+        "created": "The search is remembered.",
+        "deleted": "The search was deleted."
+      },
+      "error": "That did not work. Please try again.",
+      "back": "Back to search"
     }
   },
   "profile": {

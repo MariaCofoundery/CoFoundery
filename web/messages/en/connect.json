@@ -479,6 +479,8 @@
     "saved": {
       "created": "Search saved. From now on we will tell you what matches.",
       "deleted": "Search deleted."
-    }
+    },
+    "capabilitiesTitle": "Require particular capabilities",
+    "capabilitiesText": "Only entries from people who have disclosed at least one of these areas will trigger a notification. Anyone keeping their capabilities private never shows up here."
   }
 }

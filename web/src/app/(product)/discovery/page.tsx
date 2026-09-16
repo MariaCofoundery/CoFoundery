@@ -6,6 +6,7 @@ import {
   DISCOVERY_ROLE_OPTIONS,
 } from "@/features/discovery/discoveryConfig";
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
+import { DiscoverySavedSearchForm } from "@/features/discovery/DiscoverySavedSearchForm";
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
@@ -23,6 +24,7 @@ import {
   type DiscoveryRemoteMode,
   type FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
+import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -43,6 +45,10 @@ type DiscoverySearchParams = {
   searchResult?: string | string[];
   mode?: string | string[];
 };
+
+// Die Rueckmeldungen der Suchmaske und des Merkens teilen sich eine Stelle.
+const FEEDBACK_KEYS = ["saved", "reset", "failed", "label", "empty"];
+const WARNING_FEEDBACK = ["failed", "label", "empty"];
 
 function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -144,10 +150,11 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     redirect("/advisor/dashboard");
   }
 
-  const [profile, loadedPreferences, savedProfileIds] = await Promise.all([
+  const [profile, loadedPreferences, savedProfileIds, capabilityVocabulary] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
     getOwnSearchPreferences(user.id),
     getOwnSavedDiscoveryProfileIds(user.id),
+    getCapabilityVocabulary(supabase),
   ]);
   const preferences: FounderSearchPreferences = loadedPreferences ?? {
     id: "",
@@ -223,8 +230,8 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           </div>
 
           {saved ? (
-            <p className={`mt-4 rounded-2xl px-4 py-3 text-sm ${saved === "failed" ? "bg-amber-50 text-amber-900" : "bg-emerald-50 text-emerald-900"}`}>
-              {t(`v2.search.feedback.${saved === "failed" ? "failed" : saved === "reset" ? "reset" : "saved"}`)}
+            <p className={`mt-4 rounded-2xl px-4 py-3 text-sm ${WARNING_FEEDBACK.includes(saved ?? "") ? "bg-amber-50 text-amber-900" : "bg-emerald-50 text-emerald-900"}`}>
+              {t(`v2.search.feedback.${FEEDBACK_KEYS.includes(saved ?? "") ? saved : "saved"}`)}
             </p>
           ) : null}
 
@@ -273,6 +280,17 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
             </div>
           </form>
         </section> : null}
+
+        {mode === "search" ? (
+          <DiscoverySavedSearchForm
+            preferences={preferences}
+            families={capabilityVocabulary.families}
+            areas={capabilityVocabulary.areas}
+            className={CARD_CLASS}
+            fieldClassName={FIELD_CLASS}
+            buttonClassName={SECONDARY_CTA_CLASS}
+          />
+        ) : null}
 
         <section className={CARD_CLASS}>
           <div>

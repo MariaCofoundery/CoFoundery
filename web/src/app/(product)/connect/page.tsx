@@ -8,6 +8,8 @@ import { coFounderBridgeHref } from "@/features/connect/connectTypes";
 import { getConnectAttentionCount } from "@/features/connect/connectPresentation";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
+import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker";
+import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -19,7 +21,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
     .some((key) => (filters[key] ?? "").trim().length > 0);
-  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client)]);
+  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client)]);
   const connectAttentionCount = getConnectAttentionCount(incomingContacts, unreadMessages);
   const cofounderHref = coFounderBridgeHref(hasProfileRole(baseProfile?.roles, "founder"));
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
@@ -64,6 +66,16 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           <input type="hidden" name="include_problems" value="1" />
           <p className="text-sm font-semibold">{t("searches.saveTitle")}</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">{t("searches.saveText")}</p>
+          {/* Die Faehigkeiten waren bisher nur eine Spalte in der Datenbank -
+              ohne diese Auswahl liess sich das Kriterium nirgends setzen. */}
+          <div className="mt-3">
+            <CapabilityAreaPicker
+              families={capabilityVocabulary.families}
+              areas={capabilityVocabulary.areas}
+              title={t("searches.capabilitiesTitle")}
+              text={t("searches.capabilitiesText")}
+            />
+          </div>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <input name="label" required minLength={2} maxLength={80} className={field} placeholder={t("searches.labelPlaceholder")} aria-label={t("searches.labelPlaceholder")} />
             <SubmitButton label={t("searches.save")} pendingLabel={t("pending.save")} className={`${action} border border-slate-200`} />

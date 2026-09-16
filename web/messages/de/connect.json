@@ -479,6 +479,8 @@
     "saved": {
       "created": "Suche gespeichert. Ab jetzt melden wir dir, was dazu passt.",
       "deleted": "Suche gelöscht."
-    }
+    },
+    "capabilitiesTitle": "Bestimmte Fähigkeiten verlangen",
+    "capabilitiesText": "Nur Einträge von Menschen, die mindestens einen dieser Bereiche freigegeben haben, lösen eine Meldung aus. Wer seine Fähigkeiten privat hält, taucht hier nie auf."
   }
 }

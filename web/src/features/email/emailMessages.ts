@@ -504,3 +504,49 @@ export function getSavedSearchEmailCopy(
     preheader: input.title,
   };
 }
+
+/** Die Meldung ueber ein neues Suchprofil, das zu einer Suche passt. */
+export function getDiscoverySavedSearchEmailCopy(
+  locale: AppLocale,
+  input: { displayName: string; headline: string; reasons: string[]; hasAlignmentFilter: boolean }
+) {
+  if (locale === "en") {
+    return {
+      htmlLang: "en",
+      eyebrow: "CoFoundery Discovery",
+      subject: "A new profile matches your search",
+      headline: "A new profile matches your search",
+      intro: `${input.displayName} – ${input.headline}`,
+      reasonsTitle: "It matches these criteria of yours:",
+      reasons: input.reasons,
+      alignmentNote: input.hasAlignmentFilter
+        ? "Your search also filters by alignment tendency. That comparison needs your own answers, so it happens when you open the list – there may be fewer profiles there."
+        : null,
+      cta: "Open Discovery",
+      note: "This is a hit on the search you saved – not a recommendation, and not a statement about whether you fit together.",
+      settings: "You can switch off notifications for a saved search at any time.",
+      fallback: "If the button does not work, use this link:",
+      privacy: "Privacy",
+      preheader: `${input.displayName} – ${input.headline}`,
+    };
+  }
+
+  return {
+    htmlLang: "de",
+    eyebrow: "CoFoundery Discovery",
+    subject: "Ein neues Profil passt zu deiner Suche",
+    headline: "Ein neues Profil passt zu deiner Suche",
+    intro: `${input.displayName} – ${input.headline}`,
+    reasonsTitle: "Das trifft auf diese deiner Kriterien zu:",
+    reasons: input.reasons,
+    alignmentNote: input.hasAlignmentFilter
+      ? "Deine Suche filtert zusätzlich nach Alignment-Tendenz. Dieser Vergleich braucht deine eigenen Antworten und passiert deshalb erst beim Öffnen der Liste – dort stehen möglicherweise weniger Profile."
+      : null,
+    cta: "Discovery öffnen",
+    note: "Das ist ein Treffer auf die Suche, die du gespeichert hast – keine Empfehlung, und keine Aussage darüber, ob ihr zusammenpasst.",
+    settings: "Du kannst die Benachrichtigung für eine gespeicherte Suche jederzeit abschalten.",
+    fallback: "Falls der Knopf nicht funktioniert, nutze diesen Link:",
+    privacy: "Datenschutz",
+    preheader: `${input.displayName} – ${input.headline}`,
+  };
+}

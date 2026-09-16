@@ -54,7 +54,14 @@ export async function saveConnectSearchAction(formData: FormData) {
     locations: parseList(formData.get("locations"), 3),
     geographic_scope: optional(formData.get("geographic_scope"), CONNECT_GEOGRAPHIC_SCOPES),
     remote_mode: optional(formData.get("remote_mode"), CONNECT_REMOTE_MODES),
-    capability_area_ids: parseList(formData.get("capability_area_ids"), 8),
+    capability_area_ids: [
+      ...new Set(
+        formData
+          .getAll("capability_area_ids")
+          .map((value) => String(value).trim())
+          .filter((value) => value.length > 0 && value.length <= 64)
+      ),
+    ].slice(0, 8),
     connect_direction: optional(formData.get("direction"), CONNECT_DIRECTIONS),
     connect_category: optional(formData.get("category"), CONNECT_CATEGORIES),
     include_listings: formData.get("include_listings") !== null,

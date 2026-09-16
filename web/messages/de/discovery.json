@@ -275,7 +275,9 @@
       "feedback": {
         "saved": "Deine private Suche wurde aktualisiert.",
         "reset": "Die Suchfilter wurden zurückgesetzt.",
-        "failed": "Deine Suche konnte gerade nicht gespeichert werden."
+        "failed": "Deine Suche konnte gerade nicht gespeichert werden.",
+        "label": "Bitte gib deiner Suche einen Namen (2 bis 80 Zeichen).",
+        "empty": "Ohne ein einziges Kriterium können wir die Suche nicht merken."
       },
       "applying": "Wird angewendet …"
     },
@@ -377,6 +379,50 @@
       "previous": "Zurück",
       "next": "Weiter",
       "page": "Seite {page}"
+    },
+    "watch": {
+      "title": "Bei neuen Treffern benachrichtigen",
+      "text": "Wir merken uns deine aktuellen Suchkriterien. Wenn danach jemand Neues ein Profil veröffentlicht, das darauf passt, bekommst du eine E-Mail – höchstens einmal pro Profil.",
+      "carriedTitle": "Das wird gemerkt",
+      "industries": "Branchen",
+      "noCriteria": "Du hast noch keine Kriterien gesetzt. Grenze deine Suche oben ein oder wähle unten Fähigkeiten aus – sonst wäre die Benachrichtigung ein Abonnement auf jedes neue Profil.",
+      "capabilitiesTitle": "Bestimmte Fähigkeiten verlangen",
+      "capabilitiesText": "Nur Profile, die mindestens einen dieser Bereiche freigegeben haben, lösen eine Meldung aus. Wer seine Fähigkeiten privat hält, taucht hier nie auf.",
+      "alignmentNote": "Deine Alignment-Dimensionen gehören weiter zur Suche. Sie wirken in der Liste hier, nicht in der E-Mail – dafür braucht es deine eigenen Antworten.",
+      "labelPlaceholder": "Name für diese Suche",
+      "save": "Suche merken",
+      "saving": "Wird gespeichert …",
+      "open": "Gemerkte Suchen ansehen"
+    },
+    "searches": {
+      "title": "Gemerkte Suchen",
+      "text": "Jede Suche zeigt ihre Kriterien im Klartext – damit du nach Wochen noch weißt, warum eine Meldung kam.",
+      "emptyTitle": "Noch nichts gemerkt",
+      "emptyText": "Grenze deine Suche ein und merke sie dir. Danach meldet sich CoFoundery, wenn jemand Neues dazu passt.",
+      "emptyCta": "Zur Suche",
+      "criteria": {
+        "roles": "Rollen und Expertise",
+        "industries": "Branchen",
+        "locations": "Ort",
+        "capabilities": "Fähigkeiten",
+        "remote": "Arbeitsweise",
+        "alignment": "Alignment-Dimensionen"
+      },
+      "alignmentHint": "Die Alignment-Dimensionen wirken in der Ergebnisliste, nicht in der E-Mail.",
+      "notifyOn": "Benachrichtigung einschalten",
+      "notifyOff": "Benachrichtigung ausschalten",
+      "notifyStateOn": "Du wirst benachrichtigt.",
+      "notifyStateOff": "Du wirst nicht benachrichtigt.",
+      "delete": "Suche löschen",
+      "deleteQuestion": "Diese gemerkte Suche wirklich löschen?",
+      "deleteConfirm": "Ja, löschen",
+      "deleteCancel": "Abbrechen",
+      "saved": {
+        "created": "Die Suche ist gemerkt.",
+        "deleted": "Die Suche wurde gelöscht."
+      },
+      "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
+      "back": "Zurück zur Suche"
     }
   },
   "profile": {
