@@ -427,12 +427,12 @@
   },
   "profile": {
     "title": "Dein Co-Founder-Suchprofil",
-    "subtitle": "Erstelle ein Profil für Menschen, die potenziell mit dir gründen könnten. Du entscheidest bewusst, wann es sichtbar wird.",
+    "subtitle": "So sehen dich Menschen, die mit dir gründen könnten. Du entscheidest, wann es sichtbar wird – und kannst es jederzeit wieder pausieren.",
     "status": {
       "eyebrow": "Status",
-      "activeHint": "Eingeloggte Cofoundery-Nutzer können dein Profil sehen.",
-      "pausedHint": "Dein Profil ist pausiert und für andere nicht sichtbar.",
-      "draftHint": "Nur du siehst dieses Profil."
+      "activeHint": "Eingeloggte Mitglieder können dein Profil in der Co-Founder-Suche finden.",
+      "pausedHint": "Dein Profil ist pausiert. Niemand sieht es, deine Angaben bleiben erhalten.",
+      "draftHint": "Nur du siehst dieses Profil. Es taucht in keiner Suche auf."
     },
     "intent": {
       "searchIntent": "Wie aktiv suchst du gerade?",
@@ -490,10 +490,14 @@
       "availability": "Verfügbarkeit pro Woche",
       "availabilityPlaceholder": "z. B. 20",
       "availabilityV2": "Wie viel Zeit kannst du aktuell realistisch für eine Gründung einbringen?",
-      "identityTitle": "Name, Headline, Über dich und Region",
-      "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",
-      "identityLink": "Profil bearbeiten",
-      "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Discovery-Profil nicht veröffentlichen."
+      "identityTitle": "Das kommt aus deinem Profil",
+      "identityText": "Name, Headline, Über dich, Region, Expertise, Branchen und Arbeitsweise pflegst du an einem Ort. Änderungen dort erscheinen hier sofort.",
+      "identityLink": "Im Profil bearbeiten",
+      "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Suchprofil nicht veröffentlichen.",
+      "identityExpertise": "Expertise",
+      "identityIndustries": "Branchen",
+      "identityWorkFrame": "Arbeitsweise",
+      "identityEmpty": "Noch nichts eingetragen"
     },
     "brings": {
       "title": "Was du mitbringst",
@@ -517,10 +521,16 @@
       "saveChanges": "Änderungen speichern",
       "publish": "Profil veröffentlichen",
       "pause": "Suche pausieren",
-      "publishHelp": "Beim Veröffentlichen speichern wir deine aktuellen Angaben und machen dein Profil sichtbar, wenn alles vollständig ist.",
+      "publishHelp": "Beim Veröffentlichen speichern wir deine Angaben und machen dein Profil für eingeloggte Mitglieder sichtbar.",
       "publishIssues": "Bevor dein Profil sichtbar wird, ergänze noch:",
       "saving": "Wird gespeichert …",
-      "publishing": "Wird veröffentlicht …"
+      "publishing": "Wird veröffentlicht …",
+      "resume": "Suche fortsetzen",
+      "resuming": "Wird fortgesetzt …",
+      "resumeHelp": "Deine Angaben sind gespeichert. Fortsetzen macht dein Profil wieder sichtbar.",
+      "saveHelp": "Deine Änderungen sind sofort in deinem sichtbaren Profil.",
+      "visibilityTitle": "Sichtbarkeit",
+      "pauseHelp": "Pausieren nimmt dein Profil aus der Suche. Nichts geht verloren, du kannst es jederzeit fortsetzen."
     },
     "publishIssueItems": {
       "displayName": "Gib deinem Suchprofil einen Namen, der mindestens 2 Zeichen lang ist.",

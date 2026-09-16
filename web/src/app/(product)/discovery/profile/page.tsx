@@ -256,24 +256,34 @@ function StatusCard({
             {t("profile.status.eyebrow")}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            {t(`status.${status}`)}
+            {t("profile.actions.visibilityTitle")}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{hint}</p>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">{hint}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {(["draft", "active", "paused"] as const).map((item) => (
-            <span
-              key={item}
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                item === status
-                  ? "bg-[color:var(--brand-primary)] text-slate-950"
-                  : "bg-slate-100 text-slate-500"
-              }`}
-            >
-              {t(`status.${item}`)}
-            </span>
-          ))}
-        </div>
+        {/* Nur der Zustand, der gilt. Alle drei nebeneinander sahen aus wie
+            eine Umschaltung, war aber reine Anzeige - und die Ueberschrift
+            sagt dasselbe schon. */}
+        <span
+          className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
+            status === "active"
+              ? "bg-emerald-100 text-emerald-900"
+              : status === "paused"
+                ? "bg-amber-100 text-amber-900"
+                : "bg-slate-100 text-slate-700"
+          }`}
+        >
+          <span
+            aria-hidden
+            className={`h-2 w-2 rounded-full ${
+              status === "active"
+                ? "bg-emerald-600"
+                : status === "paused"
+                  ? "bg-amber-600"
+                  : "bg-slate-400"
+            }`}
+          />
+          {t(`status.${status}`)}
+        </span>
       </div>
     </section>
   );
@@ -379,11 +389,6 @@ export default async function DiscoveryProfilePage({
     pause: pauseFeedback,
   });
   const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
-  const pageIssues = localizedFeedback
-    ? "issues" in localizedFeedback
-      ? localizedFeedback.issues
-      : []
-    : [];
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const publishIssues = getDiscoveryProfilePublishIssues(profile);
   const ownRolesAtLimit =
@@ -420,7 +425,11 @@ export default async function DiscoveryProfilePage({
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-6">
-          <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
+          <Link
+            href="/discovery"
+            className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-slate-950"
+          >
+            <span aria-hidden>←</span>
             {t("common.backToDiscovery")}
           </Link>
           <div className="max-w-3xl">
@@ -439,12 +448,13 @@ export default async function DiscoveryProfilePage({
         <StatusCard profile={profile} t={t} />
         <PageMessage
           message={pageMessage}
-          issues={pageIssues}
+          issues={[]}
           tone={localizedFeedback ? (localizedFeedback.ok ? "success" : "error") : undefined}
           t={t}
         />
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
+          <div className="flex flex-col gap-5">
           <section className={CARD_CLASS}>
             <form action={saveProfileDraft} className="grid gap-5">
               <div className={INNER_SECTION_CLASS}>
@@ -460,19 +470,56 @@ export default async function DiscoveryProfilePage({
                   </p>
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-5">
                   <h3 className="text-sm font-semibold">{t("profile.publicProfile.identityTitle")}</h3>
                   {core?.display_name ? (
-                    <div className="mt-3 space-y-1 text-sm text-slate-700">
-                      <p className="font-medium">{core.display_name}</p>
-                      {core.headline ? <p>{core.headline}</p> : null}
-                      {core.bio ? <p className="line-clamp-2 text-slate-600">{core.bio}</p> : null}
-                      {core.location_region ? <p className="text-slate-600">{core.location_region}</p> : null}
-                    </div>
+                    <>
+                      <div className="mt-3 space-y-1 text-sm text-slate-700">
+                        <p className="font-medium">{core.display_name}</p>
+                        {core.headline ? <p>{core.headline}</p> : null}
+                        {core.bio ? <p className="line-clamp-2 text-slate-600">{core.bio}</p> : null}
+                        {core.location_region ? <p className="text-slate-600">{core.location_region}</p> : null}
+                      </div>
+                      {/* Expertise, Branchen und Arbeitsweise stehen in der
+                          Vorschau rechts - kamen hier aber nicht vor. Wer sie
+                          dort leer sah, fand keinen Ort, sie zu ergaenzen. */}
+                      <dl className="mt-4 grid gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3">
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                            {t("profile.publicProfile.identityExpertise")}
+                          </dt>
+                          <dd className="mt-1 text-slate-700">
+                            {core.expertise?.length
+                              ? core.expertise.join(", ")
+                              : t("profile.publicProfile.identityEmpty")}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                            {t("profile.publicProfile.identityIndustries")}
+                          </dt>
+                          <dd className="mt-1 text-slate-700">
+                            {core.industries?.length
+                              ? core.industries.join(", ")
+                              : t("profile.publicProfile.identityEmpty")}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                            {t("profile.publicProfile.identityWorkFrame")}
+                          </dt>
+                          <dd className="mt-1 text-slate-700">
+                            {core.remote_mode
+                              ? t(`remoteModes.${core.remote_mode as DiscoveryRemoteMode}`)
+                              : t("profile.publicProfile.identityEmpty")}
+                          </dd>
+                        </div>
+                      </dl>
+                    </>
                   ) : (
                     <p className="mt-3 text-sm text-amber-900">{t("profile.publicProfile.identityMissing")}</p>
                   )}
-                  <p className={HELP_CLASS}>{t("profile.publicProfile.identityText")}</p>
+                  <p className={`${HELP_CLASS} mt-4`}>{t("profile.publicProfile.identityText")}</p>
                   <Link href="/profile?next=/discovery/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
                     {t("profile.publicProfile.identityLink")}
                   </Link>
@@ -609,92 +656,123 @@ export default async function DiscoveryProfilePage({
 
               <PublishIssuesCard issues={publishIssues} t={t} />
 
-              <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
+              {/* Speichern steht zuerst - und zwar nicht nur optisch: Die
+                  Eingabetaste in einem Textfeld loest den ersten Knopf im
+                  Formular aus. Stuende dort das Veroeffentlichen, wuerde ein
+                  Zeilenumbruch im falschen Moment das Profil sichtbar machen.
+                  Die Hauptaktion steht deshalb rechts, wie ueberall sonst. */}
+              <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
                 <SubmitButton
-                  label={profile.status === "active" ? t("profile.actions.saveChanges") : t("profile.actions.saveDraft")}
+                  label={
+                    profile.status === "active"
+                      ? t("profile.actions.saveChanges")
+                      : t("profile.actions.saveDraft")
+                  }
                   pendingLabel={t("profile.actions.saving")}
-                  className={PRIMARY_BUTTON_CLASS}
+                  className={profile.status === "active" ? PRIMARY_BUTTON_CLASS : SECONDARY_BUTTON_CLASS}
                 />
                 {profile.status !== "active" ? (
                   <SubmitButton
                     intent="publish"
                     formAction={publishProfileFromForm}
-                    label={t("profile.actions.publish")}
-                    pendingLabel={t("profile.actions.publishing")}
+                    label={
+                      profile.status === "paused"
+                        ? t("profile.actions.resume")
+                        : t("profile.actions.publish")
+                    }
+                    pendingLabel={
+                      profile.status === "paused"
+                        ? t("profile.actions.resuming")
+                        : t("profile.actions.publishing")
+                    }
                     className={PRIMARY_BUTTON_CLASS}
                   />
                 ) : null}
               </div>
-              <p className="-mt-3 text-xs leading-5 text-slate-500">
-                {t("profile.actions.publishHelp")}
+              <p className="text-xs leading-5 text-slate-500 sm:text-right">
+                {t(
+                  profile.status === "active"
+                    ? "profile.actions.saveHelp"
+                    : profile.status === "paused"
+                      ? "profile.actions.resumeHelp"
+                      : "profile.actions.publishHelp"
+                )}
               </p>
             </form>
 
-            <section className="mt-5 rounded-3xl border border-violet-100 bg-violet-50/40 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
-                {t("v2.alignment.eyebrow")}
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                {t("v2.alignment.choose")}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {t("v2.alignment.description")}
-              </p>
-              {alignmentReadiness.hasSubmittedBaseAssessment ? (
-                <form action={saveAlignmentPreferences} className="mt-4">
-                  <label className="flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
-                    <input
-                      type="checkbox"
-                      name="discoveryV2AlignmentEnabled"
-                      value="true"
-                      defaultChecked={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
-                      className="mt-1 h-4 w-4 rounded border-slate-300"
-                    />
-                    <span className="text-sm font-semibold text-slate-900">
-                      {t("v2.alignment.enable")}
-                    </span>
-                  </label>
-                  <p className="mt-3 text-xs leading-5 text-slate-500">
-                    {t("v2.alignment.chooseHelp")}
-                  </p>
-                  <DiscoveryAlignmentPreferencesEditor
-                    initialPreferences={
-                      loadedPreferences?.discoveryV2AlignmentPreferences ?? {}
-                    }
-                    ownTendencies={ownAlignmentTendencies}
-                  />
-                  <p className="mt-4 text-xs leading-5 text-violet-900">
-                    {t("v2.alignment.transparency")}
-                  </p>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">
-                    {t("v2.alignment.disclaimer")}
-                  </p>
+            {profile.status === "active" ? (
+              <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="max-w-xl text-xs leading-5 text-slate-500">
+                  {t("profile.actions.pauseHelp")}
+                </p>
+                <form action={pauseProfile}>
                   <SubmitButton
-                    label={t("profile.intent.saveAlignment")}
+                    label={t("profile.actions.pause")}
                     pendingLabel={t("profile.actions.saving")}
-                    className={`${PRIMARY_BUTTON_CLASS} mt-4`}
+                    className={SECONDARY_BUTTON_CLASS}
                   />
                 </form>
-              ) : (
-                <div className="mt-4 rounded-2xl bg-white p-4">
-                  <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
-                  <Link href="/me/base?next=/discovery/profile" className={`${SECONDARY_BUTTON_CLASS} mt-3`}>
-                    {t("common.fillBaseQuestions")}
-                  </Link>
-                </div>
-              )}
-            </section>
+              </div>
+            ) : null}
+          </section>
 
-            <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
-              <form action={pauseProfile}>
+          {/* Eigener Rahmen: Das hier ist privat und gehoert nicht in
+              denselben Kasten wie das, was andere sehen sollen. */}
+          <section className={`${CARD_CLASS} border-violet-100 bg-violet-50/50`}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+              {t("v2.alignment.eyebrow")}
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+              {t("v2.alignment.choose")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {t("v2.alignment.description")}
+            </p>
+            {alignmentReadiness.hasSubmittedBaseAssessment ? (
+              <form action={saveAlignmentPreferences} className="mt-4">
+                <label className="flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
+                  <input
+                    type="checkbox"
+                    name="discoveryV2AlignmentEnabled"
+                    value="true"
+                    defaultChecked={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
+                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                  />
+                  <span className="text-sm font-semibold text-slate-900">
+                    {t("v2.alignment.enable")}
+                  </span>
+                </label>
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  {t("v2.alignment.chooseHelp")}
+                </p>
+                <DiscoveryAlignmentPreferencesEditor
+                  initialPreferences={
+                    loadedPreferences?.discoveryV2AlignmentPreferences ?? {}
+                  }
+                  ownTendencies={ownAlignmentTendencies}
+                />
+                <p className="mt-4 text-xs leading-5 text-violet-900">
+                  {t("v2.alignment.transparency")}
+                </p>
+                <p className="mt-2 text-xs leading-5 text-slate-500">
+                  {t("v2.alignment.disclaimer")}
+                </p>
                 <SubmitButton
-                  label={t("profile.actions.pause")}
+                  label={t("profile.intent.saveAlignment")}
                   pendingLabel={t("profile.actions.saving")}
-                  className={SECONDARY_BUTTON_CLASS}
+                  className={`${PRIMARY_BUTTON_CLASS} mt-4`}
                 />
               </form>
-            </div>
+            ) : (
+              <div className="mt-4 rounded-2xl bg-white p-4">
+                <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
+                <Link href="/me/base?next=/discovery/profile" className={`${SECONDARY_BUTTON_CLASS} mt-3`}>
+                  {t("common.fillBaseQuestions")}
+                </Link>
+              </div>
+            )}
           </section>
+          </div>
 
           <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
             <section className={CARD_CLASS}>
@@ -706,16 +784,19 @@ export default async function DiscoveryProfilePage({
               </h2>
               <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <p className="text-sm font-semibold text-slate-950">
-                  {previewText(profile.displayName, t("profile.preview.displayNameFallback"))}
+                  {previewText(
+                    core?.display_name || profile.displayName,
+                    t("profile.preview.displayNameFallback")
+                  )}
                 </p>
                 <p className="mt-2 text-xl font-semibold leading-7 text-slate-950">
-                  {previewText(profile.headline, t("profile.preview.headlineFallback"))}
+                  {previewText(
+                    core?.headline || profile.headline,
+                    t("profile.preview.headlineFallback")
+                  )}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {previewText(
-                    profile.bio,
-                    t("profile.preview.bioFallback")
-                  )}
+                  {previewText(core?.bio || profile.bio, t("profile.preview.bioFallback"))}
                 </p>
                 <dl className="mt-5 grid gap-3 text-sm">
                   <div>
@@ -728,16 +809,32 @@ export default async function DiscoveryProfilePage({
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.interests")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatIndustries(profile.industries, t)}</dd>
+                    <dd className="mt-1 text-slate-600">
+                      {formatIndustries(
+                        core?.industries?.length ? core.industries : profile.industries ?? [],
+                        t
+                      )}
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.expertise")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatIndustries(profile.expertise ?? [], t)}</dd>
+                    <dd className="mt-1 text-slate-600">
+                      {formatIndustries(
+                        core?.expertise?.length ? core.expertise : profile.expertise ?? [],
+                        t
+                      )}
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.workFrame")}</dt>
                     <dd className="mt-1 text-slate-600">
-                      {profile.locationRegion ? `${profile.locationRegion} · ` : ""}{t(`remoteModes.${profile.remoteMode as DiscoveryRemoteMode}`)} ·{" "}
+                      {core?.location_region || profile.locationRegion
+                        ? `${core?.location_region || profile.locationRegion} · `
+                        : ""}
+                      {t(
+                        `remoteModes.${(core?.remote_mode || profile.remoteMode || "flexible") as DiscoveryRemoteMode}`
+                      )}{" "}
+                      ·{" "}
                       {profile.availabilityHoursPerWeek
                         ? t("profile.preview.hoursPerWeek", {
                             hours: profile.availabilityHoursPerWeek,

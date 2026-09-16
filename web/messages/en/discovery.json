@@ -427,12 +427,12 @@
   },
   "profile": {
     "title": "Your co-founder search profile",
-    "subtitle": "Create a profile for people who might build with you. You decide when it becomes visible.",
+    "subtitle": "This is how people who might found with you will see you. You decide when it becomes visible – and can pause it again at any time.",
     "status": {
       "eyebrow": "Status",
-      "activeHint": "Logged-in Cofoundery users can see your profile.",
-      "pausedHint": "Your profile is paused and not visible to others.",
-      "draftHint": "Only you can see this profile."
+      "activeHint": "Signed-in members can find your profile in the co-founder search.",
+      "pausedHint": "Your profile is paused. Nobody sees it, your entries stay.",
+      "draftHint": "Only you see this profile. It appears in no search."
     },
     "intent": {
       "searchIntent": "How actively are you searching right now?",
@@ -490,10 +490,14 @@
       "availability": "Availability per week",
       "availabilityPlaceholder": "e.g. 20",
       "availabilityV2": "How much time can you realistically contribute to a venture right now?",
-      "identityTitle": "Name, headline, about you and region",
-      "identityText": "You maintain these details in one place in your profile. Changes there appear here immediately.",
-      "identityLink": "Edit profile",
-      "identityMissing": "Nothing entered yet. Without a name, a headline and a text about you, your discovery profile cannot be published."
+      "identityTitle": "This comes from your profile",
+      "identityText": "Name, headline, about you, region, expertise, industries and way of working are kept in one place. Changes there appear here immediately.",
+      "identityLink": "Edit in profile",
+      "identityMissing": "No entries yet. Without a name, a headline and a text about you, your search profile cannot be published.",
+      "identityExpertise": "Expertise",
+      "identityIndustries": "Industries",
+      "identityWorkFrame": "Way of working",
+      "identityEmpty": "Nothing entered yet"
     },
     "brings": {
       "title": "What you bring",
@@ -517,10 +521,16 @@
       "saveChanges": "Save changes",
       "publish": "Publish profile",
       "pause": "Pause search",
-      "publishHelp": "When publishing, we save your current details and make your profile visible if everything is complete.",
+      "publishHelp": "Publishing saves your entries and makes your profile visible to signed-in members.",
       "publishIssues": "Before your profile becomes visible, please add:",
       "saving": "Saving …",
-      "publishing": "Publishing …"
+      "publishing": "Publishing …",
+      "resume": "Resume search",
+      "resuming": "Resuming …",
+      "resumeHelp": "Your entries are saved. Resuming makes your profile visible again.",
+      "saveHelp": "Your changes go straight into your visible profile.",
+      "visibilityTitle": "Visibility",
+      "pauseHelp": "Pausing takes your profile out of the search. Nothing is lost, you can resume at any time."
     },
     "publishIssueItems": {
       "displayName": "Give your search profile a name with at least 2 characters.",

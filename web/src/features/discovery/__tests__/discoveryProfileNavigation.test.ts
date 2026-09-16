@@ -14,7 +14,9 @@ const enMessages = JSON.parse(readFileSync("messages/en/discovery.json", "utf8")
 };
 
 test("own Discovery profile returns to the canonical Discovery entry", () => {
-  assert.match(profilePageSource, /<Link href="\/discovery"/);
+  // \s statt eines Leerzeichens: Der Link darf ueber mehrere Zeilen gehen -
+  // geprueft wird das Ziel, nicht die Formatierung.
+  assert.match(profilePageSource, /<Link\s+href="\/discovery"/);
   assert.match(profilePageSource, /t\("common\.backToDiscovery"\)/);
   assert.doesNotMatch(profilePageSource, /<Link href="\/dashboard"/);
   assert.doesNotMatch(profilePageSource, /t\("common\.backToDashboard"\)/);

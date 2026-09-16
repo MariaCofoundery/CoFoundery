@@ -190,9 +190,17 @@ test("the submit button no longer carries a feature name", () => {
 test("the longest form in the product now reports that it is saving", () => {
   const page = source("src/app/(product)/discovery/profile/page.tsx");
   assert.match(page, /<SubmitButton/);
-  assert.match(page, /pendingLabel=\{t\("profile\.actions\.saving"\)\}/);
-  assert.match(page, /pendingLabel=\{t\("profile\.actions\.publishing"\)\}/);
+  assert.match(page, /profile\.actions\.saving/);
+  assert.match(page, /profile\.actions\.publishing/);
   assert.doesNotMatch(page, /<button type="submit"/, "kein Knopf ohne Pending-Zustand");
+
+  // Die eigentliche Zusage: JEDER Knopf sagt, dass er arbeitet. Vorher stand
+  // hier die woertliche Schreibweise zweier Beschriftungen - die ging kaputt,
+  // sobald eine davon von der Situation abhaengt, obwohl der Pending-Zustand
+  // unveraendert da war.
+  const buttons = page.match(/<SubmitButton/g)?.length ?? 0;
+  const pending = page.match(/pendingLabel=/g)?.length ?? 0;
+  assert.equal(pending, buttons, "jeder SubmitButton traegt einen pendingLabel");
 });
 
 // ---------------------------------------------------------------------------
