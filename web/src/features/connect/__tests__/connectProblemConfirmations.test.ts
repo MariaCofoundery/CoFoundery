@@ -318,3 +318,102 @@ test("both locales name the new notification", () => {
     }
   }
 });
+
+// ---------------------------------------------------------------------------
+// Oeffentlich nur mit Freigabe
+// ---------------------------------------------------------------------------
+const VISIBILITY_MIGRATION =
+  "../supabase/migrations/20260920120000_public_problem_visibility.sql";
+const PUBLIC_PAGE = "src/app/(public-connect)/connect/pr/[publicSlug]/page.tsx";
+
+test("a problem is not public by default", () => {
+  const migration = source(VISIBILITY_MIGRATION);
+  assert.match(migration, /add column visibility text not null default 'members_only'/);
+  // Die Adresse wird gewuerfelt. Aus dem Titel gebildet waere sie ratbar, und
+  // damit waere jedes nicht freigegebene Problem zu finden.
+  assert.match(migration, /public_slug ~ '\^problem-\[a-f0-9\]\{24\}\$'/);
+});
+
+test("publishing a problem does not publish other people's texts", () => {
+  const migration = source(VISIBILITY_MIGRATION);
+  const fn = migration.slice(
+    migration.indexOf("create or replace function public.get_public_network_problem"),
+    migration.indexOf("comment on function public.get_public_network_problem")
+  );
+  // Der wichtigste Punkt: Die Einwilligung der einstellenden Person deckt
+  // ihren eigenen Text ab - nicht den von anderen.
+  assert.doesNotMatch(fn, /network_problem_approaches/);
+  assert.doesNotMatch(fn, /network_problem_confirmations/);
+  assert.doesNotMatch(fn, /network_problem_interests/);
+  assert.doesNotMatch(fn, /interest_count|confirmation_count/);
+
+  const page = codeOnly(PUBLIC_PAGE);
+  assert.doesNotMatch(page, /getConnectProblemApproaches|getConnectProblemConfirmations/);
+});
+
+test("the consent is required on the first switch, not on every save", () => {
+  const actions = codeOnly(ACTIONS);
+  assert.match(
+    actions,
+    /if \(wanted === "public" && currentVisibility !== "public"\) \{/,
+    "danach nicht mehr - sonst haekelt man bei jeder Textaenderung denselben Haken"
+  );
+  assert.match(actions, /confirm_public_visibility"\) !== "yes"/);
+});
+
+test("a problem that is no longer active disappears from the outside", () => {
+  const migration = source(VISIBILITY_MIGRATION);
+  const fn = migration.slice(
+    migration.indexOf("create or replace function public.get_public_network_problem"),
+    migration.indexOf("comment on function public.get_public_network_problem")
+  );
+  assert.match(fn, /problem\.visibility = 'public'/);
+  assert.match(fn, /problem\.status = 'active'/);
+});
+
+test("a page that has nothing to show is not indexed", () => {
+  const page = source(PUBLIC_PAGE);
+  assert.match(
+    page,
+    /if \(!problem\) return \{[\s\S]{0,140}robots: \{ index: false, follow: false \}/,
+    "zurueckgezogen oder nie freigegeben - beides darf nicht in den Index"
+  );
+});
+
+test("the sitemap points at addresses that actually exist", () => {
+  const migration = source(VISIBILITY_MIGRATION);
+  const fn = migration.slice(migration.indexOf("create or replace function public.list_public_network_sitemap"));
+  // Der Bereich heisst seit der Umbenennung /connect. Die Funktion gab weiter
+  // /network aus - das funktionierte nur ueber eine Weiterleitung.
+  assert.doesNotMatch(fn, /'\/network\//);
+  assert.match(fn, /'\/connect\/p\/'/);
+  assert.match(fn, /'\/connect\/l\/'/);
+  assert.match(fn, /'\/connect\/pr\/'/);
+
+  const robots = source("src/app/robots.ts");
+  assert.match(robots, /"\/connect\/pr\/"/, "und der Pfad ist fuer Suchmaschinen freigegeben");
+});
+
+test("the visibility copy names what stays inside", () => {
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/connect.json`);
+    const problems = messages.problems as Record<string, string>;
+    for (const key of [
+      "visibilityTitle",
+      "visibilityPublicHint",
+      "visibilityPreviewItems",
+      "visibilityConfirm",
+      "visibilityCaution",
+      "openPublicPage",
+      "publicOpenInside",
+      "publicJoinText",
+    ]) {
+      assert.equal(typeof problems[key], "string", `${locale}: problems.${key} fehlt`);
+    }
+  }
+  // Die Einwilligung muss sagen, worauf man sich einlaesst - eine Zustimmung
+  // zu "oeffentlich sichtbar" ohne den Grund waere keine.
+  const de = readJson("messages/de/connect.json").problems as Record<string, string>;
+  assert.match(de.visibilityCaution, /Arbeitgeber/);
+  assert.match(de.visibilityPreviewItems, /Ansätze anderer/);
+});

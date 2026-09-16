@@ -182,6 +182,16 @@ export default async function ConnectProblemPage({
         <section className={`${card} mt-6`}>
           <h2 className="text-lg font-semibold">{t("problems.ownTitle")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("problems.ownText")}</p>
+          {/* Wer freigegeben hat, soll sehen koennen, was draussen steht -
+              sonst ist die Freigabe eine Behauptung. */}
+          {problem.visibility === "public" && isPublished ? (
+            <Link
+              href={`/connect/pr/${problem.public_slug}`}
+              className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
+            >
+              {t("problems.openPublicPage")}
+            </Link>
+          ) : null}
           <div className="mt-4 flex flex-wrap gap-3">
             {problem.status === "draft" ? (
               <form action={updateConnectProblemStatusAction}>

@@ -46,6 +46,25 @@ function parseList(value: FormDataEntryValue | null, max: number) {
   ].slice(0, max);
 }
 
+/**
+ * Die Freigabe, samt Einwilligung.
+ *
+ * Oeffentlich wird ein Problem nur, wenn beim ERSTEN Umschalten ausdruecklich
+ * bestaetigt wurde. Danach nicht mehr - wer schon oeffentlich steht und etwas
+ * anderes am Text aendert, soll nicht jedes Mal denselben Haken setzen.
+ */
+function resolveProblemVisibility(
+  formData: FormData,
+  currentVisibility: string | null | undefined,
+  onMissingConsent: () => never
+) {
+  const wanted = formData.get("visibility") === "public" ? "public" : "members_only";
+  if (wanted === "public" && currentVisibility !== "public") {
+    if (formData.get("confirm_public_visibility") !== "yes") onMissingConsent();
+  }
+  return wanted;
+}
+
 function back(path: string, error: string): never {
   revalidatePath(path);
   redirect(`${path}?error=${error}`);
@@ -86,6 +105,9 @@ export async function saveConnectProblemAction(formData: FormData) {
       industries: parseList(formData.get("industries"), 5),
       status: publish ? "active" : "draft",
       published_at: publish ? new Date().toISOString() : null,
+      visibility: resolveProblemVisibility(formData, null, () =>
+        back("/connect/problems/new", "public_confirmation")
+      ),
     })
     .select("id")
     .single();
@@ -325,11 +347,15 @@ export async function updateConnectProblemAction(formData: FormData) {
 
   const { data: existing } = await client
     .from("network_problems")
-    .select("status")
+    .select("status,visibility")
     .eq("id", problemId)
     .eq("author_user_id", user.id)
     .maybeSingle();
   if (!existing) back("/connect/problems", "save");
+
+  const visibility = resolveProblemVisibility(formData, existing.visibility, () =>
+    back(path, "public_confirmation")
+  );
 
   // Ein veroeffentlichtes Problem bleibt veroeffentlicht. Ein Entwurf wird es
   // nur, wenn der Veroeffentlichen-Knopf gedrueckt wurde.
@@ -350,6 +376,7 @@ export async function updateConnectProblemAction(formData: FormData) {
         nextStatus === "active" && existing.status !== "active"
           ? new Date().toISOString()
           : undefined,
+      visibility,
     })
     .eq("id", problemId)
     .eq("author_user_id", user.id);

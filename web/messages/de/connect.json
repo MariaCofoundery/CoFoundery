@@ -510,7 +510,18 @@
     "approachRepliesTitle": "Wer sich zu deinem Ansatz gemeldet hat",
     "approachRepliesEmpty": "Noch niemand. Ein Ansatz braucht meist etwas Zeit, bis jemand darauf stößt.",
     "approachReplyProfileRequiredTitle": "Zuerst dein Connect-Profil",
-    "approachReplyProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach kommst du hierher zurück."
+    "approachReplyProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach kommst du hierher zurück.",
+    "publicOpenInside": "Im Bereich öffnen",
+    "publicJoinText": "Drinnen steht, wer das Problem ebenfalls kennt und wie andere es angehen würden. Dafür brauchst du ein Konto.",
+    "visibilityTitle": "Wer das sehen darf",
+    "visibilityMembersOnly": "Nur eingeloggte Mitglieder",
+    "visibilityPublic": "Öffentlich sichtbar",
+    "visibilityPublicHint": "Die Seite ist dann ohne Konto erreichbar und kann bei Google auftauchen.",
+    "visibilityPreviewTitle": "Was dann draußen steht",
+    "visibilityPreviewItems": "Dein Titel, deine Beschreibung, Themen, Orte und dein Name. Nicht draußen: die Ansätze anderer Menschen, die Bestätigungen und wer sich gemeldet hat – dafür liegt uns keine Einwilligung der jeweiligen Personen vor.",
+    "visibilityConfirm": "Mir ist bewusst, dass dieser Text dann öffentlich lesbar ist – auch von Menschen aus meinem beruflichen Umfeld –, und dass ich das jederzeit wieder zurücknehmen kann.",
+    "visibilityCaution": "Denk kurz nach, bevor du das tust: Eine Beschreibung aus deinem Arbeitsalltag sagt oft auch etwas über deinen Arbeitgeber.",
+    "openPublicPage": "Öffentliche Seite ansehen"
   },
   "notifications": {
     "title": "Benachrichtigungen aus Connect",

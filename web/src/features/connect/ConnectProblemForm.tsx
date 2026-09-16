@@ -15,6 +15,7 @@ type T = (key: string, values?: Record<string, string | number>) => string;
 const field =
   "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
+import { ConnectVisibilityField } from "./ConnectVisibilityField";
 
 /**
  * Das Formular fuer ein Problem, fuer Einstellen und Bearbeiten.
@@ -135,6 +136,24 @@ export function ConnectProblemForm({
           <input name="industries" defaultValue={problem?.industries.join(", ")} className={field} />
           <span className={hint}>{t("form.industriesHint", { max: 5 })}</span>
         </label>
+      </div>
+
+      {/* Ein Problem beschreibt oft ein Arbeitsumfeld. Die Warnung steht
+          deshalb ueber dem Feld, nicht darunter. */}
+      <div>
+        <ConnectVisibilityField
+          initial={problem?.visibility}
+          copy={{
+            title: t("problems.visibilityTitle"),
+            membersOnly: t("problems.visibilityMembersOnly"),
+            public: t("problems.visibilityPublic"),
+            publicHint: t("problems.visibilityPublicHint"),
+            confirm: t("problems.visibilityConfirm"),
+            previewTitle: t("problems.visibilityPreviewTitle"),
+            previewItems: t("problems.visibilityPreviewItems"),
+          }}
+        />
+        <p className="mt-2 text-xs leading-5 text-slate-500">{t("problems.visibilityCaution")}</p>
       </div>
 
       <div className="flex flex-wrap gap-3">

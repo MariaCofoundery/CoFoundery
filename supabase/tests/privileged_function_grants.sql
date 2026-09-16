@@ -19,7 +19,7 @@ select extensions.plan(6);
 -- 1. Die Regel
 -- ---------------------------------------------------------------------------
 -- Keine security-definer-Funktion ohne Aufruferpruefung darf fuer anon
--- ausfuehrbar sein - ausser den vier oeffentlichen Projektionen, die genau
+-- ausfuehrbar sein - ausser den fuenf oeffentlichen Projektionen, die genau
 -- dafuer gebaut wurden und ihre Bedingungen selbst pruefen.
 select extensions.is(
   (select coalesce(string_agg(p.proname, ', ' order by p.proname), '')
@@ -33,6 +33,7 @@ select extensions.is(
      and p.proname not in (
        'get_public_network_profile',
        'get_public_network_listing',
+       'get_public_network_problem',
        'list_public_network_profile_listings',
        'list_public_network_sitemap'
      )),

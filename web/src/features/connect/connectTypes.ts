@@ -53,6 +53,17 @@ export type PublicConnectListing = Pick<ConnectListing,
   owner_profile_slug: string | null;
 };
 
+export type PublicConnectProblem = Pick<ConnectProblem,
+  "public_slug" | "title" | "description" | "author_intent" | "locations" |
+  "topics" | "industries" | "geographic_scope" | "published_at"
+> & {
+  updated_at: string;
+  author_display_name: string;
+  author_headline: string;
+  /** Nur gesetzt, wenn diese Person ihr Profil selbst oeffentlich gestellt hat. */
+  author_profile_slug: string | null;
+};
+
 export type ConnectContactRequest = {
   id: string; listing_id: string; sender_user_id: string; recipient_user_id: string;
   message: string; status: ConnectContactStatus; listing_title_snapshot: string;
@@ -138,6 +149,8 @@ export type ConnectProblem = {
   resolved_at: string | null;
   interest_count: number;
   confirmation_count: number;
+  visibility: ConnectVisibility;
+  public_slug: string;
   created_at: string;
   network_profiles?: ConnectProfile | ConnectProfile[] | null;
 };

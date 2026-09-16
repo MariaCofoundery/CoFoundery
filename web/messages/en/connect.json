@@ -510,7 +510,18 @@
     "approachRepliesTitle": "Who got in touch about your approach",
     "approachRepliesEmpty": "Nobody yet. An approach usually takes a while before someone comes across it.",
     "approachReplyProfileRequiredTitle": "Your Connect profile first",
-    "approachReplyProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards."
+    "approachReplyProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards.",
+    "publicOpenInside": "Open inside",
+    "publicJoinText": "Inside you can see who else knows this problem and how others would approach it. That needs an account.",
+    "visibilityTitle": "Who may see this",
+    "visibilityMembersOnly": "Signed-in members only",
+    "visibilityPublic": "Publicly visible",
+    "visibilityPublicHint": "The page is then reachable without an account and may appear on Google.",
+    "visibilityPreviewTitle": "What is then out there",
+    "visibilityPreviewItems": "Your title, your description, topics, places and your name. Not out there: other people's approaches, the confirmations, and who got in touch – we have no consent from those people for that.",
+    "visibilityConfirm": "I understand that this text will then be publicly readable – including by people from my professional environment – and that I can take it back at any time.",
+    "visibilityCaution": "Think for a moment before you do: a description from your working day often says something about your employer too.",
+    "openPublicPage": "View public page"
   },
   "notifications": {
     "title": "Connect notifications",
