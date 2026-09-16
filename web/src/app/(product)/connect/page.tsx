@@ -8,6 +8,8 @@ import { coFounderBridgeHref } from "@/features/connect/connectTypes";
 import { getConnectAttentionCount } from "@/features/connect/connectPresentation";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
+import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const card = "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,.05)]";
 const action = "inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold focus-visible:ring-4 focus-visible:ring-amber-200";
@@ -47,7 +49,28 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={field} aria-label={t("filters.scope")}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select>
         <select name="remote_mode" defaultValue={filters.remote_mode || ""} className={field} aria-label={t("filters.remote")}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select>
         <button className="min-h-11 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white">{t("filters.apply")}</button>
-      </form></section>
+      </form>
+        {/* Speichern, was gerade eingegrenzt ist - die Kriterien stehen schon
+            da, niemand soll sie ein zweites Mal eingeben. */}
+        <form action={saveConnectSearchAction} className="mt-4 border-t border-slate-100 pt-4">
+          <input type="hidden" name="q" value={filters.q ?? ""} />
+          <input type="hidden" name="direction" value={filters.direction ?? ""} />
+          <input type="hidden" name="category" value={filters.category ?? ""} />
+          <input type="hidden" name="geographic_scope" value={filters.geographic_scope ?? ""} />
+          <input type="hidden" name="remote_mode" value={filters.remote_mode ?? ""} />
+          <input type="hidden" name="topics" value={filters.topic ?? ""} />
+          <input type="hidden" name="industries" value={filters.industry ?? ""} />
+          <input type="hidden" name="include_listings" value="1" />
+          <input type="hidden" name="include_problems" value="1" />
+          <p className="text-sm font-semibold">{t("searches.saveTitle")}</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">{t("searches.saveText")}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <input name="label" required minLength={2} maxLength={80} className={field} placeholder={t("searches.labelPlaceholder")} aria-label={t("searches.labelPlaceholder")} />
+            <SubmitButton label={t("searches.save")} pendingLabel={t("pending.save")} className={`${action} border border-slate-200`} />
+          </div>
+        </form>
+        <Link href="/connect/searches" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("searches.open")}</Link>
+      </section>
       {listings.length ? <section aria-label={t("browseTitle")} className="grid gap-4 md:grid-cols-2">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
         {/* Zwei verschiedene Leerzustaende, die vorher gleich aussahen.
             Wer ohne Filter auf eine leere Flaeche kommt, ist der erste

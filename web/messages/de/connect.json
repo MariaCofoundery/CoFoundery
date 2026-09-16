@@ -355,7 +355,9 @@
     "problem_title": "Der Titel braucht zwischen 5 und 120 Zeichen.",
     "problem_description": "Die Beschreibung braucht mindestens 50 Zeichen – wen betrifft es, und was fehlt heute?",
     "problem_intent": "Wähle, was du mit dem Problem vorhast.",
-    "interest_note": "Schreib kurz, was du mitbringst – mindestens 10 Zeichen."
+    "interest_note": "Schreib kurz, was du mitbringst – mindestens 10 Zeichen.",
+    "search_label": "Gib der Suche einen Namen – mindestens 2 Zeichen.",
+    "search_empty": "Diese Suche grenzt nichts ein. Setz mindestens ein Kriterium, sonst wäre es ein Abonnement auf alles."
   },
   "problems": {
     "title": "Probleme, die jemand sieht",
@@ -446,5 +448,37 @@
     "stateOff": "Zurzeit ausgeschaltet.",
     "turnOn": "Einschalten",
     "turnOff": "Ausschalten"
+  },
+  "searches": {
+    "title": "Gespeicherte Suchen",
+    "text": "Was du gespeichert hast, musst du nicht wieder eingeben – und wenn etwas Neues dazu passt, sagen wir dir Bescheid.",
+    "saveTitle": "Diese Eingrenzung speichern",
+    "saveText": "Wir melden dir neue Einträge und Probleme, die auf alle deine Kriterien zutreffen.",
+    "labelPlaceholder": "Name, z. B. Vertrieb in Berlin",
+    "save": "Suche speichern",
+    "open": "Gespeicherte Suchen ansehen",
+    "emptyTitle": "Noch keine gespeicherte Suche.",
+    "emptyText": "Grenze in der Übersicht ein, wonach du suchst, und speichere es. Danach musst du nicht mehr selbst nachsehen.",
+    "emptyCta": "Zur Übersicht",
+    "scopeBoth": "Gilt für Einträge und Probleme.",
+    "scopeListings": "Gilt nur für Einträge.",
+    "scopeProblems": "Gilt nur für Probleme.",
+    "notifyOn": "Benachrichtigung einschalten",
+    "notifyOff": "Benachrichtigung ausschalten",
+    "notifyStateOn": "Du wirst benachrichtigt.",
+    "notifyStateOff": "Du wirst nicht benachrichtigt.",
+    "delete": "Suche löschen",
+    "deleteQuestion": "Diese Suche wirklich löschen?",
+    "deleteConfirm": "Ja, löschen",
+    "deleteCancel": "Behalten",
+    "criteria": {
+      "query": "Suchbegriff",
+      "locations": "Orte",
+      "capabilities": "Fähigkeiten"
+    },
+    "saved": {
+      "created": "Suche gespeichert. Ab jetzt melden wir dir, was dazu passt.",
+      "deleted": "Suche gelöscht."
+    }
   }
 }

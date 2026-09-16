@@ -446,3 +446,61 @@ export function getConnectNotificationEmailCopy(
     privacy: "Datenschutz",
   };
 }
+
+/**
+ * Die Meldung ueber einen Treffer in einer gespeicherten Suche.
+ *
+ * Nennt die Gruende, nicht nur die Tatsache: Wer eine Meldung bekommt, soll
+ * sehen, welches SEINER Kriterien zutraf. Sonst waere es eine Empfehlung von
+ * uns statt ein Treffer auf die eigene Suche.
+ */
+export function getSavedSearchEmailCopy(
+  locale: AppLocale,
+  input: { subjectKind: "listing" | "problem"; title: string; reasons: string[] }
+) {
+  if (locale === "en") {
+    return {
+      htmlLang: "en",
+      eyebrow: "CoFoundery Connect",
+      subject:
+        input.subjectKind === "problem"
+          ? "A new problem matches your search"
+          : "A new entry matches your search",
+      headline:
+        input.subjectKind === "problem"
+          ? "A new problem matches your search"
+          : "A new entry matches your search",
+      intro: input.title,
+      reasonsTitle: "It matches these criteria of yours:",
+      reasons: input.reasons,
+      cta: input.subjectKind === "problem" ? "Open the problem" : "Open the entry",
+      note: "This is a hit on the search you saved – not a recommendation from us.",
+      settings: "You can switch off notifications for a saved search at any time.",
+      fallback: "If the button does not work, use this link:",
+      privacy: "Privacy",
+      preheader: input.title,
+    };
+  }
+
+  return {
+    htmlLang: "de",
+    eyebrow: "CoFoundery Connect",
+    subject:
+      input.subjectKind === "problem"
+        ? "Ein neues Problem passt zu deiner Suche"
+        : "Ein neuer Eintrag passt zu deiner Suche",
+    headline:
+      input.subjectKind === "problem"
+        ? "Ein neues Problem passt zu deiner Suche"
+        : "Ein neuer Eintrag passt zu deiner Suche",
+    intro: input.title,
+    reasonsTitle: "Das trifft auf diese deiner Kriterien zu:",
+    reasons: input.reasons,
+    cta: input.subjectKind === "problem" ? "Problem öffnen" : "Eintrag öffnen",
+    note: "Das ist ein Treffer auf die Suche, die du gespeichert hast – keine Empfehlung von uns.",
+    settings: "Du kannst die Benachrichtigung für eine gespeicherte Suche jederzeit abschalten.",
+    fallback: "Falls der Knopf nicht funktioniert, nutze diesen Link:",
+    privacy: "Datenschutz",
+    preheader: input.title,
+  };
+}

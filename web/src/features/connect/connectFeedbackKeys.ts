@@ -27,6 +27,8 @@ export const CONNECT_ERROR_KEYS = [
   "problem_description",
   "problem_intent",
   "interest_note",
+  "search_label",
+  "search_empty",
   "save",
 ] as const;
 

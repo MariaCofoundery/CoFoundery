@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
 import { getConnectListing, getOwnConnectProfile } from "@/features/connect/connectData";
+import { notifySavedSearchMatches } from "@/features/connect/savedSearchNotifications";
 import {
   notifyConnectContactRequest,
   notifyConnectMessage,
@@ -144,6 +145,26 @@ export async function saveConnectListingAction(formData: FormData) {
     ? await client.from("network_listings").update(payload).eq("id", id).eq("owner_user_id", user.id).select("id,public_slug").single()
     : await client.from("network_listings").insert(payload).select("id,public_slug").single();
   if (result.error) redirect(`/connect/my?error=${result.error.message.includes("active_network_profile_required") ? "profile" : "save"}`);
+
+  // Abgleich mit gespeicherten Suchen, im Moment des Erscheinens. Nur beim
+  // Veroeffentlichen: Ein Entwurf ist fuer niemanden sichtbar.
+  if (publish) {
+    await notifySavedSearchMatches(client, {
+      kind: "listing",
+      id: result.data.id,
+      ownerUserId: user.id,
+      title: values.title,
+      summary: values.summary,
+      topics: values.topics,
+      industries: values.industries,
+      locations: values.locations,
+      geographicScope: values.geographic_scope ?? null,
+      remoteMode: values.remote_mode ?? null,
+      direction: values.direction,
+      category: values.category,
+    });
+  }
+
   refresh();
   if (result.data.public_slug) revalidatePath(`/connect/l/${result.data.public_slug}`);
   redirect(`/connect/listings/${result.data.id}?saved=${publish ? "published" : "draft"}`);

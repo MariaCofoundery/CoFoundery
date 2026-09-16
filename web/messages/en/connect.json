@@ -355,7 +355,9 @@
     "problem_title": "The title needs between 5 and 120 characters.",
     "problem_description": "The description needs at least 50 characters – who does it affect, and what is missing today?",
     "problem_intent": "Choose what you intend with the problem.",
-    "interest_note": "Write briefly what you bring – at least 10 characters."
+    "interest_note": "Write briefly what you bring – at least 10 characters.",
+    "search_label": "Give the search a name – at least 2 characters.",
+    "search_empty": "This search narrows nothing down. Set at least one criterion, otherwise it would subscribe you to everything."
   },
   "problems": {
     "title": "Problems people see",
@@ -446,5 +448,37 @@
     "stateOff": "Currently off.",
     "turnOn": "Turn on",
     "turnOff": "Turn off"
+  },
+  "searches": {
+    "title": "Saved searches",
+    "text": "What you saved you do not have to enter again – and when something new matches, we let you know.",
+    "saveTitle": "Save this selection",
+    "saveText": "We will tell you about new entries and problems that meet all of your criteria.",
+    "labelPlaceholder": "Name, e.g. Sales in Berlin",
+    "save": "Save search",
+    "open": "View saved searches",
+    "emptyTitle": "No saved search yet.",
+    "emptyText": "Narrow down what you are looking for in the overview and save it. After that you do not have to keep checking yourself.",
+    "emptyCta": "To the overview",
+    "scopeBoth": "Applies to entries and problems.",
+    "scopeListings": "Applies to entries only.",
+    "scopeProblems": "Applies to problems only.",
+    "notifyOn": "Turn notifications on",
+    "notifyOff": "Turn notifications off",
+    "notifyStateOn": "You will be notified.",
+    "notifyStateOff": "You will not be notified.",
+    "delete": "Delete search",
+    "deleteQuestion": "Really delete this search?",
+    "deleteConfirm": "Yes, delete",
+    "deleteCancel": "Keep it",
+    "criteria": {
+      "query": "Search term",
+      "locations": "Places",
+      "capabilities": "Capabilities"
+    },
+    "saved": {
+      "created": "Search saved. From now on we will tell you what matches.",
+      "deleted": "Search deleted."
+    }
   }
 }

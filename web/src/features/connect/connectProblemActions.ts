@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectProfile } from "@/features/connect/connectData";
 import { notifyConnectProblemInterest } from "@/features/connect/connectNotifications";
+import { notifySavedSearchMatches } from "@/features/connect/savedSearchNotifications";
 import { getConnectProblem } from "@/features/connect/connectProblemData";
 import {
   CONNECT_GEOGRAPHIC_SCOPES,
@@ -90,6 +91,23 @@ export async function saveConnectProblemAction(formData: FormData) {
       "/connect/problems/new",
       error.message.includes("active_network_profile_required") ? "identity_incomplete" : "save"
     );
+  }
+
+  if (publish) {
+    await notifySavedSearchMatches(client, {
+      kind: "problem",
+      id: data.id,
+      ownerUserId: user.id,
+      title,
+      summary: description,
+      topics: parseList(formData.get("topics"), 8),
+      industries: parseList(formData.get("industries"), 5),
+      locations: parseList(formData.get("locations"), 3),
+      geographicScope: isOneOf(CONNECT_GEOGRAPHIC_SCOPES, scope) ? scope : "regional",
+      remoteMode: null,
+      direction: null,
+      category: null,
+    });
   }
 
   revalidatePath("/connect/problems");
@@ -215,6 +233,26 @@ export async function updateConnectProblemStatusAction(formData: FormData) {
 
   if (error) {
     back(path, error.message.includes("active_network_profile_required") ? "identity_incomplete" : "save");
+  }
+
+  if (next === "active") {
+    const published = await getConnectProblem(client, problemId);
+    if (published) {
+      await notifySavedSearchMatches(client, {
+        kind: "problem",
+        id: published.id,
+        ownerUserId: user.id,
+        title: published.title,
+        summary: published.description,
+        topics: published.topics,
+        industries: published.industries,
+        locations: published.locations,
+        geographicScope: published.geographic_scope,
+        remoteMode: null,
+        direction: null,
+        category: null,
+      });
+    }
   }
 
   revalidatePath(path);
