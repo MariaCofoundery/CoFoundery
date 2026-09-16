@@ -499,7 +499,18 @@
     "withdrawApproachConfirm": "Yes, withdraw",
     "withdrawApproachCancel": "Not now",
     "approachProfileRequiredTitle": "Your Connect profile first",
-    "approachProfileRequiredText": "An approach is public and carries your name. Create your Connect profile – you will come back here afterwards."
+    "approachProfileRequiredText": "An approach is public and carries your name. Create your Connect profile – you will come back here afterwards.",
+    "approachReplyTitle": "Get in touch about this approach",
+    "approachReplyText": "Say briefly what interests you about it or what you would contribute. That person then decides whether it becomes a conversation.",
+    "approachReplyPlaceholder": "For example: I have built exactly this for a different field and would like to talk about it.",
+    "approachReply": "Get in touch",
+    "yourApproachReplyTitle": "What you wrote about this",
+    "withdrawApproachReply": "Take message back",
+    "approachInterestSaved": "Your message has arrived. If that person starts a conversation, you will find it under Messages.",
+    "approachRepliesTitle": "Who got in touch about your approach",
+    "approachRepliesEmpty": "Nobody yet. An approach usually takes a while before someone comes across it.",
+    "approachReplyProfileRequiredTitle": "Your Connect profile first",
+    "approachReplyProfileRequiredText": "Before you get in touch, the other side needs something to look at. Create your Connect profile – you will come back here afterwards."
   },
   "notifications": {
     "title": "Connect notifications",

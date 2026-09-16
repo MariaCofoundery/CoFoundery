@@ -77,8 +77,42 @@ export async function getConnectProblemInterests(client: Client, problemId: stri
   const { data } = await client
     .from("network_problem_interests")
     .select("*")
+    // Nur die Meldungen zum Problem selbst. Rueckmeldungen zu einem Ansatz
+    // gehoeren der Person, die ihn geschrieben hat - nicht dieser Liste.
+    .is("approach_id", null)
     .eq("problem_id", problemId)
     .order("created_at", { ascending: false });
+  return (data ?? []) as ConnectProblemInterest[];
+}
+
+/**
+ * Die Rueckmeldungen zu einem Ansatz.
+ *
+ * Gibt fuer alle ausser der verfassenden Person eine leere Liste zurueck -
+ * wieder nicht, weil hier gefiltert wuerde, sondern weil die Datenbank ihnen
+ * nichts zeigt.
+ */
+export async function getConnectProblemApproachInterests(client: Client, approachId: string) {
+  const { data } = await client
+    .from("network_problem_interests")
+    .select("*")
+    .eq("approach_id", approachId)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as ConnectProblemInterest[];
+}
+
+/** Die eigenen Rueckmeldungen zu Ansaetzen dieses Problems. */
+export async function getOwnConnectApproachInterests(
+  client: Client,
+  problemId: string,
+  userId: string
+) {
+  const { data } = await client
+    .from("network_problem_interests")
+    .select("*")
+    .eq("problem_id", problemId)
+    .eq("user_id", userId)
+    .not("approach_id", "is", null);
   return (data ?? []) as ConnectProblemInterest[];
 }
 

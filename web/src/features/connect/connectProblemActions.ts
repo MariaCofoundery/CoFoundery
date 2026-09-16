@@ -131,6 +131,9 @@ export async function expressConnectProblemInterestAction(formData: FormData) {
   const { client, user } = await requireConnectMember();
   const problemId = String(formData.get("problem_id") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+  // Ohne Bezug gilt die Meldung dem Problem, mit Bezug einem Ansatz. Das
+  // entscheidet, wer sie ueberhaupt zu sehen bekommt.
+  const approachId = String(formData.get("approach_id") ?? "").trim() || null;
   const path = `/connect/problems/${problemId}`;
 
   if (!problemId) back("/connect/problems", "save");
@@ -140,7 +143,7 @@ export async function expressConnectProblemInterestAction(formData: FormData) {
 
   const { error } = await client
     .from("network_problem_interests")
-    .insert({ problem_id: problemId, user_id: user.id, note });
+    .insert({ problem_id: problemId, approach_id: approachId, user_id: user.id, note });
 
   if (error) {
     // Ein doppelter Eintrag ist kein Fehler der Person - sie hat schon
@@ -154,40 +157,63 @@ export async function expressConnectProblemInterestAction(formData: FormData) {
 
   // Die einstellende Person erfaehrt davon - sonst haengt das Interesse in
   // einer Seite, die sie vielleicht wochenlang nicht oeffnet.
-  const { data: interest } = await client
+  let lookup = client
     .from("network_problem_interests")
     .select("id")
     .eq("problem_id", problemId)
-    .eq("user_id", user.id)
-    .maybeSingle();
+    .eq("user_id", user.id);
+  lookup = approachId ? lookup.eq("approach_id", approachId) : lookup.is("approach_id", null);
+  const { data: interest } = await lookup.maybeSingle();
+
   const problem = await getConnectProblem(client, problemId);
-  if (interest && problem) {
+
+  // Wem die Meldung gilt, der erfaehrt davon - und niemand sonst. Bei einem
+  // Ansatz ist das nicht die einstellende Person. Dieselbe Ableitung steht in
+  // der Datenbank; hier geht es nur darum, wohin die Mail geht.
+  let recipientUserId = problem?.author_user_id ?? null;
+  if (approachId) {
+    const { data: approach } = await client
+      .from("network_problem_approaches")
+      .select("author_user_id")
+      .eq("id", approachId)
+      .maybeSingle();
+    recipientUserId = (approach as { author_user_id: string } | null)?.author_user_id ?? null;
+  }
+
+  if (interest && problem && recipientUserId) {
     const sender = await getOwnConnectProfile(client, user.id);
     await notifyConnectProblemInterest(
       client,
       interest.id,
       problemId,
-      problem.author_user_id,
-      sender?.display_name ?? null
+      recipientUserId,
+      sender?.display_name ?? null,
+      approachId ? "approach_interest" : "problem_interest"
     );
   }
 
   revalidatePath(path);
-  redirect(`${path}?saved=interest`);
+  redirect(`${path}?saved=${approachId ? "approach_interest" : "interest"}`);
 }
 
 export async function withdrawConnectProblemInterestAction(formData: FormData) {
   const { client, user } = await requireConnectMember();
   const problemId = String(formData.get("problem_id") ?? "").trim();
+  const approachId = String(formData.get("approach_id") ?? "").trim() || null;
   const path = `/connect/problems/${problemId}`;
 
   // Mit dem Interesse faellt ein daraus entstandenes Gespraech weg - das
   // sagt die Rueckfrage in der Oberflaeche, nicht erst der Effekt.
-  const { error } = await client
+  let removal = client
     .from("network_problem_interests")
     .delete()
     .eq("problem_id", problemId)
     .eq("user_id", user.id);
+  // Ohne diese Unterscheidung loeschte das Zuruecknehmen einer Meldung zum
+  // Problem auch jede Rueckmeldung zu einem Ansatz mit.
+  removal = approachId ? removal.eq("approach_id", approachId) : removal.is("approach_id", null);
+
+  const { error } = await removal;
 
   if (error) back(path, "save");
 

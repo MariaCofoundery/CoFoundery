@@ -231,3 +231,90 @@ test("every new key exists in German and English", () => {
     }
   }
 });
+
+// ---------------------------------------------------------------------------
+// Der Weg zur Person, die einen Ansatz geschrieben hat
+// ---------------------------------------------------------------------------
+const APPROACH_MIGRATION =
+  "../supabase/migrations/20260919120000_problem_approach_interests.sql";
+
+test("a reply to an approach reuses the interest, not a third conversation origin", () => {
+  const migration = source(APPROACH_MIGRATION);
+  assert.match(migration, /alter table public\.network_problem_interests\s*\n\s*add column approach_id uuid/);
+  // Waere hier ein dritter Ursprung entstanden, muesste die Ursprungsbedingung
+  // angefasst werden. Genau das ist nicht passiert.
+  assert.doesNotMatch(migration, /network_conversations_single_origin_check/);
+  assert.doesNotMatch(migration, /problem_approach_id/);
+});
+
+test("a reply to an approach never inflates the problem's number", () => {
+  const migration = source(APPROACH_MIGRATION);
+  assert.match(
+    migration,
+    /set interest_count = \(\s*select count\(\*\) from public\.network_problem_interests\s*\n\s*where problem_id = target and approach_id is null/,
+    "gezaehlt wird nur, was dem Problem selbst gilt"
+  );
+
+  const data = codeOnly(DATA);
+  assert.match(
+    data,
+    /\.is\("approach_id", null\)/,
+    "und die Liste der einstellenden Person zeigt nur diese"
+  );
+});
+
+test("the reply reaches the approach author, not the person who posted", () => {
+  const actions = codeOnly(ACTIONS);
+  assert.match(
+    actions,
+    /from\("network_problem_approaches"\)\s*\n\s*\.select\("author_user_id"\)/,
+    "die Aktion holt sich den Empfaenger aus dem Ansatz"
+  );
+  assert.match(
+    actions,
+    /approachId \? "approach_interest" : "problem_interest"/,
+    "und die Mail heisst entsprechend anders"
+  );
+});
+
+test("withdrawing one kind of reply leaves the other alone", () => {
+  const actions = codeOnly(ACTIONS);
+  assert.match(
+    actions,
+    /removal = approachId \? removal\.eq\("approach_id", approachId\) : removal\.is\("approach_id", null\)/,
+    "sonst loeschte das Zuruecknehmen am Problem jede Rueckmeldung zu einem Ansatz mit"
+  );
+});
+
+test("the new notification kind is allowed by the database too", () => {
+  const migration = source(APPROACH_MIGRATION);
+  // Ohne diese Zeile faellt jede solche Mail still weg - die
+  // Anspruchsvergabe haette die Art nicht gekannt.
+  assert.match(
+    migration,
+    /check \(kind in \('contact_request', 'problem_interest', 'approach_interest', 'message'\)\)/
+  );
+});
+
+test("both locales name the new notification", () => {
+  const copy = source("src/features/email/emailMessages.ts");
+  assert.match(copy, /approach_interest: \{[\s\S]{0,300}hat sich zu deinem Ansatz gemeldet/);
+  assert.match(copy, /approach_interest: \{[\s\S]{0,300}got in touch about your approach/);
+
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/connect.json`);
+    const problems = messages.problems as Record<string, unknown>;
+    for (const key of [
+      "approachReplyTitle",
+      "approachReplyText",
+      "approachReply",
+      "yourApproachReplyTitle",
+      "withdrawApproachReply",
+      "approachInterestSaved",
+      "approachRepliesTitle",
+      "approachRepliesEmpty",
+    ]) {
+      assert.equal(typeof problems[key], "string", `${locale}: problems.${key} fehlt`);
+    }
+  }
+});

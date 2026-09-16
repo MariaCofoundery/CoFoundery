@@ -22,7 +22,11 @@ import { getRequestLocale } from "@/i18n/getLocale";
  *   keine - das prueft dieselbe Funktion, die den Anspruch vergibt.
  */
 
-export type ConnectNotificationKind = "contact_request" | "problem_interest" | "message";
+export type ConnectNotificationKind =
+  | "contact_request"
+  | "problem_interest"
+  | "approach_interest"
+  | "message";
 
 async function claim(
   client: SupabaseClient,
@@ -74,16 +78,23 @@ export async function notifyConnectContactRequest(
   await notify(client, "contact_request", requestId, recipientUserId, "/connect/contacts", senderName);
 }
 
+/**
+ * Die Meldung erreicht unterschiedliche Menschen und muss deshalb
+ * unterschiedlich heissen: "wuerde an deinem Problem arbeiten" waere falsch
+ * bei jemandem, der nicht das Problem geschildert, sondern einen Ansatz
+ * geschrieben hat.
+ */
 export async function notifyConnectProblemInterest(
   client: SupabaseClient,
   interestId: string,
   problemId: string,
   recipientUserId: string,
-  senderName: string | null
+  senderName: string | null,
+  kind: "problem_interest" | "approach_interest" = "problem_interest"
 ) {
   await notify(
     client,
-    "problem_interest",
+    kind,
     interestId,
     recipientUserId,
     `/connect/problems/${problemId}`,

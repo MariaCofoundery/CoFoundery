@@ -499,7 +499,18 @@
     "withdrawApproachConfirm": "Ja, zurückziehen",
     "withdrawApproachCancel": "Doch nicht",
     "approachProfileRequiredTitle": "Zuerst dein Connect-Profil",
-    "approachProfileRequiredText": "Ein Ansatz ist öffentlich und trägt deinen Namen. Leg dein Connect-Profil an – danach kommst du hierher zurück."
+    "approachProfileRequiredText": "Ein Ansatz ist öffentlich und trägt deinen Namen. Leg dein Connect-Profil an – danach kommst du hierher zurück.",
+    "approachReplyTitle": "Bei diesem Ansatz melden",
+    "approachReplyText": "Sag kurz, was dich daran interessiert oder was du beitragen würdest. Diese Person entscheidet dann, ob daraus ein Gespräch wird.",
+    "approachReplyPlaceholder": "Zum Beispiel: Ich habe genau das schon einmal für einen anderen Bereich gebaut und würde gern darüber sprechen.",
+    "approachReply": "Melden",
+    "yourApproachReplyTitle": "Das hast du dazu geschrieben",
+    "withdrawApproachReply": "Meldung zurückziehen",
+    "approachInterestSaved": "Deine Meldung ist angekommen. Wenn die Person ein Gespräch beginnt, findest du es unter Nachrichten.",
+    "approachRepliesTitle": "Wer sich zu deinem Ansatz gemeldet hat",
+    "approachRepliesEmpty": "Noch niemand. Ein Ansatz braucht meist etwas Zeit, bis jemand darauf stößt.",
+    "approachReplyProfileRequiredTitle": "Zuerst dein Connect-Profil",
+    "approachReplyProfileRequiredText": "Bevor du dich meldest, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an – danach kommst du hierher zurück."
   },
   "notifications": {
     "title": "Benachrichtigungen aus Connect",

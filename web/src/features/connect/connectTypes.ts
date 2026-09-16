@@ -192,6 +192,12 @@ export function isConnectProblemPerspective(value: unknown): value is ConnectPro
 export type ConnectProblemInterest = {
   id: string;
   problem_id: string;
+  /**
+   * Leer: die Meldung gilt dem Problem und erreicht die einstellende Person.
+   * Gesetzt: sie gilt diesem Ansatz und erreicht die Person, die ihn
+   * geschrieben hat.
+   */
+  approach_id: string | null;
   user_id: string;
   note: string;
   created_at: string;

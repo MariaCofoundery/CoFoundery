@@ -365,7 +365,11 @@ export function getAdvisorTeamFounderInviteEmailCopy(
 // ---------------------------------------------------------------------------
 // Connect-Benachrichtigungen
 // ---------------------------------------------------------------------------
-export type ConnectNotificationCopyKind = "contact_request" | "problem_interest" | "message";
+export type ConnectNotificationCopyKind =
+  | "contact_request"
+  | "problem_interest"
+  | "approach_interest"
+  | "message";
 
 /**
  * Eine Vorlage fuer drei Anlaesse statt drei Vorlagen.
@@ -392,6 +396,12 @@ export function getConnectNotificationEmailCopy(
         subject: `${name} would work on your problem`,
         headline: "Someone would work on it",
         intro: `${name} has responded to a problem you described and would work on it.`,
+        cta: "Open the problem",
+      },
+      approach_interest: {
+        subject: `${name} got in touch about your approach`,
+        headline: "Someone got in touch",
+        intro: `${name} has responded to the approach you described for a problem.`,
         cta: "Open the problem",
       },
       message: {
@@ -425,6 +435,12 @@ export function getConnectNotificationEmailCopy(
       subject: `${name} würde an deinem Problem arbeiten`,
       headline: "Jemand würde mitarbeiten",
       intro: `${name} hat auf ein Problem reagiert, das du geschildert hast, und würde daran arbeiten.`,
+      cta: "Problem öffnen",
+    },
+    approach_interest: {
+      subject: `${name} hat sich zu deinem Ansatz gemeldet`,
+      headline: "Jemand hat sich gemeldet",
+      intro: `${name} hat auf den Ansatz reagiert, den du zu einem Problem beschrieben hast.`,
       cta: "Problem öffnen",
     },
     message: {

@@ -12,9 +12,11 @@ import {
 } from "@/features/connect/connectProblemActions";
 import {
   getConnectProblem,
+  getConnectProblemApproachInterests,
   getConnectProblemApproaches,
   getConnectProblemConfirmations,
   getConnectProblemInterests,
+  getOwnConnectApproachInterests,
   getOwnConnectProblemConfirmation,
   getOwnConnectProblemInterest,
 } from "@/features/connect/connectProblemData";
@@ -36,7 +38,7 @@ const hint = "mt-1 block text-xs leading-5 text-slate-500";
 const primary = "min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold";
 const secondary = "min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold";
 
-const SAVED_KEYS = ["interest", "approach"];
+const SAVED_KEYS = ["interest", "approach", "approach_interest"];
 
 export default async function ConnectProblemPage({
   params,
@@ -73,15 +75,31 @@ export default async function ConnectProblemPage({
   const ownApproach = approaches.find((approach) => approach.author_user_id === user.id) ?? null;
   const otherApproaches = approaches.filter((approach) => approach.author_user_id !== user.id);
 
+  // Die Meldungen zu Ansaetzen: die eigenen an fremde, und die fremden an den
+  // eigenen. Beide Richtungen gibt die Datenbank nur dem, den sie angehen.
+  const [ownApproachInterests, receivedReplies] = await Promise.all([
+    getOwnConnectApproachInterests(client, problemId, user.id),
+    ownApproach
+      ? getConnectProblemApproachInterests(client, ownApproach.id)
+      : Promise.resolve([]),
+  ]);
+  const ownReplies = new Map(
+    ownApproachInterests
+      .filter((interest) => interest.approach_id !== null)
+      .map((interest) => [interest.approach_id as string, interest])
+  );
+
   const [interestedProfiles, approachProfiles] = await Promise.all([
     getConnectProfilesByUserIds(
       client,
       interests.map((interest) => interest.user_id)
     ),
-    getConnectProfilesByUserIds(
-      client,
-      otherApproaches.map((approach) => approach.author_user_id)
-    ),
+    getConnectProfilesByUserIds(client, [
+      ...otherApproaches.map((approach) => approach.author_user_id),
+      // Auch die, die sich zum eigenen Ansatz gemeldet haben - sonst stuende
+      // dort ein Kasten ohne Namen.
+      ...receivedReplies.map((reply) => reply.user_id),
+    ]),
   ]);
 
   const author = authors.get(problem.author_user_id);
@@ -96,7 +114,13 @@ export default async function ConnectProblemPage({
 
       {saved ? (
         <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-          {t(query.saved === "approach" ? "problems.approachSaved" : "problems.interestSaved")}
+          {t(
+            query.saved === "approach"
+              ? "problems.approachSaved"
+              : query.saved === "approach_interest"
+                ? "problems.approachInterestSaved"
+                : "problems.interestSaved"
+          )}
         </p>
       ) : null}
       {errorKey ? (
@@ -142,6 +166,8 @@ export default async function ConnectProblemPage({
         approaches={otherApproaches}
         authors={approachProfiles}
         ownApproach={ownApproach}
+        ownReplies={ownReplies}
+        receivedReplies={receivedReplies}
         canWrite={isPublished}
         hasProfile={isAuthor ? true : hasProfile}
         className={`${card} mt-6`}
