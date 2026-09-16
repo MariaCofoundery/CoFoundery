@@ -146,8 +146,15 @@ export default async function ConnectProblemsPage({
                 <p className="mt-2 line-clamp-3 leading-7 text-slate-700">{problem.description}</p>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
                   <span>{author?.display_name ?? t("problems.unknownAuthor")}</span>
-                  {/* Nur die Zahl, nie die Namen - und nie als Sortierkriterium. */}
-                  <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+                  {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
+                  <span className="flex flex-wrap gap-x-3">
+                    {problem.confirmation_count > 0 ? (
+                      <span>
+                        {t("problems.confirmationsCount", { count: problem.confirmation_count })}
+                      </span>
+                    ) : null}
+                    <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+                  </span>
                 </div>
                 {problem.locations.length || problem.topics.length ? (
                   <p className="mt-3 text-sm text-slate-500">

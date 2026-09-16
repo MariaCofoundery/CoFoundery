@@ -1,0 +1,233 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+import {
+  CONNECT_PROBLEM_PERSPECTIVES,
+  PROBLEM_APPROACH_AUDIENCE_MAX,
+  PROBLEM_APPROACH_AUDIENCE_MIN,
+  PROBLEM_APPROACH_NEEDS_MAX,
+  PROBLEM_APPROACH_NEEDS_MIN,
+  PROBLEM_APPROACH_SUMMARY_MAX,
+  PROBLEM_APPROACH_SUMMARY_MIN,
+  isConnectProblemPerspective,
+} from "@/features/connect/connectTypes";
+
+const source = (path: string) => readFileSync(path, "utf8");
+
+/** Siehe connectProblems.test.ts - Kommentare duerfen Pruefungen nicht treffen. */
+const codeOnly = (path: string) =>
+  source(path)
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
+
+const BOARD = "src/app/(product)/connect/problems/page.tsx";
+const DETAIL = "src/app/(product)/connect/problems/[problemId]/page.tsx";
+const CONFIRMATIONS = "src/features/connect/ProblemConfirmations.tsx";
+const APPROACHES = "src/features/connect/ProblemApproaches.tsx";
+const DATA = "src/features/connect/connectProblemData.ts";
+const ACTIONS = "src/features/connect/connectProblemActions.ts";
+const MIGRATION = "../supabase/migrations/20260918120000_problem_confirmations_and_approaches.sql";
+
+// ---------------------------------------------------------------------------
+// Die Bestaetigung ist kein Like
+// ---------------------------------------------------------------------------
+test("a confirmation always carries a perspective", () => {
+  assert.deepEqual(CONNECT_PROBLEM_PERSPECTIVES, ["affected", "professional", "observed"]);
+  assert.ok(isConnectProblemPerspective("professional"));
+  assert.ok(!isConnectProblemPerspective("gehoert_davon"));
+
+  // Kein Freitext: Ein Klick soll ein Klick bleiben - aber einer, der etwas
+  // sagt. Freitext waere beides nicht.
+  const migration = source(MIGRATION);
+  assert.match(
+    migration,
+    /perspective in \('affected', 'professional', 'observed'\)/,
+    "die Datenbank kennt genau diese drei"
+  );
+});
+
+test("the same three perspectives exist in both locales", () => {
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/connect.json`);
+    const problems = messages.problems as Record<string, unknown>;
+    const perspectives = problems.perspectives as Record<string, string>;
+    assert.deepEqual(
+      Object.keys(perspectives).sort(),
+      [...CONNECT_PROBLEM_PERSPECTIVES].sort(),
+      `${locale} kennt genau die drei Perspektiven`
+    );
+  }
+});
+
+test("an invalid perspective never reaches the database", () => {
+  const actions = codeOnly(ACTIONS);
+  assert.match(
+    actions,
+    /if \(!isConnectProblemPerspective\(perspective\)\) back\(path, "perspective"\)/,
+    "die Aktion weist alles ab, was nicht zu den drei gehoert"
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Die Namen sieht niemand
+// ---------------------------------------------------------------------------
+test("confirmations are counted, never named", () => {
+  const data = codeOnly(DATA);
+  // Die Aufteilung kommt aus der Funktion, nicht aus einer Abfrage auf die
+  // Tabelle - die gibt niemandem fremde Zeilen.
+  assert.match(data, /rpc\("get_network_problem_confirmations"/);
+
+  const confirmations = codeOnly(CONFIRMATIONS);
+  assert.doesNotMatch(
+    confirmations,
+    /display_name|getConnectProfilesByUserIds/,
+    "in der Anzeige der Bestaetigungen taucht kein Name auf"
+  );
+
+  const detail = codeOnly(DETAIL);
+  assert.doesNotMatch(
+    detail,
+    /getConnectProblemConfirmations\(client, problemId\)[\s\S]{0,200}ProfilesByUserIds\(\s*client,\s*confirmations/,
+    "zu den Bestaetigungen werden keine Profile nachgeladen"
+  );
+});
+
+test("even the person who posted sees no names", () => {
+  const migration = source(MIGRATION);
+  // Das ist der Unterschied zum Interesse: Dort darf die einstellende Person
+  // die Zeilen sehen. Hier niemand.
+  const selectPolicy = migration.slice(
+    migration.indexOf("network_problem_confirmations_select"),
+    migration.indexOf("network_problem_confirmations_insert")
+  );
+  assert.match(selectPolicy, /using \(user_id = auth\.uid\(\)\)/);
+  assert.doesNotMatch(selectPolicy, /author_user_id/);
+});
+
+test("confirming is deliberately without consequence", () => {
+  const actions = codeOnly(ACTIONS);
+  const confirm = actions.slice(
+    actions.indexOf("export async function confirmConnectProblemAction"),
+    actions.indexOf("export async function withdrawConnectProblemConfirmationAction")
+  );
+  // Keine Benachrichtigung - sonst waere es kein billiges Signal mehr.
+  assert.doesNotMatch(confirm, /notify/i);
+});
+
+// ---------------------------------------------------------------------------
+// Immer noch keine Rangliste
+// ---------------------------------------------------------------------------
+test("the confirmation count is shown but never sorted by", () => {
+  assert.match(source(BOARD), /problems\.confirmationsCount/);
+  const data = codeOnly(DATA);
+  assert.doesNotMatch(data, /order\("confirmation_count"/);
+  assert.doesNotMatch(data, /order\("interest_count"/);
+});
+
+// ---------------------------------------------------------------------------
+// Der Ansatz
+// ---------------------------------------------------------------------------
+test("the approach limits match the check constraints", () => {
+  const migration = source(MIGRATION);
+  assert.match(
+    migration,
+    new RegExp(`btrim\\(summary\\)\\) between ${PROBLEM_APPROACH_SUMMARY_MIN} and ${PROBLEM_APPROACH_SUMMARY_MAX}`)
+  );
+  assert.match(
+    migration,
+    new RegExp(`btrim\\(audience\\)\\) between ${PROBLEM_APPROACH_AUDIENCE_MIN} and ${PROBLEM_APPROACH_AUDIENCE_MAX}`)
+  );
+  assert.match(
+    migration,
+    new RegExp(`btrim\\(needs\\)\\) between ${PROBLEM_APPROACH_NEEDS_MIN} and ${PROBLEM_APPROACH_NEEDS_MAX}`)
+  );
+});
+
+test("approaches stand side by side, in no order of merit", () => {
+  const data = codeOnly(DATA);
+  // Nach Alter, aufsteigend. Keine Bewertung, keine Zustimmung, kein Zaehler.
+  assert.match(data, /from\("network_problem_approaches"\)[\s\S]{0,200}order\("created_at", \{ ascending: true \}\)/);
+
+  const approaches = codeOnly(APPROACHES);
+  assert.doesNotMatch(approaches, /\bvote|\block\b|upvote|rating|\bscore\b/i);
+});
+
+test("one approach per person and problem - changing it is the way", () => {
+  const migration = source(MIGRATION);
+  assert.match(migration, /network_problem_approaches_unique unique \(problem_id, author_user_id\)/);
+
+  const actions = codeOnly(ACTIONS);
+  assert.match(
+    actions,
+    /onConflict: "problem_id,author_user_id"/,
+    "ein zweiter Ansatz aendert den ersten, statt danebenzustehen"
+  );
+});
+
+test("withdrawing an approach keeps the text", () => {
+  const actions = codeOnly(ACTIONS);
+  const withdraw = actions.slice(
+    actions.indexOf("export async function withdrawConnectProblemApproachAction")
+  );
+  assert.match(withdraw, /\.update\(\{ status: "withdrawn" \}\)/);
+  assert.doesNotMatch(withdraw, /\.delete\(\)/, "zurueckziehen ist kein loeschen");
+});
+
+test("an approach needs a Connect profile - the gate comes before the writing", () => {
+  const approaches = codeOnly(APPROACHES);
+  // Erst das Profil, dann das Formular. Andersherum stuende die Meldung erst
+  // nach der Arbeit da.
+  const gate = approaches.indexOf("ConnectProfileRequired");
+  const form = approaches.indexOf("saveConnectProblemApproachAction}");
+  assert.ok(gate > -1 && form > -1);
+  assert.ok(gate < form, "die Profilhuerde steht vor dem Formular");
+});
+
+// ---------------------------------------------------------------------------
+// Beide Sprachen
+// ---------------------------------------------------------------------------
+test("every new key exists in German and English", () => {
+  const keys = [
+    "confirmTitle",
+    "confirmText",
+    "confirmPrivacy",
+    "confirmSubmit",
+    "confirmedTitle",
+    "confirmedAs",
+    "changePerspective",
+    "withdrawConfirmation",
+    "confirmationsTitle",
+    "confirmationsEmpty",
+    "confirmationsCount",
+    "confirmationsLine",
+    "approachesTitle",
+    "approachesText",
+    "approachesEmpty",
+    "approachBy",
+    "approachAudienceLabel",
+    "approachNeedsLabel",
+    "approachFormTitle",
+    "approachSummary",
+    "approachAudience",
+    "approachNeeds",
+    "approachSave",
+    "approachUpdate",
+    "approachSaved",
+    "yourApproachTitle",
+    "yourApproachWithdrawn",
+    "withdrawApproach",
+  ];
+
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/connect.json`);
+    const problems = messages.problems as Record<string, unknown>;
+    for (const key of keys) {
+      assert.equal(typeof problems[key], "string", `${locale}: problems.${key} fehlt`);
+    }
+    const errors = messages.errors as Record<string, unknown>;
+    for (const key of ["perspective", "approach_summary", "approach_audience", "approach_needs"]) {
+      assert.equal(typeof errors[key], "string", `${locale}: errors.${key} fehlt`);
+    }
+  }
+});

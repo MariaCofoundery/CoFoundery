@@ -11,11 +11,18 @@ import {
   CONNECT_GEOGRAPHIC_SCOPES,
   PROBLEM_DESCRIPTION_MAX,
   PROBLEM_DESCRIPTION_MIN,
+  PROBLEM_APPROACH_AUDIENCE_MAX,
+  PROBLEM_APPROACH_AUDIENCE_MIN,
+  PROBLEM_APPROACH_NEEDS_MAX,
+  PROBLEM_APPROACH_NEEDS_MIN,
+  PROBLEM_APPROACH_SUMMARY_MAX,
+  PROBLEM_APPROACH_SUMMARY_MIN,
   PROBLEM_INTEREST_NOTE_MAX,
   PROBLEM_INTEREST_NOTE_MIN,
   PROBLEM_TITLE_MAX,
   PROBLEM_TITLE_MIN,
   isConnectProblemIntent,
+  isConnectProblemPerspective,
   isOneOf,
 } from "@/features/connect/connectTypes";
 
@@ -331,4 +338,125 @@ export async function updateConnectProblemAction(formData: FormData) {
   revalidatePath(`/connect/problems/${problemId}`);
   revalidatePath("/connect/problems");
   redirect(`/connect/problems/${problemId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Kenne ich auch
+// ---------------------------------------------------------------------------
+/**
+ * Eine Bestaetigung setzen oder wechseln.
+ *
+ * Anders als das Interesse ist das kein Ereignis, ueber das jemand
+ * benachrichtigt wird - es ist absichtlich folgenlos. Wer bestaetigt, dass es
+ * ein Problem gibt, geht damit keine Verpflichtung ein und wird niemandem
+ * namentlich gemeldet. Sonst waere es kein billiges Signal mehr.
+ */
+export async function confirmConnectProblemAction(formData: FormData) {
+  const { client, user } = await requireConnectMember();
+  const problemId = String(formData.get("problem_id") ?? "").trim();
+  const perspective = String(formData.get("perspective") ?? "").trim();
+  const path = `/connect/problems/${problemId}`;
+
+  if (!problemId) back("/connect/problems", "save");
+  if (!isConnectProblemPerspective(perspective)) back(path, "perspective");
+
+  // Wechseln statt doppeln: Wer sich vertan hat, soll die Perspektive
+  // korrigieren koennen, ohne erst zurueckzunehmen.
+  const { error } = await client
+    .from("network_problem_confirmations")
+    .upsert(
+      { problem_id: problemId, user_id: user.id, perspective },
+      { onConflict: "problem_id,user_id" }
+    );
+
+  if (error) back(path, "save");
+
+  revalidatePath(path);
+  redirect(path);
+}
+
+export async function withdrawConnectProblemConfirmationAction(formData: FormData) {
+  const { client, user } = await requireConnectMember();
+  const problemId = String(formData.get("problem_id") ?? "").trim();
+  const path = `/connect/problems/${problemId}`;
+
+  const { error } = await client
+    .from("network_problem_confirmations")
+    .delete()
+    .eq("problem_id", problemId)
+    .eq("user_id", user.id);
+
+  if (error) back(path, "save");
+
+  revalidatePath(path);
+  redirect(path);
+}
+
+// ---------------------------------------------------------------------------
+// Der Ansatz
+// ---------------------------------------------------------------------------
+/**
+ * Einen Ansatz schreiben oder aendern.
+ *
+ * Ein Ansatz je Person und Problem: Wer umdenkt, aendert seinen, statt einen
+ * zweiten daneben zu stellen. Deshalb ein upsert und kein insert.
+ */
+export async function saveConnectProblemApproachAction(formData: FormData) {
+  const { client, user } = await requireConnectMember();
+  const problemId = String(formData.get("problem_id") ?? "").trim();
+  const summary = String(formData.get("summary") ?? "").trim();
+  const audience = String(formData.get("audience") ?? "").trim();
+  const needs = String(formData.get("needs") ?? "").trim();
+  const path = `/connect/problems/${problemId}`;
+
+  if (!problemId) back("/connect/problems", "save");
+  if (summary.length < PROBLEM_APPROACH_SUMMARY_MIN || summary.length > PROBLEM_APPROACH_SUMMARY_MAX) {
+    back(path, "approach_summary");
+  }
+  if (audience.length < PROBLEM_APPROACH_AUDIENCE_MIN || audience.length > PROBLEM_APPROACH_AUDIENCE_MAX) {
+    back(path, "approach_audience");
+  }
+  if (needs.length < PROBLEM_APPROACH_NEEDS_MIN || needs.length > PROBLEM_APPROACH_NEEDS_MAX) {
+    back(path, "approach_needs");
+  }
+
+  const { error } = await client
+    .from("network_problem_approaches")
+    .upsert(
+      {
+        problem_id: problemId,
+        author_user_id: user.id,
+        summary,
+        audience,
+        needs,
+        // Ein erneutes Schreiben holt einen zurueckgezogenen Ansatz zurueck -
+        // das ist es, was jemand meint, der ihn wieder ausfuellt.
+        status: "active",
+      },
+      { onConflict: "problem_id,author_user_id" }
+    );
+
+  if (error) back(path, "save");
+
+  revalidatePath(path);
+  redirect(`${path}?saved=approach`);
+}
+
+export async function withdrawConnectProblemApproachAction(formData: FormData) {
+  const { client, user } = await requireConnectMember();
+  const problemId = String(formData.get("problem_id") ?? "").trim();
+  const path = `/connect/problems/${problemId}`;
+
+  // Zurueckziehen, nicht loeschen: Wer es sich anders ueberlegt, findet seinen
+  // Text wieder, statt ihn neu schreiben zu muessen.
+  const { error } = await client
+    .from("network_problem_approaches")
+    .update({ status: "withdrawn" })
+    .eq("problem_id", problemId)
+    .eq("author_user_id", user.id);
+
+  if (error) back(path, "save");
+
+  revalidatePath(path);
+  redirect(path);
 }

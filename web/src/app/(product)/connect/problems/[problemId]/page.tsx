@@ -12,9 +12,14 @@ import {
 } from "@/features/connect/connectProblemActions";
 import {
   getConnectProblem,
+  getConnectProblemApproaches,
+  getConnectProblemConfirmations,
   getConnectProblemInterests,
+  getOwnConnectProblemConfirmation,
   getOwnConnectProblemInterest,
 } from "@/features/connect/connectProblemData";
+import { ProblemApproaches } from "@/features/connect/ProblemApproaches";
+import { ProblemConfirmations } from "@/features/connect/ProblemConfirmations";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import {
   PROBLEM_INTEREST_NOTE_MAX,
@@ -31,7 +36,7 @@ const hint = "mt-1 block text-xs leading-5 text-slate-500";
 const primary = "min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold";
 const secondary = "min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold";
 
-const SAVED_KEYS = ["interest"];
+const SAVED_KEYS = ["interest", "approach"];
 
 export default async function ConnectProblemPage({
   params,
@@ -49,16 +54,35 @@ export default async function ConnectProblemPage({
   if (!problem) notFound();
 
   const isAuthor = problem.author_user_id === user.id;
-  const [authors, ownInterest, interests, hasProfile] = await Promise.all([
-    getConnectProfilesByUserIds(client, [problem.author_user_id]),
-    isAuthor ? Promise.resolve(null) : getOwnConnectProblemInterest(client, problemId, user.id),
-    isAuthor ? getConnectProblemInterests(client, problemId) : Promise.resolve([]),
-    isAuthor ? Promise.resolve(true) : hasActiveConnectProfile(client, user.id),
+  const isPublished = problem.status === "active";
+  const [authors, ownInterest, interests, hasProfile, confirmations, ownConfirmation, approaches] =
+    await Promise.all([
+      getConnectProfilesByUserIds(client, [problem.author_user_id]),
+      isAuthor ? Promise.resolve(null) : getOwnConnectProblemInterest(client, problemId, user.id),
+      isAuthor ? getConnectProblemInterests(client, problemId) : Promise.resolve([]),
+      isAuthor ? Promise.resolve(true) : hasActiveConnectProfile(client, user.id),
+      getConnectProblemConfirmations(client, problemId),
+      isAuthor
+        ? Promise.resolve(null)
+        : getOwnConnectProblemConfirmation(client, problemId, user.id),
+      getConnectProblemApproaches(client, problemId),
+    ]);
+
+  // Der eigene Ansatz steht in seinem eigenen Block - im Formular, nicht in
+  // der Liste, sonst stuende derselbe Text zweimal auf der Seite.
+  const ownApproach = approaches.find((approach) => approach.author_user_id === user.id) ?? null;
+  const otherApproaches = approaches.filter((approach) => approach.author_user_id !== user.id);
+
+  const [interestedProfiles, approachProfiles] = await Promise.all([
+    getConnectProfilesByUserIds(
+      client,
+      interests.map((interest) => interest.user_id)
+    ),
+    getConnectProfilesByUserIds(
+      client,
+      otherApproaches.map((approach) => approach.author_user_id)
+    ),
   ]);
-  const interestedProfiles = await getConnectProfilesByUserIds(
-    client,
-    interests.map((interest) => interest.user_id)
-  );
 
   const author = authors.get(problem.author_user_id);
   const errorKey = knownKey(query.error, CONNECT_ERROR_KEYS);
@@ -72,7 +96,7 @@ export default async function ConnectProblemPage({
 
       {saved ? (
         <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-          {t("problems.interestSaved")}
+          {t(query.saved === "approach" ? "problems.approachSaved" : "problems.interestSaved")}
         </p>
       ) : null}
       {errorKey ? (
@@ -104,6 +128,28 @@ export default async function ConnectProblemPage({
           <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
         </div>
       </article>
+
+      <ProblemConfirmations
+        problemId={problem.id}
+        counts={confirmations}
+        ownConfirmation={ownConfirmation}
+        canConfirm={!isAuthor && isPublished}
+        className={`${card} mt-6`}
+      />
+
+      <ProblemApproaches
+        problemId={problem.id}
+        approaches={otherApproaches}
+        authors={approachProfiles}
+        ownApproach={ownApproach}
+        canWrite={isPublished}
+        hasProfile={isAuthor ? true : hasProfile}
+        className={`${card} mt-6`}
+        fieldClassName={field}
+        hintClassName={hint}
+        primaryClassName={primary}
+        secondaryClassName={secondary}
+      />
 
       {/* Die eigene Sicht: zurueckziehen oder als geloest markieren. */}
       {isAuthor ? (
@@ -168,7 +214,7 @@ export default async function ConnectProblemPage({
       ) : null}
 
       {/* Die fremde Sicht: Interesse zeigen oder zurueckziehen. */}
-      {!isAuthor && problem.status === "active" ? (
+      {!isAuthor && isPublished ? (
         <section className={`${card} mt-6`}>
           {ownInterest ? (
             <>

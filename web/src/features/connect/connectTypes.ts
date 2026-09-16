@@ -137,9 +137,57 @@ export type ConnectProblem = {
   published_at: string | null;
   resolved_at: string | null;
   interest_count: number;
+  confirmation_count: number;
   created_at: string;
   network_profiles?: ConnectProfile | ConnectProfile[] | null;
 };
+
+/**
+ * Woher jemand ein Problem kennt.
+ *
+ * Eine geschlossene Auswahl statt Freitext, damit eine Bestaetigung ein Klick
+ * bleibt und trotzdem etwas aussagt: "Drei Menschen, die beruflich damit zu
+ * tun haben" ist eine andere Aussage als "dreissig, die es mal gehoert haben".
+ */
+export const CONNECT_PROBLEM_PERSPECTIVES = ["affected", "professional", "observed"] as const;
+export type ConnectProblemPerspective = (typeof CONNECT_PROBLEM_PERSPECTIVES)[number];
+
+export const PROBLEM_APPROACH_SUMMARY_MIN = 50;
+export const PROBLEM_APPROACH_SUMMARY_MAX = 1000;
+export const PROBLEM_APPROACH_AUDIENCE_MIN = 10;
+export const PROBLEM_APPROACH_AUDIENCE_MAX = 300;
+export const PROBLEM_APPROACH_NEEDS_MIN = 10;
+export const PROBLEM_APPROACH_NEEDS_MAX = 500;
+
+export type ConnectProblemConfirmation = {
+  id: string;
+  problem_id: string;
+  user_id: string;
+  perspective: ConnectProblemPerspective;
+  created_at: string;
+};
+
+/** Die oeffentliche Seite: Zahlen je Perspektive, nie Namen. */
+export type ConnectProblemConfirmationCounts = Record<ConnectProblemPerspective, number>;
+
+export type ConnectProblemApproach = {
+  id: string;
+  problem_id: string;
+  author_user_id: string;
+  summary: string;
+  audience: string;
+  needs: string;
+  status: "active" | "withdrawn";
+  created_at: string;
+  updated_at: string;
+};
+
+export function isConnectProblemPerspective(value: unknown): value is ConnectProblemPerspective {
+  return (
+    typeof value === "string" &&
+    (CONNECT_PROBLEM_PERSPECTIVES as readonly string[]).includes(value)
+  );
+}
 
 export type ConnectProblemInterest = {
   id: string;

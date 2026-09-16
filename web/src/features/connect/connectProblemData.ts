@@ -1,7 +1,14 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ConnectProblem, ConnectProblemInterest } from "./connectTypes";
+import {
+  isConnectProblemPerspective,
+  type ConnectProblem,
+  type ConnectProblemApproach,
+  type ConnectProblemConfirmation,
+  type ConnectProblemConfirmationCounts,
+  type ConnectProblemInterest,
+} from "./connectTypes";
 
 type Client = SupabaseClient;
 
@@ -95,3 +102,60 @@ export async function getOwnConnectProblemInterest(
 // Zugriff, alles laeuft ueber Funktionen. Er wird auch nicht gebraucht -
 // annehmen ist wiederholbar und gibt dasselbe Gespraech zurueck, der Knopf
 // fuehrt also beim zweiten Mal einfach dorthin.
+
+/**
+ * Wie viele das Problem wiedererkennen - aufgeteilt danach, woher.
+ *
+ * Laeuft ueber eine security-definer-Funktion, weil die Tabelle niemandem
+ * fremde Zeilen zeigt, auch der einstellenden Person nicht. Die Zahlen sind
+ * oeffentlich, die Namen sind es nie.
+ */
+export async function getConnectProblemConfirmations(
+  client: Client,
+  problemId: string
+): Promise<ConnectProblemConfirmationCounts> {
+  const counts: ConnectProblemConfirmationCounts = { affected: 0, professional: 0, observed: 0 };
+
+  const { data, error } = await client.rpc("get_network_problem_confirmations", {
+    p_problem_id: problemId,
+  });
+  if (error || !data) return counts;
+
+  for (const row of data as { perspective: string; confirmations: number }[]) {
+    if (isConnectProblemPerspective(row.perspective)) {
+      counts[row.perspective] = Number(row.confirmations) || 0;
+    }
+  }
+  return counts;
+}
+
+/** Die eigene Bestaetigung, wenn es eine gibt. */
+export async function getOwnConnectProblemConfirmation(
+  client: Client,
+  problemId: string,
+  userId: string
+) {
+  const { data } = await client
+    .from("network_problem_confirmations")
+    .select("*")
+    .eq("problem_id", problemId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  return (data as ConnectProblemConfirmation | null) ?? null;
+}
+
+/**
+ * Die Ansaetze zu einem Problem.
+ *
+ * Nach Alter sortiert, nicht nach irgendeiner Bewertung: Mehrere Ansaetze
+ * stehen nebeneinander, damit man sieht, dass sie auseinandergehen - nicht,
+ * damit einer gewinnt.
+ */
+export async function getConnectProblemApproaches(client: Client, problemId: string) {
+  const { data } = await client
+    .from("network_problem_approaches")
+    .select("*")
+    .eq("problem_id", problemId)
+    .order("created_at", { ascending: true });
+  return (data ?? []) as ConnectProblemApproach[];
+}
