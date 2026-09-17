@@ -1,3 +1,4 @@
+import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { canAccessAccountSettings } from "@/features/account/accountAccess";
@@ -23,6 +24,11 @@ export default async function AccountPage() {
   ]);
   const hasConnectAccount = membershipResult.data === true;
   const notificationsEnabled = notificationsResult.data !== false;
+  // Was eine Loeschung ueberdauern koennte. Ohne Connect-Konto gibt es das
+  // nicht, dann wird auch nicht danach gefragt.
+  const outlivable = hasConnectAccount
+    ? await getOwnOutlivableContent(supabase, user.id).catch(() => null)
+    : null;
 
   if (!canAccessAccountSettings({ ...roleViews, hasConnect: hasConnectAccount })) redirect("/start");
 
@@ -51,7 +57,16 @@ export default async function AccountPage() {
         </section>
       ) : null}
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-        <DeleteAccountSection />
+        <DeleteAccountSection
+          outlivable={
+            outlivable ?? {
+              problems: 0,
+              approaches: 0,
+              problemsPreferKeeping: false,
+              approachesPreferKeeping: false,
+            }
+          }
+        />
       </section>
     </main>
   );

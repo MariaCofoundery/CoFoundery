@@ -16,7 +16,7 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   assert.match(page, /if \(!user\) redirect\("\/login\?next=\/account"\)/);
   assert.match(page, /canAccessAccountSettings/);
   assert.match(page, /redirect\("\/start"\)/);
-  assert.match(page, /<DeleteAccountSection \/>/);
+  assert.match(page, /<DeleteAccountSection\b/);
   assert.doesNotMatch(page, /\.from\(|network_listings|assessments|founder_teams|advisor_team/);
 });
 
@@ -46,7 +46,9 @@ test("Founder dashboard delegates deletion to shared Account settings", () => {
 
 test("shared action reuses deletion backend, signs out, and returns to the public start page", () => {
   const action = readFileSync("src/features/account/actions.ts", "utf8");
-  assert.match(action, /deleteFounderAccount\(user\.id\)/);
+  // Der Aufruf traegt jetzt zusaetzlich die Entscheidung, was stehen
+  // bleiben darf - geprueft wird, dass es derselbe Weg ist.
+  assert.match(action, /deleteFounderAccount\(user\.id,/);
   assert.match(action, /supabase\.auth\.signOut\(\)/);
   assert.match(action, /redirect\("\/\?status=account_deleted"\)/);
   assert.doesNotMatch(action, /connect.*delete|deleteConnect/i);

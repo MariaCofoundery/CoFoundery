@@ -110,7 +110,7 @@ test("suspended Connect-only accounts keep Account deletion but lose Connect rou
   const account = source("src/app/(product)/account/page.tsx");
   const access = source("src/features/connect/connectAccess.ts");
   assert.match(account, /rpc\("has_network_account"\)/);
-  assert.match(account, /<DeleteAccountSection \/>/);
+  assert.match(account, /<DeleteAccountSection\b/);
   assert.match(access, /rpc\("is_network_member"\)/);
   assert.match(access, /hasConnectAccount === true \? "\/account" : "\/dashboard"/);
 });

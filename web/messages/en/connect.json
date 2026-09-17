@@ -521,7 +521,13 @@
     "visibilityPreviewItems": "Your title, your description, topics, places and your name. Not out there: other people's approaches, the confirmations, and who got in touch – we have no consent from those people for that.",
     "visibilityConfirm": "I understand that this text will then be publicly readable – including by people from my professional environment – and that I can take it back at any time.",
     "visibilityCaution": "Think for a moment before you do: a description from your working day often says something about your employer too.",
-    "openPublicPage": "View public page"
+    "openPublicPage": "View public page",
+    "formerMember": "Former member",
+    "orphanNotice": "This person deleted their account and left the text standing anonymously. The problem can no longer be changed, and a message here would reach nobody.",
+    "outlivesLabel": "May stay anonymously if I delete my account",
+    "outlivesHint": "Without this, the problem disappears with your account – and with it the approaches others wrote for it. With it, the text stays without your name. You will be asked again when you delete.",
+    "outlivesApproachLabel": "May stay anonymously if I delete my account",
+    "outlivesApproachHint": "This approach sits on someone else's page. Without this, it disappears from there along with your account."
   },
   "notifications": {
     "title": "Connect notifications",

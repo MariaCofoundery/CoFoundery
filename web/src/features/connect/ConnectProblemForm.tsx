@@ -138,6 +138,26 @@ export function ConnectProblemForm({
         </label>
       </div>
 
+      {/* Was passiert, wenn du gehst. Die Frage steht hier als Voreinstellung
+          - verbindlich ist die Bestaetigung im Loeschdialog. */}
+      <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
+        <input
+          type="checkbox"
+          name="outlives_account"
+          value="yes"
+          defaultChecked={problem?.outlives_account ?? false}
+          className="mt-1 h-4 w-4 rounded border-slate-300"
+        />
+        <span>
+          <span className="block text-sm font-semibold text-slate-900">
+            {t("problems.outlivesLabel")}
+          </span>
+          <span className="mt-1 block text-xs leading-5 text-slate-500">
+            {t("problems.outlivesHint")}
+          </span>
+        </span>
+      </label>
+
       {/* Ein Problem beschreibt oft ein Arbeitsumfeld. Die Warnung steht
           deshalb ueber dem Feld, nicht darunter. */}
       <div>

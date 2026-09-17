@@ -66,7 +66,10 @@ async function deleteOwnedImageObjects(
   return !removal.error;
 }
 
-export async function deleteFounderAccount(userId: string): Promise<DeleteFounderAccountResult> {
+export async function deleteFounderAccount(
+  userId: string,
+  keep: { problems: boolean; approaches: boolean } = { problems: false, approaches: false }
+): Promise<DeleteFounderAccountResult> {
   const privileged = createPrivilegedClient();
   if (!privileged) {
     return { ok: false, error: "missing_service_role" };
@@ -79,6 +82,21 @@ export async function deleteFounderAccount(userId: string): Promise<DeleteFounde
   const connectPhotoCleanup = await deleteOwnedImageObjects(privileged, "network-profile-images", userId);
   if (!avatarCleanup || !connectPhotoCleanup) {
     console.error("deleteFounderAccount avatar cleanup failed");
+    return { ok: false, error: "cleanup_failed" };
+  }
+
+  // ZUERST das, was nicht bleiben soll. Danach loest die Kontoloeschung die
+  // Verknuepfung des Rests - der Fremdschluessel setzt author_user_id auf
+  // null. In der anderen Reihenfolge waere alles anonym stehen geblieben.
+  const preparation = await privileged.rpc("prepare_network_content_for_account_deletion", {
+    p_user_id: userId,
+    p_keep_problems: keep.problems,
+    p_keep_approaches: keep.approaches,
+  });
+  if (preparation.error) {
+    console.error("deleteFounderAccount content preparation failed", {
+      code: preparation.error.code,
+    });
     return { ok: false, error: "cleanup_failed" };
   }
 

@@ -29,7 +29,7 @@ export default async function ConnectProblemsPage({
   const problems = await getActiveConnectProblems(client, filters);
   const authors = await getConnectProfilesByUserIds(
     client,
-    problems.map((problem) => problem.author_user_id)
+    problems.map((problem) => problem.author_user_id).filter((id): id is string => id !== null)
   );
 
   const isFiltered = ["q", "intent", "geographic_scope"].some(
@@ -132,7 +132,7 @@ export default async function ConnectProblemsPage({
       {problems.length ? (
         <section aria-label={t("problems.title")} className="mt-6 space-y-4">
           {problems.map((problem) => {
-            const author = authors.get(problem.author_user_id);
+            const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
             return (
               <article key={problem.id} className={card}>
                 <p className="text-xs font-semibold uppercase tracking-[.16em] text-violet-700">
@@ -145,7 +145,9 @@ export default async function ConnectProblemsPage({
                 </h3>
                 <p className="mt-2 line-clamp-3 leading-7 text-slate-700">{problem.description}</p>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-                  <span>{author?.display_name ?? t("problems.unknownAuthor")}</span>
+                  <span>{problem.author_user_id === null
+                    ? t("problems.formerMember")
+                    : author?.display_name ?? t("problems.unknownAuthor")}</span>
                   {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
                   <span className="flex flex-wrap gap-x-3">
                     {problem.confirmation_count > 0 ? (

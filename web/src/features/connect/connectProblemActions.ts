@@ -108,6 +108,7 @@ export async function saveConnectProblemAction(formData: FormData) {
       visibility: resolveProblemVisibility(formData, null, () =>
         back("/connect/problems/new", "public_confirmation")
       ),
+      outlives_account: formData.get("outlives_account") === "yes",
     })
     .select("id")
     .single();
@@ -377,6 +378,7 @@ export async function updateConnectProblemAction(formData: FormData) {
           ? new Date().toISOString()
           : undefined,
       visibility,
+      outlives_account: formData.get("outlives_account") === "yes",
     })
     .eq("id", problemId)
     .eq("author_user_id", user.id);
@@ -482,6 +484,7 @@ export async function saveConnectProblemApproachAction(formData: FormData) {
         summary,
         audience,
         needs,
+        outlives_account: formData.get("outlives_account") === "yes",
         // Ein erneutes Schreiben holt einen zurueckgezogenen Ansatz zurueck -
         // das ist es, was jemand meint, der ihn wieder ausfuellt.
         status: "active",

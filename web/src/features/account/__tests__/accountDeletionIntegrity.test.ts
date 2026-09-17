@@ -29,7 +29,7 @@ test("account deletion removes only the founder avatar prefix before the atomic 
 });
 
 test("the action reports success only after the cleanup contract succeeds", () => {
-  assert.match(actionSource, /const deleteResult = await deleteFounderAccount\(user\.id\)/u);
+  assert.match(actionSource, /const deleteResult = await deleteFounderAccount\(user\.id,/u);
   assert.match(actionSource, /if \(!deleteResult\.ok\)[\s\S]*return \{ ok: false/u);
   assert.match(actionSource, /if \(!deleteResult\.ok\)[\s\S]*redirect\("\/\?status=account_deleted"\)/u);
 });

@@ -78,12 +78,15 @@ export async function ProblemApproaches({
       {approaches.length ? (
         <ul className="mt-5 space-y-4">
           {approaches.map((approach) => {
-            const author = authors.get(approach.author_user_id);
+            const author = approach.author_user_id ? authors.get(approach.author_user_id) : undefined;
             return (
               <li key={approach.id} className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">
                   {t("problems.approachBy", {
-                    name: author?.display_name ?? t("problems.unknownAuthor"),
+                    name:
+                      approach.author_user_id === null
+                        ? t("problems.formerMember")
+                        : author?.display_name ?? t("problems.unknownAuthor"),
                   })}
                 </p>
                 {author?.headline ? (
@@ -262,6 +265,24 @@ export async function ProblemApproaches({
                     placeholder={t("problems.approachNeedsPlaceholder")}
                   />
                   <span className={hintClassName}>{t("problems.approachNeedsHint")}</span>
+                </label>
+
+                <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-3">
+                  <input
+                    type="checkbox"
+                    name="outlives_account"
+                    value="yes"
+                    defaultChecked={ownApproach?.outlives_account ?? false}
+                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-900">
+                      {t("problems.outlivesApproachLabel")}
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-500">
+                      {t("problems.outlivesApproachHint")}
+                    </span>
+                  </span>
                 </label>
 
                 <SubmitButton

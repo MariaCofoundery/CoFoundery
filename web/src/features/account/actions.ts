@@ -12,7 +12,17 @@ export type DeleteAccountActionResult =
       error: "not_authenticated" | "missing_service_role" | "cleanup_failed";
     };
 
-export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountActionResult> {
+/**
+ * Was von jemandem stehen bleiben darf, entscheidet er hier - nicht die AGB.
+ *
+ * Die beiden Angaben wandern unveraendert in die Vorbereitung: Erst wird
+ * geloescht, was nicht bleiben soll, dann loest die Kontoloeschung die
+ * Verknuepfung des Rests. Andersherum waere alles verwaist, auch das, wogegen
+ * sich jemand ausdruecklich entschieden hat.
+ */
+export async function deleteCurrentUserAccountAction(
+  keep: { problems: boolean; approaches: boolean } = { problems: false, approaches: false }
+): Promise<DeleteAccountActionResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,7 +32,7 @@ export async function deleteCurrentUserAccountAction(): Promise<DeleteAccountAct
     return { ok: false, error: "not_authenticated" };
   }
 
-  const deleteResult = await deleteFounderAccount(user.id);
+  const deleteResult = await deleteFounderAccount(user.id, keep);
   if (!deleteResult.ok) {
     return { ok: false, error: deleteResult.error };
   }

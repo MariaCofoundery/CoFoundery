@@ -417,7 +417,16 @@
         "missingServiceRole": "Account deletion is currently not technically available. Please try again later.",
         "cleanupFailed": "Your account could not be fully deleted right now. Please try again.",
         "notAuthenticated": "Your session is no longer active. Please sign in again."
-      }
+      },
+      "outlivesTitle": "What may stay behind",
+      "outlivesText": "Some of what you wrote sits on pages where others have built on it. You now decide whether it disappears or stays anonymously.",
+      "outlivesProblems": "Leave {count, plural, one {my described problem} other {my # described problems}} standing anonymously",
+      "outlivesProblemsHint": "Without this they disappear – and with them the approaches others wrote for them.",
+      "outlivesApproaches": "Leave {count, plural, one {my approach} other {my # approaches}} on other people's problems standing anonymously",
+      "outlivesApproachesHint": "They sit on pages that belong to others. Without this they disappear from there.",
+      "outlivesIrreversible": "Anonymous means: your name is severed from the text irreversibly. We cannot link it back to you afterwards – and you can no longer change it or take it back.",
+      "outlivesCheckText": "Read once more what you wrote: does it point at you, your colleagues or your employer? Severing your name does not change the text.",
+      "outlivesReview": "Look at my entries"
     }
   },
   "outlook": {

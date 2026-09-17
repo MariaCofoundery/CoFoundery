@@ -193,3 +193,35 @@ export async function getConnectProblemApproaches(client: Client, problemId: str
     .order("created_at", { ascending: true });
   return (data ?? []) as ConnectProblemApproach[];
 }
+
+/**
+ * Was eine Kontoloeschung ueberdauern koennte - und was die Person dazu
+ * schon einmal gesagt hat.
+ *
+ * Der Loeschdialog fragt nur, wenn es etwas zu fragen gibt: Wer nie ein
+ * Problem geschildert hat, soll darueber auch nicht nachdenken muessen.
+ */
+export async function getOwnOutlivableContent(client: Client, userId: string) {
+  const [problems, approaches] = await Promise.all([
+    client
+      .from("network_problems")
+      .select("outlives_account")
+      .eq("author_user_id", userId),
+    client
+      .from("network_problem_approaches")
+      .select("outlives_account")
+      .eq("author_user_id", userId),
+  ]);
+
+  const problemRows = (problems.data ?? []) as { outlives_account: boolean }[];
+  const approachRows = (approaches.data ?? []) as { outlives_account: boolean }[];
+
+  return {
+    problems: problemRows.length,
+    approaches: approachRows.length,
+    // Vorbelegt mit dem, was beim Einstellen gewaehlt wurde - aber im
+    // Loeschdialog noch einmal zu bestaetigen.
+    problemsPreferKeeping: problemRows.some((row) => row.outlives_account),
+    approachesPreferKeeping: approachRows.some((row) => row.outlives_account),
+  };
+}

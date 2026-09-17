@@ -15,6 +15,12 @@ import {
 const source = (path: string) => readFileSync(path, "utf8");
 
 /** Siehe connectProblems.test.ts - Kommentare duerfen Pruefungen nicht treffen. */
+const sqlWithoutComments = (path: string) =>
+  source(path)
+    .split("\n")
+    .map((line) => line.replace(/--.*$/, ""))
+    .join("\n");
+
 const codeOnly = (path: string) =>
   source(path)
     .replace(/\/\*[\s\S]*?\*\//g, " ")
@@ -416,4 +422,108 @@ test("the visibility copy names what stays inside", () => {
   const de = readJson("messages/de/connect.json").problems as Record<string, string>;
   assert.match(de.visibilityCaution, /Arbeitgeber/);
   assert.match(de.visibilityPreviewItems, /Ansätze anderer/);
+});
+
+// ---------------------------------------------------------------------------
+// Was bleiben darf, wenn jemand geht
+// ---------------------------------------------------------------------------
+const OUTLIVES_MIGRATION =
+  "../supabase/migrations/20260923120000_problem_outlives_account.sql";
+
+test("the link is severed, not replaced by a placeholder", () => {
+  const migration = source(OUTLIVES_MIGRATION);
+  // Anonym heisst anonym: null, kein "geloeschtes Mitglied"-Datensatz, zu dem
+  // sich zurueckrechnen liesse.
+  assert.match(migration, /alter column author_user_id drop not null/);
+  assert.match(migration, /references auth\.users\(id\) on delete set null/);
+  // Auf dem Quelltext ohne Kommentare: Der Kommentar erklaert ja gerade,
+  // dass KEIN Platzhalter gesetzt wird - und haette die Pruefung erfuellt.
+  assert.doesNotMatch(
+    sqlWithoutComments(OUTLIVES_MIGRATION),
+    /deleted_user|platzhalter|placeholder/i
+  );
+});
+
+test("nothing survives that was not consented to", () => {
+  const migration = source(OUTLIVES_MIGRATION);
+  const fn = migration.slice(
+    migration.indexOf("create or replace function public.prepare_network_content_for_account_deletion")
+  );
+  assert.match(fn, /if not coalesce\(p_keep_problems, false\) then/);
+  assert.match(fn, /if not coalesce\(p_keep_approaches, false\) then/);
+  // Nur mit der Dienstrolle - sonst raeumte jemand fremde Inhalte ab.
+  assert.match(fn, /auth\.role\(\) <> 'service_role'/);
+
+  const deletion = codeOnly("src/features/account/deleteFounderAccount.ts");
+  // Die Reihenfolge ist der Punkt: Erst wegraeumen, dann loeschen. Andersherum
+  // waere alles verwaist - auch das, wogegen sich jemand entschieden hat.
+  const prepare = deletion.indexOf("prepare_network_content_for_account_deletion");
+  const remove = deletion.indexOf("delete_founder_account_data");
+  assert.ok(prepare > -1 && remove > prepare, "die Vorbereitung laeuft zuerst");
+});
+
+test("an orphaned problem is read-only and receives no new interest", () => {
+  const migration = source(OUTLIVES_MIGRATION);
+  assert.match(
+    migration,
+    /or \(problem\.author_user_id is not null and problem\.author_user_id <> auth\.uid\(\)\)/,
+    "eine Meldung am Problem selbst ginge ins Leere"
+  );
+  // Bestaetigen bleibt erlaubt - das erreicht niemanden und veraltet nicht.
+  assert.match(migration, /problem\.author_user_id is null or problem\.author_user_id <> auth\.uid\(\)/);
+
+  // Und der Veroeffentlichungs-Trigger darf das Trennen nicht abbrechen.
+  assert.match(migration, /if new\.author_user_id is null then\s*\n\s*return new;/);
+});
+
+test("the decision is asked twice, and the deletion dialog wins", () => {
+  const form = codeOnly("src/features/connect/ConnectProblemForm.tsx");
+  assert.match(form, /name="outlives_account"/);
+
+  const section = codeOnly("src/features/account/DeleteAccountSection.tsx");
+  // Vorbelegt mit dem, was beim Einstellen gewaehlt wurde - aber hier noch
+  // einmal zu bestaetigen.
+  assert.match(section, /useState\(outlivable\.problemsPreferKeeping\)/);
+  assert.match(section, /useState\(outlivable\.approachesPreferKeeping\)/);
+  // Getrennt gefragt: eigene Probleme und Ansaetze auf fremden Seiten.
+  assert.match(section, /problems: outlivable\.problems > 0 && keepProblems/);
+  assert.match(section, /approaches: outlivable\.approaches > 0 && keepApproaches/);
+});
+
+test("the dialog says what cannot be undone, before the decision", () => {
+  const section = source("src/features/account/DeleteAccountSection.tsx");
+  const warning = section.indexOf("outlivesIrreversible");
+  const button = section.indexOf("account.delete.button");
+  assert.ok(warning > -1 && button > warning, "die Warnung steht vor dem Knopf");
+
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/dashboard.json`);
+    const del = (messages.account as Record<string, Record<string, string>>).delete;
+    for (const key of [
+      "outlivesTitle",
+      "outlivesProblems",
+      "outlivesApproaches",
+      "outlivesIrreversible",
+      "outlivesCheckText",
+    ]) {
+      assert.equal(typeof del[key], "string", `${locale}: ${key} fehlt`);
+    }
+  }
+  // Der Text muss beides sagen: unwiderruflich, und dass er den Text nicht
+  // saeubert. Ein Problem beschreibt oft einen Arbeitgeber.
+  const de = (readJson("messages/de/dashboard.json").account as Record<string, Record<string, string>>).delete;
+  assert.match(de.outlivesIrreversible, /unwiderruflich/);
+  assert.match(de.outlivesCheckText, /Arbeitgeber/);
+});
+
+test("a nobody where the author was, not an empty gap", () => {
+  for (const file of [
+    "src/app/(product)/connect/problems/page.tsx",
+    "src/app/(product)/connect/problems/[problemId]/page.tsx",
+    "src/features/connect/ProblemApproaches.tsx",
+  ]) {
+    assert.match(source(file), /problems\.formerMember/, `${file}`);
+  }
+  const detail = source("src/app/(product)/connect/problems/[problemId]/page.tsx");
+  assert.match(detail, /problems\.orphanNotice/, "und der Hinweis, dass hier niemand mehr antwortet");
 });

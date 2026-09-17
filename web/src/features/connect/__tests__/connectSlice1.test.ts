@@ -217,5 +217,5 @@ test("Connect-only account deletion is exposed through shared Account settings",
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   const account = readFileSync("src/app/(product)/account/page.tsx", "utf8");
   assert.match(shell, /href="\/account"/);
-  assert.match(account, /<DeleteAccountSection \/>/);
+  assert.match(account, /<DeleteAccountSection\b/);
 });

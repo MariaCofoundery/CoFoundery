@@ -136,7 +136,11 @@ export const PROBLEM_INTEREST_NOTE_MAX = 500;
 
 export type ConnectProblem = {
   id: string;
-  author_user_id: string;
+  /**
+   * Leer heisst: Die Person hat ihr Konto geloescht und den Text anonym
+   * stehen lassen. Es gibt keinen Weg zurueck zu ihr - auch nicht fuer uns.
+   */
+  author_user_id: string | null;
   title: string;
   description: string;
   author_intent: ConnectProblemIntent;
@@ -149,6 +153,8 @@ export type ConnectProblem = {
   resolved_at: string | null;
   interest_count: number;
   confirmation_count: number;
+  /** Voreinstellung: darf dieser Eintrag eine Kontoloeschung ueberdauern? */
+  outlives_account: boolean;
   visibility: ConnectVisibility;
   public_slug: string;
   created_at: string;
@@ -186,11 +192,12 @@ export type ConnectProblemConfirmationCounts = Record<ConnectProblemPerspective,
 export type ConnectProblemApproach = {
   id: string;
   problem_id: string;
-  author_user_id: string;
+  author_user_id: string | null;
   summary: string;
   audience: string;
   needs: string;
   status: "active" | "withdrawn";
+  outlives_account: boolean;
   created_at: string;
   updated_at: string;
 };

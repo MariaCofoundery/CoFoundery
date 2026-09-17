@@ -59,7 +59,9 @@ export default async function ConnectProblemPage({
   const isPublished = problem.status === "active";
   const [authors, ownInterest, interests, hasProfile, confirmations, ownConfirmation, approaches] =
     await Promise.all([
-      getConnectProfilesByUserIds(client, [problem.author_user_id]),
+      problem.author_user_id
+        ? getConnectProfilesByUserIds(client, [problem.author_user_id])
+        : Promise.resolve(new Map()),
       isAuthor ? Promise.resolve(null) : getOwnConnectProblemInterest(client, problemId, user.id),
       isAuthor ? getConnectProblemInterests(client, problemId) : Promise.resolve([]),
       isAuthor ? Promise.resolve(true) : hasActiveConnectProfile(client, user.id),
@@ -95,14 +97,16 @@ export default async function ConnectProblemPage({
       interests.map((interest) => interest.user_id)
     ),
     getConnectProfilesByUserIds(client, [
-      ...otherApproaches.map((approach) => approach.author_user_id),
+      ...otherApproaches
+        .map((approach) => approach.author_user_id)
+        .filter((id): id is string => id !== null),
       // Auch die, die sich zum eigenen Ansatz gemeldet haben - sonst stuende
       // dort ein Kasten ohne Namen.
       ...receivedReplies.map((reply) => reply.user_id),
     ]),
   ]);
 
-  const author = authors.get(problem.author_user_id);
+  const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
   const errorKey = knownKey(query.error, CONNECT_ERROR_KEYS);
   const saved = SAVED_KEYS.includes(query.saved ?? "") ? query.saved : null;
 
@@ -134,6 +138,14 @@ export default async function ConnectProblemPage({
           {t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">{problem.title}</h1>
+        {/* Es gibt niemanden mehr, der es pflegt oder antwortet. Das gehoert
+            an den Anfang, nicht ans Ende - sonst schreibt jemand eine
+            Meldung ins Leere. */}
+        {problem.author_user_id === null ? (
+          <p className="mt-3 rounded-2xl bg-slate-100 p-3 text-sm leading-6 text-slate-700">
+            {t("problems.orphanNotice")}
+          </p>
+        ) : null}
         {problem.status !== "active" ? (
           <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">
             {t(`problems.statuses.${problem.status}`)}
@@ -148,7 +160,11 @@ export default async function ConnectProblemPage({
         ) : null}
 
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm text-slate-600">
-          <span>{author?.display_name ?? t("problems.unknownAuthor")}</span>
+          <span>
+            {problem.author_user_id === null
+              ? t("problems.formerMember")
+              : author?.display_name ?? t("problems.unknownAuthor")}
+          </span>
           <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
         </div>
       </article>

@@ -521,7 +521,13 @@
     "visibilityPreviewItems": "Dein Titel, deine Beschreibung, Themen, Orte und dein Name. Nicht draußen: die Ansätze anderer Menschen, die Bestätigungen und wer sich gemeldet hat – dafür liegt uns keine Einwilligung der jeweiligen Personen vor.",
     "visibilityConfirm": "Mir ist bewusst, dass dieser Text dann öffentlich lesbar ist – auch von Menschen aus meinem beruflichen Umfeld –, und dass ich das jederzeit wieder zurücknehmen kann.",
     "visibilityCaution": "Denk kurz nach, bevor du das tust: Eine Beschreibung aus deinem Arbeitsalltag sagt oft auch etwas über deinen Arbeitgeber.",
-    "openPublicPage": "Öffentliche Seite ansehen"
+    "openPublicPage": "Öffentliche Seite ansehen",
+    "formerMember": "Ehemaliges Mitglied",
+    "orphanNotice": "Diese Person hat ihr Konto gelöscht und den Text anonym stehen lassen. Das Problem lässt sich nicht mehr ändern, und eine Meldung hier erreicht niemanden mehr.",
+    "outlivesLabel": "Darf anonym stehen bleiben, wenn ich mein Konto lösche",
+    "outlivesHint": "Ohne dieses Häkchen verschwindet das Problem mit deinem Konto – und mit ihm die Ansätze, die andere dazu geschrieben haben. Mit Häkchen bleibt der Text ohne deinen Namen stehen. Du wirst beim Löschen noch einmal gefragt.",
+    "outlivesApproachLabel": "Darf anonym stehen bleiben, wenn ich mein Konto lösche",
+    "outlivesApproachHint": "Dieser Ansatz steht auf der Seite einer anderen Person. Ohne Häkchen verschwindet er dort mit deinem Konto."
   },
   "notifications": {
     "title": "Benachrichtigungen aus Connect",

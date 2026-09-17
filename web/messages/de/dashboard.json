@@ -417,7 +417,16 @@
         "missingServiceRole": "Die Löschung ist gerade technisch nicht verfügbar. Bitte versuche es später erneut.",
         "cleanupFailed": "Dein Account konnte gerade nicht vollständig gelöscht werden. Bitte versuche es erneut.",
         "notAuthenticated": "Deine Sitzung ist nicht mehr aktiv. Bitte melde dich erneut an."
-      }
+      },
+      "outlivesTitle": "Was von dir stehen bleiben darf",
+      "outlivesText": "Manches, was du geschrieben hast, steht auf Seiten, auf denen andere darauf aufgebaut haben. Du entscheidest jetzt, ob es verschwindet oder anonym stehen bleibt.",
+      "outlivesProblems": "{count, plural, one {Mein geschildertes Problem} other {Meine # geschilderten Probleme}} anonym stehen lassen",
+      "outlivesProblemsHint": "Ohne Häkchen verschwinden sie – und mit ihnen die Ansätze, die andere dazu geschrieben haben.",
+      "outlivesApproaches": "{count, plural, one {Meinen Ansatz} other {Meine # Ansätze}} auf fremden Problemen anonym stehen lassen",
+      "outlivesApproachesHint": "Sie stehen auf Seiten, die anderen gehören. Ohne Häkchen verschwinden sie dort.",
+      "outlivesIrreversible": "Anonym heißt: Dein Name wird unwiderruflich vom Text getrennt. Wir können ihn danach nicht mehr dir zuordnen – und du kannst ihn nicht mehr ändern oder zurückholen.",
+      "outlivesCheckText": "Lies vorher noch einmal, was du geschrieben hast: Steht dort etwas, das auf dich, deine Kolleginnen oder deinen Arbeitgeber zeigt? Das Trennen deines Namens ändert den Text nicht.",
+      "outlivesReview": "Meine Einträge ansehen"
     }
   },
   "outlook": {
