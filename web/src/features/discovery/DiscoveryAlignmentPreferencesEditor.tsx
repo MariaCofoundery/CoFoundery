@@ -16,14 +16,31 @@ import {
 const SELECT_CLASS =
   "mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100";
 
+/**
+ * Die Alignment-Praeferenzen - samt dem Haekchen, das sie ueberhaupt erst
+ * hervorruft.
+ *
+ * Das Haekchen stand bis zum 18.09.2026 in der Seite, die sechs Dimensionen
+ * darunter immer. Wer Alignment nicht nutzen wollte - die Voreinstellung -
+ * scrollte trotzdem an sechs Kaesten mit je zwei Auswahlfeldern vorbei. Sie
+ * sind jetzt zusammen an einer Stelle, und sie erscheinen erst, wenn jemand
+ * sie auch will.
+ *
+ * Beides gehoert in dieselbe Komponente, weil das eine das andere steuert;
+ * getrennt haette die Seite einen Zustand fuehren muessen, der nur hier
+ * gebraucht wird.
+ */
 export function DiscoveryAlignmentPreferencesEditor({
+  initialEnabled,
   initialPreferences,
   ownTendencies,
 }: {
+  initialEnabled: boolean;
   initialPreferences: DiscoveryAlignmentPreferences;
   ownTendencies: DiscoveryOwnAlignmentTendency[];
 }) {
   const t = useTranslations("discovery");
+  const [enabled, setEnabled] = useState(initialEnabled);
   const [preferences, setPreferences] = useState<DiscoveryAlignmentPreferences>(initialPreferences);
   const prioritizedCount = Object.keys(preferences).length;
 
@@ -63,6 +80,29 @@ export function DiscoveryAlignmentPreferencesEditor({
 
   return (
     <div className="mt-4 grid gap-3">
+      <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
+        <input
+          type="checkbox"
+          name="discoveryV2AlignmentEnabled"
+          value="true"
+          checked={enabled}
+          onChange={(event) => setEnabled(event.target.checked)}
+          className="mt-1 h-4 w-4 rounded border-slate-300"
+        />
+        <span>
+          <span className="block text-sm font-semibold text-slate-900">
+            {t("v2.alignment.enable")}
+          </span>
+          <span className="mt-1 block text-xs leading-5 text-slate-500">
+            {t("v2.alignment.chooseHelp")}
+          </span>
+        </span>
+      </label>
+
+      {/* Erst wenn jemand es auch will. Ohne Haekchen sind die sechs Kaesten
+          sechs Kaesten, durch die man sich scrollt. */}
+      {!enabled ? null : (
+        <>
       <p className="text-xs leading-5 text-slate-500">
         {t("v2.alignment.priorityCount", { count: prioritizedCount })}
       </p>
@@ -152,6 +192,8 @@ export function DiscoveryAlignmentPreferencesEditor({
           </section>
         );
       })}
+    </>
+      )}
     </div>
   );
 }

@@ -475,3 +475,34 @@ test("the three permanent hint paragraphs are gone", () => {
     }
   }
 });
+
+// ---------------------------------------------------------------------------
+// Die Alignment-Dimensionen erscheinen erst auf Wunsch
+// ---------------------------------------------------------------------------
+const ALIGNMENT_EDITOR = "src/features/discovery/DiscoveryAlignmentPreferencesEditor.tsx";
+
+test("the six dimensions appear only once the box is ticked", () => {
+  const editor = codeOnly(ALIGNMENT_EDITOR);
+  assert.match(editor, /const \[enabled, setEnabled\] = useState\(initialEnabled\)/);
+  assert.match(editor, /\{!enabled \? null : \(/);
+
+  // Das Haekchen steht jetzt in derselben Komponente wie das, was es
+  // hervorruft - getrennt haette die Seite einen Zustand fuehren muessen,
+  // den nur diese Komponente braucht.
+  assert.match(editor, /name="discoveryV2AlignmentEnabled"/);
+  const page = codeOnly(PAGE);
+  assert.doesNotMatch(page, /name="discoveryV2AlignmentEnabled"/);
+  assert.match(page, /initialEnabled=\{loadedPreferences\?\.discoveryV2AlignmentEnabled/);
+});
+
+test("switching alignment off does not forget the chosen dimensions", () => {
+  const actions = codeOnly("src/features/discovery/discoveryActions.ts");
+  // Die Felder sind im abgeschalteten Zustand eingeklappt und kommen gar
+  // nicht erst im Formular an. Ohne diese Fallunterscheidung loeschte jedes
+  // Speichern die Auswahl, und beim Wiedereinschalten stuende alles auf
+  // Anfang.
+  assert.match(
+    actions,
+    /discoveryV2AlignmentPreferences: enabled\s*\n\s*\? parseDiscoveryV2AlignmentPreferences\(formData\)\s*\n\s*: existing\?\.discoveryV2AlignmentPreferences \?\? \{\}/
+  );
+});

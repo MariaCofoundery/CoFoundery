@@ -316,14 +316,21 @@ export async function saveDiscoveryV2AlignmentPreferencesAction(
 
   try {
     const existing = await getOwnSearchPreferences(userId);
+    const enabled = getFirstString(formData, ["discoveryV2AlignmentEnabled"]);
+
     await upsertOwnSearchPreferences(userId, {
       priorityWeights: existing?.priorityWeights ?? {},
       mustHaves: existing?.mustHaves,
       includeAssessmentSignals: existing?.includeAssessmentSignals ?? false,
-      discoveryV2AlignmentEnabled: getFirstString(formData, [
-        "discoveryV2AlignmentEnabled",
-      ]),
-      discoveryV2AlignmentPreferences: parseDiscoveryV2AlignmentPreferences(formData),
+      discoveryV2AlignmentEnabled: enabled,
+      // Abgeschaltet heisst "nutze ich gerade nicht", nicht "vergiss es".
+      // Die Felder sind dann eingeklappt und kommen gar nicht erst im
+      // Formular an - ohne diese Zeile loeschte jedes Speichern im
+      // abgeschalteten Zustand die einmal gewaehlten Dimensionen, und beim
+      // Wiedereinschalten stuende alles auf Anfang.
+      discoveryV2AlignmentPreferences: enabled
+        ? parseDiscoveryV2AlignmentPreferences(formData)
+        : existing?.discoveryV2AlignmentPreferences ?? {},
     });
     revalidateDiscoveryPaths();
     return { ok: true, reason: "preferences_saved" };

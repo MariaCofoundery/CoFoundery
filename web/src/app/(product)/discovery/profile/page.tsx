@@ -839,22 +839,8 @@ export default async function DiscoveryProfilePage({
             </p>
             {alignmentReadiness.hasSubmittedBaseAssessment ? (
               <form action={saveAlignmentPreferences} className="mt-4">
-                <label className="flex min-h-11 items-start gap-3 rounded-2xl border border-violet-100 bg-white p-3">
-                  <input
-                    type="checkbox"
-                    name="discoveryV2AlignmentEnabled"
-                    value="true"
-                    defaultChecked={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
-                    className="mt-1 h-4 w-4 rounded border-slate-300"
-                  />
-                  <span className="text-sm font-semibold text-slate-900">
-                    {t("v2.alignment.enable")}
-                  </span>
-                </label>
-                <p className="mt-3 text-xs leading-5 text-slate-500">
-                  {t("v2.alignment.chooseHelp")}
-                </p>
                 <DiscoveryAlignmentPreferencesEditor
+                  initialEnabled={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
                   initialPreferences={
                     loadedPreferences?.discoveryV2AlignmentPreferences ?? {}
                   }
