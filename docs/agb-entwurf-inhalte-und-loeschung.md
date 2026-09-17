@@ -1,6 +1,6 @@
 # AGB-Entwurf: Inhalte, Rechte und Kontolöschung
 
-**Stand:** 17.09.2026 · **Status:** Entwurf, nicht veröffentlicht
+**Stand:** 17.09.2026 (Abschnitt 4 überarbeitet) · **Status:** Entwurf, nicht veröffentlicht
 
 > **Das hier ist keine Rechtsberatung.** Ich bin kein Anwalt, und dieser Text
 > ersetzt keine anwaltliche Prüfung. Er ist als Arbeitsgrundlage gedacht: Er
@@ -116,13 +116,21 @@ Lösungsansätze anderer bleiben möglich.
 Die Beiträge der jeweils anderen Person sind deren Inhalte; du kannst sie nicht
 löschen lassen.
 
-> **Offene Entscheidung — siehe Abschnitt 6.** Der aktuelle Stand der Plattform
-> weicht von dieser Klausel ab: Beim Löschen eines Kontos wird die gesamte
-> Unterhaltung entfernt, einschließlich der Beiträge der anderen Person. Diese
-> Klausel darf erst veröffentlicht werden, wenn das Verhalten dazu passt — oder
-> die Klausel muss das tatsächliche Verhalten beschreiben.
+**4.2 Was beim Löschen mit Unterhaltungen passiert.** Löschst du dein Konto,
+bleibt der Verlauf der anderen Person erhalten. Die Verknüpfung zu dir wird
+unwiderruflich getrennt: Du erscheinst dort namenlos, und es lässt sich nicht
+mehr schreiben. Diese Entscheidung liegt nicht bei dir, weil der Verlauf auch
+der anderen Person gehört — deine Angaben zur Person werden gelöscht, die Worte,
+die zwischen euch gewechselt wurden, bleiben ihr.
 
-**4.2 Bestätigungen und Interessensmeldungen.** Sie beziehen sich auf deine
+**4.3** Einzelne Nachrichten lassen sich derzeit nicht zurücknehmen — weder von
+dir noch von der anderen Person. Eine gesendete Nachricht bleibt bis zur
+Löschung eines der beiden Konten stehen.
+
+> *Anmerkung:* Dieser Satz beschreibt den heutigen Stand, keine Absicht. Siehe
+> Abschnitt 6, Punkt 5.
+
+**4.4 Bestätigungen und Interessensmeldungen.** Sie beziehen sich auf deine
 Person und werden mit deinem Konto gelöscht. Öffentlich sichtbar sind ohnehin
 nur Zahlen, keine Namen.
 
@@ -150,11 +158,10 @@ dort gelten eigene Fragen (Ergebnisse, Weitergabe an Advisor, Forschung).
 
 ## 6. Entscheidungen, die vor der Veröffentlichung fallen müssen
 
-1. **Nachrichten beim Löschen.** Heute verschwindet die gesamte Unterhaltung.
-   Das löscht die Worte der anderen Person mit. Üblich ist das Gegenteil: Die
-   Unterhaltung bleibt der anderen Person erhalten, die ausgetretene Seite
-   erscheint als ehemaliges Mitglied. Solange das nicht entschieden ist, kann
-   4.1 nicht veröffentlicht werden.
+1. ~~**Nachrichten beim Löschen.**~~ **Entschieden und gebaut** am 17.09.2026
+   (`20260924120000_conversations_outlive_account.sql`): Der Verlauf bleibt der
+   verbliebenen Person, die ausgetretene Seite wird anonym, geschrieben wird
+   nicht mehr. Abschnitt 4.2 beschreibt jetzt gebautes Verhalten.
 
 2. **Rückholrecht.** § 42 UrhG erlaubt den Rückruf wegen gewandelter
    Überzeugung. Bei einem unwiderruflich anonymisierten Inhalt lässt sich das
@@ -168,3 +175,10 @@ dort gelten eigene Fragen (Ergebnisse, Weitergabe an Advisor, Forschung).
 
 4. **Beta-Phase.** Solange der Zugang über Codes läuft, sollte irgendwo stehen,
    dass der Dienst sich im Aufbau befindet und Funktionen sich ändern können.
+
+5. **Einzelne Nachrichten zurücknehmen.** Gibt es heute nicht. Dafür spricht,
+   dass deine eigenen Nachrichten auch deine Daten sind; dagegen, dass ein
+   Verlauf mit Lücken für die andere Person wertlos wird und sich Zusagen
+   nachträglich wegputzen ließen. Verbreitete Lösung: löschen für beide
+   sichtbar, mit einem Hinweis „Nachricht zurückgenommen". Solange es das nicht
+   gibt, muss 4.3 so stehen bleiben, wie es dasteht.

@@ -148,3 +148,82 @@ test("German and English messaging copy has exact parity and no read receipts", 
   assert.doesNotMatch(JSON.stringify(de.messages), /gelesen um|zugestellt|Häkchen/i);
   assert.doesNotMatch(JSON.stringify(en.messages), /read at|delivered|checkmark/i);
 });
+
+// ---------------------------------------------------------------------------
+// Eine Unterhaltung gehoert zwei Menschen
+// ---------------------------------------------------------------------------
+const OUTLIVES_CONVERSATIONS =
+  "../supabase/migrations/20260924120000_conversations_outlive_account.sql";
+
+test("a departing participant no longer deletes the other person's words", () => {
+  const migration = readFileSync(OUTLIVES_CONVERSATIONS, "utf8");
+  assert.match(migration, /participant_a_user_id\) references auth\.users\(id\) on delete set null/);
+  assert.match(migration, /participant_b_user_id\) references auth\.users\(id\) on delete set null/);
+  assert.match(migration, /sender_user_id\) references auth\.users\(id\) on delete set null/);
+
+  // Der Ursprung zeigt ebenfalls auf die Person und faellt mit ihr - ohne
+  // diese beiden Zeilen naehme er die Unterhaltung trotzdem mit.
+  assert.match(migration, /contact_request_id\) references public\.network_contact_requests\(id\) on delete set null/);
+  assert.match(migration, /problem_interest_id\) references public\.network_problem_interests\(id\) on delete set null/);
+});
+
+test("the remaining person can still read, but not write", () => {
+  const migration = readFileSync(OUTLIVES_CONVERSATIONS, "utf8");
+  // Lesen: Der Zugriff haengt nicht mehr allein am Ursprung.
+  assert.match(migration, /or conversation\.participant_a_user_id is null\s*\n\s*or conversation\.participant_b_user_id is null/);
+  // Schreiben: ausdruecklich abgelehnt, mit eigener Fehlermeldung.
+  assert.match(migration, /network_conversation_counterpart_gone/);
+});
+
+test("unread messages from a departed sender do not fall out of the count", () => {
+  const migration = readFileSync(OUTLIVES_CONVERSATIONS, "utf8");
+  // `sender_user_id <> v_user_id` ergibt gegen null NULL - die Nachricht waere
+  // still aus der Zahl gefallen und stuende fuer immer ungelesen da.
+  assert.doesNotMatch(migration, /message\.sender_user_id <> v_user_id/);
+  assert.match(migration, /message\.sender_user_id is distinct from v_user_id/);
+});
+
+test("the counterpart comes from the participants, not from the origin", () => {
+  const migration = readFileSync(OUTLIVES_CONVERSATIONS, "utf8");
+  // Die Umleitung ueber Anfrage und Interesse brach genau dann, wenn der
+  // Ursprung wegfiel - also im einzigen Fall, um den es hier geht.
+  assert.match(migration, /cross join lateral \(/);
+  assert.match(migration, /conversation\.participant_a_user_id is not distinct from v_user_id/);
+});
+
+test("the interface names the gap instead of leaving it blank", () => {
+  const page = readFileSync("src/app/(product)/connect/messages/[conversationId]/page.tsx", "utf8");
+  assert.match(page, /const counterpartGone = conversation\.counterpart_user_id === null/);
+  assert.match(page, /messages\.counterpartGoneTitle/);
+  // Kein Schreibfeld, wo niemand mehr liest.
+  const goneAt = page.indexOf("counterpartGone ?");
+  // Auf die Verwendung, nicht auf den Import ganz oben.
+  const composerAt = page.indexOf("<form action={sendConnectMessageAction}");
+  assert.ok(goneAt > -1 && goneAt < composerAt, "der Hinweis steht vor dem Formular");
+
+  const contacts = readFileSync("src/app/(product)/connect/contacts/page.tsx", "utf8");
+  assert.match(contacts, /counterpart_display_name \?\? t\("messages\.formerMember"\)/);
+
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as Record<string, Record<string, string>>;
+    for (const key of ["formerMember", "counterpartGoneTitle", "counterpartGoneText"]) {
+      assert.equal(typeof messages.messages[key], "string", `${locale}: messages.${key} fehlt`);
+    }
+  }
+});
+
+test("a departed person can no longer be blocked or reported", () => {
+  // Es gibt sie nicht mehr - ein Knopf dafuer waere eine Zusage, die ins
+  // Leere geht.
+  for (const file of [
+    "src/app/(product)/connect/messages/[conversationId]/page.tsx",
+    "src/app/(product)/connect/contacts/page.tsx",
+  ]) {
+    const source = readFileSync(file, "utf8");
+    assert.match(
+      source,
+      /conversation\.counterpart_user_id \? <ConnectSafetyActions/,
+      `${file}: die Sicherheitsaktionen haengen an einer vorhandenen Gegenseite`
+    );
+  }
+});

@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(38);
+select extensions.plan(39);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','da000000-0000-4000-8000-000000000001','authenticated','authenticated','safety-a@example.com','',now(),'{}','{}',now(),now()),
@@ -89,7 +89,11 @@ reset role;
 delete from auth.users where id='da000000-0000-4000-8000-000000000002';
 select extensions.is((select count(*)::int from public.network_blocks),0,'account deletion leaves no block orphan');
 select extensions.is((select count(*)::int from public.network_reports),0,'account deletion leaves no report orphan');
-select extensions.is((select count(*)::int from public.network_messages),0,'account deletion preserves messaging cascade without orphan');
+-- GEAENDERT am 17.09.2026: Nachrichten ueberdauern die Kontoloeschung jetzt
+-- anonym - sie gehoeren zur Haelfte der Person, die bleibt. Was verschwinden
+-- muss, ist die Verknuepfung, nicht der Text.
+select extensions.is((select count(*)::int from public.network_messages where sender_user_id='da000000-0000-4000-8000-000000000002'),0,'no message points at the deleted account any more');
+select extensions.ok((select count(*)::int from public.network_messages) > 0,'but the words written in that conversation remain');
 
 select * from extensions.finish();
 rollback;

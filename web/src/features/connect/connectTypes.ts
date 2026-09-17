@@ -73,14 +73,17 @@ export type ConnectContactRequest = {
 };
 
 export type ConnectConversation = {
-  conversation_id: string; contact_request_id: string; listing_id: string;
-  counterpart_user_id: string; counterpart_display_name: string;
-  listing_title: string; created_at: string; last_message_at: string | null;
+  conversation_id: string;
+  /** Leer, wenn der Ursprung mit der ausgetretenen Person weggefallen ist. */
+  contact_request_id: string | null; listing_id: string | null;
+  /** Leer: Diese Person hat ihr Konto geloescht. */
+  counterpart_user_id: string | null; counterpart_display_name: string | null;
+  listing_title: string | null; created_at: string; last_message_at: string | null;
   unread_count: number;
 };
 
 export type ConnectMessage = {
-  id: string; conversation_id: string; sender_user_id: string;
+  id: string; conversation_id: string; sender_user_id: string | null;
   body: string; created_at: string;
 };
 

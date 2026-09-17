@@ -27,12 +27,22 @@ export default async function ConnectConversationPage({
   const { client, user } = await requireConnectMember(`/connect/messages/${conversationId}`);
   const conversation = await getConnectConversation(client, conversationId);
   if (!conversation) notFound();
+  // Die Gegenseite kann gegangen sein. Dann gibt es kein Profil, keinen
+  // Blockzustand und keinen Namen - und das ist ein Zustand, kein Fehler.
+  const counterpartGone = conversation.counterpart_user_id === null;
   const [messages, profiles, blockState] = await Promise.all([
     getConnectMessages(client, conversationId),
-    getConnectProfilesByUserIds(client, [conversation.counterpart_user_id]),
-    getConnectBlockState(client, conversation.counterpart_user_id),
+    conversation.counterpart_user_id
+      ? getConnectProfilesByUserIds(client, [conversation.counterpart_user_id])
+      : Promise.resolve(new Map()),
+    conversation.counterpart_user_id
+      ? getConnectBlockState(client, conversation.counterpart_user_id)
+      : Promise.resolve({ blocked_by_current_user: false, interaction_blocked: false }),
   ]);
-  const counterpartProfile = profiles.get(conversation.counterpart_user_id);
+  const counterpartProfile = conversation.counterpart_user_id
+    ? profiles.get(conversation.counterpart_user_id)
+    : undefined;
+  const counterpartName = conversation.counterpart_display_name ?? t("messages.formerMember");
   const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 
   return <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
@@ -41,14 +51,14 @@ export default async function ConnectConversationPage({
       <Link href="/connect/contacts" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("messages.back")}</Link>
       <header className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("messages.eyebrow")}</p>
-        <div className="mt-3 flex items-center gap-4"><ConnectAvatar profile={counterpartProfile} displayName={conversation.counterpart_display_name} className="h-14 w-14 rounded-full object-cover" /><h1 className="text-2xl font-semibold text-slate-950">{conversation.counterpart_display_name}</h1></div>
-        <Link href={`/connect/listings/${conversation.listing_id}`} className="mt-2 inline-block text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{conversation.listing_title}</Link>
-        <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id} returnTo={`/connect/messages/${conversationId}`} blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={{
+        <div className="mt-3 flex items-center gap-4"><ConnectAvatar profile={counterpartProfile} displayName={counterpartName} className="h-14 w-14 rounded-full object-cover" /><h1 className="text-2xl font-semibold text-slate-950">{counterpartName}</h1></div>
+        {conversation.listing_id ? <Link href={`/connect/listings/${conversation.listing_id}`} className="mt-2 inline-block text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{conversation.listing_title}</Link> : null}
+        {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} returnTo={`/connect/messages/${conversationId}`} blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={{
           blockedState: t("safety.blockedState"), unblock: t("safety.unblock"), unblocking: t("safety.unblocking"), blockConfirm: t("safety.blockConfirm"),
           block: t("safety.block"), blocking: t("safety.blocking"), report: t("safety.report"), reportCategory: t("safety.reportCategory"), reportComment: t("safety.reportComment"),
           reportSubmit: t("safety.reportSubmit"), reporting: t("safety.reporting"), spam: t("safety.categories.spam"), harassment: t("safety.categories.harassment"),
           misleading: t("safety.categories.misleading"), other: t("safety.categories.other"),
-        }} />
+        }} /> : null}
       </header>
 
       <section aria-label={t("messages.historyLabel")} className="mt-5 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6">
@@ -57,7 +67,7 @@ export default async function ConnectConversationPage({
             const own = message.sender_user_id === user.id;
             return <li key={message.id} className={`flex ${own ? "justify-end" : "justify-start"}`}>
               <article className={`max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] ${own ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-900"}`}>
-                <p className={`text-xs font-semibold ${own ? "text-slate-300" : "text-slate-500"}`}>{own ? t("messages.you") : conversation.counterpart_display_name}</p>
+                <p className={`text-xs font-semibold ${own ? "text-slate-300" : "text-slate-500"}`}>{own ? t("messages.you") : counterpartName}</p>
                 <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{message.body}</p>
                 <time dateTime={message.created_at} className={`mt-2 block text-[11px] ${own ? "text-slate-400" : "text-slate-500"}`}>{dateTime.format(new Date(message.created_at))}</time>
               </article>
@@ -67,7 +77,10 @@ export default async function ConnectConversationPage({
       </section>
 
       {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
-      {blockState.interaction_blocked ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700">{t("safety.chatStopped")}</p> : <form action={sendConnectMessageAction} className="sticky bottom-3 mt-5 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
+      {counterpartGone ? <div className="mt-5 rounded-2xl bg-slate-100 p-4">
+        <p className="text-sm font-semibold text-slate-900">{t("messages.counterpartGoneTitle")}</p>
+        <p className="mt-1 text-sm leading-6 text-slate-700">{t("messages.counterpartGoneText")}</p>
+      </div> : blockState.interaction_blocked ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700">{t("safety.chatStopped")}</p> : <form action={sendConnectMessageAction} className="sticky bottom-3 mt-5 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
         <input type="hidden" name="conversation_id" value={conversationId} />
         <label htmlFor="network-message" className="text-sm font-semibold text-slate-900">{t("messages.composeLabel")}</label>
         <textarea id="network-message" name="body" required maxLength={2000} rows={3} className="mt-2 w-full resize-y rounded-2xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-4 focus:ring-slate-100" aria-describedby="network-message-hint" />

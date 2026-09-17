@@ -267,7 +267,10 @@
     "unreadCount": "{count} unread messages",
     "attentionCount": "{count} open requests or unread messages",
     "lastMessage": "Last message: {date}",
-    "noMessages": "No messages yet"
+    "noMessages": "No messages yet",
+    "formerMember": "Former member",
+    "counterpartGoneTitle": "This person deleted their account",
+    "counterpartGoneText": "Your history stays with you – you can read back what was written. Replying is no longer possible; there would be nobody to read it."
   },
   "my": {
     "title": "My connect listings",

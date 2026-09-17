@@ -36,12 +36,15 @@ function ContactCard({ request, direction, t, locale, profile, blockState }: { r
 }
 
 function AcceptedContactCard({ conversation, t, locale, profile, blockState }: { conversation: ConnectConversation; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState }) {
+  // Kein Name mehr heisst: Die Person ist gegangen. Kein geratener Name, kein
+  // leeres Feld - ein Zustand, der sich benennen laesst.
+  const counterpartName = conversation.counterpart_display_name ?? t("messages.formerMember");
   return <article className="rounded-2xl border border-slate-200 bg-white p-5">
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <ConnectAvatar profile={profile} displayName={conversation.counterpart_display_name} />
-          <h3 className="text-lg font-semibold text-slate-950">{conversation.counterpart_display_name}</h3>
+          <ConnectAvatar profile={profile} displayName={counterpartName} />
+          <h3 className="text-lg font-semibold text-slate-950">{counterpartName}</h3>
           {conversation.unread_count > 0 ? <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white" aria-label={t("messages.unreadCount", { count: conversation.unread_count })}>{Math.min(conversation.unread_count, 99)}</span> : null}
         </div>
         <p className="mt-2 text-sm font-semibold text-violet-800">{conversation.listing_title}</p>
@@ -49,7 +52,8 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState }: {
       </div>
       <Link href={`/connect/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
     </div>
-    <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} />
+    {/* Wer gegangen ist, laesst sich weder blockieren noch melden. */}
+    {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} /> : null}
   </article>;
 }
 
@@ -65,9 +69,10 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     ...requests.map((request) => request.sender_user_id === user.id ? request.recipient_user_id : request.sender_user_id),
     ...conversations.map((conversation) => conversation.counterpart_user_id),
   ])];
+  const knownCounterpartIds = counterpartIds.filter((id): id is string => id !== null);
   const [profiles, stateRows] = await Promise.all([
-    getConnectProfilesByUserIds(client, counterpartIds),
-    Promise.all(counterpartIds.map(async (id) => [id, await getConnectBlockState(client, id)] as const)),
+    getConnectProfilesByUserIds(client, knownCounterpartIds),
+    Promise.all(knownCounterpartIds.map(async (id) => [id, await getConnectBlockState(client, id)] as const)),
   ]);
   const states = new Map(stateRows);
   const stateFor = (id: string) => states.get(id) ?? { interaction_blocked: true, blocked_by_current_user: false };
@@ -81,7 +86,7 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
     <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
-    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={profiles.get(conversation.counterpart_user_id)} blockState={stateFor(conversation.counterpart_user_id)} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
+    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
     {blocks.length ? <section className="mt-10"><h2 className="text-xl font-semibold">{t("safety.blockedPeople")}</h2><div className="mt-3 space-y-2">{blocks.map((block) => <div key={block.blocked_user_id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-medium">{block.display_name}</p><form action={unblockConnectUserAction}><input type="hidden" name="other_user_id" value={block.blocked_user_id} /><input type="hidden" name="return_to" value="/connect/contacts" /><ConnectSubmitButton label={t("safety.unblock")} pendingLabel={t("safety.unblocking")} className="min-h-11 text-sm font-semibold underline" /></form></div>)}</div></section> : null}
   </main>;
 }

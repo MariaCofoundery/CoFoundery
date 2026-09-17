@@ -267,7 +267,10 @@
     "unreadCount": "{count} ungelesene Nachrichten",
     "attentionCount": "{count} offene Anfragen oder ungelesene Nachrichten",
     "lastMessage": "Letzte Nachricht: {date}",
-    "noMessages": "Noch keine Nachrichten"
+    "noMessages": "Noch keine Nachrichten",
+    "formerMember": "Ehemaliges Mitglied",
+    "counterpartGoneTitle": "Diese Person hat ihr Konto gelöscht",
+    "counterpartGoneText": "Der Verlauf bleibt dir erhalten – du kannst nachlesen, was geschrieben wurde. Antworten ist nicht mehr möglich, es gäbe niemanden, der sie liest."
   },
   "my": {
     "title": "Meine Connect-Einträge",

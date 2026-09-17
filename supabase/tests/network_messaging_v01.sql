@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(60);
+select extensions.plan(62);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','cd000000-0000-4000-8000-000000000001','authenticated','authenticated','message-founder-a@example.com','',now(),'{}','{}',now(),now()),
@@ -161,8 +161,15 @@ select extensions.throws_ok($$select public.get_unread_network_message_count()$$
 
 reset role;
 delete from auth.users where id='cd000000-0000-4000-8000-000000000002';
-select extensions.is((select count(*)::int from public.network_conversations),0,'participant account deletion removes shared conversations');
-select extensions.is((select count(*)::int from public.network_messages),0,'participant account deletion cascades all messages without orphans');
+-- GEAENDERT am 17.09.2026: Bis dahin nahm eine Kontoloeschung die ganze
+-- Unterhaltung mit - einschliesslich der Nachrichten der anderen Person. Das
+-- loeschte Worte, die ihr gehoeren, von jemandem, der nicht gefragt wurde.
+-- Jetzt bleibt der Verlauf der verbliebenen Seite erhalten, die ausgetretene
+-- wird anonym. Siehe 20260924120000_conversations_outlive_account.sql.
+select extensions.ok((select count(*)::int from public.network_conversations) > 0,'the remaining participant keeps the conversation');
+select extensions.ok((select count(*)::int from public.network_messages) > 0,'and the words that were written to them');
+select extensions.is((select count(*)::int from public.network_conversations where participant_a_user_id is null or participant_b_user_id is null),(select count(*)::int from public.network_conversations),'every shared conversation now has one empty side');
+select extensions.is((select count(*)::int from public.network_messages where sender_user_id='cd000000-0000-4000-8000-000000000002'),0,'no message points at the person who left');
 select extensions.is((select count(*)::int from public.network_contact_requests),0,'participant account deletion removes parent contact requests');
 select extensions.ok(not exists(select 1 from public.network_messages message left join public.network_conversations conversation on conversation.id=message.conversation_id where conversation.id is null),'no orphan message can remain');
 
