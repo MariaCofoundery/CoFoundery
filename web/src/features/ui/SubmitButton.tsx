@@ -23,6 +23,7 @@ export function SubmitButton({
   className,
   fieldName = "intent",
   formAction,
+  formNoValidate,
 }: {
   intent?: string;
   label: string;
@@ -35,6 +36,12 @@ export function SubmitButton({
    * sonst zeigten beide gleichzeitig "laeuft".
    */
   formAction?: (formData: FormData) => void | Promise<void>;
+  /**
+   * Fuer Knoepfe, die speichern und dann weggehen. Ein Entwurf darf
+   * unvollstaendig sein - die Pflichtfeldpruefung des Browsers wuerde einen
+   * solchen Knopf sonst blockieren, und die Person saesse fest.
+   */
+  formNoValidate?: boolean;
 }) {
   const { pending, data } = useFormStatus();
   const activeIntent = data?.get(fieldName);
@@ -45,6 +52,7 @@ export function SubmitButton({
       name={intent ? fieldName : undefined}
       value={intent}
       formAction={formAction}
+      formNoValidate={formNoValidate}
       disabled={pending}
       aria-disabled={pending}
       className={`${className} disabled:cursor-wait disabled:opacity-65`}

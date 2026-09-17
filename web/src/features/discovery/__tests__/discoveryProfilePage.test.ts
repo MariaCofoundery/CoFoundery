@@ -316,22 +316,85 @@ test("every option of the three selects explains itself", () => {
 // ---------------------------------------------------------------------------
 // Der Knopf, der nichts tat
 // ---------------------------------------------------------------------------
-test("the link to the private filters lands where the filters are", () => {
-  const page = source(PAGE);
+test("nothing points at the dead anchor any more", () => {
   // /discovery#search landete im Modus "Entdecken", wo es den Anker gar nicht
-  // gibt - der Knopf tat schlicht nichts.
-  assert.doesNotMatch(page, /href="\/discovery#search"/);
-  assert.match(page, /href="\/discovery\?mode=search#search"/);
+  // gibt. Auf der Profilseite ist der Knopf inzwischen ganz weg; anderswo muss
+  // der Modus mitgegeben werden, sonst faellt der Sprung wieder ins Leere.
+  for (const file of [PAGE, "src/app/(product)/discovery/searches/page.tsx"]) {
+    assert.doesNotMatch(source(file), /"\/discovery#search"/, `${file}`);
+  }
+  assert.match(
+    source("src/app/(product)/discovery/searches/page.tsx"),
+    /href="\/discovery\?mode=search#search"/,
+    "dort, wo der Weg gebraucht wird, traegt er den Modus"
+  );
 });
 
 test("people who are not ready yet get a way out, not a waiting room", () => {
   const page = source(PAGE);
-  assert.match(page, /href="\/connect\/problems"/);
+  // Kein Link mehr, sondern ein Knopf, der erst speichert - der Weg bleibt.
+  assert.match(page, /saveDraftAndLeave\.bind\(null, "\/connect\/problems"\)/);
   for (const locale of ["de", "en"]) {
     const messages = readJson(`messages/${locale}/discovery.json`);
     const intent = (messages.profile as Record<string, Record<string, string>>).intent;
     for (const key of ["connectBridgeTitle", "connectBridgeText", "connectBridgeCta"]) {
       assert.equal(typeof intent[key], "string", `${locale}: intent.${key} fehlt`);
     }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Kein Weg aus dem Formular, der Eingaben verwirft
+// ---------------------------------------------------------------------------
+test("no navigation link sits inside the unsaved form", () => {
+  const page = source(PAGE);
+  const start = page.indexOf("<form action={saveProfileDraft}");
+  const end = page.indexOf("</form>", start);
+  assert.ok(start > -1 && end > start);
+  const form = page.slice(start, end);
+
+  // Ein Link mitten im Formular verwirft alles, was noch nicht gespeichert
+  // ist - lautlos. Die Stelle im Dokument aendert daran nichts; nur
+  // "erst speichern, dann gehen" tut es.
+  assert.doesNotMatch(form, /<Link\s/, "Wege aus dem Formular speichern erst");
+});
+
+test("the two remaining ways out save the draft first", () => {
+  const page = codeOnly(PAGE);
+  assert.match(page, /async function saveDraftAndLeave\(target: string, formData: FormData\)/);
+  assert.match(page, /saveDraftAndLeave\.bind\(null, "\/profile\?next=\/discovery\/profile"\)/);
+  assert.match(page, /saveDraftAndLeave\.bind\(null, "\/connect\/problems"\)/);
+
+  // Ohne Pflichtfeldpruefung: Ein Entwurf darf unvollstaendig sein, sonst
+  // saesse jemand fest, der "Anderer Schwerpunkt" angekreuzt und den Text
+  // noch nicht geschrieben hat.
+  assert.equal((page.match(/formNoValidate/g) ?? []).length, 2);
+
+  // Und die Beschriftung sagt, was passiert - statt es zu verschweigen.
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const profile = messages.profile as Record<string, Record<string, string>>;
+    assert.match(profile.publicProfile.identityLink, /Speichern und|Save and/);
+    assert.match(profile.intent.connectBridgeCta, /Speichern und|Save and/);
+  }
+});
+
+test("saving a draft never un-publishes an active profile", () => {
+  // Der Weg "erst speichern, dann gehen" laeuft ueber die Entwurfsaktion -
+  // bei einem sichtbaren Profil darf das nicht heissen, es verschwindet.
+  const actions = codeOnly("src/features/discovery/discoveryActions.ts");
+  assert.match(actions, /const keepPublished = existing\?\.status === "active"/);
+  assert.match(actions, /status: keepPublished \? "active" : "draft"/);
+});
+
+test("the pointless button next to the seeking roles is gone", () => {
+  const page = source(PAGE);
+  assert.doesNotMatch(page, /editPrivateSearch/);
+  // Der erklaerende Satz bleibt - er war der nuetzliche Teil.
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const seeking = (messages.profile as Record<string, Record<string, string>>).seeking;
+    assert.equal(seeking.editPrivateSearch, undefined, `${locale}: Schluessel ist weg`);
+    assert.match(seeking.description, /privat|private/);
   }
 });

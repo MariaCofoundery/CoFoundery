@@ -441,6 +441,24 @@ export default async function DiscoveryProfilePage({
     redirect(buildDiscoveryProfileDraftRedirect(result));
   }
 
+  /**
+   * Speichern und weggehen.
+   *
+   * Ein Link mitten im Formular verwirft alles, was noch nicht gespeichert
+   * ist - lautlos. Drei solche Links standen hier. Statt sie zu verschieben
+   * (was nichts aendert: die Stelle im Dokument schuetzt keine Eingabe),
+   * speichern sie jetzt erst und gehen dann.
+   *
+   * Ohne Pflichtfeldpruefung: Ein Entwurf darf unvollstaendig sein, sonst
+   * saesse jemand fest, der "Anderer Schwerpunkt" angekreuzt und den Text
+   * noch nicht geschrieben hat.
+   */
+  async function saveDraftAndLeave(target: string, formData: FormData) {
+    "use server";
+    await saveDiscoveryProfileDraftAction(formData);
+    redirect(target);
+  }
+
   async function publishProfileFromForm(formData: FormData) {
     "use server";
     const result = await publishDiscoveryProfileFromFormAction(formData);
@@ -566,9 +584,14 @@ export default async function DiscoveryProfilePage({
                     <p className="mt-3 text-sm text-amber-900">{t("profile.publicProfile.identityMissing")}</p>
                   )}
                   <p className={`${HELP_CLASS} mt-4`}>{t("profile.publicProfile.identityText")}</p>
-                  <Link href="/profile?next=/discovery/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
-                    {t("profile.publicProfile.identityLink")}
-                  </Link>
+                  <SubmitButton
+                    formAction={saveDraftAndLeave.bind(null, "/profile?next=/discovery/profile")}
+                    formNoValidate
+                    intent="identity"
+                    label={t("profile.publicProfile.identityLink")}
+                    pendingLabel={t("profile.publicProfile.identityLinkPending")}
+                    className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
+                  />
                 </div>
               </div>
 
@@ -710,12 +733,14 @@ export default async function DiscoveryProfilePage({
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {t("profile.intent.connectBridgeText")}
                   </p>
-                  <Link
-                    href="/connect/problems"
+                  <SubmitButton
+                    formAction={saveDraftAndLeave.bind(null, "/connect/problems")}
+                    formNoValidate
+                    intent="connect"
+                    label={t("profile.intent.connectBridgeCta")}
+                    pendingLabel={t("profile.publicProfile.identityLinkPending")}
                     className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
-                  >
-                    {t("profile.intent.connectBridgeCta")} →
-                  </Link>
+                  />
                 </div>
 
                 {!profile.searchIntent || !profile.startHorizon ? (
@@ -751,9 +776,6 @@ export default async function DiscoveryProfilePage({
                     }}
                   />
                 </div>
-                <Link href="/discovery?mode=search#search" className={`${SECONDARY_BUTTON_CLASS} mt-5`}>
-                  {t("profile.seeking.editPrivateSearch")}
-                </Link>
               </div>
 
               <PublishIssuesCard issues={publishIssues} t={t} />

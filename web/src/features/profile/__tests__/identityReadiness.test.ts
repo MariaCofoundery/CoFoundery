@@ -128,9 +128,12 @@ test("both context pages hand over the return path", () => {
     source("src/app/(product)/connect/profile/page.tsx"),
     /href="\/profile\?next=\/connect\/profile"/
   );
+  // In Discovery steht das Ziel in einer gebundenen Aktion statt in einem
+  // href: Der Weg dorthin speichert erst den Entwurf, weil ein Link mitten im
+  // Formular alles Ungespeicherte verworfen hat.
   assert.match(
     source("src/app/(product)/discovery/profile/page.tsx"),
-    /href="\/profile\?next=\/discovery\/profile"/
+    /"\/profile\?next=\/discovery\/profile"/
   );
 });
 

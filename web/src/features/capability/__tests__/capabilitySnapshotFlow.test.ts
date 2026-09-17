@@ -310,7 +310,9 @@ test("the Discovery profile page no longer maintains identity either", () => {
   for (const kept of ["ownRoles", "seekingRoles", "availabilityHoursPerWeek", "commitmentLevel", "ventureStage", "ventureGoal", "searchIntent", "startHorizon"]) {
     assert.match(page, new RegExp(`name="${kept}"`), `${kept} gehoert hierher und fehlt`);
   }
-  assert.match(page, /href="\/profile\?next=\/discovery\/profile"/);
+  // Der Rueckweg wird uebergeben - seit die Wege aus dem Formular erst
+  // speichern, steht das Ziel in der gebundenen Aktion statt in einem href.
+  assert.match(page, /"\/profile\?next=\/discovery\/profile"/);
 
   // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
   assert.match(actions, /parseDiscoveryProfileFormData\(\s*formData: FormData,\s*identity: PersonCore \| null/);

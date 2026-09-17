@@ -448,7 +448,7 @@
       "saveAlignment": "Alignment-Präferenzen speichern",
       "connectBridgeTitle": "Noch nicht soweit? Das ist ein eigener Weg, keine Warteschleife.",
       "connectBridgeText": "Im Connect-Bereich schildern Menschen Probleme aus ihrem Umfeld – manche suchen dafür Mitgründer, andere nur jemanden, der zuhört. Ein guter Ort, wenn du gründen willst, aber noch nicht weißt, woran.",
-      "connectBridgeCta": "Probleme ansehen"
+      "connectBridgeCta": "Speichern und Probleme ansehen"
     },
     "messages": {
       "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
@@ -499,7 +499,7 @@
       "availabilityV2": "Wie viele Stunden pro Woche kannst du aktuell realistisch einbringen?",
       "identityTitle": "Das kommt aus deinem Profil",
       "identityText": "Name, Headline, Über dich, Region, Expertise, Branchen und Arbeitsweise pflegst du an einem Ort. Änderungen dort erscheinen hier sofort.",
-      "identityLink": "Im Profil bearbeiten",
+      "identityLink": "Speichern und Profil bearbeiten",
       "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Suchprofil nicht veröffentlichen.",
       "identityExpertise": "Expertise",
       "identityIndustries": "Branchen",
@@ -514,7 +514,8 @@
       "ownRoleOtherHint": "Ohne diese Angabe steht in deinem Profil nur „Anderer Schwerpunkt“ – das sagt der anderen Seite nichts.",
       "seekingRoleOtherLabel": "Welchen Schwerpunkt suchst du?",
       "seekingRoleOtherPlaceholder": "z. B. Zulassung im Medizinbereich",
-      "seekingRoleOtherHint": "Ohne diese Angabe weiß niemand, wonach du suchst."
+      "seekingRoleOtherHint": "Ohne diese Angabe weiß niemand, wonach du suchst.",
+      "identityLinkPending": "Wird gespeichert …"
     },
     "brings": {
       "title": "Was du mitbringst",
@@ -522,8 +523,7 @@
     },
     "seeking": {
       "title": "Wen du suchst",
-      "description": "Diese Rollen stehen in deinem sichtbaren Profil. Deine Filter für die Ergebnisliste sind etwas anderes und bleiben privat.",
-      "editPrivateSearch": "Zu deinen privaten Suchfiltern"
+      "description": "Diese Rollen stehen in deinem sichtbaren Profil. Deine Filter für die Ergebnisliste sind etwas anderes und bleiben privat."
     },
     "venture": {
       "eyebrow": "Deine Gründungsrichtung",
