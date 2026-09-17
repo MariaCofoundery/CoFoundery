@@ -226,7 +226,9 @@ const ROLE_FIELD = "src/features/discovery/DiscoveryRoleField.tsx";
 
 test("choosing 'other' asks which one", () => {
   const field = codeOnly(ROLE_FIELD);
-  assert.match(field, /const otherChosen = selected\.includes\("other"\)/);
+  // Die Bedingung steht in der Karte: Das Feld klappt genau dort auf, wo
+  // angekreuzt wurde - nicht darunter im Freien.
+  assert.match(field, /const expands = option\.value === "other" && checked/);
   // Pflicht, nicht optional: Ein Profil, in dem nur "Anderer Schwerpunkt"
   // steht, sagt der suchenden Person weniger als gar nichts.
   assert.match(field, /name=\{otherName\}\s*\n\s*required/);
@@ -291,11 +293,23 @@ test("the availability field says hours per week", () => {
   }
 });
 
-test("every option of the three selects explains itself", () => {
+test("every option of the three choices explains itself", () => {
   const page = codeOnly(PAGE);
-  assert.match(page, /optionHint=\{\(option\) => t\(`commitmentLevelHints\./);
-  assert.match(page, /optionHint=\{\(option\) => t\(`ventureStageHints\./);
-  assert.match(page, /optionHint=\{\(option\) => t\(`ventureGoalHints\./);
+  // Die Erklaerung haengt an der Option, nicht als fester Absatz unter dem
+  // Feld: Drei solche Bloecke uebereinander schuetteten die Seite zu.
+  for (const group of ["commitmentLevelHints", "ventureStageHints", "ventureGoalHints"]) {
+    assert.match(page, new RegExp(`hint: t\\(\`${group}\\.`));
+  }
+
+  const field = codeOnly("src/features/discovery/DiscoveryChoiceField.tsx");
+  assert.match(field, /role="tooltip"/);
+  // Absolut und ohne Zeigerereignisse: verschiebt nichts, faengt keinen Klick.
+  assert.match(field, /pointer-events-none invisible absolute/);
+  // Sichtbar beim Zeigen UND beim Fokus - auf dem Telefon gibt es kein Zeigen.
+  assert.match(field, /group-hover:visible/);
+  assert.match(field, /peer-focus-visible:visible/);
+  // Und fuer eine Vorlesesoftware ohnehin verbunden.
+  assert.match(field, /aria-describedby=\{`\$\{id\}-hint`\}/);
 
   // Jede Option braucht ihren Satz - eine fehlende Erklaerung zeigt sonst
   // stumm den Schluesselpfad an.
@@ -424,4 +438,40 @@ test("the prepared strings cover every possible count", () => {
   // Von null bis zur Obergrenze, sonst stuende beim letzten Ankreuzen nichts
   // da - der Index ist die Anzahl.
   assert.match(page, /Array\.from\(\{ length: max \+ 1 \}/);
+});
+
+test("the free text opens inside the card it belongs to", () => {
+  const field = source(ROLE_FIELD);
+  // Die Karte ist ein div, nicht das label: Sonst schaltete ein Klick in das
+  // Textfeld das Ankreuzfeld um, weil das label der Rolle gilt.
+  const cardStart = field.indexOf("const expands =");
+  const inputAt = field.indexOf("name={otherName}");
+  assert.ok(cardStart > -1 && inputAt > cardStart, "das Feld liegt in der Karte");
+
+  // Und es bekommt den Fokus, damit man nicht sucht, wo man tippen soll.
+  assert.match(field, /name=\{otherName\}\s*\n\s*required\s*\n\s*autoFocus/);
+  // Ueber die volle Breite, sonst quetscht sich der Satz in ein Drittel.
+  assert.match(field, /expands \? "sm:col-span-2 lg:col-span-3" : ""/);
+});
+
+test("the three choices stack instead of sitting in three columns", () => {
+  const page = codeOnly(PAGE);
+  // Die Antworten sind Saetze, keine Stichwoerter - nebeneinander brachen sie
+  // um und die Spalten wurden ungleich hoch.
+  assert.doesNotMatch(page, /grid gap-5 md:grid-cols-3/);
+  assert.match(page, /<legend className=\{LABEL_CLASS\}>\{t\("profile\.venture\.commitment"\)\}/);
+});
+
+test("the three permanent hint paragraphs are gone", () => {
+  const page = codeOnly(PAGE);
+  for (const key of ["commitmentHelp", "stageHelp", "goalHelp"]) {
+    assert.doesNotMatch(page, new RegExp(`venture\\.${key}`), `${key} steht nicht mehr fest da`);
+  }
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const venture = (messages.profile as Record<string, Record<string, string>>).venture;
+    for (const key of ["commitmentHelp", "stageHelp", "goalHelp"]) {
+      assert.equal(venture[key], undefined, `${locale}: ${key} ist auch aus der Copy weg`);
+    }
+  }
 });

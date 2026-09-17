@@ -26,6 +26,7 @@ import {
   getOwnDiscoveryV2AlignmentTendencies,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
+import { DiscoveryChoiceField } from "@/features/discovery/DiscoveryChoiceField";
 import { DiscoveryRoleField } from "@/features/discovery/DiscoveryRoleField";
 import { DISCOVERY_PROFILE_PUBLISH_ISSUES } from "@/features/discovery/discoveryProfileFeedback";
 import {
@@ -353,49 +354,6 @@ function PublishIssuesCard({
   );
 }
 
-/**
- * Ein Auswahlfeld, das sagt, was die Antworten bedeuten.
- *
- * "Nebenprojekt" oder "Ich validiere eine Idee" klingen eindeutig und sind es
- * nicht - jede Person legt etwas anderes hinein. Der Hinweis unter dem Feld
- * zeigt zur gewaehlten Option, was hier damit gemeint ist; ohne JavaScript
- * steht dort die Erklaerung zum gespeicherten Wert.
- */
-function ExplainedSelect({
-  name,
-  label,
-  help,
-  value,
-  options,
-  optionLabel,
-  optionHint,
-}: {
-  name: string;
-  label: string;
-  help: string;
-  value: string;
-  options: readonly string[];
-  optionLabel: (option: string) => string;
-  optionHint: (option: string) => string;
-}) {
-  return (
-    <label>
-      <span className={LABEL_CLASS}>{label}</span>
-      <select name={name} defaultValue={value} className={FIELD_CLASS}>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {optionLabel(option)}
-          </option>
-        ))}
-      </select>
-      <span className="mt-2 block rounded-2xl bg-white px-3 py-2 text-xs leading-5 text-slate-600">
-        {optionHint(value)}
-      </span>
-      <span className={HELP_CLASS}>{help}</span>
-    </label>
-  );
-}
-
 export default async function DiscoveryProfilePage({
   searchParams,
 }: {
@@ -672,34 +630,46 @@ export default async function DiscoveryProfilePage({
                   </p>
                 </div>
 
-                <div className="mt-5 grid gap-5 md:grid-cols-3">
-                  <ExplainedSelect
-                    name="commitmentLevel"
-                    label={t("profile.venture.commitment")}
-                    help={t("profile.venture.commitmentHelp")}
-                    value={profile.commitmentLevel ?? "exploring"}
-                    options={DISCOVERY_COMMITMENT_OPTIONS.map((option) => option.value)}
-                    optionLabel={(option) => t(`commitmentLevels.${option}`)}
-                    optionHint={(option) => t(`commitmentLevelHints.${option}`)}
-                  />
-                  <ExplainedSelect
-                    name="ventureStage"
-                    label={t("profile.venture.stage")}
-                    help={t("profile.venture.stageHelp")}
-                    value={profile.ventureStage ?? "undecided"}
-                    options={DISCOVERY_VENTURE_STAGE_OPTIONS.map((option) => option.value)}
-                    optionLabel={(option) => t(`ventureStages.${option}`)}
-                    optionHint={(option) => t(`ventureStageHints.${option}`)}
-                  />
-                  <ExplainedSelect
-                    name="ventureGoal"
-                    label={t("profile.venture.goal")}
-                    help={t("profile.venture.goalHelp")}
-                    value={profile.ventureGoal ?? "undecided"}
-                    options={DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => option.value)}
-                    optionLabel={(option) => t(`ventureGoals.${option}`)}
-                    optionHint={(option) => t(`ventureGoalHints.${option}`)}
-                  />
+                {/* Untereinander statt in drei Spalten: Die Antworten sind
+                    Saetze, keine Stichwoerter - nebeneinander brachen sie auf
+                    zwei Zeilen und die Spalten wurden ungleich hoch. */}
+                <div className="mt-5 grid gap-6">
+                  <fieldset>
+                    <legend className={LABEL_CLASS}>{t("profile.venture.commitment")}</legend>
+                    <DiscoveryChoiceField
+                      name="commitmentLevel"
+                      value={profile.commitmentLevel ?? "exploring"}
+                      options={DISCOVERY_COMMITMENT_OPTIONS.map((option) => ({
+                        value: option.value,
+                        label: t(`commitmentLevels.${option.value}`),
+                        hint: t(`commitmentLevelHints.${option.value}`),
+                      }))}
+                    />
+                  </fieldset>
+                  <fieldset>
+                    <legend className={LABEL_CLASS}>{t("profile.venture.stage")}</legend>
+                    <DiscoveryChoiceField
+                      name="ventureStage"
+                      value={profile.ventureStage ?? "undecided"}
+                      options={DISCOVERY_VENTURE_STAGE_OPTIONS.map((option) => ({
+                        value: option.value,
+                        label: t(`ventureStages.${option.value}`),
+                        hint: t(`ventureStageHints.${option.value}`),
+                      }))}
+                    />
+                  </fieldset>
+                  <fieldset>
+                    <legend className={LABEL_CLASS}>{t("profile.venture.goal")}</legend>
+                    <DiscoveryChoiceField
+                      name="ventureGoal"
+                      value={profile.ventureGoal ?? "undecided"}
+                      options={DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => ({
+                        value: option.value,
+                        label: t(`ventureGoals.${option.value}`),
+                        hint: t(`ventureGoalHints.${option.value}`),
+                      }))}
+                    />
+                  </fieldset>
                 </div>
                 <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2">
                   <label>

@@ -511,10 +511,10 @@
       "roleLimitReached": "Mehr geht nicht – nimm erst eine weg.",
       "ownRoleOtherLabel": "Welcher Schwerpunkt ist das?",
       "ownRoleOtherPlaceholder": "z. B. Regulatorik, Einkauf, Fördermittel",
-      "ownRoleOtherHint": "Ohne diese Angabe steht in deinem Profil nur „Anderer Schwerpunkt“ – das sagt der anderen Seite nichts.",
+      "ownRoleOtherHint": "Sonst steht in deinem Profil nur „Anderer Schwerpunkt“ – das sagt nichts.",
       "seekingRoleOtherLabel": "Welchen Schwerpunkt suchst du?",
       "seekingRoleOtherPlaceholder": "z. B. Zulassung im Medizinbereich",
-      "seekingRoleOtherHint": "Ohne diese Angabe weiß niemand, wonach du suchst.",
+      "seekingRoleOtherHint": "Sonst weiß niemand, wonach du suchst.",
       "identityLinkPending": "Wird gespeichert …"
     },
     "brings": {
@@ -528,13 +528,10 @@
     "venture": {
       "eyebrow": "Deine Gründungsrichtung",
       "title": "Wie du gründen willst",
-      "description": "Drei Angaben, an denen andere sehen, ob Tempo, Anspruch und Zeitpunkt zusammenpassen. Es gibt keine bessere oder schlechtere Antwort.",
+      "description": "Drei Angaben, an denen andere sehen, ob Tempo, Anspruch und Zeitpunkt passen. Es geht nicht darum, wie ernst du es meinst, sondern was aktuell realistisch ist. Fahr über eine Antwort, dann steht da, was sie bedeutet.",
       "commitment": "Wie viel Platz hat Gründen gerade in deinem Leben?",
       "stage": "Wie weit ist deine Idee?",
-      "goal": "Was soll daraus werden?",
-      "commitmentHelp": "Nicht wie ernst du es meinst – sondern was davon aktuell realistisch ist.",
-      "stageHelp": "Ohne eigene Idee zu suchen ist völlig in Ordnung und für viele der Einstieg.",
-      "goalHelp": "Hier gehen Vorstellungen am häufigsten auseinander – lieber früh als nach einem Jahr."
+      "goal": "Was soll daraus werden?"
     },
     "actions": {
       "saveDraft": "Entwurf speichern",
@@ -829,25 +826,25 @@
     }
   },
   "commitmentLevelHints": {
-    "exploring": "Ich schaue mich um. Noch nichts entschieden, noch kein fester Zeitanteil.",
-    "side_project": "Abends und am Wochenende. Der Hauptjob bleibt erst mal.",
-    "part_time": "Fester Anteil meiner Woche, verbindlich eingeplant – parallel zu etwas anderem.",
+    "exploring": "Ich schaue mich erst mal um. Wie viel Zeit ich habe, weiß ich noch nicht.",
+    "side_project": "Ab und zu ein Abend oder ein Wochenende – ein, zwei Mal im Monat.",
+    "part_time": "Vielleicht 10 bis 15 Stunden pro Woche, aber die nehme ich mir wirklich.",
     "full_time": "Meine Arbeitszeit geht hier rein. Kein zweiter Job daneben.",
-    "all_in": "Vollzeit und finanziell darauf eingestellt, dass es eine Weile nichts einbringt."
+    "all_in": "Vollzeit, und ich kann es aushalten, dass erst mal kein Geld reinkommt."
   },
   "ventureStageHints": {
-    "undecided": "Dazu kann ich noch nichts sagen.",
-    "no_idea_open_to_join": "Ich habe keine eigene Idee und würde bei einer guten einsteigen.",
-    "exploring_ideas": "Ich sammle und verwerfe Ideen, noch ist keine gesetzt.",
-    "idea_validating": "Eine Idee steht, und ich prüfe mit echten Menschen, ob sie trägt.",
-    "already_building": "Es gibt schon etwas – Prototyp, erste Kundschaft oder mehr."
+    "undecided": "Kann ich noch nicht sagen.",
+    "no_idea_open_to_join": "Keine eigene Idee – ich würde bei einer guten mitmachen.",
+    "exploring_ideas": "Ich sammle Ideen und verwerfe wieder. Keine ist gesetzt.",
+    "idea_validating": "Eine Idee steht. Ich frage gerade Leute, ob sie das Problem kennen.",
+    "already_building": "Es gibt schon was – Prototyp, erste Kundschaft oder mehr."
   },
   "ventureGoalHints": {
-    "undecided": "Dazu kann ich noch nichts sagen.",
-    "explore": "Wohin es geht, würde ich gemeinsam entscheiden.",
-    "side_project": "Etwas Kleines, das neben anderem läuft und laufen bleiben darf.",
-    "profitable_business": "Ein Unternehmen, das sich selbst trägt – Wachstum ja, um jeden Preis nein.",
-    "venture_scale": "Schnelles Wachstum, Kapital von außen, große Ambition.",
-    "exit_oriented": "Aufbauen mit dem Ziel, irgendwann zu verkaufen."
+    "undecided": "Kann ich noch nicht sagen.",
+    "explore": "Das würde ich gemeinsam entscheiden.",
+    "side_project": "Etwas Kleines, das nebenbei läuft – und laufen bleiben darf.",
+    "profitable_business": "Soll sich selbst tragen. Wachstum ja, um jeden Preis nein.",
+    "venture_scale": "Schnell wachsen, Kapital von außen, große Ambition.",
+    "exit_oriented": "Aufbauen, um irgendwann zu verkaufen."
   }
 }

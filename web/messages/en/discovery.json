@@ -511,10 +511,10 @@
       "roleLimitReached": "That is the maximum – remove one first.",
       "ownRoleOtherLabel": "Which focus is that?",
       "ownRoleOtherPlaceholder": "e.g. regulatory affairs, procurement, public funding",
-      "ownRoleOtherHint": "Without this, your profile only says “Other focus” – which tells the other side nothing.",
+      "ownRoleOtherHint": "Otherwise your profile only says “Other focus” – which says nothing.",
       "seekingRoleOtherLabel": "Which focus are you looking for?",
       "seekingRoleOtherPlaceholder": "e.g. medical device approval",
-      "seekingRoleOtherHint": "Without this, nobody knows what you are looking for.",
+      "seekingRoleOtherHint": "Otherwise nobody knows what you are looking for.",
       "identityLinkPending": "Saving …"
     },
     "brings": {
@@ -528,13 +528,10 @@
     "venture": {
       "eyebrow": "Your founding direction",
       "title": "How you want to found",
-      "description": "Three entries that let others see whether pace, ambition and timing fit together. There is no better or worse answer.",
+      "description": "Three entries that let others see whether pace, ambition and timing fit. This is not about how seriously you mean it, but about what is realistic right now. Hover over an answer to see what it means.",
       "commitment": "How much room does founding have in your life right now?",
       "stage": "How far along is your idea?",
-      "goal": "What should come of it?",
-      "commitmentHelp": "Not how seriously you mean it – but what is realistic at the moment.",
-      "stageHelp": "Searching without an idea of your own is entirely fine, and for many it is the way in.",
-      "goalHelp": "This is where expectations diverge most often – better early than after a year."
+      "goal": "What should come of it?"
     },
     "actions": {
       "saveDraft": "Save draft",
@@ -829,25 +826,25 @@
     }
   },
   "commitmentLevelHints": {
-    "exploring": "I am looking around. Nothing decided, no fixed share of time yet.",
-    "side_project": "Evenings and weekends. The main job stays for now.",
-    "part_time": "A fixed share of my week, firmly planned – alongside something else.",
+    "exploring": "I am just looking around. How much time I have, I do not know yet.",
+    "side_project": "An evening or a weekend now and then – once or twice a month.",
+    "part_time": "Maybe 10 to 15 hours a week, but those I really do take.",
     "full_time": "My working hours go into this. No second job beside it.",
-    "all_in": "Full time, and financially prepared for it to earn nothing for a while."
+    "all_in": "Full time, and I can cope with no money coming in at first."
   },
   "ventureStageHints": {
     "undecided": "I cannot say yet.",
-    "no_idea_open_to_join": "I have no idea of my own and would join a good one.",
-    "exploring_ideas": "I collect and discard ideas, none is settled yet.",
-    "idea_validating": "One idea stands, and I am checking with real people whether it holds.",
-    "already_building": "Something already exists – a prototype, first customers or more."
+    "no_idea_open_to_join": "No idea of my own – I would join a good one.",
+    "exploring_ideas": "I collect ideas and drop them again. None is settled.",
+    "idea_validating": "One idea stands. I am asking people whether they know the problem.",
+    "already_building": "Something exists already – prototype, first customers or more."
   },
   "ventureGoalHints": {
     "undecided": "I cannot say yet.",
-    "explore": "Where it goes I would decide together.",
-    "side_project": "Something small that runs alongside other things and may stay that way.",
-    "profitable_business": "A company that carries itself – growth yes, at any cost no.",
-    "venture_scale": "Fast growth, outside capital, big ambition.",
-    "exit_oriented": "Building it with the aim of selling one day."
+    "explore": "That I would decide together.",
+    "side_project": "Something small that runs alongside – and may stay that way.",
+    "profitable_business": "Should carry itself. Growth yes, at any cost no.",
+    "venture_scale": "Grow fast, outside capital, big ambition.",
+    "exit_oriented": "Build it to sell one day."
   }
 }
