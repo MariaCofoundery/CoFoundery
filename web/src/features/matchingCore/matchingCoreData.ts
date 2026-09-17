@@ -108,6 +108,8 @@ type MatchingCoreProfileRow = {
   bio: string;
   own_roles: string[];
   seeking_roles: string[];
+  own_role_other: string | null;
+  seeking_role_other: string | null;
   expertise: string[];
   industries: string[];
   location_region: string | null;
@@ -199,6 +201,8 @@ function mapProfile(row: MatchingCoreProfileRow): DiscoveryProfilePreview {
     bio: row.bio,
     ownRoles: row.own_roles as DiscoveryProfilePreview["ownRoles"],
     seekingRoles: row.seeking_roles as DiscoveryProfilePreview["seekingRoles"],
+    ownRoleOther: row.own_role_other,
+    seekingRoleOther: row.seeking_role_other,
     expertise: row.expertise ?? [],
     industries: row.industries,
     locationRegion: row.location_region,
@@ -288,6 +292,10 @@ async function loadActiveProfilesByUserId(userIds: string[], client: SupabaseLik
         "bio",
         "own_roles",
         "seeking_roles",
+        "own_role_other",
+        "seeking_role_other",
+  "own_role_other",
+  "seeking_role_other",
         "expertise",
         "industries",
         "location_region",

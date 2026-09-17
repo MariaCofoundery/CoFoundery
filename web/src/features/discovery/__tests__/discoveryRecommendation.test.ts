@@ -34,6 +34,8 @@ function createProfile(
     bio: overrides.bio ?? "Kurzer Profiltext.",
     ownRoles: overrides.ownRoles ?? ["product"],
     seekingRoles: overrides.seekingRoles ?? ["tech"],
+    ownRoleOther: null,
+    seekingRoleOther: null,
     expertise: overrides.expertise ?? ["Product discovery"],
     industries: overrides.industries ?? ["SaaS"],
     locationRegion: overrides.locationRegion ?? "Berlin",

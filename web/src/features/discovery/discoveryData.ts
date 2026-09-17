@@ -46,6 +46,8 @@ type DiscoveryV2SearchRow = {
   headline: string;
   own_roles: DiscoveryFounderRole[];
   seeking_roles: DiscoveryFounderRole[];
+  own_role_other: string | null;
+  seeking_role_other: string | null;
   expertise: string[];
   location_region: string | null;
   remote_mode: DiscoveryRemoteMode;
@@ -104,6 +106,8 @@ type FounderDiscoveryProfileRow = {
   bio: string;
   own_roles: string[];
   seeking_roles: string[];
+  own_role_other: string | null;
+  seeking_role_other: string | null;
   expertise: string[];
   industries: string[];
   location_region: string | null;
@@ -143,6 +147,8 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "bio",
   "own_roles",
   "seeking_roles",
+  "own_role_other",
+  "seeking_role_other",
   "expertise",
   "industries",
   "location_region",
@@ -214,6 +220,8 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     bio: row.bio,
     ownRoles: row.own_roles as DiscoveryFounderRole[],
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
+    ownRoleOther: row.own_role_other,
+    seekingRoleOther: row.seeking_role_other,
     expertise: row.expertise ?? [],
     industries: row.industries,
     locationRegion: row.location_region,
@@ -258,6 +266,8 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     headline: profile.headline,
     bio: profile.bio,
     ownRoles: profile.ownRoles,
+    ownRoleOther: profile.ownRoleOther,
+    seekingRoleOther: profile.seekingRoleOther,
     seekingRoles: profile.seekingRoles,
     expertise: profile.expertise,
     industries: profile.industries,
@@ -338,6 +348,8 @@ export async function upsertOwnDiscoveryProfile(
         headline: normalized.headline,
         bio: normalized.bio,
         own_roles: normalized.ownRoles,
+        own_role_other: normalized.ownRoleOther,
+        seeking_role_other: normalized.seekingRoleOther,
         seeking_roles: normalized.seekingRoles,
         expertise: normalized.expertise,
         industries: normalized.industries,
@@ -605,6 +617,8 @@ export async function getDiscoveryCandidatesForCurrentUser(
     headline: row.headline,
     bio: "",
     ownRoles: row.own_roles,
+    ownRoleOther: row.own_role_other,
+    seekingRoleOther: row.seeking_role_other,
     seekingRoles: row.seeking_roles,
     expertise: row.expertise ?? [],
     industries: [],
@@ -681,6 +695,8 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         bio: "",
         ownRoles: row.own_roles,
         seekingRoles: row.seeking_roles,
+        ownRoleOther: row.own_role_other,
+        seekingRoleOther: row.seeking_role_other,
         expertise: row.expertise ?? [],
         industries: [],
         locationRegion: row.location_region,

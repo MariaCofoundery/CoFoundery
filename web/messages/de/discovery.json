@@ -440,12 +440,15 @@
     },
     "intent": {
       "searchIntent": "Wie aktiv suchst du gerade?",
-      "searchIntentHelp": "Diese Angabe beschreibt deinen aktuellen Suchmodus und ist keine Bewertung deiner Ernsthaftigkeit.",
+      "searchIntentHelp": "Das beschreibt deinen Suchmodus, nicht wie ernst es dir ist.",
       "startHorizon": "Wann möchtest du ungefähr starten?",
       "startHorizonHelp": "Eine grobe Orientierung, keine verbindliche Zusage.",
       "notProvided": "Noch nicht angegeben",
       "missingHint": "Ergänze Suchmodus und Startzeitraum, damit andere deine aktuelle Situation besser einordnen können. Dein bestehendes Profil bleibt auch ohne diese Angaben sichtbar.",
-      "saveAlignment": "Alignment-Präferenzen speichern"
+      "saveAlignment": "Alignment-Präferenzen speichern",
+      "connectBridgeTitle": "Noch nicht soweit? Das ist ein eigener Weg, keine Warteschleife.",
+      "connectBridgeText": "Im Connect-Bereich schildern Menschen Probleme aus ihrem Umfeld – manche suchen dafür Mitgründer, andere nur jemanden, der zuhört. Ein guter Ort, wenn du gründen willst, aber noch nicht weißt, woran.",
+      "connectBridgeCta": "Probleme ansehen"
     },
     "messages": {
       "fallbackError": "Aktion konnte gerade nicht abgeschlossen werden.",
@@ -474,11 +477,11 @@
       "locationRegion": "Stadt / Region",
       "locationRegionPlaceholder": "z. B. Berlin",
       "locationRegionHelp": "Nur eine grobe Angabe – keine Adresse.",
-      "ownRoles": "Eigene Rollen",
-      "ownRolesHelp": "Was bringst du selbst am stärksten ein? Maximal {count} Rollen.",
+      "ownRoles": "Was bringst du selbst ein?",
+      "ownRolesHelp": "Wähle bis zu {count} – die, in denen du wirklich stark bist, nicht alles, was du kannst.",
       "ownRolesLimit": "Du hast die maximale Anzahl eigener Rollen erreicht.",
-      "seekingRoles": "Gesuchte Rollen",
-      "seekingRolesHelp": "Welche Ergänzung suchst du bei einem Co-Founder? Maximal {count} Rollen.",
+      "seekingRoles": "Was soll die andere Person einbringen?",
+      "seekingRolesHelp": "Wähle bis zu {count}. Am häufigsten ist das die Ergänzung zu deinen eigenen Rollen.",
       "seekingRolesLimit": "Du hast die maximale Anzahl gesuchter Rollen erreicht.",
       "expertise": "Welche Expertise bringst du mit?",
       "expertisePlaceholder": "z. B. AI, React, B2B Sales",
@@ -493,7 +496,7 @@
       "remoteMode": "Remote-Modus",
       "availability": "Verfügbarkeit pro Woche",
       "availabilityPlaceholder": "z. B. 20",
-      "availabilityV2": "Wie viel Zeit kannst du aktuell realistisch für eine Gründung einbringen?",
+      "availabilityV2": "Wie viele Stunden pro Woche kannst du aktuell realistisch einbringen?",
       "identityTitle": "Das kommt aus deinem Profil",
       "identityText": "Name, Headline, Über dich, Region, Expertise, Branchen und Arbeitsweise pflegst du an einem Ort. Änderungen dort erscheinen hier sofort.",
       "identityLink": "Im Profil bearbeiten",
@@ -501,24 +504,37 @@
       "identityExpertise": "Expertise",
       "identityIndustries": "Branchen",
       "identityWorkFrame": "Arbeitsweise",
-      "identityEmpty": "Noch nichts eingetragen"
+      "identityEmpty": "Noch nichts eingetragen",
+      "availabilityHelp": "Stunden pro Woche. Eine ehrliche Zahl hilft mehr als eine ambitionierte.",
+      "availabilitySuffix": "Std./Woche",
+      "roleCounter": "{selected} von {max} gewählt",
+      "roleLimitReached": "Mehr geht nicht – nimm erst eine weg.",
+      "ownRoleOtherLabel": "Welcher Schwerpunkt ist das?",
+      "ownRoleOtherPlaceholder": "z. B. Regulatorik, Einkauf, Fördermittel",
+      "ownRoleOtherHint": "Ohne diese Angabe steht in deinem Profil nur „Anderer Schwerpunkt“ – das sagt der anderen Seite nichts.",
+      "seekingRoleOtherLabel": "Welchen Schwerpunkt suchst du?",
+      "seekingRoleOtherPlaceholder": "z. B. Zulassung im Medizinbereich",
+      "seekingRoleOtherHint": "Ohne diese Angabe weiß niemand, wonach du suchst."
     },
     "brings": {
       "title": "Was du mitbringst",
-      "description": "Rollen, Expertise und der zeitliche Rahmen, den du aktuell realistisch einbringen kannst."
+      "description": "Deine Rollen und der zeitliche Rahmen, den du aktuell wirklich halten kannst."
     },
     "seeking": {
       "title": "Wen du suchst",
-      "description": "Die Rollen hier sind Teil deines sichtbaren Profils. Deine konkreten Suchfilter bleiben privat und werden direkt in Discovery gepflegt.",
-      "editPrivateSearch": "Private Suche bearbeiten"
+      "description": "Diese Rollen stehen in deinem sichtbaren Profil. Deine Filter für die Ergebnisliste sind etwas anderes und bleiben privat.",
+      "editPrivateSearch": "Zu deinen privaten Suchfiltern"
     },
     "venture": {
       "eyebrow": "Deine Gründungsrichtung",
-      "title": "Was du gerade suchst",
-      "description": "Hilf anderen einzuschätzen, ob Richtung, Tempo und Ambition gut zusammenpassen.",
-      "commitment": "Wie viel Raum hat Gründung gerade?",
-      "stage": "Wo stehst du gerade?",
-      "goal": "Was möchtest du aufbauen?"
+      "title": "Wie du gründen willst",
+      "description": "Drei Angaben, an denen andere sehen, ob Tempo, Anspruch und Zeitpunkt zusammenpassen. Es gibt keine bessere oder schlechtere Antwort.",
+      "commitment": "Wie viel Platz hat Gründen gerade in deinem Leben?",
+      "stage": "Wie weit ist deine Idee?",
+      "goal": "Was soll daraus werden?",
+      "commitmentHelp": "Nicht wie ernst du es meinst – sondern was davon aktuell realistisch ist.",
+      "stageHelp": "Ohne eigene Idee zu suchen ist völlig in Ordnung und für viele der Einstieg.",
+      "goalHelp": "Hier gehen Vorstellungen am häufigsten auseinander – lieber früh als nach einem Jahr."
     },
     "actions": {
       "saveDraft": "Entwurf speichern",
@@ -811,5 +827,27 @@
       "requestFullMatching": "Gemeinsam prüfen",
       "startPreparation": "Gemeinsam prüfen"
     }
+  },
+  "commitmentLevelHints": {
+    "exploring": "Ich schaue mich um. Noch nichts entschieden, noch kein fester Zeitanteil.",
+    "side_project": "Abends und am Wochenende. Der Hauptjob bleibt erst mal.",
+    "part_time": "Fester Anteil meiner Woche, verbindlich eingeplant – parallel zu etwas anderem.",
+    "full_time": "Meine Arbeitszeit geht hier rein. Kein zweiter Job daneben.",
+    "all_in": "Vollzeit und finanziell darauf eingestellt, dass es eine Weile nichts einbringt."
+  },
+  "ventureStageHints": {
+    "undecided": "Dazu kann ich noch nichts sagen.",
+    "no_idea_open_to_join": "Ich habe keine eigene Idee und würde bei einer guten einsteigen.",
+    "exploring_ideas": "Ich sammle und verwerfe Ideen, noch ist keine gesetzt.",
+    "idea_validating": "Eine Idee steht, und ich prüfe mit echten Menschen, ob sie trägt.",
+    "already_building": "Es gibt schon etwas – Prototyp, erste Kundschaft oder mehr."
+  },
+  "ventureGoalHints": {
+    "undecided": "Dazu kann ich noch nichts sagen.",
+    "explore": "Wohin es geht, würde ich gemeinsam entscheiden.",
+    "side_project": "Etwas Kleines, das neben anderem läuft und laufen bleiben darf.",
+    "profitable_business": "Ein Unternehmen, das sich selbst trägt – Wachstum ja, um jeden Preis nein.",
+    "venture_scale": "Schnelles Wachstum, Kapital von außen, große Ambition.",
+    "exit_oriented": "Aufbauen mit dem Ziel, irgendwann zu verkaufen."
   }
 }

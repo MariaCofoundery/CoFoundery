@@ -16,6 +16,8 @@ function profile(id: string, displayName: string): FounderDiscoveryProfile {
     bio: "",
     ownRoles: ["tech"],
     seekingRoles: ["product"],
+  ownRoleOther: null,
+  seekingRoleOther: null,
     expertise: [],
     industries: [],
     locationRegion: null,

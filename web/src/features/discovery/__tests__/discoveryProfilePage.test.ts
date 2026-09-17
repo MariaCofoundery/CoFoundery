@@ -218,3 +218,120 @@ test("the form no longer nests three frames deep", () => {
   );
   assert.match(page, /INNER_SECTION_CLASS = "border-t border-slate-200/);
 });
+
+// ---------------------------------------------------------------------------
+// "Anderer Schwerpunkt" - und welcher?
+// ---------------------------------------------------------------------------
+const ROLE_FIELD = "src/features/discovery/DiscoveryRoleField.tsx";
+
+test("choosing 'other' asks which one", () => {
+  const field = codeOnly(ROLE_FIELD);
+  assert.match(field, /const otherChosen = selected\.includes\("other"\)/);
+  // Pflicht, nicht optional: Ein Profil, in dem nur "Anderer Schwerpunkt"
+  // steht, sagt der suchenden Person weniger als gar nichts.
+  assert.match(field, /name=\{otherName\}\s*\n\s*required/);
+});
+
+test("the free text appears everywhere the roles do", () => {
+  const presentation = codeOnly("src/features/discovery/discoveryPresentation.ts");
+  assert.match(presentation, /role === "other" && text \? text : labelFor\(role\)/);
+
+  // Eine gemeinsame Stelle, weil die Rollen an mehreren Orten gerendert
+  // werden - sonst zeigt eine Anzeige die Floskel und die naechste den Text.
+  for (const file of [PAGE, "src/features/discovery/FounderDiscoveryCard.tsx"]) {
+    assert.match(source(file), /discoveryRoleLabels/, `${file} nutzt die gemeinsame Stelle`);
+  }
+});
+
+test("the database refuses a text that belongs to no role", () => {
+  const migration = source(
+    "../supabase/migrations/20260922120000_discovery_role_other_text.sql"
+  );
+  // Sonst blieb nach dem Abwaehlen ein Satz im Profil stehen - sichtbar fuer
+  // andere, unsichtbar fuer die schreibende Person.
+  assert.match(migration, /'other' = any\(own_roles\)/);
+  assert.match(migration, /'other' = any\(seeking_roles\)/);
+});
+
+test("the search projection carries the free text", () => {
+  const migration = source(
+    "../supabase/migrations/20260922120000_discovery_role_other_text.sql"
+  );
+  assert.match(migration, /own_role_other text,\n  seeking_role_other text,/);
+  // Und die Funktion bleibt, was sie war: Sie stuetzt sich auf die
+  // Zeilensicherheit der Tabelle, statt sie zu umgehen.
+  assert.match(migration, /security invoker/);
+  assert.doesNotMatch(migration, /security definer/);
+  assert.match(migration, /p_roles text\[\] default/, "die Parameternamen bleiben");
+});
+
+// ---------------------------------------------------------------------------
+// Die Obergrenze greift sichtbar
+// ---------------------------------------------------------------------------
+test("the fourth role cannot be clicked instead of silently dropped", () => {
+  const field = codeOnly(ROLE_FIELD);
+  assert.match(field, /const disabled = !checked && atLimit/);
+  // Gesetzte bleiben anklickbar - sonst koennte man am Limit nur aufgeben.
+  assert.match(field, /copy\.counter\(selected\.length, max\)/);
+  assert.match(field, /aria-live="polite"/);
+});
+
+// ---------------------------------------------------------------------------
+// Einheiten und Erklaerungen
+// ---------------------------------------------------------------------------
+test("the availability field says hours per week", () => {
+  const page = codeOnly(PAGE);
+  assert.match(page, /profile\.publicProfile\.availabilitySuffix/);
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const publicProfile = (messages.profile as Record<string, Record<string, string>>)
+      .publicProfile;
+    assert.match(publicProfile.availabilityV2, /Stunden pro Woche|hours per week/);
+    assert.ok(publicProfile.availabilitySuffix.length > 0);
+  }
+});
+
+test("every option of the three selects explains itself", () => {
+  const page = codeOnly(PAGE);
+  assert.match(page, /optionHint=\{\(option\) => t\(`commitmentLevelHints\./);
+  assert.match(page, /optionHint=\{\(option\) => t\(`ventureStageHints\./);
+  assert.match(page, /optionHint=\{\(option\) => t\(`ventureGoalHints\./);
+
+  // Jede Option braucht ihren Satz - eine fehlende Erklaerung zeigt sonst
+  // stumm den Schluesselpfad an.
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    for (const group of ["commitmentLevels", "ventureStages", "ventureGoals"]) {
+      const labels = messages[group] as Record<string, string>;
+      const hints = messages[`${group.replace(/s$/, "")}Hints`] as Record<string, string>;
+      assert.deepEqual(
+        Object.keys(hints).sort(),
+        Object.keys(labels).sort(),
+        `${locale}: ${group} und die Hinweise decken sich nicht`
+      );
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Der Knopf, der nichts tat
+// ---------------------------------------------------------------------------
+test("the link to the private filters lands where the filters are", () => {
+  const page = source(PAGE);
+  // /discovery#search landete im Modus "Entdecken", wo es den Anker gar nicht
+  // gibt - der Knopf tat schlicht nichts.
+  assert.doesNotMatch(page, /href="\/discovery#search"/);
+  assert.match(page, /href="\/discovery\?mode=search#search"/);
+});
+
+test("people who are not ready yet get a way out, not a waiting room", () => {
+  const page = source(PAGE);
+  assert.match(page, /href="\/connect\/problems"/);
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const intent = (messages.profile as Record<string, Record<string, string>>).intent;
+    for (const key of ["connectBridgeTitle", "connectBridgeText", "connectBridgeCta"]) {
+      assert.equal(typeof intent[key], "string", `${locale}: intent.${key} fehlt`);
+    }
+  }
+});

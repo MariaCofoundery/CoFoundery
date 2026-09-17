@@ -48,6 +48,8 @@ function createCandidate(id: string): DiscoveryCandidate {
       bio: "Kurzer Profiltext.",
       ownRoles: ["tech"],
       seekingRoles: ["product"],
+      ownRoleOther: null,
+      seekingRoleOther: null,
       expertise: ["AI"],
       industries: ["SaaS"],
       locationRegion: "Berlin",

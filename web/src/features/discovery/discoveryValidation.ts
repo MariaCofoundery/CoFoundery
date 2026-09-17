@@ -201,20 +201,42 @@ export function normalizeMustHaves(value: unknown): DiscoveryMustHaves {
   };
 }
 
+/**
+ * Der Freitext hinter "Anderer Schwerpunkt".
+ *
+ * Gibt null zurueck, wenn 'other' nicht gewaehlt ist - und auch dann, wenn der
+ * Text zu kurz waere: Ein einzelnes Zeichen sagt so wenig wie die Rolle selbst.
+ */
+function normalizeRoleOther(value: unknown, roles: DiscoveryFounderRole[]) {
+  if (!roles.includes("other")) return null;
+  const text = normalizeText(value, DISCOVERY_TEXT_LIMITS.roleOther);
+  return text.length >= 2 ? text : null;
+}
+
 export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}) {
+  const ownRoles = normalizeAllowedArray<DiscoveryFounderRole>(
+    input.ownRoles,
+    DISCOVERY_FOUNDER_ROLES
+  ).slice(0, DISCOVERY_SELECTION_LIMITS.ownRoles);
+  const seekingRoles = normalizeAllowedArray<DiscoveryFounderRole>(
+    input.seekingRoles,
+    DISCOVERY_FOUNDER_ROLES
+  ).slice(0, DISCOVERY_SELECTION_LIMITS.seekingRoles);
+
   return {
     status: normalizeStatus(input.status),
     displayName: normalizeText(input.displayName, DISCOVERY_TEXT_LIMITS.displayName),
     headline: normalizeText(input.headline, DISCOVERY_TEXT_LIMITS.headline),
     bio: normalizeText(input.bio, DISCOVERY_TEXT_LIMITS.bio),
-    ownRoles: normalizeAllowedArray<DiscoveryFounderRole>(
-      input.ownRoles,
-      DISCOVERY_FOUNDER_ROLES
-    ).slice(0, DISCOVERY_SELECTION_LIMITS.ownRoles),
-    seekingRoles: normalizeAllowedArray<DiscoveryFounderRole>(
-      input.seekingRoles,
-      DISCOVERY_FOUNDER_ROLES
-    ).slice(0, DISCOVERY_SELECTION_LIMITS.seekingRoles),
+    ownRoles,
+    seekingRoles,
+    // Der Text gilt nur, solange "Anderer Schwerpunkt" auch gewaehlt ist.
+    // Dieselbe Regel steht als Bedingung in der Datenbank; hier verhindert sie
+    // nur, dass eine verstaendliche Eingabe an einer technischen Meldung
+    // scheitert. Ausserdem faellt der Satz so mit dem Abwaehlen weg, statt
+    // unsichtbar im Profil stehen zu bleiben.
+    ownRoleOther: normalizeRoleOther(input.ownRoleOther, ownRoles),
+    seekingRoleOther: normalizeRoleOther(input.seekingRoleOther, seekingRoles),
     expertise: normalizeStringArray(input.expertise, DISCOVERY_TEXT_LIMITS.expertise).slice(
       0,
       DISCOVERY_SELECTION_LIMITS.expertise

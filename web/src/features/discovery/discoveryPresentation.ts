@@ -39,3 +39,24 @@ export function compactDiscoveryValues(values: string[], limit = 3) {
     remaining: Math.max(0, normalized.length - limit),
   };
 }
+
+/**
+ * Rollen als Beschriftungen - mit dem Freitext an der Stelle von "other".
+ *
+ * Steht hier und nicht in einer der Anzeigen, weil die Rollen an fuenf Orten
+ * gerendert werden: eigene Vorschau, Kandidatenkarte, Profildetail, Intros und
+ * die Abgleichsansicht. Ohne eine gemeinsame Stelle haette die eine Anzeige
+ * "Anderer Schwerpunkt" gezeigt und die naechste den Text - und beim dritten
+ * Mal haette jemand die Ersetzung vergessen.
+ *
+ * Steht kein Text da, bleibt die Floskel. Das ist kein guter Zustand, aber ein
+ * ehrlicher: Bestandsprofile haben den Text noch nicht.
+ */
+export function discoveryRoleLabels(
+  roles: readonly string[],
+  other: string | null | undefined,
+  labelFor: (role: string) => string
+) {
+  const text = other?.trim();
+  return roles.map((role) => (role === "other" && text ? text : labelFor(role)));
+}

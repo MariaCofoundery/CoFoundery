@@ -99,6 +99,8 @@ export function buildDiscoveryV2Candidate(
       bio: profile.bio,
       ownRoles: profile.ownRoles,
       seekingRoles: profile.seekingRoles,
+      ownRoleOther: profile.ownRoleOther ?? null,
+      seekingRoleOther: profile.seekingRoleOther ?? null,
       expertise: profile.expertise,
       industries: profile.industries,
       locationRegion: profile.locationRegion,

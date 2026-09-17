@@ -16,6 +16,7 @@ import {
   saveDiscoveryProfileDraftAction,
 } from "@/features/discovery/discoveryActions";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
+import { discoveryRoleLabels } from "@/features/discovery/discoveryPresentation";
 import {
   getOwnDiscoveryProfile,
   getOwnSearchPreferences,
@@ -25,6 +26,7 @@ import {
   getOwnDiscoveryV2AlignmentTendencies,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
+import { DiscoveryRoleField } from "@/features/discovery/DiscoveryRoleField";
 import { DISCOVERY_PROFILE_PUBLISH_ISSUES } from "@/features/discovery/discoveryProfileFeedback";
 import {
   resolveDiscoveryProfileDraftFeedback,
@@ -103,20 +105,21 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
   };
 }
 
-function isChecked<T extends string>(values: readonly T[] | undefined, value: T) {
-  return values?.includes(value) ?? false;
-}
-
 function discoveryRoleLabel(t: DiscoveryT, value: DiscoveryFounderRole) {
   return t(`roles.${value}`);
 }
 
 function formatRoleList(
   values: DiscoveryFounderRole[] | undefined,
+  other: string | null | undefined,
   t: DiscoveryT
 ) {
   if (!values || values.length === 0) return t("common.notProvided");
-  return values.map((value) => discoveryRoleLabel(t, value)).join(", ");
+  // "Anderer Schwerpunkt" wird durch den Text ersetzt, den die Person dazu
+  // geschrieben hat - sonst stuende die Floskel in der eigenen Vorschau.
+  return discoveryRoleLabels(values, other, (role) =>
+    discoveryRoleLabel(t, role as DiscoveryFounderRole)
+  ).join(", ");
 }
 
 function previewText(value: string | null | undefined, fallback: string) {
@@ -126,14 +129,6 @@ function previewText(value: string | null | undefined, fallback: string) {
 
 function formatIndustries(values: string[] | undefined, t: DiscoveryT) {
   return values && values.length > 0 ? values.join(", ") : t("common.notProvided");
-}
-
-function limitHint(isAtLimit: boolean, text: string) {
-  return isAtLimit ? (
-    <p className="mt-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
-      {text}
-    </p>
-  ) : null;
 }
 
 function searchParamValue(value: string | string[] | undefined) {
@@ -212,38 +207,6 @@ function PageMessage({
   );
 }
 
-function OptionCheckbox({
-  name,
-  value,
-  label,
-  defaultChecked,
-}: {
-  name: string;
-  value: string;
-  label: string;
-  defaultChecked: boolean;
-}) {
-  return (
-    <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
-      <input
-        type="checkbox"
-        name={name}
-        value={value}
-        defaultChecked={defaultChecked}
-        className="h-4 w-4 rounded border-slate-300 text-slate-950"
-      />
-      <span>{label}</span>
-    </label>
-  );
-}
-
-/**
- * Wie weit das Profil ist.
- *
- * Dieselben acht Angaben, die das Veroeffentlichen verlangt - kein zweites
- * Mass, das etwas anderes zaehlt. Der Balken zeigt, was die Liste weiter unten
- * aufzaehlt; er ersetzt sie nicht.
- */
 function CompletionMeter({
   issues,
   t,
@@ -351,30 +314,6 @@ function StatusCard({
   );
 }
 
-function RoleCheckboxGrid({
-  name,
-  selected,
-  t,
-}: {
-  name: string;
-  selected: DiscoveryFounderRole[] | undefined;
-  t: DiscoveryT;
-}) {
-  return (
-    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-      {DISCOVERY_ROLE_OPTIONS.map((option) => (
-        <OptionCheckbox
-          key={option.value}
-          name={name}
-          value={option.value}
-          label={discoveryRoleLabel(t, option.value)}
-          defaultChecked={isChecked(selected, option.value)}
-        />
-      ))}
-    </div>
-  );
-}
-
 function PublishIssuesCard({
   issues,
   t,
@@ -397,6 +336,49 @@ function PublishIssuesCard({
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * Ein Auswahlfeld, das sagt, was die Antworten bedeuten.
+ *
+ * "Nebenprojekt" oder "Ich validiere eine Idee" klingen eindeutig und sind es
+ * nicht - jede Person legt etwas anderes hinein. Der Hinweis unter dem Feld
+ * zeigt zur gewaehlten Option, was hier damit gemeint ist; ohne JavaScript
+ * steht dort die Erklaerung zum gespeicherten Wert.
+ */
+function ExplainedSelect({
+  name,
+  label,
+  help,
+  value,
+  options,
+  optionLabel,
+  optionHint,
+}: {
+  name: string;
+  label: string;
+  help: string;
+  value: string;
+  options: readonly string[];
+  optionLabel: (option: string) => string;
+  optionHint: (option: string) => string;
+}) {
+  return (
+    <label>
+      <span className={LABEL_CLASS}>{label}</span>
+      <select name={name} defaultValue={value} className={FIELD_CLASS}>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {optionLabel(option)}
+          </option>
+        ))}
+      </select>
+      <span className="mt-2 block rounded-2xl bg-white px-3 py-2 text-xs leading-5 text-slate-600">
+        {optionHint(value)}
+      </span>
+      <span className={HELP_CLASS}>{help}</span>
+    </label>
   );
 }
 
@@ -453,10 +435,6 @@ export default async function DiscoveryProfilePage({
   const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
   const publishIssues = getDiscoveryProfilePublishIssues(profile);
-  const ownRolesAtLimit =
-    (profile.ownRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.ownRoles;
-  const seekingRolesAtLimit =
-    (profile.seekingRoles?.length ?? 0) >= DISCOVERY_SELECTION_LIMITS.seekingRoles;
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
@@ -601,12 +579,46 @@ export default async function DiscoveryProfilePage({
                   <div>
                     <p className={LABEL_CLASS}>{t("profile.publicProfile.ownRoles")}</p>
                     <p className={HELP_CLASS}>{t("profile.publicProfile.ownRolesHelp", { count: DISCOVERY_SELECTION_LIMITS.ownRoles })}</p>
-                    <RoleCheckboxGrid name="ownRoles" selected={profile.ownRoles} t={t} />
-                    {limitHint(ownRolesAtLimit, t("profile.publicProfile.ownRolesLimit"))}
+                    <DiscoveryRoleField
+                      name="ownRoles"
+                      otherName="ownRoleOther"
+                      options={DISCOVERY_ROLE_OPTIONS.map((option) => ({
+                        value: option.value,
+                        label: discoveryRoleLabel(t, option.value),
+                      }))}
+                      initialSelected={profile.ownRoles ?? []}
+                      initialOther={profile.ownRoleOther ?? null}
+                      max={DISCOVERY_SELECTION_LIMITS.ownRoles}
+                      copy={{
+                        limitReached: t("profile.publicProfile.roleLimitReached"),
+                        otherLabel: t("profile.publicProfile.ownRoleOtherLabel"),
+                        otherPlaceholder: t("profile.publicProfile.ownRoleOtherPlaceholder"),
+                        otherHint: t("profile.publicProfile.ownRoleOtherHint"),
+                        counter: (selected, max) =>
+                          t("profile.publicProfile.roleCounter", { selected, max }),
+                      }}
+                    />
                   </div>
                   <label>
                     <span className={LABEL_CLASS}>{t("profile.publicProfile.availabilityV2")}</span>
-                    <input name="availabilityHoursPerWeek" type="number" min={1} max={100} defaultValue={profile.availabilityHoursPerWeek ?? ""} className={FIELD_CLASS} placeholder={t("profile.publicProfile.availabilityPlaceholder")} />
+                    {/* Die Einheit gehoert ans Feld, nicht in die Frage allein:
+                        "20" ohne Angabe liess offen, ob Stunden, Prozent oder
+                        Tage gemeint sind. */}
+                    <span className="mt-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 transition focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-100">
+                      <input
+                        name="availabilityHoursPerWeek"
+                        type="number"
+                        min={1}
+                        max={100}
+                        defaultValue={profile.availabilityHoursPerWeek ?? ""}
+                        className="w-24 border-0 bg-transparent p-0 text-sm text-slate-900 outline-none"
+                        placeholder={t("profile.publicProfile.availabilityPlaceholder")}
+                      />
+                      <span className="text-sm font-medium text-slate-500">
+                        {t("profile.publicProfile.availabilitySuffix")}
+                      </span>
+                    </span>
+                    <span className={HELP_CLASS}>{t("profile.publicProfile.availabilityHelp")}</span>
                   </label>
                 </div>
               </div>
@@ -624,45 +636,34 @@ export default async function DiscoveryProfilePage({
                   </p>
                 </div>
 
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.venture.commitment")}</span>
-                  <select
+                <div className="mt-5 grid gap-5 md:grid-cols-3">
+                  <ExplainedSelect
                     name="commitmentLevel"
-                    defaultValue={profile.commitmentLevel}
-                    className={FIELD_CLASS}
-                  >
-                    {DISCOVERY_COMMITMENT_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {t(`commitmentLevels.${option.value}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.venture.stage")}</span>
-                  <select
+                    label={t("profile.venture.commitment")}
+                    help={t("profile.venture.commitmentHelp")}
+                    value={profile.commitmentLevel ?? "exploring"}
+                    options={DISCOVERY_COMMITMENT_OPTIONS.map((option) => option.value)}
+                    optionLabel={(option) => t(`commitmentLevels.${option}`)}
+                    optionHint={(option) => t(`commitmentLevelHints.${option}`)}
+                  />
+                  <ExplainedSelect
                     name="ventureStage"
-                    defaultValue={profile.ventureStage}
-                    className={FIELD_CLASS}
-                  >
-                    {DISCOVERY_VENTURE_STAGE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {t(`ventureStages.${option.value}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className={LABEL_CLASS}>{t("profile.venture.goal")}</span>
-                  <select name="ventureGoal" defaultValue={profile.ventureGoal} className={FIELD_CLASS}>
-                  {DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {t(`ventureGoals.${option.value}`)}
-                    </option>
-                  ))}
-                  </select>
-                </label>
+                    label={t("profile.venture.stage")}
+                    help={t("profile.venture.stageHelp")}
+                    value={profile.ventureStage ?? "undecided"}
+                    options={DISCOVERY_VENTURE_STAGE_OPTIONS.map((option) => option.value)}
+                    optionLabel={(option) => t(`ventureStages.${option}`)}
+                    optionHint={(option) => t(`ventureStageHints.${option}`)}
+                  />
+                  <ExplainedSelect
+                    name="ventureGoal"
+                    label={t("profile.venture.goal")}
+                    help={t("profile.venture.goalHelp")}
+                    value={profile.ventureGoal ?? "undecided"}
+                    options={DISCOVERY_VENTURE_GOAL_OPTIONS.map((option) => option.value)}
+                    optionLabel={(option) => t(`ventureGoals.${option}`)}
+                    optionHint={(option) => t(`ventureGoalHints.${option}`)}
+                  />
                 </div>
                 <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2">
                   <label>
@@ -698,6 +699,25 @@ export default async function DiscoveryProfilePage({
                     <span className={HELP_CLASS}>{t("profile.intent.startHorizonHelp")}</span>
                   </label>
                 </div>
+                {/* Wer "offen fuer spaeter" waehlt, steht hier sonst in einer
+                    Warteschleife. Im Connect-Bereich gibt es einen eigenen Weg
+                    fuer genau diese Leute - und das Problembrett ist der Ort,
+                    an dem aus "noch nichts" etwas wird. */}
+                <div className="mt-5 rounded-2xl border-l-[3px] border-violet-400 bg-white px-4 py-4 shadow-[0_1px_0_rgba(15,23,42,0.06)]">
+                  <p className="text-sm font-semibold text-slate-900">
+                    {t("profile.intent.connectBridgeTitle")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t("profile.intent.connectBridgeText")}
+                  </p>
+                  <Link
+                    href="/connect/problems"
+                    className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
+                  >
+                    {t("profile.intent.connectBridgeCta")} →
+                  </Link>
+                </div>
+
                 {!profile.searchIntent || !profile.startHorizon ? (
                   <p className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
                     {t("profile.intent.missingHint")}
@@ -711,10 +731,27 @@ export default async function DiscoveryProfilePage({
                 <div className="mt-5">
                   <p className={LABEL_CLASS}>{t("profile.publicProfile.seekingRoles")}</p>
                   <p className={HELP_CLASS}>{t("profile.publicProfile.seekingRolesHelp", { count: DISCOVERY_SELECTION_LIMITS.seekingRoles })}</p>
-                  <RoleCheckboxGrid name="seekingRoles" selected={profile.seekingRoles} t={t} />
-                  {limitHint(seekingRolesAtLimit, t("profile.publicProfile.seekingRolesLimit"))}
+                  <DiscoveryRoleField
+                    name="seekingRoles"
+                    otherName="seekingRoleOther"
+                    options={DISCOVERY_ROLE_OPTIONS.map((option) => ({
+                      value: option.value,
+                      label: discoveryRoleLabel(t, option.value),
+                    }))}
+                    initialSelected={profile.seekingRoles ?? []}
+                    initialOther={profile.seekingRoleOther ?? null}
+                    max={DISCOVERY_SELECTION_LIMITS.seekingRoles}
+                    copy={{
+                      limitReached: t("profile.publicProfile.roleLimitReached"),
+                      otherLabel: t("profile.publicProfile.seekingRoleOtherLabel"),
+                      otherPlaceholder: t("profile.publicProfile.seekingRoleOtherPlaceholder"),
+                      otherHint: t("profile.publicProfile.seekingRoleOtherHint"),
+                      counter: (selected, max) =>
+                        t("profile.publicProfile.roleCounter", { selected, max }),
+                    }}
+                  />
                 </div>
-                <Link href="/discovery#search" className={`${SECONDARY_BUTTON_CLASS} mt-5`}>
+                <Link href="/discovery?mode=search#search" className={`${SECONDARY_BUTTON_CLASS} mt-5`}>
                   {t("profile.seeking.editPrivateSearch")}
                 </Link>
               </div>
@@ -872,11 +909,11 @@ export default async function DiscoveryProfilePage({
                 <dl className="mt-5 grid gap-3 text-sm">
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.brings")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles, t)}</dd>
+                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles, profile.ownRoleOther, t)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.seeks")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.seekingRoles, t)}</dd>
+                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.seekingRoles, profile.seekingRoleOther, t)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.interests")}</dt>

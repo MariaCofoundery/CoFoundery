@@ -130,6 +130,8 @@ function parseDiscoveryProfileFormData(
     bio: identity?.bio ?? "",
     ownRoles: getStringList(formData, ["ownRoles", "own_roles"]),
     seekingRoles: getStringList(formData, ["seekingRoles", "seeking_roles"]),
+    ownRoleOther: getFirstString(formData, ["ownRoleOther", "own_role_other"]),
+    seekingRoleOther: getFirstString(formData, ["seekingRoleOther", "seeking_role_other"]),
     expertise: identity?.expertise ?? [],
     industries: identity?.industries ?? [],
     locationRegion: identity?.location_region ?? "",

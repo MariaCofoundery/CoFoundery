@@ -440,12 +440,15 @@
     },
     "intent": {
       "searchIntent": "How actively are you searching right now?",
-      "searchIntentHelp": "This describes your current search mode and does not rate how serious you are.",
-      "startHorizon": "When would you roughly like to start?",
-      "startHorizonHelp": "A broad orientation, not a binding commitment.",
-      "notProvided": "Not provided yet",
+      "searchIntentHelp": "This describes your search mode, not how serious you are.",
+      "startHorizon": "Roughly when would you like to start?",
+      "startHorizonHelp": "A rough orientation, not a binding commitment.",
+      "notProvided": "Not specified yet",
       "missingHint": "Add your search mode and start horizon so others can understand your current situation. Your existing profile remains visible without them.",
-      "saveAlignment": "Save Alignment preferences"
+      "saveAlignment": "Save Alignment preferences",
+      "connectBridgeTitle": "Not there yet? That is its own path, not a waiting room.",
+      "connectBridgeText": "In Connect, people describe problems from their surroundings – some are looking for co-founders, others just for someone who listens. A good place if you want to found but do not yet know what.",
+      "connectBridgeCta": "Look at problems"
     },
     "messages": {
       "fallbackError": "The action could not be completed right now.",
@@ -474,11 +477,11 @@
       "locationRegion": "City / region",
       "locationRegionPlaceholder": "e.g. Berlin",
       "locationRegionHelp": "Use a broad location only, not an address.",
-      "ownRoles": "Your roles",
-      "ownRolesHelp": "What do you bring most strongly? Up to {count} roles.",
+      "ownRoles": "What do you bring yourself?",
+      "ownRolesHelp": "Pick up to {count} – the ones you are genuinely strong in, not everything you can do.",
       "ownRolesLimit": "You reached the maximum number of own roles.",
-      "seekingRoles": "Roles you are looking for",
-      "seekingRolesHelp": "What kind of complement are you looking for in a co-founder? Up to {count} roles.",
+      "seekingRoles": "What should the other person bring?",
+      "seekingRolesHelp": "Pick up to {count}. Most often this complements your own roles.",
       "seekingRolesLimit": "You reached the maximum number of roles you are looking for.",
       "expertise": "What expertise do you bring?",
       "expertisePlaceholder": "e.g. AI, React, B2B sales",
@@ -493,7 +496,7 @@
       "remoteMode": "Remote mode",
       "availability": "Availability per week",
       "availabilityPlaceholder": "e.g. 20",
-      "availabilityV2": "How much time can you realistically contribute to a venture right now?",
+      "availabilityV2": "How many hours per week can you realistically put in right now?",
       "identityTitle": "This comes from your profile",
       "identityText": "Name, headline, about you, region, expertise, industries and way of working are kept in one place. Changes there appear here immediately.",
       "identityLink": "Edit in profile",
@@ -501,24 +504,37 @@
       "identityExpertise": "Expertise",
       "identityIndustries": "Industries",
       "identityWorkFrame": "Way of working",
-      "identityEmpty": "Nothing entered yet"
+      "identityEmpty": "Nothing entered yet",
+      "availabilityHelp": "Hours per week. An honest number helps more than an ambitious one.",
+      "availabilitySuffix": "hrs/week",
+      "roleCounter": "{selected} of {max} chosen",
+      "roleLimitReached": "That is the maximum – remove one first.",
+      "ownRoleOtherLabel": "Which focus is that?",
+      "ownRoleOtherPlaceholder": "e.g. regulatory affairs, procurement, public funding",
+      "ownRoleOtherHint": "Without this, your profile only says “Other focus” – which tells the other side nothing.",
+      "seekingRoleOtherLabel": "Which focus are you looking for?",
+      "seekingRoleOtherPlaceholder": "e.g. medical device approval",
+      "seekingRoleOtherHint": "Without this, nobody knows what you are looking for."
     },
     "brings": {
       "title": "What you bring",
-      "description": "Your roles, expertise and the time you can realistically contribute right now."
+      "description": "Your roles and the amount of time you can actually keep to right now."
     },
     "seeking": {
       "title": "Who you are looking for",
-      "description": "These roles are part of your visible profile. Your specific search filters stay private and are managed directly in Discovery.",
-      "editPrivateSearch": "Edit private search"
+      "description": "These roles appear in your visible profile. Your filters for the result list are something else and stay private.",
+      "editPrivateSearch": "To your private search filters"
     },
     "venture": {
       "eyebrow": "Your founding direction",
-      "title": "What you are looking for right now",
-      "description": "Help others understand whether direction, pace and ambition fit well.",
-      "commitment": "How much room does founding have right now?",
-      "stage": "Where are you right now?",
-      "goal": "What do you want to build?"
+      "title": "How you want to found",
+      "description": "Three entries that let others see whether pace, ambition and timing fit together. There is no better or worse answer.",
+      "commitment": "How much room does founding have in your life right now?",
+      "stage": "How far along is your idea?",
+      "goal": "What should come of it?",
+      "commitmentHelp": "Not how seriously you mean it – but what is realistic at the moment.",
+      "stageHelp": "Searching without an idea of your own is entirely fine, and for many it is the way in.",
+      "goalHelp": "This is where expectations diverge most often – better early than after a year."
     },
     "actions": {
       "saveDraft": "Save draft",
@@ -811,5 +827,27 @@
       "requestFullMatching": "Explore together",
       "startPreparation": "Explore together"
     }
+  },
+  "commitmentLevelHints": {
+    "exploring": "I am looking around. Nothing decided, no fixed share of time yet.",
+    "side_project": "Evenings and weekends. The main job stays for now.",
+    "part_time": "A fixed share of my week, firmly planned – alongside something else.",
+    "full_time": "My working hours go into this. No second job beside it.",
+    "all_in": "Full time, and financially prepared for it to earn nothing for a while."
+  },
+  "ventureStageHints": {
+    "undecided": "I cannot say yet.",
+    "no_idea_open_to_join": "I have no idea of my own and would join a good one.",
+    "exploring_ideas": "I collect and discard ideas, none is settled yet.",
+    "idea_validating": "One idea stands, and I am checking with real people whether it holds.",
+    "already_building": "Something already exists – a prototype, first customers or more."
+  },
+  "ventureGoalHints": {
+    "undecided": "I cannot say yet.",
+    "explore": "Where it goes I would decide together.",
+    "side_project": "Something small that runs alongside other things and may stay that way.",
+    "profitable_business": "A company that carries itself – growth yes, at any cost no.",
+    "venture_scale": "Fast growth, outside capital, big ambition.",
+    "exit_oriented": "Building it with the aim of selling one day."
   }
 }

@@ -22,6 +22,7 @@ export const DISCOVERY_TEXT_LIMITS = {
   locationRegion: 120,
   industry: 80,
   expertise: 60,
+  roleOther: 80,
 } as const;
 
 export const DISCOVERY_SELECTION_LIMITS = {

@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
-import { compactDiscoveryValues } from "@/features/discovery/discoveryPresentation";
+import {
+  compactDiscoveryValues,
+  discoveryRoleLabels,
+} from "@/features/discovery/discoveryPresentation";
 import type {
   DiscoveryAlignmentDimension,
   DiscoveryCandidate,
@@ -88,9 +91,17 @@ export function FounderDiscoveryCard({
   showMatchReasons?: boolean;
 }) {
   const { profile } = candidate;
-  const roles = compactDiscoveryValues(profile.ownRoles.map((role) => roleLabel(t, role)));
+  const roles = compactDiscoveryValues(
+    discoveryRoleLabels(profile.ownRoles, profile.ownRoleOther, (role) =>
+      roleLabel(t, role as DiscoveryFounderRole)
+    )
+  );
   const expertise = compactDiscoveryValues(profile.expertise);
-  const seekingRoles = compactDiscoveryValues(profile.seekingRoles.map((role) => roleLabel(t, role)));
+  const seekingRoles = compactDiscoveryValues(
+    discoveryRoleLabels(profile.seekingRoles, profile.seekingRoleOther, (role) =>
+      roleLabel(t, role as DiscoveryFounderRole)
+    )
+  );
 
   return (
     <article className="flex h-full flex-col rounded-[1.75rem] border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.055)] md:p-6">

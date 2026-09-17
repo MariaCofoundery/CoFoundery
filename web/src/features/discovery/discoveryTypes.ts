@@ -97,6 +97,9 @@ export type FounderDiscoveryProfile = {
   bio: string;
   ownRoles: DiscoveryFounderRole[];
   seekingRoles: DiscoveryFounderRole[];
+  /** Was "Anderer Schwerpunkt" konkret heisst - leer, solange other nicht gewaehlt ist. */
+  ownRoleOther: string | null;
+  seekingRoleOther: string | null;
   expertise: string[];
   industries: string[];
   locationRegion: string | null;
@@ -134,6 +137,8 @@ export type DiscoveryProfileInput = Partial<{
   bio: unknown;
   ownRoles: unknown;
   seekingRoles: unknown;
+  ownRoleOther: unknown;
+  seekingRoleOther: unknown;
   expertise: unknown;
   industries: unknown;
   locationRegion: unknown;
@@ -212,6 +217,8 @@ export type DiscoveryProfilePreview = Pick<
   | "bio"
   | "ownRoles"
   | "seekingRoles"
+  | "ownRoleOther"
+  | "seekingRoleOther"
   | "expertise"
   | "industries"
   | "locationRegion"

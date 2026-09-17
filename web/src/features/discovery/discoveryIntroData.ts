@@ -41,6 +41,8 @@ const DISCOVERY_INTRO_PROFILE_COLUMNS = [
   "bio",
   "own_roles",
   "seeking_roles",
+  "own_role_other",
+  "seeking_role_other",
   "expertise",
   "industries",
   "location_region",
@@ -79,6 +81,8 @@ type DiscoveryIntroProfileRow = {
   bio: string;
   own_roles: string[];
   seeking_roles: string[];
+  own_role_other: string | null;
+  seeking_role_other: string | null;
   expertise: string[];
   industries: string[];
   location_region: string | null;
@@ -142,6 +146,8 @@ function mapIntroProfileRow(row: DiscoveryIntroProfileRow): DiscoveryProfilePrev
     bio: row.bio,
     ownRoles: row.own_roles as DiscoveryFounderRole[],
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
+    ownRoleOther: row.own_role_other,
+    seekingRoleOther: row.seeking_role_other,
     expertise: row.expertise ?? [],
     industries: row.industries,
     locationRegion: row.location_region,
