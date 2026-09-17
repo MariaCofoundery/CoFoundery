@@ -122,6 +122,20 @@ function formatRoleList(
   ).join(", ");
 }
 
+/**
+ * Die Zaehltexte, fertig uebersetzt - einer je moeglicher Anzahl.
+ *
+ * Die Rollenauswahl laeuft im Browser, die Uebersetzung liegt auf dem Server.
+ * Also wird hier alles vorbereitet, was sie anzeigen koennte, statt eine
+ * Funktion ueber die Grenze zu reichen: Das laesst React nicht zu und wirft
+ * beim Rendern der Seite.
+ */
+function countLabels(t: DiscoveryT, max: number) {
+  return Array.from({ length: max + 1 }, (_, selected) =>
+    t("profile.publicProfile.roleCounter", { selected, max })
+  );
+}
+
 function previewText(value: string | null | undefined, fallback: string) {
   const normalized = value?.trim();
   return normalized && normalized.length > 0 ? normalized : fallback;
@@ -617,8 +631,7 @@ export default async function DiscoveryProfilePage({
                         otherLabel: t("profile.publicProfile.ownRoleOtherLabel"),
                         otherPlaceholder: t("profile.publicProfile.ownRoleOtherPlaceholder"),
                         otherHint: t("profile.publicProfile.ownRoleOtherHint"),
-                        counter: (selected, max) =>
-                          t("profile.publicProfile.roleCounter", { selected, max }),
+                        counterByCount: countLabels(t, DISCOVERY_SELECTION_LIMITS.ownRoles),
                       }}
                     />
                   </div>
@@ -771,8 +784,7 @@ export default async function DiscoveryProfilePage({
                       otherLabel: t("profile.publicProfile.seekingRoleOtherLabel"),
                       otherPlaceholder: t("profile.publicProfile.seekingRoleOtherPlaceholder"),
                       otherHint: t("profile.publicProfile.seekingRoleOtherHint"),
-                      counter: (selected, max) =>
-                        t("profile.publicProfile.roleCounter", { selected, max }),
+                      counterByCount: countLabels(t, DISCOVERY_SELECTION_LIMITS.seekingRoles),
                     }}
                   />
                 </div>

@@ -8,7 +8,15 @@ type Copy = {
   otherLabel: string;
   otherPlaceholder: string;
   otherHint: string;
-  counter: (selected: number, max: number) => string;
+  /**
+   * Fertige Texte, einer je moeglicher Anzahl - der Index ist die Anzahl.
+   *
+   * KEINE Funktion: Diese Komponente laeuft im Browser, die Uebersetzung
+   * liegt auf dem Server. Eine Funktion ueber diese Grenze zu reichen, laesst
+   * React nicht zu - es wirft beim Rendern, und die Seite zeigt nur noch
+   * "a server-side exception has occurred". Genau das ist hier passiert.
+   */
+  counterByCount: string[];
 };
 
 /**
@@ -92,7 +100,7 @@ export function DiscoveryRoleField({
       </div>
 
       <p className="mt-2 text-xs leading-5 text-slate-500" aria-live="polite">
-        {copy.counter(selected.length, max)}
+        {copy.counterByCount[selected.length] ?? ""}
         {atLimit ? ` · ${copy.limitReached}` : ""}
       </p>
 

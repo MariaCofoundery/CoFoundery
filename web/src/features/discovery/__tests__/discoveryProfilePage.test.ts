@@ -272,7 +272,7 @@ test("the fourth role cannot be clicked instead of silently dropped", () => {
   const field = codeOnly(ROLE_FIELD);
   assert.match(field, /const disabled = !checked && atLimit/);
   // Gesetzte bleiben anklickbar - sonst koennte man am Limit nur aufgeben.
-  assert.match(field, /copy\.counter\(selected\.length, max\)/);
+  assert.match(field, /copy\.counterByCount\[selected\.length\]/);
   assert.match(field, /aria-live="polite"/);
 });
 
@@ -397,4 +397,31 @@ test("the pointless button next to the seeking roles is gone", () => {
     assert.equal(seeking.editPrivateSearch, undefined, `${locale}: Schluessel ist weg`);
     assert.match(seeking.description, /privat|private/);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Nichts Unserialisierbares ueber die Server-Client-Grenze
+// ---------------------------------------------------------------------------
+test("the role field receives ready-made strings, never a function", () => {
+  const field = source(ROLE_FIELD);
+  assert.match(field, /^"use client";/, "die Komponente laeuft im Browser");
+
+  // Eine Funktion ueber diese Grenze laesst React nicht zu: Die Seite wirft
+  // beim Rendern und zeigt nur noch "a server-side exception has occurred".
+  // Genau das ist in der Fassung vom 17.09.2026 passiert.
+  const copyType = field.slice(field.indexOf("type Copy = {"), field.indexOf("};", field.indexOf("type Copy = {")));
+  assert.doesNotMatch(copyType, /=>/, "kein Prop dieser Komponente ist eine Funktion");
+  assert.match(copyType, /counterByCount: string\[\];/);
+
+  const page = codeOnly(PAGE);
+  assert.doesNotMatch(page, /counter: \(selected, max\) =>/);
+  assert.match(page, /counterByCount: countLabels\(t, DISCOVERY_SELECTION_LIMITS\.ownRoles\)/);
+  assert.match(page, /counterByCount: countLabels\(t, DISCOVERY_SELECTION_LIMITS\.seekingRoles\)/);
+});
+
+test("the prepared strings cover every possible count", () => {
+  const page = codeOnly(PAGE);
+  // Von null bis zur Obergrenze, sonst stuende beim letzten Ankreuzen nichts
+  // da - der Index ist die Anzahl.
+  assert.match(page, /Array\.from\(\{ length: max \+ 1 \}/);
 });
