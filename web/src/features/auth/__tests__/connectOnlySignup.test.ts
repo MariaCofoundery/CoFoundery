@@ -6,16 +6,25 @@ import { resolveProductEntryPath } from "@/features/auth/productEntry";
 
 const source = (path: string) => readFileSync(path, "utf8");
 
-test("start offers Founder, Advisor, and Connect as distinct bilingual intents", () => {
+/**
+ * GEAENDERT am 18.09.2026: Die Absichtswahl steht nicht mehr auf /start.
+ *
+ * Sie stand dort neben dem Beta-Code, bevor irgendwer irgendetwas vom Produkt
+ * gesehen hatte - und kannte "nur Connect" als einzige Stelle im ganzen
+ * Ablauf. Die Frage liegt jetzt hinter dem Magic Link (siehe
+ * onboardingAreas.test.ts). Die Zusage hier ist nur noch: Das Anmeldeformular
+ * fragt NICHTS ausser E-Mail und Code.
+ */
+test("signup asks for nothing but email and access code", () => {
   const page = source("src/app/(product)/start/page.tsx");
   const de = JSON.parse(source("messages/de/auth.json"));
   const en = JSON.parse(source("messages/en/auth.json"));
-  assert.match(page, /\["founder", "advisor", "connect"\]/);
-  assert.match(page, /name="intent"/);
   assert.match(page, /shouldCreateUser: true/);
-  assert.equal(de.start.intents.connect.title, "Ich möchte das Connect nutzen");
-  assert.equal(en.start.intents.connect.title, "I want to use the Connect");
-  assert.deepEqual(Object.keys(de.start.intents), Object.keys(en.start.intents));
+  assert.doesNotMatch(page, /name="intent"/);
+  for (const [locale, messages] of [["de", de], ["en", en]] as const) {
+    assert.equal(messages.start.intents, undefined, `${locale}: Absichtstexte noch da`);
+    assert.ok(messages.start.emailLabel && messages.start.codeLabel, `${locale}: Felder fehlen`);
+  }
 });
 
 test("connect signup uses a trusted one-time intent that survives every Magic Link callback path", () => {
@@ -28,8 +37,10 @@ test("connect signup uses a trusted one-time intent that survives every Magic Li
   ]) {
     assert.match(source(path), /claimConnectSignupIntent/);
   }
-  assert.match(start, /issueConnectSignupIntent/);
-  assert.match(start, /network_signup_token/);
+  // /start stellt keinen Token mehr aus. Die EINLOESUNG bleibt aber
+  // bestehen, damit Magic Links, die gerade unterwegs sind, nicht ins Leere
+  // laufen - genau das pruefen die drei Routen oben.
+  assert.doesNotMatch(start, /issueConnectSignupIntent/);
   assert.match(migration, /grant execute on function public\.claim_network_signup_intent\(uuid, text\)\s+to service_role/);
   assert.match(migration, /revoke all on function public\.claim_network_signup_intent\(uuid, text\)\s+from public, anon, authenticated/);
   assert.match(migration, /on conflict \(user_id\) do nothing/);
@@ -59,12 +70,22 @@ test("product entry separates first-run, ready, suspended, and unsupported Conne
   assert.equal(resolveProductEntryPath("/account", base, "/welcome"), "/account");
   assert.equal(resolveProductEntryPath("/dashboard", { ...base, hasConnect: false }, "/welcome"), "/account");
   assert.equal(resolveProductEntryPath("/dashboard", { ...base, hasConnect: false, hasConnectAccount: false }, "/welcome"), "/start");
-  assert.equal(resolveProductEntryPath("/dashboard", {
-    ...base,
-    hasConnect: false,
-    hasConnectAccount: false,
-    profileOnboardingAllowed: true,
-  }, "/welcome"), "/welcome");
+  // Wer noch nicht eingefuehrt wurde, wird eingefuehrt - und zwar vor jeder
+  // anderen Weiche. Das ersetzt profileOnboardingAllowed, das nur griff, wenn
+  // /start eine Absicht mitgeschickt hatte.
+  assert.equal(
+    resolveProductEntryPath("/dashboard", { ...base, onboardingComplete: false }, "/welcome"),
+    "/welcome"
+  );
+  assert.equal(
+    resolveProductEntryPath("/dashboard", {
+      ...base,
+      hasConnect: false,
+      hasConnectAccount: false,
+      onboardingComplete: false,
+    }, "/welcome"),
+    "/welcome"
+  );
 });
 
 test("existing Founder and Advisor product entry remains unchanged", () => {

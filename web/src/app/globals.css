@@ -485,6 +485,12 @@ body {
     margin-bottom: -84px;
   }
 
+  /* .reveal stand seit jeher ohne Abschalter da - auf den Marketingseiten
+     bewegte sich jeder Abschnitt beim Hereinscrollen, auch fuer Menschen, die
+     Bewegung ausdruecklich abbestellt haben. Gefunden am 18.09.2026, als die
+     Pruefung von "diese zwei Namen" auf "jede Animation im Stylesheet"
+     umgestellt wurde. */
+  .reveal,
   .dashboard-fade-up,
   .dashboard-journey-node-active,
   .dashboard-journey-glow,
@@ -689,6 +695,42 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .discovery-rise,
   .discovery-meter-fill {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Der Einstieg
+   ---------------------------------------------------------------------------
+   Eine Frage pro Bildschirm - und zwischen zwei Fragen ein kurzes Auf- statt
+   eines harten Umschlags. Das ist der ganze Unterschied zwischen "Formular"
+   und "Gespraech".
+
+   Die Bewegung haengt am Schritt: Der Behaelter traegt `key={activeStep}`,
+   wird beim Wechsel also neu eingehaengt und die Animation laeuft erneut.
+   Ohne den Schluessel liefe sie genau einmal, beim ersten Aufbau.
+
+   Kuerzer und leiser als .discovery-rise: Dort ordnet die Bewegung eine ganze
+   Seite, hier soll sie nur den Wechsel weich machen. Wer sie abbestellt hat,
+   sieht den Endzustand sofort.
+   --------------------------------------------------------------------------- */
+.onboarding-step {
+  animation: onboarding-step 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes onboarding-step {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-step {
     animation: none !important;
   }
 }

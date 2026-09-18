@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
+import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 import { randomUUID } from "node:crypto";
@@ -228,6 +229,12 @@ export async function upsertProfileBasicsAction(formData: FormData) {
 
   if (avatarToDeleteAfterSave) {
     await deleteStoredAvatarIfOwned(supabase, user.id, avatarToDeleteAfterSave);
+  }
+
+  // Nur wenn das Formular aus dem Einstieg kommt. Dasselbe Formular bearbeitet
+  // spaeter auch das Profil - ein Speichern dort ist kein Einstieg.
+  if (formData.get("completesOnboarding") === "1") {
+    await markOnboardingComplete(supabase, user.id);
   }
 
   const currentMetadataAvatarUrl =

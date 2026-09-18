@@ -148,7 +148,21 @@ async function saveRoles(
     redirect(back("error=roles"));
   }
 
-  const { error } = await client.from("profiles").update({ roles }).eq("user_id", userId);
+  // upsert, nicht update.
+  //
+  // Wer nur im Netzwerk ist, hat KEINE profiles-Zeile - und das mit Absicht:
+  // profiles.roles traegt `default '{founder}'`, eine Zeile anzulegen haette
+  // die Person ungefragt zur Founderin gemacht. Ein update ohne Treffer wirft
+  // aber nicht, es betrifft null Zeilen. Der Haken bei "Founder" waere also
+  // folgenlos gewesen - ohne Fehlermeldung, ohne Hinweis.
+  //
+  // Bis 18.09.2026 war das unerreichbar, weil das Feld nur Menschen gezeigt
+  // wurde, die schon eine Rolle hatten. Seit der Einstieg verspricht "du
+  // kannst jederzeit erweitern", muss dieser Weg halten. Der Default greift
+  // hier nicht, weil `roles` ausdruecklich gesetzt wird.
+  const { error } = await client
+    .from("profiles")
+    .upsert({ user_id: userId, roles }, { onConflict: "user_id" });
   if (error) {
     revalidatePath("/profile");
     redirect(back("error=save"));

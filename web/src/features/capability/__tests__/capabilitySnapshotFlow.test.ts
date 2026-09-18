@@ -227,7 +227,10 @@ test("identity is edited in the core only, and reaches the context rows from the
   // nur sein Vorkommen.
   const profilesWrites = actions.match(/from\("profiles"\)[^;]*/g) ?? [];
   assert.equal(profilesWrites.length, 1, "profiles darf nur an einer Stelle geschrieben werden");
-  assert.match(profilesWrites[0], /\.update\(\{ roles \}\)/);
+  // upsert seit 18.09.2026: Connect-only-Mitglieder haben keine
+  // profiles-Zeile, und ein update ohne Treffer waere folgenlos geblieben -
+  // ohne Fehler. Die Zusage bleibt: nur roles, kein Identitaetsfeld.
+  assert.match(profilesWrites[0], /\.upsert\(\{ user_id: userId, roles \}/);
   for (const identityField of [
     "display_name",
     "headline",

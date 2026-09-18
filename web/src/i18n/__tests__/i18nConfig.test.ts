@@ -165,7 +165,9 @@ test("loads English profile basics messages", () => {
     welcome?: { submit?: string };
   };
 
-  assert.equal(profile.basicsForm?.onboarding?.steps?.welcome?.title, "Welcome to CoFoundery Align");
+  // Die Begruessung nennt nicht mehr einen Bereich, als waere er das Produkt -
+  // seit es drei gibt, waere "Welcome to CoFoundery Align" eine Verengung.
+  assert.equal(profile.basicsForm?.onboarding?.steps?.welcome?.title, "Good to have you here.");
   assert.equal(profile.basicsForm?.onboarding?.startButton, "Start profile");
   assert.equal(profile.basicsForm?.skills?.Sonstiges, "Other");
   assert.equal(profile.basicsForm?.intentions?.Suche?.label, "Searching");

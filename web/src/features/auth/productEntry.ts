@@ -4,7 +4,14 @@ export type ProductCapabilities = {
   hasConnect: boolean;
   hasConnectAccount?: boolean;
   connectProfileReady?: boolean;
-  profileOnboardingAllowed?: boolean;
+  /**
+   * Ob die Person den Einstieg schon durchlaufen hat.
+   *
+   * Voreinstellung true - "im Zweifel war sie schon da". Wer den Einstieg ein
+   * zweites Mal bekommt, erlebt keine Einfuehrung, sondern eine Sperre; das
+   * ist der teurere Fehler. Der echte Wert wird beim Aufruf uebergeben.
+   */
+  onboardingComplete?: boolean;
   coreProfileComplete: boolean;
 };
 
@@ -19,9 +26,22 @@ export function resolveProductEntryPath(
     hasConnect,
     hasConnectAccount = hasConnect,
     connectProfileReady = true,
-    profileOnboardingAllowed = false,
+    onboardingComplete = true,
     coreProfileComplete,
   } = capabilities;
+
+  /**
+   * Die erste Weiche, vor allen anderen: Wer noch nicht eingefuehrt wurde,
+   * wird eingefuehrt - unabhaengig davon, welche Bereiche offen sind.
+   *
+   * Bis 18.09.2026 stand hier stattdessen `profileOnboardingAllowed`, das nur
+   * dann wahr war, wenn /start eine Absicht mitgeschickt hatte. Die Absicht
+   * fiel damit auf dem Anmeldeformular, neben dem Beta-Code, bevor irgendwer
+   * etwas gesehen hatte - und wer ohne Absicht ankam, wurde auf /start
+   * zurueckgeschickt. Menschen ohne Produktrolle sahen den Einstieg nie.
+   */
+  if (!onboardingComplete) return welcomePath;
+
   if (!hasFounder && !hasAdvisor && hasConnect) {
     if (nextPath === "/account") return nextPath;
     if (!connectProfileReady) {
@@ -32,7 +52,8 @@ export function resolveProductEntryPath(
     return nextPath.startsWith("/connect") ? nextPath : "/connect";
   }
   if (!hasFounder && !hasAdvisor && hasConnectAccount) return "/account";
-  if (!coreProfileComplete && (hasFounder || hasAdvisor || profileOnboardingAllowed)) return welcomePath;
+  // Letzter Ausweg: eingefuehrt, aber ohne jeden Bereich. Sollte nach dem
+  // Einstieg nicht vorkommen - dort waehlt man mindestens einen.
   if (!hasFounder && !hasAdvisor) return "/start";
   if (!coreProfileComplete) return welcomePath;
   if (nextPath === "/dashboard" && !hasFounder && hasAdvisor) return "/advisor/dashboard";

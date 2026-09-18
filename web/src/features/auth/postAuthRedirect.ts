@@ -43,6 +43,38 @@ function withProfileIntent(path: string, intent: "founder" | "advisor" | null) {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+/**
+ * Ob die Person den Einstieg schon durchlaufen hat.
+ *
+ * Faellt der Aufruf aus, gilt sie als eingefuehrt. Ein Lesefehler darf
+ * niemanden in den Einstiegsweg zurueckwerfen - das traefe die Menschen, die
+ * laengst drin sind, und zwar bei jeder Anmeldung. Ein neu registrierter
+ * Mensch faellt in dem Fall auf die zweite Weiche (coreProfileComplete) und
+ * landet trotzdem richtig.
+ */
+async function readOnboardingComplete(supabase: SupabaseAuthUserClient, userId: string) {
+  try {
+    const result = await (supabase.from("person_core") as {
+      select: (columns: string) => {
+        eq: (column: string, value: string) => {
+          maybeSingle: () => Promise<{
+            data: { onboarding_completed_at?: string | null } | null;
+            error: unknown;
+          }>;
+        };
+      };
+    })
+      .select("onboarding_completed_at")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (result.error) return true;
+    return Boolean(result.data?.onboarding_completed_at);
+  } catch {
+    return true;
+  }
+}
+
 export async function resolvePostAuthRedirectPath(
   supabase: SupabaseAuthUserClient,
   nextPath: string,
@@ -99,7 +131,7 @@ export async function resolvePostAuthRedirectPath(
     hasConnect,
     hasConnectAccount,
     connectProfileReady,
-    profileOnboardingAllowed: profileSignupIntent !== null,
+    onboardingComplete: await readOnboardingComplete(supabase, user.id),
     coreProfileComplete: isCoreProfileComplete(profile),
   }, withProfileIntent(buildWelcomeRedirectPath(normalizedNext), profileSignupIntent));
 }

@@ -209,16 +209,71 @@ test("the completion meter counts the same eight things publishing requires", ()
   assert.match(page, /aria-valuenow=\{done\}/);
 });
 
+/**
+ * GEAENDERT am 18.09.2026: Der Test las vorher nur den LETZTEN
+ * reduced-motion-Block (`lastIndexOf`) und pruefte darin zwei Namen. Sobald
+ * ein zweiter Block dazukam - der fuer den Einstieg -, lag der erste
+ * ausserhalb des Ausschnitts und der Test schlug fehl, obwohl nichts kaputt
+ * war.
+ *
+ * Statt den Ausschnitt zu reparieren, prueft er jetzt die eigentliche Zusage,
+ * und zwar fuer ALLE Animationen im Stylesheet: Wer Bewegung abbestellt hat,
+ * bekommt keine. Eine kuenftige Animation ohne Abschalter faellt damit auf,
+ * ohne dass jemand daran denken muss, diesen Test zu erweitern.
+ */
 test("every animation can be switched off", () => {
   const css = readFileSync("src/app/globals.css", "utf8");
-  const block = css.slice(css.lastIndexOf("@media (prefers-reduced-motion: reduce)"));
-  for (const name of ["discovery-rise", "discovery-meter-fill"]) {
-    assert.ok(block.includes(`.${name}`), `${name} fehlt in der reduced-motion-Regel`);
+
+  // Alle reduced-motion-Bloecke, mit Klammerzaehlung statt Regex - ein
+  // nicht-gieriges /\{[^}]*\}/ bricht am ersten inneren Block ab.
+  const guards: string[] = [];
+  const rest: string[] = [];
+  let cursor = 0;
+  const MARKER = "@media (prefers-reduced-motion: reduce)";
+  for (;;) {
+    const found = css.indexOf(MARKER, cursor);
+    if (found === -1) {
+      rest.push(css.slice(cursor));
+      break;
+    }
+    rest.push(css.slice(cursor, found));
+    let depth = 0;
+    let index = css.indexOf("{", found);
+    const blockStart = index;
+    for (; index < css.length; index += 1) {
+      if (css[index] === "{") depth += 1;
+      else if (css[index] === "}") {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+    }
+    guards.push(css.slice(blockStart, index + 1));
+    cursor = index + 1;
   }
+
+  assert.ok(guards.length > 0, "es gibt keine reduced-motion-Regel");
+  const guarded = guards.join("\n");
+
+  const animated = [
+    ...new Set(
+      [...rest.join("\n").matchAll(/\.([a-zA-Z][\w-]*)\s*\{[^}]*animation:/g)].map((match) => match[1])
+    ),
+  ];
+  assert.ok(animated.length >= 3, `zu wenige Animationen gefunden (${animated.length}) - die Suche greift nicht`);
+
+  for (const name of animated) {
+    assert.ok(guarded.includes(`.${name}`), `${name} laesst sich nicht abschalten`);
+  }
+  // Die beiden, um die es urspruenglich ging, muessen dabei sein.
+  for (const name of ["discovery-rise", "discovery-meter-fill", "onboarding-step"]) {
+    assert.ok(animated.includes(name), `${name} wird nicht mehr als Animation erkannt`);
+  }
+
   // Der Endzustand bleibt sichtbar - "both" statt eines Startzustands, der
   // ohne Animation stehen bliebe.
   assert.match(css, /animation: discovery-rise [^;]*both;/);
   assert.match(css, /animation: discovery-meter [^;]*both;/);
+  assert.match(css, /animation: onboarding-step [^;]*both;/);
 });
 
 test("the form no longer nests three frames deep", () => {

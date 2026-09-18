@@ -5,48 +5,37 @@
     "onboarding": {
       "steps": {
         "welcome": {
-          "eyebrow": "Step 1 of 7",
-          "title": "Welcome to CoFoundery Align",
-          "hint": "This is not only about who you find. It is about how well you can actually work together."
+          "title": "Good to have you here.",
+          "hint": "We'll ask you a few short questions. After that you'll know where you're at home in CoFoundery."
         },
         "name": {
-          "eyebrow": "Step 2 of 7",
           "title": "What should we call you?",
-          "hint": "This is how you will appear in your profile and in matching."
+          "hint": "This is how you'll appear to other people here."
         },
-        "role": {
-          "eyebrow": "Step 3 of 7",
-          "title": "Choose the role that fits where you are right now.",
-          "hint": ""
+        "plan": {
+          "title": "What are you here to do?",
+          "hint": "This decides which areas open up for you. There's no wrong answer – and none that locks you in."
         },
         "focus": {
-          "eyebrow": "Step 4 of 7",
-          "title": "What is your main focus?",
-          "hint": "This helps us understand your profile in the right context later."
+          "title": "Where's your focus?",
+          "hint": "A rough direction is enough. It gets more specific on its own."
         },
         "intention": {
-          "eyebrow": "Step 5 of 7",
           "title": "What are you working on right now?",
-          "hint": "Your intention helps us set the right context for matching and collaboration."
+          "hint": "This sets the context for everything you'll meet here."
         },
         "avatar": {
-          "eyebrow": "Step 6 of 7",
-          "title": "Would you like to add a picture?",
-          "hint": "Optional. You can also do this later."
+          "title": "Want to add a picture?",
+          "hint": "Entirely optional. You can do it later any time."
         },
         "next": {
-          "eyebrow": "Step 7 of 7",
-          "title": "What happens next",
-          "hint": "You are not heading into just another form, but into a product that makes collaboration clearer early."
+          "title": "These are your areas",
+          "hint": "You'll find them in the bar at the top from now on."
         }
       },
-      "welcomeText": "You are only creating your core profile now. It takes a moment and then brings you straight into the product.",
+      "welcomeText": "It takes a minute, and you can change everything later.",
       "nameLabel": "Name",
       "namePlaceholder": "Your name",
-      "roleBoth": "Both",
-      "roleBothDescription": "You are currently active both as a founder and from an advisory perspective.",
-      "roleAdvisorDescription": "You support founder teams from an advisory perspective.",
-      "roleFounderDescription": "You use CoFoundery for your own matching, profile, and alignment.",
       "focusOtherLabel": "Optional focus area",
       "focusOtherPlaceholder": "If you like, describe your focus more specifically here",
       "avatarSkipHint": "It is completely fine to skip this for now.",
@@ -54,15 +43,46 @@
       "startButton": "Start profile",
       "skipImageButton": "Continue without image",
       "backButton": "Back",
-      "nextCards": {
-        "profileTitle": "Build your profile",
-        "profileText": "Your core profile gives your start a clear direction.",
-        "insightsTitle": "Get insights",
-        "insightsText": "Your answers make differences and patterns easier to discuss.",
-        "collaborationTitle": "Clarify matching and collaboration",
-        "collaborationText": "This becomes clearer conversations, reports, and later concrete working agreements."
+      "nonDiagnosticHint": "CoFoundery Align is not a personality test. It helps you make collaboration clearer and more resilient early.",
+      "stepsLeft": "{count, plural, =0 {Last step} =1 {One more step} other {# more steps}}",
+      "plans": {
+        "founder": {
+          "title": "I want to found a company",
+          "description": "You're building something, or you firmly intend to – alone or with a team."
+        },
+        "advisor": {
+          "title": "I support founders",
+          "description": "You bring experience and work with teams in an advisory role."
+        },
+        "both": {
+          "title": "Both",
+          "description": "You're founding yourself and passing on what you've learned at the same time."
+        },
+        "connect": {
+          "title": "Just meet people for now",
+          "description": "You want to see who's around here before committing to anything."
+        }
       },
-      "nonDiagnosticHint": "CoFoundery Align is not a personality test. It helps you make collaboration clearer and more resilient early."
+      "opens": "Opens",
+      "planChangeable": "Nothing is final: as a founder or advisor you can change this any time in your profile.",
+      "areas": {
+        "align": {
+          "name": "Align",
+          "text": "Here you work out how you work and decide – and how well that fits with someone else. Not a personality test, but a basis for honest conversations."
+        },
+        "find": {
+          "name": "Find",
+          "text": "Here you look for people you could found with. You say what you're looking for and what you bring – and see who fits."
+        },
+        "connect": {
+          "name": "Connect",
+          "text": "Here you meet the network: people with what they offer and need, real problems from other people's days – and everything business ideas grow out of."
+        }
+      },
+      "areasLater": "You can add the other areas whenever you like – in your profile, with one checkbox.",
+      "startConnectButton": "Continue to Connect",
+      "planChangeableConnect": "And if you decide to found something later, we'll open up Align and Find – just drop us a line.",
+      "areasLaterConnect": "Align and Find are open to you whenever you want – just get in touch and we'll unlock them."
     },
     "avatar": {
       "title": "Avatar",

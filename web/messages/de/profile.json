@@ -5,48 +5,37 @@
     "onboarding": {
       "steps": {
         "welcome": {
-          "eyebrow": "Schritt 1 von 7",
-          "title": "Willkommen bei CoFoundery Align",
-          "hint": "Hier geht es nicht nur darum, wen du findest. Sondern wie gut ihr wirklich zusammenarbeitet."
+          "title": "Schön, dass du da bist.",
+          "hint": "Wir stellen dir gleich ein paar kurze Fragen. Danach weißt du, wo du bei CoFoundery zu Hause bist."
         },
         "name": {
-          "eyebrow": "Schritt 2 von 7",
           "title": "Wie sollen wir dich nennen?",
-          "hint": "So erscheinst du später in deinem Profil und im Matching."
+          "hint": "So erscheinst du später für andere Menschen hier."
         },
-        "role": {
-          "eyebrow": "Schritt 3 von 7",
-          "title": "Wähle die Rolle, mit der du gerade am ehesten unterwegs bist.",
-          "hint": ""
+        "plan": {
+          "title": "Was hast du vor?",
+          "hint": "Daran hängt, welche Bereiche sich für dich öffnen. Es gibt keine falsche Antwort – und keine, die dich festlegt."
         },
         "focus": {
-          "eyebrow": "Schritt 4 von 7",
           "title": "Worauf liegt dein Schwerpunkt?",
-          "hint": "Das hilft uns, dein Profil später besser einzuordnen."
+          "hint": "Eine grobe Richtung reicht. Genauer wird es später von selbst."
         },
         "intention": {
-          "eyebrow": "Schritt 5 von 7",
           "title": "Woran arbeitest du gerade?",
-          "hint": "Deine Intention hilft uns, den richtigen Kontext für Matching und Zusammenarbeit zu setzen."
+          "hint": "Das setzt den Kontext für alles, was dir hier begegnet."
         },
         "avatar": {
-          "eyebrow": "Schritt 6 von 7",
-          "title": "Willst du noch ein Bild hinzufügen?",
-          "hint": "Optional. Du kannst das auch später machen."
+          "title": "Magst du ein Bild dazulegen?",
+          "hint": "Ganz freiwillig. Geht auch später jederzeit."
         },
         "next": {
-          "eyebrow": "Schritt 7 von 7",
-          "title": "So geht es jetzt weiter",
-          "hint": "Du startest gleich nicht in ein Formular, sondern in ein Produkt, das Zusammenarbeit früh klarer macht."
+          "title": "Das sind deine Bereiche",
+          "hint": "Oben in der Leiste findest du sie ab jetzt wieder."
         }
       },
-      "welcomeText": "Du legst jetzt nur dein Kernprofil an. Das dauert kurz und bringt dich danach direkt in das Produkt.",
+      "welcomeText": "Es dauert eine Minute, und du kannst alles später ändern.",
       "nameLabel": "Name",
       "namePlaceholder": "Dein Name",
-      "roleBoth": "Beides",
-      "roleBothDescription": "Du bewegst dich gerade sowohl als Founder als auch mit beratender Perspektive.",
-      "roleAdvisorDescription": "Du begleitest Founder-Teams mit einer beratenden Perspektive.",
-      "roleFounderDescription": "Du nutzt CoFoundery für dein eigenes Matching, Profil und Alignment.",
       "focusOtherLabel": "Optionaler Schwerpunkt",
       "focusOtherPlaceholder": "Wenn du willst, kannst du hier deinen Schwerpunkt genauer benennen",
       "avatarSkipHint": "Wenn du gerade überspringen willst, ist das völlig okay.",
@@ -54,15 +43,46 @@
       "startButton": "Profil starten",
       "skipImageButton": "Ohne Bild weitermachen",
       "backButton": "Zurück",
-      "nextCards": {
-        "profileTitle": "Profil aufbauen",
-        "profileText": "Dein Kernprofil gibt deinem Einstieg sofort Richtung.",
-        "insightsTitle": "Insights bekommen",
-        "insightsText": "Deine Antworten machen Unterschiede und Muster greifbar.",
-        "collaborationTitle": "Matching und Zusammenarbeit klären",
-        "collaborationText": "Daraus werden klare Gespräche, Reports und später konkrete Arbeitsregeln."
+      "nonDiagnosticHint": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft dir, Zusammenarbeit früh klarer und belastbarer zu machen.",
+      "stepsLeft": "{count, plural, =0 {Letzter Schritt} =1 {Noch ein Schritt} other {Noch # Schritte}}",
+      "plans": {
+        "founder": {
+          "title": "Ich will gründen",
+          "description": "Du baust etwas auf oder hast es fest vor – allein oder im Team."
+        },
+        "advisor": {
+          "title": "Ich begleite Gründerinnen und Gründer",
+          "description": "Du bringst Erfahrung mit und arbeitest beratend mit Teams."
+        },
+        "both": {
+          "title": "Beides",
+          "description": "Du gründest selbst und gibst gleichzeitig weiter, was du gelernt hast."
+        },
+        "connect": {
+          "title": "Erstmal nur Leute kennenlernen",
+          "description": "Du willst schauen, wer hier unterwegs ist, bevor du dich festlegst."
+        }
       },
-      "nonDiagnosticHint": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft dir, Zusammenarbeit früh klarer und belastbarer zu machen."
+      "opens": "Öffnet",
+      "planChangeable": "Du legst dich nicht fest: Als Founder oder Advisor änderst du das jederzeit in deinem Profil.",
+      "areas": {
+        "align": {
+          "name": "Align",
+          "text": "Hier klärst du, wie du arbeitest und entscheidest – und wie gut das mit jemand anderem zusammenpasst. Kein Persönlichkeitstest, sondern eine Grundlage für ehrliche Gespräche."
+        },
+        "find": {
+          "name": "Find",
+          "text": "Hier suchst du Menschen, mit denen du gründen könntest. Du sagst, was du suchst und was du mitbringst – und siehst, wer dazu passt."
+        },
+        "connect": {
+          "name": "Connect",
+          "text": "Hier triffst du das Netzwerk: Menschen mit ihren Angeboten und Gesuchen, echte Probleme aus dem Alltag anderer – und alles, woraus Geschäftsideen entstehen."
+        }
+      },
+      "areasLater": "Die übrigen Bereiche nimmst du jederzeit dazu – in deinem Profil, mit einem Haken.",
+      "startConnectButton": "Weiter zu Connect",
+      "planChangeableConnect": "Und wenn du später doch gründen willst, schalten wir dir Align und Find frei – schreib uns einfach.",
+      "areasLaterConnect": "Align und Find stehen dir offen, sobald du willst – melde dich kurz bei uns, dann schalten wir sie frei."
     },
     "avatar": {
       "title": "Avatar",
