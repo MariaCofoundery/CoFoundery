@@ -32,7 +32,7 @@ function authErrorMessage(error: string | undefined, t: AuthT) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; status?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("auth");
@@ -42,6 +42,11 @@ export default async function LoginPage({
   } = await supabase.auth.getUser();
   const nextPath = normalizeNextPath(params.next);
   const errorMessage = authErrorMessage(params.error, t);
+  // Kein Fehler, sondern eine Bestaetigung: "Ueberall abmelden" fuehrt
+  // zwangslaeufig hierher, und ohne diesen Satz saehe es aus, als waere man
+  // rausgeflogen.
+  const noticeMessage =
+    params.status === "signed_out_everywhere" ? t("login.status.signedOutEverywhere") : null;
   const shouldCreateUser = canCreateAccountFromPath(nextPath);
 
   if (user) {
@@ -69,6 +74,11 @@ export default async function LoginPage({
         {errorMessage ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
             {errorMessage}
+          </p>
+        ) : null}
+        {noticeMessage ? (
+          <p role="status" className="mt-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+            {noticeMessage}
           </p>
         ) : null}
         <div className="mt-6">

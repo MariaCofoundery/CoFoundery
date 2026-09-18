@@ -62,6 +62,17 @@ function statusMessage(status: string | undefined, t: AuthT) {
     };
   }
 
+  // Der Bestaetigungsweg leitet bei einem fehlgeschlagenen Connect-Beitritt
+  // hierher (/auth/confirm). Beim Entschlacken dieser Seite am 18.09.2026 ist
+  // der Zweig mitgegangen, obwohl der Weg dorthin geblieben ist - die Meldung
+  // lief seitdem ins Leere und die Person stand ohne Erklaerung da.
+  if (status === "connect_failed") {
+    return {
+      tone: "error" as const,
+      text: t("start.status.connectFailed"),
+    };
+  }
+
   if (status === "send_failed") {
     return {
       tone: "error" as const,

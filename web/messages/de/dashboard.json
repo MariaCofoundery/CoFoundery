@@ -430,6 +430,29 @@
       "outlivesIrreversible": "Anonym heißt: Dein Name wird unwiderruflich vom Text getrennt. Wir können ihn danach nicht mehr dir zuordnen – und du kannst ihn nicht mehr ändern oder zurückholen.",
       "outlivesCheckText": "Lies vorher noch einmal, was du geschrieben hast: Steht dort etwas, das auf dich, deine Kolleginnen oder deinen Arbeitgeber zeigt? Das Trennen deines Namens ändert den Text nicht.",
       "outlivesReview": "Meine Einträge ansehen"
+    },
+    "access": {
+      "title": "Anmeldung",
+      "text": "Du meldest dich mit einem Link an, den wir dir per E-Mail schicken. Deine Adresse ist damit dein Schlüssel zum Konto – hier siehst du, welche es ist.",
+      "currentLabel": "Angemeldet als",
+      "unknownEmail": "Keine Adresse hinterlegt",
+      "changeCta": "Adresse ändern",
+      "newEmailLabel": "Neue E-Mail-Adresse",
+      "newEmailPlaceholder": "name@beispiel.de",
+      "doubleConfirmHint": "Wir schicken einen Link an die alte und an die neue Adresse. Erst wenn du beide bestätigst, gilt die neue. Bis dahin meldest du dich weiter mit der alten an.",
+      "pendingInvitations": "{count, plural, =1 {An deine jetzige Adresse ist noch eine Einladung offen. Sie geht beim Wechsel verloren – nimm sie vorher an.} other {An deine jetzige Adresse sind noch # Einladungen offen. Sie gehen beim Wechsel verloren – nimm sie vorher an.}}",
+      "submit": "Links verschicken",
+      "submitPending": "Wird verschickt …",
+      "signOutTitle": "Auf allen Geräten abmelden",
+      "signOutText": "Beendet alle Sitzungen – auch auf einem Gerät, das du nicht mehr hast, oder wenn jemand Zugriff auf dein Postfach hatte. Danach meldest du dich hier neu an.",
+      "signOutCta": "Überall abmelden",
+      "signOutPending": "Wird abgemeldet …",
+      "status": {
+        "email_sent": "Geschafft. Wir haben je einen Link an deine alte und deine neue Adresse geschickt. Bestätige beide – erst dann wird gewechselt.",
+        "email_invalid": "Das sieht nicht nach einer E-Mail-Adresse aus. Bitte sieh noch einmal nach.",
+        "email_unchanged": "Das ist die Adresse, die du schon nutzt.",
+        "email_failed": "Das hat gerade nicht geklappt. Bitte versuch es später noch einmal – und wenn es dabei bleibt, schreib uns."
+      }
     }
   },
   "outlook": {

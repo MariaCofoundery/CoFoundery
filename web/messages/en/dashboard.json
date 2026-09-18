@@ -430,6 +430,29 @@
       "outlivesIrreversible": "Anonymous means: your name is severed from the text irreversibly. We cannot link it back to you afterwards – and you can no longer change it or take it back.",
       "outlivesCheckText": "Read once more what you wrote: does it point at you, your colleagues or your employer? Severing your name does not change the text.",
       "outlivesReview": "Look at my entries"
+    },
+    "access": {
+      "title": "Signing in",
+      "text": "You sign in with a link we email you. That makes your address the key to your account – here's the one we have.",
+      "currentLabel": "Signed in as",
+      "unknownEmail": "No address on file",
+      "changeCta": "Change address",
+      "newEmailLabel": "New email address",
+      "newEmailPlaceholder": "name@example.com",
+      "doubleConfirmHint": "We'll send a link to both your old and your new address. The new one only takes effect once you confirm both. Until then you keep signing in with the old one.",
+      "pendingInvitations": "{count, plural, =1 {There's still one invitation open to your current address. It will be lost when you switch – accept it first.} other {There are still # invitations open to your current address. They will be lost when you switch – accept them first.}}",
+      "submit": "Send the links",
+      "submitPending": "Sending …",
+      "signOutTitle": "Sign out on all devices",
+      "signOutText": "Ends every session – including on a device you no longer have, or if someone had access to your inbox. You'll sign in again here afterwards.",
+      "signOutCta": "Sign out everywhere",
+      "signOutPending": "Signing out …",
+      "status": {
+        "email_sent": "Done. We've sent a link to your old and your new address. Confirm both – only then does the switch happen.",
+        "email_invalid": "That doesn't look like an email address. Please take another look.",
+        "email_unchanged": "That's the address you're already using.",
+        "email_failed": "That didn't work just now. Please try again later – and if it keeps failing, get in touch."
+      }
     }
   },
   "outlook": {

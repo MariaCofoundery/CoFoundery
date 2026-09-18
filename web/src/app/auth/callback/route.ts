@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       const requestUrl = new URL(request.url);
       const connectSignupToken = readConnectSignupToken(requestUrl);
       if (connectSignupToken && !(await claimConnectSignupIntent(supabase, connectSignupToken))) {
-        return NextResponse.redirect(new URL("/start?status=connect_failed&intent=connect", request.url));
+        return NextResponse.redirect(new URL("/start?status=connect_failed", request.url));
       }
       const destination = await resolvePostAuthRedirectPath(
         supabase,

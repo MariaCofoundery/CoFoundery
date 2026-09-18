@@ -17,7 +17,21 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   assert.match(page, /canAccessAccountSettings/);
   assert.match(page, /redirect\("\/start"\)/);
   assert.match(page, /<DeleteAccountSection\b/);
-  assert.doesNotMatch(page, /\.from\(|network_listings|assessments|founder_teams|advisor_team/);
+  assert.doesNotMatch(page, /network_listings|assessments|founder_teams|advisor_team/);
+
+  // GEAENDERT am 18.09.2026: Der Test verbot pauschal jedes `.from(`. Die
+  // Absicht dahinter - hier werden keine Produktdaten geladen - gilt
+  // unveraendert. Seit die Seite die Mailadresse aendern laesst, zaehlt sie
+  // aber offene Einladungen an die ALTE Adresse; die gehen beim Wechsel
+  // verloren, und das gehoert neben den Knopf. Das ist ein Kontodatum.
+  //
+  // Geprueft wird deshalb genau das: hoechstens diese eine Tabelle.
+  const tables = [...page.matchAll(/\.from\("([^"]+)"\)/g)].map((match) => match[1]);
+  assert.deepEqual(
+    [...new Set(tables)],
+    ["participants"],
+    "die Kontoseite laedt etwas anderes als die offenen Einladungen"
+  );
 });
 
 test("profile menu keeps Connect identity separate and exposes Account for every supported role", () => {
