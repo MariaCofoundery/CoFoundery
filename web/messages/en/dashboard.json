@@ -453,6 +453,71 @@
         "email_unchanged": "That's the address you're already using.",
         "email_failed": "That didn't work just now. Please try again later – and if it keeps failing, get in touch."
       }
+    },
+    "status": {
+      "locale_saved": "Saved. The interface and your emails will use the language you picked from now on.",
+      "locale_failed": "That didn't work just now. Please try again.",
+      "notifications_saved": "Saved. From now on we'll only write to you about what you ticked.",
+      "notifications_failed": "That didn't work just now. Please try again."
+    },
+    "locale": {
+      "title": "Language",
+      "text": "Applies to the interface and to every email we send you. Until now the language lived in your browser – on a second device it was gone.",
+      "options": {
+        "de": "Deutsch",
+        "en": "English"
+      },
+      "undecided": "You haven't picked one yet – for now we follow your browser.",
+      "submit": "Save language",
+      "submitPending": "Saving …"
+    },
+    "notifications": {
+      "title": "When do we write to you?",
+      "text": "At most one email per thing – an ongoing conversation doesn't trigger a mail per line. Whatever you switch off here is still waiting for you in the platform.",
+      "areas": {
+        "align": "Align",
+        "find": "Find",
+        "connect": "Connect"
+      },
+      "kinds": {
+        "contact_request": {
+          "title": "Someone would like to meet you",
+          "text": "When someone sends you a contact request."
+        },
+        "message": {
+          "title": "New message",
+          "text": "When someone writes to you in a conversation and you haven't read the previous one yet."
+        },
+        "problem_interest": {
+          "title": "Interest in one of your problems",
+          "text": "When someone says they know the problem too, or has an approach to it."
+        },
+        "connect_saved_search": {
+          "title": "A match for your saved search",
+          "text": "When a new offer, request or problem matches a search you saved."
+        },
+        "discovery_saved_search": {
+          "title": "A match for your saved search",
+          "text": "When a new profile matches a search you saved in the co-founder search."
+        },
+        "read_my_mind": {
+          "title": "Read My Mind: your turn",
+          "text": "When the other person started a round and is waiting for you."
+        },
+        "founder_in_the_wild": {
+          "title": "Founder in the Wild: your turn",
+          "text": "When the other person finished their part and you can carry on."
+        }
+      },
+      "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",
+      "submit": "Save choice",
+      "submitPending": "Saving …"
+    },
+    "data": {
+      "title": "Your data",
+      "text": "You can download everything stored under your account at any time – as one file that opens in any text editor.",
+      "scope": "Not included: messages other people wrote – those are theirs. And the evidence from your capability snapshot, which we never pass on anywhere.",
+      "download": "Download my data"
     }
   },
   "outlook": {

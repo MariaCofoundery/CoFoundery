@@ -2,12 +2,16 @@ import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { canAccessAccountSettings } from "@/features/account/accountAccess";
+import { AccountAccessSection } from "@/features/account/AccountAccessSection";
+import { isAccountStatus } from "@/features/account/accountStatus";
 import {
-  AccountAccessSection,
-  ACCOUNT_STATUS_KEYS,
-  type AccountStatus,
-} from "@/features/account/AccountAccessSection";
-import { ConnectNotificationSetting } from "@/features/connect/ConnectNotificationSetting";
+  AccountDataSection,
+  AccountPreferencesSection,
+} from "@/features/account/AccountPreferencesSection";
+import { isNotificationKind, type NotificationKind } from "@/features/account/notificationKinds";
+import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
+import { getResearchConsentState } from "@/features/research/consent";
+import { normalizeLocale, type AppLocale } from "@/i18n/config";
 import { DeleteAccountSection } from "@/features/account/DeleteAccountSection";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient } from "@/lib/supabase/server";
@@ -24,13 +28,29 @@ export default async function AccountPage({
 
   if (!user) redirect("/login?next=/account");
 
-  const [params, roleViews, membershipResult, t, connectT, notificationsResult, pendingInvitations] = await Promise.all([
+  const [
+    params,
+    roleViews,
+    membershipResult,
+    t,
+    preferences,
+    optedOutRows,
+    researchConsentState,
+    pendingInvitations,
+  ] = await Promise.all([
     searchParams,
     getDashboardRoleViews(user.id).catch(() => ({ hasFounder: false, hasAdvisor: false, roles: [] })),
     supabase.rpc("has_network_account"),
     getTranslations("dashboard"),
-    getTranslations("connect"),
-    supabase.rpc("get_network_email_notifications"),
+    Promise.resolve(
+      supabase.from("person_core").select("locale").eq("user_id", user.id).maybeSingle()
+    )
+      .then(({ data }) => data)
+      .catch(() => null),
+    Promise.resolve(supabase.from("notification_opt_outs").select("kind").eq("user_id", user.id))
+      .then(({ data }) => data ?? [])
+      .catch((): { kind: string }[] => []),
+    getResearchConsentState(supabase, user.id).catch(() => "undecided" as const),
     // Offene Einladungen an die AKTUELLE Adresse. Die Policy auf participants
     // ordnet ueber die Mailadresse im Token zu - nach einem Wechsel greift sie
     // nicht mehr. Die Zeilen sind durch genau diese Policy sichtbar, es
@@ -50,11 +70,12 @@ export default async function AccountPage({
   ]);
   // Nur bekannte Schluessel an t() geben - ein manipulierter Parameter wuerde
   // sonst als roher Schluesselpfad auf der Seite landen.
-  const status = ACCOUNT_STATUS_KEYS.includes(params.status as AccountStatus)
-    ? (params.status as AccountStatus)
-    : null;
+  const status = isAccountStatus(params.status) ? params.status : null;
   const hasConnectAccount = membershipResult.data === true;
-  const notificationsEnabled = notificationsResult.data !== false;
+  const accountLocale: AppLocale | null = preferences?.locale ? normalizeLocale(preferences.locale) : null;
+  const optedOut = (optedOutRows as { kind: string }[])
+    .map((row) => row.kind)
+    .filter(isNotificationKind) as NotificationKind[];
   // Was eine Loeschung ueberdauern koennte. Ohne Connect-Konto gibt es das
   // nicht, dann wird auch nicht danach gefragt.
   const outlivable = hasConnectAccount
@@ -76,23 +97,12 @@ export default async function AccountPage({
         pendingInvitations={pendingInvitations}
         status={status}
       />
-      {/* Nur bei Connect-Konten: Eine Einstellung fuer etwas, das man nicht
-          hat, ist Rauschen. */}
-      {hasConnectAccount ? (
-        <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-          <ConnectNotificationSetting
-            enabled={notificationsEnabled}
-            copy={{
-              title: connectT("notifications.title"),
-              text: connectT("notifications.text"),
-              state: connectT(notificationsEnabled ? "notifications.stateOn" : "notifications.stateOff"),
-              on: connectT("notifications.turnOn"),
-              off: connectT("notifications.turnOff"),
-              pending: connectT("pending.save"),
-            }}
-          />
-        </section>
-      ) : null}
+      <AccountPreferencesSection locale={accountLocale} optedOut={optedOut} status={status} />
+
+      <AccountDataSection>
+        <ResearchConsentSettings initialState={researchConsentState} />
+      </AccountDataSection>
+
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <DeleteAccountSection
           outlivable={

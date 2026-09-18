@@ -1,20 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { requestEmailChangeAction, signOutEverywhereAction } from "@/features/account/accountActions";
+import {
+  accountStatusSection,
+  isAccountStatusFailure,
+  type AccountStatus,
+} from "@/features/account/accountStatus";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD = "rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7";
 const PRIMARY = "inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white";
 const SECONDARY =
   "inline-flex min-h-11 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50";
-
-export const ACCOUNT_STATUS_KEYS = [
-  "email_sent",
-  "email_invalid",
-  "email_unchanged",
-  "email_failed",
-] as const;
-
-export type AccountStatus = (typeof ACCOUNT_STATUS_KEYS)[number];
 
 /**
  * Der Zugang zum Konto.
@@ -44,8 +40,10 @@ export async function AccountAccessSection({
   status: AccountStatus | null;
 }) {
   const t = await getTranslations("dashboard");
-  const message = status ? t(`account.access.status.${status}`) : null;
-  const isError = status !== null && status !== "email_sent";
+  // Nur die eigenen Meldungen: Eine gespeicherte Sprache gehoert nicht hierher.
+  const own = status && accountStatusSection(status) === "access" ? status : null;
+  const message = own ? t(`account.access.status.${own}`) : null;
+  const isError = own !== null && isAccountStatusFailure(own);
 
   return (
     <section id="anmeldung" className={`${CARD} mt-8`}>

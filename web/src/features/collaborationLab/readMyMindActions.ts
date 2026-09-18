@@ -5,8 +5,7 @@ import { redirect } from "next/navigation";
 import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent";
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { isValidReadMyMindSelection } from "@/features/collaborationLab/readMyMindModel";
-import { getReadMyMindNotificationRecipientEmail } from "@/features/collaborationLab/readMyMindNotificationRecipient";
-import { getRequestLocale } from "@/i18n/getLocale";
+import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -58,16 +57,25 @@ async function sendTeamHandoffNotification(params: {
   ).map((participant) => participant.founder_user_id))];
   if (recipients.length !== 1) return false;
 
-  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipients[0]!);
-  if (!recipientEmail) return false;
-  const locale = await getRequestLocale();
+  // Neu am 18.09.2026: eigener Schalter, und die Sprache der EMPFAENGERIN.
+  // Vorher kam die Uebergabe ungefragt und in der Sprache der Person, die
+  // gerade die Runde gestartet hat.
+  const { data: wanted } = await params.supabase.rpc("wants_email_notification", {
+    p_user_id: recipients[0]!,
+    p_kind: "read_my_mind",
+  });
+  if (wanted !== true) return false;
+
+  const recipient = await getNotificationRecipient(recipients[0]!);
+  if (!recipient) return false;
+  const locale = recipient.locale;
   const packTitles = params.claims.flatMap((claim) => {
     const pack = getReadMyMindPack(claim.pack_key, claim.pack_version);
     return pack ? [pack.title[locale]] : [];
   });
   if (packTitles.length !== params.claims.length) return false;
   const delivery = await sendReadMyMindStartedEmail({
-    recipientEmail,
+    recipientEmail: recipient.email,
     creatorName: params.creatorName,
     packTitles,
     roundUrl: toPublicAppUrl(entryHref(params.teamId)),

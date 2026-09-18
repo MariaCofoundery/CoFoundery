@@ -558,14 +558,6 @@
     "outlivesApproachLabel": "May stay anonymously if I delete my account",
     "outlivesApproachHint": "This approach sits on someone else's page. Without this, it disappears from there along with your account."
   },
-  "notifications": {
-    "title": "Connect notifications",
-    "text": "We write to you when someone contacts you, shows interest in one of your problems, or sends you a message. At most once per event – an ongoing conversation does not trigger an email per line.",
-    "stateOn": "Currently on.",
-    "stateOff": "Currently off.",
-    "turnOn": "Turn on",
-    "turnOff": "Turn off"
-  },
   "searches": {
     "title": "Saved searches",
     "text": "What you saved you do not have to enter again – and when something new matches, we let you know.",

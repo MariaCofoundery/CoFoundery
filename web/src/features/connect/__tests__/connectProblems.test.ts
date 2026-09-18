@@ -286,22 +286,34 @@ test("the email carries no content, only that something happened", () => {
   assert.match(email, /senderName/);
 });
 
+/**
+ * GEAENDERT am 18.09.2026: Der eine Connect-Schalter ist einem Abschnitt im
+ * Konto gewichen, in dem JEDE der sieben Mailarten einzeln steht - er wirkte
+ * nur auf drei davon, obwohl er "Benachrichtigungen aus Connect" hiess.
+ *
+ * Die Zusage hier ist dieselbe geblieben und steht jetzt auf eigenen Fuessen:
+ * Es gibt keinen Weg an der Einstellung vorbei, weil dieselbe Funktion, die
+ * den Anspruch vergibt, sie prueft.
+ */
 test("the switch is reachable and the database respects it", () => {
   const account = source("src/app/(product)/account/page.tsx");
-  assert.match(account, /<ConnectNotificationSetting/);
-  // Nur bei Connect-Konten - eine Einstellung fuer etwas, das man nicht hat,
-  // ist Rauschen.
-  assert.match(account, /\{hasConnectAccount \? \(/);
+  assert.match(account, /<AccountPreferencesSection/);
 
-  const migration = source("../supabase/migrations/20260916140000_network_notifications.sql");
-  // Es gibt keinen Weg am Schalter vorbei: dieselbe Funktion, die den Anspruch
-  // vergibt, prueft ihn.
-  assert.match(migration, /if v_wants is distinct from true then\s*\n\s*return false;/);
+  const migration = source(
+    "../supabase/migrations/20261001120000_account_locale_and_notifications.sql"
+  );
+  assert.match(
+    migration,
+    /if not public\.wants_email_notification\(p_recipient_user_id, p_kind\) then\s*\n\s*return false;/
+  );
 
   for (const locale of ["de", "en"]) {
-    const notifications = readJson(`messages/${locale}/connect.json`).notifications as Record<string, string>;
-    for (const key of ["title", "text", "stateOn", "stateOff", "turnOn", "turnOff"]) {
-      assert.ok(notifications[key], `${locale}: notifications.${key} fehlt`);
+    const kinds = (
+      (readJson(`messages/${locale}/dashboard.json`).account as Record<string, unknown>)
+        .notifications as { kinds: Record<string, { title?: string }> }
+    ).kinds;
+    for (const kind of ["contact_request", "message", "problem_interest"]) {
+      assert.ok(kinds[kind]?.title, `${locale}: ${kind} hat keinen Text mehr`);
     }
   }
 });

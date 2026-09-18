@@ -1,10 +1,9 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getNotificationRecipientEmail } from "@/lib/email/notificationRecipient";
+import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendConnectNotificationEmail } from "@/lib/email/sendConnectNotificationEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
-import { getRequestLocale } from "@/i18n/getLocale";
 
 /**
  * Benachrichtigungen fuer Connect.
@@ -53,15 +52,17 @@ async function notify(
   try {
     if (!(await claim(client, kind, subjectId, recipientUserId))) return;
 
-    const recipientEmail = await getNotificationRecipientEmail(recipientUserId);
-    if (!recipientEmail) return;
+    const recipient = await getNotificationRecipient(recipientUserId);
+    if (!recipient) return;
 
     await sendConnectNotificationEmail({
-      recipientEmail,
+      recipientEmail: recipient.email,
       kind,
       senderName,
       url: `${getPublicAppOrigin()}${path}`,
-      locale: await getRequestLocale(),
+      // Die Sprache der EMPFAENGERIN. Vorher stand hier die der laufenden
+      // Anfrage - also die der Person, die gerade geschrieben hat.
+      locale: recipient.locale,
     });
   } catch {
     // Bewusst stumm: Eine Benachrichtigung ist eine Beigabe, kein Teil der

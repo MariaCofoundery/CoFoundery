@@ -284,20 +284,3 @@ export async function markConnectConversationReadAction(conversationId: string) 
   return { ok: true };
 }
 
-/**
- * Connect-Benachrichtigungen ein- oder ausschalten.
- *
- * Die Entscheidung liegt in der Datenbank: claim_network_notification prueft
- * dieselbe Spalte, bevor es einen Anspruch vergibt. Damit gibt es keinen Weg,
- * an dem Schalter vorbei eine Mail zu verschicken.
- */
-export async function setConnectEmailNotificationsAction(formData: FormData) {
-  const { client } = await context();
-  const enabled = String(formData.get("enabled") ?? "") === "true";
-
-  const { error } = await client.rpc("set_network_email_notifications", { p_enabled: enabled });
-  if (error) redirect("/account?error=save");
-
-  revalidatePath("/account");
-  redirect("/account?saved=notifications");
-}

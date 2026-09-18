@@ -36,9 +36,11 @@ select ok(
 -- ---------------------------------------------------------------------------
 -- Wer nichts will, bekommt nichts
 -- ---------------------------------------------------------------------------
-update public.network_memberships
-set email_notifications = false
-where user_id = 'b2222222-2222-4222-8222-222222222222';
+-- GEAENDERT am 18.09.2026: Der Schalter liegt nicht mehr als ein Boolean an
+-- der Mitgliedschaft, sondern als Abbestellung je Art in
+-- notification_opt_outs. Die Zusage ist dieselbe geblieben.
+insert into public.notification_opt_outs(user_id, kind)
+values ('b2222222-2222-4222-8222-222222222222', 'problem_interest');
 
 select ok(
   not public.claim_network_notification('problem_interest', 'd4444444-4444-4444-8444-444444444444', 'b2222222-2222-4222-8222-222222222222'),
@@ -52,9 +54,8 @@ select is(
   'und es bleibt auch keine Zeile zurueck, die ein spaeteres Einschalten blockieren wuerde'
 );
 
-update public.network_memberships
-set email_notifications = true
-where user_id = 'b2222222-2222-4222-8222-222222222222';
+delete from public.notification_opt_outs
+where user_id = 'b2222222-2222-4222-8222-222222222222' and kind = 'problem_interest';
 
 select ok(
   public.claim_network_notification('problem_interest', 'd4444444-4444-4444-8444-444444444444', 'b2222222-2222-4222-8222-222222222222'),

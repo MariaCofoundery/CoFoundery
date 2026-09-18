@@ -453,6 +453,71 @@
         "email_unchanged": "Das ist die Adresse, die du schon nutzt.",
         "email_failed": "Das hat gerade nicht geklappt. Bitte versuch es später noch einmal – und wenn es dabei bleibt, schreib uns."
       }
+    },
+    "status": {
+      "locale_saved": "Gespeichert. Die Oberfläche und deine E-Mails sind ab jetzt auf Deutsch bzw. Englisch – je nachdem, was du gewählt hast.",
+      "locale_failed": "Das hat gerade nicht geklappt. Bitte versuch es noch einmal.",
+      "notifications_saved": "Gespeichert. Ab jetzt schreiben wir dir nur noch zu dem, was du angehakt hast.",
+      "notifications_failed": "Das hat gerade nicht geklappt. Bitte versuch es noch einmal."
+    },
+    "locale": {
+      "title": "Sprache",
+      "text": "Gilt für die Oberfläche und für alle E-Mails, die wir dir schicken. Bisher hing die Sprache am Browser – auf einem zweiten Gerät war sie wieder weg.",
+      "options": {
+        "de": "Deutsch",
+        "en": "English"
+      },
+      "undecided": "Du hast noch nichts gewählt – im Moment richten wir uns nach deinem Browser.",
+      "submit": "Sprache speichern",
+      "submitPending": "Wird gespeichert …"
+    },
+    "notifications": {
+      "title": "Wann schreiben wir dir?",
+      "text": "Höchstens eine Mail je Vorgang – ein laufendes Gespräch löst keine Mail pro Zeile aus. Was du hier abwählst, findest du weiterhin in der Plattform.",
+      "areas": {
+        "align": "Align",
+        "find": "Find",
+        "connect": "Connect"
+      },
+      "kinds": {
+        "contact_request": {
+          "title": "Jemand möchte dich kennenlernen",
+          "text": "Wenn dir jemand eine Kontaktanfrage schickt."
+        },
+        "message": {
+          "title": "Neue Nachricht",
+          "text": "Wenn dir jemand in einem Gespräch schreibt und du die vorige noch nicht gelesen hast."
+        },
+        "problem_interest": {
+          "title": "Interesse an einem deiner Probleme",
+          "text": "Wenn jemand sagt, dass er das Problem auch kennt oder einen Ansatz dazu hat."
+        },
+        "connect_saved_search": {
+          "title": "Treffer deiner gespeicherten Suche",
+          "text": "Wenn ein neues Angebot, Gesuch oder Problem zu einer Suche passt, die du gespeichert hast."
+        },
+        "discovery_saved_search": {
+          "title": "Treffer deiner gespeicherten Suche",
+          "text": "Wenn ein neues Profil zu einer Suche passt, die du bei der Co-Founder-Suche gespeichert hast."
+        },
+        "read_my_mind": {
+          "title": "Read My Mind: du bist dran",
+          "text": "Wenn dein Gegenüber eine Runde gestartet hat und auf dich wartet."
+        },
+        "founder_in_the_wild": {
+          "title": "Founder in the Wild: du bist dran",
+          "text": "Wenn dein Gegenüber seinen Teil erledigt hat und du weitermachen kannst."
+        }
+      },
+      "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",
+      "submit": "Auswahl speichern",
+      "submitPending": "Wird gespeichert …"
+    },
+    "data": {
+      "title": "Deine Daten",
+      "text": "Du kannst jederzeit alles herunterladen, was unter deinem Konto gespeichert ist – als eine Datei, die sich mit jedem Texteditor öffnen lässt.",
+      "scope": "Nicht dabei: Nachrichten, die andere Menschen geschrieben haben – die gehören ihnen. Und deine Belege aus der Fähigkeitsaufstellung, die geben wir grundsätzlich nirgendwohin weiter.",
+      "download": "Daten herunterladen"
     }
   },
   "outlook": {

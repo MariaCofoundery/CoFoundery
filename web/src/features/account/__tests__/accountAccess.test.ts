@@ -162,15 +162,24 @@ test("der fehlgeschlagene Connect-Beitritt hat wieder eine Meldung", () => {
 // ---------------------------------------------------------------------------
 test("ein manipulierter Statusparameter landet nicht als Schluesselpfad auf der Seite", () => {
   const page = source(PAGE);
-  assert.match(page, /ACCOUNT_STATUS_KEYS\.includes\(params\.status as AccountStatus\)/);
+  assert.match(page, /isAccountStatus\(params\.status\) \? params\.status : null/);
 
-  const section = source(SECTION);
-  const keys = [...section.matchAll(/^\s+"(email_[a-z_]+)",$/gm)].map((match) => match[1]);
-  assert.ok(keys.length >= 4, "die Liste der Zustaende wurde nicht gefunden");
+  // Die Liste liegt seit dem Ausbau des Kontos an einer eigenen Stelle - sie
+  // deckt jetzt auch Sprache und Benachrichtigungen ab.
+  const list = source("src/features/account/accountStatus.ts");
+  const keys = [...list.matchAll(/^\s+"([a-z_]+)",$/gm)].map((match) => match[1]);
+  assert.ok(keys.length >= 8, `die Liste der Zustaende wurde nicht gefunden (${keys.length})`);
   for (const locale of ["de", "en"]) {
-    const status = accessCopy(locale).status as Record<string, string>;
+    const account = (readJson(`messages/${locale}/dashboard.json`).account ?? {}) as {
+      access?: { status?: Record<string, string> };
+      status?: Record<string, string>;
+    };
     for (const key of keys) {
-      assert.ok(status?.[key], `${locale}: account.access.status.${key} fehlt`);
+      // Die Meldung steht bei dem Abschnitt, zu dem sie gehoert.
+      const found = key.startsWith("email_")
+        ? account.access?.status?.[key]
+        : account.status?.[key];
+      assert.ok(found, `${locale}: Text fuer ${key} fehlt`);
     }
   }
 });

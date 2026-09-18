@@ -1,10 +1,9 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getNotificationRecipientEmail } from "@/lib/email/notificationRecipient";
+import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendSavedSearchEmail } from "@/lib/email/sendSavedSearchEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
-import { getRequestLocale } from "@/i18n/getLocale";
 import {
   getDisclosedOwnCapabilityAreas,
   getSavedSearchesForMatching,
@@ -40,7 +39,6 @@ export async function notifySavedSearchMatches(
     if (!matches.length) return;
 
     const origin = getPublicAppOrigin();
-    const locale = await getRequestLocale();
     const path =
       subject.kind === "listing"
         ? `/connect/listings/${subject.id}`
@@ -56,16 +54,24 @@ export async function notifySavedSearchMatches(
       });
       if (error || claimed !== true) continue;
 
-      const recipientEmail = await getNotificationRecipientEmail(match.userId);
-      if (!recipientEmail) continue;
+      // Neu am 18.09.2026: Suchtreffer haben einen eigenen Schalter. Vorher
+      // kamen sie auch bei abgeschalteten Connect-Benachrichtigungen an.
+      const { data: wanted } = await client.rpc("wants_email_notification", {
+        p_user_id: match.userId,
+        p_kind: "connect_saved_search",
+      });
+      if (wanted !== true) continue;
+
+      const recipient = await getNotificationRecipient(match.userId);
+      if (!recipient) continue;
 
       await sendSavedSearchEmail({
-        recipientEmail,
+        recipientEmail: recipient.email,
         subjectKind: subject.kind,
         title: subject.title,
         reasons: match.reasons,
         url: `${origin}${path}`,
-        locale,
+        locale: recipient.locale,
       });
     }
   } catch {

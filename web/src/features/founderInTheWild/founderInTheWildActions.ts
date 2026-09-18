@@ -6,8 +6,7 @@ import { isFounderInTheWildChoice } from "./founderInTheWildContent";
 import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTheWildData";
 import { logFounderInTheWildServerError } from "./founderInTheWildDiagnostics";
 import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
-import { getReadMyMindNotificationRecipientEmail } from "@/features/collaborationLab/readMyMindNotificationRecipient";
-import { getRequestLocale } from "@/i18n/getLocale";
+import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendFounderInTheWildHandoffEmail } from "@/lib/email/sendFounderInTheWildHandoffEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -46,17 +45,24 @@ async function claimAndSendHandoff(params: {
   const recipientUserId = (row as { recipient_user_id?: unknown } | null)?.recipient_user_id;
   if (typeof recipientUserId !== "string") return;
 
-  const recipientEmail = await getReadMyMindNotificationRecipientEmail(recipientUserId);
-  if (!recipientEmail) {
+  // Neu am 18.09.2026: eigener Schalter, und die Sprache der Empfaengerin.
+  const { data: wanted } = await params.supabase.rpc("wants_email_notification", {
+    p_user_id: recipientUserId,
+    p_kind: "founder_in_the_wild",
+  });
+  if (wanted !== true) return;
+
+  const recipient = await getNotificationRecipient(recipientUserId);
+  if (!recipient) {
     logFounderInTheWildServerError("resolve_handoff_recipient", { code: "recipient_unavailable" });
     return;
   }
   try {
     const delivery = await sendFounderInTheWildHandoffEmail({
-      recipientEmail,
+      recipientEmail: recipient.email,
       founderName: params.founderName,
       roundUrl: toPublicAppUrl(roundHref(params.teamId, params.roundId)),
-      locale: await getRequestLocale(),
+      locale: recipient.locale,
     });
     if (!delivery.ok) {
       logFounderInTheWildServerError("send_handoff_email", { code: delivery.error });

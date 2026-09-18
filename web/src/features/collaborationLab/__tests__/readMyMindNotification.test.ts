@@ -3,7 +3,15 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { buildReadMyMindStartedEmailPayload, sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
 
-const recipientSource = readFileSync(new URL("../readMyMindNotificationRecipient.ts", import.meta.url), "utf8");
+// GEAENDERT am 18.09.2026: Der Lab-eigene Empfaengerhelfer war eine Kopie des
+// gemeinsamen unter lib/email - dessen Kommentar sagte sogar, das Muster solle
+// an einer Stelle liegen. Die Kopie ist aufgeloest; die Zusagen darueber
+// gelten jetzt fuer den gemeinsamen Helfer, der ausserdem die Sprache der
+// Empfaengerin mitbringt.
+const recipientSource = readFileSync(
+  new URL("../../../lib/email/notificationRecipient.ts", import.meta.url),
+  "utf8"
+);
 const actionSource = readFileSync(new URL("../readMyMindActions.ts", import.meta.url), "utf8");
 const foundationSource = readFileSync(new URL("../../../../../supabase/migrations/20260828160000_create_read_my_mind_foundation.sql", import.meta.url), "utf8");
 const sequentialSource = readFileSync(new URL("../../../../../supabase/migrations/20260828220000_add_read_my_mind_sequential_handoff.sql", import.meta.url), "utf8");
@@ -126,7 +134,7 @@ test("normal founder authorization and the two-founder guard precede the privile
   const teamLoadPosition = actionSource.indexOf("getReadMyMindTeamContext(teamId, auth.user.id, auth.supabase)");
   const twoFounderGuardPosition = actionSource.indexOf("team.members.length !== 2");
   const createPosition = actionSource.indexOf('rpc("create_collaboration_experience_round"');
-  const lookupPosition = actionSource.lastIndexOf("getReadMyMindNotificationRecipientEmail(");
+  const lookupPosition = actionSource.lastIndexOf("getNotificationRecipient(");
   assert.ok(teamLoadPosition >= 0 && twoFounderGuardPosition > teamLoadPosition && createPosition > twoFounderGuardPosition);
   assert.ok(lookupPosition >= 0);
   assert.match(actionSource, /\.in\("round_id", roundIds\)/);

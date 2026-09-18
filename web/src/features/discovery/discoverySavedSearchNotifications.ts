@@ -1,10 +1,9 @@
 import "server-only";
 
 import { getDisclosedOwnCapabilityAreas } from "@/features/connect/savedSearchData";
-import { getNotificationRecipientEmail } from "@/lib/email/notificationRecipient";
+import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendDiscoverySavedSearchEmail } from "@/lib/email/sendDiscoverySavedSearchEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
-import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 import {
   matchDiscoverySavedSearches,
@@ -66,7 +65,6 @@ export async function notifyDiscoverySavedSearchMatches(profile: SearchableDisco
     if (!matches.length) return;
 
     const origin = getPublicAppOrigin();
-    const locale = await getRequestLocale();
 
     for (const match of matches) {
       const { data: claimed, error: claimError } = await client.rpc("claim_saved_search_hit", {
@@ -76,17 +74,25 @@ export async function notifyDiscoverySavedSearchMatches(profile: SearchableDisco
       });
       if (claimError || claimed !== true) continue;
 
-      const recipientEmail = await getNotificationRecipientEmail(match.userId);
-      if (!recipientEmail) continue;
+      // Neu am 18.09.2026: eigener Schalter. Vorher lief diese Mailart an
+      // jedem Schalter vorbei, den es gab.
+      const { data: wanted } = await client.rpc("wants_email_notification", {
+        p_user_id: match.userId,
+        p_kind: "discovery_saved_search",
+      });
+      if (wanted !== true) continue;
+
+      const recipient = await getNotificationRecipient(match.userId);
+      if (!recipient) continue;
 
       await sendDiscoverySavedSearchEmail({
-        recipientEmail,
+        recipientEmail: recipient.email,
         displayName: profile.displayName,
         headline: profile.headline,
         reasons: match.reasons,
         hasAlignmentFilter: match.hasAlignmentFilter,
         url: `${origin}/discovery`,
-        locale,
+        locale: recipient.locale,
       });
     }
   } catch {

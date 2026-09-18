@@ -28,9 +28,9 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   // Geprueft wird deshalb genau das: hoechstens diese eine Tabelle.
   const tables = [...page.matchAll(/\.from\("([^"]+)"\)/g)].map((match) => match[1]);
   assert.deepEqual(
-    [...new Set(tables)],
-    ["participants"],
-    "die Kontoseite laedt etwas anderes als die offenen Einladungen"
+    [...new Set(tables)].sort(),
+    ["notification_opt_outs", "participants", "person_core"],
+    "die Kontoseite laedt etwas anderes als Kontoangaben"
   );
 });
 
