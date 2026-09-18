@@ -84,8 +84,10 @@ test("teuer ist sichtbar, und nur solange es offen ist", () => {
   assert.ok(critical.length >= 8, "zu wenige Themen als teuer gekennzeichnet");
   assert.ok(critical.length < FOUNDER_SETUP_CATALOG.length, "wenn alles wichtig ist, ist nichts wichtig");
 
-  // Ein geklaertes Thema soll nicht weiter mahnen.
-  assert.match(source(OVERVIEW), /isCritical && item\.displayStatus === "open"/);
+  // Ein Thema, an dem ihr schon arbeitet, soll nicht weiter mahnen. Die
+  // Bedingung haengt seit der Trennung von Stufe und Ergebnis (18.09.2026) an
+  // der STUFE - "offen" heisst dort: noch niemand hat es angefasst.
+  assert.match(source(OVERVIEW), /isCritical && item\.stage === "open"/);
 
   for (const locale of ["de", "en"]) {
     const weights = setupCopy(locale).weights as unknown as Record<string, string>;

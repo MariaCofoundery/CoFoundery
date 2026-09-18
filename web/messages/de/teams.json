@@ -542,7 +542,26 @@
       "print": "Drucken oder als PDF sichern",
       "open": "Dokument ansehen",
       "openHelp": "Alles, was ihr gemeinsam bestätigt habt – zum Ausdrucken oder Mitnehmen."
-    }
+    },
+    "stages": {
+      "open": "Offen",
+      "discussing": "In Klärung",
+      "awaiting_confirmation": "Bestätigung offen",
+      "settled": "Abgeschlossen"
+    },
+    "outcomes": {
+      "clarified": "Geklärt",
+      "documented": "Dokumentiert",
+      "not_relevant": "Nicht relevant"
+    },
+    "outcomeHelp": {
+      "clarified": "Ihr wisst beide, was gilt – festgehalten ist es hier.",
+      "documented": "Es steht zusätzlich in einem Dokument außerhalb von CoFoundery, etwa im Vertrag.",
+      "not_relevant": "Das Thema betrifft euch nicht. Ihr habt es bewusst zur Seite gelegt."
+    },
+    "legendTitle": "Was die Zeichen bedeuten",
+    "legendStages": "Wie weit ihr seid: offen · in Klärung · Bestätigung offen · abgeschlossen.",
+    "legendOutcomes": "Wie ein Thema endet, zeigt das letzte Zeichen – geklärt, zusätzlich dokumentiert oder für euch nicht relevant."
   },
   "dashboard": {
     "eyebrow": "Gemeinsame Bereiche",

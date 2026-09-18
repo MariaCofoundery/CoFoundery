@@ -6,6 +6,30 @@ import {
 
 export type FounderSetupWorkStatus = "open" | "discussing";
 export type FounderSetupResolutionStatus = "clarified" | "documented" | "not_relevant";
+
+/**
+ * Zwei Fragen, nicht eine.
+ *
+ * Bis 18.09.2026 gab es EINEN Status mit sechs Werten: Offen, In Klaerung,
+ * Bestaetigung offen, Geklaert, Dokumentiert, Nicht relevant. Sie standen
+ * nebeneinander, als waeren sie gleichartig - dabei beantworten sie zwei
+ * verschiedene Fragen:
+ *
+ *   WIE WEIT SEID IHR?      offen -> in Klaerung -> Bestaetigung offen
+ *                           -> abgeschlossen
+ *
+ *   WIE ENDET ES?           geklaert / dokumentiert / nicht relevant
+ *
+ * Dass "Dokumentiert" staerker ist als "Geklaert", musste man raten - sie
+ * sahen aus wie Geschwister von "Offen".
+ *
+ * Getrennt ist der Fortschritt eine Linie mit vier Schritten, und das
+ * Ergebnis eine Eigenschaft des letzten davon. Am Datenmodell aendert das
+ * nichts: Beides wird aus denselben Zeilen abgeleitet wie vorher.
+ */
+export const FOUNDER_SETUP_STAGES = ["open", "discussing", "awaiting_confirmation", "settled"] as const;
+export type FounderSetupStage = (typeof FOUNDER_SETUP_STAGES)[number];
+
 export type FounderSetupDisplayStatus =
   | FounderSetupWorkStatus
   | FounderSetupResolutionStatus
@@ -34,6 +58,14 @@ export type FounderSetupItem = {
   persisted: boolean;
   workStatus: FounderSetupWorkStatus;
   workingNote: string;
+  /** Wie weit ihr seid. */
+  stage: FounderSetupStage;
+  /** Wie es endet - nur bei `settled` gesetzt. */
+  outcome: FounderSetupResolutionStatus | null;
+  /**
+   * ABGELOEST durch stage + outcome. Bleibt fuer die Zaehlung in der
+   * Zusammenfassung, die weiterhin je Endzustand zaehlt.
+   */
   displayStatus: FounderSetupDisplayStatus;
   currentConfirmedRevision: FounderSetupRevision | null;
   pendingRevision: FounderSetupRevision | null;
@@ -125,6 +157,8 @@ export function buildFounderSetupReadModel(params: {
       workingNote: row?.working_note ?? "",
       currentConfirmedRevision: current,
       pendingRevision: pending,
+      stage: pending ? "awaiting_confirmation" : current ? "settled" : workStatus,
+      outcome: current?.resolutionStatus ?? null,
       displayStatus: pending ? "confirmation_pending" : current?.resolutionStatus ?? workStatus,
     };
   });

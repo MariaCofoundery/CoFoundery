@@ -85,9 +85,12 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
       >
         <h2 id={`${kind}-revision-title`} className="text-xl font-semibold text-slate-950">{t(`detail.${kind}Title`)}</h2>
         <div className="mt-3">
+          {/* Hier steht eine Fassung, die schon ein Ergebnis hat - also
+              immer die letzte Stufe, gefaerbt vom Ergebnis. */}
           <FounderSetupStatusChip
-            status={revision.resolutionStatus}
-            label={t(`statuses.${revision.resolutionStatus}`)}
+            stage="settled"
+            outcome={revision.resolutionStatus}
+            label={t(`outcomes.${revision.resolutionStatus}`)}
           />
         </div>
         <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700">{revision.note || t("detail.noNote")}</p>

@@ -96,7 +96,7 @@ export default async function FounderSetupDocument({
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <h3 className="font-semibold text-slate-950">{t(`items.${item.key}.title`)}</h3>
                       <span className="text-xs text-slate-500">
-                        {t(`statuses.${item.displayStatus}`)}
+                        {item.outcome ? t(`outcomes.${item.outcome}`) : t(`stages.${item.stage}`)}
                         {item.currentConfirmedRevision?.confirmedAt
                           ? ` · ${t("document.confirmedOn", {
                               date: dateFormatter.format(new Date(item.currentConfirmedRevision.confirmedAt)),

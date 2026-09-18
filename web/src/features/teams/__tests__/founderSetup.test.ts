@@ -7,6 +7,7 @@ import {
   FOUNDER_SETUP_ITEM_KEYS,
 } from "@/features/teams/founderSetupCatalog";
 import {
+  FOUNDER_SETUP_STAGES,
   buildFounderSetupReadModel,
   countFounderSetupStatuses,
   safeDocumentationHref,
@@ -60,6 +61,104 @@ test("read model keeps confirmed and pending snapshots separate for three founde
   assert.equal(item.pendingRevision?.confirmations.length, 2);
   assert.equal(model.members.length, 3);
   assert.equal(countFounderSetupStatuses(model).confirmation_pending, 1);
+});
+
+// ---------------------------------------------------------------------------
+// Stufe und Ergebnis sind zwei Fragen, nicht eine Liste
+// ---------------------------------------------------------------------------
+/** Ein Thema mit genau einer bestaetigten Fassung. */
+function settledWith(resolution: string) {
+  const model = buildFounderSetupReadModel({
+    teamId: "team",
+    currentUserId: "alice",
+    members,
+    itemRows: [{
+      id: "item",
+      team_id: "team",
+      item_key: "equity",
+      work_status: "discussing",
+      working_note: "",
+      current_confirmed_revision_id: "confirmed",
+      pending_revision_id: null,
+    }],
+    revisionRows: [
+      { id: "confirmed", setup_item_id: "item", resolution_status: resolution, note: "Fassung", documentation_reference: null, proposed_by_user_id: "alice", created_at: "2026-01-01", confirmed_at: "2026-01-02" },
+    ],
+    confirmationRows: [
+      { revision_id: "confirmed", user_id: "alice", confirmed_at: "2026-01-02" },
+      { revision_id: "confirmed", user_id: "bob", confirmed_at: "2026-01-02" },
+    ],
+  });
+  const item = model.items.find((entry) => entry.key === "equity");
+  assert.ok(item);
+  return item;
+}
+
+test("wie weit ihr seid und wie es endet sind getrennt", () => {
+  // NEU am 18.09.2026. Vorher gab es EINE Liste aus sechs Werten, in der
+  // "Offen", "In Klaerung", "Bestaetigung offen", "Geklaert", "Dokumentiert"
+  // und "Nicht relevant" nebeneinanderstanden - obwohl die ersten drei den
+  // Fortschritt meinen und die letzten drei das Ergebnis. Niemand konnte
+  // sagen, ob "Dokumentiert" weiter ist als "Geklaert".
+  for (const resolution of ["clarified", "documented", "not_relevant"]) {
+    const item = settledWith(resolution);
+    assert.equal(item.stage, "settled", `${resolution} ist ein Ergebnis, keine eigene Stufe`);
+    assert.equal(item.outcome, resolution);
+  }
+});
+
+test("ein Ergebnis gibt es erst, wenn etwas bestaetigt ist", () => {
+  const model = buildFounderSetupReadModel({
+    teamId: "team",
+    currentUserId: "alice",
+    members,
+    itemRows: [
+      { id: "a", team_id: "team", item_key: "equity", work_status: "open", working_note: "", current_confirmed_revision_id: null, pending_revision_id: null },
+      { id: "b", team_id: "team", item_key: "vesting", work_status: "discussing", working_note: "", current_confirmed_revision_id: null, pending_revision_id: null },
+      { id: "c", team_id: "team", item_key: "communication", work_status: "discussing", working_note: "", current_confirmed_revision_id: null, pending_revision_id: "pending" },
+    ],
+    revisionRows: [
+      { id: "pending", setup_item_id: "c", resolution_status: "documented", note: "Vorschlag", documentation_reference: null, proposed_by_user_id: "alice", created_at: "2026-02-01", confirmed_at: null },
+    ],
+    confirmationRows: [{ revision_id: "pending", user_id: "alice", confirmed_at: "2026-02-01" }],
+  });
+  const stageOf = (key: string) => model.items.find((item) => item.key === key)?.stage;
+  assert.equal(stageOf("equity"), "open");
+  assert.equal(stageOf("vesting"), "discussing");
+  assert.equal(stageOf("communication"), "awaiting_confirmation");
+
+  // Ein Vorschlag, den erst eine Person bestaetigt hat, ist noch kein
+  // Ergebnis - sonst stuende "Dokumentiert" da, bevor es stimmt.
+  assert.ok(
+    model.items.every((item) => item.outcome === null || item.stage === "settled"),
+    "ein Ergebnis ohne bestaetigte Fassung"
+  );
+});
+
+test("die Stufen sind eine Reihenfolge und die Oberflaeche erklaert sie", () => {
+  assert.deepEqual([...FOUNDER_SETUP_STAGES], ["open", "discussing", "awaiting_confirmation", "settled"]);
+
+  // Die Trennung hilft nur, wenn sie irgendwo steht. Der Unterschied zwischen
+  // "Geklaert" und "Dokumentiert" war der eigentliche Stolperstein.
+  const overview = readFileSync("src/app/(product)/teams/[teamId]/setup/page.tsx", "utf8");
+  assert.match(overview, /legendStages/);
+  assert.match(overview, /outcomeHelp\./);
+  for (const locale of ["de", "en"]) {
+    const setup = (JSON.parse(readFileSync(`messages/${locale}/teams.json`, "utf8")) as {
+      setup: Record<string, Record<string, string>>;
+    }).setup;
+    for (const stage of FOUNDER_SETUP_STAGES) {
+      assert.ok(setup.stages?.[stage], `${locale}: stages.${stage} fehlt`);
+    }
+    for (const outcome of ["clarified", "documented", "not_relevant"]) {
+      assert.ok(setup.outcomes?.[outcome], `${locale}: outcomes.${outcome} fehlt`);
+      assert.ok(
+        (setup.outcomeHelp?.[outcome] ?? "").length > 30,
+        `${locale}: outcomeHelp.${outcome} erklaert den Unterschied nicht`
+      );
+    }
+    assert.ok(setup.legendTitle && setup.legendStages && setup.legendOutcomes, `${locale}: Legende fehlt`);
+  }
 });
 
 test("empty setup remains unstarted and does not manufacture persisted rows", () => {

@@ -542,7 +542,26 @@
       "print": "Print or save as PDF",
       "open": "View the document",
       "openHelp": "Everything the two of you confirmed – to print or take with you."
-    }
+    },
+    "stages": {
+      "open": "Open",
+      "discussing": "In discussion",
+      "awaiting_confirmation": "Awaiting confirmation",
+      "settled": "Settled"
+    },
+    "outcomes": {
+      "clarified": "Clarified",
+      "documented": "Documented",
+      "not_relevant": "Not relevant"
+    },
+    "outcomeHelp": {
+      "clarified": "You both know what applies – it's recorded here.",
+      "documented": "It is additionally written down outside CoFoundery, in a contract for example.",
+      "not_relevant": "The topic doesn't apply to you. You set it aside deliberately."
+    },
+    "legendTitle": "What the markers mean",
+    "legendStages": "How far you are: open · in discussion · awaiting confirmation · settled.",
+    "legendOutcomes": "How a topic ends is shown by the last marker – clarified, additionally documented, or not relevant for you."
   },
   "dashboard": {
     "eyebrow": "Shared areas",

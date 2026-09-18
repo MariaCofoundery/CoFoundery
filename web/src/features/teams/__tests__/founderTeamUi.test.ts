@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { FOUNDER_SETUP_STAGES } from "@/features/teams/founderSetupModel";
 import test from "node:test";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
@@ -42,18 +43,21 @@ test("setup overview keeps all topics in compact keyboard-visible links", () => 
 
 test("setup status chips are textual and avoid warning colors", () => {
   const chip = readFileSync("src/features/teams/FounderSetupStatusChip.tsx", "utf8");
-  for (const status of [
-    "open",
-    "discussing",
-    "confirmation_pending",
-    "clarified",
-    "documented",
-    "not_relevant",
-  ]) {
-    assert.match(chip, new RegExp(`${status}:`));
+
+  // Seit dem 18.09.2026 traegt der Chip zwei getrennte Angaben: wie weit ihr
+  // seid (Stufe) und wie es endet (Ergebnis). Vorher lagen beide in einer
+  // Liste aus sechs Werten, in der "Dokumentiert" wie ein Geschwister von
+  // "Offen" aussah.
+  for (const stage of FOUNDER_SETUP_STAGES) {
+    assert.match(chip, new RegExp(`\\b${stage}:`), `Stufe ${stage} hat keinen eigenen Ton`);
   }
+  assert.match(chip, /stage: FounderSetupStage/);
+  assert.match(chip, /outcome\?: FounderSetupResolutionStatus \| null/);
+
   assert.match(chip, /<span>\{label\}<\/span>/);
-  assert.doesNotMatch(chip, /(?:red|rose|emerald)-/);
+  // Keine Ampel: ein offenes Thema ist kein Versagen, ein geklaertes kein Sieg.
+  // Das galt fuer die sechs Werte und gilt fuer die Stufen genauso.
+  assert.doesNotMatch(chip, /(?:red|rose|emerald|green)-/);
 });
 
 test("homebase presents localized real avatars with initials fallback in the intended order", () => {

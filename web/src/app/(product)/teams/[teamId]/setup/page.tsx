@@ -82,7 +82,7 @@ export default async function FounderSetupPage({ params }: Props) {
           const openCritical = items.filter(
             (item) =>
               getFounderSetupCatalogItem(item.key)?.weight === "critical" &&
-              item.displayStatus === "open"
+              item.stage === "open"
           ).length;
 
           return (
@@ -118,14 +118,21 @@ export default async function FounderSetupPage({ params }: Props) {
                             {t(`categories.${item.category}`)}
                             {/* Nicht "wichtiger", sondern: teuer, wenn es
                                 offen bleibt und es darauf ankommt. */}
-                            {isCritical && item.displayStatus === "open"
+                            {isCritical && item.stage === "open"
                               ? ` · ${t("weights.critical")}`
                               : ""}
                           </span>
                         </span>
+                        {/* Die Stufe traegt das Zeichen, das Ergebnis nur
+                            die Beschriftung des letzten Schritts. */}
                         <FounderSetupStatusChip
-                          status={item.displayStatus}
-                          label={t(`statuses.${item.displayStatus}`)}
+                          stage={item.stage}
+                          outcome={item.outcome}
+                          label={
+                            item.stage === "settled" && item.outcome
+                              ? t(`outcomes.${item.outcome}`)
+                              : t(`stages.${item.stage}`)
+                          }
                         />
                         <svg
                           aria-hidden="true"
@@ -144,6 +151,25 @@ export default async function FounderSetupPage({ params }: Props) {
           );
         })}
       </div>
+      {/* Eine Legende, weil der Unterschied sonst geraten werden muss.
+          "Dokumentiert" ist staerker als "Geklaert" - das sah man den
+          Zeichen nicht an. */}
+      <details className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
+        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-800">
+          {t("legendTitle")}
+        </summary>
+        <p className="mt-3 text-sm leading-7 text-slate-600">{t("legendStages")}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-600">{t("legendOutcomes")}</p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          {(["clarified", "documented", "not_relevant"] as const).map((outcome) => (
+            <div key={outcome} className="rounded-xl bg-slate-50 px-4 py-3">
+              <dt className="text-sm font-semibold text-slate-900">{t(`outcomes.${outcome}`)}</dt>
+              <dd className="mt-1 text-xs leading-6 text-slate-600">{t(`outcomeHelp.${outcome}`)}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+
       {/* Der Weg zu dem, was herauskommt. Ohne ihn bliebe das Dokument eine
           Seite, die niemand findet. */}
       <section className="mt-8 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
