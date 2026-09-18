@@ -96,3 +96,42 @@ test("die englischen Report-Texte sind wirklich da", () => {
     "diese Bausteine gibt es nur auf Deutsch"
   );
 });
+
+test("kein deutscher Scoring-Text landet im englischen Report", () => {
+  // DIMENSION_STRENGTH_TEXT und Geschwister im Scoring-Modul sind
+  // ausschliesslich deutsch - auch der Rueckfalltext dort. Ueber
+  // `toInsight` wird daraus der `title` eines Insights.
+  //
+  // Deshalb laesst die englische Fassung {title} in genau vier Saetzen weg:
+  // "The most important area to discuss deliberately is around decision
+  // logic." statt "... : Integritaet im Entscheidungstempo". Das ist Absicht,
+  // kein Versehen - ein deutscher Halbsatz mitten im englischen Text waere
+  // schlimmer als der fehlende Zusatz.
+  //
+  // Wenn jemand die ~33 Texte im Scoring uebersetzt: {title} in der
+  // englischen Copy wieder ergaenzen, dann faellt dieser Test.
+  const scoring = source("src/features/scoring/founderCompatibilityScoringV2.ts");
+  const stillGermanOnly = /DIMENSION_STRENGTH_TEXT/.test(scoring) && !/DIMENSION_STRENGTH_TEXT_EN/.test(scoring);
+  const en = source("src/features/reporting/content/builderCopy/builderCopy.en.ts");
+
+  assert.equal(
+    /\{title\}/.test(en),
+    !stillGermanOnly,
+    stillGermanOnly
+      ? "die englische Copy setzt {title} ein, obwohl der Titel nur deutsch vorliegt"
+      : "die Scoring-Texte sind uebersetzt - {title} kann zurueck in die englische Copy"
+  );
+
+  // Und die Abschnittsbauer ziehen diese Texte gar nicht erst heran.
+  for (const path of [
+    "src/features/reporting/buildDecisionLogicSection.ts",
+    "src/features/reporting/buildCommitmentSection.ts",
+    "src/features/reporting/buildConflictStyleSection.ts",
+  ]) {
+    assert.doesNotMatch(
+      source(path),
+      /collaborationStrengths|potentialTensionAreas|complementaryDynamics/,
+      `${path}: zieht deutschen Scoring-Text in den Report`
+    );
+  }
+});
