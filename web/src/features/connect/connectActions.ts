@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
 import { getConnectListing, getOwnConnectProfile } from "@/features/connect/connectData";
+import { decodePhotoData } from "@/features/connect/connectPhotoData";
 import { notifySavedSearchMatches } from "@/features/connect/savedSearchNotifications";
 import {
   notifyConnectContactRequest,
@@ -100,14 +101,6 @@ export async function saveConnectProfileAction(formData: FormData) {
   if (currentProfile.data?.public_slug) revalidatePath(`/connect/p/${currentProfile.data.public_slug}`);
   if (publish && !currentProfile.data) redirect(safeConnectRedirect(formData.get("next"), "/connect?profile=published"));
   redirect(`/connect/profile?saved=${publish ? "published" : "draft"}`);
-}
-
-function decodePhotoData(value: string) {
-  const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
-  if (!match) return null;
-  const buffer = Buffer.from(match[2], "base64");
-  if (!buffer.length || buffer.byteLength > 2 * 1024 * 1024) return null;
-  return { buffer, mimeType: match[1] };
 }
 
 async function uploadConnectPhoto(client: Awaited<ReturnType<typeof createClient>>, userId: string, value: string) {

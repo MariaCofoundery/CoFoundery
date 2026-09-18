@@ -89,6 +89,44 @@ export type PublicConnectProblem = Pick<ConnectProblem,
   author_profile_slug: string | null;
 };
 
+export const VENTURE_MAX = 5;
+export const VENTURE_NAME_MIN = 2;
+export const VENTURE_NAME_MAX = 80;
+export const VENTURE_WHAT_MIN = 50;
+export const VENTURE_WHAT_MAX = 800;
+export const VENTURE_AUDIENCE_MIN = 20;
+export const VENTURE_AUDIENCE_MAX = 300;
+export const VENTURE_MOTIVATION_MIN = 20;
+export const VENTURE_MOTIVATION_MAX = 500;
+
+/**
+ * Ein Unternehmen, Projekt oder eine Taetigkeit am Profil.
+ *
+ * Anhang an die Person, kein eigenes Inhaltsformat: kein Ablaufdatum, kein
+ * eigener Kontaktweg, keine eigene Sichtbarkeit - die erbt es vom Profil.
+ */
+export type ConnectVenture = {
+  id: string;
+  owner_user_id: string;
+  name: string;
+  role_label: string | null;
+  what_it_does: string;
+  /** Fuer wen. Eigenes Feld, damit man weiterempfehlen kann, ohne alles zu lesen. */
+  audience: string;
+  motivation: string | null;
+  website: string | null;
+  logo_path: string | null;
+  status: "active" | "hidden";
+  created_at: string;
+  updated_at: string;
+};
+
+/** Die oeffentliche Sicht - ohne Pfade, mit einem Hinweis auf das Logo. */
+export type PublicConnectVenture = Pick<
+  ConnectVenture,
+  "name" | "role_label" | "what_it_does" | "audience" | "motivation" | "website" | "updated_at"
+> & { logo_available: boolean };
+
 export type ConnectContactRequest = {
   id: string; listing_id: string; sender_user_id: string; recipient_user_id: string;
   message: string; status: ConnectContactStatus; listing_title_snapshot: string;

@@ -64,6 +64,20 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         </Link>
       </section>
       <fieldset><legend className="text-sm font-medium">{t("profile.roles")}</legend><p className={hint}>{t("profile.rolesHint")}</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{CONNECT_ROLES.map((role) => <label key={role} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"><input type="checkbox" name="network_roles" value={role} defaultChecked={profile?.network_roles.includes(role)} />{t(`roles.${role}`)}</label>)}</div></fieldset>
+      {/* Die Unternehmen liegen auf einer eigenen Seite: Fuenf Eintraege mit
+          je fuenf Feldern haetten dieses Formular auf das Dreifache gebracht,
+          und man haette sie alle auf einmal speichern muessen. */}
+      <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <h2 className="text-sm font-semibold">{t("ventures.profileLink")}</h2>
+        <p className={hint}>{t("ventures.profileLinkHint")}</p>
+        <Link
+          href="/connect/ventures"
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
+        >
+          {t("ventures.title")} →
+        </Link>
+      </section>
+
       {/* Was ein Profil ueber die Aufzaehlung hinaus sagt: wen jemand kennt,
           und in welcher Form er ansprechbar ist. Beides freiwillig, beides
           nur fuer eingeloggte Mitglieder. */}
