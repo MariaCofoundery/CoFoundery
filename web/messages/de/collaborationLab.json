@@ -23,7 +23,17 @@
       "multiple_waiting_on_partner": "{count} Packs warten auf {name}",
       "completed": "Runde abgeschlossen"
     },
-    "action": { "start": "Runde starten", "handoff": "Read My Mind öffnen", "open": "Runde ansehen", "continue": "Runde fortsetzen", "packs": "Packs ansehen", "reveal": "Reveal ansehen", "check": "Rundenstatus prüfen", "reviewCompleted": "Abgeschlossene Runde ansehen", "allPacks": "Alle Packs ansehen" }
+    "action": {
+      "start": "Runde starten",
+      "handoff": "Read My Mind öffnen",
+      "open": "Runde ansehen",
+      "continue": "Runde fortsetzen",
+      "packs": "Packs ansehen",
+      "reveal": "Reveal ansehen",
+      "check": "Rundenstatus prüfen",
+      "reviewCompleted": "Abgeschlossene Runde ansehen",
+      "allPacks": "Alle Packs ansehen"
+    }
   },
   "entry": {
     "eyebrow": "Zusammenarbeit stärken",
@@ -206,6 +216,19 @@
       "answers-incomplete": "Eure Antworten sind noch nicht vollständig.",
       "changed": "Diese Runde hat sich inzwischen geändert.",
       "waiting": "Du hast deine Reveals angesehen. Die Runde wird abgeschlossen, sobald ihr beide fertig seid."
+    }
+  },
+  "tally": {
+    "eyebrow": "Wie gut kennt ihr euch?",
+    "roundHeadline": "{hits, plural, =0 {Du hast {name} in dieser Runde kein einziges Mal richtig eingeschätzt.} one {Du hast {name} einmal von {total} richtig eingeschätzt.} other {Du hast {name} # von {total} Mal richtig eingeschätzt.}}",
+    "acrossHeadline": "{hits, plural, =0 {Bisher hast du {name} noch nie richtig eingeschätzt.} one {Bisher hast du {name} einmal von {total} richtig eingeschätzt.} other {Bisher hast du {name} # von {total} Mal richtig eingeschätzt.}}",
+    "otherDirection": "{hits, plural, =0 {{name} hat dich in dieser Runde kein einziges Mal getroffen.} one {{name} hat dich einmal von {total} getroffen.} other {{name} hat dich # von {total} Mal getroffen.}}",
+    "across": "Über {rounds, plural, one {eine Runde} other {# Runden}} zusammen: {hits} von {total}.",
+    "tone": {
+      "all": "Ihr liegt richtig übereinander – das ist selten. Spannend wird jetzt die Frage, woran das liegt: Kennt ihr euch wirklich so gut, oder habt ihr einfach ähnliche Reflexe?",
+      "many": "Ihr lest euch in vielem richtig. Die Stellen, an denen ihr danebenlagt, sind die interessanten – dort weicht etwas voneinander ab, was ihr beide für selbstverständlich haltet.",
+      "few": "Ihr habt euch öfter anders eingeschätzt als gedacht. Das ist kein schlechtes Ergebnis, im Gegenteil: Jede dieser Stellen ist etwas, das ihr voneinander noch nicht wusstet.",
+      "none": "Für eine Bilanz fehlt noch eine abgeschlossene Runde."
     }
   }
 }

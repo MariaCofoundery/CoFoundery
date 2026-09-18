@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { completeReadMyMindRoundAction } from "@/features/collaborationLab/readMyMindActions";
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { normalizeLocale } from "@/i18n/config";
+import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
+import { findGuessTallyForRound, getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ReadMyMindRevealEntryPage({ params, searchParams }: {
@@ -31,6 +33,7 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
         round.conversationMarkers.some((marker) => marker.roundPromptId === prompt.roundPromptId)
       )
     : [];
+  const tally = await getCollaborationGuessTally(supabase, teamId);
   const partnerName = round.partner.displayName ?? t(
     round.status === "completed" ? "historicalPartnerFallback" : "partnerFallback"
   );
@@ -92,6 +95,9 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
         )}
         </div>
       </header>
+      {/* Dieselbe Bilanz wie in Founder in the Wild - beide Labs lassen raten,
+          also soll auch beide dasselbe daraus machen. */}
+      <GuessTallyCard round={findGuessTallyForRound(tally, roundId)} summary={tally} partnerName={partnerName} />
       {conversationPrompts.length > 0 ? (
         <section className="mt-10" aria-labelledby="conversation-summary-title">
           <div className="rounded-[26px] border border-violet-200/80 bg-gradient-to-r from-violet-50 to-amber-50/70 p-5 sm:p-6"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Read My Mind</p><h2 id="conversation-summary-title" className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{t("conversationSummaryTitle")}</h2><p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("conversationSummaryIntro")}</p></div>

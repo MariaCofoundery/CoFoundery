@@ -6,6 +6,8 @@ import { notifyReadMyMindHandoffsAction, startReadMyMindRoundAction } from "@/fe
 import { getOpenReadMyMindRounds, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { buildReadMyMindPackNavigation } from "@/features/collaborationLab/readMyMindPackNavigation";
 import { normalizeLocale } from "@/i18n/config";
+import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
+import { getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ReadMyMindEntryPage({ params, searchParams }: { params: Promise<{ teamId: string }>; searchParams: Promise<{ result?: string }> }) {
@@ -19,6 +21,7 @@ export default async function ReadMyMindEntryPage({ params, searchParams }: { pa
   const [t, rawLocale] = await Promise.all([getTranslations("collaborationLab.entry"), getLocale()]);
   const locale = normalizeLocale(rawLocale);
   const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName ?? t("partnerFallback");
+  const tally = await getCollaborationGuessTally(supabase, teamId);
   const packNavigation = buildReadMyMindPackNavigation(READ_MY_MIND_PACKS, openRounds);
   const unannouncedHandoffs = openRounds.filter((round) =>
     round.status === "forming" &&
@@ -100,6 +103,7 @@ export default async function ReadMyMindEntryPage({ params, searchParams }: { pa
           </section>
         </>
       )}
+      <GuessTallyCard round={null} summary={tally} partnerName={partnerName} variant="entry" />
     </main>
   );
 }

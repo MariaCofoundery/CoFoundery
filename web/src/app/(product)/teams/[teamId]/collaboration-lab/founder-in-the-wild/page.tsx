@@ -6,6 +6,8 @@ import { findOpenFounderInTheWildRound, getFounderInTheWildTeam } from "@/featur
 import { founderInTheWildEntryHref, founderInTheWildRoundHref } from "@/features/founderInTheWild/founderInTheWildRoutes";
 import { FOUNDER_IN_THE_WILD_PACKS } from "@/features/founderInTheWild/founderInTheWildContent";
 import { normalizeLocale } from "@/i18n/config";
+import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
+import { getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function FounderInTheWildEntryPage({ params, searchParams }: { params: Promise<{ teamId: string }>; searchParams: Promise<{ result?: string }> }) {
@@ -16,6 +18,9 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
   const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) notFound();
   const [t, round, rawLocale] = await Promise.all([getTranslations("founderInTheWild.entry"), findOpenFounderInTheWildRound(team, user.id, supabase), getLocale()]);
   const locale = normalizeLocale(rawLocale);
+  const tally = await getCollaborationGuessTally(supabase, teamId);
+  const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName
+    ?? (locale === "de" ? "dein Co-Founder" : "your co-founder");
   return <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
     <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">{t("back")}</Link>
     <header className="mt-6 rounded-[30px] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-violet-50 p-6 shadow-[0_20px_50px_rgba(76,29,149,0.08)] sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">{t("intro")}</p></header>
@@ -35,6 +40,7 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
                 <p className="mt-2 inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-900">{t("withGuess")}</p>
               ) : null}
             </div>
+    <GuessTallyCard round={null} summary={tally} partnerName={partnerName} variant="entry" />
             {team.members.length !== 2 ? (
               <p className="text-sm text-slate-600">{t("twoFounders")}</p>
             ) : round && isOpen ? (

@@ -23,7 +23,17 @@
       "multiple_waiting_on_partner": "{count} packs are waiting for {name}",
       "completed": "Round completed"
     },
-    "action": { "start": "Start a round", "handoff": "Open Read My Mind", "open": "View round", "continue": "Continue round", "packs": "View packs", "reveal": "View reveal", "check": "Check round status", "reviewCompleted": "View completed round", "allPacks": "View all packs" }
+    "action": {
+      "start": "Start a round",
+      "handoff": "Open Read My Mind",
+      "open": "View round",
+      "continue": "Continue round",
+      "packs": "View packs",
+      "reveal": "View reveal",
+      "check": "Check round status",
+      "reviewCompleted": "View completed round",
+      "allPacks": "View all packs"
+    }
   },
   "entry": {
     "eyebrow": "Strengthen your collaboration",
@@ -206,6 +216,19 @@
       "answers-incomplete": "Your answers are not complete yet.",
       "changed": "This round has changed in the meantime.",
       "waiting": "You have viewed your reveals. The round will complete once you have both finished."
+    }
+  },
+  "tally": {
+    "eyebrow": "How well do you know each other?",
+    "roundHeadline": "{hits, plural, =0 {You didn't read {name} right once in this round.} one {You read {name} right once out of {total}.} other {You read {name} right # times out of {total}.}}",
+    "acrossHeadline": "{hits, plural, =0 {So far you haven't read {name} right once.} one {So far you've read {name} right once out of {total}.} other {So far you've read {name} right # times out of {total}.}}",
+    "otherDirection": "{hits, plural, =0 {{name} didn't read you right once in this round.} one {{name} read you right once out of {total}.} other {{name} read you right # times out of {total}.}}",
+    "across": "Across {rounds, plural, one {one round} other {# rounds}} together: {hits} out of {total}.",
+    "tone": {
+      "all": "You read each other right every time – that's rare. The interesting question now is why: do you know each other that well, or do you simply share the same reflexes?",
+      "many": "You read each other right on most of it. The places where you missed are the interesting ones – something diverges there that you both take for granted.",
+      "few": "You read each other differently more often than expected. That isn't a bad result, quite the opposite: every one of those is something you didn't know about each other yet.",
+      "none": "A completed round is still missing for a tally."
     }
   }
 }
