@@ -285,17 +285,16 @@
     "connect": "Connect profile"
   },
   "disclosure": {
-    "title": "How far do you share this?",
-    "text": "Your entries are yours. By default nobody but you sees them.",
-    "private": "Only me",
-    "privateHint": "Nobody sees your areas. You use the snapshot for yourself.",
-    "areas": "Show areas",
-    "areasHint": "Members see which areas you have worked in, on your published profiles – without the experience level and without the ownership wish.",
-    "areas_depth_on_contact": "Show areas, depth after contact",
-    "areas_depth_on_contactHint": "Additionally the experience level and ownership wish, but only for people you have an accepted connection with.",
-    "note": "Narratives are never shared. Public pages never show capability details.",
-    "submit": "Save sharing",
-    "currentPrivate": "Right now nobody but you sees your overview."
+    "title": "Who gets to see what you can do?",
+    "text": "Above you noted what you have experience in. Here you decide who sees any of it. Until you change something: nobody.",
+    "private": "Nobody but me",
+    "privateHint": "Your entries stay with you. Others can't even tell that you've filled anything in.",
+    "areas": "Members see the topics",
+    "areasHint": "Your profiles will then show what you have experience in – in your case {examples}, for instance. Nothing more: how much experience you have, and what you'd like to take on, stays with you.",
+    "areas_depth_on_contact": "People you're connected with see more",
+    "areas_depth_on_contactHint": "For everyone else it stays at the topics. Anyone whose connection you've accepted also sees how much experience you have – and what you'd like to take on, and what you'd rather not.",
+    "note": "Two things always hold: nobody ever gets to see your evidence. And on public pages – the ones anyone on the web can open – none of this ever appears.",
+    "submit": "Save choice"
   },
   "foreign": {
     "title": "What this person brings"

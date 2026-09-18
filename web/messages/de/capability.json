@@ -285,17 +285,16 @@
     "connect": "Connect-Profil"
   },
   "disclosure": {
-    "title": "Wie weit gibst du das weiter?",
-    "text": "Deine Angaben gehören dir. Standardmäßig sieht sie niemand außer dir.",
-    "private": "Nur für mich",
-    "privateHint": "Niemand sieht deine Bereiche. Du nutzt den Snapshot für dich.",
-    "areas": "Bereiche zeigen",
-    "areasHint": "Mitglieder sehen in deinen veröffentlichten Profilen, in welchen Bereichen du gearbeitet hast – ohne Erfahrungsstufe und ohne Verantwortungswunsch.",
-    "areas_depth_on_contact": "Bereiche zeigen, Tiefe nach Kontakt",
-    "areas_depth_on_contactHint": "Zusätzlich Erfahrungsstufe und Verantwortungswunsch, aber nur für Menschen, mit denen eine angenommene Verbindung besteht.",
-    "note": "Belege werden nie weitergegeben. Öffentliche Seiten zeigen niemals Capability-Angaben.",
-    "submit": "Freigabe speichern",
-    "currentPrivate": "Derzeit sieht deine Aufstellung niemand außer dir."
+    "title": "Wer sieht, was du kannst?",
+    "text": "Oben hast du eingetragen, worin du Erfahrung hast. Hier entscheidest du, wer davon etwas mitbekommt. Solange du nichts änderst: niemand.",
+    "private": "Niemand außer mir",
+    "privateHint": "Deine Angaben bleiben bei dir. Andere sehen nicht einmal, dass du etwas eingetragen hast.",
+    "areas": "Mitglieder sehen die Themen",
+    "areasHint": "In deinen Profilen steht dann, worin du Erfahrung hast – bei dir zum Beispiel {examples}. Mehr nicht: Wie viel Erfahrung du hast und was du übernehmen möchtest, bleibt bei dir.",
+    "areas_depth_on_contact": "Wer mit dir verbunden ist, sieht mehr",
+    "areas_depth_on_contactHint": "Für alle anderen bleibt es bei den Themen. Wessen Verbindung du angenommen hast, sieht zusätzlich, wie viel Erfahrung du hast – und was du gern übernehmen möchtest und was lieber nicht.",
+    "note": "Zwei Dinge gelten immer: Deine Belege bekommt niemand zu sehen. Und auf öffentlichen Seiten – denen, die jede und jeder im Netz aufrufen kann – steht davon nie etwas.",
+    "submit": "Auswahl speichern"
   },
   "foreign": {
     "title": "Was diese Person mitbringt"

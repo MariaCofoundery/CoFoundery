@@ -420,12 +420,84 @@ test("the disclosure ladder is three rungs, closed by default, and offers no nar
   // Kein Feld und kein Text fuer eine Belegfreigabe - eine Stufe, die niemand
   // waehlen sollte, wird nicht angeboten.
   assert.equal(de.disclosure.evidence, undefined);
-  assert.match(de.disclosure.note, /Belege werden nie weitergegeben/);
+
+  // GEAENDERT am 18.09.2026: Der Test verlangte den genauen Satz "Belege
+  // werden nie weitergegeben". Beim Umschreiben in verstaendliches Deutsch
+  // schlug er fehl, obwohl die Zusage unveraendert dastand. Geprueft wird
+  // jetzt, DASS beide Zusagen im Hinweis stehen - in beiden Sprachen.
+  const en = JSON.parse(source("messages/en/capability.json"));
+  for (const [locale, messages] of [["de", de], ["en", en]] as const) {
+    const note = String(messages.disclosure.note);
+    assert.match(
+      note,
+      locale === "de" ? /Belege/ : /evidence/i,
+      `${locale}: der Hinweis sagt nichts ueber Belege`
+    );
+    assert.match(
+      note,
+      locale === "de" ? /niemand|nie/ : /nobody|never/i,
+      `${locale}: der Hinweis sagt nicht, dass sie niemand bekommt`
+    );
+    assert.match(
+      note,
+      locale === "de" ? /öffentlich/i : /public/i,
+      `${locale}: der Hinweis sagt nichts ueber oeffentliche Seiten`
+    );
+  }
 
   // Und die Freigabe ist ausdruecklich nicht fuer anon - `revoke from public`
   // allein genuegt bei Supabase-Default-Privilegien nicht.
   assert.match(migration, /revoke all on function public\.get_disclosed_capability\(uuid, text\) from anon/);
   assert.doesNotMatch(migration, /to anon/);
+});
+
+test("die Freigabe ist ohne Vorwissen lesbar", () => {
+  // Maria am 18.09.2026: "Ich verstehe nur Bahnhof." Der Abschnitt hiess
+  // "Bereiche zeigen, Tiefe nach Kontakt" und erklaerte sich mit
+  // "Erfahrungsstufe und Verantwortungswunsch".
+  //
+  // Diese Woerter beschreiben Datenfelder, nicht das, was passiert. Sie
+  // stehen weiterhin dort, wo die Angaben GEMACHT werden - dort haben sie
+  // einen Bezug. In der Freigabe, wo es um andere Menschen geht, nicht mehr.
+  const JARGON = ["Tiefe", "Snapshot", "Erfahrungsstufe", "Verantwortungswunsch", "Standardmäßig"];
+  const disclosure = JSON.parse(source("messages/de/capability.json")).disclosure as Record<string, string>;
+  const wholeSection = Object.values(disclosure).join(" ");
+
+  for (const word of JARGON) {
+    assert.doesNotMatch(wholeSection, new RegExp(word), `"${word}" ist wieder in der Freigabe gelandet`);
+  }
+
+  // Jede Stufe sagt zuerst, WER etwas sieht - nicht, was technisch passiert.
+  for (const level of ["private", "areas", "areas_depth_on_contact"]) {
+    const label = disclosure[level];
+    assert.ok(label, `${level}: Beschriftung fehlt`);
+    assert.ok(label.length <= 45, `${level}: "${label}" ist zu lang fuer eine Beschriftung`);
+    assert.ok(disclosure[`${level}Hint`]?.length > 40, `${level}: der Hinweis erklaert nichts`);
+  }
+});
+
+test("die mittlere Stufe zeigt ein Beispiel aus den eigenen Angaben", () => {
+  // "Bereiche zeigen" blieb abstrakt, solange nicht dastand, was konkret
+  // gezeigt wuerde. Das Beispiel kommt deshalb aus den eigenen Eintraegen.
+  const page = source("src/app/(product)/profile/page.tsx");
+  assert.match(page, /t\("disclosure\.areasHint", \{ examples: disclosureExamples \}\)/);
+  assert.match(page, /entries\.slice\(0, 2\)\.map\(\(entry\) => areaLabel\(entry\.area_id\)\)/);
+  // Mit Intl.ListFormat, damit im Deutschen "und" und im Englischen "and"
+  // steht - und nicht zwei Woerter aneinandergeklebt.
+  assert.match(page, /new Intl\.ListFormat\(locale/);
+
+  for (const locale of ["de", "en"]) {
+    const disclosure = JSON.parse(source(`messages/${locale}/capability.json`)).disclosure as Record<string, string>;
+    assert.match(disclosure.areasHint, /\{examples\}/, `${locale}: der Platzhalter fehlt`);
+  }
+});
+
+test("die gewaehlte Stufe ist zu sehen, nicht nur am Punkt zu erraten", () => {
+  const page = source("src/app/(product)/profile/page.tsx");
+  assert.match(page, /has-\[:checked\]:/);
+  // Der native Radio-Knopf bleibt: Ihn zu verstecken hiesse, Tastatur und
+  // Screenreader selbst zu bedienen.
+  assert.doesNotMatch(page, /name="capability_disclosure"[\s\S]{0,200}sr-only/);
 });
 
 test("a withheld depth is indistinguishable from a missing one", () => {

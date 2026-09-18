@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 // Bewusste Wiederverwendung statt Kopie: die Komponente ist generisch, nur ihr
 // Name traegt noch das Feature, in dem sie entstanden ist.
 import { ConnectSubmitButton as SubmitButton } from "@/features/connect/ConnectSubmitButton";
@@ -58,8 +58,9 @@ export default async function ProfilePage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople] = await Promise.all([
+  const [t, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople] = await Promise.all([
     getTranslations("capability"),
+    getLocale(),
     searchParams,
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, user.id),
@@ -102,6 +103,11 @@ export default async function ProfilePage({
   const areaLabel = (areaId: string) => t(`areaLabels.${areaId}`);
   const readout = buildCapabilityReadout(entries, areas, families);
   // Woher jemand kam, und was den Kernangaben zum Veroeffentlichen fehlt.
+  // Hoechstens zwei, sonst liest sich der Hinweis wie eine Aufzaehlung statt
+  // wie ein Beispiel.
+  const disclosureExamples = new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(
+    entries.slice(0, 2).map((entry) => areaLabel(entry.area_id))
+  );
   const returnPath = parseIdentityReturnPath(params.next);
   const identityGaps = getIdentityGaps(core);
 
@@ -537,19 +543,36 @@ export default async function ProfilePage({
             <h2 className="text-xl font-semibold">{t("disclosure.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("disclosure.text")}</p>
           </div>
+          {/* has-[:checked]: hebt die GANZE gewaehlte Zeile hervor, inklusive
+              des Knopfes darin - peer-checked haette das nicht gekonnt, weil
+              es nur auf Geschwister wirkt und der Text ein Kind ist.
+
+              Der native Radio-Knopf bleibt stehen: Ihn zu verstecken und
+              nachzubauen heisst, Tastatur und Screenreader selbst zu
+              bedienen - fuer einen Punkt, den der Browser richtig kann. */}
           <div className="grid gap-3">
             {CAPABILITY_DISCLOSURE_LEVELS.map((level) => (
-              <label key={level} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4">
+              <label
+                key={level}
+                className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:bg-slate-50/80 has-[:checked]:border-violet-300/70 has-[:checked]:bg-[linear-gradient(120deg,rgba(124,58,237,.06),rgba(34,211,238,.08))] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-violet-300"
+              >
                 <input
                   type="radio"
                   name="capability_disclosure"
                   value={level}
                   defaultChecked={disclosure === level}
-                  className="mt-1"
+                  className="mt-1 accent-violet-600"
                 />
                 <span>
                   <span className="block text-sm font-semibold">{t(`disclosure.${level}`)}</span>
-                  <span className="mt-1 block text-xs leading-5 text-slate-600">{t(`disclosure.${level}Hint`)}</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-600">
+                    {/* Das Beispiel kommt aus den EIGENEN Eintraegen. "Bereiche
+                        zeigen" blieb abstrakt, solange nicht dastand, was
+                        konkret gezeigt wuerde. */}
+                    {level === "areas"
+                      ? t("disclosure.areasHint", { examples: disclosureExamples })
+                      : t(`disclosure.${level}Hint`)}
+                  </span>
                 </span>
               </label>
             ))}
