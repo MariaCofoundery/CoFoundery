@@ -703,19 +703,19 @@
     "sections": {
       "interests": {
         "eyebrow": "Interessen & Vorhaben",
-        "title": "Woran ich interessiert bin"
+        "title": "Worum es geht"
       },
       "brings": {
         "eyebrow": "Erfahrung & Stärken",
-        "title": "Was ich mitbringe"
+        "title": "Rollen und Expertise"
       },
       "seeks": {
         "eyebrow": "Gesuchte Ergänzung",
-        "title": "Was ich suche"
+        "title": "Gesuchte Rollen"
       },
       "founding": {
         "eyebrow": "Arbeitsrahmen",
-        "title": "Wie ich gründen möchte"
+        "title": "Zeit, Tempo und Ziel"
       }
     },
     "intro": {

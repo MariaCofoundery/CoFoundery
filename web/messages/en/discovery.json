@@ -703,19 +703,19 @@
     "sections": {
       "interests": {
         "eyebrow": "Interests & direction",
-        "title": "What I am interested in"
+        "title": "What this is about"
       },
       "brings": {
         "eyebrow": "Experience & strengths",
-        "title": "What I bring"
+        "title": "Roles and expertise"
       },
       "seeks": {
         "eyebrow": "The complement I seek",
-        "title": "What I am looking for"
+        "title": "Roles sought"
       },
       "founding": {
         "eyebrow": "Working setup",
-        "title": "How I want to build"
+        "title": "Time, pace and goal"
       }
     },
     "intro": {

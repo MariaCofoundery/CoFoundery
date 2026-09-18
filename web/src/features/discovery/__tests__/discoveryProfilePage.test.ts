@@ -678,3 +678,30 @@ test("the question comes after the profile, the status before it", () => {
   const status = page.indexOf("isOwner || !introRequest ? null : (");
   assert.ok(status > -1 && status < content, "der Stand bleibt vor dem Inhalt");
 });
+
+test("a foreign profile never speaks in the first person", () => {
+  // Die Seite zeigt die Angaben EINER ANDEREN Person. "Woran ich interessiert
+  // bin" las sich dort, als spraeche die Betrachterin ueber sich selbst.
+  const FIRST_PERSON = /\b(ich|mein|meine|meinem|meinen)\b|\bI am\b|\bI'm\b|\bmy\b/i;
+  for (const locale of ["de", "en"]) {
+    const detail = (readJson(`messages/${locale}/discovery.json`).detail as Record<string, unknown>);
+    const sections = detail.sections as Record<string, { eyebrow: string; title: string }>;
+    for (const [key, section] of Object.entries(sections)) {
+      assert.doesNotMatch(section.title, FIRST_PERSON, `${locale}: sections.${key}.title`);
+      assert.doesNotMatch(section.eyebrow, FIRST_PERSON, `${locale}: sections.${key}.eyebrow`);
+    }
+    // Und die Ueberschrift darf nicht ihre eigene Kategorie wiederholen.
+    for (const [key, section] of Object.entries(sections)) {
+      assert.notEqual(
+        section.title.toLowerCase(),
+        section.eyebrow.toLowerCase(),
+        `${locale}: sections.${key} sagt zweimal dasselbe`
+      );
+    }
+  }
+
+  // Der Bearbeiten-Knopf darf "mein" sagen - er erscheint nur der eigenen
+  // Person.
+  const page = source(PAGE.replace("profile/page.tsx", "[profileId]/page.tsx"));
+  assert.match(page, /isOwner \? \([\s\S]{0,160}detail\.editOwn/);
+});
