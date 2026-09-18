@@ -10,6 +10,15 @@ import {
 
 const MIGRATION = "../supabase/migrations/20261006120000_person_core_linkedin.sql";
 const source = (path: string) => readFileSync(path, "utf8");
+/**
+ * Ohne Kommentare. Sonst findet die Pruefung auf type="url" den Begriff in der
+ * Erklaerung daneben, warum er dort gerade NICHT stehen darf - und ist damit
+ * dauerhaft rot, ohne dass etwas kaputt ist.
+ */
+const codeOnly = (path: string) =>
+  source(path)
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
 
 // ---------------------------------------------------------------------------
 // Was als LinkedIn-Adresse durchgeht
@@ -185,6 +194,44 @@ test("jede Stufe wird erklärt, in beiden Sprachen", () => {
       );
     }
     assert.ok(linkedin.errors.linkedin, `${locale}: die Fehlermeldung fehlt`);
+  }
+});
+
+test("das Eingabefeld lässt die Adresse durch, die man wirklich kopiert", () => {
+  // GEFUNDEN AM 19.09.2026 in der Benutzung: Das Feld war ein type="url".
+  // Damit weigert sich der BROWSER, das Formular abzuschicken, solange kein
+  // Schema davorsteht - "linkedin.com/in/name" ist fuer ihn keine URL. Die
+  // Meldung heisst "Bitte eine URL eingeben", und parseLinkedInUrl, das das
+  // "https://" laengst ergaenzt haette, kam nie zum Zug. Genau die Adresse,
+  // die jede Person aus der Adresszeile kopiert, war die einzige, die nicht
+  // ging - und speichern liess sich gar nichts mehr.
+  const field = codeOnly("src/features/profile/LinkedInField.tsx");
+  assert.doesNotMatch(
+    field,
+    /type="url"/,
+    'type="url" blockiert die Eingabe ohne Schema schon im Browser'
+  );
+  assert.match(field, /name="linkedin_url"[\s\S]{0,400}type="text"|type="text"[\s\S]{0,400}name="linkedin_url"/);
+
+  // Und die Ergaenzung passiert sichtbar, bevor gespeichert wird.
+  assert.match(field, /onBlur=/);
+  assert.match(field, /parseLinkedInUrl/);
+  assert.match(field, /aria-invalid/);
+
+  // Die Pruefung selbst kann es - das war nie das Problem.
+  const parsed = parseLinkedInUrl("linkedin.com/in/mein-name");
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.ok && parsed.url, "https://linkedin.com/in/mein-name");
+
+  for (const locale of ["de", "en"]) {
+    const linkedin = (
+      JSON.parse(readFileSync(`messages/${locale}/capability.json`, "utf8")) as {
+        identity: { linkedin: Record<string, string> };
+      }
+    ).identity.linkedin;
+    assert.ok(linkedin.urlInvalid, `${locale}: die Rückmeldung am Feld fehlt`);
+    // Sie muss sagen, was richtig waere, nicht nur dass etwas falsch ist.
+    assert.match(linkedin.urlInvalid, /linkedin\.com\/in\//, `${locale}: kein Beispiel genannt`);
   }
 });
 

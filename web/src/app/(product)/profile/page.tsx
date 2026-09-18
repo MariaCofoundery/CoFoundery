@@ -414,6 +414,7 @@ export default async function ProfilePage({
               apply: t("identity.cv.apply"),
               applied: t("identity.cv.applied"),
               clear: t("identity.cv.clear"),
+              chosenCount: t("identity.cv.chosenCount"),
               fileUnsupported: t("identity.cv.fileUnsupported"),
             }}
           />
@@ -437,6 +438,7 @@ export default async function ProfilePage({
               urlLabel: t("identity.linkedin.urlLabel"),
               urlPlaceholder: t("identity.linkedin.urlPlaceholder"),
               urlHint: t("identity.linkedin.urlHint"),
+              urlInvalid: t("identity.linkedin.urlInvalid"),
               visibilityTitle: t("identity.linkedin.visibilityTitle"),
               options: {
                 private: {

@@ -199,6 +199,24 @@ test("der Beta-Stand steht dran, bevor man aufklappt", () => {
   }
 });
 
+test("der eigene Pfeil verdeckt nicht das Standard-Dreieck", () => {
+  // `list-none` allein reicht nicht: Safari zeichnet das Dreieck ueber
+  // ::-webkit-details-marker, und daneben stuende dann noch der eigene Pfeil.
+  const field = source("src/features/profile/CvImportField.tsx");
+  assert.match(field, /list-none/);
+  assert.match(field, /\[&::-webkit-details-marker\]:hidden/);
+});
+
+test("nur eine Handlung trägt den Markenverlauf", () => {
+  // Der gefuellte Verlauf gehoert der EINEN Handlung, die etwas veraendert.
+  // Stehen zwei davon nebeneinander, sagt keiner mehr etwas - deshalb ist
+  // "Text auswerten" bewusst zurueckhaltend.
+  const field = source("src/features/profile/CvImportField.tsx");
+  assert.equal((field.match(/brand-cta/g) ?? []).length, 1);
+  // Und die Klasse muss es geben, sonst ist der Knopf unsichtbar weiss.
+  assert.match(readFileSync("src/app/globals.css", "utf8"), /^\.brand-cta \{/m);
+});
+
 test("nichts wird ohne Häkchen übernommen", () => {
   const field = source("src/features/profile/CvImportField.tsx");
   // Vorausgewaehlt waere eine Uebernahme durch die Hintertuer.

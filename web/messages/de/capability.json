@@ -44,6 +44,7 @@
       "urlLabel": "Dein LinkedIn-Profil",
       "urlPlaceholder": "linkedin.com/in/dein-name",
       "urlHint": "Die Adresse deines Profils. Du kannst sie direkt aus der Adresszeile kopieren – „https://“ ergänzen wir. Es geht nur LinkedIn, keine anderen Adressen.",
+      "urlInvalid": "Das erkennen wir nicht als LinkedIn-Profil. Es muss eine Adresse bei linkedin.com sein, zum Beispiel linkedin.com/in/dein-name.",
       "visibilityTitle": "Wer soll dein LinkedIn-Profil sehen?",
       "options": {
         "private": {
@@ -87,6 +88,7 @@
       "apply": "Angehaktes übernehmen",
       "applied": "Übernommen – schau dir die Felder oben an und speichere dann.",
       "clear": "Text löschen",
+      "chosenCount": "ausgewählt",
       "fileUnsupported": "Diese Datei können wir nicht lesen. Es geht nur reiner Text (.txt oder .md) – bei einem PDF oder Word-Dokument kopierst du den Inhalt am besten direkt ins Feld."
     }
   },

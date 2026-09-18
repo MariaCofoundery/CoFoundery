@@ -44,6 +44,7 @@
       "urlLabel": "Your LinkedIn profile",
       "urlPlaceholder": "linkedin.com/in/your-name",
       "urlHint": "The address of your profile. You can paste it straight from the address bar – we'll add the “https://”. LinkedIn only, no other addresses.",
+      "urlInvalid": "We don't recognise that as a LinkedIn profile. It needs to be an address at linkedin.com, for example linkedin.com/in/your-name.",
       "visibilityTitle": "Who should see your LinkedIn profile?",
       "options": {
         "private": {
@@ -87,6 +88,7 @@
       "apply": "Apply what's ticked",
       "applied": "Applied – check the fields above, then save.",
       "clear": "Clear text",
+      "chosenCount": "selected",
       "fileUnsupported": "We can't read that file. Plain text only (.txt or .md) – for a PDF or Word document, copy the contents straight into the field."
     }
   },

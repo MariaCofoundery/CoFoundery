@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   LINKEDIN_VISIBILITIES,
+  parseLinkedInUrl,
   type LinkedInVisibility,
 } from "@/features/profile/linkedInVisibility";
 
@@ -11,6 +12,7 @@ type Copy = {
   urlLabel: string;
   urlPlaceholder: string;
   urlHint: string;
+  urlInvalid: string;
   visibilityTitle: string;
   options: Record<LinkedInVisibility, { label: string; hint: string }>;
   publicWarning: string;
@@ -43,6 +45,7 @@ export function LinkedInField({
   copy: Copy;
 }) {
   const [url, setUrl] = useState(initialUrl);
+  const [invalid, setInvalid] = useState(false);
   const [visibility, setVisibility] = useState<LinkedInVisibility>(initialVisibility);
   const firstPublicTransition = initialVisibility !== "public" && visibility === "public";
 
@@ -50,19 +53,58 @@ export function LinkedInField({
     <fieldset className="rounded-2xl border border-slate-200 p-5">
       <legend className="px-1 text-sm font-semibold text-slate-900">{copy.title}</legend>
 
+      {/* BEWUSST type="text" UND NICHT type="url".
+          Mit type="url" weigert sich der Browser, das Formular abzuschicken,
+          solange kein Schema davorsteht - "linkedin.com/in/name" ist fuer ihn
+          keine URL. Die Meldung heisst dann "Bitte eine URL eingeben", und die
+          serverseitige Pruefung, die das "https://" laengst ergaenzt haette,
+          kommt nie zum Zug. Genau die Adresse, die jede Person aus der
+          Adresszeile kopiert, war damit die einzige, die nicht ging. */}
       <label className="mt-2 block">
         <span className="block text-sm font-medium text-slate-700">{copy.urlLabel}</span>
         <input
-          type="url"
+          type="text"
           name="linkedin_url"
           inputMode="url"
+          autoComplete="url"
+          spellCheck={false}
           maxLength={300}
           value={url}
-          onChange={(event) => setUrl(event.target.value)}
+          aria-invalid={invalid || undefined}
+          onChange={(event) => {
+            setUrl(event.target.value);
+            setInvalid(false);
+          }}
+          // Beim Verlassen wird sichtbar vervollstaendigt: Aus
+          // "linkedin.com/in/name" wird "https://linkedin.com/in/name", und
+          // wer sich vertippt hat, erfaehrt es hier - nicht erst nach dem
+          // Speichern auf einer neu geladenen Seite.
+          onBlur={() => {
+            const trimmed = url.trim();
+            if (trimmed.length === 0) {
+              setInvalid(false);
+              return;
+            }
+            const parsed = parseLinkedInUrl(trimmed);
+            if (parsed.ok && parsed.url) {
+              setUrl(parsed.url);
+              setInvalid(false);
+            } else {
+              setInvalid(true);
+            }
+          }}
           placeholder={copy.urlPlaceholder}
-          className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm"
+          className={`mt-1 min-h-11 w-full rounded-xl border px-3 text-sm ${
+            invalid ? "border-amber-500 bg-amber-50/40" : "border-slate-300"
+          }`}
         />
-        <span className="mt-1 block text-xs leading-5 text-slate-500">{copy.urlHint}</span>
+        {invalid ? (
+          <span role="alert" className="mt-1 block text-xs leading-5 text-amber-900">
+            {copy.urlInvalid}
+          </span>
+        ) : (
+          <span className="mt-1 block text-xs leading-5 text-slate-500">{copy.urlHint}</span>
+        )}
       </label>
 
       {url.trim().length > 0 ? (
