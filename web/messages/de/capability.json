@@ -70,6 +70,8 @@
     },
     "cv": {
       "title": "Lebenslauf einlesen (optional)",
+      "betaBadge": "Beta",
+      "betaNote": "Noch Beta: Einlesen geht im Moment nur per Kopieren und Einfügen – willkommen zurück in den 2000ern 😉 Dateien direkt zu lesen bauen wir demnächst ein.",
       "text": "Füge deinen Lebenslauf als Text ein. Das Tool markiert, welche Kenntnisse und Branchen es darin wiedererkennt – du entscheidest, was davon ins Profil wandert.",
       "privacyNote": "Dein Lebenslauf bleibt in deinem Browser. Er wird nicht hochgeladen, nicht an eine KI geschickt und nirgends gespeichert. Wenn du die Seite verlässt, ist er weg.",
       "textareaLabel": "Text deines Lebenslaufs",

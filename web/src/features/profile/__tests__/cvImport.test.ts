@@ -170,6 +170,35 @@ test("der Lebenslauf verlässt den Browser nicht – und das steht auch da", () 
   }
 });
 
+test("der Beta-Stand steht dran, bevor man aufklappt", () => {
+  // Das Verfahren kann heute nur Kopieren und Einfügen. Das als Beta zu
+  // kennzeichnen ist keine Ausrede, sondern die ehrliche Ansage - und sie
+  // gehört an die zugeklappte Überschrift, nicht ins Innere, wo sie erst
+  // liest, wer sich schon entschieden hat.
+  const field = source("src/features/profile/CvImportField.tsx");
+  assert.match(field, /<summary[\s\S]*copy\.betaBadge/);
+  assert.match(field, /copy\.betaNote/);
+
+  for (const locale of ["de", "en"]) {
+    const cv = (
+      JSON.parse(readFileSync(`messages/${locale}/capability.json`, "utf8")) as {
+        identity: { cv: Record<string, string> };
+      }
+    ).identity.cv;
+    assert.ok(cv.betaBadge, `${locale}: das Abzeichen fehlt`);
+    assert.match(
+      cv.betaNote,
+      locale === "de" ? /Kopieren und Einfügen/ : /copy and paste/,
+      `${locale}: der Hinweis sagt nicht, was heute geht`
+    );
+    assert.match(
+      cv.betaNote,
+      locale === "de" ? /demnächst/ : /coming soon/,
+      `${locale}: der Hinweis sagt nicht, dass es weitergeht`
+    );
+  }
+});
+
 test("nichts wird ohne Häkchen übernommen", () => {
   const field = source("src/features/profile/CvImportField.tsx");
   // Vorausgewaehlt waere eine Uebernahme durch die Hintertuer.

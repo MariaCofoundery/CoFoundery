@@ -397,6 +397,8 @@ export default async function ProfilePage({
             )}
             copy={{
               title: t("identity.cv.title"),
+              betaBadge: t("identity.cv.betaBadge"),
+              betaNote: t("identity.cv.betaNote"),
               text: t("identity.cv.text"),
               privacyNote: t("identity.cv.privacyNote"),
               textareaLabel: t("identity.cv.textareaLabel"),

@@ -70,6 +70,8 @@
     },
     "cv": {
       "title": "Read in your CV (optional)",
+      "betaBadge": "Beta",
+      "betaNote": "Still beta: for now it only works by copy and paste – welcome back to the 2000s 😉 Reading files directly is coming soon.",
       "text": "Paste your CV as text. The tool marks which skills and industries it recognises in it – you decide what makes it into your profile.",
       "privacyNote": "Your CV stays in your browser. It is not uploaded, not sent to an AI, and not stored anywhere. Once you leave the page it's gone.",
       "textareaLabel": "Text of your CV",

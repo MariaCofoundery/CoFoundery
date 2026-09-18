@@ -12,6 +12,9 @@ import {
 
 type Copy = {
   title: string;
+  /** Kurzes Abzeichen an der Ueberschrift - sichtbar, bevor man aufklappt. */
+  betaBadge: string;
+  betaNote: string;
   text: string;
   privacyNote: string;
   textareaLabel: string;
@@ -126,11 +129,18 @@ export function CvImportField({
 
   return (
     <details className="rounded-2xl border border-slate-200 p-5">
-      <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">
-        {copy.title}
+      {/* Das Abzeichen steht an der zugeklappten Ueberschrift, nicht erst im
+          Inneren: Wer aufklappt, soll vorher wissen, dass das hier noch im
+          Werden ist. */}
+      <summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-slate-900">
+        <span>{copy.title}</span>
+        <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[.68rem] font-bold uppercase tracking-[.1em] text-violet-800">
+          {copy.betaBadge}
+        </span>
       </summary>
 
       <p className="mt-3 text-sm leading-6 text-slate-600">{copy.text}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{copy.betaNote}</p>
       <p className="mt-2 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-700">
         {copy.privacyNote}
       </p>
