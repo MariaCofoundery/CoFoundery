@@ -119,9 +119,9 @@
       "invitationExpired": "Einladung abgelaufen",
       "open": "offen",
       "noActivity": "Noch keine Aktivität",
-      "currentStatus": "Aktueller Stand verfügbar"
-      ,"waitReport": "Advisor Report abwarten"
-      ,"openReport": "Advisor Report ansehen"
+      "currentStatus": "Aktueller Stand verfügbar",
+      "waitReport": "Advisor Report abwarten",
+      "openReport": "Advisor Report ansehen"
     },
     "setupStatuses": {
       "not_granted": "Nicht freigegeben",
@@ -137,9 +137,9 @@
       "none": "Kein Follow-up gesetzt"
     },
     "accessDescription": {
-      "revoked": "Die Freigabe ist für dieses Team nicht mehr aktiv. Du siehst den Stand, arbeitest aber nicht weiter.",
+      "revoked": "Die Freigabe für dieses Team ist beendet. Report, Snapshot und Workbook sind nicht mehr zugänglich – das Team bleibt hier in der Liste, damit du weißt, woran du bist.",
       "ready": "Die Relationship-Freigabe ist vollständig. Report und Snapshot sind verfügbar, sobald der jeweilige Stand vorliegt. Historische Workbook-Inhalte bleiben separat erreichbar.",
-      "paused": "Mindestens eine Freigabe ist aktuell nicht aktiv. Du behältst den Status im Blick, arbeitest aber nicht weiter.",
+      "paused": "Mindestens eine Founder-Freigabe ist gerade nicht aktiv. Solange das so ist, sind die Inhalte geschlossen. Sobald wieder beide zugestimmt haben, kommst du an derselben Stelle weiter.",
       "waiting": "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team für die Begleitung offen."
     },
     "approvals": "{count} von 2 Freigaben",

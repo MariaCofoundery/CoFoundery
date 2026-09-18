@@ -137,9 +137,9 @@
       "none": "No follow-up set"
     },
     "accessDescription": {
-      "revoked": "The approval for this team is no longer active. You can see the status, but cannot continue working.",
+      "revoked": "Access to this team has ended. The report, snapshot and workbook are no longer available – the team stays in this list so you know where you stand.",
       "ready": "Relationship approval is complete. Report and snapshot become available with their respective state. Historical workbook content remains separately accessible.",
-      "paused": "At least one approval is currently not active. You can keep an eye on the status, but cannot continue working.",
+      "paused": "At least one founder approval is not active right now. While that is the case the content is closed. Once both have approved again, you continue where you left off.",
       "waiting": "One founder approval is still missing. Once both founders approve, the team is open for advisor support."
     },
     "approvals": "{count} of 2 approvals",

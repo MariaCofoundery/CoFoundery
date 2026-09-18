@@ -74,7 +74,7 @@ function reportStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
 }
 
 function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
-  if (team.accessStatus === "paused") {
+  if (team.accessStatus === "paused" || team.accessStatus === "revoked") {
     return t("dashboard.statuses.advisorPaused");
   }
 
@@ -86,11 +86,11 @@ function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.statuses.reportReady");
   }
 
-  if (team.statusLabel === "Founder-Reaktion liegt vor") {
+  if (team.activityStatus === "founder_reaction_ready") {
     return t("dashboard.statuses.founderReactionReady");
   }
 
-  if (team.statusLabel === "Founder-Reaktion offen") {
+  if (team.activityStatus === "founder_reaction_open") {
     return t("dashboard.statuses.founderReactionOpen");
   }
 
@@ -99,7 +99,7 @@ function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
 
 function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   if (team.accessStatus !== "ready") {
-    return team.accessStatus === "paused"
+    return team.accessStatus === "paused" || team.accessStatus === "revoked"
       ? t("dashboard.statuses.checkApproval")
       : t("dashboard.statuses.waitingSecondApproval");
   }
@@ -108,11 +108,11 @@ function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.statuses.waitReport");
   }
 
-  if (team.statusLabel === "Founder-Reaktion liegt vor") {
+  if (team.activityStatus === "founder_reaction_ready") {
     return t("dashboard.statuses.viewFounderReaction");
   }
 
-  if (team.statusLabel === "Founder-Reaktion offen") {
+  if (team.activityStatus === "founder_reaction_open") {
     return t("dashboard.statuses.checkNewReaction");
   }
 
@@ -139,11 +139,24 @@ function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT, locale: 
   return `${teamContext} · ${t("dashboard.lastActivityPrefix")} ${timestamp}`;
 }
 
+/**
+ * BEHOBEN am 19.09.2026.
+ *
+ * Hier stand `team.canOpenWorkbook ? accessPaused : accessRevoked` - und
+ * canOpenWorkbook war bei pausiert UND bei widerrufen false. Also bekam jeder
+ * pausierte Advisor die Meldung ueber einen Widerruf zu sehen, und die
+ * Beschriftung fuer "pausiert" war unerreichbar. Wer nur darauf wartete, dass
+ * eine Zustimmung zurueckkommt, las, die Founder haetten ihn abgesetzt.
+ *
+ * Jetzt entscheidet der Status selbst, weil er beides unterscheidet.
+ */
 function accessStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
+  if (team.accessStatus === "revoked") {
+    return t("dashboard.statuses.accessRevoked");
+  }
+
   if (team.accessStatus === "paused") {
-    return team.canOpenWorkbook
-      ? t("dashboard.statuses.accessPaused")
-      : t("dashboard.statuses.accessRevoked");
+    return t("dashboard.statuses.accessPaused");
   }
 
   if (team.accessStatus === "ready") {
@@ -154,10 +167,12 @@ function accessStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
 }
 
 function accessStatusDescription(team: AdvisorDashboardTeam, t: AdvisorT) {
+  if (team.accessStatus === "revoked") {
+    return t("dashboard.accessDescription.revoked");
+  }
+
   if (team.accessStatus === "paused") {
-    return team.canOpenWorkbook
-      ? t("dashboard.accessDescription.paused")
-      : t("dashboard.accessDescription.revoked");
+    return t("dashboard.accessDescription.paused");
   }
 
   if (team.accessStatus === "ready") {
@@ -168,19 +183,15 @@ function accessStatusDescription(team: AdvisorDashboardTeam, t: AdvisorT) {
 }
 
 function approvalSummary(team: AdvisorDashboardTeam, t: AdvisorT) {
-  if (team.accessStatus === "ready") {
-    return t("dashboard.approvals", { count: 2 });
-  }
-
-  const match = team.approvalSummary.match(/^(\d+)/);
-  const count = match ? Number(match[1]) : 0;
-  return t("dashboard.approvals", { count });
+  // Vorher baute die Datenschicht "1 von 2 Freigaben" und hier wurde die Zahl
+  // mit einem Regex zurueckgeholt. Eine Formulierungsaenderung haette daraus
+  // still eine 0 gemacht.
+  return t("dashboard.approvals", { count: team.approvalCount });
 }
 
-function advisorFollowUpLabel(value: string, t: AdvisorT) {
-  if (value === "Follow-up in 4 Wochen") return t("dashboard.followUps.fourWeeks");
-  if (value === "Follow-up in 3 Monaten") return t("dashboard.followUps.threeMonths");
-  if (value === "Kein Follow-up gesetzt") return t("dashboard.followUps.none");
+function advisorFollowUpLabel(followUp: AdvisorDashboardTeam["followUp"], t: AdvisorT) {
+  if (followUp === "four_weeks") return t("dashboard.followUps.fourWeeks");
+  if (followUp === "three_months") return t("dashboard.followUps.threeMonths");
   return t("dashboard.followUps.none");
 }
 
@@ -324,7 +335,7 @@ function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTe
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>
               <span className="text-xs font-medium text-slate-700">
-                {advisorFollowUpLabel(team.followUpLabel, t)}
+                {advisorFollowUpLabel(team.followUp, t)}
               </span>
             </div>
           </div>
@@ -590,7 +601,12 @@ export default async function AdvisorDashboardPage() {
   const displayName = advisorProfile.displayName || metadataName || emailName || "Advisor";
   const readyTeams = teams.filter((team) => team.accessStatus === "ready");
   const waitingTeams = teams.filter((team) => team.accessStatus === "waiting_for_approval");
-  const pausedTeams = teams.filter((team) => team.accessStatus === "paused");
+  // Pausiert und widerrufen stehen in derselben Gruppe - beides heisst "hier
+  // arbeitest du gerade nicht weiter". Unterschieden werden sie an der
+  // Beschriftung auf der Karte, nicht an der Ueberschrift.
+  const pausedTeams = teams.filter(
+    (team) => team.accessStatus === "paused" || team.accessStatus === "revoked"
+  );
   const preferredTeam = readyTeams.find((team) => team.reportAvailable) ?? readyTeams[0] ?? null;
   const dashboardFallbackHref = debug ? "/advisor/dashboard?debug=1#advisor-teams" : "/advisor/dashboard#advisor-teams";
   const reportHref = preferredTeam?.reportHref ?? dashboardFallbackHref;

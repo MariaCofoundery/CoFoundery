@@ -111,14 +111,34 @@ export type AdvisorDashboardTeam = {
   founderAAvatarUrl: string | null;
   founderBAvatarUrl: string | null;
   teamContext: "pre_founder" | "existing_team";
-  accessStatus: "ready" | "waiting_for_approval" | "paused";
-  accessStatusLabel: string;
-  accessStatusDescription: string;
-  approvalSummary: string;
-  statusLabel: string;
-  lastActivityLabel: string;
+  /**
+   * "revoked" ist am 19.09.2026 dazugekommen.
+   *
+   * Vorher wurde auch ein Widerruf als "paused" gemeldet, und die Oberflaeche
+   * versuchte beide am Hilfsfeld `canOpenWorkbook` zu unterscheiden. Das war
+   * in BEIDEN Faellen false - also bekam jedes pausierte Team die Meldung
+   * "Zugriff widerrufen" zu sehen. Ein Advisor, bei dem nur eine Zustimmung
+   * fehlte, las damit, die Founder haetten ihn abgesetzt.
+   */
+  accessStatus: "ready" | "waiting_for_approval" | "paused" | "revoked";
+  /** 0, 1 oder 2. Vorher ein deutscher Satz, aus dem die Seite die Zahl per Regex zurueckholte. */
+  approvalCount: number;
+  /**
+   * Woran gerade gearbeitet wird - als Schluessel.
+   *
+   * Vorher stand hier ein deutscher Satz ("Founder-Reaktion liegt vor"), den
+   * die Seite mit === verglich, um zu entscheiden, was sie anzeigt. Eine
+   * Formulierungsaenderung haette die Zweige still abgeschaltet.
+   */
+  activityStatus: AdvisorActivityStatus;
   lastActivityAt: string | null;
-  followUpLabel: string;
+  /**
+   * Schluessel, kein Satz. Vorher baute die Datenschicht "Follow-up in 4
+   * Wochen" und die Seite verglich genau diesen String, um daraus wieder eine
+   * Uebersetzung zu machen - dasselbe Muster, das die Zugriffsmeldung falsch
+   * gemacht hat.
+   */
+  followUp: "four_weeks" | "three_months" | "none";
   canOpenWorkbook: boolean;
   workbookHref: string;
   reportHref: string;
@@ -172,97 +192,56 @@ function resolveInvitationTeamName(label: string | null | undefined, inviteeEmai
   return normalizedLabel;
 }
 
-function teamContextLabel(teamContext: "pre_founder" | "existing_team") {
-  return teamContext === "existing_team" ? "Bestehendes Team" : "Pre-Founder";
-}
+export type AdvisorActivityStatus =
+  | "founder_reaction_ready"
+  | "founder_reaction_open"
+  | "workbook_in_progress"
+  | "report_ready"
+  | "workbook_empty";
 
-function formatTimestamp(value: string | null) {
-  if (!value) return "Noch keine Aktivitaet";
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
-function deriveAdvisorStatusLabel(params: {
+function deriveAdvisorActivityStatus(params: {
   hasReport: boolean;
   hasWorkbook: boolean;
   hasAdvisorClosing: boolean;
   hasFounderReaction: boolean;
-  teamContext: "pre_founder" | "existing_team";
-}) {
-  if (params.hasFounderReaction) {
-    return "Founder-Reaktion liegt vor";
-  }
-
-  if (params.hasAdvisorClosing) {
-    return "Founder-Reaktion offen";
-  }
-
-  if (params.hasWorkbook) {
-    return "Workbook in Arbeit";
-  }
-
-  if (params.hasReport) {
-    return params.teamContext === "existing_team" ? "Alignment-Report bereit" : "Matching-Report bereit";
-  }
-
-  return "Workbook noch leer";
+}): AdvisorActivityStatus {
+  if (params.hasFounderReaction) return "founder_reaction_ready";
+  if (params.hasAdvisorClosing) return "founder_reaction_open";
+  if (params.hasWorkbook) return "workbook_in_progress";
+  if (params.hasReport) return "report_ready";
+  return "workbook_empty";
 }
 
 function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAccessRow): Pick<
   AdvisorDashboardTeam,
-  "accessStatus" | "accessStatusLabel" | "accessStatusDescription" | "approvalSummary" | "canOpenWorkbook"
+  "accessStatus" | "approvalCount" | "canOpenWorkbook"
 > {
-  const founderAApproved = row.founder_a_approved === true;
-  const founderBApproved = row.founder_b_approved === true;
+  const approvalCount =
+    Number(row.founder_a_approved === true) + Number(row.founder_b_approved === true);
   const isRevoked = "status" in row ? row.status === "revoked" || Boolean(row.revoked_at) : false;
 
+  // Die Beschriftungen stehen ausschliesslich in messages/*/advisor.json. Hier
+  // standen sie ein zweites Mal - auf Deutsch, mit ae/oe/ue geschrieben, und
+  // von der Seite nie benutzt. Genau diese Doppelung hat den Fehler oben
+  // erzeugt: Wer die Ableitung las, glaubte, diese Texte seien zu sehen.
   if (isRevoked) {
-    return {
-      accessStatus: "paused",
-      accessStatusLabel: "Zugriff widerrufen",
-      accessStatusDescription: "Die Freigabe ist fuer dieses Team nicht mehr aktiv. Du siehst den Stand, arbeitest aber nicht weiter.",
-      approvalSummary: `${Number(founderAApproved) + Number(founderBApproved)} von 2 Freigaben`,
-      canOpenWorkbook: false,
-    };
+    return { accessStatus: "revoked", approvalCount, canOpenWorkbook: false };
   }
 
-  if (founderAApproved && founderBApproved) {
-    return {
-      accessStatus: "ready",
-      accessStatusLabel: "Freigegeben",
-      accessStatusDescription: "Freigabe vollstaendig. Workbook, Report und Snapshot koennen genutzt werden, sobald der jeweilige Stand vorliegt.",
-      approvalSummary: "2 von 2 Freigaben",
-      canOpenWorkbook: true,
-    };
+  if (row.founder_a_approved === true && row.founder_b_approved === true) {
+    return { accessStatus: "ready", approvalCount, canOpenWorkbook: true };
   }
-
-  const approvalSummary = `${Number(founderAApproved) + Number(founderBApproved)} von 2 Freigaben`;
 
   if (row.approved_at) {
-    return {
-      accessStatus: "paused",
-      accessStatusLabel: "Zugriff pausiert",
-      accessStatusDescription: "Mindestens eine Freigabe ist aktuell nicht aktiv. Du behaeltst den Status im Blick, arbeitest aber nicht weiter.",
-      approvalSummary,
-      canOpenWorkbook: false,
-    };
+    return { accessStatus: "paused", approvalCount, canOpenWorkbook: false };
   }
 
-  return {
-    accessStatus: "waiting_for_approval",
-    accessStatusLabel: "Wartet auf Freigabe",
-    accessStatusDescription: "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team fuer die Begleitung offen.",
-    approvalSummary,
-    canOpenWorkbook: false,
-  };
+  return { accessStatus: "waiting_for_approval", approvalCount, canOpenWorkbook: false };
 }
 
-function advisorFollowUpLabel(value: unknown) {
-  if (value === "four_weeks") return "Follow-up in 4 Wochen";
-  if (value === "three_months") return "Follow-up in 3 Monaten";
-  return "Kein Follow-up gesetzt";
+function advisorFollowUp(value: unknown): AdvisorDashboardTeam["followUp"] {
+  if (value === "four_weeks" || value === "three_months") return value;
+  return "none";
 }
 
 export async function getDashboardRoleViews(userId: string): Promise<DashboardRoleViews> {
@@ -511,7 +490,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         : relationshipAccessRow
           ? accessState.accessStatus === "waiting_for_approval"
             ? "awaiting_founder_approval"
-            : accessState.accessStatus === "paused"
+            : accessState.accessStatus === "paused" || accessState.accessStatus === "revoked"
               ? "access_paused"
               : "team_not_ready"
           : legacyAccessRow
@@ -531,16 +510,14 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         teamContext,
         ...accessState,
         canOpenWorkbook: workbookAvailable,
-        statusLabel: deriveAdvisorStatusLabel({
+        activityStatus: deriveAdvisorActivityStatus({
           hasReport: reportReady,
           hasWorkbook: hasLegacyWorkbook,
           hasAdvisorClosing,
           hasFounderReaction,
-          teamContext,
         }),
-        lastActivityLabel: `${teamContextLabel(teamContext)} · ${formatTimestamp(lastActivitySource)}`,
         lastActivityAt: lastActivitySource,
-        followUpLabel: advisorFollowUpLabel(workbookPayload?.advisorFollowUp),
+        followUp: advisorFollowUp(workbookPayload?.advisorFollowUp),
         workbookHref: buildAdvisorWorkbookHref(invitation.id, teamContext),
         reportHref: buildAdvisorReportHref(invitation.id, teamContext),
         reportReady,
