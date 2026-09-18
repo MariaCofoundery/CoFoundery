@@ -135,6 +135,19 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">{t(`categories.${catalogItem.category}`)}</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">{t(`items.${itemKey}.title`)}</h1>
         <p className="mt-4 text-sm leading-7 text-slate-600">{t(`items.${itemKey}.question`)}</p>
+        {/* Vor dem leeren Feld ein Anhaltspunkt.
+            Bis 18.09.2026 bestand ein Thema aus Titel, Frage und Textfeld.
+            Bei "Kommunikation" geht das. Bei Vesting und Beteiligung - also
+            genau dort, wo niemand weiss, was ueblich ist - sagte das Produkt
+            nichts, und zwei Menschen sassen vor einem leeren Feld und sollten
+            etwas festlegen, das ihnen in drei Jahren um die Ohren fliegt. */}
+        <section className="mt-5 rounded-2xl border border-cyan-200/70 bg-[linear-gradient(120deg,rgba(103,232,249,.10),rgba(124,58,237,.05))] p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-800">
+            {t("orientationTitle")}
+          </p>
+          <p className="mt-2 text-sm leading-7 text-slate-800">{t(`items.${itemKey}.orientation`)}</p>
+          <p className="mt-3 text-xs leading-6 text-slate-500">{t("orientationHelp")}</p>
+        </section>
         {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-white px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
       </header>
       <FounderTeamNavigation

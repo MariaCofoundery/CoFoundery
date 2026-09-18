@@ -410,78 +410,139 @@
     "items": {
       "roles_responsibilities": {
         "title": "Rollen & Verantwortlichkeiten",
-        "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?"
+        "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?",
+        "orientation": "Üblich ist, dass jede Person einen Bereich allein verantwortet und dort auch allein entscheidet – Produkt, Vertrieb, Finanzen. Die häufigste Panne ist nicht eine falsche Aufteilung, sondern eine, die nie ausgesprochen wurde: Beide fühlen sich für dasselbe zuständig, oder für nichts. Schreibt auf, wer bei welcher Frage das letzte Wort hat."
       },
       "decision_rights": {
         "title": "Entscheidungen & Entscheidungsrechte",
-        "question": "Was entscheidet ihr gemeinsam, was einzelne Founder – und wie geht ihr mit unterschiedlichen Einschätzungen um?"
+        "question": "Was entscheidet ihr gemeinsam, was einzelne Founder – und wie geht ihr mit unterschiedlichen Einschätzungen um?",
+        "orientation": "Gängig ist eine Grenze in Euro oder Wirkung: Bis dahin entscheidet der zuständige Bereich allein, darüber gemeinsam. Bei zwei Personen gibt es bei Uneinigkeit keine Mehrheit – legt deshalb vorher fest, was dann passiert: eine Person hat bei bestimmten Fragen den Stichentscheid, oder es gibt eine dritte Stimme (Advisor, Beirat)."
       },
       "time_commitment": {
         "title": "Zeit & Commitment",
-        "question": "Wie viel Zeit kann und möchte jede Person aktuell einbringen, und welche Veränderungen solltet ihr früh miteinander besprechen?"
+        "question": "Wie viel Zeit kann und möchte jede Person aktuell einbringen, und welche Veränderungen solltet ihr früh miteinander besprechen?",
+        "orientation": "Sagt es in Stunden pro Woche, nicht in „Vollzeit“ – das Wort bedeutet für zwei Menschen selten dasselbe. Ungleicher Einsatz ist kein Problem, solange er benannt ist und sich in Anteilen oder Gehalt widerspiegelt. Zum Problem wird er, wenn er unausgesprochen bleibt."
       },
       "communication": {
         "title": "Kommunikation & Zusammenarbeit",
-        "question": "Wie wollt ihr Informationen teilen, euch abstimmen, Feedback geben und im Alltag erreichbar sein?"
+        "question": "Wie wollt ihr Informationen teilen, euch abstimmen, Feedback geben und im Alltag erreichbar sein?",
+        "orientation": "Die meisten Teams brauchen genau zwei Dinge: einen festen wöchentlichen Termin, der nicht ausfällt, und eine Verabredung über Erreichbarkeit – wann man antworten muss und wann nicht. Alles Weitere regelt sich. Ohne das erste schleifen sich Themen ein, ohne das zweite entsteht das Gefühl, nie frei zu haben."
       },
       "conflict_deadlock": {
-        "title": "Konflikte & festgefahrene Situationen",
-        "question": "Wie wollt ihr Meinungsverschiedenheiten ansprechen, und was tut ihr, wenn ihr bei einer wichtigen Frage nicht weiterkommt?"
+        "title": "Konflikt & Pattsituationen",
+        "question": "Was tut ihr, wenn ihr euch nicht einigt – und wann holt ihr jemanden dazu?",
+        "orientation": "Legt es fest, solange ihr euch gut versteht. Üblich ist eine Eskalationsstufe: erst ein Gespräch mit Frist, dann eine dritte Person, die moderiert (nicht entscheidet). Wer benannt wird, sollte vorher gefragt sein. Im Ernstfall etwas zu vereinbaren funktioniert nicht."
       },
       "equity": {
-        "title": "Beteiligungsverteilung / Equity",
-        "question": "Wie sollen Anteile verteilt werden, und welche Überlegungen stehen hinter dieser Verteilung?"
+        "title": "Beteiligung",
+        "question": "Wie teilt ihr die Anteile auf – und woran macht ihr das fest?",
+        "orientation": "Zwei verbreitete Wege. Feste Aufteilung am Anfang: einfach, üblich, aber sie belohnt eine Erwartung statt eines Beitrags. Oder dynamisch (bekannt als Slicing Pie): Anteile entstehen aus dem, was tatsächlich eingebracht wird – Zeit, Geld, Sachwerte –, und die Aufteilung ergibt sich am Ende. Aufwendiger, aber fairer, wenn unklar ist, wer wie lange dabei bleibt. Ein 50/50 ohne Stichentscheid ist die häufigste Konstruktion und zugleich die häufigste Ursache für Stillstand."
       },
       "vesting": {
-        "title": "Vesting & Cliff",
-        "question": "Soll die Beteiligung an Zeit oder Mitarbeit geknüpft sein, und was soll bei einem frühen Ausscheiden gelten?"
+        "title": "Vesting",
+        "question": "Was passiert mit den Anteilen, wenn jemand früh geht?",
+        "orientation": "Am häufigsten: vier Jahre, ein Jahr Cliff. Wer vor Ablauf des ersten Jahres geht, behält nichts; danach wächst der Anteil monatlich mit. Entscheidend ist nicht die genaue Zahl, sondern dass überhaupt etwas gilt, bevor jemand geht. Ohne Vesting behält eine Person, die nach vier Monaten aussteigt, ihre vollen Anteile – und sitzt bei jeder späteren Finanzierung mit am Tisch."
       },
       "compensation": {
         "title": "Gehalt & Vergütung",
-        "question": "Wann und unter welchen Bedingungen wollt ihr euch vergüten, und wie geht ihr mit unterschiedlichen Vergütungen um?"
+        "question": "Wer bekommt wann wie viel – und was passiert, bis Geld da ist?",
+        "orientation": "In der Frühphase zahlen sich viele Teams nichts oder ein gleiches, niedriges Gehalt. Wichtiger als die Höhe ist die Verabredung, ab wann sich das ändert: ab einer Finanzierung, ab einem Umsatz, ab einem Datum. Ungleiche Gehälter sind in Ordnung, wenn der Grund benannt ist – Lebenssituation ist ein legitimer Grund."
       },
       "contributions_expenses": {
-        "title": "Einlagen, Auslagen & Founder-Darlehen",
-        "question": "Wie behandelt ihr privates Geld, Auslagen, Einlagen oder Darlehen, die Founder für das Unternehmen übernehmen?"
+        "title": "Einlagen & Ausgaben",
+        "question": "Wer bringt was ein, und wer zahlt laufende Kosten?",
+        "orientation": "Haltet von Anfang an fest, wer was bezahlt hat – auch Kleinigkeiten. Üblich ist ein gemeinsames Konto, aus dem alles läuft, und eine Liste privater Auslagen, die später erstattet werden. Wer das nachträglich rekonstruieren muss, streitet über Beträge, bei denen es nicht um Geld geht."
       },
       "personal_financial_risk": {
         "title": "Persönliches finanzielles Risiko",
-        "question": "Welche finanziellen Verpflichtungen kann und möchte jede Person übernehmen – und welche ausdrücklich nicht?"
+        "question": "Wer haftet wofür persönlich, und wie lange haltet ihr das aus?",
+        "orientation": "Bürgschaften, Mietverträge, private Darlehen: Prüft, wer davon persönlich betroffen ist – oft ist es nur eine Person. Redet außerdem über die persönliche Landebahn: Wie lange kann jede Person ohne Einkommen weitermachen? Diese Zahl bestimmt eure Entscheidungen mehr als jede Planung."
       },
       "legal_entity": {
-        "title": "Gesellschaft & formale Gründung",
-        "question": "Welche formalen Gründungsschritte sind noch offen, und wo benötigt ihr gegebenenfalls professionelle Beratung?"
+        "title": "Rechtsform",
+        "question": "In welcher Form gründet ihr – und wann?",
+        "orientation": "In Deutschland sind GmbH und UG die Regel, die UG vor allem wegen des geringeren Stammkapitals. Eine GbR entsteht dagegen von selbst, sobald ihr gemeinsam loslegt – mit persönlicher Haftung für beide. Das ist der häufigste unbemerkte Zustand: Viele Teams sind längst eine GbR, ohne es zu wissen. Die Wahl gehört mit Steuerberatung besprochen, der Zeitpunkt oft früher als gedacht."
       },
       "founder_agreements": {
-        "title": "Gesellschafts- & Founder-Vereinbarungen",
-        "question": "Welche wichtigen Absprachen wollt ihr verbindlich schriftlich festhalten?"
+        "title": "Gründervereinbarungen",
+        "question": "Was haltet ihr schriftlich fest, und wo liegt es?",
+        "orientation": "Vor dem Gesellschaftsvertrag steht meist eine formlose Gründervereinbarung: Sie hält fest, was gilt, bis der Notartermin da ist. Das ist kein Misstrauen, sondern das Gegenteil – solange ihr euch einig seid, ist es leicht aufzuschreiben. Was hier bestätigt wird, ist eine gute Grundlage dafür, aber kein Ersatz für den Vertrag selbst."
       },
       "intellectual_property": {
-        "title": "Geistiges Eigentum / IP",
-        "question": "Wie wollt ihr mit bestehendem und künftig entstehendem Code, Designs, Marken, Inhalten, Erfindungen oder anderen Arbeitsergebnissen umgehen?"
+        "title": "Rechte am Geschaffenen",
+        "question": "Wem gehört, was ihr baut – Code, Marke, Inhalte?",
+        "orientation": "Der wichtigste Satz: Was für das Unternehmen entsteht, gehört dem Unternehmen, nicht der Person, die es gebaut hat. Das muss ausdrücklich übertragen werden – es passiert nicht von selbst, besonders nicht bei Code aus der Zeit vor der Gründung. Prüft außerdem Arbeitsverträge: Wer nebenbei angestellt ist, hat dort womöglich Rechte abgetreten."
       },
       "outside_activities": {
-        "title": "Nebentätigkeiten & andere Projekte",
-        "question": "Welche anderen Jobs, Unternehmen oder Projekte laufen parallel, und was möchtet ihr dazu transparent miteinander klären?"
+        "title": "Nebentätigkeiten",
+        "question": "Was darf jede Person daneben tun?",
+        "orientation": "Üblich ist: Nebentätigkeiten sind erlaubt, solange sie offengelegt sind und nicht im Wettbewerb stehen. Die Reibung entsteht selten an der Tätigkeit selbst, sondern daran, dass sie nicht erwähnt wurde. Legt fest, was ihr einander sagt – nicht, was ihr einander verbietet."
       },
       "accounts_access": {
-        "title": "Accounts, Zugänge & wichtige Unternehmensdaten",
-        "question": "Wie stellt ihr sicher, dass wichtige Accounts, Zugänge und Unternehmensinformationen nicht nur von einer Person abhängen?"
+        "title": "Konten & Zugänge",
+        "question": "Wer hat Zugriff worauf – und was passiert, wenn jemand ausfällt?",
+        "orientation": "Die Prüffrage: Wenn eine Person morgen nicht erreichbar ist, kommt ihr an Bankkonto, Domain, Code, Kundendaten und Passwörter? Bei sehr vielen jungen Teams lautet die Antwort nein. Ein gemeinsamer Passwortspeicher und eine zweite Person mit Bankzugang lösen fast das ganze Thema."
       },
       "prolonged_absence": {
-        "title": "Längerer Ausfall",
-        "question": "Wie wollt ihr vorgehen, wenn ein Founder für längere Zeit ausfällt oder deutlich weniger verfügbar ist?"
+        "title": "Längere Abwesenheit",
+        "question": "Was gilt, wenn jemand für längere Zeit ausfällt – Krankheit, Elternzeit, Pflege?",
+        "orientation": "Regelt zwei Dinge getrennt: Was passiert mit der Arbeit (wer übernimmt, was bleibt liegen) und was passiert mit Gehalt und Anteilen. Üblich ist, Anteile und Vesting bei krankheitsbedingter Abwesenheit weiterlaufen zu lassen und erst ab einer Dauer – oft drei bis sechs Monate – neu zu sprechen."
       },
       "changing_commitment": {
-        "title": "Commitment reduzieren oder Rolle verändern",
-        "question": "Was wollt ihr klären, wenn jemand Umfang, Verantwortungsbereich oder Rolle deutlich verändern möchte?"
+        "title": "Wenn sich der Einsatz ändert",
+        "question": "Was tut ihr, wenn jemand dauerhaft weniger einbringen kann oder will?",
+        "orientation": "Das ist der häufigste reale Fall und der am seltensten geregelte. Verabredet, ab wann darüber gesprochen wird (nicht erst, wenn es eskaliert) und welche Stellschrauben es gibt: Gehalt, Rolle, Anteile, Vesting-Tempo. Wichtig ist der Satz, dass eine Veränderung erlaubt ist – sonst wird sie verschwiegen."
       },
       "founder_exit": {
-        "title": "Founder Exit / Ausscheiden",
-        "question": "Was soll geklärt sein, wenn ein Founder das Unternehmen oder das Founder-Team verlassen möchte?"
+        "title": "Ausscheiden",
+        "question": "Was gilt, wenn jemand geht – freiwillig oder nicht?",
+        "orientation": "Unterscheidet zwei Fälle, so machen es auch Gesellschaftsverträge: Wer selbst geht („bad leaver“), verliert in der Regel mehr als jemand, der gehen muss, ohne es verschuldet zu haben („good leaver“). Regelt außerdem den Preis: Wie werden die Anteile bewertet, und in welchem Zeitraum wird gezahlt? Ohne Bewertungsformel entsteht genau dort der Streit."
+      },
+      "succession": {
+        "title": "Nachfolge im Todesfall",
+        "question": "Was passiert mit den Anteilen, wenn eine von euch stirbt?",
+        "orientation": "Ohne Regelung gehen die Anteile an die Erben – Menschen, die das Unternehmen nicht kennen und oft nicht kennen wollen, und die ab dann mitentscheiden. Gesellschaftsverträge regeln das üblicherweise über eine Einziehungs- oder Abtretungsklausel mit Abfindung. Das Thema fühlt sich unangenehm an und dauert zehn Minuten; ohne Regelung dauert es Jahre."
+      },
+      "post_exit_competition": {
+        "title": "Wettbewerb nach dem Ausscheiden",
+        "question": "Was darf jemand tun, der nicht mehr dabei ist?",
+        "orientation": "Hiervon lebt der Streitfall. Üblich ist ein zeitlich und sachlich begrenztes Wettbewerbsverbot – oft ein bis zwei Jahre, auf das konkrete Geschäftsfeld bezogen. Zu weit gefasste Verbote sind in Deutschland häufig unwirksam und entschädigungspflichtig; das gehört mit anwaltlicher Beratung formuliert. Redet trotzdem vorher darüber, was ihr einander zugestehen wollt."
       }
     },
-    "formerMember": "Ehemaliges Mitglied"
+    "formerMember": "Ehemaliges Mitglied",
+    "phases": {
+      "before": {
+        "title": "Bevor ihr gründet",
+        "text": "Diese Themen könnt ihr jetzt schon klären – sie brauchen keine Gesellschaft, nur euch beide."
+      },
+      "founded": {
+        "title": "Sobald die Gesellschaft steht",
+        "text": "Ab hier geht es um Rechtsform, Rechte und Zugänge. Vorher ist vieles davon nicht beantwortbar."
+      },
+      "later": {
+        "title": "Wenn sich etwas verändert",
+        "text": "Die Fälle, an die beim Gründen niemand denkt – und die am teuersten werden, wenn sie offen bleiben."
+      },
+      "openCritical": "{count, plural, one {1 wichtiges Thema offen} other {# wichtige Themen offen}}"
+    },
+    "weights": {
+      "critical": "wird teuer, wenn es offen bleibt"
+    },
+    "orientationTitle": "Woran ihr euch orientieren könnt",
+    "orientationHelp": "Kein Vorschlag, sondern ein Ausgangspunkt: So machen es die meisten. Ob das für euch passt, entscheidet ihr.",
+    "document": {
+      "title": "Eure Gründer-Vereinbarung",
+      "asOf": "Arbeitsstand vom {date}",
+      "intro": "Dieses Dokument hält fest, worauf ihr euch bisher gemeinsam verständigt habt. Es entsteht aus dem, was ihr beide bestätigt habt – Notizen und offene Vorschläge stehen nicht darin.",
+      "confirmedOn": "bestätigt am {date}",
+      "reference": "Abgelegt unter: {reference}",
+      "openTitle": "Noch offen",
+      "nothingYet": "Ihr habt bisher keinen gemeinsamen Stand bestätigt. Sobald ihr das erste Thema abgeschlossen habt, entsteht hier euer Dokument.",
+      "disclaimer": "Dieses Dokument hält fest, worauf ihr euch verständigt habt. Es ersetzt keine rechtliche oder steuerliche Beratung und ist kein Gesellschaftsvertrag.",
+      "print": "Drucken oder als PDF sichern",
+      "open": "Dokument ansehen",
+      "openHelp": "Alles, was ihr gemeinsam bestätigt habt – zum Ausdrucken oder Mitnehmen."
+    }
   },
   "dashboard": {
     "eyebrow": "Gemeinsame Bereiche",

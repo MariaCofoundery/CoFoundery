@@ -410,78 +410,139 @@
     "items": {
       "roles_responsibilities": {
         "title": "Roles & responsibilities",
-        "question": "Who takes ownership of which areas, and where are the boundaries for responsibilities and decisions?"
+        "question": "Who takes on which areas, and where do responsibility and decision boundaries lie?",
+        "orientation": "The common pattern is that each person owns one area outright and decides within it – product, sales, finance. The usual failure isn't a wrong split but one that was never spoken out loud: both feel responsible for the same thing, or for none of it. Write down who has the final word on which question."
       },
       "decision_rights": {
         "title": "Decisions & decision rights",
-        "question": "What do you decide together, what can individual founders decide, and how do you handle different judgments?"
+        "question": "What do you decide together, what do individual founders decide – and how do you handle differing views?",
+        "orientation": "A common line is drawn in euros or impact: below it the responsible area decides alone, above it you decide together. With two people there is no majority when you disagree – so agree in advance what happens then: one person has the casting vote on certain questions, or a third voice steps in (advisor, board)."
       },
       "time_commitment": {
         "title": "Time & commitment",
-        "question": "How much time can and does each person want to contribute right now, and which changes should you discuss early?"
+        "question": "How much time can and does each person want to put in right now, and which changes should you discuss early?",
+        "orientation": "Say it in hours per week, not in \"full-time\" – that word rarely means the same to two people. Unequal effort isn't a problem as long as it's named and reflected in equity or salary. It becomes one when it stays unspoken."
       },
       "communication": {
-        "title": "Communication & ways of working",
-        "question": "How do you want to share information, coordinate, give feedback, and stay reachable day to day?"
+        "title": "Communication & collaboration",
+        "question": "How do you want to share information, coordinate, give feedback and be reachable day to day?",
+        "orientation": "Most teams need exactly two things: a fixed weekly slot that doesn't get cancelled, and an agreement about availability – when you have to answer and when you don't. The rest sorts itself out. Without the first, topics get dragged along; without the second, it starts to feel like you're never off."
       },
       "conflict_deadlock": {
         "title": "Conflict & deadlock",
-        "question": "How do you want to raise disagreements, and what will you do when you cannot move forward on an important question?"
+        "question": "What do you do when you can't agree – and when do you bring someone in?",
+        "orientation": "Settle this while you still get on well. A common escalation: first a conversation with a deadline, then a third person who moderates (not decides). Whoever gets named should have been asked beforehand. Agreeing on something in the middle of a crisis doesn't work."
       },
       "equity": {
-        "title": "Equity split",
-        "question": "How should equity be divided, and what considerations are behind that distribution?"
+        "title": "Equity",
+        "question": "How do you split the shares – and on what basis?",
+        "orientation": "Two common routes. A fixed split at the start: simple, usual, but it rewards an expectation rather than a contribution. Or dynamic (known as Slicing Pie): shares arise from what is actually put in – time, money, assets – and the split follows at the end. More effort, but fairer when it's unclear who will stay how long. A 50/50 with no casting vote is the most common construction and at the same time the most common cause of standstill."
       },
       "vesting": {
-        "title": "Vesting & cliff",
-        "question": "Should equity be tied to time or contribution, and what should apply if someone leaves early?"
+        "title": "Vesting",
+        "question": "What happens to the shares if someone leaves early?",
+        "orientation": "Most common: four years, one-year cliff. Whoever leaves before the first year is out keeps nothing; after that the share grows monthly. What matters isn't the exact number but that something applies at all before anyone leaves. Without vesting, a person who leaves after four months keeps their full stake – and sits at the table at every later financing round."
       },
       "compensation": {
         "title": "Salary & compensation",
-        "question": "When and under what conditions do you want to compensate yourselves, and how will you handle different levels of compensation?"
+        "question": "Who gets how much and when – and what applies until money is there?",
+        "orientation": "In the early phase many teams pay themselves nothing, or an equal, low salary. More important than the amount is the agreement on when that changes: at a financing round, at a revenue figure, at a date. Unequal salaries are fine when the reason is named – life circumstances are a legitimate reason."
       },
       "contributions_expenses": {
-        "title": "Contributions, expenses & founder loans",
-        "question": "How will you handle personal funds, expenses, contributions, or loans that founders provide for the company?"
+        "title": "Contributions & expenses",
+        "question": "Who brings in what, and who pays running costs?",
+        "orientation": "Record who paid for what from day one – small things included. The usual setup is one shared account everything runs through, plus a list of private outlays to be reimbursed later. Anyone reconstructing this afterwards ends up arguing over amounts where the argument isn't about money."
       },
       "personal_financial_risk": {
         "title": "Personal financial risk",
-        "question": "Which financial commitments can and does each person want to take on, and which ones explicitly not?"
+        "question": "Who is personally liable for what, and how long can you sustain it?",
+        "orientation": "Guarantees, leases, private loans: check who is personally exposed – often it's only one of you. Also talk about personal runway: how long can each person carry on without income? That number shapes your decisions more than any plan does."
       },
       "legal_entity": {
-        "title": "Legal entity & formal setup",
-        "question": "Which formal incorporation steps are still open, and where might you need professional advice?"
+        "title": "Legal form",
+        "question": "In what form are you incorporating – and when?",
+        "orientation": "In Germany the GmbH and UG are the norm, the UG mainly for its lower share capital. A GbR, by contrast, comes into being by itself as soon as you start working together – with personal liability for both of you. That's the most common unnoticed state: many teams have long been a GbR without knowing it. The choice belongs in a conversation with a tax adviser, and the timing is often earlier than expected."
       },
       "founder_agreements": {
-        "title": "Company & founder agreements",
-        "question": "Which important understandings do you want to record in a binding written form?"
+        "title": "Founder agreements",
+        "question": "What do you put in writing, and where does it live?",
+        "orientation": "Before the articles of association there is usually an informal founder agreement: it records what applies until the notary appointment. That isn't distrust, it's the opposite – while you agree, it's easy to write down. What gets confirmed here is good groundwork for it, but no substitute for the contract itself."
       },
       "intellectual_property": {
-        "title": "Intellectual property / IP",
-        "question": "How do you want to handle existing and future code, designs, brands, content, inventions, or other work products?"
+        "title": "Rights to what you create",
+        "question": "Who owns what you build – code, brand, content?",
+        "orientation": "The key sentence: what is created for the company belongs to the company, not to the person who built it. That has to be transferred explicitly – it doesn't happen by itself, especially not for code written before incorporation. Also check employment contracts: anyone employed on the side may have assigned rights there."
       },
       "outside_activities": {
-        "title": "Outside activities & other projects",
-        "question": "Which other jobs, companies, or projects are running in parallel, and what would you like to clarify transparently with each other?"
+        "title": "Outside activities",
+        "question": "What may each person do on the side?",
+        "orientation": "The usual line: side activities are fine as long as they're disclosed and not competing. Friction rarely comes from the activity itself, but from it not being mentioned. Agree what you tell each other – not what you forbid each other."
       },
       "accounts_access": {
-        "title": "Accounts, access & key company information",
-        "question": "How will you ensure that important accounts, access, and company information do not depend on only one person?"
+        "title": "Accounts & access",
+        "question": "Who has access to what – and what happens if someone is unavailable?",
+        "orientation": "The test question: if one of you is unreachable tomorrow, can you get into the bank account, the domain, the code, the customer data and the passwords? For a great many young teams the answer is no. A shared password store and a second person with bank access solve almost the whole topic."
       },
       "prolonged_absence": {
-        "title": "Extended absence",
-        "question": "How do you want to proceed if a founder is absent for an extended period or becomes significantly less available?"
+        "title": "Prolonged absence",
+        "question": "What applies if someone is out for a longer period – illness, parental leave, care?",
+        "orientation": "Settle two things separately: what happens to the work (who takes over, what waits) and what happens to salary and equity. It's common to let equity and vesting continue during illness-related absence and only revisit it after a certain length – often three to six months."
       },
       "changing_commitment": {
-        "title": "Changing commitment or role",
-        "question": "What do you want to clarify if someone wants to change their scope, responsibilities, or role significantly?"
+        "title": "When commitment changes",
+        "question": "What do you do when someone can or wants to put in permanently less?",
+        "orientation": "This is the most common real case and the least often settled. Agree when it gets discussed (not once it has escalated) and which levers exist: salary, role, equity, vesting pace. What matters is the sentence that change is allowed – otherwise it gets hidden."
       },
       "founder_exit": {
-        "title": "Founder exit",
-        "question": "What should be clarified if a founder wants to leave the company or the founder team?"
+        "title": "Leaving",
+        "question": "What applies when someone leaves – voluntarily or not?",
+        "orientation": "Distinguish two cases, as articles of association do: whoever leaves of their own accord (\"bad leaver\") usually loses more than someone who has to go through no fault of their own (\"good leaver\"). Settle the price too: how are the shares valued, and over what period is payment made? Without a valuation formula, that is exactly where the dispute starts."
+      },
+      "succession": {
+        "title": "Succession on death",
+        "question": "What happens to the shares if one of you dies?",
+        "orientation": "Without a rule the shares pass to the heirs – people who don't know the company, often don't want to, and who have a say from then on. Articles of association usually handle this through a redemption or transfer clause with compensation. The topic feels uncomfortable and takes ten minutes; without a rule it takes years."
+      },
+      "post_exit_competition": {
+        "title": "Competition after leaving",
+        "question": "What may someone do who is no longer part of it?",
+        "orientation": "This is what disputes live on. The usual instrument is a non-compete limited in time and scope – often one to two years, tied to the specific field. Clauses drawn too widely are frequently unenforceable in Germany and trigger compensation; this belongs in a lawyer's wording. Talk about what you want to grant each other beforehand all the same."
       }
     },
-    "formerMember": "Former member"
+    "formerMember": "Former member",
+    "phases": {
+      "before": {
+        "title": "Before you incorporate",
+        "text": "You can settle these now – they need no company, just the two of you."
+      },
+      "founded": {
+        "title": "Once the company exists",
+        "text": "From here it's about legal form, rights and access. Much of it can't be answered before."
+      },
+      "later": {
+        "title": "When something changes",
+        "text": "The cases nobody thinks about while founding – and the ones that get most expensive when left open."
+      },
+      "openCritical": "{count, plural, one {1 important topic open} other {# important topics open}}"
+    },
+    "weights": {
+      "critical": "gets expensive if left open"
+    },
+    "orientationTitle": "Something to go by",
+    "orientationHelp": "Not a recommendation, a starting point: this is how most do it. Whether it fits you is your call.",
+    "document": {
+      "title": "Your founder agreement",
+      "asOf": "Working state as of {date}",
+      "intro": "This document records what the two of you have agreed on so far. It is built from what you both confirmed – notes and open proposals are not in it.",
+      "confirmedOn": "confirmed on {date}",
+      "reference": "Filed under: {reference}",
+      "openTitle": "Still open",
+      "nothingYet": "You haven't confirmed a shared state yet. Once you close the first topic, your document starts here.",
+      "disclaimer": "This document records what you have agreed on. It is no substitute for legal or tax advice and is not articles of association.",
+      "print": "Print or save as PDF",
+      "open": "View the document",
+      "openHelp": "Everything the two of you confirmed – to print or take with you."
+    }
   },
   "dashboard": {
     "eyebrow": "Shared areas",

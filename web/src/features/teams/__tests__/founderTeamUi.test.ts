@@ -30,7 +30,8 @@ test("setup overview keeps all topics in compact keyboard-visible links", () => 
     setup: { items: Record<string, { title: string; question: string }> };
   };
 
-  assert.equal(Object.keys(messages.setup.items).length, 18);
+  // Jedes Thema braucht einen Text - die Zahl selbst sagt nichts.
+  assert.equal(Object.keys(messages.setup.items).length, FOUNDER_SETUP_ITEM_KEYS.length);
   assert.deepEqual(Object.keys(messages.setup.items).sort(), [...FOUNDER_SETUP_ITEM_KEYS].sort());
   assert.match(page, /className="group flex min-h-16 w-full items-center/);
   assert.match(page, /focus-visible:ring-2/);

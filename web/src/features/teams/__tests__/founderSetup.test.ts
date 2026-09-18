@@ -18,9 +18,13 @@ const members = [
   { userId: "cara", displayName: "Cara" },
 ];
 
-test("catalog contains exactly 18 typed items across four categories", () => {
-  assert.equal(FOUNDER_SETUP_ITEM_KEYS.length, 18);
-  assert.equal(FOUNDER_SETUP_CATALOG.length, 18);
+test("catalog and key list stay in step across four categories", () => {
+  // GEAENDERT am 18.09.2026: Die Zahl stand hier fest (18) und musste beim
+  // Hinzufuegen von Nachfolge und Wettbewerbsverbot mitgezogen werden. Eine
+  // feste Zahl prueft nichts - dass Liste und Katalog dasselbe enthalten,
+  // schon.
+  assert.ok(FOUNDER_SETUP_ITEM_KEYS.length >= 18, "Themen sind verschwunden");
+  assert.equal(FOUNDER_SETUP_CATALOG.length, FOUNDER_SETUP_ITEM_KEYS.length);
   assert.deepEqual(new Set(FOUNDER_SETUP_CATALOG.map((item) => item.key)), new Set(FOUNDER_SETUP_ITEM_KEYS));
   assert.deepEqual(new Set(FOUNDER_SETUP_CATALOG.map((item) => item.category)), new Set(FOUNDER_SETUP_CATEGORY_KEYS));
 });
@@ -68,7 +72,7 @@ test("empty setup remains unstarted and does not manufacture persisted rows", ()
     confirmationRows: [],
   });
   assert.equal(model.started, false);
-  assert.equal(model.items.length, 18);
+  assert.equal(model.items.length, FOUNDER_SETUP_ITEM_KEYS.length);
   assert.ok(model.items.every((item) => !item.persisted && item.displayStatus === "open"));
 });
 
