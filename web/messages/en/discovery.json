@@ -878,5 +878,11 @@
     "profitable_business": "Should carry itself. Growth yes, at any cost no.",
     "venture_scale": "Grow fast, outside capital, big ambition.",
     "exit_oriented": "Build it to sell one day."
+  },
+  "mine": {
+    "label": "My area",
+    "profile": "My search profile",
+    "searches": "My searches",
+    "saved": "Saved"
   }
 }

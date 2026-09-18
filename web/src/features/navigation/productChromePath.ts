@@ -12,7 +12,12 @@ export function isProductChromePath(pathname: string) {
     // gehoeren genauso in die Produkt-Navigation.
     pathname === "/profile" ||
     pathname.startsWith("/profile/") ||
-    pathname === "/founder-library" ||
+    // Praefix seit 19.09.2026: Jeder Begriff hat eine eigene Seite
+    // (/founder-library/<slug>), und die fiel mit dem exakten Vergleich aus der
+    // Produkt-Navigation heraus. Sie oeffnet ueblicherweise in einem zweiten
+    // Fenster - aber es ist ein zweites Fenster DIESER Anwendung, in dem man
+    // weiterarbeiten kann. Eine Seite ohne Leiste waere dort eine Sackgasse.
+    pathname.startsWith("/founder-library") ||
     pathname === "/connections" ||
     pathname.startsWith("/advisor/") ||
     pathname.startsWith("/discovery") ||

@@ -34,6 +34,15 @@ type NavigationItem = {
   href: string;
   label: string;
   isActive: (pathname: string) => boolean;
+  /**
+   * Seiten INNERHALB dieses Bereichs.
+   *
+   * Sie stehen in einer zweiten Reihe und nur dann, wenn man in dem Bereich
+   * ist - nicht neben den Bereichen. Genau dieses Mischen hatte die Leiste
+   * vorher unlesbar gemacht: fuenf Eintraege, die drei verschiedene Sorten
+   * waren. Eine eigene Ebene loest das, ohne die Seiten zu verstecken.
+   */
+  subItems?: { href: string; label: string; isActive: (pathname: string) => boolean }[];
 };
 
 type NavigationOverride = {
@@ -157,9 +166,40 @@ export function ProductShell({
           : currentPathname === "/dashboard" ||
             currentPathname === "/connections" ||
             currentPathname.startsWith("/teams/") ||
+            currentPathname.startsWith("/founder-library") ||
             currentPathname.startsWith("/founder-alignment"),
+      // Align hatte als einziger Bereich keine eigene Navigation. Beide Seiten
+      // waren nur vom Dashboard aus erreichbar - wer woanders stand, musste
+      // erst dorthin zurueck.
+      subItems:
+        resolvedActiveView === "advisor"
+          ? undefined
+          : [
+              {
+                href: "/connections",
+                label: t("alignConnections"),
+                isActive: (currentPathname: string) =>
+                  currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
+              },
+              ...(hasFounder
+                ? [
+                    {
+                      href: "/founder-library",
+                      label: t("alignLibrary"),
+                      isActive: (currentPathname: string) =>
+                        currentPathname.startsWith("/founder-library"),
+                    },
+                  ]
+                : []),
+            ],
     },
   ];
+
+  // Die zweite Reihe gehoert zu dem Bereich, in dem man gerade ist. Steht man
+  // nirgends drin, gibt es sie nicht - eine leere Leiste waere ein Balken ohne
+  // Aussage.
+  const activeAreaSubItems =
+    navigationItems.find((item) => item.isActive(pathname))?.subItems ?? [];
 
   useEffect(() => {
     if (searchParams.get("debug") !== "1" || resolvedActiveView !== "advisor") {
@@ -292,6 +332,27 @@ export function ProductShell({
               />
             </div>
           </div>
+
+          {activeAreaSubItems.length > 0 ? (
+            <div className="mx-auto w-full max-w-7xl px-6 pb-2 md:px-10 xl:px-12">
+              <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
+                {activeAreaSubItems.map((subItem) => (
+                  <Link
+                    key={subItem.href}
+                    href={subItem.href}
+                    aria-current={subItem.isActive(pathname) ? "page" : undefined}
+                    className={`inline-flex min-h-11 items-center rounded-full px-3 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40 ${
+                      subItem.isActive(pathname)
+                        ? "font-semibold text-slate-900 underline decoration-2 underline-offset-[6px]"
+                        : "font-medium text-slate-500 hover:text-slate-900"
+                    }`}
+                  >
+                    {subItem.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          ) : null}
         </header>
 
         {children}

@@ -18,6 +18,7 @@ import {
   FOUNDER_LIBRARY_UPDATE_STATUSES,
   sortFounderLibraryUpdates,
 } from "@/features/founderLibrary/founderLibraryUpdatesRegistry";
+import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { FOUNDER_SETUP_ITEM_KEYS } from "@/features/teams/founderSetupCatalog";
 import { getMessages } from "@/i18n/messages";
 
@@ -254,7 +255,13 @@ test("global Founder Library is founder-authenticated without requiring a team",
   assert.doesNotMatch(page, /getFounderTeamHomebase|teamId|membership/);
   assert.match(view, /teamId\?/);
   assert.match(view, /setupTopicLabels=\{teamId \?/);
-  assert.match(chrome, /pathname === "\/founder-library"/);
+  // GEAENDERT am 19.09.2026: Hier stand der exakte Vergleich als Text. Gemeint
+  // war, dass die Library die Produkt-Navigation bekommt - und das gilt jetzt
+  // auch fuer die Seite eines einzelnen Begriffs. Am Verhalten geprueft statt
+  // an der Schreibweise.
+  void chrome;
+  assert.equal(isProductChromePath("/founder-library"), true);
+  assert.equal(isProductChromePath("/founder-library/cliff"), true);
 });
 
 test("team homebase keeps Founder Setup before the concise glossary entry", () => {

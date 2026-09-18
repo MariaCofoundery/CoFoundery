@@ -878,5 +878,11 @@
     "profitable_business": "Soll sich selbst tragen. Wachstum ja, um jeden Preis nein.",
     "venture_scale": "Schnell wachsen, Kapital von außen, große Ambition.",
     "exit_oriented": "Aufbauen, um irgendwann zu verkaufen."
+  },
+  "mine": {
+    "label": "Mein Bereich",
+    "profile": "Mein Suchprofil",
+    "searches": "Meine Suchen",
+    "saved": "Gemerkte"
   }
 }

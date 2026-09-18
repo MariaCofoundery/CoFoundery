@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import {
   cancelDiscoveryIntroAction,
   respondDiscoveryIntroAction,
@@ -324,12 +325,17 @@ export default async function DiscoveryIntrosPage({
           <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
             {t("common.backToDiscovery")}
           </Link>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("intros.eyebrow")}
-          </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-            {t("intros.title")}
-          </h1>
+          <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                {t("intros.eyebrow")}
+              </p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
+                {t("intros.title")}
+              </h1>
+            </div>
+            <DiscoveryMineNav />
+          </div>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
             {t("intros.subtitle")}
           </p>

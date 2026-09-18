@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
 import { getOwnSavedDiscoveryCandidates } from "@/features/discovery/discoverySavesData";
@@ -36,9 +37,14 @@ export default async function SavedFounderDiscoveryPage() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-7">
           <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">{t("common.backToDiscovery")}</Link>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("saved.eyebrow")}</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("saved.title")}</h1>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("saved.description")}</p>
+          <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("saved.eyebrow")}</p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("saved.title")}</h1>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("saved.description")}</p>
+            </div>
+            <DiscoveryMineNav />
+          </div>
         </header>
 
         {savedCandidates.length > 0 ? (

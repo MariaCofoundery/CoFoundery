@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import { getOwnSavedSearches } from "@/features/connect/savedSearchData";
 import {
   deleteDiscoverySearchAction,
@@ -52,8 +53,13 @@ export default async function DiscoverySearchesPage({
         >
           ← {t("v2.searches.back")}
         </Link>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em]">{t("v2.searches.title")}</h1>
-        <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("v2.searches.text")}</p>
+        <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-[-0.03em]">{t("v2.searches.title")}</h1>
+            <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("v2.searches.text")}</p>
+          </div>
+          <DiscoveryMineNav />
+        </div>
 
         {saved ? (
           <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">

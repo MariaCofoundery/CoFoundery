@@ -42,5 +42,8 @@
   "areaConnect": "Connect",
   "areaAlignHint": "Your alignment: questionnaire, report and workbook",
   "areaFindHint": "Find people who could found with you",
-  "areaConnectHint": "Listings, problems and contacts in the network"
+  "areaConnectHint": "Listings, problems and contacts in the network",
+  "subNavLabel": "Pages in this area",
+  "alignConnections": "Connections",
+  "alignLibrary": "Founder Library"
 }

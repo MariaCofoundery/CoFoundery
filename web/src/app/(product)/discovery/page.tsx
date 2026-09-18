@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import {
   DISCOVERY_REMOTE_MODE_OPTIONS,
   DISCOVERY_ROLE_OPTIONS,
@@ -199,13 +200,19 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className={CARD_CLASS}>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("common.brandEyebrow")}</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("v2.title")}</h1>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("v2.subtitle")}</p>
+          {/* Rechts oben, was einem selbst gehoert - identisch zu Connect,
+              damit man es nicht zweimal lernen muss. "Anfragen" bleibt
+              daneben stehen: Das ist ein Eingang, kein eigener Besitz. */}
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("common.brandEyebrow")}</p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("v2.title")}</h1>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("v2.subtitle")}</p>
+            </div>
+            <DiscoveryMineNav />
+          </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/discovery/profile" className={SECONDARY_CTA_CLASS}>{t("v2.editProfile")}</Link>
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>{t("index.openRequests")}</Link>
-            <Link href="/discovery/saved" className={SECONDARY_CTA_CLASS}>{t("common.savedProfiles")}</Link>
           </div>
         </header>
 
