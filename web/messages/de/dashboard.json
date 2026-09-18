@@ -5,7 +5,10 @@
     "quoteEyebrow": "Zitat des Tages",
     "contextLabel": "Founder-Kontext",
     "error": "Die Aktion konnte gerade nicht abgeschlossen werden. Bitte versuche es erneut.",
-    "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut."
+    "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut.",
+    "heroConnections": "Deine Verbindungen",
+    "heroConnectionsCount": "{count, plural, =0 {Noch keine Verbindung} one {1 Verbindung} other {# Verbindungen}}",
+    "heroFind": "Menschen finden"
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",

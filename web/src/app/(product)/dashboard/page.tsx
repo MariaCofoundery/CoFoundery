@@ -378,6 +378,28 @@ export default async function DashboardPage({
                 </div>
               </div>
 
+              {/* Der schnelle Weg zu den Menschen. Die Verbindungen standen
+                  bisher weit unten in einem Abschnitt, den man erst
+                  hinunterscrollen musste - obwohl sie das sind, wofuer man
+                  hier ist. */}
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/connections"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[color:var(--brand-accent)] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.25)] ring-2 ring-[color:var(--brand-primary)] transition hover:brightness-110"
+                >
+                  {t("hero.heroConnections")}
+                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-medium">
+                    {t("hero.heroConnectionsCount", { count: founderTeams.length })}
+                  </span>
+                </Link>
+                <Link
+                  href="/discovery"
+                  className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+                >
+                  {t("hero.heroFind")}
+                </Link>
+              </div>
+
               <div className="mt-5">
                 <article className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.07),rgba(255,255,255,0.94)_52%,rgba(124,58,237,0.04))] px-4 py-4">
                   <div className="flex items-start gap-3">

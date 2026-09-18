@@ -5,7 +5,10 @@
     "quoteEyebrow": "Quote of the day",
     "contextLabel": "Founder context",
     "error": "The action could not be completed right now. Please try again.",
-    "loadError": "The dashboard could not be loaded completely right now. Please try again."
+    "loadError": "The dashboard could not be loaded completely right now. Please try again.",
+    "heroConnections": "Your connections",
+    "heroConnectionsCount": "{count, plural, =0 {No connection yet} one {1 connection} other {# connections}}",
+    "heroFind": "Find people"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",

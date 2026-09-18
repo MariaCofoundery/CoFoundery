@@ -58,9 +58,13 @@ const ProductNavigationOverrideContext = createContext<
  * an dem man steht.
  */
 function areaLinkClassName(active: boolean) {
+  // Der aktive Bereich traegt die Markenfarben: Lila als Grund, weisse
+  // Schrift, ein tuerkiser Ring aussen herum. Beides sind die vorhandenen
+  // Tokens - --brand-accent ist das Lila, --brand-primary das Tuerkis -, also
+  // bleibt die Leiste mit dem Rest des Produkts im selben Farbraum.
   return `rounded-full px-4 py-2 text-sm transition ${
     active
-      ? "bg-slate-950 font-semibold text-white shadow-sm"
+      ? "bg-[linear-gradient(135deg,var(--brand-accent),#6d28d9)] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)] ring-2 ring-[color:var(--brand-primary)]"
       : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
@@ -458,7 +462,7 @@ function LanguageSwitcher() {
 
   return (
     <div
-      className="flex items-center rounded-full border border-slate-200 bg-white p-1 text-xs font-medium text-slate-600"
+      className="flex items-center rounded-full border border-slate-200/80 bg-white p-0.5 text-[11px] font-medium text-slate-500"
       aria-label={t("language.switchLabel")}
     >
       {SUPPORTED_LOCALES.map((item) => (
@@ -466,12 +470,16 @@ function LanguageSwitcher() {
           key={item}
           type="button"
           onClick={() => selectLocale(item)}
-          className={`rounded-full px-2.5 py-1.5 transition ${
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition ${
             locale === item ? "bg-slate-900 text-white" : "hover:bg-slate-50 hover:text-slate-900"
           }`}
           aria-pressed={locale === item}
+          // Die Fahne ist Schmuck - der volle Name steht im Titel, damit eine
+          // Vorlesesoftware nicht "DE Fahne" vorliest.
+          title={t(`language.${item}`)}
         >
-          {t(`language.${item}`)}
+          <span>{t(`language.short.${item}`)}</span>
+          <span aria-hidden>{t(`language.flag.${item}`)}</span>
         </button>
       ))}
     </div>

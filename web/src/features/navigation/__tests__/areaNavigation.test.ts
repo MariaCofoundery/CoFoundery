@@ -48,7 +48,10 @@ test("exactly one point is filled: the one you are standing on", () => {
   // Der aktive Zustand war ein 18-Prozent-Schleier, und Discovery trug eine
   // Dauer-CTA-Farbe - das Auffaelligste zeigte nie den aktuellen Ort.
   assert.doesNotMatch(shell, /discoveryCtaClassName/);
-  assert.match(shell, /bg-slate-950 font-semibold text-white/);
+  // Markenfarben: Lila als Grund, weisse Schrift, tuerkiser Ring - beides
+  // die vorhandenen Tokens, damit die Leiste im Farbraum des Produkts bleibt.
+  assert.match(shell, /var\(--brand-accent\)[\s\S]{0,120}font-semibold text-white/);
+  assert.match(shell, /ring-2 ring-\[color:var\(--brand-primary\)\]/);
   assert.doesNotMatch(
     shell,
     /bg-\[color:var\(--brand-primary\)\]\/18/,
@@ -87,4 +90,38 @@ test("the routes did not move with the labels", () => {
   assert.match(shell, /href="\/connect"/);
   assert.doesNotMatch(shell, /href="\/find"/);
   assert.doesNotMatch(shell, /href="\/align"/);
+});
+
+test("the language switch is a footnote, not a button pair", () => {
+  const shell = source(SHELL);
+  // Kuerzer und kleiner: DE/EN statt "Deutsch"/"English", 11px statt 12px.
+  assert.match(shell, /t\(`language\.short\.\$\{item\}`\)/);
+  assert.match(shell, /text-\[11px\]/);
+
+  // Die Fahne ist Schmuck und aria-hidden. Der volle Name steht im title -
+  // eine Vorlesesoftware soll nicht "DE Flagge Deutschland" sagen, und eine
+  // Sprache ist ohnehin kein Land.
+  assert.match(shell, /<span aria-hidden>\{t\(`language\.flag\./);
+  assert.match(shell, /title=\{t\(`language\.\$\{item\}`\)\}/);
+
+  for (const locale of ["de", "en"]) {
+    const common = JSON.parse(readFileSync(`messages/${locale}/common.json`, "utf8")) as {
+      language: { short: Record<string, string>; flag: Record<string, string>; de: string };
+    };
+    assert.equal(common.language.short.de, "DE");
+    assert.equal(common.language.short.en, "EN");
+    assert.ok(common.language.flag.de.length > 0);
+    // Der volle Name bleibt erhalten - er traegt jetzt den title.
+    assert.ok(common.language.de.length > 2);
+  }
+});
+
+test("the connections are reachable from the top of Align", () => {
+  const dashboard = source("src/app/(product)/dashboard/page.tsx");
+  const heroAt = dashboard.indexOf("data-dashboard-hero");
+  const linkAt = dashboard.indexOf('href="/connections"');
+  const quoteAt = dashboard.indexOf("hero.quoteEyebrow");
+  assert.ok(heroAt > -1 && linkAt > heroAt, "der Weg steht im Kopfbereich");
+  assert.ok(linkAt < quoteAt, "und noch vor dem Zitat, nicht darunter");
+  assert.match(dashboard, /hero\.heroConnectionsCount/, "mit der Zahl, nicht nur als Wort");
 });

@@ -2,7 +2,15 @@
   "language": {
     "de": "Deutsch",
     "en": "English",
-    "switchLabel": "Language"
+    "switchLabel": "Language",
+    "short": {
+      "de": "DE",
+      "en": "EN"
+    },
+    "flag": {
+      "de": "🇩🇪",
+      "en": "🇬🇧"
+    }
   },
   "dictation": {
     "start": "Start dictation",
