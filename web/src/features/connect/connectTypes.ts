@@ -13,6 +13,28 @@ export type ConnectVisibility = "members_only" | "public";
 export const CONNECT_CONTACT_STATUSES = ["pending", "accepted", "declined", "canceled"] as const;
 export type ConnectContactStatus = (typeof CONNECT_CONTACT_STATUSES)[number];
 
+/**
+ * In welcher Form jemand ansprechbar ist.
+ *
+ * Geschlossene Auswahl statt Freitext: vergleichbar, spaeter filterbar, und
+ * mit einem Klick beantwortet. Die erste Nachricht scheitert selten am Thema
+ * und oft an der Frage, welche Form angemessen ist.
+ */
+export const CONNECT_OPEN_TO_FORMATS = [
+  "coffee",
+  "walk",
+  "video",
+  "call",
+  "sparring",
+  "intro",
+] as const;
+export type ConnectOpenToFormat = (typeof CONNECT_OPEN_TO_FORMATS)[number];
+
+export const CONNECT_REACH_MIN = 20;
+export const CONNECT_REACH_MAX = 400;
+export const CONNECT_CONTACT_NOTE_MIN = 10;
+export const CONNECT_CONTACT_NOTE_MAX = 300;
+
 export type ConnectProfile = {
   user_id: string; display_name: string; headline: string; bio: string;
   location_region: string | null; remote_mode: string | null; expertise: string[];
@@ -20,6 +42,9 @@ export type ConnectProfile = {
   photo_source: "profile_avatar" | "network_upload" | null;
   photo_avatar_id: string | null; photo_path: string | null;
   visibility: ConnectVisibility; public_slug: string;
+  network_reach: string | null;
+  open_to_formats: ConnectOpenToFormat[];
+  contact_note: string | null;
   published_at: string | null; updated_at: string;
 };
 export type ConnectListing = {

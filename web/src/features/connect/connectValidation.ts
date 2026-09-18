@@ -1,4 +1,4 @@
-import { CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES, CONNECT_ROLES, CONNECT_VENTURE_STAGES, categorySupportsRemoteMode, categorySupportsVentureStage, isOneOf } from "@/features/connect/connectTypes";
+import { CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_OPEN_TO_FORMATS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES, CONNECT_ROLES, CONNECT_VENTURE_STAGES, categorySupportsRemoteMode, categorySupportsVentureStage, isOneOf } from "@/features/connect/connectTypes";
 
 function text(value: FormDataEntryValue | null, max: number) { return String(value ?? "").trim().slice(0, max); }
 export class ConnectValidationError extends Error {
@@ -54,7 +54,23 @@ export function parseConnectProfile(formData: FormData, identity: ConnectIdentit
     expertise: (identity?.expertise ?? []).slice(0, 8).map((item) => item.slice(0, 60)),
     industries: (identity?.industries ?? []).slice(0, 5).map((item) => item.slice(0, 80)),
     network_roles: roles,
+    // Die drei freiwilligen Angaben. Zu kurz heisst leer statt abgewiesen -
+    // wer anfaengt zu schreiben und es sich anders ueberlegt, soll nicht an
+    // einer Fehlermeldung haengen bleiben. Die Bedingung in der Datenbank
+    // faengt den Rest ab.
+    network_reach: optionalLongText(formData.get("network_reach"), 20, 400),
+    open_to_formats: formData
+      .getAll("open_to_formats")
+      .filter((value): value is string => isOneOf(CONNECT_OPEN_TO_FORMATS, value))
+      .slice(0, 6),
+    contact_note: optionalLongText(formData.get("contact_note"), 10, 300),
   };
+}
+
+/** Freiwilliger Text: unter der Mindestlaenge wird daraus null, kein Fehler. */
+function optionalLongText(value: FormDataEntryValue | null, min: number, max: number) {
+  const trimmed = String(value ?? "").trim().slice(0, max);
+  return trimmed.length >= min ? trimmed : null;
 }
 
 export function parseConnectListing(formData: FormData) {

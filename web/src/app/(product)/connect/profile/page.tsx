@@ -4,7 +4,7 @@ import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectProfile } from "@/features/connect/connectData";
 import { saveConnectProfileAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
-import { CONNECT_ROLES } from "@/features/connect/connectTypes";
+import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_REACH_MAX, CONNECT_REACH_MIN, CONNECT_ROLES } from "@/features/connect/connectTypes";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectPhotoField } from "@/features/connect/ConnectPhotoField";
@@ -12,6 +12,8 @@ import { connectPhotoUrl } from "@/features/connect/ConnectAvatar";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
 
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
+const field =
+  "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
 // Nur bekannte Schluessel an t() geben. Ein erfundener Query-Parameter wuerde
 // sonst als roher Schluesselpfad auf der Seite landen - next-intl wirft bei
@@ -62,6 +64,62 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         </Link>
       </section>
       <fieldset><legend className="text-sm font-medium">{t("profile.roles")}</legend><p className={hint}>{t("profile.rolesHint")}</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{CONNECT_ROLES.map((role) => <label key={role} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"><input type="checkbox" name="network_roles" value={role} defaultChecked={profile?.network_roles.includes(role)} />{t(`roles.${role}`)}</label>)}</div></fieldset>
+      {/* Was ein Profil ueber die Aufzaehlung hinaus sagt: wen jemand kennt,
+          und in welcher Form er ansprechbar ist. Beides freiwillig, beides
+          nur fuer eingeloggte Mitglieder. */}
+      <label className="block text-sm font-medium">
+        {t("profile.reachTitle")}
+        <textarea
+          name="network_reach"
+          rows={3}
+          minLength={CONNECT_REACH_MIN}
+          maxLength={CONNECT_REACH_MAX}
+          defaultValue={profile?.network_reach ?? ""}
+          className={field}
+          placeholder={t("profile.reachPlaceholder")}
+        />
+        <span className={hint}>{t("profile.reachHint")}</span>
+      </label>
+
+      <fieldset>
+        <legend className="text-sm font-medium">{t("profile.openToTitle")}</legend>
+        <p className={hint}>{t("profile.openToHint")}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {CONNECT_OPEN_TO_FORMATS.map((format) => (
+            <label
+              key={format}
+              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"
+            >
+              <input
+                type="checkbox"
+                name="open_to_formats"
+                value={format}
+                defaultChecked={profile?.open_to_formats?.includes(format)}
+                className="h-4 w-4 rounded border-slate-300"
+              />
+              {t(`profile.openTo.${format}`)}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label className="block text-sm font-medium">
+        {t("profile.contactNoteTitle")}
+        <input
+          name="contact_note"
+          minLength={CONNECT_CONTACT_NOTE_MIN}
+          maxLength={CONNECT_CONTACT_NOTE_MAX}
+          defaultValue={profile?.contact_note ?? ""}
+          className={field}
+          placeholder={t("profile.contactNotePlaceholder")}
+        />
+        <span className={hint}>{t("profile.contactNoteHint")}</span>
+      </label>
+
+      <p className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">
+        {t("profile.membersOnlyNote")}
+      </p>
+
       <ConnectPhotoField
         displayName={profile?.display_name || baseProfile?.display_name || ""}
         currentAvatarId={profile?.photo_avatar_id}

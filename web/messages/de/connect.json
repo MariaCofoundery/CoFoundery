@@ -308,7 +308,27 @@
     "identityTitle": "Name, Headline und Über mich",
     "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",
     "identityLink": "Profil bearbeiten",
-    "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Connect-Profil nicht veröffentlichen."
+    "identityMissing": "Noch keine Angaben. Ohne Name, Headline und einen Text über dich lässt sich dein Connect-Profil nicht veröffentlichen.",
+    "reachTitle": "Wen kennst du?",
+    "reachHint": "Freiwillig. Oft liegt der Wert im zweiten Grad – wen du kennst, hilft manchmal mehr als das, was du selbst kannst.",
+    "reachPlaceholder": "z. B. Ich kenne viele Leitungen aus der ambulanten Pflege und ein paar Leute in der Kassenverwaltung.",
+    "openToTitle": "Wofür bist du ansprechbar?",
+    "openToHint": "Die erste Nachricht scheitert selten am Thema und oft an der Frage, welche Form angemessen ist. Nimm anderen die Hürde weg.",
+    "openTo": {
+      "coffee": "Kaffee",
+      "walk": "Spaziergang",
+      "video": "Videocall",
+      "call": "Telefonat",
+      "sparring": "Sparring zu einer konkreten Frage",
+      "intro": "Kontakte vermitteln"
+    },
+    "contactNoteTitle": "Wie erreicht man dich am besten?",
+    "contactNoteHint": "Ein Satz. Was die Auswahl oben nicht trifft – Zeiten, Vorlieben, was du vorher wissen willst.",
+    "contactNotePlaceholder": "z. B. Schreib mir hier kurz, worum es geht – ich melde mich meist innerhalb von zwei Tagen.",
+    "reachHeading": "Kennt Menschen aus",
+    "openToHeading": "Ansprechbar für",
+    "contactNoteHeading": "So erreichst du sie am besten",
+    "membersOnlyNote": "Diese drei Angaben sehen nur eingeloggte Mitglieder – auf deiner öffentlichen Seite stehen sie nicht."
   },
   "safety": {
     "block": "Blockieren",

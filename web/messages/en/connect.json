@@ -308,7 +308,27 @@
     "identityTitle": "Name, headline and about you",
     "identityText": "You maintain these details in one place in your profile. Changes there appear here immediately.",
     "identityLink": "Edit profile",
-    "identityMissing": "Nothing entered yet. Without a name, a headline and a text about you, your Connect profile cannot be published."
+    "identityMissing": "Nothing entered yet. Without a name, a headline and a text about you, your Connect profile cannot be published.",
+    "reachTitle": "Who do you know?",
+    "reachHint": "Optional. The value often lies one step out – who you know sometimes helps more than what you can do yourself.",
+    "reachPlaceholder": "e.g. I know a lot of managers in outpatient care and a few people in health insurance administration.",
+    "openToTitle": "What are you open to?",
+    "openToHint": "A first message rarely fails on the topic and often on the question of what form is appropriate. Take that hurdle away.",
+    "openTo": {
+      "coffee": "Coffee",
+      "walk": "A walk",
+      "video": "Video call",
+      "call": "Phone call",
+      "sparring": "Sparring on a specific question",
+      "intro": "Making introductions"
+    },
+    "contactNoteTitle": "How do people reach you best?",
+    "contactNoteHint": "One sentence. Whatever the options above do not cover – times, preferences, what you want to know upfront.",
+    "contactNotePlaceholder": "e.g. Write me a short note about what it is about – I usually reply within two days.",
+    "reachHeading": "Knows people from",
+    "openToHeading": "Open to",
+    "contactNoteHeading": "How to reach them",
+    "membersOnlyNote": "These three entries are only visible to signed-in members – they do not appear on your public page."
   },
   "safety": {
     "block": "Block",
