@@ -27,7 +27,8 @@
   "categories": {
     "equity_financing": "Equity & financing",
     "contracts_governance": "Contracts & governance",
-    "company_building": "Building the company"
+    "company_building": "Building the company",
+    "legal_form_liability": "Legal form & liability"
   },
   "updates": {
     "eyebrow": "Updates & Sources",
@@ -83,6 +84,19 @@
         "description": "EU legal acts, legislation, and publications of the European Union."
       }
     }
+  },
+  "homebase": {
+    "title": "Founder Library",
+    "description": "Terms from founder life, briefly explained.",
+    "action": "Open Library"
+  },
+  "glossaryLink": {
+    "hint": "Look up {term} in the Founder Library – opens a new window"
+  },
+  "termPage": {
+    "setupTitle": "Comes up in these setup topics",
+    "relatedTitle": "Related terms",
+    "allTerms": "See all terms →"
   },
   "terms": {
     "bootstrapping": {
@@ -164,11 +178,170 @@
     "convertible_loan": {
       "term": "Convertible Loan",
       "shortDefinition": "A loan whose repayment claim is converted, or can be converted, into equity under agreed conditions."
+    },
+    "cliff": {
+      "term": "Cliff",
+      "shortDefinition": "The lock-in period at the start of a vesting plan: leave before it ends and you keep nothing. Twelve months is common."
+    },
+    "slicing_pie": {
+      "term": "Slicing Pie",
+      "shortDefinition": "A model that does not fix shares upfront but keeps recalculating them from what each person actually contributed — time, money, materials."
+    },
+    "liquidation_preference": {
+      "term": "Liquidation preference",
+      "shortDefinition": "The promise to investors that they get their money back first when the company is sold, before the rest is distributed."
+    },
+    "company_valuation": {
+      "term": "Company valuation",
+      "shortDefinition": "The value founders and investors agree on for a funding round. It is negotiated, not measured."
+    },
+    "funding_rounds": {
+      "term": "Funding rounds",
+      "shortDefinition": "The usual sequence from pre-seed through seed to Series A and beyond. Each step stands for a stage of maturity and an order of magnitude, not a fixed amount."
+    },
+    "business_angel": {
+      "term": "Business angel",
+      "shortDefinition": "A private individual who invests their own money in young companies and usually brings experience and contacts along."
+    },
+    "due_diligence": {
+      "term": "Due diligence",
+      "shortDefinition": "The examination of a company before an investment: numbers, contracts, rights, risks. Whatever is messy here costs negotiating room later."
+    },
+    "exist_grant": {
+      "term": "EXIST founder grant",
+      "shortDefinition": "A German public grant that covers a year of living costs for founders coming out of universities so they can work on their idea."
+    },
+    "hidden_profit_distribution": {
+      "term": "Hidden profit distribution",
+      "shortDefinition": "When the company gives a shareholder more than would be usual between strangers — an inflated salary, say. The tax office retroactively treats it as a distribution of profit."
+    },
+    "gbr": {
+      "term": "GbR (German civil-law partnership)",
+      "shortDefinition": "The simplest shared legal form: it comes into being as soon as several people pursue a common purpose together. Everyone is liable with their private assets."
+    },
+    "ug": {
+      "term": "UG (limited liability)",
+      "shortDefinition": "A variant of the GmbH that can be founded with one euro of share capital. In exchange, part of the profit must be retained until 25,000 euros are reached."
+    },
+    "gmbh": {
+      "term": "GmbH (German limited company)",
+      "shortDefinition": "The most common legal form for startups in Germany. Liability is limited to company assets; founding it requires 25,000 euros of share capital and a notary appointment."
+    },
+    "share_capital": {
+      "term": "Share capital",
+      "shortDefinition": "The money or assets the shareholders put into the company at the start. Afterwards it belongs to the company, not to the individuals."
+    },
+    "contribution_in_kind": {
+      "term": "Contribution in kind",
+      "shortDefinition": "A contribution that is not money but, for example, equipment, software or rights. Its value has to be substantiated."
+    },
+    "commercial_register": {
+      "term": "Commercial register",
+      "shortDefinition": "The public directory listing companies with their seat, management and powers of representation. Anyone can look inside."
+    },
+    "notarization": {
+      "term": "Notarization",
+      "shortDefinition": "Some steps only take effect once a notary records them — founding a GmbH, or transferring shares. Without it the agreement is void."
+    },
+    "personal_guarantee": {
+      "term": "Personal guarantee",
+      "shortDefinition": "A personal promise to answer for a debt of the company. It undoes the limited liability at exactly that point."
+    },
+    "managing_director_liability": {
+      "term": "Managing director liability",
+      "shortDefinition": "Whoever runs the company is personally liable in certain cases — unpaid social security contributions, or filing for insolvency too late."
+    },
+    "bogus_self_employment": {
+      "term": "Bogus self-employment",
+      "shortDefinition": "When someone is formally treated as self-employed but actually works like an employee. Social security contributions then fall due retroactively."
+    },
+    "articles_of_association": {
+      "term": "Articles of association",
+      "shortDefinition": "The company's constitution: who holds which shares, how decisions are made, what happens when someone leaves. It overrides every spoken agreement."
+    },
+    "shareholder_resolution": {
+      "term": "Shareholders' resolution",
+      "shortDefinition": "The formal decision of the shareholders. Which topics need one and which majority counts is set out in the articles of association."
+    },
+    "casting_vote": {
+      "term": "Casting vote",
+      "shortDefinition": "A rule agreed in advance about whose vote decides a tie. It keeps a deadlock from paralysing the company."
+    },
+    "blocking_minority": {
+      "term": "Blocking minority",
+      "shortDefinition": "A stake large enough to block important resolutions — for a GmbH usually from just over a quarter."
+    },
+    "non_compete": {
+      "term": "Non-compete",
+      "shortDefinition": "The agreement not to work for a competing business during the shareholding or afterwards. After someone leaves it is only valid within limits and often only against compensation."
+    },
+    "severance_payment": {
+      "term": "Severance for shares",
+      "shortDefinition": "What someone receives for their shares when they leave. How it is calculated belongs in the contract — otherwise you argue about it precisely when things are already hard."
+    },
+    "compulsory_redemption": {
+      "term": "Compulsory redemption clause",
+      "shortDefinition": "The rule that the company may take back shares against compensation — if someone becomes insolvent, say, or breaches essential duties."
+    },
+    "transfer_restriction": {
+      "term": "Transfer restriction",
+      "shortDefinition": "Shares may only be transferred with the consent of the other shareholders. That way nobody joins as a co-shareholder unasked."
+    },
+    "succession_clause": {
+      "term": "Succession clause",
+      "shortDefinition": "What happens to the shares when a shareholder dies: whether heirs step in, are paid out, or the shares are redeemed."
+    },
+    "power_of_attorney": {
+      "term": "Power of attorney",
+      "shortDefinition": "Permission to act on someone else's behalf. Without it a lot comes to a standstill as soon as one person is out for a longer period."
+    },
+    "account_authorization": {
+      "term": "Account authorization",
+      "shortDefinition": "Who is allowed to dispose of the company's bank accounts. This is separate from power of attorney and from management, and usually has to be registered with the bank in its own right."
+    },
+    "managing_director_contract": {
+      "term": "Managing director's service contract",
+      "shortDefinition": "The contract between the company and its management: duties, pay, holidays, termination. It is independent of who owns the shares."
+    },
+    "prokura": {
+      "term": "Prokura (statutory commercial power)",
+      "shortDefinition": "A far-reaching power of representation entered in the commercial register. Whoever holds it can conclude almost any business for the company."
+    },
+    "advisory_board": {
+      "term": "Advisory board",
+      "shortDefinition": "A body that advises and — depending on what was agreed — has a say in certain decisions. Unlike the shareholders' meeting it is voluntary."
+    },
+    "nda": {
+      "term": "Non-disclosure agreement (NDA)",
+      "shortDefinition": "The agreement not to pass certain information on. Common before talks with investors, partners or possible co-founders."
+    },
+    "trademark": {
+      "term": "Trademark",
+      "shortDefinition": "The protected name or sign of an offering. Protection usually only arises with registration — not from using the name."
+    },
+    "open_source_license": {
+      "term": "Open-source license",
+      "shortDefinition": "The terms under which someone else's code may be used. Some require your own extensions to be published as well — which can become a problem in a later investment."
+    },
+    "traction": {
+      "term": "Traction",
+      "shortDefinition": "Demonstrable pull in the market: users, revenue, repeat purchases. What is meant is always the development over time, not a single figure."
+    },
+    "unit_economics": {
+      "term": "Unit economics",
+      "shortDefinition": "What a single unit — a customer, a subscription, an order — brings in and what it costs. It shows whether growth carries the business or consumes it."
+    },
+    "arr_mrr": {
+      "term": "ARR / MRR",
+      "shortDefinition": "Recurring revenue per year (ARR) or per month (MRR). The usual measure for subscription models."
+    },
+    "churn": {
+      "term": "Churn",
+      "shortDefinition": "The share of customers who leave within a period. High churn makes any growth expensive."
+    },
+    "pitch_deck": {
+      "term": "Pitch deck",
+      "shortDefinition": "The short presentation a startup uses to introduce itself to investors: problem, solution, market, team, numbers, what it needs."
     }
-  },
-  "homebase": {
-    "title": "Founder Library",
-    "description": "Terms from founder life, briefly explained.",
-    "action": "Open Library"
   }
 }

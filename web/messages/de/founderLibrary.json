@@ -27,7 +27,8 @@
   "categories": {
     "equity_financing": "Beteiligung & Finanzierung",
     "contracts_governance": "Verträge & Governance",
-    "company_building": "Unternehmensaufbau"
+    "company_building": "Unternehmensaufbau",
+    "legal_form_liability": "Rechtsform & Haftung"
   },
   "updates": {
     "eyebrow": "Updates & Quellen",
@@ -83,6 +84,19 @@
         "description": "EU-Rechtsakte, Gesetzgebung und Veröffentlichungen der Europäischen Union."
       }
     }
+  },
+  "homebase": {
+    "title": "Founder Library",
+    "description": "Begriffe aus dem Founder-Alltag – kurz erklärt.",
+    "action": "Library öffnen"
+  },
+  "glossaryLink": {
+    "hint": "{term} in der Founder Library nachschlagen – öffnet ein neues Fenster"
+  },
+  "termPage": {
+    "setupTitle": "Kommt in diesen Setup-Themen vor",
+    "relatedTitle": "Verwandte Begriffe",
+    "allTerms": "Alle Begriffe ansehen →"
   },
   "terms": {
     "bootstrapping": {
@@ -164,11 +178,170 @@
     "convertible_loan": {
       "term": "Wandeldarlehen",
       "shortDefinition": "Ein Darlehen, dessen Rückzahlungsanspruch unter vereinbarten Bedingungen in eine Beteiligung am Unternehmen umgewandelt wird oder werden kann."
+    },
+    "cliff": {
+      "term": "Cliff",
+      "shortDefinition": "Die Sperrfrist am Anfang eines Vesting-Plans: Wer vorher geht, behält nichts. Üblich sind zwölf Monate."
+    },
+    "slicing_pie": {
+      "term": "Slicing Pie",
+      "shortDefinition": "Ein Modell, das die Anteile nicht vorab festlegt, sondern laufend danach berechnet, was jede Person tatsächlich eingebracht hat – Zeit, Geld, Material."
+    },
+    "liquidation_preference": {
+      "term": "Liquidationspräferenz",
+      "shortDefinition": "Die Zusage an Kapitalgeber, beim Verkauf des Unternehmens zuerst ihr Geld zurückzubekommen, bevor der Rest verteilt wird."
+    },
+    "company_valuation": {
+      "term": "Unternehmensbewertung",
+      "shortDefinition": "Der Wert, auf den sich Gründung und Kapitalgeber für eine Finanzierungsrunde einigen. Er ist verhandelt, nicht gemessen."
+    },
+    "funding_rounds": {
+      "term": "Finanzierungsrunden",
+      "shortDefinition": "Die übliche Abfolge von Pre-Seed über Seed bis Series A und weiter. Jede Stufe steht für einen Reifegrad und eine Größenordnung, nicht für einen festen Betrag."
+    },
+    "business_angel": {
+      "term": "Business Angel",
+      "shortDefinition": "Eine Privatperson, die eigenes Geld in junge Unternehmen gibt und meist Erfahrung und Kontakte mitbringt."
+    },
+    "due_diligence": {
+      "term": "Due Diligence",
+      "shortDefinition": "Die Prüfung eines Unternehmens vor einer Beteiligung: Zahlen, Verträge, Rechte, Risiken. Was hier unsauber ist, kostet später Verhandlungsspielraum."
+    },
+    "exist_grant": {
+      "term": "EXIST-Gründerstipendium",
+      "shortDefinition": "Eine staatliche Förderung in Deutschland, die Gründerinnen und Gründern aus Hochschulen ein Jahr lang den Lebensunterhalt finanziert, damit sie an ihrer Idee arbeiten können."
+    },
+    "hidden_profit_distribution": {
+      "term": "Verdeckte Gewinnausschüttung",
+      "shortDefinition": "Wenn die Gesellschaft einem Gesellschafter mehr zukommen lässt, als unter Fremden üblich wäre – etwa ein überhöhtes Gehalt. Das Finanzamt behandelt es nachträglich als Gewinnausschüttung."
+    },
+    "gbr": {
+      "term": "GbR",
+      "shortDefinition": "Die einfachste gemeinsame Rechtsform: Sie entsteht schon dadurch, dass mehrere Menschen zusammen einen Zweck verfolgen. Alle haften mit ihrem Privatvermögen."
+    },
+    "ug": {
+      "term": "UG (haftungsbeschränkt)",
+      "shortDefinition": "Eine GmbH-Variante, die schon mit einem Euro Stammkapital gegründet werden kann. Dafür muss ein Teil des Gewinns einbehalten werden, bis 25.000 Euro erreicht sind."
+    },
+    "gmbh": {
+      "term": "GmbH",
+      "shortDefinition": "Die verbreitetste Rechtsform für Startups in Deutschland. Die Haftung ist auf das Gesellschaftsvermögen beschränkt; die Gründung braucht 25.000 Euro Stammkapital und einen Notartermin."
+    },
+    "share_capital": {
+      "term": "Stammkapital",
+      "shortDefinition": "Das Geld oder die Sachwerte, die die Gesellschafter beim Start einbringen. Es gehört danach der Gesellschaft, nicht mehr den Einzelnen."
+    },
+    "contribution_in_kind": {
+      "term": "Sacheinlage",
+      "shortDefinition": "Eine Einlage, die nicht aus Geld besteht, sondern zum Beispiel aus Technik, Software oder Rechten. Ihr Wert muss belegt werden."
+    },
+    "commercial_register": {
+      "term": "Handelsregister",
+      "shortDefinition": "Das öffentliche Verzeichnis, in dem Unternehmen mit Sitz, Geschäftsführung und Vertretungsrecht eingetragen sind. Jeder kann hineinsehen."
+    },
+    "notarization": {
+      "term": "Notarielle Beurkundung",
+      "shortDefinition": "Manche Schritte gelten nur, wenn eine Notarin oder ein Notar sie beurkundet – etwa die GmbH-Gründung oder die Übertragung von Anteilen. Ohne sie ist die Vereinbarung unwirksam."
+    },
+    "personal_guarantee": {
+      "term": "Bürgschaft",
+      "shortDefinition": "Eine persönliche Zusage, für eine Schuld der Gesellschaft einzustehen. Sie hebelt die Haftungsbeschränkung genau an dieser Stelle wieder aus."
+    },
+    "managing_director_liability": {
+      "term": "Geschäftsführerhaftung",
+      "shortDefinition": "Wer die Geschäfte führt, haftet in bestimmten Fällen persönlich – etwa bei nicht abgeführten Sozialabgaben oder einer verspäteten Insolvenzanmeldung."
+    },
+    "bogus_self_employment": {
+      "term": "Scheinselbstständigkeit",
+      "shortDefinition": "Wenn jemand formal als selbstständig geführt wird, tatsächlich aber wie angestellt arbeitet. Die Sozialabgaben werden dann rückwirkend fällig."
+    },
+    "articles_of_association": {
+      "term": "Gesellschaftsvertrag",
+      "shortDefinition": "Die Satzung der Gesellschaft: wer welche Anteile hält, wie entschieden wird, was beim Ausscheiden passiert. Sie steht über allen mündlichen Absprachen."
+    },
+    "shareholder_resolution": {
+      "term": "Gesellschafterbeschluss",
+      "shortDefinition": "Die förmliche Entscheidung der Gesellschafter. Für welche Themen sie nötig ist und welche Mehrheit zählt, steht im Gesellschaftsvertrag."
+    },
+    "casting_vote": {
+      "term": "Stichentscheid",
+      "shortDefinition": "Eine vorher festgelegte Regel, wessen Stimme bei Gleichstand entscheidet. Sie verhindert, dass eine Pattsituation das Unternehmen lähmt."
+    },
+    "blocking_minority": {
+      "term": "Sperrminorität",
+      "shortDefinition": "Ein Anteil, der groß genug ist, um wichtige Beschlüsse zu verhindern – bei der GmbH meist ab gut einem Viertel."
+    },
+    "non_compete": {
+      "term": "Wettbewerbsverbot",
+      "shortDefinition": "Die Abrede, während der Beteiligung oder danach nicht für ein konkurrierendes Unternehmen tätig zu werden. Nach dem Ausscheiden ist sie nur begrenzt und oft nur gegen Ausgleich wirksam."
+    },
+    "severance_payment": {
+      "term": "Abfindung",
+      "shortDefinition": "Was jemand beim Ausscheiden für seine Anteile bekommt. Wie sie berechnet wird, gehört in den Vertrag – sonst streitet man genau dann darüber, wenn es ohnehin schwierig ist."
+    },
+    "compulsory_redemption": {
+      "term": "Einziehungsklausel",
+      "shortDefinition": "Die Regel, dass die Gesellschaft Anteile gegen Abfindung einziehen kann – etwa wenn jemand insolvent wird oder gegen wesentliche Pflichten verstößt."
+    },
+    "transfer_restriction": {
+      "term": "Vinkulierung",
+      "shortDefinition": "Anteile dürfen nur mit Zustimmung der anderen Gesellschafter übertragen werden. So kommt niemand ungefragt als Mitgesellschafter dazu."
+    },
+    "succession_clause": {
+      "term": "Nachfolgeklausel",
+      "shortDefinition": "Was mit den Anteilen geschieht, wenn eine Gesellschafterin oder ein Gesellschafter stirbt: ob Erben nachrücken, ausgezahlt werden oder die Anteile eingezogen werden."
+    },
+    "power_of_attorney": {
+      "term": "Vollmacht",
+      "shortDefinition": "Die Erlaubnis, für jemand anderen zu handeln. Ohne sie steht vieles still, sobald eine Person längere Zeit ausfällt."
+    },
+    "account_authorization": {
+      "term": "Verfügungsberechtigung",
+      "shortDefinition": "Wer über die Konten des Unternehmens verfügen darf. Das ist getrennt von Vollmacht und Geschäftsführung und meist bei der Bank eigens zu hinterlegen."
+    },
+    "managing_director_contract": {
+      "term": "Geschäftsführeranstellungsvertrag",
+      "shortDefinition": "Der Vertrag zwischen der Gesellschaft und ihrer Geschäftsführung: Aufgaben, Vergütung, Urlaub, Kündigung. Er ist unabhängig davon, wem die Anteile gehören."
+    },
+    "prokura": {
+      "term": "Prokura",
+      "shortDefinition": "Eine weitreichende, im Handelsregister eingetragene Vertretungsmacht. Wer sie hat, kann fast alle Geschäfte für das Unternehmen abschließen."
+    },
+    "advisory_board": {
+      "term": "Beirat",
+      "shortDefinition": "Ein Gremium, das berät und – je nach Vereinbarung – bei bestimmten Entscheidungen mitredet. Anders als die Gesellschafterversammlung ist er freiwillig."
+    },
+    "nda": {
+      "term": "Geheimhaltungsvereinbarung (NDA)",
+      "shortDefinition": "Die Abrede, bestimmte Informationen nicht weiterzugeben. Üblich vor Gesprächen mit Kapitalgebern, Partnern oder möglichen Mitgründerinnen."
+    },
+    "trademark": {
+      "term": "Marke",
+      "shortDefinition": "Der geschützte Name oder das geschützte Zeichen eines Angebots. Der Schutz entsteht in der Regel erst mit der Eintragung – nicht dadurch, dass man den Namen benutzt."
+    },
+    "open_source_license": {
+      "term": "Open-Source-Lizenz",
+      "shortDefinition": "Die Bedingungen, unter denen fremder Code genutzt werden darf. Manche verlangen, dass eigene Erweiterungen ebenfalls offengelegt werden – das kann später bei einer Beteiligung zum Problem werden."
+    },
+    "traction": {
+      "term": "Traction",
+      "shortDefinition": "Belegbarer Zug am Markt: Nutzerinnen und Nutzer, Umsatz, Wiederkäufe. Gemeint ist immer die Entwicklung über die Zeit, nicht ein einzelner Wert."
+    },
+    "unit_economics": {
+      "term": "Unit Economics",
+      "shortDefinition": "Was eine einzelne Einheit – ein Kunde, ein Abo, ein Auftrag – einbringt und was sie kostet. Daran zeigt sich, ob Wachstum das Geschäft trägt oder aufzehrt."
+    },
+    "arr_mrr": {
+      "term": "ARR / MRR",
+      "shortDefinition": "Wiederkehrender Umsatz pro Jahr (ARR) oder pro Monat (MRR). Die übliche Messgröße bei Abomodellen."
+    },
+    "churn": {
+      "term": "Churn",
+      "shortDefinition": "Der Anteil der Kundinnen und Kunden, die in einem Zeitraum abspringen. Hoher Churn macht jedes Wachstum teuer."
+    },
+    "pitch_deck": {
+      "term": "Pitch Deck",
+      "shortDefinition": "Die kurze Präsentation, mit der ein Startup sich bei Kapitalgebern vorstellt: Problem, Lösung, Markt, Team, Zahlen, Bedarf."
     }
-  },
-  "homebase": {
-    "title": "Founder Library",
-    "description": "Begriffe aus dem Founder-Alltag – kurz erklärt.",
-    "action": "Library öffnen"
   }
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { GlossaryText } from "@/features/founderLibrary/GlossaryText";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
 import { FounderSetupDiscussionComposer } from "@/features/teams/FounderSetupDiscussionComposer";
@@ -148,7 +149,14 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-800">
             {t("orientationTitle")}
           </p>
-          <p className="mt-2 text-sm leading-7 text-slate-800">{t(`items.${itemKey}.orientation`)}</p>
+          {/* Der Orientierungstext ist die Stelle, an der die Fachwoerter
+              stehen - Vinkulierung, Cliff, Sperrminoritaet. Sie werden zur
+              Library verlinkt und oeffnen ein neues Fenster, damit die
+              angefangene Notiz nebenan stehen bleibt. */}
+          <GlossaryText
+            text={t(`items.${itemKey}.orientation`)}
+            className="mt-2 text-sm leading-7 text-slate-800"
+          />
           <p className="mt-3 text-xs leading-6 text-slate-500">{t("orientationHelp")}</p>
         </section>
         {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-white px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
