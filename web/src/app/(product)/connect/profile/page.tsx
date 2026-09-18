@@ -148,7 +148,12 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         copy={{
           title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
           keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
-          visibilityTitle: t("profile.photo.visibilityTitle"), platformOnly: t("profile.photo.platformOnly"), platformOnlyHint: t("profile.photo.platformOnlyHint"), publicAllowedHint: t("profile.photo.publicAllowedHint"),
+          // Entfernt am 18.09.2026: vier weitere Schluessel wurden hier
+          // durchgereicht, die es in den Texten nie gab und die
+          // ConnectPhotoField auch nie gelesen hat. Sichtbar war davon nichts -
+          // aber next-intl wirft bei einem unbekannten Schluessel nicht, es
+          // loggt einen IntlError und gibt den Pfad zurueck. Das waren vier
+          // Fehler im Log bei jedem Aufbau dieser Seite.
         }}
       />
       <ConnectVisibilityField initial={profile?.visibility} copy={{

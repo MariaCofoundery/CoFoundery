@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>CoFoundery – Fragen und Antwortmöglichkeiten</title>
+<style>
+  :root { --line: #e2e8f0; --muted: #64748b; --ink: #0f172a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px; font: 15px/1.6 -apple-system, "Segoe UI", system-ui, sans-serif; color: var(--ink); max-width: 860px; margin-inline: auto; }
+  h1 { font-size: 30px; letter-spacing: -.02em; margin: 0 0 6px; }
+  h2 { font-size: 21px; margin: 44px 0 4px; padding-top: 18px; border-top: 2px solid var(--ink); }
+  h3 { font-size: 17px; margin: 28px 0 0; }
+  .lead { color: var(--muted); margin: 0 0 4px; }
+  .item { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-top: 14px; break-inside: avoid; }
+  .item-head { display: flex; gap: 14px; align-items: baseline; }
+  .num { font-weight: 700; color: var(--muted); min-width: 28px; }
+  .meta { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+  .meta code { background: #f1f5f9; padding: 1px 6px; border-radius: 5px; }
+  .tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; }
+  .tag-core { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
+  .prompt { margin: 0; font-weight: 600; }
+  .prompt-line { margin: 4px 0 0; }
+  .choices { margin: 12px 0 0 42px; padding: 0; list-style: none; }
+  .choices li { margin-top: 5px; display: flex; gap: 10px; }
+  .val { flex: 0 0 42px; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+  .note { margin: 12px 0 0 42px; font-size: 12px; color: var(--muted); }
+  .poles { margin: 2px 0 0; font-size: 13px; }
+  .hint { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 14px; margin-top: 16px; font-size: 14px; }
+  @media print {
+    body { padding: 0; font-size: 11pt; }
+    h2 { break-before: page; }
+    h2:first-of-type { break-before: auto; }
+    .item { border-color: #cbd5e1; }
+  }
+</style>
+</head>
+<body>
+<h1>Fragen und Antwortmöglichkeiten</h1>
+<p class="lead">CoFoundery – Alignment (36 Fragen) und Wertemodul (10 Fragen)</p>
+<p class="lead">Erzeugt am 18.9.2026 aus der Registry im Code.</p>
+
+<div class="hint">
+  <strong>Woher die Angaben stammen.</strong> Die 36 Alignment-Fragen kommen direkt aus der
+  Registry, sind also immer aktuell. Die 10 Fragen des Wertemoduls liegen in der
+  Datenbank; hier steht der Schnappschuss aus <code>docs/values-instrument-v1.json</code>
+  vom 27.3.2026. Wenn dort seitdem etwas geändert wurde, steht es hier noch alt.
+</div>
+
+<h2>Teil 1 · Alignment</h2>
+<p class="lead">36 Fragen in 6 Dimensionen. Die Zahl vor einer Antwort ist der Wert, mit dem sie in die Auswertung geht (0–100).</p>
+
+<h3>Unternehmenslogik <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „substanz &amp; aufbauorientiert“ (0) bis „chancen &amp; hebelorientiert“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">1</span>
+      <div>
+        <p class="meta">
+          <code>cl_core_1</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wenn ich neue Möglichkeiten für das Unternehmen bewerte, ist für mich vor allem wichtig, ob sie das Unternehmen langfristig solide aufbauen.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = linker Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">2</span>
+      <div>
+        <p class="meta">
+          <code>cl_core_2</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu dir?</p>
+        <p class="prompt-line">A: Ich bewerte neue Möglichkeiten vor allem danach, ob sie das Unternehmen stabiler und klarer machen.</p>
+        <p class="prompt-line">B: Ich bewerte neue Möglichkeiten vor allem danach, ob sie neue Chancen für Wachstum eröffnen.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">3</span>
+      <div>
+        <p class="meta">
+          <code>cl_core_3</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Ein Geschäftsmodell ist sauber aufgebaut, hat aber nur begrenztes Wachstumspotenzial. Wie bewertest du das eher?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Für mich ist wichtiger, dass das Modell solide und stimmig ist.</li>
+      <li><span class="val">33</span>Für mich ist wichtig, dass beides möglichst zusammenkommt: Stabilität und Wachstum.</li>
+      <li><span class="val">67</span>Für mich ist wichtiger, dass das Modell mehr Wachstum ermöglicht.</li>
+      <li><span class="val">100</span>Für mich geht Wachstum klar vor, auch wenn das Modell noch nicht ganz stimmig ist.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">4</span>
+      <div>
+        <p class="meta">
+          <code>cl_core_4</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Eine neue Möglichkeit würde euch Zugang zu einem deutlich größeren Markt geben. Gleichzeitig würde euer Unternehmen dadurch komplexer und weniger klar. Woran würdest du zuerst prüfen, ob dieser Schritt sinnvoll ist?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Daran, ob das Unternehmen dadurch langfristig stabil und stimmig bleibt.</li>
+      <li><span class="val">33</span>Daran, ob sich der Schritt gut in den bisherigen Aufbau des Unternehmens einfügt.</li>
+      <li><span class="val">67</span>Daran, ob der Schritt eine klare Wachstumschance eröffnet, auch wenn es komplexer wird.</li>
+      <li><span class="val">100</span>Daran, ob der Schritt die Möglichkeiten des Unternehmens deutlich vergrößert, auch wenn es breiter und weniger klar wird.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">5</span>
+      <div>
+        <p class="meta">
+          <code>cl_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ein Investor bietet euch Kapital an. Dafür müsstet ihr euch stärker auf einen größeren Markt ausrichten, und euer bisheriges Modell würde weniger fokussiert. Was entspricht am ehesten deiner ersten Tendenz?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde das eher nicht verfolgen. Wichtiger ist mir, dass das Unternehmen klar und belastbar bleibt.</li>
+      <li><span class="val">33</span>Ich würde genau prüfen, ob sich Wachstum und ein sauberer Aufbau gut verbinden lassen.</li>
+      <li><span class="val">67</span>Ich wäre offen dafür, wenn die Chance groß genug ist und wir klare Leitplanken setzen.</li>
+      <li><span class="val">100</span>Ich würde das eher verfolgen. Wenn die Chance groß ist, sollte sich das Unternehmen daran ausrichten.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">6</span>
+      <div>
+        <p class="meta">
+          <code>cl_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ihr habt ein stabiles Geschäftsmodell gefunden. Dann zeigt sich ein anderer Markt mit deutlich mehr Wachstum, aber nur mit einem klaren Richtungswechsel. Wie gehst du damit eher um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde eher bei der bisherigen Richtung bleiben, solange sie funktioniert.</li>
+      <li><span class="val">33</span>Ich würde den neuen Markt sorgfältig prüfen, bevor wir die Richtung ändern.</li>
+      <li><span class="val">67</span>Ich würde offen prüfen, ob der neue Markt langfristig die bessere Chance ist.</li>
+      <li><span class="val">100</span>Ich würde die neue Richtung aktiv verfolgen, wenn das Potenzial deutlich größer ist.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h3>Entscheidungslogik <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „analytisch abwägend“ (0) bis „intuitiv handlungsorientiert“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">7</span>
+      <div>
+        <p class="meta">
+          <code>dl_core_1</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Bei wichtigen Entscheidungen ist mir wichtig, dass sie gut begründet sind und sich nachvollziehen lassen.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = linker Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">8</span>
+      <div>
+        <p class="meta">
+          <code>dl_core_2</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu dir?</p>
+        <p class="prompt-line">A: Ich entscheide lieber erst, wenn die wichtigsten Punkte geklärt sind.</p>
+        <p class="prompt-line">B: Ich entscheide, sobald sich eine klare Richtung abzeichnet – auch wenn noch nicht alles geklärt ist.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">9</span>
+      <div>
+        <p class="meta">
+          <code>dl_core_3</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Die Fakten sprechen eher für eine Entscheidung, aber sie fühlt sich für dich noch nicht richtig an. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Wenn die Fakten dafür sprechen, ist die Entscheidung für mich grundsätzlich tragfähig.</li>
+      <li><span class="val">33</span>Ich würde noch einmal gezielt prüfen, warum sich beides nicht deckt.</li>
+      <li><span class="val">67</span>Für mich passt die Entscheidung erst, wenn sie sich auch richtig anfühlt.</li>
+      <li><span class="val">100</span>Solange es sich nicht richtig anfühlt, treffe ich die Entscheidung nicht.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">10</span>
+      <div>
+        <p class="meta">
+          <code>dl_core_4</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wie gehst du mit Entscheidungen um, bei denen Zeitdruck besteht und noch Unsicherheit da ist?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich warte lieber und kläre weiter.</li>
+      <li><span class="val">33</span>Ich kläre so viel wie möglich, bevor ich entscheide.</li>
+      <li><span class="val">67</span>Ich entscheide, sobald eine tragfähige Richtung erkennbar ist.</li>
+      <li><span class="val">100</span>Ich entscheide bewusst schnell und passe später an.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">11</span>
+      <div>
+        <p class="meta">
+          <code>dl_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Eine wichtige Entscheidung steht an, aber du hast nur begrenzt Zeit, dich einzuarbeiten. Wie gehst du am ehesten vor?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde die Entscheidung lieber verschieben, um mehr Klarheit zu bekommen.</li>
+      <li><span class="val">33</span>Ich würde die vorhandenen Infos bündeln und dann abwägen.</li>
+      <li><span class="val">67</span>Ich würde auf Basis der tragfähigsten Hinweise entscheiden und offene Punkte später nachschärfen.</li>
+      <li><span class="val">100</span>Ich würde mich für die Richtung entscheiden, die sich am stimmigsten anfühlt, und dann weiter prüfen.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">12</span>
+      <div>
+        <p class="meta">
+          <code>dl_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Nach kurzer Zeit merkst du, dass eine Entscheidung wahrscheinlich nicht trägt. Wie reagierst du?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde erst genau verstehen wollen, was nicht passt.</li>
+      <li><span class="val">33</span>Ich würde die Richtung vorsichtig anpassen und nochmal prüfen.</li>
+      <li><span class="val">67</span>Ich würde mich in Richtung der besseren Alternative bewegen.</li>
+      <li><span class="val">100</span>Ich würde die bisherige Richtung loslassen und mich neu ausrichten.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h3>Arbeitsstruktur &amp; Zusammenarbeit <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „autonom“ (0) bis „abgestimmt“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">13</span>
+      <div>
+        <p class="meta">
+          <code>ws_core_1</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu deiner Art zu arbeiten?</p>
+        <p class="prompt-line">A: Ich arbeite am liebsten eigenständig und verantworte meinen Bereich selbst.</p>
+        <p class="prompt-line">B: Ich arbeite am liebsten eng abgestimmt mit meinem Co-Founder.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">14</span>
+      <div>
+        <p class="meta">
+          <code>ws_core_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Du arbeitest an einem neuen Feature und triffst dabei mehrere wichtige Entscheidungen. Wann beziehst du deinen Co-Founder typischerweise ein?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich entscheide in meinem Bereich meist selbstständig.</li>
+      <li><span class="val">33</span>Ich beziehe ihn ein, sobald ich erste klare Ergebnisse habe.</li>
+      <li><span class="val">67</span>Ich teile regelmäßig Zwischenstände und stimme mich punktuell ab.</li>
+      <li><span class="val">100</span>Ich stimme wichtige Schritte früh gemeinsam ab.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">15</span>
+      <div>
+        <p class="meta">
+          <code>ws_core_3</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Ihr merkt, dass ihr beide immer wieder an denselben Themen arbeitet und sich Zuständigkeiten überschneiden. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde die Zuständigkeiten klarer trennen.</li>
+      <li><span class="val">33</span>Ich würde Rollen schärfen und nur an wichtigen Punkten abstimmen.</li>
+      <li><span class="val">67</span>Ich würde regelmäßige kurze Abstimmungen einführen.</li>
+      <li><span class="val">100</span>Ich würde die Zusammenarbeit enger abstimmen.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">16</span>
+      <div>
+        <p class="meta">
+          <code>ws_core_4</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Zusammenarbeit funktioniert für mich am besten, wenn wir uns früh über Zwischenstände austauschen und nicht erst am Ende.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = rechter Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">17</span>
+      <div>
+        <p class="meta">
+          <code>ws_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ihr arbeitet zu unterschiedlichen Zeiten. Wie würdest du eure Zusammenarbeit organisieren?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Eine klare Aufgabenverteilung reicht mir.</li>
+      <li><span class="val">33</span>Ich würde nur an wenigen festen Punkten synchronisieren.</li>
+      <li><span class="val">67</span>Ich würde tägliche kurze Abstimmungsfenster einbauen.</li>
+      <li><span class="val">100</span>Ich würde möglichst viele Arbeitsphasen enger abstimmen.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">18</span>
+      <div>
+        <p class="meta">
+          <code>ws_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ein Co-Founder arbeitet sehr eigenständig und teilt wichtige Zwischenstände erst spät. Was wäre für dich dabei passend?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Für mich reicht es, wenn am Ende Ergebnisse geteilt werden.</li>
+      <li><span class="val">33</span>Für mich reicht es, wenn an ein paar Stellen sichtbar ist, wo ihr steht.</li>
+      <li><span class="val">67</span>Ich hätte gern regelmäßige Zwischenstände.</li>
+      <li><span class="val">100</span>Mir ist wichtig, früh in wichtige Entwicklungen eingebunden zu sein.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h3>Commitment <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „klar begrenzt“ (0) bis „hoch priorisiert“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">19</span>
+      <div>
+        <p class="meta">
+          <code>cm_core_1</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Das Startup nimmt aktuell einen klaren Teil meiner Zeit und Energie ein.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = rechter Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">20</span>
+      <div>
+        <p class="meta">
+          <code>cm_core_2</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu dir?</p>
+        <p class="prompt-line">A: Ich halte für das Startup einen festen, begrenzten Rahmen an Zeit und Energie ein.</p>
+        <p class="prompt-line">B: Ich richte meine Zeit und Energie eher so aus, dass das Startup mehr Raum bekommt.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">21</span>
+      <div>
+        <p class="meta">
+          <code>cm_core_3</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wenn andere wichtige Dinge in deinem Leben mehr Aufmerksamkeit brauchen: Wie verändert sich dann deine Priorität für das Startup?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich halte meine Grenzen auch dann klar ein.</li>
+      <li><span class="val">33</span>Ich passe meine Priorität nur leicht an.</li>
+      <li><span class="val">67</span>Ich gebe dem Startup in solchen Phasen mehr Raum.</li>
+      <li><span class="val">100</span>Das Startup hat dann klar Vorrang.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">22</span>
+      <div>
+        <p class="meta">
+          <code>cm_core_4</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Das Startup entwickelt sich langsamer als erwartet. Ihr überlegt, wie viel Zeit und Energie ihr in den nächsten Monaten investieren wollt. Welche Haltung passt eher zu dir?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde meinen bisherigen Zeitrahmen beibehalten.</li>
+      <li><span class="val">33</span>Ich würde etwas mehr Zeit investieren, aber mit klaren Grenzen.</li>
+      <li><span class="val">67</span>Ich würde das Startup vorübergehend höher priorisieren.</li>
+      <li><span class="val">100</span>Ich würde in dieser Phase einen großen Teil meiner Zeit darauf ausrichten.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">23</span>
+      <div>
+        <p class="meta">
+          <code>cm_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Neben dem Startup kommen weitere Projekte oder Verpflichtungen dazu. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Das ist für mich gut vereinbar, solange alles seinen festen Platz hat.</li>
+      <li><span class="val">33</span>Das passt für mich, solange klar ist, wie ich meine Zeit aufteile.</li>
+      <li><span class="val">67</span>Ich würde bewusst klären, wann das Startup mehr Raum bekommt.</li>
+      <li><span class="val">100</span>Mir ist wichtig, dass das Startup in wichtigen Phasen klar Vorrang hat.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">24</span>
+      <div>
+        <p class="meta">
+          <code>cm_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Der Aufbau des Startups braucht deutlich mehr Zeit als geplant. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich bleibe bei meinen bisherigen zeitlichen Grenzen.</li>
+      <li><span class="val">33</span>Ich erhöhe meinen Einsatz nur begrenzt.</li>
+      <li><span class="val">67</span>Ich ordne meine Prioritäten vorübergehend neu.</li>
+      <li><span class="val">100</span>Ich gebe dem Startup in dieser Phase deutlich mehr Raum.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h3>Risikoorientierung <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „sicherheitsorientiert“ (0) bis „unsicherheitsbereit“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">25</span>
+      <div>
+        <p class="meta">
+          <code>ro_core_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Der finanzielle Puffer reicht nur noch für wenige Monate. Wie gehst du mit der Situation um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde zuerst versuchen, das Risiko möglichst zu begrenzen.</li>
+      <li><span class="val">33</span>Ich würde nur Schritte gehen, bei denen die Unsicherheit überschaubar bleibt.</li>
+      <li><span class="val">67</span>Ich könnte auch mehr Unsicherheit akzeptieren, wenn sich eine Chance ergibt.</li>
+      <li><span class="val">100</span>Ich wäre bereit, deutlich mehr Unsicherheit einzugehen, um eine Wende zu schaffen.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">26</span>
+      <div>
+        <p class="meta">
+          <code>ro_core_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wie viel persönliche Sicherheit bist du bereit für unternehmerische Chancen zu riskieren?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich möchte mein persönliches Risiko möglichst gering halten.</li>
+      <li><span class="val">33</span>Ich bin zu etwas mehr Risiko bereit, aber nur mit klaren Grenzen.</li>
+      <li><span class="val">67</span>Ich bin bereit, spürbares persönliches Risiko zu tragen.</li>
+      <li><span class="val">100</span>Ich bin auch zu deutlich höherem Risiko bereit, wenn die Chance groß ist.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">27</span>
+      <div>
+        <p class="meta">
+          <code>ro_core_3</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Ich kann Unsicherheit über längere Zeit gut aushalten, auch wenn nicht alles absehbar ist.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = rechter Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">28</span>
+      <div>
+        <p class="meta">
+          <code>ro_core_4</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu dir?</p>
+        <p class="prompt-line">A: Ich gehe lieber Schritte, bei denen Risiken klar begrenzt sind.</p>
+        <p class="prompt-line">B: Ich gehe auch Schritte mit höherem Risiko, wenn die Chance groß ist.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">29</span>
+      <div>
+        <p class="meta">
+          <code>ro_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ein neues Produkt könnte starten, obwohl noch Unsicherheiten bestehen. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde erst möglichst viele Unsicherheiten klären.</li>
+      <li><span class="val">33</span>Ich wäre nur dabei, wenn die Risiken gut überschaubar sind.</li>
+      <li><span class="val">67</span>Ich könnte auch mit offenen Unsicherheiten starten.</li>
+      <li><span class="val">100</span>Ich würde auch mit hoher Unsicherheit starten, wenn die Chance passt.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">30</span>
+      <div>
+        <p class="meta">
+          <code>ro_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Eine Option bietet große Chancen, bringt aber über mehrere Monate mehr Unsicherheit mit sich. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde sie nur verfolgen, wenn die Risiken klar begrenzt sind.</li>
+      <li><span class="val">33</span>Ich würde sie nur mit klaren Sicherungen angehen.</li>
+      <li><span class="val">67</span>Ich könnte die zusätzliche Unsicherheit akzeptieren.</li>
+      <li><span class="val">100</span>Ich würde sie trotz hoher Unsicherheit verfolgen, wenn die Chance groß ist.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h3>Konfliktstil <span class="lead">· 6 Fragen</span></h3>
+<p class="lead poles">Die Achse läuft von „sortierend“ (0) bis „direkt“ (100).</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">31</span>
+      <div>
+        <p class="meta">
+          <code>cs_core_1</code>
+          <span class="tag">Zustimmung</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wenn ich merke, dass ich mit einem Co-Founder unterschiedlich denke, kläre ich meine Sicht meist erst für mich, bevor ich es anspreche.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>trifft überhaupt nicht zu</li>
+      <li><span class="val">25</span>trifft eher nicht zu</li>
+      <li><span class="val">50</span>teils / teils</li>
+      <li><span class="val">75</span>trifft eher zu</li>
+      <li><span class="val">100</span>trifft voll zu</li>
+    </ol>
+    <p class="note">
+      Niedriger Wert = linker Pol der Dimension.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">32</span>
+      <div>
+        <p class="meta">
+          <code>cs_core_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Ein Co-Founder trifft eine Entscheidung, die du anders gesehen hättest. Wie reagierst du?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich würde das erst für mich einordnen und beobachten.</li>
+      <li><span class="val">33</span>Ich würde es später ansprechen, wenn ich meine Sicht klar habe.</li>
+      <li><span class="val">67</span>Ich würde es relativ zeitnah ansprechen.</li>
+      <li><span class="val">100</span>Ich würde es direkt ansprechen.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">33</span>
+      <div>
+        <p class="meta">
+          <code>cs_core_3</code>
+          <span class="tag">A gegen B</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Welche Aussage passt eher zu dir?</p>
+        <p class="prompt-line">A: Wenn ich widerspreche, spreche ich es eher vorsichtig an.</p>
+        <p class="prompt-line">B: Wenn ich widerspreche, spreche ich es direkt an.</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>A trifft deutlich eher zu</li>
+      <li><span class="val">25</span>A trifft eher zu</li>
+      <li><span class="val">50</span>beide etwa gleich</li>
+      <li><span class="val">75</span>B trifft eher zu</li>
+      <li><span class="val">100</span>B trifft deutlich eher zu</li>
+    </ol>
+    <p class="note">
+      A bis B, links nach rechts.
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">34</span>
+      <div>
+        <p class="meta">
+          <code>cs_core_4</code>
+          <span class="tag">Situation</span>
+          <span class="tag tag-core">Kern</span>
+        </p>
+        <p class="prompt">Wenn ein Unterschied länger bestehen bleibt: Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich lasse ihn erst stehen und sortiere weiter.</li>
+      <li><span class="val">33</span>Ich spreche ihn später in einem passenden Moment an.</li>
+      <li><span class="val">67</span>Ich spreche ihn aktiv wieder an.</li>
+      <li><span class="val">100</span>Ich kläre ihn möglichst direkt weiter.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · zählt in den Dimensionswert · kann in die Zusammenfassung · kann eine Dimensionskarte tragen
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">35</span>
+      <div>
+        <p class="meta">
+          <code>cs_support_1</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">Ein Fehler im Unternehmen hat Folgen, und ihr seht ihn unterschiedlich. Wie sprichst du das an?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich spreche es eher mit etwas Abstand an.</li>
+      <li><span class="val">33</span>Ich suche einen passenden Moment und spreche es vorsichtig an.</li>
+      <li><span class="val">67</span>Ich spreche den Unterschied relativ zeitnah an.</li>
+      <li><span class="val">100</span>Ich spreche ihn direkt an.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">36</span>
+      <div>
+        <p class="meta">
+          <code>cs_support_2</code>
+          <span class="tag">Situation</span>
+          <span class="tag ">Ergänzung</span>
+        </p>
+        <p class="prompt">In einer Diskussion entsteht spürbare Spannung. Wie gehst du damit um?</p>
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">0</span>Ich nehme eher Tempo raus und sortiere erst.</li>
+      <li><span class="val">33</span>Ich lasse es kurz abkühlen und komme später darauf zurück.</li>
+      <li><span class="val">67</span>Ich spreche den Unterschied trotzdem an.</li>
+      <li><span class="val">100</span>Ich gehe direkt weiter in die Klärung, auch bei Spannung.</li>
+    </ol>
+    <p class="note">
+      scenario_left_to_right
+       · <strong>fließt nicht in die Auswertung</strong>
+    </p>
+  </article>
+
+<h2>Teil 2 · Wertemodul</h2>
+<p class="lead">10 Situationen. Stand 27.3.2026.</p>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">1</span>
+      <div>
+        <p class="meta">
+          <code>w1</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Finanzengpass &amp; Ethik: Ein legaler, aber moralisch fragwürdiger Weg verspricht schnellen Cashflow. Dein Fokus?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Ethische Integrität ist unverhandelbar. Wir lassen lieber Profit liegen, als unsere Werte zu biegen.</li>
+      <li><span class="val">2</span>Wir versuchen, Profit und Moral bestmöglich zu vereinen, ohne radikal zu sein.</li>
+      <li><span class="val">3</span>Im harten Business-Alltag sind Grauzonen manchmal notwendig, um zu überleben.</li>
+      <li><span class="val">4</span>Erfolg gibt recht. Solange es legal ist, priorisieren wir das wirtschaftliche Ergebnis.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">2</span>
+      <div>
+        <p class="meta">
+          <code>w2</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Transparenz-Kultur: Wie viel wissen Mitarbeiter und Partner über die tatsächliche (vielleicht kritische) Finanzlage?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Radikale Transparenz: Mitarbeiter und Partner wissen immer genau, wie es finanziell steht.</li>
+      <li><span class="val">2</span>Offene Kommunikation über die wichtigsten Kennzahlen und Ziele.</li>
+      <li><span class="val">3</span>Informationen werden gezielt gefiltert, um Unruhe im Team zu vermeiden.</li>
+      <li><span class="val">4</span>Information ist Macht. Nur die Gründer kennen die volle Wahrheit über die Zahlen.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">3</span>
+      <div>
+        <p class="meta">
+          <code>w3</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Loyalität vs. Performance: Ein loyaler Mitarbeiter der ersten Stunde hält mit dem Tempo nicht mehr mit. Was zählt mehr?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Loyalität zählt. Wer von Anfang an dabei war, wird auch durch Schwächephasen getragen.</li>
+      <li><span class="val">2</span>Wir versuchen, leistungsschwache Mitarbeiter wieder auf Kurs zu bringen.</li>
+      <li><span class="val">3</span>Professionalität geht vor. Wer die Ziele dauerhaft reißt, muss das Team verlassen.</li>
+      <li><span class="val">4</span>Radikale Leistungskultur: Nur die Besten bleiben, ohne Rücksicht auf die Historie.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">4</span>
+      <div>
+        <p class="meta">
+          <code>w4</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Impact vs. Shareholder-Value: Ein Investor fordert für sein Kapital den Verzicht auf unsere sozialen/ökologischen Standards. Was tun?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Unser Ziel ist es, ein gesellschaftliches oder ökologisches Problem zu lösen – das steht über dem Profit.</li>
+      <li><span class="val">2</span>Impact ist ein integraler Bestandteil unseres Geschäftsmodells.</li>
+      <li><span class="val">3</span>Wir engagieren uns für gute Zwecke, solange es die Bilanz nicht nennenswert belastet.</li>
+      <li><span class="val">4</span>Der einzige Zweck eines Unternehmens ist die Maximierung des Shareholder-Value.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">5</span>
+      <div>
+        <p class="meta">
+          <code>w5</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Umgang mit Ressourcen: Wie aggressiv gehen wir mit dem vorhandenen Kapital um (Sparsamkeit vs. Burn-Rate)?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Extreme Genügsamkeit (Bootstrapping-Mentalität). Jeder Cent wird zweimal umgedreht.</li>
+      <li><span class="val">2</span>Bewusster Umgang mit Ressourcen, um eine lange Lebensdauer (Runway) zu sichern.</li>
+      <li><span class="val">3</span>Großzügiges Investment in die besten Talente und eine moderne Arbeitskultur.</li>
+      <li><span class="val">4</span>Aggressives Spending: Wir verbrennen Kapital gezielt, um den Markt zu kaufen.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">6</span>
+      <div>
+        <p class="meta">
+          <code>w6</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Führungsstil &amp; Macht: Wie werden bei uns Richtungsentscheidungen im Team getroffen (Basisdemokratie vs. Ansage)?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Absolut flache Hierarchien. Jede Stimme im Team wiegt gleich viel.</li>
+      <li><span class="val">2</span>Partizipative Führung: Wir hören alle an, aber die Gründer entscheiden.</li>
+      <li><span class="val">3</span>Klare Ansagen und feste Strukturen geben dem Team die nötige Orientierung.</li>
+      <li><span class="val">4</span>Autokratisch: Schnelle Entscheidungen von oben nach unten ohne lange Diskussion.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">7</span>
+      <div>
+        <p class="meta">
+          <code>w7</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Integrität vs. Überleben: Ein Kunde verlangt eine "Gefälligkeit" in der Grauzone für einen lebenswichtigen Vertrag. Wie reagieren wir?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Unsere Prinzipien sind unantastbar. Wir verzichten lieber auf den Umsatz, als unsere Integrität zu opfern.</li>
+      <li><span class="val">2</span>Wir halten uns an unseren Code of Conduct, suchen aber nach einem sauberen Kompromiss für den Kunden.</li>
+      <li><span class="val">3</span>Im Einzelfall müssen wir abwägen, wie weit wir gehen können, um das Unternehmen zu retten.</li>
+      <li><span class="val">4</span>Pragmatismus geht vor. Wenn der Vertrag überlebenswichtig ist, passen wir unsere Regeln der Realität an.</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">8</span>
+      <div>
+        <p class="meta">
+          <code>w8</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Ehrlichkeit bei Fehlern: Ein massiver Produktfehler wird entdeckt, den der Kunde noch nicht sieht. Wie kommunizieren wir extern?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Wir geben Fehler gegenüber Kunden und Partnern sofort und demütig zu.</li>
+      <li><span class="val">2</span>Wir kommunizieren Fehler sachlich und präsentieren direkt die Lösung.</li>
+      <li><span class="val">3</span>Fehler werden nur dann kommuniziert, wenn es sich nicht vermeiden lässt.</li>
+      <li><span class="val">4</span>Wir verkaufen Fehler als Features oder "notwendige Lernschritte".</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">9</span>
+      <div>
+        <p class="meta">
+          <code>w9</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Unternehmenskultur &amp; Recruiting: Wie viel Zeit/Geld investieren wir in Diversität und Kultur, wenn es das Wachstum bremst?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Wir investieren aktiv Zeit und Ressourcen, um ein diverses und werteorientiertes Team aufzubauen.</li>
+      <li><span class="val">2</span>Wir achten auf Fairness im Recruiting, priorisieren aber die Geschwindigkeit.</li>
+      <li><span class="val">3</span>Einstellung erfolgt rein nach fachlicher Qualifikation, egal welcher Hintergrund.</li>
+      <li><span class="val">4</span>Wir brauchen jetzt die Leute, die am schnellsten performen – keine Zeit für "Culture-Build".</li>
+    </ol>
+  </article>
+
+  <article class="item">
+    <div class="item-head">
+      <span class="num">10</span>
+      <div>
+        <p class="meta">
+          <code>w10</code>
+          <span class="tag">scenario</span>
+          <span class="tag">Werte &amp; Ethik</span>
+        </p>
+        <p class="prompt">Deine ultimative Motivation: Warum gründest du dieses Unternehmen wirklich (Purpose vs. Profit)?</p>
+        
+      </div>
+    </div>
+    <ol class="choices">
+      <li><span class="val">1</span>Ich will etwas hinterlassen, das die Welt ein Stück besser macht.</li>
+      <li><span class="val">2</span>Ich möchte eine innovative Lösung für ein echtes Problem am Markt etablieren.</li>
+      <li><span class="val">3</span>Ich strebe nach persönlicher Freiheit und finanzieller Unabhängigkeit.</li>
+      <li><span class="val">4</span>Ich will den größtmöglichen finanziellen Erfolg (Exit) in kürzester Zeit.</li>
+    </ol>
+  </article>
+
+</body>
+</html>
