@@ -24,6 +24,8 @@ import {
   type DiscoveryIntroRequest,
 } from "@/features/discovery/discoveryIntroTypes";
 import type { DiscoveryFounderRole, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
+import { getMemberPhotos } from "@/features/profile/memberPhotoData";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { createClient } from "@/lib/supabase/server";
 
 const CARD_CLASS =
@@ -315,6 +317,9 @@ export default async function DiscoveryProfileDetailPage({
     return <EmptyState t={t} />;
   }
 
+  // Nur wenn diese Person ihr Bild fuer Mitglieder freigegeben hat.
+  const memberPhoto = (await getMemberPhotos(supabase, [profile.userId])).get(profile.userId);
+
   const isOwner = profile.userId === user.id;
   const [introRequest, alignmentContext, savedProfileIds] = isOwner
     ? [null, { preferences: {}, signals: [] }, new Set<string>()]
@@ -345,6 +350,15 @@ export default async function DiscoveryProfileDetailPage({
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 {t("detail.eyebrow")}
               </p>
+              {/* Das Bild, wenn diese Person es fuer Mitglieder freigegeben
+                  hat - sonst die Initialen, wie ueberall sonst. */}
+              <ProfileAvatar
+                displayName={profile.displayName}
+                avatarId={memberPhoto?.avatarId}
+                imageUrl={memberPhoto?.avatarUrl}
+                className="mt-4 h-20 w-20 rounded-full object-cover"
+                fallbackClassName="mt-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-950 text-lg font-semibold text-white"
+              />
               <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
                 {formatText(profile.displayName, t)}
               </h1>

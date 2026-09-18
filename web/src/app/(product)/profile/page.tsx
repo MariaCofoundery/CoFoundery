@@ -301,6 +301,28 @@ export default async function ProfilePage({
           {connectProfile?.status === "active" ? (
             <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("identity.publishedNote")}</p>
           ) : null}
+          {/* Das Bild selbst wird im Schritt "Bild" gewaehlt; hier steht die
+              Frage, wer es sehen darf. Sie gehoert zur Identitaet, nicht in
+              einen eigenen Abschnitt - es ist dieselbe Entscheidung wie Name
+              und Headline, nur fuer das Gesicht. */}
+          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
+            <input
+              type="checkbox"
+              name="photo_visible_to_members"
+              value="yes"
+              defaultChecked={core?.photo_visible_to_members ?? false}
+              className="mt-1 h-4 w-4 rounded border-slate-300"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">
+                {t("identity.photoVisibleLabel")}
+              </span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">
+                {t("identity.photoVisibleHint")}
+              </span>
+            </span>
+          </label>
+
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">
               {t("identity.name")}

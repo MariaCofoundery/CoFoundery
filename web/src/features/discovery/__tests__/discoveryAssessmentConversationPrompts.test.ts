@@ -43,6 +43,7 @@ function createCandidate(id: string): DiscoveryCandidate {
   return {
     profile: {
       id,
+      userId: `user-${id}`,
       displayName: `Founder ${id}`,
       headline: "Baut ein klares Produkt",
       bio: "Kurzer Profiltext.",

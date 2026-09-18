@@ -36,7 +36,9 @@
     "backTo": {
       "connect": "Zurück zum Connect-Profil",
       "discovery": "Zurück zum Suchprofil"
-    }
+    },
+    "photoVisibleLabel": "Mein Bild für eingeloggte Mitglieder sichtbar machen",
+    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort hängen öffentliche Seiten dran, deshalb entscheidest du das Bild dort getrennt."
   },
   "steps": {
     "evidence": "Ein Beispiel",

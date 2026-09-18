@@ -25,6 +25,7 @@ import {
   type FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
+import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -173,6 +174,12 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   const result = mode === "search"
     ? await getDiscoveryCandidatesForCurrentUser(user.id, undefined, undefined, requestedPage)
     : await getDiscoveryExploreProfilesForCurrentUser(user.id, undefined, requestedPage);
+  // Nur die Bilder derer, die sie fuer Mitglieder freigegeben haben. Wer das
+  // nicht getan hat, erscheint wie bisher mit Initialen.
+  const memberPhotos = await getMemberPhotos(
+    supabase,
+    result.candidates.map((candidate) => candidate.profile.userId)
+  );
   const isActive = profile?.status === "active";
   const saved = searchParamValue(resolvedSearchParams.searchResult);
 
@@ -302,7 +309,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
 
         {(mode === "explore" || isActive) && result.candidates.length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-2">
-            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} showMatchReasons={mode === "search"} />)}
+            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} />)}
           </div>
         ) : (
           <section className={CARD_CLASS}>

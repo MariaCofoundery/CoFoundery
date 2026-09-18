@@ -231,6 +231,9 @@ export type DiscoveryOwnAlignmentTendency = {
 export type DiscoveryProfilePreview = Pick<
   FounderDiscoveryProfile,
   | "id"
+  // Fuer die Zuordnung des freigegebenen Profilbilds. Die Kennung kommt
+  // ohnehin aus der Suchprojektion.
+  | "userId"
   | "displayName"
   | "headline"
   | "bio"

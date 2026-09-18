@@ -274,6 +274,7 @@ function mapPreferencesRow(row: FounderSearchPreferencesRow): FounderSearchPrefe
 export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): DiscoveryProfilePreview {
   return {
     id: profile.id,
+    userId: profile.userId,
     displayName: profile.displayName,
     headline: profile.headline,
     bio: profile.bio,

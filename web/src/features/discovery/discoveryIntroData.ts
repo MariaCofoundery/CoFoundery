@@ -37,6 +37,7 @@ const DISCOVERY_INTRO_COLUMNS = [
 
 const DISCOVERY_INTRO_PROFILE_COLUMNS = [
   "id",
+  "user_id",
   "display_name",
   "headline",
   "bio",
@@ -79,6 +80,7 @@ type DiscoveryIntroRequestRow = {
 
 type DiscoveryIntroProfileRow = {
   id: string;
+  user_id: string;
   display_name: string;
   headline: string;
   bio: string;
@@ -146,6 +148,7 @@ function mapIntroRow(row: DiscoveryIntroRequestRow): DiscoveryIntroRequest {
 function mapIntroProfileRow(row: DiscoveryIntroProfileRow): DiscoveryProfilePreview {
   return {
     id: row.id,
+    userId: row.user_id,
     displayName: row.display_name,
     headline: row.headline,
     bio: row.bio,

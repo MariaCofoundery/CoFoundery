@@ -65,6 +65,10 @@ export async function saveIdentityAction(formData: FormData) {
         remote_mode: REMOTE_MODES.includes(remoteMode) ? remoteMode : null,
         expertise: parseList(formData.get("expertise"), 8),
         industries: parseList(formData.get("industries"), 5),
+        // Ein Bild, eine Entscheidung: Sie gilt ueberall, wo eingeloggte
+        // Mitglieder einander sehen. Connect hat seine eigene, weil dort
+        // oeffentliche Seiten haengen.
+        photo_visible_to_members: formData.get("photo_visible_to_members") === "yes",
       },
       // Ohne count koennte diese Aktion "Gespeichert" melden, ohne etwas
       // geschrieben zu haben: Ein update ohne passende Zeile ist fuer

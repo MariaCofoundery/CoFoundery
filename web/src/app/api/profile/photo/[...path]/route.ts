@@ -33,6 +33,17 @@ export async function GET(_request: Request, { params }: { params: Promise<{ pat
   } = await client.auth.getUser();
   if (!user) return new NextResponse(null, { status: 404 });
 
+  // Der Pfad beginnt mit der Kennung der Person, der das Bild gehoert. Ohne
+  // diese Pruefung lieferte die Route jeder angemeldeten Person jedes
+  // gueltige Bild aus - die Pfade sind zwar nicht zu erraten, aber "nicht zu
+  // erraten" ist keine Zustimmung, und ein einmal weitergegebener Link liesse
+  // sich nie wieder entziehen.
+  const ownerUserId = objectPath.slice(0, objectPath.indexOf("/"));
+  const { data: allowed, error: consentError } = await client.rpc("can_read_member_photo", {
+    p_owner_user_id: ownerUserId,
+  });
+  if (consentError || allowed !== true) return new NextResponse(null, { status: 404 });
+
   const { data, error } = await client.storage.from("avatars").download(objectPath);
   if (error || !data) return new NextResponse(null, { status: 404 });
 

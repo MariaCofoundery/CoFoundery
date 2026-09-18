@@ -36,7 +36,9 @@
     "backTo": {
       "connect": "Back to the Connect profile",
       "discovery": "Back to the search profile"
-    }
+    },
+    "photoVisibleLabel": "Make my photo visible to signed-in members",
+    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: public pages hang off that, so you decide the photo there separately."
   },
   "steps": {
     "evidence": "One example",

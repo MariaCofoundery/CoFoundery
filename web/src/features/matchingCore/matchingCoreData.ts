@@ -201,6 +201,7 @@ function mapInput(row: MatchingSessionInputRow): MatchingSessionInput {
 function mapProfile(row: MatchingCoreProfileRow): DiscoveryProfilePreview {
   return {
     id: row.id,
+    userId: row.user_id,
     displayName: row.display_name,
     headline: row.headline,
     bio: row.bio,

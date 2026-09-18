@@ -21,10 +21,12 @@ export type PersonCore = {
   remote_mode: string | null;
   expertise: string[] | null;
   industries: string[] | null;
+  /** Ob das Bild fuer andere eingeloggte Mitglieder sichtbar ist. */
+  photo_visible_to_members: boolean;
 };
 
 const PERSON_CORE_COLUMNS =
-  "display_name,headline,bio,location_region,remote_mode,expertise,industries";
+  "display_name,headline,bio,location_region,remote_mode,expertise,industries,photo_visible_to_members";
 
 export async function getPersonCore(client: SupabaseClient, userId: string) {
   const { data, error } = await client

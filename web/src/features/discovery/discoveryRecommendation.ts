@@ -120,6 +120,7 @@ function getRecommendationLocale(locale: string | null | undefined): AppLocale {
 function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): DiscoveryProfilePreview {
   return {
     id: profile.id,
+    userId: profile.userId,
     displayName: profile.displayName,
     headline: profile.headline,
     bio: profile.bio,

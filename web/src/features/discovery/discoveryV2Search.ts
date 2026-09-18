@@ -94,6 +94,7 @@ export function buildDiscoveryV2Candidate(
   return {
     profile: {
       id: profile.id,
+      userId: profile.userId,
       displayName: profile.displayName,
       headline: profile.headline,
       bio: profile.bio,
