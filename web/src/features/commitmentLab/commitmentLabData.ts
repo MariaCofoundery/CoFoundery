@@ -67,7 +67,9 @@ export async function getCommitmentLab(
   }));
   const discussion = ((discussionResult.data ?? []) as Array<Record<string, unknown>>).map<CommitmentLabDiscussionEntry>((row) => ({
     id: String(row.id),
-    authorUserId: String(row.author_user_id),
+    // Null nach einer Kontoloeschung - String(null) haette "null" ergeben und
+    // die Oberflaeche haette danach einen Namen gesucht.
+    authorUserId: typeof row.author_user_id === "string" ? row.author_user_id : null,
     parentEntryId: typeof row.parent_entry_id === "string" ? row.parent_entry_id : null,
     body: String(row.body),
     createdAt: String(row.created_at),

@@ -51,7 +51,9 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
     dateStyle: "medium",
     timeStyle: "short",
   });
-  const memberName = (userId: string) => {
+  // Null heisst: Das Konto ist geloescht - siehe Commitment Lab.
+  const memberName = (userId: string | null) => {
+    if (!userId) return t("formerMember");
     const index = setup.members.findIndex((member) => member.userId === userId);
     return index >= 0
       ? setup.members[index].displayName ?? t("founderFallback", { index: index + 1 })

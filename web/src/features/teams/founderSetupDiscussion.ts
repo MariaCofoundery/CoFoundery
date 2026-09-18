@@ -4,7 +4,8 @@ export type FounderSetupDiscussionEntry = {
   id: string;
   teamId: string;
   itemKey: FounderSetupItemKey;
-  authorUserId: string;
+  /** Null nach einer Kontoloeschung - der Beitrag bleibt, die Zuordnung nicht. */
+  authorUserId: string | null;
   parentEntryId: string | null;
   body: string;
   createdAt: string;

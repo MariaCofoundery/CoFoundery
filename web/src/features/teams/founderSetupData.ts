@@ -113,7 +113,7 @@ export async function getFounderSetupDiscussion(
     id: string;
     team_id: string;
     item_key: FounderSetupItemKey;
-    author_user_id: string;
+    author_user_id: string | null;
     parent_entry_id: string | null;
     body: string;
     created_at: string;
@@ -121,6 +121,8 @@ export async function getFounderSetupDiscussion(
     id: entry.id,
     teamId: entry.team_id,
     itemKey: entry.item_key,
+    // Null nach einer Kontoloeschung: Der Beitrag bleibt, damit die andere
+    // Person ihren Gespraechsfaden behaelt - die Zuordnung faellt weg.
     authorUserId: entry.author_user_id,
     parentEntryId: entry.parent_entry_id,
     body: entry.body,

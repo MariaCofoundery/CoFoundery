@@ -226,7 +226,8 @@
       "post": "Beitrag hinzufügen",
       "replyLabel": "Antwort",
       "replyPlaceholder": "Was möchtest du darauf antworten?",
-      "reply": "Antworten"
+      "reply": "Antworten",
+      "formerMember": "Ehemaliges Mitglied"
     },
     "reflection": {
       "title": "Was nehmt ihr aus eurem Commitment Lab mit?",
@@ -479,7 +480,8 @@
         "title": "Founder Exit / Ausscheiden",
         "question": "Was soll geklärt sein, wenn ein Founder das Unternehmen oder das Founder-Team verlassen möchte?"
       }
-    }
+    },
+    "formerMember": "Ehemaliges Mitglied"
   },
   "dashboard": {
     "eyebrow": "Gemeinsame Bereiche",

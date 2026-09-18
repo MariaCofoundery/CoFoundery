@@ -57,7 +57,11 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   const teamLabel = lab.team.name ?? lab.team.members.map((member, index) => member.displayName ?? `Founder ${index + 1}`).join(" + ");
   const threads = groupCommitmentLabDiscussion(lab.discussion);
   const date = new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium", timeStyle: "short" });
-  const memberName = (id: string) => {
+  // Null heisst: Das Konto ist geloescht. Der Beitrag bleibt stehen, damit die
+  // andere Person ihren Gespraechsfaden behaelt - aber er bekommt keinen
+  // erfundenen Namen.
+  const memberName = (id: string | null) => {
+    if (!id) return t("discussion.formerMember");
     const index = lab.participantUserIds.indexOf(id);
     return index >= 0 ? lab.participantNames[index] : "Founder";
   };

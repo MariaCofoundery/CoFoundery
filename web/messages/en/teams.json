@@ -226,7 +226,8 @@
       "post": "Add post",
       "replyLabel": "Reply",
       "replyPlaceholder": "What would you like to reply?",
-      "reply": "Reply"
+      "reply": "Reply",
+      "formerMember": "Former member"
     },
     "reflection": {
       "title": "What are you taking away from your Commitment Lab?",
@@ -479,7 +480,8 @@
         "title": "Founder exit",
         "question": "What should be clarified if a founder wants to leave the company or the founder team?"
       }
-    }
+    },
+    "formerMember": "Former member"
   },
   "dashboard": {
     "eyebrow": "Shared areas",
