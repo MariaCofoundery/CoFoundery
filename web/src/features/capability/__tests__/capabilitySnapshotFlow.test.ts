@@ -389,7 +389,20 @@ test("uploaded photos are no longer reachable without a session", () => {
   // Und nicht ueber next/image: der Optimierer holt die Datei serverseitig
   // ohne Sitzungs-Cookies, bekommt vom geschuetzten Endpunkt eine 404 und
   // liefert ein leeres Bild. Genau das ist beim ersten Deploy passiert.
-  assert.match(avatar, /resolvedSrc\.startsWith\(PHOTO_ROUTE_PREFIX\)/);
+  //
+  // GEAENDERT am 18.09.2026: Die Ausnahme war ein Praefix-Vergleich auf
+  // "/api/profile/photo/" - und traf "/api/connect/photos/" nicht. Dort waren
+  // deshalb ALLE Fotos kaputt. Eine Liste von Praefixen haette beim naechsten
+  // Pfad wieder gefehlt; jetzt gilt die Regel andersherum und damit fuer jede
+  // kuenftige Route: Der Optimierer bekommt NUR Bibliotheksbilder.
+  assert.match(avatar, /const librarySrc = getAvatarSrc\(avatarId\)/);
+  assert.match(avatar, /if \(librarySrc\) \{[\s\S]{0,200}<Image/);
+  const imageUsages = avatar.match(/<Image\s+src=\{([^}]*)\}/g) ?? [];
+  assert.deepEqual(
+    imageUsages.map((usage) => usage.replace(/[\s\S]*src=\{/, "").replace("}", "")),
+    ["librarySrc"],
+    "next/image bekommt ausschliesslich die Bibliotheksquelle"
+  );
 });
 
 // ---------------------------------------------------------------------------

@@ -10,6 +10,21 @@ type ProfileAvatarProps = {
   alt?: string;
 };
 
+/**
+ * Woher ein Bild kommt - und ob es ueber den Bildoptimierer darf.
+ *
+ * Statische Bibliotheks-Illustrationen duerfen; sie liegen offen im
+ * Dateisystem. Alles andere kommt aus einer Route, die eine Sitzung verlangt -
+ * und der Optimierer holt die Datei serverseitig OHNE die Cookies der
+ * Nutzerin. Er bekommt 401 oder 404, und statt des Bildes bleibt ein kaputtes
+ * Symbol stehen.
+ *
+ * Genau das ist am 18.09.2026 aufgefallen: Die Ausnahme stand als Praefix
+ * "/api/profile/photo/" da und traf den Connect-Pfad "/api/connect/photos/"
+ * nicht - dort waren also ALLE Fotos kaputt. Eine Liste von Praefixen haette
+ * beim naechsten Pfad wieder gefehlt, deshalb jetzt andersherum: Der
+ * Optimierer bekommt nur, was aus der Bibliothek stammt.
+ */
 const PHOTO_ROUTE_PREFIX = "/api/profile/photo/";
 
 function buildInitials(displayName: string) {
@@ -31,34 +46,28 @@ export function ProfileAvatar({
   alt,
 }: ProfileAvatarProps) {
   const initials = buildInitials(displayName);
-  const resolvedSrc = getAvatarSrc(avatarId) ?? resolveProfileAvatarUrl(imageUrl);
+  const librarySrc = getAvatarSrc(avatarId);
+  const resolvedSrc = librarySrc ?? resolveProfileAvatarUrl(imageUrl);
   const resolvedAlt = alt ?? `Avatar von ${displayName}`;
 
   if (resolvedSrc) {
-    // Nicht ueber next/image ausliefern, wenn die Quelle eine Sitzung braucht.
-    // Der Bild-Optimierer holt die Datei serverseitig und ohne die Cookies der
-    // Nutzerin; eine authentifizierte Route antwortet ihm mit 404, und das Bild
-    // bleibt leer. Statische Bibliotheks-Illustrationen sind davon nicht
-    // betroffen, deshalb faellt der Fehler nur bei eigenen Fotos auf.
-    if (!resolvedSrc.startsWith("/") || resolvedSrc.startsWith(PHOTO_ROUTE_PREFIX)) {
+    // Nur die Bibliothek geht ueber den Optimierer. Alles andere ist ein
+    // eigenes Bild hinter einer Sitzung.
+    if (librarySrc) {
       return (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={resolvedSrc}
+        <Image
+          src={librarySrc}
           alt={resolvedAlt}
+          width={256}
+          height={256}
           className={className}
         />
       );
     }
 
     return (
-      <Image
-        src={resolvedSrc}
-        alt={resolvedAlt}
-        width={256}
-        height={256}
-        className={className}
-      />
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={resolvedSrc} alt={resolvedAlt} className={className} />
     );
   }
 

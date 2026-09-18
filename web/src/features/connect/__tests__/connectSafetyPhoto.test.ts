@@ -98,3 +98,23 @@ test("account deletion cleans both physical image prefixes before DB/auth deleti
   assert.match(deletion, /deleteOwnedImageObjects\(privileged, "network-profile-images", userId\)/);
   assert.match(deletion, /avatarCleanup \|\| !connectPhotoCleanup/);
 });
+
+// ---------------------------------------------------------------------------
+// Connect-Fotos gingen ueber den Bildoptimierer - und waren damit alle kaputt
+// ---------------------------------------------------------------------------
+test("a Connect photo reaches the page, not the image optimiser", () => {
+  const avatar = readFileSync("src/features/profile/ProfileAvatar.tsx", "utf8");
+  const connectAvatar = readFileSync("src/features/connect/ConnectAvatar.tsx", "utf8");
+  const route = readFileSync("src/app/api/connect/photos/[userId]/route.ts", "utf8");
+
+  // Die Route verlangt eine Sitzung - der Optimierer hat keine.
+  assert.match(route, /if \(!user\) return new NextResponse\(null, \{ status: 401 \}\)/);
+  assert.match(connectAvatar, /\/api\/connect\/photos\//);
+
+  // Deshalb darf sie nie bei next/image landen. Die Regel gilt jetzt
+  // andersherum und damit auch fuer jede kuenftige Route: Nur was aus der
+  // Bibliothek stammt, geht ueber den Optimierer.
+  const imageUsages = avatar.match(/<Image\s+src=\{([^}]*)\}/g) ?? [];
+  assert.equal(imageUsages.length, 1);
+  assert.match(imageUsages[0], /librarySrc/);
+});
