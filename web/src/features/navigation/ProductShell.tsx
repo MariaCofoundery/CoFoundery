@@ -58,14 +58,11 @@ const ProductNavigationOverrideContext = createContext<
  * an dem man steht.
  */
 function areaLinkClassName(active: boolean) {
-  // Der aktive Bereich traegt die Markenfarben: Lila als Grund, weisse
-  // Schrift, ein tuerkiser Ring aussen herum. Beides sind die vorhandenen
-  // Tokens - --brand-accent ist das Lila, --brand-primary das Tuerkis -, also
-  // bleibt die Leiste mit dem Rest des Produkts im selben Farbraum.
+  // .brand-here traegt den weichen Verlauf von Lila nach Tuerkis - dieselbe
+  // Klasse wie der Hauptweg im Align-Kopfbereich, damit beide nicht
+  // auseinanderlaufen. Siehe globals.css.
   return `rounded-full px-4 py-2 text-sm transition ${
-    active
-      ? "bg-[linear-gradient(135deg,var(--brand-accent),#6d28d9)] font-semibold text-white shadow-[0_8px_20px_rgba(124,58,237,0.28)] ring-2 ring-[color:var(--brand-primary)]"
-      : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+    active ? "brand-here font-semibold" : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 

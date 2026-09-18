@@ -692,3 +692,37 @@ body {
     animation: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Der aktuelle Ort
+   ---------------------------------------------------------------------------
+   Eine Stelle fuer beides: den aktiven Bereich in der Kopfleiste und den
+   Hauptweg im Align-Kopfbereich. Sonst laufen die beiden auseinander, sobald
+   jemand nur eine von beiden anfasst.
+
+   Die erste Fassung war ein Lila-Vollton mit tuerkisem Ring und farbigem
+   Schatten - drei laute Signale gleichzeitig, und das den ganzen Tag im
+   Blickfeld. Jetzt traegt die Flaeche einen weichen Verlauf von Lila nach
+   Tuerkis bei niedriger Saettigung, die Schrift das Lila, und die Kante ist
+   eine Haarlinie im Inneren statt eines Rings aussen.
+
+   Deutlich bleibt es trotzdem: Es ist der einzige gefuellte Punkt in einer
+   Reihe aus grauem Text.
+   --------------------------------------------------------------------------- */
+.brand-here {
+  background-image: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(103, 232, 249, 0.18)
+  );
+  color: var(--brand-accent);
+  box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.2);
+}
+
+.brand-here:hover {
+  background-image: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.16),
+    rgba(103, 232, 249, 0.24)
+  );
+}

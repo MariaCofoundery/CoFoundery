@@ -48,10 +48,24 @@ test("exactly one point is filled: the one you are standing on", () => {
   // Der aktive Zustand war ein 18-Prozent-Schleier, und Discovery trug eine
   // Dauer-CTA-Farbe - das Auffaelligste zeigte nie den aktuellen Ort.
   assert.doesNotMatch(shell, /discoveryCtaClassName/);
-  // Markenfarben: Lila als Grund, weisse Schrift, tuerkiser Ring - beides
-  // die vorhandenen Tokens, damit die Leiste im Farbraum des Produkts bleibt.
-  assert.match(shell, /var\(--brand-accent\)[\s\S]{0,120}font-semibold text-white/);
-  assert.match(shell, /ring-2 ring-\[color:var\(--brand-primary\)\]/);
+  // Markenfarben, aber zurueckhaltend: ein weicher Verlauf von Lila nach
+  // Tuerkis, die Schrift im Lila, die Kante eine Haarlinie im Inneren. Die
+  // erste Fassung hatte Vollton, Ring UND Schatten - drei laute Signale
+  // gleichzeitig, den ganzen Tag im Blickfeld.
+  assert.match(shell, /active \? "brand-here font-semibold"/);
+  const css = readFileSync("src/app/globals.css", "utf8");
+  const rule = css.slice(css.indexOf(".brand-here {"), css.indexOf("}", css.indexOf(".brand-here {")));
+  assert.match(rule, /linear-gradient/);
+  assert.match(rule, /rgba\(124, 58, 237/, "das Lila");
+  assert.match(rule, /rgba\(103, 232, 249/, "das Tuerkis");
+  assert.doesNotMatch(rule, /color: #fff|color: white/, "keine weisse Schrift mehr");
+
+  // Und eine Stelle fuer beide Orte, sonst laufen sie auseinander.
+  assert.match(
+    readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
+    /brand-here/,
+    "der Hauptweg im Kopfbereich nutzt dieselbe Klasse"
+  );
   assert.doesNotMatch(
     shell,
     /bg-\[color:var\(--brand-primary\)\]\/18/,
