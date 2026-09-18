@@ -91,7 +91,7 @@
     "action": "Open Library"
   },
   "glossaryLink": {
-    "hint": "Look up {term} in the Founder Library – opens a new window"
+    "more": "Click to read more – opens a new window"
   },
   "termPage": {
     "setupTitle": "Comes up in these setup topics",

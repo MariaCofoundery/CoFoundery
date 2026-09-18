@@ -70,7 +70,7 @@
     "overview": "Back to Connect overview",
     "connect": "Back to Connect",
     "myListings": "Back to my listings",
-    "problems": "Problems"
+    "problems": "Unsolved"
   },
   "pending": {
     "save": "Saving …",
@@ -278,7 +278,7 @@
     "empty": "No listings with this status.",
     "untitled": "Untitled draft",
     "expiresIn": "Expires in {days} days – after that it is no longer visible to others.",
-    "problemsTitle": "Problems you described",
+    "problemsTitle": "What you described",
     "problemsEmpty": "You have not described anything yet."
   },
   "profile": {
@@ -393,12 +393,12 @@
     "venture_limit": "Five entries is the maximum."
   },
   "problems": {
-    "title": "Problems people see",
+    "title": "What people see unsolved",
     "text": "This is what people experience as unsolved around them. Some want to build something from it, some already are, and some simply describe it because someone ought to know.",
     "create": "Describe a problem",
     "createTitle": "What do you see that ought to be solved?",
     "createText": "Describe it concretely enough that someone without your background understands it – who it affects, and what is missing today.",
-    "backToBoard": "Back to the problems",
+    "backToBoard": "Back to Unsolved",
     "searchPlaceholder": "Search titles, descriptions, topics and places",
     "intentLabel": "What the person intends",
     "allIntents": "All",
@@ -562,16 +562,16 @@
     "title": "Saved searches",
     "text": "What you saved you do not have to enter again – and when something new matches, we let you know.",
     "saveTitle": "Save this selection",
-    "saveText": "We will tell you about new entries and problems that meet all of your criteria.",
+    "saveText": "We will tell you about new entries and descriptions that meet all of your criteria.",
     "labelPlaceholder": "Name, e.g. Sales in Berlin",
     "save": "Save search",
     "open": "View saved searches",
     "emptyTitle": "No saved search yet.",
     "emptyText": "Narrow down what you are looking for in the overview and save it. After that you do not have to keep checking yourself.",
     "emptyCta": "To the overview",
-    "scopeBoth": "Applies to entries and problems.",
+    "scopeBoth": "Applies to entries and Unsolved.",
     "scopeListings": "Applies to entries only.",
-    "scopeProblems": "Applies to problems only.",
+    "scopeProblems": "Applies to Unsolved only.",
     "notifyOn": "Turn notifications on",
     "notifyOff": "Turn notifications off",
     "notifyStateOn": "You will be notified.",
@@ -645,7 +645,7 @@
     "label": "Areas in Connect",
     "people": "People",
     "listings": "Offers & requests",
-    "problems": "Problems"
+    "problems": "Unsolved"
   },
   "people": {
     "title": "People in the network",

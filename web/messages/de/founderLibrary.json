@@ -91,7 +91,7 @@
     "action": "Library öffnen"
   },
   "glossaryLink": {
-    "hint": "{term} in der Founder Library nachschlagen – öffnet ein neues Fenster"
+    "more": "Zum Nachlesen klicken – öffnet ein neues Fenster"
   },
   "termPage": {
     "setupTitle": "Kommt in diesen Setup-Themen vor",

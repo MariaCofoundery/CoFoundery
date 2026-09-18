@@ -380,16 +380,11 @@
       "dictationUnavailable": "Diktat ist in diesem Browser gerade nicht verfügbar."
     },
     "detail": {
-      "workingTitle": "Eure gemeinsame Notiz",
-      "workingHelp": "Hier könnt ihr Gedanken und offene Punkte sammeln. Die Notiz ist noch kein gemeinsam bestätigter Stand.",
       "workStatus": "Wo steht ihr gerade?",
-      "workingNote": "Notiz",
       "currentTitle": "Von euch gemeinsam bestätigt",
       "pendingTitle": "Vorschlag zur Bestätigung",
-      "proposalTitle": "Neuen gemeinsamen Stand vorschlagen",
       "proposalHelp": "Der Vorschlag wird erst zum gemeinsam bestätigten Stand, wenn alle aktuellen Founder zugestimmt haben.",
       "proposalReplacesPending": "Ein neuer Vorschlag ersetzt den offenen Vorschlag. Der bereits gemeinsam bestätigte Stand bleibt unverändert, bis alle dem neuen Vorschlag zugestimmt haben.",
-      "proposalNote": "Was möchtet ihr gemeinsam festhalten?",
       "resolutionStatus": "Wie möchtet ihr diesen Punkt festhalten?",
       "documentationReference": "Nur bei „Dokumentiert“: Wo habt ihr das festgehalten? (optional)",
       "documentationPlaceholder": "Zum Beispiel Dokumentname oder https://…",
@@ -397,7 +392,11 @@
       "confirmed": "bestätigt",
       "awaiting": "offen",
       "yourConfirmationPending": "Deine Bestätigung ist noch offen.",
-      "noNote": "Keine zusätzliche Fassung hinterlegt."
+      "noNote": "Keine zusätzliche Fassung hinterlegt.",
+      "noteTitle": "Woran ihr arbeitet",
+      "noteHelp": "Sammelt hier, was ihr festhalten wollt. Solange es eine Notiz ist, gilt sie nicht als gemeinsamer Stand – ihr könnt sie jederzeit ändern.",
+      "note": "Notiz",
+      "proposeToggle": "Daraus einen gemeinsamen Stand machen"
     },
     "feedback": {
       "saved": "Arbeitsstand gespeichert.",

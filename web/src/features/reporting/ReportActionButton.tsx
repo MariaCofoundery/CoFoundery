@@ -8,6 +8,15 @@ type ReportActionButtonProps = {
   variant?: "primary" | "secondary" | "utility";
   className?: string;
   type?: "button" | "submit" | "reset";
+  /**
+   * Schickt dasselbe Formular an eine andere Serveraktion.
+   *
+   * Gebraucht, wo zwei Handlungen auf DENSELBEN Feldern arbeiten - im Founder
+   * Setup speichert ein Knopf die Notiz, der andere macht daraus einen
+   * Vorschlag. Zwei Formulare haetten zwei Textfelder mit demselben Inhalt
+   * bedeutet, und genau das war dort vorher das Problem.
+   */
+  formAction?: (formData: FormData) => void | Promise<void>;
   disabled?: boolean;
 };
 
@@ -30,6 +39,7 @@ export function ReportActionButton({
   variant = "primary",
   className = "",
   type = "button",
+  formAction,
   disabled = false,
 }: ReportActionButtonProps) {
   const disabledClass = disabled
@@ -46,7 +56,13 @@ export function ReportActionButton({
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes} disabled={disabled}>
+    <button
+      type={type}
+      onClick={onClick}
+      formAction={formAction}
+      className={classes}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

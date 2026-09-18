@@ -380,16 +380,11 @@
       "dictationUnavailable": "Dictation is currently unavailable in this browser."
     },
     "detail": {
-      "workingTitle": "Your shared note",
-      "workingHelp": "Use this space to collect thoughts and open points. The note is not yet a jointly confirmed position.",
       "workStatus": "Where are you right now?",
-      "workingNote": "Note",
       "currentTitle": "Confirmed by all of you",
       "pendingTitle": "Proposal awaiting confirmation",
-      "proposalTitle": "Propose a new shared position",
       "proposalHelp": "The proposal becomes the jointly confirmed position only after every current founder has agreed to it.",
       "proposalReplacesPending": "A new proposal replaces the open proposal. The position you have already confirmed together remains unchanged until everyone agrees to the new proposal.",
-      "proposalNote": "What would you like to capture together?",
       "resolutionStatus": "How would you like to capture this point?",
       "documentationReference": "For “Documented” only: Where did you capture this? (optional)",
       "documentationPlaceholder": "For example, a document name or https://…",
@@ -397,7 +392,11 @@
       "confirmed": "confirmed",
       "awaiting": "open",
       "yourConfirmationPending": "Your confirmation is still open.",
-      "noNote": "No additional wording was provided."
+      "noNote": "No additional wording was provided.",
+      "noteTitle": "What you are working on",
+      "noteHelp": "Collect here what you want to put down. As long as it's a note it doesn't count as your shared position – you can change it any time.",
+      "note": "Note",
+      "proposeToggle": "Turn this into a shared position"
     },
     "feedback": {
       "saved": "Working state saved.",

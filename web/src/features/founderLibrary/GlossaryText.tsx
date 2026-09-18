@@ -38,6 +38,19 @@ export async function GlossaryText({
 
   const segments = buildGlossarySegments(text, entries, { maxLinks });
 
+  /**
+   * Die Erklaerung selbst in die Vorschau, nicht der Hinweis auf die Library.
+   *
+   * Vorher stand im `title` nur "in der Founder Library nachschlagen - oeffnet
+   * ein neues Fenster". Das ist die Bedienungsanleitung fuer den Link, nicht
+   * die Antwort auf die Frage, die jemand gerade hat. Wer mit der Maus auf
+   * "Vinkulierung" geht, will wissen, was das ist - und der Satz dazu liegt
+   * ohnehin schon im Sprachpaket. Zwei Zeilen: erst die Erklaerung, dann der
+   * Hinweis, dass ein Klick ein neues Fenster oeffnet.
+   */
+  const preview = (id: string) =>
+    `${t(`terms.${id}.shortDefinition`)}\n\n${t("glossaryLink.more")}`;
+
   return (
     <p className={className}>
       {segments.map((segment, index) =>
@@ -49,7 +62,7 @@ export async function GlossaryText({
             href={founderLibraryTermHref(segment.slug)}
             target="_blank"
             rel="noreferrer noopener"
-            title={t("glossaryLink.hint", { term: segment.value })}
+            title={preview(segment.id)}
             className="rounded-sm font-medium text-slate-900 decoration-slate-400 decoration-dotted underline-offset-4 hover:decoration-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 underline"
           >
             {segment.value}

@@ -214,45 +214,61 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
             <p className="mt-6 rounded-xl border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-600">{t("discussion.empty")}</p>
           )}
         </section>
-        <section className={CARD} aria-labelledby="working-note-title">
-          <h2 id="working-note-title" className="text-xl font-semibold text-slate-950">{t("detail.workingTitle")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t("detail.workingHelp")}</p>
+        {revisionCard("pending")}
+        {/* -------------------------------------------------------------
+            EIN Ort zum Schreiben, nicht zwei.
+
+            Vorher standen hier zwei Abschnitte mit je einem Textfeld:
+            "Eure gemeinsame Notiz" und "Neuen gemeinsamen Stand
+            vorschlagen" - und das zweite Feld war mit dem Inhalt des
+            ersten vorbelegt. Es war derselbe Text unter zwei Namen, mit
+            zwei Knoepfen, und man musste ihn zweimal speichern.
+
+            Jetzt: ein Textfeld. "Notiz speichern" laesst ihn Notiz sein.
+            Wer weiter ist, klappt darunter auf und macht daraus einen
+            Vorschlag - dieselben Worte, ein Schritt weiter. Die zwei
+            Angaben, die nur ein Vorschlag braucht, stehen auch erst dort.
+            ------------------------------------------------------------- */}
+        <section className={CARD} aria-labelledby="note-title">
+          <h2 id="note-title" className="text-xl font-semibold text-slate-950">{t("detail.noteTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("detail.noteHelp")}</p>
           <form action={saveAction} className="mt-5">
             <label className="block text-sm font-medium text-slate-800">{t("detail.workStatus")}
               <select name="workStatus" defaultValue={item.workStatus} className={INPUT}>
-                <option value="open">{t("statuses.open")}</option>
-                <option value="discussing">{t("statuses.discussing")}</option>
+                <option value="open">{t("stages.open")}</option>
+                <option value="discussing">{t("stages.discussing")}</option>
               </select>
             </label>
-            <label className="mt-4 block text-sm font-medium text-slate-800">{t("detail.workingNote")}
-              <textarea name="workingNote" defaultValue={item.workingNote} maxLength={10000} rows={7} className={INPUT} />
+            <label className="mt-4 block text-sm font-medium text-slate-800">{t("detail.note")}
+              <textarea name="note" defaultValue={item.workingNote} maxLength={10000} rows={7} className={INPUT} />
             </label>
             <ReportActionButton type="submit" variant="utility" className="mt-4 min-h-11">
               {t("actions.save")}
             </ReportActionButton>
-          </form>
-        </section>
-        {revisionCard("pending")}
-        <section className={CARD} aria-labelledby="proposal-title">
-          <h2 id="proposal-title" className="text-xl font-semibold text-slate-950">{t("detail.proposalTitle")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{item.pendingRevision ? t("detail.proposalReplacesPending") : t("detail.proposalHelp")}</p>
-          <form action={proposeAction} className="mt-5">
-            <label className="block text-sm font-medium text-slate-800">{t("detail.resolutionStatus")}
-              <select name="resolutionStatus" defaultValue="clarified" className={INPUT}>
-                <option value="clarified">{t("statuses.clarified")}</option>
-                <option value="documented">{t("statuses.documented")}</option>
-                <option value="not_relevant">{t("statuses.not_relevant")}</option>
-              </select>
-            </label>
-            <label className="mt-4 block text-sm font-medium text-slate-800">{t("detail.proposalNote")}
-              <textarea name="proposalNote" defaultValue={item.workingNote} maxLength={10000} rows={7} className={INPUT} />
-            </label>
-            <label className="mt-4 block text-sm font-medium text-slate-700">{t("detail.documentationReference")}
-              <input name="documentationReference" maxLength={2000} className={INPUT} placeholder={t("detail.documentationPlaceholder")} />
-            </label>
-            <ReportActionButton type="submit" variant="primary" className="mt-4 min-h-11">
-              {t("actions.propose")}
-            </ReportActionButton>
+
+            <details className="mt-6 border-t border-slate-200 pt-5">
+              <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">
+                {t("detail.proposeToggle")}
+              </summary>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {item.pendingRevision ? t("detail.proposalReplacesPending") : t("detail.proposalHelp")}
+              </p>
+              <label className="mt-4 block text-sm font-medium text-slate-800">{t("detail.resolutionStatus")}
+                <select name="resolutionStatus" defaultValue="clarified" className={INPUT}>
+                  <option value="clarified">{t("outcomes.clarified")}</option>
+                  <option value="documented">{t("outcomes.documented")}</option>
+                  <option value="not_relevant">{t("outcomes.not_relevant")}</option>
+                </select>
+              </label>
+              <label className="mt-4 block text-sm font-medium text-slate-700">{t("detail.documentationReference")}
+                <input name="documentationReference" maxLength={2000} className={INPUT} placeholder={t("detail.documentationPlaceholder")} />
+              </label>
+              {/* formAction schickt DASSELBE Formular an die andere Aktion -
+                  deshalb muss der Text nicht noch einmal getippt werden. */}
+              <ReportActionButton type="submit" formAction={proposeAction} variant="primary" className="mt-4 min-h-11">
+                {t("actions.propose")}
+              </ReportActionButton>
+            </details>
           </form>
         </section>
       </div>

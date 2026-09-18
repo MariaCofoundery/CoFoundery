@@ -70,7 +70,7 @@
     "overview": "Zur Connect-Übersicht",
     "connect": "Zurück zum Connect",
     "myListings": "Zurück zu meinen Einträgen",
-    "problems": "Probleme"
+    "problems": "Ungelöstes"
   },
   "pending": {
     "save": "Speichert …",
@@ -278,7 +278,7 @@
     "empty": "Keine Einträge in diesem Status.",
     "untitled": "Unbenannter Entwurf",
     "expiresIn": "Läuft in {days} Tagen aus – danach ist sie für andere nicht mehr sichtbar.",
-    "problemsTitle": "Geschilderte Probleme",
+    "problemsTitle": "Was du geschildert hast",
     "problemsEmpty": "Du hast noch nichts geschildert."
   },
   "profile": {
@@ -393,12 +393,12 @@
     "venture_limit": "Fünf Einträge sind das Maximum."
   },
   "problems": {
-    "title": "Probleme, die jemand sieht",
+    "title": "Ungelöstes, das jemand sieht",
     "text": "Hier steht, was Menschen in ihrem Umfeld als ungelöst erleben. Manche wollen selbst etwas daraus machen, manche arbeiten schon daran, und manche schildern es einfach, weil es jemand wissen sollte.",
     "create": "Ein Problem schildern",
     "createTitle": "Was siehst du, das gelöst gehört?",
     "createText": "Beschreib es so konkret, dass jemand ohne deinen Hintergrund versteht, worum es geht – wen es betrifft, und was heute daran fehlt.",
-    "backToBoard": "Zurück zu den Problemen",
+    "backToBoard": "Zurück zum Ungelösten",
     "searchPlaceholder": "Suche in Titel, Beschreibung, Themen und Orten",
     "intentLabel": "Was die Person vorhat",
     "allIntents": "Alle",
@@ -562,16 +562,16 @@
     "title": "Gespeicherte Suchen",
     "text": "Was du gespeichert hast, musst du nicht wieder eingeben – und wenn etwas Neues dazu passt, sagen wir dir Bescheid.",
     "saveTitle": "Diese Eingrenzung speichern",
-    "saveText": "Wir melden dir neue Einträge und Probleme, die auf alle deine Kriterien zutreffen.",
+    "saveText": "Wir melden dir neue Einträge und Schilderungen, die auf alle deine Kriterien zutreffen.",
     "labelPlaceholder": "Name, z. B. Vertrieb in Berlin",
     "save": "Suche speichern",
     "open": "Gespeicherte Suchen ansehen",
     "emptyTitle": "Noch keine gespeicherte Suche.",
     "emptyText": "Grenze in der Übersicht ein, wonach du suchst, und speichere es. Danach musst du nicht mehr selbst nachsehen.",
     "emptyCta": "Zur Übersicht",
-    "scopeBoth": "Gilt für Einträge und Probleme.",
+    "scopeBoth": "Gilt für Einträge und Ungelöstes.",
     "scopeListings": "Gilt nur für Einträge.",
-    "scopeProblems": "Gilt nur für Probleme.",
+    "scopeProblems": "Gilt nur für Ungelöstes.",
     "notifyOn": "Benachrichtigung einschalten",
     "notifyOff": "Benachrichtigung ausschalten",
     "notifyStateOn": "Du wirst benachrichtigt.",
@@ -645,7 +645,7 @@
     "label": "Bereiche in Connect",
     "people": "Menschen",
     "listings": "Angebote & Gesuche",
-    "problems": "Probleme"
+    "problems": "Ungelöstes"
   },
   "people": {
     "title": "Menschen im Netzwerk",

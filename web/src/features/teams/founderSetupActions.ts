@@ -41,7 +41,7 @@ export async function saveFounderSetupWorkingStateAction(
   const supabase = await authenticatedClient();
   if (!supabase || !isFounderSetupItemKey(itemKey)) redirect(itemHref(teamId, itemKey, "error"));
   const status = formString(formData, "workStatus");
-  const note = formString(formData, "workingNote");
+  const note = formString(formData, "note");
   if (!(["open", "discussing"] as string[]).includes(status) || note.length > 10000) {
     redirect(itemHref(teamId, itemKey, "error"));
   }
@@ -64,7 +64,11 @@ export async function proposeFounderSetupRevisionAction(
   const supabase = await authenticatedClient();
   if (!supabase || !isFounderSetupItemKey(itemKey)) redirect(itemHref(teamId, itemKey, "error"));
   const resolution = formString(formData, "resolutionStatus");
-  const note = formString(formData, "proposalNote");
+  // Seit 19.09.2026 dasselbe Feld wie beim Speichern: Auf der Seite gab es
+  // zwei Textfelder mit demselben Inhalt - die Arbeitsnotiz und der
+  // Vorschlagstext, letzterer mit der Notiz vorbelegt. Zwei Namen fuer einen
+  // Text waren der Grund, warum man ihn zweimal schreiben musste.
+  const note = formString(formData, "note");
   const reference = formString(formData, "documentationReference");
   if (
     !(["clarified", "documented", "not_relevant"] as string[]).includes(resolution) ||

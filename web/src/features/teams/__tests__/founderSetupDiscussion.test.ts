@@ -25,16 +25,47 @@ test("discussion copy is structurally parallel in DE and EN", () => {
   assert.match(en.setup.discussion.visibility, /all current founders/u);
 });
 
-test("the item page keeps confirmed, discussion, working note, and proposal semantics separate", () => {
+test("the item page keeps confirmed, discussion, and the shared note in that order", () => {
+  // GEAENDERT am 19.09.2026: Hier stand eine Folge aus FUENF Abschnitten -
+  // bestaetigt, Gespraech, Arbeitsnotiz, offener Vorschlag, Vorschlagsformular.
+  // Zwei davon waren dasselbe Textfeld unter zwei Namen, und die Seite war
+  // dadurch zu voll. Sie sind zusammengelegt; die Reihenfolge des Restes ist
+  // weiterhin die Zusage: erst was gilt, dann das Gespraech, dann das
+  // Schreiben.
   const page = readFileSync("src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx", "utf8");
   const confirmed = page.indexOf('revisionCard("current")');
   const discussion = page.indexOf('aria-labelledby="discussion-title"');
-  const working = page.indexOf('aria-labelledby="working-note-title"');
   const pending = page.indexOf('revisionCard("pending")');
-  const proposal = page.indexOf('aria-labelledby="proposal-title"');
-  assert.ok(confirmed < discussion && discussion < working && working < pending && pending < proposal);
+  const note = page.indexOf('aria-labelledby="note-title"');
+  assert.ok(confirmed >= 0 && discussion > confirmed, "der bestaetigte Stand steht nicht vorn");
+  assert.ok(pending > discussion, "der offene Vorschlag steht nicht nach dem Gespraech");
+  // Der offene Vorschlag steht direkt vor der Stelle, an der man ihn ersetzt.
+  assert.ok(note > pending, "man ersetzt einen Vorschlag, den man nicht gesehen hat");
   assert.match(page, /FounderSetupDiscussionComposer/u);
   assert.doesNotMatch(page, /advisor/i);
+});
+
+test("es gibt genau EIN Textfeld für den gemeinsamen Text", () => {
+  // Das war Marias Beschwerde am 19.09.2026: "viel zu viel". Auf der Seite
+  // standen zwei Textfelder mit demselben Inhalt - die Arbeitsnotiz und der
+  // Vorschlagstext, letzterer mit der Notiz vorbelegt. Denselben Text zweimal
+  // zu tippen oder zweimal zu speichern war der eigentliche Fehler.
+  const page = readFileSync("src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx", "utf8");
+  const textareas = page.match(/<textarea/gu) ?? [];
+  assert.equal(textareas.length, 1, "wieder mehr als ein Textfeld auf der Seite");
+  assert.match(page, /name="note"/u);
+  assert.doesNotMatch(page, /name="workingNote"|name="proposalNote"/u);
+
+  // Zwei Handlungen auf demselben Formular - nicht zwei Formulare.
+  assert.match(page, /formAction=\{proposeAction\}/u);
+  const action = readFileSync("src/features/teams/founderSetupActions.ts", "utf8");
+  assert.equal((action.match(/formString\(formData, "note"\)/gu) ?? []).length, 2);
+
+  // Getrennt bleiben muss, was getrennt IST: Eine Notiz ist kein gemeinsamer
+  // Stand, und das sind weiterhin zwei verschiedene Aktionen und zwei
+  // verschiedene Zustaende in der Datenbank.
+  assert.match(action, /save_founder_team_setup_working_state|update/u);
+  assert.match(action, /propose_founder_team_setup_revision/u);
 });
 
 test("the discussion data path is narrow and does not expose email or advisor access", () => {

@@ -108,17 +108,36 @@ test("Glossarlinks öffnen ein neues Fenster – mit Hinweis", () => {
   const component = readFileSync("src/features/founderLibrary/GlossaryText.tsx", "utf8");
   assert.match(component, /target="_blank"/);
   assert.match(component, /rel="noreferrer noopener"/);
-  assert.match(component, /glossaryLink\.hint/);
+  assert.match(component, /glossaryLink\.more/);
 
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/founderLibrary.json`, "utf8")) as {
-      glossaryLink: { hint: string };
+      glossaryLink: { more: string };
     };
     assert.match(
-      messages.glossaryLink.hint,
+      messages.glossaryLink.more,
       locale === "de" ? /neue[nms] Fenster/ : /new window/,
       `${locale}: der Hinweis sagt nicht, dass ein Fenster aufgeht`
     );
+  }
+});
+
+test("die Vorschau beantwortet die Frage, statt auf die Library zu verweisen", () => {
+  // GEAENDERT am 19.09.2026: Im `title` stand nur die Bedienungsanleitung fuer
+  // den Link ("in der Founder Library nachschlagen"). Wer mit der Maus auf
+  // "Vinkulierung" geht, hat aber eine andere Frage - und der Satz, der sie
+  // beantwortet, liegt ohnehin schon im Sprachpaket.
+  const component = readFileSync("src/features/founderLibrary/GlossaryText.tsx", "utf8");
+  assert.match(component, /shortDefinition/);
+  assert.match(component, /title=\{preview\(segment\.id\)\}/);
+
+  // Und der alte Text ist weg, nicht nur unbenutzt: Ungenutzte Uebersetzungen
+  // bleiben sonst liegen und tauchen Jahre spaeter woanders wieder auf.
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/founderLibrary.json`, "utf8")) as {
+      glossaryLink: Record<string, string>;
+    };
+    assert.equal(messages.glossaryLink.hint, undefined, `${locale}: der alte Hinweis liegt noch da`);
   }
 });
 
