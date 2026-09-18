@@ -34,7 +34,7 @@ export default async function MyConnectPage({ searchParams }: { searchParams: Pr
                 {t("my.expiresIn", { days: daysLeft })}
               </p>
             );
-          })() : null}</div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} t={t} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
+          })() : null}</div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
     })}
     {/* Geschilderte Probleme stehen hier und nicht in einer zweiten
         Uebersicht: Ein Ort fuer alles, was man eingestellt hat. Und ohne

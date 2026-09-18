@@ -31,18 +31,44 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   const cofounderHref = coFounderBridgeHref(hasProfileRole(baseProfile?.roles, "founder"));
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
     <div className="mx-auto max-w-6xl space-y-6">
+      {/* ---------------------------------------------------------------
+          Zwei Haelften, und sie sahen gleich aus.
+
+          Vorher standen die drei Knoepfe zum Einstellen direkt ueber der
+          Reiterleiste und die wiederum direkt ueber dem Suchfeld: drei
+          Reihen Bedienelemente hintereinander, alle gleich gewichtet. Man
+          musste lesen, um zu verstehen, was wovon ist.
+
+          Jetzt zuerst SELBST ETWAS BEITRAGEN - abgesetzt in einem eigenen
+          Kasten mit Ueberschrift -, dann eine Trennlinie, dann SCHAUEN, WAS
+          DA IST mit Reitern, Suche und Treffern.
+          --------------------------------------------------------------- */}
       <header>
-        <h1 className="text-4xl font-semibold tracking-[-.04em]">{t("title")}</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("subtitle")}</p>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)] text-slate-950`}>{t("actions.seek")}</Link>
-          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link>
-          <Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link>
-          {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-semibold tracking-[-.04em]">{t("title")}</h1>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("subtitle")}</p>
+          </div>
+          {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
         </div>
       </header>
 
-      <ConnectTabs active="listings" counts={tabCounts} />
+      <section className="rounded-3xl border border-slate-200/70 bg-white/70 p-5">
+        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("post.title")}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("post.text")}</p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)] text-slate-950`}>{t("actions.seek")}</Link>
+          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link>
+          <Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link>
+        </div>
+      </section>
+
+      <div className="border-t border-slate-200/80 pt-7">
+        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("browse.title")}</p>
+        <div className="mt-4">
+          <ConnectTabs active="listings" counts={tabCounts} />
+        </div>
+      </div>
 
       {/* Ein Suchfeld oben, die Eingrenzung eingeklappt. Vorher war es ein
           Formular mit fuenf Feldern ueber den Treffern - das fuehlt sich an

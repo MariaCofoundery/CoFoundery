@@ -68,10 +68,13 @@ function areaLinkClassName(active: boolean) {
 
 /** Fuer alles, was kein Bereich ist - Profil, Feedback, Konto. */
 function navLinkClassName(active: boolean) {
-  return `rounded-full px-3 py-2 text-sm font-medium transition ${
+  // Dieselbe Hervorhebung wie bei den Bereichen: "Ich bin hier" ist dieselbe
+  // Aussage, egal ob der Ort ein Bereich oder ein Querschnitt ist. Vorher trug
+  // Profil ein blasses Grau und war auf /profile praktisch nicht zu erkennen.
+  return `rounded-full px-3 py-2 text-sm transition ${
     active
-      ? "bg-slate-100 text-slate-950"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      ? "brand-here font-semibold"
+      : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 

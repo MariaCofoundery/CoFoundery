@@ -679,5 +679,12 @@
   "postSomething": "Post something",
   "resultCount": "{count, plural, =0 {No entry} one {1 entry} other {# entries}}",
   "filtersLabel": "Filters",
-  "rememberSearch": "Remember this search"
+  "rememberSearch": "Remember this search",
+  "post": {
+    "title": "Post something yourself",
+    "text": "Say what you're looking for or offering – or find someone to found with."
+  },
+  "browse": {
+    "title": "See what's there"
+  }
 }

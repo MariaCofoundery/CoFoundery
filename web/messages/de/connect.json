@@ -679,5 +679,12 @@
   "postSomething": "Etwas einstellen",
   "resultCount": "{count, plural, =0 {Kein Eintrag} one {1 Eintrag} other {# Einträge}}",
   "filtersLabel": "Filter",
-  "rememberSearch": "Diese Suche merken"
+  "rememberSearch": "Diese Suche merken",
+  "post": {
+    "title": "Selbst etwas einstellen",
+    "text": "Sag, was du suchst oder anbietest – oder finde jemanden zum Gründen."
+  },
+  "browse": {
+    "title": "Schauen, was da ist"
+  }
 }

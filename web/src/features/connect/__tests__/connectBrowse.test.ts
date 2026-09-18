@@ -161,3 +161,54 @@ test("days left round up, so the last day still counts as a day", () => {
   assert.equal(getConnectListingDaysLeft(null, now), null);
   assert.equal(getConnectListingDaysLeft("keinDatum", now), null);
 });
+
+// ---------------------------------------------------------------------------
+// Einstellen und Stoebern sind zwei Dinge
+// ---------------------------------------------------------------------------
+test("die Uebersicht trennt Beitragen sichtbar vom Suchen", () => {
+  // Vorher standen die drei Knoepfe zum Einstellen direkt ueber der
+  // Reiterleiste und die direkt ueber dem Suchfeld - drei Reihen
+  // Bedienelemente hintereinander, alle gleich gewichtet.
+  const page = readFileSync("src/app/(product)/connect/page.tsx", "utf8");
+
+  const postAt = page.indexOf('t("post.title")');
+  const dividerAt = page.indexOf("border-t border-slate-200/80");
+  const browseAt = page.indexOf('t("browse.title")');
+  const tabsAt = page.indexOf("<ConnectTabs");
+
+  assert.ok(postAt > 0, "der Bereich zum Einstellen hat keine Ueberschrift");
+  assert.ok(dividerAt > postAt, "zwischen den beiden Haelften steht keine Trennung");
+  assert.ok(browseAt > dividerAt && tabsAt > browseAt, "die Reiter stehen nicht im Stoeber-Teil");
+
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
+      post?: { title?: string; text?: string };
+      browse?: { title?: string };
+    };
+    assert.ok(messages.post?.title && messages.post?.text, `${locale}: post fehlt`);
+    assert.ok(messages.browse?.title, `${locale}: browse fehlt`);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Das Formular holt seine Texte selbst
+// ---------------------------------------------------------------------------
+test("kein Connect-Formular bekommt die Uebersetzungsfunktion gereicht", () => {
+  // `t={t}` hat /connect/listings/new und /connect/my in Produktion zerlegt:
+  // Eine Funktion laesst sich nicht ueber die Server-Browser-Grenze reichen.
+  for (const path of [
+    "src/features/connect/ConnectListingForm.tsx",
+    "src/features/connect/ConnectLifecycleForm.tsx",
+  ]) {
+    const code = readFileSync(path, "utf8");
+    assert.match(code, /useTranslations\("connect"\)/, `${path}: holt seine Texte nicht selbst`);
+    assert.doesNotMatch(code, /t: T/, `${path}: nimmt den Uebersetzer noch als Prop`);
+  }
+  for (const path of [
+    "src/app/(product)/connect/listings/new/page.tsx",
+    "src/app/(product)/connect/listings/[listingId]/edit/page.tsx",
+    "src/app/(product)/connect/my/page.tsx",
+  ]) {
+    assert.doesNotMatch(readFileSync(path, "utf8"), /t=\{t\}/, `${path}: reicht t weiter`);
+  }
+});

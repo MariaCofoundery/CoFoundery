@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { saveConnectListingAction } from "./connectActions";
 import { ConnectSubmitButton } from "./ConnectSubmitButton";
 import {
@@ -17,18 +18,31 @@ import {
 import { normalizeConnectLocations } from "./connectPresentation";
 import { ConnectVisibilityField } from "./ConnectVisibilityField";
 
-type T = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 
-export function ConnectListingForm({ listing, direction, category, canPublish = true, t }: { listing?: ConnectListing | null; direction?: string; category?: ConnectCategory;
+/**
+ * WARUM DIESES BAUTEIL SEINE TEXTE SELBST HOLT:
+ *
+ * Bis 18.09.2026 bekam es `t` als Prop von der Seite. Eine Funktion laesst
+ * sich aber nicht ueber die Server-Client-Grenze reichen - die Seite stuerzte
+ * beim Rendern ab ("Application error", Digest 876835063), und zwar erst zur
+ * Laufzeit: tsc, next build und die Tests waren alle gruen.
+ *
+ * Derselbe Fehler war schon einmal da. Der Grenzpruefer in
+ * features/ui/clientBoundary fing damals eine Funktion, die als Literal
+ * dastand - `t={t}` ist ein blosser Bezeichner und lief durch. Er kennt den
+ * Fall jetzt.
+ */
+export function ConnectListingForm({ listing, direction, category, canPublish = true }: { listing?: ConnectListing | null; direction?: string; category?: ConnectCategory;
   /**
    * Ob ein aktives Connect-Profil vorliegt. Ohne eines weist die Datenbank
    * das Veroeffentlichen ab (enforce_network_publication) - der Entwurf geht
    * aber. Der Knopf, der nicht funktioniert, wird deshalb nicht angeboten;
    * der Hinweis dazu steht auf der Seite ueber dem Formular.
    */
-  canPublish?: boolean; t: T }) {
+  canPublish?: boolean }) {
+  const t = useTranslations("connect");
   const [selectedCategory, setSelectedCategory] = useState<ConnectCategory>(listing?.category || category || "expertise");
   const showRemote = categorySupportsRemoteMode(selectedCategory);
   const showStage = categorySupportsVentureStage(selectedCategory);

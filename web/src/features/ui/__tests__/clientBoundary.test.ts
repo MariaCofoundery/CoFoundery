@@ -4,6 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   findFunctionPropsAcrossBoundary,
+  findTranslatorNames,
   isClientModule,
   isFunctionExpression,
 } from "@/features/ui/clientBoundary";
@@ -122,6 +123,50 @@ function exportedComponents(source: string) {
   }
   return names;
 }
+
+test("a translator identifier is caught, not just a function literal", () => {
+  // Der zweite Absturz dieser Art, am 18.09.2026: `t={t}` auf
+  // /connect/listings/new (Digest 876835063). Ein blosser Bezeichner - kein
+  // Funktionsliteral -, deshalb lief er durch die alte Pruefung.
+  const source = `
+    import { getTranslations } from "next-intl/server";
+    export default async function Page() {
+      const t = await getTranslations("connect");
+      return <ConnectListingForm category="expertise" t={t} />;
+    }
+  `;
+  const findings = findFunctionPropsAcrossBoundary(source, new Set(["ConnectListingForm"]));
+  assert.equal(findings.length, 1, "der Uebersetzer geht ungesehen ueber die Grenze");
+  assert.equal(findings[0]?.prop, "t");
+});
+
+test("the translator is also recognised inside a Promise.all", () => {
+  // Die zweite Schreibweise im Bestand - ohne sie waere die halbe Codebasis
+  // ungeprueft geblieben.
+  const source = `
+    const [t, locale, filters] = await Promise.all([
+      getTranslations("connect"),
+      getLocale(),
+      searchParams,
+    ]);
+    return <Widget label={locale} t={t} />;
+  `;
+  const names = findTranslatorNames(source);
+  assert.ok(names.has("t"), "t wurde nicht als Uebersetzer erkannt");
+  assert.ok(!names.has("locale"), "locale ist keine Funktion");
+  assert.ok(!names.has("filters"));
+});
+
+test("an unknown identifier stays allowed", () => {
+  // Ein Bezeichner, von dem die Datei nichts weiss, koennte eine
+  // Server-Aktion sein - und die darf hinueber.
+  const source = `
+    export default function Page() {
+      return <Form action={saveThing} onDone={handler} />;
+    }
+  `;
+  assert.deepEqual(findFunctionPropsAcrossBoundary(source, new Set(["Form"])), []);
+});
 
 test("no server module hands a function to a component that runs in the browser", () => {
   const files = walk("src");

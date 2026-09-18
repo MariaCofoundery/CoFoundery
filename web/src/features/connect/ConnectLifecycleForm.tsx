@@ -1,11 +1,17 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { changeConnectListingStatusAction } from "./connectActions";
 import { ConnectSubmitButton } from "./ConnectSubmitButton";
 
-type T = (key: string) => string;
 
-export function ConnectLifecycleForm({ id, status, t }: { id: string; status: string; t: T }) {
+/**
+ * Holt seine Texte selbst - siehe ConnectListingForm. Eine Funktion als Prop
+ * an ein Browser-Bauteil laesst React nicht zu; hier stand dasselbe `t={t}`,
+ * und /connect/my waere aus demselben Grund abgestuerzt.
+ */
+export function ConnectLifecycleForm({ id, status }: { id: string; status: string }) {
+  const t = useTranslations("connect");
   const button = (intent: "pause" | "complete" | "publish" | "renew", className: string) => (
     <ConnectSubmitButton
       intent={intent}

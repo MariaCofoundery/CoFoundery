@@ -139,3 +139,20 @@ test("the connections are reachable from the top of Align", () => {
   assert.ok(linkAt < quoteAt, "und noch vor dem Zitat, nicht darunter");
   assert.match(dashboard, /hero\.heroConnectionsCount/, "mit der Zahl, nicht nur als Wort");
 });
+
+test("auch Profil leuchtet auf, wenn man dort ist", () => {
+  // Maria am 18.09.2026: Der Reiter Profil war auf /profile praktisch nicht zu
+  // erkennen - er trug ein blasses Grau, waehrend die Bereiche den
+  // Markenverlauf tragen. "Ich bin hier" ist dieselbe Aussage, egal ob der Ort
+  // ein Bereich oder ein Querschnitt ist.
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  const navLink = shell.slice(
+    shell.indexOf("function navLinkClassName"),
+    shell.indexOf("function ConnectAttentionBadge")
+  );
+  assert.match(navLink, /brand-here font-semibold/);
+  assert.doesNotMatch(navLink, /bg-slate-100 text-slate-950/);
+
+  // Und der Ort wird weiterhin auch vorgelesen, nicht nur gefaerbt.
+  assert.match(shell, /href="\/profile"[\s\S]{0,120}aria-current=\{pathname\.startsWith\("\/profile"\) \? "page"/);
+});
