@@ -25,7 +25,7 @@ import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founder
 import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
 import type { TeamScoringResult } from "@/features/scoring/founderScoring";
 import { hasLegacyFounderAlignmentWorkbookContent } from "@/features/reporting/founderAlignmentWorkbook";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import {
   createPrivilegedAccessClient,
   syncRelationshipAdvisorFromLegacyInvitation,
@@ -370,7 +370,7 @@ export async function getAdvisorReportPageData(
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     return {
@@ -664,7 +664,7 @@ export async function saveAdvisorSectionImpulse(params: {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   if (!user) {
     return { ok: false, reason: "not_authenticated" };
   }

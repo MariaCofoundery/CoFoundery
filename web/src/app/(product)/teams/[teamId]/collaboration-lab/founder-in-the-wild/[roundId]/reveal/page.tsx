@@ -6,11 +6,11 @@ import { getFounderInTheWildRound, getFounderInTheWildTeam, getOpenedFounderInTh
 import { normalizeLocale } from "@/i18n/config";
 import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
 import { findGuessTallyForRound, getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function FounderInTheWildRevealOverview({ params, searchParams }: { params: Promise<{ teamId: string; roundId: string }>; searchParams: Promise<{ result?: string }> }) {
   const [{ teamId, roundId }, query] = await Promise.all([params, searchParams]); const roundPath = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/founder-in-the-wild/${encodeURIComponent(roundId)}`;
-  const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); if (!user) redirect(`/login?next=${encodeURIComponent(`${roundPath}/reveal`)}`);
+  const supabase = await createClient(); const { data: { user } } = await getRequestUser(); if (!user) redirect(`/login?next=${encodeURIComponent(`${roundPath}/reveal`)}`);
   const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) notFound(); const round = await getFounderInTheWildRound(team, roundId, user.id, supabase); if (!round) notFound(); if (!round.wholeRoundAnswerComplete) redirect(roundPath);
   const [t, rawLocale] = await Promise.all([getTranslations("founderInTheWild.reveal"), getLocale()]); const locale = normalizeLocale(rawLocale); const partnerName = round.partner.displayName ?? (locale === "de" ? "dein Co-Founder" : "your co-founder");
   const allOpened = round.openedPromptPositions.length === round.prompts.length;

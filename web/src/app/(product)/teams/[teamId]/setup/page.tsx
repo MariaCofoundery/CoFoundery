@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { FOUNDER_SETUP_CATEGORY_KEYS } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
@@ -15,7 +15,7 @@ type Props = { params: Promise<{ teamId: string }> };
 export default async function FounderSetupPage({ params }: Props) {
   const { teamId } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) notFound();

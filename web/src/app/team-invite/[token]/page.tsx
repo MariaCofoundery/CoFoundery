@@ -13,7 +13,7 @@ import {
   normalizeTeamName,
 } from "@/features/dashboard/advisorTeamInviteData";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
@@ -85,7 +85,7 @@ export default async function AdvisorTeamInvitePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   const loginHref = `/login?next=${encodeURIComponent(`/team-invite/${token}`)}`;
   const teamName = normalizeTeamName(row.team_name);

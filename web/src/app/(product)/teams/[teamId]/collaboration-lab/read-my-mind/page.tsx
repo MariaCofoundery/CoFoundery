@@ -8,12 +8,12 @@ import { buildReadMyMindPackNavigation } from "@/features/collaborationLab/readM
 import { normalizeLocale } from "@/i18n/config";
 import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
 import { getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function ReadMyMindEntryPage({ params, searchParams }: { params: Promise<{ teamId: string }>; searchParams: Promise<{ result?: string }> }) {
   const [{ teamId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/collaboration-lab/read-my-mind`)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
   if (!team) notFound();

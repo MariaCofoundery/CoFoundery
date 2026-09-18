@@ -6,7 +6,7 @@ import { PublicConnectAvatar, PublicConnectShell } from "@/features/connect/Publ
 import { getPublicConnectListing } from "@/features/connect/publicConnectData";
 import { getConnectBlockState } from "@/features/connect/connectData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function PublicConnectListingPage({ params }: { params: Pro
   const { publicSlug } = await params;
   const client = await createClient();
   const [t, locale, listing, auth] = await Promise.all([
-    getTranslations("connect"), getLocale(), getPublicConnectListing(client, publicSlug).catch(() => null), client.auth.getUser(),
+    getTranslations("connect"), getLocale(), getPublicConnectListing(client, publicSlug).catch(() => null), getRequestUser(),
   ]);
   if (!listing) notFound();
   const membershipResult = auth.data.user ? await client.rpc("is_network_member") : null;

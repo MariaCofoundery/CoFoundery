@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getRequestLocale } from "@/i18n/getLocale";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
@@ -19,7 +19,7 @@ export default async function MeReportPage() {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect("/login?next=/me/report");

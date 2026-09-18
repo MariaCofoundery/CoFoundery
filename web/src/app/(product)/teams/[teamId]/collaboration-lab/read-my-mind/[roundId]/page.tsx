@@ -9,12 +9,12 @@ import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collabo
 import { fillReadMyMindTarget } from "@/features/collaborationLab/readMyMindModel";
 import { shouldShowReadMyMindIntro } from "@/features/collaborationLab/readMyMindPackNavigation";
 import { normalizeLocale } from "@/i18n/config";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function ReadMyMindRoundPage({ params, searchParams }: { params: Promise<{ teamId: string; roundId: string }>; searchParams: Promise<{ prompt?: string; result?: string; intro?: string }> }) {
   const [{ teamId, roundId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   const href = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(roundId)}`;
   if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);

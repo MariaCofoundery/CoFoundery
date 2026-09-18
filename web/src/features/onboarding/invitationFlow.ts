@@ -1,6 +1,6 @@
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
 export type InvitationContinueLabelKey = "report" | "completion" | "base" | "values";
@@ -59,7 +59,7 @@ export async function resolveActiveInvitationIdForCurrentUser(): Promise<string 
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user?.id) {
     return null;

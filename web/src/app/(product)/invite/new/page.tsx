@@ -2,14 +2,14 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
 import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function NewInvitePage() {
   const supabase = await createClient();
   const t = await getTranslations("dashboard.coFounderInvitePage");
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect("/login?next=/invite/new");

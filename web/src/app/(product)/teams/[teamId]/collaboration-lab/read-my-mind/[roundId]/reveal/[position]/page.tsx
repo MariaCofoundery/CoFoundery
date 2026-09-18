@@ -6,7 +6,7 @@ import { getOpenedReadMyMindPromptReveal, getReadMyMindRound, getReadMyMindTeamC
 import type { ReadMyMindResponseContract } from "@/features/collaborationLab/readMyMindContent";
 import { ReadMyMindProgress } from "@/features/collaborationLab/ReadMyMindExperienceVisuals";
 import { normalizeLocale } from "@/i18n/config";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 function ChoiceList({ keys, contract, locale }: { keys: string[]; contract: ReadMyMindResponseContract; locale: "de" | "en" }) {
   const labels = keys.map((key) => contract.choices.find((choice) => choice.key === key)?.label[locale]).filter((label): label is string => Boolean(label));
@@ -27,7 +27,7 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
   const position = Number(rawPosition);
   if (!Number.isInteger(position) || position < 0 || position > 4) notFound();
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   const roundHref = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(roundId)}`;
   const revealHref = `${roundHref}/reveal`;
   if (!user) redirect(`/login?next=${encodeURIComponent(`${revealHref}/${position}`)}`);

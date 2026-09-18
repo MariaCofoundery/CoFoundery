@@ -5,7 +5,7 @@ import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { WelcomeAlignmentVisual } from "@/features/profile/WelcomeAlignmentVisual";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 function buildWelcomeNextParam(nextPath: string) {
   return nextPath === "/dashboard" ? "/welcome" : `/welcome?next=${encodeURIComponent(nextPath)}`;
@@ -35,7 +35,7 @@ export default async function WelcomePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent(buildWelcomeNextParam(nextPath))}`);

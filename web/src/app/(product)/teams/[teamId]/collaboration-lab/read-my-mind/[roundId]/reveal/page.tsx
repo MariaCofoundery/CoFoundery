@@ -6,7 +6,7 @@ import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collabo
 import { normalizeLocale } from "@/i18n/config";
 import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
 import { findGuessTallyForRound, getCollaborationGuessTally } from "@/features/collaborationLab/guessTally";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function ReadMyMindRevealEntryPage({ params, searchParams }: {
   params: Promise<{ teamId: string; roundId: string }>;
@@ -14,7 +14,7 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
 }) {
   const [{ teamId, roundId }, query] = await Promise.all([params, searchParams]);
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   const roundHref = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(roundId)}`;
   const revealHref = `${roundHref}/reveal`;
   if (!user) redirect(`/login?next=${encodeURIComponent(revealHref)}`);

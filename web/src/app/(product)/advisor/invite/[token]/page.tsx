@@ -7,7 +7,7 @@ import {
 } from "@/features/reporting/founderAlignmentWorkbookActions";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
@@ -74,7 +74,7 @@ export default async function AdvisorInvitePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   const loginHref = `/advisor/invite/prepare?token=${encodeURIComponent(token)}`;
   const isLinkedToOtherUser = Boolean(
@@ -88,7 +88,7 @@ export default async function AdvisorInvitePage({
     const supabase = await createClient();
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getRequestUser();
 
     if (!user) {
       redirect(loginHref);

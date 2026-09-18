@@ -8,7 +8,7 @@ import {
   getComparisonSides,
 } from "@/features/capability/capabilityComparisonData";
 import { CapabilityComparisonView } from "@/features/capability/CapabilityComparisonView";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
  * Der Vergleich mit einer verbundenen Person.
@@ -27,7 +27,7 @@ export default async function CompareCapabilityPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   if (!user) redirect(`/login?next=/profile/compare/${otherUserId}`);
 
   const person = await findComparablePerson(supabase, user.id, otherUserId);

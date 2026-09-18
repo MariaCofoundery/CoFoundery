@@ -5,7 +5,7 @@ import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess"
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
 import { getOwnSavedDiscoveryCandidates } from "@/features/discovery/discoverySavesData";
 import type { FounderSearchPreferences } from "@/features/discovery/discoveryTypes";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const SECONDARY_CTA_CLASS =
   "inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200";
@@ -25,7 +25,7 @@ const EMPTY_MUST_HAVES: FounderSearchPreferences["mustHaves"] = {
 export default async function SavedFounderDiscoveryPage() {
   const t = await getTranslations("discovery");
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user?.id) redirect(`/login?next=${encodeURIComponent("/discovery/saved")}`);
   if (!(await hasFounderDiscoveryAccess(user.id, supabase))) redirect("/advisor/dashboard");
 

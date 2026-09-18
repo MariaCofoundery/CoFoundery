@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { getFounderConnections } from "@/features/connections/founderConnectionsData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD =
   "rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-6";
@@ -14,7 +14,7 @@ export default async function ConnectionsPage() {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   if (!user) redirect("/login?next=%2Fconnections");
 
   const [connections, t] = await Promise.all([

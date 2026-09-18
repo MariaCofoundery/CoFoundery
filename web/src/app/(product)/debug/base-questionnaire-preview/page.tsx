@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { type CSSProperties } from "react";
 import { QuestionnaireDebugPreview } from "@/features/questionnaire/QuestionnaireDebugPreview";
 import { normalizeQuestionnaireQuestions } from "@/features/questionnaire/questionnaireShared";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { type QuestionnaireChoice } from "@/features/questionnaire/QuestionnaireClient";
 import {
   getCoreRegistryItems,
@@ -28,7 +28,7 @@ export default async function BaseQuestionnairePreviewPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect("/login?next=/debug/base-questionnaire-preview");

@@ -9,7 +9,7 @@ import {
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -36,7 +36,7 @@ export default async function DiscoverySearchesPage({
   const client = await createClient();
   const {
     data: { user },
-  } = await client.auth.getUser();
+  } = await getRequestUser();
   if (!user?.id) redirect(`/login?next=${encodeURIComponent("/discovery/searches")}`);
   if (!(await hasFounderDiscoveryAccess(user.id, client))) redirect("/advisor/dashboard");
 

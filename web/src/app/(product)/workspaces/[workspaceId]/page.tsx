@@ -14,7 +14,7 @@ import {
   type MatchingWorkspaceAgreementSectionKey,
   type MatchingWorkspaceAgreementSummary,
 } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ workspaceId: string }>;
@@ -219,7 +219,7 @@ export default async function MatchingWorkspacePage({ params, searchParams }: Pa
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent(`/workspaces/${workspaceId}`)}`);

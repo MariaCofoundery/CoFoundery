@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { ResearchTrackedLink } from "@/features/research/ResearchTrackedLink";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
 
@@ -39,7 +39,7 @@ export default async function InvitationBasisCompletePage({ params, searchParams
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   const nextPath = isRefreshFlow
     ? `/invite/${encodeURIComponent(invitationId)}/basis-complete?flow=refresh`

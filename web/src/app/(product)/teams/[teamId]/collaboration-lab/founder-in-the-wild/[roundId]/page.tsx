@@ -6,11 +6,11 @@ import { FounderInTheWildPromptForm } from "@/features/founderInTheWild/FounderI
 import { declineFounderInTheWildRoundAction, discardFounderInTheWildRoundAction, lockFounderInTheWildScenarioAction } from "@/features/founderInTheWild/founderInTheWildActions";
 import { getFounderInTheWildRound, getFounderInTheWildTeam } from "@/features/founderInTheWild/founderInTheWildData";
 import { normalizeLocale } from "@/i18n/config";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function FounderInTheWildRoundPage({ params, searchParams }: { params: Promise<{ teamId: string; roundId: string }>; searchParams: Promise<{ intro?: string; result?: string }> }) {
   const [{ teamId, roundId }, query] = await Promise.all([params, searchParams]); const href = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/founder-in-the-wild/${encodeURIComponent(roundId)}`;
-  const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
+  const supabase = await createClient(); const { data: { user } } = await getRequestUser(); if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
   const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) notFound(); const round = await getFounderInTheWildRound(team, roundId, user.id, supabase); if (!round) notFound();
   const [t, rawLocale] = await Promise.all([getTranslations("founderInTheWild.round"), getLocale()]); const locale = normalizeLocale(rawLocale); const partnerName = round.partner.displayName ?? (locale === "de" ? "dein Co-Founder" : "your co-founder");
   const back = <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/founder-in-the-wild`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">{t("back")}</Link>;

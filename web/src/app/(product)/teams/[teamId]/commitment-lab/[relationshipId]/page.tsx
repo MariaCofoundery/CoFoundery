@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import {
@@ -41,7 +41,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   const { teamId, relationshipId } = await params;
   const { result } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/commitment-lab/${relationshipId}`)}`);
   const lab = await getCommitmentLab(teamId, relationshipId, user.id, supabase);
   if (!lab) notFound();

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type Props = {
   searchParams?: Promise<{ view?: string }>;
@@ -12,7 +12,7 @@ export default async function GlobalFounderLibraryPage({ searchParams }: Props) 
   const pathname = "/founder-library";
   const view = (await searchParams)?.view === "updates" ? "updates" : "glossary";
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(pathname)}`);
 
   const roles = await getDashboardRoleViews(user.id);

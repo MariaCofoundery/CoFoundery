@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
 import { FounderSetupDiscussionComposer } from "@/features/teams/FounderSetupDiscussionComposer";
@@ -34,7 +34,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   const catalogItem = getFounderSetupCatalogItem(itemKey);
   if (!catalogItem) notFound();
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup/${itemKey}`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) notFound();

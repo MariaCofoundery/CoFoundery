@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type Props = {
   params: Promise<{ teamId: string }>;
@@ -14,7 +14,7 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
   const { teamId } = await params;
   const view = (await searchParams)?.view === "updates" ? "updates" : "glossary";
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   const pathname = `/teams/${encodeURIComponent(teamId)}/founder-library`;
   if (!user) redirect(`/login?next=${encodeURIComponent(pathname)}`);
 

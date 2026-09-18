@@ -6,7 +6,7 @@ import { canCreateAccountFromPath } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type AuthT = Awaited<ReturnType<typeof getTranslations>>;
 
@@ -39,7 +39,7 @@ export default async function LoginPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   const nextPath = normalizeNextPath(params.next);
   const errorMessage = authErrorMessage(params.error, t);
   // Kein Fehler, sondern eine Bestaetigung: "Ueberall abmelden" fuehrt

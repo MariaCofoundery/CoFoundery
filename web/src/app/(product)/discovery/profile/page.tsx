@@ -53,7 +53,7 @@ import {
   DISCOVERY_START_HORIZONS,
 } from "@/features/discovery/discoveryTypes";
 import { getPersonCore } from "@/features/profile/personCoreData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { normalizeLocale } from "@/i18n/config";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -365,7 +365,7 @@ export default async function DiscoveryProfilePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/profile")}`);

@@ -17,7 +17,7 @@ import {
   resolveWorkbookContentSteps,
 } from "@/features/reporting/workbookContent/workbookContent";
 import { getRequestLocale } from "@/i18n/getLocale";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageSearchParams = {
   invitationId?: string;
@@ -73,7 +73,7 @@ export default async function AdvisorSnapshotPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect("/login");

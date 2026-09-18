@@ -40,7 +40,7 @@ import {
   buildInvitationDashboardHref,
   buildInvitationResumeHref,
 } from "@/features/onboarding/invitationFlow";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { getResearchConsentState } from "@/features/research/consent";
 import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
@@ -113,7 +113,7 @@ export default async function DashboardPage({
   ]);
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect("/login");
@@ -134,6 +134,7 @@ export default async function DashboardPage({
     discoveryProfile,
     assessmentProgressResult,
     researchConsentState,
+    connectCounts,
   ] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
@@ -162,6 +163,9 @@ export default async function DashboardPage({
         .in("module", ["base", "values"])
         .order("created_at", { ascending: false }),
       getResearchConsentState(supabase as unknown as SupabaseClient, user.id),
+      // Haengt von nichts hier ab und lief trotzdem hinterher - eine
+      // Netzwerkrunde extra auf der meistbesuchten Seite.
+      getActiveOwnConnectCounts(supabase, user.id).catch(() => ({ seeking: 0, offering: 0 })),
     ]);
 
   if (!roleViews.hasFounder) {
@@ -169,8 +173,6 @@ export default async function DashboardPage({
     const { data: hasConnect } = await supabase.rpc("is_network_member");
     redirect(hasConnect === true ? "/connect" : "/start");
   }
-  const connectCounts = await getActiveOwnConnectCounts(supabase, user.id).catch(() => ({ seeking: 0, offering: 0 }));
-
   let invitationRows = initialInvitationRows;
   let runsResult = initialRunsResult;
 

@@ -160,7 +160,11 @@ test("search or category filtering clears an open term once it is no longer visi
 
 test("team-scoped route remains server-authorized for founders and fails closed for advisors", () => {
   const page = source("../../../app/(product)/teams/[teamId]/founder-library/page.tsx");
-  assert.match(page, /supabase\.auth\.getUser\(\)/);
+  // GEAENDERT am 18.09.2026: Die Seite fragt weiterhin serverseitig nach der
+  // angemeldeten Person - nur ueber getRequestUser(), das die Antwort fuer die
+  // Dauer einer Anfrage behaelt. Vorher machte diese Seite denselben
+  // Netzwerkgang wie jede andere noch einmal.
+  assert.match(page, /await (getRequestUser\(\)|supabase\.auth\.getUser\(\))/);
   assert.match(page, /getFounderTeamHomebase\(teamId, user\.id, supabase\)/);
   assert.match(page, /if \(!team\) notFound\(\)/);
   assert.doesNotMatch(page, /Advisor|advisor|serviceRole|service_role/);
@@ -212,7 +216,11 @@ test("global Founder Library is founder-authenticated without requiring a team",
   const page = source("../../../app/(product)/founder-library/page.tsx");
   const view = source("../FounderLibraryView.tsx");
   const chrome = source("../../navigation/productChromePath.ts");
-  assert.match(page, /supabase\.auth\.getUser\(\)/);
+  // GEAENDERT am 18.09.2026: Die Seite fragt weiterhin serverseitig nach der
+  // angemeldeten Person - nur ueber getRequestUser(), das die Antwort fuer die
+  // Dauer einer Anfrage behaelt. Vorher machte diese Seite denselben
+  // Netzwerkgang wie jede andere noch einmal.
+  assert.match(page, /await (getRequestUser\(\)|supabase\.auth\.getUser\(\))/);
   assert.match(page, /getDashboardRoleViews\(user\.id\)/);
   assert.match(page, /if \(!roles\.hasFounder\)/);
   assert.match(page, /\?\.view === "updates" \? "updates" : "glossary"/);

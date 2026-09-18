@@ -13,7 +13,7 @@ import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type WelcomeSearchParams = {
   invitationId?: string;
@@ -134,7 +134,7 @@ export default async function JoinWelcomePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   logInviteFlowDebug("join/welcome:request", {
     invitationId,
     tokenPresent: Boolean(token),

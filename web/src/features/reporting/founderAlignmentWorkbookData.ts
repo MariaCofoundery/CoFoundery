@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import { getFounderScoringDebug } from "@/features/scoring/founderScoringDebug";
 import {
@@ -564,7 +564,7 @@ export async function getFounderAlignmentWorkbookPageData(
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   const normalizedInvitationId = invitationId?.trim() ?? "";
   const advisorContext = options.advisorContext === true;
 

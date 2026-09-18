@@ -26,7 +26,7 @@ import {
 import type { DiscoveryFounderRole, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -303,7 +303,7 @@ export default async function DiscoveryProfileDetailPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent(`/discovery/${profileId}`)}`);

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PublicConnectShell } from "@/features/connect/PublicConnectShell";
 import { getPublicConnectProblem } from "@/features/connect/publicConnectData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
 export const dynamic = "force-dynamic";
@@ -47,7 +47,7 @@ export default async function PublicConnectProblemPage({
   const [t, problem, auth] = await Promise.all([
     getTranslations("connect"),
     getPublicConnectProblem(client, publicSlug).catch(() => null),
-    client.auth.getUser(),
+    getRequestUser(),
   ]);
   if (!problem) notFound();
 

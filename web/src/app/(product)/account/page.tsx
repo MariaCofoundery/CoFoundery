@@ -14,7 +14,7 @@ import { getResearchConsentState } from "@/features/research/consent";
 import { normalizeLocale, type AppLocale } from "@/i18n/config";
 import { DeleteAccountSection } from "@/features/account/DeleteAccountSection";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function AccountPage({
   searchParams,
@@ -24,7 +24,7 @@ export default async function AccountPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) redirect("/login?next=/account");
 

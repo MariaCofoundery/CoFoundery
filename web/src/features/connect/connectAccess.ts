@@ -1,10 +1,10 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export async function requireConnectMember(next = "/connect") {
   const client = await createClient();
-  const { data: { user } } = await client.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
   const { data: eligible } = await client.rpc("is_network_member");
   if (eligible !== true) {

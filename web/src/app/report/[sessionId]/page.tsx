@@ -27,7 +27,7 @@ import { getLegacyReportAccessState } from "@/features/reporting/reportAccess";
 import { buildWorkbookIntroHref } from "@/features/reporting/workbookNavigation";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
@@ -65,7 +65,7 @@ export default async function ReportPage({ params }: PageProps) {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     redirect(`/login?next=/report/${sessionId}`);

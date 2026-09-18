@@ -32,7 +32,7 @@ import {
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const field =
   "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
@@ -55,7 +55,7 @@ export default async function ProfilePage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
   const [t, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople] = await Promise.all([

@@ -26,7 +26,7 @@ import {
 } from "@/features/discovery/discoveryTypes";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD_CLASS =
@@ -143,7 +143,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   const requestedPage = parsePage(searchParamValue(resolvedSearchParams.page));
   const mode = searchParamValue(resolvedSearchParams.mode) === "search" ? "search" : "explore";
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getRequestUser();
   if (!user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery")}`);
   }

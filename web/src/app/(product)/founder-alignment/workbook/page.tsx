@@ -16,7 +16,7 @@ import {
 } from "@/features/reporting/workbookNavigation";
 import { isWorkbookDeepDivePilotStep } from "@/features/reporting/workbookDeepDivePilot";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageSearchParams = {
   invitationId?: string;
@@ -75,7 +75,7 @@ export default async function FounderAlignmentWorkbookPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   if (!user) {
     const nextPath = requestedDeepDiveStep

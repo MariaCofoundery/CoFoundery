@@ -13,7 +13,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getMessages } from "@/i18n/messages";
 import { DEFAULT_PUBLIC_APP_ORIGIN, getPublicAppOrigin } from "@/lib/publicAppOrigin";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const spectral = localFont({
   src: [
@@ -48,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
 
   const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
     ? await Promise.all([

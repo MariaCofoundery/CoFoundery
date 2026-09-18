@@ -11,7 +11,7 @@ import {
 } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
  * Die Anmeldung fragt nur noch nach E-Mail und Code.
@@ -93,7 +93,7 @@ export default async function StartPage({
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getRequestUser();
   const nextPath = normalizeNextPath(params.next);
   const message = statusMessage(params.status, t);
 
