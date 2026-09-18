@@ -690,5 +690,11 @@
   "linkedin": {
     "linkLabel": "View LinkedIn profile",
     "openHint": "Opens LinkedIn in a new window"
+  },
+  "mine": {
+    "label": "My area",
+    "profile": "My profile",
+    "listings": "My listings",
+    "ventures": "My ventures"
   }
 }

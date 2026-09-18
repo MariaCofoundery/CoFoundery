@@ -690,5 +690,11 @@
   "linkedin": {
     "linkLabel": "LinkedIn-Profil ansehen",
     "openHint": "Öffnet LinkedIn in einem neuen Fenster"
+  },
+  "mine": {
+    "label": "Mein Bereich",
+    "profile": "Mein Profil",
+    "listings": "Meine Einträge",
+    "ventures": "Meine Unternehmen"
   }
 }

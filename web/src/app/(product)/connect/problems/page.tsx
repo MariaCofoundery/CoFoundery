@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
+import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
@@ -44,8 +45,13 @@ export default async function ConnectProblemsPage({
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">{t("problems.title")}</h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("problems.text")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">{t("problems.title")}</h1>
+          <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("problems.text")}</p>
+        </div>
+        <ConnectMineNav />
+      </div>
 
       {/* Dieselbe Reiterleiste wie auf den anderen beiden Seiten: Drei
           Adressen, eine Flaeche. Der frueher hier stehende Zurueck-Link ist

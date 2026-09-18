@@ -10,6 +10,7 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
 import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
+import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
@@ -49,7 +50,13 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
             <h1 className="text-4xl font-semibold tracking-[-.04em]">{t("title")}</h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("subtitle")}</p>
           </div>
-          {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
+          {/* Rechts oben steht, was einem selbst gehoert. Aus Connect fuehrte
+              vorher kein Weg dorthin - man sah ausschliesslich das, was andere
+              gemacht haben. */}
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
+            <ConnectMineNav />
+          </div>
         </div>
       </header>
 

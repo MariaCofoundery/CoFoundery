@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectPeople, getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import {
@@ -44,9 +45,12 @@ export default async function ConnectPeoplePage({
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
       <div className="mx-auto max-w-6xl space-y-5">
-        <header>
-          <h1 className="text-3xl font-semibold tracking-[-.03em]">{t("people.title")}</h1>
-          <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("people.text")}</p>
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-[-.03em]">{t("people.title")}</h1>
+            <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("people.text")}</p>
+          </div>
+          <ConnectMineNav />
         </header>
 
         <ConnectTabs active="people" counts={counts} />
