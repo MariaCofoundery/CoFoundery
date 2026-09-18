@@ -288,7 +288,6 @@
       "enable": "Alignment für meine Suche nutzen",
       "choose": "Was ist dir bei einem Co-Founder besonders wichtig?",
       "chooseHelp": "Wähle bis zu drei Bereiche. Die Hinweise sind keine harten Filter und verändern weder Reihenfolge noch Sichtbarkeit der Profile.",
-      "priorityCount": "{count} von maximal 3 Bereichen priorisiert",
       "unavailable": "Fülle zuerst das Founder Alignment aus. Deine Suche funktioniert auch ohne Alignment-Signale vollständig.",
       "transparency": "Deine Auswahl bleibt privat. Ein Hinweis entsteht nur bei beidseitiger Freigabe und ausreichenden Angaben.",
       "disclaimer": "Diese Hinweise beschreiben Ähnlichkeiten und Unterschiede in euren angegebenen Präferenzen. Sie sagen nicht voraus, ob ihr gut zusammenarbeitet oder erfolgreich gründet.",
@@ -296,7 +295,12 @@
         "label": "Bedeutung für deine Suche",
         "not_prioritized": "Nicht priorisiert",
         "important": "Für dich wichtig",
-        "very_important": "Für dich besonders wichtig"
+        "very_important": "Für dich besonders wichtig",
+        "short": {
+          "important": "Wichtig",
+          "very_important": "Besonders wichtig"
+        },
+        "formLabel": "Wie wichtig ist dir das?"
       },
       "relation": {
         "label": "Welche Richtung wünschst du dir?",
@@ -354,7 +358,14 @@
         "commitment": "Commitment",
         "risk_orientation": "Risikoorientierung",
         "conflict_style": "Konfliktstil"
-      }
+      },
+      "yourChoice": "Deine Auswahl",
+      "yourChoiceCount": "{count} von 3",
+      "emptyChoice": "Noch nichts ausgewählt. Such dir unten bis zu drei Bereiche aus, die dir bei einem Co-Founder besonders wichtig sind.",
+      "more": "Weitere Bereiche",
+      "add": "Auswählen",
+      "remove": "Entfernen",
+      "full": "Drei sind ausgewählt – das ist das Maximum. Entferne einen, wenn du einen anderen aufnehmen willst."
     },
     "results": {
       "eyebrow": "Ergebnisse",

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { normalizeDiscoveryAlignmentPreferences } from "@/features/discovery/discoveryV2Alignment";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
@@ -572,6 +573,57 @@ test("switching alignment off does not forget the chosen dimensions", () => {
     actions,
     /discoveryV2AlignmentPreferences: enabled\s*\n\s*\? parseDiscoveryV2AlignmentPreferences\(formData\)\s*\n\s*: existing\?\.discoveryV2AlignmentPreferences \?\? \{\}/
   );
+});
+
+test("die ausgewaehlten Bereiche stehen oben, die uebrigen darunter", () => {
+  const editor = codeOnly(ALIGNMENT_EDITOR);
+
+  // Maria am 18.09.2026: "Ich musste kurz ueberlegen, was ich hier eigentlich
+  // sehe." Vorher blieben die gewaehlten Dimensionen an ihrem Platz zwischen
+  // den uebrigen - man musste die Liste absuchen, um die eigene Auswahl
+  // wiederzufinden.
+  assert.match(editor, /const chosen = DISCOVERY_ALIGNMENT_DIMENSIONS\.filter\(\(dimension\) => preferences\[dimension\]\)/);
+  assert.match(editor, /const remaining = DISCOVERY_ALIGNMENT_DIMENSIONS\.filter\(\(dimension\) => !preferences\[dimension\]\)/);
+
+  // Und zwar in dieser Reihenfolge im Baum, nicht nur als zwei Variablen.
+  assert.ok(
+    editor.indexOf("chosen.map(") < editor.indexOf("remaining.map("),
+    "die uebrigen stehen vor der eigenen Auswahl"
+  );
+
+  for (const locale of ["de", "en"]) {
+    const alignment = (readJson(`messages/${locale}/discovery.json`) as {
+      v2: { alignment: Record<string, string> };
+    }).v2.alignment;
+    for (const key of ["yourChoice", "yourChoiceCount", "emptyChoice", "more", "add", "remove", "full"]) {
+      assert.ok(alignment[key], `${locale}: v2.alignment.${key} fehlt`);
+    }
+  }
+});
+
+test("nicht ausgewaehlte Bereiche schicken gar kein Feld mehr mit", () => {
+  // Der Umbau nimmt den uebrigen Dimensionen ihr Auswahlfeld. Ohne Feld kommt
+  // beim Speichern ein leerer Wert an - die Normalisierung muss ihn als
+  // "nicht priorisiert" behandeln und nicht als kaputten Eintrag.
+  const normalized = normalizeDiscoveryAlignmentPreferences({
+    conflict_style: { importance: "very_important", relationPreference: "prefer_similar" },
+    company_logic: { importance: "", relationPreference: "" },
+    decision_logic: { importance: "not_prioritized", relationPreference: "" },
+  });
+
+  assert.deepEqual(Object.keys(normalized), ["conflict_style"]);
+  assert.equal(normalized.conflict_style?.importance, "very_important");
+});
+
+test("auswaehlen setzt die Abstufung, verlangt sie aber nicht", () => {
+  const editor = codeOnly(ALIGNMENT_EDITOR);
+  // Ein Klick auf "Auswaehlen" soll reichen. Die Abstufung ist eine zweite,
+  // feinere Frage - vorher musste man sie im selben Moment beantworten, weil
+  // das Auswaehlen selbst ein Eintrag im Auswahlfeld war.
+  assert.match(editor, /\[dimension\]: \{ importance: "important", relationPreference: "no_direction_preference" \}/);
+  // Und die Obergrenze steht an einer Stelle, nicht an dreien.
+  assert.match(editor, /const isFull = chosen\.length >= 3/);
+  assert.match(editor, /disabled=\{isFull\}/);
 });
 
 // ---------------------------------------------------------------------------

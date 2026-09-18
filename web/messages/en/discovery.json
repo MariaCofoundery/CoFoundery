@@ -288,7 +288,6 @@
       "enable": "Use Alignment for my search",
       "choose": "What matters most to you in a co-founder?",
       "chooseHelp": "Choose up to three areas. These cues are not hard filters and do not affect profile order or visibility.",
-      "priorityCount": "{count} of up to 3 areas prioritized",
       "unavailable": "Complete Founder Alignment first. Your search works fully without Alignment signals.",
       "transparency": "Your selection stays private. A cue is only produced with bilateral sharing and sufficient responses.",
       "disclaimer": "These cues describe similarities and differences in your stated preferences. They do not predict whether you will work well together or build a successful company.",
@@ -296,7 +295,12 @@
         "label": "Importance for your search",
         "not_prioritized": "Not prioritized",
         "important": "Important to you",
-        "very_important": "Especially important to you"
+        "very_important": "Especially important to you",
+        "short": {
+          "important": "Important",
+          "very_important": "Especially important"
+        },
+        "formLabel": "How much does this matter to you?"
       },
       "relation": {
         "label": "What direction do you prefer?",
@@ -354,7 +358,14 @@
         "commitment": "Commitment",
         "risk_orientation": "Risk orientation",
         "conflict_style": "Conflict style"
-      }
+      },
+      "yourChoice": "Your selection",
+      "yourChoiceCount": "{count} of 3",
+      "emptyChoice": "Nothing selected yet. Pick up to three areas below that matter most to you in a co-founder.",
+      "more": "Other areas",
+      "add": "Select",
+      "remove": "Remove",
+      "full": "Three are selected – that's the maximum. Remove one if you'd like to add another."
     },
     "results": {
       "eyebrow": "Results",
