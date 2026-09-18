@@ -328,7 +328,8 @@
     "reachHeading": "Knows people from",
     "openToHeading": "Open to",
     "contactNoteHeading": "How to reach them",
-    "membersOnlyNote": "These three entries are only visible to signed-in members – they do not appear on your public page."
+    "membersOnlyNote": "These three entries are only visible to signed-in members – they do not appear on your public page.",
+    "reachNoNames": "Please no names: this is about what kind of people you know, not which ones. They have not agreed to appear here."
   },
   "safety": {
     "block": "Block",

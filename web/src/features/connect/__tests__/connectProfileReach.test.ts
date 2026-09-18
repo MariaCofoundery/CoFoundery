@@ -83,3 +83,20 @@ test("they are shown where the decision to write is made", () => {
     assert.match(listing, new RegExp(`profile\\.${field}`), `${field} fehlt an der Anzeige`);
   }
 });
+
+test("the reach field asks for kinds of people, not names", () => {
+  const page = source("src/app/(product)/connect/profile/page.tsx");
+  assert.match(page, /profile\.reachNoNames/);
+  // Abgesetzt dargestellt: Es ist keine Stilbitte, sondern eine Frage der
+  // Rechte Dritter - wer hier Namen nennt, traegt Angaben ueber Menschen ein,
+  // die davon nichts wissen.
+  assert.match(page, /reachNoNames[\s\S]{0,80}|bg-amber-50[\s\S]{0,120}reachNoNames/);
+
+  for (const locale of ["de", "en"]) {
+    const profile = readJson(`messages/${locale}/connect.json`).profile as Record<string, string>;
+    assert.equal(typeof profile.reachNoNames, "string", `${locale}: Hinweis fehlt`);
+  }
+  const de = (readJson("messages/de/connect.json").profile as Record<string, string>).reachNoNames;
+  assert.match(de, /keine Namen/);
+  assert.match(de, /nicht zugestimmt/, "der Grund gehoert dazu, nicht nur das Verbot");
+});

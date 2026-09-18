@@ -328,7 +328,8 @@
     "reachHeading": "Kennt Menschen aus",
     "openToHeading": "Ansprechbar für",
     "contactNoteHeading": "So erreichst du sie am besten",
-    "membersOnlyNote": "Diese drei Angaben sehen nur eingeloggte Mitglieder – auf deiner öffentlichen Seite stehen sie nicht."
+    "membersOnlyNote": "Diese drei Angaben sehen nur eingeloggte Mitglieder – auf deiner öffentlichen Seite stehen sie nicht.",
+    "reachNoNames": "Bitte keine Namen: Es geht darum, was für Menschen du kennst, nicht wen konkret. Die Genannten haben dem Eintrag hier nicht zugestimmt."
   },
   "safety": {
     "block": "Blockieren",

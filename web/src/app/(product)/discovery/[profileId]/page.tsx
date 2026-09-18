@@ -432,7 +432,10 @@ export default async function DiscoveryProfileDetailPage({
 
         <IntroPageMessage message={introMessage} ok={introFeedback?.ok ?? false} />
 
-        {isOwner ? null : (
+        {/* Oben steht nur, was eine Information ist: dass eine Anfrage laeuft,
+            angenommen oder abgelehnt wurde. Die FRAGE "moechtest du diese
+            Person kennenlernen" steht unten - erst lesen, dann entscheiden. */}
+        {isOwner || !introRequest ? null : (
           <IntroRequestCard
             profile={profile}
             introRequest={introRequest}
@@ -558,6 +561,16 @@ export default async function DiscoveryProfileDetailPage({
             ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
           }}
         />
+
+        {/* Die Frage am Ende: Vorher stand sie direkt unter dem Kopf und
+            fragte nach einer Entscheidung, bevor irgendetwas gelesen war. */}
+        {isOwner || introRequest ? null : (
+          <IntroRequestCard
+            profile={profile}
+            introRequest={introRequest}
+            t={t}
+          />
+        )}
 
         <section className="rounded-3xl border border-slate-200 bg-white/80 p-5">
           <p className="text-sm leading-6 text-slate-600">

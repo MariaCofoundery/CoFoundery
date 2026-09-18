@@ -93,6 +93,12 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           placeholder={t("profile.reachPlaceholder")}
         />
         <span className={hint}>{t("profile.reachHint")}</span>
+        {/* Abgesetzt, weil es keine Bitte um Stil ist, sondern um die Rechte
+            Dritter: Wer hier Namen nennt, traegt Angaben ueber Menschen ein,
+            die davon nichts wissen. */}
+        <span className="mt-2 block rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+          {t("profile.reachNoNames")}
+        </span>
       </label>
 
       <fieldset>

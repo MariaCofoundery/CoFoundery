@@ -659,3 +659,22 @@ test("the last step is read on the profile, never scanned on a card", () => {
   assert.doesNotMatch(searchRowType, /recent_step/);
   assert.match(codeOnly("src/features/discovery/discoveryData.ts"), /recentStep: null,/);
 });
+
+// ---------------------------------------------------------------------------
+// Erst lesen, dann entscheiden
+// ---------------------------------------------------------------------------
+test("the question comes after the profile, the status before it", () => {
+  const page = source("src/app/(product)/discovery/[profileId]/page.tsx");
+
+  // Die FRAGE "moechtest du diese Person kennenlernen" stand direkt unter dem
+  // Kopf und verlangte eine Entscheidung, bevor irgendetwas gelesen war.
+  const question = page.indexOf("isOwner || introRequest ? null : (");
+  const content = page.indexOf("detail.sections.interests.eyebrow");
+  assert.ok(question > -1 && content > -1);
+  assert.ok(question > content, "die Frage steht hinter dem Inhalt");
+
+  // Ein laufender oder beantworteter Stand ist dagegen eine Information und
+  // bleibt oben.
+  const status = page.indexOf("isOwner || !introRequest ? null : (");
+  assert.ok(status > -1 && status < content, "der Stand bleibt vor dem Inhalt");
+});
