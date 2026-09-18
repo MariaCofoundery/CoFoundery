@@ -29,6 +29,8 @@ import {
   getIdentityGaps,
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
+import { LinkedInField } from "@/features/profile/LinkedInField";
+import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
@@ -43,7 +45,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
-const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles"];
+const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles", "linkedin"];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
@@ -375,6 +377,49 @@ export default async function ProfilePage({
               <span className={hint}>{t("identity.industriesHint", { max: 5 })}</span>
             </label>
           </div>
+
+          {/* Das LinkedIn-Profil steht hier und nicht in einem eigenen
+              Bereich: Es ist dieselbe Art Angabe wie Name und Headline - eine
+              Eigenschaft des Menschen, nicht eines Produktbereichs. Deshalb
+              wird sie einmal eingetragen und gilt ueberall.
+
+              Die Texte werden hier aufgeloest, weil LinkedInField eine
+              Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
+              nicht als Prop ueber die Grenze reichen - das hat in dieser
+              Codebasis schon zweimal die Produktion lahmgelegt. */}
+          <LinkedInField
+            initialUrl={core?.linkedin_url ?? ""}
+            initialVisibility={
+              isLinkedInVisibility(core?.linkedin_visibility) ? core.linkedin_visibility : "private"
+            }
+            copy={{
+              title: t("identity.linkedin.title"),
+              urlLabel: t("identity.linkedin.urlLabel"),
+              urlPlaceholder: t("identity.linkedin.urlPlaceholder"),
+              urlHint: t("identity.linkedin.urlHint"),
+              visibilityTitle: t("identity.linkedin.visibilityTitle"),
+              options: {
+                private: {
+                  label: t("identity.linkedin.options.private.label"),
+                  hint: t("identity.linkedin.options.private.hint"),
+                },
+                contacts: {
+                  label: t("identity.linkedin.options.contacts.label"),
+                  hint: t("identity.linkedin.options.contacts.hint"),
+                },
+                members: {
+                  label: t("identity.linkedin.options.members.label"),
+                  hint: t("identity.linkedin.options.members.hint"),
+                },
+                public: {
+                  label: t("identity.linkedin.options.public.label"),
+                  hint: t("identity.linkedin.options.public.hint"),
+                },
+              },
+              publicWarning: t("identity.linkedin.publicWarning"),
+              publicConfirm: t("identity.linkedin.publicConfirm"),
+            }}
+          />
           {/* Rollen sind eine Navigationsangabe, keine Berechtigung: Wer
               "Advisor" anhakt, sieht das Advisor-Dashboard - was darauf steht,
               entscheidet weiterhin RLS ueber advisor_user_id. Deshalb darf das

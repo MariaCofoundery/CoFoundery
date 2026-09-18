@@ -8,6 +8,8 @@ import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { ConnectSafetyActions } from "@/features/connect/ConnectSafetyActions";
 import { unblockConnectUserAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
+import { getMemberLinkedInUrls } from "@/features/profile/linkedInData";
+import { LinkedInLink } from "@/features/profile/LinkedInLink";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_CONTACT_KEYS, CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
 
@@ -35,7 +37,7 @@ function ContactCard({ request, direction, t, locale, profile, blockState }: { r
   </article>;
 }
 
-function AcceptedContactCard({ conversation, t, locale, profile, blockState }: { conversation: ConnectConversation; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState }) {
+function AcceptedContactCard({ conversation, t, locale, profile, blockState, linkedInUrl }: { conversation: ConnectConversation; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState; linkedInUrl?: string }) {
   // Kein Name mehr heisst: Die Person ist gegangen. Kein geratener Name, kein
   // leeres Feld - ein Zustand, der sich benennen laesst.
   const counterpartName = conversation.counterpart_display_name ?? t("messages.formerMember");
@@ -49,6 +51,12 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState }: {
         </div>
         <p className="mt-2 text-sm font-semibold text-violet-800">{conversation.listing_title}</p>
         {conversation.last_message_at ? <p className="mt-2 text-xs text-slate-500">{t("messages.lastMessage", { date: new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(conversation.last_message_at)) })}</p> : <p className="mt-2 text-xs text-slate-500">{t("messages.noMessages")}</p>}
+        {/* Nur hier, bei den angenommenen Kontakten: Die Stufe "Menschen, mit
+            denen du verbunden bist" zahlt sich genau an dieser Stelle aus.
+            Wessen Adresse fehlt, hat sie nicht hinterlegt oder nicht fuer
+            diesen Kreis freigegeben - beides sieht gleich aus, und das ist
+            richtig so. */}
+        {linkedInUrl ? <LinkedInLink url={linkedInUrl} label={t("linkedin.linkLabel")} hint={t("linkedin.openHint")} /> : null}
       </div>
       <Link href={`/connect/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
     </div>
@@ -70,9 +78,10 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     ...conversations.map((conversation) => conversation.counterpart_user_id),
   ])];
   const knownCounterpartIds = counterpartIds.filter((id): id is string => id !== null);
-  const [profiles, stateRows] = await Promise.all([
+  const [profiles, stateRows, linkedInUrls] = await Promise.all([
     getConnectProfilesByUserIds(client, knownCounterpartIds),
     Promise.all(knownCounterpartIds.map(async (id) => [id, await getConnectBlockState(client, id)] as const)),
+    getMemberLinkedInUrls(client, knownCounterpartIds),
   ]);
   const states = new Map(stateRows);
   const stateFor = (id: string) => states.get(id) ?? { interaction_blocked: true, blocked_by_current_user: false };
@@ -86,7 +95,7 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
     <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
-    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
+    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} linkedInUrl={conversation.counterpart_user_id ? linkedInUrls.get(conversation.counterpart_user_id) : undefined} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
     {blocks.length ? <section className="mt-10"><h2 className="text-xl font-semibold">{t("safety.blockedPeople")}</h2><div className="mt-3 space-y-2">{blocks.map((block) => <div key={block.blocked_user_id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-medium">{block.display_name}</p><form action={unblockConnectUserAction}><input type="hidden" name="other_user_id" value={block.blocked_user_id} /><input type="hidden" name="return_to" value="/connect/contacts" /><ConnectSubmitButton label={t("safety.unblock")} pendingLabel={t("safety.unblocking")} className="min-h-11 text-sm font-semibold underline" /></form></div>)}</div></section> : null}
   </main>;
 }

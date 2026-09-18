@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { parseIdentityReturnPath } from "@/features/profile/identityReadiness";
+import {
+  isLinkedInVisibility,
+  parseLinkedInUrl,
+  type LinkedInVisibility,
+} from "@/features/profile/linkedInVisibility";
 import { createClient } from "@/lib/supabase/server";
 
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"];
@@ -46,6 +51,24 @@ export async function saveIdentityAction(formData: FormData) {
   if (!user) redirect("/login?next=/profile");
 
   const remoteMode = String(formData.get("remote_mode") ?? "").trim();
+
+  // Eine unbrauchbare Adresse wird zurueckgewiesen und nicht stillschweigend
+  // geleert: Wer sich vertippt, soll das erfahren und nicht spaeter feststellen,
+  // dass sein Profil leer ist.
+  const linkedin = parseLinkedInUrl(formData.get("linkedin_url"));
+  const rawVisibility = formData.get("linkedin_visibility");
+  const linkedinVisibility: LinkedInVisibility = isLinkedInVisibility(rawVisibility)
+    ? rawVisibility
+    : "private";
+  // "Oeffentlich" ohne gesetztes Haekchen heisst: Die Bestaetigung, die die
+  // Folge erklaert, wurde nicht gegeben. Dann wird die Adresse gespeichert,
+  // aber eine Stufe darunter - sichtbar fuer Mitglieder, nicht fuer
+  // Suchmaschinen. Die Wahl zu unterstellen waere das Gegenteil von
+  // Einwilligung; die Eingabe wegzuwerfen waere unnoetig grob.
+  //
+  // Beim erneuten Speichern eines bereits oeffentlichen Profils fragt die
+  // Oberflaeche nicht noch einmal und schickt das Haekchen mit.
+  const confirmedPublic = formData.get("confirm_public_linkedin") === "yes";
   // Wohin es danach zurueckgeht, wenn jemand von Connect oder Discovery
   // hierher geschickt wurde. Ohne diesen Rueckweg endet der Weg zur
   // Identitaet in einer Sackgasse: Die Kontextseite schickt einen hierher,
@@ -53,6 +76,20 @@ export async function saveIdentityAction(formData: FormData) {
   const returnPath = parseIdentityReturnPath(formData.get("next"));
   const back = (query: string) =>
     `/profile?${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+
+  if (!linkedin.ok) {
+    redirect(back("error=linkedin"));
+  }
+
+  // Ohne Adresse ergibt keine Stufe einen Sinn. Sie faellt dann auf die engste
+  // zurueck, damit ein spaeter nachgetragener Link nicht sofort unter einer
+  // alten Entscheidung sichtbar wird.
+  const effectiveVisibility: LinkedInVisibility =
+    linkedin.url === null
+      ? "private"
+      : linkedinVisibility === "public" && !confirmedPublic
+        ? "members"
+        : linkedinVisibility;
 
   const { error, count } = await client
     .from("person_core")
@@ -65,6 +102,8 @@ export async function saveIdentityAction(formData: FormData) {
         remote_mode: REMOTE_MODES.includes(remoteMode) ? remoteMode : null,
         expertise: parseList(formData.get("expertise"), 8),
         industries: parseList(formData.get("industries"), 5),
+        linkedin_url: linkedin.url,
+        linkedin_visibility: effectiveVisibility,
         // Ein Bild, eine Entscheidung: Sie gilt ueberall, wo eingeloggte
         // Mitglieder einander sehen. Connect hat seine eigene, weil dort
         // oeffentliche Seiten haengen.

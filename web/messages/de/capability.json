@@ -38,7 +38,36 @@
       "discovery": "Zurück zum Suchprofil"
     },
     "photoVisibleLabel": "Mein Bild für eingeloggte Mitglieder sichtbar machen",
-    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort hängen öffentliche Seiten dran, deshalb entscheidest du das Bild dort getrennt."
+    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort hängen öffentliche Seiten dran, deshalb entscheidest du das Bild dort getrennt.",
+    "linkedin": {
+      "title": "LinkedIn",
+      "urlLabel": "Dein LinkedIn-Profil",
+      "urlPlaceholder": "linkedin.com/in/dein-name",
+      "urlHint": "Die Adresse deines Profils. Du kannst sie direkt aus der Adresszeile kopieren – „https://“ ergänzen wir. Es geht nur LinkedIn, keine anderen Adressen.",
+      "visibilityTitle": "Wer soll dein LinkedIn-Profil sehen?",
+      "options": {
+        "private": {
+          "label": "Niemand außer dir",
+          "hint": "Die Adresse ist gespeichert, aber nirgends zu sehen. Gut, wenn du sie hinterlegen willst und später entscheidest."
+        },
+        "contacts": {
+          "label": "Menschen, mit denen du verbunden bist",
+          "hint": "Nur wer eine Kontaktanfrage mit dir angenommen hat – also jemand, mit dem du ohnehin schon im Gespräch bist."
+        },
+        "members": {
+          "label": "Alle bei CoFoundery Angemeldeten",
+          "hint": "Jede Person, die hier ein Konto hat und eingeloggt ist. Nicht im offenen Netz, aber auch nicht nur dein engster Kreis."
+        },
+        "public": {
+          "label": "Auch außerhalb von CoFoundery",
+          "hint": "Auf deiner öffentlichen Netzwerkseite, die man ohne Konto aufrufen kann."
+        }
+      },
+      "publicWarning": "Diese Seite kann jede Person im Internet aufrufen, und Suchmaschinen lesen sie mit. Dein LinkedIn-Profil wäre damit über deinen Namen auffindbar.",
+      "publicConfirm": "Ja, mein LinkedIn-Profil darf auf meiner öffentlichen Seite stehen.",
+      "openHint": "Öffnet LinkedIn in einem neuen Fenster",
+      "linkLabel": "LinkedIn-Profil ansehen"
+    }
   },
   "steps": {
     "evidence": "Ein Beispiel",
@@ -261,7 +290,8 @@
     "area": "Bitte wähle einen Bereich aus.",
     "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal.",
     "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf.",
-    "roles": "Mindestens eine Rolle muss gesetzt bleiben. Ohne Rolle hätte die Plattform keinen Bereich, in den sie dich führen kann."
+    "roles": "Mindestens eine Rolle muss gesetzt bleiben. Ohne Rolle hätte die Plattform keinen Bereich, in den sie dich führen kann.",
+    "linkedin": "Diese Adresse können wir nicht als LinkedIn-Profil erkennen. Sie muss zu linkedin.com führen – gespeichert haben wir sie deshalb nicht."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",

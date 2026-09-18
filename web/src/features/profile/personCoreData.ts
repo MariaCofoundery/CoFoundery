@@ -23,10 +23,13 @@ export type PersonCore = {
   industries: string[] | null;
   /** Ob das Bild fuer andere eingeloggte Mitglieder sichtbar ist. */
   photo_visible_to_members: boolean;
+  /** Das LinkedIn-Profil. Wer es sieht, steht in linkedin_visibility. */
+  linkedin_url: string | null;
+  linkedin_visibility: string;
 };
 
 const PERSON_CORE_COLUMNS =
-  "display_name,headline,bio,location_region,remote_mode,expertise,industries,photo_visible_to_members";
+  "display_name,headline,bio,location_region,remote_mode,expertise,industries,photo_visible_to_members,linkedin_url,linkedin_visibility";
 
 export async function getPersonCore(client: SupabaseClient, userId: string) {
   const { data, error } = await client

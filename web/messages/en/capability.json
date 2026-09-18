@@ -38,7 +38,36 @@
       "discovery": "Back to the search profile"
     },
     "photoVisibleLabel": "Make my photo visible to signed-in members",
-    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: public pages hang off that, so you decide the photo there separately."
+    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: public pages hang off that, so you decide the photo there separately.",
+    "linkedin": {
+      "title": "LinkedIn",
+      "urlLabel": "Your LinkedIn profile",
+      "urlPlaceholder": "linkedin.com/in/your-name",
+      "urlHint": "The address of your profile. You can paste it straight from the address bar – we'll add the “https://”. LinkedIn only, no other addresses.",
+      "visibilityTitle": "Who should see your LinkedIn profile?",
+      "options": {
+        "private": {
+          "label": "Nobody but you",
+          "hint": "The address is saved but shown nowhere. Useful if you want it on file and decide later."
+        },
+        "contacts": {
+          "label": "People you are connected to",
+          "hint": "Only those who accepted a contact request with you – people you are already talking to anyway."
+        },
+        "members": {
+          "label": "Everyone signed in to CoFoundery",
+          "hint": "Anyone with an account here who is logged in. Not out on the open web, but not just your closest circle either."
+        },
+        "public": {
+          "label": "Outside CoFoundery too",
+          "hint": "On your public network page, which anyone can open without an account."
+        }
+      },
+      "publicWarning": "Anyone on the internet can open that page, and search engines read it. Your LinkedIn profile would become findable under your name.",
+      "publicConfirm": "Yes, my LinkedIn profile may appear on my public page.",
+      "openHint": "Opens LinkedIn in a new window",
+      "linkLabel": "View LinkedIn profile"
+    }
   },
   "steps": {
     "evidence": "One example",
@@ -261,7 +290,8 @@
     "area": "Please choose an area.",
     "save": "That could not be saved just now. Please try again.",
     "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first.",
-    "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to."
+    "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to.",
+    "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",

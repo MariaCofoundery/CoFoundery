@@ -686,5 +686,9 @@
   },
   "browse": {
     "title": "See what's there"
+  },
+  "linkedin": {
+    "linkLabel": "View LinkedIn profile",
+    "openHint": "Opens LinkedIn in a new window"
   }
 }
