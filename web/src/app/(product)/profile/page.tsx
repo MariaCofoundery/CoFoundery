@@ -29,6 +29,9 @@ import {
   getIdentityGaps,
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
+import { ANALYZED_AREA_IDS } from "@/features/capability/narrativeAnalysis";
+import { CvImportField } from "@/features/profile/CvImportField";
+import { CV_INDUSTRY_KEYS } from "@/features/profile/cvIndustries";
 import { LinkedInField } from "@/features/profile/LinkedInField";
 import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
 import { getPersonCore } from "@/features/profile/personCoreData";
@@ -377,6 +380,41 @@ export default async function ProfilePage({
               <span className={hint}>{t("identity.industriesHint", { max: 5 })}</span>
             </label>
           </div>
+
+          {/* Direkt unter den beiden Feldern, die es fuellt - und eingeklappt,
+              weil es eine Abkuerzung ist und kein Schritt. Wer die Felder
+              lieber selbst ausfuellt, soll nicht daran vorbei muessen.
+
+              Die Beschriftungen werden hier aufgeloest, weil CvImportField
+              eine Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
+              nicht ueber die Grenze reichen. */}
+          <CvImportField
+            expertiseLabels={Object.fromEntries(
+              ANALYZED_AREA_IDS.map((areaId) => [areaId, t(`areaLabels.${areaId}`)])
+            )}
+            industryLabels={Object.fromEntries(
+              CV_INDUSTRY_KEYS.map((key) => [key, t(`industryLabels.${key}`)])
+            )}
+            copy={{
+              title: t("identity.cv.title"),
+              text: t("identity.cv.text"),
+              privacyNote: t("identity.cv.privacyNote"),
+              textareaLabel: t("identity.cv.textareaLabel"),
+              placeholder: t("identity.cv.placeholder"),
+              fileLabel: t("identity.cv.fileLabel"),
+              analyze: t("identity.cv.analyze"),
+              tooShort: t("identity.cv.tooShort"),
+              nothingFound: t("identity.cv.nothingFound"),
+              nothingFoundHint: t("identity.cv.nothingFoundHint"),
+              expertiseTitle: t("identity.cv.expertiseTitle"),
+              industriesTitle: t("identity.cv.industriesTitle"),
+              because: t("identity.cv.because"),
+              apply: t("identity.cv.apply"),
+              applied: t("identity.cv.applied"),
+              clear: t("identity.cv.clear"),
+              fileUnsupported: t("identity.cv.fileUnsupported"),
+            }}
+          />
 
           {/* Das LinkedIn-Profil steht hier und nicht in einem eigenen
               Bereich: Es ist dieselbe Art Angabe wie Name und Headline - eine

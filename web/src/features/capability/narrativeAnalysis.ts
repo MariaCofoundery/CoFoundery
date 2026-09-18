@@ -112,17 +112,17 @@ export const ANALYZED_AREA_IDS = Object.keys(AREA_TERMS);
 const MAX_SUGGESTIONS = 3;
 
 /**
- * Regelbasierte Analyse. Zaehlt Treffer je Bereich und gibt die staerksten
- * zurueck, jeweils mit den Begriffen, die dazu gefuehrt haben.
+ * Die Zuordnung selbst, ohne Drumherum.
  *
- * Findet sie nichts, kommt eine leere Liste zurueck. Das ist der haeufige
- * Fall und wird nicht verschleiert - die Oberflaeche fragt dann nach einer
- * Zuordnung, statt eine schlechte zu behaupten.
+ * Herausgeloest am 19.09.2026, weil der Lebenslauf-Abgleich dieselbe Zuordnung
+ * braucht - nur mit mehr Vorschlaegen, weil ein Lebenslauf mehr Stationen
+ * enthaelt als eine erzaehlte Aufgabe. Zwei Begriffslisten nebeneinander waeren
+ * sofort zwei Wahrheiten gewesen, die auseinanderlaufen.
  */
-export const analyzeNarrativeWithRules: NarrativeAnalyzer = async ({ narrative }) => {
-  const haystack = narrative.toLocaleLowerCase("de-DE");
+export function scoreAreasByTerms(text: string, limit: number): AreaSuggestion[] {
+  const haystack = text.toLocaleLowerCase("de-DE");
 
-  const scored = Object.entries(AREA_TERMS)
+  return Object.entries(AREA_TERMS)
     .map(([areaId, terms]) => ({
       areaId,
       matchedTerms: terms.filter((term) => haystack.includes(term)),
@@ -137,13 +137,21 @@ export const analyzeNarrativeWithRules: NarrativeAnalyzer = async ({ narrative }
         Math.max(...b.matchedTerms.map((t) => t.length)) -
           Math.max(...a.matchedTerms.map((t) => t.length))
     )
-    .slice(0, MAX_SUGGESTIONS);
+    .slice(0, limit);
+}
 
-  return {
-    areas: scored,
-    // Regeln koennen keine Staerke formulieren. Der Platz bleibt leer, bis ein
-    // Sprachmodell dahinter tritt.
-    strength: null,
-    engine: "rules",
-  };
-};
+/**
+ * Regelbasierte Analyse. Zaehlt Treffer je Bereich und gibt die staerksten
+ * zurueck, jeweils mit den Begriffen, die dazu gefuehrt haben.
+ *
+ * Findet sie nichts, kommt eine leere Liste zurueck. Das ist der haeufige
+ * Fall und wird nicht verschleiert - die Oberflaeche fragt dann nach einer
+ * Zuordnung, statt eine schlechte zu behaupten.
+ */
+export const analyzeNarrativeWithRules: NarrativeAnalyzer = async ({ narrative }) => ({
+  areas: scoreAreasByTerms(narrative, MAX_SUGGESTIONS),
+  // Regeln koennen keine Staerke formulieren. Der Platz bleibt leer, bis ein
+  // Sprachmodell dahinter tritt.
+  strength: null,
+  engine: "rules",
+});
