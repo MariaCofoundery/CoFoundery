@@ -48,19 +48,29 @@ const ProductNavigationOverrideContext = createContext<
   ((override: NavigationOverride) => void) | null
 >(null);
 
-function navLinkClassName(active: boolean) {
-  return `rounded-full px-3 py-2 text-sm font-medium transition ${
+/**
+ * Ein Bereich in der Leiste.
+ *
+ * Der aktive Zustand war ein 18-Prozent-Schleier auf weissem, verschwommenem
+ * Grund - und "Co-Founder finden" trug eine Dauer-CTA-Farbe, war also auch
+ * dann lauter als alles andere, wenn man NICHT dort war. Das Auffaelligste
+ * zeigte damit nie den aktuellen Ort. Jetzt ist genau ein Punkt gefuellt: der,
+ * an dem man steht.
+ */
+function areaLinkClassName(active: boolean) {
+  return `rounded-full px-4 py-2 text-sm transition ${
     active
-      ? "bg-[color:var(--brand-primary)]/18 text-slate-950"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      ? "bg-slate-950 font-semibold text-white shadow-sm"
+      : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 
-function discoveryCtaClassName(active: boolean) {
-  return `rounded-full px-3 py-2 text-sm font-semibold transition ${
+/** Fuer alles, was kein Bereich ist - Profil, Feedback, Konto. */
+function navLinkClassName(active: boolean) {
+  return `rounded-full px-3 py-2 text-sm font-medium transition ${
     active
-      ? "bg-[color:var(--brand-primary)] text-slate-950"
-      : "bg-[color:var(--brand-primary)]/80 text-slate-950 hover:bg-[color:var(--brand-primary)]"
+      ? "bg-slate-100 text-slate-950"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 
@@ -125,14 +135,25 @@ export function ProductShell({
         ? "/advisor/dashboard"
         : "/dashboard";
   const connectAttentionCount = getConnectAttentionCount(incomingConnectContactCount, unreadConnectMessageCount);
+  // Die Leiste traegt Bereiche - Orte, in denen man eine Weile arbeitet.
+  // Vorher standen dort fuenf Eintraege nebeneinander, die drei verschiedene
+  // Sorten waren: Bereiche, ein Querschnitt (Profil) und eine Unterseite
+  // (Verbindungen). Genau deshalb las es sich nicht als "ich bin hier".
+  //
+  // Profil steht jetzt rechts bei Konto und Sprache. Verbindungen ist eine
+  // Seite innerhalb von Align und vom Dashboard aus verlinkt - sie verwaist
+  // dadurch nicht.
   const navigationItems: NavigationItem[] = isConnectOnly ? [] : [
     {
       href: dashboardHref,
-      label: t("dashboard"),
+      label: t("areaAlign"),
       isActive: (currentPathname) =>
         resolvedActiveView === "advisor"
           ? currentPathname === "/advisor/dashboard"
-          : currentPathname === "/dashboard",
+          : currentPathname === "/dashboard" ||
+            currentPathname === "/connections" ||
+            currentPathname.startsWith("/teams/") ||
+            currentPathname.startsWith("/founder-alignment"),
     },
   ];
 
@@ -183,48 +204,69 @@ export function ProductShell({
                   <Link
                     key={item.label}
                     href={item.href}
-                    className={navLinkClassName(item.isActive(pathname))}
+                    aria-current={item.isActive(pathname) ? "page" : undefined}
+                    className={areaLinkClassName(item.isActive(pathname))}
                   >
                     {item.label}
                   </Link>
                 ))}
-                {/* Das Profil ist der eine Ort fuer Identitaet, Snapshot,
-                    Freigabe und Vergleich - es gehoert in die Leiste und
-                    nicht nur in ein Menue hinter dem Bild. Genau dieses
-                    Versteck war die Beschwerde. */}
-                <Link href="/profile" className={navLinkClassName(pathname.startsWith("/profile"))}>
-                  {t("profile")}
-                </Link>
                 {resolvedActiveView === "advisor" ? (
                   <>
-                    {hasConnect ? <Link href="/connect" className={`${navLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}>{t("connect")}<ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} /></Link> : null}
+                    {hasConnect ? (
+                      <Link
+                        href="/connect"
+                        aria-current={pathname.startsWith("/connect") ? "page" : undefined}
+                        className={`${areaLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}
+                      >
+                        {t("areaConnect")}
+                        <ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} />
+                      </Link>
+                    ) : null}
+                    {/* Bleibt in der Leiste: Das Advisor-Dashboard verlinkt
+                        diese Seite nicht, sie waere sonst nicht erreichbar. */}
                     <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
                   </>
                 ) : (
                   <>
-                    {hasConnect ? <Link href="/connect" className={`${navLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}>{t("connect")}<ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} /></Link> : null}
-                    {hasFounder ? <><Link
-                      href="/discovery"
-                      className={`${discoveryCtaClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
-                    >
-                      <span>{t("discovery")}</span>
-                      <IncomingRequestBadge count={incomingOpenRequestCount} />
-                    </Link>
-                    <Link
-                      href="/connections"
-                      className={navLinkClassName(
-                        pathname === "/connections" || pathname.startsWith("/teams/")
-                      )}
-                    >
-                      {t("connections")}
-                    </Link>
-                    </> : null}
+                    {hasFounder ? (
+                      <Link
+                        href="/discovery"
+                        aria-current={pathname.startsWith("/discovery") ? "page" : undefined}
+                        className={`${areaLinkClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
+                      >
+                        <span>{t("areaFind")}</span>
+                        <IncomingRequestBadge count={incomingOpenRequestCount} />
+                      </Link>
+                    ) : null}
+                    {hasConnect ? (
+                      <Link
+                        href="/connect"
+                        aria-current={pathname.startsWith("/connect") ? "page" : undefined}
+                        className={`${areaLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}
+                      >
+                        {t("areaConnect")}
+                        <ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} />
+                      </Link>
+                    ) : null}
                   </>
                 )}
               </nav>
             </div>
 
             <div className="flex items-center justify-end gap-3">
+              {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
+                  gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
+                  es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
+                  war genau die Beschwerde, die es hierher gebracht hat. */}
+              {!isSuspendedConnectOnly ? (
+                <Link
+                  href="/profile"
+                  aria-current={pathname.startsWith("/profile") ? "page" : undefined}
+                  className={navLinkClassName(pathname.startsWith("/profile"))}
+                >
+                  {t("profile")}
+                </Link>
+              ) : null}
               <ProductFeedbackEntry
                 source="nav"
                 invitationId={resolvedFeedbackInvitationId}

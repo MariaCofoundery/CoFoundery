@@ -195,8 +195,18 @@ test("saving reports failure when no row was written", () => {
 // ---------------------------------------------------------------------------
 test("the profile is in the navigation bar, not only behind the avatar", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
-  const navLinks = shell.match(/<Link href="\/profile" className=\{navLinkClassName/g) ?? [];
-  assert.equal(navLinks.length, 1, "genau ein Eintrag in der Leiste");
+  // GEAENDERT am 18.09.2026: Das Profil steht weiterhin sichtbar in der
+  // Kopfzeile - aber rechts bei Konto und Sprache statt zwischen den
+  // Bereichen. Es ist ein Querschnitt, kein Ort.
+  // Der Eintrag in der Kopfzeile traegt navLinkClassName; der zweite Treffer
+  // auf /profile ist das Menue hinter dem Bild, das es immer gab.
+  const navLinks = shell.match(/href="\/profile"[\s\S]{0,200}?navLinkClassName/g) ?? [];
+  assert.equal(navLinks.length, 1, "genau ein sichtbarer Eintrag in der Kopfzeile");
+  assert.doesNotMatch(
+    shell,
+    /href="\/profile"[\s\S]{0,120}areaLinkClassName/,
+    "aber nicht in der Bereichsleiste"
+  );
 
   for (const locale of ["de", "en"]) {
     const navigation = readJson(`messages/${locale}/navigation.json`) as Record<string, string>;

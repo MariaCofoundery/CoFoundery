@@ -78,7 +78,8 @@ test("Connect-only navigation exposes Connect and Account without Founder or Adv
   const shell = source("src/features/navigation/ProductShell.tsx");
   assert.match(shell, /isConnectOnly = hasConnect && !hasFounder && !hasAdvisor/);
   assert.match(shell, /const navigationItems: NavigationItem\[\] = isConnectOnly \? \[\]/);
-  assert.match(shell, /\{hasFounder \? <><Link[\s\S]*href="\/discovery"/);
+  // Die Form hat sich geaendert, die Zusage nicht: Find haengt an hasFounder.
+  assert.match(shell, /\{hasFounder \? \([\s\S]{0,200}href="\/discovery"/);
   assert.match(shell, /href="\/account"/);
   assert.match(shell, /isSuspendedConnectOnly[\s\S]*"\/account"/);
 });

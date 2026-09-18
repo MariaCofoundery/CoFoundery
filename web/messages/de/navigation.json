@@ -36,5 +36,11 @@
     "unknown": "ohne Datum",
     "locale": "de-DE"
   },
-  "profile": "Profil"
+  "profile": "Profil",
+  "areaAlign": "Align",
+  "areaFind": "Find",
+  "areaConnect": "Connect",
+  "areaAlignHint": "Dein Alignment: Fragebogen, Report und Workbook",
+  "areaFindHint": "Menschen finden, die mit dir gründen könnten",
+  "areaConnectHint": "Anzeigen, Probleme und Kontakte im Netzwerk"
 }

@@ -36,5 +36,11 @@
     "unknown": "no date",
     "locale": "en-US"
   },
-  "profile": "Profile"
+  "profile": "Profile",
+  "areaAlign": "Align",
+  "areaFind": "Find",
+  "areaConnect": "Connect",
+  "areaAlignHint": "Your alignment: questionnaire, report and workbook",
+  "areaFindHint": "Find people who could found with you",
+  "areaConnectHint": "Listings, problems and contacts in the network"
 }

@@ -165,8 +165,18 @@ test("global and contextual navigation use the new DE/EN information architectur
 
   assert.equal(deNavigation.connections, "Verbindungen");
   assert.equal(enNavigation.connections, "Connections");
-  assert.equal(deNavigation.discovery, "Co-Founder finden");
-  assert.match(shell, /href="\/connections"/);
+  // GEAENDERT am 18.09.2026: Die Leiste traegt nur noch Bereiche - Align,
+  // Find, Connect. "Verbindungen" ist eine Seite INNERHALB von Align.
+  assert.equal(deNavigation.areaFind, "Find");
+  assert.equal(deNavigation.areaAlign, "Align");
+  // Die Zusage bleibt: erreichbar. Nur woanders - das Dashboard verlinkt sie,
+  // und der Align-Eintrag markiert sich auf dieser Adresse als aktiv.
+  assert.match(
+    readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
+    /href="\/connections"/,
+    "vom Dashboard aus erreichbar"
+  );
+  assert.match(shell, /currentPathname === "\/connections"/, "Align markiert sich dort");
   assert.doesNotMatch(shell, /<NavigationContextMenu/);
   assert.equal(isProductChromePath("/connections"), true);
 
