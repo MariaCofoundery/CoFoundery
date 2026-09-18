@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
+import { ConnectTabs } from "@/features/connect/ConnectTabs";
+import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getActiveConnectProblems } from "@/features/connect/connectProblemData";
 import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/connect/connectTypes";
@@ -25,8 +27,11 @@ export default async function ConnectProblemsPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
-  const { client } = await requireConnectMember("/connect/problems");
-  const problems = await getActiveConnectProblems(client, filters);
+  const { client, user } = await requireConnectMember("/connect/problems");
+  const [problems, tabCounts] = await Promise.all([
+    getActiveConnectProblems(client, filters),
+    getConnectTabCounts(client, user.id),
+  ]);
   const authors = await getConnectProfilesByUserIds(
     client,
     problems.map((problem) => problem.author_user_id).filter((id): id is string => id !== null)
@@ -39,11 +44,15 @@ export default async function ConnectProblemsPage({
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
-      <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
-        ← {t("navigation.overview")}
-      </Link>
-      <h1 className="mt-3 text-3xl font-semibold tracking-tight">{t("problems.title")}</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">{t("problems.title")}</h1>
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("problems.text")}</p>
+
+      {/* Dieselbe Reiterleiste wie auf den anderen beiden Seiten: Drei
+          Adressen, eine Flaeche. Der frueher hier stehende Zurueck-Link ist
+          damit ueberfluessig - man wechselt den Reiter. */}
+      <div className="mt-5">
+        <ConnectTabs active="problems" counts={tabCounts} />
+      </div>
 
       {errorKey ? (
         <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">

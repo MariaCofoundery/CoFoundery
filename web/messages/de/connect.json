@@ -648,5 +648,44 @@
     "profileLinkHint": "Bis zu fünf Einträge, die an deinem Profil stehen.",
     "saved": "Der Eintrag ist gespeichert.",
     "deleted": "Der Eintrag wurde gelöscht."
-  }
+  },
+  "tabs": {
+    "label": "Bereiche in Connect",
+    "people": "Menschen",
+    "listings": "Angebote & Gesuche",
+    "problems": "Probleme"
+  },
+  "people": {
+    "title": "Menschen im Netzwerk",
+    "text": "Wer hier ein Profil veröffentlicht hat. Sortiert nach Aktualität – es gibt keine Rangfolge und keine Empfehlung.",
+    "searchPlaceholder": "Suche in Headline, Über-mich, Expertise, Kontakten und Projekten",
+    "filters": "Filter",
+    "role": "Rolle",
+    "allRoles": "Alle Rollen",
+    "expertise": "Expertise",
+    "expertisePlaceholder": "z. B. Marketing",
+    "industry": "Branche",
+    "industryPlaceholder": "z. B. Health",
+    "region": "Region",
+    "regionPlaceholder": "z. B. Berlin",
+    "remote": "Arbeitsweise",
+    "allRemote": "Egal",
+    "openTo": "Ansprechbar für",
+    "allOpenTo": "Egal",
+    "apply": "Anwenden",
+    "reset": "Filter zurücksetzen",
+    "count": "{count, plural, =0 {Niemand gefunden} one {1 Person} other {# Menschen}}",
+    "emptyTitle": "Dazu passt gerade niemand.",
+    "emptyText": "Setz die Eingrenzung zurück oder such mit weniger Kriterien.",
+    "emptyFirstTitle": "Hier ist noch niemand.",
+    "emptyFirstText": "Sobald Menschen ihr Connect-Profil veröffentlichen, stehen sie hier.",
+    "ventureCount": "{count, plural, one {1 Projekt} other {# Projekte}}",
+    "openProfile": "Profil ansehen",
+    "noPublicProfile": "Diese Person hat ihre Seite nicht öffentlich gestellt.",
+    "ownProfileCta": "Eigenes Profil bearbeiten"
+  },
+  "postSomething": "Etwas einstellen",
+  "resultCount": "{count, plural, =0 {Kein Eintrag} one {1 Eintrag} other {# Einträge}}",
+  "filtersLabel": "Filter",
+  "rememberSearch": "Diese Suche merken"
 }

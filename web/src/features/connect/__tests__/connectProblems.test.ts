@@ -155,8 +155,16 @@ test("accepting leads straight into the conversation", () => {
 // Erreichbarkeit und Copy
 // ---------------------------------------------------------------------------
 test("the board is reachable from the Connect overview", () => {
+  // GEAENDERT am 18.09.2026: Der Weg fuehrt ueber die Reiterleiste, die auf
+  // allen drei Connect-Seiten steht - nicht mehr ueber einen eigenen Kasten
+  // auf der Uebersicht. Die Zusage bleibt: von der Uebersicht aus erreichbar.
   const connect = source("src/app/(product)/connect/page.tsx");
-  assert.match(connect, /href="\/connect\/problems"/);
+  assert.match(connect, /<ConnectTabs active="listings"/);
+  assert.match(
+    source("src/features/connect/ConnectTabs.tsx"),
+    /href: "\/connect\/problems"/,
+    "und die Leiste fuehrt dorthin"
+  );
   for (const locale of ["de", "en"]) {
     const navigation = (readJson(`messages/${locale}/connect.json`).navigation as Record<string, string>);
     assert.ok(navigation.problems, `${locale}: navigation.problems fehlt`);

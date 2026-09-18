@@ -28,8 +28,21 @@ function resolveExistingFile(basePath) {
   return null;
 }
 
+/**
+ * `server-only` und `client-only` sind Marker ohne Paket: Next.js loest sie
+ * beim Bauen selbst auf, in node_modules liegt nichts. Ein Datenmodul mit
+ * `import "server-only"` liess sich deshalb im Test gar nicht laden - genau
+ * die Module, in denen die Abfragen stehen, waren nur ueber Quelltext-Greps
+ * pruefbar. Hier werden sie zum leeren Modul, wie im Server-Build auch.
+ */
+const MARKER_MODULES = new Set(["server-only", "client-only"]);
+
 registerHooks({
   resolve(specifier, context, nextResolve) {
+    if (MARKER_MODULES.has(specifier)) {
+      return { shortCircuit: true, url: "data:text/javascript,export {};" };
+    }
+
     if (specifier.startsWith("@/")) {
       const candidatePath = resolveExistingFile(path.join(srcRoot, specifier.slice(2)));
       if (!candidatePath) {
