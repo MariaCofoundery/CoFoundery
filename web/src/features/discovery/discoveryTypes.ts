@@ -28,6 +28,17 @@ export const DISCOVERY_FOUNDER_ROLES = [
 ] as const;
 export type DiscoveryFounderRole = (typeof DISCOVERY_FOUNDER_ROLES)[number];
 
+/**
+ * Ob die Stundenangabe eine Obergrenze ist oder der heutige Stand.
+ *
+ * Bewusst keine Motivationsskala: Eine Selbsteinschaetzung, bei der alle
+ * dasselbe ankreuzen, traegt keine Information. Hier sind beide Antworten
+ * respektabel - und die zweite kostet eine Bedingung.
+ */
+export const DISCOVERY_AVAILABILITY_FLEXIBILITY = ["fixed", "would_expand"] as const;
+export type DiscoveryAvailabilityFlexibility =
+  (typeof DISCOVERY_AVAILABILITY_FLEXIBILITY)[number];
+
 export const DISCOVERY_REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 export type DiscoveryRemoteMode = (typeof DISCOVERY_REMOTE_MODES)[number];
 
@@ -105,6 +116,9 @@ export type FounderDiscoveryProfile = {
   locationRegion: string | null;
   remoteMode: DiscoveryRemoteMode;
   availabilityHoursPerWeek: number | null;
+  availabilityFlexibility: DiscoveryAvailabilityFlexibility | null;
+  /** Was passieren muesste - nur gesetzt, solange would_expand gewaehlt ist. */
+  availabilityCondition: string | null;
   commitmentLevel: DiscoveryCommitmentLevel;
   ventureStage: DiscoveryVentureStage;
   ventureGoal: DiscoveryVentureGoal;
@@ -144,6 +158,8 @@ export type DiscoveryProfileInput = Partial<{
   locationRegion: unknown;
   remoteMode: unknown;
   availabilityHoursPerWeek: unknown;
+  availabilityFlexibility: unknown;
+  availabilityCondition: unknown;
   commitmentLevel: unknown;
   ventureStage: unknown;
   ventureGoal: unknown;
@@ -224,6 +240,8 @@ export type DiscoveryProfilePreview = Pick<
   | "locationRegion"
   | "remoteMode"
   | "availabilityHoursPerWeek"
+  | "availabilityFlexibility"
+  | "availabilityCondition"
   | "commitmentLevel"
   | "ventureStage"
   | "ventureGoal"

@@ -106,6 +106,8 @@ export function buildDiscoveryV2Candidate(
       locationRegion: profile.locationRegion,
       remoteMode: profile.remoteMode,
       availabilityHoursPerWeek: profile.availabilityHoursPerWeek,
+      availabilityFlexibility: profile.availabilityFlexibility,
+      availabilityCondition: profile.availabilityCondition,
       commitmentLevel: profile.commitmentLevel,
       ventureStage: profile.ventureStage,
       ventureGoal: profile.ventureGoal,

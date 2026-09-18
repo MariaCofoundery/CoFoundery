@@ -515,7 +515,24 @@
       "seekingRoleOtherLabel": "Which focus are you looking for?",
       "seekingRoleOtherPlaceholder": "e.g. medical device approval",
       "seekingRoleOtherHint": "Otherwise nobody knows what you are looking for.",
-      "identityLinkPending": "Saving …"
+      "identityLinkPending": "Saving …",
+      "availabilityFlexTitle": "Is that your limit – or your current state?",
+      "availabilityFlexHelp": "Optional. Both answers are fine – one protects you, the other says something about your readiness.",
+      "availabilityFlexOptions": {
+        "fixed": "That is my limit",
+        "would_expand": "For the right thing I would free up more"
+      },
+      "availabilityFlexHints": {
+        "fixed": "More is not possible for the foreseeable future. That is not a no to the matter, it is an honest boundary – and it spares you trouble later.",
+        "would_expand": "You would rebuild your week if the idea and the people are right. Say straight away what would have to happen."
+      },
+      "availabilityConditionLabel": "What would have to happen?",
+      "availabilityConditionPlaceholder": "e.g. Once we have funding, I go down to 30 hours in my job.",
+      "availabilityConditionHint": "A concrete condition says more than a yes – and it is exactly what you will talk about later.",
+      "availabilityFlexShort": {
+        "fixed": "limit is set",
+        "would_expand": "would free up more"
+      }
     },
     "brings": {
       "title": "What you bring",

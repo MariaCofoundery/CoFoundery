@@ -21,6 +21,7 @@ import {
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
+  DiscoveryAvailabilityFlexibility,
   DiscoveryCommitmentLevel,
   DiscoveryFounderRole,
   DiscoveryMustHaves,
@@ -52,6 +53,8 @@ type DiscoveryV2SearchRow = {
   location_region: string | null;
   remote_mode: DiscoveryRemoteMode;
   availability_hours_per_week: number | null;
+  availability_flexibility: string | null;
+  availability_condition: string | null;
   commitment_level: DiscoveryCommitmentLevel;
   venture_stage: DiscoveryVentureStage;
   venture_goal: DiscoveryVentureGoal;
@@ -113,6 +116,8 @@ type FounderDiscoveryProfileRow = {
   location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
+  availability_flexibility: string | null;
+  availability_condition: string | null;
   commitment_level: string;
   venture_stage: string;
   venture_goal: string;
@@ -154,6 +159,8 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "location_region",
   "remote_mode",
   "availability_hours_per_week",
+  "availability_flexibility",
+  "availability_condition",
   "commitment_level",
   "venture_stage",
   "venture_goal",
@@ -227,6 +234,8 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryRemoteMode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
+    availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
+    availabilityCondition: row.availability_condition,
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
     ventureStage: row.venture_stage as DiscoveryVentureStage,
     ventureGoal: row.venture_goal as DiscoveryVentureGoal,
@@ -274,6 +283,8 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     locationRegion: profile.locationRegion,
     remoteMode: profile.remoteMode,
     availabilityHoursPerWeek: profile.availabilityHoursPerWeek,
+    availabilityFlexibility: profile.availabilityFlexibility,
+    availabilityCondition: profile.availabilityCondition,
     commitmentLevel: profile.commitmentLevel,
     ventureStage: profile.ventureStage,
     ventureGoal: profile.ventureGoal,
@@ -356,6 +367,8 @@ export async function upsertOwnDiscoveryProfile(
         location_region: normalized.locationRegion,
         remote_mode: normalized.remoteMode,
         availability_hours_per_week: normalized.availabilityHoursPerWeek,
+        availability_flexibility: normalized.availabilityFlexibility,
+        availability_condition: normalized.availabilityCondition,
         commitment_level: normalized.commitmentLevel,
         venture_stage: normalized.ventureStage,
         venture_goal: normalized.ventureGoal,
@@ -625,6 +638,8 @@ export async function getDiscoveryCandidatesForCurrentUser(
     locationRegion: row.location_region,
     remoteMode: row.remote_mode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
+    availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
+    availabilityCondition: row.availability_condition,
     commitmentLevel: row.commitment_level,
     ventureStage: row.venture_stage,
     ventureGoal: row.venture_goal,
@@ -702,6 +717,8 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         locationRegion: row.location_region,
         remoteMode: row.remote_mode,
         availabilityHoursPerWeek: row.availability_hours_per_week,
+        availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
+        availabilityCondition: row.availability_condition,
         commitmentLevel: row.commitment_level,
         ventureStage: row.venture_stage,
         ventureGoal: row.venture_goal,

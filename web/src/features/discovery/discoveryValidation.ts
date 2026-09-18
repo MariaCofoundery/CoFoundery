@@ -1,5 +1,6 @@
 import {
   DISCOVERY_COMMITMENT_LEVELS,
+  DISCOVERY_AVAILABILITY_FLEXIBILITY,
   DISCOVERY_FOUNDER_ROLES,
   DISCOVERY_PRIORITY_KEYS,
   DISCOVERY_REMOTE_MODES,
@@ -9,6 +10,7 @@ import {
   DISCOVERY_VENTURE_GOALS,
   DISCOVERY_VENTURE_STAGES,
   type DiscoveryCommitmentLevel,
+  type DiscoveryAvailabilityFlexibility,
   type DiscoveryFounderRole,
   type DiscoveryMustHaves,
   type DiscoveryPreferencesInput,
@@ -201,6 +203,14 @@ export function normalizeMustHaves(value: unknown): DiscoveryMustHaves {
   };
 }
 
+/** Obergrenze oder Jetzt-Stand - und die Bedingung, die nur zum zweiten passt. */
+function normalizeAvailabilityFlexibility(value: unknown) {
+  const text = normalizeText(value, 32);
+  return (DISCOVERY_AVAILABILITY_FLEXIBILITY as readonly string[]).includes(text)
+    ? (text as DiscoveryAvailabilityFlexibility)
+    : null;
+}
+
 /**
  * Der Freitext hinter "Anderer Schwerpunkt".
  *
@@ -214,6 +224,14 @@ function normalizeRoleOther(value: unknown, roles: DiscoveryFounderRole[]) {
 }
 
 export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}) {
+  const flexibility = normalizeAvailabilityFlexibility(input.availabilityFlexibility);
+  const conditionText = normalizeText(
+    input.availabilityCondition,
+    DISCOVERY_TEXT_LIMITS.availabilityCondition
+  );
+  const condition =
+    flexibility === "would_expand" && conditionText.length >= 10 ? conditionText : null;
+
   const ownRoles = normalizeAllowedArray<DiscoveryFounderRole>(
     input.ownRoles,
     DISCOVERY_FOUNDER_ROLES
@@ -246,6 +264,11 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
       normalizeText(input.locationRegion, DISCOVERY_TEXT_LIMITS.locationRegion) || null,
     remoteMode: normalizeRemoteMode(input.remoteMode),
     availabilityHoursPerWeek: normalizeAvailabilityHours(input.availabilityHoursPerWeek),
+    availabilityFlexibility: flexibility,
+    // Die Bedingung gilt nur zusammen mit "wuerde mehr freimachen". Dieselbe
+    // Regel steht in der Datenbank; hier faellt sie mit dem Abwaehlen weg,
+    // statt unsichtbar im Profil stehen zu bleiben.
+    availabilityCondition: condition,
     commitmentLevel: normalizeCommitmentLevel(input.commitmentLevel),
     ventureStage: normalizeVentureStage(input.ventureStage),
     ventureGoal: normalizeVentureGoal(input.ventureGoal),

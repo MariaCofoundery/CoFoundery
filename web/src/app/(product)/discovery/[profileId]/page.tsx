@@ -375,7 +375,21 @@ export default async function DiscoveryProfileDetailPage({
                     {t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}
                   </span>
                 ) : null}
+                {profile.availabilityFlexibility ? (
+                  <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-violet-900">
+                    {t(
+                      `profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`
+                    )}
+                  </span>
+                ) : null}
               </div>
+              {/* Die Bedingung steht nur hier, nicht auf der Karte: Sie ist
+                  ein Satz, ueber den man redet - kein Merkmal zum Ueberfliegen. */}
+              {profile.availabilityCondition ? (
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {profile.availabilityCondition}
+                </p>
+              ) : null}
             </div>
             {isOwner ? (
               <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>

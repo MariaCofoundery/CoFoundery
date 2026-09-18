@@ -515,7 +515,24 @@
       "seekingRoleOtherLabel": "Welchen Schwerpunkt suchst du?",
       "seekingRoleOtherPlaceholder": "z. B. Zulassung im Medizinbereich",
       "seekingRoleOtherHint": "Sonst weiß niemand, wonach du suchst.",
-      "identityLinkPending": "Wird gespeichert …"
+      "identityLinkPending": "Wird gespeichert …",
+      "availabilityFlexTitle": "Ist das dein Rahmen – oder dein Jetzt-Stand?",
+      "availabilityFlexHelp": "Freiwillig. Beide Antworten sind in Ordnung – die eine schützt dich, die andere sagt etwas über deine Bereitschaft.",
+      "availabilityFlexOptions": {
+        "fixed": "Das ist mein Rahmen",
+        "would_expand": "Für das Richtige würde ich mehr freimachen"
+      },
+      "availabilityFlexHints": {
+        "fixed": "Mehr geht auf absehbare Zeit nicht. Das ist keine Absage an die Sache, sondern eine ehrliche Grenze – und sie erspart euch später Ärger.",
+        "would_expand": "Du würdest deine Woche umbauen, wenn Idee und Menschen stimmen. Sag gleich dazu, was dafür passieren müsste."
+      },
+      "availabilityConditionLabel": "Was müsste dafür passieren?",
+      "availabilityConditionPlaceholder": "z. B. Wenn wir eine Finanzierung haben, gehe ich im Job auf 30 Stunden runter.",
+      "availabilityConditionHint": "Eine konkrete Bedingung sagt mehr als ein Ja – und sie ist genau das, worüber ihr später reden werdet.",
+      "availabilityFlexShort": {
+        "fixed": "Rahmen steht",
+        "would_expand": "würde mehr freimachen"
+      }
     },
     "brings": {
       "title": "Was du mitbringst",

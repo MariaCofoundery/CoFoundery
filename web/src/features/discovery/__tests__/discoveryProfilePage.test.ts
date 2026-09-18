@@ -11,6 +11,18 @@ const codeOnly = (path: string) =>
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .replace(/(^|[^:])\/\/.*$/gm, "$1");
 
+/**
+ * SQL ohne Kommentare.
+ *
+ * Fuer Pruefungen der Form "das darf nicht vorkommen": Der Kommentar erklaert
+ * oft gerade, WARUM etwas fehlt, und wuerde die Pruefung selbst erfuellen.
+ */
+const sqlWithoutComments = (path: string) =>
+  source(path)
+    .split("\n")
+    .map((line) => line.replace(/--.*$/, ""))
+    .join("\n");
+
 const PAGE = "src/app/(product)/discovery/profile/page.tsx";
 
 // ---------------------------------------------------------------------------
@@ -505,4 +517,84 @@ test("switching alignment off does not forget the chosen dimensions", () => {
     actions,
     /discoveryV2AlignmentPreferences: enabled\s*\n\s*\? parseDiscoveryV2AlignmentPreferences\(formData\)\s*\n\s*: existing\?\.discoveryV2AlignmentPreferences \?\? \{\}/
   );
+});
+
+// ---------------------------------------------------------------------------
+// Obergrenze oder Jetzt-Stand
+// ---------------------------------------------------------------------------
+const AVAILABILITY_FIELD = "src/features/discovery/DiscoveryAvailabilityField.tsx";
+const AVAILABILITY_MIGRATION =
+  "../supabase/migrations/20260925120000_discovery_availability_flexibility.sql";
+
+test("this is not a motivation scale", () => {
+  // Eine Selbsteinschaetzung, bei der alle das Hoechste ankreuzen, traegt
+  // keine Information - sie erzeugt nur Vergleich auf einer Achse, die sich
+  // nicht messen laesst.
+  const migration = sqlWithoutComments(AVAILABILITY_MIGRATION);
+  assert.doesNotMatch(migration, /motivation|drive|enthusias/i);
+  assert.match(migration, /availability_flexibility in \('fixed', 'would_expand'\)/);
+
+  const field = codeOnly(AVAILABILITY_FIELD);
+  assert.doesNotMatch(field, /type="range"|1-5|stars?\b/i, "keine Skala, keine Sterne");
+});
+
+test("both answers are offered as respectable", () => {
+  // Die Frage funktioniert nur, wenn keine der beiden Antworten die bessere
+  // ist. Steht das nicht in den Hinweisen, kreuzen alle dasselbe an.
+  for (const locale of ["de", "en"]) {
+    const messages = readJson(`messages/${locale}/discovery.json`);
+    const publicProfile = (messages.profile as Record<string, Record<string, unknown>>)
+      .publicProfile;
+    const hints = publicProfile.availabilityFlexHints as Record<string, string>;
+    const options = publicProfile.availabilityFlexOptions as Record<string, string>;
+    assert.deepEqual(Object.keys(options).sort(), ["fixed", "would_expand"]);
+    assert.deepEqual(Object.keys(hints).sort(), ["fixed", "would_expand"]);
+    assert.ok(hints.fixed.length > 40, `${locale}: "fixed" braucht eine echte Begruendung`);
+  }
+  const de = (
+    (readJson("messages/de/discovery.json").profile as Record<string, Record<string, unknown>>)
+      .publicProfile.availabilityFlexHints as Record<string, string>
+  ).fixed;
+  assert.match(de, /keine Absage/, "das Limit darf nicht wie ein Mangel klingen");
+});
+
+test("the promise costs a condition", () => {
+  const migration = sqlWithoutComments(AVAILABILITY_MIGRATION);
+  // "Ja, fuer das Richtige" ist billig. Die Bedingung ist der Inhalt - und sie
+  // darf nur zusammen mit der Antwort dastehen, zu der sie gehoert.
+  assert.match(migration, /availability_flexibility = 'would_expand'/);
+  assert.match(migration, /char_length\(btrim\(availability_condition\)\) between 10 and 200/);
+
+  const field = codeOnly(AVAILABILITY_FIELD);
+  assert.match(field, /const expands = option\.value === "would_expand" && checked/);
+  assert.match(field, /name="availabilityCondition"\s*\n\s*required/);
+
+  const validation = codeOnly("src/features/discovery/discoveryValidation.ts");
+  // Mit dem Abwaehlen faellt die Bedingung weg, statt unsichtbar stehen zu
+  // bleiben - dieselbe Regel wie beim Freitext der Rollen.
+  assert.match(
+    validation,
+    /flexibility === "would_expand" && conditionText\.length >= 10 \? conditionText : null/
+  );
+});
+
+test("the answer stays optional", () => {
+  const migration = sqlWithoutComments(AVAILABILITY_MIGRATION);
+  assert.match(migration, /availability_flexibility is null\s*\n\s*or availability_flexibility in/);
+
+  // Keine neue Veroeffentlichungshuerde: Bestandsprofile wuerden sonst
+  // unsichtbar, und nicht jede Person kann die Frage heute beantworten.
+  const issues = source("src/features/discovery/discoveryProfileFeedback.ts");
+  assert.doesNotMatch(issues, /availabilityFlexibility|availabilityCondition/);
+});
+
+test("the qualifier is shown next to the hours, the condition only in full", () => {
+  const card = source("src/features/discovery/FounderDiscoveryCard.tsx");
+  assert.match(card, /availabilityFlexShort/);
+  // Die Bedingung ist ein Satz zum Reden, kein Merkmal zum Ueberfliegen.
+  assert.doesNotMatch(card, /availabilityCondition/);
+
+  const detail = source("src/app/(product)/discovery/[profileId]/page.tsx");
+  assert.match(detail, /availabilityFlexShort/);
+  assert.match(detail, /profile\.availabilityCondition/);
 });

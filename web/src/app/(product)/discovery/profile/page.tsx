@@ -26,6 +26,7 @@ import {
   getOwnDiscoveryV2AlignmentTendencies,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
+import { DiscoveryAvailabilityField } from "@/features/discovery/DiscoveryAvailabilityField";
 import { DiscoveryChoiceField } from "@/features/discovery/DiscoveryChoiceField";
 import { DiscoveryRoleField } from "@/features/discovery/DiscoveryRoleField";
 import { DISCOVERY_PROFILE_PUBLISH_ISSUES } from "@/features/discovery/discoveryProfileFeedback";
@@ -47,6 +48,7 @@ import type {
   FounderDiscoveryProfile,
 } from "@/features/discovery/discoveryTypes";
 import {
+  DISCOVERY_AVAILABILITY_FLEXIBILITY,
   DISCOVERY_SEARCH_INTENTS,
   DISCOVERY_START_HORIZONS,
 } from "@/features/discovery/discoveryTypes";
@@ -614,6 +616,36 @@ export default async function DiscoveryProfilePage({
                     </span>
                     <span className={HELP_CLASS}>{t("profile.publicProfile.availabilityHelp")}</span>
                   </label>
+
+                  {/* Die Frage qualifiziert die Stundenzahl darueber - deshalb
+                      steht sie direkt darunter und nicht in einem eigenen
+                      Abschnitt. Bewusst keine Motivationsskala: Eine Angabe,
+                      bei der alle dasselbe ankreuzen, traegt nichts. Hier sind
+                      beide Antworten respektabel. */}
+                  <fieldset>
+                    <legend className={LABEL_CLASS}>
+                      {t("profile.publicProfile.availabilityFlexTitle")}
+                    </legend>
+                    <p className={HELP_CLASS}>
+                      {t("profile.publicProfile.availabilityFlexHelp")}
+                    </p>
+                    <DiscoveryAvailabilityField
+                      value={profile.availabilityFlexibility ?? null}
+                      condition={profile.availabilityCondition ?? null}
+                      options={DISCOVERY_AVAILABILITY_FLEXIBILITY.map((option) => ({
+                        value: option,
+                        label: t(`profile.publicProfile.availabilityFlexOptions.${option}`),
+                        hint: t(`profile.publicProfile.availabilityFlexHints.${option}`),
+                      }))}
+                      copy={{
+                        conditionLabel: t("profile.publicProfile.availabilityConditionLabel"),
+                        conditionPlaceholder: t(
+                          "profile.publicProfile.availabilityConditionPlaceholder"
+                        ),
+                        conditionHint: t("profile.publicProfile.availabilityConditionHint"),
+                      }}
+                    />
+                  </fieldset>
                 </div>
               </div>
 
@@ -938,7 +970,23 @@ export default async function DiscoveryProfilePage({
                             hours: profile.availabilityHoursPerWeek,
                           })
                         : t("profile.preview.timeOpen")}
+                      {/* Die Qualifizierung gehoert an die Stundenzahl, nicht
+                          in eine eigene Zeile - sonst liest man sie getrennt
+                          von dem, was sie einordnet. */}
+                      {profile.availabilityFlexibility ? (
+                        <>
+                          {" · "}
+                          {t(
+                            `profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`
+                          )}
+                        </>
+                      ) : null}
                     </dd>
+                    {profile.availabilityCondition ? (
+                      <dd className="mt-1 text-sm leading-6 text-slate-500">
+                        {profile.availabilityCondition}
+                      </dd>
+                    ) : null}
                   </div>
                 </dl>
               </div>

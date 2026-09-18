@@ -1,7 +1,10 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { DiscoveryProfilePreview } from "@/features/discovery/discoveryTypes";
+import type {
+  DiscoveryAvailabilityFlexibility,
+  DiscoveryProfilePreview,
+} from "@/features/discovery/discoveryTypes";
 import {
   type MatchingSession,
   type MatchingSessionInput,
@@ -115,6 +118,8 @@ type MatchingCoreProfileRow = {
   location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
+  availability_flexibility: DiscoveryAvailabilityFlexibility | null;
+  availability_condition: string | null;
   commitment_level: string;
   venture_stage: string;
   venture_goal: string;
@@ -208,6 +213,8 @@ function mapProfile(row: MatchingCoreProfileRow): DiscoveryProfilePreview {
     locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryProfilePreview["remoteMode"],
     availabilityHoursPerWeek: row.availability_hours_per_week,
+    availabilityFlexibility: row.availability_flexibility,
+    availabilityCondition: row.availability_condition,
     commitmentLevel: row.commitment_level as DiscoveryProfilePreview["commitmentLevel"],
     ventureStage: row.venture_stage as DiscoveryProfilePreview["ventureStage"],
     ventureGoal: row.venture_goal as DiscoveryProfilePreview["ventureGoal"],
@@ -301,6 +308,10 @@ async function loadActiveProfilesByUserId(userIds: string[], client: SupabaseLik
         "location_region",
         "remote_mode",
         "availability_hours_per_week",
+        "availability_flexibility",
+        "availability_condition",
+  "availability_flexibility",
+  "availability_condition",
         "commitment_level",
         "venture_stage",
         "venture_goal",

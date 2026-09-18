@@ -6,6 +6,7 @@ import {
   getOwnDiscoveryProfile,
 } from "@/features/discovery/discoveryData";
 import type {
+  DiscoveryAvailabilityFlexibility,
   DiscoveryCommitmentLevel,
   DiscoveryFounderRole,
   DiscoveryProfilePreview,
@@ -48,6 +49,8 @@ const DISCOVERY_INTRO_PROFILE_COLUMNS = [
   "location_region",
   "remote_mode",
   "availability_hours_per_week",
+  "availability_flexibility",
+  "availability_condition",
   "commitment_level",
   "venture_stage",
   "venture_goal",
@@ -88,6 +91,8 @@ type DiscoveryIntroProfileRow = {
   location_region: string | null;
   remote_mode: string;
   availability_hours_per_week: number | null;
+  availability_flexibility: DiscoveryAvailabilityFlexibility | null;
+  availability_condition: string | null;
   commitment_level: string;
   venture_stage: string;
   venture_goal: string;
@@ -153,6 +158,8 @@ function mapIntroProfileRow(row: DiscoveryIntroProfileRow): DiscoveryProfilePrev
     locationRegion: row.location_region,
     remoteMode: row.remote_mode as DiscoveryRemoteMode,
     availabilityHoursPerWeek: row.availability_hours_per_week,
+    availabilityFlexibility: row.availability_flexibility,
+    availabilityCondition: row.availability_condition,
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
     ventureStage: row.venture_stage as DiscoveryVentureStage,
     ventureGoal: row.venture_goal as DiscoveryVentureGoal,

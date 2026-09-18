@@ -121,6 +121,9 @@ export function FounderDiscoveryCard({
         {profile.locationRegion ? <span className={CHIP_CLASS}>{profile.locationRegion}</span> : null}
         <span className={CHIP_CLASS}>{t(`remoteModes.${profile.remoteMode}`)}</span>
         {profile.availabilityHoursPerWeek ? <span className={CHIP_CLASS}>{t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}</span> : null}
+        {/* Steht direkt neben der Stundenzahl: Sie sagt erst zusammen mit
+            dieser Angabe, was sie bedeutet. */}
+        {profile.availabilityFlexibility ? <span className={`${CHIP_CLASS} border-violet-200 bg-violet-50 text-violet-900`}>{t(`profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`)}</span> : null}
       </div>
 
       <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">

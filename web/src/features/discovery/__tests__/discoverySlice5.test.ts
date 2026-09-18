@@ -18,6 +18,8 @@ function profile(id: string, displayName: string): FounderDiscoveryProfile {
     seekingRoles: ["product"],
   ownRoleOther: null,
   seekingRoleOther: null,
+  availabilityFlexibility: null,
+  availabilityCondition: null,
     expertise: [],
     industries: [],
     locationRegion: null,

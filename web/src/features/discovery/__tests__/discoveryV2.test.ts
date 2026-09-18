@@ -30,6 +30,8 @@ const profile: FounderDiscoveryProfile = {
   seekingRoles: ["product"],
   ownRoleOther: null,
   seekingRoleOther: null,
+  availabilityFlexibility: null,
+  availabilityCondition: null,
   expertise: ["AI", "React"],
   industries: ["Legacy interest"],
   locationRegion: "Berlin",
