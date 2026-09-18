@@ -15,6 +15,26 @@ export default async function FounderInTheWildPromptReveal({ params }: { params:
   if (!data) notFound(); const reveal = data.reveal; const label = (keys: string[], type: "moves" | "matters" | "needs") => keys.flatMap((key) => reveal.prompt.content[type].find((choice) => choice.key === key)?.label[locale] ?? []); const ownMarked = round.conversationMarkers.find((entry) => entry.roundPromptId === prompt.roundPromptId)?.participantUserIds.includes(user.id) ?? false; const partnerMarked = round.conversationMarkers.find((entry) => entry.roundPromptId === prompt.roundPromptId)?.participantUserIds.includes(round.partner.userId) ?? false; const status = ownMarked && partnerMarked ? t("markedBoth") : partnerMarked ? t("markedPartner", { name: partnerName }) : ownMarked ? t("markedOwn") : null; const next = round.prompts.find((entry) => entry.position > position)?.position;
   const panel = (title: string, keys: string[], type: "moves" | "matters" | "needs") => <article className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="text-sm font-semibold text-slate-700">{title}</h3><ul className="mt-3 grid gap-2">{label(keys, type).map((value) => <li key={value} className="text-sm leading-6 text-slate-900">{value}</li>)}</ul></article>;
   return <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10"><Link href={`${base}/reveal`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline">{t("overview")}</Link><header className="mt-6 rounded-[30px] border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-amber-50 p-6 sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p><h1 className="mt-3 text-3xl font-semibold">{prompt.content.title[locale]}</h1><p className="mt-4 text-base leading-7 text-slate-700">{prompt.content.situation[locale]}</p></header><p className="mt-6 inline-flex rounded-full bg-violet-100 px-3 py-1.5 text-xs font-semibold text-violet-900">{t(reveal.own.move[0] === reveal.partner.move[0] ? "same" : "different")}</p>
+    {/* Der Moment, um den es geht: Habe ich richtig geraten, wie der andere
+        entscheidet? Nur in Packs mit Tipp - ownGuessHit ist dort null, und
+        null heisst "nicht geraten", nicht "danebengelegen". */}
+    {reveal.ownGuessHit !== null ? (
+      <section className={`mt-4 rounded-2xl border p-5 ${reveal.ownGuessHit ? "border-violet-300 bg-[linear-gradient(120deg,rgba(124,58,237,.08),rgba(34,211,238,.09))]" : "border-amber-300 bg-amber-50/70"}`}>
+        <p className="text-base font-semibold text-slate-950">
+          {t(reveal.ownGuessHit ? "guessHit" : "guessMiss", { name: partnerName })}
+        </p>
+        {!reveal.ownGuessHit ? (
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            {t("guessMissDetail", { name: partnerName, guess: label(reveal.own.guess, "moves")[0] ?? "" })}
+          </p>
+        ) : null}
+        {reveal.partnerGuessHit !== null ? (
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            {t(reveal.partnerGuessHit ? "partnerGuessHit" : "partnerGuessMiss", { name: partnerName })}
+          </p>
+        ) : null}
+      </section>
+    ) : null}
     <section className="mt-4 grid gap-4 md:grid-cols-2">{panel(t("yourMove"), reveal.own.move, "moves")}{panel(t("partnerMove", { name: partnerName }), reveal.partner.move, "moves")}{panel(t("yourMatters"), reveal.own.matters, "matters")}{panel(t("partnerMatters", { name: partnerName }), reveal.partner.matters, "matters")}{panel(t("yourNeed"), reveal.own.need, "needs")}{panel(t("partnerNeed", { name: partnerName }), reveal.partner.need, "needs")}</section>
     <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/50 p-5"><h2 className="text-lg font-semibold">{t("talkTitle")}</h2><ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-700"><li>{t("talk1")}</li><li>{t("talk2")}</li><li>{t("talk3")}</li></ol></section>
     <section id="conversation-marker" className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/50 p-5"><h2 className="text-lg font-semibold">{t("markerTitle")}</h2>{status ? <p className="mt-2 text-sm font-medium text-violet-900">{status}</p> : null}<p className="mt-2 text-sm text-slate-600">{t("visible")}</p><form action={(ownMarked ? unmarkFounderInTheWildConversationAction : markFounderInTheWildConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4"><button aria-pressed={ownMarked} className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 focus-visible:ring-2 focus-visible:ring-violet-500">{t(ownMarked ? "unmark" : "mark")}</button></form></section>

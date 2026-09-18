@@ -1,4 +1,10 @@
-import { FOUNDER_IN_THE_WILD_PACK, type FounderInTheWildScenario } from "./founderInTheWildContent";
+import {
+  FOUNDER_IN_THE_WILD_PACK,
+  getFounderInTheWildPack,
+  type FounderInTheWildPack,
+  type FounderInTheWildResponseType,
+  type FounderInTheWildScenario,
+} from "./founderInTheWildContent";
 
 export type FounderInTheWildTeam = {
   id: string;
@@ -7,7 +13,7 @@ export type FounderInTheWildTeam = {
 };
 
 export type FounderInTheWildSlot = {
-  responseType: "move" | "matters" | "need";
+  responseType: FounderInTheWildResponseType;
   assignmentId: string;
   choiceKeys: string[] | null;
   lockedAt: string | null;
@@ -20,6 +26,13 @@ export type FounderInTheWildPromptState = {
   move: FounderInTheWildSlot;
   matters: FounderInTheWildSlot;
   need: FounderInTheWildSlot;
+  /**
+   * Der Tipp, wie der andere entscheiden wuerde - null in Packs, die ihn
+   * nicht haben. Er haengt am Pack und nicht am Spiel: Ihn nachtraeglich in
+   * ein laufendes Pack zu legen haette jede angefangene Runde unvollstaendig
+   * gemacht (siehe Migration 20261002120000).
+   */
+  guess: FounderInTheWildSlot | null;
   complete: boolean;
 };
 
@@ -29,6 +42,7 @@ export type FounderInTheWildRound = {
   team: FounderInTheWildTeam;
   createdByUserId: string;
   partner: FounderInTheWildTeam["members"][number];
+  pack: FounderInTheWildPack;
   prompts: FounderInTheWildPromptState[];
   nextPromptPosition: number | null;
   ownStarted: boolean;
@@ -43,10 +57,20 @@ export type FounderInTheWildRound = {
   conversationMarkers: Array<{ roundPromptId: string; participantUserIds: string[] }>;
 };
 
+type RevealSide = { move: string[]; matters: string[]; need: string[]; guess: string[] };
+
 export type FounderInTheWildReveal = {
   prompt: FounderInTheWildPromptState;
-  own: { move: string[]; matters: string[]; need: string[] };
-  partner: { move: string[]; matters: string[]; need: string[] };
+  own: RevealSide;
+  partner: RevealSide;
+  /**
+   * Ob der eigene Tipp den Zug des anderen getroffen hat.
+   *
+   * Null, wenn in diesem Pack nicht geraten wird - und ausdruecklich nicht
+   * "false", damit die Ansicht ein fehlendes Raten nicht als Fehlschuss zeigt.
+   */
+  ownGuessHit: boolean | null;
+  partnerGuessHit: boolean | null;
 };
 
 type Row = Record<string, unknown>;
@@ -70,7 +94,10 @@ export function buildFounderInTheWildRound(params: {
   canDecline?: boolean;
   bothStarted?: boolean;
 }): FounderInTheWildRound | null {
-  if (params.round.experience_key !== FOUNDER_IN_THE_WILD_PACK.experienceKey || params.round.pack_key !== FOUNDER_IN_THE_WILD_PACK.key || params.round.pack_version !== 1) return null;
+  const pack = getFounderInTheWildPack(
+    typeof params.round.pack_key === "string" ? params.round.pack_key : null
+  );
+  if (params.round.experience_key !== FOUNDER_IN_THE_WILD_PACK.experienceKey || !pack || params.round.pack_version !== pack.version) return null;
   const status = params.round.status === "active" || params.round.status === "completed" ? params.round.status : null;
   const ownParticipant = params.participants.find((row) => row.founder_user_id === params.currentUserId && row.state === "joined");
   const partnerParticipant = params.participants.find((row) => row.founder_user_id !== params.currentUserId && row.state === "joined");
@@ -79,21 +106,35 @@ export function buildFounderInTheWildRound(params: {
   if (!status || params.participants.length !== 2 || !ownParticipant || !partner || params.team.members.length !== 2) return null;
 
   const promptStates = [...params.prompts].sort((a, b) => Number(a.position) - Number(b.position)).flatMap((row) => {
-    const content = FOUNDER_IN_THE_WILD_PACK.scenarios.find((scenario) => scenario.key === row.prompt_key && scenario.position === row.position);
+    const content = pack.scenarios.find((scenario) => scenario.key === row.prompt_key && scenario.position === row.position);
     const assignment = params.assignments.find((entry) => entry.round_prompt_id === row.id && entry.target_user_id === params.currentUserId);
     if (!content || typeof row.id !== "string" || typeof assignment?.id !== "string") return [];
-    const slot = (responseType: "move" | "matters" | "need"): FounderInTheWildSlot => {
+    const slot = (responseType: FounderInTheWildResponseType): FounderInTheWildSlot => {
       const response = params.responses.find((entry) => entry.prompt_assignment_id === assignment.id && entry.respondent_user_id === params.currentUserId && entry.response_type === responseType);
       return { responseType, assignmentId: assignment.id as string, choiceKeys: Array.isArray(response?.choice_keys) ? response.choice_keys as string[] : null, lockedAt: typeof response?.locked_at === "string" ? response.locked_at : null };
     };
     const move = slot("move"); const matters = slot("matters"); const need = slot("need");
-    return [{ roundPromptId: row.id, position: content.position, content, move, matters, need, complete: Boolean(move.lockedAt && matters.lockedAt && need.lockedAt) }];
+    const guess = pack.hasGuess ? slot("guess") : null;
+    return [{
+      roundPromptId: row.id,
+      position: content.position,
+      content,
+      move,
+      matters,
+      need,
+      guess,
+      // Dieselbe Rechnung wie in der Datenbank: Ein Pack mit Tipp ist erst
+      // fertig, wenn auch der Tipp steht. Waere das hier laxer, sagte die
+      // Seite "fertig" und der Reveal bliebe verschlossen.
+      complete: Boolean(move.lockedAt && matters.lockedAt && need.lockedAt && (!guess || guess.lockedAt)),
+    }];
   });
-  if (promptStates.length !== FOUNDER_IN_THE_WILD_PACK.scenarios.length) return null;
+  if (promptStates.length !== pack.scenarios.length) return null;
   const markerMap = new Map<string, string[]>();
   for (const marker of params.markers) if (typeof marker.round_prompt_id === "string" && typeof marker.participant_user_id === "string") markerMap.set(marker.round_prompt_id, [...(markerMap.get(marker.round_prompt_id) ?? []), marker.participant_user_id]);
   return {
     id: String(params.round.id), status, team: params.team, createdByUserId: String(params.round.created_by_user_id), partner,
+    pack,
     prompts: promptStates,
     nextPromptPosition: promptStates.find((prompt) => !prompt.complete)?.position ?? null,
     ownStarted: Boolean(params.ownStarted),
@@ -119,9 +160,28 @@ export function buildFounderInTheWildReveal(round: FounderInTheWildRound, curren
     const row = rows.find((entry) => entry.respondent_user_id === userId && entry.response_type === responseType);
     return Array.isArray(row?.choice_keys) ? row.choice_keys as string[] : [];
   };
-  const response = (userId: string) => ({ move: choices(userId, "move"), matters: choices(userId, "matters"), need: choices(userId, "need") });
+  const response = (userId: string): RevealSide => ({
+    move: choices(userId, "move"),
+    matters: choices(userId, "matters"),
+    need: choices(userId, "need"),
+    guess: choices(userId, "guess"),
+  });
   const own = response(currentUserId); const partner = response(round.partner.userId);
-  return own.move.length === 1 && own.matters.length >= 1 && own.need.length === 1 && partner.move.length === 1 && partner.matters.length >= 1 && partner.need.length === 1
-    ? { prompt, own, partner }
-    : null;
+  const complete = (side: RevealSide) =>
+    side.move.length === 1 && side.matters.length >= 1 && side.need.length === 1
+      && (!round.pack.hasGuess || side.guess.length === 1);
+  if (!complete(own) || !complete(partner)) return null;
+
+  // Getroffen heisst: Mein Tipp ist der Zug, den der andere wirklich gewaehlt
+  // hat. Ohne Raten bleibt es null, nicht false.
+  const hit = (guess: string[], actualMove: string[]) =>
+    round.pack.hasGuess && guess.length === 1 && actualMove.length === 1 ? guess[0] === actualMove[0] : null;
+
+  return {
+    prompt,
+    own,
+    partner,
+    ownGuessHit: hit(own.guess, partner.move),
+    partnerGuessHit: hit(partner.guess, own.move),
+  };
 }

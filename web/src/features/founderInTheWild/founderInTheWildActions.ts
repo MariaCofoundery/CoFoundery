@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { isFounderInTheWildChoice } from "./founderInTheWildContent";
+import { getFounderInTheWildPack, isFounderInTheWildChoice } from "./founderInTheWildContent";
 import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTheWildData";
 import { logFounderInTheWildServerError } from "./founderInTheWildDiagnostics";
 import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
@@ -72,11 +72,15 @@ async function claimAndSendHandoff(params: {
   }
 }
 
-export async function startFounderInTheWildRoundAction(teamId: string) {
+export async function startFounderInTheWildRoundAction(teamId: string, packKey: string) {
   const { supabase, user } = await auth(entryHref(teamId));
   const team = await getFounderInTheWildTeam(teamId, user.id, supabase);
   if (!team || team.members.length !== 2) redirect(`${entryHref(teamId)}?result=unavailable`);
-  const result = await supabase.rpc("create_founder_in_the_wild_round", { p_founder_team_id: teamId, p_pack_key: "under_pressure_v1", p_pack_version: 1 });
+  // Nur ein Pack, das es wirklich gibt: Der Schluessel kommt aus dem Formular
+  // und waere sonst ein Wert, den die Seite an die Datenbank durchreicht.
+  const pack = getFounderInTheWildPack(packKey);
+  if (!pack) redirect(`${entryHref(teamId)}?result=changed`);
+  const result = await supabase.rpc("create_founder_in_the_wild_round", { p_founder_team_id: teamId, p_pack_key: pack.key, p_pack_version: pack.version });
   if (result.error) {
     logFounderInTheWildServerError("create_round", result.error);
     redirect(`${entryHref(teamId)}?result=changed`);
@@ -96,11 +100,16 @@ export async function lockFounderInTheWildScenarioAction(teamId: string, roundId
   const round = team ? await getFounderInTheWildRound(team, roundId, user.id, supabase) : null;
   const prompt = round?.prompts.find((entry) => entry.roundPromptId === roundPromptId);
   if (!round || !prompt || round.status !== "active") redirect(`${entryHref(teamId)}?result=changed`);
-  for (const responseType of ["move", "matters", "need"] as const) {
+  // "guess" nur, wenn das Pack es hat - sonst gibt es keinen Vertrag dafuer
+  // und die Datenbank wiese es zu Recht ab.
+  const responseTypes = prompt.guess
+    ? (["move", "guess", "matters", "need"] as const)
+    : (["move", "matters", "need"] as const);
+  for (const responseType of responseTypes) {
     const keys = formData.getAll(responseType).filter((value): value is string => typeof value === "string");
     if (!isFounderInTheWildChoice(responseType, prompt.content, keys)) redirect(`${roundHref(teamId, roundId)}?result=invalid`);
     const slot = prompt[responseType];
-    if (slot.lockedAt) continue;
+    if (!slot || slot.lockedAt) continue;
     const result = await supabase.rpc("lock_founder_in_the_wild_response", { p_prompt_assignment_id: slot.assignmentId, p_response_type: responseType, p_choice_keys: keys });
     if (result.error) redirect(`${roundHref(teamId, roundId)}?result=changed`);
   }
