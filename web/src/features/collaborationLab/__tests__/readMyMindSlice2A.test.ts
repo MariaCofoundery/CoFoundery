@@ -79,9 +79,28 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   const en = JSON.parse(readFileSync(new URL("../../../../messages/en/collaborationLab.json", import.meta.url), "utf8"));
   const dashboardDe = JSON.parse(readFileSync(new URL("../../../../messages/de/dashboard.json", import.meta.url), "utf8"));
   const dashboardEn = JSON.parse(readFileSync(new URL("../../../../messages/en/dashboard.json", import.meta.url), "utf8"));
+  // GEAENDERT am 18.09.2026: Die Karte stand zwischen Commitment Lab und
+  // Founder Setup - zwischen den beiden schwersten Blocks der Seite, obwohl
+  // sie der leichte Einstieg ist. Die Teamseite ist jetzt in drei Gruppen
+  // geordnet (kennenlernen, verstehen, verbindlich werden); Read My Mind
+  // steht in der ersten.
+  //
+  // Die Zusage ist damit umgekehrt: Sie steht VOR dem, was Arbeit ist.
   const cardPosition = homebase.lastIndexOf("<ReadMyMindHomebaseCard");
-  assert.ok(cardPosition > homebase.indexOf("commitment-lab-title"));
-  assert.ok(cardPosition < homebase.indexOf("team-setup-title"));
+  assert.ok(cardPosition > 0, "die Karte steht nicht mehr auf der Teamseite");
+  assert.ok(
+    cardPosition < homebase.indexOf("commitment-lab-title"),
+    "Read My Mind steht wieder hinter dem Commitment Lab"
+  );
+  assert.ok(
+    cardPosition < homebase.indexOf("team-setup-title"),
+    "Read My Mind steht wieder hinter dem Founder Setup"
+  );
+  // Und in der ersten Gruppe, nicht irgendwo davor.
+  assert.ok(
+    cardPosition > homebase.indexOf('t("groups.discover.title")'),
+    "die Karte steht ausserhalb der Gruppe, zu der sie gehoert"
+  );
   assert.match(form, /type=\{multi \? "checkbox" : "radio"\}/);
   assert.match(form, /disabled=\{!complete \|\| allLocked\}/);
   assert.match(form, /focus-visible:ring/);

@@ -30,11 +30,11 @@
       "empty": "Für dieses Team gibt es noch keinen gemeinsamen Alignment-Bereich.",
       "noArtifacts": "Für diese Verbindung liegen noch keine Reports oder gemeinsamen Arbeitsbereiche vor.",
       "pair": "Alignment zwischen {names}",
-      "report": "Report ansehen",
-      "workbook": "Alignment vertiefen",
-      "continue": "Alignment vertiefen",
-      "matchingReport": "Matching-Report ansehen",
-      "workspace": "Matching Workspace öffnen"
+      "report": "Älterer Report ansehen",
+      "workbook": "Themen vertiefen",
+      "continue": "Themen vertiefen",
+      "matchingReport": "Euer gemeinsamer Report",
+      "workspace": "Eure Vereinbarungen"
     },
     "agreements": {
       "title": "Vereinbarungen",
@@ -77,6 +77,24 @@
         "invited": "Eingeladen",
         "linked": "Verbunden",
         "revoked": "Widerrufen"
+      }
+    },
+    "groups": {
+      "whereToStart": "Ihr seid gerade erst zusammengekommen. Fangt links oben an: Read My Mind dauert ein paar Minuten und zeigt euch sofort, wo ihr euch richtig eingeschätzt habt – und wo nicht.",
+      "discover": {
+        "title": "Einander kennenlernen",
+        "text": "Kurze Runden, unabhängig beantwortet und dann gemeinsam aufgedeckt. Kein Test, keine Auswertung – es geht um den Moment, in dem ihr merkt, dass ihr etwas anders seht."
+      },
+      "understand": {
+        "title": "Euch verstehen",
+        "text": "Was aus euren Antworten herausgekommen ist, und die Themen, die eine längere Unterhaltung verdienen."
+      },
+      "commit": {
+        "title": "Verbindlich werden",
+        "text": "Hier wird aus Gesprächen etwas, auf das ihr euch berufen könnt. Das ist der unbequeme Teil – und der, der später zählt."
+      },
+      "resources": {
+        "title": "Zum Nachschlagen"
       }
     }
   },
@@ -241,7 +259,7 @@
   },
   "connections": {
     "eyebrow": "Verbindungen",
-      "title": "Verbindungen & Teams",
+    "title": "Verbindungen & Teams",
     "subtitle": "Hier findest du Founder, mit denen du eine Zusammenarbeit prüfst oder bereits zusammenarbeitest.",
     "find": "Co-Founder finden",
     "avatarAlt": "Profil von {name}",
@@ -260,8 +278,8 @@
       "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden."
     },
     "potential": {
-        "title": "Kennenlernen & gemeinsam prüfen",
-        "description": "Offene Kennenlern-Anfragen und Verbindungen, bei denen ihr eure Zusammenarbeit noch gemeinsam prüft.",
+      "title": "Kennenlernen & gemeinsam prüfen",
+      "description": "Offene Kennenlern-Anfragen und Verbindungen, bei denen ihr eure Zusammenarbeit noch gemeinsam prüft.",
       "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen."
     },
     "states": {
@@ -270,12 +288,12 @@
         "sent": "Anfrage gesendet"
       },
       "intro_accepted": {
-          "incoming": "Ihr möchtet euch kennenlernen",
-          "sent": "Ihr möchtet euch kennenlernen"
+        "incoming": "Ihr möchtet euch kennenlernen",
+        "sent": "Ihr möchtet euch kennenlernen"
       },
       "alignment_in_progress": {
-          "incoming": "Ihr prüft gemeinsam",
-          "sent": "Ihr prüft gemeinsam"
+        "incoming": "Ihr prüft gemeinsam",
+        "sent": "Ihr prüft gemeinsam"
       }
     }
   },
@@ -389,24 +407,78 @@
       "error": "Die Änderung konnte gerade nicht sicher gespeichert werden. Bitte versuche es erneut."
     },
     "items": {
-      "roles_responsibilities": { "title": "Rollen & Verantwortlichkeiten", "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?" },
-      "decision_rights": { "title": "Entscheidungen & Entscheidungsrechte", "question": "Was entscheidet ihr gemeinsam, was einzelne Founder – und wie geht ihr mit unterschiedlichen Einschätzungen um?" },
-      "time_commitment": { "title": "Zeit & Commitment", "question": "Wie viel Zeit kann und möchte jede Person aktuell einbringen, und welche Veränderungen solltet ihr früh miteinander besprechen?" },
-      "communication": { "title": "Kommunikation & Zusammenarbeit", "question": "Wie wollt ihr Informationen teilen, euch abstimmen, Feedback geben und im Alltag erreichbar sein?" },
-      "conflict_deadlock": { "title": "Konflikte & festgefahrene Situationen", "question": "Wie wollt ihr Meinungsverschiedenheiten ansprechen, und was tut ihr, wenn ihr bei einer wichtigen Frage nicht weiterkommt?" },
-      "equity": { "title": "Beteiligungsverteilung / Equity", "question": "Wie sollen Anteile verteilt werden, und welche Überlegungen stehen hinter dieser Verteilung?" },
-      "vesting": { "title": "Vesting & Cliff", "question": "Soll die Beteiligung an Zeit oder Mitarbeit geknüpft sein, und was soll bei einem frühen Ausscheiden gelten?" },
-      "compensation": { "title": "Gehalt & Vergütung", "question": "Wann und unter welchen Bedingungen wollt ihr euch vergüten, und wie geht ihr mit unterschiedlichen Vergütungen um?" },
-      "contributions_expenses": { "title": "Einlagen, Auslagen & Founder-Darlehen", "question": "Wie behandelt ihr privates Geld, Auslagen, Einlagen oder Darlehen, die Founder für das Unternehmen übernehmen?" },
-      "personal_financial_risk": { "title": "Persönliches finanzielles Risiko", "question": "Welche finanziellen Verpflichtungen kann und möchte jede Person übernehmen – und welche ausdrücklich nicht?" },
-      "legal_entity": { "title": "Gesellschaft & formale Gründung", "question": "Welche formalen Gründungsschritte sind noch offen, und wo benötigt ihr gegebenenfalls professionelle Beratung?" },
-      "founder_agreements": { "title": "Gesellschafts- & Founder-Vereinbarungen", "question": "Welche wichtigen Absprachen wollt ihr verbindlich schriftlich festhalten?" },
-      "intellectual_property": { "title": "Geistiges Eigentum / IP", "question": "Wie wollt ihr mit bestehendem und künftig entstehendem Code, Designs, Marken, Inhalten, Erfindungen oder anderen Arbeitsergebnissen umgehen?" },
-      "outside_activities": { "title": "Nebentätigkeiten & andere Projekte", "question": "Welche anderen Jobs, Unternehmen oder Projekte laufen parallel, und was möchtet ihr dazu transparent miteinander klären?" },
-      "accounts_access": { "title": "Accounts, Zugänge & wichtige Unternehmensdaten", "question": "Wie stellt ihr sicher, dass wichtige Accounts, Zugänge und Unternehmensinformationen nicht nur von einer Person abhängen?" },
-      "prolonged_absence": { "title": "Längerer Ausfall", "question": "Wie wollt ihr vorgehen, wenn ein Founder für längere Zeit ausfällt oder deutlich weniger verfügbar ist?" },
-      "changing_commitment": { "title": "Commitment reduzieren oder Rolle verändern", "question": "Was wollt ihr klären, wenn jemand Umfang, Verantwortungsbereich oder Rolle deutlich verändern möchte?" },
-      "founder_exit": { "title": "Founder Exit / Ausscheiden", "question": "Was soll geklärt sein, wenn ein Founder das Unternehmen oder das Founder-Team verlassen möchte?" }
+      "roles_responsibilities": {
+        "title": "Rollen & Verantwortlichkeiten",
+        "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?"
+      },
+      "decision_rights": {
+        "title": "Entscheidungen & Entscheidungsrechte",
+        "question": "Was entscheidet ihr gemeinsam, was einzelne Founder – und wie geht ihr mit unterschiedlichen Einschätzungen um?"
+      },
+      "time_commitment": {
+        "title": "Zeit & Commitment",
+        "question": "Wie viel Zeit kann und möchte jede Person aktuell einbringen, und welche Veränderungen solltet ihr früh miteinander besprechen?"
+      },
+      "communication": {
+        "title": "Kommunikation & Zusammenarbeit",
+        "question": "Wie wollt ihr Informationen teilen, euch abstimmen, Feedback geben und im Alltag erreichbar sein?"
+      },
+      "conflict_deadlock": {
+        "title": "Konflikte & festgefahrene Situationen",
+        "question": "Wie wollt ihr Meinungsverschiedenheiten ansprechen, und was tut ihr, wenn ihr bei einer wichtigen Frage nicht weiterkommt?"
+      },
+      "equity": {
+        "title": "Beteiligungsverteilung / Equity",
+        "question": "Wie sollen Anteile verteilt werden, und welche Überlegungen stehen hinter dieser Verteilung?"
+      },
+      "vesting": {
+        "title": "Vesting & Cliff",
+        "question": "Soll die Beteiligung an Zeit oder Mitarbeit geknüpft sein, und was soll bei einem frühen Ausscheiden gelten?"
+      },
+      "compensation": {
+        "title": "Gehalt & Vergütung",
+        "question": "Wann und unter welchen Bedingungen wollt ihr euch vergüten, und wie geht ihr mit unterschiedlichen Vergütungen um?"
+      },
+      "contributions_expenses": {
+        "title": "Einlagen, Auslagen & Founder-Darlehen",
+        "question": "Wie behandelt ihr privates Geld, Auslagen, Einlagen oder Darlehen, die Founder für das Unternehmen übernehmen?"
+      },
+      "personal_financial_risk": {
+        "title": "Persönliches finanzielles Risiko",
+        "question": "Welche finanziellen Verpflichtungen kann und möchte jede Person übernehmen – und welche ausdrücklich nicht?"
+      },
+      "legal_entity": {
+        "title": "Gesellschaft & formale Gründung",
+        "question": "Welche formalen Gründungsschritte sind noch offen, und wo benötigt ihr gegebenenfalls professionelle Beratung?"
+      },
+      "founder_agreements": {
+        "title": "Gesellschafts- & Founder-Vereinbarungen",
+        "question": "Welche wichtigen Absprachen wollt ihr verbindlich schriftlich festhalten?"
+      },
+      "intellectual_property": {
+        "title": "Geistiges Eigentum / IP",
+        "question": "Wie wollt ihr mit bestehendem und künftig entstehendem Code, Designs, Marken, Inhalten, Erfindungen oder anderen Arbeitsergebnissen umgehen?"
+      },
+      "outside_activities": {
+        "title": "Nebentätigkeiten & andere Projekte",
+        "question": "Welche anderen Jobs, Unternehmen oder Projekte laufen parallel, und was möchtet ihr dazu transparent miteinander klären?"
+      },
+      "accounts_access": {
+        "title": "Accounts, Zugänge & wichtige Unternehmensdaten",
+        "question": "Wie stellt ihr sicher, dass wichtige Accounts, Zugänge und Unternehmensinformationen nicht nur von einer Person abhängen?"
+      },
+      "prolonged_absence": {
+        "title": "Längerer Ausfall",
+        "question": "Wie wollt ihr vorgehen, wenn ein Founder für längere Zeit ausfällt oder deutlich weniger verfügbar ist?"
+      },
+      "changing_commitment": {
+        "title": "Commitment reduzieren oder Rolle verändern",
+        "question": "Was wollt ihr klären, wenn jemand Umfang, Verantwortungsbereich oder Rolle deutlich verändern möchte?"
+      },
+      "founder_exit": {
+        "title": "Founder Exit / Ausscheiden",
+        "question": "Was soll geklärt sein, wenn ein Founder das Unternehmen oder das Founder-Team verlassen möchte?"
+      }
     }
   },
   "dashboard": {

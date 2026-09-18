@@ -84,6 +84,18 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
     )
   );
 
+  /**
+   * Ein Paar, das gerade erst zusammengefunden hat.
+   *
+   * Absichtlich nur aus dem, was diese Seite ohnehin weiss: kein Report, kein
+   * Setup begonnen, kein Lab gestartet. Eine feinere Empfehlung waere geraten -
+   * und ein falscher Rat ist schlechter als keiner.
+   */
+  const isNewPair =
+    team.alignment.every((entry) => !entry.matchingReport && !entry.classicReport) &&
+    !setupState?.started &&
+    startedLabRelationships.size === 0;
+
   const [t, navigationT, commitmentT] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.teamNavigation"),
@@ -161,92 +173,33 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           </ul>
         </section>
 
-        <section
-          id="team-alignment"
-          className={`${SECTION_CLASS} scroll-mt-32`}
-          aria-labelledby="team-alignment-title"
-        >
-          <h2 id="team-alignment-title" className="text-xl font-semibold text-slate-950">
-            {t("alignment.title")}
-          </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            {t("alignment.description")}
+        {/* ---------------------------------------------------------------
+            Drei Gruppen statt neun Kaesten.
+
+            Vorher standen Alignment, Commitment Lab, Read My Mind, Founder in
+            the Wild, Setup, Library und Vereinbarungen gleich gewichtet
+            untereinander. Ein frisch gematchtes Paar sah neun Kaesten und
+            wusste nicht, wo es anfangen soll - und weil alles gleich aussah,
+            fuehlte sich das Spielerische wie Hausaufgaben an und das Ernste
+            wie Beiwerk.
+
+            Die Reihenfolge bildet ab, wie ein Paar sich tatsaechlich bewegt:
+            erst einander kennenlernen, dann sich verstehen, dann verbindlich
+            werden.
+            --------------------------------------------------------------- */}
+
+{isNewPair ? (
+          <p className="rounded-2xl border border-cyan-200/70 bg-[linear-gradient(120deg,rgba(103,232,249,.10),rgba(124,58,237,.06))] px-5 py-4 text-sm leading-7 text-slate-700">
+            {t("groups.whereToStart")}
           </p>
-
-          {team.alignment.length === 0 ? (
-            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              {t("alignment.empty")}
-            </p>
-          ) : (
-            <div className="mt-5 grid gap-4">
-              {team.alignment.map((entry) => {
-                const participants = pairName(entry.participantUserIds, names, fallback);
-                const hasLinks = Boolean(
-                  entry.workbook ||
-                    entry.matchingWorkspace ||
-                    entry.classicReport ||
-                    entry.matchingReport
-                );
-                return (
-                  <article
-                    key={entry.relationshipId}
-                    className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
-                  >
-                    <h3 className="text-sm font-semibold text-slate-900">
-                      {t("alignment.pair", { names: participants })}
-                    </h3>
-                    {hasLinks ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {entry.workbook ? (
-                          <Link href={entry.workbook.href} className={LINK_CLASS}>
-                            {entry.workbook.exists
-                              ? t("alignment.workbook")
-                              : t("alignment.continue")}
-                          </Link>
-                        ) : null}
-                        {entry.matchingWorkspace ? (
-                          <Link href={entry.matchingWorkspace.href} className={LINK_CLASS}>
-                            {t("alignment.workspace")}
-                          </Link>
-                        ) : null}
-                        {entry.classicReport ? (
-                          <Link href={entry.classicReport.href} className={LINK_CLASS}>
-                            {t("alignment.report")}
-                          </Link>
-                        ) : null}
-                        {entry.matchingReport ? (
-                          <Link href={entry.matchingReport.href} className={LINK_CLASS}>
-                            {t("alignment.matchingReport")}
-                          </Link>
-                        ) : null}
-                      </div>
-                    ) : (
-                      <p className="mt-3 text-sm leading-6 text-slate-600">
-                        {t("alignment.noArtifacts")}
-                      </p>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {team.alignment.length > 0 ? (
-          <section className={SECTION_CLASS} aria-labelledby="commitment-lab-title">
-            <h2 id="commitment-lab-title" className="text-xl font-semibold text-slate-950">{commitmentT("title")}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{commitmentT("description")}</p>
-            <div className="mt-5 grid gap-3">
-              {team.alignment.map((entry) => {
-                const participants = pairName(entry.participantUserIds, names, fallback);
-                const started = startedLabRelationships.has(entry.relationshipId);
-                const completed = completedLabRelationships.has(entry.relationshipId);
-                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>{completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}</div><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(completed ? "view" : started ? "continue" : "start")}</Link></article>;
-              })}
-            </div>
-          </section>
         ) : null}
 
+        <div>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {t("groups.discover.title")}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.discover.text")}</p>
+        </div>
         <ReadMyMindHomebaseCard
           currentUserId={user.id}
           team={{
@@ -269,6 +222,116 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             members: team.members.map((member) => ({ userId: member.userId, displayName: member.displayName, avatarId: member.avatarId, avatarUrl: member.avatarUrl })),
           }}
         />
+
+
+        <div className="mt-2">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {t("groups.understand.title")}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.understand.text")}</p>
+        </div>
+        <section
+          id="team-alignment"
+          className={`${SECTION_CLASS} scroll-mt-32`}
+          aria-labelledby="team-alignment-title"
+        >
+          <h2 id="team-alignment-title" className="text-xl font-semibold text-slate-950">
+            {t("alignment.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            {t("alignment.description")}
+          </p>
+
+          {team.alignment.length === 0 ? (
+            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              {t("alignment.empty")}
+            </p>
+          ) : (
+            <div className="mt-5 grid gap-4">
+              {team.alignment.map((entry) => {
+                const participants = pairName(entry.participantUserIds, names, fallback);
+                // Vier Links hiessen "Report ansehen", "Matching-Report
+                // ansehen", "Matching Workspace oeffnen" und "Alignment
+                // vertiefen" - zwei davon "Report", und keiner sagte, was
+                // dahinter liegt. Jetzt in der Reihenfolge, in der man sie
+                // braucht, mit Namen, die die Sache nennen. Der aeltere
+                // Report steht zuletzt und leise: Er stammt aus der Zeit vor
+                // dem Matching-Report und ist nur noch fuer den Rueckblick da.
+                const hasLinks = Boolean(
+                  entry.workbook ||
+                    entry.matchingWorkspace ||
+                    entry.classicReport ||
+                    entry.matchingReport
+                );
+                return (
+                  <article
+                    key={entry.relationshipId}
+                    className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
+                  >
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      {t("alignment.pair", { names: participants })}
+                    </h3>
+                    {hasLinks ? (
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                        {entry.matchingReport ? (
+                          <Link href={entry.matchingReport.href} className={LINK_CLASS}>
+                            {t("alignment.matchingReport")}
+                          </Link>
+                        ) : null}
+                        {entry.workbook ? (
+                          <Link href={entry.workbook.href} className={LINK_CLASS}>
+                            {entry.workbook.exists
+                              ? t("alignment.workbook")
+                              : t("alignment.continue")}
+                          </Link>
+                        ) : null}
+                        {entry.matchingWorkspace ? (
+                          <Link href={entry.matchingWorkspace.href} className={LINK_CLASS}>
+                            {t("alignment.workspace")}
+                          </Link>
+                        ) : null}
+                        {entry.classicReport ? (
+                          <Link
+                            href={entry.classicReport.href}
+                            className="inline-flex min-h-11 items-center text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800"
+                          >
+                            {t("alignment.report")}
+                          </Link>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <p className="mt-3 text-sm leading-6 text-slate-600">
+                        {t("alignment.noArtifacts")}
+                      </p>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+
+        <div className="mt-2">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {t("groups.commit.title")}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.commit.text")}</p>
+        </div>
+        {team.alignment.length > 0 ? (
+          <section className={SECTION_CLASS} aria-labelledby="commitment-lab-title">
+            <h2 id="commitment-lab-title" className="text-xl font-semibold text-slate-950">{commitmentT("title")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{commitmentT("description")}</p>
+            <div className="mt-5 grid gap-3">
+              {team.alignment.map((entry) => {
+                const participants = pairName(entry.participantUserIds, names, fallback);
+                const started = startedLabRelationships.has(entry.relationshipId);
+                const completed = completedLabRelationships.has(entry.relationshipId);
+                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>{completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}</div><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(completed ? "view" : started ? "continue" : "start")}</Link></article>;
+              })}
+            </div>
+          </section>
+        ) : null}
 
         <section
           className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
@@ -297,8 +360,6 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </Link>
           </div>
         </section>
-
-        <FounderLibraryHomebaseCard teamId={teamId} />
 
         <section className={SECTION_CLASS} aria-labelledby="team-agreements-title">
           <h2 id="team-agreements-title" className="text-xl font-semibold text-slate-950">
@@ -339,6 +400,14 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </ul>
           )}
         </section>
+
+
+        <div className="mt-2">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {t("groups.resources.title")}
+          </h2>
+        </div>
+        <FounderLibraryHomebaseCard teamId={teamId} />
 
         <FounderRelationshipAdvisorPanel team={team} currentUserId={user.id} names={names} />
 
