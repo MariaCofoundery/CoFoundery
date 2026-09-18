@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
@@ -9,7 +10,6 @@ import {
   getReportRunSnapshotForSession,
 } from "@/features/reporting/actions";
 import { buildFounderAlignmentReport } from "@/features/reporting/buildFounderAlignmentReport";
-import { getFounderAlignmentReportPayloadLocale } from "@/features/reporting/founderAlignmentReportPayload";
 import {
   FOUNDER_DIMENSION_ORDER,
   type FounderDimensionKey,
@@ -159,7 +159,9 @@ export default async function ReportPage({ params }: PageProps) {
   const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
   const legacyReportAccess = getLegacyReportAccessState({ isLocked: true });
   const isLegacyReportLocked = !legacyReportAccess.isUnlocked;
-  const reportLocale = getFounderAlignmentReportPayloadLocale(snapshot.payload);
+  // Diese Seite baute den Text schon beim Anzeigen neu - nur eben in der
+  // Sprache, in der gespeichert wurde. Jetzt in der der lesenden Person.
+  const reportLocale = await getRequestLocale();
   const founderReport = buildFounderAlignmentReport({
     scoringResult: founderScoring,
     teamContext: teamContext ?? "pre_founder",

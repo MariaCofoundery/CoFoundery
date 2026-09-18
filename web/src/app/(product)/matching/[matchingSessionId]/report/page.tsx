@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderMatchingView } from "@/features/reporting/FounderMatchingView";
 import {
-  getFounderAlignmentReportPayloadLocale,
+  localizeFounderAlignmentReport,
   type FounderAlignmentReportPayload,
 } from "@/features/reporting/founderAlignmentReportPayload";
 import {
@@ -235,7 +236,13 @@ export default async function MatchingSessionReportPage({ params, searchParams }
     : null;
 
   const payload = summary.reportRun.payload;
-  const reportLocale = getFounderAlignmentReportPayloadLocale(payload);
+  // Die Sprache der LESENDEN Person, nicht die, in der gebaut wurde: Zwei
+  // Menschen teilen sich einen Report, und wer ihn ausgeloest hat, entscheidet
+  // sonst ueber die Sprache der anderen.
+  const { founderReport, locale: reportLocale } = localizeFounderAlignmentReport(
+    payload,
+    await getRequestLocale()
+  );
   const founderScoring = payload.founderScoring;
   const compareResult = compareFounders(
     toFounderScores(founderScoring, "A"),
@@ -274,7 +281,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         selection={selection}
         valuesProfileA={null}
         valuesProfileB={null}
-        founderReport={payload.founderReport}
+        founderReport={founderReport}
         workbookHref="#"
         teamContext={payload.teamContext}
         reportContext="matching_session"

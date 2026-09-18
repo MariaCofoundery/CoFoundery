@@ -80,6 +80,59 @@ export type FounderAlignmentReportPayloadResult = {
   inputAssessmentIds: string[];
 };
 
+/**
+ * Den gespeicherten Report in der Sprache der LESENDEN Person.
+ *
+ * Ein Report wird einmal gebaut und gespeichert - in der Sprache derjenigen
+ * Anfrage, die den Bau ausgeloest hat. Zwei Menschen teilen sich aber einen
+ * Report: Loest Person A ihn auf Deutsch aus, bekam Person B ihn auf Deutsch,
+ * auch mit englischem Profil, und zwar dauerhaft.
+ *
+ * Neu bauen muss dafuer niemand. Der Payload traegt beides:
+ *   - `founderScoring`, das sprachneutrale Ergebnis
+ *   - `founderReport`, den daraus gebauten Text
+ * und buildFounderAlignmentReport ist eine reine Funktion aus (Ergebnis,
+ * Teamkontext, Sprache). Der Text laesst sich also beim Anzeigen erneut
+ * bilden - dasselbe Vorgehen, das der Advisor-Report schon immer nutzt.
+ *
+ * Ohne `founderScoring` - alte Payloads koennten es nicht haben - bleibt es
+ * beim gespeicherten Text UND bei der gespeicherten Sprache. Ein halb
+ * uebersetzter Report waere schlimmer als ein durchgehend deutscher.
+ */
+export function localizeFounderAlignmentReport(
+  payload:
+    | {
+        locale?: unknown;
+        founderReport?: FounderAlignmentReport | null;
+        founderScoring?: TeamScoringResult | null;
+        teamContext?: TeamContext;
+      }
+    | null
+    | undefined,
+  viewerLocale: AppLocale
+): { founderReport: FounderAlignmentReport | null; locale: AppLocale } {
+  const storedLocale = getFounderAlignmentReportPayloadLocale(payload);
+  const stored = payload?.founderReport ?? null;
+
+  if (storedLocale === viewerLocale) {
+    return { founderReport: stored, locale: storedLocale };
+  }
+  // Auch der Teamkontext muss da sein: Er faerbt die Texte, und ihn zu raten
+  // hiesse, einen anderen Report zu bauen als den gespeicherten.
+  if (!payload?.founderScoring || !payload.teamContext) {
+    return { founderReport: stored, locale: storedLocale };
+  }
+
+  return {
+    founderReport: buildFounderAlignmentReport({
+      scoringResult: payload.founderScoring,
+      teamContext: payload.teamContext,
+      locale: viewerLocale,
+    }),
+    locale: viewerLocale,
+  };
+}
+
 export function getFounderAlignmentReportPayloadLocale(
   payload: { locale?: unknown } | null | undefined
 ): AppLocale {
