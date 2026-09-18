@@ -1,6 +1,7 @@
 import type { ReportBuilderCopy } from "@/features/reporting/content/builderCopy/builderCopy";
 
 export const REPORT_BUILDER_COPY_EN = {
+  locale: "en",
   executiveSummary: {
     dimensionLabels: {
       Unternehmenslogik: "company logic",
@@ -65,13 +66,13 @@ export const REPORT_BUILDER_COPY_EN = {
     },
     topMessages: {
       strength:
-        "The strongest current signal in your collaboration is {dimensionPrefix}.",
+        "The strongest current signal in your collaboration is {dimensionPrefix}: {title}",
       complementaryDynamic:
-        "Your strongest complementary signal is {dimensionPrefix}.",
+        "Your strongest complementary signal is {dimensionPrefix}: {title}",
       tension:
-        "The most important area to discuss deliberately is {dimensionPrefix}.",
+        "The most important area to discuss deliberately is {dimensionPrefix}: {title}",
       sharedBlindSpotTension:
-        "The main area to keep visible is {dimensionPrefix}.",
+        "The main area to keep visible is {dimensionPrefix}: {title}",
     },
     fallbackFocus: [
       "What expectations do you want to set for shared responsibility and decision paths?",

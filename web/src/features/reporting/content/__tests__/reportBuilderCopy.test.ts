@@ -151,18 +151,24 @@ test("buildExecutiveSummary returns English headline, intro, top messages, and f
   );
   assert.match(englishSummary.summaryIntro, /day-to-day collaboration/i);
   assert.match(englishSummary.summaryIntro, /decision logic/i);
+  // GEAENDERT am 18.09.2026: Die Saetze endeten nach der Dimension, weil der
+  // konkrete Befund nur deutsch vorlag und deshalb weggelassen wurde. Er liegt
+  // jetzt in beiden Sprachen vor (content/insightTitles) und steht wieder
+  // dabei - der englische Report ist damit so konkret wie der deutsche.
   assert.equal(
     englishSummary.topMessages.strength,
-    "The strongest current signal in your collaboration is around company logic."
+    "The strongest current signal in your collaboration is around company logic: " +
+      "Your views on how a company should work sit close enough together that strategic " +
+      "priorities can build on a shared assumption."
   );
-  assert.equal(
-    englishSummary.topMessages.complementaryDynamic,
-    "Your strongest complementary signal is around commitment."
-  );
-  assert.equal(
-    englishSummary.topMessages.tension,
-    "The most important area to discuss deliberately is around decision logic."
-  );
+  assert.match(englishSummary.topMessages.complementaryDynamic ?? "", /^Your strongest complementary signal is around commitment: /);
+  assert.match(englishSummary.topMessages.tension ?? "", /^The most important area to discuss deliberately is around decision logic: /);
+
+  // Und zwar ohne deutschen Rest: Das war der ganze Grund, warum der Befund
+  // vorher fehlte.
+  for (const message of Object.values(englishSummary.topMessages)) {
+    assert.doesNotMatch(String(message ?? ""), /[äöüßÄÖÜ]/, `deutscher Text im englischen Report: ${message}`);
+  }
   assert.ok(
     englishSummary.recommendedFocus.some((focus) =>
       focus.includes("pace and careful review")

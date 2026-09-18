@@ -9,6 +9,8 @@ import {
   getReportBuilderCopy,
   type ReportBuilderCopy,
 } from "@/features/reporting/content/builderCopy/builderCopy";
+import { resolveInsightTitle } from "@/features/reporting/content/insightTitles/insightTitles";
+import { type AppLocale } from "@/i18n/config";
 
 export type TeamContext = "pre_founder" | "existing_team";
 
@@ -198,28 +200,55 @@ function introForContext(
     .join(" ");
 }
 
-function strengthMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
+/**
+ * Der konkrete Befund, in der Sprache des Reports.
+ *
+ * NICHT `insight.title`: Der traegt den deutschen Text, den das Scoring
+ * gebildet hat, und stand so auch im gespeicherten Payload. Er wird hier aus
+ * sprachneutralen Angaben neu gebildet - Dimension, Art, gemeinsame Lage,
+ * Konfliktrisiko -, die alle im Scoring-Ergebnis stehen.
+ *
+ * Ohne Titel bleibt der Satz bei der Dimension stehen: Die Vorlagen tragen
+ * dann einen leeren Platzhalter, und genau dafuer raeumt trimTemplate den
+ * uebrig gebliebenen Doppelpunkt weg.
+ */
+function insightTitle(
+  insight: ReportInsight | null,
+  scoringResult: TeamScoringResult,
+  locale: AppLocale
+) {
   if (!insight) return null;
-  return formatTemplate(builderCopy.executiveSummary.topMessages.strength, {
-    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
-    title: insight.title,
-  });
+  const dimensionResult = getDimensionResult(scoringResult, insight.dimension);
+  return resolveInsightTitle(
+    {
+      dimension: insight.dimension,
+      kind: insight.kind,
+      jointState: dimensionResult?.jointState ?? null,
+      conflictRisk: dimensionResult?.conflictRisk ?? null,
+    },
+    locale
+  );
 }
 
-function complementaryMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
-  if (!insight) return null;
-  return formatTemplate(builderCopy.executiveSummary.topMessages.complementaryDynamic, {
-    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
-    title: insight.title,
-  });
+/** Ein Satz ohne Befund endet nach der Dimension, nicht mit " : ". */
+function trimTemplate(text: string) {
+  return text.replace(/\s*:\s*$/, ".").replace(/\s*:\s*\./, ".").replace(/\s{2,}/g, " ").trim();
 }
 
-function tensionMessage(insight: ReportInsight | null, builderCopy: ReportBuilderCopy) {
+function topMessage(
+  template: string,
+  insight: ReportInsight | null,
+  scoringResult: TeamScoringResult,
+  builderCopy: ReportBuilderCopy,
+  locale: AppLocale
+) {
   if (!insight) return null;
-  return formatTemplate(builderCopy.executiveSummary.topMessages.tension, {
-    dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
-    title: insight.title,
-  });
+  return trimTemplate(
+    formatTemplate(template, {
+      dimensionPrefix: dimensionPrefix(insight.dimension, builderCopy),
+      title: insightTitle(insight, scoringResult, locale) ?? "",
+    })
+  );
 }
 
 function promptsForDimension(dimension: string | null, builderCopy: ReportBuilderCopy) {
@@ -301,6 +330,9 @@ export function buildExecutiveSummary({
   teamContext,
   builderCopy = getReportBuilderCopy("de"),
 }: BuildExecutiveSummaryInput): ExecutiveSummaryResult {
+  // Die Sprache kommt aus der Textsammlung selbst - so koennen Vorlagen und
+  // Befundtexte nicht auseinanderlaufen.
+  const locale = builderCopy.locale;
   const topTensionResult = getDimensionResult(
     scoringResult,
     scoringResult.executiveInsights.topTension?.dimension ?? null
@@ -309,24 +341,39 @@ export function buildExecutiveSummary({
     scoringResult.executiveInsights.topTension == null
       ? null
       : topTensionResult?.hasSharedBlindSpotRisk
-        ? formatTemplate(builderCopy.executiveSummary.topMessages.sharedBlindSpotTension, {
-            dimensionPrefix: dimensionPrefix(
-              scoringResult.executiveInsights.topTension.dimension,
-              builderCopy
-            ),
-            title: scoringResult.executiveInsights.topTension.title,
-          })
-        : tensionMessage(scoringResult.executiveInsights.topTension, builderCopy);
+        ? topMessage(
+            builderCopy.executiveSummary.topMessages.sharedBlindSpotTension,
+            scoringResult.executiveInsights.topTension,
+            scoringResult,
+            builderCopy,
+            locale
+          )
+        : topMessage(
+            builderCopy.executiveSummary.topMessages.tension,
+            scoringResult.executiveInsights.topTension,
+            scoringResult,
+            builderCopy,
+            locale
+          );
 
   return {
     teamContext,
     headline: headlineFromState(scoringResult, builderCopy),
     summaryIntro: introForContext(teamContext, scoringResult, builderCopy),
     topMessages: {
-      strength: strengthMessage(scoringResult.executiveInsights.topStrength, builderCopy),
-      complementaryDynamic: complementaryMessage(
+      strength: topMessage(
+        builderCopy.executiveSummary.topMessages.strength,
+        scoringResult.executiveInsights.topStrength,
+        scoringResult,
+        builderCopy,
+        locale
+      ),
+      complementaryDynamic: topMessage(
+        builderCopy.executiveSummary.topMessages.complementaryDynamic,
         scoringResult.executiveInsights.topComplementaryDynamic,
-        builderCopy
+        scoringResult,
+        builderCopy,
+        locale
       ),
       tension: topTensionMessage,
     },

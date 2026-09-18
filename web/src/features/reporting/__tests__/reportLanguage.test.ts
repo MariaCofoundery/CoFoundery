@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { localizeFounderAlignmentReport } from "@/features/reporting/founderAlignmentReportPayload";
+import { resolveInsightTitle } from "@/features/reporting/content/insightTitles/insightTitles";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const codeOnly = (path: string) =>
@@ -97,41 +98,75 @@ test("die englischen Report-Texte sind wirklich da", () => {
   );
 });
 
-test("kein deutscher Scoring-Text landet im englischen Report", () => {
-  // DIMENSION_STRENGTH_TEXT und Geschwister im Scoring-Modul sind
-  // ausschliesslich deutsch - auch der Rueckfalltext dort. Ueber
-  // `toInsight` wird daraus der `title` eines Insights.
+test("der Befund steht in beiden Sprachen, und zwar getrennt vom Scoring", () => {
+  // AUSGANGSLAGE (17.-18.09.2026): Die Befundtexte standen als deutsche
+  // Konstanten im Scoring-Modul. `toInsight` baute daraus einen fertigen
+  // deutschen `title`, der so in den gespeicherten Report wanderte - deshalb
+  // liess die englische Fassung ihn in vier Saetzen weg.
   //
-  // Deshalb laesst die englische Fassung {title} in genau vier Saetzen weg:
-  // "The most important area to discuss deliberately is around decision
-  // logic." statt "... : Integritaet im Entscheidungstempo". Das ist Absicht,
-  // kein Versehen - ein deutscher Halbsatz mitten im englischen Text waere
-  // schlimmer als der fehlende Zusatz.
-  //
-  // Wenn jemand die ~33 Texte im Scoring uebersetzt: {title} in der
-  // englischen Copy wieder ergaenzen, dann faellt dieser Test.
-  const scoring = source("src/features/scoring/founderCompatibilityScoringV2.ts");
-  const stillGermanOnly = /DIMENSION_STRENGTH_TEXT/.test(scoring) && !/DIMENSION_STRENGTH_TEXT_EN/.test(scoring);
-  const en = source("src/features/reporting/content/builderCopy/builderCopy.en.ts");
+  // Jetzt liegen sie in content/insightTitles in beiden Sprachen, und der
+  // Titel wird beim Anzeigen gebildet.
+  const de = resolveInsightTitle({ dimension: "Unternehmenslogik", kind: "strength" }, "de");
+  const en = resolveInsightTitle({ dimension: "Unternehmenslogik", kind: "strength" }, "en");
+  assert.ok(de && en);
+  assert.notEqual(de, en);
+  assert.match(de, /Unternehmenslogik/);
+  assert.doesNotMatch(en, /[äöüßÄÖÜ]/, "der englische Befund traegt deutschen Text");
 
-  assert.equal(
-    /\{title\}/.test(en),
-    !stillGermanOnly,
-    stillGermanOnly
-      ? "die englische Copy setzt {title} ein, obwohl der Titel nur deutsch vorliegt"
-      : "die Scoring-Texte sind uebersetzt - {title} kann zurueck in die englische Copy"
+  // Der kanonische Name und die ID fuehren zum selben Text - `dimension`
+  // traegt im Scoring-Ergebnis den Namen, die Tabellen liegen unter der ID.
+  assert.equal(resolveInsightTitle({ dimension: "company_logic", kind: "strength" }, "en"), en);
+
+  // Bei einer Spannung entscheidet zuerst die gemeinsame Lage, dann das
+  // Konfliktrisiko - dieselbe Reihenfolge wie im Scoring.
+  const gemeinsam = resolveInsightTitle(
+    { dimension: "Konfliktstil", kind: "tension", jointState: "BOTH_HIGH", conflictRisk: "high" },
+    "en"
   );
+  const risiko = resolveInsightTitle(
+    { dimension: "Konfliktstil", kind: "tension", jointState: null, conflictRisk: "high" },
+    "en"
+  );
+  assert.ok(gemeinsam && risiko && gemeinsam !== risiko);
 
-  // Und die Abschnittsbauer ziehen diese Texte gar nicht erst heran.
-  for (const path of [
-    "src/features/reporting/buildDecisionLogicSection.ts",
-    "src/features/reporting/buildCommitmentSection.ts",
-    "src/features/reporting/buildConflictStyleSection.ts",
-  ]) {
-    assert.doesNotMatch(
-      source(path),
-      /collaborationStrengths|potentialTensionAreas|complementaryDynamics/,
-      `${path}: zieht deutschen Scoring-Text in den Report`
-    );
-  }
+  // Ohne Anhaltspunkt wird nichts erfunden.
+  assert.equal(resolveInsightTitle({ dimension: "Konfliktstil", kind: "tension" }, "en"), null);
+  assert.equal(resolveInsightTitle({ dimension: "gibt es nicht", kind: "strength" }, "en"), null);
+});
+
+test("beide Sprachen decken dieselben Faelle ab", () => {
+  // Eine Luecke auf einer Seite hiesse: In dieser Sprache endet der Satz nach
+  // der Dimension, in der anderen nicht.
+  const code = source("src/features/reporting/content/insightTitles/insightTitles.ts");
+  const keysOf = (name: string) => {
+    const start = code.indexOf(`const ${name}: LocalizedTitles`);
+    const end = code.indexOf("\n};", start);
+    return [...code.slice(start, end).matchAll(/^\s{4}([a-z_]+):/gm)].map((m) => m[1]);
+  };
+  const de = keysOf("DE");
+  const en = keysOf("EN");
+  assert.ok(de.length >= 20, `zu wenige Eintraege gefunden (${de.length})`);
+  assert.deepEqual(de, en, "die Tabellen decken nicht dieselben Dimensionen ab");
+});
+
+test("die Sprache haengt an der Textsammlung, nicht an einem zweiten Parameter", () => {
+  // Beim Bauen ist genau das schiefgegangen: englische Vorlagen plus
+  // Voreinstellung "de" fuer die Befunde - ein englischer Satz mit deutschem
+  // Halbsatz. Die Sammlung traegt ihre Sprache jetzt selbst.
+  const builder = source("src/features/reporting/content/builderCopy/builderCopy.ts");
+  assert.match(builder, /locale: AppLocale;/);
+  const summary = source("src/features/reporting/buildExecutiveSummary.ts");
+  assert.match(summary, /const locale = builderCopy\.locale;/);
+  assert.doesNotMatch(summary, /locale\?: AppLocale;/, "ein zweiter Parameter waere die alte Falle");
+});
+
+test("das Scoring traegt keine Prosa mehr in den Report", () => {
+  // Die deutschen Konstanten stehen weiter im Scoring - sie fuellen
+  // collaborationStrengths und Geschwister. Der Report liest sie nicht mehr.
+  // codeOnly, nicht source: Der Kommentar an der Stelle ERKLAERT, warum dort
+  // nicht `insight.title` steht - und liess die Pruefung sonst fehlschlagen,
+  // die genau das sichern soll.
+  const summary = codeOnly("src/features/reporting/buildExecutiveSummary.ts");
+  assert.doesNotMatch(summary, /insight\.title/, "der Report nimmt wieder den gespeicherten deutschen Titel");
+  assert.match(summary, /resolveInsightTitle\(/);
 });

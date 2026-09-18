@@ -1,6 +1,7 @@
 import type { ReportBuilderCopy } from "@/features/reporting/content/builderCopy/builderCopy";
 
 export const REPORT_BUILDER_COPY_DE = {
+  locale: "de",
   executiveSummary: {
     dimensionLabels: {
       Unternehmenslogik: "Unternehmenslogik",

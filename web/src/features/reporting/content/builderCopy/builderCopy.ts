@@ -44,6 +44,16 @@ export type ReportSectionBuilderCopy = {
 };
 
 export type ReportBuilderCopy = {
+  /**
+   * Die Sprache dieser Textsammlung.
+   *
+   * Steht hier, damit sie sich nicht von einem zweiten Parameter unterscheiden
+   * KANN. Genau das ist am 18.09.2026 passiert: buildExecutiveSummary bekam
+   * die englischen Vorlagen und die Voreinstellung "de" fuer die Befundtexte -
+   * heraus kam ein englischer Satz mit deutschem Halbsatz. Ein Test hat es
+   * gefangen, aber die Bauform hat den Fehler ueberhaupt erst erlaubt.
+   */
+  locale: AppLocale;
   executiveSummary: {
     dimensionLabels: Record<BuilderDimensionContentKey, string>;
     dimensionPrefix: {

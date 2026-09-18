@@ -109,7 +109,10 @@ const ORDERED_DIMENSION_IDS = getOrderedRegistryDimensions().map(
   (dimension) => dimension.dimensionId
 ) as DimensionId[];
 
-const CANONICAL_TO_DIMENSION_ID: Record<FounderDimensionKey, DimensionId> = {
+// Exportiert, damit der Report denselben Schluessel nutzt und ihn nicht
+// nachbaut: `DimensionResult.dimension` traegt den kanonischen Namen, die
+// Texttabellen im Report liegen unter der ID.
+export const CANONICAL_TO_DIMENSION_ID: Record<FounderDimensionKey, DimensionId> = {
   Unternehmenslogik: "company_logic",
   Entscheidungslogik: "decision_logic",
   "Arbeitsstruktur & Zusammenarbeit": "work_structure",
