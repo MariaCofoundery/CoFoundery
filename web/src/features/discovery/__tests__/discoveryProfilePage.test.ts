@@ -598,3 +598,64 @@ test("the qualifier is shown next to the hours, the condition only in full", () 
   assert.match(detail, /availabilityFlexShort/);
   assert.match(detail, /profile\.availabilityCondition/);
 });
+
+// ---------------------------------------------------------------------------
+// Der letzte Schritt
+// ---------------------------------------------------------------------------
+const RECENT_STEP_MIGRATION =
+  "../supabase/migrations/20260926120000_discovery_recent_step.sql";
+
+test("the last step cannot become a CV", () => {
+  const migration = sqlWithoutComments(RECENT_STEP_MIGRATION);
+  // 280 Zeichen sind kein Werdegang, und die Frage fragt nach DEM letzten
+  // Schritt, in der Einzahl.
+  assert.match(migration, /char_length\(btrim\(recent_step\)\) between 20 and 280/);
+
+  const de = (readJson("messages/de/discovery.json").profile as Record<string, Record<string, string>>)
+    .venture;
+  assert.match(de.recentStepLabel, /letzter Schritt/);
+  // Das Beispiel modelliert einen Schritt, keine Leistung - sonst schreiben
+  // alle "taeglich drei Stunden am Pitch Deck".
+  assert.match(de.recentStepPlaceholder, /gesprochen/);
+});
+
+test("an empty field is a valid answer, and says so", () => {
+  const migration = sqlWithoutComments(RECENT_STEP_MIGRATION);
+  assert.match(migration, /recent_step is null or/);
+
+  // Keine Veroeffentlichungshuerde - wer nichts geschafft hat, faellt hier
+  // nicht durch.
+  const issues = source("src/features/discovery/discoveryProfileFeedback.ts");
+  assert.doesNotMatch(issues, /recentStep/);
+
+  for (const locale of ["de", "en"]) {
+    const venture = (readJson(`messages/${locale}/discovery.json`).profile as Record<string, Record<string, string>>)
+      .venture;
+    assert.match(venture.recentStepHint, /Freiwillig|Optional/);
+  }
+  const de = (readJson("messages/de/discovery.json").profile as Record<string, Record<string, string>>)
+    .venture;
+  // Der Hinweis muss die Scham wegnehmen, sonst schreibt jemand etwas hin,
+  // nur um nicht leer dazustehen.
+  assert.match(de.recentStepHint, /nicht weniger ernst/);
+  assert.match(de.recentStepHint, /Absage|verworfener/);
+});
+
+test("the last step is read on the profile, never scanned on a card", () => {
+  const detail = source("src/app/(product)/discovery/[profileId]/page.tsx");
+  assert.match(detail, /profile\.recentStep/);
+
+  const card = source("src/features/discovery/FounderDiscoveryCard.tsx");
+  assert.doesNotMatch(card, /recentStep/);
+
+  // Und die Suchprojektion traegt ihn gar nicht erst - was nicht ankommt,
+  // kann auch nicht versehentlich angezeigt werden. Die Abbildung der vollen
+  // Tabellenzeile liest ihn sehr wohl; geprueft wird der Suchzeilentyp.
+  const data = source("src/features/discovery/discoveryData.ts");
+  const searchRowType = data.slice(
+    data.indexOf("type DiscoveryV2SearchRow = {"),
+    data.indexOf("};", data.indexOf("type DiscoveryV2SearchRow = {"))
+  );
+  assert.doesNotMatch(searchRowType, /recent_step/);
+  assert.match(codeOnly("src/features/discovery/discoveryData.ts"), /recentStep: null,/);
+});

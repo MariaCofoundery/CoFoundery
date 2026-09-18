@@ -38,6 +38,7 @@ function createProfile(
     seekingRoleOther: null,
     availabilityFlexibility: null,
     availabilityCondition: null,
+    recentStep: null,
     expertise: overrides.expertise ?? ["Product discovery"],
     industries: overrides.industries ?? ["SaaS"],
     locationRegion: overrides.locationRegion ?? "Berlin",

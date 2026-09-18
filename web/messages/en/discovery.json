@@ -548,7 +548,11 @@
       "description": "Three entries that let others see whether pace, ambition and timing fit. This is not about how seriously you mean it, but about what is realistic right now. Hover over an answer to see what it means.",
       "commitment": "How much room does founding have in your life right now?",
       "stage": "How far along is your idea?",
-      "goal": "What should come of it?"
+      "goal": "What should come of it?",
+      "recentStepLabel": "What was your last step in this direction?",
+      "recentStepPlaceholder": "e.g. In August I spoke to eight care service managers about whether they know the problem at all.",
+      "recentStepHint": "Optional. Something small counts too – a conversation, a course, a rejection, a draft you threw away. Having nothing here does not mean you mean it any less.",
+      "recentStepTitle": "Done recently"
     },
     "actions": {
       "saveDraft": "Save draft",

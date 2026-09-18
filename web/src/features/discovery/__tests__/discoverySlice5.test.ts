@@ -20,6 +20,7 @@ function profile(id: string, displayName: string): FounderDiscoveryProfile {
   seekingRoleOther: null,
   availabilityFlexibility: null,
   availabilityCondition: null,
+  recentStep: null,
     expertise: [],
     industries: [],
     locationRegion: null,

@@ -142,6 +142,7 @@ function parseDiscoveryProfileFormData(
     ]),
     availabilityFlexibility: getFirstString(formData, ["availabilityFlexibility"]),
     availabilityCondition: getFirstString(formData, ["availabilityCondition"]),
+    recentStep: getFirstString(formData, ["recentStep"]),
     commitmentLevel: getFirstString(formData, ["commitmentLevel", "commitment_level"]),
     ventureStage: getFirstString(formData, ["ventureStage", "venture_stage"]),
     ventureGoal: getFirstString(formData, ["ventureGoal", "venture_goal"]),

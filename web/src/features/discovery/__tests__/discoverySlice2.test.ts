@@ -40,6 +40,7 @@ const profile: FounderDiscoveryProfile = {
   seekingRoleOther: null,
   availabilityFlexibility: null,
   availabilityCondition: null,
+  recentStep: null,
   expertise: ["Product"],
   industries: [],
   locationRegion: "Berlin",

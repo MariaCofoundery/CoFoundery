@@ -548,7 +548,11 @@
       "description": "Drei Angaben, an denen andere sehen, ob Tempo, Anspruch und Zeitpunkt passen. Es geht nicht darum, wie ernst du es meinst, sondern was aktuell realistisch ist. Fahr über eine Antwort, dann steht da, was sie bedeutet.",
       "commitment": "Wie viel Platz hat Gründen gerade in deinem Leben?",
       "stage": "Wie weit ist deine Idee?",
-      "goal": "Was soll daraus werden?"
+      "goal": "Was soll daraus werden?",
+      "recentStepLabel": "Was war dein letzter Schritt in diese Richtung?",
+      "recentStepPlaceholder": "z. B. Im August habe ich mit acht Pflegedienstleitungen gesprochen, ob sie das Problem überhaupt kennen.",
+      "recentStepHint": "Freiwillig. Auch etwas Kleines zählt – ein Gespräch, ein Kurs, eine Absage, ein verworfener Entwurf. Wer hier nichts stehen hat, meint es deshalb nicht weniger ernst.",
+      "recentStepTitle": "Zuletzt getan"
     },
     "actions": {
       "saveDraft": "Entwurf speichern",

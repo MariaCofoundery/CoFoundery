@@ -118,6 +118,7 @@ type FounderDiscoveryProfileRow = {
   availability_hours_per_week: number | null;
   availability_flexibility: string | null;
   availability_condition: string | null;
+  recent_step: string | null;
   commitment_level: string;
   venture_stage: string;
   venture_goal: string;
@@ -161,6 +162,7 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "availability_hours_per_week",
   "availability_flexibility",
   "availability_condition",
+  "recent_step",
   "commitment_level",
   "venture_stage",
   "venture_goal",
@@ -236,6 +238,7 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     availabilityHoursPerWeek: row.availability_hours_per_week,
     availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
     availabilityCondition: row.availability_condition,
+    recentStep: row.recent_step,
     commitmentLevel: row.commitment_level as DiscoveryCommitmentLevel,
     ventureStage: row.venture_stage as DiscoveryVentureStage,
     ventureGoal: row.venture_goal as DiscoveryVentureGoal,
@@ -369,6 +372,7 @@ export async function upsertOwnDiscoveryProfile(
         availability_hours_per_week: normalized.availabilityHoursPerWeek,
         availability_flexibility: normalized.availabilityFlexibility,
         availability_condition: normalized.availabilityCondition,
+        recent_step: normalized.recentStep,
         commitment_level: normalized.commitmentLevel,
         venture_stage: normalized.ventureStage,
         venture_goal: normalized.ventureGoal,
@@ -640,6 +644,8 @@ export async function getDiscoveryCandidatesForCurrentUser(
     availabilityHoursPerWeek: row.availability_hours_per_week,
     availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
     availabilityCondition: row.availability_condition,
+    // Die Suchprojektion traegt ihn nicht - er steht nur auf der Profilseite.
+    recentStep: null,
     commitmentLevel: row.commitment_level,
     ventureStage: row.venture_stage,
     ventureGoal: row.venture_goal,
@@ -719,6 +725,9 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         availabilityHoursPerWeek: row.availability_hours_per_week,
         availabilityFlexibility: row.availability_flexibility as DiscoveryAvailabilityFlexibility | null,
         availabilityCondition: row.availability_condition,
+        // Absichtlich nicht in der Suchprojektion: Der letzte Schritt ist ein
+        // Satz zum Lesen, kein Merkmal fuer eine Karte.
+        recentStep: null,
         commitmentLevel: row.commitment_level,
         ventureStage: row.venture_stage,
         ventureGoal: row.venture_goal,

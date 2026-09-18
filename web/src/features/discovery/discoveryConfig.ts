@@ -24,6 +24,7 @@ export const DISCOVERY_TEXT_LIMITS = {
   expertise: 60,
   roleOther: 80,
   availabilityCondition: 200,
+  recentStep: 280,
 } as const;
 
 export const DISCOVERY_SELECTION_LIMITS = {

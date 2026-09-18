@@ -390,6 +390,16 @@ export default async function DiscoveryProfileDetailPage({
                   {profile.availabilityCondition}
                 </p>
               ) : null}
+              {/* Der letzte Schritt steht nur hier, nicht auf der Karte: Er
+                  ist ein Satz zum Lesen, kein Merkmal zum Ueberfliegen. */}
+              {profile.recentStep ? (
+                <div className="mt-4 rounded-2xl border-l-[3px] border-violet-400 bg-white px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    {t("profile.venture.recentStepTitle")}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-700">{profile.recentStep}</p>
+                </div>
+              ) : null}
             </div>
             {isOwner ? (
               <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>

@@ -703,6 +703,25 @@ export default async function DiscoveryProfilePage({
                     />
                   </fieldset>
                 </div>
+                {/* Das konkrete Gegenstueck zu den drei Angaben darueber:
+                    Absichten sind gratis, ein Schritt ist passiert. Kurz
+                    gehalten, damit daraus kein Lebenslauf wird - und
+                    ausdruecklich freiwillig, damit ein leeres Feld nicht wie
+                    Durchfallen wirkt. */}
+                <label className="mt-5 block border-t border-slate-200 pt-5 text-sm font-medium">
+                  <span className={LABEL_CLASS}>{t("profile.venture.recentStepLabel")}</span>
+                  <textarea
+                    name="recentStep"
+                    rows={2}
+                    minLength={20}
+                    maxLength={280}
+                    defaultValue={profile.recentStep ?? ""}
+                    className={FIELD_CLASS}
+                    placeholder={t("profile.venture.recentStepPlaceholder")}
+                  />
+                  <span className={HELP_CLASS}>{t("profile.venture.recentStepHint")}</span>
+                </label>
+
                 <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2">
                   <label>
                     <span className={LABEL_CLASS}>{t("profile.intent.searchIntent")}</span>
@@ -988,6 +1007,14 @@ export default async function DiscoveryProfilePage({
                       </dd>
                     ) : null}
                   </div>
+                  {profile.recentStep ? (
+                    <div>
+                      <dt className="font-semibold text-slate-900">
+                        {t("profile.venture.recentStepTitle")}
+                      </dt>
+                      <dd className="mt-1 text-slate-600">{profile.recentStep}</dd>
+                    </div>
+                  ) : null}
                 </dl>
               </div>
               <p className="mt-3 text-xs leading-5 text-slate-500">

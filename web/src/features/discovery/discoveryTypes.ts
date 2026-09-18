@@ -119,6 +119,8 @@ export type FounderDiscoveryProfile = {
   availabilityFlexibility: DiscoveryAvailabilityFlexibility | null;
   /** Was passieren muesste - nur gesetzt, solange would_expand gewaehlt ist. */
   availabilityCondition: string | null;
+  /** Der letzte Schritt in Richtung Gruendung. Freiwillig, kurz. */
+  recentStep: string | null;
   commitmentLevel: DiscoveryCommitmentLevel;
   ventureStage: DiscoveryVentureStage;
   ventureGoal: DiscoveryVentureGoal;
@@ -160,6 +162,7 @@ export type DiscoveryProfileInput = Partial<{
   availabilityHoursPerWeek: unknown;
   availabilityFlexibility: unknown;
   availabilityCondition: unknown;
+  recentStep: unknown;
   commitmentLevel: unknown;
   ventureStage: unknown;
   ventureGoal: unknown;

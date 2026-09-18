@@ -232,6 +232,8 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
   const condition =
     flexibility === "would_expand" && conditionText.length >= 10 ? conditionText : null;
 
+  const recentStep = normalizeText(input.recentStep, DISCOVERY_TEXT_LIMITS.recentStep);
+
   const ownRoles = normalizeAllowedArray<DiscoveryFounderRole>(
     input.ownRoles,
     DISCOVERY_FOUNDER_ROLES
@@ -269,6 +271,9 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
     // Regel steht in der Datenbank; hier faellt sie mit dem Abwaehlen weg,
     // statt unsichtbar im Profil stehen zu bleiben.
     availabilityCondition: condition,
+    // Kurz gehalten und freiwillig: Zu kurz sagt nichts, also lieber leer als
+    // ein Wort. Ein leeres Feld ist hier eine gueltige Antwort.
+    recentStep: recentStep.length >= 20 ? recentStep : null,
     commitmentLevel: normalizeCommitmentLevel(input.commitmentLevel),
     ventureStage: normalizeVentureStage(input.ventureStage),
     ventureGoal: normalizeVentureGoal(input.ventureGoal),
