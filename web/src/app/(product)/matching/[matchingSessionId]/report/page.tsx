@@ -221,11 +221,29 @@ export default async function MatchingSessionReportPage({ params, searchParams }
     redirect(`/login?next=${encodeURIComponent(`/matching/${matchingSessionId}/report`)}`);
   }
 
-  const summary = await getMatchingReportRunForSession(matchingSessionId, user.id);
+  // Dieselbe Absicherung wie auf der Vorbereitungsseite, und aus demselben
+  // Grund: Beide Ladefunktionen `throw`en bei jedem Datenbankfehler, und ein
+  // ungefangener Wurf in einer Serverkomponente ist eine weisse Fehlerseite.
+  // Der leere Zustand steht hier ohnehin schon fuer den Fall "noch kein
+  // Report" - er traegt den Fall "gerade nicht ladbar" mit.
+  let summary: Awaited<ReturnType<typeof getMatchingReportRunForSession>> = null;
+  let workspace: Awaited<ReturnType<typeof getMatchingWorkspaceForSession>> = null;
+  try {
+    summary = await getMatchingReportRunForSession(matchingSessionId, user.id);
+    if (summary && isFounderAlignmentReportPayload(summary.reportRun.payload)) {
+      workspace = await getMatchingWorkspaceForSession(matchingSessionId, user.id);
+    }
+  } catch (error) {
+    console.error("[matching-report] load_failed", {
+      operation: "load_matching_report",
+      reason: error instanceof Error ? error.message : "unknown",
+    });
+    return <EmptyReportState matchingSessionId={matchingSessionId} t={t} />;
+  }
+
   if (!summary || !isFounderAlignmentReportPayload(summary.reportRun.payload)) {
     return <EmptyReportState matchingSessionId={matchingSessionId} t={t} />;
   }
-  const workspace = await getMatchingWorkspaceForSession(matchingSessionId, user.id);
   const workspaceFeedback = resolveMatchingWorkspaceFeedback({
     result: searchParamValue(resolvedSearchParams.workspaceResult),
     error: searchParamValue(resolvedSearchParams.workspaceError),

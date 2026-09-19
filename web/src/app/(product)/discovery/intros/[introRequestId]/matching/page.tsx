@@ -554,7 +554,49 @@ export default async function DiscoveryIntroMatchingPreparationPage({
     redirect("/advisor/dashboard");
   }
 
-  const preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);
+  // ---------------------------------------------------------------------
+  // DIESER try/catch IST DER FEHLER, DEN MARIA AM 20.09.2026 GEMELDET HAT.
+  //
+  // "Gemeinsam prüfen" lieferte eine weisse Fehlerseite (Digest 1326995352).
+  // Der Grund war strukturell und nicht ein einzelner Bug: Diese Seite laedt
+  // drei Dinge ueber Funktionen, die bei JEDEM Datenbankfehler `throw`en -
+  // getDiscoveryMatchingPreparation, getMatchingSessionForDiscoveryStart,
+  // getMatchingReportRunForSession, und darunter ein Dutzend Abfragen mit
+  // `throw new Error(...load_failed)`. Nichts davon wurde gefangen. Ein
+  // Schluckauf, eine nicht eingespielte Migration, eine Zeile, die eine
+  // Richtlinie nicht hergibt - alles endete in einem Absturz.
+  //
+  // Die Seite hatte den ehrlichen Zustand dafuer schon: `UnavailableState`. Er
+  // wurde nur fuer den null-Fall benutzt, nicht fuer den Wurf.
+  //
+  // Und das console.error ist kein Ueberrest, sondern der Zweck: Beim naechsten
+  // Mal steht im Serverprotokoll, WELCHE der Abfragen es war. Ohne Kennungen -
+  // nur der Vorgang und die Meldung.
+  // ---------------------------------------------------------------------
+  let preparation: Awaited<ReturnType<typeof getDiscoveryMatchingPreparation>> = null;
+  let matchingSessionForStart: MatchingSessionSummary | null = null;
+  let reportRunForSession: MatchingReportRunSummary | null = null;
+  try {
+    preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);
+    if (preparation?.matchingStart) {
+      matchingSessionForStart = await getMatchingSessionForDiscoveryStart(
+        preparation.matchingStart.id,
+        user.id
+      );
+    }
+    if (matchingSessionForStart) {
+      reportRunForSession = await getMatchingReportRunForSession(
+        matchingSessionForStart.session.id,
+        user.id
+      );
+    }
+  } catch (error) {
+    console.error("[discovery-matching] preparation_load_failed", {
+      operation: "load_matching_preparation",
+      reason: error instanceof Error ? error.message : "unknown",
+    });
+    return <UnavailableState t={t} />;
+  }
 
   if (!preparation) {
     return <UnavailableState t={t} />;
@@ -574,12 +616,8 @@ export default async function DiscoveryIntroMatchingPreparationPage({
       ? preparation.recipientProfile
       : preparation.requesterProfile;
   const matchingStart = preparation.matchingStart;
-  const matchingSession = matchingStart
-    ? await getMatchingSessionForDiscoveryStart(matchingStart.id, user.id)
-    : null;
-  const reportRun = matchingSession
-    ? await getMatchingReportRunForSession(matchingSession.session.id, user.id)
-    : null;
+  const matchingSession = matchingSessionForStart;
+  const reportRun = reportRunForSession;
   const matchingStartError = searchParamValue(resolvedSearchParams.matchingStartError);
   const matchingSessionError = searchParamValue(resolvedSearchParams.matchingSessionError);
   const matchingReportError = searchParamValue(resolvedSearchParams.matchingReportError);
