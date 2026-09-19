@@ -260,7 +260,7 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   );
 }
 
-function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string; debug?: boolean }) {
+function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string }) {
   return (
     <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -366,21 +366,6 @@ function TeamCard({ team, t, locale, debug = false }: { team: AdvisorDashboardTe
         ) : null}
       </div>
 
-      {debug ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
-          <p className="font-semibold text-slate-900">Debug · Team Gatekeeper</p>
-          <p>invitationId: {team.invitationId}</p>
-          <p>relationshipId: {team.relationshipId ?? "-"}</p>
-          <p>advisorLinked: {String(team.advisorLinked)}</p>
-          <p>workbookHref: {team.workbookHref}</p>
-          <p>reportHref: {team.reportHref}</p>
-          <p>snapshotHref: {team.snapshotHref}</p>
-          <p>workbookAvailable: {String(team.workbookAvailable)}</p>
-          <p>reportAvailable: {String(team.reportAvailable)}</p>
-          <p>snapshotAvailable: {String(team.snapshotAvailable)}</p>
-          <p>whyUnavailable: {team.whyUnavailable ?? "-"}</p>
-        </div>
-      ) : null}
     </article>
   );
 }
@@ -391,14 +376,12 @@ function TeamSection({
   teams,
   t,
   locale,
-  debug = false,
 }: {
   title: string;
   description: string;
   teams: AdvisorDashboardTeam[];
   t: AdvisorT;
   locale: string;
-  debug?: boolean;
 }) {
   if (teams.length === 0) return null;
 
@@ -415,7 +398,7 @@ function TeamSection({
       </div>
       <div className="grid gap-5">
         {teams.map((team) => (
-          <TeamCard key={team.invitationId} team={team} t={t} locale={locale} debug={debug} />
+          <TeamCard key={team.invitationId} team={team} t={t} locale={locale} />
         ))}
       </div>
     </section>
@@ -570,7 +553,6 @@ function PendingInviteSection({
 
 export default async function AdvisorDashboardPage() {
   // Internal relationship and invitation metadata is never rendered in the product UI.
-  const debug = false;
   const supabase = await createClient();
   const t = await getTranslations("advisor");
   const locale = await getRequestLocale();
@@ -608,17 +590,9 @@ export default async function AdvisorDashboardPage() {
     (team) => team.accessStatus === "paused" || team.accessStatus === "revoked"
   );
   const preferredTeam = readyTeams.find((team) => team.reportAvailable) ?? readyTeams[0] ?? null;
-  const dashboardFallbackHref = debug ? "/advisor/dashboard?debug=1#advisor-teams" : "/advisor/dashboard#advisor-teams";
+  const dashboardFallbackHref = "/advisor/dashboard#advisor-teams";
   const reportHref = preferredTeam?.reportHref ?? dashboardFallbackHref;
   const workbookHref = preferredTeam?.workbookHref ?? dashboardFallbackHref;
-
-  if (debug) {
-    console.info("[advisor-report] dashboard_navigation", {
-      operation: "resolve_advisor_navigation",
-      status: preferredTeam ? "preferred_team" : "fallback",
-      teamCount: teams.length,
-    });
-  }
 
   return (
     <>
@@ -692,38 +666,6 @@ export default async function AdvisorDashboardPage() {
           </div>
         </div>
 
-        {debug ? (
-          <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white/80 p-4">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              Debug · Dashboard Links
-            </p>
-            <p className="mt-2 text-xs leading-6 text-slate-700">
-              navReportHref: {reportHref}
-              <br />
-              navWorkbookHref: {workbookHref}
-              <br />
-              preferredTeamInvitationId: {preferredTeam?.invitationId ?? "-"}
-            </p>
-            <div className="mt-3 space-y-3 text-xs leading-6 text-slate-700">
-              {teams.map((team) => (
-                <div key={`debug-${team.invitationId}`} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
-                  <p className="font-semibold text-slate-900">
-                    {team.founderAName} & {team.founderBName}
-                  </p>
-                  {team.teamName ? (
-                    <p className="text-slate-600">{t("dashboard.teamProject", { name: team.teamName })}</p>
-                  ) : null}
-                  <p>invitationId: {team.invitationId}</p>
-                  <p>workbookHref: {team.workbookHref}</p>
-                  <p>reportHref: {team.reportHref}</p>
-                  <p>
-                    reportReady: {String(team.reportReady)} · accessStatus: {team.accessStatus}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
 
         <PendingInviteSection invites={pendingInvites} t={t} locale={locale} />
 
@@ -767,7 +709,6 @@ export default async function AdvisorDashboardPage() {
               teams={readyTeams}
               t={t}
               locale={locale}
-              debug={debug}
             />
             <TeamSection
               title={t("dashboard.waitingSectionTitle")}
@@ -775,7 +716,6 @@ export default async function AdvisorDashboardPage() {
               teams={waitingTeams}
               t={t}
               locale={locale}
-              debug={debug}
             />
             <TeamSection
               title={t("dashboard.pausedSectionTitle")}
@@ -783,7 +723,6 @@ export default async function AdvisorDashboardPage() {
               teams={pausedTeams}
               t={t}
               locale={locale}
-              debug={debug}
             />
           </>
         )}

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
@@ -121,7 +121,6 @@ export function ProductShell({
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const t = useTranslations("navigation");
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
@@ -200,19 +199,6 @@ export function ProductShell({
   // Aussage.
   const activeAreaSubItems =
     navigationItems.find((item) => item.isActive(pathname))?.subItems ?? [];
-
-  useEffect(() => {
-    if (searchParams.get("debug") !== "1" || resolvedActiveView !== "advisor") {
-      return;
-    }
-
-    console.info("[advisor-report-debug] nav_links", {
-      pathname,
-      dashboardHref,
-      workbookHref: resolvedWorkbookHref,
-      reportHref: resolvedMatchingHref,
-    });
-  }, [dashboardHref, pathname, resolvedActiveView, resolvedMatchingHref, resolvedWorkbookHref, searchParams]);
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;

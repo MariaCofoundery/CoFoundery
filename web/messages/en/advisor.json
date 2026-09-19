@@ -155,9 +155,6 @@
   },
   "report": {
     "context": "Advisor context",
-    "debugEyebrow": "Advisor report debug",
-    "debugTitle": "Advisor report could not be loaded",
-    "debugText": "In this state, the product page would send you straight back to the advisor dashboard. Debug mode keeps this state visible so we can see the actual break point.",
     "eyebrow": "Advisor report",
     "missingTitle": "Report not available yet",
     "missingText": "There is no renderable advisor report for this team yet. Once the founder report has been fully generated, you can continue working with the advisor report here.",

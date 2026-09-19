@@ -43,10 +43,26 @@ test("advisor report logs retain status diagnostics without direct identifiers",
     ...advisorDashboardPage.matchAll(/console\.(?:log|info|warn|error)\([\s\S]*?\n\s*\}\);/gu),
   ].map((match) => match[0]);
 
-  assert.equal(loggingStatements.length, 2);
-  assert.match(loggingStatements[0] ?? "", /operation: "load_advisor_report"/u);
-  assert.match(loggingStatements[0] ?? "", /status: "forbidden"/u);
-  assert.match(loggingStatements[1] ?? "", /operation: "resolve_advisor_navigation"/u);
+  // GEAENDERT am 19.09.2026: Hier stand eine feste Zahl (2) und eine feste
+  // Reihenfolge. Das zweite Protokoll hing am abgeschalteten Debug-Schalter im
+  // Advisor-Dashboard und ist mit ihm entfernt worden - ohne dass an der
+  // Zusage etwas kaputt war. Die Zusage ist: Was protokolliert wird, nennt den
+  // Vorgang und den Status und KEINE Personen- oder Objektkennung.
+  assert.ok(loggingStatements.length > 0, "es wird gar nichts mehr protokolliert");
+
+  // Das Protokoll fuer abgelehnte Zugriffe muss es geben: Ohne es laesst sich
+  // "ich komme nicht an den Report" nicht beantworten.
+  assert.ok(
+    loggingStatements.some(
+      (statement) =>
+        /operation: "load_advisor_report"/u.test(statement) && /status: "forbidden"/u.test(statement)
+    ),
+    "das Protokoll für abgelehnte Zugriffe fehlt"
+  );
+
+  for (const statement of loggingStatements) {
+    assert.match(statement, /operation: "/u, `ohne Vorgang: ${statement.slice(0, 60)}`);
+  }
 
   for (const statement of loggingStatements) {
     assert.doesNotMatch(

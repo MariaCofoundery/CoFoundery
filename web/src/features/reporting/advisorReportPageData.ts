@@ -86,36 +86,14 @@ type QuestionRow = {
 
 type PrivilegedClient = NonNullable<ReturnType<typeof createPrivilegedAccessClient>>;
 
-export type AdvisorReportDebugMeta = {
-  requestedInvitationId: string;
-  userId: string | null;
-  relationshipId: string | null;
-  teamContext: "pre_founder" | "existing_team" | null;
-  accessBeforeLegacySync: boolean;
-  legacySyncAttempted: boolean;
-  legacySyncResult: "not_attempted" | "synced" | "sync_failed" | "legacy_not_found";
-  hasAccess: boolean;
-  reportRunId: string | null;
-  snapshotFounderScoring: boolean;
-  scoringSource: "snapshot" | "on_demand" | "missing";
-  finalState:
-    | "not_authenticated"
-    | "forbidden"
-    | "not_found"
-    | "missing_report"
-    | "ready";
-};
-
 export type AdvisorReportPageData =
     | {
       status: "not_authenticated";
       invitationId: string;
-      debugMeta?: AdvisorReportDebugMeta;
     }
   | {
       status: "forbidden" | "not_found" | "missing_report";
       invitationId: string;
-      debugMeta?: AdvisorReportDebugMeta;
     }
   | {
       status: "ready";
@@ -131,7 +109,6 @@ export type AdvisorReportPageData =
       snapshotHref: string;
       founderSetupItems: AdvisorConfirmedFounderSetupItem[];
       founderSetupAccess: AdvisorFounderSetupAccessState;
-      debugMeta?: AdvisorReportDebugMeta;
     };
 
 function emptyFounderScores(): FounderScores {
@@ -350,20 +327,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "not_found",
       invitationId: "",
-      debugMeta: {
-        requestedInvitationId: "",
-        userId: null,
-        relationshipId: null,
-        teamContext: null,
-        accessBeforeLegacySync: false,
-        legacySyncAttempted: false,
-        legacySyncResult: "not_attempted",
-        hasAccess: false,
-        reportRunId: null,
-        snapshotFounderScoring: false,
-        scoringSource: "missing",
-        finalState: "not_found",
-      },
     };
   }
 
@@ -376,20 +339,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "not_authenticated",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: null,
-        relationshipId: null,
-        teamContext: null,
-        accessBeforeLegacySync: false,
-        legacySyncAttempted: false,
-        legacySyncResult: "not_attempted",
-        hasAccess: false,
-        reportRunId: null,
-        snapshotFounderScoring: false,
-        scoringSource: "missing",
-        finalState: "not_authenticated",
-      },
     };
   }
 
@@ -398,20 +347,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "not_found",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: user.id,
-        relationshipId: null,
-        teamContext: null,
-        accessBeforeLegacySync: false,
-        legacySyncAttempted: false,
-        legacySyncResult: "not_attempted",
-        hasAccess: false,
-        reportRunId: null,
-        snapshotFounderScoring: false,
-        scoringSource: "missing",
-        finalState: "not_found",
-      },
     };
   }
 
@@ -425,27 +360,17 @@ export async function getAdvisorReportPageData(
     return {
       status: "not_found",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: user.id,
-        relationshipId: null,
-        teamContext: null,
-        accessBeforeLegacySync: false,
-        legacySyncAttempted: false,
-        legacySyncResult: "not_attempted",
-        hasAccess: false,
-        reportRunId: null,
-        snapshotFounderScoring: false,
-        scoringSource: "missing",
-        finalState: "not_found",
-      },
     };
   }
 
-  const accessBeforeLegacySync = relationshipResolution.hasRelationshipAdvisorAccess;
-  let hasAccess = accessBeforeLegacySync;
+  let hasAccess = relationshipResolution.hasRelationshipAdvisorAccess;
+  // Bleibt, obwohl die Debug-Ausgabe weg ist: Diese beiden Werte gehen in das
+  // Serverprotokoll unten. Wenn jemand meldet "ich komme nicht an den Report",
+  // steht dort, ob es an der Freigabe lag oder daran, dass die Uebernahme aus
+  // der alten Tabelle nicht gegriffen hat.
   let legacySyncAttempted = false;
-  let legacySyncResult: AdvisorReportDebugMeta["legacySyncResult"] = "not_attempted";
+  let legacySyncResult: "not_attempted" | "synced" | "sync_failed" | "legacy_not_found" =
+    "not_attempted";
 
   if (!hasAccess && !relationshipResolution.hasRelationshipAdvisorRecord) {
     legacySyncAttempted = true;
@@ -478,20 +403,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "forbidden",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: user.id,
-        relationshipId,
-        teamContext: null,
-        accessBeforeLegacySync,
-        legacySyncAttempted,
-        legacySyncResult,
-        hasAccess: false,
-        reportRunId: null,
-        snapshotFounderScoring: false,
-        scoringSource: "missing",
-        finalState: "forbidden",
-      },
     };
   }
 
@@ -519,20 +430,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "not_found",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: user.id,
-        relationshipId,
-        teamContext: null,
-        accessBeforeLegacySync,
-        legacySyncAttempted,
-        legacySyncResult,
-        hasAccess: true,
-        reportRunId: snapshot?.id ?? null,
-        snapshotFounderScoring: Boolean(snapshot?.founderScoring),
-        scoringSource: "missing",
-        finalState: "not_found",
-      },
     };
   }
 
@@ -548,20 +445,6 @@ export async function getAdvisorReportPageData(
     return {
       status: "missing_report",
       invitationId: normalizedInvitationId,
-      debugMeta: {
-        requestedInvitationId: normalizedInvitationId,
-        userId: user.id,
-        relationshipId,
-        teamContext: normalizeAdvisorTeamContext(invitation.team_context),
-        accessBeforeLegacySync,
-        legacySyncAttempted,
-        legacySyncResult,
-        hasAccess: true,
-        reportRunId: snapshot?.id ?? null,
-        snapshotFounderScoring: Boolean(snapshot?.founderScoring),
-        scoringSource: founderScoringResolution.source,
-        finalState: "missing_report",
-      },
     };
   }
 
@@ -633,20 +516,6 @@ export async function getAdvisorReportPageData(
     snapshotHref: buildAdvisorSnapshotHref(normalizedInvitationId, teamContext),
     founderSetupItems,
     founderSetupAccess,
-    debugMeta: {
-      requestedInvitationId: normalizedInvitationId,
-      userId: user.id,
-      relationshipId,
-      teamContext,
-      accessBeforeLegacySync,
-      legacySyncAttempted,
-      legacySyncResult,
-      hasAccess: true,
-      reportRunId: snapshot?.id ?? null,
-      snapshotFounderScoring: Boolean(snapshot?.founderScoring),
-      scoringSource: founderScoringResolution.source,
-      finalState: "ready",
-    },
   };
 }
 
