@@ -23,7 +23,7 @@ import {
 } from "@/features/matchingCore/matchingWorkspaceFeedback";
 import { getMatchingWorkspaceForSession } from "@/features/matchingCore/matchingWorkspaceData";
 import type { MatchingWorkspaceSummary } from "@/features/matchingCore/matchingWorkspaceTypes";
-import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ matchingSessionId: string }>;
@@ -213,7 +213,6 @@ export default async function MatchingSessionReportPage({ params, searchParams }
   const { matchingSessionId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const t = await getTranslations("report");
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();

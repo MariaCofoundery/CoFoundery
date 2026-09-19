@@ -133,10 +133,6 @@ export function ProductShell({
     resolvedActiveView === "advisor"
       ? navigationOverride?.matchingHref ?? advisorFallbackHref
       : navigationOverride?.matchingHref ?? "/connections";
-  const resolvedWorkbookHref =
-    resolvedActiveView === "advisor"
-      ? navigationOverride?.workbookHref ?? advisorFallbackHref
-      : navigationOverride?.workbookHref ?? "/connections";
   const isConnectOnly = hasConnect && !hasFounder && !hasAdvisor;
   const isSuspendedConnectOnly = hasConnectAccount && !hasConnect && !hasFounder && !hasAdvisor;
   const dashboardHref = isConnectOnly

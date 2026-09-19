@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import {
   createDraftAssessment,
@@ -39,7 +39,6 @@ export default async function MeBasePage({
   const params = await searchParams;
   const t = await getTranslations("assessment.base");
   const locale = await getRequestLocale();
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();

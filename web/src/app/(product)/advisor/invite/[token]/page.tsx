@@ -71,7 +71,6 @@ export default async function AdvisorInvitePage({
 
   const inviteData = invite;
 
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();

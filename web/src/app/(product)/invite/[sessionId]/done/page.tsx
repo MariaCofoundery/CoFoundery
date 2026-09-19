@@ -10,7 +10,7 @@ import {
   getInvitationJoinDecision,
 } from "@/features/reporting/actions";
 import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
-import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
@@ -70,7 +70,6 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     redirect("/dashboard");
   }
 
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();

@@ -10,7 +10,7 @@ import {
   buildWorkbookDeepDiveHref,
   buildWorkbookIntroHref,
 } from "@/features/reporting/workbookNavigation";
-import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { getRequestUser } from "@/lib/supabase/server";
 
 type PageSearchParams = {
   invitationId?: string;
@@ -38,7 +38,6 @@ export default async function FounderAlignmentWorkbookIntroPage({
   const introHref = buildWorkbookIntroHref(invitationId, requestedTeamContext);
   const reportHref = `/report/${encodeURIComponent(invitationId)}`;
 
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();

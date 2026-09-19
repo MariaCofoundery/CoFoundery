@@ -68,8 +68,11 @@ export default async function ConnectVenturesPage({
           {ventures.map((venture) => (
             <article key={venture.id} className={card}>
               <div className="flex flex-wrap items-start gap-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 {ventureLogoUrl(venture) ? (
+                  // Ein Logo aus dem eigenen Speicher mit signierter Adresse.
+                  // next/image braeuchte dafuer eine konfigurierte Domain und
+                  // wuerde die Signatur ueber den Optimierer schicken.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={ventureLogoUrl(venture) as string}
                     alt=""

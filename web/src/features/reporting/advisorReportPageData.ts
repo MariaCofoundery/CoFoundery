@@ -530,7 +530,6 @@ export async function saveAdvisorSectionImpulse(params: {
   const normalizedInvitationId = params.invitationId.trim();
   const normalizedText = params.text.trim().slice(0, 2400);
 
-  const supabase = await createClient();
   const {
     data: { user },
   } = await getRequestUser();
