@@ -92,7 +92,27 @@ export function ForcedChoiceQuestion({
 
   return (
     <div className="rounded-[1.5rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] p-5 sm:p-6">
-      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+      {/* -------------------------------------------------------------------
+          GEFUNDEN AM 20.09.2026 bei der Handy-Durchsicht.
+
+          Hier stand `grid-cols-5` ohne Umbruchpunkt - fuenf Spalten auch auf
+          einem Telefon. Rechnung fuer 360 Pixel Breite: 320 nach dem
+          Innenabstand, minus vier Luecken, geteilt durch fuenf sind 57 Pixel
+          je Knopf; davon gehen 32 fuer px-4 ab. Bleiben 25 Pixel fuer "beide
+          gleich" - zwoelf Zeichen. Die Beschriftung zerfiel.
+
+          Und das ist die Kernflaeche des Produkts: Hier beantworten Menschen
+          die Fragen.
+
+          Gestapelt auf dem Telefon, fuenf Spalten ab sm. Dasselbe Muster
+          benutzt dieser Baustein weiter oben fuer die andere Fragenart schon -
+          volle Breite, linksbuendig.
+
+          NICHT geaendert: die Reihenfolge. Skala vor Aussagen ist eine
+          Entscheidung des Fragebogens, nicht ein Layoutfehler, und in welcher
+          Folge jemand liest, kann Antworten beeinflussen.
+          ------------------------------------------------------------------- */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3">
         {options.map((option, idx) => {
           const active = isSelected(option, selectedChoiceId, selectedValue);
           const meta = scaleMeta[idx];
@@ -105,7 +125,7 @@ export function ForcedChoiceQuestion({
               disabled={disabled}
               aria-pressed={active}
               aria-label={meta.longLabel}
-              className={`rounded-lg border px-4 py-3 text-center text-sm transition-all duration-200 ${
+              className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm transition-all duration-200 sm:text-center ${
                 active
                   ? idx < 2
                     ? "border-slate-900 bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.12)]"
@@ -121,12 +141,27 @@ export function ForcedChoiceQuestion({
         })}
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-5 border-t border-slate-200/80 pt-5">
+      {/* Die Aussagen ebenso: Zwei Spalten auf einem Telefon sind zwei mal
+          140 Pixel fuer ganze Saetze.
+
+          WICHTIG beim Stapeln: Welche Aussage A und welche B ist, stand allein
+          in der POSITION - links und rechts. Uebereinander ist diese Angabe
+          weg, und die Knoepfe darueber heissen "A deutlich" und "B deutlich".
+          Deshalb tragen die Aussagen auf dem Telefon eine Kennung. Ab sm
+          bleibt es bei der Position; dort ist die Zuordnung eindeutig, und
+          eine funktionierende Ansicht wird nicht umgebaut. */}
+      <div className="mt-6 grid grid-cols-1 gap-4 border-t border-slate-200/80 pt-5 sm:grid-cols-2 sm:gap-5">
         <div className="min-w-0">
-          <p className="text-sm leading-7 text-slate-800">{statementA ?? ""}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 sm:hidden">
+            {t("scale.statementA")}
+          </p>
+          <p className="mt-1 text-sm leading-7 text-slate-800 sm:mt-0">{statementA ?? ""}</p>
         </div>
-        <div className="min-w-0 text-right">
-          <p className="text-sm leading-7 text-slate-800">{statementB ?? ""}</p>
+        <div className="min-w-0 sm:text-right">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 sm:hidden">
+            {t("scale.statementB")}
+          </p>
+          <p className="mt-1 text-sm leading-7 text-slate-800 sm:mt-0">{statementB ?? ""}</p>
         </div>
       </div>
     </div>

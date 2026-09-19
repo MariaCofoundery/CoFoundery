@@ -47,7 +47,9 @@
       "aSoft": "A somewhat",
       "both": "Both equally",
       "bSoft": "B somewhat",
-      "bStrong": "B strongly"
+      "bStrong": "B strongly",
+      "statementA": "Statement A",
+      "statementB": "Statement B"
     }
   },
   "baseComplete": {

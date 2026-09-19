@@ -47,7 +47,9 @@
       "aSoft": "A eher",
       "both": "beide gleich",
       "bSoft": "B eher",
-      "bStrong": "B deutlich"
+      "bStrong": "B deutlich",
+      "statementA": "Aussage A",
+      "statementB": "Aussage B"
     }
   },
   "baseComplete": {
