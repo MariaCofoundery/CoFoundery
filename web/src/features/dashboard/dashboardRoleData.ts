@@ -144,6 +144,7 @@ export type AdvisorDashboardTeam = {
   reportHref: string;
   reportReady: boolean;
   snapshotHref: string;
+  sessionHref: string;
   advisorLinked: boolean;
   workbookAvailable: boolean;
   reportAvailable: boolean;
@@ -522,6 +523,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         reportHref: buildAdvisorReportHref(invitation.id, teamContext),
         reportReady,
         snapshotHref: buildAdvisorSnapshotHref(invitation.id, teamContext),
+        sessionHref: `/advisor/session?invitationId=${encodeURIComponent(invitation.id)}`,
         advisorLinked,
         workbookAvailable,
         reportAvailable,

@@ -151,7 +151,8 @@
       "remove": "End invitation",
       "resend": "Resend",
       "createNew": "Create new invitation"
-    }
+    },
+    "openSession": "Session sheet"
   },
   "report": {
     "context": "Advisor context",
@@ -287,6 +288,61 @@
       "emailMismatch": "Please sign in with the email address this advisor invitation was sent to.",
       "invalidToken": "The advisor link could not be confirmed.",
       "updateFailed": "The link could not be saved right now."
+    }
+  },
+  "session": {
+    "context": "Session sheet",
+    "eyebrow": "Before the session",
+    "title": "Session sheet",
+    "text": "Everything you need for a conversation with this team on one page – and the place for your own notes.",
+    "back": "← Back to the teams you accompany",
+    "saved": {
+      "note": "Note saved.",
+      "follow_up": "Follow-up set.",
+      "follow_up_cleared": "Follow-up removed.",
+      "follow_up_done": "Marked as done."
+    },
+    "errors": {
+      "save": "That couldn't be saved just now. Please try again.",
+      "forbidden": "We can't save notes for this team.",
+      "follow_up_date": "That's not a valid date.",
+      "follow_up_past": "A date in the past reminds you of nothing. Please pick a day still to come."
+    },
+    "followUp": {
+      "title": "Your follow-up",
+      "help": "When do you want to come back to this team? This is your appointment with yourself – the founders don't see it and aren't notified.",
+      "dateLabel": "Date",
+      "noteLabel": "What it should be about",
+      "notePlaceholder": "For example: revisit vesting once the company is incorporated",
+      "save": "Save follow-up",
+      "clearHint": "Leaving the date empty removes the follow-up.",
+      "complete": "Mark as done",
+      "due": "Due now",
+      "onDate": "On {date}"
+    },
+    "note": {
+      "title": "Your notes",
+      "privacy": "These notes are yours. The founders don't see them, and nobody else at CoFoundery can read them. They stay with you even if access to this team ends – and they disappear if the team deletes their account.",
+      "label": "Note",
+      "placeholder": "What struck you, what do you want to raise next time, what can't you say yet?",
+      "save": "Save note",
+      "updatedAt": "Last changed on {date}"
+    },
+    "settled": {
+      "title": "What the team has put down",
+      "help": "Only the jointly confirmed positions – that's what the founders released to you. What is still open does not appear here.",
+      "empty": "The team hasn't confirmed a shared position yet."
+    },
+    "impulses": {
+      "title": "What you wrote to the founders",
+      "help": "Your impulses are visible to the founders – unlike your notes above.",
+      "empty": "You haven't left any impulses yet.",
+      "edit": "Edit impulses in the report →"
+    },
+    "links": {
+      "label": "Other views",
+      "report": "Advisor report",
+      "snapshot": "Snapshot"
     }
   }
 }

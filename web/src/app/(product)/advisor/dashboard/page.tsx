@@ -354,6 +354,15 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
               : accessStatusLabel(team, t)}
           </span>
         )}
+        {/* Das Sitzungsblatt haengt an derselben Bedingung wie der Report: Es
+            zeigt bestaetigte Staende und die eigenen Impulse, und dafuer
+            braucht es die Freigabe. Die eigenen Notizen liegen darin, sind aber
+            nicht der Grund fuer die Bedingung. */}
+        {team.reportAvailable ? (
+          <Link href={team.sessionHref} className={SECONDARY_CTA_CLASS}>
+            {t("dashboard.openSession")}
+          </Link>
+        ) : null}
         {team.snapshotAvailable ? (
           <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
             {t("dashboard.exportSnapshot")}
