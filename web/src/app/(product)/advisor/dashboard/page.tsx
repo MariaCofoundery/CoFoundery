@@ -18,9 +18,10 @@ import {
   type AdvisorDashboardTeam,
 } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
-import { getRequestUser } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const PRIMARY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)]";
@@ -572,12 +573,26 @@ export default async function AdvisorDashboardPage() {
     redirect("/login");
   }
 
-  const [roleViews, teams, advisorProfile, pendingInvites] = await Promise.all([
+  // Der angemeldete Zugang, nicht der privilegierte: Die Wiedervorlagen liegen
+  // unter einer Policy, die nur die eigenen Zeilen herausgibt.
+  const client = await createClient();
+  const [roleViews, teams, advisorProfile, pendingInvites, dueFollowUps] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
     getAdvisorPendingTeamInvites(user.id),
+    // Eine Verabredung, die man nur sieht, wenn man zufaellig in das richtige
+    // Team hineinschaut, ist keine Erinnerung.
+    listDueAdvisorFollowUps(client),
   ]);
+  const followUpByRelationship = new Map(
+    dueFollowUps.map((entry) => [entry.relationshipId, entry])
+  );
+  const dueNow = new Date().toISOString().slice(0, 10);
+  const overdueTeams = teams.filter((team) => {
+    const entry = team.relationshipId ? followUpByRelationship.get(team.relationshipId) : null;
+    return Boolean(entry && entry.dueOn <= dueNow);
+  });
 
   if (!roleViews.hasAdvisor) {
     redirect("/dashboard");
@@ -610,6 +625,37 @@ export default async function AdvisorDashboardPage() {
         workbookHref={workbookHref}
       />
       <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-14 md:px-10 xl:px-12">
+      {/* Ganz oben, vor allem anderen: Was sich die Person selbst vorgenommen
+          hat und heute faellig ist. Eine Verabredung, die man erst findet,
+          wenn man in das richtige Team hineinschaut, erinnert an nichts. */}
+      {overdueTeams.length > 0 ? (
+        <section
+          aria-labelledby="follow-ups-due-title"
+          className="mb-6 rounded-3xl border border-amber-300 bg-amber-50/70 p-5"
+        >
+          <h2 id="follow-ups-due-title" className="text-sm font-semibold text-amber-950">
+            {t("dashboard.followUpsDue.title", { count: overdueTeams.length })}
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {overdueTeams.map((team) => {
+              const entry = team.relationshipId
+                ? followUpByRelationship.get(team.relationshipId)
+                : null;
+              return (
+                <li key={team.invitationId} className="text-sm leading-6 text-amber-950">
+                  <Link
+                    href={team.sessionHref}
+                    className="font-semibold underline underline-offset-4"
+                  >
+                    {team.founderAName} &amp; {team.founderBName}
+                  </Link>
+                  {entry?.note ? <span> · {entry.note}</span> : null}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
       <header className="rounded-[36px] border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] p-7 shadow-[0_18px_55px_rgba(15,23,42,0.055)] md:p-9">
         <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-5">

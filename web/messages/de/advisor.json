@@ -152,7 +152,10 @@
       "resend": "Erneut senden",
       "createNew": "Neue Einladung erstellen"
     },
-    "openSession": "Sitzungsblatt"
+    "openSession": "Sitzungsblatt",
+    "followUpsDue": {
+      "title": "{count, plural, one {Eine Wiedervorlage ist fällig} other {# Wiedervorlagen sind fällig}}"
+    }
   },
   "report": {
     "context": "Advisor-Kontext",
@@ -342,7 +345,22 @@
     "links": {
       "label": "Weitere Ansichten",
       "report": "Advisor-Report",
-      "snapshot": "Snapshot"
+      "snapshot": "Snapshot",
+      "document": "Stand zum Mitnehmen"
     }
+  },
+  "document": {
+    "back": "← Zurück zum Sitzungsblatt",
+    "title": "Begleitung – Stand zum Mitnehmen",
+    "asOf": "Stand: {date}",
+    "intro": "Dieses Blatt fasst zusammen, was in der Begleitung dieses Teams festgehalten wurde: die gemeinsam bestätigten Stände der Founder und die Impulse, die dazu geschrieben wurden. Beide Seiten kennen alles, was hier steht.",
+    "settledTitle": "Was das Team gemeinsam bestätigt hat",
+    "settledEmpty": "Zum Zeitpunkt dieses Stands hat das Team noch keinen gemeinsamen Stand bestätigt – oder die Freigabe dafür ist gerade nicht aktiv.",
+    "impulsesTitle": "Impulse aus der Begleitung",
+    "impulsesEmpty": "Zu diesem Team sind noch keine Impulse festgehalten.",
+    "nextTitle": "Nächster Schritt",
+    "notesExcluded": "Nicht enthalten: die privaten Arbeitsnotizen der begleitenden Person. Die sind bewusst nicht Teil dieses Blattes – ein Dokument, das sie auf Wunsch mitdruckt, wäre eine Zusage mit Ausnahme, und das ist keine.",
+    "disclaimer": "Dieses Blatt hält einen Stand fest und ersetzt keine rechtliche oder steuerliche Beratung.",
+    "print": "Drucken oder als PDF speichern"
   }
 }

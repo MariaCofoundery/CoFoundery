@@ -334,6 +334,15 @@ export default async function AdvisorSessionPage({
           <ReportActionButton href={snapshotHref} variant="utility" className="min-h-11">
             {t("session.links.snapshot")}
           </ReportActionButton>
+          {/* Das Uebergabedokument enthaelt die Notizen NICHT - deshalb steht
+              es hier neben den anderen Ansichten und nicht im Notizblock. */}
+          <ReportActionButton
+            href={`/advisor/session/document?invitationId=${encodeURIComponent(invitationId)}`}
+            variant="utility"
+            className="min-h-11"
+          >
+            {t("session.links.document")}
+          </ReportActionButton>
         </nav>
       </main>
     </>

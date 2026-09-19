@@ -14,12 +14,14 @@ const MIGRATION = "../supabase/migrations/20261007120000_advisor_private_notes.s
 const PAGE = "src/app/(product)/advisor/session/page.tsx";
 const DATA = "src/features/reporting/advisorWorkspaceData.ts";
 const ACTIONS = "src/features/reporting/advisorWorkspaceActions.ts";
+const DOCUMENT = "src/app/(product)/advisor/session/document/page.tsx";
 
 const advisorCopy = (locale: string) =>
   (
     JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")) as {
-      dashboard: Record<string, string>;
+      dashboard: Record<string, never>;
       session: Record<string, never>;
+      document: Record<string, never>;
     }
   );
 
@@ -192,7 +194,10 @@ test("das Sitzungsblatt ist vom Dashboard aus erreichbar", () => {
     /sessionHref: `\/advisor\/session\?invitationId=/
   );
   for (const locale of ["de", "en"]) {
-    assert.ok(advisorCopy(locale).dashboard.openSession, `${locale}: der Einstieg hat kein Label`);
+    assert.ok(
+      (advisorCopy(locale).dashboard as unknown as Record<string, string>).openSession,
+      `${locale}: der Einstieg hat kein Label`
+    );
   }
 });
 
@@ -202,6 +207,73 @@ test("ohne Freigabe endet der Aufruf auf dem Dashboard", () => {
   const page = source(PAGE);
   assert.match(page, /if \(data\.status !== "ready"\) redirect\("\/advisor\/dashboard"\)/);
   assert.match(page, /if \(!invitationId\) redirect\("\/advisor\/dashboard"\)/);
+});
+
+// ---------------------------------------------------------------------------
+// Das Übergabedokument
+// ---------------------------------------------------------------------------
+test("das Übergabedokument enthält die privaten Notizen nicht", () => {
+  // Die wichtigste Entscheidung an dieser Seite. Ein Dokument mit einem
+  // Häkchen "meine Notizen mitdrucken" wäre genau die Art Funktion, die einmal
+  // jemand vergisst auszuschalten - und dann liegt die Handakte bei den
+  // Foundern auf dem Tisch. Eine Zusage mit Ausnahme ist keine Zusage.
+  const doc = codeOnly(DOCUMENT);
+  assert.doesNotMatch(doc, /getAdvisorPrivateNote|advisor_private_notes|note\.body/);
+  // Und das Blatt sagt selbst, dass sie fehlen - sonst haelt es jemand fuer
+  // vollstaendig.
+  assert.match(doc, /document\.notesExcluded/);
+
+  for (const locale of ["de", "en"]) {
+    const document = advisorCopy(locale).document as unknown as Record<string, string>;
+    assert.match(
+      document.notesExcluded,
+      locale === "de" ? /Nicht enthalten/ : /Not included/,
+      `${locale}: der Hinweis fehlt`
+    );
+    assert.ok(document.disclaimer, `${locale}: der Vorbehalt fehlt`);
+  }
+});
+
+test("das Dokument zeigt nur, was beide Seiten kennen", () => {
+  // Bestaetigte Staende (freigegeben) und die eigenen Impulse (den Foundern
+  // ohnehin im Report gezeigt). Nichts, was nur eine Seite kennt.
+  const doc = codeOnly(DOCUMENT);
+  assert.match(doc, /data\.founderSetupAccess\.status === "active" \? data\.founderSetupItems : \[\]/);
+  assert.match(doc, /data\.impulses\[key\]/);
+  assert.doesNotMatch(doc, /FOUNDER_SETUP_CATALOG|FOUNDER_SETUP_ITEM_KEYS/);
+  assert.match(doc, /if \(data\.status !== "ready"\) redirect\("\/advisor\/dashboard"\)/);
+});
+
+// ---------------------------------------------------------------------------
+// Die Erinnerung
+// ---------------------------------------------------------------------------
+test("eine fällige Wiedervorlage steht oben im Dashboard", () => {
+  // Eine Verabredung, die man erst findet, wenn man in das richtige Team
+  // hineinschaut, erinnert an nichts.
+  const dashboard = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
+  assert.match(dashboard, /listDueAdvisorFollowUps\(client\)/);
+  assert.match(dashboard, /overdueTeams/);
+  assert.match(dashboard, /dashboard\.followUpsDue\.title/);
+  // Ueber den angemeldeten Zugang - die Policy gibt nur eigene Zeilen heraus.
+  assert.doesNotMatch(dashboard, /createPrivilegedAccessClient/);
+
+  for (const locale of ["de", "en"]) {
+    const due = advisorCopy(locale).dashboard as unknown as Record<string, { title?: string }>;
+    assert.match(
+      due.followUpsDue?.title ?? "",
+      /plural/,
+      `${locale}: der Banner beugt die Anzahl nicht`
+    );
+  }
+});
+
+test("die Snapshot-Seite trägt kein abgeschaltetes Debug mehr", () => {
+  // Beim ersten Durchgang uebersehen: dieselbe `const debug = false`-Attrappe
+  // wie auf Report und Dashboard.
+  const snapshot = codeOnly("src/app/(product)/advisor/snapshot/page.tsx");
+  assert.doesNotMatch(snapshot, /const debug = false/);
+  assert.doesNotMatch(snapshot, /\{debug \?/);
+  assert.doesNotMatch(snapshot, /debug=1/);
 });
 
 test("Titel und Beschriftungen werden nicht ein zweites Mal gepflegt", () => {

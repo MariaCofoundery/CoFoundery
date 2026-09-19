@@ -152,7 +152,10 @@
       "resend": "Resend",
       "createNew": "Create new invitation"
     },
-    "openSession": "Session sheet"
+    "openSession": "Session sheet",
+    "followUpsDue": {
+      "title": "{count, plural, one {One follow-up is due} other {# follow-ups are due}}"
+    }
   },
   "report": {
     "context": "Advisor context",
@@ -342,7 +345,22 @@
     "links": {
       "label": "Other views",
       "report": "Advisor report",
-      "snapshot": "Snapshot"
+      "snapshot": "Snapshot",
+      "document": "State to take away"
     }
+  },
+  "document": {
+    "back": "← Back to the session sheet",
+    "title": "Accompaniment – the current state, to take away",
+    "asOf": "As of {date}",
+    "intro": "This sheet sums up what was put down while accompanying this team: the founders' jointly confirmed positions and the impulses written about them. Everything here is known to both sides.",
+    "settledTitle": "What the team has jointly confirmed",
+    "settledEmpty": "At the time of this state the team had not confirmed a shared position yet – or access to it is not active right now.",
+    "impulsesTitle": "Impulses from the accompaniment",
+    "impulsesEmpty": "No impulses have been recorded for this team yet.",
+    "nextTitle": "Next step",
+    "notesExcluded": "Not included: the accompanying person's private working notes. They are deliberately not part of this sheet – a document that prints them on request would be a promise with an exception, and that is not a promise.",
+    "disclaimer": "This sheet records a state and is no substitute for legal or tax advice.",
+    "print": "Print or save as PDF"
   }
 }

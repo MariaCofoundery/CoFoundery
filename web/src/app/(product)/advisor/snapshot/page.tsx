@@ -22,7 +22,6 @@ import { getRequestUser } from "@/lib/supabase/server";
 type PageSearchParams = {
   invitationId?: string;
   teamContext?: string;
-  debug?: string;
 };
 
 function resolveTeamContext(value: string | undefined) {
@@ -63,8 +62,6 @@ export default async function AdvisorSnapshotPage({
   const locale = await getRequestLocale();
   const invitationId = params.invitationId?.trim() || null;
   const requestedTeamContext = resolveTeamContext(params.teamContext);
-  // Technical access metadata is intentionally never rendered to product users.
-  const debug = false;
 
   if (!invitationId) {
     redirect("/advisor/dashboard");
@@ -81,9 +78,7 @@ export default async function AdvisorSnapshotPage({
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {
     advisorContext: true,
   });
-  const dashboardFallbackHref = debug
-    ? "/advisor/dashboard?debug=1#advisor-teams"
-    : "/advisor/dashboard#advisor-teams";
+  const dashboardFallbackHref = "/advisor/dashboard#advisor-teams";
   const reportHref =
     data.status === "ready"
       ? buildAdvisorReportHref(data.invitationId ?? invitationId, data.teamContext)
@@ -121,17 +116,6 @@ export default async function AdvisorSnapshotPage({
                 {t("snapshot.backToDashboard")}
               </Link>
             </div>
-            {debug ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-left text-xs leading-6 text-slate-700">
-                <p className="font-semibold text-slate-900">Debug · Snapshot Target</p>
-                <p>currentUserRole: -</p>
-                <p>invitationId: {invitationId}</p>
-                <p>relationshipId: -</p>
-                <p>teamContext: {requestedTeamContext}</p>
-                <p>hasAccess: -</p>
-                <p>whyNotUsable: {data.reason ?? data.status}</p>
-              </div>
-            ) : null}
           </div>
         </main>
       </>
@@ -159,19 +143,6 @@ export default async function AdvisorSnapshotPage({
         matchingHref={reportHref}
         workbookHref={workbookHref}
       />
-      {debug ? (
-        <div className="mx-auto mt-6 w-full max-w-5xl px-6 md:px-10 print:hidden">
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-xs leading-6 text-slate-700">
-            <p className="font-semibold text-slate-900">Debug · Snapshot Target</p>
-            <p>currentUserRole: {data.currentUserRole}</p>
-            <p>invitationId: {data.invitationId ?? invitationId}</p>
-            <p>relationshipId: {data.relationshipId ?? "-"}</p>
-            <p>teamContext: {data.teamContext}</p>
-            <p>hasAccess: {String(data.currentUserRole === "advisor")}</p>
-            <p>whyNotUsable: -</p>
-          </div>
-        </div>
-      ) : null}
       <main className="print-document-root mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <Link
