@@ -785,7 +785,7 @@
     "subtitle": "If you both want to, you can next explore your expectations around roles, commitment and collaboration together.",
     "safetyNote": "Your shared Alignment view is prepared only after both of you consent to this step.",
     "existingContextTitle": "You already have a shared area",
-    "existingContextText": "Open your existing connection to continue there. Cofoundery does not create the same shared context twice.",
+    "existingContextText": "You already have a shared area – from an earlier invitation to co-founder matching. Your alignment, your workbook and everything you have worked on together live there. CoFoundery does not create the same shared context twice.",
     "profilesEyebrow": "Involved profiles",
     "profilesTitle": "Your Discovery profiles",
     "profilesText": "These are the details you intentionally published through Discovery. Private search priorities and assessment answers stay hidden.",
@@ -839,7 +839,10 @@
       "startedText": "By making this request, you consent to preparing your shared Alignment view. The other person then needs to consent as well.",
       "nextStepEyebrow": "Next step",
       "startTitle": "Explore together",
-      "startText": "If you both want to, you can next compare your expectations and perspectives together. Both of you need to consent."
+      "startText": "If you both want to, you can next compare your expectations and perspectives together. Both of you need to consent.",
+      "alreadyConnectedTitle": "You already did this",
+      "alreadyConnectedSubtext": "“Check together” is not the next step here – you have already been down this road.",
+      "alreadyConnectedText": "Carry on in your shared area. If you want to compare something new there, you'll find the way in under Connections."
     },
     "steps": {
       "introAccepted": "Intro accepted",
@@ -856,7 +859,8 @@
       "waitingForConfirmation": "Waiting for consent",
       "confirmMatching": "Consent and explore together",
       "requestFullMatching": "Explore together",
-      "startPreparation": "Explore together"
+      "startPreparation": "Explore together",
+      "openExistingConnection": "Go to your connection"
     }
   },
   "commitmentLevelHints": {

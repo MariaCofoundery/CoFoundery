@@ -73,6 +73,68 @@ test("das Protokoll nennt den Grund, ohne jemanden zu nennen", () => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Die Sackgasse bei einer bestehenden Verbindung
+// ---------------------------------------------------------------------------
+test("wer sich schon kennt, bekommt keinen Knopf, der nicht gehen kann", () => {
+  // GEMELDET AM 20.09.2026: Zwei Menschen kennen sich aus dem
+  // Co-Founder-Matching, finden sich danach NOCH EINMAL über Find und nehmen
+  // dort ein Intro an. `canCreateDiscoveryMatchingStart` ergibt bei einer
+  // bestehenden Beziehung immer false - der Knopf MUSSTE scheitern.
+  const page = codeOnly(PREPARATION);
+  assert.match(page, /const existingSharedContext =/);
+  assert.match(
+    page,
+    /existingSharedContext \?[\s\S]{0,200}alreadyConnectedText/,
+    "in diesem Zustand steht kein erklärender Text statt des Knopfes"
+  );
+  // Der Knopf hängt jetzt am Gegenteil dieses Zustands.
+  const buttonAt = page.indexOf("actions.startPreparation");
+  const guardAt = page.lastIndexOf("existingSharedContext ? (", buttonAt);
+  assert.ok(guardAt > 0 && guardAt < buttonAt, "der Knopf steht ungesichert da");
+});
+
+test("der Hinweis auf die bestehende Verbindung führt auch dorthin", () => {
+  // Vorher stand da "Öffnet eure bestehende Verbindung" - ohne irgendetwas
+  // zum Anklicken. Einen Weg zu nennen, den man nicht gehen kann, ist
+  // schlimmer als ihn nicht zu nennen.
+  const page = codeOnly(PREPARATION);
+  assert.match(page, /href="\/connections"/);
+  assert.match(page, /matchingPreparation\.actions\.openExistingConnection/);
+
+  for (const locale of ["de", "en"]) {
+    const prep = (
+      JSON.parse(readFileSync(`messages/${locale}/discovery.json`, "utf8")) as {
+        matchingPreparation: {
+          actions: Record<string, string>;
+          states: Record<string, string>;
+          existingContextText: string;
+        };
+      }
+    ).matchingPreparation;
+    assert.ok(prep.actions.openExistingConnection, `${locale}: der Weg hat kein Label`);
+    for (const key of ["alreadyConnectedTitle", "alreadyConnectedSubtext", "alreadyConnectedText"]) {
+      assert.ok(prep.states[key], `${locale}: states.${key} fehlt`);
+    }
+    // Der Text muss sagen, WOHER der gemeinsame Bereich kommt - sonst liest es
+    // sich wie ein Fehler des Produkts.
+    assert.match(
+      prep.existingContextText,
+      locale === "de" ? /Co-Founder-Matching/ : /co-founder matching/,
+      `${locale}: der Text erklärt die Herkunft nicht`
+    );
+  }
+});
+
+test("die drei Schritte stehen nur da, wo es noch losgeht", () => {
+  // "Als Nächstes beantwortet ihr Fragen" vor Menschen, die das längst getan
+  // haben, ist Hohn.
+  const page = codeOnly(PREPARATION);
+  const steps = page.indexOf("steps.startFullMatching");
+  const guard = page.lastIndexOf("existingSharedContext ? null : (", steps);
+  assert.ok(guard > 0 && guard < steps, "die Schritte stehen auch im schon-verbunden-Fall");
+});
+
 test("die werfenden Ladefunktionen sind als solche erkennbar geblieben", () => {
   // Der Gegenentwurf waere gewesen, sie still `null` zurueckgeben zu lassen.
   // Das waere schlechter: Ein Ladefehler und "es gibt nichts" sind zwei

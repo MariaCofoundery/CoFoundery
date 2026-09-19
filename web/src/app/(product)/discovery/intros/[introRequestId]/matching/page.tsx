@@ -616,6 +616,10 @@ export default async function DiscoveryIntroMatchingPreparationPage({
       ? preparation.recipientProfile
       : preparation.requesterProfile;
   const matchingStart = preparation.matchingStart;
+  // Gibt es zwischen diesen beiden schon einen gemeinsamen Bereich? Dann ist
+  // "Gemeinsam pruefen" nicht der naechste Schritt, sondern bereits passiert -
+  // und `canCreateDiscoveryMatchingStart` laesst es ohnehin nicht zu.
+  const existingSharedContext = preparation.relationshipExists || preparation.invitationExists;
   const matchingSession = matchingSessionForStart;
   const reportRun = reportRunForSession;
   const matchingStartError = searchParamValue(resolvedSearchParams.matchingStartError);
@@ -676,14 +680,38 @@ export default async function DiscoveryIntroMatchingPreparationPage({
           </p>
         </section>
 
-        {preparation.relationshipExists || preparation.invitationExists ? (
+        {/* ------------------------------------------------------------------
+            DER FALL, DEN MARIA AM 20.09.2026 GEMELDET HAT.
+
+            Zwei Menschen kennen sich schon aus dem Co-Founder-Matching - es
+            gibt also eine Beziehung -, und danach finden sie sich NOCH EINMAL
+            ueber Find und nehmen dort ein Intro an. Selten, aber es kommt vor.
+
+            Hier stand dann dieser Hinweis: "Oeffnet eure bestehende
+            Verbindung, um dort weiterzumachen" - ohne irgendetwas zum
+            Anklicken. Und darunter stand weiterhin der Knopf "Gemeinsam
+            pruefen", obwohl `canCreateDiscoveryMatchingStart` bei einer
+            bestehenden Beziehung immer false ergibt: Die Aktion MUSSTE
+            scheitern. Eine Handlung anzubieten, die nicht gehen kann, und
+            daneben einen Weg zu nennen, den man nicht gehen kann - das war
+            die Sackgasse.
+            ------------------------------------------------------------------ */}
+        {existingSharedContext ? (
           <section className="rounded-3xl border border-slate-200 bg-white/90 p-5">
             <h2 className="text-xl font-semibold text-slate-950">
               {t("matchingPreparation.existingContextTitle")}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               {t("matchingPreparation.existingContextText")}
             </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/connections" className={PRIMARY_CTA_CLASS}>
+                {t("matchingPreparation.actions.openExistingConnection")}
+              </Link>
+              <Link href={profileDetailUrl(otherProfile)} className={SECONDARY_CTA_CLASS}>
+                {t("common.viewProfile")}
+              </Link>
+            </div>
           </section>
         ) : null}
 
@@ -720,29 +748,44 @@ export default async function DiscoveryIntroMatchingPreparationPage({
                 {t("matchingPreparation.states.nextStepEyebrow")}
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                {t("matchingPreparation.states.startTitle")}
+                {existingSharedContext
+                  ? t("matchingPreparation.states.alreadyConnectedTitle")
+                  : t("matchingPreparation.states.startTitle")}
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                {t("matchingPreparation.states.startText")}
+                {existingSharedContext
+                  ? t("matchingPreparation.states.alreadyConnectedSubtext")
+                  : t("matchingPreparation.states.startText")}
               </p>
-              <ol className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  {t("matchingPreparation.steps.startFullMatching")}
-                </li>
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  {t("matchingPreparation.steps.answerQuestions")}
-                </li>
-                <li className="rounded-2xl bg-slate-50 px-4 py-3">
-                  {t("matchingPreparation.steps.reportAndWorkbook")}
-                </li>
-              </ol>
-              <div className="mt-6">
-                <form action={requestJointCheck}>
-                  <button type="submit" className={PRIMARY_CTA_CLASS}>
-                    {t("matchingPreparation.actions.startPreparation")}
-                  </button>
-                </form>
-              </div>
+              {existingSharedContext ? null : (
+                <ol className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
+                  <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                    {t("matchingPreparation.steps.startFullMatching")}
+                  </li>
+                  <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                    {t("matchingPreparation.steps.answerQuestions")}
+                  </li>
+                  <li className="rounded-2xl bg-slate-50 px-4 py-3">
+                    {t("matchingPreparation.steps.reportAndWorkbook")}
+                  </li>
+                </ol>
+              )}
+              {/* Kein Knopf, wo die Aktion nicht gehen kann. Ein
+                  abgeblendeter waere auch nichts: Er wuerde erklaeren wollen,
+                  was schon darueber steht. */}
+              {existingSharedContext ? (
+                <p className="mt-6 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+                  {t("matchingPreparation.states.alreadyConnectedText")}
+                </p>
+              ) : (
+                <div className="mt-6">
+                  <form action={requestJointCheck}>
+                    <button type="submit" className={PRIMARY_CTA_CLASS}>
+                      {t("matchingPreparation.actions.startPreparation")}
+                    </button>
+                  </form>
+                </div>
+              )}
             </>
           )}
           <div className="mt-6 flex flex-wrap gap-3">

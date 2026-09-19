@@ -785,7 +785,7 @@
     "subtitle": "Wenn ihr beide möchtet, könnt ihr als Nächstes eure Erwartungen an Rollen, Commitment und Zusammenarbeit gemeinsam prüfen.",
     "safetyNote": "Euer gemeinsamer Alignment-Blick wird erst vorbereitet, wenn ihr beide diesem Schritt zugestimmt habt.",
     "existingContextTitle": "Für euch gibt es bereits einen gemeinsamen Bereich",
-    "existingContextText": "Öffnet eure bestehende Verbindung, um dort weiterzumachen. CoFoundery legt denselben gemeinsamen Kontext nicht doppelt an.",
+    "existingContextText": "Ihr habt bereits einen gemeinsamen Bereich – aus einer früheren Einladung zum Co-Founder-Matching. Dort liegen euer Alignment, euer Workbook und alles, was ihr schon miteinander erarbeitet habt. CoFoundery legt denselben gemeinsamen Kontext nicht doppelt an.",
     "profilesEyebrow": "Beteiligte Profile",
     "profilesTitle": "Eure Discovery-Profile",
     "profilesText": "Hier seht ihr die Angaben, die ihr bewusst über Discovery veröffentlicht habt. Private Suchprioritäten und Assessment-Antworten bleiben verborgen.",
@@ -839,7 +839,10 @@
       "startedText": "Mit deiner Anfrage stimmst du zu, euren gemeinsamen Alignment-Blick vorzubereiten. Die andere Person muss anschließend ebenfalls zustimmen.",
       "nextStepEyebrow": "Nächster Schritt",
       "startTitle": "Gemeinsam prüfen",
-      "startText": "Wenn ihr beide möchtet, könnt ihr als Nächstes gemeinsam eure Erwartungen und Vorstellungen vergleichen. Dafür müsst ihr beide zustimmen."
+      "startText": "Wenn ihr beide möchtet, könnt ihr als Nächstes gemeinsam eure Erwartungen und Vorstellungen vergleichen. Dafür müsst ihr beide zustimmen.",
+      "alreadyConnectedTitle": "Das habt ihr schon",
+      "alreadyConnectedSubtext": "„Gemeinsam prüfen“ ist hier nicht der nächste Schritt – ihr seid diesen Weg schon gegangen.",
+      "alreadyConnectedText": "Macht in eurem gemeinsamen Bereich weiter. Wenn du dort etwas Neues vergleichen möchtest, findest du unter Verbindungen den Weg dorthin."
     },
     "steps": {
       "introAccepted": "Intro angenommen",
@@ -856,7 +859,8 @@
       "waitingForConfirmation": "Warte auf Zustimmung",
       "confirmMatching": "Zustimmen und gemeinsam prüfen",
       "requestFullMatching": "Gemeinsam prüfen",
-      "startPreparation": "Gemeinsam prüfen"
+      "startPreparation": "Gemeinsam prüfen",
+      "openExistingConnection": "Zu eurer Verbindung"
     }
   },
   "commitmentLevelHints": {
