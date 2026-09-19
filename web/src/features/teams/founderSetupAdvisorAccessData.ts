@@ -62,3 +62,27 @@ export async function getAdvisorConfirmedFounderSetup(
   if (error || !data) return [];
   return buildAdvisorConfirmedFounderSetup(data as AdvisorConfirmedFounderSetupRow[]);
 }
+
+/**
+ * Hat diese Beziehung schon ein Founder-Team?
+ *
+ * Gebraucht, weil "Freigabe erbitten" ohne Team nicht gehen kann - und weil die
+ * Statusfunktion diesen Fall nicht von "nicht berechtigt" unterscheidet. Beides
+ * kommt dort als `member_count = 0` an.
+ *
+ * Bei einem Fehler wird `false` angenommen: Dann erscheint der Knopf nicht. Das
+ * ist die harmlosere Richtung - ein fehlender Knopf ist aergerlich, ein Knopf,
+ * der in eine falsche Fehlermeldung laeuft, war das Problem.
+ */
+export async function advisorRelationshipHasFounderTeam(
+  relationshipId: string,
+  client?: SupabaseLikeClient
+): Promise<boolean> {
+  const normalized = relationshipId.trim();
+  if (!normalized) return false;
+  const supabase = client ?? (await createClient());
+  const { data, error } = await supabase.rpc("advisor_relationship_has_founder_team", {
+    p_relationship_id: normalized,
+  });
+  return !error && data === true;
+}

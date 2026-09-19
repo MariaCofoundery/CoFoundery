@@ -233,3 +233,78 @@ test("der Grund einer pausierten Freigabe steht dabei", () => {
     );
   }
 });
+
+// ---------------------------------------------------------------------------
+// Der Fehler, den Maria direkt nach dem Einspielen gemeldet hat
+// ---------------------------------------------------------------------------
+const REASONS_MIGRATION = "../supabase/migrations/20261010120000_advisor_setup_request_reasons.sql";
+
+test("kein Founder-Team und nicht berechtigt sind zwei verschiedene Antworten", () => {
+  // GEMELDET AM 20.09.2026: "Freigabe erbitten" endete mit "Möglicherweise ist
+  // deine Freigabe für dieses Team nicht mehr aktiv." Die Meldung war falsch.
+  //
+  // Mein Fehler: Die erste Fassung suchte die Quelle MIT der Bedingung
+  // `founder_team_id is not null`. Fand sie nichts, hiess es "nicht
+  // berechtigt" - egal ob die Berechtigung fehlte oder das Team einfach noch
+  // nicht existiert. Und `founder_team_id` bleibt NULL, bis die Founder ihr
+  // Homebase anlegen; der zweite Fall ist also der häufige.
+  const migration = sqlCodeOnly(REASONS_MIGRATION);
+  const fn = migration.slice(
+    migration.indexOf("function public.request_founder_team_advisor_setup_grant"),
+    migration.indexOf("comment on function public.request_founder_team_advisor_setup_grant")
+  );
+  // Schritt 1 prüft die Berechtigung OHNE die Team-Bedingung ...
+  const eligibility = fn.slice(0, fn.indexOf("advisor_ineligible"));
+  assert.doesNotMatch(eligibility, /founder_team_id is not null/);
+  // ... Schritt 2 das Team, mit eigenem Code.
+  assert.match(fn, /founder_team_advisor_setup_team_missing/);
+  assert.match(fn, /errcode = 'P0002'/);
+  assert.match(fn, /errcode = '42501'/);
+});
+
+test("die Meldung behauptet keine Ursache, die sie nicht kennt", () => {
+  const action = source("src/features/teams/advisorSetupRequestActions.ts");
+  assert.match(action, /error\.code === "P0002"/);
+  assert.match(action, /error=setup_request_no_team/);
+
+  for (const locale of ["de", "en"]) {
+    const errors = (
+      JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")) as {
+        session: { errors: Record<string, string>; settled: Record<string, string> };
+      }
+    ).session;
+    assert.ok(errors.errors.setup_request_no_team, `${locale}: die eigene Meldung fehlt`);
+    // Die allgemeine Meldung darf die Freigabe nur noch als MOEGLICHKEIT nach
+    // einem zweiten Versuch nennen, nicht als Befund.
+    assert.match(
+      errors.errors.setup_request,
+      locale === "de" ? /noch einmal/ : /try again/,
+      `${locale}: die Meldung schickt sofort in die falsche Richtung`
+    );
+    // Und die Meldung ohne Team nennt die Freigabe gar nicht.
+    assert.doesNotMatch(
+      errors.errors.setup_request_no_team,
+      locale === "de" ? /nicht mehr aktiv/ : /no longer active/,
+      `${locale}: die Meldung verwechselt die Ursachen wieder`
+    );
+    assert.ok(errors.settled.noFounderTeam, `${locale}: der Hinweis am Knopf fehlt`);
+  }
+});
+
+test("ohne Founder-Team erscheint der Knopf nicht", () => {
+  // Ein Knopf, der in eine Fehlermeldung laeuft, ist schlechter als kein Knopf.
+  const page = source("src/app/(product)/advisor/session/page.tsx");
+  assert.match(page, /advisorRelationshipHasFounderTeam\(data\.relationshipId, client\)/);
+  assert.match(page, /status === "not_granted" && !hasFounderTeam \?/);
+  assert.match(page, /session\.settled\.noFounderTeam/);
+
+  // Die Abfrage gibt nur ja/nein heraus - die Team-Kennung braucht der Advisor
+  // nicht, und was man nicht herausgibt, kann nicht weiterverwendet werden.
+  const migration = sqlCodeOnly(REASONS_MIGRATION);
+  assert.match(migration, /function public\.advisor_relationship_has_founder_team\(p_relationship_id uuid\)\s*\nreturns boolean/);
+  assert.match(migration, /request_access\.advisor_user_id = auth\.uid\(\)/);
+  // Und sie bleibt an derselben Berechtigung wie alles andere.
+  const fn = migration.slice(migration.indexOf("function public.advisor_relationship_has_founder_team"));
+  assert.match(fn, /request_access\.status = 'linked'/);
+  assert.match(fn, /request_access\.revoked_at is null/);
+});

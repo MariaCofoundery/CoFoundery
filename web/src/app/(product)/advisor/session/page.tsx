@@ -23,6 +23,7 @@ import {
   saveAdvisorPrivateNoteAction,
 } from "@/features/reporting/advisorWorkspaceActions";
 import { requestFounderSetupAccessAction } from "@/features/teams/advisorSetupRequestActions";
+import { advisorRelationshipHasFounderTeam } from "@/features/teams/founderSetupAdvisorAccessData";
 import { describeAdvisorFounderSetupPause } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -32,7 +33,14 @@ const INPUT =
   "mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500";
 
 const SAVED_KEYS = ["note", "follow_up", "follow_up_cleared", "follow_up_done", "setup_request"];
-const ERROR_KEYS = ["save", "forbidden", "follow_up_date", "follow_up_past", "setup_request"];
+const ERROR_KEYS = [
+  "save",
+  "forbidden",
+  "follow_up_date",
+  "follow_up_past",
+  "setup_request",
+  "setup_request_no_team",
+];
 
 /**
  * Das Sitzungsblatt - eine Seite, die man vor einem Termin aufmacht.
@@ -84,9 +92,12 @@ export default async function AdvisorSessionPage({
   if (data.status !== "ready") redirect("/advisor/dashboard");
 
   const client = await createClient();
-  const [note, followUp] = await Promise.all([
+  const [note, followUp, hasFounderTeam] = await Promise.all([
     getAdvisorPrivateNote(client, data.relationshipId),
     getAdvisorFollowUp(client, data.relationshipId),
+    // Ohne Founder-Team gibt es kein Founder Setup - und "Freigabe erbitten"
+    // lief dann in eine Meldung, die eine falsche Ursache behauptet hat.
+    advisorRelationshipHasFounderTeam(data.relationshipId, client),
   ]);
 
   const teamContext = normalizeAdvisorTeamContext(data.teamContext);
@@ -290,7 +301,14 @@ export default async function AdvisorSessionPage({
                   Der Knopf steht nur bei "nicht freigegeben": Bei einer
                   laufenden Anfrage waere ein zweites Fragen nur Druck, und bei
                   "pausiert" liegt es nicht an einer fehlenden Bitte. */}
-              {data.founderSetupAccess.status === "not_granted" ? (
+              {data.founderSetupAccess.status === "not_granted" && !hasFounderTeam ? (
+                // Kein Team heisst: Es gibt nichts freizugeben. Das ist kein
+                // Fehler und keine Sache der Begleitung - die Founder legen
+                // ihr Team-Homebase selbst an.
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {t("session.settled.noFounderTeam")}
+                </p>
+              ) : data.founderSetupAccess.status === "not_granted" ? (
                 <form action={requestSetupAccess} className="mt-3">
                   <ReportActionButton type="submit" variant="utility" className="min-h-11">
                     {t("session.settled.requestAccess")}

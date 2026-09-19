@@ -316,7 +316,8 @@
       "forbidden": "We can't save notes for this team.",
       "follow_up_date": "That's not a valid date.",
       "follow_up_past": "A date in the past reminds you of nothing. Please pick a day still to come.",
-      "setup_request": "The request couldn't be sent just now. Your access to this team may no longer be active."
+      "setup_request": "The request couldn't be sent just now. Please try again – if it fails again, your access to this team may no longer be active.",
+      "setup_request_no_team": "There is no Founder Setup for this team yet that could be shared. The founders create it themselves."
     },
     "followUp": {
       "title": "Your follow-up",
@@ -343,7 +344,8 @@
       "help": "Only the jointly confirmed positions – that's what the founders released to you. What is still open does not appear here.",
       "empty": "The team hasn't confirmed a shared position yet.",
       "requestAccess": "Ask for access",
-      "requestAccessHint": "Both founders get the request in their Founder Setup and each decide there themselves. This gives you no access until both have agreed."
+      "requestAccessHint": "Both founders get the request in their Founder Setup and each decide there themselves. This gives you no access until both have agreed.",
+      "noFounderTeam": "There is no Founder Setup for this team yet. The founders create it themselves once they open their shared area – after that you can ask for access here."
     },
     "impulses": {
       "title": "What you wrote to the founders",

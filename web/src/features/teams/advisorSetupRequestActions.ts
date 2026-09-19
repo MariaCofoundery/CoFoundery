@@ -34,5 +34,20 @@ export async function requestFounderSetupAccessAction(
 
   revalidatePath("/advisor/session");
   revalidatePath("/advisor/dashboard");
-  redirect(back(error ? "error=setup_request" : "saved=setup_request"));
+
+  if (!error) {
+    redirect(back("saved=setup_request"));
+  }
+
+  // BEHOBEN am 20.09.2026: Hier stand eine einzige Meldung, die eine Ursache
+  // BEHAUPTET hat ("moeglicherweise ist deine Freigabe nicht mehr aktiv") -
+  // und in Marias Fall war sie falsch. Das Team hatte einfach noch kein
+  // Founder-Homebase.
+  //
+  // Die Funktion unterscheidet das jetzt ueber den Fehlercode: P0002 heisst
+  // "kein Founder-Team", 42501 heisst "nicht berechtigt". Eine Meldung, die
+  // eine falsche Ursache nennt, schickt Menschen an die falsche Stelle.
+  const missingTeam =
+    error.code === "P0002" || error.message.includes("setup_team_missing");
+  redirect(back(missingTeam ? "error=setup_request_no_team" : "error=setup_request"));
 }
