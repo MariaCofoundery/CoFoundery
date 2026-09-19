@@ -1,0 +1,21 @@
+# ---------------------------------------------------------------------------
+# Was nicht ins Repository gehoert
+# ---------------------------------------------------------------------------
+# Bis zum 19.09.2026 gab es hier gar keine .gitignore - nur eine in web/.
+# Deshalb waren neun Dateien eingecheckt, die niemand eingecheckt haben wollte,
+# und supabase/.temp/cli-latest schlich sich immer wieder in Commits.
+
+# macOS
+.DS_Store
+
+# Lokaler Zustand der Supabase-CLI.
+#
+# Die Dateien werden bei jedem Aufruf neu geschrieben (Versionsnummern der
+# lokalen Dienste, Projektkennung, Pooler-Adresse) und sind an die Maschine
+# gebunden. Eingecheckt erzeugen sie Konflikte bei jedem `supabase`-Befehl.
+#
+# Geprueft: Es steht kein Passwort darin - die CLI legt die Pooler-Adresse
+# ohne Zugangsdaten ab, und die Projektkennung steht ohnehin in der
+# oeffentlichen Supabase-URL. Sie wandern hier also aus Ordnung heraus, nicht
+# wegen eines Lecks.
+supabase/.temp/
