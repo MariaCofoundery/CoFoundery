@@ -105,8 +105,13 @@ test("Advisor V2 copy is parallel and avoids current Workbook primary navigation
   );
   assert.match(deTeams.setup.advisorAccess.description, /Commitment Lab.*privat/u);
   assert.match(enTeams.setup.advisorAccess.description, /Commitment Lab.*private/u);
-  assert.match(dashboard, /openHistoricalWorkbook/u);
-  assert.doesNotMatch(dashboard, /t\("dashboard\.openWorkbook"\)/u);
+  // GEAENDERT am 20.09.2026: Hier stand `assert.match(dashboard,
+  // /openHistoricalWorkbook/)` - die Zusage war "das Workbook steht da nur
+  // noch als HISTORISCHES, nicht als laufende Navigation". Inzwischen ist es
+  // ganz aus dem Advisor-Bereich entfernt; die Zusage gilt damit staerker, und
+  // der Test prueft jetzt das Ganze statt der Zwischenstufe.
+  assert.doesNotMatch(dashboard, /openHistoricalWorkbook|dashboard\.openWorkbook/u);
+  assert.doesNotMatch(dashboard, /workbookHref/u);
   assert.doesNotMatch(navigation, /\{t\("workbook"\)\}/u);
   assert.doesNotMatch(dashboard, /CommitmentLab|commitment-lab/u);
 });

@@ -121,7 +121,6 @@ export default async function AdvisorReportPage({
         activeView="advisor"
         contextLabel={t("report.context")}
         matchingHref={reportHref}
-        workbookHref={data.workbookHref}
       />
       <AdvisorReportProductView
         invitationId={data.invitationId}
@@ -130,8 +129,6 @@ export default async function AdvisorReportPage({
         participantBName={data.participantBName}
         report={data.report}
         impulses={data.impulses}
-        workbookHref={data.workbookHref}
-        historicalWorkbookAvailable={data.historicalWorkbookAvailable}
         snapshotHref={data.snapshotHref}
         savedSectionKey={savedSectionKey}
         saveAction={saveImpulseAction}

@@ -5,7 +5,6 @@ import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import {
   buildAdvisorReportHref,
-  buildAdvisorWorkbookHref,
   normalizeAdvisorTeamContext,
 } from "@/features/reporting/advisorTeamTargets";
 import {
@@ -83,10 +82,6 @@ export default async function AdvisorSnapshotPage({
     data.status === "ready"
       ? buildAdvisorReportHref(data.invitationId ?? invitationId, data.teamContext)
       : dashboardFallbackHref;
-  const workbookHref =
-    data.status === "ready"
-      ? buildAdvisorWorkbookHref(data.invitationId ?? invitationId, data.teamContext)
-      : dashboardFallbackHref;
 
   if (data.status !== "ready") {
     return (
@@ -95,7 +90,6 @@ export default async function AdvisorSnapshotPage({
           activeView="advisor"
           contextLabel={t("snapshot.context")}
           matchingHref={reportHref}
-          workbookHref={workbookHref}
         />
         <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
           <div className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
@@ -141,7 +135,6 @@ export default async function AdvisorSnapshotPage({
         activeView="advisor"
         contextLabel={t("snapshot.context")}
         matchingHref={reportHref}
-        workbookHref={workbookHref}
       />
       <main className="print-document-root mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">

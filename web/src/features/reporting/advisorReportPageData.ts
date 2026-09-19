@@ -12,7 +12,6 @@ import {
 } from "@/features/reporting/advisorTeamContext";
 import {
   buildAdvisorSnapshotHref,
-  buildAdvisorWorkbookHref,
   normalizeAdvisorTeamContext,
 } from "@/features/reporting/advisorTeamTargets";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
@@ -104,8 +103,6 @@ export type AdvisorReportPageData =
       participantBName: string;
       report: AdvisorReportData;
       impulses: Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
-      workbookHref: string;
-      historicalWorkbookAvailable: boolean;
       snapshotHref: string;
       founderSetupItems: AdvisorConfirmedFounderSetupItem[];
       founderSetupAccess: AdvisorFounderSetupAccessState;
@@ -509,10 +506,6 @@ export async function getAdvisorReportPageData(
     participantBName,
     report,
     impulses: impulseMap,
-    workbookHref: buildAdvisorWorkbookHref(normalizedInvitationId, teamContext),
-    historicalWorkbookAvailable: hasLegacyFounderAlignmentWorkbookContent(
-      (workbookResult.data as { payload?: unknown } | null)?.payload
-    ),
     snapshotHref: buildAdvisorSnapshotHref(normalizedInvitationId, teamContext),
     founderSetupItems,
     founderSetupAccess,

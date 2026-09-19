@@ -320,8 +320,13 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.report")}</span>
               <span
+                // BEHOBEN am 20.09.2026: Hier stand `team.reportReady &&
+                // team.workbookAvailable`. Ein fertiger Report sah damit
+                // gedaempft aus, solange kein historisches Workbook existierte
+                // - und das Workbook ist aus diesem Bereich jetzt ganz weg. Die
+                // Ampel haengt an dem, was sie anzeigt.
                 className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${progressToneClassName({
-                  active: team.reportReady && team.workbookAvailable,
+                  active: team.reportReady,
                   tone: team.reportReady ? "success" : "warning",
                 })}`}
               >
@@ -349,47 +354,53 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
                 </p>
               ) : null}
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>
-              <span className="text-xs font-medium text-slate-700">
-                {advisorFollowUpLabel(team.followUp, t)}
-              </span>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        {team.reportAvailable ? (
-          <Link href={team.reportHref} className={PRIMARY_CTA_CLASS}>
-            {t("dashboard.viewReport")}
-          </Link>
-        ) : (
-          <span className={DISABLED_CTA_CLASS}>
-            {team.accessStatus === "ready"
-              ? t("dashboard.reportNotReady")
-              : accessStatusLabel(team, t)}
-          </span>
-        )}
-        {/* Das Sitzungsblatt haengt an derselben Bedingung wie der Report: Es
-            zeigt bestaetigte Staende und die eigenen Impulse, und dafuer
-            braucht es die Freigabe. Die eigenen Notizen liegen darin, sind aber
-            nicht der Grund fuer die Bedingung. */}
-        {team.reportAvailable ? (
-          <Link href={team.sessionHref} className={SECONDARY_CTA_CLASS}>
-            {t("dashboard.openSession")}
-          </Link>
-        ) : null}
-        {team.snapshotAvailable ? (
-          <Link href={team.snapshotHref} className={SECONDARY_CTA_CLASS}>
-            {t("dashboard.exportSnapshot")}
-          </Link>
-        ) : null}
-        {team.canOpenWorkbook ? (
-          <Link href={team.workbookHref} className={TERTIARY_CTA_CLASS}>
-            {t("dashboard.openHistoricalWorkbook")}
-          </Link>
-        ) : null}
+      {/* -----------------------------------------------------------------
+          DIE REIHE HATTE VIER GLEICH LAUTE KNOEPFE und darunter, im Kasten
+          mit dem Zustand des Teams, die eigene Wiedervorlage. Das war die
+          unlogische Optik: Was das TEAM angeht und was man sich SELBST
+          vorgenommen hat, stand durcheinander, und kein Knopf war der
+          naechste Schritt.
+
+          Jetzt: Das Sitzungsblatt ist der eine hervorgehobene Weg - dort
+          liegt die eigene Arbeit, und von dort geht es weiter zum Report.
+          Der Report daneben, der Snapshot als stiller Export. Und die
+          eigene Wiedervorlage steht rechts, abgesetzt von allem, was das
+          Team betrifft.
+          ----------------------------------------------------------------- */}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-5">
+        <div className="flex flex-wrap items-center gap-3">
+          {team.reportAvailable ? (
+            <>
+              <Link href={team.sessionHref} className={PRIMARY_CTA_CLASS}>
+                {t("dashboard.openSession")}
+              </Link>
+              <Link href={team.reportHref} className={SECONDARY_CTA_CLASS}>
+                {t("dashboard.viewReport")}
+              </Link>
+            </>
+          ) : (
+            <span className={DISABLED_CTA_CLASS}>
+              {team.accessStatus === "ready"
+                ? t("dashboard.reportNotReady")
+                : accessStatusLabel(team, t)}
+            </span>
+          )}
+          {team.snapshotAvailable ? (
+            <Link href={team.snapshotHref} className={TERTIARY_CTA_CLASS}>
+              {t("dashboard.exportSnapshot")}
+            </Link>
+          ) : null}
+        </div>
+        <p className="text-xs leading-5 text-slate-500">
+          <span className="uppercase tracking-[0.14em] text-slate-400">
+            {t("dashboard.fields.followUp")}
+          </span>{" "}
+          {advisorFollowUpLabel(team.followUp, t)}
+        </p>
       </div>
 
     </article>
@@ -631,14 +642,12 @@ export default async function AdvisorDashboardPage() {
   const preferredTeam = readyTeams.find((team) => team.reportAvailable) ?? readyTeams[0] ?? null;
   const dashboardFallbackHref = "/advisor/dashboard#advisor-teams";
   const reportHref = preferredTeam?.reportHref ?? dashboardFallbackHref;
-  const workbookHref = preferredTeam?.workbookHref ?? dashboardFallbackHref;
 
   return (
     <>
       <ProductNavigationOverride
         activeView="advisor"
         matchingHref={reportHref}
-        workbookHref={workbookHref}
       />
       <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-14 md:px-10 xl:px-12">
       {/* Ganz oben, vor allem anderen: Was sich die Person selbst vorgenommen

@@ -9,7 +9,6 @@ import {
 import {
   buildAdvisorReportHref,
   buildAdvisorSnapshotHref,
-  buildAdvisorWorkbookHref,
 } from "@/features/reporting/advisorTeamTargets";
 import {
   listRelationshipAdvisorsForUser,
@@ -139,8 +138,6 @@ export type AdvisorDashboardTeam = {
    * gemacht hat.
    */
   followUp: "four_weeks" | "three_months" | "none";
-  canOpenWorkbook: boolean;
-  workbookHref: string;
   reportHref: string;
   reportReady: boolean;
   snapshotHref: string;
@@ -215,7 +212,7 @@ function deriveAdvisorActivityStatus(params: {
 
 function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAccessRow): Pick<
   AdvisorDashboardTeam,
-  "accessStatus" | "approvalCount" | "canOpenWorkbook"
+  "accessStatus" | "approvalCount"
 > {
   const approvalCount =
     Number(row.founder_a_approved === true) + Number(row.founder_b_approved === true);
@@ -226,18 +223,18 @@ function deriveAdvisorAccessState(row: AdvisorAccessRow | RelationshipAdvisorAcc
   // von der Seite nie benutzt. Genau diese Doppelung hat den Fehler oben
   // erzeugt: Wer die Ableitung las, glaubte, diese Texte seien zu sehen.
   if (isRevoked) {
-    return { accessStatus: "revoked", approvalCount, canOpenWorkbook: false };
+    return { accessStatus: "revoked", approvalCount };
   }
 
   if (row.founder_a_approved === true && row.founder_b_approved === true) {
-    return { accessStatus: "ready", approvalCount, canOpenWorkbook: true };
+    return { accessStatus: "ready", approvalCount };
   }
 
   if (row.approved_at) {
-    return { accessStatus: "paused", approvalCount, canOpenWorkbook: false };
+    return { accessStatus: "paused", approvalCount };
   }
 
-  return { accessStatus: "waiting_for_approval", approvalCount, canOpenWorkbook: false };
+  return { accessStatus: "waiting_for_approval", approvalCount };
 }
 
 function advisorFollowUp(value: unknown): AdvisorDashboardTeam["followUp"] {
@@ -443,7 +440,12 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
       const advisorLinked = Boolean(
         relationshipAccessRow?.status === "linked" || relationshipAccessRow?.linked_at
       );
-      const relationshipAvailable = accessState.canOpenWorkbook && Boolean(relationshipAccessRow);
+      // Haengt jetzt direkt am Zugriffsstatus. Vorher stand hier
+      // `accessState.canOpenWorkbook` - ein Feld, das den Zugriff nur
+      // MITTELBAR ausdrueckte und mit dem entfernten Workbook verschwunden
+      // ist. Gemeint war immer: die Freigabe ist vollstaendig.
+      const relationshipAvailable =
+        accessState.accessStatus === "ready" && Boolean(relationshipAccessRow);
       const workbookPayload = workbook
         ? projectFounderAlignmentWorkbookForLegacyAdvisor(workbook.payload)
         : null;
@@ -510,7 +512,6 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         founderBAvatarUrl: founderBProfile?.avatarUrl || null,
         teamContext,
         ...accessState,
-        canOpenWorkbook: workbookAvailable,
         activityStatus: deriveAdvisorActivityStatus({
           hasReport: reportReady,
           hasWorkbook: hasLegacyWorkbook,
@@ -519,7 +520,6 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
         }),
         lastActivityAt: lastActivitySource,
         followUp: advisorFollowUp(workbookPayload?.advisorFollowUp),
-        workbookHref: buildAdvisorWorkbookHref(invitation.id, teamContext),
         reportHref: buildAdvisorReportHref(invitation.id, teamContext),
         reportReady,
         snapshotHref: buildAdvisorSnapshotHref(invitation.id, teamContext),

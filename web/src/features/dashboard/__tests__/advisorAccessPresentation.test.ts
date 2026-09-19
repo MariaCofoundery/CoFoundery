@@ -147,7 +147,14 @@ test("ein widerrufener oder pausierter Zugriff öffnet nichts", () => {
   assert.doesNotMatch(predicate, /"revoked"/);
 
   // Und kein Team wird nur deshalb als offen gezeigt, weil die Beschriftung
-  // freundlich ist.
-  assert.match(source(DATA), /accessStatus: "revoked", approvalCount, canOpenWorkbook: false/);
-  assert.match(source(DATA), /accessStatus: "paused", approvalCount, canOpenWorkbook: false/);
+  // freundlich ist. GEAENDERT am 20.09.2026: `canOpenWorkbook` gibt es nicht
+  // mehr - es hing am entfernten Advisor-Workbook. Was den Zugriff oeffnet,
+  // steht jetzt ohne Umweg am Status.
+  assert.match(source(DATA), /accessStatus: "revoked", approvalCount \};/);
+  assert.match(source(DATA), /accessStatus: "paused", approvalCount \};/);
+  assert.match(
+    source(DATA),
+    /accessState\.accessStatus === "ready" && Boolean\(relationshipAccessRow\)/,
+    "was den Zugriff oeffnet, haengt nicht mehr am Status"
+  );
 });

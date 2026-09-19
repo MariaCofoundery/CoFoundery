@@ -76,7 +76,6 @@
     },
     "teamProject": "Context: {name}",
     "openWorkbook": "Open workbook",
-    "openHistoricalWorkbook": "Open historical working state",
     "viewReport": "View report",
     "exportSnapshot": "Export snapshot",
     "reportNotReady": "Report not ready yet",

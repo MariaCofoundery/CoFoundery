@@ -21,8 +21,6 @@ type Props = {
   participantBName: string;
   report: AdvisorReportData;
   impulses: Record<AdvisorImpulseSectionKey, AdvisorSectionImpulse | null>;
-  workbookHref: string;
-  historicalWorkbookAvailable: boolean;
   snapshotHref: string;
   savedSectionKey: AdvisorImpulseSectionKey | null;
   saveAction: (formData: FormData) => void | Promise<void>;
@@ -59,8 +57,6 @@ export function AdvisorReportProductView({
   participantBName,
   report,
   impulses,
-  workbookHref,
-  historicalWorkbookAvailable,
   snapshotHref,
   savedSectionKey,
   saveAction,
@@ -77,15 +73,12 @@ export function AdvisorReportProductView({
       >
         {copy.backToDashboard}
       </Link>
+      {/* Das historische Workbook ist am 20.09.2026 aus dem Advisor-Bereich
+          entfernt worden. Was es leisten sollte, leisten inzwischen der Report,
+          der Snapshot und das Sitzungsblatt - es stand nur noch als vierter
+          Knopf daneben und hat die Reihe unlesbar gemacht. Die Inhalte selbst
+          bleiben bei den Foundern, wo sie hingehoeren. */}
       <div className="flex flex-wrap gap-3">
-        {historicalWorkbookAvailable ? (
-          <Link
-            href={workbookHref}
-            className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-          >
-            {copy.openWorkbook}
-          </Link>
-        ) : null}
         <Link
           href={snapshotHref}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"

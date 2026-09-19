@@ -4,10 +4,7 @@ import { redirect } from "next/navigation";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { FounderAlignmentWorkbookClient } from "@/features/reporting/FounderAlignmentWorkbookClient";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
-import {
-  buildAdvisorReportHref,
-  buildAdvisorWorkbookHref,
-} from "@/features/reporting/advisorTeamTargets";
+import { buildAdvisorReportHref } from "@/features/reporting/advisorTeamTargets";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { getFounderAlignmentWorkbookPageData } from "@/features/reporting/founderAlignmentWorkbookData";
 import {
@@ -68,6 +65,28 @@ export default async function FounderAlignmentWorkbookPage({
     redirect(`/advisor/invite/${encodeURIComponent(legacyAdvisorToken)}`);
   }
 
+  // ---------------------------------------------------------------------
+  // DAS WORKBOOK IST KEIN ADVISOR-BEREICH MEHR (20.09.2026).
+  //
+  // Es war der vierte Knopf auf der Teamkarte, beschriftet als "historisch",
+  // und was es leisten sollte, leisten inzwischen der Advisor-Report, der
+  // Snapshot und das Sitzungsblatt. Die Eintrittspunkte sind entfernt -
+  // und diese Tuer wird mitgeschlossen, damit es nicht nur unverlinkt,
+  // sondern wirklich zu ist. Ein Bereich, den man nur noch ueber eine
+  // gemerkte Adresse erreicht, ist der schlechteste Zustand: gepflegt wird
+  // er nicht mehr, benutzt aber doch.
+  //
+  // Die INHALTE bleiben unberuehrt. Sie liegen im Workbook der Founder,
+  // wo sie hingehoeren - nur die Begleitung kommt nicht mehr hinein.
+  // ---------------------------------------------------------------------
+  if (advisorContext) {
+    redirect(
+      invitationId
+        ? buildAdvisorReportHref(invitationId, requestedTeamContext)
+        : "/advisor/dashboard"
+    );
+  }
+
   if (!invitationId) {
     redirect("/dashboard");
   }
@@ -88,19 +107,15 @@ export default async function FounderAlignmentWorkbookPage({
   });
 
   if (data.status !== "ready") {
-    const fallbackWorkbookHref = advisorContext
-      ? buildAdvisorWorkbookHref(invitationId, requestedTeamContext)
-      : buildWorkbookHref(invitationId, requestedTeamContext);
-    const fallbackReportHref = advisorContext
-      ? buildAdvisorReportHref(invitationId, requestedTeamContext)
-      : `/report/${encodeURIComponent(invitationId)}`;
+    const fallbackWorkbookHref = buildWorkbookHref(invitationId, requestedTeamContext);
+    const fallbackReportHref = `/report/${encodeURIComponent(invitationId)}`;
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
         <ProductNavigationOverride
           matchingHref={fallbackReportHref}
           workbookHref={fallbackWorkbookHref}
-          activeView={advisorContext ? "advisor" : "founder"}
-          contextLabel={advisorContext ? t("common.advisorContext") : t("common.founderContext")}
+          activeView="founder"
+          contextLabel={t("common.founderContext")}
         />
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
@@ -117,7 +132,7 @@ export default async function FounderAlignmentWorkbookPage({
           </p>
           <div className="mt-8 flex justify-center">
             <ReportActionButton href={fallbackReportHref} variant="utility">
-              {advisorContext ? t("common.advisorReport") : t("common.matchingReport")}
+              {t("common.matchingReport")}
             </ReportActionButton>
           </div>
         </div>
@@ -125,13 +140,17 @@ export default async function FounderAlignmentWorkbookPage({
     );
   }
 
+  // Die ZWEITE Haelfte derselben Tuer, und ohne sie waere der Riegel oben
+  // Fassade gewesen: `hasRelationshipAdvisorAccess` haengt NICHT am Parameter
+  // `advisorContext`. Eine begleitende Person, die die Adresse ohne das
+  // Kuerzel aufruft, wurde bis hierher weiterhin als "advisor" erkannt und
+  // bekam das projizierte Workbook zu sehen.
+  if (data.currentUserRole === "advisor") {
+    redirect(buildAdvisorReportHref(data.invitationId ?? invitationId, data.teamContext));
+  }
+
   const resolvedInvitationId = data.invitationId ?? invitationId;
-  const advisorReportHref = buildAdvisorReportHref(resolvedInvitationId, data.teamContext);
   const founderReportHref = `/report/${encodeURIComponent(resolvedInvitationId)}`;
-  const resolvedWorkbookHref =
-    data.currentUserRole === "advisor" || advisorContext
-      ? buildAdvisorWorkbookHref(resolvedInvitationId, data.teamContext)
-      : buildWorkbookHref(resolvedInvitationId, data.teamContext);
   const deepDiveTopicsHref = buildWorkbookIntroHref(resolvedInvitationId, data.teamContext);
   const initialWorkbook = requestedDeepDiveStep
     ? { ...data.workbook, currentStepId: requestedDeepDiveStep }
@@ -139,14 +158,16 @@ export default async function FounderAlignmentWorkbookPage({
 
   return (
     <main>
+      {/* Ab hier ist die lesende Person nachweislich ein Founder - die
+          Weiterleitung oben hat die Begleitung schon herausgenommen, und
+          TypeScript hat die restlichen Advisor-Zweige als unerreichbar
+          nachgewiesen. */}
       <ProductNavigationOverride
-        matchingHref={
-          data.currentUserRole === "advisor" ? advisorReportHref : founderReportHref
-        }
-        workbookHref={resolvedWorkbookHref}
+        matchingHref={founderReportHref}
+        workbookHref={buildWorkbookHref(resolvedInvitationId, data.teamContext)}
         feedbackInvitationId={data.invitationId ?? invitationId}
-        activeView={data.currentUserRole === "advisor" ? "advisor" : "founder"}
-        contextLabel={data.currentUserRole === "advisor" ? t("common.advisorContext") : t("common.founderContext")}
+        activeView="founder"
+        contextLabel={t("common.founderContext")}
       />
       <ResearchPageTracker
         eventName="workbook_page_viewed"
@@ -156,87 +177,43 @@ export default async function FounderAlignmentWorkbookPage({
       />
       <div className="px-4 pt-6 sm:px-6 lg:px-8 print:hidden">
         <div className="mx-auto flex max-w-7xl justify-end">
-          {data.currentUserRole !== "advisor" ? (
-            <Link
-              href={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
-              className="text-sm text-slate-500 transition hover:text-slate-900"
-            >
-              {t("common.backToMatchingReport")}
-            </Link>
-          ) : null}
+          <Link
+            href={`/report/${encodeURIComponent(data.invitationId ?? invitationId)}`}
+            className="text-sm text-slate-500 transition hover:text-slate-900"
+          >
+            {t("common.backToMatchingReport")}
+          </Link>
         </div>
       </div>
 
-      {data.currentUserRole === "advisor" ? (
-        <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8 print:hidden">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/90 p-4">
-            <p className="text-sm font-semibold text-slate-900">
-              {t("common.advisorLegacyTitle")}
-            </p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
-              {t("common.advisorLegacyDescription")}
-            </p>
-          </div>
-        </section>
-      ) : null}
 
-      {data.currentUserRole === "advisor" ? (
-        <FounderAlignmentWorkbookClient
-          invitationId={data.invitationId}
-          relationshipId={data.relationshipId}
-          teamContext={data.teamContext}
-          founderAName={data.founderAName}
-          founderBName={data.founderBName}
-          founderAAvatarId={data.founderAAvatarId}
-          founderBAvatarId={data.founderBAvatarId}
-          founderAAvatarUrl={data.founderAAvatarUrl}
-          founderBAvatarUrl={data.founderBAvatarUrl}
-          currentUserRole={data.currentUserRole}
-          initialWorkbook={initialWorkbook}
-          highlights={data.highlights}
-          stepMarkersByStep={data.stepMarkersByStep}
-          advisorInvite={data.advisorInvite}
-          advisorEntries={data.advisorEntries}
-          advisorImpulses={data.advisorImpulses}
-          canSave={data.canSave}
-          persisted={data.persisted}
-          updatedAt={data.updatedAt}
-          source={data.source}
-          storedTeamContext={data.storedTeamContext}
-          hasTeamContextMismatch={data.hasTeamContextMismatch}
-          showValuesStep={data.showValuesStep}
-          deepDiveHandoff={data.deepDiveHandoff}
-          deepDiveTopicsHref={deepDiveTopicsHref}
-        />
-      ) : (
-        <FounderAlignmentWorkbookClient
-          invitationId={data.invitationId}
-          relationshipId={data.relationshipId}
-          teamContext={data.teamContext}
-          founderAName={data.founderAName}
-          founderBName={data.founderBName}
-          founderAAvatarId={data.founderAAvatarId}
-          founderBAvatarId={data.founderBAvatarId}
-          founderAAvatarUrl={data.founderAAvatarUrl}
-          founderBAvatarUrl={data.founderBAvatarUrl}
-          currentUserRole={data.currentUserRole}
-          initialWorkbook={initialWorkbook}
-          highlights={data.highlights}
-          stepMarkersByStep={data.stepMarkersByStep}
-          advisorInvite={data.advisorInvite}
-          advisorEntries={data.advisorEntries}
-          advisorImpulses={data.advisorImpulses}
-          canSave={data.canSave}
-          persisted={data.persisted}
-          updatedAt={data.updatedAt}
-          source={data.source}
-          storedTeamContext={data.storedTeamContext}
-          hasTeamContextMismatch={data.hasTeamContextMismatch}
-          showValuesStep={data.showValuesStep}
-          deepDiveHandoff={data.deepDiveHandoff}
-          deepDiveTopicsHref={deepDiveTopicsHref}
-        />
-      )}
+      <FounderAlignmentWorkbookClient
+        invitationId={data.invitationId}
+        relationshipId={data.relationshipId}
+        teamContext={data.teamContext}
+        founderAName={data.founderAName}
+        founderBName={data.founderBName}
+        founderAAvatarId={data.founderAAvatarId}
+        founderBAvatarId={data.founderBAvatarId}
+        founderAAvatarUrl={data.founderAAvatarUrl}
+        founderBAvatarUrl={data.founderBAvatarUrl}
+        currentUserRole={data.currentUserRole}
+        initialWorkbook={initialWorkbook}
+        highlights={data.highlights}
+        stepMarkersByStep={data.stepMarkersByStep}
+        advisorInvite={data.advisorInvite}
+        advisorEntries={data.advisorEntries}
+        advisorImpulses={data.advisorImpulses}
+        canSave={data.canSave}
+        persisted={data.persisted}
+        updatedAt={data.updatedAt}
+        source={data.source}
+        storedTeamContext={data.storedTeamContext}
+        hasTeamContextMismatch={data.hasTeamContextMismatch}
+        showValuesStep={data.showValuesStep}
+        deepDiveHandoff={data.deepDiveHandoff}
+        deepDiveTopicsHref={deepDiveTopicsHref}
+      />
     </main>
   );
 }
