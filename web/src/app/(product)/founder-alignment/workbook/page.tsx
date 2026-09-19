@@ -107,13 +107,11 @@ export default async function FounderAlignmentWorkbookPage({
   });
 
   if (data.status !== "ready") {
-    const fallbackWorkbookHref = buildWorkbookHref(invitationId, requestedTeamContext);
     const fallbackReportHref = `/report/${encodeURIComponent(invitationId)}`;
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
         <ProductNavigationOverride
           matchingHref={fallbackReportHref}
-          workbookHref={fallbackWorkbookHref}
           activeView="founder"
           contextLabel={t("common.founderContext")}
         />
@@ -164,7 +162,6 @@ export default async function FounderAlignmentWorkbookPage({
           nachgewiesen. */}
       <ProductNavigationOverride
         matchingHref={founderReportHref}
-        workbookHref={buildWorkbookHref(resolvedInvitationId, data.teamContext)}
         feedbackInvitationId={data.invitationId ?? invitationId}
         activeView="founder"
         contextLabel={t("common.founderContext")}

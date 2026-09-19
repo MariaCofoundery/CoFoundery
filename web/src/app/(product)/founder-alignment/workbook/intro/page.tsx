@@ -51,7 +51,7 @@ export default async function FounderAlignmentWorkbookIntroPage({
   if (data.status !== "ready") {
     return (
       <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_30%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
-        <ProductNavigationOverride matchingHref={reportHref} workbookHref={introHref} />
+        <ProductNavigationOverride matchingHref={reportHref} />
         <div className="mx-auto max-w-3xl rounded-[32px] border border-slate-200/80 bg-white/95 p-10 text-center shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("common.workbook")}</p>
           <h1 className="mt-4 text-3xl font-semibold text-slate-950">
@@ -75,7 +75,6 @@ export default async function FounderAlignmentWorkbookIntroPage({
     <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_28%,#f8fafc_100%)] px-4 py-12 sm:px-6 lg:px-8">
       <ProductNavigationOverride
         matchingHref={reportHref}
-        workbookHref={introHref}
         feedbackInvitationId={data.invitationId ?? invitationId}
       />
       <ResearchPageTracker

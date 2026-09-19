@@ -172,7 +172,6 @@ export default async function ReportPage({ params }: PageProps) {
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
       <ProductNavigationOverride
         matchingHref={`/report/${encodeURIComponent(snapshot.invitationId)}`}
-        workbookHref={workbookHref}
       />
       <ResearchPageTracker
         eventName="report_page_viewed"

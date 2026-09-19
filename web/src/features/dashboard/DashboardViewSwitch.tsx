@@ -26,7 +26,7 @@ export function DashboardViewSwitch({
   return (
     <nav
       aria-label="Ansicht wechseln"
-      className="inline-flex items-center gap-1 rounded-full border border-slate-200/80 bg-slate-100/85 p-1"
+      className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200/80 bg-slate-100/85 p-1"
     >
       <Link href="/dashboard" className={linkClassName(activeView === "founder")}>
         Founder

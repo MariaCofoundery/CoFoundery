@@ -47,7 +47,6 @@ type NavigationItem = {
 
 type NavigationOverride = {
   matchingHref?: string;
-  workbookHref?: string;
   feedbackInvitationId?: string | null;
   activeView?: "founder" | "advisor";
   contextLabel?: string | null;
@@ -70,7 +69,11 @@ function areaLinkClassName(active: boolean) {
   // .brand-here traegt den weichen Verlauf von Lila nach Tuerkis - dieselbe
   // Klasse wie der Hauptweg im Align-Kopfbereich, damit beide nicht
   // auseinanderlaufen. Siehe globals.css.
-  return `rounded-full px-4 py-2 text-sm transition ${
+  // px-3 auf dem Telefon und shrink-0/whitespace-nowrap: Vier Pillen mit je
+  // 16 Pixel Innenabstand sind allein 128 Pixel Luft - genau das, was am Rand
+  // fehlte. Und ein Eintrag soll ganz in die naechste Zeile rutschen, nicht
+  // mitten im Wort zerfallen.
+  return `shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm transition sm:px-4 ${
     active ? "brand-here font-semibold" : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
@@ -80,7 +83,7 @@ function navLinkClassName(active: boolean) {
   // Dieselbe Hervorhebung wie bei den Bereichen: "Ich bin hier" ist dieselbe
   // Aussage, egal ob der Ort ein Bereich oder ein Querschnitt ist. Vorher trug
   // Profil ein blasses Grau und war auf /profile praktisch nicht zu erkennen.
-  return `rounded-full px-3 py-2 text-sm transition ${
+  return `shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm transition ${
     active
       ? "brand-here font-semibold"
       : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -204,7 +207,7 @@ export function ProductShell({
     <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
       <div className="min-h-screen">
         <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10 xl:px-12">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 md:px-10 xl:px-12">
             <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
               <Link
                 href={dashboardHref}
@@ -279,7 +282,26 @@ export function ProductShell({
               </nav>
             </div>
 
-            <div className="flex items-center justify-end gap-3">
+            {/* -----------------------------------------------------------
+                GEMELDET AM 20.09.2026: "Menueansicht auf Handy schlecht, geht
+                ueber Rand hinaus."
+
+                Hier stand `flex items-center justify-end gap-3` - ohne
+                flex-wrap und ohne min-w-0. Sechs Eintraege in einer Zeile, die
+                nicht umbrechen DARF: Postfach mit Zaehler, Profil, Feedback,
+                Ansichtswechsel, Sprache, Menue. Auf 360 Pixel Breite bleiben
+                nach dem Innenabstand rund 310 uebrig - die Reihe braucht
+                deutlich mehr und schob sich ueber den Rand.
+
+                Die linke Gruppe und der aeussere Rahmen brechen laengst um;
+                nur diese eine Reihe nicht. Mit dem Postfach ist sie kuerzlich
+                noch laenger geworden.
+
+                min-w-0 gehoert dazu: Ohne das weigert sich ein Flex-Kind,
+                unter seine Inhaltsbreite zu schrumpfen, und laeuft ueber statt
+                zu passen.
+                ----------------------------------------------------------- */}
+            <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2">
               {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
                   gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
                   es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
@@ -333,7 +355,7 @@ export function ProductShell({
           </div>
 
           {activeAreaSubItems.length > 0 ? (
-            <div className="mx-auto w-full max-w-7xl px-6 pb-2 md:px-10 xl:px-12">
+            <div className="mx-auto w-full max-w-7xl px-4 pb-2 sm:px-6 md:px-10 xl:px-12">
               <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
                 {activeAreaSubItems.map((subItem) => (
                   <Link
@@ -365,13 +387,11 @@ export function ProductShell({
 
 export function ProductNavigationOverride({
   matchingHref,
-  workbookHref,
   feedbackInvitationId,
   activeView,
   contextLabel,
 }: {
   matchingHref?: string | null;
-  workbookHref?: string | null;
   feedbackInvitationId?: string | null;
   activeView?: "founder" | "advisor";
   contextLabel?: string | null;
@@ -383,7 +403,6 @@ export function ProductNavigationOverride({
 
     setOverride({
       matchingHref: matchingHref ?? undefined,
-      workbookHref: workbookHref ?? undefined,
       feedbackInvitationId: feedbackInvitationId ?? undefined,
       activeView: activeView ?? undefined,
       contextLabel: contextLabel ?? undefined,
@@ -392,7 +411,7 @@ export function ProductNavigationOverride({
     return () => {
       setOverride(null);
     };
-  }, [activeView, contextLabel, feedbackInvitationId, matchingHref, setOverride, workbookHref]);
+  }, [activeView, contextLabel, feedbackInvitationId, matchingHref, setOverride]);
 
   return null;
 }
@@ -522,7 +541,7 @@ function LanguageSwitcher() {
 
   return (
     <div
-      className="flex items-center rounded-full border border-slate-200/80 bg-white p-0.5 text-[11px] font-medium text-slate-500"
+      className="flex shrink-0 items-center rounded-full border border-slate-200/80 bg-white p-0.5 text-[11px] font-medium text-slate-500"
       aria-label={t("language.switchLabel")}
     >
       {SUPPORTED_LOCALES.map((item) => (
