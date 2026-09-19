@@ -5,7 +5,13 @@ import {
   buildAdvisorConfirmedFounderSetup,
   buildAdvisorFounderSetupAccessState,
   buildFounderSetupAdvisorAccess,
+  describeAdvisorFounderSetupPause,
 } from "@/features/teams/founderSetupAdvisorAccessModel";
+
+const source = (path: string) => readFileSync(path, "utf8");
+/** SQL-Kommentare heraus - sonst findet die Pruefung Begriffe in der Begruendung. */
+const sqlCodeOnly = (path: string) => source(path).replace(/^\s*--.*$/gm, "");
+const REQUEST_MIGRATION = "../supabase/migrations/20261009120000_advisor_requests_setup_access.sql";
 
 test("advisor access presentation preserves all V2 status states", () => {
   assert.deepEqual(buildAdvisorFounderSetupAccessState({
@@ -31,6 +37,7 @@ test("founder grant presentation distinguishes pending and active unanimous cons
       grant_status: "pending",
       consented_founder_user_ids: ["founder-a", "founder-b", "founder-b"],
       access_active: false,
+      requested_by_advisor: true,
     },
     {
       source_relationship_advisor_id: "source-2",
@@ -49,9 +56,14 @@ test("founder grant presentation distinguishes pending and active unanimous cons
     status: "pending",
     consentedFounderUserIds: ["founder-a", "founder-b"],
     accessActive: false,
+    requestedByAdvisor: true,
   });
   assert.equal(access[1]?.consentedFounderUserIds.length, 3);
   assert.equal(access[1]?.accessActive, true);
+  // ERGAENZT am 20.09.2026: Ob die begleitende Person selbst gefragt hat, ist
+  // ein eigener Zustand. Fehlt das Feld in der Zeile - alte Daten, andere
+  // Abfrage -, gilt "nicht gefragt" und nicht "unbekannt".
+  assert.equal(access[1]?.requestedByAdvisor, false);
 });
 
 test("advisor model contains confirmed-only fields and rejects unknown setup rows", () => {
@@ -110,4 +122,114 @@ test("Advisor Founder Setup consent and confirmed-only copy is parallel in DE an
   assert.match(en.setup.advisorAccess.description, /jointly confirmed/);
   assert.match(de.setup.advisorAccess.description, /Arbeitsnotizen.*privat/);
   assert.match(en.setup.advisorAccess.description, /Working notes.*private/);
+});
+
+test("eine Anfrage des Advisors ist keine Berechtigung", () => {
+  // NEU am 20.09.2026. Vorher konnte nur ein FOUNDER eine Freigabe
+  // vorschlagen; der Advisor musste es ausserhalb des Produkts sagen.
+  //
+  // Der Punkt der neuen Funktion ist, was sie NICHT tut: Sie traegt keine
+  // Zustimmung ein. Ein Founder, der vorschlaegt, traegt seine eigene mit - er
+  // hat ja zugestimmt, indem er vorschlug. Beim Advisor gibt es nichts
+  // mitzutragen, und jedes Teammitglied stimmt weiterhin selbst zu.
+  const migration = sqlCodeOnly(REQUEST_MIGRATION);
+  const fn = migration.slice(
+    migration.indexOf("function public.request_founder_team_advisor_setup_grant"),
+    migration.indexOf("revoke all on function public.request_founder_team_advisor_setup_grant")
+  );
+  assert.doesNotMatch(
+    fn,
+    /insert into public\.founder_team_advisor_setup_consents/,
+    "die Anfrage trägt eine Zustimmung ein"
+  );
+  assert.match(fn, /'pending'/);
+});
+
+test("die Quelle wird gesucht und nicht übergeben", () => {
+  const migration = sqlCodeOnly(REQUEST_MIGRATION);
+  assert.match(migration, /request_founder_team_advisor_setup_grant\(p_relationship_id uuid\)/);
+  assert.match(migration, /into v_source_id, v_team_id/);
+  assert.match(migration, /advisor_access\.advisor_user_id = v_user_id/);
+  assert.match(migration, /advisor_access\.status = 'linked'/);
+  assert.match(migration, /advisor_access\.revoked_at is null/);
+});
+
+test("die Oberfläche fragt nur, wo noch nichts freigegeben ist", () => {
+  const page = source("src/app/(product)/advisor/session/page.tsx");
+  assert.match(page, /data\.founderSetupAccess\.status === "not_granted" \?/);
+  assert.match(page, /session\.settled\.requestAccess/);
+  for (const locale of ["de", "en"]) {
+    const settled = (
+      JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")) as {
+        session: { settled: Record<string, string> };
+      }
+    ).session.settled;
+    assert.match(
+      settled.requestAccessHint,
+      locale === "de" ? /keinen Zugriff/ : /no access/,
+      `${locale}: der Hinweis verschweigt, dass die Anfrage nichts öffnet`
+    );
+  }
+});
+
+test("die Founder sehen, dass gefragt wurde – nicht nur dass etwas wartet", () => {
+  const panel = source("src/features/teams/FounderSetupAdvisorAccessPanel.tsx");
+  assert.match(panel, /entry\.requestedByAdvisor && !entry\.accessActive/);
+  assert.match(panel, /advisorAccess\.requestedByAdvisor/);
+  assert.match(
+    sqlCodeOnly(REQUEST_MIGRATION),
+    /requested_by_advisor_at is not null as requested_by_advisor/
+  );
+  for (const locale of ["de", "en"]) {
+    const access = (
+      JSON.parse(readFileSync(`messages/${locale}/teams.json`, "utf8")) as {
+        setup: { advisorAccess: Record<string, string> };
+      }
+    ).setup.advisorAccess;
+    assert.match(access.requestedByAdvisor, /\{name\}/, `${locale}: der Name fehlt`);
+  }
+});
+
+test("der Grund einer pausierten Freigabe steht dabei", () => {
+  // GEMELDET AM 20.09.2026: Ein Founder hatte sein Konto gelöscht, das Team
+  // bestand danach aus einer Person - und auf der Karte stand nur "Freigabe
+  // pausiert". Der Grund liegt in den Zahlen, die ohnehin mitkommen.
+  assert.equal(
+    describeAdvisorFounderSetupPause({ status: "paused", consentCount: 1, memberCount: 1 }),
+    "team_too_small"
+  );
+  assert.equal(
+    describeAdvisorFounderSetupPause({ status: "paused", consentCount: 2, memberCount: 3 }),
+    "consent_missing"
+  );
+  assert.equal(
+    describeAdvisorFounderSetupPause({ status: "paused", consentCount: 2, memberCount: 2 }),
+    "unspecified"
+  );
+  for (const status of ["active", "pending", "not_granted", "revoked"] as const) {
+    assert.equal(
+      describeAdvisorFounderSetupPause({ status, consentCount: 0, memberCount: 1 }),
+      null,
+      status
+    );
+  }
+
+  for (const locale of ["de", "en"]) {
+    const reasons = (
+      JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")) as {
+        dashboard: { setupPauseReasons: Record<string, string> };
+      }
+    ).dashboard.setupPauseReasons;
+    for (const key of ["team_too_small", "consent_missing", "unspecified"]) {
+      assert.ok(reasons[key], `${locale}: ${key} fehlt`);
+    }
+    // Der Text benennt den ZUSTAND, nicht das Ereignis: Ein Team mit einer
+    // Person kann eine Löschung, einen Austritt oder eine Entfernung hinter
+    // sich haben. "Jemand hat sein Konto gelöscht" wäre geraten.
+    assert.doesNotMatch(
+      reasons.team_too_small,
+      locale === "de" ? /gelöscht/ : /deleted/,
+      `${locale}: der Text behauptet eine Ursache, die er nicht kennt`
+    );
+  }
 });

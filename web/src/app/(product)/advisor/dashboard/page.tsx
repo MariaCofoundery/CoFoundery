@@ -18,6 +18,7 @@ import {
   type AdvisorDashboardTeam,
 } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { describeAdvisorFounderSetupPause } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
@@ -327,11 +328,26 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
                 {reportStatusLabel(team, t)}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Founder Setup</span>
-              <span className="text-right text-xs font-medium text-slate-700">
-                {founderSetupStatusLabel(team, t)}
-              </span>
+            <div className="rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Founder Setup</span>
+                <span className="text-right text-xs font-medium text-slate-700">
+                  {founderSetupStatusLabel(team, t)}
+                </span>
+              </div>
+              {/* "Freigabe pausiert" allein liess raten. Der Grund steht in den
+                  Zahlen, die ohnehin mitkommen - und benennt den ZUSTAND, nicht
+                  das Ereignis: Ein Team mit einer Person kann eine Loeschung,
+                  einen Austritt oder eine Entfernung hinter sich haben. */}
+              {describeAdvisorFounderSetupPause(team.founderSetupAccess) ? (
+                <p className="mt-1.5 text-left text-xs leading-5 text-slate-500">
+                  {t(
+                    `dashboard.setupPauseReasons.${describeAdvisorFounderSetupPause(
+                      team.founderSetupAccess
+                    )}`
+                  )}
+                </p>
+              ) : null}
             </div>
             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.followUp")}</span>

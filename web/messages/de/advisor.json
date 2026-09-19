@@ -155,6 +155,11 @@
     "openSession": "Sitzungsblatt",
     "followUpsDue": {
       "title": "{count, plural, one {Eine Wiedervorlage ist fällig} other {# Wiedervorlagen sind fällig}}"
+    },
+    "setupPauseReasons": {
+      "team_too_small": "Das Team besteht gerade aus einer Person. Für die Freigabe braucht es mindestens zwei – sobald wieder zwei Founder dabei sind und beide zustimmen, geht es weiter.",
+      "consent_missing": "Eine Zustimmung fehlt gerade. Das passiert, wenn jemand neu ins Team kommt oder eine Zustimmung zurückgenommen wurde.",
+      "unspecified": "Die Freigabe ist aktuell nicht aktiv."
     }
   },
   "report": {
@@ -303,13 +308,15 @@
       "note": "Notiz gespeichert.",
       "follow_up": "Wiedervorlage gesetzt.",
       "follow_up_cleared": "Wiedervorlage entfernt.",
-      "follow_up_done": "Als erledigt vermerkt."
+      "follow_up_done": "Als erledigt vermerkt.",
+      "setup_request": "Deine Anfrage liegt jetzt im Founder Setup des Teams."
     },
     "errors": {
       "save": "Das konnte gerade nicht gespeichert werden. Versuch es bitte noch einmal.",
       "forbidden": "Für dieses Team können wir dir keine Notizen speichern.",
       "follow_up_date": "Das ist kein gültiges Datum.",
-      "follow_up_past": "Ein Datum in der Vergangenheit erinnert an nichts. Wähl bitte einen Tag, der noch kommt."
+      "follow_up_past": "Ein Datum in der Vergangenheit erinnert an nichts. Wähl bitte einen Tag, der noch kommt.",
+      "setup_request": "Die Anfrage konnte gerade nicht gestellt werden. Möglicherweise ist deine Freigabe für dieses Team nicht mehr aktiv."
     },
     "followUp": {
       "title": "Deine Wiedervorlage",
@@ -334,7 +341,9 @@
     "settled": {
       "title": "Was das Team festgehalten hat",
       "help": "Nur die gemeinsam bestätigten Stände – das ist, was die Founder für dich freigegeben haben. Was noch offen ist, steht hier nicht.",
-      "empty": "Noch hat das Team keinen gemeinsamen Stand bestätigt."
+      "empty": "Noch hat das Team keinen gemeinsamen Stand bestätigt.",
+      "requestAccess": "Freigabe erbitten",
+      "requestAccessHint": "Beide Founder bekommen die Anfrage in ihrem Founder Setup und entscheiden dort jeweils selbst. Du erhältst dadurch keinen Zugriff, bevor beide zugestimmt haben."
     },
     "impulses": {
       "title": "Was du den Foundern geschrieben hast",

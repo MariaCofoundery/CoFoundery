@@ -320,7 +320,8 @@
       "approvalOpen": "Zustimmung offen",
       "share": "Freigabe vorschlagen",
       "approve": "Zustimmen",
-      "revoke": "Zugriff beenden"
+      "revoke": "Zugriff beenden",
+      "requestedByAdvisor": "{name} hat um diese Freigabe gebeten. Jede Person im Team entscheidet selbst – Zugriff entsteht erst, wenn alle zugestimmt haben."
     },
     "advisorView": {
       "title": "Founder Setup",

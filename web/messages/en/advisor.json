@@ -155,6 +155,11 @@
     "openSession": "Session sheet",
     "followUpsDue": {
       "title": "{count, plural, one {One follow-up is due} other {# follow-ups are due}}"
+    },
+    "setupPauseReasons": {
+      "team_too_small": "The team currently consists of one person. Access needs at least two – once two founders are on board again and both agree, it continues.",
+      "consent_missing": "One approval is missing right now. That happens when somebody joins the team or an approval was withdrawn.",
+      "unspecified": "Access is not active at the moment."
     }
   },
   "report": {
@@ -303,13 +308,15 @@
       "note": "Note saved.",
       "follow_up": "Follow-up set.",
       "follow_up_cleared": "Follow-up removed.",
-      "follow_up_done": "Marked as done."
+      "follow_up_done": "Marked as done.",
+      "setup_request": "Your request is now in the team's Founder Setup."
     },
     "errors": {
       "save": "That couldn't be saved just now. Please try again.",
       "forbidden": "We can't save notes for this team.",
       "follow_up_date": "That's not a valid date.",
-      "follow_up_past": "A date in the past reminds you of nothing. Please pick a day still to come."
+      "follow_up_past": "A date in the past reminds you of nothing. Please pick a day still to come.",
+      "setup_request": "The request couldn't be sent just now. Your access to this team may no longer be active."
     },
     "followUp": {
       "title": "Your follow-up",
@@ -334,7 +341,9 @@
     "settled": {
       "title": "What the team has put down",
       "help": "Only the jointly confirmed positions – that's what the founders released to you. What is still open does not appear here.",
-      "empty": "The team hasn't confirmed a shared position yet."
+      "empty": "The team hasn't confirmed a shared position yet.",
+      "requestAccess": "Ask for access",
+      "requestAccessHint": "Both founders get the request in their Founder Setup and each decide there themselves. This gives you no access until both have agreed."
     },
     "impulses": {
       "title": "What you wrote to the founders",

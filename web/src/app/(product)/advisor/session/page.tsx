@@ -22,6 +22,8 @@ import {
   saveAdvisorFollowUpAction,
   saveAdvisorPrivateNoteAction,
 } from "@/features/reporting/advisorWorkspaceActions";
+import { requestFounderSetupAccessAction } from "@/features/teams/advisorSetupRequestActions";
+import { describeAdvisorFounderSetupPause } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -29,8 +31,8 @@ const CARD = "rounded-3xl border border-slate-200/80 bg-white/95 p-6 md:p-7";
 const INPUT =
   "mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500";
 
-const SAVED_KEYS = ["note", "follow_up", "follow_up_cleared", "follow_up_done"];
-const ERROR_KEYS = ["save", "forbidden", "follow_up_date", "follow_up_past"];
+const SAVED_KEYS = ["note", "follow_up", "follow_up_cleared", "follow_up_done", "setup_request"];
+const ERROR_KEYS = ["save", "forbidden", "follow_up_date", "follow_up_past", "setup_request"];
 
 /**
  * Das Sitzungsblatt - eine Seite, die man vor einem Termin aufmacht.
@@ -105,6 +107,12 @@ export default async function AdvisorSessionPage({
     data.relationshipId
   );
 
+  const setupPauseReason = describeAdvisorFounderSetupPause(data.founderSetupAccess);
+  const requestSetupAccess = requestFounderSetupAccessAction.bind(
+    null,
+    invitationId,
+    data.relationshipId
+  );
   const sectionMeta = getAdvisorImpulseSectionMeta(locale);
   const writtenImpulses = ADVISOR_IMPULSE_SECTION_ORDER.map((key) => ({
     key,
@@ -266,9 +274,33 @@ export default async function AdvisorSessionPage({
           </h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("session.settled.help")}</p>
           {data.founderSetupAccess.status !== "active" ? (
-            <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-              {t(`dashboard.setupStatuses.${data.founderSetupAccess.status}`)}
-            </p>
+            <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3">
+              <p className="text-sm leading-6 text-slate-700">
+                {t(`dashboard.setupStatuses.${data.founderSetupAccess.status}`)}
+              </p>
+              {setupPauseReason ? (
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  {t(`dashboard.setupPauseReasons.${setupPauseReason}`)}
+                </p>
+              ) : null}
+              {/* Fragen konnte der Advisor bisher gar nicht - nur ein Founder
+                  durfte eine Freigabe vorschlagen. Er musste es ausserhalb des
+                  Produkts sagen und hoffen, dass die Founder den Weg finden.
+
+                  Der Knopf steht nur bei "nicht freigegeben": Bei einer
+                  laufenden Anfrage waere ein zweites Fragen nur Druck, und bei
+                  "pausiert" liegt es nicht an einer fehlenden Bitte. */}
+              {data.founderSetupAccess.status === "not_granted" ? (
+                <form action={requestSetupAccess} className="mt-3">
+                  <ReportActionButton type="submit" variant="utility" className="min-h-11">
+                    {t("session.settled.requestAccess")}
+                  </ReportActionButton>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                    {t("session.settled.requestAccessHint")}
+                  </p>
+                </form>
+              ) : null}
+            </div>
           ) : data.founderSetupItems.length === 0 ? (
             <p className="mt-4 text-sm leading-6 text-slate-600">{t("session.settled.empty")}</p>
           ) : (

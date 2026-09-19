@@ -62,6 +62,15 @@ export async function FounderSetupAdvisorAccessPanel({
                         ? t("advisorAccess.pending")
                         : t("advisorAccess.notShared")}
                   </p>
+                  {/* Ob man selbst vorgeschlagen hat oder GEFRAGT wurde, ist
+                      ein Unterschied in der Sache. Ohne diese Zeile stuende in
+                      beiden Faellen nur "wartet auf Zustimmung", und niemand
+                      wuesste, dass jemand darauf wartet. */}
+                  {entry.requestedByAdvisor && !entry.accessActive ? (
+                    <p className="mt-1 text-sm leading-6 text-slate-700">
+                      {t("advisorAccess.requestedByAdvisor", { name: advisorName })}
+                    </p>
+                  ) : null}
                 </div>
                 {entry.accessActive ? (
                   <span className="w-fit rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700">

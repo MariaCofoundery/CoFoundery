@@ -320,7 +320,8 @@
       "approvalOpen": "Approval open",
       "share": "Propose access",
       "approve": "Approve",
-      "revoke": "End access"
+      "revoke": "End access",
+      "requestedByAdvisor": "{name} asked for this access. Everyone in the team decides for themselves – access only starts once all have agreed."
     },
     "advisorView": {
       "title": "Founder Setup",

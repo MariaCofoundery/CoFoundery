@@ -26,6 +26,8 @@ export type FounderSetupAdvisorAccess = {
   status: FounderSetupAdvisorGrantStatus;
   consentedFounderUserIds: string[];
   accessActive: boolean;
+  /** Hat die begleitende Person selbst darum gebeten? */
+  requestedByAdvisor: boolean;
 };
 
 export type AdvisorConfirmedFounderSetupItem = {
@@ -43,6 +45,7 @@ export type FounderSetupAdvisorAccessRow = {
   grant_status: string;
   consented_founder_user_ids: string[] | null;
   access_active: boolean;
+  requested_by_advisor?: boolean | null;
 };
 
 export type AdvisorConfirmedFounderSetupRow = {
@@ -80,6 +83,38 @@ export function buildAdvisorFounderSetupAccessState(
   };
 }
 
+/**
+ * Warum die Freigabe pausiert.
+ *
+ * "Freigabe pausiert" allein liess den Advisor raten - und im Fall, den Maria
+ * am 20.09.2026 gemeldet hat, war die Ursache ein Founder, der sein Konto
+ * geloescht hat. Das Team bestand danach aus einer Person, und die Freigabe
+ * verlangt mindestens zwei. Auf der Oberflaeche stand nur "pausiert".
+ *
+ * Der Grund muss NICHT geraten werden: `consent_count` und `member_count`
+ * kommen ohnehin mit. Was daraus NICHT folgt, ist die Ursache - ein Team mit
+ * einer Person kann eine Loeschung, einen Austritt oder eine Entfernung hinter
+ * sich haben. Deshalb benennt der Text den ZUSTAND und nicht das Ereignis:
+ * "Das Team besteht gerade aus einer Person" ist wahr, "jemand hat sein Konto
+ * geloescht" waere geraten.
+ */
+export type AdvisorFounderSetupPauseReason =
+  | "team_too_small"
+  | "consent_missing"
+  | "unspecified";
+
+export function describeAdvisorFounderSetupPause(
+  state: Pick<AdvisorFounderSetupAccessState, "status" | "consentCount" | "memberCount">
+): AdvisorFounderSetupPauseReason | null {
+  if (state.status !== "paused") return null;
+  if (state.memberCount < 2) return "team_too_small";
+  if (state.consentCount < state.memberCount) return "consent_missing";
+  // Bleibt uebrig: Die zugrundeliegende Relationship-Freigabe ist nicht mehr
+  // gueltig. Das sieht der Advisor an anderer Stelle auf derselben Karte, hier
+  // wird es nicht doppelt behauptet.
+  return "unspecified";
+}
+
 function grantStatus(value: string): FounderSetupAdvisorGrantStatus {
   if (value === "active" || value === "pending") return value;
   return "not_granted";
@@ -104,6 +139,7 @@ export function buildFounderSetupAdvisorAccess(
       status: grantStatus(row.grant_status),
       consentedFounderUserIds: [...new Set(row.consented_founder_user_ids ?? [])],
       accessActive: row.access_active === true,
+      requestedByAdvisor: row.requested_by_advisor === true,
     }];
   });
 }
