@@ -143,6 +143,16 @@ export type ConnectConversation = {
   counterpart_user_id: string | null; counterpart_display_name: string | null;
   listing_title: string | null; created_at: string; last_message_at: string | null;
   unread_count: number;
+  /**
+   * Woraus das Gespraech entstanden ist.
+   *
+   * Seit dem 19.09.2026 liegen drei Urspruenge in EINEM Postfach: eine
+   * angenommene Kontaktanfrage, ein Problem-Interesse und ein angenommenes
+   * Intro aus Find. Die Oberflaeche muss es sagen koennen, ohne zu raten -
+   * und ohne aus einem fehlenden `listing_id` zu schliessen, das auch bei
+   * einer ausgetretenen Person leer ist.
+   */
+  origin: "connect_contact" | "connect_problem" | "discovery_intro";
 };
 
 export type ConnectMessage = {

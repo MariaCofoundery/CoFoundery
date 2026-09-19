@@ -681,7 +681,9 @@
     "declinePlaceholder": "You can reply briefly, but you do not have to.",
     "accept": "Meet",
     "decline": "Decline",
-    "cancel": "Withdraw"
+    "cancel": "Withdraw",
+    "openConversation": "Send a message",
+    "conversationError": "The conversation couldn't be opened just now. Please try again."
   },
   "detail": {
     "eyebrow": "Discovery profile",

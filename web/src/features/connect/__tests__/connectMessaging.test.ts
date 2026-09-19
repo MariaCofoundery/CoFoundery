@@ -47,15 +47,20 @@ test("contacts remains the compact inbox and only accepted contacts receive chat
   const contacts = source("src/app/(product)/connect/contacts/page.tsx");
   assert.match(contacts, /request\.status !== "accepted"/);
   assert.match(contacts, /getConnectConversations/);
-  assert.match(contacts, /href=\{`\/connect\/messages\/\$\{conversation\.conversation_id\}`\}/);
+  // GEAENDERT am 19.09.2026: Das Gespraech liegt jetzt unter /messages/[id] -
+  // die Kontaktseite verlinkt direkt dorthin statt auf die alte Adresse, die
+  // nur noch weiterleitet.
+  assert.match(contacts, /href=\{`\/messages\/\$\{conversation\.conversation_id\}`\}/);
   assert.match(contacts, /conversation\.unread_count > 0/);
   assert.match(contacts, /prefetch=\{false\}/);
 });
 
 test("chat has listing context, chronological messages, empty state, pending send and back navigation", () => {
-  const page = source("src/app/(product)/connect/messages/[conversationId]/page.tsx");
+  const page = source("src/app/(product)/messages/[conversationId]/page.tsx");
   const actions = source("src/features/connect/connectActions.ts");
-  assert.match(page, /href="\/connect\/contacts"/);
+  // Der Rueckweg fuehrt jetzt ins gemeinsame Postfach und nicht nach Connect:
+  // Ein Gespraech aus Find haette dort nichts zu suchen gehabt.
+  assert.match(page, /href="\/messages"/);
   assert.match(page, /connect\/listings\/\$\{conversation\.listing_id\}/);
   assert.match(page, /messages\.map/);
   assert.match(page, /messages\.emptyText/);
@@ -131,7 +136,7 @@ test("account deletion is data-minimizing and leaves no messaging orphan path", 
 
 test("Messaging V0.1 deliberately uses refresh-after-send and no realtime infrastructure", () => {
   const files = [
-    source("src/app/(product)/connect/messages/[conversationId]/page.tsx"),
+    source("src/app/(product)/messages/[conversationId]/page.tsx"),
     source("src/features/connect/ConnectMarkConversationRead.tsx"),
     source("src/features/connect/connectActions.ts"),
   ].join("\n");
@@ -192,7 +197,7 @@ test("the counterpart comes from the participants, not from the origin", () => {
 });
 
 test("the interface names the gap instead of leaving it blank", () => {
-  const page = readFileSync("src/app/(product)/connect/messages/[conversationId]/page.tsx", "utf8");
+  const page = readFileSync("src/app/(product)/messages/[conversationId]/page.tsx", "utf8");
   assert.match(page, /const counterpartGone = conversation\.counterpart_user_id === null/);
   assert.match(page, /messages\.counterpartGoneTitle/);
   // Kein Schreibfeld, wo niemand mehr liest.
@@ -216,7 +221,7 @@ test("a departed person can no longer be blocked or reported", () => {
   // Es gibt sie nicht mehr - ein Knopf dafuer waere eine Zusage, die ins
   // Leere geht.
   for (const file of [
-    "src/app/(product)/connect/messages/[conversationId]/page.tsx",
+    "src/app/(product)/messages/[conversationId]/page.tsx",
     "src/app/(product)/connect/contacts/page.tsx",
   ]) {
     const source = readFileSync(file, "utf8");

@@ -59,7 +59,7 @@ test("no Connect page hands a raw query value to t() any more", () => {
   const pages = [
     "src/app/(product)/connect/my/page.tsx",
     "src/app/(product)/connect/contacts/page.tsx",
-    "src/app/(product)/connect/messages/[conversationId]/page.tsx",
+    "src/app/(product)/messages/[conversationId]/page.tsx",
     "src/app/(product)/connect/listings/[listingId]/page.tsx",
     "src/app/(product)/connect/listings/[listingId]/contact/page.tsx",
     "src/app/(product)/connect/listings/[listingId]/edit/page.tsx",

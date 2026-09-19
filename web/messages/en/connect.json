@@ -270,7 +270,17 @@
     "noMessages": "No messages yet",
     "formerMember": "Former member",
     "counterpartGoneTitle": "This person deleted their account",
-    "counterpartGoneText": "Your history stays with you – you can read back what was written. Replying is no longer possible; there would be nobody to read it."
+    "counterpartGoneText": "Your history stays with you – you can read back what was written. Replying is no longer possible; there would be nobody to read it.",
+    "inboxTitle": "Messages",
+    "inboxText": "All your conversations in one place – from Connect and from Find. Each one says where it came from.",
+    "inboxEmptyTitle": "No conversations yet.",
+    "inboxEmptyText": "Once a contact request is accepted, you respond to something unsolved, or an intro in Find is agreed, you'll find the conversation here.",
+    "backToInbox": "Back to messages",
+    "origins": {
+      "connect_contact": "From a contact request",
+      "connect_problem": "From something unsolved",
+      "discovery_intro": "From an intro in Find"
+    }
   },
   "my": {
     "title": "My connect listings",

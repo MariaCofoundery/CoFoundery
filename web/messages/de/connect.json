@@ -270,7 +270,17 @@
     "noMessages": "Noch keine Nachrichten",
     "formerMember": "Ehemaliges Mitglied",
     "counterpartGoneTitle": "Diese Person hat ihr Konto gelöscht",
-    "counterpartGoneText": "Der Verlauf bleibt dir erhalten – du kannst nachlesen, was geschrieben wurde. Antworten ist nicht mehr möglich, es gäbe niemanden, der sie liest."
+    "counterpartGoneText": "Der Verlauf bleibt dir erhalten – du kannst nachlesen, was geschrieben wurde. Antworten ist nicht mehr möglich, es gäbe niemanden, der sie liest.",
+    "inboxTitle": "Nachrichten",
+    "inboxText": "Alle Gespräche an einem Ort – aus Connect und aus Find. Bei jedem steht, woraus es entstanden ist.",
+    "inboxEmptyTitle": "Noch keine Gespräche.",
+    "inboxEmptyText": "Sobald eine Kontaktanfrage angenommen ist, du dich zu einem ungelösten Problem meldest oder ein Intro in Find zusagt wird, findest du das Gespräch hier.",
+    "backToInbox": "Zurück zu den Nachrichten",
+    "origins": {
+      "connect_contact": "Aus einer Kontaktanfrage",
+      "connect_problem": "Aus einem ungelösten Problem",
+      "discovery_intro": "Aus einem Intro in Find"
+    }
   },
   "my": {
     "title": "Meine Connect-Einträge",

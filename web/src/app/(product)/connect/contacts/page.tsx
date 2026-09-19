@@ -58,7 +58,7 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState, lin
             richtig so. */}
         {linkedInUrl ? <LinkedInLink url={linkedInUrl} label={t("linkedin.linkLabel")} hint={t("linkedin.openHint")} /> : null}
       </div>
-      <Link href={`/connect/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
+      <Link href={`/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
     </div>
     {/* Wer gegangen ist, laesst sich weder blockieren noch melden. */}
     {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} /> : null}

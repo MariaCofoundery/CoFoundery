@@ -681,7 +681,9 @@
     "declinePlaceholder": "Du kannst kurz antworten, musst aber nicht.",
     "accept": "Kennenlernen",
     "decline": "Ablehnen",
-    "cancel": "Zurückziehen"
+    "cancel": "Zurückziehen",
+    "openConversation": "Nachricht schreiben",
+    "conversationError": "Das Gespräch konnte gerade nicht geöffnet werden. Versuch es bitte noch einmal."
   },
   "detail": {
     "eyebrow": "Discovery-Profil",

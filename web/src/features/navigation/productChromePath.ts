@@ -19,6 +19,10 @@ export function isProductChromePath(pathname: string) {
     // weiterarbeiten kann. Eine Seite ohne Leiste waere dort eine Sackgasse.
     pathname.startsWith("/founder-library") ||
     pathname === "/connections" ||
+    // Das Postfach ist ein Querschnitt, kein Bereich - es traegt Gespraeche
+    // aus Connect UND aus Find.
+    pathname === "/messages" ||
+    pathname.startsWith("/messages/") ||
     pathname.startsWith("/advisor/") ||
     pathname.startsWith("/discovery") ||
     pathname.startsWith("/connect") ||

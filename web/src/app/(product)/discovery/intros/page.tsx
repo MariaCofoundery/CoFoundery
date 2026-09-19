@@ -6,6 +6,7 @@ import {
   cancelDiscoveryIntroAction,
   respondDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
+import { openDiscoveryIntroConversationAction as openConversation } from "@/features/discovery/discoveryConversationActions";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getReceivedDiscoveryIntroRequests,
@@ -190,6 +191,16 @@ function ReceivedIntroCard({
             {t("common.prepareSharedMatching")}
           </Link>
         ) : null}
+        {/* Vor dem gemeinsamen Matching kommt meistens erst ein Gespraech. Bis
+            19.09.2026 gab es dafuer nichts: zwei Nachrichten - Anfrage und
+            Antwort -, dann direkt der naechste grosse Schritt. */}
+        {request.status === "accepted" ? (
+          <form action={openConversation.bind(null, request.id)}>
+            <button type="submit" className={SECONDARY_CTA_CLASS}>
+              {t("intros.openConversation")}
+            </button>
+          </form>
+        ) : null}
       </div>
       {canRespondToDiscoveryIntro(request) ? (
         <div className="mt-5 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
@@ -267,6 +278,16 @@ function SentIntroCard({
           >
             {t("common.prepareSharedMatching")}
           </Link>
+        ) : null}
+        {/* Vor dem gemeinsamen Matching kommt meistens erst ein Gespraech. Bis
+            19.09.2026 gab es dafuer nichts: zwei Nachrichten - Anfrage und
+            Antwort -, dann direkt der naechste grosse Schritt. */}
+        {request.status === "accepted" ? (
+          <form action={openConversation.bind(null, request.id)}>
+            <button type="submit" className={SECONDARY_CTA_CLASS}>
+              {t("intros.openConversation")}
+            </button>
+          </form>
         ) : null}
         {canCancelDiscoveryIntro(request) ? (
           <form action={cancelIntro}>

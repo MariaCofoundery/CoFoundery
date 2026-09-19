@@ -82,7 +82,11 @@ test("contacts keep pending lifecycle actions separate from accepted conversatio
   assert.match(controls, /fieldName="response" intent="declined"/);
   assert.match(contacts, /request\.status !== "accepted"/);
   assert.match(contacts, /messages\.acceptedContacts/);
-  assert.match(contacts, /connect\/messages/);
+  // GEAENDERT am 19.09.2026: Das Gespraech liegt im gemeinsamen Postfach unter
+  // /messages/[id]. Gemeint war hier ohnehin nur, dass die angenommenen
+  // Kontakte von der Kontaktseite aus ins Gespraech fuehren - nicht, unter
+  // welcher Adresse es wohnt.
+  assert.match(contacts, /href=\{`\/messages\//);
 });
 
 test("incoming pending requests become NEEDS_YOU tasks while resolved and outgoing requests do not", () => {

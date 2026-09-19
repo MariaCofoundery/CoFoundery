@@ -284,6 +284,23 @@ export function ProductShell({
                   gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
                   es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
                   war genau die Beschwerde, die es hierher gebracht hat. */}
+              {/* Das Postfach steht hier und nicht zwischen den Bereichen:
+                  Es ist ein Querschnitt wie das Profil - Gespraeche kommen
+                  aus Connect und aus Find. Der Zaehler war ohnehin schon da,
+                  er hing nur am Connect-Eintrag. */}
+              {!isSuspendedConnectOnly ? (
+                <Link
+                  href="/messages"
+                  aria-current={pathname.startsWith("/messages") ? "page" : undefined}
+                  className={`${navLinkClassName(pathname.startsWith("/messages"))} inline-flex items-center gap-2`}
+                >
+                  {t("messages")}
+                  <ConnectAttentionBadge
+                    count={unreadConnectMessageCount}
+                    label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
+                  />
+                </Link>
+              ) : null}
               {!isSuspendedConnectOnly ? (
                 <Link
                   href="/profile"

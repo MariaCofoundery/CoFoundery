@@ -47,7 +47,7 @@ test("Connect identity photos appear without dominating listings, contacts, or c
   assert.match(source("src/features/connect/ConnectListingCard.tsx"), /<ConnectAvatar/);
   assert.match(source("src/app/(product)/connect/listings/[listingId]/page.tsx"), /<ConnectAvatar/);
   assert.match(source("src/app/(product)/connect/contacts/page.tsx"), /<ConnectAvatar/);
-  assert.match(source("src/app/(product)/connect/messages/[conversationId]/page.tsx"), /<ConnectAvatar/);
+  assert.match(source("src/app/(product)/messages/[conversationId]/page.tsx"), /<ConnectAvatar/);
 });
 
 test("block is symmetric at RPC boundaries and keeps history while stopping writes", () => {
@@ -61,7 +61,7 @@ test("block is symmetric at RPC boundaries and keeps history while stopping writ
 
 test("safety UI confirms block, supports unblock, and hides composer when blocked", () => {
   const safety = source("src/features/connect/ConnectSafetyActions.tsx");
-  const chat = source("src/app/(product)/connect/messages/[conversationId]/page.tsx");
+  const chat = source("src/app/(product)/messages/[conversationId]/page.tsx");
   const listing = source("src/app/(product)/connect/listings/[listingId]/page.tsx");
   assert.match(safety, /window\.confirm/);
   assert.match(safety, /unblockConnectUserAction/);
