@@ -390,7 +390,8 @@
     "venture_what": "Describe in at least 50 characters what it is about.",
     "venture_audience": "Say in at least 20 characters who it is for.",
     "venture_logo": "The logo could not be saved. JPG, PNG or WebP, 2 MB maximum.",
-    "venture_limit": "Five entries is the maximum."
+    "venture_limit": "Five entries is the maximum.",
+    "venture_website": "We can't open that address. It needs to be a web address, for example cofoundery.com – and it has to be reachable over https. So we haven't saved it."
   },
   "problems": {
     "title": "What people see unsolved",
@@ -616,7 +617,7 @@
     "motivationHint": "Optional – and often the part that sticks. Values usually only come up in the third conversation.",
     "website": "Website",
     "websitePlaceholder": "cofoundery.de",
-    "websiteHint": "Without https:// – we add that.",
+    "websiteHint": "The address of your website. You can paste it from the address bar – we'll add the “https://”. Links always open a new window.",
     "logo": "Logo",
     "logoHint": "Optional, 2 MB maximum. JPG, PNG or WebP.",
     "logoKeep": "Keep the current logo",
@@ -639,7 +640,8 @@
     "profileLink": "Companies & projects",
     "profileLinkHint": "Up to five entries that sit with your profile.",
     "saved": "The entry is saved.",
-    "deleted": "The entry was deleted."
+    "deleted": "The entry was deleted.",
+    "openLinkHint": "Opens the website in a new window"
   },
   "tabs": {
     "label": "Areas in Connect",

@@ -66,6 +66,33 @@ export function ConnectVentureForm({
               placeholder={t("ventures.namePlaceholder")}
             />
           </label>
+          {/* Die Adresse steht neben dem Namen und nicht hinter drei langen
+              Textfeldern: Sie gehoert zu dem, was das Unternehmen IST. Unten
+              hat sie schlicht niemand gefunden.
+
+              Bewusst kein type="url" - damit weigert sich der Browser, das
+              Formular abzuschicken, solange kein "https://" davorsteht. Genau
+              die Schreibweise, die man kopiert, waere die einzige, die nicht
+              ginge; das hat beim LinkedIn-Feld schon einmal alles blockiert.
+              Die Serveraktion ergaenzt das Schema. */}
+          <label className="block text-sm font-medium">
+            {t("ventures.website")}
+            <input
+              name="website"
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              spellCheck={false}
+              maxLength={200}
+              defaultValue={venture?.website ?? ""}
+              className={field}
+              placeholder={t("ventures.websitePlaceholder")}
+            />
+            <span className={hint}>{t("ventures.websiteHint")}</span>
+          </label>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-medium">
             {t("ventures.roleLabel")}
             <input
@@ -124,17 +151,6 @@ export function ConnectVentureForm({
         </label>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <label className="block text-sm font-medium">
-            {t("ventures.website")}
-            <input
-              name="website"
-              maxLength={200}
-              defaultValue={venture?.website ?? ""}
-              className={field}
-              placeholder={t("ventures.websitePlaceholder")}
-            />
-            <span className={hint}>{t("ventures.websiteHint")}</span>
-          </label>
           <label className="block text-sm font-medium">
             {t("ventures.logo")}
             <input

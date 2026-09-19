@@ -390,7 +390,8 @@
     "venture_what": "Beschreib mit mindestens 50 Zeichen, worum es geht.",
     "venture_audience": "Sag mit mindestens 20 Zeichen, für wen das ist.",
     "venture_logo": "Das Logo konnte nicht gespeichert werden. JPG, PNG oder WebP, maximal 2 MB.",
-    "venture_limit": "Fünf Einträge sind das Maximum."
+    "venture_limit": "Fünf Einträge sind das Maximum.",
+    "venture_website": "Diese Adresse können wir nicht öffnen. Sie muss eine Webadresse sein, zum Beispiel cofoundery.de – und sie muss über https erreichbar sein. Gespeichert haben wir sie deshalb nicht."
   },
   "problems": {
     "title": "Ungelöstes, das jemand sieht",
@@ -616,7 +617,7 @@
     "motivationHint": "Freiwillig – und oft der Teil, der hängen bleibt. Über Werte redet man sonst erst im dritten Gespräch.",
     "website": "Webseite",
     "websitePlaceholder": "cofoundery.de",
-    "websiteHint": "Ohne https:// – das ergänzen wir.",
+    "websiteHint": "Die Adresse eurer Webseite. Du kannst sie aus der Adresszeile kopieren – „https://“ ergänzen wir. Links öffnen immer ein neues Fenster.",
     "logo": "Logo",
     "logoHint": "Freiwillig, maximal 2 MB. JPG, PNG oder WebP.",
     "logoKeep": "Aktuelles Logo behalten",
@@ -639,7 +640,8 @@
     "profileLink": "Unternehmen & Projekte",
     "profileLinkHint": "Bis zu fünf Einträge, die an deinem Profil stehen.",
     "saved": "Der Eintrag ist gespeichert.",
-    "deleted": "Der Eintrag wurde gelöscht."
+    "deleted": "Der Eintrag wurde gelöscht.",
+    "openLinkHint": "Öffnet die Webseite in einem neuen Fenster"
   },
   "tabs": {
     "label": "Bereiche in Connect",

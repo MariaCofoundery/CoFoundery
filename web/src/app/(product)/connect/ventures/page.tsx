@@ -117,6 +117,7 @@ export default async function ConnectVenturesPage({
                   href={venture.website}
                   target="_blank"
                   rel="noreferrer noopener"
+                  title={t("ventures.openLinkHint")}
                   className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
                 >
                   {t("ventures.openLink")}

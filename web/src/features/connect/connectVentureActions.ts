@@ -39,13 +39,37 @@ function optional(value: FormDataEntryValue | null, min: number, max: number) {
   return text.length >= min ? text : null;
 }
 
-function parseWebsite(value: FormDataEntryValue | null) {
+/**
+ * Die Adresse des Unternehmens.
+ *
+ * GEAENDERT am 19.09.2026: Vorher gab diese Funktion bei einer unbrauchbaren
+ * Eingabe `null` zurueck, und die Aktion speicherte still ohne Adresse. Wer
+ * "http://meine-firma.de" eintrug - und http ist hier nicht erlaubt -, bekam
+ * eine Erfolgsmeldung und ein leeres Feld. Man merkt so etwas erst Wochen
+ * spaeter, wenn ueberhaupt.
+ *
+ * Jetzt sind "leer" und "unbrauchbar" zwei verschiedene Antworten.
+ */
+function parseWebsite(value: FormDataEntryValue | null): { ok: true; url: string | null } | { ok: false } {
   const text = String(value ?? "").trim().slice(0, 200);
-  if (!text) return null;
+  if (!text) return { ok: true, url: null };
+
   // Nur https: Ein http-Link auf einer https-Seite ist eine Browserwarnung
   // und ein schlechtes Bild fuer die Person.
-  const withScheme = text.startsWith("http://") || text.startsWith("https://") ? text : `https://${text}`;
-  return withScheme.startsWith("https://") ? withScheme : null;
+  if (text.startsWith("http://")) return { ok: false };
+  const withScheme = text.startsWith("https://") ? text : `https://${text}`;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(withScheme);
+  } catch {
+    return { ok: false };
+  }
+  // Ein Gastgebername ohne Punkt ist kein Ziel im Netz - "meine firma" wuerde
+  // sonst als https://meine%20firma durchgehen.
+  if (!parsed.hostname.includes(".") || parsed.hostname.endsWith(".")) return { ok: false };
+
+  return { ok: true, url: parsed.toString() };
 }
 
 async function uploadLogo(
@@ -76,13 +100,16 @@ export async function saveConnectVentureAction(formData: FormData) {
   if (whatItDoes.length < VENTURE_WHAT_MIN) back("venture_what");
   if (audience.length < VENTURE_AUDIENCE_MIN) back("venture_audience");
 
+  const website = parseWebsite(formData.get("website"));
+  if (!website.ok) back("venture_website");
+
   const values = {
     name,
     role_label: optional(formData.get("role_label"), 2, VENTURE_NAME_MAX),
     what_it_does: whatItDoes,
     audience,
     motivation: optional(formData.get("motivation"), VENTURE_MOTIVATION_MIN, VENTURE_MOTIVATION_MAX),
-    website: parseWebsite(formData.get("website")),
+    website: website.url,
   };
 
   const logoData = String(formData.get("logo_image_data") ?? "");
