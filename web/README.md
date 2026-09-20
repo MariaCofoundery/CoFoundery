@@ -35,6 +35,34 @@ Notes:
 - `INVITE_FROM_EMAIL` must be a verified sender/domain in Resend.
 - If one of these variables is missing, invites are still saved in the database, but no email is sent.
 
+## Notifications on the device (Web Push)
+
+Generate a VAPID key pair once and put it in the environment:
+
+```bash
+node scripts/generate-vapid-keys.mjs
+```
+
+```bash
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # goes to the browser, that is its purpose
+VAPID_PRIVATE_KEY=...              # never with a NEXT_PUBLIC_ prefix
+VAPID_SUBJECT=mailto:you@your-domain.com   # falls back to RESEND_FROM_EMAIL
+```
+
+Notes:
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY` is inlined at build time, so a new value needs
+  a rebuild.
+- Generate the pair **once**. A new pair invalidates every subscription a
+  browser has already stored - every device would silently stop receiving.
+- Without the keys the account page says so and offers no switch; emails are
+  unaffected.
+- On iPhone and iPad, notifications only work once the site has been added to
+  the home screen (iOS 16.4+). In a Safari tab the browser APIs are absent.
+- Sending is verified against the worked example in RFC 8291 §5
+  (`src/lib/push/__tests__/webPushCrypto.test.ts`) - a mistake there is
+  invisible in production, because the push services accept a badly encrypted
+  payload and the device drops it silently.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
