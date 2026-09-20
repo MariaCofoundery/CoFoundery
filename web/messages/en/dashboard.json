@@ -473,7 +473,7 @@
     },
     "notifications": {
       "title": "When do we write to you?",
-      "text": "At most one email per thing – an ongoing conversation doesn't trigger a mail per line. Whatever you switch off here is still waiting for you in the platform.",
+      "text": "At most one notification per thing – an ongoing conversation doesn't trigger one per line. These switches cover the email and the notifications on your device alike. Whatever you switch off here is still waiting for you in the platform.",
       "areas": {
         "align": "Align",
         "find": "Find",
@@ -518,6 +518,30 @@
       "text": "You can download everything stored under your account at any time – as one file that opens in any text editor.",
       "scope": "Not included: messages other people wrote – those are theirs. And the evidence from your capability snapshot, which we never pass on anywhere.",
       "download": "Download my data"
+    },
+    "push": {
+      "title": "Notifications on this device",
+      "text": "In addition to the email – a nudge on the device you are on right now. What you get is decided by the switches above; here you only decide where it goes.",
+      "statusLabel": "On this device:",
+      "on": "on",
+      "off": "off",
+      "enable": "Turn notifications on",
+      "disable": "Turn off on this device",
+      "pending": "One moment …",
+      "perDevice": "The permission belongs to the browser, not to the account: setting up your phone does not set up your computer. A notification never carries what someone wrote – a lock screen is a public place.",
+      "homeScreen": "On iPhone and iPad, notifications only work once the page sits on the home screen: in Safari tap Share, choose “Add to Home Screen”, open CoFoundery from there and come back here.",
+      "unsupported": "This browser cannot show notifications. The email still arrives.",
+      "notConfigured": "We are still setting notifications up – this switch is coming shortly. The email still arrives.",
+      "errors": {
+        "denied": "The browser has blocked notifications for this site. It can only be allowed again in the browser's own settings – look for CoFoundery there.",
+        "unsupported_service": "This browser registers with a service we don't know yet. Drop us a line and we'll add it.",
+        "failed": "That didn't work just now. Try again later – nothing changes about your emails."
+      },
+      "test": "Send a test one",
+      "testSent": "On its way – it should show up within a few seconds. If nothing arrives, check in your device settings whether notifications are allowed for CoFoundery.",
+      "testNothing": "Nothing could be delivered. Turn notifications off on this device and on again.",
+      "testTitle": "Hello from CoFoundery",
+      "testBody": "If you are reading this, notifications arrive on this device."
     }
   },
   "outlook": {

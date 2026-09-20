@@ -14,6 +14,7 @@ import {
   isAccountStatusFailure,
   type AccountStatus,
 } from "@/features/account/accountStatus";
+import { PushNotificationSection } from "@/features/notifications/PushNotificationSection";
 import { SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -153,6 +154,17 @@ export async function AccountPreferencesSection({
             />
           </div>
         </form>
+
+        {/* Die Schalter oben sagen, WAS jemand bekommt - fuer Mail und
+            Mitteilung gemeinsam. Hier steht nur, WOHIN. Deshalb im selben
+            Kasten und nicht in einem eigenen: Zwei Kaesten waeren zwei
+            Regelwerke, und genau das ist es nicht.
+
+            Ausserhalb des Formulars: Das Einschalten ist keine Angabe, die man
+            abschickt, sondern eine Erlaubnis, die der Browser erteilt. */}
+        <PushNotificationSection
+          vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null}
+        />
       </section>
     </>
   );

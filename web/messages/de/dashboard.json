@@ -473,7 +473,7 @@
     },
     "notifications": {
       "title": "Wann schreiben wir dir?",
-      "text": "Höchstens eine Mail je Vorgang – ein laufendes Gespräch löst keine Mail pro Zeile aus. Was du hier abwählst, findest du weiterhin in der Plattform.",
+      "text": "Höchstens eine Benachrichtigung je Vorgang – ein laufendes Gespräch löst keine je Zeile aus. Diese Schalter gelten für die Mail und für Mitteilungen auf dem Gerät gemeinsam. Was du hier abwählst, findest du weiterhin in der Plattform.",
       "areas": {
         "align": "Align",
         "find": "Find",
@@ -518,6 +518,30 @@
       "text": "Du kannst jederzeit alles herunterladen, was unter deinem Konto gespeichert ist – als eine Datei, die sich mit jedem Texteditor öffnen lässt.",
       "scope": "Nicht dabei: Nachrichten, die andere Menschen geschrieben haben – die gehören ihnen. Und deine Belege aus der Fähigkeitsaufstellung, die geben wir grundsätzlich nirgendwohin weiter.",
       "download": "Daten herunterladen"
+    },
+    "push": {
+      "title": "Mitteilungen auf diesem Gerät",
+      "text": "Zusätzlich zur Mail – als Hinweis auf dem Gerät, auf dem du gerade bist. Was du bekommst, entscheiden die Schalter darüber; hier entscheidest du nur, wohin.",
+      "statusLabel": "Auf diesem Gerät:",
+      "on": "eingeschaltet",
+      "off": "aus",
+      "enable": "Mitteilungen einschalten",
+      "disable": "Auf diesem Gerät ausschalten",
+      "pending": "Einen Moment …",
+      "perDevice": "Die Erlaubnis gehört zum Browser, nicht zum Konto: Dein Telefon einzurichten richtet den Rechner nicht mit ein. Im Text einer Mitteilung steht nie, was jemand geschrieben hat – ein Sperrbildschirm ist ein öffentlicher Ort.",
+      "homeScreen": "Auf dem iPhone und iPad gibt es Mitteilungen nur, wenn die Seite auf dem Startbildschirm liegt: In Safari auf Teilen tippen, „Zum Home-Bildschirm“ wählen, CoFoundery von dort öffnen und hier wiederkommen.",
+      "unsupported": "Dieser Browser kann keine Mitteilungen anzeigen. Die Mail kommt weiterhin.",
+      "notConfigured": "Mitteilungen richten wir gerade ein – dieser Schalter kommt in Kürze. Die Mail kommt weiterhin.",
+      "errors": {
+        "denied": "Der Browser hat Mitteilungen für diese Seite abgelehnt. Erlauben lässt sich das nur in seinen eigenen Einstellungen – such dort nach CoFoundery.",
+        "unsupported_service": "Dieser Browser meldet sich bei einem Dienst an, den wir noch nicht kennen. Schreib uns kurz, dann ergänzen wir ihn.",
+        "failed": "Das hat gerade nicht geklappt. Versuch es später noch einmal – an deinen Mails ändert sich nichts."
+      },
+      "test": "Zur Probe eine schicken",
+      "testSent": "Unterwegs – sie sollte in ein paar Sekunden erscheinen. Kommt nichts, prüf in den Geräteeinstellungen, ob Mitteilungen für CoFoundery erlaubt sind.",
+      "testNothing": "Es konnte nichts zugestellt werden. Schalte die Mitteilungen auf diesem Gerät einmal aus und wieder ein.",
+      "testTitle": "Hallo von CoFoundery",
+      "testBody": "Wenn du das liest, kommen Mitteilungen auf diesem Gerät an."
     }
   },
   "outlook": {
