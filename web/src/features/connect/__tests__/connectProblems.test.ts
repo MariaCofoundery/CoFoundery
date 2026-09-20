@@ -255,7 +255,7 @@ test("all three occasions notify, and nothing else does", () => {
 });
 
 test("a failed email never breaks the action", () => {
-  const notifications = source("src/features/connect/connectNotifications.ts");
+  const notifications = source("src/features/notifications/networkNotification.ts");
   // Wer eine Kontaktanfrage stellt, hat sie gestellt - auch wenn die Mail
   // nicht rausgeht.
   assert.match(notifications, /try \{/);
@@ -263,9 +263,9 @@ test("a failed email never breaks the action", () => {
 });
 
 test("the claim is taken before sending, not after", () => {
-  const notifications = source("src/features/connect/connectNotifications.ts");
+  const notifications = source("src/features/notifications/networkNotification.ts");
   const claimAt = notifications.indexOf("await claim(");
-  const sendAt = notifications.indexOf("sendConnectNotificationEmail(");
+  const sendAt = notifications.indexOf("sendNetworkNotificationEmail(");
   assert.ok(claimAt > 0 && claimAt < sendAt, "lieber eine Mail zu wenig als zwei");
 });
 
@@ -279,10 +279,10 @@ test("an ongoing conversation does not send a mail per line", () => {
 });
 
 test("the email carries no content, only that something happened", () => {
-  const email = source("src/lib/email/sendConnectNotificationEmail.ts");
+  const email = source("src/lib/email/sendNetworkNotificationEmail.ts");
   // Eine Mail landet in Postfaechern, die wir nicht kennen, und in Vorschauen
   // auf Sperrbildschirmen.
-  assert.doesNotMatch(codeOnly("src/lib/email/sendConnectNotificationEmail.ts"), /messageBody|params\.message\b|noteText/);
+  assert.doesNotMatch(codeOnly("src/lib/email/sendNetworkNotificationEmail.ts"), /messageBody|params\.message\b|noteText/);
   assert.match(email, /senderName/);
 });
 

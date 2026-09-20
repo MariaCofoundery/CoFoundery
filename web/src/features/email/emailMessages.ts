@@ -365,11 +365,25 @@ export function getAdvisorTeamFounderInviteEmailCopy(
 // ---------------------------------------------------------------------------
 // Connect-Benachrichtigungen
 // ---------------------------------------------------------------------------
-export type ConnectNotificationCopyKind =
+export type NetworkNotificationCopyKind =
   | "contact_request"
   | "problem_interest"
   | "approach_interest"
-  | "message";
+  | "message"
+  | "discovery_intro_request"
+  | "discovery_intro_accepted";
+
+/**
+ * Welcher Bereich ueber der Ueberschrift steht.
+ *
+ * Bis zum 20.09.2026 stand dort fest "CoFoundery Connect" - die Vorlage
+ * bediente nur Connect. Mit den Vorstellungsanfragen aus Find waere das die
+ * erste Mail, die einen falschen Ort nennt: Wer sie bekommt, sucht den Vorgang
+ * sonst im falschen Bereich.
+ */
+function notificationArea(kind: NetworkNotificationCopyKind) {
+  return kind.startsWith("discovery_intro") ? "CoFoundery Find" : "CoFoundery Connect";
+}
 
 /**
  * Eine Vorlage fuer drei Anlaesse statt drei Vorlagen.
@@ -378,9 +392,9 @@ export type ConnectNotificationCopyKind =
  * der Weg hin. Was sich unterscheidet, sind zwei Saetze. Drei getrennte
  * Vorlagen waeren dreimal dieselbe Fusszeile zu pflegen.
  */
-export function getConnectNotificationEmailCopy(
+export function getNetworkNotificationEmailCopy(
   locale: AppLocale,
-  input: { kind: ConnectNotificationCopyKind; senderName: string | null }
+  input: { kind: NetworkNotificationCopyKind; senderName: string | null }
 ) {
   const name = input.senderName?.trim() || (locale === "en" ? "Someone" : "Jemand");
 
@@ -410,11 +424,23 @@ export function getConnectNotificationEmailCopy(
         intro: `${name} has written to you on CoFoundery.`,
         cta: "Open the conversation",
       },
+      discovery_intro_request: {
+        subject: `${name} would like to get to know you`,
+        headline: "A request to be introduced",
+        intro: `${name} found your profile in Find and would like to get to know you. Your answer decides whether the two of you get in touch.`,
+        cta: "Open the request",
+      },
+      discovery_intro_accepted: {
+        subject: `${name} said yes`,
+        headline: "Your request was accepted",
+        intro: `${name} would like to get to know you too. You can write to each other from now on.`,
+        cta: "Open the conversation",
+      },
     }[input.kind];
 
     return {
       htmlLang: "en",
-      eyebrow: "CoFoundery Connect",
+      eyebrow: notificationArea(input.kind),
       ...byKind,
       preheader: byKind.intro,
       note: "We only notify you about your own activity, and at most once per event.",
@@ -449,11 +475,23 @@ export function getConnectNotificationEmailCopy(
       intro: `${name} hat dir auf CoFoundery geschrieben.`,
       cta: "Gespräch öffnen",
     },
+    discovery_intro_request: {
+      subject: `${name} möchte dich kennenlernen`,
+      headline: "Eine Vorstellungsanfrage",
+      intro: `${name} hat dein Profil in Find gefunden und möchte dich kennenlernen. Deine Antwort entscheidet, ob ihr in Kontakt kommt.`,
+      cta: "Anfrage öffnen",
+    },
+    discovery_intro_accepted: {
+      subject: `${name} hat zugesagt`,
+      headline: "Deine Anfrage wurde angenommen",
+      intro: `${name} möchte dich ebenfalls kennenlernen. Ihr könnt euch ab jetzt schreiben.`,
+      cta: "Gespräch öffnen",
+    },
   }[input.kind];
 
   return {
     htmlLang: "de",
-    eyebrow: "CoFoundery Connect",
+    eyebrow: notificationArea(input.kind),
     ...byKind,
     preheader: byKind.intro,
     note: "Wir benachrichtigen dich nur über deine eigenen Vorgänge, und höchstens einmal je Vorgang.",

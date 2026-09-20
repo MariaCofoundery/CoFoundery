@@ -1,12 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getOwnDiscoveryProfile } from "@/features/discovery/discoveryData";
 import {
   cancelDiscoveryIntro,
   normalizeDiscoveryIntroMessage,
   requestDiscoveryIntro,
   respondDiscoveryIntro,
 } from "@/features/discovery/discoveryIntroData";
+import {
+  notifyDiscoveryIntroAccepted,
+  notifyDiscoveryIntroRequest,
+} from "@/features/discovery/discoveryIntroNotifications";
 import type {
   DiscoveryIntroActionErrorReason,
   DiscoveryIntroActionState,
@@ -105,10 +110,19 @@ export async function requestDiscoveryIntroAction(
   }
 
   try {
-    await requestDiscoveryIntro({
+    const request = await requestDiscoveryIntro({
       requesterUserId: userId,
       recipientProfileId: profileId,
       message: normalizeDiscoveryIntroMessage(getFormString(formData, "message")),
+    });
+
+    // Der Name aus dem DISCOVERY-Profil, nicht aus person_core: In Find sieht
+    // man einander als das, was dort steht. Eine Benachrichtigung darf nicht
+    // mehr verraten als die Seite, von der sie handelt.
+    await notifyDiscoveryIntroRequest(await createClient(), {
+      introRequestId: request.id,
+      recipientUserId: request.recipientUserId,
+      requesterName: (await getOwnDiscoveryProfile(userId))?.displayName ?? null,
     });
 
     revalidateDiscoveryIntroPaths(profileId);
@@ -141,12 +155,23 @@ export async function respondDiscoveryIntroAction(
   }
 
   try {
-    await respondDiscoveryIntro({
+    const answered = await respondDiscoveryIntro({
       userId,
       introRequestId,
       response,
       responseMessage: normalizeDiscoveryIntroMessage(getFormString(formData, "responseMessage")),
     });
+
+    // Nur die Zusage. Eine Absage steht in der Liste und ist dort zu sehen -
+    // eine Mail darueber macht aus einem stillen Nein eine Zustellung ins
+    // Postfach, und auf ein Nein folgt nichts, was man tun koennte.
+    if (response === "accepted") {
+      await notifyDiscoveryIntroAccepted(await createClient(), {
+        introRequestId: answered.id,
+        requesterUserId: answered.requesterUserId,
+        recipientName: (await getOwnDiscoveryProfile(userId))?.displayName ?? null,
+      });
+    }
 
     revalidateDiscoveryIntroPaths();
     return {

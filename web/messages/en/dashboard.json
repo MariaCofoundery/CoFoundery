@@ -507,6 +507,14 @@
         "founder_in_the_wild": {
           "title": "Founder in the Wild: your turn",
           "text": "When the other person finished their part and you can carry on."
+        },
+        "discovery_intro_request": {
+          "title": "Someone would like to get to know you",
+          "text": "When someone from Find sends you a request to be introduced."
+        },
+        "discovery_intro_accepted": {
+          "title": "Your request was accepted",
+          "text": "When someone you wanted to meet says yes. We don't send a no – that one is in your list."
         }
       },
       "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",

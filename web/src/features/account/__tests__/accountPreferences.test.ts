@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 import {
   NOTIFICATION_KINDS,
@@ -16,6 +16,22 @@ const sqlWithoutComments = (path: string) =>
     .replace(/^\s*--.*$/gm, "");
 
 const MIGRATION = "../supabase/migrations/20261001120000_account_locale_and_notifications.sql";
+
+/**
+ * Migrationen sind append-only: Die gueltige Fassung einer Regel steht in der
+ * JUENGSTEN Datei, die sie nennt, nicht in der, die sie eingefuehrt hat. Ein
+ * fester Pfad hier hat am 20.09.2026 eine erweiterte Werteliste uebersehen.
+ */
+const latestMigrationWith = (marker: string) => {
+  const dir = "../supabase/migrations";
+  const file = readdirSync(dir)
+    .filter((name) => name.endsWith(".sql"))
+    .sort()
+    .filter((name) => readFileSync(`${dir}/${name}`, "utf8").includes(marker))
+    .at(-1);
+  assert.ok(file, `keine Migration nennt ${marker}`);
+  return sqlWithoutComments(`${dir}/${file}`);
+};
 const ACTIONS = "src/features/account/accountPreferenceActions.ts";
 const RECIPIENT = "src/lib/email/notificationRecipient.ts";
 
@@ -26,7 +42,7 @@ const accountCopy = (locale: string) =>
 // Jede Mailart hat einen Schalter
 // ---------------------------------------------------------------------------
 test("die Liste im Code und die Werteliste in der Datenbank sind dieselbe", () => {
-  const migration = sqlWithoutComments(MIGRATION);
+  const migration = latestMigrationWith("notification_opt_outs_kind_check");
   const block = migration.slice(
     migration.indexOf("notification_opt_outs_kind_check"),
     migration.indexOf("))", migration.indexOf("notification_opt_outs_kind_check"))
@@ -60,10 +76,16 @@ test("jede Mailart, die verschickt wird, fragt vorher nach", () => {
   // Funktion aufruft - ein zweiter Weg waere ein zweiter Ort zum Vergessen.
   const migration = sqlWithoutComments(MIGRATION);
   assert.match(migration, /if not public\.wants_email_notification\(p_recipient_user_id, p_kind\) then/);
+
+  // Und die Arten OHNE eigenen Schalter haengen ausdruecklich an einem, der
+  // sie beschreibt. approach_interest liess sich bis zum 20.09.2026 gar nicht
+  // abbestellen: Die Zeile waere am Constraint gescheitert.
+  const gate = latestMigrationWith("create or replace function public.wants_email_notification");
+  assert.match(gate, /when p_kind = 'approach_interest' then 'problem_interest'/);
 });
 
 test("eine neue Mailart ist automatisch an, nicht stumm", () => {
-  const migration = sqlWithoutComments(MIGRATION);
+  const migration = latestMigrationWith("create or replace function public.wants_email_notification");
   // Gespeichert werden Abbestellungen, nicht Zustimmungen. Eine Tabelle mit
   // Ja-Zeilen haette jede spaeter dazukommende Art fuer alle Bestandsleute
   // stillgelegt.
@@ -109,7 +131,9 @@ test("Benachrichtigungen kommen in der Sprache der Empfaengerin an", () => {
   // Menschen - wer eine Anzeige veroeffentlicht, loeste Mails in SEINER
   // Sprache aus.
   const senders = [
-    "src/features/connect/connectNotifications.ts",
+    // Die Mechanik fuer Connect UND Find steht seit dem 20.09.2026 an einer
+    // Stelle - vorher stand sie in connectNotifications.ts.
+    "src/features/notifications/networkNotification.ts",
     "src/features/connect/savedSearchNotifications.ts",
     "src/features/discovery/discoverySavedSearchNotifications.ts",
     "src/features/collaborationLab/readMyMindActions.ts",

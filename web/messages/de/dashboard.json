@@ -507,6 +507,14 @@
         "founder_in_the_wild": {
           "title": "Founder in the Wild: du bist dran",
           "text": "Wenn dein Gegenüber seinen Teil erledigt hat und du weitermachen kannst."
+        },
+        "discovery_intro_request": {
+          "title": "Jemand möchte dich kennenlernen",
+          "text": "Wenn dir jemand aus Find eine Vorstellungsanfrage schickt."
+        },
+        "discovery_intro_accepted": {
+          "title": "Deine Anfrage wurde angenommen",
+          "text": "Wenn jemand, den du kennenlernen wolltest, zusagt. Eine Absage schicken wir nicht – die steht in deiner Liste."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",

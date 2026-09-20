@@ -21,7 +21,7 @@ import { sendWebPush, getVapidKeys } from "@/lib/push/sendWebPush";
  *   steht deshalb nicht in der Mitteilung, sondern in CoFoundery.
  *
  * Die Texte kommen aus derselben Quelle wie die der Mail
- * (`getConnectNotificationEmailCopy`). Zwei Quellen fuer dieselbe Aussage waere
+ * (`getNetworkNotificationEmailCopy`). Zwei Quellen fuer dieselbe Aussage waere
  * die naechste Stelle, an der zwei Kanaele auseinanderlaufen.
  */
 

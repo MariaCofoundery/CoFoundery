@@ -1,23 +1,28 @@
 import type { AppLocale } from "@/i18n/config";
 import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
 import {
-  getConnectNotificationEmailCopy,
+  getNetworkNotificationEmailCopy,
   getEmailPrivacyUrl,
-  type ConnectNotificationCopyKind,
+  type NetworkNotificationCopyKind,
 } from "@/features/email/emailMessages";
 
 /**
- * Die Benachrichtigung fuer Connect.
+ * Die Benachrichtigung aus dem Netzwerk - Connect und Find.
  *
  * Bewusst knapp: Was passiert ist, wer es war, ein Knopf. Kein Inhalt der
  * Nachricht, kein Auszug aus der Anfrage - eine Mail landet in Postfaechern,
  * die wir nicht kennen, und in Vorschauen auf Sperrbildschirmen. Was jemand
  * geschrieben hat, steht in CoFoundery.
+ *
+ * Hiess bis zum 20.09.2026 `sendConnectNotificationEmail`. Mit den
+ * Vorstellungsanfragen aus Find bediente sie zwei Bereiche; die Datenbank
+ * nennt das seit jeher "network notification" (claim_network_notification),
+ * und der Name folgt jetzt der Sache.
  */
 
 type Params = {
   recipientEmail: string;
-  kind: ConnectNotificationCopyKind;
+  kind: NetworkNotificationCopyKind;
   senderName: string | null;
   url: string;
   locale?: EmailLocaleInput;
@@ -42,7 +47,7 @@ function buildFromAddress() {
 }
 
 function buildHtmlBody(params: Params, locale: AppLocale) {
-  const copy = getConnectNotificationEmailCopy(locale, {
+  const copy = getNetworkNotificationEmailCopy(locale, {
     kind: params.kind,
     senderName: params.senderName,
   });
@@ -74,14 +79,14 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
 </html>`;
 }
 
-export async function sendConnectNotificationEmail(params: Params): Promise<Result> {
+export async function sendNetworkNotificationEmail(params: Params): Promise<Result> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = buildFromAddress();
   if (!apiKey) return { ok: false, error: "missing_resend_api_key" };
   if (!from) return { ok: false, error: "missing_resend_from_email" };
 
   const locale = resolveEmailLocale(params.locale);
-  const copy = getConnectNotificationEmailCopy(locale, {
+  const copy = getNetworkNotificationEmailCopy(locale, {
     kind: params.kind,
     senderName: params.senderName,
   });

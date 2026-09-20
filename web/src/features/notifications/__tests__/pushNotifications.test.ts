@@ -136,10 +136,10 @@ test("die Mitteilung haengt an demselben Anspruch wie die Mail", () => {
   // DAS IST DIE ARCHITEKTURENTSCHEIDUNG. Ein eigener Zaehler fuer den zweiten
   // Weg waere ein zweites Regelwerk fuer dieselbe Frage - und die
   // Abbestellungen aus dem Konto wuerden fuer ihn nicht gelten.
-  const notifications = codeOnly("src/features/connect/connectNotifications.ts");
+  const notifications = codeOnly("src/features/notifications/networkNotification.ts");
   const claimAt = notifications.indexOf("await claim(");
   const pushAt = notifications.indexOf("deliverPushToUser(");
-  const mailAt = notifications.indexOf("sendConnectNotificationEmail({");
+  const mailAt = notifications.indexOf("sendNetworkNotificationEmail({");
   assert.ok(claimAt > 0 && pushAt > 0 && mailAt > 0);
   assert.ok(pushAt > claimAt, "die Mitteilung geht raus, bevor der Anspruch genommen ist");
   assert.ok(mailAt > claimAt);
@@ -154,9 +154,9 @@ test("in einer Mitteilung steht nicht, was jemand geschrieben hat", () => {
   // Der Inhalt ist bis zum Geraet verschluesselt - aber er erscheint auf einem
   // SPERRBILDSCHIRM, und der ist sichtbar fuer jeden, der das Telefon in der
   // Hand haelt. Dieselbe Regel wie bei der Mail, aus einem anderen Grund.
-  const notifications = codeOnly("src/features/connect/connectNotifications.ts");
+  const notifications = codeOnly("src/features/notifications/networkNotification.ts");
   // Die Texte kommen aus derselben Quelle wie die der Mail.
-  assert.match(notifications, /getConnectNotificationEmailCopy\(recipient\.locale/);
+  assert.match(notifications, /getNetworkNotificationEmailCopy\(recipient\.locale/);
   assert.match(notifications, /title: copy\.headline/);
   assert.match(notifications, /body: copy\.intro/);
   // Kein Nachrichtentext, kein Auszug - hier gibt es gar keinen Zugriff darauf.
@@ -190,7 +190,7 @@ test("eine abgemeldete Adresse wird geloescht, nicht gesammelt", () => {
 
 test("ein fehlgeschlagener Versand reisst die Handlung nicht mit", () => {
   // Wer schreibt, hat geschrieben - auch wenn keine Mitteilung rausgeht.
-  const notifications = source("src/features/connect/connectNotifications.ts");
+  const notifications = source("src/features/notifications/networkNotification.ts");
   assert.match(notifications, /\} catch \{/, "der stille Auffangblock ist weg");
   const delivery = codeOnly("src/features/notifications/pushDelivery.ts");
   // Ohne Schluessel gibt es diesen Kanal nicht - und dann auch keine Abfrage.

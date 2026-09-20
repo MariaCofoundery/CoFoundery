@@ -11,6 +11,14 @@
  *   Eine Einladung IST die Nachricht. Sie abzubestellen hiesse, sie nie zu
  *   bekommen, und sie geht oft an Menschen ohne Konto.
  *
+ * `approach_interest` STEHT AUCH NICHT HIER.
+ *   Es ist eine eigene Mailart mit eigenem Text, aber kein eigener Schalter:
+ *   Es haengt an `problem_interest`, dessen Beschreibung beide Faelle nennt.
+ *   Die Zuordnung steht in `wants_email_notification`
+ *   (20261012120000_discovery_intro_notifications.sql). Bis dahin liess sich
+ *   diese Art gar nicht abbestellen - die Zeile waere am Constraint
+ *   gescheitert, und der Schalter log.
+ *
  * `area` gruppiert die Liste in der Oberflaeche nach den drei Bereichen, in
  * denen die Mail entsteht - man sucht eine Einstellung dort, wo man die Sache
  * erlebt hat.
@@ -20,6 +28,8 @@ export const NOTIFICATION_KINDS = [
   { kind: "message", area: "connect" },
   { kind: "problem_interest", area: "connect" },
   { kind: "connect_saved_search", area: "connect" },
+  { kind: "discovery_intro_request", area: "find" },
+  { kind: "discovery_intro_accepted", area: "find" },
   { kind: "discovery_saved_search", area: "find" },
   { kind: "read_my_mind", area: "align" },
   { kind: "founder_in_the_wild", area: "align" },
