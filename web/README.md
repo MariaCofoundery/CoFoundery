@@ -50,8 +50,7 @@ VAPID_SUBJECT=mailto:you@your-domain.com   # falls back to RESEND_FROM_EMAIL
 ```
 
 Notes:
-- `NEXT_PUBLIC_VAPID_PUBLIC_KEY` is inlined at build time, so a new value needs
-  a rebuild.
+- A new or changed value only takes effect with the next deploy.
 - Generate the pair **once**. A new pair invalidates every subscription a
   browser has already stored - every device would silently stop receiving.
 - Without the keys the account page says so and offers no switch; emails are

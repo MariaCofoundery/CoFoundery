@@ -28,7 +28,7 @@ const privateKey = key.getPrivateKey().toString("base64url");
 
 console.log(`
 Diese drei Werte in die Umgebung (Vercel: Settings -> Environment Variables),
-danach einmal neu bauen - NEXT_PUBLIC_ wird beim Bauen eingesetzt:
+danach einmal neu ausliefern - vorher greift der neue Wert nicht:
 
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=${publicKey}
 VAPID_PRIVATE_KEY=${privateKey}
