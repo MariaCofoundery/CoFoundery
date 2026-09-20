@@ -40,12 +40,12 @@
   "areaAlign": "Align",
   "areaFind": "Find",
   "areaConnect": "Connect",
-  "areaAlignHint": "Dein Alignment: Fragebogen, Report und Workbook",
-  "areaFindHint": "Menschen finden, die mit dir gründen könnten",
-  "areaConnectHint": "Anzeigen, Probleme und Kontakte im Netzwerk",
   "subNavLabel": "Seiten in diesem Bereich",
   "alignConnections": "Verbindungen",
   "alignLibrary": "Founder Library",
   "messages": "Nachrichten",
-  "unreadMessagesBadge": "{count, plural, =0 {Keine ungelesenen Nachrichten} one {1 ungelesene Nachricht} other {# ungelesene Nachrichten}}"
+  "unreadMessagesBadge": "{count, plural, =0 {Keine ungelesenen Nachrichten} one {1 ungelesene Nachricht} other {# ungelesene Nachrichten}}",
+  "menuOpen": "Menü",
+  "menuClose": "Schließen",
+  "menuAttentionBadge": "{count, plural, =0 {Nichts Offenes} one {1 offener Punkt im Menü} other {# offene Punkte im Menü}}"
 }

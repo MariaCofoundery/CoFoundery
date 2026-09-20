@@ -30,10 +30,18 @@ type Props = {
   researchConsentState: ResearchConsentState;
 };
 
+/**
+ * Der Zaehler an einem Bereich. Zwei Sorten, weil zwei verschiedene Dinge
+ * gezaehlt werden - Vorstellungsanfragen bei Find, Kontaktanfragen und
+ * ungelesene Nachrichten bei Connect.
+ */
+type AreaBadge = { kind: "intro" | "attention"; count: number };
+
 type NavigationItem = {
   href: string;
   label: string;
   isActive: (pathname: string) => boolean;
+  badge?: AreaBadge;
   /**
    * Seiten INNERHALB dieses Bereichs.
    *
@@ -90,6 +98,71 @@ function navLinkClassName(active: boolean) {
   }`;
 }
 
+const MOBILE_MENU_ID = "product-mobile-menu";
+
+/**
+ * Eine Zeile im aufklappbaren Menue.
+ *
+ * min-h-11 sind 44 Pixel - die Groesse, unter der ein Ziel mit dem Daumen
+ * nicht mehr zuverlaessig zu treffen ist.
+ */
+const MOBILE_MENU_ROW_CLASS =
+  "flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900";
+
+function MobileMenuLink({
+  href,
+  active,
+  onNavigate,
+  badge,
+  indented = false,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  onNavigate: () => void;
+  badge?: React.ReactNode;
+  indented?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
+      // Der aktive Zustand ist hier ruhiger als die Pillen am Rechner: Eine
+      // gefuellte Zeile ueber die ganze Breite waere ein Farbband, und zu
+      // praesent war genau die Beschwerde.
+      className={`${MOBILE_MENU_ROW_CLASS} ${indented ? "ml-4" : ""} ${
+        active ? "bg-slate-100 font-semibold text-slate-900" : ""
+      }`}
+    >
+      <span className="min-w-0 truncate">{children}</span>
+      {badge}
+    </Link>
+  );
+}
+
+/** Drei Striche, offen ein Kreuz. */
+function MenuGlyph({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      className="h-4 w-4 text-slate-500"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    >
+      {isOpen ? (
+        <path d="M5 5l10 10M15 5L5 15" />
+      ) : (
+        <path d="M3 6h14M3 10h14M3 14h14" />
+      )}
+    </svg>
+  );
+}
+
 function ConnectAttentionBadge({ count, label }: { count: number; label: string }) {
   if (count < 1) return null;
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
@@ -126,7 +199,28 @@ export function ProductShell({
   const pathname = usePathname();
   const t = useTranslations("navigation");
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
+
+  // Nach jedem Wechsel des Ortes zu. Ohne das bleibt das Menue nach einem
+  // Antippen offen stehen und verdeckt die Seite, auf der man gerade
+  // angekommen ist - der haeufigste Fehler bei aufklappbaren Menues.
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isMenuOpen]);
+
+  const closeMenu = () => setIsMenuOpen(false);
   configureResearchConsentState(researchConsentState);
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   const resolvedActiveView =
@@ -154,7 +248,12 @@ export function ProductShell({
   // Profil steht jetzt rechts bei Konto und Sprache. Verbindungen ist eine
   // Seite innerhalb von Align und vom Dashboard aus verlinkt - sie verwaist
   // dadurch nicht.
-  const navigationItems: NavigationItem[] = isConnectOnly ? [] : [
+  //
+  // Seit dem 20.09.2026 ist diese Liste die EINZIGE Quelle fuer die Bereiche:
+  // Die Pillen ab 1024 Pixel und das aufklappbare Menue darunter lesen
+  // dieselben Eintraege. Vorher stand Find und Connect direkt im JSX - mit
+  // zwei Ansichten waeren daraus zwei Listen geworden, die auseinanderlaufen.
+  const alignItem: NavigationItem[] = isConnectOnly ? [] : [
     {
       href: dashboardHref,
       label: t("areaAlign"),
@@ -193,11 +292,51 @@ export function ProductShell({
     },
   ];
 
+  const findItem: NavigationItem = {
+    href: "/discovery",
+    label: t("areaFind"),
+    isActive: (currentPathname) => currentPathname.startsWith("/discovery"),
+    badge: { kind: "intro", count: incomingOpenRequestCount },
+  };
+
+  const connectItem: NavigationItem = {
+    href: "/connect",
+    label: t("areaConnect"),
+    isActive: (currentPathname) => currentPathname.startsWith("/connect"),
+    badge: { kind: "attention", count: connectAttentionCount },
+  };
+
+  const navigationItems: NavigationItem[] = [
+    ...alignItem,
+    ...(resolvedActiveView === "advisor"
+      ? hasConnect
+        ? [connectItem]
+        : []
+      : [...(hasFounder ? [findItem] : []), ...(hasConnect ? [connectItem] : [])]),
+  ];
+
   // Die zweite Reihe gehoert zu dem Bereich, in dem man gerade ist. Steht man
   // nirgends drin, gibt es sie nicht - eine leere Leiste waere ein Balken ohne
   // Aussage.
   const activeAreaSubItems =
     navigationItems.find((item) => item.isActive(pathname))?.subItems ?? [];
+
+  // Auf dem Telefon steht statt der ganzen Reihe ein Knopf. Was dahinter
+  // liegt, muss trotzdem sichtbar bleiben - deshalb traegt der Knopf die Summe
+  // aller Zaehler. Sonst waere ein geschlossenes Menue ein blinder Fleck.
+  const menuAttentionCount = connectAttentionCount + Math.max(0, incomingOpenRequestCount);
+
+  function areaBadge(badge: AreaBadge | undefined) {
+    if (!badge) return null;
+    return badge.kind === "intro" ? (
+      <IncomingRequestBadge count={badge.count} />
+    ) : (
+      <ConnectAttentionBadge
+        count={badge.count}
+        label={t("connectAttentionBadge", { count: badge.count })}
+      />
+    );
+  }
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;
@@ -225,60 +364,34 @@ export function ProductShell({
                 />
               </Link>
 
+              {/* Ab 1024 Pixeln stehen die Bereiche als Pillen in der Leiste.
+                  Darunter liegen sie im aufklappbaren Menue - die Reihe hier
+                  war auf einem Telefon der groessere Teil der Hoehe. */}
               <nav
                 aria-label={t("navLabel")}
-                className="flex flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
+                className="hidden flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1 lg:flex"
               >
                 {navigationItems.map((item) => (
                   <Link
-                    key={item.label}
+                    key={item.href}
                     href={item.href}
                     aria-current={item.isActive(pathname) ? "page" : undefined}
-                    className={areaLinkClassName(item.isActive(pathname))}
+                    className={`${areaLinkClassName(item.isActive(pathname))} inline-flex items-center gap-2`}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {areaBadge(item.badge)}
                   </Link>
                 ))}
+                {/* Bleibt in der Leiste: Das Advisor-Dashboard verlinkt diese
+                    Seite nicht, sie waere sonst nicht erreichbar. */}
                 {resolvedActiveView === "advisor" ? (
-                  <>
-                    {hasConnect ? (
-                      <Link
-                        href="/connect"
-                        aria-current={pathname.startsWith("/connect") ? "page" : undefined}
-                        className={`${areaLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}
-                      >
-                        {t("areaConnect")}
-                        <ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} />
-                      </Link>
-                    ) : null}
-                    {/* Bleibt in der Leiste: Das Advisor-Dashboard verlinkt
-                        diese Seite nicht, sie waere sonst nicht erreichbar. */}
-                    <Link href={resolvedMatchingHref} className={navLinkClassName(pathname.startsWith("/advisor/report"))}>{t("advisorConnections")}</Link>
-                  </>
-                ) : (
-                  <>
-                    {hasFounder ? (
-                      <Link
-                        href="/discovery"
-                        aria-current={pathname.startsWith("/discovery") ? "page" : undefined}
-                        className={`${areaLinkClassName(pathname.startsWith("/discovery"))} inline-flex items-center gap-2`}
-                      >
-                        <span>{t("areaFind")}</span>
-                        <IncomingRequestBadge count={incomingOpenRequestCount} />
-                      </Link>
-                    ) : null}
-                    {hasConnect ? (
-                      <Link
-                        href="/connect"
-                        aria-current={pathname.startsWith("/connect") ? "page" : undefined}
-                        className={`${areaLinkClassName(pathname.startsWith("/connect"))} inline-flex items-center gap-2`}
-                      >
-                        {t("areaConnect")}
-                        <ConnectAttentionBadge count={connectAttentionCount} label={t("connectAttentionBadge", { count: connectAttentionCount })} />
-                      </Link>
-                    ) : null}
-                  </>
-                )}
+                  <Link
+                    href={resolvedMatchingHref}
+                    className={navLinkClassName(pathname.startsWith("/advisor/report"))}
+                  >
+                    {t("advisorConnections")}
+                  </Link>
+                ) : null}
               </nav>
             </div>
 
@@ -300,62 +413,218 @@ export function ProductShell({
                 min-w-0 gehoert dazu: Ohne das weigert sich ein Flex-Kind,
                 unter seine Inhaltsbreite zu schrumpfen, und laeuft ueber statt
                 zu passen.
+
+                NACHGEMELDET AM 20.09.2026: "Menuebereich im Handy ist noch ein
+                bisschen zu praesent, zu gross." Der Umbruch hatte den
+                Ueberlauf gegen HOEHE getauscht - aus einer Reihe wurden drei,
+                und die Leiste nahm ein Viertel des Bildschirms.
+
+                Deshalb jetzt zwei Fassungen: ab 1024 Pixeln diese Reihe wie
+                bisher, darunter ein Knopf mit dem Menue. Der Umbruch bleibt
+                trotzdem stehen - auch bei 1024 Pixeln kann ein langer Name die
+                Reihe noch verlaengern.
                 ----------------------------------------------------------- */}
             <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2">
-              {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
-                  gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
-                  es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
-                  war genau die Beschwerde, die es hierher gebracht hat. */}
-              {/* Das Postfach steht hier und nicht zwischen den Bereichen:
-                  Es ist ein Querschnitt wie das Profil - Gespraeche kommen
-                  aus Connect und aus Find. Der Zaehler war ohnehin schon da,
-                  er hing nur am Connect-Eintrag. */}
-              {!isSuspendedConnectOnly ? (
-                <Link
-                  href="/messages"
-                  aria-current={pathname.startsWith("/messages") ? "page" : undefined}
-                  className={`${navLinkClassName(pathname.startsWith("/messages"))} inline-flex items-center gap-2`}
-                >
-                  {t("messages")}
-                  <ConnectAttentionBadge
-                    count={unreadConnectMessageCount}
-                    label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
-                  />
-                </Link>
-              ) : null}
-              {!isSuspendedConnectOnly ? (
-                <Link
-                  href="/profile"
-                  aria-current={pathname.startsWith("/profile") ? "page" : undefined}
-                  className={navLinkClassName(pathname.startsWith("/profile"))}
-                >
-                  {t("profile")}
-                </Link>
-              ) : null}
-              <ProductFeedbackEntry
-                source="nav"
-                invitationId={resolvedFeedbackInvitationId}
-                variant="nav"
-                triggerClassName={navLinkClassName(false)}
-              />
-              <DashboardViewSwitch
-                activeView={resolvedActiveView}
-                hasFounder={hasFounder}
-                hasAdvisor={hasAdvisor}
-              />
+              <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 lg:flex">
+                {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
+                    gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
+                    es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
+                    war genau die Beschwerde, die es hierher gebracht hat. */}
+                {/* Das Postfach steht hier und nicht zwischen den Bereichen:
+                    Es ist ein Querschnitt wie das Profil - Gespraeche kommen
+                    aus Connect und aus Find. Der Zaehler war ohnehin schon da,
+                    er hing nur am Connect-Eintrag. */}
+                {!isSuspendedConnectOnly ? (
+                  <Link
+                    href="/messages"
+                    aria-current={pathname.startsWith("/messages") ? "page" : undefined}
+                    className={`${navLinkClassName(pathname.startsWith("/messages"))} inline-flex items-center gap-2`}
+                  >
+                    {t("messages")}
+                    <ConnectAttentionBadge
+                      count={unreadConnectMessageCount}
+                      label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
+                    />
+                  </Link>
+                ) : null}
+                {!isSuspendedConnectOnly ? (
+                  <Link
+                    href="/profile"
+                    aria-current={pathname.startsWith("/profile") ? "page" : undefined}
+                    className={navLinkClassName(pathname.startsWith("/profile"))}
+                  >
+                    {t("profile")}
+                  </Link>
+                ) : null}
+                <ProductFeedbackEntry
+                  source="nav"
+                  invitationId={resolvedFeedbackInvitationId}
+                  variant="nav"
+                  triggerClassName={navLinkClassName(false)}
+                />
+                <DashboardViewSwitch
+                  activeView={resolvedActiveView}
+                  hasFounder={hasFounder}
+                  hasAdvisor={hasAdvisor}
+                />
 
-              <LanguageSwitcher />
-              <ProfileMenu
-                displayName={displayName}
-                avatarId={avatarId}
-                avatarImageUrl={avatarImageUrl}
-                accountOnly={isSuspendedConnectOnly}
-              />
+                <LanguageSwitcher />
+                <ProfileMenu
+                  displayName={displayName}
+                  avatarId={avatarId}
+                  avatarImageUrl={avatarImageUrl}
+                  accountOnly={isSuspendedConnectOnly}
+                />
+              </div>
+
+              {/* Bis 1024 Pixel genau ein Element auf der rechten Seite. */}
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen((current) => !current)}
+                aria-expanded={isMenuOpen}
+                aria-controls={MOBILE_MENU_ID}
+                className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 lg:hidden"
+              >
+                <MenuGlyph isOpen={isMenuOpen} />
+                <span>{isMenuOpen ? t("menuClose") : t("menuOpen")}</span>
+                {/* Der Zaehler steht AUF dem Knopf, nicht nur dahinter: Ein
+                    geschlossenes Menue darf nicht verbergen, dass etwas
+                    wartet. */}
+                {!isMenuOpen ? (
+                  <ConnectAttentionBadge
+                    count={menuAttentionCount}
+                    label={t("menuAttentionBadge", { count: menuAttentionCount })}
+                  />
+                ) : null}
+              </button>
             </div>
           </div>
 
+          {/* -------------------------------------------------------------
+              Das aufklappbare Menue. Es steht IM Kopfbereich und schiebt ihn
+              auf, statt sich als Schicht darueber zu legen: Eine Schicht
+              braucht Hintergrund, Fokusfalle und Scroll-Sperre, und jeder
+              dieser drei Teile ist eine eigene Fehlerquelle. Aufgeschoben
+              scrollt die Seite einfach darunter weiter.
+              ------------------------------------------------------------- */}
+          {isMenuOpen ? (
+            <div
+              id={MOBILE_MENU_ID}
+              className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-200/80 bg-white/95 px-4 pb-4 pt-2 sm:px-6 lg:hidden"
+            >
+              {/* Wer hier angemeldet ist. Am Rechner steht der Name neben dem
+                  Bild in der Leiste; auf dem Telefon war er nirgends zu sehen,
+                  und in einer App auf dem Startbildschirm ist das die Frage,
+                  die man zuerst hat. */}
+              <div className="flex min-h-11 items-center gap-3 px-3 py-2">
+                <ProfileAvatar
+                  displayName={normalizeDisplayName(displayName) || t("profileFallback")}
+                  avatarId={avatarId}
+                  imageUrl={avatarImageUrl}
+                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                  fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
+                />
+                <span className="min-w-0 truncate text-sm font-semibold text-slate-900">
+                  {normalizeDisplayName(displayName) || t("profileFallback")}
+                </span>
+              </div>
+
+              <nav aria-label={t("navLabel")} className="flex flex-col gap-1">
+                {navigationItems.map((item) => (
+                  <div key={item.href} className="flex flex-col gap-1">
+                    <MobileMenuLink
+                      href={item.href}
+                      active={item.isActive(pathname)}
+                      onNavigate={closeMenu}
+                      badge={areaBadge(item.badge)}
+                    >
+                      {item.label}
+                    </MobileMenuLink>
+                    {/* Die Unterseiten nur bei dem Bereich, in dem man steht -
+                        dieselbe Regel wie in der zweiten Reihe am Rechner. */}
+                    {item.isActive(pathname)
+                      ? (item.subItems ?? []).map((subItem) => (
+                          <MobileMenuLink
+                            key={subItem.href}
+                            href={subItem.href}
+                            active={subItem.isActive(pathname)}
+                            onNavigate={closeMenu}
+                            indented
+                          >
+                            {subItem.label}
+                          </MobileMenuLink>
+                        ))
+                      : null}
+                  </div>
+                ))}
+                {resolvedActiveView === "advisor" ? (
+                  <MobileMenuLink
+                    href={resolvedMatchingHref}
+                    active={pathname.startsWith("/advisor/report")}
+                    onNavigate={closeMenu}
+                  >
+                    {t("advisorConnections")}
+                  </MobileMenuLink>
+                ) : null}
+              </nav>
+
+              <div className="mt-2 flex flex-col gap-1 border-t border-slate-200/80 pt-2">
+                {!isSuspendedConnectOnly ? (
+                  <MobileMenuLink
+                    href="/messages"
+                    active={pathname.startsWith("/messages")}
+                    onNavigate={closeMenu}
+                    badge={
+                      <ConnectAttentionBadge
+                        count={unreadConnectMessageCount}
+                        label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
+                      />
+                    }
+                  >
+                    {t("messages")}
+                  </MobileMenuLink>
+                ) : null}
+                {!isSuspendedConnectOnly ? (
+                  <MobileMenuLink
+                    href="/profile"
+                    active={pathname.startsWith("/profile")}
+                    onNavigate={closeMenu}
+                  >
+                    {t("profile")}
+                  </MobileMenuLink>
+                ) : null}
+                <MobileMenuLink href="/account" active={pathname.startsWith("/account")} onNavigate={closeMenu}>
+                  {t("account")}
+                </MobileMenuLink>
+                <ProductFeedbackEntry
+                  source="nav"
+                  invitationId={resolvedFeedbackInvitationId}
+                  variant="nav"
+                  triggerClassName={MOBILE_MENU_ROW_CLASS}
+                />
+                <form action={signOutAction}>
+                  <button type="submit" className={`${MOBILE_MENU_ROW_CLASS} w-full text-left`}>
+                    {t("logout")}
+                  </button>
+                </form>
+              </div>
+
+              <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-200/80 pt-3">
+                <LanguageSwitcher />
+                <DashboardViewSwitch
+                  activeView={resolvedActiveView}
+                  hasFounder={hasFounder}
+                  hasAdvisor={hasAdvisor}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {/* Die zweite Reihe gilt ab 1024 Pixeln. Auf dem Telefon stehen
+              dieselben Unterseiten im Menue unter ihrem Bereich - eine zweite
+              Leiste waere dort nur weitere Hoehe. */}
           {activeAreaSubItems.length > 0 ? (
-            <div className="mx-auto w-full max-w-7xl px-4 pb-2 sm:px-6 md:px-10 xl:px-12">
+            <div className="mx-auto hidden w-full max-w-7xl px-4 pb-2 sm:px-6 md:px-10 lg:block xl:px-12">
               <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
                 {activeAreaSubItems.map((subItem) => (
                   <Link

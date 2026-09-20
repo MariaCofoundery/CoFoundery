@@ -208,7 +208,9 @@ test("product shell and Founder dashboard enforce capability separation", () => 
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
   assert.match(shell, /isConnectOnly = hasConnect && !hasFounder && !hasAdvisor/);
-  assert.match(shell, /\{hasFounder \?/);
+  // Find steht nur Menschen mit Founder-Zugang offen. Die Bedingung steht seit
+  // dem 20.09.2026 an der Bereichsliste statt im JSX der Leiste.
+  assert.match(shell, /hasFounder \? \[findItem\]/);
   assert.match(dashboard, /if \(!roleViews\.hasFounder\)/);
   assert.match(dashboard, /hasConnect === true \? "\/connect" : "\/start"/);
 });

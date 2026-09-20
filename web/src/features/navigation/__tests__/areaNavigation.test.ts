@@ -17,19 +17,32 @@ const SHELL = "src/features/navigation/ProductShell.tsx";
 
 test("the bar carries areas, and only areas", () => {
   const shell = source(SHELL);
+
+  // Seit dem 20.09.2026 gibt es ZWEI Ansichten derselben Bereiche: die Pillen
+  // ab 1024 Pixeln und das aufklappbare Menue darunter. Beide lesen
+  // `navigationItems` - deshalb prueft dieser Test die Liste und nicht mehr
+  // das JSX einer der beiden Ansichten.
+  for (const area of ["areaAlign", "areaFind", "areaConnect"]) {
+    assert.match(shell, new RegExp(`label: t\\("${area}"\\)`), `${area} fehlt als Bereich`);
+  }
+
+  // In der zusammengesetzten Liste stehen nur benannte Eintraege. Stuende dort
+  // eine Adresse, waere sie in genau einer der beiden Ansichten sichtbar.
+  const assembledAt = shell.indexOf("const navigationItems: NavigationItem[] = [");
+  const subItemsAt = shell.indexOf("const activeAreaSubItems");
+  assert.ok(assembledAt > -1 && subItemsAt > assembledAt);
+  assert.doesNotMatch(
+    shell.slice(assembledAt, subItemsAt),
+    /href/,
+    "ein Bereich steht direkt in der Liste statt als benannter Eintrag"
+  );
+
+  // Ein Querschnitt und eine Unterseite gehoeren nicht zwischen die Bereiche.
   const barStart = shell.indexOf('aria-label={t("navLabel")}');
   const barEnd = shell.indexOf("</nav>", barStart);
   assert.ok(barStart > -1 && barEnd > barStart);
   const bar = shell.slice(barStart, barEnd);
-
-  // Align kommt ueber navigationItems in die Leiste, Find und Connect stehen
-  // direkt darin - geprueft wird beides an seiner Stelle.
-  assert.match(shell, /label: t\("areaAlign"\)/);
   assert.match(bar, /navigationItems\.map/);
-  for (const area of ["areaFind", "areaConnect"]) {
-    assert.match(bar, new RegExp(`t\\("${area}"\\)`), `${area} fehlt in der Leiste`);
-  }
-  // Ein Querschnitt und eine Unterseite gehoeren nicht dazwischen.
   assert.doesNotMatch(bar, /href="\/profile"/, "das Profil ist kein Bereich");
   assert.doesNotMatch(bar, /href="\/connections"/, "Verbindungen ist eine Seite in Align");
 });
@@ -100,8 +113,10 @@ test("the routes did not move with the labels", () => {
   const shell = source(SHELL);
   // Beschriftungen und Adressen sind zwei Entscheidungen. Die Adressen stecken
   // in Magic Links, Lesezeichen, der Sitemap und in Rueckwegen.
-  assert.match(shell, /href="\/discovery"/);
-  assert.match(shell, /href="\/connect"/);
+  // href[:=]: Die Bereiche stehen als Liste (href: "..."), alles andere
+  // weiterhin als Attribut im JSX (href="...").
+  assert.match(shell, /href[:=]\s*"\/discovery"/);
+  assert.match(shell, /href[:=]\s*"\/connect"/);
   assert.doesNotMatch(shell, /href="\/find"/);
   assert.doesNotMatch(shell, /href="\/align"/);
 });

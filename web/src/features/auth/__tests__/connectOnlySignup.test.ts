@@ -98,9 +98,11 @@ test("existing Founder and Advisor product entry remains unchanged", () => {
 test("Connect-only navigation exposes Connect and Account without Founder or Advisor links", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
   assert.match(shell, /isConnectOnly = hasConnect && !hasFounder && !hasAdvisor/);
-  assert.match(shell, /const navigationItems: NavigationItem\[\] = isConnectOnly \? \[\]/);
+  assert.match(shell, /const alignItem: NavigationItem\[\] = isConnectOnly \? \[\]/);
   // Die Form hat sich geaendert, die Zusage nicht: Find haengt an hasFounder.
-  assert.match(shell, /\{hasFounder \? \([\s\S]{0,200}href="\/discovery"/);
+  // Seit dem aufklappbaren Menue auf dem Telefon steht die Bedingung an der
+  // Liste und nicht mehr im JSX - es gibt zwei Ansichten und eine Liste.
+  assert.match(shell, /hasFounder \? \[findItem\] : \[\]/);
   assert.match(shell, /href="\/account"/);
   assert.match(shell, /isSuspendedConnectOnly[\s\S]*"\/account"/);
 });

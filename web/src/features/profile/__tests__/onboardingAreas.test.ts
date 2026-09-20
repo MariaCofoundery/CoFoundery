@@ -127,10 +127,13 @@ test("die angezeigten Bereiche bilden ab, was die Datenbank tatsaechlich tut", (
 
   // Find haengt an hasFounder. Deshalb ist die Frage "was hast du vor" und
   // nicht "waehle deine Bereiche": Find ohne Align gibt es nicht.
-  assert.match(
-    source("src/features/navigation/ProductShell.tsx"),
-    /\{hasFounder \? \([\s\S]{0,200}href="\/discovery"/
-  );
+  //
+  // Diese Bedingung stand bis zum 20.09.2026 direkt im JSX der Leiste. Seit
+  // dem aufklappbaren Menue auf dem Telefon lesen zwei Ansichten dieselbe
+  // Liste, und die Bedingung steht einmal an der Liste - dieselbe Aussage.
+  const shell = source("src/features/navigation/ProductShell.tsx");
+  assert.match(shell, /const findItem: NavigationItem = \{\s*href: "\/discovery"/);
+  assert.match(shell, /hasFounder \? \[findItem\] : \[\]/);
 });
 
 test("jeder Bereich wird beim Namen genannt und erklaert", () => {
