@@ -233,6 +233,19 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+# DIE ANMELDEMAILS LIEGEN IM DASHBOARD, NICHT HIER.
+#
+# In ./templates/ stehen die Fassungen von "Confirm signup" und "Magic Link"
+# als Dateien - damit nachlesbar ist, was ankommt. Ausgeliefert werden sie von
+# dort NICHT: Diese Datei gilt fuer den lokalen Stapel, die Produktion liest
+# ihre Vorlagen aus dem Supabase-Dashboard
+# (Authentication -> Email Templates). Wer den Text aendert, aendert ihn an
+# beiden Stellen.
+#
+# Beide Vorlagen MUESSEN {{ .Token }} enthalten. Ohne das traegt die Mail nur
+# den Link, und die Anmeldung mit Code in der App auf dem Startbildschirm
+# laeuft ins Leere - ohne Fehlermeldung, weil das Feld ja da ist.
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true

@@ -1,0 +1,47 @@
+<!--
+  Die erste Mail, die jemand von CoFoundery bekommt.
+
+  WO SIE WIRKLICH LIEGT: im Supabase-Dashboard unter
+  Authentication -> Email Templates -> "Confirm signup". Diese Datei ist die
+  Fassung, die dort hineingehoert - sie wird von hier aus NICHT ausgeliefert.
+  Wer den Text aendert, aendert ihn an beiden Stellen, sonst weiss beim
+  naechsten Mal niemand mehr, was ankommt.
+
+  WARUM SIE ANDERS KLINGT ALS DER ANMELDELINK:
+    Hier ist jemand zum ersten Mal da. Der Code ist an dieser Stelle kein Weg
+    in eine App auf dem Startbildschirm - die gibt es noch gar nicht -,
+    sondern schlicht die Rueckfallebene, falls der Link nicht funktioniert.
+    Derselbe Satz wie in der anderen Mail waere hier ein Raetsel.
+
+  {{ .ConfirmationURL }} und {{ .Token }} setzt Supabase ein. Die geschweiften
+  Klammern, der Punkt und die Leerzeichen muessen genau so stehen.
+
+  Betreff: Willkommen bei CoFoundery Align
+-->
+<div style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
+  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">
+    CoFoundery Align
+  </p>
+  <h2 style="margin:0 0 16px;font-size:24px;">Willkommen</h2>
+
+  <p style="margin:0 0 20px;">
+    Du hast dich mit dieser Adresse bei CoFoundery angemeldet. Ein Klick, und du bist drin:
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="{{ .ConfirmationURL }}"
+       style="display:inline-block;padding:14px 22px;border-radius:999px;background:#6d28d9;color:#ffffff;text-decoration:none;font-weight:700;">
+      Anmeldung bestätigen
+    </a>
+  </p>
+
+  <p style="margin:0 0 8px;color:#334155;">
+    Falls der Link nicht funktioniert, kannst du stattdessen diesen Code eingeben:
+  </p>
+  <p style="margin:0 0 20px;font-size:28px;letter-spacing:6px;font-weight:700;">{{ .Token }}</p>
+
+  <p style="margin:0;color:#64748b;font-size:13px;">
+    Beides gilt eine Stunde. Wenn du dich nicht angemeldet hast, ignorier diese Mail einfach –
+    ohne den Link passiert nichts.
+  </p>
+</div>
