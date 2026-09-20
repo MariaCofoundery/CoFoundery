@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
@@ -40,6 +40,30 @@ export const metadata: Metadata = {
   title: "CoFoundery Align | Co-Founder Matching mit Werte-Fokus",
   description:
     "CoFoundery Align verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung.",
+  applicationName: "CoFoundery Align",
+  // Auf dem Startbildschirm eines iPhones ist unter dem Symbol nach etwa
+  // zwoelf Zeichen Schluss. Ohne `title` stand dort der Seitentitel bis zum
+  // ersten Abschneiden - also "CoFoundery Al...".
+  appleWebApp: {
+    capable: true,
+    title: "CoFoundery",
+    statusBarStyle: "default",
+  },
+  // Die Symbole selbst liegen als Dateien: `src/app/icon.png` fuer den
+  // Browser-Tab und `src/app/apple-icon.png` fuer den Startbildschirm. Next
+  // verlinkt sie von dort aus selbst - hier nichts eintragen, sonst stehen
+  // beide Wege im Kopf der Seite.
+};
+
+export const viewport: Viewport = {
+  // Sobald diese Angabe existiert, ersetzt sie die Voreinstellung von Next
+  // vollstaendig - width und initialScale muessen deshalb mit dabei stehen.
+  width: "device-width",
+  initialScale: 1,
+  // Kein maximumScale und kein userScalable: false. Das Wegnehmen der
+  // Zwei-Finger-Vergroesserung ist auf Telefonen eine verbreitete Unsitte und
+  // schliesst Menschen aus, die vergroessern muessen.
+  themeColor: "#eef3f9",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
