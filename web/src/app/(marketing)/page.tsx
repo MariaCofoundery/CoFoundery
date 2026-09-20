@@ -4,6 +4,7 @@ import { HowItWorksSection } from "@/components/marketing/HowItWorksSection";
 import { LandingHero } from "@/components/marketing/LandingHero";
 import { LandingTopNav } from "@/components/marketing/LandingTopNav";
 import { getMarketingContent } from "@/data/marketing";
+import { InstalledAppEntry } from "@/features/navigation/InstalledAppEntry";
 import { getRequestLocale } from "@/i18n/getLocale";
 
 export default async function Page() {
@@ -22,6 +23,10 @@ export default async function Page() {
       />
       <div aria-hidden className="pointer-events-none absolute -left-32 top-20 h-96 w-96 rounded-full bg-[color:var(--blob-a)] blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute -right-24 bottom-6 h-96 w-96 rounded-full bg-[color:var(--blob-b)] blur-3xl" />
+
+      {/* In der App auf dem Startbildschirm geht es direkt in den eigenen
+          Bereich weiter. Im Browser bleibt diese Seite, was sie ist. */}
+      <InstalledAppEntry />
 
       <LandingTopNav />
 
