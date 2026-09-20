@@ -3,6 +3,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
+import { EmailCodeForm } from "@/features/auth/EmailCodeForm";
 import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
 type MagicLinkFormProps = {
@@ -88,6 +89,7 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
   };
 
   return (
+    <>
     <form onSubmit={onSubmit} className="grid gap-3">
       <label htmlFor="email" className="text-sm font-medium text-[color:var(--ink)]">
         {t("emailLabel")}
@@ -127,8 +129,16 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
         <p className="text-xs text-[color:var(--muted)]">{t("noMailHint")}</p>
       ) : null}
     </form>
+
+    {/* Neben dem Formular und nicht darin: Ein Formular im Formular ist kein
+        gueltiges HTML, und der Browser wirft das innere kommentarlos weg.
+        Die Adresse steht hier im Zustand - auf /start kommt sie aus einem
+        Cookie, weil dort zwischendurch weitergeleitet wird. */}
+    {status === "sent" ? <EmailCodeForm defaultEmail={email} nextPath={nextPath} /> : null}
+    </>
   );
 }
+
 
 /**
  * Ob Supabase wegen des Stundenlimits abgelehnt hat.

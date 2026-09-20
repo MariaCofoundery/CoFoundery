@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -9,6 +10,11 @@ import {
   getAllowedBetaCodes,
   isValidBetaAccessCode,
 } from "@/features/auth/betaAccess";
+import { EmailCodeForm } from "@/features/auth/EmailCodeForm";
+import {
+  PENDING_EMAIL_COOKIE,
+  PENDING_EMAIL_MAX_AGE,
+} from "@/features/auth/pendingEmailCookie";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -96,6 +102,7 @@ export default async function StartPage({
   } = await getRequestUser();
   const nextPath = normalizeNextPath(params.next);
   const message = statusMessage(params.status, t);
+  const pendingEmail = (await cookies()).get(PENDING_EMAIL_COOKIE)?.value ?? null;
 
   if (user) {
     const destination = await resolvePostAuthRedirectPath(supabase, nextPath);
@@ -149,6 +156,16 @@ export default async function StartPage({
     if (error) {
       redirect(buildStartHref("send_failed", redirectNextPath));
     }
+
+    // Damit das Codefeld nach der Weiterleitung weiss, wen es fragt. Im Cookie
+    // und nicht in der Adresszeile - siehe pendingEmailCookie.ts.
+    (await cookies()).set(PENDING_EMAIL_COOKIE, email, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: PENDING_EMAIL_MAX_AGE,
+      path: "/",
+    });
 
     redirect(buildStartHref("sent", redirectNextPath));
   }
@@ -208,6 +225,12 @@ export default async function StartPage({
             {t("start.submit")}
           </button>
         </form>
+
+        {/* Der Code ist der zweite Weg und steht deshalb unter dem ersten. Er
+            erscheint, sobald eine Mail unterwegs ist - vorher gibt es nichts
+            einzutippen, und ein leeres Feld waere nur eine Frage mehr. */}
+        {pendingEmail ? <EmailCodeForm defaultEmail={pendingEmail} nextPath={nextPath} /> : null}
+
         <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row">
           <Link
             href={`/login?next=${encodeURIComponent(nextPath)}`}
