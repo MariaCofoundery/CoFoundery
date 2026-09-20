@@ -567,6 +567,13 @@
         "title": "The person accompanying you has deleted their account",
         "text": "That access has ended – nobody reaches your report or your setup through it any more. If you would like to be accompanied again, you can invite someone new."
       }
+    },
+    "ai": {
+      "title": "AI analysis",
+      "text": "Some analyses – suggestions drawn from your own texts, for instance – are computed by a language model on a machine of ours, not at a large provider. Your texts do not leave the house for it. The price is that this machine is not always running.",
+      "online": "Available right now",
+      "offline": "Not available right now",
+      "pending": "{count, plural, one {One analysis is waiting and will run as soon as things resume.} other {# analyses are waiting and will run as soon as things resume.}}"
     }
   },
   "outlook": {

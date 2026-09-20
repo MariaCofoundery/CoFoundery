@@ -9,6 +9,8 @@ import {
   AccountPreferencesSection,
 } from "@/features/account/AccountPreferencesSection";
 import { isNotificationKind, type NotificationKind } from "@/features/account/notificationKinds";
+import { AiAvailabilitySection } from "@/features/ai/AiAvailabilitySection";
+import { getAiAvailability, getOwnPendingAiJobCount } from "@/features/ai/aiAvailability";
 import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
 import { getResearchConsentState } from "@/features/research/consent";
 import { normalizeLocale, type AppLocale } from "@/i18n/config";
@@ -37,6 +39,8 @@ export default async function AccountPage({
     optedOutRows,
     researchConsentState,
     pendingInvitations,
+    aiAvailable,
+    pendingAiJobs,
   ] = await Promise.all([
     searchParams,
     getDashboardRoleViews(user.id).catch(() => ({ hasFounder: false, hasAdvisor: false, roles: [] })),
@@ -67,6 +71,8 @@ export default async function AccountPage({
     )
       .then(({ count }) => count ?? 0)
       .catch(() => 0),
+    getAiAvailability(supabase).catch(() => false),
+    getOwnPendingAiJobCount(supabase).catch(() => 0),
   ]);
   // Nur bekannte Schluessel an t() geben - ein manipulierter Parameter wuerde
   // sonst als roher Schluesselpfad auf der Seite landen.
@@ -101,6 +107,9 @@ export default async function AccountPage({
 
       <AccountDataSection>
         <ResearchConsentSettings initialState={researchConsentState} />
+        {/* Wo gerechnet wird, gehoert zu "deine Daten" - nicht in eine
+            technische Ecke. */}
+        <AiAvailabilitySection available={aiAvailable} pendingJobs={pendingAiJobs} />
       </AccountDataSection>
 
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">

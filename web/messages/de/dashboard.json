@@ -567,6 +567,13 @@
         "title": "Die Person, die euch begleitet hat, hat ihr Konto gelöscht",
         "text": "Die Freigabe ist damit beendet – niemand hat über sie noch Zugang zu eurem Report oder eurem Setup. Wenn ihr weiter Begleitung möchtet, könnt ihr jemanden neu einladen."
       }
+    },
+    "ai": {
+      "title": "KI-Auswertung",
+      "text": "Einzelne Auswertungen – etwa Vorschläge aus deinen eigenen Texten – rechnet ein Sprachmodell auf einem Rechner der Betreiberin, nicht bei einem großen Anbieter. Deine Texte verlassen dafür nicht unser Haus. Der Preis ist, dass dieser Rechner nicht immer läuft.",
+      "online": "Gerade verfügbar",
+      "offline": "Gerade nicht verfügbar",
+      "pending": "{count, plural, one {Eine Auswertung wartet und wird gerechnet, sobald es weitergeht.} other {# Auswertungen warten und werden gerechnet, sobald es weitergeht.}}"
     }
   },
   "outlook": {

@@ -35,6 +35,58 @@ Notes:
 - `INVITE_FROM_EMAIL` must be a verified sender/domain in Resend.
 - If one of these variables is missing, invites are still saved in the database, but no email is sent.
 
+## AI analysis on a local model
+
+The model runs on a laptop, not in the cloud. **The laptop asks the database for
+work; nothing ever calls the laptop.** No open port, no tunnel, no endpoint a
+stranger could reach — and when the laptop is off, work simply waits.
+
+```bash
+brew install ollama
+ollama serve
+ollama pull qwen3.5:4b
+```
+
+```bash
+npm run ai:eval      # measures the model against the curated term list
+npm run ai:worker    # takes work out of the queue
+```
+
+The worker needs an account of its own — **not** the service-role key. In the
+Supabase dashboard under Authentication → Users, add a user with email and
+password (auto-confirm), then put its id on the allowlist:
+
+```sql
+insert into public.ai_workers (user_id, label)
+values ('<the new user id>', 'Laptop');
+```
+
+```bash
+AI_WORKER_EMAIL=...
+AI_WORKER_PASSWORD=...
+AI_MODEL=qwen3.5:4b            # optional, this is the default
+OLLAMA_URL=http://127.0.0.1:11434   # optional
+```
+
+That account may do exactly three things: take a job, finish it, send a
+heartbeat. It cannot even *read* the queue — a pgTAP case pins that. If the
+laptop is lost, the damage stops there.
+
+Notes:
+- `qwen3.5` reasons before answering, which with a forced schema runs past any
+  sane timeout. The client disables it (`think: false`); that is also why no
+  hidden chain of thought is ever received or stored.
+- The model only ever sees a task plus the person's text as *material*, never as
+  instructions, and every suggestion must carry verbatim quotes that are checked
+  against the source. Nothing a model produces is authoritative before a person
+  confirms it.
+- Availability in the app comes from a heartbeat row (`get_ai_availability`),
+  not from a health call into the laptop. Two minutes of grace at a 30-second
+  beat.
+- Measured on 20.09.2026 with `qwen3.5:4b` on an M3/16 GB over ten invented
+  cases: model 10/10 found with 1 surplus, term list 3/10 with 8 surplus,
+  6–12 s per case.
+
 ## Notifications on the device (Web Push)
 
 Generate a VAPID key pair once and put it in the environment:
