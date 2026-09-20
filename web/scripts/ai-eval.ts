@@ -1,60 +1,71 @@
 /**
  * Misst das Sprachmodell gegen die Begriffsliste.
  *
- *   node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/ai-eval.ts
- *   (oder: npm run ai:eval)
+ *   npm run ai:eval
  *
  * WARUM EIN SKRIPT UND KEIN TEST: Es braucht ein laufendes Ollama. `npm test`
  * muss auf jedem Rechner durchlaufen, auch mit ausgeschaltetem Laptop - ein
- * Test, der von einem lokalen Dienst abhaengt, waere auf jedem anderen Rechner
- * rot und damit wertlos.
+ * Test, der von einem lokalen Dienst abhaengt, waere anderswo rot und damit
+ * wertlos.
  *
  * WAS ES BEANTWORTET: Ist das Modell bei unseren Texten besser als die Liste?
- * Die Liste ist dabei nicht der Gegner, sondern die Messlatte: Sie kostet
- * nichts, laeuft immer und ist vollstaendig erklaerbar. Das Modell muss den
- * Aufwand rechtfertigen, nicht umgekehrt.
+ * Die Liste ist nicht der Gegner, sondern die Messlatte: Sie kostet nichts,
+ * laeuft immer und ist vollstaendig erklaerbar. Das Modell muss den Aufwand
+ * rechtfertigen, nicht umgekehrt.
  *
- * Gezaehlt werden vier Dinge, in dieser Reihenfolge der Wichtigkeit:
- *
- *   ERFUNDEN   Vorschlaege ohne Grundlage im Text. Jeder einzelne ist ein
- *              Ausschlussgrund - eine falsche Capability landet in einem
- *              Profil, das andere Menschen lesen.
- *   GEFUNDEN   Wie viel von dem, was drinsteht, wird erkannt.
- *   RUHE       Faelle, in denen nichts drinsteht und nichts vorgeschlagen wird.
- *   DAUER      Wie lange es braucht.
+ * KEINE ANTWORT IST NICHT "NICHTS GEFUNDEN".
+ *   Der erste Lauf am 20.09.2026 zeigte zehnmal "Modell: –" und darunter
+ *   "kein zusaetzliches Rauschen" - in Wahrheit war jeder einzelne Aufruf in
+ *   den Zeitablauf gelaufen und das Modell hatte nie geantwortet. Das Urteil
+ *   war also ein Lob fuer Schweigen. Seitdem werden Ausfaelle getrennt
+ *   gezaehlt und das Ergebnis ist ungueltig, solange es welche gibt.
  */
 
 import { readFileSync } from "node:fs";
 
 import { analyzeNarrativeWithRules, type NarrativeAnalysis } from "@/features/capability/narrativeAnalysis";
-import { createModelNarrativeAnalyzer } from "@/features/capability/narrativeAnalysisModel";
+import {
+  createModelNarrativeAnalyzer,
+  type AnalyzableArea,
+} from "@/features/capability/narrativeAnalysisModel";
 import { getAiModel, isModelReachable } from "@/lib/ai/ollama";
 
 type EvalCase = { id: string; narrative: string; expected: string[]; warum?: string };
 
 const MIGRATION = "../supabase/migrations/20260907160000_create_capability_snapshot_v01.sql";
+const LABELS = "messages/de/capability.json";
 
 /**
- * Das Vokabular aus der Migration, nicht aus einer Liste im Code.
+ * Das Vokabular aus der Migration, die Beschriftungen aus i18n.
  *
- * `capability_areas` ist die eine Wahrheit. Eine zweite Aufzaehlung hier waere
- * genau die Drift, vor der die Migration selbst warnt.
+ * Beides dort, wo es hingehoert: `capability_areas` ist die eine Wahrheit fuer
+ * die IDs, und die Migration sagt selbst, dass Anzeigetexte in i18n liegen.
+ * Eine Liste im Skript waere die naechste, die auseinanderlaeuft.
  */
-function readAreaIds() {
+function readAreas(): AnalyzableArea[] {
   const sql = readFileSync(MIGRATION, "utf8");
   const ids = [...sql.matchAll(/\('([a-z_0-9]+)',\s*'[a-z_]+',\s*\d+\)/g)].map((match) => match[1]);
-  const unique = [...new Set(ids)].filter((id) => id !== "other");
-  if (unique.length < 20) throw new Error("Vokabular nicht gefunden - hat sich die Migration geaendert?");
-  return unique;
+  const labels = (JSON.parse(readFileSync(LABELS, "utf8")) as { areaLabels: Record<string, string> })
+    .areaLabels;
+
+  const areas = [...new Set(ids)]
+    .filter((id) => id !== "other")
+    .map((id) => ({ id, label: labels[id] ?? id }));
+
+  if (areas.length < 20) throw new Error("Vokabular nicht gefunden - hat sich die Migration geaendert?");
+  const ohneLabel = areas.filter((area) => area.label === area.id);
+  if (ohneLabel.length > 0) {
+    console.warn(`Ohne Beschriftung: ${ohneLabel.map((area) => area.id).join(", ")}\n`);
+  }
+  return areas;
 }
 
 function describe(analysis: NarrativeAnalysis) {
-  if (analysis.areas.length === 0) return "–";
-  return analysis.areas.map((area) => area.areaId).join(", ");
+  return analysis.areas.length === 0 ? "–" : analysis.areas.map((area) => area.areaId).join(", ");
 }
 
 async function main() {
-  const areaIds = readAreaIds();
+  const areas = readAreas();
   const { cases } = JSON.parse(readFileSync("scripts/ai-eval-cases.json", "utf8")) as {
     cases: EvalCase[];
   };
@@ -64,8 +75,8 @@ async function main() {
       [
         "Das Modell ist nicht erreichbar.",
         "",
-        "  1. ollama serve         (laeuft es schon, ist das hier der falsche Port)",
-        `  2. ollama pull ${getAiModel()}`,
+        "  ollama serve",
+        `  ollama pull ${getAiModel()}`,
         "",
         "Danach noch einmal.",
       ].join("\n")
@@ -74,13 +85,17 @@ async function main() {
     return;
   }
 
-  console.log(`Modell: ${getAiModel()}   Bereiche: ${areaIds.length}   Faelle: ${cases.length}\n`);
+  console.log(`Modell: ${getAiModel()}   Bereiche: ${areas.length}   Faelle: ${cases.length}\n`);
 
+  // Der Rueckfall ist im Auswertungslauf kein Ergebnis, sondern ein Befund:
+  // Hier soll sichtbar werden, was das MODELL antwortet.
+  let noAnswer = false;
   const analyzeWithModel = createModelNarrativeAnalyzer({
-    areaIds,
-    // Im Auswertungslauf gibt es keinen Rueckfall: Wir wollen sehen, was das
-    // Modell antwortet, nicht was die Liste daraus macht.
-    fallback: async () => ({ areas: [], strength: null, engine: "model" }),
+    areas,
+    fallback: async () => {
+      noAnswer = true;
+      return { areas: [], strength: null, engine: "model" };
+    },
   });
 
   let rulesFound = 0;
@@ -88,6 +103,7 @@ async function main() {
   let expectedTotal = 0;
   let modelExtra = 0;
   let rulesExtra = 0;
+  let failures = 0;
   let totalMs = 0;
 
   for (const testCase of cases) {
@@ -95,6 +111,8 @@ async function main() {
     expectedTotal += expected.size;
 
     const rules = await analyzeNarrativeWithRules({ narrative: testCase.narrative, locale: "de" });
+
+    noAnswer = false;
     const startedAt = Date.now();
     const model = await analyzeWithModel({ narrative: testCase.narrative, locale: "de" });
     const durationMs = Date.now() - startedAt;
@@ -106,15 +124,21 @@ async function main() {
       analysis.areas.filter((area) => !expected.has(area.areaId)).length;
 
     rulesFound += hit(rules);
-    modelFound += hit(model);
     rulesExtra += extra(rules);
-    modelExtra += extra(model);
+    if (noAnswer) {
+      failures += 1;
+    } else {
+      modelFound += hit(model);
+      modelExtra += extra(model);
+    }
 
-    const mark = extra(model) > 0 ? "!" : hit(model) === expected.size ? "+" : "~";
+    const mark = noAnswer ? "?" : extra(model) > 0 ? "!" : hit(model) === expected.size ? "+" : "~";
     console.log(`${mark} ${testCase.id}  (${(durationMs / 1000).toFixed(1)}s)`);
     console.log(`    erwartet: ${[...expected].join(", ") || "–"}`);
     console.log(`    Regeln:   ${describe(rules)}`);
-    console.log(`    Modell:   ${describe(model)}`);
+    console.log(
+      `    Modell:   ${noAnswer ? "KEINE ANTWORT (Zeitablauf oder nicht erreichbar)" : describe(model)}`
+    );
     if (model.strength) console.log(`    Stärke:   ${model.strength}`);
     for (const area of model.areas) {
       console.log(`      ${area.areaId} ← „${area.matchedTerms[0]}“`);
@@ -122,15 +146,28 @@ async function main() {
     console.log();
   }
 
-  console.log("─".repeat(60));
-  console.log(`gefunden   Regeln ${rulesFound}/${expectedTotal}   Modell ${modelFound}/${expectedTotal}`);
-  console.log(`zusätzlich Regeln ${rulesExtra}          Modell ${modelExtra}`);
-  console.log(`Dauer      ${(totalMs / cases.length / 1000).toFixed(1)}s je Fall`);
+  const answered = cases.length - failures;
+  console.log("─".repeat(64));
+  console.log(`gefunden    Regeln ${rulesFound}/${expectedTotal}   Modell ${modelFound}/${expectedTotal}`);
+  console.log(`zusätzlich  Regeln ${rulesExtra}           Modell ${modelExtra}`);
+  console.log(`Dauer       ${(totalMs / cases.length / 1000).toFixed(1)}s je Fall`);
   console.log();
+
+  if (failures > 0) {
+    console.log(
+      `${failures} von ${cases.length} Fällen ohne Antwort. Das Ergebnis sagt nichts über die Qualität ` +
+        `aus, solange das so ist - erst den Ausfall klären.`
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   console.log(
     modelExtra > rulesExtra
-      ? "Das Modell schlägt mehr Unbelegtes vor als die Liste. Das ist der Ausschlussgrund, nicht die Trefferquote."
-      : "Kein zusätzliches Rauschen gegenüber der Liste."
+      ? `Das Modell schlägt mehr Unbelegtes vor als die Liste (${modelExtra} gegen ${rulesExtra}). ` +
+          `Das ist der Ausschlussgrund, nicht die Trefferquote.`
+      : `Kein zusätzliches Rauschen gegenüber der Liste (${modelExtra} gegen ${rulesExtra}), ` +
+          `bei ${answered} beantworteten Fällen.`
   );
 }
 

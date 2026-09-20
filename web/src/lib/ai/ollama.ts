@@ -74,6 +74,19 @@ export async function askModelForJson(call: ModelCall): Promise<unknown | null> 
         model: call.model ?? getAiModel(),
         stream: false,
         format: call.schema,
+        // OHNE DAS DENKT DAS MODELL SICH ZU TODE.
+        //
+        // qwen3.5 ist ein Thinking-Modell: Es erzeugt vor der Antwort eine
+        // Gedankenkette. Gemessen am 20.09.2026 auf einem M3: 19 Sekunden fuer
+        // das Wort "Paris", und zusammen mit einem erzwungenen Schema lief
+        // jeder Aufruf in den Zeitablauf von 60 Sekunden. Abgeschaltet
+        // antwortet dasselbe Modell in viereinhalb.
+        //
+        // Es passt ausserdem zur Regel, keine verborgenen Gedankenketten zu
+        // speichern: Was wir nicht anfordern, koennen wir auch nicht aus
+        // Versehen ablegen. Fuer eine Zuordnung mit Belegpflicht ist die
+        // Begruendung ohnehin das Zitat und nicht der Denkweg.
+        think: false,
         options: {
           // Bei einer Zuordnung ist Einfallsreichtum kein Vorzug. Niedrige
           // Temperatur heisst: zweimal dieselbe Frage, zweimal dieselbe

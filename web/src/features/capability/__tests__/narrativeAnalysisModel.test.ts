@@ -28,6 +28,10 @@ const NARRATIVE =
   "Danach habe ich den Vertrag mit ihrer Einkaufsabteilung verhandelt.";
 
 const AREAS = ["b2b_sales", "partnerships", "customer_success", "software_engineering"];
+const AREAS_WITH_LABELS = [
+  { id: "b2b_sales", label: "B2B Sales" },
+  { id: "partnerships", label: "Partnerschaften & Business Development" },
+];
 
 test("ein Vorschlag ohne Beleg aus dem Text faellt weg", () => {
   // DAS IST DIE WICHTIGSTE PRUEFUNG. Ein Sprachmodell erzeugt auch gut
@@ -96,22 +100,60 @@ test("Unfug im Ergebnis fuehrt zu einer leeren Analyse, nicht zu einem Absturz",
   }
 });
 
-test("derselbe Bereich zweimal wird einmal gezaehlt, und es bleiben hoechstens drei", () => {
+test("dasselbe Zitat traegt nur einen Bereich", () => {
+  // GEMESSEN AM 20.09.2026: Drei von vier ueberzaehligen Vorschlaegen kamen
+  // daher, dass ein einziger Satz gleich mehrere Bereiche belegen sollte - ein
+  // Satz ueber vierzig Nutzergespraeche wurde zu Customer Discovery UND User
+  // Research UND Product Discovery. Wer fuer den zweiten Bereich keinen
+  // eigenen Beleg hat, hat denselben Fund zweimal benannt.
   const quotes = ["jede Woche mit Kliniken telefoniert"];
   const analysis = validateModelAnalysis(
     {
       areas: [
         { areaId: "b2b_sales", quotes },
-        { areaId: "b2b_sales", quotes },
         { areaId: "partnerships", quotes },
         { areaId: "customer_success", quotes },
-        { areaId: "software_engineering", quotes },
       ],
     },
     { narrative: NARRATIVE, areaIds: AREAS }
   );
-  assert.equal(analysis.areas.length, 3);
-  assert.equal(new Set(analysis.areas.map((a) => a.areaId)).size, 3);
+
+  assert.deepEqual(analysis.areas.map((area) => area.areaId), ["b2b_sales"]);
+});
+
+test("ein eigener Beleg traegt einen eigenen Bereich", () => {
+  // Die Gegenprobe: Wer fuer den zweiten Bereich eine ANDERE Stelle im Text
+  // anfuehrt, hat auch wirklich etwas Zweites gefunden.
+  const analysis = validateModelAnalysis(
+    {
+      areas: [
+        { areaId: "b2b_sales", quotes: ["jede Woche mit Kliniken telefoniert"] },
+        { areaId: "partnerships", quotes: ["den Vertrag mit ihrer Einkaufsabteilung verhandelt"] },
+      ],
+    },
+    { narrative: NARRATIVE, areaIds: AREAS }
+  );
+
+  assert.deepEqual(analysis.areas.map((area) => area.areaId), ["b2b_sales", "partnerships"]);
+});
+
+test("derselbe Bereich zweimal wird einmal gezaehlt, und es bleiben hoechstens drei", () => {
+  const analysis = validateModelAnalysis(
+    {
+      areas: [
+        { areaId: "b2b_sales", quotes: ["jede Woche mit Kliniken telefoniert"] },
+        { areaId: "b2b_sales", quotes: ["bis endlich eine zugesagt hat"] },
+        { areaId: "partnerships", quotes: ["bis endlich eine zugesagt hat"] },
+        { areaId: "customer_success", quotes: ["den Vertrag mit ihrer Einkaufsabteilung"] },
+        { areaId: "software_engineering", quotes: ["Einkaufsabteilung verhandelt"] },
+      ],
+    },
+    { narrative: NARRATIVE, areaIds: AREAS }
+  );
+
+  assert.ok(analysis.areas.length <= 3);
+  assert.equal(new Set(analysis.areas.map((a) => a.areaId)).size, analysis.areas.length);
+  assert.equal(analysis.areas[0].areaId, "b2b_sales");
 });
 
 test("eine zu lange Staerke wird verworfen statt gekuerzt", () => {
@@ -139,7 +181,7 @@ test("ist das Modell nicht erreichbar, antwortet die Begriffsliste", async () =>
 
   try {
     const analyze = createModelNarrativeAnalyzer({
-      areaIds: AREAS,
+      areas: AREAS_WITH_LABELS,
       fallback: analyzeNarrativeWithRules,
     });
     const analysis = await analyze({ narrative: "Ich habe im B2B Vertrieb gearbeitet.", locale: "de" });
