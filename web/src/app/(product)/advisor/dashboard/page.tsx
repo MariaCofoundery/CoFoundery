@@ -10,6 +10,8 @@ import {
   getAdvisorPendingTeamInvites,
   type AdvisorPendingTeamInvite,
 } from "@/features/dashboard/advisorTeamInviteData";
+import { AccountDeletionNoticeList } from "@/features/account/AccountDeletionNoticeList";
+import { getAccountDeletionNotices } from "@/features/account/accountDeletionNotices";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import {
   getAdvisorDashboardProfile,
@@ -603,7 +605,7 @@ export default async function AdvisorDashboardPage() {
   // Der angemeldete Zugang, nicht der privilegierte: Die Wiedervorlagen liegen
   // unter einer Policy, die nur die eigenen Zeilen herausgibt.
   const client = await createClient();
-  const [roleViews, teams, advisorProfile, pendingInvites, dueFollowUps] = await Promise.all([
+  const [roleViews, teams, advisorProfile, pendingInvites, dueFollowUps, deletionNotices] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
@@ -611,6 +613,10 @@ export default async function AdvisorDashboardPage() {
     // Eine Verabredung, die man nur sieht, wenn man zufaellig in das richtige
     // Team hineinschaut, ist keine Erinnerung.
     listDueAdvisorFollowUps(client),
+    // Ein Team, das aus der Liste verschwindet, ist von einem Team, das es nie
+    // gab, nicht zu unterscheiden. Der Hinweis steht deshalb genau ueber der
+    // Liste, in der es gestanden hat.
+    getAccountDeletionNotices(client, ["advisor_team"]),
   ]);
   const followUpByRelationship = new Map(
     dueFollowUps.map((entry) => [entry.relationshipId, entry])
@@ -745,6 +751,12 @@ export default async function AdvisorDashboardPage() {
           </div>
         </div>
 
+
+        {deletionNotices.length > 0 ? (
+          <div className="mt-6">
+            <AccountDeletionNoticeList notices={deletionNotices} />
+          </div>
+        ) : null}
 
         <PendingInviteSection invites={pendingInvites} t={t} locale={locale} />
 

@@ -550,6 +550,23 @@
       "testNothing": "Nothing could be delivered. Turn notifications off on this device and on again.",
       "testTitle": "Hello from CoFoundery",
       "testBody": "If you are reading this, notifications arrive on this device."
+    },
+    "deletionNotices": {
+      "label": "Notice about a deleted account",
+      "on": "On {date}",
+      "dismiss": "Remove this notice",
+      "founder_connection": {
+        "title": "Someone you were connected with has deleted their account",
+        "text": "Your shared report and the workbook are gone with it – half of them were their answers. What you captured as a team stays: topics, notes and entries are still there, only without their name."
+      },
+      "advisor_team": {
+        "title": "Someone in a team you accompanied has deleted their account",
+        "text": "The team is no longer available to you, and your private notes on it were removed with it. We don't keep records about a person who has deleted their account."
+      },
+      "founder_advisor": {
+        "title": "The person accompanying you has deleted their account",
+        "text": "That access has ended – nobody reaches your report or your setup through it any more. If you would like to be accompanied again, you can invite someone new."
+      }
     }
   },
   "outlook": {

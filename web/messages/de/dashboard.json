@@ -550,6 +550,23 @@
       "testNothing": "Es konnte nichts zugestellt werden. Schalte die Mitteilungen auf diesem Gerät einmal aus und wieder ein.",
       "testTitle": "Hallo von CoFoundery",
       "testBody": "Wenn du das liest, kommen Mitteilungen auf diesem Gerät an."
+    },
+    "deletionNotices": {
+      "label": "Hinweis zu einer gelöschten Person",
+      "on": "Am {date}",
+      "dismiss": "Hinweis entfernen",
+      "founder_connection": {
+        "title": "Eine Person, mit der du verbunden warst, hat ihr Konto gelöscht",
+        "text": "Euer gemeinsamer Report und das Workbook sind damit entfernt – sie bestanden zur Hälfte aus ihren Antworten. Was ihr im Team festgehalten habt, bleibt: Themen, Notizen und Beiträge stehen weiter da, nur ohne ihren Namen."
+      },
+      "advisor_team": {
+        "title": "In einem Team, das du begleitet hast, hat sich jemand gelöscht",
+        "text": "Das Team steht dir damit nicht mehr zur Verfügung, und deine privaten Notizen dazu sind mit entfernt. Aufzeichnungen über einen Menschen, der sein Konto gelöscht hat, behalten wir nicht."
+      },
+      "founder_advisor": {
+        "title": "Die Person, die euch begleitet hat, hat ihr Konto gelöscht",
+        "text": "Die Freigabe ist damit beendet – niemand hat über sie noch Zugang zu eurem Report oder eurem Setup. Wenn ihr weiter Begleitung möchtet, könnt ihr jemanden neu einladen."
+      }
     }
   },
   "outlook": {

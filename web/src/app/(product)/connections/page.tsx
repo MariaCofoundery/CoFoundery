@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AccountDeletionNoticeList } from "@/features/account/AccountDeletionNoticeList";
+import { getAccountDeletionNotices } from "@/features/account/accountDeletionNotices";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { getFounderConnections } from "@/features/connections/founderConnectionsData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -17,8 +19,11 @@ export default async function ConnectionsPage() {
   } = await getRequestUser();
   if (!user) redirect("/login?next=%2Fconnections");
 
-  const [connections, t] = await Promise.all([
+  const [connections, deletionNotices, t] = await Promise.all([
     getFounderConnections(user.id, user.email, supabase),
+    // Hier ist die Stelle, an der etwas fehlt: Wer sich geloescht hat, stand
+    // vorher in dieser Liste. Dass jemand weg ist, faellt genau hier auf.
+    getAccountDeletionNotices(supabase, ["founder_connection", "founder_advisor"]),
     getTranslations("teams.connections"),
   ]);
 
@@ -42,6 +47,7 @@ export default async function ConnectionsPage() {
       </header>
 
       <div className="mt-7 grid gap-6">
+        <AccountDeletionNoticeList notices={deletionNotices} />
         <section className={CARD} aria-labelledby="established-connections-title">
           <h2 id="established-connections-title" className="text-xl font-semibold text-slate-950">
             {t("established.title")}
