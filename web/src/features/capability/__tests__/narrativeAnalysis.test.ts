@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 import {
   ANALYZED_AREA_IDS,
@@ -51,14 +51,23 @@ test("matching is case insensitive", async () => {
 });
 
 test("every analysed area exists in the database vocabulary", () => {
-  const migration = readFileSync(
-    "../supabase/migrations/20260907160000_create_capability_snapshot_v01.sql",
-    "utf8"
-  );
-  const areaBlock = migration.split("insert into public.capability_areas")[1] ?? "";
-  const known = new Set(
-    (areaBlock.match(/\('([a-z_0-9]+)', '[a-z_]+', \d+\)/g) ?? []).map((row) => row.split("'")[1])
-  );
+  // ALLE MIGRATIONEN, nicht nur die erste. GEAENDERT AM 21.09.2026: Der Test
+  // las ausschliesslich 20260907160000 und uebersah damit die Familie
+  // "Aussenauftritt & Moderation" aus 20261021120000 - er schlug an, obwohl
+  // die fuenf Bereiche existieren. Wer das Vokabular erweitert, legt eine neue
+  // Datei an; ein Test, der eine Datei nennt, veraltet mit der ersten
+  // Erweiterung.
+  const migrationDir = "../supabase/migrations";
+  const known = new Set<string>();
+  for (const file of readdirSync(migrationDir).sort()) {
+    if (!file.endsWith(".sql")) continue;
+    const sql = readFileSync(`${migrationDir}/${file}`, "utf8");
+    for (const block of sql.split("insert into public.capability_areas").slice(1)) {
+      for (const row of block.match(/\('([a-z_0-9]+)', '[a-z_]+', \d+\)/g) ?? []) {
+        known.add(row.split("'")[1]);
+      }
+    }
+  }
 
   assert.ok(known.size >= 42, `nur ${known.size} Bereiche aus der Migration gelesen`);
   for (const areaId of ANALYZED_AREA_IDS) {
@@ -73,4 +82,51 @@ test("terms are specific enough to be worth having", () => {
   for (const tooGeneric of ['"projekt"', '"team"', '"arbeit"', '"aufgabe"', '"verantwortung"']) {
     assert.doesNotMatch(source, new RegExp(tooGeneric), `${tooGeneric} ist zu allgemein`);
   }
+});
+
+test("eine erzaehlte Antwort findet auch das Verhalten, nicht nur das Fach", () => {
+  // GEMELDET AM 21.09.2026 nach dem ersten echten Interview: "das waren
+  // wirklich nur die Hard Skills". Genau so war es - die fuenf Bereiche der
+  // Familie "Aussenauftritt & Moderation" hatten keine Begriffe, also konnte
+  // die Erkennung sie nie vorschlagen.
+  //
+  // DIESER TEST PRUEFT DAS AM ERGEBNIS und nicht an der Liste: So klingt eine
+  // Antwort auf Frage 4 des Gespraechsleitfadens.
+  const answer =
+    "Ich habe den Vortrag auf der Konferenz gehalten, den eigentlich mein Chef " +
+    "halten sollte. Vorher habe ich mit zwei Leuten geübt, und die Diskussion " +
+    "danach habe ich moderiert.";
+
+  const result = analyzeNarrativeWithRules({ narrative: answer, locale: "de" });
+  return result.then((analysis) => {
+    const found = analysis.areas.map((area) => area.areaId);
+    assert.ok(
+      found.includes("public_speaking"),
+      `vor Gruppen sprechen wurde nicht erkannt: ${found.join(", ") || "nichts"}`
+    );
+    assert.ok(found.includes("facilitation"), `Moderation wurde nicht erkannt: ${found.join(", ")}`);
+    // Und die Begruendung steht dabei - nie eine Blackbox.
+    const speaking = analysis.areas.find((area) => area.areaId === "public_speaking");
+    assert.ok(speaking && speaking.matchedTerms.length > 0);
+  });
+});
+
+test("und Unangenehmes ansprechen wird als Zustaendigkeit erkannt", () => {
+  // So klingt eine Antwort auf Frage 5. Wichtig ist, dass daraus eine
+  // ZUSTAENDIGKEIT wird ("Unangenehmes ansprechen") und keine Eigenschaft
+  // ("konfliktfaehig") - im Vokabular gibt es nur die erste Form.
+  const answer =
+    "Ich habe die offene Rechnung angesprochen, obwohl ich mit Widerstand " +
+    "gerechnet habe, und dabei klares Feedback gegeben.";
+
+  return analyzeNarrativeWithRules({ narrative: answer, locale: "de" }).then((analysis) => {
+    const found = analysis.areas.map((area) => area.areaId);
+    assert.ok(
+      found.includes("difficult_conversations"),
+      `nicht erkannt: ${found.join(", ") || "nichts"}`
+    );
+    // Die Regel-Engine leitet weiterhin keine Staerke ab - das darf nur ein
+    // Mensch, und beim Bestaetigen.
+    assert.equal(analysis.strength, null);
+  });
 });

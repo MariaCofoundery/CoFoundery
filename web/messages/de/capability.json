@@ -452,6 +452,11 @@
       "stale": "Diese Frage ist nicht mehr die aktuelle – vielleicht war ein zweites Fenster offen. Hier ist der aktuelle Stand.",
       "complete": "Das Abschließen hat nicht geklappt. Bitte noch einmal versuchen."
     },
+    "sortCta": "Antworten einordnen",
+    "sortPending": "{count, plural, one {Eine Antwort wartet darauf, eingeordnet zu werden} other {# Antworten warten darauf, eingeordnet zu werden}}",
+    "submitPending": "Wird gespeichert …",
+    "pausePending": "Wird gespeichert …",
+    "skipPending": "Wird übersprungen …",
     "sort": {
       "title": "Antworten einordnen",
       "remaining": "{count, plural, one {Eine Antwort ist noch nicht eingeordnet} other {# Antworten sind noch nicht eingeordnet}}",
@@ -478,8 +483,6 @@
         "link": "Gespeichert, aber die Antwort ließ sich nicht als eingeordnet vermerken. Sie erscheint noch einmal – ordne sie dann bitte nicht doppelt ein."
       }
     },
-    "sortCta": "Antworten einordnen",
-    "sortPending": "{count, plural, one {Eine Antwort wartet darauf, eingeordnet zu werden} other {# Antworten warten darauf, eingeordnet zu werden}}",
     "questions": {
       "owned_last": {
         "title": "Erzähl mir von der letzten Sache, für die du wirklich Verantwortung getragen hast – bis zu einem klaren Ergebnis oder einer bewussten Entscheidung, sie zu stoppen.",

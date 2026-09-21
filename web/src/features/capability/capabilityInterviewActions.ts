@@ -60,6 +60,41 @@ function back(error: string): never {
 }
 
 /**
+ * Was passiert, wenn eine abgeschickte Frage nicht mehr die aktuelle ist.
+ *
+ * GEMELDET AM 21.09.2026: "Irgendwann zwischendurch hatte ich die Ansage, hey,
+ * die Frage ist jetzt veraltet [...] obwohl ich gar nichts gemacht habe."
+ *
+ * Die Ursache waren Knoepfe ohne Pending-Zustand - ein Klick zeigte nichts,
+ * also klickte man noch einmal, und der zweite Klick schickte die inzwischen
+ * veraltete Kennung. Das ist behoben (`SubmitButton`), aber die Meldung war
+ * auch dann falsch: Es war ja nichts verloren gegangen.
+ *
+ * DESHALB HIER DIE UNTERSCHEIDUNG. Eine Fehlermeldung gehoert nur dorthin, wo
+ * jemand etwas verloren hat:
+ *
+ *   Die Sitzung ist abgeschlossen  - kein Fehler, sondern ein Ende.
+ *   Die Frage ist beantwortet      - kein Fehler, sondern ein zweiter Klick.
+ *                                    Still zur aktuellen Frage.
+ *   Die Frage ist unbeantwortet    - hier ist wirklich etwas schiefgelaufen.
+ */
+function continueQuietly(
+  state: Awaited<ReturnType<typeof getActiveInterview>>,
+  turnId: string
+): never {
+  if (!state) {
+    // Abgeschlossen, waehrend das Formular offen stand.
+    redirect("/profile?saved=interview_done");
+  }
+  const submitted = state.turns.find((turn) => turn.id === turnId);
+  if (submitted?.answer) {
+    revalidatePath(PATH);
+    redirect(PATH);
+  }
+  back("stale");
+}
+
+/**
  * Beginnt ein Gespräch - oder setzt das laufende fort.
  *
  * Idempotent mit Absicht: Ein zweiter Klick auf "Beginnen" (zwei Tabs, ein
@@ -170,7 +205,9 @@ export async function saveInterviewAnswerAction(formData: FormData) {
   const answer = String(formData.get("answer") ?? "").trim();
 
   const state = await getActiveInterview(client);
-  if (!state || !state.current || state.current.id !== turnId) back("stale");
+  if (!state || !state.current || state.current.id !== turnId) {
+    continueQuietly(state, turnId);
+  }
 
   if (answer.length > 0) {
     if (answer.length < NARRATIVE_MIN_LENGTH) back("short");
@@ -218,7 +255,9 @@ export async function skipInterviewQuestionAction(formData: FormData) {
   const turnId = String(formData.get("turnId") ?? "");
 
   const state = await getActiveInterview(client);
-  if (!state || !state.current || state.current.id !== turnId) back("stale");
+  if (!state || !state.current || state.current.id !== turnId) {
+    continueQuietly(state, turnId);
+  }
 
   await appendNextQuestion(client, state.sessionId);
   revalidatePath(PATH);

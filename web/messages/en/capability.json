@@ -452,6 +452,11 @@
       "stale": "This question is no longer the current one – perhaps a second window was open. Here is the current state.",
       "complete": "Finishing did not work. Please try again."
     },
+    "sortCta": "Sort your answers",
+    "sortPending": "{count, plural, one {One answer is waiting to be sorted} other {# answers are waiting to be sorted}}",
+    "submitPending": "Saving …",
+    "pausePending": "Saving …",
+    "skipPending": "Skipping …",
     "sort": {
       "title": "Sort your answers",
       "remaining": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}}",
@@ -478,8 +483,6 @@
         "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice."
       }
     },
-    "sortCta": "Sort your answers",
-    "sortPending": "{count, plural, one {One answer is waiting to be sorted} other {# answers are waiting to be sorted}}",
     "questions": {
       "owned_last": {
         "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",

@@ -104,6 +104,47 @@ const AREA_TERMS: Record<string, string[]> = {
   data_protection: ["datenschutz", "dsgvo", "gdpr", "avv", "verarbeitungsverzeichnis"],
   compliance_regulatory: ["compliance", "regulatorik", "zulassung", "aufsicht", "audit bestanden"],
   security: ["security", "informationssicherheit", "penetrationstest", "iso 27001", "zugriffskonzept"],
+
+  // AUSSENAUFTRITT & MODERATION, nachgetragen am 21.09.2026 - und der Grund
+  // dafuer ist ein Fehler von mir: Die fuenf Bereiche sind an jenem Tag ins
+  // Vokabular und in beide Sprachbundles gekommen, aber NICHT hierher. Damit
+  // konnte die Erkennung sie nie vorschlagen, und nach dem ersten echten
+  // Interview lautete die Rueckmeldung: "das waren wirklich nur die Hard
+  // Skills". Genau so sah es aus - die Verhaltensseite war unsichtbar.
+  //
+  // DIESE BEGRIFFE SEHEN ANDERS AUS ALS DIE OBEN, und das ist Absicht. Die
+  // fachlichen Bereiche kommen in Erzaehlungen als Fachwort vor ("Pricing",
+  // "DSGVO", "Roadmap"). Verhalten kommt als TAETIGKEIT vor: Niemand sagt
+  // "ich habe Facilitation gemacht", man sagt "ich habe das Gespraech
+  // moderiert". Deshalb stehen hier Verben und Wendungen.
+  //
+  // Und weiterhin sparsam: "geredet" oder "gesprochen" allein waere
+  // wertlos - das steht in jeder zweiten Antwort.
+  public_speaking: [
+    "vortrag", "präsentiert", "präsentation", "vor der gruppe", "vor allen",
+    "auf der bühne", "pitch gehalten", "keynote", "moderiert vor", "rede",
+    "elternabend", "podium", "kamera", "webinar",
+  ],
+  facilitation: [
+    "moderiert", "moderation", "workshop geleitet", "durch die entscheidung",
+    "runde geführt", "vermittelt zwischen", "retrospektive", "geleitet durch",
+    "diskussion geführt",
+  ],
+  networking: [
+    "netzwerk aufgebaut", "kontakte hergestellt", "kontakt hergestellt",
+    "in verbindung gebracht", "vermittelt an", "tür geöffnet", "türen geöffnet",
+    "empfehlung weitergegeben", "kennengelernt auf",
+  ],
+  difficult_conversations: [
+    "angesprochen", "unangenehme", "unangenehm", "konflikt", "feedback gegeben",
+    "kritik", "klare ansage", "schwieriges gespräch", "widerstand",
+    "erwartung klargestellt", "gekündigt", "trennung",
+  ],
+  teaching_mentoring: [
+    "eingearbeitet", "angeleitet", "erklärt", "beigebracht", "mentoring",
+    "mentorin", "mentor", "ausgebildet", "schulung", "onboarding begleitet",
+    "geübt mit",
+  ],
 };
 
 /** Fuer den Drift-Test: die Bereiche, fuer die Begriffe hinterlegt sind. */

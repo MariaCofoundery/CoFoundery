@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { DictatedTextarea } from "@/features/dictation/DictatedTextarea";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 
 import {
   autosaveInterviewAnswerAction,
@@ -169,6 +170,7 @@ export function InterviewAnswerForm({
             name="answer"
             defaultValue={value}
             rows={7}
+            minLength={NARRATIVE_MIN_LENGTH}
             maxLength={NARRATIVE_MAX_LENGTH}
             placeholder={t("interview.answerPlaceholder")}
             className="min-h-40 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-6"
@@ -236,29 +238,40 @@ export function InterviewAnswerForm({
 
         {/* Zwei Absendeknoepfe mit demselben Namen und verschiedenen Werten -
             gewoehnliches HTML, kein JavaScript noetig. Der gedrueckte Knopf
-            steht in den Formulardaten. */}
+            steht in den Formulardaten.
+            
+            MIT SubmitButton, seit dem 21.09.2026 - und das war ein Fehler von
+            mir mit einer sichtbaren Folge. Vorher waren es rohe Knoepfe ohne
+            Pending-Zustand: Ein Klick zeigte nichts, also klickte man noch
+            einmal, und der zweite Klick schickte die inzwischen veraltete
+            Frage-Kennung. Maria bekam daraufhin "diese Frage ist nicht mehr
+            die aktuelle", ohne etwas falsch gemacht zu haben.
+            
+            Der Bauteilkommentar sagt genau das: "disabled waehrend pending
+            verhindert das doppelte Absenden". Es gab ihn, ich habe ihn nicht
+            benutzt. */}
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <button
-            type="submit"
-            name="mode"
+          <SubmitButton
+            fieldName="mode"
             // Bei der letzten Frage schliesst derselbe Knopf ab: Sonst bliebe
             // das Gespraech bei einer Frage stehen, zu der es keine naechste
             // gibt.
-            value={isLastQuestion ? "complete" : "next"}
-            disabled={tooShort}
-            className="inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white disabled:opacity-50"
-          >
-            {isLastQuestion ? t("interview.submitLast") : t("interview.submit")}
-          </button>
-          <button
-            type="submit"
-            name="mode"
-            value="pause"
-            disabled={tooShort}
-            className="inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 disabled:opacity-50"
-          >
-            {t("interview.pause")}
-          </button>
+            intent={isLastQuestion ? "complete" : "next"}
+            label={isLastQuestion ? t("interview.submitLast") : t("interview.submit")}
+            pendingLabel={t("interview.submitPending")}
+            className="inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
+          />
+          <SubmitButton
+            fieldName="mode"
+            intent="pause"
+            // Ein zu kurzer Entwurf darf liegen bleiben: Der Browser wuerde
+            // das Absenden wegen minLength blockieren, und die Person saesse
+            // fest. Gespeichert wird er dann nicht - der Browser behaelt ihn.
+            formNoValidate
+            label={t("interview.pause")}
+            pendingLabel={t("interview.pausePending")}
+            className="inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800"
+          />
         </div>
       </form>
 
@@ -267,12 +280,11 @@ export function InterviewAnswerForm({
           gewollt, denn es heisst "hierzu habe ich nichts". */}
       <form action={skipInterviewQuestionAction} className="mt-3">
         <input type="hidden" name="turnId" value={turnId} />
-        <button
-          type="submit"
+        <SubmitButton
+          label={t("interview.skip")}
+          pendingLabel={t("interview.skipPending")}
           className="text-sm font-medium text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"
-        >
-          {t("interview.skip")}
-        </button>
+        />
       </form>
     </div>
   );

@@ -214,7 +214,7 @@ test("das Gespraech ist vom Profil aus zu finden", () => {
 test("das Gespraech hat ein Ende", () => {
   // Bei der letzten Frage schliesst derselbe Knopf ab - sonst bliebe man bei
   // einer Frage stehen, zu der es keine naechste gibt.
-  assert.match(codeOnly(FORM), /value=\{isLastQuestion \? "complete" : "next"\}/);
+  assert.match(codeOnly(FORM), /intent=\{isLastQuestion \? "complete" : "next"\}/);
   const actions = codeOnly(ACTIONS);
   assert.match(actions, /mode === "complete"/);
   assert.match(actions, /status: "completed", completed_at/);
@@ -223,4 +223,78 @@ test("das Gespraech hat ein Ende", () => {
   // Datenbank erlaubt genau eine AKTIVE.
   const migration = source("../supabase/migrations/20261021120000_capability_interview.sql");
   assert.match(migration, /where status = 'active'/);
+});
+
+test("kein Absendeknopf ohne Pending-Zustand", () => {
+  // GEMELDET AM 21.09.2026: "Irgendwann zwischendurch hatte ich die Ansage,
+  // hey, die Frage ist jetzt veraltet [...] obwohl ich gar nichts gemacht
+  // habe."
+  //
+  // DIE URSACHE WAR DAS FEHLENDE PENDING: Ein Klick zeigte nichts, also
+  // klickte man noch einmal - und der zweite Klick schickte die inzwischen
+  // veraltete Frage-Kennung. `SubmitButton` gab es im Projekt, mit genau
+  // diesem Satz in seiner Beschreibung ("disabled waehrend pending verhindert
+  // das doppelte Absenden"); ich hatte rohe Knoepfe gebaut.
+  const form = codeOnly(FORM);
+  assert.doesNotMatch(form, /type="submit"/, "ein roher Absendeknopf ohne Pending");
+  assert.equal(
+    (form.match(/<SubmitButton/g) ?? []).length,
+    3,
+    "Weiter, Speichern und Ueberspringen brauchen alle drei einen Pending-Zustand"
+  );
+
+  // Und die Pending-Texte existieren, sonst zeigt der Knopf einen Schluessel.
+  for (const locale of ["de", "en"]) {
+    const copy = interviewCopy(locale);
+    for (const key of ["submitPending", "pausePending", "skipPending"]) {
+      assert.ok(copy[key], `${locale}: interview.${key} fehlt`);
+    }
+  }
+});
+
+test("ein zweiter Klick ist kein Fehler", () => {
+  // Selbst mit Pending bleibt der Fall moeglich (zwei Fenster, Zurueck-Knopf).
+  // Dann ist aber nichts verloren gegangen - und eine Fehlermeldung gehoert
+  // nur dorthin, wo jemand etwas verloren hat.
+  const actions = codeOnly(ACTIONS);
+  assert.match(actions, /function continueQuietly/);
+  assert.match(actions, /continueQuietly\(state, turnId\)/);
+
+  // Drei Faelle, drei Antworten: abgeschlossen ist ein Ende, eine beantwortete
+  // Frage ist ein zweiter Klick, und nur eine unbeantwortete ist ein Fehler.
+  const quietly = actions.slice(
+    actions.indexOf("function continueQuietly"),
+    actions.indexOf("export async function startInterviewAction")
+  );
+  assert.match(quietly, /if \(!state\) \{[\s\S]{0,200}saved=interview_done/);
+  assert.match(quietly, /submitted\?\.answer/);
+  assert.match(quietly, /back\("stale"\)/);
+
+  // Und beide Wege - Weiter und Ueberspringen - nehmen dieselbe Behandlung.
+  assert.equal(
+    (actions.match(/continueQuietly\(state, turnId\)/g) ?? []).length,
+    2,
+    "einer der beiden Wege zeigt weiter einen Fehler"
+  );
+});
+
+test("die Verhaltensbereiche sind fuer die Erkennung sichtbar", () => {
+  // GEMELDET AM 21.09.2026 nach dem ersten echten Durchlauf: "das waren
+  // wirklich nur die Hard Skills".
+  //
+  // DER FEHLER WAR MEINER: Die fuenf Bereiche der Familie
+  // "Aussenauftritt & Moderation" sind ins Vokabular und in beide
+  // Sprachbundles gekommen - aber nicht in die Begriffsliste der Erkennung.
+  // Damit konnten sie aus einem Text nie vorgeschlagen werden, und die
+  // Auswertung zeigte ausschliesslich Fachliches.
+  const analysis = readFileSync("src/features/capability/narrativeAnalysis.ts", "utf8");
+  for (const areaId of [
+    "public_speaking",
+    "facilitation",
+    "networking",
+    "difficult_conversations",
+    "teaching_mentoring",
+  ]) {
+    assert.match(analysis, new RegExp(`\\n  ${areaId}: \\[`), `${areaId} hat keine Begriffe`);
+  }
 });
