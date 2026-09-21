@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(6);
+select extensions.plan(7);
 
 -- Wachhund gegen eine ganze Fehlerklasse, nicht nur gegen die sieben Funde.
 --
@@ -19,8 +19,26 @@ select extensions.plan(6);
 -- 1. Die Regel
 -- ---------------------------------------------------------------------------
 -- Keine security-definer-Funktion ohne Aufruferpruefung darf fuer anon
--- ausfuehrbar sein - ausser den sechs oeffentlichen Projektionen, die genau
+-- ausfuehrbar sein - ausser den SIEBEN oeffentlichen Projektionen, die genau
 -- dafuer gebaut wurden und ihre Bedingungen selbst pruefen.
+--
+-- DAZUGEKOMMEN AM 21.09.2026: `get_public_network_profile_linkedin`. Sie ist
+-- am 19.09.2026 mit den LinkedIn-Adressen entstanden und stand seither in
+-- diesem Test - er war rot, und weil `npm run ci:check` keine pgTAP-Tests
+-- ausfuehrt, sah es niemand.
+--
+-- GEPRUEFT UND KEIN LECK: Sie nimmt einen oeffentlichen Slug (keine user_id),
+-- verlangt ein oeffentliches, aktives Profil mit aktiver Mitgliedschaft UND
+-- zusaetzlich die eigene Entscheidung fuer genau diese Angabe
+-- (`linkedin_visibility = 'public'`). Ein oeffentliches Netzwerkprofil zu
+-- haben ist keine Zustimmung dazu, den Klarnamen-Lebenslauf daneben zu
+-- stellen. Der anon-Grant ist ausdruecklich gesetzt, und die oeffentlichen
+-- Netzwerkseiten brauchen ihn.
+--
+-- Der Wachhund hat also nicht gebellt, weil etwas offen war, sondern weil eine
+-- Ausnahme hinzukam, ueber die ein Mensch entscheiden muss. Das ist seine
+-- Aufgabe - und deshalb bleibt die Liste eine Liste und wird keine Regel
+-- ("alles, was mit public_ anfaengt, darf").
 select extensions.is(
   (select coalesce(string_agg(p.proname, ', ' order by p.proname), '')
    from pg_proc p
@@ -36,10 +54,41 @@ select extensions.is(
        'get_public_network_problem',
        'list_public_network_profile_listings',
        'list_public_network_profile_ventures',
-       'list_public_network_sitemap'
+       'list_public_network_sitemap',
+       'get_public_network_profile_linkedin'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');
+
+-- ---------------------------------------------------------------------------
+-- 1b. Und die Ausnahmen muessen ihre Ausnahme verdienen
+-- ---------------------------------------------------------------------------
+--
+-- Eine Namensliste ist eine Behauptung ("die pruefen sich selbst"). Diese
+-- Pruefung macht daraus eine Tatsache: Jede der sieben muss Sichtbarkeit UND
+-- Status im eigenen Koerper pruefen. Wer eine davon umschreibt und die
+-- Bedingung dabei verliert, faellt hier auf - und nicht erst, wenn eine
+-- zurueckgezogene Seite noch Daten herausgibt.
+--
+-- Dazugekommen am 21.09.2026, zusammen mit der siebten Ausnahme: Eine Liste,
+-- die nur laenger wird, ist irgendwann keine Ausnahme mehr, sondern die Regel.
+select extensions.is(
+  (select coalesce(string_agg(p.proname, ', ' order by p.proname), '')
+   from pg_proc p
+   join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public'
+     and p.proname in (
+       'get_public_network_profile',
+       'get_public_network_listing',
+       'get_public_network_problem',
+       'list_public_network_profile_listings',
+       'list_public_network_profile_ventures',
+       'list_public_network_sitemap',
+       'get_public_network_profile_linkedin'
+     )
+     and not (p.prosrc like '%visibility = ''public''%' and p.prosrc like '%status = ''active''%')),
+  '',
+  'jede oeffentliche Projektion prueft Sichtbarkeit und Status selbst');
 
 -- ---------------------------------------------------------------------------
 -- 2. Die beiden Loeschfunktionen namentlich
