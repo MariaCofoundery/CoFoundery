@@ -94,7 +94,17 @@ export default async function ConnectPersonPage({
           >
             {t("actions.edit")}
           </Link>
-        ) : null}
+        ) : (
+          /* Seit dem 21.09.2026 geht das auch ohne Anzeige. Der Knopf steht
+             oben und nicht am Ende der Seite: Er ist der Grund, warum man hier
+             ist. */
+          <Link
+            href={`/connect/people/${person.user_id}/contact`}
+            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold text-slate-900 sm:ml-auto"
+          >
+            {t("contact.cta")}
+          </Link>
+        )}
       </header>
 
       {person.bio ? (
@@ -249,14 +259,9 @@ export default async function ConnectPersonPage({
         </section>
       ) : null}
 
-      {/* Wenn jemand nichts eingestellt hat, gibt es keinen Weg zu ihm - und
-          das gehoert dann auch dagestanden, statt die Seite leer enden zu
-          lassen. Der direkte Kontakt ist der naechste Schritt. */}
-      {!isOwn && listings.length === 0 ? (
-        <p className="mt-8 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-          {t("people.noContactYet")}
-        </p>
-      ) : null}
+      {/* Der Satz "noch nicht erreichbar" stand hier bis zum 21.09.2026 und
+          ist mit dem direkten Kontakt weggefallen - wer nichts eingestellt
+          hat, ist jetzt trotzdem ansprechbar. */}
     </main>
   );
 }

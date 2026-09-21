@@ -211,6 +211,48 @@ export async function requestConnectContactAction(formData: FormData) {
   refreshContacts(listingId); redirect(`/connect/listings/${listingId}?contact=sent`);
 }
 
+/**
+ * Jemanden anschreiben, ohne dass er etwas ausgeschrieben hat.
+ *
+ * Eine eigene Aktion neben `requestConnectContactAction`, wie in der Datenbank
+ * auch eine eigene Funktion daneben steht: Der Weg ueber die Anzeige
+ * funktioniert und wird benutzt - ihn fuer einen zweiten Fall umzubauen waere
+ * ein Risiko ohne Gegenwert.
+ *
+ * Die Bedingung "nur mit eigenem veroeffentlichten Profil" prueft die
+ * Datenbank. Hier wird sie nur in einen Satz uebersetzt, den man lesen kann.
+ */
+export async function requestConnectPersonContactAction(formData: FormData) {
+  const { client, user } = await context();
+  const recipientUserId = String(formData.get("recipient_user_id") ?? "").trim();
+  const message = normalizeConnectContactMessage(formData.get("message"));
+  const back = `/connect/people/${recipientUserId}`;
+  if (!recipientUserId) redirect("/connect/people?error=contact");
+  if (!message) redirect(`${back}/contact?error=message`);
+
+  const { data: requestId, error } = await client.rpc("request_network_person_contact", {
+    p_recipient_user_id: recipientUserId,
+    p_message: message,
+  });
+  if (error) {
+    const reason = error.message.includes("sender_profile_required") ? "contact_profile"
+      : error.message.includes("recipient_unavailable") ? "contact_unavailable"
+      : error.message.includes("interaction_blocked") ? "contact_unavailable"
+      : error.message.includes("self_request") ? "contact_self" : "contact";
+    redirect(`${back}/contact?error=${reason}`);
+  }
+
+  // Bestenfalls und nach dem Schreiben: Die Anfrage steht, auch wenn die
+  // Benachrichtigung nicht rausgeht.
+  if (requestId) {
+    const sender = await getOwnConnectProfile(client, user.id);
+    await notifyConnectContactRequest(client, String(requestId), recipientUserId, sender?.display_name ?? null);
+  }
+
+  refreshContacts();
+  redirect(`${back}?contact=sent`);
+}
+
 export async function respondConnectContactAction(formData: FormData) {
   const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
   const response = String(formData.get("response") ?? "");

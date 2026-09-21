@@ -247,7 +247,10 @@
     },
     "profileRequiredTitle": "Zuerst dein Connect-Profil",
     "profileRequiredText": "Bevor du jemanden anschreibst, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an und veröffentliche es – danach landest du wieder hier.",
-    "profileRequiredCta": "Connect-Profil anlegen"
+    "profileRequiredCta": "Connect-Profil anlegen",
+    "personTitle": "Diese Person anschreiben",
+    "personMessageHint": "Ohne Anzeige fehlt der Anlass, den die andere Person sonst mitliest. Schreib also kurz, warum du dich meldest und was du vorhast – das erspart eine Rückfrage.",
+    "personProfileRequiredText": "Anschreiben kann, wer selbst ein veröffentlichtes Profil hat. Das ist keine Hürde, sondern Gegenseitigkeit: Wer angeschrieben wird, soll sehen können, wer da schreibt."
   },
   "messages": {
     "eyebrow": "Privater Connect-Austausch",

@@ -247,7 +247,10 @@
     },
     "profileRequiredTitle": "Your Connect profile comes first",
     "profileRequiredText": "Before you message someone, the other side needs something to look at. Create your Connect profile and publish it – you will come back here afterwards.",
-    "profileRequiredCta": "Create Connect profile"
+    "profileRequiredCta": "Create Connect profile",
+    "personTitle": "Write to this person",
+    "personMessageHint": "Without a listing there is no occasion the other person can read along. So say briefly why you are getting in touch and what you have in mind – it saves a round trip.",
+    "personProfileRequiredText": "Writing to others requires a published profile of your own. Not a hurdle but mutuality: whoever is written to should be able to see who is writing."
   },
   "messages": {
     "eyebrow": "Private Connect exchange",
