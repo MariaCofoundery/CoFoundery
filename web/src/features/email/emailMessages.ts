@@ -371,7 +371,13 @@ export type NetworkNotificationCopyKind =
   | "approach_interest"
   | "message"
   | "discovery_intro_request"
-  | "discovery_intro_accepted";
+  | "discovery_intro_accepted"
+  // DAZUGEKOMMEN AM 21.09.2026 und die erste Art, hinter der KEIN Mensch
+  // steht: Alle uebrigen entstehen, weil jemand sich gemeldet hat. Diese
+  // entsteht, weil eine Mengenschnittmenge etwas gefunden hat - deshalb geht
+  // sie nur mit ausdruecklicher Zustimmung hinaus, und deshalb sagt ihre
+  // Fusszeile etwas anderes.
+  | "connect_suggestions";
 
 /**
  * Welcher Bereich ueber der Ueberschrift steht.
@@ -394,9 +400,12 @@ function notificationArea(kind: NetworkNotificationCopyKind) {
  */
 export function getNetworkNotificationEmailCopy(
   locale: AppLocale,
-  input: { kind: NetworkNotificationCopyKind; senderName: string | null }
+  input: { kind: NetworkNotificationCopyKind; senderName: string | null; count?: number }
 ) {
   const name = input.senderName?.trim() || (locale === "en" ? "Someone" : "Jemand");
+  // Mindestens eins: Eine Meldung ueber null Vorschlaege gibt es nicht, und
+  // "0 Vorschlaege" waere der Fehler, der dann in der Betreffzeile stuende.
+  const count = Math.max(1, Math.trunc(input.count ?? 1));
 
   if (locale === "en") {
     const byKind = {
@@ -436,6 +445,17 @@ export function getNetworkNotificationEmailCopy(
         intro: `${name} would like to get to know you too. You can write to each other from now on.`,
         cta: "Open the conversation",
       },
+      connect_suggestions: {
+        subject: count === 1 ? "One suggestion for you" : `${count} suggestions for you`,
+        headline: count === 1 ? "One suggestion for you" : "New suggestions for you",
+        // KEIN NAME, KEIN TITEL. Wer oder was vorgeschlagen wurde, steht in
+        // CoFoundery - nicht in einem Postfach, dessen Weg wir nicht kennen.
+        intro:
+          count === 1
+            ? "Something in Connect overlaps with what you wrote about yourself. Every suggestion shows you the word that triggered it."
+            : `${count} things in Connect overlap with what you wrote about yourself. Every suggestion shows you the word that triggered it.`,
+        cta: "Open suggestions",
+      },
     }[input.kind];
 
     return {
@@ -443,7 +463,16 @@ export function getNetworkNotificationEmailCopy(
       eyebrow: notificationArea(input.kind),
       ...byKind,
       preheader: byKind.intro,
-      note: "We only notify you about your own activity, and at most once per event.",
+      // DIE FUSSZEILE SAGT, WARUM DIESE MAIL DA IST, und fuer Vorschlaege ist
+      // das eine andere Antwort: Alle uebrigen Arten entstehen aus der Meldung
+      // eines Menschen und sind deshalb an, solange man sie nicht abbestellt.
+      // Diese geht nur hinaus, weil jemand im Konto ausdruecklich zugestimmt
+      // hat - und dann muss die Mail selbst daran erinnern, sonst liest sie
+      // sich wie ungefragte Post.
+      note:
+        input.kind === "connect_suggestions"
+          ? "You are getting this email because you agreed to it in your account settings. At most once per batch, and never more than three suggestions a week."
+          : "We only notify you about your own activity, and at most once per event.",
       settings: "You can switch these emails off in your account settings.",
       fallback: "If the button does not work, use this link:",
       privacy: "Privacy",
@@ -487,6 +516,17 @@ export function getNetworkNotificationEmailCopy(
       intro: `${name} möchte dich ebenfalls kennenlernen. Ihr könnt euch ab jetzt schreiben.`,
       cta: "Gespräch öffnen",
     },
+    connect_suggestions: {
+      subject: count === 1 ? "Ein Vorschlag für dich" : `${count} Vorschläge für dich`,
+      headline: count === 1 ? "Ein Vorschlag für dich" : "Neue Vorschläge für dich",
+      // KEIN NAME, KEIN TITEL. Wer oder was vorgeschlagen wurde, steht in
+      // CoFoundery - nicht in einem Postfach, dessen Weg wir nicht kennen.
+      intro:
+        count === 1
+          ? "In Connect gibt es etwas, das sich mit deinen eigenen Angaben überschneidet. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat."
+          : `In Connect gibt es ${count} Dinge, die sich mit deinen eigenen Angaben überschneiden. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.`,
+      cta: "Vorschläge öffnen",
+    },
   }[input.kind];
 
   return {
@@ -494,7 +534,13 @@ export function getNetworkNotificationEmailCopy(
     eyebrow: notificationArea(input.kind),
     ...byKind,
     preheader: byKind.intro,
-    note: "Wir benachrichtigen dich nur über deine eigenen Vorgänge, und höchstens einmal je Vorgang.",
+    // Siehe die englische Fassung: Fuer Vorschlaege nennt die Fusszeile die
+    // Zustimmung, weil sie der Grund ist, aus dem diese Mail ueberhaupt
+    // hinausgeht.
+    note:
+      input.kind === "connect_suggestions"
+        ? "Du bekommst diese Mail, weil du ihr in deinen Kontoeinstellungen ausdrücklich zugestimmt hast. Höchstens einmal je Schwung, und nie mehr als drei Vorschläge pro Woche."
+        : "Wir benachrichtigen dich nur über deine eigenen Vorgänge, und höchstens einmal je Vorgang.",
     settings: "Du kannst diese Mails in deinen Kontoeinstellungen abschalten.",
     fallback: "Falls der Knopf nicht funktioniert, nutze diesen Link:",
     privacy: "Datenschutz",

@@ -26,10 +26,16 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   // verloren, und das gehoert neben den Knopf. Das ist ein Kontodatum.
   //
   // Geprueft wird deshalb genau das: hoechstens diese eine Tabelle.
+  //
+  // DAZU AM 21.09.2026: `notification_opt_ins`. Dieselbe Sache aus der anderen
+  // Richtung - dort heisst eine Zeile "ja, auch per Mail", waehrend sie in
+  // `notification_opt_outs` "diese Art nicht" heisst. Zwei Tabellen, weil die
+  // ABWESENHEIT einer Zeile das eine Mal ja und das andere Mal nein bedeutet;
+  // beides sind Kontoangaben und keine Produktdaten.
   const tables = [...page.matchAll(/\.from\("([^"]+)"\)/g)].map((match) => match[1]);
   assert.deepEqual(
     [...new Set(tables)].sort(),
-    ["notification_opt_outs", "participants", "person_core"],
+    ["notification_opt_ins", "notification_opt_outs", "participants", "person_core"],
     "die Kontoseite laedt etwas anderes als Kontoangaben"
   );
 });

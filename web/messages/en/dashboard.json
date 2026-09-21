@@ -516,11 +516,18 @@
         "discovery_intro_accepted": {
           "title": "Your request was accepted",
           "text": "When someone you wanted to meet says yes. We don't send a no – that one is in your list."
+        },
+        "connect_suggestions": {
+          "title": "Suggestions for you",
+          "text": "At most three times a week, when something in Connect matches your own entries. Nobody is writing to you – this is a comparison of your entries with what others have published."
         }
       },
       "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",
       "submit": "Save choice",
-      "submitPending": "Saving …"
+      "submitPending": "Saving …",
+      "emailOptIns": {
+        "connect_suggestions_email": "Also by email. Off by default: nobody got in touch with you here, so we ask first. The notification on your device is independent of this."
+      }
     },
     "data": {
       "title": "Your data",
@@ -575,6 +582,18 @@
       "online": "Available right now",
       "offline": "Not available right now",
       "pending": "{count, plural, one {One analysis is waiting and will run as soon as things resume.} other {# analyses are waiting and will run as soon as things resume.}}"
+    },
+    "suggestionTest": {
+      "title": "Test run: suggestions",
+      "text": "Sends you exactly the notification the daily run would send – on the same channels, with the same switches in front of it. No real suggestion is marked as announced.",
+      "send": "Start test run",
+      "pending": "Sending …",
+      "pushed": "{count, plural, one {Notification sent to one device} other {Notification sent to # devices}}",
+      "noDevice": "No notification: no device is set up for this account right now.",
+      "mailed": "Email sent.",
+      "mailOff": "No email – you have not agreed to it. That is the default.",
+      "mailFailed": "No email even though you agreed. Then something is missing in the mail setup.",
+      "failed": "The test run did not complete. Please try again."
     }
   },
   "outlook": {

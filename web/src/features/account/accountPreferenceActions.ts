@@ -3,7 +3,12 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { NOTIFICATION_KINDS, isNotificationKind } from "@/features/account/notificationKinds";
+import {
+  NOTIFICATION_EMAIL_OPT_INS,
+  NOTIFICATION_KINDS,
+  isNotificationEmailOptIn,
+  isNotificationKind,
+} from "@/features/account/notificationKinds";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, normalizeLocale } from "@/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,6 +46,32 @@ export async function saveNotificationSettingsAction(formData: FormData) {
 
   if (optOuts.length > 0) {
     const { error } = await client.from("notification_opt_outs").insert(optOuts);
+    if (error) redirect("/account?status=notifications_failed#post");
+  }
+
+  // UND DIE ANDERE RICHTUNG. Dazugekommen am 21.09.2026 mit den Vorschlaegen:
+  // Hier heisst eine Zeile "ja", waehrend sie oben "nein" heisst. Deshalb wird
+  // genau das eingefuegt, was angehakt IST - nicht dessen Gegenteil.
+  //
+  // Auch hier erst loeschen, dann einfuegen: Sonst blieben Zustimmungen
+  // stehen, die gerade zurueckgezogen wurden - und das waere die Art Fehler,
+  // die man nicht sieht, weil weiter Post kommt.
+  const consented = NOTIFICATION_EMAIL_OPT_INS.filter((entry) =>
+    formData
+      .getAll("emailOptIn")
+      .map(String)
+      .filter(isNotificationEmailOptIn)
+      .includes(entry.kind)
+  ).map((entry) => ({ user_id: user.id, kind: entry.kind }));
+
+  const { error: deleteOptInError } = await client
+    .from("notification_opt_ins")
+    .delete()
+    .eq("user_id", user.id);
+  if (deleteOptInError) redirect("/account?status=notifications_failed#post");
+
+  if (consented.length > 0) {
+    const { error } = await client.from("notification_opt_ins").insert(consented);
     if (error) redirect("/account?status=notifications_failed#post");
   }
 

@@ -26,6 +26,11 @@ type Params = {
   senderName: string | null;
   url: string;
   locale?: EmailLocaleInput;
+  /**
+   * Wie viele Dinge gemeint sind. Nur `connect_suggestions` braucht das: Diese
+   * Art meldet einen SCHWUNG, alle uebrigen genau einen Vorgang.
+   */
+  count?: number;
 };
 
 type Result = { ok: true; id: string | null } | { ok: false; error: string };
@@ -50,6 +55,7 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
   const copy = getNetworkNotificationEmailCopy(locale, {
     kind: params.kind,
     senderName: params.senderName,
+    count: params.count,
   });
   const url = escapeHtml(params.url);
   const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
@@ -89,6 +95,7 @@ export async function sendNetworkNotificationEmail(params: Params): Promise<Resu
   const copy = getNetworkNotificationEmailCopy(locale, {
     kind: params.kind,
     senderName: params.senderName,
+    count: params.count,
   });
 
   const response = await fetch("https://api.resend.com/emails", {

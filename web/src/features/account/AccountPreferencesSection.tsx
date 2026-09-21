@@ -7,6 +7,8 @@ import {
 import {
   NOTIFICATION_AREAS,
   NOTIFICATION_KINDS,
+  emailOptInForKind,
+  type NotificationEmailOptIn,
   type NotificationKind,
 } from "@/features/account/notificationKinds";
 import {
@@ -14,6 +16,7 @@ import {
   isAccountStatusFailure,
   type AccountStatus,
 } from "@/features/account/accountStatus";
+import { SuggestionNotificationTest } from "@/features/connect/SuggestionNotificationTest";
 import { PushNotificationSection } from "@/features/notifications/PushNotificationSection";
 import { SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -35,15 +38,26 @@ const PILL =
 export async function AccountPreferencesSection({
   locale,
   optedOut,
+  emailOptIns,
+  showSuggestionTest,
   status,
 }: {
   /** Null heisst "nicht entschieden" - dann entscheidet der Browser. */
   locale: AppLocale | null;
   optedOut: NotificationKind[];
+  /** Zugestimmte Mailwege. Abwesenheit heisst hier nein, nicht ja. */
+  emailOptIns: NotificationEmailOptIn[];
+  /**
+   * Ob der Probelauf fuer Vorschlaege angeboten wird. Ohne Connect-Zugang gibt
+   * es keine Vorschlaege - dann waere der Knopf eine Behauptung ueber einen
+   * Bereich, den diese Person nicht hat.
+   */
+  showSuggestionTest: boolean;
   status: AccountStatus | null;
 }) {
   const t = await getTranslations("dashboard");
   const isOff = new Set(optedOut);
+  const hasConsented = new Set(emailOptIns);
   const section = status ? accountStatusSection(status) : null;
 
   const note = (owner: "locale" | "notifications") =>
@@ -113,28 +127,69 @@ export async function AccountPreferencesSection({
                   {t(`account.notifications.areas.${area}`)}
                 </legend>
                 <div className="mt-2 grid gap-2">
-                  {kinds.map(({ kind }) => (
-                    <label
-                      key={kind}
-                      className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-3 transition has-[:checked]:border-violet-200 has-[:checked]:bg-violet-50/40"
-                    >
-                      <input
-                        type="checkbox"
-                        name="notification"
-                        value={kind}
-                        defaultChecked={!isOff.has(kind)}
-                        className="mt-1 h-4 w-4 rounded border-slate-300 accent-violet-600"
-                      />
-                      <span>
-                        <span className="block text-sm font-medium text-slate-900">
-                          {t(`account.notifications.kinds.${kind}.title`)}
-                        </span>
-                        <span className="mt-1 block text-xs leading-5 text-slate-500">
-                          {t(`account.notifications.kinds.${kind}.text`)}
-                        </span>
-                      </span>
-                    </label>
-                  ))}
+                  {kinds.map(({ kind }) => {
+                    const optIn = emailOptInForKind(kind);
+                    return (
+                      // EIN KASTEN, ZWEI HAKEN - und deshalb ein <div> um
+                      // beide statt eines <label> um alles: Ein zweites
+                      // <label> INNERHALB des ersten ist ungueltiges HTML,
+                      // und ein Klick darauf wuerde den Elternhaken
+                      // mitschalten. Also endet das erste <label> vor dem
+                      // zweiten, und der Kasten hebt sich ueber das <div>
+                      // trotzdem gemeinsam hervor.
+                      <div
+                        key={kind}
+                        className="rounded-2xl border border-slate-200 p-3 transition has-[:checked]:border-violet-200 has-[:checked]:bg-violet-50/40"
+                      >
+                        <label className="flex min-h-11 cursor-pointer items-start gap-3">
+                          <input
+                            type="checkbox"
+                            name="notification"
+                            value={kind}
+                            defaultChecked={!isOff.has(kind)}
+                            className="mt-1 h-4 w-4 rounded border-slate-300 accent-violet-600"
+                          />
+                          <span>
+                            <span className="block text-sm font-medium text-slate-900">
+                              {t(`account.notifications.kinds.${kind}.title`)}
+                            </span>
+                            <span className="mt-1 block text-xs leading-5 text-slate-500">
+                              {t(`account.notifications.kinds.${kind}.text`)}
+                            </span>
+                          </span>
+                        </label>
+
+                        {/* DER MAILWEG ALS ZWEITER, EINGERUECKTER HAKEN - und
+                            leer, bis jemand ihn setzt.
+
+                            Warum kein weiterer Schalter in der Liste oben: Es
+                            ist keine zweite ART, sondern ein zweiter WEG fuer
+                            dieselbe. Nebeneinander gestellt saehe es aus wie
+                            zwei Dinge, die man beide abbestellen kann - und
+                            dann waere die naheliegende Annahme, dass beide an
+                            sind. Das ist hier ausdruecklich nicht so.
+
+                            Er haengt am Haken darueber: Wer die Art ganz
+                            abbestellt, bekommt auch keine Mail. Das erzwingt
+                            `wants_email_channel` in der Datenbank - nicht
+                            diese Oberflaeche. */}
+                        {optIn ? (
+                          <label className="mt-2 flex cursor-pointer items-start gap-2 pl-7">
+                            <input
+                              type="checkbox"
+                              name="emailOptIn"
+                              value={optIn.kind}
+                              defaultChecked={hasConsented.has(optIn.kind)}
+                              className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-violet-600"
+                            />
+                            <span className="block text-xs leading-5 text-slate-600">
+                              {t(`account.notifications.emailOptIns.${optIn.kind}`)}
+                            </span>
+                          </label>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               </fieldset>
             );
@@ -165,6 +220,11 @@ export async function AccountPreferencesSection({
         <PushNotificationSection
           vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null}
         />
+
+        {/* Der Probelauf steht hier und nicht bei den Mitteilungen darueber:
+            Er prueft die MELDUNG auf beiden Wegen mitsamt der Schalter davor,
+            nicht den Kanal. */}
+        {showSuggestionTest ? <SuggestionNotificationTest /> : null}
       </section>
     </>
   );

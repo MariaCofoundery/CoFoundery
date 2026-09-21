@@ -8,7 +8,12 @@ import {
   AccountDataSection,
   AccountPreferencesSection,
 } from "@/features/account/AccountPreferencesSection";
-import { isNotificationKind, type NotificationKind } from "@/features/account/notificationKinds";
+import {
+  isNotificationEmailOptIn,
+  isNotificationKind,
+  type NotificationEmailOptIn,
+  type NotificationKind,
+} from "@/features/account/notificationKinds";
 import { AiAvailabilitySection } from "@/features/ai/AiAvailabilitySection";
 import { getAiAvailability, getOwnPendingAiJobCount } from "@/features/ai/aiAvailability";
 import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
@@ -37,6 +42,7 @@ export default async function AccountPage({
     t,
     preferences,
     optedOutRows,
+    emailOptInRows,
     researchConsentState,
     pendingInvitations,
     aiAvailable,
@@ -52,6 +58,11 @@ export default async function AccountPage({
       .then(({ data }) => data)
       .catch(() => null),
     Promise.resolve(supabase.from("notification_opt_outs").select("kind").eq("user_id", user.id))
+      .then(({ data }) => data ?? [])
+      .catch((): { kind: string }[] => []),
+    // Und die Zustimmungen. Eigene Tabelle, weil hier die ABWESENHEIT einer
+    // Zeile "nein" heisst - oben heisst sie "ja".
+    Promise.resolve(supabase.from("notification_opt_ins").select("kind").eq("user_id", user.id))
       .then(({ data }) => data ?? [])
       .catch((): { kind: string }[] => []),
     getResearchConsentState(supabase, user.id).catch(() => "undecided" as const),
@@ -82,6 +93,9 @@ export default async function AccountPage({
   const optedOut = (optedOutRows as { kind: string }[])
     .map((row) => row.kind)
     .filter(isNotificationKind) as NotificationKind[];
+  const emailOptIns = (emailOptInRows as { kind: string }[])
+    .map((row) => row.kind)
+    .filter(isNotificationEmailOptIn) as NotificationEmailOptIn[];
   // Was eine Loeschung ueberdauern koennte. Ohne Connect-Konto gibt es das
   // nicht, dann wird auch nicht danach gefragt.
   const outlivable = hasConnectAccount
@@ -103,7 +117,13 @@ export default async function AccountPage({
         pendingInvitations={pendingInvitations}
         status={status}
       />
-      <AccountPreferencesSection locale={accountLocale} optedOut={optedOut} status={status} />
+      <AccountPreferencesSection
+        locale={accountLocale}
+        optedOut={optedOut}
+        emailOptIns={emailOptIns}
+        showSuggestionTest={hasConnectAccount}
+        status={status}
+      />
 
       <AccountDataSection>
         <ResearchConsentSettings initialState={researchConsentState} />

@@ -516,11 +516,18 @@
         "discovery_intro_accepted": {
           "title": "Deine Anfrage wurde angenommen",
           "text": "Wenn jemand, den du kennenlernen wolltest, zusagt. Eine Absage schicken wir nicht – die steht in deiner Liste."
+        },
+        "connect_suggestions": {
+          "title": "Vorschläge für dich",
+          "text": "Höchstens dreimal pro Woche, wenn in Connect etwas zu deinen eigenen Angaben passt. Kein Mensch schreibt dir dabei – das ist ein Abgleich deiner Angaben mit dem, was andere veröffentlicht haben."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",
       "submit": "Auswahl speichern",
-      "submitPending": "Wird gespeichert …"
+      "submitPending": "Wird gespeichert …",
+      "emailOptIns": {
+        "connect_suggestions_email": "Zusätzlich per E-Mail. Standardmäßig aus: Hier hat sich niemand bei dir gemeldet, deshalb fragen wir vorher. Die Mitteilung auf dein Gerät bekommst du unabhängig davon."
+      }
     },
     "data": {
       "title": "Deine Daten",
@@ -575,6 +582,18 @@
       "online": "Gerade verfügbar",
       "offline": "Gerade nicht verfügbar",
       "pending": "{count, plural, one {Eine Auswertung wartet und wird gerechnet, sobald es weitergeht.} other {# Auswertungen warten und werden gerechnet, sobald es weitergeht.}}"
+    },
+    "suggestionTest": {
+      "title": "Probelauf: Vorschläge",
+      "text": "Schickt dir jetzt genau die Meldung, die der tägliche Lauf schicken würde – auf denselben Wegen und mit denselben Schaltern davor. Es wird dabei kein echter Vorschlag als gemeldet verbucht.",
+      "send": "Probelauf starten",
+      "pending": "Wird verschickt …",
+      "pushed": "{count, plural, one {Mitteilung an ein Gerät verschickt} other {Mitteilung an # Geräte verschickt}}",
+      "noDevice": "Keine Mitteilung: Für dieses Konto ist gerade kein Gerät eingerichtet.",
+      "mailed": "E-Mail verschickt.",
+      "mailOff": "Keine E-Mail – du hast ihr nicht zugestimmt. Das ist die Voreinstellung.",
+      "mailFailed": "Keine E-Mail, obwohl du zugestimmt hast. Dann fehlt etwas am Mailversand.",
+      "failed": "Der Probelauf ist nicht durchgelaufen. Bitte noch einmal versuchen."
     }
   },
   "outlook": {
