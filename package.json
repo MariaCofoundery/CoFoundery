@@ -7,6 +7,9 @@
     "start": "npm --prefix web run start",
     "lint": "npm --prefix web run lint",
     "test": "npm --prefix web run test",
-    "ci:check": "npm --prefix web run ci:check"
+    "ci:check": "npm --prefix web run ci:check",
+    "ai:worker": "npm --prefix web run ai:worker",
+    "ai:eval": "npm --prefix web run ai:eval",
+    "tts:build": "npm --prefix web run tts:build"
   }
 }
