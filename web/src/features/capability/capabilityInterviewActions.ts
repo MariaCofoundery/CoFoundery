@@ -6,7 +6,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import { attachCapabilityEvidence } from "./capabilityEvidenceWrite";
-import { getActiveInterview, getUnsortedInterviewAnswers } from "./capabilityInterviewData";
+import {
+  getActiveInterview,
+  getSortedInterviewAnswers,
+  getUnsortedInterviewAnswers,
+} from "./capabilityInterviewData";
 import { nextCatalogueQuestion } from "./capabilityInterviewGuide";
 import {
   MAX_CONFIRMED_AREAS,
@@ -234,7 +238,13 @@ export async function saveInterviewAnswerAction(formData: FormData) {
 
     revalidatePath(PATH);
     revalidatePath("/profile");
-    redirect("/profile?saved=interview_done");
+    revalidatePath(SORT_PATH);
+    // ZUM EINORDNEN, nicht ins Profil. Gemeldet am 21.09.2026: "Nach dem
+    // Abschliessen war unklar, was als naechstes zu tun ist." Das Gespraech
+    // hat bis hierher Antworten erzeugt und sonst nichts - die naechste
+    // Handlung ist das Einordnen, und sie gehoert an das Ende des Weges und
+    // nicht in einen gruenen Kasten auf einer anderen Seite.
+    redirect(SORT_PATH);
   }
 
   await appendNextQuestion(client, state.sessionId);
@@ -313,7 +323,8 @@ export async function completeInterviewAction() {
 
   revalidatePath(PATH);
   revalidatePath("/profile");
-  redirect("/profile?saved=interview_done");
+  revalidatePath(SORT_PATH);
+  redirect(SORT_PATH);
 }
 
 /**
@@ -382,6 +393,53 @@ export async function sortInterviewAnswerAction(formData: FormData) {
     .update({ evidence_id: written.evidenceId })
     .eq("id", turnId);
   if (error) redirect(`${SORT_PATH}?error=link`);
+
+  revalidatePath(SORT_PATH);
+  revalidatePath("/profile");
+  redirect(SORT_PATH);
+}
+
+/**
+ * Eine Antwort nochmal einordnen.
+ *
+ * GEBRAUCHT AM 21.09.2026: Die Erkennung hatte fuer die Verhaltensbereiche
+ * keine Begriffe - wer sein Gespraech vorher eingeordnet hat, bekam deshalb nur
+ * Fachliches vorgeschlagen. Die Erzaehlung liegt noch da; sie nochmal
+ * erzaehlen zu lassen, weil unsere Begriffsliste besser geworden ist, waere
+ * die falsche Richtung.
+ *
+ * DER ALTE BELEG WIRD GELOESCHT, nicht behalten: Sonst stuende dieselbe
+ * Geschichte zweimal im Profil. Die BEREICHE, die dabei bestaetigt wurden,
+ * bleiben - wer "Fundraising" schon einmal bestaetigt hat, hat das gesagt, und
+ * eine zweite Einordnung nimmt es nicht zurueck. Sie kommt hinzu.
+ *
+ * Das Loeschen eines Belegs ist eine vorhandene Handlung (im Profil gibt es
+ * "Beispiel entfernen"), und die Zeilensicherheit erlaubt sie nur fuer eigene.
+ */
+export async function resortInterviewAnswerAction(formData: FormData) {
+  const { client } = await requireUser();
+  const turnId = String(formData.get("turnId") ?? "");
+
+  const sorted = await getSortedInterviewAnswers(client);
+  const turn = sorted.find((entry) => entry.id === turnId);
+  // Nicht dabei heisst: schon wieder offen, oder nicht die eigene. Beides
+  // braucht keine Meldung - die Seite zeigt den aktuellen Stand.
+  if (!turn) redirect(SORT_PATH);
+
+  const { error: deleteError } = await client
+    .from("person_capability_evidence")
+    .delete()
+    .eq("id", turn.evidenceId);
+  if (deleteError) redirect(`${SORT_PATH}?error=resort`);
+
+  // ERST NACH DEM LOESCHEN den Verweis loesen. Umgekehrt bliebe bei einem
+  // Fehlschlag ein Beleg ohne Antwort daran - und die Geschichte stuende
+  // zweimal im Profil, sobald man neu einordnet.
+  const { error } = await client
+    .from("capability_interview_turns")
+    .update({ evidence_id: null })
+    .eq("id", turnId);
+  if (error) redirect(`${SORT_PATH}?error=resort`);
 
   revalidatePath(SORT_PATH);
   revalidatePath("/profile");

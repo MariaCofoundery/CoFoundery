@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(8);
+select extensions.plan(11);
 
 -- ---------------------------------------------------------------------------
 -- Die Freigabeleiter im Team
@@ -115,6 +115,56 @@ select extensions.is(
   (select count(*)::int from public.get_disclosed_capability('f1000000-0000-4000-8000-000000000002','team')),
   0,
   'leaving the team closes the view again'
+);
+
+-- ---------------------------------------------------------------------------
+-- Die Erzählung bleibt privat - auch im eigenen Team
+-- ---------------------------------------------------------------------------
+--
+-- GEFRAGT AM 21.09.2026: "Die eingesprochenen Texte sollen nie anderen gezeigt
+-- werden." Sie wurden es nie - aber eine Zusage, die nur im Code steht, haelt
+-- bis zur naechsten Abfrage, die jemand hinzufuegt.
+--
+-- Der Fall ist absichtlich der guenstigste, den es gibt: dieselbe Person im
+-- selben Team, mit der hoechsten Freigabestufe. Wenn die Erzaehlung HIER nicht
+-- herauskommt, kommt sie nirgends heraus.
+set local role postgres;
+insert into public.person_capability_evidence(entry_id, narrative)
+select entry.id, 'Eine private Erzaehlung, die niemandem ausser mir gehoert.'
+from public.person_capability_entries entry
+where entry.user_id = 'f1000000-0000-4000-8000-000000000002'
+  and entry.area_id = 'fundraising';
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
+-- Ueber die Tabelle: keine Zeile.
+select extensions.is(
+  (select count(*)::int from public.person_capability_evidence),
+  0,
+  'a team mate cannot read the story behind an entry'
+);
+
+-- Und die Freigabe-Funktion kennt die Spalte nicht einmal: Sie gibt genau vier
+-- Werte zurueck, und der Text ist keiner davon.
+select extensions.set_eq(
+  $$select column_name::text
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'person_capability_entries'$$,
+  $$values ('id'), ('user_id'), ('area_id'), ('application_level'), ('ownership_wish'),
+           ('created_at'), ('updated_at')$$,
+  'the entry itself holds no story - it hangs in its own table'
+);
+
+set local role postgres;
+select extensions.set_eq(
+  $$select p.proname::text
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.prosrc like '%narrative%'$$,
+  $$select null::text where false$$,
+  'no database function hands out a narrative'
 );
 
 -- ---------------------------------------------------------------------------

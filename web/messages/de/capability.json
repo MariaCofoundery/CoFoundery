@@ -477,10 +477,15 @@
       "toProfile": "Zum Profil",
       "toInterview": "Weiteres Gespräch führen",
       "alreadySorted": "Diese Antwort war schon eingeordnet – vielleicht war ein zweites Fenster offen. Hier ist die nächste.",
+      "againTitle": "{count, plural, one {Eine Antwort ist schon eingeordnet} other {# Antworten sind schon eingeordnet}}",
+      "againText": "Du kannst eine Antwort nochmal einordnen. Sinnvoll ist das, wenn die Vorschläge damals dünn waren – die Erkennung wird besser, deine Erzählung bleibt dieselbe. Der alte Beleg wird dabei ersetzt, damit dieselbe Geschichte nicht zweimal im Profil steht. Bereiche, die du schon bestätigt hast, bleiben bestehen.",
+      "again": "Nochmal einordnen",
+      "againPending": "Wird geöffnet …",
       "errors": {
         "area": "Einer der Bereiche ist unbekannt. Bitte lade die Seite neu und versuch es noch einmal.",
         "save": "Das Einordnen ließ sich nicht speichern. Deine Antwort ist unverändert da.",
-        "link": "Gespeichert, aber die Antwort ließ sich nicht als eingeordnet vermerken. Sie erscheint noch einmal – ordne sie dann bitte nicht doppelt ein."
+        "link": "Gespeichert, aber die Antwort ließ sich nicht als eingeordnet vermerken. Sie erscheint noch einmal – ordne sie dann bitte nicht doppelt ein.",
+        "resort": "Das Öffnen hat nicht geklappt. Deine Antwort und ihre Einordnung sind unverändert."
       }
     },
     "questions": {

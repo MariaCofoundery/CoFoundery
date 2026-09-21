@@ -174,3 +174,32 @@ export async function getUnsortedInterviewAnswers(client: SupabaseClient) {
     sessionId: row.session_id,
   }));
 }
+
+/**
+ * Die Antworten, die schon eingeordnet sind.
+ *
+ * WOZU: Damit man es NOCHMAL tun kann. Am 21.09.2026 kam heraus, dass die
+ * Erkennung fuer die Verhaltensbereiche gar keine Begriffe hatte - wer sein
+ * Gespraech vorher eingeordnet hat, bekam deshalb nur Fachliches vorgeschlagen.
+ * Die Erzaehlungen liegen aber noch da; es waere absurd, sie neu erzaehlen zu
+ * lassen, weil unsere Begriffsliste besser geworden ist.
+ *
+ * Und das wird wieder vorkommen: Jede Verbesserung der Erkennung macht alte
+ * Einordnungen ein Stueck schlechter als moegliche neue.
+ */
+export async function getSortedInterviewAnswers(client: SupabaseClient) {
+  const { data } = await client
+    .from("capability_interview_turns")
+    .select(
+      "id, sort_order, question_source, question_id, question_text, answer, answered_at, evidence_id"
+    )
+    .not("answer", "is", null)
+    .not("evidence_id", "is", null)
+    .order("answered_at", { ascending: true })
+    .limit(50);
+
+  return ((data ?? []) as (TurnRow & { evidence_id: string })[]).map((row) => ({
+    ...toTurn(row),
+    evidenceId: row.evidence_id,
+  }));
+}

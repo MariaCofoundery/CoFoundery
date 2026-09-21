@@ -3,10 +3,13 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
+import { resortInterviewAnswerAction } from "@/features/capability/capabilityInterviewActions";
 import {
+  getSortedInterviewAnswers,
   getUnsortedInterviewAnswers,
   interviewQuestionMeta,
 } from "@/features/capability/capabilityInterviewData";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import { InterviewSortForm } from "@/features/capability/InterviewSortForm";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -40,13 +43,14 @@ export default async function InterviewSortPage({
 
   if (!userResult.data.user) redirect("/login?next=/profile/interview/sort");
 
-  const [unsorted, vocabulary] = await Promise.all([
+  const [unsorted, sorted, vocabulary] = await Promise.all([
     getUnsortedInterviewAnswers(client),
+    getSortedInterviewAnswers(client),
     getCapabilityVocabulary(client),
   ]);
 
   const card = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-7";
-  const knownErrors = ["area", "save", "link"];
+  const knownErrors = ["area", "save", "link", "resort"];
   const error = params.error && knownErrors.includes(params.error) ? params.error : null;
   const notice = params.notice === "already" ? "already" : null;
 
@@ -146,6 +150,55 @@ export default async function InterviewSortPage({
           </section>
         </>
       )}
+
+      {/* ------------------------------------------------------------------
+          NOCHMAL EINORDNEN.
+
+          GEBRAUCHT AM 21.09.2026: Die Erkennung hatte fuer die
+          Verhaltensbereiche keine Begriffe - wer sein Gespraech vorher
+          eingeordnet hat, bekam nur Fachliches vorgeschlagen. Die Erzaehlungen
+          liegen noch da; sie neu erzaehlen zu lassen, weil unsere
+          Begriffsliste besser geworden ist, waere die falsche Richtung.
+
+          Eingeklappt, weil es der Ausnahmeweg ist und nicht der Normalfall.
+          ------------------------------------------------------------------ */}
+      {sorted.length > 0 ? (
+        <details className="mt-8 rounded-3xl border border-slate-200 bg-white/60 p-5">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">
+            {t("interview.sort.againTitle", { count: sorted.length })}
+          </summary>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("interview.sort.againText")}</p>
+
+          <ul className="mt-4 grid gap-3">
+            {sorted.map((turn) => {
+              const turnMeta = interviewQuestionMeta(turn);
+              return (
+                <li
+                  key={turn.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-4"
+                >
+                  <p className="text-sm font-medium text-slate-900">
+                    {turnMeta.question
+                      ? t(`interview.questions.${turnMeta.question.id}.title`)
+                      : turnMeta.text}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">
+                    {turn.answer}
+                  </p>
+                  <form action={resortInterviewAnswerAction} className="mt-3">
+                    <input type="hidden" name="turnId" value={turn.id} />
+                    <SubmitButton
+                      label={t("interview.sort.again")}
+                      pendingLabel={t("interview.sort.againPending")}
+                      className="text-sm font-medium text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"
+                    />
+                  </form>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      ) : null}
     </main>
   );
 }

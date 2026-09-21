@@ -51,10 +51,19 @@ test("es gibt nur einen Weg, auf dem eine Staerke in das Modell kommt", () => {
     /from\("person_capability_entries"\)/,
     "das Interview schreibt Eintraege selbst"
   );
-  assert.doesNotMatch(
-    actions,
-    /from\("person_capability_evidence"\)/,
-    "das Interview schreibt Belege selbst"
+  // GESCHAERFT AM 21.09.2026: Der Test verbot jede Beruehrung der Tabelle und
+  // stand damit dem "nochmal einordnen" im Weg, das einen alten Beleg
+  // ENTFERNT. Gemeint war immer nur der Weg HINEIN - ein Beleg entsteht
+  // ausschliesslich in `attachCapabilityEvidence`. Loeschen ist eine
+  // vorhandene Handlung der Person (im Profil: "Beispiel entfernen"), und die
+  // Zeilensicherheit erlaubt sie nur fuer eigene Zeilen.
+  const evidenceCalls = [
+    ...actions.matchAll(/from\("person_capability_evidence"\)\s*\n?\s*\.(\w+)/g),
+  ].map((match) => match[1]);
+  assert.deepEqual(
+    [...new Set(evidenceCalls)],
+    ["delete"],
+    "das Interview schreibt oder liest Belege selbst"
   );
 
   // Und das Textfeld nimmt denselben Weg.
@@ -241,4 +250,66 @@ test("alle Texte des Schrittes stehen in beiden Sprachen", () => {
     }
     assert.match(copy.remaining, /\{count, plural,/, `${locale}: ungebeugt`);
   }
+});
+
+test("eine Antwort laesst sich nochmal einordnen, ohne sich zu verdoppeln", () => {
+  // GEBRAUCHT AM 21.09.2026: Die Erkennung hatte fuer die Verhaltensbereiche
+  // keine Begriffe. Wer sein Gespraech vorher eingeordnet hat, bekam nur
+  // Fachliches vorgeschlagen - und die Antwort galt als erledigt. Die
+  // Erzaehlung liegt aber noch da; sie neu erzaehlen zu lassen, weil unsere
+  // Begriffsliste besser geworden ist, waere die falsche Richtung.
+  const actions = codeOnly(ACTIONS);
+  assert.match(actions, /export async function resortInterviewAnswerAction/);
+
+  // DER ALTE BELEG WIRD ERSETZT, nicht behalten: Sonst stuende dieselbe
+  // Geschichte zweimal im Profil.
+  const resort = actions.slice(actions.indexOf("export async function resortInterviewAnswerAction"));
+  assert.match(resort, /\.delete\(\)/);
+  assert.match(resort, /evidence_id: null/);
+
+  // UND DIE REIHENFOLGE: erst loeschen, dann den Verweis loesen. Umgekehrt
+  // bliebe bei einem Fehlschlag ein Beleg ohne Antwort daran - und die
+  // Geschichte stuende zweimal da, sobald man neu einordnet.
+  const deleteAt = resort.indexOf(".delete()");
+  const unlinkAt = resort.indexOf("evidence_id: null");
+  assert.ok(deleteAt > 0 && unlinkAt > deleteAt, "der Verweis wird vor dem Beleg geloest");
+
+  // Nur eigene, und nur schon eingeordnete: Die Liste dazu liefert die
+  // Bedingung, und die Zeilensicherheit den Rest.
+  assert.match(resort, /getSortedInterviewAnswers\(client\)/);
+  assert.match(codeOnly(DATA), /\.not\("evidence_id", "is", null\)/);
+
+  // Und der Text sagt, was dabei passiert - vor allem, dass bestaetigte
+  // Bereiche bleiben. Sonst klingt "nochmal" wie "von vorn".
+  for (const locale of ["de", "en"]) {
+    const copy = sortCopy(locale);
+    for (const key of ["againTitle", "againText", "again", "againPending"]) {
+      assert.ok(copy[key], `${locale}: interview.sort.${key} fehlt`);
+    }
+    assert.match(
+      copy.againText,
+      locale === "de" ? /bleiben/ : /stay/,
+      `${locale}: der Text sagt nicht, dass Bestaetigtes bleibt`
+    );
+    assert.ok(copy.errors.resort, `${locale}: interview.sort.errors.resort fehlt`);
+  }
+});
+
+test("nach dem Abschliessen fuehrt der Weg zum Einordnen", () => {
+  // GEMELDET AM 21.09.2026: "Nach dem Abschliessen war unklar, was als
+  // naechstes zu tun ist." Das Gespraech hat bis dahin Antworten erzeugt und
+  // sonst nichts - die naechste Handlung ist das Einordnen, und sie gehoert an
+  // das Ende des Weges und nicht in einen gruenen Kasten auf einer anderen
+  // Seite.
+  const actions = codeOnly(ACTIONS);
+  const complete = actions.slice(
+    actions.indexOf('if (mode === "complete")'),
+    actions.indexOf("await appendNextQuestion")
+  );
+  assert.match(complete, /redirect\(SORT_PATH\)/);
+  assert.doesNotMatch(complete, /saved=interview_done/, "es geht weiter ins Profil");
+
+  // Und die Aktion zum Abschliessen selbst genauso.
+  const completeAction = actions.slice(actions.indexOf("export async function completeInterviewAction"));
+  assert.match(completeAction, /redirect\(SORT_PATH\)/);
 });

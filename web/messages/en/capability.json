@@ -477,10 +477,15 @@
       "toProfile": "Back to profile",
       "toInterview": "Have another conversation",
       "alreadySorted": "This answer was already sorted – perhaps a second window was open. Here is the next one.",
+      "againTitle": "{count, plural, one {One answer is already sorted} other {# answers are already sorted}}",
+      "againText": "You can sort an answer again. That makes sense when the proposals were thin back then – the recognition keeps improving, your story stays the same. The old piece of evidence is replaced so the same story does not appear twice in your profile. Areas you already confirmed stay.",
+      "again": "Sort again",
+      "againPending": "Opening …",
       "errors": {
         "area": "One of the areas is unknown. Please reload the page and try again.",
         "save": "Sorting could not be saved. Your answer is unchanged.",
-        "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice."
+        "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice.",
+        "resort": "Opening did not work. Your answer and its sorting are unchanged."
       }
     },
     "questions": {

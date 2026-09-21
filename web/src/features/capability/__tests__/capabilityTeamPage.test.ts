@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 
 import { TEAM_AREA_STATES } from "@/features/capability/capabilityTeamReadout";
@@ -217,4 +217,41 @@ test("der Reiter steht in der Team-Navigation", () => {
     ).teamNavigation;
     assert.ok(navigation.roles, `${locale}: teamNavigation.roles fehlt`);
   }
+});
+
+test("die Erzaehlung verlaesst die eigene Seite nicht", () => {
+  // GEFRAGT AM 21.09.2026: "Die eingesprochenen Texte sollen nie anderen
+  // gezeigt werden." Sie wurden es nie - drei pgTAP-Faelle in
+  // capability_disclosure_team.sql halten es an der Datenbank fest, auch fuer
+  // den guenstigsten Fall (dieselbe Person, dasselbe Team, hoechste
+  // Freigabestufe). Hier steht die Code-Seite.
+  //
+  // GENAU EINE STELLE liest Erzaehlungen, und die holt die eigenen. Kommt eine
+  // zweite dazu, faellt sie hier auf.
+  const readers = ["src/features/capability/capabilityData.ts"];
+  const dir = "src/features/capability";
+  for (const file of readdirSync(dir)) {
+    if (!file.endsWith(".ts") && !file.endsWith(".tsx")) continue;
+    const path = `${dir}/${file}`;
+    const code = codeOnly(path);
+    if (!/narrative/.test(code)) continue;
+    // Schreiben ist erlaubt, lesen nur an der einen Stelle.
+    const reads = /select\([^)]*narrative/.test(code);
+    if (reads) {
+      assert.ok(readers.includes(path), `${path} liest Erzaehlungen - das war nicht vorgesehen`);
+    }
+  }
+
+  // Und die Teamauswertung nimmt fuer FREMDE Menschen ausschliesslich die
+  // freigegebene Sicht, die den Text nicht enthaelt. Die eigene Abfrage steht
+  // ausdruecklich unter der Bedingung, dass es die eigene Kennung ist.
+  const data = codeOnly(DATA);
+  const ownBranch = data.indexOf("userId === currentUserId");
+  // Die AUFRUFSTELLE, nicht den Namen: Der Import steht ganz oben.
+  const ownCall = data.indexOf("getOwnCapabilityEntries(client");
+  assert.ok(ownBranch > 0 && ownCall > ownBranch, "die eigene Abfrage steht nicht unter der Bedingung");
+  assert.doesNotMatch(data, /narrative/, "die Teamauswertung nennt die Erzaehlung");
+
+  // Auch die Ansicht nicht.
+  assert.doesNotMatch(codeOnly(VIEW), /narrative/);
 });
