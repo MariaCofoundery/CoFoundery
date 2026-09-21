@@ -326,7 +326,8 @@
     "snapshot": "Dein Snapshot ist gespeichert.",
     "evidence_removed": "Der Eintrag wurde entfernt.",
     "identity": "Deine Angaben sind gespeichert.",
-    "disclosure": "Deine Freigabe ist gespeichert."
+    "disclosure": "Deine Freigabe ist gespeichert.",
+    "interview_done": "Das Gespräch ist abgeschlossen. Deine Antworten stehen bereit, um in Bereiche eingeordnet zu werden."
   },
   "pending": {
     "save": "Wird gespeichert …"
@@ -361,7 +362,8 @@
   "notices": {
     "recognised": "Wir haben deine Beschreibung einem oder mehreren Bereichen zugeordnet – unten schon angehakt. Prüf, ob das passt, und ergänze, was fehlt.",
     "unmatched": "Aus deiner Beschreibung konnten wir noch keinen Bereich ableiten. Sie ist unter „Anderer Schwerpunkt“ gespeichert – wähle unten den Bereich, der wirklich passt.",
-    "confirmed": "Deine Auswahl ist gespeichert. Hier kannst du ergänzen, was noch fehlt."
+    "confirmed": "Deine Auswahl ist gespeichert. Hier kannst du ergänzen, was noch fehlt.",
+    "interview_paused": "Gespeichert. Du kannst das Gespräch jederzeit dort fortsetzen, wo du aufgehört hast."
   },
   "industryLabels": {
     "software_saas": "Software & SaaS",
@@ -416,6 +418,40 @@
     "contextProfessional": "Beruflich",
     "contextPersonal": "Außerhalb der Arbeit",
     "contextEither": "Beruflich oder privat – beides zählt hier gleich",
+    "backToProfile": "Zum Profil",
+    "start": "Gespräch beginnen",
+    "resume": "Gespräch fortsetzen",
+    "resumeEmpty": "Dein Gespräch ist geöffnet, aber es steht noch keine Frage darin. Ein Klick holt sie.",
+    "progress": "{answered} von {total} Fragen beantwortet",
+    "answerLabel": "Deine Antwort",
+    "answerPlaceholder": "Erzähl es so, wie du es jemandem am Küchentisch erzählen würdest – mit Namen, Zahlen und dem, was schiefging.",
+    "answerHint": "Mindestens {min} Zeichen.",
+    "saveStateIdle": "Wird automatisch gespeichert, während du schreibst.",
+    "saveStateLocal": "In diesem Browser gesichert.",
+    "saveStateSaving": "Wird gespeichert …",
+    "saveStateSaved": "Gespeichert.",
+    "saveStateFailed": "Konnte gerade nicht gespeichert werden – dein Text steht in diesem Browser. Lass das Fenster offen, es wird weiter versucht.",
+    "restored": "Ein Stand aus diesem Browser war länger als der gespeicherte – wir haben ihn wiederhergestellt. Prüf bitte kurz, ob er stimmt.",
+    "followUpTitle": "Nachfrage",
+    "followUpHint": "Wenn du magst, geh darauf noch ein – schreib es einfach oben dazu.",
+    "tooShort": "Mindestens {min} Zeichen, sonst lässt sich daraus nichts ableiten. Wenn dir nichts einfällt, überspring die Frage.",
+    "submit": "Weiter",
+    "submitLast": "Antwort speichern und abschließen",
+    "pause": "Speichern und später weitermachen",
+    "skip": "Diese Frage überspringen",
+    "previousTitle": "Was du bisher erzählt hast",
+    "completeTitle": "Gespräch abschließen",
+    "completeTextAll": "Du hast alle Fragen durch. Mit dem Abschließen ist das Gespräch zu; deine Antworten bleiben und werden im nächsten Schritt in Bereiche eingeordnet.",
+    "completeTextEnough": "Du hast genug beantwortet ({min} oder mehr), um eine Auswertung daraus zu machen. Du kannst aber auch weitermachen – je mehr Situationen, desto genauer.",
+    "complete": "Gespräch abschließen",
+    "errors": {
+      "start": "Das Gespräch ließ sich nicht öffnen. Bitte noch einmal versuchen.",
+      "save": "Die Antwort ließ sich nicht speichern. Dein Text steht noch im Feld.",
+      "short": "Die Antwort war zu kurz.",
+      "long": "Die Antwort war zu lang.",
+      "stale": "Diese Frage ist nicht mehr die aktuelle – vielleicht war ein zweites Fenster offen. Hier ist der aktuelle Stand.",
+      "complete": "Das Abschließen hat nicht geklappt. Bitte noch einmal versuchen."
+    },
     "questions": {
       "owned_last": {
         "title": "Erzähl mir von der letzten Sache, für die du wirklich Verantwortung getragen hast – bis zu einem klaren Ergebnis oder einer bewussten Entscheidung, sie zu stoppen.",

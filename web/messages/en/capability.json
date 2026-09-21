@@ -326,7 +326,8 @@
     "snapshot": "Your snapshot is saved.",
     "evidence_removed": "The entry was removed.",
     "identity": "Your details are saved.",
-    "disclosure": "Your sharing setting is saved."
+    "disclosure": "Your sharing setting is saved.",
+    "interview_done": "The conversation is finished. Your answers are ready to be sorted into areas."
   },
   "pending": {
     "save": "Saving …"
@@ -361,7 +362,8 @@
   "notices": {
     "recognised": "We filed your description under one or more areas – already ticked below. Check whether that fits and add what is missing.",
     "unmatched": "We could not derive an area from your description yet. It is stored under “Other focus” – pick the area below that actually fits.",
-    "confirmed": "Your selection is saved. Here you can add whatever is still missing."
+    "confirmed": "Your selection is saved. Here you can add whatever is still missing.",
+    "interview_paused": "Saved. You can continue the conversation at any time where you left off."
   },
   "industryLabels": {
     "software_saas": "Software & SaaS",
@@ -416,6 +418,40 @@
     "contextProfessional": "At work",
     "contextPersonal": "Outside of work",
     "contextEither": "At work or privately – both count equally here",
+    "backToProfile": "Back to profile",
+    "start": "Start the conversation",
+    "resume": "Continue the conversation",
+    "resumeEmpty": "Your conversation is open, but it does not hold a question yet. One click fetches it.",
+    "progress": "{answered} of {total} questions answered",
+    "answerLabel": "Your answer",
+    "answerPlaceholder": "Tell it the way you would tell somebody at the kitchen table – with names, numbers and the parts that went wrong.",
+    "answerHint": "At least {min} characters.",
+    "saveStateIdle": "Saved automatically while you write.",
+    "saveStateLocal": "Kept in this browser.",
+    "saveStateSaving": "Saving …",
+    "saveStateSaved": "Saved.",
+    "saveStateFailed": "Could not be saved just now – your text is kept in this browser. Leave the window open, it keeps trying.",
+    "restored": "A version from this browser was longer than the saved one – we restored it. Please check that it is right.",
+    "followUpTitle": "Follow-up",
+    "followUpHint": "If you like, go into this as well – just add it above.",
+    "tooShort": "At least {min} characters, otherwise nothing can be drawn from it. If nothing comes to mind, skip the question.",
+    "submit": "Continue",
+    "submitLast": "Save answer and finish",
+    "pause": "Save and continue later",
+    "skip": "Skip this question",
+    "previousTitle": "What you have told so far",
+    "completeTitle": "Finish the conversation",
+    "completeTextAll": "You have been through all the questions. Finishing closes the conversation; your answers stay and will be sorted into areas in the next step.",
+    "completeTextEnough": "You have answered enough ({min} or more) to make a readout from it. You can also carry on – the more situations, the more precise.",
+    "complete": "Finish the conversation",
+    "errors": {
+      "start": "The conversation could not be opened. Please try again.",
+      "save": "The answer could not be saved. Your text is still in the field.",
+      "short": "The answer was too short.",
+      "long": "The answer was too long.",
+      "stale": "This question is no longer the current one – perhaps a second window was open. Here is the current state.",
+      "complete": "Finishing did not work. Please try again."
+    },
     "questions": {
       "owned_last": {
         "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",

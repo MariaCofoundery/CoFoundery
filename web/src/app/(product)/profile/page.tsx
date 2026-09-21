@@ -47,9 +47,9 @@ const primary =
 const secondary = "inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold";
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
-const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure"];
+const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure", "interview_done"];
 const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles", "linkedin"];
-const NOTICE_KEYS = ["recognised", "confirmed", "unmatched"];
+const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
 export default async function ProfilePage({
@@ -164,6 +164,24 @@ export default async function ProfilePage({
             {t("steps.later")}
           </Link>
         </div>
+      ) : null}
+
+      {/* DER WEG INS GESPRAECH, und zwar vor dem einzelnen Textfeld: Wer acht
+          Fragen beantwortet hat, braucht das Feld darunter meist nicht mehr -
+          umgekehrt bleibt es aber der schnelle Weg fuer eine einzelne Sache,
+          die einem gerade einfaellt. Beides fuehrt in denselben Ablauf. */}
+      {!step ? (
+        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-5 sm:p-7">
+          <h2 className="text-lg font-semibold text-slate-950">{t("interview.title")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-700">{t("interview.text")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("interview.guidanceTime")}</p>
+          <Link
+            href="/profile/interview"
+            className={`${primary} mt-4`}
+          >
+            {t("interview.start")}
+          </Link>
+        </section>
       ) : null}
 
       {/* Schritt 1: die erzaehlte Sache, dann die Rueckfrage, was davon

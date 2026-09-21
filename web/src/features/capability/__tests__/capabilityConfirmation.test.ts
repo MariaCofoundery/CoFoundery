@@ -153,7 +153,20 @@ test("the notice after a confirmed selection differs from the one after a guess"
   assert.doesNotMatch(notices.confirmed, /Prüf, ob das passt/);
   // Unbekannte Schluessel erscheinen als roher Schluesselpfad - die Allowlist
   // muss den neuen Wert kennen.
-  assert.match(page, /const NOTICE_KEYS = \["recognised", "confirmed", "unmatched"\]/);
+  //
+  // GEAENDERT AM 21.09.2026: Der Test verlangte die Liste WOERTLICH und wurde
+  // damit von jedem weiteren Hinweis gebrochen (dazugekommen ist
+  // `interview_paused`). Geprueft wird jetzt, worum es ging: dass der
+  // Schluessel in der Allowlist steht - und dass jeder Schluessel dort auch
+  // einen Text hat, denn sonst steht auf der Seite ein Pfad.
+  const allowlist = page.match(/const NOTICE_KEYS = \[(.*?)\]/)?.[1] ?? "";
+  const allowed = [...allowlist.matchAll(/"([a-z_]+)"/g)].map((match) => match[1]);
+  for (const key of ["recognised", "confirmed", "unmatched"]) {
+    assert.ok(allowed.includes(key), `${key} fehlt in NOTICE_KEYS`);
+  }
+  for (const key of allowed) {
+    assert.ok(notices[key], `notices.${key} fehlt - auf der Seite stuende ein Schluesselpfad`);
+  }
 });
 
 // ---------------------------------------------------------------------------
