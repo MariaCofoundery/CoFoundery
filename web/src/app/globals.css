@@ -796,3 +796,80 @@ body {
   color: var(--color-slate-400);
   box-shadow: inset 0 0 0 1px var(--color-slate-200);
 }
+
+/* ---------------------------------------------------------------------------
+   Das Highlight-Feld auf der Connect-Uebersicht
+   ---------------------------------------------------------------------------
+   Es soll leuchten, ohne zu blinken. Zwei weiche Farbfelder wandern langsam
+   hinter dem Kasten - 18 Sekunden fuer einen Durchgang, weil alles darunter
+   im Blickfeld zu einer Bewegung wird, die man wegklicken moechte.
+
+   Das Leuchten liegt HINTER dem Inhalt (::before mit z-index 0 und
+   pointer-events: none): Es darf keinen Text einfaerben und keinen Klick
+   abfangen.
+
+   Bewegung ist hier Schmuck, und Schmuck ist abschaltbar. Wer im
+   Betriebssystem weniger Bewegung eingestellt hat, bekommt dieselben Farben
+   ohne Wanderung - nicht einen anderen Kasten.
+   --------------------------------------------------------------------------- */
+.connect-highlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.connect-highlight::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 42% at 18% 30%, rgba(124, 58, 237, 0.16), transparent 70%),
+    radial-gradient(34% 38% at 82% 70%, rgba(103, 232, 249, 0.18), transparent 70%);
+  animation: connect-highlight-drift 18s ease-in-out infinite;
+}
+
+.connect-highlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Die Karten heben sich beim Zeigen leicht - genug, um anfassbar zu wirken,
+   wenig genug, um beim Ueberfahren der Liste nicht zu wackeln. */
+.connect-highlight-card {
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.9, 0.24, 1),
+    box-shadow 220ms cubic-bezier(0.22, 0.9, 0.24, 1),
+    border-color 220ms ease;
+}
+
+.connect-highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(124, 58, 237, 0.1);
+}
+
+@keyframes connect-highlight-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(2%, -2%, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connect-highlight::before {
+    animation: none;
+  }
+
+  .connect-highlight-card {
+    transition: none;
+  }
+
+  .connect-highlight-card:hover {
+    transform: none;
+  }
+}

@@ -30,7 +30,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
   return (
     <section
       aria-label={t("title")}
-      className="rounded-3xl border border-violet-200/70 bg-violet-50/40 p-5 sm:p-6"
+      className="connect-highlight rounded-3xl border border-violet-200/70 bg-gradient-to-br from-violet-50/60 via-white to-cyan-50/50 p-5 sm:p-6"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-[.14em] text-violet-800">
@@ -46,7 +46,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
           <Link
             key={`${highlight.kind}:${highlight.id}`}
             href={highlight.href}
-            className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-violet-300"
+            className="connect-highlight-card flex flex-col rounded-2xl border border-slate-200 bg-white/92 p-4 shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:border-violet-300"
           >
             <p className="text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
               {t(`kinds.${highlight.kind}`)}

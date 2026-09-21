@@ -149,6 +149,27 @@ test("der Filterkasten ist kleiner als eine Anzeige", () => {
   assert.match(page, /<details className="w-full" open=\{activeFilterCount > 0\}>/);
 });
 
+test("das Leuchten ist abschaltbar, weil Bewegung Schmuck ist", () => {
+  // Wer im Betriebssystem weniger Bewegung eingestellt hat, hat das aus einem
+  // Grund getan - oft aus einem gesundheitlichen. Dann dieselben Farben ohne
+  // Wanderung, nicht ein anderer Kasten.
+  const css = readFileSync("src/app/globals.css", "utf8");
+  const block = css.slice(css.indexOf(".connect-highlight {"));
+  assert.match(block, /@keyframes connect-highlight-drift/);
+  const reduced = block.slice(block.indexOf("@media (prefers-reduced-motion: reduce)"));
+  assert.ok(reduced.length > 0, "kein Abschalter fuer die Bewegung");
+  assert.match(reduced, /\.connect-highlight::before \{\s*animation: none;/);
+
+  // Das Leuchten liegt hinter dem Inhalt und faengt keinen Klick ab.
+  assert.match(block, /pointer-events: none/);
+  assert.match(block, /\.connect-highlight > \* \{\s*position: relative;\s*z-index: 1;/);
+
+  // Langsam: Alles darunter wird im Blickfeld zu einer Bewegung, die man
+  // wegklicken moechte.
+  const seconds = Number((block.match(/connect-highlight-drift (\d+)s/) ?? [])[1]);
+  assert.ok(seconds >= 12, `zu schnell: ${seconds}s`);
+});
+
 test("der Leerzustand fragt nicht nur nach Anzeigen", () => {
   // "Hier steht noch nichts" plus zwei Knoepfe fuer Anzeigen las sich wie eine
   // Pinnwand. Wer keine Anzeige hat, hat vielleicht ein Unternehmen.
