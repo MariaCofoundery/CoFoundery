@@ -148,6 +148,45 @@ test("nur in der Plattform - es gibt gar keinen Mailweg", () => {
   }
 });
 
+test("der Weg dorthin sagt, dass etwas dort liegt", () => {
+  // MARIAS FRAGE WAR: "Wo sehe ich dann, wer mir vorgeschlagen wird?" Der Link
+  // in "Meine Sachen" beantwortete sie nur fuer den, der ohnehin nachsieht.
+  // Und weil ausdruecklich NICHTS per Mail hinausgeht, ist dieses Zeichen die
+  // einzige Stelle, an der ein Vorschlag sich bemerkbar machen kann.
+  const nav = codeOnly("src/features/connect/ConnectMineNav.tsx");
+  assert.match(nav, /countOpenConnectSuggestions/);
+  assert.match(nav, /link\.key === "suggestions" && suggestionCount > 0/);
+
+  // NICHT ROT. Rot ist in Connect fuer das reserviert, wo ein Mensch auf eine
+  // Antwort wartet - eine Anfrage, eine Nachricht. Ein Vorschlag wartet nicht,
+  // und eine rote Zahl, die auch fuer Unwichtiges leuchtet, verliert ihre
+  // Bedeutung fuer das Wichtige.
+  assert.doesNotMatch(nav, /bg-red/, "die Vorschlagszahl leuchtet wie eine Anfrage");
+
+  // Die Zahl braucht einen vorlesbaren Namen - "3" allein sagt einem
+  // Screenreader nichts.
+  assert.match(nav, /aria-label=\{t\("mine\.suggestionCount"/);
+  for (const locale of ["de", "en"]) {
+    const mine = (
+      JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
+        mine: Record<string, string>;
+      }
+    ).mine;
+    assert.ok(mine.suggestionCount, `${locale}: mine.suggestionCount fehlt`);
+    // Gebeugt: "1 Vorschläge" ist der Fehler, den man in jeder zweiten
+    // Anwendung liest.
+    assert.match(mine.suggestionCount, /\{count, plural,/, `${locale}: ungebeugt`);
+  }
+
+  // Und die Zahl darf nicht fuer jeden null sein, der die Unterseite noch nie
+  // geoeffnet hat: Auf der Uebersicht wird deshalb auch erzeugt.
+  assert.match(
+    codeOnly("src/app/(product)/connect/page.tsx"),
+    /generateConnectSuggestions\(client\)/,
+    "die Uebersicht erzeugt nichts - dann bleibt die Zahl bei null"
+  );
+});
+
 test("erzeugt wird beim Hinsehen, nicht von einem Zeitplan", () => {
   // Es gibt in diesem Projekt keinen Cron - und eine Handvoll Mengenschnitte
   // braucht keinen.

@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import { createClient } from "@/lib/supabase/server";
+
+import { countOpenConnectSuggestions } from "./connectSuggestionData";
+
 /**
  * Der Weg zum Eigenen.
  *
@@ -29,7 +33,13 @@ const LINKS = [
 ] as const;
 
 export async function ConnectMineNav() {
-  const t = await getTranslations("connect");
+  const [t, client] = await Promise.all([getTranslations("connect"), createClient()]);
+
+  // WOZU DIE ZAHL: Der Link zu den Vorschlaegen stand hier schon, aber nichts
+  // sagte, dass dort etwas liegt - und Vorschlaege gehen ausdruecklich NICHT
+  // per Mail hinaus. Wenn nichts hinausgeht, muss das Zeichen hier stehen,
+  // sonst ist "nur in der Plattform" gleichbedeutend mit "unauffindbar".
+  const suggestionCount = await countOpenConnectSuggestions(client);
 
   return (
     <nav aria-label={t("mine.label")} className="flex flex-wrap items-center gap-1">
@@ -43,6 +53,18 @@ export async function ConnectMineNav() {
           className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
         >
           {t(`mine.${link.key}`)}
+          {/* NICHT ROT. Rot ist in Connect fuer das reserviert, wo ein Mensch
+              auf eine Antwort wartet - eine Kontaktanfrage, eine Nachricht.
+              Ein Vorschlag wartet nicht. Ihn in dieselbe Farbe zu setzen
+              wuerde die rote Zahl entwerten, auf die es ankommt. */}
+          {link.key === "suggestions" && suggestionCount > 0 ? (
+            <span
+              aria-label={t("mine.suggestionCount", { count: suggestionCount })}
+              className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-violet-100 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-violet-800"
+            >
+              {Math.min(suggestionCount, 99)}
+            </span>
+          ) : null}
         </Link>
       ))}
     </nav>

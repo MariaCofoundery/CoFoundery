@@ -734,7 +734,8 @@
     "profile": "Mein Profil",
     "listings": "Meine Einträge",
     "ventures": "Meine Unternehmen",
-    "suggestions": "Für dich"
+    "suggestions": "Für dich",
+    "suggestionCount": "{count, plural, one {Ein Vorschlag für dich} other {# Vorschläge für dich}}"
   },
   "resources": {
     "title": "Zugänge und Netzwerke",

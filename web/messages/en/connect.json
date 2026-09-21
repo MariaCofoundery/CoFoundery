@@ -734,7 +734,8 @@
     "profile": "My profile",
     "listings": "My listings",
     "ventures": "My ventures",
-    "suggestions": "For you"
+    "suggestions": "For you",
+    "suggestionCount": "{count, plural, one {One suggestion for you} other {# suggestions for you}}"
   },
   "resources": {
     "title": "Access and networks",

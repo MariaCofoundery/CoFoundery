@@ -49,6 +49,28 @@ export async function generateConnectSuggestions(client: SupabaseClient) {
   await client.rpc("generate_connect_suggestions", { p_limit: 3 });
 }
 
+/**
+ * Wie viele offene Vorschlaege liegen.
+ *
+ * WOZU: Die Vorschlagsseite gab es seit dem 21.09.2026, und der Weg dorthin
+ * stand in "Meine Sachen" - aber nichts sagte, dass dort etwas liegt. Ein Link
+ * ohne Zahl beantwortet die Frage "wo sehe ich, wer mir vorgeschlagen wird?"
+ * nur fuer den, der ohnehin nachsieht.
+ *
+ * Gezaehlt wird mit `head`, also ohne die Zeilen zu holen: Die Zahl steht in
+ * einer Navigation, die auf mehreren Seiten gerendert wird.
+ */
+export async function countOpenConnectSuggestions(client: SupabaseClient) {
+  const { count, error } = await client
+    .from("connect_suggestions")
+    .select("id", { count: "exact", head: true })
+    .is("dismissed_at", null);
+
+  // Bei einem Fehler null, und die Navigation zeigt dann keine Zahl: Ein Link
+  // ohne Zahl ist harmlos, eine falsche Zahl an einem Link nicht.
+  return error ? 0 : (count ?? 0);
+}
+
 export async function getOwnConnectSuggestions(
   client: SupabaseClient
 ): Promise<ConnectSuggestion[]> {

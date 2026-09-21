@@ -15,6 +15,7 @@ import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
+import { generateConnectSuggestions } from "@/features/connect/connectSuggestionData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -26,7 +27,13 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
     .some((key) => (filters[key] ?? "").trim().length > 0);
-  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id)]);
+  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id),
+    // ERZEUGT WIRD AUCH HIER, nicht nur auf der Vorschlagsseite. Sonst waere
+    // die Zahl in "Meine Sachen" fuer jeden null, der die Unterseite noch nie
+    // geoeffnet hat - und damit waere der Hinweis genau fuer die nutzlos, die
+    // er erreichen soll. Das Wochenbudget von drei gilt unveraendert; ist es
+    // aufgebraucht, kehrt der Aufruf nach einer Zaehlung zurueck.
+    generateConnectSuggestions(client)]);
   // Wie viele Kriterien gesetzt sind - danach richtet sich, ob die
   // Eingrenzung offen oder eingeklappt erscheint.
   const activeFilterCount = ["direction", "category", "remote_mode", "geographic_scope", "topic", "industry"].filter((key) => (filters[key] ?? "").trim().length > 0).length;
