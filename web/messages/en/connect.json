@@ -774,8 +774,8 @@
   },
   "suggestions": {
     "title": "For you",
-    "text": "From the fields and industries you entered, we look for offers, companies and unsolved problems that overlap. Every suggestion shows you the word that triggered it.",
-    "because": "Because your profile says: {terms}",
+    "text": "From what you wrote yourself – fields and industries in your profile, your requests, and the problems you named – we look for offers, companies, people and unsolved problems that overlap. Every suggestion shows you the word that triggered it.",
+    "because": "Because you wrote: {terms}",
     "dismiss": "Not interesting",
     "kinds": {
       "listing": "Offer",
@@ -784,8 +784,9 @@
       "person": "Person"
     },
     "emptyTitle": "Nothing fitting right now",
-    "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precisely your fields and industries are in your profile, the more turns up.",
+    "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precise your profile is, and above all: the sooner you write down what you are looking for, the more turns up.",
     "emptyCta": "Complete your profile",
-    "note": "At most three suggestions a week, and they stay in the platform – none of this goes out by email. We do not suggest requests: whoever is looking for something should decide for themselves whom to approach."
+    "note": "At most three suggestions a week, and they stay in the platform – none of this goes out by email. We do not suggest requests: whoever is looking for something should decide for themselves whom to approach.",
+    "emptyCtaAsk": "Post a request"
   }
 }

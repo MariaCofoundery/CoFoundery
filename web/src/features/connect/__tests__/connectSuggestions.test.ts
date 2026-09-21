@@ -15,6 +15,7 @@ const sqlCodeOnly = (path: string) =>
 
 const MIGRATION = "../supabase/migrations/20261017120000_connect_suggestions.sql";
 const PERSON_MIGRATION = "../supabase/migrations/20261018120000_connect_person_suggestions.sql";
+const TERMS_MIGRATION = "../supabase/migrations/20261019120000_connect_match_terms_from_asks.sql";
 const PAGE = "src/app/(product)/connect/suggestions/page.tsx";
 const DATA = "src/features/connect/connectSuggestionData.ts";
 
@@ -117,6 +118,64 @@ test("der Schalter versteckt das Profil nicht", () => {
     codeOnly("src/features/connect/connectValidation.ts"),
     /suggestable: formData\.get\("suggestable"\) === "yes"/
   );
+});
+
+test("was ich suche, zaehlt als Kriterium mit", () => {
+  // MARIAS FRAGE WAR: "Welche Kriterien?" Bis zum 21.09.2026 war die Antwort
+  // unvollstaendig - verglichen wurde nur, was jemand KANN (expertise,
+  // industries). Gefunden wurde damit "jemand bietet etwas aus deinem
+  // Fachgebiet"; wer Podcasts macht, braucht aber nicht vorrangig andere
+  // Podcast-Leute. Die deutlichste Aussage darueber, was jemand WILL, steht in
+  // dem, was er selbst ausgeschrieben hat.
+  //
+  // Das Verhalten prueft `supabase/tests/connect_match_terms.sql` mit 9
+  // pgTAP-Faellen - darunter der Fall, der vorher nicht gefunden wurde: Mara
+  // sucht Finanzierung, Fina bietet sie, und "Finanzierung" steht nirgends in
+  // Maras Profil.
+  const terms = sqlCodeOnly(TERMS_MIGRATION);
+  assert.match(terms, /listing\.direction = 'seeking'/, "eigene Gesuche zaehlen nicht mit");
+  assert.match(terms, /problem\.author_user_id = p_user_id/, "eigene Probleme zaehlen nicht mit");
+
+  // Nur AKTIVE, nicht abgelaufene Bitten: Eine ausgelaufene Anzeige ist eine
+  // zurueckgezogene Bitte, ein Entwurf ist ein Gedanke.
+  assert.match(terms, /listing\.status = 'active'/);
+  assert.match(terms, /listing\.expires_at > now\(\)/);
+
+  // Die Grenze von drei Zeichen bleibt: Kurze Woerter treffen ueberall.
+  assert.match(terms, /char_length\(source\.term\) >= 3/);
+
+  // WAS SICH NICHT AENDERT: Ein fremdes Gesuch bleibt aussen vor. Hier wandert
+  // nur die EIGENE Bitte in die Suchbegriffe - die Vorschlagsliste selbst
+  // zeigt weiter nur Angebote.
+  assert.match(sqlCodeOnly(MIGRATION), /listing\.direction = 'offering'/);
+
+  // Und die Funktion beantwortet nur noch Fragen nach der eigenen Person: Mit
+  // Gesuchen und Problemen darin waere sie sonst eine Zusammenfassung dessen,
+  // was jemanden umtreibt - herausgegeben an jeden Angemeldeten.
+  assert.match(terms, /p_user_id <> auth\.uid\(\)/);
+  assert.match(terms, /raise exception 'own_terms_only'/);
+
+  // Der leere Zustand zeigt auf die wirksamere Handlung: ein Gesuch
+  // aufschreiben bringt jetzt mehr als ein weiteres Wort im Profil.
+  const page = codeOnly(PAGE);
+  const askAt = page.indexOf('t("suggestions.emptyCtaAsk")');
+  const profileAt = page.indexOf('t("suggestions.emptyCta")');
+  assert.ok(askAt > 0 && askAt < profileAt, "der leere Zustand zeigt zuerst aufs Profil");
+  for (const locale of ["de", "en"]) {
+    const suggestions = (
+      JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
+        suggestions: Record<string, string>;
+      }
+    ).suggestions;
+    assert.ok(suggestions.emptyCtaAsk, `${locale}: suggestions.emptyCtaAsk fehlt`);
+    // Und der erklaerende Satz nennt die neuen Quellen - sonst wundert man
+    // sich, woher ein Treffer kommt, der nicht im Profil steht.
+    assert.match(
+      suggestions.text,
+      locale === "de" ? /Gesuche/ : /requests/,
+      `${locale}: der Text nennt die Gesuche nicht`
+    );
+  }
 });
 
 test("drei pro Woche, nicht dreissig", () => {

@@ -63,12 +63,26 @@ export default async function ConnectSuggestionsPage() {
         <section className={`${card} mt-6`}>
           <h2 className="text-lg font-semibold text-slate-900">{t("suggestions.emptyTitle")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("suggestions.emptyText")}</p>
-          <Link
-            href="/connect/profile"
-            className="mt-4 inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            {t("suggestions.emptyCta")}
-          </Link>
+          {/* ZWEI WEGE, und der zweite ist seit dem 21.09.2026 der wirksamere:
+              Seit die eigenen Gesuche und Probleme zu den Suchbegriffen
+              zaehlen (Migration 20261019120000), bringt ein aufgeschriebenes
+              Gesuch mehr als ein weiteres Wort im Profil. "Profil ergaenzen"
+              allein liess den leeren Zustand auf die schwaechere Handlung
+              zeigen. */}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link
+              href="/connect/listings/new?direction=seeking"
+              className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold text-slate-900"
+            >
+              {t("suggestions.emptyCtaAsk")}
+            </Link>
+            <Link
+              href="/connect/profile"
+              className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              {t("suggestions.emptyCta")}
+            </Link>
+          </div>
         </section>
       ) : (
         <div className="mt-6 grid gap-4">

@@ -774,7 +774,7 @@
   },
   "suggestions": {
     "title": "Für dich",
-    "text": "Aus dem, was du als Fachgebiete und Branchen eingetragen hast, suchen wir passende Angebote, Unternehmen und ungelöste Probleme. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.",
+    "text": "Aus dem, was du selbst aufgeschrieben hast – Fachgebiete und Branchen im Profil, deine Gesuche und die Probleme, die du genannt hast –, suchen wir passende Angebote, Unternehmen, Menschen und ungelöste Probleme. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.",
     "because": "Weil bei dir steht: {terms}",
     "dismiss": "Nicht interessant",
     "kinds": {
@@ -784,8 +784,9 @@
       "person": "Mensch"
     },
     "emptyTitle": "Gerade nichts Passendes",
-    "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer deine Fachgebiete und Branchen im Profil stehen, desto mehr findet sich.",
+    "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer dein Profil ist, und vor allem: je eher du aufschreibst, was du suchst, desto mehr findet sich.",
     "emptyCta": "Profil ergänzen",
-    "note": "Höchstens drei Vorschläge pro Woche, und sie bleiben in der Plattform – per E-Mail geht davon nichts hinaus. Gesuche schlagen wir nicht vor: Wer etwas sucht, soll selbst entscheiden, wen er anspricht."
+    "note": "Höchstens drei Vorschläge pro Woche, und sie bleiben in der Plattform – per E-Mail geht davon nichts hinaus. Gesuche schlagen wir nicht vor: Wer etwas sucht, soll selbst entscheiden, wen er anspricht.",
+    "emptyCtaAsk": "Gesuch einstellen"
   }
 }
