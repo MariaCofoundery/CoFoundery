@@ -47,6 +47,7 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
             setup: navigationT("setup"),
             library: navigationT("library"),
             alignment: navigationT("alignment"),
+            roles: navigationT("roles"),
           }}
         />
       )}

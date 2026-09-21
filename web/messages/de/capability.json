@@ -546,5 +546,56 @@
         }
       }
     }
+  },
+  "team": {
+    "title": "Rollen und Zuständigkeiten",
+    "text": "Wer verantwortet was, wo wollen mehrere dasselbe, und wo will es niemand. Das hier ist eine Lagebeschreibung aus euren eigenen Angaben – keine Bewertung, keine Punkte und keine Rangfolge.",
+    "backToTeam": "Zum Team",
+    "basis": "{contributing} von {members} im Team haben Angaben gemacht, davon {withDepth} mit Erfahrungsstufe und Verantwortungswunsch. Nur diese beiden lassen eine Aussage über eine Rolle zu – wer weniger freigegeben hat, erscheint hier ohne Tiefe.",
+    "mapTitle": "Die Lage auf einen Blick",
+    "mapText": "Je Familie ein Balken, ein Feld pro Bereich, in dem es Angaben gibt. Die Farben stehen für den Zustand, und dieselbe Auskunft steht als Zahl daneben.",
+    "familyUnspoken": "Darüber hat niemand etwas gesagt. Das heißt nicht, dass es fehlt.",
+    "countEntry": "{count}× {state}",
+    "claimedBy": "Will verantworten: {names}",
+    "claimedByNobody": "Niemand beansprucht das",
+    "findingsTitle": "Was daraus folgt",
+    "areaCount": "{count, plural, one {ein Bereich} other {# Bereiche}}",
+    "wants": "will verantworten: {names}",
+    "canDo": "hat Tiefe: {names}",
+    "unnamedMember": "ein Teammitglied",
+    "emptyTitle": "Noch keine Grundlage",
+    "emptyText": "Für diese Auswertung braucht es von mindestens zwei Menschen im Team Angaben zu Erfahrungsstufe und Verantwortungswunsch – und die Freigabe, sie im Team zu zeigen. Beides entscheidet jede Person selbst; „privat“ bleibt privat, auch hier.",
+    "emptyInterview": "Gespräch führen",
+    "emptyDisclosure": "Freigabe einstellen",
+    "states": {
+      "contested": {
+        "label": "Mehrere wollen verantworten",
+        "text": "Zwei oder mehr beanspruchen dieselbe Zuständigkeit. Das klärt sich nicht von selbst und wird später teuer – es braucht ein Gespräch darüber, wer entscheidet, nicht darüber, wer mehr kann."
+      },
+      "gap": {
+        "label": "Will niemand, kann niemand",
+        "text": "Hier hat sich niemand die Verantwortung gewünscht und niemand Tiefe angegeben. Das ist die einzige Lage, die eine Entscheidung erzwingt: einstellen, beauftragen – oder bewusst lassen und sagen, dass es liegt."
+      },
+      "openPosition": {
+        "label": "Kann jemand, will niemand",
+        "text": "Die Fähigkeit ist da, die Zuständigkeit will sie niemand. Das ist eine Absprache, kein Mangel – oft reicht es, sie befristet zu verabreden."
+      },
+      "claimedShallow": {
+        "label": "Gewollt, noch ohne Tiefe",
+        "text": "Jemand will das verantworten und hat es nach eigener Angabe noch nicht wiederholt angewandt. Das ist in Ordnung, wenn es ausgesprochen ist – und riskant, wenn alle es für erledigt halten."
+      },
+      "handoverPath": {
+        "label": "Übergabe möglich",
+        "text": "Einer will hineinwachsen, ein anderer hat Tiefe und will die Zuständigkeit nicht behalten. Das ist der angenehmste Fall: ein Weg, den man planen kann."
+      },
+      "settled": {
+        "label": "Verantwortet",
+        "text": "Genau eine Person will es und hat nach eigener Angabe Tiefe darin. Die anderen wollen es nicht."
+      },
+      "noBasis": {
+        "label": "Zu wenige Angaben",
+        "text": "Hier haben sich weniger als zwei Menschen entschieden – oder „noch unklar“ angegeben. Daraus eine Rollenaussage zu machen wäre geraten, deshalb steht hier keine."
+      }
+    }
   }
 }

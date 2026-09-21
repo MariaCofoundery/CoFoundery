@@ -2,7 +2,7 @@ import Link from "next/link";
 
 type Props = {
   teamId: string;
-  active: "overview" | "setup" | "library" | "alignment";
+  active: "overview" | "setup" | "library" | "alignment" | "roles";
   labels: {
     ariaLabel: string;
     context: string;
@@ -10,6 +10,7 @@ type Props = {
     setup: string;
     library: string;
     alignment: string;
+    roles: string;
   };
 };
 
@@ -19,6 +20,11 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
     { key: "setup" as const, href: `/teams/${encodeURIComponent(teamId)}/setup` },
     { key: "library" as const, href: `/teams/${encodeURIComponent(teamId)}/founder-library` },
     { key: "alignment" as const, href: `/teams/${encodeURIComponent(teamId)}#team-alignment` },
+    // DAZUGEKOMMEN AM 21.09.2026: Rollen und Zustaendigkeiten. Sie stehen
+    // zuletzt, weil sie erst etwas zeigen, wenn die Mitglieder ihre Angaben
+    // gemacht und freigegeben haben - ein Reiter, der bei den meisten Teams
+    // zunaechst leer ist, gehoert nicht an den Anfang.
+    { key: "roles" as const, href: `/teams/${encodeURIComponent(teamId)}/roles` },
   ];
 
   return (

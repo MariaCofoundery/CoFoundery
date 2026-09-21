@@ -171,6 +171,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           setup: navigationT("setup"),
           library: navigationT("library"),
           alignment: navigationT("alignment"),
+          roles: navigationT("roles"),
         }}
       />
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}

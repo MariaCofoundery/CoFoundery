@@ -546,5 +546,56 @@
         }
       }
     }
+  },
+  "team": {
+    "title": "Roles and responsibilities",
+    "text": "Who owns what, where several want the same thing, and where nobody wants it. This is a description of the situation from your own entries – no rating, no points, no ranking.",
+    "backToTeam": "Back to the team",
+    "basis": "{contributing} of {members} in the team have made entries, {withDepth} of them with an application level and an ownership wish. Only those two allow a statement about a role – whoever released less appears here without depth.",
+    "mapTitle": "The situation at a glance",
+    "mapText": "One bar per family, one field per area that has entries. The colours stand for the state, and the same information is given as a number next to it.",
+    "familyUnspoken": "Nobody has said anything about this. That does not mean it is missing.",
+    "countEntry": "{count}× {state}",
+    "claimedBy": "Wants to own: {names}",
+    "claimedByNobody": "Nobody claims this",
+    "findingsTitle": "What follows from it",
+    "areaCount": "{count, plural, one {one area} other {# areas}}",
+    "wants": "wants to own: {names}",
+    "canDo": "has depth: {names}",
+    "unnamedMember": "a team member",
+    "emptyTitle": "No basis yet",
+    "emptyText": "This readout needs entries on application level and ownership wish from at least two people in the team – and their release to show them within the team. Each person decides both for themselves; “private” stays private, here too.",
+    "emptyInterview": "Have the conversation",
+    "emptyDisclosure": "Set your release",
+    "states": {
+      "contested": {
+        "label": "Several want to own it",
+        "text": "Two or more claim the same responsibility. This does not resolve itself and gets expensive later – it needs a conversation about who decides, not about who is better at it."
+      },
+      "gap": {
+        "label": "Nobody wants it, nobody can",
+        "text": "Nobody wished for the responsibility here and nobody stated depth. This is the only situation that forces a decision: hire, commission – or deliberately leave it and say that it is left."
+      },
+      "openPosition": {
+        "label": "Somebody can, nobody wants to",
+        "text": "The ability is there, the responsibility is wanted by nobody. That is an arrangement, not a shortcoming – often it is enough to agree on it for a limited time."
+      },
+      "claimedShallow": {
+        "label": "Wanted, not yet deep",
+        "text": "Somebody wants to own this and, by their own account, has not applied it repeatedly yet. That is fine when it is said out loud – and risky when everybody considers it settled."
+      },
+      "handoverPath": {
+        "label": "Handover possible",
+        "text": "One wants to grow into it, another has depth and does not want to keep the responsibility. That is the most comfortable case: a path you can plan."
+      },
+      "settled": {
+        "label": "Owned",
+        "text": "Exactly one person wants it and, by their own account, has depth in it. The others do not want it."
+      },
+      "noBasis": {
+        "label": "Too few entries",
+        "text": "Fewer than two people have decided here – or they entered “not clear yet”. Turning that into a statement about a role would be guesswork, so there is none."
+      }
+    }
   }
 }
