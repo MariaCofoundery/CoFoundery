@@ -518,6 +518,10 @@
       "skipped": "{count, plural, one {Eine Frage hast du übersprungen} other {# Fragen hast du übersprungen}}. Das ist eine Antwort, und sie bleibt es.",
       "withoutArea": "{count, plural, one {Zu einer Antwort} other {Zu # Antworten}} wurde kein Bereich gefunden. Das sagt nichts über deine Erzählung – nur darüber, dass unsere Begriffsliste sie nicht getroffen hat. Du kannst die Bereiche im Profil selbst ergänzen."
     },
+    "audio": {
+      "play": "Vorlesen",
+      "stop": "Stopp"
+    },
     "questions": {
       "owned_last": {
         "title": "Erzähl mir von der letzten Sache, für die du wirklich Verantwortung getragen hast – bis zu einem klaren Ergebnis oder einer bewussten Entscheidung, sie zu stoppen.",

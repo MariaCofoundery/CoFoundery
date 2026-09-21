@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import {
@@ -12,6 +12,8 @@ import {
 } from "@/features/capability/capabilityInterviewData";
 import { INTERVIEW_MIN_ANSWERS } from "@/features/capability/capabilityInterviewGuide";
 import { InterviewAnswerForm } from "@/features/capability/InterviewAnswerForm";
+import { SpeakButton } from "@/features/capability/SpeakButton";
+import { spokenText } from "@/features/capability/interviewAudio";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -44,11 +46,12 @@ export default async function CapabilityInterviewPage({
   // gemeinsame Weg haelt die Antwort fuer die Dauer der Anfrage fest, sonst
   // zahlt jede Seite den Netzwerkgang doppelt. Ein Test prueft das an allen
   // Seiten - und hat diese hier gefunden.
-  const [client, t, params, userResult] = await Promise.all([
+  const [client, t, params, userResult, locale] = await Promise.all([
     createClient(),
     getTranslations("capability"),
     searchParams,
     getRequestUser(),
+    getLocale(),
   ]);
 
   if (!userResult.data.user) redirect("/login?next=/profile/interview");
@@ -131,7 +134,7 @@ export default async function CapabilityInterviewPage({
             })}
           </p>
 
-          <Question state={state} t={t} card={card} />
+          <Question state={state} t={t} card={card} locale={locale} />
 
           {/* WAS BISHER ERZAEHLT WURDE, eingeklappt. Wer nach zwei Tagen
               weitermacht, weiss sonst nicht mehr, was er schon gesagt hat -
@@ -211,10 +214,12 @@ function Question({
   state,
   t,
   card,
+  locale,
 }: {
   state: NonNullable<Awaited<ReturnType<typeof getActiveInterview>>>;
   t: Awaited<ReturnType<typeof getTranslations<"capability">>>;
   card: string;
+  locale: string;
 }) {
   const turn = state.current;
   if (!turn) return null;
@@ -227,7 +232,10 @@ function Question({
   const title = question ? t(`interview.questions.${question.id}.title`) : (meta.text ?? "");
   const hint = question ? t(`interview.questions.${question.id}.hint`) : null;
   const followUps = question
-    ? question.followUpIds.map((id) => t(`interview.questions.${question.id}.followUps.${id}`))
+    ? question.followUpIds.map((id) => ({
+        text: t(`interview.questions.${question.id}.followUps.${id}`),
+        audio: spokenText(locale, `${question.id}.followUps.${id}`),
+      }))
     : [];
 
   return (
@@ -252,7 +260,26 @@ function Question({
       <h2 className="mt-2 text-xl font-semibold leading-8 tracking-tight text-slate-950">
         {title}
       </h2>
-      {hint ? <p className="mt-2 text-sm leading-6 text-slate-600">{hint}</p> : null}
+
+      {/* VORLESEN, wenn es die Datei gibt - und sonst gar kein Knopf.
+          `scripts/tts-build.ts` erzeugt die Stimme einmal je Text; zur
+          Laufzeit wird nichts erzeugt und nichts angefragt. Ein Knopf ohne
+          Datei waere die unangenehmste Art von Fehler: Man drueckt, und es
+          passiert nichts. */}
+      {question && spokenText(locale, `${question.id}.title`) ? (
+        <div className="mt-3">
+          <SpeakButton audio={spokenText(locale, `${question.id}.title`)!} />
+        </div>
+      ) : null}
+
+      {hint ? (
+        <div className="mt-2 flex flex-wrap items-start gap-2">
+          <p className="text-sm leading-6 text-slate-600">{hint}</p>
+          {question && spokenText(locale, `${question.id}.hint`) ? (
+            <SpeakButton audio={spokenText(locale, `${question.id}.hint`)!} />
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-5">
         <InterviewAnswerForm

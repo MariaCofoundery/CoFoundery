@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 
 import { DictatedTextarea } from "@/features/dictation/DictatedTextarea";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { SpeakButton } from "./SpeakButton";
+import type { SpokenText } from "./interviewAudio";
 
 import {
   autosaveInterviewAnswerAction,
@@ -88,8 +90,8 @@ export function InterviewAnswerForm({
   turnId: string;
   /** Was auf dem Server steht - leer, solange nichts gespeichert wurde. */
   savedAnswer: string;
-  /** Die geschriebenen Nachfragen zu dieser Frage. */
-  followUps: readonly string[];
+  /** Die geschriebenen Nachfragen zu dieser Frage, mit Stimme wo vorhanden. */
+  followUps: readonly { text: string; audio: SpokenText | null }[];
   isLastQuestion: boolean;
 }) {
   const t = useTranslations("capability");
@@ -219,8 +221,12 @@ export function InterviewAnswerForm({
             </p>
             <ul className="mt-2 grid gap-2">
               {followUps.map((followUp) => (
-                <li key={followUp} className="text-sm leading-6 text-slate-700">
-                  {followUp}
+                <li
+                  key={followUp.text}
+                  className="flex flex-wrap items-start gap-2 text-sm leading-6 text-slate-700"
+                >
+                  <span>{followUp.text}</span>
+                  {followUp.audio ? <SpeakButton audio={followUp.audio} /> : null}
                 </li>
               ))}
             </ul>

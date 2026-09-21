@@ -518,6 +518,10 @@
       "skipped": "{count, plural, one {You skipped one question} other {You skipped # questions}}. That is an answer, and it stays one.",
       "withoutArea": "{count, plural, one {For one answer} other {For # answers}} no area was found. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself in your profile."
     },
+    "audio": {
+      "play": "Read aloud",
+      "stop": "Stop"
+    },
     "questions": {
       "owned_last": {
         "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",

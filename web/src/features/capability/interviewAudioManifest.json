@@ -1,0 +1,16 @@
+{
+  "de": {
+    "owned_last.title": {
+      "hash": "634cbe0793be54d3",
+      "seconds": 8.46,
+      "wav": "owned_last_title.wav",
+      "mp3": "owned_last_title.mp3"
+    },
+    "owned_last.hint": {
+      "hash": "4c80b2485d5ec8b8",
+      "seconds": 9.64,
+      "wav": "owned_last_hint.wav",
+      "mp3": "owned_last_hint.mp3"
+    }
+  }
+}
