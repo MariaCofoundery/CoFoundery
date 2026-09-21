@@ -15,8 +15,11 @@
  * du gefuehrt hast?" fragt nach einem Ereignis, und Ereignisse kann man
  * erzaehlen, ohne sich einzuschaetzen.
  *
- * DESHALB HAT JEDE FRAGE EINEN ZEITANKER ("zuletzt", "schon einmal", "gerade").
- * Ohne ihn wird aus der Situationsfrage wieder eine Eigenschaftsfrage.
+ * DESHALB VERLANGT JEDE FRAGE EINE EINZELNE BEGEBENHEIT - entweder ueber einen
+ * Zeitanker ("zuletzt", "schon einmal", "gerade") oder ueber die Einladung,
+ * eine Situation zu erzaehlen ("Erzaehl von einer Situation, in der ..."). Ohne
+ * das eine oder das andere wird daraus wieder eine Eigenschaftsfrage, und ein
+ * Test prueft es an jedem Fragetext.
  *
  * VIER DINGE, DIE DER KATALOG ABDECKEN MUSS:
  *
@@ -32,15 +35,26 @@
  *
  *   3. Den AUSSENAUFTRITT. Marias Beispiel: "Ihr seid beide sehr ruhig [...]
  *      dann braeuchtet ihr vielleicht noch jemanden, der praesentieren kann."
- *      Zwei Fragen zielen darauf - und zwar auf die Situation, nicht auf den
- *      Charakter (siehe die Familie communication_representation in
- *      20261021120000).
+ *      Die Fragen 4 und 5 zielen darauf - und zwar auf die Situation, nicht auf
+ *      den Charakter (siehe die Familie communication_representation in
+ *      20261021120000). Nur Frage 5 schlaegt dabei einen Bereich vor: Was in
+ *      Frage 4 erzaehlt wird, kann Buehne, Vertriebsgespraech oder Erklaeren
+ *      sein, und einen davon vorauszuwaehlen waere geraten.
  *
  *   4. BEIDE RICHTUNGEN DES ALIGNMENTS. Zwei Fragen am Ende gehen nicht auf
  *      Koennen, sondern auf Wollen: Was willst du abgeben, was willst du
  *      uebernehmen. Genau daraus entstehen die Zustaende des Vergleichs
  *      (`contested`, `openPosition`, `handoverPath`) - ohne sie kennt die
  *      Teamauswertung nur Faehigkeiten und keine Rollen.
+ *
+ * DIE FORMULIERUNGEN SIND MARIAS, vom 21.09.2026, und an drei Stellen besser
+ * als meine erste Fassung - der Grund steht jeweils an der Frage:
+ *
+ *   Frage 1 laesst das bewusste STOPPEN als Ergebnis gelten.
+ *   Frage 2 fragt nach "anders als geplant" statt nach "misslungen" - eine
+ *   Schuldfrage beantwortet man mit Rechtfertigung.
+ *   Frage 4 fragt nach "verstaendlich machen oder gewinnen" statt nach "vor
+ *   einer Gruppe sprechen" und trifft damit auch das Gespraech zu zweit.
  *
  * DIE TEXTE STEHEN NICHT HIER, sondern in `messages/<locale>/capability.json`
  * unter `interview.questions.<id>`. Eine Frage in zwei Sprachen ist eine
@@ -131,58 +145,121 @@ export type InterviewQuestion = {
  */
 export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
   {
+    // "Erzaehl mir von der letzten Sache, fuer die du wirklich Verantwortung
+    //  getragen hast - bis zu einem klaren Ergebnis oder einer bewussten
+    //  Entscheidung, sie zu stoppen."
+    //
+    // Maria, 21.09.2026. Der Nachsatz ist der Kern: Etwas bewusst zu stoppen
+    // ist Verantwortung und kein Scheitern - ohne ihn erzaehlt niemand davon,
+    // und genau diese Faelle zeigen Urteilsfaehigkeit am deutlichsten.
+    //
+    // Zeigt: Ownership, Execution, Priorisierung, Koordination, Urteil.
     id: "owned_last",
     context: "professional",
     target: "evidence",
     suggestsAreas: [],
     suggestsWish: null,
-    // Dieselbe Frage, die bisher ueber dem Textfeld stand. Bewusst: Sie
-    // funktioniert, und wer den alten Weg kennt, findet sich wieder.
-    followUpIds: ["whatWasYours", "whatWasHardest"],
+    followUpIds: ["whatWasYours", "howYouDecidedDone"],
   },
   {
+    // "Erzaehl von etwas, das in letzter Zeit deutlich anders gelaufen ist, als
+    //  du geplant oder gehofft hattest."
+    //
+    // Bewusst nicht "was ist dir misslungen": Das ist eine Schuldfrage, und auf
+    // Schuldfragen antworten Menschen mit Rechtfertigung. "Anders als geplant"
+    // laesst dieselbe Geschichte erzaehlen, ohne sie zu bewerten.
+    //
+    // Zeigt: Reflexion, Lernen, Fehleranalyse, Anpassung.
     id: "went_wrong",
     context: "professional",
     target: "evidence",
     suggestsAreas: [],
     suggestsWish: null,
-    followUpIds: ["whatChanged", "whoNoticed"],
+    followUpIds: ["yourOwnPart", "whatChanged"],
   },
   {
+    // "Was hast du ausserhalb klassischer Erwerbsarbeit schon einmal aufgebaut,
+    //  organisiert oder ermoeglicht, bei dem dein eigener Beitrag wirklich
+    //  wichtig war?"
+    //
+    // "Klassische Erwerbsarbeit" statt "Arbeit": Pflege, Ehrenamt und
+    // Vereinsarbeit SIND Arbeit, und wer das anders benennt, faellt bei dieser
+    // Frage aus dem Katalog.
+    //
+    // Zeigt: informelle Faehigkeiten, Initiative, Ressourcen mobilisieren,
+    // Execution.
     id: "outside_work",
     context: "personal",
     target: "evidence",
     suggestsAreas: [],
     suggestsWish: null,
-    followUpIds: ["whoElseWas", "whatItTook"],
+    followUpIds: ["whatYouDidYourself", "howYouNoticedImpact"],
   },
   {
+    // "Erzaehl von einer Situation, in der du Menschen, die dich oder dein
+    //  Thema noch nicht gut kannten, etwas verstaendlich machen oder fuer etwas
+    //  gewinnen musstest."
+    //
+    // BESSER ALS "vor einer Gruppe gesprochen" (meine erste Fassung): Es trifft
+    // das Gespraech zu zweit genauso wie die Buehne. Wer noch nie auf einer
+    // Buehne stand, aber eine Behoerde, einen Vermieter oder einen ersten
+    // Kunden ueberzeugt hat, hat dieselbe Faehigkeit gezeigt.
+    //
+    // UND DESHALB SCHLAEGT SIE KEINEN BEREICH VOR: Die Situation kann
+    // Buehnenauftritt, Vertriebsgespraech oder Erklaeren sein. Einen davon
+    // vorauszuwaehlen waere geraten.
+    //
+    // Zeigt: Kommunikation, Adressatenorientierung, Influence, evtl. Vertrieb.
     id: "in_front_of_group",
     context: "either",
     target: "evidence",
-    suggestsAreas: ["public_speaking"],
+    suggestsAreas: [],
     suggestsWish: null,
-    followUpIds: ["whoAsked", "whatYouPrepared"],
+    followUpIds: ["whatYouNeededToUnderstand", "didYouAdapt"],
   },
   {
+    // "Wann hast du zuletzt ein wichtiges, unangenehmes Thema angesprochen,
+    //  obwohl du mit Widerstand oder Spannung gerechnet hast?"
+    //
+    // Die einzige Frage mit einem vorgeschlagenen Bereich: Wer darauf ueberhaupt
+    // etwas erzaehlt, hat Unangenehmes angesprochen. Das ist kein Fund im Text,
+    // sondern folgt aus der Frage - und wird in der Oberflaeche auch so
+    // ausgewiesen.
+    //
+    // Zeigt: schwierige Kommunikation, Feedback, Verhandlung, Verantwortung.
     id: "uncomfortable_topic",
     context: "either",
     target: "evidence",
     suggestsAreas: ["difficult_conversations"],
     suggestsWish: null,
-    followUpIds: ["howYouStarted", "whatCameOfIt"],
+    followUpIds: ["whyItMattered", "howYouWentAboutIt"],
   },
   {
+    // "Wobei bitten andere dich wiederholt um Hilfe, Rat oder Unterstuetzung,
+    //  obwohl das nicht unbedingt offiziell deine Aufgabe ist?"
+    //
+    // Der Blick von aussen, und die einzige Frage, die nicht die eigene
+    // Einschaetzung erhebt, sondern ein beobachtetes Verhalten anderer. Bei
+    // Menschen, die sich selbst niedrig einschaetzen, ist das oft die einzige
+    // Frage, die ihre Staerke ueberhaupt sichtbar macht.
+    //
+    // Bewusst offen: Wofuer Menschen kommen, ist genau das, was wir nicht
+    // vorwegnehmen wollen.
+    //
+    // Zeigt: wiederkehrende Staerken, Fremdsignale, informelle Expertise.
     id: "people_come_to_you",
     context: "either",
     target: "evidence",
-    // Bewusst offen: Wofuer Menschen kommen, ist genau das, was wir nicht
-    // vorwegnehmen wollen.
     suggestsAreas: [],
     suggestsWish: null,
-    followUpIds: ["lastTime", "whyYou"],
+    followUpIds: ["lastExample", "whatYouActuallyDo"],
   },
   {
+    // "Welche Aufgabe oder Verantwortung uebernimmst du gerade, obwohl du sie
+    //  langfristig lieber abgeben wuerdest?"
+    //
+    // Zeigt: Koennen ist nicht Wollen, Delegation, Qualitaetsanspruch,
+    // Rollenpraeferenz.
     id: "would_hand_over",
     context: "either",
     target: "ownership_away",
@@ -190,15 +267,22 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     // Nicht `prefer_external`: Abgeben heisst zunaechst "jemand anders im
     // Team", nicht "einkaufen". Die zweite Moeglichkeit steht daneben.
     suggestsWish: "prefer_other",
-    followUpIds: ["whatItCosts", "whoCouldDoIt"],
+    followUpIds: ["whyStillYou", "whatSomeoneElseNeeds"],
   },
   {
+    // "Welche Verantwortung wuerdest du im naechsten Jahr gern uebernehmen,
+    //  obwohl du heute noch nicht sicher waerst, sie allein gut auszufuellen?"
+    //
+    // Der Nachsatz erlaubt die Antwort. Ohne ihn nennt man nur, was man sich
+    // zutraut - und das ist wieder Selbstvertrauen statt Absicht.
+    //
+    // Zeigt: Entwicklungsinteresse, kuenftige Ownership, Lernbedarf.
     id: "want_to_own",
     context: "either",
     target: "ownership_growth",
     suggestsAreas: [],
     suggestsWish: "grow_into",
-    followUpIds: ["whatIsMissing", "firstStep"],
+    followUpIds: ["whatDrawsYou", "whatYouWouldNeed"],
   },
 ] as const;
 

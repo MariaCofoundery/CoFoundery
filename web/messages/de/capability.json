@@ -405,74 +405,80 @@
   },
   "interview": {
     "title": "Das Gespräch",
-    "text": "Acht Fragen nach wirklich passierten Situationen – beruflich und außerberuflich. Kein Test, keine Punkte: Aus deinen Erzählungen entstehen Vorschläge, welche Bereiche du abdeckst, und bestätigen musst du jeden einzelnen selbst.",
+    "text": "Acht Fragen nach Situationen, die wirklich passiert sind – beruflich und außerberuflich. Kein Test und keine Punkte: Aus deinen Erzählungen entstehen Vorschläge, welche Bereiche du abdeckst, und bestätigen musst du jeden einzelnen selbst.",
+    "guidanceTitle": "Nimm dir Zeit dafür",
+    "guidanceTime": "Rechne mit 30 bis 45 Minuten, wenn du es in einem Zug machst. Es ist aber ausdrücklich nicht dafür gedacht, schnell durchgeklickt zu werden – zwei Fragen an einem Abend sind völlig in Ordnung.",
+    "guidanceSaving": "Alles wird automatisch gespeichert, während du schreibst. Wenn dein Browser abstürzt oder du das Fenster schließt, steht dein Text beim nächsten Mal wieder da. Du kannst auch jederzeit speichern und später weitermachen.",
+    "guidanceDictate": "Du kannst tippen oder diktieren – das Mikrofon auf deiner Tastatur genügt, du brauchst dafür nichts einzuschalten.",
+    "guidanceLength": "Zwei bis fünf Sätze reichen. Erzähl es so, wie du es jemandem am Küchentisch erzählen würdest, mit Namen, Zahlen und dem, was schiefging.",
+    "guidanceNoRight": "Es gibt keine richtigen Antworten. „Weiß ich nicht“ ist auch eine – dann überspringst du die Frage einfach.",
     "privacy": "Was du hier erzählst, sieht niemand außer dir. In eine Teamauswertung geht später nur, welchen Bereich du bestätigt hast und wie du dazu stehst – nie die Geschichte dazu.",
     "contextProfessional": "Beruflich",
     "contextPersonal": "Außerhalb der Arbeit",
     "contextEither": "Beruflich oder privat – beides zählt hier gleich",
     "questions": {
       "owned_last": {
-        "title": "Was war die letzte Aufgabe, die du verantwortet und zu Ende gebracht hast?",
-        "hint": "Eine konkrete Sache mit Anfang und Ende. Sie muss nicht groß sein – und nichts, worauf du besonders stolz bist.",
+        "title": "Erzähl mir von der letzten Sache, für die du wirklich Verantwortung getragen hast – bis zu einem klaren Ergebnis oder einer bewussten Entscheidung, sie zu stoppen.",
+        "hint": "Eine konkrete Sache mit Anfang und Ende. Sie muss nicht groß sein, und etwas bewusst abgebrochen zu haben zählt hier genauso wie etwas fertiggestellt zu haben.",
         "followUps": {
-          "whatWasYours": "Was davon lag genau bei dir – und was bei anderen?",
-          "whatWasHardest": "Wo war die Stelle, an der es hätte scheitern können?"
+          "whatWasYours": "Was davon lag konkret bei dir – und was bei anderen?",
+          "howYouDecidedDone": "Woran hast du entschieden, dass es fertig, gut genug oder nicht mehr sinnvoll war?"
         }
       },
       "went_wrong": {
-        "title": "Was ist dir zuletzt richtig misslungen?",
-        "hint": "Das ist keine Beichte – es geht um das Danach. Was du nach einem Fehlschlag anders gemacht hast, sagt mehr über dein Können als eine Erfolgsgeschichte.",
+        "title": "Erzähl von etwas, das in letzter Zeit deutlich anders gelaufen ist, als du geplant oder gehofft hattest.",
+        "hint": "Es geht nicht um Schuld, sondern um das Danach. Was du hinterher verändert hast, sagt mehr über dein Können als eine Erfolgsgeschichte.",
         "followUps": {
-          "whatChanged": "Was machst du seitdem anders?",
-          "whoNoticed": "Wer hat es außer dir gemerkt, und wie hast du es angesprochen?"
+          "yourOwnPart": "Was war rückblickend dein eigener Anteil daran?",
+          "whatChanged": "Was hast du danach konkret verändert?"
         }
       },
       "outside_work": {
-        "title": "Was hast du außerhalb der Arbeit schon einmal auf die Beine gestellt, das ohne dich nicht passiert wäre?",
-        "hint": "Verein, Nachbarschaft, Familie, Freundeskreis, Ehrenamt, ein Umzug, eine Pflege, ein Festival. Das zählt hier genauso viel wie ein Projekt im Job – und es steht in keinem Arbeitszeugnis.",
+        "title": "Was hast du außerhalb klassischer Erwerbsarbeit schon einmal aufgebaut, organisiert oder ermöglicht, bei dem dein eigener Beitrag wirklich wichtig war?",
+        "hint": "Verein, Nachbarschaft, Familie, Freundeskreis, Ehrenamt, ein Umzug, eine Pflege, ein Festival, eine Demo. Das zählt hier genauso viel wie ein Projekt im Job – und es steht in keinem Arbeitszeugnis.",
         "followUps": {
-          "whoElseWas": "Wen hast du dafür gebraucht, und wie hast du die Leute zusammengeholt?",
-          "whatItTook": "Was hat es dich gekostet – an Zeit, an Nerven, an Geld?"
+          "whatYouDidYourself": "Was genau hast du dabei selbst gemacht?",
+          "howYouNoticedImpact": "Woran hast du gemerkt, dass dein Beitrag etwas bewirkt hat?"
         }
       },
       "in_front_of_group": {
-        "title": "Wann hast du zuletzt vor einer Gruppe gesprochen, die dich nicht kannte?",
-        "hint": "Vortrag, Pitch, Elternabend, Rede, Video, Podium. Auch wenn es klein war oder schiefging.",
+        "title": "Erzähl von einer Situation, in der du Menschen, die dich oder dein Thema noch nicht gut kannten, etwas verständlich machen oder für etwas gewinnen musstest.",
+        "hint": "Das kann eine Bühne sein, ein Pitch, ein Gespräch mit einer Behörde, ein erster Kunde, ein Elternabend oder eine einzelne Person, die du überzeugen musstest. Auch wenn es schiefging.",
         "followUps": {
-          "whoAsked": "Wie kam es dazu – hast du dich gemeldet, oder wurdest du gefragt?",
-          "whatYouPrepared": "Was hast du vorher getan, um dich vorzubereiten?"
+          "whatYouNeededToUnderstand": "Was musstest du über diese Menschen verstehen, damit das funktioniert?",
+          "didYouAdapt": "Hast du deine Art zu erklären oder zu überzeugen unterwegs verändert – und warum?"
         }
       },
       "uncomfortable_topic": {
-        "title": "Wann hast du zuletzt etwas Unangenehmes angesprochen, das andere lieber liegen gelassen hätten?",
+        "title": "Wann hast du zuletzt ein wichtiges, unangenehmes Thema angesprochen, obwohl du mit Widerstand oder Spannung gerechnet hast?",
         "hint": "Eine offene Rechnung, eine Erwartung, ein Verhalten, eine Entscheidung, die niemand treffen wollte. Beruflich oder privat.",
         "followUps": {
-          "howYouStarted": "Wie hast du angefangen – und was hast du dabei bewusst vermieden?",
-          "whatCameOfIt": "Was ist danach passiert?"
+          "whyItMattered": "Warum war es dir wichtig, es trotzdem anzusprechen?",
+          "howYouWentAboutIt": "Wie genau bist du dabei vorgegangen – und was ist danach passiert?"
         }
       },
       "people_come_to_you": {
-        "title": "Wofür kommen Menschen zu dir, ohne dass du dich angeboten hast?",
+        "title": "Wobei bitten andere dich wiederholt um Hilfe, Rat oder Unterstützung, obwohl das nicht unbedingt offiziell deine Aufgabe ist?",
         "hint": "Der Blick von außen. Wenn mehrere Leute dich für dasselbe fragen, ist das ein Hinweis, den man bei sich selbst leicht übersieht.",
         "followUps": {
-          "lastTime": "Wann war das zuletzt, und worum ging es?",
-          "whyYou": "Warum kommen sie damit zu dir und nicht zu jemand anderem?"
+          "lastExample": "Was war das letzte konkrete Beispiel?",
+          "whatYouActuallyDo": "Was tust du dabei konkret, das für andere hilfreich ist?"
         }
       },
       "would_hand_over": {
-        "title": "Was machst du gerade, obwohl du es lieber abgeben würdest?",
+        "title": "Welche Aufgabe oder Verantwortung übernimmst du gerade, obwohl du sie langfristig lieber abgeben würdest?",
         "hint": "Etwas, das erledigt wird, weil es sonst niemand tut. Hier geht es nicht ums Können, sondern ums Wollen – und das ist für ein Team genauso wichtig.",
         "followUps": {
-          "whatItCosts": "Was kostet es dich, dass es bei dir liegt?",
-          "whoCouldDoIt": "Wer müsste es können, damit du es guten Gewissens abgibst?"
+          "whyStillYou": "Warum machst du sie im Moment trotzdem selbst?",
+          "whatSomeoneElseNeeds": "Was müsste jemand anderes können oder liefern, damit du sie guten Gewissens abgibst?"
         }
       },
       "want_to_own": {
-        "title": "Was würdest du im nächsten Jahr gern verantworten, obwohl du es noch nicht sicher kannst?",
+        "title": "Welche Verantwortung würdest du im nächsten Jahr gern übernehmen, obwohl du heute noch nicht sicher wärst, sie allein gut auszufüllen?",
         "hint": "Etwas, in das du hineinwachsen willst. Das offen zu sagen ist im Team wertvoller, als es sich zuzutrauen und zu schweigen.",
         "followUps": {
-          "whatIsMissing": "Was fehlt dir dafür noch – Wissen, Übung, Zeit, jemand, der es vormacht?",
-          "firstStep": "Was wäre ein erster Schritt, den du ohne Erlaubnis gehen könntest?"
+          "whatDrawsYou": "Was reizt dich daran?",
+          "whatYouWouldNeed": "Was müsstest du dafür noch lernen oder einmal praktisch erlebt haben?"
         }
       }
     }

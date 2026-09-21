@@ -405,74 +405,80 @@
   },
   "interview": {
     "title": "The conversation",
-    "text": "Eight questions about situations that actually happened – at work and outside it. No test, no points: your stories turn into proposals for which areas you cover, and you confirm every single one yourself.",
+    "text": "Eight questions about situations that actually happened – at work and outside it. No test and no points: your stories turn into proposals for which areas you cover, and you confirm every single one yourself.",
+    "guidanceTitle": "Take your time with this",
+    "guidanceTime": "Expect 30 to 45 minutes if you do it in one go. But it is explicitly not meant to be clicked through quickly – two questions in an evening is perfectly fine.",
+    "guidanceSaving": "Everything is saved automatically while you write. If your browser crashes or you close the window, your text will be there next time. You can also save at any point and continue later.",
+    "guidanceDictate": "You can type or dictate – the microphone on your keyboard is enough, you do not need to switch anything on.",
+    "guidanceLength": "Two to five sentences are enough. Tell it the way you would tell somebody at the kitchen table, with names, numbers and the parts that went wrong.",
+    "guidanceNoRight": "There are no right answers. “I don't know” is one too – then you simply skip the question.",
     "privacy": "Nobody but you sees what you tell here. A team readout later shows only which area you confirmed and how you stand towards it – never the story behind it.",
     "contextProfessional": "At work",
     "contextPersonal": "Outside of work",
     "contextEither": "At work or privately – both count equally here",
     "questions": {
       "owned_last": {
-        "title": "What was the last task you owned and brought to an end?",
-        "hint": "One concrete thing with a beginning and an end. It does not have to be big – or something you are particularly proud of.",
+        "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",
+        "hint": "One concrete thing with a beginning and an end. It does not have to be big, and having deliberately stopped something counts as much here as having finished it.",
         "followUps": {
-          "whatWasYours": "Which part of it was yours exactly – and which part was other people's?",
-          "whatWasHardest": "Where was the point at which it could have failed?"
+          "whatWasYours": "Which part of it was yours specifically – and which part was other people's?",
+          "howYouDecidedDone": "How did you decide it was finished, good enough, or no longer worth it?"
         }
       },
       "went_wrong": {
-        "title": "What is the last thing that really went wrong for you?",
-        "hint": "This is not a confession – it is about what came after. What you did differently after a failure says more about your ability than a success story.",
+        "title": "Tell me about something that recently went clearly differently from what you had planned or hoped for.",
+        "hint": "This is not about blame but about what came after. What you changed afterwards says more about your ability than a success story.",
         "followUps": {
-          "whatChanged": "What do you do differently since then?",
-          "whoNoticed": "Who besides you noticed, and how did you bring it up?"
+          "yourOwnPart": "Looking back, what was your own part in it?",
+          "whatChanged": "What did you concretely change afterwards?"
         }
       },
       "outside_work": {
-        "title": "What have you put together outside of work that would not have happened without you?",
-        "hint": "A club, your neighbourhood, family, friends, volunteering, a move, caring for someone, a festival. It counts as much here as a project at work – and it appears in no reference letter.",
+        "title": "What have you built, organised or made possible outside of classic paid work, where your own contribution really mattered?",
+        "hint": "A club, your neighbourhood, family, friends, volunteering, a move, caring for someone, a festival, a demonstration. It counts as much here as a project at work – and it appears in no reference letter.",
         "followUps": {
-          "whoElseWas": "Who did you need for it, and how did you get people together?",
-          "whatItTook": "What did it cost you – in time, in nerves, in money?"
+          "whatYouDidYourself": "What exactly did you do yourself?",
+          "howYouNoticedImpact": "How did you notice that your contribution made a difference?"
         }
       },
       "in_front_of_group": {
-        "title": "When did you last speak in front of a group that did not know you?",
-        "hint": "A talk, a pitch, a parents' evening, a speech, a video, a panel. Even if it was small or went badly.",
+        "title": "Tell me about a situation in which you had to make something understandable to people who did not know you or your topic well – or win them over for it.",
+        "hint": "That can be a stage, a pitch, a conversation with an authority, a first customer, a parents' evening, or a single person you had to convince. Even if it went badly.",
         "followUps": {
-          "whoAsked": "How did it come about – did you volunteer, or were you asked?",
-          "whatYouPrepared": "What did you do beforehand to prepare?"
+          "whatYouNeededToUnderstand": "What did you have to understand about these people for it to work?",
+          "didYouAdapt": "Did you change the way you explained or persuaded along the way – and why?"
         }
       },
       "uncomfortable_topic": {
-        "title": "When did you last raise something uncomfortable that others would rather have left alone?",
+        "title": "When did you last raise an important, uncomfortable matter even though you expected resistance or tension?",
         "hint": "An unpaid invoice, an expectation, a behaviour, a decision nobody wanted to make. At work or privately.",
         "followUps": {
-          "howYouStarted": "How did you start – and what did you deliberately avoid?",
-          "whatCameOfIt": "What happened afterwards?"
+          "whyItMattered": "Why was it important to you to raise it anyway?",
+          "howYouWentAboutIt": "How exactly did you go about it – and what happened afterwards?"
         }
       },
       "people_come_to_you": {
-        "title": "What do people come to you for, without you having offered?",
+        "title": "What do others repeatedly ask you for help, advice or support with, even though it is not necessarily officially your job?",
         "hint": "The view from outside. If several people ask you about the same thing, that is a signal which is easy to miss in yourself.",
         "followUps": {
-          "lastTime": "When was the last time, and what was it about?",
-          "whyYou": "Why do they bring it to you and not to somebody else?"
+          "lastExample": "What was the last concrete example?",
+          "whatYouActuallyDo": "What do you concretely do there that others find helpful?"
         }
       },
       "would_hand_over": {
-        "title": "What are you doing right now that you would rather hand over?",
+        "title": "Which task or responsibility are you carrying right now that you would rather hand over in the long run?",
         "hint": "Something that gets done because otherwise nobody does it. This is not about ability but about wanting – and for a team that matters just as much.",
         "followUps": {
-          "whatItCosts": "What does it cost you that this sits with you?",
-          "whoCouldDoIt": "Who would have to be able to do it for you to hand it over with a clear conscience?"
+          "whyStillYou": "Why are you still doing it yourself at the moment?",
+          "whatSomeoneElseNeeds": "What would somebody else have to be able to do or deliver for you to hand it over with a clear conscience?"
         }
       },
       "want_to_own": {
-        "title": "What would you like to own next year, even though you cannot do it reliably yet?",
+        "title": "Which responsibility would you like to take on next year, even though today you would not be sure you could fill it well on your own?",
         "hint": "Something you want to grow into. Saying it openly is worth more in a team than claiming it and staying quiet.",
         "followUps": {
-          "whatIsMissing": "What is still missing for you – knowledge, practice, time, somebody who shows you?",
-          "firstStep": "What would be a first step you could take without asking permission?"
+          "whatDrawsYou": "What draws you to it?",
+          "whatYouWouldNeed": "What would you still need to learn, or to have experienced once in practice?"
         }
       }
     }

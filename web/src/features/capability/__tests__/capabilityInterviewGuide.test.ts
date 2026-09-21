@@ -43,19 +43,29 @@ test("jede Frage fragt nach einer Situation, nicht nach einer Eigenschaft", () =
   // pruefen kann: "Wie gut kannst du verhandeln?" misst Selbstbild und
   // Selbstvertrauen - und beides ist ungleich verteilt. Menschen, die gelernt
   // haben, sich zurueckzunehmen, antworten darauf systematisch niedriger.
-  // "Wann hast du zuletzt verhandelt?" fragt nach einem Ereignis.
   //
-  // Der Zeitanker ist der pruefbare Teil davon: Ohne ihn wird aus der
-  // Situationsfrage wieder eine Eigenschaftsfrage.
-  const anchors = /zuletzt|schon einmal|gerade|letzte|nächsten|kommen Menschen zu dir/;
+  // GEAENDERT AM 21.09.2026 nach Marias Formulierungen: Vorher verlangte dieser
+  // Test einen ZEITANKER in jedem Fragetext. Ihre Frage 4 hat keinen ("Erzaehl
+  // von einer Situation, in der du Menschen ... gewinnen musstest") und erfuellt
+  // die Regel trotzdem vollstaendig - sie verlangt eine einzelne Begebenheit.
+  // Der Zeitanker war also nur EINE Form davon; mein Test hat die Form geprueft
+  // statt der Sache. Jetzt gilt beides: Zeitanker ODER die Einladung, eine
+  // Situation zu erzaehlen.
+  const episode = /zuletzt|schon einmal|gerade|letzte|nächsten|situation|erzähl|wiederholt/i;
   const traits = /wie gut|wie sehr|wie stark|bist du eher|würdest du dich/i;
 
   const de = copy("de").interview.questions;
   for (const question of INTERVIEW_QUESTIONS) {
     const text = de[question.id];
     assert.ok(text, `interview.questions.${question.id} fehlt`);
-    assert.match(text.title, /\?$/, `${question.id}: das ist keine Frage`);
-    assert.match(text.title, anchors, `${question.id}: kein Zeitanker - fragt nach einer Eigenschaft`);
+
+    // Eine Frage oder eine Erzaehlaufforderung - beides verlangt eine Antwort
+    // aus dem eigenen Leben. Ein Aussagesatz waere keines von beidem.
+    assert.ok(
+      text.title.endsWith("?") || /^erzähl/i.test(text.title),
+      `${question.id}: weder Frage noch Erzaehlaufforderung`
+    );
+    assert.match(text.title, episode, `${question.id}: verlangt keine einzelne Begebenheit`);
     assert.doesNotMatch(text.title, traits, `${question.id}: fragt nach einer Selbsteinschaetzung`);
   }
 });
@@ -149,7 +159,7 @@ test("jede Nachfrage ist geschrieben - fuer den Fall, dass kein Modell da ist", 
   // Und sie sind absichtlich nicht generisch: Eine Nachfrage wie "kannst du das
   // genauer sagen?" ist schlimmer als keine - sie signalisiert, dass niemand
   // zugehoert hat.
-  const generic = /genauer|mehr dazu|erzähl mehr|noch etwas hinzufügen/i;
+  const generic = /kannst du das genauer|mehr dazu|erzähl mehr|noch etwas hinzufügen/i;
 
   for (const locale of ["de", "en"]) {
     const questions = copy(locale).interview.questions;
@@ -230,4 +240,60 @@ test("fortgesetzt wird in der Reihenfolge des Leitfadens", () => {
 
   assert.equal(interviewProgress(INTERVIEW_QUESTION_IDS).hasEnough, true);
   assert.equal(findInterviewQuestion("gibt_es_nicht"), null);
+});
+
+test("die Anleitung sagt, dass man sich Zeit nehmen soll - und was gespeichert wird", () => {
+  // GEFORDERT AM 21.09.2026: "es muss eine gute anleitung geben, dass man sich
+  // zeit nehmen soll, es soll automatisch gespeichert sein, falls was abstürzt
+  // bzw man auch speichern kann falls man nicht alles auf einmal beantworten
+  // will."
+  //
+  // WARUM DAS EIN TEST IST UND NICHT NUR TEXT: Acht Fragen nach echten
+  // Situationen sind eine halbe Stunde Arbeit. Wer das nicht weiss, faengt
+  // zwischen zwei Terminen an, schreibt drei Stichworte und bekommt eine
+  // Auswertung, die aus drei Stichworten besteht. Die Anleitung ist hier keine
+  // Hoeflichkeit, sondern Teil des Messinstruments.
+  for (const locale of ["de", "en"]) {
+    const interview = copy(locale).interview as Record<string, string>;
+    for (const key of [
+      "guidanceTitle",
+      "guidanceTime",
+      "guidanceSaving",
+      "guidanceDictate",
+      "guidanceLength",
+      "guidanceNoRight",
+      "privacy",
+    ]) {
+      assert.ok(interview[key], `${locale}: interview.${key} fehlt`);
+    }
+
+    // Eine Zeitangabe, keine Floskel: "nimm dir Zeit" ohne Zahl beantwortet
+    // die Frage nicht, die Menschen wirklich haben.
+    assert.match(interview.guidanceTime, /\d/, `${locale}: die Anleitung nennt keine Dauer`);
+    // Und die Erlaubnis, es NICHT in einem Zug zu machen.
+    assert.ok(
+      interview.guidanceTime.length > 80,
+      `${locale}: die Anleitung sagt nicht, dass Aufhoeren in Ordnung ist`
+    );
+
+    // Das Speichern muss BEIDES nennen: von allein, und auf Wunsch.
+    assert.match(
+      interview.guidanceSaving,
+      locale === "de" ? /automatisch/ : /automatically/,
+      `${locale}: das automatische Speichern wird nicht zugesagt`
+    );
+    assert.match(
+      interview.guidanceSaving,
+      locale === "de" ? /später/ : /later/,
+      `${locale}: das spaetere Weitermachen wird nicht zugesagt`
+    );
+
+    // Diktieren steht dabei - sonst tippen Menschen eine halbe Stunde auf
+    // einem Telefon.
+    assert.match(
+      interview.guidanceDictate,
+      locale === "de" ? /diktier/i : /dictate/i,
+      `${locale}: das Diktieren wird nicht erwaehnt`
+    );
+  }
 });
