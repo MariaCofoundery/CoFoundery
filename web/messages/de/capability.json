@@ -261,7 +261,8 @@
     "finance_funding": "Finanzen & Finanzierung",
     "operations_people": "Operations, People & Organisation",
     "legal_governance": "Recht, Governance & Compliance",
-    "other": "Anderer Schwerpunkt"
+    "other": "Anderer Schwerpunkt",
+    "communication_representation": "Außenauftritt & Moderation"
   },
   "areaLabels": {
     "customer_discovery": "Customer Discovery & Kundeninterviews",
@@ -306,7 +307,12 @@
     "data_protection": "Datenschutz",
     "compliance_regulatory": "Compliance & Regulatorik",
     "security": "Security",
-    "other": "Etwas anderes"
+    "other": "Etwas anderes",
+    "public_speaking": "Vor Gruppen sprechen & Pitchen",
+    "facilitation": "Moderation & Gespräche führen",
+    "networking": "Netzwerk aufbauen & halten",
+    "difficult_conversations": "Unangenehmes ansprechen",
+    "teaching_mentoring": "Anleiten & befähigen"
   },
   "errors": {
     "narrative": "Bitte schreibe mindestens zwei kurze Sätze.",
@@ -396,5 +402,79 @@
     "security_defense": "Sicherheit & Verteidigung",
     "research_academia": "Forschung & Wissenschaft",
     "chemicals": "Chemie & Werkstoffe"
+  },
+  "interview": {
+    "title": "Das Gespräch",
+    "text": "Acht Fragen nach wirklich passierten Situationen – beruflich und außerberuflich. Kein Test, keine Punkte: Aus deinen Erzählungen entstehen Vorschläge, welche Bereiche du abdeckst, und bestätigen musst du jeden einzelnen selbst.",
+    "privacy": "Was du hier erzählst, sieht niemand außer dir. In eine Teamauswertung geht später nur, welchen Bereich du bestätigt hast und wie du dazu stehst – nie die Geschichte dazu.",
+    "contextProfessional": "Beruflich",
+    "contextPersonal": "Außerhalb der Arbeit",
+    "contextEither": "Beruflich oder privat – beides zählt hier gleich",
+    "questions": {
+      "owned_last": {
+        "title": "Was war die letzte Aufgabe, die du verantwortet und zu Ende gebracht hast?",
+        "hint": "Eine konkrete Sache mit Anfang und Ende. Sie muss nicht groß sein – und nichts, worauf du besonders stolz bist.",
+        "followUps": {
+          "whatWasYours": "Was davon lag genau bei dir – und was bei anderen?",
+          "whatWasHardest": "Wo war die Stelle, an der es hätte scheitern können?"
+        }
+      },
+      "went_wrong": {
+        "title": "Was ist dir zuletzt richtig misslungen?",
+        "hint": "Das ist keine Beichte – es geht um das Danach. Was du nach einem Fehlschlag anders gemacht hast, sagt mehr über dein Können als eine Erfolgsgeschichte.",
+        "followUps": {
+          "whatChanged": "Was machst du seitdem anders?",
+          "whoNoticed": "Wer hat es außer dir gemerkt, und wie hast du es angesprochen?"
+        }
+      },
+      "outside_work": {
+        "title": "Was hast du außerhalb der Arbeit schon einmal auf die Beine gestellt, das ohne dich nicht passiert wäre?",
+        "hint": "Verein, Nachbarschaft, Familie, Freundeskreis, Ehrenamt, ein Umzug, eine Pflege, ein Festival. Das zählt hier genauso viel wie ein Projekt im Job – und es steht in keinem Arbeitszeugnis.",
+        "followUps": {
+          "whoElseWas": "Wen hast du dafür gebraucht, und wie hast du die Leute zusammengeholt?",
+          "whatItTook": "Was hat es dich gekostet – an Zeit, an Nerven, an Geld?"
+        }
+      },
+      "in_front_of_group": {
+        "title": "Wann hast du zuletzt vor einer Gruppe gesprochen, die dich nicht kannte?",
+        "hint": "Vortrag, Pitch, Elternabend, Rede, Video, Podium. Auch wenn es klein war oder schiefging.",
+        "followUps": {
+          "whoAsked": "Wie kam es dazu – hast du dich gemeldet, oder wurdest du gefragt?",
+          "whatYouPrepared": "Was hast du vorher getan, um dich vorzubereiten?"
+        }
+      },
+      "uncomfortable_topic": {
+        "title": "Wann hast du zuletzt etwas Unangenehmes angesprochen, das andere lieber liegen gelassen hätten?",
+        "hint": "Eine offene Rechnung, eine Erwartung, ein Verhalten, eine Entscheidung, die niemand treffen wollte. Beruflich oder privat.",
+        "followUps": {
+          "howYouStarted": "Wie hast du angefangen – und was hast du dabei bewusst vermieden?",
+          "whatCameOfIt": "Was ist danach passiert?"
+        }
+      },
+      "people_come_to_you": {
+        "title": "Wofür kommen Menschen zu dir, ohne dass du dich angeboten hast?",
+        "hint": "Der Blick von außen. Wenn mehrere Leute dich für dasselbe fragen, ist das ein Hinweis, den man bei sich selbst leicht übersieht.",
+        "followUps": {
+          "lastTime": "Wann war das zuletzt, und worum ging es?",
+          "whyYou": "Warum kommen sie damit zu dir und nicht zu jemand anderem?"
+        }
+      },
+      "would_hand_over": {
+        "title": "Was machst du gerade, obwohl du es lieber abgeben würdest?",
+        "hint": "Etwas, das erledigt wird, weil es sonst niemand tut. Hier geht es nicht ums Können, sondern ums Wollen – und das ist für ein Team genauso wichtig.",
+        "followUps": {
+          "whatItCosts": "Was kostet es dich, dass es bei dir liegt?",
+          "whoCouldDoIt": "Wer müsste es können, damit du es guten Gewissens abgibst?"
+        }
+      },
+      "want_to_own": {
+        "title": "Was würdest du im nächsten Jahr gern verantworten, obwohl du es noch nicht sicher kannst?",
+        "hint": "Etwas, in das du hineinwachsen willst. Das offen zu sagen ist im Team wertvoller, als es sich zuzutrauen und zu schweigen.",
+        "followUps": {
+          "whatIsMissing": "Was fehlt dir dafür noch – Wissen, Übung, Zeit, jemand, der es vormacht?",
+          "firstStep": "Was wäre ein erster Schritt, den du ohne Erlaubnis gehen könntest?"
+        }
+      }
+    }
   }
 }
