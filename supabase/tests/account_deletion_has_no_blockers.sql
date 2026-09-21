@@ -1,5 +1,5 @@
 begin;
-select plan(4);
+select plan(8);
 
 -- ---------------------------------------------------------------------------
 -- Kein Verweis auf auth.users darf eine Loeschung verbieten
@@ -85,6 +85,89 @@ select is(
    limit 1),
   'BEFORE',
   'er raeumt vor dem Loeschen auf, nicht danach'
+);
+
+-- ---------------------------------------------------------------------------
+-- Und jetzt wirklich loeschen
+-- ---------------------------------------------------------------------------
+--
+-- DAZUGEKOMMEN AM 21.09.2026. Die Faelle oben pruefen das SCHEMA - dass kein
+-- Verweis blockieren KANN. Das ist die wichtigere Haelfte, weil sie den
+-- naechsten Fremdschluessel faengt, den niemand bedacht hat.
+--
+-- Diese Haelfte prueft die andere Richtung: dass eine Loeschung mit echten
+-- Verstrickungen tatsaechlich durchlaeuft. Dafuer wird eine Person gebaut, die
+-- in allem drinsteckt, was am 21.09.2026 blockierte - eine Lab-Runde, die sie
+-- angelegt hat, eine Teilnahme, eine Promptzuweisung auf sich, und ein
+-- Workbook eines FREMDEN Teams, das sie zuletzt bearbeitet hat.
+--
+-- Der Grund fuer beide Haelften: Die Schema-Regel allein sagt nicht, dass der
+-- Aufraeumcode noch stimmt; ein bestandener Loeschlauf allein sagt nicht, dass
+-- die naechste Tabelle ihn nicht bricht.
+
+insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
+('00000000-0000-0000-0000-000000000000','ba000000-0000-4000-8000-00000000000a','authenticated','authenticated','geht@example.com','',now(),'{}','{}',now(),now()),
+('00000000-0000-0000-0000-000000000000','ba000000-0000-4000-8000-00000000000b','authenticated','authenticated','bleibt@example.com','',now(),'{}','{}',now(),now());
+
+insert into public.founder_teams(id, name, team_context)
+values ('bb000000-0000-4000-8000-00000000000a','Bleibt bestehen','pre_founder');
+insert into public.founder_team_members(team_id, user_id) values
+('bb000000-0000-4000-8000-00000000000a','ba000000-0000-4000-8000-00000000000a'),
+('bb000000-0000-4000-8000-00000000000a','ba000000-0000-4000-8000-00000000000b');
+
+-- Eine Runde, die die gehende Person angelegt hat, mit beiden als Teilnehmer.
+insert into public.collaboration_experience_rounds(
+  id, founder_team_id, experience_key, pack_key, pack_version,
+  created_by_user_id, status, rotation_offset)
+values ('bc000000-0000-4000-8000-00000000000a','bb000000-0000-4000-8000-00000000000a',
+        'read_my_mind','easy_start',1,'ba000000-0000-4000-8000-00000000000a','forming',0);
+
+insert into public.collaboration_experience_round_participants(round_id, founder_user_id, position) values
+('bc000000-0000-4000-8000-00000000000a','ba000000-0000-4000-8000-00000000000a',1),
+('bc000000-0000-4000-8000-00000000000a','ba000000-0000-4000-8000-00000000000b',2);
+
+-- Ein Workbook eines fremden Teams: angelegt von der bleibenden Person,
+-- zuletzt bearbeitet von der gehenden. Es darf die Loeschung ueberleben - die
+-- Arbeit gehoert dem Team.
+insert into public.invitations(id, inviter_user_id, invitee_email, token_hash, expires_at)
+values ('bd000000-0000-4000-8000-00000000000a','ba000000-0000-4000-8000-00000000000b',
+        'fremd@example.com','nur-fuer-diesen-test', now() + interval '30 days');
+
+insert into public.founder_alignment_workbooks(invitation_id, team_context, payload, created_by, updated_by)
+values ('bd000000-0000-4000-8000-00000000000a','pre_founder','{}'::jsonb,
+        'ba000000-0000-4000-8000-00000000000b','ba000000-0000-4000-8000-00000000000a');
+
+-- Eine Advisor-Einladung, die die gehende Person ausgesprochen hat.
+insert into public.founder_alignment_workbook_advisors(invitation_id, advisor_name, requested_by)
+values ('bd000000-0000-4000-8000-00000000000a','Eine Beratung','ba000000-0000-4000-8000-00000000000a');
+
+select lives_ok(
+  $$select public.delete_founder_account_data('ba000000-0000-4000-8000-00000000000a')$$,
+  'eine Person mit Lab-Runde, Teilnahme und fremdem Workbook laesst sich loeschen'
+);
+
+select is(
+  (select count(*)::int from auth.users where id = 'ba000000-0000-4000-8000-00000000000a'),
+  0,
+  'und sie ist danach wirklich weg'
+);
+
+-- Die Arbeit des Teams bleibt. Waere hier `cascade` gesetzt worden, waere das
+-- Workbook der bleibenden Person mit verschwunden.
+select is(
+  (select count(*)::int from public.founder_alignment_workbooks
+   where invitation_id = 'bd000000-0000-4000-8000-00000000000a'),
+  1,
+  'das Workbook des Teams ueberlebt die Loeschung eines Mitglieds'
+);
+
+-- Und die Runde ist mitgegangen, wie es die Produktentscheidung vom 28.08.2026
+-- vorsieht.
+select is(
+  (select count(*)::int from public.collaboration_experience_rounds
+   where id = 'bc000000-0000-4000-8000-00000000000a'),
+  0,
+  'die Lab-Runde der gehenden Person ist mitgegangen'
 );
 
 select * from finish();
