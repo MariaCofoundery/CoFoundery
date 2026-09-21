@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { markFounderInTheWildConversationAction, openFounderInTheWildRevealAction, unmarkFounderInTheWildConversationAction } from "@/features/founderInTheWild/founderInTheWildActions";
+import { ConversationMarkerButton } from "@/features/collaborationLab/ConversationMarkerButton";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getFounderInTheWildRound, getFounderInTheWildTeam, getOpenedFounderInTheWildReveal } from "@/features/founderInTheWild/founderInTheWildData";
 import { normalizeLocale } from "@/i18n/config";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -37,7 +39,19 @@ export default async function FounderInTheWildPromptReveal({ params }: { params:
     ) : null}
     <section className="mt-4 grid gap-4 md:grid-cols-2">{panel(t("yourMove"), reveal.own.move, "moves")}{panel(t("partnerMove", { name: partnerName }), reveal.partner.move, "moves")}{panel(t("yourMatters"), reveal.own.matters, "matters")}{panel(t("partnerMatters", { name: partnerName }), reveal.partner.matters, "matters")}{panel(t("yourNeed"), reveal.own.need, "needs")}{panel(t("partnerNeed", { name: partnerName }), reveal.partner.need, "needs")}</section>
     <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/50 p-5"><h2 className="text-lg font-semibold">{t("talkTitle")}</h2><ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-700"><li>{t("talk1")}</li><li>{t("talk2")}</li><li>{t("talk3")}</li></ol></section>
-    <section id="conversation-marker" className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/50 p-5"><h2 className="text-lg font-semibold">{t("markerTitle")}</h2>{status ? <p className="mt-2 text-sm font-medium text-violet-900">{status}</p> : null}<p className="mt-2 text-sm text-slate-600">{t("visible")}</p><form action={(ownMarked ? unmarkFounderInTheWildConversationAction : markFounderInTheWildConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4"><button aria-pressed={ownMarked} className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 focus-visible:ring-2 focus-visible:ring-violet-500">{t(ownMarked ? "unmark" : "mark")}</button></form></section>
-    <nav className="mt-6 flex justify-end">{next === undefined ? <Link href={`${base}/reveal`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("roundOverview")}</Link> : <Link href={`${base}/reveal/${next}`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("next")}</Link>}</nav>
+    <section id="conversation-marker" className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/50 p-5"><h2 className="text-lg font-semibold">{t("markerTitle")}</h2>{status ? <p className="mt-2 text-sm font-medium text-violet-900">{status}</p> : null}<p className="mt-2 text-sm text-slate-600">{t("visible")}</p><form action={(ownMarked ? unmarkFounderInTheWildConversationAction : markFounderInTheWildConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4"><ConversationMarkerButton marked={ownMarked} markLabel={t("mark")} unmarkLabel={t("unmark")} className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 focus-visible:ring-2 focus-visible:ring-violet-500" /></form></section>
+    {/* EIN SCHRITT STATT ZWEI, seit dem 21.09.2026.
+
+        GEMELDET: "Da musstest du immer noch mal so einen Zwischenschritt
+        machen mit jetzt wieder aufdecken und okay, naechstes und dann musst du
+        das auch wieder aufdecken, obwohl du ja schon zu Anfang gesagt hast,
+        dass du aufdecken willst."
+
+        Wer auf "naechste Situation" drueckt, will sie sehen. Das Siegel bleibt
+        als Moment erhalten - beim ERSTEN Aufdecken auf der Uebersicht. Ab dann
+        deckt derselbe Knopf auf und geht hin. Der Beleg ("ich habe es
+        gesehen") entsteht weiterhin je Karte, das Abschliessen verlangt ihn
+        von beiden Seiten. */}
+    <nav className="mt-6 flex justify-end">{next === undefined ? <Link href={`${base}/reveal`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("roundOverview")}</Link> : round.openedPromptPositions.includes(next) ? <Link href={`${base}/reveal/${next}`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("next")}</Link> : <form action={openFounderInTheWildRevealAction.bind(null, teamId, roundId, next)}><SubmitButton label={t("nextAndOpen")} pendingLabel={t("opening")} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white" /></form>}</nav>
   </main>;
 }

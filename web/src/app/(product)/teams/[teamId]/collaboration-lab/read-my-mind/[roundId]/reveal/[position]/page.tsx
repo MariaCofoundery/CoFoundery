@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { completeReadMyMindRoundAction, markReadMyMindConversationAction, openReadMyMindRevealAction, unmarkReadMyMindConversationAction } from "@/features/collaborationLab/readMyMindActions";
+import { ConversationMarkerButton } from "@/features/collaborationLab/ConversationMarkerButton";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getOpenedReadMyMindPromptReveal, getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import type { ReadMyMindResponseContract } from "@/features/collaborationLab/readMyMindContent";
 import { ReadMyMindProgress } from "@/features/collaborationLab/ReadMyMindExperienceVisuals";
@@ -117,15 +119,19 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
             {markerStatus ? <p className="mt-2 text-sm font-medium text-violet-900">{markerStatus}</p> : null}
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("sharedVisibility")}</p></div></div>
             <form action={(ownMarked ? unmarkReadMyMindConversationAction : markReadMyMindConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4">
-              <button type="submit" aria-pressed={ownMarked} className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 shadow-sm transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-100 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                {ownMarked ? t("unmarkConversation") : t("markConversation")}
-              </button>
+              {/* Schaltet sofort um - Begruendung in ConversationMarkerButton.tsx. */}
+              <ConversationMarkerButton
+                marked={ownMarked}
+                markLabel={t("markConversation")}
+                unmarkLabel={t("unmarkConversation")}
+                className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 shadow-sm transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-100 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+              />
             </form>
           </section>
           {next === undefined ? <section className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-100 to-amber-50 p-6 text-center"><h2 className="text-2xl font-semibold text-slate-950">{t(round.status === "completed" ? "completedTitle" : "allSeenTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-700">{t(round.status === "completed" ? "completedText" : "allSeenText")}</p></section> : null}
           <nav className="flex flex-wrap items-center justify-between gap-3" aria-label={t("progress", { current: position + 1, total: round.prompts.length })}>
             {previous !== undefined ? <Link prefetch={false} href={`${revealHref}/${previous}`} className="min-h-11 px-3 py-3 text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-slate-400">{t("previous")}</Link> : <span />}
-            {next !== undefined ? <Link prefetch={false} href={`${revealHref}/${next}`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("next")}</Link> : round.status === "completed" ? <Link href={revealHref} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("roundOverview")}</Link> : <form action={completeReadMyMindRoundAction.bind(null, teamId, roundId)}><button type="submit" className="min-h-11 rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("complete")}</button></form>}
+            {next !== undefined ? (round.openedPromptPositions.includes(next) ? <Link prefetch={false} href={`${revealHref}/${next}`} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("next")}</Link> : /* Deckt auf UND geht hin - siehe founder-in-the-wild/reveal/[position]. */ <form action={openReadMyMindRevealAction.bind(null, teamId, roundId, next)}><SubmitButton label={t("nextAndOpen")} pendingLabel={t("opening")} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2" /></form>) : round.status === "completed" ? <Link href={revealHref} className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">{t("roundOverview")}</Link> : <form action={completeReadMyMindRoundAction.bind(null, teamId, roundId)}><button type="submit" className="min-h-11 rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("complete")}</button></form>}
           </nav>
         </div>
       ) : notFound()}

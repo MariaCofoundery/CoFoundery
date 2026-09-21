@@ -84,7 +84,15 @@ test("reveal marker and compact summary stay secondary, accessible, and free of 
   const reveal = source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/reveal/[position]/page.tsx");
   const summary = source("../../../app/(product)/teams/[teamId]/collaboration-lab/read-my-mind/[roundId]/reveal/page.tsx");
   assert.match(reveal, /id="conversation-marker"/);
-  assert.match(reveal, /aria-pressed=\{ownMarked\}/);
+  // VERSCHOBEN AM 21.09.2026: Der Knopf steht jetzt in
+  // `ConversationMarkerButton.tsx`, weil er sofort umschalten muss - vorher
+  // zeigte er nach dem Drücken noch den alten Stand, und die Aktion lud die
+  // Seite neu. Die Zusage bleibt dieselbe und wird dort geprüft: Er sagt
+  // seinen Zustand an (`aria-pressed`), und zwar den, der gerade gilt.
+  assert.match(
+    source("../ConversationMarkerButton.tsx"),
+    /aria-pressed=\{shown\}/
+  );
   assert.match(reveal, /markedConversation/);
   assert.match(reveal, /sharedVisibility/);
   assert.match(summary, /conversationPrompts\.length > 0/);

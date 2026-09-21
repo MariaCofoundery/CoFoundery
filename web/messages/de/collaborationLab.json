@@ -216,7 +216,9 @@
       "answers-incomplete": "Eure Antworten sind noch nicht vollständig.",
       "changed": "Diese Runde hat sich inzwischen geändert.",
       "waiting": "Du hast deine Reveals angesehen. Die Runde wird abgeschlossen, sobald ihr beide fertig seid."
-    }
+    },
+    "nextAndOpen": "Nächste aufdecken",
+    "opening": "Wird aufgedeckt …"
   },
   "tally": {
     "eyebrow": "Wie gut kennt ihr euch?",

@@ -311,9 +311,9 @@ async function mutateConversationMarker(
     await withdrawInAppNotice(auth.supabase, markerNotice);
   }
 
+  // Keine Weiterleitung - Begruendung in founderInTheWildActions.ts.
   refresh(teamId, roundId);
   revalidatePath(revealHref(teamId, roundId, position));
-  redirect(`${revealHref(teamId, roundId, position)}#conversation-marker`);
 }
 
 export async function markReadMyMindConversationAction(

@@ -110,6 +110,8 @@
     "guessMissDetail": "You guessed: “{guess}”. {name} chose differently.",
     "partnerGuessHit": "{name}, by the way, read you correctly.",
     "partnerGuessMiss": "{name} got you wrong too, by the way.",
-    "completedNotice": "This round is complete. The reveal and the points you marked stay here."
+    "completedNotice": "This round is complete. The reveal and the points you marked stay here.",
+    "nextAndOpen": "Reveal the next one",
+    "opening": "Revealing …"
   }
 }

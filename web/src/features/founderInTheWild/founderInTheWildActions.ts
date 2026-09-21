@@ -204,7 +204,19 @@ async function marker(teamId: string, roundId: string, position: number, roundPr
     }
   }
 
-  refresh(teamId, roundId); redirect(`${revealHref(teamId, roundId, position)}#conversation-marker`);
+  // KEINE WEITERLEITUNG MEHR, seit dem 21.09.2026. Hier stand ein
+  // `redirect()` auf dieselbe Adresse mit `#conversation-marker`. Das war
+  // eine echte Navigation: Die Seite lud neu und sprang zum Anker - fuer
+  // einen Knopf, der nur an oder aus ist.
+  //
+  // GEMELDET: "Immer wenn ich geklickt habe, darueber moechte ich sprechen,
+  // hat er diese Seite im Prinzip noch mal ein bisschen neu geladen. Und das
+  // war irgendwie ein unangenehmes User-Gefuehl."
+  //
+  // `revalidatePath` allein baut die Serverkomponenten neu und flickt den
+  // Baum - kein Sprung, kein Neuaufbau der Seite. Ohne Javascript schickt das
+  // Formular weiterhin ab und bekommt die neu gebaute Seite zurueck.
+  refresh(teamId, roundId);
 }
 
 export async function markFounderInTheWildConversationAction(teamId: string, roundId: string, position: number, roundPromptId: string) { return marker(teamId, roundId, position, roundPromptId, "mark_collaboration_prompt_for_conversation"); }

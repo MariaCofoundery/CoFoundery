@@ -31,7 +31,15 @@ test("waiting and reveal stages add presentation without new lifecycle behavior"
   assert.match(revealPrompt, /openReadMyMindRevealAction\.bind/);
   assert.match(revealPrompt, /rmm-reveal-panel/);
   assert.match(revealPrompt, /md:grid-cols-2/);
-  assert.match(revealPrompt, /aria-pressed=\{ownMarked\}/);
+  // VERSCHOBEN AM 21.09.2026: Der Knopf steht jetzt in
+  // `ConversationMarkerButton.tsx`, weil er sofort umschalten muss - vorher
+  // zeigte er nach dem Drücken noch den alten Stand, und die Aktion lud die
+  // Seite neu. Die Zusage bleibt dieselbe und wird dort geprüft: Er sagt
+  // seinen Zustand an (`aria-pressed`), und zwar den, der gerade gilt.
+  assert.match(
+    source("../ConversationMarkerButton.tsx"),
+    /aria-pressed=\{shown\}/
+  );
   assert.doesNotMatch(`${round}${revealEntry}${revealPrompt}`, /framer-motion|from "framer-motion"/);
 });
 

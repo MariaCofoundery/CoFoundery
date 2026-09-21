@@ -216,7 +216,9 @@
       "answers-incomplete": "Your answers are not complete yet.",
       "changed": "This round has changed in the meantime.",
       "waiting": "You have viewed your reveals. The round will complete once you have both finished."
-    }
+    },
+    "nextAndOpen": "Reveal the next one",
+    "opening": "Revealing …"
   },
   "tally": {
     "eyebrow": "How well do you know each other?",

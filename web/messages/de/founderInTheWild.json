@@ -110,6 +110,8 @@
     "guessMissDetail": "Du hattest getippt: „{guess}“. {name} hat sich anders entschieden.",
     "partnerGuessHit": "{name} hat dich übrigens richtig eingeschätzt.",
     "partnerGuessMiss": "{name} lag bei dir übrigens auch daneben.",
-    "completedNotice": "Diese Runde ist abgeschlossen. Das Reveal und deine markierten Gesprächspunkte bleiben hier stehen."
+    "completedNotice": "Diese Runde ist abgeschlossen. Das Reveal und deine markierten Gesprächspunkte bleiben hier stehen.",
+    "nextAndOpen": "Nächste aufdecken",
+    "opening": "Wird aufgedeckt …"
   }
 }
