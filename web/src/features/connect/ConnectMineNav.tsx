@@ -10,7 +10,7 @@ import { getTranslations } from "next-intl/server";
  * also ueber einen anderen Bereich - oder gar nicht. Wer in Connect war, sah
  * ausschliesslich das, was andere gemacht haben.
  *
- * Drei Links statt eines Menues: Es sind genau drei Ziele, sie passen
+ * Vier Links statt eines Menues: Es sind wenige Ziele, sie passen
  * nebeneinander, und ein Menue waere ein zusaetzlicher Klick vor jedem davon.
  *
  * Und bewusst neben den Reitern statt nur auf der Uebersicht: Die Reiter sind
@@ -22,6 +22,10 @@ const LINKS = [
   { key: "profile", href: "/connect/profile" },
   { key: "listings", href: "/connect/my" },
   { key: "ventures", href: "/connect/ventures/mine" },
+  // Dazugekommen am 21.09.2026: Vorschlaege sind an MICH gerichtet und
+  // gehoeren damit zu meinen Sachen, nicht zwischen die Reiter, auf denen man
+  // sich umsieht.
+  { key: "suggestions", href: "/connect/suggestions" },
 ] as const;
 
 export async function ConnectMineNav() {

@@ -727,7 +727,8 @@
     "label": "My area",
     "profile": "My profile",
     "listings": "My listings",
-    "ventures": "My ventures"
+    "ventures": "My ventures",
+    "suggestions": "For you"
   },
   "resources": {
     "title": "Access and networks",
@@ -757,5 +758,20 @@
       "editorial": "Highlighted by us",
       "sponsored": "Ad"
     }
+  },
+  "suggestions": {
+    "title": "For you",
+    "text": "From the fields and industries you entered, we look for offers, companies and unsolved problems that overlap. Every suggestion shows you the word that triggered it.",
+    "because": "Because your profile says: {terms}",
+    "dismiss": "Not interesting",
+    "kinds": {
+      "listing": "Offer",
+      "venture": "Company",
+      "problem": "Unsolved"
+    },
+    "emptyTitle": "Nothing fitting right now",
+    "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precisely your fields and industries are in your profile, the more turns up.",
+    "emptyCta": "Complete your profile",
+    "note": "At most three suggestions a week, and they stay in the platform – none of this goes out by email. We do not suggest requests: whoever is looking for something should decide for themselves whom to approach."
   }
 }

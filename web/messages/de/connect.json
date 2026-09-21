@@ -727,7 +727,8 @@
     "label": "Mein Bereich",
     "profile": "Mein Profil",
     "listings": "Meine Einträge",
-    "ventures": "Meine Unternehmen"
+    "ventures": "Meine Unternehmen",
+    "suggestions": "Für dich"
   },
   "resources": {
     "title": "Zugänge und Netzwerke",
@@ -757,5 +758,20 @@
       "editorial": "Von uns hervorgehoben",
       "sponsored": "Anzeige"
     }
+  },
+  "suggestions": {
+    "title": "Für dich",
+    "text": "Aus dem, was du als Fachgebiete und Branchen eingetragen hast, suchen wir passende Angebote, Unternehmen und ungelöste Probleme. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.",
+    "because": "Weil bei dir steht: {terms}",
+    "dismiss": "Nicht interessant",
+    "kinds": {
+      "listing": "Angebot",
+      "venture": "Unternehmen",
+      "problem": "Ungelöstes"
+    },
+    "emptyTitle": "Gerade nichts Passendes",
+    "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer deine Fachgebiete und Branchen im Profil stehen, desto mehr findet sich.",
+    "emptyCta": "Profil ergänzen",
+    "note": "Höchstens drei Vorschläge pro Woche, und sie bleiben in der Plattform – per E-Mail geht davon nichts hinaus. Gesuche schlagen wir nicht vor: Wer etwas sucht, soll selbst entscheiden, wen er anspricht."
   }
 }
