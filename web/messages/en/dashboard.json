@@ -8,7 +8,8 @@
     "loadError": "The dashboard could not be loaded completely right now. Please try again.",
     "heroConnections": "Your connections",
     "heroConnectionsCount": "{count, plural, =0 {No connection yet} one {1 connection} other {# connections}}",
-    "heroFind": "Find people"
+    "heroFind": "Find people",
+    "heroOwnReport": "My report"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",

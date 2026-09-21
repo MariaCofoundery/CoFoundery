@@ -268,11 +268,16 @@ export default async function DashboardPage({
     submitted: hasSubmittedBase,
     started: hasStartedBase,
   });
+  // Dieselben zwei Bedingungen, unter denen die Statuskarten unten auf
+  // /me/report verlinken. Eine dritte Wahrheit daneben waere sofort die
+  // naechste, die auseinanderlaeuft.
   const valuesFoundationState = resolveValuesFoundationState({
     submitted: hasSubmittedValues,
     started: hasStartedValues,
   });
   const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
+  const hasIndividualReport =
+    founderAlignmentState === "result_available" || valuesFoundationState === "completed";
   const connectionOverview = await getFounderDashboardConnectionsV2({
     currentUserId: user.id,
     teams: founderTeams,
@@ -400,6 +405,24 @@ export default async function DashboardPage({
                 >
                   {t("hero.heroFind")}
                 </Link>
+                {/* DER EIGENE REPORT, hier oben und beim Namen genannt.
+                    Gemeldet am 21.09.2026: Er war nur ueber zwei Statuskarten
+                    weiter unten erreichbar - und die heissen nach dem SCHRITT
+                    ("Werte"), nicht nach dem Ergebnis. Wer sein Ergebnis
+                    nochmal ansehen will, sucht "mein Report" und nicht
+                    "Werte-Fundament".
+
+                    Nur wenn es einen gibt: Ein Weg zu einer Seite, die "noch
+                    nichts da" sagt, ist kein Weg. Die Karten fuehren weiter
+                    zum Fragebogen, das bleibt ihre Aufgabe. */}
+                {hasIndividualReport ? (
+                  <Link
+                    href="/me/report"
+                    className="inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100"
+                  >
+                    {t("hero.heroOwnReport")}
+                  </Link>
+                ) : null}
               </div>
 
               <div className="mt-5">

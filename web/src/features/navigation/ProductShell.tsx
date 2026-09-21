@@ -264,6 +264,10 @@ export function ProductShell({
             currentPathname === "/connections" ||
             currentPathname.startsWith("/teams/") ||
             currentPathname.startsWith("/founder-library") ||
+            // Fragebogen und eigener Report gehoeren zu Align. Ohne das waere
+            // die zweite Reihe genau dort verschwunden, wo der neue Eintrag
+            // hinfuehrt - ein Reiter, der sich beim Anklicken aufloest.
+            currentPathname.startsWith("/me/") ||
             currentPathname.startsWith("/founder-alignment"),
       // Align hatte als einziger Bereich keine eigene Navigation. Beide Seiten
       // waren nur vom Dashboard aus erreichbar - wer woanders stand, musste
@@ -280,6 +284,17 @@ export function ProductShell({
               },
               ...(hasFounder
                 ? [
+                    // GEMELDET AM 21.09.2026: Der eigene Report war nur ueber
+                    // zwei Statuskarten auf dem Dashboard erreichbar, und die
+                    // heissen nach dem Schritt ("Werte"), nicht nach dem
+                    // Ergebnis. Hier steht er beim Namen und von jeder
+                    // Align-Seite aus.
+                    {
+                      href: "/me/report",
+                      label: t("alignOwnReport"),
+                      isActive: (currentPathname: string) =>
+                        currentPathname.startsWith("/me/report"),
+                    },
                     {
                       href: "/founder-library",
                       label: t("alignLibrary"),

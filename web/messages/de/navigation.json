@@ -47,5 +47,6 @@
   "unreadMessagesBadge": "{count, plural, =0 {Keine ungelesenen Nachrichten} one {1 ungelesene Nachricht} other {# ungelesene Nachrichten}}",
   "menuOpen": "Menü",
   "menuClose": "Schließen",
-  "menuAttentionBadge": "{count, plural, =0 {Nichts Offenes} one {1 offener Punkt im Menü} other {# offene Punkte im Menü}}"
+  "menuAttentionBadge": "{count, plural, =0 {Nichts Offenes} one {1 offener Punkt im Menü} other {# offene Punkte im Menü}}",
+  "alignOwnReport": "Mein Report"
 }
