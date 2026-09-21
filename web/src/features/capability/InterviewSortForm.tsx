@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { sortInterviewAnswerAction } from "./capabilityInterviewActions";
+import type { AreaProposal } from "./capabilityProposalData";
 import {
   APPLICATION_LEVELS,
   MAX_CONFIRMED_AREAS,
@@ -42,6 +43,7 @@ export function InterviewSortForm({
   suggestedAreas,
   suggestedWish,
   areaLabels,
+  proposals,
 }: {
   turnId: string;
   answer: string;
@@ -51,6 +53,8 @@ export function InterviewSortForm({
   suggestedWish: OwnershipWish | null;
   /** Beschriftungen aller Bereiche, die vorgeschlagen werden koennen. */
   areaLabels: Record<string, string>;
+  /** Was ein Sprachmodell in dieser Antwort gesehen hat - je Vorschlag mit Zitat. */
+  proposals: readonly AreaProposal[];
 }) {
   const t = useTranslations("capability");
   const [analysis, setAnalysis] = useState<NarrativeAnalysis | null>(null);
@@ -68,8 +72,11 @@ export function InterviewSortForm({
     };
   }, [answer]);
 
+  const proposedIds = proposals.map((proposal) => proposal.areaId);
+  // Was das Modell gesehen hat, erscheint nicht noch einmal weiter unten: Ein
+  // Vorschlag mit Zitat ist die staerkere Fassung desselben Hinweises.
   const fromText = (analysis?.areas ?? []).filter(
-    (area) => !suggestedAreas.includes(area.areaId)
+    (area) => !suggestedAreas.includes(area.areaId) && !proposedIds.includes(area.areaId)
   );
   const atLimit = chosen.length >= MAX_CONFIRMED_AREAS;
 
@@ -90,8 +97,104 @@ export function InterviewSortForm({
     <form action={sortInterviewAnswerAction}>
       <input type="hidden" name="turnId" value={turnId} />
 
+      {/* ------------------------------------------------------------------
+          WAS DAS MODELL GESEHEN HAT - mit dem wörtlichen Satz dazu.
+
+          GEWUENSCHT AM 21.09.2026: "Das Tool hat schon rausgefiltert, ey, das
+          könnte das und das sein, dass man aber trotzdem noch sagen müsste,
+          vielleicht mit einem Schieberegler: so würde ich mich selber
+          einschätzen."
+
+          DAS ZITAT IST NICHT SCHMUCK, sondern die ganze Absicherung: Die
+          Datenbank hat beim Ablegen geprüft, dass dieser Satz wörtlich in der
+          Antwort steht (`insert_ai_capability_proposal`). Ein Modell, das
+          etwas hinzudichtet, kann es nicht belegen - und was es nicht belegen
+          kann, ist hier nie angekommen. Deshalb steht der Satz sichtbar
+          daneben: Man kann den Vorschlag gegen die eigene Erzählung prüfen,
+          ohne uns zu glauben.
+
+          UND DER REGLER IST DIE VORHANDENE SKALA. Keine Notenskala, sondern
+          die Anwendungsstufen 1-5, die situativ verankert sind: "noch nicht
+          praktisch angewandt" bis "auch in schwierigen Situationen angewandt,
+          kann andere unterstützen". Ein "wie krass bist du hier?" hätte
+          Selbstvertrauen gemessen statt Können - und Selbstvertrauen ist
+          ungleich verteilt.
+          ------------------------------------------------------------------ */}
+      {proposals.length > 0 ? (
+        <fieldset className="rounded-2xl border border-violet-200 bg-violet-50/40 p-4">
+          <legend className="px-1 text-sm font-semibold text-violet-900">
+            {t("interview.sort.fromModel")}
+          </legend>
+          <p className="mt-1 text-xs leading-5 text-violet-900/80">
+            {t("interview.sort.fromModelHint")}
+          </p>
+
+          <div className="mt-3 grid gap-3">
+            {proposals.map((proposal) => {
+              const isChosen = chosen.includes(proposal.areaId);
+              return (
+                <div
+                  key={proposal.id}
+                  className="rounded-2xl border border-violet-100 bg-white p-3"
+                >
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      type="checkbox"
+                      name="area_id"
+                      value={proposal.areaId}
+                      checked={isChosen}
+                      disabled={atLimit && !isChosen}
+                      onChange={() => toggle(proposal.areaId)}
+                      className="mt-1 h-4 w-4 rounded border-slate-300 accent-violet-600"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-slate-900">
+                        {areaLabels[proposal.areaId] ?? proposal.areaId}
+                      </span>
+                      {/* Der Beleg, wörtlich. */}
+                      <span className="mt-1 block text-sm italic leading-6 text-slate-600">
+                        „{proposal.quote}“
+                      </span>
+                    </span>
+                  </label>
+
+                  {/* Der Regler erscheint erst, wenn der Vorschlag angenommen
+                      ist: Eine Stufe zu einem Bereich, den man nicht
+                      bestätigt hat, wäre eine Angabe ins Leere. */}
+                  {isChosen ? (
+                    <div className="mt-3 border-t border-slate-100 pt-3">
+                      <label
+                        htmlFor={`level_${proposal.areaId}`}
+                        className="block text-xs font-medium text-slate-700"
+                      >
+                        {t("interview.sort.levelFor", {
+                          area: areaLabels[proposal.areaId] ?? proposal.areaId,
+                        })}
+                      </label>
+                      <select
+                        id={`level_${proposal.areaId}`}
+                        name={`level_${proposal.areaId}`}
+                        defaultValue=""
+                        className="mt-1.5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+                      >
+                        <option value="">{t("levels.unset")}</option>
+                        {APPLICATION_LEVELS.map((level) => (
+                          <option key={level} value={level}>
+                            {level} – {t(`levels.${level}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
+      ) : null}
+
       {suggestedAreas.length > 0 ? (
-        <fieldset>
+        <fieldset className={proposals.length > 0 ? "mt-6" : ""}>
           <legend className="text-sm font-medium text-slate-900">
             {t("interview.sort.fromQuestion")}
           </legend>
@@ -119,7 +222,7 @@ export function InterviewSortForm({
         </fieldset>
       ) : null}
 
-      <fieldset className={suggestedAreas.length > 0 ? "mt-6" : ""}>
+      <fieldset className={suggestedAreas.length > 0 || proposals.length > 0 ? "mt-6" : ""}>
         <legend className="text-sm font-medium text-slate-900">
           {t("interview.sort.fromText")}
         </legend>
@@ -173,6 +276,9 @@ export function InterviewSortForm({
           <label htmlFor="application_level" className="block text-sm font-medium text-slate-900">
             {t("levels.label")}
           </label>
+          {/* Die gemeinsame Stufe gilt fuer den fuehrenden Bereich. Wo ein
+              Regler oben gesetzt ist, gewinnt er - das entscheidet
+              `attachCapabilityEvidence` und nicht diese Seite. */}
           <select
             id="application_level"
             name="application_level"

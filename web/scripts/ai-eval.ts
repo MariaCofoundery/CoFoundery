@@ -24,6 +24,7 @@
 import { readFileSync } from "node:fs";
 
 import { analyzeNarrativeWithRules, type NarrativeAnalysis } from "@/features/capability/narrativeAnalysis";
+import { readCapabilityAreas } from "@/features/capability/capabilityVocabularyFromFiles";
 import {
   createModelNarrativeAnalyzer,
   type AnalyzableArea,
@@ -32,30 +33,18 @@ import { getAiModel, isModelReachable } from "@/lib/ai/ollama";
 
 type EvalCase = { id: string; narrative: string; expected: string[]; warum?: string };
 
-const MIGRATION = "../supabase/migrations/20260907160000_create_capability_snapshot_v01.sql";
-const LABELS = "messages/de/capability.json";
-
 /**
- * Das Vokabular aus der Migration, die Beschriftungen aus i18n.
- *
- * Beides dort, wo es hingehoert: `capability_areas` ist die eine Wahrheit fuer
- * die IDs, und die Migration sagt selbst, dass Anzeigetexte in i18n liegen.
- * Eine Liste im Skript waere die naechste, die auseinanderlaeuft.
+ * Das Vokabular kommt aus `capabilityVocabularyFromFiles` - GEAENDERT AM
+ * 21.09.2026: Hier stand eine eigene Fassung, die nur die erste Migration las.
+ * Damit fehlten die fuenf Bereiche der Familie "Aussenauftritt & Moderation",
+ * und die Auswertung konnte ihre Erkennung gar nicht messen. Jetzt liest
+ * dieselbe Funktion, die auch der Arbeiter benutzt, alle Migrationen.
  */
-function readAreas(): AnalyzableArea[] {
-  const sql = readFileSync(MIGRATION, "utf8");
-  const ids = [...sql.matchAll(/\('([a-z_0-9]+)',\s*'[a-z_]+',\s*\d+\)/g)].map((match) => match[1]);
-  const labels = (JSON.parse(readFileSync(LABELS, "utf8")) as { areaLabels: Record<string, string> })
-    .areaLabels;
-
-  const areas = [...new Set(ids)]
-    .filter((id) => id !== "other")
-    .map((id) => ({ id, label: labels[id] ?? id }));
-
+function readAreas() {
+  const { areas, withoutLabel } = readCapabilityAreas();
   if (areas.length < 20) throw new Error("Vokabular nicht gefunden - hat sich die Migration geaendert?");
-  const ohneLabel = areas.filter((area) => area.label === area.id);
-  if (ohneLabel.length > 0) {
-    console.warn(`Ohne Beschriftung: ${ohneLabel.map((area) => area.id).join(", ")}\n`);
+  if (withoutLabel.length > 0) {
+    console.warn(`Ohne Beschriftung: ${withoutLabel.join(", ")}\n`);
   }
   return areas;
 }

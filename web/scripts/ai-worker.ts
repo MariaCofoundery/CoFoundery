@@ -27,6 +27,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import { extractResources } from "@/features/ai/resourceExtraction";
+import { readCapabilityAreas } from "@/features/capability/capabilityVocabularyFromFiles";
+import { createModelNarrativeAnalyzer } from "@/features/capability/narrativeAnalysisModel";
 import { getAiModel, isModelReachable } from "@/lib/ai/ollama";
 
 /** Wie oft nachgefragt wird, wenn nichts daliegt. */
@@ -135,6 +137,58 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
 
       // Kein Fund ist ein gueltiges Ergebnis: Nicht in jedem Text steht ein
       // Zugang. Die Aufgabe gilt als erledigt, damit sie nicht wiederkommt.
+      return null;
+    }
+
+    case "capability_area_proposal": {
+      // EINE INTERVIEW-ANTWORT, und zwar nur auf ausdrueckliche Anforderung der
+      // Person (`request_capability_area_proposals`). Anders als bei einer
+      // veroeffentlichten Anzeige ist das der privateste Text im Produkt -
+      // Frage 3 des Leitfadens fragt nach dem Leben ausserhalb der
+      // Erwerbsarbeit.
+      const { data: sourceText, error } = await client.rpc("get_ai_job_source_text", {
+        p_job_id: job.id,
+      });
+      if (error) return "source_missing";
+      if (typeof sourceText !== "string" || sourceText.trim().length < 20) {
+        return "source_missing";
+      }
+
+      // DAS VOKABULAR AUS DEN DATEIEN: Der Arbeiter ist kein Netzwerkmitglied
+      // und darf `capability_areas` nicht lesen - das ist richtig so, er soll
+      // nichts lesen koennen, wofuer er keine Aufgabe in der Hand hat.
+      const { areas } = readCapabilityAreas();
+
+      const analyze = createModelNarrativeAnalyzer({
+        areas,
+        model: getAiModel(),
+        // Kein Rueckfall auf die Regeln: Die laufen ohnehin im Browser, und
+        // ein Regeltreffer waere hier ein Vorschlag OHNE Zitat - der kaeme
+        // durch die Pruefung der Datenbank gar nicht hindurch.
+        fallback: async () => ({ areas: [], strength: null, engine: "rules" }),
+      });
+
+      const analysis = await analyze({ narrative: sourceText, locale: "de" });
+      if (analysis.engine !== "model") return "model_unreachable";
+
+      // Jeder Vorschlag geht einzeln hinein, und die Datenbank prueft das
+      // Zitat noch einmal gegen die Antwort. `matchedTerms` traegt bei der
+      // Modellfassung die Zitate - das erste ist das beste, weil die
+      // Pruefung dort schon einmal gegriffen hat.
+      for (const area of analysis.areas) {
+        const quote = area.matchedTerms[0];
+        if (!quote) continue;
+        await client.rpc("insert_ai_capability_proposal", {
+          p_job_id: job.id,
+          p_area_id: area.areaId,
+          p_quote: quote,
+          p_model: getAiModel(),
+          p_prompt_version: PROMPT_VERSION,
+        });
+      }
+
+      // Kein Fund ist ein gueltiges Ergebnis: Nicht in jeder Erzaehlung steht
+      // ein Bereich, den dieses Vokabular kennt.
       return null;
     }
 

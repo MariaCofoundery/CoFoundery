@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import { attachCapabilityEvidence } from "./capabilityEvidenceWrite";
+import { getProposalsForTurn } from "./capabilityProposalData";
 import {
   getActiveInterview,
   getSortedInterviewAnswers,
@@ -19,6 +20,33 @@ import {
   parseApplicationLevel,
   parseOwnershipWish,
 } from "./capabilityTypes";
+
+/**
+ * Bittet ein Modell, diese Antwort zu lesen.
+ *
+ * VON EINEM MENSCHEN ANGEFORDERT, nicht vom Ablauf - und das ist der
+ * Unterschied zum Connect-Text, der veroeffentlicht ist. Eine
+ * Interview-Antwort ist der privateste Text im Produkt; Frage 3 fragt
+ * ausdruecklich nach dem Leben ausserhalb der Erwerbsarbeit.
+ *
+ * Die Bedingung "nur die eigene Antwort" steht in der Datenbank
+ * (`request_capability_area_proposals`), nicht hier: Eine Pruefung in der
+ * Oberflaeche waere eine Bitte, keine Grenze.
+ */
+export async function askForProposalsAction(formData: FormData) {
+  const { client } = await requireUser();
+  const turnId = String(formData.get("turnId") ?? "");
+
+  const { error } = await client.rpc("request_capability_area_proposals", {
+    p_turn_id: turnId,
+  });
+  // Ein abgelehnter Auftrag ist kein Drama: Vielleicht laeuft schon einer.
+  // Die Seite zeigt den Zustand.
+  if (error) redirect(`${SORT_PATH}?error=ask`);
+
+  revalidatePath(SORT_PATH);
+  redirect(SORT_PATH);
+}
 
 /**
  * Das Gespräch führen.
@@ -375,15 +403,50 @@ export async function sortInterviewAnswerAction(formData: FormData) {
     ),
   ].slice(0, MAX_CONFIRMED_AREAS);
 
+  // DIE STUFEN JE BEREICH - der Regler, um den Maria gebeten hat. Das Feld
+  // heisst `level_<area_id>`; unbekannte oder leere werden stillschweigend
+  // uebergangen, weil eine fehlende Stufe ein gueltiger Zustand ist.
+  const levelByArea: Record<string, number | null> = {};
+  for (const areaId of areaIds) {
+    levelByArea[areaId] = parseApplicationLevel(formData.get(`level_${areaId}`));
+  }
+
   const written = await attachCapabilityEvidence({
     client,
     userId,
     areaIds,
     narrative: turn.answer,
     applicationLevel: level,
+    levelByArea,
     ownershipWish: wish,
   });
   if (!written.ok) redirect(`${SORT_PATH}?error=${written.reason}`);
+
+  // DIE VORSCHLAEGE DES MODELLS SIND DAMIT ENTSCHIEDEN: angenommen, was
+  // angehakt wurde, abgelehnt der Rest. Beides wird vermerkt, damit dieselbe
+  // Antwort beim naechsten Lesen nicht wieder dieselben Vorschlaege bringt -
+  // wer etwas abgelehnt hat, hat eine Aussage gemacht.
+  //
+  // Stillschweigend: Das Einordnen ist gelungen, und ein Fehler beim Vermerken
+  // darf es nicht zuruecknehmen.
+  const proposals = await getProposalsForTurn(client, turnId);
+  if (proposals.length > 0) {
+    const accepted = proposals.filter((proposal) => areaIds.includes(proposal.areaId));
+    const rejected = proposals.filter((proposal) => !areaIds.includes(proposal.areaId));
+    const decidedAt = new Date().toISOString();
+    if (accepted.length > 0) {
+      await client
+        .from("capability_area_proposals")
+        .update({ status: "accepted", decided_at: decidedAt })
+        .in("id", accepted.map((proposal) => proposal.id));
+    }
+    if (rejected.length > 0) {
+      await client
+        .from("capability_area_proposals")
+        .update({ status: "rejected", decided_at: decidedAt })
+        .in("id", rejected.map((proposal) => proposal.id));
+    }
+  }
 
   // WELCHE BEREICHE AUS DIESER ANTWORT KAMEN - alle, nicht nur der fuehrende.
   // Der Beleg haengt nur an einem (die Erzaehlung dreimal zu speichern waere

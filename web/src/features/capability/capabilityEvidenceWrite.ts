@@ -33,8 +33,24 @@ export async function attachCapabilityEvidence(params: {
   /** Die bestaetigten Bereiche. Leer ist erlaubt - dann greift der Auffangwert. */
   areaIds: readonly string[];
   narrative: string;
-  /** Null heisst "nicht angegeben" und ueberschreibt eine vorhandene Stufe nicht. */
+  /**
+   * Die Stufe fuer den FUEHRENDEN Bereich. Null heisst "nicht angegeben" und
+   * ueberschreibt eine vorhandene Stufe nicht.
+   */
   applicationLevel: number | null;
+  /**
+   * Stufen je Bereich - und sie gewinnen, wo sie gesetzt sind.
+   *
+   * DAZUGEKOMMEN AM 21.09.2026 fuer den Regler, um den Maria gebeten hat:
+   * "vielleicht mit einem Schieberegler, so wuerde ich mich selber
+   * einschaetzen". Eine Antwort kann bis zu drei Bereiche bestaetigen, und
+   * dass man in allen dreien gleich tief steckt, ist die Ausnahme - eine
+   * gemeinsame Stufe waere also meistens falsch.
+   *
+   * Das Textfeld gibt weiterhin nur `applicationLevel` mit: Dort wird EINE
+   * Sache erzaehlt, und die Stufe gehoert zu ihr.
+   */
+  levelByArea?: Record<string, number | null>;
   /** Null heisst "hier nicht gefragt" und ueberschreibt einen vorhandenen Wunsch nicht. */
   ownershipWish: string | null;
 }): Promise<AttachEvidenceResult> {
@@ -90,6 +106,20 @@ export async function attachCapabilityEvidence(params: {
       .from("person_capability_entries")
       .update(patch)
       .eq("id", primaryEntryId);
+    if (error) return { ok: false, reason: "save" };
+  }
+
+  // DIE STUFEN JE BEREICH, und sie gewinnen gegen die gemeinsame oben: Wer
+  // fuer einen Bereich ausdruecklich eine Stufe geschoben hat, hat das
+  // gesagt. Nur gesetzte werden geschrieben - leer heisst leer, nicht Stufe 1.
+  for (const [areaId, level] of Object.entries(params.levelByArea ?? {})) {
+    if (level === null) continue;
+    const entryId = known.get(areaId);
+    if (!entryId) continue;
+    const { error } = await client
+      .from("person_capability_entries")
+      .update({ application_level: level })
+      .eq("id", entryId);
     if (error) return { ok: false, reason: "save" };
   }
 

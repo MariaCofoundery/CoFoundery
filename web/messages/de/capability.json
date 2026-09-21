@@ -481,11 +481,22 @@
       "againText": "Du kannst eine Antwort nochmal einordnen. Sinnvoll ist das, wenn die Vorschläge damals dünn waren – die Erkennung wird besser, deine Erzählung bleibt dieselbe. Der alte Beleg wird dabei ersetzt, damit dieselbe Geschichte nicht zweimal im Profil steht. Bereiche, die du schon bestätigt hast, bleiben bestehen.",
       "again": "Nochmal einordnen",
       "againPending": "Wird geöffnet …",
+      "fromModel": "Das hat die KI gesehen",
+      "fromModelHint": "Jeder Vorschlag steht mit dem wörtlichen Satz da, auf den er sich beruft – geprüft wurde er beim Speichern gegen deine Antwort. Was ein Modell nicht belegen kann, kommt hier gar nicht an. Ob es stimmt, entscheidest du.",
+      "levelFor": "Wie tief steckst du in „{area}“?",
+      "askTitle": "Die KI mitlesen lassen?",
+      "askText": "Ein Sprachmodell auf unserer eigenen Hardware liest diese eine Antwort und schlägt Bereiche vor – jeden mit dem Satz, auf den er sich beruft. Es entscheidet nichts, es setzt keine Stufe, und es sieht keine andere Antwort als diese. Du kannst das Einordnen auch ganz ohne machen.",
+      "ask": "Diese Antwort lesen lassen",
+      "askPending": "Wird angefragt …",
+      "askRunning": "Die KI liest gerade. Das dauert meist unter zwanzig Sekunden – diese Seite aktualisiert sich von selbst.",
+      "askUnavailable": "Gerade ist kein Modell erreichbar. Das ist kein Fehler: Es läuft auf einem Rechner, der auch mal aus ist. Ordne einfach ohne ein – oder komm später wieder.",
+      "askFailed": "Der letzte Versuch ist nicht durchgelaufen.",
       "errors": {
         "area": "Einer der Bereiche ist unbekannt. Bitte lade die Seite neu und versuch es noch einmal.",
         "save": "Das Einordnen ließ sich nicht speichern. Deine Antwort ist unverändert da.",
         "link": "Gespeichert, aber die Antwort ließ sich nicht als eingeordnet vermerken. Sie erscheint noch einmal – ordne sie dann bitte nicht doppelt ein.",
-        "resort": "Das Öffnen hat nicht geklappt. Deine Antwort und ihre Einordnung sind unverändert."
+        "resort": "Das Öffnen hat nicht geklappt. Deine Antwort und ihre Einordnung sind unverändert.",
+        "ask": "Die Anfrage ließ sich nicht stellen. Vielleicht liest die KI diese Antwort schon."
       }
     },
     "summary": {

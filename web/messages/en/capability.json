@@ -481,11 +481,22 @@
       "againText": "You can sort an answer again. That makes sense when the proposals were thin back then – the recognition keeps improving, your story stays the same. The old piece of evidence is replaced so the same story does not appear twice in your profile. Areas you already confirmed stay.",
       "again": "Sort again",
       "againPending": "Opening …",
+      "fromModel": "What the AI saw",
+      "fromModelHint": "Every proposal comes with the verbatim sentence it relies on – checked against your answer when it was saved. What a model cannot prove never arrives here. Whether it is right is your call.",
+      "levelFor": "How deep are you in “{area}”?",
+      "askTitle": "Let the AI read along?",
+      "askText": "A language model on our own hardware reads this one answer and proposes areas – each with the sentence it relies on. It decides nothing, it sets no level, and it sees no answer but this one. You can do the sorting entirely without it.",
+      "ask": "Have this answer read",
+      "askPending": "Asking …",
+      "askRunning": "The AI is reading. That usually takes under twenty seconds – this page refreshes itself.",
+      "askUnavailable": "No model is reachable right now. That is not an error: it runs on a machine that is sometimes off. Just sort without it – or come back later.",
+      "askFailed": "The last attempt did not complete.",
       "errors": {
         "area": "One of the areas is unknown. Please reload the page and try again.",
         "save": "Sorting could not be saved. Your answer is unchanged.",
         "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice.",
-        "resort": "Opening did not work. Your answer and its sorting are unchanged."
+        "resort": "Opening did not work. Your answer and its sorting are unchanged.",
+        "ask": "The request could not be made. Perhaps the AI is already reading this answer."
       }
     },
     "summary": {

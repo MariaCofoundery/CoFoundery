@@ -3,8 +3,17 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
-import { resortInterviewAnswerAction } from "@/features/capability/capabilityInterviewActions";
+import {
+  askForProposalsAction,
+  resortInterviewAnswerAction,
+} from "@/features/capability/capabilityInterviewActions";
+import { ProposalWatcher } from "@/features/capability/ProposalWatcher";
 import { InterviewSummaryView } from "@/features/capability/InterviewSummaryView";
+import {
+  getAiAvailability,
+  getProposalJobState,
+  getProposalsForTurn,
+} from "@/features/capability/capabilityProposalData";
 import {
   getInterviewSummary,
   getSortedInterviewAnswers,
@@ -53,7 +62,7 @@ export default async function InterviewSortPage({
   ]);
 
   const card = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-7";
-  const knownErrors = ["area", "save", "link", "resort"];
+  const knownErrors = ["area", "save", "link", "resort", "ask"];
   const error = params.error && knownErrors.includes(params.error) ? params.error : null;
   const notice = params.notice === "already" ? "already" : null;
 
@@ -67,6 +76,16 @@ export default async function InterviewSortPage({
   const turn = unsorted[0] ?? null;
   const meta = turn ? interviewQuestionMeta(turn) : null;
   const question = meta?.question ?? null;
+
+  // NUR FUER DIE ANTWORT, DIE GERADE DRAN IST. Die Vorschlaege der uebrigen
+  // interessieren hier nicht, und sie zu laden waere eine Abfrage fuer nichts.
+  const [proposals, jobState, aiAvailable] = turn
+    ? await Promise.all([
+        getProposalsForTurn(client, turn.id),
+        getProposalJobState(client, turn.id),
+        getAiAvailability(client),
+      ])
+    : [[], "none" as const, false];
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10">
@@ -133,6 +152,52 @@ export default async function InterviewSortPage({
             </p>
           </section>
 
+          {/* ------------------------------------------------------------
+              DIE KI MITLESEN LASSEN - auf Bitte, nicht von selbst.
+
+              Anders als bei einer veröffentlichten Anzeige ist das hier der
+              privateste Text im Produkt: Frage 3 fragt nach dem Leben
+              außerhalb der Erwerbsarbeit. Deshalb ein Knopf und ein Satz, der
+              sagt, was passiert - und kein stiller Ablauf.
+              ------------------------------------------------------------ */}
+          {proposals.length === 0 ? (
+            <section className={`${card} mt-4`}>
+              <h2 className="text-base font-semibold text-slate-950">
+                {t("interview.sort.askTitle")}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {t("interview.sort.askText")}
+              </p>
+
+              {jobState === "open" ? (
+                /* Sie liest gerade. Der Arbeiter holt sich die Aufgabe im
+                   Sekundenrhythmus; die Seite wartet nicht, sondern sagt es. */
+                <ProposalWatcher>
+                  <p role="status" className="mt-3 text-sm leading-6 text-violet-900">
+                    {t("interview.sort.askRunning")}
+                  </p>
+                </ProposalWatcher>
+              ) : aiAvailable ? (
+                <form action={askForProposalsAction} className="mt-4">
+                  <input type="hidden" name="turnId" value={turn.id} />
+                  <SubmitButton
+                    label={t("interview.sort.ask")}
+                    pendingLabel={t("interview.sort.askPending")}
+                    className="inline-flex min-h-11 items-center rounded-full border border-violet-300 bg-white px-5 text-sm font-semibold text-violet-900"
+                  />
+                </form>
+              ) : (
+                /* NICHT ERREICHBAR IST NICHT KAPUTT. Das Modell läuft auf
+                   einem Rechner, der auch mal aus ist - und das Einordnen
+                   geht ohne es vollständig. */
+                <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+                  {t("interview.sort.askUnavailable")}
+                  {jobState === "failed" ? ` ${t("interview.sort.askFailed")}` : ""}
+                </p>
+              )}
+            </section>
+          ) : null}
+
           <section className={`${card} mt-4`}>
             <h2 className="text-lg font-semibold text-slate-950">
               {t("interview.sort.whichAreas")}
@@ -148,6 +213,7 @@ export default async function InterviewSortPage({
                 suggestedAreas={question?.suggestsAreas ?? []}
                 suggestedWish={question?.suggestsWish ?? null}
                 areaLabels={areaLabels}
+                proposals={proposals}
               />
             </div>
           </section>
