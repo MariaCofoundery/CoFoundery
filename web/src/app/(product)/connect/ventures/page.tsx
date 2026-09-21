@@ -104,7 +104,11 @@ export default async function ConnectVentureDirectoryPage({
                     />
                   ) : null}
                   <div className="min-w-0">
-                    <h2 className="truncate text-lg font-semibold text-slate-950">{venture.name}</h2>
+                    <h2 className="truncate text-lg font-semibold text-slate-950">
+                      <Link href={`/connect/ventures/${venture.id}`} className="hover:underline">
+                        {venture.name}
+                      </Link>
+                    </h2>
                     {venture.role_label ? (
                       <p className="truncate text-sm text-slate-500">{venture.role_label}</p>
                     ) : null}

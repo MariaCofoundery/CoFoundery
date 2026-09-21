@@ -56,6 +56,22 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
               <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-600">{highlight.text}</p>
             ) : null}
 
+            {/* Bei einem Menschen: was er mitbringt. Eine Karte mit Name und
+                einer Zeile sagt nicht, warum man klicken sollte. */}
+            {highlight.has ? (
+              <span className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                {highlight.has.ventures > 0 ? (
+                  <span>{t("has.ventures", { count: highlight.has.ventures })}</span>
+                ) : null}
+                {highlight.has.offering > 0 ? (
+                  <span>{t("has.offering", { count: highlight.has.offering })}</span>
+                ) : null}
+                {highlight.has.seeking > 0 ? (
+                  <span>{t("has.seeking", { count: highlight.has.seeking })}</span>
+                ) : null}
+              </span>
+            ) : null}
+
             {/* Der Mensch dahinter. Bei einem Profil ist er der Eintrag
                 selbst - dann waere die Zeile eine Wiederholung. */}
             {highlight.person && highlight.kind !== "person" ? (

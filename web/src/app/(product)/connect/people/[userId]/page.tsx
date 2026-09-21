@@ -171,7 +171,11 @@ export default async function ConnectPersonPage({
                       />
                     ) : null}
                     <div className="min-w-0">
-                      <h3 className="truncate font-semibold text-slate-900">{venture.name}</h3>
+                      <h3 className="truncate font-semibold text-slate-900">
+                        <Link href={`/connect/ventures/${venture.id}`} className="hover:underline">
+                          {venture.name}
+                        </Link>
+                      </h3>
                       {venture.role_label ? (
                         <p className="truncate text-xs text-slate-500">{venture.role_label}</p>
                       ) : null}

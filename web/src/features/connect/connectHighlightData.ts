@@ -54,6 +54,15 @@ export type ConnectHighlight = {
   href: string;
   /** Der Mensch dahinter - bei einem Profil ist er der Eintrag selbst. */
   person: ConnectProfile | null;
+  /**
+   * Was dieser Mensch mitbringt - nur bei `kind: "person"` gefuellt.
+   *
+   * GEWUENSCHT AM 21.09.2026: "Wenn dann ein Mensch gehighlightet wird, dann
+   * koennen da irgendwie auch die Unternehmen drinstehen oder ich suche, ich
+   * biete." Eine Karte, die nur Name und Zeile zeigt, sagt nicht, warum man
+   * klicken sollte.
+   */
+  has: { ventures: number; offering: number; seeking: number } | null;
   disclosure: HighlightDisclosure;
 };
 
@@ -171,6 +180,7 @@ export async function getConnectHighlights(
       text: listing.summary,
       href: `/connect/listings/${listing.id}`,
       person: owner ?? profileByUserId.get(listing.owner_user_id) ?? null,
+      has: null,
       disclosure: "none",
     });
   }
@@ -182,10 +192,13 @@ export async function getConnectHighlights(
       id: venture.id,
       title: venture.name,
       text: venture.what_it_does,
-      // Auf den Menschen und nicht auf eine Unternehmensseite: Die gibt es
-      // nicht einzeln, und das Netzwerk besteht aus Menschen.
-      href: `/connect/people/${venture.owner_user_id}`,
+      // GEAENDERT AM 21.09.2026: Vorher fuehrte der Klick auf den Menschen -
+      // es gab keine Unternehmensseite. Jetzt gibt es sie, und wer auf ein
+      // Unternehmen klickt, will das Unternehmen sehen. Der Mensch steht dort
+      // unten und verlinkt.
+      href: `/connect/ventures/${venture.id}`,
       person: profileByUserId.get(venture.owner_user_id) ?? null,
+      has: null,
       disclosure: "none",
     });
   }
@@ -201,11 +214,65 @@ export async function getConnectHighlights(
       text: person.headline,
       href: `/connect/people/${person.user_id}`,
       person,
+      // Wird nach dem Mischen nachgeladen - nur fuer die drei, die uebrig
+      // bleiben. Fuer dreissig Profile zu zaehlen, um drei zu zeigen, waere
+      // Arbeit fuer den Papierkorb.
+      has: { ventures: 0, offering: 0, seeking: 0 },
       disclosure: "none",
     });
   }
 
   // Erst mischen, dann abschneiden - sonst waere die Reihenfolge der Sorten
   // die eigentliche Auswahl.
-  return shuffle(candidates).slice(0, limit);
+  const chosen = shuffle(candidates).slice(0, limit);
+
+  await attachWhatPeopleHave(client, chosen);
+  return chosen;
+}
+
+/**
+ * Zaehlt fuer die ausgewaehlten Menschen, was sie eingestellt haben.
+ *
+ * ERST NACH DEM MISCHEN: Es sind hoechstens drei Personen, also zwei kleine
+ * Abfragen. Vorher zu zaehlen hiesse, fuer dreissig Profile zu rechnen, um
+ * drei zu zeigen.
+ *
+ * Gezaehlt wird nur Veroeffentlichtes - ein Entwurf ist fuer niemanden
+ * sichtbar, also auch nicht als Zahl.
+ */
+async function attachWhatPeopleHave(client: SupabaseClient, highlights: ConnectHighlight[]) {
+  const personIds = highlights
+    .filter((highlight) => highlight.kind === "person")
+    .map((highlight) => highlight.id);
+  if (personIds.length === 0) return;
+
+  const [ventureResult, listingResult] = await Promise.all([
+    client
+      .from("network_ventures")
+      .select("owner_user_id")
+      .in("owner_user_id", personIds)
+      .eq("status", "active"),
+    client
+      .from("network_listings")
+      .select("owner_user_id, direction")
+      .in("owner_user_id", personIds)
+      .eq("status", "active")
+      .gt("expires_at", new Date().toISOString()),
+  ]);
+
+  for (const highlight of highlights) {
+    if (highlight.kind !== "person" || !highlight.has) continue;
+    const ventures = (ventureResult.data ?? []) as { owner_user_id: string }[];
+    const listings = (listingResult.data ?? []) as { owner_user_id: string; direction: string }[];
+
+    highlight.has = {
+      ventures: ventures.filter((row) => row.owner_user_id === highlight.id).length,
+      offering: listings.filter(
+        (row) => row.owner_user_id === highlight.id && row.direction === "offering"
+      ).length,
+      seeking: listings.filter(
+        (row) => row.owner_user_id === highlight.id && row.direction === "seeking"
+      ).length,
+    };
+  }
 }

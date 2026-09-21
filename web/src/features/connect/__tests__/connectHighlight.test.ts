@@ -85,7 +85,7 @@ test("gemischt wird, nicht bewertet", () => {
   assert.match(data, /Math\.floor\(Math\.random\(\) \* \(index \+ 1\)\)/);
   // Erst mischen, dann abschneiden - sonst waere die Reihenfolge der Sorten
   // die eigentliche Auswahl.
-  assert.match(data, /return shuffle\(candidates\)\.slice\(0, limit\)/);
+  assert.match(data, /shuffle\(candidates\)\.slice\(0, limit\)/);
 });
 
 test("alle vier Sorten koennen erscheinen, und jede sagt, was sie ist", () => {
@@ -125,11 +125,13 @@ test("niemand wird sich selbst hervorgehoben", () => {
 });
 
 test("nur Veroeffentlichtes erscheint", () => {
-  // Ein Entwurf ist fuer niemanden sichtbar - auch nicht als Highlight.
+  // Ein Entwurf ist fuer niemanden sichtbar - auch nicht als Highlight und
+  // auch nicht als Zahl auf einer Personenkarte. Drei Abfragen fuer die
+  // Kandidaten, zwei fuer das Zaehlen dessen, was ein Mensch mitbringt.
   const data = codeOnly(DATA);
-  assert.equal((data.match(/\.eq\("status", "active"\)/g) ?? []).length, 3);
-  // Und keine abgelaufenen Anzeigen.
-  assert.match(data, /\.gt\("expires_at"/);
+  assert.equal((data.match(/\.eq\("status", "active"\)/g) ?? []).length, 5);
+  // Und keine abgelaufenen Anzeigen, an beiden Stellen.
+  assert.equal((data.match(/\.gt\("expires_at"/g) ?? []).length, 2);
 });
 
 test("das Feld steht vor dem Suchen, nicht danach", () => {

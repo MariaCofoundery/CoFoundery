@@ -668,7 +668,9 @@
     "openWebsite": "Website öffnen",
     "emptyDirectory": "Noch hat niemand ein Unternehmen eingetragen.",
     "emptySearch": "Dazu ist gerade nichts eingetragen.",
-    "addOwn": "Eigenes Unternehmen eintragen"
+    "addOwn": "Eigenes Unternehmen eintragen",
+    "personBehind": "Wer dahinter steht",
+    "alsoByPerson": "Ebenfalls von dieser Person"
   },
   "tabs": {
     "label": "Bereiche in Connect",
@@ -761,6 +763,11 @@
     "disclosures": {
       "editorial": "Von uns hervorgehoben",
       "sponsored": "Anzeige"
+    },
+    "has": {
+      "ventures": "{count, plural, one {1 Unternehmen} other {# Unternehmen}}",
+      "offering": "{count, plural, one {1 Angebot} other {# Angebote}}",
+      "seeking": "{count, plural, one {1 Gesuch} other {# Gesuche}}"
     }
   },
   "suggestions": {

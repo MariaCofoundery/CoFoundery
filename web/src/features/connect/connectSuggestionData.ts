@@ -107,9 +107,7 @@ export async function getOwnConnectSuggestions(
         subjectId: row.network_ventures.id,
         title: row.network_ventures.name,
         text: row.network_ventures.what_it_does,
-        // Es gibt keine eigene Unternehmensseite - der Weg fuehrt zu dem
-        // Menschen, und das ist ohnehin das Ziel.
-        href: `/connect/people/${row.subject_owner_user_id}`,
+        href: `/connect/ventures/${row.network_ventures.id}`,
       }];
     }
     if (row.person_user_id) {

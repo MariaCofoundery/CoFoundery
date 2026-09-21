@@ -668,7 +668,9 @@
     "openWebsite": "Open website",
     "emptyDirectory": "Nobody has entered a company yet.",
     "emptySearch": "Nothing is entered for that right now.",
-    "addOwn": "Add your own company"
+    "addOwn": "Add your own company",
+    "personBehind": "Who is behind it",
+    "alsoByPerson": "Also by this person"
   },
   "tabs": {
     "label": "Areas in Connect",
@@ -761,6 +763,11 @@
     "disclosures": {
       "editorial": "Highlighted by us",
       "sponsored": "Ad"
+    },
+    "has": {
+      "ventures": "{count, plural, one {1 company} other {# companies}}",
+      "offering": "{count, plural, one {1 offer} other {# offers}}",
+      "seeking": "{count, plural, one {1 request} other {# requests}}"
     }
   },
   "suggestions": {
