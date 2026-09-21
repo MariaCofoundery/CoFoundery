@@ -44,6 +44,8 @@ export function InterviewSortForm({
   suggestedWish,
   areaLabels,
   proposals,
+  vocabulary,
+  suggestedFamily,
 }: {
   turnId: string;
   answer: string;
@@ -55,6 +57,20 @@ export function InterviewSortForm({
   areaLabels: Record<string, string>;
   /** Was ein Sprachmodell in dieser Antwort gesehen hat - je Vorschlag mit Zitat. */
   proposals: readonly AreaProposal[];
+  /**
+   * Das ganze Vokabular, nach Familien.
+   *
+   * DAZUGEKOMMEN AM 21.09.2026: Bis dahin gab es Haken NUR fuer das, was
+   * vorgeschlagen wurde. Fand die Erkennung nichts, stand man vor einer Seite
+   * ohne einen einzigen Haken - und die Erzaehlung landete in "Sonstiges".
+   * Maria hat es als "es filtert immer noch keine Soft Skills heraus"
+   * gemeldet; die Ursache war nicht die Erkennung, sondern der fehlende Weg
+   * daneben. Ein Werkzeug, das nur anbietet, was es selbst gefunden hat, laesst
+   * Menschen mit ihrem eigenen Wissen alleine.
+   */
+  vocabulary: readonly { familyId: string; label: string; areas: { id: string; label: string }[] }[];
+  /** Welche Familie diese Frage nahelegt - sie wird aufgeklappt. */
+  suggestedFamily: string | null;
 }) {
   const t = useTranslations("capability");
   const [analysis, setAnalysis] = useState<NarrativeAnalysis | null>(null);
@@ -268,6 +284,76 @@ export function InterviewSortForm({
           {t("interview.sort.limit", { max: MAX_CONFIRMED_AREAS })}
         </p>
       </fieldset>
+
+      {/* ------------------------------------------------------------------
+          SELBST AUSWÄHLEN - der Weg daneben.
+
+          Ohne ihn hängt die Einordnung an Stichwortglück: Wer von einem
+          Gespräch mit einer Behörde erzählt, benutzt keines unserer
+          Erkennungswörter und stand dann vor einer Seite ohne einen einzigen
+          Haken. Ein Werkzeug, das nur anbietet, was es selbst gefunden hat,
+          lässt Menschen mit ihrem eigenen Wissen alleine.
+
+          AUFGEKLAPPT, WENN NICHTS VORLIEGT - oder wenn die Frage auf eine
+          Familie zielt. Dann sind die Bereiche einen Griff entfernt statt
+          unter siebenundvierzig.
+          ------------------------------------------------------------------ */}
+      <details
+        className="mt-6 rounded-2xl border border-slate-200 bg-white/60 p-4"
+        open={
+          proposals.length === 0 && suggestedAreas.length === 0 && fromText.length === 0
+        }
+      >
+        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">
+          {t("interview.sort.ownChoice")}
+        </summary>
+        <p className="mt-1 text-xs leading-5 text-slate-500">
+          {t("interview.sort.ownChoiceHint")}
+        </p>
+
+        <div className="mt-3 grid gap-3">
+          {vocabulary.map((family) => (
+            <details
+              key={family.familyId}
+              // Die Familie, auf die die Frage zielt, ist offen. Das ist keine
+              // Vorauswahl - es ist ein Weg, der nicht erst gesucht werden
+              // muss.
+              open={family.familyId === suggestedFamily}
+            >
+              <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-800">
+                {family.label}
+                {family.familyId === suggestedFamily ? (
+                  <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-[.68rem] font-semibold text-violet-800">
+                    {t("interview.sort.familyHint")}
+                  </span>
+                ) : null}
+              </summary>
+              <div className="mt-2 grid gap-1.5 pl-1 sm:grid-cols-2">
+                {family.areas.map((area) => {
+                  const isChosen = chosen.includes(area.id);
+                  return (
+                    <label
+                      key={area.id}
+                      className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-700"
+                    >
+                      <input
+                        type="checkbox"
+                        name="area_id"
+                        value={area.id}
+                        checked={isChosen}
+                        disabled={atLimit && !isChosen}
+                        onChange={() => toggle(area.id)}
+                        className="h-4 w-4 rounded border-slate-300 accent-violet-600"
+                      />
+                      {area.label}
+                    </label>
+                  );
+                })}
+              </div>
+            </details>
+          ))}
+        </div>
+      </details>
 
       {/* Stufe und Wunsch. Beide duerfen leer bleiben: "noch nicht eingestuft"
           ist ein Zustand und nicht die niedrigste Stufe. */}

@@ -457,6 +457,13 @@
     "submitPending": "Saving …",
     "pausePending": "Saving …",
     "skipPending": "Skipping …",
+    "atQuestion": "Question {index} of {total}",
+    "atFollowUp": "Follow-up",
+    "answeredCount": "{answered, plural, one {one answered} other {# answered}}",
+    "audio": {
+      "play": "Read aloud",
+      "stop": "Stop"
+    },
     "sort": {
       "title": "Sort your answers",
       "remaining": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}}",
@@ -491,6 +498,9 @@
       "askRunning": "The AI is reading. That usually takes under twenty seconds – this page refreshes itself.",
       "askUnavailable": "No model is reachable right now. That is not an error: it runs on a machine that is sometimes off. Just sort without it – or come back later.",
       "askFailed": "The last attempt did not complete.",
+      "ownChoice": "Choose yourself",
+      "ownChoiceHint": "All areas, grouped by field. Take what is true – even if none of it was proposed above. Our recognition depends on words, your story does not.",
+      "familyHint": "fits the question",
       "errors": {
         "area": "One of the areas is unknown. Please reload the page and try again.",
         "save": "Sorting could not be saved. Your answer is unchanged.",
@@ -517,10 +527,6 @@
       "openTitle": "What stayed open",
       "skipped": "{count, plural, one {You skipped one question} other {You skipped # questions}}. That is an answer, and it stays one.",
       "withoutArea": "{count, plural, one {For one answer} other {For # answers}} no area was found. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself in your profile."
-    },
-    "audio": {
-      "play": "Read aloud",
-      "stop": "Stop"
     },
     "questions": {
       "owned_last": {

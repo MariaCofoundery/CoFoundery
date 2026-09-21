@@ -117,6 +117,23 @@ export type InterviewQuestion = {
    */
   suggestsAreas: readonly string[];
   /**
+   * Die Familie, auf die diese Frage zielt - und zwar nur die Familie.
+   *
+   * DAZUGEKOMMEN AM 21.09.2026, weil die Einordnung an Stichwortglueck hing:
+   * Wer auf Frage 4 von einem Gespraech mit einer Behoerde erzaehlt, benutzt
+   * keines unserer Erkennungswoerter - und stand dann vor einer Seite ohne
+   * einen einzigen Haken. Maria hat es als "es filtert immer noch keine Soft
+   * Skills heraus" gemeldet, und das war die richtige Beobachtung.
+   *
+   * WARUM DIE FAMILIE UND NICHT DER BEREICH: Frage 4 zielt eindeutig auf
+   * Aussenauftritt und Moderation - aber ob das Buehne, Vertriebsgespraech
+   * oder Erklaeren war, steht nur in der Erzaehlung. Die Familie ist damit
+   * belastbar, der Bereich waere geraten. Die Oberflaeche klappt diese Familie
+   * auf, damit die fuenf Bereiche einen Griff entfernt sind statt unter
+   * siebenundvierzig.
+   */
+  suggestsFamily: string | null;
+  /**
    * Welcher Verantwortungswunsch vorausgewaehlt wird. Nur bei den beiden
    * Ownership-Fragen gesetzt, und auch dort nur als Vorauswahl.
    */
@@ -158,6 +175,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "professional",
     target: "evidence",
     suggestsAreas: [],
+    suggestsFamily: null,
     suggestsWish: null,
     followUpIds: ["whatWasYours", "howYouDecidedDone"],
   },
@@ -174,6 +192,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "professional",
     target: "evidence",
     suggestsAreas: [],
+    suggestsFamily: null,
     suggestsWish: null,
     followUpIds: ["yourOwnPart", "whatChanged"],
   },
@@ -192,6 +211,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "personal",
     target: "evidence",
     suggestsAreas: [],
+    suggestsFamily: null,
     suggestsWish: null,
     followUpIds: ["whatYouDidYourself", "howYouNoticedImpact"],
   },
@@ -214,6 +234,9 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "either",
     target: "evidence",
     suggestsAreas: [],
+    // Zielt auf Aussenauftritt & Moderation - welcher der fuenf
+    // Bereiche es war, steht nur in der Erzaehlung.
+    suggestsFamily: "communication_representation",
     suggestsWish: null,
     followUpIds: ["whatYouNeededToUnderstand", "didYouAdapt"],
   },
@@ -231,6 +254,9 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "either",
     target: "evidence",
     suggestsAreas: ["difficult_conversations"],
+    // Zielt auf Aussenauftritt & Moderation - welcher der fuenf
+    // Bereiche es war, steht nur in der Erzaehlung.
+    suggestsFamily: "communication_representation",
     suggestsWish: null,
     followUpIds: ["whyItMattered", "howYouWentAboutIt"],
   },
@@ -251,6 +277,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "either",
     target: "evidence",
     suggestsAreas: [],
+    suggestsFamily: null,
     suggestsWish: null,
     followUpIds: ["lastExample", "whatYouActuallyDo"],
   },
@@ -264,6 +291,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "either",
     target: "ownership_away",
     suggestsAreas: [],
+    suggestsFamily: null,
     // Nicht `prefer_external`: Abgeben heisst zunaechst "jemand anders im
     // Team", nicht "einkaufen". Die zweite Moeglichkeit steht daneben.
     suggestsWish: "prefer_other",
@@ -281,6 +309,7 @@ export const INTERVIEW_QUESTIONS: readonly InterviewQuestion[] = [
     context: "either",
     target: "ownership_growth",
     suggestsAreas: [],
+    suggestsFamily: null,
     suggestsWish: "grow_into",
     followUpIds: ["whatDrawsYou", "whatYouWouldNeed"],
   },

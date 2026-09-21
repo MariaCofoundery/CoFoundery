@@ -127,11 +127,32 @@ export default async function CapabilityInterviewPage({
         </>
       ) : state.current ? (
         <>
+          {/* WO MAN IST, nicht wie viel man geschafft hat.
+              
+              GEMELDET AM 21.09.2026: "Da steht immer eine von acht Fragen
+              beantwortet. Wenn du dann doch eine überspringst, dann steht da
+              trotzdem eine von acht, und das ist ein bisschen verwirrend."
+              
+              Genau so war es: Gezählt wurden die ANTWORTEN, angezeigt aber an
+              einer Stelle, an der man seinen Standort erwartet. Wer eine Frage
+              überspringt, kommt weiter und sieht dieselbe Zahl - als wäre
+              nichts passiert.
+              
+              Jetzt die Position im Leitfaden. Die Zahl der Antworten steht
+              daneben, aber als das, was sie ist: eine zweite Angabe. */}
           <p className="mt-3 text-sm text-slate-500">
-            {t("interview.progress", {
-              answered: state.progress.answered,
-              total: state.progress.total,
-            })}
+            {interviewQuestionMeta(state.current).index
+              ? t("interview.atQuestion", {
+                  index: interviewQuestionMeta(state.current).index,
+                  total: state.progress.total,
+                })
+              : t("interview.atFollowUp")}
+            {state.progress.answered > 0 ? (
+              <span className="text-slate-400">
+                {" · "}
+                {t("interview.answeredCount", { answered: state.progress.answered })}
+              </span>
+            ) : null}
           </p>
 
           <Question state={state} t={t} card={card} locale={locale} />

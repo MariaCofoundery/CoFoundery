@@ -313,3 +313,88 @@ test("nach dem Abschliessen fuehrt der Weg zum Einordnen", () => {
   const completeAction = actions.slice(actions.indexOf("export async function completeInterviewAction"));
   assert.match(completeAction, /redirect\(SORT_PATH\)/);
 });
+
+test("man kann jeden Bereich selbst waehlen - auch einen, den niemand vorschlug", () => {
+  // GEMELDET AM 21.09.2026: "Es filtert immer noch keine Soft Skills heraus."
+  // Die Ursache war nicht die Erkennung, sondern der fehlende Weg daneben: Es
+  // gab Haken NUR fuer Vorgeschlagenes. Fand die Erkennung nichts, stand man
+  // vor einer Seite ohne einen einzigen Haken - und die Erzaehlung landete in
+  // "Sonstiges".
+  //
+  // Ein Werkzeug, das nur anbietet, was es selbst gefunden hat, laesst
+  // Menschen mit ihrem eigenen Wissen alleine.
+  const form = codeOnly(FORM);
+  assert.match(form, /vocabulary\.map\(\(family\) => \(/);
+  assert.match(form, /interview\.sort\.ownChoice/);
+
+  // Aufgeklappt, wenn nichts vorliegt: Sonst sieht die Seite leer aus, obwohl
+  // alles da ist.
+  assert.match(
+    form,
+    /proposals\.length === 0 && suggestedAreas\.length === 0 && fromText\.length === 0/
+  );
+
+  // Der Auffangwert steht nicht zur Wahl - ihn anzuhaken ist keine
+  // Entscheidung, und er wird ohnehin genommen, wenn nichts gewaehlt ist.
+  assert.match(codeOnly(PAGE), /family\.family_id !== "other"/);
+
+  for (const locale of ["de", "en"]) {
+    const copy = sortCopy(locale);
+    assert.ok(copy.ownChoice, `${locale}: interview.sort.ownChoice fehlt`);
+    assert.match(
+      copy.ownChoiceHint,
+      locale === "de" ? /auch wenn oben nichts/ : /even if none/,
+      `${locale}: der Hinweis sagt nicht, dass man gegen den Vorschlag waehlen darf`
+    );
+  }
+});
+
+test("eine Frage darf eine Familie nahelegen, aber keinen Bereich raten", () => {
+  // Frage 4 zielt eindeutig auf Aussenauftritt und Moderation - ob es Buehne,
+  // Vertriebsgespraech oder Erklaeren war, steht aber nur in der Erzaehlung.
+  // Die Familie ist damit belastbar, der Bereich waere geraten.
+  const withFamily = INTERVIEW_QUESTIONS.filter((question) => question.suggestsFamily !== null);
+  assert.deepEqual(
+    withFamily.map((question) => question.id),
+    ["in_front_of_group", "uncomfortable_topic"],
+    "andere Fragen legen eine Familie nahe als die beiden zum Aussenauftritt"
+  );
+  for (const question of withFamily) {
+    assert.equal(question.suggestsFamily, "communication_representation");
+  }
+
+  // Und die Frage, die absichtlich offen ist, bleibt offen: Wofuer Menschen zu
+  // dir kommen, wollen wir nicht vorwegnehmen.
+  assert.equal(findInterviewQuestion("people_come_to_you")?.suggestsFamily, null);
+
+  // Die Oberflaeche klappt sie auf, statt vorauszuwaehlen.
+  assert.match(codeOnly(FORM), /open=\{family\.familyId === suggestedFamily\}/);
+  assert.doesNotMatch(codeOnly(FORM), /defaultChecked/, "eine Familie waehlt vor");
+});
+
+test("der Fortschritt sagt, wo man ist - nicht wie viel man geschafft hat", () => {
+  // GEMELDET AM 21.09.2026: "Da steht immer eine von acht Fragen beantwortet.
+  // Wenn du dann doch eine ueberspringst, steht da trotzdem eine von acht, und
+  // das ist ein bisschen verwirrend."
+  //
+  // Gezaehlt wurden die ANTWORTEN, angezeigt aber an einer Stelle, an der man
+  // seinen Standort erwartet.
+  const page = codeOnly("src/app/(product)/profile/interview/page.tsx");
+  assert.match(page, /interview\.atQuestion/);
+  assert.match(page, /interviewQuestionMeta\(state\.current\)\.index/);
+  // Eine Modellnachfrage hat keine Position im Leitfaden - dann steht das da.
+  assert.match(page, /interview\.atFollowUp/);
+
+  for (const locale of ["de", "en"]) {
+    const interview = (
+      JSON.parse(readFileSync(`messages/${locale}/capability.json`, "utf8")) as {
+        interview: Record<string, string>;
+      }
+    ).interview;
+    assert.match(interview.atQuestion, /\{index\}/, `${locale}: die Position fehlt`);
+    assert.match(interview.atQuestion, /\{total\}/, `${locale}: die Gesamtzahl fehlt`);
+    assert.ok(interview.atFollowUp, `${locale}: interview.atFollowUp fehlt`);
+    // Die Zahl der Antworten bleibt - aber gebeugt und als zweite Angabe.
+    assert.match(interview.answeredCount, /\{answered, plural,/, `${locale}: ungebeugt`);
+  }
+});

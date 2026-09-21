@@ -73,6 +73,20 @@ export default async function InterviewSortPage({
     areaLabels[area.area_id] = t(`areaLabels.${area.area_id}`);
   }
 
+  // NACH FAMILIEN, damit man selbst auswaehlen kann, ohne siebenundvierzig
+  // Bereiche in einer Reihe zu lesen. Der Auffangwert bleibt draussen: Ihn
+  // anzuhaken ist keine Entscheidung, und er wird ohnehin genommen, wenn
+  // nichts gewaehlt ist.
+  const groupedVocabulary = vocabulary.families
+    .filter((family) => family.family_id !== "other")
+    .map((family) => ({
+      familyId: family.family_id,
+      label: t(`families.${family.family_id}`),
+      areas: vocabulary.areas
+        .filter((area) => area.family_id === family.family_id)
+        .map((area) => ({ id: area.area_id, label: areaLabels[area.area_id] })),
+    }));
+
   const turn = unsorted[0] ?? null;
   const meta = turn ? interviewQuestionMeta(turn) : null;
   const question = meta?.question ?? null;
@@ -214,6 +228,8 @@ export default async function InterviewSortPage({
                 suggestedWish={question?.suggestsWish ?? null}
                 areaLabels={areaLabels}
                 proposals={proposals}
+                vocabulary={groupedVocabulary}
+                suggestedFamily={question?.suggestsFamily ?? null}
               />
             </div>
           </section>
