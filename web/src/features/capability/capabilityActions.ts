@@ -11,6 +11,7 @@ import {
   parseCapabilityDisclosure,
   parseOwnershipWish,
 } from "./capabilityTypes";
+import { attachCapabilityEvidence } from "./capabilityEvidenceWrite";
 import { analyzeNarrativeWithRules } from "./narrativeAnalysis";
 
 async function context() {
@@ -79,56 +80,25 @@ export async function saveCapabilityEvidenceAction(formData: FormData) {
     ? null
     : await analyzeNarrativeWithRules({ narrative, locale: "de" });
 
-  // Bleibt nichts uebrig - nichts erkannt oder nichts angenommen -, wandert
-  // die Erzaehlung in den Auffangwert statt verloren zu gehen. Das ist
-  // ehrlicher als eine schlechte Zuordnung, und haeufende Eintraege dort sind
-  // das Signal, die Begriffe zu ueberarbeiten.
   const recognised = confirmed ? chosen : (analysis?.areas ?? []).map((area) => area.areaId);
-  const suggested = recognised.length ? recognised : ["other"];
-  const primary = suggested[0];
 
-  const existing = await client
-    .from("person_capability_entries")
-    .select("id,area_id")
-    .eq("user_id", user.id)
-    .in("area_id", suggested);
-  if (existing.error) back("evidence", "save");
-
-  const known = new Map((existing.data ?? []).map((row) => [row.area_id as string, row.id as string]));
-  const missing = suggested.filter((areaId) => !known.has(areaId));
-
-  if (missing.length) {
-    const inserted = await client
-      .from("person_capability_entries")
-      .insert(missing.map((areaId) => ({ user_id: user.id, area_id: areaId })))
-      .select("id,area_id");
-    // Ein unbekannter Bereich kommt aus einem manipulierten Formular, nicht
-    // aus der Oberflaeche. Der Fremdschluessel auf capability_areas faengt ihn
-    // ab; der eigene Fehlerschluessel sagt nur genauer, was war.
-    if (inserted.error) back("evidence", inserted.error.message.includes("area_id") ? "area" : "save");
-    for (const row of inserted.data ?? []) {
-      known.set(row.area_id as string, row.id as string);
-    }
-  }
-
-  const primaryEntryId = known.get(primary);
-  if (!primaryEntryId) back("evidence", "save");
-
-  // Die Stufe gilt fuer den Bereich, dem die Erzaehlung zugeordnet wurde.
-  // Eine vorhandene wird nur ueberschrieben, wenn jetzt eine angegeben ist -
-  // leer heisst leer, nicht Stufe 1.
-  if (level !== null) {
-    const { error } = await client
-      .from("person_capability_entries")
-      .update({ application_level: level })
-      .eq("id", primaryEntryId);
-    if (error) back("evidence", "save");
-  }
-
-  const { error } = await client
-    .from("person_capability_evidence")
-    .insert({ entry_id: primaryEntryId, narrative });
-  if (error) back("evidence", "save");
+  // GESCHRIEBEN WIRD IN `attachCapabilityEvidence`, seit dem 21.09.2026 -
+  // dieselbe Funktion, die das Interview benutzt. Vorher stand die Logik hier,
+  // und das Interview haette sie nachgebaut: zwei Wahrheiten darueber, wie
+  // eine Staerke in dieses Modell kommt.
+  //
+  // Der Verantwortungswunsch bleibt hier null: Danach fragt Schritt 3, und
+  // ihn hier stillschweigend zu setzen waere eine Antwort auf eine Frage, die
+  // noch nicht gestellt wurde.
+  const written = await attachCapabilityEvidence({
+    client,
+    userId: user.id,
+    areaIds: recognised,
+    narrative,
+    applicationLevel: level,
+    ownershipWish: null,
+  });
+  if (!written.ok) back("evidence", written.reason);
 
   // Der naechste Schritt zeigt alle Bereiche mit den jetzt gesetzten Haken.
   // Wer bestaetigt hat, soll dort nicht noch einmal gefragt werden, ob die

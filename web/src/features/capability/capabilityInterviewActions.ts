@@ -5,9 +5,16 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-import { getActiveInterview } from "./capabilityInterviewData";
+import { attachCapabilityEvidence } from "./capabilityEvidenceWrite";
+import { getActiveInterview, getUnsortedInterviewAnswers } from "./capabilityInterviewData";
 import { nextCatalogueQuestion } from "./capabilityInterviewGuide";
-import { NARRATIVE_MAX_LENGTH, NARRATIVE_MIN_LENGTH } from "./capabilityTypes";
+import {
+  MAX_CONFIRMED_AREAS,
+  NARRATIVE_MAX_LENGTH,
+  NARRATIVE_MIN_LENGTH,
+  parseApplicationLevel,
+  parseOwnershipWish,
+} from "./capabilityTypes";
 
 /**
  * Das Gespräch führen.
@@ -34,6 +41,7 @@ import { NARRATIVE_MAX_LENGTH, NARRATIVE_MIN_LENGTH } from "./capabilityTypes";
  */
 
 const PATH = "/profile/interview";
+const SORT_PATH = "/profile/interview/sort";
 
 async function requireUser() {
   const client = await createClient();
@@ -267,4 +275,76 @@ export async function completeInterviewAction() {
   revalidatePath(PATH);
   revalidatePath("/profile");
   redirect("/profile?saved=interview_done");
+}
+
+/**
+ * Eine Antwort einordnen.
+ *
+ * DER SCHRITT, DER DAS INTERVIEW ERST ETWAS WERT MACHT: Bis hierher liegen
+ * acht Erzaehlungen in einer Tabelle und tun nichts. Hier werden sie zu dem,
+ * was das Modell kennt - Eintraege in Bereichen, mit Anwendungsstufe und
+ * Verantwortungswunsch, belegt durch die Erzaehlung.
+ *
+ * GESCHRIEBEN WIRD MIT DERSELBEN FUNKTION WIE BEIM TEXTFELD
+ * (`attachCapabilityEvidence`). Das ist keine Sparsamkeit: Zwei Wege, auf
+ * denen eine Staerke in dieses Modell kommt, waeren zwei Wahrheiten darueber,
+ * was eine Staerke ist.
+ *
+ * DIE AUSWAHL TRIFFT DER MENSCH. Die Regel-Auswertung schlaegt vor, die Frage
+ * selbst legt manchmal einen Bereich nahe - bestaetigt wird beides von Hand,
+ * und eine leere Auswahl ist eine gueltige Antwort (dann greift der
+ * Auffangwert). Genau dieselbe Regel wie im Textfeld, und aus demselben Grund:
+ * Eine Zuordnung, die niemand bestaetigt hat, ist eine Behauptung ueber einen
+ * Menschen.
+ *
+ * DER VERANTWORTUNGSWUNSCH IST HIER NEU. Beim Textfeld wird er in einem
+ * eigenen dritten Schritt gesetzt; im Gespraech steht er direkt an der
+ * Antwort, weil zwei der acht Fragen ausdruecklich danach fragen ("was
+ * wuerdest du lieber abgeben", "was wuerdest du gern uebernehmen"). Ihn dort
+ * nicht mitzunehmen hiesse, die Antwort auf eine gestellte Frage wegzuwerfen.
+ */
+export async function sortInterviewAnswerAction(formData: FormData) {
+  const { client, userId } = await requireUser();
+
+  const turnId = String(formData.get("turnId") ?? "");
+  const level = parseApplicationLevel(formData.get("application_level"));
+  const wish = parseOwnershipWish(formData.get("ownership_wish"));
+
+  const unsorted = await getUnsortedInterviewAnswers(client);
+  const turn = unsorted.find((entry) => entry.id === turnId);
+  // Schon eingeordnet (zweites Fenster, Zurueck-Knopf) oder nicht die eigene:
+  // Dann steht sie nicht in dieser Liste, und es gibt nichts zu tun.
+  if (!turn || !turn.answer) redirect(`${SORT_PATH}?notice=already`);
+
+  const areaIds = [
+    ...new Set(
+      formData
+        .getAll("area_id")
+        .map((value) => String(value).trim())
+        .filter(Boolean)
+    ),
+  ].slice(0, MAX_CONFIRMED_AREAS);
+
+  const written = await attachCapabilityEvidence({
+    client,
+    userId,
+    areaIds,
+    narrative: turn.answer,
+    applicationLevel: level,
+    ownershipWish: wish,
+  });
+  if (!written.ok) redirect(`${SORT_PATH}?error=${written.reason}`);
+
+  // ERST JETZT gilt die Antwort als eingeordnet. Die Reihenfolge ist wichtig:
+  // Waere der Verweis vorher gesetzt, verschwaende ein fehlgeschlagenes
+  // Schreiben die Antwort aus der Liste - und niemand wuesste, dass sie fehlt.
+  const { error } = await client
+    .from("capability_interview_turns")
+    .update({ evidence_id: written.evidenceId })
+    .eq("id", turnId);
+  if (error) redirect(`${SORT_PATH}?error=link`);
+
+  revalidatePath(SORT_PATH);
+  revalidatePath("/profile");
+  redirect(SORT_PATH);
 }

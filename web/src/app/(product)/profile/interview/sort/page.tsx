@@ -1,0 +1,151 @@
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
+
+import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
+import {
+  getUnsortedInterviewAnswers,
+  interviewQuestionMeta,
+} from "@/features/capability/capabilityInterviewData";
+import { InterviewSortForm } from "@/features/capability/InterviewSortForm";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
+
+/**
+ * Antworten einordnen.
+ *
+ * DER SCHRITT, DER DAS GESPRÄCH EINLÖST. Bis hierher liegen die Erzaehlungen
+ * in einer Tabelle; hier werden sie zu Eintraegen im Faehigkeitsmodell - und
+ * damit zu dem, was Vergleich, Freigabeleiter und spaeter die Teamauswertung
+ * ueberhaupt lesen koennen.
+ *
+ * EINE ANTWORT JE SEITE, und zwar die aelteste zuerst. Acht Antworten auf
+ * einer Seite einzuordnen waere ein Formular mit vierundzwanzig Feldern; man
+ * haekt dann durch, statt zu entscheiden.
+ *
+ * WARUM NICHT GLEICH NACH JEDER FRAGE: Weil das Gespraech dann kein Gespraech
+ * mehr ist. Wer nach jeder Erzaehlung drei Verwaltungsschritte macht, erzaehlt
+ * bei der vierten Frage nichts mehr. Erst reden, dann ordnen.
+ */
+export default async function InterviewSortPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const [client, t, params, userResult] = await Promise.all([
+    createClient(),
+    getTranslations("capability"),
+    searchParams,
+    getRequestUser(),
+  ]);
+
+  if (!userResult.data.user) redirect("/login?next=/profile/interview/sort");
+
+  const [unsorted, vocabulary] = await Promise.all([
+    getUnsortedInterviewAnswers(client),
+    getCapabilityVocabulary(client),
+  ]);
+
+  const card = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-7";
+  const knownErrors = ["area", "save", "link"];
+  const error = params.error && knownErrors.includes(params.error) ? params.error : null;
+  const notice = params.notice === "already" ? "already" : null;
+
+  // Alle Bereiche mit Beschriftung - die Auswertung nennt Kennungen, die
+  // Oberflaeche zeigt Namen.
+  const areaLabels: Record<string, string> = {};
+  for (const area of vocabulary.areas) {
+    areaLabels[area.area_id] = t(`areaLabels.${area.area_id}`);
+  }
+
+  const turn = unsorted[0] ?? null;
+  const meta = turn ? interviewQuestionMeta(turn) : null;
+  const question = meta?.question ?? null;
+
+  return (
+    <main className="mx-auto max-w-3xl px-5 py-10">
+      <Link
+        href="/profile"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950"
+      >
+        ← {t("interview.backToProfile")}
+      </Link>
+
+      <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+        {t("interview.sort.title")}
+      </h1>
+
+      {error ? (
+        <p role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm leading-6 text-red-900">
+          {t(`interview.sort.errors.${error}`)}
+        </p>
+      ) : null}
+      {notice ? (
+        <p role="status" className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+          {t("interview.sort.alreadySorted")}
+        </p>
+      ) : null}
+
+      {!turn || !turn.answer ? (
+        <section className={`${card} mt-6`}>
+          <h2 className="text-lg font-semibold text-slate-900">{t("interview.sort.doneTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("interview.sort.doneText")}</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link
+              href="/profile"
+              className="inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
+            >
+              {t("interview.sort.toProfile")}
+            </Link>
+            <Link
+              href="/profile/interview"
+              className="inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800"
+            >
+              {t("interview.sort.toInterview")}
+            </Link>
+          </div>
+        </section>
+      ) : (
+        <>
+          <p className="mt-3 text-sm text-slate-500">
+            {t("interview.sort.remaining", { count: unsorted.length })}
+          </p>
+
+          <section className={`${card} mt-4`}>
+            {/* DIE FRAGE UND DIE EIGENE ANTWORT STEHEN OBEN. Ohne sie ordnet
+                man einen Text ein, den man vor drei Tagen geschrieben hat, und
+                erinnert sich nicht mehr, worauf er antwortete. */}
+            <p className="text-xs font-semibold uppercase tracking-[.12em] text-violet-800">
+              {t("interview.sort.yourAnswer")}
+            </p>
+            <h2 className="mt-2 text-base font-semibold leading-7 text-slate-950">
+              {question ? t(`interview.questions.${question.id}.title`) : meta?.text}
+            </h2>
+            <p className="mt-3 whitespace-pre-line rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+              {turn.answer}
+            </p>
+          </section>
+
+          <section className={`${card} mt-4`}>
+            <h2 className="text-lg font-semibold text-slate-950">
+              {t("interview.sort.whichAreas")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {t("interview.sort.whichAreasText")}
+            </p>
+
+            <div className="mt-5">
+              <InterviewSortForm
+                turnId={turn.id}
+                answer={turn.answer}
+                suggestedAreas={question?.suggestsAreas ?? []}
+                suggestedWish={question?.suggestsWish ?? null}
+                areaLabels={areaLabels}
+              />
+            </div>
+          </section>
+        </>
+      )}
+    </main>
+  );
+}

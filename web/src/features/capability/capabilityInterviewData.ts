@@ -146,3 +146,31 @@ export function interviewQuestionMeta(turn: InterviewTurn) {
     index: question ? INTERVIEW_QUESTIONS.indexOf(question) + 1 : null,
   };
 }
+
+/**
+ * Die Antworten, die noch nicht eingeordnet sind.
+ *
+ * ÜBER ALLE GESPRÄCHE HINWEG, nicht nur das laufende: Wer zwei Gespraeche
+ * gefuehrt und keines eingeordnet hat, soll nicht im ersten stecken bleiben.
+ * Aelteste zuerst - in der Reihenfolge, in der sie erzaehlt wurden.
+ *
+ * `evidence_id is null` IST DAS MERKMAL. Kein eigener Zustand, kein zweites
+ * Feld: Eine Antwort ist eingeordnet, wenn ein Beleg daran haengt - und genau
+ * das ist die Sache selbst, nicht ihre Buchhaltung.
+ */
+export async function getUnsortedInterviewAnswers(client: SupabaseClient) {
+  const { data } = await client
+    .from("capability_interview_turns")
+    .select(
+      "id, sort_order, question_source, question_id, question_text, answer, answered_at, session_id"
+    )
+    .not("answer", "is", null)
+    .is("evidence_id", null)
+    .order("answered_at", { ascending: true })
+    .limit(50);
+
+  return ((data ?? []) as (TurnRow & { session_id: string })[]).map((row) => ({
+    ...toTurn(row),
+    sessionId: row.session_id,
+  }));
+}

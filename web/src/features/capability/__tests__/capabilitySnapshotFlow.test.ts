@@ -106,9 +106,18 @@ test("selecting away an area keeps a narrated proof", () => {
 
 test("the snapshot never writes a level or an ownership wish on its own", () => {
   const actions = source("src/features/capability/capabilityActions.ts");
-  assert.match(actions, /if \(level !== null\)/, "eine vorhandene Stufe wird nur bei Angabe ueberschrieben");
-  assert.doesNotMatch(actions, /application_level: 1\b/, "kein Default auf die niedrigste Stufe");
-  assert.doesNotMatch(actions, /ownership_wish: "unclear"/, "kein Default-Ownership-Wunsch");
+  // Geschrieben wird seit dem 21.09.2026 in capabilityEvidenceWrite.ts -
+  // dieselbe Funktion benutzt das Interview. Die Zusage ist unveraendert: Nur
+  // setzen, was angegeben ist.
+  const write = source("src/features/capability/capabilityEvidenceWrite.ts");
+  assert.match(write, /if \(params\.applicationLevel !== null\) patch\.application_level/);
+  assert.match(write, /if \(params\.ownershipWish !== null\) patch\.ownership_wish/);
+  assert.doesNotMatch(write, /application_level: 1\b/, "kein Default auf die niedrigste Stufe");
+  assert.doesNotMatch(write, /ownership_wish: "unclear"/, "kein Default-Ownership-Wunsch");
+
+  // Und der Snapshot selbst fragt nach dem Wunsch erst in Schritt 3 - hier
+  // uebergibt er bewusst nichts.
+  assert.match(actions, /ownershipWish: null/, "der Snapshot setzt einen Wunsch ungefragt");
 });
 
 // ---------------------------------------------------------------------------
@@ -557,8 +566,13 @@ test("the first step no longer asks the person to classify", () => {
   // im Browser vor der Rueckfrage, auf dem Server nur ohne JavaScript.
   assert.match(start, /analyzeNarrativeWithRules\(\{ narrative, locale: "de" \}\)/);
   assert.match(actions, /analyzeNarrativeWithRules\(\{ narrative, locale: "de" \}\)/);
-  // Bleibt nichts uebrig, geht die Erzaehlung in den Auffangwert statt verloren.
-  assert.match(actions, /recognised\.length \? recognised : \["other"\]/);
+  // Bleibt nichts uebrig, geht die Erzaehlung in den Auffangwert statt
+  // verloren. Seit dem 21.09.2026 steht diese Zusage beim Schreiben, damit sie
+  // auch fuer das Interview gilt.
+  assert.match(
+    source("src/features/capability/capabilityEvidenceWrite.ts"),
+    /chosen\.length > 0 \? chosen : \["other"\]/
+  );
   // Und der Nutzer erfaehrt, welcher Fall eingetreten ist.
   assert.match(actions, /recognised\.length \? \(confirmed \? "confirmed" : "recognised"\) : "unmatched"/);
 });

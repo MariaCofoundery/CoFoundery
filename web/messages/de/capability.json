@@ -452,6 +452,34 @@
       "stale": "Diese Frage ist nicht mehr die aktuelle – vielleicht war ein zweites Fenster offen. Hier ist der aktuelle Stand.",
       "complete": "Das Abschließen hat nicht geklappt. Bitte noch einmal versuchen."
     },
+    "sort": {
+      "title": "Antworten einordnen",
+      "remaining": "{count, plural, one {Eine Antwort ist noch nicht eingeordnet} other {# Antworten sind noch nicht eingeordnet}}",
+      "yourAnswer": "Deine Antwort",
+      "whichAreas": "Welche Bereiche waren das?",
+      "whichAreasText": "Bis zu drei. Wenn keiner der Vorschläge passt, wähl nichts aus – die Erzählung bleibt trotzdem erhalten und landet in „Sonstiges“.",
+      "fromQuestion": "Folgt aus der Frage",
+      "fromQuestionHint": "Das ist kein Fund in deinem Text: Wer auf diese Frage überhaupt etwas erzählt, hat es getan. Bestätigen musst du es trotzdem.",
+      "fromText": "Aus deinem Text erkannt",
+      "analysing": "Wird gelesen …",
+      "nothingFound": "Hier wurde nichts erkannt. Das sagt nichts über deine Erzählung – nur darüber, dass unsere Begriffsliste sie nicht getroffen hat. Du kannst die Bereiche später im Profil selbst ergänzen.",
+      "because": "Erkannt an: {terms}",
+      "limit": "Höchstens {max} Bereiche. Wer alles anhakt, sagt damit nichts mehr.",
+      "submit": "Einordnen und weiter",
+      "emptyAllowed": "Ohne Auswahl weitergehen ist in Ordnung.",
+      "doneTitle": "Alles eingeordnet",
+      "doneText": "Es liegt keine Antwort mehr offen. Was du bestätigt hast, steht jetzt in deinem Profil – mit der Erzählung als Beleg daran.",
+      "toProfile": "Zum Profil",
+      "toInterview": "Weiteres Gespräch führen",
+      "alreadySorted": "Diese Antwort war schon eingeordnet – vielleicht war ein zweites Fenster offen. Hier ist die nächste.",
+      "errors": {
+        "area": "Einer der Bereiche ist unbekannt. Bitte lade die Seite neu und versuch es noch einmal.",
+        "save": "Das Einordnen ließ sich nicht speichern. Deine Antwort ist unverändert da.",
+        "link": "Gespeichert, aber die Antwort ließ sich nicht als eingeordnet vermerken. Sie erscheint noch einmal – ordne sie dann bitte nicht doppelt ein."
+      }
+    },
+    "sortCta": "Antworten einordnen",
+    "sortPending": "{count, plural, one {Eine Antwort wartet darauf, eingeordnet zu werden} other {# Antworten warten darauf, eingeordnet zu werden}}",
     "questions": {
       "owned_last": {
         "title": "Erzähl mir von der letzten Sache, für die du wirklich Verantwortung getragen hast – bis zu einem klaren Ergebnis oder einer bewussten Entscheidung, sie zu stoppen.",

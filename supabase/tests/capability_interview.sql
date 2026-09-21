@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(15);
+select extensions.plan(18);
 
 -- ---------------------------------------------------------------------------
 -- Der Gesprächsverlauf
@@ -151,8 +151,76 @@ select extensions.set_eq(
 );
 
 -- ---------------------------------------------------------------------------
+-- Die Antwort wird zur Evidenz
+-- ---------------------------------------------------------------------------
+--
+-- DER SCHRITT, DER DAS GESPRAECH EINLOEST: Aus einer Antwort wird ein Eintrag
+-- im Faehigkeitsmodell, und die Erzaehlung haengt als Beleg daran. Der Verweis
+-- auf dem Turn ist das Merkmal "eingeordnet" - kein zweites Zustandsfeld.
+insert into public.person_capability_entries(id, user_id, area_id)
+values ('e3000000-0000-4000-8000-000000000001','e1000000-0000-4000-8000-000000000001','public_speaking');
+
+insert into public.person_capability_evidence(id, entry_id, narrative)
+values ('e4000000-0000-4000-8000-000000000001','e3000000-0000-4000-8000-000000000001',
+        'Ich habe auf einer Konferenz vor 200 Leuten den Vortrag gehalten, den eigentlich mein Chef halten sollte.');
+
+update public.capability_interview_turns
+  set answer = 'Ich habe auf einer Konferenz vor 200 Leuten gesprochen.',
+      answered_at = now(),
+      evidence_id = 'e4000000-0000-4000-8000-000000000001'
+  where session_id = 'e2000000-0000-4000-8000-000000000002' and sort_order = 1;
+
+select extensions.is(
+  (select evidence_id from public.capability_interview_turns
+   where session_id = 'e2000000-0000-4000-8000-000000000002' and sort_order = 1),
+  'e4000000-0000-4000-8000-000000000001'::uuid,
+  'a sorted answer points at the evidence it became'
+);
+
+-- WER EINEN BELEG LOESCHT, LOESCHT NICHT SEIN GESPRAECH. Der Verweis faellt
+-- weg, die Antwort bleibt - und taucht damit wieder zum Einordnen auf. Das ist
+-- die ehrliche Richtung: lieber noch einmal fragen als eine Erzaehlung
+-- stillschweigend verschwinden lassen.
+delete from public.person_capability_evidence
+where id = 'e4000000-0000-4000-8000-000000000001';
+
+select extensions.ok(
+  exists (
+    select 1 from public.capability_interview_turns
+    where session_id = 'e2000000-0000-4000-8000-000000000002'
+      and sort_order = 1
+      and answer is not null
+      and evidence_id is null
+  ),
+  'deleting the evidence keeps the answer and only drops the link'
+);
+
+-- UND UMGEKEHRT: Wer sein Gespraech loescht, verliert nicht seine Staerken.
+-- Der Eintrag ist das Ergebnis, das Gespraech war der Weg dorthin.
+insert into public.person_capability_evidence(id, entry_id, narrative)
+values ('e4000000-0000-4000-8000-000000000002','e3000000-0000-4000-8000-000000000001',
+        'Zweiter Beleg, damit das Loeschen des Gespraechs etwas zum Ueberleben hat.');
+
+delete from public.capability_interview_sessions
+where id = 'e2000000-0000-4000-8000-000000000002';
+
+select extensions.ok(
+  exists (
+    select 1 from public.person_capability_evidence
+    where id = 'e4000000-0000-4000-8000-000000000002'
+  ),
+  'deleting the conversation keeps what it produced'
+);
+
+-- ---------------------------------------------------------------------------
 -- Niemand liest ein fremdes Gespräch
 -- ---------------------------------------------------------------------------
+-- Eine neue Sitzung, weil die vorige gerade geloescht wurde.
+insert into public.capability_interview_sessions(id, user_id)
+values ('e2000000-0000-4000-8000-000000000003','e1000000-0000-4000-8000-000000000001');
+insert into public.capability_interview_turns(session_id, sort_order, question_source, question_id)
+values ('e2000000-0000-4000-8000-000000000003', 1, 'catalogue', 'owned_last');
+
 set local request.jwt.claims = '{"sub":"e1000000-0000-4000-8000-000000000002","role":"authenticated"}';
 
 select extensions.is(
@@ -170,7 +238,7 @@ select extensions.is(
 -- Auch nicht hineinschreiben.
 select extensions.throws_ok(
   $$insert into public.capability_interview_turns(session_id, sort_order, question_source, question_id)
-    values ('e2000000-0000-4000-8000-000000000002', 9, 'catalogue', 'outside_work')$$,
+    values ('e2000000-0000-4000-8000-000000000003', 9, 'catalogue', 'outside_work')$$,
   '42501',
   null,
   'and nobody writes into it'

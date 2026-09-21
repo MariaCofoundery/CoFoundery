@@ -14,6 +14,7 @@ import {
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
 import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
 import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapshotStart";
+import { getUnsortedInterviewAnswers } from "@/features/capability/capabilityInterviewData";
 import { getComparablePeople, type ComparablePerson } from "@/features/capability/capabilityComparisonData";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import {
@@ -63,7 +64,7 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople] = await Promise.all([
+  const [t, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
     getTranslations("capability"),
     getLocale(),
     searchParams,
@@ -87,6 +88,11 @@ export default async function ProfilePage({
     // Wer verglichen werden darf. Eine leere Liste ist der Normalfall am
     // Anfang und laesst den Abschnitt einfach entfallen.
     getComparablePeople(supabase, user.id).catch((): ComparablePerson[] => []),
+    // Wie viele Antworten aus dem Gespraech noch nicht eingeordnet sind. Nur
+    // die Zahl - die Antworten selbst gehoeren auf ihre eigene Seite.
+    getUnsortedInterviewAnswers(supabase)
+      .then((answers) => answers.length)
+      .catch(() => 0),
   ]);
 
   const step = isSnapshotStep(params.step) ? params.step : null;
@@ -175,12 +181,25 @@ export default async function ProfilePage({
           <h2 className="text-lg font-semibold text-slate-950">{t("interview.title")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">{t("interview.text")}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("interview.guidanceTime")}</p>
-          <Link
-            href="/profile/interview"
-            className={`${primary} mt-4`}
-          >
-            {t("interview.start")}
-          </Link>
+
+          {/* WARTENDE ANTWORTEN STEHEN VOR DEM ANFANGEN. Wer acht Fragen
+              beantwortet und nicht eingeordnet hat, hat noch nichts im Profil -
+              und ein zweites Gespraech zu beginnen waere die falsche naechste
+              Handlung. */}
+          {unsortedAnswers > 0 ? (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-slate-900">
+                {t("interview.sortPending", { count: unsortedAnswers })}
+              </p>
+              <Link href="/profile/interview/sort" className={`${primary} mt-3`}>
+                {t("interview.sortCta")}
+              </Link>
+            </div>
+          ) : (
+            <Link href="/profile/interview" className={`${primary} mt-4`}>
+              {t("interview.start")}
+            </Link>
+          )}
         </section>
       ) : null}
 

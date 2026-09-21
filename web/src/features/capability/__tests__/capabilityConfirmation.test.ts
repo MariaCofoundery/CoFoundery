@@ -9,6 +9,11 @@ const readJson = (path: string) => JSON.parse(source(path)) as Record<string, un
 
 const START = "src/features/capability/CapabilitySnapshotStart.tsx";
 const ACTIONS = "src/features/capability/capabilityActions.ts";
+// SEIT DEM 21.09.2026 steht das Schreiben in einer eigenen Datei: Das Interview
+// tut dasselbe (aus einer Erzaehlung werden Eintraege, an einem haengt der
+// Beleg), und zwei Umsetzungen desselben Vorgangs waeren zwei Wahrheiten
+// darueber, wie eine Staerke in dieses Modell kommt.
+const WRITE = "src/features/capability/capabilityEvidenceWrite.ts";
 
 // ---------------------------------------------------------------------------
 // Die Rueckfrage selbst
@@ -86,15 +91,21 @@ test("a confirmed selection is not overruled by the rule engine", () => {
 });
 
 test("rejecting every suggestion is respected, not treated as no answer", () => {
-  const actions = source(ACTIONS);
-
   // Eine leere Auswahl mit Bestaetigung landet im Auffangwert - nicht in den
   // Bereichen, die die Person gerade abgelehnt hat.
-  assert.match(actions, /recognised\.length \? recognised : \["other"\]/);
-  assert.match(actions, /formData\.get\("areas_confirmed"\) === "1"/);
+  assert.match(source(WRITE), /chosen\.length > 0 \? chosen : \["other"\]/);
+  assert.match(source(ACTIONS), /formData\.get\("areas_confirmed"\) === "1"/);
+
+  // Und die Aktion gibt die bestaetigte Auswahl unveraendert weiter - auch die
+  // leere. Ein `|| analysis` an dieser Stelle waere die Stelle, an der ein
+  // "nein zu allem" still in "dann nehmen wir eben die Vorschlaege" umkippt.
+  assert.match(source(ACTIONS), /areaIds: recognised/);
 });
 
 test("the server caps and deduplicates what the form sends", () => {
+  // Beides passiert jetzt beim Schreiben, fuer alle Aufrufer zugleich.
+  assert.match(source(WRITE), /new Set\(/);
+  assert.match(source(WRITE), /\.slice\(\s*0,\s*MAX_CONFIRMED_AREAS\s*\)/);
   const actions = source(ACTIONS);
   // Das Formular begrenzt schon, aber das Formular ist nicht die Grenze.
   assert.match(actions, /new Set\(/);
@@ -112,8 +123,14 @@ test("without JavaScript the flow still assigns instead of dead-ending", () => {
 });
 
 test("an area that never existed is reported as an area problem", () => {
-  const actions = source(ACTIONS);
-  assert.match(actions, /inserted\.error\.message\.includes\("area_id"\) \? "area" : "save"/);
+  assert.match(
+    source(WRITE),
+    /inserted\.error\.message\.includes\("area_id"\) \? "area" : "save"/
+  );
+  // Und die Aktion gibt den Schluessel weiter, statt ihn in "save" zu
+  // verwandeln: "Bereich gibt es nicht" und "Speichern ging schief" sind zwei
+  // verschiedene Auskuenfte.
+  assert.match(source(ACTIONS), /back\("evidence", written\.reason\)/);
 });
 
 // ---------------------------------------------------------------------------

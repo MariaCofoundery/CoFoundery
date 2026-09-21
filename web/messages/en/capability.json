@@ -452,6 +452,34 @@
       "stale": "This question is no longer the current one – perhaps a second window was open. Here is the current state.",
       "complete": "Finishing did not work. Please try again."
     },
+    "sort": {
+      "title": "Sort your answers",
+      "remaining": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}}",
+      "yourAnswer": "Your answer",
+      "whichAreas": "Which areas were these?",
+      "whichAreasText": "Up to three. If none of the proposals fits, choose nothing – your story is kept either way and lands in “Other”.",
+      "fromQuestion": "Follows from the question",
+      "fromQuestionHint": "This is not a finding in your text: whoever tells anything at all in answer to this question has done it. You still have to confirm it.",
+      "fromText": "Recognised in your text",
+      "analysing": "Reading …",
+      "nothingFound": "Nothing was recognised here. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself later in your profile.",
+      "because": "Recognised by: {terms}",
+      "limit": "At most {max} areas. Ticking everything says nothing at all.",
+      "submit": "Sort and continue",
+      "emptyAllowed": "Moving on without a selection is fine.",
+      "doneTitle": "Everything sorted",
+      "doneText": "No answer is left open. What you confirmed is now in your profile – with your story attached as evidence.",
+      "toProfile": "Back to profile",
+      "toInterview": "Have another conversation",
+      "alreadySorted": "This answer was already sorted – perhaps a second window was open. Here is the next one.",
+      "errors": {
+        "area": "One of the areas is unknown. Please reload the page and try again.",
+        "save": "Sorting could not be saved. Your answer is unchanged.",
+        "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice."
+      }
+    },
+    "sortCta": "Sort your answers",
+    "sortPending": "{count, plural, one {One answer is waiting to be sorted} other {# answers are waiting to be sorted}}",
     "questions": {
       "owned_last": {
         "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",
