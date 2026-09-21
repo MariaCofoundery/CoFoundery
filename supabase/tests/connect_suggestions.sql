@@ -33,6 +33,14 @@ insert into public.network_profiles(
  array['founder'], array['podcast'], array['Medien'], 'active', now())
 on conflict (user_id) do update set status = excluded.status;
 
+-- DIESER TEST PRUEFT DIE SACHVORSCHLAEGE. Seit dem 21.09.2026 koennen auch
+-- Menschen vorgeschlagen werden, und Bo traegt dieselben Woerter wie Mara -
+-- ohne diese Zeile wuerde hier ein Personenvorschlag mitzaehlen und die
+-- Zahlen unten verschieben. Menschen haben ihren eigenen Test
+-- (connect_person_suggestions.sql).
+update public.network_profiles set suggestable = false
+where user_id in ('b1000000-0000-4000-8000-000000000002','b1000000-0000-4000-8000-000000000003');
+
 -- Das Angebot, das passen soll - klein geschrieben.
 insert into public.network_listings(
   id, owner_user_id, direction, category, title, summary, topics, industries,

@@ -343,7 +343,11 @@
     "openToHeading": "Open to",
     "contactNoteHeading": "How to reach them",
     "membersOnlyNote": "These three entries are only visible to signed-in members – they do not appear on your public page.",
-    "reachNoNames": "Please no names: this is about what kind of people you know, not which ones. They have not agreed to appear here."
+    "reachNoNames": "Please no names: this is about what kind of people you know, not which ones. They have not agreed to appear here.",
+    "suggestableTitle": "Being suggested",
+    "suggestableLabel": "I would like to be suggested to others",
+    "suggestableHint": "People whose fields or industries overlap with yours will occasionally see your profile under “For you” – at most three suggestions a week, and only inside the platform.",
+    "suggestableOffHint": "Switched off you stay findable as usual: in the people list, through search and through your entries. You simply won't be suggested to anyone."
   },
   "safety": {
     "block": "Block",
@@ -767,7 +771,8 @@
     "kinds": {
       "listing": "Offer",
       "venture": "Company",
-      "problem": "Unsolved"
+      "problem": "Unsolved",
+      "person": "Person"
     },
     "emptyTitle": "Nothing fitting right now",
     "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precisely your fields and industries are in your profile, the more turns up.",

@@ -125,6 +125,32 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         </div>
       </fieldset>
 
+      {/* -------------------------------------------------------------------
+          Vorgeschlagen werden.
+          Maria am 21.09.2026: "Kann standardmaessig an sein, muesste halt nur
+          gut eingeleitet werden." Deshalb steht hier nicht nur ein Kaestchen,
+          sondern was es bedeutet UND was es nicht bedeutet: Wer es abschaltet,
+          bleibt auffindbar. Ohne diesen Satz liest sich das Kaestchen wie ein
+          Sichtbarkeitsschalter, und dann haken es Menschen aus Vorsicht ab.
+          ------------------------------------------------------------------- */}
+      <fieldset className="rounded-2xl border border-slate-200 p-4">
+        <legend className="px-1 text-sm font-medium">{t("profile.suggestableTitle")}</legend>
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            name="suggestable"
+            value="yes"
+            defaultChecked={profile?.suggestable ?? true}
+            className="mt-1 h-4 w-4 rounded border-slate-300"
+          />
+          <span>
+            <span className="block font-medium text-slate-900">{t("profile.suggestableLabel")}</span>
+            <span className="mt-1 block leading-6 text-slate-600">{t("profile.suggestableHint")}</span>
+          </span>
+        </label>
+        <p className="mt-3 text-xs leading-5 text-slate-500">{t("profile.suggestableOffHint")}</p>
+      </fieldset>
+
       <label className="block text-sm font-medium">
         {t("profile.contactNoteTitle")}
         <input

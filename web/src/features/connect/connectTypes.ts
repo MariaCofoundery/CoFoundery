@@ -44,6 +44,8 @@ export type ConnectProfile = {
   visibility: ConnectVisibility; public_slug: string;
   network_reach: string | null;
   open_to_formats: ConnectOpenToFormat[];
+  /** Ob diese Person anderen vorgeschlagen werden darf. */
+  suggestable: boolean;
   contact_note: string | null;
   published_at: string | null; updated_at: string;
 };

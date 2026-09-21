@@ -14,6 +14,7 @@ const sqlCodeOnly = (path: string) =>
     .replace(/^\s*--.*$/gm, "");
 
 const MIGRATION = "../supabase/migrations/20261017120000_connect_suggestions.sql";
+const PERSON_MIGRATION = "../supabase/migrations/20261018120000_connect_person_suggestions.sql";
 const PAGE = "src/app/(product)/connect/suggestions/page.tsx";
 const DATA = "src/features/connect/connectSuggestionData.ts";
 
@@ -70,17 +71,52 @@ test("nur Angebote, keine Gesuche", () => {
   assert.doesNotMatch(sqlCodeOnly(MIGRATION), /direction = 'seeking'/);
 });
 
-test("Menschen werden in dieser Stufe nicht vorgeschlagen", () => {
+test("ein Mensch wird nur vorgeschlagen, wenn er es erlaubt", () => {
   // Einen Menschen vorzuschlagen ist eine Aussage darueber, wer wem als
-  // passend gilt. Das braucht den Schalter im Profil und kommt als eigener
-  // Schritt - nicht als Nebenwirkung.
-  const migration = sqlCodeOnly(MIGRATION);
-  const table = migration.slice(
-    migration.indexOf("create table public.connect_suggestions"),
-    migration.indexOf("comment on table")
+  // passend gilt - das braucht eine eigene Zustimmung, auch wenn der Vorschlag
+  // nur bei der empfangenden Person erscheint.
+  const person = sqlCodeOnly(PERSON_MIGRATION);
+  assert.match(person, /and profile\.suggestable/);
+
+  // Standardmaessig an: Wer sein Profil veroeffentlicht hat, ist ohnehin
+  // auffindbar - vorgeschlagen zu werden fuegt keine neue Sichtbarkeit hinzu.
+  assert.match(person, /add column if not exists suggestable boolean not null default true/);
+
+  // Und Menschen kommen ZULETZT: Wer etwas eingestellt hat, hat schon gesagt,
+  // dass er angesprochen werden moechte; ein Profil allein sagt das nicht.
+  const personStep = person.indexOf("and profile.suggestable");
+  const listingStep = person.indexOf("listing.direction = 'offering'");
+  assert.ok(listingStep > 0 && personStep > listingStep);
+});
+
+test("der Schalter versteckt das Profil nicht", () => {
+  // Ohne diesen Satz liest sich das Kaestchen wie ein Sichtbarkeitsschalter,
+  // und dann haken Menschen es aus Vorsicht ab.
+  for (const locale of ["de", "en"]) {
+    const profile = (
+      JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
+        profile: Record<string, string>;
+      }
+    ).profile;
+    for (const key of ["suggestableTitle", "suggestableLabel", "suggestableHint", "suggestableOffHint"]) {
+      assert.ok(profile[key], `${locale}: profile.${key} fehlt`);
+    }
+    assert.ok(
+      profile.suggestableOffHint.length > 80,
+      `${locale}: der Satz sagt nicht, was Abschalten NICHT bedeutet`
+    );
+  }
+
+  // Das Kaestchen ist vorausgewaehlt - und die Abwesenheit ist die
+  // Entscheidung, nicht ein fehlender Wert.
+  assert.match(
+    codeOnly("src/app/(product)/connect/profile/page.tsx"),
+    /defaultChecked=\{profile\?\.suggestable \?\? true\}/
   );
-  assert.doesNotMatch(table, /person_user_id|suggested_user_id/);
-  assert.match(table, /\(listing_id is not null\)::int/);
+  assert.match(
+    codeOnly("src/features/connect/connectValidation.ts"),
+    /suggestable: formData\.get\("suggestable"\) === "yes"/
+  );
 });
 
 test("drei pro Woche, nicht dreissig", () => {

@@ -12,10 +12,12 @@ import {
 /**
  * Was dich interessieren koennte.
  *
- * GEBAUT AM 21.09.2026, als erste Haelfte des Matchings. Vorschlaege auf
- * SACHEN - Angebote, Unternehmen, Ungeloestes. Menschen einander vorzuschlagen
- * ist eine Aussage darueber, wer wem als passend gilt; das kommt als eigener
- * Schritt mit einem Schalter im Profil.
+ * GEBAUT AM 21.09.2026. Vier Sorten: Angebote, Unternehmen, Ungeloestes - und
+ * Menschen, aber nur die, die es im Profil erlauben. Einen Menschen
+ * vorzuschlagen ist eine Aussage darueber, wer wem als passend gilt; deshalb
+ * der eigene Schalter, und deshalb stehen Menschen in der Erzeugung zuletzt:
+ * Wer etwas eingestellt hat, hat schon gesagt, dass er angesprochen werden
+ * moechte - ein Profil allein sagt das nicht.
  *
  * SIE ENTSTEHEN BEIM HINSEHEN. Kein Zeitplan, kein Hintergrundlauf: Der Aufruf
  * unten erzeugt hoechstens drei je Woche. Das ist die technische Fassung von
@@ -96,6 +98,18 @@ export default async function ConnectSuggestionsPage() {
                 >
                   {t("actions.details")}
                 </Link>
+                {/* Bei einem Menschen der direkte Weg: Seit dem 21.09.2026
+                    kann man jemanden anschreiben, ohne dass er etwas
+                    ausgeschrieben hat. Ein Vorschlag, der nur auf ein Profil
+                    zeigt, endete sonst dort. */}
+                {suggestion.kind === "person" ? (
+                  <Link
+                    href={`/connect/people/${suggestion.subjectId}/contact`}
+                    className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold text-slate-900"
+                  >
+                    {t("contact.cta")}
+                  </Link>
+                ) : null}
                 {/* Wegklicken braucht keinen Grund. Nach einem zu fragen macht
                     aus einem Achselzucken eine Begruendungspflicht. */}
                 <form action={dismissConnectSuggestionAction.bind(null, suggestion.id)}>

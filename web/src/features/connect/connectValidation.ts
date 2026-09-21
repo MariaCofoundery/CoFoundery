@@ -64,6 +64,10 @@ export function parseConnectProfile(formData: FormData, identity: ConnectIdentit
       .filter((value): value is string => isOneOf(CONNECT_OPEN_TO_FORMATS, value))
       .slice(0, 6),
     contact_note: optionalLongText(formData.get("contact_note"), 10, 300),
+    // Ein Kaestchen: nicht angehakt heisst aus. Das Formular schickt den Wert
+    // nur mit, wenn es angehakt ist - deshalb ist die Abwesenheit hier die
+    // Entscheidung und nicht ein fehlender Wert.
+    suggestable: formData.get("suggestable") === "yes",
   };
 }
 

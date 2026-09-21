@@ -343,7 +343,11 @@
     "openToHeading": "Ansprechbar für",
     "contactNoteHeading": "So erreichst du sie am besten",
     "membersOnlyNote": "Diese drei Angaben sehen nur eingeloggte Mitglieder – auf deiner öffentlichen Seite stehen sie nicht.",
-    "reachNoNames": "Bitte keine Namen: Es geht darum, was für Menschen du kennst, nicht wen konkret. Die Genannten haben dem Eintrag hier nicht zugestimmt."
+    "reachNoNames": "Bitte keine Namen: Es geht darum, was für Menschen du kennst, nicht wen konkret. Die Genannten haben dem Eintrag hier nicht zugestimmt.",
+    "suggestableTitle": "Vorgeschlagen werden",
+    "suggestableLabel": "Ich möchte anderen vorgeschlagen werden",
+    "suggestableHint": "Wer Fachgebiete oder Branchen eingetragen hat, die sich mit deinen überschneiden, sieht dein Profil gelegentlich unter „Für dich“ – höchstens drei Vorschläge pro Woche, und nur in der Plattform.",
+    "suggestableOffHint": "Abgeschaltet bleibst du ganz normal auffindbar: in der Personenliste, über die Suche und über deine Einträge. Es wird dich dann nur niemand vorgeschlagen bekommen."
   },
   "safety": {
     "block": "Blockieren",
@@ -767,7 +771,8 @@
     "kinds": {
       "listing": "Angebot",
       "venture": "Unternehmen",
-      "problem": "Ungelöstes"
+      "problem": "Ungelöstes",
+      "person": "Mensch"
     },
     "emptyTitle": "Gerade nichts Passendes",
     "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer deine Fachgebiete und Branchen im Profil stehen, desto mehr findet sich.",

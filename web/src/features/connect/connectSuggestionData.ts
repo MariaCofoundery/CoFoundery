@@ -21,7 +21,7 @@ import type { ConnectProfile } from "./connectTypes";
 
 export type ConnectSuggestion = {
   id: string;
-  kind: "listing" | "venture" | "problem";
+  kind: "listing" | "venture" | "problem" | "person";
   subjectId: string;
   title: string;
   text: string;
@@ -41,6 +41,7 @@ type Row = {
   network_listings: { id: string; title: string; summary: string } | null;
   network_ventures: { id: string; name: string; what_it_does: string } | null;
   network_problems: { id: string; title: string; description: string } | null;
+  person_user_id: string | null;
 };
 
 /** Legt neue an, soweit das Wochenbudget es zulaesst. Fehler sind stumm. */
@@ -54,7 +55,7 @@ export async function getOwnConnectSuggestions(
   const { data, error } = await client
     .from("connect_suggestions")
     .select(
-      "id, listing_id, venture_id, problem_id, subject_owner_user_id, matched_terms," +
+      "id, listing_id, venture_id, problem_id, person_user_id, subject_owner_user_id, matched_terms," +
         " network_listings(id, title, summary)," +
         " network_ventures(id, name, what_it_does)," +
         " network_problems(id, title, description)"
@@ -63,8 +64,26 @@ export async function getOwnConnectSuggestions(
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
+  const rows = data as unknown as Row[];
 
-  return (data as unknown as Row[]).flatMap((row): ConnectSuggestion[] => {
+  // Die Profile in einer zweiten Abfrage und NICHT als Beziehung im select:
+  // Der Fremdschluessel von person_user_id zeigt auf auth.users, nicht auf
+  // network_profiles - PostgREST kann darueber nichts mitladen. Dasselbe
+  // Muster wie im Unternehmensverzeichnis.
+  const personIds = [...new Set(rows.map((row) => row.person_user_id).filter((id): id is string => Boolean(id)))];
+  const personById = new Map<string, { user_id: string; display_name: string; headline: string }>();
+  if (personIds.length > 0) {
+    const { data: profiles } = await client
+      .from("network_profiles")
+      .select("user_id, display_name, headline")
+      .in("user_id", personIds)
+      .eq("status", "active");
+    for (const profile of (profiles ?? []) as { user_id: string; display_name: string; headline: string }[]) {
+      personById.set(profile.user_id, profile);
+    }
+  }
+
+  return rows.flatMap((row): ConnectSuggestion[] => {
     const base = {
       id: row.id,
       matchedTerms: row.matched_terms,
@@ -91,6 +110,20 @@ export async function getOwnConnectSuggestions(
         // Es gibt keine eigene Unternehmensseite - der Weg fuehrt zu dem
         // Menschen, und das ist ohnehin das Ziel.
         href: `/connect/people/${row.subject_owner_user_id}`,
+      }];
+    }
+    if (row.person_user_id) {
+      const person = personById.get(row.person_user_id);
+      // Kein aktives Profil mehr: Der Vorschlag bleibt liegen, wird aber nicht
+      // gezeigt - wie bei einem zurueckgezogenen Eintrag.
+      if (!person) return [];
+      return [{
+        ...base,
+        kind: "person" as const,
+        subjectId: person.user_id,
+        title: person.display_name,
+        text: person.headline,
+        href: `/connect/people/${person.user_id}`,
       }];
     }
     if (row.problem_id && row.network_problems) {
