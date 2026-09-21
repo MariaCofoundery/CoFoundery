@@ -5,6 +5,8 @@ import test from "node:test";
 import {
   HIGHLIGHT_DISCLOSURES,
   HIGHLIGHT_KINDS,
+  pickAcrossKinds,
+  type ConnectHighlight,
 } from "@/features/connect/connectHighlightData";
 
 const source = (path: string) => readFileSync(path, "utf8");
@@ -83,9 +85,12 @@ test("gemischt wird, nicht bewertet", () => {
   const data = codeOnly(DATA);
   assert.doesNotMatch(data, /sort\(\(\) => Math\.random/);
   assert.match(data, /Math\.floor\(Math\.random\(\) \* \(index \+ 1\)\)/);
-  // Erst mischen, dann abschneiden - sonst waere die Reihenfolge der Sorten
-  // die eigentliche Auswahl.
-  assert.match(data, /shuffle\(candidates\)\.slice\(0, limit\)/);
+  // Gemischt wird an drei Stellen: die Sortenfolge, die Eintraege innerhalb
+  // einer Sorte, und daraus wird reihum gezogen. Abgeschnitten wird nicht mehr
+  // ueber alle hinweg - das gab der Mehrheit die Plaetze (siehe den Test
+  // "die Auswahl mischt die Sorten").
+  assert.doesNotMatch(data, /shuffle\(candidates\)\.slice/);
+  assert.match(data, /pickAcrossKinds\(candidates, limit\)/);
 });
 
 test("alle vier Sorten koennen erscheinen, und jede sagt, was sie ist", () => {
@@ -164,6 +169,58 @@ test("das Feld steht vor dem Suchen, nicht danach", () => {
   assert.ok(highlightAt > 0 && highlightAt < tabsAt, "das Feld steht unter der Liste");
 });
 
+test("die Auswahl mischt die Sorten, statt der Mehrheit zu folgen", () => {
+  // GEMELDET AM 21.09.2026: "Ich glaube, dass die Highlights immer noch nur
+  // Unternehmen anzeigen. Also irgendwie fehlt da noch was."
+  //
+  // Das war nicht die Datenlage, sondern die Auswahl: Vorher wanderten alle
+  // Kandidaten in einen Topf, und drei wurden gezogen. Wer zwanzig Unternehmen
+  // und zwei Anzeigen hat, zieht damit fast immer drei Unternehmen - der
+  // Zufall gibt die Mehrheit wieder, und die Mehrheit ist nicht die Absicht.
+  const make = (kind: (typeof HIGHLIGHT_KINDS)[number], index: number) =>
+    ({
+      kind,
+      id: `${kind}-${index}`,
+      title: `${kind} ${index}`,
+      text: "",
+      href: "/connect",
+      disclosure: "none",
+      isOwn: false,
+    }) as unknown as ConnectHighlight;
+
+  // Der alte Fehlerfall, zwanzig zu zwei zu eins.
+  const lopsided = [
+    ...Array.from({ length: 20 }, (_, index) => make("venture", index)),
+    ...Array.from({ length: 2 }, (_, index) => make("offering", index)),
+    make("person", 0),
+  ];
+
+  // Hundert Ziehungen, und in JEDER stehen drei verschiedene Sorten. Einmal zu
+  // pruefen wuerde hier nichts heissen - die Auswahl ist zufaellig.
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const chosen = pickAcrossKinds(lopsided, 3);
+    assert.equal(chosen.length, 3);
+    assert.equal(
+      new Set(chosen.map((entry) => entry.kind)).size,
+      3,
+      `Ziehung ${attempt}: ${chosen.map((entry) => entry.kind).join(", ")}`
+    );
+  }
+
+  // Und keine Sorte steht dabei immer vorn: Eine feste Reihenfolge waere eine
+  // Rangfolge, und eine Rangfolge will dieses Feld nicht sein.
+  const firstKinds = new Set(
+    Array.from({ length: 100 }, () => pickAcrossKinds(lopsided, 3)[0]?.kind)
+  );
+  assert.ok(firstKinds.size > 1, "vorn steht immer dieselbe Sorte");
+
+  // Gibt es weniger Sorten als Plaetze, bleibt kein Platz leer - dann ruecken
+  // die vorhandenen nach.
+  const onlyVentures = Array.from({ length: 5 }, (_, index) => make("venture", index));
+  assert.equal(pickAcrossKinds(onlyVentures, 3).length, 3);
+  assert.equal(pickAcrossKinds([make("person", 0)], 3).length, 1);
+});
+
 test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => {
   // NACHGEMELDET AM 21.09.2026: "Da ist immer noch diese grosse
   // Filterfunktion noch nicht eingeklappt." Eingeklappt waren die Auswahlen -
@@ -177,8 +234,21 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
   assert.match(page, /<details className="w-full" open=\{activeFilterCount > 0\}>/);
   assert.match(page, /<details className="mt-3 border-t border-slate-100 pt-3">/);
 
-  // Der Knopf steht beim Suchfeld, nicht in einer eigenen Zeile darunter.
-  assert.match(page, /aria-label=\{t\("filters\.search"\)\}[\s\S]{0,200}filters\.apply/);
+  // NACHGESCHAERFT AM 21.09.2026, und das ist die Umkehrung dessen, was hier
+  // vorher stand: "Ich meine eigentlich, dass der ganze Bereich unter den
+  // Filtern auch weg sollte. Also auch Filter anwenden, diese Suche merken und
+  // so weiter, dieses ganze Feld, was da ist, sollte erst da sein, wenn ich es
+  // aufklappe." Der Anwenden-Knopf stand bis dahin bewusst beim Suchfeld -
+  // jetzt liegt er im eingeklappten Teil, und sichtbar bleibt nur das Feld.
+  const openerAt = page.indexOf('<details className="w-full"');
+  const applyAt = page.indexOf('t("filters.apply")');
+  const closeAt = page.indexOf("</details>", openerAt);
+  assert.ok(openerAt > 0 && applyAt > openerAt && applyAt < closeAt, "der Anwenden-Knopf ist sichtbar");
+
+  // Und die Trefferzahl liegt mit ihm drin: Wie viele Treffer es gibt, sieht
+  // man an den Treffern - die Zahl ist eine Antwort aufs Eingrenzen.
+  const countAt = page.indexOf('t("resultCount"');
+  assert.ok(countAt > openerAt && countAt < closeAt, "die Trefferzahl steht ausserhalb");
 
   // Und die Faehigkeiten-Auswahl liegt hinter dem eingeklappten Merken.
   const rememberAt = page.indexOf("rememberSearch");

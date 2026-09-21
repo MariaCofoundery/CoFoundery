@@ -65,11 +65,13 @@ test("und in der anderen Richtung: eine Personenkarte zeigt, was jemand mitbring
   // und einer Zeile sagt nicht, warum man klicken sollte.
   const data = codeOnly("src/features/connect/connectHighlightData.ts");
   assert.match(data, /has: \{ ventures: number; offering: number; seeking: number \} \| null/);
-  // Gezaehlt wird NACH dem Mischen - fuer dreissig Profile zu rechnen, um drei
-  // zu zeigen, waere Arbeit fuer den Papierkorb.
-  const shuffleAt = data.indexOf("shuffle(candidates)");
+  // Gezaehlt wird NACH der Auswahl - fuer dreissig Profile zu rechnen, um drei
+  // zu zeigen, waere Arbeit fuer den Papierkorb. (Am 21.09.2026 hiess die
+  // Stelle noch `shuffle(candidates)`; seit die Auswahl reihum durch die Sorten
+  // geht, ist es `pickAcrossKinds` - die Reihenfolge bleibt dieselbe Zusage.)
+  const pickAt = data.indexOf("pickAcrossKinds(candidates, limit)");
   const attachAt = data.indexOf("attachWhatPeopleHave(client, chosen)");
-  assert.ok(shuffleAt > 0 && attachAt > shuffleAt);
+  assert.ok(pickAt > 0 && attachAt > pickAt);
 
   const component = codeOnly("src/features/connect/ConnectHighlight.tsx");
   for (const key of ["has.ventures", "has.offering", "has.seeking"]) {

@@ -97,8 +97,18 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
             placeholder={t("filters.search")}
             aria-label={t("filters.search")}
           />
-          <button className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
         </div>
+        {/* NACHGESCHAERFT AM 21.09.2026: "Ich meine eigentlich, dass der ganze
+            Bereich unter den Filtern auch weg sollte. Also auch Filter
+            anwenden, diese Suche merken und so weiter, dieses ganze Feld, was
+            da ist, sollte erst da sein, wenn ich es aufklappe."
+            Also liegt jetzt AUCH der Anwenden-Knopf hier drin, samt
+            Zuruecksetzen und Trefferzahl. Sichtbar bleibt das Suchfeld und
+            eine Zeile.
+            Dass der Knopf eingeklappt ist, nimmt die Suche nicht weg: Er
+            bleibt im Formular, und damit sendet die Eingabetaste im Suchfeld
+            weiterhin ab - das ist bei einem einzelnen Suchfeld ohnehin der
+            Weg, den die meisten nehmen. */}
         <details className="w-full" open={activeFilterCount > 0}>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -107,14 +117,16 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={field} aria-label={t("filters.scope")}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select>
         <select name="remote_mode" defaultValue={filters.remote_mode || ""} className={field} aria-label={t("filters.remote")}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select>
         </div>
-        </details>
         {/* Zuruecksetzen nur, wenn es etwas zurueckzusetzen gibt. Die
-            Trefferzahl bleibt sichtbar: Sie ist eine Zeile und beantwortet die
-            Frage, ob das Eingrenzen etwas gebracht hat. */}
-        <div className="flex flex-wrap items-center gap-3">
+            Trefferzahl steht daneben und beantwortet die Frage, ob das
+            Eingrenzen etwas gebracht hat - sie gehoert deshalb hierhin, neben
+            die Regler, und nicht ueber die Treffer, die man ohnehin sieht. */}
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
           {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
           <span className="ml-auto text-sm text-slate-500">{t("resultCount", { count: listings.length })}</span>
         </div>
+        </details>
       </form>
         {/* AUCH EINGEKLAPPT, seit dem 21.09.2026: Dieser Block war der Rest der
             grossen Filterflaeche - mit der Faehigkeiten-Auswahl darin war er

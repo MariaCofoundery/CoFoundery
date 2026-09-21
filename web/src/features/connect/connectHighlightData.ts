@@ -235,11 +235,50 @@ export async function getConnectHighlights(
     });
   }
 
-  // Erst mischen, dann abschneiden - sonst waere die Reihenfolge der Sorten
-  // die eigentliche Auswahl.
-  const chosen = shuffle(candidates).slice(0, limit);
+  // ERST JE SORTE, DANN AUFFUELLEN.
+  //
+  // GEMELDET AM 21.09.2026: "Ich glaube, dass die Highlights immer noch nur
+  // Unternehmen anzeigen." Das war kein Datenproblem, sondern diese Stelle:
+  // Vorher wurden ALLE Kandidaten in einen Topf geworfen und drei gezogen. Wer
+  // zwanzig Unternehmen und zwei Anzeigen hat, bekommt damit fast immer drei
+  // Unternehmen - der Zufall gibt die Mehrheit wieder, und die Mehrheit ist
+  // nicht die Absicht.
+  //
+  // Jetzt reihum: aus jeder Sorte einer, in zufaelliger Sortenfolge, und erst
+  // wenn eine Sorte leer ist, ruecken die anderen nach. Bei drei Plaetzen und
+  // vier Sorten sieht man damit drei VERSCHIEDENE Dinge, sobald es sie gibt.
+  const chosen = pickAcrossKinds(candidates, limit);
 
   await attachWhatPeopleHave(client, chosen);
+  return chosen;
+}
+
+/**
+ * Reihum durch die Sorten, innerhalb jeder Sorte zufaellig.
+ *
+ * Die Sortenfolge selbst ist auch gemischt - sonst stuende immer ein Gesuch
+ * vorn, und die Reihenfolge waere eine Rangfolge.
+ *
+ * Exportiert, damit der Test die Mischung wirklich ausfuehren kann und nicht
+ * nur im Quelltext nachliest, dass sie da steht.
+ */
+export function pickAcrossKinds(candidates: ConnectHighlight[], limit: number) {
+  const byKind = new Map<HighlightKind, ConnectHighlight[]>();
+  for (const candidate of candidates) {
+    byKind.set(candidate.kind, [...(byKind.get(candidate.kind) ?? []), candidate]);
+  }
+
+  const queues = shuffle([...byKind.keys()]).map((kind) => shuffle(byKind.get(kind) ?? []));
+  const chosen: ConnectHighlight[] = [];
+
+  while (chosen.length < limit && queues.some((queue) => queue.length > 0)) {
+    for (const queue of queues) {
+      if (chosen.length >= limit) break;
+      const next = queue.shift();
+      if (next) chosen.push(next);
+    }
+  }
+
   return chosen;
 }
 
