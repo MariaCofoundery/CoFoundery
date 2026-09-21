@@ -52,7 +52,16 @@ npm run ai:eval      # measures the model against the curated term list
 npm run ai:worker    # takes work out of the queue
 ```
 
-The worker needs an account of its own — **not** the service-role key. In the
+The worker should process the REAL queue, so it needs the production project -
+while `npm run dev` keeps pointing at the local stack. Hence its own env file,
+loaded after `.env.local` and overriding it:
+
+```bash
+cp .env.ai-worker.example .env.ai-worker   # then fill in
+```
+
+It needs an account of its own — **not** the service-role key, and not your own
+account (which has no password at all: the app signs in by magic link). In the
 Supabase dashboard under Authentication → Users, add a user with email and
 password (auto-confirm), then put its id on the allowlist:
 
@@ -61,10 +70,11 @@ insert into public.ai_workers (user_id, label)
 values ('<the new user id>', 'Laptop');
 ```
 
+`label` is only a note to yourself — it says which machine this was, once there
+is more than one.
+
 ```bash
-AI_WORKER_EMAIL=...
-AI_WORKER_PASSWORD=...
-AI_MODEL=qwen3.5:4b            # optional, this is the default
+AI_MODEL=qwen3.5:4b                 # optional, this is the default
 OLLAMA_URL=http://127.0.0.1:11434   # optional
 ```
 
