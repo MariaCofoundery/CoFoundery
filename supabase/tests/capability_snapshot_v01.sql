@@ -7,10 +7,18 @@ select extensions.plan(23);
 -- ---------------------------------------------------------------------------
 -- 1. Vokabular: die Zahlen aus dem Brief
 -- ---------------------------------------------------------------------------
+-- NACHGEZOGEN AM 21.09.2026: acht fachliche Familien plus
+-- `communication_representation` (Aussenauftritt & Moderation) mit fuenf
+-- Bereichen. Der Grund steht in docs/capability-model-technical-brief.md 4.2 -
+-- "euch fehlt jemand, der praesentieren kann" liess sich vorher in diesem
+-- Modell nicht sagen.
+--
+-- Die Zahlen bleiben hart: Sie fangen den Fall, dass Referenzdaten
+-- versehentlich verschwinden, und genau das ist ihre Aufgabe.
 select extensions.is((select count(*)::int from public.capability_families where family_id <> 'other'),
-  8, 'acht Funktionsfamilien');
+  9, 'neun Funktionsfamilien');
 select extensions.is((select count(*)::int from public.capability_areas where family_id <> 'other'),
-  42, '42 Bereiche');
+  47, '47 Bereiche');
 select extensions.ok((select min(anzahl) >= 4 and max(anzahl) <= 7 from (
     select count(*) as anzahl from public.capability_areas
     where family_id <> 'other' group by family_id) pro_familie),
@@ -92,7 +100,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"fe000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select extensions.is((select count(*)::int from public.person_capability_entries),
   2, 'Eigentuemer sieht die eigenen Eintraege');
-select extensions.is((select count(*)::int from public.capability_areas), 43,
+select extensions.is((select count(*)::int from public.capability_areas), 48,
   'das Vokabular ist fuer Mitglieder lesbar');
 reset role;
 

@@ -193,9 +193,23 @@ Die acht Familien mit ihren IDs:
 | `operations_people` | Operations, People & Organisation | Operations, People & Organisation |
 | `legal_governance` | Recht, Governance & Compliance | Legal, Governance & Compliance |
 
+**Nachgetragen am 21.09.2026: eine neunte Familie.**
+
+| ID | DE | EN |
+|---|---|---|
+| `communication_representation` | Aussenauftritt & Moderation | Representation & Facilitation |
+
+Mit den Bereichen `public_speaking`, `facilitation`, `networking`, `difficult_conversations`, `teaching_mentoring`.
+
+Der Anlass war ein Satz aus der Produktarbeit: "Ihr seid beide sehr ruhig, eher zurueckhaltend, dann braeuchtet ihr vielleicht noch jemanden, der praesentieren kann." Das liess sich in diesem Modell nicht sagen - die acht Familien sind rein fachlich, und das Align-Modell kennt Unternehmenslogik, Entscheidungslogik, Arbeitsstruktur, Commitment, Risiko und Konfliktstil, aber keinen Aussenauftritt.
+
+**Als Zustaendigkeit, nicht als Charakter.** Die Bereiche tragen dieselbe Anwendungsstufe und denselben Ownership-Wunsch wie alle anderen. Es gibt hier ausdruecklich keine Skala "wie offen bist du" - die Aussage lautet "vor Gruppen sprechen will hier niemand verantworten" und nicht "ihr seid zurueckhaltend". Der Unterschied ist nicht kosmetisch: Die Teamauswertung ist fuer andere Teammitglieder sichtbar, und eine Persoenlichkeitsbehauptung ueber einen Menschen hat dort nichts zu suchen.
+
+Neun Zeilen bleiben in der Deckungsansicht lesbar; die Grenze aus 4.2 ist damit nicht ueberschritten.
+
 ### 4.3 Kuratierte Bereichsliste
 
-42 Bereiche, vier bis sieben pro Familie. Die Groesse ist bewusst gewaehlt: Der Snapshot fragt zuerst die Familien, danach erscheinen nur die Bereiche der gewaehlten Familien. Wer zwei bis drei Familien waehlt, sieht rund zehn bis zwanzig Bereiche - eine Menge, die man tatsaechlich durchklickt.
+42 Bereiche in den acht fachlichen Familien, vier bis sieben pro Familie - dazu die fuenf aus 4.2 nachgetragenen, also 47. Die Groesse ist bewusst gewaehlt: Der Snapshot fragt zuerst die Familien, danach erscheinen nur die Bereiche der gewaehlten Familien. Wer zwei bis drei Familien waehlt, sieht rund zehn bis zwanzig Bereiche - eine Menge, die man tatsaechlich durchklickt.
 
 **`customer_market`**
 
