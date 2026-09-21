@@ -562,7 +562,24 @@
     },
     "legendTitle": "What the markers mean",
     "legendStages": "How far you are: open · in discussion · awaiting confirmation · settled.",
-    "legendOutcomes": "How a topic ends is shown by the last marker – clarified, additionally documented, or not relevant for you."
+    "legendOutcomes": "How a topic ends is shown by the last marker – clarified, additionally documented, or not relevant for you.",
+    "conversationPoints": {
+      "title": "You wanted to talk about this",
+      "text": "Marked in Founder in the Wild or Read My Mind. Expand it here instead of going over – the half-typed sentence stays put.",
+      "partnerFallback": "your co-founder",
+      "markedByMe": "Marked by you",
+      "markedByPartner": "{name} would like to talk about this",
+      "markedByBoth": "You both marked this",
+      "yourAnswer": "You",
+      "partnerAnswer": "{name}",
+      "sealed": "You have not opened this card yet. Once you do that in the lab, both answers appear here.",
+      "openInLab": "See the whole situation in the lab",
+      "listHint": "{count, plural, =1 {1 conversation point} other {# conversation points}}",
+      "experiences": {
+        "founder_in_the_wild": "Founder in the Wild",
+        "read_my_mind": "Read My Mind"
+      }
+    }
   },
   "dashboard": {
     "eyebrow": "Shared areas",

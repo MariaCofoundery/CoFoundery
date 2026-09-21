@@ -562,7 +562,24 @@
     },
     "legendTitle": "Was die Zeichen bedeuten",
     "legendStages": "Wie weit ihr seid: offen · in Klärung · Bestätigung offen · abgeschlossen.",
-    "legendOutcomes": "Wie ein Thema endet, zeigt das letzte Zeichen – geklärt, zusätzlich dokumentiert oder für euch nicht relevant."
+    "legendOutcomes": "Wie ein Thema endet, zeigt das letzte Zeichen – geklärt, zusätzlich dokumentiert oder für euch nicht relevant.",
+    "conversationPoints": {
+      "title": "Darüber wolltet ihr sprechen",
+      "text": "Markiert in Founder in the Wild oder Read My Mind. Aufklappen, statt hinüberzugehen – der halb getippte Satz bleibt stehen.",
+      "partnerFallback": "dein Co-Founder",
+      "markedByMe": "Von dir markiert",
+      "markedByPartner": "{name} möchte darüber sprechen",
+      "markedByBoth": "Ihr habt das beide markiert",
+      "yourAnswer": "Du",
+      "partnerAnswer": "{name}",
+      "sealed": "Du hast diese Karte noch nicht aufgedeckt. Sobald du das im Lab tust, stehen hier beide Antworten.",
+      "openInLab": "Die ganze Situation im Lab ansehen",
+      "listHint": "{count, plural, =1 {1 Gesprächspunkt} other {# Gesprächspunkte}}",
+      "experiences": {
+        "founder_in_the_wild": "Founder in the Wild",
+        "read_my_mind": "Read My Mind"
+      }
+    }
   },
   "dashboard": {
     "eyebrow": "Gemeinsame Bereiche",

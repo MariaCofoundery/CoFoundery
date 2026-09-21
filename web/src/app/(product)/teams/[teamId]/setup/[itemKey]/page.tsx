@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { ConversationPointsCard } from "@/features/collaborationLab/ConversationPointsCard";
+import { getCollaborationConversationPoints } from "@/features/collaborationLab/collaborationConversationPoints";
 import { GlossaryText } from "@/features/founderLibrary/GlossaryText";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
@@ -18,6 +20,7 @@ import {
   saveFounderSetupWorkingStateAction,
   withdrawFounderSetupConfirmationAction,
 } from "@/features/teams/founderSetupActions";
+import { normalizeLocale } from "@/i18n/config";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 type Props = {
@@ -48,6 +51,16 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
     getFounderSetupDiscussion(teamId, itemKey, supabase),
   ]);
   const discussionThreads = groupFounderSetupDiscussionEntries(discussionEntries);
+  // Erst nach der Sprache, weil die Titel und die Antworten aus dem
+  // eingefrorenen Inhalt kommen und in der Sprache der lesenden Person
+  // dastehen muessen.
+  const conversationPoints = await getCollaborationConversationPoints({
+    teamId,
+    itemKey,
+    userId: user.id,
+    locale: normalizeLocale(locale),
+    client: supabase,
+  });
   const dateFormatter = new Intl.DateTimeFormat(getPresentationLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
@@ -176,6 +189,10 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
       />
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}
       <div className="mt-6 grid gap-6">
+        {/* VOR DER BESPRECHUNG, NICHT DANACH: Was im Lab markiert wurde, ist
+            der Anlass fuer das, was hier gleich getippt wird. Stuende es
+            darunter, waere es ein Anhang. */}
+        <ConversationPointsCard points={conversationPoints} />
         {revisionCard("current")}
         <section className={CARD} aria-labelledby="discussion-title">
           <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
