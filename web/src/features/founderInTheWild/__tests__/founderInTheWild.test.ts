@@ -89,7 +89,11 @@ test("new and existing rounds resolve to the real App Router round segment", () 
   const entryPage = readFileSync(`${root}/src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/page.tsx`, "utf8");
   assert.match(actions, /getFounderInTheWildRound\(team, result\.data, user\.id, supabase\)/);
   assert.match(actions, /redirect\(roundHref\(teamId, round\.id\)\)/);
-  assert.match(entryPage, /founderInTheWildRoundHref\(teamId, round\.id\)/);
+  // ANGEPASST AM 21.09.2026: Hieß vorher `round.id`. Die Einstiegsseite sucht
+  // seit der Reparatur die offenen Runden JE PACK (`openRound`), weil eine
+  // laufende Runde des zweiten Packs unsichtbar war. Geprüft wird weiter, dass
+  // der Link aus dem Helfer kommt und nicht aus einer zweiten Kopie des Pfads.
+  assert.match(entryPage, /founderInTheWildRoundHref\(teamId, openRound\.id\)/);
   assert.match(actions, /"create_round"/);
   assert.match(diagnostics, /operation[\s\S]*code/);
   assert.doesNotMatch(diagnostics, /userId|teamId|roundId|email|choice|token/);

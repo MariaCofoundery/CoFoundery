@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 import { IN_APP_NOTICE_KINDS } from "@/features/notifications/inAppNotice";
 
@@ -16,6 +16,11 @@ const NETWORK = "src/features/notifications/networkNotification.ts";
 const ACTIONS = "src/features/notifications/inAppNoticeActions.ts";
 const WILD = "src/features/founderInTheWild/founderInTheWildActions.ts";
 const READ_MY_MIND = "src/features/collaborationLab/readMyMindActions.ts";
+const WILD_DATA = "src/features/founderInTheWild/founderInTheWildData.ts";
+const WILD_ENTRY =
+  "src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/page.tsx";
+const WILD_REVEAL =
+  "src/app/(product)/teams/[teamId]/collaboration-lab/founder-in-the-wild/[roundId]/reveal/page.tsx";
 
 // ---------------------------------------------------------------------------
 // Hinweise in der Anwendung
@@ -35,12 +40,25 @@ test("die Liste der Arten im Code und in der Datenbank ist dieselbe", () => {
   // Wäre sie im Code kürzer, gäbe es einen Anlass ohne Hinweis. Wäre sie
   // länger, liefe ein Hinweis in einen Constraint-Fehler - und zwar erst beim
   // Nutzer, weil hier nichts ihn vorher bemerkt.
-  const migration = sqlCodeOnly(MIGRATION);
-  const block = migration.slice(
-    migration.indexOf("in_app_notices_kind_check"),
-    migration.indexOf("in_app_notices_path_check")
-  );
-  const inDatabase = [...block.matchAll(/'([a-z_]+)'/g)].map((match) => match[1]).sort();
+  //
+  // GELESEN WERDEN ALLE MIGRATIONEN, nicht die eine, die die Tabelle angelegt
+  // hat: Der Constraint wurde am 21.09.2026 schon einmal ersetzt, um eine Art
+  // hinzuzufügen. Ein Test, der nur die erste Datei liest, prüft ab dann eine
+  // Fassung, die es nicht mehr gibt - genau der Fehler, der bei den
+  // Fähigkeitsfeldern eine ganze Familie unsichtbar gemacht hat.
+  const dir = "../supabase/migrations";
+  const blocks = readdirSync(dir)
+    .filter((name) => name.endsWith(".sql"))
+    .sort()
+    .flatMap((name) => {
+      const sql = sqlCodeOnly(`${dir}/${name}`);
+      const start = sql.indexOf("in_app_notices_kind_check check");
+      return start === -1 ? [] : [sql.slice(start, sql.indexOf("))", start))];
+    });
+  assert.ok(blocks.length > 0, "die Werteliste steht in keiner Migration");
+  const inDatabase = [...blocks[blocks.length - 1]!.matchAll(/'([a-z_]+)'/g)]
+    .map((match) => match[1])
+    .sort();
   assert.deepEqual(inDatabase, [...IN_APP_NOTICE_KINDS].sort());
 });
 
@@ -165,4 +183,100 @@ test("die Liste zeigt nur, was noch wartet", () => {
   // zwei Wochen eine Liste, die niemand mehr ansieht.
   const data = codeOnly("src/features/notifications/inAppNoticeData.ts");
   assert.equal((data.match(/\.is\("read_at", null\)/g) ?? []).length, 2);
+});
+
+// ---------------------------------------------------------------------------
+// "Darüber möchte ich sprechen" erreicht die andere Seite
+// ---------------------------------------------------------------------------
+//
+// GEMELDET AM 21.09.2026: "Ich habe auch markiert, darüber möchte ich
+// sprechen, aber da kam jetzt bei dem anderen Profil noch keine Nachricht an."
+// Die Markierung stand nur auf der Reveal-Seite - wer nicht von sich aus
+// dieselbe Karte noch einmal aufmachte, erfuhr nie davon. Damit war ihr
+// einziger Zweck verfehlt.
+
+test("beide Erlebnisse melden eine Markierung an die andere Seite", () => {
+  // Eine Art für beide, weil beide dieselbe Markierungsfunktion benutzen.
+  for (const path of [WILD, READ_MY_MIND]) {
+    const code = codeOnly(path);
+    assert.match(code, /kind: "collaboration_conversation_marker"/, path);
+    assert.match(code, /recipientUserId: round\.partner\.userId/, path);
+    // Der Vorgang ist der Prompt, nicht die Runde: Sonst gäbe es je Runde nur
+    // einen Hinweis, und der zweite markierte Punkt wäre stumm.
+    assert.match(code, /subjectId: roundPromptId/, path);
+  }
+});
+
+test("wer die Markierung zurücknimmt, nimmt den Hinweis mit", () => {
+  // Ein Hinweis, der stehen bleibt, schickt die andere Person zu einem
+  // Gesprächspunkt, den es nicht mehr gibt.
+  for (const path of [WILD, READ_MY_MIND]) {
+    assert.match(codeOnly(path), /withdrawInAppNotice/, path);
+  }
+});
+
+test("ein Hinweis entsteht nur, wenn die Markierung wirklich gesetzt wurde", () => {
+  // Sonst stünde ein Hinweis für etwas, das nicht geschehen ist.
+  const wild = codeOnly(WILD);
+  assert.ok(
+    wild.indexOf("if (!error)") < wild.indexOf("createInAppNotice(supabase, {"),
+    "der Hinweis muss hinter der Fehlerprüfung der Markierung stehen"
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Das Abschließen führt nicht mehr ins Nirgendwo
+// ---------------------------------------------------------------------------
+//
+// GEMELDET AM 21.09.2026: "Und auch war das Abschließen irgendwie nicht, hat
+// nicht richtig funktioniert. Der Button führte ins Nirgendwo."
+
+test("eine laufende Runde wird in jedem Pack gefunden", () => {
+  // DER FEHLER: Hier stand `.eq("pack_key", "under_pressure_v1")`, ein Rest
+  // aus der Zeit mit einem Pack. Eine laufende Runde des zweiten Packs war
+  // unsichtbar - die Einstiegsseite zeigte "Starten", obwohl eine Runde lief.
+  const data = codeOnly(WILD_DATA);
+  assert.doesNotMatch(data, /pack_key", "under_pressure_v1/);
+  // Und es wird je Pack gesucht, nicht nach einer einzigen Runde: Die
+  // Datenbank lässt je Team und Pack eine offene Runde zu, es können also
+  // zwei offen sein.
+  assert.match(data, /findOpenFounderInTheWildRoundsByPack/);
+  assert.doesNotMatch(
+    data.slice(data.indexOf("findOpenFounderInTheWildRoundsByPack")),
+    /\.in\("status", \["forming", "active"\]\)[^;]*maybeSingle/,
+    "mit maybeSingle wäre zwei offene Runden ein Fehler und damit gar keine"
+  );
+});
+
+test("eine abgeschlossene Runde bleibt erreichbar", () => {
+  // Der Knopf tat mehr als nichts - er räumte alles weg. Gesucht wurde nur
+  // nach offenen Runden, also war die Runde nach dem Abschließen von der
+  // Einstiegsseite und von der Teamseite verschwunden. Das Reveal, das man
+  // gerade gelesen hatte, war nur über die Zurück-Taste erreichbar - und die
+  // markierten Gesprächspunkte mit ihm.
+  assert.match(codeOnly(WILD_DATA), /status", "completed/);
+  const entry = codeOnly(WILD_ENTRY);
+  assert.match(entry, /findCompletedFounderInTheWildRounds/);
+  assert.match(entry, /openLastReveal/);
+});
+
+test("nach dem Abschließen steht da, was passiert ist", () => {
+  // Vorher wechselte nur der Knopf zu einer Zeile Text, und zwar in einer Box,
+  // die es nur gibt, wenn alle Karten offen sind. Die Meldung steht jetzt oben
+  // und bei jedem Besuch.
+  const reveal = codeOnly(WILD_REVEAL);
+  assert.match(reveal, /round\.status !== "active" \? <p role="status"/);
+  assert.match(reveal, /completedNotice/);
+  // Und die Wartemeldung steht nur noch an einer Stelle.
+  assert.equal((reveal.match(/result === "waiting"/g) ?? []).length, 1);
+});
+
+test("beide Sprachen haben die neuen Sätze", () => {
+  for (const locale of ["de", "en"]) {
+    const bundle = JSON.parse(
+      readFileSync(`messages/${locale}/founderInTheWild.json`, "utf8")
+    ) as { reveal: Record<string, string>; entry: Record<string, string> };
+    assert.ok(bundle.reveal.completedNotice, `${locale}: completedNotice fehlt`);
+    assert.ok(bundle.entry.openLastReveal, `${locale}: openLastReveal fehlt`);
+  }
 });

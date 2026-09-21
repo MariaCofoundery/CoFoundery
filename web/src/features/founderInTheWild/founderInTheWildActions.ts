@@ -7,7 +7,7 @@ import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTh
 import { logFounderInTheWildServerError } from "./founderInTheWildDiagnostics";
 import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
-import { createInAppNotice } from "@/features/notifications/inAppNotice";
+import { createInAppNotice, withdrawInAppNotice } from "@/features/notifications/inAppNotice";
 import { sendFounderInTheWildHandoffEmail } from "@/lib/email/sendFounderInTheWildHandoffEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -164,9 +164,46 @@ async function endRound(teamId: string, roundId: string, action: "discard" | "de
 export async function discardFounderInTheWildRoundAction(teamId: string, roundId: string) { return endRound(teamId, roundId, "discard"); }
 export async function declineFounderInTheWildRoundAction(teamId: string, roundId: string) { return endRound(teamId, roundId, "decline"); }
 
+/**
+ * Markieren heisst, die andere Seite darauf ansprechen zu wollen.
+ *
+ * GEMELDET AM 21.09.2026: "Ich habe auch markiert, darueber moechte ich
+ * sprechen, aber da kam jetzt bei dem anderen Profil noch keine Nachricht an."
+ * Die Markierung stand bis dahin nur auf der Reveal-Seite - wer nicht von sich
+ * aus dieselbe Karte noch einmal aufmachte, erfuhr nie davon. Damit war der
+ * einzige Zweck der Markierung verfehlt.
+ *
+ * DIE RUNDE WIRD JETZT GELADEN, weil der Hinweis eine Empfaengerin braucht.
+ * Vorher genuegte die Prompt-Kennung, denn die Pruefung steckt ohnehin in der
+ * Markierungsfunktion.
+ *
+ * Und ein Zuruecknehmen nimmt den Hinweis mit: Wer nicht mehr darueber
+ * sprechen will, soll die andere Person nicht zu einem Punkt schicken, den es
+ * nicht mehr gibt.
+ */
 async function marker(teamId: string, roundId: string, position: number, roundPromptId: string, rpc: "mark_collaboration_prompt_for_conversation" | "unmark_collaboration_prompt_for_conversation") {
-  const { supabase } = await auth(revealHref(teamId, roundId, position));
-  await supabase.rpc(rpc, { p_round_prompt_id: roundPromptId });
+  const { supabase, user } = await auth(revealHref(teamId, roundId, position));
+  const { error } = await supabase.rpc(rpc, { p_round_prompt_id: roundPromptId });
+
+  // Nur wenn die Markierung wirklich gesetzt (oder entfernt) wurde. Sonst
+  // stuende ein Hinweis fuer etwas, das nicht geschehen ist.
+  if (!error) {
+    const team = await getFounderInTheWildTeam(teamId, user.id, supabase);
+    const round = team ? await getFounderInTheWildRound(team, roundId, user.id, supabase) : null;
+    if (round) {
+      const params = {
+        kind: "collaboration_conversation_marker",
+        recipientUserId: round.partner.userId,
+        subjectId: roundPromptId,
+      } as const;
+      if (rpc === "mark_collaboration_prompt_for_conversation") {
+        await createInAppNotice(supabase, { ...params, path: revealHref(teamId, roundId, position) });
+      } else {
+        await withdrawInAppNotice(supabase, params);
+      }
+    }
+  }
+
   refresh(teamId, roundId); redirect(`${revealHref(teamId, roundId, position)}#conversation-marker`);
 }
 

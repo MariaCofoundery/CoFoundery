@@ -14,6 +14,7 @@
     "discovery_intro_request": "Jemand möchte dir vorgestellt werden.",
     "discovery_intro_accepted": "Deine Vorstellungsanfrage wurde angenommen. Jetzt könnt ihr schreiben.",
     "read_my_mind_handoff": "Read My Mind: Die andere Seite hat geantwortet. Du bist dran.",
-    "founder_in_the_wild_handoff": "Founder in the Wild: Die andere Seite hat ausgefüllt. Du bist dran."
+    "founder_in_the_wild_handoff": "Founder in the Wild: Die andere Seite hat ausgefüllt. Du bist dran.",
+    "collaboration_conversation_marker": "Die andere Seite möchte über einen bestimmten Punkt sprechen."
   }
 }

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { startFounderInTheWildRoundAction } from "@/features/founderInTheWild/founderInTheWildActions";
-import { findOpenFounderInTheWildRound, getFounderInTheWildTeam } from "@/features/founderInTheWild/founderInTheWildData";
-import { founderInTheWildEntryHref, founderInTheWildRoundHref } from "@/features/founderInTheWild/founderInTheWildRoutes";
+import { findCompletedFounderInTheWildRounds, findOpenFounderInTheWildRoundsByPack, getFounderInTheWildTeam } from "@/features/founderInTheWild/founderInTheWildData";
+import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "@/features/founderInTheWild/founderInTheWildRoutes";
 import { FOUNDER_IN_THE_WILD_PACKS } from "@/features/founderInTheWild/founderInTheWildContent";
 import { normalizeLocale } from "@/i18n/config";
 import { GuessTallyCard } from "@/features/collaborationLab/GuessTallyCard";
@@ -16,7 +16,7 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
   const supabase = await createClient(); const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
   const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) notFound();
-  const [t, round, rawLocale] = await Promise.all([getTranslations("founderInTheWild.entry"), findOpenFounderInTheWildRound(team, user.id, supabase), getLocale()]);
+  const [t, openRounds, completedRounds, rawLocale] = await Promise.all([getTranslations("founderInTheWild.entry"), findOpenFounderInTheWildRoundsByPack(team, user.id, supabase), findCompletedFounderInTheWildRounds(team, supabase), getLocale()]);
   const locale = normalizeLocale(rawLocale);
   const tally = await getCollaborationGuessTally(supabase, teamId);
   const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName
@@ -30,7 +30,15 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
         zwei gleichzeitig. */}
     <div className="mt-6 grid gap-4">
       {FOUNDER_IN_THE_WILD_PACKS.map((pack) => {
-        const isOpen = round?.pack.key === pack.key;
+        // REPARIERT AM 21.09.2026: Vorher wurde EINE offene Runde gesucht, und
+        // zwar nur aus "Unter Druck". Eine laufende Runde des zweiten Packs war
+        // damit unsichtbar - die Karte zeigte "Starten", obwohl die Runde lief.
+        const openRound = openRounds.get(pack.key);
+        const anyOpen = openRounds.size > 0;
+        // Eine abgeschlossene Runde verschwand vorher vollstaendig - siehe
+        // findCompletedFounderInTheWildRounds. Das Reveal und die markierten
+        // Gespraechspunkte bleiben jetzt erreichbar.
+        const completed = completedRounds.get(pack.key);
         return (
           <section key={pack.key} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
@@ -39,15 +47,22 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
               {pack.hasGuess ? (
                 <p className="mt-2 inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-900">{t("withGuess")}</p>
               ) : null}
+              {completed && !openRound ? (
+                <p className="mt-3 text-sm text-slate-600">
+                  <Link href={founderInTheWildRevealHref(teamId, completed.id)} className="font-semibold text-violet-800 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">
+                    {t("openLastReveal")}
+                  </Link>
+                </p>
+              ) : null}
             </div>
     <GuessTallyCard round={null} summary={tally} partnerName={partnerName} variant="entry" />
             {team.members.length !== 2 ? (
               <p className="text-sm text-slate-600">{t("twoFounders")}</p>
-            ) : round && isOpen ? (
-              <Link href={founderInTheWildRoundHref(teamId, round.id)} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">
-                {t(round.ownAnswerComplete ? "status" : "continue")}
+            ) : openRound ? (
+              <Link href={founderInTheWildRoundHref(teamId, openRound.id)} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">
+                {t(openRound.ownAnswerComplete ? "status" : "continue")}
               </Link>
-            ) : round ? (
+            ) : anyOpen ? (
               <p className="shrink-0 text-sm text-slate-500">{t("otherRoundOpen")}</p>
             ) : (
               <form action={startFounderInTheWildRoundAction.bind(null, teamId, pack.key)}>

@@ -30,7 +30,8 @@
     "discarded": "Die Runde wurde verworfen. Ihr könnt später neu starten.",
     "declined": "Die Runde wurde beendet. Ihr könnt später neu starten.",
     "withGuess": "Mit Raten",
-    "otherRoundOpen": "Ihr habt gerade eine andere Runde offen."
+    "otherRoundOpen": "Ihr habt gerade eine andere Runde offen.",
+    "openLastReveal": "Das letzte Reveal ansehen"
   },
   "round": {
     "back": "Zurück zu Founder in the Wild",
@@ -108,6 +109,7 @@
     "guessMiss": "Da lagst du daneben.",
     "guessMissDetail": "Du hattest getippt: „{guess}“. {name} hat sich anders entschieden.",
     "partnerGuessHit": "{name} hat dich übrigens richtig eingeschätzt.",
-    "partnerGuessMiss": "{name} lag bei dir übrigens auch daneben."
+    "partnerGuessMiss": "{name} lag bei dir übrigens auch daneben.",
+    "completedNotice": "Diese Runde ist abgeschlossen. Das Reveal und deine markierten Gesprächspunkte bleiben hier stehen."
   }
 }

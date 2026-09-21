@@ -56,10 +56,72 @@ export async function getFounderInTheWildRound(team: FounderInTheWildTeam, round
   return readModel;
 }
 
-export async function findOpenFounderInTheWildRound(team: FounderInTheWildTeam, userId: string, client?: Client) {
+/**
+ * Die laufende Runde - egal aus welchem Pack.
+ *
+ * REPARIERT AM 21.09.2026: Hier stand `.eq("pack_key", "under_pressure_v1")`,
+ * ein Rest aus der Zeit, als es nur ein Pack gab. Eine laufende Runde des
+ * zweiten Packs war damit unsichtbar: Die Einstiegsseite und die Karte auf der
+ * Teamseite zeigten "Starten", obwohl schon eine Runde lief - und das Starten
+ * scheiterte dann an der Datenbank, die zu Recht nur eine offene Runde
+ * zulaesst. Von aussen sah das aus wie ein Knopf, der ins Nirgendwo fuehrt.
+ *
+ * Und es wird nach PACK gesucht, nicht nach einer einzigen Runde: Die
+ * Datenbank laesst je Team und Pack eine offene Runde zu
+ * (`collaboration_experience_one_open_round_per_team_pack_idx`), es koennen
+ * also zwei gleichzeitig offen sein. Mit `maybeSingle()` waere das ein Fehler
+ * und damit gar keine Runde - schlimmer als der Fehler, den es ersetzt.
+ */
+export async function findOpenFounderInTheWildRoundsByPack(team: FounderInTheWildTeam, userId: string, client?: Client) {
   const supabase = client ?? await createClient();
-  const result = await supabase.from("collaboration_experience_rounds").select("id").eq("founder_team_id", team.id).eq("experience_key", "founder_in_the_wild").eq("pack_key", "under_pressure_v1").in("status", ["forming", "active"]).maybeSingle();
-  return result.error || !result.data ? null : getFounderInTheWildRound(team, String(result.data.id), userId, supabase);
+  const result = await supabase.from("collaboration_experience_rounds").select("id,pack_key").eq("founder_team_id", team.id).eq("experience_key", "founder_in_the_wild").in("status", ["forming", "active"]).order("created_at", { ascending: false });
+  const byPack = new Map<string, FounderInTheWildRound>();
+  if (result.error || !result.data) return byPack;
+  for (const row of result.data) {
+    const packKey = String(row.pack_key);
+    if (byPack.has(packKey)) continue;
+    const round = await getFounderInTheWildRound(team, String(row.id), userId, supabase);
+    if (round) byPack.set(packKey, round);
+  }
+  return byPack;
+}
+
+/** Fuer die Karte auf der Teamseite: die neueste offene Runde, egal welches Pack. */
+export async function findOpenFounderInTheWildRound(team: FounderInTheWildTeam, userId: string, client?: Client) {
+  const rounds = await findOpenFounderInTheWildRoundsByPack(team, userId, client);
+  return rounds.values().next().value ?? null;
+}
+
+/**
+ * Die letzte abgeschlossene Runde je Pack.
+ *
+ * GEMELDET AM 21.09.2026: "Das Abschliessen hat nicht richtig funktioniert.
+ * Der Button fuehrte ins Nirgendwo." Er tat mehr als nichts - er raeumte alles
+ * weg. Gesucht wurde nur nach offenen Runden, also war die Runde nach dem
+ * Abschliessen von der Einstiegsseite UND von der Teamseite verschwunden. Das
+ * Reveal, das man gerade gelesen hatte, war nur noch ueber die Zurueck-Taste
+ * des Browsers erreichbar, und die markierten Gespraechspunkte mit ihm.
+ */
+export async function findCompletedFounderInTheWildRounds(team: FounderInTheWildTeam, client?: Client) {
+  const supabase = client ?? await createClient();
+  const result = await supabase
+    .from("collaboration_experience_rounds")
+    .select("id,pack_key,completed_at")
+    .eq("founder_team_id", team.id)
+    .eq("experience_key", "founder_in_the_wild")
+    .eq("status", "completed")
+    .order("completed_at", { ascending: false });
+  if (result.error || !result.data) return new Map<string, { id: string; completedAt: string | null }>();
+  // Je Pack die neueste - die Reihenfolge oben sorgt dafuer, dass die erste
+  // gewinnt.
+  const byPack = new Map<string, { id: string; completedAt: string | null }>();
+  for (const row of result.data) {
+    const packKey = String(row.pack_key);
+    if (!byPack.has(packKey)) {
+      byPack.set(packKey, { id: String(row.id), completedAt: row.completed_at as string | null });
+    }
+  }
+  return byPack;
 }
 
 export async function getOpenedFounderInTheWildReveal(params: { team: FounderInTheWildTeam; roundId: string; position: number; userId: string; client?: Client }): Promise<{ round: FounderInTheWildRound; reveal: FounderInTheWildReveal } | null> {

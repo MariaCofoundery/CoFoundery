@@ -30,7 +30,8 @@
     "discarded": "The round was discarded. You can start again later.",
     "declined": "The round was ended. You can start again later.",
     "withGuess": "With guessing",
-    "otherRoundOpen": "You have another round open right now."
+    "otherRoundOpen": "You have another round open right now.",
+    "openLastReveal": "Open the last reveal"
   },
   "round": {
     "back": "Back to Founder in the Wild",
@@ -108,6 +109,7 @@
     "guessMiss": "You got that one wrong.",
     "guessMissDetail": "You guessed: “{guess}”. {name} chose differently.",
     "partnerGuessHit": "{name}, by the way, read you correctly.",
-    "partnerGuessMiss": "{name} got you wrong too, by the way."
+    "partnerGuessMiss": "{name} got you wrong too, by the way.",
+    "completedNotice": "This round is complete. The reveal and the points you marked stay here."
   }
 }

@@ -49,6 +49,7 @@ export const IN_APP_NOTICE_KINDS = [
   "discovery_intro_accepted",
   "read_my_mind_handoff",
   "founder_in_the_wild_handoff",
+  "collaboration_conversation_marker",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];
@@ -76,6 +77,32 @@ export async function createInAppNotice(
     // Bewusst stumm, wie bei Mail und Mitteilung: Ein Hinweis ist eine
     // Beigabe und darf die Handlung nicht mit sich reissen, die ihn ausgeloest
     // hat. Wer eine Anfrage gestellt hat, hat sie gestellt.
+    return false;
+  }
+}
+
+/**
+ * Einen eigenen Hinweis zuruecknehmen, wenn der Anlass verschwindet.
+ *
+ * Der Fall, fuer den es gebaut ist: jemand entfernt seine Markierung
+ * "darueber moechte ich sprechen". Ein Hinweis, der dann stehen bleibt,
+ * schickt die andere Person zu einem Gespraechspunkt, den es nicht mehr gibt.
+ *
+ * Geloescht wird nur die eigene Zeile - das prueft die Funktion in der
+ * Datenbank, nicht diese hier.
+ */
+export async function withdrawInAppNotice(
+  client: SupabaseClient,
+  params: { kind: InAppNoticeKind; recipientUserId: string; subjectId: string }
+) {
+  try {
+    const { data } = await client.rpc("withdraw_in_app_notice", {
+      p_kind: params.kind,
+      p_recipient_user_id: params.recipientUserId,
+      p_subject_id: params.subjectId,
+    });
+    return data === true;
+  } catch {
     return false;
   }
 }

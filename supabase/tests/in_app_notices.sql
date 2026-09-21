@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(14);
+select extensions.plan(19);
 
 -- ---------------------------------------------------------------------------
 -- Hinweise in der Anwendung
@@ -56,7 +56,35 @@ values ('45000000-0000-4000-8000-000000000001','42000000-0000-4000-8000-00000000
   'founder_in_the_wild','under_pressure_v1',1,'41000000-0000-4000-8000-000000000001',0);
 insert into public.collaboration_experience_round_participants(round_id, founder_user_id, position) values
 ('45000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000001',1),
-('45000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000004',2);
+('45000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000002',2);
+
+-- Eine zweite Runde fuer die Blockierung: Eine Runde hat genau zwei Plaetze,
+-- also kann die blockierende Person nicht in derselben sitzen wie Bea. Und sie
+-- braucht ein anderes Pack, weil je Team und Pack nur eine Runde offen sein
+-- darf (`collaboration_experience_one_open_round_per_team_pack_idx`).
+insert into public.collaboration_experience_rounds(
+  id, founder_team_id, experience_key, pack_key, pack_version,
+  created_by_user_id, rotation_offset)
+values ('45000000-0000-4000-8000-000000000002','42000000-0000-4000-8000-000000000001',
+  'founder_in_the_wild','when_it_gets_personal_v1',1,'41000000-0000-4000-8000-000000000001',0);
+insert into public.collaboration_experience_round_participants(round_id, founder_user_id, position) values
+('45000000-0000-4000-8000-000000000002','41000000-0000-4000-8000-000000000001',1),
+('45000000-0000-4000-8000-000000000002','41000000-0000-4000-8000-000000000004',2);
+
+insert into public.founder_team_members(team_id, user_id)
+values ('42000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000002');
+
+insert into public.collaboration_experience_round_prompts(
+  id, round_id, experience_key, pack_key, pack_version, prompt_key, prompt_version, position)
+values ('46000000-0000-4000-8000-000000000001','45000000-0000-4000-8000-000000000001',
+  'founder_in_the_wild','under_pressure_v1',1,'pitch_shifts',1,0),
+('46000000-0000-4000-8000-000000000002','45000000-0000-4000-8000-000000000001',
+  'founder_in_the_wild','under_pressure_v1',1,'customer_by_friday',1,1);
+
+-- Anna hat den ersten Punkt markiert, Bea den zweiten.
+insert into public.collaboration_experience_conversation_markers(round_id, round_prompt_id, participant_user_id) values
+('45000000-0000-4000-8000-000000000001','46000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000001'),
+('45000000-0000-4000-8000-000000000001','46000000-0000-4000-8000-000000000002','41000000-0000-4000-8000-000000000002');
 
 insert into public.network_blocks(blocker_user_id, blocked_user_id)
 values ('41000000-0000-4000-8000-000000000004','41000000-0000-4000-8000-000000000001');
@@ -163,10 +191,75 @@ select extensions.ok(
 select extensions.ok(
   not public.create_in_app_notice(
     'founder_in_the_wild_handoff','41000000-0000-4000-8000-000000000004',
-    '45000000-0000-4000-8000-000000000001','/teams/42000000-0000-4000-8000-000000000001'
+    '45000000-0000-4000-8000-000000000002','/teams/42000000-0000-4000-8000-000000000001'
   ),
   'a block holds even inside a shared round'
 );
+
+-- ---------------------------------------------------------------------------
+-- "Darüber möchte ich sprechen" erreicht die andere Seite
+-- ---------------------------------------------------------------------------
+--
+-- GEMELDET AM 21.09.2026: "Ich habe auch markiert, darüber möchte ich
+-- sprechen, aber da kam jetzt bei dem anderen Profil noch keine Nachricht an."
+-- Die Markierung stand nur auf der Reveal-Seite - damit war ihr einziger Zweck
+-- verfehlt.
+select extensions.ok(
+  public.create_in_app_notice(
+    'collaboration_conversation_marker','41000000-0000-4000-8000-000000000002',
+    '46000000-0000-4000-8000-000000000001',
+    '/teams/42000000-0000-4000-8000-000000000001/collaboration-lab/founder-in-the-wild/45000000-0000-4000-8000-000000000001/reveal/0'
+  ),
+  'my own marker reaches the other side in the round'
+);
+
+-- Eine erfundene Prompt-Kennung ist auch hier wertlos.
+select extensions.ok(
+  not public.create_in_app_notice(
+    'collaboration_conversation_marker','41000000-0000-4000-8000-000000000002',
+    '46000000-0000-4000-8000-00000000ffff','/teams/42000000-0000-4000-8000-000000000001'
+  ),
+  'an invented prompt id leaves nothing behind'
+);
+
+-- UND FREMDE MARKIERUNGEN GEHOEREN MIR NICHT. Bea hat den zweiten Punkt
+-- markiert, nicht Anna. Ohne diese Grenze koennte man im Namen der anderen
+-- Person Gespraechswuensche anmelden, die sie nie geaeussert hat.
+select extensions.ok(
+  not public.create_in_app_notice(
+    'collaboration_conversation_marker','41000000-0000-4000-8000-000000000002',
+    '46000000-0000-4000-8000-000000000002','/teams/42000000-0000-4000-8000-000000000001'
+  ),
+  'a marker set by somebody else is not mine to notify about'
+);
+
+-- ---------------------------------------------------------------------------
+-- Und sie wird zurückgenommen
+-- ---------------------------------------------------------------------------
+-- Wer die Markierung entfernt, will nicht mehr darüber sprechen. Ein Hinweis,
+-- der stehen bleibt, schickt die andere Person zu einem Punkt, den es nicht
+-- mehr gibt.
+select extensions.ok(
+  public.withdraw_in_app_notice(
+    'collaboration_conversation_marker','41000000-0000-4000-8000-000000000002',
+    '46000000-0000-4000-8000-000000000001'
+  ),
+  'withdrawing my own notice removes it'
+);
+
+-- Aber nur die eigene: Sonst waere das der Weg, jemandem unsichtbar zu machen,
+-- dass er dran ist. Anna versucht hier, den Hinweis aus ihrer EIGENEN
+-- Kontaktanfrage-Zeile zu entfernen, indem sie sich als Empfaengerin ausgibt -
+-- geprueft wird `actor_user_id`, nicht der Empfaenger.
+set local request.jwt.claims = '{"sub":"41000000-0000-4000-8000-000000000003","role":"authenticated"}';
+select extensions.ok(
+  not public.withdraw_in_app_notice(
+    'contact_request','41000000-0000-4000-8000-000000000002',
+    '44000000-0000-4000-8000-000000000001'
+  ),
+  'nobody withdraws a notice they did not cause'
+);
+set local request.jwt.claims = '{"sub":"41000000-0000-4000-8000-000000000001","role":"authenticated"}';
 
 -- ---------------------------------------------------------------------------
 -- Niemand schreibt selbst hinein

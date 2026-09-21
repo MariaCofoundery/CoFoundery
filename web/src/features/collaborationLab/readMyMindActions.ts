@@ -6,7 +6,7 @@ import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { isValidReadMyMindSelection } from "@/features/collaborationLab/readMyMindModel";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
-import { createInAppNotice } from "@/features/notifications/inAppNotice";
+import { createInAppNotice, withdrawInAppNotice } from "@/features/notifications/inAppNotice";
 import { sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -294,6 +294,23 @@ async function mutateConversationMarker(
   }
   const { error } = await auth.supabase.rpc(rpc, { p_round_prompt_id: roundPromptId });
   if (error) redirect(revealHref(teamId, roundId, position, "changed"));
+
+  // Die andere Seite erfaehrt davon - siehe founderInTheWildActions.ts, dort
+  // steht die Begruendung. Ein Zuruecknehmen nimmt den Hinweis mit.
+  const markerNotice = {
+    kind: "collaboration_conversation_marker",
+    recipientUserId: round.partner.userId,
+    subjectId: roundPromptId,
+  } as const;
+  if (rpc === "mark_collaboration_prompt_for_conversation") {
+    await createInAppNotice(auth.supabase, {
+      ...markerNotice,
+      path: revealHref(teamId, roundId, position),
+    });
+  } else {
+    await withdrawInAppNotice(auth.supabase, markerNotice);
+  }
+
   refresh(teamId, roundId);
   revalidatePath(revealHref(teamId, roundId, position));
   redirect(`${revealHref(teamId, roundId, position)}#conversation-marker`);
