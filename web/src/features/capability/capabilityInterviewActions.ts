@@ -385,6 +385,19 @@ export async function sortInterviewAnswerAction(formData: FormData) {
   });
   if (!written.ok) redirect(`${SORT_PATH}?error=${written.reason}`);
 
+  // WELCHE BEREICHE AUS DIESER ANTWORT KAMEN - alle, nicht nur der fuehrende.
+  // Der Beleg haengt nur an einem (die Erzaehlung dreimal zu speichern waere
+  // dieselbe Geschichte dreimal im Profil), und ohne diesen Vermerk liesse
+  // sich nachher nicht sagen, welcher Bereich in MEHREREN Geschichten vorkam.
+  //
+  // Stillschweigend: Der Blick zurueck ist eine Zugabe. Er darf das Einordnen
+  // nicht scheitern lassen, das gerade gelungen ist.
+  if (written.areaIds.length > 0) {
+    await client
+      .from("capability_interview_turn_areas")
+      .insert(written.areaIds.map((areaId) => ({ turn_id: turnId, area_id: areaId })));
+  }
+
   // ERST JETZT gilt die Antwort als eingeordnet. Die Reihenfolge ist wichtig:
   // Waere der Verweis vorher gesetzt, verschwaende ein fehlgeschlagenes
   // Schreiben die Antwort aus der Liste - und niemand wuesste, dass sie fehlt.
@@ -431,6 +444,11 @@ export async function resortInterviewAnswerAction(formData: FormData) {
     .delete()
     .eq("id", turn.evidenceId);
   if (deleteError) redirect(`${SORT_PATH}?error=resort`);
+
+  // Die alte Zuordnung der Bereiche zu dieser Antwort geht mit: Sonst zaehlte
+  // der Blick zurueck die alte und die neue Einordnung zusammen, und aus einer
+  // Geschichte wuerden zwei.
+  await client.from("capability_interview_turn_areas").delete().eq("turn_id", turnId);
 
   // ERST NACH DEM LOESCHEN den Verweis loesen. Umgekehrt bliebe bei einem
   // Fehlschlag ein Beleg ohne Antwort daran - und die Geschichte stuende

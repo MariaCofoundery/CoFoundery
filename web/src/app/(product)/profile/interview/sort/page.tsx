@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { resortInterviewAnswerAction } from "@/features/capability/capabilityInterviewActions";
+import { InterviewSummaryView } from "@/features/capability/InterviewSummaryView";
 import {
+  getInterviewSummary,
   getSortedInterviewAnswers,
   getUnsortedInterviewAnswers,
   interviewQuestionMeta,
@@ -43,10 +45,11 @@ export default async function InterviewSortPage({
 
   if (!userResult.data.user) redirect("/login?next=/profile/interview/sort");
 
-  const [unsorted, sorted, vocabulary] = await Promise.all([
+  const [unsorted, sorted, vocabulary, summary] = await Promise.all([
     getUnsortedInterviewAnswers(client),
     getSortedInterviewAnswers(client),
     getCapabilityVocabulary(client),
+    getInterviewSummary(client),
   ]);
 
   const card = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-7";
@@ -150,6 +153,16 @@ export default async function InterviewSortPage({
           </section>
         </>
       )}
+
+      {/* ------------------------------------------------------------------
+          DER BLICK ZURUECK.
+
+          GEMELDET AM 21.09.2026: "Acht Geschichten erzählt, und am Ende kommt
+          kein Blick zurück." Er steht hier und nicht im Profil, weil er ueber
+          ANTWORTEN rechnet und nicht ueber Bereiche - die Auswertung im Profil
+          kann nicht wissen, aus wie vielen Geschichten ein Eintrag kam.
+          ------------------------------------------------------------------ */}
+      {summary.hasContent ? <InterviewSummaryView summary={summary} /> : null}
 
       {/* ------------------------------------------------------------------
           NOCHMAL EINORDNEN.

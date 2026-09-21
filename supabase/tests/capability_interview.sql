@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(18);
+select extensions.plan(21);
 
 -- ---------------------------------------------------------------------------
 -- Der Gesprächsverlauf
@@ -211,6 +211,51 @@ select extensions.ok(
   ),
   'deleting the conversation keeps what it produced'
 );
+
+-- ---------------------------------------------------------------------------
+-- Welche Bereiche aus welcher Antwort kamen
+-- ---------------------------------------------------------------------------
+--
+-- DAZUGEKOMMEN AM 21.09.2026 fuer den Blick zurueck: Der Beleg haengt nur am
+-- fuehrenden Bereich einer Antwort, und ohne diesen Vermerk liesse sich
+-- nachher nicht sagen, welcher Bereich in MEHREREN Geschichten vorkam.
+set local role postgres;
+-- Abgeschlossen, weil es je Person nur EIN aktives Gespraech gibt und weiter
+-- oben schon eines angelegt wurde.
+insert into public.capability_interview_sessions(id, user_id, status, completed_at)
+values ('e2000000-0000-4000-8000-00000000000a','e1000000-0000-4000-8000-000000000001','completed', now());
+insert into public.capability_interview_turns(id, session_id, sort_order, question_source, question_id, answer, answered_at)
+values ('e5000000-0000-4000-8000-00000000000a','e2000000-0000-4000-8000-00000000000a',
+        1,'catalogue','owned_last','Eine Antwort, die zwei Bereiche bestaetigt hat.', now());
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"e1000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
+select extensions.lives_ok(
+  $$insert into public.capability_interview_turn_areas(turn_id, area_id) values
+    ('e5000000-0000-4000-8000-00000000000a','public_speaking'),
+    ('e5000000-0000-4000-8000-00000000000a','facilitation')$$,
+  'an answer can carry several confirmed areas - not only the leading one'
+);
+
+-- Zweimal derselbe Bereich an derselben Antwort waere keine Wiederholung,
+-- sondern ein Zaehlfehler.
+select extensions.throws_ok(
+  $$insert into public.capability_interview_turn_areas(turn_id, area_id)
+    values ('e5000000-0000-4000-8000-00000000000a','public_speaking')$$,
+  '23505',
+  null,
+  'the same area cannot be recorded twice for one answer'
+);
+
+-- Und niemand sonst sieht es.
+set local request.jwt.claims = '{"sub":"e1000000-0000-4000-8000-000000000002","role":"authenticated"}';
+select extensions.is(
+  (select count(*)::int from public.capability_interview_turn_areas),
+  0,
+  'nobody sees which areas came from somebody else answer'
+);
+set local request.jwt.claims = '{"sub":"e1000000-0000-4000-8000-000000000001","role":"authenticated"}';
 
 -- ---------------------------------------------------------------------------
 -- Niemand liest ein fremdes Gespräch

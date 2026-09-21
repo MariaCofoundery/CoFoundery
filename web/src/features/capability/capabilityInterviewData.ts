@@ -8,6 +8,7 @@ import {
   interviewProgress,
   nextCatalogueQuestion,
 } from "./capabilityInterviewGuide";
+import { buildInterviewSummary, type SummarySource } from "./capabilityInterviewSummary";
 
 /**
  * Das laufende Gespräch.
@@ -202,4 +203,56 @@ export async function getSortedInterviewAnswers(client: SupabaseClient) {
     ...toTurn(row),
     evidenceId: row.evidence_id,
   }));
+}
+
+/**
+ * Der Blick zurück auf alle Gespräche.
+ *
+ * ZWEI ABFRAGEN, und die Bereiche kommen aus `capability_interview_turn_areas`
+ * und nicht über den Beleg: Der Beleg hängt nur am FÜHRENDEN Bereich einer
+ * Antwort (die Erzählung dreimal zu speichern wäre dieselbe Geschichte dreimal
+ * im Profil), und der Blick zurück braucht alle bestätigten - sonst übersieht
+ * "was mehrfach vorkam" jeden zweiten und dritten Bereich, und das ist genau
+ * die Aussage, um die es hier geht.
+ *
+ * Kein verschachteltes Embed: Das scheitert still, wenn ein Fremdschlüssel
+ * nicht auf die erwartete Tabelle zeigt - am 21.09.2026 schon einmal passiert
+ * (`person_user_id` zeigt auf `auth.users`), und TypeScript sieht es nicht.
+ */
+export async function getInterviewSummary(client: SupabaseClient) {
+  const { data: turnRows } = await client
+    .from("capability_interview_turns")
+    .select("id, question_id, answer, evidence_id")
+    .order("answered_at", { ascending: true })
+    .limit(200);
+
+  const turns = (turnRows ?? []) as {
+    id: string;
+    question_id: string;
+    answer: string | null;
+    evidence_id: string | null;
+  }[];
+
+  const areasByTurn = new Map<string, string[]>();
+  if (turns.length > 0) {
+    const { data } = await client
+      .from("capability_interview_turn_areas")
+      .select("turn_id, area_id")
+      .in(
+        "turn_id",
+        turns.map((turn) => turn.id)
+      );
+    for (const row of (data ?? []) as { turn_id: string; area_id: string }[]) {
+      areasByTurn.set(row.turn_id, [...(areasByTurn.get(row.turn_id) ?? []), row.area_id]);
+    }
+  }
+
+  const sources: SummarySource[] = turns.map((turn) => ({
+    questionId: turn.question_id,
+    answered: turn.answer !== null,
+    sorted: turn.evidence_id !== null,
+    areaIds: areasByTurn.get(turn.id) ?? [],
+  }));
+
+  return buildInterviewSummary(sources);
 }

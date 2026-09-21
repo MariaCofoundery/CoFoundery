@@ -488,6 +488,25 @@
         "resort": "Opening did not work. Your answer and its sorting are unchanged."
       }
     },
+    "summary": {
+      "title": "Looking back",
+      "text": "{answered, plural, one {One answer} other {# answers}} from this conversation, {personal, plural, =0 {none} one {one} other {#}} of them outside paid work. Here is what came up more than once – nothing you did not confirm yourself.",
+      "provisional": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}} – so this look back is provisional.",
+      "recurringTitle": "What came up more than once",
+      "recurringText": "You confirmed these areas in different stories. That is the most reliable information this method yields – not because it is better, but because it recurs.",
+      "inStories": "{count, plural, one {in one story} other {in # stories}}",
+      "observedTitle": "What others come to you for",
+      "observedText": "From the question about what others repeatedly ask you for help with. That is not a self-assessment but something others observe about you – and often the part you miss in yourself.",
+      "wantingTitle": "What you want and what you don't",
+      "wantingText": "Being able is not wanting. For a team that distinction matters as much as the ability itself, and it is almost never asked.",
+      "handOver": "You would rather hand over",
+      "growInto": "You would like to take on",
+      "singleTitle": "Mentioned once",
+      "singleText": "Confirmed in one story. That means told once – not worth less.",
+      "openTitle": "What stayed open",
+      "skipped": "{count, plural, one {You skipped one question} other {You skipped # questions}}. That is an answer, and it stays one.",
+      "withoutArea": "{count, plural, one {For one answer} other {For # answers}} no area was found. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself in your profile."
+    },
     "questions": {
       "owned_last": {
         "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",
