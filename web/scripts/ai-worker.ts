@@ -26,6 +26,7 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
+import { extractResources } from "@/features/ai/resourceExtraction";
 import { getAiModel, isModelReachable } from "@/lib/ai/ollama";
 
 /** Wie oft nachgefragt wird, wenn nichts daliegt. */
@@ -92,7 +93,7 @@ async function signIn(): Promise<SupabaseClient> {
  * bei Erfolg. Wirft nicht: Ein Absturz hier wuerde die Aufgabe auf "laufend"
  * stehen lassen, bis die zehn Minuten abgelaufen sind.
  */
-async function runJob(job: AiJob): Promise<ErrorCode | null> {
+async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | null> {
   switch (job.job_type) {
     case "ping": {
       // Prueft die Kette Anwendung -> Schlange -> Arbeiter -> Modell -> zurueck,
@@ -101,6 +102,42 @@ async function runJob(job: AiJob): Promise<ErrorCode | null> {
       // Daten ausprobieren muessen.
       return (await isModelReachable(5_000)) ? null : "model_unreachable";
     }
+    case "connect_resource_extraction": {
+      // Der Text kommt aus einer engen Funktion, nicht aus der Tabelle: Der
+      // Arbeiter darf `network_listings` nicht lesen und soll es auch nicht.
+      // Er bekommt genau den einen Text, zu dem er eine Aufgabe in der Hand
+      // hat - und nur, solange sie laeuft und der Text veroeffentlicht ist.
+      const { data: sourceText, error } = await client.rpc("get_ai_job_source_text", {
+        p_job_id: job.id,
+      });
+      if (error) return "source_missing";
+      if (typeof sourceText !== "string" || sourceText.trim().length < 40) {
+        // Zurueckgezogen, geloescht oder zu kurz, um etwas daraus zu lesen.
+        return "source_missing";
+      }
+
+      const proposals = await extractResources(sourceText, getAiModel());
+      if (proposals === null) return "model_unreachable";
+
+      // Jeder Vorschlag geht einzeln hinein, und die Datenbank prueft das
+      // Zitat noch einmal gegen die Quelle. Ein abgelehnter nimmt die anderen
+      // nicht mit - er war nur nicht belegbar.
+      for (const proposal of proposals) {
+        await client.rpc("insert_ai_resource_proposal", {
+          p_job_id: job.id,
+          p_kind: proposal.kind,
+          p_label: proposal.label,
+          p_quote: proposal.quote,
+          p_model: getAiModel(),
+          p_prompt_version: PROMPT_VERSION,
+        });
+      }
+
+      // Kein Fund ist ein gueltiges Ergebnis: Nicht in jedem Text steht ein
+      // Zugang. Die Aufgabe gilt als erledigt, damit sie nicht wiederkommt.
+      return null;
+    }
+
     default:
       // Eine Art, die dieses Skript nicht kennt, ist kein Grund für fünf
       // Anläufe. Sie gehört einer neueren Fassung des Arbeiters.
@@ -151,7 +188,7 @@ async function main() {
     }
 
     const startedAt = Date.now();
-    const failure = await runJob(job).catch((): ErrorCode => "model_unusable_answer");
+    const failure = await runJob(client, job).catch((): ErrorCode => "model_unusable_answer");
     const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
 
     if (failure) {

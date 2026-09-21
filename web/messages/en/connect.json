@@ -708,5 +708,20 @@
     "profile": "My profile",
     "listings": "My listings",
     "ventures": "My ventures"
+  },
+  "resources": {
+    "title": "Access and networks",
+    "text": "From your published listings, a language model reads out which doors you can open – people you know, places you can reach, things you can offer. Every suggestion shows the passage it rests on. None of it counts before you agree.",
+    "pendingTitle": "Suggested",
+    "confirmedTitle": "Confirmed",
+    "quote": "“{quote}”",
+    "confirm": "That's right, keep it",
+    "reject": "Discard",
+    "privateNote": "So far this is visible only to you. Whether and where it ever appears in your profile is a decision you make explicitly, later.",
+    "kinds": {
+      "network": "Knows",
+      "access": "Access to",
+      "offer": "Can offer"
+    }
   }
 }

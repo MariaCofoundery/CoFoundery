@@ -10,6 +10,8 @@ import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectPhotoField } from "@/features/connect/ConnectPhotoField";
 import { connectPhotoUrl } from "@/features/connect/ConnectAvatar";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
+import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
+import { getOwnPersonResources } from "@/features/ai/personResources";
 
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 const field =
@@ -33,7 +35,7 @@ const ERROR_KEYS = [
 
 export default async function ConnectProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/profile");
-  const [profile, baseProfile, core, params] = await Promise.all([getOwnConnectProfile(client, user.id), getProfileBasicsRow(client, user.id).catch(() => null), getPersonCore(client, user.id), searchParams]);
+  const [profile, baseProfile, core, params, resources] = await Promise.all([getOwnConnectProfile(client, user.id), getProfileBasicsRow(client, user.id).catch(() => null), getPersonCore(client, user.id), searchParams, getOwnPersonResources(client)]);
   const continuation = params.next?.startsWith("/connect/l/") && !params.next.startsWith("//") ? params.next : "";
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
@@ -165,5 +167,9 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
       <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("profile.consent")} <Link href="/datenschutz" className="font-semibold underline underline-offset-2">{t("profile.privacyLink")}</Link></p>
       <div className="flex flex-wrap gap-3"><ConnectSubmitButton intent="publish" label={t("profile.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold" /><ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 text-sm font-semibold" /></div>
     </form>
+
+    {/* Die Zugaenge stehen NEBEN dem Formular und nicht darin: Sie sind keine
+        Angabe, die man abschickt, sondern eine Entscheidung je Vorschlag. */}
+    <ResourceProposalSection proposals={resources} />
   </main>;
 }

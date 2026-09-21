@@ -708,5 +708,20 @@
     "profile": "Mein Profil",
     "listings": "Meine Einträge",
     "ventures": "Meine Unternehmen"
+  },
+  "resources": {
+    "title": "Zugänge und Netzwerke",
+    "text": "Aus deinen veröffentlichten Anzeigen liest ein Sprachmodell heraus, welche Zugänge du mitbringst – Menschen, die du kennst, Orte, an die du herankommst, Dinge, die du anbieten kannst. Jeder Vorschlag zeigt die Stelle, auf die er sich stützt. Nichts davon gilt, bevor du zustimmst.",
+    "pendingTitle": "Vorgeschlagen",
+    "confirmedTitle": "Bestätigt",
+    "quote": "„{quote}“",
+    "confirm": "Stimmt, übernehmen",
+    "reject": "Verwerfen",
+    "privateNote": "Sichtbar ist das bisher nur für dich. Ob und wo diese Angaben einmal in deinem Profil erscheinen, entscheidest du später ausdrücklich.",
+    "kinds": {
+      "network": "Kennt",
+      "access": "Zugang zu",
+      "offer": "Kann anbieten"
+    }
   }
 }

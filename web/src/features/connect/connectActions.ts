@@ -156,6 +156,16 @@ export async function saveConnectListingAction(formData: FormData) {
       direction: values.direction,
       category: values.category,
     });
+
+    // Und die Auswertung auf Zugaenge - erst jetzt, weil ein Entwurf fuer
+    // niemanden sichtbar ist, auch nicht fuer ein Modell. Sie wandert in eine
+    // Warteschlange und wird gerechnet, wenn ein Modell laeuft; hier wartet
+    // niemand darauf.
+    await client.rpc("enqueue_ai_job", {
+      p_job_type: "connect_resource_extraction",
+      p_source_table: "network_listings",
+      p_source_id: result.data.id,
+    });
   }
 
   refresh();
