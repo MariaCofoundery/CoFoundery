@@ -11,6 +11,186 @@
       "seconds": 9.64,
       "wav": "owned_last_hint.wav",
       "mp3": "owned_last_hint.mp3"
+    },
+    "owned_last.followUps.whatWasYours": {
+      "hash": "460595d34f18568f",
+      "seconds": 3.94,
+      "wav": "owned_last_followUps_whatWasYours.wav",
+      "mp3": "owned_last_followUps_whatWasYours.mp3"
+    },
+    "owned_last.followUps.howYouDecidedDone": {
+      "hash": "edf00b7efaf156c6",
+      "seconds": 5.18,
+      "wav": "owned_last_followUps_howYouDecidedDone.wav",
+      "mp3": "owned_last_followUps_howYouDecidedDone.mp3"
+    },
+    "went_wrong.title": {
+      "hash": "f64a857cd69444ac",
+      "seconds": 5.84,
+      "wav": "went_wrong_title.wav",
+      "mp3": "went_wrong_title.mp3"
+    },
+    "went_wrong.hint": {
+      "hash": "3b435567987b8e6c",
+      "seconds": 8,
+      "wav": "went_wrong_hint.wav",
+      "mp3": "went_wrong_hint.mp3"
+    },
+    "went_wrong.followUps.yourOwnPart": {
+      "hash": "a44db9c0ae0f52c3",
+      "seconds": 3.01,
+      "wav": "went_wrong_followUps_yourOwnPart.wav",
+      "mp3": "went_wrong_followUps_yourOwnPart.mp3"
+    },
+    "went_wrong.followUps.whatChanged": {
+      "hash": "dc2de5a711673c3c",
+      "seconds": 2.43,
+      "wav": "went_wrong_followUps_whatChanged.wav",
+      "mp3": "went_wrong_followUps_whatChanged.mp3"
+    },
+    "outside_work.title": {
+      "hash": "632bf529f040ee9b",
+      "seconds": 8.66,
+      "wav": "outside_work_title.wav",
+      "mp3": "outside_work_title.mp3"
+    },
+    "outside_work.hint": {
+      "hash": "fc373c23a633d16a",
+      "seconds": 13.52,
+      "wav": "outside_work_hint.wav",
+      "mp3": "outside_work_hint.mp3"
+    },
+    "outside_work.followUps.whatYouDidYourself": {
+      "hash": "a5bcb1671f9149dc",
+      "seconds": 2.98,
+      "wav": "outside_work_followUps_whatYouDidYourself.wav",
+      "mp3": "outside_work_followUps_whatYouDidYourself.mp3"
+    },
+    "outside_work.followUps.howYouNoticedImpact": {
+      "hash": "fbc3443e6d0ee194",
+      "seconds": 3.13,
+      "wav": "outside_work_followUps_howYouNoticedImpact.wav",
+      "mp3": "outside_work_followUps_howYouNoticedImpact.mp3"
+    },
+    "in_front_of_group.title": {
+      "hash": "7de5e8f9a838ce3f",
+      "seconds": 8.74,
+      "wav": "in_front_of_group_title.wav",
+      "mp3": "in_front_of_group_title.mp3"
+    },
+    "in_front_of_group.hint": {
+      "hash": "a0c197947d88ccf3",
+      "seconds": 11.64,
+      "wav": "in_front_of_group_hint.wav",
+      "mp3": "in_front_of_group_hint.mp3"
+    },
+    "in_front_of_group.followUps.whatYouNeededToUnderstand": {
+      "hash": "18d4fbc014d0497a",
+      "seconds": 3.59,
+      "wav": "in_front_of_group_followUps_whatYouNeededToUnderstand.wav",
+      "mp3": "in_front_of_group_followUps_whatYouNeededToUnderstand.mp3"
+    },
+    "in_front_of_group.followUps.didYouAdapt": {
+      "hash": "c257ab115a220027",
+      "seconds": 5.65,
+      "wav": "in_front_of_group_followUps_didYouAdapt.wav",
+      "mp3": "in_front_of_group_followUps_didYouAdapt.mp3"
+    },
+    "uncomfortable_topic.title": {
+      "hash": "a9bcc30706781c36",
+      "seconds": 7.12,
+      "wav": "uncomfortable_topic_title.wav",
+      "mp3": "uncomfortable_topic_title.mp3"
+    },
+    "uncomfortable_topic.hint": {
+      "hash": "792af7b57541591e",
+      "seconds": 8.28,
+      "wav": "uncomfortable_topic_hint.wav",
+      "mp3": "uncomfortable_topic_hint.mp3"
+    },
+    "uncomfortable_topic.followUps.whyItMattered": {
+      "hash": "6e1f8c41c6c63c83",
+      "seconds": 3.63,
+      "wav": "uncomfortable_topic_followUps_whyItMattered.wav",
+      "mp3": "uncomfortable_topic_followUps_whyItMattered.mp3"
+    },
+    "uncomfortable_topic.followUps.howYouWentAboutIt": {
+      "hash": "50de94d9e59ffb85",
+      "seconds": 4.14,
+      "wav": "uncomfortable_topic_followUps_howYouWentAboutIt.wav",
+      "mp3": "uncomfortable_topic_followUps_howYouWentAboutIt.mp3"
+    },
+    "people_come_to_you.title": {
+      "hash": "dfa07de51a5b2669",
+      "seconds": 7.25,
+      "wav": "people_come_to_you_title.wav",
+      "mp3": "people_come_to_you_title.mp3"
+    },
+    "people_come_to_you.hint": {
+      "hash": "0a62b9edfdc5831a",
+      "seconds": 7.72,
+      "wav": "people_come_to_you_hint.wav",
+      "mp3": "people_come_to_you_hint.mp3"
+    },
+    "people_come_to_you.followUps.lastExample": {
+      "hash": "67159f0b219b8421",
+      "seconds": 2.55,
+      "wav": "people_come_to_you_followUps_lastExample.wav",
+      "mp3": "people_come_to_you_followUps_lastExample.mp3"
+    },
+    "people_come_to_you.followUps.whatYouActuallyDo": {
+      "hash": "c9f43f33f4e099cb",
+      "seconds": 3.39,
+      "wav": "people_come_to_you_followUps_whatYouActuallyDo.wav",
+      "mp3": "people_come_to_you_followUps_whatYouActuallyDo.mp3"
+    },
+    "would_hand_over.title": {
+      "hash": "a9921c49e75f3581",
+      "seconds": 6.24,
+      "wav": "would_hand_over_title.wav",
+      "mp3": "would_hand_over_title.mp3"
+    },
+    "would_hand_over.hint": {
+      "hash": "bb760b2054c35901",
+      "seconds": 8.38,
+      "wav": "would_hand_over_hint.wav",
+      "mp3": "would_hand_over_hint.mp3"
+    },
+    "would_hand_over.followUps.whyStillYou": {
+      "hash": "078cde6b43834795",
+      "seconds": 3.25,
+      "wav": "would_hand_over_followUps_whyStillYou.wav",
+      "mp3": "would_hand_over_followUps_whyStillYou.mp3"
+    },
+    "would_hand_over.followUps.whatSomeoneElseNeeds": {
+      "hash": "c832cdcffc40e6b6",
+      "seconds": 4.72,
+      "wav": "would_hand_over_followUps_whatSomeoneElseNeeds.wav",
+      "mp3": "would_hand_over_followUps_whatSomeoneElseNeeds.mp3"
+    },
+    "want_to_own.title": {
+      "hash": "990ac03d28885a05",
+      "seconds": 7.05,
+      "wav": "want_to_own_title.wav",
+      "mp3": "want_to_own_title.mp3"
+    },
+    "want_to_own.hint": {
+      "hash": "6fa58a94de133273",
+      "seconds": 7.29,
+      "wav": "want_to_own_hint.wav",
+      "mp3": "want_to_own_hint.mp3"
+    },
+    "want_to_own.followUps.whatDrawsYou": {
+      "hash": "b4d792729f83621e",
+      "seconds": 1.63,
+      "wav": "want_to_own_followUps_whatDrawsYou.wav",
+      "mp3": "want_to_own_followUps_whatDrawsYou.mp3"
+    },
+    "want_to_own.followUps.whatYouWouldNeed": {
+      "hash": "c78a287ccd5a8b21",
+      "seconds": 3.75,
+      "wav": "want_to_own_followUps_whatYouWouldNeed.wav",
+      "mp3": "want_to_own_followUps_whatYouWouldNeed.mp3"
     }
   }
 }
