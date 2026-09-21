@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getActiveConnectListings, getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
+import { ConnectHighlight } from "@/features/connect/ConnectHighlight";
+import { getConnectHighlights } from "@/features/connect/connectHighlightData";
 import { ConnectListingCard } from "@/features/connect/ConnectListingCard";
 import { CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES } from "@/features/connect/connectTypes";
 import { coFounderBridgeHref } from "@/features/connect/connectTypes";
@@ -24,7 +26,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
     .some((key) => (filters[key] ?? "").trim().length > 0);
-  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id)]);
+  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id)]);
   // Wie viele Kriterien gesetzt sind - danach richtet sich, ob die
   // Eingrenzung offen oder eingeklappt erscheint.
   const activeFilterCount = ["direction", "category", "remote_mode", "geographic_scope", "topic", "industry"].filter((key) => (filters[key] ?? "").trim().length > 0).length;
@@ -70,6 +72,8 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
       </section>
 
+      <ConnectHighlight highlights={highlights} />
+
       <div className="border-t border-slate-200/80 pt-7">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("browse.title")}</p>
         <div className="mt-4">
@@ -80,16 +84,19 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
       {/* Ein Suchfeld oben, die Eingrenzung eingeklappt. Vorher war es ein
           Formular mit fuenf Feldern ueber den Treffern - das fuehlt sich an
           wie Ausfuellen, nicht wie Anfassen. */}
-      <section className={card}><form className="grid gap-3">
+      {/* KLEINER GEMACHT am 21.09.2026: Der Kasten war so gross wie eine
+          Anzeige und stand vor allem, was man eigentlich sehen will. Jetzt
+          eine Zeile - Suchfeld und "Filter" nebeneinander, ohne Rahmen. */}
+      <section className="rounded-2xl border border-slate-200/70 bg-white/60 p-4"><form className="flex flex-wrap items-center gap-2">
         <input
           name="q"
           type="search"
           defaultValue={filters.q}
-          className={`${field} sm:col-span-2 lg:col-span-4`}
+          className={`${field} min-w-0 flex-1`}
           placeholder={t("filters.search")}
           aria-label={t("filters.search")}
         />
-        <details className="mt-1" open={activeFilterCount > 0}>
+        <details className="w-full" open={activeFilterCount > 0}>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <select name="direction" defaultValue={filters.direction || ""} className={field} aria-label={t("filters.direction")}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select>
@@ -147,6 +154,10 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           {isFiltered ? <Link href="/connect" className={`${action} border border-slate-200`}>{t("empty.reset")}</Link> : null}
           <Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)]`}>{t("empty.createSeeking")}</Link>
           <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200`}>{t("empty.createOffering")}</Link>
+          {/* Dazugekommen am 21.09.2026: Wer noch keine Anzeige hat, hat
+              vielleicht ein Unternehmen - und eine leere Flaeche, die nur nach
+              Anzeigen fragt, sieht aus wie eine Pinnwand. */}
+          <Link href="/connect/ventures/mine" className={`${action} border border-slate-200`}>{t("empty.createVenture")}</Link>
         </div>
       </section>}
     </div>

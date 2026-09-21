@@ -117,7 +117,8 @@
     "createSeeking": "Eigenes Gesuch erstellen",
     "createOffering": "Eigenes Angebot erstellen",
     "firstTitle": "Hier ist noch nichts.",
-    "firstText": "Connect lebt davon, dass jemand anfängt. Sag, was du gerade suchst oder was du beitragen kannst – das ist der erste Eintrag, den andere sehen."
+    "firstText": "Connect lebt davon, dass jemand anfängt. Sag, was du gerade suchst oder was du beitragen kannst – das ist der erste Eintrag, den andere sehen.",
+    "createVenture": "Unternehmen eintragen"
   },
   "form": {
     "direction": "Was möchtest du tun?",
@@ -741,6 +742,20 @@
       "network": "Kennt",
       "access": "Zugang zu",
       "offer": "Kann anbieten"
+    }
+  },
+  "highlight": {
+    "title": "Aus dem Netzwerk",
+    "randomNote": "Zufällig ausgewählt, wechselt bei jedem Aufruf",
+    "kinds": {
+      "seeking": "Sucht",
+      "offering": "Bietet",
+      "venture": "Unternehmen",
+      "person": "Profil"
+    },
+    "disclosures": {
+      "editorial": "Von uns hervorgehoben",
+      "sponsored": "Anzeige"
     }
   }
 }

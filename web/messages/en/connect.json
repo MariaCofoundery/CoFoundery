@@ -117,7 +117,8 @@
     "createSeeking": "Create a need",
     "createOffering": "Create an offer",
     "firstTitle": "Nothing here yet.",
-    "firstText": "Connect only works once someone starts. Say what you are looking for or what you can contribute – that becomes the first entry others see."
+    "firstText": "Connect only works once someone starts. Say what you are looking for or what you can contribute – that becomes the first entry others see.",
+    "createVenture": "Add a company"
   },
   "form": {
     "direction": "What would you like to do?",
@@ -741,6 +742,20 @@
       "network": "Knows",
       "access": "Access to",
       "offer": "Can offer"
+    }
+  },
+  "highlight": {
+    "title": "From the network",
+    "randomNote": "Picked at random, changes on every visit",
+    "kinds": {
+      "seeking": "Looking for",
+      "offering": "Offering",
+      "venture": "Company",
+      "person": "Profile"
+    },
+    "disclosures": {
+      "editorial": "Highlighted by us",
+      "sponsored": "Ad"
     }
   }
 }
