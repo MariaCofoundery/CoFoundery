@@ -768,7 +768,8 @@
       "ventures": "{count, plural, one {1 company} other {# companies}}",
       "offering": "{count, plural, one {1 offer} other {# offers}}",
       "seeking": "{count, plural, one {1 request} other {# requests}}"
-    }
+    },
+    "yours": "That's you"
   },
   "suggestions": {
     "title": "For you",

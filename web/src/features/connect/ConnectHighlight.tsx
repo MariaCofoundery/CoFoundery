@@ -48,8 +48,14 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
             href={highlight.href}
             className="connect-highlight-card flex flex-col rounded-2xl border border-slate-200 bg-white/92 p-4 shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:border-violet-300"
           >
-            <p className="text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
+            <p className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
               {t(`kinds.${highlight.kind}`)}
+              {/* Damit niemand raetselt, warum da der eigene Name steht. */}
+              {highlight.isOwn ? (
+                <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] text-violet-800">
+                  {t("yours")}
+                </span>
+              ) : null}
             </p>
             <h3 className="mt-2 font-semibold leading-6 text-slate-950">{highlight.title}</h3>
             {highlight.text ? (

@@ -768,7 +768,8 @@
       "ventures": "{count, plural, one {1 Unternehmen} other {# Unternehmen}}",
       "offering": "{count, plural, one {1 Angebot} other {# Angebote}}",
       "seeking": "{count, plural, one {1 Gesuch} other {# Gesuche}}"
-    }
+    },
+    "yours": "Das bist du"
   },
   "suggestions": {
     "title": "Für dich",

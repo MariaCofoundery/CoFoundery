@@ -87,15 +87,18 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
       {/* KLEINER GEMACHT am 21.09.2026: Der Kasten war so gross wie eine
           Anzeige und stand vor allem, was man eigentlich sehen will. Jetzt
           eine Zeile - Suchfeld und "Filter" nebeneinander, ohne Rahmen. */}
-      <section className="rounded-2xl border border-slate-200/70 bg-white/60 p-4"><form className="flex flex-wrap items-center gap-2">
-        <input
-          name="q"
-          type="search"
-          defaultValue={filters.q}
-          className={`${field} min-w-0 flex-1`}
-          placeholder={t("filters.search")}
-          aria-label={t("filters.search")}
-        />
+      <section className="rounded-2xl border border-slate-200/70 bg-white/60 p-4"><form className="grid gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            name="q"
+            type="search"
+            defaultValue={filters.q}
+            className={`${field} min-w-0 flex-1`}
+            placeholder={t("filters.search")}
+            aria-label={t("filters.search")}
+          />
+          <button className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
+        </div>
         <details className="w-full" open={activeFilterCount > 0}>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -105,15 +108,21 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         <select name="remote_mode" defaultValue={filters.remote_mode || ""} className={field} aria-label={t("filters.remote")}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select>
         </div>
         </details>
+        {/* Zuruecksetzen nur, wenn es etwas zurueckzusetzen gibt. Die
+            Trefferzahl bleibt sichtbar: Sie ist eine Zeile und beantwortet die
+            Frage, ob das Eingrenzen etwas gebracht hat. */}
         <div className="flex flex-wrap items-center gap-3">
-          <button className="min-h-11 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
           {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
           <span className="ml-auto text-sm text-slate-500">{t("resultCount", { count: listings.length })}</span>
         </div>
       </form>
-        {/* Speichern, was gerade eingegrenzt ist - die Kriterien stehen schon
-            da, niemand soll sie ein zweites Mal eingeben. */}
-        <form action={saveConnectSearchAction} className="mt-4 border-t border-slate-100 pt-4">
+        {/* AUCH EINGEKLAPPT, seit dem 21.09.2026: Dieser Block war der Rest der
+            grossen Filterflaeche - mit der Faehigkeiten-Auswahl darin war er
+            grosser als die eingeklappten Filter darueber. Speichern ist der
+            zweite Schritt nach dem Eingrenzen, nicht der erste beim Ansehen. */}
+        <details className="mt-3 border-t border-slate-100 pt-3">
+        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("rememberSearch")}</summary>
+        <form action={saveConnectSearchAction} className="mt-3">
           <input type="hidden" name="q" value={filters.q ?? ""} />
           <input type="hidden" name="direction" value={filters.direction ?? ""} />
           <input type="hidden" name="category" value={filters.category ?? ""} />
@@ -123,8 +132,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           <input type="hidden" name="industries" value={filters.industry ?? ""} />
           <input type="hidden" name="include_listings" value="1" />
           <input type="hidden" name="include_problems" value="1" />
-          <p className="text-sm font-semibold">{t("rememberSearch")}</p>
-          <p className="mt-1 text-xs leading-5 text-slate-500">{t("searches.saveText")}</p>
+          <p className="text-xs leading-5 text-slate-500">{t("searches.saveText")}</p>
           {/* Die Faehigkeiten waren bisher nur eine Spalte in der Datenbank -
               ohne diese Auswahl liess sich das Kriterium nirgends setzen. */}
           <div className="mt-3">
@@ -141,6 +149,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           </div>
         </form>
         <Link href="/connect/searches" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("searches.open")}</Link>
+        </details>
       </section>
       {listings.length ? <section aria-label={t("browseTitle")} className="grid gap-4 md:grid-cols-2">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
         {/* Zwei verschiedene Leerzustaende, die vorher gleich aussahen.

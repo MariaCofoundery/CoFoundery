@@ -119,9 +119,30 @@ test("der Platz fuer Kampagnen steht schon, aber es gibt noch keine", () => {
   assert.match(page, /getConnectHighlights\(client, user\.id\)/);
 });
 
-test("niemand wird sich selbst hervorgehoben", () => {
-  // Ein Netzwerk, das mir mich zeigt, ist ein Spiegel.
-  assert.match(codeOnly(DATA), /\.neq\("user_id", currentUserId\)/);
+test("man darf sich selbst im Highlight sehen - und erfaehrt es", () => {
+  // GEAENDERT AM 21.09.2026 auf Marias Wunsch: "Ich finde auch voellig okay,
+  // wenn man selber gerade im Highlight ist, dass man sich selber auch sieht.
+  // Dann kann man sich ein bisschen freuen." Vorher war die eigene Person
+  // ausgeschlossen.
+  const data = codeOnly(DATA);
+  assert.doesNotMatch(data, /\.neq\("user_id", currentUserId\)/, "die eigene Person ist wieder ausgeschlossen");
+
+  // Aber die Karte sagt es, sonst wundert man sich, warum da der eigene Name
+  // steht.
+  // Die drei Zuweisungen, nicht die Typzeile mitgezaehlt.
+  assert.equal((data.match(/=== currentUserId/g) ?? []).length, 3, "je Sorte einmal");
+  const component = codeOnly("src/features/connect/ConnectHighlight.tsx");
+  assert.match(component, /highlight\.isOwn \?/);
+  assert.match(component, /t\("yours"\)/);
+
+  for (const locale of ["de", "en"]) {
+    const highlight = (
+      JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
+        highlight: Record<string, string>;
+      }
+    ).highlight;
+    assert.ok(highlight.yours, `${locale}: highlight.yours fehlt`);
+  }
 });
 
 test("nur Veroeffentlichtes erscheint", () => {
@@ -143,12 +164,26 @@ test("das Feld steht vor dem Suchen, nicht danach", () => {
   assert.ok(highlightAt > 0 && highlightAt < tabsAt, "das Feld steht unter der Liste");
 });
 
-test("der Filterkasten ist kleiner als eine Anzeige", () => {
-  // Er stand als volle Karte vor allem, was man eigentlich sehen will.
+test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => {
+  // NACHGEMELDET AM 21.09.2026: "Da ist immer noch diese grosse
+  // Filterfunktion noch nicht eingeklappt." Eingeklappt waren die Auswahlen -
+  // darunter stand aber weiter der Block zum Merken der Suche, mit der
+  // Faehigkeiten-Auswahl darin, und der war groesser als die Filter selbst.
   const page = codeOnly(PAGE);
   const filterSection = page.slice(page.indexOf('name="q"') - 400, page.indexOf('name="q"'));
   assert.doesNotMatch(filterSection, /className=\{card\}/, "der Filter ist wieder eine volle Karte");
+
+  // Zwei eingeklappte Bereiche: die Auswahlen und das Merken.
   assert.match(page, /<details className="w-full" open=\{activeFilterCount > 0\}>/);
+  assert.match(page, /<details className="mt-3 border-t border-slate-100 pt-3">/);
+
+  // Der Knopf steht beim Suchfeld, nicht in einer eigenen Zeile darunter.
+  assert.match(page, /aria-label=\{t\("filters\.search"\)\}[\s\S]{0,200}filters\.apply/);
+
+  // Und die Faehigkeiten-Auswahl liegt hinter dem eingeklappten Merken.
+  const rememberAt = page.indexOf("rememberSearch");
+  const pickerAt = page.indexOf("<CapabilityAreaPicker");
+  assert.ok(rememberAt > 0 && pickerAt > rememberAt);
 });
 
 test("das Leuchten ist abschaltbar, weil Bewegung Schmuck ist", () => {

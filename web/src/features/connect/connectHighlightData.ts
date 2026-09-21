@@ -63,6 +63,15 @@ export type ConnectHighlight = {
    * klicken sollte.
    */
   has: { ventures: number; offering: number; seeking: number } | null;
+  /**
+   * Bin ich das selbst?
+   *
+   * GEWUENSCHT AM 21.09.2026: "Ich finde auch voellig okay, wenn man selber
+   * gerade im Highlight ist, dass man sich selber auch sieht. Dann kann man
+   * sich ein bisschen freuen." Also wird nichts mehr ausgeschlossen - aber die
+   * Karte sagt es, sonst wundert man sich, warum da der eigene Name steht.
+   */
+  isOwn: boolean;
   disclosure: HighlightDisclosure;
 };
 
@@ -147,8 +156,9 @@ export async function getConnectHighlights(
           .from("network_profiles")
           .select("*")
           .eq("status", "active")
-          // Sich selbst hervorzuheben waere ein Spiegel, kein Netzwerk.
-          .neq("user_id", currentUserId)
+          // Kein Ausschluss der eigenen Person mehr (21.09.2026): Sich selbst
+          // im Highlight zu sehen ist eine kleine Freude, und die Karte sagt
+          // dazu, dass es die eigene ist.
           .order("published_at", { ascending: false })
           .limit(WINDOW)
       : Promise.resolve({ data: [] }),
@@ -181,6 +191,7 @@ export async function getConnectHighlights(
       href: `/connect/listings/${listing.id}`,
       person: owner ?? profileByUserId.get(listing.owner_user_id) ?? null,
       has: null,
+      isOwn: listing.owner_user_id === currentUserId,
       disclosure: "none",
     });
   }
@@ -199,6 +210,7 @@ export async function getConnectHighlights(
       href: `/connect/ventures/${venture.id}`,
       person: profileByUserId.get(venture.owner_user_id) ?? null,
       has: null,
+      isOwn: venture.owner_user_id === currentUserId,
       disclosure: "none",
     });
   }
@@ -218,6 +230,7 @@ export async function getConnectHighlights(
       // bleiben. Fuer dreissig Profile zu zaehlen, um drei zu zeigen, waere
       // Arbeit fuer den Papierkorb.
       has: { ventures: 0, offering: 0, seeking: 0 },
+      isOwn: person.user_id === currentUserId,
       disclosure: "none",
     });
   }
