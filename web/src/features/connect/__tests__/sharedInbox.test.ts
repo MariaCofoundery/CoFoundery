@@ -176,12 +176,23 @@ test("aus einem angenommenen Intro führt ein Weg ins Gespräch", () => {
   assert.doesNotMatch(action, /status === "accepted"|requester_user_id/);
 });
 
-test("das Postfach steht in der Leiste, mit dem Ungelesen-Zähler", () => {
+test("das Postfach steht in der Leiste, mit einer Zahl für alles, was dort wartet", () => {
   // Der Zähler war schon da, er hing nur am Connect-Eintrag - also an einem
   // Bereich, den ein Find-Nutzer nicht hat.
+  //
+  // GEÄNDERT AM 21.09.2026: Vorher stand hier `count={unreadConnectMessageCount}`.
+  // Seit die Hinweise ("die andere Seite hat ausgefüllt, du bist dran") im
+  // Postfach stehen, zählt die Zahl beides zusammen - zwei Punkte am selben
+  // Ort wären zwei Fragen an denselben Ort. Deshalb ein eigener Text: "3
+  // ungelesene Nachrichten" wäre falsch, wenn zwei davon Übergaben sind.
   const shell = codeOnly("src/features/navigation/ProductShell.tsx");
   assert.match(shell, /href="\/messages"/);
-  assert.match(shell, /count=\{unreadConnectMessageCount\}/);
+  assert.match(shell, /count=\{messagesAttentionCount\}/);
+  // Und die Zahl entsteht aus beiden Teilen, nicht aus einem.
+  assert.match(
+    shell,
+    /getMessagesAttentionCount\(unreadConnectMessageCount, waitingNoticeCount\)/
+  );
 
   for (const locale of ["de", "en"]) {
     const nav = JSON.parse(readFileSync(`messages/${locale}/navigation.json`, "utf8")) as Record<
@@ -189,7 +200,7 @@ test("das Postfach steht in der Leiste, mit dem Ungelesen-Zähler", () => {
       string
     >;
     assert.ok(nav.messages, `${locale}: der Eintrag hat kein Label`);
-    assert.match(nav.unreadMessagesBadge, /plural/, `${locale}: der Zähler beugt nicht`);
+    assert.match(nav.messagesAttentionBadge, /plural/, `${locale}: der Zähler beugt nicht`);
   }
 });
 

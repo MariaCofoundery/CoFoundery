@@ -59,3 +59,17 @@ export function getConnectListingDaysLeft(expiresAt: string | null | undefined, 
 
 /** Ab wann der Hinweis dringlich wird. Eine Woche reicht, um zu reagieren. */
 export const CONNECT_EXPIRY_WARNING_DAYS = 7;
+
+/**
+ * Die Zahl am Postfach.
+ *
+ * Seit dem 21.09.2026 stehen dort zwei Dinge: ungelesene Nachrichten UND
+ * Hinweise, die auf eine Antwort warten ("die andere Seite hat ausgefuellt,
+ * du bist dran"). Zwei Punkte nebeneinander waeren zwei Fragen an denselben
+ * Ort; wer nachsieht, sieht ohnehin beides. Deshalb eine Zahl - und ein
+ * eigener Text dazu, weil "3 ungelesene Nachrichten" falsch waere, wenn zwei
+ * davon Uebergaben sind.
+ */
+export function getMessagesAttentionCount(unreadMessages: number, waitingNotices: number) {
+  return Math.max(0, unreadMessages) + Math.max(0, waitingNotices);
+}

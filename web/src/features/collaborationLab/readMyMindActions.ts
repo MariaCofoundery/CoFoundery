@@ -6,6 +6,7 @@ import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent
 import { getReadMyMindRound, getReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindData";
 import { isValidReadMyMindSelection } from "@/features/collaborationLab/readMyMindModel";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
+import { createInAppNotice } from "@/features/notifications/inAppNotice";
 import { sendReadMyMindStartedEmail } from "@/lib/email/sendReadMyMindStartedEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -56,6 +57,18 @@ async function sendTeamHandoffNotification(params: {
     (participant) => participant.founder_user_id !== params.creatorUserId && participant.state === "pending"
   ).map((participant) => participant.founder_user_id))];
   if (recipients.length !== 1) return false;
+
+  // Neu am 21.09.2026: der Hinweis in der Anwendung, VOR dem Mail-Schalter -
+  // je Runde einer, denn eine Runde ist der Vorgang, um den es geht. Die
+  // Doppelten faengt die Eindeutigkeit der Tabelle, nicht diese Schleife.
+  for (const claim of params.claims) {
+    await createInAppNotice(params.supabase, {
+      kind: "read_my_mind_handoff",
+      recipientUserId: recipients[0]!,
+      subjectId: claim.round_id,
+      path: entryHref(params.teamId),
+    });
+  }
 
   // Neu am 18.09.2026: eigener Schalter, und die Sprache der EMPFAENGERIN.
   // Vorher kam die Uebergabe ungefragt und in der Sprache der Person, die

@@ -10,7 +10,7 @@ import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge"
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
-import { getConnectAttentionCount } from "@/features/connect/connectPresentation";
+import { getConnectAttentionCount, getMessagesAttentionCount } from "@/features/connect/connectPresentation";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
@@ -27,6 +27,8 @@ type Props = {
   incomingOpenRequestCount: number;
   incomingConnectContactCount: number;
   unreadConnectMessageCount: number;
+  /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
+  waitingNoticeCount: number;
   researchConsentState: ResearchConsentState;
 };
 
@@ -194,6 +196,7 @@ export function ProductShell({
   incomingOpenRequestCount,
   incomingConnectContactCount,
   unreadConnectMessageCount,
+  waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
@@ -240,6 +243,10 @@ export function ProductShell({
         ? "/advisor/dashboard"
         : "/dashboard";
   const connectAttentionCount = getConnectAttentionCount(incomingConnectContactCount, unreadConnectMessageCount);
+  // Am Postfach zaehlen ungelesene Nachrichten und wartende Hinweise
+  // zusammen: Beide fuehren dorthin, und zwei Punkte waeren zwei Fragen an
+  // denselben Ort.
+  const messagesAttentionCount = getMessagesAttentionCount(unreadConnectMessageCount, waitingNoticeCount);
   // Die Leiste traegt Bereiche - Orte, in denen man eine Weile arbeitet.
   // Vorher standen dort fuenf Eintraege nebeneinander, die drei verschiedene
   // Sorten waren: Bereiche, ein Querschnitt (Profil) und eine Unterseite
@@ -339,7 +346,7 @@ export function ProductShell({
   // Auf dem Telefon steht statt der ganzen Reihe ein Knopf. Was dahinter
   // liegt, muss trotzdem sichtbar bleiben - deshalb traegt der Knopf die Summe
   // aller Zaehler. Sonst waere ein geschlossenes Menue ein blinder Fleck.
-  const menuAttentionCount = connectAttentionCount + Math.max(0, incomingOpenRequestCount);
+  const menuAttentionCount = connectAttentionCount + Math.max(0, incomingOpenRequestCount) + Math.max(0, waitingNoticeCount);
 
   function areaBadge(badge: AreaBadge | undefined) {
     if (!badge) return null;
@@ -457,8 +464,8 @@ export function ProductShell({
                   >
                     {t("messages")}
                     <ConnectAttentionBadge
-                      count={unreadConnectMessageCount}
-                      label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
+                      count={messagesAttentionCount}
+                      label={t("messagesAttentionBadge", { count: messagesAttentionCount })}
                     />
                   </Link>
                 ) : null}
@@ -591,8 +598,8 @@ export function ProductShell({
                     onNavigate={closeMenu}
                     badge={
                       <ConnectAttentionBadge
-                        count={unreadConnectMessageCount}
-                        label={t("unreadMessagesBadge", { count: unreadConnectMessageCount })}
+                        count={messagesAttentionCount}
+                        label={t("messagesAttentionBadge", { count: messagesAttentionCount })}
                       />
                     }
                   >

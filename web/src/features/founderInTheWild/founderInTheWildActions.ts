@@ -7,6 +7,7 @@ import { getFounderInTheWildRound, getFounderInTheWildTeam } from "./founderInTh
 import { logFounderInTheWildServerError } from "./founderInTheWildDiagnostics";
 import { founderInTheWildEntryHref, founderInTheWildRevealHref, founderInTheWildRoundHref } from "./founderInTheWildRoutes";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
+import { createInAppNotice } from "@/features/notifications/inAppNotice";
 import { sendFounderInTheWildHandoffEmail } from "@/lib/email/sendFounderInTheWildHandoffEmail";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
@@ -44,6 +45,17 @@ async function claimAndSendHandoff(params: {
   const row = Array.isArray(claim.data) ? claim.data[0] : claim.data;
   const recipientUserId = (row as { recipient_user_id?: unknown } | null)?.recipient_user_id;
   if (typeof recipientUserId !== "string") return;
+
+  // Neu am 21.09.2026: der Hinweis in der Anwendung, und zwar VOR dem
+  // Mail-Schalter. Wer die Uebergabe-Mails abbestellt hat, soll trotzdem
+  // sehen, dass die andere Seite fertig ist und er dran ist - sonst wartet er,
+  // ohne es zu wissen, und genau das war der Grund fuer die Uebergabe.
+  await createInAppNotice(params.supabase, {
+    kind: "founder_in_the_wild_handoff",
+    recipientUserId,
+    subjectId: params.roundId,
+    path: roundHref(params.teamId, params.roundId),
+  });
 
   // Neu am 18.09.2026: eigener Schalter, und die Sprache der Empfaengerin.
   const { data: wanted } = await params.supabase.rpc("wants_email_notification", {

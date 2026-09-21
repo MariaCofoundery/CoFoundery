@@ -44,6 +44,7 @@
   "alignConnections": "Connections",
   "alignLibrary": "Founder Library",
   "messages": "Messages",
+  "messagesAttentionBadge": "{count, plural, =0 {Nothing waiting in the inbox} one {1 item waiting in the inbox} other {# items waiting in the inbox}}",
   "unreadMessagesBadge": "{count, plural, =0 {No unread messages} one {1 unread message} other {# unread messages}}",
   "menuOpen": "Menu",
   "menuClose": "Close",

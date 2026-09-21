@@ -6,6 +6,8 @@ import {
   getConnectConversations,
   getConnectProfilesByUserIds,
 } from "@/features/connect/connectData";
+import { WaitingNotices } from "@/features/notifications/WaitingNotices";
+import { getWaitingInAppNotices } from "@/features/notifications/inAppNoticeData";
 
 /**
  * Ein Postfach fuer alles.
@@ -20,12 +22,21 @@ import {
  * Diese Seite gab es vorher NICHT: Die Gespraechsliste stand mitten auf der
  * Connect-Kontaktseite, zwischen den offenen Anfragen. Man kam an ein Gespraech
  * also nur ueber den Bereich heran, aus dem es stammte.
+ *
+ * SEIT DEM 21.09.2026 STEHT "DU BIST DRAN" DARUEBER: Wer in Align etwas
+ * ausfuellt, gibt damit an die andere Seite ab - und das kam bis dahin nur per
+ * Mail an. Wer die Mails abbestellt hatte oder sie uebersah, liess jemanden
+ * warten, ohne es zu wissen. Es steht hier und nicht in einem eigenen
+ * Bereich: Zwei Orte zum Nachsehen heissen, dass man an einem nicht nachsieht.
  */
 export default async function MessagesPage() {
   const [t, locale] = await Promise.all([getTranslations("connect"), getLocale()]);
   const { client } = await requireSignedInForMessages();
 
-  const conversations = await getConnectConversations(client);
+  const [conversations, notices] = await Promise.all([
+    getConnectConversations(client),
+    getWaitingInAppNotices(client),
+  ]);
   const counterpartIds = conversations
     .map((conversation) => conversation.counterpart_user_id)
     .filter((id): id is string => Boolean(id));
@@ -39,6 +50,8 @@ export default async function MessagesPage() {
         {t("messages.inboxTitle")}
       </h1>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("messages.inboxText")}</p>
+
+      <WaitingNotices notices={notices} />
 
       {conversations.length === 0 ? (
         <div className="mt-8 rounded-3xl border border-dashed border-slate-300 px-5 py-8 text-center">

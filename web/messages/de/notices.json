@@ -1,0 +1,19 @@
+{
+  "title": "Du bist dran",
+  "text": "Hier steht, wo jemand etwas ausgefüllt hat und auf dich wartet.",
+  "open": "Hingehen",
+  "opening": "Öffnet …",
+  "dismiss": "Erledigt",
+  "dismissing": "Wird weggeräumt …",
+  "since": "seit {date}",
+  "badge": "{count, plural, =1 {Eine Sache wartet auf dich} other {# Sachen warten auf dich}}",
+  "kinds": {
+    "contact_request": "Jemand möchte dich kennenlernen. Die Kontaktanfrage wartet auf deine Antwort.",
+    "problem_interest": "Jemand würde an deinem Problem mitarbeiten.",
+    "approach_interest": "Jemand interessiert sich für deinen Ansatz.",
+    "discovery_intro_request": "Jemand möchte dir vorgestellt werden.",
+    "discovery_intro_accepted": "Deine Vorstellungsanfrage wurde angenommen. Jetzt könnt ihr schreiben.",
+    "read_my_mind_handoff": "Read My Mind: Die andere Seite hat geantwortet. Du bist dran.",
+    "founder_in_the_wild_handoff": "Founder in the Wild: Die andere Seite hat ausgefüllt. Du bist dran."
+  }
+}

@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getNetworkNotificationEmailCopy } from "@/features/email/emailMessages";
+import { createInAppNotice } from "@/features/notifications/inAppNotice";
 import { deliverPushToUser } from "@/features/notifications/pushDelivery";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendNetworkNotificationEmail } from "@/lib/email/sendNetworkNotificationEmail";
@@ -28,6 +29,12 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
  *   demselben Anspruch. Ein eigener Zaehler fuer den zweiten Weg waere ein
  *   zweites Regelwerk fuer dieselbe Frage - und die Abbestellungen aus dem
  *   Konto wuerden fuer ihn nicht gelten.
+ *
+ * SEIT DEM 21.09.2026 EIN DRITTER WEG, UND ZWAR AUSSERHALB DIESER VIER REGELN:
+ * der Hinweis in der Anwendung. Er steht vor dem Anspruch, nicht dahinter -
+ * denn der Anspruch prueft `wants_email_notification`, und wer die MAILS
+ * abbestellt hat, hat nicht die Anwendung abbestellt. Sein "hoechstens einmal"
+ * kommt aus der Eindeutigkeit seiner Tabelle. Begruendung in `inAppNotice.ts`.
  */
 
 export type NetworkNotificationKind =
@@ -71,6 +78,21 @@ export async function notifyNetwork(
   }
 ) {
   try {
+    // Zuerst der Weg, der niemanden draussen erreicht: Er haengt an keinem
+    // Schalter, und er braucht auch keine Mailadresse.
+    //
+    // Ausser bei einer Nachricht: Die steht im Postfach, mit Zaehler je
+    // Gespraech. Ein Hinweis daneben, der sagt "da ist eine Nachricht", waere
+    // Rauschen neben der Sache selbst.
+    if (params.kind !== "message") {
+      await createInAppNotice(client, {
+        kind: params.kind,
+        recipientUserId: params.recipientUserId,
+        subjectId: params.subjectId,
+        path: params.path,
+      });
+    }
+
     if (!(await claim(client, params.kind, params.subjectId, params.recipientUserId))) return;
 
     const recipient = await getNotificationRecipient(params.recipientUserId);

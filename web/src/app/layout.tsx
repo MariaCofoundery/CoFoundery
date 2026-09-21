@@ -6,6 +6,7 @@ import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnProfileImage } from "@/features/profile/profileData";
+import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -74,7 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await getRequestUser();
 
-  const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, researchConsentState] = user
+  const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -88,6 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         getIncomingOpenDiscoveryIntroRequestCount(user.id).catch(() => 0),
         getIncomingPendingConnectContactCount(supabase, user.id).catch(() => 0),
         getUnreadConnectMessageCount(supabase).catch(() => 0),
+        getWaitingInAppNoticeCount(supabase).catch(() => 0),
         getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
       ])
     : [
@@ -100,6 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         { avatarId: null, imageUrl: null },
         false,
         false,
+        0,
         0,
         0,
         0,
@@ -131,6 +134,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             incomingOpenRequestCount={incomingOpenRequestCount}
             incomingConnectContactCount={incomingConnectContactCount}
             unreadConnectMessageCount={unreadConnectMessageCount}
+            waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}
           >
             {children}

@@ -1,0 +1,19 @@
+{
+  "title": "Your turn",
+  "text": "This is where somebody has filled something in and is waiting for you.",
+  "open": "Go there",
+  "opening": "Opening …",
+  "dismiss": "Done",
+  "dismissing": "Clearing …",
+  "since": "since {date}",
+  "badge": "{count, plural, =1 {One thing is waiting for you} other {# things are waiting for you}}",
+  "kinds": {
+    "contact_request": "Somebody would like to get to know you. The contact request is waiting for your answer.",
+    "problem_interest": "Somebody would work on your problem with you.",
+    "approach_interest": "Somebody is interested in your approach.",
+    "discovery_intro_request": "Somebody would like to be introduced to you.",
+    "discovery_intro_accepted": "Your introduction request was accepted. You can write to each other now.",
+    "read_my_mind_handoff": "Read My Mind: the other side has answered. Your turn.",
+    "founder_in_the_wild_handoff": "Founder in the Wild: the other side has filled it in. Your turn."
+  }
+}
