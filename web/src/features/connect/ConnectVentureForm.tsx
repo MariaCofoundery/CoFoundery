@@ -173,7 +173,7 @@ export function ConnectVentureForm({
           />
           {venture ? (
             <Link
-              href="/connect/ventures"
+              href="/connect/ventures/mine"
               className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2"
             >
               {t("ventures.cancel")}

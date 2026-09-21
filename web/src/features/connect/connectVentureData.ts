@@ -44,3 +44,32 @@ export function ventureLogoUrl(venture: Pick<ConnectVenture, "id" | "logo_path" 
   if (!venture.logo_path) return null;
   return `/api/connect/venture-logos/${venture.id}?v=${encodeURIComponent(venture.updated_at)}`;
 }
+
+/**
+ * Die Unternehmen im Netzwerk - zum Durchsehen.
+ *
+ * GEBAUT AM 21.09.2026: Es gab nur die EIGENEN. Auf einer Personenkarte stand
+ * "2 Unternehmen", aber es fuehrte kein Weg dorthin.
+ *
+ * Wie bei den Menschen sortiert nach Aktualitaet und nie nach Passung: Sobald
+ * Unternehmen sortiert werden, ist es eine Rangliste.
+ */
+export async function getActiveConnectVentures(client: Client, term?: string) {
+  let query = client
+    .from("network_ventures")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(60);
+
+  const trimmed = (term ?? "").trim();
+  if (trimmed) {
+    // search_text haelt der Trigger aus 20260929120000 aktuell; ilike findet
+    // dabei auch Teile von Komposita.
+    const escaped = trimmed.replace(/[\\%_]/g, (match) => `\\${match}`);
+    query = query.ilike("search_text", `%${escaped}%`);
+  }
+
+  const { data } = await query;
+  return (data ?? []) as ConnectVenture[];
+}

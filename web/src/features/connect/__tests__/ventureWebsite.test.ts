@@ -12,7 +12,12 @@ const codeOnly = (path: string) =>
 
 const FORM = "src/features/connect/ConnectVentureForm.tsx";
 const ACTION = "src/features/connect/connectVentureActions.ts";
-const OWN_PAGE = "src/app/(product)/connect/ventures/page.tsx";
+// Umgezogen am 21.09.2026 (/connect/ventures ist jetzt das Verzeichnis), und
+// zwei neue Stellen kamen dazu: Das Verzeichnis und die Profilseite eines
+// Mitglieds zeigen Websites ebenso - also gilt die Regel dort ebenso.
+const OWN_PAGE = "src/app/(product)/connect/ventures/mine/page.tsx";
+const DIRECTORY_PAGE = "src/app/(product)/connect/ventures/page.tsx";
+const PERSON_PAGE = "src/app/(product)/connect/people/[userId]/page.tsx";
 const PUBLIC_PAGE = "src/app/(public-connect)/connect/p/[publicSlug]/page.tsx";
 
 test("die Adresse steht dort, wo man sie sucht", () => {
@@ -75,7 +80,7 @@ test("nur https, und nur etwas, das ein Ziel im Netz ist", () => {
 });
 
 test("Links auf die Webseite öffnen ein neues Fenster – innen wie außen", () => {
-  for (const page of [OWN_PAGE, PUBLIC_PAGE]) {
+  for (const page of [OWN_PAGE, DIRECTORY_PAGE, PERSON_PAGE, PUBLIC_PAGE]) {
     const content = source(page);
     const link = content.slice(content.indexOf("venture.website"));
     assert.match(link, /target="_blank"/, `${page}: kein neues Fenster`);

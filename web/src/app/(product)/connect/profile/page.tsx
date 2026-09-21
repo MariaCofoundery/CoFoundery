@@ -73,7 +73,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         <h2 className="text-sm font-semibold">{t("ventures.profileLink")}</h2>
         <p className={hint}>{t("ventures.profileLinkHint")}</p>
         <Link
-          href="/connect/ventures"
+          href="/connect/ventures/mine"
           className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
         >
           {t("ventures.title")} →

@@ -12,7 +12,7 @@ const BROWSE_PAGES = [
 ];
 
 /** Die drei Seiten, die einem selbst gehoeren. */
-const OWN_PAGES = ["/connect/profile", "/connect/my", "/connect/ventures"];
+const OWN_PAGES = ["/connect/profile", "/connect/my", "/connect/ventures/mine"];
 
 test("aus Connect führt ein Weg zum Eigenen", () => {
   // Bis 19.09.2026 gab es keinen: Die drei Seiten existierten, aber der

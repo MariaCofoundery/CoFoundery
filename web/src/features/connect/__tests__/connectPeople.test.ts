@@ -210,10 +210,10 @@ test("ohne Suchbegriff wird die Unternehmenstabelle nicht durchsucht", async () 
 // Die Zahlen an den Reitern
 // ---------------------------------------------------------------------------
 test("die Zahl am Personenreiter zaehlt die eigene Person nicht mit", async () => {
-  const { client, recorded } = fakeClient({}, { network_profiles: 7, network_listings: 3, network_problems: 2 });
+  const { client, recorded } = fakeClient({}, { network_profiles: 7, network_ventures: 4, network_listings: 3, network_problems: 2 });
   const counts = await getConnectTabCounts(client, ME);
 
-  assert.deepEqual(counts, { people: 7, listings: 3, problems: 2 });
+  assert.deepEqual(counts, { people: 7, ventures: 4, listings: 3, problems: 2 });
   const [query] = find(recorded, "network_profiles");
   assert.ok(
     query.filters.some(([op, column, value]) => op === "neq" && column === "user_id" && value === ME),

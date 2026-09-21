@@ -204,18 +204,26 @@ export default async function ConnectPeoplePage({
                       {t("people.ventureCount", { count: person.ventureCount })}
                     </span>
                   ) : null}
+                  {/* Bis zum 21.09.2026 stand hier bei allen, die ihr Profil
+                      NICHT oeffentlich gestellt hatten, ein grauer Hinweis
+                      anstelle eines Links - "nur im Netzwerk" hiess faktisch
+                      "gar nicht". Jetzt fuehrt jede Karte auf die Seite im
+                      Netzwerk; die oeffentliche Adresse steht daneben, weil sie
+                      das ist, was man teilen kann. */}
+                  <Link
+                    href={`/connect/people/${person.user_id}`}
+                    className="ml-auto inline-flex min-h-11 items-center font-semibold text-violet-800 hover:underline"
+                  >
+                    {t("people.openProfile")}
+                  </Link>
                   {person.visibility === "public" ? (
                     <Link
                       href={`/connect/p/${person.public_slug}`}
-                      className="ml-auto inline-flex min-h-11 items-center font-semibold text-violet-800 hover:underline"
+                      className="inline-flex min-h-11 items-center text-xs text-slate-500 hover:text-slate-800"
                     >
-                      {t("people.openProfile")}
+                      {t("people.openPublicProfile")}
                     </Link>
-                  ) : (
-                    <span className="ml-auto text-xs text-slate-400">
-                      {t("people.noPublicProfile")}
-                    </span>
-                  )}
+                  ) : null}
                 </div>
               </article>
             ))}

@@ -651,13 +651,23 @@
     "profileLinkHint": "Up to five entries that sit with your profile.",
     "saved": "The entry is saved.",
     "deleted": "The entry was deleted.",
-    "openLinkHint": "Opens the website in a new window"
+    "openLinkHint": "Opens the website in a new window",
+    "directoryTitle": "Companies in the network",
+    "directoryText": "What the people here are working on. Every entry shows who is behind it – one click takes you to them.",
+    "ofPersonTitle": "What this person works on",
+    "searchPlaceholder": "Name, what it does, audience",
+    "audienceLabel": "For",
+    "openWebsite": "Open website",
+    "emptyDirectory": "Nobody has entered a company yet.",
+    "emptySearch": "Nothing is entered for that right now.",
+    "addOwn": "Add your own company"
   },
   "tabs": {
     "label": "Areas in Connect",
     "people": "People",
     "listings": "Offers & requests",
-    "problems": "Unsolved"
+    "problems": "Unsolved",
+    "ventures": "Companies"
   },
   "people": {
     "title": "People in the network",
@@ -686,7 +696,13 @@
     "ventureCount": "{count, plural, one {1 project} other {# projects}}",
     "openProfile": "View profile",
     "noPublicProfile": "This person has not made their page public.",
-    "ownProfileCta": "Edit my profile"
+    "ownProfileCta": "Edit my profile",
+    "openPublicProfile": "Public page",
+    "expertiseTitle": "Expertise and industries",
+    "openToTitle": "Open to",
+    "listingsTitle": "Listings",
+    "problemsTitle": "Unsolved",
+    "noContactYet": "This person has no open listing right now. Direct contact without a listing is coming next – until then you can reach them through one of their listings or through a problem you would work on."
   },
   "postSomething": "Post something",
   "resultCount": "{count, plural, =0 {No entry} one {1 entry} other {# entries}}",

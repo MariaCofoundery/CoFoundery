@@ -34,7 +34,9 @@ test("the audience is its own field, because that is what gets passed on", () =>
   // kann jemanden weiterempfehlen.
   for (const file of [
     "src/features/connect/ConnectVentureForm.tsx",
-    "src/app/(product)/connect/ventures/page.tsx",
+    // Umgezogen am 21.09.2026: Die eigenen liegen unter /mine, weil
+    // /connect/ventures jetzt das Verzeichnis ist.
+    "src/app/(product)/connect/ventures/mine/page.tsx",
     "src/app/(public-connect)/connect/p/[publicSlug]/page.tsx",
   ]) {
     assert.match(source(file), /border-violet-400/, `${file}: die Zielgruppe steht abgesetzt`);

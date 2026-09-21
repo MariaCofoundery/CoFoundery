@@ -27,8 +27,8 @@ const BUCKET = "network-profile-images";
  */
 
 function back(error: string): never {
-  revalidatePath("/connect/ventures");
-  redirect(`/connect/ventures?error=${error}`);
+  revalidatePath("/connect/ventures/mine");
+  redirect(`/connect/ventures/mine?error=${error}`);
 }
 
 function optional(value: FormDataEntryValue | null, min: number, max: number) {
@@ -89,7 +89,7 @@ async function uploadLogo(
 }
 
 export async function saveConnectVentureAction(formData: FormData) {
-  const { client, user } = await requireConnectMember("/connect/ventures");
+  const { client, user } = await requireConnectMember("/connect/ventures/mine");
   const id = String(formData.get("venture_id") ?? "").trim();
 
   const name = String(formData.get("name") ?? "").trim().slice(0, VENTURE_NAME_MAX);
@@ -136,9 +136,9 @@ export async function saveConnectVentureAction(formData: FormData) {
     back(error.message.includes("venture_limit_reached") ? "venture_limit" : "save");
   }
 
-  revalidatePath("/connect/ventures");
+  revalidatePath("/connect/ventures/mine");
   revalidatePath("/connect/profile");
-  redirect("/connect/ventures?saved=venture");
+  redirect("/connect/ventures/mine?saved=venture");
 }
 
 export async function setConnectVentureStatusAction(formData: FormData) {
@@ -153,8 +153,8 @@ export async function setConnectVentureStatusAction(formData: FormData) {
     .eq("owner_user_id", user.id);
   if (error) back("save");
 
-  revalidatePath("/connect/ventures");
-  redirect("/connect/ventures");
+  revalidatePath("/connect/ventures/mine");
+  redirect("/connect/ventures/mine");
 }
 
 export async function deleteConnectVentureAction(formData: FormData) {
@@ -182,6 +182,6 @@ export async function deleteConnectVentureAction(formData: FormData) {
     await client.storage.from(BUCKET).remove([logoPath]);
   }
 
-  revalidatePath("/connect/ventures");
-  redirect("/connect/ventures?saved=venture_deleted");
+  revalidatePath("/connect/ventures/mine");
+  redirect("/connect/ventures/mine?saved=venture_deleted");
 }

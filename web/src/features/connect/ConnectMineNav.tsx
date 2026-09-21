@@ -21,7 +21,7 @@ import { getTranslations } from "next-intl/server";
 const LINKS = [
   { key: "profile", href: "/connect/profile" },
   { key: "listings", href: "/connect/my" },
-  { key: "ventures", href: "/connect/ventures" },
+  { key: "ventures", href: "/connect/ventures/mine" },
 ] as const;
 
 export async function ConnectMineNav() {

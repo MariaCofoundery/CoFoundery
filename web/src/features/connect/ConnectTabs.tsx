@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-type Tab = "people" | "listings" | "problems";
+type Tab = "people" | "ventures" | "listings" | "problems";
 
 /**
  * Drei Reiter, drei Adressen - eine Flaeche.
@@ -20,12 +20,16 @@ export async function ConnectTabs({
   counts,
 }: {
   active: Tab;
-  counts: { people: number; listings: number; problems: number };
+  counts: { people: number; ventures: number; listings: number; problems: number };
 }) {
   const t = await getTranslations("connect");
 
   const tabs: { key: Tab; href: string; count: number }[] = [
     { key: "people", href: "/connect/people", count: counts.people },
+    // Dazugekommen am 21.09.2026: Unternehmen gab es nur als eigene, unter
+    // /connect/ventures. Auf einer Personenkarte stand "2 Unternehmen", und es
+    // fuehrte kein Weg dorthin.
+    { key: "ventures", href: "/connect/ventures", count: counts.ventures },
     { key: "listings", href: "/connect", count: counts.listings },
     { key: "problems", href: "/connect/problems", count: counts.problems },
   ];
