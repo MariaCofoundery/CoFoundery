@@ -9,7 +9,7 @@
     "heroConnections": "Deine Verbindungen",
     "heroConnectionsCount": "{count, plural, =0 {Noch keine Verbindung} one {1 Verbindung} other {# Verbindungen}}",
     "heroFind": "Menschen finden",
-    "heroOwnReport": "Mein Report"
+    "heroOwnProfile": "Gesamtbild"
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",

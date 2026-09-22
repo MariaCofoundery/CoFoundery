@@ -297,10 +297,18 @@ export function ProductShell({
                     // Ergebnis. Hier steht er beim Namen und von jeder
                     // Align-Seite aus.
                     {
-                      href: "/me/report",
-                      label: t("alignOwnReport"),
+                      // GEAENDERT AM 22.09.2026: Hier stand `/me/report`.
+                      // Marias Beobachtung nach dem ersten Blick auf das
+                      // Founderprofil: "Das gehoert oben in die Leiste statt
+                      // mein Report, da ist ja auch der Report im Prinzip
+                      // drin." Stimmt - das Gesamtbild zeigt denselben
+                      // Selbstbericht und daneben, was sonst noch da ist. Zwei
+                      // Eintraege fuer dasselbe Ergebnis waeren zwei Orte, an
+                      // denen man nachsieht.
+                      href: "/me/profile",
+                      label: t("alignOwnProfile"),
                       isActive: (currentPathname: string) =>
-                        currentPathname.startsWith("/me/report"),
+                        currentPathname.startsWith("/me/profile"),
                     },
                     {
                       href: "/founder-library",

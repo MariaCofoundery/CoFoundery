@@ -417,10 +417,10 @@ export default async function DashboardPage({
                     zum Fragebogen, das bleibt ihre Aufgabe. */}
                 {hasIndividualReport ? (
                   <Link
-                    href="/me/report"
+                    href="/me/profile"
                     className="inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100"
                   >
-                    {t("hero.heroOwnReport")}
+                    {t("hero.heroOwnProfile")}
                   </Link>
                 ) : null}
               </div>
