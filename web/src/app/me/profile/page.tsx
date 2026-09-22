@@ -3,10 +3,13 @@ import { getTranslations } from "next-intl/server";
 import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
+import { DIRECTION_FACETS } from "@/features/direction/directionInterviewGuide";
+import { getDirectionStatements } from "@/features/direction/directionStatementData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
+import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -54,14 +57,17 @@ export default async function FounderProfilePage() {
   if (!user) redirect("/login?next=/me/profile");
 
   const supabase = await createClient();
-  const [t, tCapability, core, report, vocabulary, entries] = await Promise.all([
-    getTranslations("profile.founderProfile"),
-    getTranslations("capability"),
-    getPersonCore(supabase, user.id),
-    getLatestSelfAlignmentReport({ locale }),
-    getCapabilityVocabulary(supabase),
-    getOwnCapabilityEntries(supabase, user.id),
-  ]);
+  const [t, tCapability, tDirection, core, report, vocabulary, entries, directionStatements] =
+    await Promise.all([
+      getTranslations("profile.founderProfile"),
+      getTranslations("capability"),
+      getTranslations("direction.statements.facets"),
+      getPersonCore(supabase, user.id),
+      getLatestSelfAlignmentReport({ locale }),
+      getCapabilityVocabulary(supabase),
+      getOwnCapabilityEntries(supabase, user.id),
+      getDirectionStatements(supabase),
+    ]);
 
   const areaLabel = (areaId: string) => tCapability(`areaLabels.${areaId}`);
   const readout = buildCapabilityReadout(entries, vocabulary.areas, vocabulary.families);
@@ -162,6 +168,28 @@ export default async function FounderProfilePage() {
           text={t("missingCapability.text")}
           href="/profile/interview"
           cta={t("missingCapability.cta")}
+        />
+      )}
+
+      {/* DIE VIERTE SÄULE, dazugekommen am 22.09.2026: Das Profil zeigte, wer
+          jemand ist, wie er arbeitet und was er mitbringt - aber nicht, was
+          ihn antreibt. */}
+      {directionStatements.length > 0 ? (
+        <FounderProfileDirection
+          statements={directionStatements}
+          facets={DIRECTION_FACETS}
+          copy={{
+            title: t("direction.title"),
+            intro: t("direction.intro"),
+            facetLabel: (facet) => tDirection(facet),
+          }}
+        />
+      ) : (
+        <MissingPillar
+          title={t("missingDirection.title")}
+          text={t("missingDirection.text")}
+          href="/profile/direction"
+          cta={t("missingDirection.cta")}
         />
       )}
     </main>

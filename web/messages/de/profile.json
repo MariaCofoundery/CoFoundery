@@ -166,6 +166,15 @@
       "title": "Deine Fähigkeiten fehlen noch",
       "text": "Im Interview erzählst du von echten Situationen, und daraus entstehen die Bereiche mit Beleg. Das ist der Teil, der dieses Profil von einer Liste mit Stichworten unterscheidet.",
       "cta": "Interview starten"
+    },
+    "direction": {
+      "title": "Was dir wichtig ist",
+      "intro": "Aus dem Richtungs-Gespräch — nur das, was du selbst bestätigt hast. Die Geschichten dahinter bleiben bei dir."
+    },
+    "missingDirection": {
+      "title": "Deine Richtung fehlt noch",
+      "text": "Sechs Fragen nach echten Situationen zeigen, welche Themen und Veränderungen dich immer wieder anziehen. Das ist der Teil, den ein Lebenslauf nicht hergibt.",
+      "cta": "Gespräch beginnen"
     }
   }
 }

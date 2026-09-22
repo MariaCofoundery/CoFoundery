@@ -67,12 +67,34 @@ test("es gibt keine Gesamtzahl und keinen Score", () => {
 });
 
 test("das Profil behauptet nichts Ungebautes", () => {
-  // Kein "Direction folgt spaeter" auf der Seite: Das Produkt verspricht hier
-  // nur, was es hat. Derselbe Grundsatz wie beim Interview, das nicht
-  // behauptet, ein Coach zu fragen, solange es keinen gibt.
+  // Das Produkt verspricht hier nur, was es hat. Derselbe Grundsatz wie beim
+  // Interview, das nicht behauptet, ein Coach zu fragen, solange es keinen
+  // gibt.
+  //
+  // GEÄNDERT AM 22.09.2026: Hier stand zusätzlich, dass das Wort "Direction"
+  // auf der Seite gar nicht vorkommen darf - damals, weil es die Perspektive
+  // noch nicht gab. Jetzt gibt es sie, und sie steht hier: bestätigte
+  // Aussagen, nach Rubriken. Die Zusage ist dieselbe geblieben, nur ist der
+  // Ausschluss nicht mehr ihr Inhalt.
   const all = [source(PAGE), source("messages/de/profile.json"), source("messages/en/profile.json")].join("\n");
-  assert.doesNotMatch(codeOnly(PAGE), /direction|Direction/);
   assert.doesNotMatch(all, /demnaechst|coming soon|in Vorbereitung/i);
+});
+
+test("die vierte Säule zeigt nur Bestätigtes - und keine Geschichten", () => {
+  // GEWÜNSCHT AM 22.09.2026: "Das Interview gehört auch auf die
+  // Gesamtbild-Seite."
+  //
+  // Es wird dieselbe Grenze gezogen wie bei den Fähigkeiten: Die Antworten
+  // aus dem Gespräch bleiben, wo sie hingehören. Auf ein Profil, das man
+  // ausdruckt und weitergibt, gehören die Aussagen - nicht die Geschichten,
+  // aus denen sie entstanden sind.
+  const page = codeOnly(PAGE);
+  assert.match(page, /getDirectionStatements/);
+  assert.doesNotMatch(page, /getDirectionAnswers|direction_statement_proposals/);
+  const view = codeOnly("src/features/reporting/FounderProfileDirection.tsx");
+  assert.doesNotMatch(view, /quote|evidence|answer/);
+  // Und ein fehlender Teil wird benannt, mit dem Weg dorthin.
+  assert.match(page, /href="\/profile\/direction"/);
 });
 
 test("eine fehlende Saeule wird benannt, aber nicht mitgedruckt", () => {

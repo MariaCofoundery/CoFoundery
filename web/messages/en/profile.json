@@ -166,6 +166,15 @@
       "title": "Your capabilities are still missing",
       "text": "In the interview you tell real situations, and the areas with evidence come out of them. That is the part that makes this profile more than a list of keywords.",
       "cta": "Start the interview"
+    },
+    "direction": {
+      "title": "What matters to you",
+      "intro": "From the direction conversation — only what you confirmed yourself. The stories behind it stay with you."
+    },
+    "missingDirection": {
+      "title": "Your direction is still missing",
+      "text": "Six questions about real situations show which themes and changes keep pulling you in. That is the part a CV cannot give.",
+      "cta": "Start the conversation"
     }
   }
 }
