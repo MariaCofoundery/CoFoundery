@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(13);
 
 -- ---------------------------------------------------------------------------
 -- Das Modell schlaegt vor - die Datenbank rechnet nach
@@ -137,6 +137,26 @@ select extensions.ok(
     'qwen3.5:4b', 'direction-v1'
   ),
   'a quoted proposal goes through'
+);
+
+-- DERSELBE FUND ZWEIMAL IST KEIN FEHLER, sondern nichts Neues.
+--
+-- GESCHEITERT AM 22.09.2026: Die Eindeutigkeit (turn_id, facet, source) kam
+-- erst spaeter dazu, und ohne `on conflict` wuerde der ZWEITE Lauf ueber
+-- dieselbe Antwort hier werfen - eine Ausnahme im Arbeiter nimmt aber den
+-- ganzen Auftrag mit, einschliesslich der Vorschlaege zu den anderen Rubriken.
+-- Wer dieselbe Antwort zweimal lesen laesst (erst einzeln, dann ueber den
+-- Sammelknopf), tut nichts Verbotenes.
+set local request.jwt.claims = '{"sub":"71000000-0000-4000-8000-000000000003","role":"authenticated"}';
+select extensions.ok(
+  not public.insert_ai_direction_proposal(
+    (select id from job_ref),
+    'preferred_contribution',
+    'Ein anderer Satz zur selben Rubrik',
+    'so umgebaut, dass die Leute es ohne Rueckfragen schaffen',
+    'qwen3.5:4b', 'direction-v1'
+  ),
+  'the same facet twice is nothing new, not an error'
 );
 
 -- ---------------------------------------------------------------------------
