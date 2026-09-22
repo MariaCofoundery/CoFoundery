@@ -1,4 +1,5 @@
 import "server-only";
+import { CAPABILITY_INTERVIEW } from "@/features/interviews/interviewKinds";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -77,6 +78,12 @@ export async function getActiveInterview(client: SupabaseClient): Promise<Interv
     .from("capability_interview_sessions")
     .select("id, started_at")
     .eq("status", "active")
+    // DIE ART MUSS DABEISTEHEN, seit die Mechanik geteilt wird: Ohne sie
+    // liefert `maybeSingle()` bei zwei offenen Gespraechen verschiedener Art
+    // einen Fehler, und der wird hier als "kein Gespraech" gelesen. Das
+    // Capability-Interview waere verschwunden, sobald jemand ein
+    // Direction-Interview startet. Begruendung in `interviewKinds.ts`.
+    .eq("kind", CAPABILITY_INTERVIEW)
     .maybeSingle();
 
   // Kein aktives Gespraech ist ein gueltiger Zustand, kein Fehler: Dann steht
@@ -122,6 +129,7 @@ export async function getCompletedInterviews(client: SupabaseClient) {
     .from("capability_interview_sessions")
     .select("id, started_at, completed_at")
     .eq("status", "completed")
+    .eq("kind", CAPABILITY_INTERVIEW)
     .order("completed_at", { ascending: false })
     .limit(10);
 
@@ -165,6 +173,7 @@ export async function getUnsortedInterviewAnswers(client: SupabaseClient) {
     .select(
       "id, sort_order, question_source, question_id, question_text, answer, answered_at, session_id"
     )
+    .eq("kind", CAPABILITY_INTERVIEW)
     .not("answer", "is", null)
     .is("evidence_id", null)
     .order("answered_at", { ascending: true })
@@ -194,6 +203,7 @@ export async function getSortedInterviewAnswers(client: SupabaseClient) {
     .select(
       "id, sort_order, question_source, question_id, question_text, answer, answered_at, evidence_id"
     )
+    .eq("kind", CAPABILITY_INTERVIEW)
     .not("answer", "is", null)
     .not("evidence_id", "is", null)
     .order("answered_at", { ascending: true })
@@ -223,6 +233,7 @@ export async function getInterviewSummary(client: SupabaseClient) {
   const { data: turnRows } = await client
     .from("capability_interview_turns")
     .select("id, question_id, answer, evidence_id")
+    .eq("kind", CAPABILITY_INTERVIEW)
     .order("answered_at", { ascending: true })
     .limit(200);
 

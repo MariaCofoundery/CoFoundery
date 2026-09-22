@@ -142,11 +142,20 @@ select extensions.throws_ok(
 -- Marias Vorgabe aus der KI-Architektur: "Bitte keine versteckten
 -- Chain-of-Thought-Daten speichern oder anfordern." Es gibt hier keine Spalte,
 -- in die so etwas passen wuerde - und das ist pruefbar.
+--
+-- DAZUGEKOMMEN AM 22.09.2026: `kind`. Die Liste wird erweitert und nicht
+-- gelockert - das ist der Sinn dieser Pruefung. Sie hat beim Teilen der
+-- Gespraechsmechanik (Schritt S1) korrekt gebellt, und ein Mensch hat
+-- entschieden, dass diese Spalte hineingehoert: Sie sagt, welches Interview
+-- das war, und sie kann der Sitzung nicht widersprechen (zusammengesetzter
+-- Fremdschluessel auf (id, kind)). Kein Gedankengang, keine Bewertung, keine
+-- Aufnahme.
 select extensions.set_eq(
   $$select column_name::text from information_schema.columns
     where table_schema = 'public' and table_name = 'capability_interview_turns'$$,
-  $$values ('id'), ('session_id'), ('sort_order'), ('question_source'), ('question_id'),
-           ('question_text'), ('answer'), ('answered_at'), ('evidence_id'), ('created_at')$$,
+  $$values ('id'), ('session_id'), ('kind'), ('sort_order'), ('question_source'),
+           ('question_id'), ('question_text'), ('answer'), ('answered_at'),
+           ('evidence_id'), ('created_at')$$,
   'the turn holds question and answer - and nothing else'
 );
 

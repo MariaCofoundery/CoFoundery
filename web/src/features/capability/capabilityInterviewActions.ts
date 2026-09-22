@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { CAPABILITY_INTERVIEW } from "@/features/interviews/interviewKinds";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -147,6 +148,7 @@ export async function startInterviewAction() {
         await client.from("capability_interview_turns").insert({
           session_id: existing.sessionId,
           sort_order: 1,
+          kind: CAPABILITY_INTERVIEW,
           question_source: "catalogue",
           question_id: first.id,
         });
@@ -158,7 +160,10 @@ export async function startInterviewAction() {
 
   const { data: session, error } = await client
     .from("capability_interview_sessions")
-    .insert({ user_id: userId })
+    // Die Art steht ausdruecklich da und nicht nur als Vorgabewert der
+    // Spalte: Der Vorgabewert ist fuer die BESTEHENDEN Zeilen gedacht, damit
+    // keine wandern mussten. Wer neu schreibt, sagt, was er meint.
+    .insert({ user_id: userId, kind: CAPABILITY_INTERVIEW })
     .select("id")
     .single();
   if (error || !session) back("start");
@@ -168,6 +173,7 @@ export async function startInterviewAction() {
     const { error: turnError } = await client.from("capability_interview_turns").insert({
       session_id: session.id,
       sort_order: 1,
+      kind: CAPABILITY_INTERVIEW,
       question_source: "catalogue",
       question_id: first.id,
     });
@@ -326,6 +332,7 @@ async function appendNextQuestion(client: Awaited<ReturnType<typeof createClient
   await client.from("capability_interview_turns").insert({
     session_id: sessionId,
     sort_order: sortOrder,
+    kind: CAPABILITY_INTERVIEW,
     question_source: "catalogue",
     question_id: next.id,
   });
