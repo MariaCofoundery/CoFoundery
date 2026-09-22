@@ -136,5 +136,36 @@
   },
   "welcome": {
     "submit": "Let's start"
+  },
+  "founderProfile": {
+    "eyebrow": "Founder profile",
+    "unnamed": "Your profile",
+    "intro": "Everything you have worked out about yourself in one place: who you are, how you work and what you bring. This page is visible only to you. To pass it on, print it or save it as a PDF.",
+    "backToDashboard": "Back to overview",
+    "base": {
+      "title": "Who you are",
+      "region": "Location and way of working",
+      "expertise": "Areas of expertise",
+      "industries": "Industries",
+      "linkedin": "LinkedIn",
+      "empty": "Nothing about you yet. One sentence about yourself and your focus areas make the difference between a profile and a readout.",
+      "completeCta": "Add details"
+    },
+    "capability": {
+      "title": "What you bring",
+      "intro": "Per area: how often you have applied it and how you would see responsibility for it. The situations you told in the interview are deliberately not shown here — they stay on your profile page.",
+      "evidenceCount": "{count, plural, =1 {1 piece of evidence} other {# pieces of evidence}}",
+      "noLevel": "Level still open"
+    },
+    "missingReport": {
+      "title": "Your self-report is still missing",
+      "text": "The questionnaire shows how you work and what matters to you. Without it the profile is missing half — the half people ask about most.",
+      "cta": "Fill in the questionnaire"
+    },
+    "missingCapability": {
+      "title": "Your capabilities are still missing",
+      "text": "In the interview you tell real situations, and the areas with evidence come out of them. That is the part that makes this profile more than a list of keywords.",
+      "cta": "Start the interview"
+    }
   }
 }

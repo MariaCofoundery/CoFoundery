@@ -136,5 +136,36 @@
   },
   "welcome": {
     "submit": "Los geht's"
+  },
+  "founderProfile": {
+    "eyebrow": "Founderprofil",
+    "unnamed": "Dein Profil",
+    "intro": "Alles, was du über dich erarbeitet hast, an einem Ort: wer du bist, wie du arbeitest und was du mitbringst. Diese Seite ist nur für dich sichtbar. Wenn du sie weitergeben willst, druckst du sie aus oder speicherst sie als PDF.",
+    "backToDashboard": "Zurück zur Übersicht",
+    "base": {
+      "title": "Wer du bist",
+      "region": "Ort und Arbeitsweise",
+      "expertise": "Fachliche Schwerpunkte",
+      "industries": "Branchen",
+      "linkedin": "LinkedIn",
+      "empty": "Zu dir selbst steht hier noch nichts. Ein Satz zu dir und deine Schwerpunkte machen den Unterschied zwischen einem Profil und einer Auswertung.",
+      "completeCta": "Angaben ergänzen"
+    },
+    "capability": {
+      "title": "Was du mitbringst",
+      "intro": "Je Bereich: wie oft du es angewandt hast und wie du dazu Verantwortung sehen würdest. Die Situationen, die du im Interview erzählt hast, stehen hier absichtlich nicht — sie bleiben auf deiner Profilseite.",
+      "evidenceCount": "{count, plural, =1 {1 Beleg} other {# Belege}}",
+      "noLevel": "Stufe noch offen"
+    },
+    "missingReport": {
+      "title": "Dein Selbstbild fehlt noch",
+      "text": "Der Fragebogen zeigt, wie du arbeitest und was dir wichtig ist. Ohne ihn fehlt dem Profil die Hälfte — und zwar die, nach der am häufigsten gefragt wird.",
+      "cta": "Fragebogen ausfüllen"
+    },
+    "missingCapability": {
+      "title": "Deine Fähigkeiten fehlen noch",
+      "text": "Im Interview erzählst du von echten Situationen, und daraus entstehen die Bereiche mit Beleg. Das ist der Teil, der dieses Profil von einer Liste mit Stichworten unterscheidet.",
+      "cta": "Interview starten"
+    }
   }
 }

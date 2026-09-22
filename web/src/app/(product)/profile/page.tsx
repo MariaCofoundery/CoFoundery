@@ -128,6 +128,19 @@ export default async function ProfilePage({
       <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t("eyebrow")}</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">{t("title")}</h1>
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("text")}</p>
+      {/* DER WEG ZUM ZUSAMMENGESTELLTEN PROFIL, neu am 22.09.2026. Diese Seite
+          hier ist die Werkbank - Angaben eintragen, Bereiche sortieren,
+          Sichtbarkeit setzen. Was daraus entsteht, lag auf drei Seiten
+          verteilt; `/me/profile` legt es nebeneinander und laesst sich
+          ausdrucken. Der Link steht hier und nicht in der Leiste: Ein
+          zusammengestelltes Profil ist das Ergebnis dieser Seite, kein
+          eigener Bereich. */}
+      <Link
+        href="/me/profile"
+        className="mt-4 inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+      >
+        {t("viewFounderProfile")}
+      </Link>
 
       {saved ? (
         <p role="status" className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.${saved}`)}</p>
