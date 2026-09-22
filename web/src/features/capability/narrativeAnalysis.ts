@@ -33,7 +33,16 @@ export type AreaSuggestion = {
 export type NarrativeAnalysis = {
   areas: AreaSuggestion[];
   /** Abgeleitete Staerke. Null, solange die Regel-Engine laeuft. */
-  strength: string | null;
+  /**
+   * Eine Arbeitsweise, die in der Erzaehlung sichtbar wurde - MIT Beleg.
+   *
+   * SEIT DEM 22.09.2026 EIN OBJEKT statt eines blossen Satzes: Das Feld wurde
+   * bis dahin ausgelesen und weggeworfen, es gab also keinen Ort dafuer und
+   * niemandem fiel auf, dass nichts es stuetzte. Jetzt wird es zu einem
+   * Vorschlag, den ein Mensch bestaetigt - und dann braucht es dieselbe
+   * Zitatpflicht wie jeder andere Vorschlag.
+   */
+  strength: { statement: string; quote: string } | null;
   engine: "rules" | "model";
 };
 

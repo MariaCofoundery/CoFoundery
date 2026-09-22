@@ -192,6 +192,24 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
         });
       }
 
+      // UND DIE ARBEITSWEISE, seit dem 22.09.2026. Das Modell wurde schon
+      // vorher danach gefragt ("ein kurzer Satz ueber eine Arbeitsweise, die
+      // im Text sichtbar wird") - die Antwort wurde ausgelesen und
+      // weggeworfen, weil es keinen Ort dafuer gab. Sie ist die Antwort auf
+      // "was sind meine Staerken", und genau die hat Maria dreimal vermisst.
+      //
+      // Sie geht denselben Weg wie alles andere: mit Zitat, als Vorschlag,
+      // bestaetigt von einem Menschen.
+      if (analysis.strength) {
+        await client.rpc("insert_ai_strength_proposal", {
+          p_job_id: job.id,
+          p_statement: analysis.strength.statement,
+          p_quote: analysis.strength.quote,
+          p_model: getAiModel(),
+          p_prompt_version: PROMPT_VERSION,
+        });
+      }
+
       // Kein Fund ist ein gueltiges Ergebnis: Nicht in jeder Erzaehlung steht
       // ein Bereich, den dieses Vokabular kennt.
       return null;

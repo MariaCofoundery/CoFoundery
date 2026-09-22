@@ -320,7 +320,8 @@
     "save": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal.",
     "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf.",
     "roles": "Mindestens eine Rolle muss gesetzt bleiben. Ohne Rolle hätte die Plattform keinen Bereich, in den sie dich führen kann.",
-    "linkedin": "Diese Adresse können wir nicht als LinkedIn-Profil erkennen. Sie muss zu linkedin.com führen – gespeichert haben wir sie deshalb nicht."
+    "linkedin": "Diese Adresse können wir nicht als LinkedIn-Profil erkennen. Sie muss zu linkedin.com führen – gespeichert haben wir sie deshalb nicht.",
+    "strength_length": "Ein Satz, höchstens zweihundert Zeichen."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",
@@ -646,5 +647,43 @@
       }
     }
   },
-  "viewFounderProfile": "Gesamtbild ansehen"
+  "viewFounderProfile": "Gesamtbild ansehen",
+  "strengths": {
+    "title": "Deine Arbeitsweise",
+    "text": "Sätze darüber, wie du arbeitest — aus Situationen, die du erzählt hast. Zu jedem kannst du zwei Dinge sagen: wie oft es sich bei dir zeigt, und was Menschen sagen würden, die dich erlebt haben.",
+    "proposalsTitle": "Aus deinen Erzählungen",
+    "proposalsText": "Mit der Stelle, auf die sie sich berufen. Nichts davon gilt, bis du es übernimmst — und du kannst es umschreiben.",
+    "empty": "Noch nichts festgehalten. Erzähl im Interview von einer Situation, oder schreib selbst etwas auf.",
+    "addTitle": "Selbst festhalten",
+    "addLabel": "In einem Satz",
+    "addPlaceholder": "Zum Beispiel: Bleibt dran, wenn eine Absprache nicht hält",
+    "addHint": "Ein Satz über die ARBEITSWEISE, nicht über dich als Person. Nicht „ich bin hartnäckig“, sondern was du in einer Situation getan hast.",
+    "add": "Festhalten",
+    "confirm": "Übernehmen",
+    "reject": "Passt nicht",
+    "remove": "Entfernen",
+    "save": "Einschätzung speichern",
+    "pending": "Wird gespeichert …",
+    "unanswered": "Noch nicht beantwortet",
+    "selfLabel": "Wie oft zeigt sich das bei dir?",
+    "reflectedLabel": "Was würden andere sagen?",
+    "whoLabel": "Wen hast du dabei im Kopf?",
+    "frequencies": {
+      "rarely": "Selten",
+      "sometimes": "Manchmal",
+      "often": "Oft",
+      "almost_always": "Fast immer"
+    },
+    "groups": {
+      "former_colleagues": "Frühere Kolleg:innen",
+      "current_colleagues": "Jetzige Kolleg:innen",
+      "managers": "Vorgesetzte",
+      "friends": "Freundinnen und Freunde",
+      "family": "Familie"
+    },
+    "gap": {
+      "others_see_more": "Hier vermutest du mehr bei anderen als bei dir selbst. Das ist kein Fehler — es ist die Stelle, an der du dir vielleicht etwas zutrauen könntest, das andere längst sehen.",
+      "others_see_less": "Hier siehst du mehr bei dir als bei anderen. Auch das ist kein Fehler — vielleicht zeigst du es nur an Stellen, die niemand mitbekommt."
+    }
+  }
 }

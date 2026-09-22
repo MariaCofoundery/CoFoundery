@@ -156,20 +156,45 @@ test("derselbe Bereich zweimal wird einmal gezaehlt, und es bleiben hoechstens d
   assert.equal(analysis.areas[0].areaId, "b2b_sales");
 });
 
-test("eine zu lange Staerke wird verworfen statt gekuerzt", () => {
+test("eine Staerke braucht einen Beleg, und zu lang wird verworfen statt gekuerzt", () => {
   // Ein abgeschnittener Satz mitten im Wort sieht aus wie ein Fehler der
   // Person, nicht wie einer des Modells.
+  //
+  // ERWEITERT AM 22.09.2026: Die Staerke traegt jetzt ein Zitat. Bis dahin
+  // war sie ein Satz ins Blaue - das Feld wurde ausgelesen und weggeworfen,
+  // also fiel nicht auf, dass nichts es stuetzte. Seit sie gespeichert wird
+  // und jemandem angezeigt wird, gilt dieselbe Zitatpflicht wie fuer jeden
+  // anderen Vorschlag.
+  const quote = "drei Jahre lang jede Woche mit Kliniken telefoniert";
+
   const long = validateModelAnalysis(
-    { areas: [], strength: "x".repeat(400) },
+    { areas: [], strength: { statement: "x".repeat(400), quote } },
     { narrative: NARRATIVE, areaIds: AREAS }
   );
   assert.equal(long.strength, null);
 
-  const fine = validateModelAnalysis(
-    { areas: [], strength: "Bleibt über lange Zeiträume an einer Sache dran." },
+  // Ohne Beleg gibt es keine Staerke - auch wenn der Satz gut klingt.
+  const unquoted = validateModelAnalysis(
+    { areas: [], strength: { statement: "Bleibt lange an einer Sache dran.", quote: "steht so nicht im Text" } },
     { narrative: NARRATIVE, areaIds: AREAS }
   );
-  assert.equal(fine.strength, "Bleibt über lange Zeiträume an einer Sache dran.");
+  assert.equal(unquoted.strength, null);
+
+  // Und kein Satz UEBER die Person: "Du bist hartnaeckig" waere ein Typ.
+  const aboutPerson = validateModelAnalysis(
+    { areas: [], strength: { statement: "Du bist ein hartnaeckiger Mensch.", quote } },
+    { narrative: NARRATIVE, areaIds: AREAS }
+  );
+  assert.equal(aboutPerson.strength, null);
+
+  const fine = validateModelAnalysis(
+    { areas: [], strength: { statement: "Bleibt über lange Zeiträume an einer Sache dran.", quote } },
+    { narrative: NARRATIVE, areaIds: AREAS }
+  );
+  assert.deepEqual(fine.strength, {
+    statement: "Bleibt über lange Zeiträume an einer Sache dran.",
+    quote,
+  });
 });
 
 test("ist das Modell nicht erreichbar, antwortet die Begriffsliste", async () => {

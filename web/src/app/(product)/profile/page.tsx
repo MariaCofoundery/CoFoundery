@@ -12,6 +12,11 @@ import {
   saveCapabilityOwnershipAction,
 } from "@/features/capability/capabilityActions";
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
+import { StrengthsSection } from "@/features/capability/StrengthsSection";
+import {
+  getPendingStrengthProposals,
+  getPersonStrengths,
+} from "@/features/capability/strengthData";
 import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
 import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapshotStart";
 import { getUnsortedInterviewAnswers } from "@/features/capability/capabilityInterviewData";
@@ -49,7 +54,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure", "interview_done"];
-const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles", "linkedin"];
+const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles", "linkedin", "strength_length"];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
@@ -64,12 +69,14 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, tDirection, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
+  const [t, tDirection, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
     getTranslations("capability"),
     getTranslations("direction"),
     getLocale(),
     searchParams,
     getCapabilityVocabulary(supabase),
+    getPersonStrengths(supabase),
+    getPendingStrengthProposals(supabase),
     getOwnCapabilityEntries(supabase, user.id),
     getPersonCore(supabase, user.id),
     Promise.resolve(supabase.from("person_core").select("capability_disclosure").eq("user_id", user.id).maybeSingle())
@@ -215,6 +222,10 @@ export default async function ProfilePage({
             </Link>
           )}
         </section>
+      ) : null}
+
+      {step === null ? (
+        <StrengthsSection strengths={strengths} proposals={strengthProposals} />
       ) : null}
 
       {/* DAS ZWEITE GESPRAECH, neu am 22.09.2026. Es steht als eigener

@@ -320,7 +320,8 @@
     "save": "That could not be saved just now. Please try again.",
     "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first.",
     "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to.",
-    "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it."
+    "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it.",
+    "strength_length": "One sentence, at most two hundred characters."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",
@@ -646,5 +647,43 @@
       }
     }
   },
-  "viewFounderProfile": "See the full picture"
+  "viewFounderProfile": "See the full picture",
+  "strengths": {
+    "title": "How you work",
+    "text": "Sentences about how you work — from situations you told. For each you can say two things: how often it shows up, and what people who have worked with you would say.",
+    "proposalsTitle": "From your stories",
+    "proposalsText": "With the passage they rely on. None of it counts until you take it — and you can rewrite it.",
+    "empty": "Nothing kept yet. Tell a situation in the interview, or write something down yourself.",
+    "addTitle": "Write one yourself",
+    "addLabel": "In one sentence",
+    "addPlaceholder": "For example: keeps at it when an agreement does not hold",
+    "addHint": "A sentence about the WAY you work, not about you as a person. Not “I am persistent” but what you did in a situation.",
+    "add": "Keep it",
+    "confirm": "Take it",
+    "reject": "Does not fit",
+    "remove": "Remove",
+    "save": "Save assessment",
+    "pending": "Saving …",
+    "unanswered": "Not answered yet",
+    "selfLabel": "How often does this show up for you?",
+    "reflectedLabel": "What would others say?",
+    "whoLabel": "Who did you have in mind?",
+    "frequencies": {
+      "rarely": "Rarely",
+      "sometimes": "Sometimes",
+      "often": "Often",
+      "almost_always": "Almost always"
+    },
+    "groups": {
+      "former_colleagues": "Former colleagues",
+      "current_colleagues": "Current colleagues",
+      "managers": "Managers",
+      "friends": "Friends",
+      "family": "Family"
+    },
+    "gap": {
+      "others_see_more": "Here you assume more from others than from yourself. That is not a mistake — it is the place where you might claim something others have long seen.",
+      "others_see_less": "Here you see more in yourself than in others. Also not a mistake — perhaps you show it where nobody notices."
+    }
+  }
 }
