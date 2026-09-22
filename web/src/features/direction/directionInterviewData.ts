@@ -2,7 +2,10 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { DIRECTION_INTERVIEW } from "@/features/interviews/interviewKinds";
-import { directionProgress, nextDirectionQuestion } from "./directionInterviewGuide";
+import {
+  directionProgress,
+  nextDirectionQuestion,
+} from "@/features/direction/directionInterviewGuide";
 
 /**
  * Was gerade läuft - für das Direction-Interview.

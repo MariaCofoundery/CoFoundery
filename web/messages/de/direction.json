@@ -27,7 +27,8 @@
     "too_few": "Für eine Zusammenfassung braucht es mindestens vier Antworten.",
     "facet": "Wähl aus, worum es geht.",
     "statement_short": "Ein bisschen mehr als das.",
-    "statement_long": "Das ist länger als zweihundert Zeichen. Kürze es auf einen Satz."
+    "statement_long": "Das ist länger als zweihundert Zeichen. Kürze es auf einen Satz.",
+    "ask": "Die Anfrage ging nicht raus. Versuch es noch einmal."
   },
   "progress": {
     "atQuestion": "Frage {index} von {total}",
@@ -144,5 +145,23 @@
       "edited_proposal": "Vorschlag, von dir umformuliert"
     },
     "pendingProposals": "Vorschläge aus deinen Antworten gibt es noch nicht — bis dahin schreibst du selbst, was dir auffällt."
+  },
+  "proposals": {
+    "title": "Was in deinen Antworten auffällt",
+    "text": "Vorschläge aus deinen eigenen Worten — jeder mit der Stelle, auf die er sich beruft. Es gilt nichts davon, solange du es nicht bestätigst.",
+    "statementLabel": "So würde es dastehen",
+    "editHint": "Schreib es um, wenn es nicht deine Worte sind. Dann steht später daneben, dass du es umformuliert hast.",
+    "confirm": "Übernehmen",
+    "confirmPending": "Wird übernommen …",
+    "reject": "Passt nicht",
+    "rejectPending": "Wird verworfen …",
+    "askTitle": "Lesen lassen",
+    "askText": "Du kannst eine deiner Antworten lesen lassen. Sie geht dabei an ein Modell auf Marias Rechner — nicht an einen fremden Dienst.",
+    "ask": "Diese Antwort lesen lassen",
+    "askPending": "Wird angefragt …",
+    "jobOpen": "Wird gerade gelesen …",
+    "jobFailed": "Das hat nicht geklappt. Du kannst es noch einmal versuchen.",
+    "jobDone": "Gelesen.",
+    "unavailable": "Gerade ist kein Modell erreichbar. Deine Antworten bleiben stehen, du kannst später lesen lassen."
   }
 }

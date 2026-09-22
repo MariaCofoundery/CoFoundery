@@ -28,6 +28,11 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import { extractResources } from "@/features/ai/resourceExtraction";
 import { readCapabilityAreas } from "@/features/capability/capabilityVocabularyFromFiles";
+import {
+  createDirectionAnalyzer,
+  DIRECTION_PROMPT_VERSION,
+} from "@/features/direction/directionAnalysisModel";
+import { readDirectionFacets } from "@/features/direction/directionFacetsFromFiles";
 import { createModelNarrativeAnalyzer } from "@/features/capability/narrativeAnalysisModel";
 import { getAiModel, isModelReachable } from "@/lib/ai/ollama";
 
@@ -189,6 +194,50 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
 
       // Kein Fund ist ein gueltiges Ergebnis: Nicht in jeder Erzaehlung steht
       // ein Bereich, den dieses Vokabular kennt.
+      return null;
+    }
+
+    case "direction_statement_proposal": {
+      // DIESELBE ANTWORT, EIN ANDERER AUFTRAG. Auch hier: nur auf
+      // ausdrueckliche Anforderung der Person
+      // (`request_direction_statement_proposals`), und die Quelle ist die
+      // Antwort ohne die Frage.
+      //
+      // DER UNTERSCHIED ZU OBEN: Dort waehlt das Modell aus 48 Begriffen, hier
+      // SCHREIBT es einen Satz ueber einen Menschen. Was es dabei nicht darf -
+      // keine Eigenschaft, kein Typ, nichts ohne Beleg - steht in der
+      // Anweisung UND in der Pruefung (`directionAnalysisModel.ts`), und die
+      // Datenbank rechnet das Zitat danach noch einmal nach.
+      const { data: sourceText, error } = await client.rpc("get_ai_job_source_text", {
+        p_job_id: job.id,
+      });
+      if (error) return "source_missing";
+      if (typeof sourceText !== "string" || sourceText.trim().length < 20) {
+        return "source_missing";
+      }
+
+      const analyze = createDirectionAnalyzer({
+        facets: readDirectionFacets(),
+        model: getAiModel(),
+      });
+      const analysis = await analyze({ answer: sourceText });
+      if (analysis.engine !== "model") return "model_unreachable";
+
+      // Jeder Vorschlag geht einzeln hinein: Ein abgelehnter darf die uebrigen
+      // derselben Antwort nicht mitnehmen.
+      for (const proposal of analysis.proposals) {
+        await client.rpc("insert_ai_direction_proposal", {
+          p_job_id: job.id,
+          p_facet: proposal.facet,
+          p_statement: proposal.statement,
+          p_quote: proposal.quote,
+          p_model: getAiModel(),
+          p_prompt_version: DIRECTION_PROMPT_VERSION,
+        });
+      }
+
+      // Kein Fund ist ein gueltiges Ergebnis: Nicht in jeder Geschichte steht
+      // etwas, das sich belegen laesst.
       return null;
     }
 

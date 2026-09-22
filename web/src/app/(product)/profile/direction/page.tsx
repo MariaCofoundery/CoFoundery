@@ -17,7 +17,15 @@ import {
   DIRECTION_MIN_LENGTH,
   findDirectionQuestion,
 } from "@/features/direction/directionInterviewGuide";
+import { DirectionProposals } from "@/features/direction/DirectionProposals";
 import { DirectionStatements } from "@/features/direction/DirectionStatements";
+import { askForDirectionProposalsAction } from "@/features/direction/directionStatementActions";
+import {
+  getAiAvailability,
+  getDirectionJobStates,
+  getPendingDirectionProposals,
+} from "@/features/direction/directionProposalData";
+import { ProposalWatcher } from "@/features/capability/ProposalWatcher";
 import { getDirectionStatements } from "@/features/direction/directionStatementData";
 import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -54,12 +62,19 @@ export default async function DirectionInterviewPage({
   if (!user) redirect("/login?next=/profile/direction");
 
   const client = await createClient();
-  const [t, state, answers, statements] = await Promise.all([
+  const [t, state, answers, statements, proposals, aiAvailable] = await Promise.all([
     getTranslations("direction"),
     getActiveDirectionInterview(client),
     getDirectionAnswers(client),
     getDirectionStatements(client),
+    getPendingDirectionProposals(client),
+    getAiAvailability(client),
   ]);
+  const jobStates = await getDirectionJobStates(
+    client,
+    answers.map((answer) => answer.id)
+  );
+  const reading = [...jobStates.values()].includes("open");
 
   const turn = state?.current ?? null;
   const question = turn ? findDirectionQuestion(turn.questionId) : null;
@@ -167,6 +182,10 @@ export default async function DirectionInterviewPage({
         </section>
       )}
 
+      {reading ? <ProposalWatcher>{null}</ProposalWatcher> : null}
+
+      <DirectionProposals proposals={proposals} />
+
       <DirectionStatements statements={statements} />
 
       {/* DER BLICK ZURÜCK, und in diesem Schritt ist er das Ergebnis: Die
@@ -192,13 +211,42 @@ export default async function DirectionInterviewPage({
                   <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
                     {answer.answer}
                   </p>
+                  {/* LESEN LASSEN IST EINE HANDLUNG, kein Automatismus. Der
+                      privateste Text im Produkt geht nicht deshalb an ein
+                      Modell, weil jemand eine Seite geöffnet hat - und es
+                      steht dabei, wohin er geht. */}
+                  {jobStates.get(answer.id) === "open" ? (
+                    <p role="status" className="mt-3 text-sm font-medium text-violet-900">
+                      {t("proposals.jobOpen")}
+                    </p>
+                  ) : aiAvailable ? (
+                    <form action={askForDirectionProposalsAction} className="mt-3">
+                      <input type="hidden" name="turnId" value={answer.id} />
+                      <SubmitButton
+                        label={t("proposals.ask")}
+                        pendingLabel={t("proposals.askPending")}
+                        className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 px-4 py-2 text-sm font-semibold text-violet-900"
+                      />
+                      {jobStates.get(answer.id) === "failed" ? (
+                        <span className="ml-3 text-sm text-amber-900">{t("proposals.jobFailed")}</span>
+                      ) : null}
+                    </form>
+                  ) : null}
                 </li>
               );
             })}
           </ul>
-          <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-            {t("review.pendingSummary")}
-          </p>
+          {aiAvailable ? (
+            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+              {t("proposals.askText")}
+            </p>
+          ) : (
+            /* "Nicht erreichbar" ist ein Zustand, kein Fehler - und er wird
+               gesagt, statt einen Knopf anzubieten, der nichts tut. */
+            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+              {t("proposals.unavailable")}
+            </p>
+          )}
         </section>
       ) : null}
     </main>

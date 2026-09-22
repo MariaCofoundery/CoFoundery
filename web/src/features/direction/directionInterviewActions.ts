@@ -13,7 +13,7 @@ import {
   DIRECTION_MIN_ANSWERS,
   DIRECTION_MIN_LENGTH,
   nextDirectionQuestion,
-} from "./directionInterviewGuide";
+} from "@/features/direction/directionInterviewGuide";
 
 /**
  * Die Handlungen des Direction-Gesprächs.

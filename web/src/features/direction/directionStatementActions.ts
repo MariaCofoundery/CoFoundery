@@ -7,7 +7,7 @@ import {
   DIRECTION_FACETS,
   STATEMENT_MAX_LENGTH,
   STATEMENT_MIN_LENGTH,
-} from "./directionInterviewGuide";
+} from "@/features/direction/directionInterviewGuide";
 
 /**
  * Eigene Aussagen über die eigene Richtung.
@@ -99,6 +99,66 @@ export async function removeDirectionStatementAction(formData: FormData) {
   const { client } = await requireUser();
   const id = String(formData.get("statementId") ?? "");
   const { error } = await client.from("direction_statements").delete().eq("id", id);
+  if (error) back("save");
+  done();
+}
+
+/**
+ * Das Modell um Vorschläge bitten - für EINE eigene Antwort.
+ *
+ * NICHTS LÄUFT VON SELBST LOS. Der privateste Text im Produkt geht nicht
+ * deshalb an ein Modell, weil jemand eine Seite geöffnet hat. Die Prüfung, wem
+ * die Antwort gehört, macht die Datenbank
+ * (`request_direction_statement_proposals`).
+ */
+export async function askForDirectionProposalsAction(formData: FormData) {
+  const { client } = await requireUser();
+  const turnId = String(formData.get("turnId") ?? "");
+
+  const { error } = await client.rpc("request_direction_statement_proposals", {
+    p_turn_id: turnId,
+  });
+  // Ein abgelehnter Auftrag ist kein Drama: Vielleicht läuft schon einer.
+  if (error) back("ask");
+  done();
+}
+
+/**
+ * Einen Vorschlag annehmen - unverändert oder umformuliert.
+ *
+ * Die Herkunft entsteht in der Datenbank aus dem Vergleich mit dem, was das
+ * Modell geschrieben hat (`confirm_direction_proposal`). Sie ist damit eine
+ * Tatsache und keine Behauptung dieser Datei.
+ */
+export async function confirmDirectionProposalAction(formData: FormData) {
+  const { client } = await requireUser();
+  const proposalId = String(formData.get("proposalId") ?? "");
+  const statement = String(formData.get("statement") ?? "").trim();
+
+  const { error } = await client.rpc("confirm_direction_proposal", {
+    p_proposal_id: proposalId,
+    p_statement: statement.length > 0 ? statement : null,
+  });
+  if (error) back("save");
+  done();
+}
+
+/**
+ * Einen Vorschlag ablehnen.
+ *
+ * Er bleibt als abgelehnt stehen, statt gelöscht zu werden: So bekommt man
+ * denselben Vorschlag nicht wieder, wenn dieselbe Antwort noch einmal gelesen
+ * wird. Gezeigt wird er nie mehr.
+ */
+export async function rejectDirectionProposalAction(formData: FormData) {
+  const { client } = await requireUser();
+  const proposalId = String(formData.get("proposalId") ?? "");
+
+  const { error } = await client
+    .from("direction_statement_proposals")
+    .update({ status: "rejected", decided_at: new Date().toISOString() })
+    .eq("id", proposalId)
+    .eq("status", "pending");
   if (error) back("save");
   done();
 }

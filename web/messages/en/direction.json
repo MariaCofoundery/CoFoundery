@@ -27,7 +27,8 @@
     "too_few": "A summary needs at least four answers.",
     "facet": "Choose what it is about.",
     "statement_short": "A little more than that.",
-    "statement_long": "That is longer than two hundred characters. Shorten it to one sentence."
+    "statement_long": "That is longer than two hundred characters. Shorten it to one sentence.",
+    "ask": "The request did not go out. Please try again."
   },
   "progress": {
     "atQuestion": "Question {index} of {total}",
@@ -144,5 +145,23 @@
       "edited_proposal": "Proposal, rewritten by you"
     },
     "pendingProposals": "There are no proposals from your answers yet — until then you write down yourself what you notice."
+  },
+  "proposals": {
+    "title": "What stands out in your answers",
+    "text": "Proposals from your own words — each with the passage it relies on. None of it counts until you confirm it.",
+    "statementLabel": "This is how it would read",
+    "editHint": "Rewrite it if these are not your words. It will then say that you rewrote it.",
+    "confirm": "Take it",
+    "confirmPending": "Taking it …",
+    "reject": "Does not fit",
+    "rejectPending": "Discarding …",
+    "askTitle": "Have it read",
+    "askText": "You can have one of your answers read. It goes to a model on Maria's machine — not to an outside service.",
+    "ask": "Have this answer read",
+    "askPending": "Requesting …",
+    "jobOpen": "Being read …",
+    "jobFailed": "That did not work. You can try again.",
+    "jobDone": "Read.",
+    "unavailable": "No model is reachable right now. Your answers stay where they are; you can have them read later."
   }
 }

@@ -148,19 +148,28 @@ test("jeder Leser und jede Aktion filtert auf die Art", () => {
   assert.equal((actions.match(/kind: DIRECTION_INTERVIEW/g) ?? []).length, 4);
 });
 
-test("S2 läuft ohne Modell, und die Seite behauptet auch keines", () => {
-  // Ein Produkt, das eine Auswertung ankündigt, die es nicht gibt, hat sie
-  // damit nicht. Die Seite sagt ausdrücklich, dass die Zusammenfassung noch
-  // nicht automatisch entsteht - das ist ehrlicher als ein leerer Block.
-  const actions = codeOnly(ACTIONS);
-  assert.doesNotMatch(actions, /enqueue_ai_job|askModelForJson|ai_jobs/);
+test("das Gespräch läuft auch ohne Modell, und die Seite sagt es", () => {
+  // UMGEDREHT AM 22.09.2026 (Schritt S4). Vorher hielt dieser Test fest, dass
+  // es noch gar kein Modell gibt ("keine Erwähnung von ai_jobs"). Jetzt gibt
+  // es eines - und die Zusage dahinter ist dieselbe geblieben: Das Produkt
+  // behauptet keine Auswertung, die es gerade nicht liefern kann.
+  //
+  // "Nicht erreichbar" ist deshalb ein Zustand, der dasteht, und kein Knopf,
+  // der nichts tut.
   const page = codeOnly(PAGE);
-  assert.match(page, /review\.pendingSummary/);
-  assert.match(page, /audio: null/);
+  assert.match(page, /aiAvailable \?/);
+  assert.match(page, /proposals\.unavailable/);
   for (const locale of ["de", "en"]) {
-    const review = (bundle(locale) as unknown as { review: Record<string, string> }).review;
-    assert.ok(review.pendingSummary, `${locale}: der Hinweis auf die fehlende Zusammenfassung fehlt`);
+    const proposals = (bundle(locale) as unknown as { proposals: Record<string, string> }).proposals;
+    assert.ok(proposals.unavailable, `${locale}: der Hinweis auf das fehlende Modell fehlt`);
   }
+
+  // Das GESPRÄCH selbst bleibt ohne Modell vollständig: Fragen, Antworten,
+  // Pausieren, Rückblick. Die Aktionen des Interviews rufen nichts.
+  const interviewActions = codeOnly(ACTIONS);
+  assert.doesNotMatch(interviewActions, /enqueue_ai_job|askModelForJson|ai_jobs/);
+  // Und Stimme gibt es hier weiterhin nicht - das ist Schritt S5.
+  assert.match(page, /audio: null/);
 });
 
 test("es ist kein Test und sagt das auch", () => {
