@@ -407,7 +407,26 @@ machen" ist kein Listeneintrag.
 Konsequenz: Das Modell **schreibt Text**, statt aus einer Liste zu waehlen. Das
 ist eine andere Risikoklasse als bei Capability (Abschnitt 6).
 
-### 5.2 Warum der Regelweg hier NICHT taugt
+### 5.2 Warum der deutende Regelweg hier nicht taugt
+
+> **Teilweise zurueckgenommen am 22.09.2026.** Maria: "Es muss ja auch ohne KI
+> gehen, dass der Text mal ein bisschen analysiert wird und geschaut wird, was
+> sind so typische Sachen, die Menschen so anschreiben."
+>
+> Sie hat recht, und mein Absatz unten war zu grob. Was nicht taugt, ist ein
+> Regelweg, der DEUTET - aus Stichwoertern auf ein Thema schliessen. Was sehr
+> wohl taugt, ist einer, der die STELLE findet: Wendungen wie "mir war
+> wichtig", "hat mich genervt", "damit ... endlich" markieren im Text, wo
+> jemand selbst gesagt hat, was zaehlt. Der Vorschlag ist dann dieser Satz,
+> woertlich - ein Zitat mit einer Rubrik daneben, keine Behauptung.
+>
+> Gebaut in `directionRulesAnalysis.ts` und
+> `insert_rule_direction_proposal` (Migration 20261038120000). Die Datenbank
+> prueft dort strenger als beim Modell: Auch der VORSCHLAG muss woertlich in
+> der Antwort stehen, nicht nur sein Beleg. Und die Herkunft steht an jedem
+> Vorschlag, mit dem Vorbehalt, den Maria wollte.
+
+Der urspruengliche Absatz, der weiterhin fuer den deutenden Weg gilt:
 
 `AREA_TERMS` funktioniert, weil "programmiert" auf `software_engineering`
 zeigt. Fuer "was treibt dich an" gibt es keine Stichwoerter, die zuverlaessig

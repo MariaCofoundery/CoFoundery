@@ -19,7 +19,10 @@ import {
 } from "@/features/direction/directionInterviewGuide";
 import { DirectionProposals } from "@/features/direction/DirectionProposals";
 import { DirectionStatements } from "@/features/direction/DirectionStatements";
-import { askForAllDirectionProposalsAction } from "@/features/direction/directionStatementActions";
+import {
+  askForAllDirectionProposalsAction,
+  readDirectionAnswersWithRulesAction,
+} from "@/features/direction/directionStatementActions";
 import {
   getAiAvailability,
   getDirectionJobStates,
@@ -207,12 +210,27 @@ export default async function DirectionInterviewPage({
               </form>
             </>
           ) : (
-            /* OHNE MODELL GEHT ES GENAUSO WEITER, und das steht hier statt
-               eines Knopfes, der nichts tut. Gemeldet am 22.09.2026: "Da
-               müsste es natürlich auch eine Möglichkeit geben, dass das ohne
-               KI auch funktioniert." */
+            /* OHNE MODELL GEHT ES GENAUSO WEITER - und zwar nicht nur mit
+               einem Hinweis, sondern mit einem zweiten Weg. Gewünscht am
+               22.09.2026: "Es muss ja auch ohne KI gehen, dass der Text mal
+               ein bisschen analysiert wird." */
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{t("done.withoutAi")}</p>
           )}
+
+          {/* DURCHSEHEN GEHT IMMER, mit Modell oder ohne. Es läuft hier und
+              jetzt, nichts verlässt den Server, und heraus kommt ein Zitat mit
+              einer Rubrik - keine Deutung. Deshalb steht es auch neben dem
+              Modellknopf und nicht nur als Ersatz für ihn. */}
+          <div className="mt-4 border-t border-violet-200 pt-4">
+            <p className="max-w-2xl text-sm leading-7 text-slate-700">{t("done.withoutAiOffer")}</p>
+            <form action={readDirectionAnswersWithRulesAction} className="mt-3">
+              <SubmitButton
+                label={t("done.readWithoutAi")}
+                pendingLabel={t("proposals.askPending")}
+                className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900"
+              />
+            </form>
+          </div>
         </section>
       )}
 

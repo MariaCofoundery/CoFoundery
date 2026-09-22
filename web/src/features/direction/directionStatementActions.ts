@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDirectionAnswers } from "@/features/direction/directionInterviewData";
+import { findDirectionRuleFindings } from "@/features/direction/directionRulesAnalysis";
 import { createClient } from "@/lib/supabase/server";
 import {
   DIRECTION_FACETS,
@@ -150,6 +151,43 @@ export async function askForAllDirectionProposalsAction() {
   for (const answer of answers) {
     // Einzeln, und ein Fehler bei einer Antwort nimmt die übrigen nicht mit.
     await client.rpc("request_direction_statement_proposals", { p_turn_id: answer.id });
+  }
+  done();
+}
+
+/**
+ * Die eigenen Antworten durchsehen - ohne Modell.
+ *
+ * GEWÜNSCHT AM 22.09.2026: "Es muss ja auch ohne KI gehen, dass der Text mal
+ * ein bisschen analysiert wird."
+ *
+ * ES LÄUFT HIER UND JETZT, nicht über die Warteschlange: Es gibt kein Modell,
+ * auf das zu warten wäre, und nichts verlässt den Server. Deshalb auch kein
+ * Auftrag, kein Wartezustand, kein Nachladen.
+ *
+ * WAS ENTSTEHT, IST EIN ZITAT MIT EINER RUBRIK - der Satz, in dem die Person
+ * selbst gesagt hat, was ihr wichtig war. Die Datenbank prüft, dass auch der
+ * Vorschlag selbst wörtlich in der Antwort steht
+ * (`insert_rule_direction_proposal`); ein Regelweg, der formuliert, wäre genau
+ * der, den wir nicht wollen.
+ */
+export async function readDirectionAnswersWithRulesAction() {
+  const { client } = await requireUser();
+  const answers = await getDirectionAnswers(client);
+
+  for (const answer of answers) {
+    if (!answer.answer) continue;
+    for (const finding of findDirectionRuleFindings(answer.answer)) {
+      // Einzeln: Ein abgelehnter Fund darf die übrigen nicht mitnehmen. Und
+      // doppelte fängt die Datenbank (ein Fund je Vorgang, Rubrik und
+      // Herkunft).
+      await client.rpc("insert_rule_direction_proposal", {
+        p_turn_id: answer.id,
+        p_facet: finding.facet,
+        p_statement: finding.statement,
+        p_quote: finding.quote,
+      });
+    }
   }
   done();
 }

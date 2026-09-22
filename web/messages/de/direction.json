@@ -170,14 +170,21 @@
     "jobOpen": "Wird gerade gelesen …",
     "jobFailed": "Das hat nicht geklappt. Du kannst es noch einmal versuchen.",
     "jobDone": "Gelesen.",
-    "unavailable": "Gerade ist kein Modell erreichbar. Deine Antworten bleiben stehen, du kannst später lesen lassen."
+    "unavailable": "Gerade ist kein Modell erreichbar. Deine Antworten bleiben stehen, du kannst später lesen lassen.",
+    "sources": {
+      "model": "vom Modell gelesen",
+      "rules": "Stelle aus deinem Text"
+    },
+    "rulesCaveat": "Daran arbeiten wir noch — bitte prüf das genau. Es ist keine Deutung, sondern die Stelle, an der du selbst etwas dazu gesagt hast. Wenn sie nicht passt, verwirf sie einfach."
   },
   "done": {
     "title": "Deine Antworten stehen",
     "text": "{count} von {total} Fragen beantwortet. Was jetzt kommt, entscheidest du.",
     "withAi": "Du kannst deine Antworten lesen lassen. Sie gehen an ein Modell auf Marias Rechner — nicht an einen fremden Dienst. Heraus kommen Vorschläge mit der Stelle, auf die sie sich berufen; nichts davon gilt, bis du es bestätigst.",
     "askAll": "Antworten lesen lassen",
-    "withoutAi": "Gerade liest kein Modell mit — das macht nichts. Unter „Meine Richtung“ schreibst du selbst auf, was dir beim Lesen deiner Antworten auffällt. Genau das ist das Ergebnis; das Modell macht daraus nur Vorschläge."
+    "withoutAi": "Gerade liest kein Modell mit — das macht nichts. Unter „Meine Richtung“ schreibst du selbst auf, was dir beim Lesen deiner Antworten auffällt. Genau das ist das Ergebnis; das Modell macht daraus nur Vorschläge.",
+    "readWithoutAi": "Antworten durchsehen",
+    "withoutAiOffer": "Ohne Modell kannst du die Antworten trotzdem durchsehen lassen: Wir suchen die Stellen, an denen du selbst gesagt hast, was dir wichtig war, und legen sie dir woertlich vor. Das ist keine Deutung — und pruefen musst du es trotzdem."
   },
   "again": {
     "text": "Du kannst das Gespräch noch einmal führen. Deine bisherigen Antworten bleiben stehen.",

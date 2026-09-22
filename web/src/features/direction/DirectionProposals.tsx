@@ -43,9 +43,27 @@ export async function DirectionProposals({
       <ul className="mt-5 space-y-4">
         {proposals.map((proposal) => (
           <li key={proposal.id} className="rounded-2xl border border-violet-200 bg-white p-5">
-            <p className="text-xs font-semibold uppercase tracking-[.12em] text-violet-800">
+            <p className="flex flex-wrap items-baseline gap-x-3 text-xs font-semibold uppercase tracking-[.12em] text-violet-800">
               {tFacets(proposal.facet)}
+              {/* WER GELESEN HAT, steht dabei. Ein Modell formuliert einen
+                  eigenen Satz; der Regelweg gibt eine Stelle aus dem eigenen
+                  Text zurück. Das nebeneinander zu zeigen, ohne es zu sagen,
+                  wäre die unehrlichste Variante von beidem. */}
+              <span className="font-medium normal-case tracking-normal text-slate-500">
+                {t(`sources.${proposal.source}`)}
+              </span>
             </p>
+
+            {proposal.source === "rules" ? (
+              /* DER VORBEHALT, den Maria am 22.09.2026 ausdrücklich wollte:
+                 "Sag so, hey, wir arbeiten noch dran, das bitte prüfe gut,
+                 aber zumindest ist das etwas, was wir hier rausgelesen
+                 haben." Er steht an genau den Vorschlägen, für die er gilt -
+                 nicht als Fußnote unter allem. */
+              <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
+                {t("rulesCaveat")}
+              </p>
+            ) : null}
 
             {/* Der Beleg zuerst: erst das, was dasteht, dann die Deutung. */}
             <blockquote className="mt-3 border-l-2 border-violet-300 pl-3 text-sm italic leading-6 text-slate-600">

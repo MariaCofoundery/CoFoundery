@@ -19,6 +19,16 @@ export type DirectionProposalRow = {
   facet: DirectionFacet;
   statement: string;
   quote: string;
+  /**
+   * Wer gelesen hat.
+   *
+   * `model` - ein Sprachmodell, mit eigener Formulierung.
+   * `rules` - eine Fundstelle im eigenen Text, wörtlich übernommen.
+   *
+   * Die Unterscheidung MUSS sichtbar bleiben: Sonst stünden zwei sehr
+   * verschiedene Dinge nebeneinander, als wären sie dasselbe.
+   */
+  source: "model" | "rules";
 };
 
 export type ProposalJobState = "none" | "open" | "done" | "failed";
@@ -28,7 +38,7 @@ export async function getPendingDirectionProposals(
 ): Promise<DirectionProposalRow[]> {
   const { data } = await client
     .from("direction_statement_proposals")
-    .select("id, turn_id, facet, statement, evidence_quote")
+    .select("id, turn_id, facet, statement, evidence_quote, source")
     .eq("status", "pending")
     .order("created_at", { ascending: true })
     .limit(50);
@@ -40,6 +50,7 @@ export async function getPendingDirectionProposals(
       facet: DirectionFacet;
       statement: string;
       evidence_quote: string;
+      source: string;
     }[]
   ).map((row) => ({
     id: row.id,
@@ -47,6 +58,7 @@ export async function getPendingDirectionProposals(
     facet: row.facet,
     statement: row.statement,
     quote: row.evidence_quote,
+    source: row.source === "rules" ? ("rules" as const) : ("model" as const),
   }));
 }
 
