@@ -97,5 +97,13 @@
       "everydaySignals": "Zeigt sich im Alltag",
       "watchout": "Achte besonders auf"
     }
+  },
+  "instrumentNote": {
+    "title": "Was das hier ist — und was nicht",
+    "selfReport": "Alle Angaben stammen von dir selbst. Nichts davon ist gemessen, getestet oder von außen geprüft worden.",
+    "notATest": "Es ist kein validiertes Testverfahren. Es gibt keinen Vergleich mit einer Norm, keine Punktzahl und keine Aussage darüber, ob jemand als Gründer:in geeignet ist — solche Aussagen wären mit diesen Daten nicht zu belegen.",
+    "snapshot": "Es ist eine Momentaufnahme. Menschen antworten in einer anderen Lage anders, und das ist kein Fehler der Antwort.",
+    "purpose": "Wofür es gedacht ist: als Grundlage für ein Gespräch — zwischen Menschen, die zusammen gründen wollen, oder mit jemandem, der sie begleitet. Nicht als Grundlage für eine Auswahl.",
+    "dated": "Stand der Angaben: {date}"
   }
 }

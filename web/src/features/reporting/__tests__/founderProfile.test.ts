@@ -153,3 +153,39 @@ test("beide Sprachen haben alle Saetze", () => {
     assert.ok(capabilityBundle.viewFounderProfile, `${locale}: der Weg dorthin hat kein Label`);
   }
 });
+
+test("das Ergebnis sagt, was es ist - und wird mitgedruckt", () => {
+  // GEWÜNSCHT AM 23.09.2026: "Mir ist wichtig, dass das valide, reliabel,
+  // objektiv ist - bestmöglich wissenschaftlichen Standards entspricht."
+  //
+  // DIE LÜCKE, DIE DAS SCHLIESST: Die Dokumentation war ehrlich
+  // (`self-report-model-validation.md`: "empirisch noch nicht validiert";
+  // `capability-model-technical-brief.md`: "Validierung: keine"). Das PRODUKT
+  // sagte davon nichts. Wer den Report ausdruckt und weitergibt, übergibt
+  // etwas, das aussieht wie ein Testergebnis.
+  const note = codeOnly("src/features/reporting/InstrumentNote.tsx");
+  // Mitgedruckt - anders als die Hinweise auf fehlende Teile. In der
+  // weitergegebenen Fassung ist dieser Satz am wichtigsten.
+  assert.doesNotMatch(note, /no-print/);
+
+  for (const page of [PAGE, "src/app/me/report/page.tsx"]) {
+    assert.match(codeOnly(page), /<InstrumentNote/, `${page}: die Einordnung fehlt`);
+  }
+
+  for (const locale of ["de", "en"]) {
+    const copy = (
+      JSON.parse(source(`messages/${locale}/report.json`)) as {
+        instrumentNote: Record<string, string>;
+      }
+    ).instrumentNote;
+    for (const key of ["title", "selfReport", "notATest", "snapshot", "purpose"]) {
+      assert.ok(copy[key], `${locale}: ${key} fehlt`);
+    }
+    // Die vier Aussagen müssen die vier Dinge auch wirklich sagen.
+    assert.match(copy.selfReport!, /von dir|from you/i, `${locale}: Selbstbericht`);
+    assert.match(copy.notATest!, /kein validiertes|not a validated/i, `${locale}: kein Test`);
+    assert.match(copy.notATest!, /Norm|norm/, `${locale}: kein Normvergleich`);
+    assert.match(copy.snapshot!, /Momentaufnahme|snapshot/i, `${locale}: Momentaufnahme`);
+    assert.match(copy.purpose!, /Auswahl|selection/i, `${locale}: nicht für Auswahl`);
+  }
+});

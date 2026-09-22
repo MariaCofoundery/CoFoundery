@@ -11,6 +11,8 @@ type Props = {
   description?: string;
   headerMeta?: ReactNode;
   beforeReport?: ReactNode;
+  /** Was nach der Auswertung steht - etwa die Einordnung, was sie ist. */
+  afterReport?: ReactNode;
 };
 
 export function IndividualReportPageContent({
@@ -21,6 +23,7 @@ export function IndividualReportPageContent({
   description,
   headerMeta,
   beforeReport,
+  afterReport,
 }: Props) {
   const chrome = getSelfReportChrome(report.locale);
 
@@ -46,6 +49,8 @@ export function IndividualReportPageContent({
       {beforeReport}
 
       <SelfReportView report={report} />
+
+      {afterReport}
     </main>
   );
 }

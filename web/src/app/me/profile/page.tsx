@@ -10,6 +10,7 @@ import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
+import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -57,11 +58,12 @@ export default async function FounderProfilePage() {
   if (!user) redirect("/login?next=/me/profile");
 
   const supabase = await createClient();
-  const [t, tCapability, tDirection, core, report, vocabulary, entries, directionStatements] =
+  const [t, tCapability, tDirection, tNote, core, report, vocabulary, entries, directionStatements] =
     await Promise.all([
       getTranslations("profile.founderProfile"),
       getTranslations("capability"),
       getTranslations("direction.statements.facets"),
+      getTranslations("report.instrumentNote"),
       getPersonCore(supabase, user.id),
       getLatestSelfAlignmentReport({ locale }),
       getCapabilityVocabulary(supabase),
@@ -171,6 +173,11 @@ export default async function FounderProfilePage() {
         />
       )}
 
+      {/* WAS DAS HIER IST - UND WAS NICHT. Unten, weil ein Warnhinweis über
+          dem Ergebnis überlesen wird oder es wertlos macht, bevor man es
+          gelesen hat. Und mitgedruckt, anders als die Hinweise auf fehlende
+          Teile: In der Fassung, die weitergegeben wird, ist dieser Satz am
+          wichtigsten. */}
       {/* DIE VIERTE SÄULE, dazugekommen am 22.09.2026: Das Profil zeigte, wer
           jemand ist, wie er arbeitet und was er mitbringt - aber nicht, was
           ihn antreibt. */}
@@ -192,6 +199,23 @@ export default async function FounderProfilePage() {
           cta={t("missingDirection.cta")}
         />
       )}
+
+      <InstrumentNote
+        copy={{
+          title: tNote("title"),
+          selfReport: tNote("selfReport"),
+          notATest: tNote("notATest"),
+          snapshot: tNote("snapshot"),
+          purpose: tNote("purpose"),
+          dated: report?.createdAt
+            ? tNote("dated", {
+                date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                  new Date(report.createdAt)
+                ),
+              })
+            : null,
+        }}
+      />
     </main>
   );
 }

@@ -97,5 +97,13 @@
       "everydaySignals": "Shows up day to day",
       "watchout": "Pay particular attention to"
     }
+  },
+  "instrumentNote": {
+    "title": "What this is — and what it is not",
+    "selfReport": "Everything here comes from you. None of it has been measured, tested or checked from the outside.",
+    "notATest": "It is not a validated test. There is no comparison to a norm, no score and no statement about whether somebody is suited to founding — such statements could not be supported by this data.",
+    "snapshot": "It is a snapshot. People answer differently in a different situation, and that is not a fault of the answer.",
+    "purpose": "What it is for: as a basis for a conversation — between people who want to found together, or with somebody accompanying them. Not as a basis for selection.",
+    "dated": "State of the answers: {date}"
   }
 }
