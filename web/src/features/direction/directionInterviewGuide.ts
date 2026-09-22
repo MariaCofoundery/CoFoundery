@@ -177,6 +177,19 @@ export const DIRECTION_MIN_ANSWERS = 4;
 export const DIRECTION_MIN_LENGTH = 10;
 export const DIRECTION_MAX_LENGTH = 2000;
 
+/**
+ * Die Grenzen einer festgehaltenen Aussage (`direction_statements.statement`).
+ *
+ * Drei Zeichen sind das Minimum fuer ein Wort; zweihundert die Grenze, ab der
+ * aus einer Aussage ein Absatz wird. Eine Richtung, die man nicht in einem
+ * Satz sagen kann, ist noch keine.
+ *
+ * Auch sie stehen hier und nicht bei den Aktionen - aus demselben Grund wie
+ * oben: Eine `"use server"`-Datei darf nur asynchrone Funktionen ausfuehren.
+ */
+export const STATEMENT_MIN_LENGTH = 3;
+export const STATEMENT_MAX_LENGTH = 200;
+
 export function findDirectionQuestion(id: string) {
   return DIRECTION_QUESTIONS.find((question) => question.id === id) ?? null;
 }

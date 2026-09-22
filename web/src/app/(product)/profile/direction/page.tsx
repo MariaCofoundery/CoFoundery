@@ -17,6 +17,8 @@ import {
   DIRECTION_MIN_LENGTH,
   findDirectionQuestion,
 } from "@/features/direction/directionInterviewGuide";
+import { DirectionStatements } from "@/features/direction/DirectionStatements";
+import { getDirectionStatements } from "@/features/direction/directionStatementData";
 import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -52,10 +54,11 @@ export default async function DirectionInterviewPage({
   if (!user) redirect("/login?next=/profile/direction");
 
   const client = await createClient();
-  const [t, state, answers] = await Promise.all([
+  const [t, state, answers, statements] = await Promise.all([
     getTranslations("direction"),
     getActiveDirectionInterview(client),
     getDirectionAnswers(client),
+    getDirectionStatements(client),
   ]);
 
   const turn = state?.current ?? null;
@@ -163,6 +166,8 @@ export default async function DirectionInterviewPage({
           </form>
         </section>
       )}
+
+      <DirectionStatements statements={statements} />
 
       {/* DER BLICK ZURÜCK, und in diesem Schritt ist er das Ergebnis: Die
           eigenen Geschichten nebeneinander zu lesen ist selbst schon etwas

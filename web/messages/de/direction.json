@@ -24,7 +24,10 @@
     "save": "Die Antwort konnte nicht gespeichert werden. Der Text steht noch da, versuch es noch einmal.",
     "complete": "Das Abschließen hat nicht funktioniert. Versuch es noch einmal.",
     "stale": "Diese Frage ist nicht mehr die aktuelle. Unten steht, wo du stehst.",
-    "too_few": "Für eine Zusammenfassung braucht es mindestens vier Antworten."
+    "too_few": "Für eine Zusammenfassung braucht es mindestens vier Antworten.",
+    "facet": "Wähl aus, worum es geht.",
+    "statement_short": "Ein bisschen mehr als das.",
+    "statement_long": "Das ist länger als zweihundert Zeichen. Kürze es auf einen Satz."
   },
   "progress": {
     "atQuestion": "Frage {index} von {total}",
@@ -106,5 +109,40 @@
         }
       }
     }
+  },
+  "statements": {
+    "title": "Meine Richtung",
+    "text": "Was du hier festhältst, gehört dir — in deinen Worten. Es ist nur für dich sichtbar, und es entsteht keine Zahl daraus.",
+    "empty": "Noch nichts festgehalten. Schreib auf, was dir beim Lesen deiner Antworten aufgefallen ist.",
+    "addTitle": "Etwas festhalten",
+    "facetLabel": "Worum geht es?",
+    "statementLabel": "In einem Satz",
+    "statementPlaceholder": "Zum Beispiel: Komplizierte Systeme verständlicher machen",
+    "statementHint": "Höchstens {max} Zeichen. Eine Richtung, die man nicht in einem Satz sagen kann, ist noch keine.",
+    "add": "Festhalten",
+    "addPending": "Wird gespeichert …",
+    "edit": "Ändern",
+    "editPending": "Wird gespeichert …",
+    "remove": "Entfernen",
+    "removePending": "Wird entfernt …",
+    "originLabel": "Herkunft",
+    "facets": {
+      "recurring_theme": "Themen, die wiederkehren",
+      "problem_cared_about": "Probleme, die mir wichtig sind",
+      "people_cared_about": "Menschen, um die es mir geht",
+      "desired_change": "Veränderung, die ich gern bewirke",
+      "meaningful_outcome": "Wirkung, die mir etwas bedeutet",
+      "energising_activity": "Arbeit, die mir Energie gibt",
+      "preferred_contribution": "Art, wie ich am liebsten beitrage",
+      "frustrating_condition": "Umstände, die mich aufhalten",
+      "recurring_tension": "Spannungen, die immer wieder auftauchen",
+      "open_question": "Noch offen"
+    },
+    "origins": {
+      "own_words": "Von dir geschrieben",
+      "confirmed_proposal": "Vorschlag, bestätigt",
+      "edited_proposal": "Vorschlag, von dir umformuliert"
+    },
+    "pendingProposals": "Vorschläge aus deinen Antworten gibt es noch nicht — bis dahin schreibst du selbst, was dir auffällt."
   }
 }

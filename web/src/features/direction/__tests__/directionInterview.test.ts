@@ -213,3 +213,95 @@ test("das Antwortfeld wird geteilt, nicht kopiert", () => {
   // Und es gibt keine zweite Kopie im Direction-Bereich.
   assert.doesNotMatch(codeOnly(ACTIONS), /localStorage/);
 });
+
+// ---------------------------------------------------------------------------
+// Was aus dem Gespräch bleibt (Schritt S3)
+// ---------------------------------------------------------------------------
+
+const STATEMENT_DATA = "src/features/direction/directionStatementData.ts";
+const STATEMENT_ACTIONS = "src/features/direction/directionStatementActions.ts";
+const STATEMENT_VIEW = "src/features/direction/DirectionStatements.tsx";
+const MIGRATION = "../supabase/migrations/20261036120000_direction_statements.sql";
+const sqlCodeOnly = (path: string) => source(path).replace(/^\s*--.*$/gm, "");
+
+test("die Facetten im Code und in der Datenbank sind dieselben", () => {
+  // Wäre die Liste im Code länger, liefe eine Aussage in einen
+  // Constraint-Fehler. Wäre sie kürzer, gäbe es eine Rubrik, die niemand
+  // wählen kann.
+  const migration = sqlCodeOnly(MIGRATION);
+  const start = migration.indexOf("direction_statements_facet_check");
+  const block = migration.slice(start, migration.indexOf("))", start));
+  const inDatabase = [...block.matchAll(/'([a-z_]+)'/g)].map((match) => match[1]).sort();
+  assert.deepEqual(inDatabase, [...DIRECTION_FACETS].sort());
+});
+
+test("ein Vorschlag ist keine Aussage - und das steckt in zwei Tabellen", () => {
+  // DIE ZUSAGE aus dem Briefing: "Nur bestätigte Inhalte dürfen später für
+  // andere Produktbereiche genutzt werden." Sie wird nicht von der
+  // Oberfläche eingehalten, sondern davon, dass es zwei Tabellen sind. Eine
+  // `status`-Spalte in einer gemeinsamen Tabelle wäre dieselbe Zusage mit
+  // einem vergessenen `where` Abstand.
+  const migration = sqlCodeOnly(MIGRATION);
+  assert.match(migration, /create table public\.direction_statements/);
+  assert.match(migration, /create table public\.direction_statement_proposals/);
+  // Kein Schreibrecht auf die Vorschläge - sie entstehen nur in Schritt S4.
+  assert.doesNotMatch(migration, /grant insert[^;]*direction_statement_proposals/i);
+  assert.match(migration, /grant update \(status, decided_at\) on public\.direction_statement_proposals/);
+
+  // Und außerhalb des Direction-Bereichs liest niemand die Vorschläge.
+  const readers = [codeOnly(STATEMENT_DATA), codeOnly(STATEMENT_VIEW)].join("\n");
+  assert.doesNotMatch(readers, /direction_statement_proposals/);
+});
+
+test("die Anwendung schreibt nur eigene Worte", () => {
+  // Die beiden anderen Herkünfte entstehen erst in Schritt S4, und zwar
+  // durch eine Funktion in der Datenbank. Könnte die Anwendung sie schon
+  // schreiben, wäre die Herkunft eine Behauptung des Aufrufers statt einer
+  // Tatsache - und die Frage "wessen Formulierung ist das" wäre nicht mehr
+  // beantwortbar.
+  const actions = codeOnly(STATEMENT_ACTIONS);
+  assert.match(actions, /origin: "own_words"/);
+  assert.doesNotMatch(actions, /confirmed_proposal|edited_proposal/);
+  // Und die Facette wird geprüft, bevor sie in die Datenbank geht: Der
+  // Constraint fängt es auch, aber als Ausnahme statt als Meldung.
+  assert.match(actions, /DIRECTION_FACETS as readonly string\[\]\)\.includes\(facet\)/);
+});
+
+test("entfernen heißt entfernen", () => {
+  // Kein "verborgen"-Merkmal: Wer eine Aussage über sich zurücknimmt, will
+  // nicht, dass sie irgendwo weiterlebt.
+  const actions = codeOnly(STATEMENT_ACTIONS);
+  assert.match(actions, /\.delete\(\)/);
+  assert.doesNotMatch(actions, /hidden|archived|is_active/);
+});
+
+test("es gibt keine Freigabestufe, solange es kein Teilen gibt", () => {
+  // "Privat" ist hier kein Vorgabewert in einer Spalte, sondern die
+  // Abwesenheit jeder anderen Regel: Die Zeilensicherheit lässt nur die
+  // eigene Person lesen. Eine Spalte `direction_disclosure`, die niemand
+  // liest, wäre ein Versprechen, das nichts einlöst - abweichend vom Brief,
+  // der sie für S3 vorsah.
+  const migration = sqlCodeOnly(MIGRATION);
+  assert.doesNotMatch(migration, /direction_disclosure/);
+  assert.equal((migration.match(/user_id = auth\.uid\(\)/g) ?? []).length >= 4, true);
+});
+
+test("die Auswertung steht in beiden Sprachen und ohne Zahl", () => {
+  for (const locale of ["de", "en"]) {
+    const statements = (bundle(locale) as unknown as {
+      statements: { facets: Record<string, string>; origins: Record<string, string> } & Record<string, string>;
+    }).statements;
+    for (const facet of DIRECTION_FACETS) {
+      assert.ok(statements.facets[facet], `${locale}: ${facet} hat keinen Namen`);
+    }
+    assert.deepEqual(
+      Object.keys(statements.facets).sort(),
+      [...DIRECTION_FACETS].sort(),
+      `${locale}: die Rubriken und die Facetten stimmen nicht überein`
+    );
+    for (const origin of ["own_words", "confirmed_proposal", "edited_proposal"]) {
+      assert.ok(statements.origins[origin], `${locale}: Herkunft ${origin} fehlt`);
+    }
+    assert.ok(statements.pendingProposals, `${locale}: der Hinweis auf fehlende Vorschläge fehlt`);
+  }
+});

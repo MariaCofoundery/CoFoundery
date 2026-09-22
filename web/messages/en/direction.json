@@ -24,7 +24,10 @@
     "save": "The answer could not be saved. The text is still there, please try again.",
     "complete": "Completing did not work. Please try again.",
     "stale": "This question is no longer the current one. Below is where you stand.",
-    "too_few": "A summary needs at least four answers."
+    "too_few": "A summary needs at least four answers.",
+    "facet": "Choose what it is about.",
+    "statement_short": "A little more than that.",
+    "statement_long": "That is longer than two hundred characters. Shorten it to one sentence."
   },
   "progress": {
     "atQuestion": "Question {index} of {total}",
@@ -106,5 +109,40 @@
         }
       }
     }
+  },
+  "statements": {
+    "title": "My direction",
+    "text": "What you keep here belongs to you — in your words. It is visible only to you, and no number comes out of it.",
+    "empty": "Nothing kept yet. Write down what struck you while reading your answers.",
+    "addTitle": "Keep something",
+    "facetLabel": "What is it about?",
+    "statementLabel": "In one sentence",
+    "statementPlaceholder": "For example: making complicated systems easier to understand",
+    "statementHint": "At most {max} characters. A direction you cannot say in one sentence is not one yet.",
+    "add": "Keep it",
+    "addPending": "Saving …",
+    "edit": "Change",
+    "editPending": "Saving …",
+    "remove": "Remove",
+    "removePending": "Removing …",
+    "originLabel": "Origin",
+    "facets": {
+      "recurring_theme": "Themes that keep coming back",
+      "problem_cared_about": "Problems I care about",
+      "people_cared_about": "People I care about",
+      "desired_change": "Change I like creating",
+      "meaningful_outcome": "Outcomes that mean something to me",
+      "energising_activity": "Work that gives me energy",
+      "preferred_contribution": "How I most like to contribute",
+      "frustrating_condition": "Conditions that hold me back",
+      "recurring_tension": "Tensions that keep showing up",
+      "open_question": "Still open"
+    },
+    "origins": {
+      "own_words": "Written by you",
+      "confirmed_proposal": "Proposal, confirmed",
+      "edited_proposal": "Proposal, rewritten by you"
+    },
+    "pendingProposals": "There are no proposals from your answers yet — until then you write down yourself what you notice."
   }
 }
