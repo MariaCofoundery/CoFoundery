@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { INTERVIEW_QUESTIONS } from "@/features/capability/capabilityInterviewGuide";
-import { hasSpokenTexts, spokenText } from "@/features/capability/interviewAudio";
+import { hasSpokenTexts, spokenText } from "@/features/interviews/interviewAudio";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const codeOnly = (path: string) =>
@@ -28,7 +28,7 @@ test("zur Laufzeit wird nichts erzeugt und nichts angefragt", () => {
   // Verzeichnis im Code. Ein Rendering kostet ausserdem rund zwanzig Sekunden
   // (gemessen: 8,5 Sekunden Sprache in 19 Sekunden), und so lange wartet
   // niemand vor einer Frage.
-  for (const path of ["src/features/capability/interviewAudio.ts", PAGE]) {
+  for (const path of ["src/features/interviews/interviewAudio.ts", PAGE]) {
     const code = codeOnly(path);
     assert.doesNotMatch(code, /aicappella|AICAPELLA|fetch\(/i, `${path} ruft den Dienst`);
   }
@@ -50,7 +50,7 @@ test("kein Knopf ohne Datei", () => {
   // Die Nachfragen stehen im Formular, nicht in der Seite - sie erscheinen
   // erst, wenn jemand angefangen hat zu schreiben.
   assert.match(
-    source("src/features/capability/InterviewAnswerForm.tsx"),
+    source("src/features/interviews/InterviewAnswerForm.tsx"),
     /followUp\.audio \? <SpeakButton/
   );
 });
@@ -58,7 +58,7 @@ test("kein Knopf ohne Datei", () => {
 test("nur MP3 wird ausgeliefert - WAV ist Zwischenspeicher", () => {
   // Zweiunddreissig Texte waeren als WAV rund vierzehn Megabyte. Gemessen am
   // 21.09.2026: 8,5 Sekunden sind 406 KB als WAV und 51 KB als MP3.
-  const audio = codeOnly("src/features/capability/interviewAudio.ts");
+  const audio = codeOnly("src/features/interviews/interviewAudio.ts");
   assert.match(audio, /if \(!entry\?\.mp3\) return null/);
 
   // Und die WAV-Dateien liegen nicht im Repository.

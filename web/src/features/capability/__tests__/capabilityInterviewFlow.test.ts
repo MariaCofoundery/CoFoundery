@@ -13,7 +13,7 @@ const codeOnly = (path: string) =>
 
 const DATA = "src/features/capability/capabilityInterviewData.ts";
 const ACTIONS = "src/features/capability/capabilityInterviewActions.ts";
-const FORM = "src/features/capability/InterviewAnswerForm.tsx";
+const FORM = "src/features/interviews/InterviewAnswerForm.tsx";
 const PAGE = "src/app/(product)/profile/interview/page.tsx";
 
 const interviewCopy = (locale: string) =>
@@ -92,8 +92,15 @@ test("zwei Ebenen speichern, und sie sagen Verschiedenes", () => {
   // anderen Geraet nie da.
   const form = codeOnly(FORM);
   assert.match(form, /localStorage\.setItem/);
-  assert.match(form, /autosaveInterviewAnswerAction/);
+  // ANGEPASST AM 22.09.2026: Hier stand `autosaveInterviewAnswerAction`. Das
+  // Feld ist seit dem Teilen der Gespraechsmechanik allgemein und bekommt
+  // seine drei Aktionen als Eigenschaft - die Zusage ist dieselbe: Es gibt
+  // einen verzoegerten Gang zum Server. Dass die Capability-Seite dort ihre
+  // eigene Aktion uebergibt, prueft der Test weiter unten.
+  assert.match(form, /actions\.autosave/);
   assert.match(form, /AUTOSAVE_DELAY_MS/);
+  const page = codeOnly("src/app/(product)/profile/interview/page.tsx");
+  assert.match(page, /autosave: autosaveInterviewAnswerAction/);
 
   // Jeder Zugriff auf den Browserspeicher ist abgesichert: In einem privaten
   // Fenster oder bei abgeschalteten Websitedaten wirft er.
@@ -151,7 +158,15 @@ test("die Nachfragen kommen nach dem Schreiben, nicht davor", () => {
   // Vorher waeren es drei Fragen gleichzeitig und niemand faengt an. Danach
   // sind sie das, was sie sein sollen: ein Nachhaken an derselben Geschichte.
   const form = codeOnly(FORM);
-  assert.match(form, /showFollowUps = value\.trim\(\)\.length >= NARRATIVE_MIN_LENGTH/);
+  // ANGEPASST AM 22.09.2026: Die Schwelle heisst im geteilten Feld
+  // `minLength` und kommt von der Seite; fuer Capability ist es weiterhin
+  // NARRATIVE_MIN_LENGTH, und beide Interviews liegen bei zehn Zeichen, weil
+  // die Datenbank es so verlangt.
+  assert.match(form, /showFollowUps = value\.trim\(\)\.length >= minLength/);
+  assert.match(
+    codeOnly("src/app/(product)/profile/interview/page.tsx"),
+    /minLength=\{NARRATIVE_MIN_LENGTH\}/
+  );
   assert.ok(NARRATIVE_MIN_LENGTH >= 10, "die Schwelle ist zu niedrig, um etwas zu bedeuten");
 
   // Und sie verlaengern dieselbe Antwort, statt eine eigene Station zu werden:

@@ -64,8 +64,9 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
+  const [t, tDirection, locale, params, vocabulary, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
     getTranslations("capability"),
+    getTranslations("direction"),
     getLocale(),
     searchParams,
     getCapabilityVocabulary(supabase),
@@ -200,6 +201,21 @@ export default async function ProfilePage({
               {t("interview.start")}
             </Link>
           )}
+        </section>
+      ) : null}
+
+      {/* DAS ZWEITE GESPRAECH, neu am 22.09.2026. Es steht als eigener
+          Abschnitt und nicht als zweiter Knopf im Faehigkeitsabschnitt: Es ist
+          eine andere Perspektive (was treibt mich an), kein weiterer Schritt
+          derselben. Beide koennen gleichzeitig offen sein - die Datenbank
+          laesst je Art ein Gespraech zu. */}
+      {step === null ? (
+        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-6">
+          <h2 className="text-xl font-semibold">{tDirection("title")}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{tDirection("text")}</p>
+          <Link href="/profile/direction" className={`${primary} mt-4`}>
+            {tDirection("start")}
+          </Link>
         </section>
       ) : null}
 

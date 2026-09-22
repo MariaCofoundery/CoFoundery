@@ -1,0 +1,110 @@
+{
+  "eyebrow": "Richtung",
+  "title": "Was dich immer wieder anzieht",
+  "text": "Sechs Fragen nach echten Situationen. Nicht „was ist dein Why“ — sondern woran du gearbeitet hast, was dich aufregt und was du verändert hast. Was sich darin wiederholt, ist die Richtung.",
+  "start": "Gespräch beginnen",
+  "startPending": "Wird geöffnet …",
+  "resume": "Weitermachen",
+  "guidance": {
+    "title": "Bevor du anfängst",
+    "time": "Nimm dir Zeit. Zwanzig bis dreißig Minuten, und es wird besser, wenn du nicht nebenbei etwas anderes machst.",
+    "save": "Es wird automatisch gespeichert, während du schreibst — auch wenn etwas abstürzt. Du kannst jederzeit pausieren und später weitermachen.",
+    "stories": "Erzähl von einer Sache, die passiert ist, nicht von dir selbst. Ein Beispiel ist mehr wert als eine Zusammenfassung.",
+    "private": "Alles, was du hier schreibst, ist nur für dich sichtbar. Es fließt in keine Suche, in keine Übereinstimmung und in kein Profil, solange du es nicht ausdrücklich freigibst.",
+    "noTest": "Es ist kein Test. Es gibt keine Punkte, keinen Typ und keine Einordnung — am Ende steht, was sich in deinen Beispielen wiederholt, und du entscheidest, was davon stimmt."
+  },
+  "notice": {
+    "paused": "Gespeichert. Du kannst jederzeit weitermachen.",
+    "completed": "Das Gespräch ist abgeschlossen. Deine Antworten stehen unten."
+  },
+  "errors": {
+    "start": "Das Gespräch konnte nicht geöffnet werden. Versuch es noch einmal.",
+    "short": "Ein bisschen mehr — mindestens zehn Zeichen.",
+    "long": "Das ist länger als zweitausend Zeichen. Kürze es etwas.",
+    "save": "Die Antwort konnte nicht gespeichert werden. Der Text steht noch da, versuch es noch einmal.",
+    "complete": "Das Abschließen hat nicht funktioniert. Versuch es noch einmal.",
+    "stale": "Diese Frage ist nicht mehr die aktuelle. Unten steht, wo du stehst.",
+    "too_few": "Für eine Zusammenfassung braucht es mindestens vier Antworten."
+  },
+  "progress": {
+    "atQuestion": "Frage {index} von {total}",
+    "atFollowUp": "Nachfrage",
+    "answered": "{count, plural, =0 {noch keine beantwortet} =1 {1 beantwortet} other {# beantwortet}}",
+    "enough": "Das reicht für eine Zusammenfassung. Mehr macht sie genauer."
+  },
+  "review": {
+    "title": "Deine Antworten",
+    "text": "Nebeneinander gelesen zeigt sich oft schon, was sich wiederholt.",
+    "empty": "Noch keine Antworten.",
+    "pendingSummary": "Die Zusammenfassung — welche Themen und Veränderungen bei dir wiederkehren — entsteht noch nicht automatisch. Bis dahin sind deine Antworten das Ergebnis."
+  },
+  "interview": {
+    "answerLabel": "Deine Antwort",
+    "answerHint": "Mindestens {min} Zeichen. Erzähl ruhig ausführlich — eine Situation, kein Fazit.",
+    "answerPlaceholder": "Erzähl, was passiert ist …",
+    "tooShort": "Noch zu kurz — mindestens {min} Zeichen.",
+    "submit": "Speichern und weiter",
+    "submitLast": "Speichern und abschließen",
+    "submitPending": "Wird gespeichert …",
+    "pause": "Pausieren",
+    "pausePending": "Wird gespeichert …",
+    "skip": "Diese Frage überspringen",
+    "skipPending": "Wird übersprungen …",
+    "restored": "Es war noch ein Text in diesem Browser, der länger war als der gespeicherte. Er steht jetzt da.",
+    "saveStateIdle": "Noch nicht gespeichert",
+    "saveStateLocal": "In diesem Browser gesichert",
+    "saveStateSaving": "Wird gespeichert …",
+    "saveStateSaved": "Gespeichert",
+    "saveStateFailed": "Nicht gespeichert — der Text steht noch in diesem Browser",
+    "followUpTitle": "Falls du magst",
+    "followUpHint": "Diese Nachfragen gehören zur selben Antwort — schreib einfach weiter.",
+    "questions": {
+      "more_of_this": {
+        "title": "Erzähl mir von etwas, an dem du gearbeitet hast und bei dem du dachtest: Davon würde ich gern mehr machen.",
+        "hint": "Beruflich oder privat — beides zählt gleich.",
+        "followUps": {
+          "whatMattered": "Was genau daran war dir wichtig?",
+          "doingOrResult": "War dir dabei eher wichtig, was du getan hast — oder was dadurch entstanden ist?"
+        }
+      },
+      "keeps_bothering": {
+        "title": "Welches Problem oder welche Situation regt dich immer wieder auf, weil du denkst: Das müsste doch besser gehen?",
+        "hint": "Nicht der Ärger von heute, sondern der, der wiederkommt.",
+        "followUps": {
+          "whatExactlyBothers": "Was genau daran stört dich immer wieder?",
+          "whoIsAffected": "Für wen ist dieses Problem aus deiner Sicht besonders relevant?"
+        }
+      },
+      "changed_something": {
+        "title": "Wann hattest du zuletzt das Gefühl, mit deiner Arbeit oder deinem Handeln wirklich etwas Sinnvolles verändert zu haben?",
+        "hint": "Auch etwas Kleines. Hauptsache, es ist wirklich passiert.",
+        "followUps": {
+          "whatWasDifferentAfter": "Was war danach für jemanden tatsächlich anders?",
+          "whyThisMattered": "Warum war gerade diese Veränderung wichtig?"
+        }
+      },
+      "change_in_others": {
+        "title": "Welche Veränderung bei anderen Menschen oder in deiner Umgebung freut dich besonders, wenn du daran beteiligt warst?",
+        "hint": "Hier geht es um die Wirkung, nicht um deine Tätigkeit.",
+        "followUps": {
+          "howYouNoticed": "Woran hast du gemerkt, dass sich etwas verändert hat?"
+        }
+      },
+      "interesting_anyway": {
+        "title": "Was würdest du wahrscheinlich auch dann spannend finden, wenn dir noch niemand sagen könnte, ob daraus ein gutes Business wird?",
+        "hint": "Es muss keine Idee sein. Ein Thema genügt.",
+        "followUps": {
+          "whatYouWouldFindOutFirst": "Was würdest du als Erstes darüber herausfinden wollen?"
+        }
+      },
+      "five_years_back": {
+        "title": "Wenn du in fünf Jahren zurückblickst: Was müsste durch deine Arbeit entstanden oder anders geworden sein, damit du denkst: Das war die Mühe wert?",
+        "hint": "Eine Richtung, keine Jobbezeichnung.",
+        "followUps": {
+          "whatDependsOnYou": "Was davon hängt von dir ab — und was nicht?",
+          "whatYouWouldGiveUp": "Was würdest du dafür in Kauf nehmen?"
+        }
+      }
+    }
+  }
+}

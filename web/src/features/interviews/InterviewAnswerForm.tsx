@@ -8,13 +8,6 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 import { SpeakButton } from "./SpeakButton";
 import type { SpokenText } from "./interviewAudio";
 
-import {
-  autosaveInterviewAnswerAction,
-  saveInterviewAnswerAction,
-  skipInterviewQuestionAction,
-} from "./capabilityInterviewActions";
-import { NARRATIVE_MAX_LENGTH, NARRATIVE_MIN_LENGTH } from "./capabilityTypes";
-
 /**
  * Das Antwortfeld.
  *
@@ -80,12 +73,44 @@ function clearDraft(key: string) {
 }
 
 export function InterviewAnswerForm({
+  namespace,
+  actions,
+  minLength,
+  maxLength,
   sessionId,
   turnId,
   savedAnswer,
   followUps,
   isLastQuestion,
 }: {
+  /**
+   * Der Namensraum, in dem die Texte liegen - erwartet werden die Schluessel
+   * unter `interview.*`.
+   *
+   * DAZUGEKOMMEN AM 22.09.2026, als das Direction-Interview dasselbe Feld
+   * braucht. Vorher stand hier `useTranslations("capability")` fest, und
+   * damit war das aufwendigste Bauteil des Gespraechs an einen Bereich
+   * gebunden. Ein `copy`-Objekt mit neunzehn Beschriftungen waere die
+   * Alternative gewesen - neunzehn Zeilen an jeder Aufrufstelle, damit die
+   * Namen nicht vereinbart werden muessen. Der Namensraum ist der kuerzere
+   * Vertrag; dass beide Bundles ihn vollstaendig erfuellen, prueft ein Test.
+   */
+  namespace: string;
+  /**
+   * Die drei Server Actions dieses Interviews.
+   *
+   * `autosave` nimmt ein Objekt und kein FormData: Es laeuft im Hintergrund
+   * und gehoert zu keinem Absenden. Es leitet auch nicht weiter und meldet
+   * nur, ob es angekommen ist - der Zustandstext am Feld haengt daran.
+   */
+  actions: {
+    autosave: (input: { turnId: string; answer: string }) => Promise<{ saved: boolean }>;
+    save: (formData: FormData) => void | Promise<void>;
+    skip: (formData: FormData) => void | Promise<void>;
+  };
+  /** Die Grenzen der Datenbank - fuer beide Arten 10 bis 2000 Zeichen. */
+  minLength: number;
+  maxLength: number;
   sessionId: string;
   turnId: string;
   /** Was auf dem Server steht - leer, solange nichts gespeichert wurde. */
@@ -94,7 +119,7 @@ export function InterviewAnswerForm({
   followUps: readonly { text: string; audio: SpokenText | null }[];
   isLastQuestion: boolean;
 }) {
-  const t = useTranslations("capability");
+  const t = useTranslations(namespace);
   const key = draftKey(sessionId, turnId);
 
   const [value, setValue] = useState(savedAnswer);
@@ -123,12 +148,12 @@ export function InterviewAnswerForm({
 
     const trimmed = value.trim();
     if (trimmed === lastSaved.current.trim()) return;
-    if (trimmed.length < NARRATIVE_MIN_LENGTH) return;
-    if (trimmed.length > NARRATIVE_MAX_LENGTH) return;
+    if (trimmed.length < minLength) return;
+    if (trimmed.length > maxLength) return;
 
     timer.current = setTimeout(() => {
       setSaveState("saving");
-      void autosaveInterviewAnswerAction({ turnId, answer: trimmed })
+      void actions.autosave({ turnId, answer: trimmed })
         .then((result) => {
           if (!result.saved) {
             // Der Browserstand bleibt liegen - er ist jetzt die einzige Kopie.
@@ -145,7 +170,13 @@ export function InterviewAnswerForm({
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [value, turnId]);
+    // `actions`, `minLength` und `maxLength` stehen mit in der Liste, weil sie
+    // seit dem 22.09.2026 von aussen kommen. Sie aendern sich im Betrieb
+    // nicht - eine Server Action behaelt ihre Kennung, die Grenzen sind
+    // Konstanten - aber das gehoert nicht in einen Kommentar, sondern in die
+    // Abhaengigkeiten: Wer das Feld spaeter mit wechselnden Aktionen benutzt,
+    // soll keinen Effekt bekommen, der die alte noch ruft.
+  }, [value, turnId, actions, minLength, maxLength]);
 
   const onChange = (next: string) => {
     setValue(next);
@@ -155,12 +186,12 @@ export function InterviewAnswerForm({
     if (next.trim() !== lastSaved.current.trim()) setSaveState(stored ? "local" : "failed");
   };
 
-  const tooShort = value.trim().length > 0 && value.trim().length < NARRATIVE_MIN_LENGTH;
-  const showFollowUps = value.trim().length >= NARRATIVE_MIN_LENGTH;
+  const tooShort = value.trim().length > 0 && value.trim().length < minLength;
+  const showFollowUps = value.trim().length >= minLength;
 
   return (
     <div>
-      <form action={saveInterviewAnswerAction} onSubmit={() => clearDraft(key)}>
+      <form action={actions.save} onSubmit={() => clearDraft(key)}>
         <input type="hidden" name="turnId" value={turnId} />
 
         <label htmlFor="answer" className="block text-sm font-medium text-slate-900">
@@ -172,8 +203,8 @@ export function InterviewAnswerForm({
             name="answer"
             defaultValue={value}
             rows={7}
-            minLength={NARRATIVE_MIN_LENGTH}
-            maxLength={NARRATIVE_MAX_LENGTH}
+            minLength={minLength}
+            maxLength={maxLength}
             placeholder={t("interview.answerPlaceholder")}
             className="min-h-40 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-6"
             onValueChange={onChange}
@@ -199,7 +230,7 @@ export function InterviewAnswerForm({
                     : t("interview.saveStateIdle")}
           </span>
           <span className="text-slate-400">
-            {t("interview.answerHint", { min: NARRATIVE_MIN_LENGTH })}
+            {t("interview.answerHint", { min: minLength })}
           </span>
         </div>
 
@@ -238,7 +269,7 @@ export function InterviewAnswerForm({
 
         {tooShort ? (
           <p className="mt-3 text-sm leading-6 text-amber-800">
-            {t("interview.tooShort", { min: NARRATIVE_MIN_LENGTH })}
+            {t("interview.tooShort", { min: minLength })}
           </p>
         ) : null}
 
@@ -284,7 +315,7 @@ export function InterviewAnswerForm({
       {/* Ein eigenes Formular: Ein Formular in einem Formular ist ungueltiges
           HTML. Ueberspringen nimmt den getippten Text nicht mit - das ist
           gewollt, denn es heisst "hierzu habe ich nichts". */}
-      <form action={skipInterviewQuestionAction} className="mt-3">
+      <form action={actions.skip} className="mt-3">
         <input type="hidden" name="turnId" value={turnId} />
         <SubmitButton
           label={t("interview.skip")}

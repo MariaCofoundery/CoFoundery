@@ -7,6 +7,7 @@ import deCapability from "../../messages/de/capability.json";
 import deCommon from "../../messages/de/common.json";
 import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
+import deDirection from "../../messages/de/direction.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFeedback from "../../messages/de/feedback.json";
 import deFounderLibrary from "../../messages/de/founderLibrary.json";
@@ -28,6 +29,7 @@ import enCapability from "../../messages/en/capability.json";
 import enCommon from "../../messages/en/common.json";
 import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
+import enDirection from "../../messages/en/direction.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFeedback from "../../messages/en/feedback.json";
 import enFounderLibrary from "../../messages/en/founderLibrary.json";
@@ -52,6 +54,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     common: deCommon,
     collaborationLab: deCollaborationLab,
     dashboard: deDashboard,
+    direction: deDirection,
     discovery: deDiscovery,
     feedback: deFeedback,
     founderLibrary: deFounderLibrary,
@@ -75,6 +78,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     common: enCommon,
     collaborationLab: enCollaborationLab,
     dashboard: enDashboard,
+    direction: enDirection,
     discovery: enDiscovery,
     feedback: enFeedback,
     founderLibrary: enFounderLibrary,

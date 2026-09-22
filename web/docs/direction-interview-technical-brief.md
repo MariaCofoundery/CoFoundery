@@ -239,11 +239,23 @@ Vorproduziert, nicht zur Laufzeit:
   Wartezeit, keine Abhaengigkeit von aicapella im Betrieb.
 - Stand: 32 deutsche MP3s, 1,2 MB, 3,2 Minuten. Englisch ist nicht gebaut.
 
-**Speech-to-Text gibt es nicht.** Das Briefing nennt "Nutzerantwort per Audio,
-Speech-to-Text" - dafuer existiert im Repository keine Grundlage, und aicapella
-ist ein Stimmdienst, kein Erkenner. Das ist ein eigenes Vorhaben mit eigenem
-Anbieter, eigener Einwilligung und eigener Loeschfrist. Es gehoert nicht in
-Direction v0.1.
+**Antworten per Sprache gibt es schon** - das hatte ich am 21.09.2026 in der
+ersten Fassung dieses Dokuments falsch verneint. Vorhanden ist
+`web/src/features/dictation/` (`useDictation.ts`, `DictatedTextarea.tsx`), und
+das Antwortfeld des Capability-Interviews benutzt es bereits. Es laeuft
+**ausschliesslich ueber die Browser-Erkennung**: fortlaufend, mit
+Zwischenstand, mit eigenem Ende nach Stille - und ausdruecklich ohne Dienst,
+damit nichts vom Diktierten unsere Wege nimmt und keine Auftragsverarbeitung
+entsteht. Die Oberflaeche nennt es deshalb eine Browser-Funktion.
+
+Direction erbt das durch dasselbe Textfeld, ohne Zusatzarbeit.
+
+**Was es nicht gibt, ist serverseitige Spracherkennung** - ein Anbieter, der
+eine Aufnahme entgegennimmt. aicapella ist ein Stimmdienst, kein Erkenner. Das
+bliebe ein eigenes Vorhaben mit eigenem Anbieter, eigener Einwilligung und
+eigener Loeschfrist, und es gehoert nicht in Direction v0.1. Der Unterschied
+ist wichtig: Die Person kann heute sprechen statt tippen; was nicht existiert,
+ist ein Weg, auf dem eine Aufnahme zu uns kaeme.
 
 ### 2.10 Was kann unveraendert wiederverwendet werden?
 
@@ -598,5 +610,7 @@ Diese gehoeren Maria, nicht mir:
 3. **Name im Produkt.** "Direction" ist ein Arbeitsbegriff. `MY DIRECTION` auf
    einer deutschen Oberflaeche braucht eine deutsche Entsprechung, die nicht
    "Purpose" ist.
-4. **Speech-to-Text** - eigenes Vorhaben, eigener Anbieter, eigene
-   Einwilligung. Jetzt bewusst nicht.
+4. **Serverseitige Spracherkennung** - eigenes Vorhaben, eigener Anbieter,
+   eigene Einwilligung. Jetzt bewusst nicht. Das Diktat im Browser gibt es
+   dagegen schon und Direction erbt es (Korrektur vom 22.09.2026, siehe
+   Abschnitt 2.9).

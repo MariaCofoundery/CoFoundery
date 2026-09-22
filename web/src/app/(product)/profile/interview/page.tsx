@@ -3,7 +3,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import {
+  autosaveInterviewAnswerAction,
   completeInterviewAction,
+  saveInterviewAnswerAction,
+  skipInterviewQuestionAction,
   startInterviewAction,
 } from "@/features/capability/capabilityInterviewActions";
 import {
@@ -11,9 +14,10 @@ import {
   interviewQuestionMeta,
 } from "@/features/capability/capabilityInterviewData";
 import { INTERVIEW_MIN_ANSWERS } from "@/features/capability/capabilityInterviewGuide";
-import { InterviewAnswerForm } from "@/features/capability/InterviewAnswerForm";
-import { SpeakButton } from "@/features/capability/SpeakButton";
-import { spokenText } from "@/features/capability/interviewAudio";
+import { NARRATIVE_MAX_LENGTH, NARRATIVE_MIN_LENGTH } from "@/features/capability/capabilityTypes";
+import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
+import { SpeakButton } from "@/features/interviews/SpeakButton";
+import { spokenText } from "@/features/interviews/interviewAudio";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -303,7 +307,20 @@ function Question({
       ) : null}
 
       <div className="mt-5">
+        {/* Das Feld ist seit dem 22.09.2026 geteilt
+            (`features/interviews/InterviewAnswerForm.tsx`) - es traegt das
+            zweischichtige Speichern, und das gibt es einmal. Was dieses
+            Interview ausmacht, kommt als Namensraum und als seine drei
+            Aktionen herein. */}
         <InterviewAnswerForm
+          namespace="capability"
+          actions={{
+            autosave: autosaveInterviewAnswerAction,
+            save: saveInterviewAnswerAction,
+            skip: skipInterviewQuestionAction,
+          }}
+          minLength={NARRATIVE_MIN_LENGTH}
+          maxLength={NARRATIVE_MAX_LENGTH}
           sessionId={state.sessionId}
           turnId={turn.id}
           savedAnswer={turn.answer ?? ""}

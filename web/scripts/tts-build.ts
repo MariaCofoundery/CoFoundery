@@ -37,7 +37,7 @@ const VOICE = process.env.AICAPELLA_VOICE_ID?.trim() ?? "";
 
 const LOCALES = (process.env.TTS_LOCALES?.trim() || "de").split(",").map((l) => l.trim());
 const OUT_DIR = "public/audio/interview";
-const MANIFEST = "src/features/capability/interviewAudioManifest.json";
+const MANIFEST = "src/features/interviews/interviewAudioManifest.json";
 
 /** Grenzen des Dienstes: 300 Zeichen je Abschnitt, 20 Abschnitte je Auftrag. */
 const MAX_SEGMENT = 300;

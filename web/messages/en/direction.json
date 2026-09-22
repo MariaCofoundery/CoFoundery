@@ -1,0 +1,110 @@
+{
+  "eyebrow": "Direction",
+  "title": "What keeps pulling you in",
+  "text": "Six questions about real situations. Not “what is your why” — but what you worked on, what annoys you and what you changed. What repeats in those stories is the direction.",
+  "start": "Start the conversation",
+  "startPending": "Opening …",
+  "resume": "Continue",
+  "guidance": {
+    "title": "Before you start",
+    "time": "Take your time. Twenty to thirty minutes, and it gets better if you are not doing something else alongside.",
+    "save": "It saves automatically while you write — even if something crashes. You can pause any time and continue later.",
+    "stories": "Tell one thing that happened, rather than describing yourself. One example is worth more than a summary.",
+    "private": "Everything you write here is visible only to you. It feeds no search, no matching and no profile unless you release it explicitly.",
+    "noTest": "This is not a test. There are no points, no type and no category — at the end you see what repeats in your examples, and you decide what fits."
+  },
+  "notice": {
+    "paused": "Saved. You can continue any time.",
+    "completed": "The conversation is complete. Your answers are below."
+  },
+  "errors": {
+    "start": "The conversation could not be opened. Please try again.",
+    "short": "A little more — at least ten characters.",
+    "long": "That is longer than two thousand characters. Please shorten it.",
+    "save": "The answer could not be saved. The text is still there, please try again.",
+    "complete": "Completing did not work. Please try again.",
+    "stale": "This question is no longer the current one. Below is where you stand.",
+    "too_few": "A summary needs at least four answers."
+  },
+  "progress": {
+    "atQuestion": "Question {index} of {total}",
+    "atFollowUp": "Follow-up",
+    "answered": "{count, plural, =0 {none answered yet} =1 {1 answered} other {# answered}}",
+    "enough": "That is enough for a summary. More makes it more precise."
+  },
+  "review": {
+    "title": "Your answers",
+    "text": "Read side by side, what repeats often shows itself.",
+    "empty": "No answers yet.",
+    "pendingSummary": "The summary — which themes and changes keep coming back for you — is not generated automatically yet. Until then your answers are the result."
+  },
+  "interview": {
+    "answerLabel": "Your answer",
+    "answerHint": "At least {min} characters. Take your space — one situation, not a conclusion.",
+    "answerPlaceholder": "Tell what happened …",
+    "tooShort": "Still too short — at least {min} characters.",
+    "submit": "Save and continue",
+    "submitLast": "Save and finish",
+    "submitPending": "Saving …",
+    "pause": "Pause",
+    "pausePending": "Saving …",
+    "skip": "Skip this question",
+    "skipPending": "Skipping …",
+    "restored": "There was still a text in this browser, longer than the saved one. It is here now.",
+    "saveStateIdle": "Not saved yet",
+    "saveStateLocal": "Kept in this browser",
+    "saveStateSaving": "Saving …",
+    "saveStateSaved": "Saved",
+    "saveStateFailed": "Not saved — the text is still in this browser",
+    "followUpTitle": "If you like",
+    "followUpHint": "These follow-ups belong to the same answer — just keep writing.",
+    "questions": {
+      "more_of_this": {
+        "title": "Tell me about something you worked on where you thought: I would like to do more of that.",
+        "hint": "Professional or personal — both count equally.",
+        "followUps": {
+          "whatMattered": "What exactly about it mattered to you?",
+          "doingOrResult": "Was it more about what you did — or about what came out of it?"
+        }
+      },
+      "keeps_bothering": {
+        "title": "Which problem or situation keeps annoying you because you think: surely this could be better?",
+        "hint": "Not today's annoyance, but the one that keeps returning.",
+        "followUps": {
+          "whatExactlyBothers": "What exactly about it bothers you again and again?",
+          "whoIsAffected": "Who do you think this problem is particularly relevant for?"
+        }
+      },
+      "changed_something": {
+        "title": "When did you last feel that your work or your actions really changed something meaningful?",
+        "hint": "Something small counts too. What matters is that it actually happened.",
+        "followUps": {
+          "whatWasDifferentAfter": "What was actually different for somebody afterwards?",
+          "whyThisMattered": "Why was this particular change important?"
+        }
+      },
+      "change_in_others": {
+        "title": "Which change in other people or in your surroundings makes you especially glad when you were part of it?",
+        "hint": "This is about the effect, not about your activity.",
+        "followUps": {
+          "howYouNoticed": "How did you notice that something had changed?"
+        }
+      },
+      "interesting_anyway": {
+        "title": "What would you probably still find interesting even if nobody could tell you yet whether a good business comes out of it?",
+        "hint": "It does not have to be an idea. A topic is enough.",
+        "followUps": {
+          "whatYouWouldFindOutFirst": "What would you want to find out about it first?"
+        }
+      },
+      "five_years_back": {
+        "title": "Looking back from five years out: what would have to exist or be different because of your work for you to think: that was worth the effort?",
+        "hint": "A direction, not a job title.",
+        "followUps": {
+          "whatDependsOnYou": "Which part of that depends on you — and which does not?",
+          "whatYouWouldGiveUp": "What would you accept in return for it?"
+        }
+      }
+    }
+  }
+}
