@@ -122,15 +122,22 @@ export const DIRECTION_QUESTIONS: readonly DirectionQuestion[] = [
     followUpIds: ["whatWasDifferentAfter", "whyThisMattered"],
   },
   {
-    // "Welche Veränderung bei anderen Menschen oder in deiner Umgebung freut
-    //  dich besonders, wenn du daran beteiligt warst?"
+    // "Erzähl von etwas, das du gemacht hast und bei dem du danach dachtest:
+    //  So möchte ich das nicht nochmal machen."
     //
-    // Der Fokus liegt auf der WIRKUNG, nicht auf der Tätigkeit. Die Nähe zur
-    // vorigen Frage ist bekannt und steht als offene Entscheidung im Brief:
-    // Sechs Fragen mit einer Doppelung sind schwächer als fünf ohne.
-    id: "change_in_others",
-    facets: ["desired_change", "people_cared_about"],
-    followUpIds: ["howYouNoticed"],
+    // ERSETZT AM 22.09.2026 die Frage nach der "Veränderung bei anderen".
+    // Maria nach dem ersten Durchlauf: "Eine Frage fühlte sich irgendwie
+    // doppelt an." Sie hatte recht, und die Doppelung war die mit Frage 3:
+    // Beide fragten nach der Wirkung, einmal bei einem selbst und einmal bei
+    // anderen - und in der Antwort kommt dieselbe Geschichte zweimal.
+    //
+    // Diese hier ist der Gegenpol zu Frage 1: was man MEHR machen würde und
+    // was man NICHT nochmal so machen würde. Was jemanden abstößt, sagt über
+    // die Richtung oft mehr als das, was ihm gefällt - und `frustrating_
+    // condition` hatte bis dahin keine eigene Frage.
+    id: "not_again",
+    facets: ["frustrating_condition", "recurring_tension"],
+    followUpIds: ["whatExactlyWasIt", "whatWouldHaveHelped"],
   },
   {
     // "Was würdest du wahrscheinlich auch dann spannend finden, wenn dir noch
@@ -190,8 +197,31 @@ export const DIRECTION_MAX_LENGTH = 2000;
 export const STATEMENT_MIN_LENGTH = 3;
 export const STATEMENT_MAX_LENGTH = 200;
 
+/**
+ * Fragen, die nicht mehr gestellt werden - aber noch angezeigt werden müssen.
+ *
+ * WARUM SIE NICHT EINFACH VERSCHWINDEN: Wer eine Frage schon beantwortet hat,
+ * findet seine Antwort im Rückblick wieder. Ohne diesen Eintrag stünde dort
+ * die nackte Kennung, oder - schlimmer - der Text einer ANDEREN Frage, wenn
+ * man die Kennung für eine neue Frage wiederverwendet. Eine gegebene Antwort
+ * muss unter der Frage stehen, die wirklich gestellt wurde.
+ *
+ * Ihre Texte bleiben deshalb im Sprachbundle stehen.
+ */
+export const RETIRED_DIRECTION_QUESTIONS: readonly DirectionQuestion[] = [
+  {
+    id: "change_in_others",
+    facets: ["desired_change", "people_cared_about"],
+    followUpIds: ["howYouNoticed"],
+  },
+];
+
 export function findDirectionQuestion(id: string) {
-  return DIRECTION_QUESTIONS.find((question) => question.id === id) ?? null;
+  return (
+    DIRECTION_QUESTIONS.find((question) => question.id === id) ??
+    RETIRED_DIRECTION_QUESTIONS.find((question) => question.id === id) ??
+    null
+  );
 }
 
 /** Die erste noch nicht gestellte Frage. */

@@ -108,6 +108,14 @@
           "whatDependsOnYou": "Which part of that depends on you — and which does not?",
           "whatYouWouldGiveUp": "What would you accept in return for it?"
         }
+      },
+      "not_again": {
+        "title": "Tell me about something you did where you thought afterwards: I do not want to do it that way again.",
+        "hint": "The counterpart to the first question. What puts you off often says more about direction than what you enjoy.",
+        "followUps": {
+          "whatExactlyWasIt": "What exactly was it — the task, the circumstances or the people?",
+          "whatWouldHaveHelped": "What would have made it bearable for you?"
+        }
       }
     }
   },
@@ -163,5 +171,16 @@
     "jobFailed": "That did not work. You can try again.",
     "jobDone": "Read.",
     "unavailable": "No model is reachable right now. Your answers stay where they are; you can have them read later."
+  },
+  "done": {
+    "title": "Your answers are in",
+    "text": "{count} of {total} questions answered. What happens next is your call.",
+    "withAi": "You can have your answers read. They go to a model on Maria's machine — not to an outside service. Out come proposals with the passage they rely on; none of it counts until you confirm it.",
+    "askAll": "Have the answers read",
+    "withoutAi": "No model is reading along right now — that is fine. Under “My direction” you write down yourself what strikes you when reading your answers. That is the result; the model only turns it into proposals."
+  },
+  "again": {
+    "text": "You can go through the conversation again. Your answers so far stay where they are.",
+    "cta": "Go through it again"
   }
 }

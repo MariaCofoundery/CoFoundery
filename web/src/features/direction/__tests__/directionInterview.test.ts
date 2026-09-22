@@ -158,10 +158,19 @@ test("das Gespräch läuft auch ohne Modell, und die Seite sagt es", () => {
   // der nichts tut.
   const page = codeOnly(PAGE);
   assert.match(page, /aiAvailable \?/);
-  assert.match(page, /proposals\.unavailable/);
+  assert.match(page, /done\.withoutAi/);
   for (const locale of ["de", "en"]) {
-    const proposals = (bundle(locale) as unknown as { proposals: Record<string, string> }).proposals;
-    assert.ok(proposals.unavailable, `${locale}: der Hinweis auf das fehlende Modell fehlt`);
+    const done = (bundle(locale) as unknown as { done: Record<string, string> }).done;
+    assert.ok(done.withoutAi, `${locale}: der Hinweis auf das fehlende Modell fehlt`);
+    // GEMELDET AM 22.09.2026: "Da müsste es natürlich auch eine Möglichkeit
+    // geben, dass das ohne KI auch funktioniert." Es genügt deshalb nicht zu
+    // sagen, dass kein Modell da ist - der Satz muss den Weg nennen, der
+    // trotzdem offen steht: selbst aufschreiben.
+    assert.match(
+      done.withoutAi,
+      /Meine Richtung|My direction/,
+      `${locale}: der Satz nennt den Weg ohne Modell nicht`
+    );
   }
 
   // Das GESPRÄCH selbst bleibt ohne Modell vollständig: Fragen, Antworten,
@@ -312,5 +321,53 @@ test("die Auswertung steht in beiden Sprachen und ohne Zahl", () => {
       assert.ok(statements.origins[origin], `${locale}: Herkunft ${origin} fehlt`);
     }
     assert.ok(statements.pendingProposals, `${locale}: der Hinweis auf fehlende Vorschläge fehlt`);
+  }
+});
+
+test("am Ende steht, was als Nächstes dran ist - nicht der Anfang", () => {
+  // GEMELDET AM 22.09.2026: "Was ich nicht so gut fand, war der Flow am Ende,
+  // wenn man durch ist und wo man dann hinspringen muss."
+  //
+  // Vorher landete man nach dem Abschließen wieder auf "Bevor du anfängst" -
+  // das liest sich, als wäre nichts passiert. Die Anleitung erscheint jetzt
+  // nur noch beim ersten Mal.
+  const page = codeOnly(PAGE);
+  assert.match(page, /answers\.length === 0 \? \(/);
+  assert.match(page, /done\.title/);
+  // "Noch einmal" steht ganz unten und leise: Es ist der seltenere Wunsch.
+  const doneAt = page.indexOf("done.title");
+  const againAt = page.indexOf("again.cta");
+  assert.ok(doneAt > 0 && againAt > doneAt, "der Neustart darf nicht oben stehen");
+});
+
+test("ein Knopf statt sechs", () => {
+  // GEMELDET AM 22.09.2026: "Wenn du das sechsmal anklicken musst, ist das ein
+  // bisschen unhandlich." Es bleibt eine Entscheidung, nur eine statt sechs.
+  const page = codeOnly(PAGE);
+  assert.match(page, /askForAllDirectionProposalsAction/);
+  assert.doesNotMatch(page, /name="turnId"/);
+  // Und die Liste der Antworten kommt aus der Datenbank, nicht aus dem
+  // Formular: Sonst bestimmte der Browser, welche Zeilen an ein Modell gehen.
+  const actions = codeOnly("src/features/direction/directionStatementActions.ts");
+  const from = actions.indexOf("askForAllDirectionProposalsAction");
+  // Nur DIESE Funktion, nicht die nächste: Ein zu großzügiger Ausschnitt
+  // findet das `formData` der folgenden und lässt den Test falsch rot werden.
+  const body = actions.slice(from, actions.indexOf("export async function", from + 1));
+  assert.match(body, /getDirectionAnswers\(client\)/);
+  assert.doesNotMatch(body, /formData/);
+});
+
+test("die ersetzte Frage bleibt lesbar, wird aber nicht mehr gestellt", () => {
+  // Wer sie schon beantwortet hat, findet seine Antwort im Rückblick wieder.
+  // Ohne den Eintrag stünde dort die nackte Kennung - oder, schlimmer, der
+  // Text einer ANDEREN Frage, wenn man die Kennung wiederverwendet.
+  assert.equal(DIRECTION_QUESTIONS.some((question) => question.id === "change_in_others"), false);
+  assert.ok(findDirectionQuestion("change_in_others"), "die alte Frage ist nicht mehr auffindbar");
+  for (const locale of ["de", "en"]) {
+    const questions = (bundle(locale) as unknown as {
+      interview: { questions: Record<string, { title: string }> };
+    }).interview.questions;
+    assert.ok(questions.change_in_others, `${locale}: der alte Fragetext fehlt`);
+    assert.ok(questions.not_again, `${locale}: die neue Frage fehlt`);
   }
 });

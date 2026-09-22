@@ -19,7 +19,7 @@ import {
 } from "@/features/direction/directionInterviewGuide";
 import { DirectionProposals } from "@/features/direction/DirectionProposals";
 import { DirectionStatements } from "@/features/direction/DirectionStatements";
-import { askForDirectionProposalsAction } from "@/features/direction/directionStatementActions";
+import { askForAllDirectionProposalsAction } from "@/features/direction/directionStatementActions";
 import {
   getAiAvailability,
   getDirectionJobStates,
@@ -161,7 +161,12 @@ export default async function DirectionInterviewPage({
             </form>
           ) : null}
         </section>
-      ) : (
+      ) : answers.length === 0 ? (
+        /* DIE ANLEITUNG STEHT VOR DEM ANFANGEN - aber nur beim ersten Mal.
+           Wer schon geantwortet hat, landet nach dem Abschliessen sonst
+           wieder auf "Bevor du anfängst", und das liest sich, als wäre nichts
+           passiert. Gemeldet am 22.09.2026: "Was ich nicht so gut fand, war
+           der Flow am Ende, wenn man durch ist." */
         <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
           <h2 className="text-xl font-semibold">{t("guidance.title")}</h2>
           <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
@@ -174,11 +179,40 @@ export default async function DirectionInterviewPage({
           </ul>
           <form action={startDirectionInterviewAction} className="mt-6">
             <SubmitButton
-              label={answers.length > 0 ? t("resume") : t("start")}
+              label={t("start")}
               pendingLabel={t("startPending")}
               className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white"
             />
           </form>
+        </section>
+      ) : (
+        /* Fertig, und was jetzt? Nicht "noch einmal anfangen" - das steht
+           ganz unten. Hier steht, was als Nächstes zu tun ist. */
+        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-6">
+          <h2 className="text-xl font-semibold">{t("done.title")}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">
+            {t("done.text", { count: answers.length, total: 6 })}
+          </p>
+          {aiAvailable ? (
+            <>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{t("done.withAi")}</p>
+              {/* EIN KNOPF, NICHT SECHS. Gemeldet: "Wenn du das sechsmal
+                  anklicken musst, ist das ein bisschen unhandlich." */}
+              <form action={askForAllDirectionProposalsAction} className="mt-4">
+                <SubmitButton
+                  label={reading ? t("proposals.jobOpen") : t("done.askAll")}
+                  pendingLabel={t("proposals.askPending")}
+                  className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white"
+                />
+              </form>
+            </>
+          ) : (
+            /* OHNE MODELL GEHT ES GENAUSO WEITER, und das steht hier statt
+               eines Knopfes, der nichts tut. Gemeldet am 22.09.2026: "Da
+               müsste es natürlich auch eine Möglichkeit geben, dass das ohne
+               KI auch funktioniert." */
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{t("done.withoutAi")}</p>
+          )}
         </section>
       )}
 
@@ -211,43 +245,35 @@ export default async function DirectionInterviewPage({
                   <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
                     {answer.answer}
                   </p>
-                  {/* LESEN LASSEN IST EINE HANDLUNG, kein Automatismus. Der
-                      privateste Text im Produkt geht nicht deshalb an ein
-                      Modell, weil jemand eine Seite geöffnet hat - und es
-                      steht dabei, wohin er geht. */}
+                  {/* Nur noch der ZUSTAND je Antwort - gelesen wird über den
+                      einen Knopf oben. Sechs Knöpfe für dieselbe Entscheidung
+                      sind fünf zu viel. */}
                   {jobStates.get(answer.id) === "open" ? (
                     <p role="status" className="mt-3 text-sm font-medium text-violet-900">
                       {t("proposals.jobOpen")}
                     </p>
-                  ) : aiAvailable ? (
-                    <form action={askForDirectionProposalsAction} className="mt-3">
-                      <input type="hidden" name="turnId" value={answer.id} />
-                      <SubmitButton
-                        label={t("proposals.ask")}
-                        pendingLabel={t("proposals.askPending")}
-                        className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 px-4 py-2 text-sm font-semibold text-violet-900"
-                      />
-                      {jobStates.get(answer.id) === "failed" ? (
-                        <span className="ml-3 text-sm text-amber-900">{t("proposals.jobFailed")}</span>
-                      ) : null}
-                    </form>
+                  ) : jobStates.get(answer.id) === "failed" ? (
+                    <p className="mt-3 text-sm text-amber-900">{t("proposals.jobFailed")}</p>
                   ) : null}
                 </li>
               );
             })}
           </ul>
-          {aiAvailable ? (
-            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-              {t("proposals.askText")}
-            </p>
-          ) : (
-            /* "Nicht erreichbar" ist ein Zustand, kein Fehler - und er wird
-               gesagt, statt einen Knopf anzubieten, der nichts tut. */
-            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-              {t("proposals.unavailable")}
-            </p>
-          )}
+
         </section>
+      ) : null}
+
+      {/* NOCH EINMAL - unten und leise. Es ist der seltenere Wunsch, und oben
+          stand es bisher so, als wäre es der nächste Schritt. */}
+      {!state && answers.length > 0 ? (
+        <form action={startDirectionInterviewAction} className="mt-10 border-t border-slate-200 pt-6">
+          <p className="text-sm leading-6 text-slate-600">{t("again.text")}</p>
+          <SubmitButton
+            label={t("again.cta")}
+            pendingLabel={t("startPending")}
+            className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
+          />
+        </form>
       ) : null}
     </main>
   );

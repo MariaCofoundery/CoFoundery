@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getDirectionAnswers } from "@/features/direction/directionInterviewData";
 import { createClient } from "@/lib/supabase/server";
 import {
   DIRECTION_FACETS,
@@ -120,6 +121,36 @@ export async function askForDirectionProposalsAction(formData: FormData) {
   });
   // Ein abgelehnter Auftrag ist kein Drama: Vielleicht läuft schon einer.
   if (error) back("ask");
+  done();
+}
+
+/**
+ * Alle Antworten auf einmal lesen lassen.
+ *
+ * GEMELDET AM 22.09.2026: "Wenn du das sechsmal anklicken musst, ist das ein
+ * bisschen unhandlich." Stimmt - der Knopf stand an jeder einzelnen Antwort,
+ * und wer sein Gespräch fertig hat, will nicht sechsmal dasselbe entscheiden.
+ *
+ * ES BLEIBT EINE ENTSCHEIDUNG, nur eine statt sechs: Nichts läuft von selbst
+ * los, und es steht weiterhin dabei, wohin die Antworten gehen.
+ *
+ * DIE ANTWORTEN WERDEN HIER GELESEN, nicht aus dem Formular genommen: Sonst
+ * bestimmte der Browser, welche Zeilen an ein Modell gehen. Die Datenbank
+ * prüft ohnehin jede einzelne (`request_direction_statement_proposals`), aber
+ * eine Liste, die von außen kommt, wäre eine unnötige zweite Stelle, an der
+ * etwas falsch sein kann.
+ *
+ * Ein laufender Auftrag wird nicht verdoppelt - das entscheidet
+ * `enqueue_ai_job` selbst.
+ */
+export async function askForAllDirectionProposalsAction() {
+  const { client } = await requireUser();
+  const answers = await getDirectionAnswers(client);
+
+  for (const answer of answers) {
+    // Einzeln, und ein Fehler bei einer Antwort nimmt die übrigen nicht mit.
+    await client.rpc("request_direction_statement_proposals", { p_turn_id: answer.id });
+  }
   done();
 }
 
