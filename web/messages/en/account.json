@@ -1,0 +1,29 @@
+{
+  "personAccess": {
+    "title": "Who accompanies you",
+    "text": "This is who has access to which part of your answers. You decide per area, and you can take any access back at any time.",
+    "requestedTitle": "Requests",
+    "activeTitle": "Active access",
+    "approve": "Agree",
+    "decline": "Decline",
+    "revoke": "Take back",
+    "pending": "Saving …",
+    "neverShared": "Never included are your stories from the conversations — neither from the capability nor from the direction interview. At most, results you confirmed are shared.",
+    "scopes": {
+      "base": "Who you are",
+      "alignment_report": "Your self-report",
+      "capability": "Your capability areas",
+      "capability_depth": "Experience and responsibility wishes",
+      "strengths": "How you work",
+      "direction": "What matters to you"
+    },
+    "scopeHints": {
+      "base": "Name, short description, focus areas, location",
+      "alignment_report": "The six dimensions from the questionnaire",
+      "capability": "Which areas you entered — without depth",
+      "capability_depth": "Plus how often you applied it and what you want to own",
+      "strengths": "The sentences about how you work, with your assessment",
+      "direction": "The statements you confirmed"
+    }
+  }
+}

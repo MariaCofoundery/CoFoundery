@@ -1,0 +1,29 @@
+{
+  "personAccess": {
+    "title": "Wer dich begleitet",
+    "text": "Hier steht, wer Zugang zu welchem Teil deiner Angaben hat. Du entscheidest je Bereich einzeln, und du kannst jeden Zugang jederzeit zurücknehmen.",
+    "requestedTitle": "Anfragen",
+    "activeTitle": "Geltende Zugänge",
+    "approve": "Zustimmen",
+    "decline": "Ablehnen",
+    "revoke": "Zurücknehmen",
+    "pending": "Wird gespeichert …",
+    "neverShared": "Nie dabei sind deine Erzählungen aus den Gesprächen — weder die aus dem Fähigkeits- noch die aus dem Richtungs-Interview. Geteilt werden höchstens Ergebnisse, die du bestätigt hast.",
+    "scopes": {
+      "base": "Wer du bist",
+      "alignment_report": "Dein Selbstbericht",
+      "capability": "Deine Fähigkeitsbereiche",
+      "capability_depth": "Erfahrung und Verantwortungswünsche",
+      "strengths": "Deine Arbeitsweise",
+      "direction": "Was dir wichtig ist"
+    },
+    "scopeHints": {
+      "base": "Name, Kurzbeschreibung, Schwerpunkte, Ort",
+      "alignment_report": "Die sechs Dimensionen aus dem Fragebogen",
+      "capability": "Welche Bereiche du eingetragen hast — ohne Tiefe",
+      "capability_depth": "Zusätzlich, wie oft du es angewandt hast und was du übernehmen möchtest",
+      "strengths": "Die Sätze über deine Arbeitsweise samt deiner Einschätzung",
+      "direction": "Die Aussagen, die du bestätigt hast"
+    }
+  }
+}
