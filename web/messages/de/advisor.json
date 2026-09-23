@@ -385,6 +385,33 @@
     "revoke": "Zurücknehmen",
     "pending": "Wird gesendet …",
     "scopeCount": "{count, plural, =1 {1 Bereich} other {# Bereiche}}",
-    "notAnAccess": "Eine Einladung ist kein Zugang. Wer sie annimmt, sieht deine Anfrage in seinem Konto und entscheidet dort Bereich für Bereich — und kann jederzeit zurücknehmen."
+    "notAnAccess": "Eine Einladung ist kein Zugang. Wer sie annimmt, sieht deine Anfrage in seinem Konto und entscheidet dort Bereich für Bereich — und kann jederzeit zurücknehmen.",
+    "holderLabel": "In wessen Namen?",
+    "holderOrg": "{name}",
+    "holderSelf": "In deinem eigenen Namen",
+    "holderHint": "Im Namen der Organisation bleibt der Zugang dort, wenn du gehst — im eigenen Namen endet er mit dir."
+  },
+  "org": {
+    "title": "Deine Organisation",
+    "text": "Ein Programm oder eine Beratung mit mehreren Advisorinnen. Sie hält die Zugänge — damit sie nicht mit einer einzelnen Person verschwinden, wenn die aufhört.",
+    "nameLabel": "Name der Organisation",
+    "create": "Anlegen",
+    "inviteLabel": "Advisorin oder Advisor einladen",
+    "invite": "Einladen",
+    "removeMember": "Mitgliedschaft beenden",
+    "revoked": "beendet",
+    "pending": "Wird gespeichert …",
+    "roles": {
+      "owner": "Führt die Organisation",
+      "advisor": "Advisor"
+    },
+    "membershipMeaning": "Wer hier Mitglied ist, sieht alles, was der Organisation freigegeben wurde. Endet die Mitgliedschaft, endet dieser Zugriff sofort — die Zustimmung der begleiteten Person bleibt aber bestehen, damit deine Nachfolge nicht neu fragen muss. Die begleiteten Personen können jederzeit sehen, wer hier Mitglied ist.",
+    "peopleTitle": "Wen ihr begleitet",
+    "peopleEmpty": "Noch niemand. Lade jemanden ein, dann steht die Person hier, sobald sie zugestimmt hat.",
+    "personScopes": "{count, plural, =0 {noch nichts freigegeben} =1 {1 Bereich freigegeben} other {# Bereiche freigegeben}}",
+    "personPending": "{count, plural, =1 {1 Anfrage offen} other {# Anfragen offen}}",
+    "claimFailedTitle": "Diese Einladung geht nicht auf",
+    "claimFailedText": "Vielleicht ist sie abgelaufen, wurde schon angenommen oder war an eine andere E-Mail-Adresse gerichtet als die, mit der du angemeldet bist.",
+    "claimFailedCta": "Zur Übersicht"
   }
 }

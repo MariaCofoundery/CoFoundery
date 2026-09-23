@@ -1,5 +1,11 @@
 import Link from "next/link";
 import { PersonInviteSection, type PersonInvite } from "@/features/advisor/PersonInviteSection";
+import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import {
+  getAccompaniedPeople,
+  getMyAdvisorOrgs,
+  getOrgMembers,
+} from "@/features/advisor/orgData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
@@ -613,6 +619,10 @@ export default async function AdvisorDashboardPage() {
     .select("id, invitee_email, status, scopes")
     .order("created_at", { ascending: false })
     .limit(50);
+  const advisorOrgs = await getMyAdvisorOrgs(client);
+  const orgMembers = advisorOrgs[0] ? await getOrgMembers(client, advisorOrgs[0].id) : [];
+  const accompanied = await getAccompaniedPeople(client);
+
   const personInvites: PersonInvite[] = (
     (inviteRows ?? []) as { id: string; invitee_email: string; status: string; scopes: string[] }[]
   ).map((row) => ({
@@ -756,7 +766,13 @@ export default async function AdvisorDashboardPage() {
           gerne so, dass man auch mit den einzelnen Foundern sprechen kann -
           nicht nur mit Teams." Es steht neben der Team-Einladung, weil es
           dieselbe Handlung ist: jemanden von innen einladen. */}
-      <PersonInviteSection invites={personInvites} />
+      {/* DIE ORGANISATION, neu am 23.09.2026: "Es gibt einen
+          Organisationszugang, und darunter kann man dann auch Advisor
+          aufnehmen." Sie steht vor der Einladung an einzelne Personen, weil
+          sie entscheidet, in wessen Namen gefragt wird. */}
+      <AdvisorOrgSection orgs={advisorOrgs} members={orgMembers} accompanied={accompanied} />
+
+      <PersonInviteSection invites={personInvites} orgs={advisorOrgs} />
 
       <section
         id="advisor-teams"

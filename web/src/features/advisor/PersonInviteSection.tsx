@@ -4,6 +4,7 @@ import {
   revokePersonInviteAction,
 } from "@/features/advisor/personInviteActions";
 import { ADVISOR_SCOPES } from "@/features/advisor/personAccessData";
+import type { AdvisorOrg } from "@/features/advisor/orgData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 export type PersonInvite = {
@@ -26,7 +27,13 @@ export type PersonInvite = {
  * WAS HIER NICHT STEHT: eine Suche nach Personen. Es gibt keine, und es soll
  * keine geben - sie würde verraten, ob es zu einer Adresse ein Konto gibt.
  */
-export async function PersonInviteSection({ invites }: { invites: PersonInvite[] }) {
+export async function PersonInviteSection({
+  invites,
+  orgs,
+}: {
+  invites: PersonInvite[];
+  orgs: AdvisorOrg[];
+}) {
   const t = await getTranslations("advisor.personInvites");
   const tScopes = await getTranslations("account.personAccess.scopes");
   const open = invites.filter((invite) => invite.status === "sent");
@@ -48,6 +55,29 @@ export async function PersonInviteSection({ invites }: { invites: PersonInvite[]
             className="mt-1 min-h-11 w-full max-w-md rounded-xl border border-slate-300 px-3 text-sm"
           />
         </label>
+
+        {/* IN WESSEN NAMEN. Das ist keine Kleinigkeit: Es entscheidet, ob der
+            Zugang bleibt, wenn diese Person die Organisation verlässt. */}
+        {orgs.length > 0 ? (
+          <label className="mt-4 block">
+            <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+              {t("holderLabel")}
+            </span>
+            <select
+              name="holder"
+              defaultValue={`org:${orgs[0]!.id}`}
+              className="mt-1 min-h-11 w-full max-w-md rounded-xl border border-slate-300 px-3 text-sm"
+            >
+              {orgs.map((org) => (
+                <option key={org.id} value={`org:${org.id}`}>
+                  {t("holderOrg", { name: org.name })}
+                </option>
+              ))}
+              <option value="self">{t("holderSelf")}</option>
+            </select>
+            <span className="mt-1 block text-xs leading-5 text-slate-500">{t("holderHint")}</span>
+          </label>
+        ) : null}
 
         <fieldset className="mt-4">
           <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">

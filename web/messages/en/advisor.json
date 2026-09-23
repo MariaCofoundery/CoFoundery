@@ -385,6 +385,33 @@
     "revoke": "Take back",
     "pending": "Sending …",
     "scopeCount": "{count, plural, =1 {1 area} other {# areas}}",
-    "notAnAccess": "An invitation is not an access. Whoever accepts sees your request in their account and decides area by area — and can take it back at any time."
+    "notAnAccess": "An invitation is not an access. Whoever accepts sees your request in their account and decides area by area — and can take it back at any time.",
+    "holderLabel": "On whose behalf?",
+    "holderOrg": "{name}",
+    "holderSelf": "In your own name",
+    "holderHint": "In the organisation's name the access stays there when you leave — in your own name it ends with you."
+  },
+  "org": {
+    "title": "Your organisation",
+    "text": "A programme or a consultancy with several advisors. It holds the access — so it does not disappear with one person when they leave.",
+    "nameLabel": "Name of the organisation",
+    "create": "Create",
+    "inviteLabel": "Invite an advisor",
+    "invite": "Invite",
+    "removeMember": "End membership",
+    "revoked": "ended",
+    "pending": "Saving …",
+    "roles": {
+      "owner": "Leads the organisation",
+      "advisor": "Advisor"
+    },
+    "membershipMeaning": "Whoever is a member here sees everything released to the organisation. When the membership ends, that access ends at once — but the accompanied person's consent stays, so your successor does not have to ask again. The accompanied people can see at any time who is a member here.",
+    "peopleTitle": "Who you accompany",
+    "peopleEmpty": "Nobody yet. Invite someone, and they appear here once they have agreed.",
+    "personScopes": "{count, plural, =0 {nothing released yet} =1 {1 area released} other {# areas released}}",
+    "personPending": "{count, plural, =1 {1 request open} other {# requests open}}",
+    "claimFailedTitle": "This invitation does not open",
+    "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with.",
+    "claimFailedCta": "To the overview"
   }
 }

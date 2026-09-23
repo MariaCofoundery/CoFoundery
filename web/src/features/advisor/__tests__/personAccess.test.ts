@@ -135,3 +135,55 @@ test("eine Einladung ist kein Zugang", () => {
   const email = codeOnly("src/lib/email/sendAdvisorPersonInviteEmail.ts");
   assert.match(email, /Du entscheidest danach selbst/);
 });
+
+test("eine Organisation nimmt Mitglieder auf, sie legt keine Konten an", () => {
+  // GEWÜNSCHT AM 23.09.2026: "Es gibt einen Organisationszugang, und darunter
+  // kann man dann auch Advisor-Konten anlegen."
+  //
+  // ANGELEGT WERDEN MITGLIEDSCHAFTEN. Wer Konten für andere Menschen anlegt,
+  // hält deren Zugangsdaten - dann kann die Person nicht mehr sicher sein,
+  // dass ihr Konto ihr gehört. Die Organisation lädt ein, jeder meldet sich
+  // selbst an.
+  const actions = codeOnly("src/features/advisor/orgActions.ts");
+  assert.match(actions, /create_advisor_org_invite/);
+  assert.doesNotMatch(actions, /admin\.createUser|signUp|auth\.admin/);
+
+  const migration = sqlCodeOnly("../supabase/migrations/20261044120000_advisor_org_invites.sql");
+  // Auch hier: nur der Hash, und ein weitergeleiteter Link bewirkt nichts.
+  assert.match(migration, /token_hash ~ '\^\[0-9a-f\]\{64\}\$'/);
+  assert.match(migration, /invite_email_mismatch/);
+});
+
+test("in wessen Namen gefragt wird, entscheidet wer den Zugang behält", () => {
+  // Ohne diesen Weg wäre die Organisation eine Liste von Namen ohne Wirkung:
+  // Der Zugang gehörte weiter der einzelnen Advisorin, und mit ihr ginge er.
+  const view = codeOnly("src/features/advisor/PersonInviteSection.tsx");
+  assert.match(view, /holderLabel/);
+  assert.match(view, /value=\{`org:\$\{org\.id\}`\}/);
+
+  const actions = codeOnly("src/features/advisor/personInviteActions.ts");
+  assert.match(actions, /p_org_id: orgId/);
+
+  for (const locale of ["de", "en"]) {
+    const copy = (
+      JSON.parse(source(`messages/${locale}/advisor.json`)) as {
+        personInvites: Record<string, string>;
+      }
+    ).personInvites;
+    // Der Hinweis muss die Folge benennen, nicht nur die Option.
+    assert.match(copy.holderHint!, /bleibt|stays/i, `${locale}`);
+  }
+});
+
+test("der gesammelte Bereich trennt Zusage und Anfrage", () => {
+  // Eine Liste, die Angefragte und Begleitete vermischt, lädt dazu ein, eine
+  // Anfrage für eine Zusage zu halten.
+  const data = codeOnly("src/features/advisor/orgData.ts");
+  assert.match(data, /pendingScopes/);
+  assert.match(data, /row\.status === "active"/);
+  const view = codeOnly("src/features/advisor/AdvisorOrgSection.tsx");
+  assert.match(view, /personPending/);
+  // Und die Liste zeigt keine Namen: Sie würde sie für Menschen laden, die
+  // vielleicht nur "Wer du bist" freigegeben haben.
+  assert.doesNotMatch(view, /displayName|person_core/);
+});

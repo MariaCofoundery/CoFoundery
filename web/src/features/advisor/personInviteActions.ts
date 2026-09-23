@@ -51,11 +51,18 @@ export async function invitePersonAction(formData: FormData) {
   const token = randomBytes(24).toString("hex");
   const tokenHash = createHash("sha256").update(token).digest("hex");
 
+  // IN WESSEN NAMEN gefragt wird, entscheidet der Halter des spaeteren
+  // Zugangs - und damit, ob er bleibt, wenn diese Advisorin geht. Ob sie in
+  // der Organisation ueberhaupt aktiv ist, prueft die Datenbank.
+  const holder = String(formData.get("holder") ?? "self");
+  const orgId = holder.startsWith("org:") ? holder.slice(4) : null;
+
   const { error } = await client.rpc("create_advisor_person_invite", {
     p_email: email,
     p_token_hash: tokenHash,
     p_scopes: scopes,
     p_note: note.length > 0 ? note : null,
+    p_org_id: orgId,
   });
   if (error) back("create");
 
