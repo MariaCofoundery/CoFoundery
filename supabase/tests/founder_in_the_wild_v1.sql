@@ -26,11 +26,30 @@ insert into public.founder_team_members(team_id,user_id,created_at) values
 ('fa222222-2222-4222-8222-222222222222','f1111111-1111-4111-8111-111111111111','2026-01-01'),
 ('fa222222-2222-4222-8222-222222222222','f2222222-2222-4222-8222-222222222222','2026-01-02');
 
+-- REPARIERT AM 23.09.2026. Die Pruefung galt fuer ALLE Packs von Founder in
+-- the Wild und war damit ab dem Tag rot, an dem das zweite Pack dazukam ("Wenn
+-- es persoenlich wird", mit dem Rate-Schritt). Sie war nicht falsch gedacht,
+-- sondern zu weit gefasst: Eingefroren ist das v1-Pack, nicht das Erlebnis.
+--
+-- WARUM DAS EINGEFROREN BLEIBEN MUSS: Die Vollstaendigkeit einer Runde ergibt
+-- sich in der Datenbank aus den Antwortvertraegen des Packs. Ein vierter
+-- Vertrag im bestehenden Pack wuerde JEDE laufende und jede abgeschlossene
+-- Runde schlagartig unvollstaendig machen - deshalb tragen neue Packs den
+-- Rate-Schritt von Anfang an, und dieses hier bleibt, wie es ist.
+--
+-- Die Pruefung gilt deshalb jetzt genau dem Pack, um das es geht. Dass ein
+-- zweites Pack existiert, ist kein Fehler - dass sich das erste aendert, waere
+-- einer.
 select pg_temp.assert_fitw(
-  (select count(*)=1 from public.collaboration_experience_pack_versions where experience_key='founder_in_the_wild')
-  and (select count(*)=5 from public.collaboration_experience_prompt_versions where experience_key='founder_in_the_wild')
-  and (select count(*)=15 from public.collaboration_experience_prompt_response_contracts where experience_key='founder_in_the_wild')
-  and not exists (select 1 from public.collaboration_experience_prompt_response_contracts where experience_key='founder_in_the_wild' and response_type not in ('move','matters','need')),
+  (select count(*)=1 from public.collaboration_experience_pack_versions
+    where experience_key='founder_in_the_wild' and pack_key='under_pressure_v1')
+  and (select count(*)=5 from public.collaboration_experience_prompt_versions
+    where experience_key='founder_in_the_wild' and pack_key='under_pressure_v1')
+  and (select count(*)=15 from public.collaboration_experience_prompt_response_contracts
+    where experience_key='founder_in_the_wild' and pack_key='under_pressure_v1')
+  and not exists (select 1 from public.collaboration_experience_prompt_response_contracts
+    where experience_key='founder_in_the_wild' and pack_key='under_pressure_v1'
+      and response_type not in ('move','matters','need')),
   'frozen pack contract is incomplete'
 );
 select pg_temp.assert_fitw(to_regclass('public.collaboration_experience_one_open_round_per_team_pack_idx') is not null,'race-safe open-round unique index is missing');

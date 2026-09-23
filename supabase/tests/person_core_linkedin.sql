@@ -59,8 +59,19 @@ select extensions.is_empty(
 );
 
 reset role;
-insert into public.network_contact_requests(id,listing_id,sender_user_id,recipient_user_id,message,status)
-values ('ed000000-0000-4000-8000-000000000001',null,'ec000000-0000-4000-8000-000000000002','ec000000-0000-4000-8000-000000000001','A sufficiently long message for the contact request.','pending');
+-- REPARIERT AM 23.09.2026: Die beiden Namensschnappschuesse fehlten. Sie sind
+-- seit ihrer Einfuehrung Pflicht, und zwar aus einem guten Grund - eine
+-- Kontaktanfrage haelt fest, unter WELCHEM Namen sie gestellt wurde, damit
+-- eine spaetere Namensaenderung den Verlauf nicht umschreibt. Der Test war
+-- aelter als diese Spalten und brach seither an der ersten Einfuegung ab.
+-- Weil pgTAP nicht in `ci:check` laeuft, hat es niemand gesehen.
+insert into public.network_contact_requests(
+  id, listing_id, sender_user_id, recipient_user_id, message, status,
+  sender_display_name_snapshot, recipient_display_name_snapshot)
+values ('ed000000-0000-4000-8000-000000000001', null,
+  'ec000000-0000-4000-8000-000000000002', 'ec000000-0000-4000-8000-000000000001',
+  'A sufficiently long message for the contact request.', 'pending',
+  'Bea', 'Anna');
 
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"ec000000-0000-4000-8000-000000000002","role":"authenticated"}';
@@ -70,7 +81,12 @@ select extensions.is_empty(
 );
 
 reset role;
-update public.network_contact_requests set status = 'accepted'
+-- Auch hier: `responded_at` ist seit einer spaeteren Migration Pflicht, wenn
+-- eine Anfrage beantwortet ist. "Angenommen" ohne Zeitpunkt waere eine
+-- Behauptung ohne Beleg - dieselbe Regel wie bei den Gespraechen und den
+-- Zugaengen.
+update public.network_contact_requests
+set status = 'accepted', responded_at = now()
 where id = 'ed000000-0000-4000-8000-000000000001';
 
 -- Beide Richtungen: Wer die Anfrage gestellt hat, darf keine Rolle spielen.
@@ -104,7 +120,13 @@ select extensions.is(
 );
 
 -- Nicht angemeldet kommt hier gar nicht durch.
+--
+-- REPARIERT AM 23.09.2026: Hier stand nur ein Rollenwechsel. Die Claims der
+-- vorherigen Person blieben dabei gesetzt, und `auth.uid()` liest genau die -
+-- der Aufruf war also gar nicht anonym, und die Funktion hat zu Recht nicht
+-- geworfen. Der Test hat den Fall, den er pruefen sollte, nie erreicht.
 reset role;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
 set local role anon;
 select extensions.throws_ok(
   $$select * from public.list_member_linkedin_urls(array['ec000000-0000-4000-8000-000000000001']::uuid[])$$,

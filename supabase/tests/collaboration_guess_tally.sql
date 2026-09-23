@@ -81,16 +81,30 @@ select is(
 -- am Text und keine am Verhalten - eine echte Runde aufzubauen braeuchte die
 -- halbe Lab-Maschinerie. Der Fall, den sie absichert, ist aber genau der, den
 -- man beim Schreiben uebersieht.
+-- REPARIERT AM 23.09.2026. Beide Pruefungen lasen den Funktionstext aus
+-- `information_schema.routines` - und standen zu diesem Zeitpunkt unter
+-- `set local role authenticated`. Diese Sicht zeigt den Text aber NUR dem
+-- Eigentuemer der Funktion; fuer alle anderen ist `routine_definition` NULL,
+-- und `matches(NULL, ...)` schlaegt fehl.
+--
+-- Die Zeile war also nicht falsch, sondern unsichtbar. Beide Pruefungen waren
+-- seit ihrer Entstehung rot, und weil pgTAP nicht in `ci:check` laeuft, hat es
+-- niemand gesehen.
+--
+-- `pg_proc.prosrc` ist fuer jede angemeldete Rolle lesbar und enthaelt
+-- denselben Text. Die Zusage bleibt unveraendert.
 select matches(
-  (select routine_definition from information_schema.routines
-   where routine_schema = 'public' and routine_name = 'get_collaboration_guess_tally'),
+  (select p.prosrc from pg_proc p
+   join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname = 'get_collaboration_guess_tally'),
   'guess_on_target',
   'die Funktion unterscheidet, wo der Tipp liegt'
 );
 
 select matches(
-  (select routine_definition from information_schema.routines
-   where routine_schema = 'public' and routine_name = 'get_collaboration_guess_tally'),
+  (select p.prosrc from pg_proc p
+   join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname = 'get_collaboration_guess_tally'),
   'having count\(\*\) filter \(where paired.own_guess is not null\) > 0',
   'Packs ohne Raten erscheinen gar nicht erst - eine Bilanz "0 von 5" waere dort eine Aussage, die niemand gemacht hat'
 );

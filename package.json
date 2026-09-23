@@ -11,6 +11,7 @@
     "ai:worker": "npm --prefix web run ai:worker",
     "ai:eval": "npm --prefix web run ai:eval",
     "tts:build": "npm --prefix web run tts:build",
-    "item-analysis": "npm run item-analysis --prefix web"
+    "item-analysis": "npm run item-analysis --prefix web",
+    "db:test": "npm run db:test --prefix web"
   }
 }
