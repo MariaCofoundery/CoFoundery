@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PersonInviteSection, type PersonInvite } from "@/features/advisor/PersonInviteSection";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
@@ -605,6 +606,22 @@ export default async function AdvisorDashboardPage() {
   // Der angemeldete Zugang, nicht der privilegierte: Die Wiedervorlagen liegen
   // unter einer Policy, die nur die eigenen Zeilen herausgibt.
   const client = await createClient();
+  // Die Zeilensicherheit zeigt hier nur die eigenen Einladungen - die Bedingung
+  // steht in der Policy und nicht noch einmal hier.
+  const { data: inviteRows } = await client
+    .from("advisor_person_invites")
+    .select("id, invitee_email, status, scopes")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  const personInvites: PersonInvite[] = (
+    (inviteRows ?? []) as { id: string; invitee_email: string; status: string; scopes: string[] }[]
+  ).map((row) => ({
+    id: row.id,
+    inviteeEmail: row.invitee_email,
+    status: row.status,
+    scopes: row.scopes ?? [],
+  }));
+
   const [roleViews, teams, advisorProfile, pendingInvites, dueFollowUps, deletionNotices] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
@@ -734,6 +751,12 @@ export default async function AdvisorDashboardPage() {
       <section className="mt-8">
         <AdvisorTeamInviteForm />
       </section>
+
+      {/* EINZELNE PERSONEN, neu am 23.09.2026: "Ein Accelerator haette das
+          gerne so, dass man auch mit den einzelnen Foundern sprechen kann -
+          nicht nur mit Teams." Es steht neben der Team-Einladung, weil es
+          dieselbe Handlung ist: jemanden von innen einladen. */}
+      <PersonInviteSection invites={personInvites} />
 
       <section
         id="advisor-teams"

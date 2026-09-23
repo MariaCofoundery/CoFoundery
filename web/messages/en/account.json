@@ -24,6 +24,10 @@
       "capability_depth": "Plus how often you applied it and what you want to own",
       "strengths": "The sentences about how you work, with your assessment",
       "direction": "The statements you confirmed"
-    }
+    },
+    "claimFailedTitle": "This invitation does not open",
+    "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with. Ask the person who invited you for a new one.",
+    "claimFailedCta": "To your access list",
+    "invite_claimed": "The request is here. Below you decide what becomes visible."
   }
 }

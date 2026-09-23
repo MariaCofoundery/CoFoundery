@@ -97,3 +97,41 @@ test("wer was entscheiden darf, steht in der Datenbank und nicht im Formular", (
   assert.match(actions, /decide_advisor_person_access/);
   assert.doesNotMatch(actions, /\.update\(|\.insert\(|status:/);
 });
+
+test("eingeladen wird von innen - es gibt keine Personensuche", () => {
+  // ENTSCHIEDEN AM 23.09.2026: "Sie können eine Einladungs-E-Mail
+  // rausschicken, aber die kommt von innen [...] so wie wir das auch mit dem
+  // Co-Founder haben."
+  //
+  // Eine Suche nach E-Mail-Adressen hätte verraten, ob es zu einer Adresse ein
+  // Konto gibt. Eine Einladung verrät nichts: Sie geht an eine Adresse, die
+  // der Advisor ohnehin kennt.
+  const actions = codeOnly("src/features/advisor/personInviteActions.ts");
+  assert.match(actions, /create_advisor_person_invite/);
+  // Kein Nachschlagen von Konten zu Adressen.
+  assert.doesNotMatch(actions, /auth\.users|from\("person_core"\)|\.eq\("email"/);
+
+  // Der Token entsteht in der Anwendung, die Datenbank bekommt nur den Hash -
+  // wer die Datenbank liest, kann keine Einladung annehmen.
+  assert.match(actions, /randomBytes\(24\)/);
+  assert.match(actions, /createHash\("sha256"\)/);
+  assert.match(actions, /p_token_hash: tokenHash/);
+  assert.doesNotMatch(actions, /p_token: token\b/);
+});
+
+test("eine Einladung ist kein Zugang", () => {
+  // Das Annehmen erzeugt ANFRAGEN, keine Zugänge - die Zustimmung fällt danach
+  // im Konto, Bereich für Bereich.
+  const migration = sqlCodeOnly("../supabase/migrations/20261042120000_advisor_person_invites.sql");
+  const claim = migration.slice(migration.indexOf("function public.claim_advisor_person_invite"));
+  assert.match(claim, /insert into public\.advisor_person_grants/);
+  // Kein 'active', kein approved_at: Der Token belegt, dass jemand die
+  // Adresse erreicht hat - nicht, dass er einverstanden ist.
+  assert.doesNotMatch(claim.slice(0, claim.indexOf("$$;")), /status = 'active'|approved_at = pg_catalog\.now\(\)/);
+  // Und die Adresse muss passen, sonst wirkt ein weitergeleiteter Link.
+  assert.match(claim, /invite_email_mismatch/);
+
+  // Auch die Mail sagt es.
+  const email = codeOnly("src/lib/email/sendAdvisorPersonInviteEmail.ts");
+  assert.match(email, /Du entscheidest danach selbst/);
+});

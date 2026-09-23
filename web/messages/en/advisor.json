@@ -372,5 +372,19 @@
     "notesExcluded": "Not included: the accompanying person's private working notes. They are deliberately not part of this sheet – a document that prints them on request would be a promise with an exception, and that is not a promise.",
     "disclaimer": "This sheet records a state and is no substitute for legal or tax advice.",
     "print": "Print or save as PDF"
+  },
+  "personInvites": {
+    "title": "Invite a person",
+    "text": "You invite by email address. There is no people search — it would reveal whether an address has an account.",
+    "emailLabel": "Email address",
+    "scopesLabel": "What are you asking for?",
+    "scopesHint": "Tick them individually. A blanket request gets a blanket answer — usually none.",
+    "noteLabel": "One sentence about it",
+    "notePlaceholder": "For example: we accompany you in the programme and would like to prepare.",
+    "invite": "Send invitation",
+    "revoke": "Take back",
+    "pending": "Sending …",
+    "scopeCount": "{count, plural, =1 {1 area} other {# areas}}",
+    "notAnAccess": "An invitation is not an access. Whoever accepts sees your request in their account and decides area by area — and can take it back at any time."
   }
 }

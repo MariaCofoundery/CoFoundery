@@ -372,5 +372,19 @@
     "notesExcluded": "Nicht enthalten: die privaten Arbeitsnotizen der begleitenden Person. Die sind bewusst nicht Teil dieses Blattes – ein Dokument, das sie auf Wunsch mitdruckt, wäre eine Zusage mit Ausnahme, und das ist keine.",
     "disclaimer": "Dieses Blatt hält einen Stand fest und ersetzt keine rechtliche oder steuerliche Beratung.",
     "print": "Drucken oder als PDF speichern"
+  },
+  "personInvites": {
+    "title": "Eine Person einladen",
+    "text": "Du lädst über die E-Mail-Adresse ein. Es gibt keine Personensuche — die würde verraten, ob es zu einer Adresse ein Konto gibt.",
+    "emailLabel": "E-Mail-Adresse",
+    "scopesLabel": "Worum bittest du?",
+    "scopesHint": "Einzeln ankreuzen. Wer pauschal fragt, bekommt eine pauschale Antwort — meistens keine.",
+    "noteLabel": "Ein Satz dazu",
+    "notePlaceholder": "Zum Beispiel: Wir begleiten dich im Programm und möchten uns vorbereiten.",
+    "invite": "Einladung schicken",
+    "revoke": "Zurücknehmen",
+    "pending": "Wird gesendet …",
+    "scopeCount": "{count, plural, =1 {1 Bereich} other {# Bereiche}}",
+    "notAnAccess": "Eine Einladung ist kein Zugang. Wer sie annimmt, sieht deine Anfrage in seinem Konto und entscheidet dort Bereich für Bereich — und kann jederzeit zurücknehmen."
   }
 }

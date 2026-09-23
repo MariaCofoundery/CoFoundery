@@ -24,6 +24,10 @@
       "capability_depth": "Zusätzlich, wie oft du es angewandt hast und was du übernehmen möchtest",
       "strengths": "Die Sätze über deine Arbeitsweise samt deiner Einschätzung",
       "direction": "Die Aussagen, die du bestätigt hast"
-    }
+    },
+    "claimFailedTitle": "Diese Einladung geht nicht auf",
+    "claimFailedText": "Vielleicht ist sie abgelaufen, wurde schon angenommen oder war an eine andere E-Mail-Adresse gerichtet als die, mit der du angemeldet bist. Frag die Person, die dich eingeladen hat, nach einer neuen.",
+    "claimFailedCta": "Zu deinen Zugängen",
+    "invite_claimed": "Die Anfrage ist da. Unten entscheidest du, was sichtbar wird."
   }
 }
