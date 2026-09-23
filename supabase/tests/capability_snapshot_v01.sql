@@ -15,10 +15,19 @@ select extensions.plan(23);
 --
 -- Die Zahlen bleiben hart: Sie fangen den Fall, dass Referenzdaten
 -- versehentlich verschwinden, und genau das ist ihre Aufgabe.
+-- FORTGESCHRIEBEN AM 23.09.2026: zehn Familien, 53 Bereiche. Dazugekommen ist
+-- "Zusammenarbeit & Verantwortung" mit sechs Bereichen - Verantwortung
+-- uebernehmen, entscheiden wenn Informationen fehlen, priorisieren, Arbeit
+-- ordnen, abgeben, nach einem Rueckschlag auswerten.
+--
+-- WARUM DIE ZAHL TROTZDEM HART BLEIBT: Sie faengt den Fall, dass
+-- Referenzdaten versehentlich verschwinden. Sie wird bei einer bewussten
+-- Erweiterung fortgeschrieben, mit Datum und Grund, und nicht gelockert - sonst
+-- faengt sie gar nichts mehr.
 select extensions.is((select count(*)::int from public.capability_families where family_id <> 'other'),
-  9, 'neun Funktionsfamilien');
+  10, 'zehn Funktionsfamilien');
 select extensions.is((select count(*)::int from public.capability_areas where family_id <> 'other'),
-  47, '47 Bereiche');
+  53, '53 Bereiche');
 select extensions.ok((select min(anzahl) >= 4 and max(anzahl) <= 7 from (
     select count(*) as anzahl from public.capability_areas
     where family_id <> 'other' group by family_id) pro_familie),
@@ -100,7 +109,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"fe000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select extensions.is((select count(*)::int from public.person_capability_entries),
   2, 'Eigentuemer sieht die eigenen Eintraege');
-select extensions.is((select count(*)::int from public.capability_areas), 48,
+select extensions.is((select count(*)::int from public.capability_areas), 54,
   'das Vokabular ist fuer Mitglieder lesbar');
 reset role;
 

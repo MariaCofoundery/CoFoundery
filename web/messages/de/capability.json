@@ -262,7 +262,8 @@
     "operations_people": "Operations, People & Organisation",
     "legal_governance": "Recht, Governance & Compliance",
     "other": "Anderer Schwerpunkt",
-    "communication_representation": "Außenauftritt & Moderation"
+    "communication_representation": "Außenauftritt & Moderation",
+    "working_style": "Zusammenarbeit & Verantwortung"
   },
   "areaLabels": {
     "customer_discovery": "Customer Discovery & Kundeninterviews",
@@ -312,7 +313,13 @@
     "facilitation": "Moderation & Gespräche führen",
     "networking": "Netzwerk aufbauen & halten",
     "difficult_conversations": "Unangenehmes ansprechen",
-    "teaching_mentoring": "Anleiten & befähigen"
+    "teaching_mentoring": "Anleiten & befähigen",
+    "owning_outcomes": "Etwas bis zum Ergebnis verantworten",
+    "deciding_under_uncertainty": "Entscheiden, wenn Informationen fehlen",
+    "prioritising": "Festlegen, was zuerst passiert",
+    "structuring_work": "Arbeit so ordnen, dass andere andocken",
+    "handing_over": "Abgeben und übergeben",
+    "reviewing_setbacks": "Nach einem Rückschlag auswerten"
   },
   "errors": {
     "narrative": "Bitte schreibe mindestens zwei kurze Sätze.",
@@ -685,5 +692,13 @@
       "others_see_more": "Hier vermutest du mehr bei anderen als bei dir selbst. Das ist kein Fehler — es ist die Stelle, an der du dir vielleicht etwas zutrauen könntest, das andere längst sehen.",
       "others_see_less": "Hier siehst du mehr bei dir als bei anderen. Auch das ist kein Fehler — vielleicht zeigst du es nur an Stellen, die niemand mitbekommt."
     }
+  },
+  "sourcing": {
+    "internal_only": "gehört ins Team",
+    "component": "einkaufbar",
+    "depends": "kommt auf das Vorhaben an",
+    "internal_onlyHint": "Wer das abgibt, gibt das Unternehmen ab.",
+    "componentHint": "Das gibt es als fertige Leistung — oft besser, als man es nebenbei selbst machen würde.",
+    "dependsHint": "Ob das ins Team gehört, hängt davon ab, was ihr baut."
   }
 }

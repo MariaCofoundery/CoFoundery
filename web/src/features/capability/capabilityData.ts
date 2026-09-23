@@ -18,7 +18,7 @@ import type {
 export async function getCapabilityVocabulary(client: SupabaseClient) {
   const [families, areas] = await Promise.all([
     client.from("capability_families").select("family_id,sort_order").order("sort_order"),
-    client.from("capability_areas").select("area_id,family_id,sort_order").order("sort_order"),
+    client.from("capability_areas").select("area_id,family_id,sort_order,sourcing").order("sort_order"),
   ]);
 
   return {

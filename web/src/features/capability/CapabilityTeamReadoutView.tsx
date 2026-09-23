@@ -208,6 +208,23 @@ export async function CapabilityTeamReadoutView({
                     return (
                       <li key={area.areaId} className="text-sm leading-6">
                         <span className="font-medium text-slate-900">{areaLabel(area.areaId)}</span>
+                        {/* NACH FALTIN: Eine Lücke bei etwas Einkaufbarem ist
+                            eine Bestellung, eine Lücke bei etwas, das ins Team
+                            gehört, ist eine Entscheidung über die Gründung.
+                            Ohne diese Unterscheidung heißt jede Lücke "euch
+                            fehlt etwas", und das erzeugt Panik statt einer
+                            Handlung.
+
+                            Nur bei den zwei Zuständen, bei denen sie etwas
+                            ändert - bei "geklärt" wäre sie Lärm. */}
+                        {area.state === "gap" || area.state === "openPosition" ? (
+                          <span
+                            className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
+                            title={t(`sourcing.${area.sourcing}Hint`)}
+                          >
+                            {t(`sourcing.${area.sourcing}`)}
+                          </span>
+                        ) : null}
                         {/* WER, IN KLARTEXT. "Jemand will das verantworten"
                             ist unbrauchbar - das Gespräch darüber führt man
                             mit Namen. */}

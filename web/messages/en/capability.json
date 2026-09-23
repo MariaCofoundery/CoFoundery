@@ -262,7 +262,8 @@
     "operations_people": "Operations, People & Organisation",
     "legal_governance": "Legal, Governance & Compliance",
     "other": "Other focus",
-    "communication_representation": "Representation & facilitation"
+    "communication_representation": "Representation & facilitation",
+    "working_style": "Collaboration & responsibility"
   },
   "areaLabels": {
     "customer_discovery": "Customer Discovery",
@@ -312,7 +313,13 @@
     "facilitation": "Facilitation & leading conversations",
     "networking": "Building & keeping a network",
     "difficult_conversations": "Raising difficult matters",
-    "teaching_mentoring": "Teaching & enabling others"
+    "teaching_mentoring": "Teaching & enabling others",
+    "owning_outcomes": "Carrying something through to a result",
+    "deciding_under_uncertainty": "Deciding when information is missing",
+    "prioritising": "Deciding what happens first",
+    "structuring_work": "Ordering work so others can join in",
+    "handing_over": "Handing over and delegating",
+    "reviewing_setbacks": "Reviewing after a setback"
   },
   "errors": {
     "narrative": "Please write at least two short sentences.",
@@ -685,5 +692,13 @@
       "others_see_more": "Here you assume more from others than from yourself. That is not a mistake — it is the place where you might claim something others have long seen.",
       "others_see_less": "Here you see more in yourself than in others. Also not a mistake — perhaps you show it where nobody notices."
     }
+  },
+  "sourcing": {
+    "internal_only": "belongs in the team",
+    "component": "can be bought in",
+    "depends": "depends on the venture",
+    "internal_onlyHint": "Handing this over means handing over the company.",
+    "componentHint": "This exists as a finished service — often better than doing it on the side.",
+    "dependsHint": "Whether this belongs in the team depends on what you build."
   }
 }

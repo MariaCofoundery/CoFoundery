@@ -53,7 +53,23 @@ export const NARRATIVE_MAX_LENGTH = 2000;
 export const MAX_CONFIRMED_AREAS = 3;
 
 export type CapabilityFamily = { family_id: string; sort_order: number };
-export type CapabilityArea = { area_id: string; family_id: string; sort_order: number };
+/**
+ * Nach Faltins Komponentenmodell: Gehoert der Bereich ins Team, laesst er sich
+ * einkaufen, oder haengt es vom Vorhaben ab?
+ *
+ * WOZU DAS IN DER AUSWERTUNG STEHT: Ohne diese Angabe heisst eine Luecke "euch
+ * fehlt Finance", und das erzeugt Panik. Mit ihr heisst sie: "Buchhaltung ist
+ * eine Komponente - die kauft man. Unit Economics nicht."
+ */
+export const AREA_SOURCINGS = ["internal_only", "component", "depends"] as const;
+export type AreaSourcing = (typeof AREA_SOURCINGS)[number];
+
+export type CapabilityArea = {
+  area_id: string;
+  family_id: string;
+  sort_order: number;
+  sourcing?: AreaSourcing;
+};
 
 export type CapabilityEvidence = { id: string; narrative: string };
 

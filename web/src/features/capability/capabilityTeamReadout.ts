@@ -2,7 +2,7 @@
 // `capabilityComparison.ts`, und der Testloader loest nur die Alias-Form
 // wirklich auf (Typen werden ohnehin entfernt).
 import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
-import type { CapabilityArea, CapabilityFamily } from "./capabilityTypes";
+import type { AreaSourcing, CapabilityArea, CapabilityFamily } from "./capabilityTypes";
 
 /**
  * Die Rollenlage eines Teams.
@@ -69,6 +69,14 @@ export type TeamAreaStateKey =
 export type TeamAreaState = {
   areaId: string;
   familyId: string;
+  /**
+   * Nach Faltins Komponentenmodell - siehe Migration 20261041120000.
+   *
+   * SIE STEHT AM BEFUND UND NICHT NUR AM BEREICH, weil sie genau dort etwas
+   * ändert: Eine Lücke bei etwas Einkaufbarem ist eine Bestellung, eine Lücke
+   * bei etwas, das ins Team gehört, ist eine Entscheidung über die Gründung.
+   */
+  sourcing: AreaSourcing;
   state: TeamAreaStateKey;
   /** Wer die Zuständigkeit beansprucht. Bei `contested` mehrere. */
   claimants: string[];
@@ -136,6 +144,7 @@ export function buildCapabilityTeamReadout(
   families: CapabilityFamily[]
 ): TeamReadout {
   const familyOfArea = new Map(areas.map((area) => [area.area_id, area.family_id]));
+  const sourcingOfArea = new Map(areas.map((area) => [area.area_id, area.sourcing ?? "depends"]));
   const areaOrder = new Map(areas.map((area) => [area.area_id, area.sort_order]));
   const orderedFamilies = [...families].sort((a, b) => a.sort_order - b.sort_order);
 
@@ -149,7 +158,14 @@ export function buildCapabilityTeamReadout(
   ].filter((areaId) => familyOfArea.has(areaId));
 
   const areaStates = touchedAreaIds
-    .map((areaId) => deriveAreaState(areaId, familyOfArea.get(areaId) as string, members))
+    .map((areaId) =>
+      deriveAreaState(
+        areaId,
+        familyOfArea.get(areaId) as string,
+        sourcingOfArea.get(areaId) ?? "depends",
+        members
+      )
+    )
     .sort((a, b) => (areaOrder.get(a.areaId) ?? 0) - (areaOrder.get(b.areaId) ?? 0));
 
   const byFamily = new Map<string, TeamAreaState[]>();
@@ -210,6 +226,7 @@ function emptyCounts(): Record<TeamAreaStateKey, number> {
 function deriveAreaState(
   areaId: string,
   familyId: string,
+  sourcing: AreaSourcing,
   members: TeamMemberSides[]
 ): TeamAreaState {
   const claimants: string[] = [];
@@ -239,7 +256,7 @@ function deriveAreaState(
     else undecided += 1;
   }
 
-  const base = { areaId, familyId, claimants, deep, declining, undecided };
+  const base = { areaId, familyId, sourcing, claimants, deep, declining, undecided };
   const decided = claimants.length + declining.length;
 
   if (decided < MIN_DECIDED) return { ...base, state: "noBasis" };

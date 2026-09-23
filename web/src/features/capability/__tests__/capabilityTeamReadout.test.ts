@@ -353,3 +353,58 @@ test("fünf Menschen gehen genauso wie zwei", () => {
   assert.equal(area?.undecided, 1, "die unentschiedene Person wird nicht mitgezaehlt");
   assert.equal(readout.members.length, 5);
 });
+
+test("eine Lücke sagt, ob man sie einkaufen kann", () => {
+  // BESPROCHEN AM 23.09.2026, nach Günter Faltins Komponentenmodell: "Was
+  // nicht vorhanden ist in dem Founder-Team, das kann man dann halt von außen
+  // suchen, also extern oder man stellt Mitarbeitende."
+  //
+  // Ohne diese Angabe heißt eine Lücke "euch fehlt Finance", und das erzeugt
+  // Panik. Mit ihr heißt sie: "Buchhaltung ist eine Komponente - die kauft
+  // man. Unit Economics nicht."
+  const migration = readFileSync(
+    "../supabase/migrations/20261041120000_working_style_and_sourcing.sql",
+    "utf8"
+  ).replace(/^\s*--.*$/gm, "");
+
+  // Die ganze Verhaltensfamilie gehört ins Team: Man kann nicht einkaufen,
+  // dass jemand anders für das eigene Unternehmen Verantwortung trägt.
+  for (const areaId of [
+    "owning_outcomes",
+    "deciding_under_uncertainty",
+    "prioritising",
+    "structuring_work",
+    "handing_over",
+    "reviewing_setbacks",
+  ]) {
+    assert.match(migration, new RegExp(`'${areaId}'`), `${areaId} fehlt`);
+  }
+  assert.match(migration, /sourcing = 'internal_only'[\s\S]{0,400}'owning_outcomes'/);
+  assert.match(migration, /sourcing = 'component'[\s\S]{0,300}'accounting_controlling'/);
+
+  // Und "kommt auf das Vorhaben an" ist der Vorgabewert: Für die meisten
+  // Bereiche hängt es davon ab, was gebaut wird - das zu behaupten wäre
+  // schlimmer als es offen zu lassen.
+  assert.match(migration, /add column sourcing text not null default 'depends'/);
+});
+
+test("die neuen Bereiche sind Zuständigkeiten, keine Eigenschaften", () => {
+  // DIESELBE FESTLEGUNG wie bei der Familie vom 21.09.2026 und der Grund,
+  // warum diese Bereiche überhaupt in dieses Modell dürfen. Nicht "ist
+  // hartnäckig", sondern "verantwortet, dass eine Sache zum Ergebnis kommt".
+  // Nicht "entscheidet gut" - das wäre ein Urteil, das keine Selbstauskunft
+  // belegen kann.
+  for (const locale of ["de", "en"]) {
+    const labels = (
+      JSON.parse(readFileSync(`messages/${locale}/capability.json`, "utf8")) as {
+        areaLabels: Record<string, string>;
+      }
+    ).areaLabels;
+    for (const areaId of ["owning_outcomes", "deciding_under_uncertainty", "handing_over"]) {
+      assert.ok(labels[areaId], `${locale}: ${areaId} hat keine Beschriftung`);
+    }
+    // Keine Eigenschaftswörter in den Beschriftungen.
+    const all = Object.values(labels).join(" ");
+    assert.doesNotMatch(all, /hartnäckig|belastbar|durchsetzungsstark|resilient|persistent\b/i, locale);
+  }
+});

@@ -81,6 +81,21 @@ const AREA_TERMS: Record<string, string[]> = {
   positioning: ["positionierung", "positioning", "wertversprechen", "value proposition", "messaging"],
   strategic_planning: ["strategische planung", "jahresplanung", "okr", "strategieprozess"],
 
+  // ZUSAMMENARBEIT UND VERANTWORTUNG, dazugekommen am 23.09.2026.
+  //
+  // OHNE DIESE BEGRIFFE WAERE DIE FAMILIE UNSICHTBAR - genau der Fehler vom
+  // 21.09.2026, als die fuenf Bereiche fuer Aussenauftritt zwar existierten,
+  // aber in keiner Begriffsliste standen. Maria hat es als "es filtert immer
+  // noch keine Soft Skills heraus" gemeldet.
+  //
+  // Die Begriffe sind Taetigkeiten, keine Eigenschaften: "verantwortet",
+  // "entschieden", "abgegeben" - nicht "hartnaeckig", "belastbar".
+  owning_outcomes: ["verantwortet", "verantwortung uebernommen", "bis zum ende gebracht", "durchgezogen", "abgeschlossen", "zum ergebnis gebracht", "geleitet"],
+  deciding_under_uncertainty: ["entschieden", "entscheidung getroffen", "ohne zu wissen", "unklar war", "auf gut glueck", "trotz unsicherheit", "keine daten"],
+  prioritising: ["priorisiert", "prioritaeten", "zuerst", "wichtiger als", "verschoben", "gestrichen", "fokussiert auf"],
+  structuring_work: ["strukturiert", "ordnung", "aufgeteilt", "plan gemacht", "sortiert", "uebersicht geschaffen"],
+  handing_over: ["abgegeben", "delegiert", "uebergeben", "jemand anderes gemacht", "eingearbeitet", "extern vergeben", "beauftragt"],
+  reviewing_setbacks: ["nachbesprochen", "ausgewertet", "beim naechsten mal", "anders gemacht", "daraus gelernt", "rueckblickend", "schiefgegangen"],
   software_engineering: ["entwickelt", "programmiert", "software", "backend", "frontend", "code", "api gebaut", "deployment"],
   technical_architecture: ["architektur", "architecture", "systemdesign", "skalierung", "microservice", "infrastruktur"],
   data_analytics: ["datenanalyse", "analytics", "dashboard gebaut", "sql", "data pipeline", "kennzahlen ausgewertet"],
