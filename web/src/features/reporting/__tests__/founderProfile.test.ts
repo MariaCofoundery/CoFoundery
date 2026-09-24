@@ -104,7 +104,13 @@ test("eine fehlende Saeule wird benannt, aber nicht mitgedruckt", () => {
   // an die falsche Person.
   const page = codeOnly(PAGE);
   assert.match(page, /MissingPillar/);
-  assert.match(page, /className="no-print mt-6 rounded-2xl border border-dashed/);
+  // NACHGEZOGEN AM 24.09.2026: Hier stand der vollstaendige Klassenname
+  // samt `mt-6`. Den Abstand setzt seit dem Umbau die Saeule, nicht mehr
+  // der Hinweis - der Test fiel damit ueber eine Aenderung, die mit
+  // seinem Anliegen nichts zu tun hat. Geprueft wird jetzt genau das
+  // Anliegen: Der Hinweis erscheint auf dem Bildschirm und nicht im
+  // Ausdruck, und er sieht wie ein Platzhalter aus, nicht wie Inhalt.
+  assert.match(page, /className="no-print[^"]*border-dashed/);
   assert.match(page, /href="\/me\/base"/);
   assert.match(page, /href="\/profile\/interview"/);
 });
@@ -206,4 +212,123 @@ test("die Arbeitsweise steht auch im Gesamtbild - aber ohne den Deutungshinweis"
   // eine Einladung zum Nachdenken; in einer weitergegebenen Fassung läse sich
   // derselbe Satz wie ein Befund über einen Menschen.
   assert.doesNotMatch(view, /strengthGap|others_see_more|others_see_less/);
+});
+
+// ---------------------------------------------------------------------------
+// Der Umbau vom 24.09.2026
+// ---------------------------------------------------------------------------
+//
+// GEMELDET: "Ich finde, da muessten viel mehr Sachen zusammengeklappt sein.
+// Sachen, die man selbst beantwortet hat, brauchen nicht mehr so ausfuehrlich
+// dastehen [...] ansonsten ist es viel zu erschlagend, und es muesste bitte
+// noch mal ein bisschen sortiert werden. Auch gerne ein bisschen farbig."
+//
+// Vorher: dreizehn gleich aussehende weisse Kaesten untereinander.
+
+const SELF_REPORT = "src/features/reporting/SelfReportView.tsx";
+const PILLAR = "src/features/reporting/ProfilePillar.tsx";
+const COVERAGE_VIEW = "src/features/reporting/CoverageMap.tsx";
+const COVERAGE_DATA = "src/features/reporting/founderProfileCoverage.ts";
+const REPORT_PAGE = "src/features/reporting/IndividualReportPageContent.tsx";
+
+test("die Seite steht in vier Saeulen, jede mit eigener Farbe", () => {
+  const page = codeOnly(PAGE);
+
+  // Die Saeulen waren in der Sprache laengst da, nur nie als Struktur.
+  const tones = [...page.matchAll(/tone: "(\w+)"/g)].map((match) => match[1]);
+  assert.deepEqual(tones, ["slate", "indigo", "emerald", "violet"]);
+
+  // Und sie sind einmal als Daten beschrieben, damit der Ueberblick oben und
+  // die Abschnitte darunter nicht auseinanderlaufen koennen.
+  assert.equal([...page.matchAll(/<ProfilePillar/g)].length, 4);
+  assert.match(page, /pillars\.map\(/);
+  for (const index of [0, 1, 2, 3]) {
+    assert.match(page, new RegExp(`id=\\{pillars\\[${index}\\]\\.id\\}`));
+  }
+});
+
+test("die Farbe sagt, welche Saeule - nicht, wie gut", () => {
+  const pillar = codeOnly(PILLAR);
+
+  // Deshalb sitzt sie nur am Rahmen: Augenbraue, Randlinie, Zaehler. Waere
+  // eine Saeule bernsteinfarben hinterlegt, liesse sich die Bedeutungsfarbe
+  // innen (Bruchstelle, Luecke) nicht mehr davon unterscheiden.
+  assert.match(pillar, /rule:|eyebrow:|badge:/);
+  for (const semantic of ["amber", "rose", "red", "green-"]) {
+    assert.ok(!pillar.includes(semantic), `keine Bedeutungsfarbe als Saeulenfarbe: ${semantic}`);
+  }
+});
+
+test("die Ausfuehrungen sind eingeklappt, die Zusammenfassung nicht", () => {
+  const report = codeOnly(SELF_REPORT);
+
+  // Fuenf Abschnitte gehen zu: Alltag, Bruchstellen, Missverstaendnisse,
+  // Hebel, Werte. Das Kernmuster mit der Dimensionskarte bleibt offen - es
+  // IST die Zusammenfassung.
+  assert.equal([...report.matchAll(/<ReportSection/g)].length, 5);
+  assert.match(report, /density === "summary"/);
+  assert.match(report, /<DimensionOverview/);
+  // Die Dimensionskarte darf nicht mit in einen Aufklapper gerutscht sein.
+  const summaryStart = report.indexOf("<DimensionOverview");
+  const firstSection = report.indexOf("<ReportSection");
+  assert.ok(summaryStart < firstSection, "die Dimensionskarte steht vor dem ersten Aufklapper");
+
+  // DERSELBE INHALT, ZWEI DICHTEN: Es gibt keine zweite, kuerzere Fassung der
+  // Texte - zwei Wahrheiten ueber denselben Menschen wuerden auseinanderlaufen.
+  assert.ok(!report.includes("summaryText"), "keine eigene Kurzfassung der Texte");
+});
+
+test("die eigene Bereichsliste ist eingeklappt, die Auswertung steht offen", () => {
+  const page = codeOnly(PAGE);
+
+  // Genau die Reihenfolge, nach der gefragt wurde: erst das Bild, dann die
+  // Auswertung, und die eigenen Antworten auf Wunsch.
+  const map = page.indexOf("<CoverageMap");
+  const readout = page.indexOf("<CapabilityReadoutSection");
+  const details = page.indexOf("<ProfileDetails");
+  assert.ok(map > 0 && readout > map, "die Auswertung folgt auf die Karte");
+  assert.ok(details > readout, "die eigene Liste steht zuletzt und eingeklappt");
+  assert.match(page, /<ProfileDetails[\s\S]{0,400}<FounderProfileCapability/);
+});
+
+test("die Voreinstellung bleibt ausfuehrlich - die Berichtsseite aendert sich nicht", () => {
+  // `/me/report` IST der ausfuehrliche Bericht; wer ihn oeffnet, will lesen.
+  // Nur im Gesamtbild ist er einer von vier Teilen.
+  assert.match(codeOnly(SELF_REPORT), /density = "full"/);
+  const reportPage = codeOnly(REPORT_PAGE);
+  assert.match(reportPage, /<SelfReportView report=\{report\}\s*\/>/);
+  assert.ok(!reportPage.includes("density"), "die Berichtsseite gibt keine Dichte an");
+});
+
+test("beim Drucken geht alles wieder auf", () => {
+  const page = codeOnly(PAGE);
+  // Das Gesamtbild ist die Fassung, die weitergegeben wird. Ein zugeklapptes
+  // `details` im PDF waere kein Schoenheitsfehler, sondern ein leeres Profil.
+  assert.match(page, /<OpenDetailsForPrint \/>/);
+
+  const opener = codeOnly("src/features/reporting/OpenDetailsForPrint.tsx");
+  assert.match(opener, /beforeprint/);
+  // Und danach steht die Seite wieder so da wie vorher.
+  assert.match(opener, /afterprint/);
+  assert.match(opener, /data-profile-details/);
+});
+
+test("die Grafik ist eine Deckungskarte und kein Netzdiagramm", () => {
+  const view = codeOnly(COVERAGE_VIEW);
+  const data = codeOnly(COVERAGE_DATA);
+
+  // DIE WICHTIGSTE ZUSAGE DES UMBAUS. Ein Spinnennetz ueber die Familien
+  // braucht je Familie EINE Zahl, also einen Score. Den gibt dieses Modell
+  // nicht her - und ein unvalidiertes Instrument, das eine Zahl je Person
+  // ausgibt, wird als Auswahlkriterium benutzt, sobald es existiert.
+  for (const forbidden of ["radar", "spider", "polar", "score", "percent", "Prozent"]) {
+    assert.ok(!view.includes(forbidden), `keine Note im Bild: ${forbidden}`);
+    assert.ok(!data.includes(forbidden), `keine Note in der Rechnung: ${forbidden}`);
+  }
+
+  // Der Balken ist Schmuck - dieselbe Auskunft steht als Text daneben.
+  assert.match(view, /aria-hidden/);
+  assert.match(view, /copy\.familyCount|copy\.familyUnspoken/);
+  // Und die Karte sagt selbst, worauf sie beruht.
+  assert.match(view, /copy\.basis/);
 });

@@ -20,7 +20,12 @@ export function FounderProfileBase({
 }: {
   core: PersonCore | null;
   copy: {
-    title: string;
+  /**
+   * Die Ueberschrift darf fehlen: Im Gesamtbild traegt sie die Saeule
+   * (`ProfilePillar`), und zweimal dasselbe uebereinander liest sich wie ein
+   * Fehler. `null` heisst "steht schon darueber", nicht "hat keinen Namen".
+   */
+    title?: string | null;
     region: string;
     remoteMode: (mode: string) => string;
     expertise: string;
@@ -39,9 +44,10 @@ export function FounderProfileBase({
   const hasAnything = Boolean(core?.bio?.trim()) || region.length > 0 || expertise.length > 0 || industries.length > 0;
 
   return (
-    <section className="page-section mb-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-      <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
-
+    <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+      {copy.title ? (
+        <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
+      ) : null}
       {hasAnything ? (
         <>
           {core?.bio?.trim() ? (

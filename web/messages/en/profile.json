@@ -155,7 +155,9 @@
       "title": "What you bring",
       "intro": "Per area: how often you have applied it and how you would see responsibility for it. The situations you told in the interview are deliberately not shown here — they stay on your profile page.",
       "evidenceCount": "{count, plural, =1 {1 piece of evidence} other {# pieces of evidence}}",
-      "noLevel": "Level still open"
+      "noLevel": "Level still open",
+      "detailsSummary": "Your areas in detail",
+      "detailsHint": "{count, plural, =1 {1 area} other {# areas}}"
     },
     "missingReport": {
       "title": "Your self-report is still missing",
@@ -181,7 +183,34 @@
       "intro": "Ways of working from situations you told — with your own assessment and what you assume others would say.",
       "self": "You",
       "reflected": "{who}",
-      "unanswered": "open"
+      "unanswered": "open",
+      "subtitle": "Working styles from your situations"
+    },
+    "pillars": {
+      "step": "{index} of {total}",
+      "base": "Basics",
+      "work": "Working style",
+      "bring": "Capabilities",
+      "direction": "Direction"
+    },
+    "overview": {
+      "title": "Your profile in four parts",
+      "ready": "filled in",
+      "open": "still open"
+    },
+    "detailsHint": "{count, plural, =1 {1 section} other {# sections}}",
+    "coverage": {
+      "title": "What you have talked about",
+      "intro": "One bar per family, made of its individual areas — shaded by how far you have answered for each. These are counts, not a rating: a pale bar means the area has not come up yet, not that something is missing.",
+      "states": {
+        "answered": "Level and ownership",
+        "levelled": "Level only",
+        "named": "Named only",
+        "unspoken": "Not discussed"
+      },
+      "familyCount": "{entered} of {total} areas",
+      "familyUnspoken": "not discussed yet",
+      "basis": "This map counts your own entries. It says what the interview covered — not what you are capable of."
     }
   }
 }

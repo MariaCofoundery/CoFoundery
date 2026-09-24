@@ -28,7 +28,12 @@ export function FounderProfileDirection({
   statements: DirectionStatement[];
   facets: readonly DirectionFacet[];
   copy: {
-    title: string;
+  /**
+   * Die Ueberschrift darf fehlen: Im Gesamtbild traegt sie die Saeule
+   * (`ProfilePillar`), und zweimal dasselbe uebereinander liest sich wie ein
+   * Fehler. `null` heisst "steht schon darueber", nicht "hat keinen Namen".
+   */
+    title?: string | null;
     intro: string;
     facetLabel: (facet: string) => string;
   };
@@ -45,9 +50,10 @@ export function FounderProfileDirection({
     .filter((group) => group.statements.length > 0);
 
   return (
-    <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-      <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
-      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{copy.intro}</p>
+    <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+      {copy.title ? (
+        <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
+      ) : null}      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{copy.intro}</p>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
         {groups.map((group) => (

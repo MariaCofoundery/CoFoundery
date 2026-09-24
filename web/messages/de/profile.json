@@ -155,7 +155,9 @@
       "title": "Was du mitbringst",
       "intro": "Je Bereich: wie oft du es angewandt hast und wie du dazu Verantwortung sehen würdest. Die Situationen, die du im Interview erzählt hast, stehen hier absichtlich nicht — sie bleiben auf deiner Profilseite.",
       "evidenceCount": "{count, plural, =1 {1 Beleg} other {# Belege}}",
-      "noLevel": "Stufe noch offen"
+      "noLevel": "Stufe noch offen",
+      "detailsSummary": "Deine Bereiche im Einzelnen",
+      "detailsHint": "{count, plural, =1 {1 Bereich} other {# Bereiche}}"
     },
     "missingReport": {
       "title": "Dein Selbstbild fehlt noch",
@@ -181,7 +183,34 @@
       "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
       "self": "Du selbst",
       "reflected": "{who}",
-      "unanswered": "noch offen"
+      "unanswered": "noch offen",
+      "subtitle": "Arbeitsweisen aus deinen Situationen"
+    },
+    "pillars": {
+      "step": "{index} von {total}",
+      "base": "Grundlage",
+      "work": "Arbeitsweise",
+      "bring": "Fähigkeiten",
+      "direction": "Richtung"
+    },
+    "overview": {
+      "title": "Dein Gesamtbild in vier Teilen",
+      "ready": "ausgefüllt",
+      "open": "noch offen"
+    },
+    "detailsHint": "{count, plural, =1 {1 Abschnitt} other {# Abschnitte}}",
+    "coverage": {
+      "title": "Worüber du gesprochen hast",
+      "intro": "Je Familie ein Balken aus ihren einzelnen Bereichen — eingefärbt danach, wie weit du sie beantwortet hast. Das sind Zählwerte, keine Bewertung: Ein blasser Balken heißt, dass darüber noch nicht gesprochen wurde, nicht dass dir etwas fehlt.",
+      "states": {
+        "answered": "Stufe und Verantwortung",
+        "levelled": "nur Stufe",
+        "named": "nur genannt",
+        "unspoken": "nicht besprochen"
+      },
+      "familyCount": "{entered} von {total} Bereichen",
+      "familyUnspoken": "noch nicht besprochen",
+      "basis": "Die Karte zählt deine eigenen Einträge. Sie sagt, worüber im Interview gesprochen wurde — nicht, was du kannst."
     }
   }
 }

@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { DimensionOverview } from "@/features/reporting/DimensionOverview";
+import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { DimensionScale } from "@/features/reporting/DimensionScale";
 import {
   FOUNDER_DIMENSION_ORDER,
@@ -37,8 +39,28 @@ import { buildHeroText } from "@/features/reporting/heroTextBuilder";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { normalizeGermanText as t } from "@/lib/normalizeGermanText";
 
+/**
+ * Wie ausfuehrlich der Bericht steht.
+ *
+ * GEWUENSCHT AM 24.09.2026 fuer das Gesamtbild: "Einfach nur die
+ * Zusammenfassung, und dann kann man, wenn man will, seine eigenen Antworten
+ * noch mal ausklappen."
+ *
+ * `full` ist und bleibt die Voreinstellung. Die eigenstaendige Berichtsseite
+ * (`/me/report`) IST der ausfuehrliche Bericht - wer sie oeffnet, will lesen.
+ * Im Gesamtbild dagegen ist der Bericht einer von vier Teilen, und dort
+ * erschlaegt seine volle Laenge alles andere.
+ *
+ * WAS IN BEIDEN FAELLEN OFFEN BLEIBT: das Kernmuster mit der Dimensionskarte.
+ * Das ist die Zusammenfassung; alles Weitere ist ihre Ausfuehrung.
+ */
+export type SelfReportDensity = "full" | "summary";
+
 type Props = {
   report: SelfAlignmentReport;
+  density?: SelfReportDensity;
+  /** "4 Abschnitte" am eingeklappten Rand - sonst klickt niemand. */
+  detailsHint?: ((count: number) => string) | null;
 };
 
 type CoreParagraph = {
@@ -54,7 +76,7 @@ type InterpretationBlock = SelfReportMisreadingBlock;
 
 type LeverBlock = SelfReportLeverBlock;
 
-export function SelfReportView({ report }: Props) {
+export function SelfReportView({ report, density = "full", detailsHint = null }: Props) {
   const chrome = getSelfReportChrome(report.locale);
   const reportContent = getReportContent(report.locale);
   const selection = buildSelfReportSelection(report.scoresA);
@@ -109,10 +131,11 @@ export function SelfReportView({ report }: Props) {
         </div>
       </section>
 
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {chrome.sections.everyday}
-        </p>
+      <ReportSection
+        density={density}
+        label={chrome.sections.everyday}
+        hint={detailsHint ? detailsHint(everydayBlocks.length) : null}
+      >
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {everydayBlocks.map((block) => (
             <article key={`${block.dimension}-${block.title}`} className="rounded-2xl border border-slate-200/80 bg-white p-5">
@@ -138,12 +161,13 @@ export function SelfReportView({ report }: Props) {
             </article>
           ))}
         </div>
-      </section>
+      </ReportSection>
 
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {chrome.sections.teamBreak}
-        </p>
+      <ReportSection
+        density={density}
+        label={chrome.sections.teamBreak}
+        hint={detailsHint ? detailsHint(teamBreakBlocks.length) : null}
+      >
         <div className="mt-6 grid gap-4">
           {teamBreakBlocks.map((block) => (
             <article key={`break-${block.dimension}-${block.title}`} className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
@@ -165,12 +189,13 @@ export function SelfReportView({ report }: Props) {
             </article>
           ))}
         </div>
-      </section>
+      </ReportSection>
 
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {chrome.sections.misreadings}
-        </p>
+      <ReportSection
+        density={density}
+        label={chrome.sections.misreadings}
+        hint={detailsHint ? detailsHint(misreadings.length) : null}
+      >
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           {misreadings.map((entry) => (
             <article key={`misreading-${entry.title}`} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
@@ -179,12 +204,13 @@ export function SelfReportView({ report }: Props) {
             </article>
           ))}
         </div>
-      </section>
+      </ReportSection>
 
-      <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          {chrome.sections.levers}
-        </p>
+      <ReportSection
+        density={density}
+        label={chrome.sections.levers}
+        hint={detailsHint ? detailsHint(levers.length) : null}
+      >
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {levers.map((entry) => (
             <article key={`lever-${entry.title}`} className="rounded-2xl border border-slate-200/80 bg-white p-5">
@@ -193,17 +219,50 @@ export function SelfReportView({ report }: Props) {
             </article>
           ))}
         </div>
-      </section>
+      </ReportSection>
 
       {showValuesSection ? (
-        <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            {chrome.sections.valuesProfile}
-          </p>
+        <ReportSection density={density} label={chrome.sections.valuesProfile} hint={null}>
           <div className="mt-5">{renderCompactValuesSection(report, chrome)}</div>
-        </section>
+        </ReportSection>
       ) : null}
     </>
+  );
+}
+
+/**
+ * Ein Abschnitt des Berichts - als Karte oder als Aufklapper.
+ *
+ * DERSELBE INHALT, ZWEI DICHTEN. Es gibt bewusst keine zweite Fassung der
+ * Texte: Waere die Zusammenfassung ein eigener, kuerzerer Text, haette das
+ * Produkt zwei Wahrheiten ueber denselben Menschen, und die eine wuerde
+ * irgendwann von der anderen abweichen. Eingeklappt ist dasselbe wie
+ * ausgeklappt, nur zu.
+ */
+function ReportSection({
+  density,
+  label,
+  hint,
+  children,
+}: {
+  density: SelfReportDensity;
+  label: string;
+  hint: string | null;
+  children: ReactNode;
+}) {
+  if (density === "summary") {
+    return (
+      <ProfileDetails className="mt-3" summary={label} hint={hint}>
+        {children}
+      </ProfileDetails>
+    );
+  }
+
+  return (
+    <section className="page-section mt-6 rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:mt-4 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
+      <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{label}</p>
+      {children}
+    </section>
   );
 }
 
