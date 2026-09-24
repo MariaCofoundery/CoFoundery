@@ -413,5 +413,18 @@
     "claimFailedTitle": "Diese Einladung geht nicht auf",
     "claimFailedText": "Vielleicht ist sie abgelaufen, wurde schon angenommen oder war an eine andere E-Mail-Adresse gerichtet als die, mit der du angemeldet bist.",
     "claimFailedCta": "Zur Übersicht"
+  },
+  "personView": {
+    "back": "Zurück zur Übersicht",
+    "unnamed": "Diese Person",
+    "intro": "Nur das, was diese Person dir freigegeben hat. Sie kann jede Freigabe jederzeit zurücknehmen — dann ist der Abschnitt hier weg.",
+    "base": "Wer sie ist",
+    "region": "Ort und Arbeitsweise",
+    "expertise": "Schwerpunkte",
+    "capability": "Was sie mitbringt",
+    "strengths": "Wie sie arbeitet",
+    "direction": "Was ihr wichtig ist",
+    "self": "Selbst",
+    "scopeNote": "Die Erzählungen aus den Gesprächen sind hier nie enthalten — sie werden nicht freigegeben, in keinem Umfang."
   }
 }

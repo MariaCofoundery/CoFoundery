@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   createAdvisorOrgAction,
@@ -128,9 +129,21 @@ export async function AdvisorOrgSection({
                 key={person.subjectUserId}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
               >
-                <span className="font-medium text-slate-900">
-                  {t("personScopes", { count: person.scopes.length })}
-                </span>
+                {/* Der Weg zur Ansicht steht nur da, wenn ueberhaupt etwas
+                    freigegeben ist - ein Link auf eine Seite, die nichts
+                    zeigen darf, ist kein Weg. */}
+                {person.scopes.length > 0 ? (
+                  <Link
+                    href={`/advisor/person/${person.subjectUserId}`}
+                    className="font-medium text-slate-900 underline-offset-4 hover:underline"
+                  >
+                    {t("personScopes", { count: person.scopes.length })}
+                  </Link>
+                ) : (
+                  <span className="font-medium text-slate-900">
+                    {t("personScopes", { count: person.scopes.length })}
+                  </span>
+                )}
                 {person.pendingScopes.length > 0 ? (
                   <span className="ml-2 text-slate-500">
                     {t("personPending", { count: person.pendingScopes.length })}

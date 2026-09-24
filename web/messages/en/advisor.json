@@ -413,5 +413,18 @@
     "claimFailedTitle": "This invitation does not open",
     "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with.",
     "claimFailedCta": "To the overview"
+  },
+  "personView": {
+    "back": "Back to the overview",
+    "unnamed": "This person",
+    "intro": "Only what this person released to you. They can take back any release at any time — then the section here is gone.",
+    "base": "Who they are",
+    "region": "Location and way of working",
+    "expertise": "Focus areas",
+    "capability": "What they bring",
+    "strengths": "How they work",
+    "direction": "What matters to them",
+    "self": "Self",
+    "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope."
   }
 }

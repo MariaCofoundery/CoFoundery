@@ -187,3 +187,97 @@ test("der gesammelte Bereich trennt Zusage und Anfrage", () => {
   // vielleicht nur "Wer du bist" freigegeben haben.
   assert.doesNotMatch(view, /displayName|person_core/);
 });
+
+// ---------------------------------------------------------------------------
+// Und was davon wirklich zu sehen ist
+// ---------------------------------------------------------------------------
+//
+// NACHGETRAGEN AM 24.09.2026. Bis hierher gab es Zugänge, aber keine Ansicht -
+// freigegeben, aber nirgends darstellbar. Das ist der Teil, den ein
+// Accelerator tatsächlich benutzt, und damit der heikelste: Hier gehen zum
+// ersten Mal Daten eines Menschen an jemand anderen.
+//
+// Die Grenzen selbst prüft `supabase/tests/advisor_person_views.sql` gegen die
+// laufende Datenbank. Hier steht nur, was der Code zusagt - und das ist nicht
+// dasselbe: Ein Test gegen die Datenbank kann nicht sehen, ob die SEITE die
+// Prüfung nachträglich umgeht.
+
+const VIEW_MIGRATION = "../supabase/migrations/20261045120000_advisor_person_views.sql";
+const PERSON_PAGE = "src/app/(product)/advisor/person/[userId]/page.tsx";
+const VIEW_DATA = "src/features/advisor/personViewData.ts";
+
+test("jede Lesefunktion fragt selbst nach der Zustimmung", () => {
+  const migration = sqlCodeOnly(VIEW_MIGRATION);
+  const readers = migration.match(/create or replace function public\.get_advisor_person_\w+/g) ?? [];
+  const checks = migration.match(/if not public\.has_advisor_person_access\(/g) ?? [];
+
+  assert.ok(readers.length >= 4, "es gibt vier Lesefunktionen");
+  // GLEICH VIELE, nicht "mindestens eine": Eine Funktion ohne eigene Prüfung
+  // wäre eine offene Tür, die niemandem auffällt, weil die drei anderen
+  // geschlossen sind.
+  assert.equal(
+    checks.length,
+    readers.length,
+    "jede Lesefunktion prüft, keine verlässt sich auf eine andere"
+  );
+});
+
+test("keine Lesefunktion fasst die Erzählungen an", () => {
+  // Auch die Blockkommentare weg: Die Migration ERKLÄRT, warum sie die
+  // Vorschlagstabelle nicht anfasst, und nennt sie dabei. Geprüft wird der
+  // Code, nicht die Begründung.
+  const migration = sqlCodeOnly(VIEW_MIGRATION).replace(/\/\*[\s\S]*?\*\//g, " ");
+  // Die Belege an den Fähigkeiten, die Interviewantworten und die Vorschläge,
+  // über die noch niemand entschieden hat. Ein Advisor sieht bestätigte
+  // Ergebnisse - Frage 3 des Fähigkeits-Interviews fragt nach dem Leben
+  // ausserhalb der Erwerbsarbeit, dort stehen Pflege, Ehrenamt, Familie.
+  for (const table of [
+    "person_capability_evidence",
+    "capability_interview_turns",
+    "direction_statement_proposals",
+  ]) {
+    assert.ok(!migration.includes(table), `${table} kommt in den Ansichten nicht vor`);
+  }
+});
+
+test("die Tiefe hängt an ihrer eigenen Freigabe", () => {
+  const migration = sqlCodeOnly(VIEW_MIGRATION);
+  // Die vorhandene Sichtbarkeitsleiter trennt "welche Bereiche" von "wie tief"
+  // (`get_disclosed_capability`). Ein Advisor-Zugang darf sie nicht
+  // überspringen, also wird `capability_depth` getrennt abgefragt.
+  assert.match(migration, /has_advisor_person_access\([^)]*'capability_depth'\)/);
+  assert.match(migration, /case when v_depth then entry\.application_level end/);
+  assert.match(migration, /case when v_depth then entry\.ownership_wish end/);
+});
+
+test("die Seite zeigt nur, was die Datenbank herausgegeben hat", () => {
+  const page = codeOnly(PERSON_PAGE);
+
+  // Kein Abschnitt ohne Bedingung: Was nicht freigegeben ist, erscheint gar
+  // nicht - kein leerer Block und kein Schloss. Ein leerer Block würde aus
+  // einer fehlenden Freigabe eine Aussage über den Menschen machen.
+  for (const section of ["view.base", "view.capability", "view.strengths", "view.direction"]) {
+    assert.ok(
+      page.includes(`{${section} ?`) || page.includes(`{${section} &&`),
+      `${section} steht hinter einer Bedingung`
+    );
+  }
+
+  // Gar nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
+  assert.match(page, /grantedScopes\.length === 0\)\s*notFound\(\)/);
+
+  // Sich selbst begleitet niemand - die Freigabe-Abfrage sieht auch die
+  // EIGENEN Zeilen, die Lesefunktionen geben ihnen aber nichts heraus.
+  assert.match(page, /userId === user\.id\)\s*redirect\("\/me\/profile"\)/);
+
+  // Und es steht dabei, was das hier ist: Selbstauskunft, kein Testergebnis.
+  assert.match(page, /report\.instrumentNote/);
+});
+
+test("eine verweigerte Freigabe ist kein Fehler, sondern eine Abwesenheit", () => {
+  const data = codeOnly(VIEW_DATA);
+  // `42501` aus der Datenbank heisst "nicht freigegeben". Würde das als
+  // Fehler durchschlagen, risse ein fehlender Umfang die ganze Seite ab -
+  // und die freigegebenen Bereiche wären auch weg.
+  assert.match(data, /if \(error\) return null/);
+});
