@@ -5,11 +5,13 @@ import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadou
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { DIRECTION_FACETS } from "@/features/direction/directionInterviewGuide";
 import { getDirectionStatements } from "@/features/direction/directionStatementData";
+import { getPersonStrengths } from "@/features/capability/strengthData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
+import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
@@ -58,7 +60,7 @@ export default async function FounderProfilePage() {
   if (!user) redirect("/login?next=/me/profile");
 
   const supabase = await createClient();
-  const [t, tCapability, tDirection, tNote, core, report, vocabulary, entries, directionStatements] =
+  const [t, tCapability, tDirection, tNote, core, report, vocabulary, entries, directionStatements, strengths] =
     await Promise.all([
       getTranslations("profile.founderProfile"),
       getTranslations("capability"),
@@ -69,6 +71,7 @@ export default async function FounderProfilePage() {
       getCapabilityVocabulary(supabase),
       getOwnCapabilityEntries(supabase, user.id),
       getDirectionStatements(supabase),
+      getPersonStrengths(supabase),
     ]);
 
   const areaLabel = (areaId: string) => tCapability(`areaLabels.${areaId}`);
@@ -173,11 +176,21 @@ export default async function FounderProfilePage() {
         />
       )}
 
-      {/* WAS DAS HIER IST - UND WAS NICHT. Unten, weil ein Warnhinweis über
-          dem Ergebnis überlesen wird oder es wertlos macht, bevor man es
-          gelesen hat. Und mitgedruckt, anders als die Hinweise auf fehlende
-          Teile: In der Fassung, die weitergegeben wird, ist dieser Satz am
-          wichtigsten. */}
+      {/* DIE ARBEITSWEISE, nachgetragen am 24.09.2026: Sie stand nur auf der
+          Profilseite - und das Gesamtbild ist die Seite, die man weitergibt. */}
+      <FounderProfileStrengths
+        strengths={strengths}
+        copy={{
+          title: t("strengths.title"),
+          intro: t("strengths.intro"),
+          self: t("strengths.self"),
+          reflected: (who) => t("strengths.reflected", { who }),
+          frequency: (value) => tCapability(`strengths.frequencies.${value}`),
+          group: (value) => tCapability(`strengths.groups.${value}`),
+          unanswered: t("strengths.unanswered"),
+        }}
+      />
+
       {/* DIE VIERTE SÄULE, dazugekommen am 22.09.2026: Das Profil zeigte, wer
           jemand ist, wie er arbeitet und was er mitbringt - aber nicht, was
           ihn antreibt. */}
@@ -200,6 +213,11 @@ export default async function FounderProfilePage() {
         />
       )}
 
+      {/* WAS DAS HIER IST - UND WAS NICHT. Unten, weil ein Warnhinweis über
+          dem Ergebnis überlesen wird oder es wertlos macht, bevor man es
+          gelesen hat. Und mitgedruckt, anders als die Hinweise auf fehlende
+          Teile: In der Fassung, die weitergegeben wird, ist dieser Satz am
+          wichtigsten. */}
       <InstrumentNote
         copy={{
           title: tNote("title"),

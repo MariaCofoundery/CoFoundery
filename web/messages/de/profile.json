@@ -175,6 +175,13 @@
       "title": "Deine Richtung fehlt noch",
       "text": "Sechs Fragen nach echten Situationen zeigen, welche Themen und Veränderungen dich immer wieder anziehen. Das ist der Teil, den ein Lebenslauf nicht hergibt.",
       "cta": "Gespräch beginnen"
+    },
+    "strengths": {
+      "title": "Wie du arbeitest",
+      "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
+      "self": "Du selbst",
+      "reflected": "{who}",
+      "unanswered": "noch offen"
     }
   }
 }

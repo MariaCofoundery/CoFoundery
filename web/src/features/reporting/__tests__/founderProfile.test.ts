@@ -189,3 +189,21 @@ test("das Ergebnis sagt, was es ist - und wird mitgedruckt", () => {
     assert.match(copy.purpose!, /Auswahl|selection/i, `${locale}: nicht für Auswahl`);
   }
 });
+
+test("die Arbeitsweise steht auch im Gesamtbild - aber ohne den Deutungshinweis", () => {
+  // NACHGETRAGEN AM 24.09.2026. Auf die Frage "wo sehe ich das mit den Soft
+  // Skills" war die Antwort: auf der Profilseite, aber nicht im Gesamtbild.
+  // Das war inkonsequent - das Gesamtbild ist die Seite, die man weitergibt.
+  const page = codeOnly(PAGE);
+  assert.match(page, /<FounderProfileStrengths/);
+  assert.match(page, /getPersonStrengths/);
+
+  const view = codeOnly("src/features/reporting/FounderProfileStrengths.tsx");
+  // Beide Blicke stehen da - das ist der Ertrag des Perspektivwechsels.
+  assert.match(view, /selfFrequency/);
+  assert.match(view, /reflectedFrequency/);
+  // Der Hinweis auf den Unterschied NICHT: Auf der eigenen Profilseite ist er
+  // eine Einladung zum Nachdenken; in einer weitergegebenen Fassung läse sich
+  // derselbe Satz wie ein Befund über einen Menschen.
+  assert.doesNotMatch(view, /strengthGap|others_see_more|others_see_less/);
+});
