@@ -217,7 +217,13 @@ export async function CapabilityTeamReadoutView({
 
                             Nur bei den zwei Zuständen, bei denen sie etwas
                             ändert - bei "geklärt" wäre sie Lärm. */}
-                        {area.state === "gap" || area.state === "openPosition" ? (
+                        {/* NUR WO JEMAND ENTSCHIEDEN HAT, seit 26.09.2026.
+                            `unclassified` ist die Voreinstellung und keine
+                            Einschaetzung - ein Schildchen "kommt auf das
+                            Vorhaben an" waere dort eine Behauptung, die
+                            niemand aufgestellt hat. */}
+                        {(area.state === "gap" || area.state === "openPosition") &&
+                        area.sourcing !== "unclassified" ? (
                           <span
                             className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
                             title={t(`sourcing.${area.sourcing}Hint`)}

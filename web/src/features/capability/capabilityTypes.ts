@@ -61,7 +61,13 @@ export type CapabilityFamily = { family_id: string; sort_order: number };
  * fehlt Finance", und das erzeugt Panik. Mit ihr heisst sie: "Buchhaltung ist
  * eine Komponente - die kauft man. Unit Economics nicht."
  */
-export const AREA_SOURCINGS = ["internal_only", "component", "depends"] as const;
+/**
+ * `unclassified` ist die Voreinstellung und KEINE Einschaetzung - es heisst
+ * "hat noch niemand eingeordnet" und wird nirgends angezeigt. Bis zum
+ * 26.09.2026 uebernahm `depends` beide Bedeutungen, und damit behauptete das
+ * Produkt bei zwei Dritteln der Bereiche etwas, das nie entschieden wurde.
+ */
+export const AREA_SOURCINGS = ["internal_only", "component", "depends", "unclassified"] as const;
 export type AreaSourcing = (typeof AREA_SOURCINGS)[number];
 
 export type CapabilityArea = {

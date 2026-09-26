@@ -382,10 +382,44 @@ test("eine Lücke sagt, ob man sie einkaufen kann", () => {
   assert.match(migration, /sourcing = 'internal_only'[\s\S]{0,400}'owning_outcomes'/);
   assert.match(migration, /sourcing = 'component'[\s\S]{0,300}'accounting_controlling'/);
 
-  // Und "kommt auf das Vorhaben an" ist der Vorgabewert: Für die meisten
-  // Bereiche hängt es davon ab, was gebaut wird - das zu behaupten wäre
-  // schlimmer als es offen zu lassen.
+  // Und "kommt auf das Vorhaben an" WAR der Vorgabewert.
+  //
+  // ÜBERHOLT AM 26.09.2026, der Satz darunter stand hier als Begründung:
+  // "Für die meisten Bereiche hängt es davon ab, was gebaut wird - das zu
+  // behaupten wäre schlimmer als es offen zu lassen." Der zweite Teil stimmt,
+  // der erste war die Annahme: Tatsächlich wurden zwanzig Bereiche eingeordnet
+  // und 34 blieben auf der Voreinstellung liegen - darunter `unit_economics`,
+  // also genau das Beispiel, mit dem diese Migration sich rechtfertigt.
+  //
+  // Damit bedeutete `depends` zweierlei ("hängt wirklich ab" / "hat niemand
+  // entschieden") und zeigte trotzdem eine Aussage an. Seit
+  // 20261050120000 gibt es dafür `unclassified`. Diese Zeile prüft weiterhin
+  // die alte Migration - die ist Geschichte und ändert sich nicht.
   assert.match(migration, /add column sourcing text not null default 'depends'/);
+});
+
+test("was niemand eingeordnet hat, behauptet auch nichts", () => {
+  const migration = readFileSync(
+    "../supabase/migrations/20261050120000_sourcing_unclassified.sql",
+    "utf8"
+  ).replace(/^\s*--.*$/gm, "");
+  const view = readFileSync("src/features/capability/CapabilityTeamReadoutView.tsx", "utf8");
+
+  // Die neue Voreinstellung ist keine Einschätzung.
+  assert.match(migration, /alter column sourcing set default 'unclassified'/);
+  assert.match(migration, /'internal_only', 'component', 'depends', 'unclassified'/);
+
+  // ALLE 34 ZIEHEN UM. Keiner von ihnen wurde je auf `depends` GESETZT - sie
+  // haben den Wert bekommen, weil die Spalte ihn vergibt. Sie stehenzulassen
+  // hieße, eine Voreinstellung nachträglich zur Entscheidung zu erklären.
+  assert.match(migration, /set sourcing = 'unclassified'\s*where sourcing = 'depends'/);
+
+  // Und `depends` behält seine Bedeutung - für die, bei denen jemand wirklich
+  // zu dem Schluss kommt.
+  assert.ok(!migration.includes("drop column"), "depends bleibt ein gültiger Wert");
+
+  // Das Schildchen erscheint nur, wo jemand entschieden hat.
+  assert.match(view, /area\.sourcing !== "unclassified"/);
 });
 
 test("die neuen Bereiche sind Zuständigkeiten, keine Eigenschaften", () => {

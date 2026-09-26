@@ -144,7 +144,7 @@ export function buildCapabilityTeamReadout(
   families: CapabilityFamily[]
 ): TeamReadout {
   const familyOfArea = new Map(areas.map((area) => [area.area_id, area.family_id]));
-  const sourcingOfArea = new Map(areas.map((area) => [area.area_id, area.sourcing ?? "depends"]));
+  const sourcingOfArea = new Map(areas.map((area) => [area.area_id, area.sourcing ?? "unclassified"]));
   const areaOrder = new Map(areas.map((area) => [area.area_id, area.sort_order]));
   const orderedFamilies = [...families].sort((a, b) => a.sort_order - b.sort_order);
 
