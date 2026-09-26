@@ -94,7 +94,16 @@ insert into public.person_capability_evidence(entry_id, narrative)
 select id, 'Ersten Enterprise-Kunden von der ersten Mail bis zum Vertrag begleitet.'
 from public.person_capability_entries
 where user_id='fe000000-0000-4000-8000-000000000001' and area_id='b2b_sales';
-select extensions.is((select count(*)::int from public.person_capability_evidence), 1, 'Beleg haengt am Eintrag');
+-- REPARIERT AM 26.09.2026: Hier stand `count(*)` ueber die GANZE Tabelle.
+-- Das prueft nicht, dass der Beleg am Eintrag haengt, sondern dass die
+-- Datenbank sonst leer ist - und das ist sie, sobald jemand die App lokal
+-- benutzt hat. Gezaehlt wird jetzt, was dieser Test selbst angelegt hat.
+select extensions.is(
+  (select count(*)::int from public.person_capability_evidence ev
+   join public.person_capability_entries en on en.id = ev.entry_id
+   where en.user_id = 'fe000000-0000-4000-8000-000000000001'),
+  1,
+  'Beleg haengt am Eintrag');
 
 select extensions.throws_ok(
   $$insert into public.person_capability_evidence(entry_id, narrative)
@@ -131,8 +140,24 @@ reset role;
 -- ---------------------------------------------------------------------------
 -- 5. Lebenszyklus
 -- ---------------------------------------------------------------------------
+-- Vor dem Loeschen festhalten, welche Belege es waren - danach laesst sich
+-- ueber den Eintrag nicht mehr verbinden, denn der ist ja mit weg. Genau das
+-- ist der Punkt des Tests.
+create temporary table deleted_evidence_ids on commit drop as
+select ev.id
+from public.person_capability_evidence ev
+join public.person_capability_entries en on en.id = ev.entry_id
+where en.user_id = 'fe000000-0000-4000-8000-000000000001';
+
 delete from auth.users where id='fe000000-0000-4000-8000-000000000001';
-select extensions.is((select count(*)::int from public.person_capability_evidence), 0,
+
+-- REPARIERT AM 26.09.2026: auch hier stand `count(*)` ueber die ganze
+-- Tabelle. Fremde Zeilen ueberleben die Loeschung selbstverstaendlich - die
+-- Frage ist, ob DIESE verschwunden sind.
+select extensions.is(
+  (select count(*)::int from public.person_capability_evidence
+   where id in (select id from deleted_evidence_ids)),
+  0,
   'Kontoloeschung entfernt Eintraege und Belege ueber die Kette auth.users -> person_core -> entry -> evidence');
 
 select * from extensions.finish();

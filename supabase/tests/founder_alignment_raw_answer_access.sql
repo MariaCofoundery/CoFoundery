@@ -110,8 +110,21 @@ reset role;
 -- The trusted server path can still compute and persist the derived report.
 select set_config('request.jwt.claims', '{"role":"service_role"}', true);
 set local role service_role;
+-- REPARIERT AM 26.09.2026: Hier stand `count(*) = 4` ueber die GANZE Tabelle.
+-- Als service_role gibt es keine Zeilensicherheit, die einschraenkt - gezaehlt
+-- wurden also auch die Antworten aller anderen. Der Test verlangte damit eine
+-- leere Datenbank, nicht einen funktionierenden Lesepfad.
+--
+-- Die Pruefungen unter `authenticated` weiter oben bleiben bewusst ungezaehlt
+-- eingeschraenkt: Dort IST das globale `count` die staerkere Aussage, denn es
+-- wuerde auch ein Leck aus fremden Zeilen bemerken.
 select pg_temp.assert_raw_answer_access(
-  (select count(*) = 4 from public.assessment_answers),
+  (select count(*) = 4 from public.assessment_answers where assessment_id in (
+    'fa777777-7777-4777-8777-777777777771',
+    'fa777777-7777-4777-8777-777777777772',
+    'fb888888-8888-4888-8888-888888888881',
+    'fb888888-8888-4888-8888-888888888882'
+  )),
   'trusted report context cannot read the required inputs'
 );
 select * from public.finalize_invitation_if_ready(
