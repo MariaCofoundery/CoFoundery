@@ -421,7 +421,9 @@
     "profileRegionLabel": "Location",
     "profileFocusLabel": "Focus areas",
     "profileFocusPlaceholder": "Comma separated, at most eight",
-    "profileSave": "Save profile"
+    "profileSave": "Save profile",
+    "personUnnamed": "No name released",
+    "groupLink": "View a line-up"
   },
   "personView": {
     "back": "Back to the overview",
@@ -435,5 +437,23 @@
     "direction": "What matters to them",
     "self": "Self",
     "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope."
+  },
+  "group": {
+    "back": "Back to the organisation",
+    "title": "How do these people stand together?",
+    "intro": "Pick two or more people from your programme. You will see exactly the picture a team sees of itself — no more, no less.",
+    "chooseTitle": "Choose a line-up",
+    "chooseHint": "Selectable is anyone who released their name and capabilities to you. Twelve at most.",
+    "nobody": "You are not accompanying anyone yet.",
+    "unnamed": "No name released",
+    "notReleased": "not released yet",
+    "show": "Show line-up",
+    "resultTitle": "{names}",
+    "tooFewReleased": "Fewer than two of the people you picked released both their name and their capabilities. A line-up needs at least two.",
+    "omitted": {
+      "no_base": "{name} is not included: the name is not released, and findings nobody can attribute are useless.",
+      "no_capability": "{name} is not included: capabilities are not released."
+    },
+    "notARanking": "This page does not rate a line-up or compute a best combination. It counts areas and shows who has talked about what — a single number per group is not something this model supports, and it would decide who gets into a programme."
   }
 }

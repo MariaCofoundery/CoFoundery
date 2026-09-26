@@ -132,3 +132,42 @@ export async function getAccompaniedPeople(
   // Wer zugestimmt hat, steht oben - dort ist etwas zu tun.
   return [...byPerson.values()].sort((a, b) => b.scopes.length - a.scopes.length);
 }
+
+/**
+ * Dieselbe Liste - mit Namen, wo einer freigegeben ist.
+ *
+ * GEFUNDEN AM 26.09.2026 beim Bau der Gruppenansicht: Ein Accelerator sah
+ * seine begleiteten Menschen als namenlose Zeilen ("3 Bereiche freigegeben").
+ * Dasselbe Loch wie auf der Gegenseite, nur andersherum - und aus demselben
+ * Grund: `person_core` ist owner-only, die Anwendung kommt an den Namen nicht
+ * heran.
+ *
+ * DER NAME IST SELBST EINE FREIGABE. Er kommt aus `get_advisor_person_base`,
+ * und die Funktion gibt ihn nur heraus, wenn der Umfang `base` zugestimmt
+ * wurde. Wer nur seine Faehigkeiten freigegeben hat, bleibt namenlos - das
+ * ist kein Fehler, sondern seine Entscheidung, und die Anzeige sagt das.
+ *
+ * Gefragt wird deshalb nur fuer die, bei denen `base` ueberhaupt gilt: Ein
+ * Aufruf, von dem man weiss, dass er abgewiesen wird, ist kein Aufruf,
+ * sondern Laerm im Protokoll.
+ */
+export type AccompaniedPersonNamed = AccompaniedPerson & { name: string | null };
+
+export async function withAccompaniedNames(
+  client: SupabaseClient,
+  people: AccompaniedPerson[]
+): Promise<AccompaniedPersonNamed[]> {
+  return Promise.all(
+    people.map(async (person) => {
+      if (!person.scopes.includes("base")) return { ...person, name: null };
+
+      const { data, error } = await client.rpc("get_advisor_person_base", {
+        p_subject_user_id: person.subjectUserId,
+      });
+      if (error) return { ...person, name: null };
+
+      const name = ((data ?? []) as { display_name: string | null }[])[0]?.display_name?.trim();
+      return { ...person, name: name || null };
+    })
+  );
+}

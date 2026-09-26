@@ -3,6 +3,7 @@ import { PersonInviteSection, type PersonInvite } from "@/features/advisor/Perso
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import {
   getAccompaniedPeople,
+  withAccompaniedNames,
   getMyAdvisorOrgs,
   getOrgMembers,
 } from "@/features/advisor/orgData";
@@ -621,7 +622,9 @@ export default async function AdvisorDashboardPage() {
     .limit(50);
   const advisorOrgs = await getMyAdvisorOrgs(client);
   const orgMembers = advisorOrgs[0] ? await getOrgMembers(client, advisorOrgs[0].id) : [];
-  const accompanied = await getAccompaniedPeople(client);
+  // Mit Namen, wo einer freigegeben ist - vorher stand hier eine Liste
+  // namenloser Zeilen.
+  const accompanied = await withAccompaniedNames(client, await getAccompaniedPeople(client));
 
   const personInvites: PersonInvite[] = (
     (inviteRows ?? []) as { id: string; invitee_email: string; status: string; scopes: string[] }[]

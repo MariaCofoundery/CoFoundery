@@ -421,7 +421,9 @@
     "profileRegionLabel": "Ort",
     "profileFocusLabel": "Schwerpunkte",
     "profileFocusPlaceholder": "Durch Komma getrennt, höchstens acht",
-    "profileSave": "Profil speichern"
+    "profileSave": "Profil speichern",
+    "personUnnamed": "Ohne freigegebenen Namen",
+    "groupLink": "Aufstellung ansehen"
   },
   "personView": {
     "back": "Zurück zur Übersicht",
@@ -435,5 +437,23 @@
     "direction": "Was ihr wichtig ist",
     "self": "Selbst",
     "scopeNote": "Die Erzählungen aus den Gesprächen sind hier nie enthalten — sie werden nicht freigegeben, in keinem Umfang."
+  },
+  "group": {
+    "back": "Zurück zur Organisation",
+    "title": "Wie stehen diese Menschen zusammen da?",
+    "intro": "Wähle zwei oder mehr Personen aus deinem Programm. Du siehst dann genau das Bild, das ein Team von sich selbst sieht — nicht mehr und nicht weniger.",
+    "chooseTitle": "Aufstellung wählen",
+    "chooseHint": "Wählbar ist, wer dir Name und Fähigkeiten freigegeben hat. Höchstens zwölf.",
+    "nobody": "Du begleitest noch niemanden.",
+    "unnamed": "Ohne freigegebenen Namen",
+    "notReleased": "noch nicht freigegeben",
+    "show": "Aufstellung ansehen",
+    "resultTitle": "{names}",
+    "tooFewReleased": "Von den gewählten Personen haben weniger als zwei sowohl ihren Namen als auch ihre Fähigkeiten freigegeben. Eine Aufstellung braucht mindestens zwei.",
+    "omitted": {
+      "no_base": "{name} ist nicht dabei: Der Name ist nicht freigegeben, und eine Auswertung ohne Namen wäre nicht zuzuordnen.",
+      "no_capability": "{name} ist nicht dabei: Die Fähigkeiten sind nicht freigegeben."
+    },
+    "notARanking": "Diese Seite bewertet keine Aufstellung und berechnet keine beste Kombination. Sie zählt Bereiche und zeigt, wer worüber gesprochen hat — eine Zahl je Gruppe gäbe dieses Modell nicht her, und sie würde darüber entscheiden, wer in ein Programm kommt."
   }
 }

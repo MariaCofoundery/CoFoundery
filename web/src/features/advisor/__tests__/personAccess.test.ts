@@ -380,3 +380,82 @@ test("was die Organisation über sich sagt, ändert nur ihre Führung", () => {
   // Im Formular steht sie nicht noch einmal - es wird nur nicht gezeigt.
   assert.match(codeOnly(ORG_SECTION), /org\.role === "owner"/);
 });
+
+// ---------------------------------------------------------------------------
+// Team-Matching für den Accelerator
+// ---------------------------------------------------------------------------
+//
+// Ein Programm begleitet einzelne Menschen und möchte sehen, wie sie als
+// Aufstellung dastehen - bevor sie ein Team sind.
+
+const GROUP_DATA = "src/features/advisor/groupReadoutData.ts";
+const GROUP_PAGE = "src/app/(product)/advisor/group/page.tsx";
+
+test("der Accelerator sieht dasselbe Bild wie das Team von sich selbst", () => {
+  const data = codeOnly(GROUP_DATA);
+  const page = codeOnly(GROUP_PAGE);
+
+  // DIE ENTSCHEIDUNG DIESES BEREICHS, und keine Sparsamkeit: dieselbe reine
+  // Funktion, dasselbe Bauteil. Gäbe es hier eine eigene Rechnung, wäre sie
+  // irgendwann die bessere - und dann hätte das Produkt zwei Wahrheiten über
+  // dieselben Menschen, von denen die genauere denen gehört, die entscheiden.
+  assert.match(data, /buildCapabilityTeamReadout/);
+  assert.match(page, /<CapabilityTeamReadoutView/);
+  // Keine zweite Auswertung im Advisor-Bereich.
+  assert.ok(!data.includes("function buildAdvisor"), "keine eigene Gruppenrechnung");
+});
+
+test("es gibt keine Rangliste von Aufstellungen", () => {
+  const data = codeOnly(GROUP_DATA);
+  const page = codeOnly(GROUP_PAGE);
+
+  // Man kann nicht "die beste Dreierkombination berechnen lassen" - dafür
+  // bräuchte es eine Zahl je Gruppe, und die gäbe dieses Modell nicht her.
+  for (const forbidden of ["score", "rank", "ranking", "bestCombination", "sortByFit"]) {
+    assert.ok(!data.includes(forbidden), `keine Note je Gruppe: ${forbidden}`);
+    assert.ok(!page.includes(forbidden), `keine Note je Gruppe: ${forbidden}`);
+  }
+  // Und es steht auf der Seite, weil dort gerade eine Lückenkarte stand.
+  assert.match(page, /notARanking/);
+});
+
+test("die Aufstellung wird nicht gespeichert", () => {
+  const page = codeOnly(GROUP_PAGE);
+
+  // Eine gespeicherte "Aufstellung" wäre eine Aussage über Menschen, die
+  // diese Menschen nie gesehen haben und nicht löschen können. Ein Link ist
+  // ein Gedanke; eine Zeile in der Datenbank ist eine Behauptung.
+  assert.match(page, /method="get"/);
+  assert.ok(!page.includes(".insert("), "kein Speichern der Auswahl");
+  assert.ok(!page.includes('"use server"'), "keine Aktion, die etwas anlegt");
+});
+
+test("jede Seite der Gruppe kommt aus den Freigabefunktionen", () => {
+  const data = codeOnly(GROUP_DATA);
+
+  // Es gibt bewusst keinen Weg, der an der Zustimmung vorbeiführt - kein
+  // direkter Griff auf die Tabellen.
+  assert.match(data, /rpc\("get_advisor_person_base"/);
+  assert.match(data, /rpc\("get_advisor_person_capability"/);
+  assert.ok(!data.includes('from("person_capability_entries")'), "kein direkter Tabellenzugriff");
+  assert.ok(!data.includes('from("person_core")'), "kein direkter Tabellenzugriff");
+
+  // Ein Fehler heisst "nicht freigegeben", nicht "kaputt".
+  assert.match(data, /no_base|no_capability/);
+});
+
+test("wer fehlt, wird genannt - und warum", () => {
+  const data = codeOnly(GROUP_DATA);
+  const page = codeOnly(GROUP_PAGE);
+
+  // Eine Gruppenauswertung, der stillschweigend jemand fehlt, sieht aus wie
+  // eine Aussage über eine dünn besetzte Gruppe. Sie ist aber eine darüber,
+  // wer zugestimmt hat.
+  assert.match(data, /omitted/);
+  assert.match(page, /readout\.omitted\.map/);
+  assert.match(page, /omitted\.\$\{person\.reason\}/);
+
+  // Und die Zahl derer, die ihre Tiefe freigegeben haben, wird mitgezählt -
+  // hier noch wichtiger als im Team, weil hier jemand entscheidet.
+  assert.match(data, /withDepth/);
+});

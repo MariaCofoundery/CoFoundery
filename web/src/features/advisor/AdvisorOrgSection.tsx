@@ -6,7 +6,7 @@ import {
   inviteOrgAdvisorAction,
   setOrgMembershipAction,
 } from "@/features/advisor/orgActions";
-import type { AccompaniedPerson, AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
+import type { AccompaniedPersonNamed, AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 /**
@@ -29,7 +29,7 @@ export async function AdvisorOrgSection({
 }: {
   orgs: AdvisorOrg[];
   members: OrgMember[];
-  accompanied: AccompaniedPerson[];
+  accompanied: AccompaniedPersonNamed[];
 }) {
   const t = await getTranslations("advisor.org");
   const org = orgs[0] ?? null;
@@ -215,7 +215,19 @@ export async function AdvisorOrgSection({
       )}
 
       <div className="mt-8 border-t border-slate-200 pt-6">
-        <h3 className="text-base font-semibold text-slate-900">{t("peopleTitle")}</h3>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="text-base font-semibold text-slate-900">{t("peopleTitle")}</h3>
+          {/* Zwei Menschen sind das Minimum fuer eine Aufstellung - darunter
+              waere der Link ein Weg auf eine Seite, die nichts zeigen kann. */}
+          {accompanied.filter((person) => person.scopes.includes("capability")).length >= 2 ? (
+            <Link
+              href="/advisor/group"
+              className="text-sm font-medium text-slate-700 underline-offset-4 hover:underline"
+            >
+              {t("groupLink")}
+            </Link>
+          ) : null}
+        </div>
         {accompanied.length === 0 ? (
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("peopleEmpty")}</p>
         ) : (
@@ -228,18 +240,26 @@ export async function AdvisorOrgSection({
                 {/* Der Weg zur Ansicht steht nur da, wenn ueberhaupt etwas
                     freigegeben ist - ein Link auf eine Seite, die nichts
                     zeigen darf, ist kein Weg. */}
+                {/* DER NAME STEHT VORN, seit 26.09.2026. Vorher stand hier
+                    "3 Bereiche freigegeben" - eine Liste namenloser Zeilen.
+                    Der Name ist selbst eine Freigabe: Wer nur seine
+                    Faehigkeiten freigegeben hat, bleibt namenlos, und das
+                    steht dann da statt einer Kennung. */}
                 {person.scopes.length > 0 ? (
                   <Link
                     href={`/advisor/person/${person.subjectUserId}`}
                     className="font-medium text-slate-900 underline-offset-4 hover:underline"
                   >
-                    {t("personScopes", { count: person.scopes.length })}
+                    {person.name ?? t("personUnnamed")}
                   </Link>
                 ) : (
                   <span className="font-medium text-slate-900">
-                    {t("personScopes", { count: person.scopes.length })}
+                    {person.name ?? t("personUnnamed")}
                   </span>
                 )}
+                <span className="ml-2 text-slate-500">
+                  {t("personScopes", { count: person.scopes.length })}
+                </span>
                 {person.pendingScopes.length > 0 ? (
                   <span className="ml-2 text-slate-500">
                     {t("personPending", { count: person.pendingScopes.length })}
