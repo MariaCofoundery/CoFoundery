@@ -457,6 +457,18 @@
       "no_base": "{name} is not included: the name is not released, and findings nobody can attribute are useless.",
       "no_capability": "{name} is not included: capabilities are not released."
     },
-    "notARanking": "This page does not rate a line-up or compute a best combination. It counts areas and shows who has talked about what — a single number per group is not something this model supports, and it would decide who gets into a programme."
+    "notARanking": "This page does not rate a line-up or compute a best combination. It counts areas and shows who has talked about what — a single number per group is not something this model supports, and it would decide who gets into a programme.",
+    "requestTitle": "Request a joint evaluation",
+    "requestText": "The overview above shows what each person released to you individually. A joint evaluation goes further — it is a statement about how these people stand in relation to each other. That needs everyone's agreement.",
+    "requestDisclosure": "The request itself discloses the group: everyone asked learns who else is involved. There is no other way for anyone to agree to a comparison.",
+    "requestNoteLabel": "What it is about (optional)",
+    "requestNotePlaceholder": "One sentence on why you are suggesting this.",
+    "requestSubmit": "Ask everyone involved",
+    "requestPending": "Requesting…",
+    "requestDone": "Requested. Once everyone has agreed, the joint evaluation appears here.",
+    "requestFailed": "That did not work. You can only ask people who already let you accompany them individually.",
+    "reviewsTitle": "Requested evaluations",
+    "reviewActive": "running",
+    "reviewWaiting": "{count, plural, =1 {waiting for 1 answer} other {waiting for # answers}}"
   }
 }

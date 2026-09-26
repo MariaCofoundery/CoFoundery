@@ -36,5 +36,20 @@
       "org": "The organisation holds this access — it stays if the person who asked leaves.",
       "person": "This person holds the access — nobody else."
     }
+  },
+  "teamReview": {
+    "title": "Being looked at together",
+    "text": "Sometimes someone wants to look not just at you, but at you alongside others — how you stand in relation to each other. That is a statement about all of you, so everyone is asked separately, and it only comes about once everyone has agreed.",
+    "withWhom": "Together with {names}",
+    "askedByLine": "Asked by {who}",
+    "unknownRequester": "Unknown",
+    "whatItMeans": "What would be visible is how your entries look side by side — who wants to own which areas and where you overlap. Your questionnaire answers stay with you.",
+    "approve": "Agree",
+    "decline": "Decline",
+    "revoke": "Withdraw",
+    "pending": "One moment…",
+    "stateActive": "running",
+    "stateWaiting": "waiting for the others",
+    "revokeMeaning": "You can withdraw at any time, including after agreeing. It ends the joint evaluation for everyone — it consists precisely of your entries coming together. You are not taking away anything anyone is entitled to."
   }
 }

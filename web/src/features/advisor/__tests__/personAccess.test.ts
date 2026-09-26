@@ -459,3 +459,99 @@ test("wer fehlt, wird genannt - und warum", () => {
   // hier noch wichtiger als im Team, weil hier jemand entscheidet.
   assert.match(data, /withDepth/);
 });
+
+// ---------------------------------------------------------------------------
+// Gemeinsame Auswertungen
+// ---------------------------------------------------------------------------
+//
+// GEWÜNSCHT AM 26.09.2026: "Der Accelerator soll [...] dann ggf. auch die
+// Team-Auswertung bekommen" - und das für Advisors mit wie ohne Organisation.
+//
+// Bisher hat immer EINE Person über IHRE EIGENEN Daten entschieden. Eine
+// gemeinsame Auswertung ist eine Aussage über das Verhältnis ZWISCHEN
+// Menschen und gehört ihnen allen. Die Grenzen prüft
+// `supabase/tests/advisor_team_reviews.sql`; hier steht, was der Code zusagt.
+
+const TEAM_MIGRATION = "../supabase/migrations/20261048120000_advisor_team_reviews.sql";
+const TEAM_VIEW = "src/features/advisor/TeamReviewSection.tsx";
+const TEAM_ACTIONS = "src/features/advisor/teamReviewActions.ts";
+
+test("eine gemeinsame Auswertung ist kein weiterer Umfang", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+
+  // Ein Umfang "Vergleich mit anderen" in der Liste wäre eine
+  // Blankozustimmung für Vergleiche mit Menschen, die man noch gar nicht
+  // kennt. Deshalb ein eigener Vorgang mit eigener Entscheidung je Person.
+  assert.match(migration, /create table public\.advisor_team_reviews/);
+  assert.match(migration, /create table public\.advisor_team_review_members/);
+  assert.match(migration, /decision text not null default 'pending'/);
+
+  // Und die Umfangsliste ist unverändert geblieben.
+  const scopeMigration = sqlCodeOnly(MIGRATION);
+  assert.match(scopeMigration, /'strengths', 'direction'/);
+  assert.ok(!migration.includes("advisor_person_grants_scope_check"), "kein neuer Umfang");
+});
+
+test("beide Halter sind vorgesehen - mit Organisation und ohne", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+  // "Der Accelerator oder dann die Advisor unter dem Accelerator oder auch
+  // ohne Accelerator" - alle drei Fälle, wie bei den Einzelzugängen.
+  assert.match(migration, /num_nonnulls\(advisor_user_id, org_id\) = 1/);
+  assert.match(migration, /advisor_org_membership_required/);
+});
+
+test("sie entsteht erst, wenn alle zugestimmt haben", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+  // Nicht bei Mehrheit, nicht nach Fristablauf: bei allen.
+  assert.match(migration, /where review_id = p_review_id and decision = 'pending'/);
+  assert.match(migration, /if v_open = 0 then/);
+  // Und ein einziges Nein beendet das Ganze.
+  assert.match(migration, /set status = 'declined'/);
+});
+
+test("wer aussteigt, nimmt die Auswertung mit", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+  const view = codeOnly(TEAM_VIEW);
+
+  // Nicht nur den eigenen Anteil: Die Auswertung IST die Zusammenstellung,
+  // ohne eine Seite gibt es sie nicht.
+  assert.match(migration, /function public\.revoke_advisor_team_review/);
+  assert.match(migration, /set status = 'revoked'/);
+
+  // Und das steht dabei - nicht als Warnung, sondern weil es stimmt: Wer es
+  // nicht weiß, traut sich womöglich nicht auszusteigen.
+  assert.match(view, /revokeMeaning/);
+});
+
+test("wer gefragt wird, erfährt mit wem", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+  const view = codeOnly(TEAM_VIEW);
+
+  // DIE WICHTIGSTE ZEILE. Man kann einem Vergleich nicht zustimmen, ohne zu
+  // wissen, mit wem verglichen wird - die Namen sind nicht Zusatzinformation,
+  // sie sind der Gegenstand der Entscheidung.
+  assert.match(migration, /other_names text\[\]/);
+  assert.match(view, /withWhom/);
+
+  // Dass schon das Fragen die Gruppe preisgibt, steht über dem Knopf.
+  assert.match(codeOnly(GROUP_PAGE), /requestDisclosure/);
+});
+
+test("nur unter Menschen, die man schon begleitet", () => {
+  const migration = sqlCodeOnly(TEAM_MIGRATION);
+  // Sonst wäre eine "Anfrage" ein Weg, Fremden mitzuteilen, wen man sonst
+  // noch begleitet - denn die Anfrage nennt allen die anderen Namen.
+  assert.match(migration, /team_review_subject_not_accompanied/);
+  assert.match(migration, /grant_row\.scope = 'base'/);
+});
+
+test("die Aktionen entscheiden nichts, sie reichen weiter", () => {
+  const actions = codeOnly(TEAM_ACTIONS);
+  // Eine zweite Kopie der Regeln hier wäre die erste, die ausläuft - und
+  // auslaufen hieße, dass jemand verglichen wird, der nicht gefragt war.
+  assert.match(actions, /rpc\("decide_advisor_team_review"/);
+  assert.match(actions, /rpc\("revoke_advisor_team_review"/);
+  assert.match(actions, /rpc\("request_advisor_team_review"/);
+  assert.ok(!actions.includes(".update("), "kein direktes Schreiben");
+  assert.ok(!actions.includes(".insert("), "kein direktes Schreiben");
+});

@@ -1,6 +1,8 @@
 import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { PersonAccessSection } from "@/features/advisor/PersonAccessSection";
 import { getPersonAccessRequesters } from "@/features/advisor/personAccessData";
+import { TeamReviewSection } from "@/features/advisor/TeamReviewSection";
+import { getMyTeamReviewRequests } from "@/features/advisor/teamReviewData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { canAccessAccountSettings } from "@/features/account/accountAccess";
@@ -43,6 +45,7 @@ export default async function AccountPage({
     membershipResult,
     t,
     personAccessRequesters,
+    teamReviewRequests,
     preferences,
     optedOutRows,
     emailOptInRows,
@@ -56,6 +59,7 @@ export default async function AccountPage({
     supabase.rpc("has_network_account"),
     getTranslations("dashboard"),
     getPersonAccessRequesters(supabase),
+    getMyTeamReviewRequests(supabase),
     Promise.resolve(
       supabase.from("person_core").select("locale").eq("user_id", user.id).maybeSingle()
     )
@@ -141,6 +145,11 @@ export default async function AccountPage({
           Zugang hat und wofuer, hat nicht zugestimmt, sondern einmal
           geklickt. */}
       <PersonAccessSection requesters={personAccessRequesters} />
+
+      {/* EINE ANDERE FRAGE ALS DIE NACH DEM EIGENEN PROFIL, deshalb ein
+          eigener Abschnitt: Hier entsteht eine Aussage ueber das Verhaeltnis
+          zwischen Menschen, die es vorher nicht gab. */}
+      <TeamReviewSection requests={teamReviewRequests} />
 
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <DeleteAccountSection

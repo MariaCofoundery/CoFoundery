@@ -457,6 +457,18 @@
       "no_base": "{name} ist nicht dabei: Der Name ist nicht freigegeben, und eine Auswertung ohne Namen wäre nicht zuzuordnen.",
       "no_capability": "{name} ist nicht dabei: Die Fähigkeiten sind nicht freigegeben."
     },
-    "notARanking": "Diese Seite bewertet keine Aufstellung und berechnet keine beste Kombination. Sie zählt Bereiche und zeigt, wer worüber gesprochen hat — eine Zahl je Gruppe gäbe dieses Modell nicht her, und sie würde darüber entscheiden, wer in ein Programm kommt."
+    "notARanking": "Diese Seite bewertet keine Aufstellung und berechnet keine beste Kombination. Sie zählt Bereiche und zeigt, wer worüber gesprochen hat — eine Zahl je Gruppe gäbe dieses Modell nicht her, und sie würde darüber entscheiden, wer in ein Programm kommt.",
+    "requestTitle": "Gemeinsame Auswertung anfragen",
+    "requestText": "Die Übersicht oben zeigt, was dir jede Person einzeln freigegeben hat. Eine gemeinsame Auswertung geht darüber hinaus — sie ist eine Aussage darüber, wie diese Menschen zueinander stehen. Dafür braucht es die Zustimmung aller Beteiligten.",
+    "requestDisclosure": "Schon die Anfrage gibt die Gruppe preis: Jede angefragte Person erfährt, wer sonst dabei ist. Anders kann niemand einem Vergleich zustimmen.",
+    "requestNoteLabel": "Worum es geht (optional)",
+    "requestNotePlaceholder": "Ein Satz, warum du das vorschlägst.",
+    "requestSubmit": "Alle Beteiligten fragen",
+    "requestPending": "Wird angefragt…",
+    "requestDone": "Angefragt. Sobald alle zugestimmt haben, erscheint die gemeinsame Auswertung hier.",
+    "requestFailed": "Das hat nicht geklappt. Anfragen kannst du nur Menschen, die dich bereits einzeln begleiten lassen.",
+    "reviewsTitle": "Angefragte Auswertungen",
+    "reviewActive": "läuft",
+    "reviewWaiting": "{count, plural, =1 {wartet auf 1 Antwort} other {wartet auf # Antworten}}"
   }
 }

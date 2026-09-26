@@ -36,5 +36,20 @@
       "org": "Den Zugang hält die Organisation — er bleibt bestehen, wenn die anfragende Person sie verlässt.",
       "person": "Den Zugang hält diese Person — niemand sonst."
     }
+  },
+  "teamReview": {
+    "title": "Gemeinsam angesehen werden",
+    "text": "Manchmal möchte jemand nicht nur dich ansehen, sondern dich zusammen mit anderen — wie ihr zueinander steht. Das ist eine Aussage über euch alle, deshalb wird jede und jeder einzeln gefragt, und sie entsteht erst, wenn alle zugestimmt haben.",
+    "withWhom": "Zusammen mit {names}",
+    "askedByLine": "Angefragt von {who}",
+    "unknownRequester": "Unbekannt",
+    "whatItMeans": "Zu sehen wäre, wie eure Angaben nebeneinander aussehen — wer welche Bereiche verantworten möchte und wo ihr euch überschneidet. Deine Antworten aus dem Fragebogen bleiben dabei bei dir.",
+    "approve": "Zustimmen",
+    "decline": "Ablehnen",
+    "revoke": "Aussteigen",
+    "pending": "Einen Moment…",
+    "stateActive": "läuft",
+    "stateWaiting": "wartet auf die anderen",
+    "revokeMeaning": "Aussteigen kannst du jederzeit, auch nach deiner Zustimmung. Es beendet die gemeinsame Auswertung für alle — sie besteht ja gerade darin, dass eure Angaben zusammenkommen. Du nimmst damit niemandem etwas weg, worauf er ein Anrecht hätte."
   }
 }

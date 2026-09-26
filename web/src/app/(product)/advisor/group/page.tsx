@@ -4,6 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
 import { getAccompaniedPeople, withAccompaniedNames } from "@/features/advisor/orgData";
 import { getAdvisorGroupReadout } from "@/features/advisor/groupReadoutData";
+import { requestTeamReviewAction } from "@/features/advisor/teamReviewActions";
+import { getAdvisorTeamReviews } from "@/features/advisor/teamReviewData";
+import { getMyAdvisorOrgs } from "@/features/advisor/orgData";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -41,7 +45,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 export default async function AdvisorGroupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ p?: string | string[] }>;
+  searchParams: Promise<{ p?: string | string[]; status?: string; error?: string }>;
 }) {
   const {
     data: { user },
@@ -54,10 +58,16 @@ export default async function AdvisorGroupPage({
     (value) => /^[0-9a-f-]{36}$/i.test(value)
   );
 
-  const [t, people] = await Promise.all([
+  const [t, people, reviews, orgs] = await Promise.all([
     getTranslations("advisor.group"),
     getAccompaniedPeople(client).then((rows) => withAccompaniedNames(client, rows)),
+    getAdvisorTeamReviews(client),
+    getMyAdvisorOrgs(client),
   ]);
+  // Im Namen der Organisation, wenn es eine gibt - sonst im eigenen. Dieselbe
+  // Unterscheidung wie bei den Einzelzugaengen, und aus demselben Grund: Sie
+  // entscheidet, wer den Zugang behaelt, wenn die fragende Person geht.
+  const orgId = orgs[0]?.id ?? null;
 
   const readout = selected.length >= 2 ? await getAdvisorGroupReadout(client, selected) : null;
   const nameOf = (userId: string) =>
@@ -134,6 +144,78 @@ export default async function AdvisorGroupPage({
         <p className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
           {t("tooFewReleased")}
         </p>
+      ) : null}
+
+      {/* ------------------------------------------------------------------
+          Eine gemeinsame Auswertung anfragen.
+
+          SCHON DAS FRAGEN GIBT DIE GRUPPE PREIS: Jede angefragte Person
+          erfaehrt, wer sonst dabei ist - anders kann niemand einem Vergleich
+          zustimmen. Das steht ueber dem Knopf und nicht in einer Fussnote.
+          ------------------------------------------------------------------ */}
+      {selected.length >= 2 ? (
+        <form
+          action={requestTeamReviewAction}
+          className="mt-6 rounded-3xl border border-slate-200 bg-white p-5"
+        >
+          {selected.map((id) => (
+            <input key={id} type="hidden" name="p" value={id} />
+          ))}
+          {orgId ? <input type="hidden" name="orgId" value={orgId} /> : null}
+
+          <h2 className="text-base font-semibold text-slate-900">{t("requestTitle")}</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("requestText")}</p>
+          <p className="mt-2 max-w-2xl rounded-xl bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+            {t("requestDisclosure")}
+          </p>
+
+          <label className="mt-3 block">
+            <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+              {t("requestNoteLabel")}
+            </span>
+            <textarea
+              name="note"
+              rows={2}
+              maxLength={400}
+              placeholder={t("requestNotePlaceholder")}
+              className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <SubmitButton
+            label={t("requestSubmit")}
+            pendingLabel={t("requestPending")}
+            className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white"
+          />
+
+          {params.status === "team_review_requested" ? (
+            <p className="mt-3 text-sm leading-6 text-emerald-800">{t("requestDone")}</p>
+          ) : null}
+          {params.error === "team_review" ? (
+            <p className="mt-3 text-sm leading-6 text-rose-800">{t("requestFailed")}</p>
+          ) : null}
+        </form>
+      ) : null}
+
+      {/* Was schon laeuft oder noch auf Antworten wartet. */}
+      {reviews.length > 0 ? (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-slate-900">{t("reviewsTitle")}</h2>
+          <ul className="mt-3 space-y-2 text-sm leading-6">
+            {reviews.map((review) => (
+              <li key={review.reviewId} className="flex flex-wrap items-baseline gap-x-3">
+                <span className="text-slate-900">
+                  {review.subjectUserIds.map((id) => nameOf(id)).join(", ")}
+                </span>
+                <span className="text-xs text-slate-500">
+                  {review.status === "active"
+                    ? t("reviewActive")
+                    : t("reviewWaiting", { count: review.pendingCount })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
 
       {readout ? (
