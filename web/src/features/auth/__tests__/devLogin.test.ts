@@ -76,9 +76,16 @@ test("die Seite prueft beides - und die Aktion noch einmal", () => {
   assert.equal([...page.matchAll(/NODE_ENV === "production"\) notFound\(\)/g)].length, 2);
   assert.equal([...page.matchAll(/isLocalSupabaseUrl\(/g)].length, 2);
 
-  // Und es gibt kein Eingabefeld: Ein Formular mit freier Mailadresse waere
-  // eine Anmeldemaske ohne Ratenbegrenzung.
-  assert.ok(!page.includes("<input"), "keine freie Eingabe, genau ein Testkonto");
+  // NACHGESCHAERFT AM 26.09.2026: Hier stand `!page.includes("<input")`.
+  // Seit die Seite zwei Rollen anbietet, traegt sie versteckte Felder - und
+  // die sind keine freie Eingabe. Geprueft wird jetzt das Anliegen: kein
+  // Feld, in das man eine Mailadresse tippen kann, und eine feste
+  // Kontenliste. Ein Formular mit freier Mailadresse waere eine
+  // Anmeldemaske ohne Ratenbegrenzung.
+  assert.ok(!/type="(text|email|password)"/.test(page), "kein Feld fuer eine Mailadresse");
+  assert.match(page, /const ACCOUNTS = \{/);
+  // Und ein durchgereichter Parameter landet nicht ungeprueft in der Anmeldung.
+  assert.match(page, /isAccountKey\(requested\)/);
 });
 
 test("das Testprofil-Skript kann die echte Datenbank nicht erreichen", () => {

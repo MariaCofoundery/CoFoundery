@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isLocalSupabaseUrl } from "@/features/auth/devLogin";
+import { FOUNDER_DIMENSION_ORDER } from "@/features/reporting/founderDimensionMeta";
 
 /**
  * Ein Testprofil - ausschliesslich lokal.
@@ -41,8 +42,24 @@ import { isLocalSupabaseUrl } from "@/features/auth/devLogin";
  * Fragebogen aendert.
  */
 
-const TEST_EMAIL = "dev@cofoundery.local";
 const TEST_PASSWORD = "cofoundery-local-only";
+
+/**
+ * Eine kleine Welt statt eines einzelnen Kontos.
+ *
+ * ERWEITERT AM 26.09.2026. Ein einzelnes Profil zeigte das Gesamtbild - aber
+ * nichts von dem, was danach entstanden ist: Freigaben haben zwei Seiten,
+ * eine gemeinsame Auswertung braucht mehrere Menschen, und eine offene
+ * Anfrage sieht man nur, wenn jemand sie gestellt hat.
+ *
+ * Deshalb drei Foundernde und eine Advisorin mit Organisation. Wer welche
+ * Seite sehen will, meldet sich unter /dev-login als die entsprechende
+ * Person an.
+ */
+const FOUNDER_EMAIL = "dev@cofoundery.local";
+const SECOND_EMAIL = "ben@cofoundery.local";
+const THIRD_EMAIL = "carla@cofoundery.local";
+const ADVISOR_EMAIL = "advisor@cofoundery.local";
 
 function requireLocalStack(): { url: string; anonKey: string; serviceKey: string } {
   const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
@@ -100,44 +117,50 @@ function requireLocalStack(): { url: string; anonKey: string; serviceKey: string
  * der Zeilensicherheit vorbei geschrieben werden. Dort funktioniert er auch:
  * PostgREST nimmt ihn an, nur GoTrue nicht.
  */
-async function ensureTestUser(anon: SupabaseClient): Promise<string> {
-  const signedUp = await anon.auth.signUp({ email: TEST_EMAIL, password: TEST_PASSWORD });
+async function ensureTestUser(anon: SupabaseClient, email: string): Promise<string> {
+  const signedUp = await anon.auth.signUp({ email, password: TEST_PASSWORD });
   if (signedUp.data.user?.id) return signedUp.data.user.id;
 
   // Schon da. Dann ist die Anmeldung die Antwort auf die Frage nach der
   // Kennung - und sie bestaetigt gleich, dass /dev-login funktionieren wird.
-  const signedIn = await anon.auth.signInWithPassword({
-    email: TEST_EMAIL,
-    password: TEST_PASSWORD,
-  });
+  const signedIn = await anon.auth.signInWithPassword({ email, password: TEST_PASSWORD });
   if (signedIn.data.user?.id) return signedIn.data.user.id;
 
   throw new Error(
     [
-      `Das Testkonto ${TEST_EMAIL} gibt es, aber das Passwort passt nicht.`,
+      `Das Testkonto ${email} gibt es, aber das Passwort passt nicht.`,
       "Ohne Verwaltungsrechte laesst es sich von hier nicht zuruecksetzen.",
       "",
       "  Loeschen und neu anlegen:",
       "    npx supabase db reset      (wirft ALLE lokalen Daten weg)",
       "",
       `  Oder das Konto direkt entfernen:`,
-      `    delete from auth.users where email = '${TEST_EMAIL}';`,
+      `    delete from auth.users where email = '${email}';`,
     ].join("\n")
   );
 }
 
 /** Wer die Person ist. */
-async function seedPersonCore(admin: SupabaseClient, userId: string) {
+type PersonSeed = {
+  displayName: string;
+  headline: string;
+  bio: string;
+  locationRegion: string;
+  expertise: string[];
+  industries: string[];
+};
+
+async function seedPersonCore(admin: SupabaseClient, userId: string, person: PersonSeed) {
   const { error } = await admin.from("person_core").upsert(
     {
       user_id: userId,
-      display_name: "Nora Testerin",
-      headline: "Baut Werkzeuge für Pflegeteams",
-      bio: "Zehn Jahre zwischen Klinik-IT und Produkt. Ich mag Probleme, bei denen man mit den Betroffenen sprechen muss, bevor man irgendetwas baut.",
-      location_region: "Leipzig",
+      display_name: person.displayName,
+      headline: person.headline,
+      bio: person.bio,
+      location_region: person.locationRegion,
       remote_mode: "hybrid",
-      expertise: ["Produktentdeckung", "Nutzerforschung", "Health-IT"],
-      industries: ["Gesundheit", "B2B-Software"],
+      expertise: person.expertise,
+      industries: person.industries,
     },
     { onConflict: "user_id" }
   );
@@ -171,8 +194,12 @@ const CAPABILITY_ENTRIES: {
   { areaId: "recruiting", level: null, wish: null },
 ];
 
-async function seedCapability(admin: SupabaseClient, userId: string) {
-  for (const entry of CAPABILITY_ENTRIES) {
+async function seedCapability(
+  admin: SupabaseClient,
+  userId: string,
+  entries = CAPABILITY_ENTRIES
+) {
+  for (const entry of entries) {
     const { data, error } = await admin
       .from("person_capability_entries")
       .upsert(
@@ -208,10 +235,14 @@ const STRENGTHS = [
   { statement: "Macht Entscheidungen schriftlich nachvollziehbar", self: "often", reflected: null, who: null },
 ];
 
-async function seedStrengths(admin: SupabaseClient, userId: string) {
+async function seedStrengths(
+  admin: SupabaseClient,
+  userId: string,
+  strengths = STRENGTHS
+) {
   await admin.from("person_strengths").delete().eq("user_id", userId);
   const { error } = await admin.from("person_strengths").insert(
-    STRENGTHS.map((strength) => ({
+    strengths.map((strength) => ({
       user_id: userId,
       statement: strength.statement,
       origin: "own_words",
@@ -232,10 +263,14 @@ const DIRECTION = [
   { facet: "energising_activity", statement: "Mit Betroffenen an einem Tisch ein Problem auseinandernehmen", confidence: "recurring" },
 ];
 
-async function seedDirection(admin: SupabaseClient, userId: string) {
+async function seedDirection(
+  admin: SupabaseClient,
+  userId: string,
+  direction = DIRECTION
+) {
   await admin.from("direction_statements").delete().eq("user_id", userId);
   const { error } = await admin.from("direction_statements").insert(
-    DIRECTION.map((statement) => ({
+    direction.map((statement) => ({
       user_id: userId,
       facet: statement.facet,
       statement: statement.statement,
@@ -273,7 +308,7 @@ async function seedDirection(admin: SupabaseClient, userId: string) {
  */
 const BASE_QUESTION_CATEGORY = "basis";
 
-async function seedBaseAssessment(admin: SupabaseClient, userId: string) {
+async function seedBaseAssessment(admin: SupabaseClient, userId: string, shift = 0) {
   const { data: questionRows, error: questionError } = await admin
     .from("questions")
     .select("id, sort_order")
@@ -319,7 +354,11 @@ async function seedBaseAssessment(admin: SupabaseClient, userId: string) {
       return {
         assessment_id: assessment.id,
         question_id: questionId,
-        choice_value: values[index % values.length],
+        // `shift` verschiebt das Antwortmuster je Person. Ohne ihn saehen
+        // alle Testprofile gleich aus, und das Nebeneinander waere eine
+        // Reihe uebereinanderliegender Punkte - man saehe nicht, ob es
+        // funktioniert.
+        choice_value: values[(index + shift) % values.length],
       };
     })
     .filter((answer): answer is NonNullable<typeof answer> => answer !== null);
@@ -342,6 +381,159 @@ async function seedBaseAssessment(admin: SupabaseClient, userId: string) {
   return { written: answers.length, skipped: questionIds.length - answers.length };
 }
 
+/**
+ * Das abgelegte Selbstbild - sonst bleibt das Nebeneinander leer.
+ *
+ * Normalerweise entsteht es, wenn eine Person ihren eigenen Report ansieht
+ * (Migration 20261047120000). Im Seed wird es direkt geschrieben: Sonst
+ * muesste man sich erst als jede der drei Personen anmelden und ihr Profil
+ * oeffnen, bevor die Advisor-Seite ueberhaupt etwas zeigt.
+ *
+ * DIE WERTE SIND ERFUNDEN, und das ist hier richtig - es ist ein Testprofil,
+ * kein Messergebnis. Sie sind je Person verschoben, damit man auf den Achsen
+ * drei unterscheidbare Punkte sieht und nicht einen.
+ */
+async function seedAlignmentSnapshot(admin: SupabaseClient, userId: string, offset: number) {
+  const scores: Record<string, number> = {};
+  FOUNDER_DIMENSION_ORDER.forEach((dimension, index) => {
+    // Zwischen 1 und 5, in kleinen Schritten auseinander.
+    const raw = 1.6 + ((index * 1.3 + offset * 1.7) % 3.2);
+    scores[dimension] = Math.round(raw * 10) / 10;
+  });
+
+  const { error } = await admin.from("person_alignment_snapshots").upsert(
+    {
+      user_id: userId,
+      scores,
+      values_status: "not_started",
+      basis_answered: 36,
+      basis_total: 36,
+    },
+    { onConflict: "user_id" }
+  );
+  if (error) throw error;
+}
+
+/**
+ * Die Advisor-Seite: eine Organisation, Freigaben, gemeinsame Auswertungen.
+ *
+ * ABSICHTLICH IN VERSCHIEDENEN ZUSTAENDEN. Ein Seed, in dem alles zugestimmt
+ * ist, zeigt genau die Haelfte, auf die es ankommt, nicht: die offene Frage.
+ * Deshalb bleibt eine Freigabe und eine gemeinsame Auswertung unbeantwortet -
+ * so sieht man beim Anmelden als Founderin auch die Entscheidungsseite und
+ * nicht nur das Ergebnis.
+ */
+const ALL_SCOPES = [
+  "base",
+  "capability",
+  "capability_depth",
+  "strengths",
+  "direction",
+  "alignment_report",
+] as const;
+
+async function seedAdvisorWorld(
+  admin: SupabaseClient,
+  ids: { founder: string; second: string; third: string; advisor: string }
+) {
+  // --- Die Organisation ---------------------------------------------------
+  await admin.from("advisor_org_members").delete().eq("user_id", ids.advisor);
+  await admin.from("advisor_orgs").delete().eq("created_by_user_id", ids.advisor);
+
+  const { data: org, error: orgError } = await admin
+    .from("advisor_orgs")
+    .insert({
+      name: "Beispiel-Accelerator",
+      description:
+        "Wir begleiten zwoelf Teams im Jahr durch die ersten achtzehn Monate - mit " +
+        "woechentlichen Gespraechen, einem festen Budget und ohne Beteiligung.",
+      website_url: "https://beispiel.example",
+      focus: ["Health", "B2B-Software", "Public"],
+      location_region: "Leipzig",
+      created_by_user_id: ids.advisor,
+    })
+    .select("id")
+    .single();
+  if (orgError) throw orgError;
+
+  const { error: memberError } = await admin
+    .from("advisor_org_members")
+    .insert({ org_id: org.id, user_id: ids.advisor, role: "owner" });
+  if (memberError) throw memberError;
+
+  // --- Die Freigaben ------------------------------------------------------
+  await admin
+    .from("advisor_person_grants")
+    .delete()
+    .in("subject_user_id", [ids.founder, ids.second, ids.third]);
+
+  const grants: Record<string, unknown>[] = [];
+  for (const subject of [ids.founder, ids.second, ids.third]) {
+    for (const scope of ALL_SCOPES) {
+      // EINE BLEIBT OFFEN, und zwar bei der Person, als die man sich anmeldet:
+      // Sonst sieht man die Entscheidungsseite nie.
+      const open = subject === ids.founder && scope === "alignment_report";
+      grants.push({
+        subject_user_id: subject,
+        org_id: org.id,
+        scope,
+        status: open ? "requested" : "active",
+        approved_at: open ? null : new Date().toISOString(),
+        requested_by_user_id: ids.advisor,
+        request_note: open
+          ? "Fuer das Gespraech naechste Woche waere dein Selbstbild hilfreich."
+          : null,
+      });
+    }
+  }
+  const { error: grantError } = await admin.from("advisor_person_grants").insert(grants);
+  if (grantError) throw grantError;
+
+  // --- Zwei gemeinsame Auswertungen --------------------------------------
+  await admin.from("advisor_team_reviews").delete().eq("org_id", org.id);
+
+  // Eine, der alle zugestimmt haben - die ist zu sehen.
+  const { data: running, error: runningError } = await admin
+    .from("advisor_team_reviews")
+    .insert({
+      org_id: org.id,
+      requested_by_user_id: ids.advisor,
+      request_note: "Wir wuerden gern ueber eure Rollenverteilung sprechen.",
+      status: "active",
+      activated_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+  if (runningError) throw runningError;
+
+  // Und eine offene - die ist zu entscheiden.
+  const { data: pending, error: pendingError } = await admin
+    .from("advisor_team_reviews")
+    .insert({
+      org_id: org.id,
+      requested_by_user_id: ids.advisor,
+      request_note: "Passt ihr beide zusammen in eine Kohorte?",
+    })
+    .select("id")
+    .single();
+  if (pendingError) throw pendingError;
+
+  const decided = new Date().toISOString();
+  const { error: reviewMemberError } = await admin.from("advisor_team_review_members").insert([
+    { review_id: running.id, subject_user_id: ids.founder, decision: "approved", decided_at: decided },
+    { review_id: running.id, subject_user_id: ids.second, decision: "approved", decided_at: decided },
+    // Carla hat schon zugestimmt, die eigene Antwort steht noch aus.
+    { review_id: pending.id, subject_user_id: ids.third, decision: "approved", decided_at: decided },
+    // `decision` ausdruecklich: PostgREST fuellt bei einem Stapel mit
+    // unterschiedlichen Objekten die fehlenden Spalten mit null auf,
+    // statt die Voreinstellung der Tabelle greifen zu lassen.
+    { review_id: pending.id, subject_user_id: ids.founder, decision: "pending", decided_at: null },
+  ]);
+  if (reviewMemberError) throw reviewMemberError;
+
+  return { orgId: org.id as string };
+}
+
 async function main() {
   const { url, anonKey, serviceKey } = requireLocalStack();
   // Zwei Verbindungen mit verschiedenen Rechten: Die eine registriert wie ein
@@ -355,28 +547,114 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const userId = await ensureTestUser(anon);
-  await seedPersonCore(admin, userId);
-  await seedCapability(admin, userId);
-  await seedStrengths(admin, userId);
-  await seedDirection(admin, userId);
-  const assessment = await seedBaseAssessment(admin, userId);
+  const founder = await ensureTestUser(anon, FOUNDER_EMAIL);
+  const second = await ensureTestUser(anon, SECOND_EMAIL);
+  const third = await ensureTestUser(anon, THIRD_EMAIL);
+  const advisor = await ensureTestUser(anon, ADVISOR_EMAIL);
+
+  await seedPersonCore(admin, founder, {
+    displayName: "Nora Testerin",
+    headline: "Baut Werkzeuge für Pflegeteams",
+    bio: "Zehn Jahre zwischen Klinik-IT und Produkt. Ich mag Probleme, bei denen man mit den Betroffenen sprechen muss, bevor man irgendetwas baut.",
+    locationRegion: "Leipzig",
+    expertise: ["Produktentdeckung", "Nutzerforschung", "Health-IT"],
+    industries: ["Gesundheit", "B2B-Software"],
+  });
+  await seedPersonCore(admin, second, {
+    displayName: "Ben Testfounder",
+    headline: "Technik und Zahlen",
+    bio: "Vorher Plattform-Engineering, inzwischen mehr an der Schnittstelle zu Finanzen. Ich baue gern das, was danach noch funktioniert.",
+    locationRegion: "Dresden",
+    expertise: ["Architektur", "Unit Economics"],
+    industries: ["B2B-Software"],
+  });
+  await seedPersonCore(admin, third, {
+    displayName: "Carla Testfounderin",
+    headline: "Vertrieb und Partnerschaften",
+    bio: "Ich habe zweimal von null auf die ersten Enterprise-Kunden verkauft und finde den Teil am spannendsten, in dem noch nichts steht.",
+    locationRegion: "Berlin",
+    expertise: ["B2B-Vertrieb", "Partnerschaften"],
+    industries: ["B2B-Software", "Public"],
+  });
+  await seedPersonCore(admin, advisor, {
+    displayName: "Pia Beraterin",
+    headline: "Begleitet Teams im Beispiel-Accelerator",
+    bio: "Seit sechs Jahren im Programm, davor selbst gegründet. Ich frage lieber nach, als Ratschläge zu geben.",
+    locationRegion: "Leipzig",
+    expertise: ["Programmleitung"],
+    industries: ["Gesundheit"],
+  });
+
+  // Unterschiedliche Bereiche je Person, damit die Rollenlage etwas zu zeigen
+  // hat: Ueberschneidungen, Luecken und offene Stellen.
+  await seedCapability(admin, founder);
+  await seedCapability(admin, second, [
+    { areaId: "software_engineering", level: 5, wish: "own", evidence: "Die Plattform von der ersten Zeile bis zum Betrieb verantwortet." },
+    { areaId: "technical_architecture", level: 4, wish: "own" },
+    { areaId: "unit_economics", level: 4, wish: "own" },
+    { areaId: "financial_planning", level: 3, wish: "contribute" },
+    { areaId: "product_management", level: 3, wish: "contribute" },
+    { areaId: "data_protection", level: 2, wish: null },
+  ]);
+  await seedCapability(admin, third, [
+    { areaId: "b2b_sales", level: 5, wish: "own", evidence: "Zweimal von null auf die ersten Enterprise-Kunden." },
+    { areaId: "partnerships", level: 4, wish: "own" },
+    { areaId: "positioning", level: 4, wish: "own" },
+    { areaId: "marketing_brand", level: 3, wish: "contribute" },
+    { areaId: "customer_discovery", level: 3, wish: "contribute" },
+    { areaId: "recruiting", level: null, wish: null },
+  ]);
+
+  await seedStrengths(admin, founder);
+  await seedStrengths(admin, second, [
+    { statement: "Sagt, wenn etwas technisch nicht trägt", self: "almost_always", reflected: "often", who: "former_colleagues" },
+    { statement: "Rechnet nach, bevor er zustimmt", self: "often", reflected: "almost_always", who: "managers" },
+  ]);
+  await seedStrengths(admin, third, [
+    { statement: "Geht auf Fremde zu", self: "almost_always", reflected: "almost_always", who: "current_colleagues" },
+    { statement: "Hört zu, bevor sie etwas anbietet", self: "sometimes", reflected: "often", who: "friends" },
+  ]);
+
+  await seedDirection(admin, founder);
+  await seedDirection(admin, second, [
+    { facet: "recurring_theme", statement: "Systeme bauen, die ohne mich weiterlaufen", confidence: "recurring" },
+    { facet: "frustrating_condition", statement: "Entscheidungen, die niemand später nachvollziehen kann", confidence: "stated" },
+  ]);
+  await seedDirection(admin, third, [
+    { facet: "recurring_theme", statement: "Menschen zusammenbringen, die voneinander nichts wussten", confidence: "recurring" },
+    { facet: "energising_activity", statement: "Das erste Gespräch mit jemandem, der das Problem hat", confidence: "one_example" },
+  ]);
+
+  // Verschobene Antwortmuster: Sonst liegen im Nebeneinander alle Punkte
+  // uebereinander, und man sieht nicht, ob die Grafik stimmt.
+  const assessment = await seedBaseAssessment(admin, founder, 0);
+  await seedBaseAssessment(admin, second, 1);
+  await seedBaseAssessment(admin, third, 2);
+
+  await seedAlignmentSnapshot(admin, founder, 0);
+  await seedAlignmentSnapshot(admin, second, 1);
+  await seedAlignmentSnapshot(admin, third, 2);
+
+  const { orgId } = await seedAdvisorWorld(admin, { founder, second, third, advisor });
 
   console.log(
     [
       "",
-      "  Testprofil steht - nur in der lokalen Datenbank.",
+      "  Testwelt steht - nur in der lokalen Datenbank.",
       "",
-      `    E-Mail:    ${TEST_EMAIL}`,
-      `    Passwort:  ${TEST_PASSWORD}`,
-      `    Kennung:   ${userId}`,
+      "    Foundernde:  dev@cofoundery.local (Nora)",
+      "                 ben@cofoundery.local (Ben)",
+      "                 carla@cofoundery.local (Carla)",
+      "    Advisorin:   advisor@cofoundery.local (Pia, Beispiel-Accelerator)",
+      `    Passwort:    ${TEST_PASSWORD}`,
       "",
-      `    ${CAPABILITY_ENTRIES.length} Fähigkeitsbereiche, ${STRENGTHS.length} Arbeitsweisen,`,
-      `    ${DIRECTION.length} Richtungs-Aussagen, ${assessment.written} Fragebogen-Antworten` +
-        (assessment.skipped > 0 ? ` (${assessment.skipped} ohne Entsprechung uebersprungen).` : "."),
+      `    ${CAPABILITY_ENTRIES.length} Fähigkeitsbereiche bei Nora, ${assessment.written} Fragebogen-Antworten je Person.`,
+      `    Organisation ${orgId}, alle Umfänge freigegeben - bis auf einen.`,
       "",
-      "  Anmelden:  http://localhost:3000/dev-login",
-      "  Ansehen:   http://localhost:3000/me/profile",
+      "  Als Nora:  http://localhost:3000/dev-login",
+      "             /me/profile · /account (eine offene Freigabe, eine offene Teamanfrage)",
+      "  Als Pia:   /dev-login?as=advisor",
+      "             /advisor/dashboard · /advisor/group (eine laufende Auswertung)",
       "",
     ].join("\n")
   );
