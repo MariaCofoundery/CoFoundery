@@ -436,7 +436,10 @@
     "strengths": "Wie sie arbeitet",
     "direction": "Was ihr wichtig ist",
     "self": "Selbst",
-    "scopeNote": "Die Erzählungen aus den Gesprächen sind hier nie enthalten — sie werden nicht freigegeben, in keinem Umfang."
+    "scopeNote": "Die Erzählungen aus den Gesprächen sind hier nie enthalten — sie werden nicht freigegeben, in keinem Umfang.",
+    "alignment": "Selbstbild aus dem Fragebogen",
+    "alignmentAsOf": "Stand: {date}. So sah es aus, als diese Person ihren Report zuletzt gerechnet hat — nicht unbedingt heute.",
+    "alignmentNoDate": "Der Stand dieses Abbilds ist nicht bekannt."
   },
   "group": {
     "back": "Zurück zur Organisation",

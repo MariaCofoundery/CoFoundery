@@ -436,7 +436,10 @@
     "strengths": "How they work",
     "direction": "What matters to them",
     "self": "Self",
-    "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope."
+    "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope.",
+    "alignment": "Self-report from the questionnaire",
+    "alignmentAsOf": "As of {date}. This is how it looked when this person last computed their report — not necessarily today.",
+    "alignmentNoDate": "The date of this snapshot is unknown."
   },
   "group": {
     "back": "Back to the organisation",

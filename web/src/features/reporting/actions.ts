@@ -1895,6 +1895,46 @@ export async function getLatestSelfAlignmentReport(
   const keyInsights = buildSelfFounderKeyInsights(scoresA);
   const basisTotal = founderAggregate.expectedTotal;
 
+  // -------------------------------------------------------------------------
+  // Das Abbild fuer freigegebene Ansichten - nebenbei, nicht als Hauptsache.
+  // -------------------------------------------------------------------------
+  //
+  // NEU AM 26.09.2026. Ein Advisor mit dem Umfang `alignment_report` soll den
+  // Einzelreport sehen koennen. Die Rohantworten bekommt er dafuer NICHT -
+  // die sieht niemand ausser der Person selbst, und das ist eine geprueft
+  // Regel (`supabase/tests/founder_alignment_raw_answer_access.sql`). Statt
+  // dessen legt die Person hier ihr eigenes abgeleitetes Ergebnis ab, und
+  // genau das wird freigegeben.
+  //
+  // GESCHRIEBEN VON DER PERSON SELBST, mit ihren eigenen Rechten - kein
+  // Dienstschluessel, keine Sonderrolle. Die Zeilensicherheit auf
+  // `person_alignment_snapshots` laesst ohnehin nur die eigene Zeile zu.
+  //
+  // UND ES DARF FEHLSCHLAGEN. Das Abbild ist eine Nebenwirkung; wenn es nicht
+  // gelingt, hat die Person trotzdem ihren Report. Ein `await` mit `catch` und
+  // keine Ausnahme nach oben: Diese Funktion beantwortet "wie sieht mein
+  // Report aus" und nicht "konnte ich ihn ablegen".
+  await supabase
+    .from("person_alignment_snapshots")
+    .upsert(
+      {
+        user_id: user.id,
+        scores: scoresA,
+        values_profile: selfValuesProfile ?? null,
+        values_status: valuesModuleStatus,
+        values_answered: valuesAnsweredCount,
+        values_total: valuesTotal,
+        basis_answered: founderAggregate.answeredQuestionCount,
+        basis_total: basisTotal,
+        base_assessment_id: baseAssessment.id,
+      },
+      { onConflict: "user_id" }
+    )
+    .then(
+      () => undefined,
+      () => undefined
+    );
+
   return {
     sessionId: baseAssessment.id,
     locale,

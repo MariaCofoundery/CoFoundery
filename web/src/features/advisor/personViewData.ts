@@ -120,3 +120,58 @@ export async function getAdvisorPersonView(
     grantedScopes: grants,
   };
 }
+
+/**
+ * Das Selbstbild aus dem Fragebogen - fuer einen Advisor mit `alignment_report`.
+ *
+ * NEU AM 26.09.2026. Der Umfang war seit Langem freigebbar und nirgends
+ * darstellbar - weil die Rohantworten niemand ausser der Person selbst sieht
+ * und es nichts Abgeleitetes zu lesen gab. Seit 20261047120000 legt die
+ * Person beim Ansehen ihres eigenen Reports ein Abbild ab: Zahlen, kein
+ * fertiger Text.
+ *
+ * HIER ENTSTEHT DER TEXT NEU, aus dem aktuellen Code und aus genau diesen
+ * Zahlen. Das ist der Grund, warum das Abbild keine Saetze enthaelt: Ein
+ * abgelegter Text veraltet still, und der Accelerator laese Monate spaeter
+ * eine Formulierung, die es im Produkt nicht mehr gibt.
+ *
+ * DER STAND GEHOERT DAZU. `updatedAt` ist der Zeitpunkt, an dem die Person
+ * ihren Report zuletzt gerechnet hat - nicht "jetzt". Ohne diese Angabe
+ * saehe ein halbes Jahr altes Bild aus wie ein heutiges.
+ */
+export type AdvisorPersonAlignment = {
+  scores: Record<string, number | null>;
+  valuesProfile: unknown | null;
+  valuesStatus: "not_started" | "in_progress" | "completed";
+  valuesAnswered: number;
+  valuesTotal: number;
+  basisAnswered: number;
+  basisTotal: number;
+  updatedAt: string | null;
+};
+
+export async function getAdvisorPersonAlignment(
+  client: SupabaseClient,
+  subjectUserId: string
+): Promise<AdvisorPersonAlignment | null> {
+  const { data, error } = await client.rpc("get_advisor_person_alignment", {
+    p_subject_user_id: subjectUserId,
+  });
+  // Ein Fehler heisst "nicht freigegeben", eine leere Antwort "noch kein
+  // Abbild" - fuer die Anzeige ist beides dasselbe: Es gibt nichts zu zeigen.
+  if (error) return null;
+
+  const row = ((data ?? []) as Record<string, unknown>[])[0];
+  if (!row) return null;
+
+  return {
+    scores: (row.scores as Record<string, number | null>) ?? {},
+    valuesProfile: row.values_profile ?? null,
+    valuesStatus: (row.values_status as AdvisorPersonAlignment["valuesStatus"]) ?? "not_started",
+    valuesAnswered: Number(row.values_answered ?? 0),
+    valuesTotal: Number(row.values_total ?? 0),
+    basisAnswered: Number(row.basis_answered ?? 0),
+    basisTotal: Number(row.basis_total ?? 0),
+    updatedAt: (row.updated_at as string) ?? null,
+  };
+}

@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getAdvisorPersonView } from "@/features/advisor/personViewData";
+import { getAdvisorPersonAlignment, getAdvisorPersonView } from "@/features/advisor/personViewData";
+import { buildAdvisorSelfReport, hasUsableAlignment } from "@/features/advisor/advisorSelfReport";
+import { SelfReportView } from "@/features/reporting/SelfReportView";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -39,7 +42,11 @@ export default async function AdvisorPersonPage({
   if (userId === user.id) redirect("/me/profile");
 
   const client = await createClient();
-  const view = await getAdvisorPersonView(client, userId);
+  const [view, alignment, locale] = await Promise.all([
+    getAdvisorPersonView(client, userId),
+    getAdvisorPersonAlignment(client, userId),
+    getRequestLocale(),
+  ]);
 
   // Nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
   if (view.grantedScopes.length === 0) notFound();
@@ -92,6 +99,43 @@ export default async function AdvisorPersonPage({
               </div>
             ) : null}
           </dl>
+        </section>
+      ) : null}
+
+      {/* ----------------------------------------------------------------
+          Das Selbstbild aus dem Fragebogen.
+
+          DIE ZAHLEN SIND FREIGEGEBEN, DIE ANTWORTEN NICHT. Was hier steht,
+          entsteht aus einem abgelegten Abbild (Migration 20261047120000) -
+          die Rohantworten sieht niemand ausser der Person selbst, auch nach
+          dieser Freigabe nicht.
+
+          IN DER KURZEN DICHTE, wie im Gesamtbild: Das Kernmuster offen, die
+          Ausfuehrungen eingeklappt. Wer hier liest, entscheidet ueber
+          Menschen - eine Wand aus Text ist dabei kein Vorteil.
+          ---------------------------------------------------------------- */}
+      {hasUsableAlignment(alignment) && alignment ? (
+        <section className="mt-6">
+          <h2 className="text-base font-semibold text-slate-900">{t("alignment")}</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            {alignment.updatedAt
+              ? t("alignmentAsOf", {
+                  date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                    new Date(alignment.updatedAt)
+                  ),
+                })
+              : t("alignmentNoDate")}
+          </p>
+          <div className="mt-3">
+            <SelfReportView
+              report={buildAdvisorSelfReport({
+                alignment,
+                locale,
+                name: view.base?.displayName ?? t("unnamed"),
+              })}
+              density="summary"
+            />
+          </div>
         </section>
       ) : null}
 
