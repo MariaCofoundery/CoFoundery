@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlignmentSideBySide } from "@/features/advisor/AlignmentSideBySide";
+import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
+import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/notebookData";
 import { getTeamReviewDetail } from "@/features/advisor/teamReviewDetailData";
 import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -38,20 +40,26 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  */
 export default async function AdvisorTeamReviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ reviewId: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
   const { reviewId } = await params;
+  const query = await searchParams;
   const {
     data: { user },
   } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/advisor/review/${reviewId}`)}`);
 
   const client = await createClient();
-  const [detail, t, locale] = await Promise.all([
+  const anchor = { kind: "review", id: reviewId } as const;
+  const [detail, t, locale, note, followUp] = await Promise.all([
     getTeamReviewDetail(client, reviewId),
     getTranslations("advisor.review"),
     getRequestLocale(),
+    getAdvisorNoteFor(client, anchor),
+    getAdvisorFollowUpFor(client, anchor),
   ]);
 
   if (!detail) notFound();
@@ -127,6 +135,14 @@ export default async function AdvisorTeamReviewPage({
       <p className="mt-8 rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">
         {t("notAVerdict")}
       </p>
+
+      <AdvisorNotebook
+        anchor={anchor}
+        note={note}
+        followUp={followUp}
+        saved={query.saved}
+        error={query.error}
+      />
     </main>
   );
 }

@@ -485,5 +485,26 @@
     "alignmentBasis": "Selbstauskunft, kein Test. Die Punkte zeigen, wie sich diese Menschen selbst beschrieben haben — nicht, wie sie sind, und nicht, wie gut sie zueinander passen.",
     "alignmentMissing": "Nicht im Nebeneinander: {names}. Zugestimmt wurde der gemeinsamen Auswertung, der Fragebogen ist aber nicht freigegeben.",
     "notAVerdict": "Diese Seite fällt kein Urteil und berechnet keine Passung. Sie stellt nebeneinander, was jede Person selbst angegeben und freigegeben hat. Jede und jeder Beteiligte kann jederzeit aussteigen — dann gibt es diese Seite nicht mehr."
+  },
+  "notebook": {
+    "title": "Deine Handakte",
+    "private": "Nur für dich. Weder die begleitete Person noch andere Advisors deiner Organisation können das lesen — auch nicht die Leitung.",
+    "noteLabel": "Notiz",
+    "notePlaceholder": "Was beim letzten Mal aufgefallen ist, was du beim nächsten ansprechen willst, was du noch nicht sagen kannst.",
+    "saveNote": "Notiz speichern",
+    "followUpLabel": "Wiedervorlage",
+    "dueOn": "Wann",
+    "followUpNote": "Worum",
+    "followUpPlaceholder": "Woran du erinnert werden willst.",
+    "saveFollowUp": "Merken",
+    "markDone": "Erledigt",
+    "pending": "Einen Moment…",
+    "saved": "Gespeichert.",
+    "survives": "Deine Aufzeichnungen bleiben, wenn eine Freigabe endet — die Begleitung hat ja stattgefunden. Sie verschwinden, wenn die betreffende Person ihr Konto löscht.",
+    "errors": {
+      "forbidden": "Dafür gibt es kein Mandat — weder jetzt noch früher.",
+      "due": "Bitte ein Datum angeben.",
+      "save": "Das hat nicht geklappt."
+    }
   }
 }

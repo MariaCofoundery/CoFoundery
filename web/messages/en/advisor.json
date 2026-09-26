@@ -485,5 +485,26 @@
     "alignmentBasis": "Self-report, not a test. The dots show how these people described themselves — not how they are, and not how well they fit together.",
     "alignmentMissing": "Not in the comparison: {names}. They agreed to the joint evaluation, but their questionnaire is not released.",
     "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and released themselves. Anyone involved can withdraw at any time — then this page is gone."
+  },
+  "notebook": {
+    "title": "Your working file",
+    "private": "For you alone. Neither the person you accompany nor other advisors in your organisation can read this — not even the owner.",
+    "noteLabel": "Note",
+    "notePlaceholder": "What stood out last time, what you want to raise next time, what you cannot say yet.",
+    "saveNote": "Save note",
+    "followUpLabel": "Follow-up",
+    "dueOn": "When",
+    "followUpNote": "About",
+    "followUpPlaceholder": "What you want to be reminded of.",
+    "saveFollowUp": "Remember",
+    "markDone": "Done",
+    "pending": "One moment…",
+    "saved": "Saved.",
+    "survives": "Your notes stay when a release ends — the accompaniment did happen. They disappear when that person deletes their account.",
+    "errors": {
+      "forbidden": "There is no mandate for that — neither now nor earlier.",
+      "due": "Please give a date.",
+      "save": "That did not work."
+    }
   }
 }

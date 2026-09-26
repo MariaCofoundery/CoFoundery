@@ -611,3 +611,80 @@ test("die Selbstbilder stehen nebeneinander, sie werden nicht verrechnet", () =>
   // Und dieselbe Auskunft steht als Text da.
   assert.match(view, /sr-only/);
 });
+
+// ---------------------------------------------------------------------------
+// Die Handakte
+// ---------------------------------------------------------------------------
+//
+// GEWÜNSCHT: "[...] mit dem Advisor-Report und den ganzen Dingen, die der
+// Advisor sehen und tun kann." Notizen und Wiedervorlagen gab es seit
+// 20261007120000 - aber nur zu einer Beziehung. Wer einzelne Menschen
+// begleitet oder eine gemeinsame Auswertung führt, hatte keinen Ort dafür.
+//
+// Die Grenzen prüft `supabase/tests/advisor_notes_anchors.sql`; hier steht,
+// was der Code zusagt.
+
+const NOTES_MIGRATION = "../supabase/migrations/20261049120000_advisor_notes_beyond_relationships.sql";
+const NOTEBOOK_DATA = "src/features/advisor/notebookData.ts";
+const NOTEBOOK_ACTIONS = "src/features/advisor/notebookActions.ts";
+const NOTEBOOK_VIEW = "src/features/advisor/AdvisorNotebook.tsx";
+
+test("dieselben Tabellen, nur ein anderer Anker", () => {
+  const migration = sqlCodeOnly(NOTES_MIGRATION);
+  const data = codeOnly(NOTEBOOK_DATA);
+
+  // Eine Notiz ist eine Notiz. Zwei Speicher für dieselbe Sache laufen
+  // auseinander.
+  assert.match(migration, /alter table public\.advisor_private_notes/);
+  assert.ok(!migration.includes("create table"), "keine zweiten Tabellen");
+  assert.match(data, /from\("advisor_private_notes"\)/);
+
+  // Genau ein Anker je Zeile - sonst wäre beim Löschen nicht eindeutig,
+  // woran die Notiz hängt.
+  assert.match(migration, /num_nonnulls\(relationship_id, subject_user_id, review_id\) = 1/);
+});
+
+test("die Handakte gehört dem, der sie schreibt - auch in einer Organisation", () => {
+  const data = codeOnly(NOTEBOOK_DATA);
+  const view = codeOnly(NOTEBOOK_VIEW);
+
+  // BEWUSST DER NORMALE ANGEMELDETE ZUGANG: Die Regel ist so einfach, dass
+  // die Datenbank sie selbst hält. Ein Fehler in diesem Modul kann fremde
+  // Notizen nicht herausgeben, weil die Anfrage sie nie zu sehen bekommt.
+  assert.ok(!data.includes("service_role"), "kein privilegierter Zugang");
+  assert.ok(!data.includes("SUPABASE_SERVICE_ROLE_KEY"), "kein privilegierter Zugang");
+
+  // Und es steht dabei: Ein Feld, von dem man nicht weiß, wer es liest,
+  // schreibt sich anders.
+  assert.match(view, /t\("private"\)/);
+});
+
+test("schreiben darf, wer das Mandat je hatte - lesen nur mit aktiver Freigabe", () => {
+  const actions = codeOnly(NOTEBOOK_ACTIONS);
+  const migration = sqlCodeOnly(NOTES_MIGRATION);
+
+  // Sonst könnte eine Beraterin nach einem Widerruf ihre eigenen
+  // Aufzeichnungen nicht mehr zu Ende schreiben, obwohl die Begleitung
+  // stattgefunden hat. Dass es NIE eines gab, bleibt ausgeschlossen.
+  assert.match(actions, /mayKeepNotes/);
+  assert.match(actions, /was_ever_advisor_for_team_review/);
+  assert.match(migration, /function public\.was_ever_advisor_for_team_review/);
+  // Kein Statusfilter beim Mandatsnachweis: auch widerrufene zählen.
+  assert.ok(
+    !/mayKeepNotes[\s\S]{0,600}eq\("status"/.test(actions),
+    "der Mandatsnachweis filtert nicht nach Status"
+  );
+});
+
+test("keine Aufzeichnung überlebt eine Kontolöschung", () => {
+  const migration = sqlCodeOnly(NOTES_MIGRATION);
+
+  // DIE STELLE, DIE FAST DURCHGERUTSCHT WÄRE. Bei einer Notiz an einer
+  // PERSON trägt das der Fremdschlüssel. Bei einer Notiz an einer
+  // GEMEINSAMEN AUSWERTUNG nicht: Verschwindet eine beteiligte Person,
+  // bliebe die Auswertung stehen - und mit ihr die Aufzeichnung über einen
+  // Menschen, den es nicht mehr gibt.
+  assert.match(migration, /subject_user_id uuid references auth\.users \(id\) on delete cascade/);
+  assert.match(migration, /function public\.delete_team_review_when_member_leaves/);
+  assert.match(migration, /after delete on public\.advisor_team_review_members/);
+});

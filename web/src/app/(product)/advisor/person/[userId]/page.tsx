@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
+import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/notebookData";
 import { getAdvisorPersonAlignment, getAdvisorPersonView } from "@/features/advisor/personViewData";
 import { buildAdvisorSelfReport, hasUsableAlignment } from "@/features/advisor/advisorSelfReport";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
@@ -26,10 +28,13 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  */
 export default async function AdvisorPersonPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ userId: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
   const { userId } = await params;
+  const query = await searchParams;
   const {
     data: { user },
   } = await getRequestUser();
@@ -42,10 +47,13 @@ export default async function AdvisorPersonPage({
   if (userId === user.id) redirect("/me/profile");
 
   const client = await createClient();
-  const [view, alignment, locale] = await Promise.all([
+  const anchor = { kind: "subject", id: userId } as const;
+  const [view, alignment, locale, note, followUp] = await Promise.all([
     getAdvisorPersonView(client, userId),
     getAdvisorPersonAlignment(client, userId),
     getRequestLocale(),
+    getAdvisorNoteFor(client, anchor),
+    getAdvisorFollowUpFor(client, anchor),
   ]);
 
   // Nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
@@ -221,6 +229,17 @@ export default async function AdvisorPersonPage({
         </ul>
         <p className="mt-3 text-xs text-slate-500">{t("scopeNote")}</p>
       </section>
+
+      {/* DIE HANDAKTE GANZ UNTEN - nach allem, worueber sie handelt. Sie
+          gehoert dem Advisor und war nie fuer die begleitete Person
+          bestimmt. */}
+      <AdvisorNotebook
+        anchor={anchor}
+        note={note}
+        followUp={followUp}
+        saved={query.saved}
+        error={query.error}
+      />
     </main>
   );
 }
