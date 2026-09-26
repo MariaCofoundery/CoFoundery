@@ -412,7 +412,16 @@
     "personPending": "{count, plural, =1 {1 Anfrage offen} other {# Anfragen offen}}",
     "claimFailedTitle": "Diese Einladung geht nicht auf",
     "claimFailedText": "Vielleicht ist sie abgelaufen, wurde schon angenommen oder war an eine andere E-Mail-Adresse gerichtet als die, mit der du angemeldet bist.",
-    "claimFailedCta": "Zur Übersicht"
+    "claimFailedCta": "Zur Übersicht",
+    "profileTitle": "Wie eure Organisation auftritt",
+    "profileText": "Diese Angaben sieht jede Person, die ihr um eine Freigabe bittet — an genau der Stelle, an der sie entscheidet. Ohne sie steht dort nur ein Name.",
+    "profileDescriptionLabel": "Wofür ihr da seid",
+    "profileDescriptionPlaceholder": "Zwei, drei Sätze: Wen begleitet ihr, wie lange, und was passiert in dieser Zeit?",
+    "profileWebsiteLabel": "Website",
+    "profileRegionLabel": "Ort",
+    "profileFocusLabel": "Schwerpunkte",
+    "profileFocusPlaceholder": "Durch Komma getrennt, höchstens acht",
+    "profileSave": "Profil speichern"
   },
   "personView": {
     "back": "Zurück zur Übersicht",

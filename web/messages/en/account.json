@@ -28,6 +28,13 @@
     "claimFailedTitle": "This invitation does not open",
     "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with. Ask the person who invited you for a new one.",
     "claimFailedCta": "To your access list",
-    "invite_claimed": "The request is here. Below you decide what becomes visible."
+    "invite_claimed": "The request is here. Below you decide what becomes visible.",
+    "unknownRequester": "Unknown",
+    "askedBy": "asked by {name}",
+    "website": "Website",
+    "holder": {
+      "org": "The organisation holds this access — it stays if the person who asked leaves.",
+      "person": "This person holds the access — nobody else."
+    }
   }
 }

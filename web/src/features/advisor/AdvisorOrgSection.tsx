@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   createAdvisorOrgAction,
+  updateAdvisorOrgProfileAction,
   inviteOrgAdvisorAction,
   setOrgMembershipAction,
 } from "@/features/advisor/orgActions";
@@ -62,6 +63,101 @@ export async function AdvisorOrgSection({
       ) : (
         <>
           <p className="mt-4 text-sm font-medium text-slate-900">{org.name}</p>
+
+          {/* --------------------------------------------------------------
+              Das Profil der Organisation.
+
+              ES STEHT HIER NICHT ZUR ZIERDE. Genau diese Angaben liest eine
+              Person, die um die Freigabe ihres Profils gebeten wird - vorher
+              sah sie dort nicht einmal einen Namen. Der Hinweis darüber sagt
+              das, damit niemand das Feld für Innendekoration hält.
+
+              NUR DIE FÜHRUNG. Ein Advisor arbeitet im Namen der Organisation,
+              er bestimmt aber nicht, was sie über sich sagt. Die Regel steht
+              in der Datenbank; hier wird das Formular nur nicht gezeigt.
+              -------------------------------------------------------------- */}
+          {org.role === "owner" ? (
+            <details className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+              <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-slate-800">
+                {t("profileTitle")}
+              </summary>
+              <form action={updateAdvisorOrgProfileAction} className="grid gap-3 px-4 pb-4">
+                <input type="hidden" name="orgId" value={org.id} />
+                <p className="text-xs leading-5 text-slate-600">{t("profileText")}</p>
+
+                <label className="block">
+                  <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+                    {t("nameLabel")}
+                  </span>
+                  <input
+                    name="name"
+                    defaultValue={org.name}
+                    maxLength={120}
+                    className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+                    {t("profileDescriptionLabel")}
+                  </span>
+                  <textarea
+                    name="description"
+                    defaultValue={org.description ?? ""}
+                    rows={3}
+                    maxLength={1200}
+                    placeholder={t("profileDescriptionPlaceholder")}
+                    className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                  />
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+                      {t("profileWebsiteLabel")}
+                    </span>
+                    <input
+                      name="websiteUrl"
+                      type="url"
+                      defaultValue={org.websiteUrl ?? ""}
+                      maxLength={300}
+                      placeholder="https://"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+                      {t("profileRegionLabel")}
+                    </span>
+                    <input
+                      name="locationRegion"
+                      defaultValue={org.locationRegion ?? ""}
+                      maxLength={120}
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </label>
+                </div>
+
+                <label className="block">
+                  <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+                    {t("profileFocusLabel")}
+                  </span>
+                  <input
+                    name="focus"
+                    defaultValue={org.focus.join(", ")}
+                    placeholder={t("profileFocusPlaceholder")}
+                    className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                  />
+                </label>
+
+                <SubmitButton
+                  label={t("profileSave")}
+                  pendingLabel={t("pending")}
+                  className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                />
+              </form>
+            </details>
+          ) : null}
 
           {org.role === "owner" ? (
             <form action={inviteOrgAdvisorAction} className="mt-4 flex flex-wrap items-end gap-3">

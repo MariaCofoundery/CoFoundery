@@ -412,7 +412,16 @@
     "personPending": "{count, plural, =1 {1 request open} other {# requests open}}",
     "claimFailedTitle": "This invitation does not open",
     "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with.",
-    "claimFailedCta": "To the overview"
+    "claimFailedCta": "To the overview",
+    "profileTitle": "How your organisation appears",
+    "profileText": "Everyone you ask for access sees this — right where they decide. Without it, all they see is a name.",
+    "profileDescriptionLabel": "What you are there for",
+    "profileDescriptionPlaceholder": "Two or three sentences: who do you accompany, for how long, and what happens in that time?",
+    "profileWebsiteLabel": "Website",
+    "profileRegionLabel": "Location",
+    "profileFocusLabel": "Focus areas",
+    "profileFocusPlaceholder": "Comma separated, at most eight",
+    "profileSave": "Save profile"
   },
   "personView": {
     "back": "Back to the overview",

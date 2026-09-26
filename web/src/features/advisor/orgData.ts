@@ -17,6 +17,14 @@ export type AdvisorOrg = {
   name: string;
   personSeatLimit: number | null;
   role: "owner" | "advisor" | null;
+  /**
+   * Das Profil - seit 26.09.2026. Es ist nicht Zierde: Genau diese Angaben
+   * liest eine Person, die um Freigabe ihres Profils gebeten wird.
+   */
+  description: string | null;
+  websiteUrl: string | null;
+  focus: string[];
+  locationRegion: string | null;
 };
 
 export type OrgMember = {
@@ -43,20 +51,32 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 
   const { data: orgs } = await client
     .from("advisor_orgs")
-    .select("id, name, person_seat_limit")
+    .select("id, name, person_seat_limit, description, website_url, focus, location_region")
     .in(
       "id",
       rows.map((row) => row.org_id)
     );
 
-  return ((orgs ?? []) as { id: string; name: string; person_seat_limit: number | null }[]).map(
-    (org) => ({
-      id: org.id,
-      name: org.name,
-      personSeatLimit: org.person_seat_limit,
-      role: rows.find((row) => row.org_id === org.id)?.role ?? null,
-    })
-  );
+  return (
+    (orgs ?? []) as {
+      id: string;
+      name: string;
+      person_seat_limit: number | null;
+      description: string | null;
+      website_url: string | null;
+      focus: string[] | null;
+      location_region: string | null;
+    }[]
+  ).map((org) => ({
+    id: org.id,
+    name: org.name,
+    personSeatLimit: org.person_seat_limit,
+    role: rows.find((row) => row.org_id === org.id)?.role ?? null,
+    description: org.description,
+    websiteUrl: org.website_url,
+    focus: org.focus ?? [],
+    locationRegion: org.location_region,
+  }));
 }
 
 export async function getOrgMembers(

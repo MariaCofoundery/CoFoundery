@@ -1,6 +1,6 @@
 import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { PersonAccessSection } from "@/features/advisor/PersonAccessSection";
-import { getPersonAccessGrants } from "@/features/advisor/personAccessData";
+import { getPersonAccessRequesters } from "@/features/advisor/personAccessData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { canAccessAccountSettings } from "@/features/account/accountAccess";
@@ -42,7 +42,7 @@ export default async function AccountPage({
     roleViews,
     membershipResult,
     t,
-    personAccessGrants,
+    personAccessRequesters,
     preferences,
     optedOutRows,
     emailOptInRows,
@@ -55,7 +55,7 @@ export default async function AccountPage({
     getDashboardRoleViews(user.id).catch(() => ({ hasFounder: false, hasAdvisor: false, roles: [] })),
     supabase.rpc("has_network_account"),
     getTranslations("dashboard"),
-    getPersonAccessGrants(supabase),
+    getPersonAccessRequesters(supabase),
     Promise.resolve(
       supabase.from("person_core").select("locale").eq("user_id", user.id).maybeSingle()
     )
@@ -140,7 +140,7 @@ export default async function AccountPage({
           keine Einwilligung, nur eine Unterschrift: Wer nicht sehen kann, wer
           Zugang hat und wofuer, hat nicht zugestimmt, sondern einmal
           geklickt. */}
-      <PersonAccessSection grants={personAccessGrants} />
+      <PersonAccessSection requesters={personAccessRequesters} />
 
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <DeleteAccountSection

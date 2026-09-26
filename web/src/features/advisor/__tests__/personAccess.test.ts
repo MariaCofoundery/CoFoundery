@@ -87,7 +87,11 @@ test("widerrufen steht neben dem Zugang, nicht zwei Ebenen tiefer", () => {
   assert.match(view, /activeTitle/);
   // Und die Seite zeigt beides: offene Anfragen und geltende Zugänge.
   assert.match(view, /requestedTitle/);
-  assert.match(codeOnly(ACCOUNT), /<PersonAccessSection grants=\{personAccessGrants\}/);
+  // NACHGEZOGEN AM 26.09.2026: Die Stelle heisst jetzt `requesters` statt
+  // `grants`, weil sie nach der fragenden Partei gruppiert und nicht mehr
+  // je Umfang eine Karte zeigt. Das Anliegen des Tests ist unveraendert:
+  // Der Abschnitt haengt am Konto und nicht zwei Ebenen tiefer.
+  assert.match(codeOnly(ACCOUNT), /<PersonAccessSection requesters=\{personAccessRequesters\}/);
 });
 
 test("wer was entscheiden darf, steht in der Datenbank und nicht im Formular", () => {
@@ -280,4 +284,99 @@ test("eine verweigerte Freigabe ist kein Fehler, sondern eine Abwesenheit", () =
   // Fehler durchschlagen, risse ein fehlender Umfang die ganze Seite ab -
   // und die freigegebenen Bereiche wären auch weg.
   assert.match(data, /if \(error\) return null/);
+});
+
+// ---------------------------------------------------------------------------
+// Wer fragt da eigentlich?
+// ---------------------------------------------------------------------------
+//
+// GEMELDET AM 25.09.2026: "Ich habe als Advisor quasi den Accelerator
+// angelegt, aber ich bin noch nicht ganz so zufrieden damit, wie das dann so
+// aussieht."
+//
+// Beim Nachsehen war es schlimmer als vermutet: Eine Founderin, die um
+// Freigabe gebeten wurde, sah den UMFANG und eine freiwillige Notiz. Nicht
+// den Namen, nicht die Organisation. Und sie konnte es auch nicht sehen -
+// `person_core` ist owner-only.
+//
+// Die Grenzen prüft `supabase/tests/advisor_identity_for_consent.sql` gegen
+// die laufende Datenbank. Hier steht, was der Code zusagt.
+
+const IDENTITY_MIGRATION = "../supabase/migrations/20261046120000_advisor_identity_for_consent.sql";
+const ACCESS_DATA = "src/features/advisor/personAccessData.ts";
+const ORG_SECTION = "src/features/advisor/AdvisorOrgSection.tsx";
+
+test("die Auskunft über den Fragenden kommt aus einer engen Funktion", () => {
+  const data = codeOnly(ACCESS_DATA);
+
+  // NICHT über die Tabelle: `person_core` ist owner-only, ein direkter
+  // Lesezugriff auf den Namen des Fragenden ist gar nicht möglich. Und eine
+  // breite Policy wäre die falsche Antwort darauf.
+  assert.match(data, /rpc\("get_person_access_requests"\)/);
+  assert.ok(!data.includes('from("person_core")'), "kein direkter Griff auf person_core");
+});
+
+test("die Funktion antwortet nur über die aufrufende Person", () => {
+  const migration = sqlCodeOnly(IDENTITY_MIGRATION);
+
+  // DIE WICHTIGSTE ZEILE DER MIGRATION. Die Funktion läuft als
+  // `security definer` und liest damit `person_core` an der
+  // Zeilensicherheit vorbei - wäre ihre Regel falsch, wäre sie ein Leseweg
+  // auf die Namen aller Menschen.
+  assert.match(migration, /subject_user_id = auth\.uid\(\)/);
+
+  // Und sie nimmt keinen Parameter: Eine Funktion mit `p_user_id` wäre eine,
+  // die man nach fremden Zeilen fragen kann.
+  assert.match(migration, /function public\.get_person_access_requests\(\)/);
+});
+
+test("wer fragt und wer hält, sind zwei verschiedene Angaben", () => {
+  const migration = sqlCodeOnly(IDENTITY_MIGRATION);
+  const data = codeOnly(ACCESS_DATA);
+
+  // Ein Zugang hat genau einen Halter (`advisor_person_grants_one_holder`).
+  // Gefragt hat aber immer ein Mensch. Bei einer Organisation bleibt der
+  // Zugang dort, auch wenn die fragende Person geht - wer das nicht weiß,
+  // widerruft beim Falschen.
+  assert.match(migration, /requested_by_user_id/);
+  assert.match(migration, /then 'org' else 'person'/);
+  assert.match(data, /holder/);
+});
+
+test("eine Karte je Partei, aber eine Entscheidung je Umfang", () => {
+  const view = codeOnly(VIEW);
+
+  // Gruppiert wird nach dem HALTER: Zwei Anfragen derselben Organisation
+  // gehören zusammen, auch wenn zwei Menschen sie gestellt haben.
+  assert.match(codeOnly(ACCESS_DATA), /org:\$\{row\.org_id\}/);
+
+  // Aber je Umfang bleibt ein eigenes Formular - sonst wäre es wieder
+  // "alles oder nichts".
+  assert.match(view, /requester\.requested\.map/);
+  assert.match(view, /requester\.active\.map/);
+  assert.match(view, /approvePersonAccessAction/);
+  assert.match(view, /declinePersonAccessAction/);
+  assert.match(view, /revokePersonAccessAction/);
+});
+
+test("der Link zur Organisation führt aus dem Produkt heraus - und weiß das", () => {
+  const view = codeOnly(VIEW);
+  // Der Text stammt von der fragenden Seite. Ein Link dorthin ohne `rel`
+  // gäbe die Herkunft mit.
+  assert.match(view, /rel="noreferrer noopener nofollow"/);
+
+  // Und die Datenbank lässt nur http(s) zu: Eine Founderin klickt diesen
+  // Link, weil sie wissen will, wer sie da fragt.
+  assert.match(sqlCodeOnly(IDENTITY_MIGRATION), /website_url ~ '\^https\?/);
+});
+
+test("was die Organisation über sich sagt, ändert nur ihre Führung", () => {
+  const migration = sqlCodeOnly(IDENTITY_MIGRATION);
+  // Ein Advisor arbeitet im Namen der Organisation - er bestimmt nicht, was
+  // sie über sich sagt. Die Regel steht in der Datenbank.
+  assert.match(migration, /advisor_org_owner_required/);
+  assert.match(migration, /member\.role = 'owner'/);
+
+  // Im Formular steht sie nicht noch einmal - es wird nur nicht gezeigt.
+  assert.match(codeOnly(ORG_SECTION), /org\.role === "owner"/);
 });

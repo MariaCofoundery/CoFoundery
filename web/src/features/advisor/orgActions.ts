@@ -86,3 +86,46 @@ export async function setOrgMembershipAction(formData: FormData) {
   if (error) back("org_membership");
   done();
 }
+
+/**
+ * Was die Organisation über sich sagt.
+ *
+ * GEMELDET AM 25.09.2026: "Ich habe als Advisor quasi den Accelerator angelegt,
+ * aber ich bin noch nicht ganz so zufrieden damit, wie das dann so aussieht."
+ *
+ * Sie hatte bis dahin einen Namen, einen Status und eine Sitzanzahl - und eine
+ * Founderin, die um Freigabe gebeten wurde, sah davon nicht einmal den Namen.
+ * Diese Angaben stehen deshalb nicht hier zur Zierde: Sie sind das, was an der
+ * Einwilligungsstelle gelesen wird.
+ *
+ * DIE LÄNGEN PRÜFT DIE DATENBANK, nicht diese Aktion. Hier steht nur, was für
+ * eine brauchbare Rückmeldung nötig ist - eine zweite Kopie der Regeln wäre
+ * die erste, die ausläuft. Was hier geprüft wird, ist die FORM der Eingabe:
+ * dass aus einer Zeile Text eine Liste wird.
+ */
+export async function updateAdvisorOrgProfileAction(formData: FormData) {
+  const { client } = await requireUser();
+
+  const orgId = String(formData.get("orgId") ?? "").trim();
+  if (!orgId) back("org_profile");
+
+  // Schwerpunkte kommen als eine Zeile mit Kommas - acht sind das Maximum,
+  // und leere Stücke fliegen raus, damit "a,,b" nicht drei Einträge ergibt.
+  const focusRaw = String(formData.get("focus") ?? "").trim();
+  const focus = focusRaw
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0)
+    .slice(0, 8);
+
+  const { error } = await client.rpc("update_advisor_org_profile", {
+    p_org_id: orgId,
+    p_name: String(formData.get("name") ?? "").trim() || null,
+    p_description: String(formData.get("description") ?? "").trim() || null,
+    p_website_url: String(formData.get("websiteUrl") ?? "").trim() || null,
+    p_focus: focus.length > 0 ? focus : null,
+    p_location_region: String(formData.get("locationRegion") ?? "").trim() || null,
+  });
+  if (error) back("org_profile");
+  done();
+}
