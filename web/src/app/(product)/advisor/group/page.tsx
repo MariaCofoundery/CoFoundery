@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
 import { getAccompaniedPeople, withAccompaniedNames } from "@/features/advisor/orgData";
-import { getAdvisorGroupReadout } from "@/features/advisor/groupReadoutData";
 import { requestTeamReviewAction } from "@/features/advisor/teamReviewActions";
 import { getAdvisorTeamReviews } from "@/features/advisor/teamReviewData";
 import { getMyAdvisorOrgs } from "@/features/advisor/orgData";
@@ -69,7 +67,6 @@ export default async function AdvisorGroupPage({
   // entscheidet, wer den Zugang behaelt, wenn die fragende Person geht.
   const orgId = orgs[0]?.id ?? null;
 
-  const readout = selected.length >= 2 ? await getAdvisorGroupReadout(client, selected) : null;
   const nameOf = (userId: string) =>
     people.find((person) => person.subjectUserId === userId)?.name ?? t("unnamed");
 
@@ -138,13 +135,20 @@ export default async function AdvisorGroupPage({
       </form>
 
       {/* ------------------------------------------------------------------
-          Das Ergebnis.
+          KEINE AUSWERTUNG AUF DIESER SEITE - KORRIGIERT AM 26.09.2026.
+
+          Hier stand bis eben die Rollenlage der gewaehlten Personen,
+          gerechnet aus ihren EINZELNEN Freigaben. Das war ein Kurzschluss:
+          Saetze wie "Anna und Bert wollen beide den Vertrieb verantworten"
+          sind bereits eine Aussage ueber das Verhaeltnis zwischen zwei
+          Menschen - genau die Art Aussage, fuer die es einen Tag spaeter die
+          gemeinsame Zustimmung gab. Zwei Wege zum selben Befund, mit zwei
+          verschiedenen Einwilligungen, waeren keine Strenge, sondern eine
+          Umgehung.
+
+          Diese Seite waehlt jetzt nur noch aus und fragt an. Die Auswertung
+          steht unter /advisor/review/<id>, sobald alle zugestimmt haben.
           ------------------------------------------------------------------ */}
-      {selected.length >= 2 && !readout ? (
-        <p className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
-          {t("tooFewReleased")}
-        </p>
-      ) : null}
 
       {/* ------------------------------------------------------------------
           Eine gemeinsame Auswertung anfragen.
@@ -207,47 +211,21 @@ export default async function AdvisorGroupPage({
                 <span className="text-slate-900">
                   {review.subjectUserIds.map((id) => nameOf(id)).join(", ")}
                 </span>
-                <span className="text-xs text-slate-500">
-                  {review.status === "active"
-                    ? t("reviewActive")
-                    : t("reviewWaiting", { count: review.pendingCount })}
-                </span>
+                {review.status === "active" ? (
+                  <Link
+                    href={`/advisor/review/${review.reviewId}`}
+                    className="text-xs font-medium text-slate-700 underline underline-offset-4"
+                  >
+                    {t("reviewOpen")}
+                  </Link>
+                ) : (
+                  <span className="text-xs text-slate-500">
+                    {t("reviewWaiting", { count: review.pendingCount })}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
-
-      {readout ? (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-950">
-            {t("resultTitle", { names: readout.included.map((person) => person.name).join(", ") })}
-          </h2>
-
-          {/* WER FEHLT, WIRD GENANNT. Eine Auswertung, der stillschweigend
-              jemand fehlt, sieht aus wie eine Aussage ueber eine duenn
-              besetzte Gruppe - sie ist aber eine darueber, wer zugestimmt
-              hat. */}
-          {readout.omitted.length > 0 ? (
-            <ul className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-sm leading-6 text-slate-600">
-              {readout.omitted.map((person) => (
-                <li key={person.subjectUserId}>
-                  {t(`omitted.${person.reason}`, { name: nameOf(person.subjectUserId) })}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-
-          <div className="mt-4">
-            <CapabilityTeamReadoutView data={readout.data} />
-          </div>
-
-          {/* WAS DIESE SEITE NICHT TUT. Sie steht unter dem Ergebnis, weil sie
-              dort gelesen wird - und sie wird gelesen, weil oben gerade eine
-              Lueckenkarte stand. */}
-          <p className="mt-6 rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">
-            {t("notARanking")}
-          </p>
         </section>
       ) : null}
     </main>

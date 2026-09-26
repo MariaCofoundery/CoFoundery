@@ -390,10 +390,13 @@ test("was die Organisation über sich sagt, ändert nur ihre Führung", () => {
 
 const GROUP_DATA = "src/features/advisor/groupReadoutData.ts";
 const GROUP_PAGE = "src/app/(product)/advisor/group/page.tsx";
+const REVIEW_PAGE = "src/app/(product)/advisor/review/[reviewId]/page.tsx";
+const REVIEW_DETAIL = "src/features/advisor/teamReviewDetailData.ts";
+const SIDE_BY_SIDE = "src/features/advisor/AlignmentSideBySide.tsx";
 
 test("der Accelerator sieht dasselbe Bild wie das Team von sich selbst", () => {
   const data = codeOnly(GROUP_DATA);
-  const page = codeOnly(GROUP_PAGE);
+  const page = codeOnly(REVIEW_PAGE);
 
   // DIE ENTSCHEIDUNG DIESES BEREICHS, und keine Sparsamkeit: dieselbe reine
   // Funktion, dasselbe Bauteil. Gäbe es hier eine eigene Rechnung, wäre sie
@@ -407,7 +410,7 @@ test("der Accelerator sieht dasselbe Bild wie das Team von sich selbst", () => {
 
 test("es gibt keine Rangliste von Aufstellungen", () => {
   const data = codeOnly(GROUP_DATA);
-  const page = codeOnly(GROUP_PAGE);
+  const page = codeOnly(REVIEW_PAGE);
 
   // Man kann nicht "die beste Dreierkombination berechnen lassen" - dafür
   // bräuchte es eine Zahl je Gruppe, und die gäbe dieses Modell nicht her.
@@ -416,7 +419,7 @@ test("es gibt keine Rangliste von Aufstellungen", () => {
     assert.ok(!page.includes(forbidden), `keine Note je Gruppe: ${forbidden}`);
   }
   // Und es steht auf der Seite, weil dort gerade eine Lückenkarte stand.
-  assert.match(page, /notARanking/);
+  assert.match(page, /notAVerdict/);
 });
 
 test("die Aufstellung wird nicht gespeichert", () => {
@@ -427,7 +430,9 @@ test("die Aufstellung wird nicht gespeichert", () => {
   // ein Gedanke; eine Zeile in der Datenbank ist eine Behauptung.
   assert.match(page, /method="get"/);
   assert.ok(!page.includes(".insert("), "kein Speichern der Auswahl");
-  assert.ok(!page.includes('"use server"'), "keine Aktion, die etwas anlegt");
+  // Eine Anfrage legt sehr wohl etwas an - aber erst auf Knopfdruck und mit
+  // Zustimmung aller. Die AUSWAHL selbst bleibt ein Link.
+  assert.ok(!page.includes("saveGroup"), "die Auswahl selbst wird nicht gespeichert");
 });
 
 test("jede Seite der Gruppe kommt aus den Freigabefunktionen", () => {
@@ -452,8 +457,8 @@ test("wer fehlt, wird genannt - und warum", () => {
   // eine Aussage über eine dünn besetzte Gruppe. Sie ist aber eine darüber,
   // wer zugestimmt hat.
   assert.match(data, /omitted/);
-  assert.match(page, /readout\.omitted\.map/);
-  assert.match(page, /omitted\.\$\{person\.reason\}/);
+  assert.match(codeOnly(REVIEW_PAGE), /rolesOmitted/);
+  assert.match(codeOnly(REVIEW_PAGE), /alignmentMissing/);
 
   // Und die Zahl derer, die ihre Tiefe freigegeben haben, wird mitgezählt -
   // hier noch wichtiger als im Team, weil hier jemand entscheidet.
@@ -554,4 +559,55 @@ test("die Aktionen entscheiden nichts, sie reichen weiter", () => {
   assert.match(actions, /rpc\("request_advisor_team_review"/);
   assert.ok(!actions.includes(".update("), "kein direktes Schreiben");
   assert.ok(!actions.includes(".insert("), "kein direktes Schreiben");
+});
+
+test("die Auswertung steht hinter der gemeinsamen Zustimmung, nicht davor", () => {
+  const group = codeOnly(GROUP_PAGE);
+  const review = codeOnly(REVIEW_PAGE);
+
+  // KORRIGIERT AM 26.09.2026. Auf der Auswahlseite stand die Rollenlage,
+  // gerechnet aus den EINZELNEN Freigaben. Das war ein Kurzschluss: Sätze wie
+  // "Anna und Bert wollen beide den Vertrieb verantworten" sind bereits eine
+  // Aussage über das Verhältnis zwischen zwei Menschen - genau die Art
+  // Aussage, für die es einen Tag später die gemeinsame Zustimmung gab. Zwei
+  // Wege zum selben Befund mit zwei verschiedenen Einwilligungen wären keine
+  // Strenge, sondern eine Umgehung.
+  assert.ok(!group.includes("CapabilityTeamReadoutView"), "keine Auswertung vor der Zustimmung");
+  assert.ok(!group.includes("getAdvisorGroupReadout"), "und sie wird dort auch nicht geladen");
+
+  assert.match(review, /<CapabilityTeamReadoutView/);
+  assert.match(review, /<AlignmentSideBySide/);
+});
+
+test("die Teamzustimmung entsperrt das Nebeneinander, nicht die Daten", () => {
+  const detail = codeOnly(REVIEW_DETAIL);
+
+  // ZWEI EINWILLIGUNGEN, NICHT EINE. Die Teamzustimmung sagt "ihr dürft uns
+  // zusammen ansehen", die Einzelfreigabe sagt "das hier von mir dürft ihr
+  // sehen". Beides muss vorliegen.
+  assert.match(detail, /getAdvisorTeamReviews/);
+  assert.match(detail, /review\.status !== "active"/);
+  // Jede Seite kommt weiterhin aus den Einzelfreigabe-Funktionen.
+  assert.match(detail, /getAdvisorGroupReadout/);
+  assert.match(detail, /getAdvisorPersonAlignment/);
+  // Und wer zugestimmt, aber nicht freigegeben hat, wird genannt.
+  assert.match(detail, /withoutAlignment/);
+});
+
+test("die Selbstbilder stehen nebeneinander, sie werden nicht verrechnet", () => {
+  const view = codeOnly(SIDE_BY_SIDE);
+
+  // Eine Zahl "73 % Passung" wird zum Auswahlkriterium, sobald sie existiert -
+  // und dieses Instrument gibt sie nicht her.
+  for (const forbidden of ["distance", "similarity", "fitScore", "match(", "gapScore"]) {
+    assert.ok(!view.includes(forbidden), `kein Rechnen zwischen Menschen: ${forbidden}`);
+  }
+
+  // WEIT AUSEINANDER IST NICHT SCHLECHT: keine Ampel, keine Einfärbung nach
+  // Abstand. Die Farben unterscheiden Personen, nicht Bewertungen.
+  assert.ok(!view.includes("bg-rose"), "keine Bedeutungsfarbe");
+  assert.ok(!view.includes("bg-amber"), "keine Bedeutungsfarbe");
+
+  // Und dieselbe Auskunft steht als Text da.
+  assert.match(view, /sr-only/);
 });

@@ -175,3 +175,21 @@ export async function getAdvisorPersonAlignment(
     updatedAt: (row.updated_at as string) ?? null,
   };
 }
+
+/**
+ * Nur der Name - fuer Stellen, die sonst nichts brauchen.
+ *
+ * Er kommt aus derselben Funktion wie das ganze Grundprofil und haengt damit
+ * an derselben Freigabe (`base`). Wer sie nicht erteilt hat, bleibt namenlos.
+ */
+export async function getAdvisorPersonBaseName(
+  client: SupabaseClient,
+  subjectUserId: string
+): Promise<string | null> {
+  const { data, error } = await client.rpc("get_advisor_person_base", {
+    p_subject_user_id: subjectUserId,
+  });
+  if (error) return null;
+  const name = ((data ?? []) as { display_name: string | null }[])[0]?.display_name?.trim();
+  return name || null;
+}

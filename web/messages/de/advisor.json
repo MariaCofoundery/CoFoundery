@@ -469,6 +469,21 @@
     "requestFailed": "Das hat nicht geklappt. Anfragen kannst du nur Menschen, die dich bereits einzeln begleiten lassen.",
     "reviewsTitle": "Angefragte Auswertungen",
     "reviewActive": "läuft",
-    "reviewWaiting": "{count, plural, =1 {wartet auf 1 Antwort} other {wartet auf # Antworten}}"
+    "reviewWaiting": "{count, plural, =1 {wartet auf 1 Antwort} other {wartet auf # Antworten}}",
+    "reviewOpen": "Auswertung öffnen"
+  },
+  "review": {
+    "back": "Zurück zur Auswahl",
+    "untitled": "Gemeinsame Auswertung",
+    "intro": "Alle Beteiligten haben zugestimmt. Was hier steht, sind ihre eigenen Angaben nebeneinander — keine Bewertung und keine Empfehlung.",
+    "rolesTitle": "Rollenlage",
+    "rolesOmitted": "{count, plural, =1 {Eine beteiligte Person} other {# beteiligte Personen}} erscheint hier nicht: Die Fähigkeiten sind nicht einzeln freigegeben. Die gemeinsame Zustimmung erlaubt das Nebeneinanderstellen, nicht den Zugriff auf mehr Daten.",
+    "noRoles": "Für die Rollenlage bräuchte es von mindestens zwei Beteiligten die einzeln freigegebenen Fähigkeiten. Die liegen noch nicht vor.",
+    "alignmentTitle": "Die Selbstbilder nebeneinander",
+    "alignmentIntro": "Jede Achse zeigt eine Dimension aus dem Fragebogen, jeder Punkt eine Person. Weit auseinander ist nicht schlechter als dicht beieinander — es ist eine Stelle, über die zu sprechen sich lohnt.",
+    "alignmentNoValue": "Ohne Angabe: {names}",
+    "alignmentBasis": "Selbstauskunft, kein Test. Die Punkte zeigen, wie sich diese Menschen selbst beschrieben haben — nicht, wie sie sind, und nicht, wie gut sie zueinander passen.",
+    "alignmentMissing": "Nicht im Nebeneinander: {names}. Zugestimmt wurde der gemeinsamen Auswertung, der Fragebogen ist aber nicht freigegeben.",
+    "notAVerdict": "Diese Seite fällt kein Urteil und berechnet keine Passung. Sie stellt nebeneinander, was jede Person selbst angegeben und freigegeben hat. Jede und jeder Beteiligte kann jederzeit aussteigen — dann gibt es diese Seite nicht mehr."
   }
 }

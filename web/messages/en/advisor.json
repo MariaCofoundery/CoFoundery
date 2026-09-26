@@ -469,6 +469,21 @@
     "requestFailed": "That did not work. You can only ask people who already let you accompany them individually.",
     "reviewsTitle": "Requested evaluations",
     "reviewActive": "running",
-    "reviewWaiting": "{count, plural, =1 {waiting for 1 answer} other {waiting for # answers}}"
+    "reviewWaiting": "{count, plural, =1 {waiting for 1 answer} other {waiting for # answers}}",
+    "reviewOpen": "Open evaluation"
+  },
+  "review": {
+    "back": "Back to the selection",
+    "untitled": "Joint evaluation",
+    "intro": "Everyone involved has agreed. What you see here is their own entries side by side — not a rating and not a recommendation.",
+    "rolesTitle": "Role situation",
+    "rolesOmitted": "{count, plural, =1 {One person involved} other {# people involved}} does not appear here: their capabilities are not released individually. Joint agreement permits placing things side by side, not access to more data.",
+    "noRoles": "The role situation needs individually released capabilities from at least two of the people involved. Those are not available yet.",
+    "alignmentTitle": "Self-reports side by side",
+    "alignmentIntro": "Each axis is one dimension from the questionnaire, each dot one person. Far apart is not worse than close together — it is a place worth talking about.",
+    "alignmentNoValue": "No entry: {names}",
+    "alignmentBasis": "Self-report, not a test. The dots show how these people described themselves — not how they are, and not how well they fit together.",
+    "alignmentMissing": "Not in the comparison: {names}. They agreed to the joint evaluation, but their questionnaire is not released.",
+    "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and released themselves. Anyone involved can withdraw at any time — then this page is gone."
   }
 }
