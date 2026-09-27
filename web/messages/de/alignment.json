@@ -1,7 +1,7 @@
 {
   "shell": {
     "backToDashboard": "Zurück zum Dashboard",
-    "draftNotice": "Dieser Fragebogen ist in Arbeit und wird noch nicht ausgewertet.",
+    "draftNotice": "Testfassung. Dieser Fragebogen wird noch nicht ausgewertet.",
     "progress": "{answered} von {total} beantwortet",
     "save": "Antwort übernehmen",
     "saving": "Wird gespeichert …",
@@ -9,38 +9,33 @@
     "clear": "Antwort zurücknehmen",
     "submit": "Fragebogen abgeben",
     "submitting": "Wird abgegeben …",
-    "incomplete": "Es fehlen noch {count} Angaben. Für jede Frage gibt es auch eine Antwort, die sagt, warum du sie nicht beantworten möchtest.",
-    "submitted": "Abgegeben. Ab hier ändert sich nichts mehr."
+    "incomplete": "Du musst dich nirgends festlegen: Zu jeder Frage kannst du auch angeben, dass sie noch offen ist oder dass du sie nicht beantworten möchtest. Es fehlen noch {count} Antworten.",
+    "submitted": "Abgegeben. Ab jetzt lässt sich hier nichts mehr ändern."
   },
   "base": {
     "title": "Wie du arbeiten möchtest",
     "step1": {
       "title": "Erster Teil",
-      "intro": "Diese Fragen beschreiben, wie du arbeiten möchtest, was du erreichen willst und welche Regeln du dir wünschst. Es geht nicht darum, wie du bist, sondern was du dir vornimmst.",
-      "note": "Es gibt hier keine besseren und schlechteren Antworten und am Ende keine Punktzahl."
+      "intro": "Es geht darum, wie du arbeiten möchtest, was du erreichen willst und welche Regeln du dir wünschst — nicht darum, wie du bist.",
+      "note": "Es gibt keine besseren und schlechteren Antworten und am Ende keine Punktzahl. Der Fragebogen speichert laufend; du kannst jederzeit aufhören und später weitermachen."
     },
     "step2": {
       "title": "Zweiter Teil: die Zusagen",
-      "intro": "Jetzt geht es um Stunden, Geld und Termine. Das sind Zusagen, keine Selbstauskunft — deshalb kommen sie erst hier und nicht beim ersten Ausfüllen.",
-      "note": "Was du hier angibst, ist eine Angabe zum heutigen Stand und keine Verpflichtung."
+      "intro": "Jetzt geht es um Stunden, Geld und Termine. Das sind Zusagen und keine Selbstbeschreibung — deshalb kommen sie erst hier.",
+      "note": "Alles hier beschreibt deinen heutigen Stand. Es ist keine Verpflichtung, und du kannst es später ändern."
     }
   },
   "values": {
     "title": "Prioritäten und Grenzen",
-    "intro": "Kurze Situationen, in denen zwei berechtigte Anliegen zusammenstoßen. Beide Anliegen bewertest du getrennt — beide dürfen sehr wichtig sein.",
-    "note": "Es gibt keine richtige Wahl und keinen Wertepunktestand. Der Zweck ist, zu wissen, worüber ihr reden solltet.",
-    "concerns": "Wie wichtig ist dir dabei …",
+    "intro": "Kurze Situationen, in denen zwei nachvollziehbare Anliegen zusammenstoßen. Du sagst zu beiden getrennt, wie wichtig sie dir sind — beide dürfen sehr wichtig sein.",
+    "note": "Es gibt keine richtige Wahl und keine Auswertung deiner Werte. Der Zweck ist, zu wissen, worüber ihr reden solltet.",
+    "concerns": "Wie wichtig ist dir jedes dieser beiden Anliegen?",
     "pathQuestion": "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?",
     "limits": "Deine Grenzen"
   },
   "missing": {
     "heading": "Oder:",
-    "cannot_assess": "Kann ich noch nicht einschätzen",
-    "not_relevant": "Für mein Vorhaben nicht relevant",
-    "withheld": "Möchte ich nicht angeben",
-    "undecided": "Noch offen",
-    "confidential_first": "Möchte ich zunächst vertraulich klären",
-    "hint": "Das ist eine vollwertige Antwort und kein Überspringen."
+    "hint": "Das zählt als Antwort. Es ist kein Überspringen."
   },
   "fields": {
     "otherText": "Bitte benennen",

@@ -64,10 +64,12 @@ test("die Bedingungen gehören zur Messung, nicht zur Oberfläche", () => {
   // Ohne diesen Satz misst U etwas anderes - nämlich Autonomie ohne Mandat.
   assert.match(byId.get("U")!.condition ?? "", /Verantwortungsbereich und Budget sind vereinbart/);
   // Ohne diesen misst E Leichtsinn statt Erproben.
-  assert.match(byId.get("E")!.condition ?? "", /rückgängig zu machen/);
+  assert.match(byId.get("E")!.condition ?? "", /rückgängig machen lassen/);
   // T und D meinen sachliche Differenzen, keinen eskalierten Streit.
-  assert.match(byId.get("T")!.condition ?? "", /ohne akute Gefahr/);
-  assert.match(byId.get("D")!.condition ?? "", /ohne akute Gefahr/);
+  assert.match(byId.get("T")!.condition ?? "", /keine akute Gefahr/);
+  assert.match(byId.get("D")!.condition ?? "", /keine akute Gefahr/);
+  // Und im Wortlaut des Gutachtens steht dasselbe, nur anders formuliert.
+  assert.match(byId.get("T")!.sourceCondition ?? "", /ohne akute Gefahr/);
   // Und X meint offene Information, keine Existenzangst.
   assert.match(byId.get("X")!.condition ?? "", /nicht um akute Existenzbedrohung/);
 });
@@ -123,9 +125,13 @@ test("jeder Fragetext steht wörtlich so in der Quelle", () => {
     "utf8"
   );
 
+  // GEPRUEFT WIRD DER QUELLTEXT, NICHT DER ANGEZEIGTE. Seit dem 27.09.2026
+  // gibt es ueberarbeitete Fassungen (`rewordingsV2`). Die Registratur enthaelt
+  // weiterhin den Wortlaut des Gutachtens - genau deshalb kann dieser Test
+  // bleiben, wie er ist, und die Ueberarbeitung trotzdem sichtbar sein.
   const drifted = getAlignmentItems()
-    .filter((item) => !paper.includes(item.prompt))
-    .map((item) => `${item.itemId}: ${item.prompt}`);
+    .filter((item) => !paper.includes(item.sourcePrompt))
+    .map((item) => `${item.itemId}: ${item.sourcePrompt}`);
 
   assert.deepEqual(
     drifted,
@@ -137,7 +143,7 @@ test("jeder Fragetext steht wörtlich so in der Quelle", () => {
   // etwa weil die Quelle leer gelesen wurde oder `includes` auf einem
   // leeren Text immer wahr wäre. Eine absichtlich veränderte Frage darf
   // nicht durchgehen.
-  const first = getAlignmentItems()[0].prompt;
+  const first = getAlignmentItems()[0].sourcePrompt;
   assert.ok(paper.includes(first), "die Quelle wurde überhaupt gelesen");
   assert.ok(
     !paper.includes(first.replace("Wie häufig", "Wie oft")),
@@ -156,8 +162,8 @@ test("auch die Bedingungen und Definitionen stammen aus der Quelle", () => {
 
   const drifted: string[] = [];
   for (const preference of getAlignmentPreferences()) {
-    if (preference.condition && !paper.includes(preference.condition)) {
-      drifted.push(`${preference.id} (Bedingung): ${preference.condition}`);
+    if (preference.sourceCondition && !paper.includes(preference.sourceCondition)) {
+      drifted.push(`${preference.id} (Bedingung): ${preference.sourceCondition}`);
     }
   }
 

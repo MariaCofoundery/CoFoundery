@@ -1,4 +1,4 @@
-import { ALIGNMENT_REGISTRY_V2, getMvpAlignmentItems } from "@/features/instruments/v2/alignmentRegistryV2";
+import { ALIGNMENT_REGISTRY_V2, getAlignmentPreferences, getMvpAlignmentItems } from "@/features/instruments/v2/alignmentRegistryV2";
 import {
   CONTEXT_REGISTRY_V2,
   getMvpContextBlocks,
@@ -9,6 +9,7 @@ import {
 import { answerFormatOfBlock, type StoredAnswerFormat } from "@/features/instruments/v2/alignmentAnswersV2";
 import { requiredBlocks, type AlignmentModule } from "@/features/instruments/v2/alignmentProgress";
 import { offeredMissingCodes } from "@/features/instruments/v2/validateAlignmentAnswer";
+import type { MissingCode } from "@/features/instruments/v2/alignmentRegistryV2";
 
 /**
  * Was ein Fragebogen anzeigt - fertig zusammengestellt auf dem Server.
@@ -26,7 +27,16 @@ export type AlignmentBlockView = {
   /** Die Bedingung gehört zur Messung, nicht zur Verzierung - siehe unten. */
   condition: string | null;
   scaleLabels: string[];
-  offeredMissing: NonNullable<ReturnType<typeof offeredMissingCodes>>;
+  /**
+   * Kennung UND Beschriftung.
+   *
+   * DIE BESCHRIFTUNG KOMMT AUS DER REGISTRATUR, NICHT AUS DEM TEXTBESTAND.
+   * „Noch offen" und „möchte ich nicht angeben" sind Antwortmöglichkeiten und
+   * damit Teil der Messung - genauso wie die Fragen. Sie zweimal zu pflegen
+   * hiesse, dass sie auseinanderlaufen können; sie zu übersetzen hiesse,
+   * etwas anderes zu messen.
+   */
+  offeredMissing: { code: MissingCode["code"]; label: string }[];
   block?: ContextBlock;
   valueCase?: ValueCase;
 };
@@ -46,6 +56,17 @@ const GROUP_LABELS: Record<string, string> = {
   L: "Deine Grenzen",
 };
 
+
+/** Die Auslassungsgründe eines Blocks, mit ihrer Beschriftung aus der Quelle. */
+function missingFor(blockId: string): { code: MissingCode["code"]; label: string }[] {
+  const labels = new Map(ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => [entry.code, entry.label]));
+  return offeredMissingCodes(blockId)
+    // 'technical' ist ein Befund des Systems und hat deshalb gar keine
+    // Beschriftung - er wird niemandem angeboten.
+    .filter((code) => code !== "technical")
+    .map((code) => ({ code, label: labels.get(code) ?? code }));
+}
+
 export function buildAlignmentSections(
   module: AlignmentModule,
   step?: 1 | 2
@@ -54,7 +75,10 @@ export function buildAlignmentSections(
   const sections: AlignmentSectionView[] = [];
 
   if (module === "base") {
-    for (const preference of ALIGNMENT_REGISTRY_V2.preferences) {
+    // ueber den Leser, nicht ueber die rohe Registratur: sonst stuende hier
+    // der Originalwortlaut und in jeder anderen Ansicht die ueberarbeitete
+    // Fassung - dieselbe Frage, zweimal verschieden gestellt.
+    for (const preference of getAlignmentPreferences()) {
       const blocks = getMvpAlignmentItems()
         .filter((item) => wanted.has(item.itemId))
         .filter((item) => preference.items.some((entry) => entry.itemId === item.itemId))
@@ -67,7 +91,7 @@ export function buildAlignmentSections(
           // Hilfetext, den die Oberfläche weglassen darf.
           condition: preference.condition,
           scaleLabels: ALIGNMENT_REGISTRY_V2.answerFormats[item.answerFormat].labels,
-          offeredMissing: offeredMissingCodes(item.itemId),
+          offeredMissing: missingFor(item.itemId),
         }));
       if (blocks.length) sections.push({ key: preference.id, label: preference.label, blocks });
     }
@@ -82,7 +106,7 @@ export function buildAlignmentSections(
         answerFormat: block.answerFormat as StoredAnswerFormat,
         condition: null,
         scaleLabels: CONTEXT_REGISTRY_V2.importanceLabels,
-        offeredMissing: offeredMissingCodes(block.blockId),
+        offeredMissing: missingFor(block.blockId),
         block,
       }));
     if (blocks.length) sections.push({ key: group, label: GROUP_LABELS[group], blocks });
@@ -100,7 +124,7 @@ export function buildAlignmentSections(
         answerFormat: answerFormatOfBlock(card.caseId)!,
         condition: null,
         scaleLabels: CONTEXT_REGISTRY_V2.importanceLabels,
-        offeredMissing: offeredMissingCodes(card.caseId),
+        offeredMissing: missingFor(card.caseId),
         valueCase: card,
       }],
     });

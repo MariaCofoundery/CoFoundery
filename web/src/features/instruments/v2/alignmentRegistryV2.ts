@@ -1,4 +1,5 @@
 import registryJson from "../../../../docs/founder-alignment-registry-v2.json";
+import { reword } from "@/features/instruments/v2/rewordingsV2";
 
 /**
  * Das Modell v2 als Daten - Schritt 1.
@@ -70,7 +71,10 @@ export type AnswerFormat = {
 export type AlignmentItem = {
   itemId: string;
   order: number;
+  /** Was angezeigt wird - ggf. die ueberarbeitete Fassung. */
   prompt: string;
+  /** Der Wortlaut des Gutachtens. Gegen ihn wird geprueft. */
+  sourcePrompt: string;
   answerFormat: AnswerFormatId;
   reverse: false;
   /** Gehört zur kurzen Gesprächsfassung, nicht nur zum Forschungspool. */
@@ -88,6 +92,7 @@ export type AlignmentPreference = {
   answerFormat: AnswerFormatId;
   /** Teil der Messversion. Fehlt sie, misst die Präferenz etwas anderes. */
   condition: string | null;
+  sourceCondition: string | null;
   items: AlignmentItem[];
 };
 
@@ -161,8 +166,28 @@ export const ALIGNMENT_REGISTRY_V2 = assertAlignmentRegistryIntegrity(
   registryJson as unknown as AlignmentRegistryV2
 );
 
+/**
+ * DIE LESER LEGEN DIE UEBERARBEITETE FASSUNG SCHON AN.
+ *
+ * Absichtlich hier und nicht erst in der Oberflaeche: Sonst zeigte die naechste
+ * Ansicht, die jemand baut, wieder den Originaltext - und zwei Stellen im
+ * Produkt stellten dieselbe Frage verschieden.
+ */
 export function getAlignmentPreferences(): AlignmentPreference[] {
-  return [...ALIGNMENT_REGISTRY_V2.preferences].sort((a, b) => a.order - b.order);
+  return [...ALIGNMENT_REGISTRY_V2.preferences]
+    .sort((a, b) => a.order - b.order)
+    .map((preference) => ({
+      ...preference,
+      sourceCondition: preference.condition,
+      condition: preference.condition
+        ? reword(preference.id, "condition", preference.condition)
+        : null,
+      items: preference.items.map((item) => ({
+        ...item,
+        sourcePrompt: item.prompt,
+        prompt: reword(item.itemId, "prompt", item.prompt),
+      })),
+    }));
 }
 
 export function getAlignmentItems(): AlignmentItem[] {

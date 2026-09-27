@@ -144,7 +144,7 @@ export function AlignmentQuestionnaire({
                   blockId={entry.blockId}
                   answerFormat={entry.answerFormat}
                   scaleLabels={entry.scaleLabels}
-                  offeredMissing={entry.offeredMissing.filter((code) => code !== "technical")}
+                  offeredMissing={entry.offeredMissing}
                   block={entry.block}
                   valueCase={entry.valueCase}
                   draft={draft}

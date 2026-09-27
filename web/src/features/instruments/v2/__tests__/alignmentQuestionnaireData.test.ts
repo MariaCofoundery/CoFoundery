@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { ALIGNMENT_REGISTRY_V2 } from "@/features/instruments/v2/alignmentRegistryV2";
 import { buildAlignmentSections } from "@/features/instruments/v2/alignmentQuestionnaireData";
 import { requiredBlocks } from "@/features/instruments/v2/alignmentProgress";
 import { getAlignmentPreferences } from "@/features/instruments/v2/alignmentRegistryV2";
@@ -69,22 +70,38 @@ test("jeder Block bringt mit, was der Browser zum Anzeigen braucht", () => {
 
 test("der technische Ausfall wird niemandem angeboten", () => {
   // 'technical' ist ein Befund des Systems, keine Wahl eines Menschen. Er
-  // steht in der Registratur, damit ein Ausfall speicherbar ist - nicht,
-  // damit jemand ihn anklickt.
-  //
-  // ZWEI GETRENNTE AUSSAGEN, und die erste Fassung dieses Tests prüfte nur
-  // die erste: Heute bietet ihn keine Frage an, deshalb wäre jede Prüfung
-  // der Oberfläche grün, auch eine, die nichts filtert. Also wird beides
-  // geprüft - der Bestand UND das Netz darunter.
+  // steht in der Registratur, damit ein Ausfall speicherbar ist - und hat
+  // dort als einziger Code gar keine Beschriftung.
   for (const [module, step] of [["base", 1], ["base", 2], ["values", undefined]] as const) {
     for (const section of buildAlignmentSections(module, step)) {
       for (const block of section.blocks) {
-        assert.ok(!block.offeredMissing.includes("technical"), block.blockId);
+        assert.ok(!block.offeredMissing.some((entry) => entry.code === "technical"), block.blockId);
       }
     }
   }
+});
 
-  // Und falls ihn doch einmal eine Frage führt: die Schale zeigt ihn nicht.
-  const shell = readFileSync("src/features/instruments/v2/AlignmentQuestionnaire.tsx", "utf8");
-  assert.match(shell, /filter\(\(code\) => code !== "technical"\)/);
+test("die Beschriftungen kommen aus der Registratur, nicht aus dem Textbestand", () => {
+  // SIE SIND TEIL DER MESSUNG WIE DIE FRAGEN. Bis zum 27.09.2026 standen sie
+  // zusaetzlich im Textbestand - identisch, aber doppelt gepflegt und damit
+  // eine Stelle, an der zwei Fassungen auseinanderlaufen können. Und
+  // uebersetzen darf man sie so wenig wie eine Frage.
+  const labels = new Map(ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => [entry.code, entry.label]));
+  let seen = 0;
+  for (const section of buildAlignmentSections("base", 1)) {
+    for (const block of section.blocks) {
+      for (const entry of block.offeredMissing) {
+        assert.equal(entry.label, labels.get(entry.code), entry.code);
+        seen += 1;
+      }
+    }
+  }
+  assert.ok(seen > 20, `zu wenige geprueft: ${seen}`);
+
+  for (const locale of ["de", "en"] as const) {
+    const bundle = JSON.parse(readFileSync(`messages/${locale}/alignment.json`, "utf8"));
+    for (const code of labels.keys()) {
+      assert.ok(!(code in bundle.missing), `${locale}: ${code} steht wieder im Textbestand`);
+    }
+  }
 });

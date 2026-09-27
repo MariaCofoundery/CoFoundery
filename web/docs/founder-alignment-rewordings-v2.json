@@ -1,0 +1,156 @@
+{
+  "instrumentId": "founder-alignment-v2",
+  "createdAt": "2026-09-27",
+  "decidedBy": "Maria",
+  "note": "NEUE FASSUNGEN VON FRAGETEXTEN - der Originalwortlaut bleibt in der Registratur stehen und wird weiterhin gegen das Gutachten geprueft. Diese Datei legt sich darueber. Wer sie loescht, bekommt wieder den Originaltext und keinen stillen Mischzustand.",
+  "why": "Das Gutachten nennt die Auswahl selbst 'redaktionell und noch nicht empirisch optimiert' und plant kognitive Interviews, deren Zweck genau Verstaendlichkeit ist. Wer eine Frage fuenfmal lesen muss, antwortet auf eine andere Frage als die gemeinte - das ist kein Stilproblem, sondern ein Messproblem. Keine dieser Aenderungen verschiebt den Inhalt; wo das der Fall waere, steht es in der Begruendung.",
+  "rewordings": [
+    {
+      "target": "A02",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du vor einer wichtigen Entscheidung eine zentrale Annahme anhand verfügbarer Daten prüfen?",
+      "text": "Wie häufig möchtest du vor einer wichtigen Entscheidung mit vorhandenen Daten prüfen, ob die wichtigste Annahme dahinter stimmt?",
+      "reason": "„Eine zentrale Annahme prüfen“ ist Fachsprache. Der Inhalt bleibt derselbe: Prüfung an Daten, nicht am Bauchgefühl."
+    },
+    {
+      "target": "I03",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du einem unguten Gefühl nachgehen, obwohl die verfügbaren Zahlen für eine Möglichkeit sprechen?",
+      "text": "Wie häufig möchtest du einem unguten Gefühl nachgehen, obwohl die vorliegenden Zahlen klar für eine bestimmte Möglichkeit sprechen?",
+      "reason": "„Für eine Möglichkeit“ liest sich als „für irgendeine“ und macht den Satz mehrdeutig. Gemeint ist: Die Zahlen zeigen in eine Richtung, dein Gefühl nicht."
+    },
+    {
+      "target": "E03",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du eine vorläufige Entscheidung treffen, wenn sich ihre Folgen günstig korrigieren lassen?",
+      "text": "Wie häufig möchtest du eine vorläufige Entscheidung treffen, wenn sich ihre Folgen später ohne großen Aufwand korrigieren lassen?",
+      "reason": "„Günstig korrigieren“ kann billig oder vorteilhaft heißen. Gemeint ist der Aufwand."
+    },
+    {
+      "target": "K02",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du von einer Richtungsänderung in einem anderen Bereich erfahren, bevor daraus ein fertiges Ergebnis entsteht?",
+      "text": "Wie häufig möchtest du von einer Richtungsänderung in einem anderen Bereich erfahren, solange sie noch in Arbeit ist?",
+      "reason": "Der Nebensatz war länger als nötig und beschrieb dasselbe von hinten."
+    },
+    {
+      "target": "T03",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du eine abweichende Einschätzung noch am selben Arbeitstag zur Sprache bringen?",
+      "text": "Wie häufig möchtest du eine abweichende Einschätzung noch am selben Arbeitstag ansprechen?",
+      "reason": "Zusammen mit T06 nachgezogen: Beide Fragen lasen sich fast gleich. T03 fragt nach dem Tag, T06 nach dem Augenblick - das muss man am Satz sehen."
+    },
+    {
+      "target": "T06",
+      "field": "prompt",
+      "source": "Wie häufig möchtest du eine abweichende Sicht sofort erwähnen, auch wenn ihr die Klärung erst später plant?",
+      "text": "Wie häufig möchtest du eine abweichende Sicht sofort benennen, auch wenn ihr erst später darüber sprecht?",
+      "reason": "Siehe T03. Zusätzlich war „die Klärung erst später plant“ umständlich für „später darüber sprecht“."
+    },
+    {
+      "target": "X01",
+      "field": "prompt",
+      "source": "Wie fühlst du dich, wenn mehrere plausible Erklärungen für dasselbe Ergebnis offenbleiben?",
+      "text": "Wie fühlst du dich, wenn es für dasselbe Ergebnis mehrere glaubwürdige Erklärungen gibt und offenbleibt, welche stimmt?",
+      "reason": "Der Originalsatz verlangt, „plausible Erklärungen offenbleiben“ in einem Zug zu verstehen. Aufgeteilt in zwei Schritte."
+    },
+    {
+      "target": "X06",
+      "field": "prompt",
+      "source": "Wie fühlst du dich, wenn mehrere mögliche Entwicklungen über Wochen offenbleiben?",
+      "text": "Wie fühlst du dich, wenn über Wochen offenbleibt, in welche Richtung sich etwas entwickelt?",
+      "reason": "„Mögliche Entwicklungen bleiben offen“ ist abstrakt. Gemeint ist die unklare Richtung."
+    },
+    {
+      "target": "E",
+      "field": "condition",
+      "source": "Die Versuche sind zeitlich und finanziell begrenzt, rückgängig zu machen und ohne erhebliche Folgen für Dritte.",
+      "text": "Gemeint sind Versuche, die zeitlich und finanziell begrenzt sind, sich rückgängig machen lassen und keine erheblichen Folgen für Dritte haben.",
+      "reason": "Als Aufzählung ohne Einleitung war nicht erkennbar, dass der Satz die Frage eingrenzt."
+    },
+    {
+      "target": "T",
+      "field": "condition",
+      "source": "Gemeint sind sachliche Differenzen zwischen Foundern, ohne akute Gefahr und außerhalb eines bereits eskalierten Streits.",
+      "text": "Gemeint sind sachliche Meinungsverschiedenheiten zwischen Foundern - keine akute Gefahr und kein bereits eskalierter Streit.",
+      "reason": "„Differenzen“ und „außerhalb eines eskalierten Streits“ sind Amtssprache."
+    },
+    {
+      "target": "D",
+      "field": "condition",
+      "source": "Gemeint sind sachliche Differenzen zwischen Foundern, ohne akute Gefahr und außerhalb eines bereits eskalierten Streits.",
+      "text": "Gemeint sind sachliche Meinungsverschiedenheiten zwischen Foundern - keine akute Gefahr und kein bereits eskalierter Streit.",
+      "reason": "Wie bei T - dieselbe Bedingung, dieselbe Änderung."
+    },
+    {
+      "target": "S03",
+      "field": "prompt",
+      "source": "Welche Haltung hast du aktuell zu externem Eigenkapital?",
+      "text": "Welche Haltung hast du aktuell dazu, Geld von außen gegen Unternehmensanteile aufzunehmen?",
+      "reason": "„Externes Eigenkapital“ ist ein Fachbegriff, den nicht jede Gründerin am ersten Tag kennt."
+    },
+    {
+      "target": "R04",
+      "field": "prompt",
+      "source": "Ab wann brauchst du aus dem Vorhaben eine regelmäßige persönliche Auszahlung?",
+      "text": "Ab wann brauchst du aus dem Vorhaben regelmäßig Geld für dich selbst?",
+      "reason": "„Persönliche Auszahlung“ klingt nach Buchhaltung und meint schlicht: Geld zum Leben."
+    },
+    {
+      "target": "R06",
+      "field": "prompt",
+      "source": "Unter welchen Bedingungen würdest du vollständig auf das Vorhaben wechseln?",
+      "text": "Unter welchen Bedingungen würdest du ausschließlich für dieses Vorhaben arbeiten?",
+      "reason": "„Vollständig wechseln“ lässt offen, von wo wohin. Gemeint ist: nichts anderes mehr daneben."
+    },
+    {
+      "target": "R12",
+      "field": "prompt",
+      "source": "Bis wann möchtest du die hier gemachten Zusagen erneut prüfen?",
+      "text": "Bis wann möchtest du diese Angaben noch einmal überprüfen?",
+      "reason": "„Die hier gemachten Zusagen“ ist Behördendeutsch."
+    },
+    {
+      "target": "B01",
+      "field": "prompt",
+      "source": "Welchen zusätzlichen privaten Geldbetrag könntest und möchtest du für das Vorhaben maximal verlieren?",
+      "text": "Wie viel eigenes Geld könntest und möchtest du für das Vorhaben höchstens verlieren?",
+      "reason": "Nur sprachlich gekürzt. „Könntest und möchtest“ bleibt bewusst stehen: Das Gutachten kombiniert Können und Wollen absichtlich zu einer Obergrenze. Die Frage zu teilen wäre eine inhaltliche Änderung und keine sprachliche."
+    },
+    {
+      "target": "B05",
+      "field": "prompt",
+      "source": "Welche Absicherung brauchst du, bevor ein größeres Vorhaben beginnt?",
+      "text": "Welche Absicherung brauchst du, bevor ihr etwas Größeres angeht?",
+      "reason": "„Vorhaben“ bezeichnet im ganzen Fragebogen das Unternehmen selbst. Hier war ein einzelnes Projekt gemeint - dieselbe Vokabel für zwei Dinge."
+    },
+    {
+      "target": "G01",
+      "field": "prompt",
+      "source": "Wer soll bei einer wichtigen Entscheidung in einem klar zugeordneten Bereich das letzte Wort haben?",
+      "text": "Wer soll das letzte Wort haben, wenn eine wichtige Entscheidung klar in den Bereich einer Person fällt?",
+      "reason": "Drei Einschübe vor dem Hauptgedanken. Umgestellt, Inhalt gleich."
+    },
+    {
+      "target": "G02",
+      "field": "prompt",
+      "source": "Wie möchtest du nach einer notwendigen Pause in einem angespannten Gespräch weiter vorgehen?",
+      "text": "Wie möchtest du weitermachen, wenn ihr ein angespanntes Gespräch unterbrochen habt?",
+      "reason": "„Nach einer notwendigen Pause in einem angespannten Gespräch“ ist beim ersten Lesen nicht zu greifen."
+    },
+    {
+      "target": "L03",
+      "field": "prompt",
+      "source": "Was soll passieren, wenn ihr uneinig seid, ob diese Grenze betroffen ist?",
+      "text": "Was soll passieren, wenn ihr euch nicht einig seid, ob diese Grenze überschritten wurde?",
+      "reason": "„Betroffen“ lässt offen, was gemeint ist. Gemeint ist: überschritten."
+    },
+    {
+      "target": "W02",
+      "field": "situation",
+      "source": "Eine langjährige Person erfüllt neue Anforderungen ihrer Rolle noch nicht. Für genau eine Übergangsmaßnahme ist Budget vorhanden.",
+      "text": "Eine Person, die lange dabei ist, erfüllt die neuen Anforderungen ihrer Rolle noch nicht. Für genau eine Übergangsmaßnahme ist Budget vorhanden.",
+      "reason": "„Eine langjährige Person“ meint eine langjährige Zugehörigkeit, liest sich aber wie eine Eigenschaft des Menschen."
+    }
+  ]
+}

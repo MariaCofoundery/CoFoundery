@@ -34,7 +34,7 @@ type Props = {
    * kennen.
    */
   scaleLabels: string[];
-  offeredMissing: NonNullable<AlignmentAnswer["missingCode"]>[];
+  offeredMissing: { code: NonNullable<AlignmentAnswer["missingCode"]>; label: string }[];
   block?: ContextBlock;
   valueCase?: ValueCase;
   draft: Draft;
@@ -414,7 +414,7 @@ function Range({
 function MissingChoices({
   offered, chosen, disabled, onPick,
 }: {
-  offered: NonNullable<AlignmentAnswer["missingCode"]>[];
+  offered: { code: NonNullable<AlignmentAnswer["missingCode"]>; label: string }[];
   chosen: AlignmentAnswer["missingCode"];
   disabled?: boolean;
   onPick: (code: AlignmentAnswer["missingCode"] | null) => void;
@@ -428,21 +428,21 @@ function MissingChoices({
         {t("missing.heading")}
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
-        {offered.map((code) => (
+        {offered.map((entry) => (
           <button
-            key={code}
+            key={entry.code}
             type="button"
             disabled={disabled}
-            aria-pressed={chosen === code}
-            onClick={() => onPick(chosen === code ? null : code)}
+            aria-pressed={chosen === entry.code}
+            onClick={() => onPick(chosen === entry.code ? null : entry.code)}
             className={[
               "rounded-full border px-3 py-1.5 text-sm transition",
-              chosen === code
+              chosen === entry.code
                 ? "border-slate-900 bg-slate-900 text-white"
                 : "border-slate-300 bg-white text-slate-700 hover:border-slate-500",
             ].join(" ")}
           >
-            {t(`missing.${code}`)}
+            {entry.label}
           </button>
         ))}
       </div>

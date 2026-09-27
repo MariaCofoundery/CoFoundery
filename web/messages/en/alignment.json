@@ -1,7 +1,7 @@
 {
   "shell": {
     "backToDashboard": "Back to dashboard",
-    "draftNotice": "This questionnaire is a work in progress and is not evaluated yet.",
+    "draftNotice": "Test version. This questionnaire is not evaluated yet.",
     "progress": "{answered} of {total} answered",
     "save": "Save answer",
     "saving": "Saving …",
@@ -9,38 +9,33 @@
     "clear": "Withdraw answer",
     "submit": "Submit questionnaire",
     "submitting": "Submitting …",
-    "incomplete": "{count} entries are still missing. Every question also offers an answer that says why you would rather not answer it.",
-    "submitted": "Submitted. Nothing changes from here on."
+    "incomplete": "You do not have to commit to anything: for every question you can also state that it is still open or that you would rather not answer it. {count} answers are still missing.",
+    "submitted": "Submitted. Nothing here can be changed from now on."
   },
   "base": {
     "title": "How you want to work",
     "step1": {
       "title": "Part one",
-      "intro": "These questions describe how you want to work, what you want to achieve and which rules you would like. They are not about who you are, but about what you intend.",
-      "note": "There are no better or worse answers here, and no score at the end."
+      "intro": "This is about how you want to work, what you want to achieve and which rules you would like — not about who you are.",
+      "note": "There are no better or worse answers and no score at the end. The questionnaire saves as you go; you can stop anytime and continue later."
     },
     "step2": {
       "title": "Part two: the commitments",
-      "intro": "Now it is about hours, money and dates. These are commitments, not self-description — which is why they come here and not during the first pass.",
-      "note": "What you enter here describes today's situation. It is not an obligation."
+      "intro": "Now it is about hours, money and dates. These are commitments, not self-description — which is why they come later.",
+      "note": "Everything here describes where you stand today. It is not an obligation, and you can change it later."
     }
   },
   "values": {
     "title": "Priorities and limits",
-    "intro": "Short situations in which two legitimate concerns collide. You rate both concerns separately — both may be very important.",
-    "note": "There is no right choice and no values score. The point is to know what you should talk about.",
-    "concerns": "How important is this to you …",
+    "intro": "Short situations in which two reasonable concerns collide. You say separately how important each one is to you — both may be very important.",
+    "note": "There is no right choice and no evaluation of your values. The point is to know what you should talk about.",
+    "concerns": "How important is each of these two concerns to you?",
     "pathQuestion": "Which way would you choose first under these conditions?",
     "limits": "Your limits"
   },
   "missing": {
     "heading": "Or:",
-    "cannot_assess": "I cannot judge this yet",
-    "not_relevant": "Not relevant for my venture",
-    "withheld": "I would rather not say",
-    "undecided": "Still open",
-    "confidential_first": "I would like to discuss this privately first",
-    "hint": "This is a full answer, not a skip."
+    "hint": "This counts as an answer. It is not a skip."
   },
   "fields": {
     "otherText": "Please describe",

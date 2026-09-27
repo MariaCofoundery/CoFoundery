@@ -1,5 +1,6 @@
 import registryJson from "../../../../docs/founder-alignment-context-v2.json";
 import { ALIGNMENT_REGISTRY_V2, type MissingCode } from "@/features/instruments/v2/alignmentRegistryV2";
+import { reword } from "@/features/instruments/v2/rewordingsV2";
 
 /**
  * Ziele, Ressourcen, Grenzen, Regeln und die Wertefälle - Schritt 1b.
@@ -57,7 +58,10 @@ export type ContextBlock = {
   blockId: string;
   group: ContextGroup;
   order: number;
+  /** Was angezeigt wird - ggf. die ueberarbeitete Fassung. */
   prompt: string;
+  /** Der Wortlaut des Gutachtens. Gegen ihn wird geprueft. */
+  sourcePrompt: string;
   answerFormat: ContextAnswerFormat;
   /** Originaleinheit, etwa „Stunden/Woche". Nie umgerechnet. */
   unit: string | null;
@@ -91,6 +95,7 @@ export type ValueCase = {
   order: number;
   title: string;
   situation: string;
+  sourceSituation: string;
   /** Beide werden GETRENNT bewertet. Beide dürfen sehr wichtig sein. */
   concerns: { key: "a" | "b"; label: string }[];
   paths: ValueCasePath[];
@@ -211,18 +216,30 @@ export const CONTEXT_REGISTRY_V2 = assertContextRegistryIntegrity(
 );
 
 export function getContextBlocks(group?: ContextGroup): ContextBlock[] {
-  const blocks = [...CONTEXT_REGISTRY_V2.blocks].sort((a, b) =>
-    a.group === b.group ? a.order - b.order : a.group.localeCompare(b.group)
-  );
+  const blocks = [...CONTEXT_REGISTRY_V2.blocks]
+    .sort((a, b) => (a.group === b.group ? a.order - b.order : a.group.localeCompare(b.group)))
+    // Die ueberarbeitete Fassung wird hier angelegt, nicht in der Oberflaeche -
+    // sonst zeigte die naechste Ansicht wieder den Originaltext.
+    .map((block) => ({
+      ...block,
+      sourcePrompt: block.prompt,
+      prompt: reword(block.blockId, "prompt", block.prompt),
+    }));
   return group ? blocks.filter((block) => block.group === group) : blocks;
 }
 
 export function getValueCases(): ValueCase[] {
-  return [...CONTEXT_REGISTRY_V2.valueCases].sort((a, b) => a.order - b.order);
+  return [...CONTEXT_REGISTRY_V2.valueCases]
+    .sort((a, b) => a.order - b.order)
+    .map((value) => ({
+      ...value,
+      sourceSituation: value.situation,
+      situation: reword(value.caseId, "situation", value.situation),
+    }));
 }
 
 export function getContextBlock(blockId: string): ContextBlock | null {
-  return CONTEXT_REGISTRY_V2.blocks.find((block) => block.blockId === blockId) ?? null;
+  return getContextBlocks().find((block) => block.blockId === blockId) ?? null;
 }
 
 /**

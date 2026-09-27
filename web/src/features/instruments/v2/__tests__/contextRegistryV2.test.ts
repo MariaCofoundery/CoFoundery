@@ -43,10 +43,10 @@ test("jeder Fragetext steht wörtlich so in der Quelle", () => {
 
   const drifted: string[] = [];
   for (const block of getContextBlocks()) {
-    if (!paper.includes(block.prompt)) drifted.push(`${block.blockId}: ${block.prompt}`);
+    if (!paper.includes(block.sourcePrompt)) drifted.push(`${block.blockId}: ${block.sourcePrompt}`);
   }
   for (const value of getValueCases()) {
-    if (!paper.includes(value.situation)) drifted.push(`${value.caseId} (Situation)`);
+    if (!paper.includes(value.sourceSituation)) drifted.push(`${value.caseId} (Situation)`);
     for (const path of value.paths) {
       if (!paper.includes(path.label)) drifted.push(`${value.caseId} ${path.key}: ${path.label}`);
     }
@@ -57,7 +57,7 @@ test("jeder Fragetext steht wörtlich so in der Quelle", () => {
   assert.deepEqual(drifted, [], "Nicht mehr wörtlich in der Quelle:\n" + drifted.join("\n"));
 
   // GEGENPROBE, damit ein leer gelesenes Dokument nicht alles bejaht.
-  const first = getContextBlocks()[0].prompt;
+  const first = getContextBlocks()[0].sourcePrompt;
   assert.ok(paper.includes(first));
   assert.ok(!paper.includes(first.replace("Welche", "Welches")), "der Abgleich unterscheidet");
 });
