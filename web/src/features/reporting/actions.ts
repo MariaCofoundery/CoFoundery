@@ -24,6 +24,7 @@ import {
   toSelfBaseCoverage,
   toSelfParticipantDebugReport,
 } from "@/features/reporting/selfReportScoring";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 import { resolveSelfReportLocale } from "@/features/reporting/selfReportLocale";
 import {
@@ -1927,6 +1928,9 @@ export async function getLatestSelfAlignmentReport(
         basis_answered: founderAggregate.answeredQuestionCount,
         basis_total: basisTotal,
         base_assessment_id: baseAssessment.id,
+        // Aus welcher Fassung diese Zahlen stammen. Ohne sie stuenden
+        // v1- und v2-Werte irgendwann in derselben Spalte.
+        instrument_id: CURRENT_INSTRUMENT_ID,
       },
       { onConflict: "user_id" }
     )

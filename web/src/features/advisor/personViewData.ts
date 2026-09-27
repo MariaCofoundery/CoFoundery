@@ -147,6 +147,13 @@ export type AdvisorPersonAlignment = {
   valuesTotal: number;
   basisAnswered: number;
   basisTotal: number;
+  /**
+   * Aus welcher Fassung des Fragebogens diese Zahlen stammen (Migration
+   * 20261053120000). Wer eine Zahl sieht, soll wissen koennen, aus welchem
+   * Modell sie kommt - sonst stuenden v1- und v2-Werte irgendwann unbemerkt
+   * nebeneinander.
+   */
+  instrumentId: string | null;
   updatedAt: string | null;
 };
 
@@ -172,6 +179,7 @@ export async function getAdvisorPersonAlignment(
     valuesTotal: Number(row.values_total ?? 0),
     basisAnswered: Number(row.basis_answered ?? 0),
     basisTotal: Number(row.basis_total ?? 0),
+    instrumentId: (row.instrument_id as string) ?? null,
     updatedAt: (row.updated_at as string) ?? null,
   };
 }

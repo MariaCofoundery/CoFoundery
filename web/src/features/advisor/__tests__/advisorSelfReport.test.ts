@@ -28,6 +28,7 @@ const alignment = (scores: Record<string, number | null>): AdvisorPersonAlignmen
   valuesTotal: 0,
   basisAnswered: 36,
   basisTotal: 36,
+  instrumentId: "founder-compatibility-v1",
   updatedAt: "2026-09-20T10:00:00.000Z",
 });
 
