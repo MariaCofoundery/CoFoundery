@@ -1,0 +1,264 @@
+# Der Test in Version 2: Architektur und Schritte
+
+**Für: Maria, zum Entscheiden — noch nichts gebaut.** Stand 27.09.2026, auf Grundlage
+der „Wissenschaftlichen Neukonzeption v0.2" und einer Bestandsaufnahme des Codes.
+
+---
+
+## 1. Was ich vom Gutachten halte
+
+Es ist gut, und es ist ehrlich. Vor allem, weil es seinen eigenen Status
+ausweist: „keine empirische Validierung", „keine Ergebnisse tatsächlicher
+Expertengremien", „eigene Hypothese". Ein Papier, das sich selbst nicht
+überverkauft, ist eine brauchbare Grundlage.
+
+Zwei Befunde darin habe ich im Code überprüft, und beide stimmen:
+
+**Die Richtungsfehler sind real.** Das Gutachten nennt sechs
+Zustimmungsitems mit widersprüchlicher Codierung. Der Export, aus dem es
+liest, ist `web/docs/founder-compatibility-item-registry-v1.json` — dieselbe
+Datei, aus der das Produkt tatsächlich rechnet. Die Beispiele lassen sich dort
+nachvollziehen.
+
+**Die 0/25/50/75/100 sind wirklich nur umbenannte 1–5.** Sie stehen so in der
+Registry. Das Gutachten hat recht: Das fügt keine Information hinzu.
+
+Wo ich widerspreche oder ergänze, steht in Abschnitt 5.
+
+---
+
+## 2. Der eine Befund, an dem alles hängt
+
+**Es gibt keine Versionsspalte. Nirgends.**
+
+Weder `assessments` noch `questions` noch `choices` wissen, zu welcher Fassung
+des Instruments sie gehören. Die Registry führt zwar `registryVersion`,
+`modelVersion` und je Item ein `version`-Feld — aber nichts davon erreicht je
+die Datenbank.
+
+Das ist genau das, was du dir vorstellst, heute unmöglich macht:
+
+- „Es gibt eine neue Version, du kannst deine alte behalten" — dafür muss eine
+  Antwort wissen, zu welcher Version sie gehört.
+- „Das Alte landet im Archiv" — dafür muss es unterscheidbar sein.
+- Und jede Auswertung muss wissen, nach welchem Modell sie rechnen darf.
+
+Ohne diese Spalte wäre ein Wechsel keine neue Version, sondern eine stille
+Umdeutung aller bisherigen Antworten. Deshalb ist Versionierung nicht ein
+Schritt von vielen, sondern **Schritt null**.
+
+Nebenbefund aus derselben Ecke: Die Fragentabelle benutzt Kennungen wie
+`D1_Q1`, die Registry im Code spricht von `q01_vision_l1`. Zwei
+Kennungsschemata nebeneinander — mir gestern beim Testprofil aufgefallen. Beim
+Umbau muss genau eines übrig bleiben.
+
+---
+
+## 3. Was am Test hängt
+
+Ich habe nachgesehen, nicht geschätzt.
+
+| | |
+|---|---|
+| Dateien, die an den sechs Dimensionen hängen | **47** |
+| davon außerhalb von `reporting`/`scoring` | 9 (Matching-Report, Discovery, Advisor-Ansicht, Zeitleiste) |
+| Zeilen im Bereich `features/reporting` | **~27.500** |
+| Textbausteine (hero/pattern/challenge/complement) | ~1.500 Zeilen, alle an den sechs Achsen und ihren Polen |
+| Vergleichsreport `generateCompareReport.ts` | 1.327 Zeilen |
+
+Die sechs Dimensionen sind **kein Datenwert, sondern ein Typ**: eine
+TypeScript-Union aus sechs deutschen Beschriftungen
+(`CANONICAL_FOUNDER_DIMENSION_KEYS`). Wer sie ändert, ändert nicht Inhalte,
+sondern die Form, auf die 47 Dateien zugreifen.
+
+**Und es gibt eine Gesamt-Passungszahl.** `overallScore` →
+`overallMatchScore` → `overallFit`, verwendet im Vergleichsreport unter
+anderem für Schwellen bei 85 und 60. Das Gutachten verlangt ausdrücklich
+„**ohne Gesamt-Matchscore**". Das ist die größte Einzelentscheidung in dem
+Papier: Sie nimmt etwas weg, das heute da ist und an dem der Match-Report
+hängt. Sie steht in Abschnitt 5 als eigene Frage.
+
+---
+
+## 4. Die Architektur
+
+### Grundsatz: zwei Instrumente nebeneinander, nicht eines nacheinander
+
+Nichts wird ersetzt, solange nicht alles fertig ist. v1 bleibt vollständig
+lauffähig und rechenbar, bis du den Schalter umlegst — und auch danach, für
+alle, die ihre alte Fassung behalten.
+
+```
+                 ┌──────────────────────────────────┐
+                 │  instruments (neu)               │
+                 │  v1 = "founder-compatibility-v1" │
+                 │  v2 = "founder-alignment-v2"     │
+                 └──────────────────────────────────┘
+                        │                    │
+        ┌───────────────┴──────┐      ┌──────┴────────────────┐
+        │ questions/choices v1 │      │ items v2              │
+        │ (unverändert)        │      │ (neue Tabellen)       │
+        └──────────────────────┘      └───────────────────────┘
+                        │                    │
+        ┌───────────────┴────────────────────┴──────────────┐
+        │ assessments.instrument_id  ← DIE NEUE SPALTE      │
+        └───────────────────────────────────────────────────┘
+                        │                    │
+        ┌───────────────┴──────┐      ┌──────┴────────────────┐
+        │ Auswertung v1        │      │ Auswertung v2         │
+        │ (6 Achsen, Score)    │      │ (Präferenzen, Dossier)│
+        └──────────────────────┘      └───────────────────────┘
+```
+
+### Vier Bausteine
+
+**1. `instruments` — eine Zeile je Fassung.** Kennung, Anzeigename, Status
+(`draft` / `active` / `archived`), Einführungsdatum. Das Archiv ist damit kein
+eigener Ort, sondern ein Status.
+
+**2. `assessments.instrument_id` — die tragende Spalte.** Alle bestehenden
+Zeilen bekommen `founder-compatibility-v1`. Danach ist jede Antwort
+zuordenbar, und jede Auswertung kann prüfen, ob sie zuständig ist.
+
+**3. Getrennte Auswertungswege.** Kein `if (version === 2)` quer durch 47
+Dateien. Stattdessen: `scoring/v1/` bleibt, wie es ist; `scoring/v2/` entsteht
+daneben. Eine schmale Weiche entscheidet anhand von `instrument_id`, welcher
+Weg läuft. Wo v2 etwas nicht hergibt — etwa eine Gesamtzahl —, liefert der Weg
+schlicht nichts, statt eine Null zu erfinden.
+
+**4. Die Einladung zur neuen Fassung.** Wer v1 abgeschlossen hat, sieht einen
+Hinweis: *„Es gibt eine neue Fassung des Fragebogens. Deine bisherige bleibt
+erhalten."* Zwei Knöpfe: behalten oder neu machen. Wer neu macht, behält die
+alte Auswertung im Archiv — das ist kein Papierkorb, sondern eine zweite
+Momentaufnahme mit Datum.
+
+### Was das für die Freigaben heißt
+
+Der Advisor-Bereich, der Einzelreport und die gemeinsame Auswertung hängen an
+den Werten. Regeln:
+
+- Ein **Abbild** (`person_alignment_snapshots`) merkt sich künftig, aus welchem
+  Instrument es stammt. Sonst stünden v1- und v2-Zahlen unbemerkt
+  nebeneinander.
+- Im **Nebeneinander** zweier Menschen werden Fassungen **nicht gemischt**.
+  Unterschiedliche Fassungen heißt: Es steht dabei, und es wird nicht
+  verglichen. Das ist keine Strenge, sondern der einzige ehrliche Umgang —
+  zwei verschiedene Instrumente ergeben keine vergleichbaren Punkte.
+- Ein **Vergleich** entsteht erst, wenn beide dieselbe Fassung ausgefüllt
+  haben. Solange nicht, steht dort die Einladung, die neue zu machen.
+
+---
+
+## 5. Was du entscheiden musst, bevor ich baue
+
+Fünf Fragen. Ohne sie baue ich in eine Richtung, die du vielleicht nicht
+willst.
+
+### 5.1 Die Gesamt-Passungszahl — weg oder bleiben?
+
+Das Gutachten verlangt ihre Abschaffung. Ich halte das für richtig und würde
+weiter gehen: Auch ohne Gutachten ist eine Prozentzahl über die Passung zweier
+Menschen aus einem unvalidierten Instrument die gefährlichste Zahl im ganzen
+Produkt — sie wird zum Auswahlkriterium, sobald ein Accelerator sie sieht.
+
+Aber sie ist heute da, und der Match-Report ist um sie herum gebaut. Das ist
+deine Entscheidung, nicht meine.
+
+### 5.2 Acht Präferenzen oder weniger?
+
+Das Gutachten schlägt acht enge Kandidaten vor (A, I, E, U, K, T, D, X) und
+sagt selbst, es seien „keine acht bestätigten Faktoren". Es rechnet damit, dass
+die kognitiven Interviews das Modell verändern.
+
+Wenn wir jetzt acht Dimensionen fest in Typen und Texte bauen, bauen wir
+womöglich zweimal. Mein Vorschlag: Die **Datenhaltung** verkraftet beliebig
+viele Präferenzen (Liste statt fester Union), die **Texte** entstehen erst für
+die, die nach dem Pretest übrig bleiben.
+
+### 5.3 Wie weit soll das MVP gehen?
+
+Das Gutachten unterscheidet Forschungspool (107 Blöcke) und MVP (36 Blöcke).
+Für das Produkt ist nur das MVP relevant. Soll ich auf die dort genannte
+konkrete Auswahl bauen — A01/A02, I01/I03, E01/E03, U01/U04, K01/K02,
+T03/T06, D01/D04, X01/X06 plus Ziele, Ressourcen, Grenzen, Regeln, sechs
+Wertefälle?
+
+### 5.4 Die Texte — woher kommt die Qualität?
+
+Du sagst, die Texte sind momentan nicht gut. Das Gutachten liefert dafür eine
+Struktur, die ich für den eigentlichen Gewinn halte:
+
+> **beobachtete Antwort → mögliche Bedeutung → konkrete Klärungsfrage →
+> überprüfbare Vereinbarung**
+
+Das ist etwas anderes als heute. Heute erzeugen die Bausteine Aussagen *über
+Menschen* („du bist eher analytisch"). Die neue Struktur erzeugt Aussagen
+*über ein Gespräch* („ihr habt hier unterschiedlich geantwortet — klärt
+das"). Daraus folgt: Die Textbausteine werden nicht überarbeitet, sie werden
+durch eine andere Art von Baustein ersetzt.
+
+Frage an dich: Sollen die Texte weiterhin fest im Code stehen — oder in eine
+pflegbare Form, die du selbst ändern kannst, ohne dass ich etwas baue?
+
+### 5.5 Was passiert mit den Werten?
+
+Das Gutachten verwirft die zehn Wertefragen als „moralisch gestufte
+Karikaturen" und ersetzt sie durch zehn Fälle mit zwei getrennten
+Wichtigkeitsbewertungen plus einer Wahl. Das ist mehr Aufwand beim Ausfüllen
+und deutlich weniger Behauptung. Mitmachen?
+
+---
+
+## 6. Die Schritte
+
+Jeder Schritt ist für sich lauffähig und geprüft. Nichts davon geht live,
+bevor der letzte fertig ist.
+
+| # | Schritt | Enthält | Risiko |
+|---|---|---|---|
+| **0** | **Versionierung** | `instruments`-Tabelle, `assessments.instrument_id`, Rückfüllung auf v1, Weiche in der Auswertung. Verhalten ändert sich **nicht**. | Gering. Reine Vorbereitung, sofort nach Fertigstellung pushbar. |
+| **1** | Modell v2 als Daten | Neue Registry-Datei, Items, Antwortformate, Kennungsschema vereinheitlicht. Noch keine Oberfläche. | Gering |
+| **2** | Fragebogen v2 | Ausfüllen, Speichern, Instruktion, Kontextfragen, Missing-Codes getrennt. | Mittel — neue UX |
+| **3** | Auswertung v2 | Präferenzen als geordnete Kategorien, Dossier ohne Mittelwert, **kein** Gesamtwert. | Mittel |
+| **4** | Texte v2 | Neue Bausteinart nach dem Vierschritt. Der größte inhaltliche Brocken. | Hoch — Qualität ist hier die Arbeit |
+| **5** | Einzelreport + Abbild | Neue Darstellung, Abbild mit Instrumentkennung. | Mittel |
+| **6** | Vergleich und Match | Nebeneinander statt Score. Versionen werden nicht gemischt. | Hoch — hier hängt der Align-Bereich |
+| **7** | Advisor und Gruppe | Einzelreport und gemeinsame Auswertung auf v2 umstellen. | Mittel |
+| **8** | Umstieg und Archiv | Hinweis an alle mit v1, behalten oder neu, Archivansicht. | Mittel |
+| **9** | Ein Release | Alles zusammen: `db push`, dann `git push`. | Der eigentliche Moment |
+
+**Schritt 0 ist die Ausnahme.** Er ändert nichts am Verhalten und macht alles
+Weitere erst möglich. Den würde ich sofort nach Fertigstellung pushen, damit
+er nicht monatelang ungemergt danebenliegt.
+
+Alles ab Schritt 1 sammelt sich auf einem langen Zweig und geht gemeinsam
+live.
+
+---
+
+## 7. Was dabei nicht passieren darf
+
+- **Keine stille Umdeutung.** Eine v1-Antwort darf nie nach v2-Regeln
+  ausgewertet werden, auch nicht „näherungsweise".
+- **Kein Datenverlust.** Alte Antworten, alte Reports, alte Abbilder bleiben
+  lesbar. Wer nichts tut, verliert nichts.
+- **Keine gemischten Vergleiche.** Zwei Menschen mit verschiedenen Fassungen
+  werden nicht verglichen — es steht dabei, warum.
+- **Kein Zwang.** Niemand muss den neuen Test machen. Das alte Ergebnis bleibt
+  gültig, solange die Person es behalten will.
+- **Keine Zahl, die das Instrument nicht hergibt.** Das ist der Kern des
+  Gutachtens und deckt sich mit dem, was in diesem Produkt schon gilt.
+
+---
+
+## 8. Was ich als Nächstes bräuchte
+
+Antworten auf die fünf Fragen in Abschnitt 5 — vor allem auf 5.1 (die
+Gesamtzahl) und 5.4 (wo die Texte leben sollen). Danach fange ich mit
+Schritt 0 an, weil der unabhängig von allen inhaltlichen Entscheidungen
+richtig ist.
+
+Und eine Warnung zur Größe: Das sind zehn Schritte über 47 Dateien und rund
+27.500 Zeilen im Berichtsbereich. Das ist kein Nachmittag. Es ist aber gut
+teilbar, und nach Schritt 0 kann jederzeit pausiert werden, ohne dass etwas
+halb fertig herumliegt.

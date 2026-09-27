@@ -306,6 +306,12 @@ export default async function FounderProfilePage() {
                 familyCount: (entered, total) => t("coverage.familyCount", { entered, total }),
                 familyUnspoken: t("coverage.familyUnspoken"),
                 basis: t("coverage.basis"),
+                rolesTitle: t("coverage.rolesTitle"),
+                rolesIntro: t("coverage.rolesIntro"),
+                rolesNone: t("coverage.rolesNone"),
+                rolesOpen: (count) => t("coverage.rolesOpen", { count }),
+                rolesCaveat: t("coverage.rolesCaveat"),
+                areaLabel,
               }}
             />
 

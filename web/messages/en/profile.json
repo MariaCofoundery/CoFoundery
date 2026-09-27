@@ -210,7 +210,12 @@
       },
       "familyCount": "{entered} of {total} areas",
       "familyUnspoken": "not discussed yet",
-      "basis": "This map counts your own entries. It says what the interview covered — not what you are capable of."
+      "basis": "This map counts your own entries. It says what the interview covered — not what you are capable of.",
+      "rolesTitle": "Which roles you cover",
+      "rolesIntro": "Areas that cannot be bought in — and that you want to own. After Günter Faltin's component model: whatever exists as a finished service needs nobody on the team. What is listed here does.",
+      "rolesNone": "None so far. Either the areas you discussed are buyable, or you have not yet said whether you want to own them.",
+      "rolesOpen": "{count, plural, =1 {One more area belongs on the team, but you do not want to own it} other {# more areas belong on the team, but you do not want to own them}} — that is not a gap in you, it is an open question in the venture.",
+      "rolesCaveat": "This does not say how good you are at it. It says you want to take it on, and that it cannot be bought in."
     }
   }
 }

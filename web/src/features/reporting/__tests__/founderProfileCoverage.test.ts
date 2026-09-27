@@ -141,3 +141,77 @@ test("die Zustände decken jeden Bereich genau einmal ab", () => {
     assert.equal(summed, family.areas.length, `${family.familyId}: Zählwerte gehen auf`);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Welche Rollen jemand abdeckt
+// ---------------------------------------------------------------------------
+//
+// GEWÜNSCHT AM 27.09.2026: "Ich hätte das gerne auch im Gesamtbild, dass
+// drinsteht, welche Rollen ich im Prinzip schon abdecke [...] und vor allem
+// wird es cool, wenn man dann schaut: ich matche mit zwei weiteren, welche
+// Sachen sind in dem Startup dann schon vorhanden."
+
+const withSourcing: CapabilityArea[] = [
+  { area_id: "customer_discovery", family_id: "customer_market", sort_order: 1, sourcing: "internal_only" },
+  { area_id: "user_research", family_id: "customer_market", sort_order: 2, sourcing: "depends" },
+  { area_id: "market_analysis", family_id: "customer_market", sort_order: 3, sourcing: "component" },
+  { area_id: "prototyping", family_id: "product", sort_order: 4, sourcing: "internal_only" },
+];
+
+test("eine Rolle deckt ab, wer sie verantworten will UND sie nicht einkaufen kann", () => {
+  const coverage = buildFounderProfileCoverage(
+    [
+      entry("customer_discovery", 4, "own"),
+      // Gehört ins Team, aber jemand anders soll es machen - keine Deckung.
+      entry("prototyping", 5, "prefer_other"),
+      // Will sie verantworten, aber es ist einkaufbar - keine Rolle im Team.
+      entry("market_analysis", 4, "own"),
+    ],
+    withSourcing,
+    families
+  );
+
+  assert.deepEqual(coverage.roles.covered, ["customer_discovery"]);
+  // BEIDE BEDINGUNGEN MÜSSEN ZUSAMMENKOMMEN. Etwas zu können ist nicht
+  // dasselbe wie es zu übernehmen, und was einkaufbar ist, braucht niemanden
+  // im Team.
+  assert.deepEqual(coverage.roles.spokenNotOwned, ["prototyping"]);
+});
+
+test("hineinwachsen ist noch keine abgedeckte Rolle", () => {
+  const coverage = buildFounderProfileCoverage(
+    [entry("customer_discovery", 2, "grow_into")],
+    withSourcing,
+    families
+  );
+  // "Da will ich hineinwachsen" ist eine Absicht. Sie als Deckung zu zählen
+  // hieße, einem Team eine Rolle zuzusagen, die noch niemand ausfüllt.
+  assert.deepEqual(coverage.roles.covered, []);
+  assert.deepEqual(coverage.roles.spokenNotOwned, ["customer_discovery"]);
+});
+
+test("die Rollendeckung ist eine Liste, keine Note", () => {
+  const coverage = buildFounderProfileCoverage(
+    [entry("customer_discovery", 5, "own"), entry("prototyping", 1, "own")],
+    withSourcing,
+    families
+  );
+
+  // Die Anwendungsstufe wird NICHT verrechnet: Eine 1 und eine 5 stehen
+  // gleichberechtigt da. Eine gewichtete "Rollendeckung" wäre wieder eine
+  // Bewertung von Menschen.
+  assert.deepEqual(coverage.roles.covered, ["customer_discovery", "prototyping"]);
+  assert.ok(!Object.keys(coverage.roles).some((key) => /score|level|weight/i.test(key)));
+});
+
+test("die Zählung je Herkunftsart geht auf", () => {
+  const coverage = buildFounderProfileCoverage(
+    [entry("customer_discovery", 4, "own"), entry("user_research", 3, null), entry("market_analysis", 2, "own")],
+    withSourcing,
+    families
+  );
+  assert.equal(coverage.roles.bySourcing.internal_only, 1);
+  assert.equal(coverage.roles.bySourcing.depends, 1);
+  assert.equal(coverage.roles.bySourcing.component, 1);
+  assert.equal(coverage.roles.bySourcing.unclassified, 0);
+});

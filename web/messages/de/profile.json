@@ -210,7 +210,12 @@
       },
       "familyCount": "{entered} von {total} Bereichen",
       "familyUnspoken": "noch nicht besprochen",
-      "basis": "Die Karte zählt deine eigenen Einträge. Sie sagt, worüber im Interview gesprochen wurde — nicht, was du kannst."
+      "basis": "Die Karte zählt deine eigenen Einträge. Sie sagt, worüber im Interview gesprochen wurde — nicht, was du kannst.",
+      "rolesTitle": "Welche Rollen du abdeckst",
+      "rolesIntro": "Bereiche, die sich nicht einkaufen lassen — und die du verantworten möchtest. Nach Günter Faltins Komponentenmodell: Was als fertige Leistung existiert, braucht niemanden im Team. Was hier steht, schon.",
+      "rolesNone": "Bisher keiner. Entweder sind die besprochenen Bereiche einkaufbar, oder du hast bei ihnen noch keinen Verantwortungswunsch angegeben.",
+      "rolesOpen": "{count, plural, =1 {Ein weiterer Bereich gehört ins Team, du möchtest ihn aber nicht verantworten} other {# weitere Bereiche gehören ins Team, du möchtest sie aber nicht verantworten}} — das ist keine Lücke bei dir, sondern eine offene Frage im Vorhaben.",
+      "rolesCaveat": "Das sagt nicht, wie gut du es kannst. Es sagt, dass du es übernehmen möchtest und dass es sich nicht einkaufen lässt."
     }
   }
 }

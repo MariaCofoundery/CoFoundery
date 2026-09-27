@@ -1,4 +1,5 @@
 import type {
+  AreaSourcing,
   CapabilityArea,
   CapabilityEntry,
   CapabilityFamily,
@@ -48,8 +49,39 @@ export type CoverageFamily = {
   enteredCount: number;
 };
 
+/**
+ * Welche Rollen jemand abdeckt - nach Faltin.
+ *
+ * GEWUENSCHT AM 27.09.2026: "Ich haette das gerne auch im Gesamtbild, dass
+ * drinsteht, welche Rollen ich im Prinzip schon abdecke [...] und vor allem
+ * wird es cool, wenn man dann schaut: ich matche mit zwei weiteren, welche
+ * Sachen sind in dem Startup dann schon vorhanden."
+ *
+ * ZWEI BEDINGUNGEN MUESSEN ZUSAMMENKOMMEN, und erst zusammen sagen sie etwas:
+ *
+ *   Der Bereich GEHOERT INS TEAM (`internal_only`). Was einkaufbar ist,
+ *   braucht niemanden im Team - dort ist eine Luecke eine Bestellung.
+ *
+ *   Die Person WILL IHN VERANTWORTEN (`own` oder `contribute`). Etwas zu
+ *   koennen ist nicht dasselbe wie es zu uebernehmen: Eine hohe Stufe mit
+ *   `prefer_other` ist ein ausdruecklich gueltiger Zustand.
+ *
+ * WAS ES NICHT SAGT: dass jemand es gut kann. Die Anwendungsstufe steht
+ * daneben und wird hier nicht verrechnet - eine "Rollendeckung" mit einer
+ * Note waere wieder eine Bewertung von Menschen.
+ */
+export type RoleCoverage = {
+  /** Gehoert ins Team UND soll verantwortet werden. */
+  covered: string[];
+  /** Gehoert ins Team, ist besprochen, aber niemand will es uebernehmen. */
+  spokenNotOwned: string[];
+  /** Zaehlwerte ueber die eingetragenen Bereiche, je Herkunftsart. */
+  bySourcing: Record<AreaSourcing, number>;
+};
+
 export type FounderProfileCoverage = {
   families: CoverageFamily[];
+  roles: RoleCoverage;
   /** Nur die Familien, zu denen es ueberhaupt einen Eintrag gibt. */
   touchedFamilyCount: number;
   familyCount: number;
@@ -96,8 +128,39 @@ export function buildFounderProfileCoverage(
       };
     });
 
+  // Verantwortung heisst hier `own` oder `contribute`. `grow_into` zaehlt
+  // bewusst nicht mit: "da will ich hineinwachsen" ist eine Absicht und noch
+  // keine abgedeckte Rolle.
+  const wantsIt = (wish: string | null) => wish === "own" || wish === "contribute";
+  const sourcingOf = new Map(areas.map((area) => [area.area_id, area.sourcing ?? "unclassified"]));
+
+  const covered: string[] = [];
+  const spokenNotOwned: string[] = [];
+  const bySourcing = {
+    internal_only: 0,
+    component: 0,
+    depends: 0,
+    unclassified: 0,
+  } as Record<AreaSourcing, number>;
+
+  for (const entry of entries) {
+    const sourcing = (sourcingOf.get(entry.area_id) ?? "unclassified") as AreaSourcing;
+    bySourcing[sourcing] = (bySourcing[sourcing] ?? 0) + 1;
+    if (sourcing !== "internal_only") continue;
+    if (wantsIt(entry.ownership_wish)) covered.push(entry.area_id);
+    else spokenNotOwned.push(entry.area_id);
+  }
+
+  const order = new Map(areas.map((area) => [area.area_id, area.sort_order]));
+  const bySortOrder = (a: string, b: string) => (order.get(a) ?? 0) - (order.get(b) ?? 0);
+
   return {
     families: coverageFamilies,
+    roles: {
+      covered: covered.sort(bySortOrder),
+      spokenNotOwned: spokenNotOwned.sort(bySortOrder),
+      bySourcing,
+    },
     touchedFamilyCount: coverageFamilies.filter((family) => family.enteredCount > 0).length,
     familyCount: coverageFamilies.length,
     enteredCount: coverageFamilies.reduce((sum, family) => sum + family.enteredCount, 0),
