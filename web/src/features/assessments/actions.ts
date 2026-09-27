@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { finalizeInvitationIfReady } from "@/features/reporting/actions";
 import {
+  CURRENT_INSTRUMENT_ID,
+  type InstrumentId,
+} from "@/features/instruments/instruments";
+import {
   getFounderCompatibilityBasePersistedChoiceValue,
   getFounderCompatibilityBasePersistenceQuestionId,
   isActiveFounderCompatibilityBaseItemId,
@@ -14,11 +18,34 @@ export type ModuleKey = "base" | "values";
 export type QuestionCategory = "basis" | "values";
 export type AnswerMap = Record<string, string>; // question_id -> choice_value
 
+/**
+ * ---------------------------------------------------------------------------
+ * ZU WELCHER FASSUNG GEHOERT DAS? (Schritt 0b, 27.09.2026)
+ * ---------------------------------------------------------------------------
+ *
+ * Seit Migration 20261053120000 traegt jede Zeile eine Instrumentkennung.
+ * Diese Datei ist der eigene Fragebogenweg einer Person - und dort gilt
+ * durchgaengig die AKTUELLE Fassung:
+ *
+ *   Wer anfaengt, faengt mit dem an, was gerade vorgelegt wird.
+ *   Ein Entwurf gehoert zu der Fassung, mit der er begonnen wurde.
+ *
+ * `instrument` ist trotzdem ein Parameter und keine feste Groesse: Ab
+ * Schritt 8 kann eine Person bei ihrer alten Fassung bleiben, und dann
+ * entscheidet der Aufrufer, welche gemeint ist. Heute ist die Vorgabe
+ * richtig, weil es nur eine gibt.
+ *
+ * DIE SPALTENVORGABE IST EIN NETZ FUER DIE RUECKFUELLUNG, KEINE REGEL FUER
+ * NEUE ZEILEN. Beim Einfuegen steht die Kennung deshalb ausdruecklich da -
+ * sonst bekaeme eine neue Antwort spaeter still `v1`, obwohl gerade `v2`
+ * vorgelegt wird.
+ */
 type AssessmentRow = {
   id: string;
   module: ModuleKey;
   submitted_at: string | null;
   created_at: string;
+  instrument_id: string;
 };
 
 const MODULE_TO_CATEGORY: Record<ModuleKey, QuestionCategory> = {
@@ -37,7 +64,7 @@ async function getOwnedAssessmentOrThrow(assessmentId: string) {
   const { supabase, userId } = await getUserIdOrThrow();
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, module, submitted_at, created_at")
+    .select("id, module, submitted_at, created_at, instrument_id")
     .eq("id", assessmentId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -53,13 +80,20 @@ async function getOwnedAssessmentOrThrow(assessmentId: string) {
   };
 }
 
-export async function getLatestSubmittedAssessment(module: ModuleKey): Promise<AssessmentRow | null> {
+export async function getLatestSubmittedAssessment(
+  module: ModuleKey,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
+): Promise<AssessmentRow | null> {
   const { supabase, userId } = await getUserIdOrThrow();
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, module, submitted_at, created_at")
+    .select("id, module, submitted_at, created_at, instrument_id")
     .eq("user_id", userId)
     .eq("module", module)
+    // OHNE DIESE ZEILE WAERE "der neueste" nach einem Wechsel immer der
+    // neuen Fassung - auch bei jemandem, der ausdruecklich bei der alten
+    // bleiben wollte.
+    .eq("instrument_id", instrument)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .limit(1)
@@ -72,13 +106,19 @@ export async function getLatestSubmittedAssessment(module: ModuleKey): Promise<A
   return data as AssessmentRow;
 }
 
-export async function getOrCreateDraftAssessment(module: ModuleKey): Promise<AssessmentRow> {
+export async function getOrCreateDraftAssessment(
+  module: ModuleKey,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
+): Promise<AssessmentRow> {
   const { supabase, userId } = await getUserIdOrThrow();
   const { data: draft } = await supabase
     .from("assessments")
-    .select("id, module, submitted_at, created_at")
+    .select("id, module, submitted_at, created_at, instrument_id")
     .eq("user_id", userId)
     .eq("module", module)
+    // Ein halb ausgefuellter Fragebogen der alten Fassung darf niemandem
+    // vorgelegt werden, der gerade die neue ausfuellt.
+    .eq("instrument_id", instrument)
     .is("submitted_at", null)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -90,8 +130,8 @@ export async function getOrCreateDraftAssessment(module: ModuleKey): Promise<Ass
 
   const { data: created, error: createError } = await supabase
     .from("assessments")
-    .insert({ user_id: userId, module })
-    .select("id, module, submitted_at, created_at")
+    .insert({ user_id: userId, module, instrument_id: instrument })
+    .select("id, module, submitted_at, created_at, instrument_id")
     .single();
 
   if (createError || !created) {
@@ -101,12 +141,15 @@ export async function getOrCreateDraftAssessment(module: ModuleKey): Promise<Ass
   return created as AssessmentRow;
 }
 
-export async function createDraftAssessment(module: ModuleKey): Promise<AssessmentRow> {
+export async function createDraftAssessment(
+  module: ModuleKey,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
+): Promise<AssessmentRow> {
   const { supabase, userId } = await getUserIdOrThrow();
   const { data: created, error: createError } = await supabase
     .from("assessments")
-    .insert({ user_id: userId, module })
-    .select("id, module, submitted_at, created_at")
+    .insert({ user_id: userId, module, instrument_id: instrument })
+    .select("id, module, submitted_at, created_at, instrument_id")
     .single();
 
   if (createError || !created) {
@@ -118,7 +161,8 @@ export async function createDraftAssessment(module: ModuleKey): Promise<Assessme
 
 export async function getOwnedDraftAssessment(
   module: ModuleKey,
-  assessmentId: string
+  assessmentId: string,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
 ): Promise<AssessmentRow | null> {
   const normalizedAssessmentId = assessmentId.trim();
   if (!normalizedAssessmentId) {
@@ -128,10 +172,11 @@ export async function getOwnedDraftAssessment(
   const { supabase, userId } = await getUserIdOrThrow();
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, module, submitted_at, created_at")
+    .select("id, module, submitted_at, created_at, instrument_id")
     .eq("id", normalizedAssessmentId)
     .eq("user_id", userId)
     .eq("module", module)
+    .eq("instrument_id", instrument)
     .is("submitted_at", null)
     .maybeSingle();
 

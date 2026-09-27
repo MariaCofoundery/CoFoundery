@@ -25,6 +25,7 @@ import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityR
 import type { TeamScoringResult } from "@/features/scoring/founderScoring";
 import { hasLegacyFounderAlignmentWorkbookContent } from "@/features/reporting/founderAlignmentWorkbook";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import {
   createPrivilegedAccessClient,
   syncRelationshipAdvisorFromLegacyInvitation,
@@ -184,6 +185,7 @@ async function getLatestSubmittedBaseAssessment(
     .select("id, user_id, submitted_at, created_at")
     .eq("user_id", userId)
     .eq("module", "base")
+    .eq("instrument_id", CURRENT_INSTRUMENT_ID)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .limit(1)

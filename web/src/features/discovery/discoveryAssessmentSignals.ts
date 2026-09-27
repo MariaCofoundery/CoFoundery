@@ -1,4 +1,5 @@
 import "server-only";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { selectDiscoveryAssessmentConversationPrompts } from "@/features/discovery/discoveryAssessmentConversationPrompts";
@@ -26,6 +27,18 @@ import type {
 import { DISCOVERY_ALIGNMENT_DIMENSIONS } from "@/features/discovery/discoveryTypes";
 import { getFounderDimensionPoleTendency } from "@/features/reporting/founderDimensionMeta";
 import { normalizeLocale } from "@/i18n/config";
+
+/**
+ * ZU WELCHER FASSUNG GEHOERT DAS? (Schritt 0b, 27.09.2026)
+ *
+ * Seit Migration 20261053120000 traegt jede Antwort eine Instrumentkennung.
+ * Wer "den neuesten abgegebenen Fragebogen" holt, nennt ab jetzt ausdruecklich
+ * die Fassung - sonst laese er nach einem Wechsel stillschweigend die neue,
+ * auch bei jemandem, der bei der alten geblieben ist.
+ *
+ * Heute gibt es nur eine Fassung; die Zeile ist damit nachweislich ein
+ * Nichts-Tun. Genau deshalb wird sie jetzt eingezogen und nicht spaeter.
+ */
 
 export type {
   DiscoveryAssessmentSignalAvailability,
@@ -117,6 +130,7 @@ export async function getOwnDiscoveryAssessmentSignalReadiness(
     .select("id")
     .eq("user_id", normalizedUserId)
     .eq("module", "base")
+    .eq("instrument_id", CURRENT_INSTRUMENT_ID)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .order("created_at", { ascending: false })
@@ -189,6 +203,7 @@ export async function getDiscoveryAssessmentSignalAvailabilityForCandidates({
     .select("user_id, id, module, submitted_at")
     .in("user_id", normalizedCandidateUserIds)
     .eq("module", "base")
+    .eq("instrument_id", CURRENT_INSTRUMENT_ID)
     .not("submitted_at", "is", null);
 
   if (assessmentError) {
@@ -284,6 +299,7 @@ export async function getOwnDiscoveryV2AlignmentTendencies({
       .select("id")
       .eq("user_id", normalizedOwnerUserId)
       .eq("module", "base")
+      .eq("instrument_id", CURRENT_INSTRUMENT_ID)
       .not("submitted_at", "is", null)
       .order("submitted_at", { ascending: false })
       .order("created_at", { ascending: false })
@@ -360,6 +376,7 @@ export async function getDiscoveryAssessmentConversationPromptsForCandidates({
       .select("id, user_id, module, submitted_at, created_at")
       .in("user_id", userIdsToLoad)
       .eq("module", "base")
+      .eq("instrument_id", CURRENT_INSTRUMENT_ID)
       .not("submitted_at", "is", null)
       .order("submitted_at", { ascending: false })
       .order("created_at", { ascending: false });
@@ -535,6 +552,7 @@ export async function getDiscoveryV2AlignmentSignalsForCandidates({
       .select("id, user_id, module, submitted_at, created_at")
       .in("user_id", userIdsToLoad)
       .eq("module", "base")
+      .eq("instrument_id", CURRENT_INSTRUMENT_ID)
       .not("submitted_at", "is", null)
       .order("submitted_at", { ascending: false })
       .order("created_at", { ascending: false });

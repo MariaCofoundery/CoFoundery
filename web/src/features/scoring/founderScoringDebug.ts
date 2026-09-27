@@ -10,6 +10,7 @@ import {
 } from "@/features/scoring/founderCompatibilityAnswerRuntime";
 import { scoreFounderAlignmentV2FromAnswersV2 } from "@/features/scoring/founderCompatibilityScoringV2";
 import { getActiveRegistryItems } from "@/features/scoring/founderCompatibilityRegistry";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 type InvitationRow = {
   id: string;
@@ -76,6 +77,7 @@ async function getLatestSubmittedBaseAssessment(
     .select("id, user_id, submitted_at, created_at")
     .eq("user_id", userId)
     .eq("module", "base")
+    .eq("instrument_id", CURRENT_INSTRUMENT_ID)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .limit(1)

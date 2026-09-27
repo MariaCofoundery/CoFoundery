@@ -16,6 +16,7 @@ import {
 } from "@/features/reporting/relationshipAdvisorAccess";
 import { getAdvisorFounderSetupAccessState } from "@/features/teams/founderSetupAdvisorAccessData";
 import type { AdvisorFounderSetupAccessState } from "@/features/teams/founderSetupAdvisorAccessModel";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 export type DashboardRoleKey = "founder" | "advisor";
 
@@ -392,6 +393,7 @@ export async function getAdvisorDashboardTeams(userId: string): Promise<AdvisorD
           .from("assessments")
           .select("user_id, submitted_at")
           .eq("module", "base")
+          .eq("instrument_id", CURRENT_INSTRUMENT_ID)
           .not("submitted_at", "is", null)
           .in("user_id", relevantUserIds)
       : Promise.resolve({ data: [], error: null }),

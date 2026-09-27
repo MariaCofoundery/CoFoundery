@@ -1,4 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  CURRENT_INSTRUMENT_ID,
+  type InstrumentId,
+} from "@/features/instruments/instruments";
 
 export type AssessmentModule = "base" | "values";
 
@@ -30,12 +34,31 @@ type InvitationMatchingInputRow = {
   updated_at: string;
 };
 
+/**
+ * ---------------------------------------------------------------------------
+ * VERGLICHEN WIRD NUR INNERHALB EINER FASSUNG (Schritt 0b, 27.09.2026)
+ * ---------------------------------------------------------------------------
+ *
+ * Diese Datei liest Fragebogen auch ueber ANDERE Menschen - fuer Vergleich
+ * und Matching. Dort gilt eine strengere Regel als beim eigenen Weg:
+ *
+ *   Zwei Fassungen ergeben keine vergleichbaren Antworten. Wer verschiedene
+ *   Instrumente ausgefuellt hat, wird nicht verglichen - es gibt dann schlicht
+ *   kein Paar, und das ist die richtige Antwort, nicht ein Mangel.
+ *
+ * Deshalb nimmt jeder Leser hier ausdruecklich EINE Fassung entgegen, statt
+ * "den neuesten" zu holen und zu hoffen. Ohne das haette ein Vergleich nach
+ * einem Wechsel stillschweigend v1-Werte der einen Person gegen v2-Werte der
+ * anderen gestellt - dieselbe Skala, dieselbe Beschriftung, verschiedene
+ * Modelle.
+ */
 export type AssessmentRow = {
   id: string;
   user_id: string;
   module: string;
   submitted_at: string | null;
   created_at: string;
+  instrument_id: string;
 };
 
 export type InvitationMatchingBinding = {
@@ -169,7 +192,7 @@ async function getAssessmentsByIds(
   const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, user_id, module, submitted_at, created_at")
+    .select("id, user_id, module, submitted_at, created_at, instrument_id")
     .in("id", normalizedIds);
 
   if (error || !data) {
@@ -182,7 +205,8 @@ async function getAssessmentsByIds(
 export async function getLatestSubmittedAssessmentForUserModule(
   userId: string,
   module: AssessmentModule,
-  client?: SupabaseLikeClient
+  client?: SupabaseLikeClient,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
 ): Promise<AssessmentRow | null> {
   const normalizedUserId = userId.trim();
   if (!normalizedUserId) {
@@ -192,9 +216,10 @@ export async function getLatestSubmittedAssessmentForUserModule(
   const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, user_id, module, submitted_at, created_at")
+    .select("id, user_id, module, submitted_at, created_at, instrument_id")
     .eq("user_id", normalizedUserId)
     .eq("module", module)
+    .eq("instrument_id", instrument)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .order("created_at", { ascending: false })
@@ -222,7 +247,7 @@ async function getAssessmentForUserModule(
   const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, user_id, module, submitted_at, created_at")
+    .select("id, user_id, module, submitted_at, created_at, instrument_id")
     .eq("id", normalizedAssessmentId)
     .eq("user_id", userId)
     .eq("module", module)
@@ -243,8 +268,8 @@ async function createDraftAssessmentForUserModule(
   const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("assessments")
-    .insert({ user_id: userId, module })
-    .select("id, user_id, module, submitted_at, created_at")
+    .insert({ user_id: userId, module, instrument_id: CURRENT_INSTRUMENT_ID })
+    .select("id, user_id, module, submitted_at, created_at, instrument_id")
     .single();
 
   if (error || !data) {
@@ -270,7 +295,8 @@ function buildBindingsByUser(
 
 async function getLatestSubmittedAssessmentsByUsers(
   userIds: string[],
-  client?: SupabaseLikeClient
+  client?: SupabaseLikeClient,
+  instrument: InstrumentId = CURRENT_INSTRUMENT_ID
 ): Promise<Map<string, Map<AssessmentModule, AssessmentRow>>> {
   const normalizedUserIds = [...new Set(userIds.filter(Boolean))];
   if (normalizedUserIds.length === 0) {
@@ -280,9 +306,12 @@ async function getLatestSubmittedAssessmentsByUsers(
   const supabase = await resolveClient(client);
   const { data, error } = await supabase
     .from("assessments")
-    .select("id, user_id, module, submitted_at, created_at")
+    .select("id, user_id, module, submitted_at, created_at, instrument_id")
     .in("user_id", normalizedUserIds)
     .in("module", ["base", "values"])
+    // Alle aus DERSELBEN Fassung. Sonst stuenden im selben Ergebnis Zeilen
+    // aus zwei Modellen, und der Vergleich merkte es nicht.
+    .eq("instrument_id", instrument)
     .not("submitted_at", "is", null)
     .order("submitted_at", { ascending: false })
     .order("created_at", { ascending: false });

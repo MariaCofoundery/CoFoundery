@@ -46,6 +46,7 @@ import { getResearchConsentState } from "@/features/research/consent";
 import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
 import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 type DashboardSearchParams = {
   error?: string;
@@ -161,6 +162,7 @@ export default async function DashboardPage({
         .select("id, module, submitted_at, created_at")
         .eq("user_id", user.id)
         .in("module", ["base", "values"])
+        .eq("instrument_id", CURRENT_INSTRUMENT_ID)
         .order("created_at", { ascending: false }),
       getResearchConsentState(supabase as unknown as SupabaseClient, user.id),
       // Haengt von nichts hier ab und lief trotzdem hinterher - eine
