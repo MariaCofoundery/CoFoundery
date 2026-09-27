@@ -1,0 +1,64 @@
+{
+  "shell": {
+    "backToDashboard": "Zurück zum Dashboard",
+    "draftNotice": "Dieser Fragebogen ist in Arbeit und wird noch nicht ausgewertet.",
+    "progress": "{answered} von {total} beantwortet",
+    "save": "Antwort übernehmen",
+    "saving": "Wird gespeichert …",
+    "saved": "Gespeichert",
+    "clear": "Antwort zurücknehmen",
+    "submit": "Fragebogen abgeben",
+    "submitting": "Wird abgegeben …",
+    "incomplete": "Es fehlen noch {count} Angaben. Für jede Frage gibt es auch eine Antwort, die sagt, warum du sie nicht beantworten möchtest.",
+    "submitted": "Abgegeben. Ab hier ändert sich nichts mehr."
+  },
+  "base": {
+    "title": "Wie du arbeiten möchtest",
+    "step1": {
+      "title": "Erster Teil",
+      "intro": "Diese Fragen beschreiben, wie du arbeiten möchtest, was du erreichen willst und welche Regeln du dir wünschst. Es geht nicht darum, wie du bist, sondern was du dir vornimmst.",
+      "note": "Es gibt hier keine besseren und schlechteren Antworten und am Ende keine Punktzahl."
+    },
+    "step2": {
+      "title": "Zweiter Teil: die Zusagen",
+      "intro": "Jetzt geht es um Stunden, Geld und Termine. Das sind Zusagen, keine Selbstauskunft — deshalb kommen sie erst hier und nicht beim ersten Ausfüllen.",
+      "note": "Was du hier angibst, ist eine Angabe zum heutigen Stand und keine Verpflichtung."
+    }
+  },
+  "values": {
+    "title": "Prioritäten und Grenzen",
+    "intro": "Kurze Situationen, in denen zwei berechtigte Anliegen zusammenstoßen. Beide Anliegen bewertest du getrennt — beide dürfen sehr wichtig sein.",
+    "note": "Es gibt keine richtige Wahl und keinen Wertepunktestand. Der Zweck ist, zu wissen, worüber ihr reden solltet.",
+    "concerns": "Wie wichtig ist dir dabei …",
+    "pathQuestion": "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?",
+    "limits": "Deine Grenzen"
+  },
+  "missing": {
+    "heading": "Oder:",
+    "cannot_assess": "Kann ich noch nicht einschätzen",
+    "not_relevant": "Für mein Vorhaben nicht relevant",
+    "withheld": "Möchte ich nicht angeben",
+    "undecided": "Noch offen",
+    "confidential_first": "Möchte ich zunächst vertraulich klären",
+    "hint": "Das ist eine vollwertige Antwort und kein Überspringen."
+  },
+  "fields": {
+    "otherText": "Bitte benennen",
+    "from": "von",
+    "to": "bis",
+    "min": "mindestens",
+    "max": "höchstens",
+    "unit": "Einheit",
+    "currency": "Währung",
+    "basis": "Angabe als",
+    "brutto": "brutto",
+    "netto": "netto",
+    "recipient": "Person oder Rolle",
+    "addRecipient": "Weitere Person",
+    "addWindow": "Weiteres Zeitfenster",
+    "days": "Wochentage",
+    "date": "Datum",
+    "text": "Deine Antwort"
+  },
+  "sourceLanguage": "Die Fragen selbst stehen auf Deutsch. Ein Messinstrument zu übersetzen ist keine Übersetzungsarbeit, sondern eine neue Validierung: Ein Item, das sich anders liest, misst etwas anderes, und die Äquivalenzprüfung dafür gibt es nicht. Eine englische Fassung kommt nach den kognitiven Interviews, nicht davor."
+}

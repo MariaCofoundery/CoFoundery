@@ -295,8 +295,28 @@ neben einem `main`, das sich weiterbewegt.
 |---|---|
 | 0 | erledigt, auf `main` (Migration `20261053120000`) |
 | 1a | erledigt, auf `main` — acht Präferenzen, 64 Items |
-| 1b | erledigt — 30 Kontextfragen, 10 Wertefälle, 3 Grenzfragen |
-| ab 2 | langer Zweig |
+| 1b | erledigt, auf `main` — 30 Kontextfragen, 10 Wertefälle, 3 Grenzfragen |
+| 2a | erledigt — `alignment_answers`: entweder ein Wert oder ein Grund |
+| 2b | erledigt — Kennung für v2 (`draft`), Prüfung, Actions, Vollständigkeit |
+| 2c | erledigt — der Fragebogen, unter `debug/alignment-v2/[module]` |
+| ab 3 | langer Zweig `feat/instrument-v2`, ein Release |
+
+**Wo der Fragebogen liegt und warum dort.** `/debug/alignment-v2/base` (mit
+`?step=2` für die Zusagen) und `/debug/alignment-v2/values`. Unter `debug`,
+weil das Instrument auf `draft` steht: Die Texte sind nicht redigiert, die
+kognitiven Interviews haben nicht stattgefunden, und die Auswertung dahinter
+gibt es noch nicht. In Production ist die Seite 404. Der Umzug auf eine echte
+Route ist Schritt 9 und soll eine eigene, bewusste Änderung sein.
+
+Ein Test hält die Regel: Keine Datei außerhalb von `debug` darf auf v2
+zugreifen. Der gefährliche Fall ist nicht, dass jemand v2 baut — es ist, dass
+jemand einen Link vom Dashboard darauf setzt, weil es „ja schon geht".
+
+**Die Fragen bleiben deutsch, auch im englischen Interface.** Ein
+Messinstrument zu übersetzen ist keine Übersetzungsarbeit, sondern eine neue
+Validierung: Ein Item, das sich anders liest, misst etwas anderes, und die
+Äquivalenzprüfung dafür gibt es nicht. Die Oberfläche ist zweisprachig, die
+Items sind es nicht — und der englische Textbestand sagt das ausdrücklich.
 
 ---
 

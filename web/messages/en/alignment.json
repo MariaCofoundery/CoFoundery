@@ -1,0 +1,64 @@
+{
+  "shell": {
+    "backToDashboard": "Back to dashboard",
+    "draftNotice": "This questionnaire is a work in progress and is not evaluated yet.",
+    "progress": "{answered} of {total} answered",
+    "save": "Save answer",
+    "saving": "Saving …",
+    "saved": "Saved",
+    "clear": "Withdraw answer",
+    "submit": "Submit questionnaire",
+    "submitting": "Submitting …",
+    "incomplete": "{count} entries are still missing. Every question also offers an answer that says why you would rather not answer it.",
+    "submitted": "Submitted. Nothing changes from here on."
+  },
+  "base": {
+    "title": "How you want to work",
+    "step1": {
+      "title": "Part one",
+      "intro": "These questions describe how you want to work, what you want to achieve and which rules you would like. They are not about who you are, but about what you intend.",
+      "note": "There are no better or worse answers here, and no score at the end."
+    },
+    "step2": {
+      "title": "Part two: the commitments",
+      "intro": "Now it is about hours, money and dates. These are commitments, not self-description — which is why they come here and not during the first pass.",
+      "note": "What you enter here describes today's situation. It is not an obligation."
+    }
+  },
+  "values": {
+    "title": "Priorities and limits",
+    "intro": "Short situations in which two legitimate concerns collide. You rate both concerns separately — both may be very important.",
+    "note": "There is no right choice and no values score. The point is to know what you should talk about.",
+    "concerns": "How important is this to you …",
+    "pathQuestion": "Which way would you choose first under these conditions?",
+    "limits": "Your limits"
+  },
+  "missing": {
+    "heading": "Or:",
+    "cannot_assess": "I cannot judge this yet",
+    "not_relevant": "Not relevant for my venture",
+    "withheld": "I would rather not say",
+    "undecided": "Still open",
+    "confidential_first": "I would like to discuss this privately first",
+    "hint": "This is a full answer, not a skip."
+  },
+  "fields": {
+    "otherText": "Please describe",
+    "from": "from",
+    "to": "to",
+    "min": "at least",
+    "max": "at most",
+    "unit": "unit",
+    "currency": "currency",
+    "basis": "stated as",
+    "brutto": "gross",
+    "netto": "net",
+    "recipient": "person or role",
+    "addRecipient": "Another person",
+    "addWindow": "Another time slot",
+    "days": "weekdays",
+    "date": "date",
+    "text": "Your answer"
+  },
+  "sourceLanguage": "The questions themselves are shown in German. Translating a measurement instrument is not a translation task but a re-validation: an item that reads differently measures something else, and none of the equivalence work has been done. An English version comes after the cognitive interviews, not before."
+}

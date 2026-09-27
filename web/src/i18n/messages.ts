@@ -1,5 +1,6 @@
 import type { AbstractIntlMessages } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
+import deAlignment from "../../messages/de/alignment.json";
 import deAssessment from "../../messages/de/assessment.json";
 import deAccount from "../../messages/de/account.json";
 import deAdvisor from "../../messages/de/advisor.json";
@@ -23,6 +24,7 @@ import deResearchConsent from "../../messages/de/researchConsent.json";
 import deTeams from "../../messages/de/teams.json";
 import deWorkspace from "../../messages/de/workspace.json";
 import deWorkbook from "../../messages/de/workbook.json";
+import enAlignment from "../../messages/en/alignment.json";
 import enAssessment from "../../messages/en/assessment.json";
 import enAccount from "../../messages/en/account.json";
 import enAdvisor from "../../messages/en/advisor.json";
@@ -49,6 +51,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
+    alignment: deAlignment,
     assessment: deAssessment,
     account: deAccount,
     advisor: deAdvisor,
@@ -74,6 +77,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workbook: deWorkbook as unknown as AbstractIntlMessages,
   },
   en: {
+    alignment: enAlignment,
     assessment: enAssessment,
     account: enAccount,
     advisor: enAdvisor,
