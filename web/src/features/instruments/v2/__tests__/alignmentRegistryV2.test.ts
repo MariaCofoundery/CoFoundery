@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   ALIGNMENT_REGISTRY_V2,
@@ -96,22 +97,67 @@ test("das Modell verspricht keine Gesamtzahl und keine bestätigten Faktoren", (
   }
 });
 
-test("die Fragetexte sind vollständig, verschieden und wirklich Fragen", () => {
-  // WAS HIER NICHT GEPRÜFT WERDEN KANN, und das ist eine echte Lücke:
-  // Ob die Texte wörtlich dem Gutachten entsprechen. Die Quelle
-  // („Wissenschaftliche Neukonzeption" v0.2) liegt nicht im Repo - sie kam
-  // als Anhang. Sobald sie unter `docs/` liegt, gehört hier ein Abgleich
-  // gegen sie hin; ein Instrument, dessen Fragen sich unbemerkt von ihrer
-  // Quelle entfernen, ist nicht mehr das Instrument, das begutachtet wurde.
+test("jeder Fragetext steht wörtlich so in der Quelle", () => {
+  // DER WICHTIGSTE TEST DIESER DATEI. Ein Instrument, dessen Fragen sich
+  // unbemerkt von ihrer Quelle entfernen, ist nicht mehr das Instrument, das
+  // begutachtet wurde - und genau das passiert leise, wenn jemand eine
+  // Formulierung "nur ein bisschen glättet".
   //
-  // Bis dahin: die Prüfungen, die ohne die Quelle möglich sind.
+  // Geprüft werden ALLE 64, nicht Stichproben. Eine Stichprobe würde die
+  // eine geänderte Frage mit hoher Wahrscheinlichkeit gerade übersehen.
+  const paper = readFileSync(
+    "../docs/CoFoundery_Wissenschaftliche_Neukonzeption.md",
+    "utf8"
+  );
+
+  const drifted = getAlignmentItems()
+    .filter((item) => !paper.includes(item.prompt))
+    .map((item) => `${item.itemId}: ${item.prompt}`);
+
+  assert.deepEqual(
+    drifted,
+    [],
+    "Diese Fragetexte stehen nicht mehr wörtlich in der Quelle:\n" + drifted.join("\n")
+  );
+
+  // GEGENPROBE. Ein Abgleich, der alles findet, könnte auch alles finden -
+  // etwa weil die Quelle leer gelesen wurde oder `includes` auf einem
+  // leeren Text immer wahr wäre. Eine absichtlich veränderte Frage darf
+  // nicht durchgehen.
+  const first = getAlignmentItems()[0].prompt;
+  assert.ok(paper.includes(first), "die Quelle wurde überhaupt gelesen");
+  assert.ok(
+    !paper.includes(first.replace("Wie häufig", "Wie oft")),
+    "der Abgleich unterscheidet tatsächlich"
+  );
+});
+
+test("auch die Bedingungen und Definitionen stammen aus der Quelle", () => {
+  // Die Bedingungen sind Teil der Messversion. Wenn sich eine davon
+  // verschiebt, misst die Präferenz etwas anderes - und zwar ohne dass ein
+  // Fragetext sich ändert.
+  const paper = readFileSync(
+    "../docs/CoFoundery_Wissenschaftliche_Neukonzeption.md",
+    "utf8"
+  );
+
+  const drifted: string[] = [];
+  for (const preference of getAlignmentPreferences()) {
+    if (preference.condition && !paper.includes(preference.condition)) {
+      drifted.push(`${preference.id} (Bedingung): ${preference.condition}`);
+    }
+  }
+
+  assert.deepEqual(drifted, [], "Nicht mehr wörtlich in der Quelle:\n" + drifted.join("\n"));
+});
+
+test("die Fragetexte sind vollständig, verschieden und wirklich Fragen", () => {
   const items = getAlignmentItems();
   const prompts = items.map((item) => item.prompt);
 
   assert.equal(new Set(prompts).size, prompts.length, "kein Fragetext doppelt");
   for (const item of items) {
     assert.ok(item.prompt.trim().endsWith("?"), `${item.itemId}: keine Frage`);
-    assert.ok(item.prompt.length >= 40, `${item.itemId}: verdächtig kurz`);
     // Die beiden Formate fragen verschiedene Dinge, und das muss man am
     // Satz erkennen: F nach gewünschter Häufigkeit, C nach Befinden.
     if (item.answerFormat === "F") {
