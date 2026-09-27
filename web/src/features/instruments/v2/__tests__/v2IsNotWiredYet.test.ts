@@ -38,7 +38,14 @@ function* sourceFiles(dir: string): Generator<string> {
       yield* sourceFiles(path);
       continue;
     }
-    if (/\.(ts|tsx)$/.test(name)) yield path;
+    // TESTS ZAEHLEN NICHT. Ein Test, der die Registratur liest, macht v2 nicht
+    // erreichbar - er wird nicht ausgeliefert. Genau so ein Test ist am
+    // 27.09.2026 hier aufgeschlagen (`instrumentsMatchTheDatabase`), und die
+    // richtige Antwort war nicht, ihn zu verbieten, sondern die Regel zu
+    // schaerfen: Es geht um Anwendungscode.
+    if (/\.(ts|tsx)$/.test(name) && !name.endsWith(".test.ts") && !name.endsWith(".test.tsx")) {
+      yield path;
+    }
   }
 }
 
@@ -51,6 +58,10 @@ test("der Wächter sieht die Dateien überhaupt", () => {
   assert.ok(
     files.some((file) => file.startsWith(V2) && MENTIONS.test(readFileSync(file, "utf8"))),
     "die Suche findet nicht einmal v2 selbst"
+  );
+  assert.ok(
+    files.every((file) => !file.endsWith(".test.ts")),
+    "Tests gehoeren nicht in die Suche"
   );
 });
 

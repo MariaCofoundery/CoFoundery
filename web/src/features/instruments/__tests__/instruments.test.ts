@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  ALIGNMENT_V2_INSTRUMENT_ID,
   assertInstrument,
   CURRENT_INSTRUMENT_ID,
-  INSTRUMENT_IDS,
   isInstrumentId,
 } from "@/features/instruments/instruments";
 
@@ -24,11 +24,11 @@ const MIGRATION = "../supabase/migrations/20261053120000_instrument_versions.sql
 test("Code und Datenbank kennen dieselben Fassungen", () => {
   const migration = sqlCodeOnly(MIGRATION);
 
-  // EINE BEWUSSTE DOPPELUNG: Der Code braucht die Liste zur Übersetzungszeit,
-  // die Datenbank für den Fremdschlüssel. Dieser Test ist die Klammer.
-  for (const id of INSTRUMENT_IDS) {
-    assert.ok(migration.includes(`'${id}'`), `${id} fehlt in der Migration`);
-  }
+  // Diese Migration hat v1 angelegt - und nur v1. Spätere Fassungen kommen in
+  // eigenen Migrationen, deshalb steht die Klammer über ALLE Migrationen seit
+  // dem 27.09.2026 in `instrumentsMatchTheDatabase.test.ts`. Hier bleibt, was
+  // nur diese eine Migration betrifft.
+  assert.ok(migration.includes(`'${CURRENT_INSTRUMENT_ID}'`), "v1 fehlt in der Migration");
   assert.ok(isInstrumentId(CURRENT_INSTRUMENT_ID));
 });
 
@@ -37,11 +37,20 @@ test("eine fremde Fassung wird abgewiesen, nicht umgedeutet", () => {
   // Möglichkeiten: abbrechen oder so tun, als wäre es die eigene. Das Zweite
   // ist genau die stille Umdeutung, gegen die das hier gebaut ist.
   assert.doesNotThrow(() => assertInstrument(CURRENT_INSTRUMENT_ID, CURRENT_INSTRUMENT_ID));
-  assert.throws(() => assertInstrument("founder-alignment-v2", CURRENT_INSTRUMENT_ID), /instrument_mismatch/);
+  // Am 27.09.2026 nachgezogen: Diese Zeilen benutzten "founder-alignment-v2"
+  // als Beispiel fuer eine unbekannte Fassung. Die gibt es jetzt wirklich -
+  // und dass eine BEKANNTE fremde Fassung abgewiesen wird, ist der schaerfere
+  // Fall. Genau sie wuerde sonst stillschweigend mitgerechnet.
+  assert.throws(
+    () => assertInstrument(ALIGNMENT_V2_INSTRUMENT_ID, CURRENT_INSTRUMENT_ID),
+    /instrument_mismatch/
+  );
+  assert.throws(() => assertInstrument("gibt-es-nicht", CURRENT_INSTRUMENT_ID), /instrument_mismatch/);
   assert.throws(() => assertInstrument(null, CURRENT_INSTRUMENT_ID), /instrument_mismatch/);
   assert.throws(() => assertInstrument(undefined, CURRENT_INSTRUMENT_ID), /instrument_mismatch/);
 
-  assert.equal(isInstrumentId("founder-alignment-v2"), false);
+  assert.equal(isInstrumentId(ALIGNMENT_V2_INSTRUMENT_ID), true, "v2 ist eine bekannte Fassung");
+  assert.equal(isInstrumentId("gibt-es-nicht"), false);
   assert.equal(isInstrumentId(null), false);
 });
 

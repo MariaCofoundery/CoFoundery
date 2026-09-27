@@ -30,7 +30,16 @@
  * Datenbank braucht sie für den Fremdschlüssel. Ein Test hält beide
  * zusammen - die Kennungen entstehen in Migrationen, nicht zur Laufzeit.
  */
-export const INSTRUMENT_IDS = ["founder-compatibility-v1"] as const;
+export const INSTRUMENT_IDS = [
+  "founder-compatibility-v1",
+  /**
+   * Seit 27.09.2026 vorhanden, Status `draft` in der Tabelle: referenzierbar,
+   * kann Antworten tragen, wird aber niemandem vorgelegt. Ohne diesen
+   * Zwischenzustand gaebe es nur "fertig" oder "gibt es nicht" - und der
+   * Umstieg muesste an einem einzigen Tag passieren.
+   */
+  "founder-alignment-v2",
+] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
 /**
@@ -43,6 +52,15 @@ export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
  * deren Code es nicht gibt, wäre ein Versprechen ohne Deckung.
  */
 export const CURRENT_INSTRUMENT_ID: InstrumentId = "founder-compatibility-v1";
+
+/**
+ * Die Neufassung - noch im Bau.
+ *
+ * ABSICHTLICH NICHT `CURRENT_INSTRUMENT_ID`. Solange das hier zwei
+ * verschiedene Konstanten sind, kann nichts versehentlich v2 ausliefern: Wer
+ * v2 meint, muss es hinschreiben.
+ */
+export const ALIGNMENT_V2_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);
