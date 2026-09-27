@@ -1,157 +1,152 @@
 # Faltin: Wie die 54 Fähigkeitsbereiche eingeordnet sind
 
-**Für: Maria, zum Entscheiden.** Stand 26.09.2026, erzeugt aus der Datenbank.
+**Entschieden am 26.09.2026.** Dieses Dokument war die Vorlage dafür; jetzt ist
+es das Protokoll. Stand aus der Datenbank.
 
 ## Worum es geht
 
 An jedem Bereich hängt ein Feld `sourcing` nach Günter Faltins Komponentenmodell.
-Wenn im Teambild oder in einer gemeinsamen Auswertung eine **Lücke** auftaucht,
-steht daneben ein Schildchen. Ohne das heißt jede Lücke „euch fehlt Finance",
-und das erzeugt Panik. Mit Faltin heißt sie: „Buchhaltung ist eine Komponente —
-die kauft man. Unit Economics nicht."
+Taucht im Teambild oder in einer gemeinsamen Auswertung eine **Lücke** auf, steht
+daneben ein Schildchen. Ohne das heißt jede Lücke „euch fehlt Finance", und das
+erzeugt Panik. Mit Faltin heißt sie: „Buchhaltung ist eine Komponente — die kauft
+man. Unit Economics nicht."
 
-Vier Werte:
+| Wert | Anzeige | Bedeutung | Anzahl |
+|---|---|---|---|
+| `internal_only` | gehört ins Team | Wer das abgibt, gibt das Unternehmen ab. | 17 |
+| `component` | einkaufbar | Gibt es als fertige Leistung, oft besser als nebenbei selbst. | 11 |
+| `depends` | kommt auf das Vorhaben an | Eine Einschätzung: es hängt davon ab, was gebaut wird. | 22 |
+| `unclassified` | *(nichts)* | Noch nicht eingeordnet. **Zeigt kein Schildchen.** | 4 |
 
-| Wert | Anzeige | Bedeutung |
-|---|---|---|
-| `internal_only` | gehört ins Team | Wer das abgibt, gibt das Unternehmen ab. |
-| `component` | einkaufbar | Gibt es als fertige Leistung, oft besser als nebenbei selbst. |
-| `depends` | kommt auf das Vorhaben an | Eine echte Einschätzung: es hängt davon ab, was gebaut wird. |
-| `unclassified` | *(nichts)* | Noch nicht eingeordnet. **Zeigt kein Schildchen.** |
+## Die vier offenen
 
-`unclassified` ist seit dem 26.09.2026 die Voreinstellung. Vorher war es `depends` —
-damit behauptete das Produkt bei 34 von 54 Bereichen etwas, das nie entschieden
-worden war. Diese 34 stehen jetzt auf `unclassified` und sind unten leer.
+Sie sind kein Rest, sondern ein Ergebnis — der vierte Wert existiert genau dafür.
 
-## So gehst du vor
+**Vertrieb B2B**, **Fundraising**, **Investorenbeziehungen** — für alle drei gibt es
+einen Dienstleistungsmarkt, und bei allen dreien sagt die Gründungslehre, dass es
+am Anfang die Gründerin selbst tun muss. Das ist eine Haltung des Produkts, keine
+Wissensfrage.
 
-Trag in der letzten Spalte ein, was gelten soll: **T** (gehört ins Team),
-**E** (einkaufbar), **D** (kommt drauf an). Leer lassen heißt: bleibt vorerst
-unentschieden, und es wird nichts angezeigt — das ist ein gültiges Ergebnis.
+**Finanzplanung & Forecast** — in der Vorschlagsliste schlicht übersehen. Nachträglich
+einen Vorschlag zu erfinden wäre genau der Fehler, den der vierte Wert behebt.
 
-Danach setze ich es in eine Migration um.
+Solange sie offen stehen, zeigt das Produkt bei ihnen kein Schildchen — es behauptet
+also nichts.
+
+## Die Einordnung
 
 
+### Kunden & Markt
 
-## Kunden & Markt
+| Bereich | Einordnung |
+|---|---|
+| Customer Discovery & Kundeninterviews <br>`customer_discovery` | gehört ins Team |
+| User Research <br>`user_research` | kommt auf das Vorhaben an |
+| Markt- & Wettbewerbsanalyse <br>`market_analysis` | einkaufbar |
+| Zielgruppen & Segmentierung <br>`target_segments` | kommt auf das Vorhaben an |
+| Branchen- & Domänenwissen <br>`industry_domain` | kommt auf das Vorhaben an |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Customer Discovery & Kundeninterviews <br>`customer_discovery` | gehört ins Team |  |  | |
-| User Research <br>`user_research` | — | **D** kommt drauf an | selbst machen lehrt am meisten, einkaufbar ist es trotzdem | |
-| Markt- & Wettbewerbsanalyse <br>`market_analysis` | — | **E** einkaufbar | Marktforschung ist eine fertige Leistung | |
-| Zielgruppen & Segmentierung <br>`target_segments` | — | **D** kommt drauf an | hängt am Vorhaben | |
-| Branchen- & Domänenwissen <br>`industry_domain` | — | **D** kommt drauf an | entweder man bringt es mit oder man holt es dazu | |
+### Produkt & Nutzenversprechen
 
-## Produkt & Nutzenversprechen
+| Bereich | Einordnung |
+|---|---|
+| Product Discovery <br>`product_discovery` | gehört ins Team |
+| Product Management <br>`product_management` | kommt auf das Vorhaben an |
+| Product Strategy & Roadmap <br>`product_strategy` | gehört ins Team |
+| UX & Interface Design <br>`ux_design` | einkaufbar |
+| Prototyping <br>`prototyping` | einkaufbar |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Product Discovery <br>`product_discovery` | — | **T** gehört ins Team | Geschwister von Kundenentdeckung, die schon drin ist | |
-| Product Management <br>`product_management` | — | **D** kommt drauf an | hängt an der Größe | |
-| Product Strategy & Roadmap <br>`product_strategy` | gehört ins Team |  |  | |
-| UX & Interface Design <br>`ux_design` | — | **E** einkaufbar | Agenturen und Freiberufliche, Standardfall | |
-| Prototyping <br>`prototyping` | einkaufbar |  |  | |
+### Strategie & Geschäftsmodell
 
-## Strategie & Geschäftsmodell
+| Bereich | Einordnung |
+|---|---|
+| Geschäftsmodell <br>`business_model` | gehört ins Team |
+| Pricing & Monetarisierung <br>`pricing` | gehört ins Team |
+| Positionierung <br>`positioning` | gehört ins Team |
+| Strategische Planung <br>`strategic_planning` | gehört ins Team |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Geschäftsmodell <br>`business_model` | gehört ins Team |  |  | |
-| Pricing & Monetarisierung <br>`pricing` | — | **T** gehört ins Team | eine Strategieentscheidung, wie Geschäftsmodell und Positionierung | |
-| Positionierung <br>`positioning` | gehört ins Team |  |  | |
-| Strategische Planung <br>`strategic_planning` | gehört ins Team |  |  | |
+### Technologie & Umsetzung
 
-## Technologie & Umsetzung
+| Bereich | Einordnung |
+|---|---|
+| Software-Entwicklung <br>`software_engineering` | kommt auf das Vorhaben an |
+| Technische Architektur <br>`technical_architecture` | kommt auf das Vorhaben an |
+| Data & Analytics <br>`data_analytics` | kommt auf das Vorhaben an |
+| AI & Machine Learning <br>`ai_ml` | kommt auf das Vorhaben an |
+| Hardware & Produktion <br>`hardware_production` | einkaufbar |
+| Service Delivery <br>`service_delivery` | kommt auf das Vorhaben an |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Software-Entwicklung <br>`software_engineering` | — | **D** kommt drauf an | hängt davon ab, ob Technik das Produkt ist | |
-| Technische Architektur <br>`technical_architecture` | — | **D** kommt drauf an | dito | |
-| Data & Analytics <br>`data_analytics` | — | **D** kommt drauf an | dito | |
-| AI & Machine Learning <br>`ai_ml` | — | **D** kommt drauf an | dito | |
-| Hardware & Produktion <br>`hardware_production` | einkaufbar |  |  | |
-| Service Delivery <br>`service_delivery` | — | **D** kommt drauf an | hängt am Geschäftsmodell | |
+### Vertrieb & Wachstum
 
-## Vertrieb & Wachstum
+| Bereich | Einordnung |
+|---|---|
+| B2B Sales <br>`b2b_sales` | **offen** |
+| B2C Wachstum & Akquise <br>`b2c_growth` | kommt auf das Vorhaben an |
+| Marketing & Brand <br>`marketing_brand` | kommt auf das Vorhaben an |
+| Performance Marketing <br>`performance_marketing` | einkaufbar |
+| Partnerships & Business Development <br>`partnerships` | kommt auf das Vorhaben an |
+| Customer Success <br>`customer_success` | kommt auf das Vorhaben an |
+| Community <br>`community` | kommt auf das Vorhaben an |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| B2B Sales <br>`b2b_sales` | — | **offen** | STRITTIG: founder-led sales am Anfang - oder einkaufbar? | |
-| B2C Wachstum & Akquise <br>`b2c_growth` | — | **D** kommt drauf an | hängt am Kanal | |
-| Marketing & Brand <br>`marketing_brand` | — | **D** kommt drauf an | Markenarbeit kauft man, Haltung nicht | |
-| Performance Marketing <br>`performance_marketing` | einkaufbar |  |  | |
-| Partnerships & Business Development <br>`partnerships` | — | **D** kommt drauf an | hängt davon ab, wessen Netzwerk gebraucht wird | |
-| Customer Success <br>`customer_success` | — | **D** kommt drauf an | hängt an der Größe | |
-| Community <br>`community` | — | **D** kommt drauf an | hängt am Vorhaben | |
+### Finanzen & Finanzierung
 
-## Finanzen & Finanzierung
+| Bereich | Einordnung |
+|---|---|
+| Finanzplanung & Forecast <br>`financial_planning` | **offen** |
+| Unit Economics <br>`unit_economics` | gehört ins Team |
+| Buchhaltung & Controlling <br>`accounting_controlling` | einkaufbar |
+| Fundraising <br>`fundraising` | **offen** |
+| Investor Relations <br>`investor_relations` | **offen** |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Finanzplanung & Forecast <br>`financial_planning` | — |  |  | |
-| Unit Economics <br>`unit_economics` | — | **T** gehört ins Team | Faltins eigenes Beispiel gegen die Buchhaltung | |
-| Buchhaltung & Controlling <br>`accounting_controlling` | einkaufbar |  |  | |
-| Fundraising <br>`fundraising` | — | **offen** | STRITTIG: es gibt Berater, aber investiert wird in Gründer | |
-| Investor Relations <br>`investor_relations` | — | **offen** | STRITTIG: dasselbe | |
+### Operations, People & Organisation
 
-## Operations, People & Organisation
+| Bereich | Einordnung |
+|---|---|
+| Operations <br>`operations` | kommt auf das Vorhaben an |
+| Prozesse & Tooling <br>`process_design` | kommt auf das Vorhaben an |
+| Recruiting & Hiring <br>`recruiting` | kommt auf das Vorhaben an |
+| Führung & People Management <br>`people_management` | gehört ins Team |
+| Organisationsaufbau <br>`org_design` | gehört ins Team |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Operations <br>`operations` | — | **D** kommt drauf an | hängt am Vorhaben | |
-| Prozesse & Tooling <br>`process_design` | — | **D** kommt drauf an | hängt am Vorhaben | |
-| Recruiting & Hiring <br>`recruiting` | — | **D** kommt drauf an | am Anfang Chefsache, später eine Rolle | |
-| Führung & People Management <br>`people_management` | — | **T** gehört ins Team | man kann nicht einkaufen, jemandes Chefin zu sein | |
-| Organisationsaufbau <br>`org_design` | — | **T** gehört ins Team | wie die Firma geschnitten ist, entscheidet die Firma | |
+### Recht, Governance & Compliance
 
-## Recht, Governance & Compliance
+| Bereich | Einordnung |
+|---|---|
+| Gesellschaftsrecht & Verträge <br>`corporate_legal` | einkaufbar |
+| IP & Marken <br>`ip` | einkaufbar |
+| Datenschutz <br>`data_protection` | einkaufbar |
+| Compliance & Regulatorik <br>`compliance_regulatory` | einkaufbar |
+| Security <br>`security` | einkaufbar |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Gesellschaftsrecht & Verträge <br>`corporate_legal` | einkaufbar |  |  | |
-| IP & Marken <br>`ip` | einkaufbar |  |  | |
-| Datenschutz <br>`data_protection` | einkaufbar |  |  | |
-| Compliance & Regulatorik <br>`compliance_regulatory` | einkaufbar |  |  | |
-| Security <br>`security` | einkaufbar |  |  | |
+### Außenauftritt & Moderation
 
-## Außenauftritt & Moderation
+| Bereich | Einordnung |
+|---|---|
+| Vor Gruppen sprechen & Pitchen <br>`public_speaking` | kommt auf das Vorhaben an |
+| Moderation & Gespräche führen <br>`facilitation` | kommt auf das Vorhaben an |
+| Netzwerk aufbauen & halten <br>`networking` | kommt auf das Vorhaben an |
+| Unangenehmes ansprechen <br>`difficult_conversations` | gehört ins Team |
+| Anleiten & befähigen <br>`teaching_mentoring` | kommt auf das Vorhaben an |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Vor Gruppen sprechen & Pitchen <br>`public_speaking` | — | **D** kommt drauf an | eine Sprecherin kann man holen, Glaubwürdigkeit nicht | |
-| Moderation & Gespräche führen <br>`facilitation` | — | **D** kommt drauf an | einkaufbar, aber oft besser intern | |
-| Netzwerk aufbauen & halten <br>`networking` | — | **D** kommt drauf an | hängt davon ab, wessen Netzwerk zählt | |
-| Unangenehmes ansprechen <br>`difficult_conversations` | — | **T** gehört ins Team | ein schweres Gespräch kann niemand für dich führen | |
-| Anleiten & befähigen <br>`teaching_mentoring` | — | **D** kommt drauf an | hängt am Vorhaben | |
+### Zusammenarbeit & Verantwortung
 
-## Zusammenarbeit & Verantwortung
+| Bereich | Einordnung |
+|---|---|
+| Etwas bis zum Ergebnis verantworten <br>`owning_outcomes` | gehört ins Team |
+| Entscheiden, wenn Informationen fehlen <br>`deciding_under_uncertainty` | gehört ins Team |
+| Festlegen, was zuerst passiert <br>`prioritising` | gehört ins Team |
+| Arbeit so ordnen, dass andere andocken <br>`structuring_work` | gehört ins Team |
+| Abgeben und übergeben <br>`handing_over` | gehört ins Team |
+| Nach einem Rückschlag auswerten <br>`reviewing_setbacks` | gehört ins Team |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Etwas bis zum Ergebnis verantworten <br>`owning_outcomes` | gehört ins Team |  |  | |
-| Entscheiden, wenn Informationen fehlen <br>`deciding_under_uncertainty` | gehört ins Team |  |  | |
-| Festlegen, was zuerst passiert <br>`prioritising` | gehört ins Team |  |  | |
-| Arbeit so ordnen, dass andere andocken <br>`structuring_work` | gehört ins Team |  |  | |
-| Abgeben und übergeben <br>`handing_over` | gehört ins Team |  |  | |
-| Nach einem Rückschlag auswerten <br>`reviewing_setbacks` | gehört ins Team |  |  | |
+### Anderer Schwerpunkt
 
-## Anderer Schwerpunkt
+| Bereich | Einordnung |
+|---|---|
+| Etwas anderes <br>`other` | kommt auf das Vorhaben an |
 
-| Bereich | heute | mein Vorschlag | warum | **deine Entscheidung** |
-|---|---|---|---|---|
-| Etwas anderes <br>`other` | — | **D** kommt drauf an | Sammelposten | |
+## Wenn du etwas ändern willst
 
-## Die drei, bei denen ich keinen Vorschlag habe
-
-**Vertrieb B2B**, **Fundraising**, **Investorenbeziehungen**. Bei allen dreien
-gibt es einen Markt für Dienstleistung — und bei allen dreien sagt die
-Gründungslehre, dass es am Anfang die Gründerin selbst tun muss. Das ist keine
-Wissensfrage, sondern eine Haltung des Produkts. Deshalb deine Entscheidung.
-
-## Was ich nicht getan habe
-
-Ich habe die 34 unentschiedenen **nicht** einfach mit meinem Vorschlag
-überschrieben. Ein Vorschlag von mir ist keine Einordnung von euch — und genau
-der Unterschied war der Fehler, den der vierte Wert jetzt behebt.
+Sag mir Bereich und Wert — es ist eine kleine Migration. Dieses Dokument wird
+dann neu aus der Datenbank erzeugt, damit es nicht mit ihr auseinanderläuft.
 

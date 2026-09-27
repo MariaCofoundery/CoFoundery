@@ -442,3 +442,28 @@ test("die neuen Bereiche sind Zuständigkeiten, keine Eigenschaften", () => {
     assert.doesNotMatch(all, /hartnäckig|belastbar|durchsetzungsstark|resilient|persistent\b/i, locale);
   }
 });
+
+test("die Faltin-Einordnung ist entschieden - bis auf vier, und die stehen dazu", () => {
+  const migration = readFileSync(
+    "../supabase/migrations/20261051120000_sourcing_faltin_classification.sql",
+    "utf8"
+  ).replace(/^\s*--.*$/gm, "");
+
+  // ENTSCHIEDEN AM 26.09.2026 auf Grundlage von
+  // `docs/faltin-sourcing-review.md`. Übernommen wurde genau das, was dort
+  // als Vorschlag stand - nicht mehr.
+
+  // Faltins eigenes Beispiel stand bis dahin auf der Voreinstellung.
+  assert.match(migration, /sourcing = 'internal_only'[\s\S]{0,300}'unit_economics'/);
+  // Und "kommt drauf an" ist jetzt eine Entscheidung, keine Voreinstellung.
+  assert.match(migration, /sourcing = 'depends'[\s\S]{0,600}'software_engineering'/);
+
+  // VIER BLEIBEN OFFEN, und keiner von ihnen wird hier stillschweigend
+  // eingeordnet. Drei davon sind eine Haltungsfrage des Produkts
+  // (Dienstleistungsmarkt gegen founder-led), einer war schlicht übersehen -
+  // nachträglich einen Vorschlag zu erfinden wäre genau der Fehler, den der
+  // vierte Wert behebt.
+  for (const areaId of ["b2b_sales", "fundraising", "investor_relations", "financial_planning"]) {
+    assert.ok(!migration.includes(`'${areaId}'`), `${areaId} bleibt unentschieden`);
+  }
+});
