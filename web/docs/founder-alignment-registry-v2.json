@@ -1,0 +1,733 @@
+{
+  "instrumentId": "founder-alignment-v2",
+  "registryVersion": "v2.0.0-draft",
+  "status": "draft",
+  "createdAt": "2026-09-27",
+  "source": "CoFoundery_Wissenschaftliche_Neukonzeption.md v0.2 (26.09.2026), Teil D",
+  "notes": [
+    "KEIN REVERSE CODING. 'Niedrig' heisst jeweils weniger des benannten Inhalts, nicht den Gegenpol einer anderen Eigenschaft.",
+    "DIE BEDINGUNGEN SIND TEIL DER MESSVERSION, keine austauschbaren Hilfetexte. Wer sie weglaesst, misst etwas anderes.",
+    "ACHT KANDIDATEN SIND KEINE ACHT BESTAETIGTEN FAKTOREN. Kognitive Interviews und EFA duerfen das Modell veraendern.",
+    "KEINE GESAMTZAHL. Weder je Praeferenz noch ueber Praeferenzen hinweg entsteht aus diesen Items ein Passungswert."
+  ],
+  "answerFormats": {
+    "F": {
+      "kind": "frequency",
+      "labels": [
+        "nie",
+        "selten",
+        "manchmal",
+        "häufig",
+        "fast immer"
+      ],
+      "scoring": "1-5 ordinal, hoeher = haeufiger gewuenschtes Vorgehen",
+      "offersMissing": [
+        "cannot_assess",
+        "not_relevant"
+      ]
+    },
+    "C": {
+      "kind": "comfort",
+      "labels": [
+        "sehr unwohl",
+        "eher unwohl",
+        "weder wohl noch unwohl",
+        "eher wohl",
+        "sehr wohl"
+      ],
+      "scoring": "1-5 ordinal, hoeher = mehr Wohlbefinden",
+      "offersMissing": [
+        "cannot_assess",
+        "not_relevant"
+      ]
+    }
+  },
+  "missingCodes": [
+    {
+      "code": "cannot_assess",
+      "label": "kann ich noch nicht einschätzen",
+      "note": "Aussage ueber den eigenen Klaerungsstand. Wird NIE zur Skalenmitte."
+    },
+    {
+      "code": "not_relevant",
+      "label": "für mein Vorhaben nicht relevant",
+      "note": "Kein fehlender Wert im statistischen Sinn, sondern eine Angabe."
+    },
+    {
+      "code": "withheld",
+      "label": "möchte ich nicht angeben",
+      "note": "Bei vertraulichen Angaben kein negativer Befund - nur nicht vergleichbar."
+    },
+    {
+      "code": "technical",
+      "label": null,
+      "note": "Technisch fehlend. Nie mit den drei anderen vermischen."
+    }
+  ],
+  "preferences": [
+    {
+      "id": "A",
+      "label": "Analytische Prüfung",
+      "order": 1,
+      "definition": "Gewünschte Häufigkeit expliziter Kriterien- und Evidenzprüfung. Von selten bis häufig, nicht von intuitiv bis analytisch.",
+      "evidenceStatus": "plausible_transfer",
+      "answerFormat": "F",
+      "condition": null,
+      "items": [
+        {
+          "itemId": "A01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung mehrere Möglichkeiten anhand derselben Kriterien vergleichen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Kriteriengeleiteter Vergleich; grenzt Analyse von bloßer Verzögerung ab."
+        },
+        {
+          "itemId": "A02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung eine zentrale Annahme anhand verfügbarer Daten prüfen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Evidenzgebrauch; kein Anspruch auf vollständige Information."
+        },
+        {
+          "itemId": "A03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung die stärksten Gegenargumente zusammentragen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Suche nach Gegenbelegen; mögliche Erwünschtheit im Pilot prüfen."
+        },
+        {
+          "itemId": "A04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du bei widersprüchlichen Informationen die Verlässlichkeit der Quellen vergleichen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Quellenprüfung statt intuitiver Sicherheit."
+        },
+        {
+          "itemId": "A05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung mögliche Folgen schriftlich gegenüberstellen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Explizite Analyse; Schreibpräferenz als mögliche Fremdvarianz prüfen."
+        },
+        {
+          "itemId": "A06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung klären, welche zusätzliche Information deine Wahl noch ändern könnte?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Informationswert; analytische Prüfung ohne endlose Suche."
+        },
+        {
+          "itemId": "A07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du bei einer größeren Ausgabe verschiedene Annahmen durchrechnen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Szenarioanalyse; nur wenn größere Ausgaben vorstellbar sind."
+        },
+        {
+          "itemId": "A08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung deine Einschätzung mit einem ähnlichen früheren Fall vergleichen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Vergleichsanalyse; Überschneidung mit Erfahrungsintuition empirisch prüfen."
+        }
+      ]
+    },
+    {
+      "id": "I",
+      "label": "Nutzung von Erfahrungsintuition",
+      "order": 2,
+      "definition": "Gewünschte Nutzung subjektiver Muster- und Stimmigkeitssignale als zusätzliche Hinweise. Kein Ersatz für A, kein Maß für Richtigkeit.",
+      "evidenceStatus": "plausible_transfer",
+      "answerFormat": "F",
+      "condition": null,
+      "items": [
+        {
+          "itemId": "I01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du bei Entscheidungen in einem vertrauten Arbeitsgebiet deinen ersten Eindruck als Hinweis nutzen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Intuition bei Erfahrung; nicht Entscheidungsgeschwindigkeit."
+        },
+        {
+          "itemId": "I02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du bei widersprüchlichen Daten zusätzlich darauf achten, welche Möglichkeit sich für dich stimmig anfühlt?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Subjektives Stimmigkeitssignal als zusätzliche Information."
+        },
+        {
+          "itemId": "I03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du einem unguten Gefühl nachgehen, obwohl die verfügbaren Zahlen für eine Möglichkeit sprechen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Intuitiver Prüfimpuls; keine automatische Entscheidungsblockade."
+        },
+        {
+          "itemId": "I04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du eine vielversprechend wirkende Idee weiterverfolgen, bevor du deine Einschätzung vollständig erklären kannst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Vorverbale Einschätzung; mögliche Überschneidung mit Experimentierpräferenz."
+        },
+        {
+          "itemId": "I05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du deine Erfahrung als Entscheidungshilfe nutzen, wenn mehrere Möglichkeiten sachlich ähnlich gut abschneiden?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Erfahrungsintuition bei sachlichem Gleichstand."
+        },
+        {
+          "itemId": "I06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du ein spontan erkanntes Muster in deine Entscheidung einbeziehen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Mustererkennung; kognitive Interviews zur Verständlichkeit nötig."
+        },
+        {
+          "itemId": "I07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du bei vertrauten Aufgaben auf ein Erfahrungsgefühl zurückgreifen, auch wenn du es nicht in Zahlen ausdrücken kannst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Erfahrungsgebundenes Urteil ohne Quantifizierung."
+        },
+        {
+          "itemId": "I08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du bei einer neuen Möglichkeit deinen unmittelbaren Eindruck ausdrücklich in die Diskussion einbringen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Kommunizierte Intuition; Ausdrucksbereitschaft als Fremdvarianz prüfen."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Frühes Erproben reversibler Entscheidungen",
+      "order": 3,
+      "definition": "Gewünschter früher Handlungsbeginn bei begrenzten, korrigierbaren Folgen. Nicht generelle Geschwindigkeit oder psychologische Handlungsorientierung.",
+      "evidenceStatus": "own_hypothesis",
+      "answerFormat": "F",
+      "condition": "Die Versuche sind zeitlich und finanziell begrenzt, rückgängig zu machen und ohne erhebliche Folgen für Dritte.",
+      "items": [
+        {
+          "itemId": "E01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du einen kleinen, rückgängig machbaren Schritt ausprobieren, obwohl noch Informationen fehlen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Handlungsbeginn bei begrenzter Bindung."
+        },
+        {
+          "itemId": "E02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du bei zwei plausiblen Wegen zuerst einen davon im kleinen Rahmen testen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Experiment statt weiterer Vorabauswahl."
+        },
+        {
+          "itemId": "E03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du eine vorläufige Entscheidung treffen, wenn sich ihre Folgen günstig korrigieren lassen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Vorläufigkeit bei Reversibilität."
+        },
+        {
+          "itemId": "E04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du eine erste einfache Version ausprobieren, bevor alle Anforderungen geklärt sind?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Früher Test; nur bei begrenzten und verantwortbaren Folgen."
+        },
+        {
+          "itemId": "E05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du eine begrenzte Arbeitsphase beginnen, obwohl der weitere Verlauf noch offen ist?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Startbereitschaft; Aufwand ist vorab begrenzt."
+        },
+        {
+          "itemId": "E06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du eine Idee mit wenigen Interessierten testen, bevor ihr sie weiter ausarbeitet?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Kleiner Praxistest; Vorhaben ohne Markt noch vorstellbar."
+        },
+        {
+          "itemId": "E07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du offene Fragen durch einen praktischen Versuch beantworten?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Experimentelle Informationsgewinnung; kann mit Analyse hoch sein."
+        },
+        {
+          "itemId": "E08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du bei einer leicht korrigierbaren Entscheidung eine erste Richtung festlegen, bevor alle im Team sicher sind?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Früher Beschluss; Zustimmungserfordernisse als möglichen Zweitfaktor prüfen."
+        }
+      ]
+    },
+    {
+      "id": "U",
+      "label": "Eigenständiger Entscheidungsspielraum",
+      "order": 4,
+      "definition": "Gewünschte Autonomie innerhalb eines expliziten Mandats. Nicht Informationsverweigerung.",
+      "evidenceStatus": "plausible_transfer",
+      "answerFormat": "F",
+      "condition": "Stell dir vor, dein Verantwortungsbereich und Budget sind vereinbart. Entscheidungen mit wesentlichen Folgen für andere Bereiche sind davon ausgenommen.",
+      "items": [
+        {
+          "itemId": "U01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du innerhalb deines vereinbarten Verantwortungsbereichs selbst über das Vorgehen entscheiden?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Methodenautonomie in geklärtem Mandat."
+        },
+        {
+          "itemId": "U02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du in deinem Bereich die Reihenfolge deiner Aufgaben selbst festlegen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Planungsautonomie; als mögliche Unterfacette prüfen."
+        },
+        {
+          "itemId": "U03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du Ausgaben innerhalb eines vereinbarten Budgets selbst freigeben?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Entscheidungsautonomie bei fixem Budget."
+        },
+        {
+          "itemId": "U04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du in deinem Bereich zwischen mehreren Vorgehensweisen wählen, ohne vorher Zustimmung einzuholen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Freigabeunabhängigkeit, kein Informationsentzug."
+        },
+        {
+          "itemId": "U05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du einen vereinbarten Arbeitsplan in deinem Bereich selbst anpassen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Anpassungsspielraum."
+        },
+        {
+          "itemId": "U06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du selbst entscheiden, wann du für eine Aufgabe Unterstützung hinzuziehst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Selbststeuerung der Unterstützung."
+        },
+        {
+          "itemId": "U07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du bei Meinungsunterschieden über dein Fachgebiet die letzte Entscheidung treffen, wenn sie in deinem Mandat liegt?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Letztentscheidung; Macht-/Expertenstatus kann mitwirken."
+        },
+        {
+          "itemId": "U08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du einen begrenzten Versuch in deinem Bereich ohne gemeinsame Freigabe starten?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Experimentautonomie; mögliche Überlappung mit E."
+        }
+      ]
+    },
+    {
+      "id": "K",
+      "label": "Frühe gegenseitige Information",
+      "order": 5,
+      "definition": "Gewünschte Sichtbarkeit unfertiger Arbeit und Änderungen. Nicht Entscheidungshoheit, Nähebedürfnis oder Vertrauen.",
+      "evidenceStatus": "own_hypothesis",
+      "answerFormat": "F",
+      "condition": null,
+      "items": [
+        {
+          "itemId": "K01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du unfertige Zwischenstände mit den anderen Foundern teilen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Frühe Transparenz ohne Freigabepflicht."
+        },
+        {
+          "itemId": "K02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du von einer Richtungsänderung in einem anderen Bereich erfahren, bevor daraus ein fertiges Ergebnis entsteht?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Gewünschter Informationszeitpunkt."
+        },
+        {
+          "itemId": "K03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du kurze Zwischenstände austauschen, auch wenn gerade keine gemeinsame Entscheidung ansteht?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Informationsrhythmus, unabhängig von Entscheidungszentralisierung."
+        },
+        {
+          "itemId": "K04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du offene Fragen aus deinem Bereich für die anderen Founder sichtbar machen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Sichtbarkeit von Unfertigem."
+        },
+        {
+          "itemId": "K05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du vor einem Arbeitsschritt erfahren, ob er die Planung der anderen Founder beeinflusst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Abhängigkeitsbezogene Information."
+        },
+        {
+          "itemId": "K06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du die anderen Founder über Änderungen deiner Prioritäten informieren?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Prioritätentransparenz."
+        },
+        {
+          "itemId": "K07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du aktuelle Arbeitsstände der anderen Founder einsehen können, ohne erst nachfragen zu müssen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Asynchrone Sichtbarkeit; technische Verfügbarkeit separat."
+        },
+        {
+          "itemId": "K08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du auch kleine Verzögerungen mitteilen, bevor sie einen gemeinsamen Termin gefährden?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Frühe Abweichungskommunikation; mögliche Erwünschtheit."
+        }
+      ]
+    },
+    {
+      "id": "T",
+      "label": "Frühes Ansprechen sachlicher Differenzen",
+      "order": 6,
+      "definition": "Gewünschter früher Zeitpunkt, einen sachlichen Widerspruch sichtbar zu machen. Nicht sofortiges Ausdiskutieren.",
+      "evidenceStatus": "own_hypothesis",
+      "answerFormat": "F",
+      "condition": "Gemeint sind sachliche Differenzen zwischen Foundern, ohne akute Gefahr und außerhalb eines bereits eskalierten Streits.",
+      "items": [
+        {
+          "itemId": "T01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du eine sachliche Meinungsverschiedenheit noch im laufenden Gespräch ansprechen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Unmittelbarer Gesprächsbeginn."
+        },
+        {
+          "itemId": "T02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du einen Einwand äußern, bevor du ihn für dich vollständig ausformuliert hast?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Timing relativ zur eigenen Vorbereitung."
+        },
+        {
+          "itemId": "T03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du eine abweichende Einschätzung noch am selben Arbeitstag zur Sprache bringen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Konkretes Zeitfenster."
+        },
+        {
+          "itemId": "T04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du ein neues Bedenken direkt in die gemeinsame Diskussion einbringen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Zeitnahes Einbringen, kein Dominanzmaß."
+        },
+        {
+          "itemId": "T05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du einen sachlichen Widerspruch schon ansprechen, während du deine eigene Position noch klärst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Früher Austausch bei eigener Unsicherheit."
+        },
+        {
+          "itemId": "T06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du eine abweichende Sicht sofort erwähnen, auch wenn ihr die Klärung erst später plant?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Signalisieren getrennt von sofortigem Ausdiskutieren."
+        },
+        {
+          "itemId": "T07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du vor Ende eines Treffens benennen, wo du noch anderer Meinung bist?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Zeitnahe Sichtbarmachung."
+        },
+        {
+          "itemId": "T08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du einen sachlichen Einwand ansprechen, bevor das nächste geplante Treffen stattfindet?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Initiative zwischen Terminen; Rhythmus als Kontext."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Explizite Formulierung von Widerspruch",
+      "order": 7,
+      "definition": "Gewünschte sprachliche Eindeutigkeit eines Einwands. Nicht Aggression, Rücksichtslosigkeit oder Durchsetzungsstärke.",
+      "evidenceStatus": "own_hypothesis",
+      "answerFormat": "F",
+      "condition": "Gemeint sind sachliche Differenzen zwischen Foundern, ohne akute Gefahr und außerhalb eines bereits eskalierten Streits.",
+      "items": [
+        {
+          "itemId": "D01",
+          "order": 1,
+          "prompt": "Wie häufig möchtest du im Gespräch ausdrücklich sagen, dass du anderer Meinung bist?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Verbale Explizitheit."
+        },
+        {
+          "itemId": "D02",
+          "order": 2,
+          "prompt": "Wie häufig möchtest du einen Einwand als klare Aussage statt als offene Frage formulieren?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Form des Widerspruchs; keine globale Entweder-oder-Achse."
+        },
+        {
+          "itemId": "D03",
+          "order": 3,
+          "prompt": "Wie häufig möchtest du bei Kritik genau benennen, welchen Vorschlag du ablehnst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Gegenstandsbezogene Klarheit, nicht persönliche Härte."
+        },
+        {
+          "itemId": "D04",
+          "order": 4,
+          "prompt": "Wie häufig möchtest du direkt sagen, welche konkrete Änderung du dir wünschst?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Explizite Änderungsbitte."
+        },
+        {
+          "itemId": "D05",
+          "order": 5,
+          "prompt": "Wie häufig möchtest du klar aussprechen, wenn du eine Entscheidung nicht mittragen möchtest?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Explizite Grenze; keine Kompetenzbewertung."
+        },
+        {
+          "itemId": "D06",
+          "order": 6,
+          "prompt": "Wie häufig möchtest du bei einer Meinungsverschiedenheit zuerst deinen Einwand nennen und danach erklären?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Kommunikationsreihenfolge; engere Präferenzfacette."
+        },
+        {
+          "itemId": "D07",
+          "order": 7,
+          "prompt": "Wie häufig möchtest du klar unterscheiden, welchem Teil eines Vorschlags du zustimmst und welchem nicht?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Differenzierter Widerspruch; Erwünschtheit prüfen."
+        },
+        {
+          "itemId": "D08",
+          "order": 8,
+          "prompt": "Wie häufig möchtest du in einem schriftlichen Austausch einen Widerspruch ausdrücklich benennen?",
+          "answerFormat": "F",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Explizitheit im schriftlichen Kanal; Kanalvariation."
+        }
+      ]
+    },
+    {
+      "id": "X",
+      "label": "Wohlbefinden bei offener Informationslage",
+      "order": 8,
+      "definition": "Berichtetes Wohl-/Unwohlsein bei mehrdeutiger, unvollständiger Information. Kein klinischer Belastungswert und keine Verlustbereitschaft.",
+      "evidenceStatus": "plausible_transfer",
+      "answerFormat": "C",
+      "condition": "Es geht um eine offene Informationslage, nicht um akute Existenzbedrohung.",
+      "items": [
+        {
+          "itemId": "X01",
+          "order": 1,
+          "prompt": "Wie fühlst du dich, wenn mehrere plausible Erklärungen für dasselbe Ergebnis offenbleiben?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Mehrdeutigkeit; keine Verlusthöhe."
+        },
+        {
+          "itemId": "X02",
+          "order": 2,
+          "prompt": "Wie fühlst du dich, wenn sich noch nicht abzeichnet, welche Richtung ein Vorhaben nehmen wird?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Offener Verlauf."
+        },
+        {
+          "itemId": "X03",
+          "order": 3,
+          "prompt": "Wie fühlst du dich, wenn Rückmeldungen zu derselben Idee einander widersprechen?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Inkonsistente Information."
+        },
+        {
+          "itemId": "X04",
+          "order": 4,
+          "prompt": "Wie fühlst du dich, wenn eine wichtige Frage vorerst keine eindeutige Antwort hat?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Unauflösbarkeit auf Zeit."
+        },
+        {
+          "itemId": "X05",
+          "order": 5,
+          "prompt": "Wie fühlst du dich, wenn du in einem neuen Arbeitsgebiet noch keine verlässlichen Orientierungspunkte hast?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Unvertrautheit; Erfahrung dokumentieren."
+        },
+        {
+          "itemId": "X06",
+          "order": 6,
+          "prompt": "Wie fühlst du dich, wenn mehrere mögliche Entwicklungen über Wochen offenbleiben?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": true,
+          "rationale": "Dauer von Ungewissheit."
+        },
+        {
+          "itemId": "X07",
+          "order": 7,
+          "prompt": "Wie fühlst du dich, wenn noch nicht klar ist, welche Kriterien für eine neue Aufgabe entscheidend sein werden?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Unklare Beurteilungsmaßstäbe."
+        },
+        {
+          "itemId": "X08",
+          "order": 8,
+          "prompt": "Wie fühlst du dich, wenn neue Informationen eine bisher klare Einschätzung wieder offenlassen?",
+          "answerFormat": "C",
+          "reverse": false,
+          "inMvp": false,
+          "rationale": "Wiedereröffnete Ungewissheit."
+        }
+      ]
+    }
+  ]
+}

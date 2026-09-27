@@ -1,0 +1,143 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  ALIGNMENT_REGISTRY_V2,
+  assertAlignmentRegistryIntegrity,
+  getAlignmentItems,
+  getAlignmentPreferences,
+  getMvpAlignmentItems,
+  getPreferenceOfItem,
+  type AlignmentRegistryV2,
+} from "@/features/instruments/v2/alignmentRegistryV2";
+
+const clone = (): AlignmentRegistryV2 =>
+  JSON.parse(JSON.stringify(ALIGNMENT_REGISTRY_V2)) as AlignmentRegistryV2;
+
+// ---------------------------------------------------------------------------
+// Schritt 1: Das Modell v2 als Daten
+// ---------------------------------------------------------------------------
+//
+// Quelle ist Teil D der „Wissenschaftlichen Neukonzeption" v0.2. Die
+// Itemtexte sind wörtlich übernommen, damit sich Papier und Code gegeneinander
+// prüfen lassen.
+
+test("acht Präferenzen, vierundsechzig Items, sechzehn in der Gesprächsfassung", () => {
+  const preferences = getAlignmentPreferences();
+  const items = getAlignmentItems();
+
+  assert.deepEqual(
+    preferences.map((preference) => preference.id),
+    ["A", "I", "E", "U", "K", "T", "D", "X"]
+  );
+  assert.equal(items.length, 64);
+  assert.equal(getMvpAlignmentItems().length, 16);
+
+  // Zwei je Präferenz - und das ist im Gutachten ausdrücklich KEINE kurze
+  // zuverlässige Skala, sondern zwei Gesprächsindikatoren.
+  for (const preference of preferences) {
+    assert.equal(
+      preference.items.filter((item) => item.inMvp).length,
+      2,
+      `${preference.id}: genau zwei in der Gesprächsfassung`
+    );
+  }
+});
+
+test("kein Item ist umgepolt", () => {
+  // DIE FEHLERQUELLE AUS V1, hier strukturell ausgeschlossen: Dort liefen
+  // sechs Zustimmungsitems gegen ihre eigene Achse, und es fiel monatelang
+  // niemandem auf. „Niedrig" heißt jetzt weniger des benannten Inhalts,
+  // nicht den Gegenpol einer anderen Eigenschaft.
+  for (const item of getAlignmentItems()) {
+    assert.equal(item.reverse, false, item.itemId);
+  }
+
+  const broken = clone();
+  (broken.preferences[0].items[0] as { reverse: boolean }).reverse = true;
+  assert.throws(() => assertAlignmentRegistryIntegrity(broken), /reverse coding/);
+});
+
+test("die Bedingungen gehören zur Messung, nicht zur Oberfläche", () => {
+  const byId = new Map(getAlignmentPreferences().map((p) => [p.id, p]));
+
+  // Ohne diesen Satz misst U etwas anderes - nämlich Autonomie ohne Mandat.
+  assert.match(byId.get("U")!.condition ?? "", /Verantwortungsbereich und Budget sind vereinbart/);
+  // Ohne diesen misst E Leichtsinn statt Erproben.
+  assert.match(byId.get("E")!.condition ?? "", /rückgängig zu machen/);
+  // T und D meinen sachliche Differenzen, keinen eskalierten Streit.
+  assert.match(byId.get("T")!.condition ?? "", /ohne akute Gefahr/);
+  assert.match(byId.get("D")!.condition ?? "", /ohne akute Gefahr/);
+  // Und X meint offene Information, keine Existenzangst.
+  assert.match(byId.get("X")!.condition ?? "", /nicht um akute Existenzbedrohung/);
+});
+
+test("die Auslassungsgründe sind getrennt und werden nie zur Mitte", () => {
+  const codes = ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.code);
+  assert.deepEqual(codes, ["cannot_assess", "not_relevant", "withheld", "technical"]);
+
+  // Vier verschiedene Dinge: der eigene Klärungsstand, das Vorhaben, eine
+  // Entscheidung, ein technischer Ausfall. Wer sie zusammenwirft, macht aus
+  // „möchte ich nicht sagen" ein „weiß ich nicht".
+  const notes = ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.note).join(" ");
+  assert.match(notes, /NIE zur Skalenmitte/);
+});
+
+test("das Modell verspricht keine Gesamtzahl und keine bestätigten Faktoren", () => {
+  const notes = ALIGNMENT_REGISTRY_V2.notes.join(" ");
+  assert.match(notes, /KEINE GESAMTZAHL/);
+  assert.match(notes, /keine acht bestaetigten Faktoren/i);
+
+  // Und der Status ist ehrlich: keine Präferenz behauptet, etabliert zu sein.
+  for (const preference of getAlignmentPreferences()) {
+    assert.ok(
+      ["plausible_transfer", "own_hypothesis"].includes(preference.evidenceStatus),
+      `${preference.id}: ${preference.evidenceStatus}`
+    );
+  }
+});
+
+test("die Fragetexte sind vollständig, verschieden und wirklich Fragen", () => {
+  // WAS HIER NICHT GEPRÜFT WERDEN KANN, und das ist eine echte Lücke:
+  // Ob die Texte wörtlich dem Gutachten entsprechen. Die Quelle
+  // („Wissenschaftliche Neukonzeption" v0.2) liegt nicht im Repo - sie kam
+  // als Anhang. Sobald sie unter `docs/` liegt, gehört hier ein Abgleich
+  // gegen sie hin; ein Instrument, dessen Fragen sich unbemerkt von ihrer
+  // Quelle entfernen, ist nicht mehr das Instrument, das begutachtet wurde.
+  //
+  // Bis dahin: die Prüfungen, die ohne die Quelle möglich sind.
+  const items = getAlignmentItems();
+  const prompts = items.map((item) => item.prompt);
+
+  assert.equal(new Set(prompts).size, prompts.length, "kein Fragetext doppelt");
+  for (const item of items) {
+    assert.ok(item.prompt.trim().endsWith("?"), `${item.itemId}: keine Frage`);
+    assert.ok(item.prompt.length >= 40, `${item.itemId}: verdächtig kurz`);
+    // Die beiden Formate fragen verschiedene Dinge, und das muss man am
+    // Satz erkennen: F nach gewünschter Häufigkeit, C nach Befinden.
+    if (item.answerFormat === "F") {
+      assert.match(item.prompt, /^Wie häufig möchtest du /, item.itemId);
+    } else {
+      assert.match(item.prompt, /^Wie fühlst du dich, wenn /, item.itemId);
+    }
+  }
+});
+
+test("Kennungen sind eindeutig und auffindbar", () => {
+  const ids = getAlignmentItems().map((item) => item.itemId);
+  assert.equal(new Set(ids).size, ids.length);
+
+  assert.equal(getPreferenceOfItem("A01")?.id, "A");
+  assert.equal(getPreferenceOfItem("X08")?.id, "X");
+  assert.equal(getPreferenceOfItem("gibtesnicht"), null);
+
+  const broken = clone();
+  broken.preferences[1].items[0].itemId = broken.preferences[0].items[0].itemId;
+  assert.throws(() => assertAlignmentRegistryIntegrity(broken), /doppelte Kennung/);
+});
+
+test("jede Präferenz kommt in der Gesprächsfassung vor", () => {
+  // Sonst stünde sie im Modell und wäre im Produkt unsichtbar.
+  const broken = clone();
+  for (const item of broken.preferences[0].items) item.inMvp = false;
+  assert.throws(() => assertAlignmentRegistryIntegrity(broken), /kein einziges Item/);
+});
