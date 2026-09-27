@@ -58,14 +58,17 @@ export default async function AlignmentV2Page({ params, searchParams }: Props) {
   const { data: rows } = draft
     ? await supabase
         .from("alignment_answers")
-        .select("block_id, value, missing_code")
+        .select("block_id, value, missing_code, marked_for_discussion")
         .eq("assessment_id", draft.id)
     : { data: [] };
 
   const initialAnswers = Object.fromEntries(
     (rows ?? []).map((row) => [
       row.block_id,
-      row.missing_code ? { missingCode: row.missing_code } : { value: row.value },
+      {
+        ...(row.missing_code ? { missingCode: row.missing_code } : { value: row.value }),
+        markedForDiscussion: row.marked_for_discussion,
+      },
     ])
   );
 

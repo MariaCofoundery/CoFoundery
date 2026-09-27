@@ -55,5 +55,10 @@
     "date": "date",
     "text": "Your answer"
   },
-  "sourceLanguage": "The questions themselves are shown in German. Translating a measurement instrument is not a translation task but a re-validation: an item that reads differently measures something else, and none of the equivalence work has been done. An English version comes after the cognitive interviews, not before."
+  "sourceLanguage": "The questions themselves are shown in German. Translating a measurement instrument is not a translation task but a re-validation: an item that reads differently measures something else, and none of the equivalence work has been done. An English version comes after the cognitive interviews, not before.",
+  "discussion": {
+    "mark": "I want to talk about this",
+    "markHint": "It then goes to the top of your conversation agenda — even if you both answered the same.",
+    "changeCondition": "What would change your answer? (optional)"
+  }
 }

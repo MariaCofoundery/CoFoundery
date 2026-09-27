@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(26);
+select extensions.plan(28);
 
 -- ---------------------------------------------------------------------------
 -- Antworten auf das Instrument v2
@@ -211,6 +211,31 @@ select extensions.lives_ok(
     values ('a2000010-0010-4010-8010-000000000010', 'W01', 'value_case',
             '{"importanceA":5,"importanceB":5,"path":"A"}')$$,
   'beide Anliegen sehr wichtig ist ein gueltiger Zustand'
+);
+
+-- ---------------------------------------------------------------------------
+-- 5b. Die Gespraechsmarkierung steht neben der Antwort
+-- ---------------------------------------------------------------------------
+--
+-- "Darueber moechte ich sprechen" ist keine Antwort auf die Frage. Deshalb
+-- eine eigene Spalte: Laege sie in `value`, wuerde sie mitverglichen - und aus
+-- einer freiwilligen Notiz wuerde ein Unterschied zwischen zwei Menschen.
+
+select extensions.is(
+  (select marked_for_discussion from public.alignment_answers
+   where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'),
+  false,
+  'ohne Angabe ist nichts markiert'
+);
+
+-- Eine Markierung ohne Antwort muss moeglich sein: "darueber moechte ich
+-- reden" gilt auch dann, wenn die Frage selbst noch offen ist.
+select extensions.lives_ok(
+  $$insert into public.alignment_answers
+      (assessment_id, block_id, answer_format, missing_code, marked_for_discussion, change_condition)
+    values ('a2000010-0010-4010-8010-000000000010', 'G01', 'single_choice', 'undecided',
+            true, 'Wenn wir die Bereiche klar aufgeteilt haben.')$$,
+  'noch offen und trotzdem zur Besprechung markiert'
 );
 
 -- ---------------------------------------------------------------------------

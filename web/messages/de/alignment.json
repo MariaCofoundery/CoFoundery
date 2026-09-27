@@ -55,5 +55,10 @@
     "date": "Datum",
     "text": "Deine Antwort"
   },
-  "sourceLanguage": "Die Fragen selbst stehen auf Deutsch. Ein Messinstrument zu übersetzen ist keine Übersetzungsarbeit, sondern eine neue Validierung: Ein Item, das sich anders liest, misst etwas anderes, und die Äquivalenzprüfung dafür gibt es nicht. Eine englische Fassung kommt nach den kognitiven Interviews, nicht davor."
+  "sourceLanguage": "Die Fragen selbst stehen auf Deutsch. Ein Messinstrument zu übersetzen ist keine Übersetzungsarbeit, sondern eine neue Validierung: Ein Item, das sich anders liest, misst etwas anderes, und die Äquivalenzprüfung dafür gibt es nicht. Eine englische Fassung kommt nach den kognitiven Interviews, nicht davor.",
+  "discussion": {
+    "mark": "Darüber möchte ich sprechen",
+    "markHint": "Das steht dann oben auf eurer Gesprächsagenda — auch wenn ihr gleich geantwortet habt.",
+    "changeCondition": "Was würde deine Antwort ändern? (freiwillig)"
+  }
 }

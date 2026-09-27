@@ -12,7 +12,12 @@ import {
 } from "@/features/instruments/v2/alignmentAnswerActions";
 import type { AlignmentModule } from "@/features/instruments/v2/alignmentProgress";
 
-type Draft = { value?: AlignmentAnswerValue; missingCode?: AlignmentAnswer["missingCode"] };
+type Draft = {
+  value?: AlignmentAnswerValue;
+  missingCode?: AlignmentAnswer["missingCode"];
+  /** Steht neben der Antwort, nicht in ihr - siehe AnswerAnnotations. */
+  markedForDiscussion?: boolean;
+};
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 type Props = {
@@ -61,14 +66,24 @@ export function AlignmentQuestionnaire({
       timers.current[blockId] = setTimeout(async () => {
         setStates((current) => ({ ...current, [blockId]: "saving" }));
 
-        const empty = draft.missingCode === undefined && !hasContent(draft.value);
+        // Eine Markierung allein haelt die Zeile am Leben: „darueber moechte
+        // ich sprechen" ist auch dann eine Aussage, wenn die Frage selbst
+        // noch offen ist.
+        const empty =
+          draft.missingCode === undefined &&
+          !hasContent(draft.value) &&
+          !draft.markedForDiscussion;
         const result = empty
           ? await clearAlignmentAnswer(module, blockId)
-          : await saveAlignmentAnswer(module, {
-              blockId,
-              answerFormat,
-              ...(draft.missingCode ? { missingCode: draft.missingCode } : { value: draft.value }),
-            } as AlignmentAnswer);
+          : await saveAlignmentAnswer(
+              module,
+              {
+                blockId,
+                answerFormat,
+                ...(draft.missingCode ? { missingCode: draft.missingCode } : { value: draft.value }),
+              } as AlignmentAnswer,
+              { markedForDiscussion: draft.markedForDiscussion ?? false }
+            );
 
         setStates((current) => ({ ...current, [blockId]: result.ok ? "saved" : "error" }));
         setErrors((current) => ({ ...current, [blockId]: result.ok ? "" : result.reason }));
@@ -154,6 +169,27 @@ export function AlignmentQuestionnaire({
                     persist(entry.blockId, entry.answerFormat, next);
                   }}
                 />
+
+                {/* DIE MARKIERUNG STEHT BEI DER FRAGE, nicht in einem Menue.
+                    Sie ist Prioritaet 1 der Gespraechsagenda - vor jedem
+                    berechneten Unterschied. */}
+                <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={Boolean(draft.markedForDiscussion)}
+                    disabled={isSubmitted}
+                    onChange={(event) => {
+                      const next = { ...draft, markedForDiscussion: event.target.checked };
+                      setAnswers((current) => ({ ...current, [entry.blockId]: next }));
+                      persist(entry.blockId, entry.answerFormat, next);
+                    }}
+                  />
+                  <span>
+                    {t("discussion.mark")}
+                    <span className="block text-xs text-slate-500">{t("discussion.markHint")}</span>
+                  </span>
+                </label>
 
                 <div className="mt-3 flex items-center gap-3 text-xs">
                   {state === "saving" && <span className="text-slate-500">{t("shell.saving")}</span>}

@@ -65,9 +65,23 @@ async function draftFor(module: AlignmentModule) {
   return { supabase, draft: created };
 }
 
+/**
+ * Die Markierung und die Bedingung stehen NEBEN der Antwort, nicht in ihr.
+ *
+ * "Darueber moechte ich sprechen" ist keine Antwort auf die Frage - und
+ * "was meine Wahl aendern wuerde" auch nicht. Beides gehoert deshalb nicht in
+ * `value`: Sonst wuerde es mitverglichen, und aus einer freiwilligen Notiz
+ * wuerde ein Unterschied zwischen zwei Menschen.
+ */
+export type AnswerAnnotations = {
+  markedForDiscussion?: boolean;
+  changeCondition?: string | null;
+};
+
 export async function saveAlignmentAnswer(
   module: AlignmentModule,
-  answer: AlignmentAnswer
+  answer: AlignmentAnswer,
+  annotations: AnswerAnnotations = {}
 ): Promise<Result> {
   const verdict = validateAlignmentAnswer(answer);
   if (!verdict.ok) return verdict;
@@ -81,6 +95,8 @@ export async function saveAlignmentAnswer(
       answer_format: answer.answerFormat,
       value: answer.value ?? null,
       missing_code: answer.missingCode ?? null,
+      marked_for_discussion: annotations.markedForDiscussion ?? false,
+      change_condition: annotations.changeCondition?.trim() || null,
       answered_at: new Date().toISOString(),
     },
     { onConflict: "assessment_id,block_id" }
