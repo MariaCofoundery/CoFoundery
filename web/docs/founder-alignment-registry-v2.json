@@ -59,6 +59,16 @@
       "note": "Bei vertraulichen Angaben kein negativer Befund - nur nicht vergleichbar."
     },
     {
+      "code": "undecided",
+      "label": "noch offen",
+      "note": "NICHT dasselbe wie 'kann ich noch nicht einschaetzen': hier hat sich jemand nicht festgelegt, dort kann jemand nicht beurteilen. R04 bietet beide nebeneinander an. Fuer das Produkt ist das kein fehlender Wert, sondern der Treffer - genau hierueber waere zu sprechen."
+    },
+    {
+      "code": "confidential_first",
+      "label": "möchte ich zunächst vertraulich klären",
+      "note": "Eine offene Tuer, keine geschlossene: anders als 'moechte ich nicht angeben' bittet dieser Code um ein Gespraech unter vier Augen. Wer beides zusammenwirft, verliert genau die Bitte."
+    },
+    {
       "code": "technical",
       "label": null,
       "note": "Technisch fehlend. Nie mit den drei anderen vermischen."

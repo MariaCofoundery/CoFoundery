@@ -38,8 +38,24 @@ import registryJson from "../../../../docs/founder-alignment-registry-v2.json";
 
 export type AnswerFormatId = "F" | "C";
 
+/**
+ * Die Auslassungsgruende - EINE Liste fuer das ganze Instrument.
+ *
+ * Sie stehen hier und nicht je Registratur, weil zwei Listen derselben Sache
+ * auseinanderlaufen: Die Kontextfragen aus Schritt 1b haetten sonst ihre
+ * eigenen Codes bekommen, und spaetestens beim Report waere „noch offen" in
+ * der einen Haelfte etwas anderes gewesen als in der anderen.
+ */
 export type MissingCode = {
-  code: "cannot_assess" | "not_relevant" | "withheld" | "technical";
+  code:
+    | "cannot_assess"
+    | "not_relevant"
+    | "withheld"
+    /** Nicht festgelegt - anders als „kann ich nicht einschaetzen". */
+    | "undecided"
+    /** Bittet um ein Gespraech unter vier Augen. Keine Verweigerung. */
+    | "confidential_first"
+    | "technical";
   label: string | null;
   note: string;
 };

@@ -74,10 +74,23 @@ test("die Bedingungen gehören zur Messung, nicht zur Oberfläche", () => {
 
 test("die Auslassungsgründe sind getrennt und werden nie zur Mitte", () => {
   const codes = ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.code);
-  assert.deepEqual(codes, ["cannot_assess", "not_relevant", "withheld", "technical"]);
+  assert.deepEqual(codes, [
+    "cannot_assess",
+    "not_relevant",
+    "withheld",
+    // Am 27.09.2026 mit Schritt 1b dazugekommen. Die Kontextfragen brauchen
+    // beide, und keiner von ihnen ließ sich auf die vorhandenen abbilden:
+    // „noch offen" kommt in der Quelle 67-mal vor und meint eine fehlende
+    // Festlegung, nicht ein fehlendes Urteil - R04 bietet beide nebeneinander
+    // an. Und „vertraulich klären" ist eine offene Tür, keine geschlossene.
+    "undecided",
+    "confidential_first",
+    "technical",
+  ]);
 
-  // Vier verschiedene Dinge: der eigene Klärungsstand, das Vorhaben, eine
-  // Entscheidung, ein technischer Ausfall. Wer sie zusammenwirft, macht aus
+  // Sechs verschiedene Dinge: der eigene Klärungsstand, das Vorhaben, eine
+  // Entscheidung, eine ausstehende Festlegung, die Bitte um ein Gespräch unter
+  // vier Augen, ein technischer Ausfall. Wer sie zusammenwirft, macht aus
   // „möchte ich nicht sagen" ein „weiß ich nicht".
   const notes = ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.note).join(" ");
   assert.match(notes, /NIE zur Skalenmitte/);

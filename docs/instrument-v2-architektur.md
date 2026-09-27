@@ -231,8 +231,26 @@ bevor der letzte fertig ist.
 Weitere erst möglich. Den würde ich sofort nach Fertigstellung pushen, damit
 er nicht monatelang ungemergt danebenliegt.
 
-Alles ab Schritt 1 sammelt sich auf einem langen Zweig und geht gemeinsam
-live.
+**Nachtrag vom 27.09.2026 — auch Schritt 1 ist gegangen, und die Regel lautet
+jetzt anders.** Ursprünglich stand hier: alles ab Schritt 1 sammelt sich auf
+einem langen Zweig. Schritt 1a und 1b sind trotzdem nach `main` gemergt, und
+das ist kein Versehen, sondern eine Korrektur der Regel: Schritt 1 legt nur
+Daten und Tests an. Kein einziger Import zeigt von außerhalb
+`src/features/instruments/v2/` dorthin — ein Test hält das fest. Für die
+laufende Anwendung ist das Modell v2 damit genauso unsichtbar wie Schritt 0.
+
+Die Grenze ist also nicht die Schrittnummer, sondern die Erreichbarkeit: Was
+niemand erreichen kann, darf nach `main`. **Ab Schritt 2 — der ersten
+Oberfläche — sammelt sich alles auf einem langen Zweig und geht gemeinsam
+live.** Das Gegenteil wäre das teurere Risiko: Monate unvermischter Arbeit
+neben einem `main`, das sich weiterbewegt.
+
+| # | Status |
+|---|---|
+| 0 | erledigt, auf `main` (Migration `20261053120000`) |
+| 1a | erledigt, auf `main` — acht Präferenzen, 64 Items |
+| 1b | erledigt — 30 Kontextfragen, 10 Wertefälle, 3 Grenzfragen |
+| ab 2 | langer Zweig |
 
 ---
 

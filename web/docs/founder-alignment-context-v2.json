@@ -1,0 +1,1543 @@
+{
+  "instrumentId": "founder-alignment-v2",
+  "registryVersion": "0.2.0",
+  "status": "draft",
+  "createdAt": "2026-09-27",
+  "source": "docs/CoFoundery_Wissenschaftliche_Neukonzeption.md (v0.2, 26.09.2026), Teil D und Teil E",
+  "notes": [
+    "KEINE INTERNE KONSISTENZ ALS GUETEKRITERIUM. Zeitbudget und gewuenschte Gewinnverwendung muessen nicht korrelieren - diese Bloecke sind keine Skala.",
+    "KEINE GESAMTZAHL, auch nicht je Gruppe. Nichts hiervon wird gemittelt, summiert oder in eine Rangfolge gebracht.",
+    "'NOCH OFFEN' IST EINE ANTWORT, kein fehlender Wert - und oft die wichtigste: Sie benennt genau das, worueber zu sprechen waere.",
+    "DIE WERTEFAELLE HABEN KEINEN WERTESCORE. Gleiche Wahl bei verschiedenen Begruendungen ist keine gleiche Werthaltung."
+  ],
+  "importanceLabels": [
+    "gar nicht wichtig",
+    "wenig wichtig",
+    "mittel wichtig",
+    "ziemlich wichtig",
+    "sehr wichtig"
+  ],
+  "paperMvpSelection": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R06",
+    "R12",
+    "B01",
+    "B05",
+    "G01",
+    "G02",
+    "W01",
+    "W02",
+    "W03",
+    "W04",
+    "W05",
+    "W06"
+  ],
+  "deviationsFromSource": [
+    {
+      "blocks": [
+        "L01",
+        "L02",
+        "L03"
+      ],
+      "change": "added_to_mvp",
+      "reason": "Das Gutachten legt die Grenzfragen in die Vertiefung. Sie gehoeren in die Gespraechsfassung: Der Zweck des Produkts ist, Konflikte in Gruenderteams zu verringern, und eine Grenze, die niemand kennt, wird ueberschritten, bevor sie jemand benennt.",
+      "decidedBy": "Maria",
+      "decidedOn": "2026-09-27"
+    },
+    {
+      "blocks": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R06",
+        "R12"
+      ],
+      "change": "moved_to_step_2",
+      "reason": "Stunden, Geld und Termine sind Zusagen, keine Selbstauskunft. Wer sie beim ersten Ausfuellen abfragt, verlangt eine Festlegung, bevor ueberhaupt klar ist, mit wem. Sie kommen als zweiter Schritt.",
+      "decidedBy": "Maria",
+      "decidedOn": "2026-09-27"
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "S01",
+      "group": "S",
+      "prompt": "Welches Ergebnis möchtest du mit dem Unternehmen in den nächsten drei Jahren vor allem erreichen?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "ein verlässlich tragfähiges Einkommen",
+          "requiresText": false
+        },
+        {
+          "value": "starkes Wachstum in einem größeren Markt",
+          "requiresText": false
+        },
+        {
+          "value": "eine klar benannte gesellschaftliche oder ökologische Wirkung",
+          "requiresText": false
+        },
+        {
+          "value": "ein verkaufsfähiges Unternehmen aufbauen",
+          "requiresText": false
+        },
+        {
+          "value": "ein fachlich anspruchsvolles Vorhaben verwirklichen",
+          "requiresText": false
+        },
+        {
+          "value": "mehrere gleich wichtige Ziele – bitte benennen",
+          "requiresText": true
+        },
+        {
+          "value": "ein anderes Ziel – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: ein verlässlich tragfähiges Einkommen; starkes Wachstum in einem größeren Markt; eine klar benannte gesellschaftliche oder ökologische Wirkung; ein verkaufsfähiges Unternehmen aufbauen; ein fachlich anspruchsvolles Vorhaben verwirklichen; mehrere gleich wichtige Ziele – bitte benennen; ein anderes Ziel – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Primäres Unternehmensziel; Mehrfachmotivation bleibt sichtbar.",
+      "order": 1,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "S02",
+      "group": "S",
+      "prompt": "Welche Rolle soll ein Verkauf deiner Anteile in deiner Planung spielen?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "ich möchte langfristig beteiligt bleiben",
+          "requiresText": false
+        },
+        {
+          "value": "ein Verkauf ist eine mögliche Option",
+          "requiresText": false
+        },
+        {
+          "value": "ich möchte auf einen Verkauf hinarbeiten",
+          "requiresText": false
+        },
+        {
+          "value": "das hängt von bestimmten Bedingungen ab – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: ich möchte langfristig beteiligt bleiben; ein Verkauf ist eine mögliche Option; ich möchte auf einen Verkauf hinarbeiten; das hängt von bestimmten Bedingungen ab – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Exitabsicht; keine Gleichsetzung mit kurzfristigem Profit.",
+      "order": 2,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "S03",
+      "group": "S",
+      "prompt": "Welche Haltung hast du aktuell zu externem Eigenkapital?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "ich möchte ohne externes Eigenkapital aufbauen",
+          "requiresText": false
+        },
+        {
+          "value": "ich möchte es als Möglichkeit offenhalten",
+          "requiresText": false
+        },
+        {
+          "value": "ich möchte gezielt externes Eigenkapital suchen",
+          "requiresText": false
+        },
+        {
+          "value": "für mich hängt es von Bedingungen ab – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: ich möchte ohne externes Eigenkapital aufbauen; ich möchte es als Möglichkeit offenhalten; ich möchte gezielt externes Eigenkapital suchen; für mich hängt es von Bedingungen ab – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Finanzierungspräferenz, getrennt von Risikotoleranz.",
+      "order": 3,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "S04",
+      "group": "S",
+      "prompt": "Welches konkrete Ergebnis soll euer Vorhaben in den nächsten zwölf Monaten erreicht haben?",
+      "answerFormat": "structured_text",
+      "unit": null,
+      "hint": null,
+      "options": [],
+      "fieldNotes": [
+        "Freitext: Ergebnis, erkennbare Erfüllung, Zieldatum"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Strukturierter Freitext: Freitext: Ergebnis, erkennbare Erfüllung, Zieldatum; noch offen; möchte ich nicht angeben",
+      "rationale": "Gemeinsamer Meilenstein; Ziele dürfen für Pre-Idea auch Problemprüfung betreffen.",
+      "order": 4,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "S05",
+      "group": "S",
+      "prompt": "Wie möchtest du mögliche Gewinne in den nächsten zwei Jahren verwenden?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "überwiegend im Unternehmen belassen",
+          "requiresText": false
+        },
+        {
+          "value": "zwischen Unternehmen und Ausschüttung aufteilen",
+          "requiresText": false
+        },
+        {
+          "value": "überwiegend ausschütten",
+          "requiresText": false
+        },
+        {
+          "value": "je nach vereinbarter finanzieller Lage entscheiden",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: überwiegend im Unternehmen belassen; zwischen Unternehmen und Ausschüttung aufteilen; überwiegend ausschütten; je nach vereinbarter finanzieller Lage entscheiden; noch offen; möchte ich nicht angeben",
+      "rationale": "Gewinnverwendung; ordinale Anteile ohne künstlich genaue 0–100-Skala.",
+      "order": 5,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "S06",
+      "group": "S",
+      "prompt": "Welche Rolle möchtest du in drei Jahren selbst im Unternehmen haben?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "operativ mitarbeiten",
+          "requiresText": false
+        },
+        {
+          "value": "vor allem führen und organisieren",
+          "requiresText": false
+        },
+        {
+          "value": "vor allem fachlich gestalten",
+          "requiresText": false
+        },
+        {
+          "value": "vor allem als Anteilseigner beteiligt sein",
+          "requiresText": false
+        },
+        {
+          "value": "eine andere oder kombinierte Rolle – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: operativ mitarbeiten; vor allem führen und organisieren; vor allem fachlich gestalten; vor allem als Anteilseigner beteiligt sein; eine andere oder kombinierte Rolle – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Gewünschte Rolle, kein Founder-Typ.",
+      "order": 6,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "S07",
+      "group": "S",
+      "prompt": "Woran würdest du erkennen, dass sich der weitere Aufbau für dich nicht mehr lohnt?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext: Ereignis oder Bedingung",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Freitext: Freitext: Ereignis oder Bedingung; noch offen; möchte ich nicht angeben",
+      "rationale": "Individuelle Fortführungsgrenze; nicht als geringe Loyalität interpretieren.",
+      "order": 7,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "S08",
+      "group": "S",
+      "prompt": "Welches Ziel möchtest du auch dann weiterverfolgen, wenn das Wachstum zunächst geringer ausfällt?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext oder: kein solches Ziel festgelegt",
+      "options": [
+        {
+          "value": "kein solches Ziel festgelegt",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Freitext: Freitext oder: kein solches Ziel festgelegt; noch offen; möchte ich nicht angeben",
+      "rationale": "Nichtkompensierbare Zielpriorität, falls vorhanden.",
+      "order": 8,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R01",
+      "group": "R",
+      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen verlässlich für das Vorhaben zusagen?",
+      "answerFormat": "number_range",
+      "unit": "Stunden/Woche",
+      "hint": "Zahl oder Bereich in Stunden/Woche",
+      "options": [],
+      "fieldNotes": [
+        "0 ist zulässig"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Originaleinheit Stunden/Woche; Unter- und Obergrenze getrennt speichern. Kein Reverse.",
+      "answerSpecSource": "Zahl/Bereich: Zahl oder Bereich in Stunden/Woche; 0 ist zulässig; noch offen; möchte ich nicht angeben",
+      "rationale": "Verfügbare Zeit als Ressource; keine Motivationsmessung.",
+      "order": 1,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "R02",
+      "group": "R",
+      "prompt": "Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen von den anderen Foundern?",
+      "answerFormat": "person_number_range",
+      "unit": "Stunden/Woche",
+      "hint": "pro Person oder geplanter Rolle: Zahl/Bereich in Stunden/Woche",
+      "options": [
+        {
+          "value": "keine feste Erwartung",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Stunden/Woche je Empfänger; nicht über Personen mitteln. Kein Reverse.",
+      "answerSpecSource": "Personenbezogene Zahl/Bereich: pro Person oder geplanter Rolle: Zahl/Bereich in Stunden/Woche; keine feste Erwartung; noch offen; möchte ich nicht angeben",
+      "rationale": "Gerichtete Erwartung an andere; rollenabhängig.",
+      "order": 2,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "R03",
+      "group": "R",
+      "prompt": "Welche Zeiten möchtest du für gemeinsame Arbeit verbindlich freihalten?",
+      "answerFormat": "time_windows",
+      "unit": null,
+      "hint": "Wochentage und Zeitfenster",
+      "options": [
+        {
+          "value": "nur nach Vereinbarung",
+          "requiresText": false
+        },
+        {
+          "value": "keine festen gemeinsamen Zeiten",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Zeitfenster: Wochentage und Zeitfenster; nur nach Vereinbarung; keine festen gemeinsamen Zeiten; noch offen; möchte ich nicht angeben",
+      "rationale": "Tatsächliche Überschneidung, getrennt von Gesamteinsatz.",
+      "order": 3,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "R04",
+      "group": "R",
+      "prompt": "Ab wann brauchst du aus dem Vorhaben eine regelmäßige persönliche Auszahlung?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "ab sofort",
+          "requiresText": false
+        },
+        {
+          "value": "ab einem Datum – bitte angeben",
+          "requiresText": true
+        },
+        {
+          "value": "innerhalb der nächsten zwölf Monate voraussichtlich nicht",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "cannot_assess",
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: ab sofort; ab einem Datum – bitte angeben; innerhalb der nächsten zwölf Monate voraussichtlich nicht; noch nicht einschätzbar; noch offen; möchte ich nicht angeben",
+      "rationale": "Finanzielle Abhängigkeit; Privatsphäre durch freiwillige Angabe.",
+      "order": 4,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "R05",
+      "group": "R",
+      "prompt": "Welche regelmäßige Auszahlung brauchst du ab diesem Zeitpunkt mindestens?",
+      "answerFormat": "money_range",
+      "unit": "pro Monat",
+      "hint": "Betrag oder Bereich pro Monat in vereinbarter Währung",
+      "options": [],
+      "fieldNotes": [
+        "brutto/netto kennzeichnen"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Originalbetrag mit Währung und Bezugsbasis; nicht automatisch zwischen Ländern vergleichen. Kein Reverse.",
+      "answerSpecSource": "Geldbetrag/Bereich: Betrag oder Bereich pro Monat in vereinbarter Währung; brutto/netto kennzeichnen; noch offen; möchte ich nicht angeben",
+      "rationale": "Bedarf ist kein Anspruch und keine wirtschaftliche Prognose.",
+      "order": 5,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R06",
+      "group": "R",
+      "prompt": "Unter welchen Bedingungen würdest du vollständig auf das Vorhaben wechseln?",
+      "answerFormat": "multi_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "ich arbeite bereits vollständig daran",
+          "requiresText": false
+        },
+        {
+          "value": "wenn eine bestimmte Auszahlung gesichert ist",
+          "requiresText": false
+        },
+        {
+          "value": "wenn eine Finanzierung oder ein Meilenstein erreicht ist",
+          "requiresText": false
+        },
+        {
+          "value": "ab einem möglichen Datum",
+          "requiresText": false
+        },
+        {
+          "value": "ein vollständiger Wechsel ist aktuell nicht geplant",
+          "requiresText": false
+        },
+        {
+          "value": "andere Bedingung – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Mehrfachwahl mit Bedingungen: ich arbeite bereits vollständig daran; wenn eine bestimmte Auszahlung gesichert ist; wenn eine Finanzierung oder ein Meilenstein erreicht ist; ab einem möglichen Datum; ein vollständiger Wechsel ist aktuell nicht geplant; andere Bedingung – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Wechselbereitschaft als bedingter Plan.",
+      "order": 6,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "R07",
+      "group": "R",
+      "prompt": "Welchen zusätzlichen Zeiteinsatz könntest du für höchstens zwei Wochen verbindlich zusagen?",
+      "answerFormat": "number_range",
+      "unit": "zusätzliche Stunden/Woche",
+      "hint": "zusätzliche Stunden/Woche oder: keinen",
+      "options": [],
+      "fieldNotes": [
+        "Bedingungen optional"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Zusatzstunden; nicht als Commitment-Punkte zählen. Kein Reverse.",
+      "answerSpecSource": "Zahl/Bereich: zusätzliche Stunden/Woche oder: keinen; Bedingungen optional; noch offen; möchte ich nicht angeben",
+      "rationale": "Kurzfristige Reserve statt unbegrenzter Aufopferung.",
+      "order": 7,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R08",
+      "group": "R",
+      "prompt": "Welche regelmäßigen Zeiten sind für das Vorhaben nicht verfügbar?",
+      "answerFormat": "time_windows",
+      "unit": null,
+      "hint": "Zeitfenster",
+      "options": [],
+      "fieldNotes": [
+        "Gründe müssen nicht genannt werden"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Zeitfenster: Zeitfenster; Gründe müssen nicht genannt werden; noch offen; möchte ich nicht angeben",
+      "rationale": "Persönliche Grenzen; kein Offenlegungszwang.",
+      "order": 8,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R09",
+      "group": "R",
+      "prompt": "Wie lange möchtest du am Vorhaben weiterarbeiten, wenn der vereinbarte nächste Meilenstein ausbleibt?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "bis zu einem Datum",
+          "requiresText": false
+        },
+        {
+          "value": "bis ein neu vereinbartes Ergebnis erreicht ist",
+          "requiresText": false
+        },
+        {
+          "value": "das möchte ich dann gemeinsam neu entscheiden",
+          "requiresText": false
+        },
+        {
+          "value": "unter diesen Bedingungen nicht weiter",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: bis zu einem Datum; bis ein neu vereinbartes Ergebnis erreicht ist; das möchte ich dann gemeinsam neu entscheiden; unter diesen Bedingungen nicht weiter; noch offen; möchte ich nicht angeben",
+      "rationale": "Zeitliche Bindungsabsicht; Ergebnisabhängigkeit sichtbar machen.",
+      "order": 9,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R10",
+      "group": "R",
+      "prompt": "Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?",
+      "answerFormat": "importance_rating",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "gar nicht wichtig",
+          "requiresText": false
+        },
+        {
+          "value": "wenig wichtig",
+          "requiresText": false
+        },
+        {
+          "value": "mittel wichtig",
+          "requiresText": false
+        },
+        {
+          "value": "ziemlich wichtig",
+          "requiresText": false
+        },
+        {
+          "value": "sehr wichtig",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "1–5 ordinal, separat; keine Vermischung mit Stunden oder Geld. Kein Reverse.",
+      "answerSpecSource": "Wichtigkeitsrating: gar nicht wichtig; wenig wichtig; mittel wichtig; ziemlich wichtig; sehr wichtig; noch offen; möchte ich nicht angeben",
+      "rationale": "Einzelindikator subjektiver Bindung; keine validierte Commitment-Skala.",
+      "order": 10,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R11",
+      "group": "R",
+      "prompt": "Welche Veränderung könnte deine zugesagte Mitarbeit in den nächsten drei Monaten verringern?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "freiwilliger Freitext",
+      "options": [
+        {
+          "value": "keine absehbare Veränderung",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "withheld",
+        "undecided"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Freitext: freiwilliger Freitext; keine absehbare Veränderung; möchte ich nicht angeben; noch offen; möchte ich nicht angeben",
+      "rationale": "Veränderungsbedingung; private Ursache kann ungenannt bleiben.",
+      "order": 11,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "R12",
+      "group": "R",
+      "prompt": "Bis wann möchtest du die hier gemachten Zusagen erneut prüfen?",
+      "answerFormat": "date",
+      "unit": null,
+      "hint": "Datum",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Datum; kein psychologischer Score. Kein Reverse.",
+      "answerSpecSource": "Datum: Datum; noch offen; möchte ich nicht angeben",
+      "rationale": "Gültigkeit und vereinbarter Aktualisierungstermin.",
+      "order": 12,
+      "inMvp": true,
+      "mvpStep": 2
+    },
+    {
+      "blockId": "B01",
+      "group": "B",
+      "prompt": "Welchen zusätzlichen privaten Geldbetrag könntest und möchtest du für das Vorhaben maximal verlieren?",
+      "answerFormat": "money_range",
+      "unit": null,
+      "hint": "Betrag/Bereich mit Währung",
+      "options": [],
+      "fieldNotes": [
+        "0"
+      ],
+      "missing": [
+        "withheld",
+        "undecided"
+      ],
+      "scoring": "Grenze in Originaleinheit, nicht aus anderem Finanzwissen schätzen. Kein Reverse.",
+      "answerSpecSource": "Geldbetrag/Bereich: Betrag/Bereich mit Währung; 0; möchte ich nicht angeben; noch offen; möchte ich nicht angeben",
+      "rationale": "Selbstgesetzte finanzielle Verlustgrenze; kombiniert bewusst Können und Wollen als operative Obergrenze, keine reine Risikopropensität.",
+      "order": 1,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "B02",
+      "group": "B",
+      "prompt": "Unter welchen Bedingungen würdest du persönlich für Schulden des Unternehmens haften wollen?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "grundsätzlich nicht",
+          "requiresText": false
+        },
+        {
+          "value": "nur bis zu einer von mir genannten Höchstgrenze",
+          "requiresText": false
+        },
+        {
+          "value": "das möchte ich erst nach Prüfung des konkreten Falls entscheiden",
+          "requiresText": false
+        },
+        {
+          "value": "andere Bedingung – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: grundsätzlich nicht; nur bis zu einer von mir genannten Höchstgrenze; das möchte ich erst nach Prüfung des konkreten Falls entscheiden; andere Bedingung – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Persönliche Haftungsbereitschaft; keine rechtliche Beratung und keine psychometrische Skala.",
+      "order": 2,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "B03",
+      "group": "B",
+      "prompt": "Wie viele Wochen zusätzliche Arbeit würdest du für einen Versuch einsetzen, der möglicherweise kein nutzbares Ergebnis bringt?",
+      "answerFormat": "number_range",
+      "unit": "Wochen",
+      "hint": "Wochen oder Bereich",
+      "options": [
+        {
+          "value": "hängt vom Versuch ab – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [
+        "0"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Wochen; Risiko domänenspezifisch dokumentieren. Kein Reverse.",
+      "answerSpecSource": "Zahl/Bereich: Wochen oder Bereich; 0; hängt vom Versuch ab – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Zeitbezogene Verlustbereitschaft.",
+      "order": 3,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "B04",
+      "group": "B",
+      "prompt": "Welche Mindestreserve soll das Unternehmen vor einem neuen größeren Einsatz von Geld behalten?",
+      "answerFormat": "number_range",
+      "unit": "Monate der laufenden Ausgaben",
+      "hint": "Monate der laufenden Ausgaben",
+      "options": [],
+      "fieldNotes": [
+        "wenn noch keine Ausgaben bestehen: zunächst Ausgabenplan klären"
+      ],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Monate; Bezugsbudget und Datum speichern. Kein Reverse.",
+      "answerSpecSource": "Zahl/Bereich: Monate der laufenden Ausgaben; wenn noch keine Ausgaben bestehen: zunächst Ausgabenplan klären; noch offen; möchte ich nicht angeben",
+      "rationale": "Gewünschte betriebliche Reserve; Unternehmensnorm statt persönlicher Mut.",
+      "order": 4,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "B05",
+      "group": "B",
+      "prompt": "Welche Absicherung brauchst du, bevor ein größeres Vorhaben beginnt?",
+      "answerFormat": "multi_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "kleiner Vorversuch",
+          "requiresText": false
+        },
+        {
+          "value": "feste Ausgabenobergrenze",
+          "requiresText": false
+        },
+        {
+          "value": "vorher vereinbarte Abbruchbedingung",
+          "requiresText": false
+        },
+        {
+          "value": "externe Prüfung",
+          "requiresText": false
+        },
+        {
+          "value": "für den konkreten Fall keine zusätzliche Absicherung",
+          "requiresText": false
+        },
+        {
+          "value": "andere – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominale Anforderungen, keine Summe der Absicherungen. Kein Reverse.",
+      "answerSpecSource": "Mehrfachwahl: kleiner Vorversuch; feste Ausgabenobergrenze; vorher vereinbarte Abbruchbedingung; externe Prüfung; für den konkreten Fall keine zusätzliche Absicherung; andere – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Risikomanagement getrennt von Verlustbereitschaft.",
+      "order": 5,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "B06",
+      "group": "B",
+      "prompt": "Bei welcher möglichen Folge würdest du einen Versuch stoppen, auch wenn seine Erfolgschance attraktiv bleibt?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext: konkrete Folge",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Freitext: Freitext: konkrete Folge; noch offen; möchte ich nicht angeben",
+      "rationale": "Nichtkompensierbare Grenze; gleiche Risikopräferenz kann andere Grenze haben.",
+      "order": 6,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "G01",
+      "group": "G",
+      "prompt": "Wer soll bei einer wichtigen Entscheidung in einem klar zugeordneten Bereich das letzte Wort haben?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "die verantwortliche Person nach Anhörung",
+          "requiresText": false
+        },
+        {
+          "value": "eine benannte Person für diese Entscheidung",
+          "requiresText": false
+        },
+        {
+          "value": "Mehrheit der Founder",
+          "requiresText": false
+        },
+        {
+          "value": "alle Founder gemeinsam",
+          "requiresText": false
+        },
+        {
+          "value": "abhängig von der Entscheidung – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: die verantwortliche Person nach Anhörung; eine benannte Person für diese Entscheidung; Mehrheit der Founder; alle Founder gemeinsam; abhängig von der Entscheidung – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Gewünschtes Entscheidungsrecht; keine Rangordnung der Antworten.",
+      "order": 1,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "G02",
+      "group": "G",
+      "prompt": "Wie möchtest du nach einer notwendigen Pause in einem angespannten Gespräch weiter vorgehen?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "noch am selben Tag fortsetzen",
+          "requiresText": false
+        },
+        {
+          "value": "einen konkreten Folgetermin vereinbaren",
+          "requiresText": false
+        },
+        {
+          "value": "schriftlich die offenen Punkte sammeln und dann einen Termin vereinbaren",
+          "requiresText": false
+        },
+        {
+          "value": "eine neutrale Person für die Fortsetzung hinzunehmen",
+          "requiresText": false
+        },
+        {
+          "value": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: noch am selben Tag fortsetzen; einen konkreten Folgetermin vereinbaren; schriftlich die offenen Punkte sammeln und dann einen Termin vereinbaren; eine neutrale Person für die Fortsetzung hinzunehmen; andere Vorgehensweise – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Wiederaufnahmevereinbarung; emotionaler Abstand ist nicht Vermeidung.",
+      "order": 2,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "G03",
+      "group": "G",
+      "prompt": "Was soll passieren, wenn ihr über eine wichtige Entscheidung bis zum vereinbarten Termin keine Einigung erreicht?",
+      "answerFormat": "single_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "vorab benannte Person entscheidet",
+          "requiresText": false
+        },
+        {
+          "value": "zeitlich begrenzter Versuch",
+          "requiresText": false
+        },
+        {
+          "value": "externe Moderation oder Beratung",
+          "requiresText": false
+        },
+        {
+          "value": "Entscheidung bis zu einer neuen Frist aussetzen",
+          "requiresText": false
+        },
+        {
+          "value": "anderer vereinbarter Weg",
+          "requiresText": false
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Einzelauswahl: vorab benannte Person entscheidet; zeitlich begrenzter Versuch; externe Moderation oder Beratung; Entscheidung bis zu einer neuen Frist aussetzen; anderer vereinbarter Weg; noch offen; möchte ich nicht angeben",
+      "rationale": "Deadlock-Regel als Verfahrensfrage.",
+      "order": 3,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "G04",
+      "group": "G",
+      "prompt": "Welche Entscheidungen sollen grundsätzlich eure gemeinsame Zustimmung brauchen?",
+      "answerFormat": "multi_choice",
+      "unit": null,
+      "hint": null,
+      "options": [
+        {
+          "value": "Anteile und Aufnahme neuer Founder",
+          "requiresText": false
+        },
+        {
+          "value": "größere finanzielle Verpflichtungen",
+          "requiresText": false
+        },
+        {
+          "value": "grundlegende Richtungsänderung",
+          "requiresText": false
+        },
+        {
+          "value": "Verkauf des Unternehmens",
+          "requiresText": false
+        },
+        {
+          "value": "Änderung persönlicher Zusagen",
+          "requiresText": false
+        },
+        {
+          "value": "andere – bitte benennen",
+          "requiresText": true
+        }
+      ],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "withheld"
+      ],
+      "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
+      "answerSpecSource": "Mehrfachwahl: Anteile und Aufnahme neuer Founder; größere finanzielle Verpflichtungen; grundlegende Richtungsänderung; Verkauf des Unternehmens; Änderung persönlicher Zusagen; andere – bitte benennen; noch offen; möchte ich nicht angeben",
+      "rationale": "Reservierte Entscheidungen; Gesprächsgrundlage, keine Rechtsvereinbarung.",
+      "order": 4,
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "blockId": "L01",
+      "group": "L",
+      "prompt": "Welche Vorgehensweise kommt für dich im Unternehmen grundsätzlich nicht infrage?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "confidential_first"
+      ],
+      "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Selbst benannte Grenze; nicht als Integritätswert verrechnen.",
+      "answerSpecSource": "Freitext; noch nicht festgelegt; möchte ich zunächst vertraulich klären",
+      "order": 1,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "L02",
+      "group": "L",
+      "prompt": "Woran sollen die anderen Founder im konkreten Fall erkennen, dass diese Grenze erreicht ist?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "confidential_first"
+      ],
+      "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Operationalisierung der Grenze statt abstraktem Wertebekenntnis.",
+      "answerSpecSource": "Freitext; noch nicht festgelegt; möchte ich zunächst vertraulich klären",
+      "order": 2,
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "blockId": "L03",
+      "group": "L",
+      "prompt": "Was soll passieren, wenn ihr uneinig seid, ob diese Grenze betroffen ist?",
+      "answerFormat": "free_text",
+      "unit": null,
+      "hint": "Freitext",
+      "options": [],
+      "fieldNotes": [],
+      "missing": [
+        "undecided",
+        "confidential_first"
+      ],
+      "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Verfahren für unklare Fälle; keine automatische Mehrheitsüberstimmung.",
+      "answerSpecSource": "Freitext; noch nicht festgelegt; möchte ich zunächst vertraulich klären",
+      "order": 3,
+      "inMvp": true,
+      "mvpStep": 1
+    }
+  ],
+  "valueCases": [
+    {
+      "caseId": "W01",
+      "order": 1,
+      "title": "Transparenz und Vertraulichkeit",
+      "situation": "Ihr habt eine noch unbestätigte Finanzplanung. Eine kurzfristige Gefahr für zugesagte Zahlungen besteht nicht. Wann soll das Team davon erfahren?",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "frühe Orientierung für das Team"
+        },
+        {
+          "key": "b",
+          "label": "Verlässlichkeit der weitergegebenen Informationen"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Die vorläufige Planung jetzt mit klar benannten Unsicherheiten teilen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Erst die Zahlen prüfen und danach eine belastbare Planung teilen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Informationszeitpunkt; keine Ehrlichkeitsskala.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W02",
+      "order": 2,
+      "title": "Loyalität und Rollenanforderungen",
+      "situation": "Eine langjährige Person erfüllt neue Anforderungen ihrer Rolle noch nicht. Für genau eine Übergangsmaßnahme ist Budget vorhanden.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "Kontinuität in der bisherigen Zusammenarbeit"
+        },
+        {
+          "key": "b",
+          "label": "Passung zwischen Rolle und aktuellen Anforderungen"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Eine befristete Entwicklungsphase in der bisherigen Rolle finanzieren.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Eine passende andere Rolle suchen und den Übergang finanzieren.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Beide Wege respektieren die Person; kein moralisches Ranking und keine Kündigungsdiagnose.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W03",
+      "order": 3,
+      "title": "Wirkung und wirtschaftlicher Spielraum",
+      "situation": "Zwei zulässige Angebote sind umsetzbar. Eines erzielt mehr gesellschaftliche Wirkung, das andere mehr finanziellen Überschuss. Beide decken ihre laufenden Kosten.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "direkte gesellschaftliche Wirkung"
+        },
+        {
+          "key": "b",
+          "label": "finanzieller Spielraum für die weitere Entwicklung"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Das Angebot mit größerer Wirkung wählen und weniger Überschuss einplanen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Das Angebot mit größerem Überschuss wählen und zusätzliche Reserven aufbauen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Lokaler Zielkonflikt; keine generelle Gegensätzlichkeit von Impact und Wirtschaftlichkeit.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W04",
+      "order": 4,
+      "title": "Beteiligung und zügige Entscheidung",
+      "situation": "Ein interner Arbeitsablauf soll geändert werden. Betroffene Personen haben ihre Sicht schriftlich eingebracht. Ein weiterer Austausch würde den Start um eine Woche verschieben.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "gemeinsame Verständigung vor dem Start"
+        },
+        {
+          "key": "b",
+          "label": "zügige Umsetzung mit späterer Überprüfung"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Vor der Entscheidung einen gemeinsamen Austausch durchführen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Auf Basis der Rückmeldungen entscheiden und nach dem Start gemeinsam überprüfen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Zeitlich begrenzte Beteiligungsfrage; weder Autokratie noch Basisdemokratie.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W05",
+      "order": 5,
+      "title": "Reserve und Investition",
+      "situation": "Ihr könnt ein zusätzliches Budget entweder als Reserve behalten oder für einen klar begrenzten Markttest einsetzen. Laufende Verpflichtungen sind in beiden Fällen gedeckt.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "finanzieller Puffer"
+        },
+        {
+          "key": "b",
+          "label": "früher Erkenntnisgewinn über den Markt"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Das Budget zunächst als zusätzliche Reserve behalten.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Das Budget jetzt für den begrenzten Markttest einsetzen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Finanzielle Priorität; gehört inhaltlich auch zum Strategiemodul, nicht doppelt punkten.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W06",
+      "order": 6,
+      "title": "Gleichbehandlung und Beitrag",
+      "situation": "Ein zusätzlicher Bonus kann verteilt werden. Die gemeinsamen Grundregeln sind erfüllt; die messbaren Beiträge waren unterschiedlich.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "gleicher Anteil am gemeinsamen Ergebnis"
+        },
+        {
+          "key": "b",
+          "label": "Berücksichtigung unterschiedlicher Beiträge"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Den Zusatzbonus unter den Beteiligten gleich verteilen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Den Zusatzbonus nach den zuvor dokumentierten Beiträgen verteilen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Gerechtigkeitsprinzipien; gleiche Rechte und Verträge sind vorausgesetzt.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": true,
+      "mvpStep": 1
+    },
+    {
+      "caseId": "W07",
+      "order": 7,
+      "title": "Kundenkontinuität und Produktfokus",
+      "situation": "Eine früh unterstützende Kundengruppe wünscht eine freiwillige Zusatzfunktion. Dieselbe Entwicklungszeit könnte eine Funktion für mehr neue Kunden ermöglichen. Bestehende Zusagen sind erfüllt.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "Kontinuität bestehender Kundenbeziehungen"
+        },
+        {
+          "key": "b",
+          "label": "Nutzen für eine größere Kundengruppe"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Die Zusatzfunktion für die früh unterstützende Kundengruppe entwickeln.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Die Funktion für die größere neue Kundengruppe entwickeln.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Beziehungsloyalität und Reichweite; kein Bruch bestehender Verpflichtungen.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "caseId": "W08",
+      "order": 8,
+      "title": "Frühe Offenlegung und belastbare Kommunikation",
+      "situation": "Ihr entdeckt eine Unstimmigkeit in einer freiwillig veröffentlichten Kennzahl. Es besteht kein akuter Schaden; die Prüfung dauert zwei Tage.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "frühe Offenlegung von Unsicherheit"
+        },
+        {
+          "key": "b",
+          "label": "Präzision einer nachvollziehbaren Korrektur"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Jetzt auf die laufende Prüfung hinweisen und später das Ergebnis ergänzen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Die Prüfung abschließen und nach zwei Tagen die gesicherte Korrektur veröffentlichen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Kommunikationsverfahren bei eingegrenzter Ungewissheit; kein Verschweigen erheblicher Fehler.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "caseId": "W09",
+      "order": 9,
+      "title": "Breite Suche und schnelle Besetzung",
+      "situation": "Für eine neue Rolle gibt es eine geeignete Person. Zwei weitere Wochen Suche könnten zusätzliche Perspektiven erschließen, würden aber den Einstieg verzögern.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "Breite des berücksichtigten Bewerberfelds"
+        },
+        {
+          "key": "b",
+          "label": "schnelle Besetzung einer benötigten Rolle"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Die Suche zwei Wochen fortsetzen und zusätzliche Gruppen gezielt ansprechen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Der geeigneten Person jetzt ein Angebot machen und die Suche abschließen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Suchaufwand statt moralischer Diversitätstest; Eignung beider Wege vorausgesetzt.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": false,
+      "mvpStep": null
+    },
+    {
+      "caseId": "W10",
+      "order": 10,
+      "title": "Planbarkeit und Flexibilität",
+      "situation": "Ein Partner bittet um eine freiwillige Änderung eines gemeinsam abgestimmten Plans. Sie schafft eine neue Chance, verursacht für euch aber überschaubare Umplanung.",
+      "concerns": [
+        {
+          "key": "a",
+          "label": "Verlässlichkeit bestehender Planung"
+        },
+        {
+          "key": "b",
+          "label": "Nutzung neu entstehender Möglichkeiten"
+        }
+      ],
+      "paths": [
+        {
+          "key": "A",
+          "label": "Am vereinbarten Plan festhalten und die Chance später neu prüfen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "B",
+          "label": "Den Plan gemeinsam anpassen und die Umplanung übernehmen.",
+          "requiresText": false,
+          "isMissing": false
+        },
+        {
+          "key": "other",
+          "label": "andere Vorgehensweise – bitte benennen",
+          "requiresText": true,
+          "isMissing": false
+        },
+        {
+          "key": "unknown",
+          "label": "kann ich noch nicht entscheiden",
+          "requiresText": false,
+          "isMissing": true
+        }
+      ],
+      "rationale": "Planungspriorität; keine Unzuverlässigkeitsdiagnose.",
+      "scoring": "Wichtigkeit A und B getrennt 1–5 ordinal. Wahl A/B/other/unknown nominal. Keine Differenz-, Summen- oder Werte-Gesamtskala. Kein Reverse Coding.",
+      "inMvp": false,
+      "mvpStep": null
+    }
+  ]
+}
