@@ -38,8 +38,9 @@ export type StoredAnswerFormat = AnswerFormatId | ContextAnswerFormat | "value_c
 export type AlignmentAnswerValue =
   /** F, C und importance_rating: eine Stufe von 1 bis 5. Nie 0, nie eine Mitte. */
   | { scale: 1 | 2 | 3 | 4 | 5 }
-  | { option: string; text?: string }
-  | { options: string[]; text?: string }
+  /** Die Options-KENNUNG, nie der Text - siehe ContextOption. */
+  | { optionId: string; text?: string }
+  | { optionIds: string[]; text?: string }
   | { text: string }
   | { fields: Record<string, string> }
   | { min: number; max?: number; unit: string }
@@ -95,4 +96,28 @@ export function allBlockIds(): string[] {
     ...getContextBlocks().map((block) => block.blockId),
     ...getValueCases().map((value) => value.caseId),
   ];
+}
+
+/**
+ * In welchem Modus eine Antwort gegeben wurde.
+ *
+ * Teil F7 verlangt, dass jede Antwort ihren Antwortmodus kennt - „gewuenschte
+ * Praxis", „tatsaechliche Ressource" oder „hypothetischer Fall". Das ist keine
+ * eigene Spalte, sondern folgt eindeutig aus dem Block, und eine abgeleitete
+ * Angabe kann nicht von der Wirklichkeit abweichen.
+ *
+ * WARUM DIE UNTERSCHEIDUNG ZAEHLT: Eine Praeferenz sagt, wie jemand ARBEITEN
+ * MOECHTE. Eine Ressourcenangabe sagt, was er zusagen KANN. Ein Wertefall
+ * sagt, wie er in einer erfundenen Lage entscheiden WUERDE. Wer diese drei
+ * nebeneinanderstellt, als waeren sie dasselbe, vergleicht einen Wunsch mit
+ * einer Zusage.
+ */
+export type AnswerMode = "intended_practice" | "actual_resource" | "hypothetical_case";
+
+export function answerModeOfBlock(blockId: string): AnswerMode {
+  if (blockId.startsWith("W")) return "hypothetical_case";
+  if (blockId.startsWith("R")) return "actual_resource";
+  // Ziele, Grenzen, Regeln und die acht Praeferenzen beschreiben alle eine
+  // gewuenschte Praxis - was jemand sich vornimmt, nicht was er zusagt.
+  return "intended_practice";
 }

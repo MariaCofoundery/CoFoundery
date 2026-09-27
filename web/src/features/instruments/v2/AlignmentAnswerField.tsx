@@ -87,14 +87,14 @@ export function AlignmentAnswerField({
           <div className="space-y-2">
             {(block?.options ?? []).map((option) => (
               <Choice
-                key={option.value}
+                key={option.optionId}
                 label={option.value}
-                checked={value.option === option.value}
+                checked={value.optionId === option.optionId}
                 disabled={disabled}
-                onPick={() => patch({ option: option.value })}
+                onPick={() => patch({ optionId: option.optionId })}
               />
             ))}
-            {needsText(value.option) && (
+            {needsText(value.optionId) && (
               <input
                 className={boxClass}
                 placeholder={t("fields.otherText")}
@@ -107,21 +107,21 @@ export function AlignmentAnswerField({
         );
 
       case "multi_choice": {
-        const picked = Array.isArray(value.options) ? (value.options as string[]) : [];
+        const picked = Array.isArray(value.optionIds) ? (value.optionIds as string[]) : [];
         return (
           <div className="space-y-2">
             {(block?.options ?? []).map((option) => (
               <Choice
-                key={option.value}
+                key={option.optionId}
                 label={option.value}
                 kind="checkbox"
-                checked={picked.includes(option.value)}
+                checked={picked.includes(option.optionId)}
                 disabled={disabled}
                 onPick={() =>
                   patch({
-                    options: picked.includes(option.value)
-                      ? picked.filter((entry) => entry !== option.value)
-                      : [...picked, option.value],
+                    optionIds: picked.includes(option.optionId)
+                      ? picked.filter((entry) => entry !== option.optionId)
+                      : [...picked, option.optionId],
                   })
                 }
               />
@@ -323,9 +323,9 @@ export function AlignmentAnswerField({
     }
   }
 
-  function needsText(option: unknown): boolean {
+  function needsText(optionId: unknown): boolean {
     return (block?.options ?? []).some(
-      (entry) => entry.value === option && entry.requiresText
+      (entry) => entry.optionId === optionId && entry.requiresText
     );
   }
 }

@@ -76,30 +76,37 @@
       "hint": null,
       "options": [
         {
+          "optionId": "S01_o1",
           "value": "ein verlässlich tragfähiges Einkommen",
           "requiresText": false
         },
         {
+          "optionId": "S01_o2",
           "value": "starkes Wachstum in einem größeren Markt",
           "requiresText": false
         },
         {
+          "optionId": "S01_o3",
           "value": "eine klar benannte gesellschaftliche oder ökologische Wirkung",
           "requiresText": false
         },
         {
+          "optionId": "S01_o4",
           "value": "ein verkaufsfähiges Unternehmen aufbauen",
           "requiresText": false
         },
         {
+          "optionId": "S01_o5",
           "value": "ein fachlich anspruchsvolles Vorhaben verwirklichen",
           "requiresText": false
         },
         {
+          "optionId": "S01_o6",
           "value": "mehrere gleich wichtige Ziele – bitte benennen",
           "requiresText": true
         },
         {
+          "optionId": "S01_o7",
           "value": "ein anderes Ziel – bitte benennen",
           "requiresText": true
         }
@@ -125,18 +132,22 @@
       "hint": null,
       "options": [
         {
+          "optionId": "S02_o1",
           "value": "ich möchte langfristig beteiligt bleiben",
           "requiresText": false
         },
         {
+          "optionId": "S02_o2",
           "value": "ein Verkauf ist eine mögliche Option",
           "requiresText": false
         },
         {
+          "optionId": "S02_o3",
           "value": "ich möchte auf einen Verkauf hinarbeiten",
           "requiresText": false
         },
         {
+          "optionId": "S02_o4",
           "value": "das hängt von bestimmten Bedingungen ab – bitte benennen",
           "requiresText": true
         }
@@ -162,18 +173,22 @@
       "hint": null,
       "options": [
         {
+          "optionId": "S03_o1",
           "value": "ich möchte ohne externes Eigenkapital aufbauen",
           "requiresText": false
         },
         {
+          "optionId": "S03_o2",
           "value": "ich möchte es als Möglichkeit offenhalten",
           "requiresText": false
         },
         {
+          "optionId": "S03_o3",
           "value": "ich möchte gezielt externes Eigenkapital suchen",
           "requiresText": false
         },
         {
+          "optionId": "S03_o4",
           "value": "für mich hängt es von Bedingungen ab – bitte benennen",
           "requiresText": true
         }
@@ -221,18 +236,22 @@
       "hint": null,
       "options": [
         {
+          "optionId": "S05_o1",
           "value": "überwiegend im Unternehmen belassen",
           "requiresText": false
         },
         {
+          "optionId": "S05_o2",
           "value": "zwischen Unternehmen und Ausschüttung aufteilen",
           "requiresText": false
         },
         {
+          "optionId": "S05_o3",
           "value": "überwiegend ausschütten",
           "requiresText": false
         },
         {
+          "optionId": "S05_o4",
           "value": "je nach vereinbarter finanzieller Lage entscheiden",
           "requiresText": false
         }
@@ -258,22 +277,27 @@
       "hint": null,
       "options": [
         {
+          "optionId": "S06_o1",
           "value": "operativ mitarbeiten",
           "requiresText": false
         },
         {
+          "optionId": "S06_o2",
           "value": "vor allem führen und organisieren",
           "requiresText": false
         },
         {
+          "optionId": "S06_o3",
           "value": "vor allem fachlich gestalten",
           "requiresText": false
         },
         {
+          "optionId": "S06_o4",
           "value": "vor allem als Anteilseigner beteiligt sein",
           "requiresText": false
         },
         {
+          "optionId": "S06_o5",
           "value": "eine andere oder kombinierte Rolle – bitte benennen",
           "requiresText": true
         }
@@ -319,6 +343,7 @@
       "hint": "Freitext oder: kein solches Ziel festgelegt",
       "options": [
         {
+          "optionId": "S08_o1",
           "value": "kein solches Ziel festgelegt",
           "requiresText": false
         }
@@ -366,6 +391,7 @@
       "hint": "pro Person oder geplanter Rolle: Zahl/Bereich in Stunden/Woche",
       "options": [
         {
+          "optionId": "R02_o1",
           "value": "keine feste Erwartung",
           "requiresText": false
         }
@@ -391,10 +417,12 @@
       "hint": "Wochentage und Zeitfenster",
       "options": [
         {
+          "optionId": "R03_o1",
           "value": "nur nach Vereinbarung",
           "requiresText": false
         },
         {
+          "optionId": "R03_o2",
           "value": "keine festen gemeinsamen Zeiten",
           "requiresText": false
         }
@@ -420,14 +448,17 @@
       "hint": null,
       "options": [
         {
+          "optionId": "R04_o1",
           "value": "ab sofort",
           "requiresText": false
         },
         {
+          "optionId": "R04_o2",
           "value": "ab einem Datum – bitte angeben",
           "requiresText": true
         },
         {
+          "optionId": "R04_o3",
           "value": "innerhalb der nächsten zwölf Monate voraussichtlich nicht",
           "requiresText": false
         }
@@ -476,26 +507,32 @@
       "hint": null,
       "options": [
         {
+          "optionId": "R06_o1",
           "value": "ich arbeite bereits vollständig daran",
           "requiresText": false
         },
         {
+          "optionId": "R06_o2",
           "value": "wenn eine bestimmte Auszahlung gesichert ist",
           "requiresText": false
         },
         {
+          "optionId": "R06_o3",
           "value": "wenn eine Finanzierung oder ein Meilenstein erreicht ist",
           "requiresText": false
         },
         {
+          "optionId": "R06_o4",
           "value": "ab einem möglichen Datum",
           "requiresText": false
         },
         {
+          "optionId": "R06_o5",
           "value": "ein vollständiger Wechsel ist aktuell nicht geplant",
           "requiresText": false
         },
         {
+          "optionId": "R06_o6",
           "value": "andere Bedingung – bitte benennen",
           "requiresText": true
         }
@@ -565,18 +602,22 @@
       "hint": null,
       "options": [
         {
+          "optionId": "R09_o1",
           "value": "bis zu einem Datum",
           "requiresText": false
         },
         {
+          "optionId": "R09_o2",
           "value": "bis ein neu vereinbartes Ergebnis erreicht ist",
           "requiresText": false
         },
         {
+          "optionId": "R09_o3",
           "value": "das möchte ich dann gemeinsam neu entscheiden",
           "requiresText": false
         },
         {
+          "optionId": "R09_o4",
           "value": "unter diesen Bedingungen nicht weiter",
           "requiresText": false
         }
@@ -602,22 +643,27 @@
       "hint": null,
       "options": [
         {
+          "optionId": "R10_o1",
           "value": "gar nicht wichtig",
           "requiresText": false
         },
         {
+          "optionId": "R10_o2",
           "value": "wenig wichtig",
           "requiresText": false
         },
         {
+          "optionId": "R10_o3",
           "value": "mittel wichtig",
           "requiresText": false
         },
         {
+          "optionId": "R10_o4",
           "value": "ziemlich wichtig",
           "requiresText": false
         },
         {
+          "optionId": "R10_o5",
           "value": "sehr wichtig",
           "requiresText": false
         }
@@ -643,6 +689,7 @@
       "hint": "freiwilliger Freitext",
       "options": [
         {
+          "optionId": "R11_o1",
           "value": "keine absehbare Veränderung",
           "requiresText": false
         }
@@ -710,18 +757,22 @@
       "hint": null,
       "options": [
         {
+          "optionId": "B02_o1",
           "value": "grundsätzlich nicht",
           "requiresText": false
         },
         {
+          "optionId": "B02_o2",
           "value": "nur bis zu einer von mir genannten Höchstgrenze",
           "requiresText": false
         },
         {
+          "optionId": "B02_o3",
           "value": "das möchte ich erst nach Prüfung des konkreten Falls entscheiden",
           "requiresText": false
         },
         {
+          "optionId": "B02_o4",
           "value": "andere Bedingung – bitte benennen",
           "requiresText": true
         }
@@ -747,6 +798,7 @@
       "hint": "Wochen oder Bereich",
       "options": [
         {
+          "optionId": "B03_o1",
           "value": "hängt vom Versuch ab – bitte benennen",
           "requiresText": true
         }
@@ -796,26 +848,32 @@
       "hint": null,
       "options": [
         {
+          "optionId": "B05_o1",
           "value": "kleiner Vorversuch",
           "requiresText": false
         },
         {
+          "optionId": "B05_o2",
           "value": "feste Ausgabenobergrenze",
           "requiresText": false
         },
         {
+          "optionId": "B05_o3",
           "value": "vorher vereinbarte Abbruchbedingung",
           "requiresText": false
         },
         {
+          "optionId": "B05_o4",
           "value": "externe Prüfung",
           "requiresText": false
         },
         {
+          "optionId": "B05_o5",
           "value": "für den konkreten Fall keine zusätzliche Absicherung",
           "requiresText": false
         },
         {
+          "optionId": "B05_o6",
           "value": "andere – bitte benennen",
           "requiresText": true
         }
@@ -861,22 +919,27 @@
       "hint": null,
       "options": [
         {
+          "optionId": "G01_o1",
           "value": "die verantwortliche Person nach Anhörung",
           "requiresText": false
         },
         {
+          "optionId": "G01_o2",
           "value": "eine benannte Person für diese Entscheidung",
           "requiresText": false
         },
         {
+          "optionId": "G01_o3",
           "value": "Mehrheit der Founder",
           "requiresText": false
         },
         {
+          "optionId": "G01_o4",
           "value": "alle Founder gemeinsam",
           "requiresText": false
         },
         {
+          "optionId": "G01_o5",
           "value": "abhängig von der Entscheidung – bitte benennen",
           "requiresText": true
         }
@@ -902,22 +965,27 @@
       "hint": null,
       "options": [
         {
+          "optionId": "G02_o1",
           "value": "noch am selben Tag fortsetzen",
           "requiresText": false
         },
         {
+          "optionId": "G02_o2",
           "value": "einen konkreten Folgetermin vereinbaren",
           "requiresText": false
         },
         {
+          "optionId": "G02_o3",
           "value": "schriftlich die offenen Punkte sammeln und dann einen Termin vereinbaren",
           "requiresText": false
         },
         {
+          "optionId": "G02_o4",
           "value": "eine neutrale Person für die Fortsetzung hinzunehmen",
           "requiresText": false
         },
         {
+          "optionId": "G02_o5",
           "value": "andere Vorgehensweise – bitte benennen",
           "requiresText": true
         }
@@ -943,22 +1011,27 @@
       "hint": null,
       "options": [
         {
+          "optionId": "G03_o1",
           "value": "vorab benannte Person entscheidet",
           "requiresText": false
         },
         {
+          "optionId": "G03_o2",
           "value": "zeitlich begrenzter Versuch",
           "requiresText": false
         },
         {
+          "optionId": "G03_o3",
           "value": "externe Moderation oder Beratung",
           "requiresText": false
         },
         {
+          "optionId": "G03_o4",
           "value": "Entscheidung bis zu einer neuen Frist aussetzen",
           "requiresText": false
         },
         {
+          "optionId": "G03_o5",
           "value": "anderer vereinbarter Weg",
           "requiresText": false
         }
@@ -984,26 +1057,32 @@
       "hint": null,
       "options": [
         {
+          "optionId": "G04_o1",
           "value": "Anteile und Aufnahme neuer Founder",
           "requiresText": false
         },
         {
+          "optionId": "G04_o2",
           "value": "größere finanzielle Verpflichtungen",
           "requiresText": false
         },
         {
+          "optionId": "G04_o3",
           "value": "grundlegende Richtungsänderung",
           "requiresText": false
         },
         {
+          "optionId": "G04_o4",
           "value": "Verkauf des Unternehmens",
           "requiresText": false
         },
         {
+          "optionId": "G04_o5",
           "value": "Änderung persönlicher Zusagen",
           "requiresText": false
         },
         {
+          "optionId": "G04_o6",
           "value": "andere – bitte benennen",
           "requiresText": true
         }

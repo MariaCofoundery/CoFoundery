@@ -60,18 +60,61 @@ test("eine Wertekarte hat überhaupt keinen Auslassungsgrund", () => {
 
 test("eine Einzelauswahl meint eine der aufgeführten Optionen", () => {
   const s01 = getContextBlocks().find((block) => block.blockId === "S01")!;
-  const real = s01.options.find((option) => !option.requiresText)!.value;
+  const real = s01.options.find((option) => !option.requiresText)!;
 
-  assert.equal(reasonOf(answer({ blockId: "S01", value: { option: real } })), null);
-  assert.equal(reasonOf(answer({ blockId: "S01", value: { option: "irgendwas" } })), "option_unknown");
+  assert.equal(reasonOf(answer({ blockId: "S01", value: { optionId: real.optionId } })), null);
+  assert.equal(reasonOf(answer({ blockId: "S01", value: { optionId: "S01_o99" } })), "option_unknown");
+
+  // GESPEICHERT WIRD DIE KENNUNG, NICHT DER TEXT. Teil F7 des Gutachtens
+  // verlangt die "urspruengliche Options-ID", und der Grund ist derselbe wie
+  // bei der Instrumentversion: Der Text darf sich aendern - er hat es am
+  // 27.09.2026 schon getan -, die Bedeutung einer gegebenen Antwort nicht.
+  // Wer den Text speichert, verliert beim ersten Umformulieren die Zuordnung
+  // aller bisherigen Antworten, und zwar lautlos.
+  assert.equal(
+    reasonOf(answer({ blockId: "S01", value: { option: real.value } })),
+    "option_text_instead_of_id"
+  );
 
   // „bitte benennen" heißt: ohne Text ist die Antwort unvollständig.
-  const needsText = s01.options.find((option) => option.requiresText)!.value;
-  assert.equal(reasonOf(answer({ blockId: "S01", value: { option: needsText } })), "option_needs_text");
+  const needsText = s01.options.find((option) => option.requiresText)!;
   assert.equal(
-    reasonOf(answer({ blockId: "S01", value: { option: needsText, text: "Marktführer werden" } })),
+    reasonOf(answer({ blockId: "S01", value: { optionId: needsText.optionId } })),
+    "option_needs_text"
+  );
+  assert.equal(
+    reasonOf(answer({ blockId: "S01", value: { optionId: needsText.optionId, text: "Marktführer werden" } })),
     null
   );
+});
+
+test("eine Mehrfachwahl ebenso, und keine Option doppelt", () => {
+  const b05 = getContextBlocks().find((block) => block.blockId === "B05")!;
+  const plain = b05.options.filter((option) => !option.requiresText).map((o) => o.optionId);
+
+  assert.equal(reasonOf(answer({ blockId: "B05", value: { optionIds: plain.slice(0, 2) } })), null);
+  assert.equal(reasonOf(answer({ blockId: "B05", value: { optionIds: [] } })), "nothing_picked");
+  assert.equal(
+    reasonOf(answer({ blockId: "B05", value: { optionIds: [plain[0], plain[0]] } })),
+    "option_twice"
+  );
+  assert.equal(
+    reasonOf(answer({ blockId: "B05", value: { options: [b05.options[0].value] } })),
+    "option_text_instead_of_id"
+  );
+});
+
+test("jede Option hat eine Kennung, die zu ihrem Block gehört", () => {
+  // Eine Kennung, die nicht zum Block passt, wäre beim Auswerten still
+  // falsch zugeordnet - und niemand sähe es.
+  let seen = 0;
+  for (const block of getContextBlocks()) {
+    for (const option of block.options) {
+      assert.match(option.optionId, new RegExp(`^${block.blockId}_o\\d+$`), option.optionId);
+      seen += 1;
+    }
+  }
+  assert.equal(seen, 79);
 });
 
 test("ein Grund kommt nie als Wert durch", () => {

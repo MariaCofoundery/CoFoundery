@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(23);
+select extensions.plan(26);
 
 -- ---------------------------------------------------------------------------
 -- Antworten auf das Instrument v2
@@ -116,6 +116,35 @@ select extensions.lives_ok(
   $$insert into public.alignment_answers (assessment_id, block_id, answer_format, missing_code)
     values ('a2000010-0010-4010-8010-000000000010', 'R04', 'single_choice', 'cannot_assess')$$,
   'nicht einschaetzbar bleibt daneben moeglich'
+);
+
+-- ---------------------------------------------------------------------------
+-- 2b. Eine Auswahl wird ueber ihre Kennung gespeichert, nie ueber ihren Text
+-- ---------------------------------------------------------------------------
+--
+-- Teil F7 verlangt die "urspruengliche Options-ID". Der Grund ist derselbe wie
+-- bei der Instrumentversion: Der Text darf sich aendern - er hat es bereits -,
+-- die Bedeutung einer gegebenen Antwort nicht.
+
+select extensions.throws_ok(
+  $$insert into public.alignment_answers (assessment_id, block_id, answer_format, value)
+    values ('a2000010-0010-4010-8010-000000000010', 'S02', 'single_choice',
+            '{"option":"ich moechte langfristig beteiligt bleiben"}')$$,
+  '23514', null, 'der Antworttext einer Einzelauswahl wird abgelehnt'
+);
+
+select extensions.throws_ok(
+  $$insert into public.alignment_answers (assessment_id, block_id, answer_format, value)
+    values ('a2000010-0010-4010-8010-000000000010', 'B05', 'multi_choice',
+            '{"options":["kleiner Vorversuch"]}')$$,
+  '23514', null, 'und bei der Mehrfachwahl ebenso'
+);
+
+select extensions.lives_ok(
+  $$insert into public.alignment_answers (assessment_id, block_id, answer_format, value)
+    values ('a2000010-0010-4010-8010-000000000010', 'S02', 'single_choice',
+            '{"optionId":"S02_o1"}')$$,
+  'mit Kennung geht es'
 );
 
 -- ---------------------------------------------------------------------------

@@ -120,8 +120,10 @@ function validateValue(
 
     case "single_choice": {
       const block = getContextBlocks().find((entry) => entry.blockId === blockId)!;
-      const chosen = block.options.find((option) => option.value === value.option);
-      if (!chosen) return no("option_unknown", `${blockId}: ${String(value.option)}`);
+      // GESPEICHERT WIRD DIE KENNUNG, NICHT DER TEXT - siehe ContextOption.
+      if (value.option !== undefined) return no("option_text_instead_of_id", blockId);
+      const chosen = block.options.find((option) => option.optionId === value.optionId);
+      if (!chosen) return no("option_unknown", `${blockId}: ${String(value.optionId)}`);
       if (chosen.requiresText && !String(value.text ?? "").trim()) {
         return no("option_needs_text", `${blockId}: „${chosen.value}“ verlangt eine Angabe`);
       }
@@ -130,11 +132,12 @@ function validateValue(
 
     case "multi_choice": {
       const block = getContextBlocks().find((entry) => entry.blockId === blockId)!;
-      const picked = value.options;
+      if (value.options !== undefined) return no("option_text_instead_of_id", blockId);
+      const picked = value.optionIds;
       if (!Array.isArray(picked) || picked.length === 0) return no("nothing_picked", blockId);
       if (new Set(picked).size !== picked.length) return no("option_twice", blockId);
       for (const one of picked) {
-        const known = block.options.find((option) => option.value === one);
+        const known = block.options.find((option) => option.optionId === one);
         if (!known) return no("option_unknown", `${blockId}: ${String(one)}`);
         if (known.requiresText && !String(value.text ?? "").trim()) {
           return no("option_needs_text", `${blockId}: „${known.value}“ verlangt eine Angabe`);

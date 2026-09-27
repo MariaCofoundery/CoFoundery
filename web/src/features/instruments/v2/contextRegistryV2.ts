@@ -52,7 +52,17 @@ export type ContextAnswerFormat =
   | "importance_rating"
   | "date";
 
-export type ContextOption = { value: string; requiresText: boolean };
+/**
+ * Eine Antwortmoeglichkeit.
+ *
+ * DIE KENNUNG IST DAS, WAS GESPEICHERT WIRD, nicht der Text. Teil F7 des
+ * Gutachtens verlangt die "urspruengliche Options-ID" - und der Grund ist
+ * derselbe wie bei der Instrumentversion: Der Text darf sich aendern (und
+ * tut es, siehe `rewordingsV2`), die Bedeutung einer bereits gegebenen
+ * Antwort nicht. Wer den Text speichert, verliert beim ersten Umformulieren
+ * die Zuordnung aller bisherigen Antworten.
+ */
+export type ContextOption = { optionId: string; value: string; requiresText: boolean };
 
 export type ContextBlock = {
   blockId: string;
@@ -162,6 +172,14 @@ export function assertContextRegistryIntegrity(registry: ContextRegistryV2) {
       // sie verlangt selbst, solche Optionen zusammenzuführen statt sie
       // doppelt anzuzeigen.
       fail(`${block.blockId}: derselbe Auslassungsgrund doppelt`);
+    }
+
+    const optionIds = block.options.map((option) => option.optionId);
+    if (new Set(optionIds).size !== optionIds.length) fail(`${block.blockId}: doppelte Options-Kennung`);
+    for (const option of block.options) {
+      if (!new RegExp(`^${block.blockId}_o\\d+$`).test(option.optionId)) {
+        fail(`${block.blockId}: Options-Kennung passt nicht zum Block: ${option.optionId}`);
+      }
     }
 
     const needsOptions = block.answerFormat === "single_choice"
