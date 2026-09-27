@@ -164,6 +164,52 @@ Produkt — sie wird zum Auswahlkriterium, sobald ein Accelerator sie sieht.
 Aber sie ist heute da, und der Match-Report ist um sie herum gebaut. Das ist
 deine Entscheidung, nicht meine.
 
+**ENTSCHIEDEN am 27.09.2026 (Maria): weg.** Begründung von ihr: „haben wir eh
+niemandem gezeigt, wurde wenn überhaupt nur im Hintergrund genutzt."
+
+Das habe ich nachgeprüft, und es stimmt — mit einer Einschränkung, die die
+Entscheidung eher bestärkt.
+
+**Was die Zahl heute nicht tut:** Sie steht nirgends auf einem Bildschirm.
+`overallFit` wird berechnet, in den Report gelegt und von keiner einzigen
+Komponente gelesen. `overallMatchScore` erscheint nur im Audit-Modul für die
+Fehlersuche. Es gibt auch keine Datenbankspalte dafür — nur alte
+Report-Payloads enthalten sie als JSON, und die bleiben als Archiv, wie sie
+sind.
+
+**Was sie aber sehr wohl tut:** Sie wählt Texte aus, ohne sich zu zeigen.
+
+- Ab 85 und ohne Spannungsfeld heißt ein Paar „Die Harmonischen
+  Stabilisatoren", unter 60 oder mit zwei Hochrisikofeldern „Das High-Friction
+  Power-Duo", sonst „Die balancierten Strategen". Diese Typennamen stehen in
+  drei fertig formulierten Sätzen des Vergleichsreports. Sie werden derzeit
+  nicht gerendert — aber sie sind genau die Personenrangliste, gegen die das
+  Gutachten in Teil B argumentiert, und sie lagen eine Zeile Code davon
+  entfernt, sichtbar zu sein.
+- **Und eine zweite, unabhängige Zahl macht dasselbe und ist sichtbar:**
+  `valuesAlignmentPercent` teilt in `symbiose` (ab 85), `schnittmenge` (ab 65)
+  und `spannungsfeld` und wählt darüber den Werte-Text aus. Dieser Text
+  **wird** angezeigt (`SelfValuesProfileSection`). Die Prozentzahl steht nicht
+  daneben — aber sie fällt das Urteil. Das ist „Eure Werte passen zu 43 %
+  zusammen" mit weggelassener Zahl, und das Gutachten nennt genau diesen Satz
+  als unzulässig.
+
+**Was daraus folgt.** „Gesamtzahl weg" heißt nicht nur: keine Zahl anzeigen.
+Es heißt: **keine verborgene Zahl, die eine Aussage auswählt.** Eine Schwelle
+bei 85 ist eine Behauptung über Messgenauigkeit, auch wenn niemand die 85
+sieht. In v2 gibt es deshalb weder einen Passungswert noch eine Stufe, die aus
+einem solchen Wert folgt — beide Registraturen halten das schon als Regel fest
+(`KEINE GESAMTZAHL`), und Schritt 3 und 4 werden daran gemessen.
+
+**Was offen bleibt.** Discovery sortiert heute nach dieser Zahl. Ohne sie
+braucht es einen anderen Schlüssel — dein Vorschlag mit der Wichtigkeit je
+Dimension („bei Commitment ist mir wichtig, dass wir uns sehr ähnlich sind")
+ist der Kandidat und gehört in Schritt 6.
+
+**Was jetzt nicht passiert.** v1 wird nicht umgebaut. Die Zahl anzurühren wäre
+eine Verhaltensänderung am laufenden Produkt vor dem einen Release, das du
+willst — und v1 wird in Schritt 8 ohnehin archiviert. Sie verschwindet mit ihm.
+
 ### 5.2 Acht Präferenzen oder weniger?
 
 Das Gutachten schlägt acht enge Kandidaten vor (A, I, E, U, K, T, D, X) und
