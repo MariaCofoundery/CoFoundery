@@ -182,8 +182,6 @@ Oder: kann ich noch nicht einschätzen · für mein Vorhaben nicht relevant
 
 Eingabe: Betrag oder Bereich — Betrag/Bereich mit Währung
 
-Hinweis: 0
-
 Oder: möchte ich nicht angeben · noch offen
 
 ### B05
@@ -279,6 +277,7 @@ Oder: noch offen · möchte ich nicht angeben
 
 **Welches konkrete Ergebnis soll euer Vorhaben in den nächsten zwölf Monaten erreicht haben?**
 
+Eingabe: Freitext, mehrere Felder
 
 Hinweis: Freitext: Ergebnis, erkennbare Erfüllung, Zieldatum
 
@@ -302,7 +301,9 @@ Oder: noch offen · möchte ich nicht angeben
 
 **Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen von den anderen Foundern?**
 
-Antwortmöglichkeiten:
+Eingabe: Zahl oder Bereich je Person — pro Person oder geplanter Rolle: Zahl/Bereich in Stunden/Woche (Stunden/Woche)
+
+Statt einer Angabe wählbar:
 
 - keine feste Erwartung
 
@@ -312,7 +313,9 @@ Oder: noch offen · möchte ich nicht angeben
 
 **Welche Zeiten möchtest du für gemeinsame Arbeit verbindlich freihalten?**
 
-Antwortmöglichkeiten:
+Eingabe: Zeitfenster — Wochentage und Zeitfenster
+
+Statt einer Angabe wählbar:
 
 - nur nach Vereinbarung
 - keine festen gemeinsamen Zeiten

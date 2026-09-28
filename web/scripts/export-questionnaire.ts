@@ -99,17 +99,36 @@ function renderBlock(block: ContextBlock) {
   push();
   if (block.answerFormat === "importance_rating") {
     push(`Antwortmöglichkeiten: ${CONTEXT_REGISTRY_V2.importanceLabels.join(" · ")}`);
-  } else if (block.options.length > 0) {
-    push("Antwortmöglichkeiten:");
-    push();
-    for (const option of block.options) push(`- ${option.value}`);
-  } else if (block.hint) {
-    const kind = INPUT_KIND[block.answerFormat] ?? block.answerFormat;
-    push(`Eingabe: ${kind} — ${block.hint}${block.unit ? ` (${block.unit})` : ""}`);
+  } else {
+    // DAS EINGABEFELD ZUERST UND IMMER. Am 28.09.2026 in einer externen
+    // Durchsicht bemängelt: Bei R02 und R03 zeigte der Export nur die
+    // Sonderoptionen („keine feste Erwartung") und verschwieg die eigentliche
+    // Eingabe - Stunden je Person, Wochentage mit Uhrzeit. Die Anwendung hat
+    // diese Felder; der Export hatte sie nicht, weil er beim ersten Treffer
+    // aufhoerte. Wer den Fragebogen danach beurteilt, haelt zwei Fragen fuer
+    // unbeantwortbar, die es nicht sind.
+    const structured = INPUT_KIND[block.answerFormat];
+    if (structured) {
+      const detail = block.hint ? ` — ${block.hint}` : "";
+      push(`Eingabe: ${structured}${detail}${block.unit ? ` (${block.unit})` : ""}`);
+      if (block.options.length > 0) {
+        push();
+        push("Statt einer Angabe wählbar:");
+        push();
+        for (const option of block.options) push(`- ${option.value}`);
+      }
+    } else if (block.options.length > 0) {
+      push("Antwortmöglichkeiten:");
+      push();
+      for (const option of block.options) push(`- ${option.value}`);
+    }
   }
-  if (block.fieldNotes.length) {
+  // Feldhinweise nur, wenn sie fuer einen Menschen lesbar sind. „0" allein war
+  // ein technischer Rest aus der Quelle und stand so im Dokument.
+  const readable = block.fieldNotes.filter((note) => note.trim().length > 3);
+  if (readable.length) {
     push();
-    push(`Hinweis: ${block.fieldNotes.join("; ")}`);
+    push(`Hinweis: ${readable.join("; ")}`);
   }
   const missing = missingOf(block.blockId);
   if (missing.length) {
