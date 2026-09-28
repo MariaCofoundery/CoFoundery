@@ -357,9 +357,13 @@ v2 hat nie jemand ausgefüllt. Es ist **archiviert, nicht gelöscht**.
 | 8 Umstieg | fertig — `/founder-alignment/versionen`, beide Fassungen nebeneinander |
 | Discovery | fertig — `…/pilot/discovery`, 14 Themen, Urteile ohne Freigabe |
 | Pilotmessung | fertig — Ausfülldauer, Auslassungsgründe, Abbruchstellen (`docs/pretest-auswertung.md`) |
-| 4 Texte | **offen** — die Gesprächskarten aus v2 sind nicht übertragen |
-| 7 Advisor | **offen** |
-| Archivansicht | **offen** |
+| 4 Texte | fertig — zwölf Gesprächskarten nach dem Vierschritt, fünf wörtlich aus der Durchsicht |
+| 7 Advisor | fertig — Freigabe an Advisor, Ansicht im begleiteten Profil, zwei Schlüssel |
+| Archivansicht | fertig — Kasten im Dashboard, beide Fassungen mit ihren Verbindungen |
+
+**Damit steht alles, was für einen Pilot nötig ist.** Was fehlt, ist kein
+Bauteil mehr, sondern eine Handlung: `npx supabase db push` gegen Production
+und ein Mensch, der den Weg einmal durchklickt.
 
 **Erreichbar für Founder**, nicht in der Hauptnavigation: Ein begleiteter Pilot
 heißt, dass man Leute anspricht und ihnen den Link schickt. Die Rolle ist das
