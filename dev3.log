@@ -26,3 +26,4 @@
  GET /debug/alignment-v2/compare/94b56247-7c13-4aea-b95b-bc768dfe3925 200 in 416ms
  ✓ Compiled in 366ms (1162 modules)
  GET /debug/alignment-v2/compare/94b56247-7c13-4aea-b95b-bc768dfe3925 200 in 488ms
+[?25h
