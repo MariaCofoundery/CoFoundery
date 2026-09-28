@@ -1,0 +1,1626 @@
+{
+  "instrumentId": "founder-alignment-v2-1",
+  "registryVersion": "2.1.0",
+  "status": "draft",
+  "createdAt": "2026-09-28",
+  "source": "docs/CoFoundery_Align_v2_1_Items.json (v2.1-redaktioneller-Entwurf, 28.09.2026); Einordnungen aus docs/CoFoundery_Align_v2_Fachreview.html",
+  "administration": "Bezieht euch auf dasselbe Vorhaben. Wenn nicht anders angegeben, nächste drei Monate und gewünschte Zusammenarbeit. Solo: künftige Zusammenarbeit vorstellen. Persönliche Antworten nicht als gemeinsame Vereinbarung behandeln.",
+  "notes": [
+    "KEINE GESAMTZAHL UND KEINE DIMENSIONSWERTE. Die Quelle sagt es selbst: overall_score false, dimension_scores false.",
+    "KEIN REVERSE CODING. Jedes Item der Quelle fuehrt reverse_coding false.",
+    "ZWEIERBLOECKE SIND KEINE SUBSKALEN. Ueberschriften sind Gespraechsbereiche, keine gemessenen Dimensionen - so ausdruecklich im Fachreview.",
+    "ORDINAL ODER NOMINAL steht nicht im Format der Quelle, sondern im Fachreview: A01/A02/U04 und I01/I03/X01/X06 sind ordinal, E01 sind Praeferenzstufen, K01/K02/T03/D01/G01/G02a sind Handlungs- oder Regelwahl. Was dort nicht genannt ist, gilt als nominal - das behauptet weniger."
+  ],
+  "deviationsFromSource": [
+    {
+      "what": "confidential_first als eigener Auslassungsgrund",
+      "source": "Die Quelle fuehrt vier Codes und ordnet 'moechte ich zunaechst vertraulich klaeren' unter 'private' ein.",
+      "reason": "Eine Bitte um ein Gespraech unter vier Augen ist etwas anderes als eine Verweigerung: die eine oeffnet eine Tuer, die andere schliesst sie. Das Produkt behandelt beide verschieden - der Advisor-Zugang und der Report zeigen 'vertraulich klaeren' als offenen Punkt, 'moechte ich nicht angeben' nicht.",
+      "decidedBy": "Claude, 28.09.2026 - Maria zur Bestaetigung vorzulegen"
+    }
+  ],
+  "sections": [
+    "Entscheidungen vorbereiten",
+    "Erfahrung und Bauchgefühl",
+    "Ideen ausprobieren",
+    "Eigenständig entscheiden",
+    "Informationen teilen",
+    "Unterschiede ansprechen",
+    "Die eigene Sicht ausdrücken",
+    "Mit offenen Fragen umgehen",
+    "Geld und Absicherung",
+    "Gemeinsam entscheiden",
+    "Ein unterbrochenes Gespräch fortsetzen",
+    "Ziele für das Vorhaben",
+    "Zeit und finanzielle Rahmenbedingungen",
+    "Prioritäten im konkreten Fall: Frühe Information und Verlässlichkeit",
+    "Prioritäten im konkreten Fall: Weiterentwicklung und Rollenwechsel",
+    "Prioritäten im konkreten Fall: Gesellschaftlicher Nutzen und finanzieller Spielraum",
+    "Prioritäten im konkreten Fall: Austausch vorab und zügiger Start",
+    "Prioritäten im konkreten Fall: Zusätzliche Reserve und Markttest",
+    "Prioritäten im konkreten Fall: Gleicher Anteil und unterschiedlicher Beitrag",
+    "Persönliche Grenzen"
+  ],
+  "missingCodes": [
+    {
+      "code": "cannot_assess",
+      "note": "Aussage ueber den eigenen Klaerungsstand."
+    },
+    {
+      "code": "undecided",
+      "note": "Noch nicht festgelegt oder im Fall nicht entscheidbar. Die Beschriftung steht am Item."
+    },
+    {
+      "code": "withheld",
+      "note": "Bewusst nicht angegeben. Kein negativer Befund."
+    },
+    {
+      "code": "confidential_first",
+      "note": "Bitte um ein Gespraech unter vier Augen. Eine offene Tuer."
+    },
+    {
+      "code": "technical",
+      "note": "Technisch fehlend. Nie mit den anderen vermischen."
+    }
+  ],
+  "items": [
+    {
+      "itemId": "A01",
+      "order": 1,
+      "section": "Entscheidungen vorbereiten",
+      "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung mehrere Möglichkeiten anhand derselben Kriterien vergleichen?",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "A01_o1",
+          "label": "nie",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A01_o2",
+          "label": "selten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A01_o3",
+          "label": "manchmal",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A01_o4",
+          "label": "häufig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A01_o5",
+          "label": "fast immer",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Analytischer Vergleich als gewünschtes Vorgehen. Kein Beleg für Analysefähigkeit.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "A02",
+      "order": 2,
+      "section": "Entscheidungen vorbereiten",
+      "prompt": "Wie häufig möchtest du vor einer wichtigen Entscheidung mit vorhandenen Informationen prüfen, ob eine zentrale Annahme zutrifft?",
+      "hint": "Zum Beispiel die Annahme, dass genügend Menschen für euer Angebot bezahlen würden.",
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "A02_o1",
+          "label": "nie",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A02_o2",
+          "label": "selten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A02_o3",
+          "label": "manchmal",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A02_o4",
+          "label": "häufig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "A02_o5",
+          "label": "fast immer",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Prüfung einer Annahme. Ein Beispiel kann die Antwort beeinflussen; im Pretest mit und ohne Beispiel prüfen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "I01",
+      "order": 3,
+      "section": "Erfahrung und Bauchgefühl",
+      "prompt": "Wenn du dich in einem Arbeitsgebiet gut auskennst: Wie viel Gewicht möchtest du deinem ersten Eindruck bei einer Entscheidung geben?",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "I01_o1",
+          "label": "gar kein Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I01_o2",
+          "label": "wenig Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I01_o3",
+          "label": "mittleres Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I01_o4",
+          "label": "großes Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I01_o5",
+          "label": "sehr großes Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Gewichtung von Erfahrungsintuition, nicht bloß ihr Wahrnehmen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "I03",
+      "order": 4,
+      "section": "Erfahrung und Bauchgefühl",
+      "prompt": "Du kennst dich in einem Arbeitsgebiet gut aus. Die verfügbaren Zahlen sprechen für eine Möglichkeit, dein Bauchgefühl eher dagegen. Wie viel Gewicht möchtest du diesem Bauchgefühl bei deiner Entscheidung geben?",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "I03_o1",
+          "label": "gar kein Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I03_o2",
+          "label": "wenig Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I03_o3",
+          "label": "mittleres Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I03_o4",
+          "label": "großes Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "I03_o5",
+          "label": "sehr großes Gewicht",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Gewichtung eines intuitiven Gegensignals. Situation kann zusätzlich Vertrauen in Daten oder Verlustsorgen aktivieren; kein reines Traitmaß.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "E01",
+      "order": 5,
+      "section": "Ideen ausprobieren",
+      "prompt": "Für eine Entscheidung fehlen euch noch Informationen. Ihr könnt jetzt einen kleinen Versuch starten oder zunächst weitere Informationen sammeln. Welche Vorgehensweise wäre dir lieber?",
+      "hint": "Der Versuch kostet Zeit und Geld. Den maximalen Aufwand habt ihr begrenzt; ihr könnt ihn beenden, ohne weitere Verpflichtungen einzugehen. Er hat keine erheblichen Folgen für andere.",
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "E01_o1",
+          "label": "klar lieber jetzt ausprobieren",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o2",
+          "label": "eher jetzt ausprobieren",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o3",
+          "label": "beide Vorgehensweisen sind für mich etwa gleich passend",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o4",
+          "label": "eher zuerst weitere Informationen sammeln",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o5",
+          "label": "klar lieber zuerst weitere Informationen sammeln",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Situativer Zielkonflikt zwischen frühem Versuch und Vorabinformation; keine generelle Risikobereitschaft. Die Mitte bedeutet Gleichpräferenz, nicht Unwissen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "U04",
+      "order": 6,
+      "section": "Eigenständig entscheiden",
+      "prompt": "Wie häufig möchtest du in deinem vereinbarten Verantwortungsbereich entscheiden, ohne vorher die Zustimmung der anderen Founder einzuholen?",
+      "hint": "Der Verantwortungsbereich und das Budget sind geklärt. Gemeint sind Entscheidungen ohne wesentliche Folgen für andere Bereiche. Informieren und Zustimmung einholen sind unterschiedliche Dinge.",
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "U04_o1",
+          "label": "nie",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "U04_o2",
+          "label": "selten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "U04_o3",
+          "label": "manchmal",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "U04_o4",
+          "label": "häufig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "U04_o5",
+          "label": "fast immer",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Gewünschte Freigabeunabhängigkeit. Ein hohes Antwortniveau ist möglich und empirisch zu prüfen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "K01",
+      "order": 7,
+      "section": "Informationen teilen",
+      "prompt": "Wann möchtest du den anderen Foundern einen Zwischenstand aus deinem Bereich normalerweise zum ersten Mal zeigen?",
+      "hint": "Gemeint ist ein Thema, bei dem die anderen noch nicht mitarbeiten und nicht unmittelbar auf dein Ergebnis warten.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "K01_o1",
+          "label": "wenn es eine erste Skizze gibt und noch vieles offen ist",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K01_o2",
+          "label": "wenn die Richtung feststeht, aber die Ausarbeitung noch offen ist",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K01_o3",
+          "label": "wenn es ein erstes nutzbares Ergebnis gibt",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K01_o4",
+          "label": "wenn das Ergebnis aus meiner Sicht fertig ist",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K01_o5",
+          "label": "ich möchte das je nach Aufgabe unterschiedlich handhaben – bitte kurz erläutern",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Gewünschter Zeitpunkt eigener Information. Die letzte Kategorie ist nominal; keine einfache durchgehende Ordinalskala.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "K02",
+      "order": 8,
+      "section": "Informationen teilen",
+      "prompt": "Welche Standardregel für Informationen aus anderen Bereichen wäre dir am liebsten?",
+      "hint": "Gemeint sind Themen, die deine eigene Arbeit gerade nicht unmittelbar betreffen. Wähle die Regel, die für dich im Alltag im Vordergrund stehen soll.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "K02_o1",
+          "label": "ich möchte regelmäßig einen kurzen Überblick erhalten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K02_o2",
+          "label": "ich möchte vor allem über größere Änderungen aktiv informiert werden",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K02_o3",
+          "label": "mir reicht ein zugänglicher Arbeitsstand, den ich bei Bedarf selbst ansehen kann",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K02_o4",
+          "label": "ich möchte Informationen gezielt erfragen, wenn ich sie brauche",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "K02_o5",
+          "label": "eine andere Regel – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Gewünschte Form des Informationszugangs; keine Menge und kein Gegenpol zur Autonomie. Optionen können kombiniert werden, daher explizite Standardpriorität und andere Regel.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "T03",
+      "order": 9,
+      "section": "Unterschiede ansprechen",
+      "prompt": "In einem Gespräch merkst du, dass du eine geplante Entscheidung anders siehst. Sie betrifft eure weitere Arbeit, muss aber nicht noch am selben Tag getroffen werden. Wann möchtest du deinen Einwand normalerweise erstmals ansprechen?",
+      "hint": "Es geht um das erste Ansprechen. Die ausführliche Klärung kann später stattfinden.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "T03_o1",
+          "label": "noch im laufenden Gespräch",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T03_o2",
+          "label": "nach dem Gespräch, aber noch am selben Arbeitstag",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T03_o3",
+          "label": "am nächsten Arbeitstag",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T03_o4",
+          "label": "nach mehr als einem Arbeitstag",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T03_o5",
+          "label": "das hängt für mich von der Tragweite ab – bitte kurz erläutern",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Ansprachezeitpunkt unter eingegrenzter Dringlichkeit. Ersetzt T03 und T06; kein Konfliktkompetenzmaß.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "D01",
+      "order": 10,
+      "section": "Die eigene Sicht ausdrücken",
+      "prompt": "Wenn du einen sachlichen Einwand einbringen möchtest: Welcher Einstieg passt am ehesten zu dir?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "D01_o1",
+          "label": "„Ich sehe das anders, weil …“",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "D01_o2",
+          "label": "„Ich habe bei diesem Punkt Bedenken: …“",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "D01_o3",
+          "label": "„Wie würde unser Vorschlag mit … umgehen?“",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "D01_o4",
+          "label": "„Ich würde gern noch diese Möglichkeit anschauen: …“",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "D01_o5",
+          "label": "ein anderer Einstieg – bitte formulieren",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Bevorzugter Gesprächseinstieg. Nominal, kein objektives Maß für Direktheit; Beispiele können Wissen über gute Kommunikation ansprechen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "X01",
+      "order": 11,
+      "section": "Mit offenen Fragen umgehen",
+      "prompt": "Wie wohl fühlst du dich, wenn es für ein Ergebnis mehrere plausible Erklärungen gibt und zunächst offenbleibt, welche zutrifft?",
+      "hint": "Denke an eine offene Frage in eurem Vorhaben, ohne akute finanzielle Notlage.",
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "X01_o1",
+          "label": "sehr unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X01_o2",
+          "label": "eher unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X01_o3",
+          "label": "weder wohl noch unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X01_o4",
+          "label": "eher wohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X01_o5",
+          "label": "sehr wohl",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Berichtetes Wohlbefinden bei Mehrdeutigkeit; keine Stabilitäts- oder Belastbarkeitsdiagnose.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "X06",
+      "order": 12,
+      "section": "Mit offenen Fragen umgehen",
+      "prompt": "Wie wohl fühlst du dich, wenn für mehrere Wochen offenbleibt, welche von zwei möglichen Richtungen euer Vorhaben einschlagen wird?",
+      "hint": "Beide Richtungen sind grundsätzlich möglich. Gemeint ist keine akute finanzielle Notlage.",
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "X06_o1",
+          "label": "sehr unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X06_o2",
+          "label": "eher unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X06_o3",
+          "label": "weder wohl noch unwohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X06_o4",
+          "label": "eher wohl",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "X06_o5",
+          "label": "sehr wohl",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Subjektives Wohlbefinden bei anhaltender Richtungsungewissheit. Nicht identisch mit X01, nicht automatisch eine gemeinsame Skala.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "B01",
+      "order": 13,
+      "section": "Geld und Absicherung",
+      "prompt": "Wie viel zusätzliches eigenes Geld wärst du in den nächsten zwölf Monaten höchstens bereit, in das Vorhaben einzubringen, wenn du es vollständig verlieren könntest?",
+      "hint": "Bereits eingebrachtes Geld zählt hier nicht mit. 0 ist eine mögliche Antwort. Du kannst diese Angabe für dich behalten.",
+      "answerFormat": "money_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Geplante persönliche Einsatz-/Verlustgrenze. Keine Messung der finanziellen Tragfähigkeit; Betrag nicht als verfügbares Vermögen oder verbindliche Zahlungszusage auslegen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "B05",
+      "order": 14,
+      "section": "Geld und Absicherung",
+      "prompt": "Stell dir vor, ihr plant ein Vorhaben, das einen spürbaren Teil eurer verfügbaren Zeit oder eures Budgets beansprucht. Welche Absicherungen möchtest du vorher vereinbaren?",
+      "hint": "Wähle alle Absicherungen, die dir dafür wichtig sind.",
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "B05_o1",
+          "label": "einen kleinen Versuch vor dem größeren Einsatz",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "B05_o2",
+          "label": "eine feste Obergrenze für die Ausgaben",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "B05_o3",
+          "label": "einen Zeitpunkt oder eine Bedingung, bei der ihr neu entscheidet, ob ihr weitermacht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "B05_o4",
+          "label": "eine Prüfung durch eine fachkundige Person außerhalb des Teams",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "B05_o5",
+          "label": "eine andere Absicherung – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        },
+        {
+          "optionId": "B05_o6",
+          "label": "keine zusätzliche Absicherung",
+          "requiresText": false,
+          "exclusive": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Absicherungswünsche; Zeit/Budget bewusst breiter Gesprächsanlass, nicht eindimensionaler Messindikator. Keine Zusatzabsicherung exklusiv.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "G01",
+      "order": 15,
+      "section": "Gemeinsam entscheiden",
+      "prompt": "Wenn ihr euch bei einer wichtigen Entscheidung in einem klar zugeordneten Bereich nicht einig werdet: Welche Regel soll dann gelten?",
+      "hint": "Gemeint sind Entscheidungen ohne wesentliche Folgen für andere Bereiche und ohne ausdrücklich vereinbarte gemeinsame Zustimmungspflicht.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "G01_o1",
+          "label": "die verantwortliche Person entscheidet nach Rücksprache",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G01_o2",
+          "label": "eine vorher benannte andere Person entscheidet nach Rücksprache",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G01_o3",
+          "label": "die Mehrheit der Founder entscheidet; für Gleichstand braucht es eine zusätzliche Regel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G01_o4",
+          "label": "die Entscheidung wird nur getroffen, wenn alle Founder zustimmen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G01_o5",
+          "label": "je nach Art der Entscheidung soll eine andere Regel gelten – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Gewünschte Regel bei Dissens. Mehrheit bei zwei Personen löst den Dissens nicht; keine globale Rangfolge von Entscheidungsmodellen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "G02a",
+      "order": 16,
+      "section": "Ein unterbrochenes Gespräch fortsetzen",
+      "prompt": "Was soll nach einer Pause in einem angespannten Gespräch standardmäßig gelten?",
+      "hint": "Beide haben zunächst Zeit, sich zu sammeln. Es besteht kein akuter Zeitdruck.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "G02a_o1",
+          "label": "wir setzen das Gespräch noch am selben Tag fort",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02a_o2",
+          "label": "wir setzen es am nächsten gemeinsamen Arbeitstag fort",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02a_o3",
+          "label": "wir legen keine feste Frist fest, vereinbaren aber vor jeder Pause einen konkreten Zeitpunkt",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02a_o4",
+          "label": "eine andere Regel – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Regel zur Wiederaufnahme. Nominale Standardwahl; nächste gemeinsame Arbeitstage können verschieden weit auseinanderliegen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "G02b",
+      "order": 17,
+      "section": "Ein unterbrochenes Gespräch fortsetzen",
+      "prompt": "Was würde dir helfen, das Gespräch nach der Pause fortzusetzen?",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "G02b_o1",
+          "label": "vorher meine eigenen Gedanken sortieren",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02b_o2",
+          "label": "die offenen Punkte vorher kurz schriftlich austauschen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02b_o3",
+          "label": "zunächst gegenseitig zusammenfassen, wie wir die Situation verstehen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02b_o4",
+          "label": "eine neutrale Person hinzunehmen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02b_o5",
+          "label": "eine andere Unterstützung – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        },
+        {
+          "optionId": "G02b_o6",
+          "label": "ich brauche dafür keine besondere Vorbereitung oder Unterstützung",
+          "requiresText": false,
+          "exclusive": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Unterstützungswunsch getrennt vom Zeitpunkt. Keine besondere Unterstützung exklusiv zu konkreten Hilfen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "S01",
+      "order": 18,
+      "section": "Ziele für das Vorhaben",
+      "prompt": "Welche Ergebnisse sind dir für die nächsten drei Jahre wichtig?",
+      "hint": "Wähle die Ergebnisse, die zu deinen Zielen passen. Wenn eines besonders wichtig ist, markiere es anschließend. Du kannst auch angeben, dass du noch keine Rangfolge festlegen möchtest.",
+      "answerFormat": "multi_choice_priority",
+      "options": [
+        {
+          "optionId": "S01_o1",
+          "label": "ein regelmäßiges Einkommen, das meinen Lebensunterhalt trägt",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_o2",
+          "label": "ein Unternehmen mit starkem Wachstum aufbauen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_o3",
+          "label": "einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_o4",
+          "label": "ein Unternehmen aufbauen, das sich später verkaufen lässt",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_o5",
+          "label": "eine fachlich anspruchsvolle Idee verwirklichen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_o6",
+          "label": "ein anderes Ergebnis – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Mehrere Ziele zulassen; Zahl gewählter Ziele ist kein Ambitionswert. Keine Rangfolge festgelegt ist kein Nachweis gleicher Wichtigkeit.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "followup": {
+        "optional": true,
+        "question": "Welches gewählte Ziel hat derzeit Vorrang?",
+        "other": "ich möchte noch keine Rangfolge festlegen"
+      }
+    },
+    {
+      "itemId": "S02",
+      "order": 19,
+      "section": "Ziele für das Vorhaben",
+      "prompt": "Welche Vorstellung hast du aktuell von deiner Beteiligung am Unternehmen in drei Jahren?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "S02_o1",
+          "label": "ich möchte beteiligt bleiben und plane derzeit keinen Verkauf meiner Anteile",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S02_o2",
+          "label": "ich möchte möglicherweise einen Teil meiner Anteile verkaufen und beteiligt bleiben",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S02_o3",
+          "label": "ich möchte darauf hinarbeiten, meine Anteile vollständig zu verkaufen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S02_o4",
+          "label": "ich möchte mir die verschiedenen Möglichkeiten offenhalten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S02_o5",
+          "label": "eine andere Vorstellung – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Teilverkauf und vollständiger Ausstieg getrennt. Keine Rückschlüsse auf Loyalität. Verkauf darf von später benannten Bedingungen abhängen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "S03",
+      "order": 20,
+      "section": "Ziele für das Vorhaben",
+      "prompt": "Wie stehst du aktuell dazu, Geld von außen für das Unternehmen aufzunehmen und dafür Unternehmensanteile abzugeben?",
+      "hint": "Optional: Welche Bedingungen wären dir dabei wichtig?",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "S03_o1",
+          "label": "ich möchte zunächst ohne diese Finanzierung arbeiten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S03_o2",
+          "label": "ich möchte diese Möglichkeit offenhalten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S03_o3",
+          "label": "ich möchte gezielt nach einer solchen Finanzierung suchen",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Finanzierungspräferenz. Bedingungen separat von der Ausgangsposition erfragen; keine Skala.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "S04",
+      "order": 21,
+      "section": "Ziele für das Vorhaben",
+      "prompt": "Welches konkrete Ergebnis möchtest du mit dem Vorhaben in den nächsten zwölf Monaten erreichen?",
+      "hint": "Auch das Prüfen einer Idee oder die Entscheidung gegen ihre Weiterverfolgung kann ein Ergebnis sein.",
+      "answerFormat": "structured_text",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Individuelles Zielbild statt stellvertretende Aussage über gemeinsamen Konsens.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "R01",
+      "order": 22,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch für das Vorhaben einplanen?",
+      "hint": "0 ist eine mögliche Antwort. Falls der Umfang schwankt, kannst du die Bedingungen kurz ergänzen.",
+      "answerFormat": "number_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Kapazitätsplanung, noch keine gemeinsame Zusage. Ein Bereich ist als Schätzung zu kennzeichnen; Obergrenze nicht als garantierter Einsatz interpretieren.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "R02",
+      "order": 23,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Welchen zeitlichen Beitrag erwartest du in den nächsten zwölf Wochen von den anderen Foundern?",
+      "hint": "Erfasse deine Erwartung für jede Person getrennt. Wenn das Team noch nicht feststeht, kannst du dich auf die geplanten Rollen beziehen.",
+      "answerFormat": "person_number_range",
+      "options": [
+        {
+          "optionId": "R02_o1",
+          "label": "keine feste Stundenerwartung an diese Person oder Rolle",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Gerichtete Erwartungen. Zahl/Bereich und Empfänger sind notwendige Felder; keine feste Erwartung heißt nicht null Stunden.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "repeatPer": "Person oder geplanter Rolle"
+    },
+    {
+      "itemId": "R03",
+      "order": 24,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Welche regelmäßigen Zeitfenster könntest du für gemeinsame Arbeit einplanen?",
+      "hint": "Du musst nicht erklären, warum andere Zeiten für dich nicht verfügbar sind.",
+      "answerFormat": "time_windows",
+      "options": [
+        {
+          "optionId": "R03_o1",
+          "label": "ich möchte gemeinsame Zeiten jeweils einzeln vereinbaren",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "R03_o2",
+          "label": "ich kann derzeit keine regelmäßigen gemeinsamen Zeiten einplanen",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Verfügbarkeit für gemeinsame Zeit; feste Zeitfenster und die beiden Alternativen als getrennte Modi. Keine regelmäßigen Fenster bedeutet nicht keine Zusammenarbeit.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "fields": [
+        "Wochentag",
+        "Uhrzeit von",
+        "Uhrzeit bis",
+        "Zeitzone"
+      ]
+    },
+    {
+      "itemId": "R04",
+      "order": 25,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Ab wann brauchst du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben für deinen Lebensunterhalt?",
+      "hint": "Optional kannst du ergänzen, welchen monatlichen Betrag du ungefähr brauchst. Nenne dabei die Währung und ob du den Betrag vor oder nach persönlichen Steuern meinst.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "R04_o1",
+          "label": "ab sofort",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "R04_o2",
+          "label": "ab einem bestimmten Datum – bitte angeben",
+          "requiresText": true,
+          "exclusive": false
+        },
+        {
+          "optionId": "R04_o3",
+          "label": "in den nächsten zwölf Monaten voraussichtlich nicht",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Finanzieller Bedarf und Zeitpunkt; keine Berechnung individueller Leistbarkeit. Optionaler Betrag wird nicht aus anderen Antworten abgeleitet.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "conditionalFields": [
+        "Datum bei künftigem Beginn",
+        "optionaler Monatsbetrag, Währung, vor/nach persönlichen Steuern"
+      ]
+    },
+    {
+      "itemId": "R06",
+      "order": 26,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Welche Aussage passt zu deiner Planung für eine hauptberufliche Arbeit an diesem Vorhaben?",
+      "hint": "Gemeint ist der überwiegende Teil deiner beruflichen Arbeitszeit. Das setzt keine bestimmte Wochenstundenzahl voraus und schließt andere Tätigkeiten nicht automatisch aus.",
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "R06_o1",
+          "label": "das Vorhaben ist bereits meine berufliche Haupttätigkeit",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "R06_o2",
+          "label": "ich kann mir vorstellen, es zu meiner beruflichen Haupttätigkeit zu machen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "R06_o3",
+          "label": "ich plane das derzeit nicht",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Hauptberuflicher Wechsel, ausdrücklich keine Gleichsetzung mit Vollzeit oder Exklusivität. Bei zweiter Antwort bedingte Anschlussfelder.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "followup": {
+        "when": "möglicher zukünftiger Wechsel",
+        "question": "Was müsste dafür erfüllt sein?",
+        "options": [
+          "regelmäßige Auszahlung in bestimmter Höhe",
+          "gesicherte Finanzierung",
+          "konkreter Meilenstein",
+          "frühestmöglicher Zeitpunkt",
+          "andere Bedingung",
+          "keine besondere Bedingung"
+        ],
+        "multiple": true,
+        "exclusive": [
+          "keine besondere Bedingung"
+        ],
+        "fields": [
+          "Betrag und Währung",
+          "Finanzierungsbedingung",
+          "Meilenstein",
+          "Datum",
+          "Welche Bedingungen gemeinsam oder alternativ?"
+        ]
+      }
+    },
+    {
+      "itemId": "R12",
+      "order": 27,
+      "section": "Zeit und finanzielle Rahmenbedingungen",
+      "prompt": "Wann möchtest du die Angaben zu deiner Zeit und deinen finanziellen Rahmenbedingungen erneut prüfen?",
+      "hint": null,
+      "answerFormat": "date",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "withheld",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Gemeinsame Aktualisierung planen; persönliche Angabe ist zunächst Wunschdatum.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "W01",
+      "order": 28,
+      "section": "Prioritäten im konkreten Fall: Frühe Information und Verlässlichkeit",
+      "prompt": "Ihr habt eine vorläufige Finanzplanung. Zugesagte Zahlungen sind kurzfristig gesichert. Die Prüfung der Zahlen dauert noch einige Tage. Wie möchtet ihr das Team informieren?",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W01_o1",
+          "label": "Die vorläufige Planung jetzt teilen und offene Punkte klar benennen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W01_o2",
+          "label": "Die Zahlen zuerst prüfen und anschließend die geprüfte Planung teilen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W01_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Kein Vertraulichkeitskonflikt: Empfängerkreis unverändert. Nicht Offenheit gegen Geheimhaltung interpretieren.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "frühe Orientierung für das Team",
+        "eine verlässliche Informationsgrundlage"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "W02",
+      "order": 29,
+      "section": "Prioritäten im konkreten Fall: Weiterentwicklung und Rollenwechsel",
+      "prompt": "Eine Person, die schon länger dabei ist, erfüllt neue Anforderungen ihrer Rolle noch nicht. Eine befristete Weiterentwicklung in dieser Rolle und ein Wechsel in eine passende andere Rolle sind beide realistische Wege. Die Person ist für beide offen; beide Wege kosten ähnlich viel. Für einen davon ist Budget vorhanden.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W02_o1",
+          "label": "Eine befristete Weiterentwicklung in der bisherigen Rolle ermöglichen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W02_o2",
+          "label": "Den Wechsel in eine passende andere Rolle unterstützen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W02_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Beide Optionen können loyal und leistungsorientiert sein. Misst Wahl einer Personalentwicklungsmaßnahme, nicht Loyalität versus Leistung.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "Weiterentwicklung in der bisherigen Rolle",
+        "Wechsel in eine aktuell passendere Rolle"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "W03",
+      "order": 30,
+      "section": "Prioritäten im konkreten Fall: Gesellschaftlicher Nutzen und finanzieller Spielraum",
+      "prompt": "Ihr könnt nur eines von zwei Angeboten umsetzen. Beide sind wirtschaftlich tragfähig und ähnlich aufwendig. Nach eurer bisherigen Einschätzung verspricht eines mehr gesellschaftlichen Nutzen, das andere einen größeren finanziellen Überschuss.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W03_o1",
+          "label": "Das Angebot mit dem größeren gesellschaftlichen Nutzen wählen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W03_o2",
+          "label": "Das Angebot mit dem größeren finanziellen Überschuss wählen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W03_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Lokaler Prioritätskonflikt. Vorstellungen über Größe, Sicherheit und Art des Nutzens bleiben mögliche Kontexteinflüsse.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "größerer gesellschaftlicher Nutzen",
+        "mehr finanzieller Spielraum für das Unternehmen"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "W04",
+      "order": 31,
+      "section": "Prioritäten im konkreten Fall: Austausch vorab und zügiger Start",
+      "prompt": "Ein interner Arbeitsablauf soll geändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein zusätzliches Gespräch würde den Start um eine Woche verschieben. Eine dringende Frist gibt es nicht.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W04_o1",
+          "label": "Vor der Entscheidung noch ein gemeinsames Gespräch führen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W04_o2",
+          "label": "Auf Basis der Rückmeldungen entscheiden und nach dem Start gemeinsam überprüfen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W04_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Beide Wege beteiligen Betroffene; keine Messung von partizipativ versus autoritär.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "zusätzlicher gemeinsamer Austausch vor der Entscheidung",
+        "zügiger Start mit einer späteren Überprüfung"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "W05",
+      "order": 32,
+      "section": "Prioritäten im konkreten Fall: Zusätzliche Reserve und Markttest",
+      "prompt": "Ihr habt ein zusätzliches Budget zur Verfügung. Ihr könnt es als Reserve behalten oder für einen begrenzten Markttest einsetzen. Laufende Verpflichtungen und eure bereits vereinbarte Mindestreserve bleiben in beiden Fällen gedeckt.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W05_o1",
+          "label": "Das Budget vorerst als zusätzliche Reserve behalten.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W05_o2",
+          "label": "Das Budget jetzt für den begrenzten Markttest einsetzen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W05_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Zusätzliche Sicherheitsreserve versus Erkenntnisgewinn; Mindestreserve ist Szenariobedingung und kein normativer Sicherheitswert.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "ein zusätzlicher finanzieller Puffer",
+        "frühe Erkenntnisse aus dem Markt"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "W06",
+      "order": 33,
+      "section": "Prioritäten im konkreten Fall: Gleicher Anteil und unterschiedlicher Beitrag",
+      "prompt": "Ein einmaliger Zusatzbonus kann verteilt werden. Die Grundvergütung ist geregelt, für diesen Bonus gibt es noch keine Verteilungsregel. Alle haben ihre Zusagen erfüllt, aber in unterschiedlichem Umfang zum Ergebnis beigetragen. Die Beiträge lassen sich anhand gemeinsam akzeptierter Kriterien nachvollziehen.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [
+        {
+          "optionId": "W06_o1",
+          "label": "Den Zusatzbonus zu gleichen Teilen verteilen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W06_o2",
+          "label": "Den Zusatzbonus entsprechend den nachvollziehbaren Beiträgen verteilen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "W06_o3",
+          "label": "eine andere Vorgehensweise – bitte beschreiben",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "kann ich noch nicht entscheiden"
+        }
+      ],
+      "note": "Gleichheits- versus Beitragsprinzip in einem spezifischen Fall. Kein allgemeiner Fairnesswert; keine rückwirkende Missachtung bestehender Zusagen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "concerns": [
+        "alle erhalten den gleichen Anteil am Zusatzbonus",
+        "der Zusatzbonus berücksichtigt den unterschiedlichen Beitrag"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel wichtig",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht einschätzen"
+    },
+    {
+      "itemId": "L01",
+      "order": 34,
+      "section": "Persönliche Grenzen",
+      "prompt": "Welche Vorgehensweise würde für dich eine persönliche Grenze überschreiten?",
+      "hint": "Du entscheidest, was du davon mit dem Team teilen möchtest.",
+      "answerFormat": "free_text_repeatable",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "dazu habe ich noch keine konkrete Angabe"
+        },
+        {
+          "code": "confidential_first",
+          "label": "möchte ich zunächst vertraulich klären"
+        }
+      ],
+      "note": "Frei formulierte Grenze, keine Integritätsbewertung. Fehlende Nennung bedeutet nicht, dass keine Grenzen bestehen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit."
+    },
+    {
+      "itemId": "L02",
+      "order": 35,
+      "section": "Persönliche Grenzen",
+      "prompt": "An welchem konkreten Beispiel ließe sich erkennen, dass diese Grenze erreicht ist?",
+      "hint": "Ein Beispiel reicht. Du musst keine persönliche Erfahrung schildern.",
+      "answerFormat": "free_text_per_entry",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "dazu habe ich noch keine konkrete Angabe"
+        },
+        {
+          "code": "confidential_first",
+          "label": "möchte ich zunächst vertraulich klären"
+        }
+      ],
+      "note": "Nur nach einer in L01 benannten und für die Anschlussfrage verwendbaren Grenze anzeigen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "showWhen": "L01 enthält eine benannte Grenze, die für die Anschlussfrage verwendet werden darf"
+    },
+    {
+      "itemId": "L03",
+      "order": 36,
+      "section": "Persönliche Grenzen",
+      "prompt": "Wie möchtest du vorgehen, wenn unklar ist, ob eine Situation diese Grenze berührt?",
+      "hint": "Zum Beispiel zunächst direkt darüber sprechen oder eine gemeinsam gewählte neutrale Person hinzunehmen.",
+      "answerFormat": "free_text_per_entry",
+      "options": [],
+      "missing": [
+        {
+          "code": "undecided",
+          "label": "dazu habe ich noch keine konkrete Angabe"
+        },
+        {
+          "code": "confidential_first",
+          "label": "möchte ich zunächst vertraulich klären"
+        }
+      ],
+      "note": "Verfahren zur Klärung, keine Unterstellung bereits erfolgter Grenzüberschreitung. Beispiele im Pretest auf Lenkung prüfen.",
+      "scoring": "Kein Dimensions- oder Gesamtscore. Ordinale Antworten als Kategorien; nominale Wahlen unverrechnet; Zahlen in ihrer Originaleinheit.",
+      "showWhen": "L01 enthält eine benannte Grenze, die für die Anschlussfrage verwendet werden darf"
+    }
+  ]
+}
