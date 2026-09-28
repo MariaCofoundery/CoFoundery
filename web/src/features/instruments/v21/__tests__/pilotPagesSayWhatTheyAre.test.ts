@@ -72,10 +72,20 @@ function* sourceFiles(dir: string): Generator<string> {
   }
 }
 
-test("es gibt die drei Pilotseiten", () => {
-  // Ein Waechter, der eine leere Menge prueft, ist immer gruen.
+test("der Waechter findet die Pilotseiten", () => {
+  // Ein Waechter, der eine leere Menge prueft, ist immer gruen. Die Zahl steht
+  // hier absichtlich nicht fest - sie waechst, und ein Test, der bei jeder
+  // neuen Seite umfaellt, wird irgendwann nur noch nachgezogen statt gelesen.
   const pages = pagesOfPilot();
-  assert.ok(pages.length >= 3, `zu wenige Seiten gefunden: ${pages.join(", ")}`);
+  assert.ok(pages.length >= 4, `zu wenige Seiten gefunden: ${pages.join(", ")}`);
+  for (const erwartet of ["page.tsx", join("report", "page.tsx"),
+                          join("compare", "[partnerId]", "page.tsx"),
+                          join("discovery", "page.tsx")]) {
+    assert.ok(
+      pages.some((path) => path.endsWith(erwartet)),
+      `diese Seite fehlt: ${erwartet}`,
+    );
+  }
 });
 
 test("der Fragebogen sagt VOR der ersten Frage, dass er eine Testfassung ist", () => {
