@@ -83,5 +83,22 @@
     "marked": "Marked for discussion.",
     "notShared": "not shared",
     "noAnswerYet": "not answered yet"
+  },
+  "transition": {
+    "title": "There is a new version of the questionnaire",
+    "intro": "The questionnaire has been reworked: better questions, separate reasons for leaving something out, and no score at the end. You decide what happens to your existing answers.",
+    "reversible": "You can change this later. Your old answers are kept either way.",
+    "keep_previous": {
+      "title": "I keep my report",
+      "action": "Keep the old report"
+    },
+    "retake": {
+      "title": "I will answer again",
+      "action": "Start the new questionnaire"
+    },
+    "confirmed": {
+      "keep_previous": "Your existing report stays valid. You can answer again at any time.",
+      "retake": "Done — your old answers are kept, and the new questionnaire is waiting."
+    }
   }
 }

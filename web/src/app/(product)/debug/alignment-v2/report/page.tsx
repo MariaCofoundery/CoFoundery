@@ -6,6 +6,8 @@ import {
   buildAlignmentReport,
 } from "@/features/instruments/v2/alignmentReportData";
 import { ALIGNMENT_V2_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import { InstrumentTransitionNotice } from "@/features/instruments/v2/InstrumentTransitionNotice";
+import { needsTransitionNotice } from "@/features/instruments/v2/instrumentTransitionActions";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -37,6 +39,10 @@ export default async function AlignmentV2ReportPage() {
         .in("assessment_id", ids)
     : { data: [] };
 
+  // Wer die alte Fassung abgegeben und noch nicht entschieden hat, wird
+  // gefragt - und zwar hier oben, nicht irgendwo in den Einstellungen.
+  const showTransition = await needsTransitionNotice();
+
   const report = buildAlignmentReport(rows ?? [], {
     hasComparison: false,
     markedBlockIds: (rows ?? []).filter((row) => row.marked_for_discussion).map((row) => row.block_id),
@@ -54,6 +60,12 @@ export default async function AlignmentV2ReportPage() {
       <p className="mt-1 text-xs text-slate-500">
         {t("report.instrument", { instrument: REPORT_INSTRUMENT_LABEL })}
       </p>
+
+      {showTransition && (
+        <div className="mt-8">
+          <InstrumentTransitionNotice />
+        </div>
+      )}
 
       <div className="mt-10">
         <AlignmentReportView report={report} />

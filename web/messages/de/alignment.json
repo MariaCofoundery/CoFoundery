@@ -83,5 +83,22 @@
     "marked": "Zur Besprechung markiert.",
     "notShared": "nicht geteilt",
     "noAnswerYet": "noch nicht beantwortet"
+  },
+  "transition": {
+    "title": "Es gibt eine neue Fassung des Fragebogens",
+    "intro": "Der Fragebogen wurde überarbeitet: bessere Fragen, getrennte Gründe fürs Auslassen, und am Ende keine Punktzahl mehr. Du entscheidest, was mit deinen bisherigen Angaben passiert.",
+    "reversible": "Du kannst das später ändern. Deine alten Antworten bleiben in jedem Fall erhalten.",
+    "keep_previous": {
+      "title": "Ich behalte meinen Report",
+      "action": "Alten Report behalten"
+    },
+    "retake": {
+      "title": "Ich fülle neu aus",
+      "action": "Neuen Fragebogen starten"
+    },
+    "confirmed": {
+      "keep_previous": "Dein bisheriger Report bleibt gültig. Du kannst später jederzeit neu ausfüllen.",
+      "retake": "Alles klar — deine alten Antworten bleiben erhalten, der neue Fragebogen wartet auf dich."
+    }
   }
 }
