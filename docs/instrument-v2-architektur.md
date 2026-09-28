@@ -350,18 +350,32 @@ v2 hat nie jemand ausgefüllt. Es ist **archiviert, nicht gelöscht**.
 
 | Schritt | v2.1 |
 |---|---|
-| 2 Fragebogen | fertig — `/debug/alignment-v2-1`, alle dreizehn Antwortformate, laufendes Speichern |
+| 2 Fragebogen | fertig — `/founder-alignment/pilot`, alle dreizehn Antwortformate, laufendes Speichern |
 | 3 Auswertung | fertig — Lesbarmachung ohne Zahlen, ordinal und nominal getrennt |
-| 5 Einzelreport | fertig — `/debug/alignment-v2-1/report`, mit Markierung nach der Abgabe |
-| 6 Vergleich | fertig — `/debug/alignment-v2-1/compare/[partnerId]`, Agenda, keine Passungszahl |
+| 5 Einzelreport | fertig — `…/pilot/report`, Markierung nach der Abgabe, Freigabe mit Vorschau |
+| 6 Vergleich | fertig — `…/pilot/compare/[partnerId]`, Agenda, keine Passungszahl |
+| 8 Umstieg | fertig — `/founder-alignment/versionen`, beide Fassungen nebeneinander |
+| Discovery | fertig — `…/pilot/discovery`, 14 Themen, Urteile ohne Freigabe |
+| Pilotmessung | fertig — Ausfülldauer, Auslassungsgründe, Abbruchstellen (`docs/pretest-auswertung.md`) |
 | 4 Texte | **offen** — die Gesprächskarten aus v2 sind nicht übertragen |
 | 7 Advisor | **offen** |
-| 8 Umstieg/Archiv | **offen** |
-| Discovery | **offen** — die Themenurteile hängen noch an v2 |
+| Archivansicht | **offen** |
+
+**Erreichbar für Founder**, nicht in der Hauptnavigation: Ein begleiteter Pilot
+heißt, dass man Leute anspricht und ihnen den Link schickt. Die Rolle ist das
+Tor — ohne Founder-Rolle lässt die Datenbank nicht einmal einen Fragebogen
+anlegen.
 
 Der Schreibweg ist durch Tests und Datenbankprüfungen gedeckt, aber **niemand
-hat ihn im Browser benutzt**. Das sollte ein Mensch tun, bevor irgendetwas
-davon weiterzieht.
+hat ihn im Browser benutzt**. Das sollte ein Mensch tun, bevor die ersten
+Teilnehmenden kommen.
+
+**Discovery v1 ist nicht sauber, und das bleibt so.** Es rechnet mit den sechs
+Dimensionswerten (`discoveryV2Alignment.ts`), begrenzt auf drei Themen
+(`.slice(0, 3)`) und gibt eine Richtungstendenz auf einer Skala aus, die die
+fachliche Durchsicht nicht als Skala anerkennt. Nicht angefasst: v1 ist die
+Fassung, die gilt und funktioniert; jede Änderung daran wäre Arbeit für etwas,
+das v2.1 ersetzen soll.
 
 **Die vier Verhaltensfragen** (A91, U91, K91, T91) sind Marias Idee: neben dem
 Wunsch auch das Verhalten fragen, damit sich beides gegenprüfen lässt. Sie
