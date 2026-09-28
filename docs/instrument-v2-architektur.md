@@ -346,10 +346,22 @@ v2 hat nie jemand ausgefüllt. Es ist **archiviert, nicht gelöscht**.
 | Verhaltensfragen | vier als **Vorschlag**, in eigener Datei, Status `proposal` |
 | Dokument | `docs/fragebogen-v2-1.md` / `.html`, erzeugt über `npm run export:questionnaire` |
 
-**Was v2.1 noch nicht hat:** keine Oberfläche, keine Route, keine Auswertung,
-keine Texte. Der gesamte Weg von Schritt 2 bis 8, der für v2 schon gegangen
-ist, muss auf v2.1 umgestellt werden. Das ist die eigentliche Arbeit vor
-Schritt 9 — und der Grund, warum Schritt 9 jetzt weiter weg ist als vorgestern.
+**Stand am Abend des 28.09.2026 — v2.1 lässt sich benutzen:**
+
+| Schritt | v2.1 |
+|---|---|
+| 2 Fragebogen | fertig — `/debug/alignment-v2-1`, alle dreizehn Antwortformate, laufendes Speichern |
+| 3 Auswertung | fertig — Lesbarmachung ohne Zahlen, ordinal und nominal getrennt |
+| 5 Einzelreport | fertig — `/debug/alignment-v2-1/report`, mit Markierung nach der Abgabe |
+| 6 Vergleich | fertig — `/debug/alignment-v2-1/compare/[partnerId]`, Agenda, keine Passungszahl |
+| 4 Texte | **offen** — die Gesprächskarten aus v2 sind nicht übertragen |
+| 7 Advisor | **offen** |
+| 8 Umstieg/Archiv | **offen** |
+| Discovery | **offen** — die Themenurteile hängen noch an v2 |
+
+Der Schreibweg ist durch Tests und Datenbankprüfungen gedeckt, aber **niemand
+hat ihn im Browser benutzt**. Das sollte ein Mensch tun, bevor irgendetwas
+davon weiterzieht.
 
 **Die vier Verhaltensfragen** (A91, U91, K91, T91) sind Marias Idee: neben dem
 Wunsch auch das Verhalten fragen, damit sich beides gegenprüfen lässt. Sie

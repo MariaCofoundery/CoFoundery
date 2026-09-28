@@ -1,3 +1,4 @@
+import { MarkV21 } from "@/features/instruments/v21/MarkV21";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/readoutV21";
 
 /**
@@ -24,9 +25,11 @@ type Props = {
   sections: { section: string; entries: ReadoutEntry[] }[];
   /** Was nach einer Änderung ins Leere zeigt - benannt, nicht gelöscht. */
   orphans?: { itemId: string; entryIds: string[] }[];
+  /** Worüber diese Person sprechen möchte. Keine Aussage über die Antwort. */
+  marked?: readonly string[];
 };
 
-export function ReportViewV21({ sections, orphans = [] }: Props) {
+export function ReportViewV21({ sections, orphans = [], marked = [] }: Props) {
   return (
     <div className="space-y-10">
       {orphans.length > 0 && (
@@ -65,6 +68,8 @@ export function ReportViewV21({ sections, orphans = [] }: Props) {
                   </p>
                 )}
               </div>
+
+              <MarkV21 itemId={entry.itemId} initial={marked.includes(entry.itemId)} />
             </div>
           ))}
         </section>

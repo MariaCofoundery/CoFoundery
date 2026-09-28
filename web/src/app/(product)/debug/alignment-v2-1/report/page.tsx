@@ -35,7 +35,7 @@ export default async function ReportV21Page() {
   const { data: rows } = assessment
     ? await supabase
         .from("alignment_answers")
-        .select("block_id, value, missing_code")
+        .select("block_id, value, missing_code, marked_for_discussion")
         .eq("assessment_id", assessment.id)
     : { data: [] };
 
@@ -47,6 +47,10 @@ export default async function ReportV21Page() {
         : { blockId: row.block_id, value: row.value }) as AlignmentAnswerV21,
     ]),
   );
+
+  const marked = (rows ?? [])
+    .filter((row) => row.marked_for_discussion)
+    .map((row) => row.block_id);
 
   const sections = readAll(answers);
 
@@ -63,6 +67,11 @@ export default async function ReportV21Page() {
         Vergleich mit anderen. Es ist die Grundlage für ein Gespräch, nicht sein
         Ergebnis.
       </p>
+      <p className="mt-2 text-sm text-slate-500">
+        Setz einen Haken bei allem, worüber du sprechen möchtest. Das geht auch nach
+        dem Abgeben und sagt nichts über deine Antwort aus — es kommt in eurem
+        gemeinsamen Teil ganz oben auf die Liste.
+      </p>
 
       {sections.length === 0 ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
@@ -74,7 +83,11 @@ export default async function ReportV21Page() {
         </p>
       ) : (
         <div className="mt-10">
-          <ReportViewV21 sections={sections} orphans={orphanedFollowUps(answers)} />
+          <ReportViewV21
+            sections={sections}
+            orphans={orphanedFollowUps(answers)}
+            marked={marked}
+          />
         </div>
       )}
     </main>
