@@ -417,12 +417,12 @@ _Gemeint ist der überwiegende Teil deiner beruflichen Arbeitszeit. Das setzt ke
 
 _Anschlussfrage:_ **Was müsste dafür erfüllt sein?**
 
-- regelmäßige Auszahlung in bestimmter Höhe
-- gesicherte Finanzierung
-- konkreter Meilenstein
-- frühestmöglicher Zeitpunkt
-- andere Bedingung
-- keine besondere Bedingung
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
 
 _Wer nicht antworten kann:_ „habe ich noch nicht entschieden“ · „möchte ich nicht angeben“
 

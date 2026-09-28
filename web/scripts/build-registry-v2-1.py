@@ -22,6 +22,19 @@ src = json.load(io.open("docs/CoFoundery_Align_v2_1_Items.json", encoding="utf-8
 # Haeufigkeitskategorien", "I01/I03/X01/X06: ebenfalls ordinal", "Fuenf
 # Praeferenzstufen in E01" - und dagegen "K01/K02/T03/D01/G01/G02a: Kategorien
 # als Handlungs-/Regelwahl speichern".
+# ---------------------------------------------------------------------------
+# WELCHE ANTWORT EINE FOLGEFRAGE AUSLOEST
+# ---------------------------------------------------------------------------
+#
+# Die Quelle sagt es in Prosa: R06 hat `when: "moeglicher zukuenftiger
+# Wechsel"`. Gemeint ist die zweite Option, "ich kann mir vorstellen, es zu
+# meiner beruflichen Haupttaetigkeit zu machen". Das steht hier ausdruecklich
+# und nicht als stille Annahme im Generator - wer die Zuordnung spaeter
+# anzweifelt, findet sie an einer Stelle statt in einer Verzweigung.
+FOLLOWUP_TRIGGER = {
+    "R06": 2,   # die zweite Option
+}
+
 ORDINAL = {"A01", "A02", "U04", "I01", "I03", "X01", "X06", "E01"}
 NOMINAL_EXPLIZIT = {"K01", "K02", "T03", "D01", "G01", "G02a"}
 
@@ -100,6 +113,29 @@ for order, it in enumerate(src["items"], start=1):
             key = "".join(w if i == 0 else w.capitalize()
                           for i, w in enumerate(extra.split("_")))
             entry[key] = it[extra]
+
+    # DIE FOLGEFRAGE BEKOMMT KENNUNGEN WIE JEDE ANDERE ANTWORT.
+    #
+    # In der Quelle sind ihre Antwortmoeglichkeiten reine Texte. Gespeichert
+    # werden duerfen sie so nicht: Genau dagegen ist die Regel
+    # alignment_answers_choice_uses_ids gebaut, und ein Text, der sich aendert,
+    # laesst jede bisherige Antwort in der Luft haengen.
+    fu = entry.get("followup")
+    if isinstance(fu, dict) and isinstance(fu.get("options"), list) \
+            and fu["options"] and isinstance(fu["options"][0], str):
+        exklusiv = set(fu.get("exclusive") or [])
+        fu["options"] = [
+            collections.OrderedDict([
+                ("optionId", f'{it["id"]}_f{n}'),
+                ("label", label),
+                ("exclusive", label in exklusiv),
+            ])
+            for n, label in enumerate(fu["options"], start=1)
+        ]
+        fu.pop("exclusive", None)
+        if it["id"] in FOLLOWUP_TRIGGER:
+            fu["triggerOptionId"] = f'{it["id"]}_o{FOLLOWUP_TRIGGER[it["id"]]}'
+        entry["followup"] = fu
     items.append(entry)
 
 doc = collections.OrderedDict([

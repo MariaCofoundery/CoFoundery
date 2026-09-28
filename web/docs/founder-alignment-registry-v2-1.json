@@ -1228,24 +1228,46 @@
         "when": "möglicher zukünftiger Wechsel",
         "question": "Was müsste dafür erfüllt sein?",
         "options": [
-          "regelmäßige Auszahlung in bestimmter Höhe",
-          "gesicherte Finanzierung",
-          "konkreter Meilenstein",
-          "frühestmöglicher Zeitpunkt",
-          "andere Bedingung",
-          "keine besondere Bedingung"
+          {
+            "optionId": "R06_f1",
+            "label": "regelmäßige Auszahlung in bestimmter Höhe",
+            "exclusive": false
+          },
+          {
+            "optionId": "R06_f2",
+            "label": "gesicherte Finanzierung",
+            "exclusive": false
+          },
+          {
+            "optionId": "R06_f3",
+            "label": "konkreter Meilenstein",
+            "exclusive": false
+          },
+          {
+            "optionId": "R06_f4",
+            "label": "frühestmöglicher Zeitpunkt",
+            "exclusive": false
+          },
+          {
+            "optionId": "R06_f5",
+            "label": "andere Bedingung",
+            "exclusive": false
+          },
+          {
+            "optionId": "R06_f6",
+            "label": "keine besondere Bedingung",
+            "exclusive": true
+          }
         ],
         "multiple": true,
-        "exclusive": [
-          "keine besondere Bedingung"
-        ],
         "fields": [
           "Betrag und Währung",
           "Finanzierungsbedingung",
           "Meilenstein",
           "Datum",
           "Welche Bedingungen gemeinsam oder alternativ?"
-        ]
+        ],
+        "triggerOptionId": "R06_o2"
       }
     },
     {

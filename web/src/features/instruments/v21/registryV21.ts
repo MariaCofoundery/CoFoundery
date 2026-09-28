@@ -95,8 +95,20 @@ export type RegistryItemV21 = {
   ratingOptions?: string[];
   ratingMissing?: string;
   fields?: string[];
+  /** Zusatzangaben, die nur bei bestimmten Antworten sinnvoll sind (R04). */
   conditionalFields?: string[];
-  followup?: Record<string, unknown>;
+  followup?: {
+    question: string;
+    /** Bei S01: die Optionen des Items selbst, deshalb hier leer. */
+    options?: { optionId: string; label: string; exclusive: boolean }[];
+    other?: string;
+    optional?: boolean;
+    multiple?: boolean;
+    fields?: string[];
+    when?: string;
+    /** Welche Antwort die Folgefrage ueberhaupt erscheinen laesst. */
+    triggerOptionId?: string;
+  };
   repeatPer?: string;
   showWhen?: string;
 };

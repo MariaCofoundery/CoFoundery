@@ -3,7 +3,8 @@
     "Der Schluesselbund: welche Options-Kennung zu welcher Antwortmoeglichkeit gehoert.",
     "Eine gespeicherte Antwort merkt sich A01_o3, nicht den Text. Das ist Absicht - der Text darf sich aendern, ohne dass die Antwort ihre Bedeutung verliert.",
     "Genau deshalb darf die REIHENFOLGE sich nicht aendern. A01_o3 heisst 'die dritte Option von A01'. Wer eine Option in der Mitte einfuegt, laesst jede gespeicherte Antwort auf _o3 auf etwas anderes zeigen - lautlos, weil die Zeile stehen bleibt.",
-    "Ein Test haelt diese Datei gegen die Registratur. Eine Umformulierung faellt dort nicht auf und soll es auch nicht: Sie ist billig. Ein Einfuegen, Loeschen oder Umsortieren faellt auf und soll es."
+    "Ein Test haelt diese Datei gegen die Registratur. Eine Umformulierung faellt dort nicht auf und soll es auch nicht: Sie ist billig. Ein Einfuegen, Loeschen oder Umsortieren faellt auf und soll es.",
+    "Eintraege mit .followup sind die Antwortmoeglichkeiten einer Anschlussfrage. Sie bekommen Kennungen wie jede andere Antwort auch - ein Text, der sich aendert, laesst sonst jede bisherige Antwort in der Luft haengen."
   ],
   "createdAt": "2026-09-28",
   "instrumentId": "founder-alignment-v2-1",
@@ -187,6 +188,14 @@
       "W06_o1",
       "W06_o2",
       "W06_o3"
+    ],
+    "R06.followup": [
+      "R06_f1",
+      "R06_f2",
+      "R06_f3",
+      "R06_f4",
+      "R06_f5",
+      "R06_f6"
     ]
   }
 }

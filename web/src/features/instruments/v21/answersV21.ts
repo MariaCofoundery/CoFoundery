@@ -22,7 +22,15 @@ import { getItemV21, type RegistryItemV21, type MissingCode } from "@/features/i
  */
 
 export type AlignmentValueV21 =
-  | { optionId: string; text?: string }
+  | {
+      optionId: string;
+      text?: string;
+      /** R06: die Bedingungen, unter denen jemand wechseln wuerde. */
+      followupOptionIds?: string[];
+      followupDetail?: string;
+      /** R04: der Monatsbetrag - ausdruecklich freiwillig. */
+      optionalAmount?: string;
+    }
   | { optionIds: string[]; priorityOptionId?: string; texts?: Record<string, string> }
   | { number: number; unit: string; to?: number; condition?: string }
   | { amount: number; currency: string; to?: number }
@@ -101,6 +109,8 @@ export function validateAnswerV21(answer: AlignmentAnswerV21): AnswerVerdictV21 
       if (!optionIds.has(value.optionId)) {
         return no("unknown_option", `${answer.blockId}: ${value.optionId}`);
       }
+      const followup = followUpVerdict(item, value.optionId, value);
+      if (!followup.ok) return followup;
       return requiredTextPresent(item, [value.optionId], value);
     }
 
@@ -302,6 +312,51 @@ export function validateFollowUpV21(
 }
 
 /**
+ * Die Folgefrage - erst prüfen, wenn sie überhaupt erscheint.
+ *
+ * R06 fragt nach den Bedingungen für einen Wechsel, aber nur bei der Antwort
+ * „ich kann mir vorstellen…“. Wer „das ist schon meine Haupttätigkeit“ wählt,
+ * bekommt sie nicht zu sehen - und darf sie deshalb auch nicht beantwortet
+ * haben. Eine Antwort auf eine unsichtbare Frage kommt nicht von einem
+ * Menschen.
+ */
+function followUpVerdict(
+  item: RegistryItemV21,
+  chosenOptionId: string,
+  value: object,
+): AnswerVerdictV21 {
+  const followup = item.followup;
+  const given = has(value, "followupOptionIds")
+    ? ((value.followupOptionIds as string[] | undefined) ?? [])
+    : null;
+
+  if (!followup?.options || followup.options.length === 0) {
+    return given && given.length > 0 ? no("followup_not_offered", item.itemId) : OK;
+  }
+
+  const shown = !followup.triggerOptionId || followup.triggerOptionId === chosenOptionId;
+  if (!shown) {
+    return given && given.length > 0 ? no("followup_not_shown", item.itemId) : OK;
+  }
+  if (!given || given.length === 0) return OK;
+
+  const known = new Set(followup.options.map((option) => option.optionId));
+  for (const id of given) {
+    if (!known.has(id)) return no("unknown_followup_option", `${item.itemId}: ${id}`);
+  }
+  if (new Set(given).size !== given.length) return no("duplicate_option", item.itemId);
+
+  const exclusive = followup.options.find((option) => option.exclusive)?.optionId;
+  if (exclusive && given.includes(exclusive) && given.length > 1) {
+    return no("exclusive_option_with_others", `${item.itemId}: ${exclusive}`);
+  }
+  if (!followup.multiple && given.length > 1) {
+    return no("followup_expects_one", item.itemId);
+  }
+  return OK;
+}
+
+/**
  * „Bitte beschreiben“ heißt: ohne Beschreibung ist die Option nicht gewählt.
  *
  * Sonst steht später „eine andere Absicherung“ im Bericht und niemand weiß,
@@ -380,6 +435,13 @@ export function completenessV21(
       const option = item.options.find((entry) => entry.optionId === optionId);
       // Angekreuzt, aber der verlangte Text fehlt noch: mittendrin.
       if (option?.requiresText && !String(value.text ?? "").trim()) return "incomplete";
+      // Erscheint eine Folgefrage, gehoert sie zur Antwort. "Keine besondere
+      // Bedingung" ist eine davon - niemand muss sich etwas ausdenken.
+      const followup = item.followup;
+      if (followup?.options?.length && followup.triggerOptionId === optionId) {
+        const given = (value.followupOptionIds as string[] | undefined) ?? [];
+        if (given.length === 0) return "incomplete";
+      }
       return "complete";
     }
 

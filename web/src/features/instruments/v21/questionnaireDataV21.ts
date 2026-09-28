@@ -39,14 +39,27 @@ export type ItemView = {
   ratingMissing: string | null;
   /** Für Eingabemasken: die benannten Felder, etwa Wochentag/von/bis/Zeitzone. */
   fields: string[] | null;
+  /**
+   * Zusatzangaben, die nur bei bestimmten Antworten sinnvoll sind.
+   *
+   * R04 hat sie, und sie fehlten hier zuerst - derselbe Fehler, den die
+   * fachliche Durchsicht schon einmal gefunden hat („R02 und R03 erscheinen
+   * ohne ihre Eingabefelder"). Ein Test faengt ihn jetzt ab.
+   */
+  conditionalFields: string[] | null;
   /** Die Frage, aus der sich die Wiederholungen ergeben - oder null. */
   basisItemId: string | null;
   followup: {
     question: string;
-    options: string[];
+    /** Mit Kennungen, wie jede andere Antwort auch. */
+    options: { optionId: string; label: string; exclusive: boolean }[];
     other: string | null;
     optional: boolean;
+    multiple: boolean;
+    fields: string[];
     when: string | null;
+    /** Welche Antwort die Folgefrage erscheinen laesst - null heisst: immer. */
+    triggerOptionId: string | null;
   } | null;
 };
 
@@ -56,9 +69,7 @@ export function buildSectionsV21(): SectionView[] {
   return getSectionsV21().map(({ section, items }) => ({
     section,
     items: items.map((item) => {
-      const followup = item.followup as
-        | { question?: string; options?: string[]; other?: string; optional?: boolean; when?: string }
-        | undefined;
+      const followup = item.followup;
 
       return {
         itemId: item.itemId,
@@ -76,6 +87,7 @@ export function buildSectionsV21(): SectionView[] {
         ratingOptions: item.ratingOptions ?? null,
         ratingMissing: item.ratingMissing ?? null,
         fields: item.fields ?? null,
+        conditionalFields: item.conditionalFields ?? null,
         basisItemId: basisOf(item.itemId),
         followup: followup?.question
           ? {
@@ -83,7 +95,10 @@ export function buildSectionsV21(): SectionView[] {
               options: followup.options ?? [],
               other: followup.other ?? null,
               optional: followup.optional ?? false,
+              multiple: followup.multiple ?? false,
+              fields: followup.fields ?? [],
               when: followup.when ?? null,
+              triggerOptionId: followup.triggerOptionId ?? null,
             }
           : null,
       };

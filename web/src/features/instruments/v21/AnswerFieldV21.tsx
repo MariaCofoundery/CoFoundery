@@ -132,6 +132,90 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
             </span>
           </label>
         ))}
+
+        {/*
+          DIE FOLGEFRAGE VON R06.
+          Sie fehlte zuerst ganz - derselbe Fehler, den die fachliche
+          Durchsicht schon einmal gefunden hat: "R02 und R03 erscheinen ohne
+          ihre Eingabefelder". Eine Frage, die in der Registratur steht und
+          auf dem Bildschirm nicht auftaucht, ist unsichtbar falsch.
+        */}
+        {item.followup && chosen === item.followup.triggerOptionId && (
+          <FollowUpChoices />
+        )}
+
+        {/*
+          R04: der monatliche Betrag ist ausdruecklich OPTIONAL - der Hinweis
+          am Item sagt "Optional kannst du ergaenzen". Deshalb ohne Sternchen
+          und ohne Auswirkung auf die Vollstaendigkeit.
+        */}
+        {item.conditionalFields && chosen && (
+          <div className="mt-4 rounded-lg bg-slate-50 p-3">
+            <p className="text-xs text-slate-500">
+              Freiwillig: ungefährer Monatsbetrag, mit Währung und ob vor oder nach
+              persönlichen Steuern.
+            </p>
+            <input
+              className={`${box} mt-2`}
+              placeholder="z. B. 2.400 EUR netto"
+              value={(value.optionalAmount as string) ?? ""}
+              disabled={disabled}
+              onChange={(event) => patch({ optionalAmount: event.target.value })}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /**
+   * Die Folgefrage als Mehrfachwahl, mit eigenen Kennungen.
+   *
+   * Nicht als Texte: Genau dagegen ist die Regel gebaut, dass eine Auswahl
+   * ueber ihre Kennung gespeichert wird. Ein Text, der sich aendert, laesst
+   * jede bisherige Antwort in der Luft haengen.
+   */
+  function FollowUpChoices() {
+    const followup = item.followup!;
+    const chosen = (value.followupOptionIds as string[] | undefined) ?? [];
+    const exclusive = followup.options.find((option) => option.exclusive)?.optionId;
+
+    const toggle = (optionId: string) => {
+      const next = chosen.includes(optionId)
+        ? chosen.filter((entry) => entry !== optionId)
+        : optionId === exclusive
+          ? [optionId]
+          : [...chosen.filter((entry) => entry !== exclusive), optionId];
+      patch({ followupOptionIds: next });
+    };
+
+    return (
+      <div className="mt-4 rounded-lg bg-slate-50 p-3">
+        <p className="text-sm font-medium text-slate-800">{followup.question}</p>
+        <div className="mt-2 space-y-1">
+          {followup.options.map((option) => (
+            <label key={option.optionId} className="flex items-start gap-2 text-sm">
+              <input
+                type={followup.multiple ? "checkbox" : "radio"}
+                name={`${item.itemId}-followup`}
+                className="mt-1"
+                checked={chosen.includes(option.optionId)}
+                disabled={disabled}
+                onChange={() => toggle(option.optionId)}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+        {chosen.length > 0 && !chosen.includes(exclusive ?? "") && (
+          <input
+            className={`${box} mt-2`}
+            placeholder={followup.fields.join(" · ")}
+            value={(value.followupDetail as string) ?? ""}
+            disabled={disabled}
+            onChange={(event) => patch({ followupDetail: event.target.value })}
+          />
+        )}
       </div>
     );
   }
