@@ -82,7 +82,13 @@ export async function getDashboardVersionState(
           : null,
       }),
       decision,
-      previous: { submitted: previousSubmitted, reportHref: null },
+      previous: {
+        submitted: previousSubmitted,
+        // Der Report gibt es erst nach der Abgabe. Vorher dorthin zu
+        // verlinken hiesse, jemanden auf eine leere Seite zu schicken und ihm
+        // danach zu erklaeren, warum.
+        reportHref: previousSubmitted ? "/me/report" : null,
+      },
       next,
       connectionsNext: next.submitted ? await connectionsFor(userId) : [],
       // Der Abschnitt erscheint erst, wenn es etwas zu zeigen gibt: eine

@@ -1,4 +1,6 @@
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import assert from "node:assert/strict";
 
 import {
@@ -93,4 +95,21 @@ test("bei jeder Entscheidung steht, dass nichts zufällt", () => {
   assert.match(archiveHint("keep_previous"), /jederzeit|noch/);
   assert.match(archiveHint("retake"), /bleibt erhalten|abrufbar/);
   assert.match(archiveHint("pending"), /beide|offen/i);
+});
+
+test("der Link zum bisherigen Report zeigt auf die Stelle, die es gibt", () => {
+  // Die Archivkarte sagt „dein bisheriger Report bleibt erhalten“. Wenn der
+  // Link danach ins Leere geht, ist das eine Behauptung. Hier gepinnt, damit
+  // eine Umbenennung der Route auffaellt.
+  const dashboard = readFileSync(
+    join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+  const data = readFileSync(
+    join("src", "features", "instruments", "v21", "dashboardVersionData.ts"), "utf8");
+
+  const ziel = data.match(/reportHref: previousSubmitted \? "([^"]+)"/)?.[1];
+  assert.ok(ziel, "der Archivkasten verlinkt keinen Report");
+  assert.ok(
+    dashboard.includes(`"${ziel}"`),
+    `${ziel} wird vom Dashboard nirgends sonst verlinkt - gibt es die Route?`,
+  );
 });
