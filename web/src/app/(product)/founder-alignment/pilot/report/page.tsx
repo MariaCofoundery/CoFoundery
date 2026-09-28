@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { readAll } from "@/features/instruments/v21/readoutV21";
 import { orphanedFollowUps } from "@/features/instruments/v21/progressV21";
+import { ShareFormV21, type Recipient } from "@/features/instruments/v21/ShareFormV21";
+import { getItemsV21 } from "@/features/instruments/v21/registryV21";
 import { ALIGNMENT_V21_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
@@ -55,6 +57,63 @@ export default async function ReportV21Page() {
 
   const sections = readAll(answers);
 
+  // ---------------------------------------------------------------------------
+  // Mit wem sich ueberhaupt teilen laesst
+  // ---------------------------------------------------------------------------
+  //
+  // Die Menschen, mit denen eine angenommene Einladung besteht - in beide
+  // Richtungen, denn wer eingeladen wurde, ist genauso Mitgruender wie wer
+  // eingeladen hat. Bewusst keine freie Suche ueber alle Konten: Eine
+  // Freigabe ist etwas zwischen Menschen, die miteinander zu tun haben.
+  const { data: invitations } = await supabase
+    .from("invitations")
+    .select("inviter_user_id, invitee_user_id, inviter_display_name, label")
+    .eq("status", "accepted")
+    .is("revoked_at", null)
+    .or(`inviter_user_id.eq.${auth.user.id},invitee_user_id.eq.${auth.user.id}`);
+
+  const partnerIds = new Map<string, string>();
+  for (const row of invitations ?? []) {
+    const other =
+      row.inviter_user_id === auth.user.id ? row.invitee_user_id : row.inviter_user_id;
+    if (!other || other === auth.user.id) continue;
+    // Der Name der einladenden Person steht an der Einladung; fuer die
+    // eingeladene gibt es hier keinen - dann die Bezeichnung der Einladung.
+    const label =
+      (row.inviter_user_id === auth.user.id ? row.label : row.inviter_display_name) ??
+      row.label ??
+      "Mitgründer:in";
+    if (!partnerIds.has(other)) partnerIds.set(other, label);
+  }
+
+  const { data: shares } = assessment
+    ? await supabase
+        .from("alignment_shares")
+        .select("id, recipient_user_id, created_at")
+        .eq("assessment_id", assessment.id)
+        .is("revoked_at", null)
+    : { data: [] };
+
+  const { data: hiddenRows } = (shares ?? []).length
+    ? await supabase
+        .from("alignment_share_hidden_blocks")
+        .select("share_id, block_id")
+        .in("share_id", (shares ?? []).map((row) => row.id))
+    : { data: [] };
+
+  const hiddenByRecipient: Record<string, string[]> = {};
+  for (const share of shares ?? []) {
+    hiddenByRecipient[share.recipient_user_id] = (hiddenRows ?? [])
+      .filter((row) => row.share_id === share.id)
+      .map((row) => row.block_id);
+  }
+
+  const recipients: Recipient[] = [...partnerIds.entries()].map(([userId, label]) => ({
+    userId,
+    label,
+    sharedAt: (shares ?? []).find((row) => row.recipient_user_id === userId)?.created_at ?? null,
+  }));
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <NavV21 current="/founder-alignment/pilot/report" />
@@ -89,6 +148,18 @@ export default async function ReportV21Page() {
             orphans={orphanedFollowUps(answers)}
             marked={marked}
           />
+
+          {/* UNTER den Antworten, nicht darueber: Wer bis hierher scrollt,
+              hat gesehen, was er teilt. */}
+          <div className="mt-10">
+            <ShareFormV21
+              recipients={recipients}
+              items={getItemsV21()
+                .filter((item) => answers[item.itemId])
+                .map((item) => ({ itemId: item.itemId, prompt: item.prompt }))}
+              hiddenByRecipient={hiddenByRecipient}
+            />
+          </div>
         </div>
       )}
     </main>
