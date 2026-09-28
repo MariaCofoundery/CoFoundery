@@ -42,6 +42,8 @@ export type ReportSection = {
 };
 
 export type AlignmentReport = {
+  /** Nichts ausgefuellt - dann steht hier auch nichts ueber die Person. */
+  isEmpty: boolean;
   sections: ReportSection[];
   /** Was noch offen ist - eigener Abschnitt, nicht eingestreut. */
   open: { entry: ReadoutEntry; label: string | null }[];
@@ -118,14 +120,30 @@ export function buildAlignmentReport(
 
   const solo = CONVERSATION_LIBRARY_V2.cards.find((card) => card.id === "solo");
 
+  /**
+   * OHNE ANTWORTEN GIBT ES NICHTS ZU BERICHTEN.
+   *
+   * Gefunden am 28.09.2026 beim Durchklicken: Der Report zeigte bei einem
+   * leeren Profil den Satz "Du hast beschrieben, welchen
+   * Entscheidungsspielraum du dir wuenschst und welche Zeit du anbieten
+   * kannst" - obwohl die Person nichts beschrieben hatte.
+   *
+   * Das ist keine Schoenheitskorrektur. Ein Report, der etwas ueber mich
+   * behauptet, das nicht stattgefunden hat, ist genau das, was dieses ganze
+   * Instrument vermeiden soll. Und es faellt niemandem auf, der die Seite
+   * nicht leer gesehen hat.
+   */
+  const isEmpty = entries.length === 0;
+
   return {
+    isEmpty,
     sections,
     open,
     unanswered,
     marked: [...(options.markedBlockIds ?? [])],
     uncertainties: READOUT_UNCERTAINTIES,
     soloNote:
-      options.hasComparison || !solo
+      isEmpty || options.hasComparison || !solo
         ? null
         : { observed: solo.observed, meaning: solo.meaning, question: solo.question },
   };

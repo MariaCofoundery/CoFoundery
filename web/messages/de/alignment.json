@@ -3,14 +3,17 @@
     "backToDashboard": "Zurück zum Dashboard",
     "draftNotice": "Testfassung. Dieser Fragebogen wird noch nicht ausgewertet.",
     "progress": "{answered} von {total} beantwortet",
-    "save": "Antwort übernehmen",
     "saving": "Wird gespeichert …",
     "saved": "Gespeichert",
-    "clear": "Antwort zurücknehmen",
     "submit": "Fragebogen abgeben",
     "submitting": "Wird abgegeben …",
     "incomplete": "Du musst dich nirgends festlegen: Zu jeder Frage kannst du auch angeben, dass sie noch offen ist oder dass du sie nicht beantworten möchtest. Es fehlen noch {count} Antworten.",
-    "submitted": "Abgegeben. Ab jetzt lässt sich hier nichts mehr ändern."
+    "submitted": "Abgegeben. Ab jetzt lässt sich hier nichts mehr ändern.",
+    "navBase": "Fragebogen",
+    "navCommitments": "Zusagen",
+    "navValues": "Prioritäten",
+    "navReport": "Deine Angaben",
+    "navDiscovery": "Suchvorgaben"
   },
   "base": {
     "title": "Wie du arbeiten möchtest",
@@ -30,8 +33,7 @@
     "intro": "Kurze Situationen, in denen zwei nachvollziehbare Anliegen zusammenstoßen. Du sagst zu beiden getrennt, wie wichtig sie dir sind — beide dürfen sehr wichtig sein.",
     "note": "Es gibt keine richtige Wahl und keine Auswertung deiner Werte. Der Zweck ist, zu wissen, worüber ihr reden solltet.",
     "concerns": "Wie wichtig ist dir jedes dieser beiden Anliegen?",
-    "pathQuestion": "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?",
-    "limits": "Deine Grenzen"
+    "pathQuestion": "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?"
   },
   "missing": {
     "heading": "Oder:",
@@ -43,7 +45,6 @@
     "to": "bis",
     "min": "mindestens",
     "max": "höchstens",
-    "unit": "Einheit",
     "currency": "Währung",
     "basis": "Angabe als",
     "brutto": "brutto",
@@ -68,7 +69,10 @@
     "openIntro": "Das ist der nützlichste Teil: Genau hier wäre zu sprechen.",
     "limitsTitle": "Was diese Angaben nicht leisten",
     "marked": "Von dir zur Besprechung markiert.",
-    "instrument": "Fassung: {instrument}"
+    "instrument": "Fassung: {instrument}",
+    "emptyTitle": "Hier ist noch nichts.",
+    "emptyIntro": "Sobald du den Fragebogen ausgefüllt hast, stehen deine Angaben hier — geordnet und ohne Bewertung.",
+    "emptyAction": "Zum Fragebogen"
   },
   "compare": {
     "title": "Ihr beide",

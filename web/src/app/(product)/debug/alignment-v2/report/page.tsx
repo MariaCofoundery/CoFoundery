@@ -1,10 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AlignmentNav } from "@/features/instruments/v2/AlignmentNav";
 import { AlignmentReportView } from "@/features/instruments/v2/AlignmentReportView";
-import {
-  REPORT_INSTRUMENT_LABEL,
-  buildAlignmentReport,
-} from "@/features/instruments/v2/alignmentReportData";
+import { buildAlignmentReport } from "@/features/instruments/v2/alignmentReportData";
 import { ALIGNMENT_V2_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { InstrumentTransitionNotice } from "@/features/instruments/v2/InstrumentTransitionNotice";
 import { needsTransitionNotice } from "@/features/instruments/v2/instrumentTransitionActions";
@@ -25,6 +23,10 @@ export default async function AlignmentV2ReportPage() {
   const t = await getTranslations("alignment");
   const supabase = await createClient();
 
+  // AUCH ENTWUERFE - anders als beim Vergleich. Das hier sind die eigenen
+  // Angaben, und wer mitten im Ausfuellen nachsehen moechte, was er bisher
+  // gesagt hat, soll es sehen. Beim Vergleich zaehlt dagegen nur Abgegebenes:
+  // Der andere haette sonst etwas gelesen, das sich danach noch aendert.
   const { data: assessments } = await supabase
     .from("assessments")
     .select("id")
@@ -50,16 +52,13 @@ export default async function AlignmentV2ReportPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignmentNav current={"/debug/alignment-v2/report"} />
+
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         {t("shell.draftNotice")}
       </p>
       <h1 className="text-2xl font-semibold text-slate-900">{t("report.title")}</h1>
       <p className="mt-3 text-slate-700">{t("report.intro")}</p>
-      {/* DIE FASSUNG STEHT AM REPORT. Wer ihn in einem halben Jahr wiederfindet,
-          soll wissen, aus welchem Modell die Angaben stammen. */}
-      <p className="mt-1 text-xs text-slate-500">
-        {t("report.instrument", { instrument: REPORT_INSTRUMENT_LABEL })}
-      </p>
 
       {showTransition && (
         <div className="mt-8">

@@ -61,31 +61,33 @@ export async function AlignmentComparisonView({
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-slate-900">{t("compare.allTitle")}</h2>
-        <div className="overflow-hidden rounded-xl border border-slate-200">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-2 font-medium">{t("compare.question")}</th>
-                <th className="px-4 py-2 font-medium">{nameA}</th>
-                <th className="px-4 py-2 font-medium">{nameB}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.comparisons.map((entry) => (
-                <tr key={entry.blockId} className="border-t border-slate-100 align-top">
-                  <td className="px-4 py-3 text-slate-700">
-                    {entry.prompt}
-                    {entry.markedBy.length > 0 && (
-                      <span className="mt-1 block text-xs text-slate-500">{t("compare.marked")}</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-slate-900">{cell(entry, entry.a, "a", t)}</td>
-                  <td className="px-4 py-3 text-slate-900">{cell(entry, entry.b, "b", t)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+        {/* KEINE TABELLE. Am 28.09.2026 beim Durchsehen aufgefallen: Drei
+            Spalten mit langen Fragetexten sind auf einem Telefon unlesbar -
+            entweder man scrollt seitwaerts oder jede Zelle wird zu einer
+            Spalte aus einzelnen Woertern. Als Karten stapelt es sich von
+            selbst, und die beiden Antworten stehen auf jedem Bildschirm
+            nebeneinander, sobald Platz ist. */}
+        <ul className="space-y-3">
+          {result.comparisons.map((entry) => (
+            <li key={entry.blockId} className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm text-slate-700">{entry.prompt}</p>
+              {entry.markedBy.length > 0 && (
+                <p className="mt-1 text-xs text-slate-500">{t("compare.marked")}</p>
+              )}
+              <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">{nameA}</dt>
+                  <dd className="mt-1 text-sm text-slate-900">{cell(entry, entry.a, "a", t)}</dd>
+                </div>
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">{nameB}</dt>
+                  <dd className="mt-1 text-sm text-slate-900">{cell(entry, entry.b, "b", t)}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

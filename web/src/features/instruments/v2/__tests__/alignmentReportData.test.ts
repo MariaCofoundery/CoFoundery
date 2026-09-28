@@ -75,13 +75,43 @@ test("was noch nicht beantwortet wurde, wird benannt", () => {
   assert.ok(!report.unanswered.includes("A01"));
 });
 
-test("der Report zeigt keine Balken und keine Prozente", () => {
-  // Ein Balken macht aus „manchmal" eine Laenge - und eine Laenge laedt zum
-  // Vergleichen ein, wo es nichts zu vergleichen gibt.
+test("der Report zeigt Punkte statt Balken", () => {
+  // Maria wollte, dass es „ein bisschen farbig" ist. Ein Balken wäre das
+  // Naheliegende und genau das Falsche: Er macht aus „manchmal" eine LÄNGE,
+  // und Längen laden zum Messen ein. Zwei Balken nebeneinander lesen sich wie
+  // ein Abstand, und ein Abstand sieht aus wie ein Ergebnis.
+  //
+  // Fünf Punkte, von denen einer gefüllt ist, zeigen dasselbe, was der Readout
+  // sagt: eine Position unter benannten Kategorien. Nichts daran ist eine
+  // Strecke, nichts lässt sich davon subtrahieren.
   const view = readFileSync("src/features/instruments/v2/AlignmentReportView.tsx", "utf8");
-  for (const forbidden of [/width:\s*`/, /style=\{\{[^}]*width/, /%<\//, /progress/i]) {
+  for (const forbidden of [/width:\s*`/, /style=\{\{[^}]*width/, /progress/i, /\bbar\b/i]) {
     assert.ok(!forbidden.test(view), `${forbidden} im Report`);
   }
+  // Die Punktreihe ist da, und die Beschriftung steht weiterhin daneben.
+  assert.match(view, /function ScalePosition/);
+  assert.match(view, /Array\.from\(\{ length: of \}/);
+  assert.match(view, /rounded-full/);
+  assert.match(view, /<span className="text-base font-medium text-slate-900">\{label\}<\/span>/);
+  // Und sie ist für Vorlesegeräte beschriftet.
+  assert.match(view, /aria-label=\{`\$\{label\} \(\$\{position\}\/\$\{of\}\)`\}/);
+});
+
+test("ein leerer Report behauptet nichts über die Person", () => {
+  // GEFUNDEN AM 28.09.2026 BEIM DURCHKLICKEN. Der Report zeigte bei einem
+  // leeren Profil „Du hast beschrieben, welchen Entscheidungsspielraum du dir
+  // wünschst und welche Zeit du anbieten kannst" - obwohl niemand etwas
+  // beschrieben hatte. Ein Report, der etwas über mich behauptet, das nicht
+  // stattgefunden hat, ist genau das, was dieses Instrument vermeiden soll.
+  const empty = buildAlignmentReport([]);
+  assert.equal(empty.isEmpty, true);
+  assert.equal(empty.soloNote, null);
+  assert.deepEqual(empty.sections, []);
+
+  // Mit einer einzigen Antwort ist es kein leerer Report mehr.
+  const some = buildAlignmentReport([scale("A01", 3)]);
+  assert.equal(some.isEmpty, false);
+  assert.ok(some.soloNote);
 });
 
 test("kein v2-Abbild landet in der Tabelle für abgeleitete Zahlen", () => {

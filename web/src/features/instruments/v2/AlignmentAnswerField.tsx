@@ -20,6 +20,12 @@ import type { AlignmentAnswer, AlignmentAnswerValue, StoredAnswerFormat } from "
  * die Auswertung liest es als Meinung. Ein sichtbares „noch offen" ist für
  * das Produkt sogar die nützlichere Antwort - es benennt genau die Stelle,
  * über die zwei Gründer sprechen sollten.
+ *
+ * DIE ERKLAERUNG DAZU STEHT EINMAL OBEN, NICHT AN JEDER FRAGE. Am 28.09.2026
+ * beim Durchklicken gemessen: Zwei Erklaersaetze erschienen je 24-mal, und von
+ * 311 sichtbaren Zeilen waren nur 99 verschieden. Ein Satz, der bei jeder
+ * Frage wiederholt wird, wird nach der dritten nicht mehr gelesen - er macht
+ * die Seite nur laenger und die eigentliche Frage schwerer zu finden.
  */
 
 type Draft = { value?: AlignmentAnswerValue; missingCode?: AlignmentAnswer["missingCode"] };
@@ -446,7 +452,6 @@ function MissingChoices({
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-slate-500">{t("missing.hint")}</p>
     </div>
   );
 }

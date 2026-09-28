@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AlignmentNav } from "@/features/instruments/v2/AlignmentNav";
 import { AlignmentComparisonView } from "@/features/instruments/v2/AlignmentComparisonView";
 import { buildAlignmentComparison } from "@/features/instruments/v2/alignmentComparisonData";
 import { ALIGNMENT_V2_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -85,6 +86,8 @@ export default async function AlignmentV2ComparePage({
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
+      <AlignmentNav current="" />
+
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         {t("shell.draftNotice")}
       </p>

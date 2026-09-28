@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AlignmentNav } from "@/features/instruments/v2/AlignmentNav";
 import { AlignmentQuestionnaire } from "@/features/instruments/v2/AlignmentQuestionnaire";
 import { buildAlignmentSections } from "@/features/instruments/v2/alignmentQuestionnaireData";
 import { ALIGNMENT_V2_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -78,6 +79,8 @@ export default async function AlignmentV2Page({ params, searchParams }: Props) {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignmentNav current={`/debug/alignment-v2/${moduleKey}${step === 2 ? "?step=2" : ""}`} />
+
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         {t("shell.draftNotice")}
       </p>

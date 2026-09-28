@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AlignmentNav } from "@/features/instruments/v2/AlignmentNav";
 import { DiscoveryTopicsForm } from "@/features/instruments/v2/DiscoveryTopicsForm";
 import { getDiscoveryTopics } from "@/features/instruments/v2/discoveryTopics";
 import type { TopicChoice } from "@/features/instruments/v2/discoveryTopicActions";
@@ -28,6 +29,8 @@ export default async function AlignmentV2DiscoveryPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignmentNav current={"/debug/alignment-v2/discovery"} />
+
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         {t("shell.draftNotice")}
       </p>

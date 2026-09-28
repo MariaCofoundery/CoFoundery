@@ -3,14 +3,17 @@
     "backToDashboard": "Back to dashboard",
     "draftNotice": "Test version. This questionnaire is not evaluated yet.",
     "progress": "{answered} of {total} answered",
-    "save": "Save answer",
     "saving": "Saving …",
     "saved": "Saved",
-    "clear": "Withdraw answer",
     "submit": "Submit questionnaire",
     "submitting": "Submitting …",
     "incomplete": "You do not have to commit to anything: for every question you can also state that it is still open or that you would rather not answer it. {count} answers are still missing.",
-    "submitted": "Submitted. Nothing here can be changed from now on."
+    "submitted": "Submitted. Nothing here can be changed from now on.",
+    "navBase": "Questionnaire",
+    "navCommitments": "Commitments",
+    "navValues": "Priorities",
+    "navReport": "Your answers",
+    "navDiscovery": "Search settings"
   },
   "base": {
     "title": "How you want to work",
@@ -30,8 +33,7 @@
     "intro": "Short situations in which two reasonable concerns collide. You say separately how important each one is to you — both may be very important.",
     "note": "There is no right choice and no evaluation of your values. The point is to know what you should talk about.",
     "concerns": "How important is each of these two concerns to you?",
-    "pathQuestion": "Which way would you choose first under these conditions?",
-    "limits": "Your limits"
+    "pathQuestion": "Which way would you choose first under these conditions?"
   },
   "missing": {
     "heading": "Or:",
@@ -43,7 +45,6 @@
     "to": "to",
     "min": "at least",
     "max": "at most",
-    "unit": "unit",
     "currency": "currency",
     "basis": "stated as",
     "brutto": "gross",
@@ -68,7 +69,10 @@
     "openIntro": "This is the most useful part: exactly here is where you would talk.",
     "limitsTitle": "What these answers cannot do",
     "marked": "You marked this for discussion.",
-    "instrument": "Version: {instrument}"
+    "instrument": "Version: {instrument}",
+    "emptyTitle": "Nothing here yet.",
+    "emptyIntro": "Once you have filled in the questionnaire, your answers appear here — sorted and without any rating.",
+    "emptyAction": "Go to the questionnaire"
   },
   "compare": {
     "title": "The two of you",

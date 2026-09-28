@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { AlignmentReport } from "@/features/instruments/v2/alignmentReportData";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v2/alignmentReadout";
@@ -16,6 +17,20 @@ import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v2/align
 
 export async function AlignmentReportView({ report }: { report: AlignmentReport }) {
   const t = await getTranslations("alignment");
+
+  if (report.isEmpty) {
+    // Ein leerer Report sagt, dass er leer ist - und wohin es weitergeht.
+    return (
+      <div className="rounded-xl border border-dashed border-slate-300 p-6">
+        <p className="text-slate-800">{t("report.emptyTitle")}</p>
+        <p className="mt-2 text-sm text-slate-600">{t("report.emptyIntro")}</p>
+        <Link href="/debug/alignment-v2/base"
+              className="mt-4 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+          {t("report.emptyAction")}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -56,7 +71,15 @@ export async function AlignmentReportView({ report }: { report: AlignmentReport 
             {section.entries.map((entry) => (
               <li key={entry.blockId} className="rounded-xl border border-slate-200 bg-white p-4">
                 <p className="text-sm text-slate-800">{entry.prompt}</p>
-                <p className="mt-2 text-base font-medium text-slate-900">{describe(entry)}</p>
+                {entry.answered && entry.value.kind === "category" ? (
+                  <ScalePosition
+                    label={entry.value.label}
+                    position={entry.value.position}
+                    of={entry.value.of}
+                  />
+                ) : (
+                  <p className="mt-2 text-base font-medium text-slate-900">{describe(entry)}</p>
+                )}
                 {report.marked.includes(entry.blockId) && (
                   <p className="mt-2 text-xs text-slate-500">{t("report.marked")}</p>
                 )}
@@ -79,6 +102,44 @@ export async function AlignmentReportView({ report }: { report: AlignmentReport 
           ))}
         </ul>
       </section>
+    </div>
+  );
+}
+
+/**
+ * Eine Kategorie als Punktreihe.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM PUNKTE UND KEIN BALKEN
+ * ---------------------------------------------------------------------------
+ *
+ * Maria wollte, dass es „ein bisschen farbig" ist und nicht nur Text. Ein
+ * Balken waere das Naheliegende - und genau das Falsche: Er macht aus
+ * „manchmal" eine LAENGE, und Laengen laden zum Messen und Vergleichen ein.
+ * Zwei Balken nebeneinander lesen sich wie ein Abstand, und ein Abstand
+ * sieht aus wie ein Ergebnis.
+ *
+ * Fuenf Punkte, von denen einer gefuellt ist, zeigen dasselbe, was der
+ * Readout sagt: eine POSITION unter benannten Kategorien, drei von fuenf.
+ * Nichts daran ist eine Strecke, nichts laesst sich davon subtrahieren - und
+ * die Beschriftung steht weiterhin daneben, weil sie die eigentliche Antwort
+ * ist.
+ */
+function ScalePosition({ label, position, of }: { label: string; position: number; of: number }) {
+  return (
+    <div className="mt-2 flex items-center gap-3">
+      <div className="flex gap-1.5" role="img" aria-label={`${label} (${position}/${of})`}>
+        {Array.from({ length: of }, (_, index) => (
+          <span
+            key={index}
+            className={[
+              "h-2.5 w-2.5 rounded-full",
+              index + 1 === position ? "bg-slate-900" : "bg-slate-200",
+            ].join(" ")}
+          />
+        ))}
+      </div>
+      <span className="text-base font-medium text-slate-900">{label}</span>
     </div>
   );
 }

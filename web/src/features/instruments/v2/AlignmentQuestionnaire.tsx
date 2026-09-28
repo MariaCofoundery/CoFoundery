@@ -12,11 +12,16 @@ import {
 } from "@/features/instruments/v2/alignmentAnswerActions";
 import type { AlignmentModule } from "@/features/instruments/v2/alignmentProgress";
 
+const inputClass =
+  "mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 " +
+  "focus:border-slate-500 focus:outline-none disabled:bg-slate-50";
+
 type Draft = {
   value?: AlignmentAnswerValue;
   missingCode?: AlignmentAnswer["missingCode"];
-  /** Steht neben der Antwort, nicht in ihr - siehe AnswerAnnotations. */
+  /** Stehen neben der Antwort, nicht in ihr - siehe AnswerAnnotations. */
   markedForDiscussion?: boolean;
+  changeCondition?: string;
 };
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -52,6 +57,7 @@ export function AlignmentQuestionnaire({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [missingAfterSubmit, setMissingAfterSubmit] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(submitted);
+  const [submitting, setSubmitting] = useState(false);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const blocks = useMemo(() => sections.flatMap((section) => section.blocks), [sections]);
@@ -72,7 +78,8 @@ export function AlignmentQuestionnaire({
         const empty =
           draft.missingCode === undefined &&
           !hasContent(draft.value) &&
-          !draft.markedForDiscussion;
+          !draft.markedForDiscussion &&
+          !draft.changeCondition?.trim();
         const result = empty
           ? await clearAlignmentAnswer(module, blockId)
           : await saveAlignmentAnswer(
@@ -82,7 +89,10 @@ export function AlignmentQuestionnaire({
                 answerFormat,
                 ...(draft.missingCode ? { missingCode: draft.missingCode } : { value: draft.value }),
               } as AlignmentAnswer,
-              { markedForDiscussion: draft.markedForDiscussion ?? false }
+              {
+                markedForDiscussion: draft.markedForDiscussion ?? false,
+                changeCondition: draft.changeCondition ?? null,
+              }
             );
 
         setStates((current) => ({ ...current, [blockId]: result.ok ? "saved" : "error" }));
@@ -104,8 +114,11 @@ export function AlignmentQuestionnaire({
           <button
             type="button"
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            disabled={submitting}
             onClick={async () => {
+              setSubmitting(true);
               const result = await submitAlignmentModule(module, step);
+              setSubmitting(false);
               if (result.ok) {
                 setIsSubmitted(true);
                 setMissingAfterSubmit([]);
@@ -114,7 +127,7 @@ export function AlignmentQuestionnaire({
               }
             }}
           >
-            {t("shell.submit")}
+            {submitting ? t("shell.submitting") : t("shell.submit")}
           </button>
         )}
       </div>
@@ -128,10 +141,24 @@ export function AlignmentQuestionnaire({
         </p>
       )}
 
+      {/* DIE BEIDEN ERKLAERUNGEN EINMAL, NICHT BEI JEDER FRAGE. */}
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <p>{t("missing.hint")}</p>
+        <p className="mt-1">{t("discussion.markHint")}</p>
+      </div>
+
       {sections.map((section) => (
         <section key={section.key} className="space-y-6">
           {section.label && (
             <h2 className="text-lg font-semibold text-slate-900">{section.label}</h2>
+          )}
+          {/* Die Bedingung gilt fuer den ganzen Abschnitt. Sie ueber jede Frage
+              zu schreiben macht sie zur Randnotiz, die niemand mehr liest -
+              gemessen: viermal derselbe Satz bei T und D. */}
+          {section.blocks[0]?.condition && (
+            <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700">
+              {section.blocks[0].condition}
+            </p>
           )}
           {section.blocks.map((entry) => {
             const draft = answers[entry.blockId] ?? {};
@@ -146,13 +173,6 @@ export function AlignmentQuestionnaire({
                     : "border-slate-200 bg-white",
                 ].join(" ")}
               >
-                {entry.condition && (
-                  // Teil der Messversion, nicht Verzierung: ohne sie misst die
-                  // Präferenz etwas anderes.
-                  <p className="mb-3 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700">
-                    {entry.condition}
-                  </p>
-                )}
                 <p className="mb-4 text-base text-slate-900">{entry.prompt}</p>
 
                 <AlignmentAnswerField
@@ -185,11 +205,26 @@ export function AlignmentQuestionnaire({
                       persist(entry.blockId, entry.answerFormat, next);
                     }}
                   />
-                  <span>
-                    {t("discussion.mark")}
-                    <span className="block text-xs text-slate-500">{t("discussion.markHint")}</span>
-                  </span>
+                  <span>{t("discussion.mark")}</span>
                 </label>
+
+                {/* TEIL E SIEHT DIESE FRAGE AUSDRUECKLICH VOR: "Welche Bedingung
+                    wuerde deine Wahl aendern?" Sie erscheint erst, wenn jemand
+                    das Thema besprechen moechte - vorher waere sie ein leeres
+                    Feld an jeder einzelnen Frage. */}
+                {draft.markedForDiscussion && (
+                  <input
+                    className={inputClass}
+                    placeholder={t("discussion.changeCondition")}
+                    value={draft.changeCondition ?? ""}
+                    disabled={isSubmitted}
+                    onChange={(event) => {
+                      const next = { ...draft, changeCondition: event.target.value };
+                      setAnswers((current) => ({ ...current, [entry.blockId]: next }));
+                      persist(entry.blockId, entry.answerFormat, next);
+                    }}
+                  />
+                )}
 
                 <div className="mt-3 flex items-center gap-3 text-xs">
                   {state === "saving" && <span className="text-slate-500">{t("shell.saving")}</span>}

@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(28);
+select extensions.plan(29);
 
 -- ---------------------------------------------------------------------------
 -- Antworten auf das Instrument v2
@@ -260,6 +260,35 @@ select extensions.cmp_ok(
   '>', 0,
   'die eigene Person sieht ihre Antworten'
 );
+
+-- ---------------------------------------------------------------------------
+-- UND ZWAR AUCH OHNE FOUNDER-BERECHTIGUNG.
+-- ---------------------------------------------------------------------------
+--
+-- Am 28.09.2026 beim Durchklicken gefunden: Die Lesepolicy verlangte
+-- `has_founder_assessment_access()`, die Policy fuer Freigabeempfaenger nicht.
+-- Damit gab es einen Zustand, in dem ANDERE meine Antworten lesen koennen und
+-- ich selbst nicht - etwa wenn eine Netzwerkmitgliedschaft sich aendert.
+
+reset role;
+update public.profiles set roles = array['advisor']
+where user_id = 'a2000001-0001-4001-8001-000000000001';
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"a2000001-0001-4001-8001-000000000001","role":"authenticated"}';
+
+select extensions.cmp_ok(
+  (select count(*)::int from public.alignment_answers
+   where assessment_id = 'a2000010-0010-4010-8010-000000000010'),
+  '>', 0,
+  'auch ohne Founder-Berechtigung sieht man die eigenen Antworten'
+);
+
+reset role;
+update public.profiles set roles = array['founder']
+where user_id = 'a2000001-0001-4001-8001-000000000001';
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"a2000001-0001-4001-8001-000000000001","role":"authenticated"}';
 
 -- GEGENPROBE. Ohne sie beweisen die beiden folgenden Pruefungen nichts: Sie
 -- waeren auch dann gruen, wenn ein Update hier grundsaetzlich nie ankaeme.
