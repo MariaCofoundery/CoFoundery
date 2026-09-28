@@ -294,12 +294,63 @@ neben einem `main`, das sich weiterbewegt.
 | # | Status |
 |---|---|
 | 0 | erledigt, auf `main` (Migration `20261053120000`) |
-| 1a | erledigt, auf `main` — acht Präferenzen, 64 Items |
-| 1b | erledigt, auf `main` — 30 Kontextfragen, 10 Wertefälle, 3 Grenzfragen |
-| 2a | erledigt — `alignment_answers`: entweder ein Wert oder ein Grund |
-| 2b | erledigt — Kennung für v2 (`draft`), Prüfung, Actions, Vollständigkeit |
-| 2c | erledigt — der Fragebogen, unter `debug/alignment-v2/[module]` |
-| ab 3 | langer Zweig `feat/instrument-v2`, ein Release |
+| 1a, 1b | erledigt, auf `main` — 107 Frageblöcke als Daten |
+| 2a–2c | erledigt — Ablage, Serverseite, Fragebogen |
+| 3a, 3b | erledigt — Auswertung Stufe 0, Vergleich, Klärungsbedarf, Agenda |
+| 4 | erledigt — zwölf Gesprächskarten nach dem Vierschritt aus Teil G |
+| 5 | erledigt — Einzelreport |
+| 6a, 6b | erledigt — Freigabe von Antworten, Vergleichsansicht |
+| 7 | erledigt — Advisor-Zugang mit zwei Schlüsseln |
+| 8 | erledigt — Umstieg und Archiv |
+| Discovery | erledigt — Themen statt Passungswert, alle Themen regelbar |
+| **9** | **offen — das eine Release** |
+
+Alles außer Schritt 9 liegt auf `feat/instrument-v2`: 26 Commits, davon 15
+Migrationen. Nichts davon ist produktiv sichtbar.
+
+## Was vor Schritt 9 noch zu entscheiden ist
+
+**Inhaltlich, und nur von Maria zu entscheiden:**
+
+1. **Fünf Fragen mit Deckeneffekt** — E03, U01, K02, D04, I01. Bei jeder wird
+   fast jeder hoch antworten, damit unterscheiden sie niemanden. Jede braucht
+   einen benannten Preis, damit es etwas zu entscheiden gibt. Siehe
+   `docs/fragenformat-review.md`, Abschnitt 5, Schritt 2.
+2. **T03 und T06 zusammenlegen** zu einer Frage mit Zeitpunktoptionen. Dann
+   hätte die Präferenz T nur noch ein Item in der Gesprächsfassung — das ist
+   die eigentliche Entscheidung dahinter.
+3. **Werden die v2-Antworten je Forschungsdaten?** Wenn ja, gehört die
+   Einwilligung an den Fragebogen, bevor zum ersten Mal jemand ausfüllt — nicht
+   danach. Bauplan: `docs/forschungsdaten-architektur.md`.
+
+**Vor der ersten echten Erhebung, nicht vor dem Release:**
+
+4. **Der Forschungspool trägt noch die alte Frageform.** Die 42 übrigen
+   Häufigkeitsfragen haben keine Bezugsmenge. Sie werden niemandem vorgelegt;
+   wer eine in die Gesprächsfassung holt, muss ihr vorher eine geben. Ein Test
+   hält das fest.
+5. **Kognitive Interviews und Expertenreview** (Teil H). Nicht technisch.
+6. **Die Datenschutzerklärung** muss nennen, was ohne Einwilligung geschieht —
+   die Häufigkeitsauswertung zur Qualitätsprüfung. Aus dem Einwilligungstext
+   ist sie bewusst heraus.
+
+**Technisch offen:**
+
+7. **Discovery selbst zeigt die Urteile noch nicht.** Die Themenauswahl und die
+   Urteilsfunktion stehen, und die Urteile erscheinen über dem Vergleich — aber
+   die Liste, durch die man in Discovery blättert, ist noch die alte. Das
+   Zusammenführen gehört zu Schritt 9.
+8. **Der Schreibweg ist nie von Hand durchgeklickt worden.** Autospeichern,
+   Zurücknehmen und Abgeben sind durch Tests und Datenbankprüfungen gedeckt,
+   aber niemand hat sie im Browser benutzt. Das sollte ein Mensch tun.
+
+**Bewusst nicht in v2 (aus früheren Gesprächen):** Advisor-Report mit
+Interview, adaptive Nachfragen, Audio/Vorlesen.
+
+**Notiert, nicht angefasst:** `advisor_person_grants_approved` verlangt
+`(status='active') = (approved_at is not null)`. Wer einen Grant widerruft,
+muss `approved_at` auf null setzen und verliert damit, wann einmal zugestimmt
+wurde. v1-Gebiet.
 
 **Wo der Fragebogen liegt und warum dort.** `/debug/alignment-v2/base` (mit
 `?step=2` für die Zusagen) und `/debug/alignment-v2/values`. Unter `debug`,
