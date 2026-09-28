@@ -151,17 +151,86 @@ push("Der Gedanke: Zu vier der Wunschfragen zusätzlich fragen, wie es beim letz
   + "sich etwas wünscht und zuletzt anders gehandelt hat, hat nicht falsch "
   + "geantwortet: Die Lage kann es nicht hergegeben haben, der Wunsch kann neu sein.");
 push();
-push("Drei Entscheidungen, über die es sich zu streiten lohnt:");
-push();
-push("1. **Bezugszeitraum drei Monate.** Ohne Zeitraum ist es wieder „wie häufig“ — "
-  + "die Frage, die im September als unklar zurückkam, weil offen bleibt, woran "
-  + "jemand sich erinnern soll.");
-push("2. **„Kam nicht vor“ ist eine Antwort, kein Auslassungsgrund.** Wer in drei "
-  + "Monaten keine solche Entscheidung getroffen hat, hat etwas gesagt.");
-push("3. **Nur ein einzelner letzter Fall, keine Häufigkeit.** Ein einzelner Fall "
-  + "ist erinnerbar. Eine Häufigkeit über drei Monate wäre wieder geschätzt.");
+push("**Worum wir bitten:** eine Einschätzung zu den fünf Punkten unten. Sie sind "
+  + "nach absteigender Wichtigkeit geordnet — wenn die Zeit nur für einen reicht, "
+  + "ist es der erste.");
 push();
 
+push("### 1. Ändert das, was das Instrument ist?");
+push();
+push("Der Fragebogen misst bisher ausschließlich **gewünschtes** Vorgehen, und das "
+  + "steht in jeder Itembegründung so drin („Analytischer Vergleich als gewünschtes "
+  + "Vorgehen. Kein Beleg für Analysefähigkeit.“). Vier Verhaltensfragen daneben "
+  + "sind eine andere Art von Angabe. Bleibt es ein Präferenzinstrument mit einer "
+  + "Gegenprobe — oder wird es unbemerkt zu etwas anderem, nämlich zu einem, das "
+  + "beansprucht, Selbstauskunft zu überprüfen?");
+push();
+
+push("### 2. Liest sich die Gegenüberstellung als Gültigkeitsurteil?");
+push();
+push("Das ist unsere größte Sorge. Wir stellen Wunsch und Verhalten nebeneinander "
+  + "und sagen ausdrücklich, dass ein Unterschied **kein** Urteil ist: Die Lage kann "
+  + "es nicht hergegeben haben, der Wunsch kann neu sein. Es gibt kein "
+  + "Übereinstimmungsmaß, keine Zahl, keine Richtung — nur zwei Sätze nebeneinander "
+  + "und den Hinweis, dass sich darüber sprechen lässt.");
+push();
+push("Reicht das? Oder liest eine Person, die ihren eigenen Bericht ansieht, dort "
+  + "unvermeidlich „du tust nicht, was du sagst“ — egal, wie wir es formulieren? "
+  + "Falls ja: Wäre es dann besser, die Gegenüberstellung nur intern zur "
+  + "Itemprüfung zu verwenden und der Person gar nicht zu zeigen?");
+push();
+
+push("### 3. Ein einzelner letzter Fall statt einer Häufigkeit");
+push();
+push("Wir fragen nach dem **letzten** konkreten Fall in den vergangenen drei "
+  + "Monaten, nicht nach einer Häufigkeit. Begründung: Ein einzelner Fall ist "
+  + "erinnerbar, eine Häufigkeit über drei Monate wäre wieder geschätzt — und genau "
+  + "dieser Punkt war an der Vorfassung zu Recht kritisiert worden.");
+push();
+push("Der Preis ist bekannt: Ein Einzelfall ist anfällig für Auswahl beim Erinnern "
+  + "(man erinnert die Fälle, die zum Selbstbild passen) und für Besonderheiten der "
+  + "Lage. Ist der Tausch vertretbar, oder wäre ein anderes Format besser — etwa "
+  + "„die letzten drei“ oder ein festes Ereignis statt eines Zeitraums?");
+push();
+
+push("### 4. „Kam nicht vor“ als Antwort, nicht als Auslassung");
+push();
+push("Jede der vier Fragen bietet an: „in den vergangenen drei Monaten stand keine "
+  + "solche Entscheidung an“. Das ist bewusst eine **Antwortmöglichkeit** und kein "
+  + "Auslassungsgrund — wer in drei Monaten keinen solchen Fall hatte, hat etwas "
+  + "gesagt und nichts verschwiegen. Der Vergleich mit der Wunschangabe endet dort, "
+  + "statt zu einem Unterschied zu werden.");
+push();
+push("Ist das richtig so? Und: Bei Gründerinnen und Gründern ganz am Anfang dürfte "
+  + "das die häufigste Antwort sein. Macht das die Fragen für diese Gruppe wertlos, "
+  + "und wenn ja — sollte man sie dann überhaupt stellen?");
+push();
+
+push("### 5. Die vier Paare und ihre Vergleichbarkeit");
+push();
+push("Gepaart sind A02/A91, U04/U91, K01/K91 und T03/T91. Zwei Fragen dazu:");
+push();
+push("- Sind das die vier, bei denen eine Gegenprobe am meisten bringt? Oder gäbe es "
+  + "geeignetere — etwa dort, wo soziale Erwünschtheit am stärksten wirkt?");
+push("- Bei K01/K91 und T03/T91 haben wir die Antwortstufen **absichtlich gleich "
+  + "formuliert**, damit sich Wunsch und Verhalten nebeneinander lesen lassen. Bei "
+  + "A02/A91 und U04/U91 geht das nicht (Häufigkeit gegen Einzelfall), dort legen wir "
+  + "beides nur nebeneinander. Ist die gleiche Stufung bei den ersten beiden ein "
+  + "Vorteil — oder erzeugt sie erst den Eindruck einer Skala, die es nicht gibt?");
+push();
+
+push("### Außerdem, unabhängig von den Verhaltensfragen");
+push();
+push("Wir haben in der geprüften Fassung eine Abweichung stehen lassen und möchten "
+  + "sie bestätigt oder verworfen haben: `confidential_first` („möchte ich zunächst "
+  + "vertraulich klären“) ist bei uns ein **eigener** Auslassungsgrund und nicht "
+  + "unter „möchte ich nicht angeben“ zusammengefasst. Begründung: Das eine ist ein "
+  + "aufgeschobenes Gespräch, das andere eine Absage — wer beides zusammenfasst, "
+  + "verliert den Unterschied genau dort, wo er zählt. Ist das haltbar?");
+push();
+
+push("---");
+push();
 for (const item of getBehaviourItems()) {
   const wish = item.crossChecks;
   push();
