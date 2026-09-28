@@ -100,5 +100,22 @@
       "keep_previous": "Your existing report stays valid. You can answer again at any time.",
       "retake": "Done — your old answers are kept, and the new questionnaire is waiting."
     }
+  },
+  "discovery": {
+    "title": "What matters to you in the search",
+    "intro": "You state a wish per topic. This does not produce a fit score — it produces an order that you set yourself.",
+    "orderTitle": "Your order",
+    "orderIntro": "Your first topic is looked at first. The second only breaks a tie. Someone who does not fit your most important topic is not lifted by matches further down.",
+    "nothingChosen": "No topic chosen yet. Pick what matters to you below.",
+    "topicsTitle": "All topics",
+    "ruleLabel": "Counts as similar",
+    "up": "move up",
+    "down": "move down",
+    "saveError": "Could not be saved.",
+    "wish": {
+      "none": "doesn't matter",
+      "similar": "similar",
+      "different": "different"
+    }
   }
 }

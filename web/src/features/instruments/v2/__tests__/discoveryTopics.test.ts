@@ -282,3 +282,27 @@ test("es gibt keine Obergrenze mehr, und die Datenbank kennt den Wunsch", () => 
   assert.match(sql, /order by summed\.rank, summed\.topic_key/);
   assert.ok(!/rank \*|sum\(.*rank/i.test(sql), "der Rang wird nirgends verrechnet");
 });
+
+test("die Oberfläche hat keine Schieberegler und keine Sternchen", () => {
+  // Es gibt keine Gewichte, also darf es auch nichts geben, das wie eines
+  // aussieht. Die Reihenfolge ist das Bedienelement - sie macht aus „mir ist
+  // das wichtiger" eine Entscheidung statt einer Zahl.
+  const form = readFileSync("src/features/instruments/v2/DiscoveryTopicsForm.tsx", "utf8");
+  const markup = form.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  for (const forbidden of [/type="range"/, /slider/i, /★|⭐/, /importance|gewicht/i, /%/]) {
+    assert.ok(!forbidden.test(markup), `${forbidden} in der Themenauswahl`);
+  }
+  // Drei Zustände je Thema: egal, ähnlich, unterschiedlich.
+  assert.match(markup, /\(\[null, "similar", "different"\] as const\)/);
+});
+
+test("die Regel steht an jedem Thema", () => {
+  // „Gleiche Antwort oder höchstens eine Stufe Unterschied" ist eine
+  // Verabredung, keine Erkenntnis - wer danach filtert, soll wissen, was der
+  // Filter getan hat.
+  const form = readFileSync("src/features/instruments/v2/DiscoveryTopicsForm.tsx", "utf8");
+  assert.match(form, /topic\.rule/);
+  for (const topic of getDiscoveryTopics()) {
+    assert.ok(topic.rule.length > 10, `${topic.key}: die Regel ist zu knapp`);
+  }
+});

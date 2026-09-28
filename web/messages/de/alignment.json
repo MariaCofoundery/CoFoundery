@@ -100,5 +100,22 @@
       "keep_previous": "Dein bisheriger Report bleibt gültig. Du kannst später jederzeit neu ausfüllen.",
       "retake": "Alles klar — deine alten Antworten bleiben erhalten, der neue Fragebogen wartet auf dich."
     }
+  },
+  "discovery": {
+    "title": "Was dir bei der Suche wichtig ist",
+    "intro": "Du sagst je Thema, was du dir wünschst. Es entsteht daraus keine Passungszahl — sondern eine Reihenfolge, die du selbst bestimmst.",
+    "orderTitle": "Deine Reihenfolge",
+    "orderIntro": "Zuerst wird dein erstes Thema angesehen. Erst bei Gleichstand das zweite. Wer bei deinem wichtigsten Thema nicht passt, rutscht durch Treffer weiter unten nicht nach oben.",
+    "nothingChosen": "Noch kein Thema gewählt. Wähle unten, was dir wichtig ist.",
+    "topicsTitle": "Alle Themen",
+    "ruleLabel": "Als ähnlich gilt",
+    "up": "nach oben",
+    "down": "nach unten",
+    "saveError": "Konnte nicht gespeichert werden.",
+    "wish": {
+      "none": "egal",
+      "similar": "ähnlich",
+      "different": "unterschiedlich"
+    }
   }
 }
