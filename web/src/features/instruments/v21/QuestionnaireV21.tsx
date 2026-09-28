@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/AnswerFieldV21";
 import type { SectionView } from "@/features/instruments/v21/questionnaireDataV21";
 import {
@@ -8,6 +8,10 @@ import {
   saveAnswerV21,
   submitV21,
 } from "@/features/instruments/v21/answerActionsV21";
+import {
+  noteItemAnswered,
+  noteItemSeen,
+} from "@/features/instruments/v21/itemViewActions";
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 
 /**
@@ -51,6 +55,7 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
   const [isSubmitted, setIsSubmitted] = useState(submitted);
   const [submitting, setSubmitting] = useState(false);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const seen = useRef<Set<string>>(new Set());
 
   const allItems = useMemo(() => sections.flatMap((section) => section.items), [sections]);
 
@@ -80,6 +85,37 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
     );
   }).length;
 
+  /**
+   * Die Messung fuer den Pretest - und sie darf das Ausfuellen nicht stoeren.
+   *
+   * Kein await im Klickpfad, kein Blockieren, keine Fehlermeldung. Scheitert
+   * die Aufzeichnung, merkt das niemand: Eine Messung, die den gemessenen
+   * Vorgang behindert, misst am Ende sich selbst.
+   */
+  const quiet = (work: Promise<void>) => void work.catch(() => {});
+
+  // WELCHE FRAGEN AUF DEM BILDSCHIRM WAREN. Eine Frage, die jemand gesehen und
+  // nicht beantwortet hat, ist die Abbruchstelle, die der Pilot finden soll.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const fresh = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => entry.target.getAttribute("data-item-id"))
+          .filter((itemId): itemId is string => Boolean(itemId) && !seen.current.has(itemId!));
+        if (fresh.length === 0) return;
+        for (const itemId of fresh) seen.current.add(itemId);
+        quiet(noteItemSeen(fresh));
+      },
+      // Halb sichtbar reicht: Wer eine Frage nur beim Scrollen streift, hat
+      // sie nicht gelesen - aber wer sie zur Haelfte vor sich hat, schon.
+      { threshold: 0.5 },
+    );
+
+    for (const node of document.querySelectorAll("[data-item-id]")) observer.observe(node);
+    return () => observer.disconnect();
+  }, [sections, basisEntries.length]);
+
   const persist = useCallback((itemId: string, draft: DraftV21) => {
     clearTimeout(timers.current[itemId]);
 
@@ -108,6 +144,7 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
 
         setStates((current) => ({ ...current, [itemId]: result.ok ? "saved" : "error" }));
         setErrors((current) => ({ ...current, [itemId]: result.ok ? "" : result.reason }));
+        if (result.ok && stand === "complete") void noteItemAnswered(itemId).catch(() => {});
       } catch {
         // Wirft die Serveraktion - etwa weil kein Fragebogen angelegt werden
         // konnte -, blieb die Anzeige vorher fuer immer auf "wird
@@ -169,6 +206,7 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
               return (
                 <div
                   key={item.itemId}
+                  data-item-id={item.itemId}
                   className={[
                     "rounded-xl border p-5",
                     missingAfterSubmit.includes(item.itemId)
