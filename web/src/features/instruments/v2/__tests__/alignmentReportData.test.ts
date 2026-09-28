@@ -128,3 +128,62 @@ test("kein v2-Abbild landet in der Tabelle für abgeleitete Zahlen", () => {
   assert.match(schema, /person_alignment_snapshots_v1_only/);
   assert.match(schema, /check \(instrument_id = 'founder-compatibility-v1'\)/);
 });
+
+test("markiert wird am Report, nicht im Fragebogen", () => {
+  // Maria am 28.09.2026: „Das ist auch ein bisschen zu viel für diesen
+  // Fragebogen, weil man soll sich ja hier darauf konzentrieren."
+  //
+  // Das trifft etwas Genaueres, als es klingt: Beim Ausfüllen beantwortet man
+  // eine Frage nach der anderen und sieht nie den Zusammenhang. Was man
+  // besprechen möchte, weiß man erst, wenn die eigenen Antworten
+  // nebeneinanderstehen.
+  const questionnaire = readFileSync(
+    "src/features/instruments/v2/AlignmentQuestionnaire.tsx", "utf8"
+  );
+  assert.ok(!/discussion\.mark/.test(questionnaire), "kein Ankreuzfeld im Fragebogen");
+  assert.ok(!/changeCondition/.test(questionnaire), "und keine Notiz");
+
+  const report = readFileSync("src/features/instruments/v2/AlignmentReportView.tsx", "utf8");
+  assert.match(report, /<ReportMark/);
+});
+
+test("der Abgeben-Knopf steht am Ende, nicht über der ersten Frage", () => {
+  // „Wenn man den Fragebogen aufmacht, kommt gleich ganz oben dieser Knopf
+  // Fragebogen abschicken - der sollte dort nicht sein." Abgeben ist das
+  // Letzte, was man tut.
+  const source = readFileSync(
+    "src/features/instruments/v2/AlignmentQuestionnaire.tsx", "utf8"
+  );
+  const kopf = source.indexOf('className="sticky top-0');
+  const knopf = source.indexOf('shell.submit"');
+  const fragen = source.indexOf("sections.map(");
+  assert.ok(kopf < fragen, "die Fortschrittsanzeige steht oben");
+  assert.ok(knopf > fragen, "der Abgeben-Knopf steht hinter den Fragen");
+
+  // Und oben steht nur der Stand, kein Knopf.
+  const kopfzeile = source.slice(kopf, source.indexOf("</div>", kopf));
+  assert.ok(!/<button/.test(kopfzeile), "kein Knopf in der Kopfzeile");
+});
+
+test("die Markierung überlebt die Abgabe, die Antwort nicht", () => {
+  // Sie ist keine Antwort: Sie sagt nichts darüber aus, wie jemand arbeiten
+  // möchte, sondern „darüber möchte ich reden". Deshalb darf sie sich nach der
+  // Abgabe noch ändern - gerade dann, wenn man den eigenen Report zum ersten
+  // Mal im Zusammenhang liest.
+  const MIGRATIONS = "../supabase/migrations";
+  const schema = readdirSync(MIGRATIONS)
+    .filter((name) => name.endsWith(".sql"))
+    .map((name) => readFileSync(join(MIGRATIONS, name), "utf8"))
+    .join("\n");
+
+  assert.match(schema, /alignment_answer_frozen_after_submit/);
+  // Der Trigger friert die Antwort ein …
+  assert.match(schema, /new\.value is distinct from old\.value/);
+  // … und nennt marked_for_discussion bewusst NICHT.
+  const trigger = schema.slice(
+    schema.indexOf("keep_submitted_alignment_answers_frozen"),
+    schema.indexOf("create trigger alignment_answers_frozen_after_submit")
+  );
+  assert.ok(!/marked_for_discussion/.test(trigger), "die Markierung bleibt änderbar");
+  assert.ok(!/change_condition/.test(trigger), "die Notiz ebenfalls");
+});

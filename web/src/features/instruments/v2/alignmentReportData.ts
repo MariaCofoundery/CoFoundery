@@ -49,8 +49,8 @@ export type AlignmentReport = {
   open: { entry: ReadoutEntry; label: string | null }[];
   /** Was noch gar nicht beantwortet wurde. */
   unanswered: string[];
-  /** Zur Besprechung markiert. */
-  marked: string[];
+  /** Zur Besprechung markiert, mit der freiwilligen Notiz. */
+  marked: Record<string, { marked: boolean; note: string | null }>;
   uncertainties: typeof READOUT_UNCERTAINTIES;
   /** Der Text für „noch kein Team“ aus Teil G, wenn kein Vergleich vorliegt. */
   soloNote: { observed: string; meaning: string; question: string } | null;
@@ -69,7 +69,10 @@ const OPEN_CODES = new Set(["undecided", "cannot_assess", "confidential_first"])
 
 export function buildAlignmentReport(
   rows: readonly StoredAnswerRow[],
-  options: { hasComparison?: boolean; markedBlockIds?: readonly string[] } = {}
+  options: {
+    hasComparison?: boolean;
+    marks?: Record<string, { marked: boolean; note: string | null }>;
+  } = {}
 ): AlignmentReport {
   const entries = buildReadout(rows);
   const byId = new Map(entries.map((entry) => [entry.blockId, entry]));
@@ -140,7 +143,7 @@ export function buildAlignmentReport(
     sections,
     open,
     unanswered,
-    marked: [...(options.markedBlockIds ?? [])],
+    marked: options.marks ?? {},
     uncertainties: READOUT_UNCERTAINTIES,
     soloNote:
       isEmpty || options.hasComparison || !solo

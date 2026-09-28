@@ -13,7 +13,8 @@
     "navCommitments": "Commitments",
     "navValues": "Priorities",
     "navReport": "Your answers",
-    "navDiscovery": "Search settings"
+    "navDiscovery": "Search settings",
+    "submitHint": "Afterwards you can go through your answers and mark what you want to talk about."
   },
   "base": {
     "title": "How you want to work",

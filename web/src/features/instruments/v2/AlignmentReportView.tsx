@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReportMark } from "@/features/instruments/v2/ReportMark";
 import { getTranslations } from "next-intl/server";
 import type { AlignmentReport } from "@/features/instruments/v2/alignmentReportData";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v2/alignmentReadout";
@@ -59,6 +60,11 @@ export async function AlignmentReportView({ report }: { report: AlignmentReport 
         </section>
       )}
 
+      {/* Die Erklaerung zur Markierung - einmal, ueber allen Abschnitten. */}
+      <p className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        {t("discussion.markHint")}
+      </p>
+
       {report.sections.map((section) => (
         <section key={section.key} className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-900">{section.label}</h2>
@@ -80,9 +86,14 @@ export async function AlignmentReportView({ report }: { report: AlignmentReport 
                 ) : (
                   <p className="mt-2 text-base font-medium text-slate-900">{describe(entry)}</p>
                 )}
-                {report.marked.includes(entry.blockId) && (
-                  <p className="mt-2 text-xs text-slate-500">{t("report.marked")}</p>
-                )}
+                {/* HIER WIRD MARKIERT, NICHT IM FRAGEBOGEN. Erst wenn die
+                    eigenen Antworten nebeneinanderstehen, weiss man, worueber
+                    zu sprechen waere. */}
+                <ReportMark
+                  blockId={entry.blockId}
+                  initialMarked={report.marked[entry.blockId]?.marked ?? false}
+                  initialNote={report.marked[entry.blockId]?.note ?? null}
+                />
               </li>
             ))}
           </ul>

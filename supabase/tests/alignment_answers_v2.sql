@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(29);
+select extensions.plan(33);
 
 -- ---------------------------------------------------------------------------
 -- Antworten auf das Instrument v2
@@ -315,14 +315,21 @@ set local request.jwt.claims = '{"sub":"a2000001-0001-4001-8001-000000000001","r
 -- NACH DER ABGABE IST DER FRAGEBOGEN EIN DOKUMENT. Wer ihn rueckwirkend
 -- aendern koennte, haette den Satz "du kannst deine alte Fassung behalten"
 -- entwertet, noch bevor es eine zweite Fassung gibt.
-update public.alignment_answers set value = '{"scale":5}'
-where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01';
+-- SEIT DEM 28.09.2026 MIT FEHLER STATT STILL. Vorher blockierte die Policy
+-- die Aenderung lautlos - die Anwendung sah einen Erfolg und die Zeile blieb,
+-- wie sie war. Der Trigger sagt jetzt, dass es nicht geht, und warum.
+select extensions.throws_ok(
+  $$update public.alignment_answers set value = '{"scale":5}'
+    where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'$$,
+  '42501', null,
+  'nach der Abgabe aendert sich keine Antwort mehr'
+);
 
 select extensions.is(
   (select value ->> 'scale' from public.alignment_answers
    where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'),
   '3',
-  'nach der Abgabe aendert sich keine Antwort mehr'
+  'und die alte Antwort steht unveraendert da'
 );
 
 delete from public.alignment_answers
@@ -333,6 +340,42 @@ select extensions.is(
    where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'),
   1,
   'und geloescht wird auch nichts mehr'
+);
+
+-- ---------------------------------------------------------------------------
+-- 7. Aber die Gespraechsmarkierung darf sich noch aendern
+-- ---------------------------------------------------------------------------
+--
+-- Sie ist keine Antwort. Sie sagt nichts darueber aus, wie jemand arbeiten
+-- moechte - sie sagt "darueber moechte ich reden". Das ist eine Aussage ueber
+-- das naechste Gespraech und gehoert genau dorthin, wo man den eigenen Report
+-- zum ersten Mal im Zusammenhang liest: nach der Abgabe.
+
+update public.alignment_answers
+set marked_for_discussion = true, change_condition = 'Wenn wir mehr Daten haetten.'
+where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01';
+
+select extensions.is(
+  (select marked_for_discussion from public.alignment_answers
+   where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'),
+  true,
+  'nach der Abgabe laesst sich noch markieren'
+);
+
+select extensions.is(
+  (select change_condition from public.alignment_answers
+   where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'),
+  'Wenn wir mehr Daten haetten.',
+  'und die freiwillige Notiz ebenfalls schreiben'
+);
+
+-- DIE ANTWORT SELBST BLEIBT EIN DOKUMENT. Nicht still, sondern mit Fehler -
+-- eine stille Ablehnung saehe fuer die Anwendung aus wie ein Erfolg.
+select extensions.throws_ok(
+  $$update public.alignment_answers set value = '{"scale":5}'
+    where assessment_id = 'a2000010-0010-4010-8010-000000000010' and block_id = 'A01'$$,
+  '42501', null,
+  'die Antwort selbst laesst sich nicht mehr aendern'
 );
 
 reset role;

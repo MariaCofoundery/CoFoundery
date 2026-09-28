@@ -13,7 +13,8 @@
     "navCommitments": "Zusagen",
     "navValues": "Prioritäten",
     "navReport": "Deine Angaben",
-    "navDiscovery": "Suchvorgaben"
+    "navDiscovery": "Suchvorgaben",
+    "submitHint": "Danach kannst du deine Antworten in Ruhe durchgehen und markieren, worüber du sprechen möchtest."
   },
   "base": {
     "title": "Wie du arbeiten möchtest",

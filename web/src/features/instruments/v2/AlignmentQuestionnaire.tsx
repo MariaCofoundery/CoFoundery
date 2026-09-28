@@ -12,16 +12,9 @@ import {
 } from "@/features/instruments/v2/alignmentAnswerActions";
 import type { AlignmentModule } from "@/features/instruments/v2/alignmentProgress";
 
-const inputClass =
-  "mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 " +
-  "focus:border-slate-500 focus:outline-none disabled:bg-slate-50";
-
 type Draft = {
   value?: AlignmentAnswerValue;
   missingCode?: AlignmentAnswer["missingCode"];
-  /** Stehen neben der Antwort, nicht in ihr - siehe AnswerAnnotations. */
-  markedForDiscussion?: boolean;
-  changeCondition?: string;
 };
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -72,14 +65,7 @@ export function AlignmentQuestionnaire({
       timers.current[blockId] = setTimeout(async () => {
         setStates((current) => ({ ...current, [blockId]: "saving" }));
 
-        // Eine Markierung allein haelt die Zeile am Leben: „darueber moechte
-        // ich sprechen" ist auch dann eine Aussage, wenn die Frage selbst
-        // noch offen ist.
-        const empty =
-          draft.missingCode === undefined &&
-          !hasContent(draft.value) &&
-          !draft.markedForDiscussion &&
-          !draft.changeCondition?.trim();
+        const empty = draft.missingCode === undefined && !hasContent(draft.value);
         const result = empty
           ? await clearAlignmentAnswer(module, blockId)
           : await saveAlignmentAnswer(
@@ -89,10 +75,7 @@ export function AlignmentQuestionnaire({
                 answerFormat,
                 ...(draft.missingCode ? { missingCode: draft.missingCode } : { value: draft.value }),
               } as AlignmentAnswer,
-              {
-                markedForDiscussion: draft.markedForDiscussion ?? false,
-                changeCondition: draft.changeCondition ?? null,
-              }
+              {}
             );
 
         setStates((current) => ({ ...current, [blockId]: result.ok ? "saved" : "error" }));
@@ -104,31 +87,17 @@ export function AlignmentQuestionnaire({
 
   return (
     <div className="space-y-10">
-      <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/95 py-3 backdrop-blur">
+      {/* NUR DER STAND, KEIN KNOPF. Am 28.09.2026 gemeldet: "Wenn man den
+          Fragebogen aufmacht, kommt gleich ganz oben dieser Knopf Fragebogen
+          abschicken - der sollte dort nicht sein." Stimmt: Abgeben ist das
+          Letzte, was man tut, und ganz oben steht es vor der ersten Antwort.
+          Der Knopf steht jetzt am Ende, hinter der letzten Frage. */}
+      <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 py-3 backdrop-blur">
         <p className="text-sm text-slate-600">
           {t("shell.progress", { answered, total: blocks.length })}
         </p>
-        {isSubmitted ? (
-          <p className="text-sm font-medium text-slate-900">{t("shell.submitted")}</p>
-        ) : (
-          <button
-            type="button"
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            disabled={submitting}
-            onClick={async () => {
-              setSubmitting(true);
-              const result = await submitAlignmentModule(module, step);
-              setSubmitting(false);
-              if (result.ok) {
-                setIsSubmitted(true);
-                setMissingAfterSubmit([]);
-              } else {
-                setMissingAfterSubmit(result.missing ?? []);
-              }
-            }}
-          >
-            {submitting ? t("shell.submitting") : t("shell.submit")}
-          </button>
+        {isSubmitted && (
+          <p className="mt-1 text-sm font-medium text-slate-900">{t("shell.submitted")}</p>
         )}
       </div>
 
@@ -141,10 +110,11 @@ export function AlignmentQuestionnaire({
         </p>
       )}
 
-      {/* DIE BEIDEN ERKLAERUNGEN EINMAL, NICHT BEI JEDER FRAGE. */}
+      {/* EINMAL, NICHT BEI JEDER FRAGE. Und nur noch die eine Erklaerung: Der
+          Hinweis zur Gespraechsmarkierung steht jetzt dort, wo markiert wird -
+          am eigenen Report. */}
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
         <p>{t("missing.hint")}</p>
-        <p className="mt-1">{t("discussion.markHint")}</p>
       </div>
 
       {sections.map((section) => (
@@ -190,42 +160,6 @@ export function AlignmentQuestionnaire({
                   }}
                 />
 
-                {/* DIE MARKIERUNG STEHT BEI DER FRAGE, nicht in einem Menue.
-                    Sie ist Prioritaet 1 der Gespraechsagenda - vor jedem
-                    berechneten Unterschied. */}
-                <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm text-slate-700">
-                  <input
-                    type="checkbox"
-                    className="mt-1"
-                    checked={Boolean(draft.markedForDiscussion)}
-                    disabled={isSubmitted}
-                    onChange={(event) => {
-                      const next = { ...draft, markedForDiscussion: event.target.checked };
-                      setAnswers((current) => ({ ...current, [entry.blockId]: next }));
-                      persist(entry.blockId, entry.answerFormat, next);
-                    }}
-                  />
-                  <span>{t("discussion.mark")}</span>
-                </label>
-
-                {/* TEIL E SIEHT DIESE FRAGE AUSDRUECKLICH VOR: "Welche Bedingung
-                    wuerde deine Wahl aendern?" Sie erscheint erst, wenn jemand
-                    das Thema besprechen moechte - vorher waere sie ein leeres
-                    Feld an jeder einzelnen Frage. */}
-                {draft.markedForDiscussion && (
-                  <input
-                    className={inputClass}
-                    placeholder={t("discussion.changeCondition")}
-                    value={draft.changeCondition ?? ""}
-                    disabled={isSubmitted}
-                    onChange={(event) => {
-                      const next = { ...draft, changeCondition: event.target.value };
-                      setAnswers((current) => ({ ...current, [entry.blockId]: next }));
-                      persist(entry.blockId, entry.answerFormat, next);
-                    }}
-                  />
-                )}
-
                 <div className="mt-3 flex items-center gap-3 text-xs">
                   {state === "saving" && <span className="text-slate-500">{t("shell.saving")}</span>}
                   {state === "saved" && <span className="text-slate-500">{t("shell.saved")}</span>}
@@ -238,6 +172,30 @@ export function AlignmentQuestionnaire({
           })}
         </section>
       ))}
+      {/* HIER GEHOERT ER HIN: hinter der letzten Frage. */}
+      {!isSubmitted && (
+        <div className="border-t border-slate-200 pt-6">
+          <button
+            type="button"
+            disabled={submitting}
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            onClick={async () => {
+              setSubmitting(true);
+              const result = await submitAlignmentModule(module, step);
+              setSubmitting(false);
+              if (result.ok) {
+                setIsSubmitted(true);
+                setMissingAfterSubmit([]);
+              } else {
+                setMissingAfterSubmit(result.missing ?? []);
+              }
+            }}
+          >
+            {submitting ? t("shell.submitting") : t("shell.submit")}
+          </button>
+          <p className="mt-2 text-sm text-slate-600">{t("shell.submitHint")}</p>
+        </div>
+      )}
     </div>
   );
 }

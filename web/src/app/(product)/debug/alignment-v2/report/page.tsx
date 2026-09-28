@@ -37,7 +37,7 @@ export default async function AlignmentV2ReportPage() {
   const { data: rows } = ids.length
     ? await supabase
         .from("alignment_answers")
-        .select("block_id, answer_format, value, missing_code, marked_for_discussion")
+        .select("block_id, answer_format, value, missing_code, marked_for_discussion, change_condition")
         .in("assessment_id", ids)
     : { data: [] };
 
@@ -47,7 +47,12 @@ export default async function AlignmentV2ReportPage() {
 
   const report = buildAlignmentReport(rows ?? [], {
     hasComparison: false,
-    markedBlockIds: (rows ?? []).filter((row) => row.marked_for_discussion).map((row) => row.block_id),
+    marks: Object.fromEntries(
+      (rows ?? []).map((row) => [
+        row.block_id,
+        { marked: row.marked_for_discussion, note: row.change_condition },
+      ])
+    ),
   });
 
   return (
