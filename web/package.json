@@ -18,7 +18,8 @@
     "ai:worker": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.ai-worker --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/ai-worker.ts",
     "tts:build": "node --env-file-if-exists=.env.local --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/tts-build.ts",
     "item-analysis": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types --env-file-if-exists=.env.local scripts/item-analysis.ts",
-    "db:test": "node scripts/db-test.mjs"
+    "db:test": "node scripts/db-test.mjs",
+    "export:questionnaire": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/export-questionnaire.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
