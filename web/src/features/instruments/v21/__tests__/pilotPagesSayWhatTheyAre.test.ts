@@ -46,6 +46,9 @@ const ERLAUBT = [
   // FUEHRT dorthin, es enthaelt den Fragebogen nicht - ein eigener Test unten
   // haelt das fest.
   join("src", "app", "(product)", "dashboard") + sep,
+  // Die Advisor-Seite: Sie zeigt fremde Antworten, wenn sie freigegeben sind.
+  // Ein eigener Test unten haelt fest, dass sie dort nichts anfassen kann.
+  join("src", "app", "(product)", "advisor", "person") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
@@ -161,7 +164,25 @@ test("der Hinweis erscheint nicht fuer Menschen, die die alte Fassung nicht kenn
   assert.match(page, /versionState\.announce && <TransitionAnnounce/);
 });
 
-test("die Testfassung wird nur von den Pilotseiten, der Wahlseite und dem Dashboard erreicht", () => {
+test("der Advisor kann fremde Antworten nicht anfassen", () => {
+  // Dieselbe Ansicht zeigt dem Advisor fremde Antworten. Ein Haekchen
+  // „darueber moechte ich sprechen“ an einer Antwort, die einem nicht gehoert,
+  // waere dort falsch - die Datenbank wuerde den Schreibversuch abweisen, aber
+  // ein Bedienelement, das nichts tun darf, ist ein Fehler in der Anzeige und
+  // keine Sicherheitsstufe.
+  const page = readFileSync(
+    join("src", "app", "(product)", "advisor", "person", "[userId]", "page.tsx"), "utf8");
+  assert.match(page, /ReportViewV21/);
+  assert.ok(!/canMark/.test(page), "die Advisor-Seite erlaubt das Markieren");
+
+  // Und die Voreinstellung muss „nein“ sein, sonst haette das Weglassen
+  // genau die falsche Wirkung.
+  const view = readFileSync(
+    join("src", "features", "instruments", "v21", "ReportViewV21.tsx"), "utf8");
+  assert.match(view, /canMark = false/);
+});
+
+test("die Testfassung wird nur von den Pilotseiten, der Wahlseite, dem Dashboard und der Advisor-Seite erreicht", () => {
   // Nicht mehr „nur unter debug“, aber weiterhin an einer Stelle: Ein Link aus
   // dem Dashboard ist in Ordnung, ein zweiter Fragebogen an anderer Stelle
   // nicht. Wer v2.1 einbindet, soll es bewusst tun.

@@ -27,9 +27,21 @@ type Props = {
   orphans?: { itemId: string; entryIds: string[] }[];
   /** Worüber diese Person sprechen möchte. Keine Aussage über die Antwort. */
   marked?: readonly string[];
+  /**
+   * Darf hier markiert werden?
+   *
+   * STANDARDMÄSSIG NEIN, und das ist Absicht. Dieselbe Ansicht zeigt auch ein
+   * Advisor fremde Antworten - ein Häkchen an einer Antwort, die einem nicht
+   * gehört, wäre dort falsch. Die Datenbank würde den Schreibversuch
+   * abweisen, aber ein Bedienelement, das nichts tun darf, ist ein Fehler in
+   * der Anzeige und keine Sicherheitsstufe.
+   *
+   * Wer markieren können soll, muss es hinschreiben.
+   */
+  canMark?: boolean;
 };
 
-export function ReportViewV21({ sections, orphans = [], marked = [] }: Props) {
+export function ReportViewV21({ sections, orphans = [], marked = [], canMark = false }: Props) {
   return (
     <div className="space-y-10">
       {orphans.length > 0 && (
@@ -69,7 +81,9 @@ export function ReportViewV21({ sections, orphans = [], marked = [] }: Props) {
                 )}
               </div>
 
-              <MarkV21 itemId={entry.itemId} initial={marked.includes(entry.itemId)} />
+              {canMark && (
+                <MarkV21 itemId={entry.itemId} initial={marked.includes(entry.itemId)} />
+              )}
             </div>
           ))}
         </section>

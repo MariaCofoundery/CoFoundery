@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
+import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
+import { buildCardsV21 } from "@/features/instruments/v21/conversationCardsV21";
 import {
   buildComparisonV21,
   type StoredRow,
@@ -101,6 +103,16 @@ export default async function CompareV21Page({
     },
   );
 
+  const cards = buildCardsV21({
+    comparison: comparison.sections,
+    markedItemIds: [
+      ...mine.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
+      ...theirs.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
+    ],
+    nameA: "Du",
+    nameB: "Die andere Person",
+  });
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <NavV21 current="/founder-alignment/pilot" />
@@ -115,8 +127,26 @@ export default async function CompareV21Page({
         heißt, dass ihr darüber noch nicht gesprochen habt.
       </p>
 
-      <div className="mt-10">
-        <ComparisonViewV21 comparison={comparison} nameA="Du" nameB="Die andere Person" />
+      {/* DIE KARTEN VOR DEM VERGLEICH. Wer zuerst die Tabelle sieht, hat
+          schon gedeutet, bevor die Frage danebensteht - und die Karten sind
+          genau dafuer da, das zu verhindern. */}
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold text-slate-900">Gesprächskarten</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Aus einer geprüften Sammlung, nicht erzeugt. Zu jeder Karte steht, was
+          tatsächlich geantwortet wurde, was es bedeuten <em>kann</em>, was ihr fragen
+          könnt und woraus eine Vereinbarung bestehen sollte.
+        </p>
+        <div className="mt-4">
+          <ConversationCardsView cards={cards} />
+        </div>
+      </section>
+
+      <div className="mt-12">
+        <h2 className="text-lg font-semibold text-slate-900">Alle Antworten nebeneinander</h2>
+        <div className="mt-4">
+          <ComparisonViewV21 comparison={comparison} nameA="Du" nameB="Die andere Person" />
+        </div>
       </div>
     </main>
   );

@@ -108,6 +108,28 @@ export default async function ReportV21Page() {
       .map((row) => row.block_id);
   }
 
+  // ---------------------------------------------------------------------------
+  // Advisor, die gerade begleiten
+  // ---------------------------------------------------------------------------
+  //
+  // ZWEI SCHLUESSEL, NICHT EINER. Eine aktive Advisor-Beziehung oeffnet gar
+  // nichts - sie macht die Person nur waehlbar. Die Freigabe der Antworten
+  // bleibt eine eigene, ausdrueckliche Entscheidung, und sie endet
+  // automatisch mit der Beziehung.
+  const { data: grants } = await supabase
+    .from("advisor_person_grants")
+    .select("advisor_user_id")
+    .eq("subject_user_id", auth.user.id)
+    .eq("status", "active")
+    .is("revoked_at", null);
+
+  for (const grant of grants ?? []) {
+    const id = grant.advisor_user_id as string;
+    if (id && id !== auth.user.id && !partnerIds.has(id)) {
+      partnerIds.set(id, "Begleitung (Advisor)");
+    }
+  }
+
   const recipients: Recipient[] = [...partnerIds.entries()].map(([userId, label]) => ({
     userId,
     label,
@@ -176,6 +198,7 @@ export default async function ReportV21Page() {
             sections={sections}
             orphans={orphanedFollowUps(answers)}
             marked={marked}
+            canMark
           />
 
           {canCompareWith.length > 0 && (
