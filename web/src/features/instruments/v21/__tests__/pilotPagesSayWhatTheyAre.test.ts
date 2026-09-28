@@ -33,6 +33,16 @@ import { REGISTRY_V21 } from "@/features/instruments/v21/registryV21";
  */
 
 const PILOT = join("src", "app", "(product)", "founder-alignment", "pilot");
+/**
+ * Die zweite Stelle, die die Testfassung kennen darf - und die einzige.
+ *
+ * Eine Liste statt eines Musters: Wer eine dritte Stelle einbaut, muss sie
+ * hier eintragen und dabei kurz ueberlegen, ob sie dorthin gehoert. Genau das
+ * ist der Zweck.
+ */
+const ERLAUBT = [
+  join("src", "app", "(product)", "founder-alignment", "versionen") + sep,
+];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
 const INSTRUMENTS = join("src", "features", "instruments") + sep;
@@ -104,13 +114,25 @@ test("keine Pilotseite verwechselt v2 mit v2.1", () => {
   }
 });
 
-test("die Testfassung wird nur von den Pilotseiten erreicht", () => {
+test("die Wahlseite nennt beide Fassungen und empfiehlt keine", () => {
+  const page = readFileSync(
+    join("src", "app", "(product)", "founder-alignment", "versionen", "page.tsx"), "utf8");
+  assert.match(page, /CURRENT_INSTRUMENT_ID/);
+  assert.match(page, /ALIGNMENT_V21_INSTRUMENT_ID/);
+  // Sie erzwingt nichts: kein redirect ausser dem zum Login.
+  const redirects = page.match(/redirect\(/g) ?? [];
+  assert.equal(redirects.length, 1, "die Wahlseite leitet irgendwohin um");
+  assert.match(page, /login/);
+});
+
+test("die Testfassung wird nur von den Pilotseiten und der Wahlseite erreicht", () => {
   // Nicht mehr „nur unter debug“, aber weiterhin an einer Stelle: Ein Link aus
   // dem Dashboard ist in Ordnung, ein zweiter Fragebogen an anderer Stelle
   // nicht. Wer v2.1 einbindet, soll es bewusst tun.
   const outside: string[] = [];
   for (const file of sourceFiles(ROOT)) {
     if (file.startsWith(V21) || file.startsWith(PILOT)) continue;
+    if (ERLAUBT.some((prefix) => file.startsWith(prefix))) continue;
     if (file.startsWith(INSTRUMENTS) && !file.includes(sep + "v2")) continue;
     if (MENTIONS.test(readFileSync(file, "utf8"))) outside.push(file);
   }

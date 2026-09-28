@@ -4,6 +4,7 @@ import Link from "next/link";
 const PAGES = [
   { href: "/founder-alignment/pilot", label: "Fragebogen" },
   { href: "/founder-alignment/pilot/report", label: "Deine Antworten" },
+  { href: "/founder-alignment/versionen", label: "Beide Fassungen" },
 ];
 
 export function NavV21({ current }: { current: string }) {
