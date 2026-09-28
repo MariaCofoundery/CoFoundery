@@ -295,30 +295,87 @@ neben einem `main`, das sich weiterbewegt.
 |---|---|
 | 0 | erledigt, auf `main` (Migration `20261053120000`) |
 | 1a, 1b | erledigt, auf `main` — 107 Frageblöcke als Daten |
-| 2a–2c | erledigt — Ablage, Serverseite, Fragebogen |
-| 3a, 3b | erledigt — Auswertung Stufe 0, Vergleich, Klärungsbedarf, Agenda |
-| 4 | erledigt — zwölf Gesprächskarten nach dem Vierschritt aus Teil G |
-| 5 | erledigt — Einzelreport |
-| 6a, 6b | erledigt — Freigabe von Antworten, Vergleichsansicht |
-| 7 | erledigt — Advisor-Zugang mit zwei Schlüsseln |
-| 8 | erledigt — Umstieg und Archiv |
-| Discovery | erledigt — Themen statt Passungswert, alle Themen regelbar |
+| 2a–2c | gebaut **für v2** — Ablage, Serverseite, Fragebogen |
+| 3a, 3b | gebaut **für v2** — Auswertung Stufe 0, Vergleich, Klärungsbedarf, Agenda |
+| 4 | gebaut **für v2** — zwölf Gesprächskarten nach dem Vierschritt aus Teil G |
+| 5 | gebaut **für v2** — Einzelreport |
+| 6a, 6b | gebaut **für v2** — Freigabe von Antworten, Vergleichsansicht |
+| 7 | gebaut **für v2** — Advisor-Zugang mit zwei Schlüsseln |
+| 8 | gebaut **für v2** — Umstieg und Archiv |
+| Discovery | gebaut **für v2** — Themen statt Passungswert, alle Themen regelbar |
+| **v2.1** | **die Grundlage, auf die alles umgestellt werden muss — siehe unten** |
 | **9** | **offen — das eine Release** |
 
-Alles außer Schritt 9 liegt auf `feat/instrument-v2`: 26 Commits, davon 15
-Migrationen. Nichts davon ist produktiv sichtbar.
+„Gebaut für v2" heißt: Die Bauteile stehen und sind getestet, aber sie zeigen
+auf eine Fassung, die seit dem 28.09.2026 archiviert ist. Was davon auf v2.1
+übertragbar ist, steht in Abschnitt 6b. Die Schrittnummern bleiben, damit
+sichtbar bleibt, was schon einmal durchdacht wurde — es noch einmal von vorn
+zu nummerieren würde die Arbeit verstecken statt sie zu ordnen.
+
+Nichts davon ist produktiv sichtbar.
+
+---
+
+## 6b. Nachtrag vom 28.09.2026: v2 ist archiviert, v2.1 ist die Grundlage
+
+Eine fachliche Durchsicht kam zurück und hat Fehler gefunden, die stimmen.
+Zwei davon waren an einem einzigen Tag in v2 hineingekommen:
+
+- Die Antwortstufen „bei keiner · bei ein bis zwei · bei etwa der Hälfte · bei
+  den meisten · bei allen" sind **nicht erschöpfend**. Wo klickt jemand bei
+  drei oder vier von zehn? Und zehn *vorgestellte* Fälle sind keine Zählung,
+  sondern eine Scheingenauigkeit.
+- „Noch einmal genauer hinsehen, bevor du dich für die Zahlen entscheidest"
+  **unterstellt den Ausgang** und misst Nachprüfen statt Intuitionsgewicht.
+
+Vier Items entfallen (E03, U01, T06, D04 — womit sich die Fragen 1 und 2 aus
+„Was vor Schritt 9 noch zu entscheiden ist" von selbst erledigt haben), G02
+wird geteilt, und fünf messen etwas anderes als vorher. Das ist kein
+Umformulieren, sondern ein anderes Instrument — es bekommt deshalb eine eigene
+Kennung, statt dieselbe ID mit neuer Bedeutung weiterzuführen. Genau davor
+warnt die Durchsicht.
+
+v2 hat nie jemand ausgefüllt. Es ist **archiviert, nicht gelöscht**.
+
+| | Stand |
+|---|---|
+| Registratur v2.1 | 36 Items, 20 Abschnitte, 122 Optionen — aus dem geprüften Quelldokument erzeugt |
+| Wächtertests | jeder Fragetext, jede Option, jede Begründung wörtlich gegen die Quelle |
+| Antwortformate | vier neue: Mehrfachwahl mit Vorrang, Zeitfenster **mit Zeitzone**, wiederholte Freitexte, Anschlussfragen je Eintrag |
+| Datenbank | Migration `20261069120000` (Formate), `20261070120000` (v2.1 eingetragen, v2 archiviert) |
+| Verhaltensfragen | vier als **Vorschlag**, in eigener Datei, Status `proposal` |
+| Dokument | `docs/fragebogen-v2-1.md` / `.html`, erzeugt über `npm run export:questionnaire` |
+
+**Was v2.1 noch nicht hat:** keine Oberfläche, keine Route, keine Auswertung,
+keine Texte. Der gesamte Weg von Schritt 2 bis 8, der für v2 schon gegangen
+ist, muss auf v2.1 umgestellt werden. Das ist die eigentliche Arbeit vor
+Schritt 9 — und der Grund, warum Schritt 9 jetzt weiter weg ist als vorgestern.
+
+**Die vier Verhaltensfragen** (A91, U91, K91, T91) sind Marias Idee: neben dem
+Wunsch auch das Verhalten fragen, damit sich beides gegenprüfen lässt. Sie
+liegen absichtlich außerhalb der Registratur, damit der Wächtertest nicht
+anschlägt und niemand sie für fachlich geprüft hält. Der Vergleich ergibt
+**ein Gesprächsthema, nie ein Urteil über Gültigkeit** — wer sich etwas
+wünscht und zuletzt anders gehandelt hat, hat nicht falsch geantwortet.
+
+Sie gehören der Gutachterin vorgelegt, bevor etwas davon festgeschrieben wird.
+Genauso wie: `confidential_first` als eigener Auslassungsgrund statt als
+`withheld`.
+
+---
 
 ## Was vor Schritt 9 noch zu entscheiden ist
 
 **Inhaltlich, und nur von Maria zu entscheiden:**
 
-1. **Fünf Fragen mit Deckeneffekt** — E03, U01, K02, D04, I01. Bei jeder wird
-   fast jeder hoch antworten, damit unterscheiden sie niemanden. Jede braucht
-   einen benannten Preis, damit es etwas zu entscheiden gibt. Siehe
-   `docs/fragenformat-review.md`, Abschnitt 5, Schritt 2.
-2. **T03 und T06 zusammenlegen** zu einer Frage mit Zeitpunktoptionen. Dann
-   hätte die Präferenz T nur noch ein Item in der Gesprächsfassung — das ist
-   die eigentliche Entscheidung dahinter.
+1. ~~**Fünf Fragen mit Deckeneffekt**~~ — mit v2.1 erledigt: E03, U01, D04
+   sind entfallen, K02 und I01 sind umformuliert. Die Durchsicht hat übrigens
+   angemerkt, dass ich den Deckeneffekt als Tatsache hingeschrieben hatte, wo
+   er eine Vermutung war. Das stimmt.
+2. ~~**T03 und T06 zusammenlegen**~~ — mit v2.1 erledigt: T03 ist jetzt eine
+   Frage mit Zeitpunktoptionen, T06 ist entfallen.
+2b. **Die vier Verhaltensfragen** — der Gutachterin vorzulegen. Sie stehen in
+   `docs/fragebogen-v2-1.md` hinten unter einer eigenen Überschrift.
 3. **Werden die v2-Antworten je Forschungsdaten?** Wenn ja, gehört die
    Einwilligung an den Fragebogen, bevor zum ersten Mal jemand ausfüllt — nicht
    danach. Bauplan: `docs/forschungsdaten-architektur.md`.
@@ -326,7 +383,8 @@ Migrationen. Nichts davon ist produktiv sichtbar.
 **Vor der ersten echten Erhebung, nicht vor dem Release:**
 
 4. **Der Forschungspool trägt noch die alte Frageform.** Die 42 übrigen
-   Häufigkeitsfragen haben keine Bezugsmenge. Sie werden niemandem vorgelegt;
+   Häufigkeitsfragen haben keine Bezugsmenge — und seit v2.1 zusätzlich: sie
+   gehören zu einem Instrument, das archiviert ist. Sie werden niemandem vorgelegt;
    wer eine in die Gesprächsfassung holt, muss ihr vorher eine geben. Ein Test
    hält das fest.
 5. **Kognitive Interviews und Expertenreview** (Teil H). Nicht technisch.
