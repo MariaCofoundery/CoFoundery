@@ -43,6 +43,9 @@ import {
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
+import { TransitionAnnounce } from "@/features/instruments/v21/TransitionAnnounce";
+import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
+import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 type DashboardSearchParams = {
@@ -170,6 +173,10 @@ export default async function DashboardPage({
     const { data: hasConnect } = await supabase.rpc("is_network_member");
     redirect(hasConnect === true ? "/connect" : "/start");
   }
+  // Erst hier, nicht oben im grossen Promise.all: Wer kein Founder ist, wird
+  // vorher weitergeleitet und soll diese Abfragen nicht bezahlen.
+  const versionState = await getDashboardVersionState(user.id);
+
   let invitationRows = initialInvitationRows;
   let runsResult = initialRunsResult;
 
@@ -602,6 +609,23 @@ export default async function DashboardPage({
           </div>
         </details>
       </section>
+
+      {/*
+        DER HINWEIS AUF DIE NEUE FASSUNG.
+        Er erscheint nur fuer Menschen, die die bisherige Fassung kennen - wer
+        gerade erst anfaengt, soll keinen Hinweis auf eine Neufassung von etwas
+        bekommen, das er nie gesehen hat.
+      */}
+      {versionState.announce && <TransitionAnnounce />}
+
+      {versionState.show && (
+        <VersionArchiveCard
+          decision={versionState.decision}
+          previous={versionState.previous}
+          next={versionState.next}
+          connectionsNext={versionState.connectionsNext}
+        />
+      )}
 
       <section
         id="dashboard-block-explore"

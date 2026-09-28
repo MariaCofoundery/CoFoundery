@@ -42,6 +42,10 @@ const PILOT = join("src", "app", "(product)", "founder-alignment", "pilot");
  */
 const ERLAUBT = [
   join("src", "app", "(product)", "founder-alignment", "versionen") + sep,
+  // Das Dashboard: Hinweis auf die neue Fassung und der Archivkasten. Es
+  // FUEHRT dorthin, es enthaelt den Fragebogen nicht - ein eigener Test unten
+  // haelt das fest.
+  join("src", "app", "(product)", "dashboard") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
@@ -135,7 +139,29 @@ test("die Wahlseite nennt beide Fassungen und empfiehlt keine", () => {
   assert.match(page, /login/);
 });
 
-test("die Testfassung wird nur von den Pilotseiten und der Wahlseite erreicht", () => {
+test("das Dashboard fuehrt zur Testfassung, enthaelt sie aber nicht", () => {
+  // Der Unterschied ist wichtig: Ein Link ist in Ordnung, ein zweiter
+  // Fragebogen an anderer Stelle nicht. Sonst gaebe es zwei Wege, dieselbe
+  // Antwort zu geben, und beide wuerden auseinanderlaufen.
+  const page = readFileSync(
+    join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+  assert.match(page, /TransitionAnnounce/);
+  assert.match(page, /VersionArchiveCard/);
+  for (const verboten of ["QuestionnaireV21", "AnswerFieldV21", "saveAnswerV21", "ReportViewV21"]) {
+    assert.ok(!page.includes(verboten), `das Dashboard enthaelt ${verboten}`);
+  }
+});
+
+test("der Hinweis erscheint nicht fuer Menschen, die die alte Fassung nicht kennen", () => {
+  // Wer gerade erst anfaengt, soll keinen Hinweis auf eine Neufassung von
+  // etwas bekommen, das er nie gesehen hat - er soll einfach den aktuellen
+  // Fragebogen sehen.
+  const page = readFileSync(
+    join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+  assert.match(page, /versionState\.announce && <TransitionAnnounce/);
+});
+
+test("die Testfassung wird nur von den Pilotseiten, der Wahlseite und dem Dashboard erreicht", () => {
   // Nicht mehr „nur unter debug“, aber weiterhin an einer Stelle: Ein Link aus
   // dem Dashboard ist in Ordnung, ein zweiter Fragebogen an anderer Stelle
   // nicht. Wer v2.1 einbindet, soll es bewusst tun.
