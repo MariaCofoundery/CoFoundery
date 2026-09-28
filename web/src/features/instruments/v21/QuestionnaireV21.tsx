@@ -8,9 +8,15 @@ import {
   saveAnswerV21,
   submitV21,
 } from "@/features/instruments/v21/answerActionsV21";
-import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
+import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 
-type SaveState = "idle" | "saving" | "saved" | "error";
+/**
+ * `incomplete` ist KEIN Fehler.
+ *
+ * Eine halbe Eingabe ist eine halbe Eingabe. Sie wird nicht gespeichert, sie
+ * ueberschreibt nichts, und sie wird nicht rot angemeckert.
+ */
+type SaveState = "idle" | "saving" | "saved" | "incomplete" | "error";
 
 type Props = {
   sections: SectionView[];
@@ -68,24 +74,47 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
 
   const answered = visible.filter((item) => {
     const draft = answers[item.itemId];
-    return Boolean(draft?.missingCode) || hasContent(draft?.value);
+    return (
+      Boolean(draft?.missingCode) ||
+      completenessV21(item.itemId, draft?.value) === "complete"
+    );
   }).length;
 
   const persist = useCallback((itemId: string, draft: DraftV21) => {
     clearTimeout(timers.current[itemId]);
+
+    const stand =
+      draft.missingCode !== undefined ? "complete" : completenessV21(itemId, draft.value);
+
+    // MITTENDRIN HEISST: NICHTS TUN. Nicht speichern, nicht meckern, und vor
+    // allem nicht ueberschreiben, was schon gespeichert ist.
+    if (stand === "incomplete") {
+      setStates((current) => ({ ...current, [itemId]: "incomplete" }));
+      return;
+    }
+
     timers.current[itemId] = setTimeout(async () => {
       setStates((current) => ({ ...current, [itemId]: "saving" }));
+      try {
+        const result =
+          stand === "empty"
+            ? await clearAnswerV21(itemId)
+            : await saveAnswerV21({
+                blockId: itemId,
+                ...(draft.missingCode
+                  ? { missingCode: draft.missingCode }
+                  : { value: draft.value }),
+              } as AlignmentAnswerV21);
 
-      const empty = draft.missingCode === undefined && !hasContent(draft.value);
-      const result = empty
-        ? await clearAnswerV21(itemId)
-        : await saveAnswerV21({
-            blockId: itemId,
-            ...(draft.missingCode ? { missingCode: draft.missingCode } : { value: draft.value }),
-          } as AlignmentAnswerV21);
-
-      setStates((current) => ({ ...current, [itemId]: result.ok ? "saved" : "error" }));
-      setErrors((current) => ({ ...current, [itemId]: result.ok ? "" : result.reason }));
+        setStates((current) => ({ ...current, [itemId]: result.ok ? "saved" : "error" }));
+        setErrors((current) => ({ ...current, [itemId]: result.ok ? "" : result.reason }));
+      } catch {
+        // Wirft die Serveraktion - etwa weil kein Fragebogen angelegt werden
+        // konnte -, blieb die Anzeige vorher fuer immer auf "wird
+        // gespeichert". Das sieht aus wie Speichern und ist keines.
+        setStates((current) => ({ ...current, [itemId]: "error" }));
+        setErrors((current) => ({ ...current, [itemId]: "unreachable" }));
+      }
     }, 600);
   }, []);
 
@@ -166,6 +195,11 @@ export function QuestionnaireV21({ sections, initialAnswers, submitted }: Props)
                   <div className="mt-3 flex items-center gap-3 text-xs">
                     {state === "saving" && <span className="text-slate-500">wird gespeichert…</span>}
                     {state === "saved" && <span className="text-slate-500">gespeichert</span>}
+                    {/* Grau und ohne Ausrufezeichen: Das ist eine Auskunft
+                        ueber den Stand, kein Vorwurf. */}
+                    {state === "incomplete" && (
+                      <span className="text-slate-400">noch nicht vollständig</span>
+                    )}
                     {state === "error" && (
                       <span className="text-rose-700">{errorText(errors[item.itemId])}</span>
                     )}
@@ -237,6 +271,8 @@ function errorText(reason?: string): string {
       return "Nenne zuerst eine Grenze weiter oben.";
     case "incomplete_value_case":
       return "Bitte beide Anliegen bewerten und einen Weg wählen.";
+    case "unreachable":
+      return "Keine Verbindung — deine Eingabe steht noch da, ist aber nicht gespeichert.";
     case "priority_not_chosen":
       return "Der Vorrang muss unter den gewählten Antworten sein.";
     default:
@@ -244,14 +280,3 @@ function errorText(reason?: string): string {
   }
 }
 
-/** Ein angefangenes, aber leeres Feld ist noch keine Antwort. */
-function hasContent(value: Record<string, unknown> | undefined): boolean {
-  if (!value) return false;
-  return Object.values(value).some((entry) => {
-    if (entry === undefined || entry === null) return false;
-    if (typeof entry === "string") return entry.trim() !== "";
-    if (Array.isArray(entry)) return entry.length > 0;
-    if (typeof entry === "object") return Object.keys(entry).length > 0;
-    return true;
-  });
-}

@@ -322,3 +322,136 @@ function requiredTextPresent(
   }
   return OK;
 }
+
+/**
+ * Ist diese Eingabe schon eine Antwort?
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS NICHT DIESELBE FRAGE IST WIE „IST SIE GÜLTIG“
+ * ---------------------------------------------------------------------------
+ *
+ * Maria am 28.09.2026: „Beim Lokalen ging das auch nicht so richtig mit dem
+ * Speichern.“ Der Grund war nicht die Datenbank, sondern dieser Unterschied.
+ *
+ * Der Autospeicher feuert 600 Millisekunden nach der ersten Eingabe - also
+ * mitten hinein. Wer „eine andere Absicherung - bitte beschreiben“ ankreuzt,
+ * bekam rot „Bitte beschreibe kurz, was du meinst“, bevor er tippen konnte.
+ * Wer beim Wertefall das erste Anliegen bewertete, bekam „bitte beide
+ * bewerten“. Wer ein Zeitfenster anfing, bekam „Tag, Uhrzeit und Zeitzone
+ * angeben“, während der Cursor noch im Feld stand.
+ *
+ * Das ist alles technisch richtig und als Auskunft falsch: Eine halbe Eingabe
+ * ist kein Fehler, sondern eine halbe Eingabe.
+ *
+ * Deshalb drei Zustände statt zwei:
+ *
+ *   `empty`      - nichts drin. Eine bestehende Antwort wird zurückgenommen.
+ *   `incomplete` - jemand ist mittendrin. NICHTS passiert: nicht speichern,
+ *                  nicht meckern, und vor allem nicht das überschreiben, was
+ *                  schon gespeichert ist.
+ *   `complete`   - jetzt ist es eine Antwort. Jetzt wird gespeichert.
+ *
+ * Erst nach `complete` läuft `validateAnswerV21`. Was dort noch scheitert, ist
+ * dann wirklich ein Fehler und darf auch so aussehen.
+ */
+export type Completeness = "empty" | "incomplete" | "complete";
+
+export function completenessV21(
+  itemId: string,
+  value: Record<string, unknown> | undefined,
+): Completeness {
+  const item = getItemV21(itemId);
+  if (!item || !value) return "empty";
+
+  const filled = (entry: unknown): boolean => {
+    if (entry === undefined || entry === null) return false;
+    if (typeof entry === "string") return entry.trim() !== "";
+    if (Array.isArray(entry)) return entry.length > 0;
+    if (typeof entry === "object") return Object.keys(entry).length > 0;
+    return true;
+  };
+  const nothing = !Object.values(value).some(filled);
+
+  switch (item.answerFormat) {
+    case "ordinal_choice":
+    case "single_choice": {
+      const optionId = value.optionId as string | undefined;
+      if (!optionId) return "empty";
+      const option = item.options.find((entry) => entry.optionId === optionId);
+      // Angekreuzt, aber der verlangte Text fehlt noch: mittendrin.
+      if (option?.requiresText && !String(value.text ?? "").trim()) return "incomplete";
+      return "complete";
+    }
+
+    case "multi_choice":
+    case "multi_choice_priority": {
+      const ids = (value.optionIds as string[] | undefined) ?? [];
+      if (ids.length === 0) return "empty";
+      const texts = (value.texts as Record<string, string> | undefined) ?? {};
+      for (const id of ids) {
+        const option = item.options.find((entry) => entry.optionId === id);
+        if (option?.requiresText && !String(texts[id] ?? "").trim()) return "incomplete";
+      }
+      return "complete";
+    }
+
+    case "value_case": {
+      if (nothing) return "empty";
+      // Beide Wichtigkeiten UND ein Weg. Wer eins davon hat, ist mittendrin.
+      const ready =
+        typeof value.importanceA === "number" &&
+        typeof value.importanceB === "number" &&
+        typeof value.path === "string";
+      return ready ? "complete" : "incomplete";
+    }
+
+    case "money_range": {
+      if (value.amount === undefined || value.amount === null || value.amount === "") return "empty";
+      return String(value.currency ?? "").trim() ? "complete" : "incomplete";
+    }
+
+    case "number_range": {
+      // 0 ist eine mögliche Antwort - das sagt der Hinweis am Item selbst.
+      if (typeof value.number !== "number") return "empty";
+      return String(value.unit ?? "").trim() ? "complete" : "incomplete";
+    }
+
+    case "person_number_range": {
+      const rows = (value.perPerson as { person?: string }[] | undefined) ?? [];
+      if (rows.length === 0 || rows.every((row) => !String(row.person ?? "").trim())) return "empty";
+      // Eine Zeile ohne Namen ist eine angefangene Zeile, kein Fehler.
+      return rows.every((row) => String(row.person ?? "").trim()) ? "complete" : "incomplete";
+    }
+
+    case "time_windows": {
+      const windows = (value.windows as Record<string, unknown>[] | undefined) ?? [];
+      const started = windows.filter((window) =>
+        ["day", "from", "to"].some((key) => String(window[key] ?? "").trim()));
+      if (started.length === 0) return "empty";
+      const done = windows.every((window) =>
+        ["day", "from", "to", "timezone"].every((key) => String(window[key] ?? "").trim()));
+      return done ? "complete" : "incomplete";
+    }
+
+    case "date":
+      return String(value.date ?? "").trim() ? "complete" : "empty";
+
+    case "structured_text":
+      return String(value.text ?? "").trim() ? "complete" : "empty";
+
+    case "free_text_repeatable": {
+      const entries = (value.entries as { text?: string }[] | undefined) ?? [];
+      const written = entries.filter((entry) => String(entry.text ?? "").trim());
+      if (written.length === 0) return "empty";
+      // Eine frisch angelegte leere Zeile neben geschriebenen: mittendrin.
+      return written.length === entries.length ? "complete" : "incomplete";
+    }
+
+    case "free_text_per_entry": {
+      const perEntry = (value.perEntry as Record<string, string> | undefined) ?? {};
+      const written = Object.values(perEntry).filter((text) => String(text ?? "").trim());
+      if (written.length === 0) return "empty";
+      return "complete";
+    }
+  }
+}
