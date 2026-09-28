@@ -82,6 +82,7 @@ export default function DatenschutzPage() {
                 "Account- und Login-Daten, vor allem deine E-Mail-Adresse",
                 "Profildaten, z. B. Name, Rolle, Fokus, Intention und optional Avatar",
                 "Antworten auf strukturierte Fragebögen",
+                "beim Ausfüllen: wann eine Frage angezeigt und wann sie beantwortet wurde, und wie oft eine Antwort geändert wurde",
                 "daraus abgeleitete Scores, Dimensionen und Reports",
                 "gemeinsame Daten mit einem Co-Founder, z. B. Matching-Report und Workbook",
                 "Einladungsdaten, z. B. die E-Mail-Adresse einer eingeladenen Person",
@@ -89,6 +90,38 @@ export default function DatenschutzPage() {
                 "technische Nutzungs- und Analyseereignisse",
               ]}
             />
+          </BulletSection>
+
+          {/*
+            NEU AM 28.09.2026, UND ES GEHOERT AUSDRUECKLICH HIERHIN.
+            Die Testfassung des Fragebogens zeichnet auf, wie lange jemand bei
+            einer Frage gebraucht hat. Das ist personenbezogen - bei zwoelf
+            Teilnehmenden ist jede Zeile zuordenbar. Eine Erklaerung, die das
+            unter "technische Nutzungsereignisse" verschwinden laesst, waere
+            nicht falsch, aber unehrlich: Sie wuerde das Wesentliche nicht
+            nennen.
+          */}
+          <BulletSection number="2b" title="Verbesserung des Fragebogens">
+            <p>
+              Wir arbeiten an einer überarbeiteten Fassung unseres Fragebogens. Um zu
+              prüfen, ob die Fragen verständlich sind, zeichnen wir beim Ausfüllen
+              dieser Testfassung zusätzlich auf, wann eine Frage angezeigt und wann sie
+              beantwortet wurde und wie oft eine Antwort noch geändert wurde.
+            </p>
+            <p className="mt-3">
+              Daraus lesen wir ab, welche Fragen lange dauern, welche oft ausgelassen
+              werden und an welcher Stelle Menschen abbrechen. Das sagt nichts über die
+              Person aus — lange gebraucht heißt nicht unentschlossen, oft geändert
+              heißt nicht unsicher.
+            </p>
+            <p className="mt-3">
+              Diese Aufzeichnung gehört zu deinem Fragebogen und wird mit ihm gelöscht.
+              Sie wird niemandem sonst gezeigt — auch nicht den Personen, denen du deine
+              Antworten freigegeben hast. Rechtsgrundlage ist unser berechtigtes
+              Interesse an einem verständlichen Produkt (Art. 6 Abs. 1 lit. f DSGVO);
+              sie ist von einer Einwilligung in die Nutzung deiner Daten für Forschung
+              getrennt und ersetzt sie nicht.
+            </p>
           </BulletSection>
 
           <BulletSection number="3" title="Zweck der Verarbeitung">
@@ -334,6 +367,7 @@ export default function DatenschutzPage() {
             <List
               items={[
                 "Account-, Profil-, Fragebogen-, Report- und Workbook-Daten speichern wir grundsätzlich so lange, wie sie für die Nutzung des Produkts erforderlich sind oder bis eine Löschung erfolgt.",
+                "Die Aufzeichnung des Ausfüllverlaufs (Abschnitt 2b) hängt am jeweiligen Fragebogen und wird zusammen mit ihm gelöscht.",
                 "Bei Event-Checks werden Event-Antworten und das Event-Kurzprofil nur temporär verarbeitet und 24 Stunden nach Ende des jeweiligen Events gelöscht.",
                 "Produktanalyse- und pseudonymisierte Research-Rohdaten werden aktuell standardmäßig nach 30 Tagen bereinigt; technisch sind 1 bis 60 Tage konfigurierbar.",
                 "Zusammengefasste Statistikdaten können länger aufbewahrt werden; eine eigene automatische Löschfrist für Aggregate besteht derzeit nicht.",
