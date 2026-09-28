@@ -110,7 +110,7 @@ test("die fünf ordinalen Stufen sind als ordinal gekennzeichnet, nicht als beli
 });
 
 test("die zehn vorgestellten Fälle kommen in keinem Fragetext mehr vor", () => {
-  // Der Fehler, den die Durchsicht gefunden hat: „bei wie vielen von zehn"
+  // Der Fehler, den die Durchsicht gefunden hat: „bei wie vielen von zehn“
   // klingt nach Zählung, ist aber geraten - und die Stufen ließen drei oder
   // vier von zehn ohne Feld. Beides ist in v2.1 ersetzt.
   for (const item of getItemsV21()) {
@@ -135,9 +135,9 @@ test("jedes Item bietet mindestens einen ehrlichen Ausweg", () => {
 });
 
 test("derselbe Auslassungsgrund trägt je nach Frage einen anderen Satz", () => {
-  // Das ist Absicht und muss es bleiben: „habe ich noch nicht entschieden"
-  // (eigener Plan, G01), „kann ich noch nicht entscheiden" (erfundener Fall)
-  // und „dazu habe ich noch keine konkrete Angabe" (eigene Grenze) sind
+  // Das ist Absicht und muss es bleiben: „habe ich noch nicht entschieden“
+  // (eigener Plan, G01), „kann ich noch nicht entscheiden“ (erfundener Fall)
+  // und „dazu habe ich noch keine konkrete Angabe“ (eigene Grenze) sind
   // derselbe Code undecided und drei verschiedene Sätze. Eine Beschriftung je
   // Code hätte zwei davon falsch gemacht - deshalb hängt sie am Item.
   const labels = new Set(

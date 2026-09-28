@@ -16,7 +16,7 @@ import registryJson from "../../../../docs/founder-alignment-registry-v2-1.json"
  *   drei oder vier von zehn? Und zehn VORGESTELLTE Fälle sind keine Zählung,
  *   sondern eine Scheingenauigkeit.
  *
- *   „Noch einmal genauer hinsehen, bevor du dich für die Zahlen entscheidest"
+ *   „Noch einmal genauer hinsehen, bevor du dich für die Zahlen entscheidest“
  *   unterstellt den Ausgang und misst Nachprüfen statt Intuitionsgewicht.
  *
  * Fünf Items entfallen oder ändern ihre Bedeutung (E03, U01, T06, D04 fallen
@@ -47,7 +47,7 @@ export type MissingCode =
 /**
  * Die Beschriftung steht AM ITEM, nicht am Code.
  *
- * „Habe ich noch nicht entschieden" (eigener Plan), „kann ich noch nicht
+ * „Habe ich noch nicht entschieden“ (eigener Plan), „kann ich noch nicht
  * entscheiden" (erfundener Fall) und „dazu habe ich noch keine konkrete
  * Angabe" (eigene Grenze) sind derselbe Code und drei verschiedene Sätze. Eine
  * Beschriftung je Code hätte zwei davon falsch gemacht.
@@ -58,7 +58,7 @@ export type ItemOption = {
   optionId: string;
   label: string;
   requiresText: boolean;
-  /** Schließt alle anderen aus - „keine zusätzliche Absicherung". */
+  /** Schließt alle anderen aus - „keine zusätzliche Absicherung“. */
   exclusive: boolean;
 };
 
