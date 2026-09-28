@@ -1,0 +1,258 @@
+{
+  "instrumentId": "founder-alignment-v2",
+  "createdAt": "2026-09-27",
+  "source": "docs/CoFoundery_Wissenschaftliche_Neukonzeption.md (v0.2), Teil G",
+  "note": "DER VIERSCHRITT AUS TEIL G: beobachtete Antwort -> moegliche Bedeutung -> konkrete Klaerungsfrage -> ueberpruefbare Vereinbarung. Jede Karte hat alle vier Teile, und die Reihenfolge ist nicht beliebig: Wer mit der Bedeutung anfaengt, hat schon interpretiert, bevor jemand die Antwort gesehen hat.",
+  "forbidden": [
+    "analytischer",
+    "konfliktfaehiger",
+    "konfliktfähiger",
+    "engagierter",
+    "Konfliktrisiko",
+    "kompatibel",
+    "Kompatibilitaet",
+    "Kompatibilität",
+    "meint es nicht ernst",
+    "nicht zusammen zu gruenden",
+    "nicht zusammen zu gründen",
+    "Matchscore",
+    "Passungswert",
+    "Risikoprofil",
+    "ungeeignet",
+    "Warnung"
+  ],
+  "hedges": [
+    "koennte",
+    "könnte",
+    "moeglicherweise",
+    "möglicherweise",
+    "vielleicht",
+    "kann",
+    "können",
+    "koennen",
+    "scheint",
+    "noch keine",
+    "nicht",
+    "heisst nicht",
+    "heißt nicht"
+  ],
+  "cards": [
+    {
+      "id": "time_and_expectations",
+      "meaningKind": "about_method",
+      "trigger": {
+        "kind": "expectation_gap"
+      },
+      "observed": "{a} sagt für die kommenden zwölf Wochen {offer} zu. {b} erwartet für {a} mindestens {expected}. Für die derzeit geplante Rolle überlappen diese Angaben nicht.",
+      "meaning": "Das beschreibt eure Angaben, nicht eure Einsatzbereitschaft. Eine Vereinbarung kann die Erwartung ändern.",
+      "question": "Welche Aufgaben, Ziele oder Erwartungen möchtet ihr anpassen?",
+      "agreement": [
+        "Rolle",
+        "konkrete Zusage",
+        "gemeinsamer Prüftermin"
+      ],
+      "sourceQuote": "Welche Aufgaben, Ziele oder Erwartungen möchtet ihr anpassen?",
+      "source": "Teil G, Beispiel „Zeit und Erwartungen“"
+    },
+    {
+      "id": "autonomy_and_information",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "blocks_differ",
+        "blockIds": [
+          "U01",
+          "K01"
+        ]
+      },
+      "observed": "{a} möchte im eigenen Bereich selbst entscheiden. {b} möchte frühe Zwischenstände sehen.",
+      "meaning": "Diese Wünsche können zusammenpassen.",
+      "question": "Klärt, welche Mitteilungen nur informieren und wann tatsächlich Zustimmung nötig ist.",
+      "agreement": [
+        "Update-Rhythmus",
+        "Freigabegrenzen",
+        "wann erneut prüfen"
+      ],
+      "sourceQuote": "Diese Wünsche können zusammenpassen.",
+      "source": "Teil G, Beispiel „Autonomie und Information“"
+    },
+    {
+      "id": "analysis_and_intuition",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "blocks_differ",
+        "blockIds": [
+          "A02",
+          "I03"
+        ]
+      },
+      "observed": "Ihr beide möchtet Daten prüfen. {a} möchte zusätzlich häufig einem unguten Gefühl nachgehen.",
+      "meaning": "Das widerspricht eurer gemeinsamen Datenorientierung nicht.",
+      "question": "Wie soll ein solcher Einwand in die Entscheidung einfließen?",
+      "agreement": [
+        "das Gefühl als Hypothese benennen",
+        "welche Information es prüfen könnte"
+      ],
+      "sourceQuote": "Das widerspricht eurer gemeinsamen Datenorientierung nicht.",
+      "source": "Teil G, Beispiel „Analyse und Intuition gleichzeitig“"
+    },
+    {
+      "id": "decision_basis",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "block_differs",
+        "blockId": "A02"
+      },
+      "observed": "Bei der Frage nach dem Prüfen einer zentralen Annahme hat {a} „{answerA}“ und {b} „{answerB}“ gewählt.",
+      "meaning": "Ihr möchtet möglicherweise unterschiedlich viel Vorprüfung.",
+      "question": "Klärt an eurer nächsten größeren Entscheidung, welche Information vorliegen muss und was ihr mit einem begrenzten Versuch herausfinden könnt.",
+      "agreement": [
+        "Prüfpunkt",
+        "Testbudget",
+        "entscheidende Person",
+        "Datum der Überprüfung"
+      ],
+      "sourceQuote": "Ihr möchtet möglicherweise unterschiedlich viel Vorprüfung.",
+      "source": "Teil G, Beispiel „Entscheidungsgrundlage“"
+    },
+    {
+      "id": "conflict_pause",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "blocks_differ",
+        "blockIds": [
+          "T03",
+          "G02"
+        ]
+      },
+      "observed": "{a} möchte einen Widerspruch am selben Tag benennen. {b} möchte das Gespräch nach einer Pause fortsetzen.",
+      "meaning": "Beides kann zusammengehen: ein kurzes Signal sofort, die ausführliche Klärung später.",
+      "question": "Klärt, ob das erste Signal sofort und die ausführliche Klärung zu einem festen Termin stattfinden kann.",
+      "agreement": [
+        "kurze Formulierung zum Ankündigen",
+        "spätestens vereinbarter Rückkehrtermin"
+      ],
+      "sourceQuote": "Klärt, ob das erste Signal sofort und die ausführliche Klärung zu einem festen Termin stattfinden kann.",
+      "source": "Teil G, Beispiel „Konfliktpause“"
+    },
+    {
+      "id": "open_goal",
+      "meaningKind": "conditional",
+      "trigger": {
+        "kind": "block_differs",
+        "blockId": "S02"
+      },
+      "observed": "{a} hat „{answerA}“ gewählt, {b} „{answerB}“.",
+      "meaning": "Das sind unterschiedliche Pläne, deren Vereinbarkeit vom Zeithorizont und den Bedingungen abhängt.",
+      "question": "Welche Ereignisse würden einen Verkauf für euch gemeinsam akzeptabel machen?",
+      "agreement": [
+        "Zeithorizont",
+        "Entscheidungsrecht",
+        "individuelle Ausstiegsoptionen"
+      ],
+      "sourceQuote": "Welche Ereignisse würden einen Verkauf für euch gemeinsam akzeptabel machen?",
+      "source": "Teil G, Beispiel „Offene Zielvereinbarung“"
+    },
+    {
+      "id": "value_case_differs",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "value_case_differs"
+      },
+      "observed": "Im beschriebenen Fall würde {a} „{answerA}“ wählen, {b} „{answerB}“. Beiden von euch sind die genannten Anliegen wichtig.",
+      "meaning": "Unterschiedliche Wahl bei beidseitig hoher Wichtigkeit kann ein gemeinsam anerkanntes Dilemma zeigen.",
+      "question": "Klärt, welche Unsicherheit ihr als vorläufig kennzeichnet und wann das nächste Update kommt.",
+      "agreement": [
+        "Empfängerkreis",
+        "Kennzeichnung",
+        "Datum"
+      ],
+      "sourceQuote": "Klärt, welche Unsicherheit ihr als vorläufig kennzeichnet und wann das nächste Update kommt.",
+      "source": "Teil G, Beispiel „Wertewahl“"
+    },
+    {
+      "id": "same_choice",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "same_choice"
+      },
+      "observed": "Ihr bevorzugt in diesem Fall denselben ersten Schritt.",
+      "meaning": "Gleiche Wahl bei verschiedenen Begründungen ist noch keine gleiche Werthaltung.",
+      "question": "Klärt, ob eure Gründe und Grenzen ebenfalls übereinstimmen.",
+      "agreement": [
+        "was ihr jeweils voraussetzt",
+        "wo eure Grenzen liegen"
+      ],
+      "sourceQuote": "Klärt, ob eure Gründe und Grenzen ebenfalls übereinstimmen.",
+      "source": "Teil G, Tabelle „Gemeinsame Wahl“"
+    },
+    {
+      "id": "not_comparable",
+      "meaningKind": "about_method",
+      "trigger": {
+        "kind": "not_comparable"
+      },
+      "observed": "Zu dieser Frage liegen nicht genügend geteilte Angaben für einen Vergleich vor.",
+      "meaning": "Daraus leiten wir keine Bewertung ab.",
+      "question": "Wenn es für euren nächsten Schritt nötig ist, könnt ihr den erforderlichen Rahmen gemeinsam besprechen.",
+      "agreement": [
+        "was ihr davon für den nächsten Schritt wirklich braucht"
+      ],
+      "sourceQuote": "Daraus leiten wir keine Bewertung ab.",
+      "source": "Teil G, Beispiel „Wenig Informationen“"
+    },
+    {
+      "id": "solo",
+      "meaningKind": "fact",
+      "trigger": {
+        "kind": "solo"
+      },
+      "observed": "Du hast beschrieben, welchen Entscheidungsspielraum du dir wünschst und welche Zeit du anbieten kannst.",
+      "meaning": "Es liegt noch kein Vergleich mit einer anderen Person vor.",
+      "question": "Nutze diese Punkte, um konkrete Erwartungen im Kennenlerngespräch zu klären.",
+      "agreement": [
+        "was du zusagen kannst",
+        "was du von anderen brauchst"
+      ],
+      "sourceQuote": "Es liegt noch kein Vergleich mit einer anderen Person vor.",
+      "source": "Teil G, Beispiel „Noch kein Team“"
+    },
+    {
+      "id": "same_summary_different_item",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "marked_but_same"
+      },
+      "observed": "Ihr habt diese Frage gleich beantwortet, und {markedBy} möchte trotzdem darüber sprechen.",
+      "meaning": "Eine gleiche Antwort heißt nicht, dass ihr dasselbe meint.",
+      "question": "Erzählt euch, woran ihr bei dieser Frage jeweils gedacht habt.",
+      "agreement": [
+        "was ihr beide darunter versteht"
+      ],
+      "sourceQuote": "Dieses Thema bleibt deshalb sichtbar.",
+      "source": "Teil G, Beispiel „Gleicher Durchschnitt, andere Einzelfrage“"
+    },
+    {
+      "id": "generic_difference",
+      "meaningKind": "hypothesis",
+      "trigger": {
+        "kind": "fallback_different"
+      },
+      "observed": "{a} hat „{answerA}“ gewählt, {b} „{answerB}“.",
+      "meaning": "Das könnte unterschiedliche Erwartungen ausdrücken; prüft euer Verständnis.",
+      "question": "Erzählt euch, woran ihr bei dieser Frage jeweils gedacht habt.",
+      "agreement": [
+        "was künftig gilt",
+        "wer entscheidet oder informiert",
+        "wann erneut prüfen"
+      ],
+      "sourceQuote": "Das könnte unterschiedliche Erwartungen ausdrücken; prüft euer Verständnis.",
+      "source": "Teil G, Tabelle „Einzelantwort“"
+    }
+  ],
+  "meaningKinds": {
+    "hypothesis": "Eine Vermutung ueber die Menschen. MUSS als Moeglichkeit formuliert sein - Teil G: 'Hypothesen nie als Tatsachen ueber die Person formulieren.'",
+    "about_method": "Eine Aussage darueber, was WIR tun oder nicht tun ('daraus leiten wir keine Bewertung ab'). Sie darf und soll bestimmt sein - eine abgeschwaechte Selbstbeschraenkung waere keine.",
+    "fact": "Eine schlichte Tatsache ueber die Datenlage ('es liegt noch kein Vergleich vor'). Auch sie braucht kein 'vielleicht'.",
+    "conditional": "Eine Aussage, die ihre Geltung ausdruecklich an Bedingungen knuepft ('deren Vereinbarkeit vom Zeithorizont und den Bedingungen abhaengt'). Die Bedingtheit IST die Abschwaechung - ein zusaetzliches 'vielleicht' wuerde den Satz nur unscharf machen, ohne ihn vorsichtiger zu machen."
+  }
+}
