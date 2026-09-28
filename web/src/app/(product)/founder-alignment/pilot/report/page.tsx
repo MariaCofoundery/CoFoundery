@@ -114,6 +114,35 @@ export default async function ReportV21Page() {
     sharedAt: (shares ?? []).find((row) => row.recipient_user_id === userId)?.created_at ?? null,
   }));
 
+  // ---------------------------------------------------------------------------
+  // Wer MIR etwas freigegeben hat
+  // ---------------------------------------------------------------------------
+  //
+  // Ohne diese Liste ist die Vergleichsseite nicht auffindbar - sie braucht
+  // eine Kennung in der Adresse, und die tippt niemand ab. Gelesen wird ueber
+  // dieselben Policies wie ueberall: Wer mir nichts freigegeben hat, taucht
+  // hier nicht auf, weil die Zeile fuer mich nicht existiert.
+  const { data: sharedWithMe } = await supabase
+    .from("alignment_shares")
+    .select("assessment_id")
+    .eq("recipient_user_id", auth.user.id)
+    .is("revoked_at", null);
+
+  const { data: theirAssessments } = (sharedWithMe ?? []).length
+    ? await supabase
+        .from("assessments")
+        .select("id, user_id")
+        .in("id", (sharedWithMe ?? []).map((row) => row.assessment_id))
+        .eq("instrument_id", ALIGNMENT_V21_INSTRUMENT_ID)
+    : { data: [] };
+
+  const canCompareWith = (theirAssessments ?? [])
+    .map((row) => ({
+      userId: row.user_id as string,
+      label: partnerIds.get(row.user_id as string) ?? "Mitgründer:in",
+    }))
+    .filter((entry) => entry.userId !== auth.user.id);
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <NavV21 current="/founder-alignment/pilot/report" />
@@ -148,6 +177,27 @@ export default async function ReportV21Page() {
             orphans={orphanedFollowUps(answers)}
             marked={marked}
           />
+
+          {canCompareWith.length > 0 && (
+            <div className="mt-10 rounded-xl border border-slate-200 bg-white p-5">
+              <h2 className="text-base font-semibold text-slate-900">Nebeneinander ansehen</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Diese Menschen haben dir ihre Antworten freigegeben.
+              </p>
+              <ul className="mt-3 space-y-1">
+                {canCompareWith.map((entry) => (
+                  <li key={entry.userId}>
+                    <Link
+                      href={`/founder-alignment/pilot/compare/${entry.userId}`}
+                      className="text-sm text-slate-900 underline"
+                    >
+                      mit {entry.label} vergleichen
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* UNTER den Antworten, nicht darueber: Wer bis hierher scrollt,
               hat gesehen, was er teilt. */}
