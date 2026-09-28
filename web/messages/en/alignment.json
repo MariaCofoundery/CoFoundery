@@ -69,5 +69,19 @@
     "limitsTitle": "What these answers cannot do",
     "marked": "You marked this for discussion.",
     "instrument": "Version: {instrument}"
+  },
+  "compare": {
+    "title": "The two of you",
+    "intro": "Side by side, not calculated against each other. There is no fit score and no rating here.",
+    "cardsTitle": "What you should talk about",
+    "cardsIntro": "At most four topics per conversation. Everything else is below for reference.",
+    "nothingYet": "Nothing to discuss yet — or answers are still missing.",
+    "agreementTitle": "An agreement consists of",
+    "agreementHint": "You set the amounts and deadlines, not the questionnaire.",
+    "allTitle": "All answers",
+    "question": "Question",
+    "marked": "Marked for discussion.",
+    "notShared": "not shared",
+    "noAnswerYet": "not answered yet"
   }
 }

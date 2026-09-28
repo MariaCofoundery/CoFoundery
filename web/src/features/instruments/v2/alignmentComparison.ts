@@ -44,8 +44,22 @@ export type BlockComparison = {
    * Modul.
    */
   state: "same" | "different" | "not_comparable";
-  /** Warum nicht vergleichbar - damit „fehlt“ nicht wie „passt nicht“ aussieht. */
-  reason?: "missing_a" | "missing_b" | "missing_both" | "no_answer";
+  /**
+   * Warum nicht vergleichbar - damit „fehlt“ nicht wie „passt nicht“ aussieht.
+   *
+   * DREI VERSCHIEDENE DINGE, und das Gutachten besteht auf der Unterscheidung:
+   * `not_shared` heisst, jemand hat geantwortet und die Antwort bewusst nicht
+   * freigegeben. `missing` heisst, er hat einen Auslassungsgrund angegeben.
+   * `no_answer` heisst, die Frage ist noch nicht dran gewesen.
+   *
+   * Teil F7: „Nicht teilbare Felder sind im Teamreport ‚nicht geteilt‘, nicht
+   * ‚fehlendes Commitment‘." Wer die drei zusammenwirft, macht aus einer
+   * Entscheidung ein Versaeumnis.
+   */
+  reason?:
+    | "missing_a" | "missing_b" | "missing_both"
+    | "not_shared_a" | "not_shared_b" | "not_shared_both"
+    | "no_answer";
   markedBy: Side[];
 };
 
@@ -93,11 +107,16 @@ export function compareBlocks(
   a: readonly ReadoutEntry[],
   b: readonly ReadoutEntry[],
   markedA: readonly string[] = [],
-  markedB: readonly string[] = []
+  markedB: readonly string[] = [],
+  /** Bloecke, die die jeweilige Person ausdruecklich nicht freigegeben hat. */
+  notSharedA: readonly string[] = [],
+  notSharedB: readonly string[] = []
 ): BlockComparison[] {
   const byIdA = new Map(a.map((entry) => [entry.blockId, entry]));
   const byIdB = new Map(b.map((entry) => [entry.blockId, entry]));
-  const blockIds = [...new Set([...byIdA.keys(), ...byIdB.keys()])].sort();
+  const blockIds = [
+    ...new Set([...byIdA.keys(), ...byIdB.keys(), ...notSharedA, ...notSharedB]),
+  ].sort();
 
   return blockIds.map((blockId) => {
     const left = byIdA.get(blockId) ?? null;
@@ -113,6 +132,22 @@ export function compareBlocks(
       b: right,
       markedBy,
     };
+
+    const hiddenA = notSharedA.includes(blockId);
+    const hiddenB = notSharedB.includes(blockId);
+    if (hiddenA || hiddenB) {
+      // ZURUECKGEHALTEN STEHT VOR ALLEM ANDEREN. Wer nicht freigegeben hat,
+      // hat vielleicht trotzdem geantwortet - das darf hier nicht als
+      // fehlende Antwort erscheinen.
+      return {
+        ...base,
+        a: hiddenA ? null : left,
+        b: hiddenB ? null : right,
+        state: "not_comparable" as const,
+        reason: hiddenA && hiddenB ? ("not_shared_both" as const)
+          : hiddenA ? ("not_shared_a" as const) : ("not_shared_b" as const),
+      };
+    }
 
     if (!left || !right) {
       return { ...base, state: "not_comparable" as const, reason: "no_answer" as const };

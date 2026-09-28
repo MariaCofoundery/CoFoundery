@@ -69,5 +69,19 @@
     "limitsTitle": "Was diese Angaben nicht leisten",
     "marked": "Von dir zur Besprechung markiert.",
     "instrument": "Fassung: {instrument}"
+  },
+  "compare": {
+    "title": "Ihr beide",
+    "intro": "Nebeneinander, nicht gegeneinander verrechnet. Es gibt hier keine Passungszahl und keine Bewertung.",
+    "cardsTitle": "Worüber ihr sprechen solltet",
+    "cardsIntro": "Höchstens vier Themen pro Gespräch. Der Rest steht darunter zum Nachschlagen.",
+    "nothingYet": "Noch gibt es nichts zu besprechen — oder es fehlen noch Antworten.",
+    "agreementTitle": "Eine Vereinbarung besteht aus",
+    "agreementHint": "Betrags- und Zeitgrenzen legt ihr fest, nicht der Fragebogen.",
+    "allTitle": "Alle Antworten",
+    "question": "Frage",
+    "marked": "Zur Besprechung markiert.",
+    "notShared": "nicht geteilt",
+    "noAnswerYet": "noch nicht beantwortet"
   }
 }
