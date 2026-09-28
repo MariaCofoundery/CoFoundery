@@ -1,0 +1,170 @@
+{
+  "setId": "founder-alignment-behaviour-v2-1",
+  "status": "proposal",
+  "createdAt": "2026-09-28",
+  "belongsTo": "founder-alignment-v2-1",
+  "notes": [
+    "Diese vier Fragen stehen NICHT im fachlich geprueften Quelldokument. Sie sind ein Vorschlag und liegen deshalb getrennt: Wer die Registratur v2.1 gegen die Quelle prueft, soll sie dort nicht finden.",
+    "Jede Frage hat einen echten Bezugszeitraum. 'Wie haeufig' ohne Zeitraum ist genau die Frage, die im September 2026 als unklar zurueckkam - sie laesst offen, woran jemand sich erinnern soll.",
+    "'Kam nicht vor' ist eine ANTWORT, kein Auslassungsgrund. Wer in drei Monaten keine solche Entscheidung getroffen hat, hat das gesagt und nichts verschwiegen. Als Auslassungsgrund waere es ein Fehlen; als Option ist es eine Auskunft.",
+    "Der Vergleich von Wunsch und Verhalten ergibt ein GESPRAECHSTHEMA, nie ein Urteil ueber Gueltigkeit. Wer sich etwas wuenscht und zuletzt anders gehandelt hat, hat nicht falsch geantwortet - die Lage kann es nicht hergegeben haben.",
+    "Optionen mit outsideSequence stehen ausserhalb der Abfolge. Sie werden nicht verrechnet, sondern nebeneinandergelegt - sonst entstuende ein Abstand zwischen zwei Dingen, die keine gemeinsame Skala haben."
+  ],
+  "reportingRule": "Nie als Uebereinstimmungsmass, nie als Gueltigkeitsurteil, nie als Zahl. Ausgabe ist ein Satz, der beides nebeneinanderstellt und offen laesst, woran es lag.",
+  "items": [
+    {
+      "itemId": "A91",
+      "crossChecks": "A02",
+      "section": "Entscheidungen vorbereiten",
+      "order": 1,
+      "answerFormat": "single_choice",
+      "prompt": "Denk an die letzte wichtige Entscheidung, die du in den vergangenen drei Monaten getroffen hast. Hast du davor geprueft, ob eine zentrale Annahme zutrifft?",
+      "hint": "Gemeint ist jede Form des Nachpruefens: nachrechnen, nachlesen, jemanden fragen, ausprobieren.",
+      "options": [
+        {
+          "optionId": "A91_o1",
+          "label": "ja, bevor ich entschieden habe"
+        },
+        {
+          "optionId": "A91_o2",
+          "label": "teilweise - bei einem Teil der Annahmen"
+        },
+        {
+          "optionId": "A91_o3",
+          "label": "nein"
+        },
+        {
+          "optionId": "A91_o4",
+          "label": "in den vergangenen drei Monaten stand keine solche Entscheidung an",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Kein Beleg fuer Analysefaehigkeit und kein Gegenbeweis zur Wunschangabe in A02."
+    },
+    {
+      "itemId": "U91",
+      "crossChecks": "U04",
+      "section": "Eigenstaendig entscheiden",
+      "order": 2,
+      "answerFormat": "single_choice",
+      "prompt": "Denk an die letzte Entscheidung, die in den vergangenen drei Monaten in deinen Verantwortungsbereich fiel. Hast du sie getroffen, ohne vorher die Zustimmung anderer einzuholen?",
+      "hint": "Gemeint ist Zustimmung, nicht Information. Jemanden zu informieren ist etwas anderes, als auf ein Ja zu warten.",
+      "options": [
+        {
+          "optionId": "U91_o1",
+          "label": "ja, ich habe selbst entschieden"
+        },
+        {
+          "optionId": "U91_o2",
+          "label": "ich habe vorher jemanden gefragt, haette aber auch selbst entscheiden koennen"
+        },
+        {
+          "optionId": "U91_o3",
+          "label": "ich habe auf eine Zustimmung gewartet"
+        },
+        {
+          "optionId": "U91_o4",
+          "label": "ich hatte in den vergangenen drei Monaten keinen eigenen Verantwortungsbereich",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Wer auf eine Zustimmung gewartet hat, kann sich trotzdem mehr Eigenstaendigkeit wuenschen - genau darueber laesst sich sprechen."
+    },
+    {
+      "itemId": "K91",
+      "crossChecks": "K01",
+      "section": "Informationen teilen",
+      "order": 3,
+      "answerFormat": "single_choice",
+      "prompt": "Denk an das letzte Mal in den vergangenen drei Monaten, als du anderen einen Zwischenstand aus deiner Arbeit gezeigt hast. In welchem Zustand war er da?",
+      "hint": "",
+      "options": [
+        {
+          "optionId": "K91_o1",
+          "label": "eine erste Skizze, vieles war noch offen"
+        },
+        {
+          "optionId": "K91_o2",
+          "label": "die Richtung stand fest, die Ausarbeitung noch nicht"
+        },
+        {
+          "optionId": "K91_o3",
+          "label": "ein erstes nutzbares Ergebnis"
+        },
+        {
+          "optionId": "K91_o4",
+          "label": "aus meiner Sicht fertig"
+        },
+        {
+          "optionId": "K91_o5",
+          "label": "ich habe in den vergangenen drei Monaten keinen Zwischenstand gezeigt",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Die Stufen entsprechen absichtlich denen aus K01, damit Wunsch und Verhalten nebeneinander lesbar sind."
+    },
+    {
+      "itemId": "T91",
+      "crossChecks": "T03",
+      "section": "Unterschiede ansprechen",
+      "order": 4,
+      "answerFormat": "single_choice",
+      "prompt": "Denk an das letzte Mal in den vergangenen drei Monaten, als du eine geplante Entscheidung anders gesehen hast als die anderen. Wann hast du deinen Einwand angesprochen?",
+      "hint": "",
+      "options": [
+        {
+          "optionId": "T91_o1",
+          "label": "noch im laufenden Gespraech"
+        },
+        {
+          "optionId": "T91_o2",
+          "label": "nach dem Gespraech, aber noch am selben Arbeitstag"
+        },
+        {
+          "optionId": "T91_o3",
+          "label": "am naechsten Arbeitstag"
+        },
+        {
+          "optionId": "T91_o4",
+          "label": "nach mehr als einem Arbeitstag"
+        },
+        {
+          "optionId": "T91_o5",
+          "label": "ich habe ihn nicht angesprochen",
+          "outsideSequence": true,
+          "whyOutside": "Gar nicht ansprechen ist kein spaeterer Zeitpunkt, sondern etwas anderes. In eine Reihenfolge von Zeitpunkten gehoert es nicht."
+        },
+        {
+          "optionId": "T91_o6",
+          "label": "in den vergangenen drei Monaten kam das nicht vor",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. 'Nicht angesprochen' ist eine eigene Antwort und keine spaete Variante - in T03 fehlt sie, weil dort nach dem Wunsch gefragt wird."
+    }
+  ]
+}

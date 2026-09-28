@@ -33,12 +33,25 @@
 export const INSTRUMENT_IDS = [
   "founder-compatibility-v1",
   /**
-   * Seit 27.09.2026 vorhanden, Status `draft` in der Tabelle: referenzierbar,
-   * kann Antworten tragen, wird aber niemandem vorgelegt. Ohne diesen
-   * Zwischenzustand gaebe es nur "fertig" oder "gibt es nicht" - und der
-   * Umstieg muesste an einem einzigen Tag passieren.
+   * Seit 27.09.2026 vorhanden, seit 28.09.2026 `archived`. Nie ausgefuellt.
+   *
+   * Archiviert und nicht geloescht: Die Regel "eine Fassung, die es gab,
+   * verschwindet nicht" ist nichts wert, wenn sie beim ersten bequemen Fall
+   * gebrochen wird. Ausserdem steht die Kennung in alignment_answers als
+   * Fremdschluessel - sie zu loeschen hiesse, Antworten heimatlos zu machen.
    */
   "founder-alignment-v2",
+  /**
+   * Seit 28.09.2026, Status `draft`: referenzierbar, kann Antworten tragen,
+   * wird aber niemandem vorgelegt.
+   *
+   * Warum eine eigene Kennung und kein korrigiertes v2: Die fachliche
+   * Durchsicht hat vier Items gestrichen, eines geteilt und fuenf so
+   * veraendert, dass sie etwas anderes messen. Dieselbe Kennung mit neuer
+   * Bedeutung weiterzufuehren wuerde jede spaetere Auswertung beschaedigen,
+   * die Antworten aus zwei Zeitraeumen nebeneinanderlegt.
+   */
+  "founder-alignment-v2-1",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
@@ -61,6 +74,16 @@ export const CURRENT_INSTRUMENT_ID: InstrumentId = "founder-compatibility-v1";
  * v2 meint, muss es hinschreiben.
  */
 export const ALIGNMENT_V2_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2";
+
+/**
+ * Die Fassung, an der gearbeitet wird.
+ *
+ * Auch sie ist absichtlich nicht `CURRENT_INSTRUMENT_ID`. Und sie ist eine
+ * eigene Konstante neben v2, damit beim Umstellen auffaellt, welche Fassung
+ * eine Stelle wirklich meint - ein umbenannter Wert haette alle bisherigen
+ * v2-Verweise stillschweigend auf v2.1 umgebogen.
+ */
+export const ALIGNMENT_V21_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-1";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);

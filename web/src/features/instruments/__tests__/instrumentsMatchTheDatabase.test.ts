@@ -4,11 +4,14 @@ import { join } from "node:path";
 import test from "node:test";
 import {
   ALIGNMENT_V2_INSTRUMENT_ID,
+  ALIGNMENT_V21_INSTRUMENT_ID,
   CURRENT_INSTRUMENT_ID,
   INSTRUMENT_IDS,
 } from "@/features/instruments/instruments";
 import { ALIGNMENT_REGISTRY_V2 } from "@/features/instruments/v2/alignmentRegistryV2";
 import { CONTEXT_REGISTRY_V2 } from "@/features/instruments/v2/contextRegistryV2";
+import { REGISTRY_V21 } from "@/features/instruments/v21/registryV21";
+import { BEHAVIOUR_SET_V21 } from "@/features/instruments/v21/behaviourV21";
 
 /**
  * Die Liste der Fassungen steht an drei Orten. Sie darf nicht auseinanderlaufen.
@@ -64,4 +67,34 @@ test("v2 wird noch niemandem vorgelegt", () => {
   // Und beide Registraturen stehen auf `draft`.
   assert.equal(ALIGNMENT_REGISTRY_V2.status, "draft");
   assert.equal(CONTEXT_REGISTRY_V2.status, "draft");
+});
+
+test("die Registratur v2.1 nennt die Fassung, die der Code kennt", () => {
+  assert.equal(REGISTRY_V21.instrumentId, ALIGNMENT_V21_INSTRUMENT_ID);
+  assert.notEqual(REGISTRY_V21.instrumentId, ALIGNMENT_V2_INSTRUMENT_ID);
+});
+
+test("auch v2.1 wird noch niemandem vorgelegt", () => {
+  assert.notEqual(CURRENT_INSTRUMENT_ID, ALIGNMENT_V21_INSTRUMENT_ID);
+  assert.equal(REGISTRY_V21.status, "draft");
+});
+
+test("die Verhaltensfragen sind ein Vorschlag und haengen an v2.1", () => {
+  // Sie sind nicht fachlich geprueft. Solange das hier `proposal` ist, kann
+  // niemand sie fuer geprueft halten, nur weil sie im selben Ordner liegen.
+  assert.equal(BEHAVIOUR_SET_V21.status, "proposal");
+  assert.equal(BEHAVIOUR_SET_V21.belongsTo, ALIGNMENT_V21_INSTRUMENT_ID);
+});
+
+test("die Migration archiviert v2 und laesst genau eine Fassung aktiv", () => {
+  // Gelesen statt behauptet: Der Test liest die Migrationen, damit er nicht
+  // ein zweites Mal aufschreibt, was dort steht.
+  const sql = readdirSync(MIGRATIONS)
+    .filter((name) => name.endsWith(".sql"))
+    .map((name) => readFileSync(join(MIGRATIONS, name), "utf8"))
+    .join("\n");
+  assert.match(sql, /set status = 'archived'\s*\n?\s*where id = 'founder-alignment-v2'/,
+    "keine Migration archiviert v2");
+  assert.ok(!/delete from public\.instruments/.test(sql),
+    "eine Fassung, die es gab, wird nicht geloescht - Antworten wuerden heimatlos");
 });
