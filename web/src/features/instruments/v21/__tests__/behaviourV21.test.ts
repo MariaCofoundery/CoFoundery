@@ -101,7 +101,7 @@ test("nirgends entsteht eine Übereinstimmungszahl oder ein Gültigkeitsurteil",
       }
     }
   }
-  assert.match(BEHAVIOUR_SET_V21.reportingRule, /nie als Gueltigkeitsurteil/i);
+  assert.match(BEHAVIOUR_SET_V21.reportingRule, /nie als Gültigkeitsurteil/i);
 });
 
 test("wo es keine gemeinsame Abfolge gibt, wird nicht gerechnet", () => {

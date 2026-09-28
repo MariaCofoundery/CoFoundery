@@ -4,13 +4,13 @@
   "createdAt": "2026-09-28",
   "belongsTo": "founder-alignment-v2-1",
   "notes": [
-    "Diese vier Fragen stehen NICHT im fachlich geprueften Quelldokument. Sie sind ein Vorschlag und liegen deshalb getrennt: Wer die Registratur v2.1 gegen die Quelle prueft, soll sie dort nicht finden.",
-    "Jede Frage hat einen echten Bezugszeitraum. 'Wie haeufig' ohne Zeitraum ist genau die Frage, die im September 2026 als unklar zurueckkam - sie laesst offen, woran jemand sich erinnern soll.",
-    "'Kam nicht vor' ist eine ANTWORT, kein Auslassungsgrund. Wer in drei Monaten keine solche Entscheidung getroffen hat, hat das gesagt und nichts verschwiegen. Als Auslassungsgrund waere es ein Fehlen; als Option ist es eine Auskunft.",
-    "Der Vergleich von Wunsch und Verhalten ergibt ein GESPRAECHSTHEMA, nie ein Urteil ueber Gueltigkeit. Wer sich etwas wuenscht und zuletzt anders gehandelt hat, hat nicht falsch geantwortet - die Lage kann es nicht hergegeben haben.",
-    "Optionen mit outsideSequence stehen ausserhalb der Abfolge. Sie werden nicht verrechnet, sondern nebeneinandergelegt - sonst entstuende ein Abstand zwischen zwei Dingen, die keine gemeinsame Skala haben."
+    "Diese vier Fragen stehen NICHT im fachlich geprüften Quelldokument. Sie sind ein Vorschlag und liegen deshalb getrennt: Wer die Registratur v2.1 gegen die Quelle prüft, soll sie dort nicht finden.",
+    "Jede Frage hat einen echten Bezugszeitraum. 'Wie häufig' ohne Zeitraum ist genau die Frage, die im September 2026 als unklar zurückkam - sie lässt offen, woran jemand sich erinnern soll.",
+    "'Kam nicht vor' ist eine ANTWORT, kein Auslassungsgrund. Wer in drei Monaten keine solche Entscheidung getroffen hat, hat das gesagt und nichts verschwiegen. Als Auslassungsgrund wäre es ein Fehlen; als Option ist es eine Auskunft.",
+    "Der Vergleich von Wunsch und Verhalten ergibt ein GESPRAECHSTHEMA, nie ein Urteil über Gültigkeit. Wer sich etwas wünscht und zuletzt anders gehandelt hat, hat nicht falsch geantwortet - die Lage kann es nicht hergegeben haben.",
+    "Optionen mit outsideSequence stehen außerhalb der Abfolge. Sie werden nicht verrechnet, sondern nebeneinandergelegt - sonst entstünde ein Abstand zwischen zwei Dingen, die keine gemeinsame Skala haben."
   ],
-  "reportingRule": "Nie als Uebereinstimmungsmass, nie als Gueltigkeitsurteil, nie als Zahl. Ausgabe ist ein Satz, der beides nebeneinanderstellt und offen laesst, woran es lag.",
+  "reportingRule": "Nie als Übereinstimmungsmaß, nie als Gültigkeitsurteil, nie als Zahl. Ausgabe ist ein Satz, der beides nebeneinanderstellt und offen lässt, woran es lag.",
   "items": [
     {
       "itemId": "A91",
@@ -18,8 +18,8 @@
       "section": "Entscheidungen vorbereiten",
       "order": 1,
       "answerFormat": "single_choice",
-      "prompt": "Denk an die letzte wichtige Entscheidung, die du in den vergangenen drei Monaten getroffen hast. Hast du davor geprueft, ob eine zentrale Annahme zutrifft?",
-      "hint": "Gemeint ist jede Form des Nachpruefens: nachrechnen, nachlesen, jemanden fragen, ausprobieren.",
+      "prompt": "Denk an die letzte wichtige Entscheidung, die du in den vergangenen drei Monaten getroffen hast. Hast du davor geprüft, ob eine zentrale Annahme zutrifft?",
+      "hint": "Gemeint ist jede Form des Nachprüfens: nachrechnen, nachlesen, jemanden fragen, ausprobieren.",
       "options": [
         {
           "optionId": "A91_o1",
@@ -45,12 +45,12 @@
           "label": "daran kann ich mich nicht sicher erinnern"
         }
       ],
-      "note": "Berichtetes Verhalten im letzten konkreten Fall. Kein Beleg fuer Analysefaehigkeit und kein Gegenbeweis zur Wunschangabe in A02."
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Kein Beleg für Analysefähigkeit und kein Gegenbeweis zur Wunschangabe in A02."
     },
     {
       "itemId": "U91",
       "crossChecks": "U04",
-      "section": "Eigenstaendig entscheiden",
+      "section": "Eigenständig entscheiden",
       "order": 2,
       "answerFormat": "single_choice",
       "prompt": "Denk an die letzte Entscheidung, die in den vergangenen drei Monaten in deinen Verantwortungsbereich fiel. Hast du sie getroffen, ohne vorher die Zustimmung anderer einzuholen?",
@@ -62,7 +62,7 @@
         },
         {
           "optionId": "U91_o2",
-          "label": "ich habe vorher jemanden gefragt, haette aber auch selbst entscheiden koennen"
+          "label": "ich habe vorher jemanden gefragt, hätte aber auch selbst entscheiden können"
         },
         {
           "optionId": "U91_o3",
@@ -80,7 +80,7 @@
           "label": "daran kann ich mich nicht sicher erinnern"
         }
       ],
-      "note": "Berichtetes Verhalten im letzten konkreten Fall. Wer auf eine Zustimmung gewartet hat, kann sich trotzdem mehr Eigenstaendigkeit wuenschen - genau darueber laesst sich sprechen."
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Wer auf eine Zustimmung gewartet hat, kann sich trotzdem mehr Eigenständigkeit wünschen - genau darüber lässt sich sprechen."
     },
     {
       "itemId": "K91",
@@ -132,15 +132,15 @@
       "options": [
         {
           "optionId": "T91_o1",
-          "label": "noch im laufenden Gespraech"
+          "label": "noch im laufenden Gespräch"
         },
         {
           "optionId": "T91_o2",
-          "label": "nach dem Gespraech, aber noch am selben Arbeitstag"
+          "label": "nach dem Gespräch, aber noch am selben Arbeitstag"
         },
         {
           "optionId": "T91_o3",
-          "label": "am naechsten Arbeitstag"
+          "label": "am nächsten Arbeitstag"
         },
         {
           "optionId": "T91_o4",
@@ -150,7 +150,7 @@
           "optionId": "T91_o5",
           "label": "ich habe ihn nicht angesprochen",
           "outsideSequence": true,
-          "whyOutside": "Gar nicht ansprechen ist kein spaeterer Zeitpunkt, sondern etwas anderes. In eine Reihenfolge von Zeitpunkten gehoert es nicht."
+          "whyOutside": "Gar nicht ansprechen ist kein späterer Zeitpunkt, sondern etwas anderes. In eine Reihenfolge von Zeitpunkten gehört es nicht."
         },
         {
           "optionId": "T91_o6",
@@ -164,7 +164,7 @@
           "label": "daran kann ich mich nicht sicher erinnern"
         }
       ],
-      "note": "Berichtetes Verhalten im letzten konkreten Fall. 'Nicht angesprochen' ist eine eigene Antwort und keine spaete Variante - in T03 fehlt sie, weil dort nach dem Wunsch gefragt wird."
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. 'Nicht angesprochen' ist eine eigene Antwort und keine späte Variante - in T03 fehlt sie, weil dort nach dem Wunsch gefragt wird."
     }
   ]
 }
