@@ -69,28 +69,53 @@ test("kein Zugang zu v2.1 außerhalb von debug", () => {
   );
 });
 
-test("die Seite ist in Production nicht erreichbar", () => {
-  const page = readFileSync(join(DEBUG, "alignment-v2-1", "page.tsx"), "utf8");
-  // Nicht nur Konvention: Die Seite selbst muss es durchsetzen.
-  assert.match(page, /process\.env\.NODE_ENV === "production"/);
-  assert.match(page, /notFound\(\)/);
+/** Jede Seite unter alignment-v2-1, nicht nur die, an die ich gedacht habe. */
+function pagesOfV21(): string[] {
+  const root = join(DEBUG, "alignment-v2-1");
+  const found: string[] = [];
+  const walk = (dir: string) => {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) walk(path);
+      else if (name === "page.tsx") found.push(path);
+    }
+  };
+  walk(root);
+  return found;
+}
+
+test("jede Seite ist in Production nicht erreichbar", () => {
+  const pages = pagesOfV21();
+  // Ein Waechter, der eine fest eingetragene Datei prueft, uebersieht die
+  // naechste. Deshalb alle - und mindestens zwei, sonst sucht er falsch.
+  assert.ok(pages.length >= 2, `zu wenige Seiten gefunden: ${pages.join(", ")}`);
+  for (const path of pages) {
+    const page = readFileSync(path, "utf8");
+    // Nicht nur Konvention: Die Seite selbst muss es durchsetzen.
+    assert.match(page, /process\.env\.NODE_ENV === "production"/, path);
+    assert.match(page, /notFound\(\)/, path);
+  }
 });
 
-test("die Seite holt die Person über getRequestUser", () => {
+test("jede Seite holt die Person über getRequestUser", () => {
   // Die Middleware hat sie für diese Anfrage schon geholt; ein zweiter
   // Netzwerkgang je Seitenaufbau wäre geschenkt.
-  const page = readFileSync(join(DEBUG, "alignment-v2-1", "page.tsx"), "utf8");
-  assert.match(page, /getRequestUser/);
-  assert.ok(!/supabase\.auth\.getUser/.test(page));
+  for (const path of pagesOfV21()) {
+    const page = readFileSync(path, "utf8");
+    assert.match(page, /getRequestUser/, path);
+    assert.ok(!/supabase\.auth\.getUser/.test(page), path);
+  }
 });
 
 test("v2 und v2.1 werden nicht verwechselt", () => {
   // Der teure Fehler wäre, dass die Seite für v2.1 Antworten unter der
   // Kennung von v2 sucht - dann sähe jemand einen leeren Fragebogen, obwohl
   // er ihn ausgefüllt hat, oder schlimmer: einen fremden Stand.
-  const page = readFileSync(join(DEBUG, "alignment-v2-1", "page.tsx"), "utf8");
-  assert.match(page, /ALIGNMENT_V21_INSTRUMENT_ID/);
-  assert.ok(!/ALIGNMENT_V2_INSTRUMENT_ID/.test(page));
+  for (const path of pagesOfV21()) {
+    const page = readFileSync(path, "utf8");
+    assert.match(page, /ALIGNMENT_V21_INSTRUMENT_ID/, path);
+    assert.ok(!/ALIGNMENT_V2_INSTRUMENT_ID/.test(page), path);
+  }
 
   const actions = readFileSync(
     join("src", "features", "instruments", "v21", "answerActionsV21.ts"), "utf8");

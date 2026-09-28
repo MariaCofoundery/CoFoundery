@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { QuestionnaireV21 } from "@/features/instruments/v21/QuestionnaireV21";
 import { buildSectionsV21 } from "@/features/instruments/v21/questionnaireDataV21";
 import { ALIGNMENT_V21_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import { NavV21 } from "@/features/instruments/v21/NavV21";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -54,6 +55,8 @@ export default async function AlignmentV21Page() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <NavV21 current="/debug/alignment-v2-1" />
+
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Entwurf — wird niemandem vorgelegt
       </p>
