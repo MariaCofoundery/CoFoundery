@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
 import {
@@ -21,11 +21,12 @@ export default async function CompareV21Page({
 }: {
   params: Promise<{ partnerId: string }>;
 }) {
-  if (process.env.NODE_ENV === "production") notFound();
 
   const { partnerId } = await params;
   const { data: auth } = await getRequestUser();
-  if (!auth?.user?.id) notFound();
+  if (!auth?.user?.id) {
+    redirect(`/login?next=${encodeURIComponent(`/founder-alignment/pilot/compare/${partnerId}`)}`);
+  }
 
   const supabase = await createClient();
 
@@ -74,7 +75,7 @@ export default async function CompareV21Page({
   if (mine.rows.length === 0 || theirs.rows.length === 0) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <NavV21 current="/debug/alignment-v2-1" />
+        <NavV21 current="/founder-alignment/pilot" />
         <h1 className="text-2xl font-semibold text-slate-900">Nebeneinander</h1>
         <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
           {mine.rows.length === 0
@@ -102,7 +103,7 @@ export default async function CompareV21Page({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <NavV21 current="/debug/alignment-v2-1" />
+      <NavV21 current="/founder-alignment/pilot" />
 
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Entwurf — wird niemandem vorgelegt

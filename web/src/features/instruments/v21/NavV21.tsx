@@ -2,8 +2,8 @@ import Link from "next/link";
 
 /** Die zwei Seiten, die es zu v2.1 gibt. Mehr wird es erst, wenn es mehr gibt. */
 const PAGES = [
-  { href: "/debug/alignment-v2-1", label: "Fragebogen" },
-  { href: "/debug/alignment-v2-1/report", label: "Deine Antworten" },
+  { href: "/founder-alignment/pilot", label: "Fragebogen" },
+  { href: "/founder-alignment/pilot/report", label: "Deine Antworten" },
 ];
 
 export function NavV21({ current }: { current: string }) {

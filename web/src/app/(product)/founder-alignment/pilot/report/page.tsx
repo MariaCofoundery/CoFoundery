@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { readAll } from "@/features/instruments/v21/readoutV21";
@@ -15,10 +15,11 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  */
 
 export default async function ReportV21Page() {
-  if (process.env.NODE_ENV === "production") notFound();
 
   const { data: auth } = await getRequestUser();
-  if (!auth?.user?.id) notFound();
+  // Zum Login statt 404: Wer den Link bekommt und gerade ausgeloggt ist, soll
+  // sich anmelden koennen und danach hier landen - nicht ins Leere laufen.
+  if (!auth?.user?.id) redirect(`/login?next=${encodeURIComponent("/founder-alignment/pilot/report")}`);
 
   const supabase = await createClient();
 
@@ -56,7 +57,7 @@ export default async function ReportV21Page() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <NavV21 current="/debug/alignment-v2-1/report" />
+      <NavV21 current="/founder-alignment/pilot/report" />
 
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Entwurf — wird niemandem vorgelegt
@@ -76,7 +77,7 @@ export default async function ReportV21Page() {
       {sections.length === 0 ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
           Hier steht noch nichts.{" "}
-          <Link href="/debug/alignment-v2-1" className="underline">
+          <Link href="/founder-alignment/pilot" className="underline">
             Zum Fragebogen
           </Link>
           .
