@@ -17,8 +17,21 @@ import { AGREEMENT_FIELDS } from "@/features/instruments/v2/conversationCardsV2"
  */
 
 export async function AlignmentComparisonView({
-  result, nameA, nameB,
-}: { result: AlignmentComparison; nameA: string; nameB: string }) {
+  result, columnA, columnB,
+}: {
+  result: AlignmentComparison;
+  /**
+   * Die Spaltenueberschriften - hier darf "Du" stehen.
+   *
+   * IN DEN KARTEN NICHT. Die Bausteine aus Teil G sind in der dritten Person
+   * geschrieben ("A sagt fuer die kommenden zwoelf Wochen ... zu"). Setzt man
+   * dort "Du" ein, entsteht "Du sagt fuer die kommenden zwoelf Wochen" -
+   * beim Durchklicken am 28.09.2026 genau so dagestanden. Die Karten bekommen
+   * deshalb Namen in der dritten Person, die Tabelle die Anrede.
+   */
+  columnA: string;
+  columnB: string;
+}) {
   const t = await getTranslations("alignment");
 
   return (
@@ -77,11 +90,11 @@ export async function AlignmentComparisonView({
               )}
               <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-lg bg-slate-50 p-3">
-                  <dt className="text-xs uppercase tracking-wide text-slate-500">{nameA}</dt>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">{columnA}</dt>
                   <dd className="mt-1 text-sm text-slate-900">{cell(entry, entry.a, "a", t)}</dd>
                 </div>
                 <div className="rounded-lg bg-slate-50 p-3">
-                  <dt className="text-xs uppercase tracking-wide text-slate-500">{nameB}</dt>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">{columnB}</dt>
                   <dd className="mt-1 text-sm text-slate-900">{cell(entry, entry.b, "b", t)}</dd>
                 </div>
               </dl>

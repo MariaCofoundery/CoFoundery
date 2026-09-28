@@ -1,0 +1,28 @@
+
+> web@0.1.0 dev
+> next dev
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/sascha.schubertgmx.de/Desktop/cofoundery-app/package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/sascha.schubertgmx.de/Desktop/cofoundery-app/web/package-lock.json
+
+   ▲ Next.js 15.5.20
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.178.118:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1210ms
+ ✓ Compiled /middleware in 93ms (166 modules)
+ ○ Compiling /debug/alignment-v2/compare/[partnerId] ...
+ ✓ Compiled /debug/alignment-v2/compare/[partnerId] in 649ms (1146 modules)
+ GET /debug/alignment-v2/compare/94b56247-7c13-4aea-b95b-bc768dfe3925 200 in 1655ms
+ ✓ Compiled in 553ms (1160 modules)
+ ✓ Compiled in 131ms (318 modules)
+ ✓ Compiled in 122ms (318 modules)
+ GET /debug/alignment-v2/compare/94b56247-7c13-4aea-b95b-bc768dfe3925 200 in 416ms
+ ✓ Compiled in 366ms (1162 modules)
+ GET /debug/alignment-v2/compare/94b56247-7c13-4aea-b95b-bc768dfe3925 200 in 488ms

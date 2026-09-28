@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { buildAlignmentComparison, type ComparisonSideInput } from "@/features/instruments/v2/alignmentComparisonData";
 import type { StoredAnswerRow } from "@/features/instruments/v2/alignmentReadout";
@@ -87,4 +88,45 @@ test("höchstens vier Karten, und die Agenda ist vollständig", () => {
   // Das markierte Thema steht oben, obwohl alle denselben Abstand haben.
   assert.equal(result.agenda[0].blockId, "E03");
   assert.equal(result.agenda[0].priority, 1);
+});
+
+test("eine Erwartungslücke ergibt eine Karte, nicht zwei", () => {
+  // GEFUNDEN AM 28.09.2026 BEIM DURCHKLICKEN. Die Lücke hängt an R01 und R02
+  // zugleich, und die Agenda führt beide auf - also erschien derselbe Text
+  // zweimal hintereinander. Im Test war das nicht zu sehen, weil dort nie
+  // beide Blöcke gleichzeitig vorlagen.
+  const result = buildAlignmentComparison(
+    side({
+      name: "Anna",
+      rows: [row({ block_id: "R01", answer_format: "number_range", value: { min: 12, max: 16, unit: "Stunden/Woche" } })],
+    }),
+    side({
+      name: "Bert",
+      rows: [row({
+        block_id: "R02", answer_format: "person_number_range",
+        value: { unit: "Stunden/Woche", per: [{ recipient: "Anna", min: 25, max: 30 }] },
+      })],
+    })
+  );
+
+  // Die Agenda nennt beide Blöcke - das ist richtig, beide gehören dazu.
+  assert.ok(result.agenda.filter((entry) => entry.reason === "expectation_or_limit").length >= 2);
+  // Die Karte gibt es trotzdem nur einmal.
+  const gapCards = result.cards.filter((card) => card.id === "time_and_expectations");
+  assert.equal(gapCards.length, 1);
+});
+
+test("die Karten bekommen Namen in der dritten Person", () => {
+  // Die Bausteine aus Teil G lauten „A sagt für die kommenden zwölf Wochen …
+  // zu". Mit „Du" als Namen wird daraus „Du sagt für die kommenden zwölf
+  // Wochen" - beim Durchklicken genau so dagestanden.
+  const page = readFileSync(
+    "src/app/(product)/debug/alignment-v2/compare/[partnerId]/page.tsx",
+    "utf8"
+  );
+  // Die Anrede steht nur in den Spaltenüberschriften.
+  assert.match(page, /columnA=\{t\("compare\.you"\)\}/);
+  // Und die Karten bekommen echte Namen, im Zweifel „Person A".
+  assert.match(page, /displayName\(auth\.user\.id, "Person A"\)/);
+  assert.ok(!/nameA = "Du"/.test(page), "kein Pronomen als Name");
 });

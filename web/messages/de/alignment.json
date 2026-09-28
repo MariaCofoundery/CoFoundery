@@ -86,7 +86,8 @@
     "question": "Frage",
     "marked": "Zur Besprechung markiert.",
     "notShared": "nicht geteilt",
-    "noAnswerYet": "noch nicht beantwortet"
+    "noAnswerYet": "noch nicht beantwortet",
+    "you": "Du"
   },
   "transition": {
     "title": "Es gibt eine neue Fassung des Fragebogens",
@@ -120,6 +121,14 @@
       "none": "egal",
       "similar": "ähnlich",
       "different": "unterschiedlich"
+    },
+    "verdictTitle": "Deine Suchvorgaben, auf diese Person angewandt",
+    "verdictIntro": "In deiner Reihenfolge. Es gibt hier absichtlich keine Gesamtzahl.",
+    "basis": "Grundlage: {comparable} von {total} Fragen",
+    "fulfilment": {
+      "met": "passt",
+      "unmet": "passt nicht",
+      "unknown": "nicht beurteilbar"
     }
   }
 }

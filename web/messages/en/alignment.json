@@ -86,7 +86,8 @@
     "question": "Question",
     "marked": "Marked for discussion.",
     "notShared": "not shared",
-    "noAnswerYet": "not answered yet"
+    "noAnswerYet": "not answered yet",
+    "you": "You"
   },
   "transition": {
     "title": "There is a new version of the questionnaire",
@@ -120,6 +121,14 @@
       "none": "doesn't matter",
       "similar": "similar",
       "different": "different"
+    },
+    "verdictTitle": "Your search settings, applied to this person",
+    "verdictIntro": "In your order. There is deliberately no overall number here.",
+    "basis": "Based on {comparable} of {total} questions",
+    "fulfilment": {
+      "met": "matches",
+      "unmet": "does not match",
+      "unknown": "cannot be judged"
     }
   }
 }

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlignmentNav } from "@/features/instruments/v2/AlignmentNav";
+import { DiscoveryVerdicts, type TopicVerdictRow } from "@/features/instruments/v2/DiscoveryVerdicts";
 import { AlignmentComparisonView } from "@/features/instruments/v2/AlignmentComparisonView";
 import { buildAlignmentComparison } from "@/features/instruments/v2/alignmentComparisonData";
 import { ALIGNMENT_V2_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -68,14 +69,19 @@ export default async function AlignmentV2ComparePage({
 
   const [mine, theirs] = await Promise.all([load(auth.user.id), load(partnerId)]);
 
-  const { data: partner } = await supabase
+  const { data: profiles } = await supabase
     .from("profiles")
-    .select("display_name")
-    .eq("user_id", partnerId)
-    .maybeSingle();
+    .select("user_id, display_name")
+    .in("user_id", [auth.user.id, partnerId]);
 
-  const nameA = "Du";
-  const nameB = partner?.display_name?.trim() || "Die andere Person";
+  const displayName = (userId: string, fallback: string) =>
+    (profiles ?? []).find((row) => row.user_id === userId)?.display_name?.trim() || fallback;
+
+  // DIE KARTEN BEKOMMEN NAMEN IN DER DRITTEN PERSON, die Tabelle die Anrede.
+  // Die Textbausteine aus Teil G lauten "A sagt ... zu"; mit "Du" als Namen
+  // wird daraus "Du sagt ... zu".
+  const nameA = displayName(auth.user.id, "Person A");
+  const nameB = displayName(partnerId, "Person B");
 
   const result = buildAlignmentComparison(
     { name: nameA, instrumentId: ALIGNMENT_V2_INSTRUMENT_ID, rows: mine.rows,
@@ -83,6 +89,13 @@ export default async function AlignmentV2ComparePage({
     { name: nameB, instrumentId: ALIGNMENT_V2_INSTRUMENT_ID, rows: theirs.rows,
       markedBlockIds: theirs.marked, notSharedBlockIds: theirs.notShared }
   );
+
+  // Die eigenen Suchvorgaben, auf diese Person angewandt. Die Funktion sieht
+  // beide Seiten und gibt nur Urteil und Basis heraus - keine Antwort verlaesst
+  // sie.
+  const { data: verdicts } = await supabase.rpc("discovery_topic_verdicts", {
+    p_candidate_user_id: partnerId,
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -94,8 +107,14 @@ export default async function AlignmentV2ComparePage({
       <h1 className="text-2xl font-semibold text-slate-900">{t("compare.title")}</h1>
       <p className="mt-3 text-slate-700">{t("compare.intro")}</p>
 
-      <div className="mt-10">
-        <AlignmentComparisonView result={result} nameA={nameA} nameB={nameB} />
+      <div className="mt-10 space-y-10">
+        <DiscoveryVerdicts rows={(verdicts ?? []) as TopicVerdictRow[]} />
+
+        <AlignmentComparisonView
+          result={result}
+          columnA={t("compare.you")}
+          columnB={nameB}
+        />
       </div>
     </main>
   );

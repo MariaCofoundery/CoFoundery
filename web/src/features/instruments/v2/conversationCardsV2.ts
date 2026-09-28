@@ -180,7 +180,11 @@ function pick(
     const card = find("time_and_expectations");
     if (!card) return null;
     const [offerSide, expectSide] = gap.from === "b" ? ["a", "b"] : ["b", "a"];
-    return render(card, item.blockId, {
+    // EINE LUECKE IST EINE KARTE. Sie haengt an R01 und R02 zugleich, und die
+    // Agenda fuehrt beide auf - ohne feste Kennung erschiene derselbe Text
+    // zweimal hintereinander. Beim Durchklicken am 28.09.2026 genau so
+    // gesehen.
+    return render(card, "R01", {
       a: offerSide === "a" ? context.nameA : context.nameB,
       b: expectSide === "a" ? context.nameA : context.nameB,
       offer: `${gap.offeredAtMost} ${gap.unit}`,
