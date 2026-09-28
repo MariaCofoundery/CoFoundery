@@ -30,8 +30,8 @@
       "target": "A01",
       "field": "prompt",
       "source": "Wie häufig möchtest du vor einer wichtigen Entscheidung mehrere Möglichkeiten anhand derselben Kriterien vergleichen?",
-      "text": "Denk an zehn wichtige Entscheidungen. Bei wie vielen möchtest du mehrere Möglichkeiten anhand derselben Kriterien vergleichen?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn wichtige Entscheidungen. Bei wie vielen möchtest du vorher festlegen, worauf es ankommt, und dann jede Möglichkeit daran messen?",
+      "reason": "Maria am 28.09.2026: \"Was heisst denn mehrere Moeglichkeiten anhand derselben Kriterien vergleichen? Ich weiss nicht genau, was damit gemeint ist.\" Der alte Satz enthielt zwei Dinge auf einmal - vergleichen UND einheitliche Kriterien - und \"Kriterien\" ist Fachsprache. Gemeint ist ein Vorgehen in zwei Schritten: erst festlegen, worauf es ankommt, dann alle Moeglichkeiten daran messen. Genau so steht es jetzt da. Das unterscheidet weiterhin von Intuition (Praeferenz I) und von blossem Laengerbrauchen."
     },
     {
       "target": "A02",
@@ -58,15 +58,15 @@
       "target": "D01",
       "field": "prompt",
       "source": "Wie häufig möchtest du im Gespräch ausdrücklich sagen, dass du anderer Meinung bist?",
-      "text": "Denk an zehn Situationen, in denen du anderer Meinung bist als die anderen Founder. Bei wie vielen möchtest du ausdrücklich sagen, dass du anderer Meinung bist?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn Situationen, in denen du anderer Meinung bist als die anderen Founder. Bei wie vielen möchtest du es klar aussprechen, statt es nur anzudeuten?",
+      "reason": "Die Frage wiederholte ihre eigene Bezugsmenge (\"in denen du anderer Meinung bist ... dass du anderer Meinung bist\"). Gemessen werden soll die sprachliche Eindeutigkeit - deshalb steht jetzt der Gegensatz da, um den es geht: klar aussprechen statt andeuten."
     },
     {
       "target": "D04",
       "field": "prompt",
       "source": "Wie häufig möchtest du direkt sagen, welche konkrete Änderung du dir wünschst?",
-      "text": "Denk an zehn Situationen, in denen du dir etwas anders wünschst. Bei wie vielen möchtest du direkt sagen, welche konkrete Änderung du dir wünschst?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn Situationen, in denen du dir etwas anders wünschst. Bei wie vielen möchtest du direkt sagen, was genau du anders haben möchtest?",
+      "reason": "Dopplung, die beim Umstellen auf die Bezugsmenge am 28.09.2026 entstanden ist: \"Bei wie vielen ...\" benennt die Menge bereits, ein zweites Rueckbezugswort machte den Satz falsch. Beim Lesen der fertigen Fragen aufgefallen, nicht beim Schreiben. Zusaetzlich stand \"wuenschst\" zweimal im selben Satz."
     },
     {
       "target": "E01",
@@ -107,22 +107,22 @@
       "target": "I03",
       "field": "prompt",
       "source": "Wie häufig möchtest du einem unguten Gefühl nachgehen, obwohl die verfügbaren Zahlen für eine Möglichkeit sprechen?",
-      "text": "Denk an zehn Situationen, in denen die vorliegenden Zahlen klar für eine bestimmte Möglichkeit sprechen, du aber ein ungutes Gefühl hast. Bei wie vielen möchtest du dem Gefühl nachgehen?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn Situationen, in denen die vorliegenden Zahlen klar für eine bestimmte Möglichkeit sprechen, du aber ein ungutes Gefühl hast. Bei wie vielen möchtest du noch einmal genauer hinsehen, bevor du dich für die Zahlen entscheidest?",
+      "reason": "Dasselbe Problem wie bei A01: \"dem Gefuehl nachgehen\" sagt nicht, was man tut - innehalten? nachrechnen? anders entscheiden? Die Begruendung der Frage nennt einen Pruefimpuls und ausdruecklich KEINE Entscheidungsblockade. Genau das steht jetzt da: noch einmal hinsehen, bevor man den Zahlen folgt."
     },
     {
       "target": "K01",
       "field": "prompt",
       "source": "Wie häufig möchtest du unfertige Zwischenstände mit den anderen Foundern teilen?",
-      "text": "Denk an zehn Zwischenstände, die noch nicht fertig sind. Bei wie vielen möchtest du sie den anderen Foundern zeigen?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn Zwischenstände, die noch nicht fertig sind. Bei wie vielen möchtest du den anderen Foundern zeigen, woran du gerade arbeitest?",
+      "reason": "Dopplung, die beim Umstellen auf die Bezugsmenge am 28.09.2026 entstanden ist: \"Bei wie vielen ...\" benennt die Menge bereits, ein zweites Rueckbezugswort machte den Satz falsch. Beim Lesen der fertigen Fragen aufgefallen, nicht beim Schreiben."
     },
     {
       "target": "K02",
       "field": "prompt",
       "source": "Wie häufig möchtest du von einer Richtungsänderung in einem anderen Bereich erfahren, bevor daraus ein fertiges Ergebnis entsteht?",
-      "text": "Denk an zehn Richtungsänderungen in einem Bereich, den nicht du verantwortest. Bei wie vielen möchtest du davon erfahren, solange sie noch in Arbeit sind?",
-      "reason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
+      "text": "Denk an zehn Richtungsänderungen in einem Bereich, den nicht du verantwortest. Bei wie vielen möchtest du Bescheid wissen, solange sie noch in Arbeit sind?",
+      "reason": "Dopplung, die beim Umstellen auf die Bezugsmenge am 28.09.2026 entstanden ist: \"Bei wie vielen ...\" benennt die Menge bereits, ein zweites Rueckbezugswort machte den Satz falsch. Beim Lesen der fertigen Fragen aufgefallen, nicht beim Schreiben."
     },
     {
       "target": "L03",
