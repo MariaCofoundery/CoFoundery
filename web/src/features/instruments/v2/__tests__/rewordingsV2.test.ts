@@ -63,9 +63,12 @@ test("die Leser liefern die überarbeitete Fassung und behalten das Original", (
   assert.match(a02.prompt, /die wichtigste Annahme dahinter stimmt/);
   assert.match(a02.sourcePrompt, /eine zentrale Annahme anhand verfügbarer Daten/);
 
-  // Und wo nichts überarbeitet wurde, sind beide gleich.
-  const a01 = getAlignmentItems().find((item) => item.itemId === "A01")!;
-  assert.equal(a01.prompt, a01.sourcePrompt);
+  // Und wo nichts überarbeitet wurde, sind beide gleich. Seit dem 28.09.2026
+  // ist jede Frage der Gesprächsfassung überarbeitet, deshalb steht hier eine
+  // aus dem Forschungspool.
+  const a03 = getAlignmentItems().find((item) => item.itemId === "A03")!;
+  assert.equal(a03.inMvp, false);
+  assert.equal(a03.prompt, a03.sourcePrompt);
 
   // Jeder Leser füllt das Quellfeld - sonst stünde irgendwo `undefined`.
   for (const item of getAlignmentItems()) assert.ok(item.sourcePrompt, item.itemId);

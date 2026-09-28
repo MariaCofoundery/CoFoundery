@@ -74,6 +74,52 @@ test("die Bedingungen gehören zur Messung, nicht zur Oberfläche", () => {
   assert.match(byId.get("X")!.condition ?? "", /nicht um akute Existenzbedrohung/);
 });
 
+test("die Antwortstufen sind zählbar, und das Original steht daneben", () => {
+  // DAS EIGENTLICHE PROBLEM WAR NICHT DAS FORMAT, SONDERN DIE MENGENWÖRTER.
+  // Häufigkeitsformate schneiden im Vergleich besser ab als
+  // Zustimmungsformate - aber „selten", „manchmal", „häufig" werden je nach
+  // Person verschieden ausgelegt, und Skalen mit zählbarem Bezug messen
+  // präziser. Siehe docs/fragenformat-review.md.
+  const f = ALIGNMENT_REGISTRY_V2.answerFormats.F;
+  assert.deepEqual(f.labels, [
+    "bei keiner", "bei ein bis zwei", "bei etwa der Hälfte", "bei den meisten", "bei allen",
+  ]);
+  assert.deepEqual(f.sourceLabels, ["nie", "selten", "manchmal", "häufig", "fast immer"]);
+  assert.ok((f.labelChangeReason ?? "").length > 80, "die Änderung ist begründet");
+
+  // Und das Original steht weiterhin wörtlich im Gutachten.
+  const paper = readFileSync(
+    "../docs/CoFoundery_Wissenschaftliche_Neukonzeption.md", "utf8"
+  );
+  for (const label of f.sourceLabels!) {
+    assert.ok(paper.includes(label), `${label} steht nicht mehr in der Quelle`);
+  }
+
+  // Das Befindensformat bleibt unverändert - dort gab es keine Mengenwörter.
+  assert.equal(ALIGNMENT_REGISTRY_V2.answerFormats.C.sourceLabels, undefined);
+});
+
+test("der Forschungspool trägt noch die alte Form - und das ist bekannt", () => {
+  // KEIN VERSEHEN, SONDERN EIN ZUSTAND MIT DATUM. Am 28.09.2026 bekamen die
+  // 16 Fragen der Gesprächsfassung eine zählbare Bezugsmenge. Die übrigen 48
+  // sind Forschungspool: Sie werden niemandem vorgelegt, und jede bräuchte
+  // ihre eigene Bezugsmenge - zehn wichtige Entscheidungen sind etwas anderes
+  // als zehn unfertige Zwischenstände.
+  //
+  // Dieser Test scheitert, sobald der Pool tatsächlich gebraucht wird: Wer
+  // ein Item in die Gesprächsfassung holt, muss ihm vorher seine Bezugsmenge
+  // geben.
+  const umgestellt = getAlignmentItems().filter((item) => item.prompt.startsWith("Denk an zehn"));
+  const alteForm = getAlignmentItems().filter(
+    (item) => item.answerFormat === "F" && item.prompt.startsWith("Wie häufig")
+  );
+
+  assert.equal(umgestellt.length, 14, "die 14 Häufigkeitsfragen der Gesprächsfassung");
+  assert.ok(umgestellt.every((item) => item.inMvp), "nur die Gesprächsfassung");
+  assert.ok(alteForm.every((item) => !item.inMvp), "und keine davon wird vorgelegt");
+  assert.equal(umgestellt.length + alteForm.length, 56, "alle Häufigkeitsfragen erfasst");
+});
+
 test("die Auslassungsgründe sind getrennt und werden nie zur Mitte", () => {
   const codes = ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.code);
   assert.deepEqual(codes, [
@@ -179,8 +225,23 @@ test("die Fragetexte sind vollständig, verschieden und wirklich Fragen", () => 
     assert.ok(item.prompt.trim().endsWith("?"), `${item.itemId}: keine Frage`);
     // Die beiden Formate fragen verschiedene Dinge, und das muss man am
     // Satz erkennen: F nach gewünschter Häufigkeit, C nach Befinden.
+    //
+    // SEIT DEM 28.09.2026 NENNT JEDE F-FRAGE IHRE BEZUGSMENGE. „Wie häufig"
+    // liess offen, gemessen woran - und ohne zählbaren Bezug ist „häufig"
+    // zwischen zwei Menschen nicht vergleichbar. Im Gutachten steht weiterhin
+    // die alte Form, deshalb wird sie am Quelltext geprüft.
     if (item.answerFormat === "F") {
-      assert.match(item.prompt, /^Wie häufig möchtest du /, item.itemId);
+      // NUR DIE GESPRÄCHSFASSUNG WURDE UMGESTELLT. Der Forschungspool trägt
+      // weiter die Form des Gutachtens - er wird niemandem vorgelegt, und
+      // jede der 42 übrigen Fragen bräuchte ihre eigene Bezugsmenge. Das ist
+      // Arbeit für den Pretest, nicht für heute; ein eigener Test unten hält
+      // fest, dass der Unterschied bekannt ist.
+      if (item.inMvp) {
+        assert.match(item.prompt, /^Denk an zehn .+\. Bei wie vielen möchtest du /, item.itemId);
+      } else {
+        assert.match(item.prompt, /^Wie häufig möchtest du /, item.itemId);
+      }
+      assert.match(item.sourcePrompt, /^Wie häufig möchtest du /, item.itemId);
     } else {
       assert.match(item.prompt, /^Wie fühlst du dich, wenn /, item.itemId);
     }

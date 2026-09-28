@@ -63,7 +63,18 @@ export type MissingCode = {
 
 export type AnswerFormat = {
   kind: string;
+  /** Was angezeigt wird. */
   labels: string[];
+  /**
+   * Die Beschriftungen des Gutachtens, falls sie ersetzt wurden.
+   *
+   * WIE BEI DEN FRAGETEXTEN: Das Original bleibt stehen und wird weiterhin
+   * gegen das Dokument geprueft. Am 28.09.2026 wurden „nie · selten ·
+   * manchmal · haeufig · fast immer" durch zaehlbare Beschriftungen ersetzt -
+   * unscharfe Mengenwoerter werden je nach Person verschieden ausgelegt.
+   */
+  sourceLabels?: string[];
+  labelChangeReason?: string;
   scoring: string;
   offersMissing: MissingCode["code"][];
 };

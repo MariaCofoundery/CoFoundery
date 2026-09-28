@@ -27,7 +27,11 @@ test("eine Fünferantwort bleibt eine Kategorie und wird keine Zahl", () => {
   // wird nicht automatisch zu einem Messwert."
   const entry = one(row({ block_id: "A01", answer_format: "F", value: { scale: 3 } }));
   assert.equal(entry.answered, true);
-  assert.deepEqual(entry.value, { kind: "category", label: "manchmal", position: 3, of: 5 });
+  // Am 28.09.2026 von „manchmal" auf eine zaehlbare Beschriftung umgestellt -
+  // unscharfe Mengenwoerter werden je nach Person verschieden ausgelegt.
+  assert.deepEqual(entry.value, {
+    kind: "category", label: "bei etwa der Hälfte", position: 3, of: 5,
+  });
 
   // Die Position heißt `position` und nicht `value` - damit niemand versucht,
   // damit zu rechnen. Ein Feld namens value/score/mean gibt es nicht.

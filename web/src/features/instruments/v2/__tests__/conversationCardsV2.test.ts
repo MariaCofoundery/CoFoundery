@@ -229,7 +229,7 @@ test("keine Karte erfindet einen Grund", () => {
     assert.ok(!card.observed.toLowerCase().includes(fragment), card.observed);
   }
   // Die Antworten stehen woertlich als Beschriftung drin, nicht als Zahl.
-  assert.match(card.observed, /„fast immer“/);
-  assert.match(card.observed, /„selten“/);
+  assert.match(card.observed, /„bei allen“/);
+  assert.match(card.observed, /„bei ein bis zwei“/);
   assert.ok(!/\b[1-5]\b/.test(card.observed), "keine Skalenzahl im Text");
 });

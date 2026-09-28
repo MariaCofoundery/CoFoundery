@@ -14,17 +14,25 @@
     "F": {
       "kind": "frequency",
       "labels": [
+        "bei keiner",
+        "bei ein bis zwei",
+        "bei etwa der Hälfte",
+        "bei den meisten",
+        "bei allen"
+      ],
+      "scoring": "1-5 ordinal, hoeher = haeufiger gewuenschtes Vorgehen",
+      "offersMissing": [
+        "cannot_assess",
+        "not_relevant"
+      ],
+      "sourceLabels": [
         "nie",
         "selten",
         "manchmal",
         "häufig",
         "fast immer"
       ],
-      "scoring": "1-5 ordinal, hoeher = haeufiger gewuenschtes Vorgehen",
-      "offersMissing": [
-        "cannot_assess",
-        "not_relevant"
-      ]
+      "labelChangeReason": "Der Bezugsrahmen fehlte: \"Wie haeufig\" liess offen, gemessen woran. Unscharfe Mengenwoerter wie \"selten\" oder \"haeufig\" werden je nach Person verschieden ausgelegt; eine zaehlbare Bezugsmenge misst praeziser. Die Bezugsmenge ist je Frage eine andere - zehn wichtige Entscheidungen sind etwas anderes als zehn unfertige Zwischenstaende. Siehe docs/fragenformat-review.md, Abschnitt 5, Schritt 1."
     },
     "C": {
       "kind": "comfort",
