@@ -3,9 +3,11 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import {
-  MAX_DISCOVERY_TOPICS,
+  compareCandidatesByTopics,
+  fulfilmentOf,
   getDiscoveryTopics,
   judgeTopic,
+  type TopicVerdict,
 } from "@/features/instruments/v2/discoveryTopics";
 import { buildReadout, type StoredAnswerRow } from "@/features/instruments/v2/alignmentReadout";
 
@@ -28,7 +30,6 @@ test("es gibt Themen, keine Gewichte", () => {
     // Kein Gewicht, kein Faktor, keine Punktzahl an einem Thema.
     assert.ok(!Object.keys(entry).some((key) => /weight|score|factor|points/i.test(key)));
   }
-  assert.equal(MAX_DISCOVERY_TOPICS, 3);
 });
 
 test("gleiche und benachbarte Antworten gelten als ähnlich, weiter entfernte nicht", () => {
@@ -106,16 +107,37 @@ test("Bereiche werden über Überlappung verglichen, nicht über Mittelpunkte", 
   assert.equal(judgeTopic(topic("C_commitment"), mine, wayApart).state, "different");
 });
 
-test("nirgends entsteht eine Zahl über die Themen hinweg", () => {
-  // Wer drei Themen wählt, sieht drei Antworten und keine vierte, die sie
-  // zusammenfasst. Der Modulquelltext darf dafür gar keine Handhabe bieten.
+test("nirgends entsteht eine Zahl, die einen Menschen beschreibt", () => {
+  // DIE UNTERSCHEIDUNG, AUF DIE ES ANKOMMT - und die erste Fassung dieses
+  // Tests hat sie verfehlt: Sie verbot jedes `sort(` und schlug an, als die
+  // Themen nach dem selbst gesetzten Rang geordnet wurden.
+  //
+  // Ein SCORE ist eine Funktion von EINEM Kandidaten auf eine Zahl. Die ist
+  // verboten: Sie beschreibt einen Menschen und laesst einen Fehltreffer
+  // durch harmlose Gemeinsamkeiten verdecken.
+  //
+  // Ein VERGLEICH ist eine Funktion von ZWEI Kandidaten auf eine Reihenfolge.
+  // Der ist erlaubt und noetig - eine Liste braucht eine Reihenfolge, und
+  // diese hier addiert nichts.
   const source = readFileSync("src/features/instruments/v2/discoveryTopics.ts", "utf8");
   const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const forbidden of [/\.reduce\(/, /\bscore\b/i, /\bweight/i, /\bmatchPercent/i, /\bsort\(/]) {
+
+  for (const forbidden of [/\.reduce\(/, /\bscore\b/i, /\bweight/i, /matchPercent/i]) {
     assert.ok(!forbidden.test(code), `${forbidden} im Discovery-Modul`);
   }
-  // Und judgeTopic beurteilt genau EIN Thema - es gibt keine Funktion über alle.
-  assert.ok(!/export function judge(All|Topics)/.test(code));
+
+  // GEZAEHLT WIRD SEHR WOHL - nur innerhalb EINES Themas, und zwar die
+  // Basis. Teil F2 verlangt das ausdruecklich: "...und diese Basis genannt."
+  // Ein Verbot jeder Zaehlung haette genau diese Pflicht getroffen; die dritte
+  // Fassung dieses Tests schlug daran an.
+  assert.match(code, /comparable \+= 1/);
+
+  // Keine exportierte Funktion nimmt EINEN Kandidaten und gibt eine Zahl.
+  const singleArgNumber = /export function \w+\((?![^)]*,)[^)]*\)\s*:\s*number/;
+  assert.ok(!singleArgNumber.test(code), "keine Funktion, die einen Menschen auf eine Zahl abbildet");
+
+  // Und der Vergleich nimmt wirklich zwei.
+  assert.match(code, /export function compareCandidatesByTopics\(\s*a: readonly TopicVerdict\[\],\s*b: readonly TopicVerdict\[\]\s*\): number/);
 });
 
 test("Code und Datenbank kennen dieselben Themen", () => {
@@ -177,4 +199,86 @@ test("die Ähnlichkeitsregel lautet auf beiden Seiten gleich", () => {
   assert.match(sql, /count\(judged\.similar\) = 0 then 'not_assessable'/);
   // Alle müssen passen, nicht die Mehrheit.
   assert.match(sql, /bool_and\(judged\.similar\) then 'similar'/);
+});
+
+// ---------------------------------------------------------------------------
+// Alle Themen regelbar - seit dem 28.09.2026
+// ---------------------------------------------------------------------------
+
+const verdict = (
+  topicKey: string, rank: number, wish: "similar" | "different",
+  state: "similar" | "different" | "not_assessable"
+): TopicVerdict => ({ topicKey, rank, wish, state, basisComparable: 2, basisTotal: 2, differsAt: [] });
+
+test("ein Wunsch kann Ähnlichkeit oder Unterschied sein", () => {
+  // „different" IST EIN WUNSCH, KEINE THESE. Dass Unterschiede in einem
+  // Bereich günstiger wären, ist durch nichts belegt - das Gutachten warnt
+  // ausdrücklich vor „kleinere Differenz = besser" und ebenso vor der
+  // Umkehrung. Es ist die Suchvorgabe einer Person.
+  assert.equal(fulfilmentOf(verdict("P_A", 1, "similar", "similar")), "met");
+  assert.equal(fulfilmentOf(verdict("P_A", 1, "different", "different")), "met");
+  assert.equal(fulfilmentOf(verdict("P_A", 1, "different", "similar")), "unmet");
+});
+
+test("unbekannt ist kein Fehltreffer", () => {
+  // Wer eine Frage ausgelassen oder nicht geteilt hat, hat den Wunsch nicht
+  // verfehlt - es ist nur nichts darüber bekannt.
+  assert.equal(fulfilmentOf(verdict("P_A", 1, "similar", "not_assessable")), "unknown");
+});
+
+test("ein Fehltreffer bei Thema 1 lässt sich nicht wegmitteln", () => {
+  // DAS IST DIE GANZE ANTWORT AUF „alle Themen regeln". Die naheliegende
+  // Sortierung wäre „wie viele deiner Wünsche treffen zu" - eine Zahl über
+  // alle Themen, also der Passungswert mit selbst gesetzten Gewichten. Teil
+  // F5: Ein globaler Wert „könnte eine ausdrückliche Haftungsgrenze durch
+  // mehrere harmlose Gemeinsamkeiten verdecken."
+  const wichtigVerfehlt = [
+    verdict("P_A", 1, "similar", "different"),
+    verdict("P_I", 2, "similar", "similar"),
+    verdict("P_E", 3, "similar", "similar"),
+    verdict("P_U", 4, "similar", "similar"),
+  ];
+  const nurThemaVierVerfehlt = [
+    verdict("P_A", 1, "similar", "similar"),
+    verdict("P_I", 2, "similar", "different"),
+    verdict("P_E", 3, "similar", "different"),
+    verdict("P_U", 4, "similar", "different"),
+  ];
+
+  // Nach Punkten läge der erste vorn (3 Treffer gegen 1). Lexikografisch
+  // nicht: Thema 1 entscheidet, und dort liegt er daneben.
+  assert.ok(compareCandidatesByTopics(nurThemaVierVerfehlt, wichtigVerfehlt) < 0);
+  assert.ok(compareCandidatesByTopics(wichtigVerfehlt, nurThemaVierVerfehlt) > 0);
+});
+
+test("bei Gleichstand entscheidet das nächste Thema", () => {
+  const a = [verdict("P_A", 1, "similar", "similar"), verdict("P_I", 2, "similar", "similar")];
+  const b = [verdict("P_A", 1, "similar", "similar"), verdict("P_I", 2, "similar", "different")];
+  assert.ok(compareCandidatesByTopics(a, b) < 0);
+  assert.equal(compareCandidatesByTopics(a, [...a]), 0);
+});
+
+test("die Sortierung addiert nichts", () => {
+  // Kein Zähler, keine Summe, kein Prozentwert - auch nicht im Vergleich
+  // zweier Kandidaten.
+  const source = readFileSync("src/features/instruments/v2/discoveryTopics.ts", "utf8");
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  for (const forbidden of [/\.reduce\(/, /\bfilter\([^)]*\)\.length/, /\bcount\b/i, /\bscore\b/i]) {
+    assert.ok(!forbidden.test(code), `${forbidden} im Discovery-Modul`);
+  }
+});
+
+test("es gibt keine Obergrenze mehr, und die Datenbank kennt den Wunsch", () => {
+  const MIGRATIONS = "../supabase/migrations";
+  const sql = readdirSync(MIGRATIONS)
+    .filter((name) => name.endsWith(".sql"))
+    .map((name) => readFileSync(join(MIGRATIONS, name), "utf8"))
+    .join("\n");
+
+  assert.match(sql, /drop trigger discovery_alignment_topics_limit/);
+  assert.match(sql, /check \(wish in \('similar', 'different'\)\)/);
+  // Und die Reihenfolge ist ein Rang, kein Gewicht - sie taucht in keiner
+  // Rechnung auf.
+  assert.match(sql, /order by summed\.rank, summed\.topic_key/);
+  assert.ok(!/rank \*|sum\(.*rank/i.test(sql), "der Rang wird nirgends verrechnet");
 });

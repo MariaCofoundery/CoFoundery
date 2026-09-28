@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(10);
+select extensions.plan(12);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -124,7 +124,7 @@ select extensions.is(
 -- Erwartung mit angepasst haette.
 select extensions.is(
   pg_get_function_result('public.discovery_topic_verdicts(uuid)'::regprocedure),
-  'TABLE(topic_key text, state text, basis_comparable integer, basis_total integer)',
+  'TABLE(topic_key text, rank integer, wish text, state text, fulfilment text, basis_comparable integer, basis_total integer)',
   'die Funktion gibt nur Urteil und Basis heraus, keine Antworten'
 );
 
@@ -146,16 +146,42 @@ select extensions.throws_ok(
   'man vergleicht sich nicht mit sich selbst'
 );
 
--- HOECHSTENS DREI THEMEN. Wer alles wichtig findet, hat nichts ausgewaehlt.
-insert into public.discovery_alignment_topics (user_id, topic_key) values
-  ('e1000001-0001-4001-8001-000000000001', 'P_I'),
-  ('e1000001-0001-4001-8001-000000000001', 'P_E');
+-- ---------------------------------------------------------------------------
+-- 6. Alle Themen regelbar, mit Wunsch und eigener Reihenfolge
+-- ---------------------------------------------------------------------------
+--
+-- Seit dem 28.09.2026 gibt es keine Obergrenze mehr. Was es auch nicht gibt,
+-- ist eine Zahl ueber die Themen hinweg - sortiert wird lexikografisch nach
+-- der Reihenfolge, die die Person selbst gesetzt hat.
+
+insert into public.discovery_alignment_topics (user_id, topic_key, wish, rank) values
+  ('e1000001-0001-4001-8001-000000000001', 'P_I', 'different', 2),
+  ('e1000001-0001-4001-8001-000000000001', 'P_E', 'similar', 3),
+  ('e1000001-0001-4001-8001-000000000001', 'P_U', 'similar', 4),
+  ('e1000001-0001-4001-8001-000000000001', 'P_K', 'similar', 5);
+
+select extensions.cmp_ok(
+  (select count(*)::int from public.discovery_alignment_topics
+   where user_id = 'e1000001-0001-4001-8001-000000000001'),
+  '>', 3,
+  'mehr als drei Themen sind erlaubt'
+);
+
+-- DER WUNSCH KANN AUCH UNTERSCHIED SEIN - und ist dann erfuellt, wenn sich die
+-- beiden unterscheiden. Das ist eine Suchvorgabe, keine These darueber, was
+-- guenstiger waere.
+select extensions.is(
+  (select fulfilment from public.discovery_topic_verdicts('e1000002-0002-4002-8002-000000000002')
+   where topic_key = 'P_A'),
+  'met',
+  'ein erfuellter Aehnlichkeitswunsch heisst met'
+);
 
 select extensions.throws_ok(
-  $$insert into public.discovery_alignment_topics (user_id, topic_key)
-    values ('e1000001-0001-4001-8001-000000000001', 'P_U')$$,
+  $$insert into public.discovery_alignment_topics (user_id, topic_key, wish)
+    values ('e1000001-0001-4001-8001-000000000001', 'P_T', 'egal')$$,
   '23514', null,
-  'ein viertes Thema wird abgelehnt'
+  'ein erfundener Wunsch wird abgelehnt'
 );
 
 reset role;

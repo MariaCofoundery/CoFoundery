@@ -45,8 +45,22 @@ export type DiscoveryTopic = {
   rule: string;
 };
 
-/** Höchstens drei. Wer alles wichtig findet, hat nichts ausgewählt. */
-export const MAX_DISCOVERY_TOPICS = 3;
+/**
+ * Jedes Thema darf einen Wunsch tragen - seit dem 28.09.2026 gibt es keine
+ * Obergrenze mehr.
+ *
+ * WAS DAMIT NICHT KOMMT, IST EINE PUNKTZAHL. Bei zwoelf Themen waere die
+ * naheliegende Sortierung "wie viele deiner Wuensche treffen zu" - eine Zahl
+ * ueber alle Themen, also genau der Passungswert, nur mit selbst gesetzten
+ * Gewichten. Und nicht bloss formal falsch: Ein globaler Wert "koennte eine
+ * ausdrueckliche Haftungsgrenze durch mehrere harmlose Gemeinsamkeiten
+ * verdecken" (Teil F5). Genau das passiert, wenn 8 von 12 besser aussieht als
+ * 7 von 12, obwohl der eine Fehltreffer der ist, der zaehlt.
+ *
+ * Stattdessen ordnest du deine Themen selbst, und sortiert wird der Reihe
+ * nach. Siehe `compareCandidatesByTopics`.
+ */
+export type TopicWish = "similar" | "different";
 
 export function getDiscoveryTopics(): DiscoveryTopic[] {
   const preferences = getAlignmentPreferences().map((preference) => ({
@@ -87,6 +101,18 @@ export function getDiscoveryTopics(): DiscoveryTopic[] {
 
 export type TopicVerdict = {
   topicKey: string;
+  /** Die eigene Reihenfolge. 1 ist das wichtigste Thema - KEIN Gewicht. */
+  rank?: number;
+  /**
+   * Was sich diese Person wuenscht.
+   *
+   * "different" IST EIN WUNSCH, KEINE THESE. Dass Unterschiede in einem
+   * Bereich guenstig waeren, ist durch nichts belegt - das Gutachten warnt
+   * ausdruecklich vor der Annahme "kleinere Differenz = besser" und ebenso vor
+   * ihrer Umkehrung. Es ist die Suchvorgabe einer Person, nicht unsere
+   * Erkenntnis, und darf nie als solche dargestellt werden.
+   */
+  wish?: TopicWish;
   /**
    * `similar` | `different` | `not_assessable`
    *
@@ -208,4 +234,62 @@ function isSimilar(a: ReadoutValue, b: ReadoutValue): boolean | null {
     case "recipients":
       return null;
   }
+}
+
+/**
+ * Wird ein Wunsch erfuellt?
+ *
+ * UNBEKANNT IST KEIN FEHLTREFFER. Wer eine Frage ausgelassen oder nicht
+ * geteilt hat, hat den Wunsch nicht verfehlt - es ist nur nichts darueber
+ * bekannt.
+ */
+export type Fulfilment = "met" | "unknown" | "unmet";
+
+export function fulfilmentOf(verdict: TopicVerdict): Fulfilment {
+  if (verdict.state === "not_assessable") return "unknown";
+  if (!verdict.wish) return "unknown";
+  return verdict.state === verdict.wish ? "met" : "unmet";
+}
+
+/** met vor unknown vor unmet. */
+const FULFILMENT_ORDER: Record<Fulfilment, number> = { met: 0, unknown: 1, unmet: 2 };
+
+/**
+ * Zwei Kandidaten vergleichen - lexikografisch, nicht summiert.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS DIE GANZE ANTWORT AUF "ALLE THEMEN REGELN" IST
+ * ---------------------------------------------------------------------------
+ *
+ * Erst wird Thema 1 angesehen. Nur bei Gleichstand Thema 2, dann Thema 3.
+ *
+ * Wer bei deinem wichtigsten Thema danebenliegt, wird durch neun Treffer
+ * weiter unten NICHT nach oben gehoben. Das ist der Unterschied zu jeder
+ * Punktzahl - und genau die Eigenschaft, die Teil F5 schuetzen will: Eine
+ * ausdrueckliche Grenze laesst sich nicht durch harmlose Gemeinsamkeiten
+ * verdecken.
+ *
+ * Es wird nirgends etwas addiert. Wer die Reihenfolge seiner Themen aendert,
+ * aendert die Sortierung - aber niemals entsteht eine Zahl, die einen
+ * Menschen beschreibt.
+ */
+export function compareCandidatesByTopics(
+  a: readonly TopicVerdict[],
+  b: readonly TopicVerdict[]
+): number {
+  const byRank = (list: readonly TopicVerdict[]) =>
+    [...list].sort((one, two) => (one.rank ?? 99) - (two.rank ?? 99) || one.topicKey.localeCompare(two.topicKey));
+
+  const left = byRank(a);
+  const right = byRank(b);
+
+  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+    const one = left[index];
+    const two = right[index];
+    if (!one || !two) return left.length - right.length;
+    if (one.topicKey !== two.topicKey) return one.topicKey.localeCompare(two.topicKey);
+    const difference = FULFILMENT_ORDER[fulfilmentOf(one)] - FULFILMENT_ORDER[fulfilmentOf(two)];
+    if (difference !== 0) return difference;
+  }
+  return 0;
 }
