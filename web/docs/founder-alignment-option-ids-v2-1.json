@@ -1,0 +1,192 @@
+{
+  "note": [
+    "Der Schluesselbund: welche Options-Kennung zu welcher Antwortmoeglichkeit gehoert.",
+    "Eine gespeicherte Antwort merkt sich A01_o3, nicht den Text. Das ist Absicht - der Text darf sich aendern, ohne dass die Antwort ihre Bedeutung verliert.",
+    "Genau deshalb darf die REIHENFOLGE sich nicht aendern. A01_o3 heisst 'die dritte Option von A01'. Wer eine Option in der Mitte einfuegt, laesst jede gespeicherte Antwort auf _o3 auf etwas anderes zeigen - lautlos, weil die Zeile stehen bleibt.",
+    "Ein Test haelt diese Datei gegen die Registratur. Eine Umformulierung faellt dort nicht auf und soll es auch nicht: Sie ist billig. Ein Einfuegen, Loeschen oder Umsortieren faellt auf und soll es."
+  ],
+  "createdAt": "2026-09-28",
+  "instrumentId": "founder-alignment-v2-1",
+  "items": {
+    "A01": [
+      "A01_o1",
+      "A01_o2",
+      "A01_o3",
+      "A01_o4",
+      "A01_o5"
+    ],
+    "A02": [
+      "A02_o1",
+      "A02_o2",
+      "A02_o3",
+      "A02_o4",
+      "A02_o5"
+    ],
+    "I01": [
+      "I01_o1",
+      "I01_o2",
+      "I01_o3",
+      "I01_o4",
+      "I01_o5"
+    ],
+    "I03": [
+      "I03_o1",
+      "I03_o2",
+      "I03_o3",
+      "I03_o4",
+      "I03_o5"
+    ],
+    "E01": [
+      "E01_o1",
+      "E01_o2",
+      "E01_o3",
+      "E01_o4",
+      "E01_o5"
+    ],
+    "U04": [
+      "U04_o1",
+      "U04_o2",
+      "U04_o3",
+      "U04_o4",
+      "U04_o5"
+    ],
+    "K01": [
+      "K01_o1",
+      "K01_o2",
+      "K01_o3",
+      "K01_o4",
+      "K01_o5"
+    ],
+    "K02": [
+      "K02_o1",
+      "K02_o2",
+      "K02_o3",
+      "K02_o4",
+      "K02_o5"
+    ],
+    "T03": [
+      "T03_o1",
+      "T03_o2",
+      "T03_o3",
+      "T03_o4",
+      "T03_o5"
+    ],
+    "D01": [
+      "D01_o1",
+      "D01_o2",
+      "D01_o3",
+      "D01_o4",
+      "D01_o5"
+    ],
+    "X01": [
+      "X01_o1",
+      "X01_o2",
+      "X01_o3",
+      "X01_o4",
+      "X01_o5"
+    ],
+    "X06": [
+      "X06_o1",
+      "X06_o2",
+      "X06_o3",
+      "X06_o4",
+      "X06_o5"
+    ],
+    "B05": [
+      "B05_o1",
+      "B05_o2",
+      "B05_o3",
+      "B05_o4",
+      "B05_o5",
+      "B05_o6"
+    ],
+    "G01": [
+      "G01_o1",
+      "G01_o2",
+      "G01_o3",
+      "G01_o4",
+      "G01_o5"
+    ],
+    "G02a": [
+      "G02a_o1",
+      "G02a_o2",
+      "G02a_o3",
+      "G02a_o4"
+    ],
+    "G02b": [
+      "G02b_o1",
+      "G02b_o2",
+      "G02b_o3",
+      "G02b_o4",
+      "G02b_o5",
+      "G02b_o6"
+    ],
+    "S01": [
+      "S01_o1",
+      "S01_o2",
+      "S01_o3",
+      "S01_o4",
+      "S01_o5",
+      "S01_o6"
+    ],
+    "S02": [
+      "S02_o1",
+      "S02_o2",
+      "S02_o3",
+      "S02_o4",
+      "S02_o5"
+    ],
+    "S03": [
+      "S03_o1",
+      "S03_o2",
+      "S03_o3"
+    ],
+    "R02": [
+      "R02_o1"
+    ],
+    "R03": [
+      "R03_o1",
+      "R03_o2"
+    ],
+    "R04": [
+      "R04_o1",
+      "R04_o2",
+      "R04_o3"
+    ],
+    "R06": [
+      "R06_o1",
+      "R06_o2",
+      "R06_o3"
+    ],
+    "W01": [
+      "W01_o1",
+      "W01_o2",
+      "W01_o3"
+    ],
+    "W02": [
+      "W02_o1",
+      "W02_o2",
+      "W02_o3"
+    ],
+    "W03": [
+      "W03_o1",
+      "W03_o2",
+      "W03_o3"
+    ],
+    "W04": [
+      "W04_o1",
+      "W04_o2",
+      "W04_o3"
+    ],
+    "W05": [
+      "W05_o1",
+      "W05_o2",
+      "W05_o3"
+    ],
+    "W06": [
+      "W06_o1",
+      "W06_o2",
+      "W06_o3"
+    ]
+  }
+}
