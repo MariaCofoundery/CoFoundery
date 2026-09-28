@@ -152,7 +152,7 @@ test("derselbe Auslassungsgrund trägt je nach Frage einen anderen Satz", () => 
 
 test("die ausschließenden Optionen sind genau die zwei aus der Quelle", () => {
   const exclusive = getItemsV21().flatMap((item) =>
-    item.options.filter((option) => option.exclusive).map((option) => item.itemId));
+    item.options.filter((option) => option.exclusive).map(() => item.itemId));
   assert.deepEqual(exclusive.sort(), ["B05", "G02b"]);
 });
 

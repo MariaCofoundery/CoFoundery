@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import test from "node:test";
 
 /**
@@ -31,9 +31,18 @@ import test from "node:test";
  */
 
 const ROOT = "src";
-const V2 = join("src", "features", "instruments", "v2");
-const DEBUG = join("src", "app", "(product)", "debug");
-const MENTIONS = /instruments\/v2/;
+/**
+ * Mit abschliessendem Trennzeichen, und das ist kein Schoenheitsfehler.
+ *
+ * Ohne ihn zaehlt `src/features/instruments/v21/registryV21.ts` als
+ * v2-Datei - reiner Praefix-Zufall. Seit es v2.1 gibt, wuerde dieser Waechter
+ * dadurch die halbe neue Fassung stillschweigend verschlucken und trotzdem
+ * gruen bleiben.
+ */
+const V2 = join("src", "features", "instruments", "v2") + sep;
+const DEBUG = join("src", "app", "(product)", "debug") + sep;
+/** Ebenso: `instruments/v21/` ist kein Zugang zu v2. */
+const MENTIONS = /instruments\/v2\//;
 
 function* sourceFiles(dir: string): Generator<string> {
   for (const name of readdirSync(dir)) {
