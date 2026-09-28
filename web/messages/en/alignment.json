@@ -60,5 +60,14 @@
     "mark": "I want to talk about this",
     "markHint": "It then goes to the top of your conversation agenda — even if you both answered the same.",
     "changeCondition": "What would change your answer? (optional)"
+  },
+  "report": {
+    "title": "Your answers",
+    "intro": "This is not an assessment of you. It prepares the conversation that still lies ahead.",
+    "openTitle": "What is still open",
+    "openIntro": "This is the most useful part: exactly here is where you would talk.",
+    "limitsTitle": "What these answers cannot do",
+    "marked": "You marked this for discussion.",
+    "instrument": "Version: {instrument}"
   }
 }

@@ -60,5 +60,14 @@
     "mark": "Darüber möchte ich sprechen",
     "markHint": "Das steht dann oben auf eurer Gesprächsagenda — auch wenn ihr gleich geantwortet habt.",
     "changeCondition": "Was würde deine Antwort ändern? (freiwillig)"
+  },
+  "report": {
+    "title": "Deine Angaben",
+    "intro": "Das ist keine Auswertung deiner Person, sondern eine Vorbereitung auf das Gespräch, das noch kommt.",
+    "openTitle": "Was noch offen ist",
+    "openIntro": "Das ist der nützlichste Teil: Genau hier wäre zu sprechen.",
+    "limitsTitle": "Was diese Angaben nicht leisten",
+    "marked": "Von dir zur Besprechung markiert.",
+    "instrument": "Fassung: {instrument}"
   }
 }
