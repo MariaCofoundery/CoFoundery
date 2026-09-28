@@ -111,20 +111,29 @@ test("der Widerrufstext verspricht nicht mehr, als er halten kann", () => {
   }
 });
 
-test("Qualitätsprüfung und Forschung stehen getrennt im Text", () => {
-  // Maria am 28.09.2026: „Wir müssen ja unterscheiden zwischen den Daten, die
-  // ich für mich checke, ob das funktioniert, und Daten, die vielleicht
-  // wirklich in eine Forschung gehen. Das sind ja zwei Paar Schuhe."
+test("der Einwilligungstext beschreibt nur, wozu eingewilligt wird", () => {
+  // Maria am 28.09.2026: Der Absatz ueber die Qualitaetspruefung kann raus -
+  // "wenn wir eh nicht fragen muessen danach und keine Einwilligung dazu
+  // benoetigen, dann ist das ueberfluessig".
   //
-  // Vorher stand beides in einem Satz („für wissenschaftliche Forschung … und
-  // zur Weiterentwicklung unserer Messinstrumente"). Wer ablehnte, hätte damit
-  // auch die Prüfung der eigenen Fragen untersagt - und wer sie trotzdem
-  // vornimmt, handelt gegen den eigenen Text.
+  // Richtig, und zwar nicht nur der Kuerze wegen: Ein Einwilligungstext, der
+  // auch beschreibt, was OHNE Einwilligung geschieht, laesst offen, worauf
+  // sich das Ja bezieht. Die Auskunftspflicht ueber den uebrigen Betrieb
+  // bleibt - sie gehoert in die Datenschutzerklaerung, nicht in den Dialog,
+  // in dem jemand gerade eine Entscheidung trifft.
+  //
+  // WAS DER TEXT DAFUER NENNEN MUSS, ist das, was man sich am wenigsten
+  // denkt: dass Freitexte dazugehoeren und dass es das Produkt verlassen kann.
   for (const locale of ["de", "en"] as const) {
     const texts = JSON.parse(readFileSync(`messages/${locale}/researchConsent.json`, "utf8"));
     const body: string = texts.notice.body;
-    assert.match(body, locale === "de" ? /Davon getrennt/ : /Separately from that/);
-    assert.match(body, locale === "de" ? /keine Einwilligung/ : /do not need your consent/);
+
+    assert.match(body, locale === "de" ? /Freitexten/ : /free text/);
+    assert.match(body, locale === "de" ? /Veröffentlichung/ : /publication/);
+    assert.match(body, locale === "de" ? /freiwillig/ : /voluntary/);
+    // Und nichts ueber Dinge, fuer die gar nicht gefragt wird.
+    assert.ok(!/Davon getrennt|Separately from that/.test(body));
+    assert.ok(!/keine Einwilligung|do not need your consent/.test(body));
   }
 });
 
