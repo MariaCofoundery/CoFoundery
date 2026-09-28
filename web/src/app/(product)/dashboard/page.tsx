@@ -42,10 +42,7 @@ import {
 } from "@/features/onboarding/invitationFlow";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
-import { getResearchConsentState } from "@/features/research/consent";
-import { ResearchConsentSettings } from "@/features/research/ResearchConsentSettings";
 import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 type DashboardSearchParams = {
@@ -134,7 +131,6 @@ export default async function DashboardPage({
     founderTeams,
     discoveryProfile,
     assessmentProgressResult,
-    researchConsentState,
     connectCounts,
   ] =
     await Promise.all([
@@ -164,7 +160,6 @@ export default async function DashboardPage({
         .in("module", ["base", "values"])
         .eq("instrument_id", CURRENT_INSTRUMENT_ID)
         .order("created_at", { ascending: false }),
-      getResearchConsentState(supabase as unknown as SupabaseClient, user.id),
       // Haengt von nichts hier ab und lief trotzdem hinterher - eine
       // Netzwerkrunde extra auf der meistbesuchten Seite.
       getActiveOwnConnectCounts(supabase, user.id).catch(() => ({ seeking: 0, offering: 0 })),
@@ -709,7 +704,9 @@ export default async function DashboardPage({
               <a href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`} className={UTILITY_CTA_CLASS}>{t("actions.contactSupport")}</a>
               <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
             </div>
-            <ResearchConsentSettings initialState={researchConsentState} />
+            {/* Der Schalter steht im Account und nur dort. Am 28.09.2026 gemeldet:
+                "Ich habe die mehrmals gestellt bekommen, das war ein bisschen viel."
+                Er stand hier UND im Account - zwei Zeilen ueber dem Link dorthin. */}
             <Link href="/account" className={UTILITY_CTA_CLASS}>{t("account.manage")}</Link>
           </div>
         </details>

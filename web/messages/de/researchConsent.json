@@ -2,20 +2,20 @@
   "notice": {
     "eyebrow": "Forschung & Produktentwicklung",
     "title": "Hilf uns, Zusammenarbeit in Founder-Teams besser zu verstehen.",
-    "body": "Wenn du möchtest, dürfen wir ausgewählte strukturierte Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams und zur Weiterentwicklung unserer Messinstrumente verwenden.\n\nDeine Teilnahme ist freiwillig. Du kannst CoFoundery genauso nutzen, wenn du nicht teilnimmst.",
+    "body": "Wenn du möchtest, dürfen wir deine Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams verwenden — einschließlich Freitexten und auch außerhalb von CoFoundery, etwa in einer Veröffentlichung.\n\nDavon getrennt: Um zu prüfen, ob unsere Fragen verständlich sind, sehen wir uns an, wie oft welche Antwortmöglichkeit gewählt wurde. Das geschieht ohne Bezug zu einzelnen Personen und gehört zum Betrieb von CoFoundery — dafür brauchen wir keine Einwilligung und fragen dich deshalb auch nicht danach.\n\nDeine Teilnahme ist freiwillig. Du kannst CoFoundery genauso nutzen, wenn du nicht teilnimmst.",
     "decline": "Nein, danke",
     "accept": "An Forschung teilnehmen",
     "error": "Deine Auswahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
   },
   "settings": {
     "title": "Forschungsteilnahme",
-    "description": "Du entscheidest freiwillig, ob ausgewählte strukturierte Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung verwendet werden dürfen.",
+    "description": "Du entscheidest freiwillig, ob deine Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung verwendet werden dürfen — einschließlich Freitexten. Ob unsere Fragen verständlich sind, prüfen wir davon unabhängig anhand von Häufigkeiten ohne Personenbezug.",
     "statusLabel": "Status:",
     "active": "Aktiv",
     "inactive": "Nicht aktiv",
     "activate": "Teilnahme aktivieren",
     "withdraw": "Teilnahme beenden",
-    "withdrawal": "Nach dem Beenden werden keine neuen Research-Events gespeichert. Noch zuordenbare Rohdaten aus deiner Teilnahme werden gelöscht; bereits zusammengefasste, nicht mehr dir zuordenbare Auswertungen können bestehen bleiben.",
+    "withdrawal": "Nach dem Beenden speichern wir keine neuen Forschungsdaten mehr, und die noch dir zuordenbaren löschen wir.\n\nWas sich nicht rückgängig machen lässt: Auswertungen, in denen deine Angaben bereits mit denen anderer zusammengefasst wurden. Aus einer Häufigkeit über hundert Menschen lässt sich dein Anteil nicht wieder herausrechnen, und was veröffentlicht wurde, bleibt veröffentlicht.",
     "error": "Die Einstellung konnte gerade nicht geändert werden. Bitte versuche es erneut."
   }
 }

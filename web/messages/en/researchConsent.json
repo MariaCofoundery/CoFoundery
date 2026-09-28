@@ -2,20 +2,20 @@
   "notice": {
     "eyebrow": "Research & product development",
     "title": "Help us better understand collaboration in founder teams.",
-    "body": "If you choose to participate, we may use selected structured answers and usage data in pseudonymized form for scientific research on collaboration in founder teams and to improve our measurement instruments.\n\nParticipation is voluntary. You can use CoFoundery in exactly the same way if you choose not to participate.",
+    "body": "If you like, we may use your answers and usage data in pseudonymised form for scientific research on collaboration in founding teams — including free text, and also outside CoFoundery, for example in a publication.\n\nSeparately from that: to check whether our questions are understandable, we look at how often each answer option was chosen. That happens without reference to individuals and is part of running CoFoundery — we do not need your consent for it and therefore do not ask.\n\nTaking part is voluntary. You can use CoFoundery just the same if you do not.",
     "decline": "No, thanks",
     "accept": "Participate in research",
     "error": "We couldn't save your choice right now. Please try again."
   },
   "settings": {
     "title": "Research participation",
-    "description": "You decide voluntarily whether selected structured answers and usage data may be used in pseudonymized form for scientific research.",
+    "description": "You decide freely whether your answers and usage data may be used in pseudonymised form for scientific research — including free text. Whether our questions are understandable is checked separately, using frequencies without any reference to individuals.",
     "statusLabel": "Status:",
     "active": "Active",
     "inactive": "Not active",
     "activate": "Enable participation",
     "withdraw": "End participation",
-    "withdrawal": "After you end participation, no new research events are stored. Raw data that can still be linked to your participation is deleted; previously aggregated results that can no longer be linked to you may remain.",
+    "withdrawal": "After you stop, we store no new research data and delete what can still be attributed to you.\n\nWhat cannot be undone: analyses in which your answers have already been combined with those of others. Your share cannot be subtracted back out of a frequency across a hundred people, and what has been published stays published.",
     "error": "We couldn't update this setting right now. Please try again."
   }
 }
