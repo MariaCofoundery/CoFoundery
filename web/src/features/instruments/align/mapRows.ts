@@ -83,3 +83,59 @@ export function differenceGroups(
     }))
     .filter((group) => group.rows.length > 0);
 }
+
+/**
+ * Die sechs Ziele mit ihrer Wichtigkeit - für das Richtungsbild.
+ *
+ * ---------------------------------------------------------------------------
+ * SECHS ZEILEN UND KEIN RADAR
+ * ---------------------------------------------------------------------------
+ *
+ * Die Spezifikation empfiehlt für den Desktop ein Radar-Diagramm. Es wird
+ * keins: Ein Radar über sechs Achsen macht aus sechs Antworten eine FLÄCHE,
+ * und eine Fläche lädt dazu ein, sie mit einer anderen zu vergleichen —
+ * „größer" heißt dann „ehrgeiziger". Das wäre ein Gesamtwert über einem
+ * Instrument, das ausdrücklich keinen hat.
+ *
+ * Sechs Zeilen nebeneinander zeigen dasselbe, ohne es zu addieren.
+ *
+ * Und ohne Zahl: Die Spezifikation schreibt „██████████ 5". Die Ziffer fällt
+ * weg, die Beschriftung bleibt.
+ */
+export type DirectionRow = {
+  itemId: string;
+  label: string;
+  ordinal: OrdinalValue | null;
+  /** Der Grund, wenn jemand nicht geantwortet hat. Keine Lücke, eine Auskunft. */
+  missing: { code: string; label: string } | null;
+  /** Von der Person als besonders wichtig markiert (S01_top). */
+  top: boolean;
+};
+
+export function directionRows(
+  entries: ReadoutEntry[],
+  items: { itemId: string; shortLabel?: string; prompt: string }[],
+): DirectionRow[] {
+  const nachId = new Map(entries.map((entry) => [entry.itemId, entry]));
+
+  // Die Vorrangfrage nennt die Ziele mit ihrem ganzen Satz - so stehen sie
+  // dort zur Wahl. Verglichen wird deshalb ueber den Satz und nicht ueber eine
+  // Kennung, die es in der Antwort gar nicht gibt.
+  const top = nachId.get("S01_top");
+  const gewaehlt = new Set(
+    top?.value?.kind === "choices" ? top.value.labels : [],
+  );
+
+  return items
+    .filter((item) => /^S01[a-f]$/.test(item.itemId))
+    .map((item) => {
+      const entry = nachId.get(item.itemId);
+      return {
+        itemId: item.itemId,
+        label: item.shortLabel ?? item.prompt,
+        ordinal: ordinalOf(entry),
+        missing: entry?.missing ?? null,
+        top: gewaehlt.has(item.prompt),
+      };
+    });
+}

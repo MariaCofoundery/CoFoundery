@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
-import { WorkMap } from "@/features/instruments/align/AlignMaps";
+import { VentureDirection, WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
 import { VENTURE_ALIGNMENT, getItemsV22 } from "@/features/instruments/align/registries";
 import { withPartner } from "@/features/instruments/align/questionnaireData";
@@ -89,6 +89,16 @@ export default async function VentureAnswersPage({
           {/* DAS BILD VOR DER LISTE. Es zeigt dieselben Antworten kompakt -
               wer den Ueberblick hat, liest die Liste anders als jemand, der
               sich durch sechzehn Kaesten arbeitet. */}
+          {/* DIE RICHTUNG ZUERST. Wohin es gehen soll, ordnet alles
+              darunter - Zusagen und Regeln liest man anders, wenn man das
+              Ziel kennt. */}
+          <div className="mb-8">
+            <VentureDirection
+              entries={report.sections.flatMap((group) => group.entries)}
+              items={getItemsV22("venture_alignment")}
+            />
+          </div>
+
           <div className="mb-8">
             <WorkMap sections={report.sections} />
           </div>

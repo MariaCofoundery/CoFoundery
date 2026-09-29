@@ -109,7 +109,7 @@ Heute ist die Agenda in der Reihenfolge des Fragebogens. Das war eine bewusste
 Entscheidung gegen eine Sortierung nach Schwere — die Kategorien hier sind
 aber keine Schwere, sondern Art. Das geht.
 
-### ◐ 6. Grafiken — zwei von vier gebaut
+### ◐ 6. Grafiken — drei von vier gebaut
 
 - ☑ **Founder Work Map** — `WorkMap` in `AlignMaps.tsx`, auf beiden
   Antwortseiten und in der Advisor-Ansicht. Ein Punkt je Antwort, kein
@@ -119,9 +119,13 @@ aber keine Schwere, sondern Art. Das geht.
 - ☑ **Team Difference Map** — `DifferenceMap`, Hantel je Frage auf der
   Vergleichsseite. Nur wo beide geantwortet haben und beide Skalen gleich lang
   sind. Keine Abstandszahl: `stepsApart` ist bewusst entfernt.
-- ☐ **Venture Direction** — braucht Punkt 8 (S01 als sechs Wichtigkeiten).
-  Heute ist S01 eine Mehrfachauswahl; ein Radar daraus wäre eine erfundene
-  Abstufung zwischen „genannt“ und „nicht genannt“.
+- ☑ **Venture Direction** — `VentureDirection`, sechs Ziele nebeneinander auf
+  der Antwortseite zum Vorhaben. **Kein Radar**, obwohl die Spezifikation es
+  für Desktop empfiehlt: Ein Radar über sechs Achsen macht aus sechs Antworten
+  eine Fläche, und eine Fläche lädt dazu ein, sie mit einer anderen zu
+  vergleichen — „größer" hieße dann „ehrgeiziger". Das wäre ein Gesamtwert
+  über einem Instrument, das keinen hat. Ein offenes Ziel bekommt seinen Satz
+  und keinen Punkt ganz links: Unentschieden sieht sonst aus wie abgelehnt.
 - ☐ **Dot Plot ab drei Personen** — es gibt keinen Dreiervergleich. Der
   Vergleich ist durchgängig auf zwei Personen gebaut (`compareV21(a, b)`), und
   das ist keine Lücke in der Grafik, sondern im Modell darunter.

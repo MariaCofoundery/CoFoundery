@@ -1,6 +1,12 @@
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
-import { workMapGroups, differenceGroups } from "@/features/instruments/align/mapRows";
+import {
+  workMapGroups,
+  differenceGroups,
+  directionRows,
+  type DirectionRow,
+} from "@/features/instruments/align/mapRows";
+import type { ReadoutEntry as Entry } from "@/features/instruments/v21/readoutV21";
 
 /**
  * Die Übersichtsbilder - und was sie ausdrücklich NICHT sind.
@@ -218,5 +224,79 @@ function Hantel({ a, b, of }: { a: number; b: number; of: number }) {
         style={{ left: `${anteil(a)}%` }}
       />
     </div>
+  );
+}
+
+/**
+ * Wohin das Vorhaben soll - sechs Ziele nebeneinander.
+ *
+ * ---------------------------------------------------------------------------
+ * KEIN RADAR, UND DAS IST KEINE GESCHMACKSFRAGE
+ * ---------------------------------------------------------------------------
+ *
+ * Ein Radar über sechs Achsen macht aus sechs Antworten eine FLÄCHE, und eine
+ * Fläche lädt dazu ein, sie mit einer anderen zu vergleichen — „größer" hieße
+ * dann „ehrgeiziger". Das wäre ein Gesamtwert über einem Instrument, das
+ * ausdrücklich keinen hat.
+ *
+ * ---------------------------------------------------------------------------
+ * EIN OFFENES ZIEL IST KEINE NULL
+ * ---------------------------------------------------------------------------
+ *
+ * Wer „habe ich noch nicht entschieden" wählt, bekommt keine leere Zeile und
+ * keinen Punkt ganz links. Er bekommt seinen Satz — sonst sähe eine
+ * unentschiedene Richtung aus wie eine abgelehnte.
+ */
+export function VentureDirection({
+  entries,
+  items,
+}: {
+  entries: Entry[];
+  items: { itemId: string; shortLabel?: string; prompt: string }[];
+}) {
+  const rows = directionRows(entries, items);
+  const beantwortet = rows.filter((row) => row.ordinal || row.missing);
+
+  if (beantwortet.length === 0) return null;
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <h2 className="text-base font-semibold text-slate-900">Wohin es gehen soll</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Sechs Ziele nebeneinander, jedes mit der Wichtigkeit, die du ihm gegeben hast.
+        Sie werden nicht verrechnet — keins geht auf Kosten eines anderen, und es gibt
+        keine Summe.
+      </p>
+
+      <ul className="mt-5 space-y-3">
+        {rows.map((row) => (
+          <li key={row.itemId} className="sm:flex sm:items-center sm:gap-4">
+            <span className="block text-sm text-slate-700 sm:w-64 sm:shrink-0">
+              {row.label}
+              {/* Die Markierung sagt: dieses hier zuerst. Sie ist keine
+                  hoehere Stufe - man kann ein "mittel" wichtiges Ziel
+                  voranstellen, weil es gerade dran ist. */}
+              {row.top && (
+                <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] text-white">
+                  zuerst
+                </span>
+              )}
+            </span>
+            <span className="mt-1 flex items-center gap-3 sm:mt-0">
+              {row.ordinal ? (
+                <>
+                  <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
+                  <span className="text-sm text-slate-900">{row.ordinal.label}</span>
+                </>
+              ) : (
+                <span className="text-sm text-slate-500">
+                  {row.missing?.label ?? "noch keine Angabe"}
+                </span>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

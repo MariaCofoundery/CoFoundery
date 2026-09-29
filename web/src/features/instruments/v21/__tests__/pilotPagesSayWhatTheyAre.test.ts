@@ -286,6 +286,8 @@ test("in den Übersichtsbildern wird nichts zusammengerechnet", () => {
     join("src", "features", "instruments", "align", "AlignMaps.tsx"),
     join("src", "features", "instruments", "align", "mapRows.ts"),
   ]) {
+    // Auch das Richtungsbild: Die Spezifikation schreibt dort
+    // "██████████ 5". Die Ziffer faellt weg, die Beschriftung bleibt.
     // Ohne Kommentare: Die Dateien ERKLAEREN, warum hier kein Mittelwert
     // entsteht - und das Wort im Kommentar ist kein Mittelwert.
     const code = readFileSync(datei, "utf8")

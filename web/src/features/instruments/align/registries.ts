@@ -109,6 +109,15 @@ export type RegistryItemV22 = {
    */
   groupPrompt?: string;
   /**
+   * Ein kurzer Name für ein Bild.
+   *
+   * „Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich
+   * Einkommen erwirtschaften kann" passt in keine Zeile neben einer Achse.
+   * Der kurze Name steht im Sprachreview in der Überschrift — er wird
+   * übernommen und nicht erfunden, sonst würde das Ziel unterwegs umbenannt.
+   */
+  shortLabel?: string;
+  /**
    * Höchstens so viele Haken.
    *
    * Nur bei `multi_choice`. Weniger ist ausdrücklich kein Mangel — die Zahl

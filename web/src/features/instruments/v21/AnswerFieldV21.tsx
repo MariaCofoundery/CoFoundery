@@ -717,6 +717,23 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
   }
 }
 
+/**
+ * Der Auslassungsgrund - getrennt von der Skala, und sichtbar getrennt.
+ *
+ * ---------------------------------------------------------------------------
+ * ER IST KEINE SECHSTE STUFE
+ * ---------------------------------------------------------------------------
+ *
+ * Sprachreview v0.1, Abschnitt 3.2: „kann ich noch nicht einschätzen" wird
+ * nicht als weitere Antwortmöglichkeit in derselben Skala dargestellt. Sonst
+ * liest es sich wie ein Extrem - hinter „fast immer" käme „kann ich nicht
+ * einschätzen", und wer schnell klickt, nimmt das Letzte für das Höchste.
+ *
+ * Die Trennlinie ist deshalb kein Schmuck. Sie sagt: Was oben steht, ist eine
+ * Antwort auf die Frage; was hier steht, ist eine Entscheidung darüber, sie
+ * nicht zu beantworten. Beides ist erlaubt, beides ist eine Auskunft - aber
+ * nicht dieselbe Art von Auskunft.
+ */
 function MissingChoices({
   offered,
   chosen,
@@ -730,6 +747,11 @@ function MissingChoices({
 }) {
   if (offered.length === 0) return null;
   return (
+    <>
+    <div className="border-t border-dashed border-slate-300 pt-3">
+      <p className="mb-2 text-[11px] uppercase tracking-wide text-slate-400">
+        {offered.length === 1 ? "oder" : "oder eines davon"}
+      </p>
     <div className="flex flex-wrap gap-2">
       {offered.map((entry) => (
         <button
@@ -747,5 +769,7 @@ function MissingChoices({
         </button>
       ))}
     </div>
+    </div>
+    </>
   );
 }

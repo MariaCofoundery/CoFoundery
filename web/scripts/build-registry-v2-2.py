@@ -432,10 +432,17 @@ def s01_neu():
     skala = _nummern_nach(teil, "Antwortskala für alle sechs Items:")
     top_frage = _zitate(teil[teil.index("## 2.3"):])[0]
 
+    # Die Ueberschrift traegt den kurzen Namen: "### S01a — Wirtschaftliche
+    # Tragfaehigkeit". Ein Bild braucht ihn - der ganze Satz passt in keine
+    # Zeile, und ihn selbst zu erfinden hiesse, das Ziel umzubenennen.
     ziele = []
     for kennung in ["S01a", "S01b", "S01c", "S01d", "S01e", "S01f"]:
         block = teil[teil.index(f"### {kennung}"):]
-        ziele.append((kennung, _zitate(block)[0]))
+        # `block` beginnt bei "### S01a", die erste Zeile traegt also noch
+        # die Marken der Ueberschrift.
+        kopf = block.split("\n", 1)[0].lstrip("# ").strip()
+        kurz = re.sub(r"^S01[a-f]\s*[—–-]\s*", "", kopf).strip()
+        ziele.append((kennung, _zitate(block)[0], kurz))
 
     return gemeinsam, skala, top_frage, ziele
 
@@ -512,11 +519,12 @@ _gemeinsam, _skala, _top_frage, _ziele = s01_neu()
 items["S01"]["retired"] = True
 
 _s01_neu = []
-for kennung, ziel in _ziele:
+for kennung, ziel, kurz in _ziele:
     _s01_neu.append((kennung, collections.OrderedDict([
         ("itemId", kennung),
         ("section", items["S01"]["section"]),
         ("groupPrompt", _gemeinsam),
+        ("shortLabel", kurz),
         ("prompt", ziel),
         ("hint", None),
         ("options", list(_skala)),
@@ -531,7 +539,7 @@ _s01_neu.append(("S01_top", collections.OrderedDict([
     ("groupPrompt", None),
     ("prompt", _top_frage),
     ("hint", None),
-    ("options", [ziel for _, ziel in _ziele]),
+    ("options", [ziel for _, ziel, _kurz in _ziele]),
     ("missing", [{"code": "not_decided", "label": MISSING_LABEL["not_decided"]}]),
     ("note", "Welche ein oder zwei Ziele aktuell vorgehen. Die Zahl der Haken ist keine Auskunft - hoechstens zwei sind erlaubt, weniger ist kein Mangel."),
     ("maxChoices", 2),
@@ -569,6 +577,8 @@ for n, item_id in enumerate(reihenfolge, start=1):
     ])
     if it.get("groupPrompt"):
         eintrag["groupPrompt"] = it["groupPrompt"]
+    if it.get("shortLabel"):
+        eintrag["shortLabel"] = it["shortLabel"]
     if it.get("maxChoices"):
         eintrag["maxChoices"] = it["maxChoices"]
     if it.get("retired"):

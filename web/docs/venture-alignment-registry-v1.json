@@ -505,7 +505,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Wirtschaftliche Tragfähigkeit"
     },
     {
       "itemId": "S01b",
@@ -553,7 +554,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Wachstum & Skalierung"
     },
     {
       "itemId": "S01c",
@@ -601,7 +603,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Gesellschaftliche / ökologische Wirkung"
     },
     {
       "itemId": "S01d",
@@ -649,7 +652,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Exit-Perspektive"
     },
     {
       "itemId": "S01e",
@@ -697,7 +701,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Fachliche / technologische Verwirklichung"
     },
     {
       "itemId": "S01f",
@@ -745,7 +750,8 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "shortLabel": "Unternehmerische Unabhängigkeit"
     },
     {
       "itemId": "S01_top",
